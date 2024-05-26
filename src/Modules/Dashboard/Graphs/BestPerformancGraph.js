@@ -33,10 +33,16 @@ const BestPerformersChart = ({ data }) => {
 
   return (
     <div
-      className="max-w-4xl mx-auto p-7 "
-      style={{ width: "500px", height: "500px", margin: "auto" }}
+      className="max-w-4xl mx-auto p-2   shadow-md"
+      style={{ width: "500px", height: "350px", margin: "auto" }}
     >
-      <h2>Best Performance</h2>
+      <div className="flex justify-between items-center mb-8">
+        <h2 className="text-lg font-semibold">Best Performers</h2>
+        <select className="border border-gray-300 rounded-md p-2">
+          <option>Week</option>
+          <option>Month</option>
+        </select>
+      </div>
       <Bar data={chartData} options={options} />
     </div>
   );

@@ -1,16 +1,18 @@
 import React from "react";
-import StudentRightSide from "../../../Assets/StudentAssets/StudentRightSide.png";
+import StudentRightSide from "../../../../Assets/StudentAssets/StudentRightSide.png";
 import StudentLoginForm from "./StudentLoginForm";
-import Layout from "../../../Components/Layout";
+import Layout from "../../../../Components/Layout";
 import QIDLogin from "./QIDLogin";
 import { useSelector } from "react-redux";
 const StudentLogin = () => {
   const Auth = useSelector((store) => store.Auth.isLogedIn);
+  // const isSigninPage = useSelector((store) => store.Auth.isSignInPage);
+
   return (
     <Layout title="Student Login">
       <div className="grid grid-cols-1 md:grid-cols-12 h-screen">
         <div className="md:col-span-7  flex items-center justify-center">
-          {Auth ? <QIDLogin /> : <StudentLoginForm />}
+          {Auth ? <QIDLogin /> : <> {<StudentLoginForm />}</>}
         </div>
         <div className="md:col-span-5 relative">
           <div className="max-h-screen overflow-hidden">

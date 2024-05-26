@@ -1,7 +1,7 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
-import { setAuth } from "../../Redux/Slices/AuthSlice.js";
+import { setAuth } from "../../../Redux/Slices/AuthSlice.js";
 const useStudentLogin = () => {
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();

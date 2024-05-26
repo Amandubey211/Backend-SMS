@@ -3,14 +3,17 @@ import Error from "../Components/Error";
 import Offline from "../Components/Offline";
 import Home from "../Modules/HomePage/Home";
 import ParentLogin from "../Modules/LoginPages/Parent/ParentLogin";
-import StudentLogin from "../Modules/LoginPages/Student/StudentLogin";
+import StudentLogin from "../Modules/LoginPages/Student/Login/StudentLogin.js";
 import TeacherLogin from "../Modules/LoginPages/Teacher/TeacherLogin";
 import "./App.css";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import StudentDiwanLogo from "../Assets/HomeAssets/StudentDiwanLogo.png";
 import ProtectRoute from "../Routes/ProtectedRoutes/ProtectedRoute";
+import StudentSignUp from "../Modules/LoginPages/Student/SignUp/StudentSignUp.js";
+
 function App() {
   const Dash = lazy(() => import("../Modules/Dashboard/Dash.js"));
+  const Classes = lazy(() => import("../Modules/Classes/Classes.js"));
 
   const [isOnline, setIsOnline] = useState(window.navigator.onLine);
   useEffect(() => {
@@ -47,21 +50,30 @@ function App() {
       errorElement: <Error />,
     },
     {
+      path: "/signup",
+      element: <StudentSignUp />,
+      errorElement: <Error />,
+    },
+    {
       path: "/dash",
       element: <ProtectRoute Component={Dash} />,
+      errorElement: <Error />,
+    },
+    {
+      path: "/classes",
+      element: <ProtectRoute Component={Classes} />,
       errorElement: <Error />,
     },
   ]);
   return (
     <>
-      {/* Render OfflineMessage component if offline */}
       {!isOnline && <Offline />}
       <Suspense
         fallback={
           <div className="flex justify-center items-center w-screen h-screen">
             <img src={StudentDiwanLogo} className="h-20" alt="student diwan " />
           </div>
-        } // Render Loader component while loading
+        }
       >
         <RouterProvider router={AppRouter} />
       </Suspense>

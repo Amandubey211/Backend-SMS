@@ -1,25 +1,21 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
-import { setAuth } from "../../Redux/Slices/AuthSlice.js";
+import { setAuth } from "../../../Redux/Slices/AuthSlice.js";
 import { useNavigate } from "react-router-dom";
-const useTeacherLogin = () => {
+const useQidVerification = () => {
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const teacherLogin = async (teacherDetails) => {
+  const navigage = useNavigate();
+  const verify = async (studentDetails) => {
     try {
       setLoading(true);
-      if (!teacherDetails) return;
-      const { Email, Password } = teacherDetails;
+      const { Email, Password } = studentDetails;
       setTimeout(() => {
         dispatch(setAuth(true));
+        toast.success("Verifyed Successfully", { position: "bottom-left" });
+        navigage("/dash");
         setLoading(false);
-        navigate("/dash");
-
-        toast.success(`Teacher Logged In successfully ${Email},${Password}`, {
-          position: "bottom-left",
-        });
       }, 3000);
     } catch (error) {
       toast.error("Something went wrong");
@@ -28,8 +24,8 @@ const useTeacherLogin = () => {
 
   return {
     loading,
-    teacherLogin,
+    verify,
   };
 };
 
-export default useTeacherLogin;
+export default useQidVerification;

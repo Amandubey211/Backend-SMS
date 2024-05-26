@@ -1,16 +1,20 @@
 import React, { useState } from "react";
-import Logo from "../../../Components/Logo";
+import Logo from "../../../../Components/Logo";
 import { NavLink } from "react-router-dom";
 import { FaEye } from "react-icons/fa";
 import { PiEyeClosedFill } from "react-icons/pi";
-import useStudentLogin from "../../../Hooks/LoginsHooks/useStudentLogin";
+import useStudentLogin from "../../../../Hooks/AuthHooks/Student/useStudentLogin";
 import toast from "react-hot-toast";
 import { LuLoader } from "react-icons/lu";
+// import { setIsSignInPage } from "../../../Redux/Slices/AuthSlice";
+// import { useDispatch } from "react-redux";
+
 const StudentLoginForm = () => {
   const [StudentDetails, setStudentDetails] = useState({
     Email: "",
     Password: "",
   });
+  // const dispatch = useDispatch();
   const HandleSubmit = (e) => {
     e.preventDefault();
     if (!StudentDetails) return toast.error("please add the required details");
@@ -115,6 +119,16 @@ const StudentLoginForm = () => {
               )}
             </button>
           </form>
+          <div className="text-center py-2">
+            <span className="opacity-70">New to Student Diwan?</span>{" "}
+            <NavLink
+              // onClick={() => dispatch(setIsSignInPage(false))}
+              className="text-indigo-600 hover:text-indigo-900"
+              to="/signUp"
+            >
+              Apply Now
+            </NavLink>
+          </div>
         </div>
       </div>
     </div>

@@ -42,7 +42,7 @@ const Events = () => {
   ];
 
   return (
-    <div className="max-w-4xl mt-3 me-1 mx-auto bg-white p-6 rounded-lg ">
+    <div className="max-w-4xl mt-3 me-1 border mx-auto bg-white p-6 rounded-lg ">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-semibold">Event</h2>
         <button className="text-blue-600">View all</button>
@@ -84,6 +84,10 @@ const Events = () => {
         <div className="relative">
           <select className="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
             <option>Month</option>
+            <option>Jan-mar</option>
+            <option>Apr-Jun</option>
+            <option>Jul-Sep</option>
+            <option>Oct-Dec</option>
             {/* Add other month options here */}
           </select>
           <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">

@@ -4,7 +4,7 @@ import { NavLink } from "react-router-dom";
 import { FaEye } from "react-icons/fa";
 import { PiEyeClosedFill } from "react-icons/pi";
 import toast from "react-hot-toast";
-import useParentLogin from "../../../Hooks/LoginsHooks/useParentLogin";
+import useParentLogin from "../../../Hooks/AuthHooks/Parent/useParentLogin";
 import { LuLoader } from "react-icons/lu";
 const ParentForm = () => {
   const [ParentDetails, setParentDetails] = useState({

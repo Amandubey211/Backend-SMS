@@ -11,6 +11,7 @@ import BestPerformersChart from "./Graphs/BestPerformancGraph.js";
 import performanceData from "./DashboardData/PerformanceData.js";
 import noticeData from "./DashboardData/NoticeData.js";
 import Notice from "./NoticeModule/Notice.js";
+import NoticeBoard from "./NoticeModule/NoticeBoard.js";
 
 const MainSection = () => {
   return (
@@ -37,7 +38,7 @@ const MainSection = () => {
             <TotalStudentsGraphjs />
           </div>
         </div>
-        <div className="flex flex-wrap justify-between ">
+        <div className="flex flex-wrap mt-3 justify-between ">
           <div className="w-full md:w-1/2">
             <BestPerformersChart data={performanceData} />
           </div>
@@ -45,11 +46,12 @@ const MainSection = () => {
             <Library />
           </div>
         </div>
+
         <div className="flex flex-wrap justify-between ">
           <div className="w-full md:w-1/2">
-            <Notice notice={noticeData} />
+            <NoticeBoard />
           </div>
-          <div className="w-full md:w-1/2">
+          <div className="w-full md:w-2/4">
             <Events />
           </div>
         </div>

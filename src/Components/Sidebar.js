@@ -8,7 +8,6 @@ import {
   FaClipboardList,
   FaUniversity,
 } from "react-icons/fa";
-import { FiChevronDown } from "react-icons/fi";
 import { NavLink } from "react-router-dom";
 
 const Sidebar = ({ isOpen }) => {
@@ -31,9 +30,14 @@ const Sidebar = ({ isOpen }) => {
         {isOpen && <h2 className="text-gray-500">MENU</h2>}
         <ul className="mt-2 space-y-2">
           <NavLink
-            className={`flex items-center p-2 text-purple-500 bg-purple-100 rounded-lg ${
-              isOpen ? "" : "justify-center"
-            }`}
+            to="/dash"
+            className={({ isActive }) =>
+              `flex items-center p-2 rounded-lg ${
+                isActive
+                  ? "text-purple-500 bg-purple-100"
+                  : "text-gray-700 hover:bg-gray-100"
+              } ${isOpen ? "" : "justify-center"}`
+            }
           >
             <FaChalkboardTeacher className="w-5 h-5" />
             {isOpen && (
@@ -43,9 +47,14 @@ const Sidebar = ({ isOpen }) => {
             )}
           </NavLink>
           <NavLink
-            className={`flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg ${
-              isOpen ? "" : "justify-center"
-            }`}
+            to="/classes"
+            className={({ isActive }) =>
+              `flex items-center p-2 rounded-lg ${
+                isActive
+                  ? "text-purple-500 bg-purple-100"
+                  : "text-gray-700 hover:bg-gray-100"
+              } ${isOpen ? "" : "justify-center"}`
+            }
           >
             <FaUniversity className="w-5 h-5" />
             {isOpen && (
@@ -55,9 +64,14 @@ const Sidebar = ({ isOpen }) => {
             )}
           </NavLink>
           <NavLink
-            className={`flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg ${
-              isOpen ? "" : "justify-center"
-            }`}
+            to="/users"
+            className={({ isActive }) =>
+              `flex items-center p-2 rounded-lg ${
+                isActive
+                  ? "text-purple-500 bg-purple-100"
+                  : "text-gray-700 hover:bg-gray-100"
+              } ${isOpen ? "" : "justify-center"}`
+            }
           >
             <FaUsers className="w-5 h-5" />
             {isOpen && (
@@ -68,9 +82,14 @@ const Sidebar = ({ isOpen }) => {
           </NavLink>
 
           <NavLink
-            className={`flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg ${
-              isOpen ? "" : "justify-center"
-            }`}
+            to="/accounting"
+            className={({ isActive }) =>
+              `flex items-center p-2 rounded-lg ${
+                isActive
+                  ? "text-purple-500 bg-purple-100"
+                  : "text-gray-700 hover:bg-gray-100"
+              } ${isOpen ? "" : "justify-center"}`
+            }
           >
             <FaBook className="w-5 h-5" />
             {isOpen && (
@@ -80,9 +99,14 @@ const Sidebar = ({ isOpen }) => {
             )}
           </NavLink>
           <NavLink
-            className={`flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg ${
-              isOpen ? "" : "justify-center"
-            }`}
+            to="/graduated"
+            className={({ isActive }) =>
+              `flex items-center p-2 rounded-lg ${
+                isActive
+                  ? "text-purple-500 bg-purple-100"
+                  : "text-gray-700 hover:bg-gray-100"
+              } ${isOpen ? "" : "justify-center"}`
+            }
           >
             <FaUserGraduate className="w-5 h-5" />
             {isOpen && (
@@ -93,9 +117,14 @@ const Sidebar = ({ isOpen }) => {
           </NavLink>
 
           <NavLink
-            className={`flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg ${
-              isOpen ? "" : "justify-center"
-            }`}
+            to="/admissions"
+            className={({ isActive }) =>
+              `flex items-center p-2 rounded-lg ${
+                isActive
+                  ? "text-purple-500 bg-purple-100"
+                  : "text-gray-700 hover:bg-gray-100"
+              } ${isOpen ? "" : "justify-center"}`
+            }
           >
             <FaClipboardList className="w-5 h-5" />
             {isOpen && (
@@ -105,9 +134,14 @@ const Sidebar = ({ isOpen }) => {
             )}
           </NavLink>
           <NavLink
-            className={`flex items-center p-2 text-gray-700 hover:bg-gray-100 rounded-lg ${
-              isOpen ? "" : "justify-center"
-            }`}
+            to="/noticeboard"
+            className={({ isActive }) =>
+              `flex items-center p-2 rounded-lg ${
+                isActive
+                  ? "text-purple-500 bg-purple-100"
+                  : "text-gray-700 hover:bg-gray-100"
+              } ${isOpen ? "" : "justify-center"}`
+            }
           >
             <FaClipboardList className="w-5 h-5" />
             {isOpen && (

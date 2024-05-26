@@ -13,7 +13,7 @@ const DashLayout = ({ children }) => {
       <Sidebar isOpen={isSidebarOpen} />
       <div
         className={`transition-all duration-300 ${
-          isSidebarOpen ? "w-4/5" : "w-[96%]" // 80% or 96% width when sidebar is toggled
+          isSidebarOpen ? "w-4/5" : "w-[96%]"
         } flex-1`}
       >
         <Navbar toggleSidebar={() => dispatch(toggleSidebar())} />

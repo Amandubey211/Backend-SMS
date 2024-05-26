@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import Logo from "../../../Components/Logo";
+import Logo from "../../../../Components/Logo";
 import { NavLink } from "react-router-dom";
 import { FaEye } from "react-icons/fa";
 import { PiEyeClosedFill } from "react-icons/pi";
 import toast from "react-hot-toast";
-import useQidVerification from "../../../Hooks/LoginsHooks/useQIDVerify";
+import useQidVerification from "../../../../Hooks/AuthHooks/Student/useQIDVerify";
 import { LuLoader } from "react-icons/lu";
 
 const QIDLogin = () => {

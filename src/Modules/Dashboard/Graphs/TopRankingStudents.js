@@ -55,7 +55,7 @@ const TopRankingStudents = () => {
   ];
 
   return (
-    <div className="max-w-4xl mx-auto bg-white p-4 rounded-lg ">
+    <div className="max-w-4xl mx-auto bg-white shadow-md p-4 rounded-lg ">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-semibold">Top Ranking Students</h2>
         <div className="relative">
@@ -93,7 +93,7 @@ const TopRankingStudents = () => {
               style={{
                 background: "linear-gradient(to right, #fce7f3, #e9d5ff)",
               }}
-              className="px-2"
+              className="px-2 rounded-sm"
             >
               <span
                 style={{
@@ -124,6 +124,7 @@ const TopRankingStudents = () => {
               <span>{student.name}</span>
             </div>
             <div
+              className="rounded-sm"
               style={{
                 background: "linear-gradient(to right, #fce7f3, #e9d5ff)",
               }}
