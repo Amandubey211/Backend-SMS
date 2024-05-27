@@ -11,17 +11,18 @@ import { LuLoader } from "react-icons/lu";
 
 const StudentLoginForm = () => {
   const [StudentDetails, setStudentDetails] = useState({
-    Email: "",
-    Password: "",
+    email: "",
+    password: "",
   });
+  const { loading, studentLogin } = useStudentLogin();
+
   // const dispatch = useDispatch();
   const HandleSubmit = (e) => {
     e.preventDefault();
     if (!StudentDetails) return toast.error("please add the required details");
-    student(StudentDetails);
+    studentLogin(StudentDetails);
   };
   const [showPassword, setShowPassword] = useState(false);
-  const { loading, student } = useStudentLogin();
   // const [isModalOpen, setIsModalOpen] = useState(false);
 
   // const openModal = () => setIsModalOpen(true);
@@ -61,11 +62,11 @@ const StudentLoginForm = () => {
               <input
                 type="email"
                 id="email"
-                value={StudentDetails.Email}
+                value={StudentDetails.email}
                 onChange={(e) =>
                   setStudentDetails((prev) => ({
                     ...prev,
-                    Email: e.target.value,
+                    email: e.target.value,
                   }))
                 }
                 placeholder="Type your email"
@@ -78,11 +79,11 @@ const StudentLoginForm = () => {
                 <input
                   type={showPassword ? "text" : "password"}
                   id="password"
-                  value={StudentDetails.Password}
+                  value={StudentDetails.password}
                   onChange={(e) =>
                     setStudentDetails((prev) => ({
                       ...prev,
-                      Password: e.target.value,
+                      password: e.target.value,
                     }))
                   }
                   placeholder="Type your password"
@@ -103,7 +104,7 @@ const StudentLoginForm = () => {
                 to="/forgetpassword"
                 className="text-sm text-indigo-600 hover:text-indigo-900"
               >
-                Forgot Password
+                Forgot password
               </NavLink>
             </div>
             <button

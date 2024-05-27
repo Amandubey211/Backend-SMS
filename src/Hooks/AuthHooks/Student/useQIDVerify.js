@@ -1,24 +1,43 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
-import { setAuth } from "../../../Redux/Slices/AuthSlice.js";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 const useQidVerification = () => {
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
-  const navigage = useNavigate();
+  const navigate = useNavigate();
   const verify = async (studentDetails) => {
     try {
       setLoading(true);
-      const { Email, Password } = studentDetails;
-      setTimeout(() => {
-        dispatch(setAuth(true));
-        toast.success("Verifyed Successfully", { position: "bottom-left" });
-        navigage("/dash");
-        setLoading(false);
-      }, 3000);
+      const { addmissionNumber, Q_Id } = studentDetails;
+      if (!addmissionNumber || !Q_Id)
+        return toast.error("Please provide all the details");
+      const token =
+        "bearer" +
+        " " +
+        localStorage.getItem(process.env.REACT_APP_TOKEN_STORAGE_KEY);
+      console.log(token);
+      const { data } = await axios.post(
+        `http://localhost:8080/student/verify_school_id`,
+        studentDetails,
+        { headers: { Authentication: token } }
+      );
+      console.log(data);
+      if (data.success) {
+        toast.success("Verified successfully");
+        navigate("/dash");
+      } else {
+        toast.error(data.msg || "Verification unsuccessful");
+      }
     } catch (error) {
-      toast.error("Something went wrong");
+      // Handle specific error messages from the backend
+      const errorMessage =
+        error.response?.data?.msg || "Something went wrong. Please try again.";
+      toast.error(errorMessage);
+      console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
 

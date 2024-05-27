@@ -10,6 +10,7 @@ import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import StudentDiwanLogo from "../Assets/HomeAssets/StudentDiwanLogo.png";
 import ProtectRoute from "../Routes/ProtectedRoutes/ProtectedRoute";
 import StudentSignUp from "../Modules/LoginPages/Student/SignUp/StudentSignUp.js";
+import ResetPassword from "../Modules/LoginPages/Student/ResetPassword/ResetPassword.js";
 
 function App() {
   const Dash = lazy(() => import("../Modules/Dashboard/Dash.js"));
@@ -52,6 +53,11 @@ function App() {
     {
       path: "/signup",
       element: <StudentSignUp />,
+      errorElement: <Error />,
+    },
+    {
+      path: "/reset_password",
+      element: <ResetPassword />,
       errorElement: <Error />,
     },
     {

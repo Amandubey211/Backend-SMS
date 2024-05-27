@@ -2,27 +2,53 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { setAuth } from "../../../Redux/Slices/AuthSlice.js";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+
+const API_URL = process.env.REACT_APP_API_URL;
+const TOKEN_STORAGE_KEY = process.env.REACT_APP_TOKEN_STORAGE_KEY;
+
 const useStudentLogin = () => {
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
-  const student = async (studentDetails) => {
+  const navigate = useNavigate();
+
+  const studentLogin = async (studentDetails) => {
     try {
       setLoading(true);
-      if (!studentDetails) return;
-      const { Email, Password } = studentDetails;
-      setTimeout(() => {
+      const { email, password } = studentDetails;
+      if (!email || !password) {
+        toast.error("Please provide email and password.");
+        return;
+      }
+
+      const { data } = await axios.post(
+        `${API_URL}/student/student_login`,
+        studentDetails
+      );
+      console.log(data);
+
+      if (data.success) {
         dispatch(setAuth(true));
-        setLoading(false);
-        toast.success("Logged In successfully", { position: "bottom-left" });
-      }, 3000);
+        toast.success("Logged in successfully");
+        localStorage.setItem(TOKEN_STORAGE_KEY, data.token);
+        navigate(data.isVerifiedSchoolId && "/dash");
+      } else {
+        toast.error(data.msg || "Login unsuccessful");
+      }
     } catch (error) {
-      toast.error("Something went wrong");
+      const errorMessage =
+        error.response?.data?.msg || "Something went wrong. Please try again.";
+      toast.error(errorMessage);
+      console.error("Login error:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   return {
     loading,
-    student,
+    studentLogin,
   };
 };
 

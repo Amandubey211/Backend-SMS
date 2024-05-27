@@ -9,8 +9,8 @@ import { LuLoader } from "react-icons/lu";
 
 const QIDLogin = () => {
   const [StudentID, setStudentID] = useState({
-    QID: "",
-    ID: "",
+    Q_Id: "",
+    addmissionNumber: "",
   });
   const { loading, verify } = useQidVerification();
   const [showPassword, setShowPassword] = useState(false);
@@ -44,11 +44,11 @@ const QIDLogin = () => {
               <input
                 type="text"
                 id="studentQID"
-                value={StudentID.ID}
+                value={StudentID.addmissionNumber}
                 onChange={(e) =>
                   setStudentID((prev) => ({
                     ...prev,
-                    ID: e.target.value,
+                    addmissionNumber: e.target.value,
                   }))
                 }
                 placeholder="Type your Student/Admission Id"
@@ -61,11 +61,11 @@ const QIDLogin = () => {
                 <input
                   type={showPassword ? "text" : "password"}
                   id="studentID"
-                  value={StudentID.QID}
+                  value={StudentID.Q_Id}
                   onChange={(e) =>
                     setStudentID((prev) => ({
                       ...prev,
-                      QID: e.target.value,
+                      Q_Id: e.target.value,
                     }))
                   }
                   placeholder="Type Qatar National Identification Number"
