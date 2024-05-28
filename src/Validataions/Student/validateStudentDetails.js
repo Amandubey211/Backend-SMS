@@ -8,9 +8,9 @@ const validateStudentDetails = (studentDetails) => {
   } else if (!/\S+@\S+\.\S+/.test(studentDetails.email)) {
     errors.email = "Invalid email format";
   }
-  if (!studentDetails.password || studentDetails.password.length < 6) {
-    errors.password = "Password must be at least 6 characters";
-  }
+  // if (!studentDetails.password || studentDetails.password.length < 6) {
+  //   errors.password = "Password must be at least 6 characters";
+  // }
   if (!studentDetails.dateOfBirth)
     errors.dateOfBirth = "Date of birth is required";
   if (!studentDetails.placeOfBirth)

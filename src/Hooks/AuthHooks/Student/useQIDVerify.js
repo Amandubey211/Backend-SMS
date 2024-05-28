@@ -1,11 +1,9 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 const useQidVerification = () => {
   const [loading, setLoading] = useState(false);
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const verify = async (studentDetails) => {
     try {
@@ -17,7 +15,7 @@ const useQidVerification = () => {
         "bearer" +
         " " +
         localStorage.getItem(process.env.REACT_APP_TOKEN_STORAGE_KEY);
-      console.log(token);
+
       const { data } = await axios.post(
         `http://localhost:8080/student/verify_school_id`,
         studentDetails,

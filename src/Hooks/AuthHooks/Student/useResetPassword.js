@@ -14,17 +14,17 @@ const useResetPassword = () => {
 
       // Validation: Check if any field is empty
       if (!newPassword || !confirmPassword || !studentId) {
-        throw new Error("Please fill all the required details");
+        return toast.error("Please fill all the required details");
       }
 
       // Validation: Check if passwords match
       if (newPassword !== confirmPassword) {
-        throw new Error("Passwords do not match");
+        return toast.error("Passwords do not match");
       }
 
       // Validation: Check password complexity
       if (newPassword.length < 6) {
-        throw new Error("Password must be at least 6 characters long");
+        return toast.error("Password must be at least 6 characters long");
       }
 
       //   const hasNumber = /\d/.test(newPassword);

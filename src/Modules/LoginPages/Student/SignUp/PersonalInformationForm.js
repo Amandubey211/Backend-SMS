@@ -1,11 +1,11 @@
 import React from "react";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
+// import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const PersonalInformationForm = ({
   studentDetails,
   handleChange,
-  showPassword,
-  setShowPassword,
+  // showPassword,
+  // setShowPassword,
 }) => {
   return (
     <>
@@ -30,7 +30,7 @@ const PersonalInformationForm = ({
           required
         />
       </div>
-      <div className="grid grid-cols-2 gap-4 mb-4">
+      <div className="mb-4">
         <input
           type="email"
           name="email"
@@ -40,7 +40,7 @@ const PersonalInformationForm = ({
           className="mt-1 block w-full px-3 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
           required
         />
-        <div className="relative">
+        {/* <div className="relative">
           <input
             type={showPassword ? "text" : "password"}
             name="password"
@@ -56,7 +56,7 @@ const PersonalInformationForm = ({
           >
             {showPassword ? <FaEyeSlash /> : <FaEye />}
           </div>
-        </div>
+        </div> */}
       </div>
       <div className="grid grid-cols-2 gap-4 mb-4">
         <input

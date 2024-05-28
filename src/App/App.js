@@ -7,14 +7,25 @@ import StudentLogin from "../Modules/LoginPages/Student/Login/StudentLogin.js";
 import TeacherLogin from "../Modules/LoginPages/Teacher/TeacherLogin";
 import "./App.css";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
-import StudentDiwanLogo from "../Assets/HomeAssets/StudentDiwanLogo.png";
+
 import ProtectRoute from "../Routes/ProtectedRoutes/ProtectedRoute";
 import StudentSignUp from "../Modules/LoginPages/Student/SignUp/StudentSignUp.js";
 import ResetPassword from "../Modules/LoginPages/Student/ResetPassword/ResetPassword.js";
+import Fallback from "../Components/Fallback.js";
 
 function App() {
   const Dash = lazy(() => import("../Modules/Dashboard/Dash.js"));
   const Classes = lazy(() => import("../Modules/Classes/Classes.js"));
+  const Class = lazy(() => import("../Modules/Classes/SubClass/Class.js"));
+  const UnVerifiedStudentDetails = lazy(() =>
+    import(
+      "../Modules/Verification/SubStudentVerification/UnVerifiedStudentDetails.jsx"
+    )
+  );
+
+  const VerificationPage = lazy(() =>
+    import("../Modules/Verification/VerificationPage.js")
+  );
 
   const [isOnline, setIsOnline] = useState(window.navigator.onLine);
   useEffect(() => {
@@ -70,17 +81,26 @@ function App() {
       element: <ProtectRoute Component={Classes} />,
       errorElement: <Error />,
     },
+    {
+      path: "/class/:cid",
+      element: <ProtectRoute Component={Class} />,
+      errorElement: <Error />,
+    },
+    {
+      path: "/verify_students",
+      element: <ProtectRoute Component={VerificationPage} />,
+      errorElement: <Error />,
+    },
+    {
+      path: "/verify_students/:sid",
+      element: <ProtectRoute Component={UnVerifiedStudentDetails} />,
+      errorElement: <Error />,
+    },
   ]);
   return (
     <>
       {!isOnline && <Offline />}
-      <Suspense
-        fallback={
-          <div className="flex justify-center items-center w-screen h-screen">
-            <img src={StudentDiwanLogo} className="h-20" alt="student diwan " />
-          </div>
-        }
-      >
+      <Suspense fallback={<Fallback />}>
         <RouterProvider router={AppRouter} />
       </Suspense>
     </>

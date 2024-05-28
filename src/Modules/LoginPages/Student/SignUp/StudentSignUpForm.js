@@ -17,7 +17,6 @@ const StudentSignUpForm = () => {
     firstName: "",
     lastName: "",
     email: "",
-    password: "",
     dateOfBirth: "",
     placeOfBirth: "",
     age: "",

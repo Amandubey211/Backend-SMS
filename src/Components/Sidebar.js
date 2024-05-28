@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import StudentDiwanLogo from "../Assets/HomeAssets/StudentDiwanLogo.png";
 import {
   FaChalkboardTeacher,
@@ -7,10 +7,18 @@ import {
   FaUserGraduate,
   FaClipboardList,
   FaUniversity,
+  FaCaretDown,
+  FaCaretUp,
 } from "react-icons/fa";
 import { NavLink } from "react-router-dom";
 
 const Sidebar = ({ isOpen }) => {
+  const [isUsersDropdownOpen, setIsUsersDropdownOpen] = useState(false);
+
+  const toggleUsersDropdown = () => {
+    setIsUsersDropdownOpen((prev) => !prev);
+  };
+
   return (
     <nav
       className={`transition-all duration-300 h-screen p-4 bg-white shadow ${
@@ -22,7 +30,7 @@ const Sidebar = ({ isOpen }) => {
           src={StudentDiwanLogo}
           alt="Logo"
           className={`transition-width duration-300 ${
-            isOpen ? "w-36 " : "w-28 "
+            isOpen ? "w-36" : "w-28"
           }`}
         />
       </div>
@@ -63,24 +71,66 @@ const Sidebar = ({ isOpen }) => {
               </span>
             )}
           </NavLink>
-          <NavLink
-            to="/users"
-            className={({ isActive }) =>
-              `flex items-center p-2 rounded-lg ${
-                isActive
-                  ? "text-purple-500 bg-purple-100"
+          <div>
+            <div
+              className={`flex items-center p-2 rounded-lg cursor-pointer ${
+                isUsersDropdownOpen
+                  ? "bg-purple-100 text-purple-500"
                   : "text-gray-700 hover:bg-gray-100"
-              } ${isOpen ? "" : "justify-center"}`
-            }
-          >
-            <FaUsers className="w-5 h-5" />
-            {isOpen && (
-              <span role="presentation" className="ml-3">
-                Users
-              </span>
+              } ${isOpen ? "" : "justify-center"}`}
+              onClick={toggleUsersDropdown}
+            >
+              <FaUsers className="w-5 h-5" />
+              {isOpen && (
+                <span role="presentation" className="ml-3 flex items-center">
+                  Users{" "}
+                  {isUsersDropdownOpen ? (
+                    <FaCaretUp className="ml-2" />
+                  ) : (
+                    <FaCaretDown className="ml-2" />
+                  )}
+                </span>
+              )}
+            </div>
+            {isUsersDropdownOpen && (
+              <ul className="pl-8 space-y-2">
+                <NavLink
+                  to="/users/students"
+                  className={({ isActive }) =>
+                    `flex items-center p-2 rounded-lg ${
+                      isActive
+                        ? "text-purple-500 bg-purple-100"
+                        : "text-gray-700 hover:bg-gray-100"
+                    } ${isOpen ? "" : "justify-center"}`
+                  }
+                >
+                  <FaUserGraduate className="w-5 h-5" />
+                  {isOpen && (
+                    <span role="presentation" className="ml-3">
+                      Students
+                    </span>
+                  )}
+                </NavLink>
+                <NavLink
+                  to="/users/teachers"
+                  className={({ isActive }) =>
+                    `flex items-center p-2 rounded-lg ${
+                      isActive
+                        ? "text-purple-500 bg-purple-100"
+                        : "text-gray-700 hover:bg-gray-100"
+                    } ${isOpen ? "" : "justify-center"}`
+                  }
+                >
+                  <FaChalkboardTeacher className="w-5 h-5" />
+                  {isOpen && (
+                    <span role="presentation" className="ml-3">
+                      Teachers
+                    </span>
+                  )}
+                </NavLink>
+              </ul>
             )}
-          </NavLink>
-
+          </div>
           <NavLink
             to="/accounting"
             className={({ isActive }) =>
@@ -147,6 +197,23 @@ const Sidebar = ({ isOpen }) => {
             {isOpen && (
               <span role="presentation" className="ml-3">
                 Noticeboard
+              </span>
+            )}
+          </NavLink>
+          <NavLink
+            to="/verify_students"
+            className={({ isActive }) =>
+              `flex items-center p-2 rounded-lg ${
+                isActive
+                  ? "text-purple-500 bg-purple-100"
+                  : "text-gray-700 hover:bg-gray-100"
+              } ${isOpen ? "" : "justify-center"}`
+            }
+          >
+            <FaUserGraduate className="w-5 h-5" />
+            {isOpen && (
+              <span role="presentation" className="ml-3">
+                Verification
               </span>
             )}
           </NavLink>
