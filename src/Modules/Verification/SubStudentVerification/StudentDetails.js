@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { useParams, useNavigate, NavLink } from "react-router-dom";
-import { mockStudents } from "../VerificationData/NonVerifiedStudentData";
-import axios from "axios";
-import VerificationForm from "./VerificationForm";
+import { useSelector } from "react-redux";
 import { AiOutlineEye } from "react-icons/ai";
+import VerificationForm from "./VerificationForm";
+import Details from "./Details";
 
 const colors = [
   "bg-yellow-300",
@@ -19,7 +19,11 @@ const getColor = (index) => colors[index % colors.length];
 const StudentDetail = () => {
   const { sid } = useParams();
   const navigate = useNavigate();
-  const student = mockStudents.find((student) => student._id?.$oid === sid);
+  const unverifiedstudent = useSelector(
+    (store) => store.Admin.unVerifiedStudents
+  );
+
+  const student = unverifiedstudent.find((student) => student._id === sid);
   const [preview, setPreview] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -32,8 +36,12 @@ const StudentDetail = () => {
   };
 
   const handlePreviewClick = (url) => {
-    setPreview(url);
-    openModal();
+    if (url) {
+      setPreview(url);
+      openModal();
+    } else {
+      console.error("Invalid URL:", url);
+    }
   };
 
   if (!student) {
@@ -41,122 +49,80 @@ const StudentDetail = () => {
   }
 
   return (
-    <div className="container mx-auto p-3">
-      <div className="flex">
+    <div className="container  p-2">
+      <div className="flex mb-4">
         <NavLink
           onClick={() => navigate(-1)}
-          className="text-sm text-gray-500 hover:text-gray-700 mb-4 items-center flex gap-2"
+          className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700"
         >
-          <div className="rounded-full border text-xl w-6 h-6 flex justify-center items-center">
+          <div className="w-6 h-6 flex justify-center items-center border rounded-full text-xl">
             &larr;
           </div>
           <span>Back</span>
         </NavLink>
       </div>
-      <div className="bg-white p-2 rounded-lg ">
-        <h2 className="text-2xl font-semibold mb-6 text-gray-800">
-          Details for {student?.firstName}
-        </h2>
-        <div className="bg-gray-50 p-6 rounded-lg mb-6 shadow-sm">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            {[
-              { label: "Email", value: student?.email },
-              { label: "Student ID", value: student?.Q_Id },
-              { label: "Contact Number", value: student?.contactNumber },
-              { label: "Place of Birth", value: student?.placeOfBirth },
-              { label: "Guardian Name", value: student?.guardianName },
-              {
-                label: "Guardian Contact Number",
-                value: student?.guardianContactNumber,
-              },
-            ].map((item, index) => (
-              <p key={index} className="text-gray-700">
-                <span className="font-medium">{item.label}:</span> {item.value}
-              </p>
-            ))}
-          </div>
-          <div className="mt-6">
-            {[
-              {
-                label: "Permanent Address",
-                value: `${student?.permanentAddress?.street}, ${student?.permanentAddress?.city}, ${student?.permanentAddress?.state}, ${student?.permanentAddress?.postalCode}`,
-              },
-              {
-                label: "Residential Address",
-                value: `${student?.residentialAddress?.street}, ${student?.residentialAddress?.city}, ${student?.residentialAddress?.state}, ${student?.residentialAddress?.postalCode}`,
-              },
-            ].map((item, index) => (
-              <p key={index} className="text-gray-700">
-                <span className="font-medium">{item.label}:</span> {item.value}
-              </p>
-            ))}
-          </div>
-        </div>
-        <div className="bg-gray-50 p-3 rounded-lg mb-2 ">
+
+      <div className="bg-white p-2  ">
+        <Details student={student} />
+
+        <div className=" p-2  rounded-lg mb-3 ">
           <h3 className="text-lg font-semibold mb-4 text-gray-800">
             Document Previews
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {student?.documents?.map((doc, index) => (
+            {student?.documentId?.documents?.map((doc, index) => (
               <div
                 key={index}
-                className={`${getColor(index)} p-4 border rounded-lg shadow-md`}
+                className={`${getColor(
+                  index
+                )} p-4 border rounded-lg shadow-md transform transition-transform hover:scale-105`}
               >
                 <img
-                  src={doc?.url}
+                  src={doc?.documentUrl}
                   alt={`Document ${index + 1}`}
                   className="w-full h-40 object-cover mb-2 rounded-md"
                 />
                 <div className="flex justify-between items-center">
                   <p className="text-white">
                     <span className="font-medium">Document {index + 1}:</span>{" "}
-                    {doc?.name}
+                    {doc?.documentLabel}
                   </p>
                   <button
                     title="Open Modal"
-                    style={{
-                      background: "linear-gradient(to right, #fce7f3, #e9d5ff)",
-                      transition: "background-color 0.3s ease",
-                      transform: "scale(1)",
-                    }}
-                    className="hover:border-purple-500 shadow-2xl opacity-85 hover:opacity-100 hover:shadow-2xl hover:border hover rounded-full p-1"
-                    onClick={() => handlePreviewClick(doc?.url)}
+                    className="p-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-full shadow-lg hover:from-pink-600 hover:to-purple-600 transition-all duration-200"
+                    onClick={() => handlePreviewClick(doc?.documentUrl)}
                   >
-                    <AiOutlineEye
-                      size={25}
-                      style={{
-                        background:
-                          "linear-gradient(to right, #f43f5e, #8b5cf6)",
-                        WebkitBackgroundClip: "text",
-                        WebkitTextFillColor: "transparent",
-                        transition: "transform 0.3s ease-in",
-                        transform: "scale(1)",
-                      }}
-                    />
+                    <AiOutlineEye size={20} />
                   </button>
                 </div>
               </div>
             ))}
           </div>
         </div>
-        <VerificationForm email={student.email} studentId={student._id.$oid} />
+
+        <VerificationForm email={student.email} studentId={student._id} />
       </div>
+
       {modalOpen && (
-        <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-gray-800 bg-opacity-75 z-50">
-          <div className="bg-white p-4 rounded-lg relative max-h-full overflow-y-auto">
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75 z-50">
+          <div className="bg-white p-4 rounded-lg relative max-h-full overflow-y-auto shadow-lg">
             <button
               onClick={closeModal}
-              className="absolute top-2 right-2 p-2 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 text-white hover:from-pink-600 hover:to-purple-600 transition-colors duration-200 shadow-lg"
+              className="absolute top-2 right-2 p-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-full shadow-lg hover:from-pink-600 hover:to-purple-600 transition-colors duration-200"
             >
               ✕
             </button>
             <div>
-              {preview && (
+              {preview ? (
                 <img
                   src={preview}
                   alt="Preview"
                   className="max-h-[80vh] object-contain"
                 />
+              ) : (
+                <p className="text-center text-gray-500">
+                  No preview available
+                </p>
               )}
             </div>
           </div>

@@ -42,7 +42,7 @@ const useSaveDocument = () => {
 
       if (response.data.success) {
         toast.success("Document saved successfully");
-        // navigate("/studentlogin");
+        navigate("/studentlogin");
       } else {
         toast.error("Failed to save document");
       }

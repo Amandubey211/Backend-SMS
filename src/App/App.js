@@ -19,7 +19,7 @@ function App() {
   const Class = lazy(() => import("../Modules/Classes/SubClass/Class.js"));
   const UnVerifiedStudentDetails = lazy(() =>
     import(
-      "../Modules/Verification/SubStudentVerification/UnVerifiedStudentDetails.jsx"
+      "../Modules/Verification/SubStudentVerification/UnVerifiedStudentDetails.js"
     )
   );
 

@@ -1,0 +1,43 @@
+import axios from "axios";
+import { useState } from "react";
+import toast from "react-hot-toast";
+
+const API_URL = process.env.REACT_APP_API_URL;
+// const TOKEN_STORAGE_KEY = process.env.REACT_APP_TOKEN_STORAGE_KEY;
+
+const useSendLoginCredentials = () => {
+  const [loading, setLoading] = useState(false);
+
+  const sendCredentials = async (mailConfiguration) => {
+    setLoading(true);
+
+    try {
+      const token = process.env.REACT_APP_ADMIN_TOKEN;
+      const { data } = await axios.post(
+        `${API_URL}/admin/send_login_credential`,
+        mailConfiguration,
+        { headers: { Authentication: token } }
+      );
+      console.log(data);
+      if (data.success) {
+        toast.success(data.msg || "Credentials send successfully");
+      } else {
+        toast.error(data.msg || "Document verification failed");
+      }
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.msg || "Something went wrong. Please try again.";
+      toast.error(errorMessage);
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return {
+    loading,
+    sendCredentials,
+  };
+};
+
+export default useSendLoginCredentials;

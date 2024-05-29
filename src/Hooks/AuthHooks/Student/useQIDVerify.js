@@ -2,6 +2,7 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+const TOKEN_STORAGE_KEY = process.env.REACT_APP_TOKEN_STORAGE_KEY;
 const useQidVerification = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -11,10 +12,7 @@ const useQidVerification = () => {
       const { addmissionNumber, Q_Id } = studentDetails;
       if (!addmissionNumber || !Q_Id)
         return toast.error("Please provide all the details");
-      const token =
-        "bearer" +
-        " " +
-        localStorage.getItem(process.env.REACT_APP_TOKEN_STORAGE_KEY);
+      const token = "Bearer " + localStorage.getItem(TOKEN_STORAGE_KEY);
 
       const { data } = await axios.post(
         `http://localhost:8080/student/verify_school_id`,

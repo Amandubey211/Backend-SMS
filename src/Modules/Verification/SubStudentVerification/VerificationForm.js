@@ -1,38 +1,46 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import axios from "axios";
-import toast from "react-hot-toast";
+import useVerifyStudentDocument from "../../../Hooks/AuthHooks/Teacher/useVerifyStudentDocument";
+import { useSelector } from "react-redux";
+import useGetAllClassList from "../../../Hooks/AuthHooks/Teacher/useGetAllClassList";
+import useAssignClassToStudent from "../../../Hooks/AuthHooks/Teacher/useAssignClassToStudent";
 
 const VerificationForm = ({ email, studentId }) => {
   const navigate = useNavigate();
   const [verificationStatus, setVerificationStatus] = useState("");
   const [admissionNumber, setAdmissionNumber] = useState("");
   const [rejectionReason, setRejectionReason] = useState("");
+  const [presentClassId, setpresentClassId] = useState("");
+  const { loading, verifyDocument } = useVerifyStudentDocument();
+  const { assignClass } = useAssignClassToStudent();
+  const { getClassList } = useGetAllClassList();
+
+  const classList = useSelector((store) => store.Admin.classList);
+  useEffect(() => {
+    getClassList();
+  }, []);
 
   const handleVerifyStudent = async (e) => {
     e.preventDefault();
-    try {
-      // const response = await axios.post("/api/verifyStudentInfo", {
-      //   email,
-      //   studentId,
-      //   isVerifiedDocuments: verificationStatus,
-      //   addmissionNumber: admissionNumber,
-      //   rejectionReason:
-      //     verificationStatus === "rejected" ? rejectionReason : "",
-      // });
-      // alert(response.data.msg);
-      console.log(email, studentId, verificationStatus, rejectionReason);
-
-      toast.success(verificationStatus);
-    } catch (error) {
-      console.error("Error verifying student:", error);
-      toast.error("Error verifying student");
-    }
+    const isVerifiedDocuments = verificationStatus;
+    const verificationDetails = {
+      email,
+      studentId,
+      admissionNumber,
+      rejectionReason,
+      isVerifiedDocuments,
+      presentClassId,
+    };
+    // const assignedDetails = {
+    //   studentId,
+    //   presentClassId,
+    // };
+    await verifyDocument(verificationDetails);
   };
 
   return (
     <form onSubmit={handleVerifyStudent} className="flex w-full h-full">
-      <div className="bg-white p-8 rounded-lg w-full max-w-3xl ">
+      <div className="bg-white p-2 rounded-lg w-full max-w-3xl">
         <NavLink
           onClick={() => navigate(-1)}
           className="text-sm text-gray-500 hover:text-gray-700 mb-4 items-center flex gap-2"
@@ -58,51 +66,77 @@ const VerificationForm = ({ email, studentId }) => {
           >
             <option value="">Select verification status</option>
             <option value="verified">Verified</option>
-            <option value="rejected">Rejected</option>
+            <option value="reject">Rejected</option>
           </select>
         </div>
-        {verificationStatus === "rejected" ? (
-          <div>
-            <div className="mb-4">
-              <label
-                className="text-gray-600 font-medium"
-                htmlFor="rejectionReason"
-              >
-                Reason for Rejection
-              </label>
-              <textarea
-                id="rejectionReason"
-                value={rejectionReason}
-                onChange={(e) => setRejectionReason(e.target.value)}
-                rows={4}
-                placeholder="Provide reason for rejection"
-                className="mt-1 block w-full px-3 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              />
-            </div>
-          </div>
-        ) : (
+        {verificationStatus === "reject" ? (
           <div className="mb-4">
             <label
               className="text-gray-600 font-medium"
-              htmlFor="admissionNumber"
+              htmlFor="rejectionReason"
             >
-              Admission Number
+              Reason for Rejection
             </label>
-            <input
-              type="text"
-              id="admissionNumber"
-              value={admissionNumber}
-              onChange={(e) => setAdmissionNumber(e.target.value)}
-              placeholder="Admission Number"
+            <textarea
+              id="rejectionReason"
+              value={rejectionReason}
+              onChange={(e) => setRejectionReason(e.target.value)}
+              rows={4}
+              placeholder="Provide reason for rejection"
               className="mt-1 block w-full px-3 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
             />
           </div>
+        ) : (
+          <>
+            <div className="mb-4">
+              <label
+                className="text-gray-600 font-medium"
+                htmlFor="admissionNumber"
+              >
+                Admission Number
+              </label>
+              <input
+                type="text"
+                id="admissionNumber"
+                value={admissionNumber}
+                onChange={(e) => setAdmissionNumber(e.target.value)}
+                placeholder="Admission Number"
+                className="mt-1 block w-full px-3 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              />
+            </div>
+            <div className="mb-4">
+              <label
+                className="text-gray-600 font-medium"
+                htmlFor="assignedClass"
+              >
+                Assign Class
+              </label>
+              <select
+                id="assignedClass"
+                value={presentClassId}
+                onChange={(e) => setpresentClassId(e.target.value)}
+                className="mt-1 block w-full px-3 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              >
+                <option value="">Select class</option>
+                {classList?.map((classItem, index) => (
+                  <option key={index} value={classItem?._id} className="py-2">
+                    {classItem.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </>
         )}
         <button
           type="submit"
-          className="w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600"
+          className={`w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600 ${
+            loading ? "opacity-50 cursor-not-allowed" : ""
+          }`}
+          disabled={loading}
         >
-          {verificationStatus === "rejected"
+          {loading
+            ? "Processing..."
+            : verificationStatus === "reject"
             ? "Reject Student"
             : "Verify Student"}
         </button>

@@ -1,31 +1,80 @@
 import axios from "axios";
 import { useState } from "react";
 import toast from "react-hot-toast";
+import useAssignClassToStudent from "./useAssignClassToStudent";
+import useSendLoginCredentials from "./useSendLoginCredentials";
+
 const API_URL = process.env.REACT_APP_API_URL;
-const TOKEN_STORAGE_KEY = process.env.REACT_APP_TOKEN_STORAGE_KEY;
+// const TOKEN_STORAGE_KEY = process.env.REACT_APP_TOKEN_STORAGE_KEY;
 
 const useVerifyStudentDocument = () => {
   const [loading, setLoading] = useState(false);
+  const { assignClass } = useAssignClassToStudent();
+  const { sendCredentials } = useSendLoginCredentials();
+  const validateDetails = (details) => {
+    if (!details || typeof details !== "object") {
+      return "Invalid details object.";
+    }
+
+    const requiredFields = ["email", "studentId", "isVerifiedDocuments"];
+    for (let field of requiredFields) {
+      if (!details[field] && details[field] !== false) {
+        return `Field ${field} is required.`;
+      }
+    }
+
+    if (
+      details.isVerifiedDocuments === "verified" &&
+      !details.admissionNumber
+    ) {
+      return "Field admissionNumber is required when documents are verified.";
+    }
+
+    return null;
+  };
+
   const verifyDocument = async (verificationDetails) => {
+    const validationError = validateDetails(verificationDetails);
+    if (validationError) {
+      toast.error(validationError);
+      return;
+    }
+
     setLoading(true);
 
     try {
-      const token = "bearer" + " " + localStorage.getItem(TOKEN_STORAGE_KEY);
+      const token = process.env.REACT_APP_ADMIN_TOKEN;
       const { data } = await axios.put(
         `${API_URL}/admin/verify_student_info`,
         verificationDetails,
         { headers: { Authentication: token } }
       );
+      console.log(data);
       if (data.success) {
-        toast.success(data.msg || "Verified");
+        toast.success(data.msg || "Document verified successfully");
+
+        let assignedDetails = {
+          email: verificationDetails.email,
+          presentClassId: verificationDetails.presentClassId,
+          studentId: verificationDetails.studentId,
+        };
+        let mailConfiguration = {
+          studentId: verificationDetails.studentId,
+          descriptionOnReject: verificationDetails?.rejectionReason,
+        };
+        console.log(verificationDetails.isVerifiedDocuments);
+        if (verificationDetails.isVerifiedDocuments === "verified") {
+          await assignClass(assignedDetails);
+        }
+        await sendCredentials(mailConfiguration);
       } else {
-        toast.error("Not Verified");
+        toast.error(data.msg || "Document verification failed");
       }
     } catch (error) {
       const errorMessage =
         error.response?.data?.msg || "Something went wrong. Please try again.";
       toast.error(errorMessage);
-      console.log(error);
+      console.error(error);
     } finally {
       setLoading(false);
     }
