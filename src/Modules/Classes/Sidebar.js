@@ -1,18 +1,24 @@
 import React, { useState } from "react";
 import { RxCross2 } from "react-icons/rx";
 import classIcons from "../Dashboard/DashboardData/ClassIconData";
-import toast from "react-hot-toast";
+import useCreateClass from "../../Hooks/ClassHooks/Teacher/useCreateClass";
 
 const Sidebar = ({ isOpen, onClose }) => {
   const [activeIconId, setActiveIconId] = useState(null);
   const [newClassName, setNewClassName] = useState("");
   const [newIcon, setNewIcon] = useState("");
-  const handleIconClick = (id) => {
+  const { createClass, loading } = useCreateClass();
+  const handleIconClick = (gradeLevel, id) => {
     setActiveIconId(id);
-    setNewIcon(id);
+    setNewIcon(gradeLevel);
   };
-  const HandleSubmit = () => {
+  const HandleSubmit = async () => {
     console.log(newIcon, newClassName);
+    let classData = {
+      name: newClassName,
+      gradeLevel: newIcon,
+    };
+    await createClass(classData);
   };
   return (
     <div
@@ -57,7 +63,7 @@ const Sidebar = ({ isOpen, onClose }) => {
                 } transform hover:scale-105`}
                 src={data.icon}
                 key={data.id}
-                onClick={() => handleIconClick(data.id)}
+                onClick={() => handleIconClick(data.gradeLevel, data.id)}
                 alt="Icon"
               />
             ))}

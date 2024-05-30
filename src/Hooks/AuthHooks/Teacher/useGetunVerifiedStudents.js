@@ -12,8 +12,10 @@ const useGetUnVerifiedStudents = () => {
     setLoading(true);
 
     try {
-      let token =
-        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFtYW5AZ21haWwuY29tIiwidXNlcklkIjoiNjY1NWRkZTZkZTQ1ZDMzNjIxODA3Y2U0Iiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzE2OTYwNzMwLCJleHAiOjE3MTcwNDcxMzB9.Z-aO2RPjeIfuon-OpFCQC7mJgkkAjO73B2vyTFfiIyY";
+      const token = localStorage.getItem(
+        process.env.REACT_APP_ADMIN_TOKEN_STORAGE_KEY
+      );
+      console.log(token);
       const { data } = await axios.get(
         `${API_URL}/admin/get_unverified_student_details`,
         {

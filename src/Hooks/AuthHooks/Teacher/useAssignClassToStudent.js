@@ -32,7 +32,9 @@ const useAssignClassToStudent = () => {
     setLoading(true);
 
     try {
-      const token = process.env.REACT_APP_ADMIN_TOKEN; // change it
+      const token = localStorage.getItem(
+        process.env.REACT_APP_ADMIN_TOKEN_STORAGE_KEY
+      );
       const { data } = await axios.put(
         `${API_URL}/admin/assign_class`,
         assignedDetails,

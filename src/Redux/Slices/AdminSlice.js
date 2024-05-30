@@ -4,11 +4,15 @@ const AdminSlice = createSlice({
   name: "Admin",
   initialState: {
     unVerifiedStudents: [],
+    rejectedStudents: [],
     classList: [],
   },
   reducers: {
     setUnVerifiedStudents: (state, action) => {
       state.unVerifiedStudents = action.payload;
+    },
+    setRejectedStudents: (state, action) => {
+      state.rejectedStudents = action.payload;
     },
     setClassList: (state, action) => {
       state.classList = action.payload;
@@ -16,6 +20,7 @@ const AdminSlice = createSlice({
   },
 });
 
-export const { setUnVerifiedStudents, setClassList } = AdminSlice.actions;
+export const { setUnVerifiedStudents, setClassList, setRejectedStudents } =
+  AdminSlice.actions;
 
 export default AdminSlice.reducer;

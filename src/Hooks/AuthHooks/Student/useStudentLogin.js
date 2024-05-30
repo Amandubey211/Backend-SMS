@@ -6,7 +6,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 const API_URL = process.env.REACT_APP_API_URL;
-const TOKEN_STORAGE_KEY = process.env.REACT_APP_TOKEN_STORAGE_KEY;
+const TOKEN_STORAGE_KEY = process.env.REACT_APP_STUDENT_TOKEN_STORAGE_KEY;
 
 const useStudentLogin = () => {
   const [loading, setLoading] = useState(false);
@@ -31,7 +31,7 @@ const useStudentLogin = () => {
       if (data.success) {
         dispatch(setAuth(true));
         toast.success("Logged in successfully");
-        localStorage.setItem(TOKEN_STORAGE_KEY, data.token);
+        localStorage.setItem(TOKEN_STORAGE_KEY, `Bearer ${data.token}`);
         navigate(data.isVerifiedSchoolId && "/dash");
       } else {
         toast.error(data.msg || "Login unsuccessful");

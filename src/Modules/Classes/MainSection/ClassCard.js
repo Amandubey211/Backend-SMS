@@ -14,24 +14,24 @@ const ClassCard = ({
 }) => (
   <NavLink
     to={`/class/${classurl}`}
-    className="group p-2 py-4 border rounded-lg shadow-lg transform transition-transform duration-300 ease-in-out hover:scale-110 hover:shadow-xl"
+    className="group p-1 pb-4 border rounded-lg shadow-lg transform transition-transform duration-300 ease-in-out hover:scale-110 hover:shadow-xl"
   >
     <div className="flex justify-between items-center px-1">
       <img
         src={leftLogo}
-        className="w-14 opacity-50 transition-opacity duration-300 group-hover:opacity-90"
+        className="w-10 opacity-50 transition-opacity duration-300 group-hover:opacity-90"
         alt="class_logo"
       />
       <img
         src={RightLogo}
-        className="w-14 opacity-50 transition-opacity duration-300 group-hover:opacity-90"
+        className="w-10 opacity-50 transition-opacity duration-300 group-hover:opacity-90"
         alt="class_logo"
       />
     </div>
     <div className="flex flex-col gap-1 justify-center items-center -mt-4">
       <h2 className="text-xl font-bold text-purple-600">{className}</h2>
       <p>{teachers} Teachers</p>
-      <img src={centerLogo} className="w-24" alt="center_logo" />
+      <img src={centerLogo} className="w-20" alt="center_logo" />
     </div>
     <div className="flex justify-between items-center px-3">
       <div className="flex flex-col items-center gap-1">

@@ -1,22 +1,22 @@
+// Sidebar.js
 import React, { useState } from "react";
 import StudentDiwanLogo from "../Assets/HomeAssets/StudentDiwanLogo.png";
-import {
-  FaChalkboardTeacher,
-  FaUsers,
-  FaBook,
-  FaUserGraduate,
-  FaClipboardList,
-  FaUniversity,
-  FaCaretDown,
-  FaCaretUp,
-} from "react-icons/fa";
 import { NavLink } from "react-router-dom";
+import {
+  MdOutlineKeyboardArrowUp,
+  MdOutlineKeyboardArrowDown,
+} from "react-icons/md";
+import sidebarData from "./DataFile/sidebarData.js";
 
 const Sidebar = ({ isOpen }) => {
-  const [isUsersDropdownOpen, setIsUsersDropdownOpen] = useState(false);
+  const [openItems, setOpenItems] = useState([]);
 
-  const toggleUsersDropdown = () => {
-    setIsUsersDropdownOpen((prev) => !prev);
+  const toggleDropdown = (title) => {
+    if (openItems.includes(title)) {
+      setOpenItems(openItems.filter((item) => item !== title));
+    } else {
+      setOpenItems([...openItems, title]);
+    }
   };
 
   return (
@@ -37,186 +37,86 @@ const Sidebar = ({ isOpen }) => {
       <div className="mt-4">
         {isOpen && <h2 className="text-gray-500">MENU</h2>}
         <ul className="mt-2 space-y-2">
-          <NavLink
-            to="/dash"
-            className={({ isActive }) =>
-              `flex items-center p-2 rounded-lg ${
-                isActive
-                  ? "text-purple-500 bg-purple-100"
-                  : "text-gray-700 hover:bg-gray-100"
-              } ${isOpen ? "" : "justify-center"}`
-            }
-          >
-            <FaChalkboardTeacher className="w-5 h-5" />
-            {isOpen && (
-              <span role="presentation" className="ml-3">
-                Dashboard
-              </span>
-            )}
-          </NavLink>
-          <NavLink
-            to="/classes"
-            className={({ isActive }) =>
-              `flex items-center p-2 rounded-lg ${
-                isActive
-                  ? "text-purple-500 bg-purple-100"
-                  : "text-gray-700 hover:bg-gray-100"
-              } ${isOpen ? "" : "justify-center"}`
-            }
-          >
-            <FaUniversity className="w-5 h-5" />
-            {isOpen && (
-              <span role="presentation" className="ml-3">
-                Classes
-              </span>
-            )}
-          </NavLink>
-          <div>
-            <div
-              className={`flex items-center p-2 rounded-lg cursor-pointer ${
-                isUsersDropdownOpen
-                  ? "bg-purple-100 text-purple-500"
-                  : "text-gray-700 hover:bg-gray-100"
-              } ${isOpen ? "" : "justify-center"}`}
-              onClick={toggleUsersDropdown}
-            >
-              <FaUsers className="w-5 h-5" />
-              {isOpen && (
-                <span role="presentation" className="ml-3 flex items-center">
-                  Users{" "}
-                  {isUsersDropdownOpen ? (
-                    <FaCaretUp className="ml-2" />
-                  ) : (
-                    <FaCaretDown className="ml-2" />
+          {sidebarData.map((item, index) => (
+            <React.Fragment key={index}>
+              {item.items ? (
+                <div
+                  className={`flex items-center w-full p-2 rounded-lg cursor-pointer ${
+                    openItems.includes(item.title)
+                      ? "bg-purple-100 text-purple-500"
+                      : "text-gray-700 hover:bg-gray-100"
+                  } ${isOpen ? "justify-between" : "justify-center"}`}
+                  onClick={() => toggleDropdown(item.title)}
+                >
+                  <div className={`flex justify-center `}>
+                    <span className={`${!isOpen && "text-xl"}`}>
+                      {item.icon}
+                    </span>
+                    {isOpen && (
+                      <span
+                        role="presentation"
+                        className="ml-3 flex items-center"
+                      >
+                        {item.title}
+                      </span>
+                    )}
+                  </div>
+                  {isOpen && (
+                    <>
+                      {openItems.includes(item.title) ? (
+                        <MdOutlineKeyboardArrowUp className="ml-2" />
+                      ) : (
+                        <MdOutlineKeyboardArrowDown className="ml-2" />
+                      )}
+                    </>
                   )}
-                </span>
+                </div>
+              ) : (
+                <NavLink
+                  key={index}
+                  to={item.path}
+                  className={({ isActive }) =>
+                    `flex items-center p-2 rounded-lg ${
+                      isActive
+                        ? "text-purple-500 bg-purple-100"
+                        : "text-gray-700 hover:bg-gray-100"
+                    } ${isOpen ? "" : "justify-center"}`
+                  }
+                >
+                  <span className={`${!isOpen && "text-xl"}`}>{item.icon}</span>
+                  {isOpen && (
+                    <span role="presentation" className="ml-3">
+                      {item.title}
+                    </span>
+                  )}
+                </NavLink>
               )}
-            </div>
-            {isUsersDropdownOpen && (
-              <ul className="pl-8 space-y-2">
-                <NavLink
-                  to="/users/students"
-                  className={({ isActive }) =>
-                    `flex items-center p-2 rounded-lg ${
-                      isActive
-                        ? "text-purple-500 bg-purple-100"
-                        : "text-gray-700 hover:bg-gray-100"
-                    } ${isOpen ? "" : "justify-center"}`
-                  }
-                >
-                  <FaUserGraduate className="w-5 h-5" />
-                  {isOpen && (
-                    <span role="presentation" className="ml-3">
-                      Students
-                    </span>
-                  )}
-                </NavLink>
-                <NavLink
-                  to="/users/teachers"
-                  className={({ isActive }) =>
-                    `flex items-center p-2 rounded-lg ${
-                      isActive
-                        ? "text-purple-500 bg-purple-100"
-                        : "text-gray-700 hover:bg-gray-100"
-                    } ${isOpen ? "" : "justify-center"}`
-                  }
-                >
-                  <FaChalkboardTeacher className="w-5 h-5" />
-                  {isOpen && (
-                    <span role="presentation" className="ml-3">
-                      Teachers
-                    </span>
-                  )}
-                </NavLink>
-              </ul>
-            )}
-          </div>
-          <NavLink
-            to="/accounting"
-            className={({ isActive }) =>
-              `flex items-center p-2 rounded-lg ${
-                isActive
-                  ? "text-purple-500 bg-purple-100"
-                  : "text-gray-700 hover:bg-gray-100"
-              } ${isOpen ? "" : "justify-center"}`
-            }
-          >
-            <FaBook className="w-5 h-5" />
-            {isOpen && (
-              <span role="presentation" className="ml-3">
-                Accounting
-              </span>
-            )}
-          </NavLink>
-          <NavLink
-            to="/graduated"
-            className={({ isActive }) =>
-              `flex items-center p-2 rounded-lg ${
-                isActive
-                  ? "text-purple-500 bg-purple-100"
-                  : "text-gray-700 hover:bg-gray-100"
-              } ${isOpen ? "" : "justify-center"}`
-            }
-          >
-            <FaUserGraduate className="w-5 h-5" />
-            {isOpen && (
-              <span role="presentation" className="ml-3">
-                Graduated
-              </span>
-            )}
-          </NavLink>
-
-          <NavLink
-            to="/admissions"
-            className={({ isActive }) =>
-              `flex items-center p-2 rounded-lg ${
-                isActive
-                  ? "text-purple-500 bg-purple-100"
-                  : "text-gray-700 hover:bg-gray-100"
-              } ${isOpen ? "" : "justify-center"}`
-            }
-          >
-            <FaClipboardList className="w-5 h-5" />
-            {isOpen && (
-              <span role="presentation" className="ml-3">
-                Admissions
-              </span>
-            )}
-          </NavLink>
-          <NavLink
-            to="/noticeboard"
-            className={({ isActive }) =>
-              `flex items-center p-2 rounded-lg ${
-                isActive
-                  ? "text-purple-500 bg-purple-100"
-                  : "text-gray-700 hover:bg-gray-100"
-              } ${isOpen ? "" : "justify-center"}`
-            }
-          >
-            <FaClipboardList className="w-5 h-5" />
-            {isOpen && (
-              <span role="presentation" className="ml-3">
-                Noticeboard
-              </span>
-            )}
-          </NavLink>
-          <NavLink
-            to="/verify_students"
-            className={({ isActive }) =>
-              `flex items-center p-2 rounded-lg ${
-                isActive
-                  ? "text-purple-500 bg-purple-100"
-                  : "text-gray-700 hover:bg-gray-100"
-              } ${isOpen ? "" : "justify-center"}`
-            }
-          >
-            <FaUserGraduate className="w-5 h-5" />
-            {isOpen && (
-              <span role="presentation" className="ml-3">
-                Verification
-              </span>
-            )}
-          </NavLink>
+              {openItems.includes(item.title) && item.items && (
+                <ul className="pl-8 space-y-2">
+                  {item.items.map((subItem, subIndex) => (
+                    <NavLink
+                      key={subIndex}
+                      to={subItem.path}
+                      className={({ isActive }) =>
+                        `flex items-center p-2 rounded-lg ${
+                          isActive
+                            ? "text-purple-500 bg-purple-100"
+                            : "text-gray-700 hover:bg-gray-100"
+                        } ${isOpen ? "" : "justify-end"}`
+                      }
+                    >
+                      {subItem.icon}
+                      {isOpen && (
+                        <span role="presentation" className="ml-3">
+                          {subItem.title}
+                        </span>
+                      )}
+                    </NavLink>
+                  ))}
+                </ul>
+              )}
+            </React.Fragment>
+          ))}
         </ul>
       </div>
     </nav>

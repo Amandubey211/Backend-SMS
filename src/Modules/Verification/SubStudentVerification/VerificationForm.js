@@ -8,7 +8,7 @@ import useAssignClassToStudent from "../../../Hooks/AuthHooks/Teacher/useAssignC
 const VerificationForm = ({ email, studentId }) => {
   const navigate = useNavigate();
   const [verificationStatus, setVerificationStatus] = useState("");
-  const [admissionNumber, setAdmissionNumber] = useState("");
+  const [addmissionNumber, setAddmissionNumber] = useState("");
   const [rejectionReason, setRejectionReason] = useState("");
   const [presentClassId, setpresentClassId] = useState("");
   const { loading, verifyDocument } = useVerifyStudentDocument();
@@ -26,7 +26,7 @@ const VerificationForm = ({ email, studentId }) => {
     const verificationDetails = {
       email,
       studentId,
-      admissionNumber,
+      addmissionNumber,
       rejectionReason,
       isVerifiedDocuments,
       presentClassId,
@@ -98,8 +98,8 @@ const VerificationForm = ({ email, studentId }) => {
               <input
                 type="text"
                 id="admissionNumber"
-                value={admissionNumber}
-                onChange={(e) => setAdmissionNumber(e.target.value)}
+                value={addmissionNumber}
+                onChange={(e) => setAddmissionNumber(e.target.value)}
                 placeholder="Admission Number"
                 className="mt-1 block w-full px-3 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
               />

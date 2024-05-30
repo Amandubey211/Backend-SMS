@@ -15,6 +15,7 @@ import Fallback from "../Components/Fallback.js";
 
 function App() {
   const Dash = lazy(() => import("../Modules/Dashboard/Dash.js"));
+  const Addmission = lazy(() => import("../Modules/Addmission/Addmission.js"));
   const Classes = lazy(() => import("../Modules/Classes/Classes.js"));
   const Class = lazy(() => import("../Modules/Classes/SubClass/Class.js"));
   const UnVerifiedStudentDetails = lazy(() =>
@@ -94,6 +95,12 @@ function App() {
     {
       path: "/verify_students/:sid",
       element: <ProtectRoute Component={UnVerifiedStudentDetails} />,
+      errorElement: <Error />,
+    },
+
+    {
+      path: "/admissions",
+      element: <ProtectRoute Component={Addmission} />,
       errorElement: <Error />,
     },
   ]);

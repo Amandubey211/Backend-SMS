@@ -9,7 +9,7 @@ const DashLayout = ({ children }) => {
   const isSidebarOpen = useSelector((state) => state.sidebar.isOpen);
 
   return (
-    <div className="flex h-screen">
+    <div className="flex w-full  h-full">
       <Sidebar isOpen={isSidebarOpen} />
       <div
         className={`transition-all duration-300 ${
@@ -17,7 +17,7 @@ const DashLayout = ({ children }) => {
         } flex-1`}
       >
         <Navbar toggleSidebar={() => dispatch(toggleSidebar())} />
-        <main className="p-2 min-h-screen">{children}</main>
+        <main className=" w-full ">{children}</main>
       </div>
     </div>
   );

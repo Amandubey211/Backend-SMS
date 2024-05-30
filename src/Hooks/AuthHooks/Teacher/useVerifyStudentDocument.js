@@ -5,7 +5,7 @@ import useAssignClassToStudent from "./useAssignClassToStudent";
 import useSendLoginCredentials from "./useSendLoginCredentials";
 
 const API_URL = process.env.REACT_APP_API_URL;
-// const TOKEN_STORAGE_KEY = process.env.REACT_APP_TOKEN_STORAGE_KEY;
+// const TOKEN_STORAGE_KEY = process.env.REACT_APP_STUDENT_TOKEN_STORAGE_KEY;
 
 const useVerifyStudentDocument = () => {
   const [loading, setLoading] = useState(false);
@@ -25,7 +25,7 @@ const useVerifyStudentDocument = () => {
 
     if (
       details.isVerifiedDocuments === "verified" &&
-      !details.admissionNumber
+      !details.addmissionNumber
     ) {
       return "Field admissionNumber is required when documents are verified.";
     }
@@ -43,7 +43,10 @@ const useVerifyStudentDocument = () => {
     setLoading(true);
 
     try {
-      const token = process.env.REACT_APP_ADMIN_TOKEN;
+      const token = localStorage.getItem(
+        process.env.REACT_APP_ADMIN_TOKEN_STORAGE_KEY
+      );
+      console.log(token);
       const { data } = await axios.put(
         `${API_URL}/admin/verify_student_info`,
         verificationDetails,
