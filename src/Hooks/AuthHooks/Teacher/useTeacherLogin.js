@@ -45,7 +45,13 @@ const useTeacherLogin = () => {
       );
 
       if (data.success) {
+        console.log(TOKEN_STORAGE_KEY);
         localStorage.setItem(TOKEN_STORAGE_KEY, `Bearer ${data.token}`);
+        localStorage.removeItem(process.env.REACT_APP_PARENT_TOKEN_STORAGE_KEY);
+        localStorage.removeItem(
+          process.env.REACT_APP_STUDENT_TOKEN_STORAGE_KEY
+        );
+
         dispatch(setAuth(true));
         navigate("/dash");
         toast.success("Teacher Logged In successfully", {

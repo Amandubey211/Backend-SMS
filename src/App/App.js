@@ -18,6 +18,7 @@ function App() {
   const Addmission = lazy(() => import("../Modules/Addmission/Addmission.js"));
   const Classes = lazy(() => import("../Modules/Classes/Classes.js"));
   const Class = lazy(() => import("../Modules/Classes/SubClass/Class.js"));
+  const Teachers = lazy(() => import("../Modules/Teachers/Teacher.js"));
   const UnVerifiedStudentDetails = lazy(() =>
     import(
       "../Modules/Verification/SubStudentVerification/UnVerifiedStudentDetails.js"
@@ -101,6 +102,11 @@ function App() {
     {
       path: "/admissions",
       element: <ProtectRoute Component={Addmission} />,
+      errorElement: <Error />,
+    },
+    {
+      path: "/teachers",
+      element: <ProtectRoute Component={Teachers} />,
       errorElement: <Error />,
     },
   ]);

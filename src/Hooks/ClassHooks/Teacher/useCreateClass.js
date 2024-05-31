@@ -12,8 +12,9 @@ const useCreateClass = () => {
     setLoading(true);
 
     try {
-      let token =
-        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFtYW5AZ21haWwuY29tIiwidXNlcklkIjoiNjY1NWRkZTZkZTQ1ZDMzNjIxODA3Y2U0Iiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzE2OTYwNzMwLCJleHAiOjE3MTcwNDcxMzB9.Z-aO2RPjeIfuon-OpFCQC7mJgkkAjO73B2vyTFfiIyY";
+      const token = localStorage.getItem(
+        process.env.REACT_APP_ADMIN_TOKEN_STORAGE_KEY
+      );
       const { data } = await axios.post(
         `${API_URL}/admin/create_class`,
         classData,
@@ -23,7 +24,7 @@ const useCreateClass = () => {
       );
       if (data?.success) {
         console.log(data);
-        toast.success("class Created");
+        toast.success("Class Created");
       } else {
         toast.error(data.msg);
       }

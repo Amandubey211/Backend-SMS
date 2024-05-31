@@ -1,125 +1,23 @@
-// Sidebar.js
-import React, { useState } from "react";
-import StudentDiwanLogo from "../Assets/HomeAssets/StudentDiwanLogo.png";
-import { NavLink } from "react-router-dom";
-import {
-  MdOutlineKeyboardArrowUp,
-  MdOutlineKeyboardArrowDown,
-} from "react-icons/md";
-import sidebarData from "./DataFile/sidebarData.js";
+// src/components/Sidebar.js
+import React from "react";
+import { RxCross2 } from "react-icons/rx";
 
-const Sidebar = ({ isOpen }) => {
-  const [openItems, setOpenItems] = useState([]);
-
-  const toggleDropdown = (title) => {
-    if (openItems.includes(title)) {
-      setOpenItems(openItems.filter((item) => item !== title));
-    } else {
-      setOpenItems([...openItems, title]);
-    }
-  };
-
+const Sidebar = ({ isOpen, title, onClose, children, footer }) => {
   return (
-    <nav
-      className={`transition-all duration-300 h-screen p-4 bg-white shadow ${
-        isOpen ? "w-[15%]" : "w-[8%]"
-      }`}
+    <div
+      className={`fixed top-0 right-0 w-1/3 h-full py-3 px-4 bg-white shadow-lg transform ${
+        isOpen ? "translate-x-0" : "translate-x-full"
+      } transition-transform`}
     >
-      <div className="flex items-center justify-center p-2">
-        <img
-          src={StudentDiwanLogo}
-          alt="Logo"
-          className={`transition-width duration-300 ${
-            isOpen ? "w-36" : "w-28"
-          }`}
-        />
+      <div className="flex justify-between items-center px-2">
+        <h1 className="font-semibold">{title || "Please give title"}</h1>
+        <button onClick={onClose} className="p-1 m-1 opacity-70">
+          <RxCross2 className="text-xl" />
+        </button>
       </div>
-      <div className="mt-4">
-        {isOpen && <h2 className="text-gray-500">MENU</h2>}
-        <ul className="mt-2 space-y-2">
-          {sidebarData.map((item, index) => (
-            <React.Fragment key={index}>
-              {item.items ? (
-                <div
-                  className={`flex items-center w-full p-2 rounded-lg cursor-pointer ${
-                    openItems.includes(item.title)
-                      ? "bg-purple-100 text-purple-500"
-                      : "text-gray-700 hover:bg-gray-100"
-                  } ${isOpen ? "justify-between" : "justify-center"}`}
-                  onClick={() => toggleDropdown(item.title)}
-                >
-                  <div className={`flex justify-center `}>
-                    <span className={`${!isOpen && "text-xl"}`}>
-                      {item.icon}
-                    </span>
-                    {isOpen && (
-                      <span
-                        role="presentation"
-                        className="ml-3 flex items-center"
-                      >
-                        {item.title}
-                      </span>
-                    )}
-                  </div>
-                  {isOpen && (
-                    <>
-                      {openItems.includes(item.title) ? (
-                        <MdOutlineKeyboardArrowUp className="ml-2" />
-                      ) : (
-                        <MdOutlineKeyboardArrowDown className="ml-2" />
-                      )}
-                    </>
-                  )}
-                </div>
-              ) : (
-                <NavLink
-                  key={index}
-                  to={item.path}
-                  className={({ isActive }) =>
-                    `flex items-center p-2 rounded-lg ${
-                      isActive
-                        ? "text-purple-500 bg-purple-100"
-                        : "text-gray-700 hover:bg-gray-100"
-                    } ${isOpen ? "" : "justify-center"}`
-                  }
-                >
-                  <span className={`${!isOpen && "text-xl"}`}>{item.icon}</span>
-                  {isOpen && (
-                    <span role="presentation" className="ml-3">
-                      {item.title}
-                    </span>
-                  )}
-                </NavLink>
-              )}
-              {openItems.includes(item.title) && item.items && (
-                <ul className="pl-8 space-y-2">
-                  {item.items.map((subItem, subIndex) => (
-                    <NavLink
-                      key={subIndex}
-                      to={subItem.path}
-                      className={({ isActive }) =>
-                        `flex items-center p-2 rounded-lg ${
-                          isActive
-                            ? "text-purple-500 bg-purple-100"
-                            : "text-gray-700 hover:bg-gray-100"
-                        } ${isOpen ? "" : "justify-end"}`
-                      }
-                    >
-                      {subItem.icon}
-                      {isOpen && (
-                        <span role="presentation" className="ml-3">
-                          {subItem.title}
-                        </span>
-                      )}
-                    </NavLink>
-                  ))}
-                </ul>
-              )}
-            </React.Fragment>
-          ))}
-        </ul>
-      </div>
-    </nav>
+
+      {children}
+    </div>
   );
 };
 

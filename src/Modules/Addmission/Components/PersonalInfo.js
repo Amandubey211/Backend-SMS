@@ -43,6 +43,7 @@ const PersonalInfo = ({ studentInfo, handleInputChange }) => {
           value={studentInfo.gender}
           onChange={handleInputChange}
         >
+          <option value="">Choose Options</option>
           <option>Male</option>
           <option>Female</option>
           <option>Trans</option>
@@ -57,6 +58,7 @@ const PersonalInfo = ({ studentInfo, handleInputChange }) => {
           value={studentInfo.religion}
           onChange={handleInputChange}
         >
+          <option value="">Choose Options</option>
           <option>Islam</option>
           <option>Christianity</option>
           <option>Hinduism</option>
@@ -71,6 +73,7 @@ const PersonalInfo = ({ studentInfo, handleInputChange }) => {
           value={studentInfo.bloodGroup}
           onChange={handleInputChange}
         >
+          <option value="">Choose Options</option>
           <option>0+</option>
           <option>0-</option>
           <option>A+</option>

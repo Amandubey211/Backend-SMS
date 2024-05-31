@@ -1,8 +1,16 @@
 // src/components/AdmissionInfo.js
 
-import React from "react";
+import React, { useEffect } from "react";
+import { useSelector } from "react-redux";
+import useGetAllClassList from "../../../Hooks/AuthHooks/Teacher/useGetAllClassList";
 
 const AdmissionInfo = ({ studentInfo, handleInputChange }) => {
+  const { getClassList } = useGetAllClassList();
+
+  const classList = useSelector((store) => store.Admin.classList);
+  useEffect(() => {
+    getClassList();
+  }, []);
   return (
     <div className="mt-6">
       <h2 className="text-xl font-semibold mb-4">Admission to Class</h2>
@@ -15,10 +23,12 @@ const AdmissionInfo = ({ studentInfo, handleInputChange }) => {
             value={studentInfo.class}
             onChange={handleInputChange}
           >
-            <option>Class - 1</option>
-            <option>Class - 2</option>
-            <option>Class - 3</option>
-            <option>Class - 4</option>
+            <option value="">Choose Options</option>
+            {classList?.map((classItem, index) => (
+              <option key={index} value={classItem?._id} className="py-2">
+                {classItem.name}
+              </option>
+            ))}
           </select>
         </div>
         <div>
@@ -29,6 +39,7 @@ const AdmissionInfo = ({ studentInfo, handleInputChange }) => {
             value={studentInfo.section}
             onChange={handleInputChange}
           >
+            <option value="">Choose Options</option>
             <option>A</option>
             <option>B</option>
             <option>C</option>
@@ -46,13 +57,16 @@ const AdmissionInfo = ({ studentInfo, handleInputChange }) => {
         </div>
         <div>
           <label className="block text-gray-700">Admission Fee</label>
-          <input
-            type="text"
-            name="admissionFee"
-            className="mt-1 p-2 block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-            value={studentInfo.admissionFee}
-            onChange={handleInputChange}
-          />
+          <div className="flex items-center mt-1 p-2 rounded-md border border-gray-300 shadow-sm focus-within:border-indigo-300 focus-within:ring focus-within:ring-indigo-200 focus-within:ring-opacity-50">
+            <input
+              type="text"
+              name="admissionFee"
+              className="flex-grow focus:outline-none"
+              value={studentInfo.admissionFee}
+              onChange={handleInputChange}
+            />
+            <span className="ml-2">QR</span>
+          </div>
         </div>
         <div>
           <label className="block text-gray-700">Status</label>

@@ -1,4 +1,5 @@
 import React from "react";
+import { NavLink } from "react-router-dom";
 
 const DashCard = ({
   label,
@@ -7,9 +8,11 @@ const DashCard = ({
   textColor,
   icon,
   iconBackground,
+  url,
 }) => {
   return (
-    <div
+    <NavLink
+      to={url}
       className={`p-3 px-6 w-[20%] rounded-lg shadow-md ${bgColor} hover:shadow-lg transition-shadow duration-200`}
     >
       <div className="flex gap-4 items-center">
@@ -23,7 +26,7 @@ const DashCard = ({
           <div className={`mt-2 ${textColor}`}>{label}</div>
         </div>
       </div>
-    </div>
+    </NavLink>
   );
 };
 

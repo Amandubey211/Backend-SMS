@@ -12,20 +12,22 @@ const useGetRejectedStudents = () => {
     setLoading(true);
 
     try {
-      let token = process.env.REACT_APP_ADMIN_TOKEN;
+      const token = localStorage.getItem(
+        process.env.REACT_APP_ADMIN_TOKEN_STORAGE_KEY
+      );
 
-      //   const { data } = await axios.get(
-      //     `${API_URL}/admin/get_rejected_students`,
-      //     {
-      //       headers: { Authentication: token },
-      //     }
-      //   );
-      //   if (data?.success) {
-      //     dispatch(setRejectedStudents(data?.students));
-      //   } else {
-      //     toast.error(data.msg);
-      //   }
-      toast.success("working");
+      const { data } = await axios.get(
+        `${API_URL}/admin/get_rejected_student_details`,
+        {
+          headers: { Authentication: token },
+        }
+      );
+      console.log(data);
+      if (data?.success) {
+        dispatch(setRejectedStudents(data?.students));
+      } else {
+        toast.error(data.msg);
+      }
     } catch (error) {
       const errorMessage =
         error.response?.data?.msg || "Something went wrong. Please try again.";

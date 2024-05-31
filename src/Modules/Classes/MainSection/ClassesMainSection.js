@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import Sidebar from "../Sidebar";
 import ClassCard from "./ClassCard";
 import { classes } from "../../Dashboard/DashboardData/ClassesData";
+import Sidebar from "../../../Components/Sidebar";
+import AddNewClass from "./AddNewClass";
 
 const ClassesMainSection = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -25,7 +26,13 @@ const ClassesMainSection = () => {
           <ClassCard key={index} {...cls} />
         ))}
       </div>
-      <Sidebar isOpen={isSidebarOpen} onClose={handleSidebarClose} />
+      <Sidebar
+        isOpen={isSidebarOpen}
+        onClose={handleSidebarClose}
+        title="Add New Class"
+      >
+        <AddNewClass />
+      </Sidebar>
     </div>
   );
 };

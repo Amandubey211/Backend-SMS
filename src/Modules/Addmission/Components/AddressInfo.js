@@ -11,6 +11,7 @@ const AddressInfo = ({ studentInfo, handleInputChange }) => {
           <label className="block text-gray-700">Phone</label>
           <input
             type="text"
+            placeholder="000-000-0000"
             name="phone"
             className="mt-1 p-2 block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
             value={studentInfo.phone}
@@ -22,6 +23,7 @@ const AddressInfo = ({ studentInfo, handleInputChange }) => {
           <input
             type="text"
             name="email"
+            placeholder="studentdiwan@gmail.com"
             className="mt-1 p-2 block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
             value={studentInfo.email}
             onChange={handleInputChange}

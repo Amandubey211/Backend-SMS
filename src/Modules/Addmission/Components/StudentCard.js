@@ -14,7 +14,7 @@ const StudentCard = ({ studentInfo, imagePreview }) => {
   return (
     <div className="p-4 bg-white rounded-lg shadow-md w-64">
       <div className="flex flex-col items-center">
-        <div className="w-full h-32 bg-black relative">
+        <div className="w-full h-40 bg-black relative">
           <div className="absolute inset-0 flex items-center justify-center">
             <img
               src={imagePreview || "https://via.placeholder.com/150"}
@@ -27,7 +27,9 @@ const StudentCard = ({ studentInfo, imagePreview }) => {
           </div>
         </div>
         <div className=" mt-6">
-          <h2 className="text-lg  text-center font-semibold">{name}</h2>
+          <h2 className="text-lg  text-center font-semibold">
+            {name || "Name"}
+          </h2>
           <div className="text-sm text-gray-600 mt-2">
             <p>ID No: {studentId}</p>
             <p>Class: {studentClass}</p>

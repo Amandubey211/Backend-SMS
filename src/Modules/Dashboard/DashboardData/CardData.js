@@ -12,6 +12,7 @@ export const cardData = [
   },
   {
     label: "Teacher",
+    url: "/teachers",
     value: "674",
     bgColor: "bg-green-100",
     textColor: "text-green-700",

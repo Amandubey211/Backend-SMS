@@ -1,8 +1,8 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import Sidebar from "./Sidebar";
 import Navbar from "./Navbar";
 import { toggleSidebar } from "../Redux/Slices/SidebarSlice";
+import SideMenubar from "./SideMenubar";
 
 const DashLayout = ({ children }) => {
   const dispatch = useDispatch();
@@ -10,7 +10,7 @@ const DashLayout = ({ children }) => {
 
   return (
     <div className="flex w-full  h-full">
-      <Sidebar isOpen={isSidebarOpen} />
+      <SideMenubar isOpen={isSidebarOpen} />
       <div
         className={`transition-all duration-300 ${
           isSidebarOpen ? "w-4/5" : "w-[96%]"

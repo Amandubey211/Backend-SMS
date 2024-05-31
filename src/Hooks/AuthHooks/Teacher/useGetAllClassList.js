@@ -12,7 +12,9 @@ const useGetAllClassList = () => {
     setLoading(true);
 
     try {
-      let token = process.env.REACT_APP_ADMIN_TOKEN;
+      const token = localStorage.getItem(
+        process.env.REACT_APP_ADMIN_TOKEN_STORAGE_KEY
+      );
 
       const { data } = await axios.get(`${API_URL}/admin/get_class`, {
         headers: { Authentication: token },
