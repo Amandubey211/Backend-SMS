@@ -42,7 +42,7 @@ const Library = () => {
   ];
 
   return (
-    <div className="max-w-4xl mx-auto p-2 border  mt-3 bg-white rounded-lg ">
+    <div className="max-w-4xl mx-auto p-4   mt-3 bg-white rounded-lg shadow-md ">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-semibold">Library</h2>
         <button className="text-blue-600">View all</button>

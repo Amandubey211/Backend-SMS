@@ -115,7 +115,7 @@ function App() {
       errorElement: <Error />,
     },
     {
-      path: "/class/teachers",
+      path: "/class/:cid/teachers",
       element: <ProtectRoute Component={Teachers} role="admin" />,
       errorElement: <Error />,
     },

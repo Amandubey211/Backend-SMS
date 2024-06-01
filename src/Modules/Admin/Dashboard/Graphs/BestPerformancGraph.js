@@ -1,51 +1,79 @@
-import React from "react";
+import React, { useState } from "react";
 import { Bar } from "react-chartjs-2";
-import "chart.js/auto";
+import { Chart as ChartJS } from "chart.js/auto";
+import { weekData, monthData, yearData } from "./GraphData/BestPerformanceData";
 
-const BestPerformersChart = ({ data }) => {
-  const options = {
-    indexAxis: "y",
-    plugins: {
-      legend: {
-        display: false,
-      },
-    },
-    responsive: true,
-    scales: {
-      x: {
-        max: 100,
-        ticks: {
-          callback: (value) => `${value}%`,
-        },
-      },
-    },
-  };
+const BestPerformanceChart = () => {
+  const [data, setData] = useState(weekData);
 
-  const chartData = {
-    labels: data.map((item) => item.class),
-    datasets: data.map((item) => ({
-      label: item.subject,
-      data: [item.percentage],
-      backgroundColor: item.color,
-      barThickness: 30,
-    })),
+  const handleTimeFrameChange = (e) => {
+    const timeFrame = e.target.value;
+    if (timeFrame === "Week") {
+      setData(weekData);
+    } else if (timeFrame === "Month") {
+      setData(monthData);
+    } else if (timeFrame === "Year") {
+      setData(yearData);
+    }
   };
 
   return (
-    <div
-      className="max-w-4xl mx-auto p-2   shadow-md"
-      style={{ width: "500px", height: "350px", margin: "auto" }}
-    >
-      <div className="flex justify-between items-center mb-8">
-        <h2 className="text-lg font-semibold">Best Performers</h2>
-        <select className="border border-gray-300 rounded-md p-2">
-          <option>Week</option>
-          <option>Month</option>
-        </select>
+    <div className="h-full py-10 ">
+      <div className="flex justify-between px-4 items-center">
+        <h1 className="text-2xl font-bold text-center mb-5">Best Performers</h1>
+        <div className="flex justify-center mb-5">
+          <select
+            className="p-2 border rounded"
+            onChange={handleTimeFrameChange}
+          >
+            <option>Week</option>
+            <option>Month</option>
+            <option>Year</option>
+          </select>
+        </div>
       </div>
-      <Bar data={chartData} options={options} />
+
+      <div className="w-full max-w-4xl mx-auto">
+        <div className="">
+          {" "}
+          {/* Set height here */}
+          <Bar
+            data={data}
+            options={{
+              indexAxis: "y",
+              plugins: {
+                legend: {
+                  display: true,
+                  position: "top",
+                },
+              },
+              scales: {
+                x: {
+                  title: {
+                    display: true,
+                    text: "Percentage",
+                  },
+                  ticks: {
+                    callback: function (value) {
+                      return value + "%";
+                    },
+                  },
+                },
+                y: {
+                  title: {
+                    display: true,
+                  },
+                  stacked: true,
+                },
+              },
+              categoryPercentage: 0.8, // Adjusts the width of the category
+              barPercentage: 0.9, // Adjusts the width of the bars
+            }}
+          />
+        </div>
+      </div>
     </div>
   );
 };
 
-export default BestPerformersChart;
+export default BestPerformanceChart;

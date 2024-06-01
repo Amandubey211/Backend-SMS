@@ -6,6 +6,7 @@ import dummyData from "./DummyData/dummyData";
 import SubjectCard from "./SubjectCard";
 import Sidebar from "../../../../Components/Common/Sidebar";
 import AddNewSubject from "./AddNewSubject";
+import { useParams } from "react-router-dom";
 
 const colors = [
   "bg-yellow-300",
@@ -22,9 +23,9 @@ const getColor = (index) => {
 
 const MainSection = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
+  const { cid } = useParams();
   const iconData = [
-    { icon: "👓", text: "20 Teacher Assigned", url: "/class/teachers" },
+    { icon: "👓", text: "20 Teacher Assigned", url: `/class/${cid}/teachers` },
     { icon: "🏫", text: "3 Section | 11 Groups" },
     { icon: "🎓", text: "250 Students" },
     { icon: "📅", text: "Attendance" },

@@ -1,6 +1,6 @@
 import React from "react";
 import HomeBackground from "../../Assets/HomeAssets/HomeBackground.png";
-import HomeLeft from "./HomeLeft";
+import HomeLeft from "./HomeLeft.js";
 import Layout from "../../Components/Common/Layout";
 const home = () => {
   return (

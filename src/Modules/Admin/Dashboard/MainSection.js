@@ -38,11 +38,11 @@ const MainSection = () => {
             <TotalStudentsGraphjs />
           </div>
         </div>
-        <div className="flex flex-wrap mt-3 justify-between ">
-          <div className="w-full md:w-1/2">
+        <div className="flex flex-wrap items-center mt-3 justify-between ">
+          <div className="w-full md:w-1/2 pe-4 border flex flex-col  justify-center">
             <BestPerformersChart data={performanceData} />
           </div>
-          <div className="w-full md:w-1/2">
+          <div className="w-full md:w-1/2 border">
             <Library />
           </div>
         </div>

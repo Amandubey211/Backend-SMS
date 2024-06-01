@@ -6,9 +6,6 @@ const AdminSlice = createSlice({
     unVerifiedStudents: [],
     rejectedStudents: [],
     classList: [],
-    NavbarData: {
-      leftHeading: "Students",
-    },
   },
   reducers: {
     setUnVerifiedStudents: (state, action) => {
@@ -20,16 +17,13 @@ const AdminSlice = createSlice({
     setClassList: (state, action) => {
       state.classList = action.payload;
     },
-    setLeftHeading: (state, action) => {
-      state.NavbarData.leftHeading = action.payload;
-    },
   },
 });
 
 export const {
   setUnVerifiedStudents,
   setClassList,
-  setLeftHeading,
+
   setRejectedStudents,
 } = AdminSlice.actions;
 

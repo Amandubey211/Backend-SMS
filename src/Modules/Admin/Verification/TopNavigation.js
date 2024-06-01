@@ -2,13 +2,20 @@
 
 import React from "react";
 import { CiSearch } from "react-icons/ci";
+import { useSelector } from "react-redux";
 
 const TopNavigation = ({
+  totalUnVerified,
+  totalRejected,
   activeTab,
   setActiveTab,
   searchQuery,
   handleSearchChange,
 }) => {
+  const unVerifiedStudents = useSelector(
+    (store) => store.Admin.unVerifiedStudents
+  );
+  const rejectedStudents = useSelector((store) => store.Admin.rejectedStudents);
   return (
     <div className="flex justify-between items-center mb-6">
       <div className="flex gap-2 items-center">
@@ -20,7 +27,7 @@ const TopNavigation = ({
           }`}
           onClick={() => setActiveTab("unverified")}
         >
-          Unverified Students
+          Unverified Students({unVerifiedStudents.length})
         </h1>
         <h1
           className={`text-xl font-semibold p-1 border rounded-2xl px-4 cursor-pointer transition-all duration-300 ${
@@ -30,7 +37,7 @@ const TopNavigation = ({
           }`}
           onClick={() => setActiveTab("rejected")}
         >
-          Rejected Students
+          Rejected Students({rejectedStudents.length})
         </h1>
       </div>
 

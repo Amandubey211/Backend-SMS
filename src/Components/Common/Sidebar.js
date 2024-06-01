@@ -5,7 +5,7 @@ import { RxCross2 } from "react-icons/rx";
 const Sidebar = ({ isOpen, title, onClose, children, footer }) => {
   return (
     <div
-      className={`fixed top-0 right-0 w-1/3 h-full py-3 px-4 bg-white shadow-lg transform ${
+      className={`fixed  z-30 top-0 right-0 w-1/3 h-full py-3 px-4 bg-white shadow-lg transform ${
         isOpen ? "translate-x-0" : "translate-x-full"
       } transition-transform`}
     >
