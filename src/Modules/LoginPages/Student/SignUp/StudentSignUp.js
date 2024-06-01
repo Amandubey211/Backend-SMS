@@ -1,6 +1,6 @@
 import React from "react";
 import StudentSignUpForm from "./StudentSignUpForm";
-import Layout from "../../../../Components/Layout";
+import Layout from "../../../../Components/Common/Layout";
 
 const StudentSignUp = () => {
   return (

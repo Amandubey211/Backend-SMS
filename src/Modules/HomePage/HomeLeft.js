@@ -4,7 +4,7 @@ import TeacherBtnLogo from "../../Assets/HomeAssets/TeacherBtnLogo.png";
 import StudentBtnLogo from "../../Assets/HomeAssets/StudentBtnLogo.png";
 import ParentBtnLogo from "../../Assets/HomeAssets/ParentBtnLogo.png";
 import { NavLink } from "react-router-dom";
-import Logo from "../../Components/Logo";
+import Logo from "../../Components/Common/Logo";
 
 const HomeLeft = () => {
   return (

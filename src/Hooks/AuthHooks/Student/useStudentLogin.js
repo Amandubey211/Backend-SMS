@@ -1,7 +1,7 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
-import { setAuth } from "../../../Redux/Slices/AuthSlice.js";
+import { setAuth, setRole } from "../../../Redux/Slices/AuthSlice.js";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
@@ -30,9 +30,11 @@ const useStudentLogin = () => {
 
       if (data.success) {
         dispatch(setAuth(true));
-        toast.success("Logged in successfully");
+        dispatch(setRole("student"));
+        navigate(data.isVerifiedSchoolId && "/student_dash");
         localStorage.setItem(TOKEN_STORAGE_KEY, `Bearer ${data.token}`);
-        navigate(data.isVerifiedSchoolId && "/dash");
+
+        toast.success("Logged in successfully");
       } else {
         toast.error(data.msg || "Login unsuccessful");
       }

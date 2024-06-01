@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Logo from "../../../Components/Logo";
+import Logo from "../../../Components/Common/Logo";
 import { NavLink } from "react-router-dom";
 import { FaEye } from "react-icons/fa";
 import { PiEyeClosedFill } from "react-icons/pi";

@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import Logo from "../../../../Components/Logo";
+import Logo from "../../../../Components/Common/Logo";
 import { FaEye } from "react-icons/fa";
 import { PiEyeClosedFill } from "react-icons/pi";
 import useResetPassword from "../../../../Hooks/AuthHooks/Student/useResetPassword";
 import { LuLoader } from "react-icons/lu";
 import { NavLink } from "react-router-dom";
-import Layout from "../../../../Components/Layout";
+import Layout from "../../../../Components/Common/Layout";
 
 const ResetPassword = () => {
   const [resetDetails, setResetDetails] = useState({

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
-import { setAuth } from "../../../Redux/Slices/AuthSlice.js";
+import { setAuth, setRole } from "../../../Redux/Slices/AuthSlice.js";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
@@ -53,7 +53,8 @@ const useTeacherLogin = () => {
         );
 
         dispatch(setAuth(true));
-        navigate("/dash");
+        dispatch(setRole("admin"));
+        navigate("/admin_dash");
         toast.success("Teacher Logged In successfully", {
           position: "bottom-left",
         });

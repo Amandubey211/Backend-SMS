@@ -1,7 +1,7 @@
 import React from "react";
 import TeacherLoginForm from "./TeacherLoginForm";
 import TeacherLoginBanner from "../../../Assets/TeacherAssets/TeacherLoginBanner.png";
-import Layout from "../../../Components/Layout";
+import Layout from "../../../Components/Common/Layout";
 const TeacherLogin = () => {
   return (
     <Layout title="Teacher's Login Form">

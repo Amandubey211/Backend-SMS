@@ -1,7 +1,7 @@
 import React from "react";
 import ParentLoginBanner from "../../../Assets/ParentAssets/ParentLoginBanner.png";
 import ParentForm from "./ParentForm";
-import Layout from "../../../Components/Layout";
+import Layout from "../../../Components/Common/Layout";
 const ParentLogin = () => {
   return (
     <Layout title="parent's Login page">

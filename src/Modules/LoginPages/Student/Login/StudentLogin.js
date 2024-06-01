@@ -1,12 +1,11 @@
 import React from "react";
 import StudentRightSide from "../../../../Assets/StudentAssets/StudentRightSide.png";
 import StudentLoginForm from "./StudentLoginForm";
-import Layout from "../../../../Components/Layout";
+import Layout from "../../../../Components/Common/Layout";
 import QIDLogin from "./QIDLogin";
 import { useSelector } from "react-redux";
 const StudentLogin = () => {
-  const Auth = useSelector((store) => store.Auth.isLogedIn);
-  // const isSigninPage = useSelector((store) => store.Auth.isSignInPage);
+  const Auth = useSelector((store) => store.Auth.isLoggedIn);
 
   return (
     <Layout title="Student Login">

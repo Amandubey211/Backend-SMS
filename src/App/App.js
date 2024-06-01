@@ -1,6 +1,6 @@
 import { Suspense, lazy, useEffect, useState } from "react";
-import Error from "../Components/Error";
-import Offline from "../Components/Offline";
+import Error from "../Components/Common/Error.js";
+import Offline from "../Components/Common/Offline.js";
 import Home from "../Modules/HomePage/Home";
 import ParentLogin from "../Modules/LoginPages/Parent/ParentLogin";
 import StudentLogin from "../Modules/LoginPages/Student/Login/StudentLogin.js";
@@ -11,22 +11,29 @@ import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import ProtectRoute from "../Routes/ProtectedRoutes/ProtectedRoute";
 import StudentSignUp from "../Modules/LoginPages/Student/SignUp/StudentSignUp.js";
 import ResetPassword from "../Modules/LoginPages/Student/ResetPassword/ResetPassword.js";
-import Fallback from "../Components/Fallback.js";
+import Fallback from "../Components/Common/Fallback.js";
 
 function App() {
-  const Dash = lazy(() => import("../Modules/Dashboard/Dash.js"));
-  const Addmission = lazy(() => import("../Modules/Addmission/Addmission.js"));
-  const Classes = lazy(() => import("../Modules/Classes/Classes.js"));
-  const Class = lazy(() => import("../Modules/Classes/SubClass/Class.js"));
-  const Teachers = lazy(() => import("../Modules/Teachers/Teacher.js"));
+  const Dash = lazy(() => import("../Modules/Admin/Dashboard/Dash.js"));
+  const Addmission = lazy(() =>
+    import("../Modules/Admin/Addmission/Addmission.js")
+  );
+  const Classes = lazy(() => import("../Modules/Admin/Classes/Classes.js"));
+  const Class = lazy(() =>
+    import("../Modules/Admin/Classes/SubClass/Class.js")
+  );
+  const Teachers = lazy(() => import("../Modules/Admin/Teachers/Teacher.js"));
   const UnVerifiedStudentDetails = lazy(() =>
     import(
-      "../Modules/Verification/SubStudentVerification/UnVerifiedStudentDetails.js"
+      "../Modules/Admin/Verification/SubStudentVerification/UnVerifiedStudentDetails.js"
     )
   );
 
   const VerificationPage = lazy(() =>
-    import("../Modules/Verification/VerificationPage.js")
+    import("../Modules/Admin/Verification/VerificationPage.js")
+  );
+  const StudentDash = lazy(() =>
+    import("../Modules/Student/Dashboard/StudentDash.js")
   );
 
   const [isOnline, setIsOnline] = useState(window.navigator.onLine);
@@ -73,40 +80,50 @@ function App() {
       element: <ResetPassword />,
       errorElement: <Error />,
     },
+    // Admin Routes------------------------
     {
-      path: "/dash",
-      element: <ProtectRoute Component={Dash} />,
+      path: "/admin_dash",
+      element: <ProtectRoute Component={Dash} role="admin" />,
       errorElement: <Error />,
     },
     {
-      path: "/classes",
-      element: <ProtectRoute Component={Classes} />,
+      path: "/class",
+      element: <ProtectRoute Component={Classes} role="admin" />,
       errorElement: <Error />,
     },
     {
       path: "/class/:cid",
-      element: <ProtectRoute Component={Class} />,
+      element: <ProtectRoute Component={Class} role="admin" />,
       errorElement: <Error />,
     },
     {
       path: "/verify_students",
-      element: <ProtectRoute Component={VerificationPage} />,
+      element: <ProtectRoute Component={VerificationPage} role="admin" />,
       errorElement: <Error />,
     },
     {
       path: "/verify_students/:sid",
-      element: <ProtectRoute Component={UnVerifiedStudentDetails} />,
+      element: (
+        <ProtectRoute Component={UnVerifiedStudentDetails} role="admin" />
+      ),
       errorElement: <Error />,
     },
 
     {
       path: "/admissions",
-      element: <ProtectRoute Component={Addmission} />,
+      element: <ProtectRoute Component={Addmission} role="admin" />,
       errorElement: <Error />,
     },
     {
-      path: "/teachers",
-      element: <ProtectRoute Component={Teachers} />,
+      path: "/class/teachers",
+      element: <ProtectRoute Component={Teachers} role="admin" />,
+      errorElement: <Error />,
+    },
+
+    //Student Routes-------------------------
+    {
+      path: "/student_dash",
+      element: <ProtectRoute Component={StudentDash} role="student" />,
       errorElement: <Error />,
     },
   ]);

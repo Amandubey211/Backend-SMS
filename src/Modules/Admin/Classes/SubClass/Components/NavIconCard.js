@@ -1,0 +1,15 @@
+import React from "react";
+import { NavLink } from "react-router-dom";
+
+const NavIconCard = ({ icon, text, url }) => {
+  return (
+    <NavLink
+      to={url}
+      className="flex flex-col items-center p-3 border rounded-lg w-64 h-28"
+    >
+      <div className="text-[2rem] mb-2">{icon}</div>
+      <div className="text-lg text-center">{text}</div>
+    </NavLink>
+  );
+};
+export default NavIconCard;

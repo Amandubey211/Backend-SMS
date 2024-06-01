@@ -1,13 +1,11 @@
 import React, { useState } from "react";
-import Logo from "../../../../Components/Logo";
+import Logo from "../../../../Components/Common/Logo";
 import { NavLink } from "react-router-dom";
 import { FaEye } from "react-icons/fa";
 import { PiEyeClosedFill } from "react-icons/pi";
 import useStudentLogin from "../../../../Hooks/AuthHooks/Student/useStudentLogin";
 import toast from "react-hot-toast";
 import { LuLoader } from "react-icons/lu";
-// import { setIsSignInPage } from "../../../Redux/Slices/AuthSlice";
-// import { useDispatch } from "react-redux";
 
 const StudentLoginForm = () => {
   const [StudentDetails, setStudentDetails] = useState({
@@ -16,17 +14,13 @@ const StudentLoginForm = () => {
   });
   const { loading, studentLogin } = useStudentLogin();
 
-  // const dispatch = useDispatch();
   const HandleSubmit = (e) => {
     e.preventDefault();
     if (!StudentDetails) return toast.error("please add the required details");
     studentLogin(StudentDetails);
   };
   const [showPassword, setShowPassword] = useState(false);
-  // const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // const openModal = () => setIsModalOpen(true);
-  // const closeModal = () => setIsModalOpen(false);
   return (
     <div className="relative h-full bg-gray-100 w-full">
       <div className="absolute top-0 right-0 p-6">
@@ -45,16 +39,6 @@ const StudentLoginForm = () => {
           </NavLink>
           <div className="flex justify-between items-center  mb-6">
             <h2 className="text-2xl font-semibold">Student Account</h2>
-            {/* <button
-              onClick={openModal}
-              className="p-2 bg-gradient-to-r from-pink-500 to-purple-500 text-black py-2 px-3 rounded-md hover:from-pink-600 hover:to-purple-600"
-            >
-              Open Modal
-            </button>
-            <Modal isOpen={isModalOpen} onClose={closeModal}>
-              <h1 className="text-lg font-bold">Modal Title</h1>
-              <p className="mt-4">This is the modal content.</p>
-            </Modal> */}
           </div>
           <form onSubmit={HandleSubmit}>
             <h6>Login in using:</h6>
@@ -123,7 +107,6 @@ const StudentLoginForm = () => {
           <div className="text-center py-2">
             <span className="opacity-70">New to Student Diwan?</span>{" "}
             <NavLink
-              // onClick={() => dispatch(setIsSignInPage(false))}
               className="text-indigo-600 hover:text-indigo-900"
               to="/signUp"
             >

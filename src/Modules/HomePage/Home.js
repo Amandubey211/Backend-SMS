@@ -1,7 +1,7 @@
 import React from "react";
 import HomeBackground from "../../Assets/HomeAssets/HomeBackground.png";
 import HomeLeft from "./HomeLeft";
-import Layout from "../../Components/Layout";
+import Layout from "../../Components/Common/Layout";
 const home = () => {
   return (
     <Layout title="Student Diwan">

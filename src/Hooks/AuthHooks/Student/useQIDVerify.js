@@ -2,8 +2,11 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { setRole } from "../../../Redux/Slices/AuthSlice";
+import { useDispatch } from "react-redux";
 const TOKEN_STORAGE_KEY = process.env.REACT_APP_STUDENT_TOKEN_STORAGE_KEY;
 const useQidVerification = () => {
+  const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const verify = async (studentDetails) => {
@@ -19,10 +22,11 @@ const useQidVerification = () => {
         studentDetails,
         { headers: { Authentication: token } }
       );
-      console.log(data);
+
       if (data.success) {
+        dispatch(setRole("student"));
         toast.success("Verified successfully");
-        navigate("/dash");
+        navigate("/student_dash");
       } else {
         toast.error(data.msg || "Verification unsuccessful");
       }

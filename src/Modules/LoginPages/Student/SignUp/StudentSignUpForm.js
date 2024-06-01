@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
 import toast from "react-hot-toast";
-import Logo from "../../../../Components/Logo";
+import Logo from "../../../../Components/Common/Logo";
 import useSaveDetails from "../../../../Hooks/AuthHooks/Student/useSaveDetails";
 import useSaveDocument from "../../../../Hooks/AuthHooks/Student/useSaveDocuments";
 import PersonalInformationForm from "./PersonalInformationForm";
