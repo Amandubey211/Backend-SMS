@@ -15,6 +15,9 @@ import Fallback from "../Components/Common/Fallback.js";
 
 function App() {
   const Dash = lazy(() => import("../Modules/Admin/Dashboard/Dash.js"));
+  const Group_Section = lazy(() =>
+    import("../Modules/Admin/Groups&Sections/Group_Section.js")
+  );
   const Addmission = lazy(() =>
     import("../Modules/Admin/Addmission/Addmission.js")
   );
@@ -117,6 +120,11 @@ function App() {
     {
       path: "/class/:cid/teachers",
       element: <ProtectRoute Component={Teachers} role="admin" />,
+      errorElement: <Error />,
+    },
+    {
+      path: "/class/:cid/section_group",
+      element: <ProtectRoute Component={Group_Section} role="admin" />,
       errorElement: <Error />,
     },
 

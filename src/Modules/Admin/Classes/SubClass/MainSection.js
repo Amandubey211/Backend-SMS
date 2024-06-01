@@ -26,7 +26,11 @@ const MainSection = () => {
   const { cid } = useParams();
   const iconData = [
     { icon: "👓", text: "20 Teacher Assigned", url: `/class/${cid}/teachers` },
-    { icon: "🏫", text: "3 Section | 11 Groups" },
+    {
+      icon: "🏫",
+      text: "3 Section | 11 Groups",
+      url: `/class/${cid}/section_group`,
+    },
     { icon: "🎓", text: "250 Students" },
     { icon: "📅", text: "Attendance" },
   ];
