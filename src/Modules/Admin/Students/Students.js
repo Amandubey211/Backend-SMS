@@ -1,13 +1,9 @@
 import React from "react";
 import Layout from "../../../Components/Common/Layout";
 import DashLayout from "../../../Components/Admin/AdminDashLayout";
-import { useParams } from "react-router-dom";
-import useNavHeading from "../../../Hooks/CommonHooks/useNavHeading ";
 import MainSection from "./MainSection";
 
-const Group_Section = () => {
-  const { cid } = useParams();
-  useNavHeading(cid, "Sections & Groups");
+const Students = () => {
   return (
     <Layout>
       <DashLayout children={<MainSection />} />
@@ -15,4 +11,4 @@ const Group_Section = () => {
   );
 };
 
-export default Group_Section;
+export default Students;

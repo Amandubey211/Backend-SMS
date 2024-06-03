@@ -6,6 +6,7 @@ import { CiSearch } from "react-icons/ci";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { useSelector } from "react-redux";
 import { MdOutlineKeyboardDoubleArrowRight } from "react-icons/md";
+import { NavLink } from "react-router-dom";
 
 const Navbar = ({ toggleSidebar }) => {
   const isSidebarOpen = useSelector((state) => state.sidebar.isOpen);
@@ -22,6 +23,7 @@ const Navbar = ({ toggleSidebar }) => {
           </div>
         </button>
 
+        {/* // have to make this not only visual but functional  */}
         <div className="flex-1 text-xl font-semibold text-purple-500">
           {LeftNavHeading[1] === undefined ? (
             <> {LeftNavHeading[0]}</>
@@ -31,10 +33,14 @@ const Navbar = ({ toggleSidebar }) => {
                 <h2>{LeftNavHeading[0]}</h2>
                 <MdOutlineKeyboardDoubleArrowRight className="text-2xl" />
               </span>
-              <h1> {LeftNavHeading[1]}</h1>{" "}
+
+              <h1 className="text-gradient text-xl font-bold">
+                {LeftNavHeading[1]}
+              </h1>
             </div>
           )}
         </div>
+        {/* ----------------------------------------------- */}
         <div className="relative flex items-center max-w-xs w-full mr-4">
           <input
             type="text"

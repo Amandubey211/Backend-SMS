@@ -31,7 +31,7 @@ const MainSection = () => {
       text: "3 Section | 11 Groups",
       url: `/class/${cid}/section_group`,
     },
-    { icon: "🎓", text: "250 Students" },
+    { icon: "🎓", text: "250 Students", url: `/class/${cid}/students` },
     { icon: "📅", text: "Attendance" },
   ];
 
