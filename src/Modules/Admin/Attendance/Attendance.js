@@ -2,18 +2,20 @@ import React from "react";
 import Layout from "../../../Components/Common/Layout";
 import DashLayout from "../../../Components/Admin/AdminDashLayout";
 import MainSection from "./MainSection";
-import { useParams } from "react-router-dom";
 import useNavHeading from "../../../Hooks/CommonHooks/useNavHeading ";
+import { useParams } from "react-router-dom";
 
-const Students = () => {
+const Attendance = () => {
   const { cid } = useParams();
 
-  useNavHeading(cid, "Students");
+  useNavHeading(cid, "Attendance");
   return (
-    <Layout>
-      <DashLayout children={<MainSection />} />
-    </Layout>
+    <div>
+      <Layout>
+        <DashLayout children={<MainSection />} />
+      </Layout>
+    </div>
   );
 };
 
-export default Students;
+export default Attendance;

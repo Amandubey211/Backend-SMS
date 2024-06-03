@@ -18,6 +18,9 @@ function App() {
   const Group_Section = lazy(() =>
     import("../Modules/Admin/Groups&Sections/Group_Section.js")
   );
+  const Attendance = lazy(() =>
+    import("../Modules/Admin/Attendance/Attendance.js")
+  );
   const Students = lazy(() => import("../Modules/Admin/Students/Students.js"));
   const Addmission = lazy(() =>
     import("../Modules/Admin/Addmission/Addmission.js")
@@ -131,6 +134,11 @@ function App() {
     {
       path: "/class/:cid/students",
       element: <ProtectRoute Component={Students} role="admin" />,
+      errorElement: <Error />,
+    },
+    {
+      path: "/class/:cid/attendance",
+      element: <ProtectRoute Component={Attendance} role="admin" />,
       errorElement: <Error />,
     },
 

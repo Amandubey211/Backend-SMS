@@ -32,7 +32,7 @@ const MainSection = () => {
       url: `/class/${cid}/section_group`,
     },
     { icon: "🎓", text: "250 Students", url: `/class/${cid}/students` },
-    { icon: "📅", text: "Attendance" },
+    { icon: "📅", text: "Attendance", url: `/class/${cid}/attendance` },
   ];
 
   const handleAddNewSubject = () => {

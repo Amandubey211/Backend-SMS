@@ -1,5 +1,10 @@
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { HiOutlineDotsVertical } from "react-icons/hi";
+import { BsArrow90DegRight } from "react-icons/bs";
+import { MdOutlineModeEditOutline } from "react-icons/md";
+import { RiDeleteBin2Line } from "react-icons/ri";
+import { LuUser } from "react-icons/lu";
+import { GiImperialCrown } from "react-icons/gi";
 const groups = [
   {
     name: "English Group",
@@ -70,6 +75,31 @@ const groups = [
 ];
 
 const GroupList = () => {
+  const [expandedGroupIndex, setExpandedGroupIndex] = useState(null);
+  const [showMenu, setShowMenu] = useState(null);
+  const menuRef = useRef(null);
+
+  const toggleGroup = (index) => {
+    setExpandedGroupIndex(expandedGroupIndex === index ? null : index);
+  };
+
+  const toggleMenu = (index) => {
+    setShowMenu(showMenu === index ? null : index);
+  };
+
+  const handleClickOutside = (event) => {
+    if (menuRef.current && !menuRef.current.contains(event.target)) {
+      setShowMenu(null);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   return (
     <div className="w-full max-w-4xl p-4 bg-white rounded-lg shadow-lg">
       <div className="flex items-center justify-between mb-4">
@@ -86,34 +116,26 @@ const GroupList = () => {
       </div>
       {groups.map((group, groupIndex) => (
         <div key={groupIndex} className="mb-6">
-          <div
-            className={`flex items-center justify-between py-2 ${
-              groupIndex === 0 ? "text-blue-600" : "text-purple-600"
-            }`}
-          >
-            <h3 className="text-lg font-semibold text-purple-500">
+          <div className={`flex items-center justify-between py-2 `}>
+            <h3
+              className="text-lg font-semibold text-purple-500 cursor-pointer"
+              onClick={() => toggleGroup(groupIndex)}
+            >
               {group.name}
             </h3>
             <div className="flex items-center space-x-2">
-              <div className="flex items-center space-x-1">
-                <svg
-                  className="w-5 h-5 text-gray-500"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M5 13l4 4L19 7"
-                  ></path>
-                </svg>
-                <span className="text-gray-500">Students 5/20</span>
+              <div className="flex items-center space-x-1 border p-1 rounded-full px-4">
+                <LuUser />
+
+                <span className="text-gray-500 ">
+                  Students <span className="text-gradient"> 5/20</span>
+                </span>
               </div>
               <svg
-                className="w-5 h-5 text-gray-500"
+                className={`w-7 h-7 text-gray-500 transform p-1 border rounded-full  transition-transform ${
+                  expandedGroupIndex === groupIndex ? "rotate-180" : ""
+                }`}
+                onClick={() => toggleGroup(groupIndex)}
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -128,42 +150,74 @@ const GroupList = () => {
               </svg>
             </div>
           </div>
-          <ul className="mt-2 border-t border-gray-200">
-            {group.members.map((member, memberIndex) => (
-              <li
-                key={memberIndex}
-                className="flex items-center justify-between py-4 border-b border-gray-200"
-              >
-                <div className="flex items-center">
-                  <img
-                    src={`https://randomuser.me/api/portraits/med/${
-                      memberIndex % 2 === 0 ? "men" : "women"
-                    }/${memberIndex}.jpg`}
-                    alt={member.name}
-                    className="w-10 h-10 rounded-full mr-3"
-                  />
-                  <div>
-                    <div className="text-sm font-medium">{member.name}</div>
-                    <div className="text-xs text-gray-500">
-                      {member.role === "Group Leader" && member.role}
+          {expandedGroupIndex === groupIndex && (
+            <ul className="mt-2 border-t border-gray-200">
+              {group.members.map((member, memberIndex) => (
+                <li
+                  key={memberIndex}
+                  className="flex items-center justify-between py-4 border-b border-gray-200 relative"
+                >
+                  <div className="flex items-center">
+                    <img
+                      src={`https://randomuser.me/api/portraits/med/${
+                        memberIndex % 2 === 0 ? "men" : "women"
+                      }/${memberIndex}.jpg`}
+                      alt={member.name}
+                      className="w-10 h-10 rounded-full mr-3"
+                    />
+                    <div>
+                      <div className="text-sm font-medium">{member.name}</div>
+                      <div className="text-xs text-gray-500">
+                        {member.role === "Group Leader" && member.role}
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div className="flex flex-col justify-start  items-start text-sm">
-                  <span>{member.email}</span>
-                  <span>{member.phone}</span>
-                </div>
-                <div className="flex flex-col  justify-start text-sm">
-                  <span>parent</span>
-                  <span>7700042037</span>
-                </div>
-                <button className="px-3 py-1 text-green-500 font-semibold text-sm border border-green-500 rounded-md">
-                  {member.grade}
-                </button>
-                <HiOutlineDotsVertical />
-              </li>
-            ))}
-          </ul>
+                  <div className="flex flex-col justify-start  items-start text-sm">
+                    <span>{member.email}</span>
+                    <span>{member.phone}</span>
+                  </div>
+                  <div className="flex flex-col  justify-start text-sm">
+                    <span>parent</span>
+                    <span>7700042037</span>
+                  </div>
+                  <button className="px-3 py-1 text-green-500 font-semibold text-sm border border-green-500 rounded-md">
+                    {member.grade}
+                  </button>
+                  <button
+                    onClick={() => toggleMenu(memberIndex)}
+                    className="p-2"
+                  >
+                    <HiOutlineDotsVertical />
+                  </button>
+                  {showMenu === memberIndex && (
+                    <div
+                      ref={menuRef}
+                      className="absolute right-0 top-full mt-2 w-52 bg-white rounded-lg shadow-lg p-4 z-10 animate-fade-in"
+                    >
+                      <ul className="space-y-2">
+                        <li className="flex items-center space-x-2">
+                          <GiImperialCrown className="text-orange-300" />
+                          <span>Group Leader</span>
+                        </li>
+                        <li className="flex items-center space-x-2">
+                          <BsArrow90DegRight />
+                          <span>Move to Section</span>
+                        </li>
+                        <li className="flex items-center space-x-2">
+                          <MdOutlineModeEditOutline className="text-[#0D9755]" />
+                          <span>Edit student</span>
+                        </li>
+                        <li className="flex items-center space-x-2">
+                          <RiDeleteBin2Line className="text-[#E33131]" />
+                          <span>Remove From Group</span>
+                        </li>
+                      </ul>
+                    </div>
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       ))}
     </div>

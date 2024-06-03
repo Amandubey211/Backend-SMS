@@ -14,7 +14,7 @@ const StudentCard = ({ studentInfo, imagePreview }) => {
   return (
     <div className="p-4 bg-white rounded-lg shadow-md w-64">
       <div className="flex flex-col items-center">
-        <div className="w-full h-40 bg-black relative">
+        <div className="w-full h-40 bg-gradient-to-r rounded-md from-pink-500 to-purple-500 relative">
           <div className="absolute inset-0 flex items-center justify-center">
             <img
               src={imagePreview || "https://via.placeholder.com/150"}
