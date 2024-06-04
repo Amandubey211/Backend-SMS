@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "tailwindcss/tailwind.css";
 import Sidebar from "../../../Components/Common/Sidebar";
-import AssignTeacher from "./DummyData/AssignTeacher";
+import AssignTeacher from "./AssignTeacher";
 
 const NavigationBar = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);

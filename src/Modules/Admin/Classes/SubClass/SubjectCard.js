@@ -5,8 +5,9 @@ import { BsBook } from "react-icons/bs";
 import { NavLink } from "react-router-dom";
 
 const SubjectCard = ({ data, backgroundColor,Class}) => {
+  const formattedSid = data.title.toLowerCase().replace(/ /g, "_");
   return (
-    <NavLink to={`/class/${Class}/${data.title}`}  className={`relative rounded-xl p-4 shadow-lg ${backgroundColor}`}>
+    <NavLink to={`/class/${Class}/${formattedSid}/module`}  className={`relative rounded-xl p-4 shadow-lg ${backgroundColor}`}>
       <div className="flex justify-between items-center mb-4">
         <button className="border border-white text-white rounded-full px-4 py-1">
           Publish

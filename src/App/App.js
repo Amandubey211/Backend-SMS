@@ -13,16 +13,26 @@ import StudentSignUp from "../Modules/LoginPages/Student/SignUp/StudentSignUp.js
 import ResetPassword from "../Modules/LoginPages/Student/ResetPassword/ResetPassword.js";
 import Fallback from "../Components/Common/Fallback.js";
 
-
 function App() {
   const Dash = lazy(() => import("../Modules/Admin/Dashboard/Dash.js"));
   const Group_Section = lazy(() =>
     import("../Modules/Admin/Groups&Sections/Group_Section.js")
   );
+  const Assignment = lazy(() =>
+    import("../Modules/Admin/Subjects/Modules/Assignments/Assignment.js")
+  );
+  const Chapter = lazy(() =>
+    import("../Modules/Admin/Subjects/Modules/Chapter/Chapter.js")
+  );
+
+  const Module = lazy(() =>
+    import("../Modules/Admin/Subjects/Modules/Module/Module.js")
+  );
+
   const Attendance = lazy(() =>
     import("../Modules/Admin/Attendance/Attendance.js")
   );
-  const Subject  = lazy(()=>import("../Modules/Admin/Subject/Subject.js")) ;
+  // const Subject = lazy(() => import("../Modules/Admin/Subject/Subject.js"));
   const Students = lazy(() => import("../Modules/Admin/Students/Students.js"));
   const Addmission = lazy(() =>
     import("../Modules/Admin/Addmission/Addmission.js")
@@ -59,7 +69,6 @@ function App() {
     };
   }, []);
   const AppRouter = createBrowserRouter([
-
     // Verification Routes
     {
       path: "/",
@@ -150,11 +159,22 @@ function App() {
       path: "/class/:cid/attendance",
       element: <ProtectRoute Component={Attendance} role="admin" />,
       errorElement: <Error />,
-    },   
+    },
     //Admin Class-Subject Route -------------------
+
     {
-      path: "/class/:cid/:sid",
-      element: <ProtectRoute Component={Subject} role="admin" />,
+      path: "/class/:cid/:sid/module",
+      element: <ProtectRoute Component={Module} role="admin" />,
+      errorElement: <Error />,
+    },
+    {
+      path: "/class/:cid/:sid/chapter",
+      element: <ProtectRoute Component={Chapter} role="admin" />,
+      errorElement: <Error />,
+    },
+    {
+      path: "/class/:cid/:sid/assignments",
+      element: <ProtectRoute Component={Assignment} role="admin" />,
       errorElement: <Error />,
     },
 
