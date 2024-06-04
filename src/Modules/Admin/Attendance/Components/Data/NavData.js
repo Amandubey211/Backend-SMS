@@ -1,38 +1,41 @@
-import { FaUsers, FaChalkboardTeacher } from "react-icons/fa";
-import { MdFamilyRestroom } from "react-icons/md";
-import { SiAuth0 } from "react-icons/si";
+import { FaUsers } from "react-icons/fa";
+import { IoCheckbox } from "react-icons/io5";
+
+import { ImExit } from "react-icons/im";
+import { FaSquareXmark } from "react-icons/fa6";
+
 export const navData = [
   {
-    label: "Students",
+    label: " Total Students",
     value: "106,74",
-    bgColor: "bg-purple-100",
+    bgColor: "bg-[#f6ecf6]",
     textColor: "text-purple-700",
-    icon: <FaUsers />,
-    iconBackground: "bg-[#564FFD]",
+    icon: <FaUsers className="text-[#564FFD]"/>,
+    iconColor: "text-[#564FFD]",
   },
   {
-    label: "Teacher",
+    label: "Present Today",
     // url: "/teachers",
     value: "674",
-    bgColor: "bg-green-100",
+    bgColor: "bg-[#e9f8eb]",
     textColor: "text-green-700",
-    icon: <FaChalkboardTeacher />,
-    iconBackground: "bg-[#23BD331A]",
+    icon: <IoCheckbox  className="text-[#22c55e]" />,
+    iconColor: "text-green",
   },
   {
-    label: "Parents",
+    label: "Absent Today",
     value: "167",
-    bgColor: "bg-yellow-100",
-    textColor: "text-yellow-700",
-    icon: <MdFamilyRestroom />,
-    iconBackground: "bg-[#F09F04]",
+    bgColor: "bg-[#f7e5e5]",
+    textColor: "black",
+    icon: <FaSquareXmark   className="text-[#EA2058]"/>,
+    iconColor: "text-[#F09F04]",
   },
   {
-    label: "Staff",
+    label: "Today Leave Application",
     value: "20",
-    bgColor: "bg-pink-100",
+    bgColor: "bg-[#f7ecf4]",
     textColor: "text-pink-700",
-    icon: <SiAuth0 />,
-    iconBackground: "bg-[#EA2058]",
+    icon: <ImExit  className="text-[#EA2058]" />,
+    iconColor: "text-[#EA2058]",
   },
 ];

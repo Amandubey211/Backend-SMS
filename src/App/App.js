@@ -13,6 +13,7 @@ import StudentSignUp from "../Modules/LoginPages/Student/SignUp/StudentSignUp.js
 import ResetPassword from "../Modules/LoginPages/Student/ResetPassword/ResetPassword.js";
 import Fallback from "../Components/Common/Fallback.js";
 
+
 function App() {
   const Dash = lazy(() => import("../Modules/Admin/Dashboard/Dash.js"));
   const Group_Section = lazy(() =>
@@ -21,6 +22,7 @@ function App() {
   const Attendance = lazy(() =>
     import("../Modules/Admin/Attendance/Attendance.js")
   );
+  const Subject  = lazy(()=>import("../Modules/Admin/Subject/Subject.js")) ;
   const Students = lazy(() => import("../Modules/Admin/Students/Students.js"));
   const Addmission = lazy(() =>
     import("../Modules/Admin/Addmission/Addmission.js")
@@ -57,6 +59,8 @@ function App() {
     };
   }, []);
   const AppRouter = createBrowserRouter([
+
+    // Verification Routes
     {
       path: "/",
       element: <Home />,
@@ -121,6 +125,7 @@ function App() {
       element: <ProtectRoute Component={Addmission} role="admin" />,
       errorElement: <Error />,
     },
+    //Admin Class Route ------------------------------
     {
       path: "/class/:cid/teachers",
       element: <ProtectRoute Component={Teachers} role="admin" />,
@@ -139,6 +144,17 @@ function App() {
     {
       path: "/class/:cid/attendance",
       element: <ProtectRoute Component={Attendance} role="admin" />,
+      errorElement: <Error />,
+    },
+    {
+      path: "/class/:cid/attendance",
+      element: <ProtectRoute Component={Attendance} role="admin" />,
+      errorElement: <Error />,
+    },   
+    //Admin Class-Subject Route -------------------
+    {
+      path: "/class/:cid/:sid",
+      element: <ProtectRoute Component={Subject} role="admin" />,
       errorElement: <Error />,
     },
 

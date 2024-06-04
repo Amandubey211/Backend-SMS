@@ -1,7 +1,42 @@
-import React from "react";
+import React, { useState } from "react";
+import { navData } from "./Data/NavData";
+import AttendanceNavCard from "./AttendanceNavCard";
 
-const NavSection = () => {
-  return <div></div>;
+const NavSection = ({ onFilterChange }) => {
+  const [selectedFilter, setSelectedFilter] = useState("all");
+
+  const handleFilterChange = (filter) => {
+    setSelectedFilter(filter);
+    onFilterChange(filter);
+  };
+  console.log(selectedFilter);
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-3 ">
+        <h2 className="text-xl font-semibold text-gradient text-purple-600">
+          Student Attendance
+        </h2>
+        <button className="px-6 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-md shadow-lg">
+          Take Attendance
+        </button>
+      </div>
+
+      <div className="flex space-x-4">
+        {navData.map((item) => (
+          <AttendanceNavCard
+            key={item.label}
+            label={item.label}
+            value={item.value}
+            bgColor={item.bgColor}
+            textColor={item.textColor}
+            icon={item.icon}
+            iconBackground={item.iconBackground}
+            onClick={() => handleFilterChange(item.label)}
+          />
+        ))}
+      </div>
+    </div>
+  );
 };
 
 export default NavSection;

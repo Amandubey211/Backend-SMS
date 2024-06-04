@@ -62,6 +62,7 @@ const MainSection = () => {
             <SubjectCard
               key={index}
               data={data}
+              Class={cid}
               backgroundColor={getColor(index)}
             />
           ))}

@@ -2,10 +2,11 @@
 import React from "react";
 import { LuUser } from "react-icons/lu";
 import { BsBook } from "react-icons/bs";
+import { NavLink } from "react-router-dom";
 
-const SubjectCard = ({ data, backgroundColor }) => {
+const SubjectCard = ({ data, backgroundColor,Class}) => {
   return (
-    <div className={`relative rounded-xl p-4 shadow-lg ${backgroundColor}`}>
+    <NavLink to={`/class/${Class}/${data.title}`}  className={`relative rounded-xl p-4 shadow-lg ${backgroundColor}`}>
       <div className="flex justify-between items-center mb-4">
         <button className="border border-white text-white rounded-full px-4 py-1">
           Publish
@@ -39,7 +40,7 @@ const SubjectCard = ({ data, backgroundColor }) => {
         alt="icon"
         className="absolute bottom-6 right-6 h-28"
       />
-    </div>
+    </NavLink>
   );
 };
 

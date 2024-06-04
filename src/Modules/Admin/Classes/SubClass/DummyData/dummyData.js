@@ -6,6 +6,7 @@ import Icon4 from "../../../../../Assets/ClassesAssets/SubClassAssets/SubjectIco
 const dummyData = [
   {
     title: "Chemical Engineering Plant Design",
+  
     students: 40,
     modules: 12,
     icon: Icon1,
