@@ -13,10 +13,14 @@ import StudentSignUp from "../Modules/LoginPages/Student/SignUp/StudentSignUp.js
 import ResetPassword from "../Modules/LoginPages/Student/ResetPassword/ResetPassword.js";
 import Fallback from "../Components/Common/Fallback.js";
 
+
 function App() {
   const Dash = lazy(() => import("../Modules/Admin/Dashboard/Dash.js"));
   const Group_Section = lazy(() =>
     import("../Modules/Admin/Groups&Sections/Group_Section.js")
+  );
+  const Rubric = lazy(() =>
+    import("../Modules/Admin/Subjects/Modules/Rubric/Rubric.js")
   );
   const Assignment = lazy(() =>
     import("../Modules/Admin/Subjects/Modules/Assignments/Assignment.js")
@@ -160,7 +164,7 @@ function App() {
       element: <ProtectRoute Component={Attendance} role="admin" />,
       errorElement: <Error />,
     },
-    //Admin Class-Subject Route -------------------
+    //Admin Subject Module Route -------------------
 
     {
       path: "/class/:cid/:sid/module",
@@ -175,6 +179,11 @@ function App() {
     {
       path: "/class/:cid/:sid/assignments",
       element: <ProtectRoute Component={Assignment} role="admin" />,
+      errorElement: <Error />,
+    },
+    {
+      path: "/class/:cid/:sid/rubric",
+      element: <ProtectRoute Component={Rubric} role="admin" />,
       errorElement: <Error />,
     },
 

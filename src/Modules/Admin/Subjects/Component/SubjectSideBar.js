@@ -26,9 +26,10 @@ const SubjectSideBar = () => {
           key={index}
           to={`/class/${cid}/${formattedSid}/${item.toLocaleLowerCase()}`}
           className={({ isActive }) =>
+            
             isActive
-              ? "text-purple-600 font-semibold bg-purple-100 rounded-full py-2 px-4 "
-              : "text-gray-800 px-4 py-2 "
+              ? "text-purple-600  font-semibold   bg-purple-100 rounded-full py-1 px-4 "
+              : "text-gray-800 px-4 py-1  "
           }
         >
           {item}

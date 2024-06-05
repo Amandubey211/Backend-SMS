@@ -7,13 +7,16 @@ import { NavLink } from "react-router-dom";
 const SubjectCard = ({ data, backgroundColor,Class}) => {
   const formattedSid = data.title.toLowerCase().replace(/ /g, "_");
   return (
-    <NavLink to={`/class/${Class}/${formattedSid}/module`}  className={`relative rounded-xl p-4 shadow-lg ${backgroundColor}`}>
+    <div className={`relative rounded-xl p-4 shadow-lg ${backgroundColor}`}>
       <div className="flex justify-between items-center mb-4">
         <button className="border border-white text-white rounded-full px-4 py-1">
           Publish
         </button>
       </div>
-      <h2 className="text-xl font-bold text-white w-[65%]">{data.title}</h2>
+      <NavLink to={`/class/${Class}/${formattedSid}/module`} >
+
+
+      <h2 className="text-xl font-bold text-white w-[65%]">{data.title}</h2>    
       <div className="flex items-center mt-2 text-white">
         <span className="flex items-center mr-2 gap-1">
           <LuUser />
@@ -25,6 +28,7 @@ const SubjectCard = ({ data, backgroundColor,Class}) => {
           <span>{data.modules} Modules</span>
         </span>
       </div>
+      </NavLink>
       <div className="flex items-center mt-12">
         <img
           src={data.teacherImage}
@@ -41,7 +45,7 @@ const SubjectCard = ({ data, backgroundColor,Class}) => {
         alt="icon"
         className="absolute bottom-6 right-6 h-28"
       />
-    </NavLink>
+    </div>
   );
 };
 

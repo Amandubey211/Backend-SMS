@@ -38,7 +38,7 @@ const MainSection = () => {
   };
 
   return (
-    <div className="flex gap-1 min-h-screen">
+    <div className="flex  min-h-screen">
       <SubjectSideBar />
       <div className="w-[60%] bg-white p-4 rounded-lg shadow-md">
         <div className="bg-white p-4 rounded-lg">
