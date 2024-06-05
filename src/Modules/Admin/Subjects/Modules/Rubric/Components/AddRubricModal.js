@@ -68,12 +68,12 @@ const AddRubricModal = ({ isOpen, onClose, onAddCriteria }) => {
         <div className="p-4 border-t flex justify-end space-x-4">
           <button
             onClick={onClose}
-            className="px-4 py-2 border rounded-md hover:bg-gray-100 transition-colors duration-300"
+            className="px-4 py-2 border  rounded-md hover:bg-gray-100 transition-colors duration-300"
           >
             Cancel
           </button>
           <button
-            onClick={onAddCriteria}
+            // onClick={onAddCriteria}
             className="flex items-center gap-2 font-semibold p-2 rounded-md bg-gradient-to-r from-pink-100 to-purple-100 hover:shadow-md transition-shadow duration-300"
           >
             <span className="bg-gradient-to-r from-red-500 to-purple-500 bg-clip-text text-transparent">Add To Assignment</span>

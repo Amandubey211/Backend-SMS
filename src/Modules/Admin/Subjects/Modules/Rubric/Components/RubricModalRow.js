@@ -34,7 +34,7 @@ const RubricModalRow = ({ data }) => {
             <RatingCard key={index} rating={rating} />
           ))}
           <button
-            className="flex flex-col justify-center items-center text-purple-600 text-xl gap-1 border rounded-md px-5"
+            className="flex flex-col justify-center border-dashed  w-44 items-center text-purple-600 text-xl gap-1 border-2  border-black border-opacity-65  hover:border-opacity-100 rounded-md px-5"
             onClick={() => setSidebarOpen(true)}
           >
             <HiOutlinePlus />
