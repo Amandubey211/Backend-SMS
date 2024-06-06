@@ -186,6 +186,7 @@ function App() {
       element: <ProtectRoute Component={Assignment} role="admin" />,
       errorElement: <Error />,
     },
+    
     {
       path: "/class/:cid/:sid/createassignment",
       element: <ProtectRoute Component={CreateAssignment} role="admin" />,
