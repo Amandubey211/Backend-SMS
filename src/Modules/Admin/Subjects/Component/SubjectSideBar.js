@@ -20,7 +20,7 @@ const SubjectSideBar = () => {
   const formattedSid = sid.toLowerCase().replace(/ /g, "_");
 
   return (
-    <div className="flex flex-col min-h-screen h-full w-[18%] space-y-4 p-4 border">
+    <div className="flex flex-col min-h-screen h-full w-[18%] space-y-4 p-4 ">
       {menuItems.map((item, index) => (
         <NavLink
           key={index}

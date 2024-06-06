@@ -15,8 +15,12 @@ import Fallback from "../Components/Common/Fallback.js";
 import AccountingSection from "../Modules/Admin/Accounting/MainSection/AccountingSection.js";
 import Libary from "../Modules/Admin/Libary/MainSection/Libary.js";
 
+
 function App() {
   const Dash = lazy(() => import("../Modules/Admin/Dashboard/Dash.js"));
+  const CreateAssignment = lazy(() =>
+    import("../Modules/Admin/Subjects/Modules/Assignments/CreateAssignment/CreateAssignment.js")
+  );
   const Group_Section = lazy(() =>
     import("../Modules/Admin/Groups&Sections/Group_Section.js")
   );
@@ -180,6 +184,11 @@ function App() {
     {
       path: "/class/:cid/:sid/assignments",
       element: <ProtectRoute Component={Assignment} role="admin" />,
+      errorElement: <Error />,
+    },
+    {
+      path: "/class/:cid/:sid/createassignment",
+      element: <ProtectRoute Component={CreateAssignment} role="admin" />,
       errorElement: <Error />,
     },
     {
