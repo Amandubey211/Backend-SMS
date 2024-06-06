@@ -40,7 +40,9 @@ const useTeacherLogin = () => {
 
     try {
       const { data } = await axios.post(
-        `${process.env.REACT_APP_API_URL}/admin/staff_login`,
+        
+        // `${process.env.REACT_APP_API_URL}/admin/staff_login`,
+        `${process.env.REACT_APP_API_URL}/auth/user_login`,
         teacherDetails
       );
 

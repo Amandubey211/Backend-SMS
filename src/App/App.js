@@ -12,7 +12,8 @@ import ProtectRoute from "../Routes/ProtectedRoutes/ProtectedRoute";
 import StudentSignUp from "../Modules/LoginPages/Student/SignUp/StudentSignUp.js";
 import ResetPassword from "../Modules/LoginPages/Student/ResetPassword/ResetPassword.js";
 import Fallback from "../Components/Common/Fallback.js";
-
+import AccountingSection from "../Modules/Admin/Accounting/MainSection/AccountingSection.js";
+import Libary from "../Modules/Admin/Libary/MainSection/Libary.js";
 
 function App() {
   const Dash = lazy(() => import("../Modules/Admin/Dashboard/Dash.js"));
@@ -191,6 +192,16 @@ function App() {
     {
       path: "/student_dash",
       element: <ProtectRoute Component={StudentDash} role="student" />,
+      errorElement: <Error />,
+    }, {
+      path: "accounting/studentfees",
+      element: <AccountingSection />,
+      errorElement: <Error />,
+    },
+    ,
+    {
+      path: "library",
+      element:<Libary/>,
       errorElement: <Error />,
     },
   ]);
