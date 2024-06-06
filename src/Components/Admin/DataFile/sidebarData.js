@@ -50,6 +50,11 @@ const sidebarData = [
         path: "/accounting/reports",
       },
       {
+        title: "Student Fees",
+        icon: <FaClipboardList />,
+        path: "/accounting/studentfees",
+      },
+      {
         title: "Expenses",
         icon: <FaUniversity />,
         path: "/accounting/expenses",
