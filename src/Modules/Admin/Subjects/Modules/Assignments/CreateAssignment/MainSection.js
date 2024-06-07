@@ -1,23 +1,23 @@
 import React, { useState } from "react";
 import CreateAssignmentForm from "./Component/CreateAssignmentForm";
 import CreateAssignmentHeader from "./Component/CreateAssignmentHeader";
-import AssignmentEditor from "./Component/AssignmentEditor";
+import Editor from "../../../Component/Editor";
 
 const MainSection = () => {
-  const [assignmentName, setAssignmentName] = useState('Monthly examination');
-  const [editorContent, setEditorContent] = useState('');
+  const [assignmentName, setAssignmentName] = useState("Monthly examination");
+  const [editorContent, setEditorContent] = useState("");
   const [formState, setFormState] = useState({
-    points: '',
-    displayGrade: '',
-    submissionType: '',
-    submissionFormat: '',
-    allowedAttempts: '',
-    numberOfAttempts: '',
-    assignTo: '',
-    section: '',
-    dueDate: '',
-    availableFrom: '',
-    until: '',
+    points: "",
+    displayGrade: "",
+    submissionType: "",
+    submissionFormat: "",
+    allowedAttempts: "",
+    numberOfAttempts: "",
+    assignTo: "",
+    section: "",
+    dueDate: "",
+    availableFrom: "",
+    until: "",
   });
 
   const handleNameChange = (name) => {
@@ -37,14 +37,40 @@ const MainSection = () => {
   };
 
   const handleSave = () => {
-    const { points, displayGrade, submissionType, submissionFormat, allowedAttempts, numberOfAttempts, assignTo, section, dueDate, availableFrom, until } = formState;
+    const {
+      points,
+      displayGrade,
+      submissionType,
+      submissionFormat,
+      allowedAttempts,
+      numberOfAttempts,
+      assignTo,
+      section,
+      dueDate,
+      availableFrom,
+      until,
+    } = formState;
 
-    if (assignmentName && editorContent && points && displayGrade && submissionType && submissionFormat && allowedAttempts && numberOfAttempts && assignTo && section && dueDate && availableFrom && until) {
-      console.log('Assignment Name:', assignmentName);
-      console.log('Editor Content:', editorContent);
-      console.log('Form Data:', formState);
+    if (
+      assignmentName &&
+      editorContent &&
+      points &&
+      displayGrade &&
+      submissionType &&
+      submissionFormat &&
+      allowedAttempts &&
+      numberOfAttempts &&
+      assignTo &&
+      section &&
+      dueDate &&
+      availableFrom &&
+      until
+    ) {
+      console.log("Assignment Name:", assignmentName);
+      console.log("Editor Content:", editorContent);
+      console.log("Form Data:", formState);
     } else {
-      console.log('Please fill out all required fields.');
+      console.log("Please fill out all required fields.");
     }
   };
 
@@ -53,7 +79,8 @@ const MainSection = () => {
       <CreateAssignmentHeader onSave={handleSave} />
       <div className="flex w-full">
         <div className="w-[70%]">
-          <AssignmentEditor
+          <Editor
+            assignmentLabel="Assignment Name"
             assignmentName={assignmentName}
             editorContent={editorContent}
             onNameChange={handleNameChange}
@@ -63,8 +90,12 @@ const MainSection = () => {
         <div className="w-[30%]">
           <CreateAssignmentForm
             {...formState}
-            setDisplayGrade={(grade) => setFormState((prev) => ({ ...prev, displayGrade: grade }))}
-            setSubmissionFormat={(format) => setFormState((prev) => ({ ...prev, submissionFormat: format }))}
+            setDisplayGrade={(grade) =>
+              setFormState((prev) => ({ ...prev, displayGrade: grade }))
+            }
+            setSubmissionFormat={(format) =>
+              setFormState((prev) => ({ ...prev, submissionFormat: format }))
+            }
             handleChange={handleFormChange}
           />
         </div>

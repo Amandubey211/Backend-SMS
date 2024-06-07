@@ -1,29 +1,30 @@
 import React, { useState } from "react";
-import { assignmentDetails } from "../../Assignments/AssignmentComponents/MockData";
+import { QuizzDetails } from "../../Assignments/AssignmentComponents/MockData";
 
-const Tabs = ({ children, onTabChange }) => {
-  const [activeTab, setActiveTab] = useState("instructions");
-
+const Tabs = ({ children,activeTab,setActiveTab, onTabChange,createPage }) => {
   const handleTabClick = (tab) => {
     setActiveTab(tab);
     onTabChange(tab);
   };
 
-  const { title, type } = assignmentDetails;
+  const { title, type } = QuizzDetails;
 
   return (
     <>
       <div className="flex justify-between items-center p-2 px-3 border-b">
-        <div>
+        {
+          !createPage && <div >
           <h2 className="text-xl font-semibold mb-1">
-            {activeTab === "instructions" ? title : "Quiz Question"}
+            {activeTab === "instructions" ? title  : "Quiz Question "}
           </h2>
-          <p className="text-sm text-green-600 mb-4">
+          <p className="text-sm text-green-600 ">
             {activeTab === "instructions" ? type : "Quizz"}
           </p>
         </div>
+        }
+        
 
-        <div className="flex gap-4 bg-white">
+        <div className="flex gap-2 bg-white">
           <button
             onClick={() => handleTabClick("instructions")}
             className={`flex-grow ${

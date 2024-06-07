@@ -13,7 +13,7 @@ const CommentCard = ({ avatar, name, timestamp, comment }) => {
             <p className="text-sm text-gray-500">{timestamp}</p>
           </div>
         </div>
-        <p className="text-gray-700">{comment}</p>
+        <p className="text-gray-700 text-sm">{comment}</p>
       </div>
     );
   };

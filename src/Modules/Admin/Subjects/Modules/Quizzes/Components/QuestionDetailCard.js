@@ -11,8 +11,13 @@ const QuestionDetailCard = () => {
       name: "Mr Teacher",
       timestamp: "Feb/02 /09:02",
       comment: "Hi Sir Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore."
-    },
-    // Add more comment objects as needed
+    }, 
+    {
+      avatar: "https://avatars.githubusercontent.com/u/109097090?v=4", // Replace with actual image URL
+      name: "Mr Teacher",
+      timestamp: "Feb/02 /09:02",
+      comment: "Hi Sir Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore."
+    },  
   ];
 
   return (
@@ -23,7 +28,7 @@ const QuestionDetailCard = () => {
         <AssignmentDetail label="Question Point" value="100 Point" />
         <AssignmentDetail label="Question Type" value="Multiple Choice" />
       </div>
-      <div className="mt-4">
+      <div className="mb-4 h-52 overflow-y-scroll">
         {commentsData.map((comment, index) => (
           <CommentCard
             key={index}

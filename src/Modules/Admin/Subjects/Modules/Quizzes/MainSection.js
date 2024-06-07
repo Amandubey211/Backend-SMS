@@ -9,15 +9,14 @@ import QuestionDetailCard from './Components/QuestionDetailCard';
 
 const MainSection = () => {
   const [activeTab, setActiveTab] = useState('instructions');
-
   return (
     <div className="flex">
-      <SubjectSideBar />
+      <SubjectSideBar  />
       <div className="w-[65%] border-x">
-        <CreateQuizHeader />
-        <Tabs onTabChange={setActiveTab}>
+        <CreateQuizHeader activePage={activeTab} />
+        <Tabs onTabChange={setActiveTab} setActiveTab={setActiveTab} activeTab={activeTab}>
           {(activeTab) => (
-            <>
+            <div className='h-full'>
               {activeTab === 'instructions' && (
                 <Suspense fallback={<div>Loading...</div>}>
                   <QuizInstructionSection />
@@ -28,7 +27,7 @@ const MainSection = () => {
                   <QuizQuestions />
                 </Suspense>
               )}
-            </>
+            </div>
           )}
         </Tabs>
       </div>

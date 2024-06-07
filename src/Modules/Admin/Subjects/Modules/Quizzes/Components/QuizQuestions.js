@@ -1,32 +1,41 @@
-const QuizQuestions = () => (
-    <div>
-      <h2 className="text-2xl font-semibold mb-4">Quiz Questions</h2>
-      {/* Add your quiz questions here */}
-      <div className="mt-8">
-        <div>
-          <h3 className="text-xl font-semibold">What is Your Workplace?</h3>
-          <div className="mt-4">
-            <div>
-              <input type="radio" id="option1" name="question1" />
-              <label htmlFor="option1" className="ml-2">A place where question my authority</label>
-            </div>
-            <div className="mt-2">
-              <input type="radio" id="option2" name="question1" />
-              <label htmlFor="option2" className="ml-2">A place where everyone knows</label>
-            </div>
-            <div className="mt-2">
-              <input type="radio" id="option3" name="question1" />
-              <label htmlFor="option3" className="ml-2">here ever my best friends are,</label>
-            </div>
-            <div className="mt-2">
-              <input type="radio" id="option4" name="question1" />
-              <label htmlFor="option4" className="ml-2">A place where I’m the CEO</label>
-            </div>
+import { useState } from "react";
+import mockData from "./MockData/QuestionsMock";
+
+const QuizQuestions = () => {
+  const [selectedOptions, setSelectedOptions] = useState({});
+
+  const handleOptionChange = (questionIndex, optionValue) => {
+    setSelectedOptions({
+      ...selectedOptions,
+      [questionIndex]: optionValue,
+    });
+  };
+
+  return (
+    <div className="p-4 w-full">
+      {mockData.map((question, questionIndex) => (
+        <div key={questionIndex} className="space-y-4 pb-3 mb-2">
+          <h1 className="text-xl font-semibold mb-4">{question.question}</h1>
+          <div className="grid grid-cols-2 gap-4">
+            {question.options.map((option) => (
+              <label key={option.id} className="radio-button  radio-green flex items-center border-2 border-gray-300 rounded-full px-4 py-2 cursor-pointer transition-colors duration-200 hover:border-green-500">
+                <input
+                  type="radio"
+                  id={option.id}
+                  name={`quiz-${questionIndex}`}
+                  value={option.value}
+                  checked={selectedOptions[questionIndex] === option.value}
+                  onChange={() => handleOptionChange(questionIndex, option.value)}
+                  className="mr-2  "
+                />
+                {option.label}
+              </label>
+            ))}
           </div>
         </div>
-      </div>
-      {/* Add more questions as needed */}
+      ))}
     </div>
   );
+};
 
-  export default QuizQuestions
+export default QuizQuestions;
