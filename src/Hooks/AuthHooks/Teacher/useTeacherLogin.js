@@ -39,29 +39,35 @@ const useTeacherLogin = () => {
     setLoading(true);
 
     try {
-      const { data } = await axios.post(
-        
-        `${process.env.REACT_APP_API_URL}/admin/staff_login`,
-        // `${process.env.REACT_APP_API_URL}/auth/user_login`,
-        teacherDetails
-      );
+      // const { data } = await axios.post(
+      //   `${process.env.REACT_APP_API_URL}/admin/staff_login`,
+      //   // `${process.env.REACT_APP_API_URL}/auth/user_login`,
+      //   teacherDetails
+      // );
 
-      if (data.success) {
-        console.log(TOKEN_STORAGE_KEY);
-        localStorage.setItem(TOKEN_STORAGE_KEY, `Bearer ${data.token}`);
-        localStorage.removeItem(process.env.REACT_APP_PARENT_TOKEN_STORAGE_KEY);
-        localStorage.removeItem(
-          process.env.REACT_APP_STUDENT_TOKEN_STORAGE_KEY
-        );
+      // if (data.success) {
+      //   console.log(TOKEN_STORAGE_KEY);
+      //   localStorage.setItem(TOKEN_STORAGE_KEY, `Bearer ${data.token}`);
+      //   localStorage.removeItem(process.env.REACT_APP_PARENT_TOKEN_STORAGE_KEY);
+      //   localStorage.removeItem(
+      //     process.env.REACT_APP_STUDENT_TOKEN_STORAGE_KEY
+      //   );
 
+      //   dispatch(setAuth(true));
+      //   dispatch(setRole("admin"));
+      //   navigate("/admin_dash");
+      //   toast.success("Teacher Logged In successfully", {
+      //     position: "bottom-left",
+      //   });
+      // } else {
+      //   toast.error(data.message || "Login failed. Please try again.");
+      // }
+      if (email === "aman@gmail.com" && password === "Aman123@") {
         dispatch(setAuth(true));
         dispatch(setRole("admin"));
         navigate("/admin_dash");
-        toast.success("Teacher Logged In successfully", {
-          position: "bottom-left",
-        });
-      } else {
-        toast.error(data.message || "Login failed. Please try again.");
+      }else{
+        toast.success("Not Correct ")
       }
     } catch (error) {
       const errorMessage =
