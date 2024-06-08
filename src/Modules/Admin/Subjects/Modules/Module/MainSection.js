@@ -40,7 +40,7 @@ const MainSection = () => {
   return (
     <div className="flex  min-h-screen">
       <SubjectSideBar />
-      <div className="w-[60%] bg-white p-4 rounded-lg shadow-md">
+      <div className="w-[60%] bg-white p-4  border">
         <div className="bg-white p-4 rounded-lg">
           <div className="flex justify-between items-center mb-4">
             <h1 className="text-lg font-semibold">Business Entrepreneurship</h1>

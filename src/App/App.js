@@ -18,8 +18,16 @@ import Events from "../Modules/Admin/Dashboard/EventModule/Event.js";
 import EventSchool from "../Modules/Admin/NoticeBoard/Events/MainSection/EventSchool.js";
 import Announce from "../Modules/Admin/NoticeBoard/Announcements/Announce.js";
 
+
+
+
 function App() {
   const Dash = lazy(() => import("../Modules/Admin/Dashboard/Dash.js"));
+  const CreateQuizzes = lazy(() => import("../Modules/Admin/Subjects/Modules/Quizzes/CreateQuizzes/CreateQuizzes.js"));
+  const Quizzes = lazy(() => import("../Modules/Admin/Subjects/Modules/Quizzes/Quizzes.js"));
+  const CreateAssignment = lazy(() =>
+    import("../Modules/Admin/Subjects/Modules/Assignments/CreateAssignment/CreateAssignment.js")
+  );
   const Group_Section = lazy(() =>
     import("../Modules/Admin/Groups&Sections/Group_Section.js")
   );
@@ -185,11 +193,28 @@ function App() {
       element: <ProtectRoute Component={Assignment} role="admin" />,
       errorElement: <Error />,
     },
+    
+    {
+      path: "/class/:cid/:sid/createassignment",
+      element: <ProtectRoute Component={CreateAssignment} role="admin" />,
+      errorElement: <Error />,
+    },
     {
       path: "/class/:cid/:sid/rubric",
       element: <ProtectRoute Component={Rubric} role="admin" />,
       errorElement: <Error />,
     },
+    {
+      path: "/class/:cid/:sid/quizzes",
+      element: <ProtectRoute Component={Quizzes} role="admin" />,
+      errorElement: <Error />,
+    },
+    {
+      path: "/class/:cid/:sid/create_quiz",
+      element: <ProtectRoute Component={CreateQuizzes} role="admin" />,
+      errorElement: <Error />,
+    },
+    
 
     //Student Routes-------------------------
     {
