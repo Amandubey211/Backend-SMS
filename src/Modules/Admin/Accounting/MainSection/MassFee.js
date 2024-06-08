@@ -47,6 +47,9 @@ const MassFee = () => {
         <FormInput id="invoiceSessionEnd" label="Invoice Session End" type="date" value={formData.invoiceSessionEnd} onChange={handleChange} required />
       </div>
       <FormInput id="amount" label="Amount" type="text" value={formData.amount} onChange={handleChange} required />
+      
+      {/* <FormSelect id="automaticInvoiceCreateDate" label="Automatic Invoice Create Date" options={invoiceDateOptions} value={formData.automaticInvoiceCreateDate} onChange={handleChange} required />
+      <FormSelect id="automaticInvoiceCreateDate" label="Automatic Invoice Create Date" options={invoiceDateOptions} value={formData.automaticInvoiceCreateDate} onChange={handleChange} required /> */}
       <FormSelect id="automaticInvoiceCreateDate" label="Automatic Invoice Create Date" options={invoiceDateOptions} value={formData.automaticInvoiceCreateDate} onChange={handleChange} required />
       <button type="submit" className="w-full flex justify-center border border-transparent shadow-sm text-sm font-medium  bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600">
         Add New Fees 

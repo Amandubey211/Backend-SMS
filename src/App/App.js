@@ -14,6 +14,9 @@ import ResetPassword from "../Modules/LoginPages/Student/ResetPassword/ResetPass
 import Fallback from "../Components/Common/Fallback.js";
 import AccountingSection from "../Modules/Admin/Accounting/MainSection/AccountingSection.js";
 import Libary from "../Modules/Admin/Libary/MainSection/Libary.js";
+import Events from "../Modules/Admin/Dashboard/EventModule/Event.js";
+import EventSchool from "../Modules/Admin/NoticeBoard/Events/MainSection/EventSchool.js";
+import Announce from "../Modules/Admin/NoticeBoard/Announcements/Announce.js";
 
 
 
@@ -227,6 +230,17 @@ function App() {
     {
       path: "library",
       element:<Libary/>,
+      errorElement: <Error />,
+    },
+    ,
+    {
+      path: "noticeboard/events",
+      element:<EventSchool/>,
+      errorElement: <Error />,
+    },
+    {
+      path: "/noticeboard/announcements",
+      element:<Announce/>,
       errorElement: <Error />,
     },
   ]);
