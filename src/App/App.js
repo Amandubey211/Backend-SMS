@@ -16,8 +16,12 @@ import AccountingSection from "../Modules/Admin/Accounting/MainSection/Accountin
 import Libary from "../Modules/Admin/Libary/MainSection/Libary.js";
 
 
+
+
 function App() {
   const Dash = lazy(() => import("../Modules/Admin/Dashboard/Dash.js"));
+  const CreateQuizzes = lazy(() => import("../Modules/Admin/Subjects/Modules/Quizzes/CreateQuizzes/CreateQuizzes.js"));
+  const Quizzes = lazy(() => import("../Modules/Admin/Subjects/Modules/Quizzes/Quizzes.js"));
   const CreateAssignment = lazy(() =>
     import("../Modules/Admin/Subjects/Modules/Assignments/CreateAssignment/CreateAssignment.js")
   );
@@ -197,6 +201,17 @@ function App() {
       element: <ProtectRoute Component={Rubric} role="admin" />,
       errorElement: <Error />,
     },
+    {
+      path: "/class/:cid/:sid/quizzes",
+      element: <ProtectRoute Component={Quizzes} role="admin" />,
+      errorElement: <Error />,
+    },
+    {
+      path: "/class/:cid/:sid/create_quiz",
+      element: <ProtectRoute Component={CreateQuizzes} role="admin" />,
+      errorElement: <Error />,
+    },
+    
 
     //Student Routes-------------------------
     {
