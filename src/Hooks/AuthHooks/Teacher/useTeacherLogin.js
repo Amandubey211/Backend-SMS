@@ -3,7 +3,7 @@ import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { setAuth, setRole } from "../../../Redux/Slices/AuthSlice.js";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+// import axios from "axios";
 
 const TOKEN_STORAGE_KEY = process.env.REACT_APP_ADMIN_TOKEN_STORAGE_KEY;
 
@@ -62,7 +62,7 @@ const useTeacherLogin = () => {
       // } else {
       //   toast.error(data.message || "Login failed. Please try again.");
       // }
-      if (email === "aman@gmail.com" && password === "Aman123@") {
+      if (email === "demo@studentdiwan.com" && password === "studentdiwan123@") {
         dispatch(setAuth(true));
         dispatch(setRole("admin"));
         navigate("/admin_dash");
