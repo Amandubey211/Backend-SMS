@@ -14,9 +14,12 @@ import ResetPassword from "../Modules/LoginPages/Student/ResetPassword/ResetPass
 import Fallback from "../Components/Common/Fallback.js";
 import AccountingSection from "../Modules/Admin/Accounting/MainSection/AccountingSection.js";
 import Libary from "../Modules/Admin/Libary/MainSection/Libary.js";
- import Events from "../Modules/Admin/Dashboard/EventModule/Event.js";
- import EventSchool from "../Modules/Admin/NoticeBoard/Events/MainSection/EventSchool.js";
- import Announce from "../Modules/Admin/NoticeBoard/Announcements/Announce.js";
+
+import Events from "../Modules/Admin/Dashboard/EventModule/Event.js";
+import EventSchool from "../Modules/Admin/NoticeBoard/Events/MainSection/EventSchool.js";
+import Announce from "../Modules/Admin/NoticeBoard/Announcements/Announce.js";
+
+
 
 
 
@@ -48,7 +51,9 @@ function App() {
   const Attendance = lazy(() =>
     import("../Modules/Admin/Attendance/Attendance.js")
   );
-   const Subject = lazy(() => import("../Modules/Admin/Subject/Subject.js"));
+
+  const Subject = lazy(() => import("../Modules/Admin/Subject/Subject.js"));
+
   const Students = lazy(() => import("../Modules/Admin/Students/Students.js"));
   const Addmission = lazy(() =>
     import("../Modules/Admin/Addmission/Addmission.js")
