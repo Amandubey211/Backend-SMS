@@ -75,7 +75,7 @@ const groups = [
 ];
 
 const GroupList = () => {
-  const [expandedGroupIndex, setExpandedGroupIndex] = useState(null);
+  const [expandedGroupIndex, setExpandedGroupIndex] = useState(0);
   const [showMenu, setShowMenu] = useState(null);
   const menuRef = useRef(null);
 
@@ -101,10 +101,10 @@ const GroupList = () => {
   }, []);
 
   return (
-    <div className="w-full max-w-4xl p-4 bg-white rounded-lg shadow-lg">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold">
-          Groups <span className="text-gray-500">(10)</span>
+    <div className="w-full max-w-4xl  bg-white ">
+      <div className="flex items-center justify-between mb-4 p-2">
+        <h2 className="text-lg font-semibold ps-4">
+          Groups <span className="text-gray-500">({groups.length})</span>
         </h2>
         <div className="relative">
           <input
@@ -115,10 +115,10 @@ const GroupList = () => {
         </div>
       </div>
       {groups.map((group, groupIndex) => (
-        <div key={groupIndex} className="mb-6">
-          <div className={`flex items-center justify-between py-2 `}>
+        <div key={groupIndex} className="mb-2">
+          <div className={`flex items-center justify-between py-3  bg-gray-50`}>
             <h3
-              className="text-lg font-semibold text-purple-500 cursor-pointer"
+              className="text-lg font-semibold text-gradient ps-2   cursor-pointer"
               onClick={() => toggleGroup(groupIndex)}
             >
               {group.name}
@@ -151,11 +151,11 @@ const GroupList = () => {
             </div>
           </div>
           {expandedGroupIndex === groupIndex && (
-            <ul className="mt-2 border-t border-gray-200">
+            <ul className=" border-t border-gray-200">
               {group.members.map((member, memberIndex) => (
                 <li
                   key={memberIndex}
-                  className="flex items-center justify-between py-4 border-b border-gray-200 relative"
+                  className="flex items-center justify-between p-4 border-b  border-gray-200 relative"
                 >
                   <div className="flex items-center">
                     <img
@@ -167,9 +167,14 @@ const GroupList = () => {
                     />
                     <div>
                       <div className="text-sm font-medium">{member.name}</div>
-                      <div className="text-xs text-gray-500">
-                        {member.role === "Group Leader" && member.role}
-                      </div>
+
+                      {member.role === "Group Leader" && (
+                        <div className="flex items-center gap-1">
+                          <span className="text-xs font-medium text-gradient">      {member.role}</span>
+                    
+                          <span className="text-yellow-500"><GiImperialCrown/></span>
+                        </div>
+                      )}
                     </div>
                   </div>
                   <div className="flex flex-col justify-start  items-start text-sm">

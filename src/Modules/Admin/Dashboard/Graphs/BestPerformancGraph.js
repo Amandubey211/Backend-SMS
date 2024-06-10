@@ -20,8 +20,8 @@ const BestPerformanceChart = () => {
   return (
     <div className="h-full py-10 ">
       <div className="flex justify-between px-4 items-center">
-        <h1 className="text-2xl font-bold text-center mb-5">Best Performers</h1>
-        <div className="flex justify-center mb-5">
+        <h1 className="text-2xl font-bold text-center ">Best Performers</h1>
+        <div className="flex justify-center ">
           <select
             className="p-2 border rounded"
             onChange={handleTimeFrameChange}
@@ -33,10 +33,9 @@ const BestPerformanceChart = () => {
         </div>
       </div>
 
-      <div className="w-full max-w-4xl mx-auto">
-        <div className="">
-          {" "}
-          {/* Set height here */}
+      <div className="w-full p-3">
+        <div  className="h-96">
+        
           <Bar
             data={data}
             options={{
@@ -66,8 +65,8 @@ const BestPerformanceChart = () => {
                   stacked: true,
                 },
               },
-              categoryPercentage: 0.8, // Adjusts the width of the category
-              barPercentage: 0.9, // Adjusts the width of the bars
+              categoryPercentage: 0.9, // Adjusts the width of the category
+              barPercentage: 0.8, // Adjusts the width of the bars
             }}
           />
         </div>

@@ -10,7 +10,7 @@ const EventItem = ({ image, eventName, eventType, startDate }) => {
           src={image}
           alt={eventName}
         />
-        <p className="text-sm font-medium text-gray-900 truncate">
+        <p className="text-md   text-gray-900 truncate" title={eventName}>
           {eventName}
         </p>
       </div>

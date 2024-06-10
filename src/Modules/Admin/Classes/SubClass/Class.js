@@ -10,7 +10,7 @@ const Class = () => {
   useNavHeading(cid);
 
   return (
-    <Layout title="sub Class">
+    <Layout title={`${cid} | Student diwan`}>
       <DashLayout children={<MainSection />} />;
     </Layout>
   );

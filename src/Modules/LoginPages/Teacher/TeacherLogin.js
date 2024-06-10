@@ -4,7 +4,7 @@ import TeacherLoginBanner from "../../../Assets/TeacherAssets/TeacherLoginBanner
 import Layout from "../../../Components/Common/Layout";
 const TeacherLogin = () => {
   return (
-    <Layout title="Teacher's Login Form">
+    <Layout title="Teacher Login | Student diwan">
       <div className="grid grid-cols-1 md:grid-cols-12 h-screen">
         <div className="md:col-span-7  flex items-center justify-center">
           <TeacherLoginForm />

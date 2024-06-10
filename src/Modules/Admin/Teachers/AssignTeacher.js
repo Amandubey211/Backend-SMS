@@ -6,8 +6,19 @@ const AssignTeacher = () => {
   const [teacherCategory, setTeacherCategory] = useState("Science");
   const [section, setSection] = useState("A");
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const formData = {
+      teacherName,
+      teacherCategory,
+      section,
+    };
+    console.log(formData);
+    toast.success("Teacher data has been logged to the console");
+  };
+
   return (
-    <form className="flex flex-col h-full">
+    <form className="flex flex-col h-full" onSubmit={handleSubmit}>
       <div className="bg-white rounded-lg p-4 w-full max-w-md">
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -54,7 +65,6 @@ const AssignTeacher = () => {
       </div>
       <div className="mt-auto mb-8">
         <button
-          onClick={() => toast.success("Will be adding it soon")}
           type="submit"
           className="w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600"
         >
