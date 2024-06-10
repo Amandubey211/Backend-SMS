@@ -36,6 +36,8 @@ function App() {
   const Group_Section = lazy(() =>
     import("../Modules/Admin/Groups&Sections/Group_Section.js")
   );
+
+
   const Rubric = lazy(() =>
     import("../Modules/Admin/Subjects/Modules/Rubric/Rubric.js")
   );
@@ -54,7 +56,8 @@ function App() {
     import("../Modules/Admin/Attendance/Attendance.js")
   );
 
-  const Subject = lazy(() => import("../Modules/Admin/Subject/Subject.js"));
+  // const Subject = lazy(() => import("../Modules/Admin/Subjects/"));
+  // const Subject = lazy(() => import("../Modules/Admin/Subject/Subject.js"));
 
   const Students = lazy(() => import("../Modules/Admin/Students/Students.js"));
   const Addmission = lazy(() =>

@@ -5,16 +5,9 @@ import DashLayout from "../../../../Components/Admin/AdminDashLayout";
 import Sidebar from "../../../../Components/Common/Sidebar";
 import AddAnnouncement from "./AddAnnouncement";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { MdQueryBuilder } from "react-icons/md";
 
-import {
-  faCartShopping,
-  faPerson,
-  faTrash,
-  faCalendarDays,
-  faLocation,
-  faUserTie,
-  faClock,
-} from "@fortawesome/free-solid-svg-icons";
+
 import { notices } from "../../dummyData/dummyData";
 import AllNotice from "./AllNotice";
 
@@ -23,13 +16,7 @@ const Announce = () => {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
 
-  // const notices = [
-  //   { id: 1, title: 'Administrative Notices', date: 'July 25, 2024', priority: 'High Priority', content: 'Information related to academic activities such as examination schedules...such as examination schedules...such as examination schedules...such as examination schedules...such as examination schedules...such as examination schedules...such as examination schedules... such as examination schedules...such as examination schedules...such as examination schedules...' },
-  //   { id: 2, title: 'Administrative Notices', date: 'July 26, 2024', priority: 'Low Priority', content: 'Updates on administrative procedures including new guidelines...' },
-  //   { id: 3, title: 'Administrative Notices', date: 'July 26, 2024', priority: 'Low Priority', content: 'Updates on administrative procedures including new guidelines...' },
-  //   { id: 4, title: 'Administrative Notices', date: 'July 26, 2024', priority: 'Low Priority', content: 'Updates on administrative procedures including new guidelines...' },
-  //   // More notices
-  // ];
+ 
 
   const filteredNotices = notices.filter((notice) =>
     notice.title.toLowerCase().includes(searchTerm.toLowerCase())
@@ -101,7 +88,7 @@ const Announce = () => {
 
                         <div className="flex flex-row gap-[50px] text-xs">
                           <div className="flex   flex-wrap  justify-center items-center  ">
-                            <FontAwesomeIcon
+                            {/* <FontAwesomeIcon
                               style={{
                                 color: "gray",
                                 background: " ",
@@ -113,6 +100,14 @@ const Announce = () => {
                                 marginRight: "5px",
                               }}
                               icon={faClock}
+                            /> */}
+
+                            <MdQueryBuilder
+                              style={{
+                                color: "gray",
+                               
+                              }}
+                              className=" text-gray-400 text-xl"
                             />
 
                             <span className=" text-sm p-1 font-[400] text-[#7F7F7F] ">
