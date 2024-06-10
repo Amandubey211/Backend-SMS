@@ -9,7 +9,8 @@ import {
 const AllNotice = ({ notice, onToggle, isActive }) => (
   <div className="border-b last:border-b-0">
     <div
-      className={`cursor-pointer p-4 flex justify-between items-center ${isActive ? "bg-gray-100" : "bg-white"}`}
+      // className={`cursor-pointer p-4 flex justify-between items-center ${isActive ? "bg-gray-100" : "bg-white"}`}
+      className={`cursor-pointer   p-2   flex flex-col  ${isActive ? "bg-gray-100" : "bg-white"}`}
       onClick={onToggle}
     >
       <div className="flex items-center gap-4">

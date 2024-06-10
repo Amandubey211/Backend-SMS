@@ -17,6 +17,8 @@ import Libary from "../Modules/Admin/Libary/MainSection/Libary.js";
 import Events from "../Modules/Admin/Dashboard/EventModule/Event.js";
 import EventSchool from "../Modules/Admin/NoticeBoard/Events/MainSection/EventSchool.js";
 import Announce from "../Modules/Admin/NoticeBoard/Announcements/Announce.js";
+import Earning from "../Modules/Admin/Accounting/Earnings/Earning.js";
+import Expenses from "../Modules/Admin/Accounting/Expenses/Expenses.js";
 
 function App() {
   const Dash = lazy(() => import("../Modules/Admin/Dashboard/Dash.js"));
@@ -216,6 +218,16 @@ function App() {
     {
       path: "/noticeboard/announcements",
       element:<Announce/>,
+      errorElement: <Error />,
+    },
+    {
+      path: "/accounting/reports",
+      element:<Earning/>,
+      errorElement: <Error />,
+    },
+    {
+      path: "/accounting/expenses",
+      element:<Expenses/>,
       errorElement: <Error />,
     },
   ]);

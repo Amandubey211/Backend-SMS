@@ -2,6 +2,8 @@ import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { faCartShopping, faPerson, faTrash,faCalendarDays, faLocation,faUserTie,faClock } from "@fortawesome/free-solid-svg-icons";
+import { MdAccessTime, MdLocationOn, MdPersonOutline } from "react-icons/md";  // Example icons
+import { BiCalendarEvent } from "react-icons/bi";
 
 const ViewEvent = ({ event }) => {
   console.log("event is ", event);
@@ -33,13 +35,15 @@ const ViewEvent = ({ event }) => {
           <img className=" h-[200px] w-full rounded" src={event.imageUrl} />
           <div className=" flex  gap-5" >
             <div className="flex justify-center items-center"  >
-            <FontAwesomeIcon  style={{color:"pink", background:' ' ,margin:'0',padding:'0',  height:'20px' ,width:'20px' ,borderRadius:'50%',marginRight:'5px' }} icon={faCalendarDays} />
+            {/* <FontAwesomeIcon  style={{color:"pink", background:' ' ,margin:'0',padding:'0',  height:'20px' ,width:'20px' ,borderRadius:'50%',marginRight:'5px' }} icon={faCalendarDays} /> */}
+              <BiCalendarEvent className="text-pink-500 text-xl mr-2" />
 
           <span className="text-pink-500"> {startDateTime.date} </span>
 
             </div>
             <div className="flex justify-center items-center"  >
-            <FontAwesomeIcon  style={{color:"blue", background:' ' ,margin:'0',padding:'0',  height:'20px' ,width:'20px' ,borderRadius:'50%',marginRight:'5px' }} icon={faClock} />
+            {/* <FontAwesomeIcon  style={{color:"blue", background:' ' ,margin:'0',padding:'0',  height:'20px' ,width:'20px' ,borderRadius:'50%',marginRight:'5px' }} icon={faClock} /> */}
+            <MdAccessTime className="text-blue-700 text-xl mr-2" />
 
             <span className=" text-blue-700">{startDateTime.time}</span>
 
@@ -59,7 +63,8 @@ const ViewEvent = ({ event }) => {
             <div className="flex  justify-center items-center m-0 p-0  " >
              
                 <div>
-      <FontAwesomeIcon  style={{color:"red" ,margin:'0',padding:'2px',  height:'25px' ,width:'25px' ,borderRadius:'50%',marginRight:'5px' }} icon={faLocation} />
+      {/* <FontAwesomeIcon  style={{color:"red" ,margin:'0',padding:'2px',  height:'25px' ,width:'25px' ,borderRadius:'50%',marginRight:'5px' }} icon={faLocation} /> */}
+      <MdLocationOn className="text-red-500 text-2xl mr-2" />
 
                 </div>
               <div className="flex flex-col">
@@ -71,7 +76,8 @@ const ViewEvent = ({ event }) => {
              
 
 <div>
-      <FontAwesomeIcon  style={{color:"white", background:'blue' ,margin:'0',padding:'2px',  height:'25px' ,width:'25px' ,borderRadius:'50%',marginRight:'5px' }} icon={faUserTie} />
+      {/* <FontAwesomeIcon  style={{color:"white", background:'blue' ,margin:'0',padding:'2px',  height:'25px' ,width:'25px' ,borderRadius:'50%',marginRight:'5px' }} icon={faUserTie} /> */}
+      <MdPersonOutline className="text-blue-500 text-2xl mr-2" />
 
                 </div>
               <div className="flex flex-col">
