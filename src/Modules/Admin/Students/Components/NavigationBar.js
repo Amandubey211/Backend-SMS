@@ -4,11 +4,14 @@ import AddNewStudents from "./AddNewStudents";
 import Sidebar from "../../../../Components/Common/Sidebar";
 import { NavLink } from "react-router-dom";
 
-const NavigationBar = () => {
+const NavigationBar = ({ setActiveSection, activeSection }) => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
 
   const handleSidebarOpen = () => setSidebarOpen(true);
   const handleSidebarClose = () => setSidebarOpen(false);
+
+  const sections = ["Everyone", "Section 1", "Section 2", "Section 3", "Section 4"];
+
   return (
     <>
       <div className="flex justify-between items-center p-4">
@@ -21,8 +24,7 @@ const NavigationBar = () => {
 
         <NavLink
           to="/admissions"
-          //   onClick={handleSidebarOpen}
-          className="flex items-center border border-gray-300 ps-5  py-0 rounded-full"
+          className="flex items-center border border-gray-300 ps-5 py-0 rounded-full"
         >
           <span className="mr-2">Add New Students</span>
           <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full w-12 h-12 flex items-center justify-center">
@@ -39,21 +41,19 @@ const NavigationBar = () => {
       </Sidebar>
 
       <div className="flex space-x-2 px-5">
-        <button className="px-4 py-2 rounded-full border border-gray-300">
-          Everyone
-        </button>
-        <button className="px-4 py-2 rounded-full bg-gradient-to-r from-red-400 to-purple-500 text-white">
-          Section 1
-        </button>
-        <button className="px-4 py-2 rounded-full border border-gray-300">
-          Section 2
-        </button>
-        <button className="px-4 py-2 rounded-full border border-gray-300">
-          Section 3
-        </button>
-        <button className="px-4 py-2 rounded-full border border-gray-300">
-          Section 4
-        </button>
+        {sections.map((section) => (
+          <button
+            key={section}
+            className={`px-4 py-2 rounded-full ${
+              activeSection === section
+                ? "bg-gradient-to-r from-red-400 to-purple-500 text-white"
+                : "border border-gray-300"
+            }`}
+            onClick={() => setActiveSection(section)}
+          >
+            {section}
+          </button>
+        ))}
       </div>
     </>
   );

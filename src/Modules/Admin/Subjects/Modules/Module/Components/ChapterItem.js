@@ -1,16 +1,23 @@
 import React from 'react';
-import { FaFileAlt, FaQuestionCircle, FaFile, FaComments } from 'react-icons/fa';
+import { FaFileAlt, FaQuestionCircle, FaFile, FaComments, FaCheckCircle, FaEllipsisV } from 'react-icons/fa';
+import { RiListCheck3,RiFileUnknowLine } from "react-icons/ri";
+import { GoDiscussionClosed } from "react-icons/go";
 
+import { FiFileText } from "react-icons/fi";
 const getIcon = (type) => {
   switch (type) {
     case 'assignment':
-      return <FaFileAlt className="text-green-500" />;
+      return <RiListCheck3 className="text-green-500" />;
     case 'quiz':
-      return <FaQuestionCircle className="text-green-500" />;
+      return <RiFileUnknowLine className="text-green-500" />;
     case 'page':
-      return <FaFile className="text-green-500" />;
+      return <FiFileText className="text-green-500" />;
     case 'discussions':
-      return <FaComments className="text-green-500" />;
+      return <GoDiscussionClosed className="text-green-500" />;
+    case 'completed':
+      return <FaCheckCircle className="text-green-500" />;
+    case 'more':
+      return <FaEllipsisV className="text-green-500" />;
     default:
       return <FaFileAlt className="text-green-500" />;
   }
@@ -18,11 +25,15 @@ const getIcon = (type) => {
 
 const ChapterItem = ({ type, title }) => {
   return (
-    <div className="flex items-center mb-2 gap-2">
-      <div className="mr-2 p-2 border bg-white rounded-full">{getIcon(type)}</div>
-      <div className='flex flex-col gap-1 justify-center'> 
+    <div className="flex items-center mb-3 gap-3  rounded-lg ">
+      <div className="p-2  bg-white rounded-full">{getIcon(type)}</div>
+      <div className='flex flex-col gap-1 justify-center flex-grow'> 
         <p className="font-semibold">{title}</p>
-        <p className="text-gray-500">{type.charAt(0).toUpperCase() + type.slice(1)}</p>
+        <p className="text-green-500 text-sm ">{type.charAt(0).toUpperCase() + type.slice(1)}</p>
+      </div>
+      <div className="flex items-center gap-3">
+        <FaCheckCircle className="text-green-500" />
+        <FaEllipsisV className="text-green-500" />
       </div>
     </div>
   );

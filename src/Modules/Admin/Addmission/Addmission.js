@@ -5,7 +5,7 @@ import MainSection from "../Addmission/MainSection";
 
 const Addmission = () => {
   return (
-    <Layout title="Addmission Page" >
+    <Layout title="Addmission | Student diwan" >
       <DashLayout children={<MainSection />} />
     </Layout>
   );

@@ -4,11 +4,12 @@ import { HiOutlineDotsVertical } from "react-icons/hi";
 import { BsArrow90DegRight } from "react-icons/bs";
 import { MdOutlineModeEditOutline } from "react-icons/md";
 import { RiDeleteBin2Line } from "react-icons/ri";
+
 const students = [
   {
     name: "Courtney Henry",
     class: "09",
-    section: "Section - 1",
+    section: "Section 1",
     group: "Accounting",
     email: "raihanafridi@gmail.com",
     role: "Parent",
@@ -19,7 +20,7 @@ const students = [
   {
     name: "Darrell Steward",
     class: "09",
-    section: "Section - 1",
+    section: "Section 1",
     group: "Accounting",
     email: "raihanafridi@gmail.com",
     role: "Parent",
@@ -30,7 +31,7 @@ const students = [
   {
     name: "Ronald Richards",
     class: "09",
-    section: "Section - 1",
+    section: "Section 2",
     group: "Accounting",
     email: "raihanafridi@gmail.com",
     role: "Parent",
@@ -41,7 +42,7 @@ const students = [
   {
     name: "Jane Cooper",
     class: "09",
-    section: "Section - 1",
+    section: "Section 2",
     group: "Accounting",
     email: "raihanafridi@gmail.com",
     role: "Parent",
@@ -52,7 +53,7 @@ const students = [
   {
     name: "Brooklyn Simmons",
     class: "09",
-    section: "Section - 1",
+    section: "Section 3",
     group: "Accounting",
     email: "raihanafridi@gmail.com",
     role: "Parent",
@@ -63,7 +64,7 @@ const students = [
   {
     name: "Annette Black",
     class: "09",
-    section: "Section - 1",
+    section: "Section 3",
     group: "Accounting",
     email: "raihanafridi@gmail.com",
     role: "Parent",
@@ -74,7 +75,7 @@ const students = [
   {
     name: "Devon Lane",
     class: "09",
-    section: "Section - 1",
+    section: "Section 4",
     group: "Accounting",
     email: "raihanafridi@gmail.com",
     role: "Parent",
@@ -85,7 +86,7 @@ const students = [
   {
     name: "Wade Warren",
     class: "09",
-    section: "Section - 1",
+    section: "Section 4",
     group: "Accounting",
     email: "raihanafridi@gmail.com",
     role: "Parent",
@@ -95,7 +96,7 @@ const students = [
   },
 ];
 
-const DetailedStudentList = () => {
+const DetailedStudentList = ({ activeSection }) => {
   const [showMenu, setShowMenu] = useState(null);
   const menuRef = useRef(null);
 
@@ -116,10 +117,15 @@ const DetailedStudentList = () => {
     };
   }, []);
 
+  const filteredStudents =
+    activeSection === "Everyone"
+      ? students
+      : students.filter((student) => student.section === activeSection);
+
   return (
-    <div className="w-full max-w-6xl p-4 bg-white rounded-lg shadow-lg">
+    <div className="w-full  p-4 bg-white ">
       <ul className="divide-y divide-gray-200">
-        {students.map((student, index) => (
+        {filteredStudents.map((student, index) => (
           <li
             key={index}
             className="relative flex items-center justify-between py-4"
@@ -158,10 +164,7 @@ const DetailedStudentList = () => {
               >
                 <ul className="space-y-2">
                   <li className="flex items-center space-x-2">
-                    <TfiStatsUp
-                      className="text-[
-#333333]"
-                    />
+                    <TfiStatsUp className="text-[#333333]" />
                     <span>Promote Class</span>
                   </li>
                   <li className="flex items-center space-x-2">

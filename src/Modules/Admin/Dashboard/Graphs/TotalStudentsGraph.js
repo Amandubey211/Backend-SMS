@@ -1,6 +1,6 @@
 import React from "react";
 import { Doughnut } from "react-chartjs-2";
-
+import { BsThreeDots } from "react-icons/bs";
 const TotalStudentsGraphjs = () => {
   const data = {
     datasets: [
@@ -37,11 +37,16 @@ const TotalStudentsGraphjs = () => {
   };
 
   return (
-    <div className="max-w-xs mx-auto  w-[80%] p-4">
-      <h2 className="text-2xl font-semibold mb-4">Student</h2>
+    <div className="max-w-xs  px-2 py-4  h-full">
+      <div className="flex justify-between  items-center  ">
+      <h2 className="text-2xl font-semibold "> Total Student</h2>
+
+        <BsThreeDots/>
+
+      </div>
       <div
-        className="relative"
-        style={{ width: "300px", height: "300px", margin: "auto" }}
+        className="relative p-8  my-5 mb-12"
+        style={{ width: "300px", height: "300px" }}
       >
         <Doughnut data={data} options={options} />
         <div className="absolute inset-0 flex items-center justify-center">
@@ -51,14 +56,17 @@ const TotalStudentsGraphjs = () => {
           </div>
         </div>
       </div>
-      <div className="mt-4 flex justify-between text-sm">
-        <div className="flex items-center">
-          <span className="inline-block w-3 h-3 mr-2 rounded-full bg-green-400"></span>
-          <span>Male Students</span>
+      <div className="mt-2 flex justify-around  text-sm">
+        <div className="flex flex-col items-start">
+          <span className="inline-block w-10 h-1 mb-1 bg-[#8F77F3]"></span>
+          <span className="text-xs text-gray-500">Female Students</span>
+          <span className="text-lg font-bold">2140</span>
         </div>
-        <div className="flex items-center">
-          <span className="inline-block w-3 h-3 mr-2 rounded-full bg-purple-400"></span>
-          <span>Female Students</span>
+        <div className="border-r h-14"></div>
+        <div className="flex flex-col items-start">
+          <span className="inline-block w-10 h-1 mb-1 bg-[#23C55E]"></span>
+          <span className="text-xs text-gray-500">Male Students</span>
+          <span className="text-lg font-bold">1800</span>
         </div>
       </div>
     </div>

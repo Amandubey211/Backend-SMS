@@ -4,7 +4,7 @@ import Layout from "../../../../Components/Common/Layout";
 
 const StudentSignUp = () => {
   return (
-    <Layout title="Student SignUp">
+    <Layout title="Student SignUp | Student diwan">
       <div className=" flex items-center justify-center">
         <StudentSignUpForm />
       </div>

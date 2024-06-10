@@ -35,3 +35,24 @@
   top: 50%;
   transform: translateY(-50%);
 }
+
+/* index.css */
+@layer components {
+  .border-gradient {
+    position: relative;
+    border: 2px solid transparent;
+    border-radius: 1rem;
+    background-clip: padding-box;
+  }
+  .border-gradient::before {
+    content: '';
+    position: absolute;
+    top: -2px; /* Adjust based on your border width */
+    right: -2px;
+    bottom: -2px;
+    left: -2px;
+    z-index: -1;
+    border-radius: 1rem; /* Match with the main element’s border radius */
+    background: linear-gradient(to right, #f43f5e, #8b5cf6); /* Adjust gradient colors and direction */
+  }
+}

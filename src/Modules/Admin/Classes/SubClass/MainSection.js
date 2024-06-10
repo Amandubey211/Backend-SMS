@@ -7,7 +7,9 @@ import SubjectCard from "./SubjectCard";
 import Sidebar from "../../../../Components/Common/Sidebar";
 import AddNewSubject from "./AddNewSubject";
 import { useParams } from "react-router-dom";
-
+import { FaSchool } from "react-icons/fa";
+import { SlEyeglass } from "react-icons/sl";
+import { FcGraduationCap,FcCalendar } from "react-icons/fc";
 const colors = [
   "bg-yellow-300",
   "bg-blue-300",
@@ -25,14 +27,14 @@ const MainSection = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { cid } = useParams();
   const iconData = [
-    { icon: "👓", text: "20 Teacher Assigned", url: `/class/${cid}/teachers` },
+    { icon: <SlEyeglass/>, text: "20 Teacher Assigned", url: `/class/${cid}/teachers` },
     {
-      icon: "🏫",
+      icon: <FaSchool/>,
       text: "3 Section | 11 Groups",
       url: `/class/${cid}/section_group`,
     },
-    { icon: "🎓", text: "250 Students", url: `/class/${cid}/students` },
-    { icon: "📅", text: "Attendance", url: `/class/${cid}/attendance` },
+    { icon: <FcGraduationCap/>, text: "250 Students", url: `/class/${cid}/students` },
+    { icon: <FcCalendar/>, text: "Attendance", url: `/class/${cid}/attendance` },
   ];
 
   const handleAddNewSubject = () => {

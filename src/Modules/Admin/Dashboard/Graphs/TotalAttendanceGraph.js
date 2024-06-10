@@ -30,7 +30,7 @@ const TotalAttendanceGraph = () => {
     },
   };
   return (
-    <div className="bg-white rounded-lg shadow-md ">
+    <div className="bg-white  ">
       <div className="bg-white rounded-lg  p-4">
         <div className="flex justify-between items-center mb-4">
           <div>

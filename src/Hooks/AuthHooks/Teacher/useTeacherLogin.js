@@ -62,13 +62,13 @@ const useTeacherLogin = () => {
       // } else {
       //   toast.error(data.message || "Login failed. Please try again.");
       // }
-      if (email === "demo@studentdiwan.com" && password === "studentdiwan123@") {
+      // if (email === "demo@studentdiwan.com" && password === "studentdiwan123@") {
         dispatch(setAuth(true));
         dispatch(setRole("admin"));
         navigate("/admin_dash");
-      }else{
-        toast.success("Not Correct ")
-      }
+      // }else{
+      //   toast.success("Not Correct ")
+      // }
     } catch (error) {
       const errorMessage =
         error.response?.data?.msg || "Something went wrong. Please try again.";

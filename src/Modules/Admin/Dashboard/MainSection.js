@@ -15,40 +15,40 @@ import NoticeBoard from "./NoticeModule/NoticeBoard.js";
 
 const MainSection = () => {
   return (
-    <div className="min-h-screen ">
+    <div className="h-full">
       <div className="max-w-6xl w-full p-2">
-        <div className="flex flex-wrap lg:mx-7 justify-between p-2 px-8">
+        <div className="flex flex-wrap justify-center gap-3 py-4 ">
           {cardData?.map((item, index) => (
             <DashCard key={index} {...item} />
           ))}
         </div>
-        <div className="flex flex-wrap justify-between items-center">
-          <div className="w-full md:w-1/2">
+        <div className="flex flex-wrap justify-between items-start border-y">
+          <div className="w-full md:w-1/2 border-r">
             <TotalAttendanceGraph />
           </div>
           <div className="w-full md:w-1/2">
             <TotalEarningsGraph />
           </div>
         </div>
-        <div className="flex flex-wrap justify-between items-center">
-          <div className="w-full md:w-2/3">
+        <div className="flex flex-wrap justify-between items-start border-y">
+          <div className="w-full md:w-2/3 h-full border-r">
             <TopRankingStudents />
           </div>
-          <div className="w-full md:w-1/3">
+          <div className="w-full h-full flex flex-col md:w-1/3 ps-3">
             <TotalStudentsGraphjs />
           </div>
         </div>
-        <div className="flex flex-wrap items-center mt-3 justify-between ">
-          <div className="w-full md:w-1/2 pe-4 border flex flex-col  justify-center">
+        <div className="flex flex-wrap items-start justify-between border-y   ">
+          <div className="w-full md:w-1/2  border-r flex flex-col  justify-center">
             <BestPerformersChart data={performanceData} />
           </div>
-          <div className="w-full md:w-1/2 border">
+          <div className="w-full md:w-1/2 ">
             <Library />
           </div>
         </div>
 
-        <div className="flex flex-wrap justify-between ">
-          <div className="w-full md:w-1/2">
+        <div className="flex flex-wrap justify-between items-start  border-y">
+          <div className="w-full md:w-1/2 border-r" >
             <NoticeBoard />
           </div>
           <div className="w-full md:w-2/4">
