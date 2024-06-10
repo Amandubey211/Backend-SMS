@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Paper from '@mui/material/Paper';
+import Paper from "@mui/material/Paper";
 import {
   Scheduler,
   WeekView,
@@ -9,12 +9,12 @@ import {
   DateNavigator,
   TodayButton,
   ViewSwitcher,
-} from '@devexpress/dx-react-scheduler-material-ui';
-import { ViewState } from '@devexpress/dx-react-scheduler';
+} from "@devexpress/dx-react-scheduler-material-ui";
+import { ViewState } from "@devexpress/dx-react-scheduler";
 
 import Layout from "../../../../../Components/Common/Layout";
 import DashLayout from "../../../../../Components/Admin/AdminDashLayout";
-import '../subComponents/customCalendar.css'; // Ensure the CSS file is correctly referenced
+import "../subComponents/customCalendar.css"; // Ensure the CSS file is correctly referenced
 import EventCard from "../subComponents/EventCard";
 
 import Sidebar from "../../../../../Components/Common/Sidebar";
@@ -25,7 +25,7 @@ import { schedulerData } from "../../../dummyData/dummyData";
 
 const EventScheduler = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [currentViewName, setCurrentViewName] = useState('Month');
+  const [currentViewName, setCurrentViewName] = useState("Month");
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [sidebarContent, setSidebarContent] = useState(null);
@@ -39,7 +39,7 @@ const EventScheduler = () => {
   //     title: "Event One",
   //     id: 1,
   //   },
-  //   { 
+  //   {
   //     // start: new Date(2024, 2, 2, 9, 30),
   //     // end: new Date(2024, 2, 2, 11, 30),
   //     // allDay: false,
@@ -153,19 +153,23 @@ const EventScheduler = () => {
   //       // More students...
   //     ]
   //   },
-    
+
   // ];
-  
 
   // Console log to debug date objects
-  console.log("Event dates validation:", schedulerData.map(event => ({
-    startDateIsValid: event.startDate instanceof Date && !isNaN(event.startDate.getDate()),
-    endDateIsValid: event.endDate instanceof Date && !isNaN(event.endDate.getDate()),
-  })));
+  console.log(
+    "Event dates validation:",
+    schedulerData.map((event) => ({
+      startDateIsValid:
+        event.startDate instanceof Date && !isNaN(event.startDate.getDate()),
+      endDateIsValid:
+        event.endDate instanceof Date && !isNaN(event.endDate.getDate()),
+    }))
+  );
 
   const handleSidebarOpen = () => setSidebarOpen(true);
   const handleSidebarClose = () => setSidebarOpen(false);
-  
+
   const onCurrentDateChange = (date) => {
     setCurrentDate(date);
   };
@@ -174,12 +178,10 @@ const EventScheduler = () => {
     setCurrentViewName(viewName);
   };
 
-
-
-  const Appointment = ({ children,data, style, ...restProps }) => (
+  const Appointment = ({ children, data, style, ...restProps }) => (
     <Appointments.Appointment
       {...restProps}
-      onClick={()=>handleAppointmentClick(data)}
+      onClick={() => handleAppointmentClick(data)}
       className="custom-appointment"
     >
       {children}
@@ -187,10 +189,7 @@ const EventScheduler = () => {
   );
 
   const TimeTableCell = ({ children, ...restProps }) => (
-    <WeekView.TimeTableCell
-      {...restProps}
-      className="custom-time-table-cell"
-    >
+    <WeekView.TimeTableCell {...restProps} className="custom-time-table-cell">
       {children}
     </WeekView.TimeTableCell>
   );
@@ -198,30 +197,28 @@ const EventScheduler = () => {
   const DateTableCell = ({ children, ...restProps }) => (
     <MonthView.DateTableCell
       {...restProps}
-      className={`custom-date-table-cell ${restProps.className || ''}`}
+      className={`custom-date-table-cell ${restProps.className || ""}`}
     >
       {children}
     </MonthView.DateTableCell>
   );
-  const handleAppointmentClick=(appointmentData)=>{
-    setSelectedEvent(appointmentData)
-  
+  const handleAppointmentClick = (appointmentData) => {
+    setSelectedEvent(appointmentData);
+
     console.log(appointmentData);
-    setSidebarContent('viewEvent')
-    setSidebarOpen(true)
-  }
-  
-  const handleAddEventClick=()=>{
-  
-    setSidebarContent('addEvent')
-    setSidebarOpen(true)
-  
-  }
+    setSidebarContent("viewEvent");
+    setSidebarOpen(true);
+  };
+
+  const handleAddEventClick = () => {
+    setSidebarContent("addEvent");
+    setSidebarOpen(true);
+  };
   const renderSidebarContent = () => {
     switch (sidebarContent) {
-      case 'viewEvent':
+      case "viewEvent":
         return <ViewEvent event={selectedEvent} />;
-      case 'addEvent':
+      case "addEvent":
         return <AddEvent />;
       default:
         return <div>Select an action</div>;
@@ -276,18 +273,18 @@ const EventScheduler = () => {
             {renderSidebarContent()}
           </Sidebar> */}
             <Sidebar
-  isOpen={isSidebarOpen}
-  onClose={() => setSidebarOpen(false)}
-  title={
-    
-    <span className="bg-gradient-to-r from-pink-500   to-purple-500 inline-block text-transparent bg-clip-text">
-      {sidebarContent === 'viewEvent' ? 'View Event' : 'Add New Event'}
-    </span>
-  }
->
-  {renderSidebarContent()}
-</Sidebar>
-
+              isOpen={isSidebarOpen}
+              onClose={() => setSidebarOpen(false)}
+              title={
+                <span className="bg-gradient-to-r from-pink-500   to-purple-500 inline-block text-transparent bg-clip-text">
+                  {sidebarContent === "viewEvent"
+                    ? "View Event"
+                    : "Add New Event"}
+                </span>
+              }
+            >
+              {renderSidebarContent()}
+            </Sidebar>
           </div>
         </DashLayout>
       </Layout>
@@ -296,4 +293,3 @@ const EventScheduler = () => {
 };
 
 export default EventScheduler;
-

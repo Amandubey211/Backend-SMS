@@ -729,3 +729,174 @@ export  const books = [
     // More notices can be added similarly
   ];
   
+  export const dummyTeacherExpenses = [
+    { id: 1, name: 'Leslie Alexander', contact: '+990 7183641', salaryMonth: 'January', salaryAmount: 2500, paidDate: '01/05/2024', status: 'Paid', subject: 'Math', imageUrl: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZXZlbnR8ZW58MHx8MHx8fDA%3D' },
+    { id: 2, name: 'Bessie Cooper', contact: '+990 7183641', salaryMonth: 'January', salaryAmount: 2500, paidDate: '01/05/2024', status: 'Paid', subject: 'Science', imageUrl: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZXZlbnR8ZW58MHx8MHx8fDA%3D' },
+    { id: 3, name: 'Annette Black', contact: '+990 7183641', salaryMonth: 'January', salaryAmount: 2500, paidDate: '01/05/2024', status: 'Due', subject: 'English', imageUrl: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZXZlbnR8ZW58MHx8MHx8fDA%3D' },
+    { id: 4, name: 'Cody Fisher', contact: '+990 7183642', salaryMonth: 'February', salaryAmount: 2600, paidDate: '02/06/2024', status: 'Paid', subject: 'History', imageUrl: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZXZlbnR8ZW58MHx8MHx8fDA%3D' },
+    { id: 5, name: 'Savannah Nguyen', contact: '+990 7183643', salaryMonth: 'February', salaryAmount: 2600, paidDate: '02/06/2024', status: 'Due', subject: 'Geography', imageUrl: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZXZlbnR8ZW58MHx8MHx8fDA%3D' },
+    { id: 6, name: 'Jerome Bell', contact: '+990 7183644', salaryMonth: 'March', salaryAmount: 2700, paidDate: '03/07/2024', status: 'Paid', subject: 'Math', imageUrl: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZXZlbnR8ZW58MHx8MHx8fDA%3D' },
+    { id: 7, name: 'Kathryn Murphy', contact: '+990 7183645', salaryMonth: 'March', salaryAmount: 2700, paidDate: '03/07/2024', status: 'Due', subject: 'Biology', imageUrl: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZXZlbnR8ZW58MHx8MHx8fDA%3D' },
+    { id: 8, name: 'Arlene McCoy', contact: '+990 7183646', salaryMonth: 'April', salaryAmount: 2800, paidDate: '04/08/2024', status: 'Paid', subject: 'Chemistry', imageUrl: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZXZlbnR8ZW58MHx8MHx8fDA%3D' },
+    { id: 9, name: 'Jacob Jones', contact: '+990 7183647', salaryMonth: 'April', salaryAmount: 2800, paidDate: '04/08/2024', status: 'Due', subject: 'Physics', imageUrl: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZXZlbnR8ZW58MHx8MHx8fDA%3D' },
+    { id: 10, name: 'Guy Hawkins', contact: '+990 7183648', salaryMonth: 'May', salaryAmount: 2900, paidDate: '05/09/2024', status: 'Paid', subject: 'Math', imageUrl: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZXZlbnR8ZW58MHx8MHx8fDA%3D' },
+    { id: 11, name: 'Floyd Miles', contact: '+990 7183649', salaryMonth: 'May', salaryAmount: 2900, paidDate: '05/09/2024', status: 'Due', subject: 'English', imageUrl: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZXZlbnR8ZW58MHx8MHx8fDA%3D' },
+  
+    {
+      id: 12,
+      name: 'Martha Graham',
+      contact: '+990 7183646',
+      salaryMonth: 'July',
+      salaryAmount: 3100,
+      paidDate: '07/10/2024',
+      status: 'Due',
+      subject: 'Biology',
+      imageUrl: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Ym9va3N8ZW58MHx8MHx8fDA%3D'
+    },
+    {
+      id: 12,
+      name: 'Paul Clark',
+      contact: '+990 7183647',
+      salaryMonth: 'August',
+      salaryAmount: 3200,
+      paidDate: '08/12/2024',
+      status: 'Paid',
+      subject: 'Chemistry',
+      imageUrl: 'https://images.unsplash.com/photo-1525681752491-81f3720c9ae5?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Y2hlbWlzdHJ5fGVufDB8fDB8fHww'
+    },
+    {
+      id: 14,
+      name: 'Laura Martinez',
+      contact: '+990 7183648',
+      salaryMonth: 'September',
+      salaryAmount: 3300,
+      paidDate: '09/11/2024',
+      status: 'Due',
+      subject: 'Geography',
+      imageUrl: 'https://images.unsplash.com/photo-1529638622979-cdba6b357f23?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Z2VvZ3JhcGh5fGVufDB8fDB8fHww'
+    },
+    {
+      id: 15,
+      name: 'Kevin Turner',
+      contact: '+990 7183649',
+      salaryMonth: 'October',
+      salaryAmount: 3400,
+      paidDate: '10/15/2024',
+      status: 'Paid',
+      subject: 'Music',
+      imageUrl: 'https://images.unsplash.com/photo-1471485711773-509cad56f65d?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8bXVzaWN8ZW58MHx8MHx8fDA%3D'
+    },
+    {
+      id: 16,
+      name: 'Sophia Bailey',
+      contact: '+990 7183650',
+      salaryMonth: 'November',
+      salaryAmount: 3500,
+      paidDate: '11/20/2024',
+      status: 'Due',
+      subject: 'Philosophy',
+      imageUrl: 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cGhpbG9zb3BoeXl8ZW58MHx8MHx8fDA%3D'
+    },
+    {
+      id: 17,
+      name: 'Daniel Edwards',
+      contact: '+990 7183651',
+      salaryMonth: 'December',
+      salaryAmount: 3600,
+      paidDate: '12/22/2024',
+      status: 'Paid',
+      subject: 'Economics',
+      imageUrl: 'https://images.unsplash.com/photo-1564758565094-7215c33a376f?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZWNvbm9taWNzfGVufDB8fDB8fHww'
+    }
+  ];
+
+  export const dummyStaffExpenses = [
+    { id: 1, name: 'Leslie Alexander', contact: '+990 7183641', salaryMonth: 'January', salaryAmount: 2500, paidDate: '01/05/2024', status: 'Paid', jobRole: 'Teacher', imageUrl: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZXZlbnR8ZW58MHx8MHx8fDA%3D' },
+    { id: 2, name: 'Bessie Cooper', contact: '+990 7183641', salaryMonth: 'January', salaryAmount: 2500, paidDate: '01/05/2024', status: 'Paid', jobRole: 'Caretaker', imageUrl: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZXZlbnR8ZW58MHx8MHx8fDA%3D' },
+    { id: 3, name: 'Annette Black', contact: '+990 7183641', salaryMonth: 'January', salaryAmount: 2500, paidDate: '01/05/2024', status: 'Due', jobRole: 'Peon', imageUrl: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZXZlbnR8ZW58MHx8MHx8fDA%3D' },
+    { id: 4, name: 'Cody Fisher', contact: '+990 7183642', salaryMonth: 'February', salaryAmount: 2600, paidDate: '02/06/2024', status: 'Paid', jobRole: 'Staff', imageUrl: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZXZlbnR8ZW58MHx8MHx8fDA%3D' },
+    { id: 5, name: 'Savannah Nguyen', contact: '+990 7183643', salaryMonth: 'February', salaryAmount: 2600, paidDate: '02/06/2024', status: 'Due', jobRole: 'Assistant', imageUrl: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZXZlbnR8ZW58MHx8MHx8fDA%3D' },
+    { id: 6, name: 'Jerome Bell', contact: '+990 7183644', salaryMonth: 'March', salaryAmount: 2700, paidDate: '03/07/2024', status: 'Paid', jobRole: 'Staff', imageUrl: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZXZlbnR8ZW58MHx8MHx8fDA%3D' },
+    { id: 7, name: 'Kathryn Murphy', contact: '+990 7183645', salaryMonth: 'March', salaryAmount: 2700, paidDate: '03/07/2024', status: 'Due', jobRole: 'Librarian', imageUrl: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZXZlbnR8ZW58MHx8MHx8fDA%3D' },
+    { id: 8, name: 'Arlene McCoy', contact: '+990 7183646', salaryMonth: 'April', salaryAmount: 2800, paidDate: '04/08/2024', status: 'Paid', jobRole: 'Caretaker', imageUrl: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZXZlbnR8ZW58MHx8MHx8fDA%3D' },
+    { id: 9, name: 'Jacob Jones', contact: '+990 7183647', salaryMonth: 'April', salaryAmount: 2800, paidDate: '04/08/2024', status: 'Due', jobRole: 'Security', imageUrl: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZXZlbnR8ZW58MHx8MHx8fDA%3D' },
+    { id: 10, name: 'Guy Hawkins', contact: '+990 7183648', salaryMonth: 'May', salaryAmount: 2900, paidDate: '05/09/2024', status: 'Paid', jobRole: 'Peon', imageUrl: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZXZlbnR8ZW58MHx8MHx8fDA%3D' },
+    { id: 11, name: 'Floyd Miles', contact: '+990 7183649', salaryMonth: 'May', salaryAmount: 2900, paidDate: '05/09/2024', status: 'Due', jobRole: 'Staff', imageUrl: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZXZlbnR8ZW58MHx8MHx8fDA%3D' },
+    {
+      id: 12,
+      name: 'Martha Graham',
+      contact: '+990 7183646',
+      salaryMonth: 'July',
+      salaryAmount: 3100,
+      paidDate: '07/10/2024',
+      status: 'Due',
+      jobRole: 'Assistant',
+      imageUrl: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Ym9va3N8ZW58MHx8MHx8fDA%3D'
+    },
+    {
+      id: 13,
+      name: 'Paul Clark',
+      contact: '+990 7183647',
+      salaryMonth: 'August',
+      salaryAmount: 3200,
+      paidDate: '08/12/2024',
+      status: 'Paid',
+      jobRole: 'Security',
+      imageUrl: 'https://images.unsplash.com/photo-1525681752491-81f3720c9ae5?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Y2hlbWlzdHJ5fGVufDB8fDB8fHww'
+    },
+    {
+      id: 14,
+      name: 'Laura Martinez',
+      contact: '+990 7183648',
+      salaryMonth: 'September',
+      salaryAmount: 3300,
+      paidDate: '09/11/2024',
+      status: 'Due',
+      jobRole: 'Assistant',
+      imageUrl: 'https://images.unsplash.com/photo-1529638622979-cdba6b357f23?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Z2VvZ3JhcGh5fGVufDB8fDB8fHww'
+    },
+    {
+      id: 15,
+      name: 'Kevin Turner',
+      contact: '+990 7183649',
+      salaryMonth: 'October',
+      salaryAmount: 3400,
+      paidDate: '10/15/2024',
+      status: 'Paid',
+      jobRole: 'Librarian',
+      imageUrl: 'https://images.unsplash.com/photo-1471485711773-509cad56f65d?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8bXVzaWN8ZW58MHx8MHx8fDA%3D'
+    },
+    {
+      id: 16,
+      name: 'Sophia Bailey',
+      contact: '+990 7183650',
+      salaryMonth: 'November',
+      salaryAmount: 3500,
+      paidDate: '11/20/2024',
+      status: 'Due',
+      jobRole: 'Staff',
+      imageUrl: 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cGhpbG9zb3BoeXl8ZW58MHx8MHx8fDA%3D'
+    },
+    {
+      id: 17,
+      name: 'Daniel Edwards',
+      contact: '+990 7183651',
+      salaryMonth: 'December',
+      salaryAmount: 3600,
+      paidDate: '12/22/2024',
+      status: 'Paid',
+      jobRole: 'Accountant',
+      imageUrl: 'https://images.unsplash.com/photo-1564758565094-7215c33a376f?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZWNvbm9taWNzfGVufDB8fDB8fHww'
+    }
+  ];
+  export const dummyOtherExpenses = [
+
+    { id: 1, name: 'Buy 100 bench for class 10 ', contact: '+990 7183641', salaryMonth: 'January', salaryAmount: 2500, paidDate: '01/05/2024', status: 'Paid', jobRole: 'Teacher', imageUrl: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZXZlbnR8ZW58MHx8MHx8fDA%3D' },
+    { id: 2, name: 'Buy 100 bench for class 10', contact: '+990 7183641', salaryMonth: 'January', salaryAmount: 2500, paidDate: '01/05/2024', status: 'Paid', jobRole: 'Caretaker', imageUrl: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZXZlbnR8ZW58MHx8MHx8fDA%3D' },
+    { id: 3, name: 'Buy 100 bench for class 10', contact: '+990 7183641', salaryMonth: 'January', salaryAmount: 2500, paidDate: '01/05/2024', status: 'Due', jobRole: 'Peon', imageUrl: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZXZlbnR8ZW58MHx8MHx8fDA%3D' },
+    { id: 4, name: 'Buy 100 bench for class 10', contact: '+990 7183642', salaryMonth: 'February', salaryAmount: 2600, paidDate: '02/06/2024', status: 'Paid', jobRole: 'Staff', imageUrl: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZXZlbnR8ZW58MHx8MHx8fDA%3D' },
+    { id: 5, name: 'Buy 100 bench for class 10', contact: '+990 7183643', salaryMonth: 'February', salaryAmount: 2600, paidDate: '02/06/2024', status: 'Due', jobRole: 'Assistant', imageUrl: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZXZlbnR8ZW58MHx8MHx8fDA%3D' },
+    
+  ];
+  
+  
