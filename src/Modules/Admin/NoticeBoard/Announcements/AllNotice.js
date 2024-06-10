@@ -1,10 +1,11 @@
 import React from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faClock,
-  faTrash,
-  faCalendarDays,
-} from "@fortawesome/free-solid-svg-icons";
+// import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+// import {
+//   faClock,
+//   faTrash,
+//   faCalendarDays,
+// } from "@fortawesome/free-solid-svg-icons";
+import { MdCalendarMonth } from "react-icons/md";
 
 const AllNotice = ({ notice, onToggle, isActive }) => (
   <div className="border-b last:border-b-0">
@@ -22,7 +23,8 @@ const AllNotice = ({ notice, onToggle, isActive }) => (
         <div>
           <h2 className="text-lg font-semibold">{notice.title}</h2>
           <p className="text-sm text-gray-500">
-            <FontAwesomeIcon icon={faCalendarDays} className="mr-2" />
+            {/* <FontAwesomeIcon icon={faCalendarDays} className="mr-2" /> */}
+            <MdCalendarMonth  className="mr-2" />
             {notice.date}
           </p>
         </div>
