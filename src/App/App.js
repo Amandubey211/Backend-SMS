@@ -14,14 +14,25 @@ import ResetPassword from "../Modules/LoginPages/Student/ResetPassword/ResetPass
 import Fallback from "../Components/Common/Fallback.js";
 import AccountingSection from "../Modules/Admin/Accounting/MainSection/AccountingSection.js";
 import Libary from "../Modules/Admin/Libary/MainSection/Libary.js";
+
 import Events from "../Modules/Admin/Dashboard/EventModule/Event.js";
 import EventSchool from "../Modules/Admin/NoticeBoard/Events/MainSection/EventSchool.js";
 import Announce from "../Modules/Admin/NoticeBoard/Announcements/Announce.js";
 import Earning from "../Modules/Admin/Accounting/Earnings/Earning.js";
 import Expenses from "../Modules/Admin/Accounting/Expenses/Expenses.js";
 
+
+
+
+
+
 function App() {
   const Dash = lazy(() => import("../Modules/Admin/Dashboard/Dash.js"));
+  const CreateQuizzes = lazy(() => import("../Modules/Admin/Subjects/Modules/Quizzes/CreateQuizzes/CreateQuizzes.js"));
+  const Quizzes = lazy(() => import("../Modules/Admin/Subjects/Modules/Quizzes/Quizzes.js"));
+  const CreateAssignment = lazy(() =>
+    import("../Modules/Admin/Subjects/Modules/Assignments/CreateAssignment/CreateAssignment.js")
+  );
   const Group_Section = lazy(() =>
     import("../Modules/Admin/Groups&Sections/Group_Section.js")
   );
@@ -42,7 +53,9 @@ function App() {
   const Attendance = lazy(() =>
     import("../Modules/Admin/Attendance/Attendance.js")
   );
-  // const Subject = lazy(() => import("../Modules/Admin/Subject/Subject.js"));
+
+  const Subject = lazy(() => import("../Modules/Admin/Subject/Subject.js"));
+
   const Students = lazy(() => import("../Modules/Admin/Students/Students.js"));
   const Addmission = lazy(() =>
     import("../Modules/Admin/Addmission/Addmission.js")
@@ -187,23 +200,42 @@ function App() {
       element: <ProtectRoute Component={Assignment} role="admin" />,
       errorElement: <Error />,
     },
+    
+    {
+      path: "/class/:cid/:sid/createassignment",
+      element: <ProtectRoute Component={CreateAssignment} role="admin" />,
+      errorElement: <Error />,
+    },
     {
       path: "/class/:cid/:sid/rubric",
       element: <ProtectRoute Component={Rubric} role="admin" />,
       errorElement: <Error />,
     },
+    {
+      path: "/class/:cid/:sid/quizzes",
+      element: <ProtectRoute Component={Quizzes} role="admin" />,
+      errorElement: <Error />,
+    },
+    {
+      path: "/class/:cid/:sid/create_quiz",
+      element: <ProtectRoute Component={CreateQuizzes} role="admin" />,
+      errorElement: <Error />,
+    },
+    
 
     //Student Routes-------------------------
     {
       path: "/student_dash",
       element: <ProtectRoute Component={StudentDash} role="student" />,
       errorElement: <Error />,
-    }, {
+    },
+    
+    {
       path: "accounting/studentfees",
       element: <AccountingSection />,
       errorElement: <Error />,
     },
-    ,
+    
     {
       path: "library",
       element:<Libary/>,

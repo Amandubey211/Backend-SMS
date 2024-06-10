@@ -1,52 +1,60 @@
 import React, { useState } from "react";
-import {
-  FaSave,
-  FaRocket,
-  FaBook,
-  FaGraduationCap,
-  FaLaptop,
-} from "react-icons/fa";
 import classIcons from "../../Dashboard/DashboardData/ClassIconData";
 import toast from "react-hot-toast";
+import EditorSelector from "./Components/EditorSelector";
+
+const dummyColors = [
+  "#34D399",
+  "#F472B6",
+  "#A78BFA",
+  "#60A5FA",
+  "#3B82F6",
+  "#EC4899",
+  "#EF4444",
+  "#10B981",
+  "#F59E0B",
+  "#6366F1",
+  "#6EE7B7",
+  "#9333EA",
+  "#F43F5E",
+  "#FB923C",
+  "#F87171",
+  "#14B8A6",
+  "#60A5FA",
+  "#D97706",
+  "#4B5563",
+];
+// const dummyuser = [
+// "Aman Dubey", "Akash","Huda","Faharan"
+// ]
 
 const AddNewSubject = () => {
   const [activeTab, setActiveTab] = useState("icon");
   const [selectedColor, setSelectedColor] = useState("");
   const [activeIconId, setActiveIconId] = useState(null);
+  const [subjectTitle, setSubjectTitle] = useState("");
+  const [selectedUsers, setSelectedUsers] = useState([]);
 
-  const dummyIcons = [
-    FaSave,
-    FaRocket,
-    FaBook,
-    FaGraduationCap,
-    FaLaptop,
-    // Add more icons as needed
-  ];
-
-  const dummyColors = [
-    "#34D399",
-    "#F472B6",
-    "#A78BFA",
-    "#60A5FA",
-    "#3B82F6",
-    "#EC4899",
-    "#EF4444",
-    "#10B981",
-    "#F59E0B",
-    "#6366F1",
-    "#6EE7B7",
-    "#9333EA",
-    "#F43F5E",
-    "#FB923C",
-    "#F87171",
-    "#14B8A6",
-    "#60A5FA",
-    "#D97706",
-    "#4B5563",
-  ];
   const handleIconClick = (id) => {
     setActiveIconId(id);
   };
+
+  const handleSave = (publish = false) => {
+    const formData = {
+      subjectTitle,
+      selectedColor,
+      activeIconId,
+      selectedUsers,
+      publish,
+    };
+    console.log(formData);
+    if (publish) {
+      toast.success("Saved and Published", { position: "bottom-left" });
+    } else {
+      toast.success("Subject Saved", { position: "bottom-left" });
+    }
+  };
+
   return (
     <div className="flex flex-col h-full p-4">
       <div className="mb-4">
@@ -59,10 +67,17 @@ const AddNewSubject = () => {
         <input
           type="text"
           id="subject-title"
+          value={subjectTitle}
+          onChange={(e) => setSubjectTitle(e.target.value)}
           className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
           placeholder="Type here"
         />
       </div>
+
+      <div className="mb-4">
+        <EditorSelector selectedUsers={selectedUsers} setSelectedUsers={setSelectedUsers} />
+      </div>
+
       <div className="flex mb-4">
         <button
           className={`flex-1 py-2 ${
@@ -109,12 +124,12 @@ const AddNewSubject = () => {
         </div>
       ) : (
         <div className="flex-grow">
-          <div className="grid grid-cols-5 gap-2 mt-2">
+          <div className="grid grid-cols-6 gap-2 mt-2">
             {dummyColors.map((color, index) => (
               <button
                 key={index}
                 style={{ backgroundColor: color }}
-                className={`w-14 h-14 rounded-full border-4 ${
+                className={`w-12 h-12 rounded-full  border-4 ${
                   selectedColor === color
                     ? "border-indigo-500"
                     : "border-transparent"
@@ -127,9 +142,7 @@ const AddNewSubject = () => {
       )}
       <div className="mb-4 flex justify-between items-center space-x-4">
         <button
-          onClick={() =>
-            toast.success("Saved and Published", { position: "bottom-left" })
-          }
+          onClick={() => handleSave(true)}
           className="flex-grow rounded-md py-2 text-center"
           style={{
             background: "linear-gradient(to right, #fce7f3, #e9d5ff)",
@@ -146,9 +159,7 @@ const AddNewSubject = () => {
           </span>
         </button>
         <button
-          onClick={() =>
-            toast.success("Subject Saved ", { position: "bottom-left" })
-          }
+          onClick={() => handleSave(false)}
           className="flex-grow px-6 py-2 text-white font-semibold rounded-md bg-gradient-to-r from-purple-500 to-red-500 hover:from-purple-600 hover:to-red-600 text-center"
         >
           Save

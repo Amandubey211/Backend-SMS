@@ -1,7 +1,7 @@
 // src/EventsList.js
 import React from "react";
 import EventItem from "./EventItems";
-
+import { IoIosArrowForward,IoIosArrowBack ,IoIosArrowDown  } from "react-icons/io";
 const Events = () => {
   const events = [
     {
@@ -42,45 +42,21 @@ const Events = () => {
   ];
 
   return (
-    <div className="max-w-4xl mt-3 me-1 border mx-auto bg-white p-6 rounded-lg ">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-semibold">Event</h2>
-        <button className="text-blue-600">View all</button>
-      </div>
+    <div className="max-w-4xl  me-1 text-gray-600  mx-auto bg-white p-4  ">
+      {/* <div className="flex justify-between items-center mb-6">
+      </div> */}
       <div className="flex justify-between items-center mb-4">
-        <button className="p-2">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-6 w-6 text-gray-500"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M15 19l-7-7 7-7"
-            />
-          </svg>
-        </button>
-        <h3 className="text-lg font-medium">FEBRUARY 2024</h3>
-        <button className="p-2">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-6 w-6 text-gray-500"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M9 5l7 7-7 7"
-            />
-          </svg>
-        </button>
+        <h2 className="text-xl font-medium ">Event</h2>
+        <div className="flex items-center gap-3">
+          <button className="p-1 border rounded-full">
+            <IoIosArrowBack />
+          </button>
+          <h3 className="text-lg font-medium">FEBRUARY 2024</h3>
+          <button className="p-1 border rounded-full">
+            <IoIosArrowForward />
+          </button>
+        </div>
+
         <div className="relative">
           <select className="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
             <option>Month</option>
@@ -91,15 +67,16 @@ const Events = () => {
             {/* Add other month options here */}
           </select>
           <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-            <svg
-              className="fill-current h-4 w-4"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-            >
-              <path d="M7 10l5 5 5-5H7z" />
-            </svg>
+          <IoIosArrowDown/>
           </div>
         </div>
+      </div>
+      <div className="flex justify-between p-2 border-y py-3 font-semibold ">
+        <h1>Event Name</h1>
+        <h1>Event Type</h1>
+        <h1>Start Date</h1>
+
+
       </div>
       <div className="divide-y divide-gray-200">
         {events.map((event) => (

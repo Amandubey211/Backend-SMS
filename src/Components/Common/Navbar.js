@@ -15,7 +15,7 @@ const Navbar = ({ toggleSidebar }) => {
 
   return (
     <div className="relative">
-      <div className="flex items-center p-2 bg-white border">
+      <div className="flex items-center p-2  bg-white border-b ">
         <button onClick={toggleSidebar} className="focus:outline-none mr-4">
           <div className="p-1 rounded-full  text-purple-500  bg-white -m-4 absolute left-1  bottom-1 z-10 border">
             {isSidebarOpen ? <IoIosArrowBack /> : <IoIosArrowForward />}

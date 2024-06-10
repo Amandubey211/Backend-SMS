@@ -23,12 +23,13 @@ const ModuleCard = ({ title, moduleNumber, imageUrl, isCompleted }) => {
   }, []);
 
   return (
-    <div className="relative mb-4 border bg-white rounded-lg shadow-md">
+    <div className="relative mb-4 border-gradient bg-white rounded-lg shadow-md">
       <img src={imageUrl} alt={title} className="w-full h-36 object-cover rounded-t-lg" />
       <div className="p-4">
         <h2 className="font-semibold text-lg">{title}</h2>
         <div className="flex justify-between items-center mt-2">
-          <p className="text-purple-600 font-semibold bg-purple-100 rounded-full py-1 px-4">Module {moduleNumber}</p>
+          <p className="bg-gradient-to-r from-pink-100 to-purple-200 font-semibold rounded-full py-1 px-4">    <span className="text-gradient"> Module {moduleNumber}</span>  </p>
+       
           <div className="flex items-center space-x-2">
             {isCompleted ? (
               <FaCheckCircle className="text-green-500" />

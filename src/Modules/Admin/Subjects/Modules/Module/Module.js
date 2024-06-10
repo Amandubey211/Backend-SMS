@@ -9,7 +9,7 @@ const Module = () => {
     const {cid,sid}  = useParams()
     useNavHeading(cid,sid)
   return (
-    <Layout>
+    <Layout title="Module | student diwan">
         <DashLayout children={<MainSection/>}/>
     </Layout>
   )

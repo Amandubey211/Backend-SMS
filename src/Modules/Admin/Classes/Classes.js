@@ -7,7 +7,7 @@ import useNavHeading from "../../../Hooks/CommonHooks/useNavHeading ";
 const Classes = () => {
   useNavHeading("Classes");
   return (
-    <Layout title="All Classes">
+    <Layout title="Classes | Student diwan">
       <DashLayout children={<ClassesMainSection />} />;
     </Layout>
   );

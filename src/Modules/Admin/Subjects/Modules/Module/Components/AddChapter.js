@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 const AddChapter = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [preview, setPreview] = useState(null);
+  const [moduleTitle, setModuleTitle] = useState('');
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
@@ -23,12 +24,22 @@ const AddChapter = () => {
     setPreview(null);
   };
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const formData = {
+      moduleTitle,
+      selectedFile,
+    };
+    console.log(formData);
+    toast.success('Module data has been logged to the console');
+  };
+
   return (
-    <div className="flex flex-col h-full p-2">
+    <form className="flex flex-col h-full p-2" onSubmit={handleSubmit}>
       <div className="bg-white rounded-lg">
         <div className="mb-4">
           <label className="block text-gray-700 text-sm font-semibold opacity-60 mb-2" htmlFor="moduleImage">
-            Module Image
+            Chapter Image
           </label>
           <div className="relative border rounded-lg w-full h-48 flex items-center justify-center">
             {preview ? (
@@ -107,11 +118,13 @@ const AddChapter = () => {
         </div>
         <div>
           <label className="block text-gray-700 text-sm font-semibold opacity-60 mb-2" htmlFor="moduleTitle">
-            Module Title
+            Chapter Title
           </label>
           <input
             type="text"
             id="moduleTitle"
+            value={moduleTitle}
+            onChange={(e) => setModuleTitle(e.target.value)}
             placeholder="Type here"
             className="w-full px-3 py-2 border rounded-lg text-gray-700 focus:outline-none focus:shadow-outline"
           />
@@ -119,14 +132,13 @@ const AddChapter = () => {
       </div>
       <div className="mt-auto mb-8">
         <button
-          onClick={() => toast.success("Will be adding it soon")}
           type="submit"
           className="w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600"
         >
           Add New Chapter
         </button>
       </div>
-    </div>
+    </form>
   );
 };
 

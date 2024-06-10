@@ -10,14 +10,18 @@ const DashLayout = ({ children }) => {
 
   return (
     <div className="flex w-full  h-full">
+     
+
+    
       <SideMenubar isOpen={isSidebarOpen} />
+  
       <div
         className={`transition-all duration-300 ${
           isSidebarOpen ? "w-4/5" : "w-[96%]"
         } flex-1`}
       >
         <Navbar toggleSidebar={() => dispatch(toggleSidebar())} />
-        <main className=" w-full ">{children}</main>
+        <main className=" w-full h-full ">{children}</main>
       </div>
     </div>
   );

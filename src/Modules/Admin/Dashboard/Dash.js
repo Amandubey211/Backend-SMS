@@ -7,7 +7,7 @@ import useNavHeading from "../../../Hooks/CommonHooks/useNavHeading .js";
 const Dash = () => {
   useNavHeading("Students");
   return (
-    <Layout title="DashBoard">
+    <Layout title="Admin Dash | Student diwan">
       <DashLayout children={<MainSection />} />
     </Layout>
   );
