@@ -47,7 +47,7 @@ const MainSection = () => {
 
   return (
     <>
-      <div className="flex justify-around p-2 py-4">
+      <div className="flex justify-center gap-3 w-full p-2 py-4">
         {iconData.map((item, index) => (
           <NavIconCard
             key={index}

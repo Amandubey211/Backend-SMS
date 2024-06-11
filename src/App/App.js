@@ -12,20 +12,22 @@ import ProtectRoute from "../Routes/ProtectedRoutes/ProtectedRoute";
 import StudentSignUp from "../Modules/LoginPages/Student/SignUp/StudentSignUp.js";
 import ResetPassword from "../Modules/LoginPages/Student/ResetPassword/ResetPassword.js";
 import Fallback from "../Components/Common/Fallback.js";
-import AccountingSection from "../Modules/Admin/Accounting/MainSection/AccountingSection.js";
+// import AccountingSection from "../Modules/Admin/Accounting/MainSection/AccountingSection.js";
 import Libary from "../Modules/Admin/Libary/MainSection/Libary.js";
 
-import Events from "../Modules/Admin/Dashboard/EventModule/Event.js";
-import EventSchool from "../Modules/Admin/NoticeBoard/Events/MainSection/EventSchool.js";
-import Announce from "../Modules/Admin/NoticeBoard/Announcements/Announce.js";
 
-
+// import Events from "../Modules/Admin/Dashboard/EventModule/Event.js";
+// import EventSchool from "../Modules/Admin/NoticeBoard/Events/MainSection/EventSchool.js";
+// import Announce from "../Modules/Admin/NoticeBoard/Announcements/Announce.js";
 
 
 
 
 function App() {
+  const AssignmentList  = lazy(() => import("../Modules/Admin/Subjects/Modules/Assignments/AllAssignments/AssignmentList.js"));
   const Dash = lazy(() => import("../Modules/Admin/Dashboard/Dash.js"));
+  const Discussion = lazy(() => import("../Modules/Admin/Subjects/Modules/Discussion/Discussion.js"));
+  const QuizzList = lazy(() => import("../Modules/Admin/Subjects/Modules/Quizzes/QuizzList/QuizzList.js"));
   const CreateQuizzes = lazy(() => import("../Modules/Admin/Subjects/Modules/Quizzes/CreateQuizzes/CreateQuizzes.js"));
   const Quizzes = lazy(() => import("../Modules/Admin/Subjects/Modules/Quizzes/Quizzes.js"));
   const CreateAssignment = lazy(() =>
@@ -40,9 +42,7 @@ function App() {
   const Assignment = lazy(() =>
     import("../Modules/Admin/Subjects/Modules/Assignments/Assignment.js")
   );
-  const Chapter = lazy(() =>
-    import("../Modules/Admin/Subjects/Modules/Chapter/Chapter.js")
-  );
+
 
   const Module = lazy(() =>
     import("../Modules/Admin/Subjects/Modules/Module/Module.js")
@@ -51,9 +51,6 @@ function App() {
   const Attendance = lazy(() =>
     import("../Modules/Admin/Attendance/Attendance.js")
   );
-
-  const Subject = lazy(() => import("../Modules/Admin/Subject/Subject.js"));
-
   const Students = lazy(() => import("../Modules/Admin/Students/Students.js"));
   const Addmission = lazy(() =>
     import("../Modules/Admin/Addmission/Addmission.js")
@@ -188,13 +185,14 @@ function App() {
       element: <ProtectRoute Component={Module} role="admin" />,
       errorElement: <Error />,
     },
+
     {
-      path: "/class/:cid/:sid/chapter",
-      element: <ProtectRoute Component={Chapter} role="admin" />,
+      path: "/class/:cid/:sid/assignments",
+      element: <ProtectRoute Component={AssignmentList} role="admin" />,
       errorElement: <Error />,
     },
     {
-      path: "/class/:cid/:sid/assignments",
+      path: "/class/:cid/:sid/assignments/:aid/view",
       element: <ProtectRoute Component={Assignment} role="admin" />,
       errorElement: <Error />,
     },
@@ -211,12 +209,22 @@ function App() {
     },
     {
       path: "/class/:cid/:sid/quizzes",
+      element: <ProtectRoute Component={QuizzList} role="admin" />,
+      errorElement: <Error />,
+    },
+    {
+      path: "/class/:cid/:sid/quizzes/:qid/view",
       element: <ProtectRoute Component={Quizzes} role="admin" />,
       errorElement: <Error />,
     },
     {
       path: "/class/:cid/:sid/create_quiz",
       element: <ProtectRoute Component={CreateQuizzes} role="admin" />,
+      errorElement: <Error />,
+    },
+    {
+      path: "/class/:cid/:sid/discussions",
+      element: <ProtectRoute Component={Discussion} role="admin" />,
       errorElement: <Error />,
     },
     
@@ -228,11 +236,11 @@ function App() {
       errorElement: <Error />,
     },
     
-    {
-      path: "accounting/studentfees",
-      element: <AccountingSection />,
-      errorElement: <Error />,
-    },
+    // {
+    //   path: "accounting/studentfees",
+    //   element: <AccountingSection />,
+    //   errorElement: <Error />,
+    // },
     
     {
       path: "library",
@@ -240,16 +248,16 @@ function App() {
       errorElement: <Error />,
     },
     ,
-    {
-      path: "noticeboard/events",
-      element:<EventSchool/>,
-      errorElement: <Error />,
-    },
-    {
-      path: "/noticeboard/announcements",
-      element:<Announce/>,
-      errorElement: <Error />,
-    },
+    // {
+    //   path: "noticeboard/events",
+    //   element:<EventSchool/>,
+    //   errorElement: <Error />,
+    // },
+    // {
+    //   path: "/noticeboard/announcements",
+    //   element:<Announce/>,
+    //   errorElement: <Error />,
+    // },
   ]);
   return (
     <>

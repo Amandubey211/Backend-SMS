@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { QuizzDetails } from "../../Assignments/AssignmentComponents/MockData";
+import { FaCalendarAlt } from "react-icons/fa";
 
 const Tabs = ({ children,activeTab,setActiveTab, onTabChange,createPage }) => {
   const handleTabClick = (tab) => {
@@ -7,7 +8,7 @@ const Tabs = ({ children,activeTab,setActiveTab, onTabChange,createPage }) => {
     onTabChange(tab);
   };
 
-  const { title, type } = QuizzDetails;
+  const { title, type,availableFrom } = QuizzDetails; // dependent
 
   return (
     <>
@@ -15,11 +16,14 @@ const Tabs = ({ children,activeTab,setActiveTab, onTabChange,createPage }) => {
         {
           !createPage && <div >
           <h2 className="text-xl font-semibold mb-1">
-            {activeTab === "instructions" ? title  : "Quiz Question "}
+           {title}
           </h2>
-          <p className="text-sm text-green-600 ">
-            {activeTab === "instructions" ? type : "Quizz"}
-          </p>
+          <div className="flex items-center text-gray-500">
+        <span className="text-green-600 font-medium mr-2">{type}</span>
+        <span className="mx-2">|</span>
+        <FaCalendarAlt className="w-4 h-4 mr-2" />
+        <span className="text-sm">Available From: {availableFrom}</span>
+      </div>
         </div>
         }
         
