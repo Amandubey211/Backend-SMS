@@ -15,7 +15,6 @@ import Fallback from "../Components/Common/Fallback.js";
 // import AccountingSection from "../Modules/Admin/Accounting/MainSection/AccountingSection.js";
 import Libary from "../Modules/Admin/Libary/MainSection/Libary.js";
 
-
 // import Events from "../Modules/Admin/Dashboard/EventModule/Event.js";
 // import EventSchool from "../Modules/Admin/NoticeBoard/Events/MainSection/EventSchool.js";
 // import Announce from "../Modules/Admin/NoticeBoard/Announcements/Announce.js";
@@ -26,6 +25,7 @@ import Libary from "../Modules/Admin/Libary/MainSection/Libary.js";
 function App() {
   const AssignmentList  = lazy(() => import("../Modules/Admin/Subjects/Modules/Assignments/AllAssignments/AssignmentList.js"));
   const Dash = lazy(() => import("../Modules/Admin/Dashboard/Dash.js"));
+  const TakeAttendance = lazy(() => import("../Modules/Admin/Attendance/TakeAttendance/TakeAttendance.js"));
   const Discussion = lazy(() => import("../Modules/Admin/Subjects/Modules/Discussion/Discussion.js"));
   const QuizzList = lazy(() => import("../Modules/Admin/Subjects/Modules/Quizzes/QuizzList/QuizzList.js"));
   const CreateQuizzes = lazy(() => import("../Modules/Admin/Subjects/Modules/Quizzes/CreateQuizzes/CreateQuizzes.js"));
@@ -174,8 +174,8 @@ function App() {
       errorElement: <Error />,
     },
     {
-      path: "/class/:cid/attendance",
-      element: <ProtectRoute Component={Attendance} role="admin" />,
+      path: "/class/:cid/take_attendance",
+      element: <ProtectRoute Component={TakeAttendance} role="admin" />,
       errorElement: <Error />,
     },
     //Admin Subject Module Route -------------------

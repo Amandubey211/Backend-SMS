@@ -8,7 +8,12 @@ import { useSelector } from "react-redux";
 import { MdOutlineKeyboardDoubleArrowRight } from "react-icons/md";
 import AvatarsList from "./AvataList";
 import { FaArrowRightArrowLeft } from "react-icons/fa6";
-const Navbar = ({ toggleSidebar, hideSearchbar, hideAvatarList }) => {
+const Navbar = ({
+  toggleSidebar,
+  hideSearchbar,
+  hideAvatarList,
+  hideStudentView,
+}) => {
   const isSidebarOpen = useSelector((state) => state.sidebar.isOpen);
   const LeftNavHeading = useSelector(
     (store) => store.Common.NavbarData.leftHeading
@@ -46,14 +51,18 @@ const Navbar = ({ toggleSidebar, hideSearchbar, hideAvatarList }) => {
             <div className="flex-1 ">
               <AvatarsList />
             </div>
-            <button className="flex items-center space-x-2 bg-gradient-to-r from-purple-100 to-pink-100 text-white py-1 px-3  rounded-full ">
-              <div className="w-7 h-7 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
-                <FaArrowRightArrowLeft />
-              </div>
-              <span className="text-sm text-gradient font-medium">
-                Student View
-              </span>
-            </button>
+            {hideStudentView ? (
+              ""
+            ) : (
+              <button className="flex items-center space-x-2 bg-gradient-to-r from-purple-100 to-pink-100 text-white py-1 px-3  rounded-full ">
+                <div className="w-7 h-7 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
+                  <FaArrowRightArrowLeft />
+                </div>
+                <span className="text-sm text-gradient font-medium">
+                  Student View
+                </span>
+              </button>
+            )}
           </>
         )}
 
