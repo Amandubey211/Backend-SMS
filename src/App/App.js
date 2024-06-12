@@ -20,6 +20,8 @@ import EventSchool from "../Modules/Admin/NoticeBoard/Events/MainSection/EventSc
 import Announce from "../Modules/Admin/NoticeBoard/Announcements/Announce.js";
 import Earning from "../Modules/Admin/Accounting/Earnings/Earning.js";
 import Expenses from "../Modules/Admin/Accounting/Expenses/Expenses.js";
+import AllStudents from "../Modules/Admin/StudentProfile/MainSection.js/AllStudents.js";
+import SingleStudent from "../Modules/Admin/StudentProfile/MainSection.js/SingleStudent.js";
 
 
 
@@ -64,6 +66,7 @@ function App() {
     import("../Modules/Admin/Addmission/Addmission.js")
   );
   const Classes = lazy(() => import("../Modules/Admin/Classes/Classes.js"));
+  
   const Class = lazy(() =>
     import("../Modules/Admin/Classes/SubClass/Class.js")
   );
@@ -263,6 +266,18 @@ function App() {
     {
       path: "/accounting/expenses",
       element:<Expenses/>,
+      errorElement: <Error />,
+    },
+    {
+      path: "/users/students",
+      element:<AllStudents/>,
+      errorElement: <Error />,
+    },
+
+    {
+      path: "/user/:cid",
+      element: < SingleStudent/>,
+      // element: <ProtectRoute Component={Class} role="admin" />,
       errorElement: <Error />,
     },
   ]);
