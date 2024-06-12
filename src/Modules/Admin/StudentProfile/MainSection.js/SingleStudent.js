@@ -1,5 +1,3 @@
-
-
 // import React, { useState } from "react";
 // import { useParams } from "react-router-dom";
 // import { dummyStudentsList } from "../dummyData/dummyData";
@@ -63,7 +61,7 @@
 //         <div className="flex gap-2">
 //           {/* /left side */}
 //           <div className="flex flex-col   min-h-screen h-full w-[25%] ">
-           
+
 //     <div className="flex  flex-col items-center p-3 py-5  gap-2 justify-center  ">
 //       <img src={student.imageUrl} alt="studnet_image" className="rounded-full w-[100px] h-[100px] " />
 //       <span className="font-bold ">{student.name}</span>
@@ -75,7 +73,7 @@
 //       <div className="border rounded-md px-9 py-1 border-red-500  border-r-[50%] border-l-[50$%] ">
 //       <span> Class 8</span>
 //       </div>
-     
+
 //     </div>
 //             {/* menu */}
 //             <div className=  " flex flex-col min-h-screen h-full space-y-4  bg-gray-100 text-start items-center ">
@@ -122,19 +120,7 @@
 
 // export default SingleStudent;
 
-
-
-
-
-
-
-
-
-
-
 //-----------------------------
-
-
 
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
@@ -169,16 +155,16 @@ const SingleStudent = () => {
 
   const renderContent = () => {
     const menuComponents = {
-      "OverView": <OverView />,
+      OverView: <OverView />,
       "Course Progress": <CourseProgress />,
-      "Finance": <StudentFinance student={student} />,
-      "Quizzes": <Quizzes />,
-      "Information": <Information />,
-      "Parents": <ParentsProfile student={student} />,
-      "Grades": <Grades />,
-      "Attendance": <Attendance />,
-      "Syllabus": <Syllabus />,
-      "Book Issue": <BookIssue student={student} />
+      Finance: <StudentFinance student={student} />,
+      Quizzes: <Quizzes />,
+      Information: <Information />,
+      Parents: <ParentsProfile student={student} />,
+      Grades: <Grades />,
+      Attendance: <Attendance />,
+      Syllabus: <Syllabus />,
+      "Book Issue": <BookIssue student={student} />,
     };
     return menuComponents[activeItem] || <div>Select a menu item</div>;
   };
@@ -189,10 +175,22 @@ const SingleStudent = () => {
         <div className="flex gap-2">
           <div className="flex flex-col min-h-screen h-full w-[25%]">
             <StudentProfile student={student} />
-            <NavigationMenu activeItem={activeItem} setActiveItem={setActiveItem} items={[
-              "OverView", "Course Progress", "Finance", "Quizzes", "Information", 
-              "Parents", "Grades", "Attendance", "Syllabus", "Book Issue"
-            ]} />
+            <NavigationMenu
+              activeItem={activeItem}
+              setActiveItem={setActiveItem}
+              items={[
+                "OverView",
+                "Course Progress",
+                "Finance",
+                "Quizzes",
+                "Information",
+                "Parents",
+                "Grades",
+                "Attendance",
+                "Syllabus",
+                "Book Issue",
+              ]}
+            />
           </div>
           <div className="flex w-[75%]">
             <div className="w-full">{renderContent()}</div>
