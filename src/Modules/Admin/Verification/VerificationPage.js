@@ -6,7 +6,7 @@ import MainSection from "../Verification/MainSection";
 const VerificationPage = () => {
   return (
     <Layout title="Student Verification List">
-      <DashLayout children={<MainSection />} />;
+      <DashLayout children={<MainSection /> } hideAvatarList={true} hideStudentView={true} hideSearchbar={true} />;
     </Layout>
   );
 };

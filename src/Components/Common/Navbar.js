@@ -8,6 +8,7 @@ import { useSelector } from "react-redux";
 import { MdOutlineKeyboardDoubleArrowRight } from "react-icons/md";
 import AvatarsList from "./AvataList";
 import { FaArrowRightArrowLeft } from "react-icons/fa6";
+import { useNavigate } from "react-router-dom";
 const Navbar = ({
   toggleSidebar,
   hideSearchbar,
@@ -19,11 +20,12 @@ const Navbar = ({
     (store) => store.Common.NavbarData.leftHeading
   );
   console.log(hideSearchbar);
+  const navigate = useNavigate();
   return (
     <div className="relative">
       <div className="flex items-center p-2  bg-white border-b ">
         <button onClick={toggleSidebar} className="focus:outline-none mr-4">
-          <div className="p-1 rounded-full  text-purple-500  bg-white -m-4 absolute left-1  bottom-1 z-10 border">
+          <div className="p-1 rounded-full  text-purple-500  bg-white -m-4 absolute left-1  bottom-1 z-0 border">
             {isSidebarOpen ? <IoIosArrowBack /> : <IoIosArrowForward />}
           </div>
         </button>
@@ -32,10 +34,16 @@ const Navbar = ({
           {LeftNavHeading[1] === undefined ? (
             <span className=" text-gradient"> {LeftNavHeading[0]}</span>
           ) : (
-            <div className="flex items-center ">
+            <div className="flex items-center gap-1 ">
               <span className="opacity-55 font-bold flex   items-center text-gray-500">
-                <h2>{LeftNavHeading[0]}</h2>
-                <MdOutlineKeyboardDoubleArrowRight className="text-md" />
+                <button
+                  onClick={() => navigate(-1)}
+                  className="mr-1"
+                  title="back"
+                >
+                  {LeftNavHeading[0]}
+                </button>
+                <MdOutlineKeyboardDoubleArrowRight className="text-2xl" />
               </span>
 
               <h1 className="text-gradient text-md font-bold">

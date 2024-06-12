@@ -9,14 +9,12 @@ import Library from "./LibraryModule/Library.js";
 import Events from "./EventModule/Event.js";
 import BestPerformersChart from "./Graphs/BestPerformancGraph.js";
 import performanceData from "./DashboardData/PerformanceData.js";
-import noticeData from "./DashboardData/NoticeData.js";
-import Notice from "./NoticeModule/Notice.js";
 import NoticeBoard from "./NoticeModule/NoticeBoard.js";
 
 const MainSection = () => {
   return (
-    <div className="h-full">
-      <div className="max-w-6xl w-full p-2">
+    <div className="h-full  w-full">
+      <div className=" w-full p-2">
         <div className="flex flex-wrap justify-center gap-3 py-4 ">
           {cardData?.map((item, index) => (
             <DashCard key={index} {...item} />
