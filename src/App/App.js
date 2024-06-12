@@ -18,6 +18,10 @@ import Libary from "../Modules/Admin/Libary/MainSection/Libary.js";
 import Events from "../Modules/Admin/Dashboard/EventModule/Event.js";
 import EventSchool from "../Modules/Admin/NoticeBoard/Events/MainSection/EventSchool.js";
 import Announce from "../Modules/Admin/NoticeBoard/Announcements/Announce.js";
+import Earning from "../Modules/Admin/Accounting/Earnings/Earning.js";
+import Expenses from "../Modules/Admin/Accounting/Expenses/Expenses.js";
+import AllStudents from "../Modules/Admin/StudentProfile/MainSection.js/AllStudents.js";
+import SingleStudent from "../Modules/Admin/StudentProfile/MainSection.js/SingleStudent.js";
 
 
 
@@ -36,6 +40,8 @@ function App() {
   const Group_Section = lazy(() =>
     import("../Modules/Admin/Groups&Sections/Group_Section.js")
   );
+
+
   const Rubric = lazy(() =>
     import("../Modules/Admin/Subjects/Modules/Rubric/Rubric.js")
   );
@@ -51,11 +57,13 @@ function App() {
   const Attendance = lazy(() =>
     import("../Modules/Admin/Attendance/Attendance.js")
   );
+
   const Students = lazy(() => import("../Modules/Admin/Students/Students.js"));
   const Addmission = lazy(() =>
     import("../Modules/Admin/Addmission/Addmission.js")
   );
   const Classes = lazy(() => import("../Modules/Admin/Classes/Classes.js"));
+  
   const Class = lazy(() =>
     import("../Modules/Admin/Classes/SubClass/Class.js")
   );
@@ -256,6 +264,28 @@ function App() {
     {
       path: "/noticeboard/announcements",
       element:<Announce/>,
+      errorElement: <Error />,
+    },
+    {
+      path: "/accounting/reports",
+      element:<Earning/>,
+      errorElement: <Error />,
+    },
+    {
+      path: "/accounting/expenses",
+      element:<Expenses/>,
+      errorElement: <Error />,
+    },
+    {
+      path: "/users/students",
+      element:<AllStudents/>,
+      errorElement: <Error />,
+    },
+
+    {
+      path: "/user/:cid",
+      element: < SingleStudent/>,
+      // element: <ProtectRoute Component={Class} role="admin" />,
       errorElement: <Error />,
     },
   ]);
