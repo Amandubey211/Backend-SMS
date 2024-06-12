@@ -2,8 +2,17 @@ import React, { useState } from "react";
 import DiscussionCard from "./DiscussionCard";
 import { MdKeyboardArrowDown, MdKeyboardArrowUp } from "react-icons/md"; // Import the arrow icons
 import { TbPin } from "react-icons/tb";
+
+
+const PinnedDiscussions = () => {
+  const [isVisible, setIsVisible] = useState(true);
+
+  const toggleVisibility = () => {
+    setIsVisible(!isVisible);
+  };
 const dummyPinnedData = [
   {
+    id: 431,
     title: "Discussion Next Exam",
     lastPostDate: "10/02/2024",
     lastPostTime: "12:30 PM",
@@ -11,6 +20,7 @@ const dummyPinnedData = [
     replies: 2,
   },
   {
+    id: 452,
     title: "Project Ideas for Next Semester",
     lastPostDate: "11/03/2024",
     lastPostTime: "01:00 PM",
@@ -18,6 +28,7 @@ const dummyPinnedData = [
     replies: 5,
   },
   {
+    id: 333,
     title: "Sustainable Development Goals",
     lastPostDate: "12/04/2024",
     lastPostTime: "02:15 PM",
@@ -26,12 +37,7 @@ const dummyPinnedData = [
   },
 ];
 
-const PinnedDiscussions = () => {
-  const [isVisible, setIsVisible] = useState(true);
 
-  const toggleVisibility = () => {
-    setIsVisible(!isVisible);
-  };
 
   return (
     <div className="w-full p-3 ">

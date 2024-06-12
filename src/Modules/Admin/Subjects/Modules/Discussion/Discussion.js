@@ -6,9 +6,9 @@ import { useParams } from "react-router-dom";
 import useNavHeading from "../../../../../Hooks/CommonHooks/useNavHeading ";
 
 const Discussion = () => {
-    const { cid, sid } = useParams();
-    useNavHeading(cid, sid);
-    
+  const { cid, sid } = useParams();
+  useNavHeading(cid, sid);
+
   return (
     <Layout title={`Discussion | Student Diwan`}>
       <DashLayout children={<MainSection />} hideSearchbar={true} />

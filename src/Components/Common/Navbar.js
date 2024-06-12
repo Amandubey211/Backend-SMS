@@ -3,33 +3,20 @@ import { CiMail } from "react-icons/ci";
 import { TbBell } from "react-icons/tb";
 import { IoSettingsOutline } from "react-icons/io5";
 import { CiSearch } from "react-icons/ci";
-import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { useSelector } from "react-redux";
 import { MdOutlineKeyboardDoubleArrowRight } from "react-icons/md";
 import AvatarsList from "./AvataList";
 import { FaArrowRightArrowLeft } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
-const Navbar = ({
-  toggleSidebar,
-  hideSearchbar,
-  hideAvatarList,
-  hideStudentView,
-}) => {
-  const isSidebarOpen = useSelector((state) => state.sidebar.isOpen);
+const Navbar = ({ hideSearchbar, hideAvatarList, hideStudentView }) => {
   const LeftNavHeading = useSelector(
     (store) => store.Common.NavbarData.leftHeading
   );
   console.log(hideSearchbar);
   const navigate = useNavigate();
   return (
-    <div className="relative">
+    <div className="relative z-0">
       <div className="flex items-center p-2  bg-white border-b ">
-        <button onClick={toggleSidebar} className="focus:outline-none mr-4">
-          <div className="p-1 rounded-full  text-purple-500  bg-white -m-4 absolute left-1  bottom-1 z-0 border">
-            {isSidebarOpen ? <IoIosArrowBack /> : <IoIosArrowForward />}
-          </div>
-        </button>
-
         <div className="flex-1 text-md font-semibold">
           {LeftNavHeading[1] === undefined ? (
             <span className=" text-gradient"> {LeftNavHeading[0]}</span>
@@ -62,7 +49,7 @@ const Navbar = ({
             {hideStudentView ? (
               ""
             ) : (
-              <button className="flex items-center space-x-2 bg-gradient-to-r from-purple-100 to-pink-100 text-white py-1 px-3  rounded-full ">
+              <button className="flex  mr-3 items-center space-x-2 bg-gradient-to-r from-purple-100 to-pink-100 text-white py-1 px-3  rounded-full ">
                 <div className="w-7 h-7 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
                   <FaArrowRightArrowLeft />
                 </div>
@@ -77,7 +64,7 @@ const Navbar = ({
         {hideSearchbar ? (
           ""
         ) : (
-          <div className="relative flex items-center max-w-xs w-full mr-4">
+          <div className="relative flex items-center max-w-xs w-full mr-2">
             <input
               type="text"
               placeholder="Search here"
