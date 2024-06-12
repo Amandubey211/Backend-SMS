@@ -11,7 +11,7 @@ const Class = () => {
 
   return (
     <Layout title={`${cid} | Student diwan`}>
-      <DashLayout children={<MainSection />} />;
+      <DashLayout children={<MainSection />} hideAvatarList={true} />;
     </Layout>
   );
 };

@@ -36,7 +36,7 @@
   transform: translateY(-50%);
 }
 
-/* index.css */
+
 @layer components {
   .border-gradient {
     position: relative;
@@ -47,12 +47,100 @@
   .border-gradient::before {
     content: '';
     position: absolute;
-    top: -2px; /* Adjust based on your border width */
+    top: -2px;
     right: -2px;
     bottom: -2px;
     left: -2px;
     z-index: -1;
-    border-radius: 1rem; /* Match with the main element’s border radius */
-    background: linear-gradient(to right, #f43f5e, #8b5cf6); /* Adjust gradient colors and direction */
+    border-radius: 1rem;
+    background: linear-gradient(to right, #ec4899, #8b5cf6); /* Pink and purple gradient */
   }
+}
+
+.custom-radio {
+  appearance: none;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: inline-block;
+  position: relative;
+}
+
+.custom-radio:checked::before {
+  content: '';
+  display: block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: green;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.react-calendar {
+  width: 100%;
+  border: none;
+  font-family: 'Inter', sans-serif;
+}
+
+.react-calendar__navigation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+
+.react-calendar__navigation button {
+  min-width: 44px;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.react-calendar__month-view__weekdays {
+  display: flex;
+  justify-content: space-around;
+  font-weight: bold;
+  color: #6B7280; /* Tailwind gray-500 */
+  padding: 0.5rem 0;
+}
+
+.react-calendar__month-view__days__day {
+  padding: 0.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.react-calendar__tile--now {
+  background: none;
+}
+
+.react-calendar__tile--active {
+  background: linear-gradient(to bottom right, #9333ea, #f472b6); /* Tailwind purple-600 to pink-400 */
+  color: white;
+  border-radius: 50%;
+}
+
+.react-calendar__tile--active:hover {
+  background: linear-gradient(to bottom right, #9333ea, #f472b6); /* Tailwind purple-600 to pink-400 */
+}
+
+.highlight {
+  background: linear-gradient(to bottom right, #9333ea, #f472b6); /* Tailwind purple-600 to pink-400 */
+  color: white;
+  border-radius: 50%;
+}
+
+.react-calendar__month-view__days__day--neighboringMonth {
+  color: #d1d5db; /* Tailwind gray-300 */
 }
