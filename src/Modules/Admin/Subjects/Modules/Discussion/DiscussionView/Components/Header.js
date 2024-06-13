@@ -1,9 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 import { AiOutlineEdit } from "react-icons/ai";
 import { FaBan } from "react-icons/fa6";
 import { HiOutlineDotsVertical } from "react-icons/hi";
 import { BsChat } from "react-icons/bs";
+import Sidebar from "../../../../../../../Components/Common/Sidebar";
+import DiscussionMessage from "../../DiscussionMessage/DiscussionMessage";
 const Header = () => {
+  const [isSidebarOpen, setSidebarOpen] = useState(false);
+
+  const handleSidebarOpen = () => setSidebarOpen(true);
+  const handleSidebarClose = () => setSidebarOpen(false);
   return (
     <div className="flex items-end justify-between p-2 px-4 border-b">
       <div className="flex items-center">
@@ -43,9 +49,20 @@ const Header = () => {
             </button>
           </div>
 
-          <button className="px-4 py-1 bg-gradient-to-r from-pink-500 to-purple-500 text-white items-center  rounded-md flex gap-2 ">
+          <button   onClick={handleSidebarOpen} className="px-4 py-1 bg-gradient-to-r from-pink-500 to-purple-500 text-white items-center  rounded-md flex gap-2 ">
             <BsChat /> <span>Discussion</span>
           </button>
+
+          {/* // fix this  */}
+          <Sidebar
+          width="70%"
+            title="Discussion"
+            isOpen={isSidebarOpen}
+            onClose={handleSidebarClose}
+          >
+
+<DiscussionMessage/>
+          </Sidebar>
         </div>
       </div>
     </div>
