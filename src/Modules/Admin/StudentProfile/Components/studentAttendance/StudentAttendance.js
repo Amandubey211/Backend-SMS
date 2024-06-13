@@ -35,7 +35,7 @@ const StudentAttendance = ({ student }) => {
         bgColor = "green";
         break;
       case "Absent":
-        bgColor = "yellow";
+        bgColor = "gray";
         break;
       case "Leave":
         bgColor = "red";

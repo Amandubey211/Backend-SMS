@@ -13,6 +13,8 @@ export const dummyStudentsList = [
           { startDate: '2024-03-09T00:00', endDate: '2024-03-09T23:59', type: "Absent"},
           { startDate: '2024-03-12T00:00', endDate: '2024-03-12T23:59', type: "Attend"},
           { startDate: '2024-06-09T00:00', endDate: '2024-06-09T23:59', type: "Attend"},
+          { startDate: '2024-06-18T00:00', endDate: '2024-06-18T23:59', type: "Leave"},
+          { startDate: '2024-06-12T00:00', endDate: '2024-06-12T23:59', type: "Absent"},
 
           
           // { date: "2024-03-01", type: "Attend" },
@@ -167,7 +169,9 @@ export const dummyStudentsList = [
           { startDate: '2024-03-09T00:00', endDate: '2024-03-09T23:59', type: "Absent"},
           { startDate: '2024-03-12T00:00', endDate: '2024-03-12T23:59', type: "Attend"},
           { startDate: '2024-06-09T00:00', endDate: '2024-06-09T23:59', type: "Attend"},
- 
+          { startDate: '2024-06-18T00:00', endDate: '2024-06-18T23:59', type: "Leave"},
+          { startDate: '2024-06-12T00:00', endDate: '2024-06-12T23:59', type: "Absent"},
+
           // { date: "2024-03-01", type: "Attend" },
           // { date: "2024-03-02", type: "Attend" },
           // { date: "2024-03-03", type: "Absent" },
@@ -278,12 +282,14 @@ export const dummyStudentsList = [
       imageUrl: "https://plus.unsplash.com/premium_photo-1666900440561-94dcb6865554?q=80&w=1854&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       attendance: {
         details: [
-         { startDate: '2024-03-01T00:00', endDate: '2024-03-01T23:59', type: "Leave"},
-         { startDate: '2024-03-05T00:00', endDate: '2024-03-05T23:59', type: "Attend"},
-         { startDate: '2024-03-08T00:00', endDate: '2024-03-08T23:59', type: "Leave"},
-         { startDate: '2024-03-09T00:00', endDate: '2024-03-09T23:59', type: "Absent"},
-         { startDate: '2024-03-12T00:00', endDate: '2024-03-12T23:59', type: "Attend"},
-         { startDate: '2024-06-09T00:00', endDate: '2024-06-09T23:59', type: "Attend"},
+          { startDate: '2024-03-01T00:00', endDate: '2024-03-01T23:59', type: "Leave"},
+          { startDate: '2024-03-05T00:00', endDate: '2024-03-05T23:59', type: "Attend"},
+          { startDate: '2024-03-08T00:00', endDate: '2024-03-08T23:59', type: "Leave"},
+          { startDate: '2024-03-09T00:00', endDate: '2024-03-09T23:59', type: "Absent"},
+          { startDate: '2024-03-12T00:00', endDate: '2024-03-12T23:59', type: "Attend"},
+          { startDate: '2024-06-09T00:00', endDate: '2024-06-09T23:59', type: "Attend"},
+          { startDate: '2024-06-18T00:00', endDate: '2024-06-18T23:59', type: "Leave"},
+          { startDate: '2024-06-12T00:00', endDate: '2024-06-12T23:59', type: "Absent"},
 
           // { date: "2024-03-01", type: "Attend" },
           // { date: "2024-03-02", type: "Leave" },
@@ -387,12 +393,14 @@ export const dummyStudentsList = [
       imageUrl: "https://plus.unsplash.com/premium_photo-1666900440561-94dcb6865554?q=80&w=1854&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       attendance: {
         details: [
-         { startDate: '2024-03-01T00:00', endDate: '2024-03-01T23:59', type: "Leave"},
-         { startDate: '2024-03-05T00:00', endDate: '2024-03-05T23:59', type: "Attend"},
-         { startDate: '2024-03-08T00:00', endDate: '2024-03-08T23:59', type: "Leave"},
-         { startDate: '2024-03-09T00:00', endDate: '2024-03-09T23:59', type: "Absent"},
-         { startDate: '2024-03-12T00:00', endDate: '2024-03-12T23:59', type: "Attend"},
-         { startDate: '2024-06-09T00:00', endDate: '2024-06-09T23:59', type: "Attend"},
+          { startDate: '2024-03-01T00:00', endDate: '2024-03-01T23:59', type: "Leave"},
+          { startDate: '2024-03-05T00:00', endDate: '2024-03-05T23:59', type: "Attend"},
+          { startDate: '2024-03-08T00:00', endDate: '2024-03-08T23:59', type: "Leave"},
+          { startDate: '2024-03-09T00:00', endDate: '2024-03-09T23:59', type: "Absent"},
+          { startDate: '2024-03-12T00:00', endDate: '2024-03-12T23:59', type: "Attend"},
+          { startDate: '2024-06-09T00:00', endDate: '2024-06-09T23:59', type: "Attend"},
+          { startDate: '2024-06-18T00:00', endDate: '2024-06-18T23:59', type: "Leave"},
+          { startDate: '2024-06-12T00:00', endDate: '2024-06-12T23:59', type: "Absent"},
 
           // { date: "2024-03-01", type: "Attend" },
           // { date: "2024-03-02", type: "Absent" },
