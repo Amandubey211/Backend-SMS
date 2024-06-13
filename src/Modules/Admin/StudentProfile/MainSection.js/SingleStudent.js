@@ -154,9 +154,13 @@ import {
   Attendance,
   Syllabus,
 } from "../MenuComponents"; // Assuming these are properly exported
-import BookIssue from "../Components/BookIssue";
+import BookIssue from "../Components/BookIssueMenu/BookIssue";
 import ParentsProfile from "../Components/ParentMenu/ParentsProfile";
 import StudentFinance from "../Components/FinanceMenu/StudentFinance";
+import StudentAttendance from "../Components/studentAttendance/StudentAttendance";
+import StudentInformationMenu from "../Components/StudentInformationMenu/StudentInformationMenu";
+import StudentCourseProgress from "../Components/StudentCourseProgress/StudentCourseProgress";
+import StudentGradesAccordion from "../Components/studentGradeMenu/StudentGradesAccordion";
 
 const SingleStudent = () => {
   const { cid } = useParams();
@@ -167,17 +171,20 @@ const SingleStudent = () => {
     return <div className="text-center text-red-500">Student not found</div>;
   }
 
+  
   const renderContent = () => {
     const menuComponents = {
       "OverView": <OverView />,
-      "Course Progress": <CourseProgress />,
+      "Course Progress": <StudentCourseProgress student={student} />,
       "Finance": <StudentFinance student={student} />,
-      "Quizzes": <Quizzes />,
-      "Information": <Information />,
+      // "Quizzes": <Quizzes />,
+      "Information": <StudentInformationMenu student={student} />,
       "Parents": <ParentsProfile student={student} />,
-      "Grades": <Grades />,
-      "Attendance": <Attendance />,
-      "Syllabus": <Syllabus />,
+      "Grades": <StudentGradesAccordion student={student} />,
+      "Attendance": <StudentAttendance student={student} />,
+      // "Attendance": <AttendanceScheduler student={student} />,
+      // "Attendance": <AttendanceCalendar  student={student} />,
+      // "Syllabus": <Syllabus />,
       "Book Issue": <BookIssue student={student} />
     };
     return menuComponents[activeItem] || <div>Select a menu item</div>;
@@ -190,8 +197,8 @@ const SingleStudent = () => {
           <div className="flex flex-col min-h-screen h-full w-[25%]">
             <StudentProfile student={student} />
             <NavigationMenu activeItem={activeItem} setActiveItem={setActiveItem} items={[
-              "OverView", "Course Progress", "Finance", "Quizzes", "Information", 
-              "Parents", "Grades", "Attendance", "Syllabus", "Book Issue"
+              "OverView", "Course Progress", "Finance", "Information", 
+              "Parents", "Grades", "Attendance", "Book Issue"
             ]} />
           </div>
           <div className="flex w-[75%]">
