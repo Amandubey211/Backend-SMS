@@ -1,10 +1,10 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { FaRegSmile, FaPaperclip, FaPaperPlane } from 'react-icons/fa';
+import React, { useState, useRef, useEffect } from "react";
+import { FaRegSmile, FaPaperclip, FaPaperPlane } from "react-icons/fa";
 
 const emojis = ["😀", "😂", "😍", "😢", "😡"];
 
-const InputComment = ({ addComment, placeholder = 'Write Something...' }) => {
-  const [text, setText] = useState('');
+const InputComment = ({ addComment, placeholder = "Write Something..." }) => {
+  const [text, setText] = useState("");
   const [showEmojis, setShowEmojis] = useState(false);
   const timeoutRef = useRef(null);
   const emojiListRef = useRef(null);
@@ -13,7 +13,7 @@ const InputComment = ({ addComment, placeholder = 'Write Something...' }) => {
     e.preventDefault();
     if (text.trim()) {
       addComment(text);
-      setText('');
+      setText("");
     }
   };
 
@@ -81,7 +81,7 @@ const InputComment = ({ addComment, placeholder = 'Write Something...' }) => {
               <span
                 key={index}
                 onClick={() => handleEmojiClick(emoji)}
-                className="cursor-pointer transform transition-transform duration-300 ease-in-out hover:scale-125"
+                className="cursor-pointer hover:animate-bounce  transform transition-transform duration-300 ease-in-out hover:scale-125"
               >
                 {emoji}
               </span>
@@ -90,6 +90,7 @@ const InputComment = ({ addComment, placeholder = 'Write Something...' }) => {
         )}
       </form>
       <button
+        onClick={handleAddComment}
         type="submit"
         className="flex items-center justify-center w-10 h-10 ml-2 text-white bg-gradient-to-r from-purple-500 to-pink-500 rounded-full focus:outline-none"
       >
