@@ -22,8 +22,9 @@ const QuestionDetailCard = () => {
 
   return (
     <div className="flex flex-col h-full  bg-white" aria-label="Question Detail Card">
-      <div className="mb-auto p-4">
+      <div className="mb-auto p-3">
         <ButtonsGroup />
+        <p className='text-center text-green-500 italic font-semibold pb-3 border-b' >Submitted Students : 50/100 </p>
         <SpeedGradeButton />
         <AssignmentDetail label="Question Point" value="100 Point" />
         <AssignmentDetail label="Question Type" value="Multiple Choice" />

@@ -1,6 +1,4 @@
 
-
-
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import { dummyStudentsList } from "../dummyData/dummyData";
@@ -38,6 +36,7 @@ const SingleStudent = () => {
       "Grades": <StudentGradesAccordion student={student} />,
       "Attendance": <StudentAttendance student={student} />,
       "Book Issue": <BookIssue student={student} />
+      
     };
     return menuComponents[activeItem] || <div>Select a menu item</div>;
   };
@@ -52,6 +51,23 @@ const SingleStudent = () => {
               "OverView", "Course Progress", "Finance", "Information", 
               "Parents", "Grades", "Attendance", "Book Issue"
             ]} />
+
+            <NavigationMenu
+              activeItem={activeItem}
+              setActiveItem={setActiveItem}
+              items={[
+                "OverView",
+                "Course Progress",
+                "Finance",
+                "Quizzes",
+                "Information",
+                "Parents",
+                "Grades",
+                "Attendance",
+                "Syllabus",
+                "Book Issue",
+              ]}
+            />
           </div>
           <div className="flex w-[75%]">
             <div className="w-full">{renderContent()}</div>
