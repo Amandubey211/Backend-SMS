@@ -13,6 +13,14 @@ import ProtectRoute from "../Routes/ProtectedRoutes/ProtectedRoute";
 
 import "./App.css";
 
+const AnnouncementView = lazy(() =>
+  import(
+    "../Modules/Admin/Subjects/Modules/Announcement/AnnouncementView/AnnouncementView.js"
+  )
+);
+const Announcement = lazy(() =>
+  import("../Modules/Admin/Subjects/Modules/Announcement/Announcement.js")
+);
 const CreateSyllabus = lazy(() =>
   import(
     "../Modules/Admin/Subjects/Modules/Syllabus/CreateSyllabus/CreateSyllabus.js"
@@ -278,7 +286,18 @@ function App() {
       element: <ProtectRoute Component={CreateSyllabus} role="admin" />,
       errorElement: <Error />,
     },
-    // Student Routes
+    {
+      path: "/class/:cid/:sid/announcements",
+      element: <ProtectRoute Component={Announcement} role="admin" />,
+      errorElement: <Error />,
+    },
+    {
+      path: "/class/:cid/:sid/announcements/view",
+      element: <ProtectRoute Component={AnnouncementView} role="admin" />,
+      errorElement: <Error />,
+    },
+
+    // Student Routes-----------------------------
     {
       path: "/student_dash",
       element: <ProtectRoute Component={StudentDash} role="student" />,
