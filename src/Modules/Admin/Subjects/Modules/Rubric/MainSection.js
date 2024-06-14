@@ -15,9 +15,9 @@ const MainSection = () => {
   return (
     <div className="w-full flex ">
       <SubjectSideBar />
-      <div className="w-full p-3">
+      <div className="w-full p-3 border-l">
         <RubricHeader onAddRubric={() => setModalOpen(true)} />
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
           {cardsData.map((card, index) => (
             <RubricCard
               key={index}
