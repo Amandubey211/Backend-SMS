@@ -21,14 +21,14 @@ const getRandomColor = () => {
 };
 
 
-const AnnouncementCard = ({ title, date, section }) => {
+const AnnouncementCard = ({ title, date, section,id }) => {
     const {sid,cid} = useParams()
   const bgColor = getRandomColor();
 
   return (
-    <div style={{ backgroundColor: bgColor }} className="ps-1 rounded-md">
-      <div className="border rounded-md shadow-sm relative flex bg-white justify-between p-4">
-        <NavLink to={`/class/${cid}/${sid}/announcements/view`} className="flex flex-col items-start justify-start">
+    <div style={{ backgroundColor: bgColor }} className="ps-1 rounded-md h-36">
+      <div className="border rounded-md shadow-sm relative flex bg-white justify-between p-4 h-36">
+        <NavLink to={`/class/${cid}/${sid}/announcements/${id}/view`} className="flex flex-col items-start justify-start">
           <h2 className="text-base font-semibold">{title}</h2>
 
           <p className="text-base text-green-600">{section}</p>
@@ -36,7 +36,7 @@ const AnnouncementCard = ({ title, date, section }) => {
             <div className="flex gap-1 items-center">
               <IoCalendarOutline /> <p className="text-md ">Post On :</p>
             </div>
-            <p className="text-base ">{date}</p>
+            <p className="text-xs ">{date}</p>
           </div>
         </NavLink>
         <div className="flex flex-col gap-2 text-xl">
