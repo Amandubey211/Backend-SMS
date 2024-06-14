@@ -13,6 +13,13 @@ import ProtectRoute from "../Routes/ProtectedRoutes/ProtectedRoute";
 
 import "./App.css";
 
+const Page = lazy(() =>
+  import("../Modules/Admin/Subjects/Modules/Pages/Page.js")
+);
+
+const Grade = lazy(() =>
+  import("../Modules/Admin/Subjects/Modules/Grades/Grade.js")
+);
 const CreateAnnouncement = lazy(() =>
   import(
     "../Modules/Admin/Subjects/Modules/Announcement/CreateAnnouncement/CreateAnnouncement.js"
@@ -304,6 +311,17 @@ function App() {
     {
       path: "/class/:cid/:sid/announcements/create_announcement",
       element: <ProtectRoute Component={CreateAnnouncement} role="admin" />,
+      errorElement: <Error />,
+    },
+    {
+      path: "/class/:cid/:sid/grades",
+      element: <ProtectRoute Component={Grade} role="admin" />,
+      errorElement: <Error />,
+    },
+
+    {
+      path: "/class/:cid/:sid/page",
+      element: <ProtectRoute Component={Page} role="admin" />,
       errorElement: <Error />,
     },
 
