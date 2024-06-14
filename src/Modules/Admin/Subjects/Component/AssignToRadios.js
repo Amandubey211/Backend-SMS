@@ -1,9 +1,11 @@
 import React from "react";
 
-const AssignToRadios = ({ assignTo, handleChange }) => (
+const AssignToRadios = ({ assignTo, handleChange, title }) => (
   <fieldset className="mb-4">
-    <legend className="text-lg font-semibold text-gray-700 mb-2">Assign To</legend>
-    <div className="flex items-center gap-2 justify-around">
+    <legend className="text-lg font-semibold text-gray-700 mb-2">
+      {title || "Assign To"}
+    </legend>
+    <div className="flex items-center gap-2 justify-evenly">
       <div className="flex items-center mr-4 text-md">
         <input
           type="radio"
@@ -14,7 +16,9 @@ const AssignToRadios = ({ assignTo, handleChange }) => (
           onChange={handleChange}
           className="mr-2 focus:ring-blue-500"
         />
-        <label htmlFor="everyone" className="text-sm font-medium text-gray-700">Everyone</label>
+        <label htmlFor="everyone" className="text-sm font-medium text-gray-700">
+          Everyone
+        </label>
       </div>
       <div className="flex items-center mr-4">
         <input
@@ -26,7 +30,9 @@ const AssignToRadios = ({ assignTo, handleChange }) => (
           onChange={handleChange}
           className="mr-2 focus:ring-blue-500"
         />
-        <label htmlFor="section" className="text-sm font-medium text-gray-700">Section</label>
+        <label htmlFor="section" className="text-sm font-medium text-gray-700">
+          Section
+        </label>
       </div>
       <div className="flex items-center">
         <input
@@ -38,7 +44,9 @@ const AssignToRadios = ({ assignTo, handleChange }) => (
           onChange={handleChange}
           className="mr-2 focus:ring-blue-500"
         />
-        <label htmlFor="group" className="text-sm font-medium text-gray-700">Group</label>
+        <label htmlFor="group" className="text-sm font-medium text-gray-700">
+          Group
+        </label>
       </div>
     </div>
   </fieldset>

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { CiSearch } from "react-icons/ci";
+import { NavLink } from "react-router-dom";
 
 const AnnouncementHeader = ({ onSearch }) => {
   const [filter, setFilter] = useState("all");
@@ -16,7 +17,7 @@ const AnnouncementHeader = ({ onSearch }) => {
     <div className="p-3">
       <div className="flex justify-between items-center ">
         <h2 className="text-xl font-semibold mb-4">All Announcement</h2>
-        <button
+        <NavLink to="create_announcement"
           // onClick={onAddNewSubject}
           className="flex items-center border border-gray-300 ps-5  py-0 rounded-full"
         >
@@ -24,7 +25,7 @@ const AnnouncementHeader = ({ onSearch }) => {
           <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full w-12 h-12 flex items-center justify-center">
             <span className="text-3xl -mt-2">+</span>
           </div>
-        </button>
+        </NavLink>
       </div>
       <div className="flex items-center justify-between ps-5 pe-9 mt-3">
         <div className="relative flex items-center">
@@ -38,8 +39,8 @@ const AnnouncementHeader = ({ onSearch }) => {
             <CiSearch className="w-5 h-5 text-gray-500" />
           </button>
         </div>
-        <div className="flex items-center  gap-4">
-            <span className="text-gray-500">Status : </span>
+        <div className="flex items-center gap-4">
+          <span className="text-gray-500">Status : </span>
           <label className="inline-flex items-center">
             <input
               type="radio"
@@ -62,7 +63,6 @@ const AnnouncementHeader = ({ onSearch }) => {
             />
             <span className="ml-2">Unread</span>
           </label>
-          
         </div>
       </div>
     </div>

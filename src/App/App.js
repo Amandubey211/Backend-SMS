@@ -13,6 +13,11 @@ import ProtectRoute from "../Routes/ProtectedRoutes/ProtectedRoute";
 
 import "./App.css";
 
+const CreateAnnouncement = lazy(() =>
+  import(
+    "../Modules/Admin/Subjects/Modules/Announcement/CreateAnnouncement/CreateAnnouncement.js"
+  )
+);
 const AnnouncementView = lazy(() =>
   import(
     "../Modules/Admin/Subjects/Modules/Announcement/AnnouncementView/AnnouncementView.js"
@@ -292,8 +297,13 @@ function App() {
       errorElement: <Error />,
     },
     {
-      path: "/class/:cid/:sid/announcements/view",
+      path: "/class/:cid/:sid/announcements/:aid/view",
       element: <ProtectRoute Component={AnnouncementView} role="admin" />,
+      errorElement: <Error />,
+    },
+    {
+      path: "/class/:cid/:sid/announcements/create_announcement",
+      element: <ProtectRoute Component={CreateAnnouncement} role="admin" />,
       errorElement: <Error />,
     },
 
