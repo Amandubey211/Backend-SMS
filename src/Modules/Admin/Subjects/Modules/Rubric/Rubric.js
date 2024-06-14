@@ -10,7 +10,7 @@ const Rubric = () => {
   useNavHeading(cid, sid);
   return (
     <Layout title="Rubric | Student Diwan">
-      <DashLayout children={<MainSection />} />
+      <DashLayout children={<MainSection />} hideSearchbar={true} />
     </Layout>
   );
 };
