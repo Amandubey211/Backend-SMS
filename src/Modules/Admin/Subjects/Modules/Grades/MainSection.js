@@ -1,10 +1,14 @@
 import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import SubjectSideBar from "../../Component/SubjectSideBar";
 import GradeHeader from "./Component/GradeHeader";
 import StudentTable from "./Component/StudentTable";
 import studentsGrades from "./dummydata/dummystudents";
+import StudentGradeModal from "./StudentGradeViewModal/StudentGradeModal";
+import { setStudentGrade } from "../../../../../Redux/Slices/AdminSlice";
 
 const MainSection = () => {
+  const studentGrade = useSelector((store) => store.Admin.studentGrade);
   const [search, setSearch] = useState("");
   const [filters, setFilters] = useState({
     section: "",
@@ -12,6 +16,8 @@ const MainSection = () => {
     assignment: "",
     quizzes: "",
   });
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const dispatch = useDispatch();
 
   const handleSearchChange = (value) => {
     setSearch(value);
@@ -34,15 +40,34 @@ const MainSection = () => {
     );
   });
 
+  const handleRowClick = (student) => {
+    dispatch(setStudentGrade(student));
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    dispatch(setStudentGrade(null));
+  };
+
   return (
-    <div className="flex ">
+    <div className="flex">
       <SubjectSideBar />
-      <div className="border-l w-full ">
-        <GradeHeader onSearch={handleSearchChange} onFilterChange={handleFilterChange} />
+      <div className="border-l w-full">
+        <GradeHeader
+          onSearch={handleSearchChange}
+          onFilterChange={handleFilterChange}
+        />
         <div className="h-screen overflow-y-scroll no-scrollbar">
-          <StudentTable students={filteredStudents} />
+          <StudentTable
+            students={filteredStudents}
+            onRowClick={handleRowClick}
+          />
         </div>
       </div>
+      {studentGrade && (
+        <StudentGradeModal isOpen={isModalOpen} onClose={handleCloseModal} />
+      )}
     </div>
   );
 };

@@ -3,15 +3,15 @@ import TableHeader from "./TableHeader";
 import TableRow from "./TableRow";
 import { FaExclamationTriangle } from "react-icons/fa";
 
-const StudentTable = ({ students }) => {
+const StudentTable = ({ students, onRowClick }) => {
   return (
-    <div className="p-4 bg-white ">
+    <div className="p-4 bg-white">
       {students.length > 0 ? (
         <table className="min-w-full">
           <TableHeader />
           <tbody>
             {students.map((student) => (
-              <TableRow key={student.id} student={student} />
+              <TableRow key={student.id} student={student} onRowClick={() => onRowClick(student)} />
             ))}
           </tbody>
         </table>
