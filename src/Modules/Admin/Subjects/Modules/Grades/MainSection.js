@@ -30,9 +30,24 @@ const MainSection = () => {
     }));
   };
 
+  const fuzzySearch = (query, text) => {
+    query = query.toLowerCase();
+    text = text.toLowerCase();
+    let queryIndex = 0;
+    for (let i = 0; i < text.length; i++) {
+      if (text[i] === query[queryIndex]) {
+        queryIndex++;
+      }
+      if (queryIndex === query.length) {
+        return true;
+      }
+    }
+    return false;
+  };
+
   const filteredStudents = studentsGrades.filter((student) => {
     return (
-      student.name.toLowerCase().includes(search.toLowerCase()) &&
+      fuzzySearch(search, student.name) &&
       (filters.section ? student.section === filters.section : true) &&
       (filters.group ? student.group === filters.group : true) &&
       (filters.assignment ? student.assignment === filters.assignment : true) &&
@@ -47,7 +62,7 @@ const MainSection = () => {
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
-    dispatch(setStudentGrade(null));
+    dispatch(setStudentGrade({}));
   };
 
   return (
