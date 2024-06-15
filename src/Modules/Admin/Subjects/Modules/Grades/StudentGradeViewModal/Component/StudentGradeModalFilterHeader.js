@@ -18,9 +18,10 @@ const StudentGradeModalFilterHeader = ({ filters, onFilterChange }) => {
           className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
         >
           <option value="">Select</option>
-          <option value="name">Name</option>
-          <option value="module">Module</option>
-          <option value="dueDate">Due Date</option>
+          <option value="Assignment">Assignment</option>
+          <option value="Group Assignment">Group Assignment</option>
+          <option value="Quiz">Quiz</option>
+          <option value="Group Quiz">Group Quiz</option>
         </select>
       </div>
       <div className="flex flex-col flex-grow">
@@ -34,6 +35,7 @@ const StudentGradeModalFilterHeader = ({ filters, onFilterChange }) => {
           <option value="">Select</option>
           <option value="Module 1">Module 1</option>
           <option value="Module 2">Module 2</option>
+          <option value="Module 3">Module 3</option>  <option value="Module 4">Module 4</option>
         </select>
       </div>
       <div className="flex flex-col flex-grow">
@@ -48,6 +50,7 @@ const StudentGradeModalFilterHeader = ({ filters, onFilterChange }) => {
           <option value="Chapter 1">Chapter 1</option>
           <option value="Chapter 2">Chapter 2</option>
           <option value="Chapter 3">Chapter 3</option>
+          <option value="Chapter 4">Chapter 4</option>
         </select>
       </div>
       <div className="flex flex-col flex-grow">
@@ -64,7 +67,7 @@ const StudentGradeModalFilterHeader = ({ filters, onFilterChange }) => {
           <option value="Missing">Missing</option>
         </select>
       </div>
-      <button onClick={()=>toast.success("Waiting for Backend Integration")} className="p-2 bg-purple-100 rounded-md">
+      <button onClick={()=>toast.success("Backend Yet to Add")} className="p-2 bg-purple-100 rounded-md">
         <AiOutlinePrinter className="text-purple-600" size={24} />
       </button>
     </div>
