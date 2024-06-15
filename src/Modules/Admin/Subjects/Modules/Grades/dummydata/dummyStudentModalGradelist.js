@@ -1,10 +1,4 @@
-import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import StudentGradeModalFilterHeader from "./Component/StudentGradeModalFilterHeader";
-import StudentGradeSummary from "./Component/StudentGradeSummary";
-import StudentModalGradeList from "./Component/StudentGradeModalList";
-
-const dummyData = [
+const dummyStudentModalGradeList = [
   { name: "Final Test Exam", type: "Group Assignment", module: "Module 1", chapter: "Chapter 1", dueDate: "01 / 10 / 2024", submittedDate: "20 / 10 / 2024", status: "Submit", score: "80 / 100" },
   { name: "Final Test Exam", type: "Quiz", module: "Module 1", chapter: "Chapter 2", dueDate: "01 / 10 / 2024", submittedDate: "20 / 10 / 2024", status: "Submit", score: "80 / 100" },
   { name: "Final Test Exam", type: "Assignment", module: "Module 1", chapter: "Chapter 3", dueDate: "01 / 10 / 2024", submittedDate: "20 / 10 / 2024", status: "Excused", score: "80 / 100" },
@@ -21,66 +15,4 @@ const dummyData = [
   { name: "Final Project", type: "Group Assignment", module: "Module 4", chapter: "Chapter 3", dueDate: "25 / 10 / 2024", submittedDate: "05 / 11 / 2024", status: "Missing", score: "95 / 100" }
 ];
 
-const StudentGradeModal = ({ isOpen, onClose }) => {
-  const [filters, setFilters] = useState({
-    arrangeBy: "",
-    module: "",
-    chapter: "",
-    status: ""
-  });
-
-  const handleFilterChange = (name, value) => {
-    setFilters((prevFilters) => ({
-      ...prevFilters,
-      [name]: value
-    }));
-  };
-
-  useEffect(() => {
-    if (isOpen) {
-      document.body.classList.add("overflow-hidden");
-    } else {
-      document.body.classList.remove("overflow-hidden");
-    }
-    return () => {
-      document.body.classList.remove("overflow-hidden");
-    };
-  }, [isOpen]);
-
-  const studentGrade = useSelector((store) => store.Admin.studentGrade);
-
-  return (
-    <div
-      className={`fixed inset-0 flex items-end justify-center bg-black bg-opacity-50 z-20 transition-opacity duration-500 ease-in-out ${
-        isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
-      }`}
-    >
-      <div
-        className={`bg-white w-full p-3 h-[97vh] rounded-t-lg shadow-lg transform transition-transform duration-500 ease-in-out ${
-          isOpen ? "translate-y-0" : "translate-y-full"
-        }`}
-      >
-        <div className="flex justify-between items-center p-1 border-b">
-          <h2 className="text-lg font-semibold">Total Grade</h2>
-          <button
-            onClick={onClose}
-            className="text-gray-600 text-3xl hover:text-gray-900"
-          >
-            &times;
-          </button>
-        </div>
-        <div className="flex w-full">
-          <div className="flex-1">
-            <StudentGradeModalFilterHeader filters={filters} onFilterChange={handleFilterChange} />
-            <div className="h-96 overflow-y-scroll no-scrollbar">
-              <StudentModalGradeList data={dummyData} filters={filters} />
-            </div>
-          </div>
-          <StudentGradeSummary studentGrade={studentGrade} />
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default StudentGradeModal;
+export default dummyStudentModalGradeList;
