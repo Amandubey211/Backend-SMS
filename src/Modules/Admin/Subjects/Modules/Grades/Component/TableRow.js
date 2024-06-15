@@ -1,8 +1,8 @@
 import React from "react";
 
-const TableRow = ({ student }) => {
+const TableRow = ({ student, onRowClick }) => {
   return (
-    <tr className="border-b hover:bg-gray-50">
+    <tr className="border-b hover:bg-gray-50 cursor-pointer" onClick={onRowClick}>
       <td className="p-3 flex items-center">
         <img
           src={student.avatar}
@@ -16,17 +16,17 @@ const TableRow = ({ student }) => {
       </td>
       <td className="p-3">{student.group}</td>
       <td className="p-3 text-center">
-        <div className="border  text-pink-600 py-1 rounded-md">
+        <div className="border text-pink-600 py-1 rounded-md">
           {student.assignment}
         </div>
       </td>
       <td className="p-3 text-center">
-        <div className="border  text-green-600  py-1 rounded-md">
+        <div className="border text-green-600 py-1 rounded-md">
           {student.quizzes}
         </div>
       </td>
       <td className="p-3 text-center">
-        <div className="border  py-1 rounded-md">
+        <div className="border py-1  rounded-md">
           {student.attendance}
         </div>
       </td>
