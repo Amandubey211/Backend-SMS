@@ -15,15 +15,18 @@ const getStatusClass = (status) => {
 };
 
 const sortData = (data, arrangeBy) => {
-  if (arrangeBy === "name") {
-    return [...data].sort((a, b) => a.name.localeCompare(b.name));
-  } else if (arrangeBy === "module") {
-    return [...data].sort((a, b) => a.module.localeCompare(b.module));
-  } else if (arrangeBy === "dueDate") {
-    return [...data].sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
-  } else {
-    return data;
+  if (arrangeBy) {
+    return data.sort((a, b) => {
+      if (a.type === arrangeBy && b.type !== arrangeBy) {
+        return -1;
+      }
+      if (a.type !== arrangeBy && b.type === arrangeBy) {
+        return 1;
+      }
+      return 0;
+    });
   }
+  return data;
 };
 
 const StudentModalGradeList = ({ data, filters }) => {

@@ -27,9 +27,9 @@ const MainSection = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { cid } = useParams();
   const iconData = [
-    { icon: <SlEyeglass/>, text: "20 Teacher Assigned", url: `/class/${cid}/teachers` },
+    { icon: <SlEyeglass className="text-purple-600"/>, text: "20 Teacher Assigned", url: `/class/${cid}/teachers` },
     {
-      icon: <FaSchool/>,
+      icon: <FaSchool className="text-yellow-600"/>,
       text: "3 Section | 11 Groups",
       url: `/class/${cid}/section_group`,
     },
