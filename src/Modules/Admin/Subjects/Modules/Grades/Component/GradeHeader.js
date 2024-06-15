@@ -18,8 +18,8 @@ const GradeHeader = ({ onSearch, onFilterChange }) => {
 
   return (
     <div className="p-2 bg-white ">
-      <h2 className="text-2xl font-semibold mb-3">All Grades</h2>
-      <div className="flex  items-end justify-around   gap-1 ">
+      <h2 className="text-xl ps-2 font-semibold mb-3">All Grades</h2>
+      <div className="flex  items-end justify-around   gap-1 px-4 ">
         <div className="relative flex flex-col">
           <label className="text-gray-600 mb-1">Search Student</label>
           <div className="relative">
