@@ -15,18 +15,18 @@ const TableRow = ({ student }) => {
         </div>
       </td>
       <td className="p-3">{student.group}</td>
-      <td className="p-3">
-        <div className="border  text-pink-600 px-2 py-1 rounded-md">
+      <td className="p-3 text-center">
+        <div className="border  text-pink-600 py-1 rounded-md">
           {student.assignment}
         </div>
       </td>
-      <td className="p-3">
-        <div className="border  text-green-600 px-2 py-1 rounded-md">
+      <td className="p-3 text-center">
+        <div className="border  text-green-600  py-1 rounded-md">
           {student.quizzes}
         </div>
       </td>
-      <td className="p-3">
-        <div className="border px-2 py-1 rounded-md">
+      <td className="p-3 text-center">
+        <div className="border  py-1 rounded-md">
           {student.attendance}
         </div>
       </td>
