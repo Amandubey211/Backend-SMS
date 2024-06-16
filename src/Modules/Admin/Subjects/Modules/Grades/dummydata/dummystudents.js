@@ -1,14 +1,14 @@
 const studentsGrades = [
   {
     id: 1,
-    name: "Leslie Alexander",
+    name: "Aman Dubey",
     section: "Section A",
     group: "Business Group",
     assignment: "400 / 6",
     quizzes: "400 / 6",
     attendance: 25,
     score: "80%",
-    avatar: "https://randomuser.me/api/portraits/men/1.jpg",
+    avatar: "https://avatars.githubusercontent.com/u/109097090?v=4",
   },
   {
     id: 2,
