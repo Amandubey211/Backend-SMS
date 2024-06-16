@@ -12,7 +12,6 @@ const Navbar = ({ hideSearchbar, hideAvatarList, hideStudentView }) => {
   const LeftNavHeading = useSelector(
     (store) => store.Common.NavbarData.leftHeading
   );
-  console.log(hideSearchbar);
   const navigate = useNavigate();
   return (
     <div className="relative z-0">

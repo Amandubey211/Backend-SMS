@@ -1,13 +1,29 @@
-import React from 'react';
-import ChapterItem from './ChapterItem';
-import { FaPlus, FaEllipsisV, FaChevronDown, FaChevronUp } from 'react-icons/fa';
+import React from "react";
+import ChapterItem from "./ChapterItem";
+import {
+  FaPlus,
+  FaEllipsisV,
+  FaChevronDown,
+  FaChevronUp,
+} from "react-icons/fa";
 
-const Chapter = ({ title, chapterNumber, imageUrl, items, isExpanded, onToggle }) => {
+const Chapter = ({
+  title,
+  chapterNumber,
+  imageUrl,
+  items,
+  isExpanded,
+  onToggle,
+}) => {
   return (
     <div className="mb-4 p-1 bg-white rounded-lg border-b  ">
       <div className="flex items-center justify-between mb-2 ">
         <div className="flex items-center">
-          <img src="https://avatars.githubusercontent.com/u/109097090?v=4" alt="Chapter" className="w-12 h-12 mr-4 rounded-lg" />
+          <img
+            src="https://avatars.githubusercontent.com/u/109097090?v=4"
+            alt="Chapter"
+            className="w-12 h-12 mr-4 rounded-lg"
+          />
           <div>
             <h2 className="font-semibold text-lg">{title}</h2>
             <p className="text-gray-500">Chapter {chapterNumber}</p>
@@ -17,7 +33,7 @@ const Chapter = ({ title, chapterNumber, imageUrl, items, isExpanded, onToggle }
           <button className="border p-2 rounded-full hover:bg-gray-50">
             <FaPlus className="text-pink-500" />
           </button>
-          <button className= " border p-2 rounded-full hover:bg-gray-50">
+          <button className=" border p-2 rounded-full hover:bg-gray-50">
             <FaEllipsisV />
           </button>
           <button
@@ -30,9 +46,15 @@ const Chapter = ({ title, chapterNumber, imageUrl, items, isExpanded, onToggle }
       </div>
       {isExpanded && (
         <div className="ml-10 py-2">
-          {items.length > 0 ? (
-            items.map((item, index) => (
-              <ChapterItem key={index} type={item.type} title={item.title} />
+          {items?.length > 0 ? (
+            items?.map((item, index) => (
+              <ChapterItem
+                key={index}
+                type={item.type}
+                title={item.title}
+                isPublished={item.isPublished}
+                id={item.id}
+              />
             ))
           ) : (
             <p className="text-gray-500">No chapters found</p>

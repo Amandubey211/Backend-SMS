@@ -28,7 +28,6 @@ const SubjectSideBar = () => {
         const basePath = getBasePath(item);
         const isActive = location.pathname.includes(`/class/${cid}/${formattedSid}/${item.path}`);
 
-        console.log(" BasePath:", basePath);
 
         return (
           <NavLink
