@@ -4,10 +4,10 @@ import Chapter from "./Components/Chapter";
 import dummyData from "./Components/Data/DummyData";
 import ModuleCard from "./Components/ModuleCard";
 import dummyModules from "./Components/Data/DummyModules";
+import { PiPlusThin } from "react-icons/pi";
 import Sidebar from "../../../../../Components/Common/Sidebar";
 import AddModule from "./Components/AddModule";
 import AddChapter from "./Components/AddChapter";
-import { RiAddFill } from "react-icons/ri";
 
 const MainSection = () => {
   const [expandedChapters, setExpandedChapters] = useState([]);
@@ -69,11 +69,8 @@ const MainSection = () => {
         <div className="bg-white p-4 rounded-lg">
           <div className="flex items-center gap-1 mb-2">
             <h1 className="text-xl font-semibold">All Modules</h1>
-
-            <p className="bg-gradient-to-r from-pink-100 to-purple-200 font-semibold rounded-full p-1 px-2 ">
-              {" "}
-              <span className="text-gradient"> 06 </span>{" "}
-            </p>
+            
+            <p className="bg-gradient-to-r from-pink-100 to-purple-200 font-semibold rounded-full p-1 px-2 ">    <span className="text-gradient">     06 </span>  </p>
           </div>
           <div className="grid grid-cols-1 gap-2">
             {dummyModules.map((module, index) => (
@@ -91,7 +88,7 @@ const MainSection = () => {
           onClick={openAddModule}
           className="bg-gradient-to-r from-purple-400 to-pink-400 text-white p-4 fixed rounded-full shadow-md bottom-4 right-4"
         >
-          <RiAddFill size={24} />
+          <PiPlusThin />
         </button>
         {isSidebarOpen && (
           <Sidebar

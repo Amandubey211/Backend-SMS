@@ -1,15 +1,8 @@
-import React from "react";
-import "react-quill/dist/quill.snow.css";
-import ReactQuill from "react-quill";
+import React from 'react';
+import 'react-quill/dist/quill.snow.css';
+import ReactQuill from 'react-quill';
 
-const Editor = ({
-  assignmentLabel,
-  hideInput,
-  assignmentName,
-  editorContent,
-  onNameChange,
-  onEditorChange,
-}) => {
+const Editor = ({ assignmentLabel, hideInput, assignmentName, editorContent, onNameChange, onEditorChange }) => {
   return (
     <div className="w-full p-6 bg-white mb-3">
       {!hideInput && (
@@ -30,7 +23,7 @@ const Editor = ({
         onChange={onEditorChange}
         className="bg-white"
         theme="snow"
-        style={{ height: "300px" }} // Adjust the height as needed
+        style={{ height: '300px' }}  // Adjust the height as needed
       />
     </div>
   );

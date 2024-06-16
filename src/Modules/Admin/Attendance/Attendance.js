@@ -12,7 +12,7 @@ const Attendance = () => {
   return (
     <div>
       <Layout>
-        <DashLayout children={<MainSection />} hideAvatarList={true} />
+        <DashLayout children={<MainSection />} />
       </Layout>
     </div>
   );

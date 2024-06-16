@@ -3,11 +3,8 @@ import DateDetail from '../../../Component/DateDetail';
 import AssignmentDetail from '../../../Component/AssignmentDetail';
 import ButtonsGroup from '../../../Component/ButtonsGroup';
 import SpeedGradeButton from '../../../Component/SpeedGradeButton';
-import { useParams } from 'react-router-dom';
 
 const QuizzDetailCard = () => {
-  const {qid} = useParams()
-  //console.log(qid)//will be using this to fetch the data
   const quizDetails = [
     { label: "Quiz Point", value: "100 Point", type: "quizz" },
     { label: "Quiz Type", value: "Graded Quiz", type: "quizz" },
@@ -23,9 +20,8 @@ const QuizzDetailCard = () => {
   ];
 
   return (
-    <div className="p-3 bg-white" aria-label="Quiz Card">
+    <div className="max-w-sm p-4 bg-white" aria-label="Quiz Card">
       <ButtonsGroup />
-      <p className='text-center text-green-500 italic font-semibold pb-3 border-b' >Submitted Students : 50/100 </p>
       <SpeedGradeButton />
       {quizDetails.map((detail, index) => {
         if (detail.type === "quizz") {

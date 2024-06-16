@@ -10,7 +10,7 @@ const MainSection = () => {
     <div className="flex  ">
       <SubjectSideBar />
       <div className="w-[65%] border">
-     {/* <AssignmentHeader/> */}
+     <AssignmentHeader/>
         <AssignmentSection />
       </div>
       <div className="w-[30%]">
