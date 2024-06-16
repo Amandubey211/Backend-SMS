@@ -40,7 +40,7 @@ const Libary = () => {
     );
   });
   return (
-    <Layout title="Libary | Student Diwan">
+    <Layout title="Libary">
       <DashLayout>
         <div className="min-h-screen p-4 bg-gray-50 ">
           <div className=" flex flex-col  items-start mb-4 gap-5 ">

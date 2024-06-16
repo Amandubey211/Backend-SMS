@@ -72,7 +72,7 @@ const TopRankingStudents = () => {
         {topStudents.slice(0, 3).map((student, index) => (
           <div key={index} className="text-center p-4 border rounded-lg">
               <h3 className="text-md mb-1 font-medium">
-              {index === 0 ? "Top 1" : `Top ${index + 1}`}
+              {index === 0 ? "Top 1" : `Top ${index + 2}`}
             </h3>
             <div className="mb-2">
               <img

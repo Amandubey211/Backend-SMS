@@ -50,8 +50,8 @@ const TotalEarningsGraph = () => {
     },
   };
   return (
-    <div className="p-4">
-      <div className="bg-white p-1">
+    <div className="p-4 h-55 ">
+      <div className="bg-white p-6">
         <div className="flex justify-between items-center mb-4">
           <div>
             <h2 className="text-xl font-semibold">Earnings</h2>

@@ -8,7 +8,7 @@ const Dash = () => {
   useNavHeading("Students");
   return (
     <Layout title="Admin Dash | Student diwan">
-      <DashLayout children={<MainSection />}  hideAvatarList={true}/>
+      <DashLayout children={<MainSection />} />
     </Layout>
   );
 };

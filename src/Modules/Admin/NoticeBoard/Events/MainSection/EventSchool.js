@@ -202,6 +202,7 @@ const EventScheduler = () => {
       {children}
     </MonthView.DateTableCell>
   );
+  
   const handleAppointmentClick = (appointmentData) => {
     setSelectedEvent(appointmentData);
 
