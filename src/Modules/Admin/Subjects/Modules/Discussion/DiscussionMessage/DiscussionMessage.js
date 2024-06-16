@@ -23,9 +23,7 @@ const DiscussionMessage = () => {
     };
     setComments([newComment, ...comments]);
   };
-useEffect(()=>{
-  console.log(comments)
-},comments)
+
   const addNestedReply = (id, text, isReplyToReply = false) => {
     const newReply = {
       id: Date.now(),
