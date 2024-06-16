@@ -4,11 +4,11 @@ import { FaExclamationTriangle } from "react-icons/fa";
 const getStatusClass = (status) => {
   switch (status) {
     case "Submit":
-      return "text-green-500";
+      return "text-green-700";
     case "Excused":
       return "text-yellow-500";
     case "Missing":
-      return "text-red-500";
+      return "text-red-700";
     default:
       return "text-gray-500";
   }
@@ -49,6 +49,15 @@ const StudentModalGradeList = ({ data, filters }) => {
     );
   }
 
+  const getBoldClass = (item) => {
+    const isBold =
+      (filters.arrangeBy && item.type === filters.arrangeBy) ||
+      (filters.module && item.module === filters.module) ||
+      (filters.chapter && item.chapter === filters.chapter) ||
+      (filters.status && item.status === filters.status);
+    return isBold ? "font-bold bg-purple-50" : "";
+  };
+
   return (
     <div className="mt-4">
       <table className="min-w-full border divide-y divide-gray-200">
@@ -65,18 +74,18 @@ const StudentModalGradeList = ({ data, filters }) => {
         <tbody className="bg-white divide-y divide-gray-200">
           {sortedData.map((item, index) => (
             <tr key={index}>
-              <td className="px-6 py-4 whitespace-nowrap">
+              <td className={`px-6 py-4 whitespace-nowrap ${getBoldClass(item)}`}>
                 <div className="text-sm text-gray-900">{item.name}</div>
-                <div className="text-sm text-gray-500">{item.type}</div>
+                <div className="text-sm ">{item.type}</div>
               </td>
-              <td className="px-6 py-4 whitespace-nowrap">
+              <td className={`px-6 py-4 whitespace-nowrap ${getBoldClass(item)}`}>
                 <div className="text-sm text-gray-900">{item.module}</div>
                 <div className="text-sm text-green-500">{item.chapter}</div>
               </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.dueDate}</td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.submittedDate}</td>
-              <td className={`px-6 py-4 whitespace-nowrap text-sm ${getStatusClass(item.status)}`}>{item.status}</td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.score}</td>
+              <td className={`px-6 py-4 whitespace-nowrap text-sm text-gray-500 ${getBoldClass(item)}`}>{item.dueDate}</td>
+              <td className={`px-6 py-4 whitespace-nowrap text-sm text-gray-500 ${getBoldClass(item)}`}>{item.submittedDate}</td>
+              <td className={`px-6 py-4 whitespace-nowrap text-sm ${getBoldClass(item)} ${getStatusClass(item.status)}`}>{item.status}</td>
+              <td className={`px-6 py-4 whitespace-nowrap text-sm text-gray-500 ${getBoldClass(item)}`}>{item.score}</td>
             </tr>
           ))}
         </tbody>

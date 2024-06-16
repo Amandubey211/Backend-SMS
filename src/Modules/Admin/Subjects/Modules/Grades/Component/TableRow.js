@@ -2,8 +2,8 @@ import React from "react";
 
 const TableRow = ({ student, onRowClick }) => {
   return (
-    <tr className="border-b hover:bg-gray-50 cursor-pointer" onClick={onRowClick}>
-      <td className="p-3 flex items-center">
+    <tr className="border-b hover:bg-gray-50 ">
+      <td className="p-3 flex items-center cursor-pointer" onClick={onRowClick}>
         <img
           src={student.avatar}
           alt={student.name}
@@ -26,9 +26,7 @@ const TableRow = ({ student, onRowClick }) => {
         </div>
       </td>
       <td className="p-3 text-center">
-        <div className="border py-1  rounded-md">
-          {student.attendance}
-        </div>
+        <div className="border py-1  rounded-md">{student.attendance}</div>
       </td>
       <td className="p-3 text-pink-600">{student.score}</td>
     </tr>
