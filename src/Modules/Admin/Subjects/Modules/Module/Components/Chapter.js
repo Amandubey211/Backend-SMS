@@ -20,7 +20,7 @@ const Chapter = ({
       <div className="flex items-center justify-between mb-2 ">
         <div className="flex items-center">
           <img
-            src="https://avatars.githubusercontent.com/u/109097090?v=4"
+            src="https://s3-alpha-sig.figma.com/img/1e8c/34c0/7df4f0cd89609a7dca9260aef0718e29?Expires=1719792000&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=hEAoiy2JQWvi-eFKch9ZwRvGK9zl6lqoOEB6axX2Wgfu1EI3mvTsF4782GAunh8~PsawaT7Wh-cQVZMwd4gkZAj5e7lYfHMUWm3~P8Rwqy9L1oyW~A0ejVH1EFkvKDUseEjK1faauIJL65PYstLDCliB1tnyGf~8ORJnwemZcsq2dB0JL0s-Yf~AnFMVQsVMOmj6Xx7R7IsHINtdrlcPAMrvpOXnaMWQ3Of5uZbuvUt--CoWn5KWjjHdEZ0aPOAomCdeXW5HnIernLU9jHxLFJhtNGq98JoLxS53fryI1pyWu7dI8oo8YcC73MeGVhyY~UPoNiGM1xp1cYFp~mgG3Q__"
             alt="Chapter"
             className="w-12 h-12 mr-4 rounded-lg"
           />
