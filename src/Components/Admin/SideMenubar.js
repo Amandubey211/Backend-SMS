@@ -26,7 +26,7 @@ const SideMenubar = ({ isOpen }) => {
 
   return (
     <nav
-      className={`transition-all duration-300 min-h-screen  p-4 bg-white border-r flex flex-col ${
+      className={`transition-all duration-300 min-h-screen border p-4 bg-white border-r flex flex-col ${
         isOpen ? "w-[15%]" : "w-[7%]"
       }`}
     >
