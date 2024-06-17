@@ -35,7 +35,7 @@ const SideMenubar = () => {
         isOpen ? "w-[15%]" : "w-[7%]"
       }`}
     >
-      <div className="relative flex items-center justify-center border-b pb-1">
+      <NavLink to="/admin_dash" className="relative flex items-center justify-center border-b pb-1">
         <img
           src={isOpen ? StudentDiwanLogo : smallLogo}
           alt="Logo"
@@ -51,7 +51,7 @@ const SideMenubar = () => {
             {isSidebarOpen ? <IoIosArrowBack /> : <IoIosArrowForward />}
           </div>
         </button>
-      </div>
+      </NavLink>
       <div className="mt-4 p-2">
         {isOpen && <h2 className="text-gray-500">MENU</h2>}
         <ul className="mt-1 space-y-2 flex-grow">
