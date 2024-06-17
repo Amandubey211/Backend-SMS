@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
-import useGetUnVerifiedStudents from "../../../Hooks/AuthHooks/Teacher/useGetunVerifiedStudents";
+import useGetUnVerifiedStudents from "../../../Hooks/AuthHooks/Staff/useGetunVerifiedStudents";
 import TopNavigation from "./TopNavigation";
 import RejectStudents from "./RejectStudents";
 import UnVerifiedStudentCard from "./UnVerifiedStudentCard";

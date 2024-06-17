@@ -3,7 +3,7 @@ import Logo from "../../../Components/Common/Logo";
 import { NavLink } from "react-router-dom";
 import { FaEye } from "react-icons/fa";
 import { PiEyeClosedFill } from "react-icons/pi";
-import useTeacherLogin from "../../../Hooks/AuthHooks/Teacher/useTeacherLogin";
+import useTeacherLogin from "../../../Hooks/AuthHooks/Staff/useTeacherLogin";
 import { LuLoader } from "react-icons/lu";
 import toast from "react-hot-toast";
 

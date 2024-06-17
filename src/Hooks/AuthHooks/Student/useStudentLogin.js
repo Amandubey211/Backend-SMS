@@ -23,7 +23,7 @@ const useStudentLogin = () => {
       }
 
       const { data } = await axios.post(
-        `${API_URL}/student/student_login`,
+        `${API_URL}/auth/student/login`,
         studentDetails
       );
       console.log(data);
