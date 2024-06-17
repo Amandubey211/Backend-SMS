@@ -14,7 +14,7 @@ const TeacherLogin = () => {
             <img
               src={TeacherLoginBanner}
               alt="Placeholder"
-              className="w-full h-screen object-cover"
+              className="w-full h-full object-cover"
             />
           </div>
         </div>

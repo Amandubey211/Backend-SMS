@@ -1,9 +1,9 @@
 import React, { useEffect, useRef } from "react";
 import { RxCross2 } from "react-icons/rx";
 
-const Sidebar = ({ isOpen, title, onClose, children, footer,width }) => {
+const Sidebar = ({ isOpen, title, onClose, children, footer }) => {
   const sidebarRef = useRef(null);
-console.log(width)
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
@@ -31,7 +31,7 @@ console.log(width)
       <div className="fixed inset-0 bg-black bg-opacity-50"></div>
       <div
         ref={sidebarRef}
-        className={`absolute top-0 right-0 ${width?`w-[${width}]`:"w-1/3"} h-full py-3 px-4 bg-white shadow-lg transform ${
+        className={`absolute top-0 right-0 w-1/3 h-full py-3 px-4 bg-white shadow-lg transform ${
           isOpen ? "translate-x-0" : "translate-x-full"
         } transition-transform`}
       >

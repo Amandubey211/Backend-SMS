@@ -1,48 +1,30 @@
-import React from "react";
-import { MdOutlineModeEditOutline } from "react-icons/md";
-import { RiDeleteBin2Line } from "react-icons/ri";
-
-const colors = ["#efc42f", "#ee69b6", "#0066ad", "#b2cd09", "#5ac67c", "#e040ff", "#fd8263", "#5b9ef2", "#9966f6", "#5ac67c"];
-
-const getRandomColor = () => {
-  const randomIndex = Math.floor(Math.random() * colors.length);
-  return colors[randomIndex];
-};
+import React from 'react';
+import { RiDeleteBin5Line } from "react-icons/ri";
+import { TbEdit } from "react-icons/tb";
 
 const RubricCard = ({ title, criteria, points }) => {
-  const bgColor = getRandomColor();
-
   return (
-    <div style={{ backgroundColor: bgColor }} className="ps-1 rounded-md">
-      <div className="border rounded-md shadow-sm relative flex bg-white justify-between p-4">
-        <div className="flex flex-col items-start justify-start">
-          <div className="flex justify-between items-center">
-            <h2 className="text-base font-semibold">{title}</h2>
-          </div>
-          <div className="flex gap-4 items-center mt-2 text-gray-700">
-            <div className="flex items-center">
-              <p className="text-sm mr-1">Criteria :</p>
-              <p className="text-base font-bold">
-                {criteria.toString().padStart(2, "0")}
-              </p>
-            </div>
-            <div className="flex items-center">
-              <p className="text-sm mr-1">Points :</p>
-              <p className="text-base font-bold">{points}</p>
-            </div>
-          </div>
+    <div className="bg-gradient-to-r from-pink-100 to-purple-100 border rounded-lg shadow-sm relative flex flex-col justify-between">
+      <div className="flex py-10 px-3 justify-center items-center">
+        <h2 className="text-lg font-semibold text-purple-600">{title}</h2>
+      </div>
+      <div className="absolute top-3 right-3 flex space-x-2 text-xl">
+        <button className="text-red-600"><RiDeleteBin5Line /></button>
+        <button className="text-green-600"><TbEdit /></button>
+      </div>
+      <div className="flex justify-center border-b gap-2 p-2 bg-white rounded-b-lg text-gray-700">
+        <div className="text-center p-2">
+          <p className="text-sm">Criteria</p>
+          <p className="text-lg font-bold">{criteria.toString().padStart(2, '0')}</p>
         </div>
-        <div className="flex flex-col gap-2 text-xl">
-          <button className="text-red-600">
-            <RiDeleteBin2Line />
-          </button>
-          <button className="text-green-600">
-            <MdOutlineModeEditOutline />
-          </button>
+        <div className="border border-gray-500 opacity-60"></div>
+        <div className="text-center p-2">
+          <p className="text-sm">Points</p>
+          <p className="text-lg font-bold">{points}</p>
         </div>
       </div>
     </div>
   );
-};
+}
 
 export default RubricCard;

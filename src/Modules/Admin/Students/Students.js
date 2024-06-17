@@ -11,7 +11,7 @@ const Students = () => {
   useNavHeading(cid, "Students");
   return (
     <Layout title={`${cid} | Students | Student Diwan`}>
-      <DashLayout children={<MainSection />} hideAvatarList={true} />
+      <DashLayout children={<MainSection />} />
     </Layout>
   );
 };

@@ -17,9 +17,9 @@ const Group_Section = () => {
 
   return (
     <Layout title={ `${cid} | Group & Section | Student diwan`}>
-      <DashLayout children={  <MainSection />} hideAvatarList={true}/>
-      
-  
+      <DashLayout>
+        <MainSection />
+      </DashLayout>
     </Layout>
   );
 };
