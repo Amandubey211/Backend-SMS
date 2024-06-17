@@ -10,7 +10,7 @@ export const navData = [
     value: "106,74",
     bgColor: "bg-[#f6ecf6]",
     textColor: "text-purple-700",
-    icon: <FaUsers className="text-[#564FFD]"/>,
+    icon: <FaUsers className="text-[#564FFD]" />,
     iconColor: "text-[#564FFD]",
   },
   {
@@ -19,7 +19,7 @@ export const navData = [
     value: "674",
     bgColor: "bg-[#e9f8eb]",
     textColor: "text-green-700",
-    icon: <IoCheckbox  className="text-[#22c55e]" />,
+    icon: <IoCheckbox className="text-[#22c55e]" />,
     iconColor: "text-green",
   },
   {
@@ -27,15 +27,15 @@ export const navData = [
     value: "167",
     bgColor: "bg-[#f7e5e5]",
     textColor: "black",
-    icon: <FaSquareXmark   className="text-[#EA2058]"/>,
+    icon: <FaSquareXmark className="text-[#EA2058]" />,
     iconColor: "text-[#F09F04]",
   },
   {
-    label: "Today Leave Application",
+    label: "Leave Today",
     value: "20",
     bgColor: "bg-[#f7ecf4]",
     textColor: "text-pink-700",
-    icon: <ImExit  className="text-[#EA2058]" />,
+    icon: <ImExit className="text-[#EA2058]" />,
     iconColor: "text-[#EA2058]",
   },
 ];
