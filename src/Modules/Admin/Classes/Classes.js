@@ -8,7 +8,7 @@ const Classes = () => {
   useNavHeading("Classes");
   return (
     <Layout title="Classes | Student diwan">
-      <DashLayout children={<ClassesMainSection />} />;
+      <DashLayout children={<ClassesMainSection />} hideAvatarList={true} />;
     </Layout>
   );
 };

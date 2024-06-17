@@ -1,5 +1,15 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { FaEllipsisV, FaCheckCircle, FaBan, FaPen, FaCopy, FaArrowRight, FaIndent, FaShareAlt, FaTrashAlt } from 'react-icons/fa';
+import React, { useState, useRef, useEffect } from "react";
+import {
+  FaEllipsisV,
+  FaCheckCircle,
+  FaBan,
+  FaPen,
+  FaCopy,
+  FaArrowRight,
+  FaIndent,
+  FaShareAlt,
+  FaTrashAlt,
+} from "react-icons/fa";
 
 const ModuleCard = ({ title, moduleNumber, imageUrl, isCompleted }) => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -16,20 +26,27 @@ const ModuleCard = ({ title, moduleNumber, imageUrl, isCompleted }) => {
   };
 
   useEffect(() => {
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
   return (
-    <div className="relative mb-4 border-gradient bg-white rounded-lg shadow-md">
-      <img src={imageUrl} alt={title} className="w-full h-36 object-cover rounded-t-lg" />
-      <div className="p-4">
+    <div className="relative mb-4 border-2 border-rose-400  bg-white rounded-lg ">
+      <img
+        src={imageUrl}
+        alt={title}
+        className="w-full h-36 object-cover rounded-t-lg"
+      />
+      <div className="p-4 " >
         <h2 className="font-semibold text-lg">{title}</h2>
         <div className="flex justify-between items-center mt-2">
-          <p className="bg-gradient-to-r from-pink-100 to-purple-200 font-semibold rounded-full py-1 px-4">    <span className="text-gradient"> Module {moduleNumber}</span>  </p>
-       
+          <p className="bg-gradient-to-r from-pink-100 to-purple-200 font-semibold rounded-full py-1 px-4">
+            {" "}
+            <span className="text-gradient"> Module {moduleNumber}</span>{" "}
+          </p>
+
           <div className="flex items-center space-x-2">
             {isCompleted ? (
               <FaCheckCircle className="text-green-500" />
@@ -46,7 +63,10 @@ const ModuleCard = ({ title, moduleNumber, imageUrl, isCompleted }) => {
         </div>
       </div>
       {menuOpen && (
-        <div ref={menuRef} className="absolute top-12 right-4 bg-white border rounded-lg shadow-lg w-48 z-10">
+        <div
+          ref={menuRef}
+          className="absolute top-12 right-4 bg-white border rounded-lg shadow-lg w-48 z-10"
+        >
           <ul className="py-2">
             <li className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
               <FaPen className="mr-2" /> Edit
