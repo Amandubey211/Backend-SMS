@@ -14,31 +14,42 @@ const useStudentLogin = () => {
   const navigate = useNavigate();
 
   const studentLogin = async (studentDetails) => {
-    try {
-      setLoading(true);
-      const { email, password } = studentDetails;
-      if (!email || !password) {
-        toast.error("Please provide email and password.");
-        return;
-      }
+    // try {
+    //   setLoading(true);
+    //   const { email, password } = studentDetails;
+    //   if (!email || !password) {
+    //     toast.error("Please provide email and password.");
+    //     return;
+    //   }
 
-      const { data } = await axios.post(
-        `${API_URL}/auth/student/login`,
-        studentDetails
-      );
-      console.log(data);
+    //   const { data } = await axios.post(
+    //     `${API_URL}/student/student_login`,
+    //     studentDetails
+    //   );
+    //   console.log(data);
 
-      if (data.success) {
+    //   if (data.success) {
+    //     dispatch(setAuth(true));
+    //     dispatch(setRole("student"));
+    //     navigate(data.isVerifiedSchoolId && "/student_dash");
+    //     localStorage.setItem(TOKEN_STORAGE_KEY, `Bearer ${data.token}`);
+
+    //     toast.success("Logged in successfully");
+    //   } else {
+    //     toast.error(data.msg || "Login unsuccessful");
+    //   }
+    // } 
+   
+   try{
+     
+     
+   
         dispatch(setAuth(true));
         dispatch(setRole("student"));
-        navigate(data.isVerifiedSchoolId && "/student_dash");
-        localStorage.setItem(TOKEN_STORAGE_KEY, `Bearer ${data.token}`);
-
-        toast.success("Logged in successfully");
-      } else {
-        toast.error(data.msg || "Login unsuccessful");
-      }
-    } catch (error) {
+        navigate( "/student_dash");
+   }  
+    
+    catch (error) {
       const errorMessage =
         error.response?.data?.msg || "Something went wrong. Please try again.";
       toast.error(errorMessage);

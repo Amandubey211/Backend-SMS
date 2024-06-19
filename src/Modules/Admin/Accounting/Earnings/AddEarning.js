@@ -7,7 +7,8 @@ const AddEarning = () => {
         paymentDate: '',
         amount: '',
         description:'',
-        paymentStatus:''
+        paymentStatus:'',
+        paymentFrom:'',
       });
       const [paymentStatus, setPaymentStatus] = useState('single');
 
@@ -26,8 +27,10 @@ const AddEarning = () => {
       };
   return (
     <form className="space-y-4 mt-2 " onSubmit={handleSubmit}>
+          <FormInput id="description" label="Payment From" type="text" value={formData.paymentFrom} onChange={handleChange} required />
+
     <FormInput id="amount" label="Amount" type="text" value={formData.amount} onChange={handleChange} required />
-    <div className="flex items-center">
+    {/* <div className="flex items-center">
         {['Paid Expenses', 'Due Expenses'].map((status) => (
           <label key={status} className="flex items-center cursor-pointer">
             <input
@@ -56,7 +59,7 @@ const AddEarning = () => {
             </span>
           </label>
         ))}
-      </div>
+      </div> */}
     <FormInput id="paymentDate" label="Expense Date" type="date" value={formData.paymentDate} onChange={handleChange} required />
     <FormInput id="description" label="Expense Reason" type="text" value={formData.description} onChange={handleChange} required />
     <button type="submit" className="w-full flex justify-center border border-transparent shadow-sm text-sm font-medium  bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600">

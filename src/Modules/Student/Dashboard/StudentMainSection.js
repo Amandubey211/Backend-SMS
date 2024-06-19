@@ -1,8 +1,8 @@
 import React from "react";
-import DashCard from "./Dashcard";
-import TotalAttendanceGraph from "./Graphs/TotalAttendanceGraph";
-import { cardData } from "./DashboardData/CardData";
-import TotalEarningsGraph from "./Graphs/TotalEarningsGraph";
+import DashCard from "./Dashcard.js";
+import TotalAttendanceGraph from "./Graphs/TotalAttendanceGraph.js";
+import { cardData } from "./DashboardData/CardData.js";
+import TotalEarningsGraph from "./Graphs/TotalEarningsGraph.js";
 import TotalStudentsGraphjs from "./Graphs/TotalStudentsGraph.js";
 import TopRankingStudents from "./Graphs/TopRankingStudents.js";
 import Library from "./LibraryModule/Library.js";

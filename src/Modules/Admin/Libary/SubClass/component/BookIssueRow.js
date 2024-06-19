@@ -6,7 +6,7 @@ const BookIssueRow = ({ item }) => {
         <tr className="text-left text-gray-700 bg-gray-100">
             <td className="px-5 py-3 border-b border-gray-200">
                 <div className="flex items-center">
-                    <img src={item.image} alt="Profile" className="h-8 w-8 rounded-full mr-2"/>
+                    <img src={item.studentImage} alt="Profile" className="h-8 w-8 rounded-full mr-2"/>
                     <span>{item.studentName}</span>
                 </div>
             </td>
@@ -31,7 +31,7 @@ const BookIssueRow = ({ item }) => {
                 <div>Return: {item.dueDate}</div>
             </td>
             <td className="px-5 py-2 border-b border-gray-200">
-                <span className={`inline-block px-3 py-1 text-xs font-semibold rounded-full ${item.status === "Paid" ? "bg-green-200 text-green-800" : "bg-red-200 text-red-800"}`}>
+                <span className={`inline-block px-3 py-1 text-xs font-semibold rounded-full ${item.status === "Paid" ? "bg-green-200 text-green-800":item.status === "Return" ? "bg-sky-200 text-green-800"  : "bg-red-200 text-red-800"}`}>
                     {item.status}
                 </span>
             </td>

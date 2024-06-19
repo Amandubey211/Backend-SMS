@@ -1,12 +1,15 @@
 import React from "react";
 import Layout from "../../../Components/Common/Layout";
+import DashLayout from "../../../Components/Student/StudentDashLayout";
 
+import StudentMainSection from "./StudentMainSection";
+import useNavHeading from "../../../Hooks/CommonHooks/useNavHeading ";
 const StudentDash = () => {
+  useNavHeading("Students");
+
   return (
     <Layout title="Student Dashboard">
-      <div className="w-screen h-screen flex justify-center items-center">
-        <h1>this is Student Dashboard</h1>
-      </div>
+      <DashLayout children={<StudentMainSection/>} />
     </Layout>
   );
 };
