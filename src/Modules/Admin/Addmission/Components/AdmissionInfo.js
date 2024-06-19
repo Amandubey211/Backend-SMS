@@ -2,7 +2,7 @@
 
 import React, { useEffect } from "react";
 import { useSelector } from "react-redux";
-import useGetAllClassList from "../../../../Hooks/AuthHooks/Teacher/useGetAllClassList";
+import useGetAllClassList from "../../../../Hooks/AuthHooks/Staff/useGetAllClassList";
 
 const AdmissionInfo = ({ studentInfo, handleInputChange }) => {
   const { getClassList } = useGetAllClassList();

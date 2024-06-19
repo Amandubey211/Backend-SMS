@@ -40,14 +40,15 @@ const useStudentLogin = () => {
     //   }
     // } 
    
-   
-    try {
+   try{
      
+     
+   
         dispatch(setAuth(true));
         dispatch(setRole("student"));
         navigate( "/student_dash");
-       
-    } 
+   }  
+    
     catch (error) {
       const errorMessage =
         error.response?.data?.msg || "Something went wrong. Please try again.";
