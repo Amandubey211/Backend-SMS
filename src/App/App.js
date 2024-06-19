@@ -11,7 +11,29 @@ import ResetPassword from "../Modules/LoginPages/Student/ResetPassword/ResetPass
 import Fallback from "../Components/Common/Fallback.js";
 import ProtectRoute from "../Routes/ProtectedRoutes/ProtectedRoute";
 
+
+
+import AllStudents from "../Modules/Admin//UsersProfiles/StudentProfile/MainSection.js/AllStudents.js";
+import SingleStudent from "../Modules/Admin//UsersProfiles/StudentProfile/MainSection.js/SingleStudent.js";
+
+import AllTeachers from "../Modules/Admin/UsersProfiles/TeacherProfile/AllTeachers.js";
+import AllLibraian from "../Modules/Admin/UsersProfiles/LibraianProfile/AllLibraian.js";
+import AllStaff from "../Modules/Admin/UsersProfiles/StaffProfile/AllStaff.js";
+import AllAccountants from "../Modules/Admin/UsersProfiles/AccountantProfile/AllAccountants.js";
+
+import StudentParentProfile from "../Modules/Admin/UsersProfiles/StudentParentsProfile/StudentParentProfile.js";
+import UserProfile from "../Modules/Admin/UsersProfiles/AdminProfile/UserProfile.js";
+
+
+
+
 import "./App.css";
+import StudentLibrary from "../Modules/Student/Library/StudentLibrary.js";
+import StudentFinance from "../Modules/Student/StudentFinance.js";
+import StudentClass from "../Modules/Student/StudentClass.js";
+import StudentLibrarySection from "../Modules/Student/Library/MainSection/Libary.js";
+import StudentEvent from "../Modules/Student/StudentEvent/StudentEvent.js";
+import StudentAnnounce from "../Modules/Student/Announcements/StudentAnnounce.js";
 
 const Page = lazy(() =>
   import("../Modules/Admin/Subjects/Modules/Pages/Page.js")
@@ -68,19 +90,18 @@ const Earning = lazy(() =>
 const Expenses = lazy(() =>
   import("../Modules/Admin/Accounting/Expenses/Expenses.js")
 );
-const AllStudents = lazy(() =>
-  import("../Modules/Admin/StudentProfile/MainSection.js/AllStudents.js")
-);
-const SingleStudent = lazy(() =>
-  import("../Modules/Admin/StudentProfile/MainSection.js/SingleStudent.js")
-);
+// const AllStudents = lazy(() =>
+//   import("../Modules/Admin/StudentProfile/MainSection.js/AllStudents.js")
+// );
+// const SingleStudent = lazy(() =>
+//   import("../Modules/Admin/StudentProfile/MainSection.js/SingleStudent.js")
+// );
 
 const AssignmentList = lazy(() =>
   import(
     "../Modules/Admin/Subjects/Modules/Assignments/AllAssignments/AssignmentList.js"
   )
 );
-const Dash = lazy(() => import("../Modules/Admin/Dashboard/Dash.js"));
 const AddDiscussion = lazy(() =>
   import(
     "../Modules/Admin/Subjects/Modules/Discussion/AddDiscussion/AddDiscussion.js"
@@ -141,6 +162,10 @@ const VerificationPage = lazy(() =>
 const StudentDash = lazy(() =>
   import("../Modules/Student/Dashboard/StudentDash.js")
 );
+
+const Dash = lazy(() => import("../Modules/Admin/Dashboard/Dash.js"));
+
+
 
 function App() {
   const [isOnline, setIsOnline] = useState(window.navigator.onLine);
@@ -325,18 +350,16 @@ function App() {
       errorElement: <Error />,
     },
 
-    // Student Routes-----------------------------
-    {
-      path: "/student_dash",
-      element: <ProtectRoute Component={StudentDash} role="student" />,
-      errorElement: <Error />,
-    },
+    
     {
       path: "accounting/studentfees",
       element: <AccountingSection />,
       errorElement: <Error />,
     },
-    { path: "library", element: <Libary />, errorElement: <Error /> },
+    { path: "library",
+       element: <Libary />, 
+       errorElement: <Error />
+   },
     {
       path: "noticeboard/events",
       element: <EventSchool />,
@@ -362,7 +385,121 @@ function App() {
       element: <AllStudents />,
       errorElement: <Error />,
     },
-    { path: "/user/:cid", element: <SingleStudent />, errorElement: <Error /> },
+    { path: "/user/:cid",
+       element: <SingleStudent />, 
+       errorElement: <Error /> 
+      
+    },
+    {
+      path: "/users/teachers",
+      element:<AllTeachers/>,
+      errorElement: <Error />,
+    },
+    {
+      path: "/users/accountants",
+      element:<AllAccountants/>,
+      errorElement: <Error />,
+    },
+    {
+      path: "/users/parents",
+      element:<StudentParentProfile/>,
+      errorElement: <Error />,
+    },
+    {
+      path: "/users/libraians",
+      element:<AllLibraian/>,
+      errorElement: <Error />,
+    },
+    {
+      path: "/users/staffs",
+      element:<AllStaff/>,
+      errorElement: <Error />,
+    },
+    {
+      path: "/users/admin",
+      element:<UserProfile/>,
+      errorElement: <Error />,
+    },
+    // Student Routes-----------------------------
+  // Student Routes-----------------------------
+{
+  path: "/student_dash",
+  element: <ProtectRoute Component={StudentDash} role="student" />,
+  errorElement: <Error />,
+},
+{
+  path: "/student_library",
+  element: <StudentLibrarySection />,
+  errorElement: <Error />,
+},
+{
+  path: "/student_finance",
+  element: <StudentFinance />,
+  errorElement: <Error />,
+},
+{
+  path: "/student_class",
+  element: <StudentClass />,
+  errorElement: <Error />,
+},
+{
+  path: "/student/noticeboard/events",
+  element: <StudentEvent />,
+  errorElement: <Error />,
+},
+{
+  path: "/student/noticeboard/announcements",
+  element: <StudentAnnounce />,
+  errorElement: <Error />,
+},
+
+  
+  
+    //   {
+  //     path: "/student_dash",
+  //     element: <ProtectRoute Component={StudentDash} role="student" />,
+  //     errorElement: <Error />,
+  //   },
+  //   {
+  //     path: "/student_Library",
+  //     element: <StudentLibrarySection/>,
+  //     errorElement: <Error />,
+  //   },
+  //   // {
+  //   //   path: "/student_Library",
+  //   //   element: <ProtectRoute Component={Libary} role="student" />,
+  //   //   errorElement: <Error />,
+  //   // },
+  //   {
+  //     path: "/student_finance",
+  //     element: <StudentFinance/>,
+  //     errorElement: <Error />,
+  //   },
+  //   {
+  //     path: "/student_class",
+  //     element: <StudentClass/>,
+  //     errorElement: <Error />,
+  //   },
+  //  {
+  //     path: "/student/noticeboard/events",
+  //     element: <StudentEvent />,
+  //     errorElement: <Error />,
+  //   },
+  //   {
+  //     path: "/student/noticeboard/announcements",
+  //     element: <StudentAnnounce />,
+  //     errorElement: <Error />,
+  //   },
+  //  {
+  //     path: "/student_dash/student/noticeboard/events",
+  //     element: <StudentEvent />,
+  //     errorElement: <Error />,
+  //   },
+  //   {
+  //     path: "/student_dash/student/noticeboard/announcements",
+  //     element: <StudentAnnounce />,
+  //     errorElement: <Error />,
+  //   },
   ]);
 
   return (

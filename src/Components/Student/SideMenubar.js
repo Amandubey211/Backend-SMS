@@ -1,32 +1,27 @@
 import React, { useState } from "react";
 import { useLocation, NavLink } from "react-router-dom";
 import StudentDiwanLogo from "../../Assets/HomeAssets/StudentDiwanLogo.png";
-import {
-  MdOutlineKeyboardArrowUp,
-  MdOutlineKeyboardArrowDown,
-} from "react-icons/md";
-import sidebarData from "./DataFile/sidebarData.js";
+import { MdOutlineKeyboardArrowUp, MdOutlineKeyboardArrowDown } from "react-icons/md";
+import sidebarData from "./DataFile/sidebarData";
 import { FiLogOut } from "react-icons/fi";
 
-const isActivePath = (path, locationPath) => {
-  return locationPath.startsWith(path);
-};
+const isActivePath = (path, locationPath) => locationPath.startsWith(path);
 
 const SideMenubar = ({ isOpen }) => {
   const location = useLocation();
   const [openItems, setOpenItems] = useState([]);
 
   const toggleDropdown = (title) => {
-    if (openItems.includes(title)) {
-      setOpenItems(openItems.filter((item) => item !== title));
-    } else {
-      setOpenItems([...openItems, title]);
-    }
+    setOpenItems((prevOpenItems) =>
+      prevOpenItems.includes(title)
+        ? prevOpenItems.filter((item) => item !== title)
+        : [...prevOpenItems, title]
+    );
   };
 
   return (
     <nav
-      className={`transition-all duration-300 min-h-screen  p-4 bg-white border-r flex flex-col ${
+      className={`transition-all duration-300 min-h-screen p-4 bg-white border-r flex flex-col ${
         isOpen ? "w-[15%]" : "w-[7%]"
       }`}
     >
@@ -35,9 +30,7 @@ const SideMenubar = ({ isOpen }) => {
           <img
             src={StudentDiwanLogo}
             alt="Logo"
-            className={`transition-width duration-300 ${
-              isOpen ? "w-36" : "w-28"
-            }`}
+            className={`transition-width duration-300 ${isOpen ? "w-36" : "w-28"}`}
           />
         </div>
         <div className="mt-4">
@@ -54,27 +47,18 @@ const SideMenubar = ({ isOpen }) => {
                     } ${isOpen ? "justify-between" : "justify-center"}`}
                     onClick={() => toggleDropdown(item.title)}
                   >
-                    <div className={`flex justify-center items-center`}>
-                      <span className={`${!isOpen && "text-xl"}`}>
-                        {item.icon}
-                      </span>
+                    <div className="flex justify-center items-center">
+                      <span className={`${!isOpen && "text-xl"}`}>{item.icon}</span>
                       {isOpen && (
-                        <span
-                          role="presentation"
-                          className="ml-3 flex items-center"
-                        >
-                          {item.title}
-                        </span>
+                        <span className="ml-3 flex items-center">{item.title}</span>
                       )}
                     </div>
                     {isOpen && (
-                      <>
-                        {openItems.includes(item.title) ? (
-                          <MdOutlineKeyboardArrowUp className="ml-2" />
-                        ) : (
-                          <MdOutlineKeyboardArrowDown className="ml-2" />
-                        )}
-                      </>
+                      openItems.includes(item.title) ? (
+                        <MdOutlineKeyboardArrowUp className="ml-2" />
+                      ) : (
+                        <MdOutlineKeyboardArrowDown className="ml-2" />
+                      )
                     )}
                   </div>
                 ) : (
@@ -89,14 +73,8 @@ const SideMenubar = ({ isOpen }) => {
                       } ${isOpen ? "" : "justify-center"}`
                     }
                   >
-                    <span className={`${!isOpen && "text-xl"}`}>
-                      {item.icon}
-                    </span>
-                    {isOpen && (
-                      <span role="presentation" className="ml-3">
-                        {item.title}
-                      </span>
-                    )}
+                    <span className={`${!isOpen && "text-xl"}`}>{item.icon}</span>
+                    {isOpen && <span className="ml-3">{item.title}</span>}
                   </NavLink>
                 )}
                 {openItems.includes(item.title) && item.items && (
@@ -106,20 +84,15 @@ const SideMenubar = ({ isOpen }) => {
                         key={subIndex}
                         to={subItem.path}
                         className={({ isActive }) =>
-                          `flex items-center p-2  rounded-lg  ${
-                            isActive ||
-                            isActivePath(subItem.path, location.pathname)
+                          `flex items-center p-2 rounded-lg ${
+                            isActive || isActivePath(subItem.path, location.pathname)
                               ? "text-purple-500 bg-purple-100"
                               : "text-gray-700 hover:bg-gray-100"
                           } ${isOpen ? "" : "justify-center"}`
                         }
                       >
                         {subItem.icon}
-                        {isOpen && (
-                          <span role="presentation" className="ml-3">
-                            {subItem.title}
-                          </span>
-                        )}
+                        {isOpen && <span className="ml-3">{subItem.title}</span>}
                       </NavLink>
                     ))}
                   </ul>
@@ -130,11 +103,10 @@ const SideMenubar = ({ isOpen }) => {
         </div>
       </div>
 
-      {/* This section is always at the bottom */}
       <div className="mt-auto py-2">
         <div className="flex items-center">
           <img
-            src="https://avatars.githubusercontent.com/u/109097090?v=4" // Path to the profile image
+            src="https://avatars.githubusercontent.com/u/109097090?v=4" // Static profile image URL
             alt="Profile"
             className={`${isOpen ? "w-10 h-10" : "w-8 h-8"} rounded-full`}
           />
@@ -145,9 +117,7 @@ const SideMenubar = ({ isOpen }) => {
             </div>
           )}
           <FiLogOut
-            className={`${
-              isOpen ? "w-6 h-6" : "w-4 h-4"
-            } text-gray-500 ml-auto ${!isOpen && "ml-0"}`}
+            className={`${isOpen ? "w-6 h-6" : "w-4 h-4"} text-gray-500 ml-auto ${!isOpen && "ml-0"}`}
           />
         </div>
       </div>

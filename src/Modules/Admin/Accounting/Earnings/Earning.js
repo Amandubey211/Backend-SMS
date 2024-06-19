@@ -161,7 +161,7 @@ const Earning = () => {
           <Sidebar
             isOpen={isSidebarOpen}
             onClose={handleSidebarClose}
-            title="Add New Fees"
+            title="Add New Earnings"
           >
             <AddEarning />
           </Sidebar>

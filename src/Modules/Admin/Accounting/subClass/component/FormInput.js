@@ -2,8 +2,8 @@ import React from 'react';
 
 const FormInput = ({ id, label, type, value, onChange, required }) => {
   return (
-    <div>
-      <label htmlFor={id} className="block text-sm font-medium text-gray-700">
+    <div className='mt-4'>
+      <label htmlFor={id} className=" block text-sm font-medium text-gray-700">
         {label}
       </label>
       <input

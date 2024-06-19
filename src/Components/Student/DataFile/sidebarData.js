@@ -21,18 +21,106 @@ import { GrUserWorker } from "react-icons/gr";
 import { MdLocalLibrary,MdManageAccounts } from "react-icons/md";
 import { RiParentFill,RiAdminFill } from "react-icons/ri";
 
+// const sidebarData = [
+//   {
+//     title: "Dashboard",
+//     icon: <TbDashboard />,
+//     path: "/student_dash",
+//   },
+//   {
+//     title: "My Class",
+//     icon: <RiGraduationCapLine />,
+//     path: `/class`,
+//   },
+
+//   {
+//     title: "Users",
+//     icon: <LuUser />,
+//     items: [
+//       {
+//         title: "Admin",
+//         icon: <RiAdminFill />,
+//         path: "/users/admin",
+//       },
+//       {
+//         title: "Students",
+//         icon: <FaUserGraduate />,
+//         path: "/users/students",
+//       },
+//       {
+//         title: "Teachers",
+//         icon: <FaChalkboardTeacher />,
+//         path: "/users/teachers",
+//       },
+//       {
+//         title: "Accountant",
+//         icon: <MdManageAccounts />,
+//         path: "/users/accountants",
+//       },
+     
+//       {
+//         title: "Parents",
+//         icon: <RiParentFill />,
+//         path: "/users/parents",
+//       },
+//       {
+//         title: "Libraian",
+//         icon: <MdLocalLibrary />,
+//         path: "/users/libraians",
+//       },
+//       {
+//         title: "Staff",
+//         icon: <GrUserWorker />,
+//         path: "/users/staffs",
+//       },
+//     ],
+//   },
+
+//   {
+//     title: "Finance",
+//     icon: <RiGraduationCapLine />,
+//     path: `/student_finance`,
+//   },
+//   {
+//     title: "Library",
+//     icon: <RiGraduationCapLine />,
+//     path: `/student_Library`,
+//   },
+
+ 
+//   {
+//     title: "NoticeBoard",
+//     icon: <TbNotebook />,
+//     items: [
+//       {
+//         title: "Announcements",
+//         icon: <FaClipboardList />,
+//         path: "student/noticeboard/announcements",
+//       },
+//       {
+//         title: "Events",
+//         icon: <FaBook />,
+//         path: "student/noticeboard/events",
+//       },
+//     ],
+//   },
+ 
+// ];
+
+// export default sidebarData;
+
+
 const sidebarData = [
   {
     title: "Dashboard",
     icon: <TbDashboard />,
-    path: "/admin_dash",
+    path: "/student_dash",
   },
   {
-    title: "Classes",
+    title: "My Class",
     icon: <RiGraduationCapLine />,
-    path: `/class`,
+    path: "/student_class",
   },
-
   {
     title: "Users",
     icon: <LuUser />,
@@ -57,7 +145,6 @@ const sidebarData = [
         icon: <MdManageAccounts />,
         path: "/users/accountants",
       },
-     
       {
         title: "Parents",
         icon: <RiParentFill />,
@@ -76,25 +163,14 @@ const sidebarData = [
     ],
   },
   {
-    title: "Accounting",
-    icon: <HiOutlineCalculator />,
-    items: [
-      {
-        title: "Reports",
-        icon: <FaClipboardList />,
-        path: "/accounting/reports",
-      },
-      {
-        title: "Student Fees",
-        icon: <FaClipboardList />,
-        path: "/accounting/studentfees",
-      },
-      {
-        title: "Expenses",
-        icon: <FaUniversity />,
-        path: "/accounting/expenses",
-      },
-    ],
+    title: "Finance",
+    icon: <RiGraduationCapLine />,
+    path: "/student_finance",
+  },
+  {
+    title: "Library",
+    icon: <RiGraduationCapLine />,
+    path: "/student_library",
   },
   {
     title: "NoticeBoard",
@@ -103,34 +179,14 @@ const sidebarData = [
       {
         title: "Announcements",
         icon: <FaClipboardList />,
-        path: "/noticeboard/announcements",
+        path: "/student/noticeboard/announcements",
       },
       {
         title: "Events",
         icon: <FaBook />,
-        path: "/noticeboard/events",
+        path: "/student/noticeboard/events",
       },
     ],
-  },
-  {
-    title: "Graduated",
-    icon: <PiCertificateLight />,
-    path: "/graduated",
-  },
-  {
-    title: "Admissions",
-    icon: <RiUserAddLine />,
-    path: "/admissions",
-  },
-  {
-    title: "Library",
-    icon: <BsBook />,
-    path: "/library",
-  },
-  {
-    title: "Verification",
-    icon: <FaUserGraduate />,
-    path: "/verify_students",
   },
 ];
 
