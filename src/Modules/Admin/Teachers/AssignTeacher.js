@@ -1,22 +1,35 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import useGetAllTeachers from "../../../Hooks/AuthHooks/Staff/Admin/useGetAllTeacher";
+import { useSelector } from "react-redux";
+import useFetchSubjects from "../../../Hooks/AuthHooks/Staff/Admin/useFetchSubjects";
+import { useParams } from "react-router-dom";
 
 const AssignTeacher = () => {
-  const [teacherName, setTeacherName] = useState("Mehedi Hasan");
-  const [teacherCategory, setTeacherCategory] = useState("Science");
-  const [section, setSection] = useState("A");
-
+  const [teacherId, setTeacherId] = useState("");
+  const [subjectId, setSubjectId] = useState("");
+  const [sectionId, setSectionId] = useState("");
+  const { fetchTeachers } = useGetAllTeachers();
+  const { fetchSubjects } = useFetchSubjects();
+  const { cid } = useParams();
+  useEffect(() => {
+    fetchTeachers();
+    fetchSubjects(cid);
+  }, []);
+  const AllTeachers = useSelector((store) => store.Teachers.allTeachers);
+  const AllSubjects = useSelector((store) => store.Subject.subjects);
+  const AllSections = useSelector((store) => store.ClassSection.sectionData);
   const handleSubmit = (e) => {
     e.preventDefault();
-    const formData = {
-      teacherName,
-      teacherCategory,
-      section,
+    const assignData = {
+      classId: cid,
+      teacherId,
+      sectionId,
+      subjectId,
     };
-    console.log(formData);
+    console.log(assignData);
     toast.success("Teacher data has been logged to the console");
   };
-
   return (
     <form className="flex flex-col h-full" onSubmit={handleSubmit}>
       <div className="bg-white rounded-lg p-4 w-full max-w-md">
@@ -25,13 +38,18 @@ const AssignTeacher = () => {
             Teacher Name
           </label>
           <select
-            value={teacherName}
-            onChange={(e) => setTeacherName(e.target.value)}
+            value={teacherId}
+            onChange={(e) => setTeacherId(e.target.value)}
             className="block w-full p-2 border border-gray-300 rounded-lg"
           >
-            <option>Mehedi Hasan</option>
-            <option>John Doe</option>
-            <option>Jane Smith</option>
+            <option value="">Choose</option>
+            {AllTeachers?.map((list) => {
+              return (
+                <option key={list._id} value={list._id}>
+                  {list.fullName}
+                </option>
+              );
+            })}
           </select>
         </div>
         <div className="mb-4">
@@ -39,13 +57,18 @@ const AssignTeacher = () => {
             Teacher Category
           </label>
           <select
-            value={teacherCategory}
-            onChange={(e) => setTeacherCategory(e.target.value)}
+            value={subjectId}
+            onChange={(e) => setSubjectId(e.target.value)}
             className="block w-full p-2 border border-gray-300 rounded-lg"
           >
-            <option>Science</option>
-            <option>Math</option>
-            <option>English</option>
+            <option value="">Choose</option>
+            {AllSubjects.map((list) => {
+              return (
+                <option key={list._id} value={list._id}>
+                  {list.subjectName}
+                </option>
+              );
+            })}
           </select>
         </div>
         <div className="mb-4">
@@ -53,13 +76,18 @@ const AssignTeacher = () => {
             Section
           </label>
           <select
-            value={section}
-            onChange={(e) => setSection(e.target.value)}
+            value={sectionId}
+            onChange={(e) => setSectionId(e.target.value)}
             className="block w-full p-2 border border-gray-300 rounded-lg"
           >
-            <option>A</option>
-            <option>B</option>
-            <option>C</option>
+            <option value="">Choose</option>
+            {AllSections?.map((list) => {
+              return (
+                <option key={list._id} value={list._id}>
+                  {list.sectionName}
+                </option>
+              );
+            })}
           </select>
         </div>
       </div>

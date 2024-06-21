@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { setLeftHeading } from "../../Redux/Slices/CommonSlice";
+import { setLeftHeading } from "../../Redux/Slices/Common/CommonSlice";
 
 const useNavHeading = (heading, subheading, defaultHeading = ["Students"]) => {
   const dispatch = useDispatch();

@@ -1,7 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "tailwindcss/tailwind.css";
 import Sidebar from "../../../Components/Common/Sidebar";
 import AssignTeacher from "./AssignTeacher";
+import useFetchSection from "../../../Hooks/AuthHooks/Staff/Admin/useFetchSection";
+import { useParams } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const NavigationBar = ({ onSectionChange, selectedSection }) => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -9,9 +12,16 @@ const NavigationBar = ({ onSectionChange, selectedSection }) => {
   const handleSidebarOpen = () => setSidebarOpen(true);
   const handleSidebarClose = () => setSidebarOpen(false);
 
+  const { fetchSection } = useFetchSection();
+  const { cid } = useParams();
+  useEffect(() => {
+    fetchSection(cid);
+  }, []);
+  const Sections = useSelector((store) => store.ClassSection.sectionData);
+  console.log(Sections);
   const getButtonClass = (section) => {
-    return selectedSection === section 
-      ? "px-4 py-2 rounded-full bg-gradient-to-r from-red-400 to-purple-500 text-white" 
+    return selectedSection === section
+      ? "px-4 py-2 rounded-full bg-gradient-to-r from-red-400 to-purple-500 text-white"
       : "px-4 py-2 rounded-full border border-gray-300";
   };
 
@@ -44,21 +54,23 @@ const NavigationBar = ({ onSectionChange, selectedSection }) => {
       </Sidebar>
 
       <div className="flex space-x-2 px-5">
-        <button className={getButtonClass("Everyone")} onClick={() => onSectionChange("Everyone")}>
+        <button
+          className={getButtonClass("Everyone")}
+          onClick={() => onSectionChange("Everyone")}
+        >
           Everyone
         </button>
-        <button className={getButtonClass("Section 1")} onClick={() => onSectionChange("Section 1")}>
-          Section 1
-        </button>
-        <button className={getButtonClass("Section 2")} onClick={() => onSectionChange("Section 2")}>
-          Section 2
-        </button>
-        <button className={getButtonClass("Section 3")} onClick={() => onSectionChange("Section 3")}>
-          Section 3
-        </button>
-        <button className={getButtonClass("Section 4")} onClick={() => onSectionChange("Section 4")}>
-          Section 4
-        </button>
+
+        {Sections?.map((item) => {
+          return (
+            <button
+              className={getButtonClass(item.sectionName)}
+              onClick={() => onSectionChange(item.sectionName)}
+            >
+              {item.sectionName}
+            </button>
+          );
+        })}
       </div>
     </>
   );

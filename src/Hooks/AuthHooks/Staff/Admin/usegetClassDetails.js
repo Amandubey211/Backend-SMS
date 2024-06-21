@@ -1,0 +1,38 @@
+import { useState, useCallback } from "react";
+import axios from "axios";
+import toast from "react-hot-toast";
+import { useDispatch, useSelector } from "react-redux";
+import { setClass } from "../../../../Redux/Slices/Admin/ClassSlice";
+
+const useGetClassDetails = () => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const role = useSelector((store) => store.Auth.role);
+  const API_URL = process.env.REACT_APP_API_URL;
+  const dispatch = useDispatch();
+
+  const fetchClassDetails = useCallback(async (classId) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const token = localStorage.getItem(`${role}:token`);
+      const response = await axios.get(`${API_URL}/admin/class/${classId}`, {
+        headers: { Authentication: token },
+      });
+      dispatch(setClass(response.data.data));
+      console.log(response.data.data)
+      setLoading(false);
+    } catch (err) {
+      const errorMessage =
+        err.response?.data?.message || "Failed to fetch class details";
+      toast.error(errorMessage);
+      setLoading(false);
+      setError(errorMessage);
+    }
+  }, [API_URL, role, dispatch]);
+
+  return { loading, error, fetchClassDetails };
+};
+
+export default useGetClassDetails;

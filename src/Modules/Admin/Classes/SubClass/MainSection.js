@@ -1,15 +1,15 @@
-// src/components/MainSection.js
 import React, { useState } from "react";
 import NavIconCard from "./Components/NavIconCard";
 import ButtonGroup from "./Components/ButtonGroup";
-import dummyData from "./DummyData/dummyData";
 import SubjectCard from "./SubjectCard";
 import Sidebar from "../../../../Components/Common/Sidebar";
 import AddNewSubject from "./AddNewSubject";
 import { useParams } from "react-router-dom";
 import { FaSchool } from "react-icons/fa";
 import { SlEyeglass } from "react-icons/sl";
-import { FcGraduationCap,FcCalendar } from "react-icons/fc";
+import { FcGraduationCap, FcCalendar } from "react-icons/fc";
+import { useSelector } from "react-redux";
+
 const colors = [
   "bg-yellow-300",
   "bg-blue-300",
@@ -26,16 +26,34 @@ const getColor = (index) => {
 const MainSection = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { cid } = useParams();
-  const iconData = [
-    { icon: <SlEyeglass className="text-purple-600"/>, text: "20 Teacher Assigned", url: `/class/${cid}/teachers` },
+  const classDetails = useSelector((store) => store.Class.class);
+
+  // Static icon data
+  const staticIconData = [
     {
-      icon: <FaSchool className="text-yellow-600"/>,
-      text: "3 Section | 11 Groups",
+      icon: <SlEyeglass className="text-purple-600" />,
+      text: "",
+      url: `/class/${cid}/teachers`,
+    },
+    {
+      icon: <FaSchool className="text-yellow-600" />,
+      text: "",
       url: `/class/${cid}/section_group`,
     },
-    { icon: <FcGraduationCap/>, text: "250 Students", url: `/class/${cid}/students` },
-    { icon: <FcCalendar/>, text: "Attendance", url: `/class/${cid}/attendance` },
+    { icon: <FcGraduationCap />, text: "", url: `/class/${cid}/students` },
+    {
+      icon: <FcCalendar />,
+      text: "Attendance",
+      url: `/class/${cid}/attendance`,
+    },
   ];
+
+  // Update static icon data with dynamic details if classDetails is available
+  if (classDetails) {
+    staticIconData[0].text = `${classDetails?.teachersIds?.length || 0} Teacher Assigned`;
+    staticIconData[1].text = `${classDetails?.sections?.length || 0} Section | ${classDetails?.groups?.length || 0} Groups`;
+    staticIconData[2].text = `${classDetails?.studentsIds?.length || 0} Students`;
+  }
 
   const handleAddNewSubject = () => {
     setIsSidebarOpen(true);
@@ -47,9 +65,8 @@ const MainSection = () => {
 
   return (
     <>
-      {/* <div className="flex-1 flex  gap-3 w-full p-2 py-4"> */}
       <div className="flex flex-wrap justify-center gap-3 p-4 ">
-        {iconData.map((item, index) => (
+        {staticIconData.map((item, index) => (
           <NavIconCard
             key={index}
             icon={item.icon}
@@ -58,17 +75,23 @@ const MainSection = () => {
           />
         ))}
       </div>
-      <div className=" px-5">
+      <div className="px-5">
         <ButtonGroup onAddNewSubject={handleAddNewSubject} />
-        <div className="grid grid-cols-3 gap-4">
-          {dummyData.map((data, index) => (
-            <SubjectCard
-              key={index}
-              data={data}
-              Class={cid}
-              backgroundColor={getColor(index)}
-            />
-          ))}
+        <div className="grid grid-cols-3 gap-4 mb-10">
+          {classDetails && classDetails.subjects && classDetails.subjects.length > 0 ? (
+            classDetails.subjects.map((subject, index) => (
+              <SubjectCard
+                key={index}
+                data={subject}
+                Class={cid}
+                backgroundColor={getColor(index)}
+              />
+            ))
+          ) : (
+            <p className="col-span-3 text-center text-gray-500">
+              No subjects available.
+            </p>
+          )}
         </div>
       </div>
       <Sidebar

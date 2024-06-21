@@ -12,14 +12,14 @@ const MainSection = () => {
 
   const filteredTeachers = selectedSection === "Everyone"
     ? teachers
-    : teachers.filter(teacher => teacher.section === selectedSection);
+    : teachers.filter(teacher => teacher.sectionName === selectedSection);
 
   return (
     <>
       <div>
         <NavigationBar onSectionChange={handleSectionChange} selectedSection={selectedSection} />
       </div>
-      <div className="flex flex-wrap justify-start px-4 items-center">
+      <div className="flex flex-wrap justify-center px-2 items-center">
         {filteredTeachers.map((teacher, index) => (
           <TeacherCard
             key={index}

@@ -2,15 +2,15 @@ import React from "react";
 import Layout from "../../../Components/Common/Layout";
 import DashLayout from "../../../Components/Admin/AdminDashLayout";
 import MainSection from "./MainSection";
-import { useParams } from "react-router-dom";
 import useNavHeading from "../../../Hooks/CommonHooks/useNavHeading ";
+import { useSelector } from "react-redux";
 
 const Students = () => {
-  const { cid } = useParams();
+  const className = useSelector((store) => store.Common.selectedClass);
 
-  useNavHeading(cid, "Students");
+  useNavHeading(className, "Students");
   return (
-    <Layout title={`${cid} | Students | Student Diwan`}>
+    <Layout title={`${className} | Students | Student Diwan`}>
       <DashLayout children={<MainSection />} hideAvatarList={true} />
     </Layout>
   );

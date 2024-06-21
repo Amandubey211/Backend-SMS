@@ -3,21 +3,21 @@ import Logo from "../../../Components/Common/Logo";
 import { NavLink } from "react-router-dom";
 import { FaEye } from "react-icons/fa";
 import { PiEyeClosedFill } from "react-icons/pi";
-import useTeacherLogin from "../../../Hooks/AuthHooks/Staff/useTeacherLogin";
 import { LuLoader } from "react-icons/lu";
 import toast from "react-hot-toast";
+import useStaffLogin from "../../../Hooks/AuthHooks/Staff/useStaffLogin";
 
-const TeacherLoginForm = () => {
-  const [teacherDetails, setTeacherDetails] = useState({
+const StaffLoginForm = () => {
+  const [staffCredentials, setStaffCredentials] = useState({
     email: "",
     password: "",
   });
-  const { loading, teacherLogin } = useTeacherLogin();
+  const { loading, staffLogin } = useStaffLogin();
   const [showPassword, setShowPassword] = useState(false);
 
   const handleInputChange = (e) => {
     const { id, value } = e.target;
-    setTeacherDetails((prevDetails) => ({
+    setStaffCredentials((prevDetails) => ({
       ...prevDetails,
       [id]: value,
     }));
@@ -25,10 +25,10 @@ const TeacherLoginForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!teacherDetails.email || !teacherDetails.password) {
+    if (!staffCredentials.email || !staffCredentials.password) {
       return toast.error("Please add the required details");
     }
-    teacherLogin(teacherDetails);
+    staffLogin(staffCredentials);
   };
 
   return (
@@ -47,7 +47,7 @@ const TeacherLoginForm = () => {
             </div>
             <span>LMS Home</span>
           </NavLink>
-          <h2 className="text-2xl font-semibold mb-6">Teacher Account</h2>
+          <h2 className="text-2xl font-semibold mb-6">Staff  Account</h2>
           <form onSubmit={handleSubmit}>
             <h6>Login in using:</h6>
             <div className="mb-4">
@@ -57,7 +57,7 @@ const TeacherLoginForm = () => {
               <input
                 type="email"
                 id="email"
-                value={teacherDetails.email}
+                value={staffCredentials.email}
                 onChange={handleInputChange}
                 placeholder="Type your email"
                 className="mt-1 block w-full px-3 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
@@ -73,7 +73,7 @@ const TeacherLoginForm = () => {
                 <input
                   type={showPassword ? "text" : "password"}
                   id="password"
-                  value={teacherDetails.password}
+                  value={staffCredentials.password}
                   onChange={handleInputChange}
                   placeholder="Type your password"
                   className="mt-1 block w-full px-3 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
@@ -118,4 +118,4 @@ const TeacherLoginForm = () => {
   );
 };
 
-export default TeacherLoginForm;
+export default StaffLoginForm;
