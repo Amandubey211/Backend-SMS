@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
-import { setSectionData } from "../../../../Redux/Slices/Admin/ClassSectionsSlice";
+import { setSectionsList } from "../../../../Redux/Slices/Admin/ClassSlice";
 
 const useFetchSection = () => {
   const [loading, setLoading] = useState(false);
@@ -25,14 +25,7 @@ const useFetchSection = () => {
 
         const { data } = response.data;
         console.log(data);
-        // Dispatch the action to update the Redux store
-        dispatch(
-          setSectionData({
-            sectionName: data.sectionName,
-            sectionId: data._id,
-            sectionData: data,
-          })
-        );
+        dispatch(setSectionsList(data));
 
         setLoading(false);
         return { success: true, data };

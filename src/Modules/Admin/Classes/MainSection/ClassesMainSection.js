@@ -10,7 +10,7 @@ import Fallback from "../../../../Components/Common/Fallback";
 const ClassesMainSection = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const { loading, error, fetchClasses } = useGetAllClasses();
-  const classes = useSelector((store) => store.Classes.allClass);
+  const classes = useSelector((store) => store.Class.classList);
 
   const handleSidebarOpen = () => setSidebarOpen(true);
   const handleSidebarClose = () => setSidebarOpen(false);

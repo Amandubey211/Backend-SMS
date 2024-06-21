@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
-import "tailwindcss/tailwind.css";
+import React, { useEffect, useState, lazy, Suspense } from "react";
 import Sidebar from "../../../Components/Common/Sidebar";
-import AssignTeacher from "./AssignTeacher";
 import useFetchSection from "../../../Hooks/AuthHooks/Staff/Admin/useFetchSection";
 import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
+
+const AssignTeacher = lazy(() => import("./AssignTeacher"));
 
 const NavigationBar = ({ onSectionChange, selectedSection }) => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -15,10 +15,13 @@ const NavigationBar = ({ onSectionChange, selectedSection }) => {
   const { fetchSection } = useFetchSection();
   const { cid } = useParams();
   useEffect(() => {
-    fetchSection(cid);
-  }, []);
-  const Sections = useSelector((store) => store.ClassSection.sectionData);
-  console.log(Sections);
+    if (cid) {
+      fetchSection(cid);
+    }
+  }, [cid, fetchSection]);
+
+  const Sections = useSelector((store) => store.Class.sectionsList);
+
   const getButtonClass = (section) => {
     return selectedSection === section
       ? "px-4 py-2 rounded-full bg-gradient-to-r from-red-400 to-purple-500 text-white"
@@ -50,7 +53,9 @@ const NavigationBar = ({ onSectionChange, selectedSection }) => {
         onClose={handleSidebarClose}
         title="Assign new Teacher"
       >
-        <AssignTeacher />
+        <Suspense fallback={<div>Loading...</div>}>
+          <AssignTeacher />
+        </Suspense>
       </Sidebar>
 
       <div className="flex space-x-2 px-5">
@@ -61,16 +66,15 @@ const NavigationBar = ({ onSectionChange, selectedSection }) => {
           Everyone
         </button>
 
-        {Sections?.map((item) => {
-          return (
-            <button
-              className={getButtonClass(item.sectionName)}
-              onClick={() => onSectionChange(item.sectionName)}
-            >
-              {item.sectionName}
-            </button>
-          );
-        })}
+        {Sections?.map((item) => (
+          <button
+            key={item.sectionName}
+            className={getButtonClass(item.sectionName)}
+            onClick={() => onSectionChange(item.sectionName)}
+          >
+            {item.sectionName}
+          </button>
+        ))}
       </div>
     </>
   );

@@ -13,11 +13,10 @@ const useAssignTeacher = () => {
     setLoading(true);
     setError(null);
     try {
-      const schoolId = useSelector((store) => store.Auth.schoolId); // Assuming schoolId is in the Auth slice
       const token = localStorage.getItem(`${role}:token`);
 
       const response = await axios.post(
-        `${API_URL}/assignTeacher`,
+        `${API_URL}/admin/teacher`,
         assignData,
         {
           headers: { Authentication: token },
@@ -25,7 +24,7 @@ const useAssignTeacher = () => {
       );
 
       toast.success("Teacher assigned successfully!");
-      console.log(response.data.data);
+      console.log(response.data,"sdfsdf");
       setLoading(false);
     } catch (err) {
       const errorMessage =
