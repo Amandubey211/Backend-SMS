@@ -1,22 +1,38 @@
 import React, { useState, lazy, Suspense } from "react";
 import Sidebar from "../../../../Components/Common/Sidebar";
 import { useSelector } from "react-redux";
+import { toast } from "react-hot-toast"; // Ensure proper import
+import { RiDeleteBin5Line } from "react-icons/ri";
+import useDeleteSection from "../../../../Hooks/AuthHooks/Staff/Admin/Sections/useDeleteSection";
 
 const AddGroup = lazy(() => import("./AddGroup"));
 const AddSection = lazy(() => import("./AddSection"));
 
 const NavigationBar = ({ onSectionChange, selectedSection }) => {
   const [sidebarType, setSidebarType] = useState(null);
+  const [clickedSection, setClickedSection] = useState(null);
+
   const Sections = useSelector((store) => store.Class.sectionsList);
 
-  const openAddGroupSidebar = () => setSidebarType('addGroup');
-  const openAddSectionSidebar = () => setSidebarType('addSection');
+  const { deleteSection, loading } = useDeleteSection(); // Using the custom hook
+
+  const openAddGroupSidebar = () => setSidebarType("addGroup");
+  const openAddSectionSidebar = () => setSidebarType("addSection");
   const closeSidebar = () => setSidebarType(null);
+
+  const handleDeleteClick = async (id) => {
+    await deleteSection(id);
+  };
+
+  const handleSectionChange = (section) => {
+    onSectionChange(section);
+    setClickedSection(section);
+  };
 
   const getButtonClass = (section) => {
     return selectedSection === section
-      ? "px-4 py-2 rounded-full bg-gradient-to-r from-red-400 to-purple-500 text-white"
-      : "px-4 py-2 rounded-full border border-gray-300";
+      ? "relative px-4 py-2 rounded-full bg-gradient-to-r from-red-400 to-purple-500 text-white"
+      : "relative px-4 py-2 rounded-full border border-gray-300";
   };
 
   return (
@@ -25,21 +41,26 @@ const NavigationBar = ({ onSectionChange, selectedSection }) => {
         <div className="flex space-x-2 px-5">
           <button
             className={getButtonClass("Everyone")}
-            onClick={() => onSectionChange("Everyone")}
+            onClick={() => handleSectionChange("Everyone")}
           >
             Everyone
           </button>
-
           {Sections?.map((item) => (
             <button
               key={item.sectionName}
               className={getButtonClass(item.sectionName)}
-              onClick={() => onSectionChange(item.sectionName)}
+              onClick={() => handleSectionChange(item.sectionName)}
             >
               {item.sectionName}
+              {clickedSection === item.sectionName && (
+                <RiDeleteBin5Line
+                  className="absolute top-0 right-0 p-1 rounded-full bg-white text-2xl -m-1 text-red-600 cursor-pointer"
+                  onClick={() => handleDeleteClick(item._id)}
+                />
+              )}
             </button>
           ))}
-          <button 
+          <button
             onClick={openAddSectionSidebar}
             className="flex items-center px-4 py-2 border-2 border-dashed border-pink-600 text-gradient rounded-full"
           >
@@ -58,17 +79,17 @@ const NavigationBar = ({ onSectionChange, selectedSection }) => {
       </div>
 
       <Sidebar
-        isOpen={sidebarType === 'addSection'}
+        isOpen={sidebarType === "addSection"}
         onClose={closeSidebar}
         title="Add Section"
       >
         <Suspense fallback={<div>Loading...</div>}>
-         <AddSection/>
+          <AddSection />
         </Suspense>
       </Sidebar>
 
       <Sidebar
-        isOpen={sidebarType === 'addGroup'}
+        isOpen={sidebarType === "addGroup"}
         onClose={closeSidebar}
         title="Add New Group"
       >

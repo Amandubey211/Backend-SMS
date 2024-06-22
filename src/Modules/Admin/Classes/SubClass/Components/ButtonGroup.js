@@ -1,14 +1,27 @@
-// src/components/ButtonGroup.js
 import React from "react";
 
-const ButtonGroup = ({ onAddNewSubject }) => {
+const ButtonGroup = ({ onAddNewSubject, selectedTab, setSelectedTab }) => {
   return (
     <div className="flex justify-between items-center mb-8">
       <div className="flex space-x-4">
-        <button className="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-4 py-2 rounded-md">
-          Publish
+        <button
+          className={`px-4 py-2 rounded-md ${
+            selectedTab === "Published"
+              ? "bg-gradient-to-r from-pink-500 to-purple-600 text-white"
+              : "border border-gray-300 text-gray-600"
+          }`}
+          onClick={() => setSelectedTab("Published")}
+        >
+          Published
         </button>
-        <button className="border border-gray-300 text-gray-600 px-4 py-2 rounded-md">
+        <button
+          className={`px-4 py-2 rounded-md ${
+            selectedTab === "Draft"
+              ? "bg-gradient-to-r from-pink-500 to-purple-600 text-white"
+              : "border border-gray-300 text-gray-600"
+          }`}
+          onClick={() => setSelectedTab("Draft")}
+        >
           Draft
         </button>
       </div>

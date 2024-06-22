@@ -25,6 +25,7 @@ const getColor = (index) => {
 
 const MainSection = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [selectedTab, setSelectedTab] = useState("Published");
   const { cid } = useParams();
   const classDetails = useSelector((store) => store.Class.class);
 
@@ -50,7 +51,7 @@ const MainSection = () => {
 
   // Update static icon data with dynamic details if classDetails is available
   if (classDetails) {
-    staticIconData[0].text = `${classDetails?.teachersIds?.length || 0} Teacher Assigned`;
+    staticIconData[0].text = `${classDetails?.teachersIds?.length || 0} Instructor Assigned`;
     staticIconData[1].text = `${classDetails?.sections?.length || 0} Section | ${classDetails?.groups?.length || 0} Groups`;
     staticIconData[2].text = `${classDetails?.studentsIds?.length || 0} Students`;
   }
@@ -62,6 +63,13 @@ const MainSection = () => {
   const handleCloseSidebar = () => {
     setIsSidebarOpen(false);
   };
+
+  const filteredSubjects =
+    classDetails && classDetails.subjects
+      ? classDetails.subjects.filter((subject) =>
+          selectedTab === "Published" ? subject.isPublished : !subject.isPublished
+        )
+      : [];
 
   return (
     <>
@@ -76,10 +84,14 @@ const MainSection = () => {
         ))}
       </div>
       <div className="px-5">
-        <ButtonGroup onAddNewSubject={handleAddNewSubject} />
+        <ButtonGroup
+          onAddNewSubject={handleAddNewSubject}
+          selectedTab={selectedTab}
+          setSelectedTab={setSelectedTab}
+        />
         <div className="grid grid-cols-3 gap-4 mb-10">
-          {classDetails && classDetails.subjects && classDetails.subjects.length > 0 ? (
-            classDetails.subjects.map((subject, index) => (
+          {filteredSubjects.length > 0 ? (
+            filteredSubjects.map((subject, index) => (
               <SubjectCard
                 key={index}
                 data={subject}

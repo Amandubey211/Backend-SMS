@@ -1,7 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
-import { setTeacherAssign } from "../../../../Redux/Slices/Admin/ClassSlice";
+import { setTeacherAssign } from "../../../../../Redux/Slices/Admin/ClassSlice";
 
 const API_URL = process.env.REACT_APP_API_URL;
 

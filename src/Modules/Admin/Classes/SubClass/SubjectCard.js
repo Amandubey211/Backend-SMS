@@ -2,9 +2,11 @@ import React from "react";
 import { LuUser } from "react-icons/lu";
 import { BsBook } from "react-icons/bs";
 import { NavLink } from "react-router-dom";
-import { setSelectedSubject } from "../../../../Redux/Slices/Common/CommonSlice";
 import { useDispatch } from "react-redux";
+import { setSelectedSubject } from "../../../../Redux/Slices/Common/CommonSlice";
 import Icon1 from "../../../../Assets/ClassesAssets/SubClassAssets/SubjectIcons/image1.png";
+import { MdOutlineModeEdit } from "react-icons/md";
+import toast from "react-hot-toast";
 
 const SubjectCard = ({ data, backgroundColor, Class }) => {
   const formattedSid = data.name.toLowerCase().replace(/ /g, "_");
@@ -12,11 +14,14 @@ const SubjectCard = ({ data, backgroundColor, Class }) => {
 
   return (
     <div
-      className={`relative rounded-xl p-4 shadow-lg ${backgroundColor} transition-transform duration-300 transform hover:scale-105 hover:shadow-2xl`}
+      className={`relative rounded-xl p-4 shadow-lg ${backgroundColor} transition-transform duration-300 transform hover:scale-105 hover:shadow-2xl group`}
     >
+      <div onClick={()=>toast.success("No Figma Design ")} className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        <MdOutlineModeEdit className="text-green-800  bg-green-50 p-1 text-3xl rounded-full cursor-pointer" />
+      </div>
       <div className="flex justify-between items-center mb-4">
-        <button className="border border-white text-white rounded-full px-4 py-1">
-          {data.isPublished ? "Published" : "Publish"}
+        <button className={`border border-white rounded-full px-4 py-1 ${data.isPublished ? "text-green-600 bg-green-100" : "bg-pink-50 text-gray-600"}`}>
+          {data.isPublished ? "Publish" : "Unpublished"}
         </button>
       </div>
       <NavLink
@@ -52,7 +57,7 @@ const SubjectCard = ({ data, backgroundColor, Class }) => {
           <p className="text-white font-semibold">
             {data.teacherName || "Aman Dubey"}
           </p>
-          <p className="text-white  text-sm">{data.teacherRole || "Teacher"}</p>
+          <p className="text-white text-sm">{data.teacherRole || "Teacher"}</p>
         </div>
       </div>
       <img

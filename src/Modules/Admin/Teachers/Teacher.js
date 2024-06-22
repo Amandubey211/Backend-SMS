@@ -7,10 +7,9 @@ import { useSelector } from "react-redux";
 
 const Teacher = () => {
   const className = useSelector((store) => store.Common.selectedClass);
-
-  useNavHeading(className, "Teachers");
+  useNavHeading(className, "Instructors");
   return (
-    <Layout title={`${className} | Teachers | Student Diwan`}>
+    <Layout title={`${className} | Instructors | Student Diwan`}>
       <DashLayout children={<MainSection />} hideAvatarList={true} />
     </Layout>
   );

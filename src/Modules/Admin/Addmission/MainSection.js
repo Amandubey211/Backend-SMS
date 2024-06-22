@@ -3,7 +3,7 @@ import StudentInfo from "./StudentInfo";
 
 const MainSection = () => {
   return (
-    <div className="w-full p-5 ">
+    <div className="w-full  ">
       <StudentInfo />
     </div>
   );

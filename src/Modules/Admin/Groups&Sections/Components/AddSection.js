@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
-import useCreateSection from "../../../../Hooks/AuthHooks/Staff/Admin/useCreateSection";
+import useCreateSection from "../../../../Hooks/AuthHooks/Staff/Admin/Sections/useCreateSection";
 
 const AddSection = () => {
   const [sectionName, setSectionName] = useState("");

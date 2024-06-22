@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import useGetAllTeachers from "../../../Hooks/AuthHooks/Staff/Admin/useGetAllTeacher";
+import useGetAllTeachers from "../../../Hooks/AuthHooks/Staff/Admin/Teacher/useGetAllTeacher";
 import { useSelector } from "react-redux";
 // import useFetchSubjects from "../../../Hooks/AuthHooks/Staff/Admin/useFetchSubjects";
 import { useParams } from "react-router-dom";
-import useAssignTeacher from "../../../Hooks/AuthHooks/Staff/Admin/useAssignTeacher";
+import useAssignTeacher from "../../../Hooks/AuthHooks/Staff/Admin/Teacher/useAssignTeacher";
 
 const AssignTeacher = () => {
   const [teacherId, setTeacherId] = useState("");
@@ -101,7 +101,7 @@ const AssignTeacher = () => {
           }`}
           disabled={loading}
         >
-          {loading ? "Assigning..." : "Add New Teacher"}
+          {loading ? "Assigning..." : "Add New Instructor"}
         </button>
       </div>
     </form>

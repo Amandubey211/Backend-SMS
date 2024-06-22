@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
-import { setSectionsList } from "../../../../Redux/Slices/Admin/ClassSlice";
+import { setSectionsList } from "../../../../../Redux/Slices/Admin/ClassSlice";
 
 const useFetchSection = () => {
   const [loading, setLoading] = useState(false);
