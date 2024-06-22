@@ -1,15 +1,16 @@
 // src/components/AdmissionInfo.js
 
 import React, { useEffect } from "react";
+import useGetAllClasses from "../../../../Hooks/AuthHooks/Staff/Admin/useGetAllClasses";
+import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
-import useGetAllClassList from "../../../../Hooks/AuthHooks/Staff/useGetAllClassList";
 
 const AdmissionInfo = ({ studentInfo, handleInputChange }) => {
-  const { getClassList } = useGetAllClassList();
-
-  const classList = useSelector((store) => store.Admin.classList);
+  const { fetchClasses } = useGetAllClasses();
+  const { cid } = useParams();
+  const classList = useSelector((store) => store.Class.classList);
   useEffect(() => {
-    getClassList();
+    fetchClasses(cid);
   }, []);
   return (
     <div className="mt-6">
@@ -26,7 +27,7 @@ const AdmissionInfo = ({ studentInfo, handleInputChange }) => {
             <option value="">Choose Options</option>
             {classList?.map((classItem, index) => (
               <option key={index} value={classItem?._id} className="py-2">
-                {classItem.name}
+                {classItem.className}
               </option>
             ))}
           </select>
