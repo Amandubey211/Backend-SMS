@@ -3,14 +3,14 @@ import Layout from "../../../Components/Common/Layout";
 import DashLayout from "../../../Components/Admin/AdminDashLayout";
 import MainSection from "./MainSection";
 import useNavHeading from "../../../Hooks/CommonHooks/useNavHeading ";
-import { useParams } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const Teacher = () => {
-  const { cid } = useParams();
-  useNavHeading(cid, "Teachers");
+  const className = useSelector((store) => store.Common.selectedClass);
+  useNavHeading(className, "Instructors");
   return (
-    <Layout title={`${cid} | Teachers | Student Diwan`}>
-     <DashLayout children={<MainSection />}  hideAvatarList={true}/>
+    <Layout title={`${className} | Instructors | Student Diwan`}>
+      <DashLayout children={<MainSection />} hideAvatarList={true} />
     </Layout>
   );
 };

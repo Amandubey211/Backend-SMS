@@ -6,32 +6,40 @@ import AdmissionInfo from "./Components/AdmissionInfo";
 import ParentInfo from "./Components/ParentInfo";
 import TransferCertificateUpload from "./Components/TransferCertificateUpload";
 import StudentCard from "./Components/StudentCard";
+import useRegisterStudent from "../../../Hooks/AuthHooks/Staff/Admin/Students/useRegisterStudent";
 
 const StudentInfo = () => {
   const [studentInfo, setStudentInfo] = useState({
-    name: "",
-    studentId: "",
+    firstName: "",
+    lastName: "",
+    email: "",
     dateOfBirth: "",
+    placeOfBirth: "",
+    age: "",
     gender: "",
-    religion: "",
+    contactNumber: "",
     bloodGroup: "",
-    phone: "",
-    email: " ",
-    address: "Qatar Doha Hamad Medical City (2)",
-    class: "",
-    section: "",
-    session: "2024",
-    admissionFee: "",
-    status: "",
-    fatherName: "",
+    nationality: "",
     motherName: "",
-    parentEmail: "",
-    parentPhone: "",
-    transferCertificate: null,
+    fatherName: "",
+    guardianName: "",
+    guardianRelationToStudent: "",
+    guardianContactNumber: "",
+    guardianEmail: "",
+    permanentAddress: "",
+    residentialAddress: "",
+    emergencyNumber: "",
+    Q_Id: "",
+    enrollmentStatus: "",
+    transportRequirement: "",
+    schoolId: "",
+    profile: null,
   });
   const [imagePreview, setImagePreview] = useState(null);
   const [pdfPreview, setPdfPreview] = useState(null);
 
+  const { loading, error, registerStudent } = useRegisterStudent()
+  
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setStudentInfo({
@@ -48,6 +56,7 @@ const StudentInfo = () => {
         setImagePreview(reader.result);
       };
       reader.readAsDataURL(file);
+      setStudentInfo({ ...studentInfo, profile: file });
     }
   };
 
@@ -76,7 +85,8 @@ const StudentInfo = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(studentInfo);
+    // registerStudent(studentInfo);
+    console.log(studentInfo)
   };
 
   const handleRemoveImage = () => {
@@ -122,26 +132,30 @@ const StudentInfo = () => {
             handleTcChange={handleTcChange}
             clearPdfPreview={clearPdfPreview}
           />
-          {/* <div className="mt-6">
-            <button
+          <div className="mt-6">
+            {/* <button
               type="submit"
               className="px-4 py-2 bg-blue-600 text-white rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              disabled={loading}
             >
-              Submit
+              {loading ? "Registering..." : "Submit"}
             </button>
-          </div> */}
+            {error && <p className="text-red-500">{error}</p>} */}
+          </div>
         </form>
       </div>
-      <div>
+      <div className="">
         <StudentCard studentInfo={studentInfo} imagePreview={imagePreview} />
         <div className="mt-6">
           <button
             onClick={handleSubmit}
             type="submit"
-            className="w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600 text-center  "
+            className="w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600 text-center"
+            disabled={loading}
           >
-            Addmission Student
+              {loading ? "Registering..." : "Add Student"}
           </button>
+          {error && <p className="text-red-500">{error}</p>}
         </div>
       </div>
     </div>

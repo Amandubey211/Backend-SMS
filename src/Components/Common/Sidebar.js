@@ -1,9 +1,8 @@
 import React, { useEffect, useRef } from "react";
 import { RxCross2 } from "react-icons/rx";
 
-const Sidebar = ({ isOpen, title, onClose, children, footer,width }) => {
+const Sidebar = ({ isOpen, title, onClose, children,width }) => {
   const sidebarRef = useRef(null);
-console.log(width)
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
