@@ -85,7 +85,8 @@ const StudentInfo = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    registerStudent(studentInfo);
+    // registerStudent(studentInfo);
+    console.log(studentInfo)
   };
 
   const handleRemoveImage = () => {
@@ -132,18 +133,18 @@ const StudentInfo = () => {
             clearPdfPreview={clearPdfPreview}
           />
           <div className="mt-6">
-            <button
+            {/* <button
               type="submit"
               className="px-4 py-2 bg-blue-600 text-white rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               disabled={loading}
             >
               {loading ? "Registering..." : "Submit"}
             </button>
-            {error && <p className="text-red-500">{error}</p>}
+            {error && <p className="text-red-500">{error}</p>} */}
           </div>
         </form>
       </div>
-      <div>
+      <div className="">
         <StudentCard studentInfo={studentInfo} imagePreview={imagePreview} />
         <div className="mt-6">
           <button
@@ -152,8 +153,9 @@ const StudentInfo = () => {
             className="w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600 text-center"
             disabled={loading}
           >
-            Add Student
+              {loading ? "Registering..." : "Add Student"}
           </button>
+          {error && <p className="text-red-500">{error}</p>}
         </div>
       </div>
     </div>

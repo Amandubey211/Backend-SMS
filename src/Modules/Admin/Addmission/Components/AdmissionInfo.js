@@ -26,7 +26,7 @@ const AdmissionInfo = ({ studentInfo, handleInputChange }) => {
           >
             <option value="">Choose Options</option>
             {classList?.map((classItem, index) => (
-              <option key={index} value={classItem?._id} className="py-2">
+              <option key={index} value={classItem?.className} className="py-2">
                 {classItem.className}
               </option>
             ))}

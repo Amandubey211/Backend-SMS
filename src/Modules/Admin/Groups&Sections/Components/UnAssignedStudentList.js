@@ -18,9 +18,9 @@ const students = [
 const UnAssignedStudentList = () => {
   const { fetchUnassignedStudents } = useGetUnassignedStudents();
   const { cid } = useParams();
-  useEffect(() => {
-    fetchUnassignedStudents(cid);
-  }, []);
+  // useEffect(() => {
+  //   fetchUnassignedStudents(cid);
+  // }, []);
   return (
     <div className="w-80 p-4 bg-white rounded-lg shadow-sm border">
       <div className="mb-4">
