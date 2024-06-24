@@ -17,15 +17,17 @@ import { PiCertificateLight } from "react-icons/pi";
 import { RiUserAddLine } from "react-icons/ri";
 import { BsBook } from "react-icons/bs";
 import { TbNotebook } from "react-icons/tb";
+
 import { GrUserWorker } from "react-icons/gr";
 import { MdLocalLibrary,MdManageAccounts } from "react-icons/md";
 import { RiParentFill,RiAdminFill } from "react-icons/ri";
+
 
 const sidebarData = [
   {
     title: "Dashboard",
     icon: <TbDashboard />,
-    path: "/admin_dash",
+    path: `/dashboard`,
   },
   {
     title: "Classes",

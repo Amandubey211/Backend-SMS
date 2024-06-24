@@ -1,4 +1,6 @@
-import React from "react";
+import React, { useEffect } from "react";
+import useGetUnassignedStudents from "../../../../Hooks/AuthHooks/Staff/Admin/Students/useGetUnassignedStudents";
+import { useParams } from "react-router-dom";
 
 const students = [
   { name: "Annette Black", section: "Section A" },
@@ -14,6 +16,11 @@ const students = [
 ];
 
 const UnAssignedStudentList = () => {
+  const { fetchUnassignedStudents } = useGetUnassignedStudents();
+  const { cid } = useParams();
+  // useEffect(() => {
+  //   fetchUnassignedStudents(cid);
+  // }, []);
   return (
     <div className="w-80 p-4 bg-white rounded-lg shadow-sm border">
       <div className="mb-4">
