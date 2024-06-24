@@ -35,6 +35,7 @@ import StudentLibrarySection from "../Modules/Student/Library/MainSection/Libary
 import StudentEvent from "../Modules/Student/StudentEvent/StudentEvent.js";
 import StudentAnnounce from "../Modules/Student/Announcements/StudentAnnounce.js";
 
+//Parents 
 const Page = lazy(() =>
   import("../Modules/Admin/Subjects/Modules/Pages/Page.js")
 );
@@ -162,10 +163,15 @@ const VerificationPage = lazy(() =>
 const StudentDash = lazy(() =>
   import("../Modules/Student/Dashboard/StudentDash.js")
 );
-
+const ParentDash = lazy(() => import("../Modules/Parents/Dasboard/ParentDash.js"));
+const MyChildren = lazy(() => import("../Modules/Parents/Childrens/ChildScreen.js"));
+const MyTeacher = lazy(() => import("../Modules/Parents/Teachers/TeacherScreen.js"));
+const Calendar = lazy(() => import("../Modules/Parents/Attendance/ChildrenAttendence.js"));
+const ParentStudentNotice = lazy(() => import("../Modules/Parents/Notice/Annoucements/AllNotice.js"));
+const LibraryParent =  lazy(() => import("../Modules/Parents/Libary/LibraryDash.js"));
+const ParentFinance = lazy(()=> import("../Modules/Parents/ParentFinance.js"))
+const ParentChildGrade = lazy(()=> import("../Modules/Parents/Grades/ParentChildGrade.js"))
 const Dash = lazy(() => import("../Modules/Admin/Dashboard/Dash.js"));
-
-
 
 function App() {
   const [isOnline, setIsOnline] = useState(window.navigator.onLine);
@@ -350,16 +356,17 @@ function App() {
       errorElement: <Error />,
     },
 
-    
+
     {
       path: "accounting/studentfees",
       element: <AccountingSection />,
       errorElement: <Error />,
     },
-    { path: "library",
-       element: <Libary />, 
-       errorElement: <Error />
-   },
+    {
+      path: "library",
+      element: <Libary />,
+      errorElement: <Error />
+    },
     {
       path: "noticeboard/events",
       element: <EventSchool />,
@@ -385,121 +392,163 @@ function App() {
       element: <AllStudents />,
       errorElement: <Error />,
     },
-    { path: "/user/:cid",
-       element: <SingleStudent />, 
-       errorElement: <Error /> 
-      
+    {
+      path: "/user/:cid",
+      element: <SingleStudent />,
+      errorElement: <Error />
+
     },
     {
       path: "/users/teachers",
-      element:<AllTeachers/>,
+      element: <AllTeachers />,
       errorElement: <Error />,
     },
     {
       path: "/users/accountants",
-      element:<AllAccountants/>,
+      element: <AllAccountants />,
       errorElement: <Error />,
     },
     {
       path: "/users/parents",
-      element:<StudentParentProfile/>,
+      element: <StudentParentProfile />,
       errorElement: <Error />,
     },
     {
       path: "/users/libraians",
-      element:<AllLibraian/>,
+      element: <AllLibraian />,
       errorElement: <Error />,
     },
     {
       path: "/users/staffs",
-      element:<AllStaff/>,
+      element: <AllStaff />,
       errorElement: <Error />,
     },
     {
       path: "/users/admin",
-      element:<UserProfile/>,
+      element: <UserProfile />,
       errorElement: <Error />,
     },
     // Student Routes-----------------------------
-  // Student Routes-----------------------------
-{
-  path: "/student_dash",
-  element: <ProtectRoute Component={StudentDash} role="student" />,
-  errorElement: <Error />,
-},
-{
-  path: "/student_library",
-  element: <StudentLibrarySection />,
-  errorElement: <Error />,
-},
-{
-  path: "/student_finance",
-  element: <StudentFinance />,
-  errorElement: <Error />,
-},
-{
-  path: "/student_class",
-  element: <StudentClass />,
-  errorElement: <Error />,
-},
-{
-  path: "/student/noticeboard/events",
-  element: <StudentEvent />,
-  errorElement: <Error />,
-},
-{
-  path: "/student/noticeboard/announcements",
-  element: <StudentAnnounce />,
-  errorElement: <Error />,
-},
+    // Student Routes-----------------------------
+    {
+      path: "/student_dash",
+      element: <ProtectRoute Component={StudentDash} role="student" />,
+      errorElement: <Error />,
+    },
+    {
+      path: "/student_library",
+      element: <StudentLibrarySection />,
+      errorElement: <Error />,
+    },
+    {
+      path: "/student_finance",
+      element: <StudentFinance />,
+      errorElement: <Error />,
+    },
+    {
+      path: "/student_class",
+      element: <StudentClass />,
+      errorElement: <Error />,
+    },
+    {
+      path: "/student/noticeboard/events",
+      element: <StudentEvent />,
+      errorElement: <Error />,
+    },
+    {
+      path: "/student/noticeboard/announcements",
+      element: <StudentAnnounce />,
+      errorElement: <Error />,
+    },
 
-  
-  
-    //   {
-  //     path: "/student_dash",
-  //     element: <ProtectRoute Component={StudentDash} role="student" />,
-  //     errorElement: <Error />,
-  //   },
-  //   {
-  //     path: "/student_Library",
-  //     element: <StudentLibrarySection/>,
-  //     errorElement: <Error />,
-  //   },
-  //   // {
-  //   //   path: "/student_Library",
-  //   //   element: <ProtectRoute Component={Libary} role="student" />,
-  //   //   errorElement: <Error />,
-  //   // },
-  //   {
-  //     path: "/student_finance",
-  //     element: <StudentFinance/>,
-  //     errorElement: <Error />,
-  //   },
-  //   {
-  //     path: "/student_class",
-  //     element: <StudentClass/>,
-  //     errorElement: <Error />,
-  //   },
-  //  {
-  //     path: "/student/noticeboard/events",
-  //     element: <StudentEvent />,
-  //     errorElement: <Error />,
-  //   },
-  //   {
-  //     path: "/student/noticeboard/announcements",
-  //     element: <StudentAnnounce />,
-  //     errorElement: <Error />,
-  //   },
-  //  {
-  //     path: "/student_dash/student/noticeboard/events",
-  //     element: <StudentEvent />,
-  //     errorElement: <Error />,
-  //   },
-  //   {
-  //     path: "/student_dash/student/noticeboard/announcements",
-  //     element: <StudentAnnounce />,
-  //     errorElement: <Error />,
-  //   },
+
+
+    {
+      path: "/student_dash",
+      element: <ProtectRoute Component={StudentDash} role="student" />,
+      errorElement: <Error />,
+    },
+    {
+      path: "/student_Library",
+      element: <StudentLibrarySection />,
+      errorElement: <Error />,
+    },
+    // {
+    //   path: "/student_Library",
+    //   element: <ProtectRoute Component={Libary} role="student" />,
+    //   errorElement: <Error />,
+    // },
+    {
+      path: "/student_finance",
+      element: <StudentFinance />,
+      errorElement: <Error />,
+    },
+    {
+      path: "/student_class",
+      element: <StudentClass />,
+      errorElement: <Error />,
+    },
+    {
+      path: "/student/noticeboard/events",
+      element: <StudentEvent />,
+      errorElement: <Error />,
+    },
+    {
+      path: "/student/noticeboard/announcements",
+      element: <StudentAnnounce />,
+      errorElement: <Error />,
+    },
+    {
+      path: "/student_dash/student/noticeboard/events",
+      element: <StudentEvent />,
+      errorElement: <Error />,
+    },
+    {
+      path: "/student_dash/student/noticeboard/announcements",
+      element: <StudentAnnounce />,
+      errorElement: <Error />,
+    },
+    //Parent Routes
+    {
+      path: "/parent_dash",
+      element: <ParentDash />,
+      errorElement: <Error />,
+    },
+    {
+      path: "/children",
+      element: <MyChildren />,
+      errorElement: <Error />
+    },
+    {
+      path: "/teacher",
+      element: <MyTeacher />,
+      errorElement: <Error />
+    },
+    {
+      path: "/calender",
+      element: <Calendar />,
+      errorElement: <Error />
+    },
+    {
+      path: "/parentchildnotice",
+      element: <ParentStudentNotice />,
+      errorElement: <Error />
+    },
+    {
+      path: "/parentlibrary",
+      element: <LibraryParent />,
+      errorElement: <Error />
+    },
+    {
+      path:"/parentfinance",
+      element:<ParentFinance/>,
+      errorElement:<Error/>
+    },
+    {
+      path:"/parentchildgrade",
+      element:<ParentChildGrade/>,
+      errorElement:<Error/>
+    }
   ]);
 
   return (
