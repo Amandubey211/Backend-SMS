@@ -637,7 +637,7 @@ function App() {
       path:"/parentchildgrade",
       element:<ParentChildGrade/>,
       errorElement:<Error/>
-    }
+    },
 
   // Student Routes-----------------------------
 {
