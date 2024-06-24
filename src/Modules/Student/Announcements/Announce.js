@@ -5,10 +5,7 @@ import Sidebar from "../../../Components/Common/Sidebar";
 import { notices } from "../../Admin/dummyData/dummyData";
 import AllNotice from "./AllNotice";
 
-// import Layout from "../../../../Components/Common/Layout";
-// import DashLayout from "../../../../Components/Admin/AdminDashLayout";
-// import Sidebar from "../../../../Components/Common/Sidebar";
-// import AddAnnouncement from "./AddAnnouncement";
+
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { MdQueryBuilder } from "react-icons/md";
@@ -85,19 +82,7 @@ const Announce = () => {
                         <div className="flex flex-row gap-[50px] text-xs">
                           <div className="flex   flex-wrap  justify-center items-center  ">
                             
-                            {/* <FontAwesomeIcon
-                              style={{
-                                color: "gray",
-                                background: " ",
-                                margin: "0",
-                                padding: "0",
-                                height: "13px",
-                                width: "13px",
-                                borderRadius: "50%",
-                                marginRight: "5px",
-                              }}
-                              icon={faClock}
-                            /> */}
+                           
 
                             <MdQueryBuilder
                               style={{
@@ -135,12 +120,7 @@ const Announce = () => {
                   </div>
                 </div>
 
-                // <AllNotice
-                // key={notice.id}
-                // notice={notice}
-                // onToggle={() => toggleAccordion(index)}
-                // isActive={activeIndex === index}
-                // />
+               
               ))}
             </div>
           </div>
