@@ -75,20 +75,7 @@ const StudentAnnounce = () => {
                         <div className="flex flex-row gap-[50px] text-xs">
                           <div className="flex   flex-wrap  justify-center items-center  ">
                             
-                            {/* <FontAwesomeIcon
-                              style={{
-                                color: "gray",
-                                background: " ",
-                                margin: "0",
-                                padding: "0",
-                                height: "13px",
-                                width: "13px",
-                                borderRadius: "50%",
-                                marginRight: "5px",
-                              }}
-                              icon={faClock}
-                            /> */}
-
+                          
                             <MdQueryBuilder
                               style={{
                                 color: "gray",
@@ -125,12 +112,7 @@ const StudentAnnounce = () => {
                   </div>
                 </div>
 
-                // <AllNotice
-                // key={notice.id}
-                // notice={notice}
-                // onToggle={() => toggleAccordion(index)}
-                // isActive={activeIndex === index}
-                // />
+               
               ))}
             </div>
           </div>

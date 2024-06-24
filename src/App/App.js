@@ -29,7 +29,6 @@ import UserProfile from "../Modules/Admin/UsersProfiles/AdminProfile/UserProfile
 import "./App.css";
 import StudentLibrary from "../Modules/Student/Library/StudentLibrary.js";
 import StudentFinance from "../Modules/Student/StudentFinance.js";
-import StudentClass from "../Modules/Student/StudentClass.js";
 import StudentLibrarySection from "../Modules/Student/Library/MainSection/Libary.js";
 import StudentEvent from "../Modules/Student/StudentEvent/StudentEvent.js";
 import StudentAnnounce from "../Modules/Student/Announcements/StudentAnnounce.js";
@@ -141,6 +140,84 @@ const Assignment = lazy(() =>
 const Module = lazy(() =>
   import("../Modules/Admin/Subjects/Modules/Module/Module.js")
 );
+const StudentModule = lazy(() =>
+  import("../Modules/Student/StudentClass/Subjects/Modules/Module/Module.js")
+);
+const StudentAssignmentList = lazy(() =>
+  import(
+    "../Modules/Student/StudentClass/Subjects/Modules/Assignments/AllAssignments/AssignmentList.js"
+  )
+);
+
+const StudentAssignmentView = lazy(() =>
+  import("../Modules/Student/StudentClass/Subjects/Modules/Assignments/Assignment.js")
+);
+
+// student quiz import
+
+const StudentQuizzList = lazy(() =>
+  import("../Modules/Student/StudentClass/Subjects/Modules/Quizzes/QuizzList/QuizzList.js")
+);
+
+const StudentQuizzesView = lazy(() =>
+  import("../Modules/Student/StudentClass/Subjects/Modules/Quizzes/Quizzes.js")
+);
+// ---------
+
+// student Discussion import
+
+const StudentDiscussion = lazy(() =>
+  import("../Modules/Student/StudentClass/Subjects/Modules/Discussion/Discussion.js")
+);
+const StudentDiscussionView = lazy(() =>
+  import(
+    "../Modules/Student/StudentClass/Subjects/Modules/Discussion/DiscussionView/DiscussionView.js"
+  )
+);
+// ---------
+// student Announcemnt  import
+
+const StudentAnnouncementView = lazy(() =>
+  import(
+    "../Modules/Student/StudentClass/Subjects/Modules/Announcement/AnnouncementView/AnnouncementView.js"
+  )
+);
+const StudentAnnouncement = lazy(() =>
+  import("../Modules/Student/StudentClass/Subjects/Modules/Announcement/Announcement.js")
+);
+// ---------
+
+
+// student Grade import
+
+const StudentGrade = lazy(() =>
+  import("../Modules/Student/StudentClass/Subjects/Modules/Grades/Grade.js")
+);
+
+
+// ---------
+// student Grade import
+
+const StudentSyllabus = lazy(() =>
+  import("../Modules/Student/StudentClass/Subjects/Modules/Syllabus/SyllabusView/Syllabus.js")
+);
+
+// ---------
+// student page import
+
+const StudentPage = lazy(() =>
+  import("../Modules/Student/StudentClass/Subjects/Modules/Pages/Page.js")
+);
+
+const StudentPageView = lazy(() =>
+  import(
+    "../Modules/Student/StudentClass/Subjects/Modules/Pages/PageView/PageView.js"
+  )
+);
+
+// ---------
+
+
 const Attendance = lazy(() =>
   import("../Modules/Admin/Attendance/Attendance.js")
 );
@@ -150,6 +227,13 @@ const Addmission = lazy(() =>
 );
 const Classes = lazy(() => import("../Modules/Admin/Classes/Classes.js"));
 const Class = lazy(() => import("../Modules/Admin/Classes/SubClass/Class.js"));
+const StudentClass = lazy(() => import("../Modules/Student/StudentClass/SubClass/StudentClass.js"));
+// import StudentClass from "../Modules/Student/StudentClass.js";
+const StudentCreateAssignment = lazy(() =>
+  import(
+    "../Modules/Student/StudentClass/Subjects/Modules/Assignments/CreateAssignment/CreateAssignment.js"
+  )
+);
 const Teachers = lazy(() => import("../Modules/Admin/Teachers/Teacher.js"));
 const UnVerifiedStudentDetails = lazy(() =>
   import(
@@ -164,6 +248,7 @@ const StudentDash = lazy(() =>
 );
 
 const Dash = lazy(() => import("../Modules/Admin/Dashboard/Dash.js"));
+
 
 
 
@@ -279,11 +364,13 @@ function App() {
       element: <ProtectRoute Component={QuizzList} allowedRoles={["admin", "teacher"]} />,
       errorElement: <Error />,
     },
+    
     {
       path: "/class/:cid/:sid/quizzes/:qid/view",
       element: <ProtectRoute Component={Quizzes} allowedRoles={["admin", "teacher"]} />,
       errorElement: <Error />,
     },
+   
     {
       path: "/class/:cid/:sid/create_quiz",
       element: <ProtectRoute Component={CreateQuizzes} allowedRoles={["admin", "teacher"]} />,
@@ -341,6 +428,7 @@ function App() {
       errorElement: <Error />,
     },
 
+
     // Student Routes-----------------------------
     {
       path: "/student_dash",
@@ -378,6 +466,130 @@ function App() {
       element: <ProtectRoute Component={AllStudents} allowedRoles={["admin", "teacher"]} />,
       errorElement: <Error />,
     },
+    {
+      path: "/users/libraians",
+      element:<AllLibraian/>,
+      errorElement: <Error />,
+    },
+    {
+      path: "/users/staffs",
+      element:<AllStaff/>,
+      errorElement: <Error />,
+    },
+    {
+      path: "/users/admin",
+      element:<UserProfile/>,
+      errorElement: <Error />,
+    },
+    // Student Routes-----------------------------
+  // Student Routes-----------------------------
+{
+  path: "/student_dash",
+  element: <ProtectRoute Component={StudentDash} role="student" />,
+  errorElement: <Error />,
+},
+{
+  path: "/student_library",
+  element: <StudentLibrarySection />,
+  errorElement: <Error />,
+},
+{
+  path: "/student_finance",
+  element: <StudentFinance />,
+  errorElement: <Error />,
+},
+{
+  path: "/student_class",
+  element: <StudentClass />,
+  errorElement: <Error />,
+},
+{
+  path: "/student/noticeboard/events",
+  element: <StudentEvent />,
+  errorElement: <Error />,
+},
+{
+  path: "/student/noticeboard/announcements",
+  element: <StudentAnnounce />,
+  errorElement: <Error />,
+},
+{
+  path: "/student_class/:sid/module",
+  element: <ProtectRoute Component={StudentModule} role="student" />,
+  errorElement: <Error />,
+},
+
+{
+  path: "/student_class/:sid/assignments",
+  element: <ProtectRoute Component={StudentAssignmentList} role="student" />,
+  errorElement: <Error />,
+},
+{
+  path: "/student_class/:sid/assignments/:aid/view",
+  element: <ProtectRoute Component={StudentAssignmentView} role="student" />,
+  errorElement: <Error />,
+},
+{
+  path: "/student_class/:sid/createassignment",
+  element: <ProtectRoute Component={StudentCreateAssignment} role="student" />,
+  errorElement: <Error />,
+},
+
+{
+  path: "/student_class/:sid/quizzes",
+  element: <ProtectRoute Component={StudentQuizzList} role="student" />,
+  errorElement: <Error />,
+},
+{
+  path: "/student_class/:sid/quizzes/:qid/view",
+  element: <ProtectRoute Component={StudentQuizzesView} role="student" />,
+  errorElement: <Error />,
+},
+{
+  path: "/student_class/:sid/discussions",
+  element: <ProtectRoute Component={StudentDiscussion} role="student" />,
+  errorElement: <Error />,
+},
+{
+  path: "/student_class/:sid/discussions/:did/view",
+  element: <ProtectRoute Component={StudentDiscussionView} role="student" />,
+  errorElement: <Error />,
+},
+{
+  path: "/student_class/:sid/grades",
+  element: <ProtectRoute Component={StudentGrade} role="student" />,
+  errorElement: <Error />,
+},
+
+{
+  path: "/student_class/:sid/announcements",
+  element: <ProtectRoute Component={StudentAnnouncement} role="student" />,
+  errorElement: <Error />,
+},
+{
+  path: "/student_class/:sid/announcements/:aid/view",
+  element: <ProtectRoute Component={StudentAnnouncementView} role="student" />,
+  errorElement: <Error />,
+},
+{
+  path: "/student_class/:sid/syllabus",
+  element: <ProtectRoute Component={StudentSyllabus} role="student" />,
+  errorElement: <Error />,
+},
+
+{
+  path: "/student_class/:sid/page",
+  element: <ProtectRoute Component={StudentPage} role="student" />,
+  errorElement: <Error />,
+},
+
+{
+  path: "/student_class/:sid/pages/:did/view",
+  element: <ProtectRoute Component={StudentPageView} role="student" />,
+  errorElement: <Error />,
+},
+
+ 
     { path: "/user/:cid", element: <SingleStudent />, errorElement: <Error /> },
   ]);
   

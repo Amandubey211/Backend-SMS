@@ -71,7 +71,6 @@ const BookIssue = () => {
               <th className="px-5 py-3 border-b-2 border-gray-200">Author</th>
               <th className="px-5 py-3 border-b-2 border-gray-200">Date</th>
               <th className="px-5 py-3 border-b-2 border-gray-200">Status</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200">Action</th>
             </tr>
           </thead>
           <tbody>

@@ -4,16 +4,7 @@ import React from 'react';
 const BookIssueRow = ({ item }) => {
     return (
         <tr className="text-left text-gray-700 bg-gray-100">
-            {/* <td className="px-5 py-3 border-b border-gray-200">
-                <div className="flex items-center">
-                    <img src={item.image} alt="Profile" className="h-8 w-8 rounded-full mr-2"/>
-                    <span>{item.studentName}</span>
-                </div>
-            </td>
-            <td className="px-5 py-2 border-b border-gray-200">
-                <div className="text-base">class-{item.classLevel}</div>
-                <div className="text-[12px]">section-{item.section}</div>
-            </td> */}
+           
             <td className="px-5 py-3 border-b border-gray-200">
                 <div className="flex items-center">
                     <img src={item.image} alt="Profile" className="h-8 w-8 mr-2"/>
