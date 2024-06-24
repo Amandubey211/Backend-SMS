@@ -1,32 +1,38 @@
 import React, { useState } from "react";
 import { useLocation, NavLink } from "react-router-dom";
 import StudentDiwanLogo from "../../Assets/HomeAssets/StudentDiwanLogo.png";
+import smallLogo from "../../Assets/SideBarAsset/smallLogo.png";
+import sidebarData from "./DataFile/sidebarData.js";
 import {
   MdOutlineKeyboardArrowUp,
   MdOutlineKeyboardArrowDown,
 } from "react-icons/md";
-import sidebarData from "./DataFile/sidebarData.js";
 import { FiLogOut } from "react-icons/fi";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { useDispatch, useSelector } from "react-redux";
-import smallLogo from "../../Assets/SideBarAsset/smallLogo.png";
 import { toggleSidebar } from "../../Redux/Slices/SidebarSlice.js";
-const isActivePath = (path, locationPath) => {
-  return locationPath.startsWith(path);
-};
+import useStaffLogout from "../../Hooks/AuthHooks/Staff/useStaffLogOut.js";
+
+const isActivePath = (path, locationPath) => locationPath.startsWith(path);
 
 const SideMenubar = () => {
-  const isOpen = useSelector((state) => state.sidebar.isOpen);
-  const location = useLocation();
-  const [openItems, setOpenItems] = useState([]);
-  const isSidebarOpen = useSelector((state) => state.sidebar.isOpen);
   const dispatch = useDispatch();
+  const location = useLocation();
+  const { staffLogout } = useStaffLogout();
+
+  const { isOpen, role } = useSelector((state) => ({
+    isOpen: state.sidebar.isOpen,
+    role: state.Auth.role,
+  }));
+
+  const [openItems, setOpenItems] = useState([]);
+
   const toggleDropdown = (title) => {
-    if (openItems.includes(title)) {
-      setOpenItems(openItems.filter((item) => item !== title));
-    } else {
-      setOpenItems([...openItems, title]);
-    }
+    setOpenItems((prevOpenItems) =>
+      prevOpenItems.includes(title)
+        ? prevOpenItems.filter((item) => item !== title)
+        : [...prevOpenItems, title]
+    );
   };
 
   return (
@@ -34,27 +40,34 @@ const SideMenubar = () => {
       className={`transition-all duration-300 h-screen p-1 z-10 bg-white border-r flex flex-col ${
         isOpen ? "w-[15%]" : "w-[7%]"
       }`}
+      aria-label="Sidebar"
     >
-      <NavLink to="/admin_dash" className="relative flex items-center justify-center border-b pb-1">
-        <img
-          src={isOpen ? StudentDiwanLogo : smallLogo}
-          alt="Logo"
-          className={`transition-width  duration-300 ${
-            isOpen ? "w-36 pt-1" : "h-12"
-          }`}
-        />
+      <div className="relative flex items-center justify-center border-b pb-1">
+        <NavLink to="/dashboard" aria-label="Dashboard">
+          <img
+            src={isOpen ? StudentDiwanLogo : smallLogo}
+            alt="Logo"
+            className={`transition-width duration-300 ${
+              isOpen ? "w-36 pt-1" : "h-12"
+            }`}
+          />
+        </NavLink>
         <button
-          onClick={() => dispatch(toggleSidebar())}
-          className="focus:outline-none absolute bottom-0 right-0 "
+          onClick={(e) => {
+            e.stopPropagation();
+            dispatch(toggleSidebar());
+          }}
+          className="absolute bottom-0 right-0"
+          aria-label="Toggle Sidebar"
         >
-          <div className="p-1 rounded-full text-purple-500 -mr-4 -mb-4   z-40 bg-white border-2">
-            {isSidebarOpen ? <IoIosArrowBack /> : <IoIosArrowForward />}
+          <div className="p-1 rounded-full text-purple-500 -mr-4 -mb-4 z-40 bg-white border-2">
+            {isOpen ? <IoIosArrowBack /> : <IoIosArrowForward />}
           </div>
         </button>
-      </NavLink>
-      <div className="mt-4 p-2">
+      </div>
+      <div className="mt-4 p-2 flex-grow">
         {isOpen && <h2 className="text-gray-500">MENU</h2>}
-        <ul className="mt-1 space-y-2 flex-grow">
+        <ul className="mt-1 space-y-2">
           {sidebarData.map((item, index) => (
             <React.Fragment key={index}>
               {item.items ? (
@@ -65,8 +78,12 @@ const SideMenubar = () => {
                       : "text-gray-700 hover:bg-gray-100"
                   } ${isOpen ? "justify-between" : "justify-center"}`}
                   onClick={() => toggleDropdown(item.title)}
+                  role="button"
+                  aria-expanded={openItems.includes(item.title)}
+                  aria-controls={`submenu-${index}`}
+                  tabIndex="0"
                 >
-                  <div className={`flex justify-center items-center`}>
+                  <div className="flex justify-center items-center">
                     <span className={`${!isOpen && "text-xl"}`}>
                       {item.icon}
                     </span>
@@ -100,6 +117,7 @@ const SideMenubar = () => {
                         : "text-gray-700 hover:bg-gray-100"
                     } ${isOpen ? "" : "justify-center"}`
                   }
+                  aria-label={item.title}
                 >
                   <span className={`${!isOpen && "text-xl"}`}>{item.icon}</span>
                   {isOpen && (
@@ -110,7 +128,7 @@ const SideMenubar = () => {
                 </NavLink>
               )}
               {openItems.includes(item.title) && item.items && (
-                <ul className="pl-2 space-y-2">
+                <ul id={`submenu-${index}`} className="pl-2 space-y-2">
                   {item.items.map((subItem, subIndex) => (
                     <NavLink
                       key={subIndex}
@@ -123,6 +141,7 @@ const SideMenubar = () => {
                             : "text-gray-700 hover:bg-gray-100"
                         } ${isOpen ? "" : "justify-center"}`
                       }
+                      aria-label={subItem.title}
                     >
                       {subItem.icon}
                       {isOpen && (
@@ -138,26 +157,27 @@ const SideMenubar = () => {
           ))}
         </ul>
       </div>
-
-      {/* This section is always at the bottom */}
+      {/* Avatar section placed always at the bottom */}
       <div className="mt-auto p-2">
-        <div className="flex items-center">
+        <div className="flex items-center justify-between">
           <img
-            src="https://avatars.githubusercontent.com/u/109097090?v=4" // Path to the profile image
+            src="https://avatars.githubusercontent.com/u/109097090?v=4"
             alt="Profile"
             className={`${isOpen ? "w-10 h-10" : "w-8 h-8"} rounded-full`}
           />
           {isOpen && (
             <div className="ml-4">
-              <h2 className="text-sm font-semibold">Raihan Khan</h2>
-              <p className="text-gray-500">Admin</p>
+              <h2 className="text-sm font-semibold">{"Aman Dubey"}</h2>
+              <p className="text-gray-500 capitalize">{role}</p>
             </div>
           )}
-          <FiLogOut
-            className={`${
-              isOpen ? "w-6 h-6" : "w-4 h-4"
-            } text-gray-500 ml-auto ${!isOpen && "ml-0"}`}
-          />
+          <button title="logout" onClick={staffLogout} className="ml-3" aria-label="Logout">
+            <FiLogOut
+              className={`${
+                isOpen ? "w-7 h-7" : "w-5 h-5"
+              } text-gray-500  ${!isOpen && "ml-0"}`}
+            />
+          </button>
         </div>
       </div>
     </nav>

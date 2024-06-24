@@ -13,7 +13,8 @@ const SubjectCard = ({ data, backgroundColor,Class}) => {
           Publish
         </button>
       </div>
-      <NavLink to={`/class/${Class}/${formattedSid}/module`} >
+      {/* <NavLink to={`/student_class/${Class}/${formattedSid}/module`} > */}
+      <NavLink to={`/student_class/${formattedSid}/module`} >
 
 
       <h2 className="text-xl font-bold text-white w-[65%]">{data.title}</h2>    

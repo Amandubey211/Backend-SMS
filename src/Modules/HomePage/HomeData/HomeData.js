@@ -7,7 +7,7 @@ const HomeData = [
     path: "/stafflogin",
     imgSrc: TeacherBtnLogo,
     altText: "TeacherAccessLogo",
-    title: "Teacher Account",
+    title: "Staff Account",
     description: "I’m an Instructor/School Admin/IT Specialist",
   },
   {

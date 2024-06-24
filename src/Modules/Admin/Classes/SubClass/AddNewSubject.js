@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import classIcons from "../../Dashboard/DashboardData/ClassIconData";
 import toast from "react-hot-toast";
 import EditorSelector from "./Components/EditorSelector";
+import useCreateSubject from "../../../../Hooks/AuthHooks/Staff/Admin/useCreateSubject";
+import { useParams } from "react-router-dom";
 
 const dummyColors = [
   "#34D399",
@@ -24,34 +26,36 @@ const dummyColors = [
   "#D97706",
   "#4B5563",
 ];
-// const dummyuser = [
-// "Aman Dubey", "Akash","Huda","Faharan"
-// ]
 
-const AddNewSubject = () => {
+const AddNewSubject = ({ onClose }) => {
   const [activeTab, setActiveTab] = useState("icon");
   const [selectedColor, setSelectedColor] = useState("");
   const [activeIconId, setActiveIconId] = useState(null);
   const [subjectTitle, setSubjectTitle] = useState("");
   const [selectedUsers, setSelectedUsers] = useState([]);
+  const { createSubject, loading, error } = useCreateSubject();
+  const { cid } = useParams(); // Get classId from URL parameters
 
   const handleIconClick = (id) => {
     setActiveIconId(id);
   };
 
-  const handleSave = (publish = false) => {
-    const formData = {
-      subjectTitle,
-      selectedColor,
-      activeIconId,
-      selectedUsers,
-      publish,
+  const handleSave = async (publish = false) => {
+    const subjectData = {
+      name: subjectTitle,
+      classId: cid,
+      isPublished: publish,
+      icon: activeIconId,
+      color: selectedColor,
+      users: selectedUsers,
     };
-    console.log(formData);
-    if (publish) {
-      toast.success("Saved and Published", { position: "bottom-left" });
-    } else {
-      toast.success("Subject Saved", { position: "bottom-left" });
+
+    const result = await createSubject(subjectData);
+
+    if (result.success) {
+      toast.success(publish ? "Saved and Published" : "Subject Saved", {
+        position: "bottom-left",
+      });
     }
   };
 
@@ -69,13 +73,16 @@ const AddNewSubject = () => {
           id="subject-title"
           value={subjectTitle}
           onChange={(e) => setSubjectTitle(e.target.value)}
-          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+          className="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
           placeholder="Type here"
         />
       </div>
 
       <div className="mb-4">
-        <EditorSelector selectedUsers={selectedUsers} setSelectedUsers={setSelectedUsers} />
+        <EditorSelector
+          selectedUsers={selectedUsers}
+          setSelectedUsers={setSelectedUsers}
+        />
       </div>
 
       <div className="flex mb-4">
@@ -147,6 +154,7 @@ const AddNewSubject = () => {
           style={{
             background: "linear-gradient(to right, #fce7f3, #e9d5ff)",
           }}
+          disabled={loading}
         >
           <span
             style={{
@@ -161,10 +169,12 @@ const AddNewSubject = () => {
         <button
           onClick={() => handleSave(false)}
           className="flex-grow px-6 py-2 text-white font-semibold rounded-md bg-gradient-to-r from-purple-500 to-red-500 hover:from-purple-600 hover:to-red-600 text-center"
+          disabled={loading}
         >
           Save
         </button>
       </div>
+      {error && <p className="text-red-500 text-center">{error}</p>}
     </div>
   );
 };

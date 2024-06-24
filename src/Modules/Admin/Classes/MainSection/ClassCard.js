@@ -3,18 +3,22 @@ import leftLogo from "../../../../Assets/ClassesAssets/ClassCardLeftLogo.png";
 import RightLogo from "../../../../Assets/ClassesAssets/ClassCardRightLogo.png";
 import centerLogo from "../../../../Assets/ClassesAssets/ClassCardCenterLogo.png";
 import { NavLink } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { setSelectedClass } from "../../../../Redux/Slices/Common/CommonSlice";
 
 const ClassCard = ({
   className,
-  classurl,
-  teachers,
+   teachersCount,
   students,
   sections,
   groups,
+  classId,
 }) => {
+  const dispatch = useDispatch();
   return (
     <NavLink
-      to={`/class/${classurl}`}
+      to={`/class/${classId}`}
+      onClick={() => dispatch(setSelectedClass(className))}
       className="group p-1 pb-4 border rounded-lg shadow-lg transform transition-transform duration-300 ease-in-out hover:scale-110 hover:shadow-xl"
     >
       <div className="flex justify-between items-center px-1">
@@ -30,8 +34,10 @@ const ClassCard = ({
         />
       </div>
       <div className="flex flex-col gap-1 justify-center items-center -mt-4">
-        <h2 className="text-xl font-bold text-purple-600">{className}</h2>
-        <p>{teachers} Teachers</p>
+        <h2 className="text-xl font-bold text-purple-600 capitalize">
+          {className}
+        </h2>
+        <p>{teachersCount} Teachers</p>
         <img src={centerLogo} className="w-20" alt="center_logo" />
       </div>
       <div className="flex justify-between items-center px-3">
