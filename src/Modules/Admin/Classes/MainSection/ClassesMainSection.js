@@ -6,6 +6,8 @@ import AddNewClass from "./AddNewClass";
 import { useSelector } from "react-redux";
 import Fallback from "../../../../Components/Common/Fallback";
 import useGetAllClasses from "../../../../Hooks/AuthHooks/Staff/Admin/Class/useGetAllClasses";
+import toast from "react-hot-toast";
+import { PiSpinner } from "react-icons/pi";
 
 const ClassesMainSection = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -30,7 +32,7 @@ const ClassesMainSection = () => {
         </button>
       </div>
       {loading ? (
-        <Fallback />
+        <PiSpinner className="animate-spin text-3xl" />
       ) : error ? (
         <p className="text-red-500">{error}</p>
       ) : (

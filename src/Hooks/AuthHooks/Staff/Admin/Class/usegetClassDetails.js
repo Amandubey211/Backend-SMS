@@ -21,8 +21,8 @@ const useGetClassDetails = () => {
       const response = await axios.get(`${API_URL}/admin/class/${classId}`, {
         headers: { Authentication: token },
       });
-      dispatch(setClass(response.data.data));
-      dispatch(setSubjects(response.data.data.subjects));
+      dispatch(setClass(response.data?.data));
+      dispatch(setSubjects(response.data?.data?.subjects));
       // console.log(response.data.data)
       setLoading(false);
     } catch (err) {

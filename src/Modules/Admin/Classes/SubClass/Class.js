@@ -10,13 +10,14 @@ import useGetClassDetails from "../../../../Hooks/AuthHooks/Staff/Admin/Class/us
 const Class = () => {
   const className = useSelector((store) => store.Common.selectedClass);
   useNavHeading(className);
+  console.log("Class List Rendered")
 
   const { fetchClassDetails } = useGetClassDetails();
-  const { cid } = useParams(); // Destructure to get the class ID
+  const { cid } = useParams();
 
   useEffect(() => {
     fetchClassDetails(cid);
-  }, []); // Add fetchClassDetails to the dependency array
+  }, []);
 
   return (
     <Layout title={`${className} | Student diwan`}>
