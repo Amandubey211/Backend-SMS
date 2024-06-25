@@ -2,8 +2,8 @@ import { useState, useCallback } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
-import { setClass } from "../../../../Redux/Slices/Admin/ClassSlice";
-import { setSubjects } from "../../../../Redux/Slices/Admin/SubjectSlice";
+import { setClass } from "../../../../../Redux/Slices/Admin/ClassSlice";
+import { setSubjects } from "../../../../../Redux/Slices/Admin/SubjectSlice";
 
 const useGetClassDetails = () => {
   const [loading, setLoading] = useState(false);
@@ -13,7 +13,7 @@ const useGetClassDetails = () => {
   const API_URL = process.env.REACT_APP_API_URL;
   const dispatch = useDispatch();
 
-  const fetchClassDetails = useCallback(async (classId) => {
+  const fetchClassDetails = async (classId) => {
     setLoading(true);
     setError(null);
     try {
@@ -22,7 +22,7 @@ const useGetClassDetails = () => {
         headers: { Authentication: token },
       });
       dispatch(setClass(response.data.data));
-      dispatch(setSubjects(response.data.data.subjects))
+      dispatch(setSubjects(response.data.data.subjects));
       // console.log(response.data.data)
       setLoading(false);
     } catch (err) {
@@ -32,7 +32,7 @@ const useGetClassDetails = () => {
       setLoading(false);
       setError(errorMessage);
     }
-  }, [API_URL, role, dispatch]);
+  };
 
   return { loading, error, fetchClassDetails };
 };

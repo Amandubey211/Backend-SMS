@@ -4,8 +4,8 @@ import ClassCard from "./ClassCard";
 import Sidebar from "../../../../Components/Common/Sidebar";
 import AddNewClass from "./AddNewClass";
 import { useSelector } from "react-redux";
-import useGetAllClasses from "../../../../Hooks/AuthHooks/Staff/Admin/useGetAllClasses";
 import Fallback from "../../../../Components/Common/Fallback";
+import useGetAllClasses from "../../../../Hooks/AuthHooks/Staff/Admin/Class/useGetAllClasses";
 
 const ClassesMainSection = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);

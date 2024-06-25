@@ -344,12 +344,12 @@ function App() {
     // Student Routes-----------------------------
     {
       path: "/student_dash",
-      element: <ProtectRoute Component={StudentDash} role="student" />,
+      element: <ProtectRoute Component={StudentDash} allowedRoles={["student"]} />,
       errorElement: <Error />,
     },
     {
       path: "accounting/studentfees",
-      element: <ProtectRoute Component={AccountingSection} allowedRoles={["accountant"]} />,
+      element: <ProtectRoute Component={AccountingSection} allowedRoles={["admin, accountant"]} />,
       errorElement: <Error />,
     },
     { path: "library", element: <Libary />, errorElement: <Error /> },

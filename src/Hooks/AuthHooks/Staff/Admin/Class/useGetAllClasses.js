@@ -1,9 +1,8 @@
-// Hooks/ClassHooks/Teacher/useGetAllClasses.js
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useCallback } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
-import { setClassList } from "../../../../Redux/Slices/Admin/ClassSlice";
+import { setClassList } from "../../../../../Redux/Slices/Admin/ClassSlice";
 
 const useGetAllClasses = () => {
   const [loading, setLoading] = useState(false);
@@ -23,6 +22,7 @@ const useGetAllClasses = () => {
       });
 
       dispatch(setClassList(response.data.data));
+      console.log(response.data.data,'sdfsdf')
       setLoading(false);
     } catch (err) {
       const errorMessage =

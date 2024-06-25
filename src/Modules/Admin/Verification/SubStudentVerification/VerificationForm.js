@@ -3,8 +3,8 @@ import { NavLink, useNavigate } from "react-router-dom";
 
 import { useSelector } from "react-redux";
 import useVerifyStudentDocument from "../../../../Hooks/AuthHooks/Staff/useVerifyStudentDocument";
-import useGetAllClassList from "../../../../Hooks/AuthHooks/Staff/useGetAllClassList";
 import useAssignClassToStudent from "../../../../Hooks/AuthHooks/Staff/useAssignClassToStudent";
+import useGetAllClasses from "../../../../Hooks/AuthHooks/Staff/Admin/Class/useGetAllClasses";
 
 const VerificationForm = ({ email, studentId }) => {
   const navigate = useNavigate();
@@ -14,7 +14,7 @@ const VerificationForm = ({ email, studentId }) => {
   const [presentClassId, setpresentClassId] = useState("");
   const { loading, verifyDocument } = useVerifyStudentDocument();
   const { assignClass } = useAssignClassToStudent();
-  const { getClassList } = useGetAllClassList();
+  const { getClassList } = useGetAllClasses();
 
   const classList = useSelector((store) => store.Admin.classList);
   useEffect(() => {
