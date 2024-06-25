@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import classIcons from "../../Dashboard/DashboardData/ClassIconData";
 
 import toast from "react-hot-toast";
-import useCreateClass from "../../../../Hooks/AuthHooks/Staff/Admin/useCreateClass";
+import useCreateClass from "../../../../Hooks/AuthHooks/Staff/Admin/Class/useCreateClass";
 
 const AddNewClass = () => {
   const [activeIconId, setActiveIconId] = useState(null);

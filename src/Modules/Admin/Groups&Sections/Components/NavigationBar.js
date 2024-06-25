@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import { toast } from "react-hot-toast"; // Ensure proper import
 import { RiDeleteBin5Line } from "react-icons/ri";
 import useDeleteSection from "../../../../Hooks/AuthHooks/Staff/Admin/Sections/useDeleteSection";
+import { PiSpinner } from "react-icons/pi";
 
 const AddGroup = lazy(() => import("./AddGroup"));
 const AddSection = lazy(() => import("./AddSection"));
@@ -47,19 +48,29 @@ const NavigationBar = ({ onSectionChange, selectedSection }) => {
           </button>
           {Sections?.map((item) => (
             <button
+            disabled={loading}
               key={item.sectionName}
               className={getButtonClass(item.sectionName)}
               onClick={() => handleSectionChange(item.sectionName)}
             >
               {item.sectionName}
               {clickedSection === item.sectionName && (
-                <RiDeleteBin5Line
-                  className="absolute top-0 right-0 p-1 rounded-full bg-white text-2xl -m-1 text-red-600 cursor-pointer"
-                  onClick={() => handleDeleteClick(item._id)}
-                />
+                <span className="absolute top-0 right-0 p-1 rounded-full bg-white text-2xl -m-1 text-red-600 cursor-pointer">
+                  {loading ? (
+                    <PiSpinner className="animate-spin" />
+                  ) : (
+                    <RiDeleteBin5Line
+                      onClick={(e) => {
+                        e.stopPropagation(); // Prevent button click event
+                        handleDeleteClick(item._id);
+                      }}
+                    />
+                  )}
+                </span>
               )}
             </button>
           ))}
+
           <button
             onClick={openAddSectionSidebar}
             className="flex items-center px-4 py-2 border-2 border-dashed border-pink-600 text-gradient rounded-full"

@@ -16,13 +16,11 @@ const useCreateClass = () => {
     setError(null);
     try {
       const token = localStorage.getItem(`${role}:token`);
-      console.log(token);
       const response = await axios.post(`${API_URL}/admin/class`, classData, {
         headers: { Authentication: token },
       });
       toast.success("Class created successfully!");
       setLoading(false);
-      console.log(response.data);
       fetchClasses();
       return response.data;
     } catch (err) {

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import NavIconCard from "./Components/NavIconCard";
 import ButtonGroup from "./Components/ButtonGroup";
 import SubjectCard from "./SubjectCard";
@@ -9,6 +9,7 @@ import { FaSchool } from "react-icons/fa";
 import { SlEyeglass } from "react-icons/sl";
 import { FcGraduationCap, FcCalendar } from "react-icons/fc";
 import { useSelector } from "react-redux";
+import useGetClassDetails from "../../../../Hooks/AuthHooks/Staff/Admin/Class/usegetClassDetails";
 
 const colors = [
   "bg-yellow-300",
@@ -26,8 +27,14 @@ const getColor = (index) => {
 const MainSection = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedTab, setSelectedTab] = useState("Published");
-  const { cid } = useParams();
   const classDetails = useSelector((store) => store.Class.class);
+
+  const { fetchClassDetails } = useGetClassDetails();
+  const { cid } = useParams();
+
+  useEffect(() => {
+    fetchClassDetails(cid);
+  }, [fetchClassDetails, cid]);
 
   // Static icon data
   const staticIconData = [
@@ -51,9 +58,15 @@ const MainSection = () => {
 
   // Update static icon data with dynamic details if classDetails is available
   if (classDetails) {
-    staticIconData[0].text = `${classDetails?.teachersIds?.length || 0} Instructor Assigned`;
-    staticIconData[1].text = `${classDetails?.sections?.length || 0} Section | ${classDetails?.groups?.length || 0} Groups`;
-    staticIconData[2].text = `${classDetails?.studentsIds?.length || 0} Students`;
+    staticIconData[0].text = `${
+      classDetails?.teachersIds?.length || 0
+    } Instructor Assigned`;
+    staticIconData[1].text = `${
+      classDetails?.sections?.length || 0
+    } Section | ${classDetails?.groups?.length || 0} Groups`;
+    staticIconData[2].text = `${
+      classDetails?.studentsIds?.length || 0
+    } Students`;
   }
 
   const handleAddNewSubject = () => {
@@ -67,7 +80,9 @@ const MainSection = () => {
   const filteredSubjects =
     classDetails && classDetails.subjects
       ? classDetails.subjects.filter((subject) =>
-          selectedTab === "Published" ? subject.isPublished : !subject.isPublished
+          selectedTab === "Published"
+            ? subject.isPublished
+            : !subject.isPublished
         )
       : [];
 
