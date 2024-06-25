@@ -13,26 +13,28 @@ const useGetClassDetails = () => {
   const API_URL = process.env.REACT_APP_API_URL;
   const dispatch = useDispatch();
 
-  const fetchClassDetails = async (classId) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const token = localStorage.getItem(`${role}:token`);
-      const response = await axios.get(`${API_URL}/admin/class/${classId}`, {
-        headers: { Authentication: token },
-      });
-      dispatch(setClass(response.data?.data));
-      dispatch(setSubjects(response.data?.data?.subjects));
-      // console.log(response.data.data)
-      setLoading(false);
-    } catch (err) {
-      const errorMessage =
-        err.response?.data?.message || "Failed to fetch class details";
-      toast.error(errorMessage);
-      setLoading(false);
-      setError(errorMessage);
-    }
-  };
+  const fetchClassDetails = useCallback(
+    async (classId) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const token = localStorage.getItem(`${role}:token`);
+        const response = await axios.get(`${API_URL}/admin/class/${classId}`, {
+          headers: { Authentication: token },
+        });
+        dispatch(setClass(response.data?.data));
+        dispatch(setSubjects(response.data?.data?.subjects));
+        setLoading(false);
+      } catch (err) {
+        const errorMessage =
+          err.response?.data?.message || "Failed to fetch class details";
+        toast.error(errorMessage);
+        setLoading(false);
+        setError(errorMessage);
+      }
+    },
+    [role, API_URL, dispatch]
+  );
 
   return { loading, error, fetchClassDetails };
 };

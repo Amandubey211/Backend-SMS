@@ -12,7 +12,7 @@ const useGetAllClasses = () => {
   const role = useSelector((store) => store.Auth.role);
   const API_URL = process.env.REACT_APP_API_URL;
 
-  const fetchClasses = async () => {
+  const fetchClasses = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -22,7 +22,7 @@ const useGetAllClasses = () => {
       });
 
       dispatch(setClassList(response.data.data));
-      console.log(response.data.data, "sdfsdf");
+      console.log(response.data.data);
       setLoading(false);
     } catch (err) {
       const errorMessage =
@@ -31,7 +31,7 @@ const useGetAllClasses = () => {
       setLoading(false);
       setError(errorMessage);
     }
-  };
+  }, [dispatch, role, API_URL]);
 
   return { loading, error, fetchClasses };
 };

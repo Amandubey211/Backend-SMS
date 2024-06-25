@@ -1,4 +1,4 @@
-import React, { useEffect, useState, lazy, Suspense } from "react";
+import React, { useEffect, useState, lazy, Suspense, useCallback } from "react";
 import Sidebar from "../../../Components/Common/Sidebar";
 import useFetchSection from "../../../Hooks/AuthHooks/Staff/Admin/Sections/useFetchSection";
 import { useParams } from "react-router-dom";
@@ -13,25 +13,32 @@ const NavigationBar = ({ onSectionChange, selectedSection, totalTeachers }) => {
   const { fetchTeachersByClass } = useFetchTeachersByClass();
   const { fetchSection } = useFetchSection();
   const { cid } = useParams();
-  const handleSidebarOpen = () => setSidebarOpen(true);
-  const handleSidebarClose = () => setSidebarOpen(false);
+
+  const handleSidebarOpen = useCallback(() => setSidebarOpen(true), []);
+  const handleSidebarClose = useCallback(() => setSidebarOpen(false), []);
+
   useEffect(() => {
     if (cid) {
       fetchSection(cid);
     }
   }, [cid, fetchSection]);
 
+  const getButtonClass = useCallback(
+    (section) => {
+      return selectedSection === section
+        ? "relative px-4 py-2 rounded-full bg-gradient-to-r from-red-400 to-purple-500 text-white"
+        : "relative px-4 py-2 rounded-full border border-gray-300";
+    },
+    [selectedSection]
+  );
 
-  const getButtonClass = (section) => {
-    return selectedSection === section
-      ? "relative px-4 py-2 rounded-full bg-gradient-to-r from-red-400 to-purple-500 text-white"
-      : "relative px-4 py-2 rounded-full border border-gray-300";
-  };
-
-  const handleSectionChange = (section, id) => {
-    onSectionChange(section);
-    fetchTeachersByClass(id);
-  };
+  const handleSectionChange = useCallback(
+    (section, id) => {
+      onSectionChange(section);
+      fetchTeachersByClass(id);
+    },
+    [onSectionChange, fetchTeachersByClass]
+  );
 
   return (
     <>
@@ -42,7 +49,6 @@ const NavigationBar = ({ onSectionChange, selectedSection, totalTeachers }) => {
             {totalTeachers}
           </span>
         </div>
-
         <button
           onClick={handleSidebarOpen}
           className="flex items-center border border-gray-300 ps-5 py-0 rounded-full"
@@ -53,7 +59,6 @@ const NavigationBar = ({ onSectionChange, selectedSection, totalTeachers }) => {
           </div>
         </button>
       </div>
-
       <Sidebar
         isOpen={isSidebarOpen}
         onClose={handleSidebarClose}
@@ -63,7 +68,6 @@ const NavigationBar = ({ onSectionChange, selectedSection, totalTeachers }) => {
           <AssignTeacher />
         </Suspense>
       </Sidebar>
-
       <div className="flex space-x-2 px-5">
         <button
           className={getButtonClass("Everyone")}
@@ -71,7 +75,6 @@ const NavigationBar = ({ onSectionChange, selectedSection, totalTeachers }) => {
         >
           Everyone
         </button>
-
         {Sections?.map((item) => (
           <button
             key={item.sectionName}

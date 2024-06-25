@@ -1,13 +1,10 @@
-// Components/ClassesMainSection.js
 import React, { useEffect, useState } from "react";
 import ClassCard from "./ClassCard";
 import Sidebar from "../../../../Components/Common/Sidebar";
 import AddNewClass from "./AddNewClass";
 import { useSelector } from "react-redux";
-import Fallback from "../../../../Components/Common/Fallback";
-import useGetAllClasses from "../../../../Hooks/AuthHooks/Staff/Admin/Class/useGetAllClasses";
-import toast from "react-hot-toast";
 import { PiSpinner } from "react-icons/pi";
+import useGetAllClasses from "../../../../Hooks/AuthHooks/Staff/Admin/Class/useGetAllClasses";
 
 const ClassesMainSection = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -16,9 +13,11 @@ const ClassesMainSection = () => {
 
   const handleSidebarOpen = () => setSidebarOpen(true);
   const handleSidebarClose = () => setSidebarOpen(false);
+
   useEffect(() => {
     fetchClasses();
-  }, []);
+  }, [fetchClasses]);
+
   return (
     <div className="min-h-screen p-4">
       <div className="flex justify-between">
@@ -32,7 +31,9 @@ const ClassesMainSection = () => {
         </button>
       </div>
       {loading ? (
-        <PiSpinner className="animate-spin text-3xl" />
+        <div className="flex justify-center items-center">
+          <PiSpinner className="animate-spin text-3xl" />
+        </div>
       ) : error ? (
         <p className="text-red-500">{error}</p>
       ) : (

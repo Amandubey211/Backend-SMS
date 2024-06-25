@@ -4,17 +4,13 @@ import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import useGetAllClasses from "../../../../Hooks/AuthHooks/Staff/Admin/Class/useGetAllClasses";
-import toast from "react-hot-toast";
 
 const AdmissionInfo = ({ studentInfo, handleInputChange }) => {
   const { fetchClasses } = useGetAllClasses();
   const { cid } = useParams();
   const classList = useSelector((store) => store.Class.classList);
   useEffect(() => {
-    if (!classList) {
-      fetchClasses(cid);
-    }
-    toast.success("we have it already");
+    fetchClasses(cid);
   }, []);
   return (
     <div className="mt-6">
