@@ -1,38 +1,53 @@
-import React, { useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import toast from "react-hot-toast";
 import useCreateGroup from "../../../../Hooks/AuthHooks/Staff/Admin/useCreateGroup";
 import { useSelector } from "react-redux";
-
-const dummyStudents = ["Jason Sam", "John Doe", "Jane Doe", "Alice Smith", "Bob Johnson"];
+import useGetStudentsByClassAndSection from "../../../../Hooks/AuthHooks/Staff/Admin/Students/useGetStudentsByClassAndSection";
 
 const AddGroup = () => {
   const [groupTitle, setGroupTitle] = useState("");
   const [limitStudent, setLimitStudent] = useState("");
+  const [students, setStudents] = useState([]);
   const [selectedStudents, setSelectedStudents] = useState([]);
   const [teamLeader, setTeamLeader] = useState("");
   const [sectionId, setSectionId] = useState("");
   const AllSections = useSelector((store) => store.Class.sectionsList);
 
   const { createGroup, loading, error } = useCreateGroup();
+  const { fetchStudentsByClassAndSection } = useGetStudentsByClassAndSection();
 
-  const handleStudentSelect = (e) => {
-    const selectedStudent = e.target.value;
-    if (selectedStudent && !selectedStudents.includes(selectedStudent)) {
-      setSelectedStudents([...selectedStudents, selectedStudent]);
-    }
-  };
+  useEffect(() => {
+    const fetchStudents = async () => {
+      // implement the initial state with classId
+      if (sectionId) {
+        const data = await fetchStudentsByClassAndSection(sectionId);
+        setStudents(data);
+      }
+    };
+    fetchStudents();
+  }, [sectionId, fetchStudentsByClassAndSection]);
 
-  const handleTeamLeaderClick = (student) => {
+  const handleStudentSelect = useCallback(
+    (e) => {
+      const selectedStudent = e.target.value;
+      if (selectedStudent && !selectedStudents.includes(selectedStudent)) {
+        setSelectedStudents((prev) => [...prev, selectedStudent]);
+      }
+    },
+    [selectedStudents]
+  );
+
+  const handleTeamLeaderClick = useCallback((student) => {
     setTeamLeader(student);
-  };
+  }, []);
 
-  const handleRemoveStudent = (student) => {
-    setSelectedStudents(selectedStudents.filter((s) => s !== student));
-  };
+  const handleRemoveStudent = useCallback((student) => {
+    setSelectedStudents((prev) => prev.filter((s) => s !== student));
+  }, []);
 
-  const handleRemoveTeamLeader = () => {
+  const handleRemoveTeamLeader = useCallback(() => {
     setTeamLeader("");
-  };
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -53,10 +68,10 @@ const AddGroup = () => {
   };
 
   return (
-    <form className="flex flex-col h-full " onSubmit={handleSubmit}>
+    <form className="flex flex-col h-full" onSubmit={handleSubmit}>
       <div className="bg-white h-[80%] no-scrollbar overflow-y-scroll rounded-lg p-4 w-full max-w-md">
         <div className="flex flex-col space-y-4">
-          <div className="mb-4">
+          <div>
             <label
               htmlFor="group-title"
               className="block text-sm font-medium text-gray-700"
@@ -73,7 +88,7 @@ const AddGroup = () => {
               required
             />
           </div>
-          <div className="mb-4">
+          <div className="">
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Section
             </label>
@@ -117,9 +132,9 @@ const AddGroup = () => {
               className="block w-full p-2 border border-gray-300 rounded-lg"
             >
               <option value="">Select a student</option>
-              {dummyStudents.map((student, index) => (
+              {students?.map((student, index) => (
                 <option key={index} value={student}>
-                  {student}
+                  {student.firstName} {student.lastName}
                 </option>
               ))}
             </select>
@@ -147,7 +162,10 @@ const AddGroup = () => {
             {teamLeader && (
               <div className="bg-gradient-to-r from-pink-500 to-purple-500 text-white px-2 py-1 rounded-full mr-2 mb-2 flex items-center">
                 {teamLeader}
-                <span className="ml-2 cursor-pointer" onClick={handleRemoveTeamLeader}>
+                <span
+                  className="ml-2 cursor-pointer"
+                  onClick={handleRemoveTeamLeader}
+                >
                   &times;
                 </span>
               </div>
