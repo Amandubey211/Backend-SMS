@@ -1,14 +1,18 @@
-// Components/AddNewClass.js
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import classIcons from "../../Dashboard/DashboardData/ClassIconData";
-
 import toast from "react-hot-toast";
 import useCreateClass from "../../../../Hooks/AuthHooks/Staff/Admin/Class/useCreateClass";
 
-const AddNewClass = () => {
+const AddNewClass = ({ className, isUpdate }) => {
   const [activeIconId, setActiveIconId] = useState(null);
-  const [newClassName, setNewClassName] = useState("");
+  const [newClassName, setNewClassName] = useState(className);
   const { createClass, loading } = useCreateClass();
+
+  useEffect(() => {
+    if (isUpdate && className) {
+      setNewClassName(className);
+    }
+  }, [isUpdate, className]);
 
   const handleIconClick = (gradeLevel, id) => {
     setActiveIconId(id);
@@ -27,12 +31,18 @@ const AddNewClass = () => {
     };
 
     try {
-      await createClass(classData);
-      // Reset form fields
-      setNewClassName("");
-      setActiveIconId(null);
+      if (isUpdate) {
+        toast.success("Class updated successfully!");
+        // Add update class logic here
+      } else {
+        await createClass(classData);
+        // Reset form fields
+        setNewClassName("");
+        setActiveIconId(null);
+        toast.success("Class created successfully!");
+      }
     } catch (err) {
-      // Error is already handled in the hook via toast notification
+      toast.error(err.message || "Something went wrong");
     }
   };
 
@@ -77,14 +87,18 @@ const AddNewClass = () => {
             ))}
           </div>
         </div>
-        <div className="mt-auto mb-6">
+        <div className=" mb-9">
           <button
             type="submit"
             className="w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600"
             disabled={loading}
             aria-busy={loading ? "true" : "false"}
           >
-            {loading ? "Adding Class..." : "Add New Class"}
+            {loading
+              ? "Updating Class..."
+              : isUpdate
+              ? "Update Class"
+              : "Add New Class"}
           </button>
         </div>
       </form>

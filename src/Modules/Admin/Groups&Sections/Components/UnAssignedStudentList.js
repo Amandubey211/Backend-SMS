@@ -1,55 +1,78 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import useGetUnassignedStudents from "../../../../Hooks/AuthHooks/Staff/Admin/Students/useGetUnassignedStudents";
 import { useParams } from "react-router-dom";
-
-const students = [
-  { name: "Annette Black", section: "Section A" },
-  { name: "Guy Hawkins", section: "Section A" },
-  { name: "Esther Howard", section: "Section A" },
-  { name: "Albert Flores", section: "Section A" },
-  { name: "Marvin McKinney", section: "Section A" },
-  { name: "Jane Cooper", section: "Section A" },
-  { name: "Ralph Edwards", section: "Section A" },
-  { name: "Ronald Richards", section: "Section A" },
-  { name: "Darrell Steward", section: "Section A" },
-  { name: "Eleanor Pena", section: "Section A" },
-];
-
+import toast from "react-hot-toast";
+import { FaPlus } from "react-icons/fa";
+import { PiPlusLight } from "react-icons/pi";
 const UnAssignedStudentList = () => {
-  const { fetchUnassignedStudents } = useGetUnassignedStudents();
+  const [unassigned, setUnassignedStudents] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const { fetchUnassignedStudents, loading, error } =
+    useGetUnassignedStudents();
   const { cid } = useParams();
-  // useEffect(() => {
-  //   fetchUnassignedStudents(cid);
-  // }, []);
+
+  useEffect(() => {
+    const fetchStudents = async () => {
+      const data = await fetchUnassignedStudents(cid);
+      setUnassignedStudents(data);
+    };
+
+    fetchStudents();
+  }, [cid, fetchUnassignedStudents]);
+
+  const handleSearch = (e) => {
+    setSearchQuery(e.target.value);
+  };
+
+  const filteredStudents = unassigned.filter((student) =>
+    student.firstName.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    toast.error(error);
+    return <div>Failed to load students</div>;
+  }
+
   return (
-    <div className="w-80 p-4 bg-white rounded-lg shadow-sm border">
+    <div className="w-80  p-4 bg-white   border-r">
       <div className="mb-4">
         <h2 className="text-md font-semibold">
-          Unassigned Students <span className="text-gray-500">(50)</span>
+          Unassigned Students{" "}
+          <span className="text-gray-500">({filteredStudents.length})</span>
         </h2>
         <input
           type="text"
           placeholder="Search Student"
+          value={searchQuery}
+          onChange={handleSearch}
           className="mt-2 w-full px-3 py-2 border rounded-full"
         />
       </div>
       <ul>
-        {students.map((student, index) => (
+        {filteredStudents?.map((student, index) => (
           <li key={index} className="flex items-center justify-between py-2">
             <div className="flex items-center">
               <img
                 src={`https://randomuser.me/api/portraits/med/${
                   index % 2 === 0 ? "women" : "men"
                 }/${index}.jpg`}
-                alt={student.name}
+                alt={student.firstName}
                 className="w-10 h-10 rounded-full mr-3"
               />
               <div>
-                <div className="text-sm font-medium">{student.name}</div>
-                <div className="text-xs text-gray-500">{student.section}</div>
+                <div className="text-sm font-medium">{student?.firstName}</div>
+                <div className="text-xs text-gray-500">
+                  {student?.section || "Section A"}
+                </div>
               </div>
             </div>
-            <button className="text-green-500 font-semibold text-xl">+</button>
+            <button className=" text-center rounded-full border font-semibold text-xl p-1">
+              <PiPlusLight className="text-green-600" />
+            </button>
           </li>
         ))}
       </ul>

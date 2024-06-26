@@ -38,7 +38,7 @@ const NavigationBar = ({ onSectionChange, selectedSection }) => {
 
   return (
     <>
-      <div className="flex justify-between items-center p-4">
+      <div className="flex justify-between items-center border-b p-4">
         <div className="flex space-x-2 px-5">
           <button
             className={getButtonClass("Everyone")}
@@ -55,7 +55,7 @@ const NavigationBar = ({ onSectionChange, selectedSection }) => {
             >
               {item.sectionName}
               {clickedSection === item.sectionName && (
-                <span className="absolute top-0 right-0 p-1 rounded-full bg-white text-2xl -m-1 text-red-600 cursor-pointer">
+                <span className="absolute top-0 right-0 p-1 rounded-full bg-white hover:bg-gray-200 text-lg border -m-1 text-red-600 cursor-pointer">
                   {loading ? (
                     <PiSpinner className="animate-spin" />
                   ) : (
@@ -102,7 +102,7 @@ const NavigationBar = ({ onSectionChange, selectedSection }) => {
       <Sidebar
         isOpen={sidebarType === "addGroup"}
         onClose={closeSidebar}
-        title="Add New Group"
+        title="Add New Group sdf" 
       >
         <Suspense fallback={<div>Loading...</div>}>
           <AddGroup />

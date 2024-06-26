@@ -28,8 +28,10 @@ const MainSection = () => {
         onSectionChange={handleSectionChange}
         selectedSection={selectedSection}
       />
-      <div className="p-2 flex gap-1 ">
-        <UnAssignedStudentList />
+      <div className=" flex gap-1 ">
+        <div className="w-80 h-full">
+          <UnAssignedStudentList />
+        </div>
         <GroupList />
       </div>
     </div>
