@@ -25,6 +25,7 @@ const useFetchSection = () => {
         );
 
         const { data } = response.data;
+        console.log(data)
         dispatch(setSectionsList(data));
         setLoading(false);
         return { success: true, data };

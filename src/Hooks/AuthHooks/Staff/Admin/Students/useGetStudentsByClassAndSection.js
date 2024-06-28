@@ -15,7 +15,7 @@ const useGetStudentsByClassAndSection = () => {
       setError(null);
       try {
         const token = localStorage.getItem(`${role}:token`);
-        const response = await axios.get(`${API_URL}/admin/students/${id}`, {
+        const response = await axios.get(`${API_URL}/admin/student/${id}`, {
           headers: { Authentication: token },
         });
         console.log(response.data)

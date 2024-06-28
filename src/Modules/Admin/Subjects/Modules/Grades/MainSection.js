@@ -47,7 +47,7 @@ const MainSection = () => {
 
   const filteredStudents = studentsGrades.filter((student) => {
     return (
-      fuzzySearch(search, student.name) &&
+      fuzzySearch(search, student.firstName + student.lastName) &&
       (filters.section ? student.section === filters.section : true) &&
       (filters.group ? student.group === filters.group : true) &&
       (filters.assignment ? student.assignment === filters.assignment : true) &&

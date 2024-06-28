@@ -4,101 +4,27 @@ import { HiOutlineDotsVertical } from "react-icons/hi";
 import { BsArrow90DegRight } from "react-icons/bs";
 import { MdOutlineModeEditOutline } from "react-icons/md";
 import { RiDeleteBin2Line } from "react-icons/ri";
+import useGetStudentsByClassAndSection from "../../../../Hooks/AuthHooks/Staff/Admin/Students/useGetStudentsByClassAndSection";
+import { useParams } from "react-router-dom";
 
-const students = [
-  {
-    name: "Courtney Henry",
-    class: "09",
-    section: "Section 1",
-    group: "Accounting",
-    email: "raihanafridi@gmail.com",
-    role: "Parent",
-    phone: "(671) 555-0110",
-    grade: "See Grade",
-    id: "ID - 001",
-  },
-  {
-    name: "Darrell Steward",
-    class: "09",
-    section: "Section 1",
-    group: "Accounting",
-    email: "raihanafridi@gmail.com",
-    role: "Parent",
-    phone: "(671) 555-0110",
-    grade: "See Grade",
-    id: "ID - 001",
-  },
-  {
-    name: "Ronald Richards",
-    class: "09",
-    section: "Section 2",
-    group: "Accounting",
-    email: "raihanafridi@gmail.com",
-    role: "Parent",
-    phone: "(671) 555-0110",
-    grade: "See Grade",
-    id: "ID - 001",
-  },
-  {
-    name: "Jane Cooper",
-    class: "09",
-    section: "Section 2",
-    group: "Accounting",
-    email: "raihanafridi@gmail.com",
-    role: "Parent",
-    phone: "(671) 555-0110",
-    grade: "See Grade",
-    id: "ID - 001",
-  },
-  {
-    name: "Brooklyn Simmons",
-    class: "09",
-    section: "Section 3",
-    group: "Accounting",
-    email: "raihanafridi@gmail.com",
-    role: "Parent",
-    phone: "(671) 555-0110",
-    grade: "See Grade",
-    id: "ID - 001",
-  },
-  {
-    name: "Annette Black",
-    class: "09",
-    section: "Section 3",
-    group: "Accounting",
-    email: "raihanafridi@gmail.com",
-    role: "Parent",
-    phone: "(671) 555-0110",
-    grade: "See Grade",
-    id: "ID - 001",
-  },
-  {
-    name: "Devon Lane",
-    class: "09",
-    section: "Section 4",
-    group: "Accounting",
-    email: "raihanafridi@gmail.com",
-    role: "Parent",
-    phone: "(671) 555-0110",
-    grade: "See Grade",
-    id: "ID - 001",
-  },
-  {
-    name: "Wade Warren",
-    class: "09",
-    section: "Section 4",
-    group: "Accounting",
-    email: "raihanafridi@gmail.com",
-    role: "Parent",
-    phone: "(671) 555-0110",
-    grade: "See Grade",
-    id: "ID - 001",
-  },
-];
-
-const DetailedStudentList = ({ activeSection }) => {
+const DetailedStudentList = ({ activeSection, onSeeGradeClick }) => {
   const [showMenu, setShowMenu] = useState(null);
   const menuRef = useRef(null);
+  const [students, setStudents] = useState([]);
+
+  const { fetchStudentsByClassAndSection } = useGetStudentsByClassAndSection();
+  const { cid } = useParams();
+
+  useEffect(() => {
+    const fetchStudents = async () => {
+      if (cid) {
+        const data = await fetchStudentsByClassAndSection(cid);
+        setStudents(data);
+      }
+    };
+
+    fetchStudents();
+  }, [cid, fetchStudentsByClassAndSection]);
 
   const toggleMenu = (index) => {
     setShowMenu(showMenu === index ? null : index);
@@ -123,12 +49,12 @@ const DetailedStudentList = ({ activeSection }) => {
       : students.filter((student) => student.section === activeSection);
 
   return (
-    <div className="w-full  p-4 bg-white ">
-      <ul className="divide-y divide-gray-200">
+    <div className="w-full p-4 bg-white ">
+      <ul className="">
         {filteredStudents.map((student, index) => (
           <li
             key={index}
-            className="relative flex items-center justify-between py-4"
+            className="relative flex items-center justify-between py-4 border-b"
           >
             <div className="flex items-center">
               <img
@@ -139,20 +65,40 @@ const DetailedStudentList = ({ activeSection }) => {
                 className="w-10 h-10 rounded-full mr-3"
               />
               <div>
-                <div className="text-sm font-medium">{student.name}</div>
-                <div className="text-xs text-gray-500">{student.id}</div>
+                <div className="text-sm font-medium">{student?.firstName} {student?.lastName}</div>
+                <div className="text-xs text-gray-500">{student?._id}</div>
               </div>
             </div>
-            <div className="text-sm text-gray-500">{`Class ${student.class}`}</div>
-            <div className="text-sm text-gray-500">{student.section}</div>
-            <div className="text-sm text-gray-500">{student.group}</div>
-            <div className="text-sm">
-              <div>{student.email}</div>
-              <div>{student.phone}</div>
+
+            <div className="flex flex-col gap-1 items-start justify-start ">
+              <div className="text-sm text-gray-500">Class</div>
+              <div className="text-sm text-gray-500">
+                {student?.class || "09"}
+              </div>
             </div>
-            <div className="text-sm text-gray-500">{student.role}</div>
-            <button className="px-3 py-1 text-green-500 font-semibold text-sm border border-green-500 rounded-full">
-              {student.grade}
+            <div className="flex flex-col gap-1 items-start justify-center ">
+              <div className="text-sm text-gray-500">
+                {student?.section || "Section"}
+              </div>
+              <div className="text-sm text-gray-500">{`Group-${
+                student?.group || "Accounting"
+              } `}</div>
+            </div>
+
+            <div className="flex flex-col text-sm gap-1 items-start justify-start ">
+              <div>{student.email}</div>
+              <div>{student.contactNumber}</div>
+            </div>
+
+            <div className="flex flex-col text-sm gap-1 items-start justify-start ">
+              <div>Parent</div>
+              <div>{student.guardianContactNumber}</div>
+            </div>
+            <button
+              className="px-3 py-1 text-green-500 font-semibold text-sm border border-green-500 rounded-lg"
+              onClick={() => onSeeGradeClick(student)}
+            >
+              See Grade
             </button>
             <button onClick={() => toggleMenu(index)} className="p-2">
               <HiOutlineDotsVertical />
