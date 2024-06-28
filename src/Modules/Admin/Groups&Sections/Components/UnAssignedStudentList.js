@@ -77,7 +77,7 @@ const UnAssignedStudentList = () => {
           <li key={index} className="flex items-center justify-between py-2">
             <div className="flex items-center">
               <img
-                src={`https://randomuser.me/api/portraits/med/${
+                src={student.profile || `https://randomuser.me/api/portraits/med/${
                   index % 2 === 0 ? "women" : "men"
                 }/${index}.jpg`}
                 alt={student.firstName}
@@ -114,7 +114,7 @@ const UnAssignedStudentList = () => {
             section={getSectionName(selectedStudent.presentSectionId).name}
             studentId={selectedStudent._id}
             imageUrl={
-              selectedStudent.imgUrl ||
+              selectedStudent.profile ||
               "https://avatars.githubusercontent.com/u/109097090?v=4"
             }
           />

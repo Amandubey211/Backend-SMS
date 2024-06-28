@@ -49,7 +49,7 @@ const MainSection = () => {
         onSeeGradeClick={handleSeeGradeClick}
         students={students}
       />
-      <StudentGradeModal isOpen={isModalOpen} onClose={handleCloseModal} />
+      <StudentGradeModal isOpen={isModalOpen} onClose={handleCloseModal}  />
     </div>
   );
 };
