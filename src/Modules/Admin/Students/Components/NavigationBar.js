@@ -1,13 +1,9 @@
-import React, { useCallback, useState } from "react";
-// import Sidebar from "../../../../Components/Common/Sidebar";
+import React, { useCallback } from "react";
 import { NavLink, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 
-const NavigationBar = ({ setActiveSection, activeSection }) => {
-  // const [isSidebarOpen, setSidebarOpen] = useState(false);
+const NavigationBar = ({ setActiveSection, activeSection, totalStudents }) => {
   const { cid } = useParams();
-  // const handleSidebarOpen = () => setSidebarOpen(true);
-  // const handleSidebarClose = () => setSidebarOpen(false);
   const Sections = useSelector((store) => store.Class.sectionsList);
 
   const getButtonClass = useCallback(
@@ -18,8 +14,9 @@ const NavigationBar = ({ setActiveSection, activeSection }) => {
     },
     [activeSection]
   );
+
   const handleSectionChange = useCallback(
-    (section, id) => {
+    (section) => {
       setActiveSection(section);
     },
     [setActiveSection]
@@ -31,10 +28,9 @@ const NavigationBar = ({ setActiveSection, activeSection }) => {
         <div className="flex items-center space-x-4">
           <h1 className="text-xl font-semibold">All Students</h1>
           <span className="bg-purple-200 text-purple-700 rounded-full px-2 py-1 text-sm">
-            150
+            {totalStudents}
           </span>
         </div>
-
         <NavLink
           to="/admissions"
           className="flex items-center border border-gray-300 ps-5 py-0 rounded-full"
@@ -45,18 +41,10 @@ const NavigationBar = ({ setActiveSection, activeSection }) => {
           </div>
         </NavLink>
       </div>
-      {/* <Sidebar
-        // isOpen={isSidebarOpen}
-        // onClose={handleSidebarClose}
-        title="Assign new Students"
-      >
-        <AddNewStudents />
-      </Sidebar> */}
-
       <div className="flex space-x-2 px-5">
         <button
           className={getButtonClass("Everyone")}
-          onClick={() => handleSectionChange("Everyone", cid)}
+          onClick={() => handleSectionChange("Everyone")}
         >
           Everyone
         </button>
@@ -64,7 +52,7 @@ const NavigationBar = ({ setActiveSection, activeSection }) => {
           <button
             key={item.sectionName}
             className={getButtonClass(item.sectionName)}
-            onClick={() => handleSectionChange(item.sectionName, item._id)}
+            onClick={() => handleSectionChange(item.sectionName)}
           >
             {item.sectionName}
           </button>

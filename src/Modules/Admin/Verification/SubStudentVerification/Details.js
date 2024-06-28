@@ -16,7 +16,7 @@ const Details = ({ student }) => {
         <div className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4 mb-6">
           <img
             className="w-16 h-16 rounded-full"
-            src="https://avatars.githubusercontent.com/u/109097090?v=4" // Placeholder image, replace with actual profile picture URL from student object
+            src={student.profile || "https://avatars.githubusercontent.com/u/109097090?v=4"} // Placeholder image, replace with actual profile picture URL from student object
             alt={`${student?.firstName} ${student?.lastName}`}
           />
           <div className="text-center sm:text-left">
