@@ -11,6 +11,7 @@ const useGetStudentsByClassAndSection = () => {
 
   const fetchStudentsByClassAndSection = useCallback(
     async (id) => {
+      console.log(id,"Frontend")
       setLoading(true);
       setError(null);
       try {
