@@ -3,7 +3,6 @@ import React from "react";
 const StudentGradeSummary = ({ studentGrade }) => {
   const {
     profile,
-
     firstName,
     lastName,
     section,

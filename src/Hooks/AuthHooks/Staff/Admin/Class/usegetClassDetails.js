@@ -23,6 +23,7 @@ const useGetClassDetails = () => {
           headers: { Authentication: token },
         });
         dispatch(setClass(response.data?.data));
+        console.log(response.data.data);
         dispatch(setSubjects(response.data?.data?.subjects));
         setLoading(false);
       } catch (err) {

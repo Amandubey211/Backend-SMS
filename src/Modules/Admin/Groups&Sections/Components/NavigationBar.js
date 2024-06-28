@@ -25,8 +25,8 @@ const NavigationBar = ({ onSectionChange, selectedSection }) => {
     await deleteSection(id);
   };
 
-  const handleSectionChange = (section) => {
-    onSectionChange(section);
+  const handleSectionChange = (section, sectionId) => {
+    onSectionChange(section, sectionId);
     setClickedSection(section);
   };
 
@@ -42,16 +42,16 @@ const NavigationBar = ({ onSectionChange, selectedSection }) => {
         <div className="flex space-x-2 px-5">
           <button
             className={getButtonClass("Everyone")}
-            onClick={() => handleSectionChange("Everyone")}
+            onClick={() => handleSectionChange("Everyone", null)}
           >
             Everyone
           </button>
           {Sections?.map((item) => (
             <button
               disabled={loading}
-              key={item.sectionName}
+              key={item._id}
               className={getButtonClass(item.sectionName)}
-              onClick={() => handleSectionChange(item.sectionName)}
+              onClick={() => handleSectionChange(item.sectionName, item._id)}
             >
               {item.sectionName}
               {clickedSection === item.sectionName && (
