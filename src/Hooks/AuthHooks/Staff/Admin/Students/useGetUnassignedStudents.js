@@ -24,6 +24,7 @@ const useGetUnassignedStudents = () => {
           }
         );
         if (response.data.status) {
+          console.log(response.data)
           return response.data?.data;
         } else {
           toast.error("Please try again");

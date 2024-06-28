@@ -2,8 +2,10 @@ import React from "react";
 
 const StudentGradeSummary = ({ studentGrade }) => {
   const {
-    avatar,
-    name,
+    profile,
+
+    firstName,
+    lastName,
     section,
     assignment,
     groupAssignment,
@@ -18,11 +20,15 @@ const StudentGradeSummary = ({ studentGrade }) => {
       <div className="text-center border-b p-4">
         <img
           className="w-24 h-24 rounded-full mx-auto"
-          src={avatar}
+          src={
+            profile || "https://avatars.githubusercontent.com/u/109097090?v=4"
+          }
           alt="Profile"
         />
-        <h2 className="mt-4 text-lg font-semibold">{name}</h2>
-        <p className="text-gray-500">{section}</p>
+        <h2 className="mt-4 text-lg font-semibold">
+          {firstName} {lastName}
+        </h2>
+        <p className="text-gray-500">{section || "Section A"}</p>
       </div>
       <div className="mt-4 p-3">
         <h3 className="text-md font-semibold mb-4">Grade Summary</h3>

@@ -1,16 +1,29 @@
-import React, { useState } from "react";
-import "tailwindcss/tailwind.css";
-import AddNewStudents from "./AddNewStudents";
-import Sidebar from "../../../../Components/Common/Sidebar";
-import { NavLink } from "react-router-dom";
+import React, { useCallback, useState } from "react";
+// import Sidebar from "../../../../Components/Common/Sidebar";
+import { NavLink, useParams } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const NavigationBar = ({ setActiveSection, activeSection }) => {
-  const [isSidebarOpen, setSidebarOpen] = useState(false);
+  // const [isSidebarOpen, setSidebarOpen] = useState(false);
+  const { cid } = useParams();
+  // const handleSidebarOpen = () => setSidebarOpen(true);
+  // const handleSidebarClose = () => setSidebarOpen(false);
+  const Sections = useSelector((store) => store.Class.sectionsList);
 
-  const handleSidebarOpen = () => setSidebarOpen(true);
-  const handleSidebarClose = () => setSidebarOpen(false);
-
-  const sections = ["Everyone", "Section 1", "Section 2", "Section 3", "Section 4"];
+  const getButtonClass = useCallback(
+    (section) => {
+      return activeSection === section
+        ? "relative px-4 py-2 rounded-full bg-gradient-to-r from-red-400 to-purple-500 text-white"
+        : "relative px-4 py-2 rounded-full border border-gray-300";
+    },
+    [activeSection]
+  );
+  const handleSectionChange = useCallback(
+    (section, id) => {
+      setActiveSection(section);
+    },
+    [setActiveSection]
+  );
 
   return (
     <>
@@ -32,26 +45,28 @@ const NavigationBar = ({ setActiveSection, activeSection }) => {
           </div>
         </NavLink>
       </div>
-      <Sidebar
-        isOpen={isSidebarOpen}
-        onClose={handleSidebarClose}
+      {/* <Sidebar
+        // isOpen={isSidebarOpen}
+        // onClose={handleSidebarClose}
         title="Assign new Students"
       >
         <AddNewStudents />
-      </Sidebar>
+      </Sidebar> */}
 
       <div className="flex space-x-2 px-5">
-        {sections.map((section) => (
+        <button
+          className={getButtonClass("Everyone")}
+          onClick={() => handleSectionChange("Everyone", cid)}
+        >
+          Everyone
+        </button>
+        {Sections?.map((item) => (
           <button
-            key={section}
-            className={`px-4 py-2 rounded-full ${
-              activeSection === section
-                ? "bg-gradient-to-r from-red-400 to-purple-500 text-white"
-                : "border border-gray-300"
-            }`}
-            onClick={() => setActiveSection(section)}
+            key={item.sectionName}
+            className={getButtonClass(item.sectionName)}
+            onClick={() => handleSectionChange(item.sectionName, item._id)}
           >
-            {section}
+            {item.sectionName}
           </button>
         ))}
       </div>

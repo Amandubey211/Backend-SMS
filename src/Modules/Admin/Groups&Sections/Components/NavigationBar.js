@@ -1,7 +1,7 @@
 import React, { useState, lazy, Suspense } from "react";
 import Sidebar from "../../../../Components/Common/Sidebar";
 import { useSelector } from "react-redux";
-import { toast } from "react-hot-toast"; // Ensure proper import
+import { toast } from "react-hot-toast";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import useDeleteSection from "../../../../Hooks/AuthHooks/Staff/Admin/Sections/useDeleteSection";
 import { PiSpinner } from "react-icons/pi";
@@ -15,7 +15,7 @@ const NavigationBar = ({ onSectionChange, selectedSection }) => {
 
   const Sections = useSelector((store) => store.Class.sectionsList);
 
-  const { deleteSection, loading } = useDeleteSection(); // Using the custom hook
+  const { deleteSection, loading } = useDeleteSection();
 
   const openAddGroupSidebar = () => setSidebarType("addGroup");
   const openAddSectionSidebar = () => setSidebarType("addSection");
@@ -48,7 +48,7 @@ const NavigationBar = ({ onSectionChange, selectedSection }) => {
           </button>
           {Sections?.map((item) => (
             <button
-            disabled={loading}
+              disabled={loading}
               key={item.sectionName}
               className={getButtonClass(item.sectionName)}
               onClick={() => handleSectionChange(item.sectionName)}
@@ -61,7 +61,7 @@ const NavigationBar = ({ onSectionChange, selectedSection }) => {
                   ) : (
                     <RiDeleteBin5Line
                       onClick={(e) => {
-                        e.stopPropagation(); // Prevent button click event
+                        e.stopPropagation();
                         handleDeleteClick(item._id);
                       }}
                     />
@@ -70,7 +70,6 @@ const NavigationBar = ({ onSectionChange, selectedSection }) => {
               )}
             </button>
           ))}
-
           <button
             onClick={openAddSectionSidebar}
             className="flex items-center px-4 py-2 border-2 border-dashed border-pink-600 text-gradient rounded-full"
@@ -102,7 +101,7 @@ const NavigationBar = ({ onSectionChange, selectedSection }) => {
       <Sidebar
         isOpen={sidebarType === "addGroup"}
         onClose={closeSidebar}
-        title="Add New Group sdf" 
+        title="Add New Group"
       >
         <Suspense fallback={<div>Loading...</div>}>
           <AddGroup />
