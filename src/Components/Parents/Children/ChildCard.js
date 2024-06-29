@@ -23,7 +23,7 @@ const ChildCard = ({ student }) => {
             <div className="flex space-x-4 mb-4">
                 <button className="bg-purple-200 text-purple-800 py-1 px-3 rounded" onClick={()=> navigate("/teacher")}>Teachers</button>
                 <button className="bg-purple-200 text-purple-800 py-1 px-3 rounded" onClick={()=> navigate("/childgrade")}>Grades</button>
-                <button className="bg-purple-200 text-purple-800 py-1 px-3 rounded" onClick={()=> navigate("/calender")}>Attendance</button>
+                <button className="bg-purple-200 text-purple-800 py-1 px-3 rounded" onClick={()=> navigate("/attendance")}>Attendance</button>
             </div>
             <div>
                 <button className="bg-green-200 text-green-800 py-2 px-4 rounded" onClick={()=> navigate("/checkprogress")}>Check Subject Progress</button>
