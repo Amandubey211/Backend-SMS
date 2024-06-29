@@ -9,7 +9,7 @@ const ParentDash = () => {
   useNavHeading("My Child");
   return (
     <Layout title="Parents | Student diwan">
-      <DashLayout children={<MyChildren/>} hideAvatarList={true} />
+      <DashLayout children={<MyChildren />} hideAvatarList={true} />
     </Layout>
   );
 };

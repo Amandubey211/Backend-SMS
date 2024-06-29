@@ -1,10 +1,34 @@
-import React, { useState } from 'react';
-import { Table } from 'antd';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { Table, Spin, Alert } from 'antd';
 import LibraryData  from '../../../Modules/Parents/dummyData/dummyData'; 
 
 const LibraryTable = () => {
+  const [books, setBooks] = useState([]);
   const [statusFilter, setStatusFilter] = useState('All');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  useEffect(() => {
+    const fetchBooks = async () => {
+      const token = localStorage.getItem("parent:token");
+      try {
+        const response = await axios.get('http://localhost:8080/admin/all/book', {
+          headers: {
+            'Authentication': `${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
 
+        setBooks(response.data);
+        setLoading(false);
+      } catch (err) {
+        setError('Error fetching books');
+        setLoading(false);
+      }
+    };
+
+    fetchBooks();
+  }, []);
   const handleFilterChange = (value) => {
     setStatusFilter(value);
   };
@@ -14,6 +38,8 @@ const LibraryTable = () => {
     return item.status === statusFilter;
   });
 
+
+  
   const columns = [
     {
       title: 'Issue Book',
@@ -55,6 +81,13 @@ const LibraryTable = () => {
       ),
     },
   ];
+  if (loading) {
+    return <Spin size="large" className="flex justify-center items-center h-screen" />;
+  }
+
+  if (error) {
+    return <Alert message="Error" description={error} type="error" showIcon />;
+  }
 
   return (
     <div className="p-6">

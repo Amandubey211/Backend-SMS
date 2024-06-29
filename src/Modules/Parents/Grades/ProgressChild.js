@@ -9,7 +9,7 @@ import dummyModules from "./Components/Data/DummyModules";
 // import AddChapter from "./Components/AddChapter";
 import { RiAddFill } from "react-icons/ri";
 
-const ParentGradeSection = () => {
+const ProgressChild = () => {
   const [expandedChapters, setExpandedChapters] = useState([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [sidebarContent, setSidebarContent] = useState(null);
@@ -111,4 +111,4 @@ const ParentGradeSection = () => {
   );
 };
 
-export default ParentGradeSection;
+export default ProgressChild;

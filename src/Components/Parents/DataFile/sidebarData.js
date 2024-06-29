@@ -25,26 +25,33 @@ const sidebarData = [
   {
     title: "Dashboard",
     icon: <TbDashboard />,
-    path: "/admin_dash",
+    path: "/parent_dash",
   },
   {
     title: "My Childs",
     icon: <RiGraduationCapLine />,
-    path: `/class`,
+    path: `/children`,
   },
 
   {
     title: "Finance",
     icon: <LuUser />,
+    path:'/parentfinance'
   },
   {
     title: "Library",
     icon: <HiOutlineCalculator />,
+    path:'/parentlibrary'
   },
   {
     title: "Notice Board",
     icon: <FaUserGraduate />,
-    path: "/verify_students",
+    path: "/parentchildnotice",
+  },
+  {
+    title: "Announcements",
+    icon: <FaUserGraduate />,
+    path: "/parentannounce",
   },
 ];
 
