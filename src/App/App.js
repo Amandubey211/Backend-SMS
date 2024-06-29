@@ -440,12 +440,12 @@ function App() {
 
     {
       path: "/student_dash",
-      element: <ProtectRoute Component={StudentDash} role="student" />,
+      element: <ProtectRoute Component={StudentDash} allowedRoles={["student"]} />,
       errorElement: <Error />,
     },
     {
       path: "accounting/studentfees",
-      element: <ProtectRoute Component={AccountingSection} allowedRoles={["accountant"]} />,
+      element: <ProtectRoute Component={AccountingSection} allowedRoles={["admin, accountant"]} />,
       errorElement: <Error />,
     },
 
@@ -651,113 +651,118 @@ function App() {
       element: <ChildGrade />,
       errorElement: <Error />
     },
-    // Student Routes-----------------------------
-    {
-      path: "/student_dash",
-      element: <ProtectRoute Component={StudentDash} role="student" />,
-      errorElement: <Error />,
-    },
-    {
-      path: "/student_library",
-      element: <StudentLibrarySection />,
-      errorElement: <Error />,
-    },
-    {
-      path: "/student_finance",
-      element: <StudentFinance />,
-      errorElement: <Error />,
-    },
-    {
-      path: "/student_class",
-      element: <StudentClass />,
-      errorElement: <Error />,
-    },
-    {
-      path: "/student/noticeboard/events",
-      element: <StudentEvent />,
-      errorElement: <Error />,
-    },
-    {
-      path: "/student/noticeboard/announcements",
-      element: <StudentAnnounce />,
-      errorElement: <Error />,
-    },
-    {
-      path: "/student_class/:sid/module",
-      element: <ProtectRoute Component={StudentModule} role="student" />,
-      errorElement: <Error />,
-    },
+   
+   
+  
 
-    {
-      path: "/student_class/:sid/assignments",
-      element: <ProtectRoute Component={StudentAssignmentList} role="student" />,
-      errorElement: <Error />,
-    },
-    {
-      path: "/student_class/:sid/assignments/:aid/view",
-      element: <ProtectRoute Component={StudentAssignmentView} role="student" />,
-      errorElement: <Error />,
-    },
-    {
-      path: "/student_class/:sid/createassignment",
-      element: <ProtectRoute Component={StudentCreateAssignment} role="student" />,
-      errorElement: <Error />,
-    },
+  // Student Routes-----------------------------
+{
+  path: "/student_dash",
+  element: <ProtectRoute Component={StudentDash} role="student" />,
+  errorElement: <Error />,
+},
+{
+  path: "/student_library",
+  element: <StudentLibrarySection />,
+  errorElement: <Error />,
+},
+{
+  path: "/student_finance",
+  element: <StudentFinance />,
+  errorElement: <Error />,
+},
+{
+  path: "/student_class",
+  element: <StudentClass />,
+  errorElement: <Error />,
+},
+{
+  path: "/student/noticeboard/events",
+  element: <StudentEvent />,
+  errorElement: <Error />,
+},
+{
+  path: "/student/noticeboard/announcements",
+  element: <StudentAnnounce />,
+  errorElement: <Error />,
+},
+{
+  path: "/student_class/:sid/module",
+  element: <ProtectRoute Component={StudentModule} role="student" />,
+  errorElement: <Error />,
+},
 
-    {
-      path: "/student_class/:sid/quizzes",
-      element: <ProtectRoute Component={StudentQuizzList} role="student" />,
-      errorElement: <Error />,
-    },
-    {
-      path: "/student_class/:sid/quizzes/:qid/view",
-      element: <ProtectRoute Component={StudentQuizzesView} role="student" />,
-      errorElement: <Error />,
-    },
-    {
-      path: "/student_class/:sid/discussions",
-      element: <ProtectRoute Component={StudentDiscussion} role="student" />,
-      errorElement: <Error />,
-    },
-    {
-      path: "/student_class/:sid/discussions/:did/view",
-      element: <ProtectRoute Component={StudentDiscussionView} role="student" />,
-      errorElement: <Error />,
-    },
-    {
-      path: "/student_class/:sid/grades",
-      element: <ProtectRoute Component={StudentGrade} role="student" />,
-      errorElement: <Error />,
-    },
+{
+  path: "/student_class/:sid/assignments",
+  element: <ProtectRoute Component={StudentAssignmentList} role="student" />,
+  errorElement: <Error />,
+},
+{
+  path: "/student_class/:sid/assignments/:aid/view",
+  element: <ProtectRoute Component={StudentAssignmentView} role="student" />,
+  errorElement: <Error />,
+},
+{
+  path: "/student_class/:sid/createassignment",
+  element: <ProtectRoute Component={StudentCreateAssignment} role="student" />,
+  errorElement: <Error />,
+},
 
-    {
-      path: "/student_class/:sid/announcements",
-      element: <ProtectRoute Component={StudentAnnouncement} role="student" />,
-      errorElement: <Error />,
-    },
-    {
-      path: "/student_class/:sid/announcements/:aid/view",
-      element: <ProtectRoute Component={StudentAnnouncementView} role="student" />,
-      errorElement: <Error />,
-    },
-    {
-      path: "/student_class/:sid/syllabus",
-      element: <ProtectRoute Component={StudentSyllabus} role="student" />,
-      errorElement: <Error />,
-    },
+{
+  path: "/student_class/:sid/quizzes",
+  element: <ProtectRoute Component={StudentQuizzList} role="student" />,
+  errorElement: <Error />,
+},
+{
+  path: "/student_class/:sid/quizzes/:qid/view",
+  element: <ProtectRoute Component={StudentQuizzesView} role="student" />,
+  errorElement: <Error />,
+},
+{
+  path: "/student_class/:sid/discussions",
+  element: <ProtectRoute Component={StudentDiscussion} role="student" />,
+  errorElement: <Error />,
+},
+{
+  path: "/student_class/:sid/discussions/:did/view",
+  element: <ProtectRoute Component={StudentDiscussionView} role="student" />,
+  errorElement: <Error />,
+},
+{
+  path: "/student_class/:sid/grades",
+  element: <ProtectRoute Component={StudentGrade} role="student" />,
+  errorElement: <Error />,
+},
 
-    {
-      path: "/student_class/:sid/page",
-      element: <ProtectRoute Component={StudentPage} role="student" />,
-      errorElement: <Error />,
-    },
+{
+  path: "/student_class/:sid/announcements",
+  element: <ProtectRoute Component={StudentAnnouncement} role="student" />,
+  errorElement: <Error />,
+},
+{
+  path: "/student_class/:sid/announcements/:aid/view",
+  element: <ProtectRoute Component={StudentAnnouncementView} role="student" />,
+  errorElement: <Error />,
+},
+{
+  path: "/student_class/:sid/syllabus",
+  element: <ProtectRoute Component={StudentSyllabus} role="student" />,
+  errorElement: <Error />,
+},
 
-    {
-      path: "/student_class/:sid/pages/:did/view",
-      element: <ProtectRoute Component={StudentPageView} role="student" />,
-      errorElement: <Error />,
-    },
+{
+  path: "/student_class/:sid/page",
+  element: <ProtectRoute Component={StudentPage} role="student" />,
+  errorElement: <Error />,
+},
 
+{
+  path: "/student_class/:sid/pages/:did/view",
+  element: <ProtectRoute Component={StudentPageView} role="student" />,
+  errorElement: <Error />,
+},
+
+ 
 
     { path: "/user/:cid", element: <SingleStudent />, errorElement: <Error /> },
   ]);

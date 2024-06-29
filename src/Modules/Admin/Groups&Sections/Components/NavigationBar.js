@@ -1,9 +1,10 @@
 import React, { useState, lazy, Suspense } from "react";
 import Sidebar from "../../../../Components/Common/Sidebar";
 import { useSelector } from "react-redux";
-import { toast } from "react-hot-toast"; // Ensure proper import
+import { toast } from "react-hot-toast";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import useDeleteSection from "../../../../Hooks/AuthHooks/Staff/Admin/Sections/useDeleteSection";
+import { PiSpinner } from "react-icons/pi";
 
 const AddGroup = lazy(() => import("./AddGroup"));
 const AddSection = lazy(() => import("./AddSection"));
@@ -14,7 +15,7 @@ const NavigationBar = ({ onSectionChange, selectedSection }) => {
 
   const Sections = useSelector((store) => store.Class.sectionsList);
 
-  const { deleteSection, loading } = useDeleteSection(); // Using the custom hook
+  const { deleteSection, loading } = useDeleteSection();
 
   const openAddGroupSidebar = () => setSidebarType("addGroup");
   const openAddSectionSidebar = () => setSidebarType("addSection");
@@ -24,8 +25,8 @@ const NavigationBar = ({ onSectionChange, selectedSection }) => {
     await deleteSection(id);
   };
 
-  const handleSectionChange = (section) => {
-    onSectionChange(section);
+  const handleSectionChange = (section, sectionId) => {
+    onSectionChange(section, sectionId);
     setClickedSection(section);
   };
 
@@ -37,26 +38,35 @@ const NavigationBar = ({ onSectionChange, selectedSection }) => {
 
   return (
     <>
-      <div className="flex justify-between items-center p-4">
+      <div className="flex justify-between items-center border-b p-4">
         <div className="flex space-x-2 px-5">
           <button
             className={getButtonClass("Everyone")}
-            onClick={() => handleSectionChange("Everyone")}
+            onClick={() => handleSectionChange("Everyone", null)}
           >
             Everyone
           </button>
           {Sections?.map((item) => (
             <button
-              key={item.sectionName}
+              disabled={loading}
+              key={item._id}
               className={getButtonClass(item.sectionName)}
-              onClick={() => handleSectionChange(item.sectionName)}
+              onClick={() => handleSectionChange(item.sectionName, item._id)}
             >
               {item.sectionName}
               {clickedSection === item.sectionName && (
-                <RiDeleteBin5Line
-                  className="absolute top-0 right-0 p-1 rounded-full bg-white text-2xl -m-1 text-red-600 cursor-pointer"
-                  onClick={() => handleDeleteClick(item._id)}
-                />
+                <span className="absolute top-0 right-0 p-1 rounded-full bg-white hover:bg-gray-200 text-lg border -m-1 text-red-600 cursor-pointer">
+                  {loading ? (
+                    <PiSpinner className="animate-spin" />
+                  ) : (
+                    <RiDeleteBin5Line
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteClick(item._id);
+                      }}
+                    />
+                  )}
+                </span>
               )}
             </button>
           ))}

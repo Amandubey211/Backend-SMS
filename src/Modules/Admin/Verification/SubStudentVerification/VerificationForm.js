@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate, useParams } from "react-router-dom";
 
 import { useSelector } from "react-redux";
 import useVerifyStudentDocument from "../../../../Hooks/AuthHooks/Staff/useVerifyStudentDocument";
-import useGetAllClassList from "../../../../Hooks/AuthHooks/Staff/useGetAllClassList";
 import useAssignClassToStudent from "../../../../Hooks/AuthHooks/Staff/useAssignClassToStudent";
+import useGetAllClasses from "../../../../Hooks/AuthHooks/Staff/Admin/Class/useGetAllClasses";
 
 const VerificationForm = ({ email, studentId }) => {
   const navigate = useNavigate();
@@ -13,12 +13,12 @@ const VerificationForm = ({ email, studentId }) => {
   const [rejectionReason, setRejectionReason] = useState("");
   const [presentClassId, setpresentClassId] = useState("");
   const { loading, verifyDocument } = useVerifyStudentDocument();
-  const { assignClass } = useAssignClassToStudent();
-  const { getClassList } = useGetAllClassList();
+  const { fetchClasses } = useGetAllClasses();
 
-  const classList = useSelector((store) => store.Admin.classList);
+  const { cid } = useParams();
+  const classList = useSelector((store) => store.Class.classList);
   useEffect(() => {
-    getClassList();
+    fetchClasses(cid);
   }, []);
 
   const handleVerifyStudent = async (e) => {
@@ -121,7 +121,7 @@ const VerificationForm = ({ email, studentId }) => {
                 <option value="">Select class</option>
                 {classList?.map((classItem, index) => (
                   <option key={index} value={classItem?._id} className="py-2">
-                    {classItem.name}
+                    {classItem.className}
                   </option>
                 ))}
               </select>

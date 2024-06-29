@@ -144,6 +144,7 @@ const StudentInfo = () => {
           </div>
         </form>
       </div>
+      {/* // i wnat  */}
       <div className="">
         <StudentCard studentInfo={studentInfo} imagePreview={imagePreview} />
         <div className="mt-6">

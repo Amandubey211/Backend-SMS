@@ -1,10 +1,14 @@
 // src/components/AdmissionInfo.js
 
 import React, { useEffect } from "react";
+
 import useGetAllClasses from "../../../../Hooks/AuthHooks/Staff/Admin/useGetAllClasses";
 import useGetAllSchools from "../../../../Hooks/AuthHooks/Staff/Admin/useGetAllSchool";
+
+
 import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
+import useGetAllClasses from "../../../../Hooks/AuthHooks/Staff/Admin/Class/useGetAllClasses";
 
 const AdmissionInfo = ({ studentInfo, handleInputChange }) => {
   const { fetchClasses } = useGetAllClasses();

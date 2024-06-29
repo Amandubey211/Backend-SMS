@@ -1,16 +1,26 @@
-import React, { useState } from "react";
-import "tailwindcss/tailwind.css";
-import AddNewStudents from "./AddNewStudents";
-import Sidebar from "../../../../Components/Common/Sidebar";
-import { NavLink } from "react-router-dom";
+import React, { useCallback } from "react";
+import { NavLink, useParams } from "react-router-dom";
+import { useSelector } from "react-redux";
 
-const NavigationBar = ({ setActiveSection, activeSection }) => {
-  const [isSidebarOpen, setSidebarOpen] = useState(false);
+const NavigationBar = ({ setActiveSection, activeSection, totalStudents }) => {
+  const { cid } = useParams();
+  const Sections = useSelector((store) => store.Class.sectionsList);
 
-  const handleSidebarOpen = () => setSidebarOpen(true);
-  const handleSidebarClose = () => setSidebarOpen(false);
+  const getButtonClass = useCallback(
+    (section) => {
+      return activeSection === section
+        ? "relative px-4 py-2 rounded-full bg-gradient-to-r from-red-400 to-purple-500 text-white"
+        : "relative px-4 py-2 rounded-full border border-gray-300";
+    },
+    [activeSection]
+  );
 
-  const sections = ["Everyone", "Section 1", "Section 2", "Section 3", "Section 4"];
+  const handleSectionChange = useCallback(
+    (section) => {
+      setActiveSection(section);
+    },
+    [setActiveSection]
+  );
 
   return (
     <>
@@ -18,10 +28,9 @@ const NavigationBar = ({ setActiveSection, activeSection }) => {
         <div className="flex items-center space-x-4">
           <h1 className="text-xl font-semibold">All Students</h1>
           <span className="bg-purple-200 text-purple-700 rounded-full px-2 py-1 text-sm">
-            150
+            {totalStudents}
           </span>
         </div>
-
         <NavLink
           to="/admissions"
           className="flex items-center border border-gray-300 ps-5 py-0 rounded-full"
@@ -32,26 +41,20 @@ const NavigationBar = ({ setActiveSection, activeSection }) => {
           </div>
         </NavLink>
       </div>
-      <Sidebar
-        isOpen={isSidebarOpen}
-        onClose={handleSidebarClose}
-        title="Assign new Students"
-      >
-        <AddNewStudents />
-      </Sidebar>
-
       <div className="flex space-x-2 px-5">
-        {sections.map((section) => (
+        <button
+          className={getButtonClass("Everyone")}
+          onClick={() => handleSectionChange("Everyone")}
+        >
+          Everyone
+        </button>
+        {Sections?.map((item) => (
           <button
-            key={section}
-            className={`px-4 py-2 rounded-full ${
-              activeSection === section
-                ? "bg-gradient-to-r from-red-400 to-purple-500 text-white"
-                : "border border-gray-300"
-            }`}
-            onClick={() => setActiveSection(section)}
+            key={item.sectionName}
+            className={getButtonClass(item.sectionName)}
+            onClick={() => handleSectionChange(item.sectionName)}
           >
-            {section}
+            {item.sectionName}
           </button>
         ))}
       </div>

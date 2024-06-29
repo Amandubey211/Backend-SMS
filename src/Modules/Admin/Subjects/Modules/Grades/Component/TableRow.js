@@ -5,12 +5,12 @@ const TableRow = ({ student, onRowClick }) => {
     <tr className="border-b hover:bg-gray-50 ">
       <td className="p-3 flex items-center cursor-pointer" onClick={onRowClick}>
         <img
-          src={student.avatar}
-          alt={student.name}
+          src={student.profile}
+          alt={student.firstName}
           className="w-10 h-10 rounded-full mr-3"
         />
         <div>
-          <div className="font-medium">{student.name}</div>
+          <div className="font-medium">{student.firstName} {student.lastName}</div>
           <div className="text-green-600">{student.section}</div>
         </div>
       </td>
