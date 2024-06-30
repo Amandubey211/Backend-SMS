@@ -4,7 +4,7 @@ import AttendanceNavCard from "../../Components/AttendanceNavCard";
 
 const Statistics = () => {
   return (
-    <div className="space-y-4">
+    <div className="space-y-2 w-full">
       {navData.filter((item)=>item.label != "Leave Today").map((item) => (
         <AttendanceNavCard
           key={item.label}
