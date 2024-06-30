@@ -1,19 +1,17 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 
-const CustomCalendar = () => {
-  const [date, setDate] = useState(new Date());
-
+const CustomCalendar = ({ selectedDate, setSelectedDate }) => {
   const onChange = (newDate) => {
-    setDate(newDate);
+    setSelectedDate(newDate);
   };
 
   return (
     <div className="">
       <Calendar
         onChange={onChange}
-        value={date}
+        value={selectedDate}
         tileClassName={({ date, view }) => {
           if (date.getDate() === 12 && date.getMonth() === 6 && date.getFullYear() === 2023) {
             return 'highlight';
