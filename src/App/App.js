@@ -454,7 +454,7 @@ function App() {
       element: <Libary />,
       errorElement: <Error />
     },
-    { path: "library", element: <Libary />, errorElement: <Error /> },
+    // { path: "library", element: <Libary />, errorElement: <Error /> },
 
     {
       path: "noticeboard/events",

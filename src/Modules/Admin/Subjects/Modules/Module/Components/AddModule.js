@@ -1,10 +1,15 @@
-import React, { useState } from 'react';
-import { FaTimes } from 'react-icons/fa';
-import toast from 'react-hot-toast';
+import React, { useState } from "react";
+import { FaTimes } from "react-icons/fa";
+import toast from "react-hot-toast";
+import { useParams } from "react-router-dom";
+import useAddModule from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useAddModule";
 
 const AddModule = () => {
+  const { sid } = useParams();
   const [selectedFile, setSelectedFile] = useState(null);
   const [preview, setPreview] = useState(null);
+  const [moduleTitle, setModuleTitle] = useState("");
+  const { loading, error, success, addModule } = useAddModule();
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
@@ -23,17 +28,45 @@ const AddModule = () => {
     setPreview(null);
   };
 
+  const handleSubmit = async () => {
+    if (!moduleTitle) {
+      toast.error("Module title is required");
+      return;
+    }
+    if (!selectedFile) {
+      toast.error("Module image is required");
+      return;
+    }
+
+    await addModule(moduleTitle, selectedFile);
+    if (success) {
+      toast.success(success);
+      setModuleTitle("");
+      clearImage();
+    }
+    if (error) {
+      toast.error(error);
+    }
+  };
+
   return (
     <div className="flex flex-col h-full p-2">
       <div className="bg-white rounded-lg">
         <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-semibold opacity-60 mb-2" htmlFor="moduleImage">
+          <label
+            className="block text-gray-700 text-sm font-semibold opacity-60 mb-2"
+            htmlFor="moduleImage"
+          >
             Module Image
           </label>
-          <div className="relative border rounded-lg w-full h-48 flex items-center justify-center">
+          <div className="relative border border-dashed rounded-lg w-full h-48 flex items-center justify-center">
             {preview ? (
               <>
-                <img src={preview} alt="Preview" className="w-full h-full object-cover rounded-lg" />
+                <img
+                  src={preview}
+                  alt="Preview"
+                  className="w-full h-full object-cover rounded-lg"
+                />
                 <button
                   onClick={clearImage}
                   className="absolute top-2 right-2 bg-white text-gray-700 p-1 rounded-full shadow-md hover:text-red-500"
@@ -106,24 +139,30 @@ const AddModule = () => {
           </div>
         </div>
         <div>
-          <label className="block text-gray-700 text-sm font-semibold opacity-60 mb-2" htmlFor="moduleTitle">
+          <label
+            className="block text-gray-700 text-sm font-semibold opacity-60 mb-2"
+            htmlFor="moduleTitle"
+          >
             Module Title
           </label>
           <input
             type="text"
             id="moduleTitle"
             placeholder="Type here"
+            value={moduleTitle}
+            onChange={(e) => setModuleTitle(e.target.value)}
             className="w-full px-3 py-2 border rounded-lg text-gray-700 focus:outline-none focus:shadow-outline"
           />
         </div>
       </div>
       <div className="mt-auto mb-8">
         <button
-          onClick={() => toast.success("Will be adding it soon")}
+          onClick={handleSubmit}
           type="submit"
           className="w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600"
+          disabled={loading}
         >
-          Add New Module
+          {loading ? "Adding Module..." : "Add New Module"}
         </button>
       </div>
     </div>
