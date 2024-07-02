@@ -3,8 +3,9 @@ import { CiSearch } from "react-icons/ci";
 import { FaEllipsisV, FaExclamationTriangle } from "react-icons/fa";
 import { BsPatchCheckFill } from "react-icons/bs";
 import { NavLink, useParams } from "react-router-dom";
-
-const List = ({ data, icon, title, type }) => {
+import { ImSpinner3 } from "react-icons/im";
+import { MdOutlineBlock } from "react-icons/md";
+const List = ({ data, icon, title, type, loading, error }) => {
   const { cid, sid } = useParams();
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -13,7 +14,7 @@ const List = ({ data, icon, title, type }) => {
   };
 
   const filteredData = data.filter((item) =>
-    item.title.toLowerCase().includes(searchQuery.toLowerCase())
+    item.name?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -41,15 +42,26 @@ const List = ({ data, icon, title, type }) => {
         </div>
       </div>
       <ul className="border-t p-4">
-        {filteredData.length > 0 ? (
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-10 text-gray-500">
+            <ImSpinner3 className="w-12 h-12 animate-spin mb-3" />
+            <p className="text-lg font-semibold">Loading...</p>
+          </div>
+        ) : error ? (
+          <div className="flex flex-col items-center justify-center py-10 text-gray-500">
+            <FaExclamationTriangle className="w-12 h-12 mb-3" />
+            {/* <p className="text-lg font-semibold">Error: {error}</p> */}
+            <p className="text-lg font-semibold">No Data Found</p>
+          </div>
+        ) : filteredData.length > 0 ? (
           filteredData.map((item) => (
             <NavLink
               to={
                 type === "Assignment"
-                  ? `/class/${cid}/${sid}/assignments/${item.id}/view`
-                  : `/class/${cid}/${sid}/quizzes/${item.id}/view`
+                  ? `/class/${cid}/${sid}/assignments/${item._id}/view`
+                  : `/class/${cid}/${sid}/quizzes/${item._id}/view`
               }
-              key={item.id}
+              key={item._id}
               className="flex items-center mb-3 gap-3 p-1 rounded-lg"
             >
               <div className="text-green-600 p-2 border rounded-full ">
@@ -58,13 +70,22 @@ const List = ({ data, icon, title, type }) => {
               <div className="flex justify-between w-full px-2 items-start">
                 <div className="flex flex-col gap-1 justify-center flex-grow">
                   <div>
-                    <h3 className="text-md font-semibold mb-1">{item.title}</h3>
-                    <p className="text-sm text-gray-500">
-                      Module : {item.module} | Chapter : {item.chapter}
+                    <h3 className="text-md font-semibold mb-1">
+                      {item.name || "No Title"}
+                    </h3>
+                    <p className="text-sm text-gray-500 capitalize">
+                      Module : {item.moduleName || "N/A"} | Chapter :{" "}
+                      {item.chapterName || "N/A"}
                     </p>
                   </div>
                 </div>
+
                 <div className="flex items-center gap-3">
+                  {/* {item.isPublished ? (
+                    <BsPatchCheckFill className="text-green-600 p-1 border rounded-full h-7 w-7" />
+                  ) : (
+                    <MdOutlineBlock className="text-gray-600" />
+                  )} */}
                   <BsPatchCheckFill className="text-green-600 p-1 border rounded-full h-7 w-7" />
                   <FaEllipsisV className="text-green-600 p-1 border rounded-full h-7 w-7" />
                 </div>

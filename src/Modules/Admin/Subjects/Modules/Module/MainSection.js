@@ -5,41 +5,37 @@ import Chapter from "./Components/Chapter";
 import ModuleCard from "./Components/ModuleCard";
 import Sidebar from "../../../../../Components/Common/Sidebar";
 import AddModule from "./Components/AddModule";
-import AddChapter from "./Components/AddChapter";
+// import AddChapter from "./Components/AddChapter";
 import { RiAddFill } from "react-icons/ri";
 import { setSelectedModule } from "../../../../../Redux/Slices/Common/CommonSlice";
 import useGetModulesForStudent from "../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useGetModulesForStudent";
+import MoveModule from "./Components/MoveModule";
 
 const MainSection = () => {
   const [expandedChapters, setExpandedChapters] = useState([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isMoveSidebarOpen, setIsMoveSidebarOpen] = useState(false); // New state for move sidebar
   const [sidebarContent, setSidebarContent] = useState(null);
   const dispatch = useDispatch();
   const selectedModule = useSelector((state) => state.Common.selectedModule);
-  const { error, fetchModules, loading, modulesData } = useGetModulesForStudent();
+  const { error, fetchModules, loading, modulesData } =
+    useGetModulesForStudent();
 
   useEffect(() => {
     // Fetch modules data
     fetchModules();
-
-    return () => {
-      // Reset the selected module when the component unmounts
-      dispatch(setSelectedModule({
-        moduleId: null,
-        name: null,
-        chapters: [],
-      }));
-    };
-  }, [fetchModules, dispatch]);
+  }, [fetchModules]);
 
   useEffect(() => {
     // Set the first module as the default selected module when modulesData is updated
     if (modulesData && modulesData.modules.length > 0) {
-      dispatch(setSelectedModule({
-        moduleId: modulesData.modules[0]._id,
-        name: modulesData.modules[0].name,
-        chapters: modulesData.modules[0].chapters,
-      }));
+      dispatch(
+        setSelectedModule({
+          moduleId: modulesData.modules[0]._id,
+          name: modulesData.modules[0].name,
+          chapters: modulesData.modules[0].chapters,
+        })
+      );
     }
   }, [dispatch, modulesData]);
 
@@ -66,13 +62,29 @@ const MainSection = () => {
     setSidebarContent(null);
   };
 
+  const handleMoveSidebarClose = () => {
+    setIsMoveSidebarOpen(false);
+  };
+
   const handleModuleSelect = (module) => {
-    dispatch(setSelectedModule({
-      moduleId: module._id,
-      name: module.name,
-      chapters: module.chapters,
-    }));
+    dispatch(
+      setSelectedModule({
+        moduleId: module._id,
+        name: module.name,
+        chapters: module.chapters,
+      })
+    );
     setExpandedChapters([]);
+  };
+
+  const handleEditModule = (module) => {
+    setSidebarContent(<AddModule data={module} />);
+    setIsSidebarOpen(true);
+  };
+
+  const handleMoveModule = () => {
+    setSidebarContent(<MoveModule />);
+    setIsMoveSidebarOpen(true);
   };
 
   return (
@@ -118,7 +130,9 @@ const MainSection = () => {
             <h1 className="text-xl font-semibold">All Modules</h1>
 
             <p className="bg-gradient-to-r from-pink-100 to-purple-200 font-semibold rounded-full p-1 px-2">
-              <span className="text-gradient">{modulesData?.modules.length}</span>
+              <span className="text-gradient">
+                {modulesData?.modules.length}
+              </span>
             </p>
           </div>
           <div className="grid grid-cols-1 gap-2">
@@ -127,13 +141,15 @@ const MainSection = () => {
                 key={index}
                 title={module.name}
                 moduleNumber={index + 1}
-                imageUrl={module?.thumbnail || "https://avatars.githubusercontent.com/u/109097090?v=4"}
-                isPublished={true} // Update this based on your logic
+                imageUrl={module.thumbnail}
+                moduleId={module._id}
+                isPublished={false} // Update this based on your logic
                 isSelected={
-                  selectedModule &&
-                  selectedModule.moduleId === module._id
+                  selectedModule && selectedModule.moduleId === module._id
                 }
                 onSelect={() => handleModuleSelect(module)}
+                onEdit={() => handleEditModule(module)}
+                onMove={() => handleMoveModule(module)}
               />
             ))}
           </div>
@@ -154,7 +170,16 @@ const MainSection = () => {
                 : "Add New Module"
             }
           >
-            {sidebarContent === "chapter" ? <AddChapter /> : <AddModule />}
+            {sidebarContent}
+          </Sidebar>
+        )}
+        {isMoveSidebarOpen && (
+          <Sidebar
+            isOpen={isMoveSidebarOpen}
+            onClose={handleMoveSidebarClose}
+            title="Move Module"
+          >
+            <MoveModule />{" "}
           </Sidebar>
         )}
       </div>

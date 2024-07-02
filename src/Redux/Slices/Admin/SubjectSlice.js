@@ -2,6 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   subjects: [],
+  modules:[]
 };
 
 const SubjectsSlice = createSlice({
@@ -11,8 +12,11 @@ const SubjectsSlice = createSlice({
     setSubjects: (state, action) => {
       state.subjects = action.payload;
     },
+    setModules: (state, action) => {
+      state.modules = action.payload;
+    },
   },
 });
 
-export const { setSubjects } = SubjectsSlice.actions;
+export const { setSubjects ,setModules} = SubjectsSlice.actions;
 export default SubjectsSlice.reducer;
