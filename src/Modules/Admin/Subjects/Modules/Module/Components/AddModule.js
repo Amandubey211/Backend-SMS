@@ -1,15 +1,22 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FaTimes } from "react-icons/fa";
 import toast from "react-hot-toast";
 import { useParams } from "react-router-dom";
 import useAddModule from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useAddModule";
 
-const AddModule = () => {
+const AddModule = ({ data }) => {
   const { sid } = useParams();
   const [selectedFile, setSelectedFile] = useState(null);
   const [preview, setPreview] = useState(null);
   const [moduleTitle, setModuleTitle] = useState("");
   const { loading, error, success, addModule } = useAddModule();
+
+  useEffect(() => {
+    if (data) {
+      setModuleTitle(data.name);
+      setPreview(data.thumbnail);
+    }
+  }, [data]);
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
@@ -33,12 +40,12 @@ const AddModule = () => {
       toast.error("Module title is required");
       return;
     }
-    if (!selectedFile) {
+    if (!selectedFile && !preview) {
       toast.error("Module image is required");
       return;
     }
 
-    await addModule(moduleTitle, selectedFile);
+    await addModule(moduleTitle, selectedFile || preview);
     if (success) {
       toast.success(success);
       setModuleTitle("");
@@ -162,7 +169,7 @@ const AddModule = () => {
           className="w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600"
           disabled={loading}
         >
-          {loading ? "Adding Module..." : "Add New Module"}
+          {loading ? "Adding Module..." : data ? "Update Module" : "Add New Module"}
         </button>
       </div>
     </div>

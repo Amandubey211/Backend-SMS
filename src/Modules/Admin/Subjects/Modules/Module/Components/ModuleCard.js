@@ -10,6 +10,7 @@ import {
   FaShareAlt,
   FaTrashAlt,
 } from "react-icons/fa";
+import useDeleteModule from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useDeleteModule";
 
 const ModuleCard = ({
   title,
@@ -18,11 +19,16 @@ const ModuleCard = ({
   isPublished,
   isSelected,
   onSelect,
+  onEdit,
+  onMove,
+  moduleId,
 }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef();
+  const { loading, error, success, deleteModule } = useDeleteModule();
 
-  const toggleMenu = () => {
+  const toggleMenu = (e) => {
+    e.stopPropagation();
     setMenuOpen(!menuOpen);
   };
 
@@ -30,6 +36,12 @@ const ModuleCard = ({
     if (menuRef.current && !menuRef.current.contains(event.target)) {
       setMenuOpen(false);
     }
+  };
+
+  const handleDelete = (e) => {
+    e.stopPropagation();
+    console.log(moduleId)
+    deleteModule(moduleId);
   };
 
   useEffect(() => {
@@ -41,9 +53,7 @@ const ModuleCard = ({
 
   return (
     <div
-      className={`relative mb-4 border-2 ${
-        isSelected ? "border-rose-400" : ""
-      } bg-white rounded-lg cursor-pointer`}
+      className={`relative mb-4 border-2 ${isSelected ? "border-rose-400" : ""} bg-white rounded-lg cursor-pointer`}
       onClick={onSelect}
     >
       <img
@@ -79,14 +89,14 @@ const ModuleCard = ({
           className="absolute top-12 right-4 bg-white border rounded-lg shadow-lg w-48 z-10"
         >
           <ul className="py-2">
-            <li className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
+            <li className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick={onEdit}>
               <FaPen className="mr-2" /> Edit
+            </li>
+            <li className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick={onMove}>
+              <FaArrowRight className="mr-2" /> Move to...
             </li>
             <li className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
               <FaCopy className="mr-2" /> Duplicate
-            </li>
-            <li className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
-              <FaArrowRight className="mr-2" /> Move to...
             </li>
             <li className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
               <FaIndent className="mr-2" /> Increase indent
@@ -94,12 +104,15 @@ const ModuleCard = ({
             <li className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
               <FaShareAlt className="mr-2" /> Share to Commons
             </li>
-            <li className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
+            <li className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick={handleDelete}>
               <FaTrashAlt className="mr-2" /> Remove
             </li>
           </ul>
         </div>
       )}
+      {loading && <p>Deleting...</p>}
+      {error && <p className="text-red-500">{error}</p>}
+      {success && <p className="text-green-500">{success}</p>}
     </div>
   );
 };
