@@ -1,12 +1,15 @@
-import React, { useState } from 'react';
-import { FaTimes } from 'react-icons/fa';
-import toast from 'react-hot-toast';
+import React, { useState } from "react";
+import { FaTimes } from "react-icons/fa";
+import toast from "react-hot-toast";
+import useAddChapter from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useAddChapter";
+import { useSelector } from "react-redux";
 
 const AddChapter = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [preview, setPreview] = useState(null);
-  const [moduleTitle, setModuleTitle] = useState('');
-
+  const [chapterTitle, setChapterTitle] = useState("");
+  const { loading, error, success, addChapter } = useAddChapter();
+const selectedModule = useSelector((store)=>store.Common.selectedModule)
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     if (file) {
@@ -24,27 +27,48 @@ const AddChapter = () => {
     setPreview(null);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const formData = {
-      moduleTitle,
-      selectedFile,
-    };
-    console.log(formData);
-    toast.success('Module data has been logged to the console');
+    if (!chapterTitle) {
+      toast.error("Chapter title is required");
+      return;
+    }
+    if (!selectedFile) {
+      toast.error("Chapter image is required");
+      return;
+    }
+
+    await addChapter(chapterTitle, selectedFile,selectedModule?.moduleId);
+    console.log(chapterTitle, selectedFile,selectedModule?.moduleId)
+
+    if (success) {
+      toast.success(success);
+      setChapterTitle("");
+      clearImage();
+    }
+    if (error) {
+      toast.error(error);
+    }
   };
 
   return (
     <form className="flex flex-col h-full p-2" onSubmit={handleSubmit}>
       <div className="bg-white rounded-lg">
         <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-semibold opacity-60 mb-2" htmlFor="moduleImage">
+          <label
+            className="block text-gray-700 text-sm font-semibold opacity-60 mb-2"
+            htmlFor="moduleImage"
+          >
             Chapter Image
           </label>
           <div className="relative border rounded-lg w-full h-48 flex items-center justify-center">
             {preview ? (
               <>
-                <img src={preview} alt="Preview" className="w-full h-full object-cover rounded-lg" />
+                <img
+                  src={preview}
+                  alt="Preview"
+                  className="w-full h-full object-cover rounded-lg"
+                />
                 <button
                   onClick={clearImage}
                   className="absolute top-2 right-2 bg-white text-gray-700 p-1 rounded-full shadow-md hover:text-red-500"
@@ -117,14 +141,17 @@ const AddChapter = () => {
           </div>
         </div>
         <div>
-          <label className="block text-gray-700 text-sm font-semibold opacity-60 mb-2" htmlFor="moduleTitle">
+          <label
+            className="block text-gray-700 text-sm font-semibold opacity-60 mb-2"
+            htmlFor="moduleTitle"
+          >
             Chapter Title
           </label>
           <input
             type="text"
             id="moduleTitle"
-            value={moduleTitle}
-            onChange={(e) => setModuleTitle(e.target.value)}
+            value={chapterTitle}
+            onChange={(e) => setChapterTitle(e.target.value)}
             placeholder="Type here"
             className="w-full px-3 py-2 border rounded-lg text-gray-700 focus:outline-none focus:shadow-outline"
           />
@@ -134,8 +161,9 @@ const AddChapter = () => {
         <button
           type="submit"
           className="w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600"
+          disabled={loading}
         >
-          Add New Chapter
+          {loading ? "Adding Chapter..." : "Add New Chapter"}
         </button>
       </div>
     </form>

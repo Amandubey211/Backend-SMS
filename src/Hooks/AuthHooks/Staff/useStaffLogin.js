@@ -1,7 +1,11 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
-import { setAuth, setRole } from "../../../Redux/Slices/AuthSlice.js";
+import {
+  setAuth,
+  setRole,
+  setUerDetails,
+} from "../../../Redux/Slices/AuthSlice.js";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
@@ -50,6 +54,15 @@ const useStaffLogin = () => {
 
         dispatch(setAuth(true));
         dispatch(setRole(data.role)); // dynamic role from backend
+        dispatch(
+          setUerDetails({
+            userId: data.userId,
+            schoolId: data.schoolId,
+            email: data.email,
+            userName: data?.fullName,
+            profile: data?.profile,
+          })
+        );
         navigate(`/dashboard`);
         toast.success("Logged in successfully", {
           position: "bottom-left",
