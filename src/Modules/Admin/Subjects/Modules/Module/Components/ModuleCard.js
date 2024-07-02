@@ -11,7 +11,14 @@ import {
   FaTrashAlt,
 } from "react-icons/fa";
 
-const ModuleCard = ({ title, moduleNumber, imageUrl, isCompleted }) => {
+const ModuleCard = ({
+  title,
+  moduleNumber,
+  imageUrl,
+  isPublished,
+  isSelected,
+  onSelect,
+}) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef();
 
@@ -33,22 +40,26 @@ const ModuleCard = ({ title, moduleNumber, imageUrl, isCompleted }) => {
   }, []);
 
   return (
-    <div className="relative mb-4 border-2 border-rose-400  bg-white rounded-lg ">
+    <div
+      className={`relative mb-4 border-2 ${
+        isSelected ? "border-rose-400" : ""
+      } bg-white rounded-lg cursor-pointer`}
+      onClick={onSelect}
+    >
       <img
         src={imageUrl}
         alt={title}
         className="w-full h-36 object-cover rounded-t-lg"
       />
-      <div className="p-4 " >
+      <div className="p-4">
         <h2 className="font-semibold text-lg">{title}</h2>
         <div className="flex justify-between items-center mt-2">
           <p className="bg-gradient-to-r from-pink-100 to-purple-200 font-semibold rounded-full py-1 px-4">
-            {" "}
-            <span className="text-gradient"> Module {moduleNumber}</span>{" "}
+            <span className="text-gradient">Module {moduleNumber}</span>
           </p>
 
           <div className="flex items-center space-x-2">
-            {isCompleted ? (
+            {isPublished ? (
               <FaCheckCircle className="text-green-500" />
             ) : (
               <FaBan className="text-gray-500" />

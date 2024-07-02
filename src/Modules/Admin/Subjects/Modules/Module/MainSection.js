@@ -1,18 +1,47 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import SubjectSideBar from "../../Component/SubjectSideBar";
 import Chapter from "./Components/Chapter";
-import dummyData from "./Components/Data/DummyData";
 import ModuleCard from "./Components/ModuleCard";
-import dummyModules from "./Components/Data/DummyModules";
 import Sidebar from "../../../../../Components/Common/Sidebar";
 import AddModule from "./Components/AddModule";
 import AddChapter from "./Components/AddChapter";
 import { RiAddFill } from "react-icons/ri";
+import { setSelectedModule } from "../../../../../Redux/Slices/Common/CommonSlice";
+import useGetModulesForStudent from "../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useGetModulesForStudent";
 
 const MainSection = () => {
   const [expandedChapters, setExpandedChapters] = useState([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [sidebarContent, setSidebarContent] = useState(null);
+  const dispatch = useDispatch();
+  const selectedModule = useSelector((state) => state.Common.selectedModule);
+  const { error, fetchModules, loading, modulesData } = useGetModulesForStudent();
+
+  useEffect(() => {
+    // Fetch modules data
+    fetchModules();
+
+    return () => {
+      // Reset the selected module when the component unmounts
+      dispatch(setSelectedModule({
+        moduleId: null,
+        name: null,
+        chapters: [],
+      }));
+    };
+  }, [fetchModules, dispatch]);
+
+  useEffect(() => {
+    // Set the first module as the default selected module when modulesData is updated
+    if (modulesData && modulesData.modules.length > 0) {
+      dispatch(setSelectedModule({
+        moduleId: modulesData.modules[0]._id,
+        name: modulesData.modules[0].name,
+        chapters: modulesData.modules[0].chapters,
+      }));
+    }
+  }, [dispatch, modulesData]);
 
   const handleToggle = (chapterNumber) => {
     setExpandedChapters((prev) =>
@@ -37,32 +66,50 @@ const MainSection = () => {
     setSidebarContent(null);
   };
 
+  const handleModuleSelect = (module) => {
+    dispatch(setSelectedModule({
+      moduleId: module._id,
+      name: module.name,
+      chapters: module.chapters,
+    }));
+    setExpandedChapters([]);
+  };
+
   return (
-    <div className="flex  min-h-screen">
+    <div className="flex min-h-screen">
       <SubjectSideBar />
-      <div className="w-[60%] bg-white p-2  border-l">
+
+      <div className="w-[60%] bg-white p-2 border-l">
         <div className="bg-white p-2 rounded-lg">
           <div className="flex justify-between items-center mb-5">
-            <h1 className="text-md font-semibold">Business Entrepreneurship</h1>
+            <h1 className="text-md font-semibold">
+              {selectedModule.name ? selectedModule.name : "Select a Module"}
+            </h1>
 
-            <button
-              onClick={openAddChapter}
-              className="px-4 py-2 rounded-md  bg-gradient-to-r from-pink-100 to-purple-200"
-            >
-              <span className="text-gradient"> + Add Chapter</span>
-            </button>
+            {selectedModule.name && (
+              <button
+                onClick={openAddChapter}
+                className="px-4 py-2 rounded-md bg-gradient-to-r from-pink-100 to-purple-200"
+              >
+                <span className="text-gradient">+ Add Chapter</span>
+              </button>
+            )}
           </div>
-          {dummyData.map((chapter, index) => (
-            <Chapter
-              key={index}
-              title={chapter.title}
-              chapterNumber={chapter.chapterNumber}
-              imageUrl={chapter.imageUrl}
-              items={chapter.items}
-              isExpanded={expandedChapters.includes(chapter.chapterNumber)}
-              onToggle={() => handleToggle(chapter.chapterNumber)}
-            />
-          ))}
+          {selectedModule.chapters && selectedModule.chapters.length > 0 ? (
+            selectedModule.chapters.map((chapter, index) => (
+              <Chapter
+                key={index}
+                title={chapter.name}
+                chapterNumber={index + 1}
+                imageUrl={chapter.thumbnail}
+                items={chapter.items}
+                isExpanded={expandedChapters.includes(index + 1)}
+                onToggle={() => handleToggle(index + 1)}
+              />
+            ))
+          ) : (
+            <p>Select a module to view its chapters.</p>
+          )}
         </div>
       </div>
       <div className="w-[35%] p-2 border">
@@ -70,19 +117,23 @@ const MainSection = () => {
           <div className="flex items-center gap-1 mb-2">
             <h1 className="text-xl font-semibold">All Modules</h1>
 
-            <p className="bg-gradient-to-r from-pink-100 to-purple-200 font-semibold rounded-full p-1 px-2 ">
-              {" "}
-              <span className="text-gradient"> 06 </span>{" "}
+            <p className="bg-gradient-to-r from-pink-100 to-purple-200 font-semibold rounded-full p-1 px-2">
+              <span className="text-gradient">{modulesData?.modules.length}</span>
             </p>
           </div>
           <div className="grid grid-cols-1 gap-2">
-            {dummyModules.map((module, index) => (
+            {modulesData?.modules.map((module, index) => (
               <ModuleCard
                 key={index}
-                title={module.title}
-                moduleNumber={module.moduleNumber}
-                imageUrl={module.imageUrl}
-                isCompleted={module.isCompleted}
+                title={module.name}
+                moduleNumber={index + 1}
+                imageUrl={module?.thumbnail || "https://avatars.githubusercontent.com/u/109097090?v=4"}
+                isPublished={true} // Update this based on your logic
+                isSelected={
+                  selectedModule &&
+                  selectedModule.moduleId === module._id
+                }
+                onSelect={() => handleModuleSelect(module)}
               />
             ))}
           </div>

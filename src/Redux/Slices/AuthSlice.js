@@ -6,6 +6,7 @@ const AuthSlice = createSlice({
     isLoggedIn: false,
     step: 1,
     role: null,
+    userDetail: {},
   },
   reducers: {
     setAuth: (state, action) => {
@@ -17,9 +18,12 @@ const AuthSlice = createSlice({
     setRole: (state, action) => {
       state.role = action.payload;
     },
+    setUerDetails:(state, action) => {
+      state.userDetail = action.payload;
+    },
   },
 });
 
-export const { setAuth, setRole, setStep } = AuthSlice.actions;
+export const { setAuth, setRole, setStep,setUerDetails } = AuthSlice.actions;
 
 export default AuthSlice.reducer;

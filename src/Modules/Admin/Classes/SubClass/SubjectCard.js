@@ -43,7 +43,7 @@ const SubjectCard = ({ data, backgroundColor, Class }) => {
         <div className="flex items-center mt-2 text-white">
           <span className="flex items-center mr-2 gap-1">
             <LuUser />
-            <span>{data.students ? data.students.length : 0}</span>
+            <span>{data.studentsIds ? data.studentsIds.length :0}</span>
           </span>
           <span className="border-r-2 border-white h-5 mr-2"></span>
           <span className="flex items-center gap-1">
