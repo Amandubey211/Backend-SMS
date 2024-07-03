@@ -2,11 +2,9 @@ import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 
 const FilterCard = ({ filters, setFilters }) => {
-  const [publishStatus, setPublishStatus] = useState(filters.publish || "");
+  const [publishStatus, setPublishStatus] = useState(filters.publish || null);
   const [selectedModule, setSelectedModule] = useState(filters.moduleId || "");
-  const [selectedChapter, setSelectedChapter] = useState(
-    filters.chapterId || ""
-  );
+  const [selectedChapter, setSelectedChapter] = useState(filters.chapterId || "");
   const [chapters, setChapters] = useState([]);
   const moduleList = useSelector((store) => store.Subject.modules);
 
@@ -31,6 +29,15 @@ const FilterCard = ({ filters, setFilters }) => {
     });
   };
 
+  const togglePublishStatus = (status) => {
+    setPublishStatus((prevStatus) => (prevStatus === status ? null : status));
+  };
+
+  const handleModuleChange = (e) => {
+    setSelectedModule(e.target.value);
+    setSelectedChapter(""); // Reset chapter when module changes
+  };
+
   const radioStyles = (checked, color) => ({
     appearance: "none",
     height: "20px",
@@ -53,7 +60,7 @@ const FilterCard = ({ filters, setFilters }) => {
             name="publishStatus"
             value="true"
             checked={publishStatus === "true"}
-            onChange={() => setPublishStatus("true")}
+            onChange={() => togglePublishStatus("true")}
             style={radioStyles(publishStatus === "true", "#10b981")} // Green color for publish
           />
           <span className="ml-2 text-green-600">Publish</span>
@@ -64,7 +71,7 @@ const FilterCard = ({ filters, setFilters }) => {
             name="publishStatus"
             value="false"
             checked={publishStatus === "false"}
-            onChange={() => setPublishStatus("false")}
+            onChange={() => togglePublishStatus("false")}
             style={radioStyles(publishStatus === "false", "#ef4444")} // Red color for unpublish
           />
           <span className="ml-2 text-red-600">Unpublish</span>
@@ -75,12 +82,12 @@ const FilterCard = ({ filters, setFilters }) => {
         <select
           className="mt-1 block w-full pl-3 pr-10 border py-2 text-base focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
           value={selectedModule}
-          onChange={(e) => setSelectedModule(e.target.value)}
+          onChange={handleModuleChange}
         >
           <option value="">Select</option>
           {moduleList.map((module) => (
             <option key={module._id} value={module._id}>
-              {module.name}
+              {module.moduleName}
             </option>
           ))}
         </select>

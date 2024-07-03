@@ -13,7 +13,7 @@ const CreateAssignmentHeader = ({ onSave }) => {
   const [isSidebarOpen, setSidebarOpen] = useState(false); // Manage sidebar state
 
   return (
-    <div className="flex items-center justify-between p-4 bg-white border-b border-gray-300 shadow-sm">
+    <div className="flex items-center justify-between p-2 bg-white border-b border-gray-300 shadow-sm">
       <div className="flex items-center">
         <IoIosArrowBack
           className="mr-2 text-gray-600 text-2xl cursor-pointer"
