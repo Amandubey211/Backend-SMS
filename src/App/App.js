@@ -353,7 +353,7 @@ function App() {
       errorElement: <Error />,
     },
     {
-      path: "/class/:cid/:sid/assignments/:aid/view",
+      path: "/class/:cid/:sid/assignment/:aid/view",
       element: <ProtectRoute Component={Assignment} allowedRoles={["admin", "teacher"]} />,
       errorElement: <Error />,
     },
@@ -374,7 +374,7 @@ function App() {
     },
 
     {
-      path: "/class/:cid/:sid/quizzes/:qid/view",
+      path: "/class/:cid/:sid/quiz/:qid/view",
       element: <ProtectRoute Component={Quizzes} allowedRoles={["admin", "teacher"]} />,
       errorElement: <Error />,
     },

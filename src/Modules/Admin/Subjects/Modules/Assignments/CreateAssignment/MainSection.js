@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import CreateAssignmentForm from "./Component/CreateAssignmentForm";
 import CreateAssignmentHeader from "./Component/CreateAssignmentHeader";
 import Editor from "../../../Component/Editor";
+import useCreateAssignment from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useCreateAssignment";
 
 const MainSection = () => {
   const [assignmentName, setAssignmentName] = useState("Monthly examination");
@@ -18,7 +19,10 @@ const MainSection = () => {
     dueDate: "",
     availableFrom: "",
     until: "",
+    thumbnail: null,
   });
+
+  const { loading, error, success, createAssignment } = useCreateAssignment();
 
   const handleNameChange = (name) => {
     setAssignmentName(name);
@@ -36,7 +40,7 @@ const MainSection = () => {
     }));
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const {
       points,
       displayGrade,
@@ -49,6 +53,7 @@ const MainSection = () => {
       dueDate,
       availableFrom,
       until,
+      thumbnail,
     } = formState;
 
     if (
@@ -66,9 +71,23 @@ const MainSection = () => {
       availableFrom &&
       until
     ) {
-      console.log("Assignment Name:", assignmentName);
-      console.log("Editor Content:", editorContent);
-      console.log("Form Data:", formState);
+      const assignmentData = {
+        name: assignmentName,
+        content: editorContent,
+        points,
+        grade: displayGrade,
+        submissionType,
+        submissionFormat,
+        allowedAttempts,
+        allowNumberOfAttempts: numberOfAttempts,
+        assignTo,
+        sectionId: section,
+        dueDate,
+        availableFrom,
+        thumbnail,
+        publish: true,
+      };
+      await createAssignment(assignmentData);
     } else {
       console.log("Please fill out all required fields.");
     }

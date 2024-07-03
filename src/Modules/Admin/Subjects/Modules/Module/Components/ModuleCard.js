@@ -40,7 +40,6 @@ const ModuleCard = ({
 
   const handleDelete = (e) => {
     e.stopPropagation();
-    console.log(moduleId)
     deleteModule(moduleId);
   };
 
@@ -53,7 +52,7 @@ const ModuleCard = ({
 
   return (
     <div
-      className={`relative mb-4 border-2 ${isSelected ? "border-rose-400" : ""} bg-white rounded-lg cursor-pointer`}
+      className={`relative mb-4 border  ${isSelected ?  " border-2 border-rose-400" : ""} bg-white rounded-lg cursor-pointer`}
       onClick={onSelect}
     >
       <img
@@ -89,10 +88,10 @@ const ModuleCard = ({
           className="absolute top-12 right-4 bg-white border rounded-lg shadow-lg w-48 z-10"
         >
           <ul className="py-2">
-            <li className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick={onEdit}>
+            <li className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick={(e) => { e.stopPropagation(); onEdit({ _id: moduleId, name: title, chapters: [] }); setMenuOpen(false); }}>
               <FaPen className="mr-2" /> Edit
             </li>
-            <li className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick={onMove}>
+            <li className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick={(e) => { e.stopPropagation(); onMove(); setMenuOpen(false); }}>
               <FaArrowRight className="mr-2" /> Move to...
             </li>
             <li className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">

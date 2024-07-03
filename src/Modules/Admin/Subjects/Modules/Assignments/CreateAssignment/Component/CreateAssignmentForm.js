@@ -1,6 +1,4 @@
 import React from "react";
-import GradeDropdown from "./GradeDropDown";
-import SubmissionTypeDropdown from "./SubmissionTypeDropdown ";
 import PointsInput from "./PointsInput";
 import SubmissionTypeRadios from "./SubmissionTypeRadios";
 import AllowedAttemptsSelect from "./AllowedAttemptsSelect";
@@ -8,6 +6,8 @@ import NumberOfAttemptsInput from "./NumberOfAttemptsInput";
 import AssignToRadios from "../../../../Component/AssignToRadios";
 import SectionSelect from "../../../../Component/SectionSelect";
 import DateInput from "../../../../Component/DateInput";
+import GradeDropdown from "./GradeDropDown";
+import SubmissionTypeDropdown from "./SubmissionTypeDropdown ";
 
 const CreateAssignmentForm = ({
   points,
@@ -24,6 +24,7 @@ const CreateAssignmentForm = ({
   availableFrom,
   until,
   handleChange,
+  // handleFileChange,
 }) => {
   return (
     <div className="max-w-sm mx-auto p-6 bg-white border">
@@ -73,6 +74,15 @@ const CreateAssignmentForm = ({
         value={until}
         handleChange={handleChange}
       />
+      
+      {/* <label className="block mb-2 text-sm font-medium text-gray-700">Thumbnail</label>
+      <input
+        type="file"
+        name="thumbnail"
+        onChange={handleFileChange}
+        accept="image/*"
+        className="mb-4 w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+      /> */}
 
       <button className="py-2 text-green-500 font-medium rounded-md hover:text-green-800 transition">
         + Add Assign

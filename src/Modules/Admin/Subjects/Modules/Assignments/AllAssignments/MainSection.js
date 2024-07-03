@@ -8,9 +8,8 @@ import useGetFilteredAssignments from "../../../../../../Hooks/AuthHooks/Staff/A
 
 const MainSection = () => {
   const { sid, cid } = useParams();
-  const { loading, error, assignments, fetchFilteredAssignments } =
-    useGetFilteredAssignments();
-
+  const { loading, error, assignments, fetchFilteredAssignments } = useGetFilteredAssignments();
+  
   const [filters, setFilters] = useState({
     moduleId: "",
     chapterId: "",
@@ -19,20 +18,12 @@ const MainSection = () => {
 
   useEffect(() => {
     const { moduleId, chapterId, publish } = filters;
-    if (publish !== null) {
-      fetchFilteredAssignments(cid, moduleId, chapterId, publish);
-    } else {
-      fetchFilteredAssignments(cid, moduleId, chapterId);
-    }
-  }, [cid, filters, fetchFilteredAssignments]);
+    fetchFilteredAssignments(sid, moduleId, chapterId, publish);
+  }, [sid, filters, fetchFilteredAssignments]);
 
-  const navLinkStyles = useMemo(
-    () => ({
-      className:
-        "bg-gradient-to-r from-purple-400 to-pink-400 text-white p-4 fixed rounded-full shadow-md bottom-4 right-4",
-    }),
-    []
-  );
+  const navLinkStyles = useMemo(() => ({
+    className: "bg-gradient-to-r from-purple-400 to-pink-400 text-white p-4 fixed rounded-full shadow-md bottom-4 right-4",
+  }), []);
 
   return (
     <div className="flex">

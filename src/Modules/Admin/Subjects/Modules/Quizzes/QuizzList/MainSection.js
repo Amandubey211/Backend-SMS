@@ -17,7 +17,8 @@ const MainSection = () => {
         <List title="All Quizzes"  data={assignments} icon={<RiFileUnknowLine />} />
       </div>
       <div className="w-[30%] px-2">
-        <FilterCard />
+        {/* <FilterCard /> */}
+        this is filter card placeholder 
       </div>
       <NavLink
         to={`/class/${cid}/${sid}/create_quiz`}

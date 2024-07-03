@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import axios from "axios";
 import { useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
 
 const useGetFilteredAssignments = () => {
   const [loading, setLoading] = useState(false);
@@ -9,9 +10,8 @@ const useGetFilteredAssignments = () => {
 
   const role = useSelector((store) => store.Auth.role);
   const API_URL = process.env.REACT_APP_API_URL;
-
   const fetchFilteredAssignments = useCallback(
-    async (classId, moduleId, chapterId, publish) => {
+    async (sid,moduleId, chapterId, publish) => {
       setLoading(true);
       setError(null);
 
@@ -24,7 +24,7 @@ const useGetFilteredAssignments = () => {
         if (publish !== undefined) params.publish = publish;
 
         const response = await axios.get(
-          `${API_URL}/admin/assignments/${classId}`,
+          `${API_URL}/admin/assignments/${sid}`,
           {
             headers: {
               Authentication: token,

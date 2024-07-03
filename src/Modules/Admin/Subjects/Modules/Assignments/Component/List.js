@@ -58,8 +58,8 @@ const List = ({ data, icon, title, type, loading, error }) => {
             <NavLink
               to={
                 type === "Assignment"
-                  ? `/class/${cid}/${sid}/assignments/${item._id}/view`
-                  : `/class/${cid}/${sid}/quizzes/${item._id}/view`
+                  ? `/class/${cid}/${sid}/assignment/${item._id}/view`
+                  : `/class/${cid}/${sid}/quiz/${item._id}/view`
               }
               key={item._id}
               className="flex items-center mb-3 gap-3 p-1 rounded-lg"
@@ -81,12 +81,12 @@ const List = ({ data, icon, title, type, loading, error }) => {
                 </div>
 
                 <div className="flex items-center gap-3">
-                  {/* {item.isPublished ? (
+                  {item.publish ? (
                     <BsPatchCheckFill className="text-green-600 p-1 border rounded-full h-7 w-7" />
                   ) : (
-                    <MdOutlineBlock className="text-gray-600" />
-                  )} */}
-                  <BsPatchCheckFill className="text-green-600 p-1 border rounded-full h-7 w-7" />
+                    <MdOutlineBlock className="text-gray-600 p-1 h-7 w-7" />
+                  )}
+                  {/* // <BsPatchCheckFill className="text-green-600 p-1 border rounded-full h-7 w-7" /> */}
                   <FaEllipsisV className="text-green-600 p-1 border rounded-full h-7 w-7" />
                 </div>
               </div>
