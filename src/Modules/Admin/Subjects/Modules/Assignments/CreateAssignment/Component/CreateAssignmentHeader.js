@@ -4,7 +4,7 @@ import { IoIosArrowBack } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 import AddRubricModal from "../../../Rubric/Components/AddRubricModal";
 // import Sidebar from "../../../../../../../Components/Common/Sidebar";
-import AddNewCriteriaForm from "../../../Rubric/Components/AddNewCriteriaForm ";
+import AddNewCriteriaForm from "../../../Rubric/Components/AddNewCriteriaForm";
 import Sidebar from "../../../../../../../Components/Common/Sidebar";
 
 const CreateAssignmentHeader = ({ onSave }) => {
