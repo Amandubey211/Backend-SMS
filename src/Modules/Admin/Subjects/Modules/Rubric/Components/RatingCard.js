@@ -2,11 +2,11 @@ import React from 'react';
 import { RiDeleteBin5Line } from 'react-icons/ri';
 import { TbEdit } from 'react-icons/tb';
 
-const RatingCard = ({ rating }) => {
+const RatingCard = ({ rating, onDeleteRating }) => {
   return (
-    <div className="relative flex flex-col border w-44 p-2 rounded-sm shadow-sm">
+    <div className="relative flex flex-col border w-44 h-40 p-2 rounded-sm shadow-sm">
       <div className="absolute top-2 right-2 flex gap-2">
-        <button className="text-red-600">
+        <button className="text-red-600" onClick={onDeleteRating}>
           <RiDeleteBin5Line />
         </button>
         <button className="text-green-600">

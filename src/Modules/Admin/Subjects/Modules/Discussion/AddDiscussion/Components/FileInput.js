@@ -1,12 +1,12 @@
 import React from "react";
 
-const FileInput = ({ onChange, file }) => {
+const FileInput = ({ onChange, file, title }) => {
   return (
     <div className="flex flex-col w-full md:w-3/10">
       <label htmlFor="attachment" className="text-gray-500 mb-1">
-        Attachment
+        {title || "Attachment"}
       </label>
-      <div className="flex items-center border border-gray-300 rounded p-2">
+      <div className="flex items-center border border-gray-300 rounded p-2  ">
         <input
           id="attachment"
           type="file"
@@ -19,7 +19,9 @@ const FileInput = ({ onChange, file }) => {
         >
           <span className="text-gradient text-sm ">Choose file</span>
         </label>
-        <span className="text-gray-500">{file ? file.name : "No file selection"}</span>
+        <span className="text-gray-500">
+          {file ? file.name : "No file selection"}
+        </span>
       </div>
     </div>
   );

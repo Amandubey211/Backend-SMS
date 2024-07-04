@@ -13,7 +13,7 @@ const AddModule = ({ data }) => {
 
   useEffect(() => {
     if (data) {
-      setModuleTitle(data.name);
+      setModuleTitle(data.moduleName);
       setPreview(data.thumbnail);
     }
   }, [data]);

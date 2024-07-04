@@ -1,4 +1,4 @@
-const mockData = [
+const criteria = [
     {
       criteria: "Design Component",
       range: true,
@@ -38,23 +38,7 @@ const mockData = [
       ],
       fullMark: 10,
     },
-    {
-      criteria: "Implementation",
-      range: false,
-      ratings: [
-        {
-          markType: "Full Mark",
-          points: "10 Points",
-          description: "Excellent implementation with no issues.",
-        },
-        {
-          markType: "Partial Mark",
-          points: "05 Points",
-          description: "Some minor issues in implementation.",
-        },
-      ],
-      fullMark: 10,
-    },
+    
     // Add more mock data as needed
   ];
   export const TABLE_HEADERS = [
@@ -64,4 +48,4 @@ const mockData = [
   ];
   
   
-  export default mockData;
+  export default criteria;

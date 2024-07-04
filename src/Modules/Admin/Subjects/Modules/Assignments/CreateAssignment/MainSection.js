@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import CreateAssignmentForm from "./Component/CreateAssignmentForm";
 import CreateAssignmentHeader from "./Component/CreateAssignmentHeader";
-import Editor from "../../../Component/Editor";
 import useCreateAssignment from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useCreateAssignment";
+import EditorComponent from "../../../Component/Editor";
 
 const MainSection = () => {
   const [assignmentName, setAssignmentName] = useState("Monthly examination");
@@ -56,21 +56,21 @@ const MainSection = () => {
       thumbnail,
     } = formState;
 
-    if (
-      assignmentName &&
-      editorContent &&
-      points &&
-      displayGrade &&
-      submissionType &&
-      submissionFormat &&
-      allowedAttempts &&
-      numberOfAttempts &&
-      assignTo &&
-      section &&
-      dueDate &&
-      availableFrom &&
-      until
-    ) {
+    // if (
+    //   assignmentName &&
+    //   editorContent &&
+    //   points &&
+    //   displayGrade &&
+    //   submissionType &&
+    //   submissionFormat &&
+    //   allowedAttempts &&
+    //   numberOfAttempts &&
+    //   assignTo &&
+    //   section &&
+    //   dueDate &&
+    //   availableFrom &&
+    //   until
+    // ) {
       const assignmentData = {
         name: assignmentName,
         content: editorContent,
@@ -87,10 +87,11 @@ const MainSection = () => {
         thumbnail,
         publish: true,
       };
-      await createAssignment(assignmentData);
-    } else {
-      console.log("Please fill out all required fields.");
-    }
+      // await createAssignment(assignmentData);
+      console.log(assignmentData);
+    // } else {
+    //   console.log("Please fill out all required fields.");
+    // }
   };
 
   return (
@@ -98,7 +99,7 @@ const MainSection = () => {
       <CreateAssignmentHeader onSave={handleSave} />
       <div className="flex w-full">
         <div className="w-[70%]">
-          <Editor
+          <EditorComponent
             assignmentLabel="Assignment Name"
             assignmentName={assignmentName}
             editorContent={editorContent}

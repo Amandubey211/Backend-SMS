@@ -10,7 +10,7 @@ import SpeedGradeButton from '../../../Component/SpeedGradeButton';
 import ButtonsGroup from '../../../Component/ButtonsGroup';
 import RubricButton from './RubricButton';
 import Sidebar from '../../../../../../../Components/Common/Sidebar';
-import AddNewCriteriaForm from '../../../../../../Admin/Subjects/Modules/Rubric/Components/AddNewCriteriaForm ';
+import AddNewCriteriaForm from '../../../../../../Admin/Subjects/Modules/Rubric/Components/AddNewCriteriaForm';
 // import AddNewCriteriaForm from '../../Rubric/Components/AddNewCriteriaForm ';
 import { NavLink, useParams } from "react-router-dom";
 import { RiListCheck3, RiAddFill } from "react-icons/ri";

@@ -9,7 +9,7 @@ import DateDetail from '../../../Component/DateDetail';
 import SpeedGradeButton from '../../../Component/SpeedGradeButton';
 import ButtonsGroup from '../../../Component/ButtonsGroup';
 import RubricButton from './RubricButton';
-import AddNewCriteriaForm from '../../Rubric/Components/AddNewCriteriaForm ';
+import AddNewCriteriaForm from '../../Rubric/Components/AddNewCriteriaForm';
 
 const AssignmentCard = () => {
   const {
