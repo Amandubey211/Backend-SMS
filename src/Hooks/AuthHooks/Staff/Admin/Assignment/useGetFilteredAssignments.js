@@ -11,7 +11,7 @@ const useGetFilteredAssignments = () => {
   const role = useSelector((store) => store.Auth.role);
   const API_URL = process.env.REACT_APP_API_URL;
   const fetchFilteredAssignments = useCallback(
-    async (sid,moduleId, chapterId, publish) => {
+    async (sid, moduleId, chapterId, publish) => {
       setLoading(true);
       setError(null);
 

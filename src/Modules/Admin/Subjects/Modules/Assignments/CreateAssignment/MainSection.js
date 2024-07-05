@@ -1,17 +1,18 @@
 import React, { useState } from "react";
 import CreateAssignmentForm from "./Component/CreateAssignmentForm";
 import CreateAssignmentHeader from "./Component/CreateAssignmentHeader";
-import useCreateAssignment from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useCreateAssignment";
 import EditorComponent from "../../../Component/Editor";
+import useCreateAssignment from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/createAssignment";
+import { useParams } from "react-router-dom";
 
 const MainSection = () => {
   const [assignmentName, setAssignmentName] = useState("Monthly examination");
   const [editorContent, setEditorContent] = useState("");
+  const {cid,sid} = useParams()
   const [formState, setFormState] = useState({
     points: "",
     displayGrade: "",
     submissionType: "",
-    submissionFormat: "",
     allowedAttempts: "",
     numberOfAttempts: "",
     assignTo: "",
@@ -20,6 +21,8 @@ const MainSection = () => {
     availableFrom: "",
     until: "",
     thumbnail: null,
+    moduleId: "",
+    chapterId: "",
   });
 
   const { loading, error, success, createAssignment } = useCreateAssignment();
@@ -40,58 +43,32 @@ const MainSection = () => {
     }));
   };
 
-  const handleSave = async () => {
-    const {
-      points,
-      displayGrade,
-      submissionType,
-      submissionFormat,
-      allowedAttempts,
-      numberOfAttempts,
-      assignTo,
-      section,
-      dueDate,
-      availableFrom,
-      until,
-      thumbnail,
-    } = formState;
+  const handleSave = async (publish) => {
+    const assignmentData = {
+      name: assignmentName,
+      content: editorContent,
+      points: formState.points,
+      grade: formState.displayGrade,
+      submissionType: formState.submissionType,
+      allowedAttempts: formState.allowedAttempts,
+      allowNumberOfAttempts: formState.numberOfAttempts,
+      assignTo: formState.assignTo,
+      sectionId: formState.section,
+      dueDate: formState.dueDate,
+      availableFrom: formState.availableFrom,
+      until: formState.until,
+      thumbnail: formState.thumbnail,
+      classId:cid,
+      subjectId:sid,
+      moduleId: formState.moduleId,
+      chapterId: formState.chapterId,
+      publish,
+    };
 
-    // if (
-    //   assignmentName &&
-    //   editorContent &&
-    //   points &&
-    //   displayGrade &&
-    //   submissionType &&
-    //   submissionFormat &&
-    //   allowedAttempts &&
-    //   numberOfAttempts &&
-    //   assignTo &&
-    //   section &&
-    //   dueDate &&
-    //   availableFrom &&
-    //   until
-    // ) {
-      const assignmentData = {
-        name: assignmentName,
-        content: editorContent,
-        points,
-        grade: displayGrade,
-        submissionType,
-        submissionFormat,
-        allowedAttempts,
-        allowNumberOfAttempts: numberOfAttempts,
-        assignTo,
-        sectionId: section,
-        dueDate,
-        availableFrom,
-        thumbnail,
-        publish: true,
-      };
-      // await createAssignment(assignmentData);
-      console.log(assignmentData);
-    // } else {
-    //   console.log("Please fill out all required fields.");
-    // }
+    const result = await createAssignment(assignmentData);
+    if (result.success) {
+      console.log("Assignment created successfully:", result.data);
+    }
   };
 
   return (
@@ -112,9 +89,6 @@ const MainSection = () => {
             {...formState}
             setDisplayGrade={(grade) =>
               setFormState((prev) => ({ ...prev, displayGrade: grade }))
-            }
-            setSubmissionFormat={(format) =>
-              setFormState((prev) => ({ ...prev, submissionFormat: format }))
             }
             handleChange={handleFormChange}
           />

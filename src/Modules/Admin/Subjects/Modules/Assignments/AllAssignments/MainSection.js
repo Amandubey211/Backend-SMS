@@ -19,7 +19,7 @@ const MainSection = () => {
   useEffect(() => {
     const { moduleId, chapterId, publish } = filters;
     fetchFilteredAssignments(sid, moduleId, chapterId, publish);
-  }, [sid, filters, fetchFilteredAssignments]);
+  }, [filters, fetchFilteredAssignments]);
 
   const navLinkStyles = useMemo(() => ({
     className: "bg-gradient-to-r from-purple-400 to-pink-400 text-white p-4 fixed rounded-full shadow-md bottom-4 right-4",

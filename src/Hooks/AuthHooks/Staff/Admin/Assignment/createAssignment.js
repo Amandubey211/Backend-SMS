@@ -2,16 +2,48 @@ import { useState, useCallback } from "react";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
-import useGetClassDetails from "./useGetClassDetails"; // Adjust the import based on your project structure
 
 const useCreateAssignment = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const { fetchClassDetails } = useGetClassDetails();
   const role = useSelector((store) => store.Auth.role);
 
   const createAssignment = useCallback(
-    async (assignmentData, thumbnailFile) => {
+    async (assignmentData) => {
+      const {
+        name,
+        content,
+        points,
+        grade,
+        submissionType,
+        allowedAttempts,
+        allowNumberOfAttempts,
+        assignTo,
+        sectionId,
+        dueDate,
+        availableFrom,
+        thumbnail,
+      } = assignmentData;
+
+      const missingFields = [];
+
+      if (!name) missingFields.push("Assignment Name");
+      if (!content) missingFields.push("Content");
+      if (!points) missingFields.push("Points");
+      if (!grade) missingFields.push("Grade");
+      if (!submissionType) missingFields.push("Submission Type");
+      if (!allowedAttempts) missingFields.push("Allowed Attempts");
+      if (!allowNumberOfAttempts) missingFields.push("Number of Attempts");
+      if (!assignTo) missingFields.push("Assign To");
+      if (!sectionId) missingFields.push("Section");
+      if (!dueDate) missingFields.push("Due Date");
+      if (!availableFrom) missingFields.push("Available From");
+
+      if (missingFields.length > 0) {
+        toast.error(`Please fill out the following fields: ${missingFields.join(", ")}`);
+        return { success: false, error: "Validation Error" };
+      }
+
       setLoading(true);
       setError(null);
 
@@ -19,32 +51,17 @@ const useCreateAssignment = () => {
         const API_URL = process.env.REACT_APP_API_URL;
         const token = localStorage.getItem(`${role}:token`);
 
-        let imageUrl = "";
-
-        if (thumbnailFile) {
-          const formData = new FormData();
-          formData.append("file", thumbnailFile);
-          formData.append("upload_preset", "assignments"); // Adjust the upload preset as needed
-
-          const cloudinaryResponse = await axios.post(
-            `https://api.cloudinary.com/v1_1/YOUR_CLOUDINARY_CLOUD_NAME/upload`, // Replace with your Cloudinary URL
-            formData
-          );
-
-          imageUrl = cloudinaryResponse.data.secure_url;
-        }
-
         const response = await axios.post(
           `${API_URL}/admin/create_assignment`, // Adjust the API endpoint as needed
-          { ...assignmentData, thumbnail: imageUrl },
+          assignmentData,
           {
-            headers: { Authentication: token },
+            headers: {       Authentication: token, },
           }
         );
 
         const { data } = response.data;
 
-        fetchClassDetails(assignmentData.classId);
+        console.log(data);
         setLoading(false);
         toast.success("Assignment created successfully");
         return { success: true, data };
@@ -57,7 +74,7 @@ const useCreateAssignment = () => {
         return { success: false, error: errorMessage };
       }
     },
-    [role, fetchClassDetails]
+    [role]
   );
 
   return { createAssignment, loading, error };
