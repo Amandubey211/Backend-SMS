@@ -1,20 +1,30 @@
-import React from 'react';
+import React from "react";
+import { useSelector } from "react-redux";
 
-const SectionSelect = ({ section, handleChange }) => (
-  <>
-    <label className="block mb-2 text-sm font-medium text-gray-700">Section</label>
-    <select
-      name="section"
-      value={section}
-      onChange={handleChange}
-      className="mb-4 w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-    >
-      <option value="">Select Section</option>
-      <option value="section1">Section 1</option>
-      <option value="section2">Section 2</option>
-      <option value="section3">Section 3</option>
-    </select>
-  </>
-);
+const SectionSelect = ({ section, handleChange }) => {
+  const AllSections = useSelector((store) => store.Class.sectionsList);
+
+  return (
+    <>
+      <label className="block mb-2 text-sm font-medium text-gray-700">
+        Section
+      </label>
+
+      <select
+        value={section}
+        name="section"
+        onChange={handleChange}
+        className="block w-full mb-4 p-2 border border-gray-300 rounded-lg"
+      >
+        <option value="">Choose Section</option>
+        {AllSections.map((section) => (
+          <option key={section._id} value={section._id}>
+            {section.sectionName}
+          </option>
+        ))}
+      </select>
+    </>
+  );
+};
 
 export default SectionSelect;

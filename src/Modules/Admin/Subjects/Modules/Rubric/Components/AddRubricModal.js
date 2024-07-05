@@ -56,7 +56,7 @@ const AddRubricModal = ({ criteria, isOpen, onClose, onAddCriteria, onDeleteCrit
               Point
             </div>
           </div>
-          {criteria.map((item, index) => (
+          {criteria?.map((item, index) => (
             <RubricModalRow key={index} data={item} criteriaIndex={index} onDeleteCriteria={onDeleteCriteria} />
           ))}
         </div>

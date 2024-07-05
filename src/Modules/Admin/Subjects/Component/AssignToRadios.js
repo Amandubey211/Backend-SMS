@@ -11,8 +11,8 @@ const AssignToRadios = ({ assignTo, handleChange, title }) => (
           type="radio"
           id="everyone"
           name="assignTo"
-          value="everyone"
-          checked={assignTo === "everyone"}
+          value="Everyone"
+          checked={assignTo === "Everyone"}
           onChange={handleChange}
           className="mr-2 focus:ring-blue-500"
         />
@@ -25,8 +25,8 @@ const AssignToRadios = ({ assignTo, handleChange, title }) => (
           type="radio"
           id="section"
           name="assignTo"
-          value="section"
-          checked={assignTo === "section"}
+          value="Section"
+          checked={assignTo === "Section"}
           onChange={handleChange}
           className="mr-2 focus:ring-blue-500"
         />
@@ -39,8 +39,8 @@ const AssignToRadios = ({ assignTo, handleChange, title }) => (
           type="radio"
           id="group"
           name="assignTo"
-          value="group"
-          checked={assignTo === "group"}
+          value="Group"
+          checked={assignTo === "Group"}
           onChange={handleChange}
           className="mr-2 focus:ring-blue-500"
         />

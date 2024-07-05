@@ -12,7 +12,7 @@ const Announcement = () => {
   useNavHeading(className, subjectName);
   return (
       <Layout title={`Announcement | Student Diwan`}>
-        <DashLayout children={<MainSection/>} hideSearchbar={true}/>
+        <DashLayout children={<MainSection/> } hideSearchbar={true}/>
       </Layout>
   )
 }
