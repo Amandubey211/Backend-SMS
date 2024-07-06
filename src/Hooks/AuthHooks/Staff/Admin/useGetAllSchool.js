@@ -10,7 +10,7 @@ const useGetAllSchools = () => {
     try {
       const response = await axios.get("http://localhost:8080/student_diwan/get_schools");
       console.log(response.data)
-      setSchoolList(response.data);
+      setSchoolList(response.data.schools);
     } catch (error) {
       console.error("Error fetching schools:", error);
     }

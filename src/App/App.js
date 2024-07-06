@@ -9,9 +9,7 @@ import StudentSignUp from "../Modules/LoginPages/Student/SignUp/StudentSignUp.js
 import ResetPassword from "../Modules/LoginPages/Student/ResetPassword/ResetPassword.js";
 import Fallback from "../Components/Common/Fallback.js";
 import ProtectRoute from "../Routes/ProtectedRoutes/ProtectedRoute";
-
-
-import useFirebaseMessaging from '../Hooks/NotificationHooks/NotificationHooks.js';
+import { useFirebaseMessaging } from '../Hooks/NotificationHooks/NotificationHooks.js';
 import AllStudents from "../Modules/Admin//UsersProfiles/StudentProfile/MainSection.js/AllStudents.js";
 import SingleStudent from "../Modules/Admin//UsersProfiles/StudentProfile/MainSection.js/SingleStudent.js";
 
@@ -33,6 +31,7 @@ import StudentLibrarySection from "../Modules/Student/Library/MainSection/Libary
 import StudentEvent from "../Modules/Student/StudentEvent/StudentEvent.js";
 import StudentAnnounce from "../Modules/Student/Announcements/StudentAnnounce.js";
 import StaffLogin from "../Modules/LoginPages/Staff/StaffLogin.js";
+import ForgetPassword from "../Modules/LoginPages/Student/Login/ForgetPassword/ForgetPassword.js";
 
 //Parents 
 const Page = lazy(() =>
@@ -283,6 +282,7 @@ function App() {
     { path: "/stafflogin", element: <StaffLogin />, errorElement: <Error /> },
     { path: "/signup", element: <StudentSignUp />, errorElement: <Error /> },
     { path: "/reset_password", element: <ResetPassword />, errorElement: <Error /> },
+    { path: "/forget_password", element: <ForgetPassword />, errorElement: <Error /> },
 
     // Admin Routes
     {

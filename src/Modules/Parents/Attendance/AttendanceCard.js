@@ -1,17 +1,127 @@
-import React from 'react';
-import { Card } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Card, Select } from 'antd';
 import { CheckCircleOutlined, CloseCircleOutlined, ClockCircleOutlined } from '@ant-design/icons';
-import data from "./AttendanceData/AttendenceData";
+import axios from 'axios';
 
-const AttendanceCard = () => {
+const { Option } = Select;
+
+const AttendanceCard = ({ initialMonth, initialYear }) => {
+  const currentDate = new Date();
+  const [month, setMonth] = useState(initialMonth || currentDate.getMonth() + 1); // Months are 0-indexed in JavaScript Date
+  const [year, setYear] = useState(initialYear || currentDate.getFullYear());
+  const [summary, setSummary] = useState({
+    presentCount: 0,
+    absentCount: 0,
+    leaveCount: 0
+  });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchAttendanceSummary = async () => {
+      const token = localStorage.getItem('parent:token');
+      const childrenData = JSON.parse(localStorage.getItem('childrenData'));
+      const studentId = childrenData && childrenData[0] ? childrenData[0].id : null;
+
+      if (!studentId || !month || !year) {
+        console.error('Student ID, month, and year are required');
+        setError('Student ID, month, and year are required');
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const response = await axios.get('http://localhost:8080/parent/api/attendance', {
+          headers: {
+            Authentication: `${token}`
+          },
+          params: {
+            studentId,
+            month,
+            year
+          }
+        });
+
+        if (response.data && response.data.report && response.data.report.summary) {
+          setSummary(response.data.report.summary);
+        } else {
+          throw new Error('No report summary available');
+        }
+      } catch (error) {
+        console.error('Error fetching attendance summary:', error);
+        setError('🚨 Error fetching attendance summary: Please try again later. 🚨');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAttendanceSummary();
+  }, [month, year]);
+
+  const handleMonthChange = (newMonth) => {
+    setMonth(parseInt(newMonth));
+    setLoading(true);
+  };
+
+  const handleYearChange = (newYear) => {
+    setYear(parseInt(newYear));
+    setLoading(true);
+  };
+
+  const months = Array.from({ length: 12 }, (_, i) => i + 1);
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: 10 }, (_, i) => currentYear - 5 + i);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return (
+      <div className="text-red-600 text-center font-bold text-xl p-4">
+        {error}
+      </div>
+    );
+  }
+
+  const summaryData = [
+    { title: 'Present', value: summary.presentCount, icon: 'present', color: 'bg-green-200' },
+    { title: 'Absent', value: summary.absentCount, icon: 'absent', color: 'bg-red-200' },
+    { title: 'Leave', value: summary.leaveCount, icon: 'leave', color: 'bg-yellow-200' }
+  ];
+
   return (
-    <div className="flex flex-col items-center">
-      <div className="grid grid-cols-1 ml-10 mr-10  sm:grid-cols-2 md:grid-cols-3 gap-4 mt-10">
-        {data.map((item, index) => (
+    <div className="flex flex-col items-center overflow-hidden">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-[15vw] mt-10 justify-between px-16">
+        {summaryData.map((item, index) => (
           <CardComponent key={index} data={item} />
         ))}
       </div>
-      <div className="mt-4 text-xl font-semibold">March-2024</div>
+      <div className="mt-4 text-xl font-semibold text-center">
+        <Select
+          style={{ width: 120, marginRight: 10 }}
+          onChange={handleMonthChange}
+          value={month}
+        >
+          {months.map((m) => (
+            <Option key={m} value={m}>
+              {m}
+            </Option>
+          ))}
+        </Select>
+        <Select
+          style={{ width: 120 }}
+          onChange={handleYearChange}
+          value={year}
+        >
+          {years.map((y) => (
+            <Option key={y} value={y}>
+              {y}
+            </Option>
+          ))}
+        </Select>
+        {/* {`${month}-${year}`} */}
+      </div>
     </div>
   );
 };

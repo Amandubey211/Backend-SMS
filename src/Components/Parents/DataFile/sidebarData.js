@@ -9,6 +9,12 @@ import {
   FaUniversity,
   
 } from "react-icons/fa";
+import { FcAlarmClock, FcMoneyTransfer } from "react-icons/fc";
+import { FcHome } from "react-icons/fc";
+import { FcReading } from "react-icons/fc";
+import { FcAdvertising } from "react-icons/fc";
+
+
 import { TbDashboard } from "react-icons/tb";
 import { RiGraduationCapLine } from "react-icons/ri";
 import { LuUser } from "react-icons/lu";
@@ -20,37 +26,39 @@ import { TbNotebook } from "react-icons/tb";
 import { GrUserWorker } from "react-icons/gr";
 import { MdLocalLibrary,MdManageAccounts } from "react-icons/md";
 import { RiParentFill,RiAdminFill } from "react-icons/ri";
+import { FcManager } from "react-icons/fc";
+
 
 const sidebarData = [
   {
     title: "Dashboard",
-    icon: <TbDashboard />,
+    icon: <FcHome />,
     path: "/parent_dash",
   },
   {
     title: "My Childs",
-    icon: <RiGraduationCapLine />,
+    icon: <FcManager  />,
     path: `/children`,
   },
 
   {
     title: "Finance",
-    icon: <LuUser />,
+    icon: <FcMoneyTransfer />,
     path:'/parentfinance'
   },
   {
     title: "Library",
-    icon: <HiOutlineCalculator />,
+    icon: <FcReading />,
     path:'/parentlibrary'
   },
   {
     title: "Notice Board",
-    icon: <FaUserGraduate />,
+    icon: <FcAlarmClock />,
     path: "/parentchildnotice",
   },
   {
     title: "Announcements",
-    icon: <FaUserGraduate />,
+    icon: <FcAdvertising />,
     path: "/parentannounce",
   },
 ];

@@ -3,7 +3,7 @@ import { Card, Avatar } from 'antd';
 import { gradeSummary } from '../../../Modules/Parents/GradeChild/DummyData/grade';
 
 const GradeSummary = () => (
-  <Card className="shadow-md p-6 max-w-sm mx-auto">
+  <Card className=" p-6 max-w-sm mx-auto rounded-lg shadow-lg">
 
     <div className="flex flex-col items-center mb-8">
       <Avatar size={64} src="https://via.placeholder.com/150" className="mb-4" />
