@@ -3,20 +3,24 @@ import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { setAuth, setRole } from "../../../Redux/Slices/AuthSlice.js";
 import { useNavigate } from "react-router-dom";
+import {requestPermissionAndGetToken} from '../../NotificationHooks/NotificationHooks.js';
 import axios from "axios";
 
 const useStaffLogin = () => {
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
+ 
   const validateEmail = (email) => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return re.test(String(email).toLowerCase());
   };
 
   const staffLogin = async (staffDetails) => {
+    
+    
     if (!staffDetails) {
+      
       toast.error("Please provide staff details.");
       return;
     }
@@ -36,9 +40,11 @@ const useStaffLogin = () => {
     setLoading(true);
 
     try {
+      const deviceToken = await requestPermissionAndGetToken();
+      const userdetail = {email,password,deviceToken}
       const { data } = await axios.post(
         `${process.env.REACT_APP_API_URL}/auth/staff/login`,
-        staffDetails
+        userdetail
       );
 
       if (data.success) {

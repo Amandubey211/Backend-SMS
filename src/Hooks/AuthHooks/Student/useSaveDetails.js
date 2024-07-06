@@ -9,6 +9,7 @@ const useSaveDetails = () => {
   const saveDetails = async (studentDetails) => {
     setLoading(true);
     try {
+      console.log(studentDetails)
       const { data } = await axios.post(
         `http://localhost:8080/student/student_register`,
         studentDetails

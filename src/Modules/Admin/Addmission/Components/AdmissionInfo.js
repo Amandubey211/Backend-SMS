@@ -8,15 +8,15 @@ import useGetAllClasses from "../../../../Hooks/AuthHooks/Staff/Admin/Class/useG
 
 const AdmissionInfo = ({ studentInfo, handleInputChange }) => {
   const { fetchClasses } = useGetAllClasses();
-  const { fetchSchools } = useGetAllSchools();
+  const { fetchSchools,schoolList } = useGetAllSchools();
   const { cid } = useParams();
-  const { sid } = useParams();
 
   const classList = useSelector((store) => store.Class.classList);
-  const schoolList = useSelector((store)=> store.School.schoolList);
+
   useEffect(() => {
     fetchClasses(cid);
-    fetchSchools(sid);
+    fetchSchools();
+    console.log(schoolList)
   }, []);
   return (
     <div className="mt-6">
@@ -33,8 +33,8 @@ const AdmissionInfo = ({ studentInfo, handleInputChange }) => {
           >
             <option value="">Choose Options</option>
             {schoolList.map((school, index) => (
-              <option key={index} value={school?.name} className="py-2">
-                {school.name}
+              <option key={index} value={school._id} className="py-2">
+                {school.nameOfSchool}
               </option>
             ))}
           </select>

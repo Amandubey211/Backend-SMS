@@ -40,16 +40,20 @@ const StudentSignUpForm = () => {
       postalCode: "",
     },
     emergencyNumber: "",
+    schoolId: "",
+    profile: '',
   });
   const [studentDocuments, setStudentDocuments] = useState({
     documentLabels: [""],
     documents: [null],
   });
   const [showPassword, setShowPassword] = useState(false);
-  const step = useSelector((store) => store.Auth.step);
+  const [step, setStep] = useState(1);
   const [acknowledged, setAcknowledged] = useState(false);
   const [sameAddress, setSameAddress] = useState(false);
   const [preview, setPreview] = useState("");
+  const [imagePreview, setImagePreview] = useState(null);
+  const [profile, setProfile] = useState(null);
   const { loading, saveDetails } = useSaveDetails();
   const { docloading, saveDocument } = useSaveDocument();
 
@@ -68,16 +72,73 @@ const StudentSignUpForm = () => {
     }
   };
 
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file && file.type.startsWith('image')) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+        setProfile(file);  // Debug: Log the file object
+      };
+      reader.readAsDataURL(file);
+    } else {
+      toast.error("Please upload a valid image file.");
+    }
+  };
+
   const handleSave = async (e) => {
     e.preventDefault();
+   
+
+    // Ensure email is not empty
+    if (!studentDetails.email) {
+      toast.error("Email is required");
+      return;
+    }
+
     const validationErrors = validateStudentDetails(studentDetails);
+    
+
     if (Object.keys(validationErrors).length > 0) {
       toast.error(Object.values(validationErrors)[0]);
       return;
     }
+
     if (acknowledged) {
-      await saveDetails(studentDetails);
-      console.log(studentDetails);
+      try {
+        
+
+        const formData = new FormData();
+        for (const key in studentDetails) {
+          if (studentDetails.hasOwnProperty(key)) {
+            if (typeof studentDetails[key] === 'object') {
+              formData.append(key, JSON.stringify(studentDetails[key]));
+            } else {
+              formData.append(key, studentDetails[key]);
+            }
+          }
+        }
+
+        if (profile) {
+          formData.append('profile', profile);
+        }
+
+        const response = await fetch("http://localhost:8080/student/student_register", {
+          method: "POST",
+          body: formData,
+        });
+
+        const result = await response.json();
+        if (result.success) {
+          toast.success("SAVED");
+          setStep(2); // Move to step 2
+        } else {
+          toast.error("Failed to save student details");
+        }
+      } catch (error) {
+        console.error("Error in submitting student details:", error);
+        toast.error("An error occurred while submitting the student details.");
+      }
     } else {
       toast.error("Please acknowledge all the details.");
     }
@@ -150,8 +211,9 @@ const StudentSignUpForm = () => {
               <PersonalInformationForm
                 studentDetails={studentDetails}
                 handleChange={handleChange}
-                showPassword={showPassword}
-                setShowPassword={setShowPassword}
+                imagePreview={imagePreview}
+                setImagePreview={setImagePreview}
+                handleImageChange={handleImageChange}
               />
               <FamilyInformationForm
                 studentDetails={studentDetails}

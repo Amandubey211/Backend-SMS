@@ -16,24 +16,25 @@ const firebaseConfig = {
 // Initialize Firebase
 const firebaseApp = initializeApp(firebaseConfig);
 const messaging = getMessaging(firebaseApp);
-
-const useFirebaseMessaging = () => {
+export const requestPermissionAndGetToken = async () => {
+  try {
+    const permission = await Notification.requestPermission();
+    if (permission === 'granted') {
+      console.log('Notification permission granted.');
+      const token = await getToken(messaging, { vapidKey: "BNOfE1p1FdW9ifLKQnU9ssjU_OXs2_myraIea_R5BeplSf1jzn3NW-K2Le3pJ43w4n11R-Rl-nNFC4SEJwW6pLY" });
+      console.log('Device token:', token);
+      return  token
+    } else {
+      console.log('Notification permission denied.');
+    }
+  } catch (error) {
+    console.error('An error occurred while requesting permission or getting the token:', error);
+  }
+};
+export const useFirebaseMessaging = () => {
   useEffect(() => {
-    const requestPermissionAndGetToken = async () => {
-      try {
-        const permission = await Notification.requestPermission();
-        if (permission === 'granted') {
-          console.log('Notification permission granted.');
-          const token = await getToken(messaging, { vapidKey: "BNOfE1p1FdW9ifLKQnU9ssjU_OXs2_myraIea_R5BeplSf1jzn3NW-K2Le3pJ43w4n11R-Rl-nNFC4SEJwW6pLY" });
-          console.log('Device token:', token);
-          await sendTokenToServer(token);
-        } else {
-          console.log('Notification permission denied.');
-        }
-      } catch (error) {
-        console.error('An error occurred while requesting permission or getting the token:', error);
-      }
-    };
+    requestPermissionAndGetToken()
+
 
     const sendTokenToServer = async (token) => {
       try {
@@ -74,4 +75,3 @@ const useFirebaseMessaging = () => {
   return null;
 };
 
-export default useFirebaseMessaging;
