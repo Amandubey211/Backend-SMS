@@ -6,6 +6,8 @@ import CreateAnnouncementForm from "./Components/CreateAnnouncementForm";
 import TopicTitleInput from "../../Discussion/AddDiscussion/Components/TopicTitleInput";
 import FileInput from "../../Discussion/AddDiscussion/Components/FileInput";
 import EditorComponent from "../../../Component/AdminEditor";
+import useCreateAnnouncement from "../../../../../../Hooks/AuthHooks/Staff/Admin/Announcement/useCreateAnnouncement";
+import { useParams } from "react-router-dom";
 
 const CreateAnnouncement = () => {
   const [assignmentName, setAssignmentName] = useState("");
@@ -19,6 +21,8 @@ const CreateAnnouncement = () => {
     availableFrom: "",
   });
 
+  const { createAnnouncement, loading, error } = useCreateAnnouncement();
+  const { cid } = useParams();
   const handleNameChange = (e) => {
     setAssignmentName(e.target.value);
   };
@@ -39,8 +43,22 @@ const CreateAnnouncement = () => {
     }));
   };
 
-  const handleSave = () => {
-    console.log(formState, assignmentName, editorContent, file);
+  const handleSave = async () => {
+    const announcementData = {
+      title: assignmentName,
+      content: editorContent,
+      classId: cid,
+      ...formState,
+    };
+
+    const files = {
+      attachment: file,
+    };
+
+    const result = await createAnnouncement(announcementData, files);
+    if (result) {
+      console.log("Announcement created successfully", result);
+    }
   };
 
   return (
@@ -49,7 +67,7 @@ const CreateAnnouncement = () => {
         <SideMenubar />
         <div className="w-full">
           <>
-            <CreateAnnouncementHeader onSave={handleSave} />
+            <CreateAnnouncementHeader onSave={handleSave} loading={loading} />
             <div className="flex w-full">
               <div className="w-[75%]">
                 <div className="flex flex-col md:flex-row items-center gap-4 px-4 pt-3">

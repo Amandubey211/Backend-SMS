@@ -1,10 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 
-const AddNewRatingForm = ({ onAddNewRating }) => {
+const EditRatingForm = ({ currentRating, onUpdateRating }) => {
   const [markType, setMarkType] = useState("");
   const [points, setPoints] = useState("");
   const [description, setDescription] = useState("");
+
+  useEffect(() => {
+    if (currentRating) {
+      setMarkType(currentRating?.ratingTitle);
+      setPoints(currentRating.ratingScore);
+      setDescription(currentRating.ratingDescription);
+    }
+  }, [currentRating]);
 
   const handleMarkTypeChange = (e) => {
     setMarkType(e.target.value);
@@ -19,17 +27,14 @@ const AddNewRatingForm = ({ onAddNewRating }) => {
   };
 
   const handleSubmit = () => {
-    const newRating = {
+    const updatedRating = {
       ratingTitle: markType,
       ratingScore: points,
       ratingDescription: description,
     };
 
-    onAddNewRating(newRating);
-    setMarkType("");
-    setPoints("");
-    setDescription("");
-    toast.success("New Rating Added");
+    onUpdateRating(updatedRating);
+    toast.success("Rating Updated");
   };
 
   return (
@@ -75,11 +80,11 @@ const AddNewRatingForm = ({ onAddNewRating }) => {
           type="submit"
           className="w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600"
         >
-          Add New Rating
+          Update Rating
         </button>
       </div>
     </div>
   );
 };
 
-export default AddNewRatingForm;
+export default EditRatingForm;
