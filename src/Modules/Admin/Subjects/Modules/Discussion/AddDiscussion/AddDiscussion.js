@@ -2,10 +2,10 @@ import React, { useState } from "react";
 import Layout from "../../../../../../Components/Common/Layout";
 import SideMenubar from "../../../../../../Components/Admin/SideMenubar";
 import AddDiscussionHeader from "./Components/AddDiscussionHeader";
-import Editor from "../../../Component/Editor";
 import CreateDiscussionForm from "./Components/CreateDiscussionForm";
 import TopicTitleInput from "./Components/TopicTitleInput";
 import FileInput from "./Components/FileInput";
+import EditorComponent from "../../../Component/AdminEditor";
 
 const AddDiscussion = () => {
   const [assignmentName, setAssignmentName] = useState("");
@@ -60,7 +60,7 @@ const AddDiscussion = () => {
                   <FileInput onChange={handleFileChange} file={file} />
                 </div>
 
-                <Editor
+                <EditorComponent
                   hideInput={true}
                   assignmentLabel="Discussion Name"
                   editorContent={editorContent}

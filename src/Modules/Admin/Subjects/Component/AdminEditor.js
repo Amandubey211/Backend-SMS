@@ -37,24 +37,25 @@ const EditorComponent = ({
 
       const formData = new FormData();
       formData.append("file", file);
-      formData.append("upload_preset", process.env.REACT_APP_CLOUDINARY_PRESET);
+      // formData.append("upload_preset", process.env.REACT_APP_CLOUDINARY_PRESET);
 
-      try {
-        const response = await axios.post(
-          process.env.REACT_APP_CLOUDINARY_URL,
-          formData
-        );
-        const imageUrl = response.data.secure_url;
-        const quill = quillRef.current.getEditor();
-        const range = quill.getSelection();
-        quill.deleteText(range.index, 1); // Remove the placeholder image
-        quill.insertEmbed(range.index, "image", imageUrl);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error uploading image to Cloudinary", error);
-        setError("Error uploading image. Please try again.");
-        setLoading(false);
-      }
+      console.log(file);
+      // try {
+      //   const response = await axios.post(
+      //     process.env.REACT_APP_CLOUDINARY_URL,
+      //     formData
+      //   );
+      //   const imageUrl = response.data.secure_url;
+      //   const quill = quillRef.current.getEditor();
+      //   const range = quill.getSelection();
+      //   quill.deleteText(range.index, 1); // Remove the placeholder image
+      //   quill.insertEmbed(range.index, "image", imageUrl);
+      //   setLoading(false);
+      // } catch (error) {
+      //   console.error("Error uploading image to Cloudinary", error);
+      //   setError("Error uploading image. Please try again.");
+      //   setLoading(false);
+      // }
     };
   }, []);
 

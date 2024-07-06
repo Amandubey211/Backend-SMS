@@ -10,7 +10,7 @@ const SubjectSideBar = () => {
 
   const menuItems = [
     { name: "Module", path: "module" },
-    { name: "Assignments", path: "assignments" },
+    { name: "Assignments", path: "assignment" },
     { name: "Quizzes", path: "quizzes" },
     { name: "Discussions", path: "discussions" },
     { name: "Page", path: "page" },

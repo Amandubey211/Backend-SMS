@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import CreateSyllabusHeader from "./Components/CreateSyllabusHeader";
 import SideMenubar from "../../../../../../Components/Admin/SideMenubar";
-import Editor from "../../../Component/Editor";
+import EditorComponent from "../../../Component/AdminEditor";
 
 const MainSection = () => {
   const [assignmentName, setAssignmentName] = useState("");
@@ -21,7 +21,7 @@ const MainSection = () => {
       <SideMenubar />
       <div className="w-full">
         <CreateSyllabusHeader onSave={handleSave} />
-        <Editor
+        <EditorComponent
           assignmentLabel="Page Title"
           assignmentName={assignmentName}
           editorContent={editorContent}
