@@ -10,7 +10,7 @@ const useFetchSection = () => {
   const role = useSelector((store) => store.Auth.role);
 
   const fetchSection = useCallback(
-    async (sectionId) => {
+    async (classId) => {
       setLoading(true);
       setError(null);
 
@@ -18,7 +18,7 @@ const useFetchSection = () => {
         const API_URL = process.env.REACT_APP_API_URL;
         const token = localStorage.getItem(`${role}:token`);
         const response = await axios.get(
-          `${API_URL}/admin/getSectionByclass/${sectionId}`,
+          `${API_URL}/admin/getSectionByclass/${classId}`,
           {
             headers: { Authentication: token },
           }

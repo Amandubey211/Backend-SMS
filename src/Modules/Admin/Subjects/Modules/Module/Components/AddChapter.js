@@ -12,6 +12,7 @@ const AddChapter = () => {
 const selectedModule = useSelector((store)=>store.Common.selectedModule)
   const handleFileChange = (event) => {
     const file = event.target.files[0];
+    console.log(file)
     if (file) {
       setSelectedFile(file);
       const reader = new FileReader();
@@ -38,7 +39,7 @@ const selectedModule = useSelector((store)=>store.Common.selectedModule)
       return;
     }
 
-    await addChapter(chapterTitle, selectedFile,selectedModule?.moduleId);
+    // await addChapter(chapterTitle, selectedFile,selectedModule?.moduleId);
     console.log(chapterTitle, selectedFile,selectedModule?.moduleId)
 
     if (success) {

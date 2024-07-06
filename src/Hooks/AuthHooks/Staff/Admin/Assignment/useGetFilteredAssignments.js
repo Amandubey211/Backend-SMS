@@ -1,13 +1,14 @@
 import { useState, useCallback } from "react";
 import axios from "axios";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
+import { setAssignment } from "../../../../../Redux/Slices/Admin/SubjectSlice";
 
 const useGetFilteredAssignments = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [assignments, setAssignments] = useState([]);
-
+  const dispatch = useDispatch();
   const role = useSelector((store) => store.Auth.role);
   const API_URL = process.env.REACT_APP_API_URL;
   const fetchFilteredAssignments = useCallback(
@@ -35,6 +36,7 @@ const useGetFilteredAssignments = () => {
         console.log(response.data);
         if (response.data && response.data.success) {
           setAssignments(response.data.assignments);
+          dispatch(setAssignment(response.data.assignments));
         } else {
           setError(response.data.msg || "Failed to fetch assignments.");
         }

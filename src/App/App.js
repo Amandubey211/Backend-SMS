@@ -348,7 +348,7 @@ function App() {
       errorElement: <Error />,
     },
     {
-      path: "/class/:cid/:sid/assignments",
+      path: "/class/:cid/:sid/assignment",
       element: <ProtectRoute Component={AssignmentList} allowedRoles={["admin", "teacher"]} />,
       errorElement: <Error />,
     },

@@ -1,13 +1,13 @@
 import React, { useState, Suspense } from "react";
 import CreateQuizHeader from "./Components/CreateQuizHeader";
 import Tabs from "../Components/Tabs";
-import Editor from "../../../Component/Editor";
 import CreateQuizForm from "./Components/CreateQuizForm";
 import toast from "react-hot-toast";
 import CreateQuestionForm from "./Components/CreateQuestionForm";
 import AnswerSection from "./Components/AnswerSection";
 import QuestionList from "./Components/QuestionList";
 import AddQuestionButton from "./Components/AddQuestionButton";
+import EditorComponent from "../../../Component/AdminEditor";
 
 const MainSection = () => {
   const [activeTab, setActiveTab] = useState("instructions");
@@ -118,7 +118,7 @@ const MainSection = () => {
               <div className="h-full">
                 {activeTab === "instructions" ? (
                   <Suspense fallback={<div>Loading...</div>}>
-                    <Editor
+                    <EditorComponent
                       assignmentLabel="Quiz Instructions"
                       assignmentName={assignmentName}
                       editorContent={instruction}
@@ -132,7 +132,7 @@ const MainSection = () => {
                       <h2 className="text-gradient text-2xl font-semibold mb-4">
                         Questions:
                       </h2>
-                      <Editor 
+                      <EditorComponent
                         hideInput={true}
                         editorContent={question}
                         onEditorChange={handleQuestionChange}

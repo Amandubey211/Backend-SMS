@@ -1,8 +1,32 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useSelector } from "react-redux";
+import useFetchSection from "../../../../Hooks/AuthHooks/Staff/Admin/Sections/useFetchSection";
+import { useParams } from "react-router-dom";
+import { createSelector } from "reselect";
+
+const selectSections = createSelector(
+  (store) => store.Class.sectionsList,
+  (sectionsList) => sectionsList
+);
 
 const SectionSelect = ({ section, handleChange }) => {
-  const AllSections = useSelector((store) => store.Class.sectionsList);
+  const { error, fetchSection, loading } = useFetchSection();
+  const { cid } = useParams();
+  const AllSections = useSelector(selectSections);
+
+  useEffect(() => {
+    if (!AllSections.length) {
+      fetchSection(cid);
+    }
+  }, [fetchSection, AllSections, cid]);
+
+  if (loading) {
+    return <p>Loading sections...</p>;
+  }
+
+  if (error) {
+    return <p>Error loading sections: {error}</p>;
+  }
 
   return (
     <>

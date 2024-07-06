@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import Layout from "../../../../../../Components/Common/Layout";
 import SideMenubar from "../../../../../../Components/Admin/SideMenubar";
-import Editor from "../../../Component/Editor";
 import CreateAnnouncementHeader from "./Components/CreateAnnouncementHeader";
 import CreateAnnouncementForm from "./Components/CreateAnnouncementForm";
 import TopicTitleInput from "../../Discussion/AddDiscussion/Components/TopicTitleInput";
 import FileInput from "../../Discussion/AddDiscussion/Components/FileInput";
+import EditorComponent from "../../../Component/AdminEditor";
 
 const CreateAnnouncement = () => {
   const [assignmentName, setAssignmentName] = useState("");
@@ -60,7 +60,7 @@ const CreateAnnouncement = () => {
                   <FileInput onChange={handleFileChange} file={file} />
                 </div>
 
-                <Editor
+                <EditorComponent
                   hideInput={true}
                   assignmentLabel="Discussion Name"
                   editorContent={editorContent}
