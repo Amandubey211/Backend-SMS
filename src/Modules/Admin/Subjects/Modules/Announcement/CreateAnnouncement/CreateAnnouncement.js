@@ -18,7 +18,10 @@ const CreateAnnouncement = () => {
     dueDate: "",
     section: "",
     option: "",
+    author:"",
     availableFrom: "",
+    groupId:""
+    //allow comments option is not clear with backend 
   });
 
   const { createAnnouncement, loading, error } = useCreateAnnouncement();
@@ -47,6 +50,8 @@ const CreateAnnouncement = () => {
     const announcementData = {
       title: assignmentName,
       content: editorContent,
+      sectionId:formState.section,
+      delayPosting:formState.dueDate,
       classId: cid,
       ...formState,
     };
@@ -56,6 +61,7 @@ const CreateAnnouncement = () => {
     };
 
     const result = await createAnnouncement(announcementData, files);
+    console.log(announcementData)
     if (result) {
       console.log("Announcement created successfully", result);
     }

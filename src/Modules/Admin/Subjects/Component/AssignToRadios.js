@@ -10,7 +10,7 @@ const AssignToRadios = ({ assignTo, handleChange, title }) => (
         <input
           type="radio"
           id="everyone"
-          name="assignTo"
+          name="postTo"
           value="Everyone"
           checked={assignTo === "Everyone"}
           onChange={handleChange}
@@ -24,7 +24,7 @@ const AssignToRadios = ({ assignTo, handleChange, title }) => (
         <input
           type="radio"
           id="section"
-          name="assignTo"
+          name="postTo"
           value="Section"
           checked={assignTo === "Section"}
           onChange={handleChange}
@@ -38,7 +38,7 @@ const AssignToRadios = ({ assignTo, handleChange, title }) => (
         <input
           type="radio"
           id="group"
-          name="assignTo"
+          name="postTo"
           value="Group"
           checked={assignTo === "Group"}
           onChange={handleChange}
