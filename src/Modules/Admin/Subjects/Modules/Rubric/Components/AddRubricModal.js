@@ -164,7 +164,7 @@ const AddRubricModal = ({
             </div>
             {dropdownOpen && (
               <ul className="absolute left-0 right-0 mt-2 max-h-72 overflow-auto bg-white border rounded-md shadow-lg z-10 py-2">
-                {AssignmentList.map((assignment) => (
+                {AssignmentList?.map((assignment) => (
                   <li
                     key={assignment._id}
                     onClick={() => handleSelectChange(assignment._id)}
@@ -189,7 +189,7 @@ const AddRubricModal = ({
               </div>
             ))}
           </div>
-          {criteriaList.map((item, index) => (
+          {criteriaList?.map((item, index) => (
             <RubricModalRow
               key={index}
               data={item}

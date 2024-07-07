@@ -178,3 +178,10 @@
 .animate-spin {
   animation: spin 1s linear infinite;
 }
+.ql-toolbar .ql-separator {
+  display: inline-block;
+  width: 1px;
+  background-color: #ccc;
+  margin: 0 8px;
+  height: 24px;
+}

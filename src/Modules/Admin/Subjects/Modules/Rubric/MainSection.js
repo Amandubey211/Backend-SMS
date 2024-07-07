@@ -1,12 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, lazy, Suspense } from "react";
 import RubricHeader from "./Components/RubricHeader";
 import RubricCard from "./Components/RubricCard";
 import RubricList from "./Components/MockData/DummyRubricList";
 import Sidebar from "../../../../../Components/Common/Sidebar";
-import AddRubricModal from "./Components/AddRubricModal";
 import AddNewCriteriaForm from "./Components/AddNewCriteriaForm";
 import SubjectSideBar from "../../Component/SubjectSideBar";
 import initialCriteria from "./Components/MockData/DummyCriteria";
+
+// Lazy load the AddRubricModal component
+const AddRubricModal = lazy(() => import("./Components/AddRubricModal"));
 
 const MainSection = () => {
   const [isModalOpen, setModalOpen] = useState(false);
@@ -28,7 +30,7 @@ const MainSection = () => {
       <div className="w-full p-3 border-l">
         <RubricHeader onAddRubric={() => setModalOpen(true)} />
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
-          {RubricList.map((card, index) => (
+          {RubricList?.map((card, index) => (
             <RubricCard
               key={index}
               title={card.title}
@@ -37,13 +39,17 @@ const MainSection = () => {
             />
           ))}
         </div>
-        <AddRubricModal
-          isOpen={isModalOpen}
-          onClose={() => setModalOpen(false)}
-          criteria={criteria}
-          onAddCriteria={() => setSidebarOpen(true)}
-          onDeleteCriteria={handleDeleteCriteria}
-        />
+        <Suspense fallback={<div>Loading...</div>}>
+          {isModalOpen && (
+            <AddRubricModal
+              isOpen={isModalOpen}
+              onClose={() => setModalOpen(false)}
+              criteria={criteria}
+              onAddCriteria={() => setSidebarOpen(true)}
+              onDeleteCriteria={handleDeleteCriteria}
+            />
+          )}
+        </Suspense>
         <Sidebar
           isOpen={isSidebarOpen}
           onClose={() => setSidebarOpen(false)}
