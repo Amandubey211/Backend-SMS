@@ -10,6 +10,8 @@ import RubricModalRow from "./RubricModalRow";
 import { useSelector } from "react-redux";
 import useCreateRubric from "../../../../../../Hooks/AuthHooks/Staff/Admin/Rubric/useCreateRubric";
 import toast from "react-hot-toast";
+import useGetFilteredAssignments from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useGetFilteredAssignments";
+import { useParams } from "react-router-dom";
 
 const AddRubricModal = ({
   isOpen,
@@ -23,8 +25,17 @@ const AddRubricModal = ({
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
   const { createRubric, loading } = useCreateRubric();
+  const {
+    loading: assignmentLoading,
+    error,
+    assignments,
+    fetchFilteredAssignments,
+  } = useGetFilteredAssignments();
   const AssignmentList = useSelector((store) => store.Subject.assignments);
-
+  const { sid } = useParams();
+  useEffect(() => {
+    fetchFilteredAssignments(sid);
+  }, [fetchFilteredAssignments, sid]);
   useEffect(() => {
     const toggleBodyClass = () => {
       document.body.classList.toggle("overflow-hidden", isOpen);

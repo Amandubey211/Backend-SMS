@@ -2,24 +2,25 @@ import { useState, useCallback } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
 
-const useFetchSyllabus = () => {
+const useDeleteSyllabus = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [syllabi, setSyllabi] = useState([]);
+  // const { cid } = useParams();
 
   const API_URL = process.env.REACT_APP_API_URL;
   const { role } = useSelector((store) => store.Auth);
 
-  const fetchSyllabus = useCallback(
-    async (subjectId, classId) => {
+  const deleteSyllabus = useCallback(
+    async (syllabusId) => {
       setLoading(true);
       setError(null);
 
       try {
         const token = localStorage.getItem(`${role}:token`);
-        const response = await axios.get(
-          `${API_URL}/admin/syllabus/${subjectId}/class/${classId}`,
+        const response = await axios.delete(
+          `${API_URL}/admin/syllabus/${syllabusId}`,
           {
             headers: {
               Authentication: token,
@@ -27,13 +28,14 @@ const useFetchSyllabus = () => {
           }
         );
         if (response.data.status) {
-          setSyllabi(response.data.data);
+          toast.success("Syllabus deleted successfully!");
         } else {
-          toast.error("Failed to fetch syllabus");
+          toast.error("Failed to delete syllabus");
         }
+        return response.data;
       } catch (err) {
         const errorMessage =
-          err.response?.data?.message || "Failed to fetch syllabus";
+          err.response?.data?.message || "Failed to delete syllabus";
         toast.error(errorMessage);
         setError(errorMessage);
       } finally {
@@ -43,7 +45,7 @@ const useFetchSyllabus = () => {
     [role, API_URL]
   );
 
-  return { loading, error, syllabi, fetchSyllabus };
+  return { loading, error, deleteSyllabus };
 };
 
-export default useFetchSyllabus;
+export default useDeleteSyllabus;
