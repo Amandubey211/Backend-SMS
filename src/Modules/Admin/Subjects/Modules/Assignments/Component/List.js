@@ -6,16 +6,21 @@ import { NavLink, useParams } from "react-router-dom";
 import { ImSpinner3 } from "react-icons/im";
 import { MdOutlineBlock } from "react-icons/md";
 const List = ({ data, icon, title, type, loading, error }) => {
+  console.log(data);
   const { cid, sid } = useParams();
   const [searchQuery, setSearchQuery] = useState("");
 
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
   };
-
-  const filteredData = data.filter((item) =>
-    item.name?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  let filteredData;
+  if (type === "Assignment") {
+    filteredData = data.filter((item) =>
+      item.name?.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  } else {
+    filteredData = data;
+  }
 
   return (
     <div className="bg-white p-5 w-full">

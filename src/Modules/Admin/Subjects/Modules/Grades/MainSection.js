@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import SubjectSideBar from "../../Component/SubjectSideBar";
 import GradeHeader from "./Component/GradeHeader";
@@ -6,6 +6,7 @@ import StudentTable from "./Component/StudentTable";
 import studentsGrades from "./dummydata/dummystudents";
 import StudentGradeModal from "./StudentGradeViewModal/StudentGradeModal";
 import { setStudentGrade } from "../../../../../Redux/Slices/AdminSlice";
+import useFetchClassGrades from "../../../../../Hooks/AuthHooks/Staff/Admin/Grades/useFetchClassGrades";
 
 const MainSection = () => {
   const studentGrade = useSelector((store) => store.Admin.studentGrade);
@@ -18,6 +19,12 @@ const MainSection = () => {
   });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const dispatch = useDispatch();
+  const { error, fetchClassGrades, grades, loading } = useFetchClassGrades();
+
+  useEffect(()=>{
+    fetchClassGrades()
+    console.log(grades)
+  },[])
 
   const handleSearchChange = (value) => {
     setSearch(value);
