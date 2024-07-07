@@ -3,7 +3,7 @@ import toast from "react-hot-toast";
 import { IoIosArrowBack } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 
-const CreateAnnouncementHeader = ({ onSave, loading }) => {
+const CreateAnnouncementHeader = ({ onSave, loading, isEditing }) => {
   const navigate = useNavigate();
 
   return (
@@ -14,7 +14,7 @@ const CreateAnnouncementHeader = ({ onSave, loading }) => {
           onClick={() => navigate(-1)}
         />
         <h1 className="text-lg font-semibold text-gray-800">
-          Create New Announcement
+          {isEditing ? "Update Announcement" : "Create New Announcement"}
         </h1>
       </div>
       <div className="flex items-center space-x-2">
@@ -34,7 +34,7 @@ const CreateAnnouncementHeader = ({ onSave, loading }) => {
           disabled={loading}
         >
           <span className="text-gradient">
-            {loading ? "Saving..." : "Submit Announcement"}
+            {loading ? "Saving..." : isEditing ? "Update Announcement" : "Submit Announcement"}
           </span>
         </button>
       </div>

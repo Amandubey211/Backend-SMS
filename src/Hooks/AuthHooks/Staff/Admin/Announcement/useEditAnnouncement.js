@@ -4,17 +4,15 @@ import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
 import FormData from "form-data";
 
-const useCreateAnnouncement = () => {
+const useEditAnnouncement = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const API_URL = process.env.REACT_APP_API_URL;
-  const {
-    role,
-  } = useSelector((store) => store.Auth);
+  const { role } = useSelector((store) => store.Auth);
 
-  const createAnnouncement = useCallback(
-    async (data, files) => {
+  const editAnnouncement = useCallback(
+    async (id, data, files) => {
       setLoading(true);
       setError(null);
 
@@ -30,8 +28,8 @@ const useCreateAnnouncement = () => {
           formData.append("attachment", files.attachment);
         }
 
-        const response = await axios.post(
-          `${API_URL}/admin/announcement`,
+        const response = await axios.put(
+          `${API_URL}/admin/announcement/${id}`,
           formData,
           {
             headers: {
@@ -41,17 +39,16 @@ const useCreateAnnouncement = () => {
           }
         );
         if (response.data.status) {
-          toast.success("Announcement created successfully!");
-
+          toast.success("Announcement updated successfully!");
         } else {
-          toast.error("Announcement not created");
-          setError("Announcement not created");
+          toast.error("Announcement not updated");
+          setError("Announcement not updated");
         }
 
         return response.data.data;
       } catch (err) {
         const errorMessage =
-          err.response?.data?.message || "Failed to create announcement";
+          err.response?.data?.message || "Failed to update announcement";
         toast.error(errorMessage);
         setError(errorMessage);
       } finally {
@@ -61,7 +58,7 @@ const useCreateAnnouncement = () => {
     [role, API_URL]
   );
 
-  return { loading, error, createAnnouncement };
+  return { loading, error, editAnnouncement };
 };
 
-export default useCreateAnnouncement;
+export default useEditAnnouncement;
