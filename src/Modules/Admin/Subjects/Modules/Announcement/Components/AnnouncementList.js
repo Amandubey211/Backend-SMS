@@ -4,6 +4,7 @@ import AnnouncementCard from "./AnnouncementCard";
 import useGetAllAnnouncements from "../../../../../../Hooks/AuthHooks/Staff/Admin/Announcement/useGetAllAnnouncements";
 import { useParams } from "react-router-dom";
 import { ImSpinner3 } from "react-icons/im";
+import { AiOutlineFileSearch } from "react-icons/ai";
 
 const colors = [
   "#efc42f",
@@ -61,16 +62,23 @@ const AnnouncementList = () => {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-2">
-          {filteredAnnouncements.map((announcement) => (
-            <AnnouncementCard
-              key={announcement._id}
-              title={announcement.title}
-              section={announcement.sectionId || "Default Section"}
-              date={announcement.createdAt}
-              id={announcement._id}
-              color={announcement.color}
-            />
-          ))}
+          {filteredAnnouncements.length > 0 ? (
+            filteredAnnouncements.map((announcement) => (
+              <AnnouncementCard
+                key={announcement._id}
+                title={announcement.title}
+                section={announcement.sectionId || "Default Section"}
+                date={announcement.createdAt}
+                id={announcement._id}
+                color={announcement.color}
+              />
+            ))
+          ) : (
+            <div className="flex flex-col items-center justify-center col-span-full py-10 text-gray-500">
+              <AiOutlineFileSearch className="w-12 h-12 mb-3" />
+              <p className="text-lg font-semibold">No announcements found.</p>
+            </div>
+          )}
         </div>
       )}
     </div>

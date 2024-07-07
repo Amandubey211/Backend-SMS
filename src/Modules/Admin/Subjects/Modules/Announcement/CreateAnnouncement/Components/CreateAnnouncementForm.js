@@ -10,6 +10,7 @@ const CreateAnnouncementForm = ({
   option,
   handleChange,
   groupId,
+  author
 }) => {
   return (
     <div>
@@ -22,14 +23,15 @@ const CreateAnnouncementForm = ({
         handleChange={handleChange}
       />
       <div className="mb-4">
-        <label htmlFor="topicTitle" className="text-gray-500 mb-1">
+        <label htmlFor="author" className="text-gray-500 mb-1">
           Author
         </label>
         <input
-          id="topicTitle"
+          id="author"
           type="text"
           name="author"
           onChange={handleChange}
+          value={author}
           placeholder="Type Name"
           className="p-2 border border-gray-300 rounded w-full"
         />

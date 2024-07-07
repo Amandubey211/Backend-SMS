@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { CiSearch } from "react-icons/ci";
-import { NavLink } from "react-router-dom";
+import { NavLink, useParams } from "react-router-dom";
 
 const AnnouncementHeader = ({ onSearch }) => {
   const [filter, setFilter] = useState("all");
-
+const {cid,sid} = useParams()
   const handleFilterChange = (event) => {
     setFilter(event.target.value);
   };
@@ -17,8 +17,7 @@ const AnnouncementHeader = ({ onSearch }) => {
     <div className="p-3">
       <div className="flex justify-between items-center ">
         <h2 className="text-xl font-semibold mb-4">All Announcement</h2>
-        <NavLink to="create_announcement"
-          // onClick={onAddNewSubject}
+        <NavLink to={`/class/${cid}/${sid}/announcements/create_announcement`}
           className="flex items-center border border-gray-300 ps-5  py-0 rounded-full"
         >
           <span className="mr-2">Add New Announcement</span>
