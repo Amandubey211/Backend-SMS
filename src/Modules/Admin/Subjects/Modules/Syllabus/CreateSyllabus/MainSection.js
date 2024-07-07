@@ -1,15 +1,18 @@
 import React, { useState } from "react";
+import { useLocation, useParams } from "react-router-dom";
 import CreateSyllabusHeader from "./Components/CreateSyllabusHeader";
 import SideMenubar from "../../../../../../Components/Admin/SideMenubar";
 import EditorComponent from "../../../Component/AdminEditor";
-import { useParams } from "react-router-dom";
 import useCreateSyllabus from "../../../../../../Hooks/AuthHooks/Staff/Admin/Syllabus/useCreateSyllabus";
+import useEditSyllabus from "../../../../../../Hooks/AuthHooks/Staff/Admin/Syllabus/useEditSyllabus";
 
 const MainSection = () => {
-  const [assignmentName, setAssignmentName] = useState("");
-  const [editorContent, setEditorContent] = useState("");
-  const { loading, error, createSyllabus } = useCreateSyllabus();
+  const { state } = useLocation();
   const { sid } = useParams();
+  const [assignmentName, setAssignmentName] = useState(state?.syllabus?.title || "");
+  const [editorContent, setEditorContent] = useState(state?.syllabus?.content || "");
+  const { loading: createLoading, error: createError, createSyllabus } = useCreateSyllabus();
+  const { loading: editLoading, error: editError, editSyllabus } = useEditSyllabus();
 
   const handleNameChange = (name) => {
     setAssignmentName(name);
@@ -26,14 +29,22 @@ const MainSection = () => {
       subjectId: sid,
     };
 
-    await createSyllabus(data);
+    if (state?.syllabus?._id) {
+      await editSyllabus(state.syllabus._id, data);
+    } else {
+      await createSyllabus(data);
+    }
   };
+
+  const loading = createLoading || editLoading;
+  const error = createError || editError;
+  const isEditing = Boolean(state?.syllabus?._id);
 
   return (
     <div className="flex">
       <SideMenubar />
       <div className="w-full mb-4">
-        <CreateSyllabusHeader onSave={handleSave} loading={loading} />
+        <CreateSyllabusHeader onSave={handleSave} loading={loading} isEditing={isEditing} />
         <EditorComponent
           inputPlaceHolder="Syllabus Heading"
           assignmentLabel="Page Title"

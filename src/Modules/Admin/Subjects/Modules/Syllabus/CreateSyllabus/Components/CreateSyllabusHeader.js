@@ -3,7 +3,7 @@ import toast from "react-hot-toast";
 import { IoIosArrowBack } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 
-const CreateSyllabusHeader = ({ onSave, loading }) => {
+const CreateSyllabusHeader = ({ onSave, loading, isEditing }) => {
   const navigate = useNavigate();
 
   return (
@@ -17,7 +17,7 @@ const CreateSyllabusHeader = ({ onSave, loading }) => {
           <IoIosArrowBack aria-hidden="true" />
         </button>
         <h1 className="text-lg font-semibold text-gray-800">
-          Create New Syllabus
+          {isEditing ? "Update Syllabus" : "Create New Syllabus"}
         </h1>
       </div>
       <div className="flex items-center space-x-2">
@@ -35,11 +35,11 @@ const CreateSyllabusHeader = ({ onSave, loading }) => {
         >
           {loading ? (
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-rose-500 to-indigo-500">
-              Saving...
+              {isEditing ? "Updating..." : "Saving...."}
             </span>
           ) : (
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-rose-500 to-indigo-500">
-              Submit Syllabus
+              {isEditing ? "Update Syllabus" : "Submit Syllabus"}
             </span>
           )}
         </button>
