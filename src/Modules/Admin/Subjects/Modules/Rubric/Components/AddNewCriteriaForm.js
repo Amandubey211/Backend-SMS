@@ -1,11 +1,16 @@
-import React, { useState } from "react";
-
-const AddNewCriteriaForm = ({ onSave }) => {
+import React, { useEffect, useState } from "react";
+const AddNewCriteriaForm = ({ onSave, initialData, editMode }) => {
   const [criteriaData, setCriteriaData] = useState({
     title: "",
     description: "",
     ratings: [],
   });
+
+  useEffect(() => {
+    if (initialData) {
+      setCriteriaData(initialData);
+    }
+  }, [initialData]);
 
   const handleAddCriteria = () => {
     onSave(criteriaData);
@@ -48,7 +53,7 @@ const AddNewCriteriaForm = ({ onSave }) => {
           type="submit"
           className="w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600"
         >
-          Add Criteria
+          {editMode ? "Update Criteria" : "Add Criteria"}
         </button>
       </div>
     </div>

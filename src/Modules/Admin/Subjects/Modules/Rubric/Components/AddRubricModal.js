@@ -1,17 +1,9 @@
-import React, {
-  useEffect,
-  useState,
-  useCallback,
-  useRef,
-  useMemo,
-} from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import { HiOutlinePlus } from "react-icons/hi2";
 import RubricModalRow from "./RubricModalRow";
 import { useSelector } from "react-redux";
 import useCreateRubric from "../../../../../../Hooks/AuthHooks/Staff/Admin/Rubric/useCreateRubric";
 import toast from "react-hot-toast";
-import useGetFilteredAssignments from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useGetFilteredAssignments";
-import { useParams } from "react-router-dom";
 
 const AddRubricModal = ({
   isOpen,
@@ -19,23 +11,15 @@ const AddRubricModal = ({
   onAddCriteria,
   criteriaList,
   setCriteriaList,
+  onEditCriteria, // Add this line
 }) => {
   const [assignment, setAssignment] = useState("");
   const [rubricName, setRubricName] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
-  const { createRubric, loading } = useCreateRubric();
-  const {
-    loading: assignmentLoading,
-    error,
-    assignments,
-    fetchFilteredAssignments,
-  } = useGetFilteredAssignments();
+  const { createRubric, loading, error } = useCreateRubric();
   const AssignmentList = useSelector((store) => store.Subject.assignments);
-  const { sid } = useParams();
-  useEffect(() => {
-    fetchFilteredAssignments(sid);
-  }, [fetchFilteredAssignments, sid]);
+
   useEffect(() => {
     const toggleBodyClass = () => {
       document.body.classList.toggle("overflow-hidden", isOpen);
@@ -58,30 +42,24 @@ const AddRubricModal = ({
     };
   }, []);
 
-  const handleSelectChange = useCallback((id) => {
+  const handleSelectChange = useCallback((id, name) => {
     setAssignment(id);
     setDropdownOpen(false);
   }, []);
 
-  const handleAddRating = useCallback(
-    (criteriaIndex, ratings) => {
-      const updatedCriteria = criteriaList.map((crit, idx) =>
-        idx === criteriaIndex ? { ...crit, ratings } : crit
-      );
-      setCriteriaList(updatedCriteria);
-    },
-    [criteriaList, setCriteriaList]
-  );
+  const handleAddRating = (criteriaIndex, ratings) => {
+    const updatedCriteria = criteriaList.map((crit, idx) =>
+      idx === criteriaIndex ? { ...crit, ratings } : crit
+    );
+    setCriteriaList(updatedCriteria);
+  };
 
-  const handleDeleteCriteria = useCallback(
-    (index) => {
-      const updatedCriteria = criteriaList.filter((_, i) => i !== index);
-      setCriteriaList(updatedCriteria);
-    },
-    [criteriaList, setCriteriaList]
-  );
+  const handleDeleteCriteria = (index) => {
+    const updatedCriteria = criteriaList.filter((_, i) => i !== index);
+    setCriteriaList(updatedCriteria);
+  };
 
-  const handleSubmit = useCallback(async () => {
+  const handleSubmit = async () => {
     const selectedAssignment = AssignmentList.find((a) => a._id === assignment);
 
     const totalScore = criteriaList.reduce((acc, criterion) => {
@@ -94,42 +72,38 @@ const AddRubricModal = ({
 
     console.log(totalScore);
 
-    if (totalScore > selectedAssignment?.points) {
+    if (totalScore > selectedAssignment.points) {
       toast.error("Total points cannot exceed the assignment's points.");
       return;
     }
 
-    const rubricData = {
-      name: rubricName,
-      criteria: criteriaList,
-      assignmentId: assignment,
-      totalScore,
-    };
-
-    console.log(rubricData);
-
-    if (totalScore === selectedAssignment?.points) {
-      await createRubric(rubricData);
-
-      // after creating the modal will be closed
-      onClose();
+    if (totalScore === selectedAssignment.points) {
+      const rubricData = {
+        name: rubricName,
+        criteria: criteriaList,
+        assignmentId: assignment,
+        totalScore,
+      };
+      console.log(rubricData);
+      const result = await createRubric(rubricData);
+      if (result.success) {
+        onClose();
+      }
     } else {
+      const rubricData = {
+        name: rubricName,
+        criteria: criteriaList,
+        assignmentId: assignment,
+        totalScore,
+      };
+      console.log(rubricData);
       return toast.error("Total Point Not correct");
     }
-  }, [
-    assignment,
-    criteriaList,
-    rubricName,
-    AssignmentList,
-    createRubric,
-    onClose,
-  ]);
+  };
 
-  const selectedAssignmentPoints = useMemo(
-    () =>
-      assignment ? AssignmentList.find((a) => a._id === assignment)?.points : 0,
-    [assignment, AssignmentList]
-  );
+  const selectedAssignmentPoints = assignment
+    ? AssignmentList.find((a) => a._id === assignment)?.points
+    : 0;
 
   return (
     <div
@@ -175,10 +149,12 @@ const AddRubricModal = ({
             </div>
             {dropdownOpen && (
               <ul className="absolute left-0 right-0 mt-2 max-h-72 overflow-auto bg-white border rounded-md shadow-lg z-10 py-2">
-                {AssignmentList?.map((assignment) => (
+                {AssignmentList.map((assignment) => (
                   <li
                     key={assignment._id}
-                    onClick={() => handleSelectChange(assignment._id)}
+                    onClick={() =>
+                      handleSelectChange(assignment._id, assignment.name)
+                    }
                     className="px-4 py-2 hover:bg-gray-100 transition duration-300 transform cursor-pointer hover:translate-x-[-8px] ps-6"
                   >
                     {assignment.name}
@@ -200,13 +176,14 @@ const AddRubricModal = ({
               </div>
             ))}
           </div>
-          {criteriaList?.map((item, index) => (
+          {criteriaList.map((item, index) => (
             <RubricModalRow
               key={index}
               data={item}
               criteriaIndex={index}
               onDeleteCriteria={handleDeleteCriteria}
               onAddRating={handleAddRating}
+              onEditCriteria={onEditCriteria} // Pass the prop here
             />
           ))}
         </div>
@@ -217,27 +194,28 @@ const AddRubricModal = ({
           >
             <HiOutlinePlus className="text-red-600 text-2xl" />
             <span className="bg-gradient-to-r from-red-500 to-purple-500 bg-clip-text text-transparent">
-              Add Criteria
+              Add New Criteria
             </span>
           </button>
           <div className="text-transparent text-xl font-bold bg-clip-text bg-gradient-to-r from-pink-500 to-purple-500">
             Total Points: {selectedAssignmentPoints}
           </div>
         </div>
-        <div className="p-4 border-t flex justify-end space-x-4">
+        <div className="flex justify-end items-center p-2 mb-2">
           <button
             onClick={onClose}
-            className="px-4 py-2 border rounded-md hover:bg-gray-100 transition-colors duration-300"
+            className="text-gray-600 bg-gray-100 hover:bg-gray-200 p-2 px-4 rounded-md"
           >
             Cancel
           </button>
+          <button className="bg-gradient-to-r from-red-500 to-purple-500 bg-clip-text text-transparent p-2 rounded-md"></button>
           <button
             onClick={handleSubmit}
-            className="flex items-center gap-2 font-semibold p-2 rounded-md bg-gradient-to-r from-pink-100 to-purple-100 hover:shadow-md transition-shadow duration-300"
             disabled={loading}
+            className="flex items-center gap-2 font-semibold p-2 px-4 rounded-md bg-gradient-to-r from-pink-100 to-purple-100 hover:shadow-md transition-shadow duration-300"
           >
             <span className="bg-gradient-to-r from-red-500 to-purple-500 bg-clip-text text-transparent">
-              {loading ? "Creating..." : "Add To Assignment"}
+              {loading ? "Loading..." : "Save Rubric"}
             </span>
           </button>
         </div>

@@ -6,23 +6,26 @@ import RatingCard from "./RatingCard";
 import AddNewRatingForm from "./AddNewRatingForm";
 import EditRatingForm from "./EditRatingForm";
 import Sidebar from "../../../../../../Components/Common/Sidebar";
-
 const RubricModalRow = ({
   data,
   criteriaIndex,
   onDeleteCriteria,
   onAddRating,
+  onEditCriteria, // Add this line
 }) => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [isEditSidebarOpen, setEditSidebarOpen] = useState(false);
-  const [ratings, setRatings] = useState(data.ratings);
+  const [ratings, setRatings] = useState(data?.ratings);
   const [totalPoints, setTotalPoints] = useState(0);
   const [currentEditRating, setCurrentEditRating] = useState(null);
   const [currentEditIndex, setCurrentEditIndex] = useState(null);
 
   useEffect(() => {
     const calculateTotalPoints = () => {
-      const total = ratings.reduce((acc, rating) => acc + Number(rating.ratingScore), 0);
+      const total = ratings.reduce(
+        (acc, rating) => acc + Number(rating.ratingScore),
+        0
+      );
       setTotalPoints(total);
     };
 
@@ -61,6 +64,7 @@ const RubricModalRow = ({
       <div className="flex justify-between flex-row">
         <div className="flex flex-col w-48 justify-around px-4 py-2">
           <p className="font-medium text-gray-900">{data.title}</p>
+          <p className="text-sm text-gray-600">{data.description}</p>
           <div className="flex justify-between items-center mt-1">
             <div className="flex items-center gap-1">
               <input
@@ -78,7 +82,10 @@ const RubricModalRow = ({
               >
                 <RiDeleteBin5Line />
               </button>
-              <button className="text-green-600">
+              <button
+                className="text-green-600"
+                onClick={() => onEditCriteria(criteriaIndex)} // Update this line
+              >
                 <TbEdit />
               </button>
             </div>
