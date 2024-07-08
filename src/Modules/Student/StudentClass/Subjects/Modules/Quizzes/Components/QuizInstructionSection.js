@@ -35,33 +35,3 @@ const QuizInstructionSection = ({quiz}) => {
 };
 
 export default QuizInstructionSection;
-
-
-//--------------------
-
-
-// import React from 'react';
-
-// const QuizInstructionSection = ({ instructions, startTimer, quizStarted, totalTime }) => {
-//   return (
-//     <div className="p-4">
-//       <h2 className="text-xl font-semibold mb-4">Quiz Instructions</h2>
-//       <p className="text-gray-700 mb-4">{instructions}</p>
-//       {!quizStarted && (
-//         <button
-//           onClick={startTimer}
-//           className="bg-purple-500 text-white py-2 px-4 rounded"
-//         >
-//           Start Quiz
-//         </button>
-//       )}
-//       {quizStarted && (
-//         <div className="text-gray-700">
-//           <p>Total Time: {totalTime} seconds</p>
-//         </div>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default QuizInstructionSection;
