@@ -1,25 +1,39 @@
 import React, { useState, lazy, Suspense, useEffect } from "react";
 import RubricHeader from "./Components/RubricHeader";
 import RubricCard from "./Components/RubricCard";
-import RubricList from "./Components/MockData/DummyRubricList";
 import Sidebar from "../../../../../Components/Common/Sidebar";
 import AddNewCriteriaForm from "./Components/AddNewCriteriaForm";
 import SubjectSideBar from "../../Component/SubjectSideBar";
-import initialCriteria from "./Components/MockData/DummyCriteria";
 import useGetRubricBySubjectId from "../../../../../Hooks/AuthHooks/Staff/Admin/Rubric/useGetRubricBySubjectId";
+import useDeleteRubric from "../../../../../Hooks/AuthHooks/Staff/Admin/Rubric/useDeleteRubric";
+import { useParams } from "react-router-dom";
 
 // Lazy load the AddRubricModal component
 const AddRubricModal = lazy(() => import("./Components/AddRubricModal"));
+
 const MainSection = () => {
   const [isModalOpen, setModalOpen] = useState(false);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [criteria, setCriteria] = useState([]);
   const [editMode, setEditMode] = useState(false);
   const [criteriaToEdit, setCriteriaToEdit] = useState(null);
+  const { error, fetchRubricBySubjectId, loading, rubrics } =
+    useGetRubricBySubjectId();
+  const { deleteRubric } = useDeleteRubric();
+  const { sid } = useParams();
+
+  useEffect(() => {
+    fetchRubricBySubjectId(sid);
+    console.log(rubrics);
+  }, [sid, fetchRubricBySubjectId]);
 
   const handleAddNewCriteria = (newCriteria) => {
     if (editMode) {
-      setCriteria(criteria.map((crit, index) => index === criteriaToEdit.index ? newCriteria : crit));
+      setCriteria(
+        criteria.map((crit, index) =>
+          index === criteriaToEdit.index ? newCriteria : crit
+        )
+      );
     } else {
       setCriteria([...criteria, newCriteria]);
     }
@@ -38,18 +52,27 @@ const MainSection = () => {
     setCriteria(criteria.filter((_, index) => index !== criteriaIndex));
   };
 
+  const handleDeleteRubric = async (rubricId) => {
+    const result = await deleteRubric(rubricId);
+    if (result.success) {
+      fetchRubricBySubjectId(sid);
+    }
+  };
+
   return (
     <div className="w-full flex">
       <SubjectSideBar />
       <div className="w-full p-3 border-l">
         <RubricHeader onAddRubric={() => setModalOpen(true)} />
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
-          {RubricList?.map((card, index) => (
+          {rubrics.map((rubric) => (
             <RubricCard
-              key={index}
-              title={card.title}
-              criteria={card.criteria}
-              points={card.points}
+              key={rubric._id}
+              rubricId={rubric._id}
+              title={rubric.name}
+              criteria={rubric.criteria.length}
+              points={rubric.totalScore}
+              onDelete={() => handleDeleteRubric(rubric._id)} // Pass the delete function
             />
           ))}
         </div>
@@ -62,7 +85,7 @@ const MainSection = () => {
               setCriteriaList={setCriteria}
               onAddCriteria={() => setSidebarOpen(true)}
               onDeleteCriteria={handleDeleteCriteria}
-              onEditCriteria={handleEditCriteria} // Pass the handleEditCriteria function
+              onEditCriteria={handleEditCriteria}
             />
           )}
         </Suspense>
@@ -75,10 +98,10 @@ const MainSection = () => {
           }}
           title={editMode ? "Update Criteria" : "Add New Criteria"}
         >
-          <AddNewCriteriaForm 
-            onSave={handleAddNewCriteria} 
-            initialData={criteriaToEdit} 
-            editMode={editMode} 
+          <AddNewCriteriaForm
+            onSave={handleAddNewCriteria}
+            initialData={criteriaToEdit}
+            editMode={editMode}
           />
         </Sidebar>
       </div>
