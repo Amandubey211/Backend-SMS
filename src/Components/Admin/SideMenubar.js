@@ -20,9 +20,10 @@ const SideMenubar = () => {
   const location = useLocation();
   const { staffLogout } = useStaffLogout();
 
-  const { isOpen, role } = useSelector((state) => ({
+  const { isOpen, role, userDetails } = useSelector((state) => ({
     isOpen: state.sidebar.isOpen,
     role: state.Auth.role,
+    userDetails: state.Auth.userDetail,
   }));
 
   const [openItems, setOpenItems] = useState([]);
@@ -161,21 +162,31 @@ const SideMenubar = () => {
       <div className="mt-auto p-2">
         <div className="flex items-center justify-between">
           <img
-            src="https://avatars.githubusercontent.com/u/109097090?v=4"
+            src={
+              userDetails.profile ||
+              "https://avatars.githubusercontent.com/u/109097090?v=4"
+            }
             alt="Profile"
             className={`${isOpen ? "w-10 h-10" : "w-8 h-8"} rounded-full`}
           />
           {isOpen && (
             <div className="ml-4">
-              <h2 className="text-sm font-semibold">{"Aman Dubey"}</h2>
+              <h2 className="text-sm font-semibold">
+                {userDetails.fullName || "Aman Dubey"}
+              </h2>
               <p className="text-gray-500 capitalize">{role}</p>
             </div>
           )}
-          <button title="logout" onClick={staffLogout} className="ml-3" aria-label="Logout">
+          <button
+            title="logout"
+            onClick={staffLogout}
+            className="ml-3"
+            aria-label="Logout"
+          >
             <FiLogOut
-              className={`${
-                isOpen ? "w-7 h-7" : "w-5 h-5"
-              } text-gray-500  ${!isOpen && "ml-0"}`}
+              className={`${isOpen ? "w-7 h-7" : "w-5 h-5"} text-gray-500  ${
+                !isOpen && "ml-0"
+              }`}
             />
           </button>
         </div>

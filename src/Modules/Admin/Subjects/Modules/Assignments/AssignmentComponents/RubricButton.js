@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React from 'react';
 
 const RubricButton = ({ onClick }) => (
@@ -8,3 +9,15 @@ const RubricButton = ({ onClick }) => (
 );
 
 export default RubricButton;
+=======
+import React from 'react';
+
+const RubricButton = ({ onClick }) => (
+  <button onClick={onClick} className="mt-8 w-full border rounded-full py-2 border-red-600 flex justify-center text-xl gap-1 items-center">
+    <span className="text-gradient text-3xl -mt-1">+</span>
+    <span className="text-gradient font-semibold "> View Rubric</span>
+  </button>
+);
+
+export default RubricButton;
+>>>>>>> main

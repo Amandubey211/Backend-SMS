@@ -6,18 +6,23 @@ import { PiEyeClosedFill } from "react-icons/pi";
 import toast from "react-hot-toast";
 import useParentLogin from "../../../Hooks/AuthHooks/Parent/useParentLogin";
 import { LuLoader } from "react-icons/lu";
+
 const ParentForm = () => {
-  const [ParentDetails, setParentDetails] = useState({
-    Email: "",
-    Password: "",
+  const [parentDetails, setParentDetails] = useState({
+    email: "",
+    password: "",
   });
-  const { loading, login } = useParentLogin();
-  const HandleSubmit = (e) => {
-    e.preventDefault();
-    if (!ParentDetails) return toast.error("please add the required details");
-    login(ParentDetails);
-  };
+  const { loading, parentLogin } = useParentLogin();
   const [showPassword, setShowPassword] = useState(false);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!parentDetails.email || !parentDetails.password) {
+      return toast.error("Please add the required details");
+    }
+    parentLogin(parentDetails);
+  };
+
   return (
     <div className="relative h-full bg-gray-100 w-full">
       <div className="absolute top-0 right-0 p-6">
@@ -27,7 +32,7 @@ const ParentForm = () => {
         <div className="bg-white border p-8 rounded-lg w-full max-w-md">
           <NavLink
             to="/"
-            className="text-sm  text-gray-500 hover:text-gray-700 mb-4 items-center flex gap-2"
+            className="text-sm text-gray-500 hover:text-gray-700 mb-4 items-center flex gap-2"
           >
             <div className="rounded-full border-2 text-xl w-6 h-6 flex justify-center items-center">
               &larr;
@@ -35,20 +40,20 @@ const ParentForm = () => {
             <span>LMS Home</span>
           </NavLink>
           <h2 className="text-2xl font-semibold mb-6">Parent Account</h2>
-          <form onSubmit={HandleSubmit}>
+          <form onSubmit={handleSubmit}>
             <h6>Login in using:</h6>
             <div className="mb-4">
               <input
                 type="email"
                 id="email"
-                value={ParentDetails.Email}
+                value={parentDetails.email}
                 onChange={(e) =>
                   setParentDetails((prev) => ({
                     ...prev,
-                    Email: e.target.value,
+                    email: e.target.value,
                   }))
                 }
-                placeholder="  Type your email"
+                placeholder="Type your email"
                 className="mt-1 block w-full px-3 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                 required
               />
@@ -58,11 +63,11 @@ const ParentForm = () => {
                 <input
                   type={showPassword ? "text" : "password"}
                   id="password"
-                  value={ParentDetails.Password}
+                  value={parentDetails.password}
                   onChange={(e) =>
                     setParentDetails((prev) => ({
                       ...prev,
-                      Password: e.target.value,
+                      password: e.target.value,
                     }))
                   }
                   placeholder="Type your password"
@@ -87,12 +92,11 @@ const ParentForm = () => {
               </NavLink>
             </div>
             <button
-              onClick={HandleSubmit}
               type="submit"
               className="w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600"
             >
               {loading ? (
-                <div className="flex justify-center  ">
+                <div className="flex justify-center">
                   <LuLoader className="animate-spin text-2xl" />
                 </div>
               ) : (

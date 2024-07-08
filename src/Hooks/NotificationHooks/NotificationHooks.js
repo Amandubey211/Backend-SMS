@@ -1,0 +1,77 @@
+import { useEffect } from 'react';
+import { initializeApp } from 'firebase/app';
+import { getMessaging, getToken, onMessage } from 'firebase/messaging';
+
+// Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyDppitmp2HvLospsMAfOuvq2SsHpKvId5E",
+  authDomain: "school-management-system-3f735.firebaseapp.com",
+  projectId: "school-management-system-3f735",
+  storageBucket: "school-management-system-3f735.appspot.com",
+  messagingSenderId: "23404838622",
+  appId: "1:23404838622:web:8a53f62c7710f8fa2e8c4f",
+  measurementId: "G-1TLNLSCHP8"
+};
+
+// Initialize Firebase
+const firebaseApp = initializeApp(firebaseConfig);
+const messaging = getMessaging(firebaseApp);
+export const requestPermissionAndGetToken = async () => {
+  try {
+    const permission = await Notification.requestPermission();
+    if (permission === 'granted') {
+      console.log('Notification permission granted.');
+      const token = await getToken(messaging, { vapidKey: "BNOfE1p1FdW9ifLKQnU9ssjU_OXs2_myraIea_R5BeplSf1jzn3NW-K2Le3pJ43w4n11R-Rl-nNFC4SEJwW6pLY" });
+      console.log('Device token:', token);
+      return  token
+    } else {
+      console.log('Notification permission denied.');
+    }
+  } catch (error) {
+    console.error('An error occurred while requesting permission or getting the token:', error);
+  }
+};
+export const useFirebaseMessaging = () => {
+  useEffect(() => {
+    requestPermissionAndGetToken()
+
+
+    const sendTokenToServer = async (token) => {
+      try {
+        const response = await fetch('http://localhost:8080/firebasetoken/store-token', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ token }),
+        });
+
+        if (response.ok) {
+          console.log('Token successfully sent to the server.');
+        } else {
+          console.error('Failed to send token to server:', response.statusText);
+        }
+      } catch (error) {
+        console.error('An error occurred while sending token to the server:', error);
+      }
+    };
+
+    const onMessageListener = () => {
+      onMessage(messaging, (payload) => {
+        console.log('Message received. Payload:', payload);
+      });
+    };
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.ready.then((registration) => {
+        requestPermissionAndGetToken();
+        onMessageListener();
+      });
+    } else {
+      console.error('Service Worker is not supported in this browser.');
+    }
+  }, []);
+
+  return null;
+};
+

@@ -15,10 +15,14 @@ const MainSection = () => {
   const AssignedTeachers = useSelector((store) => store.Class.assignedTeacher);
 
   useEffect(() => {
-    if (cid) {
-      fetchTeachersByClass(cid).finally(() => setInitialLoad(false));
-    }
-  }, []);
+    let isMounted = true;
+    fetchTeachersByClass(cid).finally(() => {
+      if (isMounted) setInitialLoad(false);
+    });
+    return () => {
+      isMounted = false;
+    };
+  }, [cid, fetchTeachersByClass]);
 
   const handleSectionChange = (section) => {
     setSelectedSection(section);
@@ -42,12 +46,12 @@ const MainSection = () => {
       </div>
       <div className="flex flex-wrap justify-center px-2 items-center">
         {initialLoad &&
-          Array.from({ length: 6 }).map((_, index) => (
+          Array.from({ length: 3 }).map((_, index) => (
             <ShimmerCard key={index} />
           ))}
         {error && <p>Error: {error}</p>}
         {!loading && !AssignedTeachers.length && (
-          <p>No teachers assigned to this class.</p>
+          <p className="py-10">No teachers assigned to this Section.</p>
         )}
         {AssignedTeachers?.map((teacher, index) => (
           <TeacherCard

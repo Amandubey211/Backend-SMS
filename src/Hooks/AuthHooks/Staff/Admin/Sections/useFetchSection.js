@@ -8,25 +8,25 @@ const useFetchSection = () => {
   const [error, setError] = useState(null);
   const dispatch = useDispatch();
   const role = useSelector((store) => store.Auth.role);
+
   const fetchSection = useCallback(
-    async (sectionId) => {
+    async (classId) => {
       setLoading(true);
       setError(null);
 
       try {
         const API_URL = process.env.REACT_APP_API_URL;
-        const token = localStorage.getItem(`${role}:token`); // Adjust based on your authentication setup
+        const token = localStorage.getItem(`${role}:token`);
         const response = await axios.get(
-          `${API_URL}/admin/getSectionByclass/${sectionId}`,
+          `${API_URL}/admin/getSectionByclass/${classId}`,
           {
             headers: { Authentication: token },
           }
         );
 
         const { data } = response.data;
-        console.log(data);
+        console.log(data)
         dispatch(setSectionsList(data));
-
         setLoading(false);
         return { success: true, data };
       } catch (err) {
@@ -37,7 +37,7 @@ const useFetchSection = () => {
         return { success: false, error: errorMessage };
       }
     },
-    [dispatch]
+    [dispatch, role]
   );
 
   return { fetchSection, loading, error };

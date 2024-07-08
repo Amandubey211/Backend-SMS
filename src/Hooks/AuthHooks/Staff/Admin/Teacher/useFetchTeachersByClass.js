@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { setTeacherAssign } from "../../../../../Redux/Slices/Admin/ClassSlice";
@@ -11,7 +11,7 @@ const useFetchTeachersByClass = () => {
   const role = useSelector((store) => store.Auth.role);
   const dispatch = useDispatch();
 
-  const fetchTeachersByClass = async (classId) => {
+  const fetchTeachersByClass = useCallback(async (classId) => {
     setLoading(true);
     setError(null); // Reset error state before new request
     try {
@@ -26,7 +26,7 @@ const useFetchTeachersByClass = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [role, dispatch]);
 
   return { fetchTeachersByClass, loading, error };
 };

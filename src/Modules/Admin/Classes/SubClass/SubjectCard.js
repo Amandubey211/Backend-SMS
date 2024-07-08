@@ -9,33 +9,41 @@ import { MdOutlineModeEdit } from "react-icons/md";
 import toast from "react-hot-toast";
 
 const SubjectCard = ({ data, backgroundColor, Class }) => {
-  const formattedSid = data.name.toLowerCase().replace(/ /g, "_");
   const dispatch = useDispatch();
 
   return (
     <div
       className={`relative rounded-xl p-4 shadow-lg ${backgroundColor} transition-transform duration-300 transform hover:scale-105 hover:shadow-2xl group`}
     >
-      <div onClick={()=>toast.success("No Figma Design ")} className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+      <div
+        onClick={() => toast.success("No Figma Design ")}
+        className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+      >
         <MdOutlineModeEdit className="text-green-800  bg-green-50 p-1 text-3xl rounded-full cursor-pointer" />
       </div>
       <div className="flex justify-between items-center mb-4">
-        <button className={`border border-white rounded-full px-4 py-1 ${data.isPublished ? "text-green-600 bg-green-100" : "bg-pink-50 text-gray-600"}`}>
+        <button
+          className={`border border-white rounded-full px-4 py-1 ${
+            data.isPublished
+              ? "text-green-600 bg-green-100"
+              : "bg-pink-50 text-gray-600"
+          }`}
+        >
           {data.isPublished ? "Publish" : "Unpublished"}
         </button>
       </div>
       <NavLink
-        to={`/class/${Class}/${formattedSid}/module`}
+        to={`/class/${Class}/${data._id}/module`}
         onClick={() => dispatch(setSelectedSubject(data.name))}
         className="block"
       >
-        <h2 className="text-xl font-bold capitalize text-white w-[65%] transition-colors duration-300 hover:underline">
+        <h2 className="text-xl font-bold capitalize text-white w-[65%] transition-colors duration-300 ">
           {data.name}
         </h2>
         <div className="flex items-center mt-2 text-white">
           <span className="flex items-center mr-2 gap-1">
             <LuUser />
-            <span>{data.students ? data.students.length : 0}</span>
+            <span>{data.studentsIds ? data.studentsIds.length :0}</span>
           </span>
           <span className="border-r-2 border-white h-5 mr-2"></span>
           <span className="flex items-center gap-1">

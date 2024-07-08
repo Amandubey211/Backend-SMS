@@ -20,7 +20,7 @@ const UnVerifiedStudentCard = ({ student, color }) => {
       <div className="flex items-center mt-4">
         <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-white">
           <img
-            src="https://avatars.githubusercontent.com/u/109097090?v=4"
+            src={student.profile ||"https://avatars.githubusercontent.com/u/109097090?v=4" }
             alt="Student"
             className="w-full h-full object-cover"
           />

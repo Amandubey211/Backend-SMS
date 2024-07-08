@@ -2,7 +2,7 @@ import { useState, useCallback } from "react";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
-import useGetClassDetails from "./usegetClassDetails";
+import useGetClassDetails from "./Class/usegetClassDetails";
 
 const useCreateSubject = () => {
   const [loading, setLoading] = useState(false);
