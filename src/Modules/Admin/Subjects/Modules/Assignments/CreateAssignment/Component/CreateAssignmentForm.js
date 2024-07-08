@@ -108,7 +108,7 @@ const CreateAssignmentForm = ({
         numberOfAttempts={numberOfAttempts}
         handleChange={handleChange}
       />
-      <AssignToRadios assignTo={assignTo} handleChange={handleChange} />
+      <AssignToRadios isAssignToLabel={true} assignTo={assignTo} handleChange={handleChange} />
       <SectionSelect section={section} handleChange={handleChange} />
       <DateInput
         label="Available from"

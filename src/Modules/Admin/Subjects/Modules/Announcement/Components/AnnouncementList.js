@@ -28,7 +28,8 @@ const AnnouncementList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [coloredAnnouncements, setColoredAnnouncements] = useState([]);
   const { cid } = useParams();
-  const { error, fetchAnnouncements, loading, announcementData } = useGetAllAnnouncements();
+  const { error, fetchAnnouncements, loading, announcementData } =
+    useGetAllAnnouncements();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -40,7 +41,7 @@ const AnnouncementList = () => {
 
   useEffect(() => {
     if (announcementData.length) {
-      const coloredData = announcementData.map(announcement => ({
+      const coloredData = announcementData.map((announcement) => ({
         ...announcement,
         color: getRandomColor(),
       }));

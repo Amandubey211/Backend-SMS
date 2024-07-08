@@ -8,7 +8,7 @@ const EditRatingForm = ({ currentRating, onUpdateRating }) => {
 
   useEffect(() => {
     if (currentRating) {
-      setMarkType(currentRating?.ratingTitle);
+      setMarkType(currentRating.ratingTitle);
       setPoints(currentRating.ratingScore);
       setDescription(currentRating.ratingDescription);
     }
