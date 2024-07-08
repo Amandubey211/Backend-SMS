@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { CiSearch } from 'react-icons/ci';
 
-const DiscussionHeader = ({ onSearch }) => {
+const DiscussionHeader = ({ onSearch, onFilterChange }) => {
   const [filter, setFilter] = useState('all');
 
   const handleFilterChange = (event) => {
-    setFilter(event.target.value);
+    const value = event.target.value;
+    setFilter(value);
+    onFilterChange(value);
   };
 
   const handleSearchChange = (event) => {

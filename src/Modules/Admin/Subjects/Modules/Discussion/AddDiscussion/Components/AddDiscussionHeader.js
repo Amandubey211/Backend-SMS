@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React from "react";
 import toast from "react-hot-toast";
 import { IoIosArrowBack } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 
-const AddDiscussionHeader = ({ onSave }) => {
+const AddDiscussionHeader = ({ onSave, isUpdating }) => {
   const navigate = useNavigate();
 
   return (
@@ -14,21 +14,26 @@ const AddDiscussionHeader = ({ onSave }) => {
           onClick={() => navigate(-1)} // Navigate to the previous page
         />
         <h1 className="text-lg font-semibold text-gray-800">
-          Create New Discussion
+          {isUpdating ? "Update Discussion" : "Create New Discussion"}
         </h1>
       </div>
       <div className="flex items-center space-x-2">
         <button
           onClick={() => {
             onSave();
-            toast.success("Saved and Published", { position: "bottom-left" });
+            toast.success(
+              isUpdating ? "Updated and Published" : "Saved and Published",
+              { position: "bottom-left" }
+            );
           }}
           className="flex-grow rounded-md py-2 px-6 text-center bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200 transition"
         >
-          <span className="text-gradient">Save & Publish</span>
+          <span className="text-gradient">
+            {isUpdating ? "Update & Publish" : "Save & Publish"}
+          </span>
         </button>
         <button className="flex-grow rounded-md py-2 px-6 text-center bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200 transition">
-          <span className="text-gradient">Save</span>
+          <span className="text-gradient">{isUpdating ? "Update" : "Save"}</span>
         </button>
       </div>
     </div>

@@ -7,6 +7,7 @@ const CreateDiscussionForm = ({
   assignTo,
   dueDate,
   availableFrom,
+  availableUntil,
   section,
   option,
   handleChange,
@@ -30,6 +31,12 @@ const CreateDiscussionForm = ({
         label="Due"
         name="dueDate"
         value={dueDate}
+        handleChange={handleChange}
+      />
+       <DateInput
+        label="Until"
+        name="availableUntil"
+        value={availableUntil}
         handleChange={handleChange}
       />
     </div>

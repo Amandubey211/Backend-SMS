@@ -49,6 +49,7 @@ const StudentGradeModal = ({ isOpen, onClose }) => {
   }, [isOpen]);
 
   const studentGrade = useSelector((store) => store.Admin.studentGrade);
+  // console.log(studentGrade._id)
 
   return (
     <div
