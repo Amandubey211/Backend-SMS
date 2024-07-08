@@ -1,3 +1,59 @@
+// import React from "react";
+// import { FaEllipsisV } from "react-icons/fa";
+// import { IoCalendarOutline } from "react-icons/io5";
+// import { TbBookmark } from "react-icons/tb";
+// import { BsPatchCheckFill } from "react-icons/bs";
+// import { GoDiscussionClosed } from "react-icons/go";
+// import { NavLink, useParams } from "react-router-dom";
+
+// const DiscussionCard = ({ discussion }) => {
+//   const { sid, cid } = useParams();
+//   return (
+//     <div className="p-4 bg-white shadow rounded-lg border">
+//       <div className="flex items-center justify-end space-x-2 mb-4">
+//         <TbBookmark className="text-gray-400 w-6 h-6" />
+//         <BsPatchCheckFill className="text-green-600 w-6 h-6" />
+//         <FaEllipsisV className="border w-7 h-7 p-1 rounded-full" />
+//       </div>
+//       {/* /student_class/:sid/discussions/:did/view */}
+//             {/* <NavLink to={`/class/${cid}/${sid}/discussions/${discussion.id}/view`}> */}
+
+//       <NavLink to={`/student_class/${cid}/section/${sid}/discussions/${discussion.id}/view`}>
+//         <div className="flex items-center justify-center mb-4">
+//           <GoDiscussionClosed className="w-16 h-16 p-2 border rounded-full text-green-500" />
+//         </div>
+//         <div className="text-lg flex justify-center border-b pb-2">
+//           <span> {discussion.title}</span>
+//         </div>
+//       </NavLink>
+
+//       <div className="mt-4 text-sm text-gray-600">
+//         <div className="flex justify-center items-center mb-7 space-x-2">
+//           <IoCalendarOutline className="w-4 h-4" />
+//           <span>Last Post at: {discussion.lastPostDate}</span>
+//           <span className="text-green-600">({discussion.lastPostTime})</span>
+//         </div>
+//         <div className="flex justify-center space-x-4">
+//           <div className="flex items-center space-x-1 border rounded-full px-4 py-1">
+//             <span className="font-semibold text-lg">
+//               {discussion.unreadReplies}
+//             </span>
+//             <span className="text-sm text-gray-500">Unread Reply</span>
+//           </div>
+//           <div className="flex items-center space-x-1 border rounded-full px-4 py-1">
+//             <span className="font-semibold text-lg">{discussion.replies}</span>
+//             <span className="text-sm text-gray-500">Reply</span>
+//           </div>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default DiscussionCard;
+
+
+
 import React from "react";
 import { FaEllipsisV } from "react-icons/fa";
 import { IoCalendarOutline } from "react-icons/io5";
@@ -15,10 +71,7 @@ const DiscussionCard = ({ discussion }) => {
         <BsPatchCheckFill className="text-green-600 w-6 h-6" />
         <FaEllipsisV className="border w-7 h-7 p-1 rounded-full" />
       </div>
-      {/* /student_class/:sid/discussions/:did/view */}
-            {/* <NavLink to={`/class/${cid}/${sid}/discussions/${discussion.id}/view`}> */}
-
-      <NavLink to={`/student_class/${sid}/discussions/${discussion.id}/view`}>
+      <NavLink to={`/student_class/${cid}/section/${sid}/discussions/${discussion._id}/view`}>
         <div className="flex items-center justify-center mb-4">
           <GoDiscussionClosed className="w-16 h-16 p-2 border rounded-full text-green-500" />
         </div>
@@ -26,23 +79,15 @@ const DiscussionCard = ({ discussion }) => {
           <span> {discussion.title}</span>
         </div>
       </NavLink>
-
       <div className="mt-4 text-sm text-gray-600">
         <div className="flex justify-center items-center mb-7 space-x-2">
           <IoCalendarOutline className="w-4 h-4" />
-          <span>Last Post at: {discussion.lastPostDate}</span>
-          <span className="text-green-600">({discussion.lastPostTime})</span>
+          <span>Last Post at: {new Date(discussion.updatedAt).toLocaleDateString()}</span>
         </div>
         <div className="flex justify-center space-x-4">
           <div className="flex items-center space-x-1 border rounded-full px-4 py-1">
-            <span className="font-semibold text-lg">
-              {discussion.unreadReplies}
-            </span>
-            <span className="text-sm text-gray-500">Unread Reply</span>
-          </div>
-          <div className="flex items-center space-x-1 border rounded-full px-4 py-1">
-            <span className="font-semibold text-lg">{discussion.replies}</span>
-            <span className="text-sm text-gray-500">Reply</span>
+            <span className="font-semibold text-lg">{discussion.replies.length}</span>
+            <span className="text-sm text-gray-500">Replies</span>
           </div>
         </div>
       </div>

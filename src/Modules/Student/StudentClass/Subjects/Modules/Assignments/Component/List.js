@@ -1,3 +1,6 @@
+
+
+
 import React, { useState } from "react";
 import { CiSearch } from "react-icons/ci";
 import { FaEllipsisV, FaExclamationTriangle } from "react-icons/fa";
@@ -12,9 +15,9 @@ const List = ({ data, icon, title, type }) => {
     setSearchQuery(event.target.value);
   };
 
-  const filteredData = data.filter((item) =>
-    item.title.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // const filteredData = data.filter((item) =>
+  //   item.title.toLowerCase().includes(searchQuery.toLowerCase())
+  // );
 
   return (
     <div className="bg-white p-5 w-full">
@@ -22,7 +25,7 @@ const List = ({ data, icon, title, type }) => {
         <h2 className="text-xl font-semibold text-gradient">
           {title}
           <span className="border rounded-full text-sm p-1 px-2 ml-1 text-gray-500">
-            {filteredData.length}
+            {data.length}
           </span>
         </h2>
         <div className="relative">
@@ -41,17 +44,11 @@ const List = ({ data, icon, title, type }) => {
         </div>
       </div>
       <ul className="border-t p-4">
-        {filteredData.length > 0 ? (
-          filteredData.map((item) => (
+        {data.length > 0 ? (
+          data.map((item) => (
             <NavLink
-              to={
-                type === "Assignment"
-                  ? `/student_class/${sid}/assignments/${item.id}/view`
-                  : `/student_class/${sid}/quizzes/${item.id}/view`
-                  // ? `/class/${cid}/${sid}/assignments/${item.id}/view`
-                  // : `/class/${cid}/${sid}/quizzes/${item.id}/view`
-              }
-              key={item.id}
+              to={`/student_class/${cid}/section/${sid}/assignments/${item.assignmentId}/view`}
+              key={item.assignmentId}
               className="flex items-center mb-3 gap-3 p-1 rounded-lg"
             >
               <div className="text-green-600 p-2 border rounded-full ">
@@ -85,3 +82,4 @@ const List = ({ data, icon, title, type }) => {
 };
 
 export default List;
+

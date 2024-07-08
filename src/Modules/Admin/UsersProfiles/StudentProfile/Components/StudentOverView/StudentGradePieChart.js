@@ -58,7 +58,7 @@ const StudentGradePieChart = () => {
   return (
     <>
 
-      <div className=" flex-1 p-5 flex flex-row justify-start items-start ">
+      <div className=" flex-1 p-5 flex flex-row justify-start items-start  ">
       <span className="text-sm font-medium ">Student Grade</span>
 
         <Pie data={data} options={options} />

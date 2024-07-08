@@ -5,8 +5,117 @@ import { faCartShopping, faPerson, faTrash,faCalendarDays, faLocation,faUserTie,
 import { MdAccessTime, MdLocationOn, MdPersonOutline } from "react-icons/md";  // Example icons
 import { BiCalendarEvent } from "react-icons/bi";
 
+// const ViewEvent = ({ event }) => {
+//   console.log("event is ", event);
+//   const formatDateTime = (date) => {
+//     const options = { year: "numeric", month: "long", day: "numeric" };
+//     const timeOptions = { hour: "2-digit", minute: "2-digit", hour12: true };
+//     return {
+//       date: date.toLocaleDateString(undefined, options),
+//       time: date.toLocaleTimeString(undefined, timeOptions),
+//     };
+//   };
+
+//   const startDateTime = formatDateTime(new Date(event.startDate));
+//   const endDateTime = formatDateTime(new Date(event.endDate));
+//   return (
+   
+//     <>
+//       <div
+//         className="px-4 bg-white  rounded-lg  overflow-auto"
+//         style={{ maxHeight: "90vh" }}
+//       >
+
+//         <div className="flex flex-col gap-2">
+
+            
+        
+//         {/* imahge amd date time */}
+//         <div className="flex flex-col gap-2 "  >
+//           <img className=" h-[200px] w-full rounded" src={event.imageUrl} />
+//           <div className=" flex  gap-5" >
+//             <div className="flex justify-center items-center"  >
+//             {/* <FontAwesomeIcon  style={{color:"pink", background:' ' ,margin:'0',padding:'0',  height:'20px' ,width:'20px' ,borderRadius:'50%',marginRight:'5px' }} icon={faCalendarDays} /> */}
+//               <BiCalendarEvent className="text-pink-500 text-xl mr-2" />
+
+//           <span className="text-pink-500"> {startDateTime.date} </span>
+
+//             </div>
+//             <div className="flex justify-center items-center"  >
+//             {/* <FontAwesomeIcon  style={{color:"blue", background:' ' ,margin:'0',padding:'0',  height:'20px' ,width:'20px' ,borderRadius:'50%',marginRight:'5px' }} icon={faClock} /> */}
+//             <MdAccessTime className="text-blue-700 text-xl mr-2" />
+
+//             <span className=" text-blue-700">{startDateTime.time}</span>
+
+//             </div>
+//             {/* <span className=" text-blue-700"> ⌚6.38 PM</span> */}
+           
+//           </div> 
+//           <h1 className=" font-bold text-[#4D4D4D] ">{event.title}</h1>
+//         </div>
+//         {/* event  title type  location director */}
+//         <div className=" flex flex-col gap-4">
+//           <div className="flex flex-col  " >
+//             <span className=" font-xs  text-gray-400 ">Event Type</span>
+//             <span> College Holiday</span>
+//           </div>
+//           <div className="flex justify-between items-start  " >
+//             <div className="flex  justify-center items-center m-0 p-0  " >
+             
+//                 <div>
+//       {/* <FontAwesomeIcon  style={{color:"red" ,margin:'0',padding:'2px',  height:'25px' ,width:'25px' ,borderRadius:'50%',marginRight:'5px' }} icon={faLocation} /> */}
+//       <MdLocationOn className="text-red-500 text-2xl mr-2" />
+
+//                 </div>
+//               <div className="flex flex-col">
+//                 <span className="   text-gray-400 ">Location</span>
+//                 <span>School Grounds</span>
+//               </div>
+//             </div>
+//             <div className="flex justify-center items-center m-0 p-0 ">
+             
+
+// <div>
+//       {/* <FontAwesomeIcon  style={{color:"white", background:'blue' ,margin:'0',padding:'2px',  height:'25px' ,width:'25px' ,borderRadius:'50%',marginRight:'5px' }} icon={faUserTie} /> */}
+//       <MdPersonOutline className="text-blue-500 text-2xl mr-2" />
+
+//                 </div>
+//               <div className="flex flex-col">
+//                 <span className=" font-xs  text-gray-400 ">Event Director</span>
+//                 <span>Arijit</span>
+//               </div>
+//             </div>
+//           </div>
+//         </div>
+//         {/* joint studnet and desc */}
+//         <div className="flex flex-col gap-2" >
+//           <div className="mt-4 flex flex-col gap-2 ">
+//             <div className="text-sm text-gray-700  ">Join Students</div>
+//             <div className="flex overflow-x-auto">
+//               {event.students.map((student, index) => (
+//                 <img
+//                   key={index}
+//                   className="h-8 w-8 rounded-full "
+//                   src={student.photo}
+//                   alt={student.name}
+//                 />
+//               ))}
+//             </div>
+//           </div>
+
+//           <div className="text-sm text-gray-600">{event.details}</div>
+//         </div>
+//       </div>
+//       </div>
+//     </>
+//   );
+// };
+
+// export default ViewEvent;
+
 const ViewEvent = ({ event }) => {
   console.log("event is ", event);
+
   const formatDateTime = (date) => {
     const options = { year: "numeric", month: "long", day: "numeric" };
     const timeOptions = { hour: "2-digit", minute: "2-digit", hour12: true };
@@ -17,95 +126,67 @@ const ViewEvent = ({ event }) => {
   };
 
   const startDateTime = formatDateTime(new Date(event.startDate));
-  const endDateTime = formatDateTime(new Date(event.endDate));
+  const endDateTime = formatDateTime(new Date(event.endDate)); // Ensure you use endDateTime if needed
+
   return (
-   
     <>
-      <div
-        className="px-4 bg-white  rounded-lg  overflow-auto"
-        style={{ maxHeight: "90vh" }}
-      >
-
+      <div className="px-4 bg-white rounded-lg overflow-auto" style={{ maxHeight: "90vh" }}>
         <div className="flex flex-col gap-2">
-
-            
-        
-        {/* imahge amd date time */}
-        <div className="flex flex-col gap-2 "  >
-          <img className=" h-[200px] w-full rounded" src={event.imageUrl} />
-          <div className=" flex  gap-5" >
-            <div className="flex justify-center items-center"  >
-            {/* <FontAwesomeIcon  style={{color:"pink", background:' ' ,margin:'0',padding:'0',  height:'20px' ,width:'20px' ,borderRadius:'50%',marginRight:'5px' }} icon={faCalendarDays} /> */}
-              <BiCalendarEvent className="text-pink-500 text-xl mr-2" />
-
-          <span className="text-pink-500"> {startDateTime.date} </span>
-
-            </div>
-            <div className="flex justify-center items-center"  >
-            {/* <FontAwesomeIcon  style={{color:"blue", background:' ' ,margin:'0',padding:'0',  height:'20px' ,width:'20px' ,borderRadius:'50%',marginRight:'5px' }} icon={faClock} /> */}
-            <MdAccessTime className="text-blue-700 text-xl mr-2" />
-
-            <span className=" text-blue-700">{startDateTime.time}</span>
-
-            </div>
-            {/* <span className=" text-blue-700"> ⌚6.38 PM</span> */}
-           
-          </div> 
-          <h1 className=" font-bold text-[#4D4D4D] ">{event.title}</h1>
-        </div>
-        {/* event  title type  location director */}
-        <div className=" flex flex-col gap-4">
-          <div className="flex flex-col  " >
-            <span className=" font-xs  text-gray-400 ">Event Type</span>
-            <span> College Holiday</span>
-          </div>
-          <div className="flex justify-between items-start  " >
-            <div className="flex  justify-center items-center m-0 p-0  " >
-             
-                <div>
-      {/* <FontAwesomeIcon  style={{color:"red" ,margin:'0',padding:'2px',  height:'25px' ,width:'25px' ,borderRadius:'50%',marginRight:'5px' }} icon={faLocation} /> */}
-      <MdLocationOn className="text-red-500 text-2xl mr-2" />
-
-                </div>
-              <div className="flex flex-col">
-                <span className="   text-gray-400 ">Location</span>
-                <span>School Grounds</span>
+          {/* Image and date time */}
+          <div className="flex flex-col gap-2">
+            <img className="h-[200px] w-full rounded" src='https://www.adobe.com/content/dam/www/us/en/events/overview-page/eventshub_evergreen_opengraph_1200x630_2x.jpg' alt="Event" />
+            {/* <img className="h-[200px] w-full rounded" src={event.imageUrl} alt="Event" /> */}
+            <div className="flex gap-5">
+              <div className="flex justify-center items-center">
+                <BiCalendarEvent className="text-pink-500 text-xl mr-2" />
+                <span className="text-pink-500">{startDateTime.date}</span>
+              </div>
+              <div className="flex justify-center items-center">
+                <MdAccessTime className="text-blue-700 text-xl mr-2" />
+                {/* <span className="text-blue-700">{startDateTime.time}</span> */}
+                <span className="text-blue-700">{event.time}</span>
               </div>
             </div>
-            <div className="flex justify-center items-center m-0 p-0 ">
-             
-
-<div>
-      {/* <FontAwesomeIcon  style={{color:"white", background:'blue' ,margin:'0',padding:'2px',  height:'25px' ,width:'25px' ,borderRadius:'50%',marginRight:'5px' }} icon={faUserTie} /> */}
-      <MdPersonOutline className="text-blue-500 text-2xl mr-2" />
-
+            <h1 className="font-bold text-[#4D4D4D]">{event.title}</h1>
+          </div>
+          {/* Event title, type, location, director */}
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col">
+              <span className="font-xs text-gray-400">Event Type</span>
+              <span>{event.type || 'No Type Available'}</span> {/* Example of handling undefined type */}
+            </div>
+            <div className="flex justify-between items-start">
+              <div className="flex justify-center items-center">
+                <MdLocationOn className="text-red-500 text-2xl mr-2" />
+                <div className="flex flex-col">
+                  <span className="text-gray-400">Location</span>
+                  <span>{event.location || 'No Location Available'}</span>
                 </div>
-              <div className="flex flex-col">
-                <span className=" font-xs  text-gray-400 ">Event Director</span>
-                <span>Arijit</span>
+              </div>
+              <div className="flex justify-center items-center">
+                <MdPersonOutline className="text-blue-500 text-2xl mr-2" />
+                <div className="flex flex-col">
+                  <span className="font-xs text-gray-400">Event Director</span>
+                  <span>{event.director || 'No Director Available'}</span>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        {/* joint studnet and desc */}
-        <div className="flex flex-col gap-2" >
-          <div className="mt-4 flex flex-col gap-2 ">
-            <div className="text-sm text-gray-700  ">Join Students</div>
-            <div className="flex overflow-x-auto">
-              {event.students.map((student, index) => (
-                <img
-                  key={index}
-                  className="h-8 w-8 rounded-full "
-                  src={student.photo}
-                  alt={student.name}
-                />
-              ))}
+          {/* Join students and description */}
+          {event.students && event.students.length > 0 && (
+            <div className="flex flex-col gap-2">
+              <div className="mt-4 flex flex-col gap-2">
+                <div className="text-sm text-gray-700">Join Students</div>
+                <div className="flex overflow-x-auto">
+                  {event.students.map((student, index) => (
+                    <img key={index} className="h-8 w-8 rounded-full" src={student.photo} alt={student.name} />
+                  ))}
+                </div>
+              </div>
             </div>
-          </div>
-
-          <div className="text-sm text-gray-600">{event.details}</div>
+          )}
+          <div className="text-sm text-gray-600">{event.description || 'No Details Available'}</div>
         </div>
-      </div>
       </div>
     </>
   );

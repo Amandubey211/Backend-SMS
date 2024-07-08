@@ -1,3 +1,21 @@
+<<<<<<< HEAD
+import React, { useState } from "react";
+import DetailedStudentList from "./Components/DetailedStudentList";
+import NavigationBar from "./Components/NavigationBar";
+
+const MainSection = () => {
+  const [activeSection, setActiveSection] = useState("Everyone");
+
+  return (
+    <div className="p-2 w-full ">
+      <NavigationBar setActiveSection={setActiveSection} activeSection={activeSection} />
+      <DetailedStudentList activeSection={activeSection} />
+    </div>
+  );
+};
+
+export default MainSection;
+=======
 import React, { useState, useEffect, useCallback } from "react";
 import { useDispatch } from "react-redux";
 import DetailedStudentList from "./Components/DetailedStudentList";
@@ -55,3 +73,4 @@ const MainSection = () => {
 };
 
 export default MainSection;
+>>>>>>> main

@@ -11,6 +11,9 @@ const CommonSlice = createSlice({
       chapters: [],
 
     },
+    selectedSection: null,  // Add selectedSection
+    studentId: null, // Add studentId here
+
     NavbarData: {
       leftHeading: ["aman"],
     },
@@ -27,6 +30,12 @@ const CommonSlice = createSlice({
     },
     setSelectedModule: (state, action) => {
       state.selectedModule = action.payload;
+    },
+    setSelectedSection: (state, action) => {  // Add setSelectedSection
+      state.selectedSection = action.payload;
+    },
+    setStudentId: (state, action) => { // Add setStudentId action
+      state.studentId = action.payload;
     },
   },
 });

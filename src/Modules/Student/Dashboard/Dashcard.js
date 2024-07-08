@@ -7,7 +7,7 @@ const DashCard = ({
   textColor,
   icon,
   iconBackground,
-  // url,
+
 }) => {
   return (
     <div
@@ -21,8 +21,9 @@ const DashCard = ({
           {icon}
         </div>
         <div>
+        <div className={`mt-2 ${textColor}`}>{label}</div>
+
           <div className="text-xl font-semibold">{value}</div>
-          <div className={`mt-2 ${textColor}`}>{label}</div>
         </div>
       </div>
     </div>
