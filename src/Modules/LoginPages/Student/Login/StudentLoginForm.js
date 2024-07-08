@@ -1,25 +1,39 @@
 import React, { useState } from "react";
 import Logo from "../../../../Components/Common/Logo";
-import { NavLink } from "react-router-dom";
 import { FaEye } from "react-icons/fa";
 import { PiEyeClosedFill } from "react-icons/pi";
 import useStudentLogin from "../../../../Hooks/AuthHooks/Student/useStudentLogin";
 import toast from "react-hot-toast";
 import { LuLoader } from "react-icons/lu";
+import { NavLink, useNavigate } from "react-router-dom";
 
 const StudentLoginForm = () => {
-  const [StudentDetails, setStudentDetails] = useState({
+  const [studentDetails, setStudentDetails] = useState({
     email: "",
     password: "",
   });
-  const { loading, studentLogin } = useStudentLogin();
+    const [showPassword, setShowPassword] = useState(false);
+const { loading, studentLogin } = useStudentLogin();
+const navigate = useNavigate();
 
-  const HandleSubmit = (e) => {
-    e.preventDefault();
-    if (!StudentDetails) return toast.error("please add the required details");
-    studentLogin(StudentDetails);
-  };
-  const [showPassword, setShowPassword] = useState(false);
+ 
+//  const HandleSubmit = (e) => {
+//     e.preventDefault();
+//     if (!StudentDetails) return toast.error("please add the required details");
+//     studentLogin(StudentDetails);
+//   };
+
+const HandleSubmit = async (e) => {
+  e.preventDefault();
+  if (!studentDetails.email || !studentDetails.password) {
+    toast.error("Please add the required details");
+    return;
+  }
+  const success = await studentLogin(studentDetails);
+  if (success) {
+    navigate("/student_dash");
+  }
+};
 
   return (
     <div className="relative h-full bg-gray-100 w-full">
@@ -46,7 +60,7 @@ const StudentLoginForm = () => {
               <input
                 type="email"
                 id="email"
-                value={StudentDetails.email}
+                value={studentDetails.email}
                 onChange={(e) =>
                   setStudentDetails((prev) => ({
                     ...prev,
@@ -63,7 +77,7 @@ const StudentLoginForm = () => {
                 <input
                   type={showPassword ? "text" : "password"}
                   id="password"
-                  value={StudentDetails.password}
+                  value={studentDetails.password}
                   onChange={(e) =>
                     setStudentDetails((prev) => ({
                       ...prev,

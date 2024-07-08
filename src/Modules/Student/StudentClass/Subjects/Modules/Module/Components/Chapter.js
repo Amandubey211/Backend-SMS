@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import ChapterItem from "./ChapterItem";
 import {
   FaPlus,
@@ -6,15 +6,19 @@ import {
   FaChevronDown,
   FaChevronUp,
 } from "react-icons/fa";
+import ModuleDetails from "./ModuleDetails"; // Import the new ModuleDetails component
 
-const Chapter = ({
-  title,
-  chapterNumber,
-  imageUrl,
-  items,
-  isExpanded,
-  onToggle,
-}) => {
+// const Chapter = ({
+//   title,
+//   chapterNumber,
+//   imageUrl,
+//   items,
+//   isExpanded,
+//   onToggle,
+// }) => {
+
+  const Chapter = ({ title, isExpanded,chapterNumber,onToggle, classId, studentId, imageUrl, items }) => {
+console.log("classId is",classId)
   return (
     <div className="mb-4 p-1 bg-white rounded-lg border-b  ">
       <div className="flex items-center justify-between mb-2 ">
@@ -44,7 +48,7 @@ const Chapter = ({
           </button>
         </div>
       </div>
-      {isExpanded && (
+      {/* {isExpanded && (
         <div className="ml-10 py-2">
           {items?.length > 0 ? (
             items?.map((item, index) => (
@@ -60,7 +64,11 @@ const Chapter = ({
             <p className="text-gray-500">No chapters found</p>
           )}
         </div>
+      )} */}
+{isExpanded && (
+        <ModuleDetails isExpanded={isExpanded} classId={classId} studentId={studentId} />
       )}
+
     </div>
   );
 };

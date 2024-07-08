@@ -1,12 +1,85 @@
+// import { useState } from "react";
+// import toast from "react-hot-toast";
+// import { useDispatch } from "react-redux";
+// import { setAuth, setRole } from "../../../Redux/Slices/AuthSlice.js";
+// import axios from "axios";
+// import { useNavigate } from "react-router-dom";
+
+// const API_URL = process.env.REACT_APP_API_URL;
+// const TOKEN_STORAGE_KEY = process.env.REACT_APP_STUDENT_TOKEN_STORAGE_KEY;
+
+// const useStudentLogin = () => {
+//   const [loading, setLoading] = useState(false);
+//   const dispatch = useDispatch();
+//   const navigate = useNavigate();
+
+//   const studentLogin = async (studentDetails) => {
+//     // try {
+//     //   setLoading(true);
+//     //   const { email, password } = studentDetails;
+//     //   if (!email || !password) {
+//     //     toast.error("Please provide email and password.");
+//     //     return;
+//     //   }
+
+//     //   const { data } = await axios.post(
+//     //     `${API_URL}/student/student_login`,
+//     //     studentDetails
+//     //   );
+//     //   console.log(data);
+
+//     //   if (data.success) {
+//     //     dispatch(setAuth(true));
+//     //     dispatch(setRole("student"));
+//     //     navigate(data.isVerifiedSchoolId && "/student_dash");
+//     //     localStorage.setItem(TOKEN_STORAGE_KEY, `Bearer ${data.token}`);
+
+//     //     toast.success("Logged in successfully");
+//     //   } else {
+//     //     toast.error(data.msg || "Login unsuccessful");
+//     //   }
+//     // } 
+   
+//    try{
+     
+     
+   
+//         dispatch(setAuth(true));
+//         dispatch(setRole("student"));
+//         navigate( "/student_dash");
+//    }  
+    
+//     catch (error) {
+//       const errorMessage =
+//         error.response?.data?.msg || "Something went wrong. Please try again.";
+//       toast.error(errorMessage);
+//       console.error("Login error:", error);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   return {
+//     loading,
+//     studentLogin,
+//   };
+// };
+
+// export default useStudentLogin;
+
+
+//----------------------------
+
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
-import { setAuth, setRole } from "../../../Redux/Slices/AuthSlice.js";
+import { setAuth, setRole } from "../../../Redux/Slices/AuthSlice";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { setStudentId } from "../../../Redux/Slices/Common/CommonSlice";
 
-const API_URL = process.env.REACT_APP_API_URL;
-const TOKEN_STORAGE_KEY = process.env.REACT_APP_STUDENT_TOKEN_STORAGE_KEY;
+const API_URL = process.env.REACT_APP_API_URL; // Ensure this is correctly set in your .env file
+const TOKEN_STORAGE_KEY = process.env.REACT_APP_STUDENT_TOKEN_STORAGE_KEY; // Ensure this is correctly set in your .env file
 
 const useStudentLogin = () => {
   const [loading, setLoading] = useState(false);
@@ -14,46 +87,49 @@ const useStudentLogin = () => {
   const navigate = useNavigate();
 
   const studentLogin = async (studentDetails) => {
-    // try {
-    //   setLoading(true);
-    //   const { email, password } = studentDetails;
-    //   if (!email || !password) {
-    //     toast.error("Please provide email and password.");
-    //     return;
-    //   }
+    setLoading(true);
+    const { email, password } = studentDetails;
+    console.log("Attempting login with:", studentDetails);
 
-    //   const { data } = await axios.post(
-    //     `${API_URL}/student/student_login`,
-    //     studentDetails
-    //   );
-    //   console.log(data);
+    if (!email || !password) {
+      toast.error("Please provide email and password.");
+      setLoading(false);
+      return;
+    }
 
-    //   if (data.success) {
-    //     dispatch(setAuth(true));
-    //     dispatch(setRole("student"));
-    //     navigate(data.isVerifiedSchoolId && "/student_dash");
-    //     localStorage.setItem(TOKEN_STORAGE_KEY, `Bearer ${data.token}`);
+    try {
+      const { data } = await axios.post(
+        // `${API_URL}/auth/student/student_login`,
+        'http://localhost:8080/auth/student/login',
+        studentDetails
+      );
+      console.log("Login response:", data);
 
-    //     toast.success("Logged in successfully");
-    //   } else {
-    //     toast.error(data.msg || "Login unsuccessful");
-    //   }
-    // } 
-   
-   try{
-     
-     
-   
+      if (data.success) {
+        // localStorage.setItem(TOKEN_STORAGE_KEY, `Bearer ${data.token}`);
+        localStorage.setItem(TOKEN_STORAGE_KEY, `Bearer ${data.token}`);
+        console.log("Token stored in localStorage", data.token);
+      
         dispatch(setAuth(true));
+        dispatch(setStudentId(data.userId));
         dispatch(setRole("student"));
-        navigate( "/student_dash");
-   }  
-    
-    catch (error) {
-      const errorMessage =
-        error.response?.data?.msg || "Something went wrong. Please try again.";
+        navigate("/student_dash");
+        // Navigate based on verification status
+        // if (data.isVerifiedSchoolId) {
+        //   navigate("/student_dash");
+        // } else {
+        //   toast.error("Your account is not verified.");
+        // }
+
+        toast.success("Logged in successfully");
+      } else {
+        toast.error(data.msg || "Login unsuccessful");
+      }
+    } catch (error) {
+      const errorMessage = error.response?.data?.msg || "Something went wrong. Please try again.";
       toast.error(errorMessage);
       console.error("Login error:", error);
+
     } finally {
       setLoading(false);
     }

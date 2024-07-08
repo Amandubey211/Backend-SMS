@@ -2,22 +2,22 @@ import React from "react";
 import { QuizzDetails } from "../../Assignments/AssignmentComponents/MockData";
 import { FaCalendarAlt } from "react-icons/fa";
 
-const Tabs = ({ children, activeTab, setActiveTab, onTabChange, createPage, quizSubmitted, hasAttempted }) => {
+const Tabs = ({ quiz,children, activeTab, setActiveTab, onTabChange, createPage, quizSubmitted, hasAttempted }) => {
   const handleTabClick = (tab) => {
     setActiveTab(tab);
     onTabChange(tab);
   };
 
-  const { title, type, availableFrom } = QuizzDetails; // dependent
+  const { name, quizType, availableFrom } = quiz; // dependent
 
   return (
     <>
       <div className="flex justify-between items-center p-2 px-3 border-b">
         {!createPage && (
           <div>
-            <h2 className="text-xl font-semibold mb-1">{title}</h2>
+            <h2 className="text-xl font-semibold mb-1">{name}</h2>
             <div className="flex items-center text-gray-500">
-              <span className="text-green-600 font-medium mr-2">{type}</span>
+              <span className="text-green-600 font-medium mr-2">{quizType}</span>
               <span className="mx-2">|</span>
               <FaCalendarAlt className="w-4 h-4 mr-2" />
               <span className="text-sm">Available From: {availableFrom}</span>
@@ -66,3 +66,61 @@ const Tabs = ({ children, activeTab, setActiveTab, onTabChange, createPage, quiz
 };
 
 export default Tabs;
+
+
+
+
+//----------------------\
+
+
+// import React from 'react';
+// import { FaCalendarAlt } from 'react-icons/fa';
+
+// const Tabs = ({ activeTab, setActiveTab, quizSubmitted, hasAttempted }) => {
+//   const handleTabClick = (tab) => {
+//     setActiveTab(tab);
+//   };
+
+//   return (
+//     <div className="flex justify-between items-center p-2 px-3 border-b">
+//       <div>
+//         <h2 className="text-xl font-semibold mb-1">Quiz Title</h2>
+//         <div className="flex items-center text-gray-500">
+//           <span className="text-green-600 font-medium mr-2">Quiz Type</span>
+//           <span className="mx-2">|</span>
+//           <FaCalendarAlt className="w-4 h-4 mr-2" />
+//           <span className="text-sm">Available From: Date</span>
+//         </div>
+//       </div>
+//       <div className="flex gap-2 bg-white">
+//         <button
+//           onClick={() => handleTabClick("instructions")}
+//           className={`flex-grow ${
+//             activeTab === "instructions"
+//               ? "bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200"
+//               : "border border-gray-300 text-gray-800"
+//           } rounded-md py-2 px-4 text-center transition`}
+//         >
+//           <span className={`${activeTab === "instructions" ? "text-gradient" : "text-black"}`}>
+//             Quiz Instructions
+//           </span>
+//         </button>
+
+//         <button
+//           onClick={() => handleTabClick("questions")}
+//           className={`flex-grow ${
+//             activeTab === "questions"
+//               ? "bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200"
+//               : "border border-gray-300 text-gray-800"
+//           } rounded-md py-2 px-4 text-center transition`}
+//         >
+//           <span className={`${activeTab === "questions" ? "text-gradient" : "text-black"}`}>
+//             {quizSubmitted || hasAttempted ? "Retake Quiz" : "Take the Quiz"}
+//           </span>
+//         </button>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default Tabs;

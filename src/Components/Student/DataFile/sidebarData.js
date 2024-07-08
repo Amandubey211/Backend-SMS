@@ -19,7 +19,7 @@ import { BsBook } from "react-icons/bs";
 import { TbNotebook } from "react-icons/tb";
 import { GrUserWorker } from "react-icons/gr";
 import { MdLocalLibrary,MdManageAccounts } from "react-icons/md";
-import { RiParentFill,RiAdminFill } from "react-icons/ri";
+import { RiParentFill,RiAdminFill ,RiNotificationLine} from "react-icons/ri";
 
 // const sidebarData = [
 //   {
@@ -120,61 +120,62 @@ const sidebarData = [
     title: "My Class",
     icon: <RiGraduationCapLine />,
     path: "/student_class",
+    // path: "/class",
   },
-  {
-    title: "Users",
-    icon: <LuUser />,
-    items: [
-      {
-        title: "Admin",
-        icon: <RiAdminFill />,
-        path: "/users/admin",
-      },
-      {
-        title: "Students",
-        icon: <FaUserGraduate />,
-        path: "/users/students",
-      },
-      {
-        title: "Teachers",
-        icon: <FaChalkboardTeacher />,
-        path: "/users/teachers",
-      },
-      {
-        title: "Accountant",
-        icon: <MdManageAccounts />,
-        path: "/users/accountants",
-      },
-      {
-        title: "Parents",
-        icon: <RiParentFill />,
-        path: "/users/parents",
-      },
-      {
-        title: "Libraian",
-        icon: <MdLocalLibrary />,
-        path: "/users/libraians",
-      },
-      {
-        title: "Staff",
-        icon: <GrUserWorker />,
-        path: "/users/staffs",
-      },
-    ],
-  },
+  // {
+  //   title: "Users",
+  //   icon: <LuUser />,
+  //   items: [
+  //     {
+  //       title: "Admin",
+  //       icon: <RiAdminFill />,
+  //       path: "/users/admin",
+  //     },
+  //     {
+  //       title: "Students",
+  //       icon: <FaUserGraduate />,
+  //       path: "/users/students",
+  //     },
+  //     {
+  //       title: "Teachers",
+  //       icon: <FaChalkboardTeacher />,
+  //       path: "/users/teachers",
+  //     },
+  //     {
+  //       title: "Accountant",
+  //       icon: <MdManageAccounts />,
+  //       path: "/users/accountants",
+  //     },
+  //     {
+  //       title: "Parents",
+  //       icon: <RiParentFill />,
+  //       path: "/users/parents",
+  //     },
+  //     {
+  //       title: "Libraian",
+  //       icon: <MdLocalLibrary />,
+  //       path: "/users/libraians",
+  //     },
+  //     {
+  //       title: "Staff",
+  //       icon: <GrUserWorker />,
+  //       path: "/users/staffs",
+  //     },
+  //   ],
+  // },
   {
     title: "Finance",
-    icon: <RiGraduationCapLine />,
+    icon: <HiOutlineCalculator />,
     path: "/student_finance",
   },
   {
     title: "Library",
-    icon: <RiGraduationCapLine />,
+    icon: <MdLocalLibrary />,
     path: "/student_library",
   },
   {
-    title: "NoticeBoard",
-    icon: <TbNotebook />,
+    title: "Notice Board",
+    icon: <RiNotificationLine />,
     items: [
       {
         title: "Announcements",
