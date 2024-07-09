@@ -1,62 +1,42 @@
-<<<<<<< HEAD
-import React from "react";
-import SubjectSideBar from "../../../Component/SubjectSideBar";
-import List from "../../Assignments/Component/List";
-import FilterCard from "../../Assignments/Component/FilterCard";
-import { RiAddFill, RiFileUnknowLine } from "react-icons/ri";
-import { assignments } from "../../Assignments/AllAssignments/DummyData/assignments";
-import { NavLink, useParams } from "react-router-dom";
-import useNavHeading from "../../../../../../Hooks/CommonHooks/useNavHeading ";
-
-const MainSection = () => {
-  const { cid, sid } = useParams();
-  useNavHeading(cid, sid);
-  return (
-    <div className="flex  ">
-      <SubjectSideBar />
-      <div className="w-[65%] border-l">
-        <List title="All Quizzes"  data={assignments} icon={<RiFileUnknowLine />} />
-      </div>
-      <div className="w-[30%] px-2">
-        <FilterCard />
-      </div>
-      <NavLink
-        to={`/class/${cid}/${sid}/create_quiz`}
-        className="bg-gradient-to-r from-purple-400 to-pink-400 text-white p-4 fixed rounded-full shadow-md bottom-4 right-4"
-      >
-        <RiAddFill size={24} />
-      </NavLink>
-    </div>
-  );
-};
-
-export default MainSection;
-=======
-import React from "react";
+import React, { useEffect, useState } from "react";
 import SubjectSideBar from "../../../Component/SubjectSideBar";
 import List from "../../Assignments/Component/List";
 import { RiAddFill, RiFileUnknowLine } from "react-icons/ri";
-import { assignments } from "../../Assignments/AllAssignments/DummyData/assignments";
 import { NavLink, useParams } from "react-router-dom";
-import useNavHeading from "../../../../../../Hooks/CommonHooks/useNavHeading ";
 import QuizFilterCard from "../Components/QuizFilterCard";
+import useGetFilteredQuizzes from "../../../../../../Hooks/AuthHooks/Staff/Admin/Quiz/useGetFilteredQuizzes";
+import useNavHeading from "../../../../../../Hooks/CommonHooks/useNavHeading ";
 
 const MainSection = () => {
   const { cid, sid } = useParams();
+  const [filters, setFilters] = useState({
+    moduleId: "",
+    chapterId: "",
+    publish: null,
+  });
+  const { error, fetchFilteredQuizzes, loading, quizzes } = useGetFilteredQuizzes();
+
+  useEffect(() => {
+    fetchFilteredQuizzes(filters.moduleId, filters.chapterId, filters.publish);
+  }, [fetchFilteredQuizzes, filters]);
+
   useNavHeading(cid, sid);
+
   return (
-    <div className="flex  ">
+    <div className="flex">
       <SubjectSideBar />
       <div className="w-[65%] border-l">
         <List
           title="All Quizzes"
-          data={assignments}
+          data={quizzes}
           icon={<RiFileUnknowLine />}
-          type="quizz"
+          type="Quiz"
+          loading={loading}
+          error={error}
         />
       </div>
       <div className="w-[30%] px-2">
-        <QuizFilterCard />
+        <QuizFilterCard filters={filters} setFilters={setFilters} />
       </div>
       <NavLink
         to={`/class/${cid}/${sid}/create_quiz`}
@@ -69,4 +49,3 @@ const MainSection = () => {
 };
 
 export default MainSection;
->>>>>>> main

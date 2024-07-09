@@ -7,7 +7,6 @@ import LabeledSelect from "./LabeledSelect";
 import LabeledInput from "./LabeledInput";
 
 const CreateQuizForm = ({
-
   displayGrade,
   setDisplayGrade,
   submissionType,
@@ -25,9 +24,11 @@ const CreateQuizForm = ({
   handleChange,
   accessCode,
   ipAddresses,
+  studentSeeAnswer,
+  showAnswerDate,
 }) => {
   return (
-    <div className="max-w-md  mx-auto p-4  bg-white  space-y-2">
+    <div className="max-w-md mx-auto p-4 bg-white space-y-2">
       <h2 className="text-xl font-semibold">Option</h2>
       <div className="space-y-4">
         <LabeledSelect
@@ -36,9 +37,9 @@ const CreateQuizForm = ({
           value={submissionType}
           onChange={handleChange}
           options={[
-            { value: '', label: 'Select' },
-            { value: 'Type 1', label: 'Type 1' },
-            { value: 'Type 2', label: 'Type 2' }
+            { value: "", label: "Select" },
+            { value: "Practice", label: "Practice Quiz" },
+            { value: "Graded", label: "Graded Quiz" },
           ]}
         />
         <LabeledSelect
@@ -47,8 +48,8 @@ const CreateQuizForm = ({
           value={submissionFormat}
           onChange={handleChange}
           options={[
-            { value: 'Yes', label: 'Yes' },
-            { value: 'No', label: 'No' }
+            { value: true, label: "Yes" },
+            { value: false, label: "No" },
           ]}
         />
         <LabeledInput
@@ -57,28 +58,6 @@ const CreateQuizForm = ({
           value={timeLimit}
           onChange={handleChange}
         />
-        <div className="flex items-center">
-          <input
-            type="checkbox"
-            name="allwoMultiple"
-          value={allowMultiple}
-            onChange={handleChange}
-            className="mr-2 p-3"
-          />
-          <label className="text-gray-700">Allow Multiple Attempt</label>
-        </div>
-        <LabeledSelect
-          label="Quiz Score to Keep"
-          name="displayGrade"
-          value={displayGrade}
-          onChange={(e) => setDisplayGrade(e.target.value)}
-          options={[
-            { value: '', label: 'Choose One' },
-            { value: 'Highest', label: 'Highest' },
-            { value: 'Latest', label: 'Latest' },
-            { value: 'Average', label: 'Average' }
-          ]}
-        />
         <LabeledInput
           label="Allowed Attempts"
           name="numberOfAttempts"
@@ -86,51 +65,83 @@ const CreateQuizForm = ({
           value={numberOfAttempts}
           onChange={handleChange}
         />
-         
-            <h2 className="text-xl font-semibold mt-6 border-t">Quiz Restrictions</h2>
-      <div className="space-y-4">
-        <LabeledInput
-          label="Require an access code"
-          name="accessCode"
-          value={accessCode}
-          onChange={handleChange}
-        />
-        <LabeledInput
-          label="Filter IP Addresses"
-          name="ipAddresses"
-          value={ipAddresses}
-          onChange={handleChange}
-        />
-        <LabeledSelect
-          label="Show one question at a time"
-          name="showOneQuestionAtATime"
-          value={showOneQuestionAtATime}
-          onChange={handleChange}
-          options={[
-            { value: 'Yes', label: 'Yes' },
-            { value: 'No', label: 'No' }
-          ]}
-        />
-        <div className="flex items-center">
-          <input
-            type="checkbox"
-            name="lockQuestionsAfterAnswering"
-            checked={lockQuestionsAfterAnswering}
+
+        <h2 className="text-xl font-semibold mt-6 pt-4 border-t">
+          Quiz Restrictions
+        </h2>
+        {/* New section for Students See Correct Answer */}
+        <div className="p-2">
+          <h3 className="text-gray-700 mb-1">
+            Students See the Correct Answer
+          </h3>
+          <div className="flex items-center">
+            <input
+              type="radio"
+              name="studentSeeAnswer"
+              value="yes"
+              checked={studentSeeAnswer === "yes"}
+              onChange={handleChange}
+              className="mr-2"
+            />
+            <label className="mr-4">Yes</label>
+            <input
+              type="radio"
+              name="studentSeeAnswer"
+              value="no"
+              checked={studentSeeAnswer === "no"}
+              onChange={handleChange}
+              className="mr-2"
+            />
+            <label>No</label>
+          </div>
+          {studentSeeAnswer === "yes" && (
+            <DateInput
+              label="Select Date"
+              name="showAnswerDate"
+              value={showAnswerDate}
+              handleChange={handleChange}
+            />
+          )}
+        </div>
+        <div className="space-y-4">
+          {/* <LabeledInput
+            label="Require an access code"
+            name="accessCode"
+            value={accessCode}
             onChange={handleChange}
-            className="mr-2 p-3"
           />
-          <label className="text-gray-700">Lock questions after answering</label>
+          <LabeledInput
+            label="Filter IP Addresses"
+            name="ipAddresses"
+            value={ipAddresses}
+            onChange={handleChange}
+          /> */}
+          <LabeledSelect
+            label="Show one question at a time"
+            name="showOneQuestionAtATime"
+            value={showOneQuestionAtATime}
+            onChange={handleChange}
+            options={[
+              { value: "Yes", label: "Yes" },
+              { value: "No", label: "No" },
+            ]}
+          />
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              name="lockQuestionsAfterAnswering"
+              checked={lockQuestionsAfterAnswering}
+              onChange={handleChange}
+              className="mr-2 p-3"
+            />
+            <label className="text-gray-700">
+              Lock questions after answering
+            </label>
           </div>
         </div>
-        <h3 className="text-lg font-semibold mb-4 border-t">Assign To</h3>
+
         <AssignToRadios assignTo={assignTo} handleChange={handleChange} />
         <SectionSelect section={section} handleChange={handleChange} />
-        <DateInput
-          label="Due"
-          name="dueDate"
-          value={dueDate}
-          handleChange={handleChange}
-        />
         <DateInput
           label="Available from"
           name="availableFrom"
@@ -138,11 +149,18 @@ const CreateQuizForm = ({
           handleChange={handleChange}
         />
         <DateInput
+          label="Due"
+          name="dueDate"
+          value={dueDate}
+          handleChange={handleChange}
+        />
+
+        {/* <DateInput
           label="Until"
           name="until"
           value={until}
           handleChange={handleChange}
-        />
+        /> */}
       </div>
     </div>
   );

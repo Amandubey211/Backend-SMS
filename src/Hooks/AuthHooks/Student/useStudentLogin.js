@@ -76,7 +76,7 @@ import { useDispatch } from "react-redux";
 import { setAuth, setRole } from "../../../Redux/Slices/AuthSlice";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { setStudentId } from "../../../Redux/Slices/Common/CommonSlice";
+// import { setStudentId } from "../../../Redux/Slices/Common/CommonSlice";
 
 const API_URL = process.env.REACT_APP_API_URL; // Ensure this is correctly set in your .env file
 const TOKEN_STORAGE_KEY = process.env.REACT_APP_STUDENT_TOKEN_STORAGE_KEY; // Ensure this is correctly set in your .env file
@@ -111,7 +111,7 @@ const useStudentLogin = () => {
         console.log("Token stored in localStorage", data.token);
       
         dispatch(setAuth(true));
-        dispatch(setStudentId(data.userId));
+        // dispatch(setStudentId(data.userId));
         dispatch(setRole("student"));
         navigate("/student_dash");
         // Navigate based on verification status

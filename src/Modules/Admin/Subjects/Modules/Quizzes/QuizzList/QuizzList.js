@@ -8,10 +8,10 @@ import useNavHeading from "../../../../../../Hooks/CommonHooks/useNavHeading ";
 const QuizzList = () => {
   const className = useSelector((store) => store.Common.selectedClass);
   const subjectName = useSelector((store) => store.Common.selectedSubject);
-
+  console.log(className, subjectName);
   useNavHeading(className, subjectName);
   return (
-  <Layout title={`Quiz List | Student Diwan`}>
+    <Layout title={`Quiz List | Student Diwan`}>
       <DashLayout children={<MainSection />} hideSearchbar={true} />
     </Layout>
   );

@@ -96,7 +96,7 @@ const AddDiscussion = () => {
     }
 
     if (createSuccess || updateSuccess) {
-      navigate(/class/${cid}/${sid}/discussions);
+      navigate(`/class/${cid}/${sid}/discussions`);
     }
   };
 
@@ -154,4 +154,4 @@ const AddDiscussion = () => {
   );
 };
 
-export default AddDiscussion;
+export default AddDiscussion;
