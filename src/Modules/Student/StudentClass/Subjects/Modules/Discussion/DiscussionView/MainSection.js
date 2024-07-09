@@ -56,7 +56,7 @@
 //           `http://localhost:8080/admin/getDiscussionById/${did}`,
 //           {
 //             headers: {
-//               Authorization: token,
+//               Authentication: token,
 //             },
 //           }
 //         );
@@ -142,7 +142,7 @@ const MainSection = () => {
           `http://localhost:8080/admin/getDiscussionById/${did}`,
           {
             headers: {
-              Authorization: token,
+              'Authentication': token,
             },
           }
         );

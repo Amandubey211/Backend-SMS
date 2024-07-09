@@ -19,7 +19,7 @@ useEffect(()=>{
           }
           const response= await fetch('http://localhost:8080/student/all/notices',{
             headers:{
-              'Authorization': token
+              'Authentication': token
             }
           })
           if(!response.ok){

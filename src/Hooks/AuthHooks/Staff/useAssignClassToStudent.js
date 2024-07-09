@@ -38,7 +38,7 @@ const useAssignClassToStudent = () => {
       const { data } = await axios.put(
         `${API_URL}/admin/assign_class`,
         assignedDetails,
-        { headers: { Authentication: token } } // Changed 'Authentication' to 'Authorization'
+        { headers: { Authentication: token } } // Changed 'Authentication' to 'Authentication'
       );
 
       if (data.success) {

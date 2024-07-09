@@ -17,7 +17,7 @@ const ModuleDetails = ({ isExpanded, classId, studentId }) => {
             }
           const response = await fetch(`http://localhost:8080/admin/modules/${classId}/${studentId}`,{
             headers: {
-                Authorization: token,
+                'Authentication': token,
               },
 
           });
@@ -68,7 +68,10 @@ const ModuleDetails = ({ isExpanded, classId, studentId }) => {
                   isPublished={quiz.completed}
                 />
               ))}
-              {chapter.discussions.map((discussion, discussionIndex) => (
+
+              {/* discussion */}
+
+              {/* {chapter.discussions.map((discussion, discussionIndex) => (
                 <ChapterItem
                   key={discussionIndex}
                   type="discussions"
@@ -76,8 +79,11 @@ const ModuleDetails = ({ isExpanded, classId, studentId }) => {
                   id={discussion._id}
                   isPublished={discussion.completed}
                 />
-              ))}
-              {chapter.pages.map((page, pageIndex) => (
+              ))} */}
+
+              {/* page */}
+
+              {/* {chapter.pages.map((page, pageIndex) => (
                 <ChapterItem
                   key={pageIndex}
                   type="page"
@@ -85,7 +91,7 @@ const ModuleDetails = ({ isExpanded, classId, studentId }) => {
                   id={page._id}
                   isPublished={page.completed}
                 />
-              ))}
+              ))} */}
             </div>
           ))}
         </div>

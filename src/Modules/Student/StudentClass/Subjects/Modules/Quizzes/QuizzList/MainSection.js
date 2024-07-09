@@ -36,7 +36,7 @@ console.log("this component");
 
         const response = await fetch(`http://localhost:8080/student/studentquiz/class/${selectedClass}?subjectId=${selectedSubject}`, {
           headers: {
-            'Authorization': token,
+            'Authentication': token,
           },
         });
 

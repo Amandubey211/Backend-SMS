@@ -74,7 +74,7 @@ const MainSection = () => {
 
         const response = await fetch(`http://localhost:8080/admin/getDiscussion/class/${cid}`, {
           headers: {
-            Authorization: token,
+            'Authentication': token,
           },
         });
 

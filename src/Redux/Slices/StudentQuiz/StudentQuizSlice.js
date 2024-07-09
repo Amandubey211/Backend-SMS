@@ -9,7 +9,7 @@ export const fetchAttemptHistory = createAsyncThunk(
     
     const response = await fetch(`http://localhost:8080/student/studentquiz/${quizId}/attempt`, {
       headers: {
-        'Authorization': token,
+        'Authentication': token,
       },
     });
 
@@ -32,7 +32,7 @@ export const submitQuiz = createAsyncThunk(
     const response = await fetch(`http://localhost:8080/student/studentquiz/submit/${quizId}`, {
       method: 'POST',
       headers: {
-        'Authorization': token,
+        'Authentication': token,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ studentAnswers: answers, timeTaken }),
@@ -146,7 +146,7 @@ export default StudentQuizSlice.reducer;
     
 //     const response = await fetch(`http://localhost:8080/student/studentquiz/${quizId}/attempt`, {
 //       headers: {
-//         'Authorization': token,
+//         'Authentication': token,
 //       },
 //     });
 
@@ -169,7 +169,7 @@ export default StudentQuizSlice.reducer;
 //     const response = await fetch(`http://localhost:8080/student/studentquiz/submit/${quizId}`, {
 //       method: 'POST',
 //       headers: {
-//         'Authorization': token,
+//         'Authentication': token,
 //         'Content-Type': 'application/json',
 //       },
 //       body: JSON.stringify({ studentAnswers: answers, timeTaken }),
@@ -286,7 +286,7 @@ export default StudentQuizSlice.reducer;
     
 //     const response = await fetch(`http://localhost:8080/student/studentquiz/${quizId}/attempt`, {
 //       headers: {
-//         'Authorization': token,
+//         'Authentication': token,
 //       },
 //     });
 
@@ -309,7 +309,7 @@ export default StudentQuizSlice.reducer;
 //     const response = await fetch(`http://localhost:8080/student/studentquiz/submit/${quizId}`, {
 //       method: 'POST',
 //       headers: {
-//         'Authorization': token,
+//         'Authentication': token,
 //         'Content-Type': 'application/json',
 //       },
 //       body: JSON.stringify({ studentAnswers: answers, timeTaken }),
