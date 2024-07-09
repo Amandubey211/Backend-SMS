@@ -540,3 +540,48 @@ export const bookIssueData = [
     image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT19C_xDIFRmFMwPz1CZN_a5-ZP8sj_RPPB0Q&s",
   },
 ];
+export const RecentStudentDummyGrade = {
+  subject: "Business Planning System",
+  assessments: [
+    {
+      name: "Final Test Exam",
+      type: "Group Assignment",
+      module: "Module 1",
+      chapter: "Chapter 1",
+      dueDate: "01/10/2024",
+      submittedDate: "20/10/2024",
+      status: "Submit",
+      score: "80/100",
+    },
+    {
+      name: "Midterm Exam",
+      type: "Individual Assignment",
+      module: "Module 2",
+      chapter: "Chapter 3",
+      dueDate: "15/09/2024",
+      submittedDate: "16/09/2024",
+      status: "Missing",
+      score: "70/100",
+    },
+    {
+      name: "Quiz 1",
+      type: "Quiz",
+      module: "Module 1",
+      chapter: "Chapter 1",
+      dueDate: "05/08/2024",
+      submittedDate: "05/08/2024",
+      status: "Submit",
+      score: "85/100",
+    },
+    {
+      name: "Group Project",
+      type: "Group Assignment",
+      module: "Module 3",
+      chapter: "Chapter 4",
+      dueDate: "25/11/2024",
+      submittedDate: "24/11/2024",
+      status: "Excused",
+      score: "90/100",
+    },
+  ],
+};

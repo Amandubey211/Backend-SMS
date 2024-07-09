@@ -6,6 +6,7 @@ import Layout from "../../../../../../../Components/Common/Layout";
 import StudentDashLayout from "../../../../../../../Components/Student/StudentDashLayout";
  
 const QuizzList = () => {
+  console.log("first")
   return (
     <Layout>
       <StudentDashLayout children={<MainSection />} hideSearchbar={true} />

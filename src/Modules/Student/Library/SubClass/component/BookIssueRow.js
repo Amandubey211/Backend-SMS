@@ -9,8 +9,8 @@ const BookIssueRow = ({ item }) => {
                 <div className="flex items-center">
                     <img src={item.image} alt="Profile" className="h-8 w-8 mr-2"/>
                     <div className="flex flex-col">
-                        <span>{item.bookTitle}</span>
-                        <span className="text-[12px] text-green-600">{item.category}</span>
+                        <span>{item.author}</span>
+                        <span className="text-[12px] text-green-600">{item.author}</span>
                     </div>
                 </div>
             </td>
@@ -19,7 +19,7 @@ const BookIssueRow = ({ item }) => {
             </td>
             <td className="px-5 py-2 border-b border-gray-200">
                 <div>Issue: {item.issueDate}</div>
-                <div>Return: {item.dueDate}</div>
+                <div>Return: {item.returnDate}</div>
             </td>
             <td className="px-5 py-2 border-b border-gray-200">
                 <span className={`inline-block px-3 py-1 text-xs font-semibold rounded-full ${item.status === "Paid" ? "bg-green-200 text-green-800" : "bg-red-200 text-red-800"}`}>

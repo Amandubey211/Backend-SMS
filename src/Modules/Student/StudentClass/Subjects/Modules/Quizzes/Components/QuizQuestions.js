@@ -1,16 +1,13 @@
-import React, { useState } from "react";
-import mockData from "./MockData/QuestionsMock";
+
+
+//-----------------useMemo----------------
+import React, { memo } from "react";
 import QuizQuestionCard from "./QuizQuestionCard";
 
 const QuizQuestions = ({ questions, selectedOptions, handleOptionChange }) => {
-  // const [selectedOptions, setSelectedOptions] = useState({});
-
-  // const handleOptionChange = (questionIndex, optionValue) => {
-  //   setSelectedOptions({
-  //     ...selectedOptions,
-  //     [questionIndex]: optionValue,
-  //   });
-  // };
+  console.log("question in quiz questions", questions);
+  console.log("selectedOptions in quiz questions", selectedOptions);
+  console.log("handleOptionChange in quiz questions", handleOptionChange);
 
   return (
     <div className="w-full p-1">
@@ -18,9 +15,9 @@ const QuizQuestions = ({ questions, selectedOptions, handleOptionChange }) => {
         All Question Preview
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {mockData.map((question, questionIndex) => (
+        {questions.map((question, questionIndex) => (
           <QuizQuestionCard
-            key={questionIndex}
+            key={question._id} // Use unique ID if available, else use questionIndex
             question={question}
             questionIndex={questionIndex}
             selectedOption={selectedOptions[questionIndex]}
@@ -32,4 +29,6 @@ const QuizQuestions = ({ questions, selectedOptions, handleOptionChange }) => {
   );
 };
 
-export default QuizQuestions;
+export default memo(QuizQuestions);
+
+
