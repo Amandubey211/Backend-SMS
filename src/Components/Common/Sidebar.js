@@ -40,8 +40,10 @@ const Sidebar = ({ isOpen, title, onClose, children,width }) => {
             <RxCross2 className="text-xl" />
           </button>
         </div>
-
-        {children}
+        
+            {children}
+        
+      
       </div>
     </div>
   );
