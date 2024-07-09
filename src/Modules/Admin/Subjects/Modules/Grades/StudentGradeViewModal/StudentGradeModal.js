@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import StudentGradeModalFilterHeader from "./Component/StudentGradeModalFilterHeader";
@@ -49,6 +50,7 @@ const StudentGradeModal = ({ isOpen, onClose }) => {
   }, [isOpen]);
 
   const studentGrade = useSelector((store) => store.Admin.studentGrade);
+  // console.log(studentGrade._id)
 
   return (
     <div
@@ -85,3 +87,4 @@ const StudentGradeModal = ({ isOpen, onClose }) => {
 };
 
 export default StudentGradeModal;
+

@@ -66,8 +66,7 @@ import React from "react";
 const StudentGradeSummary = ({ studentGrade }) => {
   const {
     profile,
-    firstName,
-    lastName,
+    studentName,
     section,
     assignment,
     groupAssignment,
@@ -87,9 +86,7 @@ const StudentGradeSummary = ({ studentGrade }) => {
           }
           alt="Profile"
         />
-        <h2 className="mt-4 text-lg font-semibold">
-          {firstName} {lastName}
-        </h2>
+        <h2 className="mt-4 text-lg font-semibold">{studentName}</h2>
         <p className="text-gray-500">{section || "Section A"}</p>
       </div>
       <div className="mt-4 p-3">

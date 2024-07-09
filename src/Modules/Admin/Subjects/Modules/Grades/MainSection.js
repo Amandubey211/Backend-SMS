@@ -95,7 +95,6 @@ import { useDispatch, useSelector } from "react-redux";
 import SubjectSideBar from "../../Component/SubjectSideBar";
 import GradeHeader from "./Component/GradeHeader";
 import StudentTable from "./Component/StudentTable";
-import studentsGrades from "./dummydata/dummystudents";
 import StudentGradeModal from "./StudentGradeViewModal/StudentGradeModal";
 import { setStudentGrade } from "../../../../../Redux/Slices/AdminSlice";
 import useFetchClassGrades from "../../../../../Hooks/AuthHooks/Staff/Admin/Grades/useFetchClassGrades";
@@ -113,10 +112,10 @@ const MainSection = () => {
   const dispatch = useDispatch();
   const { error, fetchClassGrades, grades, loading } = useFetchClassGrades();
 
-  useEffect(()=>{
-    fetchClassGrades()
-    console.log(grades)
-  },[])
+  useEffect(() => {
+    fetchClassGrades();
+    console.log(grades);
+  }, []);
 
   const handleSearchChange = (value) => {
     setSearch(value);
@@ -144,9 +143,9 @@ const MainSection = () => {
     return false;
   };
 
-  const filteredStudents = studentsGrades.filter((student) => {
+  const filteredStudents = grades.filter((student) => {
     return (
-      fuzzySearch(search, student.firstName + student.lastName) &&
+      fuzzySearch(search, student.studentName) &&
       (filters.section ? student.section === filters.section : true) &&
       (filters.group ? student.group === filters.group : true) &&
       (filters.assignment ? student.assignment === filters.assignment : true) &&
@@ -168,20 +167,12 @@ const MainSection = () => {
     <div className="flex">
       <SubjectSideBar />
       <div className="border-l w-full">
-        <GradeHeader
-          onSearch={handleSearchChange}
-          onFilterChange={handleFilterChange}
-        />
+        <GradeHeader onSearch={handleSearchChange} onFilterChange={handleFilterChange} />
         <div className="h-screen overflow-y-scroll no-scrollbar">
-          <StudentTable
-            students={filteredStudents}
-            onRowClick={handleRowClick}
-          />
+          <StudentTable students={filteredStudents} onRowClick={handleRowClick} />
         </div>
       </div>
-      {studentGrade && (
-        <StudentGradeModal isOpen={isModalOpen} onClose={handleCloseModal} />
-      )}
+      {studentGrade && <StudentGradeModal  isOpen={isModalOpen} onClose={handleCloseModal} />}
     </div>
   );
 };
