@@ -1,3 +1,4 @@
+
 import React from "react";
 import DateInput from "../../../../Component/DateInput";
 import OptionRadios from "./OptionRadios";
@@ -7,6 +8,7 @@ const CreateDiscussionForm = ({
   assignTo,
   dueDate,
   availableFrom,
+  availableUntil,
   section,
   option,
   handleChange,
@@ -32,8 +34,15 @@ const CreateDiscussionForm = ({
         value={dueDate}
         handleChange={handleChange}
       />
+       <DateInput
+        label="Until"
+        name="availableUntil"
+        value={availableUntil}
+        handleChange={handleChange}
+      />
     </div>
   );
 };
 
 export default CreateDiscussionForm;
+

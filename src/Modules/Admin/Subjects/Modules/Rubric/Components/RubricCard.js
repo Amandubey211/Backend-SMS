@@ -9,7 +9,7 @@ const getRandomColor = () => {
   return colors[randomIndex];
 };
 
-const RubricCard = ({ title, criteria, points }) => {
+const RubricCard = ({ rubricId, title, criteria, points, onDelete }) => {
   const bgColor = getRandomColor();
 
   return (
@@ -33,7 +33,7 @@ const RubricCard = ({ title, criteria, points }) => {
           </div>
         </div>
         <div className="flex flex-col gap-2 text-xl">
-          <button className="text-red-600">
+          <button className="text-red-600" onClick={onDelete}>
             <RiDeleteBin2Line />
           </button>
           <button className="text-green-600">

@@ -44,9 +44,12 @@ const useCreateRubric = () => {
           }
         );
         const { data } = response.data;
-
         setLoading(false);
-        toast.success("Rubric created successfully");
+        if (response?.data?.success) {
+          toast.success("Rubric created successfully");
+        } else {
+          toast.error("Rubric Not created");
+        }
         return { success: true, data };
       } catch (err) {
         const errorMessage =

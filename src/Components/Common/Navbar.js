@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { CiMail } from "react-icons/ci";
 import { TbBell } from "react-icons/tb";
@@ -110,3 +111,4 @@ const Navbar = ({ hideSearchbar, hideAvatarList, hideStudentView }) => {
 };
 
 export default Navbar;
+

@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef } from "react";
 import { RxCross2 } from "react-icons/rx";
 
@@ -50,3 +51,4 @@ const Sidebar = ({ isOpen, title, onClose, children,width }) => {
 };
 
 export default Sidebar;
+
