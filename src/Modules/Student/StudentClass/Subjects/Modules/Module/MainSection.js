@@ -25,7 +25,7 @@ const MainSection = () => {
 
         const response = await fetch('http://localhost:8080/student/my_class', {
           headers: {
-            'Authorization': token,
+            'Authentication': token,
           },
         });
 

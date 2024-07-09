@@ -34,7 +34,7 @@ const MainSection = () => {
         // const response = await fetch(`http://localhost:8080/studentAssignment/class/${cid}/section/${sid}?subjectId=${subjectId}`, {
         const response = await fetch(`http://localhost:8080/student/studentAssignment/class/${selectedClass}/section/${selectedSection}?subjectId=${selectedSubject}`, {
           headers: {
-            'Authorization':  token,
+            'Authentication':  token,
           },
         });
 
