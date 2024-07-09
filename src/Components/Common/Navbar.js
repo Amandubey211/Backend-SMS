@@ -1,4 +1,5 @@
-import React from "react";
+
+import React, { useState } from "react";
 import { CiMail } from "react-icons/ci";
 import { TbBell } from "react-icons/tb";
 import { IoSettingsOutline } from "react-icons/io5";
@@ -8,14 +9,19 @@ import { MdOutlineKeyboardDoubleArrowRight } from "react-icons/md";
 import AvatarsList from "./AvataList";
 import { FaArrowRightArrowLeft } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
+import NotificationBar from "./NotificationBar";
+import Sidebar from "./Sidebar";
 
 const Navbar = ({ hideSearchbar, hideAvatarList, hideStudentView }) => {
   const LeftNavHeading = useSelector(
     (store) => store.Common.NavbarData.leftHeading
   );
-  console.log("LeftNavHeading",LeftNavHeading)
   const navigate = useNavigate();
-
+  const [isOpen,setIsOpen] = useState(false)
+ const openNotification = ()=>{
+  setIsOpen(true)
+ }
+ const handleSidebarClose = () =>  setIsOpen(!isOpen);
   return (
     <div className="relative z-0">
       <div className="flex items-center p-2 bg-white border-b">
@@ -85,8 +91,15 @@ const Navbar = ({ hideSearchbar, hideAvatarList, hideStudentView }) => {
           <button aria-label="Mail">
             <CiMail className="w-8 h-8 text-purple-500 p-1 border rounded-full" />
           </button>
-          <button aria-label="Notifications">
-            <TbBell className="w-8 h-8 text-purple-500 p-1 border rounded-full" />
+          <button aria-label="Notifications" onClick={openNotification} className="relative">
+            <TbBell className="w-8 h-8 text-purple-500 p-1 border rounded-full"  />
+            {/* {
+           isOpen?<NotificationBar isOpen={isOpen} onClose={onClose} />:null
+            } */}
+            <Sidebar  isOpen={isOpen} onClose={handleSidebarClose} title={'Recent Notifications'} >
+              <NotificationBar/>
+            </Sidebar>
+            <p className="absolute top-[-5px]  right-0 bg-purple-500 rounded-full text-white w-[20px] h-[20px] flex  justify-center items-center ">6</p>
           </button>
           <button aria-label="Settings">
             <IoSettingsOutline className="w-8 h-8 text-purple-500 p-1 border rounded-full" />
@@ -98,3 +111,4 @@ const Navbar = ({ hideSearchbar, hideAvatarList, hideStudentView }) => {
 };
 
 export default Navbar;
+
