@@ -5,22 +5,18 @@ import { BsPatchCheckFill } from "react-icons/bs";
 import { NavLink, useParams } from "react-router-dom";
 import { ImSpinner3 } from "react-icons/im";
 import { MdOutlineBlock } from "react-icons/md";
+
 const List = ({ data, icon, title, type, loading, error }) => {
-  console.log(data);
   const { cid, sid } = useParams();
   const [searchQuery, setSearchQuery] = useState("");
 
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
   };
-  let filteredData;
-  if (type === "Assignment") {
-    filteredData = data.filter((item) =>
-      item.name?.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  } else {
-    filteredData = data;
-  }
+
+  const filteredData = data.filter((item) =>
+    item.name?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <div className="bg-white p-5 w-full">
@@ -55,7 +51,6 @@ const List = ({ data, icon, title, type, loading, error }) => {
         ) : error ? (
           <div className="flex flex-col items-center justify-center py-10 text-gray-500">
             <FaExclamationTriangle className="w-12 h-12 mb-3" />
-            {/* <p className="text-lg font-semibold">Error: {error}</p> */}
             <p className="text-lg font-semibold">No Data Found</p>
           </div>
         ) : filteredData.length > 0 ? (
@@ -79,19 +74,26 @@ const List = ({ data, icon, title, type, loading, error }) => {
                       {item.name || "No Title"}
                     </h3>
                     <p className="text-sm text-gray-500 capitalize">
-                      Module : {item.moduleName || "N/A"} | Chapter :{" "}
-                      {item.chapterName || "N/A"}
+                      {type === "Assignment" ? (
+                        <>
+                          Module : {item.moduleName || "N/A"} | Chapter :{" "}
+                          {item.chapterName || "N/A"}
+                        </>
+                      ) : (
+                        <>
+                          Total Points : {item.totalPoints} | Type :{" "}
+                          {item.quizType}
+                        </>
+                      )}
                     </p>
                   </div>
                 </div>
-
                 <div className="flex items-center gap-3">
                   {item.publish ? (
                     <BsPatchCheckFill className="text-green-600 p-1 border rounded-full h-7 w-7" />
                   ) : (
                     <MdOutlineBlock className="text-gray-600 p-1 h-7 w-7" />
                   )}
-                  {/* // <BsPatchCheckFill className="text-green-600 p-1 border rounded-full h-7 w-7" /> */}
                   <FaEllipsisV className="text-green-600 p-1 border rounded-full h-7 w-7" />
                 </div>
               </div>
