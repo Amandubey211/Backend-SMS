@@ -3,6 +3,7 @@ import { CiSearch } from "react-icons/ci";
 import { NavLink } from "react-router-dom";
 
 const AnnouncementHeader = ({ onSearch }) => {
+  
   const [filter, setFilter] = useState("all");
 
   const handleFilterChange = (event) => {

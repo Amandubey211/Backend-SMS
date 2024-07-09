@@ -9,8 +9,11 @@ import QuestionDetailCard from './Components/QuestionDetailCard';
 
 const MainSection = () => {
   const [activeTab, setActiveTab] = useState('instructions');
+  
   return (
     <div className="flex">
+            <h2>arijit das</h2>
+
       <SubjectSideBar  />
       <div className="w-[65%] border-x">
         {/* <CreateQuizHeader activePage={activeTab} /> */}

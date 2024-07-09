@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import DiscussionCard from "./Components/DiscussionCard";
 import PinnedDiscussions from "./Components/PinnedDiscussions";
@@ -67,3 +68,4 @@ const MainSection = () => {
 };
 
 export default MainSection;
+

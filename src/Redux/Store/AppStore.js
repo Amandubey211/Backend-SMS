@@ -6,7 +6,9 @@ import CommonReducers from "../Slices/Common/CommonSlice.js";
 import ClassReducer from "../Slices/Admin/ClassSlice.js";
 import TeachersReducer from "../Slices/Admin/TeachersSlice.js";
 import SubjectReducer from "../Slices/Admin/SubjectSlice.js"
+import StudentQuizReducer from "../Slices/StudentQuiz/StudentQuizSlice.js";
 const AppStore = configureStore({
+
   reducer: {
     Admin: AdminReducers,
     Auth: AuthSliceReducer,
@@ -14,8 +16,11 @@ const AppStore = configureStore({
     Common: CommonReducers,
     Class: ClassReducer,
     Teachers: TeachersReducer, 
-    Subject:SubjectReducer
+    Subject:SubjectReducer,
+    StudentQuiz: StudentQuizReducer, // Add StudentQuizSlice to the store
+
   },
 });
 
 export default AppStore;
+

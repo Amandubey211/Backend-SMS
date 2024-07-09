@@ -1,15 +1,51 @@
-import React,{useState} from 'react'
+import React,{useEffect, useState} from 'react'
 import Announce from './Announce'
 import Layout from '../../../Components/Common/Layout';
 import DashLayout from '../../../Components/Student/StudentDashLayout';
 import { MdQueryBuilder } from "react-icons/md";
-import { notices } from '../studentDummyData/studentDummyData';
+// import { notices } from '../studentDummyData/studentDummyData';
 
 const StudentAnnounce = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeIndex, setActiveIndex] = useState(0);
-
+  const [notices,setNotices]=useState([])
  
+useEffect(()=>{
+  const fetchNotices=async()=>{
+      try {
+          const token =localStorage.getItem('student:token')
+          if(!token){
+            throw new Error ('Authentication not found')
+          }
+          const response= await fetch('http://localhost:8080/student/all/notices',{
+            headers:{
+              'Authorization': token
+            }
+          })
+          if(!response.ok){
+            throw new Error(`Failed to fetch notices, status: ${response.status}`);
+
+          }
+          const data=await response.json()
+          if(data.success && data.notices){
+            const formattedNotices = data.notices.map(notice => ({
+              ...notice,
+              startDate: new Date(notice.startDate),
+              endDate: new Date(notice.endDate)
+            }));
+            console.log("Formatted notices:", formattedNotices);
+            setNotices(formattedNotices);
+          }else{
+            console.log("No notices data or unsuccessful response");
+
+          }
+      } catch (error) {
+        console.error("Failed to fetch notices:", error);
+
+      }
+  }
+  fetchNotices()
+},[])
 
   const filteredNotices = notices.filter((notice) =>
     notice.title.toLowerCase().includes(searchTerm.toLowerCase())
@@ -60,7 +96,8 @@ const StudentAnnounce = () => {
                       {/* <img className=" h-10 w-10 " src="https://via.placeholder.com/40" alt="notice-image" /> */}
                       <img
                         className=" h-10 w-10  rounded "
-                        src={notice.imageUrl}
+                        src='https://www.adobe.com/content/dam/www/us/en/events/overview-page/eventshub_evergreen_opengraph_1200x630_2x.jpg'
+                        // src={notice.imageUrl}
                         alt="notice-image"
                       />
 
@@ -106,7 +143,7 @@ const StudentAnnounce = () => {
                   <div>
                     {activeIndex === index && (
                       <div className="p-2 text-[#4D4D4D] ">
-                        <p>{notice.content}</p>
+                        <p>{notice.description}</p>
                       </div>
                     )}
                   </div>

@@ -13,6 +13,7 @@ const Navbar = ({ hideSearchbar, hideAvatarList, hideStudentView }) => {
   const LeftNavHeading = useSelector(
     (store) => store.Common.NavbarData.leftHeading
   );
+  console.log("LeftNavHeading",LeftNavHeading)
   const navigate = useNavigate();
 
   return (
