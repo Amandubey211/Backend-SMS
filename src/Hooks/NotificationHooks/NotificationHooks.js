@@ -59,8 +59,14 @@ export const useFirebaseMessaging = () => {
     const onMessageListener = () => {
       onMessage(messaging, (payload) => {
         console.log('Message received. Payload:', payload);
+        const notifications = JSON.parse(localStorage.getItem('notifications')) || [];
+        notifications.push(payload);
+        localStorage.setItem('notifications', JSON.stringify(notifications));
+        console.log('Notification saved to local storage:', payload);
       });
+      
     };
+    
 
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.ready.then((registration) => {
@@ -74,4 +80,3 @@ export const useFirebaseMessaging = () => {
 
   return null;
 };
-

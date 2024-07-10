@@ -25,7 +25,7 @@ const QuizResultSummary = ({ totalPoints, correctAnswers, wrongAnswers, quizId }
 
       const response = await fetch(`http://localhost:8080/student/studentquiz/${quizId}/attempt`, {
         headers: {
-          'Authorization': token,
+          'Authentication': token,
         },
       });
 

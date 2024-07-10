@@ -24,7 +24,7 @@ const MainSection = () => {
 
         const response = await fetch(`http://localhost:8080/admin/announcement/${aid}`, {
           headers: {
-            Authorization:token
+            Authentication:token
           }
         });
 

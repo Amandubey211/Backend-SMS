@@ -84,7 +84,7 @@ import { useParams } from "react-router-dom";
 import { FaSchool } from "react-icons/fa";
 import { SlEyeglass } from "react-icons/sl";
 import { FcGraduationCap, FcCalendar } from "react-icons/fc";
-import { setSelectedClass, setSelectedSubject } from "../../../../Redux/Slices/Common/CommonSlice";
+import { setSelectedClass, setSelectedSection, setSelectedSubject } from "../../../../Redux/Slices/Common/CommonSlice";
 
 const colors = [
   "bg-yellow-300",
@@ -104,17 +104,19 @@ const MainSection = () => {
   const [classData, setClassData] = useState(null);
   const { cid } = useParams();
 console.log("class ud ",cid)
+
   useEffect(() => {
     const fetchClassData = async () => {
       try {
         const token = localStorage.getItem('student:token');
+        console.log("token--",token);
         if (!token) {
           throw new Error('Authentication token not found');
         }
 
         const response = await fetch('http://localhost:8080/student/my_class', {
           headers: {
-            'Authorization': token,
+            'Authentication': token,
           },
         });
 
@@ -127,7 +129,7 @@ console.log("class ud ",cid)
         if (data.status && data.data) {
           setClassData(data.data);
           dispatch(setSelectedClass(data.data.classId));
-          // dispatch(setSelectedSection(data.data.section.sectionId));
+          dispatch(setSelectedSection(data.data.section.sectionId));
         } else {
           console.error("No class data or unsuccessful response");
         }
@@ -245,7 +247,7 @@ export default MainSection;
 //           `http://localhost:8080/admin/my_subjects/${cid}`,
 //           {
 //             headers: {
-//               Authorization: token,
+//               Authentication: token,
 //             },
 //           }
 //         );
