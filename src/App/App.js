@@ -374,7 +374,7 @@ function App() {
       errorElement: <Error />,
     },
     {
-      path: "/class/:cid/:sid/quizzes",
+      path: "/class/:cid/:sid/quiz",
       element: <ProtectRoute Component={QuizzList} allowedRoles={["admin", "teacher"]} />,
       errorElement: <Error />,
     },
