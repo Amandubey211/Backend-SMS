@@ -1,61 +1,74 @@
-import React, { useState, Suspense } from "react";
+import React, { useState, Suspense, useCallback, useEffect } from "react";
+import { useParams, useLocation } from "react-router-dom";
 import CreateQuizHeader from "./Components/CreateQuizHeader";
 import Tabs from "../Components/Tabs";
-import CreateQuizForm from "./Components/CreateQuizForm";
+import QuizInstructions from "./Components/QuizInstructions";
+import QuestionListView from "./Components/QuestionListView";
+import Sidebar from "../../../../../../Components/Common/Sidebar";
+import useCreateQuiz from "../../../../../../Hooks/AuthHooks/Staff/Admin/Quiz/createQuiz";
+import useAddQuestion from "../../../../../../Hooks/AuthHooks/Staff/Admin/Quiz/useAddQuestion"; // Import the hook
 import toast from "react-hot-toast";
-import CreateQuestionForm from "./Components/CreateQuestionForm";
-import AnswerSection from "./Components/AnswerSection";
-import QuestionList from "./Components/QuestionList";
-import AddQuestionButton from "./Components/AddQuestionButton";
-import EditorComponent from "../../../Component/AdminEditor";
+import CreateQuizForm from "./Components/CreateQuizForm";
+import QuestionForm from "./Components/QuestionForm";
 
 const MainSection = () => {
+  const { cid, sid } = useParams();
+  const location = useLocation();
   const [activeTab, setActiveTab] = useState("instructions");
   const [assignmentName, setAssignmentName] = useState("");
   const [instruction, setInstruction] = useState("");
   const [question, setQuestion] = useState("");
-  const [formState, setFormState] = useState({
-    points: "",
-    displayGrade: "",
-    submissionType: "",
-    submissionFormat: "",
-    allowedAttempts: 1,
-    allowMultiple: false,
-    numberOfAttempts: "",
-    assignTo: "",
-    // accessCode: "",
-    // ipAddresses: "",
-    showOneQuestionAtATime: "",
-    questionType: "",
-    section: "",
-    dueDate: "",
-    availableFrom: "",
-    lockQuestionsAfterAnswering: "",
-    until: "",
-    timeLimit: "",
-  });
+  const [formState, setFormState] = useState(initialFormState);
+  const [quizId, setQuizId] = useState("");
   const [questionState, setQuestionState] = useState([]);
-  const [answers, setAnswers] = useState([
-    { text: '', isCorrect: false },
-    { text: '', isCorrect: false },
-    { text: '', isCorrect: false },
-    { text: '', isCorrect: false },
-  ]);
+  const [answers, setAnswers] = useState(initialAnswersState);
   const [rightAnswerComment, setRightAnswerComment] = useState("");
   const [wrongAnswerComment, setWrongAnswerComment] = useState("");
+  const [questionPoint, setQuestionPoint] = useState('');
+  const [questionType, setQuestionType] = useState('multiple choice');
+  const [isSidebarOpen, setSidebarOpen] = useState(false);
 
-  const handleNameChange = (name) => {
-    setAssignmentName(name);
-  };
+  const handleSidebarOpen = useCallback(() => setSidebarOpen(true), []);
+  const handleSidebarClose = useCallback(() => setSidebarOpen(false), []);
+  const { createQuiz, loading } = useCreateQuiz();
+  const { addQuestion, loading: questionLoading } = useAddQuestion(); // Destructure from hook
 
-  const handleInstructionChange = (content) => {
-    setInstruction(content);
-  };
+  useEffect(() => {
+    if (location.state && location.state.quiz) {
+      const quiz = location.state.quiz;
+      setAssignmentName(quiz.name);
+      setInstruction(quiz.content);
+      setQuizId(quiz._id);
+      setFormState({
+        points: quiz.points || "",
+        quizType: quiz.quizType || "",
+        submissionFormat: quiz.submissionFormat || "",
+        allowedAttempts: quiz.allowedAttempts || 1,
+        allowMultiple: quiz.allowMultiple || false,
+        numberOfAttempts: quiz.numberOfAttempts || "",
+        assignTo: quiz.assignTo || "",
+        showOneQuestionAtATime: quiz.showOneQuestionAtATime || "",
+        questionType: quiz.questionType || "",
+        section: quiz.section || "",
+        allowShuffleAnswers: quiz.allowShuffleAnswers || false,
+        dueDate: quiz.dueDate || "",
+        availableFrom: quiz.availableFrom || "",
+        lockQuestionsAfterAnswering: quiz.lockQuestionsAfterAnswering || "",
+        until: quiz.until || "",
+        timeLimit: quiz.timeLimit || "",
+        moduleId: quiz.moduleId || "",
+        chapterId: quiz.chapterId || "",
+      });
+      setQuestionState(quiz.questions || []);
+      setAnswers(quiz.answers || initialAnswersState);
+      setRightAnswerComment(quiz.rightAnswerComment || "");
+      setWrongAnswerComment(quiz.wrongAnswerComment || "");
+    }
+  }, [location.state]);
 
-  const handleQuestionChange = (content) => {
-    setQuestion(content);
-  };
-
+  const handleNameChange = (name) => setAssignmentName(name);
+  const handleInstructionChange = (content) => setInstruction(content);
+  const handleQuestionChange = (content) => setQuestion(content);
   const handleFormChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormState((prev) => ({
@@ -71,24 +84,26 @@ const MainSection = () => {
     setAnswers(newAnswers);
   };
 
-  const addNewQuestion = () => {
+  const addNewQuestion = async () => {
+    const correctOption = answers.find((answer) => answer.isCorrect);
     const newQuestion = {
-      question: question,
+      questionText: question,
+      questionPoint: questionPoint,
+      type: questionType,
       options: answers,
-      rightAnswerComment,
-      wrongAnswerComment,
+      correctAnswer: correctOption ? correctOption.text : "", // Ensure correctAnswer is a string
+      correctAnswerComment: rightAnswerComment,
+      inCorrectAnswerComment: wrongAnswerComment,
     };
-    setQuestionState((prev) => [...prev, newQuestion]);
-    setQuestion("");
-    setAnswers([
-      { text: '', isCorrect: false },
-      { text: '', isCorrect: false },
-      { text: '', isCorrect: false },
-      { text: '', isCorrect: false },
-    ]);
-    setRightAnswerComment("");
-    setWrongAnswerComment("");
-    toast.success("Question Added");
+
+    const result = await addQuestion(quizId, newQuestion);
+    if (result.success) {
+      setQuestionState((prev) => [...prev, newQuestion]);
+      resetQuestionForm();
+      toast.success("Question Added");
+    } else {
+      toast.error("Failed to add question");
+    }
   };
 
   const deleteQuestion = (index) => {
@@ -97,67 +112,82 @@ const MainSection = () => {
     toast.success("Question Deleted");
   };
 
-  const handleSave = () => {
-    console.log(formState, assignmentName, instruction, questionState);
-    toast.success("Form Submitted");
+  const handleSave = async () => {
+    const quizData = {
+      ...formState,
+      name: assignmentName,
+      content: instruction,
+      correctAnswerComment: rightAnswerComment,
+      inCorrectAnswerComment: wrongAnswerComment,
+      classId: cid,
+      subjectId: sid,
+    };
+    const result = await createQuiz(quizData);
+    if (result.success) {
+      setActiveTab("questions");
+      setQuizId(result.quiz._id);
+      toast.success("Quiz created successfully");
+    } else {
+      toast.error("Failed to create quiz");
+    }
+  };
+
+  const resetQuestionForm = () => {
+    setQuestion("");
+    setAnswers(initialAnswersState);
+    setRightAnswerComment("");
+    setWrongAnswerComment("");
+    setQuestionPoint('');
+    setQuestionType('multiple choice');
   };
 
   return (
     <div className="flex flex-col w-full">
-      <CreateQuizHeader onSave={handleSave} onTabChange={setActiveTab} />
+      <CreateQuizHeader
+        onSave={handleSave}
+        onTabChange={setActiveTab}
+        quizId={quizId}
+      />
 
       <div className="w-full flex">
-        <div className="w-[70%] border-x">
+        <div
+          className={` ${
+            activeTab === "instructions" ? "w-[70%]" : "w-full"
+          } border-x`}
+        >
           <Tabs
             createPage={true}
             activeTab={activeTab}
             setActiveTab={setActiveTab}
             onTabChange={setActiveTab}
+            handleSidebarOpen={handleSidebarOpen}
           >
             {(activeTab) => (
               <div className="h-full">
                 {activeTab === "instructions" ? (
                   <Suspense fallback={<div>Loading...</div>}>
-                    <EditorComponent
-                      assignmentLabel="Quiz Instructions"
+                    <QuizInstructions
                       assignmentName={assignmentName}
-                      editorContent={instruction}
-                      onNameChange={handleNameChange}
-                      onEditorChange={handleInstructionChange}
+                      instruction={instruction}
+                      handleNameChange={handleNameChange}
+                      handleInstructionChange={handleInstructionChange}
                     />
                   </Suspense>
                 ) : (
-                  <Suspense fallback={<div>Loading...</div>}>
-                    <div>
-                      <h2 className="text-gradient text-2xl font-semibold mb-4">
-                        Questions:
-                      </h2>
-                      <EditorComponent
-                        hideInput={true}
-                        editorContent={question}
-                        onEditorChange={handleQuestionChange}
-                      />
-                      <AnswerSection 
-                        answers={answers}
-                        setAnswers={setAnswers}
-                        handleAnswerChange={handleAnswerChange}
-                        rightAnswerComment={rightAnswerComment}
-                        setRightAnswerComment={setRightAnswerComment}
-                        wrongAnswerComment={wrongAnswerComment}
-                        setWrongAnswerComment={setWrongAnswerComment}
-                      />
-                      <AddQuestionButton addNewQuestion={addNewQuestion} />
-                      <QuestionList questions={questionState} deleteQuestion={deleteQuestion} />
-                    </div>
-                  </Suspense>
+                  <QuestionListView
+                    quizId={quizId}
+                    questionState={questionState}
+                    handleSidebarOpen={handleSidebarOpen}
+                    deleteQuestion={deleteQuestion}
+                  />
                 )}
               </div>
             )}
           </Tabs>
         </div>
 
-        <div className="w-[30%] h-full ">
-          {activeTab === "instructions" ? (
+        {activeTab === "instructions" && (
+          <div className="w-[30%] h-full ">
             <CreateQuizForm
               {...formState}
               setDisplayGrade={(grade) =>
@@ -168,17 +198,63 @@ const MainSection = () => {
               }
               handleChange={handleFormChange}
             />
-          ) : (
-            <CreateQuestionForm
-              points={formState.points}
-              questionType={formState.questionType}
-              handleChange={handleFormChange}
-            />
-          )}
-        </div>
+          </div>
+        )}
       </div>
+
+      <Sidebar
+        isOpen={isSidebarOpen}
+        onClose={handleSidebarClose}
+        title="Add new Question"
+        width="95%"
+      >
+        <QuestionForm
+          question={question}
+          answers={answers}
+          questionPoint={questionPoint}
+          questionType={questionType}
+          rightAnswerComment={rightAnswerComment}
+          wrongAnswerComment={wrongAnswerComment}
+          handleQuestionChange={handleQuestionChange}
+          handleAnswerChange={handleAnswerChange}
+          setAnswers={setAnswers}
+          setRightAnswerComment={setRightAnswerComment}
+          setWrongAnswerComment={setWrongAnswerComment}
+          setQuestionPoint={setQuestionPoint}
+          setQuestionType={setQuestionType}
+          addNewQuestion={addNewQuestion}
+        />
+      </Sidebar>
     </div>
   );
 };
+
+const initialFormState = {
+  points: "",
+  quizType: "",
+  submissionFormat: "",
+  allowedAttempts: 1,
+  allowMultiple: false,
+  numberOfAttempts: "",
+  assignTo: "",
+  showOneQuestionAtATime: "",
+  questionType: "",
+  section: "",
+  allowShuffleAnswers: false,
+  dueDate: "",
+  availableFrom: "",
+  lockQuestionsAfterAnswering: "",
+  until: "",
+  timeLimit: "",
+  moduleId: "",
+  chapterId: "",
+};
+
+const initialAnswersState = [
+  { text: "", isCorrect: false },
+  { text: "", isCorrect: false },
+  { text: "", isCorrect: false },
+  { text: "", isCorrect: false },
+];
 
 export default MainSection;

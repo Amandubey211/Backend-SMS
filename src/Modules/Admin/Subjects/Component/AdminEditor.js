@@ -12,6 +12,7 @@ const EditorComponent = ({
   onNameChange,
   onEditorChange,
   inputPlaceHolder,
+  isCreateQuestion,
 }) => {
   const quillRef = useRef(null);
   const [loading, setLoading] = useState(false);
@@ -70,11 +71,9 @@ const EditorComponent = ({
         ["clean"],
         [{ align: [] }],
         [{ list: "bullet" }, { list: "ordered" }],
-        // [{ separator: true }], // Custom separator
         [{ color: [] }, { background: [] }],
         ["link", "image", "video"],
         ["blockquote", "code-block"],
-        // remove formatting button
       ],
       handlers: {
         image: handleImageUpload,
@@ -108,7 +107,7 @@ const EditorComponent = ({
   };
 
   return (
-    <div className="w-full p-6 bg-white mb-3">
+    <div className="w-full  bg-white mb-3">
       {!hideInput && (
         <div className="flex flex-col md:flex-row items-center gap-4 mb-2">
           <div className="flex flex-col w-full md:w-7/10">
@@ -130,7 +129,7 @@ const EditorComponent = ({
         ref={quillRef}
         value={editorContent}
         onChange={handleEditorChange}
-        className="bg-white h-72 min-h-[400px] md:min-h-[500px] lg:min-h-[600px] p-2" // Tailwind CSS classes for responsive min height
+        className={`bg-white p-2 ${isCreateQuestion ? "h-60" : "h-96"}`}
         theme="snow"
         modules={modules}
         formats={formats}

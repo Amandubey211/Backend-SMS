@@ -20,7 +20,7 @@ const MainSection = () => {
     fetchFilteredQuizzes(filters.moduleId, filters.chapterId, filters.publish);
   }, [fetchFilteredQuizzes, filters]);
 
-  useNavHeading(cid, sid);
+  // useNavHeading(cid, sid);
 
   return (
     <div className="flex">
@@ -35,7 +35,7 @@ const MainSection = () => {
           error={error}
         />
       </div>
-      <div className="w-[30%] px-2">
+      <div className="w-[30%] px-2 pt-2">
         <QuizFilterCard filters={filters} setFilters={setFilters} />
       </div>
       <NavLink
