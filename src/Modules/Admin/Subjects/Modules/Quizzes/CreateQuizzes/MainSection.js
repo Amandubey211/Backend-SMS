@@ -1,4 +1,5 @@
-import React, { useState, Suspense, useCallback } from "react";
+import React, { useState, Suspense, useCallback, useEffect } from "react";
+import { useParams, useLocation } from "react-router-dom";
 import CreateQuizHeader from "./Components/CreateQuizHeader";
 import Tabs from "../Components/Tabs";
 import QuizInstructions from "./Components/QuizInstructions";
@@ -6,17 +7,17 @@ import QuestionListView from "./Components/QuestionListView";
 import Sidebar from "../../../../../../Components/Common/Sidebar";
 import useCreateQuiz from "../../../../../../Hooks/AuthHooks/Staff/Admin/Quiz/createQuiz";
 import useAddQuestion from "../../../../../../Hooks/AuthHooks/Staff/Admin/Quiz/useAddQuestion"; // Import the hook
-import { useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import CreateQuizForm from "./Components/CreateQuizForm";
 import QuestionForm from "./Components/QuestionForm";
 
 const MainSection = () => {
+  const { cid, sid } = useParams();
+  const location = useLocation();
   const [activeTab, setActiveTab] = useState("instructions");
   const [assignmentName, setAssignmentName] = useState("");
   const [instruction, setInstruction] = useState("");
   const [question, setQuestion] = useState("");
-  const { cid, sid } = useParams();
   const [formState, setFormState] = useState(initialFormState);
   const [quizId, setQuizId] = useState("");
   const [questionState, setQuestionState] = useState([]);
@@ -31,6 +32,39 @@ const MainSection = () => {
   const handleSidebarClose = useCallback(() => setSidebarOpen(false), []);
   const { createQuiz, loading } = useCreateQuiz();
   const { addQuestion, loading: questionLoading } = useAddQuestion(); // Destructure from hook
+
+  useEffect(() => {
+    if (location.state && location.state.quiz) {
+      const quiz = location.state.quiz;
+      setAssignmentName(quiz.name);
+      setInstruction(quiz.content);
+      setQuizId(quiz._id);
+      setFormState({
+        points: quiz.points || "",
+        quizType: quiz.quizType || "",
+        submissionFormat: quiz.submissionFormat || "",
+        allowedAttempts: quiz.allowedAttempts || 1,
+        allowMultiple: quiz.allowMultiple || false,
+        numberOfAttempts: quiz.numberOfAttempts || "",
+        assignTo: quiz.assignTo || "",
+        showOneQuestionAtATime: quiz.showOneQuestionAtATime || "",
+        questionType: quiz.questionType || "",
+        section: quiz.section || "",
+        allowShuffleAnswers: quiz.allowShuffleAnswers || false,
+        dueDate: quiz.dueDate || "",
+        availableFrom: quiz.availableFrom || "",
+        lockQuestionsAfterAnswering: quiz.lockQuestionsAfterAnswering || "",
+        until: quiz.until || "",
+        timeLimit: quiz.timeLimit || "",
+        moduleId: quiz.moduleId || "",
+        chapterId: quiz.chapterId || "",
+      });
+      setQuestionState(quiz.questions || []);
+      setAnswers(quiz.answers || initialAnswersState);
+      setRightAnswerComment(quiz.rightAnswerComment || "");
+      setWrongAnswerComment(quiz.wrongAnswerComment || "");
+    }
+  }, [location.state]);
 
   const handleNameChange = (name) => setAssignmentName(name);
   const handleInstructionChange = (content) => setInstruction(content);

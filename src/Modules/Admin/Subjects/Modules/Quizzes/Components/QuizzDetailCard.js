@@ -58,7 +58,7 @@ const QuizzDetailCard = ({ quiz }) => {
 
   return (
     <div className="p-3 bg-white" aria-label="Quiz Card">
-      <ButtonsGroup />
+      <ButtonsGroup quiz={quiz} />
       <p className="text-center text-green-500 italic font-semibold pb-3 border-b">
         Submitted Students : 50/100{" "}
       </p>
