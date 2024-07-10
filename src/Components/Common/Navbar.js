@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { CiMail } from "react-icons/ci";
 import { TbBell } from "react-icons/tb";
 import { IoSettingsOutline } from "react-icons/io5";
@@ -17,11 +17,52 @@ const Navbar = ({ hideSearchbar, hideAvatarList, hideStudentView }) => {
     (store) => store.Common.NavbarData.leftHeading
   );
   const navigate = useNavigate();
-  const [isOpen,setIsOpen] = useState(false)
+  const [isOpenNotification,setIsOpenNotification] = useState(false);
+  const [notificationCount,setNotificationCount] = useState(0);
+  useEffect(()=>{
+    function getNotificationsFromIndexedDB() {
+      return new Promise((resolve, reject) => {
+        const dbPromise = indexedDB.open('firebase-messaging-store', 1);
+        dbPromise.onsuccess = function(event) {
+          const db = event.target.result;
+          const transaction = db.transaction(['notifications'], 'readonly');
+          const objectStore = transaction.objectStore('notifications');
+          const request = objectStore.getAll();
+    
+          request.onsuccess = function() {
+            resolve(request.result);
+           
+          };
+    
+          request.onerror = function(event) {
+            reject(event);
+          };
+        };
+    
+        dbPromise.onerror = function(event) {
+          reject(event);
+        };
+      });
+    };
+    getNotificationsFromIndexedDB().then((notifications) => {
+      console.log('Retrieved notifications from IndexedDB:', notifications);
+      localStorage.setItem('NotificationCount',notifications.length)
+      // Display notifications in your UI
+    }).catch((error) => {
+      console.error('Failed to retrieve notifications from IndexedDB:', error);
+    });
+  },[])
+  useEffect(()=>{
+    setNotificationCount(localStorage.getItem('NotificationCount'));
+  },[localStorage.getItem('NotificationCount'),notificationCount]);
  const openNotification = ()=>{
-  setIsOpen(true)
+ setIsOpenNotification(true)
  }
- const handleSidebarClose = () =>  setIsOpen(!isOpen);
+//  const handleSidebarClose = () => {
+ 
+//   setIsOpen(false)
+//   alert(isOpen)
+// };
   return (
     <div className="relative z-0">
       <div className="flex items-center p-2 bg-white border-b">
@@ -96,10 +137,10 @@ const Navbar = ({ hideSearchbar, hideAvatarList, hideStudentView }) => {
             {/* {
            isOpen?<NotificationBar isOpen={isOpen} onClose={onClose} />:null
             } */}
-            <Sidebar  isOpen={isOpen} onClose={handleSidebarClose} title={'Recent Notifications'} >
+            <Sidebar  isOpen={isOpenNotification} onClose={()=> setIsOpenNotification(false)} title={'Recent Notifications'} >
               <NotificationBar/>
             </Sidebar>
-            <p className="absolute top-[-5px]  right-0 bg-purple-500 rounded-full text-white w-[20px] h-[20px] flex  justify-center items-center ">6</p>
+            <p className="absolute top-[-5px]  right-0 bg-purple-500 rounded-full text-white w-[20px] h-[20px] flex  justify-center items-center ">{notificationCount}</p>
           </button>
           <button aria-label="Settings">
             <IoSettingsOutline className="w-8 h-8 text-purple-500 p-1 border rounded-full" />
