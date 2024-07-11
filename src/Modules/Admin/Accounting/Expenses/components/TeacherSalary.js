@@ -120,7 +120,7 @@ const TeacherSalary = ({ selectedMonth }) => {
           <button key={number} onClick={() => handlePageChange(number + 1)}>
             {number + 1}
           </button>
-        ))}https://github.com/TechTeam-studentdiwan/sms_frontend/pull/76/conflict?name=src%252FModules%252FAdmin%252FAccounting%252FExpenses%252Fcomponents%252FTeacherSalary.js&ancestor_oid=2ec5a1f58a034a41ed6714d8041fee6971c8b799&base_oid=607dbe98b0382e6fe557e15302222cd6097c0755&head_oid=d1b3a943f9cb03948f222eb3411743bcbd3f9e1d
+        ))}
       </div>
       <Sidebar
         isOpen={isSidebarOpen}
