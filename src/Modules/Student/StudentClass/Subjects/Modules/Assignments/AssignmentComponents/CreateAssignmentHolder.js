@@ -28,7 +28,7 @@ const CreateAssignmentHolder = ({ onSubmit, assignmentId, isReattempt = false })
         method: isReattempt ? "PUT" : "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": token,
+          "Authentication": token,
         },
         body: JSON.stringify({
           content: editorContent,

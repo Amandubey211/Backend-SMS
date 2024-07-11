@@ -5,9 +5,9 @@ const CommonSlice = createSlice({
   initialState: {
     selectedClass: null,
     selectedSubject: null,
-    selectedModule:{
-      moduleId:null,
-      name:null,
+    selectedModule: {
+      moduleId: null,
+      name: null,
       chapters: [],
 
     },
@@ -40,7 +40,7 @@ const CommonSlice = createSlice({
   },
 });
 
-export const { setLeftHeading, setSelectedSubject, setSelectedClass,setSelectedModule } =
+export const { setLeftHeading, setSelectedSection,setStudentId, setSelectedSubject, setSelectedClass, setSelectedModule } =
   CommonSlice.actions;
 
 export default CommonSlice.reducer;

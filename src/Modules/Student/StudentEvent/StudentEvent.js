@@ -40,8 +40,8 @@ const StudentEvent = () => {
 
         const response = await fetch('http://localhost:8080/student/all/events', {
           headers: {
-            // 'Authorization': `Bearer ${token}`
-            'Authorization': token
+            // 'Authentication': `Bearer ${token}`
+            'Authentication': token
           }
         });
 

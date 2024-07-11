@@ -36,8 +36,8 @@ const ChapterItem = ({ type, title, id, isPublished }) => {
   const { sid, cid } = useParams();
   console.log(isPublished ,"sdfsdfdsf");
   return (
-    <NavLink
-      to={`/class/${cid}/${sid}/${type}/${id}/view`}
+    <div
+      // to={`/class/${cid}/${sid}/${type}/${id}/view`}
       className="flex items-center mb-3 gap-3  rounded-lg "
     >
       <div className="p-2  bg-white rounded-full">{getIcon(type)}</div>
@@ -56,7 +56,29 @@ const ChapterItem = ({ type, title, id, isPublished }) => {
 
         <FaEllipsisV className="text-green-500" />
       </div>
-    </NavLink>
+    </div>
+
+    //  {/* <NavLink
+    //   to={`/class/${cid}/${sid}/${type}/${id}/view`}
+    //   className="flex items-center mb-3 gap-3  rounded-lg "
+    // >
+    //   <div className="p-2  bg-white rounded-full">{getIcon(type)}</div>
+    //   <div className="flex flex-col gap-1 justify-center flex-grow">
+    //     <p className="font-semibold">{title}</p>
+    //     <p className="text-green-500 text-sm ">
+    //       {type.charAt(0).toUpperCase() + type.slice(1)}
+    //     </p>
+    //   </div>
+    //   <div className="flex items-center gap-3">
+    //     {isPublished ? (
+    //       <FaCheckCircle className="text-green-500" />
+    //     ) : (
+    //       <MdOutlineBlock className="text-gray-600" />
+    //     )}
+
+    //     <FaEllipsisV className="text-green-500" />
+    //   </div>
+    // </NavLink> */}
   );
 };
 

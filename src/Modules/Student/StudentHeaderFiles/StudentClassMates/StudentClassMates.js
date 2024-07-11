@@ -31,7 +31,7 @@ const StudentClassMates = () => {
           `http://localhost:8080/student/my_classmates/${selectedClass}`,
           {
             headers: {
-              Authorization: token,
+              'Authentication': token,
             },
           }
         );

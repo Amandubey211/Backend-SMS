@@ -31,7 +31,7 @@ const StudentTeacher = () => {
           `http://localhost:8080/student/my_teachers/${selectedClass}`,
           {
             headers: {
-              Authorization: token,
+              'Authentication': token,
             },
           }
         );
