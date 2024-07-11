@@ -81,7 +81,7 @@ const Navbar = ({ hideSearchbar, hideAvatarList, hideStudentView }) => {
         <LeftHeading leftHeading={leftHeading} navigate={navigate} />
         {!hideAvatarList && (
           <>
-            <div className="flex-1 w-full flex justify-center border">
+            <div className="flex-1 w-full flex justify-center ">
               <AvatarsList />
             </div>
             {/* {!hideStudentView && <StudentViewButton />} */}
