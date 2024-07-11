@@ -5,7 +5,7 @@ import AddRubricModal from "../../../Rubric/Components/AddRubricModal";
 import Sidebar from "../../../../../../../Components/Common/Sidebar";
 import AddNewCriteriaForm from "../../../Rubric/Components/AddNewCriteriaForm";
 
-const CreateQuizHeader = ({ onSave, onTabChange, quizId }) => {
+const CreateQuizHeader = ({ onSave, onTabChange, isEditing }) => {
   const navigate = useNavigate();
   const [isModalOpen, setModalOpen] = useState(false);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -22,7 +22,7 @@ const CreateQuizHeader = ({ onSave, onTabChange, quizId }) => {
           onClick={() => navigate(-1)} // Navigate to the previous page
         />
         <h1 className="text-lg font-semibold text-gray-800">
-          {quizId ? "Add Question" : "Create New Quiz"} 
+          {isEditing ? "Add Question" : "Create New Quiz"} 
         </h1>
       </div>
       <div className="flex items-center space-x-2">
@@ -37,7 +37,7 @@ const CreateQuizHeader = ({ onSave, onTabChange, quizId }) => {
           onClick={handleNext}
           className="px-6 py-2 text-white font-semibold rounded-md bg-gradient-to-r from-purple-500 to-red-500 hover:from-purple-600 hover:to-red-600 transition"
         >
-          {quizId ? "Submit" : "Next"}
+          {isEditing ? "Submit" : "Next"}
         </button>
         <AddRubricModal
           type="quiz"
