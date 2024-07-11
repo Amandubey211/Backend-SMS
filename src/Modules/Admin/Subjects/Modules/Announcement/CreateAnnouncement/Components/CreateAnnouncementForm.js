@@ -4,21 +4,38 @@ import DateInput from "../../../../Component/DateInput";
 import AssignToSection from "../../../Discussion/AddDiscussion/Components/AssignToSection";
 
 const CreateAnnouncementForm = ({
-  assignTo,
+  postTo,
   availableFrom,
   section,
   option,
   handleChange,
+  groupId,
+  author
 }) => {
   return (
     <div>
       <OptionRadios option={option} handleChange={handleChange} />
       <AssignToSection
+        groupId={groupId}
         assignTitle="Post To"
-        assignTo={assignTo}
+        assignTo={postTo}
         section={section}
         handleChange={handleChange}
       />
+      <div className="mb-4">
+        <label htmlFor="author" className="text-gray-500 mb-1">
+          Author
+        </label>
+        <input
+          id="author"
+          type="text"
+          name="author"
+          onChange={handleChange}
+          value={author}
+          placeholder="Type Name"
+          className="p-2 border border-gray-300 rounded w-full"
+        />
+      </div>
 
       <DateInput
         label="Delay Posting"

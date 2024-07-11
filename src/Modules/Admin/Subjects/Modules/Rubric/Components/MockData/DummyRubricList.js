@@ -1,3 +1,4 @@
+
 const RubricList = [
     { title: 'Final Exam Rubric', criteria: 3, points: 100 },
     { title: 'Test Exam Rubric', criteria: 4, points: 80 },

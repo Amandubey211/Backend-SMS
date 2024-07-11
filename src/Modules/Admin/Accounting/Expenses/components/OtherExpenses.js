@@ -93,3 +93,4 @@ const OtherExpenses = React.memo(({ selectedMonth }) => {
 });
 
 export default OtherExpenses;
+

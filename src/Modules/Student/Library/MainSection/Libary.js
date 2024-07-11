@@ -1,13 +1,13 @@
 
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo ,useEffect} from "react";
 import BookCard from "../SubClass/component/BookCard";
 import Layout from "../../../../Components/Common/Layout";
 import StudentDashLayout from "../../../../Components/Student/StudentDashLayout";
 import FormField from "../../subClass/component/FormField";
 import BookIssue from "./BookIssue";
 import TabButton from "../Subclasss/component/TabButton";
-import { books } from "../../studentDummyData/studentDummyData";
+// import { books } from "../../studentDummyData/studentDummyData";
 import Sidebar from "../../../../Components/Common/Sidebar";
 
 const Library = () => {
@@ -15,9 +15,52 @@ const Library = () => {
     class: "",
     category: "",
   });
+  const [books, setBooks] = useState([]);
 
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("Library");
+  useEffect(() => {
+    const fetchBooks = async () => {
+      console.log("Fetching books...");
+      try {
+        const token = localStorage.getItem('student:token');
+        if (!token) {
+          throw new Error('Authentication token not found');
+        }
+
+        const response = await fetch('http://localhost:8080/admin/all/book', {
+          headers: {
+            'Authentication': token
+          }
+        });
+
+        console.log("Response received:", response);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch books, status: ${response.status}`);
+        }
+        const data = await response.json();
+        console.log("Data parsed:", data);
+
+        if (data.success && data.books) {
+          const formattedBooks = data.books.map(book => ({
+            ...book,
+            classLevel: book.name,
+            category: book.name,
+            available: book.copies,
+          
+          }));
+          console.log("Formatted books:", formattedBooks);
+          setBooks(formattedBooks);
+        } else {
+          console.log("No books data or unsuccessful response");
+        }
+      } catch (error) {
+        console.error("Failed to fetch books:", error);
+      }
+    };
+
+    fetchBooks();
+  }, []);
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
@@ -99,15 +142,27 @@ const Library = () => {
               </div>
               <div className="grid grid-cols-3 gap-4 p-4">
                 {filteredBooks.map((book) => (
+                  // <BookCard
+                  //   key={book.id}
+                  //   title={book.name}
+                  //   author={book.author}
+                  //   category={book.name}
+                  //   classLevel={book.name}
+                  //   copies={book.copies}
+                  //   available={book.copies}
+                  //   coverImageUrl={book.image}
+                  // />
+
+
                   <BookCard
-                    key={book.id}
+                    key={book._id}
                     title={book.title}
                     author={book.author}
                     category={book.category}
                     classLevel={book.classLevel}
                     copies={book.copies}
                     available={book.available}
-                    coverImageUrl={book.coverImageUrl}
+                    coverImageUrl={book.image}
                   />
                 ))}
               </div>

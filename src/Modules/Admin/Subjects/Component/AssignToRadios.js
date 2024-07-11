@@ -1,6 +1,6 @@
 import React from "react";
 
-const AssignToRadios = ({ assignTo, handleChange, title }) => (
+const AssignToRadios = ({ assignTo, handleChange, title, isAssignToLabel }) => (
   <fieldset className="mb-4">
     <legend className="text-lg font-semibold text-gray-700 mb-2">
       {title || "Assign To"}
@@ -10,7 +10,7 @@ const AssignToRadios = ({ assignTo, handleChange, title }) => (
         <input
           type="radio"
           id="everyone"
-          name="assignTo"
+          name={isAssignToLabel ? "assignTo" : "postTo"}
           value="Everyone"
           checked={assignTo === "Everyone"}
           onChange={handleChange}
@@ -24,7 +24,7 @@ const AssignToRadios = ({ assignTo, handleChange, title }) => (
         <input
           type="radio"
           id="section"
-          name="assignTo"
+          name={isAssignToLabel ? "assignTo" : "postTo"}
           value="Section"
           checked={assignTo === "Section"}
           onChange={handleChange}
@@ -38,7 +38,7 @@ const AssignToRadios = ({ assignTo, handleChange, title }) => (
         <input
           type="radio"
           id="group"
-          name="assignTo"
+          name={isAssignToLabel ? "assignTo" : "postTo"}
           value="Group"
           checked={assignTo === "Group"}
           onChange={handleChange}

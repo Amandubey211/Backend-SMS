@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React from "react";
 import toast from "react-hot-toast";
 import { IoIosArrowBack } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 
-const CreateAnnouncementHeader = ({ onSave }) => {
+const CreateAnnouncementHeader = ({ onSave, loading, isEditing }) => {
   const navigate = useNavigate();
 
   return (
@@ -11,24 +11,31 @@ const CreateAnnouncementHeader = ({ onSave }) => {
       <div className="flex items-center">
         <IoIosArrowBack
           className="mr-2 text-gray-600 text-2xl cursor-pointer"
-          onClick={() => navigate(-1)} 
+          onClick={() => navigate(-1)}
         />
         <h1 className="text-lg font-semibold text-gray-800">
-          Create New Announcement
+          {isEditing ? "Update Announcement" : "Create New Announcement"}
         </h1>
       </div>
       <div className="flex items-center space-x-2">
         <button
-            onClick={() => navigate(-1)} 
+          onClick={() => navigate(-1)}
           className="flex-grow rounded-md py-2 px-6 text-center border"
+          disabled={loading}
         >
-          <span >Cancel</span>
+          <span>Cancel</span>
         </button>
-        <button onClick={() => {
+        <button
+          onClick={() => {
             onSave();
             toast.success("Saved and Published", { position: "bottom-left" });
-          }} className="flex-grow rounded-md py-2 px-6 text-center border bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200 transition">
-          <span className="text-gradient">Submit Announcement</span>
+          }}
+          className="flex-grow rounded-md py-2 px-6 text-center border bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200 transition"
+          disabled={loading}
+        >
+          <span className="text-gradient">
+            {loading ? "Saving..." : isEditing ? "Update Announcement" : "Submit Announcement"}
+          </span>
         </button>
       </div>
     </div>

@@ -2,7 +2,8 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   subjects: [],
-  modules:[]
+  modules: [],
+  assignments: [],
 };
 
 const SubjectsSlice = createSlice({
@@ -15,8 +16,11 @@ const SubjectsSlice = createSlice({
     setModules: (state, action) => {
       state.modules = action.payload;
     },
+    setAssignment: (state, action) => {
+      state.assignments = action.payload;
+    },
   },
 });
 
-export const { setSubjects ,setModules} = SubjectsSlice.actions;
+export const { setSubjects, setModules, setAssignment } = SubjectsSlice.actions;
 export default SubjectsSlice.reducer;

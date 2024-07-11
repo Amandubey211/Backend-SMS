@@ -1,32 +1,35 @@
-import React, { useState } from "react";
-import { QuizzDetails } from "../../Assignments/AssignmentComponents/MockData";
+import React from "react";
 import { FaCalendarAlt } from "react-icons/fa";
 
-const Tabs = ({ children,activeTab,setActiveTab, onTabChange,createPage }) => {
+const Tabs = ({
+  children,
+  activeTab,
+  setActiveTab,
+  onTabChange,
+  createPage,
+  handleSidebarOpen,
+  title,
+  availableFrom,
+}) => {
   const handleTabClick = (tab) => {
     setActiveTab(tab);
     onTabChange(tab);
   };
 
-  const { title, type,availableFrom } = QuizzDetails; // dependent
-
   return (
     <>
       <div className="flex justify-between items-center p-2 px-3 border-b">
-        {
-          !createPage && <div >
-          <h2 className="text-xl font-semibold mb-1">
-           {title}
-          </h2>
-          <div className="flex items-center text-gray-500">
-        <span className="text-green-600 font-medium mr-2">{type}</span>
-        <span className="mx-2">|</span>
-        <FaCalendarAlt className="w-4 h-4 mr-2" />
-        <span className="text-sm">Available From: {availableFrom}</span>
-      </div>
-        </div>
-        }
-        
+        {!createPage && (
+          <div>
+            <h2 className="text-xl font-semibold mb-1">{title}</h2>
+            <div className="flex items-center text-gray-500">
+              <span className="text-green-600 font-medium mr-2">Quiz</span>
+              <span className="mx-2">|</span>
+              <FaCalendarAlt className="w-4 h-4 mr-2" />
+              <span className="text-sm">Available From: {new Date(availableFrom).toLocaleDateString()}</span>
+            </div>
+          </div>
+        )}
 
         <div className="flex gap-2 bg-white">
           <button
@@ -63,6 +66,17 @@ const Tabs = ({ children,activeTab,setActiveTab, onTabChange,createPage }) => {
             </span>
           </button>
         </div>
+        {activeTab === "questions" && createPage && (
+          <button
+            onClick={handleSidebarOpen}
+            className="flex items-center border border-gray-300 ps-5  rounded-full"
+          >
+            <span className="mr-2">Add new Question</span>
+            <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full w-10 h-10 flex items-center justify-center">
+              <span className="text-3xl -mt-2">+</span>
+            </div>
+          </button>
+        )}
       </div>
       <div className="p-4">{children(activeTab)}</div>
     </>

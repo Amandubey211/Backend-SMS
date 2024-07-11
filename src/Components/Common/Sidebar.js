@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef } from "react";
 import { RxCross2 } from "react-icons/rx";
 
@@ -40,11 +41,14 @@ const Sidebar = ({ isOpen, title, onClose, children,width }) => {
             <RxCross2 className="text-xl" />
           </button>
         </div>
-
-        {children}
+        
+            {children}
+        
+      
       </div>
     </div>
   );
 };
 
 export default Sidebar;
+

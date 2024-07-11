@@ -10,6 +10,16 @@ const CreateAssignmentHeader = ({ onSave }) => {
   const navigate = useNavigate();
   const [isModalOpen, setModalOpen] = useState(false);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
+  const [criteriaList, setCriteriaList] = useState([]);
+
+  const handleAddCriteria = () => {
+    setSidebarOpen(true);
+  };
+
+  const handleSaveCriteria = (criteria) => {
+    setCriteriaList([...criteriaList, criteria]);
+    setSidebarOpen(false);
+  };
 
   return (
     <div className="flex items-center justify-between p-2 bg-white border-b border-gray-300 shadow-sm">
@@ -53,14 +63,16 @@ const CreateAssignmentHeader = ({ onSave }) => {
         <AddRubricModal
           isOpen={isModalOpen}
           onClose={() => setModalOpen(false)}
-          onAddCriteria={() => setSidebarOpen(true)}
+          criteriaList={criteriaList}
+          setCriteriaList={setCriteriaList}
+          onAddCriteria={handleAddCriteria}
         />
         <Sidebar
           isOpen={isSidebarOpen}
           onClose={() => setSidebarOpen(false)}
           title="Add New Criteria"
         >
-          <AddNewCriteriaForm />
+          <AddNewCriteriaForm onSave={handleSaveCriteria} />
         </Sidebar>
       </div>
     </div>

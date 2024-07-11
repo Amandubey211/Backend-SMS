@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import CreateAssignmentForm from "./Component/CreateAssignmentForm";
 import CreateAssignmentHeader from "./Component/CreateAssignmentHeader";
-import EditorComponent from "../../../Component/Editor";
 import useCreateAssignment from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/createAssignment";
 import { useParams } from "react-router-dom";
+import EditorComponent from "../../../Component/AdminEditor";
 
 const MainSection = () => {
   const [assignmentName, setAssignmentName] = useState("Monthly examination");

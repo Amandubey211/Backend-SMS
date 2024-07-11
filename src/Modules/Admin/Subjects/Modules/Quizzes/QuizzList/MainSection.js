@@ -1,24 +1,42 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import SubjectSideBar from "../../../Component/SubjectSideBar";
 import List from "../../Assignments/Component/List";
-import FilterCard from "../../Assignments/Component/FilterCard";
 import { RiAddFill, RiFileUnknowLine } from "react-icons/ri";
-import { assignments } from "../../Assignments/AllAssignments/DummyData/assignments";
 import { NavLink, useParams } from "react-router-dom";
+import QuizFilterCard from "../Components/QuizFilterCard";
+import useGetFilteredQuizzes from "../../../../../../Hooks/AuthHooks/Staff/Admin/Quiz/useGetFilteredQuizzes";
 import useNavHeading from "../../../../../../Hooks/CommonHooks/useNavHeading ";
 
 const MainSection = () => {
   const { cid, sid } = useParams();
-  useNavHeading(cid, sid);
+  const [filters, setFilters] = useState({
+    moduleId: "",
+    chapterId: "",
+    publish: null,
+  });
+  const { error, fetchFilteredQuizzes, loading, quizzes } = useGetFilteredQuizzes();
+
+  useEffect(() => {
+    fetchFilteredQuizzes(filters.moduleId, filters.chapterId, filters.publish);
+  }, [fetchFilteredQuizzes, filters]);
+
+  // useNavHeading(cid, sid);
+
   return (
-    <div className="flex  ">
+    <div className="flex">
       <SubjectSideBar />
       <div className="w-[65%] border-l">
-        <List title="All Quizzes"  data={assignments} icon={<RiFileUnknowLine />} />
+        <List
+          title="All Quizzes"
+          data={quizzes}
+          icon={<RiFileUnknowLine />}
+          type="Quiz"
+          loading={loading}
+          error={error}
+        />
       </div>
-      <div className="w-[30%] px-2">
-        {/* <FilterCard /> */}
-        this is filter card placeholder 
+      <div className="w-[30%] px-2 pt-2">
+        <QuizFilterCard filters={filters} setFilters={setFilters} />
       </div>
       <NavLink
         to={`/class/${cid}/${sid}/create_quiz`}

@@ -25,8 +25,7 @@ const AddNewRatingForm = ({ onAddNewRating }) => {
       ratingDescription: description,
     };
 
-    // onAddNewRating(newRating);
-    console.log(newRating)
+    onAddNewRating(newRating);
     setMarkType("");
     setPoints("");
     setDescription("");

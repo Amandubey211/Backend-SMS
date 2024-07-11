@@ -1,5 +1,4 @@
 import { useState, useCallback } from "react";
-import axios from "axios";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
