@@ -9,10 +9,22 @@ import useEditSyllabus from "../../../../../../Hooks/AuthHooks/Staff/Admin/Sylla
 const MainSection = () => {
   const { state } = useLocation();
   const { sid } = useParams();
-  const [assignmentName, setAssignmentName] = useState(state?.syllabus?.title || "");
-  const [editorContent, setEditorContent] = useState(state?.syllabus?.content || "");
-  const { loading: createLoading, error: createError, createSyllabus } = useCreateSyllabus();
-  const { loading: editLoading, error: editError, editSyllabus } = useEditSyllabus();
+  const [assignmentName, setAssignmentName] = useState(
+    state?.syllabus?.title || ""
+  );
+  const [editorContent, setEditorContent] = useState(
+    state?.syllabus?.content || ""
+  );
+  const {
+    loading: createLoading,
+    error: createError,
+    createSyllabus,
+  } = useCreateSyllabus();
+  const {
+    loading: editLoading,
+    error: editError,
+    editSyllabus,
+  } = useEditSyllabus();
 
   const handleNameChange = (name) => {
     setAssignmentName(name);
@@ -44,7 +56,11 @@ const MainSection = () => {
     <div className="flex">
       <SideMenubar />
       <div className="w-full mb-4">
-        <CreateSyllabusHeader onSave={handleSave} loading={loading} isEditing={isEditing} />
+        <CreateSyllabusHeader
+          onSave={handleSave}
+          loading={loading}
+          isEditing={isEditing}
+        />
         <EditorComponent
           inputPlaceHolder="Syllabus Heading"
           assignmentLabel="Page Title"
@@ -54,7 +70,11 @@ const MainSection = () => {
           onEditorChange={handleEditorChange}
         />
         {loading && <p role="status">Loading...</p>}
-        {error && <p role="alert" className="text-red-400 text-current my-4">{error}</p>}
+        {error && (
+          <p role="alert" className="text-red-400 text-current my-4">
+            {error}
+          </p>
+        )}
       </div>
     </div>
   );

@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useMemo } from "react";
 import SubjectSideBar from "../../../Component/SubjectSideBar";
-import List from "../Component/List";
-import FilterCard from "../Component/FilterCard";
 import { RiListCheck3, RiAddFill } from "react-icons/ri";
 import { NavLink, useParams } from "react-router-dom";
 import useGetFilteredAssignments from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useGetFilteredAssignments";
+import FilterCard from "../Component/FilterCard";
+import List from "../Component/List";
 
 const MainSection = () => {
   const { sid, cid } = useParams();
@@ -19,6 +19,7 @@ const MainSection = () => {
   useEffect(() => {
     const { moduleId, chapterId, publish } = filters;
     fetchFilteredAssignments(sid, moduleId, chapterId, publish);
+    console.log(assignments)
   }, [filters, fetchFilteredAssignments]);
 
   const navLinkStyles = useMemo(() => ({

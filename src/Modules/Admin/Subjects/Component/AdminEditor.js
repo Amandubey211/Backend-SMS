@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useRef } from "react";
 import ReactQuill from "react-quill";
-//import "react-quill/dist/quill.snow.css";
+import "react-quill/dist/quill.snow.css";
 import axios from "axios";
 import { FaSpinner } from "react-icons/fa";
 
@@ -107,7 +107,7 @@ const EditorComponent = ({
   };
 
   return (
-    <div className="w-full  bg-white mb-3">
+    <div className="w-full  bg-white mb-3 p-2">
       {!hideInput && (
         <div className="flex flex-col md:flex-row items-center gap-4 mb-2">
           <div className="flex flex-col w-full md:w-7/10">

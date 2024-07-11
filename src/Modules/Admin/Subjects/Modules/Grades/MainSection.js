@@ -22,7 +22,7 @@ const MainSection = () => {
 
   useEffect(() => {
     fetchClassGrades();
-    console.log(grades);
+
   }, []);
 
   const handleSearchChange = (value) => {
