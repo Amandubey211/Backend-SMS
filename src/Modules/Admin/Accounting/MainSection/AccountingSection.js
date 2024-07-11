@@ -1,16 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Sidebar from "../../../../Components/Common/Sidebar";
 import Layout from "../../../../Components/Common/Layout";
 import DashLayout from "../../../../Components/Admin/AdminDashLayout";
 import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
-import AddFeesForm from "../subClass/component/AddFeesForm"; // Assuming you have this form component for adding fees
+import AddFeesForm from "../subClass/component/AddFeesForm";
 import FormField from "../subClass/component/FormField";
-import { dummyData } from "../../dummyData/dummyData";
-
-
-const uniqueFilterOptions = (data, key) => {
-  return [...new Set(data.map((item) => item[key]))].sort();
-};
 
 const AccountingSection = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -20,53 +14,71 @@ const AccountingSection = () => {
     feesType: "",
     status: "Everyone",
   });
+  const [feesData, setFeesData] = useState([]);
   const [selectedStatus, setSelectedStatus] = useState("Everyone");
 
   useNavHeading("Accounting");
 
-  const classes = uniqueFilterOptions(dummyData, "class");
-  const sections = uniqueFilterOptions(dummyData, "section");
-  const feesTypes = uniqueFilterOptions(dummyData, "feesType");
+  useEffect(() => {
+    const token = localStorage.getItem('admin:token');
+    fetch("http://localhost:8080/admin/get_fees", {
+      method: "GET",
+      headers: {
+        Authentication: `${token}`
+      },
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          setFeesData(data.data);
+        }
+      })
+      .catch(error => console.error('Error fetching fees data:', error));
+  }, []);
+
+  const uniqueFilterOptions = (data, key) => {
+    return [...new Set(data.map(item => item[key]))].sort();
+  };
+
+  const classes = useMemo(() => uniqueFilterOptions(feesData.map(fd => fd.studentId.presentClassId), "className"), [feesData]);
+  const feesTypes = useMemo(() => uniqueFilterOptions(feesData, "feeType"), [feesData]);
 
   const handleSidebarOpen = () => setSidebarOpen(true);
   const handleSidebarClose = () => setSidebarOpen(false);
-
+  
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
     setFilters((prev) => ({ ...prev, [name]: value }));
   };
+
   const handleStatusChange = (status) => {
     setSelectedStatus(status);
+    setFilters((prev) => ({ ...prev, status }));
   };
-  const filteredData = dummyData.filter(
-    (item) =>
-      (filters.class === "" || item.class === filters.class) &&
-      (filters.section === "" || item.section === filters.section) &&
-      (filters.feesType === "" || item.feesType === filters.feesType) &&
-      (filters.status === "Everyone" ||
-        (filters.status === "Paid" && item.status === "Paid") ||
-        (filters.status === "Unpaid" && item.status === "Unpaid"))
-  );
+
+  const filteredData = useMemo(() => feesData.filter(item => {
+    const { class: classFilter, feesType, status } = filters;
+    return (
+      (classFilter === "" || item.studentId.presentClassId.className === classFilter) &&
+      (feesType === "" || item.feeType === feesType) &&
+      (status === "Everyone" ||
+        (status === "Paid" && item.status === "Paid") ||
+        (status === "Unpaid" && item.status === "Unpaid"))
+    );
+  }), [feesData, filters]);
 
   return (
     <Layout title="Accounting">
       <DashLayout>
         <div className="min-h-screen p-4 bg-gray-50 ">
-          <div className="flex  items-center mb-4  ">
-            <div className="   justify-between   items-end  flex space-x-2  w-full ">
+          <div className="flex items-center mb-4">
+            <div className="flex justify-between items-end space-x-2 w-full">
               <FormField
                 id="class"
                 label="Class"
                 value={filters.class}
                 onChange={handleFilterChange}
                 options={classes}
-              />
-              <FormField
-                id="section"
-                label="Section"
-                value={filters.section}
-                onChange={handleFilterChange}
-                options={sections}
               />
               <FormField
                 id="feesType"
@@ -78,8 +90,7 @@ const AccountingSection = () => {
 
               <button
                 onClick={handleSidebarOpen}
-                className="  h-12 inline-flex items-center  border border-transparent text-sm font-medium  shadow-sm         bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600
-                "
+                className="h-12 inline-flex items-center border border-transparent text-sm font-medium shadow-sm bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600"
               >
                 Add New Fees
                 <span className="ml-2">+</span>
@@ -87,7 +98,6 @@ const AccountingSection = () => {
             </div>
           </div>
 
-          {/* //everyone, paid,unpaid */}
           <div className="p-4">
             <div className="flex items-center space-x-4">
               {["Everyone", "Paid", "Unpaid"].map((status) => (
@@ -128,56 +138,33 @@ const AccountingSection = () => {
             </div>
           </div>
 
-          <div className=" overflow-x-auto bg-white shadow rounded-lg">
+          <div className="overflow-x-auto bg-white shadow rounded-lg">
             <table className="min-w-full leading-normal">
               <thead>
                 <tr className="text-left text-gray-700 bg-gray-100">
                   <th className="px-5 py-3 border-b-2 border-gray-200">Name</th>
-                  <th className="px-5 py-3 border-b-2 border-gray-200">
-                    Class
-                  </th>
-                  <th className="px-5 py-3 border-b-2 border-gray-200">
-                    Section
-                  </th>
-                  <th className="px-5 py-3 border-b-2 border-gray-200">
-                    Fees Type
-                  </th>
-                  <th className="px-5 py-3 border-b-2 border-gray-200">
-                    Due Date
-                  </th>
-                  <th className="px-5 py-3 border-b-2 border-gray-200">
-                    Amount
-                  </th>
-                  <th className="px-5 py-3 border-b-2 border-gray-200">
-                    Status
-                  </th>
-                  <th className="px-5 py-3 border-b-2 border-gray-200">
-                    Action
-                  </th>
+                  <th className="px-5 py-3 border-b-2 border-gray-200">Class</th>
+                  <th className="px-5 py-3 border-b-2 border-gray-200">Fees Type</th>
+                  <th className="px-5 py-3 border-b-2 border-gray-200">Due Date</th>
+                  <th className="px-5 py-3 border-b-2 border-gray-200">Amount</th>
+                  <th className="px-5 py-3 border-b-2 border-gray-200">Status</th>
+                  <th className="px-5 py-3 border-b-2 border-gray-200">Action</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredData.map((item, index) => (
-                  <tr key={index} className=" text-left text-gray-700 bg-gray-100">
-                    <td className="px-5 py-2 border-b border-gray-200 flex items-center">
-                      <img
-                        src={item.image}
-                        alt="Profile"
-                        className="h-8 w-8 rounded-full mr-2"
-                      />
-                      <span>{item.name}</span>
+                  <tr key={index} className="text-left text-gray-700 bg-gray-100">
+                    <td className="px-5 py-2 border-b border-gray-200">
+                      <span>{item.studentId.fullName}</span>
                     </td>
                     <td className="px-5 py-2 border-b border-gray-200">
-                      {item.class}
+                      {item.studentId.presentClassId.className}
                     </td>
                     <td className="px-5 py-2 border-b border-gray-200">
-                      {item.section}
+                      {item.feeType}
                     </td>
                     <td className="px-5 py-2 border-b border-gray-200">
-                      {item.feesType}
-                    </td>
-                    <td className="px-5 py-2 border-b border-gray-200">
-                      {item.dueDate}
+                      {new Date(item.dueDate).toLocaleDateString()}
                     </td>
                     <td className="px-5 py-2 border-b border-gray-200">
                       {item.amount}
