@@ -443,9 +443,15 @@ function App() {
       element: <ProtectRoute Component={StudentDash} allowedRoles={["student"]} />,
       errorElement: <Error />,
     },
+    // {
+    //   path: "accounting/studentfees",
+    //   element: <ProtectRoute Component={AccountingSection} allowedRoles={["admin, accountant"]} />,
+    //   errorElement: <Error />,
+    // },
+
     {
       path: "accounting/studentfees",
-      element: <ProtectRoute Component={AccountingSection} allowedRoles={["admin, accountant"]} />,
+      element: <ProtectRoute Component={AccountingSection} allowedRoles={["admin", "accountant"]} />,
       errorElement: <Error />,
     },
 
@@ -467,7 +473,7 @@ function App() {
       errorElement: <Error />,
     },
     {
-      path: "/accounting/reports",
+      path: "/accounting/earning",
       element: <ProtectRoute Component={Earning} allowedRoles={["admin", "accountant"]} />,
       errorElement: <Error />,
     },

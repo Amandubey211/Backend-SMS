@@ -82,9 +82,9 @@ const sidebarData = [
     icon: <HiOutlineCalculator />,
     items: [
       {
-        title: "Reports",
+        title: "Earning",
         icon: <FaClipboardList />,
-        path: "/accounting/reports",
+        path: "/accounting/earning",
       },
       {
         title: "Student Fees",
