@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import SubjectSideBar from "../../../Component/SubjectSideBar";
 import List from "../../Assignments/Component/List";
 import { RiAddFill, RiFileUnknowLine } from "react-icons/ri";
 import { NavLink, useParams } from "react-router-dom";
 import QuizFilterCard from "../Components/QuizFilterCard";
 import useGetFilteredQuizzes from "../../../../../../Hooks/AuthHooks/Staff/Admin/Quiz/useGetFilteredQuizzes";
-import useNavHeading from "../../../../../../Hooks/CommonHooks/useNavHeading ";
 
 const MainSection = () => {
   const { cid, sid } = useParams();
@@ -16,11 +15,13 @@ const MainSection = () => {
   });
   const { error, fetchFilteredQuizzes, loading, quizzes } = useGetFilteredQuizzes();
 
-  useEffect(() => {
+  const refetchQuizzes = useCallback(() => {
     fetchFilteredQuizzes(filters.moduleId, filters.chapterId, filters.publish);
   }, [fetchFilteredQuizzes, filters]);
 
-  // useNavHeading(cid, sid);
+  useEffect(() => {
+    refetchQuizzes();
+  }, [refetchQuizzes]);
 
   return (
     <div className="flex">
@@ -33,6 +34,7 @@ const MainSection = () => {
           type="Quiz"
           loading={loading}
           error={error}
+          refetchQuizzes={refetchQuizzes}
         />
       </div>
       <div className="w-[30%] px-2 pt-2">

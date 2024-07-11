@@ -1,15 +1,44 @@
-import React, { useState, Suspense, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect, Suspense } from "react";
 import { useParams, useLocation } from "react-router-dom";
 import CreateQuizHeader from "./Components/CreateQuizHeader";
 import Tabs from "../Components/Tabs";
 import QuizInstructions from "./Components/QuizInstructions";
 import QuestionListView from "./Components/QuestionListView";
 import Sidebar from "../../../../../../Components/Common/Sidebar";
-import useCreateQuiz from "../../../../../../Hooks/AuthHooks/Staff/Admin/Quiz/createQuiz";
+import useUpdateQuiz from "../../../../../../Hooks/AuthHooks/Staff/Admin/Quiz/useUpdateQuiz"; // Import the hook
 import useAddQuestion from "../../../../../../Hooks/AuthHooks/Staff/Admin/Quiz/useAddQuestion"; // Import the hook
 import toast from "react-hot-toast";
 import CreateQuizForm from "./Components/CreateQuizForm";
 import QuestionForm from "./Components/QuestionForm";
+import useCreateQuiz from "../../../../../../Hooks/AuthHooks/Staff/Admin/Quiz/createQuiz";
+
+const initialFormState = {
+  points: "",
+  quizType: "",
+  submissionFormat: "",
+  allowedAttempts: 1,
+  allowMultiple: false,
+  numberOfAttempts: "",
+  assignTo: "",
+  showOneQuestionAtATime: "",
+  questionType: "",
+  section: "",
+  allowShuffleAnswers: false,
+  dueDate: "",
+  availableFrom: "",
+  lockQuestionsAfterAnswering: "",
+  until: "",
+  timeLimit: "",
+  moduleId: "",
+  chapterId: "",
+};
+
+const initialAnswersState = [
+  { text: "", isCorrect: false },
+  { text: "", isCorrect: false },
+  { text: "", isCorrect: false },
+  { text: "", isCorrect: false },
+];
 
 const MainSection = () => {
   const { cid, sid } = useParams();
@@ -27,11 +56,13 @@ const MainSection = () => {
   const [questionPoint, setQuestionPoint] = useState('');
   const [questionType, setQuestionType] = useState('multiple choice');
   const [isSidebarOpen, setSidebarOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
   const handleSidebarOpen = useCallback(() => setSidebarOpen(true), []);
   const handleSidebarClose = useCallback(() => setSidebarOpen(false), []);
-  const { createQuiz, loading } = useCreateQuiz();
-  const { addQuestion, loading: questionLoading } = useAddQuestion(); // Destructure from hook
+  const { createQuiz, loading: createLoading } = useCreateQuiz();
+  const { updateQuiz, loading: updateLoading } = useUpdateQuiz();
+  const { addQuestion, loading: questionLoading } = useAddQuestion();
 
   useEffect(() => {
     if (location.state && location.state.quiz) {
@@ -39,6 +70,7 @@ const MainSection = () => {
       setAssignmentName(quiz.name);
       setInstruction(quiz.content);
       setQuizId(quiz._id);
+      setIsEditing(true);
       setFormState({
         points: quiz.points || "",
         quizType: quiz.quizType || "",
@@ -122,13 +154,23 @@ const MainSection = () => {
       classId: cid,
       subjectId: sid,
     };
-    const result = await createQuiz(quizData);
-    if (result.success) {
-      setActiveTab("questions");
-      setQuizId(result.quiz._id);
-      toast.success("Quiz created successfully");
+    if (isEditing) {
+      const result = await updateQuiz(quizId, quizData);
+      if (result.success) {
+        setActiveTab("questions");
+        toast.success("Quiz updated successfully");
+      } else {
+        toast.error("Failed to update quiz");
+      }
     } else {
-      toast.error("Failed to create quiz");
+      const result = await createQuiz(quizData);
+      if (result.success) {
+        setActiveTab("questions");
+        setQuizId(result.quiz._id);
+        toast.success("Quiz created successfully");
+      } else {
+        toast.error("Failed to create quiz");
+      }
     }
   };
 
@@ -146,14 +188,12 @@ const MainSection = () => {
       <CreateQuizHeader
         onSave={handleSave}
         onTabChange={setActiveTab}
-        quizId={quizId}
+        isEditing={isEditing}
       />
 
       <div className="w-full flex">
         <div
-          className={` ${
-            activeTab === "instructions" ? "w-[70%]" : "w-full"
-          } border-x`}
+          className={` ${activeTab === "instructions" ? "w-[70%]" : "w-full"} border-x`}
         >
           <Tabs
             createPage={true}
@@ -228,33 +268,5 @@ const MainSection = () => {
     </div>
   );
 };
-
-const initialFormState = {
-  points: "",
-  quizType: "",
-  submissionFormat: "",
-  allowedAttempts: 1,
-  allowMultiple: false,
-  numberOfAttempts: "",
-  assignTo: "",
-  showOneQuestionAtATime: "",
-  questionType: "",
-  section: "",
-  allowShuffleAnswers: false,
-  dueDate: "",
-  availableFrom: "",
-  lockQuestionsAfterAnswering: "",
-  until: "",
-  timeLimit: "",
-  moduleId: "",
-  chapterId: "",
-};
-
-const initialAnswersState = [
-  { text: "", isCorrect: false },
-  { text: "", isCorrect: false },
-  { text: "", isCorrect: false },
-  { text: "", isCorrect: false },
-];
 
 export default MainSection;

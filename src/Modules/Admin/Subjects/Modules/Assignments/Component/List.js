@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { CiSearch } from "react-icons/ci";
 import { FaEllipsisV, FaExclamationTriangle, FaTrashAlt } from "react-icons/fa";
 import { BsPatchCheckFill } from "react-icons/bs";
@@ -7,12 +7,18 @@ import { ImSpinner3 } from "react-icons/im";
 import { MdOutlineBlock } from "react-icons/md";
 import useDeleteQuiz from "../../../../../../Hooks/AuthHooks/Staff/Admin/Quiz/useDeleteQuiz";
 
-const List = ({ data, icon, title, type, loading, error }) => {
+const List = ({ data, icon, title, type, loading, error, refetchQuizzes }) => {
   const { cid, sid } = useParams();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeMenu, setActiveMenu] = useState(null);
 
   const { loading: deleteLoading, error: deleteError, success: deleteSuccess, deleteQuiz } = useDeleteQuiz();
+
+  useEffect(() => {
+    if (deleteSuccess) {
+      refetchQuizzes();
+    }
+  }, [deleteSuccess, refetchQuizzes]);
 
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
