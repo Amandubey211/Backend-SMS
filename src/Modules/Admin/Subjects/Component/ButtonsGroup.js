@@ -1,23 +1,45 @@
-import React, { useState } from 'react';
-import { FaBan } from 'react-icons/fa';
-import { AiOutlineEdit, AiOutlineDelete } from 'react-icons/ai';
-import { HiOutlineDotsVertical } from 'react-icons/hi';
-import { useNavigate, useParams } from 'react-router-dom';
-import useDeleteQuiz from '../../../../Hooks/AuthHooks/Staff/Admin/Quiz/useDeleteQuiz';
+import React, { useState } from "react";
+import { FaBan } from "react-icons/fa";
+import { AiOutlineEdit, AiOutlineDelete } from "react-icons/ai";
+import { HiOutlineDotsVertical } from "react-icons/hi";
+import { useNavigate, useParams } from "react-router-dom";
+import useDeleteQuiz from "../../../../Hooks/AuthHooks/Staff/Admin/Quiz/useDeleteQuiz";
+import useDeleteAssignment from "../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useDeleteAssignment";
 
-const ButtonsGroup = ({ quiz }) => {
+const ButtonsGroup = ({ data, type }) => {
   const navigate = useNavigate();
   const { sid, cid } = useParams();
   const [showMenu, setShowMenu] = useState(false);
 
-  const { loading, error, success, deleteQuiz } = useDeleteQuiz();
+  const {
+    loading: quizLoading,
+    error: quizError,
+    deleteQuiz,
+  } = useDeleteQuiz();
+  const {
+    loading: assignmentLoading,
+    error: assignmentError,
+    deleteAssignment,
+  } = useDeleteAssignment();
 
   const handleEdit = () => {
-    navigate(`/class/${cid}/${sid}/create_quiz`, { state: { quiz } });
+    if (type === "Quiz") {
+      navigate(`/class/${cid}/${sid}/create_quiz`, { state: { quiz: data } });
+    }
+    if (type === "Assignment") {
+      navigate(`/class/${cid}/${sid}/createassignment`, {
+        state: { assignment: data },
+      });
+    }
   };
 
-  const handleDelete = () => {
-    deleteQuiz(quiz._id);
+  const handleDelete = async () => {
+    if (type === "Quiz") {
+      await deleteQuiz(data._id);
+    }
+    if (type === "Assignment") {
+      await deleteAssignment(data._id);
+    }
   };
 
   return (
@@ -48,7 +70,7 @@ const ButtonsGroup = ({ quiz }) => {
             <button
               onClick={handleDelete}
               className="flex items-center space-x-2 px-4 py-2 hover:bg-red-100 w-full text-left"
-              aria-label="Delete Quiz"
+              aria-label={`Delete ${type}`}
             >
               <AiOutlineDelete aria-hidden="true" className="text-red-600" />
               <span>Delete</span>

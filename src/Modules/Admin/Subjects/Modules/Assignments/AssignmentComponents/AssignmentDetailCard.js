@@ -29,7 +29,7 @@ const AssignmentDetailCard = ({ assignment, loading, error }) => {
 
   return (
     <div className="max-w-sm p-4 bg-white" aria-label="Assignment Card">
-      <ButtonsGroup />
+      <ButtonsGroup  type="Assignment" data={assignment}/>
       <SpeedGradeButton />
       <AssignmentDetail label="Assignment Points" value={`${points} Points`} />
       <AssignmentDetail
