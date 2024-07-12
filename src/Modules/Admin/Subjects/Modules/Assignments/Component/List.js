@@ -6,19 +6,32 @@ import { NavLink, useParams } from "react-router-dom";
 import { ImSpinner3 } from "react-icons/im";
 import { MdOutlineBlock } from "react-icons/md";
 import useDeleteQuiz from "../../../../../../Hooks/AuthHooks/Staff/Admin/Quiz/useDeleteQuiz";
+import useDeleteAssignment from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useDeleteAssignment";
 
-const List = ({ data, icon, title, type, loading, error, refetchQuizzes }) => {
+const List = ({ data, icon, title, type, loading, error, refetchAssignments }) => {
   const { cid, sid } = useParams();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeMenu, setActiveMenu] = useState(null);
 
-  const { loading: deleteLoading, error: deleteError, success: deleteSuccess, deleteQuiz } = useDeleteQuiz();
+  const {
+    loading: deleteQuizLoading,
+    error: deleteQuizError,
+    success: deleteQuizSuccess,
+    deleteQuiz,
+  } = useDeleteQuiz();
+  const {
+    loading: deleteAssignmentLoading,
+    error: deleteAssignmentError,
+    success: deleteAssignmentSuccess,
+    deleteAssignment,
+  } = useDeleteAssignment();
 
   useEffect(() => {
-    if (deleteSuccess) {
-      refetchQuizzes();
+    if (deleteQuizSuccess || deleteAssignmentSuccess) {
+      console.log('Refetching assignments...');
+      refetchAssignments();
     }
-  }, [deleteSuccess, refetchQuizzes]);
+  }, [deleteQuizSuccess, deleteAssignmentSuccess, refetchAssignments]);
 
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
@@ -28,8 +41,13 @@ const List = ({ data, icon, title, type, loading, error, refetchQuizzes }) => {
     setActiveMenu(activeMenu === id ? null : id);
   };
 
-  const handleDelete = (quizId) => {
-    deleteQuiz(quizId);
+  const handleDelete = (id) => {
+    if (type === "Assignment") {
+      deleteAssignment(id);
+    }
+    if (type === "Quiz") {
+      deleteQuiz(id);
+    }
   };
 
   const filteredData = data.filter((item) =>
@@ -129,26 +147,29 @@ const List = ({ data, icon, title, type, loading, error, refetchQuizzes }) => {
                         <button
                           onClick={() => handleDelete(item._id)}
                           className="flex items-center space-x-2 px-4 py-2 hover:bg-red-100 w-full text-left"
-                          aria-label="Delete Quiz"
-                          disabled={deleteLoading}
+                          aria-label={`Delete ${type}`}
+                          disabled={deleteQuizLoading || deleteAssignmentLoading}
                         >
-                          {deleteLoading ? (
+                          {(deleteQuizLoading || deleteAssignmentLoading) ? (
                             <ImSpinner3 className="w-5 h-5 animate-spin text-red-600" />
                           ) : (
                             <>
-                              <FaTrashAlt aria-hidden="true" className="text-red-600" />
+                              <FaTrashAlt
+                                aria-hidden="true"
+                                className="text-red-600"
+                              />
                               <span>Delete</span>
                             </>
                           )}
                         </button>
-                        {deleteError && (
+                        {(deleteQuizError || deleteAssignmentError) && (
                           <div className="text-red-600 text-sm px-4 py-2">
-                            {deleteError}
+                            {deleteQuizError || deleteAssignmentError}
                           </div>
                         )}
-                        {deleteSuccess && (
+                        {(deleteQuizSuccess || deleteAssignmentSuccess) && (
                           <div className="text-green-600 text-sm px-4 py-2">
-                            {deleteSuccess}
+                            {deleteQuizSuccess || deleteAssignmentSuccess}
                           </div>
                         )}
                       </div>

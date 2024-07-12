@@ -55,7 +55,7 @@ const useUpdateQuiz = () => {
         const token = localStorage.getItem(`${role}:token`);
 
         const response = await axios.put(
-          `${API_URL}/admin/quizzes/${quizId}`, // Adjust the API endpoint as needed
+          `${API_URL}/admin/update_quiz/${quizId}`, // Adjust the API endpoint as needed
           {
             name,
 

@@ -22,6 +22,7 @@ const MainSection = () => {
 
   useEffect(() => {
     fetchClassGrades();
+  
 
   }, []);
 
