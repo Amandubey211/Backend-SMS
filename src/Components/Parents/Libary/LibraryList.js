@@ -1,34 +1,70 @@
-import React, { useState } from 'react';
-import { Table } from 'antd';
-import LibraryData from '../../../Modules/Parents/dummyData/dummyData';
+import React, { useState, useEffect } from 'react';
+import { Table, message } from 'antd';
+import axios from 'axios';
+import { format } from 'date-fns';
 
 const LibraryTable = () => {
+  const [data, setData] = useState([]);
   const [statusFilter, setStatusFilter] = useState('All');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+      const token = localStorage.getItem('parent:token');
+      try {
+        const response = await axios.get('http://localhost:8080/parent/api/all/bookIssue', {
+          headers: {
+            Authentication: `${token}`
+          }
+        });
+
+        const mappedData = response.data.books.map(book => ({
+          ...book,
+          issueDate: format(new Date(book.issueDate), 'dd/MM/yyyy'),
+          returnDate: format(new Date(book.returnDate), 'dd/MM/yyyy'),
+          bookName: book.bookId.name,
+          bookCategory: book.bookId.category,
+        }));
+        console.log(mappedData);
+        setData(mappedData);
+      } catch (err) {
+        setError(err.message);
+        message.error('Failed to fetch data');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const handleFilterChange = (value) => {
     setStatusFilter(value);
   };
 
-  const filteredData = LibraryData.filter((item) => {
+  const filteredData = data.filter((item) => {
     if (statusFilter === 'All') return true;
     return item.status === statusFilter;
   });
 
   const columns = [
     {
-      title: 'Issue Book',
-      dataIndex: 'issueBook',
-      key: 'issueBook',
+      title: 'Child',
+      dataIndex: 'author',
+      key: 'author',
     },
     {
-      title: 'Devon Lane',
-      dataIndex: 'devonLane',
-      key: 'devonLane',
+      title: 'Book Name',
+      dataIndex: 'bookName',
+      key: 'bookName',
     },
     {
       title: 'Category',
-      dataIndex: 'category',
-      key: 'category',
+      dataIndex: 'bookCategory',
+      key: 'bookCategory',
     },
     {
       title: 'Issue Date',
@@ -59,7 +95,7 @@ const LibraryTable = () => {
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-xl font-bold">Status</h1>
+        <h1 className="text-xl font-bold">Library Status</h1>
         <div className="flex space-x-4">
           <button
             className={`px-4 py-2 rounded-full text-sm ${
@@ -87,7 +123,7 @@ const LibraryTable = () => {
           </button>
         </div>
       </div>
-      <Table columns={columns} dataSource={filteredData} rowKey="id" />
+      <Table columns={columns} dataSource={filteredData} rowKey="_id" loading={loading} />
     </div>
   );
 };

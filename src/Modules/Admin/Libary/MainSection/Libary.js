@@ -1,4 +1,5 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
+import axios from "axios";
 import BookCard from "../SubClass/component/BookCard";
 import Layout from "../../../../Components/Common/Layout";
 import DashLayout from "../../../../Components/Admin/AdminDashLayout";
@@ -7,15 +8,32 @@ import Sidebar from "../../../../Components/Common/Sidebar";
 import BookIssue from "./BookIssue";
 import AddBook from "../SubClass/component/AddBook";
 import TabButton from "../Subclasss/component/TabButton";
-import { books } from "../../dummyData/dummyData";
 
 const Library = () => {
-  const [filters, setFilters] = useState({
-    class: "",
-    category: "",
-  });
+  const [filters, setFilters] = useState({ class: "", category: "" });
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("Library");
+  const [books, setBooks] = useState([]);
+
+  const token = localStorage.getItem('admin:token');
+
+  useEffect(() => {
+    const fetchBooks = async () => {
+      try {
+        const response = await axios.get("http://localhost:8080/admin/all/book", {
+          headers: {
+            Authentication: `${token}`,
+          },
+        });
+        if (response.data.success) {
+          setBooks(response.data.books);
+        }
+      } catch (error) {
+        console.error("Error fetching books:", error);
+      }
+    };
+    fetchBooks();
+  }, [token]);
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
@@ -25,9 +43,8 @@ const Library = () => {
   const handleSidebarOpen = () => setSidebarOpen(true);
   const handleSidebarClose = () => setSidebarOpen(false);
 
-  // Extract unique class levels and categories
   const classLevels = useMemo(() => {
-    const levels = books.map((book) => book.classLevel.toString());
+    const levels = books.map((book) => book.classId.className);
     return Array.from(new Set(levels));
   }, [books]);
 
@@ -38,7 +55,7 @@ const Library = () => {
 
   const filteredBooks = books.filter((book) => {
     return (
-      (filters.class === "" || book.classLevel.toString() === filters.class) &&
+      (filters.class === "" || book.classId.className === filters.class) &&
       (filters.category === "" || book.category === filters.category)
     );
   });
@@ -96,14 +113,14 @@ const Library = () => {
               <div className="grid grid-cols-3 gap-4 p-4">
                 {filteredBooks.map((book) => (
                   <BookCard
-                    key={book.id}
-                    title={book.title}
+                    key={book._id}
+                    title={book.name}
                     author={book.author}
                     category={book.category}
-                    classLevel={book.classLevel}
+                    classLevel={book.classId.className}
                     copies={book.copies}
-                    available={book.available}
-                    coverImageUrl={book.coverImageUrl}
+                    available={book.copies}
+                    coverImageUrl={book.image}
                   />
                 ))}
               </div>
