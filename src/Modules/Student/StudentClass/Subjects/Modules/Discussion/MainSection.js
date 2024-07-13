@@ -38,7 +38,7 @@
 //             ))}
 //           </div>
 //         </div>
-        
+
 //       </div>
 //     </div>
 //   );
@@ -74,7 +74,9 @@ const MainSection = () => {
 
         const response = await fetch(`http://localhost:8080/admin/getDiscussion/class/${cid}`, {
           headers: {
-            Authorization: token,
+            // 'Authorization': token,
+
+            'Authentication': token
           },
         });
 
@@ -83,7 +85,7 @@ const MainSection = () => {
         }
 
         const data = await response.json();
-        console.log("data in discussion",data)
+        console.log("data in discussion", data)
         if (data.status && data.data) {
           setDiscussions(data.data);
         } else {

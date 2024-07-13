@@ -17,9 +17,15 @@ useEffect(()=>{
           if(!token){
             throw new Error ('Authentication not found')
           }
-          const response= await fetch('http://localhost:8080/student/all/notices',{
+          // const response= await fetch('http://localhost:8080/student/all/notices',{
+            const response= await fetch('http://localhost:8080/admin/all/notices',{
+
+            
+            
             headers:{
-              'Authorization': token
+              // 'Authorization': token
+              'Authentication': token
+
             }
           })
           if(!response.ok){

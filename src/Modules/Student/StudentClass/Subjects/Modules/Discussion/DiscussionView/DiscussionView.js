@@ -7,9 +7,16 @@ import useNavHeading from "../../../../../../../Hooks/CommonHooks/useNavHeading 
 import StudentDashLayout from "../../../../../../../Components/Student/StudentDashLayout";
 import Layout from "../../../../../../../Components/Common/Layout";
 // import useNavHeading from "../../../../../../Hooks/CommonHooks/useNavHeading ";
+import { useSelector } from "react-redux";
+
 const DiscussionView = () => {
     const { cid, sid } = useParams();
-    useNavHeading(cid, sid);
+    const subjectName = useSelector((store) => store.Common.selectedSubjectName);
+    const className = useSelector((store) => store.Common.selectedClassName);
+
+    // useNavHeading(cid, sid);
+    useNavHeading(className, subjectName);
+
   return (
     <Layout title={`Discussion View | Student Diwan`}>
       <StudentDashLayout  children={<MainSection/>} hideSearchbar={true} />

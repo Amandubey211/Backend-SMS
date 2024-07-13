@@ -24,13 +24,16 @@ const Library = () => {
       console.log("Fetching books...");
       try {
         const token = localStorage.getItem('student:token');
+        console.log("token is ",token)
         if (!token) {
           throw new Error('Authentication token not found');
         }
 
         const response = await fetch('http://localhost:8080/admin/all/book', {
           headers: {
-            'Authorization': token
+            // 'Authorization': token
+            'Authentication': token
+
           }
         });
 
@@ -176,3 +179,4 @@ const Library = () => {
 };
 
 export default Library;
+

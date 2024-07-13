@@ -40,7 +40,9 @@ const MainSection = () => {
           `http://localhost:8080/student/studentAssignment/${aid}`,
           {
             headers: {
-              Authorization: token,
+              // Authorization: token,
+              
+            'Authentication': token
             },
           }
         );

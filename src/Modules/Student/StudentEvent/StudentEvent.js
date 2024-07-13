@@ -38,10 +38,16 @@ const StudentEvent = () => {
           throw new Error('Authentication token not found');
         }
 
-        const response = await fetch('http://localhost:8080/student/all/events', {
+        // const response = await fetch('http://localhost:8080/student/all/events', {
+         
+          const response = await fetch('http://localhost:8080/admin/all/events', {
+
           headers: {
             // 'Authorization': `Bearer ${token}`
-            'Authorization': token
+            // 'Authorization': token
+            
+            'Authentication': token
+
           }
         });
 

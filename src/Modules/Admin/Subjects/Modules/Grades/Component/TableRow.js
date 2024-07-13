@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import React from "react";
 
 const TableRow = ({ student, onRowClick }) => {
@@ -6,70 +5,32 @@ const TableRow = ({ student, onRowClick }) => {
     <tr className="border-b hover:bg-gray-50 ">
       <td className="p-3 flex items-center cursor-pointer" onClick={onRowClick}>
         <img
-          src={student.avatar}
-          alt={student.name}
+          src={student?.profile || "https://avatars.githubusercontent.com/u/109097090?v=4"}
+          alt={student.studentName}
           className="w-10 h-10 rounded-full mr-3"
         />
         <div>
-          <div className="font-medium">{student.name}</div>
-          <div className="text-green-600">{student.section}</div>
+          <div className="font-medium">{student.studentName}</div>
+          <div className="text-green-600">{student.section || "Section 1"}</div>
         </div>
       </td>
-      <td className="p-3">{student.group}</td>
+      <td className="p-3">{student.group || "No Group"}</td>
       <td className="p-3 text-center">
         <div className="border text-pink-600 py-1 rounded-md">
-          {student.assignment}
+          {student.totalAssignmentsPoints } / {student.completedAssignmentsScore}
         </div>
       </td>
       <td className="p-3 text-center">
         <div className="border text-green-600 py-1 rounded-md">
-          {student.quizzes}
+          {student.totalQuizzes}/{student.completedQuizzes}
         </div>
       </td>
       <td className="p-3 text-center">
         <div className="border py-1  rounded-md">{student.attendance}</div>
       </td>
-      <td className="p-3 text-pink-600">{student.score}</td>
+      <td className="p-3 text-pink-600">{student.score}%</td>
     </tr>
   );
 };
 
 export default TableRow;
-=======
-import React from "react";
-
-const TableRow = ({ student, onRowClick }) => {
-  return (
-    <tr className="border-b hover:bg-gray-50 ">
-      <td className="p-3 flex items-center cursor-pointer" onClick={onRowClick}>
-        <img
-          src={student.profile}
-          alt={student.firstName}
-          className="w-10 h-10 rounded-full mr-3"
-        />
-        <div>
-          <div className="font-medium">{student.firstName} {student.lastName}</div>
-          <div className="text-green-600">{student.section}</div>
-        </div>
-      </td>
-      <td className="p-3">{student.group}</td>
-      <td className="p-3 text-center">
-        <div className="border text-pink-600 py-1 rounded-md">
-          {student.assignment}
-        </div>
-      </td>
-      <td className="p-3 text-center">
-        <div className="border text-green-600 py-1 rounded-md">
-          {student.quizzes}
-        </div>
-      </td>
-      <td className="p-3 text-center">
-        <div className="border py-1  rounded-md">{student.attendance}</div>
-      </td>
-      <td className="p-3 text-pink-600">{student.score}</td>
-    </tr>
-  );
-};
-
-export default TableRow;
->>>>>>> main

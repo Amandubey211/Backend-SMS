@@ -1,64 +1,56 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import axios from "axios";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-// import { setQuizzes } from "../../../../../Redux/Slices/Admin/QuizSlice";
 
 const useGetFilteredQuizzes = () => {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [quizzes, setQuizzes] = useState([]);
-  const dispatch = useDispatch();
+  const [state, setState] = useState({
+    loading: false,
+    error: null,
+    quizzes: [],
+  });
   const role = useSelector((store) => store.Auth.role);
-  const API_URL = process.env.REACT_APP_API_URL;
-  const { classId } = useParams();
-  const schoolId = useSelector((store) => store.Auth.schoolId);
+  const API_URL = useMemo(() => process.env.REACT_APP_API_URL, []);
+  const { cid } = useParams();
 
   const fetchFilteredQuizzes = useCallback(
     async (moduleId, chapterId, publish) => {
-      setLoading(true);
-      setError(null);
+      setState((prevState) => ({ ...prevState, loading: true, error: null }));
 
       try {
         const token = localStorage.getItem(`${role}:token`);
-        const params = {};
+        const params = {
+          ...(moduleId && { moduleId }),
+          ...(chapterId && { chapterId }),
+          ...(publish !== undefined && { publish }),
+        };
 
-        if (moduleId) params.moduleId = moduleId;
-        if (chapterId) params.chapterId = chapterId;
-        if (publish !== undefined) params.publish = publish;
+        const response = await axios.get(`${API_URL}/admin/quizzes/${cid}`, {
+          headers: { Authentication: token },
+          params,
+        });
 
-        const response = await axios.get(
-          `${API_URL}/quizzes/${classId}`,
-          {
-            headers: {
-              Authentication: token,
-            },
-            params: {
-              ...params,
-              schoolId,
-            },
-          }
-        );
-        
-        console.log(response.data);
-        if (response.data && response.data.success) {
-          setQuizzes(response.data.quizzes);
-        //   dispatch(setQuizzes(response.data.quizzes));
+        if (response.data?.success) {
+          setState({ loading: false, error: null, quizzes: response.data.quizzes });
         } else {
-          setError(response.data.msg || "Failed to fetch quizzes.");
+          setState((prevState) => ({
+            ...prevState,
+            loading: false,
+            error: response.data?.msg || "Failed to fetch quizzes.",
+          }));
         }
       } catch (err) {
-        setError(
-          err.response?.data?.message || "Error in fetching quizzes"
-        );
-      } finally {
-        setLoading(false);
+        setState((prevState) => ({
+          ...prevState,
+          loading: false,
+          error: err.response?.data?.message || "Error in fetching quizzes",
+        }));
       }
     },
-    [role, API_URL, classId, schoolId]
+    [role, API_URL, cid]
   );
 
-  return { loading, error, quizzes, fetchFilteredQuizzes };
+  return { ...state, fetchFilteredQuizzes };
 };
 
 export default useGetFilteredQuizzes;

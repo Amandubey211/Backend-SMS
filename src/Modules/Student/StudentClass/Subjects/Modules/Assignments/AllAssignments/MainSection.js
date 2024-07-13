@@ -10,7 +10,7 @@ import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 const MainSection = () => {
-  const { selectedClass, selectedSection,selectedSubject } = useSelector((state) => state.Common);
+  const { selectedClass, selectedSection, selectedSubject } = useSelector((state) => state.Common);
 
   const { cid, sid, subjectId } = useParams(); // Ensure subjectId is part of the route parameters
   const [assignments, setAssignments] = useState([]);
@@ -34,7 +34,9 @@ const MainSection = () => {
         // const response = await fetch(`http://localhost:8080/studentAssignment/class/${cid}/section/${sid}?subjectId=${subjectId}`, {
         const response = await fetch(`http://localhost:8080/student/studentAssignment/class/${selectedClass}/section/${selectedSection}?subjectId=${selectedSubject}`, {
           headers: {
-            'Authorization':  token,
+            // 'Authorization': token,
+
+            'Authentication': token
           },
         });
 
@@ -43,7 +45,7 @@ const MainSection = () => {
         }
 
         const data = await response.json();
-        console.log("data in assignment maisection",data)
+        console.log("data in assignment maisection", data)
         if (data.success && data.data) {
           setAssignments(data.data);
         } else {

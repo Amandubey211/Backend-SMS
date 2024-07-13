@@ -8,11 +8,12 @@ import { NavLink, useParams } from "react-router-dom";
 
 const DiscussionCard = ({ discussion }) => {
   const { sid, cid } = useParams();
+  console.log("discussion",discussion)
   return (
     <div className="p-4 bg-white shadow rounded-lg border flex flex-col">
       
       <div className="p-3">
-      <NavLink to={`/student_class/${sid}/pages/${discussion.id}/view`}>
+      <NavLink to={`/student_class/${cid}/section/${sid}/pages/${discussion._id}/view`}>
         <div className="flex items-center justify-center mb-4">
           <GoDiscussionClosed className="w-16 h-16 p-2 border rounded-full text-green-500" />
         </div>

@@ -1,148 +1,74 @@
-<<<<<<< HEAD
-import React, { useState } from "react";
-import CreateAssignmentForm from "./Component/CreateAssignmentForm";
+import React, { useState, useEffect, useCallback } from "react";
+import { useParams, useLocation } from "react-router-dom";
 import CreateAssignmentHeader from "./Component/CreateAssignmentHeader";
-import Editor from "../../../Component/Editor";
+import EditorComponent from "../../../Component/AdminEditor";
+import Sidebar from "../../../../../../Components/Common/Sidebar";
+import useCreateAssignment from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/createAssignment";
+import toast from "react-hot-toast";
+import CreateAssignmentForm from "./Component/CreateAssignmentForm";
+import AddNewCriteriaForm from "../../Rubric/Components/AddNewCriteriaForm";
+import useUpdateAssignment from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useUpdateAssignment";
 
-const MainSection = () => {
-  const [assignmentName, setAssignmentName] = useState("Monthly examination");
-  const [editorContent, setEditorContent] = useState("");
-  const [formState, setFormState] = useState({
-    points: "",
-    displayGrade: "",
-    submissionType: "",
-    submissionFormat: "",
-    allowedAttempts: "",
-    numberOfAttempts: "",
-    assignTo: "",
-    section: "",
-    dueDate: "",
-    availableFrom: "",
-    until: "",
-  });
-
-  const handleNameChange = (name) => {
-    setAssignmentName(name);
-  };
-
-  const handleEditorChange = (content) => {
-    setEditorContent(content);
-  };
-
-  const handleFormChange = (e) => {
-    const { name, value } = e.target;
-    setFormState((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleSave = () => {
-    const {
-      points,
-      displayGrade,
-      submissionType,
-      submissionFormat,
-      allowedAttempts,
-      numberOfAttempts,
-      assignTo,
-      section,
-      dueDate,
-      availableFrom,
-      until,
-    } = formState;
-
-    if (
-      assignmentName &&
-      editorContent &&
-      points &&
-      displayGrade &&
-      submissionType &&
-      submissionFormat &&
-      allowedAttempts &&
-      numberOfAttempts &&
-      assignTo &&
-      section &&
-      dueDate &&
-      availableFrom &&
-      until
-    ) {
-      console.log("Assignment Name:", assignmentName);
-      console.log("Editor Content:", editorContent);
-      console.log("Form Data:", formState);
-    } else {
-      console.log("Please fill out all required fields.");
-    }
-  };
-
-  return (
-    <>
-      <CreateAssignmentHeader onSave={handleSave} />
-      <div className="flex w-full">
-        <div className="w-[70%]">
-          <Editor
-            assignmentLabel="Assignment Name"
-            assignmentName={assignmentName}
-            editorContent={editorContent}
-            onNameChange={handleNameChange}
-            onEditorChange={handleEditorChange}
-          />
-        </div>
-        <div className="w-[30%]">
-          <CreateAssignmentForm
-            {...formState}
-            setDisplayGrade={(grade) =>
-              setFormState((prev) => ({ ...prev, displayGrade: grade }))
-            }
-            setSubmissionFormat={(format) =>
-              setFormState((prev) => ({ ...prev, submissionFormat: format }))
-            }
-            handleChange={handleFormChange}
-          />
-        </div>
-      </div>
-    </>
-  );
+const initialFormState = {
+  points: "",
+  displayGrade: "",
+  submissionType: "",
+  allowedAttempts: "",
+  numberOfAttempts: "",
+  assignTo: "",
+  section: "",
+  dueDate: "",
+  availableFrom: "",
+  until: "",
+  thumbnail: null,
+  moduleId: "",
+  chapterId: "",
 };
 
-export default MainSection;
-=======
-import React, { useState } from "react";
-import CreateAssignmentForm from "./Component/CreateAssignmentForm";
-import CreateAssignmentHeader from "./Component/CreateAssignmentHeader";
-import useCreateAssignment from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/createAssignment";
-import { useParams } from "react-router-dom";
-import EditorComponent from "../../../Component/AdminEditor";
-
 const MainSection = () => {
-  const [assignmentName, setAssignmentName] = useState("Monthly examination");
+  const { cid, sid } = useParams();
+  const location = useLocation();
+  const assignmentData = location.state?.assignment || {};
+
+  const [assignmentName, setAssignmentName] = useState("");
   const [editorContent, setEditorContent] = useState("");
-  const {cid,sid} = useParams()
-  const [formState, setFormState] = useState({
-    points: "",
-    displayGrade: "",
-    submissionType: "",
-    allowedAttempts: "",
-    numberOfAttempts: "",
-    assignTo: "",
-    section: "",
-    dueDate: "",
-    availableFrom: "",
-    until: "",
-    thumbnail: null,
-    moduleId: "",
-    chapterId: "",
-  });
+  const [formState, setFormState] = useState(initialFormState);
+  const [isSidebarOpen, setSidebarOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
-  const { loading, error, success, createAssignment } = useCreateAssignment();
+  const handleSidebarOpen = useCallback(() => setSidebarOpen(true), []);
+  const handleSidebarClose = useCallback(() => setSidebarOpen(false), []);
 
-  const handleNameChange = (name) => {
-    setAssignmentName(name);
-  };
+  const { createAssignment, loading: createLoading } = useCreateAssignment();
+  const { updateAssignment, loading: updateLoading } = useUpdateAssignment();
 
-  const handleEditorChange = (content) => {
-    setEditorContent(content);
-  };
+  useEffect(() => {
+    if (location.state && location.state.assignment) {
+      const assignment = location.state.assignment;
+      console.log(assignment)
+      setAssignmentName(assignment.name || "");
+      setEditorContent(assignment.content || "");
+      setIsEditing(true);
+      setFormState({
+        points: assignment.points || "",
+        displayGrade: assignment.grade || "",
+        submissionType: assignment.submissionType || "",
+        allowedAttempts: assignment.allowedAttempts || "",
+        numberOfAttempts: assignment.allowNumberOfAttempts || "",
+        assignTo: assignment.assignTo || "",
+        section: assignment.sectionId || "",
+        dueDate: assignment.dueDate || "",
+        availableFrom: assignment.availableFrom || "",
+        until: assignment.until || "",
+        thumbnail: assignment.thumbnail || null,
+        moduleId: assignment.moduleId || "",
+        chapterId: assignment.chapterId || "",
+      });
+    }
+  }, [location.state]);
+
+  const handleNameChange = (name) => setAssignmentName(name);
+  const handleEditorChange = (content) => setEditorContent(content);
 
   const handleFormChange = (e) => {
     const { name, value } = e.target;
@@ -167,23 +93,34 @@ const MainSection = () => {
       availableFrom: formState.availableFrom,
       until: formState.until,
       thumbnail: formState.thumbnail,
-      classId:cid,
-      subjectId:sid,
+      classId: cid,
+      subjectId: sid,
       moduleId: formState.moduleId,
       chapterId: formState.chapterId,
       publish,
     };
 
-    const result = await createAssignment(assignmentData);
-    if (result.success) {
-      console.log("Assignment created successfully:", result.data);
+    if (isEditing) {
+      const result = await updateAssignment(assignmentData);
+      if (result.success) {
+        toast.success("Assignment updated successfully");
+      } else {
+        toast.error("Failed to update assignment");
+      }
+    } else {
+      const result = await createAssignment(assignmentData);
+      if (result.success) {
+        toast.success("Assignment created successfully");
+      } else {
+        toast.error("Failed to create assignment");
+      }
     }
   };
 
   return (
-    <>
+    <div className="flex flex-col w-full">
       <CreateAssignmentHeader onSave={handleSave} />
-      <div className="flex w-full">
+      <div className="w-full flex">
         <div className="w-[70%]">
           <EditorComponent
             assignmentLabel="Assignment Name"
@@ -203,9 +140,15 @@ const MainSection = () => {
           />
         </div>
       </div>
-    </>
+      <Sidebar
+        isOpen={isSidebarOpen}
+        onClose={handleSidebarClose}
+        title="Add New Criteria"
+      >
+        <AddNewCriteriaForm />
+      </Sidebar>
+    </div>
   );
 };
 
 export default MainSection;
->>>>>>> main

@@ -24,7 +24,10 @@ console.log("selected subject id in syllabus",selectedSubjectId)
 
         const response = await fetch(`http://localhost:8080/admin/syllabus/${selectedSubjectId}/class/${cid}`, {
           headers: {
-            Authorization: token
+            // Authorization: token
+            
+            'Authentication': token
+
           }
         });
 

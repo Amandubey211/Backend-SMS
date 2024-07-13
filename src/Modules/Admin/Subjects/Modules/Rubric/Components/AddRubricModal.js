@@ -1,92 +1,3 @@
-<<<<<<< HEAD
-import React, { useEffect } from "react";
-import { HiOutlinePlus } from "react-icons/hi2";
-import RubricModalRow from "./RubricModalRow";
-import mockData from "./MockData/ModalData";
-
-const AddRubricModal = ({ isOpen, onClose, onAddCriteria }) => {
-  useEffect(() => {
-    if (isOpen) {
-      document.body.classList.add("overflow-hidden");
-    } else {
-      document.body.classList.remove("overflow-hidden");
-    }
-    return () => {
-      document.body.classList.remove("overflow-hidden");
-    };
-  }, [isOpen]);
-
-  return (
-    <div
-      className={`fixed inset-0 flex items-end justify-center bg-black bg-opacity-50 z-20 transition-opacity duration-300 ${
-        isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
-      }`}
-    >
-      <div
-        className={`bg-white w-full p-3 h-[97vh] rounded-t-lg shadow-lg transform transition-transform duration-300 ${
-          isOpen ? "translate-y-0" : "translate-y-full"
-        }`}
-      >
-        <div className="flex justify-between items-center p-1">
-          <h2 className="text-lg font-semibold">Add Rubric</h2>
-          <button
-            onClick={onClose}
-            className="text-gray-600 text-3xl hover:text-gray-900"
-          >
-            &times;
-          </button>
-        </div>
-        <div className="p-2">
-          <label className="block mb-2 text-sm text-gray-700">Rubric Name</label>
-          <input
-            type="text"
-            className="block w-full p-2 border rounded-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-            placeholder="Type here"
-          />
-        </div>
-        <div className="m-2 overflow-auto border h-[47vh]"> {/* Set a fixed height and make it scrollable */}
-          <div className="flex px-4 font-semibold justify-between items-center p-2 w-full  bg-gradient-to-r from-pink-100 to-purple-100">
-            <div className="w-2/8 bg-gradient-to-r from-red-500 to-purple-500 bg-clip-text text-transparent">Criteria</div>
-            <div className="w-2/8 bg-gradient-to-r from-red-500 to-purple-500 bg-clip-text text-transparent">Ratings</div>
-            <div className="w-2/8 bg-gradient-to-r from-red-500 to-purple-500 bg-clip-text text-transparent">Point</div>
-          </div>
-          {mockData.map((item, index) => (
-            <RubricModalRow key={index} data={item} />
-          ))}
-        </div>
-        <div className="flex justify-between items-center p-4 border-t">
-          <button
-            onClick={onAddCriteria}
-            className="flex items-center gap-2 font-semibold p-2 rounded-md bg-gradient-to-r from-pink-100 to-purple-100 hover:shadow-md transition-shadow duration-300"
-          >
-            <HiOutlinePlus className="text-red-600 text-2xl" />
-            <span className="bg-gradient-to-r from-red-500 to-purple-500 bg-clip-text text-transparent">Add Criteria</span>
-          </button>
-          <div className="text-transparent text-xl font-bold bg-clip-text bg-gradient-to-r from-pink-500 to-purple-500">
-            Total Points :100
-          </div>
-        </div>
-        <div className="p-4 border-t flex justify-end space-x-4">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 border  rounded-md hover:bg-gray-100 transition-colors duration-300"
-          >
-            Cancel
-          </button>
-          <button
-            // onClick={onAddCriteria}
-            className="flex items-center gap-2 font-semibold p-2 rounded-md bg-gradient-to-r from-pink-100 to-purple-100 hover:shadow-md transition-shadow duration-300"
-          >
-            <span className="bg-gradient-to-r from-red-500 to-purple-500 bg-clip-text text-transparent">Add To Assignment</span>
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default AddRubricModal;
-=======
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import { HiOutlinePlus } from "react-icons/hi2";
 import RubricModalRow from "./RubricModalRow";
@@ -95,6 +6,7 @@ import useCreateRubric from "../../../../../../Hooks/AuthHooks/Staff/Admin/Rubri
 import toast from "react-hot-toast";
 import useGetFilteredAssignments from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useGetFilteredAssignments";
 import { useParams } from "react-router-dom";
+import useGetFilteredQuizzes from "../../../../../../Hooks/AuthHooks/Staff/Admin/Quiz/useGetFilteredQuizzes";
 
 const AddRubricModal = ({
   isOpen,
@@ -103,19 +15,31 @@ const AddRubricModal = ({
   criteriaList,
   setCriteriaList,
   onEditCriteria,
+  type,
 }) => {
   const [assignment, setAssignment] = useState("");
+  const [quiz, setQuiz] = useState("");
   const [rubricName, setRubricName] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [dropdownOpen2, setDropdownOpen2] = useState(false);
+
   const dropdownRef = useRef(null);
+  const dropdownRef2 = useRef(null);
 
   const { createRubric, loading: createLoading } = useCreateRubric();
   const { fetchFilteredAssignments, assignments } = useGetFilteredAssignments();
+  const { fetchFilteredQuizzes, quizzes } = useGetFilteredQuizzes();
+
   const { sid } = useParams();
   
   useEffect(() => {
-    fetchFilteredAssignments(sid);
-  }, [fetchFilteredAssignments, sid]);
+    if (type !== "quiz") {
+      fetchFilteredAssignments(sid);
+    }
+    if (type !== "assignment") {
+      fetchFilteredQuizzes();
+    }
+  }, [fetchFilteredAssignments, sid, fetchFilteredQuizzes, type]);
 
   useEffect(() => {
     document.body.classList.toggle("overflow-hidden", isOpen);
@@ -127,15 +51,23 @@ const AddRubricModal = ({
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setDropdownOpen(false);
       }
+      if (dropdownRef2.current && !dropdownRef2.current.contains(event.target)) {
+        setDropdownOpen2(false);
+      }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleSelectChange = (id) => {
+  const handleSelectAssignmentChange = (id) => {
     setAssignment(id);
     setDropdownOpen(false);
+  };
+
+  const handleSelectQuizChange = (id) => {
+    setQuiz(id);
+    setDropdownOpen2(false);
   };
 
   const handleAddRating = (criteriaIndex, ratings) => {
@@ -161,7 +93,7 @@ const AddRubricModal = ({
       );
     }, 0);
 
-    if (totalScore > selectedAssignment.points) {
+    if (totalScore > (selectedAssignment?.points || 0)) {
       toast.error("Total points cannot exceed the assignment's points.");
       return;
     }
@@ -170,6 +102,7 @@ const AddRubricModal = ({
       name: rubricName,
       criteria: criteriaList,
       assignmentId: assignment,
+      quizId: quiz,
       totalScore,
     };
 
@@ -205,21 +138,40 @@ const AddRubricModal = ({
               placeholder="Type here"
             />
           </div>
-          <div className="p-2 flex-1 relative" ref={dropdownRef}>
-            <label className="block text-gray-700 mb-1">Assignment</label>
-            <div className="block w-full pl-3 pr-10 py-2 text-base border rounded-md cursor-pointer focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" onClick={() => setDropdownOpen(!dropdownOpen)}>
-              {assignments.find((a) => a._id === assignment)?.name || "Select"}
+          {(type === "assignment" || !type) && (
+            <div className="p-2 flex-1 relative" ref={dropdownRef}>
+              <label className="block text-gray-700 mb-1">Assignment</label>
+              <div className="block w-full pl-3 pr-10 py-2 text-base border rounded-md cursor-pointer focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" onClick={() => setDropdownOpen(!dropdownOpen)}>
+                {assignments.find((a) => a._id === assignment)?.name || "Select"}
+              </div>
+              {dropdownOpen && (
+                <ul className="absolute left-0 right-0 mt-2 max-h-72 overflow-auto bg-white border rounded-md shadow-lg z-10 py-2">
+                  {assignments.map((assignment) => (
+                    <li key={assignment._id} onClick={() => handleSelectAssignmentChange(assignment._id)} className="px-4 py-2 hover:bg-gray-100 transition duration-300 transform cursor-pointer hover:translate-x-[-8px] ps-6">
+                      {assignment.name}
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
-            {dropdownOpen && (
-              <ul className="absolute left-0 right-0 mt-2 max-h-72 overflow-auto bg-white border rounded-md shadow-lg z-10 py-2">
-                {assignments.map((assignment) => (
-                  <li key={assignment._id} onClick={() => handleSelectChange(assignment._id)} className="px-4 py-2 hover:bg-gray-100 transition duration-300 transform cursor-pointer hover:translate-x-[-8px] ps-6">
-                    {assignment.name}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
+          )}
+          {(type === "quiz" || !type) && (
+            <div className="p-2 flex-1 relative" ref={dropdownRef2}>
+              <label className="block text-gray-700 mb-1">Quizzes</label>
+              <div className="block w-full pl-3 pr-10 py-2 text-base border rounded-md cursor-pointer focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" onClick={() => setDropdownOpen2(!dropdownOpen2)}>
+                {quizzes.find((q) => q._id === quiz)?.name || "Select"}
+              </div>
+              {dropdownOpen2 && (
+                <ul className="absolute left-0 right-0 mt-2 max-h-72 overflow-auto bg-white border rounded-md shadow-lg z-10 py-2">
+                  {quizzes.map((quiz) => (
+                    <li key={quiz._id} onClick={() => handleSelectQuizChange(quiz._id)} className="px-4 py-2 hover:bg-gray-100 transition duration-300 transform cursor-pointer hover:translate-x-[-8px] ps-6">
+                      {quiz.name}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="m-2 overflow-auto border h-[47vh]">
@@ -269,4 +221,3 @@ const AddRubricModal = ({
 };
 
 export default AddRubricModal;
->>>>>>> main
