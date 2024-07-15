@@ -12,6 +12,7 @@ const useFetchClassGrades = () => {
   const API_URL = process.env.REACT_APP_API_URL;
   const { role } = useSelector((store) => store.Auth);
   const { cid, sid } = useParams();
+
   const fetchClassGrades = useCallback(
     async (
       moduleId = null,
@@ -31,8 +32,8 @@ const useFetchClassGrades = () => {
             params: { moduleId, assignmentId, quizId, studentId },
           }
         );
-        console.log(response.data.gradesResult);
-        if (response.data) {
+
+        if (response.data.success) {
           setGrades(response.data.gradesResult);
         } else {
           toast.error("Failed to fetch grades");
@@ -47,7 +48,7 @@ const useFetchClassGrades = () => {
         setLoading(false);
       }
     },
-    [role, API_URL]
+    [role, API_URL, cid, sid]
   );
 
   return { loading, error, fetchClassGrades, grades };

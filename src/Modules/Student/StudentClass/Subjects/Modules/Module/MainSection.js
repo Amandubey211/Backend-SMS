@@ -14,7 +14,11 @@ import { useSelector } from "react-redux";
 const MainSection = () => {
   const [expandedChapters, setExpandedChapters] = useState([]);
   const [classData, setClassData] = useState(null);
-
+  
+  const selectedClass = useSelector(state => state.Common.selectedClass);
+  const selectedSubjectId = useSelector(state => state.Common.selectedSubject);
+  const selectedSection = useSelector(state => state.Common.selectedSection);
+  const studentId = useSelector(state => state.Common.studentId);
   useEffect(() => {
     const fetchClassData = async () => {
       try {
@@ -24,8 +28,10 @@ const MainSection = () => {
         }
 
         const response = await fetch('http://localhost:8080/student/my_class', {
+          // const response = await fetch(`http://localhost:8080/admin/student/classes/${selectedClass}/modules/${selectedSubject}`, {
+        //http://localhost:8080/admin/student/classes/6672d55a57740d7dd939f72a/modules/667e76376c30078298d1e048        
           headers: {
-            'Authorization': token,
+            'Authentication': token,
           },
         });
 
@@ -34,7 +40,7 @@ const MainSection = () => {
         }
 
         const data = await response.json();
-        console.log("data in mainsection module",data)
+        console.log("data in mainsection module", data)
         if (data.status && data.data) {
           setClassData(data.data);
         } else {
@@ -55,10 +61,7 @@ const MainSection = () => {
         : [...prev, chapterId]
     );
   };
-  const selectedClass = useSelector(state => state.Common.selectedClass);
-  const selectedSubjectId = useSelector(state => state.Common.selectedSubject);
-  const selectedSection = useSelector(state => state.Common.selectedSection);
-  const studentId = useSelector(state => state.Common.studentId);
+ 
   console.log("Selected Subject ID from Redux:", selectedSubjectId);
   console.log("Selected  section from Redux:", selectedSection);
   console.log("studentId from Redux:", studentId);
@@ -66,7 +69,7 @@ const MainSection = () => {
   if (!classData) {
     return <div>Loading...</div>;
   }
-  console.log("classData._id is",selectedClass)
+  console.log("classData._id is", selectedClass)
 
   // const { subjects } = classData;
 
@@ -82,8 +85,8 @@ const MainSection = () => {
       <div className="w-[60%] bg-white p-2 border-l">
         <div className="bg-white p-2 rounded-lg">
           <div className="flex justify-between items-center mb-5">
-          <h1 className="text-md font-semibold">{selectedSubject.subjectName || "Subject"}</h1>
-          {/* <h1 className="text-md font-semibold">{subjects[0]?.subjectName || "Subject"}</h1> */}
+            <h1 className="text-md font-semibold">{selectedSubject.subjectName || "Subject"}</h1>
+            {/* <h1 className="text-md font-semibold">{subjects[0]?.subjectName || "Subject"}</h1> */}
           </div>
           {/* {subjects[0]?.modules.map((module, index) => (
             <Chapter
@@ -97,7 +100,7 @@ const MainSection = () => {
             />
           ))} */}
 
-{selectedSubject.modules.map((module, index) => (
+          {selectedSubject.modules.map((module, index) => (
             <Chapter
               key={index}
               title={module.name}
@@ -124,7 +127,7 @@ const MainSection = () => {
             </p>
           </div>
           <div className="grid grid-cols-1 gap-2">
-          {selectedSubject.modules.map((module, index) => (
+            {selectedSubject.modules.map((module, index) => (
               <ModuleCard
                 key={index}
                 title={module.name}

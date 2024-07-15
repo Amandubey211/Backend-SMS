@@ -19,6 +19,7 @@ import StudentGradePieChart from "./DashBoardComponents/Charts/StudentGradePieCh
 import TaskCompletionChart from "./DashBoardComponents/Charts/TaskCompletionChart.js";
 import StudentRecentGradeTable from "./DashBoardComponents/StudentRecentGradeTable.js";
 import StudentDashFeeCard from "./DashBoardComponents/StudentDashFeeCard.js";
+import AttendanceDashboard from "./DashBoardComponents/Charts/AttendanceDashboard.js";
 
 const StudentMainSection = () => {
   return (
@@ -40,7 +41,8 @@ const StudentMainSection = () => {
           <div className="w-[70%] flex flex-col flex-wrap border p-2">
             <div className="    w-full border   ">
               <div className=" border  px-32    w-full ">
-                <AttendanceChart />
+                {/* <AttendanceChart /> */}
+                <AttendanceDashboard/>
               </div>
             </div>
             <div className="p-10 gap-3 border  flex flex-row  items-center  justify-around ">

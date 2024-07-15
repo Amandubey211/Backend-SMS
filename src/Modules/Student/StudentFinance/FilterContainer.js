@@ -26,7 +26,7 @@ console.log("feetype",feesTypes)
       />
       <div className="flex justify-between gap-3">
         {/*  📌 check ->change later as per paid and unpaid later  */}
-        {["Everyone", "paid", "unpaid"].map((status) => (
+        {["Everyone", "Paid", "Unpaid"].map((status) => (
           <div key={status} className="">
             <label className="flex items-center cursor-pointer">
               <input

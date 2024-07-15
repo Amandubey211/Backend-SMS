@@ -1,6 +1,6 @@
 
 
-import React, { useState, useMemo ,useEffect} from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import BookCard from "../SubClass/component/BookCard";
 import Layout from "../../../../Components/Common/Layout";
 import StudentDashLayout from "../../../../Components/Student/StudentDashLayout";
@@ -24,13 +24,14 @@ const Library = () => {
       console.log("Fetching books...");
       try {
         const token = localStorage.getItem('student:token');
+        console.log("token is ",token)
         if (!token) {
           throw new Error('Authentication token not found');
         }
 
         const response = await fetch('http://localhost:8080/admin/all/book', {
           headers: {
-            'Authorization': token
+            'Authentication': token
           }
         });
 
@@ -47,7 +48,7 @@ const Library = () => {
             classLevel: book.name,
             category: book.name,
             available: book.copies,
-          
+
           }));
           console.log("Formatted books:", formattedBooks);
           setBooks(formattedBooks);
@@ -176,3 +177,4 @@ const Library = () => {
 };
 
 export default Library;
+

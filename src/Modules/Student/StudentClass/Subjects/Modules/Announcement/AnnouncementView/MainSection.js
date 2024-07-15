@@ -24,7 +24,7 @@ const MainSection = () => {
 
         const response = await fetch(`http://localhost:8080/admin/announcement/${aid}`, {
           headers: {
-            Authorization:token
+            Authentication: token
           }
         });
 
@@ -33,7 +33,7 @@ const MainSection = () => {
         }
 
         const data = await response.json();
-        console.log("announcement view",data)
+        console.log("announcement view", data)
         if (data.status) {
           setAnnouncement(data.data);
         } else {

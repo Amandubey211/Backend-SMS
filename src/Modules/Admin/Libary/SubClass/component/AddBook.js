@@ -9,10 +9,11 @@ const AddBook = () => {
     bookName: "",
     authorName: "",
     class: "",
-    category: "History", 
+    category: "History",
     copies: "",
     bookImage: null,
   });
+
   const classOptions = [
     { value: "Ten", label: "Ten" },
     { value: "Nine", label: "Nine" },
@@ -44,13 +45,47 @@ const AddBook = () => {
       }));
     }
   };
+
   const handleRemoveImage = () => {
     setImagePreview(null);
+    setBookData((prev) => ({
+      ...prev,
+      bookImage: null,
+    }));
   };
-  const handleSubmit = (e) => {
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Book data to submit:", bookData);
-    // Implement submission logic here
+    const token = localStorage.getItem('admin:token');
+
+    const formData = new FormData();
+    formData.append("name", bookData.bookName);
+    formData.append("author", bookData.authorName);
+    formData.append("classId", bookData.class);
+    formData.append("subjectId", bookData.category);
+    formData.append("copies", bookData.copies);
+    if (bookData.bookImage) {
+      formData.append("image", bookData.bookImage);
+    }
+
+    try {
+      const response = await fetch("http://localhost:8080/admin/add_book", {
+        method: "POST",
+        headers: {
+          Authentication: `${token}`,
+        },
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to add book");
+      }
+
+      const result = await response.json();
+      console.log("Book added successfully:", result);
+    } catch (error) {
+      console.error("Error adding book:", error);
+    }
   };
 
   return (
@@ -59,7 +94,7 @@ const AddBook = () => {
       style={{ maxHeight: "90vh" }}
     >
       <form className="space-y-4" onSubmit={handleSubmit}>
-        <div className="image-upload-container  ">
+        <div className="image-upload-container">
           <ImageUpload
             imagePreview={imagePreview}
             handleImageChange={handleImageChange}

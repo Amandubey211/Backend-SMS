@@ -18,7 +18,7 @@ import StudentDashLayout from "../../../Components/Student/StudentDashLayout";
 import EventCard from "./Events/subComponents/EventCard";
 import Sidebar from "../../../Components/Common/Sidebar";
 import ViewEvent from "./Events/subComponents/ViewEvent";
-import "./Events/subComponents/customCalendar.css"; 
+import "./Events/subComponents/customCalendar.css";
 
 const StudentEvent = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -33,15 +33,18 @@ const StudentEvent = () => {
       console.log("Fetching events...");
       try {
         const token = localStorage.getItem('student:token');
-        console.log("token in student event ",token)
+        console.log("token in student event ", token)
         if (!token) {
           throw new Error('Authentication token not found');
         }
 
-        const response = await fetch('http://localhost:8080/student/all/events', {
+        // const response = await fetch('http://localhost:8080/student/all/events', {
+         
+          const response = await fetch('http://localhost:8080/admin/all/events', {
+
           headers: {
-            // 'Authorization': `Bearer ${token}`
-            'Authorization': token
+            // 'Authentication': `Bearer ${token}`
+            'Authentication': token
           }
         });
 
@@ -51,7 +54,7 @@ const StudentEvent = () => {
         }
         const data = await response.json();
         console.log("Data parsed:", data);
-        
+
         if (data.success && data.events) {
           const formattedEvents = data.events.map(event => ({
             ...event,

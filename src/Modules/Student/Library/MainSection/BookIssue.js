@@ -1,4 +1,4 @@
-import React, { useState, useEffect ,useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Layout from "../../../../Components/Common/Layout";
 import DashLayout from "../../../../Components/Admin/AdminDashLayout";
 import Sidebar from "../../../../Components/Common/Sidebar";
@@ -22,7 +22,7 @@ const BookIssue = () => {
     const { name, value } = e.target;
     setFilters((prev) => ({ ...prev, [name]: value }));
   };
- 
+
   useEffect(() => {
     const fetchBookIssues = async () => {
       console.log("Fetching book issues...");
@@ -33,9 +33,12 @@ const BookIssue = () => {
           throw new Error('Authentication token not found');
         }
 
-        const response = await fetch('http://localhost:8080/student/issue/books', {
+        // const response = await fetch('http://localhost:8080/student/issue/books', {
+          const response = await fetch(' http://localhost:8080/admin/all/bookIssue/', {
+
+          
           headers: {
-            'Authorization': token
+            'Authentication': token
           }
         });
 
@@ -59,7 +62,7 @@ const BookIssue = () => {
     fetchBookIssues();
   }, []);
 
-  
+
   // const classLevels = useMemo(() => {
   //   const levels = bookIssueData.map((book) => book.classLevel.toString());
   //   return Array.from(new Set(levels));

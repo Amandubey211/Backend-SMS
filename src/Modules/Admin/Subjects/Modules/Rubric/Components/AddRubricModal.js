@@ -6,6 +6,7 @@ import useCreateRubric from "../../../../../../Hooks/AuthHooks/Staff/Admin/Rubri
 import toast from "react-hot-toast";
 import useGetFilteredAssignments from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useGetFilteredAssignments";
 import { useParams } from "react-router-dom";
+import useGetFilteredQuizzes from "../../../../../../Hooks/AuthHooks/Staff/Admin/Quiz/useGetFilteredQuizzes";
 
 const AddRubricModal = ({
   isOpen,
@@ -14,19 +15,31 @@ const AddRubricModal = ({
   criteriaList,
   setCriteriaList,
   onEditCriteria,
+  type,
 }) => {
   const [assignment, setAssignment] = useState("");
+  const [quiz, setQuiz] = useState("");
   const [rubricName, setRubricName] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [dropdownOpen2, setDropdownOpen2] = useState(false);
+
   const dropdownRef = useRef(null);
+  const dropdownRef2 = useRef(null);
 
   const { createRubric, loading: createLoading } = useCreateRubric();
   const { fetchFilteredAssignments, assignments } = useGetFilteredAssignments();
+  const { fetchFilteredQuizzes, quizzes } = useGetFilteredQuizzes();
+
   const { sid } = useParams();
   
   useEffect(() => {
-    fetchFilteredAssignments(sid);
-  }, [fetchFilteredAssignments, sid]);
+    if (type !== "quiz") {
+      fetchFilteredAssignments(sid);
+    }
+    if (type !== "assignment") {
+      fetchFilteredQuizzes();
+    }
+  }, [fetchFilteredAssignments, sid, fetchFilteredQuizzes, type]);
 
   useEffect(() => {
     document.body.classList.toggle("overflow-hidden", isOpen);
@@ -38,15 +51,23 @@ const AddRubricModal = ({
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setDropdownOpen(false);
       }
+      if (dropdownRef2.current && !dropdownRef2.current.contains(event.target)) {
+        setDropdownOpen2(false);
+      }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleSelectChange = (id) => {
+  const handleSelectAssignmentChange = (id) => {
     setAssignment(id);
     setDropdownOpen(false);
+  };
+
+  const handleSelectQuizChange = (id) => {
+    setQuiz(id);
+    setDropdownOpen2(false);
   };
 
   const handleAddRating = (criteriaIndex, ratings) => {
@@ -72,7 +93,7 @@ const AddRubricModal = ({
       );
     }, 0);
 
-    if (totalScore > selectedAssignment.points) {
+    if (totalScore > (selectedAssignment?.points || 0)) {
       toast.error("Total points cannot exceed the assignment's points.");
       return;
     }
@@ -81,6 +102,7 @@ const AddRubricModal = ({
       name: rubricName,
       criteria: criteriaList,
       assignmentId: assignment,
+      quizId: quiz,
       totalScore,
     };
 
@@ -116,21 +138,40 @@ const AddRubricModal = ({
               placeholder="Type here"
             />
           </div>
-          <div className="p-2 flex-1 relative" ref={dropdownRef}>
-            <label className="block text-gray-700 mb-1">Assignment</label>
-            <div className="block w-full pl-3 pr-10 py-2 text-base border rounded-md cursor-pointer focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" onClick={() => setDropdownOpen(!dropdownOpen)}>
-              {assignments.find((a) => a._id === assignment)?.name || "Select"}
+          {(type === "assignment" || !type) && (
+            <div className="p-2 flex-1 relative" ref={dropdownRef}>
+              <label className="block text-gray-700 mb-1">Assignment</label>
+              <div className="block w-full pl-3 pr-10 py-2 text-base border rounded-md cursor-pointer focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" onClick={() => setDropdownOpen(!dropdownOpen)}>
+                {assignments.find((a) => a._id === assignment)?.name || "Select"}
+              </div>
+              {dropdownOpen && (
+                <ul className="absolute left-0 right-0 mt-2 max-h-72 overflow-auto bg-white border rounded-md shadow-lg z-10 py-2">
+                  {assignments.map((assignment) => (
+                    <li key={assignment._id} onClick={() => handleSelectAssignmentChange(assignment._id)} className="px-4 py-2 hover:bg-gray-100 transition duration-300 transform cursor-pointer hover:translate-x-[-8px] ps-6">
+                      {assignment.name}
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
-            {dropdownOpen && (
-              <ul className="absolute left-0 right-0 mt-2 max-h-72 overflow-auto bg-white border rounded-md shadow-lg z-10 py-2">
-                {assignments.map((assignment) => (
-                  <li key={assignment._id} onClick={() => handleSelectChange(assignment._id)} className="px-4 py-2 hover:bg-gray-100 transition duration-300 transform cursor-pointer hover:translate-x-[-8px] ps-6">
-                    {assignment.name}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
+          )}
+          {(type === "quiz" || !type) && (
+            <div className="p-2 flex-1 relative" ref={dropdownRef2}>
+              <label className="block text-gray-700 mb-1">Quizzes</label>
+              <div className="block w-full pl-3 pr-10 py-2 text-base border rounded-md cursor-pointer focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" onClick={() => setDropdownOpen2(!dropdownOpen2)}>
+                {quizzes.find((q) => q._id === quiz)?.name || "Select"}
+              </div>
+              {dropdownOpen2 && (
+                <ul className="absolute left-0 right-0 mt-2 max-h-72 overflow-auto bg-white border rounded-md shadow-lg z-10 py-2">
+                  {quizzes.map((quiz) => (
+                    <li key={quiz._id} onClick={() => handleSelectQuizChange(quiz._id)} className="px-4 py-2 hover:bg-gray-100 transition duration-300 transform cursor-pointer hover:translate-x-[-8px] ps-6">
+                      {quiz.name}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="m-2 overflow-auto border h-[47vh]">
