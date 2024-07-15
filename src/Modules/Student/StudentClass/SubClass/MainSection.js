@@ -84,7 +84,7 @@ import { useParams } from "react-router-dom";
 import { FaSchool } from "react-icons/fa";
 import { SlEyeglass } from "react-icons/sl";
 import { FcGraduationCap, FcCalendar } from "react-icons/fc";
-import { setSelectedClass, setSelectedSection, setSelectedSubject } from "../../../../Redux/Slices/Common/CommonSlice";
+import { setSelectedClass, setSelectedClassName, setSelectedSubjectName,setSelectedSection, setSelectedSubject } from "../../../../Redux/Slices/Common/CommonSlice";
 
 const colors = [
   "bg-yellow-300",
@@ -125,9 +125,12 @@ const MainSection = () => {
 
         const data = await response.json();
         console.log("data is in main section sub class  ", data);
+        console.log("classnameesss ", data.data.className);
+
         if (data.status && data.data) {
           setClassData(data.data);
           dispatch(setSelectedClass(data.data.classId));
+          dispatch(setSelectedClassName(data.data.className))
           dispatch(setSelectedSection(data.data.section.sectionId));
         } else {
           console.error("No class data or unsuccessful response");
@@ -140,9 +143,13 @@ const MainSection = () => {
     fetchClassData();
   }, [cid]);
 
-  const handleSubjectClick = (subjectId) => {
+  const handleSubjectClick = ({subjectId,subjectName}) => {
+    // const handleSubjectClick = (subjectId) => {
     console.log("Subject ID clicked:", subjectId);
+    console.log("Subject NAME clicked:", subjectName);
+
     dispatch(setSelectedSubject(subjectId));
+    dispatch(setSelectedSubjectName(subjectName))
   };
 
   if (!classData) {

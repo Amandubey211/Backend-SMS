@@ -24,6 +24,7 @@ const Library = () => {
       console.log("Fetching books...");
       try {
         const token = localStorage.getItem('student:token');
+        console.log("token is ",token)
         if (!token) {
           throw new Error('Authentication token not found');
         }
@@ -176,3 +177,4 @@ const Library = () => {
 };
 
 export default Library;
+

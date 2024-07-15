@@ -18,7 +18,7 @@ const FeeTable = ({ feesDetails }) => {
         {feesDetails.map((item, index) => (
           <tr key={index} className="text-left text-gray-700">
             <td className="px-5 py-2 border-b border-gray-200">{item.feeType}</td>
-            <td className="px-5 py-2 border-b border-gray-200">{item.studentId.fullName}</td>
+            {/* <td className="px-5 py-2 border-b border-gray-200">{item.studentId.fullName}</td> */}
             <td className="px-5 py-2 border-b border-gray-200">{item.dueDate}</td>
             <td className="px-5 py-2 border-b border-gray-200">{item.amount} QR</td>
             <td className="px-5 py-2 border-b border-gray-200">

@@ -11,7 +11,6 @@ import Tabs from './Components/Tabs';
 import { useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
-
 const MainSection = ({ quiz }) => {
   const quizId = quiz._id;
   const { selectedClass, selectedSection, selectedSubject, studentId } = useSelector((state) => state.Common);
@@ -33,7 +32,6 @@ const MainSection = ({ quiz }) => {
     setQuizStarted(true);
   };
 
-
   useEffect(() => {
     let timer;
     if (quizStarted && timeLeft > 0) {
@@ -52,7 +50,6 @@ const MainSection = ({ quiz }) => {
 
     return () => clearInterval(timer);
   }, [quizStarted]);
-
 
   useEffect(() => {
     const fetchAttemptHistory = async () => {
@@ -79,7 +76,9 @@ const MainSection = ({ quiz }) => {
         console.log("atttempt data", data)
         if (data.success && data.submission) {
           setAttemptHistory(data.submission);
+          setQuizSubmitted(data.submission.length > 0);
         } else {
+          setQuizSubmitted(false); // Reset to false if no submission found
           console.error("No attempt history data or unsuccessful response");
         }
       } catch (error) {
@@ -89,7 +88,6 @@ const MainSection = ({ quiz }) => {
 
     fetchAttemptHistory();
   }, [quizId]);
-
 
   const submitQuiz = async (answers, timeTaken) => {
     console.log("answers⌚⌚", answers)
@@ -111,8 +109,8 @@ const MainSection = ({ quiz }) => {
       });
 
       const data = await response.json();
+      console.log("data is ",data)
       if (response.ok) {
-        console.log('Quiz submitted successfully:', data);
         setQuizSubmitted(true);
         setQuizResults({
           totalPoints: data.score,
@@ -120,7 +118,6 @@ const MainSection = ({ quiz }) => {
           wrongAnswers: data.wrongAnswer,
         });
 
-        // Update the attempt history with the new submission
         setAttemptHistory(prev => [
           ...prev,
           {
@@ -132,14 +129,12 @@ const MainSection = ({ quiz }) => {
           }
         ]);
       } else {
-        console.error('Failed to submit quiz:', data.msg);
+        console.error('Failed to submit quiz:', data.message);
       }
     } catch (error) {
       console.error('Error submitting quiz:', error);
     }
   };
-
-
 
   const handleOptionChange = (questionIndex, selectedOption) => {
     setSelectedOptions((prev) => ({
@@ -148,22 +143,32 @@ const MainSection = ({ quiz }) => {
     }));
   };
 
-
-
+  const handleTabChange = useCallback((tab) => {
+    if (tab === 'questions') {
+      if (quizSubmitted) {
+        setSelectedOptions({});
+        setTimeLeft(quizDuration);
+        setQuizResults({ totalPoints: 0, correctAnswers: 0, wrongAnswers: 0 });
+      }
+      if (!quizStarted) {
+        startTimer();
+      }
+    } else {
+      // Reset quizSubmitted and other states when switching to 'instructions'
+      setQuizSubmitted(false);
+      setSelectedOptions({});
+      setQuizResults({ totalPoints: 0, correctAnswers: 0, wrongAnswers: 0 });
+      setQuizStarted(false); // Stop the timer
+    }
+    setActiveTab(tab);
+  }, [quizSubmitted, quizDuration, quizStarted]);
 
   const handleSubmit = useCallback(() => {
-    console.log('🔖🔖🔖🔖handlebutton is clicked 📌📌📌📌📌📌');
     let totalPoints = 0;
     let correctAnswers = 0;
     let wrongAnswers = 0;
     const questionsWithSelectedOptions = quiz.questions.map((question, index) => {
-      const correctOption = question.options.find((option) => option.isCorrect);
-      console.log("🛜correctOption:🛜", correctOption);
-
       const selectedOption = selectedOptions[index];
-      console.log("🛜selectedOption:🛜", selectedOption);
-
-      // const isCorrect = correctOption && selectedOption === correctOption.value;
       const isCorrect = selectedOption && selectedOption === question.correctAnswer;
       // console.log("Question data💻:", isCorrect);
 
@@ -175,7 +180,6 @@ const MainSection = ({ quiz }) => {
       if (selectedOption) {
         if (isCorrect) {
           correctAnswers += 1;
-          // totalPoints += question.points;
           totalPoints += question.questionPoint;
         } else {
           wrongAnswers += 1;
@@ -220,16 +224,7 @@ const MainSection = ({ quiz }) => {
 
 
   const hasAttempted = attemptHistory.length > 0;
-  console.log('MainSection Rendered: ', {
-    activeTab,
-    selectedOptions,
-    totalTime,
-    timeLeft,
-    quizStarted,
-    quizSubmitted,
-    quizResults,
-    attemptHistory,
-  });
+
   return (
     <div className="flex">
       <SubjectSideBar />

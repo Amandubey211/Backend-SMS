@@ -33,7 +33,10 @@ const BookIssue = () => {
           throw new Error('Authentication token not found');
         }
 
-        const response = await fetch('http://localhost:8080/student/issue/books', {
+        // const response = await fetch('http://localhost:8080/student/issue/books', {
+          const response = await fetch(' http://localhost:8080/admin/all/bookIssue/', {
+
+          
           headers: {
             'Authentication': token
           }

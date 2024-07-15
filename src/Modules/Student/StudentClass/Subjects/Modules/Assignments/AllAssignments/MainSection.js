@@ -11,6 +11,7 @@ import { useSelector } from "react-redux";
 
 const MainSection = () => {
   const { selectedClass, selectedSection, selectedSubject } = useSelector((state) => state.Common);
+  const { selectedClass, selectedSection, selectedSubject } = useSelector((state) => state.Common);
 
   const { cid, sid, subjectId } = useParams(); // Ensure subjectId is part of the route parameters
   const [assignments, setAssignments] = useState([]);
@@ -43,6 +44,7 @@ const MainSection = () => {
         }
 
         const data = await response.json();
+        console.log("data in assignment maisection", data)
         console.log("data in assignment maisection", data)
         if (data.success && data.data) {
           setAssignments(data.data);

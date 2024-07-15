@@ -14,7 +14,11 @@ import { useSelector } from "react-redux";
 const MainSection = () => {
   const [expandedChapters, setExpandedChapters] = useState([]);
   const [classData, setClassData] = useState(null);
-
+  
+  const selectedClass = useSelector(state => state.Common.selectedClass);
+  const selectedSubjectId = useSelector(state => state.Common.selectedSubject);
+  const selectedSection = useSelector(state => state.Common.selectedSection);
+  const studentId = useSelector(state => state.Common.studentId);
   useEffect(() => {
     const fetchClassData = async () => {
       try {
@@ -24,6 +28,8 @@ const MainSection = () => {
         }
 
         const response = await fetch('http://localhost:8080/student/my_class', {
+          // const response = await fetch(`http://localhost:8080/admin/student/classes/${selectedClass}/modules/${selectedSubject}`, {
+        //http://localhost:8080/admin/student/classes/6672d55a57740d7dd939f72a/modules/667e76376c30078298d1e048        
           headers: {
             'Authentication': token,
           },
@@ -55,10 +61,7 @@ const MainSection = () => {
         : [...prev, chapterId]
     );
   };
-  const selectedClass = useSelector(state => state.Common.selectedClass);
-  const selectedSubjectId = useSelector(state => state.Common.selectedSubject);
-  const selectedSection = useSelector(state => state.Common.selectedSection);
-  const studentId = useSelector(state => state.Common.studentId);
+ 
   console.log("Selected Subject ID from Redux:", selectedSubjectId);
   console.log("Selected  section from Redux:", selectedSection);
   console.log("studentId from Redux:", studentId);
