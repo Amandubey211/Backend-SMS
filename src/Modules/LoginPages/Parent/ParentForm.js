@@ -85,7 +85,7 @@ const ParentForm = () => {
             </div>
             <div className="mb-6 text-right">
               <NavLink
-                to="/forgetpassword"
+                to="/forget_password"
                 className="text-sm text-indigo-600 hover:text-indigo-900"
               >
                 Forgot Password
