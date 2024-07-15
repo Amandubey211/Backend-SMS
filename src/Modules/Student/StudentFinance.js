@@ -155,7 +155,7 @@ const FinanceTable = () => {
               Authentication: token,
             },
           }
-        });
+        );
 
         console.log("Response received:", response);
         if (!response.ok) {
