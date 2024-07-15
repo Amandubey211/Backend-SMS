@@ -1,7 +1,7 @@
 import React from "react";
 import QuestionCard from "./QuestionCard";
 
-const QuestionList = ({ questions, deleteQuestion }) => {
+const QuestionList = ({ questions, deleteQuestion, editQuestion }) => {
   const totalPoints = questions.reduce((sum, question) => sum + question.questionPoint, 0);
 
   return (
@@ -17,6 +17,7 @@ const QuestionList = ({ questions, deleteQuestion }) => {
             question={q}
             index={index}
             deleteQuestion={deleteQuestion}
+            editQuestion={editQuestion} // Pass the edit handler
           />
         ))}
       </div>

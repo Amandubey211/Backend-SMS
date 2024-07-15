@@ -5,8 +5,9 @@ import Tabs from "../Components/Tabs";
 import QuizInstructions from "./Components/QuizInstructions";
 import QuestionListView from "./Components/QuestionListView";
 import Sidebar from "../../../../../../Components/Common/Sidebar";
-import useUpdateQuiz from "../../../../../../Hooks/AuthHooks/Staff/Admin/Quiz/useUpdateQuiz"; // Import the hook
-import useAddQuestion from "../../../../../../Hooks/AuthHooks/Staff/Admin/Quiz/useAddQuestion"; // Import the hook
+import useUpdateQuiz from "../../../../../../Hooks/AuthHooks/Staff/Admin/Quiz/useUpdateQuiz"; 
+import useAddQuestion from "../../../../../../Hooks/AuthHooks/Staff/Admin/Quiz/useAddQuestion"; 
+import useEditQuestion from "../../../../../../Hooks/AuthHooks/Staff/Admin/Quiz/useEditQuestion"; // Import the hook
 import toast from "react-hot-toast";
 import CreateQuizForm from "./Components/CreateQuizForm";
 import QuestionForm from "./Components/QuestionForm";
@@ -57,12 +58,14 @@ const MainSection = () => {
   const [questionType, setQuestionType] = useState('multiple choice');
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [editingQuestionId, setEditingQuestionId] = useState(null); // Add this state to track the question being edited
 
   const handleSidebarOpen = useCallback(() => setSidebarOpen(true), []);
   const handleSidebarClose = useCallback(() => setSidebarOpen(false), []);
   const { createQuiz, loading: createLoading } = useCreateQuiz();
   const { updateQuiz, loading: updateLoading } = useUpdateQuiz();
   const { addQuestion, loading: questionLoading } = useAddQuestion();
+  const { editQuestion, loading: editLoading } = useEditQuestion();
 
   useEffect(() => {
     if (location.state && location.state.quiz) {
@@ -144,6 +147,18 @@ const MainSection = () => {
     toast.success("Question Deleted");
   };
 
+  const editQuestionHandler = (index) => {
+    const questionToEdit = questionState[index];
+    setQuestion(questionToEdit.questionText);
+    setAnswers(questionToEdit.options);
+    setRightAnswerComment(questionToEdit.correctAnswerComment);
+    setWrongAnswerComment(questionToEdit.inCorrectAnswerComment);
+    setQuestionPoint(questionToEdit.questionPoint);
+    setQuestionType(questionToEdit.type);
+    setEditingQuestionId(questionToEdit._id); // Set the question ID to be edited
+    handleSidebarOpen();
+  };
+
   const handleSave = async () => {
     const quizData = {
       ...formState,
@@ -174,6 +189,32 @@ const MainSection = () => {
     }
   };
 
+  const updateQuestion = async () => {
+    const correctOption = answers.find((answer) => answer.isCorrect);
+    const updatedQuestion = {
+      questionText: question,
+      questionPoint: questionPoint,
+      type: questionType,
+      options: answers,
+      correctAnswer: correctOption ? correctOption.text : "", // Ensure correctAnswer is a string
+      correctAnswerComment: rightAnswerComment,
+      inCorrectAnswerComment: wrongAnswerComment,
+    };
+
+    const result = await editQuestion(quizId, editingQuestionId, updatedQuestion);
+    if (result.success) {
+      const updatedQuestions = questionState.map((q) =>
+        q._id === editingQuestionId ? updatedQuestion : q
+      );
+      setQuestionState(updatedQuestions);
+      resetQuestionForm();
+      handleSidebarClose();
+      toast.success("Question Updated");
+    } else {
+      toast.error("Failed to update question");
+    }
+  };
+
   const resetQuestionForm = () => {
     setQuestion("");
     setAnswers(initialAnswersState);
@@ -181,6 +222,7 @@ const MainSection = () => {
     setWrongAnswerComment("");
     setQuestionPoint('');
     setQuestionType('multiple choice');
+    setEditingQuestionId(null); // Reset editing question ID
   };
 
   return (
@@ -219,6 +261,7 @@ const MainSection = () => {
                     questionState={questionState}
                     handleSidebarOpen={handleSidebarOpen}
                     deleteQuestion={deleteQuestion}
+                    editQuestion={editQuestionHandler} // Pass the edit handler
                   />
                 )}
               </div>
@@ -245,7 +288,7 @@ const MainSection = () => {
       <Sidebar
         isOpen={isSidebarOpen}
         onClose={handleSidebarClose}
-        title="Add new Question"
+        title={editingQuestionId ? "Edit Question" : "Add new Question"} // Change title based on mode
         width="95%"
       >
         <QuestionForm
@@ -262,7 +305,7 @@ const MainSection = () => {
           setWrongAnswerComment={setWrongAnswerComment}
           setQuestionPoint={setQuestionPoint}
           setQuestionType={setQuestionType}
-          addNewQuestion={addNewQuestion}
+          addNewQuestion={editingQuestionId ? updateQuestion : addNewQuestion} // Use updateQuestion if editing
         />
       </Sidebar>
     </div>

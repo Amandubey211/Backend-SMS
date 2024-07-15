@@ -2,7 +2,7 @@ import React from "react";
 import { FaCheckCircle, FaRegCircle } from "react-icons/fa";
 import { FiEdit2, FiTrash2 } from "react-icons/fi";
 
-const QuestionCard = ({ question, index, deleteQuestion }) => {
+const QuestionCard = ({ question, index, deleteQuestion, editQuestion }) => {
   return (
     <div className=" bg-white shadow min-h-60 min-w-96 rounded-lg mb-4 border">
       <div className="flex justify-between items-center mb-2 bg-gray-100 p-3">
@@ -11,7 +11,7 @@ const QuestionCard = ({ question, index, deleteQuestion }) => {
           <span className="text-black">{question.questionPoint}</span>
         </div>
         <div className="flex space-x-2">
-          <FiEdit2 className="text-green-600 cursor-pointer text-xl" />
+          <FiEdit2 className="text-green-600 cursor-pointer text-xl" onClick={() => editQuestion(index)} /> {/* Add onClick */}
           <FiTrash2
             className="text-red-600 cursor-pointer text-xl"
             onClick={() => deleteQuestion(index)}

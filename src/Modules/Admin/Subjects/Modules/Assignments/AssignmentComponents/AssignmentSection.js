@@ -6,7 +6,7 @@ const AssignmentSection = ({ assignment, loading, error }) => {
   if (error) return <p>Error: {error}</p>;
 
   if (!assignment) return null;
-
+console.log(assignment)
   const { name, content, thumbnail, type, videoThumbnailUrl } = assignment;
 
   return (
