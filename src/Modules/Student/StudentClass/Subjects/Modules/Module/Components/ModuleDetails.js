@@ -124,7 +124,8 @@ const ModuleDetails = ({ isExpanded, classId, studentId }) => {
   const [moduleDetails, setModuleDetails] = useState([]);
   const [loading, setLoading] = useState(true);
   console.log("classId is", classId)
-
+  const selectedClass = useSelector(state => state.Common.selectedClass);
+  const selectedSubject = useSelector(state => state.Common.selectedSubject);
   useEffect(() => {
     if (isExpanded) {
       const fetchModuleDetails = async () => {

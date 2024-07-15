@@ -11,7 +11,7 @@ import { useSelector } from "react-redux";
 
 const MainSection = () => {
   const { selectedClass, selectedSection, selectedSubject } = useSelector((state) => state.Common);
-  const { selectedClass, selectedSection, selectedSubject } = useSelector((state) => state.Common);
+  
 
   const { cid, sid, subjectId } = useParams(); // Ensure subjectId is part of the route parameters
   const [assignments, setAssignments] = useState([]);

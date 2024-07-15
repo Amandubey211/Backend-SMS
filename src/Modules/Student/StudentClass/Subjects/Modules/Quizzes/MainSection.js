@@ -207,20 +207,7 @@ const MainSection = ({ quiz }) => {
     setAttemptHistory((prev) => [...prev, newAttempt]);
   }, [selectedOptions, attemptHistory, quiz.questions, submitQuiz, totalTime, timeLeft]);
 
-  const handleTabChange = useCallback((tab) => {
-    if (tab === 'questions') {
-      if (quizSubmitted) {
-        setSelectedOptions({});
-        setQuizSubmitted(false);
-        setTimeLeft(quizDuration);
-        setQuizResults({ totalPoints: 0, correctAnswers: 0, wrongAnswers: 0 });
-      }
-      if (!quizStarted) {
-        startTimer();
-      }
-    }
-    setActiveTab(tab);
-  }, [quizSubmitted, quizDuration, quizStarted]);
+
 
 
   const hasAttempted = attemptHistory.length > 0;
