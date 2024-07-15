@@ -1,6 +1,6 @@
 
 
-import React, { useState, useMemo ,useEffect} from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import BookCard from "../SubClass/component/BookCard";
 import Layout from "../../../../Components/Common/Layout";
 import StudentDashLayout from "../../../../Components/Student/StudentDashLayout";
@@ -30,7 +30,7 @@ const Library = () => {
 
         const response = await fetch('http://localhost:8080/admin/all/book', {
           headers: {
-            'Authorization': token
+            'Authentication': token
           }
         });
 
@@ -47,7 +47,7 @@ const Library = () => {
             classLevel: book.name,
             category: book.name,
             available: book.copies,
-          
+
           }));
           console.log("Formatted books:", formattedBooks);
           setBooks(formattedBooks);

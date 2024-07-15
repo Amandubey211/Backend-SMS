@@ -1,5 +1,5 @@
 
-import React, { useState, Suspense, useEffect ,useCallback} from 'react';
+import React, { useState, Suspense, useEffect, useCallback } from 'react';
 import SubjectSideBar from '../../Component/SubjectSideBar';
 import QuizzDetailCard from './Components/QuizzDetailCard';
 import QuizInstructionSection from './Components/QuizInstructionSection';
@@ -23,7 +23,7 @@ const MainSection = ({ quiz }) => {
   const [quizSubmitted, setQuizSubmitted] = useState(false);
   const [quizResults, setQuizResults] = useState({ totalPoints: 0, correctAnswers: 0, wrongAnswers: 0 });
   const [attemptHistory, setAttemptHistory] = useState([]);
-  
+
   const { timeLimit } = quiz;
   const quizDuration = timeLimit * 60;
 
@@ -61,14 +61,14 @@ const MainSection = ({ quiz }) => {
         if (!token) {
           throw new Error('Authentication token not found');
         }
- const attemptNumber = 1; // Start with the first attempt for example
+        const attemptNumber = 1; // Start with the first attempt for example
         // const response = await fetch(`http://localhost:8080/student/studentquiz/${quizId}/attempt/${attemptNumber}`, {
         const response = await fetch(`http://localhost:8080/student/studentquiz/${quizId}/attempt`, {
           headers: {
-            'Authorization': token,
+            'Authentication': token,
           },
         });
-// console.log(`http://localhost:8080/student/studentquiz/${quizId}/attempt/${attemptNumber}`)
+        // console.log(`http://localhost:8080/student/studentquiz/${quizId}/attempt/${attemptNumber}`)
         if (!response.ok) {
           throw new Error(`Failed to fetch attempt history, status: ${response.status}`);
         }
@@ -76,7 +76,7 @@ const MainSection = ({ quiz }) => {
         const data = await response.json();
 
 
-        console.log("atttempt data" ,data)
+        console.log("atttempt data", data)
         if (data.success && data.submission) {
           setAttemptHistory(data.submission);
         } else {
@@ -92,10 +92,10 @@ const MainSection = ({ quiz }) => {
 
 
   const submitQuiz = async (answers, timeTaken) => {
-    console.log("answers⌚⌚",answers)
-    console.log("timeTaken",timeTaken)
+    console.log("answers⌚⌚", answers)
+    console.log("timeTaken", timeTaken)
     try {
-     
+
       const token = localStorage.getItem('student:token');
       if (!token) {
         throw new Error('Authentication token not found');
@@ -104,7 +104,7 @@ const MainSection = ({ quiz }) => {
       const response = await fetch(`http://localhost:8080/student/studentquiz/submit/${quizId}`, {
         method: 'POST',
         headers: {
-          'Authorization': token,
+          'Authentication': token,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ studentAnswers: answers, timeTaken }),
@@ -166,7 +166,7 @@ const MainSection = ({ quiz }) => {
       // const isCorrect = correctOption && selectedOption === correctOption.value;
       const isCorrect = selectedOption && selectedOption === question.correctAnswer;
       // console.log("Question data💻:", isCorrect);
-  
+
       console.log("🛜isCorrect:🛜", isCorrect);
 
 
@@ -217,7 +217,7 @@ const MainSection = ({ quiz }) => {
     }
     setActiveTab(tab);
   }, [quizSubmitted, quizDuration, quizStarted]);
-  
+
 
   const hasAttempted = attemptHistory.length > 0;
   console.log('MainSection Rendered: ', {

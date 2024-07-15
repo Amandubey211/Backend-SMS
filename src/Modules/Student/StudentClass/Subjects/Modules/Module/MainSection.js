@@ -25,7 +25,7 @@ const MainSection = () => {
 
         const response = await fetch('http://localhost:8080/student/my_class', {
           headers: {
-            'Authorization': token,
+            'Authentication': token,
           },
         });
 
@@ -34,7 +34,7 @@ const MainSection = () => {
         }
 
         const data = await response.json();
-        console.log("data in mainsection module",data)
+        console.log("data in mainsection module", data)
         if (data.status && data.data) {
           setClassData(data.data);
         } else {
@@ -66,7 +66,7 @@ const MainSection = () => {
   if (!classData) {
     return <div>Loading...</div>;
   }
-  console.log("classData._id is",selectedClass)
+  console.log("classData._id is", selectedClass)
 
   // const { subjects } = classData;
 
@@ -82,8 +82,8 @@ const MainSection = () => {
       <div className="w-[60%] bg-white p-2 border-l">
         <div className="bg-white p-2 rounded-lg">
           <div className="flex justify-between items-center mb-5">
-          <h1 className="text-md font-semibold">{selectedSubject.subjectName || "Subject"}</h1>
-          {/* <h1 className="text-md font-semibold">{subjects[0]?.subjectName || "Subject"}</h1> */}
+            <h1 className="text-md font-semibold">{selectedSubject.subjectName || "Subject"}</h1>
+            {/* <h1 className="text-md font-semibold">{subjects[0]?.subjectName || "Subject"}</h1> */}
           </div>
           {/* {subjects[0]?.modules.map((module, index) => (
             <Chapter
@@ -97,7 +97,7 @@ const MainSection = () => {
             />
           ))} */}
 
-{selectedSubject.modules.map((module, index) => (
+          {selectedSubject.modules.map((module, index) => (
             <Chapter
               key={index}
               title={module.name}
@@ -124,7 +124,7 @@ const MainSection = () => {
             </p>
           </div>
           <div className="grid grid-cols-1 gap-2">
-          {selectedSubject.modules.map((module, index) => (
+            {selectedSubject.modules.map((module, index) => (
               <ModuleCard
                 key={index}
                 title={module.name}

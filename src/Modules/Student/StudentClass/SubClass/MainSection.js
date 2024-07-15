@@ -35,7 +35,7 @@
 //     { icon: <FcCalendar/>, text: "Attendance", url: `/class/${cid}/attendance` },
 //   ];
 
- 
+
 
 //   const handleCloseSidebar = () => {
 //     setIsSidebarOpen(false);
@@ -66,7 +66,7 @@
 //           ))}
 //         </div>
 //       </div>
-      
+
 //     </>
 //   );
 // };
@@ -103,7 +103,7 @@ const MainSection = () => {
   const dispatch = useDispatch();
   const [classData, setClassData] = useState(null);
   const { cid } = useParams();
-console.log("class ud ",cid)
+  console.log("class ud ", cid)
   useEffect(() => {
     const fetchClassData = async () => {
       try {
@@ -114,7 +114,7 @@ console.log("class ud ",cid)
 
         const response = await fetch('http://localhost:8080/student/my_class', {
           headers: {
-            'Authorization': token,
+            'Authentication': token,
           },
         });
 
@@ -147,7 +147,7 @@ console.log("class ud ",cid)
   if (!classData) {
     return <div>Loading...</div>;
   }
-console.log("class data",classData)
+  console.log("class data", classData)
 
   const iconData = [
     { icon: <SlEyeglass className="text-purple-600" />, text: `${classData.teachersCount} My Class Instructor`, url: `/student_class/class/${cid}/teachers` },
@@ -155,12 +155,14 @@ console.log("class data",classData)
       icon: <FaSchool className="text-yellow-600" />,
       text: `${classData.section?.sectionName || 'No Section'} | ${classData.groups ? classData.groups.length : 0} Section`,
       // url: `/class/${cid}/section_group`,
-      url: `/student_class/class/${cid}/teachers`    },
+      url: `/student_class/class/${cid}/teachers`
+    },
 
-    { icon: <FcGraduationCap />, text: `${classData.classmatesCount} Classmate`, 
-    // url: `/class/${cid}/students` 
-    url: `/student_class/class/${cid}/classmates`
-  },
+    {
+      icon: <FcGraduationCap />, text: `${classData.classmatesCount} Classmate`,
+      // url: `/class/${cid}/students` 
+      url: `/student_class/class/${cid}/classmates`
+    },
     { icon: <FcCalendar />, text: "Attendance", url: `/class/${cid}/attendance` },
   ];
   // const iconData = [
@@ -174,7 +176,7 @@ console.log("class data",classData)
   //   { icon: <FcCalendar />, text: "Attendance", url: `/class/${cid}/attendance` },
   // ];
 
-  console.log("icondata",iconData)
+  console.log("icondata", iconData)
   return (
     <>
       <div className="flex flex-wrap justify-center gap-3 p-4 ">
@@ -245,7 +247,7 @@ export default MainSection;
 //           `http://localhost:8080/admin/my_subjects/${cid}`,
 //           {
 //             headers: {
-//               Authorization: token,
+//               Authentication: token,
 //             },
 //           }
 //         );

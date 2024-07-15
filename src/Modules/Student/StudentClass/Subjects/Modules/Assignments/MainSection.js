@@ -40,7 +40,7 @@ const MainSection = () => {
           `http://localhost:8080/student/studentAssignment/${aid}`,
           {
             headers: {
-              Authorization: token,
+              Authentication: token,
             },
           }
         );
@@ -85,7 +85,7 @@ const MainSection = () => {
         {
           method: "PUT",
           headers: {
-            Authorization: token,
+            Authentication: token,
             "Content-Type": "application/json"
           },
           body: JSON.stringify({

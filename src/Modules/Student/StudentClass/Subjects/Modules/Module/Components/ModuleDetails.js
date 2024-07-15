@@ -5,27 +5,27 @@ import ChapterItem from "./ChapterItem";
 const ModuleDetails = ({ isExpanded, classId, studentId }) => {
   const [moduleDetails, setModuleDetails] = useState([]);
   const [loading, setLoading] = useState(true);
-  console.log("classId is",classId)
+  console.log("classId is", classId)
 
   useEffect(() => {
     if (isExpanded) {
       const fetchModuleDetails = async () => {
         try {
-            const token = localStorage.getItem("student:token");
-            if (!token) {
-              throw new Error("Authentication token not found");
-            }
-          const response = await fetch(`http://localhost:8080/admin/modules/${classId}/${studentId}`,{
+          const token = localStorage.getItem("student:token");
+          if (!token) {
+            throw new Error("Authentication token not found");
+          }
+          const response = await fetch(`http://localhost:8080/admin/modules/${classId}/${studentId}`, {
             headers: {
-                Authorization: token,
-              },
+              Authentication: token,
+            },
 
           });
           if (!response.ok) {
             throw new Error(`Error: ${response.status}`);
           }
           const data = await response.json();
-          console.log("moduledetails data",data)
+          console.log("moduledetails data", data)
           setModuleDetails(data.modules.modules || []);
         } catch (error) {
           console.error("Failed to fetch module details:", error);

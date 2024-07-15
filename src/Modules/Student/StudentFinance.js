@@ -27,7 +27,7 @@ const FinanceTable = () => {
           "http://localhost:8080/studentfees/student/get_own_fees",
           {
             headers: {
-              Authorization: token,
+              Authentication: token,
             },
           }
         );
