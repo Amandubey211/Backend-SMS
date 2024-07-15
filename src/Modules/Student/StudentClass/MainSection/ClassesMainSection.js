@@ -10,7 +10,7 @@ const ClassesMainSection = () => {
   const handleSidebarOpen = () => setSidebarOpen(true);
   const handleSidebarClose = () => setSidebarOpen(false);
 
-  return (
+  return ( 
     <div className="min-h-screen p-4">
       <div className="flex justify-between">
         <h1 className="text-lg opacity-50 ">All Classes</h1>
@@ -18,7 +18,7 @@ const ClassesMainSection = () => {
           onClick={handleSidebarOpen}
           className="px-4 py-2 rounded-md  bg-gradient-to-r from-pink-100 to-purple-200"
         >
-          <span className="text-gradient">     + Add New Class</span>
+          <span className="text-gradient"> + Add New Class</span>
      
         </button>
       </div>

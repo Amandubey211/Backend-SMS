@@ -142,7 +142,7 @@ const MainSection = () => {
           `http://localhost:8080/admin/getDiscussionById/${did}`,
           {
             headers: {
-              'Authentication': token,
+              Authentication: token,
             },
           }
         );

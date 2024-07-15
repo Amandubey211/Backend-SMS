@@ -18,7 +18,7 @@ const MainSection = () => {
   const { cid, sid, subjectId } = useParams();
   const [quizzes, setQuizzes] = useState([]);
   const [loading, setLoading] = useState(true);
-console.log("this component");
+  console.log("this component");
   useEffect(() => {
     console.log("Class ID (cid):", selectedClass);
     console.log("Section ID (sid):", selectedSection);

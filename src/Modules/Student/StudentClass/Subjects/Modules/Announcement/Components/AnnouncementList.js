@@ -23,7 +23,7 @@ const AnnouncementList = () => {
 
         const response = await fetch(`http://localhost:8080/admin/announcement/class/${cid}`, {
           headers: {
-            'Authentication': token,
+            Authentication: token,
           },
         });
 

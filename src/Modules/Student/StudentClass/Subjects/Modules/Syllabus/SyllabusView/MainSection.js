@@ -13,7 +13,7 @@ const MainSection = () => {
 
   const [syllabusData, setSyllabusData] = useState([]);
   const selectedSubjectId = useSelector(state => state.Common.selectedSubject);
-console.log("selected subject id in syllabus",selectedSubjectId)
+  console.log("selected subject id in syllabus", selectedSubjectId)
   useEffect(() => {
     const fetchSyllabusData = async () => {
       try {
@@ -24,7 +24,7 @@ console.log("selected subject id in syllabus",selectedSubjectId)
 
         const response = await fetch(`http://localhost:8080/admin/syllabus/${selectedSubjectId}/class/${cid}`, {
           headers: {
-            'Authentication': token
+            Authentication: token
           }
         });
 
@@ -33,7 +33,7 @@ console.log("selected subject id in syllabus",selectedSubjectId)
         }
 
         const data = await response.json();
-        console.log("data in syllabus is ",data)
+        console.log("data in syllabus is ", data)
         if (data.status) {
           setSyllabusData(data.data); // Assuming data.data is an array of syllabus items
         } else {

@@ -132,7 +132,9 @@ import ClassCardBookImg from "../../../../Assets/ClassesAssets/ClassCardBook.png
 import { useSelector } from "react-redux";
 
 const SubjectCard = ({ data, IDs, backgroundColor, Class, onSubjectClick }) => {
-  console.log("subject id", data.subjectId);
+  console.log("subject idSSSS", data.subjectId);
+  console.log("subject Nameisss", data.subjectName);
+
   console.log(" id", IDs);
   console.log(" classId", IDs.classId);
   console.log(" sectionID", IDs.section?.sectionId);
@@ -142,7 +144,12 @@ const SubjectCard = ({ data, IDs, backgroundColor, Class, onSubjectClick }) => {
   console.log("Selected Subject ID from Redux:", selectedSubjectId);
 
   return (
-    <div className={`relative rounded-xl p-4 shadow-lg ${backgroundColor}`} onClick={() => onSubjectClick(data.subjectId)}>
+    <div className={`relative rounded-xl p-4 shadow-lg ${backgroundColor}`} 
+    // ()}
+
+    // onClick={() => onSubjectClick(data.subjectId)}>
+        onClick={() => onSubjectClick({subjectId: data.subjectId, subjectName: data.subjectName})}>
+
       <div className="flex justify-between items-center mb-4">
         <button className="border border-white text-white rounded-full px-4 py-1">
           {data.isPublished ? "Published" : "Unpublished"}

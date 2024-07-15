@@ -1,4 +1,4 @@
-import React,{useEffect, useState} from 'react'
+import React, { useEffect, useState } from 'react'
 import Announce from './Announce'
 import Layout from '../../../Components/Common/Layout';
 import DashLayout from '../../../Components/Student/StudentDashLayout';
@@ -8,44 +8,46 @@ import { MdQueryBuilder } from "react-icons/md";
 const StudentAnnounce = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeIndex, setActiveIndex] = useState(0);
-  const [notices,setNotices]=useState([])
- 
-useEffect(()=>{
-  const fetchNotices=async()=>{
+  const [notices, setNotices] = useState([])
+
+  useEffect(() => {
+    const fetchNotices = async () => {
       try {
-          const token =localStorage.getItem('student:token')
-          if(!token){
-            throw new Error ('Authentication not found')
+        const token = localStorage.getItem('student:token')
+        if (!token) {
+          throw new Error('Authentication not found')
+        }
+        const response = await fetch('http://localhost:8080/student/all/notices', {
+          headers: {
+            'Authentication': token
           }
-          const response= await fetch('http://localhost:8080/student/all/notices',{
-            headers:{
-              'Authentication': token
-            }
-          })
-          if(!response.ok){
-            throw new Error(`Failed to fetch notices, status: ${response.status}`);
 
-          }
-          const data=await response.json()
-          if(data.success && data.notices){
-            const formattedNotices = data.notices.map(notice => ({
-              ...notice,
-              startDate: new Date(notice.startDate),
-              endDate: new Date(notice.endDate)
-            }));
-            console.log("Formatted notices:", formattedNotices);
-            setNotices(formattedNotices);
-          }else{
-            console.log("No notices data or unsuccessful response");
+        })
+        if (!response.ok) {
+          throw new Error(`Failed to fetch notices, status: ${response.status}`);
 
-          }
+
+        }
+        const data = await response.json()
+        if (data.success && data.notices) {
+          const formattedNotices = data.notices.map(notice => ({
+            ...notice,
+            startDate: new Date(notice.startDate),
+            endDate: new Date(notice.endDate)
+          }));
+          console.log("Formatted notices:", formattedNotices);
+          setNotices(formattedNotices);
+        } else {
+          console.log("No notices data or unsuccessful response");
+
+        }
       } catch (error) {
         console.error("Failed to fetch notices:", error);
 
       }
-  }
-  fetchNotices()
-},[])
+    }
+    fetchNotices()
+  }, [])
 
   const filteredNotices = notices.filter((notice) =>
     notice.title.toLowerCase().includes(searchTerm.toLowerCase())
@@ -77,11 +79,11 @@ useEffect(()=>{
                     Search
                   </span>
                 </button>
-               
+
               </div>
 
               <div>
-            
+
               </div>
             </div>
 
@@ -111,12 +113,12 @@ useEffect(()=>{
 
                         <div className="flex flex-row gap-[50px] text-xs">
                           <div className="flex   flex-wrap  justify-center items-center  ">
-                            
-                          
+
+
                             <MdQueryBuilder
                               style={{
                                 color: "gray",
-                               
+
                               }}
                               className=" text-gray-400 text-xl"
                             />
@@ -127,11 +129,10 @@ useEffect(()=>{
                           </div>
                           <div className="px-2 text-xs bg-pink-100 text-center flex justify-center items-center">
                             <span
-                              className={` ${
-                                notice.priority === "High Priority"
-                                  ? "  font-semibold bg-gradient-to-r from-pink-500   to-purple-500 inline-block text-transparent bg-clip-text"
-                                  : "text-blue-500 font-bold "
-                              }`}
+                              className={` ${notice.priority === "High Priority"
+                                ? "  font-semibold bg-gradient-to-r from-pink-500   to-purple-500 inline-block text-transparent bg-clip-text"
+                                : "text-blue-500 font-bold "
+                                }`}
                             >
                               {notice.priority}
                             </span>
@@ -149,7 +150,7 @@ useEffect(()=>{
                   </div>
                 </div>
 
-               
+
               ))}
             </div>
           </div>

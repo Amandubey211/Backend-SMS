@@ -35,7 +35,7 @@
 //     { icon: <FcCalendar/>, text: "Attendance", url: `/class/${cid}/attendance` },
 //   ];
 
- 
+
 
 //   const handleCloseSidebar = () => {
 //     setIsSidebarOpen(false);
@@ -66,7 +66,7 @@
 //           ))}
 //         </div>
 //       </div>
-      
+
 //     </>
 //   );
 // };
@@ -84,7 +84,7 @@ import { useParams } from "react-router-dom";
 import { FaSchool } from "react-icons/fa";
 import { SlEyeglass } from "react-icons/sl";
 import { FcGraduationCap, FcCalendar } from "react-icons/fc";
-import { setSelectedClass, setSelectedSection, setSelectedSubject } from "../../../../Redux/Slices/Common/CommonSlice";
+import { setSelectedClass, setSelectedClassName, setSelectedSubjectName,setSelectedSection, setSelectedSubject } from "../../../../Redux/Slices/Common/CommonSlice";
 
 const colors = [
   "bg-yellow-300",
@@ -103,8 +103,7 @@ const MainSection = () => {
   const dispatch = useDispatch();
   const [classData, setClassData] = useState(null);
   const { cid } = useParams();
-console.log("class ud ",cid)
-
+  console.log("class ud ", cid)
   useEffect(() => {
     const fetchClassData = async () => {
       try {
@@ -126,9 +125,12 @@ console.log("class ud ",cid)
 
         const data = await response.json();
         console.log("data is in main section sub class  ", data);
+        console.log("classnameesss ", data.data.className);
+
         if (data.status && data.data) {
           setClassData(data.data);
           dispatch(setSelectedClass(data.data.classId));
+          dispatch(setSelectedClassName(data.data.className))
           dispatch(setSelectedSection(data.data.section.sectionId));
         } else {
           console.error("No class data or unsuccessful response");
@@ -141,15 +143,19 @@ console.log("class ud ",cid)
     fetchClassData();
   }, [cid]);
 
-  const handleSubjectClick = (subjectId) => {
+  const handleSubjectClick = ({subjectId,subjectName}) => {
+    // const handleSubjectClick = (subjectId) => {
     console.log("Subject ID clicked:", subjectId);
+    console.log("Subject NAME clicked:", subjectName);
+
     dispatch(setSelectedSubject(subjectId));
+    dispatch(setSelectedSubjectName(subjectName))
   };
 
   if (!classData) {
     return <div>Loading...</div>;
   }
-console.log("class data",classData)
+  console.log("class data", classData)
 
   const iconData = [
     { icon: <SlEyeglass className="text-purple-600" />, text: `${classData.teachersCount} My Class Instructor`, url: `/student_class/class/${cid}/teachers` },
@@ -157,12 +163,14 @@ console.log("class data",classData)
       icon: <FaSchool className="text-yellow-600" />,
       text: `${classData.section?.sectionName || 'No Section'} | ${classData.groups ? classData.groups.length : 0} Section`,
       // url: `/class/${cid}/section_group`,
-      url: `/student_class/class/${cid}/teachers`    },
+      url: `/student_class/class/${cid}/teachers`
+    },
 
-    { icon: <FcGraduationCap />, text: `${classData.classmatesCount} Classmate`, 
-    // url: `/class/${cid}/students` 
-    url: `/student_class/class/${cid}/classmates`
-  },
+    {
+      icon: <FcGraduationCap />, text: `${classData.classmatesCount} Classmate`,
+      // url: `/class/${cid}/students` 
+      url: `/student_class/class/${cid}/classmates`
+    },
     { icon: <FcCalendar />, text: "Attendance", url: `/class/${cid}/attendance` },
   ];
   // const iconData = [
@@ -176,7 +184,7 @@ console.log("class data",classData)
   //   { icon: <FcCalendar />, text: "Attendance", url: `/class/${cid}/attendance` },
   // ];
 
-  console.log("icondata",iconData)
+  console.log("icondata", iconData)
   return (
     <>
       <div className="flex flex-wrap justify-center gap-3 p-4 ">

@@ -4,11 +4,16 @@ import { useParams } from "react-router-dom";
 import Layout from "../../../../../../Components/Common/Layout";
 import StudentDashLayout from "../../../../../../Components/Student/StudentDashLayout";
 import useNavHeading from "../../../../../../Hooks/CommonHooks/useNavHeading ";
+import { useSelector } from "react-redux";
 
 
 const Discussion = () => {
-  const { cid, sid } = useParams();
-  useNavHeading(cid, sid);
+  const { cid, sid } = useParams();  
+   const subjectName = useSelector((store) => store.Common.selectedSubjectName);
+  const className = useSelector((store) => store.Common.selectedClassName);
+
+  // useNavHeading(cid, sid);
+  useNavHeading(className, subjectName);
 
   return (
     <Layout title={`Discussion | Student Diwan`}>

@@ -5,10 +5,13 @@ import MainSection from "./MainSection";
 import { useParams } from "react-router-dom";
 import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 import StudentDashLayout from "../../../../Components/Student/StudentDashLayout";
+import { useSelector } from "react-redux";
 
 const StudentClass = () => {
   const { cid } = useParams();
-  useNavHeading(cid);
+  const className = useSelector((store) => store.Common.selectedClassName);
+  // useNavHeading(cid);
+  useNavHeading(className);
 
   return (
     <Layout title={`${cid} | Student diwan`}>
