@@ -6,7 +6,7 @@ import AddRubricModal from "../../../Rubric/Components/AddRubricModal";
 import Sidebar from "../../../../../../../Components/Common/Sidebar";
 import AddNewCriteriaForm from "../../../Rubric/Components/AddNewCriteriaForm";
 
-const CreateAssignmentHeader = ({ onSave }) => {
+const CreateAssignmentHeader = ({ onSave, id }) => {
   const navigate = useNavigate();
   const [isModalOpen, setModalOpen] = useState(false);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -61,6 +61,8 @@ const CreateAssignmentHeader = ({ onSave }) => {
           Save
         </button>
         <AddRubricModal
+          AssignmentId={id}
+          type="assignment"
           isOpen={isModalOpen}
           onClose={() => setModalOpen(false)}
           criteriaList={criteriaList}

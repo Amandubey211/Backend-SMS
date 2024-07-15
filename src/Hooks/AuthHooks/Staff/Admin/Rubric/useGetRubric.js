@@ -9,31 +9,36 @@ const useGetRubric = () => {
   const [rubric, setRubric] = useState(null);
   const role = useSelector((store) => store.Auth.role);
 
-  const getRubric = useCallback(async (schoolId, assignmentId) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const API_URL = process.env.REACT_APP_API_URL;
-      const token = localStorage.getItem(`${role}:token`);
-      const response = await axios.get(
-        `${API_URL}/admin/rubric/${assignmentId}`,
-        {
-          headers: { Authentication: token },
+  const getRubric = useCallback(
+    async (assignmentId) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const API_URL = process.env.REACT_APP_API_URL;
+        const token = localStorage.getItem(`${role}:token`);
+        const response = await axios.get(
+          `${API_URL}/admin/rubric/${assignmentId}`,
+          {
+            headers: { Authentication: token },
+          }
+        );
+        console.log(response.data);
+        if (response.data.success) {
+          setRubric(response.data.rubric);
+          return { success: true, rubric: response.data.rubric };
         }
-      );
-
-      setRubric(response.data.rubric);
-      setLoading(false);
-      return { success: true, rubric: response.data.rubric };
-    } catch (err) {
-      const errorMessage =
-        err.response?.data?.message || "Failed to fetch rubric";
-      toast.error(errorMessage);
-      setLoading(false);
-      setError(errorMessage);
-      return { success: false, error: errorMessage };
-    }
-  }, [role]);
+        setLoading(false);
+      } catch (err) {
+        const errorMessage =
+          err.response?.data?.message || "Failed to fetch rubric";
+        toast.error(errorMessage);
+        setLoading(false);
+        setError(errorMessage);
+        return { success: false, error: errorMessage };
+      }
+    },
+    [role]
+  );
 
   return { getRubric, loading, error, rubric };
 };

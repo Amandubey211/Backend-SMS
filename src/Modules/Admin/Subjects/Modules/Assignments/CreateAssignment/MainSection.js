@@ -13,7 +13,7 @@ const initialFormState = {
   points: "",
   displayGrade: "",
   submissionType: "",
-  allowedAttempts: "",
+  allowedAttempts: false,
   numberOfAttempts: "",
   assignTo: "",
   section: "",
@@ -28,14 +28,13 @@ const initialFormState = {
 const MainSection = () => {
   const { cid, sid } = useParams();
   const location = useLocation();
-  const assignmentData = location.state?.assignment || {};
 
   const [assignmentName, setAssignmentName] = useState("");
   const [editorContent, setEditorContent] = useState("");
   const [formState, setFormState] = useState(initialFormState);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-
+  const [assignmentId, setAssignmentId] = useState("");
   const handleSidebarOpen = useCallback(() => setSidebarOpen(true), []);
   const handleSidebarClose = useCallback(() => setSidebarOpen(false), []);
 
@@ -45,15 +44,15 @@ const MainSection = () => {
   useEffect(() => {
     if (location.state && location.state.assignment) {
       const assignment = location.state.assignment;
-      console.log(assignment)
       setAssignmentName(assignment.name || "");
       setEditorContent(assignment.content || "");
       setIsEditing(true);
+      setAssignmentId(assignment._id);
       setFormState({
         points: assignment.points || "",
         displayGrade: assignment.grade || "",
         submissionType: assignment.submissionType || "",
-        allowedAttempts: assignment.allowedAttempts || "",
+        allowedAttempts: assignment.allowedAttempts || false,
         numberOfAttempts: assignment.allowNumberOfAttempts || "",
         assignTo: assignment.assignTo || "",
         section: assignment.sectionId || "",
@@ -101,25 +100,15 @@ const MainSection = () => {
     };
 
     if (isEditing) {
-      const result = await updateAssignment(assignmentData);
-      if (result.success) {
-        toast.success("Assignment updated successfully");
-      } else {
-        toast.error("Failed to update assignment");
-      }
+      await updateAssignment(assignmentId, assignmentData);
     } else {
-      const result = await createAssignment(assignmentData);
-      if (result.success) {
-        toast.success("Assignment created successfully");
-      } else {
-        toast.error("Failed to create assignment");
-      }
+      await createAssignment(assignmentData);
     }
   };
 
   return (
     <div className="flex flex-col w-full">
-      <CreateAssignmentHeader onSave={handleSave} />
+      <CreateAssignmentHeader onSave={handleSave} id={assignmentId} />
       <div className="w-full flex">
         <div className="w-[70%]">
           <EditorComponent

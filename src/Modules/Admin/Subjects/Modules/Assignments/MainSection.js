@@ -7,21 +7,29 @@ import { useParams } from "react-router-dom";
 
 const MainSection = () => {
   const { assignmentId } = useParams();
-  const { assignment, error, fetchAssignmentById, loading } = useGetAssignmentById();
+  const { assignment, error, fetchAssignmentById, loading } =
+    useGetAssignmentById();
 
   useEffect(() => {
     fetchAssignmentById(assignmentId);
-    console.log(assignment);
   }, [assignmentId, fetchAssignmentById]);
 
   return (
     <div className="flex">
       <SubjectSideBar />
       <div className="w-[65%] border">
-        <AssignmentSection assignment={assignment} loading={loading} error={error} />
+        <AssignmentSection
+          assignment={assignment}
+          loading={loading}
+          error={error}
+        />
       </div>
       <div className="w-[30%]">
-        <AssignmentDetailCard assignment={assignment} loading={loading} error={error} />
+        <AssignmentDetailCard
+          assignment={assignment}
+          loading={loading}
+          error={error}
+        />
       </div>
     </div>
   );

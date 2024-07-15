@@ -1,9 +1,9 @@
 import React from "react";
 import QuestionList from "./QuestionList";
 
-const QuestionListView = ({ questionState, handleSidebarOpen, deleteQuestion, quizId }) => (
+const QuestionListView = ({ questionState, handleSidebarOpen, deleteQuestion, editQuestion, quizId }) => (
   <>
-    <QuestionList questions={questionState} deleteQuestion={deleteQuestion} />
+    <QuestionList questions={questionState} deleteQuestion={deleteQuestion} editQuestion={editQuestion} />
     {questionState?.length === 0 && (
       <div className="w-full h-80 flex justify-center items-center">
         <div>

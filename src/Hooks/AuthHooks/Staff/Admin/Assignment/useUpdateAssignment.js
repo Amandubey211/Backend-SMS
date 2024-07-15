@@ -10,6 +10,7 @@ const useUpdateAssignment = () => {
 
   const updateAssignment = useCallback(
     async (assignmentId, assignmentData) => {
+      console.log(assignmentData)
       const {
         name,
         points,
@@ -37,7 +38,6 @@ const useUpdateAssignment = () => {
       if (!points) missingFields.push("Points");
       if (!grade) missingFields.push("Grade");
       if (!submissionType) missingFields.push("Submission Type");
-      if (!allowedAttempts) missingFields.push("Allowed Attempts");
       if (!allowNumberOfAttempts) missingFields.push("Number of Attempts");
       if (!assignTo) missingFields.push("Assign To");
       if (!sectionId) missingFields.push("Section");

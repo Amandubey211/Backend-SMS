@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { HiOutlinePlus } from "react-icons/hi2";
 import RubricModalRow from "./RubricModalRow";
 import { useSelector } from "react-redux";
@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 import useGetFilteredAssignments from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useGetFilteredAssignments";
 import { useParams } from "react-router-dom";
 import useGetFilteredQuizzes from "../../../../../../Hooks/AuthHooks/Staff/Admin/Quiz/useGetFilteredQuizzes";
+import useGetRubric from "../../../../../../Hooks/AuthHooks/Staff/Admin/Rubric/useGetRubric";
 
 const AddRubricModal = ({
   isOpen,
@@ -16,6 +17,7 @@ const AddRubricModal = ({
   setCriteriaList,
   onEditCriteria,
   type,
+  AssignmentId,
 }) => {
   const [assignment, setAssignment] = useState("");
   const [quiz, setQuiz] = useState("");
@@ -29,9 +31,17 @@ const AddRubricModal = ({
   const { createRubric, loading: createLoading } = useCreateRubric();
   const { fetchFilteredAssignments, assignments } = useGetFilteredAssignments();
   const { fetchFilteredQuizzes, quizzes } = useGetFilteredQuizzes();
-
+  const {
+    getRubric,
+    loading: rubricLoading,
+    error: rubricError,
+    rubric,
+  } = useGetRubric();
+  useEffect(() => {
+    setAssignment(AssignmentId);
+  }, [AssignmentId]);
   const { sid } = useParams();
-  
+
   useEffect(() => {
     if (type !== "quiz") {
       fetchFilteredAssignments(sid);
@@ -51,7 +61,10 @@ const AddRubricModal = ({
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setDropdownOpen(false);
       }
-      if (dropdownRef2.current && !dropdownRef2.current.contains(event.target)) {
+      if (
+        dropdownRef2.current &&
+        !dropdownRef2.current.contains(event.target)
+      ) {
         setDropdownOpen2(false);
       }
     };
@@ -59,6 +72,17 @@ const AddRubricModal = ({
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  useEffect(() => {
+    if (assignment) {
+      getRubric(assignment).then((result) => {
+        if (result.success) {
+          setCriteriaList(result.rubric.criteria);
+          setRubricName(result.rubric.name);
+        }
+      });
+    }
+  }, [assignment, getRubric, setCriteriaList]);
 
   const handleSelectAssignmentChange = (id) => {
     setAssignment(id);
@@ -89,7 +113,10 @@ const AddRubricModal = ({
     const totalScore = criteriaList.reduce((acc, criterion) => {
       return (
         acc +
-        criterion.ratings.reduce((ratingAcc, rating) => ratingAcc + Number(rating.ratingScore), 0)
+        criterion.ratings.reduce(
+          (ratingAcc, rating) => ratingAcc + Number(rating.ratingScore),
+          0
+        )
       );
     }, 0);
 
@@ -119,17 +146,30 @@ const AddRubricModal = ({
     : 0;
 
   return (
-    <div className={`fixed inset-0 flex items-end justify-center bg-black bg-opacity-50 z-20 transition-opacity duration-300 ${isOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}>
-      <div className={`bg-white w-full p-3 h-[97vh] rounded-t-lg shadow-lg transform transition-transform duration-300 ${isOpen ? "translate-y-0" : "translate-y-full"}`}>
+    <div
+      className={`fixed inset-0 flex items-end justify-center bg-black bg-opacity-50 z-20 transition-opacity duration-300 ${
+        isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+      }`}
+    >
+      <div
+        className={`bg-white w-full p-3 h-[97vh] rounded-t-lg shadow-lg transform transition-transform duration-300 ${
+          isOpen ? "translate-y-0" : "translate-y-full"
+        }`}
+      >
         <div className="flex justify-between items-center p-1">
           <h2 className="text-lg font-semibold">Add Rubric</h2>
-          <button onClick={onClose} className="text-gray-600 text-3xl hover:text-gray-900">
+          <button
+            onClick={onClose}
+            className="text-gray-600 text-3xl hover:text-gray-900"
+          >
             &times;
           </button>
         </div>
         <div className="flex items-center px-2">
           <div className="p-2 flex-1">
-            <label className="block mb-2 text-sm text-gray-700">Rubric Name</label>
+            <label className="block mb-2 text-sm text-gray-700">
+              Rubric Name
+            </label>
             <input
               type="text"
               value={rubricName}
@@ -141,13 +181,23 @@ const AddRubricModal = ({
           {(type === "assignment" || !type) && (
             <div className="p-2 flex-1 relative" ref={dropdownRef}>
               <label className="block text-gray-700 mb-1">Assignment</label>
-              <div className="block w-full pl-3 pr-10 py-2 text-base border rounded-md cursor-pointer focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" onClick={() => setDropdownOpen(!dropdownOpen)}>
-                {assignments.find((a) => a._id === assignment)?.name || "Select"}
+              <div
+                className="block w-full pl-3 pr-10 py-2 text-base border rounded-md cursor-pointer focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                onClick={() => setDropdownOpen(!dropdownOpen)}
+              >
+                {assignments.find((a) => a._id === assignment)?.name ||
+                  "Select"}
               </div>
               {dropdownOpen && (
                 <ul className="absolute left-0 right-0 mt-2 max-h-72 overflow-auto bg-white border rounded-md shadow-lg z-10 py-2">
                   {assignments.map((assignment) => (
-                    <li key={assignment._id} onClick={() => handleSelectAssignmentChange(assignment._id)} className="px-4 py-2 hover:bg-gray-100 transition duration-300 transform cursor-pointer hover:translate-x-[-8px] ps-6">
+                    <li
+                      key={assignment._id}
+                      onClick={() =>
+                        handleSelectAssignmentChange(assignment._id)
+                      }
+                      className="px-4 py-2 hover:bg-gray-100 transition duration-300 transform cursor-pointer hover:translate-x-[-8px] ps-6"
+                    >
                       {assignment.name}
                     </li>
                   ))}
@@ -158,13 +208,20 @@ const AddRubricModal = ({
           {(type === "quiz" || !type) && (
             <div className="p-2 flex-1 relative" ref={dropdownRef2}>
               <label className="block text-gray-700 mb-1">Quizzes</label>
-              <div className="block w-full pl-3 pr-10 py-2 text-base border rounded-md cursor-pointer focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" onClick={() => setDropdownOpen2(!dropdownOpen2)}>
+              <div
+                className="block w-full pl-3 pr-10 py-2 text-base border rounded-md cursor-pointer focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                onClick={() => setDropdownOpen2(!dropdownOpen2)}
+              >
                 {quizzes.find((q) => q._id === quiz)?.name || "Select"}
               </div>
               {dropdownOpen2 && (
                 <ul className="absolute left-0 right-0 mt-2 max-h-72 overflow-auto bg-white border rounded-md shadow-lg z-10 py-2">
                   {quizzes.map((quiz) => (
-                    <li key={quiz._id} onClick={() => handleSelectQuizChange(quiz._id)} className="px-4 py-2 hover:bg-gray-100 transition duration-300 transform cursor-pointer hover:translate-x-[-8px] ps-6">
+                    <li
+                      key={quiz._id}
+                      onClick={() => handleSelectQuizChange(quiz._id)}
+                      className="px-4 py-2 hover:bg-gray-100 transition duration-300 transform cursor-pointer hover:translate-x-[-8px] ps-6"
+                    >
                       {quiz.name}
                     </li>
                   ))}
@@ -177,7 +234,10 @@ const AddRubricModal = ({
         <div className="m-2 overflow-auto border h-[47vh]">
           <div className="flex px-4 font-semibold justify-between items-center p-2 w-full bg-gradient-to-r from-pink-100 to-purple-100">
             {["Criteria", "Ratings", "Point"].map((heading, idx) => (
-              <div key={idx} className="w-2/8 bg-gradient-to-r from-red-500 to-purple-500 bg-clip-text text-transparent">
+              <div
+                key={idx}
+                className="w-2/8 bg-gradient-to-r from-red-500 to-purple-500 bg-clip-text text-transparent"
+              >
                 {heading}
               </div>
             ))}
@@ -194,7 +254,10 @@ const AddRubricModal = ({
           ))}
         </div>
         <div className="flex justify-between items-center p-4 border-t">
-          <button onClick={onAddCriteria} className="flex items-center gap-2 font-semibold p-2 rounded-md bg-gradient-to-r from-pink-100 to-purple-100 hover:shadow-md transition-shadow duration-300">
+          <button
+            onClick={onAddCriteria}
+            className="flex items-center gap-2 font-semibold p-2 rounded-md bg-gradient-to-r from-pink-100 to-purple-100 hover:shadow-md transition-shadow duration-300"
+          >
             <HiOutlinePlus className="text-red-600 text-2xl" />
             <span className="bg-gradient-to-r from-red-500 to-purple-500 bg-clip-text text-transparent">
               Add New Criteria
@@ -205,11 +268,18 @@ const AddRubricModal = ({
           </div>
         </div>
         <div className="flex justify-end items-center p-2 mb-2">
-          <button onClick={onClose} className="text-gray-600 bg-gray-100 hover:bg-gray-200 p-2 px-4 rounded-md">
+          <button
+            onClick={onClose}
+            className="text-gray-600 bg-gray-100 hover:bg-gray-200 p-2 px-4 rounded-md"
+          >
             Cancel
           </button>
-          <button className="bg-gradient-to-r from-red-500 to-purple-500 bg-clip-text text-transparent p-2 rounded-md"></button>
-          <button onClick={handleSubmit} disabled={createLoading} className="flex items-center gap-2 font-semibold p-2 px-4 rounded-md bg-gradient-to-r from-pink-100 to-purple-100 hover:shadow-md transition-shadow duration-300">
+          {/* <button className="bg-gradient-to-r from-red-500 to-purple-500 bg-clip-text text-transparent p-2 rounded-md"></button> */}
+          <button
+            onClick={handleSubmit}
+            disabled={createLoading}
+            className="flex items-center gap-2 font-semibold p-2 px-4 rounded-md bg-gradient-to-r from-pink-100 to-purple-100 hover:shadow-md transition-shadow duration-300"
+          >
             <span className="bg-gradient-to-r from-red-500 to-purple-500 bg-clip-text text-transparent">
               {createLoading ? "Loading..." : "Save Rubric"}
             </span>
