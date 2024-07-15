@@ -84,7 +84,7 @@ import { useParams } from "react-router-dom";
 import { FaSchool } from "react-icons/fa";
 import { SlEyeglass } from "react-icons/sl";
 import { FcGraduationCap, FcCalendar } from "react-icons/fc";
-import { setSelectedClass, setSelectedSubject } from "../../../../Redux/Slices/Common/CommonSlice";
+import { setSelectedClass, setSelectedSection, setSelectedSubject } from "../../../../Redux/Slices/Common/CommonSlice";
 
 const colors = [
   "bg-yellow-300",
@@ -108,6 +108,7 @@ const MainSection = () => {
     const fetchClassData = async () => {
       try {
         const token = localStorage.getItem('student:token');
+        console.log("token--",token);
         if (!token) {
           throw new Error('Authentication token not found');
         }
@@ -127,7 +128,7 @@ const MainSection = () => {
         if (data.status && data.data) {
           setClassData(data.data);
           dispatch(setSelectedClass(data.data.classId));
-          // dispatch(setSelectedSection(data.data.section.sectionId));
+          dispatch(setSelectedSection(data.data.section.sectionId));
         } else {
           console.error("No class data or unsuccessful response");
         }

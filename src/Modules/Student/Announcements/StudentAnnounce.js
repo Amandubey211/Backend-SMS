@@ -21,9 +21,11 @@ const StudentAnnounce = () => {
           headers: {
             'Authentication': token
           }
+
         })
         if (!response.ok) {
           throw new Error(`Failed to fetch notices, status: ${response.status}`);
+
 
         }
         const data = await response.json()
@@ -128,8 +130,8 @@ const StudentAnnounce = () => {
                           <div className="px-2 text-xs bg-pink-100 text-center flex justify-center items-center">
                             <span
                               className={` ${notice.priority === "High Priority"
-                                  ? "  font-semibold bg-gradient-to-r from-pink-500   to-purple-500 inline-block text-transparent bg-clip-text"
-                                  : "text-blue-500 font-bold "
+                                ? "  font-semibold bg-gradient-to-r from-pink-500   to-purple-500 inline-block text-transparent bg-clip-text"
+                                : "text-blue-500 font-bold "
                                 }`}
                             >
                               {notice.priority}

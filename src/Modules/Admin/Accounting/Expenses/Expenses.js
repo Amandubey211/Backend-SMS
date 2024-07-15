@@ -1,46 +1,86 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Layout from "../../../../Components/Common/Layout";
 import DashLayout from "../../../../Components/Admin/AdminDashLayout";
 import TeacherSalary from "./components/TeacherSalary";
 import StaffSalary from "./components/StaffSalary";
 import OtherExpenses from "./components/OtherExpenses";
 import TabButton from "../../Libary/Subclasss/component/TabButton";
-import {
-  dummyTeacherExpenses,
-  dummyStaffExpenses,
-  dummyOtherExpenses,
-} from "../../dummyData/dummyData";
 import Sidebar from "../../../../Components/Common/Sidebar";
 import PaySalary from "./components/PaySalary";
 import AddEarning from "../Earnings/AddEarning";
-
-// import TabButton from "../Subclasss/component/TabButton"; // Ensure correct import path
-// TabButton
+import {
+  createExpense,
+  getAllExpenses,
+  getExpenseById,
+  updateExpense,
+  deleteExpense
+} from './api/apiService.js';
 
 const Expenses = () => {
   const [activeTab, setActiveTab] = useState("TeacherSalary");
   const [selectedMonth, setSelectedMonth] = useState("All");
   const [selectedFilter, setSelectedFilter] = useState("All Expenses");
   const [isSidebarOpen, setSidebarOpen] = useState(false);
-  const [sidebarContent, setSidebarContent] = useState(null);
+  const [expensesData, setExpensesData] = useState({
+    TeacherSalary: [],
+    StaffSalary: [],
+    OtherExpenses: []
+  });
+  const [currentExpense, setCurrentExpense] = useState(null);
 
   const handleSidebarOpen = () => setSidebarOpen(true);
-  const handleSidebarClose = () => setSidebarOpen(false);
-  const expensesData = {
-    TeacherSalary: dummyTeacherExpenses,
-    StaffSalary: dummyStaffExpenses,
-    OtherExpenses: dummyOtherExpenses,
+  const handleSidebarClose = () => {
+    setSidebarOpen(false);
+    setCurrentExpense(null); // Clear the current expense when sidebar is closed
   };
 
-  //   const filteredExpenses = dummyTeacherExpenses.filter((expense) => {
-  //     const monthMatch =
-  //       expense.salaryMonth === selectedMonth || selectedMonth === "All";
+  useEffect(() => {
+    fetchExpenses();
+  }, []);
 
-  //     const filterMatch =
-  //       selectedFilter === "All Expenses" || expense.status === selectedFilter;
+  const fetchExpenses = async () => {
+    try {
+      const response = await getAllExpenses();
+      const data = response.data;
+      setExpensesData({
+        TeacherSalary: data.filter(expense => expense.type === 'TeacherSalary'),
+        StaffSalary: data.filter(expense => expense.type === 'StaffSalary'),
+        OtherExpenses: data.filter(expense => expense.type === 'OtherExpenses')
+      });
+    } catch (error) {
+      console.error('Error fetching expenses:', error);
+    }
+  };
 
-  //     return monthMatch, filterMatch;
-  //   });
+  const fetchExpenseById = async (id) => {
+    try {
+      const response = await getExpenseById(id);
+      setCurrentExpense(response.data);
+      handleSidebarOpen(); // Open the sidebar to show the expense details
+    } catch (error) {
+      console.error('Error fetching expense by id:', error);
+    }
+  };
+
+  const handleUpdateExpense = async (id, updatedData) => {
+    try {
+      await updateExpense(id, updatedData);
+      fetchExpenses(); // Refresh the expenses list
+      handleSidebarClose(); // Close the sidebar after updating
+    } catch (error) {
+      console.error('Error updating expense:', error);
+    }
+  };
+
+  const handleDeleteExpense = async (id) => {
+    try {
+      await deleteExpense(id);
+      fetchExpenses(); // Refresh the expenses list
+    } catch (error) {
+      console.error('Error deleting expense:', error);
+    }
+  };
+
   const filteredExpenses = expensesData[activeTab].filter((expense) => {
     const monthMatch =
       expense.salaryMonth === selectedMonth || selectedMonth === "All";
@@ -49,11 +89,10 @@ const Expenses = () => {
     return monthMatch && filterMatch;
   });
 
-  // const handleMonthChange=dummyTeacherExpenses.filter(month=>month.salaryMonth===selectedMonth||selectedMonth==='All')
-
   const uniqueMonths = [
-    ...new Set(dummyTeacherExpenses.map((item) => item.salaryMonth)),
+    ...new Set(expensesData.TeacherSalary.map((item) => item.salaryMonth)),
   ];
+
   const handleMonthChange = (e) => {
     setSelectedMonth(e.target.value);
   };
@@ -95,7 +134,6 @@ const Expenses = () => {
               <div>
                 <button
                   onClick={handleSidebarOpen}
-                  // onClick={handleSidebarOpen}
                   className="flex items-center border border-gray-300 ps-5  py-0 rounded-full"
                 >
                   <span className="mr-2">Add New Earning</span>
@@ -167,6 +205,8 @@ const Expenses = () => {
             <TeacherSalary
               data={filteredExpenses}
               selectedMonth={selectedMonth}
+              onEdit={fetchExpenseById}
+              onDelete={handleDeleteExpense}
             />
           )}
 
@@ -174,35 +214,28 @@ const Expenses = () => {
             <StaffSalary
               data={filteredExpenses}
               selectedMonth={selectedMonth}
+              onEdit={fetchExpenseById}
+              onDelete={handleDeleteExpense}
             />
           )}
           {activeTab === "OtherExpenses" && (
             <OtherExpenses
               data={filteredExpenses}
               selectedMonth={selectedMonth}
+              onEdit={fetchExpenseById}
+              onDelete={handleDeleteExpense}
             />
           )}
-
-          {/* <Sidebar
-              isOpen={isSidebarOpen}
-              onClose={() => setSidebarOpen(false)}
-              title={
-                <span className="bg-gradient-to-r from-pink-500   to-purple-500 inline-block text-transparent bg-clip-text">
-                  {sidebarContent === "payNow"
-                    ? "Pay Now"
-                    : "Add Transaction"}
-                </span>
-              }
-            >
-              {renderSidebarContent()}
-            </Sidebar> */}
 
           <Sidebar
             isOpen={isSidebarOpen}
             onClose={handleSidebarClose}
-            title={<span className=" font-normal  text-gray-600 " >Add Transaction</span>}
-            >
-            <AddEarning />
+            title={<span className=" font-normal  text-gray-600 ">Add Transaction</span>}
+          >
+            <AddEarning 
+              expense={currentExpense} 
+              onUpdate={handleUpdateExpense}
+            />
           </Sidebar>
         </div>
       </DashLayout>
@@ -211,6 +244,7 @@ const Expenses = () => {
 };
 
 export default Expenses;
+
 
 
 

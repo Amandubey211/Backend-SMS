@@ -1,25 +1,29 @@
 import React, { useState, useEffect, useMemo } from "react";
 import SubjectSideBar from "../../../Component/SubjectSideBar";
-import List from "../Component/List";
-import FilterCard from "../Component/FilterCard";
 import { RiListCheck3, RiAddFill } from "react-icons/ri";
 import { NavLink, useParams } from "react-router-dom";
 import useGetFilteredAssignments from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useGetFilteredAssignments";
+import FilterCard from "../Component/FilterCard";
+import List from "../Component/List";
 
 const MainSection = () => {
   const { sid, cid } = useParams();
   const { loading, error, assignments, fetchFilteredAssignments } = useGetFilteredAssignments();
-  
+
   const [filters, setFilters] = useState({
     moduleId: "",
     chapterId: "",
     publish: null,
   });
 
-  useEffect(() => {
+  const refetchAssignments = () => {
     const { moduleId, chapterId, publish } = filters;
     fetchFilteredAssignments(sid, moduleId, chapterId, publish);
-  }, [filters, fetchFilteredAssignments]);
+  };
+
+  useEffect(() => {
+    refetchAssignments();
+  }, [filters]);
 
   const navLinkStyles = useMemo(() => ({
     className: "bg-gradient-to-r from-purple-400 to-pink-400 text-white p-4 fixed rounded-full shadow-md bottom-4 right-4",
@@ -36,6 +40,7 @@ const MainSection = () => {
           icon={<RiListCheck3 />}
           loading={loading}
           error={error}
+          refetchAssignments={refetchAssignments}
         />
       </div>
       <div className="w-[30%] p-2">
