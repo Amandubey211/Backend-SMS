@@ -12,36 +12,35 @@ const useGetAttendanceByClassSectionGroupAndDate = () => {
   const role = useSelector((store) => store.Auth.role);
   const API_URL = process.env.REACT_APP_API_URL;
 
-  const fetchAttendance = useCallback(async (classId, sectionId, groupId, month, year) => {
-    console.log(classId, sectionId, groupId, month, year)
-    setLoading(true);
-    setError(null);
-    try {
-      const token = localStorage.getItem(`${role}:token`);
-      const response = await axios.get(
-        `${API_URL}/api/teacher/attendance/get`,
-        {
-          headers: { Authentication: token },
-          params: { classId, sectionId, groupId, month, year },
-        }
-      );
-      console.log(response.data);
-      if (response.data) {
-        setAttendanceData(response.data);
-      } else {
-        toast.error(
-          "No attendance records found for the given class, section, group, and month."
+  const fetchAttendance = useCallback(
+    async (classId, sectionId, groupId, month, year) => {
+      console.log(classId, sectionId, groupId, month, year);
+      setLoading(true);
+      setError(null);
+      try {
+        const token = localStorage.getItem(`${role}:token`);
+        const response = await axios.get(
+          `${API_URL}/api/teacher/attendance/get`,
+          {
+            headers: { Authentication: token },
+            params: { classId, sectionId, groupId, month, year },
+          }
         );
+        console.log(response.data);
+        if (response.data) {
+          setAttendanceData(response.data);
+        }
+      } catch (err) {
+        const errorMessage =
+          err.response?.data?.message || "Failed to fetch attendance records";
+        toast.error(errorMessage);
+        setError(errorMessage);
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      const errorMessage =
-        err.response?.data?.message || "Failed to fetch attendance records";
-      toast.error(errorMessage);
-      setError(errorMessage);
-    } finally {
-      setLoading(false);
-    }
-  }, [role, API_URL]);
+    },
+    [role, API_URL]
+  );
 
   return { loading, error, attendanceData, fetchAttendance };
 };

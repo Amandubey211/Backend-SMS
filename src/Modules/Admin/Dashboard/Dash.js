@@ -9,7 +9,8 @@ const Dash = () => {
   useNavHeading("Students");
   const role = useSelector((store) => store.Auth.role);
 
-  const formattedRole = role.charAt(0).toUpperCase() + role.slice(1).toLowerCase();
+  const formattedRole =
+    role.charAt(0).toUpperCase() + role.slice(1).toLowerCase();
 
   return (
     <Layout title={`${formattedRole} Dash | Student Diwan`}>

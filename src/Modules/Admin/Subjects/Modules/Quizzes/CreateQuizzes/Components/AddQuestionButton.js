@@ -1,15 +1,21 @@
-import React from 'react';
-import { AiOutlinePlus } from 'react-icons/ai';
+import React from "react";
 
 const AddQuestionButton = ({ addNewQuestion }) => {
   return (
-    <button
-      onClick={addNewQuestion}
-      className="flex items-center px-4 ms-3 py-2 border border-purple-300 rounded-md text-purple-500 hover:bg-purple-100 transition mt-6"
-    >
-      <AiOutlinePlus className="mr-2" />
-      Add New Question
-    </button>
+    <div className="flex justify-end items-center px-5 gap-3 mt-3">
+      <button
+        className="bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200                
+            rounded-md py-2 px-4 text-center transition"
+      >
+        <span className="text-gradient"> Reset</span>
+      </button>
+      <button
+        onClick={addNewQuestion}
+        className="px-6 py-2 text-white font-semibold rounded-md bg-gradient-to-r from-purple-500 to-red-500 hover:from-purple-600 hover:to-red-600 transition"
+      >
+        Submit Question
+      </button>
+    </div>
   );
 };
 

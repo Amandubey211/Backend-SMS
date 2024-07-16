@@ -21,12 +21,12 @@ const useAddQuestion = () => {
       } = questionData;
 
       const missingFields = [];
-      if(!quizId)  missingFields.push("Quiz ID")
+      if (!quizId) missingFields.push("Quiz ID");
       if (!questionText) missingFields.push("Question Text");
       if (!questionPoint) missingFields.push("Question Point");
       if (!type) missingFields.push("Type");
       if (!options || options.length === 0) missingFields.push("Options");
-      if (!correctAnswer) missingFields.push("Correct Answer");
+      if (type !== "text" && !correctAnswer) missingFields.push("Correct Answer");
 
       if (missingFields.length > 0) {
         toast.error(
@@ -49,7 +49,7 @@ const useAddQuestion = () => {
             questionPoint,
             type,
             options,
-            correctAnswer, // Ensure correctAnswer is included as a string
+            correctAnswer: type !== "text" ? correctAnswer : undefined, // Include correctAnswer only if type is not text
             correctAnswerComment,
             inCorrectAnswerComment,
           },

@@ -3,7 +3,7 @@ import QuestionList from "./QuestionList";
 
 const QuestionListView = ({ questionState, handleSidebarOpen, deleteQuestion, editQuestion, quizId }) => (
   <>
-    <QuestionList questions={questionState} deleteQuestion={deleteQuestion} editQuestion={editQuestion} />
+    <QuestionList questions={questionState} deleteQuestion={deleteQuestion} editQuestion={editQuestion} quizId={quizId} />
     {questionState?.length === 0 && (
       <div className="w-full h-80 flex justify-center items-center">
         <div>

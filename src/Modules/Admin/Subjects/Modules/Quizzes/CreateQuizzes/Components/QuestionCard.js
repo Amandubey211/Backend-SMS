@@ -11,19 +11,13 @@ const QuestionCard = ({ question, index, deleteQuestion, editQuestion }) => {
           <span className="text-black">{question.questionPoint}</span>
         </div>
         <div className="flex space-x-2">
-          <FiEdit2 className="text-green-600 cursor-pointer text-xl" onClick={() => editQuestion(index)} /> {/* Add onClick */}
-          <FiTrash2
-            className="text-red-600 cursor-pointer text-xl"
-            onClick={() => deleteQuestion(index)}
-          />
+          <FiEdit2 className="text-green-600 cursor-pointer text-xl" onClick={() => editQuestion(index)} />
+          <FiTrash2 className="text-red-600 cursor-pointer text-xl" onClick={() => deleteQuestion(index)} />
         </div>
       </div>
       <div className="px-4 py-2">
         <h2 className="text-lg font-semibold mb-3">
-          <span
-            dangerouslySetInnerHTML={{ __html: question.questionText }}
-          ></span>
-          {/* <span>?</span> */}
+          <span dangerouslySetInnerHTML={{ __html: question.questionText }}></span>
         </h2>
         <div className="space-y-2 ms-4">
           {question.options.map((option, optionIndex) => (
