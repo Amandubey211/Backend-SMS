@@ -11,7 +11,7 @@ const BookIssue = ({ student }) => {
     setSelectedFilter(filter);
   };
 
-  const filteredData = student.bookIssues.filter((book) => {
+  const filteredData = student?.bookIssues?.filter((book) => {
     return selectedFilter === "All Book" || book.status === selectedFilter;
   });
 

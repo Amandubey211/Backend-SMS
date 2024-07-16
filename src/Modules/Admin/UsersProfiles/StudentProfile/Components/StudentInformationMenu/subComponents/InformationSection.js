@@ -9,18 +9,19 @@ const InformationSection = ({ student }) => {
 
       <div className="flex flex-row w-full">
 <div className="flex-1">
-     <InformationItem icon={MdOutlineLocationOn} title="Address" value={student.information.address} />
-      <InformationItem icon={MdMale} title="Gender" value={student.information.gender} />
-      <InformationItem icon={MdTempleHindu} title="Religion" value={student.information.religion} />
+     <InformationItem icon={MdOutlineLocationOn} title="Address" value={student?.residentialAddress?.
+street} />
+      <InformationItem icon={MdMale} title="Gender" value={student?.gender} />
+      <InformationItem icon={MdTempleHindu} title="Religion" value={student?.religion} />
      
      </div>
      <div  className="flex-1">
-     <InformationItem icon={MdEmail} title="Email" value={student.information.email} />
+     <InformationItem icon={MdEmail} title="Email" value={student?.email} />
       <InformationItem icon={MdBloodtype} title="Blood Group" value="O+" />
       
      </div>
      <div  className="flex-1">  
-        <InformationItem icon={MdPhone} title="Phone" value={student.information.phone} />
+        <InformationItem icon={MdPhone} title="Phone" value={student?.contactNumber} />
       <InformationItem icon={MdCake} title="Birthday" value="25th July, 2008" />
    </div>
 

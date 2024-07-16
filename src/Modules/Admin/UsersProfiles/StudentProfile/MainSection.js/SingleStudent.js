@@ -18,12 +18,13 @@ import StudentGradesAccordion from "../Components/studentGradeMenu/StudentGrades
 import StudentOverView from "../Components/StudentOverView/StudentOverView";
 import Layout from "../../../../../Components/Common/Layout";
 import DashLayout from "../../../../../Components/Admin/AdminDashLayout";
+import { useSelector } from "react-redux";
 
 const SingleStudent = () => {
   const { cid } = useParams();
-  const student = dummyStudentsList.find((s) => s.id === cid);
+  const students = useSelector((store) => store.Students.allStudent);
+  const student = students.find((s) => s._id === cid);
   const [activeItem, setActiveItem] = useState("OverView");
-
   if (!student) {
     return <div className="text-center text-red-500">Student not found</div>;
   }
@@ -37,8 +38,8 @@ const SingleStudent = () => {
       "Information": <StudentInformationMenu student={student} />,
       "Parents": <ParentsProfile student={student} />,
       "Grades": <StudentGradesAccordion student={student} />,
-      "Attendance": <StudentAttendance student={student} />,
-      "Book Issue": <BookIssue student={student} />
+      "Attendance": <StudentAttendance  />,
+      "Book Issue": <BookIssue  />
     };
     return menuComponents[activeItem] || <div>Select a menu item</div>;
   };
