@@ -37,7 +37,7 @@ const useCreateDiscussion = () => {
             },
           }
         );
-console.log(response.data)
+        console.log(response.data);
         if (response.data.status) {
           setSuccess(true);
           toast.success("Discussion created successfully");

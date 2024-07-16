@@ -64,7 +64,11 @@ const AllTeachers = () => {
                   <div className="flex flex-col h-[80%] justify-center items-center  py-3">
                     <img
                       className=" object-cover rounded-full w-[100px] h-[100px]"
-                      src={teacher.profile}
+
+                      src={teacher.imageUrl || "https://avatars.githubusercontent.com/u/109097090?v=4"}
+
+
+
                       alt={teacher.name}
                     />
                     <h3 className="text-lg font-medium">{teacher.fullName}</h3>
