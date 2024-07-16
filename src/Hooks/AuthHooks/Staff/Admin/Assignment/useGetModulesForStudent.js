@@ -28,6 +28,7 @@ const useGetModulesForStudent = () => {
         dispatch(setModules(response.data.data.modules));
         setModulesData(response.data.data);
       } else {
+        dispatch(setModules([]));
         setError(response.data.msg || "Failed to fetch modules.");
       }
     } catch (err) {

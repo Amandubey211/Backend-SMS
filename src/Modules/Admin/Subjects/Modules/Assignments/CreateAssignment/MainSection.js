@@ -102,6 +102,7 @@ const MainSection = () => {
     if (isEditing) {
       await updateAssignment(assignmentId, assignmentData);
     } else {
+      console.log(assignmentData)
       await createAssignment(assignmentData);
     }
   };

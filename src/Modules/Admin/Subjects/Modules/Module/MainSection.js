@@ -18,7 +18,8 @@ const MainSection = () => {
   const [sidebarContent, setSidebarContent] = useState(null);
   const dispatch = useDispatch();
   const selectedModule = useSelector((state) => state.Common.selectedModule);
-  const { error, fetchModules, loading, modulesData } = useGetModulesForStudent();
+  const { error, fetchModules, loading, modulesData } =
+    useGetModulesForStudent();
 
   useEffect(() => {
     fetchModules();
@@ -33,6 +34,8 @@ const MainSection = () => {
           chapters: modulesData.modules[0].chapters,
         })
       );
+    } else {
+      dispatch(setSelectedModule({}));
     }
   }, [dispatch, modulesData]);
 
@@ -165,7 +168,9 @@ const MainSection = () => {
             title={
               sidebarContent === "chapter"
                 ? "Add New Chapter"
-                : sidebarContent === "module" ? "Add New Module" : "Edit Module"
+                : sidebarContent === "module"
+                ? "Add New Module"
+                : "Edit Module"
             }
           >
             {sidebarContent === "chapter" ? (
