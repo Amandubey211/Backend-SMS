@@ -37,7 +37,7 @@ const SubmissionTypeDropdown = ({ submissionType, handleChange }) => {
       {isOpen && (
         <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg">
           <ul className="py-2">
-            {['No Submission', 'Online', 'On paper'].map((option) => (
+            {['NO submission', 'Online', 'On paper'].map((option) => (
               <li
                 key={option}
                 className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"

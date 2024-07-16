@@ -39,8 +39,7 @@ const selectedModule = useSelector((store)=>store.Common.selectedModule)
       return;
     }
 
-    // await addChapter(chapterTitle, selectedFile,selectedModule?.moduleId);
-    console.log(chapterTitle, selectedFile,selectedModule?.moduleId)
+    await addChapter(chapterTitle, selectedFile,selectedModule?.moduleId);
 
     if (success) {
       toast.success(success);
