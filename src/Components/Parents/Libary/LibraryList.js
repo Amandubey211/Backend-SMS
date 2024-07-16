@@ -15,7 +15,7 @@ const LibraryTable = () => {
       setError(null);
       const token = localStorage.getItem('parent:token');
       try {
-        const response = await axios.get('http://localhost:8080/parent/api/all/bookIssue', {
+        const response = await axios.get('http://localhost:8080/parent/all/bookIssue', {
           headers: {
             Authentication: `${token}`
           }
