@@ -9,12 +9,15 @@ import SidebarSlide from "../../../../Components/Common/SidebarSlide";
 import AddTeacher from "./AddTeacher";
 import useGetAllTeachers from "../../../../Hooks/AuthHooks/Staff/Admin/Teacher/useGetAllTeacher";
 import { useSelector } from "react-redux";
+import useDeleteUser from "../../../../Hooks/AuthHooks/Staff/Admin/staff/useDeleteUser";
+import AddUser from "../StaffProfile/AddUser";
 
 const AllTeachers = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const { fetchTeachers } = useGetAllTeachers();
   const teachers = useSelector((store) => store.Teachers.allTeachers);
   useEffect(() => {
+    
     fetchTeachers();
     // fetchSubjects(cid);
     console.log(teachers);
@@ -22,9 +25,11 @@ const AllTeachers = () => {
 
   const handleSidebarOpen = () => setSidebarOpen(true);
   const handleSidebarClose = () => setSidebarOpen(false);
+  const {deleteUser} = useDeleteUser()
  const deleteTeacher = (event,id)=>{
-  alert(id);
+  deleteUser(id)
   event.stopPropagation();
+ 
  }
   return (
     <Layout title="All Teachers">
@@ -46,10 +51,7 @@ const AllTeachers = () => {
                 className="relative w-full sm:w-1/2 md:w-1/3 lg:w-1/4 px-2 mb-4 flex flex-col"
                 key={index}
               >
-                <NavLink
-                  to={`/teachers/${teacher._id}`}
-                  className="block p-6 bg-white rounded-lg shadow-lg hover:bg-gray-100 transition"
-                >
+              
                   <div className=" absolute right-0 flex flex-col px-4 gap-2 justify-end ">
                     <button className=" bg-transparent p-2 rounded-full border  ">
                       <FiUserPlus className="text-sm text-green-500 " />
@@ -62,7 +64,11 @@ const AllTeachers = () => {
                   <div className="flex flex-col h-[80%] justify-center items-center  py-3">
                     <img
                       className=" object-cover rounded-full w-[100px] h-[100px]"
+
                       src={teacher.imageUrl || "https://avatars.githubusercontent.com/u/109097090?v=4"}
+
+
+
                       alt={teacher.name}
                     />
                     <h3 className="text-lg font-medium">{teacher.fullName}</h3>
@@ -75,7 +81,7 @@ const AllTeachers = () => {
                     <p className="text-gray-600 ">Phone: </p>
                     <p className="text-gray-600 ">{teacher.mobileNumber}</p>
                   </div>
-                </NavLink>
+                
               </div>
             ))}
           </div>
@@ -83,10 +89,12 @@ const AllTeachers = () => {
             isOpen={isSidebarOpen}
             onClose={handleSidebarClose}
             title="Add New Teacher"
-            width="70%" // Custom width
+            width="70%"
+            
+             // Custom width
             // Custom height
           >
-            <AddTeacher />
+            <AddUser role={'teacher'} />
           </SidebarSlide>
         </div>
       </DashLayout>

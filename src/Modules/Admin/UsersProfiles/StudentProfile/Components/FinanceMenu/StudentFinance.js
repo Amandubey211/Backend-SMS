@@ -12,27 +12,29 @@ const StudentFinance = ({ student }) => {
             <FinanceCard
               icon={<MdOutlineLocationOn className="text-red-300 text-2xl" />}
               label="Total Unpaid Fees"
-              value={student.finance.totalUnpaidFees}
+              value={student?.finance?.totalUnpaidFees}
               buttonLabel="Message"
               onButtonClick={() => console.log("Message clicked")}
             />
             <FinanceCard
               icon={<MdOutlineLocationOn className="text-red-300 text-2xl" />}
               label="Parents Account Total Paid"
-              value={student.finance.parentsAccountTotalPaid}
+              value={student?.finance?.parentsAccountTotalPaid}
               buttonLabel="Message"
               onButtonClick={() => console.log("Message clicked")}
             />
             <FinanceCard
               icon={<MdOutlineLocationOn className="text-red-300 text-2xl" />}
               label="Total Paid Fees"
-              value={student.finance.totalPaidFees}
+              value={student?.finance
+                ?.totalPaidFees}
               buttonLabel="Message"
               onButtonClick={() => console.log("Message clicked")}
             />
           </div>
         </div>
-        <FinanceTable feesDetails={student.finance.feesDetails} />
+        <FinanceTable feesDetails={student?.finance
+          ?.feesDetails} />
       </div>
     </>
   );

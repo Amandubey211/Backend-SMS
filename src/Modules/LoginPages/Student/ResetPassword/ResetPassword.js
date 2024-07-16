@@ -10,8 +10,7 @@ import Layout from "../../../../Components/Common/Layout";
 const ResetPassword = () => {
   const [resetDetails, setResetDetails] = useState({
     newPassword: "",
-    confirmPassword: "",
-    studentId: "",
+    confirmPassword: ""
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -52,17 +51,7 @@ const ResetPassword = () => {
             </NavLink>
             <h2 className="text-3xl  py-4 font-semibold">Reset Password </h2>
 
-            <div className="mb-4">
-              <input
-                type="text"
-                name="studentId"
-                value={resetDetails.studentId}
-                onChange={handleChange}
-                placeholder="Student ID/ Addmission ID*"
-                className="mt-1 block w-full px-3 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                required
-              />
-            </div>
+           
 
             <div className="mb-4">
               <div className="relative">

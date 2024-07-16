@@ -1,16 +1,26 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { dummyStaff } from './dummyData/dummyData';  // Import staff data
 import Layout from '../../../../Components/Common/Layout';
 import DashLayout from '../../../../Components/Admin/AdminDashLayout';
 import SidebarSlide from '../../../../Components/Common/SidebarSlide';
-import AddStaff from "./AddStaff";
 import ViewStaff from "./ViewStaff";
 import ProfileCard from "../SubComponents/ProfileCard";
+import useGetAllStaff from "../../../../Hooks/AuthHooks/Staff/Admin/staff/useGetAllStaff";
+import { useSelector } from "react-redux";
+import AddUser from "./AddUser";
+
 
 const AllStaff = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarContent, setSidebarContent] = useState(null);
   const [selectedStaff, setSelectedStaff] = useState(null);
+  const staff = useSelector((store) => store.Staff.allStaff);
+const {fetchStaff}= useGetAllStaff()
+  useEffect(() => {
+    fetchStaff()
+    // fetchSubjects(cid);
+    console.log(staff );
+  }, []);
 
   const handleSidebarOpen = () => setSidebarOpen(true);
   const handleSidebarClose = () => setSidebarOpen(false);
@@ -37,7 +47,7 @@ const AllStaff = () => {
       case "viewStaff":
         return <ViewStaff staff={selectedStaff} />;
       case "addStaff":
-        return <AddStaff />;
+        return <AddUser role ={'staff'} />;
       default:
         return <div>Select an action</div>;
     }
@@ -55,10 +65,10 @@ const AllStaff = () => {
             </button>
           </div>
           <div className="flex flex-wrap -mx-2">
-            {dummyStaff.map((staff, index) => (
+            {staff.map(( profile, index) => (
               <ProfileCard
                 key={index}
-                profile={staff}
+                profile={ profile}
                 onClick={handleStaffClick}
               />
             ))}
@@ -69,7 +79,8 @@ const AllStaff = () => {
             title={<span className="bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent bg-clip-text">
               {sidebarContent === "viewStaff" ? "Quick View of Staff" : "Add New Staff"}
             </span>}
-            width="40%"
+            width="70%"
+            height='auto'
           >
             {renderSidebarContent()}
           </SidebarSlide>

@@ -59,7 +59,8 @@ const useStaffLogin = () => {
         );
 
         dispatch(setAuth(true));
-        dispatch(setRole(data.role)); // dynamic role from backend
+        dispatch(setRole(data.role));// dynamic role from backend
+        console.log(data);
         dispatch(
           setUerDetails({
             userId: data.userId,

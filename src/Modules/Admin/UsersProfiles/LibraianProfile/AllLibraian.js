@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { dummyTeachers } from './dummyData/dummyData'; // Assuming this has librarian data
 import Layout from "../../../../Components/Common/Layout";
 import DashLayout from "../../../../Components/Admin/AdminDashLayout";
@@ -6,12 +6,21 @@ import SidebarSlide from "../../../../Components/Common/SidebarSlide";
 import AddLibraian from "./AddLibraian";
 import ViewLibraian from "./ViewLibraian";
 import ProfileCard from '../SubComponents/ProfileCard';
+import useGetAllStaff from "../../../../Hooks/AuthHooks/Staff/Admin/staff/useGetAllStaff";
+import { useSelector } from "react-redux";
+import AddUser from "../StaffProfile/AddUser";
 
 const AllLibraian = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarContent, setSidebarContent] = useState(null);
   const [selectedLibrarian, setSelectedLibrarian] = useState(null);
+  const allLibraian = useSelector((store) => store.Staff.allLibraian);
+const {fetchStaff}= useGetAllStaff()
+  useEffect(() => {
+    fetchStaff()
+    console.log(allLibraian);
 
+  }, []);
   const handleSidebarOpen = () => setSidebarOpen(true);
   const handleSidebarClose = () => setSidebarOpen(false);
 
@@ -31,7 +40,7 @@ const AllLibraian = () => {
       case "viewLibraian":
         return <ViewLibraian librarian={selectedLibrarian} />;
       case "addLibraian":
-        return <AddLibraian />;
+        return <AddUser role ={'libranian'} />;
       default:
         return <div>Select an action</div>;
     }
@@ -49,7 +58,7 @@ const AllLibraian = () => {
             </button>
           </div>
           <div className="flex flex-wrap -mx-2">
-            {dummyTeachers.map((librarian, index) => (
+            {allLibraian.map((librarian, index) => (
               <ProfileCard key={index} profile={librarian} onClick={handleAppointmentClick} />
             ))}
           </div>
@@ -59,7 +68,7 @@ const AllLibraian = () => {
             title={<span className="bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent bg-clip-text">
               {sidebarContent === "viewLibraian" ? "Quick View of Libraian" : "Add New Libraian"}
             </span>}
-            width="40%"
+            width="70%"
           >
             {renderSidebarContent()}
           </SidebarSlide>
