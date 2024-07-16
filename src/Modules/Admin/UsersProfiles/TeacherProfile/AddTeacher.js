@@ -4,28 +4,44 @@ import FormInput from "../../Accounting/subClass/component/FormInput";
 import FormSelect from "../../Accounting/subClass/component/FormSelect";
 import Layout from "../../../../Components/Common/Layout";
 import DashLayout from "../../../../Components/Admin/AdminDashLayout";
+import useAddUser from "../../../../Hooks/AuthHooks/Staff/Admin/staff/useAddUser";
+import useGetAllTeachers from "../../../../Hooks/AuthHooks/Staff/Admin/Teacher/useGetAllTeacher";
 
-const AddTeacher = () => {
+const AddTeacher = ({role}) => {
   const [imagePreview, setImagePreview] = useState(null);
+  const [address, setAddress] = useState({
+    street: '',
+    city: '',
+    state: '',
+    postalCode: '',
+    country: ''
+  })
   const [teacherData, setTeacherData] = useState({
-    name: "",
+    firstName: "",
+    lastName: "",
     dob: "",
     religion: "",
     gender: "",
-    category: "",
-    salary: "",
+    position: "",
+    monthlySalary: "",
     bloodGroup: "",
-    phone: "",
+    mobileNumber: "",
     email: "",
-    address: "",
-    teacherImage: null,
+    profile:null,
     teacherCV: null,
+    employeeID:'',
+    address:null,
+    role:''
   });
+ 
 
+  // firstName, lastName, email, mobileNumber, address, role, position,
+  // department, subjects, dob, gender, employeeID, emergencyContact,
+  // dateOfJoining, qualifications, previousExperience, classIds, monthlymonthlySalary
   const genderOptions = [
-    { value: "Male", label: "Male" },
-    { value: "Female", label: "Female" },
-    { value: "Other", label: "Other" },
+    { value: "male", label: "Male" },
+    { value: "female", label: "Female" },
+    { value: "other", label: "Other" },
   ];
 
   const categoryOptions = [
@@ -54,6 +70,14 @@ const AddTeacher = () => {
       [name]: value,
     }));
   };
+  const handleAddressInputChange = (e) => {
+    const { name, value } = e.target;
+    console.log(name,value);
+    setAddress((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -65,7 +89,7 @@ const AddTeacher = () => {
       reader.readAsDataURL(file);
       setTeacherData((prev) => ({
         ...prev,
-        teacherImage: file,
+        profile: file,
       }));
     }
   };
@@ -83,11 +107,18 @@ const AddTeacher = () => {
   const handleRemoveImage = () => {
     setImagePreview(null);
   };
-
-  const handleSubmit = (e) => {
+  const { fetchTeachers } = useGetAllTeachers();
+const {addUser,error,loading} = useAddUser()
+  const handleSubmit = async(e) => {
     e.preventDefault();
+   teacherData.address=address;
+   teacherData.role = role
     console.log("Teacher data to submit:", teacherData);
-    // Implement submission logic here
+   await addUser(teacherData);
+   if(!error){
+    fetchTeachers()
+   }
+
   };
 
   return (
@@ -110,9 +141,15 @@ const AddTeacher = () => {
             </div>
             <div className=" flex flex-col gap-3 ">
               <FormInput
-                id="name"
-                label="Name"
-                value={teacherData.name}
+                id="firstName"
+                label="Fisrt Name"
+                value={teacherData.fisrtName}
+                onChange={handleInputChange}
+              />
+              <FormInput
+                id="lastName"
+                label="Last Name"
+                value={teacherData.lastName}
                 onChange={handleInputChange}
               />
               <FormInput
@@ -137,19 +174,27 @@ const AddTeacher = () => {
                 onChange={handleInputChange}
               />
               <FormSelect
-                id="category"
+                id="position"
                 label="Teacher Category"
                 options={categoryOptions}
-                value={teacherData.category}
+                value={teacherData.position}
                 onChange={handleInputChange}
               />
             </div>
             <div className="  flex flex-col gap-3">
               <FormInput
-                id="salary"
-                label="Salary"
+                id="monthlySalary"
+                label="Monthly Salary"
                 type="number"
-                value={teacherData.salary}
+                name='monthlySalary'
+                value={teacherData.monthlySalary}
+                onChange={handleInputChange}
+              />
+              <FormInput
+                id="employeeID"
+                label="employeeID"
+                name="employeeID"
+                value={teacherData.employeeID}
                 onChange={handleInputChange}
               />
               <FormSelect
@@ -165,9 +210,9 @@ const AddTeacher = () => {
           <div className="flex flex-col gap-5">
             <div className="flex  gap-5">
               <FormInput
-                id="phone"
-                label="Phone"
-                value={teacherData.phone}
+                id="mobileNumber"
+                label="Mobile Number"
+                value={teacherData.mobileNumber}
                 onChange={handleInputChange}
               />
               <FormInput
@@ -178,13 +223,51 @@ const AddTeacher = () => {
               />
             </div>
 
-            <div className="w-[50%]"  >
-              <FormInput
-                id="address"
-                label="Address"
-                value={teacherData.address}
-                onChange={handleInputChange}
+            <div className="flex flex-col gap-5"  >
+            <div className="flex  gap-5">
+                  <FormInput
+                id="country"
+                label="Country"
+                value={address.country}
+                onChange={handleAddressInputChange}
               />
+                  <FormInput
+                id="state"
+                label="State"
+                value={address.state}
+                onChange={handleAddressInputChange}
+              />
+            </div>
+          
+            </div>
+            <div className="flex flex-col gap-5"  >
+            <div className="flex  gap-5">
+                  <FormInput
+                id="city"
+                label="City"
+                value={address.city}
+                onChange={handleAddressInputChange}
+              />
+                  <FormInput
+                id="postalCode"
+                label="Postal Code"
+                value={address.postalCode}
+                onChange={handleAddressInputChange}
+              />
+            </div>
+          
+            </div>
+            <div className="w-[50%]"  >
+           
+                  <FormInput
+                id="street"
+                label="Street"
+                value={address.street}
+                onChange={handleAddressInputChange}
+              />
+              
+            
+          
             </div>
             <div className="w-[50%] h-25 flex items-center p-4 bg-white border-2 border-dashed border-gray-300 rounded-lg">
             <input

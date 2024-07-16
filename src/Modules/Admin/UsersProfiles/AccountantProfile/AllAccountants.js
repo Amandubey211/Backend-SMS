@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { dummyAccountants } from './dummyData/dummyData'; // Assuming this holds accountant data
 import Layout from '../../../../Components/Common/Layout';
 import DashLayout from '../../../../Components/Admin/AdminDashLayout';
@@ -6,11 +6,20 @@ import SidebarSlide from '../../../../Components/Common/SidebarSlide';
 import AddAccountant from "./AddAccountant";
 import ViewAccountant from "./ViewAccountant";
 import ProfileCard from '../SubComponents/ProfileCard'; // Import the generic ProfileCard
+import { useSelector } from "react-redux";
+import useGetAllStaff from "../../../../Hooks/AuthHooks/Staff/Admin/staff/useGetAllStaff";
+import AddUser from "../StaffProfile/AddUser";
 
 const AllAccountants = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarContent, setSidebarContent] = useState(null);
   const [selectedAccountant, setSelectedAccountant] = useState(null);
+  const allAccountant = useSelector((store) => store.Staff.allAccountant);
+const {fetchStaff}= useGetAllStaff()
+  useEffect(() => {
+    fetchStaff()
+
+  }, []);
 
   const handleSidebarOpen = () => setSidebarOpen(true);
   const handleSidebarClose = () => setSidebarOpen(false);
@@ -31,7 +40,7 @@ const AllAccountants = () => {
       case "viewAccountant":
         return <ViewAccountant accountant={selectedAccountant} />;
       case "addAccountant":
-        return <AddAccountant />;
+        return <AddUser role={'accountant'} />;
       default:
         return <div>Select an action</div>;
     }
@@ -49,7 +58,7 @@ const AllAccountants = () => {
             </button>
           </div>
           <div className="flex flex-wrap -mx-2">
-            {dummyAccountants.map((accountant, index) => (
+            {allAccountant.map((accountant, index) => (
               <ProfileCard
                 key={index}
                 profile={accountant}
@@ -63,7 +72,7 @@ const AllAccountants = () => {
             title={<span className="bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent bg-clip-text">
               {sidebarContent === "viewAccountant" ? "Quick View of Accountant" : "Add New Accountant"}
             </span>}
-            width="40%"
+            width="70%"
           >
             {renderSidebarContent()}
           </SidebarSlide>

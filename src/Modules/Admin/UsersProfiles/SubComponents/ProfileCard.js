@@ -17,12 +17,12 @@ const ProfileCard = ({ profile, onClick }) => {
           </button>
         </div>
         <div className="flex flex-col h-[80%] justify-center items-center py-3">
-          <img className="object-cover rounded-full w-[100px] h-[100px]" src={profile.imageUrl} alt={profile.name} />
-          <h3 className="text-lg font-medium">{profile.name}</h3>
-          <p className="text-gray-500">{profile.subject}</p>
+          <img className="object-cover rounded-full w-[100px] h-[100px]" src={profile?.imageUrl} alt={profile.firstName} />
+          <h3 className="text-lg font-medium">{profile.firstName} {profile.lastName}</h3>
+          <p className="text-gray-500">{profile.position}</p>
         </div>
         <div className="p-4 text-center justify-center items-center">
-          <p className="text-gray-600">Phone: {profile.phone}</p>
+          <p className="text-gray-600">Phone: {profile.mobileNumber}</p>
         </div>
       </div>
     </div>

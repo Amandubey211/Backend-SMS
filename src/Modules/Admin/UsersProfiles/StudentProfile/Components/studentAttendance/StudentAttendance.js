@@ -18,10 +18,10 @@ import DashLayout from "../../../../../../Components/Admin/AdminDashLayout";
 // import Layout from "../../../../../Components/Common/";
 // import DashLayout from "../../../../../Components/Admin/AdminDashLayout";
 
-const StudentAttendance = ({ student }) => {
+const StudentAttendance = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
-
-  const attendanceData = student.attendance.details.map((attendance) => ({
+let student;
+  const attendanceData = student?.attendance?.details.map((attendance) => ({
     startDate: attendance.startDate,
     endDate: attendance.endDate,
     title: attendance.type,

@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useRef } from "react";
 import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css";
+//import "react-quill/dist/quill.snow.css";
 import axios from "axios";
 import { FaSpinner } from "react-icons/fa";
 
