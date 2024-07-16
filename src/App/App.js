@@ -328,7 +328,7 @@ function App() {
     { path: "/stafflogin", element: <StaffLogin />, errorElement: <Error /> },
     { path: "/signup", element: <StudentSignUp />, errorElement: <Error /> },
     {
-      path: "/reset_password",
+      path: "/reset_password/:token",
       element: <ResetPassword />,
       errorElement: <Error />,
     },
