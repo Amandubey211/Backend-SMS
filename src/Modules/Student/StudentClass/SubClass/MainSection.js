@@ -85,7 +85,7 @@ import { FaSchool } from "react-icons/fa";
 import { SlEyeglass } from "react-icons/sl";
 import { FcGraduationCap, FcCalendar } from "react-icons/fc";
 import { setSelectedClass, setSelectedClassName, setSelectedSubjectName,setSelectedSection, setSelectedSubject } from "../../../../Redux/Slices/Common/CommonSlice";
-
+import { TbProgress } from "react-icons/tb";
 const colors = [
   "bg-yellow-300",
   "bg-blue-300",
@@ -158,20 +158,20 @@ const MainSection = () => {
   console.log("class data", classData)
 
   const iconData = [
-    { icon: <SlEyeglass className="text-purple-600" />, text: `${classData.teachersCount} My Class Instructor`, url: `/student_class/class/${cid}/teachers` },
+    { icon: <SlEyeglass className="text-purple-600" />, text: `My Class Teacher (${classData.teachersCount})`, url: `/student_class/class/${cid}/teachers` },
     {
       icon: <FaSchool className="text-yellow-600" />,
-      text: `${classData.section?.sectionName || 'No Section'} | ${classData.groups ? classData.groups.length : 0} Section`,
+      text: `${classData.section?.sectionName || 'No Section'} - ${classData.groups[0].groupName}`,
       // url: `/class/${cid}/section_group`,
       url: `/student_class/class/${cid}/teachers`
     },
 
     {
-      icon: <FcGraduationCap />, text: `${classData.classmatesCount} Classmate`,
+      icon: <FcGraduationCap />, text: `My Classmates (${classData.classmatesCount}) `,
       // url: `/class/${cid}/students` 
       url: `/student_class/class/${cid}/classmates`
     },
-    { icon: <FcCalendar />, text: "Attendance", url: `/class/${cid}/attendance` },
+    { icon: <FcCalendar />, text: "My Attendance", url: `/class/${cid}/attendance` },
   ];
   // const iconData = [
   //   { icon: <SlEyeglass className="text-purple-600" />, text: `${classData.teachersCount} Teacher Assigned`, url: `/class/${cid}/teachers` },
