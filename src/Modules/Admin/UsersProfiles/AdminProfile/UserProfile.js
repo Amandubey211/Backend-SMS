@@ -2,14 +2,13 @@ import React, { useState } from "react";
 import Layout from "../../../../Components/Common/Layout";
 import DashLayout from "../../../../Components/Admin/AdminDashLayout";
 import SidebarSlide from "../../../../Components/Common/SidebarSlide";
+import { useSelector } from "react-redux";
+import useChangePassword from "../../../../Hooks/AuthHooks/Staff/Admin/resetPassword/useResetPassword";
+import toast from "react-hot-toast";
 
 const UserProfile = () => {
-  const [userData, setUserData] = useState({
-    firstName: "Dianne",
-    lastName: "Russell",
-    email: "dianne.russell@gmail.com",
-    phoneNumber: "01835550123",
-  });
+  const user = useSelector((store)=>store.Auth.userDetail);;
+   const [userData, setUserData] = useState(user);
   const [passwordData, setPasswordData] = useState({
     currentPassword: "",
     newPassword: "",
@@ -24,13 +23,13 @@ const UserProfile = () => {
     // Logic to update profile
     console.log("Profile updated:", userData);
   };
-
+const {ChangePassword} =  useChangePassword();
   const updatePassword = () => {
-    // Logic to update password
+    console.log(passwordData);
     if (passwordData.newPassword === passwordData.confirmPassword) {
-      console.log("Password updated.");
+      ChangePassword(passwordData)
     } else {
-      console.log("Passwords do not match.");
+      toast.error("Passwords do not match.");
     }
   };
 
@@ -45,7 +44,8 @@ const UserProfile = () => {
               className="w-20 h-20 rounded-full"
             />
             <div className="flex flex-row justify-between  w-full ">
-              <h2 className="text-xl font-semibold">Cameron Williamson</h2>
+              <h2 className="text-xl font-semibold">{userData.adminName
+                }</h2>
               {/* <button onClick={updateProfile} className="text-blue-600">
                 Edit
               </button> */}
@@ -64,21 +64,22 @@ Edit                </button>
           <div className="flex flex-col gap-5 ">
               <div className="flex  flex-col" >
                 <span  className=" font-normal text-gray-500">First name</span>
-                <span  className=" font-medium text-gray-800">Arijit</span>
+                <span  className=" font-medium text-gray-800">{userData.adminName
+                }</span>
               </div>
               <div className="flex flex-col ">
                 <span   className=" font-normal text-gray-500">email</span>
-                <span  className=" font-medium text-gray-800">arijit@gmail.com</span>
+                <span  className=" font-medium text-gray-800">{userData.email}</span>
               </div>
             </div>
             <div className="flex flex-col gap-5 ">
               <div className="flex  flex-col" >
                 <span  className=" font-normal text-gray-500">Last Name</span>
-                <span  className=" font-medium text-gray-800">Das</span>
+                <span  className=" font-medium text-gray-800">{userData?.adminName?.split(' ')[1]?userData.adminName.split(' ')[1]:'-'}</span>
               </div>
               <div className="flex flex-col ">
                 <span   className=" font-normal text-gray-500">Phone</span>
-                <span  className=" font-medium text-gray-800">8918125833</span>
+                <span  className=" font-medium text-gray-800">{userData.contactNumber}</span>
               </div>
             </div>
             {/* <div className="flex flex-col"></div> */}

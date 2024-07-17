@@ -10,29 +10,6 @@ const useAddUser = () => {
   const addUser = useCallback(
     
     async (userData) => {
-      const {
-        firstName, lastName, email, mobileNumber, address, role, position,
-        department, subjects, dob, gender, employeeID, emergencyContact,
-        dateOfJoining, qualifications, previousExperience, classIds, monthlySalary
-      } = userData;
-console.log(userData);
-      const missingFields = [];
-
-      if (!firstName) missingFields.push("First Name");
-      if (!lastName) missingFields.push("Last Name");
-      if (!email) missingFields.push("Email");
-      if (!mobileNumber) missingFields.push("Mobile Number");
-      if (!address) missingFields.push("Address");
-      if (!role) missingFields.push("Role");
-      if (!dob) missingFields.push("Date of Birth");
-      if (!gender) missingFields.push("Gender");
-      if (!monthlySalary) missingFields.push("Monthly Salary");
-
-      if (missingFields.length > 0) {
-        toast.error(`Please fill out the following fields: ${missingFields.join(", ")}`);
-        return { success: false, error: "Validation Error" };
-      }
-
       setLoading(true);
       setError(null);
 
@@ -42,7 +19,7 @@ console.log(userData);
 
         const response = await axios.post(
           `${API_URL}/admin/staff_register`, // Adjust the API endpoint as needed
-          userData,
+         userData,
           {
             headers: {       Authentication: token, },
           }
