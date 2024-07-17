@@ -27,4 +27,6 @@ const useGetAllStaff = () => {
   return { fetchStaff, loading, error };
 };
 
+
+
 export default useGetAllStaff;

@@ -51,7 +51,6 @@ const AllTeachers = () => {
                 className="relative w-full sm:w-1/2 md:w-1/3 lg:w-1/4 px-2 mb-4 flex flex-col"
                 key={index}
               >
-              
                   <div className=" absolute right-0 flex flex-col px-4 gap-2 justify-end ">
                     <button className=" bg-transparent p-2 rounded-full border  ">
                       <FiUserPlus className="text-sm text-green-500 " />

@@ -62,13 +62,7 @@ const useStaffLogin = () => {
         dispatch(setRole(data.role));// dynamic role from backend
         console.log(data);
         dispatch(
-          setUerDetails({
-            userId: data.userId,
-            schoolId: data.schoolId,
-            email: data.email,
-            userName: data?.fullName,
-            profile: data?.profile,
-          })
+          setUerDetails(data.user)
         );
         navigate(`/dashboard`);
         toast.success("Logged in successfully", {

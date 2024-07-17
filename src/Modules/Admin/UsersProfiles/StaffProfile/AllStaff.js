@@ -47,12 +47,12 @@ const {fetchStaff}= useGetAllStaff()
       case "viewStaff":
         return <ViewStaff staff={selectedStaff} />;
       case "addStaff":
-        return <AddUser role ={'staff'} />;
+        return <AddUser role = {'staff'} />;
       default:
         return <div>Select an action</div>;
     }
   };
-
+  
   return (
     <Layout title="All Staff">
       <DashLayout>
