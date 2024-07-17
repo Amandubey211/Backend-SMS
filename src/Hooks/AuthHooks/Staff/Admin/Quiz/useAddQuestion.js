@@ -19,14 +19,15 @@ const useAddQuestion = () => {
         correctAnswerComment,
         inCorrectAnswerComment,
       } = questionData;
-
+      console.log(typeof questionPoint);
       const missingFields = [];
       if (!quizId) missingFields.push("Quiz ID");
       if (!questionText) missingFields.push("Question Text");
       if (!questionPoint) missingFields.push("Question Point");
       if (!type) missingFields.push("Type");
       if (!options || options.length === 0) missingFields.push("Options");
-      if (type !== "text" && !correctAnswer) missingFields.push("Correct Answer");
+      if (type !== "text" && !correctAnswer)
+        missingFields.push("Correct Answer");
 
       if (missingFields.length > 0) {
         toast.error(

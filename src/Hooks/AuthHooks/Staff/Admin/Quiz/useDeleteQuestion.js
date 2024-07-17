@@ -23,7 +23,7 @@ const useDeleteQuestion = () => {
         const token = localStorage.getItem(`${role}:token`);
 
         const response = await axios.delete(
-          `${API_URL}/quiz/${quizId}/question/${questionId}`,
+          `${API_URL}/admin/quiz/${quizId}/question/${questionId}`,
           {
             headers: { Authentication: token },
           }

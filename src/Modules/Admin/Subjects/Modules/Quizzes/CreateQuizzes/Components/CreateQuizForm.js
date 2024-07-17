@@ -39,6 +39,7 @@ const CreateQuizForm = ({
       setChapters([]);
     }
   }, [moduleId, moduleList]);
+
   return (
     <div className="max-w-md mx-auto p-4 bg-white space-y-2">
       <h2 className="text-xl font-semibold">Option</h2>
@@ -63,7 +64,7 @@ const CreateQuizForm = ({
               type="radio"
               name="allowShuffleAnswers"
               value="true"
-              // checked={allowShuffleAnswers === true}
+              checked={allowShuffleAnswers === true}
               onChange={(e) =>
                 handleChange({
                   target: {
@@ -79,7 +80,7 @@ const CreateQuizForm = ({
               type="radio"
               name="allowShuffleAnswers"
               value="false"
-              // checked={allowShuffleAnswers === false}
+              checked={allowShuffleAnswers === false}
               onChange={(e) =>
                 handleChange({
                   target: {

@@ -1,7 +1,7 @@
 import React from "react";
 import QuestionCard from "./QuestionCard";
 
-const QuestionList = ({ questions, deleteQuestion, editQuestion, quizId }) => {
+const QuestionList = ({ questions, deleteQuestion, editQuestion }) => {
   const totalPoints = questions.reduce((sum, question) => {
     return sum + parseFloat(question.questionPoint);
   }, 0);
@@ -13,13 +13,12 @@ const QuestionList = ({ questions, deleteQuestion, editQuestion, quizId }) => {
         <h3>Total Points: {totalPoints}</h3>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {questions.map((q, index) => (
+        {questions.map((q) => (
           <QuestionCard
-            key={index}
+            key={q._id}
             question={q}
-            index={index}
-            deleteQuestion={deleteQuestion}
-            editQuestion={editQuestion}
+            deleteQuestion={() => deleteQuestion(q._id)}
+            editQuestion={() => editQuestion(q._id)}
           />
         ))}
       </div>

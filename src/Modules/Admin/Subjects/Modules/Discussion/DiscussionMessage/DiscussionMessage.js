@@ -1,23 +1,33 @@
-import React, { useEffect, useState } from 'react';
-import CommentSection from './CommentSection';
-import CommentsHeader from './Components/CommentsHeader';
-import InputComment from './Components/InputComment';
-import dummycomments from './dummyData';
+import React, { useEffect, useState } from "react";
+import CommentSection from "./CommentSection";
+import CommentsHeader from "./Components/CommentsHeader";
+import InputComment from "./Components/InputComment";
+import dummycomments from "./dummyData";
+import useFetchCommentsByDiscussion from "../../../../../../Hooks/AuthHooks/Staff/Admin/Disscussion/Message/useFetchCommentsByDiscussion";
 
 const DiscussionMessage = () => {
   const [comments, setComments] = useState(dummycomments);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [activeReplyId, setActiveReplyId] = useState(null);
+  // const {
+  //   comments: fetchedComments,
+  //   error,
+  //   fetchCommentsByDiscussion,
+  //   loading,
+  // } = useFetchCommentsByDiscussion();
 
+  // useEffect(() => {
+  //   fetchCommentsByDiscussion();
+  // }, []);
   const addComment = (text) => {
     const newComment = {
       id: comments.length + 1,
-      author: 'New User',
+      author: "New User",
       role: null,
-      time: 'Just now',
+      time: "Just now",
       text: text,
       likes: 0,
-      avatarUrl: 'https://avatars.githubusercontent.com/u/109097090?v=4',
+      avatarUrl: "https://avatars.githubusercontent.com/u/109097090?v=4",
       replies: [],
       isUserCreated: true,
     };
@@ -27,27 +37,27 @@ const DiscussionMessage = () => {
   const addNestedReply = (id, text, isReplyToReply = false) => {
     const newReply = {
       id: Date.now(),
-      author: 'New User',
+      author: "New User",
       role: null,
-      time: 'Just now',
+      time: "Just now",
       text: text,
       likes: 0,
-      avatarUrl: 'https://avatars.githubusercontent.com/u/109097090?v=4',
+      avatarUrl: "https://avatars.githubusercontent.com/u/109097090?v=4",
       replies: [],
       isUserCreated: true,
     };
 
     const addReplyRecursively = (comments) => {
-      return comments.map(comment => {
+      return comments.map((comment) => {
         if (comment.id === id && !isReplyToReply) {
           return {
             ...comment,
-            replies: [newReply, ...comment.replies]
+            replies: [newReply, ...comment.replies],
           };
         } else if (comment.replies.length > 0) {
           return {
             ...comment,
-            replies: addReplyRecursively(comment.replies)
+            replies: addReplyRecursively(comment.replies),
           };
         }
         return comment;
@@ -70,16 +80,16 @@ const DiscussionMessage = () => {
 
   const deleteReply = (commentId, replyId) => {
     const deleteReplyRecursively = (comments) => {
-      return comments.map(comment => {
+      return comments.map((comment) => {
         if (comment.id === commentId) {
           return {
             ...comment,
-            replies: comment.replies.filter(reply => reply.id !== replyId)
+            replies: comment.replies.filter((reply) => reply.id !== replyId),
           };
         } else if (comment.replies.length > 0) {
           return {
             ...comment,
-            replies: deleteReplyRecursively(comment.replies)
+            replies: deleteReplyRecursively(comment.replies),
           };
         }
         return comment;
