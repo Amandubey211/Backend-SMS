@@ -13,6 +13,7 @@ import toast from "react-hot-toast";
 import CreateQuizForm from "./Components/CreateQuizForm";
 import QuestionForm from "./Components/QuestionForm";
 import useCreateQuiz from "../../../../../../Hooks/AuthHooks/Staff/Admin/Quiz/createQuiz";
+import useSidebar from "../../../../../../Hooks/CommonHooks/useSidebar";
 
 const initialFormState = {
   points: "",
@@ -57,17 +58,15 @@ const MainSection = () => {
   const [wrongAnswerComment, setWrongAnswerComment] = useState("");
   const [questionPoint, setQuestionPoint] = useState("");
   const [questionType, setQuestionType] = useState("multiple choice");
-  const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editingQuestionId, setEditingQuestionId] = useState(null);
 
-  const handleSidebarOpen = useCallback(() => setSidebarOpen(true), []);
-  const handleSidebarClose = useCallback(() => setSidebarOpen(false), []);
   const { createQuiz, loading: createLoading } = useCreateQuiz();
   const { updateQuiz, loading: updateLoading } = useUpdateQuiz();
   const { addQuestion, loading: questionLoading } = useAddQuestion();
   const { editQuestion, loading: editLoading } = useEditQuestion();
   const { deleteQuestion, error, loading } = useDeleteQuestion();
+  const { handleSidebarClose, handleSidebarOpen, isSidebarOpen } = useSidebar();
 
   useEffect(() => {
     if (location.state && location.state.quiz) {
@@ -247,7 +246,9 @@ const MainSection = () => {
 
       <div className="w-full flex">
         <div
-          className={` ${activeTab === "instructions" ? "w-[70%]" : "w-full"} border-x`}
+          className={` ${
+            activeTab === "instructions" ? "w-[70%]" : "w-full"
+          } border-x`}
         >
           <Tabs
             createPage={true}

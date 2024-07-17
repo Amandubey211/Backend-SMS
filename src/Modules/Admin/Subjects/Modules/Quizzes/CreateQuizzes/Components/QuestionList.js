@@ -5,6 +5,7 @@ const QuestionList = ({ questions, deleteQuestion, editQuestion, quizId }) => {
   const totalPoints = questions.reduce((sum, question) => {
     return sum + parseFloat(question.questionPoint);
   }, 0);
+  console.log(questions);
 
   return (
     <div className="">
