@@ -65,9 +65,12 @@ const AttendanceDashboard = () => {
   ];
 
   return (
-    <div className="attendance-dashboard">
-      <h2>Monthly Attendance Summary</h2>
-      <AttendanceChart data={attendanceData} />
+    <div className="attendance-dashboard w-[95%] ">
+      <h2>Attendance</h2>
+      <div className='justify-center text-center w-full '>
+      <AttendanceChart data={attendanceData}/>
+        
+      </div>
     </div>
   );
 };

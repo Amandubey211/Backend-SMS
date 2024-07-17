@@ -62,13 +62,16 @@ const StudentTeacher = () => {
   }
 
   return (
-    <Layout title="My Teachers">
+    <Layout title="My Class Teachers">
       <DashLayout>
         <div className="p-4">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold">My Teachers</h2>
+          <div className="flex items-center gap-3 mb-4">
+            <h2 className="text-xl font-semibold">My Class Teachers </h2>
+            <div className="flex justify-center items-center bg-gradient-to-br from-pink-100 via-purple-100 to-blue-100 rounded-full w-[25px] h-[25px] border border-gray-300">
+              <p className="text-lg font-semibold text-purple-500">{teachers.length || 0}</p>
+            </div>
           </div>
-          <div className="flex flex-wrap -mx-2">
+          <div className="flex flex-wrap -mx-2  ">
             {teachers.map((teacher, index) => (
               <ProfileCard key={index} profile={teacher} />
             ))}
