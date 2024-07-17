@@ -24,7 +24,7 @@ const ButtonsGroup = ({ data, type }) => {
 
   const handleEdit = () => {
     if (type === "Quiz") {
-      navigate(`/class/${cid}/${sid}/create_quiz`, { state: { quiz: data } });
+      navigate(`/class/${cid}/${sid}/create_quiz`, { state: { quizId: data._id } });
     }
     if (type === "Assignment") {
       navigate(`/class/${cid}/${sid}/createassignment`, {

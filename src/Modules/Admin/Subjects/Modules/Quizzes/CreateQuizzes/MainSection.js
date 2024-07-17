@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, Suspense } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { useParams, useLocation } from "react-router-dom";
 import CreateQuizHeader from "./Components/CreateQuizHeader";
 import Tabs from "../Components/Tabs";
@@ -8,12 +8,13 @@ import Sidebar from "../../../../../../Components/Common/Sidebar";
 import useUpdateQuiz from "../../../../../../Hooks/AuthHooks/Staff/Admin/Quiz/useUpdateQuiz";
 import useAddQuestion from "../../../../../../Hooks/AuthHooks/Staff/Admin/Quiz/useAddQuestion";
 import useEditQuestion from "../../../../../../Hooks/AuthHooks/Staff/Admin/Quiz/useEditQuestion";
-import useDeleteQuestion from "../../../../../../Hooks/AuthHooks/Staff/Admin/Quiz/useDeleteQuestion"; // Import the hook
+import useDeleteQuestion from "../../../../../../Hooks/AuthHooks/Staff/Admin/Quiz/useDeleteQuestion";
+import useCreateQuiz from "../../../../../../Hooks/AuthHooks/Staff/Admin/Quiz/createQuiz";
+import useSidebar from "../../../../../../Hooks/CommonHooks/useSidebar";
+import useFetchQuizById from "../../../../../../Hooks/AuthHooks/Staff/Admin/Quiz/useFetchQuizById";
 import toast from "react-hot-toast";
 import CreateQuizForm from "./Components/CreateQuizForm";
 import QuestionForm from "./Components/QuestionForm";
-import useCreateQuiz from "../../../../../../Hooks/AuthHooks/Staff/Admin/Quiz/createQuiz";
-import useSidebar from "../../../../../../Hooks/CommonHooks/useSidebar";
 
 const initialFormState = {
   points: "",
@@ -56,7 +57,7 @@ const MainSection = () => {
   const [answers, setAnswers] = useState(initialAnswersState);
   const [rightAnswerComment, setRightAnswerComment] = useState("");
   const [wrongAnswerComment, setWrongAnswerComment] = useState("");
-  const [questionPoint, setQuestionPoint] = useState("");
+  const [questionPoint, setQuestionPoint] = useState(1);
   const [questionType, setQuestionType] = useState("multiple choice");
   const [isEditing, setIsEditing] = useState(false);
   const [editingQuestionId, setEditingQuestionId] = useState(null);
@@ -67,10 +68,18 @@ const MainSection = () => {
   const { editQuestion, loading: editLoading } = useEditQuestion();
   const { deleteQuestion, error, loading } = useDeleteQuestion();
   const { handleSidebarClose, handleSidebarOpen, isSidebarOpen } = useSidebar();
+  const { fetchQuizById, quiz } = useFetchQuizById();
 
   useEffect(() => {
-    if (location.state && location.state.quiz) {
-      const quiz = location.state.quiz;
+    const quizIdFromState = location.state?.quizId;
+    if (quizIdFromState) {
+      setQuizId(quizIdFromState);
+      fetchQuizById(quizIdFromState);
+    }
+  }, [location.state, fetchQuizById]);
+
+  useEffect(() => {
+    if (quiz) {
       setAssignmentName(quiz.name);
       setInstruction(quiz.content);
       setQuizId(quiz._id);
@@ -100,7 +109,7 @@ const MainSection = () => {
       setRightAnswerComment(quiz.rightAnswerComment || "");
       setWrongAnswerComment(quiz.wrongAnswerComment || "");
     }
-  }, [location.state]);
+  }, [quiz]);
 
   const handleNameChange = (name) => setAssignmentName(name);
   const handleInstructionChange = (content) => setInstruction(content);
@@ -131,31 +140,24 @@ const MainSection = () => {
       correctAnswerComment: rightAnswerComment,
       inCorrectAnswerComment: wrongAnswerComment,
     };
-
     const result = await addQuestion(quizId, newQuestion);
     if (result.success) {
       setQuestionState((prev) => [...prev, newQuestion]);
       resetQuestionForm();
-      toast.success("Question Added");
-    } else {
-      toast.error("Failed to add question");
+      fetchQuizById(quizId); // Refetch quiz
     }
   };
 
-  const deleteQuestionHandler = async (index) => {
-    const questionToDelete = questionState[index];
-    const result = await deleteQuestion(quizId, questionToDelete._id);
+  const deleteQuestionHandler = async (questionId) => {
+    const result = await deleteQuestion(quizId, questionId);
     if (result.success) {
-      const newQuestionState = questionState.filter((_, i) => i !== index);
-      setQuestionState(newQuestionState);
-      toast.success("Question Deleted");
-    } else {
-      toast.error("Failed to delete question");
+      setQuestionState((prev) => prev.filter((q) => q._id !== questionId));
+      fetchQuizById(quizId); // Refetch quiz
     }
   };
 
-  const editQuestionHandler = (index) => {
-    const questionToEdit = questionState[index];
+  const editQuestionHandler = (questionId) => {
+    const questionToEdit = questionState.find((q) => q._id === questionId);
     setQuestion(questionToEdit.questionText);
     setAnswers(questionToEdit.options);
     setRightAnswerComment(questionToEdit.correctAnswerComment);
@@ -163,6 +165,11 @@ const MainSection = () => {
     setQuestionPoint(questionToEdit.questionPoint);
     setQuestionType(questionToEdit.type);
     setEditingQuestionId(questionToEdit._id);
+    handleSidebarOpen();
+  };
+
+  const handleAddNewQuestion = () => {
+    resetQuestionForm();
     handleSidebarOpen();
   };
 
@@ -180,9 +187,6 @@ const MainSection = () => {
       const result = await updateQuiz(quizId, quizData);
       if (result.success) {
         setActiveTab("questions");
-        toast.success("Quiz updated successfully");
-      } else {
-        toast.error("Failed to update quiz");
       }
     } else {
       const result = await createQuiz(quizData);
@@ -231,7 +235,7 @@ const MainSection = () => {
     setAnswers(initialAnswersState);
     setRightAnswerComment("");
     setWrongAnswerComment("");
-    setQuestionPoint("");
+    setQuestionPoint(1);
     setQuestionType("multiple choice");
     setEditingQuestionId(null);
   };
@@ -255,7 +259,7 @@ const MainSection = () => {
             activeTab={activeTab}
             setActiveTab={setActiveTab}
             onTabChange={setActiveTab}
-            handleSidebarOpen={handleSidebarOpen}
+            handleSidebarOpen={handleAddNewQuestion}
           >
             {(activeTab) => (
               <div className="h-full">
@@ -272,7 +276,7 @@ const MainSection = () => {
                   <QuestionListView
                     quizId={quizId}
                     questionState={questionState}
-                    handleSidebarOpen={handleSidebarOpen}
+                    handleSidebarOpen={handleAddNewQuestion}
                     deleteQuestion={deleteQuestionHandler}
                     editQuestion={editQuestionHandler}
                   />

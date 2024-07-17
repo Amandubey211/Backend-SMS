@@ -61,9 +61,12 @@ const useFetchCommentsByDiscussion = () => {
 
     try {
       const token = localStorage.getItem(`${role}:token`);
-      const response = await axios.get(`${API_URL}/comments/${discussionId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await axios.get(
+        `${API_URL}/admin/getDiscussionComment/${discussionId}`,
+        {
+          headers: { Authentication: token },
+        }
+      );
 
       if (response.data.status) {
         const topLevelComments = response.data.data;

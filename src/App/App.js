@@ -687,7 +687,7 @@ function App() {
     },
     {
       path: "/users/teachers",
-      element: <AllTeachers/>,
+      element: <AllTeachers />,
       errorElement: <Error />,
     },
     {

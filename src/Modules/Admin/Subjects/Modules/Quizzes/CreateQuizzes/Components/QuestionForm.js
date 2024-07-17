@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import EditorComponent from '../../../../Component/AdminEditor';
 import AnswerSection from './AnswerSection';
 import AddQuestionButton from './AddQuestionButton';
@@ -21,6 +21,12 @@ const QuestionForm = ({
   setQuestionType,
   addNewQuestion,
 }) => {
+
+  useEffect(() => {
+    if (questionType === 'true/false') {
+      setAnswers([{ text: 'True', isCorrect: false }, { text: 'False', isCorrect: false }]);
+    }
+  }, [questionType, setAnswers]);
 
   const handleQuestionTypeChange = (e) => {
     setQuestionType(e.target.value);
