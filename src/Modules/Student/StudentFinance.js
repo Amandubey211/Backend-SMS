@@ -212,8 +212,12 @@ console.log("TotalPaidFees",totalUnpaidFees)
             />
             <FeeTable feesDetails={filteredFeesDetails} />
           </div>
+          
           <div className="w-[20%] border p-4 h-screen">
+          <h3 className="mb-5 text-gray-500">Your Finance Details</h3>
+
             <div className="flex flex-col gap-5">
+
               <FeeCard
                 title="Total Unpaid Fees"
                 // amount={feesDetails?.tUnpaidFees?.reduce((sum, item) => item.status === "unpaid" ? sum + item.amount : sum, 0)}

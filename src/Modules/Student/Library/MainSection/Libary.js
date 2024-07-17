@@ -141,6 +141,7 @@ const Library = () => {
                   />
                 </div>
               </div>
+
               <div className="grid grid-cols-3 gap-4 p-4">
                 {filteredBooks.map((book) => (
                   // <BookCard
@@ -153,8 +154,7 @@ const Library = () => {
                   //   available={book.copies}
                   //   coverImageUrl={book.image}
                   // />
-
-
+                  
                   <BookCard
                     key={book._id}
                     title={book.title}

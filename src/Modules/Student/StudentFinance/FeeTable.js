@@ -11,7 +11,7 @@ const FeeTable = ({ feesDetails }) => {
           <th className="px-5 py-3 border-b-2 border-gray-200">Due Date</th>
           <th className="px-5 py-3 border-b-2 border-gray-200">Amount</th>
           <th className="px-5 py-3 border-b-2 border-gray-200">Status</th>
-          <th className="px-5 py-3 border-b-2 border-gray-200">Action</th>
+          {/* <th className="px-5 py-3 border-b-2 border-gray-200">Action</th> */}
         </tr>
       </thead>
       <tbody>
@@ -32,7 +32,7 @@ const FeeTable = ({ feesDetails }) => {
                 {item.status}
               </span>
             </td>
-            <td className="px-5 py-2 border-b border-gray-200">
+            {/* <td className="px-5 py-2 border-b border-gray-200">
               {item.status === "Paid" ? (
                 <span className="inline-flex items-center border border-transparent text-xs font-medium shadow-sm bg-green-200 text-green-800 py-1 px-2 rounded-md">
                   Complete
@@ -42,7 +42,7 @@ const FeeTable = ({ feesDetails }) => {
                   Pay Now
                 </button>
               )}
-            </td>
+            </td> */}
           </tr>
         ))}
       </tbody>

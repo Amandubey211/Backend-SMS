@@ -1,4 +1,5 @@
 import React from "react";
+import { BsThreeDotsVertical } from "react-icons/bs";
 
 const BookCard = ({
   title,
@@ -30,11 +31,11 @@ const BookCard = ({
       </div>
       <div className=" relative p-4 ">
         <h3 className="text-lg font-bold text-[#333333]">{title}</h3>
-        <p className="text-base font-semibold bg-gradient-to-r from-pink-500   to-purple-500 inline-block text-transparent bg-clip-text">{category}</p>
+        <p className="text-xs font-semibold bg-gradient-to-r from-pink-500   to-purple-500 inline-block text-transparent bg-clip-text">{category}</p>
 
-        <p className=" mt-2  text-sm font-medium text-gray-500">Author</p>
-        <p className="text-sm font-medium text-gray-600"> {author}</p>
-        <button className=" absolute right-2  bottom-2 text-indigo-600 hover:text-indigo-900">Edit</button>
+        <p className=" mt-2  text-xs font-medium text-gray-500">Author</p>
+        <p className="text-lg te text-gray-600"> {author}</p>
+        <button className=" absolute right-2  bottom-2 text-indigo-600 hover:text-indigo-900"><BsThreeDotsVertical /></button>
 
       </div>
 
