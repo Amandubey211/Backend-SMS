@@ -20,13 +20,17 @@ const ProfileCard = ({ profile, onClick }) => {
             </>
           )}
         </div>
-        <div className="flex flex-col h-[80%] justify-center items-center py-3">
+        <div className="mb-2 flex flex-col h-[80%] justify-center items-center py-3">
           <img className="object-cover rounded-full w-[100px] h-[100px]" src={profile.profile} alt={profile.name} />
           <h3 className="text-lg font-medium">{profile.name}</h3>
-          <p className="text-gray-500">{profile.group}</p>
+          <p className="font-semibold">{profile.number}</p>
+          
+          
         </div>
-        <div className="p-4 text-center justify-center items-center">
-          <p className="text-gray-600">Phone: {profile.number}</p>
+          <hr/>
+         <div className="p-4 text-center justify-center items-center ">
+          <p className="text-gray-600 mt-2 mb-1">ID: {profile.admissionNumber}</p>
+          <p><span className="font-bold">Group:</span> {profile.group}</p>
         </div>
       </div>
     </div>

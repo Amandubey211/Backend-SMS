@@ -65,8 +65,12 @@ const StudentClassMates = () => {
     <Layout title="My Classmates">
       <DashLayout>
         <div className="p-4">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold">My Classmates</h2>
+          <div className="flex items-center mb-4 gap-3">
+            <h2 className="text-xl font-semibold">My Classmates </h2>
+            <div className="flex justify-center items-center bg-gradient-to-br from-pink-100 via-purple-100 to-blue-100 rounded-full w-[25px] h-[25px] border border-gray-300">
+
+            <p className="text-lg font-semibold text-purple-500">{classmates.length || 0}</p>
+            </div>
           </div>
           <div className="flex flex-wrap -mx-2">
             {classmates.map((classmate, index) => (

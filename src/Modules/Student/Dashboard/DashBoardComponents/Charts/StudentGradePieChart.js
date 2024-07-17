@@ -42,7 +42,7 @@ const StudentGradePieChart = () => {
         position: "bottom",
         labels: {
           boxWidth: 20,
-          padding: 20,
+          padding: 8,
           usePointStyle: true,
         },
       },
