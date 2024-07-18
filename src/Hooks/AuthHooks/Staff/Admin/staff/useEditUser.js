@@ -3,18 +3,16 @@ import axios from "axios";
 import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
 
-const useAddUser = () => {
+const useEditUser = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const adminRole = useSelector((store) => store.Auth.role);
-  const addUser = useCallback(
+  const EditUser = useCallback(
     
-    async (userData,address) => {
+    async (userData) => {
       const { firstName, lastName, email, mobileNumber, role, position,
-       dob, gender, employeeID, monthlySalary} = userData;
-
+       dob, gender, employeeID, monthlySalary,_id,address,profile} = userData;
        const missingFields = [];
-
        if (!firstName) missingFields.push("First Name");
        if (!lastName) missingFields.push("Last Name");
        if (!email) missingFields.push("Email");
@@ -25,7 +23,7 @@ const useAddUser = () => {
        if (!gender) missingFields.push("Gender");
        if (!employeeID) missingFields.push("Employee ID");
        if (!monthlySalary) missingFields.push("Monthly Salary");
-       if (!address) missingFields.push("Address");
+       if (!address) missingFields.push("address");
        
        if (missingFields.length > 0) {
          toast.error(`Please fill out the following fields: ${missingFields.join(", ")}`);
@@ -41,9 +39,9 @@ const useAddUser = () => {
         Object.keys(userData).forEach(key => {
           formData.append(key, userData[key]);
         });
-        formData.append('address', JSON.stringify(address)); 
-        const response = await axios.post(
-          `${API_URL}/admin/staff_register`, // Adjust the API endpoint as needed
+        formData.append('address', JSON.stringify(userData.address)); 
+        const response = await axios.put(
+          `${API_URL}/admin/update_staff/${_id}`, // Adjust the API endpoint as needed
           formData,
           {
             headers: {       Authentication: token, },
@@ -54,11 +52,11 @@ const useAddUser = () => {
 
         console.log(data);
         setLoading(false);
-        toast.success("User added successfully");
+        toast.success("User Edited successfully");
         return { success: true, data };
       } catch (err) {
         const errorMessage =
-          err.response?.data?.message || "Failed to add user";
+          err.response?.data?.message || "Failed to Edit user";
         toast.error(errorMessage);
         setLoading(false);
         setError(errorMessage);
@@ -68,7 +66,7 @@ const useAddUser = () => {
     [adminRole]
   );
 
-  return { addUser, loading, error };
+  return { EditUser, loading, error };
 };
 
-export default useAddUser;
+export default useEditUser;

@@ -5,7 +5,7 @@ const ViewAccountant = ({ accountant }) => {
   return (
     <div className="flex flex-col">
     <div className="flex flex-col justify-center items-center py-3">
-      <img className="object-cover rounded-full w-[100px] h-[100px]" src={accountant.imageUrl} alt={accountant.name} />
+      <img className="object-cover rounded-full w-[100px] h-[100px]" src={accountant.profile} alt={accountant.name} />
       <h3 className="text-lg font-medium">{accountant.name}</h3>
       <p className="text-gray-500">{accountant.email}</p>
     </div>
@@ -21,7 +21,7 @@ const ViewAccountant = ({ accountant }) => {
         <MdOutlineLocationOn className='text-pink-600 text-2xl p-1 border border-pink-200 rounded-full' />
         <div className="flex flex-col justify-center">
           <span className="font-medium">Address</span>
-          <span className="text-gray-500 text-sm">{accountant.address}</span>
+          <span className="text-gray-500 text-sm">{accountant.address.city}</span>
         </div>
       </div>
 
@@ -38,7 +38,7 @@ const ViewAccountant = ({ accountant }) => {
        <MdOutlineLocationOn className=' text-pink-600 text-2xl p-1 border border-pink-200 rounded-full h-[30px] w-[30px]' />
        <div className="flex flex-col justify-center">
         <span className="font-medium">Address</span>
-        <span className="text-gray-500 text-sm">{accountant.address}</span>
+        <span className="text-gray-500 text-sm">{accountant.address.city}</span>
       </div>
     </div>
     </div>

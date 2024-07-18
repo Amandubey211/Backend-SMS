@@ -9,18 +9,19 @@ import useGetAllStaff from "../../../../Hooks/AuthHooks/Staff/Admin/staff/useGet
 import { useSelector } from "react-redux";
 import AddUser from "./AddUser";
 
-
 const AllStaff = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarContent, setSidebarContent] = useState(null);
   const [selectedStaff, setSelectedStaff] = useState(null);
+  const [staffData, setStaffData] = useState(null);
   const staff = useSelector((store) => store.Staff.allStaff);
-const {fetchStaff}= useGetAllStaff()
+  const { fetchStaff } = useGetAllStaff();
+
   useEffect(() => {
-    fetchStaff()
+    fetchStaff();
     // fetchSubjects(cid);
-    console.log(staff );
-  }, []);
+    console.log(staff);
+  }, [fetchStaff, staff]);
 
   const handleSidebarOpen = () => setSidebarOpen(true);
   const handleSidebarClose = () => setSidebarOpen(false);
@@ -34,12 +35,14 @@ const {fetchStaff}= useGetAllStaff()
   const handleAddStaffClick = () => {
     setSidebarContent("addStaff");
     setSidebarOpen(true);
+    setStaffData(null);
   };
 
-  // Function to handle deleting a staff (the implementation would depend on your application's context)
-  const handleDeleteStaff = (staff) => {
-    console.log('Deleting staff:', staff);
-    // Placeholder for actual delete logic
+  const editUser = (event, data) => {
+    event.stopPropagation();
+    setSidebarContent("editStaff");
+    setSidebarOpen(true);
+    setStaffData(data);
   };
 
   const renderSidebarContent = () => {
@@ -47,40 +50,48 @@ const {fetchStaff}= useGetAllStaff()
       case "viewStaff":
         return <ViewStaff staff={selectedStaff} />;
       case "addStaff":
-        return <AddUser role = {'staff'} />;
+        return <AddUser role="staff" data={staffData} />;
+      case "editStaff":
+        return <AddUser role="staff" data={staffData} />;
       default:
         return <div>Select an action</div>;
     }
   };
-  
+
   return (
     <Layout title="All Staff">
       <DashLayout>
         <div className="p-4">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-semibold">All Staff</h2>
-            <button onClick={handleAddStaffClick}
-              className="bg-purple-500 text-white px-4 py-2 rounded-md flex items-center space-x-2">
+            <button
+              onClick={handleAddStaffClick}
+              className="bg-purple-500 text-white px-4 py-2 rounded-md flex items-center space-x-2"
+            >
               <span>Add New Staff</span>
             </button>
           </div>
           <div className="flex flex-wrap -mx-2">
-            {staff.map(( profile, index) => (
+            {staff.map((profile, index) => (
               <ProfileCard
                 key={index}
-                profile={ profile}
+                profile={profile}
                 onClick={handleStaffClick}
+                editUser={editUser}
               />
             ))}
           </div>
           <SidebarSlide
+            key={sidebarContent} // Use the key to force re-render
             isOpen={isSidebarOpen}
             onClose={handleSidebarClose}
-            title={<span className="bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent bg-clip-text">
-              {sidebarContent === "viewStaff" ? "Quick View of Staff" : "Add New Staff"}
-            </span>}
+            title={
+              <span className="bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent bg-clip-text">
+                {sidebarContent === "viewStaff" ? "Quick View of Staff" : "Add/Edit Staff"}
+              </span>
+            }
             width="70%"
-            height='auto'
+            height="auto"
           >
             {renderSidebarContent()}
           </SidebarSlide>
