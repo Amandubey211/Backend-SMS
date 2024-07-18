@@ -20,16 +20,13 @@ const Comment = ({
   const [showReplies, setShowReplies] = useState(false);
   const { toggleLikeMessage } = useToggleLikeMessage();
   const { role } = useSelector((store) => store.Auth);
-  const [isLiked, setIsLiked] = useState(comment.likes.some((like) => like.userId === role)); // Check if liked by current user
+  const [isLiked, setIsLiked] = useState(
+    comment.likes.some((like) => like.userId === role)
+  ); // Check if liked by current user
   const [likesCount, setLikesCount] = useState(comment.likes.length);
 
   const handleDeleteComment = async () => {
-    try {
-      await deleteComment(comment._id);
-      toast.success("Comment Deleted");
-    } catch (err) {
-      toast.error(err.message);
-    }
+    await deleteComment(comment._id);
   };
 
   const handleReplyClick = (replyId) => {

@@ -1,9 +1,19 @@
-import React from 'react';
+
+
+import React, { useEffect, useRef } from 'react';
 import { FaRegCommentDots } from 'react-icons/fa';
-import Comment from "./Components/Comment";
 import Spinner from '../../../../../../Components/Common/Spinner';
+import Comment from './Components/Comment';
 
 const CommentSection = ({ comments, deleteComment, deleteReply, addNestedReply, activeReplyId, setActiveReplyId, loading, error }) => {
+  const commentsEndRef = useRef(null);
+
+  useEffect(() => {
+    if (commentsEndRef.current) {
+      commentsEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [comments]);
+
   if (loading) {
     return <Spinner />;
   }
@@ -15,7 +25,7 @@ const CommentSection = ({ comments, deleteComment, deleteReply, addNestedReply, 
   return (
     <div className="w-full h-full flex flex-col">
       {comments.length > 0 ? (
-        comments.reverse().map((comment) => (
+        comments.map((comment) => (
           <Comment
             key={comment._id}
             comment={comment}
@@ -32,6 +42,7 @@ const CommentSection = ({ comments, deleteComment, deleteReply, addNestedReply, 
           <p className="mt-4 text-lg text-gray-500">No comments found</p>
         </div>
       )}
+      <div ref={commentsEndRef} />
     </div>
   );
 };

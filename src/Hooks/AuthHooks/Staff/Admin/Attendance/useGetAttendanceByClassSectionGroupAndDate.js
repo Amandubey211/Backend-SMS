@@ -26,14 +26,12 @@ const useGetAttendanceByClassSectionGroupAndDate = () => {
             params: { classId, sectionId, groupId, month, year },
           }
         );
-        console.log(response.data);
         if (response.data) {
           setAttendanceData(response.data);
         }
       } catch (err) {
         const errorMessage =
           err.response?.data?.message || "Failed to fetch attendance records";
-        toast.error(errorMessage);
         setError(errorMessage);
       } finally {
         setLoading(false);
