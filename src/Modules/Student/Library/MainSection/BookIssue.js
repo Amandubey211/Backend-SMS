@@ -40,7 +40,7 @@ const BookIssue = () => {
         }
       });
 
-      const data = response.data?.booksIssue;
+      const data = response.data?.booksIssue.reverse();
       console.log("Data parsed:", data);
 
       setBookIssueData(data);
