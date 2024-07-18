@@ -108,8 +108,8 @@ const AssignmentList = () => {
   };
 
   return (
-    <div className="p-6 bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 rounded-lg shadow-lg">
-      <h1 className="text-4xl font-bold text-white mb-8 p-4 border-b-2 border-white">Assignments</h1>
+    <div className="p-6  rounded-lg shadow-lg">
+      <h1 className="text-4xl font-bold  mb-8 p-4 text-gradient from-purple-500 via-pink-500 to-red-500 border-b-2 border-white">Assignments</h1>
       {error && <p className="text-red-500">{error}</p>}
       <Collapse
         accordion
@@ -124,11 +124,11 @@ const AssignmentList = () => {
           <Panel
             header={
               <div className="flex items-center text-white">
-                <Text className="text-lg font-semibold">{subject.name}</Text>
+                <Text className="text-lg text-gradient font-semibold">{subject.name}</Text>
               </div>
             }
             key={subject._id}
-            className="bg-white rounded-lg shadow-md p-4 mb-4"
+            className="bg-gradient rounded-lg shadow-md p-4 mb-4"
           >
             {loading ? <p>Loading...</p> : (
               <Table

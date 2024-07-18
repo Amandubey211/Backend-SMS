@@ -45,7 +45,7 @@ const ParentSection = () => {
             iconBackground: "bg-rose-800",
           },
           {
-            label: "Upcoming Events",
+            label: "Upcoming Exams",
             value: data.upcomingExamsCount.toString(),
             bgColor: "bg-green-200",
             textColor: "text-green-500",

@@ -1,14 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect  } from "react";
+import { useNavigate } from "react-router-dom";
 import Sidebar from "../../../../Components/Common/Sidebar";
 import Layout from "../../../../Components/Common/Layout";
 import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 import axios from "axios";
+
 
 const uniqueFilterOptions = (data, key) => {
   return [...new Set(data.map((item) => item[key]))].sort();
 };
 
 const AccountingSection = () => {
+  const navigate = useNavigate();
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [filters, setFilters] = useState({
     class: "",
@@ -71,12 +74,16 @@ const AccountingSection = () => {
     <Layout title="Accounting">
       <div className="p-4">
         
-        <div className="flex items-center mb-4">
-          {/* Add any additional content here */}
-        </div>
+      <div className="flex justify-between items-center mb-4">
+    <h2 className="text-md font-bold text-gray-600">Accounting</h2>
+    <button className="text-blue-500"  onClick={() => navigate("/parentfinance")}>
+      See All
+    </button>
+</div>
+
         
         <div className="p-4">
-          <div className="overflow-x-auto bg-white shadow rounded-lg">
+          <div className="overflow-x-auto  shadow rounded-lg">
             <table className="min-w-full leading-normal">
               <thead>
                 <tr className="text-left text-gray-700 bg-gray-100">
@@ -85,7 +92,7 @@ const AccountingSection = () => {
                   <th className="px-5 py-3 border-b-2 border-gray-200">Due Date</th>
                   <th className="px-5 py-3 border-b-2 border-gray-200">Amount</th>
                   <th className="px-5 py-3 border-b-2 border-gray-200">Status</th>
-                  <th className="px-5 py-3 border-b-2 border-gray-200">Action</th>
+                  {/* <th className="px-5 py-3 border-b-2 border-gray-200">Action</th> */}
                 </tr>
               </thead>
               <tbody>
@@ -95,8 +102,9 @@ const AccountingSection = () => {
                       {item.feeType}
                     </td>
                     <td className="px-5 py-2 border-b border-gray-200">
-                      {item.paidBy}
-                    </td>
+  {item.paidBy || "------"}
+</td>
+
                     <td className="px-5 py-2 border-b border-gray-200">
                       {item.dueDate}
                     </td>
@@ -105,18 +113,16 @@ const AccountingSection = () => {
                     </td>
                     <td className="px-5 py-2 border-b border-gray-200">
                       <span
-                        className={`inline-block px-3 py-1 text-xs font-semibold rounded-full ${
+                        className={`inline-block px-3 py-1 text-xs font-bold rounded-full ${
                           item.status === "Paid"
-                            ? "bg-green-200 text-green-800"
-                            : "bg-red-200 text-red-800"
+                            ? " text-green-400"
+                            : " text-red-500"
                         }`}
                       >
                         {item.status}
                       </span>
                     </td>
-                    <td className="px-5 py-2 border-b border-gray-200">
-                      {/* Add action buttons or content here */}
-                    </td>
+                    
                   </tr>
                 ))}
               </tbody>

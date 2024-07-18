@@ -12,7 +12,7 @@ export const cardData = [
     iconBackground: "bg-rose-800",
   },
   {
-    label: "Upcoming Events",
+    label: "Upcoming Exams",
     value: "0",
     bgColor: "bg-green-200",
     textColor: "text-green-500",

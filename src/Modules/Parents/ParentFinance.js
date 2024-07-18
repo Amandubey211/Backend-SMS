@@ -130,7 +130,10 @@ const ParentFinanceTable = () => {
                   {filteredFeesDetails.map((item, index) => (
                     <tr key={index} className="text-left text-gray-700">
                       <td className="px-5 py-2 border-b border-gray-200">{item.feeType}</td>
-                      <td className="px-5 py-2 border-b border-gray-200">{item.paidBy}</td>
+                      <td className="px-5 py-2 border-b border-gray-200">
+  {item.paidBy || "------"}
+</td>
+
                       <td className="px-5 py-2 border-b border-gray-200">{item.dueDate}</td>
                       <td className="px-5 py-2 border-b border-gray-200">{item.amount}</td>
                       <td className="px-5 py-2 border-b border-gray-200">
@@ -171,7 +174,7 @@ const ParentFinanceTable = () => {
                   <span className="text-xl font-bold bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent bg-clip-text">
                     {totalUnpaidFees}
                   </span>
-                  <button className="flex items-center border border-blue-800 w-full justify-center px-5 rounded-full">
+                  <button className="flex items-center border border-blue-800 p-1 w-full justify-center px-5 rounded-full">
                     <span className="text-blue-800">Pay Now</span>
                   </button>
                 </div>
@@ -201,7 +204,7 @@ const ParentFinanceTable = () => {
                   <span className="text-xl font-bold bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent bg-clip-text">
                     {totalPaidFees}
                   </span>
-                  <button className="flex items-center border border-blue-800 w-full justify-center px-5 rounded-full">
+                  <button className="flex items-center border border-blue-800 p-1 w-full justify-center px-5 rounded-full">
                     <span className="text-blue-800">View All Expenses</span>
                   </button>
                 </div>
