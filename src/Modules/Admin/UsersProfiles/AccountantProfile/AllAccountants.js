@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { dummyAccountants } from './dummyData/dummyData'; // Assuming this holds accountant data
 import Layout from '../../../../Components/Common/Layout';
 import DashLayout from '../../../../Components/Admin/AdminDashLayout';
 import SidebarSlide from '../../../../Components/Common/SidebarSlide';
-import AddAccountant from "./AddAccountant";
 import ViewAccountant from "./ViewAccountant";
 import ProfileCard from '../SubComponents/ProfileCard'; // Import the generic ProfileCard
 import { useSelector } from "react-redux";
@@ -14,12 +12,13 @@ const AllAccountants = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarContent, setSidebarContent] = useState(null);
   const [selectedAccountant, setSelectedAccountant] = useState(null);
+  const [accountantData, setAccountantData] = useState(null);
   const allAccountant = useSelector((store) => store.Staff.allAccountant);
-const {fetchStaff}= useGetAllStaff()
-  useEffect(() => {
-    fetchStaff()
+  const { fetchStaff } = useGetAllStaff();
 
-  }, []);
+  useEffect(() => {
+    fetchStaff();
+  }, [fetchStaff]);
 
   const handleSidebarOpen = () => setSidebarOpen(true);
   const handleSidebarClose = () => setSidebarOpen(false);
@@ -33,6 +32,14 @@ const {fetchStaff}= useGetAllStaff()
   const handleAddAccountantClick = () => {
     setSidebarContent("addAccountant");
     setSidebarOpen(true);
+    setAccountantData(null);
+  };
+
+  const editUser = (event, accountant) => {
+    event.stopPropagation();
+    setSidebarContent("editAccountant");
+    setSidebarOpen(true);
+    setAccountantData(accountant);
   };
 
   const renderSidebarContent = () => {
@@ -40,7 +47,9 @@ const {fetchStaff}= useGetAllStaff()
       case "viewAccountant":
         return <ViewAccountant accountant={selectedAccountant} />;
       case "addAccountant":
-        return <AddUser role={'accountant'} />;
+        return <AddUser role={'accountant'} data={accountantData} />;
+      case "editAccountant":
+        return <AddUser role={'accountant'} data={accountantData} />;
       default:
         return <div>Select an action</div>;
     }
@@ -63,14 +72,16 @@ const {fetchStaff}= useGetAllStaff()
                 key={index}
                 profile={accountant}
                 onClick={handleAccountantClick}
+                editUser={editUser} // Pass the editUser function as a prop
               />
             ))}
           </div>
           <SidebarSlide
+            key={sidebarContent} // Use the key to force re-render
             isOpen={isSidebarOpen}
             onClose={handleSidebarClose}
             title={<span className="bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent bg-clip-text">
-              {sidebarContent === "viewAccountant" ? "Quick View of Accountant" : "Add New Accountant"}
+              {sidebarContent === "viewAccountant" ? "Quick View of Accountant" : "Add/Edit Accountant"}
             </span>}
             width="70%"
           >

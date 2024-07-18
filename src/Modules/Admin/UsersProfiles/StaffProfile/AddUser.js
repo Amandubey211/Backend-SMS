@@ -1,12 +1,13 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ImageUpload from "../../Addmission/Components/ImageUpload";
 import FormInput from "../../Accounting/subClass/component/FormInput";
 import FormSelect from "../../Accounting/subClass/component/FormSelect";
 import useAddUser from "../../../../Hooks/AuthHooks/Staff/Admin/staff/useAddUser";
 import useGetAllTeachers from "../../../../Hooks/AuthHooks/Staff/Admin/Teacher/useGetAllTeacher";
+import { add } from "date-fns";
+import useEditUser from "../../../../Hooks/AuthHooks/Staff/Admin/staff/useEditUser";
 
-const AddUser = ({ role }) => {
-  console.log(role);
+const AddUser = ({ role ,data}) => {
   const [imagePreview, setImagePreview] = useState(null);
   const [address, setAddress] = useState({
     street: '',
@@ -31,7 +32,37 @@ const AddUser = ({ role }) => {
     employeeID: '',
     role: role
   });
-
+  useEffect(()=>{
+   if(data){
+    setTeacherData(data);
+    setAddress(data?.address)
+   }
+   return () => {
+    setTeacherData({
+      firstName: "",
+      lastName: "",
+      dob: "",
+      religion: "",
+      gender: "",
+      position: "",
+      monthlySalary: "",
+      bloodGroup: "",
+      mobileNumber: "",
+      email: "",
+      profile: null,
+      teacherCV: null,
+      employeeID: '',
+      role: role
+    })
+    setAddress({
+      street: '',
+      city: '',
+      state: '',
+      postalCode: '',
+      country: ''
+    })
+  };
+  },[data])
   const genderOptions = [
     { value: "male", label: "Male" },
     { value: "female", label: "Female" },
@@ -103,21 +134,17 @@ const AddUser = ({ role }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const formData = new FormData();
-    Object.keys(teacherData).forEach(key => {
-      formData.append(key, teacherData[key]);
-    });
-    formData.append('address', JSON.stringify(address)); // Add address as a JSON string
-
-    for (let [key, value] of formData.entries()) {
-      console.log(`${key}: ${value}`);
-    }
-
-    await addUser(formData);
+    teacherData.role = role
+    await addUser(teacherData,address);
     if (!error) {
       fetchTeachers();
+     
     }
   };
+  const {EditUser} = useEditUser();
+  const editUserHandel = async()=>{
+   await EditUser(data)
+  }
 
   return (
     <div className="p-4 bg-gray-50 h-full border rounded-lg overflow-auto" style={{ maxHeight: "90vh" }}>
@@ -279,12 +306,18 @@ const AddUser = ({ role }) => {
             </div>
           </div>
         </div>
-        <button
+       {data? <button
+          
+          className="bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-10 rounded-md hover:from-pink-600 hover:to-purple-600"
+          onClick={editUserHandel}
+        >
+          Update Staff
+        </button>:<button
           type="submit"
           className="bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-10 rounded-md hover:from-pink-600 hover:to-purple-600"
         >
           Add New Staff
-        </button>
+        </button>}
       </form>
     </div>
   );

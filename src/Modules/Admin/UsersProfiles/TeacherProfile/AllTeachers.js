@@ -14,7 +14,9 @@ import AddUser from "../StaffProfile/AddUser";
 
 const AllTeachers = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
+  const [teacherData, setTeacherData] = useState(null);
   const { fetchTeachers } = useGetAllTeachers();
+
   const teachers = useSelector((store) => store.Teachers.allTeachers);
   useEffect(() => {
     
@@ -23,13 +25,21 @@ const AllTeachers = () => {
     console.log(teachers);
   }, []);
 
-  const handleSidebarOpen = () => setSidebarOpen(true);
+  const handleSidebarOpen = () => {setSidebarOpen(true);setTeacherData(null)};
   const handleSidebarClose = () => setSidebarOpen(false);
-  const {deleteUser} = useDeleteUser()
- const deleteTeacher = (event,id)=>{
-  deleteUser(id)
+  const {deleteUser,error} = useDeleteUser()
+ const deleteTeacher = async(event,id)=>{
+  await deleteUser(id);
+  if(!error){
+    fetchTeachers();
+  }
   event.stopPropagation();
  
+ }
+ const editUser = async(event,data)=>{
+  setSidebarOpen(true);
+  setTeacherData(data);
+  event.stopPropagation();
  }
   return (
     <Layout title="All Teachers">
@@ -52,8 +62,8 @@ const AllTeachers = () => {
                 key={index}
               >
                   <div className=" absolute right-0 flex flex-col px-4 gap-2 justify-end ">
-                    <button className=" bg-transparent p-2 rounded-full border  ">
-                      <FiUserPlus className="text-sm text-green-500 " />
+                    <button className=" bg-transparent p-2 rounded-full border  " onClick={(event)=>editUser(event,teacher)}>
+                      <FiUserPlus className="text-sm text-green-500 "   />
                     </button>
                     <button className=" bg-transparent p-2 rounded-full border" onClick={(event)=>deleteTeacher(event,teacher._id)}>
                       <BiTrash className="text-sm text-red-500  "  />
@@ -64,14 +74,14 @@ const AllTeachers = () => {
                     <img
                       className=" object-cover rounded-full w-[100px] h-[100px]"
 
-                      src={teacher.imageUrl || "https://avatars.githubusercontent.com/u/109097090?v=4"}
+                      src={teacher.profile || "https://avatars.githubusercontent.com/u/109097090?v=4"}
 
 
 
                       alt={teacher.name}
                     />
                     <h3 className="text-lg font-medium">{teacher.fullName}</h3>
-                    <p className="text-gray-500">not yet</p>
+                    <p className="text-gray-500">{teacher.position}</p>
                   </div>
 
                   <div className="p-4 text-center justify-center items-center  ">
@@ -93,7 +103,7 @@ const AllTeachers = () => {
              // Custom width
             // Custom height
           >
-            <AddUser role={'teacher'} />
+            <AddUser role={'teacher'}  data={teacherData}/>
           </SidebarSlide>
         </div>
       </DashLayout>

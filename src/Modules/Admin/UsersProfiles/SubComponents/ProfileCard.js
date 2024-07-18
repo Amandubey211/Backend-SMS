@@ -3,20 +3,22 @@ import React from "react";
 import { FiUserPlus } from 'react-icons/fi';
 import { BiTrash } from 'react-icons/bi';
 import useDeleteUser from "../../../../Hooks/AuthHooks/Staff/Admin/staff/useDeleteUser";
-const ProfileCard = ({ profile, onClick }) => {
+const ProfileCard = ({ profile, onClick,editUser}) => {
   const {deleteUser} = useDeleteUser()
   const deleteTeacher = (event,id)=>{
     deleteUser(id)
     event.stopPropagation();
    
-   }
+   };
+ 
+
   return (
     <div className="relative w-full sm:w-1/2 md:w-1/3 lg:w-1/4 px-2 mb-4">
       <div onClick={() => onClick(profile)}
         className="block p-6 bg-white rounded-lg shadow-lg hover:bg-gray-100 transition cursor-pointer"
       >
         <div className="absolute right-0 top-0 flex flex-col px-4 py-2 gap-2 justify-start">
-          <button className="bg-transparent p-2 rounded-full border hover:bg-gray-200 transition">
+          <button className="bg-transparent p-2 rounded-full border hover:bg-gray-200 transition" onClick={(event)=>editUser(event,profile)}>
             <FiUserPlus className="text-sm text-green-500" />
           </button>
           <button className="bg-transparent p-2 rounded-full border hover:bg-gray-200 transition">

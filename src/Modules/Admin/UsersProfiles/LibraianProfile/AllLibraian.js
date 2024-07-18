@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { dummyTeachers } from './dummyData/dummyData'; // Assuming this has librarian data
 import Layout from "../../../../Components/Common/Layout";
 import DashLayout from "../../../../Components/Admin/AdminDashLayout";
 import SidebarSlide from "../../../../Components/Common/SidebarSlide";
-import AddLibraian from "./AddLibraian";
 import ViewLibraian from "./ViewLibraian";
 import ProfileCard from '../SubComponents/ProfileCard';
 import useGetAllStaff from "../../../../Hooks/AuthHooks/Staff/Admin/staff/useGetAllStaff";
@@ -14,13 +12,15 @@ const AllLibraian = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarContent, setSidebarContent] = useState(null);
   const [selectedLibrarian, setSelectedLibrarian] = useState(null);
+  const [librarianData, setLibrarianData] = useState(null);
   const allLibraian = useSelector((store) => store.Staff.allLibraian);
-const {fetchStaff}= useGetAllStaff()
-  useEffect(() => {
-    fetchStaff()
-    console.log(allLibraian);
+  const { fetchStaff } = useGetAllStaff();
 
-  }, []);
+  useEffect(() => {
+    fetchStaff();
+    console.log(allLibraian);
+  }, [fetchStaff]);
+
   const handleSidebarOpen = () => setSidebarOpen(true);
   const handleSidebarClose = () => setSidebarOpen(false);
 
@@ -33,6 +33,14 @@ const {fetchStaff}= useGetAllStaff()
   const handleAddLibraianClick = () => {
     setSidebarContent("addLibraian");
     setSidebarOpen(true);
+    setLibrarianData(null);
+  };
+
+  const editUser = (event, librarian) => {
+    event.stopPropagation();
+    setSidebarContent("editLibraian");
+    setSidebarOpen(true);
+    setLibrarianData(librarian);
   };
 
   const renderSidebarContent = () => {
@@ -40,7 +48,9 @@ const {fetchStaff}= useGetAllStaff()
       case "viewLibraian":
         return <ViewLibraian librarian={selectedLibrarian} />;
       case "addLibraian":
-        return <AddUser role ={'libranian'} />;
+        return <AddUser role="libranian" data={librarianData} />;
+      case "editLibraian":
+        return <AddUser role="libranian" data={librarianData} />;
       default:
         return <div>Select an action</div>;
     }
@@ -52,22 +62,32 @@ const {fetchStaff}= useGetAllStaff()
         <div className="p-4">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-semibold">All Libraian</h2>
-            <button onClick={handleAddLibraianClick}
-              className="bg-purple-500 text-white px-4 py-2 rounded-md flex items-center space-x-2">
+            <button
+              onClick={handleAddLibraianClick}
+              className="bg-purple-500 text-white px-4 py-2 rounded-md flex items-center space-x-2"
+            >
               <span>Add New Libraian</span>
             </button>
           </div>
           <div className="flex flex-wrap -mx-2">
             {allLibraian.map((librarian, index) => (
-              <ProfileCard key={index} profile={librarian} onClick={handleAppointmentClick} />
+              <ProfileCard
+                key={index}
+                profile={librarian}
+                onClick={handleAppointmentClick}
+                editUser={editUser}
+              />
             ))}
           </div>
           <SidebarSlide
+            key={sidebarContent} // Use the key to force re-render
             isOpen={isSidebarOpen}
             onClose={handleSidebarClose}
-            title={<span className="bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent bg-clip-text">
-              {sidebarContent === "viewLibraian" ? "Quick View of Libraian" : "Add New Libraian"}
-            </span>}
+            title={
+              <span className="bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent bg-clip-text">
+                {sidebarContent === "viewLibraian" ? "Quick View of Libraian" : "Add/Edit Libraian"}
+              </span>
+            }
             width="70%"
           >
             {renderSidebarContent()}
@@ -79,6 +99,7 @@ const {fetchStaff}= useGetAllStaff()
 };
 
 export default AllLibraian;
+
 
 
 
