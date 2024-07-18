@@ -1,10 +1,3 @@
-
-
-
-///_________________
-
-
-
 import React, { useState, useEffect } from "react";
 import SubjectSideBar from "../../Component/SubjectSideBar";
 import Chapter from "./Components/Chapter";
@@ -84,21 +77,7 @@ const MainSection = () => {
       <SubjectSideBar />
       <div className="w-[60%] bg-white p-2 border-l">
         <div className="bg-white p-2 rounded-lg">
-          <div className="flex justify-between items-center mb-5">
-            <h1 className="text-md font-semibold">{selectedSubject.subjectName || "Subject"}</h1>
-            {/* <h1 className="text-md font-semibold">{subjects[0]?.subjectName || "Subject"}</h1> */}
-          </div>
-          {/* {subjects[0]?.modules.map((module, index) => (
-            <Chapter
-              key={index}
-              title={module.name}
-              chapterNumber={index + 1}
-              imageUrl={module.thumbnail}
-              items={module.chapters}
-              isExpanded={expandedChapters.includes(module._id)}
-              onToggle={() => handleToggle(module._id)}
-            />
-          ))} */}
+         
 
           {selectedSubject.modules.map((module, index) => (
             <Chapter
@@ -136,15 +115,7 @@ const MainSection = () => {
                 isCompleted={module.isPublished}
               />
             ))}
-            {/* {subjects[0]?.modules.map((module, index) => (
-              <ModuleCard
-                key={index}
-                title={module.name}
-                moduleNumber={index + 1}
-                imageUrl={module.thumbnail}
-                isCompleted={module.isPublished}
-              />
-            ))} */}
+            
           </div>
         </div>
       </div>

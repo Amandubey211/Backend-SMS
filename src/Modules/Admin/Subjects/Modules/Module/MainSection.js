@@ -93,7 +93,8 @@ const MainSection = () => {
 
       <div className="w-[60%] bg-white p-2 border-l">
         <div className="bg-white p-2 rounded-lg">
-          <div className="flex justify-between items-center mb-5">
+          <div className="
+          ">
             <h1 className="text-md font-semibold">
               {selectedModule.name ? selectedModule.name : "Select a Module"}
             </h1>
