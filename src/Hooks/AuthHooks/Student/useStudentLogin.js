@@ -36,6 +36,7 @@ const useStudentLogin = () => {
       if (data.success) {
         // localStorage.setItem(TOKEN_STORAGE_KEY, Bearer ${data.token});
         localStorage.setItem(TOKEN_STORAGE_KEY, `Bearer ${data.token}`);
+        localStorage.setItem("classId",`${data.classId}`)
         console.log("Token stored in localStorage", data.token);
       
         dispatch(setAuth(true));

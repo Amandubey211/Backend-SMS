@@ -13,6 +13,7 @@ const BookIssue = () => {
   const [filters, setFilters] = useState({
     classLevel: "",
     category: "",
+    status: "All",
   });
 
   const handleSidebarOpen = () => setSidebarOpen(true);
@@ -23,53 +24,82 @@ const BookIssue = () => {
     setFilters((prev) => ({ ...prev, [name]: value }));
   };
 
-  useEffect(() => {
-    const fetchBookIssues = async () => {
-      console.log("Fetching book issues...");
-      try {
-        const token = localStorage.getItem('student:token');
-        console.log("token in student book issue", token);
-        if (!token) {
-          throw new Error('Authentication token not found');
-        }
+  const fetchBookIssues = async () => {
+    console.log("Fetching book issues...");
+    try {
+      const token = localStorage.getItem('student:token');
+      console.log("Token in student book issue:", token);
 
-        // const response = await fetch('http://localhost:8080/student/issue/books', {
-          const response = await fetch(' http://localhost:8080/admin/all/bookIssue/', {
-
-          
-          headers: {
-            'Authentication': token
-          }
-        });
-
-        console.log("Response received:", response);
-        setBookIssueData(response.data)
-        if (!response.ok) {
-          throw new Error(`Failed to fetch book issues, status: ${response.status}`);
-        }
-        const data = await response.json();
-        console.log("Data parsed:", data);
-
-        if (data.success && data.booksIssue) {
-          setBookIssueData(data.booksIssue);
-        } else {
-          console.log("No book issues data or unsuccessful response");
-        }
-      } catch (error) {
-        console.error("Failed to fetch book issues:", error);
+      if (!token) {
+        throw new Error('Authentication token not found');
       }
-    };
 
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/student/issue/books`, {
+        headers: {
+          'Authentication': token
+        }
+      });
+
+      const data = response.data?.booksIssue;
+      console.log("Data parsed:", data);
+
+      setBookIssueData(data);
+
+    } catch (error) {
+      console.error("Failed to fetch book issues:", error);
+    }
+  };
+
+  useEffect(() => {
     fetchBookIssues();
   }, []);
 
+  const filteredBookIssueData = useMemo(() => {
+    if (filters.status === "All") {
+      return bookIssueData;
+    }
+    return bookIssueData.filter(item => item.status === filters.status);
+  }, [bookIssueData, filters.status]);
 
   return (
     <div className="min-h-screen p-4 bg-gray-50">
       <div className="flex justify-between items-center mb-4">
-        
-      </div>
 
+      </div>
+      <div className="flex gap-3 mb-5">
+        {["All", "Pending", "Return"].map((status) => (
+          <div key={status} className="">
+            <label className="flex items-center cursor-pointer">
+              <input
+                type="radio"
+                name="status"
+                value={status}
+                checked={filters.status === status}
+                onChange={handleFilterChange}
+                className="hidden"
+              />
+              <div
+                className={`h-5 w-5 rounded-full mr-2 flex items-center justify-center border-2 ${filters.status === status
+                  ? "border-green-500 bg-green-500"
+                  : "border-gray-300"
+                  }`}
+              >
+                {filters.status === status && (
+                  <div className="h-3 w-3 bg-white rounded-full"></div>
+                )}
+              </div>
+              <span
+                className={`transition-colors duration-200 ${filters.status === status
+                  ? "text-red-700"
+                  : "text-gray-700"
+                  }`}
+              >
+                {status}
+              </span>
+            </label>
+          </div>
+        ))}
+      </div>
       <div className="overflow-x-auto bg-white shadow rounded-lg">
         <table className="min-w-full">
           <thead>
@@ -83,9 +113,9 @@ const BookIssue = () => {
             </tr>
           </thead>
           <tbody>
-            {bookIssueData?.map((item) => (
+            {filteredBookIssueData?.map((item) => (
               <BookIssueRow key={item.id} item={item} />
-              
+
             ))}
           </tbody>
         </table>
