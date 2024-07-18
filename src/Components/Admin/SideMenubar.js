@@ -66,15 +66,19 @@ const SideMenubar = () => {
           </div>
         </button>
       </div>
-      <div className="mt-4 p-2 flex-grow">
-        {isOpen && <h2 className="text-gray-500">MENU</h2>}
-        <ul className="mt-1 space-y-2">
+      <div className=" p-2 flex-grow">
+        {isOpen && <h2 className="text-gray-500 my-1">MENU</h2>}
+        <ul className=" space-y-1">
           {sidebarData.map((item, index) => (
             <React.Fragment key={index}>
               {item.items ? (
                 <div
                   className={`flex items-center w-full p-2 rounded-lg cursor-pointer ${
-                    isActivePath(item.path, location.pathname)
+                    isActivePath(item.path, location.pathname) ||
+                    (item.items &&
+                      item.items.some((subItem) =>
+                        isActivePath(subItem.path, location.pathname)
+                      ))
                       ? "bg-purple-100 text-purple-500"
                       : "text-gray-700 hover:bg-gray-100"
                   } ${isOpen ? "justify-between" : "justify-center"}`}
@@ -99,10 +103,14 @@ const SideMenubar = () => {
                   </div>
                   {isOpen && (
                     <>
-                      {openItems.includes(item.title) ? (
-                        <MdOutlineKeyboardArrowUp className="ml-2" />
+                      {openItems.includes(item.title) ||
+                      (item.items &&
+                        item.items.some((subItem) =>
+                          isActivePath(subItem.path, location.pathname)
+                        )) ? (
+                        <MdOutlineKeyboardArrowUp className="ml-2 transition-transform transform hover:scale-110" />
                       ) : (
-                        <MdOutlineKeyboardArrowDown className="ml-2" />
+                        <MdOutlineKeyboardArrowDown className="ml-2 transition-transform transform hover:scale-110" />
                       )}
                     </>
                   )}
@@ -128,32 +136,37 @@ const SideMenubar = () => {
                   )}
                 </NavLink>
               )}
-              {openItems.includes(item.title) && item.items && (
-                <ul id={`submenu-${index}`} className="pl-2 space-y-2">
-                  {item.items.map((subItem, subIndex) => (
-                    <NavLink
-                      key={subIndex}
-                      to={subItem.path}
-                      className={({ isActive }) =>
-                        `flex items-center p-2 rounded-lg ${
-                          isActive ||
-                          isActivePath(subItem.path, location.pathname)
-                            ? "text-purple-500 bg-purple-100"
-                            : "text-gray-700 hover:bg-gray-100"
-                        } ${isOpen ? "" : "justify-center"}`
-                      }
-                      aria-label={subItem.title}
-                    >
-                      {subItem.icon}
-                      {isOpen && (
-                        <span role="presentation" className="ml-3">
-                          {subItem.title}
-                        </span>
-                      )}
-                    </NavLink>
-                  ))}
-                </ul>
-              )}
+              {(openItems.includes(item.title) ||
+                (item.items &&
+                  item.items.some((subItem) =>
+                    isActivePath(subItem.path, location.pathname)
+                  ))) &&
+                item.items && (
+                  <ul id={`submenu-${index}`} className="pl-2 space-y-2">
+                    {item.items.map((subItem, subIndex) => (
+                      <NavLink
+                        key={subIndex}
+                        to={subItem.path}
+                        className={({ isActive }) =>
+                          `flex items-center p-2 rounded-lg ${
+                            isActive ||
+                            isActivePath(subItem.path, location.pathname)
+                              ? "text-purple-500 bg-purple-100"
+                              : "text-gray-700 hover:bg-gray-100"
+                          } ${isOpen ? "" : "justify-center"}`
+                        }
+                        aria-label={subItem.title}
+                      >
+                        {subItem.icon}
+                        {isOpen && (
+                          <span role="presentation" className="ml-3">
+                            {subItem.title}
+                          </span>
+                        )}
+                      </NavLink>
+                    ))}
+                  </ul>
+                )}
             </React.Fragment>
           ))}
         </ul>
