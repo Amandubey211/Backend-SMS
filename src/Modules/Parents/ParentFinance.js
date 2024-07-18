@@ -3,6 +3,10 @@ import axios from "axios";
 import Layout from "../../Components/Common/Layout";
 import ParentDashLayout from "../../Components/Parents/ParentDashLayout.js";
 import { MdAccessTime, MdMoneyBillWave } from "react-icons/md";
+import {GiExpense } from "react-icons/gi";
+import {LuPocket} from "react-icons/lu";
+import { CiMoneyCheck1 } from "react-icons/ci";
+
 
 const uniqueFilterOptions = (data, key) => {
   return [...new Set(data.map((item) => item[key]))].sort();
@@ -180,7 +184,7 @@ const ParentFinanceTable = () => {
                 </div>
                 <div className="px-7 py-2 flex flex-1 flex-col justify-around items-center gap-3 border border-gray-300 rounded-lg">
                   <div className="border border-black flex items-center justify-center p-1.5 rounded-full">
-                    <MdAccessTime className="text-2xl text-red-400" />
+                    <GiExpense className="text-2xl text-red-400" />
                   </div>
                   <span className="text-sm">Total Paid Fees</span>
                   <span className="text-xl font-bold bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent bg-clip-text">
@@ -189,7 +193,7 @@ const ParentFinanceTable = () => {
                 </div>
                 <div className="px-7 py-2 flex flex-1 flex-col justify-around items-center gap-3 border border-gray-300 rounded-lg">
                   <div className="border border-black flex items-center justify-center p-1.5 rounded-full">
-                    <MdAccessTime className="text-2xl text-red-400" />
+                    <CiMoneyCheck1  className="text-2xl text-red-400" />
                   </div>
                   <span className="text-sm">Parent Account Total Paid</span>
                   <span className="text-xl font-bold bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent bg-clip-text">
@@ -198,7 +202,7 @@ const ParentFinanceTable = () => {
                 </div>
                 <div className="px-7 py-2 flex flex-1 flex-col justify-around items-center gap-3 border border-gray-300 rounded-lg">
                   <div className="border border-black flex items-center justify-center p-1.5 rounded-full">
-                    <MdAccessTime className="text-2xl text-red-400" />
+                    <LuPocket className="text-2xl text-red-400" />
                   </div>
                   <span className="text-sm">My Account Total Paid</span>
                   <span className="text-xl font-bold bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent bg-clip-text">
