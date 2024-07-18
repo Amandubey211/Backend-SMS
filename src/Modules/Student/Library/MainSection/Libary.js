@@ -4,11 +4,9 @@ import React, { useState, useMemo, useEffect } from "react";
 import BookCard from "../SubClass/component/BookCard";
 import Layout from "../../../../Components/Common/Layout";
 import StudentDashLayout from "../../../../Components/Student/StudentDashLayout";
-import FormField from "../../subClass/component/FormField";
 import BookIssue from "./BookIssue";
 import TabButton from "../Subclasss/component/TabButton";
-// import { books } from "../../studentDummyData/studentDummyData";
-import Sidebar from "../../../../Components/Common/Sidebar";
+import axios from "axios";
 
 const Library = () => {
   const [filters, setFilters] = useState({
@@ -17,59 +15,57 @@ const Library = () => {
   });
   const [books, setBooks] = useState([]);
 
+
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("Library");
-  useEffect(() => {
-    const fetchBooks = async () => {
-      console.log("Fetching books...");
-      try {
-        const token = localStorage.getItem('student:token');
-        console.log("token is ",token)
-        if (!token) {
-          throw new Error('Authentication token not found');
-        }
 
-        const response = await fetch('http://localhost:8080/admin/all/book', {
-          headers: {
-            'Authentication': token
-          }
-        });
+  const fetchBooks = async () => {
+    console.log("Fetching books...");
+    try {
+      const token = localStorage.getItem('student:token');
+      const selectedClass = localStorage.getItem('classId');
+      console.log("Token is:", token);
 
-        console.log("Response received:", response);
-        if (!response.ok) {
-          throw new Error(`Failed to fetch books, status: ${response.status}`);
-        }
-        const data = await response.json();
-        console.log("Data parsed:", data);
-
-        if (data.success && data.books) {
-          const formattedBooks = data.books.map(book => ({
-            ...book,
-            classLevel: book.name,
-            category: book.name,
-            available: book.copies,
-
-          }));
-          console.log("Formatted books:", formattedBooks);
-          setBooks(formattedBooks);
-        } else {
-          console.log("No books data or unsuccessful response");
-        }
-      } catch (error) {
-        console.error("Failed to fetch books:", error);
+      if (!token) {
+        throw new Error('Authentication token not found');
       }
-    };
 
-    fetchBooks();
-  }, []);
+      console.log("classId:", selectedClass);
 
-  const handleFilterChange = (e) => {
-    const { name, value } = e.target;
-    setFilters((prev) => ({ ...prev, [name]: value }));
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/admin/all/book`, {
+        headers: {
+          'Authentication': token,
+        },
+        params: {
+          classId: selectedClass,
+        },
+      });
+
+      console.log("Response received:", response);
+
+      const data = response.data;
+      console.log("Data parsed:", data);
+
+      if (data.success && data.books) {
+        const formattedBooks = data.books.map(book => ({
+          ...book,
+          classLevel: book.classId,
+          title: book.name,
+          available: book.copies,
+        }));
+        console.log("Formatted books:", formattedBooks);
+        setBooks(formattedBooks);
+      } else {
+        console.log("No books data or unsuccessful response");
+      }
+    } catch (error) {
+      console.error("Failed to fetch books:", error);
+    }
   };
 
-  const handleSidebarOpen = () => setSidebarOpen(true);
-  const handleSidebarClose = () => setSidebarOpen(false);
+  useEffect(() => {
+    fetchBooks();
+  }, []);
 
   // Extract unique class levels and categories
   const classLevels = useMemo(() => {
@@ -119,48 +115,15 @@ const Library = () => {
           </div>
           {activeTab === "Library" && (
             <>
-              <div className="flex justify-between items-end space-x-2 w-full">
-                <div className="flex gap-6">
-                  <FormField
-                    id="class"
-                    name="class"
-                    label="Class"
-                    value={filters.class}
-                    onChange={handleFilterChange}
-                    options={classLevels}
-                    placeholder="Select Class"
-                  />
-                  <FormField
-                    id="category"
-                    name="category"
-                    label="Category"
-                    value={filters.category}
-                    onChange={handleFilterChange}
-                    options={categories}
-                    placeholder="Select Category"
-                  />
-                </div>
-              </div>
-
               <div className="grid grid-cols-3 gap-4 p-4">
                 {filteredBooks.map((book) => (
-                  // <BookCard
-                  //   key={book.id}
-                  //   title={book.name}
-                  //   author={book.author}
-                  //   category={book.name}
-                  //   classLevel={book.name}
-                  //   copies={book.copies}
-                  //   available={book.copies}
-                  //   coverImageUrl={book.image}
-                  // />
-                  
+
                   <BookCard
                     key={book._id}
                     title={book.title}
                     author={book.author}
                     category={book.category}
-                    classLevel={book.classLevel}
+                    classLevel={book.classLevel.className}
                     copies={book.copies}
                     available={book.available}
                     coverImageUrl={book.image}
