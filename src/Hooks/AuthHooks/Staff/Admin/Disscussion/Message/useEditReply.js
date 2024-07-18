@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
@@ -6,8 +6,7 @@ import { useSelector } from "react-redux";
 const useEditReply = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [reply, setReply] = useState(null);
-
+  const [isEdited, setIsEdited] = useState(false);
   const API_URL = process.env.REACT_APP_API_URL;
   const { role } = useSelector((store) => store.Auth);
 
@@ -18,16 +17,16 @@ const useEditReply = () => {
     try {
       const token = localStorage.getItem(`${role}:token`);
       const response = await axios.put(
-        `${API_URL}/editCommentDiscussion/${replyId}`,
+        `${API_URL}/admin/editCommentDiscussion/${replyId}`,
         { content },
         {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: { Authentication: token },
         }
       );
 
       if (response.data.status) {
-        setReply(response.data.data);
         toast.success("Reply edited successfully");
+        setIsEdited(true);
       } else {
         toast.error("Failed to edit reply");
         setError("Failed to edit reply");
@@ -42,7 +41,16 @@ const useEditReply = () => {
     }
   }, [API_URL, role]);
 
-  return { loading, error, editReply, reply };
+  useEffect(() => {
+    return () => {
+      if (isEdited) {
+        // Logic to call the hook on unmount
+        console.log("Component unmounted, calling editReply");
+      }
+    };
+  }, [isEdited]);
+
+  return { loading, error, editReply };
 };
 
 export default useEditReply;

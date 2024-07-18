@@ -4,41 +4,27 @@ import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 
-const useReplyDiscussion = () => {
+const useAddReply = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [reply, setReply] = useState(null);
-
   const API_URL = process.env.REACT_APP_API_URL;
-  const { role, userId, userSchoolId } = useSelector((store) => store.Auth);
-  const { id: discussionId } = useParams();
-
-  const replyDiscussion = useCallback(async (content, parentId, files) => {
+  const { role } = useSelector((store) => store.Auth);
+  const { did: discussionId } = useParams();
+  const addReply = useCallback(async (parentId, text) => {
     setLoading(true);
     setError(null);
 
     try {
       const token = localStorage.getItem(`${role}:token`);
-      const formData = new FormData();
-      formData.append("content", content);
-      formData.append("parentId", parentId);
-      if (files && files.attachment) {
-        formData.append("attachment", files.attachment);
-      }
-
       const response = await axios.post(
-        `${API_URL}/createCommentDiscussion/${discussionId}/replies`,
-        formData,
+        `${API_URL}/admin/createCommentDiscussion/${discussionId}/replies`,
+        { content: text, parentId },
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
-          },
+          headers: { Authentication: token },
         }
       );
 
       if (response.data.status) {
-        setReply(response.data.data);
         toast.success("Reply added successfully");
       } else {
         toast.error("Failed to add reply");
@@ -52,9 +38,9 @@ const useReplyDiscussion = () => {
     } finally {
       setLoading(false);
     }
-  }, [API_URL, role, discussionId]);
+  }, [API_URL, role]);
 
-  return { loading, error, replyDiscussion, reply };
+  return { loading, error, addReply };
 };
 
-export default useReplyDiscussion;
+export default useAddReply;

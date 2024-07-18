@@ -1,14 +1,18 @@
-
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, lazy, Suspense } from "react";
 import { AiOutlineEdit } from "react-icons/ai";
 import { FaBan } from "react-icons/fa6";
 import { HiOutlineDotsVertical } from "react-icons/hi";
 import { BsChat } from "react-icons/bs";
 import { MdDelete } from "react-icons/md";
 import Sidebar from "../../../../../../../Components/Common/Sidebar";
-import DiscussionMessage from "../../DiscussionMessage/DiscussionMessage";
 import { useNavigate, useParams } from "react-router-dom";
 import useDeleteDiscussion from "../../../../../../../Hooks/AuthHooks/Staff/Admin/Disscussion/useDeleteDiscussion";
+
+// Lazy load the DiscussionMessage component
+//we dont need the replies in the discussion response
+const DiscussionMessage = lazy(() =>
+  import("../../DiscussionMessage/DiscussionMessage")
+);
 
 const Header = ({ discussion }) => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -16,7 +20,12 @@ const Header = ({ discussion }) => {
   const navigate = useNavigate();
   const { cid, sid } = useParams();
   const menuRef = useRef(null);
-  const { deleteDiscussion, loading: deleteLoading, error: deleteError, success: deleteSuccess } = useDeleteDiscussion();
+  const {
+    deleteDiscussion,
+    loading: deleteLoading,
+    error: deleteError,
+    success: deleteSuccess,
+  } = useDeleteDiscussion();
 
   const handleSidebarOpen = () => setSidebarOpen(true);
   const handleSidebarClose = () => setSidebarOpen(false);
@@ -123,7 +132,9 @@ const Header = ({ discussion }) => {
             isOpen={isSidebarOpen}
             onClose={handleSidebarClose}
           >
-            <DiscussionMessage />
+            <Suspense fallback={<div>Loading...</div>}>
+              <DiscussionMessage />
+            </Suspense>
           </Sidebar>
         </div>
       </div>

@@ -8,7 +8,15 @@ import { MdOutlineBlock } from "react-icons/md";
 import useDeleteQuiz from "../../../../../../Hooks/AuthHooks/Staff/Admin/Quiz/useDeleteQuiz";
 import useDeleteAssignment from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useDeleteAssignment";
 
-const List = ({ data, icon, title, type, loading, error, refetchAssignments }) => {
+const List = ({
+  data,
+  icon,
+  title,
+  type,
+  loading,
+  error,
+  refetchAssignments,
+}) => {
   const { cid, sid } = useParams();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeMenu, setActiveMenu] = useState(null);
@@ -28,7 +36,7 @@ const List = ({ data, icon, title, type, loading, error, refetchAssignments }) =
 
   useEffect(() => {
     if (deleteQuizSuccess || deleteAssignmentSuccess) {
-      console.log('Refetching assignments...');
+      console.log("Refetching assignments...");
       refetchAssignments();
     }
   }, [deleteQuizSuccess, deleteAssignmentSuccess, refetchAssignments]);
@@ -148,9 +156,11 @@ const List = ({ data, icon, title, type, loading, error, refetchAssignments }) =
                           onClick={() => handleDelete(item._id)}
                           className="flex items-center space-x-2 px-4 py-2 hover:bg-red-100 w-full text-left"
                           aria-label={`Delete ${type}`}
-                          disabled={deleteQuizLoading || deleteAssignmentLoading}
+                          disabled={
+                            deleteQuizLoading || deleteAssignmentLoading
+                          }
                         >
-                          {(deleteQuizLoading || deleteAssignmentLoading) ? (
+                          {deleteQuizLoading || deleteAssignmentLoading ? (
                             <ImSpinner3 className="w-5 h-5 animate-spin text-red-600" />
                           ) : (
                             <>

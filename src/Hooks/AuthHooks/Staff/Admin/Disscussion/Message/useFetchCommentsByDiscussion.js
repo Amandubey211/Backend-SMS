@@ -1,61 +1,18 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 
 const useFetchCommentsByDiscussion = () => {
+  const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [comments, setComments] = useState([]);
-
+  const { did: discussionId } = useParams();
   const API_URL = process.env.REACT_APP_API_URL;
   const { role } = useSelector((store) => store.Auth);
-  const { did: discussionId } = useParams();
-  const userId = useSelector((store) => store.Auth.userId);
 
-  const fetchCommentsWithReadStatus = useCallback(
-    async (commentIds) => {
-      try {
-        const token = localStorage.getItem(`${role}:token`);
-        const response = await axios.post(
-          `${API_URL}/comments/readStatus`,
-          { commentIds },
-          {
-            headers: { Authentication: token },
-          }
-        );
-
-        return await Promise.all(
-          response.data.comments.map(async (comment) => {
-            const userReadStatus = comment.userStatus.find(
-              (status) =>
-                status.userId.toString() === userId.toString() &&
-                status.userType === role
-            );
-            const isRead = userReadStatus ? userReadStatus.read : false;
-
-            const nestedReplies = comment.replies.length
-              ? await fetchCommentsWithReadStatus(comment.replies)
-              : [];
-
-            return {
-              ...comment,
-              isRead,
-              replies: nestedReplies,
-            };
-          })
-        );
-      } catch (error) {
-        toast.error("Failed to fetch comments with read status");
-        setError("Failed to fetch comments with read status");
-        return [];
-      }
-    },
-    [API_URL, role, userId]
-  );
-
-  const fetchCommentsByDiscussion = useCallback(async () => {
+  const fetchComments = useCallback(async () => {
     setLoading(true);
     setError(null);
 
@@ -67,13 +24,10 @@ const useFetchCommentsByDiscussion = () => {
           headers: { Authentication: token },
         }
       );
-
+console.log(response.data)
       if (response.data.status) {
-        const topLevelComments = response.data.data;
-        const commentsWithReadStatus = await fetchCommentsWithReadStatus(
-          topLevelComments.map((comment) => comment._id)
-        );
-        setComments(commentsWithReadStatus);
+        setComments(response.data.data);
+        console.log(comments)
       } else {
         toast.error("Failed to fetch comments");
         setError("Failed to fetch comments");
@@ -86,9 +40,13 @@ const useFetchCommentsByDiscussion = () => {
     } finally {
       setLoading(false);
     }
-  }, [API_URL, role, discussionId, fetchCommentsWithReadStatus]);
+  }, [API_URL, discussionId, role]);
 
-  return { loading, error, fetchCommentsByDiscussion, comments };
+  useEffect(() => {
+    fetchComments();
+  }, [fetchComments]);
+
+  return { comments, loading, error, fetchComments };
 };
 
 export default useFetchCommentsByDiscussion;
