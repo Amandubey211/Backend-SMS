@@ -5,7 +5,14 @@ const TeacherCard = ({ instructors }) => {
     return (
         <div className="relative w-96 h-70 rounded-lg overflow-hidden shadow-md border border-gray-200 p-4 m-2 flex flex-col items-center transition-transform duration-300 hover:scale-105 hover:shadow-lg bg-white">
             <div className="w-full flex flex-col items-center">
-                <img className="w-24 h-24 rounded-full mt-4 mb-3" src={instructors.photo} alt={`${instructors.name}'s photo`} />
+            <img 
+  className="w-24 h-24 rounded-full mt-4 mb-3" 
+  src="https://avatars.githubusercontent.com/u/109097090?v=4" 
+  alt={`${instructors.name}'s photo`}
+  onError={(e) => e.currentTarget.src = 'https://avatars.githubusercontent.com/u/109097090?v=4'} // Fallback image
+/>
+
+
                 <div className="text-center">
                     <p className="text-gray-900 text-lg font-semibold">{instructors.name}</p>
                     <p className="text-gray-500 font-semibold text-sm">{instructors.role}</p>

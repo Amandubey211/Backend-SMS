@@ -2,25 +2,25 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 const StudentCard = ({ student, index }) => {
+  const defaultImage = "https://via.placeholder.com/150"; // Placeholder image URL
+  const profileImage = student.profile || defaultImage; // Use the student profile image or the default image
+
   return (
     <div className="border rounded-lg p-4 mb-4 text-center shadow-lg relative">
-      <div className="absolute top-2 right-2 bg-gray-200 text-gray-800 py-1 px-2 rounded-full">
+      <div className="absolute top-2 left-2 bg-gray-200 text-gray-800 py-1 px-2 rounded-full">
         Child {index + 1}
       </div>
       <img
-        src={student.imageUrl}
+        src={profileImage}
         alt={student.name}
         className="w-24 h-24 rounded-full mx-auto mb-4"
+        onError={(e) => { e.target.onerror = null; e.target.src = defaultImage; }} // Fallback to default image if the provided src fails
       />
       <h2 className="text-xl font-semibold mb-2">{student.name}</h2>
       <div className="text-gray-700">
-        <div className="flex justify-center space-x-2 mb-2">
-          <span className="rounded-full uppercase">Class: {student.class}</span>
-          <span className="rounded-full uppercase">Id: {student.id}</span>
-          <span className=" rounded-full uppercase">Section: {student.section}</span>
-        </div>
-        <span className="rounded-full uppercase">Group: {student.group}</span>
+        Class: {student.class} | Id: {student.admissionNumber} | Section: {student.section}
       </div>
+      <div className="text-green-500">Group: {student.group}</div>
     </div>
   );
 };
@@ -57,13 +57,6 @@ const StudentParentCard = () => {
           }
         });
 
-        const contentType = response.headers.get("content-type");
-        if (!contentType || !contentType.includes("application/json")) {
-          const textResponse = await response.text();
-          console.error("Response is not JSON:", textResponse);
-          throw new Error("Server response is not JSON");
-        }
-
         if (!response.ok) {
           const errorData = await response.json();
           throw new Error(errorData.msg || "Network response was not ok");
@@ -71,10 +64,8 @@ const StudentParentCard = () => {
 
         const data = await response.json();
 
-        // Ensure data contains children array
         if (data && data.children) {
           setStudents(data.children);
-          // Store the children data in localStorage
           localStorage.setItem('childrenData', JSON.stringify(data.children));
         } else {
           throw new Error("No children data found");

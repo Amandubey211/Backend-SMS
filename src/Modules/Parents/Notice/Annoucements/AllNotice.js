@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Layout from "../../../../Components/Common/Layout";
 import ParentDashLayout from "../../../../Components/Parents/ParentDashLayout.js";
+import {  FcAdvertising } from "react-icons/fc";
 import { MdQueryBuilder } from "react-icons/md";
 import Notice from "./Notice";
 import toast from "react-hot-toast";
@@ -66,11 +67,25 @@ const AllNotice = () => {
                     onClick={() => toggleAccordion(index)}
                   >
                     <div className="flex gap-6 px-3 py-2">
-                      <img
-                        className="h-10 w-10 rounded"
-                        src={notice.imageUrl}
-                        alt="notice-image"
-                      />
+                    {/* <img
+  className="h-10 w-10 rounded"
+  src={notice.imageUrl}
+  alt="notice-image"
+  onError={(e) => {
+    e.target.onerror = null; 
+    e.target.src = "https://via.placeholder.com/40"; 
+    e.target.style = "background: #f3f4f6; display: flex; align-items: center; justify-content: center;";
+    e.target.alt = '📅'; 
+  }}
+/> */}
+<div
+  className="h-10 w-10 rounded flex items-center justify-center text-2xl"
+  style={{ background: '#f3f4f6' }}
+>
+<FcAdvertising />{/* You can replace this emoji with any other relevant emoji */}
+</div>
+
+
                       <div className="flex flex-col gap-3 mt-[-5px]">
                         <h2
                           className="font-[500] text-[#4D4D4D]"
@@ -91,16 +106,20 @@ const AllNotice = () => {
                               {new Date(notice.endDate).toLocaleDateString()}
                             </span>
                           </div>
-                          <div className="px-2 text-xs bg-pink-100 text-center flex justify-center items-center">
-                            <span
-                              className={`${notice.priority === "High Priority"
-                                  ? "font-semibold bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent bg-clip-text"
-                                  : "text-blue-500 font-bold"
-                                }`}
-                            >
-                              {notice.priority}
-                            </span>
-                          </div>
+                          <div className="px-3 py-1 text-xs text-center flex justify-center items-center">
+  <span
+    className={`${
+      notice.priority === "High priority"
+        ? "px-3 py-1 bg-pink-100 text-pink-700 font-bold"
+        : notice.priority === "Low priority"
+        ? "px-3 py-1 bg-gray-100 text-black font-normal"
+        : ""
+    }`}
+  >
+    {notice.priority}
+  </span>
+</div>
+
                         </div>
                       </div>
                     </div>
@@ -108,7 +127,7 @@ const AllNotice = () => {
                   <div>
                     {activeIndex === index && (
                       <div className="p-2 text-[#4D4D4D]">
-                        <p>{notice.content}</p>
+                        <p>{notice.description}</p>
                       </div>
                     )}
                   </div>
