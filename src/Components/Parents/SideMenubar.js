@@ -1,16 +1,15 @@
 import React, { useState } from "react";
 import { useLocation, NavLink } from "react-router-dom";
 import StudentDiwanLogo from "../../Assets/HomeAssets/StudentDiwanLogo.png";
-import {
-  MdOutlineKeyboardArrowUp,
-  MdOutlineKeyboardArrowDown,
-} from "react-icons/md";
+import { MdOutlineKeyboardArrowUp, MdOutlineKeyboardArrowDown } from "react-icons/md";
 import sidebarData from "./DataFile/sidebarData.js";
 import { FiLogOut } from "react-icons/fi";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { useDispatch, useSelector } from "react-redux";
 import smallLogo from "../../Assets/SideBarAsset/smallLogo.png";
 import { toggleSidebar } from "../../Redux/Slices/SidebarSlice.js";
+  import  useParentLogout  from '../../Hooks/AuthHooks/Parent/useParentLogout.js';  
+
 const isActivePath = (path, locationPath) => {
   return locationPath.startsWith(path);
 };
@@ -19,8 +18,9 @@ const SideMenubar = () => {
   const isOpen = useSelector((state) => state.sidebar.isOpen);
   const location = useLocation();
   const [openItems, setOpenItems] = useState([]);
-  const isSidebarOpen = useSelector((state) => state.sidebar.isOpen);
   const dispatch = useDispatch();
+  const { parentLogout } = useParentLogout(); // Use the hook
+
   const toggleDropdown = (title) => {
     if (openItems.includes(title)) {
       setOpenItems(openItems.filter((item) => item !== title));
@@ -39,16 +39,14 @@ const SideMenubar = () => {
         <img
           src={isOpen ? StudentDiwanLogo : smallLogo}
           alt="Logo"
-          className={`transition-width  duration-300 ${
+          className={`transition-width duration-300 ${
             isOpen ? "w-36 pt-1" : "h-12"
           }`}
         />
-        <button
-          onClick={() => dispatch(toggleSidebar())}
-          className="focus:outline-none absolute bottom-0 right-0 "
-        >
-          <div className="p-1 rounded-full text-purple-500 -mr-4 -mb-4   z-40 bg-white border-2">
-            {isSidebarOpen ? <IoIosArrowBack /> : <IoIosArrowForward />}
+        <button onClick={() => dispatch(toggleSidebar())}
+          className="focus:outline-none absolute bottom-0 right-0">
+          <div className="p-1 rounded-full text-purple-500 -mr-4 -mb-4 z-40 bg-white border-2">
+            {isOpen ? <IoIosArrowBack /> : <IoIosArrowForward />}
           </div>
         </button>
       </NavLink>
@@ -134,26 +132,15 @@ const SideMenubar = () => {
         </ul>
       </div>
 
-      {/* This section is always at the bottom */}
+      {/* Logout button at the bottom */}
       <div className="mt-auto p-2">
-        <div className="flex items-center">
-          <img
-            src="https://avatars.githubusercontent.com/u/109097090?v=4" // Path to the profile image
-            alt="Profile"
-            className={`${isOpen ? "w-10 h-10" : "w-8 h-8"} rounded-full`}
-          />
-          {isOpen && (
-            <div className="ml-4">
-              <h2 className="text-sm font-semibold">Raihan Khan</h2>
-              <p className="text-gray-500">Admin</p>
-            </div>
-          )}
-          <FiLogOut
-            className={`${
-              isOpen ? "w-6 h-6" : "w-4 h-4"
-            } text-gray-500 ml-auto ${!isOpen && "ml-0"}`}
-          />
-        </div>
+        <button
+          onClick={parentLogout}  // Logout function tied to button click
+          className="flex items-center justify-center w-full text-gray-700 hover:text-white hover:bg-gray-900 p-2 rounded-lg"
+        >
+          <FiLogOut className={`${isOpen ? "w-6 h-6" : "w-4 h-4"}`} />
+          {isOpen && <span className="ml-2">Logout</span>}
+        </button>
       </div>
     </nav>
   );
