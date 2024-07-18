@@ -47,7 +47,7 @@ const Library = () => {
       console.log("Data parsed:", data);
 
       if (data.success && data.books) {
-        const formattedBooks = data.books.map(book => ({
+        const formattedBooks = data.books.reverse().map(book => ({
           ...book,
           classLevel: book.classId,
           title: book.name,

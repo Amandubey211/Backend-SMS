@@ -178,7 +178,7 @@ const sidebarData = [
     icon: <RiNotificationLine />,
     items: [
       {
-        title: "Announcements",
+        title: "Notice",
         icon: <FaClipboardList />,
         path: "/student/noticeboard/announcements",
       },

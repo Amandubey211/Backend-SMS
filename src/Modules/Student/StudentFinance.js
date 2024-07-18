@@ -41,7 +41,7 @@ const FinanceTable = () => {
       console.log("Data parsed:", data);
   
       if (data) {
-        setFeesDetails(data.fees);
+        setFeesDetails(data.fees.reverse());
         setTotalUnpaidFees(data.totalUnpaidFees);
         setTotalPaidFees(data.totalPaidFees);
       } else {
@@ -95,25 +95,14 @@ const FinanceTable = () => {
 
               <FeeCard
                 title="Total Unpaid Fees"
-                // amount={feesDetails?.tUnpaidFees?.reduce((sum, item) => item.status === "unpaid" ? sum + item.amount : sum, 0)}
                 amount={totalUnpaidFees}
                 buttonText="Pay Now"
               />
               <FeeCard
                 title="Total Paid Fees"
-                // amount={feesDetails?.totalPaidFees?.reduce((sum, item) => item.status === "paid" ? sum + item.amount : sum, 0)}
                 amount={totalPaidFees}
 
               />
-              {/* <FeeCard
-                title="Parent Account Total Paid"
-                amount={feesDetails.reduce((sum, item) => item.status === "paid" ? sum + item.amount : sum, 0)}
-              /> */}
-              {/* <FeeCard
-                title="My Account Total Paid"
-                amount={feesDetails.reduce((sum, item) => item.status === "paid" ? sum + item.amount : sum, 0)}
-                buttonText="View All Expenses"
-              /> */}
             </div>
           </div>
         </div>
