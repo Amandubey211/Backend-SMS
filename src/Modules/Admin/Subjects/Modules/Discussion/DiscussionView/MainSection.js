@@ -1,4 +1,3 @@
-
 import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import Header from "./Components/Header";
@@ -7,8 +6,10 @@ import useFetchDiscussionById from "../../../../../../Hooks/AuthHooks/Staff/Admi
 
 const MainSection = () => {
   const { did } = useParams();
-  const { discussion, error, fetchDiscussionById, loading } = useFetchDiscussionById();
-
+  const { discussion, error, fetchDiscussionById, loading } =
+    useFetchDiscussionById();
+  // we are getting the replies as well here in future we have to remove the replies from the backend and ,
+  //in DiscussionMessage we have to fetch the replies with useEffect
   useEffect(() => {
     fetchDiscussionById(did);
   }, [did, fetchDiscussionById]);
@@ -23,19 +24,20 @@ const MainSection = () => {
       <div className="border-l w-full">
         <Header discussion={discussion} />
         <div className="p-6 bg-white">
-        <h1 className="text-lg font-semibold">{discussion.title}</h1>
-          <div className="relative w-full h-64 md:h-80 lg:h-96 overflow-hidden rounded-lg mb-4">
-            {discussion.attachment && (
+          <h1 className="text-lg font-semibold">{discussion.title}</h1>
+
+          <div className="text-gray-700 mb-3">
+            <div dangerouslySetInnerHTML={{ __html: discussion.content }} />
+          </div>
+          {discussion.attachment != null && (
+            <div className="relative w-full h-64 md:h-80 lg:h-96 overflow-hidden rounded-lg mb-4">
               <img
                 src={discussion.attachment}
                 alt="Attachment"
                 className="absolute top-0 left-0 w-full h-full object-cover"
               />
-            )}
-          </div>
-          <div className="text-gray-700 mb-6">
-            <div dangerouslySetInnerHTML={{ __html: discussion.content }} />
-          </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -43,4 +45,3 @@ const MainSection = () => {
 };
 
 export default MainSection;
-

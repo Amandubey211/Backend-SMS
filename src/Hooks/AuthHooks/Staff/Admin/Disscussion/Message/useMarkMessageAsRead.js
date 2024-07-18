@@ -6,8 +6,6 @@ import { useSelector } from "react-redux";
 const useMarkMessageAsRead = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [message, setMessage] = useState(null);
-
   const API_URL = process.env.REACT_APP_API_URL;
   const { role } = useSelector((store) => store.Auth);
 
@@ -18,15 +16,14 @@ const useMarkMessageAsRead = () => {
     try {
       const token = localStorage.getItem(`${role}:token`);
       const response = await axios.put(
-        `${API_URL}/markAsReadDiscussions/replies/${messageId}`,
+        `${API_URL}/admin/markAsReadDiscussions/replies/${messageId}`,
         {},
         {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: { Authentication: token },
         }
       );
 
       if (response.data.status) {
-        setMessage(response.data.data);
         toast.success("Message marked as read successfully");
       } else {
         toast.error("Failed to mark message as read");
@@ -42,7 +39,7 @@ const useMarkMessageAsRead = () => {
     }
   }, [API_URL, role]);
 
-  return { loading, error, markMessageAsRead, message };
+  return { loading, error, markMessageAsRead };
 };
 
 export default useMarkMessageAsRead;

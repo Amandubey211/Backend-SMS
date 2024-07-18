@@ -2,37 +2,39 @@ import { useState, useCallback } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
 
-const useToggleLikeMessage = () => {
+const useAddComment = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const API_URL = process.env.REACT_APP_API_URL;
   const { role } = useSelector((store) => store.Auth);
-
-  const toggleLikeMessage = useCallback(
-    async (messageId) => {
+  const { did: discussionId } = useParams();
+  const addComment = useCallback(
+    async (text) => {
       setLoading(true);
       setError(null);
-      console.log(messageId,"sdfsdf");
+      console.log(text);
+
       try {
         const token = localStorage.getItem(`${role}:token`);
-        const response = await axios.put(
-          `${API_URL}/admin/likeDiscussions/${messageId}`,
-          {},
+        const response = await axios.post(
+          `${API_URL}/admin/createCommentDiscussion/${discussionId}/replies`,
+          { content: text, parentId: null },
           {
             headers: { Authentication: token },
           }
         );
 
         if (response.data.status) {
-          // do if success
+          //  logic
         } else {
-          toast.error("Failed to toggle like");
-          setError("Failed to toggle like");
+          toast.error("Failed to add comment");
+          setError("Failed to add comment");
         }
       } catch (err) {
         const errorMessage =
-          err.response?.data?.message || "Error toggling like";
+          err.response?.data?.message || "Error adding comment";
         toast.error(errorMessage);
         setError(errorMessage);
       } finally {
@@ -42,7 +44,7 @@ const useToggleLikeMessage = () => {
     [API_URL, role]
   );
 
-  return { loading, error, toggleLikeMessage };
+  return { loading, error, addComment };
 };
 
-export default useToggleLikeMessage;
+export default useAddComment;

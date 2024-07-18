@@ -3,34 +3,34 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
 
-const useDeleteReply = () => {
+const useDeleteComment = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const API_URL = process.env.REACT_APP_API_URL;
   const { role } = useSelector((store) => store.Auth);
 
-  const deleteReply = useCallback(async (replyId) => {
+  const deleteComment = useCallback(async (commentId) => {
     setLoading(true);
     setError(null);
 
     try {
       const token = localStorage.getItem(`${role}:token`);
       const response = await axios.delete(
-        `${API_URL}/admin/deleteCommentDiscussion/${replyId}`,
+        `${API_URL}/admin/deleteCommentDiscussion/${commentId}`,
         {
           headers: { Authentication: token },
         }
       );
 
       if (response.data.status) {
-        toast.success("Reply deleted successfully");
+        toast.success("Comment deleted successfully");
       } else {
-        toast.error("Failed to delete reply");
-        setError("Failed to delete reply");
+        toast.error("Failed to delete comment");
+        setError("Failed to delete comment");
       }
     } catch (err) {
       const errorMessage =
-        err.response?.data?.message || "Error deleting reply";
+        err.response?.data?.message || "Error deleting comment";
       toast.error(errorMessage);
       setError(errorMessage);
     } finally {
@@ -38,7 +38,7 @@ const useDeleteReply = () => {
     }
   }, [API_URL, role]);
 
-  return { loading, error, deleteReply };
+  return { loading, error, deleteComment };
 };
 
-export default useDeleteReply;
+export default useDeleteComment;

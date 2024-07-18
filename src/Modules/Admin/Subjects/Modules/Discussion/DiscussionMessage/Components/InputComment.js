@@ -3,8 +3,8 @@ import { FaRegSmile, FaPaperclip, FaPaperPlane } from "react-icons/fa";
 
 const emojis = ["😀", "😂", "😍", "😢", "😡"];
 
-const InputComment = ({ addComment, placeholder = "Write Something..." }) => {
-  const [text, setText] = useState("");
+const InputComment = ({ addComment, placeholder = "Write Something...", initialText = "" }) => {
+  const [text, setText] = useState(initialText);
   const [showEmojis, setShowEmojis] = useState(false);
   const timeoutRef = useRef(null);
   const emojiListRef = useRef(null);
@@ -81,7 +81,7 @@ const InputComment = ({ addComment, placeholder = "Write Something..." }) => {
               <span
                 key={index}
                 onClick={() => handleEmojiClick(emoji)}
-                className="cursor-pointer hover:animate-bounce  transform transition-transform duration-300 ease-in-out hover:scale-125"
+                className="cursor-pointer hover:animate-bounce transform transition-transform duration-300 ease-in-out hover:scale-125"
               >
                 {emoji}
               </span>
