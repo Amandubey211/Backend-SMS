@@ -6,7 +6,7 @@ const PersonalInfo = ({ studentInfo, handleInputChange }) => {
   return (
     <div className="grid grid-cols-2 gap-4">
       <div>
-        <label className="block text-gray-700"> First Name</label>
+        <label className="block text-gray-700">Name</label>
         <input
           type="text"
           name="name"
@@ -16,16 +16,7 @@ const PersonalInfo = ({ studentInfo, handleInputChange }) => {
         />
         
       </div>
-    <div>
-    <label className="block text-gray-700"> Last Name</label>
-        <input
-          type="text"
-          name="name"
-          className="mt-1 p-2 block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-          value={studentInfo.name}
-          onChange={handleInputChange}
-        />
-    </div>
+   
       <div>
         <label className="block text-gray-700">Student ID</label>
         <input

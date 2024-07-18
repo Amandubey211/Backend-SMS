@@ -10,8 +10,7 @@ import useRegisterStudent from "../../../Hooks/AuthHooks/Staff/Admin/Students/us
 
 const StudentInfo = () => {
   const [studentInfo, setStudentInfo] = useState({
-    firstName: "",
-    lastName: "",
+    name: "",
     email: "",
     dateOfBirth: "",
     placeOfBirth: "",
@@ -34,12 +33,16 @@ const StudentInfo = () => {
     transportRequirement: "",
     schoolId: "",
     profile: null,
+    fatherImage: null,
+    motherImage: null,
   });
   const [imagePreview, setImagePreview] = useState(null);
   const [pdfPreview, setPdfPreview] = useState(null);
+  const [fatherImagePreview, setFatherImagePreview] = useState(null);
+  const [motherImagePreview, setMotherImagePreview] = useState(null);
 
-  const { loading, error, registerStudent } = useRegisterStudent()
-  
+  const { loading, error, registerStudent } = useRegisterStudent();
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setStudentInfo({
@@ -57,6 +60,30 @@ const StudentInfo = () => {
       };
       reader.readAsDataURL(file);
       setStudentInfo({ ...studentInfo, profile: file });
+    }
+  };
+
+  const handleFatherImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFatherImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+      setStudentInfo({ ...studentInfo, fatherImage: file });
+    }
+  };
+
+  const handleMotherImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setMotherImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+      setStudentInfo({ ...studentInfo, motherImage: file });
     }
   };
 
@@ -83,19 +110,30 @@ const StudentInfo = () => {
     }
   };
 
+  const handleRemoveImage = () => {
+    setImagePreview(null);
+    setStudentInfo({ ...studentInfo, profile: null });
+  };
+
+  const handleRemoveFatherImage = () => {
+    setFatherImagePreview(null);
+    setStudentInfo({ ...studentInfo, fatherImage: null });
+  };
+
+  const handleRemoveMotherImage = () => {
+    setMotherImagePreview(null);
+    setStudentInfo({ ...studentInfo, motherImage: null });
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     // registerStudent(studentInfo);
-    console.log(studentInfo)
-  };
-
-  const handleRemoveImage = () => {
-    setImagePreview(null);
+    console.log(studentInfo);
   };
 
   return (
-    <div className="flex gap-4">
-      <div className="p-8 max-w-4xl bg-white rounded-lg ">
+    <div className="flex gap-4 h-screen">
+      <div className="p-8 max-w-4xl bg-white rounded-lg overflow-y-auto no-scrollbar">
         <h2 className="text-2xl font-semibold mb-6">Student Information</h2>
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-12 gap-4">
@@ -125,6 +163,12 @@ const StudentInfo = () => {
           <ParentInfo
             studentInfo={studentInfo}
             handleInputChange={handleInputChange}
+            fatherImagePreview={fatherImagePreview}
+            motherImagePreview={motherImagePreview}
+            handleFatherImageChange={handleFatherImageChange}
+            handleMotherImageChange={handleMotherImageChange}
+            handleRemoveFatherImage={handleRemoveFatherImage}
+            handleRemoveMotherImage={handleRemoveMotherImage}
           />
           <TransferCertificateUpload
             pdfPreview={pdfPreview}
@@ -132,20 +176,10 @@ const StudentInfo = () => {
             handleTcChange={handleTcChange}
             clearPdfPreview={clearPdfPreview}
           />
-          <div className="mt-6">
-            {/* <button
-              type="submit"
-              className="px-4 py-2 bg-blue-600 text-white rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-              disabled={loading}
-            >
-              {loading ? "Registering..." : "Submit"}
-            </button>
-            {error && <p className="text-red-500">{error}</p>} */}
-          </div>
+          <div className="mt-6"></div>
         </form>
       </div>
-      {/* // i wnat  */}
-      <div className="">
+      <div className="sticky top-0">
         <StudentCard studentInfo={studentInfo} imagePreview={imagePreview} />
         <div className="mt-6">
           <button
@@ -154,7 +188,7 @@ const StudentInfo = () => {
             className="w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600 text-center"
             disabled={loading}
           >
-              {loading ? "Registering..." : "Add Student"}
+            {loading ? "Registering..." : "Add Student"}
           </button>
           {error && <p className="text-red-500">{error}</p>}
         </div>

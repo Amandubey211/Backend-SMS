@@ -1,5 +1,5 @@
 import React from "react";
-
+import { GiArmorUpgrade } from "react-icons/gi";
 const StudentCard = ({ studentInfo, imagePreview }) => {
   const {
     name,
@@ -12,31 +12,32 @@ const StudentCard = ({ studentInfo, imagePreview }) => {
   } = studentInfo;
 
   return (
-    <div className="p-4 bg-white rounded-lg shadow-md w-64">
+    <div className=" bg-white rounded-lg shadow-md w-64 border">
       <div className="flex flex-col items-center">
-        <div className="w-full h-40 bg-gradient-to-r rounded-md from-pink-500 to-purple-500 relative">
-          <div className="absolute inset-0 flex items-center justify-center">
+        <div className="w-full h-40 bg-black rounded-md relative flex justify-center items-center">
+          <div className="absolute top-2 left-2 text-white text-sm font-semibold">
+            <div className="flex items-center space-x-1">
+              <GiArmorUpgrade className="w-5 h-5 text-pink-600" />
+              <span>Student Diwan</span>
+            </div>
+          </div>
+          <div className="mt-4 bg-white rounded-full flex justify-center items-center">
             <img
               src={imagePreview || "https://via.placeholder.com/150"}
               alt={name}
-              className="rounded-full w-24 h-24 border-4 border-white object-cover"
+              className="rounded-full w-24 h-24 object-cover"
             />
           </div>
-          <div className="absolute top-2 left-2 text-white text-sm font-semibold">
-            Student Diwan
-          </div>
         </div>
-        <div className=" mt-6">
-          <h2 className="text-lg  text-center font-semibold">
-            {name || "Name"}
-          </h2>
-          <div className="text-sm text-gray-600 mt-2">
-            <p>ID No: {studentId}</p>
-            <p>Class: {studentClass}</p>
-            <p>Section: {section}</p>
-            <p>Blood: {bloodGroup}</p>
-            <p>Religion: {religion}</p>
-            <p>Email: {email}</p>
+        <div className="mt-4 text-center">
+          <h2 className="text-lg font-semibold">{name || "Student Name"}</h2>
+          <div className="text-sm text-gray-600 mt-2 space-y-1 text-left">
+            <p><span className="font-semibold">ID No</span>: {studentId}</p>
+            <p><span className="font-semibold">Class</span>: {studentClass}</p>
+            <p><span className="font-semibold">Section</span>: {section}</p>
+            <p><span className="font-semibold">Blood</span>: {bloodGroup}</p>
+            <p><span className="font-semibold">Religion</span>: {religion}</p>
+            <p><span className="font-semibold">Email</span>: {email}</p>
           </div>
         </div>
       </div>
