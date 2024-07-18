@@ -1,11 +1,39 @@
-// src/components/ParentInfo.js
-
 import React from "react";
+import ImageUpload from "./ImageUpload";
 
-const ParentInfo = ({ studentInfo, handleInputChange }) => {
+const ParentInfo = ({
+  studentInfo,
+  handleInputChange,
+  fatherImagePreview,
+  motherImagePreview,
+  handleFatherImageChange,
+  handleMotherImageChange,
+  handleRemoveFatherImage,
+  handleRemoveMotherImage,
+}) => {
   return (
     <div className="mt-6">
       <h2 className="text-xl font-semibold mb-4">Parent Information</h2>
+      <div className="grid grid-cols-2 gap-8 mb-4">
+        <div>
+          <label className="block text-gray-700 mb-2">Father Image</label>
+          <ImageUpload
+            imagePreview={fatherImagePreview}
+            handleBrowseClick={() => {}}
+            handleImageChange={handleFatherImageChange}
+            handleRemoveImage={handleRemoveFatherImage}
+          />
+        </div>
+        <div>
+          <label className="block text-gray-700 mb-2">Mother Image</label>
+          <ImageUpload
+            imagePreview={motherImagePreview}
+            handleBrowseClick={() => {}}
+            handleImageChange={handleMotherImageChange}
+            handleRemoveImage={handleRemoveMotherImage}
+          />
+        </div>
+      </div>
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="block text-gray-700">Father Name</label>
