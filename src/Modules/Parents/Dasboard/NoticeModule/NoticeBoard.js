@@ -14,7 +14,7 @@ const NoticeBoard = () => {
     const fetchNotices = async () => {
       try {
         const token = localStorage.getItem("parent:token");
-        const response = await axios.get("http://localhost:8080/admin/all/notices", {
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/admin/all/notices`, {
           headers: {
             Authentication: `${token}`, 
           },

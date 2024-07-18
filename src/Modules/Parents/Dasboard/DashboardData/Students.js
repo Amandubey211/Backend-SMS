@@ -49,7 +49,7 @@ const StudentParentCard = () => {
           throw new Error("No guardian email found");
         }
 
-        const response = await fetch(`http://localhost:8080/parent/api/children?email=${encodeURIComponent(email)}`, {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/parent/api/children?email=${encodeURIComponent(email)}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
