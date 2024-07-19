@@ -13,10 +13,10 @@ const StudentRecentGradeTable = () => {
       };
   return (
     <>
-    <div className="p-3">
+    <div className="py-3">
       <table className="min-w-full py-3 px-5">
-        <thead className="border-b">
-          <tr className="text-left">
+        <thead className="bg-gray-200 border-b">
+          <tr className="text-left text-gray-500">
             <th className="px-5 py-2">Name</th>
             <th className="px-5 py-2">Module</th>
             <th className="px-5 py-2">Due Date</th>
@@ -30,7 +30,7 @@ const StudentRecentGradeTable = () => {
             <tr key={idx} className="bg-white">
               <td className="px-5 py-2 flex flex-col ">
                 <span>{evalItem.name}</span>
-                <span className="text-xs">{evalItem.type}</span>
+                <span className="text-xs text-gray-500">{evalItem.type}</span>
               </td>
 
               <td className="px-5 py-2">
