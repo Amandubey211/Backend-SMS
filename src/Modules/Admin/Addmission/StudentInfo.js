@@ -179,7 +179,7 @@ const StudentInfo = () => {
           <div className="mt-6"></div>
         </form>
       </div>
-      <div className="sticky top-0">
+      <div className="sticky top-4">
         <StudentCard studentInfo={studentInfo} imagePreview={imagePreview} />
         <div className="mt-6">
           <button
