@@ -10,7 +10,7 @@ import {
   FaShareAlt,
   FaTrashAlt,
 } from "react-icons/fa";
-
+import { TbProgress } from "react-icons/tb";
 const ModuleCard = ({ title, moduleNumber, imageUrl, isCompleted }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef();
@@ -47,48 +47,12 @@ const ModuleCard = ({ title, moduleNumber, imageUrl, isCompleted }) => {
             <span className="text-gradient"> Module {moduleNumber}</span>{" "}
           </p>
 
-          <div className="flex items-center space-x-2">
-            {isCompleted ? (
-              <FaCheckCircle className="text-green-500" />
-            ) : (
-              <FaBan className="text-gray-500" />
-            )}
-            <button
-              className="bg-gray-100 p-2 rounded-full hover:bg-gray-200"
-              onClick={toggleMenu}
-            >
-              <FaEllipsisV />
-            </button>
-          </div>
+{/* Here it will be progress bar */}
+<TbProgress size={40}/>
+         
         </div>
       </div>
-      {menuOpen && (
-        <div
-          ref={menuRef}
-          className="absolute top-12 right-4 bg-white border rounded-lg shadow-lg w-48 z-10"
-        >
-          <ul className="py-2">
-            <li className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
-              <FaPen className="mr-2" /> Edit
-            </li>
-            <li className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
-              <FaCopy className="mr-2" /> Duplicate
-            </li>
-            <li className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
-              <FaArrowRight className="mr-2" /> Move to...
-            </li>
-            <li className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
-              <FaIndent className="mr-2" /> Increase indent
-            </li>
-            <li className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
-              <FaShareAlt className="mr-2" /> Share to Commons
-            </li>
-            <li className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
-              <FaTrashAlt className="mr-2" /> Remove
-            </li>
-          </ul>
-        </div>
-      )}
+      
     </div>
   );
 };

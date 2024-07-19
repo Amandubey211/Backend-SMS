@@ -71,7 +71,6 @@ const List = ({ data, icon, title, type }) => {
                 </div>
                 <div className="flex items-center gap-3">
                   <BsPatchCheckFill className="text-green-600 p-1 border rounded-full h-7 w-7" />
-                  <FaEllipsisV className="text-green-600 p-1 border rounded-full h-7 w-7" />
                 </div>
               </div>
             </NavLink>

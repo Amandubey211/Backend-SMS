@@ -18,7 +18,7 @@ const Calendar = () => {
     }
 
     try {
-      const response = await axios.get('http://localhost:8080/parent/api/attendance', {
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/parent/api/attendance`, {
         headers: {
           Authentication: `${token}`
         },
