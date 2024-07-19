@@ -40,10 +40,10 @@ const StudentMainSection = () => {
       const { data } = response.data;
 
       const formattedData = [
-        { label: 'Upcoming Exam', value: data.upcomingExam, bgColor: 'bg-red-100', textColor: 'text-red-500', icon: '📝' },
-        { label: 'Due Fees', value: data.dueFees, bgColor: 'bg-red-100', textColor: 'text-red-500', icon: '💸' },
-        { label: 'Event', value: data.events, bgColor: 'bg-blue-100', textColor: 'text-blue-500', icon: '📅' },
-        { label: 'Notice', value: data.notices, bgColor: 'bg-yellow-100', textColor: 'text-yellow-500', icon: '🔔' },
+        { label: 'Upcoming Exam', value: data.upcomingExam, bgColor: 'bg-green-100', textColor: 'text-black-500', icon: '📝' },
+        { label: 'Due Fees', value: data.dueFees, bgColor: 'bg-red-100', textColor: 'text-black-500', icon: '💸' },
+        { label: 'Event', value: data.events, bgColor: 'bg-blue-100', textColor: 'text-black-500', icon: '📅' },
+        { label: 'Notice', value: data.notices, bgColor: 'bg-yellow-100', textColor: 'text-black-500', icon: '🔔' },
       ];
 
       setCardData(formattedData);
