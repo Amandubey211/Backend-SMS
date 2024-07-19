@@ -1,5 +1,7 @@
 import React from "react";
 import { GiArmorUpgrade } from "react-icons/gi";
+import CardBanner from "../../../../Assets/AdmissionCard/CardBanner.jpg";
+
 const StudentCard = ({ studentInfo, imagePreview }) => {
   const {
     name,
@@ -12,9 +14,12 @@ const StudentCard = ({ studentInfo, imagePreview }) => {
   } = studentInfo;
 
   return (
-    <div className=" bg-white rounded-lg shadow-md w-64 border">
+    <div className="pb-4 mt-2 bg-white rounded-lg shadow-md w-64 border">
       <div className="flex flex-col items-center">
-        <div className="w-full h-40 bg-black rounded-md relative flex justify-center items-center">
+        <div
+          className="w-full h-40 bg-cover bg-center rounded-t-md relative flex justify-center items-center"
+          style={{ backgroundImage: `url(${CardBanner})` }}
+        >
           <div className="absolute top-2 left-2 text-white text-sm font-semibold">
             <div className="flex items-center space-x-1">
               <GiArmorUpgrade className="w-5 h-5 text-pink-600" />
@@ -32,12 +37,24 @@ const StudentCard = ({ studentInfo, imagePreview }) => {
         <div className="mt-4 text-center">
           <h2 className="text-lg font-semibold">{name || "Student Name"}</h2>
           <div className="text-sm text-gray-600 mt-2 space-y-1 text-left">
-            <p><span className="font-semibold">ID No</span>: {studentId}</p>
-            <p><span className="font-semibold">Class</span>: {studentClass}</p>
-            <p><span className="font-semibold">Section</span>: {section}</p>
-            <p><span className="font-semibold">Blood</span>: {bloodGroup}</p>
-            <p><span className="font-semibold">Religion</span>: {religion}</p>
-            <p><span className="font-semibold">Email</span>: {email}</p>
+            <p>
+              <span className="font-semibold">ID No</span>: {studentId}
+            </p>
+            <p>
+              <span className="font-semibold">Class</span>: {studentClass}
+            </p>
+            <p>
+              <span className="font-semibold">Section</span>: {section}
+            </p>
+            <p>
+              <span className="font-semibold">Blood</span>: {bloodGroup}
+            </p>
+            <p>
+              <span className="font-semibold">Religion</span>: {religion}
+            </p>
+            <p>
+              <span className="font-semibold">Email</span>: {email}
+            </p>
           </div>
         </div>
       </div>

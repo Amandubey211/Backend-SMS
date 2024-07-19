@@ -36,13 +36,13 @@ const useFetchClassGrades = () => {
         if (response.data.success) {
           setGrades(response.data.gradesResult);
         } else {
-          toast.error("Failed to fetch grades");
+          // toast.error("Failed to fetch grades");
           setError("Failed to fetch grades");
         }
       } catch (err) {
         const errorMessage =
           err.response?.data?.message || "Error fetching grades";
-        toast.error(errorMessage);
+        // toast.error(errorMessage);
         setError(errorMessage);
       } finally {
         setLoading(false);
