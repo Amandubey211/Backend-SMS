@@ -16,17 +16,20 @@ const SubjectCard = ({ subject }) => {
         />
         <div className="flex flex-col">
           <span>{name}</span>
-          <span className="text-[12px] text-green-600">{startDate}</span>
+          <span className="text-[12px] text-gray-600">Started:0</span>
         </div>
       </div>
 
       <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
         <div
           className="bg-blue-600 h-2.5 rounded-full"
-          style={{ width: `${progress}%` }}
+          style={{ width: `70%` }}
         ></div>
       </div>
-      <p className="text-right text-sm text-gray-500">{progress}% Completed</p>
+      <div className="flex justify-between items-center">
+        <p className="text-sm text-gray-500">0/{totalModules} Module</p>
+        <p className="text-sm text-gray-500">70%</p>
+      </div>
     </div>
   );
 };

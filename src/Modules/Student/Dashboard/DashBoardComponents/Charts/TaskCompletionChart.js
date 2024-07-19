@@ -85,9 +85,7 @@ const TaskCompletionChart = () => {
     plugins: {
       legend: {
         display: true, // Hide the legend
-
         position: 'bottom',
-        
       },
       tooltip: {
         callbacks: {
@@ -101,22 +99,12 @@ const TaskCompletionChart = () => {
         },
       },
     },
-    // Example: Setting specific width and height
-    // layout: {
-    //   padding: {
-    //     left: 3,
-    //     right: 3,
-    //     top: 0,
-    //     bottom: 0,
-    //   },
-    // },
   };
 
   return (
-    // <div className="w-full max-w-2xl h-96 mx-auto p-5  ">
-    <div className=" flex-1 px-20 py-6  flex flex-row justify-start items-start  border  " >
-        <Doughnut data={data} options={options} />
-      </div>   
+    <div className="flex-1 flex justify-center items-center">
+      <Doughnut data={data} options={options} />
+    </div>
   );
 };
 

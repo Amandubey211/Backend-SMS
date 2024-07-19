@@ -54,20 +54,14 @@ const StudentGradePieChart = () => {
         },
       },
     },
-    cutout: "70%",
   };
 
   return (
-    <>
-
-      {/* <div className="  p-5 flex  "> */}
-      <div className=" flex-1 px-20 py-6 flex flex-row justify-start items-start border ">
-      {/* <span className="text-sm font-medium ">Student Grade</span> */}
-
-        <Pie data={data} options={options} />
-      </div>
-    </>
+    <div className="flex-1 flex justify-center items-center">
+      <Pie data={data} options={options} />
+    </div>
   );
 };
+
 
 export default StudentGradePieChart;

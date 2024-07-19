@@ -5,7 +5,7 @@ const StudentDashFeeCard = ({ title, amount, unpaidFees, buttonText }) => {
   console.log("Rendering StudentDashFeeCard with props:", { title, amount, unpaidFees, buttonText,  });
 
   return (
-    <div className="px-7 py-2 flex flex-1 flex-col justify-around items-center gap-3 border border-gray-300 rounded-lg">
+    <div className="py-4 flex flex-1 flex-col justify-around items-center gap-5">
       <div className="border border-black flex items-center justify-center p-1.5 rounded-full">
         <MdAccessTime className="text-2xl text-red-400" />
       </div>
