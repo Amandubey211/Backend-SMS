@@ -15,7 +15,7 @@ const List = ({
   type,
   loading,
   error,
-  refetchAssignments,
+  refetchData,
 }) => {
   const { cid, sid } = useParams();
   const [searchQuery, setSearchQuery] = useState("");
@@ -36,10 +36,9 @@ const List = ({
 
   useEffect(() => {
     if (deleteQuizSuccess || deleteAssignmentSuccess) {
-      console.log("Refetching assignments...");
-      refetchAssignments();
+      refetchData();
     }
-  }, [deleteQuizSuccess, deleteAssignmentSuccess, refetchAssignments]);
+  }, [deleteQuizSuccess, deleteAssignmentSuccess, refetchData]);
 
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
