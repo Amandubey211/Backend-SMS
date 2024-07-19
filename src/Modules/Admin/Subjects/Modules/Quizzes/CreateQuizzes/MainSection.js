@@ -133,13 +133,14 @@ const MainSection = () => {
     const correctOption = answers.find((answer) => answer.isCorrect);
     const newQuestion = {
       questionText: question,
-      questionPoint: questionPoint,
+      questionPoint: Number(questionPoint),
       type: questionType,
       options: answers,
       correctAnswer: correctOption ? correctOption.text : "",
       correctAnswerComment: rightAnswerComment,
       inCorrectAnswerComment: wrongAnswerComment,
     };
+    console.log(newQuestion, "new questio", typeof newQuestion.questionPoint);
     const result = await addQuestion(quizId, newQuestion);
     if (result.success) {
       setQuestionState((prev) => [...prev, newQuestion]);

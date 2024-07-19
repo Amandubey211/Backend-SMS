@@ -31,7 +31,7 @@ const useGetRubric = () => {
       } catch (err) {
         const errorMessage =
           err.response?.data?.message || "Failed to fetch rubric";
-        toast.error(errorMessage);
+        // toast.error(errorMessage);
         setLoading(false);
         setError(errorMessage);
         return { success: false, error: errorMessage };

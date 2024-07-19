@@ -17,7 +17,7 @@ const MainSection = () => {
 
   const refetchQuizzes = useCallback(() => {
     fetchFilteredQuizzes(filters.moduleId, filters.chapterId, filters.publish);
-  }, [fetchFilteredQuizzes, filters]);
+  }, [filters, fetchFilteredQuizzes]);
 
   useEffect(() => {
     refetchQuizzes();
@@ -34,7 +34,7 @@ const MainSection = () => {
           type="Quiz"
           loading={loading}
           error={error}
-          refetchQuizzes={refetchQuizzes}
+          refetchData={refetchQuizzes} // Pass the correct prop
         />
       </div>
       <div className="w-[30%] px-2 pt-2">
