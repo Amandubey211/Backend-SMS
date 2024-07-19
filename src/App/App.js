@@ -29,6 +29,7 @@ import StudentEvent from "../Modules/Student/StudentEvent/StudentEvent.js";
 import StudentAnnounce from "../Modules/Student/Announcements/StudentAnnounce.js";
 import StaffLogin from "../Modules/LoginPages/Staff/StaffLogin.js";
 import ForgetPassword from "../Modules/LoginPages/Student/Login/ForgetPassword/ForgetPassword.js";
+import AttendanceMain from "../Modules/Student/Attendance/AttendanceMain.js";
 
 //Parents
 const ViewPage = lazy(() =>
@@ -295,6 +296,12 @@ const StudentTeacher = lazy(() =>
 const StudentClassMates = lazy(() =>
   import(
     "../Modules/Student/StudentHeaderFiles/StudentClassMates/StudentClassMates.js"
+  )
+);
+
+const StudentAttendance = lazy(() =>
+  import(
+    "../Modules/Student/Attendance/AttendanceMain.js"
   )
 );
 
@@ -1082,11 +1089,11 @@ function App() {
       ),
       errorElement: <Error />,
     },
-    // {
-    //   path: "student_class/class/:cid/attendance",
-    //   element: <ProtectRoute Component={Attendance} allowedRoles={["student", "teacher"]} />,
-    //   errorElement: <Error />,
-    // },
+    {
+      path: "student_class/class/:cid/attendance",
+      element: <ProtectRoute Component={StudentAttendance} allowedRoles={["student"]} />,
+      errorElement: <Error />,
+    },
 
     // {
     //   path: "/student_dash",

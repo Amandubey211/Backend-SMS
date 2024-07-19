@@ -95,7 +95,7 @@ const MainSection = () => {
       // url: `/class/${cid}/students` 
       url: `/student_class/class/${cid}/classmates`
     },
-    { icon: <FcCalendar />, text: "My Attendance", url: `/class/${cid}/attendance` },
+    { icon: <FcCalendar />, text: "My Attendance", url: `/student_class/class/${cid}/attendance` },
   ];
   // const iconData = [
   //   { icon: <SlEyeglass className="text-purple-600" />, text: `${classData.teachersCount} Teacher Assigned`, url: `/class/${cid}/teachers` },

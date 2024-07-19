@@ -3,7 +3,7 @@ import Announce from './Announce'
 import Layout from '../../../Components/Common/Layout';
 import DashLayout from '../../../Components/Student/StudentDashLayout';
 import { MdQueryBuilder } from "react-icons/md";
-import noticeIcon from "../../../Assets/StudentAssets/notice.png"
+import announcementIcon from "../../../Assets/StudentAssets/announcement.png"
 import axios from 'axios';
 import { MdExpandMore, MdExpandLess } from 'react-icons/md';
 
@@ -99,11 +99,11 @@ const StudentAnnounce = () => {
                     onClick={() => toggleAccordion(index)}
                   >
                     <div className="flex gap-6 px-3 py-2">
-                      <div className='bg-gray-300 border rounded-[10%] flex items-center justify-center' style={{ height: '60px', width: '60px' }}>
+                      <div className='border bg-blue-300 rounded-[10%] flex items-center justify-center' style={{ height: '70px', width: '70px' }}>
                         <img
-                          className="h-full w-full bg-pink-300 rounded-[10%]"
-                          src={noticeIcon}
-                          alt="notice-image"
+                          className="h-[80%] w-[80%] rounded-[10%]"
+                          src={announcementIcon}
+                          alt="announcement-image"
                         />
                       </div>
                       <div className="flex flex-col gap-3 mt-[-5px] flex-1">
