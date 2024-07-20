@@ -3,30 +3,21 @@ import { Calendar } from 'antd';
 import moment from 'moment';
 import { FaCheckCircle, FaTimesCircle, FaMinusCircle } from 'react-icons/fa';
 
-const attendanceData = {
-  '2024-03-01': 'Attend',
-  '2024-03-02': 'Absent',
-  '2024-03-03': 'Attend',
-  '2024-03-04': 'Attend',
-  '2024-03-05': 'Attend',
-  '2024-03-06': 'Leave',
-  // Add other dates accordingly
-};
 
 const getStatusIcon = (status) => {
   switch (status) {
-    case 'Attend':
+    case 'attend':
       return <FaCheckCircle className="text-green-500" />;
-    case 'Absent':
+    case 'absent':
       return <FaTimesCircle className="text-red-500" />;
-    case 'Leave':
+    case 'leave':
       return <FaMinusCircle className="text-purple-500" />;
     default:
       return null;
   }
 };
 
-const CalendarHeader = () => {
+const CalendarHeader = ({ attendanceData, onPanelChange }) => {
   const dateCellRender = (value) => {
     const dateStr = value.format('YYYY-MM-DD');
     const status = attendanceData[dateStr];
@@ -41,10 +32,6 @@ const CalendarHeader = () => {
         </div>
       ) : null
     );
-  };
-
-  const onPanelChange = (value, mode) => {
-    console.log(value.format('YYYY-MM-DD'), mode);
   };
 
   return <Calendar dateCellRender={dateCellRender} onPanelChange={onPanelChange} />;
