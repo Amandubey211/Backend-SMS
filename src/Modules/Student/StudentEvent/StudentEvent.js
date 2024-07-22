@@ -121,17 +121,13 @@ const StudentEvent = () => {
                   const end = 12;
                   const monthOptions = [];
 
-                  const current = value.clone();
                   const localeData = value.localeData();
-                  const months = [];
-                  for (let i = 0; i < 12; i++) {
-                    current.month(i);
-                    months.push(localeData.monthsShort(current));
-                  }
+                  const months = localeData.monthsShort();
+                  console.log(months);
 
                   for (let index = start; index < end; index++) {
                     monthOptions.push(
-                      <option className="bg-white" key={`${index}`}>
+                      <option key={index} value={index}>
                         {months[index]}
                       </option>
                     );
