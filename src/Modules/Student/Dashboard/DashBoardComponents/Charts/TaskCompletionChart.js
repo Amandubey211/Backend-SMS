@@ -102,8 +102,10 @@ const TaskCompletionChart = () => {
   };
 
   return (
-    <div className="flex-1 flex justify-center items-center">
-      <Doughnut data={data} options={options} />
+    <div className="flex-1 flex justify-center items-center h-full">
+      <div style={{ width: "290px", height: "290px" , marginTop:"10px"}}>
+        <Doughnut data={data} options={options} />
+      </div>
     </div>
   );
 };

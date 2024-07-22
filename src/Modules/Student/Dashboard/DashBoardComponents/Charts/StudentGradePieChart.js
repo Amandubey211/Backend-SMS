@@ -58,7 +58,9 @@ const StudentGradePieChart = () => {
 
   return (
     <div className="flex-1 flex justify-center items-center">
-      <Pie data={data} options={options} />
+      <div style={{ width: "300px", height: "300px" }}>
+        <Pie data={data} options={options} />
+      </div>
     </div>
   );
 };

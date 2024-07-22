@@ -1,30 +1,44 @@
 import React, { useState, useEffect } from "react";
-import { Modal, Button, Form, Input, message } from "antd";
+import { message } from "antd";
 import Layout from "../../../../Components/Common/Layout";
 import DashLayout from "../../../../Components/Admin/AdminDashLayout";
-import { MdAccessTime } from "react-icons/md";
-import AddEarning from "./AddEarning";
 import Sidebar from "../../../../Components/Common/Sidebar";
+import AddEarning from "./AddEarning";
+import EditEarning from "./EditEarning";
+import { GiMoneyStack } from "react-icons/gi";
+import { GiTakeMyMoney } from "react-icons/gi";
+import { HiOutlineBanknotes } from "react-icons/hi2";
 
 const Earning = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [earnings, setEarnings] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [isEditModalOpen, setEditModalOpen] = useState(false);
+  const [isEditSidebarOpen, setEditSidebarOpen] = useState(false);
   const [editEarning, setEditEarning] = useState(null);
   const [totalEarnings, setTotalEarnings] = useState(0);
   const [totalExpense, setTotalExpense] = useState(0);
   const [totalFees, setTotalFees] = useState(0);
   const [remainingBalance, setRemainingBalance] = useState(0);
+  const [openDropdown, setOpenDropdown] = useState(null);
+
+  const handleDropdownToggle = (index) => {
+    setOpenDropdown(openDropdown === index ? null : index);
+  };
+
+  const handleDropdownClose = () => {
+    setOpenDropdown(null);
+  };
 
   const handleSidebarOpen = () => setSidebarOpen(true);
   const handleSidebarClose = () => setSidebarOpen(false);
-  const handleEditModalOpen = (earning) => {
+
+  const handleEditSidebarOpen = (earning) => {
     setEditEarning(earning);
-    setEditModalOpen(true);
+    setEditSidebarOpen(true);
   };
-  const handleEditModalClose = () => setEditModalOpen(false);
+  const handleEditSidebarClose = () => setEditSidebarOpen(false);
+
   const fetchTotalAmounts = async () => {
     const token = localStorage.getItem('admin:token');
     try {
@@ -54,7 +68,7 @@ const Earning = () => {
     try {
       const response = await fetch('http://localhost:8080/admin/getearning', {
         headers: {
-          Authentication: `${token}` 
+          Authentication: `${token}`
         }
       });
       const data = await response.json();
@@ -67,49 +81,6 @@ const Earning = () => {
       setError(err.message);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const fetchTotalEarnings = async () => {
-    const token = localStorage.getItem('admin:token');
-    try {
-      const response = await fetch('http://localhost:8080/admin/total_earnings', {
-        headers: {
-          Authentication: `${token}`
-        }
-      });
-      const data = await response.json();
-      if (response.ok) {
-        setTotalEarnings(data.totalEarnings);
-      } else {
-        throw new Error(data.msg || 'Failed to fetch total earnings');
-      }
-    } catch (err) {
-      message.error(err.message);
-    }
-  };
-
-  const handleEdit = async (values) => {
-    const token = localStorage.getItem('admin:token');
-    try {
-      const response = await fetch(`http://localhost:8080/admin/updateEarning/${editEarning._id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authentication: `${token}`
-        },
-        body: JSON.stringify(values)
-      });
-      const data = await response.json();
-      if (response.ok) {
-        message.success('Earning updated successfully');
-        fetchEarnings();
-        handleEditModalClose();
-      } else {
-        throw new Error(data.msg || 'Failed to update earning');
-      }
-    } catch (err) {
-      message.error(err.message);
     }
   };
 
@@ -134,19 +105,26 @@ const Earning = () => {
     }
   };
 
+  const formatDate = (isoDate) => {
+    const date = new Date(isoDate);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  };
+
   useEffect(() => {
     fetchEarnings();
-    fetchTotalEarnings();
-    fetchTotalAmounts(); 
+    fetchTotalAmounts();
   }, []);
 
   return (
     <Layout title="Accounting">
       <DashLayout>
-        <div className="min-h-screen flex border">
-          {/* Left side */}
-          <div className="w-[80%] border">
-            <div className="w-full h-20 p-4 border flex justify-between items-center" style={{ maxHeight: "90vh" }}>
+        <div className="min-h-screen flex">
+          <div className="w-[75%] border-r">
+            <div className="w-full h-20 p-4 border-b flex justify-between items-center" style={{ maxHeight: "90vh" }}>
               <span>All Earnings</span>
               <button onClick={handleSidebarOpen} className="flex items-center border border-gray-300 ps-5 py-0 rounded-full">
                 <span className="mr-2">Add New Earning</span>
@@ -156,11 +134,11 @@ const Earning = () => {
               </button>
             </div>
             {loading ? <p>Loading...</p> : error ? <p>Error: {error}</p> : (
-              <div className="overflow-x-auto bg-white shadow rounded-lg">
+              <div className="overflow-x-auto h-full bg-white shadow rounded-lg ">
                 <table className="min-w-full leading-normal">
                   <thead>
-                    <tr className="text-left text-gray-700 bg-gray-100">
-                      <th className="px-5 py-3 border-b-2 border-gray-200">Earning Description</th>
+                    <tr className="text-center text-gray-700 bg-gray-100 ">
+                      <th className="px-5 py-3 border-b-2 border-gray-200">Earning Reason</th>
                       <th className="px-5 py-3 border-b-2 border-gray-200">From</th>
                       <th className="px-5 py-3 border-b-2 border-gray-200">Earning Date</th>
                       <th className="px-5 py-3 border-b-2 border-gray-200">Amount</th>
@@ -169,7 +147,7 @@ const Earning = () => {
                   </thead>
                   <tbody>
                     {earnings.map((item, index) => (
-                      <tr key={index} className="text-left text-gray-700">
+                      <tr key={index} className="text-center text-gray-700">
                         <td className="px-5 py-2 border-b border-gray-200">
                           {item.description}
                         </td>
@@ -177,26 +155,41 @@ const Earning = () => {
                           {item.from}
                         </td>
                         <td className="px-5 py-2 border-b border-gray-200">
-                          {new Date(item.dateOfEarning).toLocaleDateString()}
+                          {formatDate(item.dateOfEarning)}
                         </td>
                         <td className="px-5 py-2 border-b border-gray-200">
-                          {item.amount}
+                          {item.amount} QR
                         </td>
-                        <td className="px-5 py-2 border-b border-gray-200 flex">
-  <button
-    onClick={() => handleEditModalOpen(item)}
-    className="bg-indigo-500 text-white px-4 py-2 rounded-full hover:bg-indigo-700 mr-4 transition duration-300"
-  >
-    Edit
-  </button>
-  <button
-    onClick={() => handleDelete(item._id)}
-    className="bg-red-500 text-white px-4 py-2 rounded-full hover:bg-red-700 transition duration-300"
-  >
-    Delete
-  </button>
-</td>
-
+                        <td className="px-5 py-2 border-b border-gray-200 font-bold relative">
+                          <button
+                            onClick={() => handleDropdownToggle(index)}
+                            className="text-gray-500 hover:text-gray-700 transition duration-300"
+                          >
+                            &#x22EE;
+                          </button>
+                          {openDropdown === index && (
+                            <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+                              <button
+                                onClick={() => {
+                                  handleEditSidebarOpen(item);
+                                  handleDropdownClose();
+                                }}
+                                className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 transition duration-300"
+                              >
+                                Edit
+                              </button>
+                              <button
+                                onClick={() => {
+                                  handleDelete(item._id);
+                                  handleDropdownClose();
+                                }}
+                                className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 transition duration-300"
+                              >
+                                Delete
+                              </button>
+                            </div>
+                          )}
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -204,110 +197,73 @@ const Earning = () => {
               </div>
             )}
           </div>
-          {/* Right side - Widgets */}
-         
-          <div className="w-[20%] flex flex-col items-center">
-  <div className="bg-white shadow rounded-lg p-4 w-full max-w-xs text-center">
-    <div className="flex items-center justify-center mb-4">
-      <svg className="w-8 h-8 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
-        <line x1="1" y1="10" x2="23" y2="10"></line>
-      </svg>
-    </div>
-    <h2 className="text-lg font-semibold">Remaining Balance</h2>
-    <p className="text-4xl font-bold text-gradient bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-pink-500">${remainingBalance}</p>
-  </div>
-  
-  <div className="bg-white shadow rounded-lg p-4 w-full max-w-xs text-center">
-    <div className="flex items-center justify-center mb-4">
-      <svg className="w-8 h-8 text-green-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
-        <line x1="1" y1="10" x2="23" y2="10"></line>
-      </svg>
-    </div>
-    <h2 className="text-lg font-semibold">Total Earning</h2>
-    <p className="text-4xl font-bold text-gradient bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-pink-500">${totalEarnings}</p>
-  </div>
-  
-  <div className="bg-white shadow rounded-lg p-4 w-full max-w-xs text-center">
-    <div className="flex items-center justify-center mb-4">
-      <svg className="w-8 h-8 text-blue-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
-        <line x1="1" y1="10" x2="23" y2="10"></line>
-      </svg>
-    </div>
-    <h2 className="text-lg font-semibold">Total Student Fees</h2>
-    <p className="text-4xl font-bold text-gradient bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-pink-500">${totalFees}</p>
-    <button className="mt-4 px-4 py-2 border border-blue-500 text-blue-500 rounded-full">View All Fees</button>
-  </div>
-  
-  <div className="bg-white shadow rounded-lg p-4 w-full max-w-xs text-center">
-    <div className="flex items-center justify-center mb-4">
-      <svg className="w-8 h-8 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
-        <line x1="1" y1="10" x2="23" y2="10"></line>
-      </svg>
-    </div>
-    <h2 className="text-lg font-semibold">Total Expenses</h2>
-    <p className="text-4xl font-bold text-gradient bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-pink-500">${totalExpense}</p>
-    <button className="mt-4 px-4 py-2 border border-red-500 text-red-500 rounded-full">View All Expenses</button>
-  </div>
-</div>
+
+          <div className="w-[25%] flex flex-col items-center gap-4 p-4">
+            <div className="bg-white shadow rounded-lg p-4 w-full max-w-xs text-center border border-gray-200">
+              <div className="flex items-center justify-center mb-4">
+                <div className="bg-black-0 rounded-full p-4 border border-red-500">
+                  <GiMoneyStack size={40} color="red" />
+                </div>
+              </div>
+              <h2 className="text-lg font-semibold text-gray-800">Remaining Balance</h2>
+              <p className="text-3xl font-bold text-gradient bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-pink-500">{remainingBalance} QR</p>
+            </div>
+
+            <div className="bg-white shadow rounded-lg p-4 w-full max-w-xs text-center border border-gray-200">
+              <div className="flex items-center justify-center mb-4">
+                <div className="bg-white rounded-full p-4 border border-green-500">
+                  <GiMoneyStack size={40} color="green" />
+                </div>
+
+              </div>
+              <h2 className="text-lg font-semibold text-gray-800">Total Earning</h2>
+              <p className="text-3xl font-bold text-gradient bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-pink-500">{totalEarnings} QR</p>
+            </div>
+
+            <div className="bg-white shadow rounded-lg p-4 w-full max-w-xs text-center border border-gray-200">
+              <div className="flex items-center justify-center mb-4">
+                <div className="bg-white rounded-full p-4 border border-blue-500">
+                  <GiTakeMyMoney className="size-10 text-blue-400" />
+                </div>
+              </div>
+              <h2 className="text-lg font-semibold text-gray-800">Total Student Fees</h2>
+              <p className="text-3xl font-bold text-gradient bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-pink-500">{totalFees} QR</p>
+              <button className="mt-4 px-4 py-2 border border-blue-500 text-blue-500 rounded-full">View All Fees</button>
+            </div>
+
+            <div className="bg-white shadow rounded-lg p-4 w-full max-w-xs text-center border border-gray-200">
+              <div className="flex items-center justify-center mb-4">
+                <div className="bg-white rounded-full p-4 border border-red-500 ">
+                  <HiOutlineBanknotes className="size-10 text-red-500" />
+                </div>
+              </div>
+              <h2 className="text-lg font-semibold text-gray-800">Total Expenses</h2>
+              <p className="text-3xl font-bold text-gradient bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-pink-500">{totalExpense} QR</p>
+              <button className="mt-4 px-4 py-2 border border-red-500 text-red-500 rounded-full">View All Expenses</button>
+            </div>
+          </div>
 
           <Sidebar
             isOpen={isSidebarOpen}
             onClose={handleSidebarClose}
             title="Add New Earnings"
           >
-            <AddEarning />
+            <AddEarning fetchEarning={fetchEarnings} />
           </Sidebar>
-          <Modal
-            title="Edit Earning"
-            visible={isEditModalOpen}
-            onCancel={handleEditModalClose}
-            footer={null}
+
+          <Sidebar
+            isOpen={isEditSidebarOpen}
+            onClose={handleEditSidebarClose}
+            title="Update Earning"
           >
             {editEarning && (
-              <Form
-                initialValues={editEarning}
-                onFinish={handleEdit}
-              >
-                <Form.Item
-                  name="description"
-                  label="Description"
-                  rules={[{ required: true, message: 'Please input the description!' }]}
-                >
-                  <Input />
-                </Form.Item>
-                <Form.Item
-                  name="from"
-                  label="From"
-                  rules={[{ required: true, message: 'Please input the source!' }]}
-                >
-                  <Input />
-                </Form.Item>
-                <Form.Item
-                  name="dateOfEarning"
-                  label="Date of Earning"
-                  rules={[{ required: true, message: 'Please input the date!' }]}
-                >
-                  <Input type="date" />
-                </Form.Item>
-                <Form.Item
-                  name="amount"
-                  label="Amount"
-                  rules={[{ required: true, message: 'Please input the amount!' }]}
-                >
-                  <Input type="number" />
-                </Form.Item>
-                <Form.Item>
-                  <Button type="primary" htmlType="submit">
-                    Save
-                  </Button>
-                </Form.Item>
-              </Form>
+              <EditEarning
+                earning={editEarning}
+                onClose={handleEditSidebarClose}
+                onUpdate={fetchEarnings}
+              />
             )}
-          </Modal>
+          </Sidebar>
         </div>
       </DashLayout>
     </Layout>
