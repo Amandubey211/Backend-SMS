@@ -4,12 +4,12 @@ import Logo from "../../../../Components/Common/Logo";
 import useSaveDetails from "../../../../Hooks/AuthHooks/Student/useSaveDetails";
 import useSaveDocument from "../../../../Hooks/AuthHooks/Student/useSaveDocuments";
 import PersonalInformationForm from "./PersonalInformationForm";
-import FamilyInformationForm from "./FamilyInformationForm";
 import AddressForm from "./AddressForm";
 import DocumentUploadForm from "./DocumentUploadForm";
 import NavigationLink from "./NavigationLink";
 import validateStudentDetails from "../../../../Validataions/Student/validateStudentDetails";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { setStep } from "../../../../Redux/Slices/AuthSlice";
 
 const StudentSignUpForm = () => {
   const fileInputRef = useRef(null);
@@ -21,6 +21,7 @@ const StudentSignUpForm = () => {
     placeOfBirth: "",
     age: "",
     gender: "",
+    nationality: "",
     contactNumber: "",
     motherName: "",
     fatherName: "",
@@ -41,44 +42,39 @@ const StudentSignUpForm = () => {
     },
     emergencyNumber: "",
     schoolId: "",
-    profile: '',
+    profile: "",
   });
   const [studentDocuments, setStudentDocuments] = useState({
     documentLabels: [""],
-    documents: [null],
+    documents: [],
+    schoolId: studentDetails.schoolId,
+    email: studentDetails.email,
   });
-  const [showPassword, setShowPassword] = useState(false);
-  const [step, setStep] = useState(1);
-  const [acknowledged, setAcknowledged] = useState(false);
+  const step = useSelector((store) => store.Auth.step);
+  const dispatch = useDispatch();
   const [sameAddress, setSameAddress] = useState(false);
-  const [preview, setPreview] = useState("");
+  const [preview, setPreview] = useState([]);
   const [imagePreview, setImagePreview] = useState(null);
   const [profile, setProfile] = useState(null);
   const { loading, saveDetails } = useSaveDetails();
   const { docloading, saveDocument } = useSaveDocument();
+  const [showModal, setShowModal] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    if (step === 1) {
-      setStudentDetails((prev) => ({
-        ...prev,
-        [name]: value,
-      }));
-    } else {
-      setStudentDocuments((prev) => ({
-        ...prev,
-        [name]: [value],
-      }));
-    }
+    setStudentDetails((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
-    if (file && file.type.startsWith('image')) {
+    if (file && file.type.startsWith("image")) {
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result);
-        setProfile(file);  // Debug: Log the file object
+        setProfile(file);
       };
       reader.readAsDataURL(file);
     } else {
@@ -86,61 +82,26 @@ const StudentSignUpForm = () => {
     }
   };
 
-  const handleSave = async (e) => {
+  const handleNext = async (e) => {
     e.preventDefault();
-   
 
-    // Ensure email is not empty
     if (!studentDetails.email) {
       toast.error("Email is required");
       return;
     }
 
     const validationErrors = validateStudentDetails(studentDetails);
-    
 
     if (Object.keys(validationErrors).length > 0) {
       toast.error(Object.values(validationErrors)[0]);
       return;
     }
 
-    if (acknowledged) {
-      try {
-        
-
-        const formData = new FormData();
-        for (const key in studentDetails) {
-          if (studentDetails.hasOwnProperty(key)) {
-            if (typeof studentDetails[key] === 'object') {
-              formData.append(key, JSON.stringify(studentDetails[key]));
-            } else {
-              formData.append(key, studentDetails[key]);
-            }
-          }
-        }
-
-        if (profile) {
-          formData.append('profile', profile);
-        }
-
-        const response = await fetch("http://localhost:8080/student/student_register", {
-          method: "POST",
-          body: formData,
-        });
-
-        const result = await response.json();
-        if (result.success) {
-          toast.success("SAVED");
-          setStep(2); // Move to step 2
-        } else {
-          toast.error("Failed to save student details");
-        }
-      } catch (error) {
-        console.error("Error in submitting student details:", error);
-        toast.error("An error occurred while submitting the student details.");
-      }
-    } else {
-      toast.error("Please acknowledge all the details.");
+    try {
+      dispatch(setStep(2)); // Move to the next step
+    } catch (error) {
+      console.error("Error in submitting student details:", error);
+      toast.error("Please try again");
     }
   };
 
@@ -165,9 +126,58 @@ const StudentSignUpForm = () => {
     }
   };
 
-  const handleDocumentSubmit = (e) => {
+  const handleDocumentSubmit = async (e) => {
     e.preventDefault();
-    saveDocument(studentDocuments);
+
+    if (!studentDetails.email) {
+      toast.error("Email is required");
+      return;
+    }
+
+    if (!studentDetails.schoolId) {
+      toast.error("School ID is required");
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      for (const key in studentDetails) {
+        if (studentDetails.hasOwnProperty(key)) {
+          if (typeof studentDetails[key] === "object") {
+            formData.append(key, JSON.stringify(studentDetails[key]));
+          } else {
+            formData.append(key, studentDetails[key]);
+          }
+        }
+      }
+
+      if (profile) {
+        formData.append("profile", profile);
+      }
+
+      const response = await saveDetails(formData);
+
+      if (response.success) {
+        toast.success("Details Saved Successfully");
+        const documentResponse = await saveDocument(
+          studentDetails.email,
+          studentDetails.schoolId,
+          studentDocuments
+        );
+        if (documentResponse?.success) {
+          toast.success("Documents uploaded successfully!");
+          setShowModal(true);
+          dispatch(setStep(1));
+        } else {
+          toast.error("Failed to upload the document");
+        }
+      } else {
+        toast.error("Failed to save student details.");
+      }
+    } catch (error) {
+      console.error("Error in submitting documents:", error);
+      toast.error("An error occurred while submitting the documents.");
+    }
   };
 
   const handleFileUploadIconClick = () => {
@@ -175,26 +185,36 @@ const StudentSignUpForm = () => {
   };
 
   const handlePhotoChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
+    const files = Array.from(e.target.files);
+    if (files.length + studentDocuments.documents.length > 3) {
+      toast.error("You can upload a maximum of 3 documents.");
+      return;
+    }
+
+    const updatedDocuments = [...studentDocuments.documents];
+    const updatedPreviews = [...preview];
+
+    files.forEach((file) => {
       const reader = new FileReader();
       reader.onloadend = () => {
+        updatedDocuments.push({ file, label: "" });
+        updatedPreviews.push(reader.result);
         setStudentDocuments((prevState) => ({
           ...prevState,
-          documents: [file],
+          documents: updatedDocuments,
         }));
-        setPreview(reader.result);
+        setPreview(updatedPreviews);
       };
       reader.readAsDataURL(file);
-    }
+    });
   };
 
   const handleClearPhoto = () => {
     setStudentDocuments((prevState) => ({
       ...prevState,
-      documents: null,
+      documents: [],
     }));
-    setPreview("");
+    setPreview([]);
     fileInputRef.current.value = "";
   };
 
@@ -207,7 +227,7 @@ const StudentSignUpForm = () => {
         <div className="bg-white p-8 rounded-lg w-full max-w-3xl">
           <NavigationLink />
           {step === 1 && (
-            <form onSubmit={handleSave}>
+            <form onSubmit={handleNext}>
               <PersonalInformationForm
                 studentDetails={studentDetails}
                 handleChange={handleChange}
@@ -215,10 +235,7 @@ const StudentSignUpForm = () => {
                 setImagePreview={setImagePreview}
                 handleImageChange={handleImageChange}
               />
-              <FamilyInformationForm
-                studentDetails={studentDetails}
-                handleChange={handleChange}
-              />
+
               <AddressForm
                 type="Permanent Address"
                 address={studentDetails.permanentAddress}
@@ -226,7 +243,7 @@ const StudentSignUpForm = () => {
                   handleAddressChange(e, "permanentAddress")
                 }
               />
-              <div className="mb-4">
+              <div className="mb-4 mt-2">
                 <input
                   type="checkbox"
                   checked={sameAddress}
@@ -246,27 +263,13 @@ const StudentSignUpForm = () => {
                   }
                 />
               )}
-
-              <div className="flex items-center mb-4">
-                <input
-                  type="checkbox"
-                  checked={acknowledged}
-                  onChange={() => setAcknowledged(!acknowledged)}
-                  className="mr-2"
-                  required
-                />
-                <label className="text-sm">
-                  I acknowledge that the above information is correct.
-                </label>
-              </div>
-              <div className="flex items-center justify-center">
+              <div className="flex items-center justify-center mt-4">
                 <button
                   type="submit"
-                  onClick={handleSave}
                   className={`w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600 text-center`}
-                  disabled={loading}
+                  disabled={loading || docloading}
                 >
-                  {loading ? "Saving Please Wait..." : "Save"}
+                  {loading ? "Saving Please Wait..." : "Next"}
                 </button>
               </div>
             </form>
@@ -279,6 +282,8 @@ const StudentSignUpForm = () => {
               handlePhotoChange={handlePhotoChange}
               handleClearPhoto={handleClearPhoto}
               preview={preview}
+              setPreview={setPreview}
+              setStudentDocuments={setStudentDocuments}
               fileInputRef={fileInputRef}
               handleDocumentSubmit={handleDocumentSubmit}
               docloading={docloading}
@@ -286,6 +291,25 @@ const StudentSignUpForm = () => {
           )}
         </div>
       </div>
+      {showModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75 z-50">
+          <div className="bg-white p-4 rounded-lg shadow-lg">
+            <h2 className="text-xl font-semibold mb-4">
+              Registration Successful
+            </h2>
+            <p className="mb-4">
+              You will receive your login credentials at your registered email
+              address. Please wait for verification.
+            </p>
+            <button
+              onClick={() => setShowModal(false)}
+              className="bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

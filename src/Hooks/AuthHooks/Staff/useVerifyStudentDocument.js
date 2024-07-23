@@ -12,6 +12,7 @@ const useVerifyStudentDocument = () => {
   const { assignClass } = useAssignClassToStudent();
   const { sendCredentials } = useSendLoginCredentials();
   const validateDetails = (details) => {
+    console.log(details,"verification details");
     if (!details || typeof details !== "object") {
       return "Invalid details object.";
     }

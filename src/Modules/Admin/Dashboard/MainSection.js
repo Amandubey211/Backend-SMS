@@ -13,9 +13,11 @@ import { FaUsers, FaChalkboardTeacher } from "react-icons/fa";
 import { MdFamilyRestroom } from "react-icons/md";
 import { SiAuth0 } from "react-icons/si";
 import DashCard from "./Dashcard";
+import Fallback from "../../../Components/Common/Fallback";
 
 const MainSection = () => {
-  const { dashboardData, error, fetchAdminDashboardData, loading } = useGetAdminDashboardData();
+  const { dashboardData, error, fetchAdminDashboardData, loading } =
+    useGetAdminDashboardData();
 
   useEffect(() => {
     fetchAdminDashboardData();
@@ -57,7 +59,7 @@ const MainSection = () => {
   ];
 
   if (loading) {
-    return <p>Loading...</p>;
+    return <Fallback />;
   }
 
   if (error) {
@@ -85,9 +87,9 @@ const MainSection = () => {
             <TopRankingStudents />
           </div>
           <div className="w-full h-full flex flex-col md:w-1/3 ps-3">
-            <TotalStudentsGraphjs 
-              maleStudents={dashboardData?.maleStudents || 0} 
-              femaleStudents={dashboardData?.femaleStudents || 0} 
+            <TotalStudentsGraphjs
+              maleStudents={dashboardData?.maleStudents || 0}
+              femaleStudents={dashboardData?.femaleStudents || 0}
             />
           </div>
         </div>
