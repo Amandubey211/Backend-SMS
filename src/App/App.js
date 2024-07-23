@@ -707,7 +707,7 @@ function App() {
       element: <StudentParentProfile />,
       element: (
         <ProtectRoute
-          Component={AllStudents}
+          Component={StudentParentProfile}
           allowedRoles={["admin", "teacher"]}
         />
       ),

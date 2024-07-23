@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { dummyParents } from "./dummyData/dummyData";
 import Layout from "../../../../Components/Common/Layout";
 import DashLayout from "../../../../Components/Admin/AdminDashLayout";
 import FormField from "../../Accounting/subClass/component/FormField";
 import ChildProfile from "./ChildProfile";
 import Sidebar from "../../../../Components/Common/Sidebar";
+import { useSelector } from "react-redux";
+import useGetAllParents from "../../../../Hooks/AuthHooks/Staff/Admin/parent/useGetAllParents";
 
 // import DashLayout from "../../../../Components/Admin/AdminDashLayout";
 const uniqueFilterOptions = (data, key) => {
@@ -16,8 +18,17 @@ const uniqueFilterOptions = (data, key) => {
 };
 
 const StudentParentProfile = () => {
-
-    const [selectedChild,setSelectedChild]=useState(null)
+    const {allParents} = useSelector((store)=>store.Parents);
+      const {fetchAllParents} = useGetAllParents()
+    useEffect(() => {
+      async function fetchData() {
+        await fetchAllParents();
+        console.log(allParents)
+      }
+      fetchData();
+    }, [])
+    
+     const [selectedChild,setSelectedChild]=useState(null)
     const [isSidebarOpen, setSidebarOpen] = useState(false);
 
     const handleSidebarOpen = () => setSidebarOpen(true);
@@ -73,10 +84,10 @@ const handleStudentClick=(child)=>{
                 <thead>
                   <tr className="text-left text-gray-700 bg-gray-100">
                     <th className="px-5 py-3 border-b-2 border-gray-200">
-                      Parents Father
+                      Father
                     </th>
                     <th className="px-5 py-3 border-b-2 border-gray-200">
-                      Parents Mother
+                      Mother
                     </th>
                     <th className="px-5 py-3 border-b-2 border-gray-200">
                       Phone
@@ -90,36 +101,37 @@ const handleStudentClick=(child)=>{
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredParents.map((parent, index) => (
+                  {allParents?.map((parent, index) => (
                     <tr
                       key={index}
                       className="text-left text-gray-700 bg-gray-100  "
                     >
                       <td className="px-5 py-4 border-b border-gray-200 flex items-center">
                         <img
-                          src={parent.fatherImageUrl}
+                          src={parent.profile}
                           alt="Profile"
-                          className="h-8 w-8 rounded-full mr-2"
+                          className="h-8 w-8 rounded-full mr-2 bg-gray-300 "
                         />
-                        <span>{parent.fatherName}</span>
+                        <span>{parent.fatherName?parent.fatherName:parent.guardianName
+                        }</span>
                       </td>
 
                       <td className="px-5 py-2 border-b border-gray-200">
                         <div className="flex items-center">
                           {" "}
                           <img
-                            src={parent.motherImageUrl}
+                            src={parent?.motherImageUrl}
                             alt="Profile"
-                            className="h-8 w-8 rounded-full mr-2"
+                            className="h-8 w-8 rounded-full mr-2 bg-gray-300"
                           />
                           <span> {parent.motherName}</span>
                         </div>
                       </td>
                       <td className="px-5 py-2 border-b border-gray-200">
-                        {parent.phone}
+                        {parent.guardianContactNumber}
                       </td>
                       <td className="px-5 py-2 border-b border-gray-200">
-                        {parent.email}
+                        {parent.guardianEmail}
                       </td>
                       {/* <td className="px-5 py-2 border-b border-gray-200">
                         {" "}
@@ -130,23 +142,23 @@ const handleStudentClick=(child)=>{
 
                       <td className=" px-5 py-2 border-b border-gray-200 ">
                         <div className="flex items-center     py-1">
-                         <div onClick={()=>handleStudentClick(parent.children)}
+                          <div onClick={()=>handleStudentClick(parent.childs)}
                           className="flex bg-pink-100 p-2  border-l border-t border-b  border-r   items-center  rounded-full">
 
-                            {parent.children.map((child, idx) => (
+                            {parent.childs?.map((child, idx) => (
                             <img
                               key={idx}
-                              src={child.imageUrl} 
-                              alt={child.name}
+                              src={child.profile} 
+                              alt={child.firstName}
                               className="h-8 w-8  rounded-full"
-                              title={child.name} 
+                              title={child.firstName} 
                             />
                           ))}
                         
                           
-                          <span  className="ml-2  font-normal ">{parent.children.length} Child </span>{" "} 
+                          <span  className="ml-2  font-normal ">{parent.childs.length} Child </span>{" "} 
                           
-                          </div>
+                          </div> 
                           {/* Display the count next to the images */}
 
                           
