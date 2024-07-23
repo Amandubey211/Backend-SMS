@@ -3,8 +3,9 @@ import { useParams } from "react-router-dom";
 import ChapterItem from "./ChapterItem";
 import { useSelector } from "react-redux";
 import { toast } from 'react-hot-toast';
+import { baseUrl } from "../../../../../../../config/Common";
 
-const Dummy= [
+const Dummy = [
   {
     "moduleName": "Business Planning System",
     "chapters": [
@@ -45,7 +46,7 @@ const ModuleDetails = ({ isExpanded, classId, studentId }) => {
           if (!token) {
             throw new Error("Authentication token not found");
           }
-          const response = await fetch(`http://localhost:8080/admin/modules/${classId}/${studentId}`, {
+          const response = await fetch(`${baseUrl}/admin/modules/${classId}/${studentId}`, {
             headers: {
               Authentication: token,
             },

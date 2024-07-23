@@ -3,13 +3,14 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
+import { baseUrl } from "../../../../../config/Common";
 
 const useFetchClassDiscussions = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [discussions, setDiscussions] = useState([]);
 
-  const API_URL = process.env.REACT_APP_API_URL;
+  
   const { role } = useSelector((store) => store.Auth);
   const { cid } = useParams();
 
@@ -20,7 +21,7 @@ const useFetchClassDiscussions = () => {
     try {
       const token = localStorage.getItem(`${role}:token`);
       const response = await axios.get(
-        `${API_URL}/admin/getDiscussion/class/${cid}`,
+        `${baseUrl}/admin/getDiscussion/class/${cid}`,
         {
           headers: { Authentication: token },
         }
@@ -40,7 +41,7 @@ const useFetchClassDiscussions = () => {
     } finally {
       setLoading(false);
     }
-  }, [role, API_URL, cid]);
+  }, [role, baseUrl, cid]);
 
   return { loading, error, fetchClassDiscussions, discussions };
 };

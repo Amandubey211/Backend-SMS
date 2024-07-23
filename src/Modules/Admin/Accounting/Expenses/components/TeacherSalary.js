@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import Sidebar from "../../../../../Components/Common/Sidebar";
 import PaySalary from "./PaySalary";
 import { fetchApi } from '../api/api';
+import { baseUrl } from "../../../../../config/Common";
 
 const TeacherRow = React.memo(({ teacher, onPayClick }) => (
   <tr className="bg-white">
@@ -61,7 +62,7 @@ const TeacherSalary = ({ selectedMonth }) => {
 
   const loadSalaries = async () => {
     try {
-      const response = await fetchApi("http://localhost:8080/admin/staff/get_salary?salaryRole=teacher", "GET", null, token);
+      const response = await fetchApi(`${baseUrl}/admin/staff/get_salary?salaryRole=teacher`, "GET", null, token);
       if (response && response.success && Array.isArray(response.salaryRecords)) {
         const formattedData = response.salaryRecords.map(record => ({
           profile: record.staffId.profile,
@@ -93,7 +94,7 @@ const TeacherSalary = ({ selectedMonth }) => {
 
   const handleCreateSalary = async (salaryDetails) => {
     try {
-      await fetchApi("http://localhost:8080/staff/create_salary?salaryRole=teacher", "POST", salaryDetails, token);
+      await fetchApi(`${baseUrl}/staff/create_salary?salaryRole=teacher`, "POST", salaryDetails, token);
       loadSalaries();
       handleSidebarClose();
     } catch (error) {
@@ -103,7 +104,7 @@ const TeacherSalary = ({ selectedMonth }) => {
 
   const handleUpdateSalary = async (salaryDetails) => {
     try {
-      await fetchApi("http://localhost:8080/staff/update_salary?salaryRole=teacher", "PUT", salaryDetails, token);
+      await fetchApi(`${baseUrl}/staff/update_salary?salaryRole=teacher`, "PUT", salaryDetails, token);
       loadSalaries();
       handleSidebarClose();
     } catch (error) {

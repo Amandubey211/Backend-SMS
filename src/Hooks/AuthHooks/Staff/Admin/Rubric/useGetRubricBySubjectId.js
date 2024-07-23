@@ -2,6 +2,7 @@ import { useState, useCallback } from "react";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
+import { baseUrl } from "../../../../../config/Common";
 // import { setRubrics } from "../../../../../Redux/Slices/Admin/RubricSlice";
 
 const useGetRubricBySubjectId = () => {
@@ -10,7 +11,7 @@ const useGetRubricBySubjectId = () => {
   const [rubrics, setRubrics] = useState([]);
 //   const dispatch = useDispatch();
   const role = useSelector((store) => store.Auth.role);
-  const API_URL = process.env.REACT_APP_API_URL;
+  
   const { sid } = useParams();
 
   const fetchRubricBySubjectId = useCallback(
@@ -22,7 +23,7 @@ const useGetRubricBySubjectId = () => {
         const token = localStorage.getItem(`${role}:token`);
 
         const response = await axios.get(
-          `${API_URL}/admin/rubric/subject/${sid}`,
+          `${baseUrl}/admin/rubric/subject/${sid}`,
           {
             headers: {
               Authentication: token,
@@ -46,7 +47,7 @@ const useGetRubricBySubjectId = () => {
         setLoading(false);
       }
     },
-    [role, API_URL, ]
+    [role, baseUrl, ]
   );
 
   return { loading, error, rubrics, fetchRubricBySubjectId };

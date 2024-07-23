@@ -6,6 +6,7 @@ import EventCard from "./Events/subComponents/EventCard";
 import Sidebar from "../../../Components/Common/Sidebar";
 import ViewEvent from "./Events/subComponents/ViewEvent";
 import "./Events/subComponents/customCalendar.css";
+import { baseUrl } from "../../../config/Common";
 
 const StudentEvent = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -24,7 +25,7 @@ const StudentEvent = () => {
           throw new Error("Authentication token not found");
         }
 
-        const response = await fetch("http://localhost:8080/admin/all/events", {
+        const response = await fetch(`${baseUrl}/admin/all/events`, {
           headers: {
             Authentication: token,
           },

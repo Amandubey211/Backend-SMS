@@ -4,6 +4,7 @@ import DashLayout from "../../../../Components/Student/StudentDashLayout";
 import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import ProfileCard from "./ProfileCard";
+import { baseUrl } from "../../../../config/Common";
 
 const StudentTeacher = () => {
   const { selectedClass, selectedSection, selectedSubject } = useSelector((state) => state.Common);
@@ -28,7 +29,7 @@ const StudentTeacher = () => {
         }
 
         const response = await fetch(
-          `http://localhost:8080/student/my_teachers/${selectedClass}`,
+          `${baseUrl}/student/my_teachers/${selectedClass}`,
           {
             headers: {
               Authentication: token,

@@ -3,8 +3,9 @@ import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import useFetchSection from "./useFetchSection";
+import { baseUrl } from "../../../../../config/Common";
 
-const API_URL = process.env.REACT_APP_API_URL;
+
 
 const useCreateSection = () => {
   const [loading, setLoading] = useState(false);
@@ -17,7 +18,7 @@ const useCreateSection = () => {
     try {
       const token = localStorage.getItem(`${role}:token`);
       const { data } = await axios.post(
-        `${API_URL}/admin/section`,
+        `${baseUrl}/admin/section`,
         sectionData,
         {
           headers: { Authentication: token },

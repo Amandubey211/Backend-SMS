@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import TeacherCards from '../../../Components/Parents/Teachers/TeacherCard';
 import axios from 'axios';
+import { baseUrl } from '../../../config/Common';
 
 const MyTeacher = () => {
     const [instructors, setTeachers] = useState([]);
@@ -18,7 +19,7 @@ const MyTeacher = () => {
                 }
 
                 const { email } = userData;
-                
+
 
                 if (!token) {
                     throw new Error("No token found");
@@ -27,7 +28,7 @@ const MyTeacher = () => {
                     throw new Error("No guardian email found");
                 }
 
-                const response = await axios.get(`http://localhost:8080/parent/api/instructors?guardianEmail=${encodeURIComponent(email)}`, {
+                const response = await axios.get(`${baseUrl}/parent/api/instructors?guardianEmail=${encodeURIComponent(email)}`, {
                     headers: {
                         'Authentication': `${token}`
                     }
@@ -35,7 +36,7 @@ const MyTeacher = () => {
 
                 if (!response.data) {
 
-                
+
                     throw new Error("No teachers data found");
                 }
                 console.log(response.data.instructors)

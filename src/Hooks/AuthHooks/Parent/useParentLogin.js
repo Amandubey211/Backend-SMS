@@ -4,6 +4,7 @@ import { useDispatch } from "react-redux";
 import { setAuth, setRole } from "../../../Redux/Slices/AuthSlice.js";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { baseUrl } from "../../../config/Common.js";
 
 const useParentLogin = () => {
   const [loading, setLoading] = useState(false);
@@ -37,7 +38,7 @@ const useParentLogin = () => {
 
     try {
       const { data } = await axios.post(
-        `${process.env.REACT_APP_API_URL}/auth/parent/login`,
+        `${baseUrl}/auth/parent/login`,
         parentDetails
       );
 

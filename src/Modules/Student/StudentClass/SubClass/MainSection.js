@@ -7,8 +7,9 @@ import { useParams } from "react-router-dom";
 import { FaSchool } from "react-icons/fa";
 import { SlEyeglass } from "react-icons/sl";
 import { FcGraduationCap, FcCalendar } from "react-icons/fc";
-import { setSelectedClass, setSelectedClassName, setSelectedSubjectName,setSelectedSection, setSelectedSubject } from "../../../../Redux/Slices/Common/CommonSlice";
+import { setSelectedClass, setSelectedClassName, setSelectedSubjectName, setSelectedSection, setSelectedSubject } from "../../../../Redux/Slices/Common/CommonSlice";
 import { TbProgress } from "react-icons/tb";
+import { baseUrl } from "../../../../config/Common";
 const colors = [
   "bg-yellow-300",
   "bg-blue-300",
@@ -31,12 +32,12 @@ const MainSection = () => {
     const fetchClassData = async () => {
       try {
         const token = localStorage.getItem('student:token');
-        console.log("token--",token);
+        console.log("token--", token);
         if (!token) {
           throw new Error('Authentication token not found');
         }
 
-        const response = await fetch('http://localhost:8080/student/my_class', {
+        const response = await fetch(`${baseUrl}/student/my_class`, {
           headers: {
             'Authentication': token,
           },
@@ -66,7 +67,7 @@ const MainSection = () => {
     fetchClassData();
   }, [cid]);
 
-  const handleSubjectClick = ({subjectId,subjectName}) => {
+  const handleSubjectClick = ({ subjectId, subjectName }) => {
     // const handleSubjectClick = (subjectId) => {
     console.log("Subject ID clicked:", subjectId);
     console.log("Subject NAME clicked:", subjectName);
@@ -86,7 +87,7 @@ const MainSection = () => {
       icon: <FaSchool className="text-yellow-600" />,
       text: `${classData.section?.sectionName || 'No Section'} - ${classData.groups[0].groupName}`,
       // url: `/class/${cid}/section_group`,
-      
+
       // url: `/student_class/class/${cid}/section`
     },
 
@@ -176,7 +177,7 @@ export default MainSection;
 //           throw new Error("Authentication token not found");
 //         }
 //         const response = await fetch(
-//           `http://localhost:8080/admin/my_subjects/${cid}`,
+//           `${baseUrl}/admin/my_subjects/${cid}`,
 //           {
 //             headers: {
 //               Authentication: token,

@@ -3,13 +3,14 @@ import axios from "axios";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import useGetModulesForStudent from "./useGetModulesForStudent";
+import { baseUrl } from "../../../../../config/Common";
 
 const useDeleteModule = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
 
-  const API_URL = process.env.REACT_APP_API_URL;
+  
   const role = useSelector((store) => store.Auth.role);
   const { sid } = useParams();
   const {fetchModules} = useGetModulesForStudent()
@@ -25,7 +26,7 @@ const useDeleteModule = () => {
         const token = localStorage.getItem(`${role}:token`);
 
         const response = await axios.delete(
-          `${API_URL}/admin/subjects/${sid}/modules/${moduleId}`,
+          `${baseUrl}/admin/subjects/${sid}/modules/${moduleId}`,
           {
             headers: {
               Authentication: token,
@@ -45,7 +46,7 @@ const useDeleteModule = () => {
         setLoading(false);
       }
     },
-    [role, API_URL]
+    [role, baseUrl]
   );
 
   return { loading, error, success, deleteModule };

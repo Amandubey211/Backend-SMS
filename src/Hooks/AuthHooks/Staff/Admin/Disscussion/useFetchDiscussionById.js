@@ -3,13 +3,14 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
+import { baseUrl } from "../../../../../config/Common";
 
 const useFetchDiscussionById = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [discussion, setDiscussion] = useState(null);
 
-  const API_URL = process.env.REACT_APP_API_URL;
+  
   const { role } = useSelector((store) => store.Auth);
   const { did } = useParams();
 
@@ -20,7 +21,7 @@ const useFetchDiscussionById = () => {
     try {
       const token = localStorage.getItem(`${role}:token`);
       const response = await axios.get(
-        `${API_URL}/admin/getDiscussionById/${did}`,
+        `${baseUrl}/admin/getDiscussionById/${did}`,
         {
           headers: { Authentication: token },
         }
@@ -40,7 +41,7 @@ const useFetchDiscussionById = () => {
     } finally {
       setLoading(false);
     }
-  }, [role, API_URL, did]);
+  }, [role, baseUrl, did]);
 
   return { loading, error, fetchDiscussionById, discussion };
 };

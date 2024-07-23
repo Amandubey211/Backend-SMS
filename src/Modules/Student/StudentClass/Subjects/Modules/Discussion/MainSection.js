@@ -58,6 +58,7 @@ import DiscussionHeader from "./Components/DiscussionHeader";
 import { MdKeyboardArrowDown } from "react-icons/md";
 import { GoDiscussionClosed } from "react-icons/go";
 import SubjectSideBar from "../../Component/SubjectSideBar";
+import { baseUrl } from "../../../../../../config/Common";
 
 const MainSection = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -73,7 +74,7 @@ const MainSection = () => {
           throw new Error("Authentication token not found");
         }
 
-        const response = await fetch(`http://localhost:8080/admin/getDiscussion/class/${cid}`, {
+        const response = await fetch(`${baseUrl}/admin/getDiscussion/class/${cid}`, {
           headers: {
             Authentication: token,
           },

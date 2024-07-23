@@ -2,6 +2,7 @@ import { useState, useCallback } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
+import { baseUrl } from "../../../../../config/Common";
 
 const useGetFilteredEvents = () => {
   const [loading, setLoading] = useState(false);
@@ -9,14 +10,14 @@ const useGetFilteredEvents = () => {
   const [events, setEvents] = useState([]);
 
   const role = useSelector((store) => store.Auth.role);
-  const API_URL = process.env.REACT_APP_API_URL;
+  
 
   const fetchFilteredEvents = useCallback(async (month, year) => {
     setLoading(true);
     setError(null);
     try {
       const token = localStorage.getItem(`${role}:token`);
-      const response = await axios.get(`${API_URL}/admin/dashboard/events`, {
+      const response = await axios.get(`${baseUrl}/admin/dashboard/events`, {
         headers: { Authentication: token },
         params: { month, year },
       });
@@ -29,7 +30,7 @@ const useGetFilteredEvents = () => {
       setLoading(false);
       setError(errorMessage);
     }
-  }, [role, API_URL]);
+  }, [role, baseUrl]);
 
   return { loading, error, events, fetchFilteredEvents };
 };

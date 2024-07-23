@@ -64,6 +64,7 @@ import { RiAddFill } from "react-icons/ri";
 import { NavLink, useParams } from "react-router-dom";
 import SubjectSideBar from "../../Component/SubjectSideBar";
 import { toast } from 'react-hot-toast';
+import { baseUrl } from "../../../../../../config/Common";
 
 const MainSection = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -78,7 +79,7 @@ const MainSection = () => {
           throw new Error('Authentication token not found');
         }
 
-        const response = await fetch('http://localhost:8080/student/pages', {
+        const response = await fetch(`${baseUrl}/student/pages`, {
           headers: {
             'Authentication': token
           }
@@ -126,7 +127,7 @@ const MainSection = () => {
           </div>
         </div>
         {/* <NavLink
-          to={`/class/${cid}/${sid}/create_discussion`}
+          to={`/ class/ ${ cid } / ${ sid } / create_discussion`}
           className="bg-gradient-to-r from-purple-400 to-pink-400 text-white p-4 fixed rounded-full shadow-md bottom-4 right-4"
         >
           <RiAddFill size={24} />

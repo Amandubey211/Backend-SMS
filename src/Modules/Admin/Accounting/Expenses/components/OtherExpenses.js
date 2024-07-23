@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
+import { baseUrl } from "../../../../../config/Common";
 
 const OtherExpenses = React.memo(({ selectedMonth }) => {
   const [data, setData] = useState([]);
@@ -13,7 +14,7 @@ const OtherExpenses = React.memo(({ selectedMonth }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`http://localhost:8080/api/admin/expenses?page=${currentPage}`, {
+        const response = await fetch(`${baseUrl}/api/admin/expenses?page=${currentPage}`, {
           headers: {
             'Authentication': `${token}` // Add Authorization header
           }

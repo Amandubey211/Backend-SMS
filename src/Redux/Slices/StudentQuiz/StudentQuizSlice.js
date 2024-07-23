@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { baseUrl } from "../../../config/Common";
 
 // Async thunk to fetch attempt history
 export const fetchAttemptHistory = createAsyncThunk(
@@ -7,7 +8,7 @@ export const fetchAttemptHistory = createAsyncThunk(
     const token = localStorage.getItem('student:token');
     if (!token) throw new Error('Authentication token not found');
     
-    const response = await fetch(`http://localhost:8080/student/studentquiz/${quizId}/attempt`, {
+    const response = await fetch(`${baseUrl}/student/studentquiz/${quizId}/attempt`, {
       headers: {
         'Authentication': token,
       },
@@ -29,7 +30,7 @@ export const submitQuiz = createAsyncThunk(
     const token = localStorage.getItem('student:token');
     if (!token) throw new Error('Authentication token not found');
     
-    const response = await fetch(`http://localhost:8080/student/studentquiz/submit/${quizId}`, {
+    const response = await fetch(`${baseUrl}/student/studentquiz/submit/${quizId}`, {
       method: 'POST',
       headers: {
         'Authentication': token,
@@ -144,7 +145,7 @@ export default StudentQuizSlice.reducer;
 //     const token = localStorage.getItem('student:token');
 //     if (!token) throw new Error('Authentication token not found');
     
-//     const response = await fetch(`http://localhost:8080/student/studentquiz/${quizId}/attempt`, {
+//     const response = await fetch(`${baseUrl}/student/studentquiz/${quizId}/attempt`, {
 //       headers: {
 //         'Authentication': token,
 //       },
@@ -166,7 +167,7 @@ export default StudentQuizSlice.reducer;
 //     const token = localStorage.getItem('student:token');
 //     if (!token) throw new Error('Authentication token not found');
     
-//     const response = await fetch(`http://localhost:8080/student/studentquiz/submit/${quizId}`, {
+//     const response = await fetch(`${baseUrl}/student/studentquiz/submit/${quizId}`, {
 //       method: 'POST',
 //       headers: {
 //         'Authentication': token,
@@ -284,7 +285,7 @@ export default StudentQuizSlice.reducer;
 //     const token = localStorage.getItem('student:token');
 //     if (!token) throw new Error('Authentication token not found');
     
-//     const response = await fetch(`http://localhost:8080/student/studentquiz/${quizId}/attempt`, {
+//     const response = await fetch(`${baseUrl}/student/studentquiz/${quizId}/attempt`, {
 //       headers: {
 //         'Authentication': token,
 //       },
@@ -306,7 +307,7 @@ export default StudentQuizSlice.reducer;
 //     const token = localStorage.getItem('student:token');
 //     if (!token) throw new Error('Authentication token not found');
     
-//     const response = await fetch(`http://localhost:8080/student/studentquiz/submit/${quizId}`, {
+//     const response = await fetch(`${baseUrl}/student/studentquiz/submit/${quizId}`, {
 //       method: 'POST',
 //       headers: {
 //         'Authentication': token,

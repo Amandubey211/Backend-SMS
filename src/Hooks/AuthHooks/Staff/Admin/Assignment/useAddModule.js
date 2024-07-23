@@ -3,6 +3,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
+import { baseUrl } from "../../../../../config/Common";
 
 const useAddModule = () => {
   const [loading, setLoading] = useState(false);
@@ -10,7 +11,7 @@ const useAddModule = () => {
   const [success, setSuccess] = useState(null);
 
   const role = useSelector((store) => store.Auth.role);
-  const API_URL = process.env.REACT_APP_API_URL;
+  
   const { sid } = useParams();
 
   const addModule = useCallback(
@@ -29,7 +30,7 @@ const useAddModule = () => {
         }
 
         const response = await axios.post(
-          `${API_URL}/admin/add_module`,
+          `${baseUrl}/admin/add_module`,
           formData,
           {
             headers: {
@@ -54,7 +55,7 @@ const useAddModule = () => {
         setLoading(false);
       }
     },
-    [role, API_URL, sid]
+    [role, baseUrl, sid]
   );
 
   return { loading, error, success, addModule };

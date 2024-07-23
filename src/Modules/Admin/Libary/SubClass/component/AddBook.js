@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import ImageUpload from "../../../Addmission/Components/ImageUpload";
 import FormInput from "../../../Accounting/subClass/component/FormInput";
 import FormSelect from "../../../Accounting/subClass/component/FormSelect";
+import { baseUrl } from "../../../../../config/Common";
 
 const AddBook = () => {
   const [imagePreview, setImagePreview] = useState(null);
@@ -69,7 +70,7 @@ const AddBook = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:8080/admin/add_book", {
+      const response = await fetch(`${baseUrl}/admin/add_book`, {
         method: "POST",
         headers: {
           Authentication: `${token}`,

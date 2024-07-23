@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import { toast } from "react-hot-toast";
 import useFetchSection from "./useFetchSection";
 import { useParams } from "react-router-dom";
+import { baseUrl } from "../../../../../config/Common";
 
 const useDeleteSection = () => {
   const [loading, setLoading] = useState(false);
@@ -15,10 +16,10 @@ const useDeleteSection = () => {
     setLoading(true);
     setError(null);
     try {
-      const API_URL = process.env.REACT_APP_API_URL;
+      
       const token = localStorage.getItem(`${role}:token`);
       const response = await axios.delete(
-        `${API_URL}/admin/section/${sectionId}`,
+        `${baseUrl}/admin/section/${sectionId}`,
         {
           headers: { Authentication: token },
         }

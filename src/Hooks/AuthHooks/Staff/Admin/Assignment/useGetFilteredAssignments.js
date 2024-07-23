@@ -3,6 +3,7 @@ import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { setAssignment } from "../../../../../Redux/Slices/Admin/SubjectSlice";
+import { baseUrl } from "../../../../../config/Common";
 
 const useGetFilteredAssignments = () => {
   const [loading, setLoading] = useState(false);
@@ -10,7 +11,7 @@ const useGetFilteredAssignments = () => {
   const [assignments, setAssignments] = useState([]);
   const dispatch = useDispatch();
   const role = useSelector((store) => store.Auth.role);
-  const API_URL = process.env.REACT_APP_API_URL;
+  
 
   const fetchFilteredAssignments = useCallback(
     async (sid, moduleId, chapterId, publish) => {
@@ -26,7 +27,7 @@ const useGetFilteredAssignments = () => {
         if (publish !== null) params.publish = publish;
 
         const response = await axios.get(
-          `${API_URL}/admin/assignments/${sid}`,
+          `${baseUrl}/admin/assignments/${sid}`,
           {
             headers: {
               Authentication: token,
@@ -47,7 +48,7 @@ const useGetFilteredAssignments = () => {
         setLoading(false);
       }
     },
-    [role, API_URL, dispatch]
+    [role, baseUrl, dispatch]
   );
 
   return { loading, error, assignments, fetchFilteredAssignments };

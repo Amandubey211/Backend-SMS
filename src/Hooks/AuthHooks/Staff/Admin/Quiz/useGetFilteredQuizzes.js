@@ -2,6 +2,7 @@ import { useState, useCallback, useMemo } from "react";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
+import { baseUrl } from "../../../../../config/Common";
 
 const useGetFilteredQuizzes = () => {
   const [state, setState] = useState({
@@ -10,7 +11,7 @@ const useGetFilteredQuizzes = () => {
     quizzes: [],
   });
   const role = useSelector((store) => store.Auth.role);
-  const API_URL = useMemo(() => process.env.REACT_APP_API_URL, []);
+  
   const { cid } = useParams();
 
   const fetchFilteredQuizzes = useCallback(
@@ -25,7 +26,7 @@ const useGetFilteredQuizzes = () => {
           ...(publish !== undefined && { publish }),
         };
 
-        const response = await axios.get(`${API_URL}/admin/quizzes/${cid}`, {
+        const response = await axios.get(`${baseUrl}/admin/quizzes/${cid}`, {
           headers: { Authentication: token },
           params,
         });
@@ -47,7 +48,7 @@ const useGetFilteredQuizzes = () => {
         }));
       }
     },
-    [role, API_URL, cid]
+    [role, baseUrl, cid]
   );
 
   return { ...state, fetchFilteredQuizzes };

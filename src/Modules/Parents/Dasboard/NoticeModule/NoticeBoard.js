@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { message } from "antd";
 import { format } from 'date-fns'; // Import format function from date-fns
+import { baseUrl } from "../../../../config/Common";
 
 const NoticeBoard = () => {
   const [notices, setNotices] = useState([]);
@@ -14,7 +15,7 @@ const NoticeBoard = () => {
     const fetchNotices = async () => {
       try {
         const token = localStorage.getItem("parent:token");
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/admin/all/notices`, {
+        const response = await axios.get(`${baseUrl}/admin/all/notices`, {
           headers: {
             Authentication: `${token}`, 
           },

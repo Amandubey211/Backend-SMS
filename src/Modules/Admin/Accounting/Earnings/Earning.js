@@ -8,6 +8,7 @@ import EditEarning from "./EditEarning";
 import { GiMoneyStack } from "react-icons/gi";
 import { GiTakeMyMoney } from "react-icons/gi";
 import { HiOutlineBanknotes } from "react-icons/hi2";
+import { baseUrl } from "../../../../config/Common";
 
 const Earning = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -42,7 +43,7 @@ const Earning = () => {
   const fetchTotalAmounts = async () => {
     const token = localStorage.getItem('admin:token');
     try {
-      const response = await fetch('http://localhost:8080/admin/total_amount', {
+      const response = await fetch(`${baseUrl}/admin/total_amount`, {
         headers: {
           Authentication: `${token}`
         }
@@ -66,7 +67,7 @@ const Earning = () => {
     setError(null);
     const token = localStorage.getItem('admin:token');
     try {
-      const response = await fetch('http://localhost:8080/admin/getearning', {
+      const response = await fetch(`${baseUrl}/admin/getearning`, {
         headers: {
           Authentication: `${token}`
         }
@@ -87,7 +88,7 @@ const Earning = () => {
   const handleDelete = async (earningId) => {
     const token = localStorage.getItem('admin:token');
     try {
-      const response = await fetch(`http://localhost:8080/admin/deleteEarning/${earningId}`, {
+      const response = await fetch(`${baseUrl}/admin/deleteEarning/${earningId}`, {
         method: 'DELETE',
         headers: {
           Authentication: `${token}`

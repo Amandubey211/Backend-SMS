@@ -3,10 +3,10 @@ import toast from "react-hot-toast";
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { setRejectedStudents } from "../../../Redux/Slices/AdminSlice";
+import { baseUrl } from "../../../config/Common";
 
 const useGetRejectedStudents = () => {
   const [loading, setLoading] = useState(false);
-  const API_URL = process.env.REACT_APP_API_URL;
   const dispatch = useDispatch();
   const getRejectedStudents = async () => {
     setLoading(true);
@@ -17,7 +17,7 @@ const useGetRejectedStudents = () => {
       );
 
       const { data } = await axios.get(
-        `${API_URL}/admin/get_rejected_student_details`,
+        `${baseUrl}/admin/get_rejected_student_details`,
         {
           headers: { Authentication: token },
         }

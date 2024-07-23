@@ -39,11 +39,12 @@ import { useParams } from "react-router-dom";
 import Header from "./Components/Header";
 import SubjectSideBar from "../../../Component/SubjectSideBar";
 import { toast } from 'react-hot-toast';
+import { baseUrl } from "../../../../../../../config/Common";
 
 const MainSection = () => {
   const { did } = useParams();
   const [pageData, setPageData] = useState({});
-  
+
   useEffect(() => {
     const fetchPageData = async () => {
       try {
@@ -52,7 +53,7 @@ const MainSection = () => {
           throw new Error('Authentication token not found');
         }
 
-        const response = await fetch(`http://localhost:8080/student/pages/${did}`, {
+        const response = await fetch(`${baseUrl}/student/pages/${did}`, {
           headers: {
             'Authentication': token
           }
@@ -63,7 +64,7 @@ const MainSection = () => {
         }
 
         const data = await response.json();
-        console.log("data in page view",data)
+        console.log("data in page view", data)
         setPageData(data); // Update state with fetched page data
       } catch (error) {
         console.error("Failed to fetch page data:", error);

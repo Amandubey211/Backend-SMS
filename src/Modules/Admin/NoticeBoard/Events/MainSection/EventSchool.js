@@ -20,6 +20,7 @@ import EventCard from "../subComponents/EventCard";
 import Sidebar from "../../../../../Components/Common/Sidebar";
 import AddEvent from "../subComponents/AddEvent";
 import ViewEvent from "../subComponents/ViewEvent";
+import { baseUrl } from "../../../../../config/Common";
 
 const EventScheduler = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -39,7 +40,7 @@ const EventScheduler = () => {
       }
 
       try {
-        const response = await axios.get('http://localhost:8080/admin/all/events', {
+        const response = await axios.get(`${baseUrl}/admin/all/events`, {
           headers: {
             'Authentication': `${token}` // Use token in the Authorization header
           }

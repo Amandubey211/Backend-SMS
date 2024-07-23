@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import FormInput from "../../Accounting/subClass/component/FormInput";
+import { baseUrl } from "../../../../config/Common";
 
 const AddAnnouncement = () => {
   const [imagePreview, setImagePreview] = useState(null);
@@ -12,7 +13,7 @@ const AddAnnouncement = () => {
     notice: null,
   });
   const [selectedStatus, setSelectedStatus] = useState("High priority");
-  const token = localStorage.getItem('admin:token'); 
+  const token = localStorage.getItem('admin:token');
 
   // Handle input changes for all fields
   const handleInputChange = (e) => {
@@ -23,7 +24,7 @@ const AddAnnouncement = () => {
     }));
   };
 
-  
+
   const handleRemoveImage = () => {
     setImagePreview(null);
     setNoticeData(prev => ({
@@ -32,7 +33,7 @@ const AddAnnouncement = () => {
     }));
   };
 
-  
+
   const handleStatusChange = (status) => {
     setSelectedStatus(status);
     setNoticeData(prev => ({
@@ -41,7 +42,7 @@ const AddAnnouncement = () => {
     }));
   };
 
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -54,11 +55,11 @@ const AddAnnouncement = () => {
     };
 
     try {
-      const response = await fetch('http://localhost:8080/admin/create_notice', {
+      const response = await fetch(`${baseUrl}/admin/create_notice`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authentication': `${token}`, 
+          'Authentication': `${token}`,
         },
         body: JSON.stringify(postData),
       });

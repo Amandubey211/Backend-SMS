@@ -2,6 +2,7 @@ import { useState, useCallback } from "react";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
+import { baseUrl } from "../../../../../config/Common";
 
 const useCreateRubric = () => {
   const [loading, setLoading] = useState(false);
@@ -34,10 +35,10 @@ const useCreateRubric = () => {
       }
 
       try {
-        const API_URL = process.env.REACT_APP_API_URL;
+        
         const token = localStorage.getItem(`${role}:token`);
         const response = await axios.post(
-          `${API_URL}/admin/create_rubric`,
+          `${baseUrl}/admin/create_rubric`,
           rubricData,
           {
             headers: { Authentication: token },

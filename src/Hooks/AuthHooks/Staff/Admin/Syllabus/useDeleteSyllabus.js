@@ -3,13 +3,14 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
+import { baseUrl } from "../../../../../config/Common";
 
 const useDeleteSyllabus = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   // const { cid } = useParams();
 
-  const API_URL = process.env.REACT_APP_API_URL;
+  
   const { role } = useSelector((store) => store.Auth);
 
   const deleteSyllabus = useCallback(
@@ -20,7 +21,7 @@ const useDeleteSyllabus = () => {
       try {
         const token = localStorage.getItem(`${role}:token`);
         const response = await axios.delete(
-          `${API_URL}/admin/syllabus/${syllabusId}`,
+          `${baseUrl}/admin/syllabus/${syllabusId}`,
           {
             headers: {
               Authentication: token,
@@ -42,7 +43,7 @@ const useDeleteSyllabus = () => {
         setLoading(false);
       }
     },
-    [role, API_URL]
+    [role, baseUrl]
   );
 
   return { loading, error, deleteSyllabus };

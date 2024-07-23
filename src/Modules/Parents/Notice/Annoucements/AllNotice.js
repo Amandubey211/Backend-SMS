@@ -2,10 +2,11 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Layout from "../../../../Components/Common/Layout";
 import ParentDashLayout from "../../../../Components/Parents/ParentDashLayout.js";
-import {  FcAdvertising } from "react-icons/fc";
+import { FcAdvertising } from "react-icons/fc";
 import { MdQueryBuilder } from "react-icons/md";
 import Notice from "./Notice";
 import toast from "react-hot-toast";
+import { baseUrl } from "../../../../config/Common.js";
 
 const AllNotice = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -19,7 +20,7 @@ const AllNotice = () => {
       try {
         const token = localStorage.getItem("parent:token");
         console.log(token)
-        const response = await axios.get("http://localhost:8080/admin/all/notices", {
+        const response = await axios.get(`${baseUrl}/admin/all/notices`, {
           headers: {
             Authentication: `${token}`,
           },
@@ -67,7 +68,7 @@ const AllNotice = () => {
                     onClick={() => toggleAccordion(index)}
                   >
                     <div className="flex gap-6 px-3 py-2">
-                    {/* <img
+                      {/* <img
   className="h-10 w-10 rounded"
   src={notice.imageUrl}
   alt="notice-image"
@@ -78,12 +79,12 @@ const AllNotice = () => {
     e.target.alt = '📅'; 
   }}
 /> */}
-<div
-  className="h-10 w-10 rounded flex items-center justify-center text-2xl"
-  style={{ background: '#f3f4f6' }}
->
-<FcAdvertising />{/* You can replace this emoji with any other relevant emoji */}
-</div>
+                      <div
+                        className="h-10 w-10 rounded flex items-center justify-center text-2xl"
+                        style={{ background: '#f3f4f6' }}
+                      >
+                        <FcAdvertising />{/* You can replace this emoji with any other relevant emoji */}
+                      </div>
 
 
                       <div className="flex flex-col gap-3 mt-[-5px]">
@@ -107,18 +108,17 @@ const AllNotice = () => {
                             </span>
                           </div>
                           <div className="px-3 py-1 text-xs text-center flex justify-center items-center">
-  <span
-    className={`${
-      notice.priority === "High priority"
-        ? "px-3 py-1 bg-pink-100 text-pink-700 font-bold"
-        : notice.priority === "Low priority"
-        ? "px-3 py-1 bg-gray-100 text-black font-normal"
-        : ""
-    }`}
-  >
-    {notice.priority}
-  </span>
-</div>
+                            <span
+                              className={`${notice.priority === "High priority"
+                                  ? "px-3 py-1 bg-pink-100 text-pink-700 font-bold"
+                                  : notice.priority === "Low priority"
+                                    ? "px-3 py-1 bg-gray-100 text-black font-normal"
+                                    : ""
+                                }`}
+                            >
+                              {notice.priority}
+                            </span>
+                          </div>
 
                         </div>
                       </div>

@@ -3,11 +3,12 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
+import { baseUrl } from "../../../../../../config/Common";
 
 const useAddReply = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const API_URL = process.env.REACT_APP_API_URL;
+  
   const { role } = useSelector((store) => store.Auth);
   const { did: discussionId } = useParams();
   const addReply = useCallback(async (parentId, text) => {
@@ -17,7 +18,7 @@ const useAddReply = () => {
     try {
       const token = localStorage.getItem(`${role}:token`);
       const response = await axios.post(
-        `${API_URL}/admin/createCommentDiscussion/${discussionId}/replies`,
+        `${baseUrl}/admin/createCommentDiscussion/${discussionId}/replies`,
         { content: text, parentId },
         {
           headers: { Authentication: token },
@@ -38,7 +39,7 @@ const useAddReply = () => {
     } finally {
       setLoading(false);
     }
-  }, [API_URL, role]);
+  }, [baseUrl, role]);
 
   return { loading, error, addReply };
 };

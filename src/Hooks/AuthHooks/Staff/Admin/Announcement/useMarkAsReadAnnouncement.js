@@ -2,12 +2,13 @@ import { useState, useCallback } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
+import { baseUrl } from "../../../../../config/Common";
 
 const useMarkAsReadAnnouncement = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const API_URL = process.env.REACT_APP_API_URL;
+  
   const { role } = useSelector((store) => store.Auth);
 
   const markAsReadAnnouncement = useCallback(
@@ -19,7 +20,7 @@ const useMarkAsReadAnnouncement = () => {
         const token = localStorage.getItem(`${role}:token`);
         // backend  route is inconsistent
         const response = await axios.put(
-          `${API_URL}/admin/markAsRead/announcement/${announcementId}/`,
+          `${baseUrl}/admin/markAsRead/announcement/${announcementId}/`,
           {},
           {
             headers: {
@@ -43,7 +44,7 @@ const useMarkAsReadAnnouncement = () => {
         setLoading(false);
       }
     },
-    [role, API_URL]
+    [role, baseUrl]
   );
 
   return { loading, error, markAsReadAnnouncement };

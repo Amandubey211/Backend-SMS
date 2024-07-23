@@ -2,6 +2,7 @@ import { useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { setSectionsList } from "../../../../../Redux/Slices/Admin/ClassSlice";
+import { baseUrl } from "../../../../../config/Common";
 
 const useFetchSection = () => {
   const [loading, setLoading] = useState(false);
@@ -15,10 +16,10 @@ const useFetchSection = () => {
       setError(null);
 
       try {
-        const API_URL = process.env.REACT_APP_API_URL;
+       
         const token = localStorage.getItem(`${role}:token`);
         const response = await axios.get(
-          `${API_URL}/admin/getSectionByclass/${classId}`,
+          `${baseUrl}/admin/getSectionByclass/${classId}`,
           {
             headers: { Authentication: token },
           }

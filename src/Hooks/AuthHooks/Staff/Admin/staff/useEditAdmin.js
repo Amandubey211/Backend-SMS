@@ -2,6 +2,7 @@ import { useState, useCallback } from "react";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
+import { baseUrl } from "../../../../../config/Common";
 
 const useEditAdmin = () => {
   const [loading, setLoading] = useState(false);
@@ -13,14 +14,14 @@ const useEditAdmin = () => {
        setError(null);
  
        try {
-         const API_URL = process.env.REACT_APP_API_URL;
+         
          const token = localStorage.getItem(`${adminRole}:token`);
          const formData = new FormData();
          Object.keys(AdminData).forEach(key => {
            formData.append(key, AdminData[key]);
          });  
         const response = await axios.put(
-          `${API_URL}/admin/update/admin_profile`,
+          `${baseUrl}/admin/update/admin_profile`,
           formData,
           {
             headers: {       

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import axios from "axios"; // Ensure Axios is installed
 import ImageUpload from "../../../Addmission/Components/ImageUpload";
 import FormInput from "../../../Accounting/subClass/component/FormInput";
+import { baseUrl } from "../../../../../config/Common";
 
 const AddEvent = () => {
   const [imagePreview, setImagePreview] = useState(null);
@@ -65,7 +66,7 @@ const AddEvent = () => {
     const token = localStorage.getItem('admin:token');
 
     try {
-      const response = await axios.post('http://localhost:8080/admin/create_event', formData, {
+      const response = await axios.post(`${baseUrl}/admin/create_event`, formData, {
         headers: {
           'Authentication': `${token}`, // Use Bearer authentication scheme
           'Content-Type': 'multipart/form-data'

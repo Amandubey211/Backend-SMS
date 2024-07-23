@@ -2,6 +2,7 @@ import { useState, useCallback } from "react";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
+import { baseUrl } from "../../../../../config/Common";
 
 const useUpdateRubric = () => {
   const [loading, setLoading] = useState(false);
@@ -12,10 +13,10 @@ const useUpdateRubric = () => {
     setLoading(true);
     setError(null);
     try {
-      const API_URL = process.env.REACT_APP_API_URL;
+      
       const token = localStorage.getItem(`${role}:token`);
       await axios.put(
-        `${API_URL}/admin/rubric/${rubricId}`,
+        `${baseUrl}/admin/rubric/${rubricId}`,
         rubricData,
         {
           headers: { Authentication: token },

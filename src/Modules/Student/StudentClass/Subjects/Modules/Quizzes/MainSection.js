@@ -10,6 +10,7 @@ import QuizResultSummary from './Components/QuizResultSummary';
 import Tabs from './Components/Tabs';
 import { useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import { baseUrl } from '../../../../../../config/Common';
 
 const MainSection = ({ quiz }) => {
   const quizId = quiz._id;
@@ -59,13 +60,13 @@ const MainSection = ({ quiz }) => {
           throw new Error('Authentication token not found');
         }
         const attemptNumber = 1; // Start with the first attempt for example
-        // const response = await fetch(`http://localhost:8080/student/studentquiz/${quizId}/attempt/${attemptNumber}`, {
-        const response = await fetch(`http://localhost:8080/student/studentquiz/${quizId}/attempt`, {
+        // const response = await fetch(`${baseUrl}/student/studentquiz/${quizId}/attempt/${attemptNumber}`, {
+        const response = await fetch(`${baseUrl}/student/studentquiz/${quizId}/attempt`, {
           headers: {
             'Authentication': token,
           },
         });
-        // console.log(`http://localhost:8080/student/studentquiz/${quizId}/attempt/${attemptNumber}`)
+        // console.log(`${baseUrl}/student/studentquiz/${quizId}/attempt/${attemptNumber}`)
         if (!response.ok) {
           throw new Error(`Failed to fetch attempt history, status: ${response.status}`);
         }
@@ -99,7 +100,7 @@ const MainSection = ({ quiz }) => {
         throw new Error('Authentication token not found');
       }
 
-      const response = await fetch(`http://localhost:8080/student/studentquiz/submit/${quizId}`, {
+      const response = await fetch(`${baseUrl}/student/studentquiz/submit/${quizId}`, {
         method: 'POST',
         headers: {
           'Authentication': token,
@@ -109,7 +110,7 @@ const MainSection = ({ quiz }) => {
       });
 
       const data = await response.json();
-      console.log("data is ",data)
+      console.log("data is ", data)
       if (response.ok) {
         setQuizSubmitted(true);
         setQuizResults({

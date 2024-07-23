@@ -8,10 +8,11 @@ import FilterCard from "../Component/FilterCard";
 import { RiListCheck3 } from "react-icons/ri";
 import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { baseUrl } from "../../../../../../../config/Common";
 
 const MainSection = () => {
   const { selectedClass, selectedSection, selectedSubject } = useSelector((state) => state.Common);
-  
+
 
   const { cid, sid, subjectId } = useParams(); // Ensure subjectId is part of the route parameters
   const [assignments, setAssignments] = useState([]);
@@ -32,8 +33,8 @@ const MainSection = () => {
           throw new Error('Authentication token not found');
         }
 
-        // const response = await fetch(`http://localhost:8080/studentAssignment/class/${cid}/section/${sid}?subjectId=${subjectId}`, {
-        const response = await fetch(`http://localhost:8080/student/studentAssignment/class/${selectedClass}/section/${selectedSection}?subjectId=${selectedSubject}`, {
+        // const response = await fetch(`${baseUrl}/studentAssignment/class/${cid}/section/${sid}?subjectId=${subjectId}`, {
+        const response = await fetch(`${baseUrl}/student/studentAssignment/class/${selectedClass}/section/${selectedSection}?subjectId=${selectedSubject}`, {
           headers: {
             'Authentication': token,
           },

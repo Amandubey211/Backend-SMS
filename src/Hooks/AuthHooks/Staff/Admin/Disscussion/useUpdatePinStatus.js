@@ -3,12 +3,13 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
 import useFetchClassDiscussions from "./useFetchClassDiscussions";
+import { baseUrl } from "../../../../../config/Common";
 
 const useUpdatePinStatus = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const { role } = useSelector((store) => store.Auth);
-  const API_URL = process.env.REACT_APP_API_URL;
+  
   const {fetchClassDiscussions} = useFetchClassDiscussions()
 
   const updatePinStatus = useCallback(
@@ -18,7 +19,7 @@ const useUpdatePinStatus = () => {
       try {
         const token = localStorage.getItem(`${role}:token`);
         const response = await axios.put(
-          `${API_URL}/admin/discussion/pinstatus/${discussionId}`,
+          `${baseUrl}/admin/discussion/pinstatus/${discussionId}`,
           { isPinned },
           {
             headers: { Authentication: token },
@@ -44,7 +45,7 @@ const useUpdatePinStatus = () => {
         setLoading(false);
       }
     },
-    [role, API_URL]
+    [role, baseUrl]
   );
 
   return { loading, error, updatePinStatus };

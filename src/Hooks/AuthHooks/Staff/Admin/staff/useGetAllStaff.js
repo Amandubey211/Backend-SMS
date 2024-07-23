@@ -3,7 +3,8 @@ import { useState } from "react";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { setStaff } from "../../../../../Redux/Slices/Admin/StaffSlice";
-const API_URL = process.env.REACT_APP_API_URL;
+import { baseUrl } from "../../../../../config/Common";
+
 
 const useGetAllStaff = () => {
   const [loading, setLoading] = useState(true);
@@ -13,7 +14,7 @@ const useGetAllStaff = () => {
   const fetchStaff = async () => {
     try {
       const token = localStorage.getItem(`${role}:token`);
-      const response = await axios.get(`${API_URL}/admin/get_staffs`, {
+      const response = await axios.get(`${baseUrl}/admin/get_staffs`, {
         headers: { Authentication: token },
       });
       dispatch(setStaff(response.data));

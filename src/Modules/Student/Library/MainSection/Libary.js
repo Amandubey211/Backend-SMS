@@ -7,6 +7,7 @@ import StudentDashLayout from "../../../../Components/Student/StudentDashLayout"
 import BookIssue from "./BookIssue";
 import TabButton from "../Subclasss/component/TabButton";
 import axios from "axios";
+import { baseUrl } from "../../../../config/Common";
 
 const Library = () => {
   const [filters, setFilters] = useState({
@@ -32,7 +33,7 @@ const Library = () => {
 
       console.log("classId:", selectedClass);
 
-      const response = await axios.get(`${process.env.REACT_APP_API_URL}/admin/all/book`, {
+      const response = await axios.get(`${baseUrl}/admin/all/book`, {
         headers: {
           'Authentication': token,
         },

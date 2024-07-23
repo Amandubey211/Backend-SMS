@@ -7,6 +7,7 @@ import SyllabusHeader from "./Components/SyllabusHeader";
 import SyllabusSection from "./Components/SyllabusSection";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
+import { baseUrl } from "../../../../../../../config/Common";
 
 const MainSection = () => {
   const { cid } = useParams();
@@ -22,7 +23,7 @@ const MainSection = () => {
           throw new Error("Authentication token not found");
         }
 
-        const response = await fetch(`http://localhost:8080/admin/syllabus/${selectedSubjectId}/class/${cid}`, {
+        const response = await fetch(`${baseUrl}/admin/syllabus/${selectedSubjectId}/class/${cid}`, {
           headers: {
             Authentication: token
           }

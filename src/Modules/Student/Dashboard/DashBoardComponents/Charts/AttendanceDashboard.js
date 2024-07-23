@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import AttendanceChart from './AttendanceChart'; // Replace with your actual component import
+import { baseUrl } from '../../../../../config/Common';
 
 const AttendanceDashboard = () => {
   const [attendanceSummary, setAttendanceSummary] = useState(null);
@@ -13,10 +14,10 @@ const AttendanceDashboard = () => {
         if (!token) {
           throw new Error('Authentication token not found');
         }
-        // const response = await fetch('http://localhost:8080/student/dashboard/student');
+        // const response = await fetch('${baseUrl}/student/dashboard/student');
 
-        // const response = await fetch(`http://localhost:8080/student/dashboard/student`, {
-        const response = await fetch(`http://localhost:8080/api/studentDashboard/dashboard/student`, {
+        // const response = await fetch(`${baseUrl}/student/dashboard/student`, {
+        const response = await fetch(`${baseUrl}/api/studentDashboard/dashboard/student`, {
 
           // 
           headers: {

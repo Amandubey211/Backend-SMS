@@ -1,8 +1,9 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
 import axios from "axios";
+import { baseUrl } from "../../../config/Common";
 
-const API_URL = process.env.REACT_APP_API_URL;
+
 
 const useSaveDetails = () => {
   const [loading, setLoading] = useState(false);
@@ -10,7 +11,7 @@ const useSaveDetails = () => {
   const saveDetails = async (formData) => {
     try {
       setLoading(true);
-      const response = await axios.post(`${API_URL}/student/student_register`, formData);
+      const response = await axios.post(`${baseUrl}/student/student_register`, formData);
       setLoading(false);
       return response.data;
     } catch (error) {

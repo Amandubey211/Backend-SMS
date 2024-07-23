@@ -6,6 +6,7 @@ import FilterContainer from "./StudentFinance/FilterContainer";
 import FeeTable from "./StudentFinance/FeeTable";
 import FeeCard from "./StudentFinance/FeeCard";
 import axios from "axios";
+import { baseUrl } from "../../config/Common";
 
 const FinanceTable = () => {
   const [filters, setFilters] = useState({
@@ -28,7 +29,7 @@ const FinanceTable = () => {
       }
   
       const response = await axios.get(
-        `${process.env.REACT_APP_API_URL}/student/my_fees`,
+        `${baseUrl}/student/my_fees`,
         {
           headers: {
             Authentication: token,

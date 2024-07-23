@@ -11,6 +11,7 @@ import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import FilterCard from "../Component/FilterCard";
 import List from "../Component/List";
+import { baseUrl } from "../../../../../../../config/Common";
 
 const MainSection = () => {
   const { selectedClass, selectedSection, selectedSubject } = useSelector((state) => state.Common);
@@ -34,7 +35,7 @@ const MainSection = () => {
           throw new Error('Authentication token not found');
         }
 
-        const response = await fetch(`http://localhost:8080/student/studentquiz/class/${selectedClass}?subjectId=${selectedSubject}`, {
+        const response = await fetch(`${baseUrl}/student/studentquiz/class/${selectedClass}?subjectId=${selectedSubject}`, {
           headers: {
             'Authentication': token,
           },

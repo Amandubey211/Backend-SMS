@@ -2,13 +2,14 @@
 
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { baseUrl } from "../../../../config/Common";
 
 const useGetAllSchools = () => {
   const [schoolList, setSchoolList] = useState([]);
 
   const fetchSchools = async () => {
     try {
-      const response = await axios.get("http://localhost:8080/student_diwan/get_schools");
+      const response = await axios.get(`${baseUrl}/student_diwan/get_schools`);
       console.log(response.data)
       setSchoolList(response.data.schools);
     } catch (error) {

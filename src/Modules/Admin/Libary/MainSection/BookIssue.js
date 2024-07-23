@@ -6,6 +6,7 @@ import FormField from "../../Accounting/subClass/component/FormField";
 import Sidebar from "../../../../Components/Common/Sidebar";
 import AddIssue from "../SubClass/component/AddIssue";
 import BookIssueRow from "../SubClass/component/BookIssueRow";
+import { baseUrl } from "../../../../config/Common";
 
 const BookIssue = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -24,7 +25,7 @@ const BookIssue = () => {
   };
 
   useEffect(() => {
-    axios.get('http://localhost:8080/admin/all/bookIssue', { headers: getAuthHeaders() })
+    axios.get(`${baseUrl}/admin/all/bookIssue`, { headers: getAuthHeaders() })
       .then(response => {
         if (response.data.success) {
           setData(response.data.books);
@@ -42,7 +43,7 @@ const BookIssue = () => {
   };
 
   const handleAddSuccess = (newItem) => {
-    axios.post('http://localhost:8080/admin/all/bookIssue', newItem, { headers: getAuthHeaders() })
+    axios.post(`${baseUrl}/admin/all/bookIssue`, newItem, { headers: getAuthHeaders() })
       .then(response => {
         if (response.data.success) {
           setData(prev => [...prev, response.data.book]);

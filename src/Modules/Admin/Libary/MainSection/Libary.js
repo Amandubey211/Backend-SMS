@@ -8,6 +8,7 @@ import Sidebar from "../../../../Components/Common/Sidebar";
 import BookIssue from "./BookIssue";
 import AddBook from "../SubClass/component/AddBook";
 import TabButton from "../Subclasss/component/TabButton";
+import { baseUrl } from "../../../../config/Common";
 
 const Library = () => {
   const [filters, setFilters] = useState({ class: "", category: "" });
@@ -20,7 +21,7 @@ const Library = () => {
   useEffect(() => {
     const fetchBooks = async () => {
       try {
-        const response = await axios.get("http://localhost:8080/admin/all/book", {
+        const response = await axios.get(`${baseUrl}/admin/all/book`, {
           headers: {
             Authentication: `${token}`,
           },

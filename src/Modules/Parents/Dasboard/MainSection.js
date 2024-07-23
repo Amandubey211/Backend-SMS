@@ -9,10 +9,11 @@ import { RiBookOpenLine } from "react-icons/ri";
 import { CiMoneyBill } from "react-icons/ci";
 import { RiMoneyDollarBoxFill } from "react-icons/ri";
 import { RiCalendarCheckLine } from "react-icons/ri";
+import { baseUrl } from '../../../config/Common.js';
 const fetchDashboardData = async () => {
   try {
     const token = localStorage.getItem('parent:token');
-    const response = await axios.get(`${process.env.REACT_APP_API_URL}/parent/api/dashboard/sections`, {
+    const response = await axios.get(`${baseUrl}/parent/api/dashboard/sections`, {
       headers: {
         Authentication: `${token}`
       }

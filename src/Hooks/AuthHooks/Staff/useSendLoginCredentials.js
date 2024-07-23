@@ -1,8 +1,9 @@
 import axios from "axios";
 import { useState } from "react";
 import toast from "react-hot-toast";
+import { baseUrl } from "../../../config/Common";
 
-const API_URL = process.env.REACT_APP_API_URL;
+
 
 const useSendLoginCredentials = () => {
   const [loading, setLoading] = useState(false);
@@ -15,7 +16,7 @@ const useSendLoginCredentials = () => {
         process.env.REACT_APP_ADMIN_TOKEN_STORAGE_KEY
       );
       const { data } = await axios.post(
-        `${API_URL}/admin/send_login_credential`,
+        `${baseUrl}/admin/send_login_credential`,
         mailConfiguration,
         { headers: { Authentication: token } }
       );

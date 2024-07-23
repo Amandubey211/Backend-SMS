@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { baseUrl } from '../../../../config/Common';
 
 const StudentCard = ({ student, index }) => {
   const defaultImage = "https://via.placeholder.com/150"; // Placeholder image URL
@@ -49,7 +50,7 @@ const StudentParentCard = () => {
           throw new Error("No guardian email found");
         }
 
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/parent/api/children?email=${encodeURIComponent(email)}`, {
+        const response = await fetch(`${baseUrl}/parent/api/children?email=${encodeURIComponent(email)}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',

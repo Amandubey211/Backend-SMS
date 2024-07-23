@@ -4,12 +4,13 @@ import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import useFetchTeachersByClass from "./useFetchTeachersByClass";
+import { baseUrl } from "../../../../../config/Common";
 
 const useAssignTeacher = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const role = useSelector((store) => store.Auth.role);
-  const API_URL = process.env.REACT_APP_API_URL;
+  
 const {cid} = useParams()
 const {fetchTeachersByClass} = useFetchTeachersByClass()
   const assignTeacher = async (assignData) => {
@@ -19,7 +20,7 @@ const {fetchTeachersByClass} = useFetchTeachersByClass()
       const token = localStorage.getItem(`${role}:token`);
 
       const response = await axios.post(
-        `${API_URL}/admin/teacher`,
+        `${baseUrl}/admin/teacher`,
         assignData,
         {
           headers: { Authentication: token },

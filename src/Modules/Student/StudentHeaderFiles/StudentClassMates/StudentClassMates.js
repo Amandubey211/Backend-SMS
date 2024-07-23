@@ -4,6 +4,7 @@ import DashLayout from "../../../../Components/Student/StudentDashLayout";
 import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import ProfileCard from "./ProfileCard";
+import { baseUrl } from "../../../../config/Common";
 
 const StudentClassMates = () => {
   const { selectedClass, selectedSection, selectedSubject } = useSelector((state) => state.Common);
@@ -28,7 +29,7 @@ const StudentClassMates = () => {
         }
 
         const response = await fetch(
-          `http://localhost:8080/student/my_classmates/${selectedClass}`,
+          `${baseUrl}/student/my_classmates/${selectedClass}`,
           {
             headers: {
               Authentication: token,
@@ -69,7 +70,7 @@ const StudentClassMates = () => {
             <h2 className="text-xl font-semibold">My Classmates </h2>
             <div className="flex justify-center items-center bg-gradient-to-br from-pink-100 via-purple-100 to-blue-100 rounded-full w-[25px] h-[25px] border border-gray-300">
 
-            <p className="text-lg font-semibold text-purple-500">{classmates.length || 0}</p>
+              <p className="text-lg font-semibold text-purple-500">{classmates.length || 0}</p>
             </div>
           </div>
           <div className="flex flex-wrap -mx-2">
