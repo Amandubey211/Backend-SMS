@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Calendar, Badge } from "antd";
+import { Calendar } from "antd";
 import Layout from "../../../Components/Common/Layout";
 import StudentDashLayout from "../../../Components/Student/StudentDashLayout";
 import EventCard from "./Events/subComponents/EventCard";
@@ -74,11 +74,13 @@ const StudentEvent = () => {
     ];
 
     return (
-      <ul className="events space-y-1 ">
+      <ul className="events space-y-1">
         {dayEvents.map((event, index) => (
           <li
             key={event.id}
-            className={`inline-block px-2 py-1 rounded text-white ${bgColors[index % bgColors.length]} shadow-md`}
+            className={`inline-block px-2 py-1 rounded text-white ${
+              bgColors[index % bgColors.length]
+            } shadow-md`}
           >
             {event.title}
           </li>
@@ -87,8 +89,9 @@ const StudentEvent = () => {
     );
   };
 
-  const handleAppointmentClick = (appointmentData) => {
-    setSelectedEvent(appointmentData);
+  const handleEventClick = (event) => {
+    console.log("Event clicked:", event); // Debugging log
+    setSelectedEvent(event);
     setSidebarContent("viewEvent");
     setSidebarOpen(true);
   };
@@ -109,11 +112,11 @@ const StudentEvent = () => {
           <div className="min-h-screen p-4 bg-gray-50">
             <div className="my-4 w-full h-40 flex justify-around rounded-sm gap-4">
               {events.map((event) => (
-                <EventCard key={event.id} event={event} />
+                <EventCard key={event.id} event={event} onClick={handleEventClick} />
               ))}
             </div>
-            <hr className="my-6 border-t-2 mt-12 " />
-            <div className="py-7 ">
+            <hr className="my-6 border-t-2 mt-12" />
+            <div className="py-7">
               <Calendar
                 dateCellRender={handleDateCellRender}
                 headerRender={({ value, type, onChange, onTypeChange }) => {
@@ -123,7 +126,7 @@ const StudentEvent = () => {
 
                   const localeData = value.localeData();
                   const months = localeData.monthsShort();
-                  console.log(months);
+                 
 
                   for (let index = start; index < end; index++) {
                     monthOptions.push(
