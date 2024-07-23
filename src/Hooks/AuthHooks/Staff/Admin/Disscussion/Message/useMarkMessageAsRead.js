@@ -2,11 +2,12 @@ import { useState, useCallback } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
+import { baseUrl } from "../../../../../../config/Common";
 
 const useMarkMessageAsRead = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const API_URL = process.env.REACT_APP_API_URL;
+  
   const { role } = useSelector((store) => store.Auth);
 
   const markMessageAsRead = useCallback(async (messageId) => {
@@ -16,7 +17,7 @@ const useMarkMessageAsRead = () => {
     try {
       const token = localStorage.getItem(`${role}:token`);
       const response = await axios.put(
-        `${API_URL}/admin/markAsReadDiscussions/replies/${messageId}`,
+        `${baseUrl}/admin/markAsReadDiscussions/replies/${messageId}`,
         {},
         {
           headers: { Authentication: token },
@@ -37,7 +38,7 @@ const useMarkMessageAsRead = () => {
     } finally {
       setLoading(false);
     }
-  }, [API_URL, role]);
+  }, [baseUrl, role]);
 
   return { loading, error, markMessageAsRead };
 };

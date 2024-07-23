@@ -4,6 +4,7 @@ import CalendarHeader from './Calender';
 import StudentDashLayout from '../../../Components/Student/StudentDashLayout';
 import axios from 'axios';
 import moment from 'moment';
+import { baseUrl } from '../../../config/Common';
 
 
 const AttendanceMain = () => {
@@ -19,7 +20,7 @@ const AttendanceMain = () => {
                 throw new Error('Authentication not found');
             }
 
-            const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/studentDashboard/myAttendance`, {
+            const response = await axios.get(`${baseUrl}/api/studentDashboard/myAttendance`, {
                 params: { month, year },
                 headers: {
                     'Authentication': token

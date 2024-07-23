@@ -1,10 +1,10 @@
 import axios from 'axios';
+import { baseUrl } from '../../../config/Common';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080';
 
 export const forgotPassword = async (email) => {
   try {
-    return await axios.post(`${API_URL}/api/password/forgot-password`, { email });
+    return await axios.post(`${baseUrl}/api/password/forgot-password`, { email });
   } catch (error) {
     console.error('Error in forgot password:', error);
     throw error.response.data;
@@ -13,7 +13,7 @@ export const forgotPassword = async (email) => {
 
 export const resetPassword = async ({ email, newPassword, confirmPassword, token }) => {
   try {
-    return await axios.post(`${API_URL}/api/password/reset-password`, {
+    return await axios.post(`${baseUrl}/api/password/reset-password`, {
       email,
       newPassword,
       confirmPassword,

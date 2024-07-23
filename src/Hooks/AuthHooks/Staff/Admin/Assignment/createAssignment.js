@@ -2,6 +2,7 @@ import { useState, useCallback } from "react";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
+import { baseUrl } from "../../../../../config/Common";
 
 const useCreateAssignment = () => {
   const [loading, setLoading] = useState(false);
@@ -48,11 +49,11 @@ const useCreateAssignment = () => {
       setError(null);
 
       try {
-        const API_URL = process.env.REACT_APP_API_URL;
+        
         const token = localStorage.getItem(`${role}:token`);
 
         const response = await axios.post(
-          `${API_URL}/admin/create_assignment`, // Adjust the API endpoint as needed
+          `${baseUrl}/admin/create_assignment`, // Adjust the API endpoint as needed
           assignmentData,
           {
             headers: {       Authentication: token, },

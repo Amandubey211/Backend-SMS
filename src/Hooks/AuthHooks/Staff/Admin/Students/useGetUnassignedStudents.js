@@ -2,13 +2,13 @@ import { useState, useCallback } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
+import { baseUrl } from "../../../../../config/Common";
 
 const useGetUnassignedStudents = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const role = useSelector((store) => store.Auth.role);
-  const API_URL = process.env.REACT_APP_API_URL;
-
+  
   const fetchUnassignedStudents = useCallback(
     async (classId) => {
       setLoading(true);
@@ -16,7 +16,7 @@ const useGetUnassignedStudents = () => {
       try {
         const token = localStorage.getItem(`${role}:token`);
         const response = await axios.get(
-          `${API_URL}/admin/unassignedStudent/${classId}`,
+          `${baseUrl}/admin/unassignedStudent/${classId}`,
           {
             headers: {
               Authentication: token,
@@ -41,7 +41,7 @@ const useGetUnassignedStudents = () => {
         setLoading(false);
       }
     },
-    [API_URL, role]
+    [baseUrl, role]
   );
 
   return { loading, error, fetchUnassignedStudents };

@@ -2,12 +2,13 @@ import { useState, useCallback } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
+import { baseUrl } from "../../../../../config/Common";
 
 const useMarkAsReadDiscussion = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const { role } = useSelector((store) => store.Auth);
-  const API_URL = process.env.REACT_APP_API_URL;
+  
 
   const markAsReadDiscussion = useCallback(
     async (discussionId) => {
@@ -17,7 +18,7 @@ const useMarkAsReadDiscussion = () => {
       try {
         const token = localStorage.getItem(`${role}:token`);
         const response = await axios.put(
-          `${API_URL}/admin/discussion/readstatus/${discussionId}`,
+          `${baseUrl}/admin/discussion/readstatus/${discussionId}`,
           {},
           {
             headers: { Authentication: token },
@@ -39,7 +40,7 @@ const useMarkAsReadDiscussion = () => {
         setLoading(false);
       }
     },
-    [role, API_URL]
+    [role, baseUrl]
   );
 
   return { loading, error, markAsReadDiscussion };

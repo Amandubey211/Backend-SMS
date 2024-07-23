@@ -3,13 +3,14 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
+import { baseUrl } from "../../../../../../config/Common";
 
 const useFetchCommentsByDiscussion = () => {
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const { did: discussionId } = useParams();
-  const API_URL = process.env.REACT_APP_API_URL;
+  
   const { role } = useSelector((store) => store.Auth);
 
   const fetchComments = useCallback(async () => {
@@ -19,7 +20,7 @@ const useFetchCommentsByDiscussion = () => {
     try {
       const token = localStorage.getItem(`${role}:token`);
       const response = await axios.get(
-        `${API_URL}/admin/getDiscussionComment/${discussionId}`,
+        `${baseUrl}/admin/getDiscussionComment/${discussionId}`,
         {
           headers: { Authentication: token },
         }
@@ -40,7 +41,7 @@ console.log(response.data)
     } finally {
       setLoading(false);
     }
-  }, [API_URL, discussionId, role]);
+  }, [baseUrl, discussionId, role]);
 
   useEffect(() => {
     fetchComments();

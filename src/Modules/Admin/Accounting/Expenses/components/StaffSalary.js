@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useMemo } from "react";
 import Sidebar from "../../../../../Components/Common/Sidebar";
 import PaySalary from "./PaySalary";
-import { fetchApi } from '../api/api'; 
+import { fetchApi } from '../api/api';
+import { baseUrl } from "../../../../../config/Common";
 
 // Memoized row component
 const SalaryRow = React.memo(({ teacher, onPayClick }) => (
@@ -13,9 +14,8 @@ const SalaryRow = React.memo(({ teacher, onPayClick }) => (
     <td className="px-5 py-2 border-b border-gray-200">{teacher.paidDate ? new Date(teacher.paidDate).toLocaleDateString() : "Not Paid"}</td>
     <td className="px-5 py-2 border-b border-gray-200">
       <span
-        className={`px-3 py-1 text-xs font-semibold rounded-full ${
-          teacher.status === "Paid" ? "bg-green-200 text-green-800" : "bg-red-200 text-red-800"
-        }`}
+        className={`px-3 py-1 text-xs font-semibold rounded-full ${teacher.status === "Paid" ? "bg-green-200 text-green-800" : "bg-red-200 text-red-800"
+          }`}
       >
         {teacher.status}
       </span>
@@ -43,7 +43,7 @@ const StaffSalary = ({ selectedMonth }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [recordsPerPage] = useState(10); // Adjust the number per page as needed
   const [isSidebarOpen, setSidebarOpen] = useState(false);
-  const token = localStorage.getItem('admin:token'); 
+  const token = localStorage.getItem('admin:token');
 
   useEffect(() => {
     loadSalaries();
@@ -51,7 +51,7 @@ const StaffSalary = ({ selectedMonth }) => {
 
   const loadSalaries = async () => {
     try {
-      const response = await fetchApi("http://localhost:8080/admin/staff/get_salary?salaryRole=all", "GET", null, token);
+      const response = await fetchApi(`${baseUrl}/admin/staff/get_salary?salaryRole=all`, "GET", null, token);
       if (response && response.success && Array.isArray(response.salaryRecords)) {
         setTeachersData(response.salaryRecords);
       } else {
@@ -75,8 +75,8 @@ const StaffSalary = ({ selectedMonth }) => {
 
   const handleCreateSalary = async (salaryDetails) => {
     try {
-      await fetchApi("http://localhost:8080/staff/create_salary?salaryRole=all", "POST", salaryDetails, token);
-      loadSalaries(); 
+      await fetchApi(`${baseUrl}/staff/create_salary?salaryRole=all`, "POST", salaryDetails, token);
+      loadSalaries();
       handleSidebarClose();
     } catch (error) {
       console.error("Failed to create salary:", error);
@@ -85,7 +85,7 @@ const StaffSalary = ({ selectedMonth }) => {
 
   const handleUpdateSalary = async (salaryDetails) => {
     try {
-      await fetchApi("http://localhost:8080/staff/update_salary?salaryRole=all", "PUT", salaryDetails, token);
+      await fetchApi(`${baseUrl}/staff/update_salary?salaryRole=all`, "PUT", salaryDetails, token);
       loadSalaries();
       handleSidebarClose();
     } catch (error) {

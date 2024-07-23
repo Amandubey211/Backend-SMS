@@ -4,6 +4,7 @@ import Sidebar from "../../../../Components/Common/Sidebar";
 import Layout from "../../../../Components/Common/Layout";
 import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 import axios from "axios";
+import { baseUrl } from "../../../../config/Common";
 
 
 const uniqueFilterOptions = (data, key) => {
@@ -36,7 +37,7 @@ const AccountingSection = () => {
           return;
         }
 
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/parent/api/fees`, {
+        const response = await axios.get(`${baseUrl}/parent/api/fees`, {
           headers: {
             Authentication: `${token}`,
           },

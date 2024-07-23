@@ -2,8 +2,9 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { baseUrl } from "../../../config/Common";
 
-const API_URL = process.env.REACT_APP_API_URL;
+
 
 const useSaveDocument = () => {
   const [docloading, setDocloading] = useState(false);
@@ -31,7 +32,7 @@ const useSaveDocument = () => {
       });
 
       const response = await axios.post(
-        `${API_URL}/student/upload_documents`,
+        `${baseUrl}/student/upload_documents`,
         formData,
         {
           headers: {

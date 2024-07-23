@@ -3,12 +3,13 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
 import FormData from "form-data";
+import { baseUrl } from "../../../../../config/Common";
 
 const useCreateSyllabus = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const API_URL = process.env.REACT_APP_API_URL;
+  
   const { role } = useSelector((store) => store.Auth);
 
   const createSyllabus = useCallback(
@@ -25,7 +26,7 @@ const useCreateSyllabus = () => {
         }
 
         const response = await axios.post(
-          `${API_URL}/admin/syllabus`,
+          `${baseUrl}/admin/syllabus`,
           formData,
           {
             headers: {
@@ -50,7 +51,7 @@ const useCreateSyllabus = () => {
         setLoading(false);
       }
     },
-    [role, API_URL]
+    [role, baseUrl]
   );
 
   return { loading, error, createSyllabus };

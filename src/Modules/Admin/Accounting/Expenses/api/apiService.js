@@ -1,7 +1,8 @@
 import axios from 'axios';
+import { baseUrl } from '../../../../../config/Common';
 
 const api = axios.create({
-  baseURL: 'http://localhost:8080/api/admin/expenses',
+  baseURL: baseUrl,
   headers: {
     Authentication: `${localStorage.getItem('admin:token')}`
   }

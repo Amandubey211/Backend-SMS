@@ -2,6 +2,7 @@ import { useState, useCallback } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
+import { baseUrl } from "../../../../../config/Common";
 
 const useAddQuestion = () => {
   const [loading, setLoading] = useState(false);
@@ -40,11 +41,11 @@ const useAddQuestion = () => {
       setError(null);
 
       try {
-        const API_URL = process.env.REACT_APP_API_URL;
+        
         const token = localStorage.getItem(`${role}:token`);
 
         const response = await axios.put(
-          `${API_URL}/admin/add_question/quiz/${quizId}`, // Adjust the API endpoint as needed
+          `${baseUrl}/admin/add_question/quiz/${quizId}`, // Adjust the API endpoint as needed
           {
             questionText,
             questionPoint,

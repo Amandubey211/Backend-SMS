@@ -2,12 +2,13 @@ import { useState, useCallback, useEffect } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
+import { baseUrl } from "../../../../../../config/Common";
 
 const useEditReply = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [isEdited, setIsEdited] = useState(false);
-  const API_URL = process.env.REACT_APP_API_URL;
+  
   const { role } = useSelector((store) => store.Auth);
 
   const editReply = useCallback(async (replyId, content) => {
@@ -17,7 +18,7 @@ const useEditReply = () => {
     try {
       const token = localStorage.getItem(`${role}:token`);
       const response = await axios.put(
-        `${API_URL}/admin/editCommentDiscussion/${replyId}`,
+        `${baseUrl}/admin/editCommentDiscussion/${replyId}`,
         { content },
         {
           headers: { Authentication: token },
@@ -39,7 +40,7 @@ const useEditReply = () => {
     } finally {
       setLoading(false);
     }
-  }, [API_URL, role]);
+  }, [baseUrl, role]);
 
   useEffect(() => {
     return () => {

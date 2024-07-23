@@ -12,6 +12,7 @@ import AssignmentSection from "./AssignmentComponents/AssignmentSection";
 import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { Toaster, toast } from "react-hot-toast";
+import { baseUrl } from "../../../../../../config/Common";
 
 const MainSection = () => {
   const { selectedClass, selectedSection, selectedSubject, studentId } = useSelector(
@@ -37,7 +38,7 @@ const MainSection = () => {
         }
 
         const response = await fetch(
-          `http://localhost:8080/student/studentAssignment/${aid}`,
+          `${baseUrl}/student/studentAssignment/${aid}`,
           {
             headers: {
               Authentication: token,
@@ -81,7 +82,7 @@ const MainSection = () => {
       }
 
       const response = await fetch(
-        `http://localhost:8080/student/studentAssignment/reattempt/${aid}`,
+        `${baseUrl}/student/studentAssignment/reattempt/${aid}`,
         {
           method: "PUT",
           headers: {

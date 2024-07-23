@@ -6,6 +6,7 @@ import BookIssueRow from "../SubClass/component/BookIssueRow";
 import { bookIssueData } from "../../studentDummyData/studentDummyData";
 import FormField from "../../../Admin/Accounting/subClass/component/FormField";
 import axios from "axios";
+import { baseUrl } from "../../../../config/Common";
 
 const BookIssue = () => {
   const [bookIssueData, setBookIssueData] = useState([]);
@@ -34,7 +35,7 @@ const BookIssue = () => {
         throw new Error('Authentication token not found');
       }
 
-      const response = await axios.get(`${process.env.REACT_APP_API_URL}/student/issue/books`, {
+      const response = await axios.get(`${baseUrl}/student/issue/books`, {
         headers: {
           'Authentication': token
         }

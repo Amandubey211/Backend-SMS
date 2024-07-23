@@ -9,6 +9,7 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import SubjectSideBar from "../../../Component/SubjectSideBar";
 import AnnouncementViewHeader from "./Components/AnnouncementHeader";
+import { baseUrl } from "../../../../../../../config/Common";
 
 const MainSection = () => {
   const { aid } = useParams();
@@ -22,7 +23,7 @@ const MainSection = () => {
           throw new Error("Authentication token not found");
         }
 
-        const response = await fetch(`http://localhost:8080/admin/announcement/${aid}`, {
+        const response = await fetch(`${baseUrl}/admin/announcement/${aid}`, {
           headers: {
             Authentication: token
           }

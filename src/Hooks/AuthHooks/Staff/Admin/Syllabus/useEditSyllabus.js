@@ -4,13 +4,14 @@ import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
 import FormData from "form-data";
 import { useParams } from "react-router-dom";
+import { baseUrl } from "../../../../../config/Common";
 
 const useEditSyllabus = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const { cid } = useParams();
 
-  const API_URL = process.env.REACT_APP_API_URL;
+  
   const { role } = useSelector((store) => store.Auth);
 
   const editSyllabus = useCallback(
@@ -26,7 +27,7 @@ const useEditSyllabus = () => {
           formData.append(key, data[key]);
         }
         const response = await axios.put(
-          `${API_URL}/admin/syllabus/${syllabusId}/class/${cid}`,
+          `${baseUrl}/admin/syllabus/${syllabusId}/class/${cid}`,
           formData,
           {
             headers: {
@@ -51,7 +52,7 @@ const useEditSyllabus = () => {
         setLoading(false);
       }
     },
-    [role, API_URL, cid]
+    [role, baseUrl, cid]
   );
 
   return { loading, error, editSyllabus };

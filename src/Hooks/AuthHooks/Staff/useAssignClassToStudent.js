@@ -1,8 +1,9 @@
 import axios from "axios";
 import { useState } from "react";
 import toast from "react-hot-toast";
+import { baseUrl } from "../../../config/Common";
 
-const API_URL = process.env.REACT_APP_API_URL;
+
 
 const useAssignClassToStudent = () => {
   const [loading, setLoading] = useState(false);
@@ -36,7 +37,7 @@ const useAssignClassToStudent = () => {
         process.env.REACT_APP_ADMIN_TOKEN_STORAGE_KEY
       );
       const { data } = await axios.put(
-        `${API_URL}/admin/assign_class`,
+        `${baseUrl}/admin/assign_class`,
         assignedDetails,
         { headers: { Authentication: token } } // Changed 'Authentication' to 'Authentication'
       );

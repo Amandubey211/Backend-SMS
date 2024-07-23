@@ -3,13 +3,14 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
+import { baseUrl } from "../../../../../config/Common";
 
 const useCreateDiscussion = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
 
-  const API_URL = process.env.REACT_APP_API_URL;
+  
   const { role } = useSelector((store) => store.Auth);
   const { cid } = useParams();
 
@@ -28,7 +29,7 @@ const useCreateDiscussion = () => {
         }
 
         const response = await axios.post(
-          `${API_URL}/admin/createDiscussion/class/${cid}`,
+          `${baseUrl}/admin/createDiscussion/class/${cid}`,
           formData,
           {
             headers: {
@@ -54,7 +55,7 @@ const useCreateDiscussion = () => {
         setLoading(false);
       }
     },
-    [role, API_URL, cid]
+    [role, baseUrl, cid]
   );
 
   return { loading, error, success, createDiscussion };

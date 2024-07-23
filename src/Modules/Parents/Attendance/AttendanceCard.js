@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Card, Select } from 'antd';
 import { CheckCircleOutlined, CloseCircleOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import axios from 'axios';
+import { baseUrl } from '../../../config/Common';
 
 const { Option } = Select;
 
@@ -31,7 +32,7 @@ const AttendanceCard = ({ initialMonth, initialYear }) => {
       }
 
       try {
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/parent/api/attendance`, {
+        const response = await axios.get(`${baseUrl}/parent/api/attendance`, {
           headers: {
             Authentication: `${token}`
           },

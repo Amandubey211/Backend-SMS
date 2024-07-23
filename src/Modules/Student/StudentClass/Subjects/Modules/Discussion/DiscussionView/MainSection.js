@@ -53,7 +53,7 @@
 //         }
 
 //         const response = await fetch(
-//           `http://localhost:8080/admin/getDiscussionById/${did}`,
+//           `${baseUrl}/admin/getDiscussionById/${did}`,
 //           {
 //             headers: {
 //               Authentication: token,
@@ -124,6 +124,7 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import Header from "./Components/Header";
 import SubjectSideBar from "../../../Component/SubjectSideBar";
+import { baseUrl } from "../../../../../../../config/Common";
 
 const MainSection = () => {
   const { did } = useParams();
@@ -139,7 +140,7 @@ const MainSection = () => {
         }
 
         const response = await fetch(
-          `http://localhost:8080/admin/getDiscussionById/${did}`,
+          `${baseUrl}/admin/getDiscussionById/${did}`,
           {
             headers: {
               Authentication: token,

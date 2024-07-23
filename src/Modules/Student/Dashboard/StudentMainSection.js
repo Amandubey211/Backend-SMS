@@ -21,6 +21,7 @@ import StudentRecentGradeTable from "./DashBoardComponents/StudentRecentGradeTab
 import StudentDashFeeCard from "./DashBoardComponents/StudentDashFeeCard.js";
 import AttendanceDashboard from "./DashBoardComponents/Charts/AttendanceDashboard.js";
 import axios from "axios";
+import { baseUrl } from "../../../config/Common.js";
 const StudentMainSection = () => {
   const [cardData, setCardData] = useState([]);
   const [subjects, setSubjects] = useState([]);
@@ -30,7 +31,7 @@ const StudentMainSection = () => {
   const fetchDashboardDetails = async () => {
     const token = localStorage.getItem('student:token')
     try {
-      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/studentDashboard/dashboard/student`,
+      const response = await axios.get(`${baseUrl}/api/studentDashboard/dashboard/student`,
         {
           headers: {
             Authentication: token

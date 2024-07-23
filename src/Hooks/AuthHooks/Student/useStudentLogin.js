@@ -5,8 +5,9 @@ import { setAuth, setRole } from "../../../Redux/Slices/AuthSlice";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { setStudentId } from "../../../Redux/Slices/Common/CommonSlice";
+import { baseUrl } from "../../../config/Common";
 
-const API_URL = process.env.REACT_APP_API_URL; // Ensure this is correctly set in your .env file
+ // Ensure this is correctly set in your .env file
 const TOKEN_STORAGE_KEY = process.env.REACT_APP_STUDENT_TOKEN_STORAGE_KEY; // Ensure this is correctly set in your .env file
 
 const useStudentLogin = () => {
@@ -27,8 +28,8 @@ const useStudentLogin = () => {
 
     try {
       const { data } = await axios.post(
-        // ${API_URL}/auth/student/student_login,
-        'http://localhost:8080/auth/student/login',
+        // ${baseUrl}/auth/student/student_login,
+        `${baseUrl}/auth/student/login`,
         studentDetails
       );
       console.log("Login response:", data);
@@ -36,9 +37,9 @@ const useStudentLogin = () => {
       if (data.success) {
         // localStorage.setItem(TOKEN_STORAGE_KEY, Bearer ${data.token});
         localStorage.setItem(TOKEN_STORAGE_KEY, `Bearer ${data.token}`);
-        localStorage.setItem("classId",`${data.classId}`)
+        localStorage.setItem("classId", `${data.classId}`)
         console.log("Token stored in localStorage", data.token);
-      
+
         dispatch(setAuth(true));
         dispatch(setStudentId(data.userId));
         dispatch(setRole("student"));

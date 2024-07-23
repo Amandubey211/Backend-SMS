@@ -3,8 +3,9 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import useAssignClassToStudent from "./useAssignClassToStudent";
 import useSendLoginCredentials from "./useSendLoginCredentials";
+import { baseUrl } from "../../../config/Common";
 
-const API_URL = process.env.REACT_APP_API_URL;
+
 // const TOKEN_STORAGE_KEY = process.env.REACT_APP_STUDENT_TOKEN_STORAGE_KEY;
 
 const useVerifyStudentDocument = () => {
@@ -49,7 +50,7 @@ const useVerifyStudentDocument = () => {
       );
       console.log(token);
       const { data } = await axios.put(
-        `${API_URL}/admin/verify_student_info`,
+        `${baseUrl}/admin/verify_student_info`,
         verificationDetails,
         { headers: { Authentication: token } }
       );

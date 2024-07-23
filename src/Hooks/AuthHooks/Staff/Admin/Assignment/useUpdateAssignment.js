@@ -2,6 +2,7 @@ import { useState, useCallback } from "react";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
+import { baseUrl } from "../../../../../config/Common";
 
 const useUpdateAssignment = () => {
   const [loading, setLoading] = useState(false);
@@ -53,7 +54,7 @@ const useUpdateAssignment = () => {
       setError(null);
 
       try {
-        const API_URL = process.env.REACT_APP_API_URL;
+        
         const token = localStorage.getItem(`${role}:token`);
 
         const formData = new FormData();
@@ -78,7 +79,7 @@ const useUpdateAssignment = () => {
         }
 
         const response = await axios.put(
-          `${API_URL}/admin/update_assignment/${assignmentId}`,
+          `${baseUrl}/admin/update_assignment/${assignmentId}`,
           formData,
           {
             headers: {

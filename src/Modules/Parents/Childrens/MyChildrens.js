@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import ChildCard from "../../../Components/Parents/Children/ChildCard";
+import { baseUrl } from "../../../config/Common";
 
 const MyChildren = () => {
   const [students, setStudents] = useState([]);
@@ -26,7 +27,7 @@ const MyChildren = () => {
           throw new Error("No guardian email found");
         }
 
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/parent/api/children?email=${encodeURIComponent(email)}`, {
+        const response = await fetch(`${baseUrl}/parent/api/children?email=${encodeURIComponent(email)}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',

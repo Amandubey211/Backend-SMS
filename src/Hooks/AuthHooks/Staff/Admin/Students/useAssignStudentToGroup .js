@@ -3,12 +3,13 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
+import { baseUrl } from "../../../../../config/Common";
 
 const useAssignStudentToGroup = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const role = useSelector((store) => store.Auth.role);
-  const API_URL = process.env.REACT_APP_API_URL;
+
   const { cid } = useParams(); // Assuming 'cid' is the class ID needed for some operations
 
   const assignStudentToGroup = async (studentId, groupId) => {
@@ -18,7 +19,7 @@ const useAssignStudentToGroup = () => {
       const token = localStorage.getItem(`${role}:token`);
 
       const response = await axios.post(
-        `${API_URL}/admin/assignStudentToGroup`,
+        `${baseUrl}/admin/assignStudentToGroup`,
         { studentId, groupId },
         {
           headers: { Authentication: token },

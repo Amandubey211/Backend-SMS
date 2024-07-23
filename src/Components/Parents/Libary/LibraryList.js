@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Table, message } from 'antd';
 import axios from 'axios';
 import { format } from 'date-fns';
+import { baseUrl } from '../../../config/Common';
 
 const LibraryTable = () => {
   const [data, setData] = useState([]);
@@ -15,7 +16,7 @@ const LibraryTable = () => {
       setError(null);
       const token = localStorage.getItem('parent:token');
       try {
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/parent/all/bookIssue`, {
+        const response = await axios.get(`${baseUrl}/parent/all/bookIssue`, {
           headers: {
             Authentication: `${token}`
           }

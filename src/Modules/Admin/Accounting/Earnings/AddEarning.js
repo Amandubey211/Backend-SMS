@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import FormInput from '../subClass/component/FormInput';
 import axios from 'axios';  // Importing Axios
+import { baseUrl } from '../../../../config/Common';
 
 const AddEarning = ({ fetchEarning }) => {
   const [formData, setFormData] = useState({
@@ -37,7 +38,7 @@ const AddEarning = ({ fetchEarning }) => {
 
     try {
 
-      const response = await axios.post('http://localhost:8080/admin/addEarning', payload, config);
+      const response = await axios.post(`${baseUrl}/admin/addEarning`, payload, config);
       console.log('Earning saved successfully:', response.data);
       setFormData({
         paymentDate: '',

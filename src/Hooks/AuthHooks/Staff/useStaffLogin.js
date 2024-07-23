@@ -9,6 +9,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import {requestPermissionAndGetToken} from '../../NotificationHooks/NotificationHooks.js';
 import axios from "axios";
+import { baseUrl } from "../../../config/Common.js";
 
 const useStaffLogin = () => {
   const [loading, setLoading] = useState(false);
@@ -47,7 +48,7 @@ const useStaffLogin = () => {
       const deviceToken = await requestPermissionAndGetToken();
       const userdetail = {email,password,deviceToken}
       const { data } = await axios.post(
-        `${process.env.REACT_APP_API_URL}/auth/staff/login`,
+        `${baseUrl}/auth/staff/login`,
         userdetail
       );
 

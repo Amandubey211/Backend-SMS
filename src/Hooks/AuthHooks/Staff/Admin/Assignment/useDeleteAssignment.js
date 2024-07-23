@@ -2,6 +2,7 @@ import { useState, useCallback } from "react";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
+import { baseUrl } from "../../../../../config/Common";
 
 const useDeleteAssignment = () => {
   const [loading, setLoading] = useState(false);
@@ -14,11 +15,11 @@ const useDeleteAssignment = () => {
       setError(null);
 
       try {
-        const API_URL = process.env.REACT_APP_API_URL;
+        
         const token = localStorage.getItem(`${role}:token`);
 
         const response = await axios.delete(
-          `${API_URL}/admin/delete_assignment/${assignmentId}`,
+          `${baseUrl}/admin/delete_assignment/${assignmentId}`,
           {
             headers: { Authentication: token },
           }

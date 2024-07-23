@@ -2,6 +2,7 @@ import { useState, useCallback } from "react";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
+import { baseUrl } from "../../../../../config/Common";
 
 const useEditUser = () => {
   const [loading, setLoading] = useState(false);
@@ -34,7 +35,7 @@ const useEditUser = () => {
        setError(null);
  
        try {
-         const API_URL = process.env.REACT_APP_API_URL;
+         
          const token = localStorage.getItem(`${adminRole}:token`);
          const formData = new FormData();
          Object.keys(userData).forEach(key => {
@@ -45,7 +46,7 @@ const useEditUser = () => {
          formData.append('address', JSON.stringify(address));
         console.log(address);
         const response = await axios.put(
-          `${API_URL}/admin/update_staff/${id}`,
+          `${baseUrl}/admin/update_staff/${id}`,
           formData,
           {
             headers: {       

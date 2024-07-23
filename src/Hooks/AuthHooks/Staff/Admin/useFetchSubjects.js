@@ -14,10 +14,10 @@
 //       setError(null);
 
 //       try {
-//         const API_URL = process.env.REACT_APP_API_URL;
+//         
 //         const token = localStorage.getItem(`${role}:token`); // Adjust based on your authentication setup
 //         const response = await axios.get(
-//           `${API_URL}/admin/subject/${classId}`,
+//           `${baseUrl}/admin/subject/${classId}`,
 //           {
 //             headers: { Authentication: token },
 //           }

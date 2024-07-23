@@ -2,6 +2,7 @@ import { useState, useCallback } from "react";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
+import { baseUrl } from "../../../../../config/Common";
 
 const useAddRating = () => {
   const [loading, setLoading] = useState(false);
@@ -12,10 +13,10 @@ const useAddRating = () => {
     setLoading(true);
     setError(null);
     try {
-      const API_URL = process.env.REACT_APP_API_URL;
+     
       const token = localStorage.getItem(`${role}:token`);
       const response = await axios.post(
-        `${API_URL}/admin/rubric/${rubricId}/rating`,
+        `${baseUrl}/admin/rubric/${rubricId}/rating`,
         ratingData,
         {
           headers: { Authentication: token },

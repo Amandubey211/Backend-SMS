@@ -2,13 +2,14 @@ import { useState, useCallback } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
+import { baseUrl } from "../../../../../config/Common";
 
 const useRegisterStudent = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const role = useSelector((store) => store.Auth.role);
-  const API_URL = process.env.REACT_APP_API_URL;
+  
 
   const registerStudent = useCallback(
     async (studentData) => {
@@ -22,7 +23,7 @@ const useRegisterStudent = () => {
         });
 
         const response = await axios.post(
-          `${API_URL}/register-student`,
+          `${baseUrl}/register-student`,
           formData,
           {
             headers: {
@@ -42,7 +43,7 @@ const useRegisterStudent = () => {
         setError(errorMessage);
       }
     },
-    [API_URL, role]
+    [baseUrl, role]
   );
 
   return { loading, error, registerStudent };

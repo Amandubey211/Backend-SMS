@@ -2,6 +2,7 @@ import { useState, useCallback } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
+import { baseUrl } from "../../../../../config/Common";
 
 const useDeleteQuestion = () => {
   const [loading, setLoading] = useState(false);
@@ -19,11 +20,11 @@ const useDeleteQuestion = () => {
       setError(null);
 
       try {
-        const API_URL = process.env.REACT_APP_API_URL;
+        
         const token = localStorage.getItem(`${role}:token`);
 
         const response = await axios.delete(
-          `${API_URL}/admin/quiz/${quizId}/question/${questionId}`,
+          `${baseUrl}/admin/quiz/${quizId}/question/${questionId}`,
           {
             headers: { Authentication: token },
           }

@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { setRole } from "../../../Redux/Slices/AuthSlice";
 import { useDispatch } from "react-redux";
+import { baseUrl } from "../../../config/Common";
 const TOKEN_STORAGE_KEY = process.env.REACT_APP_STUDENT_TOKEN_STORAGE_KEY;
 const useQidVerification = () => {
   const dispatch = useDispatch();
@@ -18,7 +19,7 @@ const useQidVerification = () => {
       const token = localStorage.getItem(TOKEN_STORAGE_KEY);
 
       const { data } = await axios.post(
-        `http://localhost:8080/student/verify_school_id`,
+        `${baseUrl}/student/verify_school_id`,
         studentDetails,
         { headers: { Authentication: token } }
       );

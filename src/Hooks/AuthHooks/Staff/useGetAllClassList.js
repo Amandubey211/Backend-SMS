@@ -3,10 +3,10 @@ import toast from "react-hot-toast";
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { setClassList } from "../../../Redux/Slices/AdminSlice";
+import { baseUrl } from "../../../config/Common";
 
 const useGetAllClassList = () => {
   const [loading, setLoading] = useState(false);
-  const API_URL = process.env.REACT_APP_API_URL;
   const dispatch = useDispatch();
   const getClassList = async () => {
     setLoading(true);
@@ -16,7 +16,7 @@ const useGetAllClassList = () => {
         process.env.REACT_APP_ADMIN_TOKEN_STORAGE_KEY
       );
 
-      const { data } = await axios.get(`${API_URL}/admin/get_class`, {
+      const { data } = await axios.get(`${baseUrl}/admin/get_class`, {
         headers: { Authentication: token },
       });
       if (data?.success) {

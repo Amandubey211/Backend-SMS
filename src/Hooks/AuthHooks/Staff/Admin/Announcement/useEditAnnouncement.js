@@ -3,12 +3,13 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
 import FormData from "form-data";
+import { baseUrl } from "../../../../../config/Common";
 
 const useEditAnnouncement = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const API_URL = process.env.REACT_APP_API_URL;
+  
   const { role } = useSelector((store) => store.Auth);
 
   const editAnnouncement = useCallback(
@@ -29,7 +30,7 @@ const useEditAnnouncement = () => {
         }
 
         const response = await axios.put(
-          `${API_URL}/admin/announcement/${id}`,
+          `${baseUrl}/admin/announcement/${id}`,
           formData,
           {
             headers: {
@@ -55,7 +56,7 @@ const useEditAnnouncement = () => {
         setLoading(false);
       }
     },
-    [role, API_URL]
+    [role, baseUrl]
   );
 
   return { loading, error, editAnnouncement };

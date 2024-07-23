@@ -6,6 +6,7 @@ import React, { useState, useEffect } from "react";
 import AnnouncementHeader from "./AnnouncementHeader";
 import AnnouncementCard from "./AnnouncementCard";
 import { useParams } from "react-router-dom";
+import { baseUrl } from "../../../../../../../config/Common";
 
 const AnnouncementList = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -21,7 +22,7 @@ const AnnouncementList = () => {
           throw new Error("Authentication token not found");
         }
 
-        const response = await fetch(`http://localhost:8080/admin/announcement/class/${cid}`, {
+        const response = await fetch(`${baseUrl}/admin/announcement/class/${cid}`, {
           headers: {
             Authentication: token,
           },

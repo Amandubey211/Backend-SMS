@@ -3,13 +3,14 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { baseUrl } from "../../../../../config/Common";
 
 const useDeleteAnnouncement = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  const API_URL = process.env.REACT_APP_API_URL;
+  
   const { role } = useSelector((store) => store.Auth);
 
   const deleteAnnouncement = useCallback(
@@ -20,7 +21,7 @@ const useDeleteAnnouncement = () => {
       try {
         const token = localStorage.getItem(`${role}:token`);
         const response = await axios.delete(
-          `${API_URL}/admin/announcement/${id}`,
+          `${baseUrl}/admin/announcement/${id}`,
           {
             headers: {
               Authentication: token,
@@ -44,7 +45,7 @@ const useDeleteAnnouncement = () => {
         setLoading(false);
       }
     },
-    [role, API_URL, navigate]
+    [role, baseUrl, navigate]
   );
 
   return { loading, error, deleteAnnouncement };

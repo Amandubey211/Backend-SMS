@@ -2,6 +2,7 @@ import { useState, useCallback, useRef } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
+import { baseUrl } from "../../../../../config/Common";
 
 const useGetAttendanceByClassSectionGroupAndDate = () => {
   const [loading, setLoading] = useState(false);
@@ -10,7 +11,7 @@ const useGetAttendanceByClassSectionGroupAndDate = () => {
   const cache = useRef({});
 
   const role = useSelector((store) => store.Auth.role);
-  const API_URL = process.env.REACT_APP_API_URL;
+  
 
   const fetchAttendance = useCallback(
     async (classId, sectionId, groupId, month, year) => {
@@ -20,7 +21,7 @@ const useGetAttendanceByClassSectionGroupAndDate = () => {
       try {
         const token = localStorage.getItem(`${role}:token`);
         const response = await axios.get(
-          `${API_URL}/api/teacher/attendance/get`,
+          `${baseUrl}/api/teacher/attendance/get`,
           {
             headers: { Authentication: token },
             params: { classId, sectionId, groupId, month, year },
@@ -37,7 +38,7 @@ const useGetAttendanceByClassSectionGroupAndDate = () => {
         setLoading(false);
       }
     },
-    [role, API_URL]
+    [role, baseUrl]
   );
 
   return { loading, error, attendanceData, fetchAttendance };

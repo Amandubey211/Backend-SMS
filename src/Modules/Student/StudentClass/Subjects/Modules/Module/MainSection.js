@@ -3,11 +3,12 @@ import SubjectSideBar from "../../Component/SubjectSideBar";
 import Chapter from "./Components/Chapter";
 import ModuleCard from "./Components/ModuleCard";
 import { useSelector } from "react-redux";
+import { baseUrl } from "../../../../../../config/Common";
 
 const MainSection = () => {
   const [expandedChapters, setExpandedChapters] = useState([]);
   const [classData, setClassData] = useState(null);
-  
+
   const selectedClass = useSelector(state => state.Common.selectedClass);
   const selectedSubjectId = useSelector(state => state.Common.selectedSubject);
   const selectedSection = useSelector(state => state.Common.selectedSection);
@@ -20,9 +21,9 @@ const MainSection = () => {
           throw new Error('Authentication token not found');
         }
 
-        const response = await fetch('http://localhost:8080/student/my_class', {
-          // const response = await fetch(`http://localhost:8080/admin/student/classes/${selectedClass}/modules/${selectedSubject}`, {
-        //http://localhost:8080/admin/student/classes/6672d55a57740d7dd939f72a/modules/667e76376c30078298d1e048        
+        const response = await fetch(`${baseUrl}/student/my_class`, {
+          // const response = await fetch(`${baseUrl}/admin/student/classes/${selectedClass}/modules/${selectedSubject}`, {
+          //${baseUrl}/admin/student/classes/6672d55a57740d7dd939f72a/modules/667e76376c30078298d1e048        
           headers: {
             'Authentication': token,
           },
@@ -54,7 +55,7 @@ const MainSection = () => {
         : [...prev, chapterId]
     );
   };
- 
+
   console.log("Selected Subject ID from Redux:", selectedSubjectId);
   console.log("Selected  section from Redux:", selectedSection);
   console.log("studentId from Redux:", studentId);
@@ -77,7 +78,7 @@ const MainSection = () => {
       <SubjectSideBar />
       <div className="w-[60%] bg-white p-2 border-l">
         <div className="bg-white p-2 rounded-lg">
-         
+
 
           {selectedSubject.modules.map((module, index) => (
             <Chapter
@@ -115,7 +116,7 @@ const MainSection = () => {
                 isCompleted={module.isPublished}
               />
             ))}
-            
+
           </div>
         </div>
       </div>

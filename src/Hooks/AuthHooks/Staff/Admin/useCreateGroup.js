@@ -1,8 +1,9 @@
 import { useState } from "react";
 import axios from "axios";
 import { useSelector } from "react-redux";
+import { baseUrl } from "../../../../config/Common";
 
-const API_URL = process.env.REACT_APP_API_URL;
+
 
 const useCreateGroup = () => {
   const [loading, setLoading] = useState(false);
@@ -13,7 +14,7 @@ const useCreateGroup = () => {
     setError(null); // Reset error state before new request
     try {
       const token = localStorage.getItem(`${role}:token`); // Replace with your actual token key
-      const { data } = await axios.post(`${API_URL}/admin/group`, groupData, {
+      const { data } = await axios.post(`${baseUrl}/admin/group`, groupData, {
         headers: { Authentication: token },
       });
     } catch (err) {

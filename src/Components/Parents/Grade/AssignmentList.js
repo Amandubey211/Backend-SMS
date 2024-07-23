@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Table, Tag, Collapse, Typography, message } from 'antd';
 import axios from 'axios';
+import { baseUrl } from '../../../config/Common';
 
 const { Panel } = Collapse;
 const { Text } = Typography;
@@ -68,7 +69,7 @@ const AssignmentList = () => {
           throw new Error('Authentication token not found');
         }
 
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/studentDashboard/subjects/${studentId}`, {
+        const response = await axios.get(`${baseUrl}/api/studentDashboard/subjects/${studentId}`, {
           headers: { Authentication: token }
         });
 
@@ -91,7 +92,7 @@ const AssignmentList = () => {
       const studentId = childrenData[0].id;
       const classId = childrenData[0].classId;
       const token = localStorage.getItem('parent:token');
-      const url = `${process.env.REACT_APP_API_URL}/parent/api/grades?studentId=${studentId}&classId=${classId}&subjectId=${subjectId}`;
+      const url = `${baseUrl}/parent/api/grades?studentId=${studentId}&classId=${classId}&subjectId=${subjectId}`;
 
       const response = await axios.get(url, {
         headers: { Authentication: token }

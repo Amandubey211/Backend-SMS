@@ -2,12 +2,13 @@ import { useState, useCallback } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
+import { baseUrl } from "../../../../../config/Common";
 
 const useMarkAttendance = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const role = useSelector((store) => store.Auth.role);
-  const API_URL = process.env.REACT_APP_API_URL;
+  
 
   const markAttendance = useCallback(
     async (attendanceData) => {
@@ -16,7 +17,7 @@ const useMarkAttendance = () => {
       try {
         const token = localStorage.getItem(`${role}:token`);
         const response = await axios.post(
-          `${API_URL}/api/teacher/attendance/mark`,
+          `${baseUrl}/api/teacher/attendance/mark`,
           attendanceData,
           {
             headers: { Authentication: token },
@@ -34,7 +35,7 @@ const useMarkAttendance = () => {
         setLoading(false);
       }
     },
-    [role, API_URL]
+    [role, baseUrl]
   );
 
   return { markAttendance, loading, error };

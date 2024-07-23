@@ -2,6 +2,7 @@ import { useState, useCallback } from "react";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
+import { baseUrl } from "../../../../../config/Common";
 // import { useCloudinary } from "./useCloudinary"; // Assuming you have a custom hook for Cloudinary
 
 const useCreateQuiz = () => {
@@ -61,11 +62,11 @@ const useCreateQuiz = () => {
         //   imageUrl = result.secure_url;
         // }
 
-        const API_URL = process.env.REACT_APP_API_URL;
+        
         const token = localStorage.getItem(`${role}:token`);
 
         const response = await axios.post(
-          `${API_URL}/admin/create_quiz`, // Adjust the API endpoint as needed
+          `${baseUrl}/admin/create_quiz`, // Adjust the API endpoint as needed
           {
             name,
             // thumbnail: imageUrl,

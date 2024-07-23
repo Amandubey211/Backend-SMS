@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { initializeApp } from 'firebase/app';
 import { getMessaging, getToken, onMessage } from 'firebase/messaging';
+import { baseUrl } from '../../config/Common';
 
 // Firebase configuration
 const firebaseConfig = {
@@ -38,7 +39,7 @@ export const useFirebaseMessaging = () => {
 
     const sendTokenToServer = async (token) => {
       try {
-        const response = await fetch('http://localhost:8080/firebasetoken/store-token', {
+        const response = await fetch(`${baseUrl}/firebasetoken/store-token`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

@@ -7,6 +7,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { MdQueryBuilder } from "react-icons/md";
 import { FcAlarmClock } from "react-icons/fc";
 import toast from "react-hot-toast";
+import { baseUrl } from "../../../../config/Common.js";
 
 const ParentAnnounce = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -19,7 +20,7 @@ const ParentAnnounce = () => {
     const fetchAncmts = async () => {
       try {
         const token = localStorage.getItem("parent:token");
-        const response = await axios.get("http://localhost:8080/admin/all/events", {
+        const response = await axios.get(`${baseUrl}/admin/all/events`, {
           headers: {
             Authentication: `${token}`,
           },
@@ -82,12 +83,12 @@ const ParentAnnounce = () => {
                     onClick={() => toggleAccordion(index)}
                   >
                     <div className="flex gap-6 px-3 py-2">
-                    <div
-  className="h-10 w-10 rounded flex items-center justify-center text-3xl"
-  style={{ background: '#f3f4f6' }}
->
-<FcAlarmClock />
-</div>
+                      <div
+                        className="h-10 w-10 rounded flex items-center justify-center text-3xl"
+                        style={{ background: '#f3f4f6' }}
+                      >
+                        <FcAlarmClock />
+                      </div>
 
                       <div className="flex flex-col gap-3 mt-[-5px]">
                         <h2
@@ -109,8 +110,8 @@ const ParentAnnounce = () => {
                           <div className="px-2 text-xs bg-pink-100 text-center flex justify-center items-center">
                             <span
                               className={`${ancmt.type === "High priority"
-                                  ? "font-semibold bg-pink-100 text-pink-700 inline-block text-transparent bg-clip-text"
-                                  : "text-blue-500 font-bold"
+                                ? "font-semibold bg-pink-100 text-pink-700 inline-block text-transparent bg-clip-text"
+                                : "text-blue-500 font-bold"
                                 }`}
                             >
                               {ancmt.type}

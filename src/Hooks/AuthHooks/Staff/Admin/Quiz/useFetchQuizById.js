@@ -2,13 +2,14 @@ import { useState, useCallback } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
+import { baseUrl } from "../../../../../config/Common";
 
 const useFetchQuizById = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [quiz, setQuiz] = useState(null);
 
-  const API_URL = process.env.REACT_APP_API_URL;
+  
   const { role } = useSelector((store) => store.Auth);
 
   const fetchQuizById = useCallback(
@@ -18,7 +19,7 @@ const useFetchQuizById = () => {
 
       try {
         const token = localStorage.getItem(`${role}:token`);
-        const response = await axios.get(`${API_URL}/admin/quiz/${quizId}`, {
+        const response = await axios.get(`${baseUrl}/admin/quiz/${quizId}`, {
           headers: { Authentication: token },
         });
         console.log(response.data)
@@ -37,7 +38,7 @@ const useFetchQuizById = () => {
         setLoading(false);
       }
     },
-    [role, API_URL]
+    [role, baseUrl]
   );
 
   return { loading, error, fetchQuizById, quiz };

@@ -3,6 +3,7 @@ import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import useGetClassDetails from "./Class/usegetClassDetails";
+import { baseUrl } from "../../../../config/Common";
 
 const useCreateSubject = () => {
   const [loading, setLoading] = useState(false);
@@ -14,10 +15,10 @@ const useCreateSubject = () => {
     setLoading(true);
     setError(null);
     try {
-      const API_URL = process.env.REACT_APP_API_URL;
+      
       const token = localStorage.getItem(`${role}:token`);
       const response = await axios.post(
-        `${API_URL}/admin/subject`,
+        `${baseUrl}/admin/subject`,
         subjectData,
         {
           headers: { Authentication: token },

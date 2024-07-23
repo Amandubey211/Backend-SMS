@@ -3,13 +3,14 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
+import { baseUrl } from "../../../../../config/Common";
 
 const useFetchAllPages = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [pages, setPages] = useState([]);
 
-  const API_URL = process.env.REACT_APP_API_URL;
+  
   const { role } = useSelector((store) => store.Auth);
   const { cid } = useParams();
 
@@ -19,7 +20,7 @@ const useFetchAllPages = () => {
 
     try {
       const token = localStorage.getItem(`${role}:token`);
-      const response = await axios.get(`${API_URL}/admin/api/pages/class/pages/${cid}`, {
+      const response = await axios.get(`${baseUrl}/admin/api/pages/class/pages/${cid}`, {
         headers: { Authentication: token },
       });
       console.log(response.data);
@@ -37,7 +38,7 @@ const useFetchAllPages = () => {
     } finally {
       setLoading(false);
     }
-  }, [role, API_URL, cid]);
+  }, [role, baseUrl, cid]);
 
   return { loading, error, fetchAllPages, pages };
 };

@@ -3,18 +3,19 @@ import { useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
+import { baseUrl } from "../../../../../config/Common";
 const useChangePassword = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const role = useSelector((store) => store.Auth.role);
-  const API_URL = process.env.REACT_APP_API_URL;
+  
   const ChangePassword = async (data) => {
     setLoading(true);
     setError(null);
     try {
       const token = localStorage.getItem(`${role}:token`);
       console.log(token);
-      const response = await axios.put(`${API_URL}/api/password/change-password`, data, {
+      const response = await axios.put(`${baseUrl}/api/password/change-password`, data, {
         headers: { Authentication: token },
       });
       setLoading(false);

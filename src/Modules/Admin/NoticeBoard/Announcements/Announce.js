@@ -6,6 +6,7 @@ import Sidebar from "../../../../Components/Common/Sidebar";
 import AddAnnouncement from "./AddAnnouncement";
 import { MdQueryBuilder } from "react-icons/md";
 import axios from "axios";  // Make sure to install axios if not already installed
+import { baseUrl } from "../../../../config/Common";
 
 const Announce = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -17,7 +18,7 @@ const Announce = () => {
     const fetchNotices = async () => {
       const token = localStorage.getItem('admin:token');
       try {
-        const response = await axios.get('http://localhost:8080/admin/all/notices', {
+        const response = await axios.get(`${baseUrl}/admin/all/notices`, {
           headers: {
             Authentication: token,
           },
@@ -99,11 +100,10 @@ const Announce = () => {
                             </span>
                           </div>
                           <div className="px-2 text-xs bg-pink-100 text-center flex justify-center items-center">
-                            <span className={`${
-                              notice.priority === "High priority"
+                            <span className={`${notice.priority === "High priority"
                                 ? "font-semibold bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent bg-clip-text"
                                 : "text-blue-500 font-bold"
-                            }`}>
+                              }`}>
                               {notice.priority}
                             </span>
                           </div>

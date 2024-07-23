@@ -2,12 +2,13 @@ import { useState, useCallback } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
+import { baseUrl } from "../../../../../config/Common";
 
 const useGetGroupsByClass = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const role = useSelector((store) => store.Auth.role);
-  const API_URL = process.env.REACT_APP_API_URL;
+  
 
   const fetchGroupsByClass = useCallback(
     async (classId) => {
@@ -15,7 +16,7 @@ const useGetGroupsByClass = () => {
       setError(null);
       try {
         const token = localStorage.getItem(`${role}:token`);
-        const response = await axios.get(`${API_URL}/admin/group/${classId}`, {
+        const response = await axios.get(`${baseUrl}/admin/group/${classId}`, {
           headers: { Authentication: token },
         });
 
@@ -35,7 +36,7 @@ const useGetGroupsByClass = () => {
         setLoading(false);
       }
     },
-    [API_URL, role]
+    [baseUrl, role]
   );
 
   return { loading, error, fetchGroupsByClass };

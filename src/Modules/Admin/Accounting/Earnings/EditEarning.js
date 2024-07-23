@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import FormInput from '../subClass/component/FormInput';
 import axios from 'axios';
+import { baseUrl } from '../../../../config/Common';
 
 const EditEarning = ({ earning, onClose, onUpdate }) => {
     const [formData, setFormData] = useState({
@@ -41,7 +42,7 @@ const EditEarning = ({ earning, onClose, onUpdate }) => {
         };
 
         try {
-            const response = await axios.put(`http://localhost:8080/admin/updateEarning/${earning._id}`, payload, {
+            const response = await axios.put(`${baseUrl}/admin/updateEarning/${earning._id}`, payload, {
                 headers: {
                     Authentication: `${token}`
                 },

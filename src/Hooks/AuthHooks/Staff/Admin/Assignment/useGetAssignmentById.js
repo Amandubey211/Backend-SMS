@@ -2,6 +2,7 @@ import { useState, useCallback } from "react";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
+import { baseUrl } from "../../../../../config/Common";
 // import { setAssignment } from "../../../../../Redux/Slices/Admin/SubjectSlice";
 
 const useGetAssignmentById = () => {
@@ -11,7 +12,7 @@ const useGetAssignmentById = () => {
   //   const dispatch = useDispatch();
   const { aid } = useParams();
   const role = useSelector((store) => store.Auth.role);
-  const API_URL = process.env.REACT_APP_API_URL;
+  
 
   const fetchAssignmentById = useCallback(async () => {
     setLoading(true);
@@ -19,7 +20,7 @@ const useGetAssignmentById = () => {
 
     try {
       const token = localStorage.getItem(`${role}:token`);
-      const response = await axios.get(`${API_URL}/admin/assignment/${aid}`, {
+      const response = await axios.get(`${baseUrl}/admin/assignment/${aid}`, {
         headers: {
           Authentication: token,
         },
@@ -36,7 +37,7 @@ const useGetAssignmentById = () => {
     } finally {
       setLoading(false);
     }
-  }, [role, API_URL]);
+  }, [role, baseUrl]);
 
   return { loading, error, assignment, fetchAssignmentById };
 };

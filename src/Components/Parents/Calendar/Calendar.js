@@ -3,6 +3,7 @@ import { Calendar as AntCalendar } from 'antd';
 import { dateCellRender } from '../../../Modules/Parents/utils/dateCellRender';
 import './ChildrenAttendance.css';
 import axios from 'axios';
+import { baseUrl } from '../../../config/Common';
 
 const Calendar = () => {
   const [attendanceData, setAttendanceData] = useState([]);
@@ -18,7 +19,7 @@ const Calendar = () => {
     }
 
     try {
-      const response = await axios.get(`${process.env.REACT_APP_API_URL}/parent/api/attendance`, {
+      const response = await axios.get(`${baseUrl}/parent/api/attendance`, {
         headers: {
           Authentication: `${token}`
         },

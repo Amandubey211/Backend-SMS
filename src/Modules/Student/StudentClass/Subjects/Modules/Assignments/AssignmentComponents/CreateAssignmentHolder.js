@@ -22,8 +22,8 @@
 //     }
 
 //     const url = isReattempt
-//       ? `http://localhost:8080/student/studentAssignment/reattempt/${assignmentId}`
-//       : `http://localhost:8080/student/studentAssignment/submit/${assignmentId}`;
+//       ? `${baseUrl}/student/studentAssignment/reattempt/${assignmentId}`
+//       : `${baseUrl}/student/studentAssignment/submit/${assignmentId}`;
 
 //     try {
 //       const response = await fetch(url, {
@@ -134,8 +134,8 @@
 //   //   }
 
 //   //   const url = isReattempt
-//   //     ? `http://localhost:8080/student/studentAssignment/reattempt/${assignmentId}`
-//   //     : `http://localhost:8080/student/studentAssignment/submit/${assignmentId}`;
+//   //     ? `${baseUrl}/student/studentAssignment/reattempt/${assignmentId}`
+//   //     : `${baseUrl}/student/studentAssignment/submit/${assignmentId}`;
 
 //   //   try {
 //   //     const response = await fetch(url, {
@@ -173,23 +173,23 @@
 //       toast.error("Authentication token not found");
 //       return;
 //     }
-  
+
 //     const url = isReattempt
-//       ? `http://localhost:8080/student/studentAssignment/reattempt/${assignmentId}`
-//       : `http://localhost:8080/student/studentAssignment/submit/${assignmentId}`;
-  
+//       ? `${baseUrl}/student/studentAssignment/reattempt/${assignmentId}`
+//       : `${baseUrl}/student/studentAssignment/submit/${assignmentId}`;
+
 //     try {
 //       let contentToSend = null; // Variable to store content for logging
-  
+
 //       if (activeTab === "Editor") {
 //         contentToSend = editorContent;
 //       } else if (activeTab === "MediaUpload") {
 //         // contentToSend = "Media Upload";
 //         contentToSend = "Media Upload";
 //         // contentToSend = fileUrl; 
-        
+
 //       }
-  
+
 //       const response = await fetch(url, {
 //         method: isReattempt ? "PUT" : "POST",
 //         headers: {
@@ -202,11 +202,11 @@
 //           comment: commentText,
 //         }),
 //       });
-  
+
 //       if (!response.ok) {
 //         throw new Error(`Failed to submit assignment, status: ${response.status}`);
 //       }
-  
+
 //       const data = await response.json();
 //       if (data.success) {
 //         toast.success("Assignment submitted successfully");
@@ -218,7 +218,7 @@
 //       toast.error("Failed to submit assignment: " + error.message);
 //     }
 //   };
-  
+
 //   return (
 //     <>
 //       <div className="flex gap-4 mb-4">
@@ -295,6 +295,7 @@ import Editor from "../../../Component/Editor";
 import MediaUpload from "./MediaUpload";
 import TabButton from "./TabButton";
 import { toast } from 'react-hot-toast';
+import { baseUrl } from "../../../../../../../config/Common";
 
 const CreateAssignmentHolder = ({ onSubmit, assignmentId, isReattempt = false }) => {
   const [editorContent, setEditorContent] = useState("");
@@ -309,8 +310,8 @@ const CreateAssignmentHolder = ({ onSubmit, assignmentId, isReattempt = false })
     }
 
     const url = isReattempt
-      ? `http://localhost:8080/student/studentAssignment/reattempt/${assignmentId}`
-      : `http://localhost:8080/student/studentAssignment/submit/${assignmentId}`;
+      ? `${baseUrl}/student/studentAssignment/reattempt/${assignmentId}`
+      : `${baseUrl}/student/studentAssignment/submit/${assignmentId}`;
 
     try {
       let contentToSend = null; // Variable to store content for logging

@@ -3,6 +3,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { setClassList } from "../../../../../Redux/Slices/Admin/ClassSlice";
+import { baseUrl } from "../../../../../config/Common";
 
 const useGetAllClasses = () => {
   const [loading, setLoading] = useState(false);
@@ -10,14 +11,14 @@ const useGetAllClasses = () => {
 
   const dispatch = useDispatch();
   const role = useSelector((store) => store.Auth.role);
-  const API_URL = process.env.REACT_APP_API_URL;
+  
 
   const fetchClasses = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
       const token = localStorage.getItem(`${role}:token`);
-      const response = await axios.get(`${API_URL}/admin/class`, {
+      const response = await axios.get(`${baseUrl}/admin/class`, {
         headers: { Authentication: token },
       });
 
@@ -30,7 +31,7 @@ const useGetAllClasses = () => {
       setLoading(false);
       setError(errorMessage);
     }
-  }, [dispatch, role, API_URL]);
+  }, [dispatch, role, baseUrl]);
 
   return { loading, error, fetchClasses };
 };

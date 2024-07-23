@@ -2,13 +2,14 @@ import { useState, useCallback } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
+import { baseUrl } from "../../../../../config/Common";
 
 const useDeleteDiscussion = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
 
-  const API_URL = process.env.REACT_APP_API_URL;
+  
   const { role } = useSelector((store) => store.Auth);
 
   const deleteDiscussion = useCallback(
@@ -20,7 +21,7 @@ const useDeleteDiscussion = () => {
       try {
         const token = localStorage.getItem(`${role}:token`);
         const response = await axios.delete(
-          `${API_URL}/admin/deleteDiscussion/${discussionId}`,
+          `${baseUrl}/admin/deleteDiscussion/${discussionId}`,
           {
             headers: { Authentication: token },
           }
@@ -42,7 +43,7 @@ const useDeleteDiscussion = () => {
         setLoading(false);
       }
     },
-    [role, API_URL]
+    [role, baseUrl]
   );
 
   return { loading, error, success, deleteDiscussion };

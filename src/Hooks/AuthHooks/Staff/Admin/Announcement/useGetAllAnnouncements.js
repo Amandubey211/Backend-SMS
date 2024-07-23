@@ -2,13 +2,14 @@ import { useState, useCallback } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
+import { baseUrl } from "../../../../../config/Common";
 
 const useGetAllAnnouncements = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [announcementData, setAnnouncementData] = useState([]);
 
-  const API_URL = process.env.REACT_APP_API_URL;
+  
   const {
     role,
     userDetail: { userId },
@@ -21,7 +22,7 @@ const useGetAllAnnouncements = () => {
       try {
         const token = localStorage.getItem(`${role}:token`);
         const response = await axios.get(
-          `${API_URL}/admin/announcement/class/${classId}`,
+          `${baseUrl}/admin/announcement/class/${classId}`,
           {
             headers: { Authentication: token },
           }
@@ -37,7 +38,7 @@ const useGetAllAnnouncements = () => {
         setLoading(false);
       }
     },
-    [role, API_URL]
+    [role, baseUrl]
   );
 
   return { loading, error, fetchAnnouncements, announcementData };

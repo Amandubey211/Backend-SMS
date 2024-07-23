@@ -3,7 +3,8 @@ import { useState } from "react";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { setTeachers } from "../../../../../Redux/Slices/Admin/TeachersSlice";
-const API_URL = process.env.REACT_APP_API_URL;
+import { baseUrl } from "../../../../../config/Common";
+
 
 const useGetAllTeachers = () => {
   const [loading, setLoading] = useState(true);
@@ -13,7 +14,7 @@ const useGetAllTeachers = () => {
   const fetchTeachers = async () => {
     try {
       const token = localStorage.getItem(`${role}:token`);
-      const response = await axios.get(`${API_URL}/admin/teacher`, {
+      const response = await axios.get(`${baseUrl}/admin/teacher`, {
         headers: { Authentication: token },
       });
       // setTeachers(response.data.data);

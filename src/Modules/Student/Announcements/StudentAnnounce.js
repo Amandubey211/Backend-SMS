@@ -6,6 +6,7 @@ import { MdQueryBuilder } from "react-icons/md";
 import announcementIcon from "../../../Assets/StudentAssets/announcement.png"
 import axios from 'axios';
 import { MdExpandMore, MdExpandLess } from 'react-icons/md';
+import { baseUrl } from '../../../config/Common';
 
 const StudentAnnounce = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -28,7 +29,7 @@ const StudentAnnounce = () => {
         throw new Error('Authentication not found');
       }
 
-      const response = await axios.get(`${process.env.REACT_APP_API_URL}/student/all/notices/`, {
+      const response = await axios.get(`${baseUrl}/student/all/notices/`, {
         headers: {
           'Authentication': token
         }

@@ -5,6 +5,7 @@ import DashLayout from "../../../../Components/Admin/AdminDashLayout";
 import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 import AddFeesForm from "../subClass/component/AddFeesForm";
 import FormField from "../subClass/component/FormField";
+import { baseUrl } from "../../../../config/Common";
 
 const AccountingSection = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -21,7 +22,7 @@ const AccountingSection = () => {
 
   useEffect(() => {
     const token = localStorage.getItem('admin:token');
-    fetch("http://localhost:8080/admin/get_fees", {
+    fetch(`${baseUrl}/admin/get_fees`, {
       method: "GET",
       headers: {
         Authentication: `${token}`
@@ -45,7 +46,7 @@ const AccountingSection = () => {
 
   const handleSidebarOpen = () => setSidebarOpen(true);
   const handleSidebarClose = () => setSidebarOpen(false);
-  
+
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
     setFilters((prev) => ({ ...prev, [name]: value }));
@@ -114,22 +115,20 @@ const AccountingSection = () => {
                     className="hidden"
                   />
                   <div
-                    className={`h-5 w-5 rounded-full mr-2 flex items-center justify-center border-2 ${
-                      selectedStatus === status
+                    className={`h-5 w-5 rounded-full mr-2 flex items-center justify-center border-2 ${selectedStatus === status
                         ? "border-green-500 bg-green-500"
                         : "border-gray-300"
-                    }`}
+                      }`}
                   >
                     {selectedStatus === status && (
                       <div className="h-3 w-3 bg-white rounded-full"></div>
                     )}
                   </div>
                   <span
-                    className={`transition-colors duration-200 ${
-                      selectedStatus === status
+                    className={`transition-colors duration-200 ${selectedStatus === status
                         ? "text-red-700"
                         : "text-gray-700"
-                    }`}
+                      }`}
                   >
                     {status}
                   </span>
@@ -171,11 +170,10 @@ const AccountingSection = () => {
                     </td>
                     <td className="px-5 py-2 border-b border-gray-200">
                       <span
-                        className={`inline-block px-3 py-1 text-xs font-semibold rounded-full ${
-                          item.status === "Paid"
+                        className={`inline-block px-3 py-1 text-xs font-semibold rounded-full ${item.status === "Paid"
                             ? "bg-green-200 text-green-800"
                             : "bg-red-200 text-red-800"
-                        }`}
+                          }`}
                       >
                         {item.status}
                       </span>
