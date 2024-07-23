@@ -37,7 +37,7 @@ const EventCard = ({ event }) => {
         </div>
         <div className="flex flex-col px-6 text-[#F9FAFC]  font-[350] ">
           <span>{event.description}</span>
-          <span>07-Mar-2024</span>
+          <span>{event.date}</span>
         </div>
       </div>
     </>

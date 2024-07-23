@@ -100,25 +100,25 @@ const BookIssue = () => {
         <table className="min-w-full">
           <thead>
             <tr className="text-left text-gray-700 bg-gray-100">
-              <th className="px-5 py-3 border-b-2 border-gray-200">Student</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200">Class & Section</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200">Issue Book</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200">Author</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200">Date</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200">Status</th>
-              <th className="px-5 py-3 border-b-2 border-gray-200">Action</th>
+              <th className="px-6 py-3 border-b-2 border-gray-200">Student</th>
+              <th className="px-6 py-3 border-b-2 border-gray-200">Class & Section</th>
+              <th className="px-6 py-3 border-b-2 border-gray-200">Issue Book</th>
+              <th className="px-6 py-3 border-b-2 border-gray-200">Author</th>
+              <th className="px-6 py-3 border-b-2 border-gray-200">Date</th>
+              <th className="px-6 py-3 border-b-2 border-gray-200">Status</th>
+              <th className="px-6 py-3 border-b-2 border-gray-200">Action</th>
             </tr>
           </thead>
           <tbody>
             {filteredData.map((item) => (
-              <tr key={item._id}>
-                <td>{item.studentFirstName + " " + item.studentLastName}</td>
-                <td>{item.className + " & " + (item.sectionName || "N/A")}</td>
-                <td>{item.bookName}</td>
-                <td>{item.bookAuthor}</td>
-                <td>{new Date(item.issueDate).toLocaleDateString()}</td>
-                <td>{item.status}</td>
-                <td>...</td>
+              <tr key={item._id} className="hover:bg-gray-50">
+                <td className="px-6 py-4 border-b border-gray-200">{item.studentFirstName + " " + item.studentLastName}</td>
+                <td className="px-6 py-4 border-b border-gray-200">{item.className + " & " + (item.sectionName || "N/A")}</td>
+                <td className="px-6 py-4 border-b border-gray-200">{item.bookName}</td>
+                <td className="px-6 py-4 border-b border-gray-200">{item.bookAuthor}</td>
+                <td className="px-6 py-4 border-b border-gray-200">{new Date(item.issueDate).toLocaleDateString()}</td>
+                <td className="px-6 py-4 border-b border-gray-200">{item.status}</td>
+                <td className="px-6 py-4 border-b border-gray-200">...</td>
               </tr>
             ))}
           </tbody>
