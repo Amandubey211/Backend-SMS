@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from "axios"; // Ensure Axios is installed
 import ImageUpload from "../../../Addmission/Components/ImageUpload";
 import FormInput from "../../../Accounting/subClass/component/FormInput";
 
@@ -17,7 +18,7 @@ const AddEvent = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setEventData((prev) => ({
+    setEventData(prev => ({
       ...prev,
       [name]: value,
     }));
@@ -31,7 +32,7 @@ const AddEvent = () => {
         setImagePreview(reader.result);
       };
       reader.readAsDataURL(file);
-      setEventData((prev) => ({
+      setEventData(prev => ({
         ...prev,
         eventImage: file,
       }));
@@ -40,23 +41,46 @@ const AddEvent = () => {
 
   const handleRemoveImage = () => {
     setImagePreview(null);
-    setEventData((prev) => ({
+    setEventData(prev => ({
       ...prev,
       eventImage: null,
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Event data to submit:", eventData);
-    // Implement submission logic here
+    const formData = new FormData();
+    formData.append('title', eventData.eventName);
+    formData.append('date', eventData.startDate);
+    formData.append('time', '10:00 AM'); // Assuming fixed time, modify as necessary
+    formData.append('type', eventData.eventType);
+    formData.append('location', eventData.location);
+    formData.append('director', eventData.eventDirector);
+    formData.append('description', eventData.description);
+    if (eventData.eventImage) {
+      formData.append('image', eventData.eventImage);
+    }
+
+    // Retrieve JWT from localStorage
+    const token = localStorage.getItem('admin:token');
+
+    try {
+      const response = await axios.post('http://localhost:8080/admin/create_event', formData, {
+        headers: {
+          'Authentication': `${token}`, // Use Bearer authentication scheme
+          'Content-Type': 'multipart/form-data'
+        },
+      });
+      console.log('Event created successfully:', response.data);
+      // Clear the form or show success message
+    } catch (error) {
+      console.error('Failed to create event:', error);
+      // Handle errors, such as displaying an error message
+    }
   };
 
   return (
-    <div
-      className="p-4 bg-gray-50 border rounded-lg overflow-auto"
-      style={{ maxHeight: "90vh" }}
-    >
+    <div className="p-4 bg-gray-50 border rounded-lg overflow-auto" style={{ maxHeight: "90vh" }}>
       <form className="space-y-4" onSubmit={handleSubmit}>
         <div className="image-upload-container">
           <ImageUpload
@@ -67,13 +91,15 @@ const AddEvent = () => {
         </div>
         <FormInput
           id="eventName"
+          name="eventName"
           label="Event Name"
           value={eventData.eventName}
           onChange={handleInputChange}
         />
-         <div className="flex justify-between">
+        <div className="flex justify-between">
           <FormInput
             id="startDate"
+            name="startDate"
             label="Start Date"
             type="date"
             value={eventData.startDate}
@@ -82,6 +108,7 @@ const AddEvent = () => {
           />
           <FormInput
             id="endDate"
+            name="endDate"
             label="End Date"
             type="date"
             value={eventData.endDate}
@@ -91,29 +118,32 @@ const AddEvent = () => {
         </div>
         <FormInput
           id="location"
+          name="location"
           label="Location"
           value={eventData.location}
           onChange={handleInputChange}
         />
-       
-        <div className='flex justify-between '>
-            <FormInput
-          id="eventDirector"
-          label="Event Director"
-          value={eventData.eventDirector}
-          onChange={handleInputChange}
-        />
-       <FormInput
-          id="eventType"
-          label="Event Type"
-          value={eventData.eventType}
-          onChange={handleInputChange}
-        />
+        <div className='flex justify-between'>
+          <FormInput
+            id="eventDirector"
+            name="eventDirector"
+            label="Event Director"
+            value={eventData.eventDirector}
+            onChange={handleInputChange}
+          />
+          <FormInput
+            id="eventType"
+            name="eventType"
+            label="Event Type"
+            value={eventData.eventType}
+            onChange={handleInputChange}
+          />
         </div>
         <FormInput
           id="description"
+          name="description"
           label="Description"
-          type="text"
+          type="textarea"
           value={eventData.description}
           onChange={handleInputChange}
           multiline
@@ -130,4 +160,3 @@ const AddEvent = () => {
 };
 
 export default AddEvent;
-
