@@ -34,7 +34,22 @@ const AddUser = ({ role ,data}) => {
   });
   useEffect(()=>{
    if(data){
-    setTeacherData(data);
+    setTeacherData({
+      firstName:  data?.firstName ,
+      lastName:  data?.lastName ,
+      dob:  data?.dob ,
+      religion:  data?.religion ,
+      gender:  data?.gender,
+      position:  data?.position ,
+      monthlySalary:  data?.monthlySalary ,
+      bloodGroup:  data?.bloodGroup ,
+      mobileNumber: data?.mobileNumber ,
+      email: data?.email ,
+      profile:null,
+      teacherCV:null,
+      employeeID: data?.employeeID ,
+      role: role
+    });
     setAddress(data?.address)
    }
    return () => {
@@ -47,11 +62,11 @@ const AddUser = ({ role ,data}) => {
       position: "",
       monthlySalary: "",
       bloodGroup: "",
-      mobileNumber: "",
-      email: "",
-      profile: null,
-      teacherCV: null,
-      employeeID: '',
+      mobileNumber:"",
+      email:"",
+      profile:null,
+      teacherCV:null,
+      employeeID:'',
       role: role
     })
     setAddress({
@@ -143,7 +158,12 @@ const AddUser = ({ role ,data}) => {
   };
   const {EditUser} = useEditUser();
   const editUserHandel = async()=>{
-   await EditUser(data)
+    console.log(teacherData);
+   await EditUser(teacherData,address,data?._id);
+   if (!error) {
+    fetchTeachers();
+   
+  }
   }
 
   return (
@@ -306,13 +326,14 @@ const AddUser = ({ role ,data}) => {
             </div>
           </div>
         </div>
-       {data? <button
+       {data? <div
           
-          className="bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-10 rounded-md hover:from-pink-600 hover:to-purple-600"
+          className="bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-10 rounded-md hover:from-pink-600 hover:to-purple-600 cursor-pointer w-[11rem]"
           onClick={editUserHandel}
         >
           Update Staff
-        </button>:<button
+        </div>:
+        <button
           type="submit"
           className="bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-10 rounded-md hover:from-pink-600 hover:to-purple-600"
         >

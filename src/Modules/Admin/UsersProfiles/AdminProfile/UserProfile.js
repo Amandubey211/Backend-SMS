@@ -5,6 +5,7 @@ import SidebarSlide from "../../../../Components/Common/SidebarSlide";
 import { useSelector } from "react-redux";
 import useChangePassword from "../../../../Hooks/AuthHooks/Staff/Admin/resetPassword/useResetPassword";
 import toast from "react-hot-toast";
+import EditAdmin from "./EditProfile";
 
 const UserProfile = () => {
   const user = useSelector((store)=>store.Auth.userDetail);;
@@ -32,16 +33,20 @@ const {ChangePassword} =  useChangePassword();
       toast.error("Passwords do not match.");
     }
   };
-
+  const [isSidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarContent, setSidebarContent] = useState(null)
+  const handleSidebarOpen = () => setSidebarOpen(true);
+  const handleSidebarClose = () => setSidebarOpen(false);
   return (
-    <Layout title="Accounting">
+    <>
+    <Layout title="Admin">
       <DashLayout>
         <div className="flex flex-col h-screen w-full p-4 gap-3">
           <div className="flex  items-center px-6 py-4 gap-3 border rounded-md">
             <img
-              src="https://i.imgur.com/6VDme5u.jpg"
+              src={userData.profile}
               alt="Cameron Williamson"
-              className="w-20 h-20 rounded-full"
+              className="w-20 h-20 rounded-full "
             />
             <div className="flex flex-row justify-between  w-full ">
               <h2 className="text-xl font-semibold">{userData.adminName
@@ -51,10 +56,11 @@ const {ChangePassword} =  useChangePassword();
               </button> */}
 
               <button
-                    onClick={updateProfile}
+                    onClick={handleSidebarOpen}
                     className="px-4 inline-flex items-center border border-transparent text-sm font-medium  shadow-sm    bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-md hover:from-pink-600 hover:to-purple-600"
                 >
-Edit                </button>
+                   Edit            
+                       </button>
             </div>
           </div>
                    <h3 className="text-lg font-semibold mb-4">Personal Information</h3>
@@ -64,7 +70,7 @@ Edit                </button>
           <div className="flex flex-col gap-5 ">
               <div className="flex  flex-col" >
                 <span  className=" font-normal text-gray-500">First name</span>
-                <span  className=" font-medium text-gray-800">{userData.adminName
+                <span  className=" font-medium text-gray-800">{userData.adminName?.split(' ')[0]
                 }</span>
               </div>
               <div className="flex flex-col ">
@@ -120,8 +126,15 @@ Edit                </button>
                     Update Password
                 </button>
                 </div>
-
-
+              
+                <SidebarSlide
+            isOpen={isSidebarOpen}
+            onClose={handleSidebarClose}
+            title='Edit Profile'
+            width="50%"
+          >
+            <EditAdmin data={userData} />
+          </SidebarSlide>
         </div>
         {/* <div className="flex flex-col p-6 bg-white border rounded-lg max-w-screen-lg mx-auto my-4">
             <div className="flex flex-row items-center space-x-4 mb-6">
@@ -203,7 +216,11 @@ Edit                </button>
             </div>
         </div> */}
       </DashLayout>
+      
+   
     </Layout>
+    
+    </>
   );
 };
 

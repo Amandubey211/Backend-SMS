@@ -8,7 +8,8 @@ import TeachersReducer from "../Slices/Admin/TeachersSlice.js";
 import SubjectReducer from "../Slices/Admin/SubjectSlice.js"
 import StudentQuizReducer from "../Slices/StudentQuiz/StudentQuizSlice.js";
 import studentReducer from '../Slices/Admin/StudentSlice.js'
-import staffReducer from '../Slices/Admin/StaffSlice.js'
+import staffReducer from '../Slices/Admin/StaffSlice.js';
+import parentsReducer from '../Slices/Admin/parentsSilce.js';
 const AppStore = configureStore({
 
   reducer: {
@@ -21,7 +22,8 @@ const AppStore = configureStore({
     Staff: staffReducer, 
     Subject:SubjectReducer,
     StudentQuiz: StudentQuizReducer,
-    Students:studentReducer
+    Students:studentReducer,
+    Parents:parentsReducer,
      // Add StudentQuizSlice to the store
 
   },

@@ -4,7 +4,7 @@ import React from "react";
 const StudentProfileCard = ({ student }) => {
   return (
     <div className="flex flex-col items-center p-3 py-5 gap-2 justify-center">
-      <img src={student.imageUrl} alt="student_image" className="rounded-full w-[100px] h-[100px]" />
+      <img src={student.imageUrl} alt="student_image" className="rounded-full w-[100px] h-[100px] bg-gray-300" />
       <span className="font-bold">{student.fullName}</span>
       <div className="flex gap-4 font-medium text-gray-500 flex-col ">
         <span>Class {student?.class}|</span> 
