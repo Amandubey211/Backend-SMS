@@ -64,30 +64,31 @@ const BookIssue = () => {
     <div className="min-h-screen p-4 bg-gray-50">
       <div className="flex justify-between items-center mb-4">
         <div className="flex space-x-4">
-          <FormField
-            id="classLevel"
-            label="Class"
-            value={filters.classLevel}
-            onChange={handleFilterChange}
-            options={data.map(book => book.className)}
-            placeholder="Select Class"
-          />
-          <FormField
-            id="section"
-            label="Section"
-            value={filters.section}
-            onChange={handleFilterChange}
-            options={data.map(book => book.sectionName)}
-            placeholder="Select Section"
-          />
-          <FormField
-            id="category"
-            label="Category"
-            value={filters.category}
-            onChange={handleFilterChange}
-            options={data.map(book => book.bookCategory)}
-            placeholder="Select Category"
-          />
+        <FormField
+  id="classLevel"
+  label="Class"
+  value={filters.classLevel}
+  onChange={handleFilterChange}
+  options={[...new Set(data.map(book => book.className))]} // Ensures unique class names
+  placeholder="Select Class"
+/>
+<FormField
+  id="section"
+  label="Section"
+  value={filters.section}
+  onChange={handleFilterChange}
+  options={[...new Set(data.map(book => book.sectionName))]} // Ensures unique section names
+  placeholder="Select Section"
+/>
+<FormField
+  id="category"
+  label="Category"
+  value={filters.category}
+  onChange={handleFilterChange}
+  options={[...new Set(data.map(book => book.bookCategory))]} // Ensures unique categories
+  placeholder="Select Category"
+/>
+
         </div>
         <button
           onClick={handleSidebarOpen}
