@@ -15,6 +15,12 @@ import { SiAuth0 } from "react-icons/si";
 import DashCard from "./Dashcard";
 import Fallback from "../../../Components/Common/Fallback";
 
+
+import { ReactComponent as StudentIcon } from "../../../Assets/DashboardAssets/SVG/student.svg";
+import { ReactComponent as InstructorIcon } from "../../../Assets/DashboardAssets/SVG/instructor.svg";
+import { ReactComponent as ParentIcon } from "../../../Assets/DashboardAssets/SVG/parent.svg";
+import { ReactComponent as StaffIcon } from "../../../Assets/DashboardAssets/SVG/staff.svg";
+
 const MainSection = () => {
   const { dashboardData, error, fetchAdminDashboardData, loading } =
     useGetAdminDashboardData();
@@ -29,7 +35,7 @@ const MainSection = () => {
       value: dashboardData?.totalStudents || "Loading...",
       bgColor: "bg-purple-100",
       textColor: "text-purple-700",
-      icon: <FaUsers />,
+      icon: <StudentIcon className="w-10 h-10" />,
       iconBackground: "bg-[#564FFD]",
     },
     {
@@ -37,7 +43,7 @@ const MainSection = () => {
       value: dashboardData?.teachers || "Loading...",
       bgColor: "bg-green-100",
       textColor: "text-green-700",
-      icon: <FaChalkboardTeacher />,
+      icon: <InstructorIcon className="w-10 h-10" />,
       iconBackground: "bg-[#23BD331A]",
     },
     {
@@ -45,7 +51,7 @@ const MainSection = () => {
       value: dashboardData?.parents || "Loading...",
       bgColor: "bg-yellow-100",
       textColor: "text-yellow-700",
-      icon: <MdFamilyRestroom />,
+      icon:  <ParentIcon className="w-10 h-10" />,
       iconBackground: "bg-[#F09F04]",
     },
     {
@@ -53,7 +59,7 @@ const MainSection = () => {
       value: dashboardData?.staffs || "Loading...",
       bgColor: "bg-pink-100",
       textColor: "text-pink-700",
-      icon: <SiAuth0 />,
+      icon: <StaffIcon className="w-10 h-10" />,
       iconBackground: "bg-[#EA2058]",
     },
   ];

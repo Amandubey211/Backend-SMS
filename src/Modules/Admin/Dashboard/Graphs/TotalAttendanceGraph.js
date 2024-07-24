@@ -8,16 +8,20 @@ const TotalAttendanceGraph = () => {
       {
         label: "Female",
         data: [300, 150, 350, 200, 250, 300],
-        backgroundColor: "rgba(124, 58, 237, 0.5)", // Purple color
-        borderColor: "rgba(124, 58, 237, 1)",
+        backgroundColor: "#8F77F3", // Updated Purple color
+        borderRadius: 10, // Curved edges
         borderWidth: 1,
+        stack: 'combined',
+        barThickness: 30, // Explicitly set bar thickness
       },
       {
         label: "Male",
         data: [200, 100, 150, 100, 150, 200],
-        backgroundColor: "rgba(34, 197, 94, 0.5)", // Green color
-        borderColor: "rgba(34, 197, 94, 1)",
+        backgroundColor: "#23C55E", // Updated Green color
+        borderRadius: 10, // Curved edges
         borderWidth: 1,
+        stack: 'combined',
+        barThickness: 30, // Explicitly set bar thickness
       },
     ],
   };
@@ -26,34 +30,55 @@ const TotalAttendanceGraph = () => {
     scales: {
       y: {
         beginAtZero: true,
+        stacked: true,
+        ticks: {
+          stepSize: 100,
+          max: 500,
+        },
+      },
+      x: {
+        stacked: true,
+        barPercentage: 0.5, // Adjust category percentage to make bars thinner
       },
     },
+    plugins: {
+      legend: {
+        display: false,
+      },
+    },
+    responsive: true,
+    maintainAspectRatio: false,
   };
+
   return (
-    <div className="bg-white  ">
-      <div className="bg-white rounded-lg  p-4">
-        <div className="flex justify-between items-center mb-4">
-          <div>
-            <h2 className="text-xl font-semibold">Today's Attendance</h2>
-            <div className="text-2xl font-bold">2,500</div>
-          </div>
-          <div>
-            <select className="border rounded p-2">
-              <option>This month</option>
-              <option>Last month</option>
-            </select>
-          </div>
+    <div className="bg-white p-4 rounded-lg shadow-lg">
+      <div className="flex justify-between items-center mb-4">
+        <div>
+          <h2 className="text-xl font-semibold">Todays Attendance</h2>
+          <div className="text-3xl font-bold">2,500</div>
         </div>
+        <div>
+          <select className="border rounded p-2">
+            <option>This month</option>
+            <option>Last month</option>
+          </select>
+        </div>
+      </div>
+      <div style={{ height: '300px' }}>
         <Bar data={data} options={options} />
-        <div className="flex justify-around mt-4">
+      </div>
+      <div className="flex justify-around mt-4">
+        <div className="flex flex-col items-start">
+          <div className="w-16 h-1 bg-[#8F77F3] rounded-full mb-1" style={{ alignSelf: 'flex-start' }}></div>
           <div className="flex items-center">
-            <div className="w-4 h-4 bg-purple-500 mr-2"></div>
-            <div>Total Female</div>
+            <div className="text-gray-700">Total Female</div>
             <div className="ml-2 font-bold">1,500</div>
           </div>
+        </div>
+        <div className="flex flex-col items-start">
+          <div className="w-16 h-1 bg-[#23C55E] rounded-full mb-1" style={{ alignSelf: 'flex-start' }}></div>
           <div className="flex items-center">
-            <div className="w-4 h-4 bg-green-500 mr-2"></div>
-            <div>Total Male</div>
+            <div className="text-gray-700">Total Male</div>
             <div className="ml-2 font-bold">1,000</div>
           </div>
         </div>
