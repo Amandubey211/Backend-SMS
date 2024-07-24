@@ -1,46 +1,35 @@
 import React from "react";
-// import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-
-// import { faCartShopping, faPerson, faTrash,faCalendarDays, faLocation,faUserTie,faClock } from "@fortawesome/free-solid-svg-icons";
 import { MdAccessTime } from "react-icons/md";
+import { format } from "date-fns";
+
 const EventCard = ({ event }) => {
-  const bgColors = [
-    "bg-pink-500",
-    "bg-purple-500",
-    "bg-blue-500",
-    "bg-indigo-500",
-  ];
-  const bgColor = bgColors[event.id % bgColors.length];
+  // Format date and time
+  const formattedDate = format(event.startDate, "MMM d, yyyy");
+  const formattedTime = format(event.startDate, "hh:mm a");
+  const formattedDescription = event.description || "No description available";
 
   return (
-    <>
-      <div className="h-full flex-1 border  flex-wrap   rounded-lg shadow-lg text-white bg-[#FF6C9C] border-black">
-        <div className=" flex  items-center justify-around  p-4 gap-2 ">
-          <div className=" border  rounded  p-2 bg-[#F9FAFC]">
-            <span className="text-3xl font-semibold text-[#FF6C9C]">
-              {" "}
-              {event.startDate.getDate()}
-            </span>
-          </div>
-
-          <div className="flex  flex-col flex-wrap justify-start  ">
-            <span className=" font-medium">{event.title}</span>
-            <div className="flex  items-center">
-              {/* <FontAwesomeIcon  style={{color:"white", background:' ' ,margin:'0',padding:'0',  height:'20px' ,width:'20px' ,borderRadius:'50%',marginRight:'5px' }} icon={faClock} /> */}
-              <MdAccessTime className="text-white text-xl mr-2" />
-
-              <span className="font-xs  font-[350]">{`${event.startDate.getHours()}:${String(
-                event.startDate.getMinutes()
-              ).padStart(2, "0")} AM`}</span>
-            </div>
-          </div>
+    <div className="h-full w-full  flex flex-col border rounded-lg shadow-lg text-white bg-[#FF6C9C] border-black">
+      <div className="flex items-center p-4 gap-4">
+        <div className="flex flex-col items-center justify-center border rounded p-3 bg-[#F9FAFC]">
+          <span className="text-3xl font-semibold text-[#FF6C9C]">
+            {format(event.startDate, "d")}
+          </span>
         </div>
-        <div className="flex flex-col px-6 text-[#F9FAFC]  font-[350] ">
-          <span>{event.description}</span>
-          <span>{event.date}</span>
+
+        <div className="flex flex-col justify-start">
+          <span className="text-lg font-medium">{event.title}</span>
+          <div className="flex items-center mt-2">
+            <MdAccessTime className="text-white text-xl mr-2" />
+            <span className="text-sm font-light">{formattedTime}</span>
+          </div>
         </div>
       </div>
-    </>
+      <div className="flex flex-col px-6 py-[8px] text-[#F9FAFC] font-light ">
+        <span className="mb-2">{formattedDescription}</span>
+        <span className="text-sm">{formattedDate}</span>
+      </div>
+    </div>
   );
 };
 
