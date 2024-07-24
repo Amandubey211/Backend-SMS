@@ -1,60 +1,31 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-import Paper from "@mui/material/Paper";
-import {
-  Scheduler,
-  WeekView,
-  Appointments,
-  MonthView,
-  Toolbar,
-  DateNavigator,
-  TodayButton,
-  ViewSwitcher,
-} from "@devexpress/dx-react-scheduler-material-ui";
-import { ViewState } from "@devexpress/dx-react-scheduler";
-
+import { Calendar } from "antd";
 import Layout from "../../../../../Components/Common/Layout";
 import DashLayout from "../../../../../Components/Admin/AdminDashLayout";
-import "../subComponents/customCalendar.css";
 import EventCard from "../subComponents/EventCard";
 import Sidebar from "../../../../../Components/Common/Sidebar";
 import AddEvent from "../subComponents/AddEvent";
+import UpdateEvent from "../subComponents/UpdateEvent"; // Import UpdateEvent
 import ViewEvent from "../subComponents/ViewEvent";
-import { baseUrl } from "../../../../../config/Common";
+import { getEvents, createEvent, updateEvent, deleteEvent } from '../api/event';
+import { format, parseISO } from 'date-fns';
+import "../subComponents/customCalendar.css";
 
 const EventScheduler = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [currentViewName, setCurrentViewName] = useState("Month");
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [sidebarContent, setSidebarContent] = useState(null);
-  const [events, setEvents] = useState([]); // State to store fetched events
+  const [events, setEvents] = useState([]);
 
-  // Fetch events when the component mounts
   useEffect(() => {
     const fetchEvents = async () => {
-      const token = localStorage.getItem('admin:token'); // Retrieve the token from localStorage
-      if (!token) {
-        console.error('Authorization token is not available.');
-        return;
-      }
-
       try {
-        const response = await axios.get(`${baseUrl}/admin/all/events`, {
-          headers: {
-            'Authentication': `${token}` // Use token in the Authorization header
-          }
-        });
-        const mappedEvents = response.data.events.map(event => ({
-          id: event._id,
-          startDate: new Date(event.date), // Convert date to JavaScript Date object
-          endDate: new Date(new Date(event.date).getTime() + 2 * 60 * 60 * 1000), // Assuming a fixed 2-hour duration for all events
-          title: event.title,
-          type: event.type,
-          location: event.location,
-          director: event.director,
-          description: event.description,
-          image: event.image,
+        const events = await getEvents();
+        const mappedEvents = events.map(event => ({
+          ...event,
+          startDate: parseISO(event.date),
+          endDate: new Date(new Date(event.date).getTime() + 2 * 60 * 60 * 1000),
         }));
         setEvents(mappedEvents);
       } catch (error) {
@@ -67,29 +38,37 @@ const EventScheduler = () => {
 
   const handleSidebarOpen = () => setSidebarOpen(true);
   const handleSidebarClose = () => setSidebarOpen(false);
-  const onCurrentDateChange = (date) => setCurrentDate(date);
-  const onCurrentViewNameChange = (viewName) => setCurrentViewName(viewName);
 
-  const Appointment = ({ children, data, style, ...restProps }) => (
-    <Appointments.Appointment {...restProps} onClick={() => handleAppointmentClick(data)}>
-      {children}
-    </Appointments.Appointment>
-  );
+  const handleDateCellRender = (value) => {
+    const formattedDate = format(value.toDate(), "yyyy-MM-dd");
+    const dayEvents = events.filter(
+      (event) => format(event.startDate, "yyyy-MM-dd") === formattedDate
+    );
 
-  const TimeTableCell = ({ children, ...restProps }) => (
-    <WeekView.TimeTableCell {...restProps} className="custom-time-table-cell">
-      {children}
-    </WeekView.TimeTableCell>
-  );
+    const bgColors = [
+      "bg-pink-500",
+      "bg-purple-500",
+      "bg-blue-500",
+      "bg-indigo-500",
+    ];
 
-  const DateTableCell = ({ children, ...restProps }) => (
-    <MonthView.DateTableCell {...restProps} className={`custom-date-table-cell ${restProps.className || ""}`}>
-      {children}
-    </MonthView.DateTableCell>
-  );
+    return (
+      <ul className="events space-y-1 ">
+        {dayEvents.map((event, index) => (
+          <li
+            key={event._id}
+            className={`inline-block px-2 py-1 rounded text-white ${bgColors[index % bgColors.length]} shadow-md cursor-pointer`}
+            onClick={() => handleStickerClick(event)}
+          >
+            {event.title} - {format(event.startDate, "hh:mm a")}
+          </li>
+        ))}
+      </ul>
+    );
+  };
 
-  const handleAppointmentClick = (appointmentData) => {
-    setSelectedEvent(appointmentData);
+  const handleStickerClick = (event) => {
+    setSelectedEvent(event);
     setSidebarContent("viewEvent");
     setSidebarOpen(true);
   };
@@ -99,16 +78,62 @@ const EventScheduler = () => {
     setSidebarOpen(true);
   };
 
+  const handleSaveEvent = async (eventData) => {
+    try {
+      if (selectedEvent) {
+        await updateEvent(selectedEvent._id, eventData);
+      } else {
+        await createEvent(eventData);
+      }
+      setSidebarOpen(false);
+      const updatedEvents = await getEvents();
+      setEvents(updatedEvents.map(event => ({
+        ...event,
+        startDate: parseISO(event.date),
+        endDate: new Date(new Date(event.date).getTime() + 2 * 60 * 60 * 1000),
+      })));
+    } catch (error) {
+      console.error('Failed to save event:', error);
+    }
+  };
+
+  const handleDeleteEvent = async () => {
+    try {
+      await deleteEvent(selectedEvent._id);
+      setSidebarOpen(false);
+      const updatedEvents = await getEvents();
+      setEvents(updatedEvents.map(event => ({
+        ...event,
+        startDate: parseISO(event.date),
+        endDate: new Date(new Date(event.date).getTime() + 2 * 60 * 60 * 1000),
+      })));
+    } catch (error) {
+      console.error('Failed to delete event:', error);
+    }
+  };
+
   const renderSidebarContent = () => {
     switch (sidebarContent) {
       case "viewEvent":
-        return <ViewEvent event={selectedEvent} />;
+        return (
+          <ViewEvent
+            event={selectedEvent}
+            onDelete={handleDeleteEvent}
+            onEdit={() => {
+              setSidebarContent("updateEvent"); // Change to updateEvent
+            }}
+          />
+        );
       case "addEvent":
-        return <AddEvent />;
+        return <AddEvent onSave={handleSaveEvent} />;
+      case "updateEvent":
+        return <UpdateEvent event={selectedEvent} onSave={handleSaveEvent} />; // Use UpdateEvent
       default:
         return <div>Select an action</div>;
     }
   };
+
+  const recentEvents = events.slice(0, 3);
 
   return (
     <>
@@ -125,33 +150,87 @@ const EventScheduler = () => {
               </button>
             </div>
             <div className="my-4 w-full h-40 flex justify-around rounded-sm gap-4">
-              {events.map((event) => (
-                <EventCard key={event.id} event={event} />
+              {recentEvents.map((event) => (
+                <EventCard key={event._id} event={event} />
               ))}
             </div>
-            <div className="py-7">
-              <Paper>
-                <Scheduler data={events}>
-                  <ViewState
-                    currentDate={currentDate}
-                    currentViewName={currentViewName}
-                    onCurrentDateChange={onCurrentDateChange}
-                    onCurrentViewNameChange={onCurrentViewNameChange}
-                  />
-                  <WeekView timeTableCellComponent={TimeTableCell} />
-                  <MonthView dateTableCellComponent={DateTableCell} />
-                  <Toolbar />
-                  <DateNavigator />
-                  <TodayButton />
-                  <ViewSwitcher />
-                  <Appointments appointmentComponent={Appointment} />
-                </Scheduler>
-              </Paper>
+            <hr className="my-6 border-t-2 mt-12 " />
+            <div className="py-7 ">
+              <Calendar
+                dateCellRender={handleDateCellRender}
+                headerRender={({ value, type, onChange, onTypeChange }) => {
+                  const start = 0;
+                  const end = 12;
+                  const monthOptions = [];
+
+                  const localeData = value.localeData();
+                  const months = localeData.monthsShort();
+
+                  for (let index = start; index < end; index++) {
+                    monthOptions.push(
+                      <option key={index} value={index}>
+                        {months[index]}
+                      </option>
+                    );
+                  }
+
+                  const year = value.year();
+                  const month = value.month();
+                  const options = [];
+                  for (let i = year - 10; i < year + 10; i += 1) {
+                    options.push(
+                      <option className="bg-white" key={i} value={i}>
+                        {i}
+                      </option>
+                    );
+                  }
+                  return (
+                    <div className="flex items-center space-x-2 justify-end mt-2 pt-2 mb-4">
+                      <select
+                        className="border rounded px-2 py-1"
+                        value={year}
+                        onChange={(event) => {
+                          const newYear = parseInt(event.target.value, 10);
+                          const now = value.clone().year(newYear);
+                          onChange(now);
+                        }}
+                      >
+                        {options}
+                      </select>
+                      <select
+                        className="border rounded px-2 py-1"
+                        value={month}
+                        onChange={(event) => {
+                          const newMonth = parseInt(event.target.value, 10);
+                          const now = value.clone().month(newMonth);
+                          onChange(now);
+                        }}
+                      >
+                        {monthOptions}
+                      </select>
+                      <div className="flex space-x-2">
+                        <button
+                          className={`border rounded px-2 py-1 ${type === "month" ? "bg-gradient-to-r from-pink-500 to-purple-500 text-white" : ""}`}
+                          onClick={() => onTypeChange("month")}
+                        >
+                          Month
+                        </button>
+                        <button
+                          className={`border rounded px-2 py-1 ${type === "year" ? "bg-gradient-to-r from-pink-500 to-purple-500 text-white" : ""}`}
+                          onClick={() => onTypeChange("year")}
+                        >
+                          Year
+                        </button>
+                      </div>
+                    </div>
+                  );
+                }}
+              />
             </div>
             <Sidebar
               isOpen={isSidebarOpen}
               onClose={handleSidebarClose}
-              title={<span className="bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent bg-clip-text">{sidebarContent === "viewEvent" ? "View Event" : "Add New Event"}</span>}
+              title={<span className="bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent bg-clip-text">{sidebarContent === "viewEvent" ? "View Event" : sidebarContent === "addEvent" ? "Add New Event" : "Update Event"}</span>}
             >
               {renderSidebarContent()}
             </Sidebar>
