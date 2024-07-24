@@ -1,43 +1,25 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { baseUrl } from "../../../../../config/Common";
 
-const OtherExpenses = React.memo(({ selectedMonth }) => {
+
+
+
+const OtherExpenses = (({ expenseData, selectedMonth }) => {
   const [data, setData] = useState([]);
   const [selectedTeacher, setSelectedTeacher] = useState(null);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1); // Pagination state
 
-  // Retrieve token
-  const token = localStorage.getItem('admin:token');
 
-  // Fetch data with pagination
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch(`${baseUrl}/api/admin/expenses?page=${currentPage}`, {
-          headers: {
-            'Authentication': `${token}` // Add Authorization header
-          }
-        });
-        const jsonData = await response.json();
-        setData(jsonData);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
+  // const handleSidebarOpen = () => {
+  //   if (selectedTeacher) setSidebarOpen(true);
+  // };
+  // const handleSidebarClose = () => setSidebarOpen(false);
 
-    fetchData();
-  }, [currentPage, token]); // Include token in dependency array
-
-  const handleSidebarOpen = () => {
-    if (selectedTeacher) setSidebarOpen(true);
-  };
-  const handleSidebarClose = () => setSidebarOpen(false);
-
-  const handlePayClick = (teacher) => {
-    setSelectedTeacher(teacher);
-    handleSidebarOpen();
-  };
+  // const handlePayClick = (teacher) => {
+  //   setSelectedTeacher(teacher);
+  //   handleSidebarOpen();
+  // };
 
   // Memoized filtering to optimize performance
   const filteredData = useMemo(() => {
@@ -59,27 +41,27 @@ const OtherExpenses = React.memo(({ selectedMonth }) => {
           </tr>
         </thead>
         <tbody>
-          {filteredData.map((item, index) => (
+          {expenseData?.reverse()?.map((item, index) => (
             <tr key={index} className="bg-white">
-              <td className="px-5 py-2 border-b border-gray-200">{item.reason}</td>
-              <td className="px-5 py-2 border-b border-gray-200">{item.amount}</td>
-              <td className="px-5 py-2 border-b border-gray-200">{new Date(item.date).toLocaleDateString()}</td>
+              <td className="px-5 py-2 border-b border-gray-200">{item?.reason}</td>
+              <td className="px-5 py-2 border-b border-gray-200">{item?.amount} QR</td>
+              <td className="px-5 py-2 border-b border-gray-200">{new Date(item?.date).toLocaleDateString()}</td>
               <td className="px-5 py-2 border-b border-gray-200">
                 <span
-                  className={`px-3 py-1 text-xs font-semibold rounded-full ${item.status === "Paid" ? "bg-green-200 text-green-800" : "bg-red-200 text-red-800"}`}
+                  className={`px-3 py-1 text-xs font-semibold rounded-full ${item?.status === "Paid" ? "bg-green-200 text-green-800" : "bg-red-200 text-red-800"}`}
                 >
-                  {item.status}
+                  {item?.status}
                 </span>
               </td>
               <td className="px-5 py-2 border-b border-gray-200">
-                {item.status === "Paid" ? (
+                {item?.status === "Paid" ? (
                   <span className="inline-flex items-center border border-transparent text-xs font-medium shadow-sm bg-green-200 text-green-800 py-1 px-2 rounded-md">
                     Complete
                   </span>
                 ) : (
                   <button
                     className="inline-flex items-center border border-transparent text-xs font-medium shadow-sm bg-gradient-to-r from-pink-500 to-purple-500 text-white py-1 px-2 rounded-md hover:from-pink-600 hover:to-purple-600"
-                    onClick={() => handlePayClick(item)}
+                  // onClick={() => handlePayClick(item)}
                   >
                     Pay Now
                   </button>
