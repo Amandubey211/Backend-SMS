@@ -9,32 +9,34 @@ const MainSection = () => {
   const [expandedChapters, setExpandedChapters] = useState([]);
   const [classData, setClassData] = useState(null);
 
-  const selectedClass = useSelector(state => state.Common.selectedClass);
-  const selectedSubjectId = useSelector(state => state.Common.selectedSubject);
-  const selectedSection = useSelector(state => state.Common.selectedSection);
-  const studentId = useSelector(state => state.Common.studentId);
+  const selectedClass = useSelector((state) => state.Common.selectedClass);
+  const selectedSubjectId = useSelector(
+    (state) => state.Common.selectedSubject
+  );
+  const selectedSection = useSelector((state) => state.Common.selectedSection);
+  const studentId = useSelector((state) => state.Common.studentId);
   useEffect(() => {
     const fetchClassData = async () => {
       try {
-        const token = localStorage.getItem('student:token');
+        const token = localStorage.getItem("student:token");
         if (!token) {
-          throw new Error('Authentication token not found');
+          throw new Error("Authentication token not found");
         }
 
         const response = await fetch(`${baseUrl}/student/my_class`, {
-          // const response = await fetch(`${baseUrl}/admin/student/classes/${selectedClass}/modules/${selectedSubject}`, {
-          //${baseUrl}/admin/student/classes/6672d55a57740d7dd939f72a/modules/667e76376c30078298d1e048        
           headers: {
-            'Authentication': token,
+            Authentication: token,
           },
         });
 
         if (!response.ok) {
-          throw new Error(`Failed to fetch class data, status: ${response.status}`);
+          throw new Error(
+            `Failed to fetch class data, status: ${response.status}`
+          );
         }
 
         const data = await response.json();
-        console.log("data in mainsection module", data)
+        console.log("data in mainsection module", data);
         if (data.status && data.data) {
           setClassData(data.data);
         } else {
@@ -63,11 +65,13 @@ const MainSection = () => {
   if (!classData) {
     return <div>Loading...</div>;
   }
-  console.log("classData._id is", selectedClass)
+  console.log("classData._id is", selectedClass);
 
   // const { subjects } = classData;
 
-  const selectedSubject = classData.subjects.find(subject => subject.subjectId === selectedSubjectId);
+  const selectedSubject = classData.subjects.find(
+    (subject) => subject.subjectId === selectedSubjectId
+  );
 
   if (!selectedSubject) {
     return <div>No subject selected or subject data not available</div>;
@@ -78,8 +82,6 @@ const MainSection = () => {
       <SubjectSideBar />
       <div className="w-[60%] bg-white p-2 border-l">
         <div className="bg-white p-2 rounded-lg">
-
-
           {selectedSubject.modules.map((module, index) => (
             <Chapter
               key={index}
@@ -93,7 +95,6 @@ const MainSection = () => {
               studentId={studentId}
             />
           ))}
-
         </div>
       </div>
       <div className="w-[35%] p-2 border">
@@ -103,7 +104,9 @@ const MainSection = () => {
             <p className="bg-gradient-to-r from-pink-100 to-purple-200 font-semibold rounded-full p-1 px-2">
               {" "}
               {/* <span className="text-gradient">{subjects[0]?.moduleCount || 0}</span>{" "} */}
-              <span className="text-gradient">{selectedSubject.moduleCount || 0}</span>
+              <span className="text-gradient">
+                {selectedSubject.moduleCount || 0}
+              </span>
             </p>
           </div>
           <div className="grid grid-cols-1 gap-2">
@@ -116,7 +119,6 @@ const MainSection = () => {
                 isCompleted={module.isPublished}
               />
             ))}
-
           </div>
         </div>
       </div>
