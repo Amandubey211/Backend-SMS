@@ -4,7 +4,7 @@ import DashLayout from "../../../Components/Admin/AdminDashLayout";
 import useNavHeading from "../../../Hooks/CommonHooks/useNavHeading ";
 import MainSection from "./MainSection";
 import { useDispatch, useSelector } from "react-redux";
-import { toggleSidebar } from "../../../Redux/Slices/SidebarSlice";
+import { toggleSidebar } from "../../../Redux/Slices/Common/SidebarSlice";
 
 const Group_Section = () => {
   const className = useSelector((store) => store.Common.selectedClass);

@@ -7,7 +7,7 @@ import { FiLogOut } from "react-icons/fi";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { useDispatch, useSelector } from "react-redux";
 import smallLogo from "../../Assets/SideBarAsset/smallLogo.png";
-import { toggleSidebar } from "../../Redux/Slices/SidebarSlice.js";
+import { toggleSidebar } from "../../Redux/Slices/Common/SidebarSlice.js";
   import  useParentLogout  from '../../Hooks/AuthHooks/Parent/useParentLogout.js';  
 
 const isActivePath = (path, locationPath) => {

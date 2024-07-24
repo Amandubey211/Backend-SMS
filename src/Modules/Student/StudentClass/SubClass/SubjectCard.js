@@ -15,25 +15,33 @@ const SubjectCard = ({ data, IDs, backgroundColor, Class, onSubjectClick }) => {
   console.log(" sectionID", IDs.section?.sectionId);
 
   const formattedSid = data.subjectId;
-  const selectedSubjectId = useSelector(state => state.Common.selectedSubject);
+  const selectedSubjectId = useSelector(
+    (state) => state.Common.selectedSubject
+  );
   console.log("Selected Subject ID from Redux:", selectedSubjectId);
 
   return (
-    <div className={`relative rounded-xl p-4 shadow-lg ${backgroundColor}`} 
-    // ()}
-
-    // onClick={() => onSubjectClick(data.subjectId)}>
-        onClick={() => onSubjectClick({subjectId: data.subjectId, subjectName: data.subjectName})}>
-
+    <div
+      className={`relative rounded-xl p-4 shadow-lg ${backgroundColor}`}
+      onClick={() =>
+        onSubjectClick({
+          subjectId: data.subjectId,
+          subjectName: data.subjectName,
+        })
+      }
+    >
       <div className="flex justify-between items-center mb-4">
         <button className="border border-white text-white rounded-full px-4 py-1">
-          {data.isPublished ? "Published" : "Unpublished"}
-
+          {data.isPublished ? "Publish" : "Unpublish"}
         </button>
-        <TbProgress size={50} color={"white"}/>
+        <TbProgress size={50} color={"white"} />
       </div>
-      <NavLink to={`/student_class/${IDs.classId}/section/${IDs.section?.sectionId}/module`}>
-        <h2 className="text-xl font-bold text-white w-[65%]">{data.subjectName}</h2>
+      <NavLink
+        to={`/student_class/${IDs.classId}/section/${IDs.section?.sectionId}/module`}
+      >
+        <h2 className="text-xl font-bold text-white w-[65%]">
+          {data.subjectName}
+        </h2>
         <div className="flex items-center mt-2 text-white">
           <span className="flex items-center mr-2 gap-1">
             <LuUser />
@@ -48,7 +56,7 @@ const SubjectCard = ({ data, IDs, backgroundColor, Class, onSubjectClick }) => {
       </NavLink>
       <div className="flex items-center mt-12">
         <img
-          src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR55M_UlhGRrK6U32QA4ETW3lQYkfOZrbgvdAibLhPmE7ffAwdvUOq6HvDvo0O9EPDjhY4&usqp=CAU'
+          src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR55M_UlhGRrK6U32QA4ETW3lQYkfOZrbgvdAibLhPmE7ffAwdvUOq6HvDvo0O9EPDjhY4&usqp=CAU"
           alt="teacher"
           className="w-12 h-12 rounded-full"
         />

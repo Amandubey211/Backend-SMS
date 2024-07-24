@@ -10,7 +10,7 @@ import {
 import { FiLogOut } from "react-icons/fi";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { useDispatch, useSelector } from "react-redux";
-import { toggleSidebar } from "../../Redux/Slices/SidebarSlice.js";
+import { toggleSidebar } from "../../Redux/Slices/Common/SidebarSlice.js";
 import useStaffLogout from "../../Hooks/AuthHooks/Staff/useStaffLogOut.js";
 
 const isActivePath = (path, locationPath) => locationPath.startsWith(path);

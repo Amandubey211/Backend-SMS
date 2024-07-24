@@ -9,8 +9,8 @@ import { NavLink, useNavigate } from "react-router-dom";
 
 const StudentLoginForm = () => {
   const [studentDetails, setStudentDetails] = useState({
-    email: "",
-    password: "",
+    email: "siddhant@studentdiwan.com",
+    password: "studentDiwan@12",
   });
     const [showPassword, setShowPassword] = useState(false);
 const { loading, studentLogin } = useStudentLogin();

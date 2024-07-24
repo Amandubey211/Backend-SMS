@@ -1,21 +1,19 @@
 import React from "react";
 import Layout from "../../../../Components/Common/Layout";
-// import DashLayout from "../../../../Components/Admin/AdminDashLayout";
 import MainSection from "./MainSection";
-import { useParams } from "react-router-dom";
 import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 import StudentDashLayout from "../../../../Components/Student/StudentDashLayout";
 import { useSelector } from "react-redux";
 
 const StudentClass = () => {
-  const { cid } = useParams();
   const className = useSelector((store) => store.Common.selectedClassName);
-  // useNavHeading(cid);
+  console.log(className)
   useNavHeading(className);
 
   return (
-    <Layout title={`${cid} | Student diwan`}>
-      <StudentDashLayout children={<MainSection />} hideAvatarList={true} />;
+    <Layout title={`My Class | Student diwan`}>
+       {/* hideAvatarList={true} */}
+      <StudentDashLayout children={<MainSection />} />;
     </Layout>
   );
 };
