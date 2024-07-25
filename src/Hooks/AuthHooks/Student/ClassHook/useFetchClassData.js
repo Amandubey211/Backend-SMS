@@ -4,6 +4,7 @@ import axios from "axios";
 import {
   setSelectedClass,
   setSelectedClassName,
+  setSelectedSectionId,
 } from "../../../../Redux/Slices/Common/CommonSlice";
 import { baseUrl } from "../../../../config/Common";
 
@@ -30,6 +31,7 @@ const useFetchClassData = () => {
 
         if (response.data.status && response.data.data) {
           setClassData(response.data.data);
+          dispatch(setSelectedSectionId(response.data.data.section.sectionId))
           dispatch(setSelectedClass(response.data.data.classId));
           dispatch(setSelectedClassName(response.data.data.className));
         } else {

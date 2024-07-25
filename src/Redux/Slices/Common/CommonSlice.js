@@ -11,7 +11,7 @@ const CommonSlice = createSlice({
       chapters: [],
     },
     NavbarData: {
-      leftHeading: ["aman"],
+      leftHeading: ["Student Diwan"],
     },
     selectedSection: null,
     studentId: null,
@@ -28,12 +28,12 @@ const CommonSlice = createSlice({
     setSelectedSubject: (state, action) => {
       state.selectedSubject = action.payload;
     },
+
     setSelectedModule: (state, action) => {
       state.selectedModule = action.payload;
     },
 
     setStudentId: (state, action) => {
-      // Add setStudentId action
       state.studentId = action.payload;
     },
 
@@ -42,6 +42,9 @@ const CommonSlice = createSlice({
     },
     setSelectedSubjectName: (state, action) => {
       state.selectedSubjectName = action.payload;
+    },
+    setSelectedSectionId: (state, action) => {
+      state.selectedSection = action.payload;
     },
   },
 });
@@ -54,6 +57,7 @@ export const {
   setSelectedClass,
   setSelectedClassName,
   setSelectedModule,
+  setSelectedSectionId
 } = CommonSlice.actions;
 
 export default CommonSlice.reducer;

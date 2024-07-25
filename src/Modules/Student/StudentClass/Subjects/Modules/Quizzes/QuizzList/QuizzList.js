@@ -1,12 +1,15 @@
 import React from "react";
-// import Layout from "../../../../../../Components/Common/Layout";
-import DashLayout from "../../../../../../../Components/Admin/AdminDashLayout";
 import MainSection from "./MainSection";
 import Layout from "../../../../../../../Components/Common/Layout";
 import StudentDashLayout from "../../../../../../../Components/Student/StudentDashLayout";
+import { useSelector } from "react-redux";
+import useNavHeading from "../../../../../../../Hooks/CommonHooks/useNavHeading ";
  
 const QuizzList = () => {
-  console.log("first")
+  const subjectName = useSelector((store) => store.Common.selectedSubjectName);
+  const className = useSelector((store) => store.Common.selectedClassName);
+
+  useNavHeading(className, subjectName);
   return (
     <Layout>
       <StudentDashLayout children={<MainSection />} hideSearchbar={true} />

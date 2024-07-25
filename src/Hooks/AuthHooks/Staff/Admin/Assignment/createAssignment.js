@@ -49,14 +49,13 @@ const useCreateAssignment = () => {
       setError(null);
 
       try {
-        
         const token = localStorage.getItem(`${role}:token`);
-
+        console.log(assignmentData);
         const response = await axios.post(
           `${baseUrl}/admin/create_assignment`, // Adjust the API endpoint as needed
           assignmentData,
           {
-            headers: {       Authentication: token, },
+            headers: { Authentication: token },
           }
         );
 
