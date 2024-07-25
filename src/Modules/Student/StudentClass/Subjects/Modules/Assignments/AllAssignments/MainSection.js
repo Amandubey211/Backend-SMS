@@ -1,25 +1,29 @@
-import React from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import SubjectSideBar from "../../../Component/SubjectSideBar";
-import List from "../Component/List";
-import FilterCard from "../Component/FilterCard";
+import List from "../../../Component/List";
+import FilterCard from "../../../Component/FilterCard";
 import { RiListCheck3 } from "react-icons/ri";
-import { useParams } from "react-router-dom";
 import useFetchAssignedAssignments from "../../../../../../../Hooks/AuthHooks/Student/Assignment/useFetchAssignedAssignments";
 import { useSelector } from "react-redux";
 
 const MainSection = () => {
-  const sectionId =
-    useSelector((state) => state.Common.selectedSection) || "sdf67890987"; // we need section id w
-  const { assignments, loading, error } =
+  const sectionId = useSelector((state) => state.Common.selectedSection);
+  const [filters, setFilters] = useState({
+    moduleId: "",
+    chapterId: "",
+  });
+
+  const { assignments, error, loading, fetchFilteredAssignments } =
     useFetchAssignedAssignments(sectionId);
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+  const refetchAssignments = useCallback(() => {
+    const { moduleId, chapterId } = filters;
+    fetchFilteredAssignments(sectionId, moduleId, chapterId);
+  }, [filters, sectionId, fetchFilteredAssignments]);
 
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
+  useEffect(() => {
+    refetchAssignments();
+  }, [refetchAssignments]);
 
   return (
     <div className="flex">
@@ -30,10 +34,12 @@ const MainSection = () => {
           title="All Assignments"
           data={assignments}
           icon={<RiListCheck3 />}
+          loading={loading}
+          error={error}
         />
       </div>
       <div className="w-[30%] p-4">
-        <FilterCard />
+        <FilterCard filters={filters} setFilters={setFilters} />
       </div>
     </div>
   );

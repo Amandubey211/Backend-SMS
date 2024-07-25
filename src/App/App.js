@@ -78,7 +78,6 @@ const Addmission = lazy(() => import("../Modules/Admin/Addmission/Addmission.js"
 const Classes = lazy(() => import("../Modules/Admin/Classes/Classes.js"));
 const Class = lazy(() => import("../Modules/Admin/Classes/SubClass/Class.js"));
 const StudentClass = lazy(() => import("../Modules/Student/StudentClass/SubClass/StudentClass.js"));
-const StudentCreateAssignment = lazy(() => import("../Modules/Student/StudentClass/Subjects/Modules/Assignments/CreateAssignment/CreateAssignment.js"));
 const Teachers = lazy(() => import("../Modules/Admin/Teachers/Teacher.js"));
 const UnVerifiedStudentDetails = lazy(() => import("../Modules/Admin/Verification/SubStudentVerification/UnVerifiedStudentDetails.js"));
 const VerificationPage = lazy(() => import("../Modules/Admin/Verification/VerificationPage.js"));
