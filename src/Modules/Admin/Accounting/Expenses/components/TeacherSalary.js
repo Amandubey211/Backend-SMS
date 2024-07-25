@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import Sidebar from "../../../../../Components/Common/Sidebar";
 import PaySalary from "./PaySalary";
 import { fetchApi } from '../api/api';
 import { baseUrl } from "../../../../../config/Common";
+import axios from "axios";
 
 const TeacherRow = React.memo(({ teacher, onPayClick }) => (
   <tr className="bg-white">
@@ -49,78 +50,57 @@ const TeacherRow = React.memo(({ teacher, onPayClick }) => (
   </tr>
 ));
 
-const TeacherSalary = ({ teacherData, selectedMonth }) => {
-  //const [teachersData, setTeachersData] = useState([]);
+const TeacherSalary = ({ initialTeacherData, selectedOption, selectedMonth }) => {
+  const [teacherData, setTeacherData] = useState(initialTeacherData || []);
   const [selectedTeacher, setSelectedTeacher] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [recordsPerPage] = useState(10); // Adjust number per page as needed
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const token = localStorage.getItem('admin:token');
 
-  // useEffect(() => {
-  //   loadSalaries();
-  // }, [selectedMonth]);
+  // Fetch salaries based on filter
+  const fetchSalaries = useCallback(async (query, month) => {
+    try {
+      const year = new Date().getFullYear();
+      const response = await axios.get(`${baseUrl}/admin/staff/get_salary?salaryRole=teacher&status=${query}&month=${month}&year=${year}`,
+        {
+          headers: {
+            Authentication: token
+          }
+        }
+      );
+      setTeacherData(response.data.salaryRecords);
+      console.log("teacgerDara",response);
+    } catch (error) {
+      console.error('Error fetching salaries:', error);
+    }
+  }, [token]);
 
-  // const loadSalaries = async () => {
-  //   try {
-  //     const response = await fetchApi(`${baseUrl}/admin/staff/get_salary?salaryRole=teacher`, "GET", null, token);
-  //     if (response && response.success && Array.isArray(response.salaryRecords)) {
-  //       const formattedData = response.salaryRecords.map(record => ({
-  //         profile: record.staffId.profile,
-  //         staffId: record.staffId._id,
-  //         staffName: record.staffId.fullName,
-  //         position: record.staffId.position,
-  //         contactInfo: record.staffId.mobileNumber,
-  //         month: record.month,
-  //         year: record.year,
-  //         salaryAmount: record.salaryAmount,
-  //         paidDate: record.paidDate,
-  //         status: record.status === "unpaid" ? "Unpaid" : "Paid"
-  //       }));
-  //       setTeachersData(formattedData);
-  //     } else {
-  //       setTeachersData([]);
-  //     }
-  //   } catch (error) {
-  //     console.error("Failed to fetch salaries:", error);
-  //   }
-  // };
+  useEffect(() => {
+    fetchSalaries(selectedOption, selectedMonth);
+  }, [selectedOption, selectedMonth, fetchSalaries]);
 
-  // const indexOfLastRecord = currentPage * recordsPerPage;
-  // const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
-  // const currentRecords = useMemo(() => data.slice(indexOfFirstRecord, indexOfLastRecord), [indexOfFirstRecord, indexOfLastRecord, teachersData]);
+  // Handle clicking the pay button
+  const handlePayClick = (teacher) => {
+    setSelectedTeacher(teacher);
+    setSidebarOpen(true);
+  };
 
-  // const handlePayClick = (teacher) => {
-  //   setSelectedTeacher(teacher);
-  //   setSidebarOpen(true);
-  // };
-
-  // const handleCreateSalary = async (salaryDetails) => {
-  //   try {
-  //     await fetchApi(`${baseUrl}/staff/create_salary?salaryRole=teacher`, "POST", salaryDetails, token);
-  //     //loadSalaries();
-  //     handleSidebarClose();
-  //   } catch (error) {
-  //     console.error("Failed to create salary:", error);
-  //   }
-  // };
-
+  // Handle salary update
   const handleUpdateSalary = async (salaryDetails) => {
     try {
       await fetchApi(`${baseUrl}/admin/staff/update_salary`, "PUT", salaryDetails, token);
-      //loadSalaries();
+      // Reload the salaries after update
+      await fetchSalaries(selectedOption, selectedMonth);
       handleSidebarClose();
     } catch (error) {
       console.error("Failed to update salary:", error);
     }
   };
 
+  // Close the sidebar
   const handleSidebarClose = () => {
     setSidebarOpen(false);
     setSelectedTeacher(null);
   };
-
-  const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
     <div>
@@ -138,15 +118,11 @@ const TeacherSalary = ({ teacherData, selectedMonth }) => {
         </thead>
         <tbody>
           {teacherData?.reverse()?.map((teacher, index) => (
-            <TeacherRow key={index} teacher={teacher} />
+            <TeacherRow key={index} teacher={teacher} onPayClick={handlePayClick} />
           ))}
         </tbody>
       </table>
-      <Sidebar
-        isOpen={isSidebarOpen}
-        onClose={handleSidebarClose}
-        title="Add Transaction"
-      >
+      <Sidebar isOpen={isSidebarOpen} onClose={handleSidebarClose} title="Add Transaction">
         <PaySalary teacher={selectedTeacher} onSave={handleUpdateSalary} />
       </Sidebar>
     </div>

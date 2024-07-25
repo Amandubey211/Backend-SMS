@@ -117,14 +117,9 @@ const Expenses = () => {
     }
   };
 
-  const handleUpdateExpense = async (id, updatedData) => {
-    try {
-      await updateExpense(id, updatedData);
-      //fetchExpenses(); // Refresh the expenses list
-      handleSidebarClose(); // Close the sidebar after updating
-    } catch (error) {
-      console.error('Error updating expense:', error);
-    }
+  const handleCreateExpense = async () => {
+    fetchSalaries(selectedOption, activeTab, selectedMonth); 
+    handleSidebarClose();
   };
 
   const handleDeleteExpense = async (id) => {
@@ -235,8 +230,9 @@ const Expenses = () => {
 
           {activeTab === "TeacherSalary" && (
             <TeacherSalary
-              teacherData={salaryData}
+              initialTeacherData={salaryData}
               selectedMonth={selectedMonth}
+              selectedOption={selectedOption}
               onEdit={fetchExpenseById}
               onDelete={handleDeleteExpense}
             />
@@ -246,6 +242,7 @@ const Expenses = () => {
             <StaffSalary
               staffData={salaryData}
               selectedMonth={selectedMonth}
+              selectedOption={selectedOption}
               onEdit={fetchExpenseById}
               onDelete={handleDeleteExpense}
             />
@@ -266,8 +263,8 @@ const Expenses = () => {
             title={<span className="font-normal text-gray-600">Add New Expenses</span>}
           >
             <AddExpense
-              expense={currentExpense}
-              onUpdate={handleUpdateExpense}
+              
+              onCreate={handleCreateExpense}
             />
           </Sidebar>
         </div>

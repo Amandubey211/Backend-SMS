@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
-import axios from 'axios';  // Importing Axios
+import axios from 'axios';
 import FormInput from '../../subClass/component/FormInput';
 import { baseUrl } from '../../../../../config/Common';
 
-const AddExpense = ({ fetchEarning }) => {
+const AddExpense = ({ onCreate }) => {
   const [formData, setFormData] = useState({
     amount: '',
-    expenseDate: '',
-    expenseReason: '',
-    paymentStatus: 'Paid Expenses', // Default to Paid Expenses
+    date: '',
+    reason: '',
+    status: 'paid', // Default to paid
   });
 
   const handleSubmit = async (e) => {
@@ -23,10 +23,11 @@ const AddExpense = ({ fetchEarning }) => {
 
     const payload = {
       amount: formData.amount,
-      dateOfEarning: formData.expenseDate,
-      expenseReason: formData.expenseReason,
-      paymentStatus: formData.paymentStatus,
+      date: formData.date,
+      reason: formData.reason,
+      status: formData.status === 'Paid Expenses' ? 'paid' : 'unpaid',
     };
+
     const config = {
       headers: {
         'Content-Type': 'application/json',
@@ -39,13 +40,13 @@ const AddExpense = ({ fetchEarning }) => {
       console.log('Expense saved successfully:', response.data);
       setFormData({
         amount: '',
-        expenseDate: '',
-        expenseReason: '',
-        paymentStatus: 'Paid Expenses',
+        date: '',
+        reason: '',
+        status: 'paid',
       });
-      fetchEarning();
+      onCreate();  // Call the onCreate callback to refresh the expenses list
     } catch (error) {
-      console.error('Error saving the expense:', error.response ? error.response.data.msg : error.message);
+      console.error('Error saving the expense:', error.response ? error.response.data.message : error.message);
     }
   };
 
@@ -63,9 +64,9 @@ const AddExpense = ({ fetchEarning }) => {
           <label className="flex items-center">
             <input
               type="radio"
-              name="paymentStatus"
+              name="status"
               value="Paid Expenses"
-              checked={formData.paymentStatus === 'Paid Expenses'}
+              checked={formData.status === 'Paid Expenses'}
               onChange={handleChange}
               className="form-radio"
             />
@@ -74,9 +75,9 @@ const AddExpense = ({ fetchEarning }) => {
           <label className="flex items-center">
             <input
               type="radio"
-              name="paymentStatus"
+              name="status"
               value="Due Expenses"
-              checked={formData.paymentStatus === 'Due Expenses'}
+              checked={formData.status === 'Due Expenses'}
               onChange={handleChange}
               className="form-radio"
             />
@@ -84,8 +85,8 @@ const AddExpense = ({ fetchEarning }) => {
           </label>
         </div>
       </div>
-      <FormInput id="expenseDate" name="expenseDate" label="Expense Date" type="date" value={formData.expenseDate} onChange={handleChange} required />
-      <FormInput id="expenseReason" name="expenseReason" label="Expense Reason" type="text" value={formData.expenseReason} onChange={handleChange} required />
+      <FormInput id="date" name="date" label="Expense Date" type="date" value={formData.date} onChange={handleChange} required />
+      <FormInput id="reason" name="reason" label="Expense Reason" type="text" value={formData.reason} onChange={handleChange} required />
       <button type="submit" className="w-full flex justify-center border border-transparent shadow-sm text-sm font-medium bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600">
         Add New Expense
       </button>

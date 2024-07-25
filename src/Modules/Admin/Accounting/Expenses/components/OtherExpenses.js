@@ -6,20 +6,19 @@ import { baseUrl } from "../../../../../config/Common";
 
 const OtherExpenses = (({ expenseData, selectedMonth }) => {
   const [data, setData] = useState([]);
-  const [selectedTeacher, setSelectedTeacher] = useState(null);
+  const [selectedItem, setSelectedItem] = useState(null);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1); // Pagination state
 
 
-  // const handleSidebarOpen = () => {
-  //   if (selectedTeacher) setSidebarOpen(true);
-  // };
-  // const handleSidebarClose = () => setSidebarOpen(false);
+  const handleSidebarOpen = () => {
+    if (selectedItem) setSidebarOpen(true);
+  };
+  const handleSidebarClose = () => setSidebarOpen(false);
 
-  // const handlePayClick = (teacher) => {
-  //   setSelectedTeacher(teacher);
-  //   handleSidebarOpen();
-  // };
+  const handlePayClick = (item) => {
+    setSelectedItem(item);
+    handleSidebarOpen();
+  };
 
   // Memoized filtering to optimize performance
   const filteredData = useMemo(() => {
@@ -61,7 +60,7 @@ const OtherExpenses = (({ expenseData, selectedMonth }) => {
                 ) : (
                   <button
                     className="inline-flex items-center border border-transparent text-xs font-medium shadow-sm bg-gradient-to-r from-pink-500 to-purple-500 text-white py-1 px-2 rounded-md hover:from-pink-600 hover:to-purple-600"
-                  // onClick={() => handlePayClick(item)}
+                  onClick={() => handlePayClick(item)}
                   >
                     Pay Now
                   </button>
