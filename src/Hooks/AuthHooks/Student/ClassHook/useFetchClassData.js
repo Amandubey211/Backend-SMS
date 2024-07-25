@@ -1,10 +1,9 @@
-// hooks/useFetchClassData.js
 import { useState, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import axios from "axios";
 import {
   setSelectedClass,
   setSelectedClassName,
-  setSelectedSection,
 } from "../../../../Redux/Slices/Common/CommonSlice";
 import { baseUrl } from "../../../../config/Common";
 
@@ -14,6 +13,7 @@ const useFetchClassData = () => {
   const [error, setError] = useState(null);
   const dispatch = useDispatch();
   const role = useSelector((store) => store.Auth.role);
+
   useEffect(() => {
     const fetchClassData = async () => {
       try {
@@ -22,24 +22,16 @@ const useFetchClassData = () => {
           throw new Error("Authentication token not found");
         }
 
-        const response = await fetch(`${baseUrl}/student/my_class`, {
+        const response = await axios.get(`${baseUrl}/student/my_class`, {
           headers: {
             Authentication: token,
           },
         });
 
-        if (!response.ok) {
-          throw new Error(
-            `Failed to fetch class data, status: ${response.status}`
-          );
-        }
-
-        const data = await response.json();
-        if (data.status && data.data) {
-          setClassData(data.data);
-          dispatch(setSelectedClass(data.data.classId));
-          dispatch(setSelectedClassName(data.data.className));
-          dispatch(setSelectedSection(data.data.section.sectionId));
+        if (response.data.status && response.data.data) {
+          setClassData(response.data.data);
+          dispatch(setSelectedClass(response.data.data.classId));
+          dispatch(setSelectedClassName(response.data.data.className));
         } else {
           throw new Error("No class data or unsuccessful response");
         }
@@ -51,7 +43,7 @@ const useFetchClassData = () => {
     };
 
     fetchClassData();
-  }, [dispatch]);
+  }, [dispatch, role]);
 
   const memoizedClassData = useMemo(() => classData, [classData]);
 

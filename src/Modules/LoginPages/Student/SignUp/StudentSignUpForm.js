@@ -9,7 +9,7 @@ import DocumentUploadForm from "./DocumentUploadForm";
 import NavigationLink from "./NavigationLink";
 import validateStudentDetails from "../../../../Validataions/Student/validateStudentDetails";
 import { useSelector, useDispatch } from "react-redux";
-import { setStep } from "../../../../Redux/Slices/AuthSlice";
+import { setStep } from "../../../../Redux/Slices/Auth/AuthSlice";
 
 const StudentSignUpForm = () => {
   const fileInputRef = useRef(null);

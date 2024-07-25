@@ -1,7 +1,7 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
-import { setAuth, setRole } from "../../../Redux/Slices/AuthSlice.js";
+import { setAuth, setRole } from "../../../Redux/Slices/Auth/AuthSlice.js";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { baseUrl } from "../../../config/Common.js";

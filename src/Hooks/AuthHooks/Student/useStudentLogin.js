@@ -1,7 +1,7 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
-import { setAuth, setRole } from "../../../Redux/Slices/AuthSlice";
+import { setAuth, setRole } from "../../../Redux/Slices/Auth/AuthSlice";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { setStudentId } from "../../../Redux/Slices/Common/CommonSlice";

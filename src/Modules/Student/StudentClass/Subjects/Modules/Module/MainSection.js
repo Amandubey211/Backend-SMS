@@ -2,53 +2,33 @@ import React, { useState, useEffect } from "react";
 import SubjectSideBar from "../../Component/SubjectSideBar";
 import Chapter from "./Components/Chapter";
 import ModuleCard from "./Components/ModuleCard";
-import { useSelector } from "react-redux";
-import { baseUrl } from "../../../../../../config/Common";
+import { useSelector, useDispatch } from "react-redux";
+import { setSelectedModule } from "../../../../../../Redux/Slices/Common/CommonSlice";
+import useGetModulesForStudent from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useGetModulesForStudent";
 
 const MainSection = () => {
   const [expandedChapters, setExpandedChapters] = useState([]);
-  const [classData, setClassData] = useState(null);
+  const dispatch = useDispatch();
+  const selectedModule = useSelector((state) => state.Common.selectedModule);
+  const { error, fetchModules, loading, modulesData } = useGetModulesForStudent();
 
-  const selectedClass = useSelector((state) => state.Common.selectedClass);
-  const selectedSubjectId = useSelector(
-    (state) => state.Common.selectedSubject
-  );
-  const selectedSection = useSelector((state) => state.Common.selectedSection);
-  const studentId = useSelector((state) => state.Common.studentId);
   useEffect(() => {
-    const fetchClassData = async () => {
-      try {
-        const token = localStorage.getItem("student:token");
-        if (!token) {
-          throw new Error("Authentication token not found");
-        }
+    fetchModules();
+  }, [fetchModules]);
 
-        const response = await fetch(`${baseUrl}/student/my_class`, {
-          headers: {
-            Authentication: token,
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error(
-            `Failed to fetch class data, status: ${response.status}`
-          );
-        }
-
-        const data = await response.json();
-        console.log("data in mainsection module", data);
-        if (data.status && data.data) {
-          setClassData(data.data);
-        } else {
-          console.error("No class data or unsuccessful response");
-        }
-      } catch (error) {
-        console.error("Failed to fetch class data:", error);
-      }
-    };
-
-    fetchClassData();
-  }, []);
+  useEffect(() => {
+    if (modulesData && modulesData.modules.length > 0) {
+      dispatch(
+        setSelectedModule({
+          moduleId: modulesData.modules[0]._id,
+          name: modulesData.modules[0].moduleName,
+          chapters: modulesData.modules[0].chapters,
+        })
+      );
+    } else {
+      dispatch(setSelectedModule({}));
+    }
+  }, [dispatch, modulesData]);
 
   const handleToggle = (chapterId) => {
     setExpandedChapters((prev) =>
@@ -58,43 +38,43 @@ const MainSection = () => {
     );
   };
 
-  console.log("Selected Subject ID from Redux:", selectedSubjectId);
-  console.log("Selected  section from Redux:", selectedSection);
-  console.log("studentId from Redux:", studentId);
-
-  if (!classData) {
-    return <div>Loading...</div>;
-  }
-  console.log("classData._id is", selectedClass);
-
-  // const { subjects } = classData;
-
-  const selectedSubject = classData.subjects.find(
-    (subject) => subject.subjectId === selectedSubjectId
-  );
-
-  if (!selectedSubject) {
-    return <div>No subject selected or subject data not available</div>;
-  }
+  const handleModuleSelect = (module) => {
+    dispatch(
+      setSelectedModule({
+        moduleId: module._id,
+        name: module.moduleName,
+        chapters: module.chapters,
+      })
+    );
+    setExpandedChapters([]);
+  };
 
   return (
     <div className="flex min-h-screen">
       <SubjectSideBar />
       <div className="w-[60%] bg-white p-2 border-l">
         <div className="bg-white p-2 rounded-lg">
-          {selectedSubject.modules.map((module, index) => (
-            <Chapter
-              key={index}
-              title={module.name}
-              chapterNumber={index + 1}
-              imageUrl={module.thumbnail}
-              items={module.chapters}
-              isExpanded={expandedChapters.includes(module._id)}
-              onToggle={() => handleToggle(module._id)}
-              classId={selectedClass}
-              studentId={studentId}
-            />
-          ))}
+          <div className="flex justify-between px-4 mb-3 items-center">
+            <h1 className="text-md font-semibold">
+              {selectedModule.name ? selectedModule.name : "Select a Module"}
+            </h1>
+          </div>
+          {selectedModule.chapters && selectedModule.chapters.length > 0 ? (
+            selectedModule.chapters.map((chapter, index) => (
+              <Chapter
+                key={index}
+                title={chapter.name}
+                chapterNumber={index + 1}
+                imageUrl={chapter.thumbnail}
+                assignments={chapter.assignments}
+                quizzes={chapter.quizzes}
+                isExpanded={expandedChapters.includes(chapter._id)}
+                onToggle={() => handleToggle(chapter._id)}
+              />
+            ))
+          ) : (
+            <p>No Chapters Found.</p>
+          )}
         </div>
       </div>
       <div className="w-[35%] p-2 border">
@@ -102,21 +82,23 @@ const MainSection = () => {
           <div className="flex items-center gap-1 mb-2">
             <h1 className="text-xl font-semibold">All Modules</h1>
             <p className="bg-gradient-to-r from-pink-100 to-purple-200 font-semibold rounded-full p-1 px-2">
-              {" "}
-              {/* <span className="text-gradient">{subjects[0]?.moduleCount || 0}</span>{" "} */}
               <span className="text-gradient">
-                {selectedSubject.moduleCount || 0}
+                {modulesData?.modules.length || 0}
               </span>
             </p>
           </div>
           <div className="grid grid-cols-1 gap-2">
-            {selectedSubject.modules.map((module, index) => (
+            {modulesData?.modules.map((module, index) => (
               <ModuleCard
                 key={index}
-                title={module.name}
+                title={module.moduleName}
                 moduleNumber={index + 1}
                 imageUrl={module.thumbnail}
                 isCompleted={module.isPublished}
+                isSelected={
+                  selectedModule && selectedModule.moduleId === module._id
+                }
+                onSelect={() => handleModuleSelect(module)}
               />
             ))}
           </div>

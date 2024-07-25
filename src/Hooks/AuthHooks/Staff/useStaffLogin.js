@@ -5,7 +5,7 @@ import {
   setAuth,
   setRole,
   setUerDetails,
-} from "../../../Redux/Slices/AuthSlice.js";
+} from "../../../Redux/Slices/Auth/AuthSlice.js";
 import { useNavigate } from "react-router-dom";
 import {requestPermissionAndGetToken} from '../../NotificationHooks/NotificationHooks.js';
 import axios from "axios";

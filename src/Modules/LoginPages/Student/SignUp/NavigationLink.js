@@ -1,7 +1,7 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { NavLink } from "react-router-dom";
-import { setStep } from "../../../../Redux/Slices/AuthSlice";
+import { setStep } from "../../../../Redux/Slices/Auth/AuthSlice";
 
 const Navigation = () => {
   const step = useSelector((store) => store.Auth.step);

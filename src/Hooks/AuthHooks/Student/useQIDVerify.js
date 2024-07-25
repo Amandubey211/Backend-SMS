@@ -2,7 +2,7 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { setRole } from "../../../Redux/Slices/AuthSlice";
+import { setRole } from "../../../Redux/Slices/Auth/AuthSlice";
 import { useDispatch } from "react-redux";
 import { baseUrl } from "../../../config/Common";
 const TOKEN_STORAGE_KEY = process.env.REACT_APP_STUDENT_TOKEN_STORAGE_KEY;
