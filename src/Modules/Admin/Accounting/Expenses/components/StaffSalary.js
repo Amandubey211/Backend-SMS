@@ -1,12 +1,13 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import Sidebar from "../../../../../Components/Common/Sidebar";
 import PaySalary from "./PaySalary";
 import { fetchApi } from '../api/api';
 import { baseUrl } from "../../../../../config/Common";
+import axios from "axios";
 
 // Memoized row component
 const SalaryRow = React.memo(({ staff, onPayClick }) => (
-  
+
   <tr className="bg-white">
     <td className="px-5 py-3 border-b border-gray-200 flex items-center">
       {staff.staffId?.profile ? (
@@ -30,12 +31,12 @@ const SalaryRow = React.memo(({ staff, onPayClick }) => (
       {staff.paidDate ? new Date(staff.paidDate).toLocaleDateString() : "---"}
     </td>
     <td className="px-5 py-2 border-b border-gray-200">
-      <span className={`px-3 py-1 text-xs font-semibold ${staff.status === "Paid" ? " text-green-800" : " text-red-800"}`}>
+      <span className={`px-3 py-1 text-xs font-semibold ${staff.status === "paid" ? " text-green-800" : " text-red-800"}`}>
         {staff.status}
       </span>
     </td>
     <td className="px-5 py-2 border-b border-gray-200">
-      {staff.status === "Paid" ? (
+      {staff.status === "paid" ? (
         <span className="inline-flex items-center border border-transparent text-xs font-medium shadow-sm bg-green-200 text-green-800 py-1 px-2 rounded-md">
           Completed
         </span>
@@ -51,76 +52,57 @@ const SalaryRow = React.memo(({ staff, onPayClick }) => (
   </tr>
 ));
 
-const StaffSalary = ({ staffData, selectedMonth }) => {
-  const [teachersData, setTeachersData] = useState([]);
-  const [selectedTeacher, setSelectedTeacher] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [recordsPerPage] = useState(10); // Adjust the number per page as needed
+const StaffSalary = ({ initialStaffData, selectedOption, selectedMonth }) => {
+  const [staffData, setStaffData] = useState(initialStaffData || []);
+  const [selectedStaff, setSelectedStaff] = useState(null);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const token = localStorage.getItem('admin:token');
 
-  // useEffect(() => {
-  //   loadSalaries();
-  // }, [selectedMonth]);
 
-  // const loadSalaries = async () => {
-  //   try {
-  //     const response = await fetchApi(`${baseUrl}/admin/staff/get_salary?salaryRole=all`, "GET", null, token);
-  //     if (response && response.success && Array.isArray(response.salaryRecords)) {
-  //       const formattedData = response.salaryRecords.map(record => ({
-  //         profile: record.staffId.profile,
-  //         staffName: record.staffId.fullName,
-  //         position: record.staffId.position,
-  //         contactInfo: record.staffId.mobileNumber,
-  //         month: record.month,
-  //         salaryAmount: record.salaryAmount,
-  //         paidDate: record.paidDate,
-  //         status: record.status === "unpaid" ? "Unpaid" : "Paid"
-  //       }));
-  //       console.log("formattedData", formattedData)
-  //       setTeachersData(formattedData);
-  //     } else {
-  //       setTeachersData([]);
-  //     }
-  //   } catch (error) {
-  //     console.error("Failed to fetch salaries:", error);
-  //   }
-  // };
 
-  const indexOfLastRecord = currentPage * recordsPerPage;
-  const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
-  //const currentRecords = useMemo(() => teachersData.slice(indexOfFirstRecord, indexOfLastRecord), [indexOfFirstRecord, indexOfLastRecord, teachersData]);
+  const fetchSalaries = useCallback(async (query, month) => {
+    try {
+      const year = new Date().getFullYear();
+      const response = await axios.get(`${baseUrl}/admin/staff/get_salary?salaryRole=all&status=${query}&month=${month}&year=${year}`,
+        {
+          headers: {
+            Authentication: token
+          }
+        }
+      );
+      setStaffData(response.data.salaryRecords);
+      console.log("staffData", response);
+    } catch (error) {
+      console.error('Error fetching salaries:', error);
+    }
+  }, [token]);
 
-  const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
+  useEffect(() => {
+    fetchSalaries(selectedOption, selectedMonth);
+  }, [selectedOption, selectedMonth, fetchSalaries]);
 
-  const handlePayClick = (teacher) => {
-    setSelectedTeacher(teacher);
+  // Handle clicking the pay button
+  const handlePayClick = (staff) => {
+    setSelectedStaff(staff);
     setSidebarOpen(true);
   };
 
-  // const handleCreateSalary = async (salaryDetails) => {
-  //   try {
-  //     await fetchApi(`${baseUrl}/staff/create_salary?salaryRole=all`, "POST", salaryDetails, token);
-  //     loadSalaries();
-  //     handleSidebarClose();
-  //   } catch (error) {
-  //     console.error("Failed to create salary:", error);
-  //   }
-  // };
 
-  // const handleUpdateSalary = async (salaryDetails) => {
-  //   try {
-  //     await fetchApi(`${baseUrl}/admin/staff/update_salary`, "PUT", salaryDetails, token);
-  //     loadSalaries();
-  //     handleSidebarClose();
-  //   } catch (error) {
-  //     console.error("Failed to update salary:", error);
-  //   }
-  // };
+
+  const handleUpdateSalary = async (salaryDetails) => {
+    try {
+      await fetchApi(`${baseUrl}/admin/staff/update_salary`, "PUT", salaryDetails, token);
+
+      await fetchSalaries(selectedOption, selectedMonth);
+      handleSidebarClose();
+    } catch (error) {
+      console.error("Failed to update salary:", error);
+    }
+  };
 
   const handleSidebarClose = () => {
     setSidebarOpen(false);
-    setSelectedTeacher(null); // Reset selected teacher on close
+    setSelectedStaff(null);
   };
 
   return (
@@ -138,25 +120,18 @@ const StaffSalary = ({ staffData, selectedMonth }) => {
           </tr>
         </thead>
         <tbody>
-          
+
           {staffData?.reverse()?.map((staff, index) => (
             <SalaryRow key={index} staff={staff} onPayClick={handlePayClick} />
           ))}
         </tbody>
       </table>
-      <div className="pagination">
-        {[...Array(Math.ceil(teachersData.length / recordsPerPage)).keys()].map(number => (
-          <button key={number} onClick={() => handlePageChange(number + 1)}>
-            {number + 1}
-          </button>
-        ))}
-      </div>
       <Sidebar
         isOpen={isSidebarOpen}
         onClose={handleSidebarClose}
         title="Add Transaction"
       >
-        <PaySalary teacher={selectedTeacher} />
+        <PaySalary teacher={selectedStaff} onSave={handleUpdateSalary} />
       </Sidebar>
     </div>
   );

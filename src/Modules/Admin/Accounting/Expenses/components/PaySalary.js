@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
 
 const PaySalary = ({ teacher, onSave }) => {
-  const [salaryAmount, setSalaryAmount] = useState(
-    teacher ? teacher.salaryAmount : 0
-  );
+  const [salaryAmount, setSalaryAmount] = useState(teacher ? teacher.salaryAmount : 0);
+
   useEffect(() => {
     if (teacher) {
       setSalaryAmount(teacher.salaryAmount);
@@ -16,12 +15,12 @@ const PaySalary = ({ teacher, onSave }) => {
 
   const handlePayment = () => {
     const salaryDetails = {
-      staffId: teacher.staffId,
+      staffId: teacher.staffId._id, // Assuming staffId is an object
       month: teacher.month,
-      year:teacher.year,
-      status: 'Paid'
+      year: teacher.year,
+      status: 'paid'
     };
-    console.log("salaryDetails",salaryDetails);
+    console.log("salaryDetails", salaryDetails);
     onSave(salaryDetails);
   };
 
@@ -31,20 +30,20 @@ const PaySalary = ({ teacher, onSave }) => {
         <h2 className="text-xl font-semibold">Pay Salary</h2>
       </div>
       <div className="flex flex-col items-center mb-4">
-      {teacher.profile ? (
+        {teacher.staffId.profile ? (
           <img
-            src={teacher.profile}
-            alt={teacher.staffName}
+            src={teacher.staffId.profile}
+            alt={teacher.staffId.fullName}
             className="w-24 h-24 rounded-full"
           />
         ) : (
           <div className="w-24 h-24 rounded-full bg-gray-300 flex items-center justify-center">
-            <span className="text-gray-700 font-semibold text-3xl">{teacher.staffName[0]}</span>
+            <span className="text-gray-700 font-semibold text-3xl">{teacher.staffId.fullName[0]}</span>
           </div>
         )}
-        <h3 className="mt-2 text-lg font-semibold">{teacher.staffName}</h3>
-        <p className="">{teacher.position}</p>
-        <p className="text-green-600">{teacher.contactInfo}</p>
+        <h3 className="mt-2 text-lg font-semibold">{teacher.staffId.fullName}</h3>
+        <p>{teacher.staffId.position}</p>
+        <p className="text-green-600">{teacher.staffId.mobileNumber}</p>
       </div>
       <div className="mb-4">
         <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -60,12 +59,13 @@ const PaySalary = ({ teacher, onSave }) => {
       </div>
       <button
         onClick={handlePayment}
-        className="w-full flex justify-center border border-transparent shadow-sm text-sm font-medium  bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600"
+        className="w-full flex justify-center border border-transparent shadow-sm text-sm font-medium bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600"
       >
         Pay Now
       </button>
     </div>
   );
 };
+
 
 export default PaySalary;
