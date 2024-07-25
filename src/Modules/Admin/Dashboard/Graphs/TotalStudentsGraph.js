@@ -7,8 +7,12 @@ const TotalStudentsGraphjs = ({ maleStudents, femaleStudents }) => {
     datasets: [
       {
         data: [maleStudents, femaleStudents], // Dynamic values for the chart
-        backgroundColor: ["#8F77F3", "#23C55E"], // Colors for the segments
-        borderWidth: 1,
+        backgroundColor: ["#23C55E", "#8F77F3"], // Colors for the segments
+        borderWidth: 0,
+        cutout: "70%",
+        borderRadius: 10,
+        spacing: 5, // Reduce space between segments
+        hoverOffset: 10, // Increase segment size on hover
       },
     ],
     labels: ["Male Students", "Female Students"],
@@ -35,6 +39,10 @@ const TotalStudentsGraphjs = ({ maleStudents, femaleStudents }) => {
         },
       },
     },
+    hover: {
+      mode: 'nearest',
+      intersect: true,
+    },
   };
 
   return (
@@ -52,17 +60,20 @@ const TotalStudentsGraphjs = ({ maleStudents, femaleStudents }) => {
           </div>
         </div>
       </div>
-      <div className="mt-2 flex justify-around text-sm">
+      <div className="flex justify-around mt-4 text-lg">
         <div className="flex flex-col items-start">
-          <span className="inline-block w-10 h-1 mb-1 bg-[#8F77F3]"></span>
-          <span className="text-xs text-gray-500">Male Students</span>
-          <span className="text-lg font-bold">{maleStudents}</span>
+          <div className="w-16 h-1 bg-[#8F77F3] rounded-full mb-1"></div>
+          <div className="text-left">
+            <span className="text-gray-700">Female Students</span>
+            <div className="font-bold text-gray-700">{femaleStudents}</div>
+          </div>
         </div>
-        <div className="border-r h-14"></div>
         <div className="flex flex-col items-start">
-          <span className="inline-block w-10 h-1 mb-1 bg-[#23C55E]"></span>
-          <span className="text-xs text-gray-500">Female Students</span>
-          <span className="text-lg font-bold">{femaleStudents}</span>
+          <div className="w-16 h-1 bg-[#23C55E] rounded-full mb-1"></div>
+          <div className="text-left">
+            <span className="text-gray-700">Male Students</span>
+            <div className="font-bold text-gray-700">{maleStudents}</div>
+          </div>
         </div>
       </div>
     </div>

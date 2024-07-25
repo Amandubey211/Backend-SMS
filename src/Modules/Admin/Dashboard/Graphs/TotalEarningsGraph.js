@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { Line } from "react-chartjs-2";
 import { Chart as ChartJS, registerables } from "chart.js";
 ChartJS.register(...registerables);
@@ -6,6 +6,7 @@ ChartJS.register(...registerables);
 const TotalEarningsGraph = () => {
   const chartRef = useRef(null);
   const [clickedIndex, setClickedIndex] = useState(null);
+  const [tooltipData, setTooltipData] = useState(null);
 
   const data = {
     labels: ["Sat", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri"],
@@ -67,38 +68,20 @@ const TotalEarningsGraph = () => {
   const options = {
     plugins: {
       tooltip: {
-        backgroundColor: "rgba(0, 0, 0, 0.8)",
-        titleFont: {
-          size: 14,
-          weight: "bold",
-        },
-        bodyFont: {
-          size: 14,
-        },
-        displayColors: false,
-        callbacks: {
-          label: function (context) {
-            const value = context.raw.toLocaleString();
-            const day = context.dataIndex + 1;
-            const date = new Date();
-            date.setDate(day);
-            const formattedDate = `${day}${getOrdinalSuffix(
-              day
-            )} ${date.toLocaleString("default", { month: "long" })}`;
-            return `${value}\n${formattedDate}`;
-          },
-          title: function () {
-            return "";
-          },
-        },
-        titleAlign: "center",
-        bodyAlign: "center",
-        padding: 10,
-        usePointStyle: true,
-        caretSize: 10,
-        cornerRadius: 4,
-        boxWidth: 10,
-        boxHeight: 10,
+        enabled: false,
+        external: (context) => {
+          const tooltipModel = context.tooltip;
+          if (tooltipModel.opacity === 0) {
+            setTooltipData(null);
+            return;
+          }
+          const value = tooltipModel.dataPoints[0].raw.toLocaleString();
+          const day = tooltipModel.dataPoints[0].dataIndex + 1;
+          const date = new Date();
+          date.setDate(day);
+          const formattedDate = `${day}${getOrdinalSuffix(day)} ${date.toLocaleString("default", { month: "long" })}`;
+          setTooltipData({ value, formattedDate, left: tooltipModel.caretX, top: tooltipModel.caretY });
+        }
       },
       legend: {
         display: false,
@@ -156,19 +139,41 @@ const TotalEarningsGraph = () => {
             ctx.strokeStyle = dataset.borderColor;
             ctx.stroke();
             ctx.restore();
-          },
+          }
         };
 
         ChartJS.unregister(verticalLinePlugin);
         ChartJS.register(verticalLinePlugin);
         chartInstance.update();
+
+        // Show tooltip data
+        const value = point.toLocaleString();
+        const day = index + 1;
+        const date = new Date();
+        date.setDate(day);
+        const formattedDate = `${day}${getOrdinalSuffix(day)} ${date.toLocaleString("default", { month: "long" })}`;
+        setTooltipData({ value, formattedDate, left: elements[0].element.x, top: elements[0].element.y });
       }
     },
   };
 
+  const handleOutsideClick = (event) => {
+    if (!chartRef.current.canvas.contains(event.target)) {
+      setClickedIndex(null);
+      setTooltipData(null);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("click", handleOutsideClick);
+    return () => {
+      document.removeEventListener("click", handleOutsideClick);
+    };
+  }, []);
+
   return (
-    <div className="p-4">
-      <div className="bg-white p-6 rounded-lg shadow-md">
+    <div className="">
+      <div className="bg-white p-6 ">
         <div className="flex justify-between items-center mb-4">
           <div>
             <h2 className="text-xl font-semibold">Earnings</h2>
@@ -180,8 +185,27 @@ const TotalEarningsGraph = () => {
             </select>
           </div>
         </div>
-        <Line ref={chartRef} data={data} options={options} />
-
+        <div className="relative">
+          <Line ref={chartRef} data={data} options={options} />
+          {tooltipData && (
+            <div
+              style={{
+                position: "absolute",
+                left: tooltipData.left,
+                top: tooltipData.top,
+                transform: "translate(-50%, -100%)",
+                backgroundColor: "rgba(0, 0, 0, 0.8)",
+                color: "#fff",
+                padding: "8px",
+                borderRadius: "4px",
+                pointerEvents: "none",
+              }}
+            >
+              <div>{tooltipData.value}</div>
+              <div>{tooltipData.formattedDate}</div>
+            </div>
+          )}
+        </div>
         <div className="flex justify-around mt-4">
           <div className="flex flex-col items-start">
             <div

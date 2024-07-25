@@ -51,7 +51,7 @@ const TotalAttendanceGraph = () => {
   };
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow-lg">
+    <div className="bg-white p-4 ">
       <div className="flex justify-between items-center mb-4">
         <div>
           <h2 className="text-xl font-semibold">Todays Attendance</h2>

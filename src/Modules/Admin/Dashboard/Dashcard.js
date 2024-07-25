@@ -16,7 +16,7 @@ const DashCard = ({
     >
       <div className="flex gap-4 items-center">
         <div
-          className={`p-3 bg-white ${textColor} rounded-full shadow-2xl text-2xl`}
+          className={`p-3 bg-white ${textColor} rounded-full  text-2xl`}
         >
           {icon}
         </div>
