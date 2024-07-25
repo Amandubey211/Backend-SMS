@@ -10,7 +10,7 @@ const useGetModulesForStudent = () => {
   const [error, setError] = useState(null);
   const [modulesData, setModulesData] = useState(null);
   const role = useSelector((store) => store.Auth.role);
-  
+
   const { cid, sid } = useParams();
   const dispatch = useDispatch();
   const fetchModules = useCallback(async () => {

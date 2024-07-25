@@ -1,5 +1,5 @@
 import { configureStore } from "@reduxjs/toolkit";
-import AuthSliceReducer from "../Slices/AuthSlice.js";
+import AuthSliceReducer from "../Slices/Auth/AuthSlice.js";
 import sidebarReducer from "../Slices/Common/SidebarSlice.js";
 import AdminReducers from "../Slices/AdminSlice.js";
 import CommonReducers from "../Slices/Common/CommonSlice.js";

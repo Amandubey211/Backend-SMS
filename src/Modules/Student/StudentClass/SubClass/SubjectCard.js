@@ -1,24 +1,13 @@
 import React from "react";
 import { LuUser } from "react-icons/lu";
 import { BsBook } from "react-icons/bs";
-import { NavLink } from "react-router-dom";
+import { NavLink, useParams } from "react-router-dom";
 import ClassCardBookImg from "../../../../Assets/ClassesAssets/ClassCardBook.png";
 import { useSelector } from "react-redux";
 import { TbProgress } from "react-icons/tb";
 
-const SubjectCard = ({ data, IDs, backgroundColor, Class, onSubjectClick }) => {
-  console.log("subject idSSSS", data.subjectId);
-  console.log("subject Nameisss", data.subjectName);
+const SubjectCard = ({ data, backgroundColor, classId, onSubjectClick }) => {
 
-  console.log(" id", IDs);
-  console.log(" classId", IDs.classId);
-  console.log(" sectionID", IDs.section?.sectionId);
-
-  const formattedSid = data.subjectId;
-  const selectedSubjectId = useSelector(
-    (state) => state.Common.selectedSubject
-  );
-  console.log("Selected Subject ID from Redux:", selectedSubjectId);
 
   return (
     <div
@@ -37,7 +26,7 @@ const SubjectCard = ({ data, IDs, backgroundColor, Class, onSubjectClick }) => {
         <TbProgress size={50} color={"white"} />
       </div>
       <NavLink
-        to={`/student_class/${IDs.classId}/section/${IDs.section?.sectionId}/module`}
+        to={`/student_class/${classId}/${data.subjectId}/module`}
       >
         <h2 className="text-xl font-bold text-white w-[65%]">
           {data.subjectName}

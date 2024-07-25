@@ -1,27 +1,30 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
+import { FaChevronDown, FaChevronUp, FaEllipsisV } from "react-icons/fa";
 import ChapterItem from "./ChapterItem";
-import {
-  FaPlus,
-  FaEllipsisV,
-  FaChevronDown,
-  FaChevronUp,
-} from "react-icons/fa";
-import ModuleDetails from "./ModuleDetails"; // Import the new ModuleDetails component
 
-// const Chapter = ({
-//   title,
-//   chapterNumber,
-//   imageUrl,
-//   items,
-//   isExpanded,
-//   onToggle,
-// }) => {
+const Chapter = ({
+  title,
+  chapterNumber,
+  imageUrl,
+  assignments,
+  quizzes,
+  isExpanded,
+  onToggle,
+}) => {
+  const combinedItems = [
+    ...assignments.map((assignment) => ({
+      ...assignment,
+      type: "assignment",
+    })),
+    ...quizzes.map((quiz) => ({
+      ...quiz,
+      type: "quiz",
+    })),
+  ];
 
-const Chapter = ({ title, isExpanded, chapterNumber, onToggle, classId, studentId, imageUrl, items }) => {
-  console.log("classId is", classId)
   return (
-    <div className="mb-4 p-1 bg-white rounded-lg border-b  ">
-      <div className="flex items-center justify-between mb-2 ">
+    <div className="mb-4 p-1 bg-white rounded-lg border-b">
+      <div className="flex items-center justify-between mb-2">
         <div className="flex items-center">
           <img
             src={imageUrl}
@@ -33,13 +36,10 @@ const Chapter = ({ title, isExpanded, chapterNumber, onToggle, classId, studentI
             <p className="text-gray-500">Chapter {chapterNumber}</p>
           </div>
         </div>
-        <div className="flex  items-center space-x-2">
-          {/* <button className="border p-2 rounded-full hover:bg-gray-50">
-            <FaPlus className="text-pink-500" />
-          </button>
-          <button className=" border p-2 rounded-full hover:bg-gray-50">
+        <div className="flex items-center space-x-2">
+          <button className="border p-2 rounded-full hover:bg-gray-50">
             <FaEllipsisV />
-          </button> */}
+          </button>
           <button
             className="border p-2 rounded-full hover:bg-gray-50"
             onClick={onToggle}
@@ -48,27 +48,25 @@ const Chapter = ({ title, isExpanded, chapterNumber, onToggle, classId, studentI
           </button>
         </div>
       </div>
-      {/* {isExpanded && (
+      {isExpanded && (
         <div className="ml-10 py-2">
-          {items?.length > 0 ? (
-            items?.map((item, index) => (
+          {combinedItems.length > 0 ? (
+            combinedItems.map((item, index) => (
               <ChapterItem
                 key={index}
                 type={item.type}
-                title={item.title}
+                title={item.name}
+                id={item._id}
                 isPublished={item.isPublished}
-                id={item.id}
               />
             ))
           ) : (
-            <p className="text-gray-500">No chapters found</p>
+            <p className="py-2 bg-gray-50 italic text-gray-500 text-center">
+              No Data found
+            </p>
           )}
         </div>
-      )} */}
-      {isExpanded && (
-        <ModuleDetails isExpanded={isExpanded} classId={classId} studentId={studentId} />
       )}
-
     </div>
   );
 };

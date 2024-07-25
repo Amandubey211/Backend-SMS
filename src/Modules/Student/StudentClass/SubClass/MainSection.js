@@ -6,13 +6,12 @@ import { useParams } from "react-router-dom";
 import { FaSchool, FaSpinner } from "react-icons/fa";
 import { SlEyeglass } from "react-icons/sl";
 import { FcGraduationCap, FcCalendar } from "react-icons/fc";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import useFetchClassData from "../../../../Hooks/AuthHooks/Student/ClassHook/useFetchClassData";
 import {
   setSelectedSubject,
   setSelectedSubjectName,
 } from "../../../../Redux/Slices/Common/CommonSlice";
-import Spinner from "../../../../Components/Common/Spinner";
 import Fallback from "../../../../Components/Common/Fallback";
 
 const colors = [
@@ -27,7 +26,6 @@ const colors = [
 const getColor = (index) => colors[index % colors.length];
 
 const MainSection = () => {
-  const { cid } = useParams();
   const { classData, loading, error } = useFetchClassData();
   const dispatch = useDispatch();
 
@@ -35,14 +33,13 @@ const MainSection = () => {
     dispatch(setSelectedSubject(subjectId));
     dispatch(setSelectedSubjectName(subjectName));
   };
-
   const iconData = useMemo(
     () =>
       classData && [
         {
           icon: <SlEyeglass className="text-purple-600" />,
           text: `My Class Teacher (${classData.teachersCount})`,
-          url: `/student_class/class/${cid}/teachers`,
+          url: `/student_class/class/${classData.classId}/teachers`,
         },
         {
           icon: <FaSchool className="text-yellow-600" />,
@@ -53,22 +50,22 @@ const MainSection = () => {
         {
           icon: <FcGraduationCap />,
           text: `My Classmates (${classData.classmatesCount}) `,
-          url: `/student_class/class/${cid}/classmates`,
+          url: `/student_class/class/${classData.classId}/classmates`,
         },
         {
           icon: <FcCalendar />,
           text: "My Attendance",
-          url: `/student_class/class/${cid}/attendance`,
+          url: `/student_class/class/${classData.classId}/attendance`,
         },
       ],
-    [classData, cid]
+    [classData]
   );
 
   if (loading) {
     return (
       <div className="w-full h-screen flex flex-col items-center justify-center">
         {/* <Spinner /> */}
-        <Fallback/>
+        <Fallback />
       </div>
     );
   }
@@ -99,8 +96,7 @@ const MainSection = () => {
             <SubjectCard
               key={index}
               data={subject}
-              IDs={classData}
-              Class={cid}
+              classId={classData.classId}
               onSubjectClick={handleSubjectClick}
               backgroundColor={getColor(index)}
             />
