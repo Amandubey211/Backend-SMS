@@ -29,7 +29,7 @@ const AllStudents = () => {
       <NavLink 
         key={student.id} 
         to={`/user/${student._id}`} 
-        className="block p-6 bg-white rounded-lg shadow-lg hover:bg-gray-100 transition"
+        className="block p-6 bg-white rounded-lg shadow-lg hover:bg-gray-100 transition border"
       >
         <h3 className="text-2xl font-semibold mb-2">{student.firstName}</h3>
         <p className="text-gray-600"><span className="font-medium">ID:</span> {student.id}</p>

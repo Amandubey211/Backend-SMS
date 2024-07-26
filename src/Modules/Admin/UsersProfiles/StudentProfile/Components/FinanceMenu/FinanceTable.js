@@ -1,6 +1,7 @@
 import React from "react";
 
 const FinanceTable = ({ feesDetails }) => {
+  console.log(feesDetails);
   return (
     <table className="min-w-full leading-normal">
       <thead>

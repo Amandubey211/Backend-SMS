@@ -3,7 +3,7 @@ import { createSlice } from '@reduxjs/toolkit';
 const initialState = {
   allStaff: [],
   allAccountant: [],
-  allLibraian: [],
+  allLibrarian: [],
 };
 
 const StaffSlice = createSlice({
@@ -13,7 +13,7 @@ const StaffSlice = createSlice({
     setStaff: (state, action) => {
       state.allStaff = action.payload.staff;
       state.allAccountant = action.payload.accountant;
-      state.allLibraian = action.payload.libraian;
+      state.allLibrarian = action.payload.librarian;
     },
   },
 });

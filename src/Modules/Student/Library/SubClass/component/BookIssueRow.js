@@ -19,7 +19,7 @@ const BookIssueRow = ({ item }) => {
             <td className="px-5 py-3 border-b border-gray-100">
                 <div className="flex items-center">
                     <div className="rounded-full border border-gray-100">
-                        <img src={item.bookId.image} alt="Profile" className="h-8 w-8 rounded-full" />
+                        <img src={item?.bookId?.image} alt="Profile" className="h-8 w-8 rounded-full" />
                     </div>
 
                     <div className="flex flex-col ml-2">
