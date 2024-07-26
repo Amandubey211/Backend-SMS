@@ -170,11 +170,14 @@ function App() {
     { path: "/users/libraians", element: <AllLibraian />, errorElement: <Error /> },
     { path: "/users/staffs", element: <AllStaff />, errorElement: <Error /> },
     { path: "/users/admin", element: <UserProfile />, errorElement: <Error /> },
-    
-   // Student------------------------------------------------------------------------------
+
+    // Student------------------------------------------------------------------------------
     { path: "/student_dash", element: <ProtectRoute Component={StudentDash} allowedRoles={["student"]} />, errorElement: <Error /> },
     //-- Student Class -------------
-    { path: "/student_class", element: <ProtectRoute Component={ StudentClass} allowedRoles={["student"]} />, errorElement: <Error /> },
+    { path: "/student_class", element: <ProtectRoute Component={StudentClass} allowedRoles={["student"]} />, errorElement: <Error /> },
+    { path: "/student_class/class/:cid/attendance", element: <ProtectRoute Component={StudentAttendance} allowedRoles={["student"]} />, errorElement: <Error /> },
+    { path: "/student_class/class/:cid/teachers", element: <ProtectRoute Component={StudentTeacher} allowedRoles={["student"]} />, errorElement: <Error /> },
+    { path: "/student_class/class/:cid/classmates", element: <ProtectRoute Component={StudentClassMates} allowedRoles={["student"]} />, errorElement: <Error /> },
     { path: "/student_class/:cid/:sid/module", element: <ProtectRoute Component={StudentModule} allowedRoles={["student"]} />, errorElement: <Error /> },
     { path: "/student_class/:cid/:sid/assignments", element: <ProtectRoute Component={StudentAssignmentList} allowedRoles={["student"]} />, errorElement: <Error /> },
     { path: "/student_class/:cid/:sid/assignments/:aid/view", element: <ProtectRoute Component={StudentAssignmentView} allowedRoles={["student"]} />, errorElement: <Error /> },
@@ -191,11 +194,11 @@ function App() {
     { path: "/student_class/:cid/section/:sid/pages/:did/view", element: <ProtectRoute Component={StudentPageView} allowedRoles={["student"]} />, errorElement: <Error /> },
 
     //--------------------------------------------------------------------------------------------------
-    { path: "/student_finance", element: <ProtectRoute Component={StudentFinance} allowedRoles={["student"]} />, errorElement: <Error  />  },
+    { path: "/student_finance", element: <ProtectRoute Component={StudentFinance} allowedRoles={["student"]} />, errorElement: <Error /> },
     { path: "/student_library", element: <ProtectRoute Component={StudentLibrarySection} allowedRoles={["student"]} />, errorElement: <Error /> },
-    { path: "/student/noticeboard/announcements", element:  <ProtectRoute Component={StudentAnnounce} allowedRoles={["student"]}/>, errorElement: <Error /> },
-    { path: "/student/noticeboard/events", element: <ProtectRoute Component={StudentEvent} allowedRoles={["student"]}/>, errorElement: <Error /> },
-   
+    { path: "/student/noticeboard/announcements", element: <ProtectRoute Component={StudentAnnounce} allowedRoles={["student"]} />, errorElement: <Error /> },
+    { path: "/student/noticeboard/events", element: <ProtectRoute Component={StudentEvent} allowedRoles={["student"]} />, errorElement: <Error /> },
+
 
     // parent----------------------------------------------------------------
     { path: "/parent_dash", element: <ParentDash />, errorElement: <Error /> },
