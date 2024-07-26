@@ -13,7 +13,6 @@ const TaskChart = ({ totalTasks = 12, completedTasks = 5 }) => {
     const missingPercentage = 100 - completedPercentage;
 
     const data = {
-        labels: ['Completed Task', 'Missing Task'],
         datasets: [
             {
                 data: [completedPercentage, missingPercentage],
@@ -49,11 +48,13 @@ const TaskChart = ({ totalTasks = 12, completedTasks = 5 }) => {
     };
 
     return (
-        <div className=" flex-1 p-5 flex flex-row justify-start items-start ">
-
-            <Doughnut data={data} options={options} />
+        <>
+       
+        <div className=" flex-1 p-5 flex flex-col justify-start items-start h-[15rem] ">
+   
+              <Doughnut data={data} options={options} />
             </div>
-
+</>
     );
 };
 

@@ -37,9 +37,9 @@ const MainSection = () => {
   };
 
   return (
-    <div className="flex  min-h-screen">
+    <div className="flex  min-h-screen my-2">
       {/* <SubjectSideBar /> */}
-      <div className="w-[60%] bg-white p-2  border-l">
+      <div className="w-[65%] bg-white p-2  border-l">
         <div className="bg-white p-2 rounded-lg">
           <div className="flex justify-between items-center mb-5">
 
@@ -63,7 +63,7 @@ const MainSection = () => {
           ))}
         </div>
       </div>
-      <div className="w-[35%] p-2 border">
+      <div className="w-[35%] p-2 border-l-2 ">
         <div className="bg-white p-4 rounded-lg">
           <div className="flex items-center gap-1 mb-2">
             {/* <h1 className="text-xl font-semibold">All Modules</h1> */}

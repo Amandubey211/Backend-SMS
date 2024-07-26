@@ -14,10 +14,13 @@ import { format } from "date-fns";
 import { ViewState } from "@devexpress/dx-react-scheduler";
 import Layout from "../../../../../../Components/Common/Layout";
 import DashLayout from "../../../../../../Components/Admin/AdminDashLayout";
-
+import { FaCheck } from "react-icons/fa";
+import { FaUserFriends } from "react-icons/fa";
+import AttendenceCard from "./AttendenceCard";
 // import Layout from "../../../../../Components/Common/";
 // import DashLayout from "../../../../../Components/Admin/AdminDashLayout";
-
+import { MdCancel } from "react-icons/md";
+import { FcLeave } from "react-icons/fc";
 const StudentAttendance = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
 let student;
@@ -87,6 +90,32 @@ let student;
 
   return (
     <>
+     <div className="flex flex-row gap-3 p-4 ">
+           <div className="w-[18rem]">
+           <AttendenceCard
+              icon={<FaCheck className="text-green-300 text-[2.5rem] font-bold border border-green-300 p-2 rounded-full" />}
+              label="Total Present"
+              value={ 0}
+              buttonLabel="Message"
+              onButtonClick={() => console.log("Message clicked")}
+            />
+           </div>
+            <AttendenceCard
+              icon={<MdCancel className="text-red-300 text-[2.5rem] font-bold border border-red-300 p-2 rounded-full" />}
+              label="Total Absent"
+              value={student?.finance?.parentsAccountTotalPaid | 0}
+              onButtonClick={() => console.log("Message clicked")}
+              buttonLabel={null}
+            />
+            <AttendenceCard
+              icon={<FcLeave className="text-red-200 text-[2.5rem] font-bold border border-red-200 p-2 rounded-full" />}
+              label="Total Leave"
+              value={student?.finance
+                ?.totalPaidFees | 0}
+                buttonLabel={null}
+              onButtonClick={() => console.log("Message clicked")}
+            />
+          </div>
       <div className="min-h-screen p-4 bg-gray-50">
         <Paper>
           <Scheduler data={attendanceData} height={660}>
