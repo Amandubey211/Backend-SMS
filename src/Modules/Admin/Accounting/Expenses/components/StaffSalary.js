@@ -5,52 +5,106 @@ import { fetchApi } from '../api/api';
 import { baseUrl } from "../../../../../config/Common";
 import axios from "axios";
 
-// Memoized row component
-const SalaryRow = React.memo(({ staff, onPayClick }) => (
 
-  <tr className="bg-white">
-    <td className="px-5 py-3 border-b border-gray-200 flex items-center">
-      {staff.staffId?.profile ? (
-        <img src={staff.staffId?.profile} alt="Profile" className="w-10 h-10 rounded-full mr-3" />
-      ) : (
-        <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center mr-3">
-          <span className="text-gray-700 font-semibold">
-            {staff.staffId?.fullName[0]}
-          </span>
+const DropdownMenu = ({ onEditClick }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const handleToggle = () => setIsOpen(!isOpen);
+
+  return (
+    <div className="relative">
+      <button
+        onClick={handleToggle}
+        className="inline-flex items-center justify-center p-2 bg-transparent text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+      >
+        <span className="text-lg">&#x22EE;</span>
+      </button>
+      {isOpen && (
+        <div className="absolute right-0 w-48 mt-2 origin-top-right bg-white border border-gray-200 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+          <div className="p-1">
+            <button
+              onClick={onEditClick}
+              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+            >
+              Edit
+            </button>
+          </div>
         </div>
       )}
-      <div>
-        <div>{staff.staffId?.fullName}</div>
-        <div className="text-sm text-gray-500">{staff.staffId?.position}</div>
-      </div>
-    </td>
-    <td className="px-5 py-2 border-b border-gray-200">{staff.staffId?.mobileNumber}</td>
-    <td className="px-5 py-2 border-b border-gray-200">{staff.month}</td>
-    <td className="px-5 py-2 border-b border-gray-200">{staff.salaryAmount} QR</td>
-    <td className="px-5 py-2 border-b border-gray-200">
-      {staff.paidDate ? new Date(staff.paidDate).toLocaleDateString() : "---"}
-    </td>
-    <td className="px-5 py-2 border-b border-gray-200">
-      <span className={`px-3 py-1 text-xs font-semibold ${staff.status === "paid" ? " text-green-800" : " text-red-800"}`}>
-        {staff.status}
-      </span>
-    </td>
-    <td className="px-5 py-2 border-b border-gray-200">
-      {staff.status === "paid" ? (
-        <span className="inline-flex items-center border border-transparent text-xs font-medium shadow-sm bg-green-200 text-green-800 py-1 px-2 rounded-md">
-          Completed
+    </div>
+  );
+};
+
+
+
+
+// Memoized row component
+const SalaryRow = React.memo(({ staff, onPayClick }) => {
+  const handleEditClick = async () => {
+    try {
+      // Trigger API call for updating salary
+      await axios.put(`${baseUrl}/admin/staff/update_salary`, {
+        staffId: staff.staffId._id, 
+      }, {
+        headers: {
+          Authentication: localStorage.getItem('admin:token')
+        }
+      });
+
+      // You might want to refresh data or provide feedback to the user
+      console.log('Salary updated successfully');
+      // Optionally, trigger a refresh or update the parent component's state
+    } catch (error) {
+      console.error("Failed to update salary:", error);
+    }
+  };
+
+  return (
+    <tr className="bg-white">
+      <td className="px-5 py-3 border-b border-gray-200 flex items-center">
+        {staff.staffId?.profile ? (
+          <img src={staff.staffId?.profile} alt="Profile" className="w-10 h-10 rounded-full mr-3" />
+        ) : (
+          <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center mr-3">
+            <span className="text-gray-700 font-semibold">
+              {staff.staffId?.fullName[0]}
+            </span>
+          </div>
+        )}
+        <div>
+          <div>{staff.staffId?.fullName}</div>
+          <div className="text-sm text-gray-500">{staff.staffId?.position}</div>
+        </div>
+      </td>
+      <td className="px-5 py-2 border-b border-gray-200">{staff.staffId?.mobileNumber}</td>
+      <td className="px-5 py-2 border-b border-gray-200">{staff.month}</td>
+      <td className="px-5 py-2 border-b border-gray-200">{staff.salaryAmount} QR</td>
+      <td className="px-5 py-2 border-b border-gray-200">
+        {staff.paidDate ? new Date(staff.paidDate).toLocaleDateString() : "---"}
+      </td>
+      <td className="px-5 py-2 border-b border-gray-200">
+        <span className={`px-3 py-1 text-xs font-semibold ${staff.status === "paid" ? " text-green-800" : " text-red-800"}`}>
+          {staff.status}
         </span>
-      ) : (
-        <button
-          className="inline-flex items-center border border-transparent text-xs font-medium shadow-sm bg-gradient-to-r from-pink-500 to-purple-500 text-white py-1 px-2 rounded-md hover:from-pink-600 hover:to-purple-600"
-          onClick={() => onPayClick(staff)}
-        >
-          Pay Now
-        </button>
-      )}
-    </td>
-  </tr>
-));
+      </td>
+      <td className="px-5 py-2 border-b border-gray-200 flex items-center justify-between space-x-2">
+        {staff.status === "paid" ? (
+          <span className="inline-flex items-center border border-transparent text-xs font-medium shadow-sm bg-green-200 text-green-800 py-1 px-2 rounded-md">
+            Completed
+          </span>
+        ) : (
+          <button
+            className="inline-flex items-center border border-transparent text-xs font-medium shadow-sm bg-gradient-to-r from-pink-500 to-purple-500 text-white py-1 px-2 rounded-md hover:from-pink-600 hover:to-purple-600"
+            onClick={() => onPayClick(staff)}
+          >
+            Pay Now
+          </button>
+        )}
+        <DropdownMenu onEditClick={handleEditClick} />
+      </td>
+    </tr>
+  );
+});
 
 const StaffSalary = ({ initialStaffData, selectedOption, selectedMonth }) => {
   const [staffData, setStaffData] = useState(initialStaffData || []);
