@@ -41,7 +41,7 @@ const subjects = [
   ];
 const AllSubjects = () => {
   return (
-    <div className="p-4 ">
+    <div className="px-4">
       <SubjectsSlider subjects={subjects} />
     </div>
   )
