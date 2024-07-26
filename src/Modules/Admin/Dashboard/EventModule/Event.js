@@ -12,6 +12,7 @@ const monthNames = [
 
 const Events = () => {
   const { error, events, fetchFilteredEvents, loading } = useGetFilteredEvents();
+  console.log(useGetFilteredEvents)
 
   const currentMonth = new Date().getMonth() + 1; // Months are zero-indexed
   const currentYear = new Date().getFullYear();
