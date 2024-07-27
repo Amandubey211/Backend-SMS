@@ -2,8 +2,7 @@
 import React, { useMemo } from "react";
 import NavIconCard from "./Components/NavIconCard";
 import SubjectCard from "./SubjectCard";
-import { useParams } from "react-router-dom";
-import { FaSchool, FaSpinner } from "react-icons/fa";
+import { FaSchool } from "react-icons/fa";
 import { SlEyeglass } from "react-icons/sl";
 import { FcGraduationCap, FcCalendar } from "react-icons/fc";
 import { useDispatch, useSelector } from "react-redux";
@@ -12,7 +11,7 @@ import {
   setSelectedSubject,
   setSelectedSubjectName,
 } from "../../../../Redux/Slices/Common/CommonSlice";
-import Fallback from "../../../../Components/Common/Fallback";
+import Spinner from "../../../../Components/Common/Spinner";
 
 const colors = [
   "bg-yellow-300",
@@ -64,8 +63,7 @@ const MainSection = () => {
   if (loading) {
     return (
       <div className="w-full h-screen flex flex-col items-center justify-center">
-        {/* <Spinner /> */}
-        <Fallback />
+        <Spinner />
       </div>
     );
   }

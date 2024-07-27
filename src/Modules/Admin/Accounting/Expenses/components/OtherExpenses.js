@@ -4,16 +4,34 @@ import { baseUrl } from "../../../../../config/Common";
 import Sidebar from "../../../../../Components/Common/Sidebar";
 import { useSelector } from "react-redux";
 
-
 const OtherExpenses = ({ expenseData, selectedMonth }) => {
   const [data, setData] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
-  const [loading, setLoading] = useState(false); // Track loading state
   const role = useSelector((store) => store.Auth.role);
   const token = localStorage.getItem(`${role}:token`);
+  const [loading, setLoading] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState(null);
+  const [isEditSidebarOpen, setEditSidebarOpen] = useState(false);
+  const [editExpense, setEditExpense] = useState(null);
 
-  // Debugging useEffect to see if expenseData is being set correctly
+  const handleDropdownToggle = (index) => {
+    setOpenDropdown(openDropdown === index ? null : index);
+  };
+
+  const handleDropdownClose = () => {
+    setOpenDropdown(null);
+  };
+
+  const handleEditSidebarOpen = (expense) => {
+    setEditExpense(expense);
+    setEditSidebarOpen(true);
+  };
+
+  const handleEditSidebarClose = () => {
+    setEditSidebarOpen(false);
+    setEditExpense(null);
+  };
   useEffect(() => {
     setData(expenseData);
   }, [expenseData]);
@@ -37,25 +55,21 @@ const OtherExpenses = ({ expenseData, selectedMonth }) => {
     setSelectedItem(item);
   };
 
-  // Function to handle API call
   const handlePayNow = async () => {
     if (!selectedItem) return;
 
     setLoading(true);
 
     try {
-      const expenseId = selectedItem._id
-      // Replace with your actual API endpoint and request
+      const expenseId = selectedItem._id;
       await axios.put(`${baseUrl}/api/admin/expenses/${expenseId}`, {
         status: "paid"
-      },
-        {
-          headers: {
-            Authentication: token
-          }
-        });
+      }, {
+        headers: {
+          Authentication: token
+        }
+      });
 
-      // Update the local state or handle response as needed
       setData((prevData) =>
         prevData.map((item) =>
           item._id === selectedItem._id ? { ...item, status: "paid" } : item
@@ -70,7 +84,48 @@ const OtherExpenses = ({ expenseData, selectedMonth }) => {
     }
   };
 
-  // Memoized filtering to optimize performance
+  const handleDelete = async (expenseId) => {
+    setLoading(true);
+    try {
+      await axios.delete(`${baseUrl}/api/admin/expenses/${expenseId}`, {
+        headers: {
+          Authentication: token
+        }
+      });
+      setData(prevData => prevData.filter(item => item._id !== expenseId));
+    } catch (error) {
+      console.error('Error deleting expense:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleEditSave = async () => {
+    if (!editExpense) return;
+
+    setLoading(true);
+
+    try {
+      const expenseId = editExpense._id;
+      await axios.put(`${baseUrl}/api/admin/expenses/${expenseId}`, editExpense, {
+        headers: {
+          Authentication: token
+        }
+      });
+
+      setData((prevData) =>
+        prevData.map((item) =>
+          item._id === editExpense._id ? editExpense : item
+        )
+      );
+      handleEditSidebarClose();
+    } catch (error) {
+      console.error('Error updating expense:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const filteredData = useMemo(() => {
     const filtered = selectedMonth === "All" || !selectedMonth
       ? data
@@ -103,7 +158,7 @@ const OtherExpenses = ({ expenseData, selectedMonth }) => {
                   {item.status}
                 </span>
               </td>
-              <td className="px-5 py-2 border-b border-gray-200">
+              <td className="px-5 py-2 border-b border-gray-200 flex items-center justify-between relative">
                 {item.status === "paid" ? (
                   <span className="inline-flex items-center border border-transparent text-xs font-medium shadow-sm bg-green-200 text-green-800 py-1 px-2 rounded-md">
                     Completed
@@ -115,6 +170,34 @@ const OtherExpenses = ({ expenseData, selectedMonth }) => {
                   >
                     Pay Now
                   </button>
+                )}
+                <button
+                  onClick={() => handleDropdownToggle(index)}
+                  className="text-gray-500 hover:text-gray-700 transition duration-300"
+                >
+                  &#x22EE;
+                </button>
+                {openDropdown === index && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+                    <button
+                      onClick={() => {
+                        handleEditSidebarOpen(item);
+                        handleDropdownClose();
+                      }}
+                      className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 transition duration-300"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => {
+                        handleDelete(item._id);
+                        handleDropdownClose();
+                      }}
+                      className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 transition duration-300"
+                    >
+                      Delete
+                    </button>
+                  </div>
                 )}
               </td>
             </tr>
@@ -168,7 +251,61 @@ const OtherExpenses = ({ expenseData, selectedMonth }) => {
           </button>
         </div>
       </Sidebar>
+
+      <Sidebar
+        isOpen={isEditSidebarOpen}
+        title="Edit Expense"
+        onClose={handleEditSidebarClose}
+        width="1/3"
+      >
+        <div className="bg-white p-4 rounded-lg shadow">
+          <div className="flex justify-between items-center border-b pb-4 mb-4">
+            <h2 className="text-xl font-semibold">Edit Expense</h2>
+          </div>
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Reason
+            </label>
+            <input
+              type="text"
+              value={editExpense?.reason || ''}
+              onChange={(e) => setEditExpense({ ...editExpense, reason: e.target.value })}
+              className="mt-1 p-2 w-full border border-gray-300 rounded-md shadow-sm"
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Amount
+            </label>
+            <input
+              type="number"
+              value={editExpense?.amount || ''}
+              onChange={(e) => setEditExpense({ ...editExpense, amount: e.target.value })}
+              className="mt-1 p-2 w-full border border-gray-300 rounded-md shadow-sm"
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Date
+            </label>
+            <input
+              type="date"
+              value={editExpense?.date ? new Date(editExpense.date).toISOString().split('T')[0] : ''}
+              onChange={(e) => setEditExpense({ ...editExpense, date: e.target.value })}
+              className="mt-1 p-2 w-full border border-gray-300 rounded-md shadow-sm"
+            />
+          </div>
+          <button
+            onClick={handleEditSave}
+            disabled={loading}
+            className={`w-full flex justify-center border border-transparent shadow-sm text-sm font-medium bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600 ${loading ? 'bg-gray-400' : ''}`}
+          >
+            {loading ? 'Saving...' : 'Save'}
+          </button>
+        </div>
+      </Sidebar>
     </div>
   );
 };
-export default OtherExpenses;
+
+export default React.memo(OtherExpenses);

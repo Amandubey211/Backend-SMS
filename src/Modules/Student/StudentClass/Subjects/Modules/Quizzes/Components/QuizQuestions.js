@@ -1,6 +1,3 @@
-
-
-//-----------------useMemo----------------
 import React, { memo } from "react";
 import QuizQuestionCard from "./QuizQuestionCard";
 
@@ -30,5 +27,3 @@ const QuizQuestions = ({ questions, selectedOptions, handleOptionChange }) => {
 };
 
 export default memo(QuizQuestions);
-
-

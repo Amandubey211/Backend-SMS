@@ -1,55 +1,19 @@
 import React, { useRef, useState, useEffect } from "react";
 import { Line } from "react-chartjs-2";
 import { Chart as ChartJS, registerables } from "chart.js";
+import useGetAdminDashboardData from "../../../../Hooks/AuthHooks/Staff/Admin/Dashboard/useGetAdminDashboardData";
+import Fallback from "../../../../Components/Common/Fallback";
 ChartJS.register(...registerables);
 
 const TotalEarningsGraph = () => {
   const chartRef = useRef(null);
   const [clickedIndex, setClickedIndex] = useState(null);
   const [tooltipData, setTooltipData] = useState(null);
+  const { loading, error, dashboardData, fetchAdminDashboardData } = useGetAdminDashboardData();
 
-  const data = {
-    labels: ["Sat", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri"],
-    datasets: [
-      {
-        label: "Total Collections",
-        data: [300000, 250000, 200000, 300000, 250000, 200000, 150000],
-        borderColor: "#7C3AED",
-        borderWidth: 3,
-        fill: true,
-        backgroundColor: (context) => {
-          const gradient = context.chart.ctx.createLinearGradient(
-            0,
-            0,
-            0,
-            context.chart.height
-          );
-          gradient.addColorStop(0, "rgba(124, 58, 237, 0.1)");
-          gradient.addColorStop(1, "rgba(124, 58, 237, 0)");
-          return gradient;
-        },
-        tension: 0.4,
-        pointBackgroundColor: "#7C3AED",
-        pointBorderColor: "#fff",
-        pointBorderWidth: 2,
-        pointRadius: 4,
-        pointHoverRadius: 6,
-      },
-      {
-        label: "Total Expenses",
-        data: [200000, 150000, 51749, 180000, 220000, 170000, 200000],
-        borderColor: "#EA580C",
-        borderWidth: 3,
-        fill: false,
-        tension: 0.4,
-        pointBackgroundColor: "#EA580C",
-        pointBorderColor: "#fff",
-        pointBorderWidth: 2,
-        pointRadius: 4,
-        pointHoverRadius: 6,
-      },
-    ],
-  };
+  useEffect(() => {
+    fetchAdminDashboardData();
+  }, [fetchAdminDashboardData]);
 
   const getOrdinalSuffix = (day) => {
     if (day > 3 && day < 21) return "th";
@@ -63,6 +27,72 @@ const TotalEarningsGraph = () => {
       default:
         return "th";
     }
+  };
+
+  const handleOutsideClick = (event) => {
+    if (chartRef.current && !chartRef.current.canvas.contains(event.target)) {
+      setClickedIndex(null);
+      setTooltipData(null);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("click", handleOutsideClick);
+    return () => {
+      document.removeEventListener("click", handleOutsideClick);
+    };
+  }, []);
+
+  if (loading) {
+    return <Fallback />;
+  }
+
+  if (error) {
+    return <p>Error: {error}</p>;
+  }
+
+  if (!dashboardData || !dashboardData.earnings) {
+    return <p>No earnings data available.</p>;
+  }
+
+  const { earningsData, expensesData, totalEarnings, totalExpenses } = dashboardData.earnings;
+
+  const data = {
+    labels: ["Sat", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri"],
+    datasets: [
+      {
+        label: "Total Collections",
+        data: earningsData.slice(0, 7).map((item) => item.amount),
+        borderColor: "#7C3AED",
+        borderWidth: 3,
+        fill: true,
+        backgroundColor: (context) => {
+          const gradient = context.chart.ctx.createLinearGradient(0, 0, 0, context.chart.height);
+          gradient.addColorStop(0, "rgba(124, 58, 237, 0.1)");
+          gradient.addColorStop(1, "rgba(124, 58, 237, 0)");
+          return gradient;
+        },
+        tension: 0.4,
+        pointBackgroundColor: "#7C3AED",
+        pointBorderColor: "#fff",
+        pointBorderWidth: 2,
+        pointRadius: 4,
+        pointHoverRadius: 6,
+      },
+      {
+        label: "Total Expenses",
+        data: expensesData.slice(0, 7).map((item) => item.amount),
+        borderColor: "#EA580C",
+        borderWidth: 3,
+        fill: false,
+        tension: 0.4,
+        pointBackgroundColor: "#EA580C",
+        pointBorderColor: "#fff",
+        pointBorderWidth: 2,
+        pointRadius: 4,
+        pointHoverRadius: 6,
+      },
+    ],
   };
 
   const options = {
@@ -81,7 +111,7 @@ const TotalEarningsGraph = () => {
           date.setDate(day);
           const formattedDate = `${day}${getOrdinalSuffix(day)} ${date.toLocaleString("default", { month: "long" })}`;
           setTooltipData({ value, formattedDate, left: tooltipModel.caretX, top: tooltipModel.caretY });
-        }
+        },
       },
       legend: {
         display: false,
@@ -139,7 +169,7 @@ const TotalEarningsGraph = () => {
             ctx.strokeStyle = dataset.borderColor;
             ctx.stroke();
             ctx.restore();
-          }
+          },
         };
 
         ChartJS.unregister(verticalLinePlugin);
@@ -156,20 +186,6 @@ const TotalEarningsGraph = () => {
       }
     },
   };
-
-  const handleOutsideClick = (event) => {
-    if (!chartRef.current.canvas.contains(event.target)) {
-      setClickedIndex(null);
-      setTooltipData(null);
-    }
-  };
-
-  useEffect(() => {
-    document.addEventListener("click", handleOutsideClick);
-    return () => {
-      document.removeEventListener("click", handleOutsideClick);
-    };
-  }, []);
 
   return (
     <div className="">
@@ -214,7 +230,7 @@ const TotalEarningsGraph = () => {
             ></div>
             <div className="flex items-center">
               <div className="text-gray-700">Total Collections</div>
-              <div className="ml-2 font-bold mr-1">2,41,500</div>
+              <div className="ml-2 font-bold mr-1">{totalEarnings.toLocaleString()}</div>
               <div className="text-gray-700">QR</div>
             </div>
           </div>
@@ -225,7 +241,7 @@ const TotalEarningsGraph = () => {
             ></div>
             <div className="flex items-center">
               <div className="text-gray-700">Total Expenses</div>
-              <div className="ml-2 font-bold mr-1">41,500</div>
+              <div className="ml-2 font-bold mr-1">{totalExpenses.toLocaleString()}</div>
               <div className="text-gray-700">QR</div>
             </div>
           </div>

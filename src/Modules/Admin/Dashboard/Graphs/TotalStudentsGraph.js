@@ -1,8 +1,30 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Doughnut } from "react-chartjs-2";
 import { BsThreeDots } from "react-icons/bs";
+import useGetAdminDashboardData from "../../../../Hooks/AuthHooks/Staff/Admin/Dashboard/useGetAdminDashboardData";
+import Fallback from "../../../../Components/Common/Fallback";
 
-const TotalStudentsGraphjs = ({ maleStudents, femaleStudents }) => {
+const TotalStudentsGraphjs = () => {
+  const { loading, error, dashboardData, fetchAdminDashboardData } = useGetAdminDashboardData();
+
+  useEffect(() => {
+    fetchAdminDashboardData();
+  }, [fetchAdminDashboardData]);
+
+  if (loading) {
+    return <Fallback />;
+  }
+
+  if (error) {
+    return <p>Error: {error}</p>;
+  }
+
+  if (!dashboardData) {
+    return null;
+  }
+
+  const { maleStudents, femaleStudents } = dashboardData;
+
   const data = {
     datasets: [
       {
@@ -40,7 +62,7 @@ const TotalStudentsGraphjs = ({ maleStudents, femaleStudents }) => {
       },
     },
     hover: {
-      mode: 'nearest',
+      mode: "nearest",
       intersect: true,
     },
   };
