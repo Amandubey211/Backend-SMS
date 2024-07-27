@@ -7,7 +7,7 @@ import { dummyStudentsList } from "../dummyData/dummyData";
 // import Layout from "../../../../Components/Common/Layout";
 // import DashLayout from "../../../../Components/Admin/AdminDashLayout";
 import StudentProfile from "./StudentProfileCard";
-import NavigationMenu from "./NavigationMenu ";
+import NavigationMenu from './NavigationMenu.js'
 import BookIssue from "../Components/BookIssueMenu/BookIssue";
 import ParentsProfile from "../Components/ParentMenu/ParentsProfile";
 import StudentFinance from "../Components/FinanceMenu/StudentFinance";
@@ -28,8 +28,6 @@ const SingleStudent = () => {
   if (!student) {
     return <div className="text-center text-red-500">Student not found</div>;
   }
-
-  
   const renderContent = () => {
     const menuComponents = {
       "OverView": <StudentOverView />,

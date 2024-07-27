@@ -4,6 +4,7 @@ import PaySalary from "./PaySalary";
 import { fetchApi } from '../api/api';
 import { baseUrl } from "../../../../../config/Common";
 import axios from "axios";
+import { useSelector } from "react-redux";
 
 const TeacherRow = React.memo(({ teacher, onPayClick }) => (
   <tr className="bg-white">
@@ -54,7 +55,8 @@ const TeacherSalary = ({ initialTeacherData, selectedOption, selectedMonth }) =>
   const [teacherData, setTeacherData] = useState(initialTeacherData || []);
   const [selectedTeacher, setSelectedTeacher] = useState(null);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
-  const token = localStorage.getItem('admin:token');
+  const role = useSelector((store) => store.Auth.role);
+  const token = localStorage.getItem(`${role}:token`);
 
   // Fetch salaries based on filter
   const fetchSalaries = useCallback(async (query, month) => {

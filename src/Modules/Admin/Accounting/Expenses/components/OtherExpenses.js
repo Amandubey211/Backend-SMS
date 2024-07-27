@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import axios from 'axios';
 import { baseUrl } from "../../../../../config/Common";
 import Sidebar from "../../../../../Components/Common/Sidebar";
+import { useSelector } from "react-redux";
 
 
 const OtherExpenses = ({ expenseData, selectedMonth }) => {
@@ -9,7 +10,8 @@ const OtherExpenses = ({ expenseData, selectedMonth }) => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [loading, setLoading] = useState(false); // Track loading state
-  const token = localStorage.getItem('admin:token');
+  const role = useSelector((store) => store.Auth.role);
+  const token = localStorage.getItem(`${role}:token`);
 
   // Debugging useEffect to see if expenseData is being set correctly
   useEffect(() => {

@@ -9,6 +9,7 @@ import { GiMoneyStack } from "react-icons/gi";
 import { GiTakeMyMoney } from "react-icons/gi";
 import { HiOutlineBanknotes } from "react-icons/hi2";
 import { baseUrl } from "../../../../config/Common";
+import { useSelector } from "react-redux";
 
 const Earning = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -22,7 +23,7 @@ const Earning = () => {
   const [totalFees, setTotalFees] = useState(0);
   const [remainingBalance, setRemainingBalance] = useState(0);
   const [openDropdown, setOpenDropdown] = useState(null);
-
+  const role = useSelector((store) => store.Auth.role);
   const handleDropdownToggle = (index) => {
     setOpenDropdown(openDropdown === index ? null : index);
   };
@@ -41,7 +42,7 @@ const Earning = () => {
   const handleEditSidebarClose = () => setEditSidebarOpen(false);
 
   const fetchTotalAmounts = async () => {
-    const token = localStorage.getItem('admin:token');
+    const token = localStorage.getItem(`${role}:token`);
     try {
       const response = await fetch(`${baseUrl}/admin/total_amount`, {
         headers: {
@@ -61,11 +62,10 @@ const Earning = () => {
       message.error(err.message);
     }
   };
-
   const fetchEarnings = async () => {
     setLoading(true);
     setError(null);
-    const token = localStorage.getItem('admin:token');
+    const token = localStorage.getItem(`${role}:token`);
     try {
       const response = await fetch(`${baseUrl}/admin/getearning`, {
         headers: {
@@ -86,7 +86,7 @@ const Earning = () => {
   };
 
   const handleDelete = async (earningId) => {
-    const token = localStorage.getItem('admin:token');
+    const token = localStorage.getItem(`${role}:token`);
     try {
       const response = await fetch(`${baseUrl}/admin/deleteEarning/${earningId}`, {
         method: 'DELETE',

@@ -7,6 +7,7 @@ import { FaUserFriends } from "react-icons/fa";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import { baseUrl } from "../../../../../../config/Common";
+import { useSelector } from "react-redux";
 const StudentFinance = ({ student }) => {
   const {cid} = useParams();
   const [filters, setFilters] = useState({
@@ -17,11 +18,11 @@ const StudentFinance = ({ student }) => {
   const [totalUnpaidFees, setTotalUnpaidFees] = useState("");
   const [totalPaidFees, setTotalPaidFees] = useState("");
   const [loading, setLoading] = useState(true);
-
+  const role = useSelector((store) => store.Auth.role);
   const fetchFeesDetails = async () => {
     console.log("Fetching fees details...");
     try {
-      const token = localStorage.getItem('admin:token');
+      const token = localStorage.getItem(`${role}:token`);
   
       if (!token) {
         throw new Error('Authentication token not found');

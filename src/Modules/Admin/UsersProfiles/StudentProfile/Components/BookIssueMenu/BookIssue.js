@@ -3,6 +3,7 @@ import BookIssueRow from "../../../../../Student/Library/SubClass/component/Book
 import axios from "axios";
 import { baseUrl } from "../../../../../../config/Common";
 import { useParams } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const BookIssue = () => {
   const [bookIssueData, setBookIssueData] = useState([]);
@@ -21,11 +22,11 @@ const BookIssue = () => {
     const { name, value } = e.target;
     setFilters((prev) => ({ ...prev, [name]: value }));
   };
-
+  const role = useSelector((store) => store.Auth.role);
   const fetchBookIssues = async () => {
 
     try {
-      const token = localStorage.getItem('admin:token');
+      const token = localStorage.getItem(`${role}:token`);
       if (!token) {
         throw new Error('Authentication token not found');
       }

@@ -3,6 +3,7 @@ import axios from "axios"; // Ensure Axios is installed
 import ImageUpload from "../../../Addmission/Components/ImageUpload";
 import FormInput from "../../../Accounting/subClass/component/FormInput";
 import { baseUrl } from "../../../../../config/Common";
+import { useSelector } from "react-redux";
 
 const AddEvent = () => {
   const [imagePreview, setImagePreview] = useState(null);
@@ -47,7 +48,7 @@ const AddEvent = () => {
       eventImage: null,
     }));
   };
-
+  const role = useSelector((store) => store.Auth.role);
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData();
@@ -63,7 +64,7 @@ const AddEvent = () => {
     }
 
     // Retrieve JWT from localStorage
-    const token = localStorage.getItem('admin:token');
+    const token = localStorage.getItem(`${role}:token`);
 
     try {
       const response = await axios.post(`${baseUrl}/admin/create_event`, formData, {

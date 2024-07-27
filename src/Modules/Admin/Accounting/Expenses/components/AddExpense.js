@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import FormInput from '../../subClass/component/FormInput';
 import { baseUrl } from '../../../../../config/Common';
+import { useSelector } from 'react-redux';
 
 const AddExpense = ({ onCreate }) => {
   const [formData, setFormData] = useState({
@@ -10,11 +11,11 @@ const AddExpense = ({ onCreate }) => {
     reason: '',
     status: 'paid', // Default to paid
   });
-
+  const role = useSelector((store) => store.Auth.role);
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log('Submitting New Expense:', formData);
-    const token = localStorage.getItem('admin:token');
+    const token = localStorage.getItem(`${role}:token`);
 
     if (!token) {
       console.error('Authentication token is not available.');

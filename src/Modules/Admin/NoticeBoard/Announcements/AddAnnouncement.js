@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import FormInput from "../../Accounting/subClass/component/FormInput";
 import { baseUrl } from "../../../../config/Common";
+import { useSelector } from "react-redux";
 
 const AddAnnouncement = () => {
   const [imagePreview, setImagePreview] = useState(null);
@@ -12,8 +13,9 @@ const AddAnnouncement = () => {
     noticePriority: "High priority",
     notice: null,
   });
+  const role = useSelector((store) => store.Auth.role);
   const [selectedStatus, setSelectedStatus] = useState("High priority");
-  const token = localStorage.getItem('admin:token');
+  const token = localStorage.getItem(`${role}:token`);
 
   // Handle input changes for all fields
   const handleInputChange = (e) => {

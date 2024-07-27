@@ -7,16 +7,17 @@ import AddAnnouncement from "./AddAnnouncement";
 import { MdQueryBuilder } from "react-icons/md";
 import axios from "axios";  // Make sure to install axios if not already installed
 import { baseUrl } from "../../../../config/Common";
+import { useSelector } from "react-redux";
 
 const Announce = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [notices, setNotices] = useState([]);
   const [activeIndex, setActiveIndex] = useState(0);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
-
+  const role = useSelector((store) => store.Auth.role);
   useEffect(() => {
     const fetchNotices = async () => {
-      const token = localStorage.getItem('admin:token');
+      const token = localStorage.getItem(`${role}:token`);
       try {
         const response = await axios.get(`${baseUrl}/admin/all/notices`, {
           headers: {
