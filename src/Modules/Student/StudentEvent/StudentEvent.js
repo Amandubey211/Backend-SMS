@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Calendar, Badge } from "antd";
+import { Calendar } from "antd";
 import Layout from "../../../Components/Common/Layout";
 import StudentDashLayout from "../../../Components/Student/StudentDashLayout";
 import EventCard from "./Events/subComponents/EventCard";
@@ -104,13 +104,17 @@ const StudentEvent = () => {
     }
   };
 
+  // Sort events by date and get the top 4 latest events
+  const sortedEvents = events.sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
+  const topEvents = sortedEvents.slice(0, 4);
+
   return (
     <>
       <Layout title="Event">
         <StudentDashLayout>
           <div className="min-h-screen p-4 bg-gray-50">
             <div className="my-4 w-full h-40 flex justify-around rounded-sm gap-4">
-              {events.map((event) => (
+              {topEvents.map((event) => (
                 <EventCard key={event.id} event={event} onClick={handleStickerClick} />
               ))}
             </div>
