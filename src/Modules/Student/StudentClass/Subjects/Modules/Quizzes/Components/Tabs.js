@@ -1,8 +1,16 @@
 import React from "react";
-import { QuizzDetails } from "../../Assignments/AssignmentComponents/MockData";
 import { FaCalendarAlt } from "react-icons/fa";
 
-const Tabs = ({ quiz,children, activeTab, setActiveTab, onTabChange, createPage, quizSubmitted, hasAttempted }) => {
+const Tabs = ({
+  quiz,
+  children,
+  activeTab,
+  setActiveTab,
+  onTabChange,
+  createPage,
+  quizSubmitted,
+  hasAttempted,
+}) => {
   const handleTabClick = (tab) => {
     setActiveTab(tab);
     onTabChange(tab);
@@ -17,7 +25,9 @@ const Tabs = ({ quiz,children, activeTab, setActiveTab, onTabChange, createPage,
           <div>
             <h2 className="text-xl font-semibold mb-1">{name}</h2>
             <div className="flex items-center text-gray-500">
-              <span className="text-green-600 font-medium mr-2">{quizType}</span>
+              <span className="text-green-600 font-medium mr-2">
+                {quizType}
+              </span>
               <span className="mx-2">|</span>
               <FaCalendarAlt className="w-4 h-4 mr-2" />
               <span className="text-sm">Available From: {availableFrom}</span>
@@ -66,5 +76,3 @@ const Tabs = ({ quiz,children, activeTab, setActiveTab, onTabChange, createPage,
 };
 
 export default Tabs;
-
-

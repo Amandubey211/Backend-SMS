@@ -8,7 +8,7 @@ import { NavLink, useParams } from "react-router-dom";
 const List = ({ data, icon, title, type, loading, error }) => {
   const { cid, sid } = useParams();
   const [searchQuery, setSearchQuery] = useState("");
-
+  console.log(data[0]?._id,"sdfsdf");
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
   };
@@ -24,7 +24,6 @@ const List = ({ data, icon, title, type, loading, error }) => {
         : false
     );
   }, [data, searchQuery, type]);
-  console.log(filteredData);
 
   return (
     <div className="bg-white p-5 w-full">
@@ -81,9 +80,16 @@ const List = ({ data, icon, title, type, loading, error }) => {
                     <h3 className="text-md font-semibold mb-1">
                       {getItemName(item)}
                     </h3>
-                    <p className="text-sm text-gray-500">
-                      Module : {item.moduleId} | Chapter : {item.chapterId}
-                    </p>
+                    {type === "Assignment" ? (
+                      <p className="text-sm text-gray-500">
+                        Module : {item.module} | Chapter : {item.chapter}
+                      </p>
+                    ) : (
+                      <p className="text-sm text-gray-500">
+                        Total Points : {item.totalPoints} | Type :{" "}
+                        {item.quizType}
+                      </p>
+                    )}
                   </div>
                 </div>
                 <div className="flex items-center gap-3">

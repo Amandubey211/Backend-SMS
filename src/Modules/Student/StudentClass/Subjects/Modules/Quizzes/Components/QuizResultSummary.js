@@ -1,6 +1,3 @@
-
-//---------------  with attepmt historu button   ----------------------------
-
 import React, { useState, useEffect } from 'react';
 import AssignmentDetail from '../../../Component/AssignmentDetail';
 import DateDetail from '../../../Component/DateDetail';
@@ -127,5 +124,3 @@ const QuizResultSummary = ({ totalPoints, correctAnswers, wrongAnswers, quizId }
 };
 
 export default QuizResultSummary;
-
-

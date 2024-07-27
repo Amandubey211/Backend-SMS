@@ -21,7 +21,7 @@ const useFetchQuizzes = (selectedClass, selectedSubject) => {
           `${baseUrl}/student/studentquiz/class/${selectedClass}`,
           {
             headers: {
-                Authentication: token,
+              Authentication: token,
             },
             params: {
               subjectId: selectedSubject,
