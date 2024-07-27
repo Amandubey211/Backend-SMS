@@ -11,7 +11,6 @@ import { requestPermissionAndGetToken } from "../../NotificationHooks/Notificati
 import axios from "axios";
 import { baseUrl } from "../../../config/Common.js";
 import { setLeftHeading } from "../../../Redux/Slices/Common/CommonSlice.js";
-import useNavHeading from "../../CommonHooks/useNavHeading .js";
 
 const useStaffLogin = () => {
   const [loading, setLoading] = useState(false);
@@ -59,7 +58,9 @@ const useStaffLogin = () => {
         );
 
         dispatch(setAuth(true));
-        dispatch(setRole(data.role)); 
+        dispatch(setRole(data.role));
+        // localStorage.setItem("isLoggedIn", true);
+        // localStorage.setItem("role", data.role);
         dispatch(setLeftHeading(data.role));
         // useNavHeading(data.role);
         console.log(data);

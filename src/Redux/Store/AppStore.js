@@ -1,4 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
+import { persistStore, persistReducer } from 'redux-persist';
+import storage from 'redux-persist/lib/storage'; // defaults to localStorage for web
 import AuthSliceReducer from "../Slices/Auth/AuthSlice.js";
 import sidebarReducer from "../Slices/Common/SidebarSlice.js";
 import AdminReducers from "../Slices/AdminSlice.js";
@@ -10,10 +12,20 @@ import StudentQuizReducer from "../Slices/StudentQuiz/StudentQuizSlice.js";
 import studentReducer from "../Slices/Admin/StudentSlice.js";
 import staffReducer from "../Slices/Admin/StaffSlice.js";
 import parentsReducer from "../Slices/Admin/parentsSilce.js";
+
+// Persist configuration for Auth slice
+const authPersistConfig = {
+  key: 'auth',
+  storage,
+  whitelist: ['isLoggedIn', 'role', 'userDetail'], // Only persist these fields
+};
+
+const persistedAuthReducer = persistReducer(authPersistConfig, AuthSliceReducer);
+
 const AppStore = configureStore({
   reducer: {
     Admin: AdminReducers,
-    Auth: AuthSliceReducer,
+    Auth: persistedAuthReducer, // Use persisted reducer
     sidebar: sidebarReducer,
     Common: CommonReducers,
     Class: ClassReducer,
@@ -23,8 +35,9 @@ const AppStore = configureStore({
     StudentQuiz: StudentQuizReducer,
     Students: studentReducer,
     Parents: parentsReducer,
-    // Add StudentQuizSlice to the store
   },
 });
 
-export default AppStore;
+const persistor = persistStore(AppStore);
+
+export { AppStore, persistor };
