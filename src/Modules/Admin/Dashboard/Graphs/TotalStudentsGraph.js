@@ -71,7 +71,7 @@ const TotalStudentsGraphjs = () => {
     <div className="max-w-xs px-2 py-4 h-full">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-semibold">Total Student</h2>
-        <BsThreeDots />
+        
       </div>
       <div className="relative p-8 my-5 mb-12" style={{ width: "300px", height: "300px" }}>
         <Doughnut data={data} options={options} />
