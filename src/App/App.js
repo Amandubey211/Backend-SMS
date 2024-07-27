@@ -180,7 +180,6 @@ function App() {
     { path: "/student_class/:cid/:sid/module", element: <ProtectRoute Component={StudentModule} allowedRoles={["student"]} />, errorElement: <Error /> },
     { path: "/student_class/:cid/:sid/assignments", element: <ProtectRoute Component={StudentAssignmentList} allowedRoles={["student"]} />, errorElement: <Error /> },
     { path: "/student_class/:cid/:sid/assignments/:aid/view", element: <ProtectRoute Component={StudentAssignmentView} allowedRoles={["student"]} />, errorElement: <Error /> },
-    //{ path: "/student_class/:sid/createassignment", element: <ProtectRoute Component={StudentCreateAssignment} allowedRoles={["student"]} />, errorElement: <Error /> },
     { path: "/student_class/:cid/:sid/quizzes", element: <ProtectRoute Component={StudentQuizzList} allowedRoles={["student"]} />, errorElement: <Error /> },
     { path: "/student_class/:cid/:sid/quizzes/:qid/view", element: <ProtectRoute Component={StudentQuizzesView} allowedRoles={["student"]} />, errorElement: <Error /> },
     { path: "/student_class/:cid/:sid/discussions", element: <ProtectRoute Component={StudentDiscussion} allowedRoles={["student"]} />, errorElement: <Error /> },
@@ -190,7 +189,7 @@ function App() {
     { path: "/student_class/:cid/:sid/announcements/:aid/view", element: <ProtectRoute Component={StudentAnnouncementView} allowedRoles={["student"]} />, errorElement: <Error /> },
     { path: "/student_class/:cid/:sid/syllabus", element: <ProtectRoute Component={StudentSyllabus} allowedRoles={["student"]} />, errorElement: <Error /> },
     { path: "/student_class/:cid/:sid/page", element: <ProtectRoute Component={StudentPage} allowedRoles={["student"]} />, errorElement: <Error /> },
-    { path: "/student_class/:cid/:sid/pages/:did/view", element: <ProtectRoute Component={StudentPageView} allowedRoles={["student"]} />, errorElement: <Error /> },
+    { path: "/student_class/:cid/:sid/page/:pid/view", element: <ProtectRoute Component={StudentPageView} allowedRoles={["student"]} />, errorElement: <Error /> },
 
     //--------------------------------------------------------------------------------------------------
     { path: "/student_finance", element: <ProtectRoute Component={StudentFinance} allowedRoles={["student"]} />, errorElement: <Error /> },

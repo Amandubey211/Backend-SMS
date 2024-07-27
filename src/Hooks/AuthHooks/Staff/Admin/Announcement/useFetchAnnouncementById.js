@@ -1,3 +1,4 @@
+// useFetchAnnouncementById.js
 import { useState, useCallback } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -9,7 +10,6 @@ const useFetchAnnouncementById = () => {
   const [error, setError] = useState(null);
   const [announcement, setAnnouncement] = useState(null);
 
-  
   const { role } = useSelector((store) => store.Auth);
 
   const fetchAnnouncementById = useCallback(
@@ -26,6 +26,7 @@ const useFetchAnnouncementById = () => {
           }
         );
         if (response.data.status) {
+          console.log(response.data);
           setAnnouncement(response.data.data);
         } else {
           toast.error("Announcement not found");
@@ -40,7 +41,7 @@ const useFetchAnnouncementById = () => {
         setLoading(false);
       }
     },
-    [role, baseUrl]
+    [role]
   );
 
   return { loading, error, fetchAnnouncementById, announcement };

@@ -8,7 +8,7 @@ import { NavLink, useParams } from "react-router-dom";
 const List = ({ data, icon, title, type, loading, error }) => {
   const { cid, sid } = useParams();
   const [searchQuery, setSearchQuery] = useState("");
-  console.log(data[0]?._id,"sdfsdf");
+  console.log(data[0]?._id, "sdfsdf");
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
   };

@@ -2,7 +2,10 @@ import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { FiRefreshCw } from "react-icons/fi";
 
-const FilterCard = ({ filters = { moduleId: "", chapterId: "" }, setFilters }) => {
+const FilterCard = ({
+  filters = { moduleId: "", chapterId: "" },
+  setFilters,
+}) => {
   const [selectedModule, setSelectedModule] = useState(filters.moduleId);
   const [selectedChapter, setSelectedChapter] = useState(filters.chapterId);
   const [chapters, setChapters] = useState([]);
@@ -53,7 +56,9 @@ const FilterCard = ({ filters = { moduleId: "", chapterId: "" }, setFilters }) =
       </button>
       <h2 className="text-lg font-semibold mb-4">Filter</h2>
       <div className="mb-4">
-        <label className="block text-gray-700" htmlFor="module-select">Module</label>
+        <label className="block text-gray-700" htmlFor="module-select">
+          Module
+        </label>
         <select
           id="module-select"
           className="mt-1 block w-full pl-3 pr-10 border py-2 text-base focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
@@ -63,13 +68,15 @@ const FilterCard = ({ filters = { moduleId: "", chapterId: "" }, setFilters }) =
           <option value="">Select</option>
           {moduleList.map((module) => (
             <option key={module._id} value={module._id}>
-              {module.name}
+              {module.moduleName}
             </option>
           ))}
         </select>
       </div>
       <div className="mb-4">
-        <label className="block text-gray-700" htmlFor="chapter-select">Chapter</label>
+        <label className="block text-gray-700" htmlFor="chapter-select">
+          Chapter
+        </label>
         <select
           id="chapter-select"
           className="mt-1 block w-full pl-3 pr-10 py-2 text-base border focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
@@ -86,7 +93,7 @@ const FilterCard = ({ filters = { moduleId: "", chapterId: "" }, setFilters }) =
       </div>
       <button
         onClick={handleApplyFilters}
-        className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-2 rounded-md focus:outline-none"
+        className="w-full bg-gradient-to-r rounded-full from-purple-500 to-pink-500 text-white py-2  focus:outline-none"
         aria-label="Apply filters"
       >
         Apply
