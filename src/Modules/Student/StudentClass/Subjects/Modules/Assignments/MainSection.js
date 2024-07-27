@@ -1,23 +1,15 @@
-
-
-
-
-
-//----------------------------------------------- ☝️----
-
 import React, { useState, useEffect } from "react";
 import SubjectSideBar from "../../Component/SubjectSideBar";
 import AssignmentDetailCard from "./AssignmentComponents/AssignmentDetailCard";
 import AssignmentSection from "./AssignmentComponents/AssignmentSection";
 import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { Toaster, toast } from "react-hot-toast";
+import { toast } from "react-hot-toast";
 import { baseUrl } from "../../../../../../config/Common";
 
 const MainSection = () => {
-  const { selectedClass, selectedSection, selectedSubject, studentId } = useSelector(
-    (state) => state.Common
-  );
+  const { selectedClass, selectedSection, selectedSubject, studentId } =
+    useSelector((state) => state.Common);
 
   const { cid, sid, aid } = useParams();
   const [assignmentData, setAssignmentData] = useState(null);
@@ -47,7 +39,9 @@ const MainSection = () => {
         );
 
         if (!response.ok) {
-          throw new Error(`Failed to fetch assignment, status: ${response.status}`);
+          throw new Error(
+            `Failed to fetch assignment, status: ${response.status}`
+          );
         }
 
         const data = await response.json();
@@ -68,7 +62,11 @@ const MainSection = () => {
     fetchAssignment();
   }, [cid, sid, aid]);
 
-  const handleResubmit = async (submissionContent, submissionType, submissionComment) => {
+  const handleResubmit = async (
+    submissionContent,
+    submissionType,
+    submissionComment
+  ) => {
     try {
       const currentAttempts = submissionData ? submissionData.attempt : 0;
       if (currentAttempts >= assignmentData.allowNumberOfAttempts) {
@@ -87,13 +85,13 @@ const MainSection = () => {
           method: "PUT",
           headers: {
             Authentication: token,
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({
             content: submissionContent,
             type: submissionType,
-            commentText: submissionComment
-          })
+            commentText: submissionComment,
+          }),
         }
       );
 
@@ -116,7 +114,6 @@ const MainSection = () => {
 
   return (
     <div className="flex">
-      <Toaster />
       <SubjectSideBar />
       <div className="w-[65%] border">
         <AssignmentSection

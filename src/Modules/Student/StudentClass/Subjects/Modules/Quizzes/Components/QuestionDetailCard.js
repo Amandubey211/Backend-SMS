@@ -1,6 +1,3 @@
-
-//--------------
-
 import React from 'react';
 import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
@@ -8,7 +5,7 @@ import AssignmentDetail from '../../../Component/AssignmentDetail';
 import CommentCard from './CommentCard';
 import DateDetail from '../../../Component/DateDetail';
 
-const QuestionDetailCard = ({ quiz,timeLeft ,totalTime}) => {
+const QuestionDetailCard = ({ quiz, timeLeft }) => {
   const { name, quizType, availableFrom, totalPoints, allowNumberOfAttempts, timeLimit } = quiz; // destructure quiz object
   const commentsData = [
     {
