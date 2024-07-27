@@ -24,6 +24,7 @@ const CreateQuizForm = ({
   showAnswerDate,
   moduleId,
   chapterId,
+  group,
 }) => {
   const [chapters, setChapters] = useState([]);
   const moduleList = useSelector((store) => store.Subject.modules);
@@ -186,7 +187,7 @@ const CreateQuizForm = ({
           handleChange={handleChange}
           isAssignToLabel={true}
         />
-        <SectionSelect section={section} handleChange={handleChange} />
+        <SectionSelect section={section} handleChange={handleChange} group={group} assignTo={assignTo}/>
         <div className="mb-4">
           <label className="block text-gray-700" htmlFor="module-select">
             Module
