@@ -21,7 +21,7 @@ const AllStaff = () => {
     fetchStaff();
     // fetchSubjects(cid);
     console.log(staff);
-  }, [fetchStaff, staff]);
+  }, []);
 
   const handleSidebarOpen = () => setSidebarOpen(true);
   const handleSidebarClose = () => setSidebarOpen(false);

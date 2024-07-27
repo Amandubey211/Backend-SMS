@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 
 const SubjectCard = ({ subject,i}) => {
-  const { name, startDate, totalModules, completedModules, progress } = subject;
+  const { name, startDate, modules,    completedModules, progress } = subject;
   const [bgColor,setBgColor] =useState('')
   useEffect(() => {
     console.log(i);
@@ -52,8 +52,8 @@ const SubjectCard = ({ subject,i}) => {
         ></div>
       </div>
       <div className="flex flex-row justify-between">
-        <p className="text-right text-sm text-gray-500">17/5 Module</p>
-      <p className="text-right text-sm text-gray-500">{progress}/ Completed</p></div>
+        <p className="text-right text-sm text-gray-500">0/{modules?.length} Module</p>
+      <p className="text-right text-sm text-gray-500">0/ Completed</p></div>
     </div>
   );
 };

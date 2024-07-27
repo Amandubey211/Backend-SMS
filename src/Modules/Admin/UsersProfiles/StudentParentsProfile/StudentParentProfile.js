@@ -7,22 +7,25 @@ import ChildProfile from "./ChildProfile";
 import Sidebar from "../../../../Components/Common/Sidebar";
 import { useSelector } from "react-redux";
 import useGetAllParents from "../../../../Hooks/AuthHooks/Staff/Admin/parent/useGetAllParents";
-
+import useFetchSection from "../../../../Hooks/AuthHooks/Staff/Admin/Sections/useFetchSection";
 // import DashLayout from "../../../../Components/Admin/AdminDashLayout";
 const uniqueFilterOptions = (data, key) => {
   return [
     ...new Set(
-      data.flatMap((item) => item.children.map((child) => child[key]))
+      data?.flatMap((item) => item.children.map((child) => child[key]))
     ),
   ].sort();
 };
 
 const StudentParentProfile = () => {
     const {allParents} = useSelector((store)=>store.Parents);
-      const {fetchAllParents} = useGetAllParents()
+    const {classList, sectionsList} = useSelector((store)=>store.Class);
+      const {fetchAllParents} = useGetAllParents();
+      const { fetchSection } = useFetchSection();
     useEffect(() => {
       async function fetchData() {
         await fetchAllParents();
+     
         console.log(allParents)
       }
       fetchData();
@@ -39,9 +42,13 @@ const StudentParentProfile = () => {
     section: "",
   });
 
-  const handleFilterChange = (e) => {
-    const { name, value } = e.target;
+  const handleFilterChange = async(e) => {
+    const { name, value} = e.target;
     setFilters((prev) => ({ ...prev, [name]: value }));
+ const selectClass = classList.forEach(element => {
+   return element.className == name
+  });
+  console.log(selectClass);
   };
 const handleStudentClick=(child)=>{
     console.log(child);
@@ -66,9 +73,9 @@ const handleStudentClick=(child)=>{
                 <FormField
                   id="class"
                   label="Class"
-                  value={filters.class}
-                  onChange={handleFilterChange}
-                  options={uniqueFilterOptions(dummyParents, "class")}
+                  value={filters.className}
+                  onChange={(e)=>handleFilterChange(e)}
+                  options={classList}
                 />
                 <FormField
                   id="section"

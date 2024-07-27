@@ -10,7 +10,8 @@ const StudentProfileCard = ({ student }) => {
         <span>Class {student?.class} <span className="text-gray-300">|</span> </span> 
         <span>Section {student?.section}</span>
       </div>
-      <span>ID: <span className="text-gray-500">{student?._id}</span></span>
+      <span>ID: <span className="text-gray-500">{student?.admissionNumber
+      }</span></span>
       <div className="border rounded-md px-9 py-1 border-red-300 ">
         <span className=' font-semibold bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent bg-clip-text'> Class {student.class}</span>
       </div>

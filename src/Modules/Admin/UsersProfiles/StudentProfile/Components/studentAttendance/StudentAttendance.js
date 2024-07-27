@@ -35,7 +35,6 @@ const StudentAttendance = () => {
             console.log(response);
             setAttendanceData(attendanceMap);
             setSummary(summary);
-
         } catch (error) {
             console.error("Failed to fetch Attendance:", error);
         }
