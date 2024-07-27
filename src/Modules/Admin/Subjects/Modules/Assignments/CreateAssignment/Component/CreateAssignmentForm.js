@@ -23,12 +23,13 @@ const CreateAssignmentForm = ({
   availableFrom,
   moduleId,
   chapterId,
+  group,
 }) => {
   const moduleList = useSelector((store) => store.Subject.modules);
   const [chapters, setChapters] = useState([]);
   const [selectedModule, setSelectedModule] = useState(moduleId || "");
   const [selectedChapter, setSelectedChapter] = useState(chapterId || "");
-console.log(allowedAttempts,"sdf")
+  console.log(allowedAttempts, "sdf")
   useEffect(() => {
     if (selectedModule) {
       const module = moduleList.find((mod) => mod._id === selectedModule);
@@ -104,12 +105,14 @@ console.log(allowedAttempts,"sdf")
         allowedAttempts={allowedAttempts}
         handleChange={handleChange}
       />
-      <NumberOfAttemptsInput
-        numberOfAttempts={numberOfAttempts}
-        handleChange={handleChange}
-      />
+      {allowedAttempts !== 'true' && (
+        <NumberOfAttemptsInput
+          numberOfAttempts={numberOfAttempts}
+          handleChange={handleChange}
+        />
+      )}
       <AssignToRadios isAssignToLabel={true} assignTo={assignTo} handleChange={handleChange} />
-      <SectionSelect section={section} handleChange={handleChange} />
+      <SectionSelect assignTo={assignTo} section={section} handleChange={handleChange} group={group} />
       <DateInput
         label="Available from"
         name="availableFrom"
