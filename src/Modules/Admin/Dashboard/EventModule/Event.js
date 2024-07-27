@@ -4,6 +4,7 @@ import { FaCalendarAlt } from "react-icons/fa";
 import useGetFilteredEvents from "../../../../Hooks/AuthHooks/Staff/Admin/Dashboard/useGetFilteredEvents";
 import Spinner from "../../../../Components/Common/Spinner";
 import EventItem from "./EventItem";
+import { useNavigate } from 'react-router-dom';
 
 const monthNames = [
   "January", "February", "March", "April", "May", "June",
@@ -12,7 +13,7 @@ const monthNames = [
 
 const Events = () => {
   const { error, events, fetchFilteredEvents, loading } = useGetFilteredEvents();
-  console.log(useGetFilteredEvents)
+  const navigate = useNavigate();
 
   const currentMonth = new Date().getMonth() + 1; // Months are zero-indexed
   const currentYear = new Date().getFullYear();
@@ -56,6 +57,12 @@ const Events = () => {
       return { month: newMonth, year: newYear };
     });
   };
+
+  const handleViewAll = () => {
+    navigate("/noticeboard/events");
+  };
+
+  const top5Events = events.slice(0, 5);
 
   return (
     <div className="max-w-4xl me-1 text-gray-600 mx-auto bg-white p-4">
@@ -104,6 +111,12 @@ const Events = () => {
             </div>
           </div>
         </div>
+        <button
+          className="text-blue-500 hover:underline ml-2"
+          onClick={handleViewAll}
+        >
+          View All
+        </button>
       </div>
       <div className="flex justify-between p-2 border-y py-3 font-semibold">
         <h1>Event Name</h1>
@@ -117,13 +130,13 @@ const Events = () => {
           </div>
         ) : error ? (
           <p>Error: {error}</p>
-        ) : events.length === 0 ? (
+        ) : top5Events.length === 0 ? (
           <div className="flex flex-col items-center justify-center my-10">
             <FaCalendarAlt className="text-gray-400 text-6xl mb-4" />
             <p className="text-gray-500 text-xl">No events found</p>
           </div>
         ) : (
-          events.map((event) => (
+          top5Events.map((event) => (
             <EventItem
               key={event.id}
               image={event.image}

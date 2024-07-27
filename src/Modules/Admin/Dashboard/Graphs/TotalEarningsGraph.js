@@ -7,7 +7,6 @@ ChartJS.register(...registerables);
 
 const TotalEarningsGraph = () => {
   const chartRef = useRef(null);
-  const [clickedIndex, setClickedIndex] = useState(null);
   const [tooltipData, setTooltipData] = useState(null);
   const { loading, error, dashboardData, fetchAdminDashboardData } = useGetAdminDashboardData();
 
@@ -31,7 +30,6 @@ const TotalEarningsGraph = () => {
 
   const handleOutsideClick = (event) => {
     if (chartRef.current && !chartRef.current.canvas.contains(event.target)) {
-      setClickedIndex(null);
       setTooltipData(null);
     }
   };
@@ -138,112 +136,57 @@ const TotalEarningsGraph = () => {
         },
       },
     },
-    onClick: function (evt, elements) {
-      if (elements.length > 0) {
-        const chartInstance = chartRef.current;
-        const datasetIndex = elements[0].datasetIndex;
-        const index = elements[0].index;
-
-        setClickedIndex(index);
-
-        const dataset = chartInstance.data.datasets[datasetIndex];
-        const point = dataset.data[index];
-
-        const verticalLinePlugin = {
-          id: "verticalLine",
-          beforeDraw: (chart) => {
-            const ctx = chart.ctx;
-            const xAxis = chart.scales.x;
-            const yAxis = chart.scales.y;
-
-            // Clear previous line
-            ctx.clearRect(0, 0, chart.width, chart.height);
-
-            const x = xAxis.getPixelForValue(chart.data.labels[index]);
-            ctx.save();
-            ctx.beginPath();
-            ctx.setLineDash([5, 5]);
-            ctx.moveTo(x, yAxis.top);
-            ctx.lineTo(x, yAxis.bottom);
-            ctx.lineWidth = 1; // Adjusted line width
-            ctx.strokeStyle = dataset.borderColor;
-            ctx.stroke();
-            ctx.restore();
-          },
-        };
-
-        ChartJS.unregister(verticalLinePlugin);
-        ChartJS.register(verticalLinePlugin);
-        chartInstance.update();
-
-        // Show tooltip data
-        const value = point.toLocaleString();
-        const day = index + 1;
-        const date = new Date();
-        date.setDate(day);
-        const formattedDate = `${day}${getOrdinalSuffix(day)} ${date.toLocaleString("default", { month: "long" })}`;
-        setTooltipData({ value, formattedDate, left: elements[0].element.x, top: elements[0].element.y });
-      }
-    },
   };
 
   return (
-    <div className="">
-      <div className="bg-white p-6 ">
-        <div className="flex justify-between items-center mb-4">
-          <div>
-            <h2 className="text-xl font-semibold">Earnings</h2>
+    <div className="p-4 bg-white">
+      <div className="flex justify-between items-center mb-4">
+        <div>
+          <h2 className="text-xl font-semibold">Earnings</h2>
+        </div>
+        <div>
+          <select className="border rounded p-2">
+            <option>This month</option>
+            <option>Last month</option>
+          </select>
+        </div>
+      </div>
+      <div className="relative">
+        <Line ref={chartRef} data={data} options={options} />
+        {tooltipData && (
+          <div
+            style={{
+              position: "absolute",
+              left: tooltipData.left,
+              top: tooltipData.top,
+              transform: "translate(-50%, -100%)",
+              backgroundColor: "rgba(0, 0, 0, 0.8)",
+              color: "#fff",
+              padding: "8px",
+              borderRadius: "4px",
+              pointerEvents: "none",
+            }}
+          >
+            <div>{tooltipData.value}</div>
+            <div>{tooltipData.formattedDate}</div>
           </div>
-          <div>
-            <select className="border rounded p-2">
-              <option>This month</option>
-              <option>Last month</option>
-            </select>
+        )}
+      </div>
+      <div className="flex justify-around mt-4">
+        <div className="flex flex-col items-start">
+          <div className="w-16 h-1 rounded-full mb-1" style={{ backgroundColor: "#7C3AED", alignSelf: "flex-start" }}></div>
+          <div className="flex items-center">
+            <div className="text-gray-700">Total Collections</div>
+            <div className="ml-2 font-bold mr-1">{totalEarnings.toLocaleString()}</div>
+            <div className="text-gray-700">QR</div>
           </div>
         </div>
-        <div className="relative">
-          <Line ref={chartRef} data={data} options={options} />
-          {tooltipData && (
-            <div
-              style={{
-                position: "absolute",
-                left: tooltipData.left,
-                top: tooltipData.top,
-                transform: "translate(-50%, -100%)",
-                backgroundColor: "rgba(0, 0, 0, 0.8)",
-                color: "#fff",
-                padding: "8px",
-                borderRadius: "4px",
-                pointerEvents: "none",
-              }}
-            >
-              <div>{tooltipData.value}</div>
-              <div>{tooltipData.formattedDate}</div>
-            </div>
-          )}
-        </div>
-        <div className="flex justify-around mt-4">
-          <div className="flex flex-col items-start">
-            <div
-              className="w-16 h-1 rounded-full mb-1"
-              style={{ backgroundColor: "#7C3AED", alignSelf: "flex-start" }}
-            ></div>
-            <div className="flex items-center">
-              <div className="text-gray-700">Total Collections</div>
-              <div className="ml-2 font-bold mr-1">{totalEarnings.toLocaleString()}</div>
-              <div className="text-gray-700">QR</div>
-            </div>
-          </div>
-          <div className="flex flex-col items-start">
-            <div
-              className="w-16 h-1 rounded-full mb-1"
-              style={{ backgroundColor: "#EA580C", alignSelf: "flex-start" }}
-            ></div>
-            <div className="flex items-center">
-              <div className="text-gray-700">Total Expenses</div>
-              <div className="ml-2 font-bold mr-1">{totalExpenses.toLocaleString()}</div>
-              <div className="text-gray-700">QR</div>
-            </div>
+        <div className="flex flex-col items-start">
+          <div className="w-16 h-1 rounded-full mb-1" style={{ backgroundColor: "#EA580C", alignSelf: "flex-start" }}></div>
+          <div className="flex items-center">
+            <div className="text-gray-700">Total Expenses</div>
+            <div className="ml-2 font-bold mr-1">{totalExpenses.toLocaleString()}</div>
+            <div className="text-gray-700">QR</div>
           </div>
         </div>
       </div>
