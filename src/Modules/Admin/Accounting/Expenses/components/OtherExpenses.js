@@ -2,13 +2,15 @@ import React, { useState, useEffect, useMemo } from "react";
 import axios from 'axios';
 import { baseUrl } from "../../../../../config/Common";
 import Sidebar from "../../../../../Components/Common/Sidebar";
+import { useSelector } from "react-redux";
 
 const OtherExpenses = ({ expenseData, selectedMonth }) => {
   const [data, setData] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
+  const role = useSelector((store) => store.Auth.role);
+  const token = localStorage.getItem(`${role}:token`);
   const [loading, setLoading] = useState(false);
-  const token = localStorage.getItem('admin:token');
   const [openDropdown, setOpenDropdown] = useState(null);
   const [isEditSidebarOpen, setEditSidebarOpen] = useState(false);
   const [editExpense, setEditExpense] = useState(null);
@@ -30,7 +32,6 @@ const OtherExpenses = ({ expenseData, selectedMonth }) => {
     setEditSidebarOpen(false);
     setEditExpense(null);
   };
-
   useEffect(() => {
     setData(expenseData);
   }, [expenseData]);

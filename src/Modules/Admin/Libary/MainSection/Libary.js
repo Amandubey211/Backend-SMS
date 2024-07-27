@@ -9,14 +9,15 @@ import BookIssue from "./BookIssue";
 import AddBook from "../SubClass/component/AddBook";
 import TabButton from "../Subclasss/component/TabButton";
 import { baseUrl } from "../../../../config/Common";
+import { useSelector } from "react-redux";
 
 const Library = () => {
   const [filters, setFilters] = useState({ class: "", category: "" });
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("Library");
   const [books, setBooks] = useState([]);
-
-  const token = localStorage.getItem('admin:token');
+  const role = useSelector((store) => store.Auth.role);
+  const token = localStorage.getItem(`${role}:token`);
 
   useEffect(() => {
     const fetchBooks = async () => {

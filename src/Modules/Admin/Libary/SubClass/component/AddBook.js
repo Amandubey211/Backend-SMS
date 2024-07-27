@@ -3,6 +3,7 @@ import ImageUpload from "../../../Addmission/Components/ImageUpload";
 import FormInput from "../../../Accounting/subClass/component/FormInput";
 import FormSelect from "../../../Accounting/subClass/component/FormSelect";
 import { baseUrl } from "../../../../../config/Common";
+import { useSelector } from "react-redux";
 
 const AddBook = () => {
   const [imagePreview, setImagePreview] = useState(null);
@@ -54,10 +55,10 @@ const AddBook = () => {
       bookImage: null,
     }));
   };
-
+  const role = useSelector((store) => store.Auth.role);
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const token = localStorage.getItem('admin:token');
+    const token = localStorage.getItem(`${role}:token`);
 
     const formData = new FormData();
     formData.append("name", bookData.bookName);

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import FormInput from '../subClass/component/FormInput';
 import axios from 'axios';  // Importing Axios
 import { baseUrl } from '../../../../config/Common';
+import { useSelector } from 'react-redux';
 
 const AddEarning = ({ fetchEarning }) => {
   const [formData, setFormData] = useState({
@@ -11,11 +12,11 @@ const AddEarning = ({ fetchEarning }) => {
     paymentStatus: '',
     paymentFrom: '',
   });
-
+  const role = useSelector((store) => store.Auth.role);
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log('Submitting New Earning:', formData);
-    const token = localStorage.getItem('admin:token');
+    const token = localStorage.getItem(`${role}:token`);
 
     if (!token) {
       console.error('Authentication token is not available.');

@@ -18,6 +18,7 @@ import {
 import axios from "axios";
 import { baseUrl } from "../../../../config/Common.js";
 import AddExpense from "./components/AddExpense.js";
+import { useSelector } from "react-redux";
 
 const Expenses = () => {
   const [activeTab, setActiveTab] = useState("TeacherSalary");
@@ -26,7 +27,7 @@ const Expenses = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [salaryData, setSalaryData] = useState([]);
   const [currentExpense, setCurrentExpense] = useState(null);
-
+  const role = useSelector((store) => store.Auth.role);
   const options = [{
     label: 'All Expenses',
     value: ''
@@ -63,7 +64,7 @@ const Expenses = () => {
 
   const fetchSalaries = async (query, activeTab, month) => {
     try {
-      const token = localStorage.getItem('admin:token')
+      const token = localStorage.getItem(`${role}:token`)
       const year = new Date().getFullYear()
       if (activeTab === "TeacherSalary") {
 

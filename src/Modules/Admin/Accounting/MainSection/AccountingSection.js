@@ -6,6 +6,7 @@ import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 import AddFeesForm from "../subClass/component/AddFeesForm";
 import FormField from "../subClass/component/FormField";
 import { baseUrl } from "../../../../config/Common";
+import { useSelector } from "react-redux";
 
 const AccountingSection = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -17,11 +18,11 @@ const AccountingSection = () => {
   });
   const [feesData, setFeesData] = useState([]);
   const [selectedStatus, setSelectedStatus] = useState("Everyone");
-
+  const role = useSelector((store) => store.Auth.role);
   useNavHeading("Accounting");
 
   useEffect(() => {
-    const token = localStorage.getItem('admin:token');
+    const token = localStorage.getItem(`${role}:token`);
     fetch(`${baseUrl}/admin/get_fees`, {
       method: "GET",
       headers: {

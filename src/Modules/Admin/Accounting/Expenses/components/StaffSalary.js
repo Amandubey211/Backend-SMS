@@ -4,6 +4,7 @@ import PaySalary from "./PaySalary";
 import { fetchApi } from '../api/api';
 import { baseUrl } from "../../../../../config/Common";
 import axios from "axios";
+import { useSelector } from "react-redux";
 
 
 const DropdownMenu = ({ onEditClick }) => {
@@ -110,7 +111,8 @@ const StaffSalary = ({ initialStaffData, selectedOption, selectedMonth }) => {
   const [staffData, setStaffData] = useState(initialStaffData || []);
   const [selectedStaff, setSelectedStaff] = useState(null);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
-  const token = localStorage.getItem('admin:token');
+  const role = useSelector((store) => store.Auth.role);
+  const token = localStorage.getItem(`${role}:token`);
 
 
 

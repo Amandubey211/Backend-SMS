@@ -7,6 +7,7 @@ import Sidebar from "../../../../Components/Common/Sidebar";
 import AddIssue from "../SubClass/component/AddIssue";
 import BookIssueRow from "../SubClass/component/BookIssueRow";
 import { baseUrl } from "../../../../config/Common";
+import { useSelector } from "react-redux";
 
 const BookIssue = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -16,9 +17,9 @@ const BookIssue = () => {
     category: "",
   });
   const [data, setData] = useState([]);
-
+  const role = useSelector((store) => store.Auth.role);
   const getAuthHeaders = () => {
-    const token = localStorage.getItem('admin:token');
+    const token = localStorage.getItem(`${role}:token`);
     return {
       Authentication: `${token}`,
     };
