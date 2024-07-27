@@ -1,54 +1,20 @@
-
-
-
-
 import React, { useState, useEffect } from "react";
+import { FaExclamationCircle } from "react-icons/fa";
+import { useParams } from "react-router-dom";
 import AnnouncementHeader from "./AnnouncementHeader";
 import AnnouncementCard from "./AnnouncementCard";
-import { useParams } from "react-router-dom";
-import { baseUrl } from "../../../../../../../config/Common";
+import useGetAllAnnouncements from "../../../../../../../Hooks/AuthHooks/Staff/Admin/Announcement/useGetAllAnnouncements";
 
 const AnnouncementList = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [announcements, setAnnouncements] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { loading, fetchAnnouncements, announcementData } = useGetAllAnnouncements();
   const { cid } = useParams();
 
   useEffect(() => {
-    const fetchAnnouncements = async () => {
-      try {
-        const token = localStorage.getItem("student:token");
-        if (!token) {
-          throw new Error("Authentication token not found");
-        }
+    fetchAnnouncements(cid);
+  }, [cid, fetchAnnouncements]);
 
-        const response = await fetch(`${baseUrl}/admin/announcement/class/${cid}`, {
-          headers: {
-            Authentication: token,
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error(`Failed to fetch announcements, status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        if (data.status && data.data) {
-          setAnnouncements(data.data);
-        } else {
-          console.error("No announcement data or unsuccessful response");
-        }
-      } catch (error) {
-        console.error("Failed to fetch announcements:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAnnouncements();
-  }, [cid]);
-
-  const filteredAnnouncements = announcements.filter((card) =>
+  const filteredAnnouncements = announcementData.filter((card) =>
     card.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -59,17 +25,24 @@ const AnnouncementList = () => {
   return (
     <div className="w-full ps-3">
       <AnnouncementHeader onSearch={setSearchTerm} />
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-2">
-        {filteredAnnouncements.map((card) => (
-          <AnnouncementCard
-            key={card._id}
-            title={card.title}
-            section={card.sectionId || "General"}
-            date={new Date(card.createdAt).toLocaleDateString()}
-            id={card._id}
-          />
-        ))}
-      </div>
+      {filteredAnnouncements.length === 0 ? (
+        <div className="flex flex-col items-center justify-center h-72">
+          <FaExclamationCircle className="text-6xl text-gray-400" />
+          <p className="mt-4 text-gray-600">No announcements Found</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-2">
+          {filteredAnnouncements.map((card) => (
+            <AnnouncementCard
+              key={card._id}
+              title={card.title}
+              section={card.sectionId || "General"}
+              date={new Date(card.createdAt).toLocaleDateString()}
+              id={card._id}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 };

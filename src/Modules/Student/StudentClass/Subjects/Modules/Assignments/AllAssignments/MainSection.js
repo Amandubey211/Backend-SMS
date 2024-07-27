@@ -28,7 +28,7 @@ const MainSection = () => {
   return (
     <div className="flex">
       <SubjectSideBar />
-      <div className="w-[65%] border-l p-4">
+      <div className="w-[65%] border-l ">
         <List
           type="Assignment"
           title="All Assignments"
