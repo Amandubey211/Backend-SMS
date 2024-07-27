@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { setStudentId } from "../../../Redux/Slices/Common/CommonSlice";
 import { baseUrl } from "../../../config/Common";
 
- // Ensure this is correctly set in your .env file
+// Ensure this is correctly set in your .env file
 const TOKEN_STORAGE_KEY = process.env.REACT_APP_STUDENT_TOKEN_STORAGE_KEY; // Ensure this is correctly set in your .env file
 
 const useStudentLogin = () => {
@@ -37,29 +37,23 @@ const useStudentLogin = () => {
       if (data.success) {
         // localStorage.setItem(TOKEN_STORAGE_KEY, Bearer ${data.token});
         localStorage.setItem(TOKEN_STORAGE_KEY, `Bearer ${data.token}`);
-        localStorage.setItem("classId", `${data.classId}`)
+        localStorage.setItem("classId", `${data.classId}`);
         console.log("Token stored in localStorage", data.token);
 
         dispatch(setAuth(true));
         dispatch(setStudentId(data.userId));
         dispatch(setRole("student"));
         navigate("/student_dash");
-        // Navigate based on verification status
-        // if (data.isVerifiedSchoolId) {
-        //   navigate("/student_dash");
-        // } else {
-        //   toast.error("Your account is not verified.");
-        // }
 
         toast.success("Logged in successfully");
       } else {
         toast.error(data.msg || "Login unsuccessful");
       }
     } catch (error) {
-      const errorMessage = error.response?.data?.msg || "Something went wrong. Please try again.";
+      const errorMessage =
+        error.response?.data?.msg || "Something went wrong. Please try again.";
       toast.error(errorMessage);
       console.error("Login error:", error);
-
     } finally {
       setLoading(false);
     }

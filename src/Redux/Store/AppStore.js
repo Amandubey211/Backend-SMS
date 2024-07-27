@@ -1,6 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
-import { persistStore, persistReducer } from 'redux-persist';
-import storage from 'redux-persist/lib/storage'; // defaults to localStorage for web
+import { persistStore, persistReducer } from "redux-persist";
+import storage from "redux-persist/lib/storage"; // defaults to localStorage for web
 import AuthSliceReducer from "../Slices/Auth/AuthSlice.js";
 import sidebarReducer from "../Slices/Common/SidebarSlice.js";
 import AdminReducers from "../Slices/AdminSlice.js";
@@ -15,12 +15,15 @@ import parentsReducer from "../Slices/Admin/parentsSilce.js";
 
 // Persist configuration for Auth slice
 const authPersistConfig = {
-  key: 'auth',
+  key: "auth",
   storage,
-  whitelist: ['isLoggedIn', 'role', 'userDetail'], // Only persist these fields
+  whitelist: ["isLoggedIn", "role", "userDetail"], // Only persist these fields
 };
 
-const persistedAuthReducer = persistReducer(authPersistConfig, AuthSliceReducer);
+const persistedAuthReducer = persistReducer(
+  authPersistConfig,
+  AuthSliceReducer
+);
 
 const AppStore = configureStore({
   reducer: {

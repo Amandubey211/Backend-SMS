@@ -11,8 +11,6 @@ const useStaffLogout = () => {
     const roles = ["admin", "teacher", "accountant", "librarian", "peon"];
     roles.forEach((role) => {
       localStorage.removeItem(`${role}:token`);
-      localStorage.removeItem("isLoggedIn");
-      localStorage.removeItem("role");
     });
 
     dispatch(setAuth(false));

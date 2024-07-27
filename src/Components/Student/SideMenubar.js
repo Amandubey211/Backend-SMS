@@ -11,12 +11,14 @@ import { FiLogOut } from "react-icons/fi";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleSidebar } from "../../Redux/Slices/Common/SidebarSlice";
+import useStudentLogout from "../../Hooks/AuthHooks/Student/useStudentLogout";
 
 const isActivePath = (path, locationPath) => locationPath.startsWith(path);
 
 const SideMenubar = () => {
   const dispatch = useDispatch();
   const location = useLocation();
+  const { studentLogout } = useStudentLogout();
 
   const { isOpen, userDetails } = useSelector((state) => ({
     isOpen: state.sidebar.isOpen,
@@ -186,7 +188,12 @@ const SideMenubar = () => {
               <p className="text-gray-500">Student</p>
             </div>
           )}
-          <button title="logout" className="ml-3" aria-label="Logout">
+          <button
+            title="logout"
+            className="ml-3"
+            aria-label="Logout"
+            onClick={studentLogout}
+          >
             <FiLogOut
               className={`${isOpen ? "w-7 h-7" : "w-5 h-5"} text-gray-500 ${
                 !isOpen && "ml-0"
