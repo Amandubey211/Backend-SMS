@@ -22,7 +22,7 @@ const useFetchQuizById = () => {
         const response = await axios.get(`${baseUrl}/admin/quiz/${quizId}`, {
           headers: { Authentication: token },
         });
-        console.log(response.data)
+        console.log("quiz response",response.data)
         if (response.data.success) {
           setQuiz(response.data.quiz);
         } else {
