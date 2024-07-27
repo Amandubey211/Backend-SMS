@@ -173,6 +173,11 @@ function App() {
     { path: "/student_dash", element: <ProtectRoute Component={StudentDash} allowedRoles={["student"]} />, errorElement: <Error /> },
     //-- Student Class -------------
     { path: "/student_class", element: <ProtectRoute Component={ StudentClass} allowedRoles={["student"]} />, errorElement: <Error /> },
+    { path: "/student_class/:cid/teachers", element: <ProtectRoute Component={ StudentTeacher} allowedRoles={["student"]} />, errorElement: <Error /> },
+    { path: "/student_class/:cid/classmates", element: <ProtectRoute Component={ StudentClassMates} allowedRoles={["student"]} />, errorElement: <Error /> },
+    { path: "/student_class/:cid/attendance", element: <ProtectRoute Component={ StudentAttendance} allowedRoles={["student"]} />, errorElement: <Error /> },
+
+
     { path: "/student_class/:cid/:sid/module", element: <ProtectRoute Component={StudentModule} allowedRoles={["student"]} />, errorElement: <Error /> },
     { path: "/student_class/:cid/:sid/assignments", element: <ProtectRoute Component={StudentAssignmentList} allowedRoles={["student"]} />, errorElement: <Error /> },
     { path: "/student_class/:cid/:sid/assignments/:aid/view", element: <ProtectRoute Component={StudentAssignmentView} allowedRoles={["student"]} />, errorElement: <Error /> },

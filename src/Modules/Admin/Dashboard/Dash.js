@@ -6,7 +6,7 @@ import useNavHeading from "../../../Hooks/CommonHooks/useNavHeading .js";
 import { useSelector } from "react-redux";
 
 const Dash = () => {
-  useNavHeading("Students");
+  useNavHeading("Admin");
   const role = useSelector((store) => store.Auth.role);
 
   const formattedRole =
