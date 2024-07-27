@@ -85,7 +85,7 @@ const DiscussionCard = ({ discussion }) => {
         )}
       </div>
       <NavLink
-        to={`/class/${cid}/${sid}/discussions/${discussion._id}/view`}
+        to={`/student_class/${cid}/${sid}/discussions/${discussion._id}/view`}
         className="block transition-transform transform hover:scale-105"
       >
         <div className="flex items-center justify-center mb-4">

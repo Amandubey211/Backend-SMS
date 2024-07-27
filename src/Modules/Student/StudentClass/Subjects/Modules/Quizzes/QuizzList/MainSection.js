@@ -28,7 +28,7 @@ const MainSection = () => {
           error={error}
         />
       </div>
-      <div className="w-[30%] p-2">
+      <div className="w-[30%] p-4">
         <FilterCard filters={filters} setFilters={setFilters} />
       </div>
     </div>

@@ -1,12 +1,14 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import axios from "axios";
+import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
-import { baseUrl } from "../../../../../config/Common"; // Adjust the path as needed
+import { baseUrl } from "../../../../../config/Common";
 
 const useGetBooks = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [books, setBooks] = useState([]);
+
   const role = useSelector((store) => store.Auth.role);
 
   const fetchBooks = useCallback(async () => {
@@ -17,20 +19,23 @@ const useGetBooks = () => {
       const response = await axios.get(`${baseUrl}/admin/all/book`, {
         headers: { Authentication: token },
       });
+
+      console.log('Fetched Books:', response.data.books); // Log the fetched books data
       setBooks(response.data.books);
       setLoading(false);
     } catch (err) {
-      const errorMessage = err.response?.data?.msg || "Failed to fetch books";
-      setError(errorMessage);
+      const errorMessage = err.response?.data?.message || "Failed to fetch books";
+      toast.error(errorMessage);
       setLoading(false);
+      setError(errorMessage);
     }
-  }, [role]);
+  }, [role, baseUrl]);
 
   useEffect(() => {
     fetchBooks();
   }, [fetchBooks]);
 
-  return { loading, error, books, fetchBooks };
+  return { loading, error, books };
 };
 
 export default useGetBooks;

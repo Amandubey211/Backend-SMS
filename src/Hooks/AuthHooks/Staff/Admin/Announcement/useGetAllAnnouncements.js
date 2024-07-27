@@ -1,7 +1,8 @@
+// useGetAllAnnouncements.js
 import { useState, useCallback } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { baseUrl } from "../../../../../config/Common";
 
 const useGetAllAnnouncements = () => {
@@ -9,7 +10,6 @@ const useGetAllAnnouncements = () => {
   const [error, setError] = useState(null);
   const [announcementData, setAnnouncementData] = useState([]);
 
-  
   const {
     role,
     userDetail: { userId },
@@ -38,7 +38,7 @@ const useGetAllAnnouncements = () => {
         setLoading(false);
       }
     },
-    [role, baseUrl]
+    [role]
   );
 
   return { loading, error, fetchAnnouncements, announcementData };

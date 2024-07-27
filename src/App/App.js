@@ -189,7 +189,7 @@ function App() {
     { path: "/student_class/:cid/:sid/announcements/:aid/view", element: <ProtectRoute Component={StudentAnnouncementView} allowedRoles={["student"]} />, errorElement: <Error /> },
     { path: "/student_class/:cid/:sid/syllabus", element: <ProtectRoute Component={StudentSyllabus} allowedRoles={["student"]} />, errorElement: <Error /> },
     { path: "/student_class/:cid/:sid/page", element: <ProtectRoute Component={StudentPage} allowedRoles={["student"]} />, errorElement: <Error /> },
-    { path: "/student_class/:cid/:sid/pages/:did/view", element: <ProtectRoute Component={StudentPageView} allowedRoles={["student"]} />, errorElement: <Error /> },
+    { path: "/student_class/:cid/:sid/page/:pid/view", element: <ProtectRoute Component={StudentPageView} allowedRoles={["student"]} />, errorElement: <Error /> },
 
     //--------------------------------------------------------------------------------------------------
     { path: "/student_finance", element: <ProtectRoute Component={StudentFinance} allowedRoles={["student"]} />, errorElement: <Error /> },
