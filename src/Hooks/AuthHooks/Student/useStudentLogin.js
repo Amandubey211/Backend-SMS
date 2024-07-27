@@ -1,7 +1,11 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
-import { setAuth, setRole } from "../../../Redux/Slices/Auth/AuthSlice";
+import {
+  setAuth,
+  setRole,
+  setUerDetails,
+} from "../../../Redux/Slices/Auth/AuthSlice";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { setStudentId } from "../../../Redux/Slices/Common/CommonSlice";
@@ -28,21 +32,20 @@ const useStudentLogin = () => {
 
     try {
       const { data } = await axios.post(
-        // ${baseUrl}/auth/student/student_login,
         `${baseUrl}/auth/student/login`,
         studentDetails
       );
       console.log("Login response:", data);
 
       if (data.success) {
-        // localStorage.setItem(TOKEN_STORAGE_KEY, Bearer ${data.token});
         localStorage.setItem(TOKEN_STORAGE_KEY, `Bearer ${data.token}`);
         localStorage.setItem("classId", `${data.classId}`);
         console.log("Token stored in localStorage", data.token);
 
         dispatch(setAuth(true));
         dispatch(setStudentId(data.userId));
-        dispatch(setRole("student"));
+        dispatch(setRole(data.role));
+        dispatch(setUerDetails(data.user));
         navigate("/student_dash");
 
         toast.success("Logged in successfully");
