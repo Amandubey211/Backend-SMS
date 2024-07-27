@@ -11,7 +11,7 @@ import useUpdateAssignment from "../../../../../../Hooks/AuthHooks/Staff/Admin/A
 
 const initialFormState = {
   points: "",
-  displayGrade: "",
+  displayGrade: false,
   submissionType: "",
   allowedAttempts: false,
   numberOfAttempts: "",
@@ -21,8 +21,9 @@ const initialFormState = {
   availableFrom: "",
   until: "",
   thumbnail: null,
-  moduleId: "",
-  chapterId: "",
+  moduleId: null,
+  chapterId: null,
+  group: null,
 };
 
 const MainSection = () => {
@@ -50,7 +51,7 @@ const MainSection = () => {
       setAssignmentId(assignment._id);
       setFormState({
         points: assignment.points || "",
-        displayGrade: assignment.grade || "",
+        displayGrade: assignment.grade || false,
         submissionType: assignment.submissionType || "",
         allowedAttempts: assignment.allowedAttempts || false,
         numberOfAttempts: assignment.allowNumberOfAttempts || "",
@@ -60,8 +61,9 @@ const MainSection = () => {
         availableFrom: assignment.availableFrom || "",
         until: assignment.until || "",
         thumbnail: assignment.thumbnail || null,
-        moduleId: assignment.moduleId || "",
-        chapterId: assignment.chapterId || "",
+        moduleId: assignment.moduleId || null,
+        chapterId: assignment.chapterId || null,
+        group: assignment?.groupId || null,
       });
     }
   }, [location.state]);
@@ -71,12 +73,13 @@ const MainSection = () => {
 
   const handleFormChange = (e) => {
     const { name, value } = e.target;
+
     setFormState((prev) => ({
       ...prev,
       [name]: value,
     }));
   };
-
+  console.log("formstate--", formState);
   const handleSave = async (publish) => {
     const assignmentData = {
       name: assignmentName,
@@ -87,7 +90,6 @@ const MainSection = () => {
       allowedAttempts: formState.allowedAttempts,
       allowNumberOfAttempts: formState.numberOfAttempts,
       assignTo: formState.assignTo,
-      sectionId: formState.section,
       dueDate: formState.dueDate,
       availableFrom: formState.availableFrom,
       until: formState.until,
@@ -99,13 +101,21 @@ const MainSection = () => {
       publish,
     };
 
+    if (formState.assignTo === "Section") {
+      assignmentData.sectionId = formState.section || null;
+    } else if (formState.assignTo === "Group") {
+      assignmentData.groupId = formState.group || null;
+    }
+    console.log("assignmnet data", assignmentData);
     if (isEditing) {
-      await updateAssignment(assignmentId, assignmentData);
+      let sectionId = formState.section || null
+      await updateAssignment(assignmentId, assignmentData, sectionId);
+
     } else {
-      console.log(assignmentData)
       await createAssignment(assignmentData);
     }
   };
+
 
   return (
     <div className="flex flex-col w-full">

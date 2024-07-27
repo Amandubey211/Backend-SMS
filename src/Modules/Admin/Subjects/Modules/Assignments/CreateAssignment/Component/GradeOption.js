@@ -4,13 +4,13 @@ const GradeOption = ({ displayGrade, setDisplayGrade }) => {
   const [selectedOption, setSelectedOption] = useState(displayGrade || "true");
 
   const handleOptionChange = (e) => {
-    const value = e.target.value === "true";
+    const value = e.target.value === true;
     setSelectedOption(e.target.value);
     setDisplayGrade(value);
   };
 
   useEffect(() => {
-    setSelectedOption(displayGrade ? "true" : "false");
+    setSelectedOption(displayGrade ? true : false);
   }, [displayGrade]);
 
   return (
@@ -23,7 +23,7 @@ const GradeOption = ({ displayGrade, setDisplayGrade }) => {
           type="radio"
           id="yes"
           name="grade"
-          value="true"
+          value={true}
           checked={selectedOption === "true"}
           onChange={handleOptionChange}
           className="form-radio h-4 w-4 text-green-500 transition duration-150 ease-in-out"
@@ -35,7 +35,7 @@ const GradeOption = ({ displayGrade, setDisplayGrade }) => {
           type="radio"
           id="no"
           name="grade"
-          value="false"
+          value={false}
           checked={selectedOption === "false"}
           onChange={handleOptionChange}
           className="form-radio h-4 w-4 text-gray-500 ml-6 transition duration-150 ease-in-out"

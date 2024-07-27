@@ -1,8 +1,8 @@
 import React, { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import Notice from "./Notice";
 import useGetNotices from "../../../../Hooks/AuthHooks/Staff/Admin/Notices/useGetNotices";
 import Fallback from "../../../../Components/Common/Fallback";
+import { useNavigate } from "react-router-dom"; // Updated import
 import icon1 from "../../../../Assets/DashboardAssets/Images/image1.png"; // Update with correct path
 import icon2 from "../../../../Assets/DashboardAssets/Images/image2.png"; // Update with correct path
 
@@ -22,7 +22,7 @@ const generateRandomColor = () => {
 
 const NoticeBoard = () => {
   const { loading, error, notices, fetchNotices } = useGetNotices();
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // Use useNavigate
 
   useEffect(() => {
     fetchNotices();
@@ -35,20 +35,17 @@ const NoticeBoard = () => {
   if (error) {
     return <p>Error: {error}</p>;
   }
-
+  
   const noticesSort = notices.sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
-
-  const handleViewAllClick = () => {
-    navigate("/noticeboard/announcements");
-  };
+  const topNotices = noticesSort.slice(0, 5);
 
   return (
     <div className="p-2">
       <div className="flex justify-between p-4 items-center px-6">
         <h2 className="text-xl font-semibold text-gray-600">Notice Board</h2>
-        <button onClick={handleViewAllClick} className="text-blue-500">view all</button>
+        <button className="text-blue-500" onClick={() => navigate('/noticeboard/announcements')}>view all</button>
       </div>
-      {noticesSort.map((notice, index) => (
+      {topNotices.map((notice, index) => (
         <Notice
           key={index}
           image={icons[index % icons.length]} // Use cyclic icons

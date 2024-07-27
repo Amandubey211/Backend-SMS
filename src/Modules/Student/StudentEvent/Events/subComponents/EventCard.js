@@ -46,7 +46,7 @@ const EventCard = ({ event, onClick }) => {
       </div>
       <div className="flex flex-col mt-2 text-white font-inter text-sm font-semibold leading-[1.5]">
         <span>{event.description}</span>
-        <span>{formatDate(event.date)}</span>
+        <span>{formatDate(event.startDate)}</span>
       </div>
     </div>
   );
