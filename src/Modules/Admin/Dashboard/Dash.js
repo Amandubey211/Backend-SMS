@@ -7,10 +7,11 @@ import { useSelector } from "react-redux";
 
 const Dash = () => {
   useNavHeading("Admin");
-  const role = useSelector((store) => store.Auth.role);
+  // const role = useSelector((store) => store.Auth.role);
+  const role = localStorage.getItem("role");
 
   const formattedRole =
-    role.charAt(0).toUpperCase() + role.slice(1).toLowerCase();
+    role?.charAt(0).toUpperCase() + role.slice(1).toLowerCase();
 
   return (
     <Layout title={`${formattedRole} Dash | Student Diwan`}>
