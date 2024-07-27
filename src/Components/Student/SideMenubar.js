@@ -180,7 +180,7 @@ const SideMenubar = () => {
         <div className="flex items-center justify-between">
           <img
             src={
-              userDetails.profile ||
+              userDetails?.profile ||
               "https://avatars.githubusercontent.com/u/109097090?v=4"
             }
             alt="Profile"
@@ -189,7 +189,7 @@ const SideMenubar = () => {
           {isOpen && (
             <div className="ml-4">
               <h2 className="text-sm font-semibold">
-                {userDetails.fullName || "User Name"}
+                {userDetails?.fullName || "User Name"}
               </h2>
               <p className="text-gray-500 capitalize">{role}</p>
             </div>
