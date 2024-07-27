@@ -1,40 +1,51 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 // import SubjectSideBar from "../../../../";
 import Chapter from "./Components/Chapter";
 import dummyData from "./Components/Data/DummyData";
 import ModuleCard from "./Components/ModuleCard";
 import dummyModules from "./Components/Data/DummyModules";
 import { PiPlusThin } from "react-icons/pi";
-// import Sidebar from "../../../../../Components/Common/Sidebar";
-
+import { useSelector } from "react-redux";
+import { baseUrl } from "../../../../../../../config/Common";
+import axios from "axios";
+import { useParams } from "react-router-dom";
 
 const MainSection = () => {
-  const [expandedChapters, setExpandedChapters] = useState([]);
+  const [expandedChapters, setExpandedChapters] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [sidebarContent, setSidebarContent] = useState(null);
+  const [modules,setModules] = useState([]);
+  const [chapters,setChapters] = useState([]);
+  const [studentSubjects,setStudentSubjects] = useState([]);
+  const role = useSelector((store) => store.Auth.role);
+  const {cid} = useParams()
+  useEffect(() => {
+    const fetchSubjects = async () => {
+      try {
+        const token = localStorage.getItem(`${role}:token`);
+        if (!token) {
+          throw new Error('Authentication token not found');
+        }
+        const response = await axios.get(`${baseUrl}/api/studentDashboard/subjects/${cid}`, {
+          headers: { Authentication: token }
+        });
 
-  const handleToggle = (chapterNumber) => {
-    setExpandedChapters((prev) =>
-      prev.includes(chapterNumber)
-        ? prev.filter((number) => number !== chapterNumber)
-        : [...prev, chapterNumber]
-    );
+        setStudentSubjects(response.data.subjects);
+        setModules(response.data.subjects[6].modules);
+        setChapters(response.data.subjects[6].modules[0].chapters)
+        console.log(response.data.subjects[6].modules[0].chapters);
+      } catch (err) {
+        console.error('Error fetching subjects:', err);
+      }
+    };
+
+    fetchSubjects();
+  }, []);
+  const handleToggle = () => {
+    setExpandedChapters(true)
   };
 
-  const openAddChapter = () => {
-    setSidebarContent("chapter");
-    setIsSidebarOpen(true);
-  };
 
-  const openAddModule = () => {
-    setSidebarContent("module");
-    setIsSidebarOpen(true);
-  };
-
-  const handleSidebarClose = () => {
-    setIsSidebarOpen(false);
-    setSidebarContent(null);
-  };
 
   return (
     <div className="flex  min-h-screen my-2">
@@ -50,15 +61,15 @@ const MainSection = () => {
               <span className="text-gradient"> + Add Chapter</span>
             </button> */}
           </div>
-          {dummyData.map((chapter, index) => (
+          {chapters.map((chapter, index) => (
             <Chapter
               key={index}
-              title={chapter.title}
-              chapterNumber={chapter.chapterNumber}
-              imageUrl={chapter.imageUrl}
-              items={chapter.items}
-              isExpanded={expandedChapters.includes(chapter.chapterNumber)}
-              onToggle={() => handleToggle(chapter.chapterNumber)}
+              title={chapter?.title}
+              chapterNumber={index+1}
+              imageUrl={chapter?.imageUrl}
+              items={chapters}
+              isExpanded={expandedChapters}
+              onToggle={() => handleToggle()}
             />
           ))}
         </div>
@@ -71,7 +82,7 @@ const MainSection = () => {
             <p className="bg-gradient-to-r from-pink-100 to-purple-200 font-semibold rounded-full p-1 px-2 ">    <span className="text-gradient">     06 </span>  </p>
           </div>
           <div className="grid grid-cols-1 gap-2">
-            {dummyModules.map((module, index) => (
+            {modules.map((module, index) => (
               <ModuleCard
                 key={index}
                 title={module.title}

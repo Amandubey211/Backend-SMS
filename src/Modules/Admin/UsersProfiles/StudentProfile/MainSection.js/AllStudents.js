@@ -29,11 +29,20 @@ const AllStudents = () => {
       <NavLink 
         key={student.id} 
         to={`/user/${student._id}`} 
-        className="block p-6 bg-white rounded-lg shadow-lg hover:bg-gray-100 transition border"
+        className="block p-6 bg-white rounded-lg shadow-lg hover:bg-gray-100 transition border items-center justify-center"
       >
-        <h3 className="text-2xl font-semibold mb-2">{student.firstName}</h3>
-        <p className="text-gray-600"><span className="font-medium">ID:</span> {student.id}</p>
+   <div className='flex w-full items-center'>
+   <img src={student.profile} alt='' className='w-[3rem] h-[3rem] rounded-full bg-gray-200'/>
+   </div>
+        <div className='flex flex-row w-full items-center gap-4'>
+          <div className='flex flex-col w-[50%] gap-[-10px]'>
+          <p className=" font-bold">{student.firstName}</p>
+            <p className="text-gray-600 w-[50%]"><span className="font-medium">ID:</span>{student.admissionNumber}</p> 
+          </div>
+         
         <p className="text-gray-600"><span className="font-medium">Parents:</span> {student.fatherName} & {student.motherName}</p>
+        </div>
+        
       </NavLink>
     ))}
   </div>

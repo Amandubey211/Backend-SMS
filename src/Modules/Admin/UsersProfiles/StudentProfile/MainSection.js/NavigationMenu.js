@@ -10,8 +10,8 @@ const NavigationMenu = ({ activeItem, setActiveItem, items }) => {
           onClick={() => setActiveItem(item)}
           className={`mt-2 px-4 ${
             activeItem === item
-              ? "inline-flex items-center border border-transparent font-medium shadow-sm bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-md  justify-center hover:from-pink-600 hover:to-purple-600 py-2 w-[60%] px-4"
-              : "text-black px-4 py-1 font-medium"
+              ? "inline-flex  border border-transparent font-medium shadow-sm bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-md   hover:from-pink-600 hover:to-purple-600 py-2 w-[60%] px-4"
+              : "inline-flex   font-medium  rounded-md   hover:from-pink-600 hover:to-purple-600 py-2 w-[60%] px-4"
           } transition duration-200 ease-in-out`}
         >
           {item}

@@ -19,7 +19,7 @@ const AllLibrarian = () => {
   useEffect(() => {
     fetchStaff();
     console.log(allLibrarian);
-  }, [fetchStaff]);
+  }, []);
 
   const handleSidebarOpen = () => setSidebarOpen(true);
   const handleSidebarClose = () => setSidebarOpen(false);

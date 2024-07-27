@@ -14,12 +14,6 @@ const Chapter = ({ title, chapterNumber, imageUrl, items, isExpanded, onToggle }
           </div>
         </div>
         <div className="flex  items-center space-x-2">
-          <button className="border p-2 rounded-full hover:bg-gray-50">
-            <FaPlus className="text-pink-500" />
-          </button>
-          <button className= " border p-2 rounded-full hover:bg-gray-50">
-            <FaEllipsisV />
-          </button>
           <button
             className="border p-2 rounded-full hover:bg-gray-50"
             onClick={onToggle}

@@ -1,5 +1,9 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import SubjectsSlider from './SubjectsSlider';
+import { useParams } from 'react-router-dom';
+import { baseUrl } from '../../../../../../../config/Common';
+import { useSelector } from 'react-redux';
+import axios from 'axios';
 
 const subjects = [
     {
@@ -39,10 +43,34 @@ const subjects = [
     },
     // More subjects...
   ];
+ 
 const AllSubjects = () => {
+  const [studentSubjects,setStudentSubjects] = useState([]);
+  const role = useSelector((store) => store.Auth.role);
+  const {cid} = useParams()
+  useEffect(() => {
+    const fetchSubjects = async () => {
+      try {
+        const token = localStorage.getItem(`${role}:token`);
+        if (!token) {
+          throw new Error('Authentication token not found');
+        }
+        const response = await axios.get(`${baseUrl}/api/studentDashboard/subjects/${cid}`, {
+          headers: { Authentication: token }
+        });
+
+        setStudentSubjects(response.data.subjects);
+        console.log(response.data.subjects);
+      } catch (err) {
+        console.error('Error fetching subjects:', err);
+      }
+    };
+
+    fetchSubjects();
+  }, []);
   return (
     <div className="px-4">
-      <SubjectsSlider subjects={subjects} />
+      <SubjectsSlider subjects={studentSubjects} />
     </div>
   )
 }
