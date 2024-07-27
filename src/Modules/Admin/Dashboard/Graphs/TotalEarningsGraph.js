@@ -56,11 +56,11 @@ const TotalEarningsGraph = () => {
   const { earningsData, expensesData, totalEarnings, totalExpenses } = dashboardData.earnings;
 
   const data = {
-    labels: ["Sat", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri"],
+    labels: earningsData.map((item) => `${item.day}`),
     datasets: [
       {
         label: "Total Collections",
-        data: earningsData.slice(0, 7).map((item) => item.amount),
+        data: earningsData.map((item) => item.amount),
         borderColor: "#7C3AED",
         borderWidth: 3,
         fill: true,
@@ -79,7 +79,7 @@ const TotalEarningsGraph = () => {
       },
       {
         label: "Total Expenses",
-        data: expensesData.slice(0, 7).map((item) => item.amount),
+        data: expensesData.map((item) => item.amount),
         borderColor: "#EA580C",
         borderWidth: 3,
         fill: false,
