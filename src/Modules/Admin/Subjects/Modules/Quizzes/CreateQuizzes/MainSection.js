@@ -26,16 +26,16 @@ const initialFormState = {
   assignTo: "",
   showOneQuestionAtATime: "",
   questionType: "",
-  section: "",
+  section: null,
   allowShuffleAnswers: false,
   dueDate: "",
   availableFrom: "",
   lockQuestionsAfterAnswering: "",
   until: "",
   timeLimit: "",
-  moduleId: "",
-  chapterId: "",
-  group: "",
+  moduleId: null,
+  chapterId: null,
+  group: null,
 };
 
 const initialAnswersState = [
