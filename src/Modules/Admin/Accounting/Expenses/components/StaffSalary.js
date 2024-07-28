@@ -1,11 +1,10 @@
-import React, { useState, useEffect, useMemo, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Sidebar from "../../../../../Components/Common/Sidebar";
 import PaySalary from "./PaySalary";
 import { fetchApi } from '../api/api';
 import { baseUrl } from "../../../../../config/Common";
 import axios from "axios";
 import { useSelector } from "react-redux";
-
 
 const DropdownMenu = ({ onEditClick }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -36,30 +35,8 @@ const DropdownMenu = ({ onEditClick }) => {
   );
 };
 
-
-
-
 // Memoized row component
-const SalaryRow = React.memo(({ staff, onPayClick }) => {
-  const handleEditClick = async () => {
-    try {
-      // Trigger API call for updating salary
-      await axios.put(`${baseUrl}/admin/staff/update_salary`, {
-        staffId: staff.staffId._id, 
-      }, {
-        headers: {
-          Authentication: localStorage.getItem('admin:token')
-        }
-      });
-
-      // You might want to refresh data or provide feedback to the user
-      console.log('Salary updated successfully');
-      // Optionally, trigger a refresh or update the parent component's state
-    } catch (error) {
-      console.error("Failed to update salary:", error);
-    }
-  };
-
+const SalaryRow = React.memo(({ staff, onPayClick, onEditClick }) => {
   return (
     <tr className="bg-white">
       <td className="px-5 py-3 border-b border-gray-200 flex items-center">
@@ -101,7 +78,7 @@ const SalaryRow = React.memo(({ staff, onPayClick }) => {
             Pay Now
           </button>
         )}
-        <DropdownMenu onEditClick={handleEditClick} />
+        <DropdownMenu onEditClick={() => onEditClick(staff)} />
       </td>
     </tr>
   );
@@ -111,10 +88,10 @@ const StaffSalary = ({ initialStaffData, selectedOption, selectedMonth }) => {
   const [staffData, setStaffData] = useState(initialStaffData || []);
   const [selectedStaff, setSelectedStaff] = useState(null);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
+  const [isEditSidebarOpen, setEditSidebarOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
   const role = useSelector((store) => store.Auth.role);
   const token = localStorage.getItem(`${role}:token`);
-
-
 
   const fetchSalaries = useCallback(async (query, month) => {
     try {
@@ -143,17 +120,29 @@ const StaffSalary = ({ initialStaffData, selectedOption, selectedMonth }) => {
     setSidebarOpen(true);
   };
 
-
+  // Handle clicking the edit button
+  const handleEditClick = (staff) => {
+    setSelectedStaff(staff);
+    setEditSidebarOpen(true);
+  };
 
   const handleUpdateSalary = async (salaryDetails) => {
+    setLoading(true);
     try {
       await fetchApi(`${baseUrl}/admin/staff/update_salary`, "PUT", salaryDetails, token);
 
       await fetchSalaries(selectedOption, selectedMonth);
-      handleSidebarClose();
+      handleEditSidebarClose();
     } catch (error) {
       console.error("Failed to update salary:", error);
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const handleEditSidebarClose = () => {
+    setEditSidebarOpen(false);
+    setSelectedStaff(null);
   };
 
   const handleSidebarClose = () => {
@@ -176,12 +165,12 @@ const StaffSalary = ({ initialStaffData, selectedOption, selectedMonth }) => {
           </tr>
         </thead>
         <tbody>
-
-          {staffData?.reverse()?.map((staff, index) => (
-            <SalaryRow key={index} staff={staff} onPayClick={handlePayClick} />
+          {staffData.map((staff, index) => (
+            <SalaryRow key={index} staff={staff} onPayClick={handlePayClick} onEditClick={handleEditClick} />
           ))}
         </tbody>
       </table>
+
       <Sidebar
         isOpen={isSidebarOpen}
         onClose={handleSidebarClose}
@@ -189,9 +178,69 @@ const StaffSalary = ({ initialStaffData, selectedOption, selectedMonth }) => {
       >
         <PaySalary teacher={selectedStaff} onSave={handleUpdateSalary} />
       </Sidebar>
+
+      <Sidebar
+        isOpen={isEditSidebarOpen}
+        onClose={handleEditSidebarClose}
+        title="Edit Salary Status"
+      >
+        {selectedStaff && (
+          <div className="bg-white p-4 rounded-lg shadow">
+            <div className="flex justify-between items-center border-b pb-4 mb-4">
+              <h2 className="text-xl font-semibold">Edit Salary Status</h2>
+            </div>
+            <div className="flex flex-col items-center mb-4">
+              {selectedStaff.staffId.profile ? (
+                <img
+                  src={selectedStaff.staffId.profile}
+                  alt={selectedStaff.staffId.fullName}
+                  className="w-24 h-24 rounded-full"
+                />
+              ) : (
+                <div className="w-24 h-24 rounded-full bg-gray-300 flex items-center justify-center">
+                  <span className="text-gray-700 font-semibold text-3xl">{selectedStaff.staffId.fullName[0]}</span>
+                </div>
+              )}
+              <h3 className="mt-2 text-lg font-semibold">{selectedStaff.staffId.fullName}</h3>
+              <p>{selectedStaff.staffId.position}</p>
+              <p className="text-green-600">{selectedStaff.staffId.mobileNumber}</p>
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Salary Amount
+              </label>
+              <input
+                type="number"
+                value={selectedStaff.salaryAmount}
+                className="mt-1 p-2 w-full border border-gray-300 rounded-md shadow-sm"
+                readOnly
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Status
+              </label>
+              <select
+                value={selectedStaff.status || ''}
+                onChange={(e) => setSelectedStaff({ ...selectedStaff, status: e.target.value })}
+                className="mt-1 p-2 w-full border border-gray-300 rounded-md shadow-sm"
+              >
+                <option value="unpaid">Unpaid</option>
+                <option value="paid">Paid</option>
+              </select>
+            </div>
+            <button
+              onClick={() => handleUpdateSalary(selectedStaff)}
+              disabled={loading}
+              className={`w-full flex justify-center border border-transparent shadow-sm text-sm font-medium bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600 ${loading ? 'bg-gray-400' : ''}`}
+            >
+              {loading ? 'Saving...' : 'Save'}
+            </button>
+          </div>
+        )}
+      </Sidebar>
     </div>
   );
 };
 
 export default StaffSalary;
-
