@@ -4,7 +4,7 @@ import axios from 'axios';
 import { baseUrl } from '../../../../config/Common';
 import { useSelector } from 'react-redux';
 
-const EditEarning = ({ earning, onClose, onUpdate }) => {
+const EditEarning = ({ earning, onClose, onUpdate, fetchTotalAmounts }) => {
     const [formData, setFormData] = useState({
         paymentDate: '',
         amount: '',
@@ -51,6 +51,7 @@ const EditEarning = ({ earning, onClose, onUpdate }) => {
             console.log('Earning saved successfully:', response.data);
             onUpdate();
             onClose();
+            fetchTotalAmounts();
         } catch (error) {
             console.error('Error saving the earning:', error.response ? error.response.data.msg : error.message);
         }
