@@ -3,8 +3,9 @@ import FormInput from '../subClass/component/FormInput';
 import axios from 'axios';  // Importing Axios
 import { baseUrl } from '../../../../config/Common';
 import { useSelector } from 'react-redux';
+import { message } from "antd";
 
-const AddEarning = ({ fetchEarning }) => {
+const AddEarning = ({ fetchEarning, fetchTotalAmounts, handleSidebarClose }) => {
   const [formData, setFormData] = useState({
     paymentDate: '',
     amount: '',
@@ -40,7 +41,7 @@ const AddEarning = ({ fetchEarning }) => {
     try {
 
       const response = await axios.post(`${baseUrl}/admin/addEarning`, payload, config);
-      console.log('Earning saved successfully:', response.data);
+      //console.log('Earning saved successfully:', response);
       setFormData({
         paymentDate: '',
         amount: '',
@@ -48,7 +49,12 @@ const AddEarning = ({ fetchEarning }) => {
         paymentStatus: '',
         paymentFrom: '',
       })
-      fetchEarning()
+      if (response.data.success) {
+        message.success('Earning deleted successfully');
+      }
+      fetchEarning();
+      fetchTotalAmounts();
+      handleSidebarClose();
     } catch (error) {
       console.error('Error saving the earning:', error.response ? error.response.data.msg : error.message);
     }

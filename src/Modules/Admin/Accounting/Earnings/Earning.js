@@ -98,6 +98,7 @@ const Earning = () => {
       if (response.ok) {
         message.success('Earning deleted successfully');
         fetchEarnings();
+        fetchTotalAmounts();
       } else {
         throw new Error(data.msg || 'Failed to delete earning');
       }
@@ -249,7 +250,7 @@ const Earning = () => {
             onClose={handleSidebarClose}
             title="Add New Earnings"
           >
-            <AddEarning fetchEarning={fetchEarnings} />
+            <AddEarning fetchEarning={fetchEarnings} fetchTotalAmounts={fetchTotalAmounts} handleSidebarClose={handleSidebarClose} />
           </Sidebar>
 
           <Sidebar
@@ -262,6 +263,7 @@ const Earning = () => {
                 earning={editEarning}
                 onClose={handleEditSidebarClose}
                 onUpdate={fetchEarnings}
+                fetchTotalAmounts={fetchTotalAmounts}
               />
             )}
           </Sidebar>
