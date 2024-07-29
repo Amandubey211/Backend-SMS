@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { Doughnut } from "react-chartjs-2";
-import { BsThreeDots } from "react-icons/bs";
+import { FaCalendarAlt } from "react-icons/fa";
 import useGetAdminDashboardData from "../../../../Hooks/AuthHooks/Staff/Admin/Dashboard/useGetAdminDashboardData";
 import Fallback from "../../../../Components/Common/Fallback";
 
@@ -19,8 +19,16 @@ const TotalStudentsGraphjs = () => {
     return <p>Error: {error}</p>;
   }
 
-  if (!dashboardData) {
-    return null;
+  if (!dashboardData || (dashboardData.maleStudents === 0 && dashboardData.femaleStudents === 0)) {
+    return (
+      <div className="max-w-xs px-2 py-4 h-full">
+        <h2 className="text-2xl font-semibold">Total Student</h2>
+        <div className="flex flex-col items-center justify-center my-10">
+          <FaCalendarAlt className="text-gray-400 text-6xl mb-4" />
+          <p className="text-gray-500 text-xl">No student data found</p>
+        </div>
+      </div>
+    );
   }
 
   const { maleStudents, femaleStudents } = dashboardData;
@@ -28,13 +36,13 @@ const TotalStudentsGraphjs = () => {
   const data = {
     datasets: [
       {
-        data: [maleStudents, femaleStudents], // Dynamic values for the chart
-        backgroundColor: ["#23C55E", "#8F77F3"], // Colors for the segments
+        data: [maleStudents, femaleStudents],
+        backgroundColor: ["#23C55E", "#8F77F3"],
         borderWidth: 0,
         cutout: "70%",
         borderRadius: 10,
-        spacing: 5, // Reduce space between segments
-        hoverOffset: 10, // Increase segment size on hover
+        spacing: 5,
+        hoverOffset: 10,
       },
     ],
     labels: ["Male Students", "Female Students"],
@@ -71,7 +79,6 @@ const TotalStudentsGraphjs = () => {
     <div className="max-w-xs px-2 py-4 h-full">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-semibold">Total Student</h2>
-        
       </div>
       <div className="relative p-8 my-5 mb-12" style={{ width: "300px", height: "300px" }}>
         <Doughnut data={data} options={options} />
