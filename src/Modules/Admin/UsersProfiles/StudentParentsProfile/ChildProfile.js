@@ -15,25 +15,19 @@ const ChildProfile = ({ children }) => {
         <div className='flex flex-col text-center border border-gray-300 rounded-md items-center justify-around  mx-5 py-5 gap-3  ' >
         <div >
         <img
-            src={child.profile}
+            src={child.imageUrl}
             alt={child.name}
             className="w-24 h-24 rounded-full object-cover "
           /> 
         </div>
-        <h2 className='font-medium' >{child.firstName}</h2>
-        <div className='flex gap-2 flex-col ' >
-         <div>
-         <span className='text-gray-500'> Id: </span>
-         <span className='font-medium text-gray-800' >{child._id}</span>
-         </div>
-            <div>
+        <h2 className='font-medium' >{child.name}</h2>
+        <div className='flex gap-2  ' >
+            <span className='text-gray-500'> Id: </span>
+            <span className='font-medium text-gray-800' >{child.id}</span>
             <span className='text-gray-500'> Class </span>
-            <span className='font-medium text-gray-800'>{child.class} ssas </span>
-            </div>
-            <div>
+            <span className='font-medium text-gray-800'>{child.class}  </span>
             <span className='text-gray-500'>Section</span>
             <span className='font-medium text-gray-800'>  {child.section}</span>
-            </div>
         </div>
         
         <div>

@@ -55,10 +55,11 @@ const AllTeachers = () => {
               <span>Add New Teacher</span>
             </button>
           </div>
-          <div className="flex flex-wrap -mx-2 gap-4">
+          <div className="flex flex-wrap  gap-4">
             {teachers.map((teacher, index) => (
               <div
-                className="block p-6 bg-white rounded-lg shadow-lg hover:bg-gray-100 transition cursor-pointer w-[16rem] border"
+                className=" relative w-full sm:w-1/2 md:w-1/3 lg:w-1/4 px-1 mb-4 flex flex-col
+                 rounded-lg shadow-lg hover:bg-gray-100 border"
                 key={index}
               >
                   <div className=" absolute right-0 flex flex-col px-4 gap-2 justify-end ">

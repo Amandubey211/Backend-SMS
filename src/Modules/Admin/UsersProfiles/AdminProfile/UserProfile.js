@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Layout from "../../../../Components/Common/Layout";
 import DashLayout from "../../../../Components/Admin/AdminDashLayout";
 import SidebarSlide from "../../../../Components/Common/SidebarSlide";
@@ -6,10 +6,22 @@ import { useSelector } from "react-redux";
 import useChangePassword from "../../../../Hooks/AuthHooks/Staff/Admin/resetPassword/useResetPassword";
 import toast from "react-hot-toast";
 import EditAdmin from "./EditProfile";
+import useGetUserDetail from "../../../../Hooks/AuthHooks/Staff/useGetUserDetail";
 
 const UserProfile = () => {
-  const user = useSelector((store)=>store.Auth.userDetail);;
+  const  {userDetail} = useGetUserDetail();
+  const user = useSelector((store)=>store.Auth.userDetail);
    const [userData, setUserData] = useState(user);
+   useEffect(() => {
+    const getData = async () => {
+      await userDetail();
+    };
+    getData();
+  }, []);
+  useEffect(() => {
+    setUserData(user);
+  }, [user]);
+  
   const [passwordData, setPasswordData] = useState({
     currentPassword: "",
     newPassword: "",
@@ -37,6 +49,7 @@ const {ChangePassword} =  useChangePassword();
   const [sidebarContent, setSidebarContent] = useState(null)
   const handleSidebarOpen = () => setSidebarOpen(true);
   const handleSidebarClose = () => setSidebarOpen(false);
+  
   return (
     <>
     <Layout title="Admin">
