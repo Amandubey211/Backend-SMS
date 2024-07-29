@@ -8,11 +8,28 @@ ChartJS.register(...registerables);
 const TotalEarningsGraph = () => {
   const chartRef = useRef(null);
   const [tooltipData, setTooltipData] = useState(null);
+  const [selectedOption, setSelectedOption] = useState("currentMonth");
   const { loading, error, dashboardData, fetchAdminDashboardData } = useGetAdminDashboardData();
 
+  const fetchDashboardData = (option) => {
+    const date = new Date();
+    let month = date.getMonth() + 1;
+    let year = date.getFullYear();
+    let includeExpensesWithoutPay = false;
+
+    if (option === "lastMonth") {
+      month = month === 1 ? 12 : month - 1;
+      year = month === 12 ? year - 1 : year;
+    } else if (option === "totalExpensesWithoutPay") {
+      includeExpensesWithoutPay = true;
+    }
+
+    fetchAdminDashboardData(month, year, includeExpensesWithoutPay);
+  };
+
   useEffect(() => {
-    fetchAdminDashboardData();
-  }, [fetchAdminDashboardData]);
+    fetchDashboardData(selectedOption);
+  }, [fetchAdminDashboardData, selectedOption]);
 
   const getOrdinalSuffix = (day) => {
     if (day > 3 && day < 21) return "th";
@@ -145,9 +162,10 @@ const TotalEarningsGraph = () => {
           <h2 className="text-xl font-semibold">Earnings</h2>
         </div>
         <div>
-          <select className="border rounded p-2">
-            <option>This month</option>
-            <option>Last month</option>
+          <select className="border rounded p-2" value={selectedOption} onChange={(e) => setSelectedOption(e.target.value)}>
+            <option value="currentMonth">This month</option>
+            <option value="lastMonth">Last month</option>
+            <option value="totalExpensesWithoutPay">Total Expenses Without Pay</option>
           </select>
         </div>
       </div>

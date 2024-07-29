@@ -59,7 +59,7 @@ const TopRankingStudents = () => {
   return (
     <div className="bg-white p-5">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold text-gray-600">Top Ranking Students</h2>
+        <h2 className="text-xl font-semibold text-gray-600">Top Ranking Students (Dummmy Data)</h2>
         <div className="relative">
           <select className="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
             <option>Class: 5</option>

@@ -20,7 +20,7 @@ const BestPerformanceChart = () => {
   return (
     <div className="h-full py-10 ">
       <div className="flex justify-between px-4 items-center">
-        <h1 className="text-2xl font-bold text-center ">Best Performers</h1>
+        <h1 className="text-xl font-semibold text-gray-600 ">Best Performers (Dummmy Data)</h1>
         <div className="flex justify-center ">
           <select
             className="p-2 border rounded"

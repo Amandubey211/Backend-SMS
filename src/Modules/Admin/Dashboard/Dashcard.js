@@ -2,7 +2,7 @@ import React from "react";
 
 const DashCard = ({
   label,
-  value,
+  value = 0, // Set a default value of 0
   bgColor,
   textColor,
   icon,
@@ -16,7 +16,7 @@ const DashCard = ({
     >
       <div className="flex gap-4 items-center">
         <div
-          className={`p-3 bg-white ${textColor} rounded-full  text-2xl`}
+          className={`p-3 bg-white ${textColor} rounded-full text-2xl`}
         >
           {icon}
         </div>
