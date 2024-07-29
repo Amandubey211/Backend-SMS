@@ -1,5 +1,5 @@
 import React from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { Navigate } from "react-router-dom";
 
 const ProtectRoute = ({ Component, allowedRoles }) => {
@@ -10,7 +10,7 @@ const ProtectRoute = ({ Component, allowedRoles }) => {
     return <Navigate to="/" />;
   }
 
-  return <Component /> || Component;
+  return <Component />;
 };
 
 export default ProtectRoute;

@@ -62,37 +62,39 @@ const useCreateQuiz = () => {
         //   imageUrl = result.secure_url;
         // }
 
-        
+
         const token = localStorage.getItem(`${role}:token`);
 
         const response = await axios.post(
           `${baseUrl}/admin/create_quiz`, // Adjust the API endpoint as needed
-          {
-            name,
-            // thumbnail: imageUrl,
-            quizType,
-            allowShuffleAnswers,
-            timeLimit,
-            studentSeeAnswer,
-            showAnswerDate,
-            showOneQuestionOnly,
-            lockQuestionAfterAnswering,
-            allowedAttempts,
-            allowNumberOfAttempts,
-            acessCode,
-            publish,
-            correctAnswerComment,
-            inCorrectAnswerComment,
-            assignTo,
-            sectionId,
-            availableFrom,
-            dueDate,
-            content,
-            classId,
-            subjectId,
-            moduleId,
-            chapterId,
-          },
+          // {
+          //   name,
+          //   // thumbnail: imageUrl,
+          //   quizType,
+          //   allowShuffleAnswers,
+          //   timeLimit,
+          //   studentSeeAnswer,
+          //   showAnswerDate,
+          //   showOneQuestionOnly,
+          //   lockQuestionAfterAnswering,
+          //   allowedAttempts,
+          //   allowNumberOfAttempts,
+          //   acessCode,
+          //   publish,
+          //   correctAnswerComment,
+          //   inCorrectAnswerComment,
+          //   assignTo,
+          //   sectionId,
+          //   availableFrom,
+          //   dueDate,
+          //   content,
+          //   classId,
+          //   subjectId,
+          //   moduleId,
+          //   chapterId,
+          //   groupId,
+          // },
+          quizData,
           {
             headers: { Authentication: token },
           }

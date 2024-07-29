@@ -38,7 +38,7 @@ const MainSection = () => {
         {
           icon: <SlEyeglass className="text-purple-600" />,
           text: `My Class Teacher (${classData.teachersCount})`,
-          url: `/student_class/class/${classData.classId}/teachers`,
+          url: `/student_class/${classData.classId}/teachers`,
         },
         {
           icon: <FaSchool className="text-yellow-600" />,
@@ -49,12 +49,12 @@ const MainSection = () => {
         {
           icon: <FcGraduationCap />,
           text: `My Classmates (${classData.classmatesCount}) `,
-          url: `/student_class/class/${classData.classId}/classmates`,
+          url: `/student_class/${classData.classId}/classmates`,
         },
         {
           icon: <FcCalendar />,
           text: "My Attendance",
-          url: `/student_class/class/${classData.classId}/attendance`,
+          url: `/student_class/${classData.classId}/attendance`,
         },
       ],
     [classData]

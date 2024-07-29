@@ -1,81 +1,54 @@
 import React from "react";
-import { FaEllipsisV } from "react-icons/fa";
-import { IoCalendarOutline } from "react-icons/io5";
-import { TbBookmark } from "react-icons/tb";
-import { BsPatchCheckFill } from "react-icons/bs";
-import { GoDiscussionClosed } from "react-icons/go";
+import { IoCalendarOutline, IoBookOutline } from "react-icons/io5";
 import { NavLink, useParams } from "react-router-dom";
 
-const DiscussionCard = ({ discussion }) => {
-  const { sid, cid } = useParams();
-  console.log("discussion",discussion)
+const PageCard = ({ title, authorName, publishDate, updateDate, id, readOnly }) => {
+  const formatDate = (dateString) => {
+    const options = { year: "numeric", month: "short", day: "numeric" };
+    return new Date(dateString).toLocaleDateString(undefined, options);
+  };
+  const { cid, sid } = useParams();
+
   return (
-    <div className="p-4 bg-white shadow rounded-lg border flex flex-col">
-      
-      <div className="p-3">
-      <NavLink to={`/student_class/${cid}/section/${sid}/pages/${discussion._id}/view`}>
-        <div className="flex items-center justify-center mb-4">
-          <GoDiscussionClosed className="w-16 h-16 p-2 border rounded-full text-green-500" />
+    <div className="relative max-w-xs bg-white rounded-lg border flex flex-col justify-between transition-shadow duration-300 hover:shadow-lg group">
+      <NavLink to={`/student_class/${cid}/${sid}/page/${id}/view`}>
+        <div className="flex justify-center p-3">
+          <IoBookOutline className="text-green-500 h-24 w-24" />
         </div>
-        <div className="text-lg flex justify-center border-b pb-2">
-          <span> {discussion.title}</span>
+        <div className="text-center mb-4 mt-2">
+          <h2 className="font-semibold">{title}</h2>
+          <div className="flex items-center justify-center mt-2">
+            <img
+              className="h-7 w-7 rounded-full"
+              src="https://avatars.githubusercontent.com/u/109097090?v=4"
+              alt={authorName}
+            />
+            <span className="ml-2 text-gray-700">{authorName}</span>
+          </div>
         </div>
       </NavLink>
-      </div>
-     
-        <div className="flex justify-around space-x-4">
-          <div className="flex flex-col ">
-            <span className="font-semibold text-lg">
-             Publish 
-            </span>
-            <span className="text-sm text-gray-500">Mar 13,2024</span>
+      <div className="flex justify-between items-center text-sm text-gray-600 rounded-b-lg p-4 bg-gray-50">
+        <div className="flex flex-col items-start">
+          <div className="flex items-center">
+            <IoCalendarOutline className="mr-1" />
+            <span>Publish</span>
           </div>
-          
-          <div className="flex flex-col ">
-            <span className="font-semibold text-lg">
-             Update 
-            </span>
-            <span className="text-sm text-gray-500">Mar 26,2024</span>
+          <div className="text-lg text-gray-600 capitalize">
+            <span>{formatDate(publishDate)}</span>
           </div>
-
-          
         </div>
-      {/* </div> */}
+        <div className="flex flex-col items-start">
+          <div className="flex items-center">
+            <IoCalendarOutline className="mr-1" />
+            <span>Update</span>
+          </div>
+          <div className="text-lg text-gray-600 capitalize">
+            <span>{formatDate(updateDate)}</span>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
 
-export default DiscussionCard;
-
-
-
-// import React from "react";
-// import { GoFile } from "react-icons/go";
-// import { IoCalendarOutline } from "react-icons/io5";
-// import { NavLink, useParams } from "react-router-dom";
-
-// const DiscussionCard = ({ discussion }) => {
-//   const { sid, cid } = useParams();
-//   return (
-//     <div className="p-4 bg-white shadow rounded-lg border flex flex-col">
-//       <NavLink to={`/student_class/${sid}/pages/${discussion.id}/view`}>
-//         <div className="flex items-center justify-center mb-4">
-//           <GoFile className="w-16 h-16 p-2 text-green-500" />
-//         </div>
-//         <div className="text-lg font-semibold text-center mb-2">
-//           {discussion.title}
-//         </div>
-//         <div className="flex  items-center justify-center text-sm text-gray-500 mb-2">
-//           <IoCalendarOutline className="mr-1" />
-//           <span>Publish {discussion.publishDate}</span>
-//         </div>
-//         <div className="flex items-center justify-center text-sm text-gray-500">
-//           <IoCalendarOutline className="mr-1" />
-//           <span>Update {discussion.updateDate}</span>
-//         </div>
-//       </NavLink>
-//     </div>
-//   );
-// };
-
-// export default DiscussionCard;
+export default PageCard;

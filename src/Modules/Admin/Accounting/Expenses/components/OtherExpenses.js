@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import axios from 'axios';
 import { baseUrl } from "../../../../../config/Common";
 import Sidebar from "../../../../../Components/Common/Sidebar";
@@ -11,17 +11,8 @@ const OtherExpenses = ({ expenseData, selectedMonth }) => {
   const role = useSelector((store) => store.Auth.role);
   const token = localStorage.getItem(`${role}:token`);
   const [loading, setLoading] = useState(false);
-  const [openDropdown, setOpenDropdown] = useState(null);
   const [isEditSidebarOpen, setEditSidebarOpen] = useState(false);
   const [editExpense, setEditExpense] = useState(null);
-
-  const handleDropdownToggle = (index) => {
-    setOpenDropdown(openDropdown === index ? null : index);
-  };
-
-  const handleDropdownClose = () => {
-    setOpenDropdown(null);
-  };
 
   const handleEditSidebarOpen = (expense) => {
     setEditExpense(expense);
@@ -32,6 +23,7 @@ const OtherExpenses = ({ expenseData, selectedMonth }) => {
     setEditSidebarOpen(false);
     setEditExpense(null);
   };
+
   useEffect(() => {
     setData(expenseData);
   }, [expenseData]);
@@ -135,7 +127,7 @@ const OtherExpenses = ({ expenseData, selectedMonth }) => {
 
   return (
     <div>
-      <table className="min-w-full leading-normal mt-4 shadow-lg rounded-lg overflow-hidden">
+      <table className="min-w-full leading-normal mt-4 rounded-lg ">
         <thead>
           <tr className="text-left text-gray-700 bg-gray-100">
             <th className="px-5 py-3 border-b-2 border-gray-200">Expenses Reason</th>
@@ -146,61 +138,15 @@ const OtherExpenses = ({ expenseData, selectedMonth }) => {
           </tr>
         </thead>
         <tbody>
-          {filteredData.reverse().map((item, index) => (
-            <tr key={index} className="bg-white">
-              <td className="px-5 py-2 border-b border-gray-200">{item.reason}</td>
-              <td className="px-5 py-2 border-b border-gray-200">{item.amount} QR</td>
-              <td className="px-5 py-2 border-b border-gray-200">{new Date(item.date).toLocaleDateString()}</td>
-              <td className="px-5 py-2 border-b border-gray-200">
-                <span
-                  className={`px-3 py-1 text-xs font-semibold rounded-full ${item.status === "paid" ? "text-green-800" : "text-red-800"}`}
-                >
-                  {item.status}
-                </span>
-              </td>
-              <td className="px-5 py-2 border-b border-gray-200 flex items-center justify-between relative">
-                {item.status === "paid" ? (
-                  <span className="inline-flex items-center border border-transparent text-xs font-medium shadow-sm bg-green-200 text-green-800 py-1 px-2 rounded-md">
-                    Completed
-                  </span>
-                ) : (
-                  <button
-                    className="inline-flex items-center border border-transparent text-xs font-medium shadow-sm bg-gradient-to-r from-pink-500 to-purple-500 text-white py-1 px-2 rounded-md hover:from-pink-600 hover:to-purple-600"
-                    onClick={() => handlePayClick(item)}
-                  >
-                    Pay Now
-                  </button>
-                )}
-                <button
-                  onClick={() => handleDropdownToggle(index)}
-                  className="text-gray-500 hover:text-gray-700 transition duration-300"
-                >
-                  &#x22EE;
-                </button>
-                {openDropdown === index && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
-                    <button
-                      onClick={() => {
-                        handleEditSidebarOpen(item);
-                        handleDropdownClose();
-                      }}
-                      className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 transition duration-300"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => {
-                        handleDelete(item._id);
-                        handleDropdownClose();
-                      }}
-                      className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 transition duration-300"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                )}
-              </td>
-            </tr>
+          {filteredData.map((item, index) => (
+            <ExpenseRow
+              key={item._id}
+              item={item}
+              index={index}
+              handlePayClick={handlePayClick}
+              handleDelete={handleDelete}
+              handleEditSidebarOpen={handleEditSidebarOpen}
+            />
           ))}
         </tbody>
       </table>
@@ -295,6 +241,19 @@ const OtherExpenses = ({ expenseData, selectedMonth }) => {
               className="mt-1 p-2 w-full border border-gray-300 rounded-md shadow-sm"
             />
           </div>
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Status
+            </label>
+            <select
+              value={editExpense?.status || ''}
+              onChange={(e) => setEditExpense({ ...editExpense, status: e.target.value })}
+              className="mt-1 p-2 w-full border border-gray-300 rounded-md shadow-sm"
+            >
+              <option value="unpaid">Unpaid</option>
+              <option value="paid">Paid</option>
+            </select>
+          </div>
           <button
             onClick={handleEditSave}
             disabled={loading}
@@ -305,6 +264,94 @@ const OtherExpenses = ({ expenseData, selectedMonth }) => {
         </div>
       </Sidebar>
     </div>
+  );
+};
+
+const ExpenseRow = ({ item, index, handlePayClick, handleDelete, handleEditSidebarOpen }) => {
+  const [openDropdown, setOpenDropdown] = useState(false);
+  const dropdownRef = useRef(null);
+
+  const handleDropdownToggle = () => {
+    setOpenDropdown(!openDropdown);
+  };
+
+  const handleDropdownClose = () => {
+    setOpenDropdown(false);
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        handleDropdownClose();
+      }
+    };
+
+    if (openDropdown) {
+      document.addEventListener('mousedown', handleClickOutside);
+    } else {
+      document.removeEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [openDropdown]);
+
+  return (
+    <tr key={item._id} className="bg-white">
+      <td className="px-5 py-2 border-b border-gray-200">{item.reason}</td>
+      <td className="px-5 py-2 border-b border-gray-200">{item.amount} QR</td>
+      <td className="px-5 py-2 border-b border-gray-200">{new Date(item.date).toLocaleDateString()}</td>
+      <td className="px-5 py-2 border-b border-gray-200">
+        <span
+          className={`px-3 py-1 text-xs font-semibold rounded-full ${item.status === "paid" ? "text-green-800" : "text-red-800"}`}
+        >
+          {item.status}
+        </span>
+      </td>
+      <td className="px-5 py-2 border-b border-gray-200 flex items-center justify-between relative">
+        {item.status === "paid" ? (
+          <span className="inline-flex items-center border border-transparent text-xs font-medium shadow-sm bg-green-200 text-green-800 py-1 px-2 rounded-md">
+            Completed
+          </span>
+        ) : (
+          <button
+            className="inline-flex items-center border border-transparent text-xs font-medium shadow-sm bg-gradient-to-r from-pink-500 to-purple-500 text-white py-1 px-2 rounded-md hover:from-pink-600 hover:to-purple-600"
+            onClick={() => handlePayClick(item)}
+          >
+            Pay Now
+          </button>
+        )}
+        <button
+          onClick={handleDropdownToggle}
+          className="text-gray-500 hover:text-gray-700 transition duration-300"
+        >
+          &#x22EE;
+        </button>
+        {openDropdown && (
+          <div ref={dropdownRef} className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+            <button
+              onClick={() => {
+                handleEditSidebarOpen(item);
+                handleDropdownClose();
+              }}
+              className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 transition duration-300"
+            >
+              Edit
+            </button>
+            <button
+              onClick={() => {
+                handleDelete(item._id);
+                handleDropdownClose();
+              }}
+              className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 transition duration-300"
+            >
+              Delete
+            </button>
+          </div>
+        )}
+      </td>
+    </tr>
   );
 };
 

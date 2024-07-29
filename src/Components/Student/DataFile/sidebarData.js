@@ -1,50 +1,40 @@
-// sidebarData.js
 import React from "react";
-import {
-  FaChalkboardTeacher,
-  FaUsers,
-  FaBook,
-  FaUserGraduate,
-  FaClipboardList,
-  FaUniversity,
-
-} from "react-icons/fa";
+import { TbDashboard } from "react-icons/tb";
 import { RiGraduationCapLine } from "react-icons/ri";
-import { FcAlarmClock, FcMoneyTransfer } from "react-icons/fc";
-import { FcHome } from "react-icons/fc";
-import { FcReading } from "react-icons/fc";
-import { FcAdvertising } from "react-icons/fc";
-import { MdOutlineNotificationsActive } from "react-icons/md";
+import { HiOutlineCalculator } from "react-icons/hi2";
+import { MdLocalLibrary, MdOutlineNotificationsActive } from "react-icons/md";
+import { FaClipboardList, FaBook } from "react-icons/fa";
 import { LiaClipboardListSolid } from "react-icons/lia";
+import { FcAdvertising } from "react-icons/fc";
 
 const sidebarData = [
   {
     title: "Dashboard",
-    icon: <FcHome />,
+    icon: <TbDashboard />,
     path: "/student_dash",
   },
   {
     title: "My Class",
-    icon: <RiGraduationCapLine color="blue"/>,
+    icon: <RiGraduationCapLine />,
     path: "/student_class",
   },
   {
     title: "Finance",
-    icon: <FcMoneyTransfer />,
+    icon: <HiOutlineCalculator />,
     path: "/student_finance",
   },
   {
     title: "Library",
-    icon: <FcReading />,
+    icon: <MdLocalLibrary />,
     path: "/student_library",
   },
   {
     title: "Notice Board",
-    icon: <MdOutlineNotificationsActive color="red" />,
+    icon: <MdOutlineNotificationsActive />,
     items: [
       {
         title: "Notice",
-        icon: <LiaClipboardListSolid color="violet" />,
+        icon: <FaClipboardList />,
         path: "/student/noticeboard/announcements",
       },
       {

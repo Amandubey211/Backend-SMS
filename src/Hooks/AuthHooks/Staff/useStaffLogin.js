@@ -7,25 +7,23 @@ import {
   setUerDetails,
 } from "../../../Redux/Slices/Auth/AuthSlice.js";
 import { useNavigate } from "react-router-dom";
-import {requestPermissionAndGetToken} from '../../NotificationHooks/NotificationHooks.js';
+import { requestPermissionAndGetToken } from "../../NotificationHooks/NotificationHooks.js";
 import axios from "axios";
 import { baseUrl } from "../../../config/Common.js";
+import { setLeftHeading } from "../../../Redux/Slices/Common/CommonSlice.js";
 
 const useStaffLogin = () => {
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
- 
+
   const validateEmail = (email) => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return re.test(String(email).toLowerCase());
   };
 
   const staffLogin = async (staffDetails) => {
-    
-    
     if (!staffDetails) {
-      
       toast.error("Please provide staff details.");
       return;
     }
@@ -46,7 +44,7 @@ const useStaffLogin = () => {
 
     try {
       const deviceToken = await requestPermissionAndGetToken();
-      const userdetail = {email,password,deviceToken}
+      const userdetail = { email, password, deviceToken };
       const { data } = await axios.post(
         `${baseUrl}/auth/staff/login`,
         userdetail
@@ -60,11 +58,13 @@ const useStaffLogin = () => {
         );
 
         dispatch(setAuth(true));
-        dispatch(setRole(data.role));// dynamic role from backend
+        dispatch(setRole(data.role));
+        // localStorage.setItem("isLoggedIn", true);
+        // localStorage.setItem("role", data.role);
+        dispatch(setLeftHeading(data.role));
+        // useNavHeading(data.role);
         console.log(data);
-        dispatch(
-          setUerDetails(data.user)
-        );
+        dispatch(setUerDetails(data.user));
         navigate(`/dashboard`);
         toast.success("Logged in successfully", {
           position: "bottom-left",

@@ -1,4 +1,5 @@
 
+
 import React, { useEffect } from "react";
 import { CiMail, CiSearch } from "react-icons/ci";
 import { TbBell } from "react-icons/tb";
@@ -73,14 +74,16 @@ const StudentViewButton = () => (
 );
 
 const Navbar = ({ hideSearchbar, hideAvatarList, hideStudentView }) => {
-  const leftHeading = useSelector((store) => store.Common.NavbarData.leftHeading);
+  const leftHeading = useSelector(
+    (store) => store.Common.NavbarData.leftHeading
+  );
   const navigate = useNavigate();
   const  {userDetail} = useGetUserDetail();
   useEffect(()=>{
      userDetail();
   },[])
   return (
-    <div className="relative z-0">
+    <div className="relative -z-10">
       <div className="flex items-center p-2 bg-white border-b">
         <LeftHeading leftHeading={leftHeading} navigate={navigate} />
         {!hideAvatarList && (

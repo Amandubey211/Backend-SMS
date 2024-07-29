@@ -57,7 +57,7 @@ export const {
   setSelectedClass,
   setSelectedClassName,
   setSelectedModule,
-  setSelectedSectionId
+  setSelectedSectionId,
 } = CommonSlice.actions;
 
 export default CommonSlice.reducer;

@@ -32,10 +32,10 @@ const Expenses = () => {
     label: 'All Expenses',
     value: ''
   }, {
-    label: 'Paid',
+    label: 'Paid Expenses',
     value: 'paid'
   }, {
-    label: 'Due',
+    label: 'Due Expenses',
     value: 'unpaid'
   }]
 
@@ -119,7 +119,7 @@ const Expenses = () => {
   };
 
   const handleCreateExpense = async () => {
-    fetchSalaries(selectedOption, activeTab, selectedMonth); 
+    fetchSalaries(selectedOption, activeTab, selectedMonth);
     handleSidebarClose();
   };
 
@@ -149,7 +149,7 @@ const Expenses = () => {
     fetchSalaries(selectedOption, activeTab, selectedMonth);
 
   }, [activeTab]);
-  
+
 
   return (
     <Layout title="Expenses">
@@ -178,7 +178,7 @@ const Expenses = () => {
                 </TabButton>
               </div>
 
-              <div>
+              {activeTab === "OtherExpenses" && <div>
                 <button
                   onClick={handleSidebarOpen}
                   className="flex items-center border border-gray-300 ps-5 py-0 rounded-full"
@@ -188,7 +188,7 @@ const Expenses = () => {
                     <span className="text-2xl -mt-2">+</span>
                   </div>
                 </button>
-              </div>
+              </div>}
             </div>
 
             <div className="flex justify-between">
@@ -264,7 +264,7 @@ const Expenses = () => {
             title={<span className="font-normal text-gray-600">Add New Expenses</span>}
           >
             <AddExpense
-              
+
               onCreate={handleCreateExpense}
             />
           </Sidebar>

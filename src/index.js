@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App/App";
 import { Provider } from "react-redux";
-import AppStore from "./Redux/Store/AppStore";
+import { AppStore } from "./Redux/Store/AppStore";
 
 // Register the Service Worker
 if ('serviceWorker' in navigator) {

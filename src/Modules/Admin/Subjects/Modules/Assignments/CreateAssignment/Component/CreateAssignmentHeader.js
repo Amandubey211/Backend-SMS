@@ -6,7 +6,7 @@ import AddRubricModal from "../../../Rubric/Components/AddRubricModal";
 import Sidebar from "../../../../../../../Components/Common/Sidebar";
 import AddNewCriteriaForm from "../../../Rubric/Components/AddNewCriteriaForm";
 
-const CreateAssignmentHeader = ({ onSave, id }) => {
+const CreateAssignmentHeader = ({ onSave, id, isEditing }) => {
   const navigate = useNavigate();
   const [isModalOpen, setModalOpen] = useState(false);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -28,8 +28,9 @@ const CreateAssignmentHeader = ({ onSave, id }) => {
           className="mr-2 text-gray-600 text-2xl cursor-pointer"
           onClick={() => navigate(-1)}
         />
+
         <h1 className="text-lg font-semibold text-gray-800">
-          Create New Assignment
+          {isEditing ? "Update Assignment" : "Create New Assignment"}
         </h1>
       </div>
       <div className="flex items-center space-x-2">
@@ -48,7 +49,7 @@ const CreateAssignmentHeader = ({ onSave, id }) => {
           className="flex-grow rounded-md py-2 px-4 text-center bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200 transition"
         >
           <span className="bg-clip-text text-transparent bg-gradient-to-r from-rose-500 to-indigo-500">
-            Save & Publish
+            {isEditing ? "Update & Publish" : "Save & Publish"}
           </span>
         </button>
         <button

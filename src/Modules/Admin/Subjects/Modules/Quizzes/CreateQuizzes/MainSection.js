@@ -26,15 +26,16 @@ const initialFormState = {
   assignTo: "",
   showOneQuestionAtATime: "",
   questionType: "",
-  section: "",
+  section: null,
   allowShuffleAnswers: false,
   dueDate: "",
   availableFrom: "",
   lockQuestionsAfterAnswering: "",
   until: "",
   timeLimit: "",
-  moduleId: "",
-  chapterId: "",
+  moduleId: null,
+  chapterId: null,
+  group: null,
 };
 
 const initialAnswersState = [
@@ -94,15 +95,16 @@ const MainSection = () => {
         assignTo: quiz.assignTo || "",
         showOneQuestionAtATime: quiz.showOneQuestionAtATime || "",
         questionType: quiz.questionType || "",
-        section: quiz.section || "",
+        section: quiz?.sectionId || null,
         allowShuffleAnswers: quiz.allowShuffleAnswers || false,
         dueDate: quiz.dueDate || "",
         availableFrom: quiz.availableFrom || "",
         lockQuestionsAfterAnswering: quiz.lockQuestionsAfterAnswering || "",
         until: quiz.until || "",
         timeLimit: quiz.timeLimit || "",
-        moduleId: quiz.moduleId || "",
-        chapterId: quiz.chapterId || "",
+        moduleId: quiz.moduleId || null,
+        chapterId: quiz.chapterId || null,
+        group: quiz?.groupId || null,
       });
       setQuestionState(quiz.questions || []);
       setAnswers(quiz.answers || initialAnswersState);
@@ -184,6 +186,11 @@ const MainSection = () => {
       classId: cid,
       subjectId: sid,
     };
+    if (formState.assignTo === "Section") {
+      quizData.sectionId = formState.section || null;
+    } else if (formState.assignTo === "Group") {
+      quizData.groupId = formState.group || null;
+    }
     if (isEditing) {
       const result = await updateQuiz(quizId, quizData);
       if (result.success) {
@@ -251,9 +258,8 @@ const MainSection = () => {
 
       <div className="w-full flex">
         <div
-          className={` ${
-            activeTab === "instructions" ? "w-[70%]" : "w-full"
-          } border-x`}
+          className={` ${activeTab === "instructions" ? "w-[70%]" : "w-full"
+            } border-x`}
         >
           <Tabs
             createPage={true}
