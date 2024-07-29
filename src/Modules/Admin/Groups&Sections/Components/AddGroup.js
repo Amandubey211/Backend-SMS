@@ -7,19 +7,29 @@ import useGetStudentsByClassAndSection from "../../../../Hooks/AuthHooks/Staff/A
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 
-const AddGroup = () => {
-  const [groupName, setGroupName] = useState("");
-  const [seatLimit, setSeatLimit] = useState("");
+const AddGroup = ({ group, isUpdate, groupId, onClose }) => {
+  const [groupName, setGroupName] = useState(group?.groupName || "");
+  const [seatLimit, setSeatLimit] = useState(group?.seatLimit || "");
   const [students, setStudents] = useState([]);
-  const [selectedStudents, setSelectedStudents] = useState([]);
-  const [leader, setLeader] = useState(null);
-  const [sectionId, setSectionId] = useState("");
+  const [selectedStudents, setSelectedStudents] = useState(group?.students || []);
+  const [leader, setLeader] = useState(group?.leader || null);
+  const [sectionId, setSectionId] = useState(group?.sectionId || "");
   const [isDropdownOpen, setDropdownOpen] = useState(false);
 
   const AllSections = useSelector((store) => store.Class.sectionsList);
-  const { createGroup, loading, error } = useCreateGroup();
+  const { createGroup, updateGroup, loading, error } = useCreateGroup();
   const { fetchStudentsByClassAndSection } = useGetStudentsByClassAndSection();
   const { cid } = useParams();
+
+  useEffect(() => {
+    if (isUpdate && group) {
+      setGroupName(group.groupName);
+      setSeatLimit(group.seatLimit);
+      setSelectedStudents(group.students);
+      setLeader(group.leader);
+      setSectionId(group.sectionId);
+    }
+  }, [isUpdate, group]);
 
   useEffect(() => {
     const fetchStudents = async () => {
@@ -77,10 +87,20 @@ const AddGroup = () => {
     };
 
     try {
-      await createGroup(formData);
-      toast.success("Group Added Successfully");
+      if (isUpdate) {
+        await updateGroup(formData, groupId);
+      } else {
+        await createGroup(formData);
+        // Reset form fields
+        setGroupName("");
+        setSeatLimit("");
+        setSelectedStudents([]);
+        setLeader(null);
+        setSectionId("");
+      }
+      onClose();
     } catch (err) {
-      toast.error("Failed to add group: " + err.message);
+      toast.error(err.message || "Something went wrong");
     }
   };
 
@@ -94,6 +114,14 @@ const AddGroup = () => {
       onSubmit={handleSubmit}
     >
       <div className="bg-white h-[80%] overflow-y-auto rounded-lg p-4 w-full max-w-md">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-lg font-semibold">
+            {isUpdate ? "Update Group" : "Add New Group"}
+          </h2>
+          <button onClick={onClose}>
+            <FaTimes className="text-gray-500" />
+          </button>
+        </div>
         <div className="flex flex-col space-y-4">
           <div>
             <label
@@ -233,7 +261,7 @@ const AddGroup = () => {
           className="w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600 transition duration-300 transform"
           disabled={loading}
         >
-          {loading ? "Creating..." : "Add New Group"}
+          {loading ? "Saving..." : isUpdate ? "Update Group" : "Add Group"}
         </button>
       </div>
       {error && <p className="text-red-500 text-center">{error}</p>}

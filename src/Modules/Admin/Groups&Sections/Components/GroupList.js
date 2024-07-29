@@ -1,10 +1,35 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState } from "react";
 import { LuUser } from "react-icons/lu";
 import { GiImperialCrown } from "react-icons/gi";
+import { TbDotsVertical } from "react-icons/tb";
 import SidebarMenu from "../../Students/Components/SidebarMenu";
+import AddGroup from "./AddGroup"; // Adjust the import path as necessary
 
 const GroupList = ({ selectedSection, onSeeGradeClick, groupList }) => {
   const [expandedGroupIndex, setExpandedGroupIndex] = useState(null);
+  const [activeMenu, setActiveMenu] = useState(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [editingGroup, setEditingGroup] = useState(null);
+
+  const handleMenuToggle = (groupIndex) => {
+    setActiveMenu(activeMenu === groupIndex ? null : groupIndex);
+  };
+
+  const handleEdit = (group) => {
+    setEditingGroup(group);
+    setIsSidebarOpen(true);
+    setActiveMenu(null);
+  };
+
+  const handleDelete = (groupIndex) => {
+    console.log(`Delete group ${groupIndex}`);
+    setActiveMenu(null);
+  };
+
+  const closeSidebar = () => {
+    setIsSidebarOpen(false);
+    setEditingGroup(null);
+  };
 
   return (
     <div className="w-full max-w-4xl bg-white">
@@ -34,7 +59,7 @@ const GroupList = ({ selectedSection, onSeeGradeClick, groupList }) => {
               {group?.groupName || "Aman's Group"} (
               {group?.sectionName || "Section A"})
             </h3>
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2 relative">
               <div className="flex items-center space-x-1 border p-1 rounded-full px-4">
                 <LuUser />
                 <span className="text-gray-500">
@@ -43,6 +68,30 @@ const GroupList = ({ selectedSection, onSeeGradeClick, groupList }) => {
                     {group?.students?.length || "0"}/{group?.seatLimit || "20"}
                   </span>
                 </span>
+              </div>
+              <div className="relative">
+                <div
+                  className="w-7 h-7 flex items-center justify-center rounded-full border cursor-pointer"
+                  onClick={() => handleMenuToggle(groupIndex)}
+                >
+                  <TbDotsVertical className="w-6 h-6 text-gray-500" />
+                </div>
+                {activeMenu === groupIndex && (
+                  <div className="absolute right-0 mt-2 w-32 bg-white border rounded-md shadow-lg z-10">
+                    <div
+                      className="px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer"
+                      onClick={() => handleEdit(group)}
+                    >
+                      Edit
+                    </div>
+                    <div
+                      className="px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer"
+                      onClick={() => handleDelete(groupIndex)}
+                    >
+                      Delete
+                    </div>
+                  </div>
+                )}
               </div>
               <svg
                 className={`w-7 h-7 text-gray-500 transform p-1 border rounded-full transition-transform ${
@@ -128,6 +177,13 @@ const GroupList = ({ selectedSection, onSeeGradeClick, groupList }) => {
           )}
         </div>
       ))}
+      {isSidebarOpen && (
+        <div className="fixed inset-0 z-50 flex justify-end bg-black bg-opacity-50">
+          <div className="bg-white h-full w-full max-w-md shadow-lg p-4 overflow-y-auto">
+            <AddGroup group={editingGroup} isUpdate={!!editingGroup} groupId={editingGroup?._id} onClose={closeSidebar} />
+          </div>
+        </div>
+      )}
     </div>
   );
 };
