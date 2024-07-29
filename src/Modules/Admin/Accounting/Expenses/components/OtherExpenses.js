@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import axios from 'axios';
 import { baseUrl } from "../../../../../config/Common";
 import Sidebar from "../../../../../Components/Common/Sidebar";
@@ -127,7 +127,7 @@ const OtherExpenses = ({ expenseData, selectedMonth }) => {
 
   return (
     <div>
-      <table className="min-w-full leading-normal mt-4 shadow-lg rounded-lg overflow-hidden">
+      <table className="min-w-full leading-normal mt-4 rounded-lg ">
         <thead>
           <tr className="text-left text-gray-700 bg-gray-100">
             <th className="px-5 py-3 border-b-2 border-gray-200">Expenses Reason</th>
@@ -241,6 +241,19 @@ const OtherExpenses = ({ expenseData, selectedMonth }) => {
               className="mt-1 p-2 w-full border border-gray-300 rounded-md shadow-sm"
             />
           </div>
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Status
+            </label>
+            <select
+              value={editExpense?.status || ''}
+              onChange={(e) => setEditExpense({ ...editExpense, status: e.target.value })}
+              className="mt-1 p-2 w-full border border-gray-300 rounded-md shadow-sm"
+            >
+              <option value="unpaid">Unpaid</option>
+              <option value="paid">Paid</option>
+            </select>
+          </div>
           <button
             onClick={handleEditSave}
             disabled={loading}
@@ -256,6 +269,7 @@ const OtherExpenses = ({ expenseData, selectedMonth }) => {
 
 const ExpenseRow = ({ item, index, handlePayClick, handleDelete, handleEditSidebarOpen }) => {
   const [openDropdown, setOpenDropdown] = useState(false);
+  const dropdownRef = useRef(null);
 
   const handleDropdownToggle = () => {
     setOpenDropdown(!openDropdown);
@@ -264,6 +278,24 @@ const ExpenseRow = ({ item, index, handlePayClick, handleDelete, handleEditSideb
   const handleDropdownClose = () => {
     setOpenDropdown(false);
   };
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        handleDropdownClose();
+      }
+    };
+
+    if (openDropdown) {
+      document.addEventListener('mousedown', handleClickOutside);
+    } else {
+      document.removeEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [openDropdown]);
 
   return (
     <tr key={item._id} className="bg-white">
@@ -297,7 +329,7 @@ const ExpenseRow = ({ item, index, handlePayClick, handleDelete, handleEditSideb
           &#x22EE;
         </button>
         {openDropdown && (
-          <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+          <div ref={dropdownRef} className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
             <button
               onClick={() => {
                 handleEditSidebarOpen(item);

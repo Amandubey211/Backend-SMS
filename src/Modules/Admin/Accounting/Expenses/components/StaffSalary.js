@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import Sidebar from "../../../../../Components/Common/Sidebar";
 import PaySalary from "./PaySalary";
 import { fetchApi } from '../api/api';
@@ -8,8 +8,27 @@ import { useSelector } from "react-redux";
 
 const DropdownMenu = ({ onEditClick }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null); // <-- Added useRef
 
   const handleToggle = () => setIsOpen(!isOpen);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    } else {
+      document.removeEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpen]); // <-- Added useEffect
 
   return (
     <div className="relative">
@@ -20,7 +39,7 @@ const DropdownMenu = ({ onEditClick }) => {
         <span className="text-lg">&#x22EE;</span>
       </button>
       {isOpen && (
-        <div className="absolute right-0 w-48 mt-2 origin-top-right bg-white border border-gray-200 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+        <div ref={dropdownRef} className="absolute right-0 w-48 mt-2 origin-top-right bg-white border border-gray-200 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"> {/* <-- Added ref */}
           <div className="p-1">
             <button
               onClick={onEditClick}
@@ -152,7 +171,7 @@ const StaffSalary = ({ initialStaffData, selectedOption, selectedMonth }) => {
 
   return (
     <div>
-      <table className="min-w-full leading-normal mt-4 shadow-lg rounded-lg overflow-hidden">
+      <table className="min-w-full leading-normal mt-4 rounded-lg">
         <thead>
           <tr className="text-left text-gray-700 bg-gray-100">
             <th className="px-5 py-3 border-b-2 border-gray-200">Staff Name</th>
