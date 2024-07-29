@@ -35,15 +35,14 @@ const AddNewClass = ({ className, isUpdate, classId }) => {
       console.log("isUpdate--", isUpdate);
       if (isUpdate) {
         console.log("classId---", classId);
-        await updateClass(classData, classId)
+        updateClass(classData, classId)
         // toast.success("Class updated successfully!");
         // Add update class logic here
       } else {
-        await createClass(classData);
+        createClass(classData);
         // Reset form fields
         setNewClassName("");
         setActiveIconId(null);
-        toast.success("Class created successfully!");
       }
     } catch (err) {
       toast.error(err.message || "Something went wrong");
@@ -97,7 +96,7 @@ const AddNewClass = ({ className, isUpdate, classId }) => {
             aria-busy={loading ? "true" : "false"}
           >
             {loading
-              ? "Updating Class..."
+              ? "loading..."
               : isUpdate
                 ? "Update Class"
                 : "Add New Class"}
