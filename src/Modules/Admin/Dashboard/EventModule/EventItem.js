@@ -37,7 +37,7 @@ const EventItem = ({ event, onUpdate }) => {
   const handleTimeChange = (time, timeString) => {
     setEditedEvent({ ...editedEvent, time: timeString });
   };
-
+  console.log(event)
   return (
     <div className="flex items-center justify-between py-4">
       <div className="flex items-center">
