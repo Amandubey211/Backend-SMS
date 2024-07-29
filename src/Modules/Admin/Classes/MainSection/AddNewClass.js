@@ -3,10 +3,11 @@ import classIcons from "../../Dashboard/DashboardData/ClassIconData";
 import toast from "react-hot-toast";
 import useCreateClass from "../../../../Hooks/AuthHooks/Staff/Admin/Class/useCreateClass";
 
-const AddNewClass = ({ className, isUpdate }) => {
+
+const AddNewClass = ({ className, isUpdate, classId }) => {
   const [activeIconId, setActiveIconId] = useState(null);
   const [newClassName, setNewClassName] = useState(className);
-  const { createClass, loading } = useCreateClass();
+  const { createClass, updateClass, loading } = useCreateClass();
 
   useEffect(() => {
     if (isUpdate && className) {
@@ -31,8 +32,11 @@ const AddNewClass = ({ className, isUpdate }) => {
     };
 
     try {
+      console.log("isUpdate--", isUpdate);
       if (isUpdate) {
-        toast.success("Class updated successfully!");
+        console.log("classId---", classId);
+        await updateClass(classData, classId)
+        // toast.success("Class updated successfully!");
         // Add update class logic here
       } else {
         await createClass(classData);
@@ -70,15 +74,13 @@ const AddNewClass = ({ className, isUpdate }) => {
               <button
                 type="button"
                 key={data.id}
-                className={`h-16 w-16 p-1 rounded-lg border hover:cursor-pointer bg-gradient-to-r transition duration-300 ease-in-out ${
-                  activeIconId === data.id
-                    ? "from-pink-600 to-purple-600"
-                    : "from-transparent to-transparent"
-                } hover:from-pink-600 hover:to-purple-600 ${
-                  activeIconId === data.id
+                className={`h-16 w-16 p-1 rounded-lg border hover:cursor-pointer bg-gradient-to-r transition duration-300 ease-in-out ${activeIconId === data.id
+                  ? "from-pink-600 to-purple-600"
+                  : "from-transparent to-transparent"
+                  } hover:from-pink-600 hover:to-purple-600 ${activeIconId === data.id
                     ? "border-pink-500"
                     : "border-gray-300"
-                } transform hover:scale-105`}
+                  } transform hover:scale-105`}
                 onClick={() => handleIconClick(data.gradeLevel, data.id)}
                 aria-label={`Select icon ${data.id}`}
               >
@@ -97,8 +99,8 @@ const AddNewClass = ({ className, isUpdate }) => {
             {loading
               ? "Updating Class..."
               : isUpdate
-              ? "Update Class"
-              : "Add New Class"}
+                ? "Update Class"
+                : "Add New Class"}
           </button>
         </div>
       </form>
