@@ -23,6 +23,7 @@ import StudentLibrary from "../Modules/Student/Library/StudentLibrary.js";
 import StaffLogin from "../Modules/LoginPages/Staff/StaffLogin.js";
 import ForgetPassword from "../Modules/LoginPages/Student/Login/ForgetPassword/ForgetPassword.js";
 import AttendanceMain from "../Modules/Student/Attendance/AttendanceMain.js";
+import useGetUserDetail from "../Hooks/AuthHooks/Staff/useGetUserDetail.js";
 
 // lazy loaded routes
 const StudentFinance = lazy(() => import("../Modules/Student/StudentFinance.js"));
@@ -98,6 +99,14 @@ const StudentAttendance = lazy(() => import("../Modules/Student/Attendance/Atten
 const Dash = lazy(() => import("../Modules/Admin/Dashboard/Dash.js"));
 
 function App() {
+  const  {userDetail} = useGetUserDetail();
+  useEffect(() => {
+    const getData = async () => {
+      await userDetail();
+    };
+    getData();
+  }, []);
+ 
   const [isOnline, setIsOnline] = useState(window.navigator.onLine);
   useFirebaseMessaging();
 

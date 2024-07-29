@@ -3,6 +3,7 @@ import ImageUpload from "../../Addmission/Components/ImageUpload";
 import FormInput from "../../Accounting/subClass/component/FormInput";
 import FormSelect from "../../Accounting/subClass/component/FormSelect";
 import useEditAdmin from "../../../../Hooks/AuthHooks/Staff/Admin/staff/useEditAdmin";
+import useGetUserDetail from "../../../../Hooks/AuthHooks/Staff/useGetUserDetail";
 
 const EditAdmin = ({data}) => {
   const [imagePreview, setImagePreview] = useState(null);
@@ -38,12 +39,14 @@ const EditAdmin = ({data}) => {
   const handleRemoveImage = () => {
     setImagePreview(null);
   };
+  const  {userDetail} = useGetUserDetail();
 const {EditAdmin} = useEditAdmin()
-  const handleSubmit = (e) => {
+  const handleSubmit = async(e) => {
     e.preventDefault();
     console.log("admin data to submit:", adminData);
     
-   EditAdmin(adminData)
+  await  EditAdmin(adminData);
+  userDetail()
   };
   return (
     <>

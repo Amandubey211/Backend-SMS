@@ -1,37 +1,24 @@
 import React, { useEffect, useState } from "react";
-import { dummyParents } from "./dummyData/dummyData";
 import Layout from "../../../../Components/Common/Layout";
 import DashLayout from "../../../../Components/Admin/AdminDashLayout";
 import FormField from "../../Accounting/subClass/component/FormField";
 import ChildProfile from "./ChildProfile";
 import Sidebar from "../../../../Components/Common/Sidebar";
-import { useSelector } from "react-redux";
 import useGetAllParents from "../../../../Hooks/AuthHooks/Staff/Admin/parent/useGetAllParents";
-import useFetchSection from "../../../../Hooks/AuthHooks/Staff/Admin/Sections/useFetchSection";
+import { useSelector } from "react-redux";
+
 // import DashLayout from "../../../../Components/Admin/AdminDashLayout";
 const uniqueFilterOptions = (data, key) => {
   return [
     ...new Set(
-      data?.flatMap((item) => item.children.map((child) => child[key]))
+      data.flatMap((item) => item.children.map((child) => child[key]))
     ),
   ].sort();
 };
 
 const StudentParentProfile = () => {
-    const {allParents} = useSelector((store)=>store.Parents);
-    const {classList, sectionsList} = useSelector((store)=>store.Class);
-      const {fetchAllParents} = useGetAllParents();
-      const { fetchSection } = useFetchSection();
-    useEffect(() => {
-      async function fetchData() {
-        await fetchAllParents();
-     
-        console.log(allParents)
-      }
-      fetchData();
-    }, [])
-    
-     const [selectedChild,setSelectedChild]=useState(null)
+
+    const [selectedChild,setSelectedChild]=useState(null)
     const [isSidebarOpen, setSidebarOpen] = useState(false);
 
     const handleSidebarOpen = () => setSidebarOpen(true);
@@ -42,20 +29,24 @@ const StudentParentProfile = () => {
     section: "",
   });
 
-  const handleFilterChange = async(e) => {
-    const { name, value} = e.target;
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
     setFilters((prev) => ({ ...prev, [name]: value }));
- const selectClass = classList.forEach(element => {
-   return element.className == name
-  });
-  console.log(selectClass);
   };
 const handleStudentClick=(child)=>{
     console.log(child);
     setSelectedChild(child)
     setSidebarOpen(true);
 }
-  const filteredParents = dummyParents.filter((parent) =>
+const {fetchAllParents} = useGetAllParents();
+const allParents = useSelector((store)=>store.Parents.allParents)
+useEffect(() => {
+async function fetchData() {
+  await fetchAllParents();
+}
+fetchData();
+}, [])
+  const filteredParents = allParents.filter((parent) =>
     parent.children.some(
       (child) =>
         (filters.class === "" || child.class === filters.class) &&
@@ -73,16 +64,16 @@ const handleStudentClick=(child)=>{
                 <FormField
                   id="class"
                   label="Class"
-                  value={filters.className}
-                  onChange={(e)=>handleFilterChange(e)}
-                  options={classList}
+                  value={filters.class}
+                  onChange={handleFilterChange}
+                  options={uniqueFilterOptions(allParents, "class")}
                 />
                 <FormField
                   id="section"
                   label="Section"
                   value={filters.section}
                   onChange={handleFilterChange}
-                  options={uniqueFilterOptions(dummyParents, "section")}
+                  options={uniqueFilterOptions(allParents, "section")}
                 />
               </div>
             </div>
@@ -91,10 +82,10 @@ const handleStudentClick=(child)=>{
                 <thead>
                   <tr className="text-left text-gray-700 bg-gray-100">
                     <th className="px-5 py-3 border-b-2 border-gray-200">
-                      Father
+                      Parents Father
                     </th>
                     <th className="px-5 py-3 border-b-2 border-gray-200">
-                      Mother
+                      Parents Mother
                     </th>
                     <th className="px-5 py-3 border-b-2 border-gray-200">
                       Phone
@@ -108,37 +99,36 @@ const handleStudentClick=(child)=>{
                   </tr>
                 </thead>
                 <tbody>
-                  {allParents?.map((parent, index) => (
+                  {filteredParents.map((parent, index) => (
                     <tr
                       key={index}
                       className="text-left text-gray-700 bg-gray-100  "
                     >
                       <td className="px-5 py-4 border-b border-gray-200 flex items-center">
                         <img
-                          src={parent.profile}
+                          src={parent.fatherImageUrl}
                           alt="Profile"
-                          className="h-8 w-8 rounded-full mr-2 bg-gray-300 "
+                          className="h-8 w-8 rounded-full mr-2"
                         />
-                        <span>{parent.fatherName?parent.fatherName:parent.guardianName
-                        }</span>
+                        <span>{parent.fatherName}</span>
                       </td>
 
                       <td className="px-5 py-2 border-b border-gray-200">
                         <div className="flex items-center">
                           {" "}
                           <img
-                            src={parent?.motherImageUrl}
+                            src={parent.motherImageUrl}
                             alt="Profile"
-                            className="h-8 w-8 rounded-full mr-2 bg-gray-300"
+                            className="h-8 w-8 rounded-full mr-2"
                           />
                           <span> {parent.motherName}</span>
                         </div>
                       </td>
                       <td className="px-5 py-2 border-b border-gray-200">
-                        {parent.guardianContactNumber}
+                        {parent.phone}
                       </td>
                       <td className="px-5 py-2 border-b border-gray-200">
-                        {parent.guardianEmail}
+                        {parent.email}
                       </td>
                       {/* <td className="px-5 py-2 border-b border-gray-200">
                         {" "}
@@ -149,23 +139,23 @@ const handleStudentClick=(child)=>{
 
                       <td className=" px-5 py-2 border-b border-gray-200 ">
                         <div className="flex items-center     py-1">
-                          <div onClick={()=>handleStudentClick(parent.childs)}
+                         <div onClick={()=>handleStudentClick(parent.children)}
                           className="flex bg-pink-100 p-2  border-l border-t border-b  border-r   items-center  rounded-full">
 
-                            {parent.childs?.map((child, idx) => (
+                            {parent.children.map((child, idx) => (
                             <img
                               key={idx}
-                              src={child.profile} 
-                              alt={child.firstName}
+                              src={child.imageUrl} 
+                              alt={child.name}
                               className="h-8 w-8  rounded-full"
-                              title={child.firstName} 
+                              title={child.name} 
                             />
                           ))}
                         
                           
-                          <span  className="ml-2  font-normal ">{parent.childs.length} Child </span>{" "} 
+                          <span  className="ml-2  font-normal ">{parent.children.length} Child </span>{" "} 
                           
-                          </div> 
+                          </div>
                           {/* Display the count next to the images */}
 
                           

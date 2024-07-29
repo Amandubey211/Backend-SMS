@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import { CiMail, CiSearch } from "react-icons/ci";
 import { TbBell } from "react-icons/tb";
 import { IoSettingsOutline } from "react-icons/io5";
@@ -8,6 +8,7 @@ import { FaArrowRightArrowLeft } from "react-icons/fa6";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import AvatarsList from "./AvataList";
+import useGetUserDetail from "../../Hooks/AuthHooks/Staff/useGetUserDetail";
 
 const IconButton = ({ icon: Icon, label }) => (
   <button aria-label={label}>
@@ -74,7 +75,10 @@ const StudentViewButton = () => (
 const Navbar = ({ hideSearchbar, hideAvatarList, hideStudentView }) => {
   const leftHeading = useSelector((store) => store.Common.NavbarData.leftHeading);
   const navigate = useNavigate();
-
+  const  {userDetail} = useGetUserDetail();
+  useEffect(()=>{
+     userDetail();
+  },[])
   return (
     <div className="relative z-0">
       <div className="flex items-center p-2 bg-white border-b">
