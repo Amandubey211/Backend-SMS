@@ -10,6 +10,7 @@ import NavigationLink from "./NavigationLink";
 import validateStudentDetails from "../../../../Validataions/Student/validateStudentDetails";
 import { useSelector, useDispatch } from "react-redux";
 import { setStep } from "../../../../Redux/Slices/Auth/AuthSlice";
+import { useNavigate } from "react-router-dom";
 
 const StudentSignUpForm = () => {
   const fileInputRef = useRef(null);
@@ -33,12 +34,14 @@ const StudentSignUpForm = () => {
       city: "",
       state: "",
       postalCode: "",
+      country: "",
     },
     residentialAddress: {
       street: "",
       city: "",
       state: "",
       postalCode: "",
+      country: "",
     },
     emergencyNumber: "",
     schoolId: "",
@@ -59,7 +62,7 @@ const StudentSignUpForm = () => {
   const { loading, saveDetails } = useSaveDetails();
   const { docloading, saveDocument } = useSaveDocument();
   const [showModal, setShowModal] = useState(false);
-
+  const navigate = useNavigate();
   const handleChange = (e) => {
     const { name, value } = e.target;
     setStudentDetails((prev) => ({
@@ -143,8 +146,13 @@ const StudentSignUpForm = () => {
       const formData = new FormData();
       for (const key in studentDetails) {
         if (studentDetails.hasOwnProperty(key)) {
-          if (typeof studentDetails[key] === "object") {
-            formData.append(key, JSON.stringify(studentDetails[key]));
+          if (key === "permanentAddress" || key === "residentialAddress") {
+            const address = studentDetails[key];
+            for (const field in address) {
+              if (address.hasOwnProperty(field)) {
+                formData.append(`${key}.${field}`, address[field]);
+              }
+            }
           } else {
             formData.append(key, studentDetails[key]);
           }
@@ -168,6 +176,7 @@ const StudentSignUpForm = () => {
           toast.success("Documents uploaded successfully!");
           setShowModal(true);
           dispatch(setStep(1));
+          navigate("/studentlogin");
         } else {
           toast.error("Failed to upload the document");
         }

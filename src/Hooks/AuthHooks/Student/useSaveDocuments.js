@@ -1,14 +1,10 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 import { baseUrl } from "../../../config/Common";
-
-
 
 const useSaveDocument = () => {
   const [docloading, setDocloading] = useState(false);
-  const navigate = useNavigate();
   const saveDocument = async (email, schoolId, studentDocuments) => {
     if (!email) {
       toast.error("Email is required");
@@ -42,7 +38,7 @@ const useSaveDocument = () => {
       );
       if (response.data.success) {
         toast.success("Document saved successfully");
-        navigate("/studentlogin");
+
         return response.data;
       } else {
         toast.error(response.data.msg || "Failed to save document");

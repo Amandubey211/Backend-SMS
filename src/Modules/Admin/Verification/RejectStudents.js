@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 
 import { useSelector } from "react-redux";
-import useGetRejectedStudents from "../../../Hooks/AuthHooks/Staff/useGetRejectedStudents";
 import UnVerifiedStudentCard from "./UnVerifiedStudentCard";
+import useGetRejectedStudents from "../../../Hooks/AuthHooks/Staff/Admin/Students/useGetRejectedStudents";
 
 const RejectStudents = ({ getColor, searchQuery }) => {
   const [filteredStudents, setFilteredStudents] = useState([]);

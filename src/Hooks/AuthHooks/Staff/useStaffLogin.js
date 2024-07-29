@@ -59,12 +59,11 @@ const useStaffLogin = () => {
 
         dispatch(setAuth(true));
         dispatch(setRole(data.role));
-        // localStorage.setItem("isLoggedIn", true);
-        // localStorage.setItem("role", data.role);
+
         dispatch(setLeftHeading(data.role));
-        // useNavHeading(data.role);
         console.log(data);
-        dispatch(setUerDetails(data.user));
+        const user = { schoolId: data?.schoolId, userId: data?.userId };
+        dispatch(setUerDetails(user));
         navigate(`/dashboard`);
         toast.success("Logged in successfully", {
           position: "bottom-left",

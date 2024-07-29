@@ -1,4 +1,4 @@
-const validateStudentDetails = (studentDetails) => {
+const validateStudentDetails = (studentDetails, type = "Student") => {
   const errors = {};
 
   if (!studentDetails.firstName) errors.firstName = "First name is required";
@@ -34,7 +34,9 @@ const validateStudentDetails = (studentDetails) => {
   if (!studentDetails.guardianContactNumber) {
     errors.guardianContactNumber = "Guardian's contact number is required";
   }
-  if (!studentDetails.Q_Id) errors.Q_Id = "Qatar ID is required";
+  if (type === "Student") {
+    if (!studentDetails.Q_Id) errors.Q_Id = "Qatar ID is required";
+  }
 
   // Validate Permanent Address
   if (!studentDetails.permanentAddress) {

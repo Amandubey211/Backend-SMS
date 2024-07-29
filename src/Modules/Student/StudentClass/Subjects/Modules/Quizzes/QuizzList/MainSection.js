@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import SubjectSideBar from "../../../Component/SubjectSideBar";
 import { RiFileUnknowLine } from "react-icons/ri";
 import List from "../../../Component/List";
@@ -8,12 +8,21 @@ import { useParams } from "react-router-dom";
 
 const MainSection = () => {
   const { cid, sid } = useParams();
-  const { quizzes, loading, error } = useFetchQuizzes(cid, sid);
-
   const [filters, setFilters] = useState({
     moduleId: "",
     chapterId: "",
   });
+
+  const { quizzes, error, loading, fetchFilteredQuizzes } = useFetchQuizzes(cid, sid);
+
+  const refetchQuizzes = useCallback(() => {
+    const { moduleId, chapterId } = filters;
+    fetchFilteredQuizzes(cid, sid, moduleId, chapterId);
+  }, [filters, cid, sid, fetchFilteredQuizzes]);
+
+  useEffect(() => {
+    refetchQuizzes();
+  }, [refetchQuizzes]);
 
   return (
     <div className="flex">

@@ -10,10 +10,7 @@ const useGetAllAnnouncements = () => {
   const [error, setError] = useState(null);
   const [announcementData, setAnnouncementData] = useState([]);
 
-  const {
-    role,
-    userDetail: { userId },
-  } = useSelector((store) => store.Auth);
+  const { role } = useSelector((store) => store.Auth);
 
   const fetchAnnouncements = useCallback(
     async (classId) => {
