@@ -1,35 +1,47 @@
 import React, { useEffect, useState } from "react";
 import { Bar } from "react-chartjs-2";
-import useGetAdminDashboardData from "../../../../Hooks/AuthHooks/Staff/Admin/Dashboard/useGetAdminDashboardData";
+import useGetAttendanceData from "../../../../Hooks/AuthHooks/Staff/Admin/Dashboard/useGetAttendanceData";
 import Fallback from "../../../../Components/Common/Fallback";
 
 const TotalAttendanceGraph = () => {
-  const { loading, error, dashboardData, fetchAdminDashboardData } = useGetAdminDashboardData();
+  const currentMonth = new Date().getMonth() + 1; // Months are zero-indexed
+  const currentYear = new Date().getFullYear();
+  
+  const [month, setMonth] = useState(currentMonth);
+  const [year, setYear] = useState(currentYear);
+
+  const { attendanceData, loading, error, fetchAttendanceData } = useGetAttendanceData();
+
+  useEffect(() => {
+    fetchAttendanceData(month, year);
+  }, [month, year, fetchAttendanceData]);
+
   const [graphData, setGraphData] = useState(null);
 
   useEffect(() => {
-    fetchAdminDashboardData();
-  }, [fetchAdminDashboardData]);
+    if (attendanceData && attendanceData.attendanceData) {
+      const attendance = attendanceData.attendanceData;
 
-  useEffect(() => {
-    console.log("Dashboard Data: ", dashboardData);
-    if (dashboardData && dashboardData.attendance && dashboardData.attendance.attendanceData) {
-      const attendanceData = dashboardData.attendance.attendanceData;
-      console.log("Attendance Data: ", attendanceData);
+      // Sort classes numerically and place unnamed classes at the end
+      const sortedAttendance = attendance.sort((a, b) => {
+        const extractNumber = str => {
+          const match = str.match(/\d+/);
+          return match ? parseInt(match[0]) : Infinity;
+        };
 
-      const labels = ["One", "Two", "Three", "Four", "Five", "Six"];
-      const femaleAttendance = new Array(labels.length).fill(0);
-      const maleAttendance = new Array(labels.length).fill(0);
+        const numA = extractNumber(a.className);
+        const numB = extractNumber(b.className);
 
-      attendanceData.forEach((item, index) => {
-        if (index < labels.length) {
-          femaleAttendance[index] = item.femaleAttendance;
-          maleAttendance[index] = item.maleAttendance;
+        if (numA !== numB) {
+          return numA - numB;
+        } else {
+          return a.className.localeCompare(b.className);
         }
       });
 
-      console.log("Female Attendance: ", femaleAttendance);
-      console.log("Male Attendance: ", maleAttendance);
+      const labels = sortedAttendance.map(item => item.className);
+      const femaleAttendance = sortedAttendance.map(item => item.femaleAttendance);
+      const maleAttendance = sortedAttendance.map(item => item.maleAttendance);
 
       const data = {
         labels: labels,
@@ -57,7 +69,7 @@ const TotalAttendanceGraph = () => {
 
       setGraphData(data);
     }
-  }, [dashboardData]);
+  }, [attendanceData]);
 
   if (loading) {
     return <Fallback />;
@@ -119,21 +131,33 @@ const TotalAttendanceGraph = () => {
     maintainAspectRatio: false,
   };
 
+  const handleMonthChange = (e) => {
+    setMonth(parseInt(e.target.value));
+  };
+
+  const handleYearChange = (e) => {
+    setYear(parseInt(e.target.value));
+  };
+
   return (
-    <div className="bg-white p-4 ">
+    <div className="bg-white p-4">
       <div className="flex justify-between items-center mb-4">
         <div>
           <h2 className="text-xl font-semibold">Today's Attendance</h2>
           <div className="text-3xl font-bold">
-            {dashboardData && dashboardData.attendance 
-              ? dashboardData.attendance.totalMaleAttendance + dashboardData.attendance.totalFemaleAttendance 
-              : 0}
+            {attendanceData && attendanceData.totalMaleAttendance + attendanceData.totalFemaleAttendance}
           </div>
         </div>
         <div>
-          <select className="border rounded p-2">
-            <option>This month</option>
-            <option>Last month</option>
+          <select className="border rounded p-2" onChange={handleMonthChange} value={month}>
+            {[...Array(12).keys()].map(i => (
+              <option key={i} value={i + 1}>{new Date(0, i).toLocaleString('default', { month: 'long' })}</option>
+            ))}
+          </select>
+          <select className="border rounded p-2" onChange={handleYearChange} value={year}>
+            {[2024, 2023, 2022, 2021].map(y => (
+              <option key={y} value={y}>{y}</option>
+            ))}
           </select>
         </div>
       </div>
@@ -146,9 +170,7 @@ const TotalAttendanceGraph = () => {
           <div className="flex items-center">
             <div className="text-gray-700">Total Female</div>
             <div className="ml-2 font-bold">
-              {dashboardData && dashboardData.attendance 
-                ? dashboardData.attendance.totalFemaleAttendance 
-                : 0}
+              {attendanceData ? attendanceData.totalFemaleAttendance : 0}
             </div>
           </div>
         </div>
@@ -157,9 +179,7 @@ const TotalAttendanceGraph = () => {
           <div className="flex items-center">
             <div className="text-gray-700">Total Male</div>
             <div className="ml-2 font-bold">
-              {dashboardData && dashboardData.attendance 
-                ? dashboardData.attendance.totalMaleAttendance 
-                : 0}
+              {attendanceData ? attendanceData.totalMaleAttendance : 0}
             </div>
           </div>
         </div>

@@ -1,35 +1,38 @@
 import React, { useRef, useState, useEffect } from "react";
 import { Line } from "react-chartjs-2";
 import { Chart as ChartJS, registerables } from "chart.js";
-import useGetAdminDashboardData from "../../../../Hooks/AuthHooks/Staff/Admin/Dashboard/useGetAdminDashboardData";
 import Fallback from "../../../../Components/Common/Fallback";
+import { FiCalendar } from "react-icons/fi";
+import useGetEarningsData from "../../../../Hooks/AuthHooks/Staff/Admin/Dashboard/useGetEarningsData";
+
 ChartJS.register(...registerables);
 
 const TotalEarningsGraph = () => {
   const chartRef = useRef(null);
   const [tooltipData, setTooltipData] = useState(null);
   const [selectedOption, setSelectedOption] = useState("currentMonth");
-  const { loading, error, dashboardData, fetchAdminDashboardData } = useGetAdminDashboardData();
+
+  const { loading, error, earningsData, fetchEarningsData } = useGetEarningsData();
 
   const fetchDashboardData = (option) => {
     const date = new Date();
     let month = date.getMonth() + 1;
     let year = date.getFullYear();
-    let includeExpensesWithoutPay = false;
+    let includeUnpaidExpenses = true;
 
     if (option === "lastMonth") {
       month = month === 1 ? 12 : month - 1;
       year = month === 12 ? year - 1 : year;
     } else if (option === "totalExpensesWithoutPay") {
-      includeExpensesWithoutPay = true;
+      includeUnpaidExpenses = false;
     }
 
-    fetchAdminDashboardData(month, year, includeExpensesWithoutPay);
+    fetchEarningsData(month, year, includeUnpaidExpenses);
   };
 
   useEffect(() => {
     fetchDashboardData(selectedOption);
-  }, [fetchAdminDashboardData, selectedOption]);
+  }, [selectedOption]);
 
   const getOrdinalSuffix = (day) => {
     if (day > 3 && day < 21) return "th";
@@ -62,22 +65,55 @@ const TotalEarningsGraph = () => {
     return <Fallback />;
   }
 
-  if (error) {
-    return <p>Error: {error}</p>;
+  if (error || !earningsData || (earningsData.earningsData.length === 0 && earningsData.expensesData.length === 0)) {
+    return (
+      <div className="p-4 bg-white">
+        <div className="flex justify-between items-center mb-4">
+          <div>
+            <h2 className="text-xl font-semibold">Earnings</h2>
+          </div>
+          <div>
+            <select className="border rounded p-2" value={selectedOption} onChange={(e) => setSelectedOption(e.target.value)}>
+              <option value="currentMonth">This month</option>
+              <option value="lastMonth">Last month</option>
+              <option value="totalExpensesWithoutPay">Total Expenses Without Pay</option>
+            </select>
+          </div>
+        </div>
+        <div className="flex flex-col items-center justify-center text-center p-4">
+          <FiCalendar size={40} className="mb-4 text-gray-400" />
+          <p className="text-gray-500">No Earnings/Expense Data Found</p>
+        </div>
+        <div className="flex justify-around mt-4">
+          <div className="flex flex-col items-start">
+            <div className="w-16 h-1 rounded-full mb-1" style={{ backgroundColor: "#7C3AED", alignSelf: "flex-start" }}></div>
+            <div className="flex items-center">
+              <div className="text-gray-700">Total Collections</div>
+              <div className="ml-2 font-bold mr-1">{earningsData ? earningsData.totalEarnings.toLocaleString() : 0}</div>
+              <div className="text-gray-700">QR</div>
+            </div>
+          </div>
+          <div className="flex flex-col items-start">
+            <div className="w-16 h-1 rounded-full mb-1" style={{ backgroundColor: "#EA580C", alignSelf: "flex-start" }}></div>
+            <div className="flex items-center">
+              <div className="text-gray-700">Total Expenses</div>
+              <div className="ml-2 font-bold mr-1">{earningsData ? earningsData.totalExpenses.toLocaleString() : 0}</div>
+              <div className="text-gray-700">QR</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
-  if (!dashboardData || !dashboardData.earnings) {
-    return <p>No earnings data available.</p>;
-  }
-
-  const { earningsData, expensesData, totalEarnings, totalExpenses } = dashboardData.earnings;
+  const { earningsData: earnings, expensesData: expenses, totalEarnings, totalExpenses } = earningsData;
 
   const data = {
-    labels: earningsData.map((item) => `${item.day}`),
+    labels: earnings.map((item) => `${item.day}`),
     datasets: [
       {
         label: "Total Collections",
-        data: earningsData.map((item) => item.amount),
+        data: earnings.map((item) => item.amount),
         borderColor: "#7C3AED",
         borderWidth: 3,
         fill: true,
@@ -96,7 +132,7 @@ const TotalEarningsGraph = () => {
       },
       {
         label: "Total Expenses",
-        data: expensesData.map((item) => item.amount),
+        data: expenses.map((item) => item.amount),
         borderColor: "#EA580C",
         borderWidth: 3,
         fill: false,
