@@ -62,6 +62,15 @@ const Events = () => {
     navigate("/noticeboard/events");
   };
 
+  const handleUpdateEvent = (updatedEvent) => {
+    // Logic to update the event in the list
+    const updatedEvents = events.map(event => 
+      event.id === updatedEvent.id ? updatedEvent : event
+    );
+    // Assuming fetchFilteredEvents updates the events state
+    fetchFilteredEvents(updatedEvents);
+  };
+
   const top5Events = events.slice(0, 5);
 
   return (
@@ -139,10 +148,8 @@ const Events = () => {
           top5Events.map((event) => (
             <EventItem
               key={event.id}
-              image={event.image}
-              eventName={event.eventName}
-              eventType={event.eventType}
-              startDate={event.startDate}
+              event={event}
+              onUpdate={handleUpdateEvent}
             />
           ))
         )}
