@@ -10,6 +10,7 @@ import { RiDeleteBin6Line } from "react-icons/ri";
 import toast from "react-hot-toast";
 import Sidebar from "../../../../Components/Common/Sidebar";
 import AddNewClass from "./AddNewClass";
+import useCreateClass from "../../../../Hooks/AuthHooks/Staff/Admin/Class/useCreateClass";
 
 const ClassCard = ({
   className,
@@ -21,13 +22,14 @@ const ClassCard = ({
 }) => {
   const dispatch = useDispatch();
   const [isSidebarOpen, setSidebarOpen] = useState(false);
+  const { deleteClass, loading } = useCreateClass();
 
   const handleSidebarOpen = () => setSidebarOpen(true);
   const handleSidebarClose = () => setSidebarOpen(false);
 
-  const handleDelete = (e) => {
-    e.preventDefault();
-    toast.success("Delete button clicked!");
+  const handleDelete = (clasId) => {
+    deleteClass(classId)
+
   };
   return (
     <>
@@ -52,7 +54,9 @@ const ClassCard = ({
             <TbEdit className="w-5 h-5  text-green-500" />
           </button>
           <button
-            onClick={handleDelete}
+            disabled={loading}
+            aria-busy={loading ? "true" : "false"}
+            onClick={() => handleDelete(classId)}
             className="bg-white p-1 rounded-full shadow hover:bg-gray-200"
           >
             <RiDeleteBin6Line className="w-5 h-5 text-red-500" />
@@ -89,7 +93,7 @@ const ClassCard = ({
         onClose={handleSidebarClose}
         title="Update Class"
       >
-        <AddNewClass className={className} isUpdate={true} />
+        <AddNewClass className={className} classId={classId} isUpdate={true} />
       </Sidebar>
     </>
   );
