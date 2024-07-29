@@ -4,12 +4,13 @@ import CardBanner from "../../../../Assets/AdmissionCard/CardBanner.jpg";
 
 const StudentCard = ({ studentInfo, imagePreview }) => {
   const {
-    name,
+    firstName,
+    lastName,
     studentId,
     class: studentClass,
     section,
     bloodGroup,
-    religion,
+    nationality,
     email,
   } = studentInfo;
 
@@ -29,13 +30,15 @@ const StudentCard = ({ studentInfo, imagePreview }) => {
           <div className="mt-4 bg-white rounded-full flex justify-center items-center">
             <img
               src={imagePreview || "https://via.placeholder.com/150"}
-              alt={name}
+              alt={firstName}
               className="rounded-full w-24 h-24 object-cover"
             />
           </div>
         </div>
         <div className="mt-4 text-center">
-          <h2 className="text-lg font-semibold">{name || "Student Name"}</h2>
+          <h2 className="text-lg font-semibold">
+            {firstName + " " + lastName || "Student Name"}
+          </h2>
           <div className="text-sm text-gray-600 mt-2 space-y-1 text-left">
             <p>
               <span className="font-semibold">ID No</span>: {studentId}
@@ -50,7 +53,7 @@ const StudentCard = ({ studentInfo, imagePreview }) => {
               <span className="font-semibold">Blood</span>: {bloodGroup}
             </p>
             <p>
-              <span className="font-semibold">Religion</span>: {religion}
+              <span className="font-semibold">Nationality</span>: {nationality}
             </p>
             <p>
               <span className="font-semibold">Email</span>: {email}

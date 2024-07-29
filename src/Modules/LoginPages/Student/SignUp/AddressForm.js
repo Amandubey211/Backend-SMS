@@ -34,6 +34,13 @@ const AddressForm = ({ type, address, handleAddressChange }) => (
       placeholder="Postal Code*"
       required
     />
+       <TextInput
+      name="country"
+      value={address.country}
+      onChange={handleAddressChange}
+      placeholder="Country*"
+      required
+    />
   </>
 );
 

@@ -2,9 +2,9 @@ import React, { useEffect, useState } from "react";
 import { NavLink, useNavigate, useParams } from "react-router-dom";
 
 import { useSelector } from "react-redux";
-import useVerifyStudentDocument from "../../../../Hooks/AuthHooks/Staff/useVerifyStudentDocument";
 import useAssignClassToStudent from "../../../../Hooks/AuthHooks/Staff/useAssignClassToStudent";
 import useGetAllClasses from "../../../../Hooks/AuthHooks/Staff/Admin/Class/useGetAllClasses";
+import useVerifyStudentDocument from "../../../../Hooks/AuthHooks/Staff/Admin/Students/useVerifyStudentDocument";
 
 const VerificationForm = ({ email, studentId }) => {
   const navigate = useNavigate();

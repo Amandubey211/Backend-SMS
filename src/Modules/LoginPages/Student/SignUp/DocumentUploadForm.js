@@ -18,6 +18,7 @@ const DocumentUploadForm = ({
   fileInputRef,
   handleDocumentSubmit,
   docloading,
+  type = "Student",
 }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedPreview, setSelectedPreview] = useState("");
@@ -183,36 +184,43 @@ const DocumentUploadForm = ({
           </div>
         )}
       </div>
-      <div className="flex items-center mb-4 mt-4">
-        <input
-          type="checkbox"
-          checked={acknowledged}
-          onChange={() => setAcknowledged(!acknowledged)}
-          className="mr-2"
-          required
-        />
-        <label className="text-sm">
-          I acknowledge that the above information is correct.
-        </label>
-      </div>
-      <div className="mt-6">
-        <button
-          type="submit"
-          className={`w-full ${
-            docloading ? "cursor-wait" : ""
-          } bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600 text-center transition duration-500 ease-in-out`}
-          disabled={docloading}
-        >
-          {docloading ? (
-            <div className="flex justify-center gap-1">
-              <LuLoader className="animate-spin text-2xl" />
-              <span>Uploading...</span>
-            </div>
-          ) : (
-            "Upload Document & Apply"
-          )}
-        </button>
-      </div>
+
+      {type === "Student" && (
+        <>
+          <div className="flex items-center mb-4 mt-4">
+            <input
+              type="checkbox"
+              checked={acknowledged}
+              onChange={() => setAcknowledged(!acknowledged)}
+              className="mr-2"
+              required
+            />
+            <label className="text-sm">
+              I acknowledge that the above information is correct.
+            </label>
+          </div>
+          <div className="mt-6">
+            <button
+              type="submit"
+              className={`w-full ${
+                docloading ? "cursor-wait" : ""
+              } bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600 text-center transition duration-500 ease-in-out`}
+              disabled={docloading}
+            >
+              {docloading ? (
+                <div className="flex justify-center gap-1">
+                  <LuLoader className="animate-spin text-2xl" />
+                  <span>Uploading...</span>
+                </div>
+              ) : (
+                "Upload Document & Apply"
+              )}
+            </button>
+            )}
+          </div>
+        </>
+      )}
+
       {modalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75 z-50 transition-opacity duration-500 ease-in-out">
           <div className="bg-white p-4 rounded-lg relative max-h-full overflow-y-auto shadow-lg transform transition-transform duration-500 ease-in-out scale-100">

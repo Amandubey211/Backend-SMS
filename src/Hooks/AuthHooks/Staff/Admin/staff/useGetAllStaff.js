@@ -1,10 +1,8 @@
-
 import { useState } from "react";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { setStaff } from "../../../../../Redux/Slices/Admin/StaffSlice";
 import { baseUrl } from "../../../../../config/Common";
-
 
 const useGetAllStaff = () => {
   const [loading, setLoading] = useState(true);
@@ -27,7 +25,5 @@ const useGetAllStaff = () => {
 
   return { fetchStaff, loading, error };
 };
-
-
 
 export default useGetAllStaff;

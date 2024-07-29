@@ -1,32 +1,30 @@
-// src/components/PersonalInfo.js
-
 import React from "react";
 
 const PersonalInfo = ({ studentInfo, handleInputChange }) => {
   return (
     <div className="grid grid-cols-2 gap-4">
       <div>
-        <label className="block text-gray-700">Name</label>
+        <label className="block text-gray-700">First Name</label>
         <input
           type="text"
-          name="name"
+          name="firstName"
           className="mt-1 p-2 block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-          value={studentInfo.name}
+          value={studentInfo.firstName}
           onChange={handleInputChange}
         />
-        
       </div>
-   
+
       <div>
-        <label className="block text-gray-700">Student ID</label>
+        <label className="block text-gray-700">Last Name</label>
         <input
           type="text"
-          name="studentId"
+          name="lastName"
           className="mt-1 p-2 block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-          value={studentInfo.studentId}
+          value={studentInfo.lastName}
           onChange={handleInputChange}
         />
       </div>
+
       <div>
         <label className="block text-gray-700">Date of Birth</label>
         <input
@@ -37,6 +35,7 @@ const PersonalInfo = ({ studentInfo, handleInputChange }) => {
           onChange={handleInputChange}
         />
       </div>
+
       <div>
         <label className="block text-gray-700">Gender</label>
         <select
@@ -46,18 +45,18 @@ const PersonalInfo = ({ studentInfo, handleInputChange }) => {
           onChange={handleInputChange}
         >
           <option value="">Choose Options</option>
-          <option>Male</option>
-          <option>Female</option>
-          <option>Trans</option>
-          <option>Other</option>
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+          <option value="other">Other</option>
         </select>
       </div>
+
       <div>
-        <label className="block text-gray-700">Religion</label>
+        <label className="block text-gray-700">Nationality</label>
         <select
-          name="religion"
+          name="nationality"
           className="mt-1 p-2 block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-          value={studentInfo.religion}
+          value={studentInfo.nationality}
           onChange={handleInputChange}
         >
           <option value="">Choose Options</option>
@@ -67,24 +66,38 @@ const PersonalInfo = ({ studentInfo, handleInputChange }) => {
           <option>Buddhism</option>
         </select>
       </div>
-      <div>
-        <label className="block text-gray-700">Blood Group</label>
-        <select
-          name="bloodGroup"
-          className="mt-1 p-2 block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-          value={studentInfo.bloodGroup}
-          onChange={handleInputChange}
-        >
-          <option value="">Choose Options</option>
-          <option>0+</option>
-          <option>0-</option>
-          <option>A+</option>
-          <option>A-</option>
-          <option>B+</option>
-          <option>B-</option>
-          <option>AB+</option>
-          <option>AB-</option>
-        </select>
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-gray-700">Blood Group</label>
+          <select
+            name="bloodGroup"
+            className="mt-1 p-2 block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+            value={studentInfo.bloodGroup}
+            onChange={handleInputChange}
+          >
+            <option value="">Choose Options</option>
+            <option>O+</option>
+            <option>O-</option>
+            <option>A+</option>
+            <option>A-</option>
+            <option>B+</option>
+            <option>B-</option>
+            <option>AB+</option>
+            <option>AB-</option>
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-gray-700">Age</label>
+          <input
+            type="number"
+            placeholder="00"
+            name="age"
+            className="mt-1 p-2 block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+            value={studentInfo.age}
+            onChange={handleInputChange}
+          />
+        </div>
       </div>
     </div>
   );

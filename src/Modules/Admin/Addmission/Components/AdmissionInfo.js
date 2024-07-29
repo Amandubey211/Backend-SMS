@@ -5,6 +5,7 @@ import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import useGetAllClasses from "../../../../Hooks/AuthHooks/Staff/Admin/Class/useGetAllClasses";
+import SelectInput from "../../../LoginPages/Student/SignUp/SelectInput";
 
 const AdmissionInfo = ({ studentInfo, handleInputChange }) => {
   const { fetchClasses } = useGetAllClasses();
@@ -54,14 +55,16 @@ const AdmissionInfo = ({ studentInfo, handleInputChange }) => {
           </select>
         </div>
         <div>
-          <label className="block text-gray-700">Session</label>
-          <input
-            type="text"
-            name="session"
+          <label className="block text-gray-700">Transport Requirement</label>
+          <select
+            name="transportRequirement"
             className="mt-1 p-2 block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-            value={studentInfo.session}
+            value={studentInfo.transportRequirement}
             onChange={handleInputChange}
-          />
+          >
+            <option value={true}>yes</option>
+            <option value={false}> No</option>
+          </select>
         </div>
         <div>
           <label className="block text-gray-700">Admission Fee</label>
@@ -86,6 +89,29 @@ const AdmissionInfo = ({ studentInfo, handleInputChange }) => {
           >
             <option>Paid</option>
             <option>Unpaid</option>
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-gray-700"> Enrollment Status</label>
+
+          <select
+            name="enrollmentStatus"
+            value={studentInfo.enrollmentStatus}
+            onChange={handleInputChange}
+            className="mt-1 p-2 block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+          >
+            <option value="" disabled>
+              Select
+            </option>
+            {[
+              { value: "Full Time", label: "Full Time" },
+              { value: "Part Time", label: "Part Time" },
+            ].map((option, index) => (
+              <option key={index} value={option.value}>
+                {option.label}
+              </option>
+            ))}
           </select>
         </div>
       </div>

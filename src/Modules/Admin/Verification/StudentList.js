@@ -2,10 +2,10 @@
 
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
-import useGetUnVerifiedStudents from "../../../Hooks/AuthHooks/Staff/useGetunVerifiedStudents";
 import TopNavigation from "./TopNavigation";
 import RejectStudents from "./RejectStudents";
 import UnVerifiedStudentCard from "./UnVerifiedStudentCard";
+import useGetUnVerifiedStudents from "../../../Hooks/AuthHooks/Staff/Admin/Students/useGetunVerifiedStudents";
 const StudentList = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredStudents, setFilteredStudents] = useState([]);
