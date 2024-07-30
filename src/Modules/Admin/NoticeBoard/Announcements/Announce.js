@@ -32,24 +32,24 @@ const Announce = () => {
   const { deleteNotice } = useDeleteNotice();
 
   useEffect(() => {
-    const fetchNotices = async () => {
-      const token = localStorage.getItem(`${role}:token`);
-      try {
-        const response = await axios.get(`${baseUrl}/admin/all/notices`, {
-          headers: {
-            Authentication: token,
-          },
-        });
-        if (response.data.success) {
-          setNotices(response.data.notices);
-        }
-      } catch (error) {
-        console.error('Failed to fetch notices', error);
-      }
-    };
-
     fetchNotices();
   }, []);
+
+  const fetchNotices = async () => {
+    const token = localStorage.getItem(`${role}:token`);
+    try {
+      const response = await axios.get(`${baseUrl}/admin/all/notices`, {
+        headers: {
+          Authentication: token,
+        },
+      });
+      if (response.data.success) {
+        setNotices(response.data.notices);
+      }
+    } catch (error) {
+      console.error("Failed to fetch notices", error);
+    }
+  };
 
   const filteredNotices = notices.filter((notice) =>
     notice.title.toLowerCase().includes(searchTerm.toLowerCase())
@@ -201,7 +201,7 @@ const Announce = () => {
               onClose={handleSidebarClose}
               title="Create New Notice"
             >
-              <AddAnnouncement />
+              <AddAnnouncement onSuccess={fetchNotices} onClose={handleSidebarClose} />
             </Sidebar>
 
             {/* Sidebar for editing notice */}
