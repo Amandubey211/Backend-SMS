@@ -1,13 +1,7 @@
-
-
-
-
 import React from 'react';
 import { FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
 
-const SelectedQuestionCard = ({ question, selectedOption }) => {
-  const correctOption = question.correctAnswer;
-
+const SelectedQuestionCard = ({ question, selectedOption, correctOption, isCorrect }) => {
   return (
     <div className="w-[300px] p-4 bg-white shadow rounded-lg mb-4 border">
       <div className="text-sm font-semibold text-gray-500 mb-2">
@@ -62,4 +56,4 @@ const SelectedQuestionCard = ({ question, selectedOption }) => {
   );
 };
 
-export default SelectedQuestionCard;
+export default React.memo(SelectedQuestionCard);

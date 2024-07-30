@@ -16,21 +16,16 @@ const Tabs = ({
     onTabChange(tab);
   };
 
-  const { name, quizType, availableFrom } = quiz; // dependent
+  const { name } = quiz;
 
   return (
     <>
-      <div className="flex justify-between items-center p-2 px-3 border-b">
+      <div className="flex justify-between items-center p-2 px-8 border-b">
         {!createPage && (
           <div>
-            <h2 className="text-xl font-semibold mb-1">{name}</h2>
+            <h2 className="text-lg font-semibold mb-1 capitalize ">{name}</h2>
             <div className="flex items-center text-gray-500">
-              <span className="text-green-600 font-medium mr-2">
-                {quizType}
-              </span>
-              <span className="mx-2">|</span>
-              <FaCalendarAlt className="w-4 h-4 mr-2" />
-              <span className="text-sm">Available From: {availableFrom}</span>
+              <span className="text-green-600 font-medium mr-2">quiz</span>
             </div>
           </div>
         )}

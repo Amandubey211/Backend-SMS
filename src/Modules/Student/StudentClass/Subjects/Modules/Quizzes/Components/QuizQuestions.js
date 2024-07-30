@@ -1,11 +1,7 @@
 import React, { memo } from "react";
 import QuizQuestionCard from "./QuizQuestionCard";
 
-const QuizQuestions = ({ questions, selectedOptions, handleOptionChange }) => {
-  console.log("question in quiz questions", questions);
-  console.log("selectedOptions in quiz questions", selectedOptions);
-  console.log("handleOptionChange in quiz questions", handleOptionChange);
-
+const QuizQuestions = memo(({ questions, selectedOptions, handleOptionChange }) => {
   return (
     <div className="w-full p-1">
       <div className="flex justify-start mb-2 font-medium text-xl">
@@ -14,7 +10,7 @@ const QuizQuestions = ({ questions, selectedOptions, handleOptionChange }) => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {questions.map((question, questionIndex) => (
           <QuizQuestionCard
-            key={question._id} // Use unique ID if available, else use questionIndex
+            key={question._id}
             question={question}
             questionIndex={questionIndex}
             selectedOption={selectedOptions[questionIndex]}
@@ -24,6 +20,6 @@ const QuizQuestions = ({ questions, selectedOptions, handleOptionChange }) => {
       </div>
     </div>
   );
-};
+});
 
-export default memo(QuizQuestions);
+export default QuizQuestions;
