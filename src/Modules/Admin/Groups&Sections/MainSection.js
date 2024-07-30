@@ -30,17 +30,23 @@ const MainSection = () => {
     error: errorBySection,
   } = useGetGroupsByClassAndSection();
 
+  const fetchGroups = async () => {
+    if (cid) {
+      let data;
+      if (activeSection === "Everyone") {
+        data = await fetchGroupsByClass(cid);
+      } else {
+        data = await fetchGroupsByClassAndSection(cid, activeSectionId);
+      }
+      setGroupList(data);
+    }
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       if (cid) {
         await fetchSection(cid);
-        let data;
-        if (activeSection === "Everyone") {
-          data = await fetchGroupsByClass(cid);
-        } else {
-          data = await fetchGroupsByClassAndSection(cid, activeSectionId);
-        }
-        setGroupList(data);
+        await fetchGroups();
       }
     };
     fetchData();
@@ -110,6 +116,7 @@ const MainSection = () => {
             selectedSection={activeSection}
             onSeeGradeClick={handleSeeGradeClick}
             groupList={groupList}
+            fetchGroups={fetchGroups}
           />
         )}
         <StudentGradeModal isOpen={isModalOpen} onClose={handleCloseModal} />

@@ -4,13 +4,14 @@ import { GiImperialCrown } from "react-icons/gi";
 import { TbDotsVertical } from "react-icons/tb";
 import SidebarMenu from "../../Students/Components/SidebarMenu";
 import AddGroup from "./AddGroup"; // Adjust the import path as necessary
+import useCreateGroup from "../../../../Hooks/AuthHooks/Staff/Admin/useCreateGroup";
 
-const GroupList = ({ selectedSection, onSeeGradeClick, groupList }) => {
+const GroupList = ({ selectedSection, onSeeGradeClick, groupList, fetchGroups }) => {
   const [expandedGroupIndex, setExpandedGroupIndex] = useState(null);
   const [activeMenu, setActiveMenu] = useState(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [editingGroup, setEditingGroup] = useState(null);
-
+  const { deleteGroup, loading, error } = useCreateGroup();
   const handleMenuToggle = (groupIndex) => {
     setActiveMenu(activeMenu === groupIndex ? null : groupIndex);
   };
@@ -21,9 +22,10 @@ const GroupList = ({ selectedSection, onSeeGradeClick, groupList }) => {
     setActiveMenu(null);
   };
 
-  const handleDelete = (groupIndex) => {
-    console.log(`Delete group ${groupIndex}`);
+  const handleDelete = async (group) => {
+    await deleteGroup(group._id);
     setActiveMenu(null);
+    fetchGroups();
   };
 
   const closeSidebar = () => {
@@ -86,7 +88,7 @@ const GroupList = ({ selectedSection, onSeeGradeClick, groupList }) => {
                     </div>
                     <div
                       className="px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer"
-                      onClick={() => handleDelete(groupIndex)}
+                      onClick={() => handleDelete(group)}
                     >
                       Delete
                     </div>
@@ -180,7 +182,7 @@ const GroupList = ({ selectedSection, onSeeGradeClick, groupList }) => {
       {isSidebarOpen && (
         <div className="fixed inset-0 z-50 flex justify-end bg-black bg-opacity-50">
           <div className="bg-white h-full w-full max-w-md shadow-lg p-4 overflow-y-auto">
-            <AddGroup group={editingGroup} isUpdate={!!editingGroup} groupId={editingGroup?._id} onClose={closeSidebar} />
+            <AddGroup group={editingGroup} isUpdate={!!editingGroup} groupId={editingGroup?._id} onClose={closeSidebar} fetchGroups={fetchGroups} />
           </div>
         </div>
       )}

@@ -7,7 +7,7 @@ import useGetStudentsByClassAndSection from "../../../../Hooks/AuthHooks/Staff/A
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 
-const AddGroup = ({ group, isUpdate, groupId, onClose }) => {
+const AddGroup = ({ group, isUpdate, groupId, onClose, fetchGroups}) => {
   const [groupName, setGroupName] = useState(group?.groupName || "");
   const [seatLimit, setSeatLimit] = useState(group?.seatLimit || "");
   const [students, setStudents] = useState([]);
@@ -89,6 +89,8 @@ const AddGroup = ({ group, isUpdate, groupId, onClose }) => {
     try {
       if (isUpdate) {
         await updateGroup(formData, groupId);
+        fetchGroups()
+        onClose();
       } else {
         await createGroup(formData);
         // Reset form fields
@@ -98,7 +100,6 @@ const AddGroup = ({ group, isUpdate, groupId, onClose }) => {
         setLeader(null);
         setSectionId("");
       }
-      onClose();
     } catch (err) {
       toast.error(err.message || "Something went wrong");
     }
@@ -114,14 +115,16 @@ const AddGroup = ({ group, isUpdate, groupId, onClose }) => {
       onSubmit={handleSubmit}
     >
       <div className="bg-white h-[80%] overflow-y-auto rounded-lg p-4 w-full max-w-md">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-semibold">
-            {isUpdate ? "Update Group" : "Add New Group"}
-          </h2>
-          <button onClick={onClose}>
-            <FaTimes className="text-gray-500" />
-          </button>
-        </div>
+        {isUpdate && (
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-lg font-semibold">
+              {isUpdate ? "Update Group" : "Add New Group"}
+            </h2>
+            <button onClick={onClose}>
+              <FaTimes className="text-gray-500" />
+            </button>
+          </div>
+        )}
         <div className="flex flex-col space-y-4">
           <div>
             <label
@@ -267,6 +270,7 @@ const AddGroup = ({ group, isUpdate, groupId, onClose }) => {
       {error && <p className="text-red-500 text-center">{error}</p>}
     </form>
   );
+  
 };
 
 export default AddGroup;
