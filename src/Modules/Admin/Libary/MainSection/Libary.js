@@ -90,7 +90,7 @@ const Library = () => {
                 <div className="flex gap-6">
                   <FormField
                     id="class"
-                    name="class"
+                    name=" all class"
                     label="Class"
                     value={filters.class}
                     onChange={handleFilterChange}

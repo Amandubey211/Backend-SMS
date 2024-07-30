@@ -1,30 +1,33 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ImageUpload from "../../../Addmission/Components/ImageUpload";
 import FormInput from "../../../Accounting/subClass/component/FormInput";
 import FormSelect from "../../../Accounting/subClass/component/FormSelect";
 import { baseUrl } from "../../../../../config/Common";
 import { useSelector } from "react-redux";
-
+import useGetAllClasses from "../../../../../Hooks/AuthHooks/Staff/Admin/Class/useGetAllClasses";
 const AddBook = () => {
   const [imagePreview, setImagePreview] = useState(null);
+  const {classList} = useSelector((store)=>store.Class);
+
+  const { fetchClasses } = useGetAllClasses();
+  useEffect(()=>{
+    fetchClasses()
+  },[])
   const [bookData, setBookData] = useState({
     bookName: "",
     authorName: "",
     class: "",
-    category: "History",
+    category: "",
     copies: "",
     bookImage: null,
   });
 
-  const classOptions = [
-    { value: "Ten", label: "Ten" },
-    { value: "Nine", label: "Nine" },
-  ];
-  const categoryOptions = [
-    { value: "Business Management", label: "Business Management" },
-    { value: "History", label: "History" },
-  ];
+  let  classOptions = [];
+  const classData = classList.map((item)=>{
+    classOptions.push( { value: item.className,
+      label:item.className })
 
+  })
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setBookData((prev) => ({
@@ -58,18 +61,19 @@ const AddBook = () => {
   const role = useSelector((store) => store.Auth.role);
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const token = localStorage.getItem(`${role}:token`);
-
+    const token   = localStorage.getItem(`${role}:token`);
+  const findClass = classList.filter((item)=> item.className == bookData.class);
+ 
     const formData = new FormData();
     formData.append("name", bookData.bookName);
     formData.append("author", bookData.authorName);
-    formData.append("classId", bookData.class);
-    formData.append("subjectId", bookData.category);
+    formData.append("classId", findClass[0]._id);
+    formData.append("category", bookData.category);
     formData.append("copies", bookData.copies);
     if (bookData.bookImage) {
       formData.append("image", bookData.bookImage);
     }
-
+    console.log(formData);
     try {
       const response = await fetch(`${baseUrl}/admin/add_book`, {
         method: "POST",
@@ -122,10 +126,9 @@ const AddBook = () => {
           value={bookData.class}
           onChange={handleInputChange}
         />
-        <FormSelect
+        <FormInput
           id="category"
-          label="Select Category"
-          options={categoryOptions}
+          label="Category"
           value={bookData.category}
           onChange={handleInputChange}
         />

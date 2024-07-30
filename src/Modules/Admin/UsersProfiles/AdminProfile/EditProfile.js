@@ -44,7 +44,6 @@ const {EditAdmin} = useEditAdmin()
   const handleSubmit = async(e) => {
     e.preventDefault();
     console.log("admin data to submit:", adminData);
-    
   await  EditAdmin(adminData);
   userDetail()
   };
