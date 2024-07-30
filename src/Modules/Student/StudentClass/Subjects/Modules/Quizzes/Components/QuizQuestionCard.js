@@ -1,5 +1,3 @@
-
-
 import React from 'react';
 
 const QuizQuestionCard = ({ question, questionIndex, selectedOption, handleOptionChange }) => {
@@ -11,19 +9,19 @@ const QuizQuestionCard = ({ question, questionIndex, selectedOption, handleOptio
       <h2 className="text-lg font-semibold mb-3">{question.questionText}</h2>
       <div className="space-y-2">
         {question.options.map((option, optionIndex) => (
-          <label key={option._id} className="flex items-center space-x-3"> {/* Using unique ID */}
+          <label key={option._id} className="flex items-center space-x-3">
             <div className="relative">
               <input
                 type="radio"
                 id={option._id}
                 name={`quiz-${questionIndex}`}
-                value={option.text} // Assuming 'text' is the string for the option
+                value={option.text}
                 checked={selectedOption === option.text}
                 onChange={() => handleOptionChange(questionIndex, option.text)}
                 className="form-radio h-4 w-4 text-green-500"
               />
             </div>
-            <span>{option.text}</span> {/* Assuming 'text' holds the label for the option */}
+            <span>{option.text}</span>
           </label>
         ))}
       </div>
@@ -31,5 +29,4 @@ const QuizQuestionCard = ({ question, questionIndex, selectedOption, handleOptio
   );
 };
 
-export default QuizQuestionCard;
-
+export default React.memo(QuizQuestionCard);

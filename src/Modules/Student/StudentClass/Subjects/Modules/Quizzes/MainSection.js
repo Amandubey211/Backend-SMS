@@ -1,16 +1,17 @@
-import React, { useState, useEffect, useCallback, Suspense } from "react";
+import React, { useState, useEffect, useCallback, Suspense, lazy } from "react";
 import { useParams } from "react-router-dom";
 import SubjectSideBar from "../../Component/SubjectSideBar";
 import useFetchQuizById from "../../../../../../Hooks/AuthHooks/Student/Quiz/useFetchQuizById";
 import axios from "axios";
 import { baseUrl } from "../../../../../../config/Common";
 import Tabs from "./Components/Tabs";
-import QuizResultSummary from "./Components/QuizResultSummary";
-import QuizQuestions from "./Components/QuizQuestions";
-import QuizInstructionSection from "./Components/QuizInstructionSection";
-import QuizResults from "./Components/QuizResults";
-import QuizzDetailCard from "./Components/QuizzDetailCard";
-import QuestionDetailCard from "./Components/QuestionDetailCard";
+
+const QuizResultSummary = lazy(() => import("./Components/QuizResultSummary"));
+const QuizQuestions = lazy(() => import("./Components/QuizQuestions"));
+const QuizInstructionSection = lazy(() => import("./Components/QuizInstructionSection"));
+const QuizResults = lazy(() => import("./Components/QuizResults"));
+const QuizzDetailCard = lazy(() => import("./Components/QuizzDetailCard"));
+const QuestionDetailCard = lazy(() => import("./Components/QuestionDetailCard"));
 
 const MainSection = () => {
   const { qid: quizId } = useParams();
@@ -61,7 +62,7 @@ const MainSection = () => {
           setAttemptHistory(response.data.submission);
           setQuizSubmitted(response.data.submission.length > 0);
         } else {
-          setQuizSubmitted(false); // Reset to false if no submission found
+          setQuizSubmitted(false);
           console.error("No attempt history data or unsuccessful response");
         }
       } catch (error) {
@@ -88,7 +89,7 @@ const MainSection = () => {
           if (prevTime <= 1) {
             clearInterval(timer);
             setQuizStarted(false);
-            handleSubmit(); // Automatically submit when timer reaches 0
+            handleSubmit();
             return 0;
           }
           return prevTime - 1;
@@ -99,7 +100,7 @@ const MainSection = () => {
     return () => clearInterval(timer);
   }, [quizStarted, timeLeft]);
 
-  const submitQuiz = async (answers, timeTaken) => {
+  const submitQuiz = useCallback(async (answers, timeTaken) => {
     try {
       const token = localStorage.getItem("student:token");
       if (!token) {
@@ -141,14 +142,14 @@ const MainSection = () => {
     } catch (error) {
       console.error("Error submitting quiz:", error);
     }
-  };
+  }, [quizId]);
 
-  const handleOptionChange = (questionIndex, selectedOption) => {
+  const handleOptionChange = useCallback((questionIndex, selectedOption) => {
     setSelectedOptions((prev) => ({
       ...prev,
       [questionIndex]: selectedOption,
     }));
-  };
+  }, []);
 
   const handleTabChange = useCallback(
     (tab) => {
@@ -166,11 +167,10 @@ const MainSection = () => {
           startTimer();
         }
       } else {
-        // Reset quizSubmitted and other states when switching to 'instructions'
         setQuizSubmitted(false);
         setSelectedOptions({});
         setQuizResults({ totalPoints: 0, correctAnswers: 0, wrongAnswers: 0 });
-        setQuizStarted(false); // Stop the timer
+        setQuizStarted(false);
       }
       setActiveTab(tab);
     },
@@ -213,7 +213,7 @@ const MainSection = () => {
 
     setQuizResults(newAttempt);
     setQuizSubmitted(true);
-    setQuizStarted(false); // Stop the timer
+    setQuizStarted(false);
     submitQuiz(questionsWithSelectedOptions, totalTime - timeLeft);
     setAttemptHistory((prev) => [...prev, newAttempt]);
   }, [
@@ -283,23 +283,25 @@ const MainSection = () => {
         </Tabs>
       </div>
       <div className="w-[30%]">
-        {activeTab === "instructions" && <QuizzDetailCard quiz={quiz} />}
-        {activeTab === "questions" && !quizSubmitted && (
-          <QuestionDetailCard
-            timeLeft={timeLeft}
-            totalTime={totalTime}
-            quiz={quiz}
-          />
-        )}
-        {activeTab === "questions" && quizSubmitted && (
-          <QuizResultSummary
-            totalPoints={quizResults.totalPoints}
-            correctAnswers={quizResults.correctAnswers}
-            wrongAnswers={quizResults.wrongAnswers}
-            attemptHistory={attemptHistory}
-            quizId={quizId}
-          />
-        )}
+        <Suspense fallback={<div>Loading...</div>}>
+          {activeTab === "instructions" && <QuizzDetailCard quiz={quiz} />}
+          {activeTab === "questions" && !quizSubmitted && (
+            <QuestionDetailCard
+              timeLeft={timeLeft}
+              totalTime={totalTime}
+              quiz={quiz}
+            />
+          )}
+          {activeTab === "questions" && quizSubmitted && (
+            <QuizResultSummary
+              totalPoints={quizResults.totalPoints}
+              correctAnswers={quizResults.correctAnswers}
+              wrongAnswers={quizResults.wrongAnswers}
+              attemptHistory={attemptHistory}
+              quizId={quizId}
+            />
+          )}
+        </Suspense>
       </div>
     </div>
   );

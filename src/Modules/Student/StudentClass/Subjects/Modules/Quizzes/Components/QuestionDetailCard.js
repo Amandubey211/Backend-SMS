@@ -2,25 +2,10 @@ import React from 'react';
 import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import AssignmentDetail from '../../../Component/AssignmentDetail';
-import CommentCard from './CommentCard';
 import DateDetail from '../../../Component/DateDetail';
 
 const QuestionDetailCard = ({ quiz, timeLeft }) => {
-  const { name, quizType, availableFrom, totalPoints, allowNumberOfAttempts, timeLimit } = quiz; // destructure quiz object
-  const commentsData = [
-    {
-      avatar: "https://avatars.githubusercontent.com/u/109097090?v=4", // Replace with actual image URL
-      name: "Mr Teacher",
-      timestamp: "Feb/02 /09:02",
-      comment: "Hi Sir Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore."
-    },
-    {
-      avatar: "https://avatars.githubusercontent.com/u/109097090?v=4", // Replace with actual image URL
-      name: "Mr Teacher",
-      timestamp: "Feb/02 /09:02",
-      comment: "Hi Sir Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore."
-    },
-  ];
+  const { totalPoints, allowNumberOfAttempts, timeLimit } = quiz;
 
   const formatTime = (seconds) => {
     const h = String(Math.floor(seconds / 3600)).padStart(2, '0');
@@ -33,21 +18,16 @@ const QuestionDetailCard = ({ quiz, timeLeft }) => {
     { label: "Allow Attempts", value: allowNumberOfAttempts, type: "quizz" },
     { label: "Quiz Point", value: `${totalPoints} Point`, type: "quizz" },
     { label: "Questions", value: "25", type: "quizz" },
-    { label: "Time Limit", value: formatTime(timeLimit), type: "quizz" },
-    { label: "You can see the correct Answer", value: "02/10/2024", type: "date" },
+    { label: "Time Limit", value: formatTime(timeLimit * 60), type: "quizz" },
   ];
 
-  // Convert timeLimit to seconds if it's not already
   const timeLimitInSeconds = timeLimit * 60;
-
-  // Calculate hours, minutes, and seconds from timeLimitInSeconds
   const hours = Math.floor(timeLeft / 3600);
   const minutes = Math.floor((timeLeft % 3600) / 60);
   const seconds = timeLeft % 60;
-
   const totalHours = Math.floor(timeLeft / 3600);
-  const totalMinutes = 60; // Max minutes value is always 60
-  const totalSeconds = 60; // Max seconds value is always 60
+  const totalMinutes = 60;
+  const totalSeconds = 60;
 
   const hourPercentage = totalHours ? (hours / totalHours) * 100 : 0;
   const minutePercentage = (minutes / totalMinutes) * 100;
@@ -56,14 +36,9 @@ const QuestionDetailCard = ({ quiz, timeLeft }) => {
   return (
     <div className="flex flex-col gap-24 bg-white" aria-label="Question Detail Card">
       <div className="mb-auto p-3">
-        {quizQuestionDetails.map((detail, index) => {
-          if (detail.type === "quizz") {
-            return <AssignmentDetail key={index} label={detail.label} extra={detail.extra} value={detail.value} />;
-          } else if (detail.type === "date") {
-            return <DateDetail key={index} label={detail.label} value={detail.value} />;
-          }
-          return null;
-        })}
+        {quizQuestionDetails.map((detail, index) => (
+          <AssignmentDetail key={index} label={detail.label} value={detail.value} />
+        ))}
         <div className="flex justify-around mt-4">
           <div style={{ width: 70, height: 70 }}>
             <CircularProgressbar
@@ -78,9 +53,6 @@ const QuestionDetailCard = ({ quiz, timeLeft }) => {
                 },
                 trail: {
                   stroke: '#d6d6d6',
-                },
-                background: {
-                  fill: '#3e98c7',
                 },
               }}
             />
@@ -99,9 +71,6 @@ const QuestionDetailCard = ({ quiz, timeLeft }) => {
                 trail: {
                   stroke: '#d6d6d6',
                 },
-                background: {
-                  fill: '#3e98c7',
-                },
               }}
             />
           </div>
@@ -119,27 +88,13 @@ const QuestionDetailCard = ({ quiz, timeLeft }) => {
                 trail: {
                   stroke: '#d6d6d6',
                 },
-                background: {
-                  fill: '#3e98c7',
-                },
               }}
             />
           </div>
         </div>
       </div>
-      <div className="mb-4 h-52 overflow-y-scroll">
-        {commentsData.map((comment, index) => (
-          <CommentCard
-            key={index}
-            avatar={comment.avatar}
-            name={comment.name}
-            timestamp={comment.timestamp}
-            comment={comment.comment}
-          />
-        ))}
-      </div>
     </div>
   );
 };
 
-export default QuestionDetailCard;
+export default React.memo(QuestionDetailCard);

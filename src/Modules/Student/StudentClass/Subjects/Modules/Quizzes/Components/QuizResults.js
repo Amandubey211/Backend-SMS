@@ -7,12 +7,8 @@ const QuizResults = ({ questions, selectedOptions }) => {
   let wrongAnswers = 0;
 
   const results = questions.map((question, index) => {
-    console.log("Question data:💻", question);
     const selectedOption = selectedOptions[index];
-    console.log("selectedOption💻:", selectedOption);
-
     const isCorrect = selectedOption && selectedOption === question.correctAnswer;
-    console.log("Question data💻:", isCorrect);
 
     if (selectedOption) {
       if (isCorrect) {
@@ -40,15 +36,17 @@ const QuizResults = ({ questions, selectedOptions }) => {
         <div>Correct Answers: {correctAnswers}</div>
         <div>Wrong Answers: {wrongAnswers}</div>
       </div>
-      {questions.map((question, index) => (
+      {results.map((result, index) => (
         <SelectedQuestionCard
           key={index}
-          question={question}
-          selectedOption={selectedOptions[index]}
+          question={result.question}
+          selectedOption={result.selectedOption}
+          correctOption={result.correctOption}
+          isCorrect={result.isCorrect}
         />
       ))}
     </div>
   );
 };
 
-export default QuizResults;
+export default React.memo(QuizResults);
