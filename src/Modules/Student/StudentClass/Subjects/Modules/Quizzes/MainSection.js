@@ -238,7 +238,7 @@ const MainSection = () => {
   return (
     <div className="flex">
       <SubjectSideBar />
-      <div className="w-[65%] border-x">
+      <div className="flex-grow border-x">
         <Tabs
           activeTab={activeTab}
           setActiveTab={handleTabChange}
@@ -282,7 +282,7 @@ const MainSection = () => {
           )}
         </Tabs>
       </div>
-      <div className="w-[30%]">
+      <div className="w-1/4 p-4">
         <Suspense fallback={<div>Loading...</div>}>
           {activeTab === "instructions" && <QuizzDetailCard quiz={quiz} />}
           {activeTab === "questions" && !quizSubmitted && (

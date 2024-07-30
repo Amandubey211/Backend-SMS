@@ -1,15 +1,21 @@
-import React from 'react';
-import { FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
+import React from "react";
+import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 
-const SelectedQuestionCard = ({ question, selectedOption, correctOption, isCorrect }) => {
+const SelectedQuestionCard = ({
+  question,
+  selectedOption,
+  correctOption,
+  isCorrect,
+}) => {
   return (
     <div className="w-[300px] p-4 bg-white shadow rounded-lg mb-4 border">
       <div className="text-sm font-semibold text-gray-500 mb-2">
-        Question Point : <span className="text-black">{question.questionPoint}</span>
+        Question Point :{" "}
+        <span className="text-black">{question.questionPoint}</span>
       </div>
       <h2 className="text-lg font-semibold mb-3">{question.questionText}</h2>
       <div className="space-y-2">
-        {question.options.map((option, optionIndex) => (
+        {question?.options?.map((option, optionIndex) => (
           <label key={optionIndex} className="flex items-center space-x-3">
             <div className="relative">
               <input
@@ -24,7 +30,13 @@ const SelectedQuestionCard = ({ question, selectedOption, correctOption, isCorre
             </div>
             <span>{option.text}</span>
             {selectedOption === option.text && (
-              <span className={option.text === correctOption ? 'text-green-600' : 'text-red-600'}>
+              <span
+                className={
+                  option.text === correctOption
+                    ? "text-green-600"
+                    : "text-red-600"
+                }
+              >
                 {option.text === correctOption ? (
                   <FaCheckCircle className="ml-2" />
                 ) : (
@@ -38,7 +50,9 @@ const SelectedQuestionCard = ({ question, selectedOption, correctOption, isCorre
       {selectedOption && (
         <div
           className={`mt-3 p-2 rounded-md ${
-            selectedOption === correctOption ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+            selectedOption === correctOption
+              ? "bg-green-100 text-green-700"
+              : "bg-red-100 text-red-700"
           }`}
         >
           {selectedOption === correctOption ? (
