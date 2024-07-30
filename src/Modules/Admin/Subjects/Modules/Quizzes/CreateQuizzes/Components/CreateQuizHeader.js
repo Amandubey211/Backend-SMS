@@ -4,15 +4,12 @@ import { useNavigate } from "react-router-dom";
 import AddRubricModal from "../../../Rubric/Components/AddRubricModal";
 import Sidebar from "../../../../../../../Components/Common/Sidebar";
 import AddNewCriteriaForm from "../../../Rubric/Components/AddNewCriteriaForm";
+import toast from "react-hot-toast";
 
-const CreateQuizHeader = ({ onSave, onTabChange, isEditing }) => {
+const CreateQuizHeader = ({ onSave, isEditing }) => {
   const navigate = useNavigate();
   const [isModalOpen, setModalOpen] = useState(false);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
-
-  const handleNext = () => {
-    onSave();
-  };
 
   return (
     <div className="flex items-center justify-between p-2 bg-white border-b border-gray-300 shadow-sm">
@@ -22,7 +19,7 @@ const CreateQuizHeader = ({ onSave, onTabChange, isEditing }) => {
           onClick={() => navigate(-1)} // Navigate to the previous page
         />
         <h1 className="text-lg font-semibold text-gray-800">
-          {isEditing ? "Edit Quiz" : "Create New Quiz"} 
+          {isEditing ? "Edit Quiz" : "Create New Quiz"}
         </h1>
       </div>
       <div className="flex items-center space-x-2">
@@ -34,10 +31,24 @@ const CreateQuizHeader = ({ onSave, onTabChange, isEditing }) => {
           <span>Add Rubric</span>
         </button>
         <button
-          onClick={handleNext}
-          className="px-6 py-2 text-white font-semibold rounded-md bg-gradient-to-r from-purple-500 to-red-500 hover:from-purple-600 hover:to-red-600 transition"
+          onClick={() => {
+            onSave(true);
+            toast.success("Saved and Published", { position: "bottom-left" });
+          }}
+          className="flex-grow rounded-md py-2 px-4 text-center bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200 transition"
         >
-          {isEditing ? "Submit" : "Next"}
+          <span className="bg-clip-text text-transparent bg-gradient-to-r from-rose-500 to-indigo-500">
+            {isEditing ? "Update & Publish" : "Save & Publish"}
+          </span>
+        </button>
+        <button
+          onClick={() => {
+            onSave(false);
+            toast.success("Saved", { position: "bottom-left" });
+          }}
+          className="px-4 py-2 text-white font-semibold rounded-md bg-gradient-to-r from-purple-500 to-red-500 hover:from-purple-600 hover:to-red-600 transition"
+        >
+          Save
         </button>
         <AddRubricModal
           type="quiz"

@@ -44,7 +44,7 @@ const EventItem = ({ event, onUpdate }) => {
         <img
           className="w-10 h-10 rounded-full mr-4"
           src={
-            event.image ||
+            event.eventImage ||
             "https://via.placeholder.com/50"
           }
           alt={event.eventName}
@@ -55,41 +55,6 @@ const EventItem = ({ event, onUpdate }) => {
       </div>
       <p className="text-sm text-gray-500">{event.eventType}</p>
       <p className="text-sm text-gray-500">{event.startDate}</p>
-      <Button onClick={handleEditClick}>Edit</Button>
-
-      <Modal title="Update Event" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
-        <Form layout="vertical">
-          <Form.Item label="Title">
-            <Input name="eventName" value={editedEvent.eventName} onChange={handleInputChange} />
-          </Form.Item>
-          <Form.Item label="Date">
-            <DatePicker
-              value={moment(editedEvent.startDate, "DD/MM/YYYY")}
-              format="DD/MM/YYYY"
-              onChange={handleDateChange}
-            />
-          </Form.Item>
-          <Form.Item label="Time">
-            <TimePicker
-              value={moment(editedEvent.time, "hh:mm A")}
-              format="hh:mm A"
-              onChange={handleTimeChange}
-            />
-          </Form.Item>
-          <Form.Item label="Location">
-            <Input name="location" value={editedEvent.location} onChange={handleInputChange} />
-          </Form.Item>
-          <Form.Item label="Event Type">
-            <Input name="eventType" value={editedEvent.eventType} onChange={handleInputChange} />
-          </Form.Item>
-          <Form.Item label="Event Director">
-            <Input name="eventDirector" value={editedEvent.eventDirector} onChange={handleInputChange} />
-          </Form.Item>
-          <Form.Item label="Event Details">
-            <Input.TextArea name="eventDetails" value={editedEvent.eventDetails} onChange={handleInputChange} />
-          </Form.Item>
-        </Form>
-      </Modal>
     </div>
   );
 };

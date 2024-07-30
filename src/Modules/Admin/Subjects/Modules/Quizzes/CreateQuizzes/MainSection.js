@@ -176,7 +176,7 @@ const MainSection = () => {
     handleSidebarOpen();
   };
 
-  const handleSave = async () => {
+  const handleSave = async (publish) => {
     const quizData = {
       ...formState,
       name: assignmentName,
@@ -185,6 +185,7 @@ const MainSection = () => {
       inCorrectAnswerComment: wrongAnswerComment,
       classId: cid,
       subjectId: sid,
+      publish,
     };
     if (formState.assignTo === "Section") {
       quizData.sectionId = formState.section || null;
@@ -195,13 +196,22 @@ const MainSection = () => {
       const result = await updateQuiz(quizId, quizData);
       if (result.success) {
         setActiveTab("questions");
+        if (publish) {
+          toast.success("Quiz updated and published successfully");
+        } else {
+          toast.success("Quiz updated successfully");
+        }
       }
     } else {
       const result = await createQuiz(quizData);
       if (result.success) {
         setActiveTab("questions");
         setQuizId(result.quiz._id);
-        toast.success("Quiz created successfully");
+        if (publish) {
+          toast.success("Quiz created and published successfully");
+        } else {
+          toast.success("Quiz created successfully");
+        }
       } else {
         toast.error("Failed to create quiz");
       }
@@ -252,7 +262,6 @@ const MainSection = () => {
     <div className="flex flex-col w-full">
       <CreateQuizHeader
         onSave={handleSave}
-        onTabChange={setActiveTab}
         isEditing={isEditing}
       />
 
