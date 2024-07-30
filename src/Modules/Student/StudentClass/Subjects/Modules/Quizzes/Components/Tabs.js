@@ -1,6 +1,5 @@
 import React from "react";
-import { FaCalendarAlt } from "react-icons/fa";
-
+import { format } from 'date-fns';
 const Tabs = ({
   quiz,
   children,
@@ -18,50 +17,42 @@ const Tabs = ({
 
   const { name } = quiz;
 
+  const getButtonText = () => {
+    if (activeTab === "instructions") {
+      return hasAttempted ? "Retake Quiz" : "Take The Quiz";
+    }
+    return "Quiz Instructions";
+  };
+  const formattedDate = format(new Date(quiz.availableFrom), "dd/MM/yyyy");
+
   return (
     <>
-      <div className="flex justify-between items-center p-2 px-8 border-b">
+      <div className="flex justify-between items-center p-4 border-b bg-white">
         {!createPage && (
           <div>
-            <h2 className="text-lg font-semibold mb-1 capitalize ">{name}</h2>
+            <h2 className="text-lg font-semibold mb-1 capitalize">{name}</h2>
             <div className="flex items-center text-gray-500">
-              <span className="text-green-600 font-medium mr-2">quiz</span>
+              <span className="text-green-600 font-medium mr-2">Quiz</span>
+              <span className="text-sm">
+                {activeTab === "questions" && `Started: ${formattedDate}`}
+              </span>
             </div>
           </div>
         )}
-        <div className="flex gap-2 bg-white">
+        <div className="flex gap-2">
           <button
-            onClick={() => handleTabClick("instructions")}
+            onClick={() =>
+              handleTabClick(
+                activeTab === "instructions" ? "questions" : "instructions"
+              )
+            }
             className={`flex-grow ${
               activeTab === "instructions"
-                ? "bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200"
-                : "border border-gray-300 text-gray-800"
+                ? "bg-gradient-to-r from-pink-500 to-purple-500 text-white"
+                : "bg-gradient-to-r from-pink-500 to-purple-500 text-white"
             } rounded-md py-2 px-4 text-center transition`}
           >
-            <span
-              className={`${
-                activeTab === "instructions" ? "text-gradient" : "text-black"
-              }`}
-            >
-              Quiz Instructions
-            </span>
-          </button>
-
-          <button
-            onClick={() => handleTabClick("questions")}
-            className={`flex-grow ${
-              activeTab === "questions"
-                ? "bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200"
-                : "border border-gray-300 text-gray-800"
-            } rounded-md py-2 px-4 text-center transition`}
-          >
-            <span
-              className={`${
-                activeTab === "questions" ? "text-gradient" : "text-black"
-              }`}
-            >
-              {quizSubmitted || hasAttempted ? "Retake Quiz" : "Take the Quiz"}
-            </span>
+            <span>{getButtonText()}</span>
           </button>
         </div>
       </div>

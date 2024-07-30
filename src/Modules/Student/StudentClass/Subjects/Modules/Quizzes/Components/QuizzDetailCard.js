@@ -12,7 +12,12 @@ const QuizzDetailCard = React.memo(({ quiz }) => {
       extra: "Time",
     },
     { label: "Question", value: quiz.totalQuestions, extra: "Question" },
-    { label: "Time Limit", value: quiz.timeLimit, extra: "Minute" },
+    {
+      label: "Time Limit",
+      value: `${Math.floor(quiz.timeLimit / 60)} Hour ${
+        quiz.timeLimit % 60
+      } Minute`,
+    },
   ];
 
   return (
