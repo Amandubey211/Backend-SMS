@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import classIcons from "../../Dashboard/DashboardData/ClassIconData";
 import toast from "react-hot-toast";
 import EditorSelector from "./Components/EditorSelector";
@@ -27,14 +27,28 @@ const dummyColors = [
   "#4B5563",
 ];
 
-const AddNewSubject = ({ onClose }) => {
+const AddNewSubject = ({ onClose, subject }) => {
   const [activeTab, setActiveTab] = useState("icon");
   const [selectedColor, setSelectedColor] = useState("");
   const [activeIconId, setActiveIconId] = useState(null);
   const [subjectTitle, setSubjectTitle] = useState("");
   const [selectedUsers, setSelectedUsers] = useState([]);
-  const { createSubject, loading, error } = useCreateSubject();
-  const { cid } = useParams(); // Get classId from URL parameters
+  const { createSubject, updateSubject, loading, error } = useCreateSubject();
+  const { cid } = useParams();
+
+  useEffect(() => {
+    if (subject) {
+      setSelectedColor(subject.color || "");
+      setActiveIconId(subject.icon || null);
+      setSubjectTitle(subject.name || "");
+      setSelectedUsers(subject.users || []);
+    } else {
+      setSelectedColor("");
+      setActiveIconId(null);
+      setSubjectTitle("");
+      setSelectedUsers([]);
+    }
+  }, [subject]);
 
   const handleIconClick = (id) => {
     setActiveIconId(id);
@@ -50,12 +64,24 @@ const AddNewSubject = ({ onClose }) => {
       users: selectedUsers,
     };
 
-    const result = await createSubject(subjectData);
-
-    if (result.success) {
-      toast.success(publish ? "Saved and Published" : "Subject Saved", {
-        position: "bottom-left",
-      });
+    if (subject) {
+      // If editing, update the subject
+      const result = await updateSubject(subject._id, subjectData);
+      if (result) {
+        toast.success("Subject updated successfully");
+        onClose();
+      } else {
+        toast.error("Failed to update subject");
+      }
+    } else {
+      // If adding a new subject, create it
+      const result = await createSubject(subjectData);
+      if (result) {
+        toast.success("Subject created successfully");
+        onClose();
+      } else {
+        toast.error("Failed to create subject");
+      }
     }
   };
 
@@ -87,21 +113,19 @@ const AddNewSubject = ({ onClose }) => {
 
       <div className="flex mb-4">
         <button
-          className={`flex-1 py-2 ${
-            activeTab === "icon"
+          className={`flex-1 py-2 ${activeTab === "icon"
               ? "border-b-2 border-indigo-500 text-indigo-500"
               : "text-gray-500"
-          }`}
+            }`}
           onClick={() => setActiveTab("icon")}
         >
           Subject Icon
         </button>
         <button
-          className={`flex-1 py-2 ${
-            activeTab === "color"
+          className={`flex-1 py-2 ${activeTab === "color"
               ? "border-b-2 border-indigo-500 text-indigo-500"
               : "text-gray-500"
-          }`}
+            }`}
           onClick={() => setActiveTab("color")}
         >
           Frame Color
@@ -112,15 +136,13 @@ const AddNewSubject = ({ onClose }) => {
           <div className="grid grid-cols-5 gap-4 mt-2">
             {classIcons.map((data) => (
               <img
-                className={`h-16 p-1 rounded-lg border hover:cursor-pointer bg-gradient-to-r transition duration-300 ease-in-out ${
-                  activeIconId === data.id
+                className={`h-16 p-1 rounded-lg border hover:cursor-pointer bg-gradient-to-r transition duration-300 ease-in-out ${activeIconId === data.id
                     ? "from-pink-600 to-purple-600"
                     : "from-transparent to-transparent"
-                } hover:from-pink-600 hover:to-purple-600 ${
-                  activeIconId === data.id
+                  } hover:from-pink-600 hover:to-purple-600 ${activeIconId === data.id
                     ? "border-pink-500"
                     : "border-gray-300"
-                } transform hover:scale-105`}
+                  } transform hover:scale-105`}
                 src={data.icon}
                 key={data.id}
                 onClick={() => handleIconClick(data.id)}
@@ -136,11 +158,10 @@ const AddNewSubject = ({ onClose }) => {
               <button
                 key={index}
                 style={{ backgroundColor: color }}
-                className={`w-12 h-12 rounded-full  border-4 ${
-                  selectedColor === color
+                className={`w-12 h-12 rounded-full  border-4 ${selectedColor === color
                     ? "border-indigo-500"
                     : "border-transparent"
-                }`}
+                  }`}
                 onClick={() => setSelectedColor(color)}
               />
             ))}
@@ -174,7 +195,11 @@ const AddNewSubject = ({ onClose }) => {
           Save
         </button>
       </div>
-      {error && <p className="text-red-500 text-center">{error}</p>}
+      {error && (
+        <p className="text-red-500 text-center">
+          {error}
+        </p>
+      )}
     </div>
   );
 };

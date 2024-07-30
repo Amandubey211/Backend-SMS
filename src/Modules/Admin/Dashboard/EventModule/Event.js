@@ -64,7 +64,7 @@ const Events = () => {
 
   const handleUpdateEvent = (updatedEvent) => {
     // Logic to update the event in the list
-    const updatedEvents = events.map(event => 
+    const updatedEvents = events.map(event =>
       event.id === updatedEvent.id ? updatedEvent : event
     );
     // Assuming fetchFilteredEvents updates the events state
@@ -74,10 +74,10 @@ const Events = () => {
   const top5Events = events.slice(0, 5);
 
   return (
-    <div className="max-w-4xl me-1 text-gray-600 mx-auto bg-white p-4">
+    <div className="max-w-4xl mx-auto text-gray-600 bg-white p-4">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-medium">Event</h2>
-        <div className="flex flex-grow justify-center items-center gap-3">
+        <div className="flex items-center gap-3">
           <button className="p-1 border rounded-full" onClick={handlePreviousMonth}>
             <IoIosArrowBack />
           </button>
@@ -120,14 +120,11 @@ const Events = () => {
             </div>
           </div>
         </div>
-        <button
-          className="text-blue-500 hover:underline ml-2"
-          onClick={handleViewAll}
-        >
+        <button className="text-blue-500 hover:underline ml-2" onClick={handleViewAll}>
           View All
         </button>
       </div>
-      <div className="flex justify-between p-2 border-y py-3 font-semibold">
+      <div className="grid grid-cols-3 gap-4 py-3 font-semibold text-left border-y border-gray-200">
         <h1>Event Name</h1>
         <h1>Event Type</h1>
         <h1>Start Date</h1>
@@ -146,11 +143,7 @@ const Events = () => {
           </div>
         ) : (
           top5Events.map((event) => (
-            <EventItem
-              key={event.id}
-              event={event}
-              onUpdate={handleUpdateEvent}
-            />
+            <EventItem key={event.id} event={event} onUpdate={handleUpdateEvent} />
           ))
         )}
       </div>
