@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { RxCross2 } from "react-icons/rx";
+import { format } from 'date-fns';
 
-const UpdateEvent = ({ event, onSave }) => {
+const UpdateEvent = ({ event, onSave, onClose }) => {
   const [eventData, setEventData] = useState({
     title: '',
     description: '',
@@ -11,54 +12,39 @@ const UpdateEvent = ({ event, onSave }) => {
     location: '',
     director: '',
     image: null,
-    imagePreview: null, // Add imagePreview to state
+    imagePreview: null,
   });
 
-  // Initialize form state with the selected event details
   useEffect(() => {
     if (event) {
       setEventData({
         title: event.title || '',
         description: event.description || '',
-        date: event.startDate ? formatDateForInput(event.startDate) : '',
-        time: event.time || '',
+        date: event.date ? new Date(event.date).toISOString().split('T')[0] : '',
+        time: event.time ? format(new Date(`1970-01-01T${event.time}:00`), 'HH:mm') : '',
         type: event.type || '',
         location: event.location || '',
         director: event.director || '',
         image: event.image || null,
-        imagePreview: event.image || null, // Set existing image
+        imagePreview: event.image || null,
       });
     }
   }, [event]);
 
-  // Function to format Date object to the format used in datetime-local input
-  const formatDateForInput = (date) => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-    return `${year}-${month}-${day}T${hours}:${minutes}`;
-  };
-
-  // Handle form input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setEventData({ ...eventData, [name]: value });
   };
 
-  // Handle image change
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     setEventData({ ...eventData, image: file, imagePreview: URL.createObjectURL(file) });
   };
 
-  // Handle image remove
   const handleImageRemove = () => {
     setEventData({ ...eventData, image: null, imagePreview: null });
   };
 
-  // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
     onSave(eventData);
@@ -149,13 +135,13 @@ const UpdateEvent = ({ event, onSave }) => {
             <label htmlFor="type" className="block text-gray-700">Event Type</label>
             <input
               type="text"
-            id="type"
-            name="type"
-            value={eventData.type}
-            onChange={handleChange}
-            className="border px-3 py-2 w-full rounded"
-            required
-          />
+              id="type"
+              name="type"
+              value={eventData.type}
+              onChange={handleChange}
+              className="border px-3 py-2 w-full rounded"
+              required
+            />
           </div>
           <div className="w-1/2">
             <label htmlFor="director" className="block text-gray-700">Event Director</label>
