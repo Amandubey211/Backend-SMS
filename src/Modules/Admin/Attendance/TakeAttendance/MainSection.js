@@ -7,6 +7,7 @@ import Header from "./Components/Header";
 import useMarkAttendance from "../../../../Hooks/AuthHooks/Staff/Admin/Attendance/useMarkAttendance";
 import useGetAttendanceByClassSectionGroupAndDate from "../../../../Hooks/AuthHooks/Staff/Admin/Attendance/useGetAttendanceByClassSectionGroupAndDate";
 import { useParams } from "react-router-dom";
+import Spinner from "../../../../Components/Common/Spinner";
 
 const MainSection = () => {
   const [filters, setFilters] = useState({
@@ -85,7 +86,7 @@ const MainSection = () => {
         <div className="flex-grow">
           <Filters filters={filters} onFilterChange={handleFilterChange} />
           {fetchingLoading ? (
-            <div>Loading...</div>
+            <Spinner />
           ) : fetchingError ? (
             <div>Error: {fetchingError}</div>
           ) : (

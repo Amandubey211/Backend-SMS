@@ -1,5 +1,6 @@
 import React from "react";
-import SidebarMenu from "./SidebarMenu";
+import { FaUsers } from "react-icons/fa";
+import StudentMenuOptions from "./StudentMenuOptions";
 
 const DetailedStudentList = ({ activeSection, onSeeGradeClick, students }) => {
   const filteredStudents =
@@ -9,15 +10,16 @@ const DetailedStudentList = ({ activeSection, onSeeGradeClick, students }) => {
 
   return (
     <div className="w-full p-4 bg-white">
-      <ul>
-        {filteredStudents.length === 0 ? (
-          <li className="p-4 text-center text-gray-500 italic">
-            No students found in this section.
-          </li>
-        ) : (
-          filteredStudents.map((student, index) => (
+      {filteredStudents.length === 0 ? (
+        <div className="flex flex-col items-center justify-center h-64 text-center text-gray-500">
+          <FaUsers className="text-6xl mb-4" />
+          <p className="">No students found in this section.</p>
+        </div>
+      ) : (
+        <ul>
+          {filteredStudents.map((student, index) => (
             <li
-              key={index}
+              key={student._id}
               className="relative flex items-center justify-between py-4 border-b"
             >
               <StudentInfo
@@ -25,66 +27,75 @@ const DetailedStudentList = ({ activeSection, onSeeGradeClick, students }) => {
                 index={index}
                 onSeeGradeClick={onSeeGradeClick}
               />
-              <SidebarMenu
+              <StudentMenuOptions
                 studentId={student._id}
                 onSeeGradeClick={onSeeGradeClick}
               />
             </li>
-          ))
-        )}
-      </ul>
+          ))}
+        </ul>
+      )}
     </div>
   );
 };
 
 const StudentInfo = React.memo(({ student, index, onSeeGradeClick }) => (
   <>
-    <div className="flex items-center">
+    <div className="flex items-center w-1/4">
       <img
-        src={student.profile || `https://randomuser.me/api/portraits/med/${
-          index % 2 === 0 ? "women" : "men"
-        }/${index}.jpg`}
+        src={
+          student.profile ||
+          `https://randomuser.me/api/portraits/med/${
+            index % 2 === 0 ? "women" : "men"
+          }/${index}.jpg`
+        }
         alt={student.name}
         className="w-10 h-10 rounded-full mr-3"
+        loading="lazy"
       />
-      <div>
-        <div className="text-sm font-medium">
+      <div className="flex flex-col truncate">
+        <div className="text-sm font-medium truncate">
           {student?.firstName} {student?.lastName}
         </div>
-        <div className="text-xs text-gray-500">{student?._id}</div>
+        <div className="text-xs text-gray-500 truncate">{student?._id}</div>
       </div>
     </div>
     <StudentDetails student={student} />
-    <button
-      className="px-3 py-1 text-green-500 font-semibold text-sm border border-green-500 rounded-lg"
-      onClick={() => onSeeGradeClick(student)}
-    >
-      See Grade
-    </button>
+    <div className="flex items-center w-1/6">
+      <button
+        className="px-3 py-1 text-green-500 font-semibold text-sm border border-green-500 rounded-lg"
+        onClick={() => onSeeGradeClick(student)}
+        aria-label={`See Grade for ${student?.firstName} ${student?.lastName}`}
+      >
+        See Grade
+      </button>
+    </div>
   </>
 ));
 
 const StudentDetails = React.memo(({ student }) => (
   <>
-    <div className="flex flex-col gap-1 items-start justify-start">
+    <div className="flex flex-col gap-1 items-start justify-start w-1/5 ml-5 truncate">
       <div className="text-sm text-gray-500">Class</div>
-      <div className="text-sm text-gray-500">{student?.className || "09"}</div>
+      <div className="text-sm text-gray-500 truncate">
+        {student?.className || "09"}
+      </div>
     </div>
-    <div className="flex flex-col gap-1 items-start justify-center">
-      <div className="text-sm text-gray-500">
+    <div className="flex flex-col gap-1 items-start justify-center w-1/5 truncate">
+      <div className="text-sm text-gray-500 truncate">
         {student?.section || "Section"}
       </div>
-      <div className="text-sm text-gray-500">{`Group-${
+      <div className="text-sm text-gray-500 truncate">{`Group-${
         student?.group || "Accounting"
       }`}</div>
     </div>
-    <div className="flex flex-col text-sm gap-1 items-start justify-start">
-      <div>{student.email}</div>
-      <div>{student.contactNumber}</div>
+    <div className="flex flex-col text-sm gap-1 items-start justify-start w-1/4 truncate">
+      <div className="truncate">{student.email}</div>
+      <div className="truncate">{student.contactNumber}</div>
     </div>
-    <div className="flex flex-col text-sm gap-1 items-start justify-start">
+    <div className="flex flex-col text-sm gap-1 items-start justify-start w-1/4 truncate">
       <div>Parent</div>
-      <div>{student.guardianContactNumber}</div>
+      <div className="truncate">{student.guardianContactNumber}</div>
     </div>
   </>
 ));

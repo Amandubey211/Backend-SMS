@@ -8,11 +8,10 @@ const useGetGroupsByClassAndSection = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const role = useSelector((store) => store.Auth.role);
-  
 
   const fetchGroupsByClassAndSection = useCallback(
     async (classId, sectionId) => {
-      console.log(classId,sectionId)
+      console.log(classId, sectionId);
       setLoading(true);
       setError(null);
       try {

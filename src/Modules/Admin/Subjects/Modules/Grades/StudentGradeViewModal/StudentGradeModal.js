@@ -6,7 +6,6 @@ import StudentGradeSummary from "./Component/StudentGradeSummary";
 import useFetchStudentGrades from "../../../../../../Hooks/AuthHooks/Staff/Admin/Grades/useFetchStudentGrades";
 import dummyData from "./Component/DummyData";
 
-
 const StudentGradeModal = ({ isOpen, onClose }) => {
   const [filters, setFilters] = useState({
     arrangeBy: "",
@@ -39,7 +38,7 @@ const StudentGradeModal = ({ isOpen, onClose }) => {
     useFetchStudentGrades();
   useEffect(() => {
     fetchStudentGrades(studentGrade._id);
-    console.log(grades)
+    console.log(grades);
   }, [studentGrade, fetchStudentGrades]);
 
   return (

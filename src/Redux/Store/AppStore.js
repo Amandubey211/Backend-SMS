@@ -1,6 +1,7 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { persistStore, persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage"; // defaults to localStorage for web
+
 import AuthSliceReducer from "../Slices/Auth/AuthSlice.js";
 import sidebarReducer from "../Slices/Common/SidebarSlice.js";
 import AdminReducers from "../Slices/AdminSlice.js";
@@ -25,12 +26,24 @@ const persistedAuthReducer = persistReducer(
   AuthSliceReducer
 );
 
+// Persist configuration for Common slice
+const commonPersistConfig = {
+  key: "common",
+  storage,
+  whitelist: ["NavbarData", "selectedClass", "selectedSubject"], // Persist NavbarData and selectedClassName
+};
+
+const persistedCommonReducer = persistReducer(
+  commonPersistConfig,
+  CommonReducers
+);
+
 const AppStore = configureStore({
   reducer: {
     Admin: AdminReducers,
-    Auth: persistedAuthReducer, // Use persisted reducer
+    Auth: persistedAuthReducer, // Use persisted reducer for Auth
     sidebar: sidebarReducer,
-    Common: CommonReducers,
+    Common: persistedCommonReducer, // Use persisted reducer for Common
     Class: ClassReducer,
     Teachers: TeachersReducer,
     Staff: staffReducer,

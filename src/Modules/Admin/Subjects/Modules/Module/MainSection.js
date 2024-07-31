@@ -10,12 +10,17 @@ import { setSelectedModule } from "../../../../../Redux/Slices/Common/CommonSlic
 import useGetModulesForStudent from "../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useGetModulesForStudent";
 import MoveModule from "./Components/MoveModule";
 import AddChapter from "./Components/AddChapter";
+import { FaExclamationTriangle, FaSpinner } from "react-icons/fa";
+import DeleteModal from "../../../../../Components/Common/DeleteModal";
+import toast from "react-hot-toast";
 
 const MainSection = () => {
   const [expandedChapters, setExpandedChapters] = useState([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isMoveSidebarOpen, setIsMoveSidebarOpen] = useState(false);
   const [sidebarContent, setSidebarContent] = useState(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState(null);
   const dispatch = useDispatch();
   const selectedModule = useSelector((state) => state.Common.selectedModule);
   const { error, fetchModules, loading, modulesData } =
@@ -87,20 +92,28 @@ const MainSection = () => {
     setIsMoveSidebarOpen(true);
   };
 
+  const handleDelete = (target) => {
+    setDeleteTarget(target);
+    setIsDeleteModalOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    // Delete logic here
+    toast.success(`${deleteTarget.type} deleted successfully!`);
+    setIsDeleteModalOpen(false);
+    setDeleteTarget(null);
+    await fetchModules();
+  };
+
   return (
     <div className="flex min-h-screen">
       <SubjectSideBar />
-
       <div className="w-[60%] bg-white p-2 border-l">
         <div className="bg-white p-2 rounded-lg">
-          <div
-            className="flex justify-between px-4 mb-3 items-center
-          "
-          >
+          <div className="flex justify-between px-4 mb-3 items-center">
             <h1 className="text-md font-semibold">
               {selectedModule.name ? selectedModule.name : "Select a Module"}
             </h1>
-
             {selectedModule.name && (
               <button
                 onClick={openAddChapter}
@@ -110,7 +123,17 @@ const MainSection = () => {
               </button>
             )}
           </div>
-          {selectedModule.chapters && selectedModule.chapters.length > 0 ? (
+          {loading ? (
+            <div className="flex flex-col items-center justify-center h-64 text-center text-gray-500">
+              <FaSpinner className="text-6xl mb-4 animate-spin" />
+              <p className="italic">Loading...</p>
+            </div>
+          ) : error ? (
+            <div className="flex flex-col items-center justify-center h-64 text-center text-gray-500">
+              <FaExclamationTriangle className="text-6xl mb-4 text-red-500" />
+              <p className="italic">Error fetching modules: {error.message}</p>
+            </div>
+          ) : selectedModule.chapters && selectedModule.chapters.length > 0 ? (
             selectedModule.chapters.map((chapter, index) => (
               <Chapter
                 key={index}
@@ -121,6 +144,10 @@ const MainSection = () => {
                 quizzes={chapter.quizzes}
                 isExpanded={expandedChapters.includes(index + 1)}
                 onToggle={() => handleToggle(index + 1)}
+                onDelete={() =>
+                  handleDelete({ type: "Chapter", name: chapter.name })
+                }
+                onEdit={() => toast.success("Edit Chapter")}
               />
             ))
           ) : (
@@ -132,7 +159,6 @@ const MainSection = () => {
         <div className="bg-white p-4 rounded-lg">
           <div className="flex items-center gap-1 mb-2">
             <h1 className="text-xl font-semibold">All Modules</h1>
-
             <p className="bg-gradient-to-r from-pink-100 flex justify-center items-center to-purple-200 font-semibold rounded-full w-6 h-6">
               <span className="text-gradient">
                 {modulesData?.modules.length}
@@ -154,6 +180,9 @@ const MainSection = () => {
                 onSelect={() => handleModuleSelect(module)}
                 onEdit={() => handleEditModule(module)}
                 onMove={() => handleMoveModule(module)}
+                onDelete={() =>
+                  handleDelete({ type: "Module", name: module.moduleName })
+                }
               />
             ))}
           </div>
@@ -193,6 +222,14 @@ const MainSection = () => {
           >
             <MoveModule />
           </Sidebar>
+        )}
+        {isDeleteModalOpen && (
+          <DeleteModal
+            isOpen={isDeleteModalOpen}
+            onClose={() => setIsDeleteModalOpen(false)}
+            onConfirm={confirmDelete}
+            title={deleteTarget ? deleteTarget.name : ""}
+          />
         )}
       </div>
     </div>

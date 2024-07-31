@@ -52,7 +52,7 @@ const StudentInfo = () => {
     transportRequirement: false,
     Q_Id: "",
     enrollmentStatus: "",
-    transportRequirement: "",
+    //transportRequirement: "",
     enrollmentStatus: "",
     schoolId: schoolId,
     // fatherImage: null,
