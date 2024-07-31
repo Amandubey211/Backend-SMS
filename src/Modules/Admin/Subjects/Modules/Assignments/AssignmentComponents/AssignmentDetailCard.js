@@ -29,9 +29,12 @@ const AssignmentDetailCard = ({ assignment, loading, error }) => {
 
   return (
     <div className="max-w-sm p-4 bg-white" aria-label="Assignment Card">
-      <ButtonsGroup  type="Assignment" data={assignment}/>
+      <ButtonsGroup type="Assignment" data={assignment} />
       <SpeedGradeButton />
-      <AssignmentDetail label="Assignment Points" value={`${points} Points`} />
+      <AssignmentDetail
+        label="Assignment Points"
+        value={`${points || "N/A"} Points`}
+      />
       <AssignmentDetail
         label="Allowed Attempts"
         value={`${allowNumberOfAttempts ? allowNumberOfAttempts : 0} Times`}
@@ -40,11 +43,15 @@ const AssignmentDetailCard = ({ assignment, loading, error }) => {
       <AssignmentDetail label="This Assignment For" value={assignTo} />
       <DateDetail
         label="Due Date"
-        value={new Date(dueDate).toLocaleDateString()}
+        value={dueDate ? new Date(dueDate).toLocaleDateString() : "DD/MM/YY"}
       />
       <DateDetail
         label="Available From"
-        value={new Date(availableFrom).toLocaleDateString()}
+        value={
+          availableFrom
+            ? new Date(availableFrom).toLocaleDateString()
+            : "DD/MM/YY"
+        }
       />
       <RubricButton onClick={() => setModalOpen(true)} />
 

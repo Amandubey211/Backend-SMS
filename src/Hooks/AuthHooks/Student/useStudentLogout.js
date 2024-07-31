@@ -13,8 +13,6 @@ const useStudentLogout = () => {
 
   const studentLogout = () => {
     localStorage.removeItem("student:token");
-    //localStorage.removeItem("isLoggedIn");
-    //localStorage.removeItem("role");
 
     dispatch(setAuth(false));
     dispatch(setRole(null));

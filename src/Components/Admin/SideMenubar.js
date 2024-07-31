@@ -38,7 +38,7 @@ const SideMenubar = () => {
 
   return (
     <nav
-      className={`transition-all duration-300 h-screen p-1 z-10 bg-white border-r flex flex-col ${
+      className={`transition-all duration-300 h-screen p-1 px-3 z-10 bg-white border-r flex flex-col ${
         isOpen ? "w-[15%]" : "w-[7%]"
       }`}
       aria-label="Sidebar"

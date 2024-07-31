@@ -81,7 +81,7 @@ const Navbar = ({ hideSearchbar, hideAvatarList, hideStudentView }) => {
   //    userDetail();
   // },[])
   return (
-    <div className="relative -z-10">
+    <div className="relative">
       <div className="flex items-center p-2 bg-white border-b">
         <LeftHeading leftHeading={leftHeading} navigate={navigate} />
         {!hideAvatarList && (

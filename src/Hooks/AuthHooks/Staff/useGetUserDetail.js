@@ -11,24 +11,23 @@ import { baseUrl } from "../../../config/Common.js";
 
 const useGetUserDetail = () => {
   const [loading, setLoading] = useState(false);
- // const role = useSelector((store) => store.Auth.role);
-  const dispatch = useDispatch()
+  const role = useSelector((store) => store.Auth.role);
+  const dispatch = useDispatch();
   const userDetail = async () => {
     setLoading(true);
     try {
-     const token = localStorage.getItem(`admin:token`);
-      const  {data } = await axios.get(
-        `${baseUrl}/auth/user/detail`,{
-            headers: { Authentication: token },
-        }
-      );
-      if(data.token){
-        console.log( data);
+      const token = localStorage.getItem(`${role}:token`);
+      const { data } = await axios.get(`${baseUrl}/auth/user/detail`, {
+        headers: { Authentication: token },
+      });
+      if (data.token) {
+        console.log(data);
         localStorage.setItem(`${data.user.role}:token`, `Bearer ${data.token}`);
-        dispatch(setAuth(true));   dispatch(setRole(data.user.role));
-       
+        dispatch(setAuth(true));
+        dispatch(setRole(data.user.role));
+
         dispatch(setUerDetails(data.user));
-      }else{
+      } else {
         toast.error("Something is wrong");
       }
     } catch (error) {

@@ -38,7 +38,7 @@ const SideMenubar = () => {
 
   return (
     <nav
-      className={`transition-all duration-300 h-screen p-2 px-3 bg-white border-r flex flex-col justify-between ${
+      className={`transition-all duration-300 h-screen p-1 z-10 px-3 bg-white border-r flex flex-col justify-between ${
         isOpen ? "w-[15%]" : "w-[7%]"
       }`}
       aria-label="Sidebar"
@@ -50,7 +50,7 @@ const SideMenubar = () => {
               src={isOpen ? StudentDiwanLogo : smallLogo}
               alt="Logo"
               className={`transition-width duration-300 ${
-                isOpen ? "w-36" : "w-28"
+                isOpen ? "w-36 pt-1" : "h-12"
               }`}
             />
           </NavLink>
@@ -62,14 +62,14 @@ const SideMenubar = () => {
             className="absolute bottom-0 right-0"
             aria-label="Toggle Sidebar"
           >
-            <div className="p-1 rounded-full text-purple-500 -mr-6 -mb-4 z-50 bg-white border-2">
+            <div className="p-1 rounded-full text-purple-500 -mr-6 -mb-4 z-40 bg-white border-2">
               {isOpen ? <IoIosArrowBack /> : <IoIosArrowForward />}
             </div>
           </button>
         </div>
-        <div className="mt-4 flex-grow">
+        <div className="p-2 flex-grow">
           {isOpen && <h2 className="text-gray-500">MENU</h2>}
-          <ul className="mt-1 space-y-2">
+          <ul className="space-y-2">
             {sidebarData.map((item, index) => (
               <React.Fragment key={index}>
                 {item.items ? (

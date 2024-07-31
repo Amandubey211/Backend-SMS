@@ -1,5 +1,5 @@
-import React from 'react';
-import { FaRegCalendarAlt } from 'react-icons/fa';
+import React from "react";
+import { FaRegCalendarAlt } from "react-icons/fa";
 
 const DateDetail = ({ label, value }) => (
   <div className="mt-4">
@@ -8,7 +8,7 @@ const DateDetail = ({ label, value }) => (
         <FaRegCalendarAlt className="mr-2" aria-hidden="true" />
         <p className="text-sm font-medium">{label} :</p>
       </div>
-      <p className="text-sm font-normal text-gray-900">{value}</p>
+      <p className="text-sm font-normal text-gray-900">{value || "mm/yy/dd"}</p>
     </div>
   </div>
 );

@@ -114,11 +114,11 @@ const sidebarData = [
       },
     ],
   },
-  {
-    title: "Graduated",
-    icon: <PiCertificateLight />,
-    path: "/graduated",
-  },
+  // {
+  //   title: "Graduated",
+  //   icon: <PiCertificateLight />,
+  //   path: "/graduated",
+  // },
   {
     title: "Admissions",
     icon: <RiUserAddLine />,
