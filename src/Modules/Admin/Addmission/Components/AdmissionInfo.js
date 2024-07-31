@@ -41,18 +41,15 @@ const AdmissionInfo = ({ studentInfo, handleInputChange }) => {
           </select>
         </div>
         <div>
-          <label className="block text-gray-700">Section</label>
-          <select
-            name="section"
+          <label className="block text-gray-700">Q_ID</label>
+          <input
+            type="text"
+            name="Q_Id"
             className="mt-1 p-2 block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-            value={studentInfo.section}
+            value={studentInfo.Q_Id}
             onChange={handleInputChange}
           >
-            <option value="">Choose Options</option>
-            <option>A</option>
-            <option>B</option>
-            <option>C</option>
-          </select>
+          </input>
         </div>
         <div>
           <label className="block text-gray-700">Transport Requirement</label>
