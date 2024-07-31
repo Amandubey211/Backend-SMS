@@ -21,7 +21,11 @@ export const createEvent = async (eventData) => {
   try {
     const formData = new FormData();
     Object.keys(eventData).forEach(key => {
-      formData.append(key, eventData[key]);
+      if (key === 'startDate' || key === 'endDate') {
+        formData.append(key, new Date(eventData[key]).toISOString());
+      } else {
+        formData.append(key, eventData[key]);
+      }
     });
 
     const response = await axios.post(`${baseUrl}/admin/create_event`, formData, {
@@ -41,7 +45,11 @@ export const updateEvent = async (eventId, eventData) => {
   try {
     const formData = new FormData();
     Object.keys(eventData).forEach(key => {
-      formData.append(key, eventData[key]);
+      if (key === 'startDate' || key === 'endDate') {
+        formData.append(key, new Date(eventData[key]).toISOString());
+      } else {
+        formData.append(key, eventData[key]);
+      }
     });
 
     const response = await axios.put(`${baseUrl}/admin/update/event/${eventId}`, formData, {

@@ -5,7 +5,7 @@ import DashLayout from "../../../../../Components/Admin/AdminDashLayout";
 import EventCard from "../subComponents/EventCard";
 import Sidebar from "../../../../../Components/Common/Sidebar";
 import AddEvent from "../subComponents/AddEvent";
-import UpdateEvent from "../subComponents/UpdateEvent"; // Import UpdateEvent
+import UpdateEvent from "../subComponents/UpdateEvent";
 import ViewEvent from "../subComponents/ViewEvent";
 import { getEvents, createEvent, updateEvent, deleteEvent } from '../api/event';
 import { format, parseISO } from 'date-fns';
@@ -53,16 +53,19 @@ const EventScheduler = () => {
     ];
 
     return (
-      <ul className="events space-y-1 ">
-        {dayEvents.map((event, index) => (
-          <li
-            key={event._id}
-            className={`inline-block px-2 py-1 rounded text-white ${bgColors[index % bgColors.length]} shadow-md cursor-pointer`}
-            onClick={() => handleStickerClick(event)}
-          >
-            {event.title} - {format(event.startDate, "hh:mm a")}
-          </li>
-        ))}
+      <ul className="events space-y-1">
+        {dayEvents.map((event, index) => {
+          const eventTime = parseISO(`${format(event.startDate, 'yyyy-MM-dd')}T${event.time}`);
+          return (
+            <li
+              key={event._id}
+              className={`inline-block px-2 py-1 rounded text-white ${bgColors[index % bgColors.length]} shadow-md cursor-pointer`}
+              onClick={() => handleStickerClick(event)}
+            >
+              {event.title} - {format(eventTime, "hh:mm a")}
+            </li>
+          );
+        })}
       </ul>
     );
   };
@@ -120,14 +123,14 @@ const EventScheduler = () => {
             event={selectedEvent}
             onDelete={handleDeleteEvent}
             onEdit={() => {
-              setSidebarContent("updateEvent"); // Change to updateEvent
+              setSidebarContent("updateEvent");
             }}
           />
         );
       case "addEvent":
         return <AddEvent onSave={handleSaveEvent} />;
       case "updateEvent":
-        return <UpdateEvent event={selectedEvent} onSave={handleSaveEvent} />; // Use UpdateEvent
+        return <UpdateEvent event={selectedEvent} onSave={handleSaveEvent} />;
       default:
         return <div>Select an action</div>;
     }
@@ -155,7 +158,7 @@ const EventScheduler = () => {
               ))}
             </div>
             <hr className="my-6 border-t-2 mt-12 " />
-            <div className="py-7 ">
+            <div className="py-7">
               <Calendar
                 dateCellRender={handleDateCellRender}
                 headerRender={({ value, type, onChange, onTypeChange }) => {
