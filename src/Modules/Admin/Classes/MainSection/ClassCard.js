@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import PropTypes from "prop-types";
 import leftLogo from "../../../../Assets/ClassesAssets/ClassCardLeftLogo.png";
 import RightLogo from "../../../../Assets/ClassesAssets/ClassCardRightLogo.png";
 import centerLogo from "../../../../Assets/ClassesAssets/ClassCardCenterLogo.png";
@@ -11,6 +12,7 @@ import toast from "react-hot-toast";
 import Sidebar from "../../../../Components/Common/Sidebar";
 import AddNewClass from "./AddNewClass";
 import useCreateClass from "../../../../Hooks/AuthHooks/Staff/Admin/Class/useCreateClass";
+import DeleteModal from "../../../../Components/Common/DeleteModal";
 
 const ClassCard = ({
   className,
@@ -22,15 +24,28 @@ const ClassCard = ({
 }) => {
   const dispatch = useDispatch();
   const [isSidebarOpen, setSidebarOpen] = useState(false);
+  const [isModalOpen, setModalOpen] = useState(false);
   const { deleteClass, loading } = useCreateClass();
 
   const handleSidebarOpen = () => setSidebarOpen(true);
   const handleSidebarClose = () => setSidebarOpen(false);
 
-  const handleDelete = (classId) => {
-    deleteClass(classId)
 
+  const handleDeleteClick = () => {
+    setModalOpen(true);
   };
+
+  const handleConfirmDelete = () => {
+    setModalOpen(false);
+    deleteClass(classId);
+    toast.success(`${className} deleted successfully!`);
+  };
+
+
+  const handleCloseModal = () => {
+    setModalOpen(false);
+  };
+
   return (
     <>
       <div className="group p-1 pb-4 border rounded-lg shadow-lg transform transition-transform duration-300 ease-in-out hover:scale-105 hover:shadow-xl">
@@ -56,7 +71,7 @@ const ClassCard = ({
           <button
             disabled={loading}
             aria-busy={loading ? "true" : "false"}
-            onClick={() => handleDelete(classId)}
+            onClick={handleDeleteClick}
             className="bg-white p-1 rounded-full shadow hover:bg-gray-200"
           >
             <RiDeleteBin6Line className="w-5 h-5 text-red-500" />
@@ -95,8 +110,23 @@ const ClassCard = ({
       >
         <AddNewClass className={className} classId={classId} isUpdate={true} />
       </Sidebar>
+      <DeleteModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        onConfirm={handleConfirmDelete}
+        title={className}
+      />
     </>
   );
+};
+
+ClassCard.propTypes = {
+  className: PropTypes.string.isRequired,
+  teachersCount: PropTypes.number.isRequired,
+  students: PropTypes.number.isRequired,
+  sections: PropTypes.number.isRequired,
+  groups: PropTypes.number.isRequired,
+  classId: PropTypes.string.isRequired,
 };
 
 export default ClassCard;

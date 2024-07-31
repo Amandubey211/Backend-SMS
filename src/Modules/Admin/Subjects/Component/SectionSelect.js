@@ -1,4 +1,3 @@
-
 import React, { useEffect } from "react";
 import { useSelector } from "react-redux";
 import useFetchSection from "../../../../Hooks/AuthHooks/Staff/Admin/Sections/useFetchSection";
@@ -22,7 +21,7 @@ const SectionSelect = ({ section, handleChange, group, assignTo }) => {
     if (!AllSections.length) {
       fetchSection(cid);
     }
-  }, [fetchSection, AllSections, cid]);
+  }, [fetchSection]);
 
   if (loading) {
     return <p>Loading sections...</p>;
@@ -78,7 +77,5 @@ const SectionSelect = ({ section, handleChange, group, assignTo }) => {
     </>
   );
 };
-
-
 
 export default SectionSelect;

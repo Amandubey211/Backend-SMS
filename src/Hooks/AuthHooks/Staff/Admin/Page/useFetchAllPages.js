@@ -27,7 +27,6 @@ const useFetchAllPages = () => {
       if (response.data && response.data.success) {
         setPages(response.data.data);
       } else {
-        toast.error("Failed to fetch pages");
         setError("Failed to fetch pages");
       }
     } catch (err) {
