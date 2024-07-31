@@ -76,10 +76,6 @@ const Navbar = ({ hideSearchbar, hideAvatarList, hideStudentView }) => {
     (store) => store.Common.NavbarData.leftHeading
   );
   const navigate = useNavigate();
-  // const  {userDetail} = useGetUserDetail();
-  // useEffect(()=>{
-  //    userDetail();
-  // },[])
   return (
     <div className="relative -z-10">
       <div className="flex items-center p-2 bg-white border-b">

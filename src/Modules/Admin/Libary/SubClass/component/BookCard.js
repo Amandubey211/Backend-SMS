@@ -1,6 +1,14 @@
-import React from "react";
-
+import React, { useState } from "react";
+import { HiDotsVertical } from "react-icons/hi";
+import { MdCancel } from "react-icons/md";
+import Sidebar from "../../../../../Components/Common/Sidebar";
+import EditBook from "./EditBook";
+import { baseUrl } from "../../../../../config/Common";
+import toast from "react-hot-toast";
+import { useSelector } from "react-redux";
 const BookCard = ({
+  key,
+  id,
   title,
   author,
   category,
@@ -8,9 +16,40 @@ const BookCard = ({
   copies,
   available,
   coverImageUrl,
+  onupdate
 }) => {
+  const [showEditMenu, setShowEditMenu] = useState(false);
+  const [isSidebarOpen, setSidebarOpen] = useState(false);
+  const handleSidebarOpen = () => setSidebarOpen(true);
+  const handleSidebarClose = () => setSidebarOpen(false);
+  const [bookData, setBookData] = useState();
+  const role = useSelector((store) => store.Auth.role);
+  const token   = localStorage.getItem(`${role}:token`);
+  const DeleteBook = async()=>{
+    try {
+      const response = await fetch(`${baseUrl}/admin/delete/book/${id}`, {
+        method: "Delete",
+        headers: {
+          Authentication: `${token}`,
+        },
+      });
+  
+      if (!response.ok) {
+        throw new Error("Failed to edit book");
+      }
+  
+      const result = await response.json();
+      toast.success('Book delete successfully');
+      onupdate()
+      
+    } catch (error) {
+      console.error("Error delete book:", error);
+      toast.error(error.message || "Failed delete book. Please try again.");
+    }
+   
+  };
   return (
-    <div className="border p-2 bg-white rounded-lg shadow overflow-hidden">
+    <div className="border p-2 bg-white rounded-lg shadow overflow-hidden relative">
       <div className="w-full h-40 flex ">
 
         <img
@@ -34,11 +73,42 @@ const BookCard = ({
 
         <p className=" mt-2  text-sm font-medium text-gray-500">Author</p>
         <p className="text-sm font-medium text-gray-600"> {author}</p>
-        <button className=" absolute right-2  bottom-2 text-indigo-600 hover:text-indigo-900">Edit</button>
+        <div className=" absolute right-2  bottom-2 text-indigo-600 hover:text-indigo-900 cursor-pointer font-bold" onClick={() => setShowEditMenu(true)}><HiDotsVertical /></div>
+        {
+          showEditMenu ?
+            <div className="absolute bottom-0 right-0 bg-white shadow-lg flex flex-col items-center w-[6rem] h-[3rem] border rounded-lg">
+              <button className=" absolute left-[-1.5rem] top-[-2rem]  bottom-2 text-indigo-600 hover:text-indigo-900" onClick={() => setShowEditMenu(false)} ><MdCancel className="text-2xl text-black" /></button>
+              <button className="  bottom-2 text-indigo-600 hover:text-indigo-900"  onClick={() => {
+                setBookData({
+                  id,
+                  title,
+                  author,
+                  category,
+                  classLevel,
+                  copies,
+                  available,
+                  coverImageUrl,
+                  
+                });
+                handleSidebarOpen();
+              }}>Edit </button>
+              <button className=" bottom-2 text-indigo-600 hover:text-indigo-900 " onClick={DeleteBook}>Delete</button>
+            </div> : null
+        }
 
       </div>
 
- 
+      <Sidebar
+        isOpen={isSidebarOpen}
+        onClose={handleSidebarClose}
+        title="Edit Book"
+
+      >
+        <EditBook
+        data={bookData} 
+        onupdate= {onupdate}
+        />
+      </Sidebar>
     </div>
   );
 };
