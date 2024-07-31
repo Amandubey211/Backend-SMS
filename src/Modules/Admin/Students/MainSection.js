@@ -7,7 +7,7 @@ import StudentGradeModal from "../Subjects/Modules/Grades/StudentGradeViewModal/
 import { useParams } from "react-router-dom";
 import useGetStudentsByClassAndSection from "../../../Hooks/AuthHooks/Staff/Admin/Students/useGetStudentsByClassAndSection";
 import Spinner from "../../../Components/Common/Spinner";
-
+import { FaUsers } from "react-icons/fa";
 const MainSection = () => {
   const [activeSection, setActiveSection] = useState("Everyone");
   const [isModalOpen, setIsModalOpen] = useState(false);
