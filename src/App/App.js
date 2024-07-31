@@ -102,13 +102,6 @@ const StudentAttendance = lazy(() => import("../Modules/Student/Attendance/Atten
 const Dash = lazy(() => import("../Modules/Admin/Dashboard/Dash.js"));
 
 function App() {
-  const  {userDetail} = useGetUserDetail();
-  useEffect(() => {
-    const getData = async () => {
-      await userDetail();
-    };
-    getData();
-  }, []);
  
   const [isOnline, setIsOnline] = useState(window.navigator.onLine);
   useFirebaseMessaging();
