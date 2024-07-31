@@ -7,27 +7,44 @@ import { setSelectedSubject } from "../../../../Redux/Slices/Common/CommonSlice"
 import Icon1 from "../../../../Assets/ClassesAssets/SubClassAssets/SubjectIcons/image1.png";
 import { MdOutlineModeEdit } from "react-icons/md";
 import toast from "react-hot-toast";
+import { RiDeleteBin6Line } from "react-icons/ri";
+import useCreateSubject from "../../../../Hooks/AuthHooks/Staff/Admin/useCreateSubject";
 
-const SubjectCard = ({ data, backgroundColor, Class }) => {
+const SubjectCard = ({ data, backgroundColor, Class, onEdit, subjectId }) => {
   const dispatch = useDispatch();
+  const { deleteSubject, loading } = useCreateSubject();
+
+  const handleDelete = (subjectId, Class) => {
+    deleteSubject(subjectId, Class)
+  };
+
 
   return (
     <div
       className={`relative rounded-xl p-4 shadow-lg ${backgroundColor} transition-transform duration-300 transform hover:scale-105 hover:shadow-2xl group`}
     >
-      <div
-        onClick={() => toast.success("No Figma Design ")}
-        className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-      >
-        <MdOutlineModeEdit className="text-green-800  bg-green-50 p-1 text-3xl rounded-full cursor-pointer" />
+      <div className="absolute top-2 right-2 flex flex-col space-y-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        <button
+          onClick={() => onEdit(data)}
+          className="bg-white p-1 rounded-full shadow hover:bg-gray-200"
+        >
+          <MdOutlineModeEdit className="text-green-800 bg-green-50 p-1 text-3xl rounded-full cursor-pointer" />
+        </button>
+        <button
+          className="bg-white p-1 rounded-full shadow hover:bg-gray-200"
+          disabled={loading}
+          aria-busy={loading ? "true" : "false"}
+          onClick={() => handleDelete(subjectId, Class)}
+        >
+          <RiDeleteBin6Line className="text-red-800 bg-red-50 p-1 text-3xl rounded-full cursor-pointer" />
+        </button>
       </div>
       <div className="flex justify-between items-center mb-4">
         <button
-          className={`border border-white rounded-full px-4 py-1 ${
-            data.isPublished
-              ? "text-green-600 bg-green-100"
-              : "bg-pink-50 text-gray-600"
-          }`}
+          className={`border border-white rounded-full px-4 py-1 ${data.isPublished
+            ? "text-green-600 bg-green-100"
+            : "bg-pink-50 text-gray-600"
+            }`}
         >
           {data.isPublished ? "Publish" : "Unpublished"}
         </button>
@@ -43,7 +60,7 @@ const SubjectCard = ({ data, backgroundColor, Class }) => {
         <div className="flex items-center mt-2 text-white">
           <span className="flex items-center mr-2 gap-1">
             <LuUser />
-            <span>{data.studentsIds ? data.studentsIds.length :0}</span>
+            <span>{data.studentsIds ? data.studentsIds.length : 0}</span>
           </span>
           <span className="border-r-2 border-white h-5 mr-2"></span>
           <span className="flex items-center gap-1">

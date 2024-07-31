@@ -269,7 +269,6 @@ const Dash = lazy(() => import("../Modules/Admin/Dashboard/Dash.js"));
 
 function App() {
 
-
   const [isOnline, setIsOnline] = useState(window.navigator.onLine);
   useFirebaseMessaging();
 

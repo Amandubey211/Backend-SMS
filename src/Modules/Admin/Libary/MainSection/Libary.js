@@ -18,22 +18,22 @@ const Library = () => {
   const [books, setBooks] = useState([]);
   const role = useSelector((store) => store.Auth.role);
   const token = localStorage.getItem(`${role}:token`);
-
-  useEffect(() => {
-    const fetchBooks = async () => {
-      try {
-        const response = await axios.get(`${baseUrl}/admin/all/book`, {
-          headers: {
-            Authentication: `${token}`,
-          },
-        });
-        if (response.data.success) {
-          setBooks(response.data.books);
-        }
-      } catch (error) {
-        console.error("Error fetching books:", error);
+  const fetchBooks = async () => {
+    try {
+      const response = await axios.get(`${baseUrl}/admin/all/book`, {
+        headers: {
+          Authentication: `${token}`,
+        },
+      });
+      if (response.data.success) {
+        setBooks(response.data.books);
       }
-    };
+    } catch (error) {
+      console.error("Error fetching books:", error);
+    }
+  };
+  useEffect(() => {
+    
     fetchBooks();
   }, [token]);
 
@@ -46,7 +46,7 @@ const Library = () => {
   const handleSidebarClose = () => setSidebarOpen(false);
 
   const classLevels = useMemo(() => {
-    const levels = books.map((book) => book.classId.className);
+    const levels = books.map((book) => book?.classId?.className);
     return Array.from(new Set(levels));
   }, [books]);
 
@@ -116,13 +116,15 @@ const Library = () => {
                 {filteredBooks.map((book) => (
                   <BookCard
                     key={book._id}
+                    id={book._id}
                     title={book.name}
                     author={book.author}
                     category={book.category}
-                    classLevel={book.classId.className}
+                    classLevel={book?.classId?.className}
                     copies={book.copies}
                     available={book.copies}
                     coverImageUrl={book.image}
+                    onupdate = {fetchBooks}
                   />
                 ))}
               </div>
@@ -134,7 +136,7 @@ const Library = () => {
             onClose={handleSidebarClose}
             title="Add New Book"
           >
-            <AddBook />
+            <AddBook onupdate={fetchBooks} />
           </Sidebar>
         </div>
       </DashLayout>

@@ -5,7 +5,8 @@ import FormSelect from "../../../Accounting/subClass/component/FormSelect";
 import { baseUrl } from "../../../../../config/Common";
 import { useSelector } from "react-redux";
 import useGetAllClasses from "../../../../../Hooks/AuthHooks/Staff/Admin/Class/useGetAllClasses";
-const AddBook = () => {
+import toast from "react-hot-toast";
+const AddBook = ({onupdate}) => {
   const [imagePreview, setImagePreview] = useState(null);
   const {classList} = useSelector((store)=>store.Class);
 
@@ -88,7 +89,8 @@ const AddBook = () => {
       }
 
       const result = await response.json();
-      console.log("Book added successfully:", result);
+      toast.success("Book added successfully:", result);
+      onupdate()
     } catch (error) {
       console.error("Error adding book:", error);
     }

@@ -30,6 +30,7 @@ const ClassCard = ({
   const handleSidebarOpen = () => setSidebarOpen(true);
   const handleSidebarClose = () => setSidebarOpen(false);
 
+
   const handleDeleteClick = () => {
     setModalOpen(true);
   };
@@ -39,6 +40,7 @@ const ClassCard = ({
     deleteClass(classId);
     toast.success(`${className} deleted successfully!`);
   };
+
 
   const handleCloseModal = () => {
     setModalOpen(false);
