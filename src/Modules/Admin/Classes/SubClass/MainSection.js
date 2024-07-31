@@ -10,6 +10,7 @@ import { SlEyeglass } from "react-icons/sl";
 import { FcGraduationCap, FcCalendar } from "react-icons/fc";
 import { useSelector } from "react-redux";
 import useGetClassDetails from "../../../../Hooks/AuthHooks/Staff/Admin/Class/usegetClassDetails";
+import { RiDeleteBin6Line } from "react-icons/ri";
 
 const colors = [
   "bg-yellow-300",
@@ -27,6 +28,7 @@ const getColor = (index) => {
 const MainSection = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedTab, setSelectedTab] = useState("Published");
+  const [editSubject, setEditSubject] = useState(null); // New state for editing
   const classDetails = useSelector((store) => store.Class.class);
 
   const { fetchClassDetails } = useGetClassDetails();
@@ -58,18 +60,21 @@ const MainSection = () => {
 
   // Update static icon data with dynamic details if classDetails is available
   if (classDetails) {
-    staticIconData[0].text = `${
-      classDetails?.teachersIds?.length || 0
-    } Instructor Assigned`;
-    staticIconData[1].text = `${
-      classDetails?.sections?.length || 0
-    } Section | ${classDetails?.groups?.length || 0} Groups`;
-    staticIconData[2].text = `${
-      classDetails?.studentsIds?.length || 0
-    } Students`;
+    staticIconData[0].text = `${classDetails?.teachersIds?.length || 0
+      } Instructor Assigned`;
+    staticIconData[1].text = `${classDetails?.sections?.length || 0
+      } Section | ${classDetails?.groups?.length || 0} Groups`;
+    staticIconData[2].text = `${classDetails?.studentsIds?.length || 0
+      } Students`;
   }
 
   const handleAddNewSubject = () => {
+    setEditSubject(null); // Reset edit state when adding a new subject
+    setIsSidebarOpen(true);
+  };
+
+  const handleEditSubject = (subject) => {
+    setEditSubject(subject); // Set the subject to be edited
     setIsSidebarOpen(true);
   };
 
@@ -80,10 +85,10 @@ const MainSection = () => {
   const filteredSubjects =
     classDetails && classDetails.subjects
       ? classDetails.subjects.filter((subject) =>
-          selectedTab === "Published"
-            ? subject.isPublished
-            : !subject.isPublished
-        )
+        selectedTab === "Published"
+          ? subject.isPublished
+          : !subject.isPublished
+      )
       : [];
 
   return (
@@ -111,7 +116,9 @@ const MainSection = () => {
                 key={index}
                 data={subject}
                 Class={cid}
+                subjectId={subject._id}
                 backgroundColor={getColor(index)}
+                onEdit={handleEditSubject}
               />
             ))
           ) : (
@@ -122,11 +129,11 @@ const MainSection = () => {
         </div>
       </div>
       <Sidebar
-        title="Add New Subject"
+        title={editSubject ? "Edit Subject" : "Add New Subject"}
         isOpen={isSidebarOpen}
         onClose={handleCloseSidebar}
       >
-        <AddNewSubject />
+        <AddNewSubject subject={editSubject} onClose={handleCloseSidebar}/>
       </Sidebar>
     </>
   );

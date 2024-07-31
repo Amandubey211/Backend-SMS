@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import AssignmentDetail from '../../../Component/AssignmentDetail';
 import DateDetail from '../../../Component/DateDetail';
-import SidebarSlide from '../../../../../../../Components/Common/SidebarSlide'; // Import SidebarSlide
-import SelectedQuestionCard from './SelectedQuestionCard'; // Import SelectedQuestionCard to display questions
+import SidebarSlide from '../../../../../../../Components/Common/SidebarSlide';
+import SelectedQuestionCard from './SelectedQuestionCard';
 import { baseUrl } from '../../../../../../../config/Common';
 
 const QuizResultSummary = ({ totalPoints, correctAnswers, wrongAnswers, quizId }) => {
@@ -123,4 +123,4 @@ const QuizResultSummary = ({ totalPoints, correctAnswers, wrongAnswers, quizId }
   );
 };
 
-export default QuizResultSummary;
+export default React.memo(QuizResultSummary);

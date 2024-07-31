@@ -1,5 +1,3 @@
-
-
 import React, { useEffect } from "react";
 import { CiMail, CiSearch } from "react-icons/ci";
 import { TbBell } from "react-icons/tb";
@@ -9,7 +7,7 @@ import { FaArrowRightArrowLeft } from "react-icons/fa6";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import AvatarsList from "./AvataList";
-import useGetUserDetail from "../../Hooks/AuthHooks/Staff/useGetUserDetail";
+// import useGetUserDetail from "../../Hooks/AuthHooks/Staff/useGetUserDetail";
 
 const IconButton = ({ icon: Icon, label }) => (
   <button aria-label={label}>
@@ -61,17 +59,17 @@ const SearchBar = () => (
   </div>
 );
 
-const StudentViewButton = () => (
-  <button
-    className="flex mr-3 items-center space-x-2 bg-gradient-to-r from-purple-100 to-pink-100 text-white py-1 px-3 rounded-full"
-    aria-label="Switch to Student View"
-  >
-    <div className="w-7 h-7 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
-      <FaArrowRightArrowLeft aria-hidden="true" />
-    </div>
-    <span className="text-sm text-gradient font-medium">Student View</span>
-  </button>
-);
+// const StudentViewButton = () => (
+//   <button
+//     className="flex mr-3 items-center space-x-2 bg-gradient-to-r from-purple-100 to-pink-100 text-white py-1 px-3 rounded-full"
+//     aria-label="Switch to Student View"
+//   >
+//     <div className="w-7 h-7 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
+//       <FaArrowRightArrowLeft aria-hidden="true" />
+//     </div>
+//     <span className="text-sm text-gradient font-medium">Student View</span>
+//   </button>
+// );
 
 const Navbar = ({ hideSearchbar, hideAvatarList, hideStudentView }) => {
   const leftHeading = useSelector(

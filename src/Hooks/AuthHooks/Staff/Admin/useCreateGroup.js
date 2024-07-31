@@ -18,6 +18,7 @@ const useCreateGroup = () => {
       const { data } = await axios.post(`${baseUrl}/admin/group`, groupData, {
         headers: { Authentication: token },
       });
+      toast.success("Group added successfully!");
     } catch (err) {
       setError(err.response?.data?.message || err.message);
     } finally {
@@ -46,7 +47,7 @@ const useCreateGroup = () => {
     setError(null); // Reset error state before new request
     try {
       const token = localStorage.getItem(`${role}:token`); // Replace with your actual token key
-      const { data } = await axios.delete(`${baseUrl}/admin/group/:${groupId}`, {
+      const { data } = await axios.delete(`${baseUrl}/admin/group/${groupId}`, {
         headers: { Authentication: token },
       });
       toast.success("Group deleted successfully!");

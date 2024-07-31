@@ -27,7 +27,7 @@ const ClassCard = ({
   const handleSidebarOpen = () => setSidebarOpen(true);
   const handleSidebarClose = () => setSidebarOpen(false);
 
-  const handleDelete = (clasId) => {
+  const handleDelete = (classId) => {
     deleteClass(classId)
 
   };
