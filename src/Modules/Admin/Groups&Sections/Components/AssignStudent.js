@@ -29,8 +29,8 @@ const AssignStudent = ({ name, imageUrl, section, studentId }) => {
   };
 
   // Compute all groups or the groups from a specific section
-  const groups = sectionId 
-    ? AllSections.find(section => section._id === sectionId)?.groups
+  const groups = sectionId
+    ? AllSections.find((section) => section._id === sectionId)?.groups
     : AllSections.reduce((acc, section) => acc.concat(section.groups), []);
 
   return (
@@ -44,13 +44,15 @@ const AssignStudent = ({ name, imageUrl, section, studentId }) => {
           />
           <div>
             <div className="text-sm font-medium">{name}</div>
-            <div className="text-xs text-gray-500">{section || "No Section Assigned"}</div>
+            <div className="text-xs text-gray-500">
+              {section || "No Section Assigned"}
+            </div>
           </div>
         </div>
       </div>
       <div className="mt-4">
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          Section Filter
+          Section
         </label>
         <select
           value={sectionId}
@@ -88,7 +90,9 @@ const AssignStudent = ({ name, imageUrl, section, studentId }) => {
         <button
           type="submit"
           className={`w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md ${
-            loading ? "opacity-50 cursor-not-allowed" : "hover:from-pink-600 hover:to-purple-600"
+            loading
+              ? "opacity-50 cursor-not-allowed"
+              : "hover:from-pink-600 hover:to-purple-600"
           }`}
           disabled={loading}
         >

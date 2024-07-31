@@ -18,7 +18,6 @@ const useFetchStudentGrades = () => {
     attendance: 0,
   });
 
-  
   const { role } = useSelector((store) => store.Auth);
   const { sid, cid } = useParams();
 
@@ -65,13 +64,11 @@ const useFetchStudentGrades = () => {
             attendance: response.data.attendance,
           });
         } else {
-          toast.error("Failed to fetch grades");
           setError("Failed to fetch grades");
         }
       } catch (err) {
         const errorMessage =
           err.response?.data?.message || "Error fetching grades";
-        toast.error(errorMessage);
         setError(errorMessage);
       } finally {
         setLoading(false);

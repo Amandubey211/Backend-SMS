@@ -7,16 +7,18 @@ import useGetStudentsByClassAndSection from "../../../../Hooks/AuthHooks/Staff/A
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 
-const AddGroup = ({ group, isUpdate, groupId, onClose, fetchGroups}) => {
+const AddGroup = ({ group, isUpdate, groupId, onClose, fetchGroups }) => {
   const [groupName, setGroupName] = useState(group?.groupName || "");
   const [seatLimit, setSeatLimit] = useState(group?.seatLimit || "");
   const [students, setStudents] = useState([]);
-  const [selectedStudents, setSelectedStudents] = useState(group?.students || []);
+  const [selectedStudents, setSelectedStudents] = useState(
+    group?.students || []
+  );
   const [leader, setLeader] = useState(group?.leader || null);
   const [sectionId, setSectionId] = useState(group?.sectionId || "");
   const [isDropdownOpen, setDropdownOpen] = useState(false);
 
-  const AllSections = useSelector((store) => store.Class.sectionsList);
+  const allSections = useSelector((store) => store.Class.sectionsList);
   const { createGroup, updateGroup, loading, error } = useCreateGroup();
   const { fetchStudentsByClassAndSection } = useGetStudentsByClassAndSection();
   const { cid } = useParams();
@@ -89,7 +91,7 @@ const AddGroup = ({ group, isUpdate, groupId, onClose, fetchGroups}) => {
     try {
       if (isUpdate) {
         await updateGroup(formData, groupId);
-        fetchGroups()
+        fetchGroups();
         onClose();
       } else {
         await createGroup(formData);
@@ -105,7 +107,8 @@ const AddGroup = ({ group, isUpdate, groupId, onClose, fetchGroups}) => {
     }
   };
 
-  const toggleDropdown = () => {
+  const toggleDropdown = (e) => {
+    e.stopPropagation(); // Prevent form submission
     setDropdownOpen(!isDropdownOpen);
   };
 
@@ -120,7 +123,7 @@ const AddGroup = ({ group, isUpdate, groupId, onClose, fetchGroups}) => {
             <h2 className="text-lg font-semibold">
               {isUpdate ? "Update Group" : "Add New Group"}
             </h2>
-            <button onClick={onClose}>
+            <button type="button" onClick={onClose} aria-label="Close modal">
               <FaTimes className="text-gray-500" />
             </button>
           </div>
@@ -152,9 +155,10 @@ const AddGroup = ({ group, isUpdate, groupId, onClose, fetchGroups}) => {
               onChange={(e) => setSectionId(e.target.value)}
               className="block w-full p-2 border border-gray-300 rounded-lg transition duration-300"
               disabled={loading}
+              aria-label="Select Section"
             >
               <option value="">Choose</option>
-              {AllSections.map((section) => (
+              {allSections.map((section) => (
                 <option key={section._id} value={section._id}>
                   {section.sectionName}
                 </option>
@@ -176,6 +180,7 @@ const AddGroup = ({ group, isUpdate, groupId, onClose, fetchGroups}) => {
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition duration-300"
               placeholder="50"
               required
+              aria-label="Seat Limit"
             />
           </div>
           <div className="relative w-full">
@@ -195,26 +200,41 @@ const AddGroup = ({ group, isUpdate, groupId, onClose, fetchGroups}) => {
                   <span className="truncate">
                     {student.firstName} {student.lastName}
                   </span>
-                  <button onClick={() => handleRemoveStudent(student._id)}>
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveStudent(student._id)}
+                    aria-label={`Remove ${student.firstName} ${student.lastName}`}
+                  >
                     <FaTimes className="w-4 h-4" />
                   </button>
                 </div>
               ))}
               <button
                 id="student-selector"
+                type="button"
                 onClick={toggleDropdown}
                 className="ml-auto flex items-center px-2 py-1"
+                aria-label="Select Students"
               >
                 <FaChevronDown className="w-4 h-4" />
               </button>
             </div>
             {isDropdownOpen && (
-              <div className="absolute mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg z-10">
+              <div
+                className="absolute mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg z-10"
+                role="listbox"
+                aria-labelledby="student-selector"
+              >
                 {students.map((student) => (
                   <button
                     key={student._id}
+                    type="button"
                     onClick={() => handleStudentSelect(student._id)}
                     className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                    role="option"
+                    aria-selected={selectedStudents.some(
+                      (s) => s._id === student._id
+                    )}
                   >
                     {student.firstName} {student.lastName}
                   </button>
@@ -233,8 +253,10 @@ const AddGroup = ({ group, isUpdate, groupId, onClose, fetchGroups}) => {
                   {leader.firstName} {leader.lastName}
                 </span>
                 <button
+                  type="button"
                   onClick={handleRemoveLeader}
                   className="p-1 text-xl font-bold"
+                  aria-label="Remove Leader"
                 >
                   &times;
                 </button>
@@ -250,6 +272,8 @@ const AddGroup = ({ group, isUpdate, groupId, onClose, fetchGroups}) => {
                       : ""
                   }`}
                   onClick={() => handleLeaderClick(student)}
+                  role="button"
+                  aria-pressed={leader && leader._id === student._id}
                 >
                   {student.firstName} {student.lastName}
                 </div>
@@ -263,6 +287,9 @@ const AddGroup = ({ group, isUpdate, groupId, onClose, fetchGroups}) => {
           type="submit"
           className="w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600 transition duration-300 transform"
           disabled={loading}
+          aria-label={
+            loading ? "Saving..." : isUpdate ? "Update Group" : "Add Group"
+          }
         >
           {loading ? "Saving..." : isUpdate ? "Update Group" : "Add Group"}
         </button>
@@ -270,7 +297,6 @@ const AddGroup = ({ group, isUpdate, groupId, onClose, fetchGroups}) => {
       {error && <p className="text-red-500 text-center">{error}</p>}
     </form>
   );
-  
 };
 
-export default AddGroup;
+export default React.memo(AddGroup);
