@@ -11,6 +11,7 @@ import {
   FaTrashAlt,
 } from "react-icons/fa";
 import useDeleteModule from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useDeleteModule";
+import toast from "react-hot-toast";
 
 const ModuleCard = ({
   title,
@@ -21,6 +22,7 @@ const ModuleCard = ({
   onSelect,
   onEdit,
   onMove,
+  onDelete,
   moduleId,
 }) => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -38,9 +40,10 @@ const ModuleCard = ({
     }
   };
 
-  const handleDelete = (e) => {
+  const handleDelete = async (e) => {
     e.stopPropagation();
-    deleteModule(moduleId);
+    await deleteModule(moduleId);
+    onDelete();
   };
 
   useEffect(() => {
@@ -52,7 +55,7 @@ const ModuleCard = ({
 
   return (
     <div
-      className={`relative mb-4 border  ${isSelected ?  " border-2 border-rose-400" : ""} bg-white rounded-lg cursor-pointer`}
+      className={`relative mb-4 border ${isSelected ? "border-2 border-rose-400" : ""} bg-white rounded-lg cursor-pointer`}
       onClick={onSelect}
     >
       <img
@@ -88,22 +91,60 @@ const ModuleCard = ({
           className="absolute top-12 right-4 bg-white border rounded-lg shadow-lg w-48 z-10"
         >
           <ul className="py-2">
-            <li className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick={(e) => { e.stopPropagation(); onEdit({ _id: moduleId, name: title, chapters: [] }); setMenuOpen(false); }}>
+            <li
+              className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
+              onClick={(e) => {
+                e.stopPropagation();
+                onEdit();
+                setMenuOpen(false);
+              }}
+            >
               <FaPen className="mr-2" /> Edit
             </li>
-            <li className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick={(e) => { e.stopPropagation(); onMove(); setMenuOpen(false); }}>
+            <li
+              className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
+              onClick={(e) => {
+                e.stopPropagation();
+                onMove();
+                setMenuOpen(false);
+              }}
+            >
               <FaArrowRight className="mr-2" /> Move to...
             </li>
-            <li className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
+            <li
+              className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
+              onClick={(e) => {
+                e.stopPropagation();
+                toast.success('Duplicated');
+                setMenuOpen(false);
+              }}
+            >
               <FaCopy className="mr-2" /> Duplicate
             </li>
-            <li className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
+            <li
+              className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
+              onClick={(e) => {
+                e.stopPropagation();
+                toast.success('Increased indent');
+                setMenuOpen(false);
+              }}
+            >
               <FaIndent className="mr-2" /> Increase indent
             </li>
-            <li className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
+            <li
+              className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
+              onClick={(e) => {
+                e.stopPropagation();
+                toast.success('Shared to Commons');
+                setMenuOpen(false);
+              }}
+            >
               <FaShareAlt className="mr-2" /> Share to Commons
             </li>
-            <li className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick={handleDelete}>
+            <li
+              className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
+              onClick={handleDelete}
+            >
               <FaTrashAlt className="mr-2" /> Remove
             </li>
           </ul>

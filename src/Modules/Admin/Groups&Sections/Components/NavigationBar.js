@@ -1,10 +1,11 @@
 import React, { useState, lazy, Suspense } from "react";
 import Sidebar from "../../../../Components/Common/Sidebar";
 import { useSelector } from "react-redux";
-import { toast } from "react-hot-toast";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import useDeleteSection from "../../../../Hooks/AuthHooks/Staff/Admin/Sections/useDeleteSection";
 import { PiSpinner } from "react-icons/pi";
+import useDeleteModal from "../../../../Hooks/CommonHooks/useDeleteModal";
+import DeleteModal from "../../../../Components/Common/DeleteModal";
 
 const AddGroup = lazy(() => import("./AddGroup"));
 const AddSection = lazy(() => import("./AddSection"));
@@ -17,12 +18,17 @@ const NavigationBar = ({ onSectionChange, selectedSection }) => {
 
   const { deleteSection, loading } = useDeleteSection();
 
+  const { isModalOpen, modalData, openModal, closeModal } = useDeleteModal(); // Use the custom hook
+
   const openAddGroupSidebar = () => setSidebarType("addGroup");
   const openAddSectionSidebar = () => setSidebarType("addSection");
   const closeSidebar = () => setSidebarType(null);
 
-  const handleDeleteClick = async (id) => {
-    await deleteSection(id);
+  const handleDeleteConfirm = async () => {
+    if (modalData) {
+      await deleteSection(modalData._id);
+      closeModal();
+    }
   };
 
   const handleSectionChange = (section, sectionId) => {
@@ -62,7 +68,7 @@ const NavigationBar = ({ onSectionChange, selectedSection }) => {
                     <RiDeleteBin5Line
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleDeleteClick(item._id);
+                        openModal(item);
                       }}
                     />
                   )}
@@ -107,6 +113,13 @@ const NavigationBar = ({ onSectionChange, selectedSection }) => {
           <AddGroup />
         </Suspense>
       </Sidebar>
+
+      <DeleteModal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        onConfirm={handleDeleteConfirm}
+        title={modalData?.sectionName || ""}
+      />
     </>
   );
 };

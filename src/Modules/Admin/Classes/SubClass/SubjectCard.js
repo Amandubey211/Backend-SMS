@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { LuUser } from "react-icons/lu";
 import { BsBook } from "react-icons/bs";
 import { NavLink } from "react-router-dom";
@@ -6,18 +6,32 @@ import { useDispatch } from "react-redux";
 import { setSelectedSubject } from "../../../../Redux/Slices/Common/CommonSlice";
 import Icon1 from "../../../../Assets/ClassesAssets/SubClassAssets/SubjectIcons/image1.png";
 import { MdOutlineModeEdit } from "react-icons/md";
-import toast from "react-hot-toast";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import useCreateSubject from "../../../../Hooks/AuthHooks/Staff/Admin/useCreateSubject";
+import DeleteModal from "../../../../Components/Common/DeleteModal";
 
 const SubjectCard = ({ data, backgroundColor, Class, onEdit, subjectId }) => {
   const dispatch = useDispatch();
   const { deleteSubject, loading } = useCreateSubject();
 
-  const handleDelete = (subjectId, Class) => {
-    deleteSubject(subjectId, Class)
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleDelete = async () => {
+    try {
+      await deleteSubject(subjectId, Class);
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error("Error deleting subject:", error);
+    }
   };
 
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
 
   return (
     <div
@@ -34,17 +48,18 @@ const SubjectCard = ({ data, backgroundColor, Class, onEdit, subjectId }) => {
           className="bg-white p-1 rounded-full shadow hover:bg-gray-200"
           disabled={loading}
           aria-busy={loading ? "true" : "false"}
-          onClick={() => handleDelete(subjectId, Class)}
+          onClick={openModal}
         >
           <RiDeleteBin6Line className="text-red-800 bg-red-50 p-1 text-3xl rounded-full cursor-pointer" />
         </button>
       </div>
       <div className="flex justify-between items-center mb-4">
         <button
-          className={`border border-white rounded-full px-4 py-1 ${data.isPublished
-            ? "text-green-600 bg-green-100"
-            : "bg-pink-50 text-gray-600"
-            }`}
+          className={`border border-white rounded-full px-4 py-1 ${
+            data.isPublished
+              ? "text-green-600 bg-green-100"
+              : "bg-pink-50 text-gray-600"
+          }`}
         >
           {data.isPublished ? "Publish" : "Unpublished"}
         </button>
@@ -89,6 +104,12 @@ const SubjectCard = ({ data, backgroundColor, Class, onEdit, subjectId }) => {
         src={data.icon || Icon1}
         alt="icon"
         className="absolute bottom-6 right-6 h-28 transition-transform duration-300 transform hover:scale-110"
+      />
+      <DeleteModal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        onConfirm={handleDelete}
+        title={data.name}
       />
     </div>
   );

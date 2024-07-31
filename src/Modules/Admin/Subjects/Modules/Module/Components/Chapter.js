@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import {
-  FaPlus,
   FaEllipsisV,
   FaChevronDown,
   FaChevronUp,
+  FaPen,
+  FaTrashAlt,
 } from "react-icons/fa";
 import ChapterItem from "./ChapterItem";
 
@@ -15,17 +16,15 @@ const Chapter = ({
   quizzes,
   isExpanded,
   onToggle,
+  onDelete,
+  onEdit,
 }) => {
-  const combinedItems = [
-    ...assignments.map((assignment) => ({
-      ...assignment,
-      type: "assignment",
-    })),
-    ...quizzes.map((quiz) => ({
-      ...quiz,
-      type: "quiz",
-    })),
-  ];
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const toggleMenu = (e) => {
+    e.stopPropagation();
+    setMenuOpen(!menuOpen);
+  };
 
   return (
     <div className="mb-4 p-1 bg-white rounded-lg border-b">
@@ -42,34 +41,63 @@ const Chapter = ({
           </div>
         </div>
         <div className="flex items-center space-x-2">
-          {/* <button className="border p-2 rounded-full hover:bg-gray-50">
-            <FaPlus className="text-pink-500" />
-          </button> */}
-          <button className="border p-2 rounded-full hover:bg-gray-50">
+          <button className="border p-2 rounded-full hover:bg-gray-50" onClick={toggleMenu}>
             <FaEllipsisV />
           </button>
-          <button
-            className="border p-2 rounded-full hover:bg-gray-50"
-            onClick={onToggle}
-          >
+          <button className="border p-2 rounded-full hover:bg-gray-50" onClick={onToggle}>
             {isExpanded ? <FaChevronUp /> : <FaChevronDown />}
           </button>
         </div>
       </div>
+      {menuOpen && (
+        <div className="absolute right-4 bg-white border rounded-lg shadow-lg w-48 z-10">
+          <ul className="py-2">
+            <li
+              className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
+              onClick={(e) => {
+                e.stopPropagation();
+                onEdit();
+                setMenuOpen(false);
+              }}
+            >
+              <FaPen className="mr-2" /> Edit
+            </li>
+            <li
+              className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete();
+                setMenuOpen(false);
+              }}
+            >
+              <FaTrashAlt className="mr-2" /> Delete
+            </li>
+          </ul>
+        </div>
+      )}
       {isExpanded && (
         <div className="ml-10 py-2">
-          {combinedItems.length > 0 ? (
-            combinedItems.map((item, index) => (
-              <ChapterItem
-                key={index}
-                type={item.type}
-                title={item.name}
-                id={item._id}
-                isPublished={item.isPublished}
-                // isPublished={index/2 == 0 ? true:false}
-
-              />
-            ))
+          {assignments.length || quizzes.length ? (
+            <>
+              {assignments.map((assignment, index) => (
+                <ChapterItem
+                  key={index}
+                  type="assignment"
+                  title={assignment.name}
+                  id={assignment._id}
+                  isPublished={assignment.isPublished}
+                />
+              ))}
+              {quizzes.map((quiz, index) => (
+                <ChapterItem
+                  key={index}
+                  type="quiz"
+                  title={quiz.name}
+                  id={quiz._id}
+                  isPublished={quiz.isPublished}
+                />
+              ))}
+            </>
           ) : (
             <p className="py-2 bg-gray-50 italic text-gray-500 text-center">
               No Data found

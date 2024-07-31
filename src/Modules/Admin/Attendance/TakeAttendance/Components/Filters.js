@@ -14,6 +14,7 @@ const Filters = ({ filters, onFilterChange }) => {
   const AllSections = useSelector((store) => store.Class.sectionsList);
   const { cid } = useParams();
   const { fetchSection } = useFetchSection();
+  const className = useSelector((store) => store.Common.selectedClass);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -57,7 +58,7 @@ const Filters = ({ filters, onFilterChange }) => {
       <div className="flex flex-col">
         <label className="text-gray-600 mb-1">Class</label>
         <select className="border rounded p-2 w-56">
-          <option>Select Class</option>
+          <option>{className}</option>
         </select>
       </div>
       <div className="flex flex-col">

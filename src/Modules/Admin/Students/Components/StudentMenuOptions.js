@@ -10,12 +10,13 @@ import { MdOutlineModeEditOutline } from "react-icons/md";
 import { RiDeleteBin2Line } from "react-icons/ri";
 import { TfiStatsUp } from "react-icons/tfi";
 
-const SidebarMenu = ({ studentId, onSeeGradeClick }) => {
+const StudentMenuOptions = ({ studentId, onSeeGradeClick }) => {
   const [showMenu, setShowMenu] = useState(null);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarContent, setSidebarContent] = useState(null);
   const [sidebarTitle, setSidebarTitle] = useState("");
   const menuRef = useRef(null);
+  const buttonRef = useRef(null);
 
   const toggleMenu = useCallback(
     (index) => {
@@ -25,7 +26,11 @@ const SidebarMenu = ({ studentId, onSeeGradeClick }) => {
   );
 
   const handleClickOutside = useCallback((event) => {
-    if (menuRef.current && !menuRef.current.contains(event.target)) {
+    if (
+      menuRef.current &&
+      !menuRef.current.contains(event.target) &&
+      !buttonRef.current.contains(event.target)
+    ) {
       setShowMenu(null);
     }
   }, []);
@@ -37,17 +42,20 @@ const SidebarMenu = ({ studentId, onSeeGradeClick }) => {
     };
   }, [handleClickOutside]);
 
-  const handleMenuItemClick = useCallback((action) => {
-    setShowMenu(null);
-    const sidebarComponents = {
-      "Promote Class": <PromoteClass studentId={studentId} />,
-      "Move to Section": <MoveToSection studentId={studentId} />,
-      "Edit Student": <EditStudent studentId={studentId} />,
-      "Delete Student": <DeleteStudent studentId={studentId} />,
-    };
+  const handleMenuItemClick = useCallback(
+    (action) => {
+      setShowMenu(null);
+      const sidebarComponents = {
+        "Promote Class": <PromoteClass studentId={studentId} />,
+        "Move to Section": <MoveToSection studentId={studentId} />,
+        "Edit Student": <EditStudent studentId={studentId} />,
+        "Delete Student": <DeleteStudent studentId={studentId} />,
+      };
 
-    handleSidebarOpen(action, sidebarComponents[action]);
-  }, [studentId]);
+      handleSidebarOpen(action, sidebarComponents[action]);
+    },
+    [studentId]
+  );
 
   const handleSidebarOpen = (title, content) => {
     setSidebarTitle(title);
@@ -63,13 +71,20 @@ const SidebarMenu = ({ studentId, onSeeGradeClick }) => {
 
   return (
     <>
-      <button onClick={() => toggleMenu(studentId)} className="p-2">
+      <button
+        ref={buttonRef}
+        onClick={() => toggleMenu(studentId)}
+        className="p-2"
+        aria-haspopup="true"
+        aria-expanded={showMenu === studentId}
+      >
         <HiOutlineDotsVertical />
       </button>
       {showMenu === studentId && (
         <div
           ref={menuRef}
-          className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg p-4 z-10 animate-fade-in"
+          className="absolute bg-white w-52 rounded-lg shadow-lg p-4 z-10"
+          style={{ right: 0 }}
         >
           <ul className="space-y-2">
             <MenuItem
@@ -110,10 +125,13 @@ const MenuItem = React.memo(({ icon, text, onClick }) => (
   <li
     className="flex items-center space-x-2 transition-transform duration-200 ease-in-out transform hover:translate-x-1 hover:bg-gray-100 p-2 rounded cursor-pointer"
     onClick={onClick}
+    role="menuitem"
+    tabIndex={0}
+    onKeyDown={(e) => e.key === "Enter" && onClick()}
   >
     {icon}
     <span>{text}</span>
   </li>
 ));
 
-export default SidebarMenu;
+export default StudentMenuOptions;

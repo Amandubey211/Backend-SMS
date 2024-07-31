@@ -61,7 +61,7 @@ const SideMenubar = () => {
           className="absolute bottom-0 right-0"
           aria-label="Toggle Sidebar"
         >
-          <div className="p-1 rounded-full text-purple-500 -mr-4 -mb-4 z-40 bg-white border-2">
+          <div className="p-1 rounded-full text-purple-500 -mr-7 -mb-4 z-40 bg-white border-2">
             {isOpen ? <IoIosArrowBack /> : <IoIosArrowForward />}
           </div>
         </button>

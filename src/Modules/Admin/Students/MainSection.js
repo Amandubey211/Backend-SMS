@@ -6,22 +6,28 @@ import { setStudentGrade } from "../../../Redux/Slices/AdminSlice";
 import StudentGradeModal from "../Subjects/Modules/Grades/StudentGradeViewModal/StudentGradeModal";
 import { useParams } from "react-router-dom";
 import useGetStudentsByClassAndSection from "../../../Hooks/AuthHooks/Staff/Admin/Students/useGetStudentsByClassAndSection";
+import Spinner from "../../../Components/Common/Spinner";
 
 const MainSection = () => {
   const [activeSection, setActiveSection] = useState("Everyone");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [students, setStudents] = useState([]);
   const dispatch = useDispatch();
-  const { fetchStudentsByClassAndSection } = useGetStudentsByClassAndSection();
+  const { fetchStudentsByClassAndSection, loading, error } =
+    useGetStudentsByClassAndSection();
   const { cid } = useParams();
 
-  const fetchStudents = useCallback(async (section) => {
-    const data = await fetchStudentsByClassAndSection(cid);
-    const filteredStudents = section === "Everyone"
-      ? data
-      : data.filter((student) => student.section === section);
-    setStudents(filteredStudents);
-  }, [cid, fetchStudentsByClassAndSection]);
+  const fetchStudents = useCallback(
+    async (section) => {
+      const data = await fetchStudentsByClassAndSection(cid);
+      setStudents(
+        section === "Everyone"
+          ? data
+          : data.filter((student) => student.section === section)
+      );
+    },
+    [cid, fetchStudentsByClassAndSection]
+  );
 
   useEffect(() => {
     fetchStudents(activeSection);
@@ -44,12 +50,23 @@ const MainSection = () => {
         activeSection={activeSection}
         totalStudents={students.length}
       />
-      <DetailedStudentList
-        activeSection={activeSection}
-        onSeeGradeClick={handleSeeGradeClick}
-        students={students}
-      />
-      <StudentGradeModal isOpen={isModalOpen} onClose={handleCloseModal}  />
+      {loading ? (
+        <div className="flex justify-center items-center h-64">
+          <Spinner />
+        </div>
+      ) : error ? (
+        <div className="flex flex-col items-center justify-center h-64 text-center text-gray-500">
+          <FaUsers className="text-6xl mb-4" />
+          <p className="italic">Error fetching students: {error.message}</p>
+        </div>
+      ) : (
+        <DetailedStudentList
+          activeSection={activeSection}
+          onSeeGradeClick={handleSeeGradeClick}
+          students={students}
+        />
+      )}
+      <StudentGradeModal isOpen={isModalOpen} onClose={handleCloseModal} />
     </div>
   );
 };

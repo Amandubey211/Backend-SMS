@@ -45,6 +45,7 @@ const NavigationBar = ({ setActiveSection, activeSection, totalStudents }) => {
         <button
           className={getButtonClass("Everyone")}
           onClick={() => handleSectionChange("Everyone")}
+          aria-pressed={activeSection === "Everyone"}
         >
           Everyone
         </button>
@@ -53,6 +54,7 @@ const NavigationBar = ({ setActiveSection, activeSection, totalStudents }) => {
             key={item.sectionName}
             className={getButtonClass(item.sectionName)}
             onClick={() => handleSectionChange(item.sectionName)}
+            aria-pressed={activeSection === item.sectionName}
           >
             {item.sectionName}
           </button>
