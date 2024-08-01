@@ -7,6 +7,8 @@ import SubjectSideBar from "../../Component/SubjectSideBar";
 import useGetRubricBySubjectId from "../../../../../Hooks/AuthHooks/Staff/Admin/Rubric/useGetRubricBySubjectId";
 import useDeleteRubric from "../../../../../Hooks/AuthHooks/Staff/Admin/Rubric/useDeleteRubric";
 import { useParams } from "react-router-dom";
+import Spinner from "../../../../../Components/Common/Spinner";
+import NoDataFound from "../../../../../Components/Common/NoDataFound"; // Import a placeholder component
 
 // Lazy load the AddRubricModal component
 const AddRubricModal = lazy(() => import("./Components/AddRubricModal"));
@@ -24,7 +26,6 @@ const MainSection = () => {
 
   useEffect(() => {
     fetchRubricBySubjectId(sid);
-    console.log(rubrics);
   }, [sid, fetchRubricBySubjectId]);
 
   const handleAddNewCriteria = (newCriteria) => {
@@ -64,22 +65,28 @@ const MainSection = () => {
       <SubjectSideBar />
       <div className="w-full p-3 border-l">
         <RubricHeader onAddRubric={() => setModalOpen(true)} />
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
-          {rubrics.map((rubric) => (
-            <RubricCard
-              key={rubric._id}
-              rubricId={rubric._id}
-              title={rubric.name}
-              criteria={rubric.criteria.length}
-              points={rubric.totalScore}
-              onDelete={() => handleDeleteRubric(rubric._id)} // Pass the delete function
-            />
-          ))}
-        </div>
-        <Suspense fallback={<div>Loading...</div>}>
+        {loading ? (
+          <Spinner />
+        ) : rubrics.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
+            {rubrics.map((rubric) => (
+              <RubricCard
+                key={rubric._id}
+                rubricId={rubric._id}
+                title={rubric.name}
+                criteria={rubric.criteria.length}
+                points={rubric.totalScore}
+                onDelete={() => handleDeleteRubric(rubric._id)} // Pass the delete function
+              />
+            ))}
+          </div>
+        ) : (
+          <NoDataFound title="Rubrics" />
+        )}
+        <Suspense fallback={<Spinner />}>
           {isModalOpen && (
             <AddRubricModal
-            type="assignment"
+              type="assignment"
               isOpen={isModalOpen}
               onClose={() => setModalOpen(false)}
               criteriaList={criteria}

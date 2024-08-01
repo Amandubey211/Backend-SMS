@@ -7,6 +7,7 @@ import QuizQuestions from "./Components/QuizQuestions";
 import QuestionDetailCard from "./Components/QuestionDetailCard";
 import useFetchQuizById from "../../../../../Hooks/AuthHooks/Staff/Admin/Quiz/useFetchQuizById";
 import { useParams } from "react-router-dom";
+import Spinner from "../../../../../Components/Common/Spinner";
 
 const MainSection = () => {
   const [activeTab, setActiveTab] = useState("instructions");
@@ -40,9 +41,9 @@ const MainSection = () => {
                 </Suspense>
               )}
               {activeTab === "questions" && (
-                <Suspense fallback={<div>Loading...</div>}>
+                <Suspense fallback={<Spinner />}>
                   {loading ? (
-                    <div>Loading...</div>
+                    <Spinner />
                   ) : (
                     <QuizQuestions questions={quiz?.questions} />
                   )}

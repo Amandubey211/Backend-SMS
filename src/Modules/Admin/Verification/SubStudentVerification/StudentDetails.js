@@ -25,6 +25,7 @@ const StudentDetail = () => {
 
   const student = unverifiedstudent.find((student) => student._id === sid);
   const [preview, setPreview] = useState(null);
+  const [previewType, setPreviewType] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
 
   const openModal = () => {
@@ -35,9 +36,10 @@ const StudentDetail = () => {
     setModalOpen(false);
   };
 
-  const handlePreviewClick = (url) => {
+  const handlePreviewClick = (url, type) => {
     if (url) {
       setPreview(url);
+      setPreviewType(type);
       openModal();
     } else {
       console.error("Invalid URL:", url);
@@ -77,11 +79,19 @@ const StudentDetail = () => {
                   index
                 )} p-4 border rounded-lg shadow-md transform transition-transform hover:scale-105`}
               >
-                <img
-                  src={doc?.documentUrl}
-                  alt={`Document ${index + 1}`}
-                  className="w-full h-40 object-cover mb-2 rounded-md"
-                />
+                {doc.documentType.startsWith("image/") ? (
+                  <img
+                    src={doc?.documentUrl}
+                    alt={`Document ${index + 1}`}
+                    className="w-full h-40 object-cover mb-2 rounded-md"
+                  />
+                ) : (
+                  <embed
+                    src={doc?.documentUrl}
+                    type={doc.documentType}
+                    className="w-full h-40 mb-2 rounded-md"
+                  />
+                )}
                 <div className="flex justify-between items-center">
                   <p className="text-white">
                     <span className="font-medium">Document {index + 1}:</span>{" "}
@@ -90,7 +100,7 @@ const StudentDetail = () => {
                   <button
                     title="Open Modal"
                     className="p-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-full shadow-lg hover:from-pink-600 hover:to-purple-600 transition-all duration-200"
-                    onClick={() => handlePreviewClick(doc?.documentUrl)}
+                    onClick={() => handlePreviewClick(doc?.documentUrl, doc.documentType)}
                   >
                     <AiOutlineEye size={20} />
                   </button>
@@ -114,11 +124,19 @@ const StudentDetail = () => {
             </button>
             <div>
               {preview ? (
-                <img
-                  src={preview}
-                  alt="Preview"
-                  className="max-h-[80vh] object-contain"
-                />
+                previewType.startsWith("image/") ? (
+                  <img
+                    src={preview}
+                    alt="Preview"
+                    className="max-h-[80vh] object-contain"
+                  />
+                ) : (
+                  <embed
+                    src={preview}
+                    type={previewType}
+                    className="w-full h-[80vh] object-contain"
+                  />
+                )
               ) : (
                 <p className="text-center text-gray-500">
                   No preview available

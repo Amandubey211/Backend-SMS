@@ -100,7 +100,7 @@ const MainSection = () => {
         dueDate: quiz.dueDate || "",
         availableFrom: quiz.availableFrom || "",
         lockQuestionsAfterAnswering: quiz.lockQuestionsAfterAnswering || "",
-        until: quiz.until || "",
+        until: quiz.until || "DD/MM/YY",
         timeLimit: quiz.timeLimit || "",
         moduleId: quiz.moduleId || null,
         chapterId: quiz.chapterId || null,
@@ -260,15 +260,13 @@ const MainSection = () => {
 
   return (
     <div className="flex flex-col w-full">
-      <CreateQuizHeader
-        onSave={handleSave}
-        isEditing={isEditing}
-      />
+      <CreateQuizHeader onSave={handleSave} isEditing={isEditing} />
 
       <div className="w-full flex">
         <div
-          className={` ${activeTab === "instructions" ? "w-[70%]" : "w-full"
-            } border-x`}
+          className={` ${
+            activeTab === "instructions" ? "w-[70%]" : "w-full"
+          } border-x`}
         >
           <Tabs
             createPage={true}

@@ -46,7 +46,11 @@ const useStudentLogin = () => {
         dispatch(setStudentId(data.userId));
         dispatch(setRole(data.role));
         dispatch(setUerDetails(data.user));
-        navigate("/student_dash");
+        if (data.userVerified) {
+          navigate("/student_dash");
+        } else {
+          navigate("/verify_qid");
+        }
 
         toast.success("Logged in successfully");
       } else {

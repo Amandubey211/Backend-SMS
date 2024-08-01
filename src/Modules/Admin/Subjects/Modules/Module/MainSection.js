@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import SubjectSideBar from "../../Component/SubjectSideBar";
 import Chapter from "./Components/Chapter";
@@ -10,9 +10,12 @@ import { setSelectedModule } from "../../../../../Redux/Slices/Common/CommonSlic
 import useGetModulesForStudent from "../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useGetModulesForStudent";
 import MoveModule from "./Components/MoveModule";
 import AddChapter from "./Components/AddChapter";
-import { FaExclamationTriangle, FaSpinner } from "react-icons/fa";
 import DeleteModal from "../../../../../Components/Common/DeleteModal";
 import toast from "react-hot-toast";
+import Spinner from "../../../../../Components/Common/Spinner";
+import NoDataFound from "../../../../../Components/Common/NoDataFound";
+import useAddModule from "../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useAddModule";
+import useDeleteModule from "../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useDeleteModule";
 
 const MainSection = () => {
   const [expandedChapters, setExpandedChapters] = useState([]);
@@ -21,10 +24,14 @@ const MainSection = () => {
   const [sidebarContent, setSidebarContent] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
+
   const dispatch = useDispatch();
   const selectedModule = useSelector((state) => state.Common.selectedModule);
   const { error, fetchModules, loading, modulesData } =
     useGetModulesForStudent();
+
+  const { addModule } = useAddModule(fetchModules);
+  const { deleteModule } = useDeleteModule(fetchModules);
 
   useEffect(() => {
     fetchModules();
@@ -98,12 +105,19 @@ const MainSection = () => {
   };
 
   const confirmDelete = async () => {
-    // Delete logic here
-    toast.success(`${deleteTarget.type} deleted successfully!`);
-    setIsDeleteModalOpen(false);
-    setDeleteTarget(null);
-    await fetchModules();
+    if (deleteTarget.type === "Module") {
+      const result = await deleteModule(deleteTarget.id);
+      if (result.success) {
+        toast.success(`${deleteTarget.type} deleted successfully!`);
+        setIsDeleteModalOpen(false); // Close the modal on successful deletion
+        setDeleteTarget(null);
+      }
+    }
   };
+
+  const handleModuleAdded = useCallback(() => {
+    fetchModules();
+  }, [fetchModules]);
 
   return (
     <div className="flex min-h-screen">
@@ -111,7 +125,7 @@ const MainSection = () => {
       <div className="w-[60%] bg-white p-2 border-l">
         <div className="bg-white p-2 rounded-lg">
           <div className="flex justify-between px-4 mb-3 items-center">
-            <h1 className="text-md font-semibold">
+            <h1 className="text-lg font-semibold">
               {selectedModule.name ? selectedModule.name : "Select a Module"}
             </h1>
             {selectedModule.name && (
@@ -124,15 +138,9 @@ const MainSection = () => {
             )}
           </div>
           {loading ? (
-            <div className="flex flex-col items-center justify-center h-64 text-center text-gray-500">
-              <FaSpinner className="text-6xl mb-4 animate-spin" />
-              <p className="italic">Loading...</p>
-            </div>
+            <Spinner />
           ) : error ? (
-            <div className="flex flex-col items-center justify-center h-64 text-center text-gray-500">
-              <FaExclamationTriangle className="text-6xl mb-4 text-red-500" />
-              <p className="italic">Error fetching modules: {error.message}</p>
-            </div>
+            <NoDataFound />
           ) : selectedModule.chapters && selectedModule.chapters.length > 0 ? (
             selectedModule.chapters.map((chapter, index) => (
               <Chapter
@@ -151,7 +159,7 @@ const MainSection = () => {
               />
             ))
           ) : (
-            <p>No Chapters Found.</p>
+            <NoDataFound title="Chapter" />
           )}
         </div>
       </div>
@@ -181,7 +189,11 @@ const MainSection = () => {
                 onEdit={() => handleEditModule(module)}
                 onMove={() => handleMoveModule(module)}
                 onDelete={() =>
-                  handleDelete({ type: "Module", name: module.moduleName })
+                  handleDelete({
+                    type: "Module",
+                    name: module.moduleName,
+                    id: module._id,
+                  })
                 }
               />
             ))}
@@ -190,6 +202,7 @@ const MainSection = () => {
         <button
           onClick={openAddModule}
           className="bg-gradient-to-r from-purple-400 to-pink-400 text-white p-4 fixed rounded-full shadow-md bottom-4 right-4"
+          aria-label="Add Module"
         >
           <RiAddFill size={24} />
         </button>
@@ -206,9 +219,17 @@ const MainSection = () => {
             }
           >
             {sidebarContent === "chapter" ? (
-              <AddChapter />
+              <AddChapter
+                onClose={() => {
+                  handleSidebarClose();
+                  fetchModules();
+                }}
+              />
             ) : sidebarContent === "module" ? (
-              <AddModule />
+              <AddModule
+                onClose={handleSidebarClose}
+                onModuleAdded={handleModuleAdded}
+              />
             ) : (
               sidebarContent
             )}

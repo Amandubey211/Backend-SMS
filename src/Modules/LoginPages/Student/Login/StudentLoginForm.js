@@ -5,35 +5,35 @@ import { PiEyeClosedFill } from "react-icons/pi";
 import useStudentLogin from "../../../../Hooks/AuthHooks/Student/useStudentLogin";
 import toast from "react-hot-toast";
 import { LuLoader } from "react-icons/lu";
+import { FcInfo } from "react-icons/fc";
 import { NavLink, useNavigate } from "react-router-dom";
+import Modal from "../../../../Components/Common/Modal";
+import { AiOutlinePhone } from "react-icons/ai";
 
 const StudentLoginForm = () => {
   const [studentDetails, setStudentDetails] = useState({
     email: "siddhant@studentdiwan.com",
     password: "studentDiwan@12",
   });
-    const [showPassword, setShowPassword] = useState(false);
-const { loading, studentLogin } = useStudentLogin();
-const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
+  const { loading, studentLogin } = useStudentLogin();
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const navigate = useNavigate();
 
- 
-//  const HandleSubmit = (e) => {
-//     e.preventDefault();
-//     if (!StudentDetails) return toast.error("please add the required details");
-//     studentLogin(StudentDetails);
-//   };
+  const HandleSubmit = async (e) => {
+    e.preventDefault();
+    if (!studentDetails.email || !studentDetails.password) {
+      toast.error("Please add the required details");
+      return;
+    }
+    const success = await studentLogin(studentDetails);
+    if (success) {
+      navigate("/student_dash");
+    }
+  };
 
-const HandleSubmit = async (e) => {
-  e.preventDefault();
-  if (!studentDetails.email || !studentDetails.password) {
-    toast.error("Please add the required details");
-    return;
-  }
-  const success = await studentLogin(studentDetails);
-  if (success) {
-    navigate("/student_dash");
-  }
-};
+  const openModal = () => setModalIsOpen(true);
+  const closeModal = () => setModalIsOpen(false);
 
   return (
     <div className="relative h-full bg-gray-100 w-full">
@@ -51,8 +51,11 @@ const HandleSubmit = async (e) => {
             </div>
             <span>LMS Home</span>
           </NavLink>
-          <div className="flex justify-between items-center  mb-6">
+          <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-semibold">Student Account</h2>
+            <button onClick={openModal} aria-label="Open information modal">
+              <FcInfo className="text-2xl" />
+            </button>
           </div>
           <form onSubmit={HandleSubmit}>
             <h6>Login in using:</h6>
@@ -92,6 +95,7 @@ const HandleSubmit = async (e) => {
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-gray-700"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
                 >
                   {showPassword ? <FaEye /> : <PiEyeClosedFill />}
                 </button>
@@ -107,10 +111,10 @@ const HandleSubmit = async (e) => {
             </div>
             <button
               type="submit"
-              className="w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600 text-center  "
+              className="w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600 text-center"
             >
               {loading ? (
-                <div className="flex justify-center  ">
+                <div className="flex justify-center">
                   <LuLoader className="animate-spin text-2xl" />
                 </div>
               ) : (
@@ -129,6 +133,36 @@ const HandleSubmit = async (e) => {
           </div>
         </div>
       </div>
+
+      <Modal isOpen={modalIsOpen} onClose={closeModal}>
+        <div className="">
+          <img
+            src="https://via.placeholder.com/150"
+            alt="Information"
+            className="mx-auto mb-4 w-24 h-24 rounded-full"
+          />
+          <h2 className="text-2xl font-semibold mb-4" id="modal-title">
+            Information
+          </h2>
+          <p className="mb-6 capitalize">
+            If you have{" "}
+            <b>already applied, please wait for your login credentials. </b>
+            It may take 4-5 working days. For any queries, contact us at:
+          </p>
+          <div className="flex   mb-4">
+            <AiOutlinePhone className="text-xl mr-2" />
+            <span className="font-semibold">Phone: 123-456-7890</span>
+          </div>
+          <div className="flex justify-end">
+            <button
+              onClick={closeModal}
+              className="mt-6 bg-pink-500 text-white py-2 px-4 rounded-md hover:bg-pink-600"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };

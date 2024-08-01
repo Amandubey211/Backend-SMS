@@ -5,6 +5,7 @@ import useFetchAllPages from "../../../../../Hooks/AuthHooks/Staff/Admin/Page/us
 import PageCard from "./Components/PageCard";
 import { MdSearchOff } from "react-icons/md"; // Importing the icon
 import Spinner from "../../../../../Components/Common/Spinner";
+import NoDataFound from "../../../../../Components/Common/NoDataFound";
 
 const MainSection = () => {
   const { loading, error, fetchAllPages, pages } = useFetchAllPages();
@@ -33,8 +34,8 @@ const MainSection = () => {
           handleSearchChange={handleSearchChange}
         />
         <div className="mt-5">
-          {loading && <Spinner/>}
-          {/* {error && <p>{error}</p>} */}
+          {loading && <Spinner />}
+          {error && <NoDataFound title="Pages" />}
           {!loading && !error && filteredPages.length === 0 && (
             <div className="flex flex-col h-96 w-full items-center justify-center text-gray-500">
               <MdSearchOff className="w-12 h-12 mb-3" />

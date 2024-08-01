@@ -2,7 +2,6 @@ import { useState, useCallback } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
 import { baseUrl } from "../../../../../config/Common";
 
 const useUpdatePage = () => {
@@ -10,12 +9,10 @@ const useUpdatePage = () => {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
 
-  
   const { role } = useSelector((store) => store.Auth);
-  const { cid, sid, pageId } = useParams();
 
   const updatePage = useCallback(
-    async (pageData) => {
+    async (pageId, pageData) => {
       const { title, content } = pageData;
 
       // Validate required fields
@@ -30,6 +27,11 @@ const useUpdatePage = () => {
 
       try {
         const token = localStorage.getItem(`${role}:token`);
+
+        // Ensure token is present
+        if (!token) {
+          throw new Error("User not authenticated");
+        }
 
         const response = await axios.put(
           `${baseUrl}/admin/api/pages/${pageId}`,
@@ -46,8 +48,7 @@ const useUpdatePage = () => {
           setSuccess(true);
           toast.success("Page updated successfully");
         } else {
-          toast.error("Failed to update page");
-          setError("Failed to update page");
+          throw new Error(response.data.message || "Failed to update page");
         }
       } catch (err) {
         const errorMessage =
@@ -58,7 +59,7 @@ const useUpdatePage = () => {
         setLoading(false);
       }
     },
-    [role, baseUrl, pageId]
+    [role]
   );
 
   return { loading, error, success, updatePage };

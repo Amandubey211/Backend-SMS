@@ -4,6 +4,8 @@ import FilterAttendanceBar from "./Components/FilterAttendanceBar";
 import AttendanceTable from "./Components/AttendanceTable";
 import { useParams } from "react-router-dom";
 import useGetAttendanceByClassSectionGroupAndDate from "../../../Hooks/AuthHooks/Staff/Admin/Attendance/useGetAttendanceByClassSectionGroupAndDate";
+import Spinner from "../../../Components/Common/Spinner";
+import NoDataFound from "../../../Components/Common/NoDataFound";
 
 const months = [
   { name: "January", number: 1 },
@@ -75,33 +77,9 @@ const MainSection = () => {
         onFilterChange={handleFilterChange}
       />
       {loading ? (
-        <div className="flex justify-center items-center w-full">
-          <svg
-            className="animate-spin h-8 w-8 text-blue-600"
-            viewBox="0 0 24 24"
-          >
-            <circle
-              className="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              strokeWidth="4"
-            ></circle>
-            <path
-              className="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 2.137.835 4.168 2.205 5.709l1.795-1.418z"
-            ></path>
-          </svg>
-        </div>
+        <Spinner />
       ) : error ? (
-        // <div className="text-red-500">{error}</div>
-        <div className="text-center py-10">
-          <h2 className="text-2xl font-semibold text-gray-600">
-            No attendance records found for the selected filters.
-          </h2>
-        </div>
+        <NoDataFound title="Attendence" />
       ) : (
         <AttendanceTable
           filter={filters.filter}

@@ -24,7 +24,6 @@ import StaffLogin from "../Modules/LoginPages/Staff/StaffLogin.js";
 import ForgetPassword from "../Modules/LoginPages/Student/Login/ForgetPassword/ForgetPassword.js";
 import AttendanceMain from "../Modules/Student/Attendance/AttendanceMain.js";
 
-
 import QIDLogin from "../Modules/LoginPages/Student/Login/QIDLogin.js";
 
 // lazy loaded routes
@@ -268,7 +267,6 @@ const StudentAttendance = lazy(() =>
 const Dash = lazy(() => import("../Modules/Admin/Dashboard/Dash.js"));
 
 function App() {
-
   const [isOnline, setIsOnline] = useState(window.navigator.onLine);
   useFirebaseMessaging();
 
