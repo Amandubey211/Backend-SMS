@@ -1,7 +1,12 @@
 import React from "react";
 import QuestionCard from "./QuestionCard";
 
-const QuestionList = ({ questions, deleteQuestion, editQuestion }) => {
+const QuestionList = ({
+  questions,
+  deleteQuestion,
+  editQuestion,
+  allowShuffleAnswers,
+}) => {
   const totalPoints = questions.reduce((sum, question) => {
     return sum + parseFloat(question.questionPoint);
   }, 0);
@@ -17,6 +22,7 @@ const QuestionList = ({ questions, deleteQuestion, editQuestion }) => {
           <QuestionCard
             key={q._id}
             question={q}
+            allowShuffleAnswers={allowShuffleAnswers} // Pass the prop here
             deleteQuestion={() => deleteQuestion(q._id)}
             editQuestion={() => editQuestion(q._id)}
           />

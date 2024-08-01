@@ -8,7 +8,9 @@ const DateDetail = ({ label, value }) => (
         <FaRegCalendarAlt className="mr-2" aria-hidden="true" />
         <p className="text-sm font-medium">{label} :</p>
       </div>
-      <p className="text-sm font-normal text-gray-900">{value || "mm/yy/dd"}</p>
+      <p className="text-sm font-normal text-gray-900">
+        {value || "MM/DD/YYYY"}
+      </p>
     </div>
   </div>
 );
