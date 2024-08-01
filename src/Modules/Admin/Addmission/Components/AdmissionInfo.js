@@ -41,7 +41,7 @@ const AdmissionInfo = ({ studentInfo, handleInputChange }) => {
           </select>
         </div>
         <div>
-          <label className="block text-gray-700">Q_ID</label>
+          <label className="block text-gray-700">QID</label>
           <input
             type="text"
             name="Q_Id"
@@ -59,8 +59,8 @@ const AdmissionInfo = ({ studentInfo, handleInputChange }) => {
             value={studentInfo.transportRequirement}
             onChange={handleInputChange}
           >
-            <option value={true}>yes</option>
-            <option value={false}> No</option>
+            <option value={true}>YES</option>
+            <option value={false}>NO</option>
           </select>
         </div>
         <div>

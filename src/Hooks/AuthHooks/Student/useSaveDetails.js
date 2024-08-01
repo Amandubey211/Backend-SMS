@@ -11,7 +11,11 @@ const useSaveDetails = () => {
       setLoading(true);
       const response = await axios.post(
         `${baseUrl}/student/student_register`,
-        formData
+        formData,{
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        }
       );
       setLoading(false);
       return response.data;

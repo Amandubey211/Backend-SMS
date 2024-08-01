@@ -12,7 +12,7 @@ const StudentCard = ({ studentInfo, imagePreview }) => {
     class: studentClass,
     section,
     bloodGroup,
-    nationality,
+    religion,
     email,
   } = studentInfo;
 
@@ -57,7 +57,7 @@ const StudentCard = ({ studentInfo, imagePreview }) => {
               <span className="font-semibold">Blood</span>: {bloodGroup}
             </p>
             <p>
-              <span className="font-semibold">Nationality</span>: {nationality}
+              <span className="font-semibold">Religion</span>: {religion}
             </p>
             <p title={email}>
               <span className="font-semibold">Email</span>:{" "}

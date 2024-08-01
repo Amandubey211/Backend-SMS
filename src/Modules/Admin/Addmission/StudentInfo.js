@@ -26,7 +26,7 @@ const StudentInfo = () => {
     gender: "",
     contactNumber: "",
     bloodGroup: "",
-    nationality: "",
+    religion: "",
     motherName: "",
     fatherName: "",
     guardianName: "",
@@ -200,7 +200,7 @@ const StudentInfo = () => {
             const address = studentInfo[key];
             for (const field in address) {
               if (address.hasOwnProperty(field)) {
-                formData.append(`${key}.${field}`, address[field]);
+                formData.append(`${key}[${field}]`, address[field]);
               }
             }
           } else {
@@ -221,18 +221,20 @@ const StudentInfo = () => {
       if (response.success) {
         toast.success("Details Saved Successfully");
 
-        const documentResponse = await saveDocument(
-          studentInfo.email,
-          studentInfo.schoolId,
-          studentDocuments
-        );
-
-        if (documentResponse?.success) {
-          toast.success("Documents uploaded successfully!");
-          // addStudent(studentInfo);
-        } else {
-          toast.error("Failed to upload the document");
+        if (studentDocuments?.documents.length!==0) {
+          const documentResponse = await saveDocument(
+            studentInfo.email,
+            studentInfo.schoolId,
+            studentDocuments
+          );
+          if (documentResponse?.success) {
+            toast.success("Documents uploaded successfully!");
+            // addStudent(studentInfo);
+          } else {
+            toast.error("Failed to upload the document");
+          }
         }
+
       } else {
         toast.error("Failed to save student details.");
       }
@@ -280,19 +282,19 @@ const StudentInfo = () => {
           <ParentInfo
             studentInfo={studentInfo}
             handleInputChange={handleInputChange}
-            // dont remove  the below code --------------------
-            // fatherImagePreview={fatherImagePreview}
-            // motherImagePreview={motherImagePreview}
-            // handleFatherImageChange={handleFatherImageChange}
-            // handleMotherImageChange={handleMotherImageChange}
-            // handleRemoveFatherImage={() => {
-            //   setFatherImagePreview(null);
-            //   setStudentInfo({ ...studentInfo, fatherImage: null });
-            // }}
-            // handleRemoveMotherImage={() => {
-            //   setMotherImagePreview(null);
-            //   setStudentInfo({ ...studentInfo, motherImage: null });
-            // }}
+          // dont remove  the below code --------------------
+          // fatherImagePreview={fatherImagePreview}
+          // motherImagePreview={motherImagePreview}
+          // handleFatherImageChange={handleFatherImageChange}
+          // handleMotherImageChange={handleMotherImageChange}
+          // handleRemoveFatherImage={() => {
+          //   setFatherImagePreview(null);
+          //   setStudentInfo({ ...studentInfo, fatherImage: null });
+          // }}
+          // handleRemoveMotherImage={() => {
+          //   setMotherImagePreview(null);
+          //   setStudentInfo({ ...studentInfo, motherImage: null });
+          // }}
           />
           <DocumentUploadForm
             type="Admin"

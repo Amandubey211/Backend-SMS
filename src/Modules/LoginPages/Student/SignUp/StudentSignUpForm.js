@@ -22,7 +22,7 @@ const StudentSignUpForm = () => {
     placeOfBirth: "",
     age: "",
     gender: "",
-    nationality: "",
+    religion: "",
     contactNumber: "",
     motherName: "",
     fatherName: "",
