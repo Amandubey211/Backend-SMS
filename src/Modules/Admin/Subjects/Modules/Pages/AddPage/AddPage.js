@@ -16,72 +16,71 @@ const AddPage = () => {
   const [publishAt, setPublishDate] = useState("");
   const [isUpdating, setIsUpdating] = useState(false);
   const [publish, setPublish] = useState(false);
+  const [loadingType, setLoadingType] = useState(""); // Separate loading state for each button
 
   const {
+    createPage,
     loading: createLoading,
     error: createError,
     success: createSuccess,
-    createPage,
   } = useCreatePage();
   const {
+    updatePage,
     loading: updateLoading,
     error: updateError,
     success: updateSuccess,
-    updatePage,
   } = useUpdatePage();
 
   useEffect(() => {
     if (state?.page) {
-      setTitle(state.page.title);
-      setEditorContent(state.page.content);
+      setTitle(state.page.title || "");
+      setEditorContent(state.page.content || "");
       setEditPermission(state.page.editPermission || "Only Instructor");
       setPublish(state.page.publish || false);
-      if (state.page.publishDate) {
+      if (state.page.publishAt) {
         setPublishDate(
-          new Date(state.page.publishDate).toISOString().substring(0, 10)
+          new Date(state.page.publishAt).toISOString().substring(0, 10)
         );
       }
       setIsUpdating(true);
     }
   }, [state]);
 
-  const handleNameChange = (name) => {
-    setTitle(name);
-  };
+  const handleNameChange = (name) => setTitle(name);
+  const handleEditorChange = (content) => setEditorContent(content);
+  const handleEditPermissionChange = (e) => setEditPermission(e.target.value);
+  const handlePublishDateChange = (e) => setPublishDate(e.target.value);
 
-  const handleEditorChange = (content) => {
-    setEditorContent(content);
-  };
-
-  const handleEditPermissionChange = (e) => {
-    setEditPermission(e.target.value);
-  };
-
-  const handlePublishDateChange = (e) => {
-    setPublishDate(e.target.value);
-  };
-
-  const handleSave = async () => {
+  const handleSave = async (shouldPublish) => {
     const pageData = {
       title,
       content: editorContent,
       editPermission,
       publishAt,
-      publish,
+      publish: shouldPublish,
     };
 
-    if (isUpdating) {
-      await updatePage(state?.page._id, pageData);
-    } else {
-      await createPage(pageData);
-    }
+    setLoadingType(shouldPublish ? "publish" : "save");
 
-    if (createSuccess || updateSuccess) {
-      setTitle("");
-      setEditorContent("");
-      setEditPermission("Only Instructor");
-      setPublishDate("");
-      setPublish(false);
+    try {
+      if (isUpdating) {
+        await updatePage(state?.page._id, pageData);
+      } else {
+        await createPage(pageData);
+      }
+
+      if (createSuccess || updateSuccess) {
+        // Reset the form if the operation is successful
+        setTitle("");
+        setEditorContent("");
+        setEditPermission("Only Instructor");
+        setPublishDate("");
+        setPublish(false);
+      }
+    } catch (error) {
+      console.error("Error saving page:", error);
+    } finally {
+      setLoadingType("");
     }
   };
 
@@ -97,7 +96,7 @@ const AddPage = () => {
           <AddPageHeader
             onSave={handleSave}
             isUpdating={isUpdating}
-            loading={createLoading || updateLoading}
+            loadingType={loadingType}
           />
           <div className="flex w-full">
             <div className="w-[70%]">
