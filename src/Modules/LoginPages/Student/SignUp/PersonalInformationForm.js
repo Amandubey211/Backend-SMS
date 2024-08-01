@@ -136,9 +136,9 @@ const PersonalInformationForm = ({
         </div>
       </div>
       <SelectInput
-        label="Nationality*"
-        name="nationality"
-        value={studentDetails.nationality}
+        label="Religion*"
+        name="religion"
+        value={studentDetails.religion}
         onChange={handleChange}
         options={religionOptions}
         required
