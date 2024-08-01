@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { CiSearch } from "react-icons/ci";
 import { FaEllipsisV, FaExclamationTriangle, FaTrashAlt } from "react-icons/fa";
 import { BsPatchCheckFill } from "react-icons/bs";
@@ -7,19 +7,16 @@ import { ImSpinner3 } from "react-icons/im";
 import { MdOutlineBlock } from "react-icons/md";
 import useDeleteQuiz from "../../../../../../Hooks/AuthHooks/Staff/Admin/Quiz/useDeleteQuiz";
 import useDeleteAssignment from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useDeleteAssignment";
+import DeleteModal from "../../../../../../Components/Common/DeleteModal";
 
-const List = ({
-  data,
-  icon,
-  title,
-  type,
-  loading,
-  error,
-  refetchData,
-}) => {
+const List = ({ data, icon, title, type, loading, error, refetchData }) => {
   const { cid, sid } = useParams();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeMenu, setActiveMenu] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentDeleteId, setCurrentDeleteId] = useState(null);
+  const [currentDeleteTitle, setCurrentDeleteTitle] = useState("");
+  const menuRef = useRef(null); // Reference to the menu
 
   const {
     loading: deleteQuizLoading,
@@ -48,18 +45,38 @@ const List = ({
     setActiveMenu(activeMenu === id ? null : id);
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = (id, name) => {
+    setCurrentDeleteId(id);
+    setCurrentDeleteTitle(name);
+    setIsModalOpen(true);
+  };
+
+  const confirmDelete = async () => {
     if (type === "Assignment") {
-      deleteAssignment(id);
+      await deleteAssignment(currentDeleteId);
     }
     if (type === "Quiz") {
-      deleteQuiz(id);
+      await deleteQuiz(currentDeleteId);
     }
   };
 
   const filteredData = data.filter((item) =>
     item.name?.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  // Click outside to close menu
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setActiveMenu(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   return (
     <div className="bg-white p-5 w-full">
@@ -150,35 +167,24 @@ const List = ({
                       onClick={() => handleMenuToggle(item._id)}
                     />
                     {activeMenu === item._id && (
-                      <div className="absolute top-full right-0 mt-2 w-48 bg-white border border-gray-300 rounded-md shadow-lg">
+                      <div
+                        ref={menuRef} // Attach ref to menu
+                        className="absolute top-full right-0 mt-2 w-48 bg-white border border-gray-300 rounded-md shadow-lg"
+                      >
                         <button
-                          onClick={() => handleDelete(item._id)}
+                          onClick={() => handleDelete(item._id, item.name)}
                           className="flex items-center space-x-2 px-4 py-2 hover:bg-red-100 w-full text-left"
                           aria-label={`Delete ${type}`}
-                          disabled={
-                            deleteQuizLoading || deleteAssignmentLoading
-                          }
                         >
-                          {deleteQuizLoading || deleteAssignmentLoading ? (
-                            <ImSpinner3 className="w-5 h-5 animate-spin text-red-600" />
-                          ) : (
-                            <>
-                              <FaTrashAlt
-                                aria-hidden="true"
-                                className="text-red-600"
-                              />
-                              <span>Delete</span>
-                            </>
-                          )}
+                          <FaTrashAlt
+                            aria-hidden="true"
+                            className="text-red-600"
+                          />
+                          <span>Delete</span>
                         </button>
                         {(deleteQuizError || deleteAssignmentError) && (
                           <div className="text-red-600 text-sm px-4 py-2">
                             {deleteQuizError || deleteAssignmentError}
-                          </div>
-                        )}
-                        {(deleteQuizSuccess || deleteAssignmentSuccess) && (
-                          <div className="text-green-600 text-sm px-4 py-2">
-                            {deleteQuizSuccess || deleteAssignmentSuccess}
                           </div>
                         )}
                       </div>
@@ -195,6 +201,13 @@ const List = ({
           </div>
         )}
       </ul>
+
+      <DeleteModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onConfirm={confirmDelete}
+        title={currentDeleteTitle}
+      />
     </div>
   );
 };

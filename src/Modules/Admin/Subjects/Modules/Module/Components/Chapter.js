@@ -27,7 +27,8 @@ const Chapter = ({
   };
 
   return (
-    <div className="mb-4 p-1 bg-white rounded-lg border-b">
+    <div className="mb-4 p-1 bg-white rounded-lg border-b relative">
+      {/* Added relative positioning to the parent container */}
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center">
           <img
@@ -42,10 +43,36 @@ const Chapter = ({
         </div>
         <div className="flex items-center space-x-2">
           <button
-            className="border p-2 rounded-full hover:bg-gray-50"
+            className="border p-2 rounded-full hover:bg-gray-50 relative"
             onClick={toggleMenu}
           >
             <FaEllipsisV />
+            {menuOpen && (
+              <div className="absolute top-full mt-2 right-0 bg-white border rounded-lg shadow-lg w-48 z-10">
+                <ul className="py-2">
+                  <li
+                    className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onEdit();
+                      setMenuOpen(false);
+                    }}
+                  >
+                    <FaPen className="mr-2" /> Edit
+                  </li>
+                  <li
+                    className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDelete();
+                      setMenuOpen(false);
+                    }}
+                  >
+                    <FaTrashAlt className="mr-2" /> Delete
+                  </li>
+                </ul>
+              </div>
+            )}
           </button>
           <button
             className="border p-2 rounded-full hover:bg-gray-50"
@@ -55,32 +82,6 @@ const Chapter = ({
           </button>
         </div>
       </div>
-      {menuOpen && (
-        <div className="absolute right-4 bg-white border rounded-lg shadow-lg w-48 z-10">
-          <ul className="py-2">
-            <li
-              className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
-              onClick={(e) => {
-                e.stopPropagation();
-                onEdit();
-                setMenuOpen(false);
-              }}
-            >
-              <FaPen className="mr-2" /> Edit
-            </li>
-            <li
-              className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
-              onClick={(e) => {
-                e.stopPropagation();
-                onDelete();
-                setMenuOpen(false);
-              }}
-            >
-              <FaTrashAlt className="mr-2" /> Delete
-            </li>
-          </ul>
-        </div>
-      )}
       {isExpanded && (
         <div className="ml-10 py-2">
           {assignments.length || quizzes.length ? (

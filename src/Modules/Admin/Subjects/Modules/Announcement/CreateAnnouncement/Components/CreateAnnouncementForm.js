@@ -10,7 +10,7 @@ const CreateAnnouncementForm = ({
   option,
   handleChange,
   groupId,
-  author
+  author,
 }) => {
   return (
     <div>

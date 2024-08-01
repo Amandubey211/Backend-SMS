@@ -4,6 +4,8 @@ import { AiOutlineFileAdd } from "react-icons/ai";
 import SubjectSideBar from "../../../Component/SubjectSideBar";
 import useFetchAnnouncementById from "../../../../../../Hooks/AuthHooks/Staff/Admin/Announcement/useFetchAnnouncementById";
 import AnnouncementViewHeader from "./Components/AnnouncementViewHeader";
+import Spinner from "../../../../../../Components/Common/Spinner";
+import NoDataFound from "../../../../../../Components/Common/NoDataFound";
 
 const MainSection = () => {
   const { aid } = useParams();
@@ -20,35 +22,19 @@ const MainSection = () => {
       <div className="border-l w-full">
         <AnnouncementViewHeader announcement={announcement} />
         <div className="p-4 bg-white">
-          {loading && (
-            <div className="flex justify-center items-center">
-              <svg
-                className="animate-spin h-5 w-5 mr-3 text-gray-700"
-                viewBox="0 0 24 24"
-              >
-                <circle
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                />
-              </svg>
-              Loading...
-            </div>
-          )}
-          {error && <p>Error: {error}</p>}
+          {loading && <Spinner />}
+          {error && <NoDataFound title="Announcement" />}
           {announcement ? (
             <>
-            {/* // this is the thumbnail */}
-              <div className="relative w-full h-64 md:h-80 lg:h-96 overflow-hidden rounded-lg mb-4">
+              {announcement.attachment && (
                 <img
                   src={announcement.attachment || "default_image_url_here"}
                   alt="Announcement"
                   className="absolute top-0 left-0 w-full h-full object-cover"
                 />
-              </div>
-              <h2 className="text-2xl font-bold mb-4">{announcement.title}</h2>
+              )}
+
+              <h2 className="text-2xl font-bold mb-4">{announcement?.title}</h2>
               <div
                 className="text-gray-700 mb-6"
                 dangerouslySetInnerHTML={{ __html: announcement.content }}
