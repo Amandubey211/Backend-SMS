@@ -7,9 +7,8 @@ import { MdDelete } from "react-icons/md";
 import Sidebar from "../../../../../../../Components/Common/Sidebar";
 import { useNavigate, useParams } from "react-router-dom";
 import useDeleteDiscussion from "../../../../../../../Hooks/AuthHooks/Staff/Admin/Disscussion/useDeleteDiscussion";
+import DeleteModal from "../../../../../../../Components/Common/DeleteModal";
 
-// Lazy load the DiscussionMessage component
-//we dont need the replies in the discussion response
 const DiscussionMessage = lazy(() =>
   import("../../DiscussionMessage/DiscussionMessage")
 );
@@ -17,9 +16,11 @@ const DiscussionMessage = lazy(() =>
 const Header = ({ discussion }) => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [isMenuOpen, setMenuOpen] = useState(false);
+  const [isModalOpen, setModalOpen] = useState(false); // State for modal
   const navigate = useNavigate();
   const { cid, sid } = useParams();
   const menuRef = useRef(null);
+
   const {
     deleteDiscussion,
     loading: deleteLoading,
@@ -30,7 +31,11 @@ const Header = ({ discussion }) => {
   const handleSidebarOpen = () => setSidebarOpen(true);
   const handleSidebarClose = () => setSidebarOpen(false);
 
-  const handleDeleteClick = async () => {
+  const handleDeleteClick = () => {
+    setModalOpen(true);
+  };
+
+  const confirmDelete = async () => {
     await deleteDiscussion(discussion._id);
     if (deleteSuccess) {
       navigate(`/class/${cid}/${sid}/discussions`);
@@ -108,7 +113,7 @@ const Header = ({ discussion }) => {
             >
               <button
                 className="flex items-center space-x-2 px-4 py-2 text-red-600 hover:bg-gray-100 w-full"
-                onClick={handleDeleteClick}
+                onClick={handleDeleteClick} // Open modal instead of direct delete
                 disabled={deleteLoading}
               >
                 <MdDelete aria-hidden="true" />
@@ -138,6 +143,13 @@ const Header = ({ discussion }) => {
           </Sidebar>
         </div>
       </div>
+
+      <DeleteModal
+        isOpen={isModalOpen}
+        onClose={() => setModalOpen(false)}
+        onConfirm={confirmDelete}
+        title={discussion.title || "this discussion"}
+      />
     </div>
   );
 };

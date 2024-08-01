@@ -7,10 +7,12 @@ import Sidebar from "../../../../../../../Components/Common/Sidebar";
 import DiscussionMessage from "../../../Discussion/DiscussionMessage/DiscussionMessage";
 import { useParams, useNavigate } from "react-router-dom";
 import useDeleteAnnouncement from "../../../../../../../Hooks/AuthHooks/Staff/Admin/Announcement/useDeleteAnnouncement";
+import DeleteModal from "../../../../../../../Components/Common/DeleteModal";
 
 const AnnouncementViewHeader = ({ announcement }) => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [isModalOpen, setModalOpen] = useState(false); // State for modal
   const { cid, sid } = useParams();
   const navigate = useNavigate();
   const { deleteAnnouncement, loading: deleteLoading } =
@@ -50,8 +52,13 @@ const AnnouncementViewHeader = ({ announcement }) => {
     });
   };
 
-  const handleDeleteClick = async () => {
+  const handleDeleteClick = () => {
+    setModalOpen(true); // Open the modal on delete click
+  };
+
+  const confirmDelete = async () => {
     await deleteAnnouncement(announcement._id);
+    setModalOpen(false); // Close the modal after deletion
   };
 
   return (
@@ -111,7 +118,7 @@ const AnnouncementViewHeader = ({ announcement }) => {
             >
               <button
                 className="w-full flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 transition"
-                onClick={handleDeleteClick}
+                onClick={handleDeleteClick} // Open the modal instead of deleting directly
                 disabled={deleteLoading}
               >
                 <RiDeleteBin5Line className="mr-2 text-red-700" />
@@ -132,10 +139,18 @@ const AnnouncementViewHeader = ({ announcement }) => {
             isOpen={isSidebarOpen}
             onClose={handleSidebarClose}
           >
-            <DiscussionMessage />
+            <div>will be added </div>
+            {/* <DiscussionMessage /> */}
           </Sidebar>
         </div>
       </div>
+
+      <DeleteModal
+        isOpen={isModalOpen}
+        onClose={() => setModalOpen(false)}
+        onConfirm={confirmDelete}
+        title={announcement?.title || "this announcement"}
+      />
     </div>
   );
 };
