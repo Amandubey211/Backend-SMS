@@ -12,6 +12,7 @@ import {
 } from "react-icons/fa";
 import useDeleteModule from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useDeleteModule";
 import toast from "react-hot-toast";
+import DeleteModal from "../../../../../../Components/Common/DeleteModal";
 
 const ModuleCard = ({
   title,
@@ -26,6 +27,7 @@ const ModuleCard = ({
   moduleId,
 }) => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const menuRef = useRef();
   const { loading, error, success, deleteModule } = useDeleteModule();
 
@@ -40,10 +42,12 @@ const ModuleCard = ({
     }
   };
 
-  const handleDelete = async (e) => {
-    e.stopPropagation();
-    await deleteModule(moduleId);
-    onDelete();
+  const handleDelete = async () => {
+    const result = await deleteModule(moduleId);
+    if (result.success) {
+      onDelete();
+      setIsDeleteModalOpen(false); // Close the modal on successful deletion
+    }
   };
 
   useEffect(() => {
@@ -55,7 +59,9 @@ const ModuleCard = ({
 
   return (
     <div
-      className={`relative mb-4 border ${isSelected ? "border-2 border-rose-400" : ""} bg-white rounded-lg cursor-pointer`}
+      className={`relative mb-4 border ${
+        isSelected ? "border-2 border-rose-400" : ""
+      } bg-white rounded-lg cursor-pointer`}
       onClick={onSelect}
     >
       <img
@@ -88,7 +94,7 @@ const ModuleCard = ({
       {menuOpen && (
         <div
           ref={menuRef}
-          className="absolute top-12 right-4 bg-white border rounded-lg shadow-lg w-48 z-10"
+          className="absolute -top-8 right-12 bg-white border rounded-lg shadow-lg w-48 z-10"
         >
           <ul className="py-2">
             <li
@@ -115,7 +121,7 @@ const ModuleCard = ({
               className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
               onClick={(e) => {
                 e.stopPropagation();
-                toast.success('Duplicated');
+                toast.success("Duplicated");
                 setMenuOpen(false);
               }}
             >
@@ -125,7 +131,7 @@ const ModuleCard = ({
               className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
               onClick={(e) => {
                 e.stopPropagation();
-                toast.success('Increased indent');
+                toast.success("Increased indent");
                 setMenuOpen(false);
               }}
             >
@@ -135,7 +141,7 @@ const ModuleCard = ({
               className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
               onClick={(e) => {
                 e.stopPropagation();
-                toast.success('Shared to Commons');
+                toast.success("Shared to Commons");
                 setMenuOpen(false);
               }}
             >
@@ -143,13 +149,23 @@ const ModuleCard = ({
             </li>
             <li
               className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
-              onClick={handleDelete}
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsDeleteModalOpen(true); // Show delete confirmation modal
+                setMenuOpen(false);
+              }}
             >
               <FaTrashAlt className="mr-2" /> Remove
             </li>
           </ul>
         </div>
       )}
+      <DeleteModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleDelete}
+        title={title}
+      />
       {loading && <p>Deleting...</p>}
       {error && <p className="text-red-500">{error}</p>}
       {success && <p className="text-green-500">{success}</p>}

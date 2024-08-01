@@ -10,7 +10,6 @@ const useFetchAllPages = () => {
   const [error, setError] = useState(null);
   const [pages, setPages] = useState([]);
 
-  
   const { role } = useSelector((store) => store.Auth);
   const { cid } = useParams();
 
@@ -20,10 +19,18 @@ const useFetchAllPages = () => {
 
     try {
       const token = localStorage.getItem(`${role}:token`);
-      const response = await axios.get(`${baseUrl}/admin/api/pages/class/pages/${cid}`, {
-        headers: { Authentication: token },
-      });
-      console.log(response.data);
+      if (!token) {
+        throw new Error("User not authenticated");
+      }
+
+      // Include query parameters if needed (e.g., ?publish=true)
+      const response = await axios.get(
+        `${baseUrl}/admin/api/pages/class/pages/${cid}?publish=true`,
+        {
+          headers: { Authentication: token },
+        }
+      );
+
       if (response.data && response.data.success) {
         setPages(response.data.data);
       } else {
@@ -32,7 +39,6 @@ const useFetchAllPages = () => {
     } catch (err) {
       const errorMessage =
         err.response?.data?.message || "Error fetching pages";
-      toast.error(errorMessage);
       setError(errorMessage);
     } finally {
       setLoading(false);

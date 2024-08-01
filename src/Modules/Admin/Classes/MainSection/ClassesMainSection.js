@@ -5,6 +5,7 @@ import AddNewClass from "./AddNewClass";
 import { useSelector } from "react-redux";
 import { PiSpinner } from "react-icons/pi";
 import useGetAllClasses from "../../../../Hooks/AuthHooks/Staff/Admin/Class/useGetAllClasses";
+import Spinner from "../../../../Components/Common/Spinner";
 
 const ClassesMainSection = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -31,11 +32,9 @@ const ClassesMainSection = () => {
         </button>
       </div>
       {loading ? (
-        <div className="flex justify-center items-center">
-          <PiSpinner className="animate-spin text-3xl" />
-        </div>
+        <Spinner />
       ) : error ? (
-        <p className="text-red-500">{error}</p>
+        <p className="text-red-500 p-4">{error}</p>
       ) : (
         <div className="grid grid-cols-1 gap-4 mt-4 sm:grid-cols-2 lg:grid-cols-4">
           {classes?.map((cls) => (

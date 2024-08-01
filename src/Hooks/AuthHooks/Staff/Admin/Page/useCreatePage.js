@@ -10,7 +10,6 @@ const useCreatePage = () => {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
 
-  
   const { role } = useSelector((store) => store.Auth);
   const { cid } = useParams();
 
@@ -30,6 +29,9 @@ const useCreatePage = () => {
 
       try {
         const token = localStorage.getItem(`${role}:token`);
+        if (!token) {
+          throw new Error("Authentication token is missing");
+        }
 
         const response = await axios.post(
           `${baseUrl}/admin/api/pages/class/${cid}`,

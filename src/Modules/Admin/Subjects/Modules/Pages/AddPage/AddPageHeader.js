@@ -2,7 +2,6 @@ import React from "react";
 import { IoIosArrowBack } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 import { ImSpinner8 } from "react-icons/im";
-import toast from "react-hot-toast";
 
 const AddPageHeader = ({ onSave, isUpdating, loading }) => {
   const navigate = useNavigate();
@@ -22,10 +21,6 @@ const AddPageHeader = ({ onSave, isUpdating, loading }) => {
         <button
           onClick={() => {
             onSave(false); // Save without publishing
-            toast.success(
-              isUpdating ? "Page updated" : "Page saved",
-              { position: "bottom-left" }
-            );
           }}
           className="flex-grow rounded-md py-2 px-6 text-center bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200 transition"
           disabled={loading}
@@ -36,18 +31,16 @@ const AddPageHeader = ({ onSave, isUpdating, loading }) => {
                 <ImSpinner8 className="animate-spin mr-2" />
                 {isUpdating ? "Updating..." : "Saving..."}
               </>
+            ) : isUpdating ? (
+              "Update"
             ) : (
-              isUpdating ? "Update" : "Save"
+              "Save"
             )}
           </span>
         </button>
         <button
           onClick={() => {
             onSave(true); // Save and publish
-            toast.success(
-              isUpdating ? "Updated and Published" : "Saved and Published",
-              { position: "bottom-left" }
-            );
           }}
           className="flex-grow rounded-md py-2 px-6 text-center bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200 transition"
           disabled={loading}
@@ -58,8 +51,10 @@ const AddPageHeader = ({ onSave, isUpdating, loading }) => {
                 <ImSpinner8 className="animate-spin mr-2" />
                 {isUpdating ? "Updating..." : "Saving..."}
               </>
+            ) : isUpdating ? (
+              "Update & Publish"
             ) : (
-              isUpdating ? "Update & Publish" : "Save & Publish"
+              "Save & Publish"
             )}
           </span>
         </button>

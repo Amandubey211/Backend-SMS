@@ -1,20 +1,19 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
 import axios from "axios";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setUnVerifiedStudents } from "../../../../../Redux/Slices/AdminSlice";
 import { baseUrl } from "../../../../../config/Common";
 
 const useGetUnVerifiedStudents = () => {
   const [loading, setLoading] = useState(false);
+  const role = useSelector((store) => store.Auth.role);
+
   const dispatch = useDispatch();
   const getUnverifiedStudents = async () => {
     setLoading(true);
-
     try {
-      const token = localStorage.getItem(
-        process.env.REACT_APP_ADMIN_TOKEN_STORAGE_KEY
-      );
+      const token = localStorage.getItem(`${role}:token`);
       console.log(token);
       const { data } = await axios.get(
         `${baseUrl}/admin/get_unverified_student_details`,
