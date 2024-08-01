@@ -27,6 +27,7 @@ const CreateQuizForm = ({
 }) => {
   const [chapters, setChapters] = useState([]);
   const moduleList = useSelector((store) => store.Subject.modules);
+
   useEffect(() => {
     if (moduleId) {
       const module = moduleList.find((mod) => mod._id === moduleId);
@@ -42,7 +43,7 @@ const CreateQuizForm = ({
 
   return (
     <div className="max-w-md mx-auto p-4 bg-white space-y-2">
-      <h2 className="text-xl font-semibold">Option</h2>
+      <h2 className="text-xl font-semibold">Options</h2>
       <div className="space-y-4">
         <LabeledSelect
           label="Quiz type"
@@ -64,13 +65,13 @@ const CreateQuizForm = ({
               type="radio"
               id="shuffleYes"
               name="allowShuffleAnswers"
-              value={true}
+              value="true"
               checked={allowShuffleAnswers === true}
               onChange={(e) =>
                 handleChange({
                   target: {
                     name: "allowShuffleAnswers",
-                    value: e.target.value === "true",
+                    value: true,
                   },
                 })
               }
@@ -83,13 +84,13 @@ const CreateQuizForm = ({
               type="radio"
               id="shuffleNo"
               name="allowShuffleAnswers"
-              value={false}
+              value="false"
               checked={allowShuffleAnswers === false}
               onChange={(e) =>
                 handleChange({
                   target: {
                     name: "allowShuffleAnswers",
-                    value: e.target.value === "false",
+                    value: false,
                   },
                 })
               }

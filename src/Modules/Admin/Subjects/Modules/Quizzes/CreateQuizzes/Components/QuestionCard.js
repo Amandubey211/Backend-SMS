@@ -1,10 +1,45 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FaCheckCircle, FaTimesCircle, FaRegCircle } from "react-icons/fa";
 import { FiEdit2, FiTrash2 } from "react-icons/fi";
 
-const QuestionCard = ({ question, deleteQuestion, editQuestion }) => {
+// Utility function to shuffle an array
+function shuffleArray(array) {
+  let currentIndex = array.length;
+  let randomIndex;
+
+  // While there remain elements to shuffle...
+  while (currentIndex !== 0) {
+    // Pick a remaining element...
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex--;
+
+    // And swap it with the current element.
+    [array[currentIndex], array[randomIndex]] = [
+      array[randomIndex],
+      array[currentIndex],
+    ];
+  }
+
+  return array;
+}
+
+const QuestionCard = ({
+  question,
+  deleteQuestion,
+  editQuestion,
+  allowShuffleAnswers,
+}) => {
   const [selectedOption, setSelectedOption] = useState(null);
+  const [shuffledOptions, setShuffledOptions] = useState([]);
   const correctAnswer = question.correctAnswer;
+
+  useEffect(() => {
+    if (allowShuffleAnswers) {
+      setShuffledOptions(shuffleArray([...question.options]));
+    } else {
+      setShuffledOptions(question.options);
+    }
+  }, [question.options, allowShuffleAnswers]);
 
   const handleOptionClick = (option) => {
     setSelectedOption(option.text);
@@ -18,16 +53,24 @@ const QuestionCard = ({ question, deleteQuestion, editQuestion }) => {
           <span className="text-black">{question.questionPoint}</span>
         </div>
         <div className="flex space-x-2">
-          <FiEdit2 className="text-green-600 cursor-pointer text-xl" onClick={editQuestion} />
-          <FiTrash2 className="text-red-600 cursor-pointer text-xl" onClick={deleteQuestion} />
+          <FiEdit2
+            className="text-green-600 cursor-pointer text-xl"
+            onClick={editQuestion}
+          />
+          <FiTrash2
+            className="text-red-600 cursor-pointer text-xl"
+            onClick={deleteQuestion}
+          />
         </div>
       </div>
       <div className="px-4 py-2">
         <h2 className="text-lg font-semibold mb-3">
-          <span dangerouslySetInnerHTML={{ __html: question.questionText }}></span>
+          <span
+            dangerouslySetInnerHTML={{ __html: question.questionText }}
+          ></span>
         </h2>
         <div className="space-y-2 ms-4">
-          {question.options.map((option, index) => (
+          {shuffledOptions.map((option, index) => (
             <label
               key={index}
               className="flex items-center space-x-3 cursor-pointer"
@@ -68,11 +111,13 @@ const QuestionCard = ({ question, deleteQuestion, editQuestion }) => {
           >
             {selectedOption === correctAnswer ? (
               <div className="flex items-center text-sm">
-                <FaCheckCircle className="mr-2" /> {question.correctAnswerComment || "Right Answer"}
+                <FaCheckCircle className="mr-2" />{" "}
+                {question.correctAnswerComment || "Right Answer"}
               </div>
             ) : (
               <div className="flex items-center text-sm">
-                <FaTimesCircle className="mr-2" /> {question.inCorrectAnswerComment || "Wrong Answer"}
+                <FaTimesCircle className="mr-2" />{" "}
+                {question.inCorrectAnswerComment || "Wrong Answer"}
               </div>
             )}
           </div>

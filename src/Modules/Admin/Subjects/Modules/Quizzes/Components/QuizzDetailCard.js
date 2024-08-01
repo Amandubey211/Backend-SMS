@@ -38,7 +38,9 @@ const QuizzDetailCard = ({ quiz }) => {
     },
     {
       label: "Student See The correct Answer",
-      value: new Date(quiz?.showAnswerDate).toLocaleDateString(),
+      value: new Date(
+        quiz?.showAnswerDate || "MM/DD/YYYY"
+      ).toLocaleDateString(),
       type: "quizz",
     },
     {
@@ -52,33 +54,39 @@ const QuizzDetailCard = ({ quiz }) => {
       value: new Date(quiz?.dueDate).toLocaleDateString(),
       type: "date",
     },
- 
+
     // { label: "Until", value: "02/10/2024", type: "date" }
   ];
 
   return (
     <div className="p-3 bg-white" aria-label="Quiz Card">
-      <ButtonsGroup data={quiz}  type="Quiz"  />
+      <ButtonsGroup data={quiz} type="Quiz" />
       <p className="text-center text-green-500 italic font-semibold pb-3 border-b">
         Submitted Students : 50/100{" "}
       </p>
       <SpeedGradeButton />
-      {quizDetails.map((detail, index) => {
-        if (detail.type === "quizz") {
-          return (
-            <AssignmentDetail
-              key={index}
-              label={detail.label}
-              value={detail.value}
-            />
-          );
-        } else if (detail.type === "date") {
-          return (
-            <DateDetail key={index} label={detail.label} value={detail.value} />
-          );
-        }
-        return null;
-      })}
+      <div className="ps-3 ">
+        {quizDetails.map((detail, index) => {
+          if (detail.type === "quizz") {
+            return (
+              <AssignmentDetail
+                key={index}
+                label={detail.label}
+                value={detail.value}
+              />
+            );
+          } else if (detail.type === "date") {
+            return (
+              <DateDetail
+                key={index}
+                label={detail.label}
+                value={detail.value}
+              />
+            );
+          }
+          return null;
+        })}
+      </div>
     </div>
   );
 };
