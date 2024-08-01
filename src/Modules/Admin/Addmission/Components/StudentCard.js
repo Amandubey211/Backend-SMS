@@ -7,7 +7,8 @@ const StudentCard = ({ studentInfo, imagePreview }) => {
   const {
     firstName,
     lastName,
-    studentId,
+    Q_Id,
+    contactNumber,
     class: studentClass,
     section,
     bloodGroup,
@@ -46,14 +47,12 @@ const StudentCard = ({ studentInfo, imagePreview }) => {
           </h2>
           <div className="text-sm text-gray-600 mt-2 space-y-1 ">
             <p>
-              <span className="font-semibold">ID No</span>: {studentId}
+              <span className="font-semibold">QID</span>: {Q_Id}
             </p>
             <p>
               <span className="font-semibold">Class</span>: {studentClass}
             </p>
-            <p>
-              <span className="font-semibold">Section</span>: {section}
-            </p>
+
             <p>
               <span className="font-semibold">Blood</span>: {bloodGroup}
             </p>
@@ -63,6 +62,9 @@ const StudentCard = ({ studentInfo, imagePreview }) => {
             <p title={email}>
               <span className="font-semibold">Email</span>:{" "}
               {truncateEmail(email)}
+            </p>
+            <p>
+              <span className="font-semibold">Number</span>: {contactNumber}
             </p>
           </div>
         </div>
