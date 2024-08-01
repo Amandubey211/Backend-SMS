@@ -8,6 +8,7 @@ import useMarkAttendance from "../../../../Hooks/AuthHooks/Staff/Admin/Attendanc
 import useGetAttendanceByClassSectionGroupAndDate from "../../../../Hooks/AuthHooks/Staff/Admin/Attendance/useGetAttendanceByClassSectionGroupAndDate";
 import { useParams } from "react-router-dom";
 import Spinner from "../../../../Components/Common/Spinner";
+import NoDataFound from "../../../../Components/Common/NoDataFound";
 
 const MainSection = () => {
   const [filters, setFilters] = useState({
@@ -88,7 +89,7 @@ const MainSection = () => {
           {fetchingLoading ? (
             <Spinner />
           ) : fetchingError ? (
-            <div>Error: {fetchingError}</div>
+            <NoDataFound title="Attendence" />
           ) : (
             <AttendanceTable
               filters={filters}
@@ -104,17 +105,18 @@ const MainSection = () => {
       <div className="w-4/12 p-4 bg-white flex flex-col">
         <div className="flex justify-center items-center">
           <button
-            className="px-6 py-2 mb-2 w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-md shadow-lg"
+            className="px-6 py-2 mb-2 w-full bg-gradient-to-r from-pink-500 to-purple-500 hover:bg-gradient-to-r hover:from-pink-700 hover:to-purple-700 text-white rounded-md shadow-lg"
             onClick={handleSubmitAttendance}
           >
             {markingLoading ? "Marking.." : "Submit Attendance"}
           </button>
         </div>
-
-        <CustomCalendar
-          selectedDate={selectedDate}
-          setSelectedDate={setSelectedDate}
-        />
+        <div className="flex justify-center">
+          <CustomCalendar
+            selectedDate={selectedDate}
+            setSelectedDate={setSelectedDate}
+          />{" "}
+        </div>
         <div className="flex-grow p-3 mt-1 w-full">
           <Statistics />
         </div>

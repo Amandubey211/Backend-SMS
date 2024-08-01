@@ -36,15 +36,21 @@ const Chapter = ({
             className="w-12 h-12 mr-4 rounded-lg"
           />
           <div>
-            <h2 className="font-semibold text-lg">{title}</h2>
+            <h2 className="font-semibold text-md">{title}</h2>
             <p className="text-gray-500">Chapter {chapterNumber}</p>
           </div>
         </div>
         <div className="flex items-center space-x-2">
-          <button className="border p-2 rounded-full hover:bg-gray-50" onClick={toggleMenu}>
+          <button
+            className="border p-2 rounded-full hover:bg-gray-50"
+            onClick={toggleMenu}
+          >
             <FaEllipsisV />
           </button>
-          <button className="border p-2 rounded-full hover:bg-gray-50" onClick={onToggle}>
+          <button
+            className="border p-2 rounded-full hover:bg-gray-50"
+            onClick={onToggle}
+          >
             {isExpanded ? <FaChevronUp /> : <FaChevronDown />}
           </button>
         </div>

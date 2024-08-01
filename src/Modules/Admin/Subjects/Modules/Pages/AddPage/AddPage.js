@@ -6,20 +6,29 @@ import EditorComponent from "../../../Component/AdminEditor";
 import DateInput from "../../../Component/DateInput";
 import useCreatePage from "../../../../../../Hooks/AuthHooks/Staff/Admin/Page/useCreatePage";
 import useUpdatePage from "../../../../../../Hooks/AuthHooks/Staff/Admin/Page/useUpdatePage";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 const AddPage = () => {
   const { state } = useLocation();
   const [title, setTitle] = useState("");
   const [editorContent, setEditorContent] = useState("");
   const [editPermission, setEditPermission] = useState("Only Instructor");
-  const [publishDate, setPublishDate] = useState("");
+  const [publishAt, setPublishDate] = useState("");
   const [isUpdating, setIsUpdating] = useState(false);
   const [publish, setPublish] = useState(false);
 
-  const { pageId } = useParams();
-  const { loading: createLoading, error: createError, success: createSuccess, createPage } = useCreatePage();
-  const { loading: updateLoading, error: updateError, success: updateSuccess, updatePage } = useUpdatePage();
+  const {
+    loading: createLoading,
+    error: createError,
+    success: createSuccess,
+    createPage,
+  } = useCreatePage();
+  const {
+    loading: updateLoading,
+    error: updateError,
+    success: updateSuccess,
+    updatePage,
+  } = useUpdatePage();
 
   useEffect(() => {
     if (state?.page) {
@@ -28,7 +37,9 @@ const AddPage = () => {
       setEditPermission(state.page.editPermission || "Only Instructor");
       setPublish(state.page.publish || false);
       if (state.page.publishDate) {
-        setPublishDate(new Date(state.page.publishDate).toISOString().substring(0, 10));
+        setPublishDate(
+          new Date(state.page.publishDate).toISOString().substring(0, 10)
+        );
       }
       setIsUpdating(true);
     }
@@ -50,21 +61,17 @@ const AddPage = () => {
     setPublishDate(e.target.value);
   };
 
-  const handlePublishChange = (e) => {
-    setPublish(e.target.checked);
-  };
-
   const handleSave = async () => {
     const pageData = {
       title,
       content: editorContent,
       editPermission,
-      publishDate,
+      publishAt,
       publish,
     };
 
     if (isUpdating) {
-      await updatePage(pageId, pageData);
+      await updatePage(state?.page._id, pageData);
     } else {
       await createPage(pageData);
     }
@@ -79,11 +86,19 @@ const AddPage = () => {
   };
 
   return (
-    <Layout title={isUpdating ? "Update Page | Student Diwan" : "Add Page | Student Diwan"}>
+    <Layout
+      title={
+        isUpdating ? "Update Page | Student Diwan" : "Add Page | Student Diwan"
+      }
+    >
       <div className="flex">
         <SideMenubar />
         <div className="w-full">
-          <AddPageHeader onSave={handleSave} isUpdating={isUpdating} loading={createLoading || updateLoading} />
+          <AddPageHeader
+            onSave={handleSave}
+            isUpdating={isUpdating}
+            loading={createLoading || updateLoading}
+          />
           <div className="flex w-full">
             <div className="w-[70%]">
               <EditorComponent
@@ -111,22 +126,11 @@ const AddPage = () => {
                   <option>Instructor and TA</option>
                 </select>
               </div>
-              <div className="mb-4">
-                <label className="block text-gray-700" htmlFor="publish">
-                  Publish
-                </label>
-                <input
-                  id="publish"
-                  type="checkbox"
-                  checked={publish}
-                  onChange={handlePublishChange}
-                  className="mt-1 block"
-                />
-              </div>
+
               <DateInput
                 label="Publish at"
-                name="publishDate"
-                value={publishDate}
+                name="publishAt"
+                value={publishAt}
                 handleChange={handlePublishDateChange}
               />
             </div>

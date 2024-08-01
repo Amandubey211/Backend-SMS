@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 import { useParams } from "react-router-dom";
 import useAddModule from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useAddModule";
 
-const AddModule = ({ data }) => {
+const AddModule = ({ data, onClose, onModuleAdded }) => {
   const { sid } = useParams();
   const [selectedFile, setSelectedFile] = useState(null);
   const [preview, setPreview] = useState(null);
@@ -45,14 +45,15 @@ const AddModule = ({ data }) => {
       return;
     }
 
-    await addModule(moduleTitle, selectedFile || preview);
-    if (success) {
-      toast.success(success);
+    const result = await addModule(moduleTitle, selectedFile || preview);
+    if (result && result.success) {
+      toast.success("Module added successfully");
       setModuleTitle("");
       clearImage();
-    }
-    if (error) {
-      toast.error(error);
+      onModuleAdded(); // Notify the parent component
+      onClose(); // Close the sidebar
+    } else if (result && result.error) {
+      toast.error(result.error);
     }
   };
 
@@ -169,7 +170,11 @@ const AddModule = ({ data }) => {
           className="w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600"
           disabled={loading}
         >
-          {loading ? "Adding Module..." : data ? "Update Module" : "Add New Module"}
+          {loading
+            ? "Adding Module..."
+            : data
+            ? "Update Module"
+            : "Add New Module"}
         </button>
       </div>
     </div>

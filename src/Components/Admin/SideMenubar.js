@@ -12,6 +12,7 @@ import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleSidebar } from "../../Redux/Slices/Common/SidebarSlice.js";
 import useStaffLogout from "../../Hooks/AuthHooks/Staff/useStaffLogOut.js";
+import LogoutConfirmationModal from "../Common/LogoutConfirmationModal.js";
 
 const isActivePath = (path, locationPath) => locationPath.startsWith(path);
 
@@ -27,6 +28,8 @@ const SideMenubar = () => {
   }));
 
   const [openItems, setOpenItems] = useState([]);
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false); // State to control the modal visibility
+  const [isLoggingOut, setIsLoggingOut] = useState(false); // State to handle loading
 
   const toggleDropdown = (title) => {
     setOpenItems((prevOpenItems) =>
@@ -34,6 +37,20 @@ const SideMenubar = () => {
         ? prevOpenItems.filter((item) => item !== title)
         : [...prevOpenItems, title]
     );
+  };
+
+  const handleLogout = () => {
+    setIsLogoutModalOpen(true);
+  };
+
+  const confirmLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      await staffLogout(); // Perform the actual logout
+      setIsLogoutModalOpen(false); // Close modal after confirmation
+    } finally {
+      setIsLoggingOut(false);
+    }
   };
 
   return (
@@ -186,14 +203,13 @@ const SideMenubar = () => {
             <div className="ml-4">
               <h2 className="text-sm font-semibold">
                 {userDetails?.fullName || userDetails?.adminName || "User"}
-
               </h2>
               <p className="text-gray-500 capitalize">{role}</p>
             </div>
           )}
           <button
             title="logout"
-            onClick={staffLogout}
+            onClick={handleLogout} // Open the logout confirmation modal
             className="ml-3"
             aria-label="Logout"
           >
@@ -205,6 +221,12 @@ const SideMenubar = () => {
           </button>
         </div>
       </div>
+      <LogoutConfirmationModal
+        isOpen={isLogoutModalOpen}
+        onClose={() => setIsLogoutModalOpen(false)}
+        onConfirm={confirmLogout}
+        loading={isLoggingOut}
+      />
     </nav>
   );
 };

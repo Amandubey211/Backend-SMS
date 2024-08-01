@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import PointsInput from "../../../Assignments/CreateAssignment/Component/PointsInput";
 import DateInput from "../../../../Component/DateInput";
 import SectionSelect from "../../../../Component/SectionSelect";
 import AssignToRadios from "../../../../Component/AssignToRadios";
@@ -60,11 +59,12 @@ const CreateQuizForm = ({
         {/* Shuffle Answers Input */}
         <div className="p-2">
           <h3 className="text-gray-700">Shuffle Answers</h3>
-          <div className="flex items-center ">
+          <div className="flex items-center">
             <input
               type="radio"
+              id="shuffleYes"
               name="allowShuffleAnswers"
-              value="true"
+              value={true}
               checked={allowShuffleAnswers === true}
               onChange={(e) =>
                 handleChange({
@@ -76,11 +76,14 @@ const CreateQuizForm = ({
               }
               className="mr-2"
             />
-            <label className="mr-4">Yes</label>
+            <label htmlFor="shuffleYes" className="mr-4">
+              Yes
+            </label>
             <input
               type="radio"
+              id="shuffleNo"
               name="allowShuffleAnswers"
-              value="false"
+              value={false}
               checked={allowShuffleAnswers === false}
               onChange={(e) =>
                 handleChange({
@@ -92,7 +95,7 @@ const CreateQuizForm = ({
               }
               className="mr-2"
             />
-            <label>No</label>
+            <label htmlFor="shuffleNo">No</label>
           </div>
         </div>
 
@@ -105,21 +108,26 @@ const CreateQuizForm = ({
         <div className="flex items-center">
           <input
             type="checkbox"
+            id="allowMultiple"
             name="allowMultiple"
             checked={allowMultiple}
             onChange={handleChange}
             className="mr-2 p-3"
           />
-          <label className="text-gray-700">Allow Multiple Attempts</label>
+          <label htmlFor="allowMultiple" className="text-gray-700">
+            Allow Multiple Attempts
+          </label>
         </div>
 
-        <LabeledInput
-          label="Allowed Attempts"
-          name="numberOfAttempts"
-          type="number"
-          value={numberOfAttempts}
-          onChange={handleChange}
-        />
+        {!allowMultiple && (
+          <LabeledInput
+            label="Allowed Attempts"
+            name="numberOfAttempts"
+            type="number"
+            value={numberOfAttempts}
+            onChange={handleChange}
+          />
+        )}
 
         <h2 className="text-xl font-semibold mt-6 pt-4 border-t">
           Quiz Restrictions
@@ -131,22 +139,26 @@ const CreateQuizForm = ({
           <div className="flex items-center mb-4">
             <input
               type="radio"
+              id="seeAnswerYes"
               name="studentSeeAnswer"
               value="yes"
               checked={studentSeeAnswer === "yes"}
               onChange={handleChange}
               className="mr-2"
             />
-            <label className="mr-4">Yes</label>
+            <label htmlFor="seeAnswerYes" className="mr-4">
+              Yes
+            </label>
             <input
               type="radio"
+              id="seeAnswerNo"
               name="studentSeeAnswer"
               value="no"
               checked={studentSeeAnswer === "no"}
               onChange={handleChange}
               className="mr-2"
             />
-            <label>No</label>
+            <label htmlFor="seeAnswerNo">No</label>
           </div>
           {studentSeeAnswer === "yes" && (
             <DateInput
@@ -171,12 +183,16 @@ const CreateQuizForm = ({
           <div className="flex items-center">
             <input
               type="checkbox"
+              id="lockQuestionsAfterAnswering"
               name="lockQuestionsAfterAnswering"
               checked={lockQuestionsAfterAnswering}
               onChange={handleChange}
               className="mr-2 p-3"
             />
-            <label className="text-gray-700">
+            <label
+              htmlFor="lockQuestionsAfterAnswering"
+              className="text-gray-700"
+            >
               Lock questions after answering
             </label>
           </div>
@@ -187,7 +203,12 @@ const CreateQuizForm = ({
           handleChange={handleChange}
           isAssignToLabel={true}
         />
-        <SectionSelect section={section} handleChange={handleChange} group={group} assignTo={assignTo}/>
+        <SectionSelect
+          section={section}
+          handleChange={handleChange}
+          group={group}
+          assignTo={assignTo}
+        />
         <div className="mb-4">
           <label className="block text-gray-700" htmlFor="module-select">
             Module
@@ -229,13 +250,13 @@ const CreateQuizForm = ({
         <DateInput
           label="Available from"
           name="availableFrom"
-          value={availableFrom}
+          value={availableFrom || "DD/MM/YY"}
           handleChange={handleChange}
         />
         <DateInput
           label="Due"
           name="dueDate"
-          value={dueDate}
+          value={dueDate || "DD/MM/YY"}
           handleChange={handleChange}
         />
       </div>

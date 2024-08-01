@@ -1,13 +1,55 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import PropTypes from "prop-types";
 import { createPortal } from "react-dom";
 import { RiCloseLine } from "react-icons/ri";
-import { FaSpinner } from "react-icons/fa";
+import { ImSpinner3 } from "react-icons/im";
+
+// Hook for trapping focus within a modal
+function useFocusTrap(modalRef, isOpen) {
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const focusableElements = modalRef.current.querySelectorAll(
+      "a, button, input, textarea, select, details,[tabindex]:not([tabindex='-1'])"
+    );
+
+    const firstElement = focusableElements[0];
+    const lastElement = focusableElements[focusableElements.length - 1];
+
+    const handleKeyDown = (e) => {
+      if (e.key === "Tab") {
+        if (e.shiftKey) {
+          // Shift + Tab
+          if (document.activeElement === firstElement) {
+            e.preventDefault();
+            lastElement.focus();
+          }
+        } else {
+          // Tab
+          if (document.activeElement === lastElement) {
+            e.preventDefault();
+            firstElement.focus();
+          }
+        }
+      }
+    };
+
+    firstElement.focus();
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isOpen, modalRef]);
+}
 
 const DeleteModal = ({ isOpen, onClose, onConfirm, title }) => {
   const [inputValue, setInputValue] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const modalRef = useRef(null);
+
+  useFocusTrap(modalRef, isOpen);
 
   useEffect(() => {
     if (!isOpen) {
@@ -53,7 +95,10 @@ const DeleteModal = ({ isOpen, onClose, onConfirm, title }) => {
       role="dialog"
       aria-modal="true"
     >
-      <div className="bg-white rounded-lg overflow-hidden shadow-lg transform transition-transform duration-300 w-11/12 md:w-1/3">
+      <div
+        ref={modalRef}
+        className="bg-white rounded-lg overflow-hidden shadow-lg transform transition-transform duration-300 w-11/12 md:w-1/3"
+      >
         <div className="flex justify-between items-center p-4 border-b">
           <h3 id="delete-modal-title" className="text-lg font-semibold">
             Delete {title}
@@ -95,7 +140,11 @@ const DeleteModal = ({ isOpen, onClose, onConfirm, title }) => {
               disabled={!isMatching}
               aria-label="Delete"
             >
-              {loading ? <FaSpinner className="animate-spin mr-2" /> : "Delete"}
+              {loading ? (
+                <ImSpinner3 className="animate-spin mr-2" />
+              ) : (
+                "Delete"
+              )}
             </button>
           </div>
         </div>

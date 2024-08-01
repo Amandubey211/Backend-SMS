@@ -2,7 +2,6 @@ import { useState, useCallback } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
 import { baseUrl } from "../../../../../config/Common";
 
 const useUpdatePage = () => {
@@ -10,12 +9,10 @@ const useUpdatePage = () => {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
 
-  
   const { role } = useSelector((store) => store.Auth);
-  const { cid, sid, pageId } = useParams();
 
   const updatePage = useCallback(
-    async (pageData) => {
+    async (pageId, pageData) => {
       const { title, content } = pageData;
 
       // Validate required fields
@@ -58,7 +55,7 @@ const useUpdatePage = () => {
         setLoading(false);
       }
     },
-    [role, baseUrl, pageId]
+    [role, baseUrl]
   );
 
   return { loading, error, success, updatePage };

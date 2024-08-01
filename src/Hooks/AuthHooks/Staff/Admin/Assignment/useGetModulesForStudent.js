@@ -13,6 +13,7 @@ const useGetModulesForStudent = () => {
 
   const { cid, sid } = useParams();
   const dispatch = useDispatch();
+
   const fetchModules = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -25,7 +26,7 @@ const useGetModulesForStudent = () => {
         }
       );
       console.log(response.data);
-      if (response.data && response.data.success) {
+      if (response.data?.success) {
         dispatch(setModules(response.data.data.modules));
         setModulesData(response.data.data);
       } else {
@@ -39,7 +40,7 @@ const useGetModulesForStudent = () => {
     } finally {
       setLoading(false);
     }
-  }, [role, baseUrl]);
+  }, [role, dispatch, cid, sid]); // Include all dependencies
 
   return { loading, error, modulesData, fetchModules };
 };
