@@ -3,7 +3,7 @@ import { IoIosArrowBack } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 import { ImSpinner8 } from "react-icons/im";
 
-const AddPageHeader = ({ onSave, isUpdating, loading }) => {
+const AddPageHeader = ({ onSave, isUpdating, loadingType }) => {
   const navigate = useNavigate();
 
   return (
@@ -19,14 +19,12 @@ const AddPageHeader = ({ onSave, isUpdating, loading }) => {
       </div>
       <div className="flex items-center space-x-2">
         <button
-          onClick={() => {
-            onSave(false); // Save without publishing
-          }}
+          onClick={() => onSave(false)} // Save without publishing
           className="flex-grow rounded-md py-2 px-6 text-center bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200 transition"
-          disabled={loading}
+          disabled={loadingType === "save" || loadingType === "publish"}
         >
           <span className="text-gradient flex items-center justify-center">
-            {loading ? (
+            {loadingType === "save" ? (
               <>
                 <ImSpinner8 className="animate-spin mr-2" />
                 {isUpdating ? "Updating..." : "Saving..."}
@@ -39,14 +37,12 @@ const AddPageHeader = ({ onSave, isUpdating, loading }) => {
           </span>
         </button>
         <button
-          onClick={() => {
-            onSave(true); // Save and publish
-          }}
+          onClick={() => onSave(true)} // Save and publish
           className="flex-grow rounded-md py-2 px-6 text-center bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200 transition"
-          disabled={loading}
+          disabled={loadingType === "save" || loadingType === "publish"}
         >
           <span className="text-gradient flex items-center justify-center">
-            {loading ? (
+            {loadingType === "publish" ? (
               <>
                 <ImSpinner8 className="animate-spin mr-2" />
                 {isUpdating ? "Updating..." : "Saving..."}

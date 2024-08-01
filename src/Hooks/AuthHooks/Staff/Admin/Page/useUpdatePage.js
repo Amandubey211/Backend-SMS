@@ -28,6 +28,11 @@ const useUpdatePage = () => {
       try {
         const token = localStorage.getItem(`${role}:token`);
 
+        // Ensure token is present
+        if (!token) {
+          throw new Error("User not authenticated");
+        }
+
         const response = await axios.put(
           `${baseUrl}/admin/api/pages/${pageId}`,
           pageData,
@@ -43,8 +48,7 @@ const useUpdatePage = () => {
           setSuccess(true);
           toast.success("Page updated successfully");
         } else {
-          toast.error("Failed to update page");
-          setError("Failed to update page");
+          throw new Error(response.data.message || "Failed to update page");
         }
       } catch (err) {
         const errorMessage =
@@ -55,7 +59,7 @@ const useUpdatePage = () => {
         setLoading(false);
       }
     },
-    [role, baseUrl]
+    [role]
   );
 
   return { loading, error, success, updatePage };
