@@ -1,18 +1,35 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FaTimes } from "react-icons/fa";
+import { FiLoader } from "react-icons/fi"; // Importing a loader icon
 import toast from "react-hot-toast";
 import useAddChapter from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useAddChapter";
+import useUpdateChapter from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useUpdateChapter";
 import { useSelector } from "react-redux";
 
-const AddChapter = () => {
+const AddChapter = ({ chapterData, isEditing, onClose }) => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [preview, setPreview] = useState(null);
   const [chapterTitle, setChapterTitle] = useState("");
-  const { loading, error, success, addChapter } = useAddChapter();
-const selectedModule = useSelector((store)=>store.Common.selectedModule)
+
+  const { loading: addLoading, error, success, addChapter } = useAddChapter();
+  const {
+    loading: updateLoading,
+    error: updateError,
+    success: updateSuccess,
+    updateChapter,
+  } = useUpdateChapter();
+
+  const selectedModule = useSelector((store) => store.Common.selectedModule);
+
+  useEffect(() => {
+    if (isEditing && chapterData) {
+      setChapterTitle(chapterData.name);
+      setPreview(chapterData.thumbnail);
+    }
+  }, [isEditing, chapterData]);
+
   const handleFileChange = (event) => {
     const file = event.target.files[0];
-    console.log(file)
     if (file) {
       setSelectedFile(file);
       const reader = new FileReader();
@@ -34,20 +51,39 @@ const selectedModule = useSelector((store)=>store.Common.selectedModule)
       toast.error("Chapter title is required");
       return;
     }
-    if (!selectedFile) {
+
+    if (!preview && !selectedFile) {
       toast.error("Chapter image is required");
       return;
     }
 
-    await addChapter(chapterTitle, selectedFile,selectedModule?.moduleId);
+    const thumbnail = selectedFile ? selectedFile : null;
 
-    if (success) {
-      toast.success(success);
-      setChapterTitle("");
-      clearImage();
-    }
-    if (error) {
-      toast.error(error);
+    if (isEditing) {
+      await updateChapter(
+        chapterTitle,
+        thumbnail,
+        selectedModule?.moduleId,
+        chapterData._id
+      );
+      if (updateSuccess) {
+        toast.success(updateSuccess);
+        onClose();
+      }
+      if (updateError) {
+        toast.error(updateError);
+      }
+    } else {
+      await addChapter(chapterTitle, thumbnail, selectedModule?.moduleId);
+      if (success) {
+        toast.success(success);
+        setChapterTitle("");
+        clearImage();
+        onClose();
+      }
+      if (error) {
+        toast.error(error);
+      }
     }
   };
 
@@ -160,10 +196,19 @@ const selectedModule = useSelector((store)=>store.Common.selectedModule)
       <div className="mt-auto mb-8">
         <button
           type="submit"
-          className="w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600"
-          disabled={loading}
+          className="w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600 flex justify-center items-center"
+          disabled={addLoading || updateLoading}
         >
-          {loading ? "Adding Chapter..." : "Add New Chapter"}
+          {addLoading || updateLoading ? (
+            <FiLoader className="animate-spin mr-2" />
+          ) : null}
+          {addLoading || updateLoading
+            ? isEditing
+              ? "Updating Chapter..."
+              : "Adding Chapter..."
+            : isEditing
+            ? "Update Chapter"
+            : "Add New Chapter"}
         </button>
       </div>
     </form>

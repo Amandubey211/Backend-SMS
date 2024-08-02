@@ -9,7 +9,6 @@ const useDeleteQuiz = () => {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
 
-  
   const role = useSelector((store) => store.Auth.role);
 
   const deleteQuiz = useCallback(

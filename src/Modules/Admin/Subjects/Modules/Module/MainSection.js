@@ -60,7 +60,14 @@ const MainSection = () => {
   };
 
   const openAddChapter = () => {
-    setSidebarContent("chapter");
+    setSidebarContent(
+      <AddChapter
+        onClose={() => {
+          handleSidebarClose();
+          fetchModules();
+        }}
+      />
+    );
     setIsSidebarOpen(true);
   };
 
@@ -119,6 +126,21 @@ const MainSection = () => {
     fetchModules();
   }, [fetchModules]);
 
+  // Handle editing a chapter
+  const handleEditChapter = (chapter) => {
+    setSidebarContent(
+      <AddChapter
+        chapterData={chapter}
+        isEditing={true}
+        onClose={() => {
+          handleSidebarClose();
+          fetchModules();
+        }}
+      />
+    );
+    setIsSidebarOpen(true);
+  };
+
   return (
     <div className="flex min-h-screen">
       <SubjectSideBar />
@@ -147,15 +169,22 @@ const MainSection = () => {
                 key={index}
                 title={chapter.name}
                 chapterNumber={index + 1}
+                chapterId={chapter._id}
+                moduleId={selectedModule.moduleId}
                 imageUrl={chapter.thumbnail}
                 assignments={chapter.assignments}
                 quizzes={chapter.quizzes}
                 isExpanded={expandedChapters.includes(index + 1)}
                 onToggle={() => handleToggle(index + 1)}
                 onDelete={() =>
-                  handleDelete({ type: "Chapter", name: chapter.name })
+                  handleDelete({
+                    type: "Chapter",
+                    name: chapter.name,
+                    id: chapter._id,
+                    moduleId: selectedModule.moduleId,
+                  })
                 }
-                onEdit={() => toast.success("Edit Chapter")}
+                onEdit={() => handleEditChapter(chapter)}
               />
             ))
           ) : (

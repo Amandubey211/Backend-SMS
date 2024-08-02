@@ -1,15 +1,29 @@
 import React, { useState, useEffect } from "react";
 import { FaTimes } from "react-icons/fa";
+import { FiLoader } from "react-icons/fi"; // Importing a loader icon
 import toast from "react-hot-toast";
 import { useParams } from "react-router-dom";
 import useAddModule from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useAddModule";
+import useEditModule from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useEditModule";
 
 const AddModule = ({ data, onClose, onModuleAdded }) => {
   const { sid } = useParams();
   const [selectedFile, setSelectedFile] = useState(null);
   const [preview, setPreview] = useState(null);
   const [moduleTitle, setModuleTitle] = useState("");
-  const { loading, error, success, addModule } = useAddModule();
+
+  const {
+    loading: addLoading,
+    error: addError,
+    success: addSuccess,
+    addModule,
+  } = useAddModule();
+  const {
+    loading: editLoading,
+    error: editError,
+    success: editSuccess,
+    editModule,
+  } = useEditModule();
 
   useEffect(() => {
     if (data) {
@@ -45,15 +59,30 @@ const AddModule = ({ data, onClose, onModuleAdded }) => {
       return;
     }
 
-    const result = await addModule(moduleTitle, selectedFile || preview);
-    if (result && result.success) {
-      toast.success("Module added successfully");
-      setModuleTitle("");
-      clearImage();
-      onModuleAdded(); // Notify the parent component
-      onClose(); // Close the sidebar
-    } else if (result && result.error) {
-      toast.error(result.error);
+    if (data) {
+      // Edit module
+      await editModule(data._id, moduleTitle, selectedFile);
+      if (editSuccess) {
+        toast.success("Module updated successfully");
+        setModuleTitle("");
+        clearImage();
+        onModuleAdded(); // Notify the parent component
+        onClose(); // Close the sidebar
+      } else if (editError) {
+        toast.error(editError);
+      }
+    } else {
+      // Add module
+      const result = await addModule(moduleTitle, selectedFile || preview);
+      if (result && result.success) {
+        toast.success("Module added successfully");
+        setModuleTitle("");
+        clearImage();
+        onModuleAdded(); // Notify the parent component
+        onClose(); // Close the sidebar
+      } else if (result && result.error) {
+        toast.error(result.error);
+      }
     }
   };
 
@@ -167,11 +196,16 @@ const AddModule = ({ data, onClose, onModuleAdded }) => {
         <button
           onClick={handleSubmit}
           type="submit"
-          className="w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600"
-          disabled={loading}
+          className="w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600 flex justify-center items-center"
+          disabled={addLoading || editLoading}
         >
-          {loading
-            ? "Adding Module..."
+          {(addLoading || editLoading) && (
+            <FiLoader className="animate-spin mr-2" />
+          )}
+          {addLoading || editLoading
+            ? data
+              ? "Updating Module..."
+              : "Adding Module..."
             : data
             ? "Update Module"
             : "Add New Module"}
