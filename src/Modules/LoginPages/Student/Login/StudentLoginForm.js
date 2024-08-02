@@ -9,6 +9,7 @@ import { FcInfo } from "react-icons/fc";
 import { NavLink, useNavigate } from "react-router-dom";
 import Modal from "../../../../Components/Common/Modal";
 import { AiOutlinePhone } from "react-icons/ai";
+import StudentDiwanLogo from "../../../../Assets/HomeAssets/StudentDiwanLogo.png";
 
 const StudentLoginForm = () => {
   const [studentDetails, setStudentDetails] = useState({
@@ -137,11 +138,11 @@ const StudentLoginForm = () => {
       <Modal isOpen={modalIsOpen} onClose={closeModal}>
         <div className="">
           <img
-            src="https://via.placeholder.com/150"
-            alt="Information"
-            className="mx-auto mb-4 w-24 h-24 rounded-full"
+            src={StudentDiwanLogo}
+            alt="logo"
+            className="mx-auto mb-4 h-18 w-60 "
           />
-          <h2 className="text-2xl font-semibold mb-4" id="modal-title">
+          <h2 className="text-2xl    font-semibold mb-4" id="modal-title">
             Information
           </h2>
           <p className="mb-6 capitalize">

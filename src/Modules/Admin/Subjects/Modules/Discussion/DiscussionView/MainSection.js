@@ -3,20 +3,22 @@ import { useParams } from "react-router-dom";
 import Header from "./Components/Header";
 import SubjectSideBar from "../../../Component/SubjectSideBar";
 import useFetchDiscussionById from "../../../../../../Hooks/AuthHooks/Staff/Admin/Disscussion/useFetchDiscussionById";
+import Spinner from "../../../../../../Components/Common/Spinner";
+import NoDataFound from "../../../../../../Components/Common/NoDataFound";
 
 const MainSection = () => {
   const { did } = useParams();
   const { discussion, error, fetchDiscussionById, loading } =
     useFetchDiscussionById();
-  // we are getting the replies as well here in future we have to remove the replies from the backend and ,
+  // we are getting the replies as well, in future we have to remove the replies from the backend and ,
   //in DiscussionMessage we have to fetch the replies with useEffect
   useEffect(() => {
     fetchDiscussionById(did);
   }, [did, fetchDiscussionById]);
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error}</p>;
-  if (!discussion) return <p>No discussion found.</p>;
+  if (loading) return <Spinner />;
+  if (error) return <NoDataFound />;
+  if (!discussion) return <NoDataFound />;
 
   return (
     <div className="flex">
