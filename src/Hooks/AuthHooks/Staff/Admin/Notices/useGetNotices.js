@@ -16,7 +16,7 @@ const useGetNotices = () => {
     setError(null);
     try {
       const token = localStorage.getItem(`${role}:token`);
-      const response = await axios.get(`${baseUrl}/admin/all/notices`, {
+      const response = await axios.get(`${baseUrl}/admin/dashboard/notices`, {
         headers: { Authentication: token },
       });
 
