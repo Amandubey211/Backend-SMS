@@ -7,15 +7,14 @@ import toast from "react-hot-toast";
 const AddEvent = () => {
   const [imagePreview, setImagePreview] = useState(null);
   const [eventData, setEventData] = useState({
-    eventName: "",
+    title: "",  // Changed from eventName
     location: "",
-    startDate: "",
-    endDate: "",
+    date: "",
     time: "",
-    eventDirector: "",
-    eventType: "",
+    director: "",  // Changed from eventDirector
+    type: "",  // Changed from eventType
     description: "",
-    eventImage: null,
+    image: null,  // Changed from eventImage
   });
 
   const { loading, error, createEvent } = useCreateEvent();
@@ -38,7 +37,7 @@ const AddEvent = () => {
       reader.readAsDataURL(file);
       setEventData((prev) => ({
         ...prev,
-        eventImage: file,
+        image: file,
       }));
     }
   };
@@ -47,7 +46,7 @@ const AddEvent = () => {
     setImagePreview(null);
     setEventData((prev) => ({
       ...prev,
-      eventImage: null,
+      image: null,
     }));
   };
 
@@ -55,28 +54,13 @@ const AddEvent = () => {
     e.preventDefault();
 
     // Check required fields
-    if (!eventData.eventName || !eventData.startDate || !eventData.endDate || !eventData.time || !eventData.eventImage) {
+    if (!eventData.title || !eventData.date || !eventData.time || !eventData.image) {
       toast.error("Please fill in all required fields.");
       return;
     }
 
-    // Create a FormData object to handle file upload
-    const formData = new FormData();
-    formData.append("eventName", eventData.eventName);
-    formData.append("location", eventData.location);
-    formData.append("startDate", eventData.startDate);
-    formData.append("endDate", eventData.endDate);
-    formData.append("time", eventData.time);
-    formData.append("eventDirector", eventData.eventDirector);
-    formData.append("eventType", eventData.eventType);
-    formData.append("description", eventData.description);
-    formData.append("eventImage", eventData.eventImage);
-
-    console.log("Submitting event data:", eventData);
-
-    // Submit event data
     try {
-      await createEvent(formData);
+      await createEvent(eventData); // Pass the eventData directly
       toast.success("Event created successfully.");
     } catch (error) {
       console.error("Error during event creation:", error);
@@ -94,32 +78,24 @@ const AddEvent = () => {
           />
         </div>
         <FormInput
-          id="eventName"
-          name="eventName"
+          id="title"
+          name="title"
           label="Event Name"
-          value={eventData.eventName}
+          value={eventData.title}
           onChange={handleInputChange}
           required
         />
         <div className="flex justify-between">
           <FormInput
-            id="startDate"
-            name="startDate"
-            label="Start Date"
+            id="date"
+            name="date"
+            label="Date"
             type="date"
-            value={eventData.startDate}
+            value={eventData.date}
             onChange={handleInputChange}
             required
           />
-          <FormInput
-            id="endDate"
-            name="endDate"
-            label="End Date"
-            type="date"
-            value={eventData.endDate}
-            onChange={handleInputChange}
-            required
-          />
+          
           <FormInput
             id="time"
             name="time"
@@ -139,17 +115,17 @@ const AddEvent = () => {
         />
         <div className="flex justify-between">
           <FormInput
-            id="eventDirector"
-            name="eventDirector"
+            id="director"
+            name="director"
             label="Event Director"
-            value={eventData.eventDirector}
+            value={eventData.director}
             onChange={handleInputChange}
           />
           <FormInput
-            id="eventType"
-            name="eventType"
+            id="type"
+            name="type"
             label="Event Type"
-            value={eventData.eventType}
+            value={eventData.type}
             onChange={handleInputChange}
           />
         </div>
