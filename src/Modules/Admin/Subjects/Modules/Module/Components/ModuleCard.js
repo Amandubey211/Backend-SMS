@@ -166,9 +166,6 @@ const ModuleCard = ({
         onConfirm={handleDelete}
         title={title}
       />
-      {loading && <p>Deleting...</p>}
-      {error && <p className="text-red-500">{error}</p>}
-      {success && <p className="text-green-500">{success}</p>}
     </div>
   );
 };

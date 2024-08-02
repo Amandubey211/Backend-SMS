@@ -15,7 +15,6 @@ const useDeleteAssignment = () => {
       setError(null);
 
       try {
-        
         const token = localStorage.getItem(`${role}:token`);
 
         const response = await axios.delete(
