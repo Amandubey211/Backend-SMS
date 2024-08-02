@@ -1,9 +1,8 @@
 import React, { useState } from "react";
-import axios from "axios"; // Ensure Axios is installed
 import ImageUpload from "../../../Addmission/Components/ImageUpload";
 import FormInput from "../../../Accounting/subClass/component/FormInput";
-import { baseUrl } from "../../../../../config/Common";
-import { useSelector } from "react-redux";
+import useCreateEvent from "../../../../../Hooks/AuthHooks/Staff/Admin/Events/useCreateEvent";
+import toast from "react-hot-toast";
 
 const AddEvent = () => {
   const [imagePreview, setImagePreview] = useState(null);
@@ -12,15 +11,18 @@ const AddEvent = () => {
     location: "",
     startDate: "",
     endDate: "",
+    time: "",
     eventDirector: "",
     eventType: "",
     description: "",
     eventImage: null,
   });
 
+  const { loading, error, createEvent } = useCreateEvent();
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setEventData(prev => ({
+    setEventData((prev) => ({
       ...prev,
       [name]: value,
     }));
@@ -34,7 +36,7 @@ const AddEvent = () => {
         setImagePreview(reader.result);
       };
       reader.readAsDataURL(file);
-      setEventData(prev => ({
+      setEventData((prev) => ({
         ...prev,
         eventImage: file,
       }));
@@ -43,41 +45,41 @@ const AddEvent = () => {
 
   const handleRemoveImage = () => {
     setImagePreview(null);
-    setEventData(prev => ({
+    setEventData((prev) => ({
       ...prev,
       eventImage: null,
     }));
   };
-  const role = useSelector((store) => store.Auth.role);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const formData = new FormData();
-    formData.append('title', eventData.eventName);
-    formData.append('date', eventData.startDate);
-    formData.append('time', '10:00 AM'); // Assuming fixed time, modify as necessary
-    formData.append('type', eventData.eventType);
-    formData.append('location', eventData.location);
-    formData.append('director', eventData.eventDirector);
-    formData.append('description', eventData.description);
-    if (eventData.eventImage) {
-      formData.append('image', eventData.eventImage);
+
+    // Check required fields
+    if (!eventData.eventName || !eventData.startDate || !eventData.endDate || !eventData.time || !eventData.eventImage) {
+      toast.error("Please fill in all required fields.");
+      return;
     }
 
-    // Retrieve JWT from localStorage
-    const token = localStorage.getItem(`${role}:token`);
+    // Create a FormData object to handle file upload
+    const formData = new FormData();
+    formData.append("eventName", eventData.eventName);
+    formData.append("location", eventData.location);
+    formData.append("startDate", eventData.startDate);
+    formData.append("endDate", eventData.endDate);
+    formData.append("time", eventData.time);
+    formData.append("eventDirector", eventData.eventDirector);
+    formData.append("eventType", eventData.eventType);
+    formData.append("description", eventData.description);
+    formData.append("eventImage", eventData.eventImage);
 
+    console.log("Submitting event data:", eventData);
+
+    // Submit event data
     try {
-      const response = await axios.post(`${baseUrl}/admin/create_event`, formData, {
-        headers: {
-          'Authentication': `${token}`, // Use Bearer authentication scheme
-          'Content-Type': 'multipart/form-data'
-        },
-      });
-      console.log('Event created successfully:', response.data);
-      // Clear the form or show success message
+      await createEvent(formData);
+      toast.success("Event created successfully.");
     } catch (error) {
-      console.error('Failed to create event:', error);
-      // Handle errors, such as displaying an error message
+      console.error("Error during event creation:", error);
     }
   };
 
@@ -97,6 +99,7 @@ const AddEvent = () => {
           label="Event Name"
           value={eventData.eventName}
           onChange={handleInputChange}
+          required
         />
         <div className="flex justify-between">
           <FormInput
@@ -117,6 +120,15 @@ const AddEvent = () => {
             onChange={handleInputChange}
             required
           />
+          <FormInput
+            id="time"
+            name="time"
+            label="Event Time"
+            type="time"
+            value={eventData.time}
+            onChange={handleInputChange}
+            required
+          />
         </div>
         <FormInput
           id="location"
@@ -125,7 +137,7 @@ const AddEvent = () => {
           value={eventData.location}
           onChange={handleInputChange}
         />
-        <div className='flex justify-between'>
+        <div className="flex justify-between">
           <FormInput
             id="eventDirector"
             name="eventDirector"
@@ -153,9 +165,11 @@ const AddEvent = () => {
         <button
           type="submit"
           className="w-full mt-4 p-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600"
+          disabled={loading}
         >
-          Add Event
+          {loading ? "Adding Event..." : "Add Event"}
         </button>
+        {error && <div className="text-red-500 mt-2">{error}</div>}
       </form>
     </div>
   );

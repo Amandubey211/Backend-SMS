@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import FormInput from "../../Accounting/subClass/component/FormInput";
 import { baseUrl } from "../../../../config/Common";
 import { useSelector } from "react-redux";
+import toast from "react-hot-toast";
 
 const AddAnnouncement = ({ onSuccess, onClose }) => {
   const [imagePreview, setImagePreview] = useState(null);
@@ -66,14 +67,15 @@ const AddAnnouncement = ({ onSuccess, onClose }) => {
       const responseData = await response.json();
 
       if (response.ok) {
-        console.log("Event data submitted successfully:", responseData);
+        console.log("Announcement data submitted successfully:", responseData);
+        toast.success("Announcement created successfully!");
         onSuccess(); // Trigger success action
         onClose(); // Close the sidebar
       } else {
-        console.error("Failed to submit event data:", responseData);
+        console.error("Failed to submit Announcement data:", responseData);
       }
     } catch (error) {
-      console.error("Error submitting event data:", error);
+      console.error("Error submitting Announcement data:", error);
     }
   };
 

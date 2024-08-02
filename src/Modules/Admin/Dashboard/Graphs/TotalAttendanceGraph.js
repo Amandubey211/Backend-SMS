@@ -96,6 +96,9 @@ const TotalAttendanceGraph = () => {
     return <p>Error: {error}</p>;
   }
 
+  // Generate array of years dynamically
+  const availableYears = Array.from({ length: 2 }, (_, i) => currentYear - i);
+
   return (
     <div className="bg-white p-4">
       <div className="flex justify-between items-center mb-4">
@@ -112,7 +115,7 @@ const TotalAttendanceGraph = () => {
             ))}
           </select>
           <select className="border rounded p-2" onChange={handleYearChange} value={year}>
-            {[2024, 2023, 2022, 2021].map(y => (
+            {availableYears.map(y => (
               <option key={y} value={y}>{y}</option>
             ))}
           </select>
