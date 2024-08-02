@@ -1,17 +1,19 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import useAssignStudentToGroup from "../../../../Hooks/AuthHooks/Staff/Admin/Students/useAssignStudentToGroup ";
+import useGetGroupsByClass from "../../../../Hooks/AuthHooks/Staff/Admin/Groups/useGetGroupByClass";
+import useFetchSection from "../../../../Hooks/AuthHooks/Staff/Admin/Sections/useFetchSection";
 
 const AssignStudent = ({ name, imageUrl, section, studentId }) => {
   const [sectionId, setSectionId] = useState("");
   const [groupId, setGroupId] = useState("");
   const AllSections = useSelector((store) => store.Class.sectionsList);
-  const { assignStudentToGroup, error, loading } = useAssignStudentToGroup();
+  const AllGroups = useSelector((store) => store.Class.groupsList);
+  const { assignStudentToGroup, assignStudentToSection, error, loading } = useAssignStudentToGroup();
 
   const handleSectionChange = (e) => {
     setSectionId(e.target.value);
-    setGroupId(""); // Reset group when changing sections
   };
 
   const handleSubmit = async (e) => {
@@ -20,18 +22,18 @@ const AssignStudent = ({ name, imageUrl, section, studentId }) => {
       toast.error("Please select a group.");
       return;
     }
+    if (!sectionId) {
+      toast.error("Please select a group.");
+      return;
+    }
     try {
+      await assignStudentToSection(studentId, sectionId)
       await assignStudentToGroup(studentId, groupId);
       toast.success("Student assigned to group successfully!");
     } catch (error) {
       toast.error(error.message);
     }
   };
-
-  // Compute all groups or the groups from a specific section
-  const groups = sectionId
-    ? AllSections.find((section) => section._id === sectionId)?.groups
-    : AllSections.reduce((acc, section) => acc.concat(section.groups), []);
 
   return (
     <form className="flex flex-col h-full" onSubmit={handleSubmit}>
@@ -61,7 +63,7 @@ const AssignStudent = ({ name, imageUrl, section, studentId }) => {
           disabled={loading}
         >
           <option value="">All Section</option>
-          {AllSections.map((section) => (
+          {AllSections?.map((section) => (
             <option key={section._id} value={section._id}>
               {section.sectionName}
             </option>
@@ -79,9 +81,9 @@ const AssignStudent = ({ name, imageUrl, section, studentId }) => {
           disabled={loading}
         >
           <option value="">Choose Group</option>
-          {groups.map((group) => (
-            <option key={group._id} value={group._id}>
-              {group.groupName}
+          {AllGroups?.map((group) => (
+            <option key={group?._id} value={group?._id}>
+              {group?.groupName}
             </option>
           ))}
         </select>
@@ -89,11 +91,10 @@ const AssignStudent = ({ name, imageUrl, section, studentId }) => {
       <div className="mt-auto mb-8">
         <button
           type="submit"
-          className={`w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md ${
-            loading
-              ? "opacity-50 cursor-not-allowed"
-              : "hover:from-pink-600 hover:to-purple-600"
-          }`}
+          className={`w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md ${loading
+            ? "opacity-50 cursor-not-allowed"
+            : "hover:from-pink-600 hover:to-purple-600"
+            }`}
           disabled={loading}
         >
           {loading ? "Assigning..." : "Assign Student"}

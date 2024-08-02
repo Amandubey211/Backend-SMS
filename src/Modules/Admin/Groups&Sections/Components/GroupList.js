@@ -95,8 +95,7 @@ const GroupList = ({
                   )
                 }
               >
-                {group?.groupName || " Group Name"} (
-                {group?.sectionName || "Section A"})
+                {group?.groupName || " Group Name"} 
               </h3>
               <div className="flex items-center space-x-2 relative">
                 <div className="flex items-center space-x-1 border p-1 rounded-full px-4">

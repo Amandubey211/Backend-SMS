@@ -40,7 +40,35 @@ const useAssignStudentToGroup = () => {
     }
   };
 
-  return { assignStudentToGroup, loading, error };
+  const assignStudentToSection = async (studentId, sectionId) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const token = localStorage.getItem(`${role}:token`);
+
+      const response = await axios.post(
+        `${baseUrl}/admin/assignStudentToSection`,
+        { studentId, sectionId },
+        {
+          headers: { Authentication: token },
+        }
+      );
+      console.log(response.data)
+
+      toast.success("Student assigned to group successfully!");
+      setLoading(false);
+      return response.data;
+    } catch (err) {
+      const errorMessage =
+        err.response?.data?.message || "Failed to assign student to group";
+      toast.error(errorMessage);
+      setError(errorMessage);
+      setLoading(false);
+      throw new Error(errorMessage); // This ensures that the error can be handled further up if needed
+    }
+  }
+
+  return { assignStudentToGroup, assignStudentToSection, loading, error };
 };
 
 export default useAssignStudentToGroup;

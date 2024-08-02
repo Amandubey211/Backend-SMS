@@ -15,7 +15,7 @@ const UnAssignedStudentList = () => {
   const { fetchUnassignedStudents, loading, error } =
     useGetUnassignedStudents();
   const { cid } = useParams();
-  const sections = useSelector((state) => state.Class.sectionsList); // Assuming sections list is in Redux
+  const sections = useSelector((state) => state.Class.sectionsList); 
 
   useEffect(() => {
     const fetchStudents = async () => {
@@ -87,10 +87,10 @@ const UnAssignedStudentList = () => {
                 <div className="text-sm font-medium">{student.firstName}</div>
                 <div
                   className={`text-xs ${
-                    getSectionName(student.presentSectionId).color
+                    getSectionName(student?.presentSectionId).color
                   }`}
                 >
-                  {getSectionName(student.presentSectionId).name}
+                  {getSectionName(student?.presentSectionId).name}
                 </div>
               </div>
             </div>
@@ -111,8 +111,8 @@ const UnAssignedStudentList = () => {
         >
           <AssignStudent
             name={selectedStudent.firstName}
-            section={getSectionName(selectedStudent.presentSectionId).name}
-            studentId={selectedStudent._id}
+            section={getSectionName(selectedStudent?.presentSectionId).name}
+            studentId={selectedStudent?._id}
             imageUrl={
               selectedStudent.profile ||
               "https://avatars.githubusercontent.com/u/109097090?v=4"
