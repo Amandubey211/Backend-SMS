@@ -13,39 +13,22 @@ const useCreateEvent = () => {
     setLoading(true);
     setError(null);
 
-    const tokenKey = `${role}:token`;
-    const token = localStorage.getItem(tokenKey);
+    const token = localStorage.getItem(`${role}:token`);
 
     if (!token) {
-      setError("Authentication token not found.");
+      const errorMessage = "Authentication token not found.";
+      setError(errorMessage);
       toast.error("Authentication failed: No token found.");
       setLoading(false);
       return;
     }
-
-    console.log("Creating event with data:", eventData);
-    console.log("Token key:", tokenKey);
-    console.log("Retrieved token:", token);
-
-    const formData = new FormData();
-    formData.append("title", eventData.eventName);
-    formData.append("startDate", eventData.startDate);
-    formData.append("endDate", eventData.endDate);
-    formData.append("time", eventData.time);
-    formData.append("type", eventData.eventType);
-    formData.append("location", eventData.location);
-    formData.append("director", eventData.eventDirector);
-    formData.append("description", eventData.description);
-    if (eventData.eventImage) {
-      formData.append("image", eventData.eventImage);
-    }
-
-    // Log formData content
-    formData.forEach((value, key) => {
-      console.log(`${key}: ${value}`);
-    });
-
+    
     try {
+      const formData = new FormData();
+      Object.entries(eventData).forEach(([key, value]) => {
+        if (value) formData.append(key, value);
+      });
+      console.log(formData)
       const response = await axios.post(
         `${baseUrl}/admin/create_event`,
         formData,
@@ -56,13 +39,11 @@ const useCreateEvent = () => {
           },
         }
       );
-      console.log("Event created successfully:", response.data);
       toast.success("Event created successfully!");
       setLoading(false);
       return response.data;
     } catch (err) {
       const errorMessage = err.response?.data?.msg || "Failed to create event";
-      console.error("Error during event creation:", err);
       toast.error(errorMessage);
       setError(errorMessage);
       setLoading(false);
