@@ -15,6 +15,7 @@ const TotalAttendanceGraph = () => {
   const { attendanceData, loading, error, fetchAttendanceData } = useGetAttendanceData();
 
   useEffect(() => {
+    console.log(`Fetching data for: month=${month}, year=${year}`);
     fetchAttendanceData(month, year);
   }, [month, year, fetchAttendanceData]);
 
@@ -77,11 +78,20 @@ const TotalAttendanceGraph = () => {
   }, [attendanceData, gender]);
 
   const handleMonthChange = (e) => {
-    setMonth(parseInt(e.target.value));
+    const newMonth = parseInt(e.target.value);
+    console.log(`Month changed to: ${newMonth}`);
+    setMonth(newMonth);
   };
 
   const handleYearChange = (e) => {
-    setYear(parseInt(e.target.value));
+    const selectedValue = e.target.value;
+    if (selectedValue === 'Current Year') {
+      console.log('Year changed to current year');
+      setYear(currentYear);
+    } else if (selectedValue === 'Past Year') {
+      console.log('Year changed to past year');
+      setYear(currentYear - 1);
+    }
   };
 
   const handleGenderChange = (e) => {
@@ -97,7 +107,13 @@ const TotalAttendanceGraph = () => {
   }
 
   // Generate array of years dynamically
-  const availableYears = Array.from({ length: 2 }, (_, i) => currentYear - i);
+  const availableYears = [
+    { label: "Current Year", value: "Current Year" },
+    { label: "Past Year", value: "Past Year" }
+  ];
+
+  // Determine the label for the current year state
+  const yearLabel = year === currentYear ? "Current Year" : "Past Year";
 
   return (
     <div className="bg-white p-4">
@@ -114,9 +130,9 @@ const TotalAttendanceGraph = () => {
               <option key={i} value={i + 1}>{new Date(0, i).toLocaleString('default', { month: 'long' })}</option>
             ))}
           </select>
-          <select className="border rounded p-2" onChange={handleYearChange} value={year}>
-            {availableYears.map(y => (
-              <option key={y} value={y}>{y}</option>
+          <select className="border rounded p-2" onChange={handleYearChange} value={yearLabel}>
+            {availableYears.map(({ label, value }) => (
+              <option key={value} value={value}>{label}</option>
             ))}
           </select>
           <select className="border rounded p-2" onChange={handleGenderChange} value={gender}>

@@ -7,8 +7,8 @@ import EventItem from "./EventItem";
 import { useNavigate } from 'react-router-dom';
 
 const monthNames = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December"
+  "JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE",
+  "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"
 ];
 
 const Events = () => {
@@ -88,38 +88,7 @@ const Events = () => {
             <IoIosArrowForward />
           </button>
         </div>
-        <div className="flex items-center gap-4">
-          <div className="relative">
-            <select
-              className="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-              value={date.month}
-              onChange={handleMonthChange}
-            >
-              {monthNames.map((name, index) => (
-                <option key={index} value={index + 1}>{name}</option>
-              ))}
-            </select>
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-              <IoIosArrowDown />
-            </div>
-          </div>
-          <div className="relative">
-            <select
-              className="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-              value={date.year}
-              onChange={handleYearChange}
-            >
-              <option value="2024">2024</option>
-              <option value="2023">2023</option>
-              <option value="2022">2022</option>
-              <option value="2021">2021</option>
-              {/* Add more years as needed */}
-            </select>
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-              <IoIosArrowDown />
-            </div>
-          </div>
-        </div>
+
         <button className="text-blue-500 hover:underline ml-2" onClick={handleViewAll}>
           View All
         </button>

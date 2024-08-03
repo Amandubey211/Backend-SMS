@@ -24,7 +24,7 @@ const generateRandomColor = () => {
 const NoticeBoard = () => {
   const { loading, error, notices, fetchNotices } = useGetNotices();
   const navigate = useNavigate(); // Use useNavigate
-
+  console.log("This is notices",fetchNotices)
   useEffect(() => {
     fetchNotices();
   }, [fetchNotices]);
