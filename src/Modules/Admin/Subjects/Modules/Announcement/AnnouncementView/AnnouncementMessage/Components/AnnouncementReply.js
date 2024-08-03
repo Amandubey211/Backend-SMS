@@ -54,7 +54,7 @@ const AnnouncementReply = ({
     <div className="ml-10 mt-2 p-4 bg-gray-100 rounded-md shadow-sm">
       <div className="flex items-center mb-2">
         <img
-          src={reply.avatarUrl}
+          src={reply.profile}
           alt="avatar"
           className="w-8 h-8 rounded-full mr-3"
         />

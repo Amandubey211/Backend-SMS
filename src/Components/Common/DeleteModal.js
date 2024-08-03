@@ -44,6 +44,7 @@ function useFocusTrap(modalRef, isOpen) {
       }
     };
 
+    // Initially focus the first element
     if (firstElement) {
       firstElement.focus();
     }
