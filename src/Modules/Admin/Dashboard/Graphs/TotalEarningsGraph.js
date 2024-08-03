@@ -76,7 +76,7 @@ const TotalEarningsGraph = () => {
             <select className="border rounded p-2" value={selectedOption} onChange={(e) => setSelectedOption(e.target.value)}>
               <option value="currentMonth">This month</option>
               <option value="lastMonth">Last month</option>
-              <option value="totalExpensesWithoutPay">Total Expenses Without Pay</option>
+              
             </select>
           </div>
         </div>
@@ -201,7 +201,7 @@ const TotalEarningsGraph = () => {
           <select className="border rounded p-2" value={selectedOption} onChange={(e) => setSelectedOption(e.target.value)}>
             <option value="currentMonth">This month</option>
             <option value="lastMonth">Last month</option>
-            <option value="totalExpensesWithoutPay">Total Expenses Without Pay</option>
+            
           </select>
         </div>
       </div>

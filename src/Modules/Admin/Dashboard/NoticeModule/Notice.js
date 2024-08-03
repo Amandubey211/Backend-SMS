@@ -5,7 +5,12 @@ const priorityClasses = {
   "Low priority": "bg-gray-100 text-black",
 };
 
+
 const Notice = ({ title, date, priority, content, image, backgroundColor }) => {
+
+  const truncateText = (text, maxLength) => {
+    return text.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
+  };
   return (
     <div className="p-4 border-t bg-white flex">
       <div className="mr-4 flex-shrink-0">
@@ -29,7 +34,7 @@ const Notice = ({ title, date, priority, content, image, backgroundColor }) => {
             {priority}
           </span>
         </div>
-        <p className="text-gray-600">{content}</p>
+        <p className="text-gray-600">{truncateText(content, 50)}</p>
       </div>
     </div>
   );
