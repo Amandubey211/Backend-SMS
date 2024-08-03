@@ -67,9 +67,8 @@ const EventScheduler = () => {
             return (
               <li
                 key={event._id}
-                className={`inline-block px-2 py-1 rounded text-white ${
-                  bgColors[index % bgColors.length]
-                } shadow-md cursor-pointer`}
+                className={`inline-block px-2 py-1 rounded text-white ${bgColors[index % bgColors.length]
+                  } shadow-md cursor-pointer`}
                 onClick={() => handleStickerClick(event)}
               >
                 {event.title} - {timeString}
@@ -102,7 +101,7 @@ const EventScheduler = () => {
         toast.success("Event updated successfully!");
       } else {
         await createEvent(eventData);
-        
+
       }
 
       handleSidebarClose(); // Close sidebar after success
@@ -165,7 +164,12 @@ const EventScheduler = () => {
         return <div>Select an action</div>;
     }
   };
-
+  const bgColors = [
+    "#FF6C9C", // pink
+    "#E24DFF", // purple
+    "#21AEE7", // blue
+    "#FBB778", // orange
+  ];
   const recentEvents = events.slice(0, 4); // Show four recent events
 
   return (
@@ -174,7 +178,9 @@ const EventScheduler = () => {
         <DashLayout>
           <div className="min-h-screen p-4 bg-gray-50">
             <div className="flex flex-row justify-between">
-              <span>Student Events</span>
+              <h1 className="mb-2 bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent font-semibold bg-clip-text">
+                Student Events
+              </h1>
               <button
                 className="h-10 inline-flex items-center border border-transparent text-sm font-medium shadow-sm bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600"
                 onClick={handleAddEventClick}
@@ -183,11 +189,12 @@ const EventScheduler = () => {
               </button>
             </div>
             <div className="my-4 w-full h-40 flex justify-around rounded-sm gap-4">
-              {recentEvents.map((event) => (
+              {recentEvents.map((event, index) => (
                 <EventCard
                   key={event._id}
                   event={event}
-                  onClick={handleStickerClick} // Add click handler
+                  color={bgColors[index % bgColors.length]} // Pass the color prop
+                  onClick={handleStickerClick}
                 />
               ))}
             </div>
@@ -247,21 +254,19 @@ const EventScheduler = () => {
                       </select>
                       <div className="flex space-x-2">
                         <button
-                          className={`border rounded px-2 py-1 ${
-                            type === "month"
+                          className={`border rounded px-2 py-1 ${type === "month"
                               ? "bg-gradient-to-r from-pink-500 to-purple-500 text-white"
                               : ""
-                          }`}
+                            }`}
                           onClick={() => onTypeChange("month")}
                         >
                           Month
                         </button>
                         <button
-                          className={`border rounded px-2 py-1 ${
-                            type === "year"
+                          className={`border rounded px-2 py-1 ${type === "year"
                               ? "bg-gradient-to-r from-pink-500 to-purple-500 text-white"
                               : ""
-                          }`}
+                            }`}
                           onClick={() => onTypeChange("year")}
                         >
                           Year
@@ -280,8 +285,8 @@ const EventScheduler = () => {
                   {sidebarContent === "viewEvent"
                     ? "View Event"
                     : sidebarContent === "addEvent"
-                    ? "Add New Event"
-                    : "Update Event"}
+                      ? "Add New Event"
+                      : "Update Event"}
                 </span>
               }
             >

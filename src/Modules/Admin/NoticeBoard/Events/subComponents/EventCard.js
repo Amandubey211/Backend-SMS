@@ -1,37 +1,44 @@
 import React from "react";
 import { MdAccessTime } from "react-icons/md";
-import { format } from "date-fns";
+import { format, parse } from "date-fns";
 
-const EventCard = ({ event, onClick }) => {
-  // Format date and time
-  const formattedDate = format(event.startDate, "MMM d, yyyy");
-  const formattedTime = format(event.startDate, "hh:mm a");
+const EventCard = ({ event, color, onClick }) => {
+  // Format date
+  const formattedDate = format(new Date(event.startDate), "MMM d, yyyy");
+
+  // Parse and format the time
+  let formattedTime = "Invalid time";
+  try {
+    if (event.time) {
+      // Attempt to parse the time from a 24-hour format
+      const [hours, minutes] = event.time.split(":");
+      const parsedTime = new Date();
+      parsedTime.setHours(parseInt(hours), parseInt(minutes));
+
+      // Format it to 12-hour format with AM/PM
+      formattedTime = format(parsedTime, "hh:mm a");
+    } else {
+      // Fallback if event.time is not provided, use startDate
+      formattedTime = format(new Date(event.startDate), "hh:mm a");
+    }
+  } catch (error) {
+    console.error("Error formatting time:", error, event.time);
+  }
+
   const formattedDescription = event.description || "No description available";
-
-  // Define an array of background colors
-  const bgColors = [
-    "#FF6C9C", // pink
-    "#E24DFF", // purple
-    "#21AEE7", // blue
-    "#FBB778", // orange
-  ];
-
-  // Determine the background color based on the event ID
-  const eventId = event.id ?? 0;
-  const bgColor = bgColors[eventId % bgColors.length];
 
   return (
     <div
       className="flex flex-col justify-between rounded-xl p-4 text-white shadow-lg m-2 cursor-pointer"
-      style={{ backgroundColor: bgColor, width: "220px", height: "180px" }}
+      style={{ backgroundColor: color, width: "220px", height: "180px" }}
       onClick={() => onClick(event)}
     >
       <div className="flex items-start">
         <div
           className="flex items-center justify-center bg-white rounded-lg p-2 w-12 h-12 text-2xl font-bold"
-          style={{ color: bgColor }}
+          style={{ color }}
         >
-          {format(event.startDate, "d")}
+          {format(new Date(event.startDate), "d")}
         </div>
 
         <div className="flex flex-col ml-2">
