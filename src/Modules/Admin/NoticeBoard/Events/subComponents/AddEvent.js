@@ -4,17 +4,17 @@ import FormInput from "../../../Accounting/subClass/component/FormInput";
 import useCreateEvent from "../../../../../Hooks/AuthHooks/Staff/Admin/Events/useCreateEvent";
 import toast from "react-hot-toast";
 
-const AddEvent = () => {
+const AddEvent = ({ onSave }) => { // Receive onSave as a prop
   const [imagePreview, setImagePreview] = useState(null);
   const [eventData, setEventData] = useState({
-    title: "",  // Changed from eventName
+    title: "", 
     location: "",
     date: "",
     time: "",
-    director: "",  // Changed from eventDirector
-    type: "",  // Changed from eventType
+    director: "", 
+    type: "", 
     description: "",
-    image: null,  // Changed from eventImage
+    image: null, 
   });
 
   const { loading, error, createEvent } = useCreateEvent();
@@ -52,20 +52,37 @@ const AddEvent = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     // Check required fields
     if (!eventData.title || !eventData.date || !eventData.time || !eventData.image) {
       toast.error("Please fill in all required fields.");
       return;
     }
-
+  
     try {
       await createEvent(eventData); // Pass the eventData directly
-      toast.success("Event created successfully.");
+      toast.success("Event created successfully!"); // Notify success
+      
+      // Reset the form fields after successful creation
+      setEventData({
+        title: "",
+        location: "",
+        date: "",
+        time: "",
+        director: "",
+        type: "",
+        description: "",
+        image: null,
+      });
+      setImagePreview(null);
+  
+      onSave(); // Close the sidebar after successful creation
     } catch (error) {
       console.error("Error during event creation:", error);
+      toast.error("Error creating event.");
     }
   };
+  
 
   return (
     <div className="p-4 bg-gray-50 border rounded-lg overflow-auto" style={{ maxHeight: "90vh" }}>
