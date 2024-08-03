@@ -261,7 +261,11 @@ const MainSection = () => {
 
   return (
     <div className="flex flex-col w-full">
-      <CreateQuizHeader onSave={handleSave} isEditing={isEditing} />
+      <CreateQuizHeader
+        onSave={handleSave}
+        isEditing={isEditing}
+        quizId={quizId}
+      />
 
       <div className="w-full flex">
         <div
