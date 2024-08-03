@@ -39,7 +39,7 @@ const useCreateEvent = () => {
           },
         }
       );
-      toast.success("Event created successfully!");
+      
       setLoading(false);
       return response.data;
     } catch (err) {

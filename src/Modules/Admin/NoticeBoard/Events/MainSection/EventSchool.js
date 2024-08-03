@@ -7,9 +7,10 @@ import Sidebar from "../../../../../Components/Common/Sidebar";
 import AddEvent from "../subComponents/AddEvent";
 import UpdateEvent from "../subComponents/UpdateEvent";
 import ViewEvent from "../subComponents/ViewEvent";
-import { getEvents, createEvent, updateEvent, deleteEvent } from '../api/event';
-import { format, parseISO } from 'date-fns';
+import { getEvents, createEvent, updateEvent, deleteEvent } from "../api/event";
+import { format, parseISO } from "date-fns";
 import "../subComponents/customCalendar.css";
+import toast from "react-hot-toast";
 
 const EventScheduler = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -22,14 +23,14 @@ const EventScheduler = () => {
     const fetchEvents = async () => {
       try {
         const events = await getEvents();
-        const mappedEvents = events.map(event => ({
+        const mappedEvents = events.map((event) => ({
           ...event,
           startDate: parseISO(event.date),
           endDate: new Date(new Date(event.date).getTime() + 2 * 60 * 60 * 1000),
         }));
         setEvents(mappedEvents);
       } catch (error) {
-        console.error('Failed to fetch events:', error);
+        console.error("Failed to fetch events:", error);
       }
     };
 
@@ -37,7 +38,10 @@ const EventScheduler = () => {
   }, []);
 
   const handleSidebarOpen = () => setSidebarOpen(true);
-  const handleSidebarClose = () => setSidebarOpen(false);
+  const handleSidebarClose = () => {
+    setSelectedEvent(null); // Reset the selected event when closing
+    setSidebarOpen(false);
+  };
 
   const handleDateCellRender = (value) => {
     const formattedDate = format(value.toDate(), "yyyy-MM-dd");
@@ -55,16 +59,26 @@ const EventScheduler = () => {
     return (
       <ul className="events space-y-1">
         {dayEvents.map((event, index) => {
-          const eventTime = parseISO(`${format(event.startDate, 'yyyy-MM-dd')}T${event.time}`);
-          return (
-            <li
-              key={event._id}
-              className={`inline-block px-2 py-1 rounded text-white ${bgColors[index % bgColors.length]} shadow-md cursor-pointer`}
-              onClick={() => handleStickerClick(event)}
-            >
-              {event.title} - {format(eventTime, "hh:mm a")}
-            </li>
-          );
+          try {
+            const eventTime = parseISO(
+              `${format(event.startDate, "yyyy-MM-dd")}T${event.time}`
+            );
+            const timeString = format(eventTime, "hh:mm a");
+            return (
+              <li
+                key={event._id}
+                className={`inline-block px-2 py-1 rounded text-white ${
+                  bgColors[index % bgColors.length]
+                } shadow-md cursor-pointer`}
+                onClick={() => handleStickerClick(event)}
+              >
+                {event.title} - {timeString}
+              </li>
+            );
+          } catch (error) {
+            console.error("Invalid event time:", error, event);
+            return null; // Optionally render an error indicator
+          }
         })}
       </ul>
     );
@@ -85,33 +99,49 @@ const EventScheduler = () => {
     try {
       if (selectedEvent) {
         await updateEvent(selectedEvent._id, eventData);
+        toast.success("Event updated successfully!");
       } else {
         await createEvent(eventData);
+        
       }
-      setSidebarOpen(false);
+
+      handleSidebarClose(); // Close sidebar after success
+
+      // Update events list after creation/update
       const updatedEvents = await getEvents();
-      setEvents(updatedEvents.map(event => ({
-        ...event,
-        startDate: parseISO(event.date),
-        endDate: new Date(new Date(event.date).getTime() + 2 * 60 * 60 * 1000),
-      })));
+      setEvents(
+        updatedEvents.map((event) => ({
+          ...event,
+          startDate: parseISO(event.date),
+          endDate: new Date(
+            new Date(event.date).getTime() + 2 * 60 * 60 * 1000
+          ),
+        }))
+      );
     } catch (error) {
-      console.error('Failed to save event:', error);
+      console.error("Failed to save event:", error);
+      toast.error("Failed to save event.");
     }
   };
 
   const handleDeleteEvent = async () => {
     try {
       await deleteEvent(selectedEvent._id);
-      setSidebarOpen(false);
+      handleSidebarClose();
       const updatedEvents = await getEvents();
-      setEvents(updatedEvents.map(event => ({
-        ...event,
-        startDate: parseISO(event.date),
-        endDate: new Date(new Date(event.date).getTime() + 2 * 60 * 60 * 1000),
-      })));
+      setEvents(
+        updatedEvents.map((event) => ({
+          ...event,
+          startDate: parseISO(event.date),
+          endDate: new Date(
+            new Date(event.date).getTime() + 2 * 60 * 60 * 1000
+          ),
+        }))
+      );
+      toast.success("Event deleted successfully!"); // Show toast on deletion
     } catch (error) {
-      console.error('Failed to delete event:', error);
+      console.error("Failed to delete event:", error);
+      toast.error("Failed to delete event.");
     }
   };
 
@@ -128,7 +158,7 @@ const EventScheduler = () => {
           />
         );
       case "addEvent":
-        return <AddEvent onSave={handleSaveEvent} />;
+        return <AddEvent onSave={handleSidebarClose} />
       case "updateEvent":
         return <UpdateEvent event={selectedEvent} onSave={handleSaveEvent} />;
       default:
@@ -136,7 +166,7 @@ const EventScheduler = () => {
     }
   };
 
-  const recentEvents = events.slice(0, 3);
+  const recentEvents = events.slice(0, 4); // Show four recent events
 
   return (
     <>
@@ -154,7 +184,11 @@ const EventScheduler = () => {
             </div>
             <div className="my-4 w-full h-40 flex justify-around rounded-sm gap-4">
               {recentEvents.map((event) => (
-                <EventCard key={event._id} event={event} />
+                <EventCard
+                  key={event._id}
+                  event={event}
+                  onClick={handleStickerClick} // Add click handler
+                />
               ))}
             </div>
             <hr className="my-6 border-t-2 mt-12 " />
@@ -213,13 +247,21 @@ const EventScheduler = () => {
                       </select>
                       <div className="flex space-x-2">
                         <button
-                          className={`border rounded px-2 py-1 ${type === "month" ? "bg-gradient-to-r from-pink-500 to-purple-500 text-white" : ""}`}
+                          className={`border rounded px-2 py-1 ${
+                            type === "month"
+                              ? "bg-gradient-to-r from-pink-500 to-purple-500 text-white"
+                              : ""
+                          }`}
                           onClick={() => onTypeChange("month")}
                         >
                           Month
                         </button>
                         <button
-                          className={`border rounded px-2 py-1 ${type === "year" ? "bg-gradient-to-r from-pink-500 to-purple-500 text-white" : ""}`}
+                          className={`border rounded px-2 py-1 ${
+                            type === "year"
+                              ? "bg-gradient-to-r from-pink-500 to-purple-500 text-white"
+                              : ""
+                          }`}
                           onClick={() => onTypeChange("year")}
                         >
                           Year
@@ -233,7 +275,15 @@ const EventScheduler = () => {
             <Sidebar
               isOpen={isSidebarOpen}
               onClose={handleSidebarClose}
-              title={<span className="bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent bg-clip-text">{sidebarContent === "viewEvent" ? "View Event" : sidebarContent === "addEvent" ? "Add New Event" : "Update Event"}</span>}
+              title={
+                <span className="bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent bg-clip-text">
+                  {sidebarContent === "viewEvent"
+                    ? "View Event"
+                    : sidebarContent === "addEvent"
+                    ? "Add New Event"
+                    : "Update Event"}
+                </span>
+              }
             >
               {renderSidebarContent()}
             </Sidebar>
