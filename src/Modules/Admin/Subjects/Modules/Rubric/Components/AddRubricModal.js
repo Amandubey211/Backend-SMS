@@ -1,11 +1,10 @@
 import React, { useEffect, useState, useRef } from "react";
 import { HiOutlinePlus } from "react-icons/hi2";
 import RubricModalRow from "./RubricModalRow";
-import { useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
 import useCreateRubric from "../../../../../../Hooks/AuthHooks/Staff/Admin/Rubric/useCreateRubric";
 import toast from "react-hot-toast";
 import useGetFilteredAssignments from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useGetFilteredAssignments";
-import { useParams } from "react-router-dom";
 import useGetFilteredQuizzes from "../../../../../../Hooks/AuthHooks/Staff/Admin/Quiz/useGetFilteredQuizzes";
 import useGetRubric from "../../../../../../Hooks/AuthHooks/Staff/Admin/Rubric/useGetRubric";
 
@@ -31,15 +30,12 @@ const AddRubricModal = ({
   const { createRubric, loading: createLoading } = useCreateRubric();
   const { fetchFilteredAssignments, assignments } = useGetFilteredAssignments();
   const { fetchFilteredQuizzes, quizzes } = useGetFilteredQuizzes();
-  const {
-    getRubric,
-    loading: rubricLoading,
-    error: rubricError,
-    rubric,
-  } = useGetRubric();
+  const { getRubric } = useGetRubric();
+
   useEffect(() => {
     setAssignment(AssignmentId);
   }, [AssignmentId]);
+
   const { sid } = useParams();
 
   useEffect(() => {
@@ -81,17 +77,37 @@ const AddRubricModal = ({
           setRubricName(result.rubric.name);
         }
       });
+    } else {
+      // Reset criteria and rubric name when no assignment is selected
+      setCriteriaList([]);
+      setRubricName("");
     }
   }, [assignment, getRubric, setCriteriaList]);
 
   const handleSelectAssignmentChange = (id) => {
-    setAssignment(id);
-    setDropdownOpen(false);
+    if (id === "reset") {
+      setAssignment("");
+      setQuiz("");
+      setCriteriaList([]);
+      setRubricName("");
+    } else {
+      setAssignment(id);
+      setQuiz(""); // Reset quiz selection when an assignment is selected
+    }
+    setDropdownOpen(false); // Close dropdown after selection
   };
 
   const handleSelectQuizChange = (id) => {
-    setQuiz(id);
-    setDropdownOpen2(false);
+    if (id === "reset") {
+      setAssignment("");
+      setQuiz("");
+      setCriteriaList([]);
+      setRubricName("");
+    } else {
+      setQuiz(id);
+      setAssignment(""); // Reset assignment selection when a quiz is selected
+    }
+    setDropdownOpen2(false); // Close dropdown after selection
   };
 
   const handleAddRating = (criteriaIndex, ratings) => {
@@ -178,7 +194,7 @@ const AddRubricModal = ({
               placeholder="Type here"
             />
           </div>
-          {(type === "assignment" || !type) && (
+          {!quiz && (
             <div className="p-2 flex-1 relative" ref={dropdownRef}>
               <label className="block text-gray-700 mb-1">Assignment</label>
               <div
@@ -190,6 +206,12 @@ const AddRubricModal = ({
               </div>
               {dropdownOpen && (
                 <ul className="absolute left-0 right-0 mt-2 max-h-72 overflow-auto bg-white border rounded-md shadow-lg z-10 py-2">
+                  <li
+                    onClick={() => handleSelectAssignmentChange("reset")}
+                    className="px-4 py-2 hover:bg-gray-100 transition duration-300 transform cursor-pointer hover:translate-x-[-8px] ps-6 text-red-600"
+                  >
+                    Reset
+                  </li>
                   {assignments.map((assignment) => (
                     <li
                       key={assignment._id}
@@ -205,7 +227,7 @@ const AddRubricModal = ({
               )}
             </div>
           )}
-          {(type === "quiz" || !type) && (
+          {!assignment && (
             <div className="p-2 flex-1 relative" ref={dropdownRef2}>
               <label className="block text-gray-700 mb-1">Quizzes</label>
               <div
@@ -216,6 +238,12 @@ const AddRubricModal = ({
               </div>
               {dropdownOpen2 && (
                 <ul className="absolute left-0 right-0 mt-2 max-h-72 overflow-auto bg-white border rounded-md shadow-lg z-10 py-2">
+                  <li
+                    onClick={() => handleSelectQuizChange("reset")}
+                    className="px-4 py-2 hover:bg-gray-100 transition duration-300 transform cursor-pointer hover:translate-x-[-8px] ps-6 text-red-600"
+                  >
+                    Reset
+                  </li>
                   {quizzes.map((quiz) => (
                     <li
                       key={quiz._id}

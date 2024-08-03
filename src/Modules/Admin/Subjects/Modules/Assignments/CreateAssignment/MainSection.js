@@ -108,14 +108,12 @@ const MainSection = () => {
     }
     console.log("assignmnet data", assignmentData);
     if (isEditing) {
-      let sectionId = formState.section || null
+      let sectionId = formState.section || null;
       await updateAssignment(assignmentId, assignmentData, sectionId);
-
     } else {
       await createAssignment(assignmentData);
     }
   };
-
 
   return (
     <div className="flex flex-col w-full">

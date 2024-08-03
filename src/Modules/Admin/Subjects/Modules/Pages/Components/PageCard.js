@@ -1,21 +1,44 @@
-import React from "react";
-import { IoCalendarOutline, IoBookOutline, IoTrashOutline } from "react-icons/io5";
+import React, { useState } from "react";
+import {
+  IoCalendarOutline,
+  IoBookOutline,
+  IoTrashOutline,
+} from "react-icons/io5";
 import { NavLink, useParams } from "react-router-dom";
 import useDeletePage from "../../../../../../Hooks/AuthHooks/Staff/Admin/Page/useDeletePage"; // Adjust the import path as needed
+import DeleteModal from "../../../../../../Components/Common/DeleteModal";
 
-const PageCard = ({ title, authorName, publishDate, updateDate, id, onDeleteSuccess }) => {
+const PageCard = ({
+  title,
+  authorName,
+  publishDate,
+  updateDate,
+  id,
+  onDeleteSuccess,
+}) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { cid, sid } = useParams();
+  const { loading, error, success, deletePage } = useDeletePage();
+
   const formatDate = (dateString) => {
     const options = { year: "numeric", month: "short", day: "numeric" };
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
-  const { cid, sid } = useParams();
-  const { loading, error, success, deletePage } = useDeletePage();
 
   const handleDelete = async () => {
     await deletePage(id);
     if (success) {
       onDeleteSuccess(); // Refetch the pages after successful deletion
+      setIsModalOpen(false);
     }
+  };
+
+  const openDeleteModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const closeDeleteModal = () => {
+    setIsModalOpen(false);
   };
 
   return (
@@ -58,7 +81,7 @@ const PageCard = ({ title, authorName, publishDate, updateDate, id, onDeleteSucc
       </div>
       <div
         className="absolute top-2 right-2 p-1 bg-red-600 text-white rounded-full cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-        onClick={handleDelete}
+        onClick={openDeleteModal}
       >
         <IoTrashOutline className="h-5 w-5" />
       </div>
@@ -70,6 +93,12 @@ const PageCard = ({ title, authorName, publishDate, updateDate, id, onDeleteSucc
       {error && (
         <p className="absolute top-2 left-2 text-sm text-red-500">{error}</p>
       )}
+      <DeleteModal
+        isOpen={isModalOpen}
+        onClose={closeDeleteModal}
+        onConfirm={handleDelete}
+        title={title}
+      />
     </div>
   );
 };
