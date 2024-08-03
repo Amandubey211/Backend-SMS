@@ -25,16 +25,16 @@ const AdmissionInfo = ({ studentInfo, handleInputChange }) => {
 
       <div className="grid grid-cols-3 gap-4">
         <div>
-          <label className="block text-gray-700">Class</label>
+          <label className="block text-gray-700">Applying For</label>
           <select
-            name="class"
+            name="applyingClass"
             className="mt-1 p-2 block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-            value={studentInfo.class}
+            value={studentInfo.applyingClass}
             onChange={handleInputChange}
           >
             <option value="">Choose Options</option>
             {classList?.map((classItem, index) => (
-              <option key={index} value={classItem?.className} className="py-2">
+              <option key={index} value={classItem?._id} className="py-2">
                 {classItem.className}
               </option>
             ))}

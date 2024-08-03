@@ -147,7 +147,7 @@ const AddGroup = ({ group, isUpdate, groupId, onClose, fetchGroups }) => {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            {/* <label className="block text-sm font-medium text-gray-700 mb-1">
               Section
             </label>
             <select
@@ -163,7 +163,7 @@ const AddGroup = ({ group, isUpdate, groupId, onClose, fetchGroups }) => {
                   {section.sectionName}
                 </option>
               ))}
-            </select>
+            </select> */}
           </div>
           <div>
             <label
