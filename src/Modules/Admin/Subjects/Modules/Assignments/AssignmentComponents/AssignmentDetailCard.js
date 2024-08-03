@@ -12,11 +12,14 @@ const AssignmentDetailCard = ({ assignment, loading, error }) => {
   const [isModalOpen, setModalOpen] = useState(false);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
 
+  // Add criteriaList state
+  const [criteriaList, setCriteriaList] = useState([]);
+
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error}</p>;
 
   if (!assignment) return null;
-
+  console.log(assignment);
   const {
     points,
     allowedAttempts,
@@ -56,9 +59,13 @@ const AssignmentDetailCard = ({ assignment, loading, error }) => {
       <RubricButton onClick={() => setModalOpen(true)} />
 
       <AddRubricModal
+        type="assignment"
+        AssignmentId={assignment._id}
         isOpen={isModalOpen}
         onClose={() => setModalOpen(false)}
         onAddCriteria={() => setSidebarOpen(true)}
+        criteriaList={criteriaList} // Pass the criteriaList state
+        setCriteriaList={setCriteriaList} // Pass the setCriteriaList function
       />
       <Sidebar
         isOpen={isSidebarOpen}

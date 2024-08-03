@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import { HiOutlinePlus } from "react-icons/hi2";
 import RubricModalRow from "./RubricModalRow";
 import { useParams } from "react-router-dom";
@@ -17,6 +17,7 @@ const AddRubricModal = ({
   onEditCriteria,
   type,
   AssignmentId,
+  quizId,
 }) => {
   const [assignment, setAssignment] = useState("");
   const [quiz, setQuiz] = useState("");
@@ -32,11 +33,11 @@ const AddRubricModal = ({
   const { fetchFilteredQuizzes, quizzes } = useGetFilteredQuizzes();
   const { getRubric } = useGetRubric();
 
+  const { sid } = useParams();
+
   useEffect(() => {
     setAssignment(AssignmentId);
   }, [AssignmentId]);
-
-  const { sid } = useParams();
 
   useEffect(() => {
     if (type !== "quiz") {
@@ -52,8 +53,8 @@ const AddRubricModal = ({
     return () => document.body.classList.remove("overflow-hidden");
   }, [isOpen]);
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
+  const handleClickOutside = useCallback(
+    (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setDropdownOpen(false);
       }
@@ -63,11 +64,14 @@ const AddRubricModal = ({
       ) {
         setDropdownOpen2(false);
       }
-    };
+    },
+    [dropdownRef, dropdownRef2]
+  );
 
+  useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  }, [handleClickOutside]);
 
   useEffect(() => {
     if (assignment) {
@@ -78,36 +82,36 @@ const AddRubricModal = ({
         }
       });
     } else {
-      // Reset criteria and rubric name when no assignment is selected
       setCriteriaList([]);
       setRubricName("");
     }
   }, [assignment, getRubric, setCriteriaList]);
 
+  const resetSelection = () => {
+    setAssignment("");
+    setQuiz("");
+    setCriteriaList([]);
+    setRubricName("");
+  };
+
   const handleSelectAssignmentChange = (id) => {
     if (id === "reset") {
-      setAssignment("");
-      setQuiz("");
-      setCriteriaList([]);
-      setRubricName("");
+      resetSelection();
     } else {
       setAssignment(id);
-      setQuiz(""); // Reset quiz selection when an assignment is selected
+      setQuiz("");
     }
-    setDropdownOpen(false); // Close dropdown after selection
+    setDropdownOpen(false);
   };
 
   const handleSelectQuizChange = (id) => {
     if (id === "reset") {
-      setAssignment("");
-      setQuiz("");
-      setCriteriaList([]);
-      setRubricName("");
+      resetSelection();
     } else {
       setQuiz(id);
-      setAssignment(""); // Reset assignment selection when a quiz is selected
+      setAssignment("");
     }
-    setDropdownOpen2(false); // Close dropdown after selection
+    setDropdownOpen2(false);
   };
 
   const handleAddRating = (criteriaIndex, ratings) => {
