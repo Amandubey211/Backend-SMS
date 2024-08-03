@@ -62,8 +62,8 @@ const AllStaff = () => {
     <Layout title="All Staff">
       <DashLayout>
         <div className="p-4">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold">All Staff</h2>
+          <div className="flex justify-between items-center mb-4  border-b-2 h-20">
+            <h2 className="text-xl font-semibold">All Staff <span className="bg-purple-400 px-2 text-sm py-1 rounded-full  ">{staff?.length}</span></h2>
             <button
               onClick={handleAddStaffClick}
               className="bg-purple-500 text-white px-4 py-2 rounded-md flex items-center space-x-2"

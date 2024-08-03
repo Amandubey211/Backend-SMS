@@ -63,7 +63,7 @@ const {EditAdmin} = useEditAdmin()
             <div className="flex flex-col gap-3">
               <FormInput id="adminName" label="Full Name" value={adminData.adminName} onChange={handleInputChange} />
               <FormInput id="email"  label="Email" type="email" value={adminData.email} onChange={handleInputChange} />
-              <FormInput id="contactNumber" label="Contact" type="number" value={adminData.contactNumber} onChange={handleInputChange} />
+              <FormInput id="contactNumber" label="Contact" type="text" value={adminData.contactNumber} onChange={handleInputChange} />
             </div>
           </div>
         </div>

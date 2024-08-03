@@ -148,7 +148,7 @@ const DeleteBook=(id)=>{
               id:item._id,
               class: item.classId?.className,
               section:item.sectionId?.sectionName,
-              student: item.studentId?.firstName,
+              student: item.studentId?.firstName+item.studentId?.lastName,
               book: item.bookId?.name,
               authorName: item.author,
               issueDate: item.issueDate,

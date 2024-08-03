@@ -1,7 +1,9 @@
 
 import React from 'react';
-
+import profileIcon from '../../../../Assets/DashboardAssets/profileIcon.png'
+import { useNavigate } from 'react-router-dom';
 const ChildProfile = ({ children }) => {
+  const navigate= useNavigate()
   if (!children || children.length === 0) {
     return <div>No children data available</div>;
   }
@@ -15,15 +17,15 @@ const ChildProfile = ({ children }) => {
         <div className='flex flex-col text-center border border-gray-300 rounded-md items-center justify-around  mx-5 py-5 gap-3  ' >
         <div >
         <img
-            src={child.imageUrl}
+            src={child.imageUrl || profileIcon}
             alt={child.name}
-            className="w-24 h-24 rounded-full object-cover "
+            className="w-24 h-24 rounded-full object-cover border "
           /> 
         </div>
         <h2 className='font-medium' >{child.name}</h2>
         <div className='flex gap-2  ' >
             <span className='text-gray-500'> Id: </span>
-            <span className='font-medium text-gray-800' >{child.id}</span>
+            <span className='font-medium text-gray-800' >{child.admissionNumber}</span>
             <span className='text-gray-500'> Class </span>
             <span className='font-medium text-gray-800'>{child.class}  </span>
             <span className='text-gray-500'>Section</span>
@@ -31,7 +33,7 @@ const ChildProfile = ({ children }) => {
         </div>
         
         <div>
-        <button className=" border p-2 w-[300px] rounded bg-pink-100 text-center flex justify-center items-center  ">
+        <button className=" border p-2 w-[300px] rounded bg-pink-100 text-center flex justify-center items-center  " onClick={()=>navigate(`/user/${child?.id}`)}>
         <span className="font-semibold bg-gradient-to-r from-pink-500   to-purple-500 inline-block text-transparent bg-clip-text">
         View Profile
                   </span>
