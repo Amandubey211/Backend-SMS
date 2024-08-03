@@ -5,6 +5,7 @@ import TaskChart from "./TaskChart";
 import AllSubjects from "../StudentCourseProgress/allSubjects/AllSubjects";
 
 const StudentOverView = () => {
+
   return (
     <>
       <div className="flex flex-col">
@@ -17,7 +18,8 @@ const StudentOverView = () => {
           <AllSubjects />
         </div>
         
-        <div className="mt-4 w-full h-96 p-5 justify-center items-center flex self-center border-t-2  ">
+        <div className="mt-4 w-full h-96 p-5 justify-center items-center flex self-center border-t-2 flex-col  ">
+          <h1 className="mb-4 font-bold">Attendance</h1>
           <AttendanceGraph />
         </div>
         <div className='flex justify-between  w-[100%]  border-t-2'> 

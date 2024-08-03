@@ -18,7 +18,7 @@ const AllAccountants = () => {
 
   useEffect(() => {
     fetchStaff();
-  }, [fetchStaff]);
+  }, []);
 
   const handleSidebarOpen = () => setSidebarOpen(true);
   const handleSidebarClose = () => setSidebarOpen(false);
@@ -59,8 +59,8 @@ const AllAccountants = () => {
     <Layout title="All Accountants">
       <DashLayout>
         <div className="p-4">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold">All Accountants</h2>
+          <div className="flex justify-between items-center mb-4 border-b-2 h-20">
+            <h2 className="text-xl font-semibold">All Accountants <span className="bg-purple-400 px-2 text-sm py-1 rounded-full  ">{allAccountant?.length}</span></h2>
             <button onClick={handleAddAccountantClick}
               className="bg-purple-500 text-white px-4 py-2 rounded-md flex items-center space-x-2">
               <span>Add New Accountant</span>

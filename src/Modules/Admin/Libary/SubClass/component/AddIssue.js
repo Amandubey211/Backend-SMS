@@ -138,7 +138,6 @@ const AddIssue = ({ editIssueData, onupdate }) => {
             classId: selectedClass?._id || null
         };
         console.log(submissionData);
-
         try {
             if (editIssueData.class) {
                 // If editing, make a PUT request
@@ -176,6 +175,7 @@ const AddIssue = ({ editIssueData, onupdate }) => {
                     options={classData}
                     value={issueData.class}
                     onChange={handleInputChange}
+                    required={true}
                 />
                 <FormSelect
                     id="section"
@@ -192,6 +192,7 @@ const AddIssue = ({ editIssueData, onupdate }) => {
                     options={studentData}
                     value={issueData.student}
                     onChange={handleInputChange}
+                    required={true}
                 />
                 <FormSelect
                     id='book'
@@ -213,7 +214,7 @@ const AddIssue = ({ editIssueData, onupdate }) => {
                     name="issueDate"
                     label="Issue Date"
                     type="date"
-                    value={issueData.issueDate}
+                    value={issueData.issueDate.slice(0,10)}
                     onChange={handleInputChange}
                     required
                 />
@@ -222,7 +223,7 @@ const AddIssue = ({ editIssueData, onupdate }) => {
                     name="returnDate"
                     label="Return Date"
                     type="date"
-                    value={issueData.returnDate}
+                    value={issueData.returnDate.slice(0,10)}
                     onChange={handleInputChange}
                     required
                 />

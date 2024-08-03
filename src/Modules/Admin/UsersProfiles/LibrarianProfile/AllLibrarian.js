@@ -60,8 +60,8 @@ const AllLibrarian = () => {
     <Layout title="All Librarian">
       <DashLayout>
         <div className="p-4">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold">All Librarian</h2>
+          <div className="flex justify-between items-center mb-4 border-b-2 h-20">
+            <h2 className="text-xl font-semibold">All Librarian <span className="bg-purple-400 px-2 text-sm py-1 rounded-full">{allLibrarian?.length}</span></h2>
             <button
               onClick={handleAddLibrarianClick}
               className="bg-purple-500 text-white px-4 py-2 rounded-md flex items-center space-x-2"
