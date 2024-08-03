@@ -61,11 +61,11 @@ const AnnouncementViewHeader = () => {
 
           <Sidebar
             width="70%"
-            title="Announcement"
+            title="Comments"
             isOpen={isSidebarOpen}
             onClose={handleSidebarClose}
           >
-         <DiscussionMessage/>
+            <DiscussionMessage />
           </Sidebar>
         </div>
       </div>

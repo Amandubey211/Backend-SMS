@@ -19,7 +19,7 @@ const CreateAnnouncement = () => {
   const [formState, setFormState] = useState({
     postTo: "",
     availableFrom: "",
-    section: "",
+    sectionId: "",
     option: "",
     author: "",
     groupId: "",
@@ -46,7 +46,7 @@ const CreateAnnouncement = () => {
         availableFrom: announcement.delayPosting
           ? new Date(announcement.delayPosting).toISOString().split("T")[0]
           : "",
-        section: announcement.sectionId || "",
+        sectionId: announcement.sectionId || "",
         option: "",
         author: announcement.author || "",
         groupId: announcement.groupId || "",

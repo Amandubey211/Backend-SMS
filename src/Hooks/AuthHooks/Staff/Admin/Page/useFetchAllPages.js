@@ -25,7 +25,7 @@ const useFetchAllPages = () => {
 
       // Include query parameters if needed (e.g., ?publish=true)
       const response = await axios.get(
-        `${baseUrl}/admin/api/pages/class/pages/${cid}?publish=true`,
+        `${baseUrl}/admin/api/pages/class/pages/${cid}`,
         {
           headers: { Authentication: token },
         }

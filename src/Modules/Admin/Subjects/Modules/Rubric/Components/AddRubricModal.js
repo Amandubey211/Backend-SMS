@@ -267,14 +267,13 @@ const AddRubricModal = ({
             Total Points: {selectedAssignmentPoints}
           </div>
         </div>
-        <div className="flex justify-end items-center p-2 mb-2">
+        <div className="flex justify-end gap-3 items-center p-2 mb-2">
           <button
             onClick={onClose}
             className="text-gray-600 bg-gray-100 hover:bg-gray-200 p-2 px-4 rounded-md"
           >
             Cancel
           </button>
-          {/* <button className="bg-gradient-to-r from-red-500 to-purple-500 bg-clip-text text-transparent p-2 rounded-md"></button> */}
           <button
             onClick={handleSubmit}
             disabled={createLoading}
