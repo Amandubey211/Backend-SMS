@@ -4,7 +4,7 @@ import SectionSelect from "../../../../Component/SectionSelect";
 
 const AssignToSection = ({
   assignTo,
-  section,
+  sectionId,
   groupId,
   handleChange,
   assignTitle,
@@ -18,7 +18,8 @@ const AssignToSection = ({
         title={assignTitle}
       />
       <SectionSelect
-        section={section}
+        assignTo={assignTo}
+        section={sectionId}
         groupId={groupId}
         handleChange={handleChange}
       />

@@ -4,19 +4,20 @@ import { HiOutlineDotsVertical } from "react-icons/hi";
 import { BsChat } from "react-icons/bs";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import Sidebar from "../../../../../../../Components/Common/Sidebar";
-import DiscussionMessage from "../../../Discussion/DiscussionMessage/DiscussionMessage";
 import { useParams, useNavigate } from "react-router-dom";
 import useDeleteAnnouncement from "../../../../../../../Hooks/AuthHooks/Staff/Admin/Announcement/useDeleteAnnouncement";
 import DeleteModal from "../../../../../../../Components/Common/DeleteModal";
+import AnnouncementCommentSection from "../AnnouncementMessage/AnnouncementCommentSection";
 
 const AnnouncementViewHeader = ({ announcement }) => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [isModalOpen, setModalOpen] = useState(false); // State for modal
+  const [isModalOpen, setModalOpen] = useState(false);
   const { cid, sid } = useParams();
   const navigate = useNavigate();
   const { deleteAnnouncement, loading: deleteLoading } =
     useDeleteAnnouncement();
+  const menuButtonRef = useRef(null);
   const menuRef = useRef(null);
 
   const handleSidebarOpen = () => setSidebarOpen(true);
@@ -24,7 +25,11 @@ const AnnouncementViewHeader = ({ announcement }) => {
   const toggleMenu = () => setMenuOpen(!menuOpen);
 
   const handleClickOutside = (event) => {
-    if (menuRef.current && !menuRef.current.contains(event.target)) {
+    if (
+      menuRef.current &&
+      !menuRef.current.contains(event.target) &&
+      !menuButtonRef.current.contains(event.target)
+    ) {
       setMenuOpen(false);
     }
   };
@@ -53,21 +58,21 @@ const AnnouncementViewHeader = ({ announcement }) => {
   };
 
   const handleDeleteClick = () => {
-    setModalOpen(true); // Open the modal on delete click
+    setModalOpen(true);
   };
 
   const confirmDelete = async () => {
     await deleteAnnouncement(announcement._id);
-    setModalOpen(false); // Close the modal after deletion
+    setModalOpen(false);
   };
 
   return (
-    <div className="flex items-end justify-between p-2 px-4 border-b">
+    <div className="flex items-center justify-between p-2 px-4 border-b">
       <div className="flex items-center">
         <img
           src="https://avatars.githubusercontent.com/u/109097090?v=4"
           alt="Profile"
-          className="w-10 h-10 rounded-full"
+          className="w-12 h-12 rounded-full"
         />
         <div className="ml-3">
           <h1 className="text-lg font-semibold">
@@ -78,16 +83,17 @@ const AnnouncementViewHeader = ({ announcement }) => {
           </p>
         </div>
       </div>
-      <div className="flex flex-col gap-1 justify-center relative">
-        <div className="flex gap-2 items-center ">
+      <div className="flex flex-col gap-2 justify-center relative">
+        <div className="flex gap-2 items-center">
           <div className="text-sm flex items-center gap-1 pr-2 border-r">
-            <span className="bg-gradient-to-r from-purple-100 rounded-full px-1 gap-1 to-pink-100 text-white">
+            <span className="bg-gradient-to-r from-purple-100 to-pink-100 rounded-full h-6 w-6 flex items-center justify-center text-white">
               <span className="text-gradient text-xs font-semibold">
                 {announcement?.replies?.length || 0}
               </span>
-            </span>{" "}
+            </span>
             <span>Comments</span>
           </div>
+
           <span className="text-sm pr-2 border-r">
             For: {announcement?.postTo || "Everyone"}
           </span>
@@ -95,7 +101,7 @@ const AnnouncementViewHeader = ({ announcement }) => {
             Posted on: {formatDate(announcement?.createdAt) || "Date"}
           </span>
         </div>
-        <div className="flex items-center gap-2 justify-center">
+        <div className="flex items-center gap-2 justify-center relative">
           <button
             className="flex items-center space-x-1 px-4 py-2 border rounded-md border-gray-300 text-green-600 hover:bg-gray-100 transition"
             aria-label="Edit Announcement"
@@ -104,29 +110,37 @@ const AnnouncementViewHeader = ({ announcement }) => {
             <AiOutlineEdit aria-hidden="true" />
             <span>Edit</span>
           </button>
-          <button
-            className="flex items-center space-x-1 border rounded-full w-8 h-8 justify-center border-gray-300 text-gray-600 hover:bg-gray-100 transition"
-            aria-label="More Options"
-            onClick={toggleMenu}
-          >
-            <HiOutlineDotsVertical aria-hidden="true" />
-          </button>
-          {menuOpen && (
-            <div
-              ref={menuRef}
-              className="absolute right-0 mt-10 w-48 bg-white border rounded shadow-md"
+          <div className="relative">
+            <button
+              className="flex items-center space-x-1 border rounded-full p-1 justify-center border-gray-300 text-gray-600 hover:bg-gray-100 transition"
+              aria-label="More Options"
+              onClick={toggleMenu}
+              ref={menuButtonRef}
+              aria-expanded={menuOpen}
+              aria-haspopup="menu"
             >
-              <button
-                className="w-full flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 transition"
-                onClick={handleDeleteClick} // Open the modal instead of deleting directly
-                disabled={deleteLoading}
+              <HiOutlineDotsVertical aria-hidden="true" className="text-2xl" />
+            </button>
+            {menuOpen && (
+              <div
+                ref={menuRef}
+                className="absolute right-0 mt-2 w-48 bg-white border rounded shadow-md z-10"
+                style={{ top: "100%", right: "0" }}
+                role="menu"
+                aria-label="Options"
               >
-                <RiDeleteBin5Line className="mr-2 text-red-700" />
-                <span>{deleteLoading ? "Deleting..." : "Delete"}</span>
-              </button>
-              {/* Add more menu items here if needed */}
-            </div>
-          )}
+                <button
+                  className="w-full flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 transition"
+                  onClick={handleDeleteClick}
+                  disabled={deleteLoading}
+                  role="menuitem"
+                >
+                  <RiDeleteBin5Line className="mr-2 text-red-700" />
+                  <span>{deleteLoading ? "Deleting..." : "Delete"}</span>
+                </button>
+              </div>
+            )}
+          </div>
           <button
             onClick={handleSidebarOpen}
             className="px-4 py-2 bg-gradient-to-r w-full from-pink-500 to-purple-500 text-white items-center rounded-md flex gap-2"
@@ -139,8 +153,7 @@ const AnnouncementViewHeader = ({ announcement }) => {
             isOpen={isSidebarOpen}
             onClose={handleSidebarClose}
           >
-            <div>will be added </div>
-            {/* <DiscussionMessage /> */}
+            <AnnouncementCommentSection />
           </Sidebar>
         </div>
       </div>

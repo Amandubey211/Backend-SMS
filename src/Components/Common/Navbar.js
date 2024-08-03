@@ -16,7 +16,7 @@ const IconButton = ({ icon: Icon, label }) => (
 );
 
 const LeftHeading = ({ leftHeading, navigate }) => (
-  <div className="flex-1 text-md font-semibold capitalize">
+  <div className="flex-1 text-md font-semibold ps-4 capitalize">
     {leftHeading[1] === undefined ? (
       <span className="text-gradient capitalize">{leftHeading[0]}</span>
     ) : (

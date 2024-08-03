@@ -9,10 +9,7 @@ const useCreateAnnouncement = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  
-  const {
-    role,
-  } = useSelector((store) => store.Auth);
+  const { role } = useSelector((store) => store.Auth);
 
   const createAnnouncement = useCallback(
     async (data, files) => {
@@ -43,7 +40,6 @@ const useCreateAnnouncement = () => {
         );
         if (response.data.status) {
           toast.success("Announcement created successfully!");
-
         } else {
           toast.error("Announcement not created");
           setError("Announcement not created");

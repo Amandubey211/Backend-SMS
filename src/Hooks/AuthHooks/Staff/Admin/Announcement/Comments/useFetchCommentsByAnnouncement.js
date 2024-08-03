@@ -5,11 +5,11 @@ import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { baseUrl } from "../../../../../../config/Common";
 
-const useFetchCommentsByDiscussion = () => {
+const useFetchCommentsByAnnouncement = () => {
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const { did: discussionId } = useParams();
+  const { aid: announcementId } = useParams();
 
   const { role } = useSelector((store) => store.Auth);
 
@@ -20,15 +20,14 @@ const useFetchCommentsByDiscussion = () => {
     try {
       const token = localStorage.getItem(`${role}:token`);
       const response = await axios.get(
-        `${baseUrl}/admin/getDiscussionComment/${discussionId}`,
+        `${baseUrl}/admin/getAnnouncementComment/${announcementId}`,
         {
           headers: { Authentication: token },
         }
       );
-      console.log(response.data);
+
       if (response.data.status) {
         setComments(response.data.data);
-        console.log(comments);
       } else {
         toast.error("Failed to fetch comments");
         setError("Failed to fetch comments");
@@ -41,7 +40,7 @@ const useFetchCommentsByDiscussion = () => {
     } finally {
       setLoading(false);
     }
-  }, [baseUrl, discussionId, role]);
+  }, [announcementId, role]);
 
   useEffect(() => {
     fetchComments();
@@ -50,4 +49,4 @@ const useFetchCommentsByDiscussion = () => {
   return { comments, loading, error, fetchComments };
 };
 
-export default useFetchCommentsByDiscussion;
+export default useFetchCommentsByAnnouncement;

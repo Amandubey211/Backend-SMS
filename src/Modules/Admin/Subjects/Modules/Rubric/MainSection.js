@@ -86,7 +86,7 @@ const MainSection = () => {
         <Suspense fallback={<Spinner />}>
           {isModalOpen && (
             <AddRubricModal
-              type="assignment"
+              // type="assignment"
               isOpen={isModalOpen}
               onClose={() => setModalOpen(false)}
               criteriaList={criteria}

@@ -5,6 +5,7 @@ import useGetAllAnnouncements from "../../../../../../Hooks/AuthHooks/Staff/Admi
 import { useParams } from "react-router-dom";
 import { ImSpinner3 } from "react-icons/im";
 import { AiOutlineFileSearch } from "react-icons/ai";
+import Spinner from "../../../../../../Components/Common/Spinner";
 
 const colors = [
   "#efc42f",
@@ -57,10 +58,7 @@ const AnnouncementList = () => {
     <div className="w-full ps-3">
       <AnnouncementHeader onSearch={setSearchTerm} />
       {loading ? (
-        <div className="flex flex-col items-center justify-center py-10 text-gray-500">
-          <ImSpinner3 className="w-12 h-12 animate-spin mb-3" />
-          <p className="text-lg font-semibold">Loading...</p>
-        </div>
+        <Spinner />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-2">
           {filteredAnnouncements.length > 0 ? (
@@ -68,7 +66,7 @@ const AnnouncementList = () => {
               <AnnouncementCard
                 key={announcement._id}
                 title={announcement.title}
-                section={announcement.sectionId || "Default Section"}
+                section={announcement.sectionName || "N/A Section"}
                 date={announcement.createdAt}
                 id={announcement._id}
                 color={announcement.color}
