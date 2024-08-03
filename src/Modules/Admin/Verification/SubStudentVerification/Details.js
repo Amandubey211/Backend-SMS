@@ -111,9 +111,9 @@ const Details = ({ student }) => {
             </div>
             <div className="bg-gray-100 rounded-md p-4 transition-opacity duration-500 ease-in-out hover:opacity-80">
               <span className="font-medium text-gray-700">
-                Admission Number:
+              Student Applied for Class:
               </span>
-              <p className="text-gray-600">{student?.admissionNumber}</p>
+              <p className="text-gray-600">{student?.applyingClass?.className}</p>
             </div>
             <div className="bg-gray-100 rounded-md p-4 transition-opacity duration-500 ease-in-out hover:opacity-80">
               <span className="font-medium text-gray-700">

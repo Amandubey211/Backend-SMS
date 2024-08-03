@@ -10,9 +10,9 @@ const useAssignTeacher = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const role = useSelector((store) => store.Auth.role);
-  
-const {cid} = useParams()
-const {fetchTeachersByClass} = useFetchTeachersByClass()
+
+  const { cid } = useParams()
+  const { fetchTeachersByClass } = useFetchTeachersByClass()
   const assignTeacher = async (assignData) => {
     setLoading(true);
     setError(null);
@@ -28,7 +28,7 @@ const {fetchTeachersByClass} = useFetchTeachersByClass()
       );
 
       toast.success("Teacher assigned successfully!");
-      console.log(response.data,"sdfsdf");
+      console.log(response.data, "sdfsdf");
       fetchTeachersByClass(cid)
       setLoading(false);
     } catch (err) {
@@ -40,8 +40,32 @@ const {fetchTeachersByClass} = useFetchTeachersByClass()
       throw new Error(errorMessage); // Ensuring the error is thrown for the caller to handle
     }
   };
+  const unassignTeacher = async (teacherId) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const token = localStorage.getItem(`${role}:token`);
 
-  return { assignTeacher, loading, error };
+      const response = await axios.delete(
+        `${baseUrl}/admin/teacher/${teacherId}/class/${cid}`,
+        {
+          headers: { Authentication: token },
+        }
+      );
+
+      toast.success("Teacher unassigned successfully!");
+      fetchTeachersByClass(cid)
+      setLoading(false);
+    } catch (err) {
+      const errorMessage =
+        err.response?.data?.message || "Failed to remove teacher";
+      toast.error(errorMessage);
+      setLoading(false);
+      setError(errorMessage);
+      throw new Error(errorMessage);
+    }
+  }
+  return { assignTeacher, unassignTeacher, loading, error };
 };
 
 export default useAssignTeacher;

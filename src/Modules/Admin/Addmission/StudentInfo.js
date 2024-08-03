@@ -51,6 +51,7 @@ const StudentInfo = () => {
     emergencyNumber: "",
     transportRequirement: false,
     Q_Id: "",
+    applyingClass: "",
     enrollmentStatus: "",
     //transportRequirement: "",
     enrollmentStatus: "",
@@ -221,7 +222,7 @@ const StudentInfo = () => {
       if (response.success) {
         toast.success("Details Saved Successfully");
 
-        if (studentDocuments?.documents.length!==0) {
+        if (studentDocuments?.documents.length !== 0) {
           const documentResponse = await saveDocument(
             studentInfo.email,
             studentInfo.schoolId,
