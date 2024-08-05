@@ -21,7 +21,14 @@ const getRandomColor = () => {
   return colors[randomIndex];
 };
 
-const RubricCard = ({ rubricId, title, criteria, points, onDelete }) => {
+const RubricCard = ({
+  rubricId,
+  title,
+  criteria,
+  points,
+  onDelete,
+  onEdit,
+}) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const bgColor = getRandomColor();
 
@@ -58,7 +65,7 @@ const RubricCard = ({ rubricId, title, criteria, points, onDelete }) => {
           <button className="text-red-600" onClick={handleDeleteClick}>
             <RiDeleteBin2Line />
           </button>
-          <button className="text-green-600">
+          <button className="text-green-600" onClick={() => onEdit(rubricId)}>
             <MdOutlineModeEditOutline />
           </button>
         </div>

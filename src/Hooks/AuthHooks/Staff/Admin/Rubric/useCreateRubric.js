@@ -10,14 +10,15 @@ const useCreateRubric = () => {
   const role = useSelector((store) => store.Auth.role);
 
   const validateRubricData = (rubricData) => {
+    console.log(rubricData, "Create hook ");
     if (!rubricData.name) {
-      return "Rubric name is required.";
+      return "Rubric name is sdfsdfrequired.";
     }
     if (!rubricData.criteria || rubricData.criteria.length === 0) {
       return "At least one criterion is required.";
     }
-    if (!rubricData.assignmentId) {
-      return "Assignment ID is required.";
+    if (!rubricData.assignmentId && !rubricData.quizId) {
+      return "Either Assignment ID or Quiz ID is required.";
     }
     return null;
   };
@@ -35,7 +36,6 @@ const useCreateRubric = () => {
       }
 
       try {
-        
         const token = localStorage.getItem(`${role}:token`);
         const response = await axios.post(
           `${baseUrl}/admin/create_rubric`,
@@ -44,21 +44,24 @@ const useCreateRubric = () => {
             headers: { Authentication: token },
           }
         );
-        const { data } = response.data;
-        setLoading(false);
+
         if (response?.data?.success) {
           toast.success("Rubric created successfully");
+          return { success: true, data: response.data };
         } else {
-          toast.error("Rubric Not created");
+          const errorMessage = response?.data?.message || "Rubric not created";
+          toast.error(errorMessage);
+          return { success: false, error: errorMessage };
         }
-        return { success: true, data };
       } catch (err) {
         const errorMessage =
           err.response?.data?.message || "Failed to create rubric";
         toast.error(errorMessage);
-        setLoading(false);
         setError(errorMessage);
+        setLoading(false);
+
         return { success: false, error: errorMessage };
+      } finally {
       }
     },
     [role]

@@ -2,15 +2,12 @@ import { useState, useCallback } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
 import { baseUrl } from "../../../../../config/Common";
 
 const useDeleteSyllabus = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  // const { cid } = useParams();
 
-  
   const { role } = useSelector((store) => store.Auth);
 
   const deleteSyllabus = useCallback(
@@ -28,7 +25,7 @@ const useDeleteSyllabus = () => {
             },
           }
         );
-        if (response.data.status) {
+        if (response.data.success) {
           toast.success("Syllabus deleted successfully!");
         } else {
           toast.error("Failed to delete syllabus");

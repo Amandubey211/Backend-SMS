@@ -87,8 +87,9 @@ const SectionSelect = ({ section, handleChange, group, assignTo }) => {
             >
               <option value="">Choose Group</option>
               {groups.map((group) => (
-                <option key={group._id} value={group._id}>
-                  {group.groupName}
+                <option key={group} value={group}>
+                  {group}
+                  {/* {group.name} */}
                 </option>
               ))}
             </select>
