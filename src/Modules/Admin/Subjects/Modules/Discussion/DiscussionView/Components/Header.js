@@ -1,5 +1,7 @@
-import React, { useState, useRef, useEffect, lazy, Suspense } from "react";
+import React, { useState, useRef, useEffect, Suspense } from "react";
 import { AiOutlineEdit } from "react-icons/ai";
+import { MdOutlineBlock } from "react-icons/md";
+import { BsPatchCheckFill } from "react-icons/bs";
 import { FaBan } from "react-icons/fa6";
 import { HiOutlineDotsVertical } from "react-icons/hi";
 import { BsChat } from "react-icons/bs";
@@ -7,16 +9,19 @@ import { MdDelete } from "react-icons/md";
 import Sidebar from "../../../../../../../Components/Common/Sidebar";
 import { useNavigate, useParams } from "react-router-dom";
 import useDeleteDiscussion from "../../../../../../../Hooks/AuthHooks/Staff/Admin/Disscussion/useDeleteDiscussion";
+import useUpdateDiscussion from "../../../../../../../Hooks/AuthHooks/Staff/Admin/Disscussion/useUpdateDiscussion";
 import DeleteModal from "../../../../../../../Components/Common/DeleteModal";
 
-const DiscussionMessage = lazy(() =>
+const DiscussionMessage = React.lazy(() =>
   import("../../DiscussionMessage/DiscussionMessage")
 );
 
-const Header = ({ discussion }) => {
+const Header = ({ discussion, refetchDiscussion }) => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [isMenuOpen, setMenuOpen] = useState(false);
   const [isModalOpen, setModalOpen] = useState(false); // State for modal
+  const [isPublished, setIsPublished] = useState(discussion.publish); // State for publish status
+
   const navigate = useNavigate();
   const { cid, sid } = useParams();
   const menuRef = useRef(null);
@@ -27,6 +32,8 @@ const Header = ({ discussion }) => {
     error: deleteError,
     success: deleteSuccess,
   } = useDeleteDiscussion();
+
+  const { loading: updateLoading, updateDiscussion } = useUpdateDiscussion();
 
   const handleSidebarOpen = () => setSidebarOpen(true);
   const handleSidebarClose = () => setSidebarOpen(false);
@@ -60,6 +67,19 @@ const Header = ({ discussion }) => {
     };
   }, [isMenuOpen]);
 
+  const handlePublishToggle = async () => {
+    const updatedData = {
+      ...discussion,
+      publish: !isPublished, // Toggle publish status
+    };
+
+    const success = await updateDiscussion(discussion._id, updatedData);
+    if (success) {
+      setIsPublished(!isPublished); // Update local state if successful
+      refetchDiscussion(); // Refetch discussion data after update
+    }
+  };
+
   return (
     <div className="flex items-end justify-between p-2 px-4 border-b">
       <div className="flex items-center">
@@ -78,34 +98,48 @@ const Header = ({ discussion }) => {
           Due: {new Date(discussion.dueDate).toLocaleDateString()}
         </span>
         <div className="flex items-center space-x-4">
-          <div className="flex justify-center gap-2 items-center w-full p-2 text-gray-700">
-            <button
-              className="flex items-center space-x-1 px-4 py-1 border rounded-md border-gray-300 text-gray-600 hover:bg-gray-100 transition"
-              aria-label="Publish Assignment"
-            >
-              <FaBan aria-hidden="true" />
-              <span>Publish</span>
-            </button>
-            <button
-              className="flex items-center space-x-1 px-4 py-1 border rounded-md border-gray-300 text-green-600 hover:bg-gray-100 transition"
-              aria-label="Edit Assignment"
-              onClick={() =>
-                navigate(`/class/${cid}/${sid}/create_discussion`, {
-                  state: { discussion },
-                })
-              }
-            >
-              <AiOutlineEdit aria-hidden="true" />
-              <span>Edit</span>
-            </button>
-            <button
-              className="flex items-center space-x-1 border rounded-full w-8 h-8 justify-center border-gray-300 text-gray-600 hover:bg-gray-100 transition"
-              aria-label="More Options"
-              onClick={() => setMenuOpen((prev) => !prev)}
-            >
-              <HiOutlineDotsVertical aria-hidden="true" className="" />
-            </button>
-          </div>
+          <button
+            className="flex items-center space-x-1 px-4 py-1 border rounded-md border-gray-300 text-gray-600 hover:bg-gray-100 transition"
+            aria-label={
+              isPublished ? "Unpublish Discussion" : "Publish Discussion"
+            }
+            onClick={handlePublishToggle}
+            disabled={updateLoading}
+          >
+            {isPublished ? (
+              <>
+                <BsPatchCheckFill
+                  aria-hidden="true"
+                  className="text-green-600"
+                />
+                <span>Publish</span>
+              </>
+            ) : (
+              <>
+                <MdOutlineBlock aria-hidden="true" />
+                <span>Unpublish</span>
+              </>
+            )}
+          </button>
+          <button
+            className="flex items-center space-x-1 px-4 py-1 border rounded-md border-gray-300 text-green-600 hover:bg-gray-100 transition"
+            aria-label="Edit Discussion"
+            onClick={() =>
+              navigate(`/class/${cid}/${sid}/create_discussion`, {
+                state: { discussion },
+              })
+            }
+          >
+            <AiOutlineEdit aria-hidden="true" />
+            <span>Edit</span>
+          </button>
+          <button
+            className="flex items-center space-x-1 border rounded-full w-8 h-8 justify-center border-gray-300 text-gray-600 hover:bg-gray-100 transition"
+            aria-label="More Options"
+            onClick={() => setMenuOpen((prev) => !prev)}
+          >
+            <HiOutlineDotsVertical aria-hidden="true" className="" />
+          </button>
           {isMenuOpen && (
             <div
               ref={menuRef}
@@ -113,7 +147,7 @@ const Header = ({ discussion }) => {
             >
               <button
                 className="flex items-center space-x-2 px-4 py-2 text-red-600 hover:bg-gray-100 w-full"
-                onClick={handleDeleteClick} // Open modal instead of direct delete
+                onClick={handleDeleteClick}
                 disabled={deleteLoading}
               >
                 <MdDelete aria-hidden="true" />

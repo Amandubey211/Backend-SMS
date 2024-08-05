@@ -20,7 +20,7 @@ const MainSection = () => {
       <SubjectSideBar />
       <div className="border-l w-full">
         <AnnouncementViewHeader announcement={announcement} />
-        <div className="p-4 bg-white">
+        <div className="p-4 bg-white border">
           {loading && <Spinner />}
           {error && <NoDataFound title="Announcement" />}
           {announcement ? (
@@ -29,7 +29,7 @@ const MainSection = () => {
                 <img
                   src={announcement.attachment || "default_image_url_here"}
                   alt="Announcement"
-                  className="absolute top-0 left-0 w-full h-full object-cover"
+                  className=" w-full h-full "
                 />
               )}
 

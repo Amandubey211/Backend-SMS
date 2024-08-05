@@ -8,13 +8,14 @@ const AssignToSection = ({
   groupId,
   handleChange,
   assignTitle,
+  isAssignToLabel,
 }) => {
   return (
     <div className="mt-5">
       <AssignToRadios
         assignTo={assignTo}
         handleChange={handleChange}
-        isAssignToLabel={false}
+        isAssignToLabel={isAssignToLabel}
         title={assignTitle}
       />
       <SectionSelect

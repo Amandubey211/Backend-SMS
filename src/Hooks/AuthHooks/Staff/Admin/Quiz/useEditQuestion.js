@@ -22,13 +22,21 @@ const useEditQuestion = () => {
       } = questionData;
 
       const missingFields = [];
-      if(!quizId)  missingFields.push("Quiz ID");
-      if(!questionId)  missingFields.push("Question ID");
-      if (!questionText) missingFields.push("Question Text");
-      if (!questionPoint) missingFields.push("Question Point");
-      if (!type) missingFields.push("Type");
-      if (!options || options.length === 0) missingFields.push("Options");
-      if (!correctAnswer) missingFields.push("Correct Answer");
+      if (!quizId) missingFields.push("Quiz ID");
+      if (!questionId) missingFields.push("Question ID");
+      if (type === "text") {
+        // Validation for text type questions
+        if (!questionText) missingFields.push("Question Text");
+        if (!questionPoint) missingFields.push("Question Point");
+        if (!type) missingFields.push("Type");
+      } else {
+        // Validation for non-text type questions
+        if (!questionText) missingFields.push("Question Text");
+        if (!questionPoint) missingFields.push("Question Point");
+        if (!type) missingFields.push("Type");
+        if (!options || options.length === 0) missingFields.push("Options");
+        if (!correctAnswer) missingFields.push("Correct Answer");
+      }
 
       if (missingFields.length > 0) {
         toast.error(
@@ -41,7 +49,6 @@ const useEditQuestion = () => {
       setError(null);
 
       try {
-        
         const token = localStorage.getItem(`${role}:token`);
 
         const response = await axios.put(

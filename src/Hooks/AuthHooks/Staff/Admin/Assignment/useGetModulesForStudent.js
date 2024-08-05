@@ -9,8 +9,8 @@ const useGetModulesForStudent = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [modulesData, setModulesData] = useState(null);
-  const role = useSelector((store) => store.Auth.role);
 
+  const role = useSelector((store) => store.Auth.role);
   const { cid, sid } = useParams();
   const dispatch = useDispatch();
 
@@ -19,16 +19,23 @@ const useGetModulesForStudent = () => {
     setError(null);
     try {
       const token = localStorage.getItem(`${role}:token`);
+      if (!token) {
+        setError("Authentication token not found.");
+        setLoading(false);
+        return;
+      }
+
       const response = await axios.get(
         `${baseUrl}/admin/student/classes/${cid}/modules/${sid}`,
         {
           headers: { Authentication: token },
         }
       );
-      console.log(response.data);
+
+      console.log(response.data); // Debugging output
       if (response.data?.success) {
-        dispatch(setModules(response.data.data.modules));
-        setModulesData(response.data.data);
+        dispatch(setModules(response.data.data.modules)); // Update Redux
+        setModulesData(response.data.data); // Update local state
       } else {
         dispatch(setModules([]));
         setError(response.data.msg || "Failed to fetch modules.");
@@ -40,7 +47,7 @@ const useGetModulesForStudent = () => {
     } finally {
       setLoading(false);
     }
-  }, [role, dispatch, cid, sid]); // Include all dependencies
+  }, [role, dispatch, cid, sid]); // All dependencies included
 
   return { loading, error, modulesData, fetchModules };
 };

@@ -40,7 +40,7 @@ const SectionSelect = ({ section, handleChange, group, assignTo }) => {
           </label>
           <select
             value={section}
-            name="section"
+            name="sectionId"
             onChange={handleChange}
             className="block w-full mb-4 p-2 border border-gray-300 rounded-lg"
           >
@@ -62,7 +62,7 @@ const SectionSelect = ({ section, handleChange, group, assignTo }) => {
             </label>
             <select
               value={section}
-              name="section"
+              name="sectionId"
               onChange={handleChange}
               className="block w-full mb-4 p-2 border border-gray-300 rounded-lg"
             >

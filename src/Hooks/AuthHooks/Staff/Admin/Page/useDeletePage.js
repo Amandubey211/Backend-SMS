@@ -9,7 +9,6 @@ const useDeletePage = () => {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
 
-  
   const { role } = useSelector((store) => store.Auth);
   const deletePage = useCallback(
     async (pid) => {

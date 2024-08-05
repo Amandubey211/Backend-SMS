@@ -20,15 +20,23 @@ const useAddQuestion = () => {
         correctAnswerComment,
         inCorrectAnswerComment,
       } = questionData;
-      console.log(typeof questionPoint);
+
       const missingFields = [];
       if (!quizId) missingFields.push("Quiz ID");
       if (!questionText) missingFields.push("Question Text");
       if (!questionPoint) missingFields.push("Question Point");
       if (!type) missingFields.push("Type");
-      if (!options || options.length === 0) missingFields.push("Options");
-      if (type !== "text" && !correctAnswer)
-        missingFields.push("Correct Answer");
+
+      // Add conditional validation based on question type
+      if (type === "text") {
+        // Only require these fields for "text" type
+        if (!questionText) missingFields.push("Question Text");
+        if (!questionPoint) missingFields.push("Question Point");
+      } else {
+        // For non-"text" types, validate options and correct answer
+        if (!options || options.length === 0) missingFields.push("Options");
+        if (!correctAnswer) missingFields.push("Correct Answer");
+      }
 
       if (missingFields.length > 0) {
         toast.error(
@@ -41,7 +49,6 @@ const useAddQuestion = () => {
       setError(null);
 
       try {
-        
         const token = localStorage.getItem(`${role}:token`);
 
         const response = await axios.put(
@@ -50,10 +57,12 @@ const useAddQuestion = () => {
             questionText,
             questionPoint,
             type,
-            options,
+            options: type !== "text" ? options : undefined, // Include options only if type is not text
             correctAnswer: type !== "text" ? correctAnswer : undefined, // Include correctAnswer only if type is not text
-            correctAnswerComment,
-            inCorrectAnswerComment,
+            correctAnswerComment:
+              type !== "text" ? correctAnswerComment : undefined, // Include correctAnswerComment only if type is not text
+            inCorrectAnswerComment:
+              type !== "text" ? inCorrectAnswerComment : undefined, // Include inCorrectAnswerComment only if type is not text
           },
           {
             headers: { Authentication: token },
