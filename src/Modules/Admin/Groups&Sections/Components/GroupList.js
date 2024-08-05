@@ -95,7 +95,7 @@ const GroupList = ({
                   )
                 }
               >
-                {group?.groupName || " Group Name"} 
+                {group?.groupName || " Group Name"}
               </h3>
               <div className="flex items-center space-x-2 relative">
                 <div className="flex items-center space-x-1 border p-1 rounded-full px-4">
@@ -145,9 +145,8 @@ const GroupList = ({
                   )}
                 </div>
                 <svg
-                  className={`w-7 h-7 text-gray-500 transform p-1 border rounded-full transition-transform ${
-                    expandedGroupIndex === groupIndex ? "rotate-180" : ""
-                  }`}
+                  className={`w-7 h-7 text-gray-500 transform p-1 border rounded-full transition-transform ${expandedGroupIndex === groupIndex ? "rotate-180" : ""
+                    }`}
                   onClick={() =>
                     setExpandedGroupIndex((prevExpandedGroupIndex) =>
                       prevExpandedGroupIndex === groupIndex ? null : groupIndex
