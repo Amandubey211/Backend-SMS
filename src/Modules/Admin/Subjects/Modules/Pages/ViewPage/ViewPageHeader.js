@@ -6,9 +6,13 @@ import { HiOutlineDotsVertical } from "react-icons/hi";
 import { useNavigate, useParams } from "react-router-dom";
 import useDeletePage from "../../../../../../Hooks/AuthHooks/Staff/Admin/Page/useDeletePage"; // Adjust the import path as needed
 import toast from "react-hot-toast";
+import DeleteModal from "../../../../../../Components/Common/DeleteModal";
+import Spinner from "../../../../../../Components/Common/Spinner";
+import NoDataFound from "../../../../../../Components/Common/NoDataFound";
 
 const ViewPageHeader = ({ title, LastEdit, page }) => {
   const [showMenu, setShowMenu] = useState(false);
+  const [isModalOpen, setModalOpen] = useState(false);
   const navigate = useNavigate();
   const { cid, sid } = useParams();
   const { loading, error, success, deletePage } = useDeletePage();
@@ -17,15 +21,23 @@ const ViewPageHeader = ({ title, LastEdit, page }) => {
     navigate(`/class/${cid}/${sid}/page/create_Page`, { state: { page } });
   };
 
-  const handleDelete = async () => {
+  const handleDeleteClick = () => {
+    setModalOpen(true); // Open the delete confirmation modal
+  };
+
+  const handleConfirmDelete = async () => {
     await deletePage(page._id);
   };
 
   useEffect(() => {
     if (success) {
+      toast.success("Page deleted successfully!");
       navigate(`/class/${cid}/${sid}/page`);
     }
-  }, [success, navigate, cid, sid]);
+    if (error) {
+      toast.error("Failed to delete the page.");
+    }
+  }, [success, error, navigate, cid, sid]);
 
   return (
     <div className="flex justify-between items-end p-4 border-b">
@@ -66,7 +78,7 @@ const ViewPageHeader = ({ title, LastEdit, page }) => {
           {showMenu && (
             <div className="absolute top-full right-0 mt-2 w-48 bg-white border border-gray-300 rounded-md shadow-lg">
               <button
-                onClick={handleDelete}
+                onClick={handleDeleteClick}
                 className="flex items-center space-x-2 px-4 py-2 hover:bg-red-100 w-full text-left"
                 aria-label="Delete Page"
               >
@@ -77,8 +89,16 @@ const ViewPageHeader = ({ title, LastEdit, page }) => {
           )}
         </button>
       </div>
-      {loading && <p>Loading...</p>}
-      {error && <p className="text-red-500">{error}</p>}
+
+      <DeleteModal
+        isOpen={isModalOpen}
+        onClose={() => setModalOpen(false)}
+        onConfirm={handleConfirmDelete}
+        title={page.title}
+      />
+
+      {loading && <Spinner />}
+      {error && <NoDataFound />}
     </div>
   );
 };

@@ -11,7 +11,6 @@ const useGetFilteredAssignments = () => {
   const [assignments, setAssignments] = useState([]);
   const dispatch = useDispatch();
   const role = useSelector((store) => store.Auth.role);
-  
 
   const fetchFilteredAssignments = useCallback(
     async (sid, moduleId, chapterId, publish) => {
@@ -43,7 +42,9 @@ const useGetFilteredAssignments = () => {
           setError(response.data.msg || "Failed to fetch assignments.");
         }
       } catch (err) {
-        setError(err.response?.data?.message || "Error in fetching assignments");
+        setError(
+          err.response?.data?.message || "Error in fetching assignments"
+        );
       } finally {
         setLoading(false);
       }

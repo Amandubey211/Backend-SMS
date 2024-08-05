@@ -1,3 +1,4 @@
+// CreateAssignmentHeader Component
 import React, { useState } from "react";
 import toast from "react-hot-toast";
 import { IoIosArrowBack } from "react-icons/io";
@@ -6,11 +7,18 @@ import AddRubricModal from "../../../Rubric/Components/AddRubricModal";
 import Sidebar from "../../../../../../../Components/Common/Sidebar";
 import AddNewCriteriaForm from "../../../Rubric/Components/AddNewCriteriaForm";
 
-const CreateAssignmentHeader = ({ onSave, id, isEditing }) => {
+const CreateAssignmentHeader = ({
+  onSave,
+  id,
+  isEditing,
+  criteriaList,
+  setCriteriaList,
+  setExistingRubricId,
+  assignmentId, // Receive assignment ID as prop
+}) => {
   const navigate = useNavigate();
   const [isModalOpen, setModalOpen] = useState(false);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
-  const [criteriaList, setCriteriaList] = useState([]);
 
   const handleAddCriteria = () => {
     setSidebarOpen(true);
@@ -28,7 +36,6 @@ const CreateAssignmentHeader = ({ onSave, id, isEditing }) => {
           className="mr-2 text-gray-600 text-2xl cursor-pointer"
           onClick={() => navigate(-1)}
         />
-
         <h1 className="text-lg font-semibold text-gray-800">
           {isEditing ? "Update Assignment" : "Create New Assignment"}
         </h1>
@@ -62,13 +69,14 @@ const CreateAssignmentHeader = ({ onSave, id, isEditing }) => {
           Save
         </button>
         <AddRubricModal
-          AssignmentId={id}
           type="assignment"
           isOpen={isModalOpen}
           onClose={() => setModalOpen(false)}
           criteriaList={criteriaList}
           setCriteriaList={setCriteriaList}
           onAddCriteria={handleAddCriteria}
+          setExistingRubricId={setExistingRubricId}
+          AssignmentId={assignmentId} // Pass assignment ID to modal
         />
         <Sidebar
           isOpen={isSidebarOpen}

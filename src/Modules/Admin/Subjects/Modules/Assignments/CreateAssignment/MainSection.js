@@ -1,13 +1,14 @@
+// MainSection Component
 import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useLocation } from "react-router-dom";
 import CreateAssignmentHeader from "./Component/CreateAssignmentHeader";
 import EditorComponent from "../../../Component/AdminEditor";
 import Sidebar from "../../../../../../Components/Common/Sidebar";
 import useCreateAssignment from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/createAssignment";
+import useUpdateAssignment from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useUpdateAssignment";
 import toast from "react-hot-toast";
 import CreateAssignmentForm from "./Component/CreateAssignmentForm";
 import AddNewCriteriaForm from "../../Rubric/Components/AddNewCriteriaForm";
-import useUpdateAssignment from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useUpdateAssignment";
 
 const initialFormState = {
   points: "",
@@ -36,11 +37,14 @@ const MainSection = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [assignmentId, setAssignmentId] = useState("");
-  const handleSidebarOpen = useCallback(() => setSidebarOpen(true), []);
-  const handleSidebarClose = useCallback(() => setSidebarOpen(false), []);
+  const [criteriaList, setCriteriaList] = useState([]);
+  const [existingRubricId, setExistingRubricId] = useState(null);
 
   const { createAssignment, loading: createLoading } = useCreateAssignment();
   const { updateAssignment, loading: updateLoading } = useUpdateAssignment();
+
+  const handleSidebarOpen = useCallback(() => setSidebarOpen(true), []);
+  const handleSidebarClose = useCallback(() => setSidebarOpen(false), []);
 
   useEffect(() => {
     if (location.state && location.state.assignment) {
@@ -79,7 +83,7 @@ const MainSection = () => {
       [name]: value,
     }));
   };
-  console.log("formstate--", formState);
+
   const handleSave = async (publish) => {
     const assignmentData = {
       name: assignmentName,
@@ -106,18 +110,33 @@ const MainSection = () => {
     } else if (formState.assignTo === "Group") {
       assignmentData.groupId = formState.group || null;
     }
-    console.log("assignmnet data", assignmentData);
-    if (isEditing) {
-      let sectionId = formState.section || null;
-      await updateAssignment(assignmentId, assignmentData, sectionId);
-    } else {
-      await createAssignment(assignmentData);
+
+    try {
+      if (isEditing) {
+        let sectionId = formState.section || null;
+        await updateAssignment(assignmentId, assignmentData, sectionId);
+        toast.success("Assignment updated successfully.");
+      } else {
+        const response = await createAssignment(assignmentData);
+        setAssignmentId(response.data._id); // Set assignment ID after creation
+        toast.success("Assignment created successfully.");
+      }
+    } catch (error) {
+      toast.error("Failed to save the assignment. Please try again.");
     }
   };
 
   return (
     <div className="flex flex-col w-full">
-      <CreateAssignmentHeader onSave={handleSave} id={assignmentId} />
+      <CreateAssignmentHeader
+        onSave={handleSave}
+        id={assignmentId}
+        isEditing={isEditing}
+        criteriaList={criteriaList}
+        setCriteriaList={setCriteriaList}
+        setExistingRubricId={setExistingRubricId}
+        assignmentId={assignmentId} // Pass assignment ID to header
+      />
       <div className="w-full flex">
         <div className="w-[70%]">
           <EditorComponent
@@ -143,7 +162,14 @@ const MainSection = () => {
         onClose={handleSidebarClose}
         title="Add New Criteria"
       >
-        <AddNewCriteriaForm />
+        <AddNewCriteriaForm
+          onSave={(criteria) =>
+            setFormState((prev) => ({
+              ...prev,
+              criteria: [...prev.criteria, criteria],
+            }))
+          }
+        />
       </Sidebar>
     </div>
   );
