@@ -11,6 +11,7 @@ import { getEvents, createEvent, updateEvent, deleteEvent } from "../api/event";
 import { format, parseISO, isValid } from "date-fns";
 import "../subComponents/customCalendar.css";
 import toast from "react-hot-toast";
+import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
 
 const EventScheduler = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -18,6 +19,9 @@ const EventScheduler = () => {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [sidebarContent, setSidebarContent] = useState(null);
   const [events, setEvents] = useState([]);
+  const [currentPage, setCurrentPage] = useState(0); // New state for pagination
+
+  const itemsPerPage = 4; // Number of stickers to show per page
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -59,7 +63,9 @@ const EventScheduler = () => {
     return (
       <ul className="events space-y-1">
         {dayEvents.map((event, index) => {
-          const eventTime = event.time ? new Date(`${format(event.startDate, "yyyy-MM-dd")}T${event.time}`) : null;
+          const eventTime = event.time
+            ? new Date(`${format(event.startDate, "yyyy-MM-dd")}T${event.time}`)
+            : null;
           const timeString = isValid(eventTime) ? format(eventTime, "hh:mm a") : "Invalid Time";
 
           return (
@@ -153,7 +159,7 @@ const EventScheduler = () => {
         return <div>Select an action</div>;
     }
   };
-  
+
   const bgColors = [
     "#FF6C9C", // pink
     "#E24DFF", // purple
@@ -161,7 +167,10 @@ const EventScheduler = () => {
     "#FBB778", // orange
   ];
 
-  const recentEvents = events.slice(0, 4);
+  const paginatedEvents = events.slice(
+    currentPage * itemsPerPage,
+    (currentPage + 1) * itemsPerPage
+  );
 
   return (
     <Layout title="Event">
@@ -178,8 +187,16 @@ const EventScheduler = () => {
               Add New Event
             </button>
           </div>
-          <div className="my-4 w-full h-40 flex justify-around rounded-sm gap-4">
-            {recentEvents.map((event, index) => (
+          <div className="my-4 w-full h-40 flex justify-around rounded-sm gap-4 relative">
+            {currentPage > 0 && (
+              <div
+                className="p-1 rounded-full text-purple-500 bg-white border-2 cursor-pointer absolute left-0 top-1/2 transform -translate-y-1/2"
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 0))}
+              >
+                <IoIosArrowBack />
+              </div>
+            )}
+            {paginatedEvents.map((event, index) => (
               <EventCard
                 key={event._id}
                 event={event}
@@ -187,6 +204,14 @@ const EventScheduler = () => {
                 onClick={handleStickerClick}
               />
             ))}
+            {(currentPage + 1) * itemsPerPage < events.length && (
+              <div
+                className="p-1 rounded-full text-purple-500 bg-white border-2 cursor-pointer absolute right-0 top-1/2 transform -translate-y-1/2"
+                onClick={() => setCurrentPage((prev) => prev + 1)}
+              >
+                <IoIosArrowForward />
+              </div>
+            )}
           </div>
           <hr className="my-6 border-t-2 mt-12 " />
           <div className="py-7">
