@@ -31,6 +31,7 @@ const EventScheduler = () => {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
+        console.log("Fetching events...");
         const events = await getEvents();
         const mappedEvents = events.map((event) => ({
           ...event,
@@ -41,6 +42,7 @@ const EventScheduler = () => {
         }));
         setEvents(mappedEvents);
         filterAndSortEvents(mappedEvents, selectedMonthYear);
+        console.log("Events fetched and mapped:", mappedEvents);
       } catch (error) {
         console.error("Failed to fetch events:", error);
       }
@@ -50,10 +52,12 @@ const EventScheduler = () => {
   }, []);
 
   useEffect(() => {
+    console.log("Filtering and sorting events for month/year:", selectedMonthYear);
     filterAndSortEvents(events, selectedMonthYear);
   }, [selectedMonthYear, events]);
 
   const filterAndSortEvents = (events, { month, year }) => {
+    console.log("Filtering events...");
     const filtered = events.filter((event) => {
       const eventDate = new Date(event.startDate);
       return eventDate.getMonth() === month && eventDate.getFullYear() === year;
@@ -63,11 +67,15 @@ const EventScheduler = () => {
 
     setFilteredEvents(sorted);
     setCurrentPage(0); // Reset to first page when filter changes
+    console.log("Filtered and sorted events:", sorted);
   };
 
-  const handleSidebarOpen = () => setSidebarOpen(true);
+  const handleSidebarOpen = () => {
+    console.log("Opening sidebar");
+    setSidebarOpen(true);
+  };
   const handleSidebarClose = () => {
-    console.log("Sidebar is closing");
+    console.log("Closing sidebar");
     setSelectedEvent(null);
     setSidebarOpen(false);
   };
@@ -86,7 +94,7 @@ const EventScheduler = () => {
 
       setEvents(mappedEvents);
       filterAndSortEvents(mappedEvents, selectedMonthYear);
-      console.log("Events refreshed");
+      console.log("Events refreshed:", mappedEvents);
     } catch (error) {
       console.error("Failed to refresh events:", error);
     }
@@ -132,29 +140,42 @@ const EventScheduler = () => {
   };
 
   const handleStickerClick = (event) => {
+    console.log("Sticker clicked:", event);
     setSelectedEvent(event);
     setSidebarContent("viewEvent");
     setSidebarOpen(true);
   };
 
   const handleAddEventClick = () => {
+    console.log("Add Event clicked");
     setSidebarContent("addEvent");
     setSidebarOpen(true);
   };
 
   const handleSaveEvent = async (eventData) => {
+    console.log("Saving event data:", eventData);
+    
+    if (!eventData || Object.keys(eventData).length === 0) {
+      console.error("Event data is undefined or null.");
+      toast.error("Event data is missing.");
+      return;
+    }
+  
     try {
-      console.log("Saving event data:", eventData);
       if (selectedEvent) {
         await updateEvent(selectedEvent._id, eventData);
         toast.success("Event updated successfully!");
         console.log("Event updated successfully!");
       } else {
-        await createEvent(eventData);
-        toast.success("Event created successfully!");
-        console.log("Event created successfully!");
+        const result = await createEvent(eventData);
+        if (result?.success) {
+          toast.success(result.msg || "Event created successfully!");
+          console.log("Event created successfully!");
+        } else {
+          toast.error("Failed to create event.");
+        }
       }
-
+  
       handleSidebarClose(); // Close the sidebar after success
       refreshEvents(); // Refresh the events list
     } catch (error) {
@@ -162,13 +183,18 @@ const EventScheduler = () => {
       toast.error("Failed to save event.");
     }
   };
+  
+  
+  
 
   const handleDeleteEvent = async () => {
     try {
+      console.log("Deleting event:", selectedEvent);
       await deleteEvent(selectedEvent._id);
       handleSidebarClose();
       refreshEvents();
       toast.success("Event deleted successfully!");
+      console.log("Event deleted successfully!");
     } catch (error) {
       console.error("Failed to delete event:", error);
       toast.error("Failed to delete event.");
