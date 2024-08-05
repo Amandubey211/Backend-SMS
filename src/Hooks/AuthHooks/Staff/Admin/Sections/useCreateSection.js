@@ -11,7 +11,7 @@ const useCreateSection = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const role = useSelector((store) => store.Auth.role);
-  const {fetchSection} = useFetchSection()
+  const { fetchSection } = useFetchSection()
   const createSection = async (sectionData) => {
     setLoading(true);
     setError(null); // Reset error state before new request
@@ -24,7 +24,7 @@ const useCreateSection = () => {
           headers: { Authentication: token },
         }
       );
-      if(data.success){
+      if (data.success) {
         toast.success("Section Created ")
       }
       fetchSection(sectionData.classId)
@@ -35,7 +35,29 @@ const useCreateSection = () => {
     }
   };
 
-  return { createSection, loading, error };
+  const updateSection = async (sectionData) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const token = localStorage.getItem(`${role}:token`);
+      const sectionId = sectionData.sectionId
+      const { data } = await axios.put(
+        `${baseUrl}/admin/editSection/${sectionId}`,
+        sectionData,
+        {
+          headers: { Authentication: token },
+        }
+      );
+      if (data.success) {
+        toast.success("Section Updated Successfully ")
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+  return { createSection, updateSection, loading, error };
 };
 
 export default useCreateSection;

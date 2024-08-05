@@ -82,6 +82,7 @@ const MainSection = () => {
       <NavigationBar
         onSectionChange={handleSectionChange}
         selectedSection={activeSection}
+        fetchSections={fetchSection}
       />
       <div className="flex gap-1 h-screen">
         <div className="w-80 h-full flex-shrink-0">

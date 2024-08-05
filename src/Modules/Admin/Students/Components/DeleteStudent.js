@@ -1,11 +1,16 @@
 import React from 'react';
+import { useSelector } from 'react-redux';
 
-const DeleteStudent = ({ studentId }) => {
+const DeleteStudent = ({ studentId, groupId }) => {
+  console.log("grouId--", groupId);
   return (
     <div>
-      <h2>Delete Student</h2>
-      <p>Student ID: {studentId}</p>
-      {/* Additional delete student logic */}
+      <button
+        className="px-4 py-2 bg-red-500 text-white rounded-md"
+        aria-label="Remove student from group"
+      >
+        Remove Student
+      </button>
     </div>
   );
 };
