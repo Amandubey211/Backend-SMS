@@ -15,7 +15,7 @@ const AddGroup = ({ group, isUpdate, groupId, onClose, fetchGroups }) => {
     group?.students || []
   );
   const [leader, setLeader] = useState(group?.leader || null);
-  const [sectionId, setSectionId] = useState(group?.sectionId || "");
+  //const [sectionId, setSectionId] = useState(group?.sectionId || "");
   const [isDropdownOpen, setDropdownOpen] = useState(false);
 
   const allSections = useSelector((store) => store.Class.sectionsList);
@@ -29,7 +29,7 @@ const AddGroup = ({ group, isUpdate, groupId, onClose, fetchGroups }) => {
       setSeatLimit(group.seatLimit);
       setSelectedStudents(group.students);
       setLeader(group.leader);
-      setSectionId(group.sectionId);
+      //setSectionId(group.sectionId);
     }
   }, [isUpdate, group]);
 
@@ -75,13 +75,13 @@ const AddGroup = ({ group, isUpdate, groupId, onClose, fetchGroups }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!sectionId) {
-      toast.error("Please select a section.");
-      return;
-    }
+    // if (!sectionId) {
+    //   toast.error("Please select a section.");
+    //   return;
+    // }
 
     const formData = {
-      sectionId,
+      //sectionId,
       groupName,
       seatLimit,
       students: selectedStudents.map((student) => student._id),
@@ -91,7 +91,7 @@ const AddGroup = ({ group, isUpdate, groupId, onClose, fetchGroups }) => {
     try {
       if (isUpdate) {
         await updateGroup(formData, groupId);
-        fetchGroups();
+        //fetchGroups();
         onClose();
       } else {
         await createGroup(formData);
@@ -100,7 +100,7 @@ const AddGroup = ({ group, isUpdate, groupId, onClose, fetchGroups }) => {
         setSeatLimit("");
         setSelectedStudents([]);
         setLeader(null);
-        setSectionId("");
+        //setSectionId("");
       }
     } catch (err) {
       toast.error(err.message || "Something went wrong");

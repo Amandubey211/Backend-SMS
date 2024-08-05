@@ -9,14 +9,19 @@ import { BsArrow90DegRight } from "react-icons/bs";
 import { MdOutlineModeEditOutline } from "react-icons/md";
 import { RiDeleteBin2Line } from "react-icons/ri";
 import { TfiStatsUp } from "react-icons/tfi";
+import useAssignStudentToGroup from "../../../../Hooks/AuthHooks/Staff/Admin/Students/useAssignStudentToGroup ";
+import DeleteModal from "../../../../Components/Common/DeleteModal";
 
-const StudentMenuOptions = ({ studentId, onSeeGradeClick }) => {
+const StudentMenuOptions = ({ studentId, studentName, groupId, fetchGroups, onSeeGradeClick }) => {
   const [showMenu, setShowMenu] = useState(null);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarContent, setSidebarContent] = useState(null);
   const [sidebarTitle, setSidebarTitle] = useState("");
+  const [isModalOpen, setModalOpen] = useState(false);
   const menuRef = useRef(null);
   const buttonRef = useRef(null);
+
+  const { removeStudentFromGroup } = useAssignStudentToGroup();
 
   const toggleMenu = useCallback(
     (index) => {
@@ -45,14 +50,18 @@ const StudentMenuOptions = ({ studentId, onSeeGradeClick }) => {
   const handleMenuItemClick = useCallback(
     (action) => {
       setShowMenu(null);
-      const sidebarComponents = {
-        "Promote Class": <PromoteClass studentId={studentId} />,
-        "Move to Section": <MoveToSection studentId={studentId} />,
-        "Edit Student": <EditStudent studentId={studentId} />,
-        "Delete Student": <DeleteStudent studentId={studentId} />,
-      };
+      if (action === "Delete Student") {
+        setModalOpen(true);
+      } else {
+        const sidebarComponents = {
+          "Promote Class": <PromoteClass studentId={studentId} />,
+          "Move to Section": <MoveToSection studentId={studentId} fetchGroups={fetchGroups} onClose={handleSidebarClose} />,
+          "Edit Student": <EditStudent studentId={studentId} fetchGroups={fetchGroups} onClose={handleSidebarClose} />,
+          "Delete Student": <DeleteStudent studentId={studentId} groupId={groupId} />,
+        };
 
-      handleSidebarOpen(action, sidebarComponents[action]);
+        handleSidebarOpen(action, sidebarComponents[action]);
+      }
     },
     [studentId]
   );
@@ -69,6 +78,15 @@ const StudentMenuOptions = ({ studentId, onSeeGradeClick }) => {
     setSidebarTitle("");
   };
 
+  const handleDeleteConfirm = async () => {
+    try {
+      await removeStudentFromGroup(studentId, groupId);
+      fetchGroups();
+      setModalOpen(false);
+    } catch (error) {
+      console.error("Error removing student:", error);
+    }
+  };
   return (
     <>
       <button
@@ -117,6 +135,12 @@ const StudentMenuOptions = ({ studentId, onSeeGradeClick }) => {
       >
         {sidebarContent}
       </Sidebar>
+      <DeleteModal
+        isOpen={isModalOpen}
+        onClose={() => setModalOpen(false)}
+        onConfirm={handleDeleteConfirm}
+        title={studentName}
+      />
     </>
   );
 };

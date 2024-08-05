@@ -1,45 +1,60 @@
 import React, { useState, lazy, Suspense } from "react";
 import Sidebar from "../../../../Components/Common/Sidebar";
 import { useSelector } from "react-redux";
-import { RiDeleteBin5Line } from "react-icons/ri";
+import { RiDeleteBin5Line, RiEdit2Line } from "react-icons/ri";
 import useDeleteSection from "../../../../Hooks/AuthHooks/Staff/Admin/Sections/useDeleteSection";
 import { PiSpinner } from "react-icons/pi";
 import useDeleteModal from "../../../../Hooks/CommonHooks/useDeleteModal";
 import DeleteModal from "../../../../Components/Common/DeleteModal";
+import AddSection from "./AddSection"; // Use the same AddSection component for both add and edit
+import { useParams } from "react-router-dom";
 
 const AddGroup = lazy(() => import("./AddGroup"));
-const AddSection = lazy(() => import("./AddSection"));
 
-const NavigationBar = ({ onSectionChange, selectedSection }) => {
+const NavigationBar = ({ onSectionChange, selectedSection, fetchSections }) => {
   const [sidebarType, setSidebarType] = useState(null);
-  const [clickedSection, setClickedSection] = useState(null);
-
+  const [hoveredSection, setHoveredSection] = useState(null);
+  const [editingSection, setEditingSection] = useState(null); // Track editing section
+  const { cid } = useParams();
   const Sections = useSelector((store) => store.Class.sectionsList);
 
   const { deleteSection, loading } = useDeleteSection();
 
-  const { isModalOpen, modalData, openModal, closeModal } = useDeleteModal(); // Use the custom hook
+  const { isModalOpen, modalData, openModal, closeModal } = useDeleteModal();
 
   const openAddGroupSidebar = () => setSidebarType("addGroup");
   const openAddSectionSidebar = () => setSidebarType("addSection");
-  const closeSidebar = () => setSidebarType(null);
+  const closeSidebar = () => {
+    setSidebarType(null);
+    setEditingSection(null);
+  };
 
   const handleDeleteConfirm = async () => {
     if (modalData) {
       await deleteSection(modalData._id);
       closeModal();
+      fetchSections(cid);
     }
   };
 
   const handleSectionChange = (section, sectionId) => {
     onSectionChange(section, sectionId);
-    setClickedSection(section);
+  };
+
+  const handleEditSection = (section) => {
+    setEditingSection(section);
+    setSidebarType("editSection");
+  };
+
+  const handleSectionSubmitSuccess = () => {
+    fetchSections(cid); // Refresh sections list
+    closeSidebar()
   };
 
   const getButtonClass = (section) => {
     return selectedSection === section
       ? "relative px-4 py-2 rounded-full bg-gradient-to-r from-red-400 to-purple-500 text-white"
-      : "relative px-4 py-2 rounded-full border border-gray-300";
+      : "relative px-4 py-2 rounded-full border border-gray-300 hover:border-red-400 hover:bg-gray-100";
   };
 
   return (
@@ -58,19 +73,30 @@ const NavigationBar = ({ onSectionChange, selectedSection }) => {
               key={item._id}
               className={getButtonClass(item.sectionName)}
               onClick={() => handleSectionChange(item.sectionName, item._id)}
+              onMouseEnter={() => setHoveredSection(item.sectionName)}
+              onMouseLeave={() => setHoveredSection(null)}
             >
               {item.sectionName}
-              {clickedSection === item.sectionName && (
-                <span className="absolute top-0 right-0 p-1 rounded-full bg-white hover:bg-gray-200 text-lg border -m-1 text-red-600 cursor-pointer">
+              {hoveredSection === item.sectionName && (
+                <span className="absolute top-0 right-0 p-1 flex space-x-2 rounded-full bg-white hover:bg-gray-200 text-lg border -m-1 text-red-600 cursor-pointer">
                   {loading ? (
                     <PiSpinner className="animate-spin" />
                   ) : (
-                    <RiDeleteBin5Line
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        openModal(item);
-                      }}
-                    />
+                    <>
+                      <RiEdit2Line
+                        className="hover:text-blue-500"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEditSection(item);
+                        }}
+                      />
+                      <RiDeleteBin5Line
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openModal(item);
+                        }}
+                      />
+                    </>
                   )}
                 </span>
               )}
@@ -99,9 +125,10 @@ const NavigationBar = ({ onSectionChange, selectedSection }) => {
         onClose={closeSidebar}
         title="Add Section"
       >
-        <Suspense fallback={<div>Loading...</div>}>
-          <AddSection />
-        </Suspense>
+        <AddSection
+          onSubmitSuccess={handleSectionSubmitSuccess}
+          onCancel={closeSidebar}
+        />
       </Sidebar>
 
       <Sidebar
@@ -112,6 +139,20 @@ const NavigationBar = ({ onSectionChange, selectedSection }) => {
         <Suspense fallback={<div>Loading...</div>}>
           <AddGroup />
         </Suspense>
+      </Sidebar>
+
+      <Sidebar
+        isOpen={sidebarType === "editSection"}
+        onClose={closeSidebar}
+        title="Edit Section"
+      >
+        {editingSection && (
+          <AddSection
+            initialSection={editingSection}
+            onSubmitSuccess={handleSectionSubmitSuccess}
+            onCancel={closeSidebar}
+          />
+        )}
       </Sidebar>
 
       <DeleteModal

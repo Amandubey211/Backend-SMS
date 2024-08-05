@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { LuUser } from "react-icons/lu";
 import { GiImperialCrown } from "react-icons/gi";
 import { TbDotsVertical } from "react-icons/tb";
@@ -8,6 +8,7 @@ import StudentMenuOptions from "../../Students/Components/StudentMenuOptions";
 import AddGroup from "./AddGroup"; // Adjust the import path as necessary
 import useDeleteModal from "../../../../Hooks/CommonHooks/useDeleteModal";
 import DeleteModal from "../../../../Components/Common/DeleteModal";
+import useGetUnassignedStudents from "../../../../Hooks/AuthHooks/Staff/Admin/Students/useGetUnassignedStudents";
 
 const GroupList = ({
   selectedSection,
@@ -19,7 +20,7 @@ const GroupList = ({
   const [activeMenu, setActiveMenu] = useState(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [editingGroup, setEditingGroup] = useState(null);
-
+  const { fetchUnassignedStudents } = useGetUnassignedStudents()
   const { deleteGroup, loading } = useCreateGroup();
   const { isModalOpen, modalData, openModal, closeModal } = useDeleteModal();
 
@@ -52,8 +53,7 @@ const GroupList = ({
   const closeSidebar = () => {
     setIsSidebarOpen(false);
     setEditingGroup(null);
-  };
-
+  }
   return (
     <div className="w-full max-w-4xl bg-white">
       <div className="flex items-center justify-between mb-4 p-2">
@@ -237,7 +237,10 @@ const GroupList = ({
                       <div className="flex-shrink-0 w-1/8 relative">
                         <StudentMenuOptions
                           studentId={student._id}
+                          studentName={student.firstName}
+                          groupId={group._id}
                           onSeeGradeClick={onSeeGradeClick}
+                          fetchGroups={fetchGroups}
                         />
                       </div>
                     </li>
