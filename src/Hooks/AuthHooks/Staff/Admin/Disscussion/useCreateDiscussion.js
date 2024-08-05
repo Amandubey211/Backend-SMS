@@ -10,7 +10,6 @@ const useCreateDiscussion = () => {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
 
-  
   const { role } = useSelector((store) => store.Auth);
   const { cid } = useParams();
 

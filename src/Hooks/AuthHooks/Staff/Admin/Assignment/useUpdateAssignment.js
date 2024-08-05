@@ -12,10 +12,9 @@ const useUpdateAssignment = () => {
     for (let pair of formData.entries()) {
       console.log(`${pair[0]}: ${pair[1]}`);
     }
-  }
+  };
   const updateAssignment = useCallback(
     async (assignmentId, assignmentData, sectionId) => {
-
       const {
         name,
         points,
@@ -32,7 +31,7 @@ const useUpdateAssignment = () => {
         moduleId,
         chapterId,
         publish,
-        thumbnail
+        thumbnail,
       } = assignmentData;
 
       //const missingFields = [];
@@ -55,8 +54,6 @@ const useUpdateAssignment = () => {
 
       setLoading(true);
       setError(null);
-
-
 
       const token = localStorage.getItem(`${role}:token`);
 
@@ -87,8 +84,7 @@ const useUpdateAssignment = () => {
         formData.append("thumbnail", thumbnail);
       }
 
-
-      logFormData(formData)
+      logFormData(formData);
 
       try {
         const response = await axios.put(

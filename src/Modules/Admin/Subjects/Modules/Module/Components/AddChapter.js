@@ -6,7 +6,7 @@ import useAddChapter from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignm
 import useUpdateChapter from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useUpdateChapter";
 import { useSelector } from "react-redux";
 
-const AddChapter = ({ chapterData, isEditing, onClose }) => {
+const AddChapter = ({ chapterData, isEditing, onClose, fetchModules }) => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [preview, setPreview] = useState(null);
   const [chapterTitle, setChapterTitle] = useState("");
@@ -69,6 +69,7 @@ const AddChapter = ({ chapterData, isEditing, onClose }) => {
       if (updateSuccess) {
         toast.success(updateSuccess);
         onClose();
+        fetchModules(); // Refetch after updating a chapter
       }
       if (updateError) {
         toast.error(updateError);
@@ -80,6 +81,7 @@ const AddChapter = ({ chapterData, isEditing, onClose }) => {
         setChapterTitle("");
         clearImage();
         onClose();
+        fetchModules(); // Refetch after adding a chapter
       }
       if (error) {
         toast.error(error);

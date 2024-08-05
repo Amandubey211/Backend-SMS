@@ -1,10 +1,9 @@
-import React, { useState, Suspense, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import SubjectSideBar from "../../Component/SubjectSideBar";
 import QuizzDetailCard from "./Components/QuizzDetailCard";
 import QuizInstructionSection from "./Components/QuizInstructionSection";
 import Tabs from "./Components/Tabs";
 import QuizQuestions from "./Components/QuizQuestions";
-import QuestionDetailCard from "./Components/QuestionDetailCard";
 import useFetchQuizById from "../../../../../Hooks/AuthHooks/Staff/Admin/Quiz/useFetchQuizById";
 import { useParams } from "react-router-dom";
 import Spinner from "../../../../../Components/Common/Spinner";
@@ -15,8 +14,13 @@ const MainSection = () => {
   const { error, fetchQuizById, loading, quiz } = useFetchQuizById();
 
   useEffect(() => {
-    fetchQuizById(qid);
+    fetchQuizById(qid); // Initial fetch
   }, [qid, fetchQuizById]);
+
+  // Define onRefresh to trigger a refetch
+  const onRefresh = () => {
+    fetchQuizById(qid);
+  };
 
   return (
     <div className="flex">
@@ -31,30 +35,24 @@ const MainSection = () => {
         >
           {(activeTab) => (
             <div className="h-full">
-              {activeTab === "instructions" && (
-                <Suspense fallback={<div>Loading...</div>}>
-                  {loading ? (
-                    <div>Loading...</div>
-                  ) : (
-                    <QuizInstructionSection content={quiz?.content} />
-                  )}
-                </Suspense>
-              )}
-              {activeTab === "questions" && (
-                <Suspense fallback={<Spinner />}>
-                  {loading ? (
-                    <Spinner />
-                  ) : (
-                    <QuizQuestions questions={quiz?.questions} />
-                  )}
-                </Suspense>
-              )}
+              {activeTab === "instructions" &&
+                (loading ? (
+                  <div>Loading...</div>
+                ) : (
+                  <QuizInstructionSection content={quiz?.content} />
+                ))}
+              {activeTab === "questions" &&
+                (loading ? (
+                  <Spinner />
+                ) : (
+                  <QuizQuestions questions={quiz?.questions} />
+                ))}
             </div>
           )}
         </Tabs>
       </div>
       <div className="w-[30%]">
-        <QuizzDetailCard quiz={quiz} />
+        <QuizzDetailCard quiz={quiz} onRefresh={onRefresh} />
       </div>
     </div>
   );

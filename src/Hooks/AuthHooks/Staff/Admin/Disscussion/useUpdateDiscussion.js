@@ -9,7 +9,6 @@ const useUpdateDiscussion = () => {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
 
-  
   const { role } = useSelector((store) => store.Auth);
 
   const updateDiscussion = useCallback(
@@ -22,9 +21,9 @@ const useUpdateDiscussion = () => {
         const token = localStorage.getItem(`${role}:token`);
         const formData = new FormData();
 
-        for (const key in discussionData) {
+        Object.keys(discussionData).forEach((key) => {
           formData.append(key, discussionData[key]);
-        }
+        });
 
         const response = await axios.put(
           `${baseUrl}/admin/updateDiscussion/${id}`,
@@ -40,15 +39,18 @@ const useUpdateDiscussion = () => {
         if (response.data.status) {
           setSuccess(true);
           toast.success("Discussion updated successfully");
+          return true; // Indicate success
         } else {
           toast.error("Failed to update discussion");
           setError("Failed to update discussion");
+          return false; // Indicate failure
         }
       } catch (err) {
         const errorMessage =
           err.response?.data?.message || "Error updating discussion";
         toast.error(errorMessage);
         setError(errorMessage);
+        return false; // Indicate failure
       } finally {
         setLoading(false);
       }

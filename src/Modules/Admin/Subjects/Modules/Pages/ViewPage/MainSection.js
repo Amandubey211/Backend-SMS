@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useCallback } from "react";
 import SubjectSideBar from "../../../Component/SubjectSideBar";
 import ViewPageHeader from "./ViewPageHeader";
 import useFetchPageById from "../../../../../../Hooks/AuthHooks/Staff/Admin/Page/useFetchPageById";
@@ -7,6 +7,11 @@ import NoDataFound from "../../../../../../Components/Common/NoDataFound";
 
 const MainSection = () => {
   const { error, fetchPageById, loading, page } = useFetchPageById();
+
+  // Callback function to refetch the page
+  const handleRefetchPage = useCallback(() => {
+    fetchPageById();
+  }, [fetchPageById]);
 
   useEffect(() => {
     fetchPageById();
@@ -30,6 +35,7 @@ const MainSection = () => {
               title={page.title}
               LastEdit={page.updatedAt}
               page={page}
+              refetchPage={handleRefetchPage} // Pass the refetch function
             />
             <div
               className="p-4"
