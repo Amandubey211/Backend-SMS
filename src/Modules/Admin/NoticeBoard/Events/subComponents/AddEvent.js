@@ -4,94 +4,93 @@ import FormInput from "../../../Accounting/subClass/component/FormInput";
 import useCreateEvent from "../../../../../Hooks/AuthHooks/Staff/Admin/Events/useCreateEvent";
 import toast from "react-hot-toast";
 
-const AddEvent = ({ onSave }) => { // Receive onSave as a prop
-  const [imagePreview, setImagePreview] = useState(null);
+const AddEvent = ({ onSave }) => {
   const [eventData, setEventData] = useState({
-    title: "", 
+    title: "",
     location: "",
     date: "",
     time: "",
-    director: "", 
-    type: "", 
+    director: "",
+    type: "",
     description: "",
-    image: null, 
+    image: null,
+    imagePreview: null,
   });
 
-  const { loading, error, createEvent } = useCreateEvent();
+  const { loading, createEvent } = useCreateEvent();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setEventData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    console.log(`Input changed: ${name} = ${value}`);
+    setEventData({ ...eventData, [name]: value });
   };
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result);
-      };
-      reader.readAsDataURL(file);
-      setEventData((prev) => ({
-        ...prev,
-        image: file,
-      }));
-    }
+    console.log("Image selected:", file);
+    setEventData({
+      ...eventData,
+      image: file,
+      imagePreview: file ? URL.createObjectURL(file) : null,
+    });
   };
 
-  const handleRemoveImage = () => {
-    setImagePreview(null);
-    setEventData((prev) => ({
-      ...prev,
-      image: null,
-    }));
+  const handleImageRemove = () => {
+    console.log("Removing image");
+    setEventData({ ...eventData, image: null, imagePreview: null });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
-    // Check required fields
+    console.log("Form submitted with eventData:", eventData);
+
     if (!eventData.title || !eventData.date || !eventData.time || !eventData.image) {
+      console.log("Validation failed: Required fields are missing");
       toast.error("Please fill in all required fields.");
       return;
     }
-  
+
     try {
-      await createEvent(eventData); // Pass the eventData directly
-      toast.success("Event created successfully!"); // Notify success
-      
-      // Reset the form fields after successful creation
-      setEventData({
-        title: "",
-        location: "",
-        date: "",
-        time: "",
-        director: "",
-        type: "",
-        description: "",
-        image: null,
-      });
-      setImagePreview(null);
-  
-      onSave(); // Close the sidebar after successful creation
+      console.log("Attempting to create event...");
+      const result = await createEvent(eventData);
+      console.log("Create event result:", result);
+
+      if (result?.success) {
+        toast.success(result.msg || "Event created successfully!");
+        console.log("Event creation successful!");
+
+        // Reset form fields
+        setEventData({
+          title: "",
+          location: "",
+          date: "",
+          time: "",
+          director: "",
+          type: "",
+          description: "",
+          image: null,
+          imagePreview: null,
+        });
+
+        console.log("Triggering onSave...");
+        onSave(eventData); // Ensure passing the right data
+      } else {
+        toast.error("Failed to create event.");
+      }
     } catch (error) {
       console.error("Error during event creation:", error);
       toast.error("Error creating event.");
     }
   };
-  
 
   return (
     <div className="p-4 bg-gray-50 border rounded-lg overflow-auto" style={{ maxHeight: "90vh" }}>
       <form className="space-y-4" onSubmit={handleSubmit}>
         <div className="image-upload-container">
           <ImageUpload
-            imagePreview={imagePreview}
+            imagePreview={eventData.imagePreview}
             handleImageChange={handleImageChange}
-            handleRemoveImage={handleRemoveImage}
+            handleRemoveImage={handleImageRemove}
           />
         </div>
         <FormInput
@@ -112,7 +111,6 @@ const AddEvent = ({ onSave }) => { // Receive onSave as a prop
             onChange={handleInputChange}
             required
           />
-          
           <FormInput
             id="time"
             name="time"
@@ -162,7 +160,6 @@ const AddEvent = ({ onSave }) => { // Receive onSave as a prop
         >
           {loading ? "Adding Event..." : "Add Event"}
         </button>
-        {error && <div className="text-red-500 mt-2">{error}</div>}
       </form>
     </div>
   );
