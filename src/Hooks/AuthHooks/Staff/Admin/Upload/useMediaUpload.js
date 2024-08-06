@@ -7,7 +7,7 @@ const useMediaUpload = () => {
 
   const uploadMedia = useCallback(async (file, type) => {
     if (!file) return;
-    
+
     setLoading(true);
     setError(null);
 
