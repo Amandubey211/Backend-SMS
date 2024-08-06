@@ -6,6 +6,7 @@ import EditBook from "./EditBook";
 import { baseUrl } from "../../../../../config/Common";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
+import DeleteConfirmatiomModal from "../../../../../Components/Common/DeleteConfirmationModal";
 const BookCard = ({
   key,
   id,
@@ -47,6 +48,14 @@ const BookCard = ({
       toast.error(error.message || "Failed delete book. Please try again.");
     }
    
+  };
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
   };
   return (
     <div className="border p-2 bg-white rounded-lg shadow overflow-hidden relative">
@@ -92,7 +101,7 @@ const BookCard = ({
                 });
                 handleSidebarOpen();
               }}>Edit </button>
-              <button className=" bottom-2 text-indigo-600 hover:text-indigo-900 " onClick={DeleteBook}>Delete</button>
+              <button className=" bottom-2 text-indigo-600 hover:text-indigo-900 " onClick={openModal}>Delete</button>
             </div> : null
         }
 
@@ -109,6 +118,11 @@ const BookCard = ({
         onupdate= {onupdate}
         />
       </Sidebar>
+      <DeleteConfirmatiomModal
+  isOpen={isModalOpen}
+  onClose={closeModal}
+  onConfirm={DeleteBook}
+/>
     </div>
   );
 };

@@ -4,7 +4,6 @@ import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import { baseUrl } from "../../../../../config/Common";
 import useGetAllStaff from "./useGetAllStaff";
-
 const useEditUser = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);

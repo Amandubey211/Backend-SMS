@@ -103,7 +103,7 @@ fetchData();
                   {filteredParents.map((parent, index) => (
                     <tr
                       key={index}
-                      className="text-left text-gray-700 bg-gray-100  "
+                      className="text-left text-gray-700 "
                     >
                       <td className="px-5 py-4 border-b border-gray-200 flex items-center">
                         <img

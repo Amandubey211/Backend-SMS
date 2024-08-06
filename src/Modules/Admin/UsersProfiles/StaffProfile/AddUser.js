@@ -4,7 +4,6 @@ import FormInput from "../../Accounting/subClass/component/FormInput";
 import FormSelect from "../../Accounting/subClass/component/FormSelect";
 import useAddUser from "../../../../Hooks/AuthHooks/Staff/Admin/staff/useAddUser";
 import useGetAllTeachers from "../../../../Hooks/AuthHooks/Staff/Admin/Teacher/useGetAllTeacher";
-import { add } from "date-fns";
 import useEditUser from "../../../../Hooks/AuthHooks/Staff/Admin/staff/useEditUser";
 
 const AddUser = ({ role ,data}) => {
@@ -162,7 +161,6 @@ const AddUser = ({ role ,data}) => {
    await EditUser(teacherData,address,data?._id);
    if (!error) {
     fetchTeachers();
-   
   }
   }
 
