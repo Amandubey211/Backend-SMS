@@ -19,6 +19,8 @@ import { ReactComponent as StudentIcon } from "../../../Assets/DashboardAssets/S
 import { ReactComponent as InstructorIcon } from "../../../Assets/DashboardAssets/SVG/instructor.svg";
 import { ReactComponent as ParentIcon } from "../../../Assets/DashboardAssets/SVG/parent.svg";
 import { ReactComponent as StaffIcon } from "../../../Assets/DashboardAssets/SVG/staff.svg";
+import Spinner from "../../../Components/Common/Spinner";
+import NoDataFound from "../../../Components/Common/NoDataFound";
 
 const MainSection = () => {
   const { dashboardData, error, fetchAdminDashboardData, loading } =
@@ -31,7 +33,10 @@ const MainSection = () => {
   const cardData = [
     {
       label: "Students",
-      value: typeof dashboardData?.totalStudents === 'number' ? dashboardData.totalStudents : "Loading...",
+      value:
+        typeof dashboardData?.totalStudents === "number"
+          ? dashboardData.totalStudents
+          : "Loading...",
       bgColor: "bg-purple-100",
       textColor: "text-purple-700",
       icon: <StudentIcon className="w-10 h-10" />,
@@ -39,7 +44,10 @@ const MainSection = () => {
     },
     {
       label: "Teacher",
-      value: typeof dashboardData?.teachers === 'number' ? dashboardData.teachers : "Loading...",
+      value:
+        typeof dashboardData?.teachers === "number"
+          ? dashboardData.teachers
+          : "Loading...",
       bgColor: "bg-green-100",
       textColor: "text-green-700",
       icon: <InstructorIcon className="w-10 h-10" />,
@@ -47,7 +55,10 @@ const MainSection = () => {
     },
     {
       label: "Parents",
-      value: typeof dashboardData?.parents === 'number' ? dashboardData.parents : "Loading...",
+      value:
+        typeof dashboardData?.parents === "number"
+          ? dashboardData.parents
+          : "Loading...",
       bgColor: "bg-yellow-100",
       textColor: "text-yellow-700",
       icon: <ParentIcon className="w-10 h-10" />,
@@ -55,7 +66,10 @@ const MainSection = () => {
     },
     {
       label: "Staff",
-      value: typeof dashboardData?.staffs === 'number' ? dashboardData.staffs : "Loading...",
+      value:
+        typeof dashboardData?.staffs === "number"
+          ? dashboardData.staffs
+          : "Loading...",
       bgColor: "bg-pink-100",
       textColor: "text-pink-700",
       icon: <StaffIcon className="w-10 h-10" />,
@@ -64,11 +78,11 @@ const MainSection = () => {
   ];
 
   if (loading) {
-    return <Fallback />;
+    return <Spinner />;
   }
 
   if (error) {
-    return <p>Error: {error}</p>;
+    return <NoDataFound />;
   }
 
   return (
