@@ -12,11 +12,12 @@ import { useSelector } from "react-redux";
 import useDeleteUser from "../../../../Hooks/AuthHooks/Staff/Admin/staff/useDeleteUser";
 import AddUser from "../StaffProfile/AddUser";
 import profileIcon from '../../../../Assets/DashboardAssets/profileIcon.png'
+import DeleteConfirmatiomModal from "../../../../Components/Common/DeleteConfirmationModal";
 const AllTeachers = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [teacherData, setTeacherData] = useState(null);
   const { fetchTeachers } = useGetAllTeachers();
-
+ const [teacherId,setTeacherId] =useState()
   const teachers = useSelector((store) => store.Teachers.allTeachers);
   useEffect(() => {
     
@@ -28,19 +29,27 @@ const AllTeachers = () => {
   const handleSidebarOpen = () => {setSidebarOpen(true);setTeacherData(null)};
   const handleSidebarClose = () => setSidebarOpen(false);
   const {deleteUser,error} = useDeleteUser()
- const deleteTeacher = async(event,id)=>{
-  await deleteUser(id);
+ const deleteTeacher = async()=>{
+  await deleteUser(teacherId);
   if(!error){
     fetchTeachers();
   }
-  event.stopPropagation();
- 
+  setIsModalOpen(false);
  }
  const editUser = async(event,data)=>{
   setSidebarOpen(true);
   setTeacherData(data);
   event.stopPropagation();
  }
+    const [isModalOpen, setIsModalOpen] = useState(false);
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
   return (
     <Layout title="All Teachers">
       <DashLayout>
@@ -66,7 +75,7 @@ const AllTeachers = () => {
                     <button className=" bg-transparent p-2 rounded-full border  " onClick={(event)=>editUser(event,teacher)}>
                       <FiUserPlus className="text-sm text-green-500 "   />
                     </button>
-                    <button className=" bg-transparent p-2 rounded-full border" onClick={(event)=>deleteTeacher(event,teacher._id)}>
+                    <button className=" bg-transparent p-2 rounded-full border" onClick={(event)=>{event.stopPropagation();openModal();setTeacherId(teacher._id)}}>
                       <BiTrash className="text-sm text-red-500  "  />
                     </button>
                   </div>
@@ -106,6 +115,11 @@ const AllTeachers = () => {
           >
             <AddUser role={'teacher'}  data={teacherData}/>
           </SidebarSlide>
+          <DeleteConfirmatiomModal
+  isOpen={isModalOpen}
+  onClose={closeModal}
+  onConfirm={deleteTeacher}
+/>
         </div>
       </DashLayout>
     </Layout>

@@ -8,16 +8,18 @@ import FormField from "../subClass/component/FormField";
 import { baseUrl } from "../../../../config/Common";
 import { useSelector } from "react-redux";
 import { MdCancel } from "react-icons/md";
-import { HiDotsVertical } from "react-icons/hi";
 import EditFee from "./EditFee";
-
+import DeleteConfirmatiomModal from "../../../../Components/Common/DeleteConfirmationModal";
+import toast from "react-hot-toast";
+import axios from "axios";
+import useGetAllClasses from "../../../../Hooks/AuthHooks/Staff/Admin/Class/useGetAllClasses";
 const AccountingSection = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [isSidebarEditOpen, setSidebarEditOpen] = useState(false);
   const [showEditMenu, setShowEditMenu] = useState({ show: false, index: 0 });
+  const { loading, error, fetchClasses } = useGetAllClasses();
   const [filters, setFilters] = useState({
     class: "",
-    section: "",
     feesType: "",
     status: "Everyone",
   });
@@ -38,7 +40,6 @@ const AccountingSection = () => {
       .then((data) => {
         if (data.success) {
           setFeesData(data.data);
-          console.log(data);
         }
       })
       .catch((error) => console.error("Error fetching fees data:", error));
@@ -46,10 +47,11 @@ const AccountingSection = () => {
 
   useEffect(() => {
     getFeeData();
+    fetchClasses()
   }, []);
 
   const uniqueFilterOptions = (data, key) => {
-   // return [...new Set(data.map((item) => item[key]))].sort();
+    return [...new Set(data.map((item) => item[key]))].sort();
   };
 
   const classes = useMemo(
@@ -83,22 +85,44 @@ const AccountingSection = () => {
           (classFilter === "" || item.studentId?.presentClassId?.className === classFilter) &&
           (feesType === "" || item.feeType === feesType) &&
           (status === "Everyone" ||
-            (status === "Paid" && item.status === "Paid") ||
-            (status === "Unpaid" && item.status === "Unpaid"))
+            (status === "Paid" && item.status === "paid") ||
+            (status === "Unpaid" && item.status === "unpaid"))
         );
       }),
     [feesData, filters]
   );
 
   const [editFormData, setEditFormData] = useState({
-    class: "",
-    section: "",
-    studentId: "",
-    feesType: "",
+    feeId: "",
+    feeType: "",
     dueDate: "",
     amount: "",
   });
 
+  useEffect(() => {}, [editFormData]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+  const  deleteFee = async () => {
+
+    try {
+      const token = localStorage.getItem(`${role}:token`);
+      const { data } = await axios.delete(`${baseUrl}/admin/fee/delete/${editFormData.feeId}`, {
+        headers: { Authentication: token },
+      });
+      toast.success(" deleted successfully!");
+      getFeeData();
+    } catch (err) {
+      toast.error('Failed')
+    } 
+    
+    setIsModalOpen(false);
+  };
   return (
     <Layout title="Accounting">
       <DashLayout>
@@ -198,7 +222,7 @@ const AccountingSection = () => {
                     <td className="px-5 py-2 border-b border-gray-200">
                       <span
                         className={`inline-block px-3 py-1 text-xs font-semibold rounded-full ${
-                          item.status === "Paid"
+                          item.status === "paid"
                             ? "bg-green-200 text-green-800"
                             : "bg-red-200 text-red-800"
                         }`}
@@ -225,8 +249,8 @@ const AccountingSection = () => {
                             className="bottom-2 text-indigo-600 hover:text-indigo-900"
                             onClick={() => {
                               setEditFormData({
-                                studentId: item.studentId?.fullName,
-                                feesType: item.feeType,
+                                feeId: item._id,
+                                feeType: item.feeType,
                                 dueDate: item.dueDate,
                                 amount: item.amount,
                               });
@@ -237,7 +261,15 @@ const AccountingSection = () => {
                           </button>
                           <button
                             className="bottom-2 text-indigo-600 hover:text-indigo-900"
-                            onClick={() => {}}
+                            onClick={() => {
+                              setEditFormData({
+                                feeId: item._id,
+                                feeType: item.feeType,
+                                dueDate: item.dueDate,
+                                amount: item.amount,
+                              });
+                              openModal();
+                            }}
                           >
                             Delete
                           </button>
@@ -264,6 +296,11 @@ const AccountingSection = () => {
           >
             <AddFeesForm onUpdate={getFeeData} />
           </Sidebar>
+          <DeleteConfirmatiomModal
+  isOpen={isModalOpen}
+  onClose={closeModal}
+  onConfirm={deleteFee}
+/>
         </div>
       </DashLayout>
     </Layout>

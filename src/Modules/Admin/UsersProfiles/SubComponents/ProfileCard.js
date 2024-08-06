@@ -1,17 +1,25 @@
 
-import React from "react";
+import React ,{useState}from "react";
 import { FiUserPlus } from 'react-icons/fi';
 import { BiTrash } from 'react-icons/bi';
 import useDeleteUser from "../../../../Hooks/AuthHooks/Staff/Admin/staff/useDeleteUser";
 import profileIcon from '../../../../Assets/DashboardAssets/profileIcon.png'
+import DeleteConfirmatiomModal from "../../../../Components/Common/DeleteConfirmationModal";
 const ProfileCard = ({ profile, onClick,editUser}) => {
-  const {deleteUser} = useDeleteUser()
-  const deleteTeacher = (event,id)=>{
-    deleteUser(id)
-    event.stopPropagation();
-   
+  const {deleteUser} = useDeleteUser();
+  const deleteTeacher = ()=>{
+
+    deleteUser(profile._id)
+
    };
- 
+   const [isModalOpen, setIsModalOpen] = useState(false);
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
 
   return (
     <div className="relative w-full sm:w-1/2 md:w-1/3 lg:w-1/4 px-2 mb-4">
@@ -24,7 +32,7 @@ const ProfileCard = ({ profile, onClick,editUser}) => {
             <FiUserPlus className="text-sm text-green-500" />
           </button>
           <button className="bg-transparent p-2 rounded-full border hover:bg-gray-200 transition">
-            <BiTrash className="text-sm text-red-500" onClick={(event)=>deleteTeacher(event,profile._id)} />
+            <BiTrash className="text-sm text-red-500" onClick={(event)=>{event.stopPropagation();openModal()}} />
           </button>
         </div>
         <div className="flex flex-col h-[80%] justify-center items-center py-3">
@@ -36,6 +44,11 @@ const ProfileCard = ({ profile, onClick,editUser}) => {
           <p className="text-gray-600">Phone: {profile.mobileNumber}</p>
         </div>
       </div>
+      <DeleteConfirmatiomModal
+  isOpen={isModalOpen}
+  onClose={closeModal}
+  onConfirm={deleteTeacher}
+/>
     </div>
   );
 };

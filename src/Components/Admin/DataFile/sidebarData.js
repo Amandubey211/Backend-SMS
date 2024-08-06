@@ -39,11 +39,7 @@ const sidebarData = [
     title: "Users",
     icon: <LuUser />,
     items: [
-      {
-        title: "Admin",
-        icon: <RiAdminFill />,
-        path: "/users/admin",
-      },
+    
       {
         title: "Students",
         icon: <FaUserGraduate />,

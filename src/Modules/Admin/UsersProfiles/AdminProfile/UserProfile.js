@@ -81,7 +81,7 @@ const [showPaasword,setShowPassword] = useState(false)
           <div className="flex flex-col  w-full p-4 gap-3 ">
             <div className="flex items-center px-6 py-4 gap-3 border rounded-md">
               <img
-                src={userData.profiles ? userData?.profile : profileIcon}
+                src={userData.profile ? userData?.profile : profileIcon}
                 alt="Cameron Williamson"
                 className="w-20 h-20 rounded-full shadow-lg border "
               />
@@ -154,13 +154,13 @@ const [showPaasword,setShowPassword] = useState(false)
               <div className="flex gap-3">
                 <button
                   onClick={updatePassword}
-                  className="px-4 w-[200px] h-12 inline-flex items-center border border-transparent text-sm font-medium shadow-sm bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-md hover:from-pink-600 hover:to-purple-600"
+                  className="px-4 w-[200px] h-12 inline-flex items-center border border-transparent text-sm font-medium shadow-sm bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-md hover:from-pink-600 hover:to-purple-600 justify-center"
                 >
                   Update Password
                 </button>
                 <button
                   onClick={cancelUpdatePassword}
-                  className="px-4 w-[200px] h-12 inline-flex items-center border border-transparent text-sm font-medium shadow-sm bg-gray-300 text-black rounded-md hover:bg-gray-400"
+                  className="px-4 w-[200px] h-12 inline-flex items-center justify-center border border-transparent text-lg font-medium shadow-sm bg-gray-300 text-black rounded-md hover:bg-gray-400"
                 >
                   Cancel
                 </button>
