@@ -20,13 +20,13 @@ const EventScheduler = () => {
   const [sidebarContent, setSidebarContent] = useState(null);
   const [events, setEvents] = useState([]);
   const [filteredEvents, setFilteredEvents] = useState([]);
-  const [currentPage, setCurrentPage] = useState(0); // State for pagination
+  const [currentPage, setCurrentPage] = useState(0);
   const [selectedMonthYear, setSelectedMonthYear] = useState({
     month: currentDate.getMonth(),
     year: currentDate.getFullYear(),
   });
 
-  const itemsPerPage = 4; // Number of stickers to show per page
+  const itemsPerPage = 4;
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -52,7 +52,10 @@ const EventScheduler = () => {
   }, []);
 
   useEffect(() => {
-    console.log("Filtering and sorting events for month/year:", selectedMonthYear);
+    console.log(
+      "Filtering and sorting events for month/year:",
+      selectedMonthYear
+    );
     filterAndSortEvents(events, selectedMonthYear);
   }, [selectedMonthYear, events]);
 
@@ -66,7 +69,7 @@ const EventScheduler = () => {
     const sorted = filtered.sort((a, b) => a.startDate - b.startDate);
 
     setFilteredEvents(sorted);
-    setCurrentPage(0); // Reset to first page when filter changes
+    setCurrentPage(0);
     console.log("Filtered and sorted events:", sorted);
   };
 
@@ -74,6 +77,7 @@ const EventScheduler = () => {
     console.log("Opening sidebar");
     setSidebarOpen(true);
   };
+
   const handleSidebarClose = () => {
     console.log("Closing sidebar");
     setSelectedEvent(null);
@@ -154,7 +158,7 @@ const EventScheduler = () => {
 
   const handleSaveEvent = async (eventData) => {
     console.log("Saving event data:", eventData);
-    
+  
     if (!eventData || Object.keys(eventData).length === 0) {
       console.error("Event data is undefined or null.");
       toast.error("Event data is missing.");
@@ -165,26 +169,21 @@ const EventScheduler = () => {
       if (selectedEvent) {
         await updateEvent(selectedEvent._id, eventData);
         toast.success("Event updated successfully!");
-        console.log("Event updated successfully!");
       } else {
         const result = await createEvent(eventData);
         if (result?.success) {
           toast.success(result.msg || "Event created successfully!");
-          console.log("Event created successfully!");
+          refreshEvents(); // Refresh the events list to show new events
+          handleSidebarClose(); // Close the sidebar after success
         } else {
           toast.error("Failed to create event.");
         }
       }
-  
-      handleSidebarClose(); // Close the sidebar after success
-      refreshEvents(); // Refresh the events list
     } catch (error) {
       console.error("Failed to save event:", error);
       toast.error("Failed to save event.");
     }
   };
-  
-  
   
 
   const handleDeleteEvent = async () => {
