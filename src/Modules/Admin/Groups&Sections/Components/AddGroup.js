@@ -82,6 +82,7 @@ const AddGroup = ({ group, isUpdate, groupId, onClose, fetchGroups }) => {
 
     const formData = {
       //sectionId,
+      classId: cid,
       groupName,
       seatLimit,
       students: selectedStudents.map((student) => student._id),
@@ -91,7 +92,7 @@ const AddGroup = ({ group, isUpdate, groupId, onClose, fetchGroups }) => {
     try {
       if (isUpdate) {
         await updateGroup(formData, groupId);
-        //fetchGroups();
+        fetchGroups();
         onClose();
       } else {
         await createGroup(formData);
@@ -266,11 +267,10 @@ const AddGroup = ({ group, isUpdate, groupId, onClose, fetchGroups }) => {
               {selectedStudents.map((student) => (
                 <div
                   key={student._id}
-                  className={`px-2 py-1 rounded-lg mr-2 mb-2 cursor-pointer bg-gray-100 transition duration-300 ${
-                    leader && leader._id === student._id
+                  className={`px-2 py-1 rounded-lg mr-2 mb-2 cursor-pointer bg-gray-100 transition duration-300 ${leader && leader._id === student._id
                       ? "border border-pink-500"
                       : ""
-                  }`}
+                    }`}
                   onClick={() => handleLeaderClick(student)}
                   role="button"
                   aria-pressed={leader && leader._id === student._id}
