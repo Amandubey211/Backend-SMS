@@ -18,16 +18,15 @@ const AddEvent = ({ onSave }) => {
   });
 
   const { loading, createEvent } = useCreateEvent();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    console.log(`Input changed: ${name} = ${value}`);
     setEventData({ ...eventData, [name]: value });
   };
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
-    console.log("Image selected:", file);
     setEventData({
       ...eventData,
       image: file,
@@ -36,29 +35,27 @@ const AddEvent = ({ onSave }) => {
   };
 
   const handleImageRemove = () => {
-    console.log("Removing image");
     setEventData({ ...eventData, image: null, imagePreview: null });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Form submitted with eventData:", eventData);
-
+  
+    if (isSubmitting) return; // Prevent multiple submissions
+    setIsSubmitting(true); // Set submission state immediately
+  
+    // Check if all required fields are filled
     if (!eventData.title || !eventData.date || !eventData.time || !eventData.image) {
-      console.log("Validation failed: Required fields are missing");
       toast.error("Please fill in all required fields.");
+      setIsSubmitting(false);
       return;
     }
-
+  
     try {
-      console.log("Attempting to create event...");
       const result = await createEvent(eventData);
-      console.log("Create event result:", result);
-
       if (result?.success) {
         toast.success(result.msg || "Event created successfully!");
-        console.log("Event creation successful!");
-
+  
         // Reset form fields
         setEventData({
           title: "",
@@ -71,17 +68,20 @@ const AddEvent = ({ onSave }) => {
           image: null,
           imagePreview: null,
         });
-
-        console.log("Triggering onSave...");
-        onSave(eventData); // Ensure passing the right data
+  
+        onSave(eventData); // Pass eventData to onSave to notify parent component
       } else {
         toast.error("Failed to create event.");
       }
     } catch (error) {
       console.error("Error during event creation:", error);
       toast.error("Error creating event.");
+    } finally {
+      setIsSubmitting(false); // Reset submission state after processing
     }
   };
+  
+
 
   return (
     <div className="p-4 bg-gray-50 border rounded-lg overflow-auto" style={{ maxHeight: "90vh" }}>
@@ -156,7 +156,7 @@ const AddEvent = ({ onSave }) => {
         <button
           type="submit"
           className="w-full mt-4 p-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600"
-          disabled={loading}
+          disabled={loading || isSubmitting} // Ensure button is disabled on submit
         >
           {loading ? "Adding Event..." : "Add Event"}
         </button>
