@@ -12,6 +12,7 @@ import { format, parseISO, isValid } from "date-fns";
 import "../subComponents/customCalendar.css";
 import toast from "react-hot-toast";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
+import { IoCalendarOutline } from "react-icons/io5"; // Importing a calendar icon
 
 const EventScheduler = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -31,7 +32,6 @@ const EventScheduler = () => {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        console.log("Fetching events...");
         const events = await getEvents();
         const mappedEvents = events.map((event) => ({
           ...event,
@@ -42,7 +42,6 @@ const EventScheduler = () => {
         }));
         setEvents(mappedEvents);
         filterAndSortEvents(mappedEvents, selectedMonthYear);
-        console.log("Events fetched and mapped:", mappedEvents);
       } catch (error) {
         console.error("Failed to fetch events:", error);
       }
@@ -52,15 +51,10 @@ const EventScheduler = () => {
   }, []);
 
   useEffect(() => {
-    console.log(
-      "Filtering and sorting events for month/year:",
-      selectedMonthYear
-    );
     filterAndSortEvents(events, selectedMonthYear);
   }, [selectedMonthYear, events]);
 
   const filterAndSortEvents = (events, { month, year }) => {
-    console.log("Filtering events...");
     const filtered = events.filter((event) => {
       const eventDate = new Date(event.startDate);
       return eventDate.getMonth() === month && eventDate.getFullYear() === year;
@@ -70,22 +64,18 @@ const EventScheduler = () => {
 
     setFilteredEvents(sorted);
     setCurrentPage(0);
-    console.log("Filtered and sorted events:", sorted);
   };
 
   const handleSidebarOpen = () => {
-    console.log("Opening sidebar");
     setSidebarOpen(true);
   };
 
   const handleSidebarClose = () => {
-    console.log("Closing sidebar");
     setSelectedEvent(null);
     setSidebarOpen(false);
   };
 
   const refreshEvents = async () => {
-    console.log("Refreshing events");
     try {
       const updatedEvents = await getEvents();
       const mappedEvents = updatedEvents.map((event) => ({
@@ -98,7 +88,6 @@ const EventScheduler = () => {
 
       setEvents(mappedEvents);
       filterAndSortEvents(mappedEvents, selectedMonthYear);
-      console.log("Events refreshed:", mappedEvents);
     } catch (error) {
       console.error("Failed to refresh events:", error);
     }
@@ -144,27 +133,22 @@ const EventScheduler = () => {
   };
 
   const handleStickerClick = (event) => {
-    console.log("Sticker clicked:", event);
     setSelectedEvent(event);
     setSidebarContent("viewEvent");
     setSidebarOpen(true);
   };
 
   const handleAddEventClick = () => {
-    console.log("Add Event clicked");
     setSidebarContent("addEvent");
     setSidebarOpen(true);
   };
 
   const handleSaveEvent = async (eventData) => {
-    console.log("Saving event data:", eventData);
-  
     if (!eventData || Object.keys(eventData).length === 0) {
-      console.error("Event data is undefined or null.");
       toast.error("Event data is missing.");
       return;
     }
-  
+
     try {
       if (selectedEvent) {
         await updateEvent(selectedEvent._id, eventData);
@@ -184,16 +168,13 @@ const EventScheduler = () => {
       toast.error("Failed to save event.");
     }
   };
-  
 
   const handleDeleteEvent = async () => {
     try {
-      console.log("Deleting event:", selectedEvent);
       await deleteEvent(selectedEvent._id);
       handleSidebarClose();
       refreshEvents();
       toast.success("Event deleted successfully!");
-      console.log("Event deleted successfully!");
     } catch (error) {
       console.error("Failed to delete event:", error);
       toast.error("Failed to delete event.");
@@ -256,7 +237,7 @@ const EventScheduler = () => {
               Add New Event
             </button>
           </div>
-          <div className="my-4 w-full h-40 flex justify-around rounded-sm gap-4 relative">
+          <div className="my-4 w-full h-40 flex rounded-sm gap-20 pl-10 relative">
             {currentPage > 0 && (
               <div
                 className="p-1 rounded-full text-purple-500 bg-white border-2 cursor-pointer absolute left-0 top-1/2 transform -translate-y-1/2"
@@ -265,14 +246,21 @@ const EventScheduler = () => {
                 <IoIosArrowBack />
               </div>
             )}
-            {paginatedEvents.map((event, index) => (
-              <EventCard
-                key={event._id}
-                event={event}
-                color={bgColors[index % bgColors.length]}
-                onClick={handleStickerClick}
-              />
-            ))}
+            {paginatedEvents.length === 0 ? (
+              <div className="flex flex-col items-center justify-center w-full h-full text-gray-500">
+                <IoCalendarOutline className="text-6xl" />
+                <span>No Events in this Month</span>
+              </div>
+            ) : (
+              paginatedEvents.map((event, index) => (
+                <EventCard
+                  key={event._id}
+                  event={event}
+                  color={bgColors[index % bgColors.length]}
+                  onClick={handleStickerClick}
+                />
+              ))
+            )}
             {(currentPage + 1) * itemsPerPage < filteredEvents.length && (
               <div
                 className="p-1 rounded-full text-purple-500 bg-white border-2 cursor-pointer absolute right-0 top-1/2 transform -translate-y-1/2"
