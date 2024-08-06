@@ -25,7 +25,9 @@ const EventCard = ({ event, onClick }) => {
       onClick(event);
     }
   };
-
+  const truncateText = (text, maxLength) => {
+    return text.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
+  };
   return (
     <div
       className="flex flex-col justify-between rounded-xl p-4 text-white shadow-lg m-2 cursor-pointer"
@@ -45,7 +47,7 @@ const EventCard = ({ event, onClick }) => {
         </div>
       </div>
       <div className="flex flex-col mt-2 text-white font-inter text-sm font-semibold leading-[1.5]">
-        <span>{event.description}</span>
+        <span>{truncateText(event.description, 20)}</span>
         <span>{formatDate(event.startDate)}</span>
       </div>
     </div>
