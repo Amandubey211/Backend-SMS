@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { AiOutlineDelete, AiOutlineEdit } from "react-icons/ai";
 import { FaCalendarAlt } from "react-icons/fa";
-import { FaBan } from "react-icons/fa6";
 import { HiOutlineDotsVertical } from "react-icons/hi";
 import { BsPatchCheckFill } from "react-icons/bs";
 import { useNavigate, useParams } from "react-router-dom";
@@ -11,6 +10,7 @@ import toast from "react-hot-toast";
 import Spinner from "../../../../../../Components/Common/Spinner";
 import NoDataFound from "../../../../../../Components/Common/NoDataFound";
 import DeleteModal from "../../../../../../Components/Common/DeleteModal";
+import { MdOutlineBlock } from "react-icons/md";
 
 const ViewPageHeader = ({ title, LastEdit, page, refetchPage }) => {
   const [showMenu, setShowMenu] = useState(false);
@@ -112,13 +112,13 @@ const ViewPageHeader = ({ title, LastEdit, page, refetchPage }) => {
         >
           {isPublished ? (
             <>
-              <FaBan aria-hidden="true" />
-              <span>Unpublish</span>
+              <BsPatchCheckFill aria-hidden="true" className="text-green-600" />
+              <span>Publish</span>
             </>
           ) : (
             <>
-              <BsPatchCheckFill aria-hidden="true" className="text-green-600" />
-              <span>Publish</span>
+              <MdOutlineBlock aria-hidden="true" />
+              <span>Unpublish</span>
             </>
           )}
         </button>

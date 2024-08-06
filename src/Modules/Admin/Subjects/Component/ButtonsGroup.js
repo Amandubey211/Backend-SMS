@@ -111,13 +111,13 @@ const ButtonsGroup = ({ data, type, onRefresh }) => {
       >
         {isPublished ? (
           <>
-            <MdOutlineBlock aria-hidden="true" />
-            <span>Unpublish</span>
+            <BsPatchCheckFill aria-hidden="true" className="text-green-600" />
+            <span>Publish</span>
           </>
         ) : (
           <>
-            <BsPatchCheckFill aria-hidden="true" className="text-green-600" />
-            <span>Publish</span>
+            <MdOutlineBlock aria-hidden="true" />
+            <span>Unpublish</span>
           </>
         )}
       </button>

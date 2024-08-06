@@ -137,7 +137,7 @@ const MainSection = () => {
         setExistingRubricId={setExistingRubricId}
         assignmentId={assignmentId} // Pass assignment ID to header
       />
-      <div className="w-full flex">
+      <div className="w-full flex z-30">
         <div className="w-[70%]">
           <EditorComponent
             assignmentLabel="Assignment Name"

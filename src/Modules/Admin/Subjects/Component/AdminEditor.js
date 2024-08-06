@@ -2,7 +2,8 @@ import React, { useState, useCallback, useRef } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import axios from "axios";
-import { FaSpinner } from "react-icons/fa";
+import { ImSpinner3 } from "react-icons/im";
+import toast, { Toaster } from "react-hot-toast";
 
 const EditorComponent = ({
   assignmentLabel,
@@ -16,8 +17,8 @@ const EditorComponent = ({
 }) => {
   const quillRef = useRef(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
 
+  // Handle image upload and display
   const handleImageUpload = useCallback(async () => {
     const input = document.createElement("input");
     input.setAttribute("type", "file");
@@ -29,13 +30,14 @@ const EditorComponent = ({
       if (!file) return;
 
       setLoading(true);
+
       const reader = new FileReader();
       reader.onload = () => {
         const quill = quillRef.current.getEditor();
         const range = quill.getSelection();
         quill.insertEmbed(range.index, "image", reader.result);
       };
-      reader.readAsDataURL(file);
+      reader.readAsDataURL(file); // Show a preview of the image locally
 
       const formData = new FormData();
       formData.append("file", file);
@@ -49,25 +51,25 @@ const EditorComponent = ({
         const imageUrl = response.data.secure_url;
         const quill = quillRef.current.getEditor();
         const range = quill.getSelection();
-        quill.deleteText(range.index, 1); // Remove the placeholder image
-        quill.insertEmbed(range.index, "image", imageUrl);
-        setLoading(false);
+        quill.deleteText(range.index, 1); // Remove the local preview
+        quill.insertEmbed(range.index, "image", imageUrl); // Insert the uploaded image URL
+        toast.success("Image Uploaded");
       } catch (error) {
         console.error("Error uploading image to Cloudinary", error);
-        setError("Error uploading image. Please try again.");
+        toast.error("Error uploading image. Please try again.");
+      } finally {
         setLoading(false);
       }
     };
   }, []);
 
+  // Quill modules and formats for toolbar configuration
   const modules = {
     toolbar: {
       container: [
         [{ header: [1, 2, 3, false] }],
-        [{ font: [] }],
         ["bold", "italic", "underline", "strike"], // toggled buttons
         [{ script: "sub" }, { script: "super" }], // superscript/subscript
-        [{ size: [] }],
         ["clean"],
         [{ align: [] }],
         [{ list: "bullet" }, { list: "ordered" }],
@@ -83,8 +85,6 @@ const EditorComponent = ({
 
   const formats = [
     "header",
-    "font",
-    "size",
     "bold",
     "italic",
     "underline",
@@ -102,12 +102,14 @@ const EditorComponent = ({
     "script",
   ];
 
+  // Handle content changes in the editor
   const handleEditorChange = (content, delta, source, editor) => {
     onEditorChange(editor.getHTML());
   };
 
   return (
-    <div className="w-full  bg-white mb-3 p-2">
+    <div className="relative w-full bg-white mb-3 p-2">
+      <Toaster />
       {!hideInput && (
         <div className="flex flex-col md:flex-row items-center gap-4 mb-2">
           <div className="flex flex-col w-full md:w-7/10">
@@ -136,13 +138,39 @@ const EditorComponent = ({
       />
 
       {loading && (
-        <div className="flex items-center justify-center mt-3">
-          <FaSpinner className="animate-spin mr-2 text-2xl" />
-          <span>Uploading...</span>
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: "transparent", // Transparent background
+            zIndex: 10,
+          }}
+        >
+          <ImSpinner3
+            style={{
+              fontSize: "48px",
+              color: "#007bff",
+              animation: "spin 1s linear infinite",
+            }}
+          />
         </div>
       )}
 
-      {error && <div className="text-red-500 mt-3">{error}</div>}
+      {/* Inline CSS for spinner animation */}
+      <style>
+        {`
+          @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+          }
+        `}
+      </style>
     </div>
   );
 };

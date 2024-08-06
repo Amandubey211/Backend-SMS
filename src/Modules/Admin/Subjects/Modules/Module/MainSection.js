@@ -33,10 +33,12 @@ const MainSection = () => {
   const { addModule } = useAddModule(fetchModules);
   const { deleteModule } = useDeleteModule(fetchModules);
 
+  // Fetch modules on component mount
   useEffect(() => {
-    fetchModules(); // Fetch modules on component mount
+    fetchModules();
   }, [fetchModules]);
 
+  // Update selected module when modulesData changes
   useEffect(() => {
     if (modulesData && modulesData.modules.length > 0) {
       dispatch(
@@ -221,7 +223,7 @@ const MainSection = () => {
                 moduleNumber={index + 1}
                 imageUrl={module.thumbnail}
                 moduleId={module._id}
-                isPublished={false}
+                isPublished={module.isPublished}
                 isSelected={
                   selectedModule && selectedModule.moduleId === module._id
                 }
@@ -235,6 +237,7 @@ const MainSection = () => {
                     id: module._id,
                   })
                 }
+                fetchModules={fetchModules}
               />
             ))}
           </div>
