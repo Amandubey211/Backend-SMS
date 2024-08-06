@@ -40,22 +40,22 @@ const AddEvent = ({ onSave }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     if (isSubmitting) return; // Prevent multiple submissions
     setIsSubmitting(true); // Set submission state immediately
-  
+
     // Check if all required fields are filled
     if (!eventData.title || !eventData.date || !eventData.time || !eventData.image) {
       toast.error("Please fill in all required fields.");
       setIsSubmitting(false);
       return;
     }
-  
+
     try {
       const result = await createEvent(eventData);
       if (result?.success) {
         toast.success(result.msg || "Event created successfully!");
-  
+
         // Reset form fields
         setEventData({
           title: "",
@@ -68,8 +68,8 @@ const AddEvent = ({ onSave }) => {
           image: null,
           imagePreview: null,
         });
-  
-        onSave(eventData); // Pass eventData to onSave to notify parent component
+
+        onSave(eventData, result); // Pass eventData to onSave to notify parent component
       } else {
         toast.error("Failed to create event.");
       }
@@ -80,7 +80,7 @@ const AddEvent = ({ onSave }) => {
       setIsSubmitting(false); // Reset submission state after processing
     }
   };
-  
+
 
 
   return (
