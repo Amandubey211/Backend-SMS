@@ -32,7 +32,6 @@ const useGetModulesForStudent = () => {
         }
       );
 
-      console.log(response.data); // Debugging output
       if (response.data?.success) {
         dispatch(setModules(response.data.data.modules)); // Update Redux
         setModulesData(response.data.data); // Update local state
