@@ -130,9 +130,8 @@ const EventScheduler = () => {
           return (
             <li
               key={event._id}
-              className={`inline-block px-2 py-1 rounded text-white ${
-                bgColors[index % bgColors.length]
-              } shadow-md cursor-pointer`}
+              className={`inline-block px-2 py-1 rounded text-white ${bgColors[index % bgColors.length]
+                } shadow-md cursor-pointer`}
               onClick={() => handleStickerClick(event)}
             >
               {event.title} - {timeString}
@@ -156,25 +155,25 @@ const EventScheduler = () => {
     setSidebarOpen(true);
   };
 
-  const handleSaveEvent = async (eventData) => {
+  const handleSaveEvent = async (eventData, result) => {
     console.log("Saving event data:", eventData);
-  
+
     if (!eventData || Object.keys(eventData).length === 0) {
       console.error("Event data is undefined or null.");
       toast.error("Event data is missing.");
       return;
     }
-  
+
     try {
       if (selectedEvent) {
         await updateEvent(selectedEvent._id, eventData);
         toast.success("Event updated successfully!");
+        refreshEvents(); 
+        handleSidebarClose();
       } else {
-        const result = await createEvent(eventData);
         if (result?.success) {
-          toast.success(result.msg || "Event created successfully!");
-          refreshEvents(); // Refresh the events list to show new events
-          handleSidebarClose(); // Close the sidebar after success
+          refreshEvents(); 
+          handleSidebarClose();
         } else {
           toast.error("Failed to create event.");
         }
@@ -184,7 +183,7 @@ const EventScheduler = () => {
       toast.error("Failed to save event.");
     }
   };
-  
+
 
   const handleDeleteEvent = async () => {
     try {
@@ -346,21 +345,19 @@ const EventScheduler = () => {
                     </select>
                     <div className="flex space-x-2">
                       <button
-                        className={`border rounded px-2 py-1 ${
-                          type === "month"
+                        className={`border rounded px-2 py-1 ${type === "month"
                             ? "bg-gradient-to-r from-pink-500 to-purple-500 text-white"
                             : ""
-                        }`}
+                          }`}
                         onClick={() => onTypeChange("month")}
                       >
                         Month
                       </button>
                       <button
-                        className={`border rounded px-2 py-1 ${
-                          type === "year"
+                        className={`border rounded px-2 py-1 ${type === "year"
                             ? "bg-gradient-to-r from-pink-500 to-purple-500 text-white"
                             : ""
-                        }`}
+                          }`}
                         onClick={() => onTypeChange("year")}
                       >
                         Year
@@ -379,8 +376,8 @@ const EventScheduler = () => {
                 {sidebarContent === "viewEvent"
                   ? "View Event"
                   : sidebarContent === "addEvent"
-                  ? "Add New Event"
-                  : "Update Event"}
+                    ? "Add New Event"
+                    : "Update Event"}
               </span>
             }
           >
