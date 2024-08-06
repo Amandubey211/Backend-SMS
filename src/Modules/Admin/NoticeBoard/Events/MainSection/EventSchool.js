@@ -119,9 +119,8 @@ const EventScheduler = () => {
           return (
             <li
               key={event._id}
-              className={`inline-block px-2 py-1 rounded text-white ${
-                bgColors[index % bgColors.length]
-              } shadow-md cursor-pointer`}
+              className={`inline-block px-2 py-1 rounded text-white ${bgColors[index % bgColors.length]
+                } shadow-md cursor-pointer`}
               onClick={() => handleStickerClick(event)}
             >
               {event.title} - {timeString}
@@ -237,10 +236,11 @@ const EventScheduler = () => {
               Add New Event
             </button>
           </div>
-          <div className="my-4 w-full h-40 flex rounded-sm gap-20 pl-10 relative">
+          
+          <div className="my-4 w-full h-40 flex rounded-sm gap-20 pl-10 relative ">
             {currentPage > 0 && (
               <div
-                className="p-1 rounded-full text-purple-500 bg-white border-2 cursor-pointer absolute left-0 top-1/2 transform -translate-y-1/2"
+                className="p-1 rounded-full text-purple-500 bg-black border-2 cursor-pointer absolute left-0 top-1/2 transform -translate-y-1/2"
                 onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 0))}
               >
                 <IoIosArrowBack />
@@ -258,6 +258,7 @@ const EventScheduler = () => {
                   event={event}
                   color={bgColors[index % bgColors.length]}
                   onClick={handleStickerClick}
+                  className="transform transition-transform duration-200 hover:scale-105 hover:shadow-xl"
                 />
               ))
             )}
@@ -270,6 +271,7 @@ const EventScheduler = () => {
               </div>
             )}
           </div>
+
           <hr className="my-6 border-t-2 mt-12 " />
           <div className="py-7">
             <Calendar
@@ -334,21 +336,19 @@ const EventScheduler = () => {
                     </select>
                     <div className="flex space-x-2">
                       <button
-                        className={`border rounded px-2 py-1 ${
-                          type === "month"
+                        className={`border rounded px-2 py-1 ${type === "month"
                             ? "bg-gradient-to-r from-pink-500 to-purple-500 text-white"
                             : ""
-                        }`}
+                          }`}
                         onClick={() => onTypeChange("month")}
                       >
                         Month
                       </button>
                       <button
-                        className={`border rounded px-2 py-1 ${
-                          type === "year"
+                        className={`border rounded px-2 py-1 ${type === "year"
                             ? "bg-gradient-to-r from-pink-500 to-purple-500 text-white"
                             : ""
-                        }`}
+                          }`}
                         onClick={() => onTypeChange("year")}
                       >
                         Year
@@ -367,8 +367,8 @@ const EventScheduler = () => {
                 {sidebarContent === "viewEvent"
                   ? "View Event"
                   : sidebarContent === "addEvent"
-                  ? "Add New Event"
-                  : "Update Event"}
+                    ? "Add New Event"
+                    : "Update Event"}
               </span>
             }
           >
