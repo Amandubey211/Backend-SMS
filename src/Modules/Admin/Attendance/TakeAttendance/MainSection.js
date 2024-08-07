@@ -28,14 +28,15 @@ const MainSection = () => {
     loading: fetchingLoading,
     error: fetchingError,
     attendanceData,
+    fetchAttendanceByClass
   } = useGetAttendanceByClassSectionGroupAndDate();
   const { cid } = useParams();
 
-  useEffect(() => {
-    if (cid || filters.sectionId || filters.groupId) {
-      fetchAttendance(cid, filters.sectionId, filters.groupId, 6, "2024");
-    }
-  }, [filters.sectionId, filters.groupId, fetchAttendance, cid]);
+  // useEffect(() => {
+  //   if (cid || filters.sectionId || filters.groupId) {
+  //     fetchAttendanceByClass(cid, "2-2-2024");
+  //   }
+  // }, [filters.sectionId, filters.groupId, fetchAttendanceByClass, cid]);
 
   const handleFilterChange = (name, value) => {
     setFilters((prevFilters) => ({
@@ -67,10 +68,10 @@ const MainSection = () => {
           status: student.present
             ? "present"
             : student.absent
-            ? "absent"
-            : student.leave
-            ? "leave"
-            : null,
+              ? "absent"
+              : student.leave
+                ? "leave"
+                : null,
         }))
         .filter((entry) => entry.status !== null),
     };
@@ -78,7 +79,7 @@ const MainSection = () => {
     handleMarkAttendance(attendanceData);
     // console.log(attendanceData.date)
   };
-
+  
   return (
     <div className="flex min-h-screen w-full">
       {/* This section should take 70% of the space */}
@@ -93,7 +94,7 @@ const MainSection = () => {
           ) : (
             <AttendanceTable
               filters={filters}
-              attendanceData={attendanceData}
+              //attendanceData={attendanceData}
               // loading={markingLoading}
               students={students}
               setStudents={setStudents}
