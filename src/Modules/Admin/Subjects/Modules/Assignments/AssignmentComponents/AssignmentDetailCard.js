@@ -49,7 +49,7 @@ const AssignmentDetailCard = ({ assignment, loading, error, onRefresh }) => {
         data={assignment}
         onRefresh={onRefresh} // Pass the refresh callback
       />
-      <SpeedGradeButton />
+      <SpeedGradeButton sgid={assignment._id} name={assignment.name} />
       <AssignmentDetail
         label="Assignment Points"
         value={`${points || "N/A"} Points`}

@@ -27,6 +27,9 @@ import AttendanceMain from "../Modules/Student/Attendance/AttendanceMain.js";
 import QIDLogin from "../Modules/LoginPages/Student/Login/QIDLogin.js";
 
 // lazy loaded routes
+const SpeedGrade = lazy(() =>
+  import("../Modules/Admin/Subjects/Modules/SpeedGrade/SpeedGrade.js")
+);
 const StudentFinance = lazy(() =>
   import("../Modules/Student/StudentFinance.js")
 );
@@ -538,6 +541,16 @@ function App() {
       path: "/class/:cid/:sid/grades",
       element: (
         <ProtectRoute Component={Grade} allowedRoles={["admin", "teacher"]} />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/class/:cid/:sid/speedgrade/:sgid",
+      element: (
+        <ProtectRoute
+          Component={SpeedGrade}
+          allowedRoles={["admin", "teacher"]}
+        />
       ),
       errorElement: <Error />,
     },
