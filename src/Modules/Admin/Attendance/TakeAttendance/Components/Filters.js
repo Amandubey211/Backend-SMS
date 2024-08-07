@@ -6,6 +6,7 @@ import {
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import useFetchSection from "../../../../../Hooks/AuthHooks/Staff/Admin/Sections/useFetchSection";
+import useGetGroupsByClass from "../../../../../Hooks/AuthHooks/Staff/Admin/Groups/useGetGroupByClass";
 
 const Filters = ({ filters, onFilterChange }) => {
   const { sectionId, groupId } = filters;
@@ -15,6 +16,8 @@ const Filters = ({ filters, onFilterChange }) => {
   const { cid } = useParams();
   const { fetchSection } = useFetchSection();
   const className = useSelector((store) => store.Common.selectedClass);
+  const { fetchGroupsByClass } = useGetGroupsByClass()
+  const groups = useSelector((store) => store.Class.groupsList);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -23,9 +26,11 @@ const Filters = ({ filters, onFilterChange }) => {
     fetchData();
   }, [fetchSection, cid]);
 
-  const groups = sectionId
-    ? AllSections.find((section) => section._id === sectionId)?.groups || []
-    : AllSections.reduce((acc, section) => acc.concat(section.groups), []);
+  useEffect(() => {
+    if (!groups || groups.length === 0) {
+      fetchGroupsByClass(cid)
+    }
+  }, [groups, fetchGroupsByClass])
 
   const toggleDropdown = (setter, currentState) => {
     setter(!currentState);

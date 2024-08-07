@@ -11,7 +11,7 @@ const useGetAttendanceByClassSectionGroupAndDate = () => {
   const cache = useRef({});
 
   const role = useSelector((store) => store.Auth.role);
-  
+
 
   const fetchAttendance = useCallback(
     async (classId, sectionId, groupId, month, year) => {
@@ -41,7 +41,33 @@ const useGetAttendanceByClassSectionGroupAndDate = () => {
     [role, baseUrl]
   );
 
-  return { loading, error, attendanceData, fetchAttendance };
+  const fetchAttendanceByClass = useCallback(
+    async (classId, date) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const token = localStorage.getItem(`${role}:token`);
+        const response = await axios.get(
+          `${baseUrl}/api/teacher/attendance/getStudentList/${classId}`,
+          {
+            headers: { Authentication: token },
+            params: { date },
+          }
+        );
+        if (response.data) {
+          setAttendanceData(response.data);
+        }
+      } catch (error) {
+        const errorMessage = error.response?.data?.message || "Failed to fetch attendance records";
+        setError(errorMessage);
+      } finally {
+        setLoading(false);
+      }
+    }, [role, baseUrl]
+  )
+
+
+  return { loading, error, attendanceData, fetchAttendance, fetchAttendanceByClass };
 };
 
 export default useGetAttendanceByClassSectionGroupAndDate;
