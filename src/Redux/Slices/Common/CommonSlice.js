@@ -5,6 +5,7 @@ const CommonSlice = createSlice({
   initialState: {
     selectedClass: null,
     selectedSubject: null,
+    selectedAssignmentName: null,
     selectedModule: {
       moduleId: null,
       name: null,
@@ -43,6 +44,9 @@ const CommonSlice = createSlice({
     setSelectedSubjectName: (state, action) => {
       state.selectedSubjectName = action.payload;
     },
+    setSelectedAssignmentname: (state, action) => {
+      state.selectedAssignmentName = action.payload;
+    },
     setSelectedSectionId: (state, action) => {
       state.selectedSection = action.payload;
     },
@@ -57,6 +61,7 @@ export const {
   setSelectedClass,
   setSelectedClassName,
   setSelectedModule,
+  setSelectedAssignmentname,
   setSelectedSectionId,
 } = CommonSlice.actions;
 
