@@ -17,14 +17,14 @@ const initialFormState = {
   allowedAttempts: false,
   numberOfAttempts: "",
   assignTo: "",
-  section: null,
+  sectionId: null,
   dueDate: "",
   availableFrom: "",
   until: "",
   thumbnail: null,
   moduleId: null,
   chapterId: null,
-  group: null,
+  groupId: null,
 };
 
 const MainSection = () => {
@@ -60,14 +60,14 @@ const MainSection = () => {
         allowedAttempts: assignment.allowedAttempts || false,
         numberOfAttempts: assignment.allowNumberOfAttempts || "",
         assignTo: assignment.assignTo || "",
-        section: assignment?.sectionId || null,
+        sectionId: assignment?.sectionId || null,
         dueDate: assignment.dueDate || "",
         availableFrom: assignment.availableFrom || "",
         until: assignment.until || "",
         thumbnail: assignment.thumbnail || null,
         moduleId: assignment.moduleId || null,
         chapterId: assignment.chapterId || null,
-        group: assignment?.groupId || null,
+        groupId: assignment?.groupId || null,
       });
     }
   }, [location.state]);
@@ -106,14 +106,14 @@ const MainSection = () => {
     };
 
     if (formState.assignTo === "Section") {
-      assignmentData.sectionId = formState.section || null;
+      assignmentData.sectionId = formState.sectionId || null;
     } else if (formState.assignTo === "Group") {
-      assignmentData.groupId = formState.group || null;
+      assignmentData.groupId = formState.groupId || null;
     }
 
     try {
       if (isEditing) {
-        let sectionId = formState.section || null;
+        let sectionId = formState.sectionId || null;
         await updateAssignment(assignmentId, assignmentData, sectionId);
         toast.success("Assignment updated successfully.");
       } else {
