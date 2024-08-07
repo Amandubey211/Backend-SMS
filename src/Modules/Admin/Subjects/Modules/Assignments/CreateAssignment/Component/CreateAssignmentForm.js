@@ -9,6 +9,8 @@ import DateInput from "../../../../Component/DateInput";
 import GradeOption from "./GradeOption";
 import SubmissionTypeDropdown from "./SubmissionTypeDropdown";
 import useGetModulesForStudent from "../../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useGetModulesForStudent";
+import useGetGroupsByClass from "../../../../../../../Hooks/AuthHooks/Staff/Admin/Groups/useGetGroupByClass";
+import { useParams } from "react-router-dom";
 
 const CreateAssignmentForm = ({
   points,
@@ -19,23 +21,29 @@ const CreateAssignmentForm = ({
   allowedAttempts,
   numberOfAttempts,
   assignTo,
-  section,
+  sectionId,
   dueDate,
   availableFrom,
   moduleId,
   chapterId,
-  group,
+  groupId,
 }) => {
   const moduleList = useSelector((store) => store.Subject.modules);
   const { loading, error, fetchModules } = useGetModulesForStudent();
   const [chapters, setChapters] = useState([]);
   const [selectedModule, setSelectedModule] = useState(moduleId || "");
   const [selectedChapter, setSelectedChapter] = useState(chapterId || "");
-
+  const { fetchGroupsByClass, loading: groupLoading, error: groupError } = useGetGroupsByClass()
+  const groupsList = useSelector((store) => store.Class.groupsList);
+  const { cid } = useParams()
+  
   useEffect(() => {
     // Fetch modules if not available in the Redux store
     if (!moduleList || moduleList.length === 0) {
       fetchModules();
+    }
+    if (!groupsList || groupsList.length === 0) {
+      fetchGroupsByClass(cid)
     }
   }, [moduleList, fetchModules]);
 
@@ -134,9 +142,9 @@ const CreateAssignmentForm = ({
       />
       <SectionSelect
         assignTo={assignTo}
-        section={section}
+        section={sectionId}
         handleChange={handleChange}
-        group={group}
+        group={groupId}
       />
       <DateInput
         label="Available from"
