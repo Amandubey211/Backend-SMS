@@ -1,22 +1,17 @@
 import React, { useState, useEffect } from "react";
-import {
-  MdOutlineKeyboardArrowDown,
-  MdOutlineKeyboardArrowUp,
-} from "react-icons/md";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import useFetchSection from "../../../../../Hooks/AuthHooks/Staff/Admin/Sections/useFetchSection";
 import useGetGroupsByClass from "../../../../../Hooks/AuthHooks/Staff/Admin/Groups/useGetGroupByClass";
+import { GrPowerReset } from "react-icons/gr";
 
-const Filters = ({ filters, onFilterChange }) => {
+const Filters = ({ filters, onFilterChange, resetDate }) => {
   const { sectionId, groupId } = filters;
-  const [isSectionDropdownOpen, setIsSectionDropdownOpen] = useState(false);
-  const [isGroupDropdownOpen, setIsGroupDropdownOpen] = useState(false);
   const AllSections = useSelector((store) => store.Class.sectionsList);
   const { cid } = useParams();
   const { fetchSection } = useFetchSection();
   const className = useSelector((store) => store.Common.selectedClass);
-  const { fetchGroupsByClass } = useGetGroupsByClass()
+  const { fetchGroupsByClass } = useGetGroupsByClass();
   const groups = useSelector((store) => store.Class.groupsList);
 
   useEffect(() => {
@@ -28,128 +23,69 @@ const Filters = ({ filters, onFilterChange }) => {
 
   useEffect(() => {
     if (!groups || groups.length === 0) {
-      fetchGroupsByClass(cid)
+      fetchGroupsByClass(cid);
     }
-  }, [groups, fetchGroupsByClass])
+  }, [groups, fetchGroupsByClass, cid]);
 
-  const toggleDropdown = (setter, currentState) => {
-    setter(!currentState);
+  const handleSectionChange = (e) => {
+    onFilterChange("sectionId", e.target.value);
   };
 
-  const handleSectionChange = (value) => {
-    onFilterChange("sectionId", value);
-    onFilterChange("groupId", ""); // Reset group when changing sections
-    setIsSectionDropdownOpen(false);
+  const handleGroupChange = (e) => {
+    onFilterChange("groupId", e.target.value);
   };
 
-  const handleGroupChange = (value) => {
-    onFilterChange("groupId", value);
-    setIsGroupDropdownOpen(false);
-  };
-
-  const handleSectionReset = () => {
+  const handleAllChange = () => {
     onFilterChange("sectionId", "");
-    onFilterChange("groupId", ""); // Reset group when resetting sections
-    setIsSectionDropdownOpen(false);
-  };
-
-  const handleGroupReset = () => {
     onFilterChange("groupId", "");
-    setIsGroupDropdownOpen(false);
+    resetDate();
   };
 
   return (
-    <div className="flex justify-between space-x-4 my-2">
-      <div className="flex flex-col">
-        <label className="text-gray-600 mb-1">Class</label>
-        <select className="border rounded p-2 w-56">
-          <option>{className}</option>
-        </select>
-      </div>
-      <div className="flex flex-col">
-        <label className="text-gray-600 mb-1">Section</label>
-        <div className="relative w-56">
-          <div
-            className="block w-full p-2 border border-gray-300 rounded appearance-none cursor-pointer transition-transform duration-300"
-            onClick={() =>
-              toggleDropdown(setIsSectionDropdownOpen, isSectionDropdownOpen)
-            }
-          >
-            {AllSections.find((section) => section._id === sectionId)
-              ?.sectionName || "Select Sections"}
-
-            <div className="absolute inset-y-0 right-0 flex items-center px-2 text-gray-700 cursor-pointer transition-transform transform duration-300 ease-in-out hover:translate-y-1">
-              {isSectionDropdownOpen ? (
-                <MdOutlineKeyboardArrowUp className="fill-current h-7 w-7" />
-              ) : (
-                <MdOutlineKeyboardArrowDown className="fill-current h-7 w-7" />
-              )}
-            </div>
-          </div>
-          {isSectionDropdownOpen && (
-            <div className="absolute z-10 w-full bg-white border border-gray-300 rounded-lg mt-1">
-              <div
-                key="All"
-                className="p-2 cursor-pointer hover:bg-gray-100 transition-transform duration-300 ease-in-out hover:translate-x-1"
-                onClick={handleSectionReset}
-              >
-                Reset
-              </div>
-              {AllSections.map((section) => (
-                <div
-                  key={section._id}
-                  className="p-2 cursor-pointer hover:bg-gray-100 transition-transform duration-300 ease-in-out hover:translate-x-1"
-                  onClick={() => handleSectionChange(section._id)}
-                >
-                  {section.sectionName}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-      <div className="flex flex-col">
-        <label className="text-gray-600 mb-1">Group</label>
-        <div className="relative w-56">
-          <div
-            className="block w-full p-2 border border-gray-300 rounded-lg appearance-none cursor-pointer transition-transform duration-300"
-            onClick={() =>
-              toggleDropdown(setIsGroupDropdownOpen, isGroupDropdownOpen)
-            }
-          >
-            {groups.find((group) => group._id === groupId)?.groupName ||
-              "Select Groups"}
-            <div className="absolute inset-y-0 right-0 flex items-center px-2 text-gray-700 cursor-pointer transition-transform transform duration-300 ease-in-out hover:translate-y-1">
-              {isGroupDropdownOpen ? (
-                <MdOutlineKeyboardArrowUp className="fill-current h-7 w-7" />
-              ) : (
-                <MdOutlineKeyboardArrowDown className="fill-current h-7 w-7" />
-              )}
-            </div>
-          </div>
-          {isGroupDropdownOpen && (
-            <div className="absolute z-10 w-full bg-white border border-gray-300 rounded-lg mt-1">
-              <div
-                key="All"
-                className="p-2 cursor-pointer hover:bg-gray-100 transition-transform duration-300 ease-in-out hover:translate-x-1"
-                onClick={handleGroupReset}
-              >
-                Reset
-              </div>
-              {groups.map((group) => (
-                <div
-                  key={group._id}
-                  className="p-2 cursor-pointer hover:bg-gray-100 transition-transform duration-300 ease-in-out hover:translate-x-1"
-                  onClick={() => handleGroupChange(group._id)}
-                >
-                  {group.groupName}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
+    <div className="flex justify-between items-center my-2">
+  <div className="flex space-x-4">
+    <div className="flex flex-col">
+      <label className="text-gray-600 mb-1">Section</label>
+      <select
+        className="border rounded p-2 w-56"
+        value={sectionId}
+        onChange={handleSectionChange}
+      >
+        <option value="">Reset</option>
+        {AllSections.map((section) => (
+          <option key={section._id} value={section._id}>
+            {section.sectionName}
+          </option>
+        ))}
+      </select>
     </div>
+    <div className="flex flex-col">
+      <label className="text-gray-600 mb-1">Group</label>
+      <select
+        className="border rounded p-2 w-56"
+        value={groupId}
+        onChange={handleGroupChange}
+      >
+        <option value="">Reset Group</option>
+        {groups.map((group) => (
+          <option key={group._id} value={group._id}>
+            {group.groupName}
+          </option>
+        ))}
+      </select>
+    </div>
+  </div>
+  <div className="flex items-center">
+    <button
+      className="rounded p-2 flex items-center justify-center"
+      title="Reset All"
+      onClick={handleAllChange}
+      style={{ marginTop: '20px' }}
+    >
+      <GrPowerReset className="size-10 text-gray-700" />
+    </button>
+  </div>
+</div>
   );
 };
 

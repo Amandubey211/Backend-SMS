@@ -34,7 +34,7 @@ const MainSection = () => {
   });
 
   const { cid } = useParams();
-  const { attendanceData, error, fetchAttendance, loading } =
+  const { attendanceData, attendanceStat, error, fetchAttendance, loading } =
     useGetAttendanceByClassSectionGroupAndDate();
 
   const handleFilterChange = (name, value) => {
@@ -53,6 +53,7 @@ const MainSection = () => {
       }));
     }
   }, [filters.month]);
+console.log("attendance--",attendanceData);
 
   useEffect(() => {
     if (cid && filters.month) {
@@ -71,6 +72,7 @@ const MainSection = () => {
     <div className="p-4">
       <NavSection
         onFilterChange={(newFilter) => handleFilterChange("filter", newFilter)}
+       
       />
       <FilterAttendanceBar
         filters={filters}
