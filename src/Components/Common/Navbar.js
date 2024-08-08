@@ -81,7 +81,7 @@ const Navbar = ({ hideSearchbar, hideAvatarList, hideStudentView }) => {
     (store) => store.Common.NavbarData.leftHeading
   );
   const navigate = useNavigate();
-  const [showSetting,setShowSetting] = useState(false);
+  const [showSetting, setShowSetting] = useState(false);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const openModal = () => {
@@ -92,10 +92,9 @@ const Navbar = ({ hideSearchbar, hideAvatarList, hideStudentView }) => {
     setIsModalOpen(false);
   };
   const { staffLogout } = useStaffLogout();
-  const  logout = async () => {
-      await staffLogout();
-      setIsModalOpen(false); 
-    
+  const logout = async () => {
+    await staffLogout();
+    setIsModalOpen(false);
   };
   const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   return (
@@ -111,36 +110,68 @@ const Navbar = ({ hideSearchbar, hideAvatarList, hideStudentView }) => {
             settings- profile, languages, time zone, logout */}
           </>
         )}
-      
-        {!hideSearchbar && <SearchBar />}
+
+        {/* {!hideSearchbar && <SearchBar />} */}
         <div className="flex items-center space-x-2 border-l ml-3 pl-3">
-          <div> <IconButton icon={CiMail} label="Mail" /></div>
-          <div> <IconButton icon={TbBell} label="Notifications" /></div>
-          
-          
+          <div>
+            {" "}
+            <IconButton icon={CiMail} label="Mail" />
+          </div>
+          <div>
+            {" "}
+            <IconButton icon={TbBell} label="Notifications" />
+          </div>
+
           <div className="relative">
-           <div onClick={()=>setShowSetting(!showSetting)}> <IconButton icon={IoSettingsOutline} label="Settings"  /></div>
-          {showSetting? 
-           <div className="absolute top-9 right-0 w-[auto] h-[auto] bg-white rounded-lg shadow-lg border px-4 py-4 flex flex-col gap-2 z-[1000]">
-             <button className="flex items-center flex-row gap-2 font-semibold hover:border-b-2 w-[100%]" onClick={()=>navigate('/users/admin')}> <span><FaUser/></span> Profile</button>
-             <div className="flex items-center flex-row gap-2 font-semibold hover:border-b-2 w-full">
-                  <span><IoLanguage /></span>
+            <div onClick={() => setShowSetting(!showSetting)}>
+              {" "}
+              <IconButton icon={IoSettingsOutline} label="Settings" />
+            </div>
+            {showSetting ? (
+              <div className="absolute top-9 right-0 w-[auto] h-[auto] bg-white rounded-lg shadow-lg border px-4 py-4 flex flex-col gap-2 z-[1000]">
+                <button
+                  className="flex items-center flex-row gap-2 font-semibold hover:border-b-2 w-[100%]"
+                  onClick={() => navigate("/users/admin")}
+                >
+                  {" "}
+                  <span>
+                    <FaUser />
+                  </span>{" "}
+                  Profile
+                </button>
+                <div className="flex items-center flex-row gap-2 font-semibold hover:border-b-2 w-full">
+                  <span>
+                    <IoLanguage />
+                  </span>
                   <select className="border-none outline-none bg-transparent">
                     <option value="english">English</option>
                     <option value="arabic">Arabic</option>
-                    <option value="Hindi">Hindi</option> 
+                    <option value="Hindi">Hindi</option>
                   </select>
                 </div>
-             <button className="flex items-center flex-row gap-2 font-semibold hover:border-b-2 w-[100%]"> <span><RiTimeZoneLine/></span>{timeZone}</button>
-             <button className="flex items-center flex-row gap-2 font-semibold hover:border-b-2 w-[100%]" onClick={openModal}>Logout  <span><IoIosLogOut /></span></button>
- 
-            </div>
-:null}
+                <button className="flex items-center flex-row gap-2 font-semibold hover:border-b-2 w-[100%]">
+                  {" "}
+                  <span>
+                    <RiTimeZoneLine />
+                  </span>
+                  {timeZone}
+                </button>
+                <button
+                  className="flex items-center flex-row gap-2 font-semibold hover:border-b-2 w-[100%]"
+                  onClick={openModal}
+                >
+                  Logout{" "}
+                  <span>
+                    <IoIosLogOut />
+                  </span>
+                </button>
+              </div>
+            ) : null}
             <LogoutConfirmationModal
-  isOpen={isModalOpen}
-  onClose={closeModal}
-  onConfirm={logout}
-/>
+              isOpen={isModalOpen}
+              onClose={closeModal}
+              onConfirm={logout}
+            />
           </div>
         </div>
       </div>

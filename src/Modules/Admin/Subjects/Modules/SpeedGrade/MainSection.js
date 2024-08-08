@@ -25,27 +25,24 @@ const MainSection = () => {
   );
 
   return (
-    <div className="flex">
+    <div className="flex h-screen">
       {/* Student List Section */}
-      <div className="w-1/4 p-4 border-r border-gray-200">
+      <div className="w-1/4 p-4 border-r border-gray-200 flex flex-col">
         <StudentList onSelectStudent={handleStudentSelection} />
       </div>
 
-      {/* Placeholder when no student is selected */}
+      {/* Middle Section */}
       {!selectedStudent ? (
-        <div className="flex-grow flex flex-col items-center justify-center text-gray-400">
-          <FaUserCircle className="text-9xl mb-4" /> {/* Big icon */}
-          <p className="text-lg font-semibold">No student selected</p>
-          <p>Please select a student to view details.</p>
+        <div className="flex items-center justify-center text-gray-400 h-full w-full">
+          Select a student to view assignment details.
         </div>
       ) : (
         <>
-          {/* Middle Section */}
-          <div className="w-1/2 p-4 border-r border-gray-200">
+          <div className="w-1/2 p-4 border-r border-gray-200 flex flex-col">
             {loading ? (
               <Spinner />
             ) : error ? (
-              <p className="text-center text-red-500">{error}</p>
+              <NoDataFound />
             ) : (
               <AssignmentDetails
                 student={selectedStudent}
@@ -55,8 +52,18 @@ const MainSection = () => {
           </div>
 
           {/* Right Section */}
-          <div className="w-1/4 p-2">
-            <SubmissionDetails assignmentId={sgid} />
+          <div className="w-1/4 flex flex-col">
+            {assignmentDetails ? (
+              <SubmissionDetails
+                assignment={assignmentDetails}
+                student={selectedStudent}
+              />
+            ) : (
+              <div className="flex-grow flex flex-col items-center justify-center text-gray-400">
+                <FaUserCircle className="text-9xl mb-4" /> {/* Big icon */}
+                <p className="text-lg font-semibold">No submission found</p>
+              </div>
+            )}
           </div>
         </>
       )}

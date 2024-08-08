@@ -12,7 +12,7 @@ const SpeedGrade = () => {
   useNavHeading(selectedAssignmentName, "Speed Grade");
 
   return (
-    <Layout title={`Speed Grade - ${selectedAssignmentName} | "Student Diwan"`}>
+    <Layout title={`Speed Grade - ${selectedAssignmentName} | Student Diwan`}>
       <DashLayout children={<MainSection />} hideSearchbar={true} />
       {/* <div className="flex w-full h-full">
       <SideMenubar />

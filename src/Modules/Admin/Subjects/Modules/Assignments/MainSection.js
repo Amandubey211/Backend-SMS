@@ -32,6 +32,7 @@ const MainSection = () => {
       </div>
       <div className="w-[30%]">
         <AssignmentDetailCard
+          isPublish={assignment?.publish}
           assignment={assignment}
           loading={loading}
           error={error}

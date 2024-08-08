@@ -1,34 +1,35 @@
 import React from "react";
-import NoDataFound from "../../../../../../Components/Common/NoDataFound";
 
 const AssignmentDetails = ({ student, assignment }) => {
   if (!student || !assignment) {
-    return (
-      <div className="flex items-center justify-center text-gray-400 h-full">
-        Select a student to view assignment details.
-      </div>
-    );
+    return null; // Empty return if no student or assignment is selected
   }
 
-  const { title, submissionDate, imageUrl, description } =
-    assignment.assignmentId || {};
+  const { content, studentPoints } = assignment;
+  const { name, points, dueDate } = assignment.assignmentId || {};
 
   return (
-    <div>
-      <h2 className="text-2xl font-bold mb-2">
-        {title || "Untitled Assignment"}
-      </h2>
-      <p className="text-gray-500 mb-4">
-        Submission Date: {submissionDate || "N/A"}
-      </p>
-      <img
-        src={imageUrl || "https://via.placeholder.com/600x200"}
-        alt="Assignment"
-        className="w-full h-64 object-cover mb-4"
-      />
-      <p className="text-gray-700">
-        {description || "No description available."}
-      </p>
+    <div className="bg-white">
+      <div className="flex justify-between items-center mb-4 border-b pb-2">
+        <div>
+          <h2 className="text-xl font-medium mb-1 capitalize">
+            {name || "Untitled Assignment"}
+          </h2>
+          <p className="text-gray-500">
+            Submission Date:{" "}
+            {dueDate ? new Date(dueDate).toLocaleDateString() : "N/A"}
+          </p>
+        </div>
+        <div className="text-right">
+          <p className="text-gray-500 mb-1">Assignment Point</p>
+          <p className="text-green-500 font-bold text-md">
+            {studentPoints || 0}/{points}
+          </p>
+        </div>
+      </div>
+      <div className="text-gray-700 mb-4">
+        {content || "No content available."}
+      </div>
     </div>
   );
 };
