@@ -2,39 +2,38 @@ import { useState, useCallback } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
-import { baseUrl } from "../../../../../config/Common";
+import { baseUrl } from "../../../../../../config/Common";
 
-const useAssignGradeToStudent = () => {
+const useGetStudentQuiz = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [quizDetails, setQuizDetails] = useState(null);
   const role = useSelector((store) => store.Auth.role);
 
-  const assignGrade = useCallback(
-    async ({ studentId, assignmentId, grade, attemptDate, status }) => {
+  const fetchStudentQuiz = useCallback(
+    async (studentId, quizId) => {
       setLoading(true);
       setError(null);
       try {
         const token = localStorage.getItem(`${role}:token`);
-        const response = await axios.put(
-          `${baseUrl}/admin/speed_grade/grade`,
-          { studentId, assignmentId, grade, attemptDate, status },
-          {
-            headers: { Authentication: token },
-          }
-        );
+        const response = await axios.get(`${baseUrl}/admin/speed_grade/quiz`, {
+          headers: { Authentication: token },
+          params: { studentId, quizId },
+        });
 
         if (response.data.success) {
-          toast.success("Student graded successfully");
+          setQuizDetails(response.data.data); // Store the quiz details in local state
           return response.data.data;
         } else {
           toast.error(
-            response.data.message || "Failed to assign grade. Please try again."
+            response.data.message ||
+              "Failed to fetch quiz details. Please try again."
           );
           return null;
         }
       } catch (err) {
         const errorMessage =
-          err.response?.data?.message || "Failed to assign grade";
+          err.response?.data?.message || "Failed to fetch quiz details";
         toast.error(errorMessage);
         setError(errorMessage);
         return null;
@@ -42,10 +41,10 @@ const useAssignGradeToStudent = () => {
         setLoading(false);
       }
     },
-    [role]
+    [baseUrl, role]
   );
 
-  return { loading, error, assignGrade };
+  return { loading, error, quizDetails, fetchStudentQuiz };
 };
 
-export default useAssignGradeToStudent;
+export default useGetStudentQuiz;

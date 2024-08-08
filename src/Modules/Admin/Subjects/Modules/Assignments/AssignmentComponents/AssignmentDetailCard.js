@@ -57,6 +57,7 @@ const AssignmentDetailCard = ({
       />
 
       <SpeedGradeButton
+        type="Assignment"
         sgid={assignment._id}
         name={assignment.name}
         isPublish={isPublish}

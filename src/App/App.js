@@ -545,7 +545,7 @@ function App() {
       errorElement: <Error />,
     },
     {
-      path: "/class/:cid/:sid/speedgrade/:sgid",
+      path: "/class/:cid/:sid/speedgrade/:type/:sgid",
       element: (
         <ProtectRoute
           Component={SpeedGrade}

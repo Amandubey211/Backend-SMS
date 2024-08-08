@@ -2,23 +2,44 @@ import React, { useEffect, useState, useCallback } from "react";
 import { IoSearchOutline } from "react-icons/io5";
 import { VscSettings } from "react-icons/vsc";
 import { useParams } from "react-router-dom";
-import useGetAssignedStudents from "../../../../../../Hooks/AuthHooks/Staff/Admin/SpeedGrade/useGetAssignedStudents";
 import Spinner from "../../../../../../Components/Common/Spinner";
 import NoDataFound from "../../../../../../Components/Common/NoDataFound";
+import useGetAssignedAssignmentStudents from "../../../../../../Hooks/AuthHooks/Staff/Admin/SpeedGrade/Assignment/useGetAssignedAssignmentStudents";
+import useGetAssignedQuizStudents from "../../../../../../Hooks/AuthHooks/Staff/Admin/SpeedGrade/Quiz/useGetAssignedQuizStudents";
 
 function StudentList({ onSelectStudent }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeIndex, setActiveIndex] = useState(null);
-  const { sgid } = useParams(); // Assuming sgid is the assignment ID
+  const { sgid, type } = useParams(); // Assuming sgid is the assignment ID
 
-  const { error, fetchAssignedStudents, loading, students } =
-    useGetAssignedStudents();
+  // Determine which hook to use based on the `type` parameter
+  const {
+    error: assignmentError,
+    fetchAssignedStudents: fetchAssignmentStudents,
+    loading: assignmentLoading,
+    students: assignmentStudents,
+  } = useGetAssignedAssignmentStudents();
+
+  const {
+    error: quizError,
+    fetchAssignedStudents: fetchQuizStudents,
+    loading: quizLoading,
+    students: quizStudents,
+  } = useGetAssignedQuizStudents();
 
   useEffect(() => {
     if (sgid) {
-      fetchAssignedStudents(sgid);
+      if (type === "Assignment") {
+        fetchAssignmentStudents(sgid);
+      } else if (type === "Quiz") {
+        fetchQuizStudents(sgid);
+      }
     }
-  }, [sgid, fetchAssignedStudents]);
+  }, [sgid, type, fetchAssignmentStudents, fetchQuizStudents]);
+
+  const students = type === "Assignment" ? assignmentStudents : quizStudents;
+  const loading = type === "Assignment" ? assignmentLoading : quizLoading;
+  const error = type === "Assignment" ? assignmentError : quizError;
 
   const filteredStudents = students.filter((student) =>
     student.fullName.toLowerCase().includes(searchTerm.toLowerCase())
