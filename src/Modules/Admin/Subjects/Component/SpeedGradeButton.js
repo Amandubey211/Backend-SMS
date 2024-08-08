@@ -6,16 +6,16 @@ import { useDispatch } from "react-redux";
 import { NavLink, useNavigate, useParams } from "react-router-dom";
 import { setSelectedAssignmentname } from "../../../../Redux/Slices/Common/CommonSlice";
 import toast from "react-hot-toast";
-const SpeedGradeButton = ({ sgid, name, isPublish }) => {
+const SpeedGradeButton = ({ sgid, name, isPublish, type }) => {
   const { cid, sid } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   dispatch(setSelectedAssignmentname(name));
   const HandleClick = () => {
     if (isPublish) {
-      navigate(`/class/${cid}/${sid}/speedgrade/${sgid}`);
+      navigate(`/class/${cid}/${sid}/speedgrade/${type}/${sgid}`);
     } else {
-      toast.error("Assignment/quiz Not Publish");
+      toast.error(`${type} Not Publish Yet`);
       return;
     }
   };

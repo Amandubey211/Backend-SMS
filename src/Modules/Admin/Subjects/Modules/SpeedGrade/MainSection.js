@@ -4,25 +4,47 @@ import AssignmentDetails from "./Components/AssignmentDetails";
 import SubmissionDetails from "./Components/SubmissionDetails";
 import Spinner from "../../../../../Components/Common/Spinner";
 import NoDataFound from "../../../../../Components/Common/NoDataFound";
-import { FaUserCircle } from "react-icons/fa"; // Importing an icon from react-icons
-import useGetStudentAssignment from "../../../../../Hooks/AuthHooks/Staff/Admin/SpeedGrade/useGetStudentAssignment";
+import { FaUserCircle } from "react-icons/fa";
 import { useParams } from "react-router-dom";
+import useGetStudentAssignment from "../../../../../Hooks/AuthHooks/Staff/Admin/SpeedGrade/Assignment/useGetStudentAssignment";
+import useGetStudentQuiz from "../../../../../Hooks/AuthHooks/Staff/Admin/SpeedGrade/Quiz/useGetStudentQuiz";
 
 const MainSection = () => {
   const [selectedStudent, setSelectedStudent] = useState(null);
-  const { loading, error, assignmentDetails, fetchStudentAssignment } =
-    useGetStudentAssignment();
-  const { sgid } = useParams();
+  const { sgid, type } = useParams();
+
+  // Determine which hook to use based on the `type` parameter
+  const {
+    loading: assignmentLoading,
+    error: assignmentError,
+    assignmentDetails,
+    fetchStudentAssignment,
+  } = useGetStudentAssignment();
+
+  const {
+    loading: quizLoading,
+    error: quizError,
+    quizDetails,
+    fetchStudentQuiz,
+  } = useGetStudentQuiz();
 
   const handleStudentSelection = useCallback(
     (student) => {
       setSelectedStudent(student);
       if (student) {
-        fetchStudentAssignment(student._id, sgid);
+        if (type === "Assignment") {
+          fetchStudentAssignment(student._id, sgid);
+        } else if (type === "Quiz") {
+          fetchStudentQuiz(student._id, sgid);
+        }
       }
     },
-    [fetchStudentAssignment, sgid]
+    [fetchStudentAssignment, fetchStudentQuiz, sgid, type]
   );
+
+  const loading = type === "Assignment" ? assignmentLoading : quizLoading;
+  const error = type === "Assignment" ? assignmentError : quizError;
+  const details = type === "Assignment" ? assignmentDetails : quizDetails;
 
   return (
     <div className="flex h-screen">
@@ -34,7 +56,7 @@ const MainSection = () => {
       {/* Middle Section */}
       {!selectedStudent ? (
         <div className="flex items-center justify-center text-gray-400 h-full w-full">
-          Select a student to view assignment details.
+          Select a student to view details.
         </div>
       ) : (
         <>
@@ -44,20 +66,14 @@ const MainSection = () => {
             ) : error ? (
               <NoDataFound />
             ) : (
-              <AssignmentDetails
-                student={selectedStudent}
-                assignment={assignmentDetails}
-              />
+              <AssignmentDetails student={selectedStudent} details={details} />
             )}
           </div>
 
           {/* Right Section */}
           <div className="w-1/4 flex flex-col">
-            {assignmentDetails ? (
-              <SubmissionDetails
-                assignment={assignmentDetails}
-                student={selectedStudent}
-              />
+            {details ? (
+              <SubmissionDetails details={details} student={selectedStudent} />
             ) : (
               <div className="flex-grow flex flex-col items-center justify-center text-gray-400">
                 <FaUserCircle className="text-9xl mb-4" /> {/* Big icon */}

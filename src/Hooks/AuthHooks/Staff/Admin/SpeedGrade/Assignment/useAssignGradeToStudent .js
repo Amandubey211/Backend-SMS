@@ -2,51 +2,50 @@ import { useState, useCallback } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
-import { baseUrl } from "../../../../../config/Common";
+import { baseUrl } from "../../../../../../config/Common";
 
-const useGetAssignedStudents = () => {
+const useAssignGradeToStudent = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [students, setStudents] = useState([]); // Local state for students
   const role = useSelector((store) => store.Auth.role);
 
-  const fetchAssignedStudents = useCallback(
-    async (assignmentId) => {
+  const assignGrade = useCallback(
+    async ({ studentId, assignmentId, grade, attemptDate, status }) => {
       setLoading(true);
       setError(null);
       try {
         const token = localStorage.getItem(`${role}:token`);
-        const response = await axios.get(
-          `${baseUrl}/admin/speed_grade/students/${assignmentId}`,
+        const response = await axios.put(
+          `${baseUrl}/admin/speed_grade/grade`,
+          { studentId, assignmentId, grade, attemptDate, status },
           {
             headers: { Authentication: token },
           }
         );
 
         if (response.data.success) {
-          setStudents(response.data.data); // Store the students in local state
+          toast.success("Student graded successfully");
           return response.data.data;
         } else {
           toast.error(
-            response.data.message ||
-              "Failed to fetch students. Please try again."
+            response.data.message || "Failed to assign grade. Please try again."
           );
-          return [];
+          return null;
         }
       } catch (err) {
         const errorMessage =
-          err.response?.data?.message || "Failed to fetch students";
+          err.response?.data?.message || "Failed to assign grade";
         toast.error(errorMessage);
         setError(errorMessage);
-        return [];
+        return null;
       } finally {
         setLoading(false);
       }
     },
-    [baseUrl, role]
+    [role]
   );
 
-  return { loading, error, students, fetchAssignedStudents };
+  return { loading, error, assignGrade };
 };
 
-export default useGetAssignedStudents;
+export default useAssignGradeToStudent;

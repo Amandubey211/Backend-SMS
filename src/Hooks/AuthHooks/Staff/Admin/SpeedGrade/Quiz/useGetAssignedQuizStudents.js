@@ -2,45 +2,43 @@ import { useState, useCallback } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
-import { baseUrl } from "../../../../../config/Common";
+import { baseUrl } from "../../../../../../config/Common";
 
-const useGetStudentAssignment = () => {
+const useGetAssignedQuizStudents = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [assignmentDetails, setAssignmentDetails] = useState(null);
+  const [students, setStudents] = useState([]);
   const role = useSelector((store) => store.Auth.role);
 
-  const fetchStudentAssignment = useCallback(
-    async (studentId, assignmentId) => {
-      console.log(studentId, assignmentId, "sdfsdfxxxxxxxxxx");
+  const fetchAssignedStudents = useCallback(
+    async (quizId) => {
       setLoading(true);
       setError(null);
       try {
         const token = localStorage.getItem(`${role}:token`);
         const response = await axios.get(
-          `${baseUrl}/admin/speed_grade/assignment`,
+          `${baseUrl}/admin/speed_grade/quiz/${quizId}`,
           {
             headers: { Authentication: token },
-            params: { studentId, assignmentId },
           }
         );
 
         if (response.data.success) {
-          setAssignmentDetails(response.data.data); // Store the assignment details in local state
+          setStudents(response.data.data);
           return response.data.data;
         } else {
           toast.error(
             response.data.message ||
-              "Failed to fetch assignment details. Please try again."
+              "Failed to fetch students. Please try again."
           );
-          return null;
+          return [];
         }
       } catch (err) {
         const errorMessage =
-          err.response?.data?.message || "Failed to fetch assignment details";
-        // toast.error(errorMessage);
+          err.response?.data?.message || "Failed to fetch students";
+        toast.error(errorMessage);
         setError(errorMessage);
-        return null;
+        return [];
       } finally {
         setLoading(false);
       }
@@ -48,7 +46,7 @@ const useGetStudentAssignment = () => {
     [baseUrl, role]
   );
 
-  return { loading, error, assignmentDetails, fetchStudentAssignment };
+  return { loading, error, students, fetchAssignedStudents };
 };
 
-export default useGetStudentAssignment;
+export default useGetAssignedQuizStudents;

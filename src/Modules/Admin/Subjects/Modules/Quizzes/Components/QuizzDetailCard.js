@@ -4,7 +4,7 @@ import AssignmentDetail from "../../../Component/AssignmentDetail";
 import ButtonsGroup from "../../../Component/ButtonsGroup";
 import SpeedGradeButton from "../../../Component/SpeedGradeButton";
 
-const QuizzDetailCard = ({ quiz, onRefresh }) => {
+const QuizzDetailCard = ({ quiz, onRefresh, isPublish }) => {
   const quizDetails = [
     {
       label: "Quiz Point",
@@ -63,7 +63,13 @@ const QuizzDetailCard = ({ quiz, onRefresh }) => {
       <p className="text-center text-green-500 italic font-semibold pb-3 border-b">
         Submitted Students : 50/100{" "}
       </p>
-      <SpeedGradeButton />
+      <SpeedGradeButton
+        type="Quiz"
+        sgid={quiz?._id}
+        name={quiz?.name}
+        isPublish={isPublish}
+      />
+
       <div className="ps-3 ">
         {quizDetails.map((detail, index) => {
           if (detail.type === "quizz") {

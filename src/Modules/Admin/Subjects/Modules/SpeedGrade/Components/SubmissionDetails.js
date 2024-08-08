@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { AiOutlineFileText } from "react-icons/ai";
 import { FaRegComment, FaFileAlt } from "react-icons/fa";
 import { IoCalendarOutline } from "react-icons/io5";
@@ -8,9 +8,11 @@ import { RiFileWord2Line } from "react-icons/ri";
 import AddRubricModal from "../../Rubric/Components/AddRubricModal";
 import Sidebar from "../../../../../../Components/Common/Sidebar";
 import AddNewCriteriaForm from "../../Rubric/Components/AddNewCriteriaForm";
-import useAssignGradeToStudent from "../../../../../../Hooks/AuthHooks/Staff/Admin/SpeedGrade/useAssignGradeToStudent ";
+import { useParams } from "react-router-dom";
+import useAssignQuizGrade from "../../../../../../Hooks/AuthHooks/Staff/Admin/SpeedGrade/Quiz/useAssignGradeToStudent";
+import useAssignGradeToStudent from "../../../../../../Hooks/AuthHooks/Staff/Admin/SpeedGrade/Assignment/useAssignGradeToStudent ";
 
-const SubmissionDetails = ({ assignment, student }) => {
+const SubmissionDetails = ({ details, student }) => {
   const [isModalOpen, setModalOpen] = useState(false);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [criteriaList, setCriteriaList] = useState([]);
@@ -18,11 +20,26 @@ const SubmissionDetails = ({ assignment, student }) => {
   const [grade, setGrade] = useState(0);
   const [attemptDate, setAttemptDate] = useState("");
   const [status, setStatus] = useState("Missing");
+  const { type } = useParams();
 
-  const { loading, error, assignGrade } = useAssignGradeToStudent();
+  const {
+    loading: assignGradeLoading,
+    error: assignGradeError,
+    assignGrade,
+  } = useAssignGradeToStudent();
 
-  const { dueDate, points } = assignment.assignmentId;
-  const { content, comments, files } = assignment;
+  const {
+    loading: assignQuizGradeLoading,
+    error: assignQuizGradeError,
+    assignQuizGrade,
+  } = useAssignQuizGrade();
+
+  const loading =
+    type === "Assignment" ? assignGradeLoading : assignQuizGradeLoading;
+  const error = type === "Assignment" ? assignGradeError : assignQuizGradeError;
+
+  const { dueDate, points, content, comments, files } =
+    details?.assignmentId || details?.quizId || {};
   const wordCount = content ? content.split(/\s+/).length : 0;
   const today = new Date();
   const due = new Date(dueDate);
@@ -34,18 +51,18 @@ const SubmissionDetails = ({ assignment, student }) => {
   const daysLabelClass = daysLeft
     ? "text-green-500 bg-green-100"
     : "text-red-500 bg-red-100";
-  const commentCount = comments.length;
+  const commentCount = comments ? comments.length : 0;
 
   useEffect(() => {
-    // Reset state variables when a new assignment is selected
-    setGrade(assignment.grade || 0);
+    // Reset state variables when new details are selected
+    setGrade(details.grade || 0);
     setAttemptDate(
-      assignment.submittedAt
-        ? new Date(assignment.submittedAt).toISOString().split("T")[0]
+      details.submittedAt
+        ? new Date(details.submittedAt).toISOString().split("T")[0]
         : ""
     );
-    setStatus(assignment.status || "Missing");
-  }, [assignment]);
+    setStatus(details.status || "Missing");
+  }, [details]);
 
   const handleViewRubric = () => {
     setModalOpen(true);
@@ -55,18 +72,40 @@ const SubmissionDetails = ({ assignment, student }) => {
     setSidebarOpen(true);
   };
 
-  const handleSubmitGrade = async () => {
-    const result = await assignGrade({
+  const handleSubmitGrade = useCallback(async () => {
+    const gradeData = {
       studentId: student._id,
-      assignmentId: assignment._id,
+      assignmentId: details._id,
       grade,
       attemptDate,
       status,
-    });
+    };
+
+    if (type === "Assignment") {
+      gradeData.assignmentId = details._id;
+    } else if (type === "Quiz") {
+      gradeData.quizId = details._id;
+      gradeData.score = grade; // use score instead of grade for quizzes
+    }
+
+    const result =
+      type === "Assignment"
+        ? await assignGrade(gradeData)
+        : await assignQuizGrade(gradeData);
+
     if (result) {
       // Handle success (e.g., show a success message or update state)
     }
-  };
+  }, [
+    assignGrade,
+    assignQuizGrade,
+    details._id,
+    grade,
+    attemptDate,
+    status,
+    student._id,
+    type,
+  ]);
 
   const renderWordCount = () => {
     if (wordCount === 0) {
@@ -264,6 +303,7 @@ const SubmissionDetails = ({ assignment, student }) => {
       </div>
 
       <div className="p-4 border-t border-gray-200">
+        {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
         <div className="space-y-2 flex-col flex justify-center items-center mb-2">
           <button className="w-48 p-1 border border-purple-300 text-green-600 rounded-full hover:bg-purple-50 focus:outline-none flex items-center justify-center space-x-2">
             <FaRegComment className="inline-block" />
@@ -280,10 +320,10 @@ const SubmissionDetails = ({ assignment, student }) => {
       </div>
 
       <AddRubricModal
-        type="assignment"
+        type={type === "Assignment" ? "assignment" : "quiz"}
         isOpen={isModalOpen}
         onClose={() => setModalOpen(false)}
-        assignmentId={assignment._id}
+        assignmentId={details._id}
         criteriaList={criteriaList}
         setCriteriaList={setCriteriaList}
         setExistingRubricId={setExistingRubricId}

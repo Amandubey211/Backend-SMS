@@ -12,7 +12,7 @@ const MainSection = () => {
   const [activeTab, setActiveTab] = useState("instructions");
   const { qid } = useParams();
   const { error, fetchQuizById, loading, quiz } = useFetchQuizById();
-
+  console.log(quiz);
   useEffect(() => {
     fetchQuizById(qid); // Initial fetch
   }, [qid, fetchQuizById]);
@@ -52,7 +52,11 @@ const MainSection = () => {
         </Tabs>
       </div>
       <div className="w-[30%]">
-        <QuizzDetailCard quiz={quiz} onRefresh={onRefresh} />
+        <QuizzDetailCard
+          quiz={quiz}
+          onRefresh={onRefresh}
+          isPublish={quiz?.publish}
+        />
       </div>
     </div>
   );
