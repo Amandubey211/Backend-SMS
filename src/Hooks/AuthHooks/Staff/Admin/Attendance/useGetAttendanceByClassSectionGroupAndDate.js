@@ -11,7 +11,11 @@ const useGetAttendanceByClassSectionGroupAndDate = () => {
   const cache = useRef({});
 
   const role = useSelector((store) => store.Auth.role);
-
+  const formatDate = (date) => {
+    const offset = date.getTimezoneOffset();
+    const adjustedDate = new Date(date.getTime() - offset * 60 * 1000);
+    return adjustedDate.toISOString().split("T")[0];
+  };
 
   const fetchAttendance = useCallback(
     async (classId, sectionId, groupId, month, year) => {
@@ -21,14 +25,14 @@ const useGetAttendanceByClassSectionGroupAndDate = () => {
       try {
         const token = localStorage.getItem(`${role}:token`);
         const response = await axios.get(
-          `${baseUrl}/api/teacher/attendance/get`,
+          `${baseUrl}/api/teacher/attendance/getStudentMonthList/${classId}`,
           {
             headers: { Authentication: token },
-            params: { classId, sectionId, groupId, month, year },
+            params: { sectionId, groupId, month, year },
           }
         );
         if (response.data) {
-          setAttendanceData(response.data);
+          setAttendanceData(response.data?.attendanceList);
         }
       } catch (err) {
         const errorMessage =
@@ -42,16 +46,19 @@ const useGetAttendanceByClassSectionGroupAndDate = () => {
   );
 
   const fetchAttendanceByClass = useCallback(
-    async (classId, date) => {
+    async (classId, date, sectionId, groupId) => {
       setLoading(true);
       setError(null);
+      console.log("classId", classId);
+      console.log("date", date);
+      const formatedDate = formatDate(date)
       try {
         const token = localStorage.getItem(`${role}:token`);
         const response = await axios.get(
           `${baseUrl}/api/teacher/attendance/getStudentList/${classId}`,
           {
             headers: { Authentication: token },
-            params: { date },
+            params: { date: formatedDate, sectionId, groupId },
           }
         );
         if (response.data) {
@@ -65,6 +72,7 @@ const useGetAttendanceByClassSectionGroupAndDate = () => {
       }
     }, [role, baseUrl]
   )
+  console.log("attendanceDtaa", attendanceData);
 
 
   return { loading, error, attendanceData, fetchAttendance, fetchAttendanceByClass };

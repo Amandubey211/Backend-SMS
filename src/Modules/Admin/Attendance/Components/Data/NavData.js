@@ -7,7 +7,6 @@ import { FaSquareXmark } from "react-icons/fa6";
 export const navData = [
   {
     label: " Total Students",
-    value: "106,74",
     bgColor: "bg-[#f6ecf6]",
     textColor: "text-purple-700",
     icon: <FaUsers className="text-[#564FFD]" />,
@@ -16,7 +15,6 @@ export const navData = [
   {
     label: "Present Today",
     // url: "/teachers",
-    value: "674",
     bgColor: "bg-[#e9f8eb]",
     textColor: "text-green-700",
     icon: <IoCheckbox className="text-[#22c55e]" />,
@@ -24,7 +22,6 @@ export const navData = [
   },
   {
     label: "Absent Today",
-    value: "167",
     bgColor: "bg-[#f7e5e5]",
     textColor: "black",
     icon: <FaSquareXmark className="text-[#EA2058]" />,
@@ -32,7 +29,6 @@ export const navData = [
   },
   {
     label: "Leave Today",
-    value: "20",
     bgColor: "bg-[#f7ecf4]",
     textColor: "text-pink-700",
     icon: <ImExit className="text-[#EA2058]" />,
