@@ -33,7 +33,7 @@ function StudentList({ onSelectStudent }) {
   );
 
   return (
-    <div>
+    <div className="flex flex-col h-full">
       <div className="mb-4">
         <div className="relative">
           <input
@@ -56,7 +56,7 @@ function StudentList({ onSelectStudent }) {
       {loading && <Spinner />}
       {error && <p className="text-center text-red-500">{error}</p>}
       {!loading && !filteredStudents.length && <NoDataFound title="Students" />}
-      <div className="space-y-2">
+      <div className="flex-grow overflow-y-auto space-y-2">
         {filteredStudents.map((student, index) => (
           <div
             key={student._id}

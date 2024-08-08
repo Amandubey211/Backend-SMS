@@ -10,7 +10,13 @@ import AddNewCriteriaForm from "../../Rubric/Components/AddNewCriteriaForm";
 import Spinner from "../../../../../../Components/Common/Spinner";
 import NoDataFound from "../../../../../../Components/Common/NoDataFound";
 
-const AssignmentDetailCard = ({ assignment, loading, error, onRefresh }) => {
+const AssignmentDetailCard = ({
+  assignment,
+  loading,
+  error,
+  onRefresh,
+  isPublish,
+}) => {
   const [isModalOpen, setModalOpen] = useState(false);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [criteriaList, setCriteriaList] = useState([]);
@@ -49,7 +55,13 @@ const AssignmentDetailCard = ({ assignment, loading, error, onRefresh }) => {
         data={assignment}
         onRefresh={onRefresh} // Pass the refresh callback
       />
-      <SpeedGradeButton sgid={assignment._id} name={assignment.name} />
+
+      <SpeedGradeButton
+        sgid={assignment._id}
+        name={assignment.name}
+        isPublish={isPublish}
+      />
+
       <AssignmentDetail
         label="Assignment Points"
         value={`${points || "N/A"} Points`}
