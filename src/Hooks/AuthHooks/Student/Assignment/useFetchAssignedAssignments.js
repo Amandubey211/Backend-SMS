@@ -1,10 +1,14 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import axios from "axios";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { baseUrl } from "../../../../config/Common";
 import { useParams } from "react-router-dom";
+import { setAssignment } from "../../../../Redux/Slices/Student/SubjectSlice";
 
 const useFetchAssignedAssignments = (sectionId) => {
+  const { selectedClass, selectedSection, selectedSubject } = useSelector((state) => state.Common);
+  const dispatch = useDispatch();
+
   const [assignments, setAssignments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -28,7 +32,9 @@ const useFetchAssignedAssignments = (sectionId) => {
 
     try {
       const response = await axios.get(
-        `${baseUrl}/student/studentAssignment/class/${cid}/section/${sectionId}`, {
+        // const response = await fetch(`http://localhost:8080/student/studentAssignment/class/${selectedClass}/section/${selectedSection}?subjectId=${selectedSubject}`, {
+
+        `${baseUrl}/student/studentAssignment/class/${cid}/section/${sectionId}?subjectId=${selectedSubject}`, {
           headers: {
             Authentication: token,
           },
@@ -42,6 +48,8 @@ const useFetchAssignedAssignments = (sectionId) => {
 
       if (response.data.success && response.data.data) {
         setAssignments(response.data.data);
+        dispatch(setAssignment(response.data.data));
+
         localStorage.setItem(cacheKey, JSON.stringify(response.data.data)); // Cache the data
       } else {
         throw new Error(response.data.message || "Failed to fetch assignments");

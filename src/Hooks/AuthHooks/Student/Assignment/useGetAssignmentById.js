@@ -1,0 +1,52 @@
+import { useState, useCallback } from "react";
+import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
+import { baseUrl } from "../../../../../config/Common";
+// import { setAssignment } from "../../../../../Redux/Slices/Admin/SubjectSlice";
+
+const useGetAssignmentById = () => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [assignment, setAssignment] = useState(null);
+
+  const [submissionData, setSubmissionData] = useState(null);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+
+
+  //   const dispatch = useDispatch();
+  const { aid } = useParams();
+  const role = useSelector((store) => store.Auth.role);
+  
+
+  const fetchAssignmentById = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const token = localStorage.getItem(`${role}:token`);
+      const response = await axios.get(`${baseUrl}/student/studentAssignment/${aid}`, {
+        headers: {
+          Authentication: token,
+        },
+      });
+      console.log(response.data);
+      if (response.data && response.data.success) {
+        setAssignment(response.data.assignment);
+        // dispatch(setAssignment(response.data.assignment));
+        setSubmissionData(response.data.submission || null);
+        setIsSubmitted(!!response.data.submission);
+      } else {
+        setError(response.data.msg || "Failed to fetch assignment.");
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || "Error in fetching assignment");
+    } finally {
+      setLoading(false);
+    }
+  }, [role, baseUrl]);
+
+  return { loading, error, assignment,submissionData,isSubmitted, fetchAssignmentById };
+};
+
+export default useGetAssignmentById;

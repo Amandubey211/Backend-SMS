@@ -9,6 +9,8 @@ const List = ({ data, icon, title, type, loading, error }) => {
   const { cid, sid } = useParams();
   const [searchQuery, setSearchQuery] = useState("");
   console.log(data[0]?._id, "sdfsdf");
+  console.log(data, "data for assignment");
+
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
   };
@@ -63,12 +65,9 @@ const List = ({ data, icon, title, type, loading, error }) => {
         <ul className="border-t p-4">
           {filteredData.map((item) => (
             <NavLink
-              to={
-                type === "Assignment"
-                  ? `/student_class/${cid}/${sid}/assignments/${item?.assignmentId}/view`
-                  : `/student_class/${cid}/${sid}/quizzes/${item?._id}/view`
-              }
-              key={item._id || item.assignmentId}
+              // to={`/student_class/${cid}/section/${sid}/assignments/${item.assignmentId}/view`}
+              to={`/student_class/${cid}/${sid}/assignments/${item.assignmentId}/view`}
+              key={item.assignmentId}
               className="flex items-center mb-3 gap-3 p-1 rounded-lg"
             >
               <div className="text-green-600 p-2 border rounded-full ">
