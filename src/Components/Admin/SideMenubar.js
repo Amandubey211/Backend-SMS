@@ -55,7 +55,7 @@ const SideMenubar = () => {
 
   return (
     <nav
-      className={`fixed top-0 left-0 bottom-0 transition-all duration-300 p-1 px-3 z-10 border-r flex flex-col bg-white ${
+      className={`fixed top-0 left-0 bottom-0 transition-all duration-300 p-1 px-3 z-30 border-r flex flex-col bg-white ${
         isOpen ? "w-[15%]" : "w-[7%]"
       }`}
       aria-label="Sidebar"
