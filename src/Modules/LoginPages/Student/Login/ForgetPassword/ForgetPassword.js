@@ -1,15 +1,18 @@
 import React, { useState } from 'react';
 import Logo from '../../../../../Components/Common/Logo';
-import {useForgotPassword} from '../../../../../Hooks/AuthHooks/Student/useResetPassword';
+import { useForgotPassword } from '../../../../../Hooks/AuthHooks/Student/useResetPassword';
 import { LuLoader } from 'react-icons/lu';
 import { NavLink, useNavigate } from 'react-router-dom';
 import Layout from '../../../../../Components/Common/Layout';
+import { useLocation } from 'react-router-dom';
 
 const ForgetPassword = () => {
   const [email, setEmail] = useState('');
-  const { loading,sendForgotPassword } = useForgotPassword();
+  const { loading, sendForgotPassword } = useForgotPassword();
   const navigate = useNavigate();
-
+  const location = useLocation();
+  const { role } = location.state;
+  
   const handleChange = (e) => {
     setEmail(e.target.value);
   };
@@ -17,7 +20,7 @@ const ForgetPassword = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await sendForgotPassword({ email });
+      await sendForgotPassword({ email, role });
       // navigate('/reset_password');
     } catch (error) {
       console.error('Failed to reset password:', error);

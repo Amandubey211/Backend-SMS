@@ -6,10 +6,10 @@ import { forgotPassword, resetPassword as apiResetPassword } from './useForgotPa
 export const useForgotPassword = () => {
   const [loading, setLoading] = useState(false);
 
-  const sendForgotPassword = async ({ email }) => {
+  const sendForgotPassword = async ({ email, role }) => {
     setLoading(true);
     try {
-      const response = await forgotPassword(email);
+      const response = await forgotPassword(email, role);
       toast.success('Check your email to reset your password!');
       return response.data;
     } catch (error) {
