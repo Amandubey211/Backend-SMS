@@ -49,7 +49,6 @@ const MainSection = () => {
   const handleSidebarSubmit = (e) => {
     e.preventDefault();
     if (selectedTeacher) {
-      
       toast.success(`Teacher details updated successfully!`);
       setIsSidebarOpen(false);
     }
@@ -91,7 +90,12 @@ const MainSection = () => {
         ))}
       </div>
       {/* Sidebar for editing teacher details */}
-      <Sidebar isOpen={isSidebarOpen} title="Update Assigned Teacher" onClose={() => setIsSidebarOpen(false)} width="30%">
+      <Sidebar
+        isOpen={isSidebarOpen}
+        title="Update Assigned Teacher"
+        onClose={() => setIsSidebarOpen(false)}
+        width="30%"
+      >
         <form className="flex flex-col h-full" onSubmit={handleSidebarSubmit}>
           <div className="bg-white rounded-lg p-4 w-full max-w-md">
             <div className="mb-4">
@@ -134,8 +138,9 @@ const MainSection = () => {
           <div className="mt-auto mb-8">
             <button
               type="submit"
-              className={`w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600 ${loading ? "opacity-50 cursor-not-allowed" : ""
-                }`}
+              className={`w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600 ${
+                loading ? "opacity-50 cursor-not-allowed" : ""
+              }`}
               disabled={loading}
             >
               {loading ? "Assigning..." : "Update Instructor"}

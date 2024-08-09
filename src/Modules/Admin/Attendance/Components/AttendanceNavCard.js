@@ -11,7 +11,7 @@ const AttendanceNavCard = ({
 }) => {
   return (
     <div
-      onClick={onClick}
+      //onClick={onClick}
       className={`flex-1 p-3 px-5 rounded-lg shadow-md ${bgColor} hover:shadow-lg transition-shadow duration-200 cursor-pointer`}
     >
       <div className="flex gap-4 items-center">

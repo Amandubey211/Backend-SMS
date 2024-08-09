@@ -6,7 +6,7 @@ const AssignmentDetails = ({ student, details, type }) => {
     return null; // Return null if no student or details are selected
   }
 
-  const { content, studentPoints, assignmentId, quizId } = details;
+  const { content, grade, score, assignmentId, quizId } = details;
   const { name, points, dueDate, questions, totalPoints } =
     assignmentId || quizId || {};
 
@@ -25,7 +25,7 @@ const AssignmentDetails = ({ student, details, type }) => {
         <div className="text-right">
           <p className="text-gray-500 mb-1">Points</p>
           <p className="text-green-500 font-bold text-md">
-            {studentPoints || 0}/{type === "Quiz" ? totalPoints : points}
+            { type === "Quiz" ? score :grade || 0}/{type === "Quiz" ? totalPoints : points}
           </p>
         </div>
       </div>

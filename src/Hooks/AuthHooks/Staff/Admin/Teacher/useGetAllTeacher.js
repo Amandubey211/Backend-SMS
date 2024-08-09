@@ -11,6 +11,7 @@ const useGetAllTeachers = () => {
   const [error, setError] = useState(null);
   const role = useSelector((store) => store.Auth.role);
   const dispatch = useDispatch();
+  
   const fetchTeachers = async () => {
     try {
       const token = localStorage.getItem(`${role}:token`);
@@ -19,6 +20,7 @@ const useGetAllTeachers = () => {
       });
       // setTeachers(response.data.data);
       dispatch(setTeachers(response.data.data));
+      // createSalary('unpaid','pay now')
     } catch (err) {
       setError(err.message);
     } finally {

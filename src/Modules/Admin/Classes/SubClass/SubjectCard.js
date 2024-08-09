@@ -7,13 +7,13 @@ import { setSelectedSubject } from "../../../../Redux/Slices/Common/CommonSlice"
 import Icon1 from "../../../../Assets/ClassesAssets/SubClassAssets/SubjectIcons/image1.png";
 import { MdOutlineModeEdit } from "react-icons/md";
 import { RiDeleteBin6Line } from "react-icons/ri";
+import { CiUser } from "react-icons/ci";
 import useCreateSubject from "../../../../Hooks/AuthHooks/Staff/Admin/useCreateSubject";
 import DeleteModal from "../../../../Components/Common/DeleteModal";
 
 const SubjectCard = ({ data, backgroundColor, Class, onEdit, subjectId }) => {
   const dispatch = useDispatch();
   const { deleteSubject, loading } = useCreateSubject();
-
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleDelete = async () => {
@@ -61,7 +61,7 @@ const SubjectCard = ({ data, backgroundColor, Class, onEdit, subjectId }) => {
               : "bg-pink-50 text-gray-600"
           }`}
         >
-          {data.isPublished ? "Publish" : "Unpublished"}
+          {data.isPublished ? "Published" : "Unpublished"}
         </button>
       </div>
       <NavLink
@@ -69,7 +69,7 @@ const SubjectCard = ({ data, backgroundColor, Class, onEdit, subjectId }) => {
         onClick={() => dispatch(setSelectedSubject(data.name))}
         className="block"
       >
-        <h2 className="text-xl font-bold capitalize text-white w-[65%] transition-colors duration-300 ">
+        <h2 className="text-xl font-bold capitalize text-white w-[65%] transition-colors duration-300">
           {data.name}
         </h2>
         <div className="flex items-center mt-2 text-white">
@@ -85,17 +85,18 @@ const SubjectCard = ({ data, backgroundColor, Class, onEdit, subjectId }) => {
         </div>
       </NavLink>
       <div className="flex items-center mt-12">
-        <img
-          src={
-            data.teacherImage ||
-            "https://avatars.githubusercontent.com/u/109097090?v=4"
-          }
-          alt="teacher"
-          className="w-12 h-12 rounded-full transition-transform duration-300 transform hover:scale-110"
-        />
+        {data.teacherImage ? (
+          <img
+            src={data.teacherImage}
+            alt="teacher"
+            className="w-12 h-12 rounded-full transition-transform duration-300 transform hover:scale-110"
+          />
+        ) : (
+          <CiUser className="w-10 h-10 bg-transparent text-white " />
+        )}
         <div className="ml-3 capitalize">
           <p className="text-white font-semibold">
-            {data.teacherName || "Aman Dubey"}
+            {data.teacherName || "No Instructor Assigned"}
           </p>
           <p className="text-white text-sm">{data.teacherRole || "Teacher"}</p>
         </div>

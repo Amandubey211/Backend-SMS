@@ -86,6 +86,7 @@ const ParentForm = () => {
             <div className="mb-6 text-right">
               <NavLink
                 to="/forget_password"
+                state={{ role: "parent" }}
                 className="text-sm text-indigo-600 hover:text-indigo-900"
               >
                 Forgot Password

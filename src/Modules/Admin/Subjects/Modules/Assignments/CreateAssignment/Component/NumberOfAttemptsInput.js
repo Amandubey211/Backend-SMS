@@ -1,8 +1,10 @@
-import React from 'react';
+import React from "react";
 
 const NumberOfAttemptsInput = ({ numberOfAttempts, handleChange }) => (
   <>
-    <label className="block mb-2 text-sm font-medium text-gray-700">Number of Attempts</label>
+    <label className="block mb-2 text-sm font-medium text-gray-700">
+      Number of Attempts
+    </label>
     <input
       type="number"
       name="numberOfAttempts"

@@ -1,18 +1,38 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { navData } from "./Data/NavData";
 import AttendanceNavCard from "./AttendanceNavCard";
 import toast from "react-hot-toast";
 import { NavLink, useParams } from "react-router-dom";
+import useGetAttendanceByClassSectionGroupAndDate from "../../../../Hooks/AuthHooks/Staff/Admin/Attendance/useGetAttendanceByClassSectionGroupAndDate";
 
 const NavSection = ({ onFilterChange }) => {
   const [selectedFilter, setSelectedFilter] = useState("all");
-const {cid} = useParams()
+  const { fetchAttendanceStats, attendanceStat } = useGetAttendanceByClassSectionGroupAndDate()
+  const { cid } = useParams()
   const handleFilterChange = (filter) => {
     toast.success(filter)
     setSelectedFilter(filter);
     onFilterChange(filter);
   };
-  console.log(selectedFilter);
+  const dataMapping = {
+    "Total Students": "totalStudents",
+    "Present Today": "totalPresent",
+    "Absent Today": "totalAbsent",
+    "Leave Today": "totalLeave",
+  };
+
+  const mappedData = navData.map(item => {
+    const key = dataMapping[item.label.trim()];
+    return {
+      ...item,
+      value: attendanceStat[key] || 0,
+    };
+  });
+
+  useEffect(() => {
+    fetchAttendanceStats(cid)
+  }, [])
+  
   return (
     <div>
       <div className="flex items-center justify-between mb-3 ">
@@ -25,7 +45,7 @@ const {cid} = useParams()
       </div>
 
       <div className="flex space-x-4">
-        {navData.map((item) => (
+        {mappedData?.map((item) => (
           <AttendanceNavCard
             key={item.label}
             label={item.label}
