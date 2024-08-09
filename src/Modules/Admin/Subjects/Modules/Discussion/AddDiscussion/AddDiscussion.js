@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useLocation, useParams, useNavigate } from "react-router-dom";
 import Layout from "../../../../../../Components/Common/Layout";
 import SideMenubar from "../../../../../../Components/Admin/SideMenubar";
@@ -9,6 +9,7 @@ import FileInput from "./Components/FileInput";
 import EditorComponent from "../../../Component/AdminEditor";
 import useCreateDiscussion from "../../../../../../Hooks/AuthHooks/Staff/Admin/Disscussion/useCreateDiscussion";
 import useUpdateDiscussion from "../../../../../../Hooks/AuthHooks/Staff/Admin/Disscussion/useUpdateDiscussion";
+import Spinner from "../../../../../../Components/Common/Spinner";
 
 const AddDiscussion = () => {
   const { state } = useLocation();
@@ -25,7 +26,7 @@ const AddDiscussion = () => {
   const [formState, setFormState] = useState({
     assignTo: state?.discussion?.assignTo || "",
     dueDate: state?.discussion?.dueDate || "",
-    section: state?.discussion?.sectionId || "",
+    sectionId: state?.discussion?.sectionId || "",
     groupId: state?.discussion?.groupId || "",
     option: state?.discussion?.allowThreadedReplies
       ? "threadedReplies"
@@ -71,7 +72,7 @@ const AddDiscussion = () => {
     }));
   };
 
-  const handleSave = async () => {
+  const handleSave = async (publish) => {
     const discussionData = {
       title: assignmentName,
       content: editorContent,
@@ -80,13 +81,14 @@ const AddDiscussion = () => {
       allowThreadedReplies: formState.option === "threadedReplies",
       mustPostBeforeSeeingReplies: formState.option === "postBeforeReplies",
       assignTo: formState.assignTo,
-      sectionId: formState.assignTo === "Section" ? formState.section : null,
+      sectionId: formState.assignTo === "Section" ? formState.sectionId : null,
       groupId: formState.assignTo === "Group" ? formState.groupId : null,
       dueDate: formState.dueDate,
       availableFrom: formState.availableFrom,
       availableUntil: formState.availableUntil,
       attachment: file,
       classId: cid,
+      publish, // Add publish flag here
     };
 
     if (isEditing) {
@@ -141,12 +143,16 @@ const AddDiscussion = () => {
                 />
               </div>
             </div>
-            {loading && <p role="status">Loading...</p>}
-            {error && (
+            {loading && (
+              <p role="status">
+                <Spinner />
+              </p>
+            )}
+            {/* {error && (
               <p role="alert" className="text-red-400 text-current my-4">
                 {error}
               </p>
-            )}
+            )} */}
           </>
         </div>
       </div>

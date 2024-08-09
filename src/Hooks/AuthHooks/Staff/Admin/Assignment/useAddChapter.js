@@ -5,17 +5,17 @@ import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { baseUrl } from "../../../../../config/Common";
 
-const useAddChapter = () => {
+const useAddChapter = (fetchModules) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
 
   const role = useSelector((store) => store.Auth.role);
-  
+
   const { sid } = useParams(); // Assuming subjectId and moduleId are in the URL params
 
   const addChapter = useCallback(
-    async (name, thumbnail,moduleId) => {
+    async (name, thumbnail, moduleId) => {
       setLoading(true);
       setError(null);
       setSuccess(null);
@@ -43,6 +43,7 @@ const useAddChapter = () => {
         if (response.data && response.data.success) {
           setSuccess(response.data.msg);
           toast.success(response.data.msg);
+          fetchModules(); // Refetch modules after adding a chapter
         } else {
           toast.error(response.data.msg || "Failed to add chapter.");
         }
@@ -55,7 +56,7 @@ const useAddChapter = () => {
         setLoading(false);
       }
     },
-    [role, baseUrl, sid]
+    [role, baseUrl, sid, fetchModules]
   );
 
   return { loading, error, success, addChapter };

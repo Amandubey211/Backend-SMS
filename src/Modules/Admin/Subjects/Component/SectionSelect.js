@@ -9,13 +9,18 @@ const selectSections = createSelector(
   (sectionsList) => sectionsList
 );
 
-const SectionSelect = ({ section, handleChange, group, assignTo }) => {
+const SectionSelect = ({ sectionId, handleChange, groupId, assignTo }) => {
   const { error, fetchSection, loading } = useFetchSection();
   const { cid } = useParams();
   const AllSections = useSelector(selectSections);
-  const groups = section
-    ? AllSections.find((sec) => sec._id === section)?.groups
-    : AllSections.reduce((acc, sec) => acc.concat(sec.groups), []);
+  const groups = useSelector((store) => store.Class.groupsList);
+  console.log("AllSections", AllSections);
+  console.log("groups", groups);
+
+
+  // const groups = section
+  //   ? AllSections.find((sec) => sec._id === section)?.groups
+  //   : AllSections.reduce((acc, sec) => acc.concat(sec.groups), []);
 
   useEffect(() => {
     if (!AllSections.length) {
@@ -39,8 +44,8 @@ const SectionSelect = ({ section, handleChange, group, assignTo }) => {
             Section
           </label>
           <select
-            value={section}
-            name="section"
+            value={sectionId}
+            name="sectionId"
             onChange={handleChange}
             className="block w-full mb-4 p-2 border border-gray-300 rounded-lg"
           >
@@ -57,30 +62,12 @@ const SectionSelect = ({ section, handleChange, group, assignTo }) => {
         // if section needs to be removed , just remove it from below
         <>
           <div className="mt-4">
-            <label className="block mb-2 text-sm font-medium text-gray-700">
-              Section
-            </label>
-            <select
-              value={section}
-              name="section"
-              onChange={handleChange}
-              className="block w-full mb-4 p-2 border border-gray-300 rounded-lg"
-            >
-              <option value="">Choose Section</option>
-              {AllSections.map((section) => (
-                <option key={section._id} value={section._id}>
-                  {section.sectionName}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="mt-4">
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Group
             </label>
             <select
-              value={group}
-              name="group"
+              value={groupId}
+              name="groupId"
               onChange={handleChange}
               className="block w-full p-2 border border-gray-300 rounded-lg"
               disabled={loading}
@@ -89,6 +76,7 @@ const SectionSelect = ({ section, handleChange, group, assignTo }) => {
               {groups.map((group) => (
                 <option key={group._id} value={group._id}>
                   {group.groupName}
+                  {/* {group.name} */}
                 </option>
               ))}
             </select>

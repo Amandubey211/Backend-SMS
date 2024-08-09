@@ -6,11 +6,11 @@ import AssignToSection from "../../../Discussion/AddDiscussion/Components/Assign
 const CreateAnnouncementForm = ({
   postTo,
   availableFrom,
-  section,
+  sectionId,
   option,
   handleChange,
   groupId,
-  author
+  author,
 }) => {
   return (
     <div>
@@ -19,7 +19,7 @@ const CreateAnnouncementForm = ({
         groupId={groupId}
         assignTitle="Post To"
         assignTo={postTo}
-        section={section}
+        section={sectionId}
         handleChange={handleChange}
       />
       <div className="mb-4">

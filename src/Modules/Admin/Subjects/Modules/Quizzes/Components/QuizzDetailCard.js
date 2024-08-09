@@ -3,9 +3,8 @@ import DateDetail from "../../../Component/DateDetail";
 import AssignmentDetail from "../../../Component/AssignmentDetail";
 import ButtonsGroup from "../../../Component/ButtonsGroup";
 import SpeedGradeButton from "../../../Component/SpeedGradeButton";
-import { useParams } from "react-router-dom";
 
-const QuizzDetailCard = ({ quiz }) => {
+const QuizzDetailCard = ({ quiz, onRefresh, isPublish }) => {
   const quizDetails = [
     {
       label: "Quiz Point",
@@ -30,7 +29,6 @@ const QuizzDetailCard = ({ quiz }) => {
       value: quiz?.timeLimit ? `${quiz.timeLimit} Minutes` : "No Time Limit",
       type: "quizz",
     },
-
     {
       label: "This Quiz Is For",
       value: quiz?.assignTo || "N/A",
@@ -38,47 +36,62 @@ const QuizzDetailCard = ({ quiz }) => {
     },
     {
       label: "Student See The correct Answer",
-      value: new Date(quiz?.showAnswerDate).toLocaleDateString(),
+      value: new Date(
+        quiz?.showAnswerDate || "MM/DD/YYYY"
+      ).toLocaleDateString(),
       type: "quizz",
     },
     {
       label: "Available From",
-      value: new Date(quiz?.availableFrom).toLocaleDateString(),
+      value: quiz?.availableFrom
+        ? new Date(quiz?.availableFrom).toLocaleDateString()
+        : "N/A",
       type: "date",
     },
-
     {
       label: "Due Date",
-      value: new Date(quiz?.dueDate).toLocaleDateString(),
+      value: quiz?.dueDate
+        ? new Date(quiz?.dueDate).toLocaleDateString()
+        : "N/A",
       type: "date",
     },
- 
-    // { label: "Until", value: "02/10/2024", type: "date" }
   ];
 
   return (
     <div className="p-3 bg-white" aria-label="Quiz Card">
-      <ButtonsGroup data={quiz}  type="Quiz"  />
+      <ButtonsGroup data={quiz} type="Quiz" onRefresh={onRefresh} />
       <p className="text-center text-green-500 italic font-semibold pb-3 border-b">
         Submitted Students : 50/100{" "}
       </p>
-      <SpeedGradeButton />
-      {quizDetails.map((detail, index) => {
-        if (detail.type === "quizz") {
-          return (
-            <AssignmentDetail
-              key={index}
-              label={detail.label}
-              value={detail.value}
-            />
-          );
-        } else if (detail.type === "date") {
-          return (
-            <DateDetail key={index} label={detail.label} value={detail.value} />
-          );
-        }
-        return null;
-      })}
+      <SpeedGradeButton
+        type="Quiz"
+        sgid={quiz?._id}
+        name={quiz?.name}
+        isPublish={isPublish}
+      />
+
+      <div className="ps-3 ">
+        {quizDetails.map((detail, index) => {
+          if (detail.type === "quizz") {
+            return (
+              <AssignmentDetail
+                key={index}
+                label={detail.label}
+                value={detail.value}
+              />
+            );
+          } else if (detail.type === "date") {
+            return (
+              <DateDetail
+                key={index}
+                label={detail.label}
+                value={detail.value}
+              />
+            );
+          }
+          return null;
+        })}
+      </div>
     </div>
   );
 };

@@ -10,6 +10,7 @@ import AddBook from "../SubClass/component/AddBook";
 import TabButton from "../Subclasss/component/TabButton";
 import { baseUrl } from "../../../../config/Common";
 import { useSelector } from "react-redux";
+import DeleteConfirmatiomModal from "../../../../Components/Common/DeleteConfirmationModal";
 
 const Library = () => {
   const [filters, setFilters] = useState({ class: "", category: "" });
@@ -61,7 +62,7 @@ const Library = () => {
       (filters.category === "" || book.category === filters.category)
     );
   });
-
+ 
   return (
     <Layout title="Library | Student Diwan">
       <DashLayout>
@@ -138,6 +139,7 @@ const Library = () => {
           >
             <AddBook onupdate={fetchBooks} />
           </Sidebar>
+    
         </div>
       </DashLayout>
     </Layout>

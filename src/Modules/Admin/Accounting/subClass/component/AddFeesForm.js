@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import SingleFee from '../../MainSection/SingleFee';
 import MassFee from '../../MainSection/MassFee';
 
-const AddFeesForm = () => {
+const AddFeesForm = ({onUpdate}) => {
   const [feeType, setFeeType] = useState('single');
 
   const handleFeeTypeChange = (status) => {
@@ -51,8 +51,8 @@ const AddFeesForm = () => {
     
   </div>
       </div>
-      {feeType === 'single' && <SingleFee />}
-      {feeType === 'mass' && <MassFee />}
+      {feeType === 'single' && <SingleFee onUpdate={onUpdate} />}
+      {feeType === 'mass' && <MassFee  onUpdate={onUpdate}/>}
     </div>
   );
 };

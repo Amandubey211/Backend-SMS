@@ -15,7 +15,7 @@ const UnAssignedStudentList = () => {
   const { fetchUnassignedStudents, loading, error } =
     useGetUnassignedStudents();
   const { cid } = useParams();
-  const sections = useSelector((state) => state.Class.sectionsList); // Assuming sections list is in Redux
+  const sections = useSelector((state) => state.Class.sectionsList);
 
   useEffect(() => {
     const fetchStudents = async () => {
@@ -32,6 +32,7 @@ const UnAssignedStudentList = () => {
   const filteredStudents = unassigned.filter((student) =>
     student.firstName.toLowerCase().includes(searchQuery.toLowerCase())
   );
+  console.log("filtered students--", filteredStudents);
 
   const handleSidebarOpen = (student) => {
     setSelectedStudent(student);
@@ -56,7 +57,7 @@ const UnAssignedStudentList = () => {
     toast.error(error);
     return <div>Failed to load students</div>;
   }
-
+  
   return (
     <div className="w-80 p-4 bg-white border-r">
       <div className="mb-4">
@@ -77,20 +78,18 @@ const UnAssignedStudentList = () => {
           <li key={index} className="flex items-center justify-between py-2">
             <div className="flex items-center">
               <img
-                src={student.profile || `https://randomuser.me/api/portraits/med/${
-                  index % 2 === 0 ? "women" : "men"
-                }/${index}.jpg`}
+                src={student.profile || `https://randomuser.me/api/portraits/med/${index % 2 === 0 ? "women" : "men"
+                  }/${index}.jpg`}
                 alt={student.firstName}
                 className="w-10 h-10 rounded-full mr-3"
               />
               <div>
                 <div className="text-sm font-medium">{student.firstName}</div>
                 <div
-                  className={`text-xs ${
-                    getSectionName(student.presentSectionId).color
-                  }`}
+                  className={`text-xs ${getSectionName(student?.presentSectionId).color
+                    }`}
                 >
-                  {getSectionName(student.presentSectionId).name}
+                  {getSectionName(student?.presentSectionId).name}
                 </div>
               </div>
             </div>
@@ -111,8 +110,8 @@ const UnAssignedStudentList = () => {
         >
           <AssignStudent
             name={selectedStudent.firstName}
-            section={getSectionName(selectedStudent.presentSectionId).name}
-            studentId={selectedStudent._id}
+            section={getSectionName(selectedStudent?.presentSectionId).name}
+            studentId={selectedStudent?._id}
             imageUrl={
               selectedStudent.profile ||
               "https://avatars.githubusercontent.com/u/109097090?v=4"

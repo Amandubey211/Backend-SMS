@@ -7,9 +7,12 @@ import Sidebar from "../../../../../Components/Common/Sidebar";
 import AddEvent from "../subComponents/AddEvent";
 import UpdateEvent from "../subComponents/UpdateEvent";
 import ViewEvent from "../subComponents/ViewEvent";
-import { getEvents, createEvent, updateEvent, deleteEvent } from '../api/event';
-import { format, parseISO } from 'date-fns';
+import { getEvents, createEvent, updateEvent, deleteEvent } from "../api/event";
+import { format, parseISO, isValid } from "date-fns";
 import "../subComponents/customCalendar.css";
+import toast from "react-hot-toast";
+import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
+import { IoCalendarOutline } from "react-icons/io5"; // Importing a calendar icon
 
 const EventScheduler = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -17,31 +20,82 @@ const EventScheduler = () => {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [sidebarContent, setSidebarContent] = useState(null);
   const [events, setEvents] = useState([]);
+  const [filteredEvents, setFilteredEvents] = useState([]);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [selectedMonthYear, setSelectedMonthYear] = useState({
+    month: currentDate.getMonth(),
+    year: currentDate.getFullYear(),
+  });
+
+  const itemsPerPage = 4;
 
   useEffect(() => {
     const fetchEvents = async () => {
       try {
         const events = await getEvents();
-        const mappedEvents = events.map(event => ({
+        const mappedEvents = events.map((event) => ({
           ...event,
           startDate: parseISO(event.date),
-          endDate: new Date(new Date(event.date).getTime() + 2 * 60 * 60 * 1000),
+          endDate: new Date(
+            new Date(event.date).getTime() + 2 * 60 * 60 * 1000
+          ),
         }));
         setEvents(mappedEvents);
+        filterAndSortEvents(mappedEvents, selectedMonthYear);
       } catch (error) {
-        console.error('Failed to fetch events:', error);
+        console.error("Failed to fetch events:", error);
       }
     };
 
     fetchEvents();
   }, []);
 
-  const handleSidebarOpen = () => setSidebarOpen(true);
-  const handleSidebarClose = () => setSidebarOpen(false);
+  useEffect(() => {
+    filterAndSortEvents(events, selectedMonthYear);
+  }, [selectedMonthYear, events]);
+
+  const filterAndSortEvents = (events, { month, year }) => {
+    const filtered = events.filter((event) => {
+      const eventDate = new Date(event.startDate);
+      return eventDate.getMonth() === month && eventDate.getFullYear() === year;
+    });
+
+    const sorted = filtered.sort((a, b) => a.startDate - b.startDate);
+
+    setFilteredEvents(sorted);
+    setCurrentPage(0);
+  };
+
+  const handleSidebarOpen = () => {
+    setSidebarOpen(true);
+  };
+
+  const handleSidebarClose = () => {
+    setSelectedEvent(null);
+    setSidebarOpen(false);
+  };
+
+  const refreshEvents = async () => {
+    try {
+      const updatedEvents = await getEvents();
+      const mappedEvents = updatedEvents.map((event) => ({
+        ...event,
+        startDate: parseISO(event.date),
+        endDate: new Date(
+          new Date(event.date).getTime() + 2 * 60 * 60 * 1000
+        ),
+      }));
+
+      setEvents(mappedEvents);
+      filterAndSortEvents(mappedEvents, selectedMonthYear);
+    } catch (error) {
+      console.error("Failed to refresh events:", error);
+    }
+  };
 
   const handleDateCellRender = (value) => {
     const formattedDate = format(value.toDate(), "yyyy-MM-dd");
-    const dayEvents = events.filter(
+    const dayEvents = filteredEvents.filter(
       (event) => format(event.startDate, "yyyy-MM-dd") === formattedDate
     );
 
@@ -55,14 +109,21 @@ const EventScheduler = () => {
     return (
       <ul className="events space-y-1">
         {dayEvents.map((event, index) => {
-          const eventTime = parseISO(`${format(event.startDate, 'yyyy-MM-dd')}T${event.time}`);
+          const eventTime = event.time
+            ? new Date(`${format(event.startDate, "yyyy-MM-dd")}T${event.time}`)
+            : null;
+          const timeString = isValid(eventTime)
+            ? format(eventTime, "hh:mm a")
+            : "Invalid Time";
+
           return (
             <li
               key={event._id}
-              className={`inline-block px-2 py-1 rounded text-white ${bgColors[index % bgColors.length]} shadow-md cursor-pointer`}
+              className={`inline-block px-2 py-1 rounded text-white ${bgColors[index % bgColors.length]
+                } shadow-md cursor-pointer`}
               onClick={() => handleStickerClick(event)}
             >
-              {event.title} - {format(eventTime, "hh:mm a")}
+              {event.title} - {timeString}
             </li>
           );
         })}
@@ -82,36 +143,40 @@ const EventScheduler = () => {
   };
 
   const handleSaveEvent = async (eventData) => {
+    if (!eventData || Object.keys(eventData).length === 0) {
+      toast.error("Event data is missing.");
+      return;
+    }
+
     try {
       if (selectedEvent) {
         await updateEvent(selectedEvent._id, eventData);
+        toast.success("Event updated successfully!");
       } else {
-        await createEvent(eventData);
+        const result = await createEvent(eventData);
+        if (result?.success) {
+          toast.success(result.msg || "Event created successfully!");
+          refreshEvents(); // Refresh the events list to show new events
+          handleSidebarClose(); // Close the sidebar after success
+        } else {
+          toast.error("Failed to create event.");
+        }
       }
-      setSidebarOpen(false);
-      const updatedEvents = await getEvents();
-      setEvents(updatedEvents.map(event => ({
-        ...event,
-        startDate: parseISO(event.date),
-        endDate: new Date(new Date(event.date).getTime() + 2 * 60 * 60 * 1000),
-      })));
     } catch (error) {
-      console.error('Failed to save event:', error);
+      console.error("Failed to save event:", error);
+      toast.error("Failed to save event.");
     }
   };
 
   const handleDeleteEvent = async () => {
     try {
       await deleteEvent(selectedEvent._id);
-      setSidebarOpen(false);
-      const updatedEvents = await getEvents();
-      setEvents(updatedEvents.map(event => ({
-        ...event,
-        startDate: parseISO(event.date),
-        endDate: new Date(new Date(event.date).getTime() + 2 * 60 * 60 * 1000),
-      })));
+      handleSidebarClose();
+      refreshEvents();
+      toast.success("Event deleted successfully!");
     } catch (error) {
-      console.error('Failed to delete event:', error);
+      console.error("Failed to delete event:", error);
+      toast.error("Failed to delete event.");
     }
   };
 
@@ -128,119 +193,190 @@ const EventScheduler = () => {
           />
         );
       case "addEvent":
-        return <AddEvent onSave={handleSaveEvent} />;
+        return (
+          <AddEvent onSave={handleSaveEvent} onClose={handleSidebarClose} />
+        );
       case "updateEvent":
-        return <UpdateEvent event={selectedEvent} onSave={handleSaveEvent} />;
+        return (
+          <UpdateEvent
+            event={selectedEvent}
+            onSave={handleSaveEvent}
+            onClose={handleSidebarClose}
+          />
+        );
       default:
         return <div>Select an action</div>;
     }
   };
 
-  const recentEvents = events.slice(0, 3);
+  const bgColors = [
+    "#FF6C9C", // pink
+    "#E24DFF", // purple
+    "#21AEE7", // blue
+    "#FBB778", // orange
+  ];
+
+  const paginatedEvents = filteredEvents.slice(
+    currentPage * itemsPerPage,
+    (currentPage + 1) * itemsPerPage
+  );
 
   return (
-    <>
-      <Layout title="Event">
-        <DashLayout>
-          <div className="min-h-screen p-4 bg-gray-50">
-            <div className="flex flex-row justify-between">
-              <span>Student Events</span>
-              <button
-                className="h-10 inline-flex items-center border border-transparent text-sm font-medium shadow-sm bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600"
-                onClick={handleAddEventClick}
-              >
-                Add New Event
-              </button>
-            </div>
-            <div className="my-4 w-full h-40 flex justify-around rounded-sm gap-4">
-              {recentEvents.map((event) => (
-                <EventCard key={event._id} event={event} />
-              ))}
-            </div>
-            <hr className="my-6 border-t-2 mt-12 " />
-            <div className="py-7">
-              <Calendar
-                dateCellRender={handleDateCellRender}
-                headerRender={({ value, type, onChange, onTypeChange }) => {
-                  const start = 0;
-                  const end = 12;
-                  const monthOptions = [];
-
-                  const localeData = value.localeData();
-                  const months = localeData.monthsShort();
-
-                  for (let index = start; index < end; index++) {
-                    monthOptions.push(
-                      <option key={index} value={index}>
-                        {months[index]}
-                      </option>
-                    );
-                  }
-
-                  const year = value.year();
-                  const month = value.month();
-                  const options = [];
-                  for (let i = year - 10; i < year + 10; i += 1) {
-                    options.push(
-                      <option className="bg-white" key={i} value={i}>
-                        {i}
-                      </option>
-                    );
-                  }
-                  return (
-                    <div className="flex items-center space-x-2 justify-end mt-2 pt-2 mb-4">
-                      <select
-                        className="border rounded px-2 py-1"
-                        value={year}
-                        onChange={(event) => {
-                          const newYear = parseInt(event.target.value, 10);
-                          const now = value.clone().year(newYear);
-                          onChange(now);
-                        }}
-                      >
-                        {options}
-                      </select>
-                      <select
-                        className="border rounded px-2 py-1"
-                        value={month}
-                        onChange={(event) => {
-                          const newMonth = parseInt(event.target.value, 10);
-                          const now = value.clone().month(newMonth);
-                          onChange(now);
-                        }}
-                      >
-                        {monthOptions}
-                      </select>
-                      <div className="flex space-x-2">
-                        <button
-                          className={`border rounded px-2 py-1 ${type === "month" ? "bg-gradient-to-r from-pink-500 to-purple-500 text-white" : ""}`}
-                          onClick={() => onTypeChange("month")}
-                        >
-                          Month
-                        </button>
-                        <button
-                          className={`border rounded px-2 py-1 ${type === "year" ? "bg-gradient-to-r from-pink-500 to-purple-500 text-white" : ""}`}
-                          onClick={() => onTypeChange("year")}
-                        >
-                          Year
-                        </button>
-                      </div>
-                    </div>
-                  );
-                }}
-              />
-            </div>
-            <Sidebar
-              isOpen={isSidebarOpen}
-              onClose={handleSidebarClose}
-              title={<span className="bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent bg-clip-text">{sidebarContent === "viewEvent" ? "View Event" : sidebarContent === "addEvent" ? "Add New Event" : "Update Event"}</span>}
+    <Layout title="Event">
+      <DashLayout>
+        <div className="min-h-screen p-4 bg-gray-50">
+          <div className="flex flex-row justify-between">
+            <h1 className="mb-2 bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent font-semibold bg-clip-text">
+              Student Events
+            </h1>
+            <button
+              className="h-10 inline-flex items-center border border-transparent text-sm font-medium shadow-sm bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600"
+              onClick={handleAddEventClick}
             >
-              {renderSidebarContent()}
-            </Sidebar>
+              Add New Event
+            </button>
           </div>
-        </DashLayout>
-      </Layout>
-    </>
+          
+          <div className="my-4 w-full h-40 flex rounded-sm gap-20 pl-10 relative ">
+            {currentPage > 0 && (
+              <div
+                className="p-1 rounded-full text-purple-500 bg-black border-2 cursor-pointer absolute left-0 top-1/2 transform -translate-y-1/2"
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 0))}
+              >
+                <IoIosArrowBack />
+              </div>
+            )}
+            {paginatedEvents.length === 0 ? (
+              <div className="flex flex-col items-center justify-center w-full h-full text-gray-500">
+                <IoCalendarOutline className="text-6xl" />
+                <span>No Events in this Month</span>
+              </div>
+            ) : (
+              paginatedEvents.map((event, index) => (
+                <EventCard
+                  key={event._id}
+                  event={event}
+                  color={bgColors[index % bgColors.length]}
+                  onClick={handleStickerClick}
+                  className="transform transition-transform duration-200 hover:scale-105 hover:shadow-xl"
+                />
+              ))
+            )}
+            {(currentPage + 1) * itemsPerPage < filteredEvents.length && (
+              <div
+                className="p-1 rounded-full text-purple-500 bg-white border-2 cursor-pointer absolute right-0 top-1/2 transform -translate-y-1/2"
+                onClick={() => setCurrentPage((prev) => prev + 1)}
+              >
+                <IoIosArrowForward />
+              </div>
+            )}
+          </div>
+
+          <hr className="my-6 border-t-2 mt-12 " />
+          <div className="py-7">
+            <Calendar
+              dateCellRender={handleDateCellRender}
+              headerRender={({ value, type, onChange, onTypeChange }) => {
+                const start = 0;
+                const end = 12;
+                const monthOptions = [];
+
+                const localeData = value.localeData();
+                const months = localeData.monthsShort();
+
+                for (let index = start; index < end; index++) {
+                  monthOptions.push(
+                    <option key={index} value={index}>
+                      {months[index]}
+                    </option>
+                  );
+                }
+
+                const year = value.year();
+                const month = value.month();
+                const options = [];
+                for (let i = year - 10; i < year + 10; i += 1) {
+                  options.push(
+                    <option className="bg-white" key={i} value={i}>
+                      {i}
+                    </option>
+                  );
+                }
+                return (
+                  <div className="flex items-center space-x-2 justify-end mt-2 pt-2 mb-4">
+                    <select
+                      className="border rounded px-2 py-1"
+                      value={year}
+                      onChange={(event) => {
+                        const newYear = parseInt(event.target.value, 10);
+                        const now = value.clone().year(newYear);
+                        setSelectedMonthYear((prev) => ({
+                          ...prev,
+                          year: newYear,
+                        }));
+                        onChange(now);
+                      }}
+                    >
+                      {options}
+                    </select>
+                    <select
+                      className="border rounded px-2 py-1"
+                      value={month}
+                      onChange={(event) => {
+                        const newMonth = parseInt(event.target.value, 10);
+                        const now = value.clone().month(newMonth);
+                        setSelectedMonthYear((prev) => ({
+                          ...prev,
+                          month: newMonth,
+                        }));
+                        onChange(now);
+                      }}
+                    >
+                      {monthOptions}
+                    </select>
+                    <div className="flex space-x-2">
+                      <button
+                        className={`border rounded px-2 py-1 ${type === "month"
+                            ? "bg-gradient-to-r from-pink-500 to-purple-500 text-white"
+                            : ""
+                          }`}
+                        onClick={() => onTypeChange("month")}
+                      >
+                        Month
+                      </button>
+                      <button
+                        className={`border rounded px-2 py-1 ${type === "year"
+                            ? "bg-gradient-to-r from-pink-500 to-purple-500 text-white"
+                            : ""
+                          }`}
+                        onClick={() => onTypeChange("year")}
+                      >
+                        Year
+                      </button>
+                    </div>
+                  </div>
+                );
+              }}
+            />
+          </div>
+          <Sidebar
+            isOpen={isSidebarOpen}
+            onClose={handleSidebarClose}
+            title={
+              <span className="bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent bg-clip-text">
+                {sidebarContent === "viewEvent"
+                  ? "View Event"
+                  : sidebarContent === "addEvent"
+                    ? "Add New Event"
+                    : "Update Event"}
+              </span>
+            }
+          >
+            {renderSidebarContent()}
+          </Sidebar>
+        </div>
+      </DashLayout>
+    </Layout>
   );
 };
 

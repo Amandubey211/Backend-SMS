@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { RxCross2 } from "react-icons/rx";
-import { format } from 'date-fns';
+import { format, parse } from 'date-fns';
 
 const UpdateEvent = ({ event, onSave, onClose }) => {
   const [eventData, setEventData] = useState({
@@ -21,7 +21,7 @@ const UpdateEvent = ({ event, onSave, onClose }) => {
         title: event.title || '',
         description: event.description || '',
         date: event.date ? new Date(event.date).toISOString().split('T')[0] : '',
-        time: event.time ? format(new Date(`1970-01-01T${event.time}:00`), 'HH:mm') : '',
+        time: event.time ? formatTime(event.time) : '', // Use helper to handle 24-hour format
         type: event.type || '',
         location: event.location || '',
         director: event.director || '',
@@ -30,6 +30,21 @@ const UpdateEvent = ({ event, onSave, onClose }) => {
       });
     }
   }, [event]);
+
+  const formatTime = (time) => {
+    if (!time) return '';
+    try {
+      const parsedTime = parse(time, 'HH:mm', new Date());
+      if (isNaN(parsedTime)) {
+        console.error("Invalid time value:", time);
+        return '';
+      }
+      return format(parsedTime, 'HH:mm');
+    } catch (error) {
+      console.error("Error formatting time:", error, time);
+      return '';
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;

@@ -1,22 +1,66 @@
 import React from 'react';
 import { MdAccessTime, MdLocationOn, MdPersonOutline } from 'react-icons/md';
 import { BiCalendarEvent } from 'react-icons/bi';
-import { format } from 'date-fns';
+import { format, isValid, parse } from 'date-fns';
 
 const ViewEvent = ({ event, onDelete, onEdit }) => {
+  // Default placeholder for missing data
+  const defaultEvent = {
+    image: '',
+    date: '',
+    time: '',
+    title: 'No Title Available',
+    type: 'N/A',
+    location: 'N/A',
+    director: 'N/A',
+    description: 'No description available',
+    students: [],
+  };
+
+  // Merge the event object with defaults to ensure all properties exist
+  const safeEvent = { ...defaultEvent, ...event };
+
   const formatDateTime = (date, time) => {
-    const formattedDate = format(new Date(date), 'd MMMM yyyy');
-    const formattedTime = format(new Date(`1970-01-01T${time}:00`), 'hh:mm a');
+    let formattedDate = 'Invalid date';
+    let formattedTime = 'Invalid time';
+
+    try {
+      // Parse the date
+      const parsedDate = new Date(date);
+      if (isValid(parsedDate)) {
+        formattedDate = format(parsedDate, 'd MMMM yyyy');
+      }
+
+      // Parse the time
+      if (time) {
+        let parsedTime;
+        // Check if time includes AM/PM
+        if (time.toLowerCase().includes('am') || time.toLowerCase().includes('pm')) {
+          parsedTime = parse(time, 'hh:mm a', new Date());
+        } else {
+          // Parse as 24-hour format
+          parsedTime = parse(time, 'HH:mm', new Date());
+        }
+        if (isValid(parsedTime)) {
+          formattedTime = format(parsedTime, 'hh:mm a');
+        }
+      }
+    } catch (error) {
+      console.error('Error formatting date/time:', error, { date, time });
+    }
+
     return { date: formattedDate, time: formattedTime };
   };
 
-  const { date, time } = formatDateTime(event.date, event.time);
+  const { date, time } = formatDateTime(safeEvent.date, safeEvent.time);
 
   return (
     <div className="px-4 bg-white rounded-lg overflow-auto" style={{ maxHeight: '90vh' }}>
       <div className="flex flex-col gap-2">
         <div className="flex flex-col gap-2">
-          <img className="h-[200px] w-full rounded" src={event.image} alt="Event" />
+          {safeEvent.image && (
+            <img className="h-[200px] w-full rounded" src={safeEvent.image} alt="Event" />
+          )}
           <div className="flex gap-5">
             <div className="flex justify-center items-center">
               <BiCalendarEvent className="text-pink-500 text-xl mr-2" />
@@ -27,26 +71,26 @@ const ViewEvent = ({ event, onDelete, onEdit }) => {
               <span className="text-blue-700">{time}</span>
             </div>
           </div>
-          <h1 className="font-bold text-[#4D4D4D]">{event.title}</h1>
+          <h1 className="font-bold text-[#4D4D4D]">{safeEvent.title}</h1>
         </div>
         <div className="flex flex-col gap-4">
           <div className="flex flex-col">
             <span className="font-xs text-gray-400">Event Type</span>
-            <span>{event.type}</span>
+            <span>{safeEvent.type}</span>
           </div>
           <div className="flex justify-between items-start">
             <div className="flex justify-center items-center m-0 p-0">
               <MdLocationOn className="text-red-500 text-2xl mr-2" />
               <div className="flex flex-col">
                 <span className="text-gray-400">Location</span>
-                <span>{event.location}</span>
+                <span>{safeEvent.location}</span>
               </div>
             </div>
             <div className="flex justify-center items-center m-0 p-0">
               <MdPersonOutline className="text-blue-500 text-2xl mr-2" />
               <div className="flex flex-col">
                 <span className="text-gray-400">Event Director</span>
-                <span>{event.director}</span>
+                <span>{safeEvent.director}</span>
               </div>
             </div>
           </div>
@@ -55,17 +99,17 @@ const ViewEvent = ({ event, onDelete, onEdit }) => {
           <div className="mt-4 flex flex-col gap-2">
             <div className="text-sm text-gray-700">Join Students</div>
             <div className="flex overflow-x-auto">
-              {event.students && event.students.map((student, index) => (
+              {safeEvent.students.map((student, index) => (
                 <img
                   key={index}
                   className="h-8 w-8 rounded-full"
-                  src={student.photo}
-                  alt={student.name}
+                  src={student.photo || ''}
+                  alt={student.name || 'Student'}
                 />
               ))}
             </div>
           </div>
-          <div className="text-sm text-gray-600">{event.description}</div>
+          <div className="text-sm text-gray-600">{safeEvent.description}</div>
         </div>
         <div className="flex gap-4">
           <button

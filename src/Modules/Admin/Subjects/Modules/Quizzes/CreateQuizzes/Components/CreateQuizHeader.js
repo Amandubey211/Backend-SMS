@@ -6,10 +6,13 @@ import Sidebar from "../../../../../../../Components/Common/Sidebar";
 import AddNewCriteriaForm from "../../../Rubric/Components/AddNewCriteriaForm";
 import toast from "react-hot-toast";
 
-const CreateQuizHeader = ({ onSave, isEditing }) => {
+const CreateQuizHeader = ({ onSave, isEditing, quizId }) => {
   const navigate = useNavigate();
   const [isModalOpen, setModalOpen] = useState(false);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
+
+  // Add criteriaList state
+  const [criteriaList, setCriteriaList] = useState([]);
 
   return (
     <div className="flex items-center justify-between p-2 bg-white border-b border-gray-300 shadow-sm">
@@ -23,13 +26,13 @@ const CreateQuizHeader = ({ onSave, isEditing }) => {
         </h1>
       </div>
       <div className="flex items-center space-x-2">
-        <button
+        {/* <button
           onClick={() => setModalOpen(true)}
           className="flex items-center px-4 py-2 border border-gray-300 rounded-md text-pink-500 hover:bg-gray-100 transition"
         >
           <span className="mr-1">+</span>
           <span>Add Rubric</span>
-        </button>
+        </button> */}
         <button
           onClick={() => {
             onSave(true);
@@ -52,9 +55,12 @@ const CreateQuizHeader = ({ onSave, isEditing }) => {
         </button>
         <AddRubricModal
           type="quiz"
+          quizId={quizId}
           isOpen={isModalOpen}
           onClose={() => setModalOpen(false)}
           onAddCriteria={() => setSidebarOpen(true)} // Pass down function to open sidebar
+          criteriaList={criteriaList} // Pass criteriaList state
+          setCriteriaList={setCriteriaList} // Pass setCriteriaList function
         />
         <Sidebar
           isOpen={isSidebarOpen}

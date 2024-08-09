@@ -30,7 +30,12 @@ const persistedAuthReducer = persistReducer(
 const commonPersistConfig = {
   key: "common",
   storage,
-  whitelist: ["NavbarData", "selectedClass", "selectedSubject"], // Persist NavbarData and selectedClassName
+  whitelist: [
+    "NavbarData",
+    "selectedClass",
+    "selectedSubject",
+    "selectedAssignmentName",
+  ], // Persist NavbarData and selectedClassName
 };
 
 const persistedCommonReducer = persistReducer(

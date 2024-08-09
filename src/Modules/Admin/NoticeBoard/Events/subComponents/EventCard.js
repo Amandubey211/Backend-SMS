@@ -1,33 +1,60 @@
 import React from "react";
 import { MdAccessTime } from "react-icons/md";
-import { format } from "date-fns";
+import { format, parse } from "date-fns";
 
-const EventCard = ({ event }) => {
-  // Format date and time
-  const formattedDate = format(event.startDate, "MMM d, yyyy");
-  const formattedTime = format(event.startDate, "hh:mm a");
+const EventCard = ({ event, color, onClick }) => {
+  // Format date
+  const formattedDate = format(new Date(event.startDate), "MMM d, yyyy");
+
+  // Parse and format the time
+  let formattedTime = "Invalid time";
+  try {
+    if (event.time) {
+      // Attempt to parse the time from a 24-hour format
+      const [hours, minutes] = event.time.split(":");
+      const parsedTime = new Date();
+      parsedTime.setHours(parseInt(hours), parseInt(minutes));
+
+      // Format it to 12-hour format with AM/PM
+      formattedTime = format(parsedTime, "hh:mm a");
+    } else {
+      // Fallback if event.time is not provided, use startDate
+      formattedTime = format(new Date(event.startDate), "hh:mm a");
+    }
+  } catch (error) {
+    console.error("Error formatting time:", error, event.time);
+  }
+
   const formattedDescription = event.description || "No description available";
-
+  const truncateText = (text, maxLength) => {
+    return text.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
+  };
   return (
-    <div className="h-full w-full  flex flex-col border rounded-lg shadow-lg text-white bg-[#FF6C9C] border-black">
-      <div className="flex items-center p-4 gap-4">
-        <div className="flex flex-col items-center justify-center border rounded p-3 bg-[#F9FAFC]">
-          <span className="text-3xl font-semibold text-[#FF6C9C]">
-            {format(event.startDate, "d")}
-          </span>
+    
+    <div
+      className="flex flex-col justify-between rounded-xl p-4 text-white shadow-lg m-2 cursor-pointer"
+      style={{ backgroundColor: color, width: "220px", height: "180px" }}
+      onClick={() => onClick(event)}
+    >
+      <div className="flex items-start">
+        <div
+          className="flex items-center justify-center bg-white rounded-lg p-2 w-12 h-12 text-2xl font-bold"
+          style={{ color }}
+        >
+          {format(new Date(event.startDate), "d")}
         </div>
 
-        <div className="flex flex-col justify-start">
-          <span className="text-lg font-medium">{event.title}</span>
-          <div className="flex items-center mt-2">
-            <MdAccessTime className="text-white text-xl mr-2" />
+        <div className="flex flex-col ml-2">
+          <span className="text-lg font-semibold">{event.title}</span>
+          <div className="flex items-center">
+            <MdAccessTime className="mr-2 text-white text-lg" />
             <span className="text-sm font-light">{formattedTime}</span>
           </div>
         </div>
       </div>
-      <div className="flex flex-col px-6 py-[8px] text-[#F9FAFC] font-light ">
-        <span className="mb-2">{formattedDescription}</span>
-        <span className="text-sm">{formattedDate}</span>
+      <div className="flex flex-col mt-2 font-inter text-sm font-semibold leading-[1.5]">
+        <span>{truncateText(formattedDescription, 20)}</span>
+        <span>{formattedDate}</span>
       </div>
     </div>
   );

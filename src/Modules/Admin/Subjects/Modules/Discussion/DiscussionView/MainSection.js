@@ -1,35 +1,46 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import Header from "./Components/Header";
 import SubjectSideBar from "../../../Component/SubjectSideBar";
 import useFetchDiscussionById from "../../../../../../Hooks/AuthHooks/Staff/Admin/Disscussion/useFetchDiscussionById";
+import Spinner from "../../../../../../Components/Common/Spinner";
+import NoDataFound from "../../../../../../Components/Common/NoDataFound";
 
 const MainSection = () => {
   const { did } = useParams();
   const { discussion, error, fetchDiscussionById, loading } =
     useFetchDiscussionById();
-  // we are getting the replies as well here in future we have to remove the replies from the backend and ,
-  //in DiscussionMessage we have to fetch the replies with useEffect
+
+  // Callback function to refetch discussion
+  const handleRefetchDiscussion = useCallback(() => {
+    console.log("Refetching discussion...");
+    fetchDiscussionById(did);
+  }, [did, fetchDiscussionById]);
+
   useEffect(() => {
     fetchDiscussionById(did);
   }, [did, fetchDiscussionById]);
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error}</p>;
-  if (!discussion) return <p>No discussion found.</p>;
+  if (loading) return <Spinner />;
+  if (error) return <NoDataFound />;
+  if (!discussion) return <NoDataFound />;
 
   return (
     <div className="flex">
       <SubjectSideBar />
       <div className="border-l w-full">
-        <Header discussion={discussion} />
+        {/* Pass refetchDiscussion as a prop to Header */}
+        <Header
+          discussion={discussion}
+          refetchDiscussion={handleRefetchDiscussion}
+        />
         <div className="p-6 bg-white">
           <h1 className="text-lg font-semibold">{discussion.title}</h1>
 
           <div className="text-gray-700 mb-3">
             <div dangerouslySetInnerHTML={{ __html: discussion.content }} />
           </div>
-          {discussion.attachment != null && (
+          {discussion.attachment && (
             <div className="relative w-full h-64 md:h-80 lg:h-96 overflow-hidden rounded-lg mb-4">
               <img
                 src={discussion.attachment}

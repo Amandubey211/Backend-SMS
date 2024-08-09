@@ -3,7 +3,11 @@ import { FaRegSmile, FaPaperclip, FaPaperPlane } from "react-icons/fa";
 
 const emojis = ["😀", "😂", "😍", "😢", "😡"];
 
-const InputComment = ({ addComment, placeholder = "Write Something...", initialText = "" }) => {
+const InputComment = ({
+  addComment,
+  placeholder = "Write Something...",
+  initialText = "",
+}) => {
   const [text, setText] = useState(initialText);
   const [showEmojis, setShowEmojis] = useState(false);
   const timeoutRef = useRef(null);

@@ -18,7 +18,7 @@ const useUpdatePage = () => {
       // Validate required fields
       if (!title.trim() || !content.trim()) {
         toast.error("Title and content are required");
-        return;
+        return false; // Early exit
       }
 
       setLoading(true);
@@ -43,10 +43,12 @@ const useUpdatePage = () => {
             },
           }
         );
+        console.log(response.data);
 
         if (response.data.success) {
           setSuccess(true);
           toast.success("Page updated successfully");
+          return true; // Indicate success
         } else {
           throw new Error(response.data.message || "Failed to update page");
         }
@@ -58,6 +60,7 @@ const useUpdatePage = () => {
       } finally {
         setLoading(false);
       }
+      return false; // Indicate failure
     },
     [role]
   );

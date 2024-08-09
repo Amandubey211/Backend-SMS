@@ -1,12 +1,6 @@
 import React, { useState } from "react";
-import { IoCalendarOutline } from "react-icons/io5";
 import { Modal, Button, Form, Input, DatePicker, TimePicker } from "antd";
 import moment from "moment";
-
-const priorityClasses = {
-  "High priority": "bg-pink-100 text-pink-700",
-  "Low priority": "bg-gray-100 text-black",
-};
 
 const EventItem = ({ event, onUpdate }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -37,7 +31,11 @@ const EventItem = ({ event, onUpdate }) => {
   const handleTimeChange = (time, timeString) => {
     setEditedEvent({ ...editedEvent, time: timeString });
   };
-  console.log(event)
+
+  const truncateText = (text, maxLength) => {
+    return text.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
+  };
+
   return (
     <div className="grid grid-cols-3 items-center py-4 gap-4">
       <div className="flex items-center">
@@ -46,14 +44,17 @@ const EventItem = ({ event, onUpdate }) => {
           src={event.eventImage || "https://via.placeholder.com/50"}
           alt={event.eventName}
         />
-        <p className="text-md text-gray-900 truncate" title={event.eventName}>
-          {event.eventName}
+        <p
+          className="text-md text-gray-900 truncate"
+          title={event.eventName}
+        >
+          {truncateText(event.eventName, 30)}
         </p>
       </div>
       <p className="text-sm text-gray-500 truncate">{event.eventType}</p>
       <p className="text-sm text-gray-500">{event.startDate}</p>
     </div>
-  );  
+  );
 };
 
 export default EventItem;

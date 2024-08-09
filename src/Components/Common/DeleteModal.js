@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import PropTypes from "prop-types";
 import { createPortal } from "react-dom";
 import { RiCloseLine } from "react-icons/ri";
@@ -7,10 +7,20 @@ import { ImSpinner3 } from "react-icons/im";
 // Hook for trapping focus within a modal
 function useFocusTrap(modalRef, isOpen) {
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen || !modalRef.current) return;
+
+    const focusableSelectors = [
+      "a[href]",
+      "button:not([disabled])",
+      "input:not([disabled])",
+      "textarea:not([disabled])",
+      "select:not([disabled])",
+      "details",
+      "[tabindex]:not([tabindex='-1'])",
+    ];
 
     const focusableElements = modalRef.current.querySelectorAll(
-      "a, button, input, textarea, select, details,[tabindex]:not([tabindex='-1'])"
+      focusableSelectors.join(", ")
     );
 
     const firstElement = focusableElements[0];
@@ -34,7 +44,11 @@ function useFocusTrap(modalRef, isOpen) {
       }
     };
 
-    firstElement.focus();
+    // Initially focus the first element
+    if (firstElement) {
+      firstElement.focus();
+    }
+
     document.addEventListener("keydown", handleKeyDown);
 
     return () => {

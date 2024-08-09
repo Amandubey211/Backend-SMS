@@ -25,6 +25,7 @@ const ModuleCard = ({
   onMove,
   onDelete,
   moduleId,
+  fetchModules,
 }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -47,6 +48,7 @@ const ModuleCard = ({
     if (result.success) {
       onDelete();
       setIsDeleteModalOpen(false); // Close the modal on successful deletion
+      fetchModules(); // Refetch modules after deletion
     }
   };
 
@@ -166,9 +168,6 @@ const ModuleCard = ({
         onConfirm={handleDelete}
         title={title}
       />
-      {loading && <p>Deleting...</p>}
-      {error && <p className="text-red-500">{error}</p>}
-      {success && <p className="text-green-500">{success}</p>}
     </div>
   );
 };

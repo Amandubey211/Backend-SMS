@@ -3,13 +3,15 @@ import axios from "axios";
 import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import { baseUrl } from "../../../../../config/Common";
+import useGetAllStaff from "./useGetAllStaff";
 
 const useAddUser = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const adminRole = useSelector((store) => store.Auth.role);
+  const  { fetchStaff} = useGetAllStaff()
   const addUser = useCallback(
-    
+   
     async (userData,address) => {
       const { firstName, lastName, email, mobileNumber, role, position,
        dob, gender, employeeID, monthlySalary} = userData;
@@ -56,6 +58,7 @@ const useAddUser = () => {
         console.log(data);
         setLoading(false);
         toast.success("User added successfully");
+        fetchStaff()
         return { success: true, data };
       } catch (err) {
         const errorMessage =

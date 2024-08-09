@@ -1,18 +1,26 @@
 import React, { useState, useRef, useEffect } from "react";
 import { FaEllipsisV } from "react-icons/fa";
-import { IoBookmarks, IoCalendarOutline, IoBookmarksOutline } from "react-icons/io5";
+import {
+  IoBookmarks,
+  IoCalendarOutline,
+  IoBookmarksOutline,
+} from "react-icons/io5";
 import { BsPatchCheckFill } from "react-icons/bs";
 import { GoDiscussionClosed } from "react-icons/go";
-import { MdMarkEmailRead } from "react-icons/md";
+import { MdMarkEmailRead, MdOutlineBlock } from "react-icons/md"; // Import MdOutlineBlock
 import { NavLink, useParams } from "react-router-dom";
 import useUpdatePinStatus from "../../../../../../Hooks/AuthHooks/Staff/Admin/Disscussion/useUpdatePinStatus";
 import useMarkAsReadDiscussion from "../../../../../../Hooks/AuthHooks/Staff/Admin/Disscussion/useMarkAsReadDiscussion";
 
 const DiscussionCard = ({ discussion }) => {
   const { sid, cid } = useParams();
-  const lastReply = discussion.replies.length > 0 ? discussion.replies[discussion.replies.length - 1] : null;
+  const lastReply =
+    discussion.replies.length > 0
+      ? discussion.replies[discussion.replies.length - 1]
+      : null;
   const { updatePinStatus, loading: pinLoading } = useUpdatePinStatus();
-  const { markAsReadDiscussion, loading: readLoading } = useMarkAsReadDiscussion();
+  const { markAsReadDiscussion, loading: readLoading } =
+    useMarkAsReadDiscussion();
   const [isPinned, setIsPinned] = useState(discussion.isPinned);
   const [isMenuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
@@ -62,6 +70,13 @@ const DiscussionCard = ({ discussion }) => {
           )}
         </button>
         <BsPatchCheckFill className="text-green-600 w-6 h-6 transition-transform transform hover:scale-110" />
+
+        {/* Conditionally render publish/unpublish icon
+        {discussion.publish ? (
+          <BsPatchCheckFill className="text-green-600 w-6 h-6 transition-transform transform hover:scale-110" />
+        ) : (
+          <MdOutlineBlock className="text-gray-600 w-6 h-6 transition-transform transform hover:scale-110" />
+        )} */}
         <button
           className="border w-7 h-7 p-1 rounded-full transition-transform transform hover:scale-110"
           onClick={() => setMenuOpen((prev) => !prev)}
@@ -100,12 +115,16 @@ const DiscussionCard = ({ discussion }) => {
           <IoCalendarOutline className="w-4 h-4 transition-transform transform hover:scale-110" />
           <span>
             Last Post at:{" "}
-            {lastReply ? new Date(lastReply.updatedAt).toLocaleDateString() : "N/A"}
+            {lastReply
+              ? new Date(lastReply.updatedAt).toLocaleDateString()
+              : "N/A"}
           </span>
         </div>
         <div className="flex justify-center space-x-4">
           <div className="flex items-center space-x-1 border rounded-full px-4 py-1">
-            <span className="font-semibold text-lg">{discussion.replies.length}</span>
+            <span className="font-semibold text-lg">
+              {discussion.replies.length}
+            </span>
             <span className="text-sm text-gray-500">Replies</span>
           </div>
         </div>

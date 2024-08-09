@@ -1,4 +1,3 @@
-
 import React from "react";
 import DateInput from "../../../../Component/DateInput";
 import OptionRadios from "./OptionRadios";
@@ -9,7 +8,8 @@ const CreateDiscussionForm = ({
   dueDate,
   availableFrom,
   availableUntil,
-  section,
+  sectionId,
+  groupId,
   option,
   handleChange,
 }) => {
@@ -18,8 +18,10 @@ const CreateDiscussionForm = ({
       <OptionRadios option={option} handleChange={handleChange} />
       <AssignToSection
         assignTo={assignTo}
-        section={section}
+        sectionId={sectionId}
         handleChange={handleChange}
+        groupId={groupId}
+        isAssignToLabel={true}
       />
 
       <DateInput
@@ -34,7 +36,7 @@ const CreateDiscussionForm = ({
         value={dueDate}
         handleChange={handleChange}
       />
-       <DateInput
+      <DateInput
         label="Until"
         name="availableUntil"
         value={availableUntil}
@@ -45,4 +47,3 @@ const CreateDiscussionForm = ({
 };
 
 export default CreateDiscussionForm;
-

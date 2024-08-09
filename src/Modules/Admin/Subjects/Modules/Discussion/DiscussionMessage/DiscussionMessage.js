@@ -14,7 +14,8 @@ const DiscussionMessage = () => {
   const { addReply: addNewReply } = useAddReply();
   const { deleteComment: deleteExistingComment } = useDeleteComment();
   const { deleteReply: deleteExistingReply } = useDeleteReply();
-  const { comments, error, fetchComments, loading } = useFetchCommentsByDiscussion();
+  const { comments, error, fetchComments, loading } =
+    useFetchCommentsByDiscussion();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeReplyId, setActiveReplyId] = useState(null);
   const [localComments, setLocalComments] = useState([]);
@@ -92,7 +93,9 @@ const DiscussionMessage = () => {
 
   const deleteComment = async (commentId) => {
     // Optimistic update
-    const updatedComments = localComments.filter((comment) => comment._id !== commentId);
+    const updatedComments = localComments.filter(
+      (comment) => comment._id !== commentId
+    );
     setLocalComments(updatedComments);
 
     try {
@@ -136,7 +139,10 @@ const DiscussionMessage = () => {
   return (
     <div className="h-screen flex flex-col">
       <div className="flex-none h-[10%]">
-        <CommentsHeader handleSearch={handleSearch} handleRefresh={handleRefresh} />
+        <CommentsHeader
+          handleSearch={handleSearch}
+          handleRefresh={handleRefresh}
+        />
       </div>
       <div className="h-[70%] overflow-y-scroll no-scrollbar px-6">
         <CommentSection

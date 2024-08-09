@@ -33,10 +33,12 @@ const MainSection = () => {
   const { addModule } = useAddModule(fetchModules);
   const { deleteModule } = useDeleteModule(fetchModules);
 
+  // Fetch modules on component mount
   useEffect(() => {
     fetchModules();
   }, [fetchModules]);
 
+  // Update selected module when modulesData changes
   useEffect(() => {
     if (modulesData && modulesData.modules.length > 0) {
       dispatch(
@@ -60,7 +62,14 @@ const MainSection = () => {
   };
 
   const openAddChapter = () => {
-    setSidebarContent("chapter");
+    setSidebarContent(
+      <AddChapter
+        onClose={() => {
+          handleSidebarClose();
+          fetchModules(); // Refetch after adding a chapter
+        }}
+      />
+    );
     setIsSidebarOpen(true);
   };
 
@@ -90,7 +99,15 @@ const MainSection = () => {
   };
 
   const handleEditModule = (module) => {
-    setSidebarContent(<AddModule data={module} />);
+    setSidebarContent(
+      <AddModule
+        data={module}
+        onClose={() => {
+          handleSidebarClose();
+          fetchModules(); // Refetch after editing a module
+        }}
+      />
+    );
     setIsSidebarOpen(true);
   };
 
@@ -111,13 +128,31 @@ const MainSection = () => {
         toast.success(`${deleteTarget.type} deleted successfully!`);
         setIsDeleteModalOpen(false); // Close the modal on successful deletion
         setDeleteTarget(null);
+        fetchModules(); // Refetch modules after successful deletion
+      } else {
+        toast.error(`Failed to delete ${deleteTarget.type}.`);
       }
     }
   };
 
   const handleModuleAdded = useCallback(() => {
-    fetchModules();
+    fetchModules(); // Refetch modules after adding a module
   }, [fetchModules]);
+
+  // Handle editing a chapter
+  const handleEditChapter = (chapter) => {
+    setSidebarContent(
+      <AddChapter
+        chapterData={chapter}
+        isEditing={true}
+        onClose={() => {
+          handleSidebarClose();
+          fetchModules(); // Refetch after editing a chapter
+        }}
+      />
+    );
+    setIsSidebarOpen(true);
+  };
 
   return (
     <div className="flex min-h-screen">
@@ -147,15 +182,22 @@ const MainSection = () => {
                 key={index}
                 title={chapter.name}
                 chapterNumber={index + 1}
+                chapterId={chapter._id}
+                moduleId={selectedModule.moduleId}
                 imageUrl={chapter.thumbnail}
                 assignments={chapter.assignments}
                 quizzes={chapter.quizzes}
                 isExpanded={expandedChapters.includes(index + 1)}
                 onToggle={() => handleToggle(index + 1)}
                 onDelete={() =>
-                  handleDelete({ type: "Chapter", name: chapter.name })
+                  handleDelete({
+                    type: "Chapter",
+                    name: chapter.name,
+                    id: chapter._id,
+                    moduleId: selectedModule.moduleId,
+                  })
                 }
-                onEdit={() => toast.success("Edit Chapter")}
+                onEdit={() => handleEditChapter(chapter)}
               />
             ))
           ) : (
@@ -181,7 +223,7 @@ const MainSection = () => {
                 moduleNumber={index + 1}
                 imageUrl={module.thumbnail}
                 moduleId={module._id}
-                isPublished={false}
+                isPublished={module.isPublished}
                 isSelected={
                   selectedModule && selectedModule.moduleId === module._id
                 }
@@ -195,6 +237,7 @@ const MainSection = () => {
                     id: module._id,
                   })
                 }
+                fetchModules={fetchModules}
               />
             ))}
           </div>
@@ -222,12 +265,15 @@ const MainSection = () => {
               <AddChapter
                 onClose={() => {
                   handleSidebarClose();
-                  fetchModules();
+                  fetchModules(); // Refetch after closing the sidebar
                 }}
               />
             ) : sidebarContent === "module" ? (
               <AddModule
-                onClose={handleSidebarClose}
+                onClose={() => {
+                  handleSidebarClose();
+                  fetchModules(); // Refetch after closing the sidebar
+                }}
                 onModuleAdded={handleModuleAdded}
               />
             ) : (

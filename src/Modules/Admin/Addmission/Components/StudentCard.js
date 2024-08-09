@@ -9,7 +9,7 @@ const StudentCard = ({ studentInfo, imagePreview }) => {
     lastName,
     Q_Id,
     contactNumber,
-    class: studentClass,
+    applyingClass: studentClass,
     section,
     bloodGroup,
     religion,

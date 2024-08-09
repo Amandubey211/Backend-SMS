@@ -1,31 +1,93 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { AiOutlineDelete, AiOutlineEdit } from "react-icons/ai";
 import { FaCalendarAlt } from "react-icons/fa";
-import { FaBan } from "react-icons/fa6";
 import { HiOutlineDotsVertical } from "react-icons/hi";
+import { BsPatchCheckFill } from "react-icons/bs";
 import { useNavigate, useParams } from "react-router-dom";
-import useDeletePage from "../../../../../../Hooks/AuthHooks/Staff/Admin/Page/useDeletePage"; // Adjust the import path as needed
+import useDeletePage from "../../../../../../Hooks/AuthHooks/Staff/Admin/Page/useDeletePage";
+import useUpdatePage from "../../../../../../Hooks/AuthHooks/Staff/Admin/Page/useUpdatePage";
 import toast from "react-hot-toast";
+import Spinner from "../../../../../../Components/Common/Spinner";
+import NoDataFound from "../../../../../../Components/Common/NoDataFound";
+import DeleteModal from "../../../../../../Components/Common/DeleteModal";
+import { MdOutlineBlock } from "react-icons/md";
 
-const ViewPageHeader = ({ title, LastEdit, page }) => {
+const ViewPageHeader = ({ title, LastEdit, page, refetchPage }) => {
   const [showMenu, setShowMenu] = useState(false);
+  const [isModalOpen, setModalOpen] = useState(false);
+  const [isPublished, setIsPublished] = useState(page.publish); // State for publish status
+  const menuRef = useRef(null); // Reference for the menu
   const navigate = useNavigate();
   const { cid, sid } = useParams();
-  const { loading, error, success, deletePage } = useDeletePage();
+  const {
+    loading: deleteLoading,
+    error: deleteError,
+    success: deleteSuccess,
+    deletePage,
+  } = useDeletePage();
+  const {
+    loading: updateLoading,
+    error: updateError,
+    success: updateSuccess,
+    updatePage,
+  } = useUpdatePage();
 
   const handleEdit = () => {
     navigate(`/class/${cid}/${sid}/page/create_Page`, { state: { page } });
   };
 
-  const handleDelete = async () => {
+  const handleDeleteClick = () => {
+    setModalOpen(true); // Open the delete confirmation modal
+  };
+
+  const handleConfirmDelete = async () => {
     await deletePage(page._id);
   };
 
-  useEffect(() => {
+  const handlePublishToggle = async () => {
+    const updatedData = {
+      ...page,
+      publish: !isPublished, // Toggle publish status
+    };
+
+    const success = await updatePage(page._id, updatedData);
     if (success) {
+      setIsPublished(!isPublished); // Update local state if successful
+      refetchPage(); // Refetch page data after update
+    }
+  };
+
+  // Effect to handle clicks outside the menu
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setShowMenu(false);
+      }
+    };
+
+    if (showMenu) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showMenu]);
+
+  useEffect(() => {
+    if (deleteSuccess) {
+      toast.success("Page deleted successfully!");
       navigate(`/class/${cid}/${sid}/page`);
     }
-  }, [success, navigate, cid, sid]);
+    if (deleteError) {
+      toast.error("Failed to delete the page.");
+    }
+    if (updateError) {
+      toast.error("Failed to update the page.");
+    }
+  }, [deleteSuccess, deleteError, updateError, navigate, cid, sid]);
 
   return (
     <div className="flex justify-between items-end p-4 border-b">
@@ -44,15 +106,26 @@ const ViewPageHeader = ({ title, LastEdit, page }) => {
       <div className="relative flex justify-end gap-2 items-center w-full p-2 text-gray-700">
         <button
           className="flex items-center space-x-1 px-4 py-1 border rounded-md border-gray-300 text-gray-600 hover:bg-gray-100 transition"
-          aria-label="Publish Assignment"
+          aria-label={isPublished ? "Unpublish Page" : "Publish Page"}
+          onClick={handlePublishToggle}
+          disabled={updateLoading}
         >
-          <FaBan aria-hidden="true" />
-          <span>Publish</span>
+          {isPublished ? (
+            <>
+              <BsPatchCheckFill aria-hidden="true" className="text-green-600" />
+              <span>Publish</span>
+            </>
+          ) : (
+            <>
+              <MdOutlineBlock aria-hidden="true" />
+              <span>Unpublish</span>
+            </>
+          )}
         </button>
         <button
           onClick={handleEdit}
           className="flex items-center space-x-1 px-4 py-1 border rounded-md border-gray-300 text-green-600 hover:bg-gray-100 transition"
-          aria-label="Edit Assignment"
+          aria-label="Edit Page"
         >
           <AiOutlineEdit aria-hidden="true" />
           <span>Edit</span>
@@ -64,9 +137,12 @@ const ViewPageHeader = ({ title, LastEdit, page }) => {
         >
           <HiOutlineDotsVertical aria-hidden="true" />
           {showMenu && (
-            <div className="absolute top-full right-0 mt-2 w-48 bg-white border border-gray-300 rounded-md shadow-lg">
+            <div
+              ref={menuRef} // Attach ref to menu
+              className="absolute top-full right-0 mt-2 w-48 bg-white border border-gray-300 rounded-md shadow-lg"
+            >
               <button
-                onClick={handleDelete}
+                onClick={handleDeleteClick}
                 className="flex items-center space-x-2 px-4 py-2 hover:bg-red-100 w-full text-left"
                 aria-label="Delete Page"
               >
@@ -77,8 +153,16 @@ const ViewPageHeader = ({ title, LastEdit, page }) => {
           )}
         </button>
       </div>
-      {loading && <p>Loading...</p>}
-      {error && <p className="text-red-500">{error}</p>}
+
+      <DeleteModal
+        isOpen={isModalOpen}
+        onClose={() => setModalOpen(false)}
+        onConfirm={handleConfirmDelete}
+        title={page.title}
+      />
+
+      {deleteLoading && <Spinner />}
+      {deleteError && <NoDataFound />}
     </div>
   );
 };

@@ -3,6 +3,8 @@ import axios from "axios";
 import { useSelector } from "react-redux";
 import { baseUrl } from "../../../../config/Common";
 import toast from "react-hot-toast";
+import useGetUnassignedStudents from "./Students/useGetUnassignedStudents";
+import { useParams } from "react-router-dom";
 
 
 
@@ -10,6 +12,8 @@ const useCreateGroup = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const role = useSelector((store) => store.Auth.role);
+  const { fetchUnassignedStudents } = useGetUnassignedStudents()
+  const { cid } = useParams()
   const createGroup = async (groupData) => {
     setLoading(true);
     setError(null); // Reset error state before new request
@@ -35,6 +39,8 @@ const useCreateGroup = () => {
         headers: { Authentication: token },
       });
       toast.success("Group updated successfully!");
+      const classId = cid
+      fetchUnassignedStudents(classId);
     } catch (err) {
       setError(err.response?.data?.message || err.message);
     } finally {

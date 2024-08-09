@@ -15,8 +15,13 @@ const MainSection = () => {
     sectionId: "",
     groupId: "",
   });
+
   const [students, setStudents] = useState([]);
   const [selectedDate, setSelectedDate] = useState(new Date()); // State for selected date
+  
+  const resetDate = () => {
+    setSelectedDate(new Date());
+  };
 
   const {
     markAttendance,
@@ -28,14 +33,9 @@ const MainSection = () => {
     loading: fetchingLoading,
     error: fetchingError,
     attendanceData,
+    fetchAttendanceByClass
   } = useGetAttendanceByClassSectionGroupAndDate();
   const { cid } = useParams();
-
-  useEffect(() => {
-    if (cid || filters.sectionId || filters.groupId) {
-      fetchAttendance(cid, filters.sectionId, filters.groupId, 6, "2024");
-    }
-  }, [filters.sectionId, filters.groupId, fetchAttendance, cid]);
 
   const handleFilterChange = (name, value) => {
     setFilters((prevFilters) => ({
@@ -44,11 +44,7 @@ const MainSection = () => {
     }));
   };
 
-  const formatDate = (date) => {
-    const offset = date.getTimezoneOffset();
-    const adjustedDate = new Date(date.getTime() - offset * 60 * 1000);
-    return adjustedDate.toISOString().split("T")[0];
-  };
+
 
   const handleMarkAttendance = async (attendanceData) => {
     await markAttendance(attendanceData);
@@ -57,27 +53,28 @@ const MainSection = () => {
   const handleSubmitAttendance = () => {
     const attendanceData = {
       classId: cid,
-      teacherId: "66715f2cdfb15fc5c53c0b8a", // Replace with actual teacher ID
       sectionId: filters.sectionId,
-      groupId: filters.groupId,
-      date: formatDate(selectedDate), // Use formatted date
+      date: selectedDate,
       studentEntry: students
         .map((student) => ({
-          studentId: student.id,
-          status: student.present
-            ? "present"
-            : student.absent
-            ? "absent"
-            : student.leave
-            ? "leave"
-            : null,
+          studentId: student.studentId,
+          status: student.attendanceStatus
         }))
-        .filter((entry) => entry.status !== null),
+
     };
 
     handleMarkAttendance(attendanceData);
     // console.log(attendanceData.date)
   };
+
+  useEffect(() => {
+    //if (filters?.sectionId || filters?.groupId) {
+    fetchAttendanceByClass(cid, selectedDate, filters?.sectionId, filters?.groupId);
+    //}
+  }, [filters?.sectionId, filters?.groupId, fetchAttendanceByClass, selectedDate,]);
+
+  console.log("attendanceData Main--", attendanceData);
+
 
   return (
     <div className="flex min-h-screen w-full">
@@ -85,7 +82,7 @@ const MainSection = () => {
       <div className="w-8/12 p-4 bg-white border-r flex flex-col">
         <Header onSubmit={handleSubmitAttendance} loading={markingLoading} />
         <div className="flex-grow">
-          <Filters filters={filters} onFilterChange={handleFilterChange} />
+          <Filters filters={filters} onFilterChange={handleFilterChange} resetDate={resetDate} />
           {fetchingLoading ? (
             <Spinner />
           ) : fetchingError ? (
@@ -93,10 +90,11 @@ const MainSection = () => {
           ) : (
             <AttendanceTable
               filters={filters}
-              attendanceData={attendanceData}
+              //attendanceData={attendanceData}
               // loading={markingLoading}
               students={students}
               setStudents={setStudents}
+              selectedDate={selectedDate}
             />
           )}
         </div>
@@ -118,7 +116,7 @@ const MainSection = () => {
           />{" "}
         </div>
         <div className="flex-grow p-3 mt-1 w-full">
-          <Statistics />
+          <Statistics attendanceData={attendanceData} />
         </div>
       </div>
     </div>

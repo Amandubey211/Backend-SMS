@@ -16,6 +16,18 @@ const ViewEvent = ({ event }) => {
     };
   };
 
+  const formatTime = (timeString) => {
+    const [hour, minute] = timeString.split(':');
+    const date = new Date();
+    date.setHours(hour);
+    date.setMinutes(minute);
+    const hours = date.getHours();
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    const formattedHours = hours % 12 || 12; // Convert to 12-hour format
+    return `${formattedHours}:${minutes} ${ampm}`;
+  };
+
   const startDateTime = formatDateTime(new Date(event.startDate));
   const endDateTime = formatDateTime(new Date(event.endDate));
 
@@ -49,7 +61,7 @@ const ViewEvent = ({ event }) => {
               <div className="bg-orange-500 p-2 rounded-full">
                 <ClockIcon className="text-white" />
               </div>
-              <span className="text-orange-500 ml-2">{event.time}</span>
+              <span className="text-orange-500 ml-2">{formatTime(event.time)}</span>
             </div>
             <div className="flex items-center">
               <div className="bg-blue-500 p-2 rounded-full">

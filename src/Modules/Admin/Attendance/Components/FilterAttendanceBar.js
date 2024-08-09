@@ -7,6 +7,7 @@ import {
 } from "react-icons/md";
 import { useParams } from "react-router-dom";
 import useFetchSection from "../../../../Hooks/AuthHooks/Staff/Admin/Sections/useFetchSection";
+import useGetGroupsByClass from "../../../../Hooks/AuthHooks/Staff/Admin/Groups/useGetGroupByClass";
 
 const months = [
   { name: "January", number: 1 },
@@ -31,10 +32,8 @@ const FilterAttendanceBar = ({ filters, onFilterChange }) => {
   const AllSections = useSelector((store) => store.Class.sectionsList);
   const { cid } = useParams();
   const { fetchSection } = useFetchSection();
-
-  const groups = sectionId
-    ? AllSections.find((section) => section._id === sectionId)?.groups || []
-    : AllSections.reduce((acc, section) => acc.concat(section.groups), []);
+  const { fetchGroupsByClass } = useGetGroupsByClass()
+  const groups = useSelector((store) => store.Class.groupsList)
 
   const toggleDropdown = (setter, currentState) => {
     setter(!currentState);
@@ -46,6 +45,13 @@ const FilterAttendanceBar = ({ filters, onFilterChange }) => {
     };
     fetchData();
   }, [fetchSection]);
+
+  useEffect(() => {
+    if (!groups || groups.length === 0) {
+      fetchGroupsByClass(cid)
+    }
+  }, [groups, fetchGroupsByClass])
+
 
   const handleSectionChange = (value) => {
     onFilterChange("sectionId", value);
@@ -174,9 +180,8 @@ const FilterAttendanceBar = ({ filters, onFilterChange }) => {
             {months.map((monthObj) => (
               <div
                 key={monthObj.name}
-                className={`p-1 ps-8  cursor-pointer hover:bg-gray-100 transition-transform duration-300 ease-in-out hover:translate-x-2 ${
-                  month === monthObj.number ? "bg-gray-200" : ""
-                }`}
+                className={`p-1 ps-8  cursor-pointer hover:bg-gray-100 transition-transform duration-300 ease-in-out hover:translate-x-2 ${month === monthObj.number ? "bg-gray-200" : ""
+                  }`}
                 onClick={() => handleMonthChange(monthObj.number)}
               >
                 {monthObj.name}

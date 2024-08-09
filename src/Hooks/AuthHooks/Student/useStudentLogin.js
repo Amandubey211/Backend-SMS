@@ -46,7 +46,8 @@ const useStudentLogin = () => {
         dispatch(setStudentId(data.userId));
         dispatch(setRole(data.role));
         dispatch(setUerDetails(data.user));
-        if (data.userVerified) {
+        console.log("data",data);
+        if (data.isVerifiedSchoolId) {
           navigate("/student_dash");
         } else {
           navigate("/verify_qid");

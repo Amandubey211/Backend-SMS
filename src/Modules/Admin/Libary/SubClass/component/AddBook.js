@@ -89,7 +89,7 @@ const AddBook = ({onupdate}) => {
       }
 
       const result = await response.json();
-      toast.success("Book added successfully:", result);
+      toast.success("Book added successfully");
       onupdate()
     } catch (error) {
       console.error("Error adding book:", error);

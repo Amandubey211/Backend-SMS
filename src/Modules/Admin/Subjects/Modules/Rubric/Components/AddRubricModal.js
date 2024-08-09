@@ -1,55 +1,47 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import { HiOutlinePlus } from "react-icons/hi2";
 import RubricModalRow from "./RubricModalRow";
-import { useSelector } from "react-redux";
-import useCreateRubric from "../../../../../../Hooks/AuthHooks/Staff/Admin/Rubric/useCreateRubric";
 import toast from "react-hot-toast";
 import useGetFilteredAssignments from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useGetFilteredAssignments";
-import { useParams } from "react-router-dom";
 import useGetFilteredQuizzes from "../../../../../../Hooks/AuthHooks/Staff/Admin/Quiz/useGetFilteredQuizzes";
 import useGetRubric from "../../../../../../Hooks/AuthHooks/Staff/Admin/Rubric/useGetRubric";
+import { useParams } from "react-router-dom";
 
 const AddRubricModal = ({
+  type, // Can be "assignment", "quiz", or undefined
   isOpen,
   onClose,
   onAddCriteria,
   criteriaList,
   setCriteriaList,
   onEditCriteria,
-  type,
-  AssignmentId,
+  onSubmit,
+  createLoading,
+  updateLoading,
+  editMode,
+  AssignmentId, // Use this to fetch rubric for a specific assignment
+  QuizId, // To fetch rubric for a specific quiz
+  setExistingRubricId, // Pass this function as a prop
 }) => {
-  const [assignment, setAssignment] = useState("");
-  const [quiz, setQuiz] = useState("");
   const [rubricName, setRubricName] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [dropdownOpen2, setDropdownOpen2] = useState(false);
+  const [selectedAssignmentId, setSelectedAssignmentId] = useState(
+    AssignmentId || ""
+  );
+  const [selectedQuizId, setSelectedQuizId] = useState(QuizId || "");
 
   const dropdownRef = useRef(null);
   const dropdownRef2 = useRef(null);
-
-  const { createRubric, loading: createLoading } = useCreateRubric();
+  const { sid } = useParams();
   const { fetchFilteredAssignments, assignments } = useGetFilteredAssignments();
   const { fetchFilteredQuizzes, quizzes } = useGetFilteredQuizzes();
-  const {
-    getRubric,
-    loading: rubricLoading,
-    error: rubricError,
-    rubric,
-  } = useGetRubric();
-  useEffect(() => {
-    setAssignment(AssignmentId);
-  }, [AssignmentId]);
-  const { sid } = useParams();
+  const { getRubric } = useGetRubric();
 
   useEffect(() => {
-    if (type !== "quiz") {
-      fetchFilteredAssignments(sid);
-    }
-    if (type !== "assignment") {
-      fetchFilteredQuizzes();
-    }
-  }, [fetchFilteredAssignments, sid, fetchFilteredQuizzes, type]);
+    fetchFilteredAssignments(sid);
+    fetchFilteredQuizzes();
+  }, [fetchFilteredAssignments, fetchFilteredQuizzes, sid]);
 
   useEffect(() => {
     document.body.classList.toggle("overflow-hidden", isOpen);
@@ -57,7 +49,33 @@ const AddRubricModal = ({
   }, [isOpen]);
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
+    if (isOpen) {
+      // Fetch rubric data based on AssignmentId or QuizId
+      if (AssignmentId) {
+        fetchRubricData(AssignmentId);
+        setSelectedAssignmentId(AssignmentId); // Use internal state
+      } else if (QuizId) {
+        fetchRubricData(QuizId);
+        setSelectedQuizId(QuizId);
+      }
+    }
+  }, [isOpen, AssignmentId, QuizId]);
+
+  const fetchRubricData = async (id) => {
+    const result = await getRubric(id);
+    if (result.success) {
+      setCriteriaList(result.rubric.criteria);
+      setRubricName(result.rubric.name);
+      setExistingRubricId(result.rubric._id); // Update parent component's rubric ID
+    } else {
+      setCriteriaList([]);
+      setRubricName("");
+      setExistingRubricId(null);
+    }
+  };
+
+  const handleClickOutside = useCallback(
+    (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setDropdownOpen(false);
       }
@@ -67,30 +85,42 @@ const AddRubricModal = ({
       ) {
         setDropdownOpen2(false);
       }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+    },
+    [dropdownRef, dropdownRef2]
+  );
 
   useEffect(() => {
-    if (assignment) {
-      getRubric(assignment).then((result) => {
-        if (result.success) {
-          setCriteriaList(result.rubric.criteria);
-          setRubricName(result.rubric.name);
-        }
-      });
-    }
-  }, [assignment, getRubric, setCriteriaList]);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [handleClickOutside]);
+
+  const resetSelection = () => {
+    setSelectedAssignmentId("");
+    setSelectedQuizId("");
+    setCriteriaList([]);
+    setRubricName("");
+    setExistingRubricId(null);
+  };
 
   const handleSelectAssignmentChange = (id) => {
-    setAssignment(id);
+    if (id === "reset") {
+      resetSelection();
+    } else {
+      setSelectedAssignmentId(id);
+      setSelectedQuizId(""); // Hide quiz selection when an assignment is selected
+      fetchRubricData(id);
+    }
     setDropdownOpen(false);
   };
 
   const handleSelectQuizChange = (id) => {
-    setQuiz(id);
+    if (id === "reset") {
+      resetSelection();
+    } else {
+      setSelectedQuizId(id);
+      setSelectedAssignmentId(""); // Hide assignment selection when a quiz is selected
+      fetchRubricData(id);
+    }
     setDropdownOpen2(false);
   };
 
@@ -109,7 +139,16 @@ const AddRubricModal = ({
   };
 
   const handleSubmit = async () => {
-    const selectedAssignment = assignments.find((a) => a._id === assignment);
+    const targetId = selectedAssignmentId || selectedQuizId;
+    if (!targetId) {
+      toast.error("Please select either an assignment or a quiz.");
+      return;
+    }
+
+    const selectedAssignment = assignments.find(
+      (a) => a._id === selectedAssignmentId
+    );
+
     const totalScore = criteriaList.reduce((acc, criterion) => {
       return (
         acc +
@@ -128,21 +167,36 @@ const AddRubricModal = ({
     const rubricData = {
       name: rubricName,
       criteria: criteriaList,
-      assignmentId: assignment,
-      quizId: quiz,
+      assignmentId: selectedAssignmentId,
+      quizId: selectedQuizId,
       totalScore,
     };
 
-    const result = await createRubric(rubricData);
-    if (result.success) {
-      onClose();
-    } else {
-      toast.error("Total Point Not correct");
+    try {
+      if (editMode) {
+        const result = await onSubmit(rubricData);
+        if (result.success) {
+          toast.success("Rubric updated successfully.");
+          onClose();
+        } else {
+          throw new Error(result.error || "Update operation failed");
+        }
+      } else {
+        const result = await onSubmit(rubricData);
+        if (result.success) {
+          toast.success("Rubric created successfully.");
+          onClose();
+        } else {
+          throw new Error(result.error || "Create operation failed");
+        }
+      }
+    } catch (error) {
+      toast.error(error.message);
     }
   };
 
-  const selectedAssignmentPoints = assignment
-    ? assignments.find((a) => a._id === assignment)?.points
+  const selectedAssignmentPoints = selectedAssignmentId
+    ? assignments.find((a) => a._id === selectedAssignmentId)?.points
     : 0;
 
   return (
@@ -157,7 +211,9 @@ const AddRubricModal = ({
         }`}
       >
         <div className="flex justify-between items-center p-1">
-          <h2 className="text-lg font-semibold">Add Rubric</h2>
+          <h2 className="text-lg font-semibold">
+            {editMode ? "Update" : "Add"} Rubric
+          </h2>
           <button
             onClick={onClose}
             className="text-gray-600 text-3xl hover:text-gray-900"
@@ -178,18 +234,25 @@ const AddRubricModal = ({
               placeholder="Type here"
             />
           </div>
-          {(type === "assignment" || !type) && (
+
+          {(type === "assignment" || !type) && selectedQuizId === "" && (
             <div className="p-2 flex-1 relative" ref={dropdownRef}>
               <label className="block text-gray-700 mb-1">Assignment</label>
               <div
                 className="block w-full pl-3 pr-10 py-2 text-base border rounded-md cursor-pointer focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                 onClick={() => setDropdownOpen(!dropdownOpen)}
               >
-                {assignments.find((a) => a._id === assignment)?.name ||
-                  "Select"}
+                {assignments.find((a) => a._id === selectedAssignmentId)
+                  ?.name || "Select"}
               </div>
               {dropdownOpen && (
                 <ul className="absolute left-0 right-0 mt-2 max-h-72 overflow-auto bg-white border rounded-md shadow-lg z-10 py-2">
+                  <li
+                    onClick={() => handleSelectAssignmentChange("reset")}
+                    className="px-4 py-2 hover:bg-gray-100 transition duration-300 transform cursor-pointer hover:translate-x-[-8px] ps-6 text-red-600"
+                  >
+                    Reset
+                  </li>
                   {assignments.map((assignment) => (
                     <li
                       key={assignment._id}
@@ -205,17 +268,25 @@ const AddRubricModal = ({
               )}
             </div>
           )}
-          {(type === "quiz" || !type) && (
+
+          {(type === "quiz" || !type) && selectedAssignmentId === "" && (
             <div className="p-2 flex-1 relative" ref={dropdownRef2}>
               <label className="block text-gray-700 mb-1">Quizzes</label>
               <div
                 className="block w-full pl-3 pr-10 py-2 text-base border rounded-md cursor-pointer focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                 onClick={() => setDropdownOpen2(!dropdownOpen2)}
               >
-                {quizzes.find((q) => q._id === quiz)?.name || "Select"}
+                {quizzes.find((q) => q._id === selectedQuizId)?.name ||
+                  "Select"}
               </div>
               {dropdownOpen2 && (
                 <ul className="absolute left-0 right-0 mt-2 max-h-72 overflow-auto bg-white border rounded-md shadow-lg z-10 py-2">
+                  <li
+                    onClick={() => handleSelectQuizChange("reset")}
+                    className="px-4 py-2 hover:bg-gray-100 transition duration-300 transform cursor-pointer hover:translate-x-[-8px] ps-6 text-red-600"
+                  >
+                    Reset
+                  </li>
                   {quizzes.map((quiz) => (
                     <li
                       key={quiz._id}
@@ -267,21 +338,24 @@ const AddRubricModal = ({
             Total Points: {selectedAssignmentPoints}
           </div>
         </div>
-        <div className="flex justify-end items-center p-2 mb-2">
+        <div className="flex justify-end gap-3 items-center p-2 mb-2">
           <button
             onClick={onClose}
             className="text-gray-600 bg-gray-100 hover:bg-gray-200 p-2 px-4 rounded-md"
           >
             Cancel
           </button>
-          {/* <button className="bg-gradient-to-r from-red-500 to-purple-500 bg-clip-text text-transparent p-2 rounded-md"></button> */}
           <button
             onClick={handleSubmit}
-            disabled={createLoading}
+            disabled={createLoading || updateLoading}
             className="flex items-center gap-2 font-semibold p-2 px-4 rounded-md bg-gradient-to-r from-pink-100 to-purple-100 hover:shadow-md transition-shadow duration-300"
           >
             <span className="bg-gradient-to-r from-red-500 to-purple-500 bg-clip-text text-transparent">
-              {createLoading ? "Loading..." : "Save Rubric"}
+              {createLoading || updateLoading
+                ? "Loading..."
+                : editMode
+                ? "Update Rubric"
+                : "Save Rubric"}
             </span>
           </button>
         </div>

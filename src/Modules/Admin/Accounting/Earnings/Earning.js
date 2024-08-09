@@ -10,6 +10,7 @@ import { GiTakeMyMoney } from "react-icons/gi";
 import { HiOutlineBanknotes } from "react-icons/hi2";
 import { baseUrl } from "../../../../config/Common";
 import { useSelector } from "react-redux";
+import { Link } from "react-router-dom";
 
 const Earning = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -229,8 +230,10 @@ const Earning = () => {
                 </div>
               </div>
               <h2 className="text-lg font-semibold text-gray-800">Total Student Fees</h2>
-              <p className="text-3xl font-bold text-gradient bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-pink-500">{totalFees} QR</p>
-              <button className="mt-4 px-4 py-2 border border-blue-500 text-blue-500 rounded-full">View All Fees</button>
+              <p className="text-3xl mb-5 font-bold text-gradient bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-pink-500">{totalFees} QR</p>
+              <Link to="/accounting/studentfees" className="mt-4 px-4 py-2 border border-blue-500 text-blue-500 rounded-full">
+                View All Fees
+              </Link>
             </div>
 
             <div className="bg-white shadow rounded-lg p-4 w-full max-w-xs text-center border border-gray-200">
@@ -240,8 +243,10 @@ const Earning = () => {
                 </div>
               </div>
               <h2 className="text-lg font-semibold text-gray-800">Total Expenses</h2>
-              <p className="text-3xl font-bold text-gradient bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-pink-500">{totalExpense} QR</p>
-              <button className="mt-4 px-4 py-2 border border-red-500 text-red-500 rounded-full">View All Expenses</button>
+              <p className="text-3xl mb-5 font-bold text-gradient bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-pink-500">{totalExpense} QR</p>
+              <Link to="/accounting/expenses" className="mt-4 px-4 py-2 border border-red-500 text-red-500 rounded-full">
+              View All Expenses
+              </Link>
             </div>
           </div>
 

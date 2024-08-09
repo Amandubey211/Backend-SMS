@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
-
+import profileIcon  from '../../../../../Assets/DashboardAssets/profileIcon.png'
 import { dummyStudentsList } from '../dummyData/dummyData'; // Ensure this path is correct
 // import Layout from '../../../../Components/Common/Layout';
 // import DashLayout from '../../../../Components/Admin/AdminDashLayout';
@@ -32,7 +32,7 @@ const AllStudents = () => {
         className="block p-6 bg-white rounded-lg shadow-lg hover:bg-gray-100 transition border items-center justify-center"
       >
    <div className='flex w-full items-center'>
-   <img src={student.profile} alt='' className='w-[3rem] h-[3rem] rounded-full bg-gray-200'/>
+   <img src={student.profile || profileIcon} alt='' className='w-[3rem] h-[3rem] rounded-full bg-gray-200 border'/>
    </div>
         <div className='flex flex-row w-full items-center gap-4'>
           <div className='flex flex-col w-[50%] gap-[-10px]'>

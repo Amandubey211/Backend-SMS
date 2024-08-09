@@ -1,9 +1,7 @@
 // QuestionOptions.jsx
-import React from 'react';
-import LabeledInput from './LabeledInput';
-import LabeledSelect from './LabeledSelect';
-
-
+import React from "react";
+import LabeledInput from "./LabeledInput";
+import LabeledSelect from "./LabeledSelect";
 
 const QuestionOptions = ({ questionType, points, handleChange }) => {
   return (
@@ -16,9 +14,9 @@ const QuestionOptions = ({ questionType, points, handleChange }) => {
           value={questionType}
           onChange={handleChange}
           options={[
-            { value: 'Multiple Choice', label: 'Multiple Choice' },
-            { value: 'True/False', label: 'True/False' },
-            { value: 'Short Answer', label: 'Short Answer' },
+            { value: "Multiple Choice", label: "Multiple Choice" },
+            { value: "True/False", label: "True/False" },
+            { value: "Short Answer", label: "Short Answer" },
           ]}
         />
         <LabeledInput

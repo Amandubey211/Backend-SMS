@@ -62,7 +62,12 @@ const useStaffLogin = () => {
 
         dispatch(setLeftHeading(data.role));
         console.log(data);
-        const user = { schoolId: data?.schoolId, userId: data?.userId };
+        const user = {
+          schoolId: data?.schoolId,
+          userId: data?.userId,
+          profile: data?.profile,
+          fullName: data?.fullName,
+        };
         dispatch(setUerDetails(user));
         navigate(`/dashboard`);
         toast.success("Logged in successfully", {

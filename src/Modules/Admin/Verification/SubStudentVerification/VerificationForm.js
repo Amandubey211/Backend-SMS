@@ -110,7 +110,7 @@ const VerificationForm = ({ email, studentId }) => {
                 className="text-gray-600 font-medium"
                 htmlFor="assignedClass"
               >
-                Assign Class
+                Assign Class to Student
               </label>
               <select
                 id="assignedClass"

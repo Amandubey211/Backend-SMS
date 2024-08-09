@@ -1,4 +1,3 @@
-
 import React from "react";
 import toast from "react-hot-toast";
 import { IoIosArrowBack } from "react-icons/io";
@@ -21,7 +20,7 @@ const AddDiscussionHeader = ({ onSave, isUpdating }) => {
       <div className="flex items-center space-x-2">
         <button
           onClick={() => {
-            onSave();
+            onSave(true); // Pass publish as true
             toast.success(
               isUpdating ? "Updated and Published" : "Saved and Published",
               { position: "bottom-left" }
@@ -33,8 +32,18 @@ const AddDiscussionHeader = ({ onSave, isUpdating }) => {
             {isUpdating ? "Update & Publish" : "Save & Publish"}
           </span>
         </button>
-        <button className="flex-grow rounded-md py-2 px-6 text-center bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200 transition">
-          <span className="text-gradient">{isUpdating ? "Update" : "Save"}</span>
+        <button
+          onClick={() => {
+            onSave(false); // Pass publish as false
+            toast.success(isUpdating ? "Updated" : "Saved", {
+              position: "bottom-left",
+            });
+          }}
+          className="flex-grow rounded-md py-2 px-6 text-center bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200 transition"
+        >
+          <span className="text-gradient">
+            {isUpdating ? "Update" : "Save"}
+          </span>
         </button>
       </div>
     </div>
@@ -42,4 +51,3 @@ const AddDiscussionHeader = ({ onSave, isUpdating }) => {
 };
 
 export default AddDiscussionHeader;
-

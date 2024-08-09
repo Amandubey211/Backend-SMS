@@ -1,18 +1,17 @@
+// SyllabusHeader.js
 import React, { useState, useRef, useEffect } from "react";
 import { AiOutlineEdit } from "react-icons/ai";
 import { HiOutlineDotsVertical } from "react-icons/hi";
-import { GiArrest } from "react-icons/gi";
 import { RiDeleteBin5Line } from "react-icons/ri";
-import useDeleteSyllabus from "../../../../../../../Hooks/AuthHooks/Staff/Admin/Syllabus/useDeleteSyllabus";
+import DeleteModal from "../../../../../../../Components/Common/DeleteModal";
 
 const SyllabusHeader = ({ onEditClick, onDeleteClick, syllabus }) => {
   const [menuOpen, setMenuOpen] = useState(false);
-  const { deleteSyllabus, loading: deleteLoading } = useDeleteSyllabus();
+  const [isModalOpen, setModalOpen] = useState(false);
   const menuRef = useRef(null);
 
-  const handleDeleteClick = async () => {
-    await deleteSyllabus(syllabus._id);
-    onDeleteClick(syllabus._id);
+  const handleDeleteClick = () => {
+    setModalOpen(true); // Open the delete confirmation modal
   };
 
   const handleClickOutside = (event) => {
@@ -61,21 +60,24 @@ const SyllabusHeader = ({ onEditClick, onDeleteClick, syllabus }) => {
               <button
                 className="w-full flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 transition"
                 onClick={handleDeleteClick}
-                disabled={deleteLoading}
               >
                 <RiDeleteBin5Line className="mr-2 text-red-700" />
                 <span>Delete</span>
-              </button>
-              <button
-                className="w-full flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 transition"
-              >
-                <GiArrest className="mr-2 text-blue-700" />
-                <span>Task 2</span>
               </button>
             </div>
           )}
         </div>
       </div>
+
+      <DeleteModal
+        isOpen={isModalOpen}
+        onClose={() => setModalOpen(false)}
+        onConfirm={() => {
+          onDeleteClick(syllabus._id);
+          setModalOpen(false);
+        }}
+        title={syllabus?.title || "this syllabus"}
+      />
     </div>
   );
 };

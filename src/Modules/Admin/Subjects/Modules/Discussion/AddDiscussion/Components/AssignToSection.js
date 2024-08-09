@@ -2,12 +2,28 @@ import React from "react";
 import AssignToRadios from "../../../../Component/AssignToRadios";
 import SectionSelect from "../../../../Component/SectionSelect";
 
-const AssignToSection = ({ assignTo, section,groupId, handleChange , assignTitle }) => {
+const AssignToSection = ({
+  assignTo,
+  sectionId,
+  groupId,
+  handleChange,
+  assignTitle,
+  isAssignToLabel,
+}) => {
   return (
     <div className="mt-5">
-      <AssignToRadios assignTo={assignTo} handleChange={handleChange} isAssignToLabel={true}  title={assignTitle}/>
-      <SectionSelect section={section} groupId={groupId} handleChange={handleChange} />
-      
+      <AssignToRadios
+        assignTo={assignTo}
+        handleChange={handleChange}
+        isAssignToLabel={isAssignToLabel}
+        title={assignTitle}
+      />
+      <SectionSelect
+        assignTo={assignTo}
+        section={sectionId}
+        groupId={groupId}
+        handleChange={handleChange}
+      />
     </div>
   );
 };

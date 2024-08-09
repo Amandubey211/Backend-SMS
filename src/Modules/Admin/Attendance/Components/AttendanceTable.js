@@ -1,6 +1,7 @@
 import React from "react";
 import { IoCheckmarkCircle, IoCloseCircle } from "react-icons/io5";
 import { FaCircle, FaExclamationCircle } from "react-icons/fa";
+import profileIcon from '../../../../Assets/DashboardAssets/profileIcon.png'
 
 const AttendanceTable = ({ filter, attendanceData, filters }) => {
   const { month } = filters;
@@ -9,36 +10,67 @@ const AttendanceTable = ({ filter, attendanceData, filters }) => {
     return new Date(new Date().getFullYear(), month, 0).getDate();
   };
 
-  const transformData = (data) => {
+  // const transformData = (attendanceData) => {
+  //   const daysInMonth = getDaysInMonth(month);
+  //   const students = {};
+
+  //   if (attendanceData) {
+  //     attendanceData.forEach((record) => {
+  //       record.attendanceStatus?.forEach((dateRecord) => {
+  //         dateRecord.date?.forEach((entry) => {
+  //           const studentId = entry.studentId;
+  //           if (!students[studentId]) {
+  //             const studentProfile = data.studentProfiles?.find(
+  //               (profile) => profile.studentId === studentId
+  //             );
+  //             students[studentId] = {
+  //               ...studentProfile,
+  //               attendance: Array(daysInMonth).fill("-"), // Default to "-" if no record exists
+  //               total: { present: 0, absent: 0, late: 0, leave: 0 }, // Initialize total attendance counters
+  //             };
+  //           }
+  //           const date = new Date(dateRecord.date).getDate() - 1;
+  //           const statusIcon = getStatusIcon(entry.status);
+  //           students[studentId].attendance[date] = statusIcon;
+  //           students[studentId].total[entry.status]++;
+  //         });
+  //       });
+  //     });
+  //   }
+
+  //   return Object.values(students);
+  // };
+
+
+  const transformData = (attendanceData) => {
     const daysInMonth = getDaysInMonth(month);
     const students = {};
 
-    if (data.attendanceRecords) {
-      data.attendanceRecords.forEach((record) => {
-        record.dates?.forEach((dateRecord) => {
-          dateRecord.studentEntry?.forEach((entry) => {
-            const studentId = entry.studentId;
-            if (!students[studentId]) {
-              const studentProfile = data.studentProfiles?.find(
-                (profile) => profile.studentId === studentId
-              );
-              students[studentId] = {
-                ...studentProfile,
-                attendance: Array(daysInMonth).fill("-"), // Default to "-" if no record exists
-                total: { present: 0, absent: 0, late: 0, leave: 0 }, // Initialize total attendance counters
-              };
-            }
-            const date = new Date(dateRecord.date).getDate() - 1;
-            const statusIcon = getStatusIcon(entry.status);
-            students[studentId].attendance[date] = statusIcon;
-            students[studentId].total[entry.status]++;
-          });
-        });
+    attendanceData.forEach((record) => {
+      const { studentId, name, admissionNumber, profile, attendanceStatus } = record;
+
+      if (!students[studentId]) {
+        students[studentId] = {
+          studentId,
+          name,
+          admissionNumber,
+          profile,
+          attendance: Array(daysInMonth).fill("-"), // Default to "-"
+          total: { present: 0, absent: 0, late: 0, leave: 0 }, // Initialize counters
+        };
+      }
+
+      attendanceStatus.forEach(({ date, status }) => {
+        const day = new Date(date).getDate() - 1; // Get the day of the month (0-indexed)
+        students[studentId].attendance[day] = getStatusIcon(status);
+        students[studentId].total[status]++;
       });
-    }
+    });
 
     return Object.values(students);
   };
+
+
 
   const getStatusIcon = (status) => {
     switch (status) {
@@ -56,6 +88,7 @@ const AttendanceTable = ({ filter, attendanceData, filters }) => {
   };
 
   const filteredStudents = transformData(attendanceData);
+  console.log("filteredStudents", filteredStudents);
 
   return (
     <div className="overflow-x-auto">
@@ -78,7 +111,7 @@ const AttendanceTable = ({ filter, attendanceData, filters }) => {
             </tr>
           </thead>
           <tbody>
-            {filteredStudents.map((student) => (
+            {filteredStudents?.map((student) => (
               <tr key={student.studentId}>
                 <td className="w-1/4 px-2 py-2 whitespace-no-wrap border-gray-300 border-b">
                   <div className="flex items-center">
@@ -86,17 +119,14 @@ const AttendanceTable = ({ filter, attendanceData, filters }) => {
                       <img
                         className="h-10 w-10 rounded-full"
                         src={
-                          student.profileUrl ||
-                          `https://i.pravatar.cc/150?img=${Math.floor(
-                            Math.random() * 70
-                          )}`
+                          student.profile || profileIcon
                         }
                         alt={`${student.firstName} ${student.lastName}`}
                       />
                     </div>
                     <div className="ml-2">
                       <div className="text-sm leading-5 font-medium text-gray-500">
-                        {student.firstName} {student.lastName}
+                        {student.name}
                       </div>
                       <div className="text-sm leading-5 text-gray-500">
                         {student.admissionNumber}
@@ -104,7 +134,7 @@ const AttendanceTable = ({ filter, attendanceData, filters }) => {
                     </div>
                   </div>
                 </td>
-                {student.attendance.map((status, index) => (
+                {student?.attendance?.map((status, index) => (
                   <td
                     key={index}
                     className="whitespace-no-wrap border-gray-300 border-b text-center"

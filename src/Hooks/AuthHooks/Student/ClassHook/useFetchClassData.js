@@ -29,8 +29,10 @@ const useFetchClassData = () => {
           },
         });
 
+          console.log(response.data.data.section.sectionId)
         if (response.data.status && response.data.data) {
           setClassData(response.data.data);
+          // dispatch(setSelectedSectionId(response.data.data.section.sectionId))
           dispatch(setSelectedSectionId(response.data.data.section.sectionId))
           dispatch(setSelectedClass(response.data.data.classId));
           dispatch(setSelectedClassName(response.data.data.className));

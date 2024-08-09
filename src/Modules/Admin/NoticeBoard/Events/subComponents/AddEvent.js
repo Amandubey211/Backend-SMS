@@ -1,119 +1,122 @@
 import React, { useState } from "react";
-import axios from "axios"; // Ensure Axios is installed
 import ImageUpload from "../../../Addmission/Components/ImageUpload";
 import FormInput from "../../../Accounting/subClass/component/FormInput";
-import { baseUrl } from "../../../../../config/Common";
-import { useSelector } from "react-redux";
+import useCreateEvent from "../../../../../Hooks/AuthHooks/Staff/Admin/Events/useCreateEvent";
+import toast from "react-hot-toast";
 
-const AddEvent = () => {
-  const [imagePreview, setImagePreview] = useState(null);
+const AddEvent = ({ onSave }) => {
   const [eventData, setEventData] = useState({
-    eventName: "",
+    title: "",
     location: "",
-    startDate: "",
-    endDate: "",
-    eventDirector: "",
-    eventType: "",
+    date: "",
+    time: "",
+    director: "",
+    type: "",
     description: "",
-    eventImage: null,
+    image: null,
+    imagePreview: null,
   });
+
+  const { loading, createEvent } = useCreateEvent();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setEventData(prev => ({
-      ...prev,
-      [name]: value,
-    }));
+    setEventData({ ...eventData, [name]: value });
   };
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result);
-      };
-      reader.readAsDataURL(file);
-      setEventData(prev => ({
-        ...prev,
-        eventImage: file,
-      }));
-    }
+    setEventData({
+      ...eventData,
+      image: file,
+      imagePreview: file ? URL.createObjectURL(file) : null,
+    });
   };
 
-  const handleRemoveImage = () => {
-    setImagePreview(null);
-    setEventData(prev => ({
-      ...prev,
-      eventImage: null,
-    }));
+  const handleImageRemove = () => {
+    setEventData({ ...eventData, image: null, imagePreview: null });
   };
-  const role = useSelector((store) => store.Auth.role);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const formData = new FormData();
-    formData.append('title', eventData.eventName);
-    formData.append('date', eventData.startDate);
-    formData.append('time', '10:00 AM'); // Assuming fixed time, modify as necessary
-    formData.append('type', eventData.eventType);
-    formData.append('location', eventData.location);
-    formData.append('director', eventData.eventDirector);
-    formData.append('description', eventData.description);
-    if (eventData.eventImage) {
-      formData.append('image', eventData.eventImage);
-    }
 
-    // Retrieve JWT from localStorage
-    const token = localStorage.getItem(`${role}:token`);
+    if (isSubmitting) return; // Prevent multiple submissions
+    setIsSubmitting(true); // Set submission state immediately
+
+    // Check if all required fields are filled
+    if (!eventData.title || !eventData.date || !eventData.time || !eventData.image) {
+      toast.error("Please fill in all required fields.");
+      setIsSubmitting(false);
+      return;
+    }
 
     try {
-      const response = await axios.post(`${baseUrl}/admin/create_event`, formData, {
-        headers: {
-          'Authentication': `${token}`, // Use Bearer authentication scheme
-          'Content-Type': 'multipart/form-data'
-        },
-      });
-      console.log('Event created successfully:', response.data);
-      // Clear the form or show success message
+      const result = await createEvent(eventData);
+      if (result?.success) {
+        toast.success(result.msg || "Event created successfully!");
+
+        // Reset form fields
+        setEventData({
+          title: "",
+          location: "",
+          date: "",
+          time: "",
+          director: "",
+          type: "",
+          description: "",
+          image: null,
+          imagePreview: null,
+        });
+
+        onSave(eventData, result); // Pass eventData to onSave to notify parent component
+      } else {
+        toast.error("Failed to create event.");
+      }
     } catch (error) {
-      console.error('Failed to create event:', error);
-      // Handle errors, such as displaying an error message
+      console.error("Error during event creation:", error);
+      toast.error("Error creating event.");
+    } finally {
+      setIsSubmitting(false); // Reset submission state after processing
     }
   };
+
+
 
   return (
     <div className="p-4 bg-gray-50 border rounded-lg overflow-auto" style={{ maxHeight: "90vh" }}>
       <form className="space-y-4" onSubmit={handleSubmit}>
         <div className="image-upload-container">
           <ImageUpload
-            imagePreview={imagePreview}
+            imagePreview={eventData.imagePreview}
             handleImageChange={handleImageChange}
-            handleRemoveImage={handleRemoveImage}
+            handleRemoveImage={handleImageRemove}
           />
         </div>
         <FormInput
-          id="eventName"
-          name="eventName"
+          id="title"
+          name="title"
           label="Event Name"
-          value={eventData.eventName}
+          value={eventData.title}
           onChange={handleInputChange}
+          required
         />
         <div className="flex justify-between">
           <FormInput
-            id="startDate"
-            name="startDate"
-            label="Start Date"
+            id="date"
+            name="date"
+            label="Date"
             type="date"
-            value={eventData.startDate}
+            value={eventData.date}
             onChange={handleInputChange}
             required
           />
           <FormInput
-            id="endDate"
-            name="endDate"
-            label="End Date"
-            type="date"
-            value={eventData.endDate}
+            id="time"
+            name="time"
+            label="Event Time"
+            type="time"
+            value={eventData.time}
             onChange={handleInputChange}
             required
           />
@@ -125,19 +128,19 @@ const AddEvent = () => {
           value={eventData.location}
           onChange={handleInputChange}
         />
-        <div className='flex justify-between'>
+        <div className="flex justify-between">
           <FormInput
-            id="eventDirector"
-            name="eventDirector"
+            id="director"
+            name="director"
             label="Event Director"
-            value={eventData.eventDirector}
+            value={eventData.director}
             onChange={handleInputChange}
           />
           <FormInput
-            id="eventType"
-            name="eventType"
+            id="type"
+            name="type"
             label="Event Type"
-            value={eventData.eventType}
+            value={eventData.type}
             onChange={handleInputChange}
           />
         </div>
@@ -153,8 +156,9 @@ const AddEvent = () => {
         <button
           type="submit"
           className="w-full mt-4 p-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600"
+          disabled={loading || isSubmitting} // Ensure button is disabled on submit
         >
-          Add Event
+          {loading ? "Adding Event..." : "Add Event"}
         </button>
       </form>
     </div>

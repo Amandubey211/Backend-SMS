@@ -30,7 +30,7 @@ const initialFormState = {
   allowShuffleAnswers: false,
   dueDate: "",
   availableFrom: "",
-  lockQuestionsAfterAnswering: "",
+  lockQuestionsAfterAnswering: false,
   until: "",
   timeLimit: "",
   moduleId: null,
@@ -99,7 +99,7 @@ const MainSection = () => {
         allowShuffleAnswers: quiz.allowShuffleAnswers || false,
         dueDate: quiz.dueDate || "",
         availableFrom: quiz.availableFrom || "",
-        lockQuestionsAfterAnswering: quiz.lockQuestionsAfterAnswering || "",
+        lockQuestionsAfterAnswering: quiz.lockQuestionsAfterAnswering || false,
         until: quiz.until || "DD/MM/YY",
         timeLimit: quiz.timeLimit || "",
         moduleId: quiz.moduleId || null,
@@ -118,6 +118,7 @@ const MainSection = () => {
   const handleQuestionChange = (content) => setQuestion(content);
   const handleFormChange = (e) => {
     const { name, value, type, checked } = e.target;
+    console.log(value, "sdfsdf");
     setFormState((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
@@ -142,7 +143,7 @@ const MainSection = () => {
       correctAnswerComment: rightAnswerComment,
       inCorrectAnswerComment: wrongAnswerComment,
     };
-    console.log(newQuestion, "new questio", typeof newQuestion.questionPoint);
+    console.log(newQuestion, "new question", typeof newQuestion.questionPoint);
     const result = await addQuestion(quizId, newQuestion);
     if (result.success) {
       setQuestionState((prev) => [...prev, newQuestion]);
@@ -260,7 +261,11 @@ const MainSection = () => {
 
   return (
     <div className="flex flex-col w-full">
-      <CreateQuizHeader onSave={handleSave} isEditing={isEditing} />
+      <CreateQuizHeader
+        onSave={handleSave}
+        isEditing={isEditing}
+        quizId={quizId}
+      />
 
       <div className="w-full flex">
         <div
@@ -289,6 +294,7 @@ const MainSection = () => {
                 ) : (
                   <QuestionListView
                     quizId={quizId}
+                    allowShuffleAnswers={formState.allowShuffleAnswers}
                     questionState={questionState}
                     handleSidebarOpen={handleAddNewQuestion}
                     deleteQuestion={deleteQuestionHandler}

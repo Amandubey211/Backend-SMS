@@ -9,32 +9,42 @@ const useUpdateRubric = () => {
   const [error, setError] = useState(null);
   const role = useSelector((store) => store.Auth.role);
 
-  const updateRubric = useCallback(async (rubricId, rubricData) => {
-    setLoading(true);
-    setError(null);
-    try {
-      
-      const token = localStorage.getItem(`${role}:token`);
-      await axios.put(
-        `${baseUrl}/admin/rubric/${rubricId}`,
-        rubricData,
-        {
-          headers: { Authentication: token },
-        }
-      );
+  const updateRubric = useCallback(
+    async (rubricId, rubricData) => {
+      setLoading(true);
+      setError(null);
+      try {
+        console.log("sdfsdf updaing hook");
+        const token = localStorage.getItem(`${role}:token`);
+        const response = await axios.put(
+          `${baseUrl}/admin/rubric/${rubricId}`,
+          rubricData,
+          {
+            headers: { Authentication: token },
+          }
+        );
 
-      setLoading(false);
-      toast.success("Rubric updated successfully");
-      return { success: true };
-    } catch (err) {
-      const errorMessage =
-        err.response?.data?.message || "Failed to update rubric";
-      toast.error(errorMessage);
-      setLoading(false);
-      setError(errorMessage);
-      return { success: false, error: errorMessage };
-    }
-  }, [role]);
+        if (response?.data?.success) {
+          toast.success("Rubric updated successfully");
+          return { success: true };
+        } else {
+          const errorMessage =
+            response?.data?.message || "Failed to update rubric";
+          toast.error(errorMessage);
+          return { success: false, error: errorMessage };
+        }
+      } catch (err) {
+        const errorMessage =
+          err.response?.data?.message || "Failed to update rubric";
+        toast.error(errorMessage);
+        setError(errorMessage);
+        return { success: false, error: errorMessage };
+      } finally {
+        setLoading(false);
+      }
+    },
+    [role]
+  );
 
   return { updateRubric, loading, error };
 };

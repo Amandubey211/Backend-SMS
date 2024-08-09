@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import AddRubricModal from "../../Rubric/Components/AddRubricModal";
 import Sidebar from "../../../../../../Components/Common/Sidebar";
 import AssignmentDetail from "../../../Component/AssignmentDetail";
@@ -7,15 +7,36 @@ import SpeedGradeButton from "../../../Component/SpeedGradeButton";
 import ButtonsGroup from "../../../Component/ButtonsGroup";
 import RubricButton from "./RubricButton";
 import AddNewCriteriaForm from "../../Rubric/Components/AddNewCriteriaForm";
+import Spinner from "../../../../../../Components/Common/Spinner";
+import NoDataFound from "../../../../../../Components/Common/NoDataFound";
 
-const AssignmentDetailCard = ({ assignment, loading, error }) => {
+const AssignmentDetailCard = ({
+  assignment,
+  loading,
+  error,
+  onRefresh,
+  isPublish,
+}) => {
   const [isModalOpen, setModalOpen] = useState(false);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
+  const [criteriaList, setCriteriaList] = useState([]);
+  const [existingRubricId, setExistingRubricId] = useState(null);
+  const [selectedAssignmentId, setSelectedAssignmentId] = useState("");
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error}</p>;
+  useEffect(() => {
+    if (assignment && assignment._id) {
+      setSelectedAssignmentId(assignment._id);
+    }
+  }, [assignment]);
 
-  if (!assignment) return null;
+  const handleViewRubric = () => {
+    setModalOpen(true);
+  };
+
+  if (loading) return <Spinner />;
+  if (error) return <NoDataFound />;
+
+  if (!assignment) return <NoDataFound />;
 
   const {
     points,
@@ -29,8 +50,19 @@ const AssignmentDetailCard = ({ assignment, loading, error }) => {
 
   return (
     <div className="max-w-sm p-4 bg-white" aria-label="Assignment Card">
-      <ButtonsGroup type="Assignment" data={assignment} />
-      <SpeedGradeButton />
+      <ButtonsGroup
+        type="Assignment"
+        data={assignment}
+        onRefresh={onRefresh} // Pass the refresh callback
+      />
+
+      <SpeedGradeButton
+        type="Assignment"
+        sgid={assignment._id}
+        name={assignment.name}
+        isPublish={isPublish}
+      />
+
       <AssignmentDetail
         label="Assignment Points"
         value={`${points || "N/A"} Points`}
@@ -53,12 +85,17 @@ const AssignmentDetailCard = ({ assignment, loading, error }) => {
             : "DD/MM/YY"
         }
       />
-      <RubricButton onClick={() => setModalOpen(true)} />
+      <RubricButton onClick={handleViewRubric} />
 
       <AddRubricModal
+        type="assignment"
+        AssignmentId={selectedAssignmentId} // Pass the selected assignment ID
         isOpen={isModalOpen}
         onClose={() => setModalOpen(false)}
         onAddCriteria={() => setSidebarOpen(true)}
+        criteriaList={criteriaList}
+        setCriteriaList={setCriteriaList}
+        setExistingRubricId={setExistingRubricId}
       />
       <Sidebar
         isOpen={isSidebarOpen}

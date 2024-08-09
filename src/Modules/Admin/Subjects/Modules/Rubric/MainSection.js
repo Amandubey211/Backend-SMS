@@ -1,3 +1,4 @@
+// MainSection Component
 import React, { useState, lazy, Suspense, useEffect } from "react";
 import RubricHeader from "./Components/RubricHeader";
 import RubricCard from "./Components/RubricCard";
@@ -6,11 +7,12 @@ import AddNewCriteriaForm from "./Components/AddNewCriteriaForm";
 import SubjectSideBar from "../../Component/SubjectSideBar";
 import useGetRubricBySubjectId from "../../../../../Hooks/AuthHooks/Staff/Admin/Rubric/useGetRubricBySubjectId";
 import useDeleteRubric from "../../../../../Hooks/AuthHooks/Staff/Admin/Rubric/useDeleteRubric";
+import useUpdateRubric from "../../../../../Hooks/AuthHooks/Staff/Admin/Rubric/useUpdateRubric";
+import useCreateRubric from "../../../../../Hooks/AuthHooks/Staff/Admin/Rubric/useCreateRubric";
 import { useParams } from "react-router-dom";
 import Spinner from "../../../../../Components/Common/Spinner";
-import NoDataFound from "../../../../../Components/Common/NoDataFound"; // Import a placeholder component
+import NoDataFound from "../../../../../Components/Common/NoDataFound";
 
-// Lazy load the AddRubricModal component
 const AddRubricModal = lazy(() => import("./Components/AddRubricModal"));
 
 const MainSection = () => {
@@ -19,9 +21,17 @@ const MainSection = () => {
   const [criteria, setCriteria] = useState([]);
   const [editMode, setEditMode] = useState(false);
   const [criteriaToEdit, setCriteriaToEdit] = useState(null);
+  const [rubricToEdit, setRubricToEdit] = useState(null);
+  const [selectedAssignmentId, setSelectedAssignmentId] = useState("");
+  const [selectedQuizId, setSelectedQuizId] = useState("");
+  const [existingRubricId, setExistingRubricId] = useState(null);
+
   const { error, fetchRubricBySubjectId, loading, rubrics } =
     useGetRubricBySubjectId();
   const { deleteRubric } = useDeleteRubric();
+  const { updateRubric, loading: updateLoading } = useUpdateRubric();
+  const { createRubric, loading: createLoading } = useCreateRubric();
+
   const { sid } = useParams();
 
   useEffect(() => {
@@ -60,11 +70,51 @@ const MainSection = () => {
     }
   };
 
+  const handleEditRubric = (rubricId) => {
+    const rubric = rubrics.find((rubric) => rubric._id === rubricId);
+    setRubricToEdit(rubric);
+    setCriteria(rubric.criteria);
+    setSelectedAssignmentId(rubric.assignmentId?._id || "");
+    setSelectedQuizId(rubric.quizId?._id || "");
+    setExistingRubricId(rubric._id); // Set existing rubric ID
+    setModalOpen(true);
+    setEditMode(true);
+  };
+
+  const handleSubmit = async (rubricData) => {
+    if (existingRubricId) {
+      const result = await updateRubric(existingRubricId, rubricData);
+      if (result.success) {
+        fetchRubricBySubjectId(sid);
+        setModalOpen(false);
+        setRubricToEdit(null);
+        setEditMode(false);
+      }
+    } else {
+      console.log(rubricData, "creating");
+      const result = await createRubric(rubricData);
+      if (result.success) {
+        fetchRubricBySubjectId(sid);
+        setModalOpen(false);
+      }
+    }
+  };
+
+  const handleAddRubric = () => {
+    setModalOpen(true);
+    setEditMode(false);
+    setCriteria([]); // Clear criteria for new rubric
+    setRubricToEdit(null);
+    setSelectedAssignmentId("");
+    setSelectedQuizId("");
+    setExistingRubricId(null); // Reset existing rubric ID
+  };
+
   return (
     <div className="w-full flex">
       <SubjectSideBar />
       <div className="w-full p-3 border-l">
-        <RubricHeader onAddRubric={() => setModalOpen(true)} />
+        <RubricHeader onAddRubric={handleAddRubric} />
         {loading ? (
           <Spinner />
         ) : rubrics.length > 0 ? (
@@ -76,7 +126,8 @@ const MainSection = () => {
                 title={rubric.name}
                 criteria={rubric.criteria.length}
                 points={rubric.totalScore}
-                onDelete={() => handleDeleteRubric(rubric._id)} // Pass the delete function
+                onDelete={() => handleDeleteRubric(rubric._id)}
+                onEdit={() => handleEditRubric(rubric._id)}
               />
             ))}
           </div>
@@ -86,7 +137,6 @@ const MainSection = () => {
         <Suspense fallback={<Spinner />}>
           {isModalOpen && (
             <AddRubricModal
-              type="assignment"
               isOpen={isModalOpen}
               onClose={() => setModalOpen(false)}
               criteriaList={criteria}
@@ -94,6 +144,13 @@ const MainSection = () => {
               onAddCriteria={() => setSidebarOpen(true)}
               onDeleteCriteria={handleDeleteCriteria}
               onEditCriteria={handleEditCriteria}
+              onSubmit={handleSubmit}
+              createLoading={createLoading}
+              updateLoading={updateLoading}
+              editMode={editMode}
+              AssignmentId={selectedAssignmentId} // Use these props to set IDs
+              QuizId={selectedQuizId}
+              setExistingRubricId={setExistingRubricId} // Allow setting existing rubric ID
             />
           )}
         </Suspense>

@@ -6,7 +6,7 @@ import ChildProfile from "./ChildProfile";
 import Sidebar from "../../../../Components/Common/Sidebar";
 import useGetAllParents from "../../../../Hooks/AuthHooks/Staff/Admin/parent/useGetAllParents";
 import { useSelector } from "react-redux";
-
+import profileIcon from '../../../../Assets/DashboardAssets/profileIcon.png'
 // import DashLayout from "../../../../Components/Admin/AdminDashLayout";
 const uniqueFilterOptions = (data, key) => {
   return [
@@ -58,7 +58,8 @@ fetchData();
     <>
       <Layout title="Parents">
         <DashLayout>
-          <div className="min-h-screen p-4 bg-gray-50">
+          <div className="min-h-screen p-4 ">
+          <h2 className="text-xl font-semibold mb-4">All Parents <span className="bg-purple-400 px-2 text-sm py-1 rounded-full">{allParents?.length}</span></h2>
             <div className="flex justify-between items-center mb-4">
               <div className="flex  gap-5 space-x-4  ">
                 <FormField
@@ -94,7 +95,7 @@ fetchData();
                       Email
                     </th>
                     <th className="px-5 py-3 border-b-2 border-gray-200">
-                      Children
+                      Childs
                     </th>
                   </tr>
                 </thead>
@@ -102,13 +103,13 @@ fetchData();
                   {filteredParents.map((parent, index) => (
                     <tr
                       key={index}
-                      className="text-left text-gray-700 bg-gray-100  "
+                      className="text-left text-gray-700 "
                     >
                       <td className="px-5 py-4 border-b border-gray-200 flex items-center">
                         <img
-                          src={parent.fatherImageUrl}
+                          src={parent.fatherImageUrl || profileIcon }
                           alt="Profile"
-                          className="h-8 w-8 rounded-full mr-2"
+                          className="h-8 w-8 rounded-full mr-2 border"
                         />
                         <span>{parent.fatherName}</span>
                       </td>
@@ -117,7 +118,7 @@ fetchData();
                         <div className="flex items-center">
                           {" "}
                           <img
-                            src={parent.motherImageUrl}
+                            src={parent.motherImageUrl || profileIcon}
                             alt="Profile"
                             className="h-8 w-8 rounded-full mr-2"
                           />
@@ -145,7 +146,7 @@ fetchData();
                             {parent.children.map((child, idx) => (
                             <img
                               key={idx}
-                              src={child.imageUrl} 
+                              src={child.imageUrl || profileIcon} 
                               alt={child.name}
                               className="h-8 w-8  rounded-full"
                               title={child.name} 
@@ -169,7 +170,7 @@ fetchData();
             <Sidebar
             isOpen={isSidebarOpen}
             onClose={handleSidebarClose}
-            title="Add New Book"
+            title={`Childern ${selectedChild?.length}`}
           >
             <ChildProfile  children={selectedChild} />
           </Sidebar>

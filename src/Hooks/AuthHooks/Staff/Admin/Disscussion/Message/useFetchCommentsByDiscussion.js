@@ -10,7 +10,7 @@ const useFetchCommentsByDiscussion = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const { did: discussionId } = useParams();
-  
+
   const { role } = useSelector((store) => store.Auth);
 
   const fetchComments = useCallback(async () => {
@@ -25,10 +25,10 @@ const useFetchCommentsByDiscussion = () => {
           headers: { Authentication: token },
         }
       );
-console.log(response.data)
+      console.log(response.data);
       if (response.data.status) {
         setComments(response.data.data);
-        console.log(comments)
+        console.log(comments);
       } else {
         toast.error("Failed to fetch comments");
         setError("Failed to fetch comments");

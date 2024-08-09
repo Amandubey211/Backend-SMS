@@ -19,14 +19,22 @@ const CreateAnnouncement = () => {
   const [formState, setFormState] = useState({
     postTo: "",
     availableFrom: "",
-    section: "",
+    sectionId: "",
     option: "",
     author: "",
-    groupId: ""
+    groupId: "",
   });
 
-  const { createAnnouncement, loading: createLoading, error: createError } = useCreateAnnouncement();
-  const { editAnnouncement, loading: editLoading, error: editError } = useEditAnnouncement();
+  const {
+    createAnnouncement,
+    loading: createLoading,
+    error: createError,
+  } = useCreateAnnouncement();
+  const {
+    editAnnouncement,
+    loading: editLoading,
+    error: editError,
+  } = useEditAnnouncement();
   const { cid } = useParams();
 
   useEffect(() => {
@@ -35,11 +43,13 @@ const CreateAnnouncement = () => {
       setEditorContent(announcement.content || "");
       setFormState({
         postTo: announcement.postTo || "",
-        availableFrom: announcement.delayPosting ? new Date(announcement.delayPosting).toISOString().split("T")[0] : "",
-        section: announcement.sectionId || "",
+        availableFrom: announcement.delayPosting
+          ? new Date(announcement.delayPosting).toISOString().split("T")[0]
+          : "",
+        sectionId: announcement.sectionId || "",
         option: "",
         author: announcement.author || "",
-        groupId: announcement.groupId || ""
+        groupId: announcement.groupId || "",
       });
     }
   }, [announcement]);
@@ -80,7 +90,11 @@ const CreateAnnouncement = () => {
 
     if (announcement?._id) {
       // Edit announcement
-      const result = await editAnnouncement(announcement._id, announcementData, files);
+      const result = await editAnnouncement(
+        announcement._id,
+        announcementData,
+        files
+      );
       if (result) {
         console.log("Announcement updated successfully", result);
       }
@@ -98,12 +112,18 @@ const CreateAnnouncement = () => {
   const isEditing = !!announcement?._id;
 
   return (
-    <Layout title={`${isEditing ? "Update" : "Create"} Announcement | Student Diwan`}>
+    <Layout
+      title={`${isEditing ? "Update" : "Create"} Announcement | Student Diwan`}
+    >
       <div className="flex">
         <SideMenubar />
         <div className="w-full">
           <>
-            <CreateAnnouncementHeader onSave={handleSave} loading={loading} isEditing={isEditing} />
+            <CreateAnnouncementHeader
+              onSave={handleSave}
+              loading={loading}
+              isEditing={isEditing}
+            />
             <div className="flex w-full">
               <div className="w-[75%]">
                 <div className="flex flex-col md:flex-row items-center gap-4 px-4 pt-3">
