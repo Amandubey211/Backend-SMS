@@ -55,8 +55,11 @@ const MainSection = () => {
 
       {/* Middle Section */}
       {!selectedStudent ? (
-        <div className="flex items-center justify-center text-gray-400 h-full w-full">
-          Select a student to view details.
+        <div className="flex flex-col items-center justify-center text-gray-400 h-full w-full">
+          <FaUserCircle className="text-9xl mb-4" /> {/* Large user icon */}
+          <p className="text-xl font-semibold">
+            Select a student to view details
+          </p>
         </div>
       ) : (
         <>
@@ -66,7 +69,11 @@ const MainSection = () => {
             ) : error ? (
               <NoDataFound />
             ) : (
-              <AssignmentDetails student={selectedStudent} details={details} />
+              <AssignmentDetails
+                student={selectedStudent}
+                details={details}
+                type={type}
+              />
             )}
           </div>
 

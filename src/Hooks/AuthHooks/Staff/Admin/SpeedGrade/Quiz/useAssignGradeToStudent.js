@@ -16,10 +16,10 @@ const useAssignQuizGrade = () => {
       try {
         const token = localStorage.getItem(`${role}:token`);
         const response = await axios.put(
-          `${baseUrl}/admin/speed_grade/quiz_grade`,
+          `${baseUrl}/admin/speed_grade/quiz/grade`,
           { studentId, quizId, attemptDate, score, status },
           {
-            headers: { Authentication: `Bearer ${token}` },
+            headers: { Authentication: token },
           }
         );
 
