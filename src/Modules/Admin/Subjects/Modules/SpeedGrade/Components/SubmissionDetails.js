@@ -38,8 +38,10 @@ const SubmissionDetails = ({ details, student }) => {
     type === "Assignment" ? assignGradeLoading : assignQuizGradeLoading;
   const error = type === "Assignment" ? assignGradeError : assignQuizGradeError;
 
-  const { dueDate, points, content, comments, files } =
+  const { dueDate, points, comments, files } =
     details?.assignmentId || details?.quizId || {};
+  const { content } = details;
+  console.log(content, "Content");
   const wordCount = content ? content.split(/\s+/).length : 0;
   const today = new Date();
   const due = new Date(dueDate);

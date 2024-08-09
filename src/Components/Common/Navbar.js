@@ -101,15 +101,15 @@ const Navbar = ({ hideSearchbar, hideAvatarList, hideStudentView }) => {
     <div className="relative">
       <div className="flex items-center p-2 bg-white border-b">
         <LeftHeading leftHeading={leftHeading} navigate={navigate} />
-        {!hideAvatarList && (
+        {/* {!hideAvatarList && (
           <>
             <div className="flex-1 w-full flex justify-center ">
               <AvatarsList />
             </div>
             {/* {!hideStudentView && <StudentViewButton />}  // 
             settings- profile, languages, time zone, logout */}
-          </>
-        )}
+        {/* </> */}
+        {/* )} */}
 
         {/* {!hideSearchbar && <SearchBar />} */}
         <div className="flex items-center space-x-2 border-l ml-3 pl-3">
