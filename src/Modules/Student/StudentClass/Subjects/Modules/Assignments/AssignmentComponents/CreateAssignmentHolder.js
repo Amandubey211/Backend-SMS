@@ -290,6 +290,240 @@
 
 //---------------uuu
 
+// import React, { useState } from "react";
+// import Editor from "../../../Component/Editor";
+// import MediaUpload from "./MediaUpload";
+// import TabButton from "./TabButton";
+// import { toast } from 'react-hot-toast';
+// import { baseUrl } from "../../../../../../../config/Common";
+
+// const CreateAssignmentHolder = ({ onSubmit, assignmentId, isReattempt = false }) => {
+//   const [editorContent, setEditorContent] = useState("");
+//   const [commentText, setCommentText] = useState("");
+//   const [activeTab, setActiveTab] = useState("Editor");
+
+//   const handleFormSubmit = async (fileUrl) => {
+//     const token = localStorage.getItem("student:token");
+//     if (!token) {
+//       toast.error("Authentication token not found");
+//       return;
+//     }
+
+//     const url = isReattempt
+//       ? `${baseUrl}/student/studentAssignment/reattempt/${assignmentId}`
+//       : `${baseUrl}/student/studentAssignment/submit/${assignmentId}`;
+
+//     try {
+//       let contentToSend = null; // Variable to store content for logging
+
+//       if (activeTab === "Editor") {
+//         contentToSend = editorContent;
+//       } else if (activeTab === "MediaUpload") {
+//         contentToSend = fileUrl; // Use the Cloudinary fileUrl received from MediaUpload
+//       }
+
+//       const response = await fetch(url, {
+//         method: isReattempt ? "PUT" : "POST",
+//         headers: {
+          // "Content-Type": "application/json",
+          // "Authentication": token,
+//         },
+//         body: JSON.stringify({
+//           content: contentToSend,
+//           type: activeTab === "Editor" ? "Text Entry" : "Media Upload",
+//           comment: commentText,
+//         }),
+//       });
+
+//       if (!response.ok) {
+//         throw new Error(`Failed to submit assignment, status: ${response.status}`);
+//       }
+
+//       const data = await response.json();
+//       if (data.success) {
+//         toast.success("Assignment submitted successfully");
+//         onSubmit(); // Call the parent onSubmit function
+//       } else {
+//         toast.error(data.message || "Failed to submit assignment");
+//       }
+//     } catch (error) {
+//       toast.error("Failed to submit assignment: " + error.message);
+//     }
+//   };
+
+//   return (
+//     <>
+//       <div className="flex gap-4 mb-4">
+//         <TabButton
+//           isActive={activeTab === "Editor"}
+//           onClick={() => setActiveTab("Editor")}
+//         >
+//           Editor
+//         </TabButton>
+//         <TabButton
+//           isActive={activeTab === "MediaUpload"}
+//           onClick={() => setActiveTab("MediaUpload")}
+//         >
+//           Media Upload
+//         </TabButton>
+//       </div>
+
+//       {activeTab === "Editor" && (
+//         <Editor
+//           assignmentLabel="Assignment Title"
+//           hideInput={false}
+//           editorContent={editorContent}
+//           onEditorChange={setEditorContent}
+//           onSubmit={handleFormSubmit} // Pass handleFormSubmit to Editor
+//         />
+//       )}
+
+//       {activeTab === "MediaUpload" && (
+//         <MediaUpload
+//           onSubmit={(fileUrl, comment) => {
+//             console.log("file url here", fileUrl);
+//             setCommentText(comment); // Set comment text from MediaUpload
+//             handleFormSubmit(fileUrl); // Submit form after media upload with fileUrl
+//           }}
+//         />
+//       )}
+//     </>
+//   );
+// };
+
+// export default CreateAssignmentHolder;
+
+
+
+//-------------
+
+// import React, { useState } from "react";
+// import Editor from "../../../Component/Editor";
+// import MediaUpload from "./MediaUpload";
+// import TabButton from "./TabButton";
+// import { toast } from 'react-hot-toast';
+// import { baseUrl } from "../../../../../../../config/Common";
+
+// const CreateAssignmentHolder = ({ onSubmit, assignmentId, isReattempt = false }) => {
+//   const [editorContent, setEditorContent] = useState("");
+//   const [commentText, setCommentText] = useState("gdgdgdgd");
+//   const [activeTab, setActiveTab] = useState("Editor");
+
+//   const handleFormSubmit = async (fileUrl) => {
+//     const token = localStorage.getItem("student:token");
+//     if (!token) {
+//       toast.error("Authentication token not found");
+//       return;
+//     }
+
+//     const url = isReattempt
+//       ? `${baseUrl}/student/studentAssignment/reattempt/${assignmentId}`
+//       : `${baseUrl}/student/studentAssignment/submit/${assignmentId}`;
+
+//     try {
+//       let contentToSend = null; // Variable to store content for logging
+
+//       if (activeTab === "Editor") {
+//         contentToSend = editorContent;
+//       } else if (activeTab === "MediaUpload") {
+//         contentToSend = fileUrl; // Use the Cloudinary fileUrl received from MediaUpload
+//       }
+
+//       console.log("Submitting to URL:", url);
+//       console.log("Request payload:", {
+//         content: contentToSend,
+//         type: activeTab === "Editor" ? "Text Entry" : "Media Upload",
+//         comment: commentText,
+//       });
+
+//       const response = await fetch(url, {
+//         method: isReattempt ? "PUT" : "POST",
+//         headers: {
+//           "Content-Type": "application/json",
+//           "Authentication": token,
+//         },
+//         body: JSON.stringify({
+//           content: contentToSend,
+//           type: activeTab === "Editor" ? "Text Entry" : "Media Upload",
+//           comment: commentText,
+//         }),
+//       });
+
+//       console.log("Response status:", response.status);
+//       console.log("Response headers:", [...response.headers.entries()]);
+//       const data = await response.json();
+//       console.log("Response data:", data);
+
+//       if (!response.ok) {
+//         throw new Error(`Failed to submit assignment, status: ${response.status}`);
+//       }
+
+//       if (data.success) {
+//         toast.success("Assignment submitted successfully");
+//         onSubmit(); // Call the parent onSubmit function
+//       } else {
+//         // Display validation errors
+//         if (data.errors) {
+//           for (const error in data.errors) {
+//             toast.error(data.errors[error].message);
+//           }
+//         } else {
+//           toast.error(data.message || "Failed to submit assignment");
+//         }
+//       }
+//     } catch (error) {
+//       console.error("Error submitting assignment:", error);
+//       toast.error("Failed to submit assignment: " + error.message);
+//     }
+//   };
+
+//   return (
+//     <>
+//       <div className="flex gap-4 mb-4">
+//         <TabButton
+//           isActive={activeTab === "Editor"}
+//           onClick={() => setActiveTab("Editor")}
+//         >
+//           Editor
+//         </TabButton>
+//         <TabButton
+//           isActive={activeTab === "MediaUpload"}
+//           onClick={() => setActiveTab("MediaUpload")}
+//         >
+//           Media Upload
+//         </TabButton>
+//       </div>
+
+//       {activeTab === "Editor" && (
+//         <Editor
+//           assignmentLabel="Assignment Title"
+//           hideInput={false}
+//           editorContent={editorContent}
+//           onEditorChange={setEditorContent}
+//           onSubmit={handleFormSubmit} // Pass handleFormSubmit to Editor
+//         />
+//       )}
+
+//       {activeTab === "MediaUpload" && (
+//         <MediaUpload
+//           onSubmit={(fileUrl, comment) => {
+//             console.log("file url here", fileUrl);
+//             setCommentText(comment); // Set comment text from MediaUpload
+//             handleFormSubmit(fileUrl); // Submit form after media upload with fileUrl
+//           }}
+//         />
+//       )}
+//     </>
+//   );
+// };
+
+// export default CreateAssignmentHolder;
+
+
+
+//----------👆-------------
+
+
 import React, { useState } from "react";
 import Editor from "../../../Component/Editor";
 import MediaUpload from "./MediaUpload";
@@ -299,7 +533,7 @@ import { baseUrl } from "../../../../../../../config/Common";
 
 const CreateAssignmentHolder = ({ onSubmit, assignmentId, isReattempt = false }) => {
   const [editorContent, setEditorContent] = useState("");
-  const [commentText, setCommentText] = useState("");
+  const [commentText, setCommentText] = useState(""); // Initialize with an empty string
   const [activeTab, setActiveTab] = useState("Editor");
 
   const handleFormSubmit = async (fileUrl) => {
@@ -313,14 +547,24 @@ const CreateAssignmentHolder = ({ onSubmit, assignmentId, isReattempt = false })
       ? `${baseUrl}/student/studentAssignment/reattempt/${assignmentId}`
       : `${baseUrl}/student/studentAssignment/submit/${assignmentId}`;
 
+    // Set commentText to "No comments" if it's empty
+    const commentToSend = commentText.trim() === "" ? "No comments" : commentText;
+
     try {
-      let contentToSend = null; // Variable to store content for logging
+      let contentToSend = null;
 
       if (activeTab === "Editor") {
         contentToSend = editorContent;
       } else if (activeTab === "MediaUpload") {
-        contentToSend = fileUrl; // Use the Cloudinary fileUrl received from MediaUpload
+        contentToSend = fileUrl;
       }
+
+      console.log("Submitting to URL:", url);
+      console.log("Request payload:", {
+        content: contentToSend,
+        type: activeTab === "Editor" ? "Text Entry" : "Media Upload",
+        comment: commentToSend,
+      });
 
       const response = await fetch(url, {
         method: isReattempt ? "PUT" : "POST",
@@ -331,22 +575,33 @@ const CreateAssignmentHolder = ({ onSubmit, assignmentId, isReattempt = false })
         body: JSON.stringify({
           content: contentToSend,
           type: activeTab === "Editor" ? "Text Entry" : "Media Upload",
-          comment: commentText,
+          comment: commentToSend,
         }),
       });
+
+      console.log("Response status:", response.status);
+      console.log("Response headers:", [...response.headers.entries()]);
+      const data = await response.json();
+      console.log("Response data:", data);
 
       if (!response.ok) {
         throw new Error(`Failed to submit assignment, status: ${response.status}`);
       }
 
-      const data = await response.json();
       if (data.success) {
         toast.success("Assignment submitted successfully");
         onSubmit(); // Call the parent onSubmit function
       } else {
-        toast.error(data.message || "Failed to submit assignment");
+        if (data.errors) {
+          for (const error in data.errors) {
+            toast.error(data.errors[error].message);
+          }
+        } else {
+          toast.error(data.message || "Failed to submit assignment");
+        }
       }
     } catch (error) {
+      console.error("Error submitting assignment:", error);
       toast.error("Failed to submit assignment: " + error.message);
     }
   };
@@ -382,7 +637,8 @@ const CreateAssignmentHolder = ({ onSubmit, assignmentId, isReattempt = false })
         <MediaUpload
           onSubmit={(fileUrl, comment) => {
             console.log("file url here", fileUrl);
-            setCommentText(comment); // Set comment text from MediaUpload
+            // Ensure commentText is updated properly
+            setCommentText(comment.trim()); // Trim to avoid spaces being counted as a comment
             handleFormSubmit(fileUrl); // Submit form after media upload with fileUrl
           }}
         />

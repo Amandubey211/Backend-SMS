@@ -1,9 +1,11 @@
+
+//---------------  with attepmt historu button   ----------------------------
+
 import React, { useState, useEffect } from 'react';
 import AssignmentDetail from '../../../Component/AssignmentDetail';
 import DateDetail from '../../../Component/DateDetail';
-import SidebarSlide from '../../../../../../../Components/Common/SidebarSlide';
-import SelectedQuestionCard from './SelectedQuestionCard';
-import { baseUrl } from '../../../../../../../config/Common';
+import SidebarSlide from '../../../../../../../Components/Common/SidebarSlide'; // Import SidebarSlide
+import SelectedQuestionCard from './SelectedQuestionCard'; // Import SelectedQuestionCard to display questions
 
 const QuizResultSummary = ({ totalPoints, correctAnswers, wrongAnswers, quizId }) => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -21,9 +23,12 @@ const QuizResultSummary = ({ totalPoints, correctAnswers, wrongAnswers, quizId }
         throw new Error('Authentication token not found');
       }
 
-      const response = await fetch(`${baseUrl}/student/studentquiz/${quizId}/attempt`, {
+      const response = await fetch(`http://localhost:8080/student/studentquiz/${quizId}/attempt`, {
         headers: {
-          'Authentication': token,
+           // 'Authorization': token,
+            
+           'Authentication': token
+
         },
       });
 
@@ -123,4 +128,6 @@ const QuizResultSummary = ({ totalPoints, correctAnswers, wrongAnswers, quizId }
   );
 };
 
-export default React.memo(QuizResultSummary);
+export default QuizResultSummary;
+
+
