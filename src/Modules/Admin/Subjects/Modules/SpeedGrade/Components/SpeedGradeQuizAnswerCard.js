@@ -8,34 +8,41 @@ const SpeedGradeQuizAnswerCard = ({
 }) => {
   const correctAnswer = question.correctAnswer;
   const isCorrect = selectedOption === correctAnswer;
+  console.log(question.type);
 
   return (
-    <div className="relative  bg-white shadow rounded-lg mb-4 border flex flex-col h-full">
+    <div className="relative bg-white shadow rounded-lg mb-4 border flex flex-col h-full">
       {/* Badge at the top right */}
-      <div className="absolute top-2 right-2">
-        {isCorrect ? (
-          <span className="px-2 py-1 text-xs font-semibold text-green-800 bg-green-200 rounded-full">
-            Correct
-          </span>
-        ) : (
-          <span className="px-2 py-1 text-xs font-semibold text-red-800 bg-red-200 rounded-full">
-            Wrong
-          </span>
-        )}
-      </div>
+      {question.type === "text" ? (
+        <></>
+      ) : (
+        <div className="absolute top-1 right-0">
+          {isCorrect ? (
+            <span className="px-2 py-2 text-xs shadow-sm font-semibold text-green-800 bg-green-200 rounded-l-full">
+              Correct Answer
+            </span>
+          ) : (
+            <span className="px-2 py-2 text-xs font-semibold shadow-sm text-red-800 bg-red-200 rounded-l-full">
+              Wrong Answer
+            </span>
+          )}
+        </div>
+      )}
 
       <div className="text-sm font-semibold py-2 ps-2 bg-gray-100 text-gray-500 mb-2">
         Question Point:{" "}
         <span className="text-black">{question.questionPoint}</span>
       </div>
       <div className="px-4 pb-3">
-        <h2 className="text-lg font-semibold mb-3">
+        <h2 className="text-md font-semibold mb-3">
           <span
             dangerouslySetInnerHTML={{ __html: question.questionText }}
           ></span>
         </h2>
 
-        <div className="space-y-2">
+        <div className="">
+          {" "}
+          {/* Reduced spacing here */}
           {question.type === "text" ? (
             <textarea
               rows="4"
@@ -47,7 +54,7 @@ const SpeedGradeQuizAnswerCard = ({
             question.options.map((option, optionIndex) => (
               <label
                 key={optionIndex}
-                className={`flex items-center space-x-3 cursor-pointer p-2 rounded-md ${
+                className={`flex items-center space-x-3 cursor-pointer p-1 rounded-md ${
                   option.text === selectedOption
                     ? option.text === correctAnswer
                       ? "bg-green-100"

@@ -327,7 +327,7 @@ const SubmissionDetails = ({ details, student }) => {
         </div>
       </div>
 
-      <div className="p-4 border-t border-gray-200">
+      <div className="p-4 mb-14 border-t border-gray-200">
         {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
         <div className="space-y-2 flex-col flex justify-center items-center mb-2">
           <button className="w-48 p-1 border border-purple-300 text-green-600 rounded-full hover:bg-purple-50 focus:outline-none flex items-center justify-center space-x-2">
