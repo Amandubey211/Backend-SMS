@@ -1,6 +1,10 @@
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { setAuth, setRole } from "../../../Redux/Slices/Auth/AuthSlice.js";
+import {
+  setAuth,
+  setRole,
+  setUerDetails,
+} from "../../../Redux/Slices/Auth/AuthSlice.js";
 import toast from "react-hot-toast";
 
 const useStaffLogout = () => {
@@ -15,6 +19,7 @@ const useStaffLogout = () => {
 
     dispatch(setAuth(false));
     dispatch(setRole(null));
+    dispatch(setUerDetails(null));
     navigate("/stafflogin");
 
     toast.success("Logged out successfully", {
