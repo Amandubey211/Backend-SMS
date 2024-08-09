@@ -23,12 +23,14 @@ const DashLayout = ({
           marginLeft: sidebarWidth,
         }}
       >
+        {/* Navbar is sticky and stays at the top */}
         <Navbar
           hideSearchbar={hideSearchbar}
           hideAvatarList={hideAvatarList}
           hideStudentView={hideStudentView}
         />
-        <main className="w-full min-h-screen h-screen overflow-y-scroll no-scrollbar pb-0 mb-10">
+        {/* Main content area */}
+        <main className="w-full min-h-screen h-screen overflow-y-scroll no-scrollbar ">
           {children}
         </main>
       </div>
