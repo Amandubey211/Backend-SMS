@@ -4,6 +4,7 @@ import {
   IoBookOutline,
   IoTrashOutline,
 } from "react-icons/io5";
+import { CiUser } from "react-icons/ci";
 import { NavLink, useParams } from "react-router-dom";
 import useDeletePage from "../../../../../../Hooks/AuthHooks/Staff/Admin/Page/useDeletePage"; // Adjust the import path as needed
 import DeleteModal from "../../../../../../Components/Common/DeleteModal";
@@ -14,6 +15,7 @@ const PageCard = ({
   publishDate,
   updateDate,
   id,
+  profile,
   onDeleteSuccess,
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -50,11 +52,16 @@ const PageCard = ({
         <div className="text-center mb-4 mt-2">
           <h2 className="font-semibold">{title}</h2>
           <div className="flex items-center justify-center mt-2">
-            <img
-              className="h-7 w-7 rounded-full"
-              src="https://avatars.githubusercontent.com/u/109097090?v=4"
-              alt={authorName}
-            />
+            {profile ? (
+              <img
+                className="h-7 w-7 rounded-full"
+                src={profile}
+                alt={authorName}
+              />
+            ) : (
+              <CiUser className="h-6 w-6" />
+            )}
+
             <span className="ml-2 text-gray-700">{authorName}</span>
           </div>
         </div>

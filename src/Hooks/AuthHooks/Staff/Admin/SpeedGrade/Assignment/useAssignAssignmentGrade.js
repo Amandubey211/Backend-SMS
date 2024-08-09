@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
 import { baseUrl } from "../../../../../../config/Common";
 
-const useAssignGradeToStudent = () => {
+const useAssignAssignmentGrade = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const role = useSelector((store) => store.Auth.role);
@@ -48,4 +48,4 @@ const useAssignGradeToStudent = () => {
   return { loading, error, assignGrade };
 };
 
-export default useAssignGradeToStudent;
+export default useAssignAssignmentGrade;

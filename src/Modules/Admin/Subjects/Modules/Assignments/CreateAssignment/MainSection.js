@@ -1,4 +1,3 @@
-// MainSection Component
 import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useLocation } from "react-router-dom";
 import CreateAssignmentHeader from "./Component/CreateAssignmentHeader";
@@ -14,7 +13,7 @@ const initialFormState = {
   points: "",
   displayGrade: false,
   submissionType: "",
-  allowedAttempts: false,
+  allowedAttempts: "false", // Default to "Unlimited"
   numberOfAttempts: "",
   assignTo: "",
   sectionId: null,
@@ -57,7 +56,7 @@ const MainSection = () => {
         points: assignment.points || "",
         displayGrade: assignment.grade || false,
         submissionType: assignment.submissionType || "",
-        allowedAttempts: assignment.allowedAttempts || false,
+        allowedAttempts: assignment.allowedAttempts ? "true" : "false",
         numberOfAttempts: assignment.allowNumberOfAttempts || "",
         assignTo: assignment.assignTo || "",
         sectionId: assignment?.sectionId || null,
@@ -85,14 +84,20 @@ const MainSection = () => {
   };
 
   const handleSave = async (publish) => {
+    // Adjust allowedAttempts and numberOfAttempts based on the select option
+    const allowedAttempts = formState.allowedAttempts === "true";
+    const allowNumberOfAttempts = allowedAttempts
+      ? formState.numberOfAttempts
+      : null;
+
     const assignmentData = {
       name: assignmentName,
       content: editorContent,
       points: formState.points,
       grade: formState.displayGrade,
       submissionType: formState.submissionType,
-      allowedAttempts: formState.allowedAttempts,
-      allowNumberOfAttempts: formState.numberOfAttempts,
+      allowedAttempts, // boolean value
+      allowNumberOfAttempts, // either null or number
       assignTo: formState.assignTo,
       dueDate: formState.dueDate,
       availableFrom: formState.availableFrom,
