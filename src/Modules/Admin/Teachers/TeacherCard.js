@@ -4,14 +4,12 @@ import { TbUserEdit } from "react-icons/tb";
 import { RiDeleteBinLine } from "react-icons/ri";
 import toast from "react-hot-toast";
 import DeleteModal from "../../../Components/Common/DeleteModal";
-import { CgProfile } from "react-icons/cg";
+import { CiUser } from "react-icons/ci";
 import useAssignTeacher from "../../../Hooks/AuthHooks/Staff/Admin/Teacher/useAssignTeacher";
-import { useSelector } from "react-redux";
-import Sidebar from "../../../Components/Common/Sidebar";
 
 const TeacherCard = ({ id, name, role, phone, image, onEditClick }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { unassignTeacher, loading } = useAssignTeacher()
+  const { unassignTeacher, loading } = useAssignTeacher();
 
   const handleDeleteClick = () => {
     setIsModalOpen(true);
@@ -50,13 +48,9 @@ const TeacherCard = ({ id, name, role, phone, image, onEditClick }) => {
       </div>
       <div className="flex justify-center">
         {image ? (
-          <img
-            className="w-24 h-24 rounded-full"
-            src={image}
-            alt={name}
-          />
+          <img className="w-24 h-24 rounded-full" src={image} alt={name} />
         ) : (
-          <CgProfile className="text-gray-500 w-24 h-24" />
+          <CiUser className="text-gray-800 w-24 h-24" />
         )}
       </div>
       <div className="text-center mt-4">

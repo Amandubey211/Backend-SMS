@@ -33,17 +33,21 @@ const CreateAssignmentForm = ({
   const [chapters, setChapters] = useState([]);
   const [selectedModule, setSelectedModule] = useState(moduleId || "");
   const [selectedChapter, setSelectedChapter] = useState(chapterId || "");
-  const { fetchGroupsByClass, loading: groupLoading, error: groupError } = useGetGroupsByClass()
+  const {
+    fetchGroupsByClass,
+    loading: groupLoading,
+    error: groupError,
+  } = useGetGroupsByClass();
   const groupsList = useSelector((store) => store.Class.groupsList);
-  const { cid } = useParams()
-  
+  const { cid } = useParams();
+
   useEffect(() => {
     // Fetch modules if not available in the Redux store
     if (!moduleList || moduleList.length === 0) {
       fetchModules();
     }
     if (!groupsList || groupsList.length === 0) {
-      fetchGroupsByClass(cid)
+      fetchGroupsByClass(cid);
     }
   }, [moduleList, fetchModules]);
 
@@ -129,7 +133,7 @@ const CreateAssignmentForm = ({
         allowedAttempts={allowedAttempts}
         handleChange={handleChange}
       />
-      {allowedAttempts !== "true" && (
+      {allowedAttempts == "true" && (
         <NumberOfAttemptsInput
           numberOfAttempts={numberOfAttempts}
           handleChange={handleChange}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import NavIconCard from "./Components/NavIconCard";
 import ButtonGroup from "./Components/ButtonGroup";
 import SubjectCard from "./SubjectCard";
@@ -10,7 +10,6 @@ import { SlEyeglass } from "react-icons/sl";
 import { FcGraduationCap, FcCalendar } from "react-icons/fc";
 import { useSelector } from "react-redux";
 import useGetClassDetails from "../../../../Hooks/AuthHooks/Staff/Admin/Class/usegetClassDetails";
-import { RiDeleteBin6Line } from "react-icons/ri";
 import NoDataFound from "../../../../Components/Common/NoDataFound";
 
 const colors = [
@@ -97,7 +96,7 @@ const MainSection = () => {
 
   return (
     <>
-      <div className="flex flex-wrap justify-center gap-3 p-4 ">
+      <div className="flex flex-wrap justify-center gap-3 p-4">
         {staticIconData.map((item, index) => (
           <NavIconCard
             key={index}
@@ -118,7 +117,14 @@ const MainSection = () => {
             filteredSubjects.map((subject, index) => (
               <SubjectCard
                 key={index}
-                data={subject}
+                data={{
+                  ...subject,
+                  teacherName: subject.teacherId
+                    ? subject.teacherId.fullName
+                    : "No Instructor Assigned",
+                  teacherImage: subject.teacherId?.profile,
+                  teacherRole: subject.teacherId?.role || "Teacher",
+                }}
                 Class={cid}
                 subjectId={subject._id}
                 backgroundColor={getColor(index)}

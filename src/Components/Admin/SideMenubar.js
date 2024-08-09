@@ -55,7 +55,7 @@ const SideMenubar = () => {
 
   return (
     <nav
-      className={`transition-all duration-300 h-screen p-1 px-3 z-10 bg-white border-r flex flex-col ${
+      className={`transition-all duration-300 p-1 px-3 z-10 border-r flex flex-col ${
         isOpen ? "w-[15%]" : "w-[7%]"
       }`}
       aria-label="Sidebar"
@@ -83,9 +83,11 @@ const SideMenubar = () => {
           </div>
         </button>
       </div>
-      <div className=" p-2 flex-grow">
+
+      {/* Sidebar menu list with scroll overflow */}
+      <div className="flex-grow overflow-y-auto no-scrollbar">
         {isOpen && <h2 className="text-gray-500 my-1">MENU</h2>}
-        <ul className=" space-y-1">
+        <ul className="space-y-1">
           {sidebarData.map((item, index) => (
             <React.Fragment key={index}>
               {item.items ? (
@@ -188,38 +190,35 @@ const SideMenubar = () => {
           ))}
         </ul>
       </div>
+
       {/* Avatar section placed always at the bottom */}
-      <div className="mt-auto p-2">
-        <div className="flex items-center justify-between">
-          <img
-            src={
-              userDetails?.profile ||
-              "https://avatars.githubusercontent.com/u/109097090?v=4"
-            }
-            alt="Profile"
-            className={`${isOpen ? "w-10 h-10" : "w-8 h-8"} rounded-full`}
+      <div className="p-2 border-t flex items-center justify-between">
+        <img
+          src={
+            userDetails?.profile ||
+            "https://avatars.githubusercontent.com/u/109097090?v=4"
+          }
+          alt="Profile"
+          className={`${isOpen ? "w-10 h-10" : "w-8 h-8"} rounded-full`}
+        />
+        {isOpen && (
+          <div className="flex-1 ml-3">
+            <h2 className="font-semibold">
+              {userDetails?.fullName || userDetails?.adminName || "User"}
+            </h2>
+            <p className="text-gray-500 capitalize text-sm">{role}</p>
+          </div>
+        )}
+        <button
+          title="logout"
+          onClick={handleLogout} // Open the logout confirmation modal
+          className="ml-3"
+          aria-label="Logout"
+        >
+          <FiLogOut
+            className={`${isOpen ? "w-7 h-7" : "w-5 h-5"} text-gray-500`}
           />
-          {isOpen && (
-            <div className="ml-4">
-              <h2 className="text-sm font-semibold">
-                {userDetails?.fullName || userDetails?.adminName || "User"}
-              </h2>
-              <p className="text-gray-500 capitalize">{role}</p>
-            </div>
-          )}
-          <button
-            title="logout"
-            onClick={handleLogout} // Open the logout confirmation modal
-            className="ml-3"
-            aria-label="Logout"
-          >
-            <FiLogOut
-              className={`${isOpen ? "w-7 h-7" : "w-5 h-5"} text-gray-500  ${
-                !isOpen && "ml-0"
-              }`}
-            />
-          </button>
-        </div>
+        </button>
       </div>
       <LogoutConfirmationModal
         isOpen={isLogoutModalOpen}

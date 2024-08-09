@@ -1,18 +1,15 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { CiMail, CiSearch } from "react-icons/ci";
 import { TbBell } from "react-icons/tb";
 import { IoLanguage, IoSettingsOutline } from "react-icons/io5";
 import { MdOutlineKeyboardDoubleArrowRight } from "react-icons/md";
-import { FaArrowRightArrowLeft, FaLanguage, FaUser } from "react-icons/fa6";
+import { FaUser } from "react-icons/fa";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import AvatarsList from "./AvataList";
-import { RiTimeZoneLine } from "react-icons/ri";
-import { IoIosLogOut } from "react-icons/io";
-import DeleteModal from "./DeleteModal";
 import LogoutConfirmationModal from "./LogoutConfirmationModal";
 import useStaffLogout from "../../Hooks/AuthHooks/Staff/useStaffLogOut";
-// import useGetUserDetail from "../../Hooks/AuthHooks/Staff/useGetUserDetail";
+import { RiTimeZoneLine } from "react-icons/ri";
+import { IoIosLogOut } from "react-icons/io";
 
 const IconButton = ({ icon: Icon, label }) => (
   <button aria-label={label}>
@@ -64,18 +61,6 @@ const SearchBar = () => (
   </div>
 );
 
-// const StudentViewButton = () => (
-//   <button
-//     className="flex mr-3 items-center space-x-2 bg-gradient-to-r from-purple-100 to-pink-100 text-white py-1 px-3 rounded-full"
-//     aria-label="Switch to Student View"
-//   >
-//     <div className="w-7 h-7 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
-//       <FaArrowRightArrowLeft aria-hidden="true" />
-//     </div>
-//     <span className="text-sm text-gradient font-medium">Student View</span>
-//   </button>
-// );
-
 const Navbar = ({ hideSearchbar, hideAvatarList, hideStudentView }) => {
   const leftHeading = useSelector(
     (store) => store.Common.NavbarData.leftHeading
@@ -101,30 +86,17 @@ const Navbar = ({ hideSearchbar, hideAvatarList, hideStudentView }) => {
     <div className="relative">
       <div className="flex items-center p-2 bg-white border-b">
         <LeftHeading leftHeading={leftHeading} navigate={navigate} />
-        {/* {!hideAvatarList && (
-          <>
-            <div className="flex-1 w-full flex justify-center ">
-              <AvatarsList />
-            </div>
-            {/* {!hideStudentView && <StudentViewButton />}  // 
-            settings- profile, languages, time zone, logout */}
-        {/* </> */}
-        {/* )} */}
 
-        {/* {!hideSearchbar && <SearchBar />} */}
         <div className="flex items-center space-x-2 border-l ml-3 pl-3">
           <div>
-            {" "}
             <IconButton icon={CiMail} label="Mail" />
           </div>
           <div>
-            {" "}
             <IconButton icon={TbBell} label="Notifications" />
           </div>
 
           <div className="relative">
             <div onClick={() => setShowSetting(!showSetting)}>
-              {" "}
               <IconButton icon={IoSettingsOutline} label="Settings" />
             </div>
             {showSetting ? (
@@ -133,10 +105,9 @@ const Navbar = ({ hideSearchbar, hideAvatarList, hideStudentView }) => {
                   className="flex items-center flex-row gap-2 font-semibold hover:border-b-2 w-[100%]"
                   onClick={() => navigate("/users/admin")}
                 >
-                  {" "}
                   <span>
                     <FaUser />
-                  </span>{" "}
+                  </span>
                   Profile
                 </button>
                 <div className="flex items-center flex-row gap-2 font-semibold hover:border-b-2 w-full">
@@ -150,7 +121,6 @@ const Navbar = ({ hideSearchbar, hideAvatarList, hideStudentView }) => {
                   </select>
                 </div>
                 <button className="flex items-center flex-row gap-2 font-semibold hover:border-b-2 w-[100%]">
-                  {" "}
                   <span>
                     <RiTimeZoneLine />
                   </span>
@@ -160,7 +130,7 @@ const Navbar = ({ hideSearchbar, hideAvatarList, hideStudentView }) => {
                   className="flex items-center flex-row gap-2 font-semibold hover:border-b-2 w-[100%]"
                   onClick={openModal}
                 >
-                  Logout{" "}
+                  Logout
                   <span>
                     <IoIosLogOut />
                   </span>

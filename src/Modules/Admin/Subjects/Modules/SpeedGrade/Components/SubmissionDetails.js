@@ -9,8 +9,9 @@ import AddRubricModal from "../../Rubric/Components/AddRubricModal";
 import Sidebar from "../../../../../../Components/Common/Sidebar";
 import AddNewCriteriaForm from "../../Rubric/Components/AddNewCriteriaForm";
 import { useParams } from "react-router-dom";
-import useAssignQuizGrade from "../../../../../../Hooks/AuthHooks/Staff/Admin/SpeedGrade/Quiz/useAssignGradeToStudent";
-import useAssignGradeToStudent from "../../../../../../Hooks/AuthHooks/Staff/Admin/SpeedGrade/Assignment/useAssignGradeToStudent ";
+import toast, { Toaster } from "react-hot-toast";
+import useAssignQuizGrade from "../../../../../../Hooks/AuthHooks/Staff/Admin/SpeedGrade/Quiz/useAssignQuizGrade";
+import useAssignAssignmentGrade from "../../../../../../Hooks/AuthHooks/Staff/Admin/SpeedGrade/Assignment/useAssignAssignmentGrade";
 
 const SubmissionDetails = ({ details, student }) => {
   const [isModalOpen, setModalOpen] = useState(false);
@@ -26,7 +27,7 @@ const SubmissionDetails = ({ details, student }) => {
     loading: assignGradeLoading,
     error: assignGradeError,
     assignGrade,
-  } = useAssignGradeToStudent();
+  } = useAssignAssignmentGrade();
 
   const {
     loading: assignQuizGradeLoading,
@@ -38,10 +39,12 @@ const SubmissionDetails = ({ details, student }) => {
     type === "Assignment" ? assignGradeLoading : assignQuizGradeLoading;
   const error = type === "Assignment" ? assignGradeError : assignQuizGradeError;
 
-  const { dueDate, points, comments, files } =
+  const { dueDate, points, totalPoints, comments, files } =
     details?.assignmentId || details?.quizId || {};
   const { content } = details;
-  console.log(content, "Content");
+
+  const maxPoints = type === "Quiz" ? totalPoints : points;
+
   const wordCount = content ? content.split(/\s+/).length : 0;
   const today = new Date();
   const due = new Date(dueDate);
@@ -54,10 +57,11 @@ const SubmissionDetails = ({ details, student }) => {
     ? "text-green-500 bg-green-100"
     : "text-red-500 bg-red-100";
   const commentCount = comments ? comments.length : 0;
+  const { sgid } = useParams();
 
   useEffect(() => {
     // Reset state variables when new details are selected
-    setGrade(details.grade || 0);
+    setGrade(details.grade || details.score || 0); // Use score for quizzes and grade for assignments
     setAttemptDate(
       details.submittedAt
         ? new Date(details.submittedAt).toISOString().split("T")[0]
@@ -74,19 +78,37 @@ const SubmissionDetails = ({ details, student }) => {
     setSidebarOpen(true);
   };
 
+  const handleGradeChange = (e) => {
+    const inputGrade = e.target.value;
+
+    // Allow clearing the input by setting grade to an empty string
+    if (inputGrade === "") {
+      setGrade("");
+    } else {
+      const parsedGrade = parseFloat(inputGrade);
+
+      // Ensure that parsedGrade is a number and does not exceed maxPoints
+      if (!isNaN(parsedGrade) && parsedGrade <= maxPoints) {
+        setGrade(parsedGrade);
+      } else if (parsedGrade > maxPoints) {
+        toast.error(`Grade cannot exceed ${maxPoints} points`);
+        setGrade(maxPoints);
+      }
+    }
+  };
+
   const handleSubmitGrade = useCallback(async () => {
     const gradeData = {
       studentId: student._id,
-      assignmentId: details._id,
       grade,
       attemptDate,
       status,
     };
 
     if (type === "Assignment") {
-      gradeData.assignmentId = details._id;
+      gradeData.assignmentId = sgid;
     } else if (type === "Quiz") {
-      gradeData.quizId = details._id;
+      gradeData.quizId = sgid;
       gradeData.score = grade; // use score instead of grade for quizzes
     }
 
@@ -101,7 +123,7 @@ const SubmissionDetails = ({ details, student }) => {
   }, [
     assignGrade,
     assignQuizGrade,
-    details._id,
+    sgid,
     grade,
     attemptDate,
     status,
@@ -174,13 +196,14 @@ const SubmissionDetails = ({ details, student }) => {
 
   return (
     <div className="flex flex-col h-full">
+      {/* <Toaster position="top-right" reverseOrder={false} /> */}
       <div className="flex gap-2 p-2 justify-center items-center border-b pb-3">
         <button className="flex items-center bg-white border text-sm gap-1 border-gray-300 font-semibold py-2 px-4 rounded-full hover:bg-gray-100 focus:outline-none">
           <RxPerson className="inline-block" />
           <span>
             Graded:{" "}
             <span className=" text-purple-500">
-              {grade ? `${grade}` : "N/A"}
+              {grade !== "" ? `${grade}` : "N/A"}
             </span>
           </span>
         </button>
@@ -228,13 +251,13 @@ const SubmissionDetails = ({ details, student }) => {
             <label className="block text-sm font-medium text-gray-500">
               Grade{" "}
               <span className="text-xs font-normal text-pink-500 italic">
-                (Out of {points})
+                (Out of {type === "Quiz" ? totalPoints : points || 0})
               </span>
             </label>
             <input
               type="number"
               value={grade}
-              onChange={(e) => setGrade(e.target.value)}
+              onChange={handleGradeChange}
               className="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
             />
           </div>
