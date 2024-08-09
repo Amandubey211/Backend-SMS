@@ -4,52 +4,55 @@ import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import { baseUrl } from "../../../../../config/Common";
 import useGetAllStaff from "./useGetAllStaff";
+import useCreateSalary from "../../../../CommonHooks/useCreateSalary";
 
 const useAddUser = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const adminRole = useSelector((store) => store.Auth.role);
-  const  { fetchStaff} = useGetAllStaff()
+  const { fetchStaff } = useGetAllStaff()
+  const { createSalary } = useCreateSalary()
+  
   const addUser = useCallback(
-   
-    async (userData,address) => {
+
+    async (userData, address) => {
       const { firstName, lastName, email, mobileNumber, role, position,
-       dob, gender, employeeID, monthlySalary} = userData;
+        dob, gender, employeeID, monthlySalary } = userData;
 
-       const missingFields = [];
+      const missingFields = [];
 
-       if (!firstName) missingFields.push("First Name");
-       if (!lastName) missingFields.push("Last Name");
-       if (!email) missingFields.push("Email");
-       if (!mobileNumber) missingFields.push("Mobile Number");
-       if (!role) missingFields.push("Role");
-       if (!position) missingFields.push("Position");
-       if (!dob) missingFields.push("Date of Birth");
-       if (!gender) missingFields.push("Gender");
-       if (!employeeID) missingFields.push("Employee ID");
-       if (!monthlySalary) missingFields.push("Monthly Salary");
-       if (!address) missingFields.push("Address");
-       
-       if (missingFields.length > 0) {
-         toast.error(`Please fill out the following fields: ${missingFields.join(", ")}`);
-         return { success: false, error: "Validation Error" };
-       }
+      if (!firstName) missingFields.push("First Name");
+      if (!lastName) missingFields.push("Last Name");
+      if (!email) missingFields.push("Email");
+      if (!mobileNumber) missingFields.push("Mobile Number");
+      if (!role) missingFields.push("Role");
+      if (!position) missingFields.push("Position");
+      if (!dob) missingFields.push("Date of Birth");
+      if (!gender) missingFields.push("Gender");
+      if (!employeeID) missingFields.push("Employee ID");
+      if (!monthlySalary) missingFields.push("Monthly Salary");
+      if (!address) missingFields.push("Address");
+
+      if (missingFields.length > 0) {
+        toast.error(`Please fill out the following fields: ${missingFields.join(", ")}`);
+        return { success: false, error: "Validation Error" };
+      }
       setLoading(true);
       setError(null);
 
       try {
-        
+
         const token = localStorage.getItem(`${adminRole}:token`);
         const formData = new FormData();
         Object.keys(userData).forEach(key => {
           formData.append(key, userData[key]);
         });
-        formData.append('address', JSON.stringify(address)); 
+        formData.append('address', JSON.stringify(address));
         const response = await axios.post(
           `${baseUrl}/admin/staff_register`, // Adjust the API endpoint as needed
           formData,
           {
-            headers: {       Authentication: token, },
+            headers: { Authentication: token, },
           }
         );
 
@@ -58,7 +61,8 @@ const useAddUser = () => {
         console.log(data);
         setLoading(false);
         toast.success("User added successfully");
-        fetchStaff()
+        fetchStaff();
+        createSalary('unpaid', 'pay now')
         return { success: true, data };
       } catch (err) {
         const errorMessage =

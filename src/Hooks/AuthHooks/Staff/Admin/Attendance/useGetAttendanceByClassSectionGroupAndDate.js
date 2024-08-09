@@ -8,6 +8,7 @@ const useGetAttendanceByClassSectionGroupAndDate = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [attendanceData, setAttendanceData] = useState([]);
+  const [attendanceStat, setAttendanceStat] = useState([]);
   const cache = useRef({});
 
   const role = useSelector((store) => store.Auth.role);
@@ -72,10 +73,32 @@ const useGetAttendanceByClassSectionGroupAndDate = () => {
       }
     }, [role, baseUrl]
   )
-  console.log("attendanceDtaa", attendanceData);
 
+  const fetchAttendanceStats = useCallback(
+    async (classId) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const token = localStorage.getItem(`${role}:token`);
+        const response = await axios.get(
+          `${baseUrl}/api/teacher/attendance/getAttendanceStats/${classId}`,
+          {
+            headers: { Authentication: token }
+          }
+        );
+        if (response.data) {
+          setAttendanceStat(response.data);
+        }
+      } catch (error) {
+        const errorMessage = error.response?.data?.message || "Failed to fetch attendance stat";
+        setError(errorMessage);
+      } finally {
+        setLoading(false);
+      }
+    }, [role, baseUrl]
+  )
 
-  return { loading, error, attendanceData, fetchAttendance, fetchAttendanceByClass };
+  return { loading, error, attendanceData, attendanceStat, fetchAttendance, fetchAttendanceByClass, fetchAttendanceStats };
 };
 
 export default useGetAttendanceByClassSectionGroupAndDate;
