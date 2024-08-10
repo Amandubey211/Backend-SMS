@@ -10,20 +10,26 @@ const DashLayout = ({
   hideStudentView,
 }) => {
   const isSidebarOpen = useSelector((state) => state.sidebar.isOpen);
+  const sidebarWidth = isSidebarOpen ? "15%" : "7%"; // Adjust the width based on sidebar state
+
   return (
-    <div className="flex w-full h-screen fixed  ">
+    <div className="flex w-full min-h-screen">
+      {/* Sidebar is fixed on the left */}
       <SideMenubar />
       <div
-        className={`transition-all duration-500 ${
-          isSidebarOpen ? "w-4/5" : "w-full"
-        } flex-1 h-full`}
+        className={`ml-${sidebarWidth} transition-all duration-500 flex-1 h-full`}
+        style={{
+          marginLeft: sidebarWidth,
+        }}
       >
+        {/* Navbar is sticky and stays at the top */}
         <Navbar
           hideSearchbar={hideSearchbar}
           hideAvatarList={hideAvatarList}
           hideStudentView={hideStudentView}
         />
-        <main className="w-full min-h-screen h-screen overflow-y-scroll no-scrollbar pb-0">
+        {/* Main content area */}
+        <main className="w-full min-h-screen h-screen overflow-y-scroll no-scrollbar ">
           {children}
         </main>
       </div>

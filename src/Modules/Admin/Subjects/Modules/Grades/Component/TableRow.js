@@ -22,13 +22,13 @@ const TableRow = ({ student, onRowClick }) => {
       </td>
       <td className="p-3 text-center">
         <div className="border text-green-600 py-1 rounded-md">
-          {student.totalQuizzes}/{student.completedQuizzes}
+          {student.completedQuizzes}/{student.totalQuizzes}
         </div>
       </td>
       <td className="p-3 text-center">
         <div className="border py-1  rounded-md">{student.attendance}</div>
       </td>
-      <td className="p-3 text-pink-600">{student.score}%</td>
+      <td className="p-3 text-pink-600 text-center">{student.score} %</td>
     </tr>
   );
 };

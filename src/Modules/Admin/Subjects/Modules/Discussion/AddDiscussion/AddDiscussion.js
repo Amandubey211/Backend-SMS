@@ -10,6 +10,7 @@ import EditorComponent from "../../../Component/AdminEditor";
 import useCreateDiscussion from "../../../../../../Hooks/AuthHooks/Staff/Admin/Disscussion/useCreateDiscussion";
 import useUpdateDiscussion from "../../../../../../Hooks/AuthHooks/Staff/Admin/Disscussion/useUpdateDiscussion";
 import Spinner from "../../../../../../Components/Common/Spinner";
+import { useSelector } from "react-redux";
 
 const AddDiscussion = () => {
   const { state } = useLocation();
@@ -104,6 +105,8 @@ const AddDiscussion = () => {
 
   const loading = createLoading || updateLoading;
   const error = createError || updateError;
+  const isSidebarOpen = useSelector((state) => state.sidebar.isOpen);
+  const sidebarWidth = isSidebarOpen ? "15%" : "7%"; // Adjust the width based on sidebar state
 
   return (
     <Layout
@@ -113,9 +116,14 @@ const AddDiscussion = () => {
           : "Add Discussion | Student Diwan"
       }
     >
-      <div className="flex">
+      <div className="flex w-full min-h-screen">
         <SideMenubar />
-        <div className="w-full">
+        <div
+          className={`ml-${sidebarWidth} transition-all duration-500 flex-1 h-full`}
+          style={{
+            marginLeft: sidebarWidth,
+          }}
+        >
           <>
             <AddDiscussionHeader onSave={handleSave} isUpdating={isEditing} />
             <div className="flex w-full">

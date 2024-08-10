@@ -22,7 +22,7 @@ const CreateQuizHeader = ({ onSave, isEditing, quizId }) => {
           onClick={() => navigate(-1)} // Navigate to the previous page
         />
         <h1 className="text-lg font-semibold text-gray-800">
-          {isEditing ? "Edit Quiz" : "Create New Quiz"}
+          {isEditing ? "Update Quiz" : "Create New Quiz"}
         </h1>
       </div>
       <div className="flex items-center space-x-2">

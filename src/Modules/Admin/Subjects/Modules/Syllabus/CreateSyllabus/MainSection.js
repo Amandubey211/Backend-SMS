@@ -1,12 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation, useParams } from "react-router-dom";
 import CreateSyllabusHeader from "./Components/CreateSyllabusHeader";
 import SideMenubar from "../../../../../../Components/Admin/SideMenubar";
 import EditorComponent from "../../../Component/AdminEditor";
 import useCreateSyllabus from "../../../../../../Hooks/AuthHooks/Staff/Admin/Syllabus/useCreateSyllabus";
 import useEditSyllabus from "../../../../../../Hooks/AuthHooks/Staff/Admin/Syllabus/useEditSyllabus";
+import { useSelector } from "react-redux";
+import Spinner from "../../../../../../Components/Common/Spinner";
 
-const MainSection = () => {
+const MainSection = ({ setIsEditing }) => {
   const { state } = useLocation();
   const { sid } = useParams();
   const [assignmentName, setAssignmentName] = useState(
@@ -25,6 +27,11 @@ const MainSection = () => {
     error: editError,
     editSyllabus,
   } = useEditSyllabus();
+
+  useEffect(() => {
+    // Set the isEditing state in the parent based on whether we are editing or creating
+    setIsEditing(Boolean(state?.syllabus?._id));
+  }, [state, setIsEditing]);
 
   const handleNameChange = (name) => {
     setAssignmentName(name);
@@ -50,16 +57,22 @@ const MainSection = () => {
 
   const loading = createLoading || editLoading;
   const error = createError || editError;
-  const isEditing = Boolean(state?.syllabus?._id);
+  const isSidebarOpen = useSelector((state) => state.sidebar.isOpen);
+  const sidebarWidth = isSidebarOpen ? "15%" : "7%";
 
   return (
-    <div className="flex">
+    <div className="flex w-full min-h-screen">
       <SideMenubar />
-      <div className="w-full mb-4">
+      <div
+        className={`ml-${sidebarWidth} transition-all duration-500 flex-1 h-full`}
+        style={{
+          marginLeft: sidebarWidth,
+        }}
+      >
         <CreateSyllabusHeader
           onSave={handleSave}
           loading={loading}
-          isEditing={isEditing}
+          isEditing={Boolean(state?.syllabus?._id)}
         />
         <EditorComponent
           inputPlaceHolder="Syllabus Heading"
@@ -69,7 +82,7 @@ const MainSection = () => {
           onNameChange={handleNameChange}
           onEditorChange={handleEditorChange}
         />
-        {loading && <p role="status">Loading...</p>}
+        {loading && <Spinner />}
         {error && (
           <p role="alert" className="text-red-400 text-current my-4">
             {error}

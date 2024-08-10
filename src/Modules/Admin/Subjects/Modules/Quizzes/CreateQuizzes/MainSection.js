@@ -45,7 +45,7 @@ const initialAnswersState = [
   { text: "", isCorrect: false },
 ];
 
-const MainSection = () => {
+const MainSection = ({ setIsEditing }) => {
   const { cid, sid } = useParams();
   const location = useLocation();
   const [activeTab, setActiveTab] = useState("instructions");
@@ -60,7 +60,7 @@ const MainSection = () => {
   const [wrongAnswerComment, setWrongAnswerComment] = useState("");
   const [questionPoint, setQuestionPoint] = useState(1);
   const [questionType, setQuestionType] = useState("multiple choice");
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditing, setLocalIsEditing] = useState(false); // Local isEditing state
   const [editingQuestionId, setEditingQuestionId] = useState(null);
 
   const { createQuiz, loading: createLoading } = useCreateQuiz();
@@ -76,15 +76,19 @@ const MainSection = () => {
     if (quizIdFromState) {
       setQuizId(quizIdFromState);
       fetchQuizById(quizIdFromState);
+      setIsEditing(true); // Notify parent that we're editing
+    } else {
+      setIsEditing(false); // Notify parent that we're creating
     }
-  }, [location.state, fetchQuizById]);
+  }, [location.state, fetchQuizById, setIsEditing]);
 
   useEffect(() => {
     if (quiz) {
       setAssignmentName(quiz.name);
       setInstruction(quiz.content);
       setQuizId(quiz._id);
-      setIsEditing(true);
+      setLocalIsEditing(true); // Set local isEditing state
+      setIsEditing(true); // Notify parent that we're editing
       setFormState({
         points: quiz.points || "",
         quizType: quiz.quizType || "",
@@ -111,14 +115,13 @@ const MainSection = () => {
       setRightAnswerComment(quiz.rightAnswerComment || "");
       setWrongAnswerComment(quiz.wrongAnswerComment || "");
     }
-  }, [quiz]);
+  }, [quiz, setIsEditing]);
 
   const handleNameChange = (name) => setAssignmentName(name);
   const handleInstructionChange = (content) => setInstruction(content);
   const handleQuestionChange = (content) => setQuestion(content);
   const handleFormChange = (e) => {
     const { name, value, type, checked } = e.target;
-    console.log(value, "sdfsdf");
     setFormState((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
@@ -143,7 +146,6 @@ const MainSection = () => {
       correctAnswerComment: rightAnswerComment,
       inCorrectAnswerComment: wrongAnswerComment,
     };
-    console.log(newQuestion, "new question", typeof newQuestion.questionPoint);
     const result = await addQuestion(quizId, newQuestion);
     if (result.success) {
       setQuestionState((prev) => [...prev, newQuestion]);

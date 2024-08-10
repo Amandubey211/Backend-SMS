@@ -25,11 +25,11 @@ const useDeleteSyllabus = () => {
             },
           }
         );
-        if (response.data.success) {
-          toast.success("Syllabus deleted successfully!");
-        } else {
-          toast.error("Failed to delete syllabus");
-        }
+        // if (response.data.success) {
+        //   toast.success("Syllabus deleted successfully!");
+        // } else {
+        //   toast.error("Failed to delete syllabus");
+        // }
         return response.data;
       } catch (err) {
         const errorMessage =

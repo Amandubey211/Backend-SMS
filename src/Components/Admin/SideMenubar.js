@@ -55,7 +55,7 @@ const SideMenubar = () => {
 
   return (
     <nav
-      className={`transition-all duration-300 p-1 px-3 z-10 border-r flex flex-col ${
+      className={`fixed top-0 left-0 bottom-0 transition-all duration-300 p-1 px-3 z-30 border-r flex flex-col bg-white ${
         isOpen ? "w-[15%]" : "w-[7%]"
       }`}
       aria-label="Sidebar"
@@ -87,12 +87,12 @@ const SideMenubar = () => {
       {/* Sidebar menu list with scroll overflow */}
       <div className="flex-grow overflow-y-auto no-scrollbar">
         {isOpen && <h2 className="text-gray-500 my-1">MENU</h2>}
-        <ul className="space-y-1">
+        <ul className={`space-y-1 ${!isOpen && "mt-3"}`}>
           {sidebarData.map((item, index) => (
             <React.Fragment key={index}>
               {item.items ? (
                 <div
-                  className={`flex items-center w-full p-2 rounded-lg cursor-pointer ${
+                  className={`flex items-center w-full p-2 rounded-lg cursor-pointer  ${
                     isActivePath(item.path, location.pathname) ||
                     (item.items &&
                       item.items.some((subItem) =>
@@ -100,7 +100,7 @@ const SideMenubar = () => {
                       ))
                       ? "bg-purple-100 text-purple-500"
                       : "text-gray-700 hover:bg-gray-100"
-                  } ${isOpen ? "justify-between" : "justify-center"}`}
+                  } ${isOpen ? "justify-between" : "justify-center "}`}
                   onClick={() => toggleDropdown(item.title)}
                   role="button"
                   aria-expanded={openItems.includes(item.title)}

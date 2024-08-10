@@ -22,7 +22,7 @@ const ModuleCard = ({
   isSelected,
   onSelect,
   onEdit,
-  onMove,
+  onMove, // Function to open the MoveModule sidebar
   onDelete,
   moduleId,
   fetchModules,
@@ -30,7 +30,7 @@ const ModuleCard = ({
   const [menuOpen, setMenuOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const menuRef = useRef();
-  const { loading, error, success, deleteModule } = useDeleteModule();
+  const { loading, deleteModule } = useDeleteModule();
 
   const toggleMenu = (e) => {
     e.stopPropagation();
@@ -50,6 +50,12 @@ const ModuleCard = ({
       setIsDeleteModalOpen(false); // Close the modal on successful deletion
       fetchModules(); // Refetch modules after deletion
     }
+  };
+
+  const handleMove = (e) => {
+    e.stopPropagation();
+    onMove(); // Open the MoveModule sidebar
+    setMenuOpen(false);
   };
 
   useEffect(() => {
@@ -111,11 +117,7 @@ const ModuleCard = ({
             </li>
             <li
               className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
-              onClick={(e) => {
-                e.stopPropagation();
-                onMove();
-                setMenuOpen(false);
-              }}
+              onClick={handleMove} // Call the move handler which opens the sidebar
             >
               <FaArrowRight className="mr-2" /> Move to...
             </li>

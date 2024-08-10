@@ -14,7 +14,6 @@ import DeleteModal from "../../../../../Components/Common/DeleteModal";
 import toast from "react-hot-toast";
 import Spinner from "../../../../../Components/Common/Spinner";
 import NoDataFound from "../../../../../Components/Common/NoDataFound";
-import useAddModule from "../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useAddModule";
 import useDeleteModule from "../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useDeleteModule";
 
 const MainSection = () => {
@@ -30,7 +29,6 @@ const MainSection = () => {
   const { error, fetchModules, loading, modulesData } =
     useGetModulesForStudent();
 
-  const { addModule } = useAddModule(fetchModules);
   const { deleteModule } = useDeleteModule(fetchModules);
 
   // Fetch modules on component mount
@@ -111,8 +109,21 @@ const MainSection = () => {
     setIsSidebarOpen(true);
   };
 
-  const handleMoveModule = () => {
-    setSidebarContent(<MoveModule />);
+  const handleMoveModule = (module) => {
+    const currentIndex = modulesData.modules.findIndex(
+      (mod) => mod._id === module._id
+    );
+    console.log(modulesData);
+    console.log(currentIndex);
+
+    setSidebarContent(
+      <MoveModule
+        moduleId={selectedModule.moduleId}
+        currentPosition={currentIndex}
+        modulesData={modulesData} // Pass modulesData directly
+        onClose={handleMoveSidebarClose}
+      />
+    );
     setIsMoveSidebarOpen(true);
   };
 
@@ -229,7 +240,7 @@ const MainSection = () => {
                 }
                 onSelect={() => handleModuleSelect(module)}
                 onEdit={() => handleEditModule(module)}
-                onMove={() => handleMoveModule(module)}
+                onMove={() => handleMoveModule(module)} // Pass the function here
                 onDelete={() =>
                   handleDelete({
                     type: "Module",
@@ -287,7 +298,7 @@ const MainSection = () => {
             onClose={handleMoveSidebarClose}
             title="Move Module"
           >
-            <MoveModule />
+            {sidebarContent} {/* Pass the module data to the sidebar content */}
           </Sidebar>
         )}
         {isDeleteModalOpen && (

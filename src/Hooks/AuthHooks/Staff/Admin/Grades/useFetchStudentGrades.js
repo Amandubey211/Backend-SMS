@@ -23,36 +23,25 @@ const useFetchStudentGrades = () => {
 
   const fetchStudentGrades = useCallback(
     async (
-      moduleId = null,
-      assignmentId = null,
-      quizId = null,
-      chapterId = null,
-      status = null,
-      arrangeBy = "assignment",
-      studentId
+      studentId,moduleId,chapterId,arrangeBy
     ) => {
+      const params = {};
+        if (moduleId) params.moduleId = moduleId;
+        if (chapterId) params.chapterId = chapterId;
+        if (arrangeBy) params.arrangeBy = arrangeBy;
       setLoading(true);
       setError(null);
-
       try {
         const token = localStorage.getItem(`${role}:token`);
         const response = await axios.get(
-          `${baseUrl}/admin/grades/student/${studentId}/class/${cid}/subject/${sid}`,
+          `${baseUrl}/admin/grades/student/${studentId}/class/${cid}/?subjectId=${sid}`,
           {
             headers: { Authentication: token },
-            params: {
-              moduleId,
-              assignmentId,
-              quizId,
-              chapterId,
-              status,
-              arrangeBy,
-            },
+            params:params
           }
         );
-
         if (response.data.success) {
-          setGrades(response.data.grades);
+          setGrades(response.data);
           setTotals({
             totalScoreOfAllAssignments:
               response.data.totalScoreOfAllAssignments,
