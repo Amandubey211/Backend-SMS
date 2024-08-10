@@ -11,6 +11,7 @@ import useGetStudentQuiz from "../../../../../Hooks/AuthHooks/Staff/Admin/SpeedG
 
 const MainSection = () => {
   const [selectedStudent, setSelectedStudent] = useState(null);
+  const [totalGrade, setTotalGrade] = useState(0);
   const { sgid, type } = useParams();
 
   // Determine which hook to use based on the `type` parameter
@@ -46,6 +47,10 @@ const MainSection = () => {
   const error = type === "Assignment" ? assignmentError : quizError;
   const details = type === "Assignment" ? assignmentDetails : quizDetails;
 
+  const handleTotalGradeUpdate = (grade) => {
+    setTotalGrade(grade);
+  };
+
   return (
     <div className="flex h-screen">
       {/* Student List Section */}
@@ -73,6 +78,7 @@ const MainSection = () => {
                 student={selectedStudent}
                 details={details}
                 type={type}
+                onTotalGradeUpdate={handleTotalGradeUpdate}
               />
             )}
           </div>
@@ -80,7 +86,11 @@ const MainSection = () => {
           {/* Right Section */}
           <div className="w-1/4 flex flex-col">
             {details ? (
-              <SubmissionDetails details={details} student={selectedStudent} />
+              <SubmissionDetails
+                details={details}
+                student={selectedStudent}
+                initialGrade={totalGrade}
+              />
             ) : (
               <div className="flex-grow flex flex-col items-center justify-center text-gray-400">
                 <FaUserCircle className="text-9xl mb-4" /> {/* Big icon */}
