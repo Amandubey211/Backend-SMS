@@ -12,7 +12,7 @@ const ProfileCard = ({ profile }) => {
         <div className="mb-2 flex flex-col h-[80%] justify-center items-center py-3 ">
 
           <div className="mb-1 bg-gray-300 flex justify-center items-center text-center rounded-full w-[100px] h-[100px] overflow-hidden">
-            <img className="object-cover rounded-full w-full h-full" src={profile.imageUrl} alt={profile.name} />
+            <img className="object-cover rounded-full w-full h-full" src={profile.profile} alt={profile.name} />
           </div>
           <h3 className="text-lg font-medium">{profile.name}</h3>
           <p className="text-gray-500">{profile.subject}</p>

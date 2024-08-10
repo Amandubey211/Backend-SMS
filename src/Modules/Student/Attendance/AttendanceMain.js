@@ -5,14 +5,22 @@ import StudentDashLayout from '../../../Components/Student/StudentDashLayout';
 import axios from 'axios';
 import moment from 'moment';
 import { baseUrl } from '../../../config/Common';
+import useNavHeading from '../../../Hooks/CommonHooks/useNavHeading ';
+import { shallowEqual, useSelector } from 'react-redux';
 
 
 const AttendanceMain = () => {
-
+    const { selectedClassName } = useSelector(
+        (state) => ({
+          selectedClassName: state.Common.selectedClassName,
+        }),
+        shallowEqual
+      );
     const [attendanceData, setAttendanceData] = useState({})
     const [currentDate, setCurrentDate] = useState(moment());
     const [summary, setSummary] = useState({ presentCount: 0, absentCount: 0, leaveCount: 0 });
-
+   
+    useNavHeading(selectedClassName, "Attendance");
     const fetchAttendance = async (month, year) => {
         try {
             const token = localStorage.getItem('student:token')
