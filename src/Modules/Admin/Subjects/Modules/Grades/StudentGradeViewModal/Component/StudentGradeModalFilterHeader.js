@@ -32,10 +32,10 @@ const StudentGradeModalFilterHeader = ({ filters, onFilterChange }) => {
           className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
         >
           <option value="">Select</option>
-          <option value="Assignment">Assignment</option>
-          <option value="Group Assignment">Group Assignment</option>
-          <option value="Quiz">Quiz</option>
-          <option value="Group Quiz">Group Quiz</option>
+          <option value="assignment">Assignment</option>
+          <option value="group assignment">Group Assignment</option>
+          <option value="quiz">Quiz</option>
+          <option value="group quiz">Group Quiz</option>
         </select>
       </div>
       <div className="flex flex-col flex-grow">
