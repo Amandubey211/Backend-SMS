@@ -1,8 +1,10 @@
 import React, { useEffect } from "react";
 import { useSelector } from "react-redux";
 import useFetchSection from "../../../../Hooks/AuthHooks/Staff/Admin/Sections/useFetchSection";
+
 import { useParams } from "react-router-dom";
 import { createSelector } from "reselect";
+import useGetGroupsByClass from "../../../../Hooks/AuthHooks/Staff/Admin/Groups/useGetGroupByClass";
 
 const selectSections = createSelector(
   (store) => store.Class.sectionsList,
@@ -11,12 +13,14 @@ const selectSections = createSelector(
 
 const SectionSelect = ({ sectionId, handleChange, groupId, assignTo }) => {
   const { error, fetchSection, loading } = useFetchSection();
+  const {
+    error: grpopError,
+    fetchGroupsByClass,
+    loading: groupLoading,
+  } = useGetGroupsByClass();
   const { cid } = useParams();
   const AllSections = useSelector(selectSections);
-  const groups = useSelector((store) => store.Class.groupsList);
-  console.log("AllSections", AllSections);
-  console.log("groups", groups);
-
+  const groupsList = useSelector((store) => store.Class.groupsList);
 
   // const groups = section
   //   ? AllSections.find((sec) => sec._id === section)?.groups
@@ -26,7 +30,10 @@ const SectionSelect = ({ sectionId, handleChange, groupId, assignTo }) => {
     if (!AllSections.length) {
       fetchSection(cid);
     }
-  }, [fetchSection]);
+    if (!groupsList || groupsList.length === 0) {
+      fetchGroupsByClass(cid);
+    }
+  }, [fetchSection, fetchGroupsByClass]);
 
   if (loading) {
     return <p>Loading sections...</p>;
@@ -73,7 +80,7 @@ const SectionSelect = ({ sectionId, handleChange, groupId, assignTo }) => {
               disabled={loading}
             >
               <option value="">Choose Group</option>
-              {groups.map((group) => (
+              {groupsList.map((group) => (
                 <option key={group._id} value={group._id}>
                   {group.groupName}
                   {/* {group.name} */}

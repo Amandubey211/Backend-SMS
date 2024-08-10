@@ -80,7 +80,7 @@ const CreateAnnouncement = () => {
     const announcementData = {
       title: assignmentName,
       content: editorContent,
-      sectionId: formState.section,
+      sectionId: formState.sectionId,
       delayPosting: formState.availableFrom,
       classId: cid,
       ...formState,

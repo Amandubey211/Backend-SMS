@@ -22,7 +22,7 @@ const useGetGroupsByClass = () => {
         });
 
         if (response.data.status) {
-          dispatch(setGroupsList(response.data.data))
+          dispatch(setGroupsList(response.data.data));
           return response.data.data;
         } else {
           toast.error("Failed to fetch groups. Please try again.");

@@ -20,7 +20,7 @@ const AssignToSection = ({
       />
       <SectionSelect
         assignTo={assignTo}
-        section={sectionId}
+        sectionId={sectionId}
         groupId={groupId}
         handleChange={handleChange}
       />

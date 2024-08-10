@@ -5,6 +5,7 @@ import AssignToRadios from "../../../../Component/AssignToRadios";
 import LabeledSelect from "./LabeledSelect";
 import LabeledInput from "./LabeledInput";
 import { useSelector } from "react-redux";
+import useGetModulesForStudent from "../../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useGetModulesForStudent";
 
 const CreateQuizForm = ({
   quizType,
@@ -15,7 +16,7 @@ const CreateQuizForm = ({
   allowMultiple,
   assignTo,
   timeLimit,
-  section,
+  sectionId,
   dueDate,
   availableFrom,
   handleChange,
@@ -23,10 +24,18 @@ const CreateQuizForm = ({
   showAnswerDate,
   moduleId,
   chapterId,
-  group,
+  groupId,
 }) => {
   const [chapters, setChapters] = useState([]);
+  const { loading, error, fetchModules } = useGetModulesForStudent();
+
   const moduleList = useSelector((store) => store.Subject.modules);
+  useEffect(() => {
+    // Fetch modules if not available in the Redux store
+    if (!moduleList || moduleList.length === 0) {
+      fetchModules();
+    }
+  }, [moduleList, fetchModules]);
 
   useEffect(() => {
     if (moduleId) {
@@ -205,9 +214,9 @@ const CreateQuizForm = ({
           isAssignToLabel={true}
         />
         <SectionSelect
-          section={section}
+          sectionId={sectionId}
           handleChange={handleChange}
-          group={group}
+          groupId={groupId}
           assignTo={assignTo}
         />
         <div className="mb-4">
