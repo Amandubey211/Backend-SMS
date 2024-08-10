@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ImageUpload from "../../Addmission/Components/ImageUpload";
 import FormInput from "../../Accounting/subClass/component/FormInput";
 import FormSelect from "../../Accounting/subClass/component/FormSelect";
@@ -13,7 +13,15 @@ const EditAdmin = ({data}) => {
     email: data.email,
     profile: null,
   });
-
+  useEffect(() => {
+    if (data) {
+      setAdminData({
+        adminName: data.adminName || "",
+        contactNumber: data.contactNumber || "",
+        email: data.email || "",
+      });
+    }
+  }, [data]);
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setAdminData((prev) => ({
@@ -62,7 +70,7 @@ const {EditAdmin} = useEditAdmin()
             </div>
             <div className="flex flex-col gap-3">
               <FormInput id="adminName" label="Full Name" value={adminData.adminName} onChange={handleInputChange} />
-              <FormInput id="email"  label="Email" type="email" value={adminData.email} onChange={handleInputChange} />
+              <FormInput id="email"  label="Email" type="email" value={adminData.email} readOnly />
               <FormInput id="contactNumber" label="Contact" type="text" value={adminData.contactNumber} onChange={handleInputChange} />
             </div>
           </div>

@@ -6,15 +6,17 @@ import StudentTable from "./Component/StudentTable";
 import StudentGradeModal from "./StudentGradeViewModal/StudentGradeModal";
 import { setStudentGrade } from "../../../../../Redux/Slices/AdminSlice";
 import useFetchClassGrades from "../../../../../Hooks/AuthHooks/Staff/Admin/Grades/useFetchClassGrades";
+import { LoaderIcon } from "react-hot-toast";
+import { FiLoader } from "react-icons/fi";
 
 const MainSection = () => {
   const studentGrade = useSelector((store) => store.Admin.studentGrade);
   const [search, setSearch] = useState("");
   const [filters, setFilters] = useState({
-    section: "",
-    group: "",
-    assignment: "",
-    quizzes: "",
+    moduleId: "",
+    classId:"",
+    assignmentId: "",
+    quizId: "",
   });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const dispatch = useDispatch();
@@ -27,14 +29,21 @@ const MainSection = () => {
   }, []);
 
   const handleSearchChange = (value) => {
-    setSearch(value);
+       setSearch(value); 
+   
+  
   };
 
-  const handleFilterChange = (name, value) => {
-    setFilters((prevFilters) => ({
-      ...prevFilters,
-      [name]: value,
-    }));
+  const handleFilterChange = async(name, value) => {
+// Update filters state
+  const updatedFilters = {
+    ...filters,
+    [name]: value,
+  };
+  setFilters(updatedFilters);
+
+  // Fetch grades with the updated filters
+  await fetchClassGrades(updatedFilters);
   };
 
   const fuzzySearch = (query, text) => {
@@ -52,16 +61,6 @@ const MainSection = () => {
     return false;
   };
 
-  const filteredStudents = grades.filter((student) => {
-    return (
-      fuzzySearch(search, student.studentName) &&
-      (filters.section ? student.section === filters.section : true) &&
-      (filters.group ? student.group === filters.group : true) &&
-      (filters.assignment ? student.assignment === filters.assignment : true) &&
-      (filters.quizzes ? student.quizzes === filters.quizzes : true)
-    );
-  });
-
   const handleRowClick = (student) => {
     dispatch(setStudentGrade(student));
     setIsModalOpen(true);
@@ -73,12 +72,12 @@ const MainSection = () => {
   };
 
   return (
-    <div className="flex">
+    <div className="flex  ">
       <SubjectSideBar />
-      <div className="border-l w-full">
+      <div className="border-l w-full mr-2">
         <GradeHeader onSearch={handleSearchChange} onFilterChange={handleFilterChange} />
         <div className="h-screen overflow-y-scroll no-scrollbar">
-          <StudentTable students={filteredStudents} onRowClick={handleRowClick} />
+          {loading? <div className="flex items-center h-[80%] w-[100%] justify-center"><FiLoader className="animate-spin mr-2 w-[2rem] h-[2rem] " /></div>:<StudentTable students={grades} onRowClick={handleRowClick} />}
         </div>
       </div>
       {studentGrade && <StudentGradeModal  isOpen={isModalOpen} onClose={handleCloseModal} />}

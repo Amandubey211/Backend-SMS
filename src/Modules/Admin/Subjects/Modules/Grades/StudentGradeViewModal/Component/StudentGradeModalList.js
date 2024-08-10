@@ -1,5 +1,6 @@
 import React from "react";
 import { FaExclamationTriangle } from "react-icons/fa";
+import { useSelector } from "react-redux";
 
 const getStatusClass = (status) => {
   switch (status) {
@@ -15,6 +16,8 @@ const getStatusClass = (status) => {
 };
 
 const sortData = (data, arrangeBy) => {
+ 
+  
   if (arrangeBy) {
     return data.sort((a, b) => {
       if (a.type === arrangeBy && b.type !== arrangeBy) {
@@ -30,17 +33,10 @@ const sortData = (data, arrangeBy) => {
 };
 
 const StudentModalGradeList = ({ data, filters }) => {
-  const filteredData = data.filter((item) => {
-    return (
-      (filters.module ? item.module === filters.module : true) &&
-      (filters.chapter ? item.chapter === filters.chapter : true) &&
-      (filters.status ? item.status === filters.status : true)
-    );
-  });
 
-  const sortedData = sortData(filteredData, filters.arrangeBy);
+console.log(data);
 
-  if (sortedData.length === 0) {
+  if (data?.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-10 text-gray-500">
         <FaExclamationTriangle className="w-12 h-12 mb-3" />
@@ -72,18 +68,18 @@ const StudentModalGradeList = ({ data, filters }) => {
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
-          {sortedData.map((item, index) => (
+          {data?.map((item, index) => (
             <tr key={index}>
               <td className={`px-6 py-4 whitespace-nowrap ${getBoldClass(item)}`}>
-                <div className="text-sm text-gray-900">{item.name}</div>
+                <div className="text-sm text-gray-900">{item.Name}</div>
                 <div className="text-sm ">{item.type}</div>
               </td>
               <td className={`px-6 py-4 whitespace-nowrap ${getBoldClass(item)}`}>
-                <div className="text-sm text-gray-900">{item.module}</div>
-                <div className="text-sm text-green-500">{item.chapter}</div>
+                <div className="text-sm text-gray-900">{item.moduleName}</div>
+                {/* <div className="text-sm text-green-500">{item.chapterId}</div> */}
               </td>
-              <td className={`px-6 py-4 whitespace-nowrap text-sm text-gray-500 ${getBoldClass(item)}`}>{item.dueDate}</td>
-              <td className={`px-6 py-4 whitespace-nowrap text-sm text-gray-500 ${getBoldClass(item)}`}>{item.submittedDate}</td>
+              <td className={`px-6 py-4 whitespace-nowrap text-sm text-gray-500 ${getBoldClass(item)}`}>{item.dueDate.slice(0,10)}</td>
+              <td className={`px-6 py-4 whitespace-nowrap text-sm text-gray-500 ${getBoldClass(item)}`}>{item.submittedDate.slice(0,10)}</td>
               <td className={`px-6 py-4 whitespace-nowrap text-sm ${getBoldClass(item)} ${getStatusClass(item.status)}`}>{item.status}</td>
               <td className={`px-6 py-4 whitespace-nowrap text-sm text-gray-500 ${getBoldClass(item)}`}>{item.score}</td>
             </tr>

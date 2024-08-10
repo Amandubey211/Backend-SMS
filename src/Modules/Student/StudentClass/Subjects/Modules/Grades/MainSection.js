@@ -86,7 +86,7 @@ const MainSection = () => {
 
     <>
      {/* <SubjectSideBar /> */}
-      <div className="flex  w-full">
+      <div className="flex  w-full bg-green-700">
       <SubjectSideBar />
         <div key={studentGrades.id} className=" w-[70%]">
           {studentGrades.grades.map((grade, index) => (

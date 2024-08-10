@@ -16,10 +16,7 @@ const useFetchClassGrades = () => {
 
   const fetchClassGrades = useCallback(
     async (
-      moduleId = null,
-      assignmentId = null,
-      quizId = null,
-      studentId = null
+     filter
     ) => {
       setLoading(true);
       setError(null);
@@ -27,10 +24,10 @@ const useFetchClassGrades = () => {
       try {
         const token = localStorage.getItem(`${role}:token`);
         const response = await axios.get(
-          `${baseUrl}/admin/grades/class/${cid}/subject/${sid}`,
+          `${baseUrl}/admin/grades/class/${cid}/subject/${sid}/`,
           {
             headers: { Authentication: token },
-            params: { moduleId, assignmentId, quizId, studentId },
+            params: { moduleId:filter?.moduleId, assignmentId:filter?.assignmentId, quizId:filter?.quizId, studentId:filter?.studentId },
           }
         );
 

@@ -37,7 +37,8 @@ const StudentGradeModal = ({ isOpen, onClose }) => {
   const { error, fetchStudentGrades, grades, loading, totals } =
     useFetchStudentGrades();
   useEffect(() => {
-    fetchStudentGrades(studentGrade._id);
+
+    fetchStudentGrades(studentGrade.studentId);
     console.log(grades);
   }, [studentGrade, fetchStudentGrades]);
 
@@ -68,10 +69,10 @@ const StudentGradeModal = ({ isOpen, onClose }) => {
               onFilterChange={handleFilterChange}
             />
             <div className="h-96 overflow-y-scroll no-scrollbar">
-              <StudentModalGradeList data={dummyData} filters={filters} />
+              <StudentModalGradeList data={grades.grades} filters={filters} />
             </div>
           </div>
-          <StudentGradeSummary studentGrade={studentGrade} />
+          <StudentGradeSummary studentGrade={grades} />
         </div>
       </div>
     </div>

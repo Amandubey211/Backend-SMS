@@ -1,12 +1,26 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { AiOutlinePrinter } from "react-icons/ai";
 import {toast} from "react-hot-toast"
+import { useSelector } from "react-redux";
+import useGetModulesForStudent from "../../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useGetModulesForStudent";
 const StudentGradeModalFilterHeader = ({ filters, onFilterChange }) => {
+
+  let [chapters,setChapters] = useState([])
+  const moduleList = useSelector((store) => store.Subject.modules);
+  const { loading, error, fetchModules } = useGetModulesForStudent();
+  useEffect(()=>{
+    fetchModules();
+    console.log(moduleList);
+  },[])
   const handleChange = (e) => {
     const { name, value } = e.target;
+    console.log(value);
+    if(name=='module'){
+      const module = moduleList?.filter((i)=>i._id==value);
+      setChapters(module[0]?.chapters)
+    }
     onFilterChange(name, value);
   };
-
   return (
     <div className="flex items-end gap-4 p-4 bg-white w-full">
       <div className="flex flex-col flex-grow">
@@ -30,12 +44,14 @@ const StudentGradeModalFilterHeader = ({ filters, onFilterChange }) => {
           name="module"
           value={filters.module}
           onChange={handleChange}
-          className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+          className="mt-1 block w-[15rem] px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
         >
-          <option value="">Select</option>
-          <option value="Module 1">Module 1</option>
-          <option value="Module 2">Module 2</option>
-          <option value="Module 3">Module 3</option>  <option value="Module 4">Module 4</option>
+          <option value=''>All</option>
+          {moduleList?.map((i)=>(
+            <>
+            <option value={i._id}>{i.moduleName}</option>
+              </>
+          ))}
         </select>
       </div>
       <div className="flex flex-col flex-grow">
@@ -44,13 +60,12 @@ const StudentGradeModalFilterHeader = ({ filters, onFilterChange }) => {
           name="chapter"
           value={filters.chapter}
           onChange={handleChange}
-          className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+          className="mt-1 block w-[15rem] px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
         >
-          <option value="">Select</option>
-          <option value="Chapter 1">Chapter 1</option>
-          <option value="Chapter 2">Chapter 2</option>
-          <option value="Chapter 3">Chapter 3</option>
-          <option value="Chapter 4">Chapter 4</option>
+          <option value=''>All</option>
+          {chapters?.map((i)=>(
+            <option value={i._id}>{i.name}</option>
+          ))}
         </select>
       </div>
       <div className="flex flex-col flex-grow">
