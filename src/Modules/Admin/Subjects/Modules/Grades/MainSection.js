@@ -77,7 +77,10 @@ const MainSection = () => {
       <div className="border-l w-full mr-2">
         <GradeHeader onSearch={handleSearchChange} onFilterChange={handleFilterChange} />
         <div className="h-screen overflow-y-scroll no-scrollbar">
-          {loading? <div className="flex items-center h-[80%] w-[100%] justify-center"><FiLoader className="animate-spin mr-2 w-[2rem] h-[2rem] " /></div>:<StudentTable students={grades} onRowClick={handleRowClick} />}
+          {loading? <div className="flex items-center h-[80%] w-[100%] justify-center flex-col gap-2">
+            <FiLoader className="animate-spin mr-2 w-[3rem] h-[3rem] " />
+            <p className="text-gray-800 text-lg">Loading...</p>
+            </div>:<StudentTable students={grades} onRowClick={handleRowClick} />}
         </div>
       </div>
       {studentGrade && <StudentGradeModal  isOpen={isModalOpen} onClose={handleCloseModal} />}
