@@ -13,8 +13,8 @@ import StudentDiwanLogo from "../../../../Assets/HomeAssets/StudentDiwanLogo.png
 
 const StudentLoginForm = () => {
   const [studentDetails, setStudentDetails] = useState({
-    email: "siddhant@studentdiwan.com",
-    password: "studentDiwan@12",
+    email: "",
+    password: "",
   });
   const [showPassword, setShowPassword] = useState(false);
   const { loading, studentLogin } = useStudentLogin();
