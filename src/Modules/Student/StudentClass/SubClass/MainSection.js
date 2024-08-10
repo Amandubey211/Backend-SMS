@@ -79,7 +79,7 @@ const MainSection = () => {
   return (
     <>
       <div className="flex flex-wrap justify-center gap-3 p-4">
-        {iconData.map((item, index) => (
+        {iconData?.map((item, index) => (
           <NavIconCard
             key={index}
             icon={item.icon}

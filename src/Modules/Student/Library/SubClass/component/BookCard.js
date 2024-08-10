@@ -35,7 +35,7 @@ const BookCard = ({
 
         <p className=" mt-2  text-xs font-medium text-gray-500">Author</p>
         <p className="text-lg te text-gray-600"> {author}</p>
-        <button className=" absolute right-2  bottom-2 text-indigo-600 hover:text-indigo-900"><BsThreeDotsVertical /></button>
+        {/* <button className=" absolute right-2  bottom-2 text-indigo-600 hover:text-indigo-900"><BsThreeDotsVertical /></button> */}
 
       </div>
 

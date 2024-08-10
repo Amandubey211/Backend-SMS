@@ -6,7 +6,7 @@ import { FaCheckCircle, FaTimesCircle, FaMinusCircle } from 'react-icons/fa';
 
 const getStatusIcon = (status) => {
   switch (status) {
-    case 'attend':
+    case 'present':
       return <FaCheckCircle className="text-green-500" />;
     case 'absent':
       return <FaTimesCircle className="text-red-500" />;
