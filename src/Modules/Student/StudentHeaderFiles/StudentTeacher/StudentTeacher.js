@@ -2,15 +2,20 @@ import React, { useState, useEffect } from "react";
 import Layout from "../../../../Components/Common/Layout";
 import DashLayout from "../../../../Components/Student/StudentDashLayout";
 import { useParams } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { shallowEqual, useSelector } from "react-redux";
 import ProfileCard from "./ProfileCard";
 import { baseUrl } from "../../../../config/Common";
 import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 
 const StudentTeacher = () => {
   const { selectedClass, selectedClassName } = useSelector(
-    (state) => state.Common
+    (state) => ({
+      selectedClass: state.Common.selectedClass,
+      selectedClassName: state.Common.selectedClassName,
+    }),
+    shallowEqual
   );
+
   const { cid } = useParams(); // Ensure classId is part of the route parameters
   const [teachers, setTeachers] = useState([]);
   const [loading, setLoading] = useState(true);

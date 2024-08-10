@@ -2,16 +2,23 @@ import React, { useState, useEffect } from "react";
 import Layout from "../../../../Components/Common/Layout";
 import DashLayout from "../../../../Components/Student/StudentDashLayout";
 import { useParams } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { shallowEqual, useSelector } from "react-redux";
 import ProfileCard from "./ProfileCard";
 import { baseUrl } from "../../../../config/Common";
+import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 
 const StudentClassMates = () => {
-  const { selectedClass, selectedSection, selectedSubject } = useSelector((state) => state.Common);
+  const { selectedClass, selectedClassName } = useSelector(
+    (state) => ({
+      selectedClass: state.Common.selectedClass,
+      selectedClassName: state.Common.selectedClassName,
+    }),
+    shallowEqual
+  );
   const { cid } = useParams(); // Ensure classId is part of the route parameters
   const [classmates, setClassmates] = useState([]);
   const [loading, setLoading] = useState(true);
-
+  useNavHeading(selectedClassName, "Classmates");
   useEffect(() => {
     console.log("cid from URL params:", cid);
     console.log("Class ID from Redux (selectedClass):", selectedClass);
