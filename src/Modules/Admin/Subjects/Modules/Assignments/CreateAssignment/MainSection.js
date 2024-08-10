@@ -26,7 +26,7 @@ const initialFormState = {
   groupId: null,
 };
 
-const MainSection = () => {
+const MainSection = ({ setIsEditing }) => {
   const { cid, sid } = useParams();
   const location = useLocation();
 
@@ -34,7 +34,7 @@ const MainSection = () => {
   const [editorContent, setEditorContent] = useState("");
   const [formState, setFormState] = useState(initialFormState);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditing, setLocalIsEditing] = useState(false); // Define isEditing state locally
   const [assignmentId, setAssignmentId] = useState("");
   const [criteriaList, setCriteriaList] = useState([]);
   const [existingRubricId, setExistingRubricId] = useState(null);
@@ -50,7 +50,8 @@ const MainSection = () => {
       const assignment = location.state.assignment;
       setAssignmentName(assignment.name || "");
       setEditorContent(assignment.content || "");
-      setIsEditing(true);
+      setLocalIsEditing(true); // Set the local isEditing state
+      setIsEditing(true); // Inform the parent component that we're editing
       setAssignmentId(assignment._id);
       setFormState({
         points: assignment.points || "",
@@ -68,8 +69,11 @@ const MainSection = () => {
         chapterId: assignment.chapterId || null,
         groupId: assignment?.groupId || null,
       });
+    } else {
+      setLocalIsEditing(false); // Set the local isEditing state
+      setIsEditing(false); // Inform the parent component that we're creating
     }
-  }, [location.state]);
+  }, [location.state, setIsEditing]);
 
   const handleNameChange = (name) => setAssignmentName(name);
   const handleEditorChange = (content) => setEditorContent(content);
@@ -118,6 +122,7 @@ const MainSection = () => {
 
     try {
       if (isEditing) {
+        // Use the local isEditing state
         let sectionId = formState.sectionId || null;
         await updateAssignment(assignmentId, assignmentData, sectionId);
         toast.success("Assignment updated successfully.");
@@ -136,7 +141,7 @@ const MainSection = () => {
       <CreateAssignmentHeader
         onSave={handleSave}
         id={assignmentId}
-        isEditing={isEditing}
+        isEditing={isEditing} // Pass the local isEditing state
         criteriaList={criteriaList}
         setCriteriaList={setCriteriaList}
         setExistingRubricId={setExistingRubricId}

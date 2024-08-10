@@ -7,6 +7,7 @@ import DateInput from "../../../Component/DateInput";
 import useCreatePage from "../../../../../../Hooks/AuthHooks/Staff/Admin/Page/useCreatePage";
 import useUpdatePage from "../../../../../../Hooks/AuthHooks/Staff/Admin/Page/useUpdatePage";
 import { useLocation } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const AddPage = () => {
   const { state } = useLocation();
@@ -17,7 +18,8 @@ const AddPage = () => {
   const [isUpdating, setIsUpdating] = useState(false);
   const [publish, setPublish] = useState(false);
   const [loadingType, setLoadingType] = useState(""); // Separate loading state for each button
-
+  const isSidebarOpen = useSelector((state) => state.sidebar.isOpen);
+  const sidebarWidth = isSidebarOpen ? "15%" : "7%"; 
   const {
     createPage,
     loading: createLoading,
@@ -90,9 +92,14 @@ const AddPage = () => {
         isUpdating ? "Update Page | Student Diwan" : "Add Page | Student Diwan"
       }
     >
-      <div className="flex">
+    <div className="flex w-full min-h-screen">
         <SideMenubar />
-        <div className="w-full">
+        <div
+          className={`ml-${sidebarWidth} transition-all duration-500 flex-1 h-full`}
+          style={{
+            marginLeft: sidebarWidth,
+          }}
+        >
           <AddPageHeader
             onSave={handleSave}
             isUpdating={isUpdating}
