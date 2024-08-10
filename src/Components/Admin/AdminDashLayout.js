@@ -16,7 +16,6 @@ const DashLayout = ({
     <div className="flex w-full min-h-screen">
       {/* Sidebar is fixed on the left */}
       <SideMenubar />
-      {/* Main content adjusts its margin based on sidebar width */}
       <div
         className={`ml-${sidebarWidth} transition-all duration-500 flex-1 h-full`}
         style={{

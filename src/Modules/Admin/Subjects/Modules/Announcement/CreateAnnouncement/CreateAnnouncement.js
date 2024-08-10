@@ -9,6 +9,7 @@ import FileInput from "../../Discussion/AddDiscussion/Components/FileInput";
 import EditorComponent from "../../../Component/AdminEditor";
 import useCreateAnnouncement from "../../../../../../Hooks/AuthHooks/Staff/Admin/Announcement/useCreateAnnouncement";
 import useEditAnnouncement from "../../../../../../Hooks/AuthHooks/Staff/Admin/Announcement/useEditAnnouncement";
+import { useSelector } from "react-redux";
 
 const CreateAnnouncement = () => {
   const location = useLocation();
@@ -36,7 +37,8 @@ const CreateAnnouncement = () => {
     error: editError,
   } = useEditAnnouncement();
   const { cid } = useParams();
-
+  const isSidebarOpen = useSelector((state) => state.sidebar.isOpen);
+  const sidebarWidth = isSidebarOpen ? "15%" : "7%";
   useEffect(() => {
     if (announcement) {
       setAssignmentName(announcement.title || "");
@@ -115,9 +117,14 @@ const CreateAnnouncement = () => {
     <Layout
       title={`${isEditing ? "Update" : "Create"} Announcement | Student Diwan`}
     >
-      <div className="flex">
+      <div className="flex w-full min-h-screen">
         <SideMenubar />
-        <div className="w-full">
+        <div
+          className={`ml-${sidebarWidth} transition-all duration-500 flex-1 h-full`}
+          style={{
+            marginLeft: sidebarWidth,
+          }}
+        >
           <>
             <CreateAnnouncementHeader
               onSave={handleSave}

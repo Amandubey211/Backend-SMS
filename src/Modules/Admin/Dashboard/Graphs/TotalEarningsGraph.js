@@ -4,6 +4,7 @@ import { Chart as ChartJS, registerables } from "chart.js";
 import Fallback from "../../../../Components/Common/Fallback";
 import { FiCalendar } from "react-icons/fi";
 import useGetEarningsData from "../../../../Hooks/AuthHooks/Staff/Admin/Dashboard/useGetEarningsData";
+import Spinner from "../../../../Components/Common/Spinner";
 
 ChartJS.register(...registerables);
 
@@ -12,7 +13,8 @@ const TotalEarningsGraph = () => {
   const [tooltipData, setTooltipData] = useState(null);
   const [selectedOption, setSelectedOption] = useState("currentMonth");
 
-  const { loading, error, earningsData, fetchEarningsData } = useGetEarningsData();
+  const { loading, error, earningsData, fetchEarningsData } =
+    useGetEarningsData();
 
   const fetchDashboardData = (option) => {
     const date = new Date();
@@ -62,10 +64,15 @@ const TotalEarningsGraph = () => {
   }, []);
 
   if (loading) {
-    return <Fallback />;
+    return <Spinner />;
   }
 
-  if (error || !earningsData || (earningsData.earningsData.length === 0 && earningsData.expensesData.length === 0)) {
+  if (
+    error ||
+    !earningsData ||
+    (earningsData.earningsData.length === 0 &&
+      earningsData.expensesData.length === 0)
+  ) {
     return (
       <div className="p-4 bg-white">
         <div className="flex justify-between items-center mb-4">
@@ -73,10 +80,13 @@ const TotalEarningsGraph = () => {
             <h2 className="text-xl font-semibold">Earnings</h2>
           </div>
           <div>
-            <select className="border rounded p-2" value={selectedOption} onChange={(e) => setSelectedOption(e.target.value)}>
+            <select
+              className="border rounded p-2"
+              value={selectedOption}
+              onChange={(e) => setSelectedOption(e.target.value)}
+            >
               <option value="currentMonth">This month</option>
               <option value="lastMonth">Last month</option>
-              
             </select>
           </div>
         </div>
@@ -86,18 +96,28 @@ const TotalEarningsGraph = () => {
         </div>
         <div className="flex justify-around mt-4">
           <div className="flex flex-col items-start">
-            <div className="w-16 h-1 rounded-full mb-1" style={{ backgroundColor: "#7C3AED", alignSelf: "flex-start" }}></div>
+            <div
+              className="w-16 h-1 rounded-full mb-1"
+              style={{ backgroundColor: "#7C3AED", alignSelf: "flex-start" }}
+            ></div>
             <div className="flex items-center">
               <div className="text-gray-700">Total Collections</div>
-              <div className="ml-2 font-bold mr-1">{earningsData ? earningsData.totalEarnings.toLocaleString() : 0}</div>
+              <div className="ml-2 font-bold mr-1">
+                {earningsData ? earningsData.totalEarnings.toLocaleString() : 0}
+              </div>
               <div className="text-gray-700">QR</div>
             </div>
           </div>
           <div className="flex flex-col items-start">
-            <div className="w-16 h-1 rounded-full mb-1" style={{ backgroundColor: "#EA580C", alignSelf: "flex-start" }}></div>
+            <div
+              className="w-16 h-1 rounded-full mb-1"
+              style={{ backgroundColor: "#EA580C", alignSelf: "flex-start" }}
+            ></div>
             <div className="flex items-center">
               <div className="text-gray-700">Total Expenses</div>
-              <div className="ml-2 font-bold mr-1">{earningsData ? earningsData.totalExpenses.toLocaleString() : 0}</div>
+              <div className="ml-2 font-bold mr-1">
+                {earningsData ? earningsData.totalExpenses.toLocaleString() : 0}
+              </div>
               <div className="text-gray-700">QR</div>
             </div>
           </div>
@@ -106,7 +126,12 @@ const TotalEarningsGraph = () => {
     );
   }
 
-  const { earningsData: earnings, expensesData: expenses, totalEarnings, totalExpenses } = earningsData;
+  const {
+    earningsData: earnings,
+    expensesData: expenses,
+    totalEarnings,
+    totalExpenses,
+  } = earningsData;
 
   const data = {
     labels: earnings.map((item) => `${item.day}`),
@@ -118,7 +143,12 @@ const TotalEarningsGraph = () => {
         borderWidth: 3,
         fill: true,
         backgroundColor: (context) => {
-          const gradient = context.chart.ctx.createLinearGradient(0, 0, 0, context.chart.height);
+          const gradient = context.chart.ctx.createLinearGradient(
+            0,
+            0,
+            0,
+            context.chart.height
+          );
           gradient.addColorStop(0, "rgba(124, 58, 237, 0.1)");
           gradient.addColorStop(1, "rgba(124, 58, 237, 0)");
           return gradient;
@@ -160,8 +190,15 @@ const TotalEarningsGraph = () => {
           const day = tooltipModel.dataPoints[0].dataIndex + 1;
           const date = new Date();
           date.setDate(day);
-          const formattedDate = `${day}${getOrdinalSuffix(day)} ${date.toLocaleString("default", { month: "long" })}`;
-          setTooltipData({ value, formattedDate, left: tooltipModel.caretX, top: tooltipModel.caretY });
+          const formattedDate = `${day}${getOrdinalSuffix(
+            day
+          )} ${date.toLocaleString("default", { month: "long" })}`;
+          setTooltipData({
+            value,
+            formattedDate,
+            left: tooltipModel.caretX,
+            top: tooltipModel.caretY,
+          });
         },
       },
       legend: {
@@ -198,10 +235,13 @@ const TotalEarningsGraph = () => {
           <h2 className="text-xl font-semibold">Earnings</h2>
         </div>
         <div>
-          <select className="border rounded p-2" value={selectedOption} onChange={(e) => setSelectedOption(e.target.value)}>
+          <select
+            className="border rounded p-2"
+            value={selectedOption}
+            onChange={(e) => setSelectedOption(e.target.value)}
+          >
             <option value="currentMonth">This month</option>
             <option value="lastMonth">Last month</option>
-            
           </select>
         </div>
       </div>
@@ -228,18 +268,28 @@ const TotalEarningsGraph = () => {
       </div>
       <div className="flex justify-around mt-4">
         <div className="flex flex-col items-start">
-          <div className="w-16 h-1 rounded-full mb-1" style={{ backgroundColor: "#7C3AED", alignSelf: "flex-start" }}></div>
+          <div
+            className="w-16 h-1 rounded-full mb-1"
+            style={{ backgroundColor: "#7C3AED", alignSelf: "flex-start" }}
+          ></div>
           <div className="flex items-center">
             <div className="text-gray-700">Total Collections</div>
-            <div className="ml-2 font-bold mr-1">{totalEarnings.toLocaleString()}</div>
+            <div className="ml-2 font-bold mr-1">
+              {totalEarnings.toLocaleString()}
+            </div>
             <div className="text-gray-700">QR</div>
           </div>
         </div>
         <div className="flex flex-col items-start">
-          <div className="w-16 h-1 rounded-full mb-1" style={{ backgroundColor: "#EA580C", alignSelf: "flex-start" }}></div>
+          <div
+            className="w-16 h-1 rounded-full mb-1"
+            style={{ backgroundColor: "#EA580C", alignSelf: "flex-start" }}
+          ></div>
           <div className="flex items-center">
             <div className="text-gray-700">Total Expenses</div>
-            <div className="ml-2 font-bold mr-1">{totalExpenses.toLocaleString()}</div>
+            <div className="ml-2 font-bold mr-1">
+              {totalExpenses.toLocaleString()}
+            </div>
             <div className="text-gray-700">QR</div>
           </div>
         </div>
