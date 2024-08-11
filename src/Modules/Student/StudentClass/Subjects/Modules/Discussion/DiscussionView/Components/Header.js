@@ -3,10 +3,15 @@ import React, { useState } from "react";
 import { BsChat } from "react-icons/bs";
 import DiscussionMessage from "../../DiscussionMessage/DiscussionMessage";
 import Sidebar from "../../../../../../../../Components/Common/Sidebar";
+import { ImSpinner3 } from 'react-icons/im';
+import { FaExclamationTriangle } from 'react-icons/fa';
 
 const Header = ({ discussion }) => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
+console.log(
 
+  "disccussion",discussion
+)
   const handleSidebarOpen = () => setSidebarOpen(true);
   const handleSidebarClose = () => setSidebarOpen(false);
 
@@ -14,6 +19,8 @@ const Header = ({ discussion }) => {
     const options = { year: "numeric", month: "long", day: "numeric" };
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
+  
+  if (!discussion) return <p>No discussion found.</p>;
 
   return (
     <div className="flex items-end justify-between p-2 px-4 border-b">
@@ -65,7 +72,7 @@ const Header = ({ discussion }) => {
             isOpen={isSidebarOpen}
             onClose={handleSidebarClose}
           >
-            <DiscussionMessage />
+            <DiscussionMessage discussion={discussion}   />
           </Sidebar>
         </div>
       </div>
