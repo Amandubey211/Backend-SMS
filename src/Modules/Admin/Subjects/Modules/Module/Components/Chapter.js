@@ -71,7 +71,7 @@ const Chapter = ({
 
   return (
     <div className="mb-4 p-1 bg-white rounded-lg border-b relative">
-      <div className="flex items-center justify-between mb-2">
+      <div className="flex items-center justify-between mb-2 relative">
         <div className="flex items-center">
           <img
             src={imageUrl}
@@ -83,7 +83,7 @@ const Chapter = ({
             <p className="text-gray-500">Chapter {chapterNumber}</p>
           </div>
         </div>
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2 relative">
           <button
             className="border p-2 rounded-full hover:bg-gray-50 relative"
             onClick={toggleMenu}
