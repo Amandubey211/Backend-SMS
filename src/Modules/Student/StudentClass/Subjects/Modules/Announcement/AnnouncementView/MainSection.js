@@ -4,6 +4,7 @@ import { AiOutlineFileAdd } from "react-icons/ai";
 import SubjectSideBar from "../../../Component/SubjectSideBar";
 import AnnouncementViewHeader from "./Components/AnnouncementHeader";
 import useFetchAnnouncementById from "../../../../../../../Hooks/AuthHooks/Staff/Admin/Announcement/useFetchAnnouncementById";
+import { ImSpinner3 } from "react-icons/im";
 
 const StudentMainSection = () => {
   const { aid } = useParams();
@@ -15,12 +16,22 @@ const StudentMainSection = () => {
   }, [aid, fetchAnnouncementById]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex flex-col items-center justify-center h-full">
+        <ImSpinner3 className="w-12 h-12 animate-spin text-gray-500 mb-3" />
+        <p className="text-lg font-semibold text-gray-500">Loading...</p>
+      </div>
+    );
   }
 
   if (error) {
-    return <p>Error: {error}</p>;
+    return (
+      <div className="flex flex-col items-center justify-center h-full">
+        <p className="text-red-500">Error: {error}</p>
+      </div>
+    );
   }
+
 
   if (!announcement) {
     return (
@@ -35,7 +46,8 @@ const StudentMainSection = () => {
     <div className="flex w-full">
       <SubjectSideBar />
       <div className="border-l w-full">
-        <AnnouncementViewHeader announcement={announcement} />
+        <AnnouncementViewHeader announcement={announcement}   loading={loading}
+          error={error}  />
         <div className="p-4 bg-white">
           <div className="relative w-full h-64 md:h-80 lg:h-96 overflow-hidden rounded-lg mb-4">
             <img

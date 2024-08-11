@@ -104,6 +104,8 @@ import { RiFileUnknowLine } from "react-icons/ri";
 import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import useFetchQuizzes from "../../../../../../../Hooks/AuthHooks/Student/Quiz/useFetchQuizzes";
+import { FaEllipsisV, FaExclamationTriangle } from "react-icons/fa";
+import Spinner from "../../../../../../../Components/Common/Spinner";
 
 const MainSection = () => {
   const { cid, sid } = useParams();
@@ -126,13 +128,22 @@ const MainSection = () => {
     refetchQuizzes();
   }, [refetchQuizzes]);
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+  // if (loading) {
+  //   return (
+  //     <Spinner/>
+  //   )
+  // }
 
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
+  // if (error) {
+  //   return (
+
+      
+  //     <div className="flex flex-col items-center justify-center py-10 text-gray-500">
+  //       <FaExclamationTriangle className="w-12 h-12 mb-3" />
+  //       <p className="text-lg font-semibold">No data found</p>
+  //     </div>
+  //   )
+  // }
 
   return (
     <div className="flex">
@@ -140,7 +151,7 @@ const MainSection = () => {
       <div className="w-[65%] border-l">
         <List
           type="Quiz"
-          title="All 3"
+          title="All Quizes"
           data={quizzes}
           icon={<RiFileUnknowLine />}
           loading={loading}

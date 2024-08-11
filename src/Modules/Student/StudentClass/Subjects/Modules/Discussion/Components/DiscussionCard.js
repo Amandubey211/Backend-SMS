@@ -1,6 +1,10 @@
 import React, { useState, useRef, useEffect } from "react";
 import { FaEllipsisV } from "react-icons/fa";
-import { IoBookmarks, IoCalendarOutline, IoBookmarksOutline } from "react-icons/io5";
+import {
+  IoBookmarks,
+  IoCalendarOutline,
+  IoBookmarksOutline,
+} from "react-icons/io5";
 import { BsPatchCheckFill } from "react-icons/bs";
 import { GoDiscussionClosed } from "react-icons/go";
 import { MdMarkEmailRead } from "react-icons/md";
@@ -10,7 +14,10 @@ import useMarkAsRead from "../../../../../../../Hooks/AuthHooks/Student/Discussi
 
 const DiscussionCard = ({ discussion }) => {
   const { sid, cid } = useParams();
-  const lastReply = discussion.replies.length > 0 ? discussion.replies[discussion.replies.length - 1] : null;
+  const lastReply =
+    discussion.replies.length > 0
+      ? discussion.replies[discussion.replies.length - 1]
+      : null;
   const { updatePinStatus, loading: pinLoading } = useUpdatePinStatus();
   const { markAsRead, loading: readLoading } = useMarkAsRead();
   const [isPinned, setIsPinned] = useState(discussion.isPinned);
@@ -100,12 +107,16 @@ const DiscussionCard = ({ discussion }) => {
           <IoCalendarOutline className="w-4 h-4 transition-transform transform hover:scale-110" />
           <span>
             Last Post at:{" "}
-            {lastReply ? new Date(lastReply.updatedAt).toLocaleDateString() : "N/A"}
+            {lastReply
+              ? new Date(lastReply.updatedAt).toLocaleDateString()
+              : "N/A"}
           </span>
         </div>
         <div className="flex justify-center space-x-4">
           <div className="flex items-center space-x-1 border rounded-full px-4 py-1">
-            <span className="font-semibold text-lg">{discussion.replies.length}</span>
+            <span className="font-semibold text-lg">
+              {discussion.replies.length}
+            </span>
             <span className="text-sm text-gray-500">Replies</span>
           </div>
         </div>

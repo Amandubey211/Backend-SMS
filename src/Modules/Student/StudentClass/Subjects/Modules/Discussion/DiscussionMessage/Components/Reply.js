@@ -1,10 +1,20 @@
+
+
 import React from 'react';
-import { FaRegHeart, FaRegComment, FaEdit, FaTrashAlt } from 'react-icons/fa';
-import InputComment from './InputComment';
+import { FaRegHeart, FaRegComment, FaTrashAlt } from 'react-icons/fa';
+import InputComment from './InputComment'; // Using the existing InputComment component
 import toast from 'react-hot-toast';
 import { MdOutlineEdit } from "react-icons/md";
 import { RxCross2 } from "react-icons/rx";
-const Reply = ({ reply, commentId, deleteReply, addNestedReply, activeReplyId, setActiveReplyId }) => {
+
+const Reply = ({
+  reply,
+  commentId,
+  deleteReply,
+  addNestedReply,
+  activeReplyId,
+  setActiveReplyId
+}) => {
   const handleDeleteReply = () => {
     if (reply.isUserCreated) {
       deleteReply(commentId, reply.id);
@@ -18,8 +28,15 @@ const Reply = ({ reply, commentId, deleteReply, addNestedReply, activeReplyId, s
     setActiveReplyId(activeReplyId === reply.id ? null : reply.id);
   };
 
+  const handleAddNestedReply = (text) => {
+    if (text.trim()) {
+      addNestedReply(reply.id, text, true);
+      setActiveReplyId(null); // Optionally, close the reply form after submission
+    }
+  };
+
   return (
-    <div className="ml-8 mt-2 ps-4 bg-gray-100 p-2 rounded-lg">
+    <div className="ml-8 mt-2 ps-4 bg-gray-100 p-2 rounded-lg border shadow-sm">
       <div className="flex items-center mb-2">
         <img
           src={reply.avatarUrl}
@@ -36,7 +53,7 @@ const Reply = ({ reply, commentId, deleteReply, addNestedReply, activeReplyId, s
           <span className="text-sm text-gray-500">{reply.time}</span>
         </div>
         <div className="ml-auto gap-2 flex space-x-2">
-        <MdOutlineEdit className="text-gray-500 text-xl cursor-pointer" />
+          <MdOutlineEdit className="text-gray-500 text-xl cursor-pointer" />
           <RxCross2 className="text-red-500 text-xl cursor-pointer" onClick={handleDeleteReply} />
         </div>
       </div>
@@ -50,13 +67,29 @@ const Reply = ({ reply, commentId, deleteReply, addNestedReply, activeReplyId, s
       {activeReplyId === reply.id && (
         <div className="mt-4">
           <InputComment
-            addComment={(text) => addNestedReply(reply.id, text, true)}
+            addComment={handleAddNestedReply}
             placeholder="Write a reply..."
           />
         </div>
       )}
+      <div className="mt-4 ml-4">
+        {reply.replies && reply.replies.map((nestedReply) => (
+          <Reply
+            key={nestedReply.id}
+            reply={nestedReply}
+            commentId={commentId}
+            deleteReply={deleteReply}
+            addNestedReply={addNestedReply}
+            activeReplyId={activeReplyId}
+            setActiveReplyId={setActiveReplyId}
+          />
+        ))}
+      </div>
     </div>
   );
 };
 
-export default Reply
+export default Reply;
+
+
+

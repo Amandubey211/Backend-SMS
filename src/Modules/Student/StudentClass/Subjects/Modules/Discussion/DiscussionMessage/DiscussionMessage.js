@@ -1,92 +1,261 @@
-import React, { useEffect, useState } from 'react';
-import CommentSection from './CommentSection';
-import CommentsHeader from './Components/CommentsHeader';
-import InputComment from './Components/InputComment';
-import dummycomments from './dummyData';
-
-const DiscussionMessage = () => {
-  const [comments, setComments] = useState(dummycomments);
-  const [searchQuery, setSearchQuery] = useState('');
+import React, { useEffect, useState } from "react";
+import CommentSection from "./CommentSection";
+import CommentsHeader from "./Components/CommentsHeader";
+import InputComment from "./Components/InputComment";
+import { useParams } from "react-router-dom";
+import { baseUrl } from "../../../../../../../config/Common";
+import toast from "react-hot-toast";
+import { ImSpinner3 } from "react-icons/im";
+import { FaExclamationTriangle } from "react-icons/fa";
+const DiscussionMessage = ({ discussion }) => {
+  const { _id } = useParams();
+  const [comments, setComments] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
   const [activeReplyId, setActiveReplyId] = useState(null);
+  const [activeReplyParentId, setActiveReplyParentId] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const addComment = (text) => {
-    const newComment = {
-      id: comments.length + 1,
-      author: 'New User',
-      role: null,
-      time: 'Just now',
-      text: text,
-      likes: 0,
-      avatarUrl: 'https://avatars.githubusercontent.com/u/109097090?v=4',
-      replies: [],
-      isUserCreated: true,
+  useEffect(() => {
+    const fetchComments = async () => {
+      setLoading(true);
+      try {
+        const token = localStorage.getItem("student:token");
+        if (!token) {
+          throw new Error("Authentication token not found");
+        }
+
+        const response = await fetch(
+          `${baseUrl}/admin/getDiscussionComment/${discussion._id}`,
+          {
+            headers: {
+              Authentication: token,
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(
+            `Failed to fetch comments, status: ${response.status}`
+          );
+        }
+
+        const data = await response.json();
+        console.log("discussion comments", data);
+
+        if (data.status) {
+          const formattedComments = data.data.map((comment) => ({
+            id: comment._id,
+            author: comment.createdBy,
+            role: comment.role,
+            time: new Date(comment.createdAt).toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            }),
+            text: comment.content,
+            likes: comment.likes.length,
+            avatarUrl: comment.profile,
+            replies: formatReplies(comment.replies),
+            isUserCreated: false,
+          }));
+
+          setComments(formattedComments);
+        }
+      } catch (error) {
+        console.error("Error fetching comments:", error);
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
     };
-    setComments([newComment, ...comments]);
+
+    fetchComments();
+  }, [discussion._id]);
+
+  const formatReplies = (replies) => {
+    return replies.map((reply) => ({
+      id: reply._id,
+      author: reply.createdBy,
+      role: reply.role,
+      time: new Date(reply.createdAt).toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+      text: reply.content,
+      likes: reply.likes.length,
+      avatarUrl: reply.profile,
+      replies: reply.replies ? formatReplies(reply.replies) : [],
+      isRead: reply.isRead,
+    }));
   };
 
-  const addNestedReply = (id, text, isReplyToReply = false) => {
-    const newReply = {
-      id: Date.now(),
-      author: 'New User',
-      role: null,
-      time: 'Just now',
-      text: text,
-      likes: 0,
-      avatarUrl: 'https://avatars.githubusercontent.com/u/109097090?v=4',
-      replies: [],
-      isUserCreated: true,
-    };
-
-    const addReplyRecursively = (comments) => {
-      return comments.map(comment => {
-        if (comment.id === id && !isReplyToReply) {
-          return {
-            ...comment,
-            replies: [newReply, ...comment.replies]
-          };
-        } else if (comment.replies.length > 0) {
-          return {
-            ...comment,
-            replies: addReplyRecursively(comment.replies)
-          };
+  const addComment = async (text) => {
+    try {
+      const token = localStorage.getItem("student:token");
+      const response = await fetch(
+        `${baseUrl}/admin/createCommentDiscussion/${discussion._id}/replies`,
+        {
+          method: "POST",
+          headers: {
+            Authentication: token,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ content: text, parentId: null }),
         }
-        return comment;
-      });
-    };
+      );
 
-    setComments(addReplyRecursively(comments));
-    setActiveReplyId(null); // Reset active reply ID after adding a reply
+      if (!response.ok) {
+        throw new Error(`Failed to add comment, status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      if (data.status) {
+        const newComment = {
+          id: data.data._id,
+          author: data.data.createdBy,
+          role: data.data.role,
+          time: new Date(data.data.createdAt).toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+          text: data.data.content,
+          likes: data.data.likes.length,
+          avatarUrl: data.data.profile,
+          replies: [],
+          isUserCreated: true,
+        };
+        setComments([newComment, ...comments]);
+      }
+    } catch (error) {
+      console.error("Error adding comment:", error);
+    }
+  };
+
+  const addNestedReply = async (id, text) => {
+    try {
+      const token = localStorage.getItem("student:token");
+      const response = await fetch(
+        `${baseUrl}/admin/createCommentDiscussion/${discussion._id}/replies`,
+        {
+          method: "POST",
+          headers: {
+            Authentication: token,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ content: text, parentId: id }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Failed to add reply, status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      if (data.status) {
+        const newReply = {
+          id: data.data._id,
+          author: data.data.createdBy,
+          role: data.data.role,
+          time: new Date(data.data.createdAt).toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+          text: data.data.content,
+          likes: data.data.likes.length,
+          avatarUrl: data.data.profile,
+          replies: [],
+          isUserCreated: true,
+        };
+
+        const addReplyRecursively = (comments) => {
+          return comments.map((comment) => {
+            if (comment.id === id) {
+              return {
+                ...comment,
+                replies: [newReply, ...comment.replies],
+              };
+            } else if (comment.replies.length > 0) {
+              return {
+                ...comment,
+                replies: addReplyRecursively(comment.replies),
+              };
+            }
+            return comment;
+          });
+        };
+
+        setComments(addReplyRecursively(comments));
+        setActiveReplyId(null);
+        setActiveReplyParentId(null);
+      }
+    } catch (error) {
+      console.error("Error adding reply:", error);
+    }
+  };
+
+  const deleteComment = async (commentId) => {
+    try {
+      const token = localStorage.getItem("student:token");
+      const response = await fetch(`${baseUrl}/deleteComment/${commentId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to delete comment, status: ${response.status}`);
+      }
+
+      setComments((prevComments) =>
+        prevComments.filter((comment) => comment.id !== commentId)
+      );
+      toast.success("Comment Deleted");
+    } catch (error) {
+      console.error("Error deleting comment:", error);
+    }
+  };
+
+  const deleteReply = async (commentId, replyId) => {
+    try {
+      const token = localStorage.getItem("student:token");
+      const response = await fetch(`${baseUrl}/deleteReply/${replyId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to delete reply, status: ${response.status}`);
+      }
+
+      const deleteReplyRecursively = (comments) => {
+        return comments.map((comment) => {
+          if (comment.id === commentId) {
+            return {
+              ...comment,
+              replies: comment.replies.filter((reply) => reply.id !== replyId),
+            };
+          } else if (comment.replies.length > 0) {
+            return {
+              ...comment,
+              replies: deleteReplyRecursively(comment.replies),
+            };
+          }
+          return comment;
+        });
+      };
+
+      setComments(deleteReplyRecursively(comments));
+      toast.success("Reply Deleted");
+    } catch (error) {
+      console.error("Error deleting reply:", error);
+    }
   };
 
   const handleSearch = (query) => {
     setSearchQuery(query);
-  };
-
-  const deleteComment = (commentId) => {
-    setComments((prevComments) =>
-      prevComments.filter((comment) => comment.id !== commentId)
-    );
-  };
-
-  const deleteReply = (commentId, replyId) => {
-    const deleteReplyRecursively = (comments) => {
-      return comments.map(comment => {
-        if (comment.id === commentId) {
-          return {
-            ...comment,
-            replies: comment.replies.filter(reply => reply.id !== replyId)
-          };
-        } else if (comment.replies.length > 0) {
-          return {
-            ...comment,
-            replies: deleteReplyRecursively(comment.replies)
-          };
-        }
-        return comment;
-      });
-    };
-
-    setComments(deleteReplyRecursively(comments));
   };
 
   const filteredComments = comments.filter((comment) => {
@@ -101,22 +270,42 @@ const DiscussionMessage = () => {
 
   return (
     <div className="h-screen flex flex-col">
-      <div className="flex-none h-[10%]">
-        <CommentsHeader handleSearch={handleSearch} />
-      </div>
-      <div className="h-[70%] overflow-y-scroll no-scrollbar px-6">
-        <CommentSection
-          comments={filteredComments}
-          deleteComment={deleteComment}
-          deleteReply={deleteReply}
-          addNestedReply={addNestedReply}
-          activeReplyId={activeReplyId}
-          setActiveReplyId={setActiveReplyId}
-        />
-      </div>
-      <div className="flex-none h-[15%]">
-        <InputComment addComment={addComment} />
-      </div>
+      {loading ? (
+        <>
+          <div className="flex flex-col items-center justify-center py-10 text-gray-500">
+            <ImSpinner3 className="w-12 h-12 animate-spin mb-3" />
+            <p className="text-lg font-semibold">Loading comments...</p>
+          </div>
+        </>
+      ) : error ? (
+        <>
+          <div className="flex flex-col items-center justify-center py-10 text-gray-500">
+            <FaExclamationTriangle className="w-12 h-12 mb-3" />
+            <p className="text-lg font-semibold">{error}</p>
+          </div>
+        </>
+      ) : (
+        <>
+          <div className="flex-none h-[10%]">
+            <CommentsHeader handleSearch={handleSearch} />
+          </div>
+          <div className="h-[70%] overflow-y-scroll no-scrollbar px-6">
+            <CommentSection
+              comments={filteredComments}
+              deleteComment={deleteComment}
+              deleteReply={deleteReply}
+              addNestedReply={addNestedReply}
+              activeReplyId={activeReplyId}
+              setActiveReplyId={setActiveReplyId}
+              activeReplyParentId={activeReplyParentId}
+              setActiveReplyParentId={setActiveReplyParentId}
+            />
+          </div>
+          <div className="flex-none h-[15%]">
+            <InputComment addComment={addComment} />
+          </div>
+        </>
+      )}
     </div>
   );
 };

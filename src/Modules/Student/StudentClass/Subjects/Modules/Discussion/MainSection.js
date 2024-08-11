@@ -42,13 +42,13 @@ const MainSection = () => {
     (discussion) => discussion.isPinned
   );
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+  // if (loading) {
+  //   return <div>Loading...</div>;
+  // }
 
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
+  // if (error) {
+  //   return <div>Error: {error}</div>;
+  // }
 
   return (
     <div className="flex">
@@ -57,6 +57,8 @@ const MainSection = () => {
         <DiscussionHeader
           onSearch={handleSearch}
           onFilterChange={handleFilterChange}
+          loading={loading}
+          error={error}
         />
         <PinnedDiscussions discussions={pinnedDiscussions} />
         <div className="p-3">
