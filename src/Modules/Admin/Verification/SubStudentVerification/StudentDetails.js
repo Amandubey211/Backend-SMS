@@ -52,10 +52,10 @@ const StudentDetail = () => {
 
   return (
     <div className="container  p-2">
-      <div className="flex mb-4">
+      <div className="flex ">
         <NavLink
           onClick={() => navigate(-1)}
-          className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700"
+          className="flex items-center gap-2 mt-5 ps-4 text-sm text-gray-500 hover:text-gray-700"
         >
           <div className="w-6 h-6 flex justify-center items-center border rounded-full text-xl">
             &larr;
@@ -100,7 +100,9 @@ const StudentDetail = () => {
                   <button
                     title="Open Modal"
                     className="p-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-full shadow-lg hover:from-pink-600 hover:to-purple-600 transition-all duration-200"
-                    onClick={() => handlePreviewClick(doc?.documentUrl, doc.documentType)}
+                    onClick={() =>
+                      handlePreviewClick(doc?.documentUrl, doc.documentType)
+                    }
                   >
                     <AiOutlineEye size={20} />
                   </button>

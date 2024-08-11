@@ -6,8 +6,8 @@ import ChildProfile from "./ChildProfile";
 import Sidebar from "../../../../Components/Common/Sidebar";
 import useGetAllParents from "../../../../Hooks/AuthHooks/Staff/Admin/parent/useGetAllParents";
 import { useSelector } from "react-redux";
-import profileIcon from '../../../../Assets/DashboardAssets/profileIcon.png'
-// import DashLayout from "../../../../Components/Admin/AdminDashLayout";
+import profileIcon from "../../../../Assets/DashboardAssets/profileIcon.png";
+
 const uniqueFilterOptions = (data, key) => {
   return [
     ...new Set(
@@ -17,12 +17,11 @@ const uniqueFilterOptions = (data, key) => {
 };
 
 const StudentParentProfile = () => {
+  const [selectedChild, setSelectedChild] = useState(null);
+  const [isSidebarOpen, setSidebarOpen] = useState(false);
 
-    const [selectedChild,setSelectedChild]=useState(null)
-    const [isSidebarOpen, setSidebarOpen] = useState(false);
-
-    const handleSidebarOpen = () => setSidebarOpen(true);
-    const handleSidebarClose = () => setSidebarOpen(false);
+  const handleSidebarOpen = () => setSidebarOpen(true);
+  const handleSidebarClose = () => setSidebarOpen(false);
 
   const [filters, setFilters] = useState({
     class: "",
@@ -33,19 +32,19 @@ const StudentParentProfile = () => {
     const { name, value } = e.target;
     setFilters((prev) => ({ ...prev, [name]: value }));
   };
-const handleStudentClick=(child)=>{
+  const handleStudentClick = (child) => {
     console.log(child);
-    setSelectedChild(child)
+    setSelectedChild(child);
     setSidebarOpen(true);
-}
-const {fetchAllParents} = useGetAllParents();
-const allParents = useSelector((store)=>store.Parents.allParents)
-useEffect(() => {
-async function fetchData() {
-  await fetchAllParents();
-}
-fetchData();
-}, [])
+  };
+  const { fetchAllParents } = useGetAllParents();
+  const allParents = useSelector((store) => store.Parents.allParents);
+  useEffect(() => {
+    async function fetchData() {
+      await fetchAllParents();
+    }
+    fetchData();
+  }, []);
   const filteredParents = allParents.filter((parent) =>
     parent.children.some(
       (child) =>
@@ -53,15 +52,20 @@ fetchData();
         (filters.section === "" || child.section === filters.section)
     )
   );
-  
+
   return (
     <>
       <Layout title="Parents">
         <DashLayout>
           <div className="min-h-screen p-4 ">
-          <h2 className="text-xl font-semibold mb-4">All Parents <span className="bg-purple-400 px-2 text-sm py-1 rounded-full">{allParents?.length}</span></h2>
+            <h2 className="text-xl font-semibold mb-4">
+              All Parents{" "}
+              <span className="bg-purple-400 px-2 text-sm py-1 rounded-full">
+                {allParents?.length}
+              </span>
+            </h2>
             <div className="flex justify-between items-center mb-4">
-              <div className="flex  gap-5 space-x-4  ">
+              <div className="flex gap-5 space-x-4">
                 <FormField
                   id="class"
                   label="Class"
@@ -101,65 +105,53 @@ fetchData();
                 </thead>
                 <tbody>
                   {filteredParents.map((parent, index) => (
-                    <tr
-                      key={index}
-                      className="text-left text-gray-700 "
-                    >
-                      <td className="px-5 py-4 border-b border-gray-200 flex items-center">
-                        <img
-                          src={parent.fatherImageUrl || profileIcon }
-                          alt="Profile"
-                          className="h-8 w-8 rounded-full mr-2 border"
-                        />
-                        <span>{parent.fatherName}</span>
+                    <tr key={index} className="text-left text-gray-700">
+                      <td className="px-5 py-5 border-b border-gray-200 align-middle">
+                        <div className="flex items-center">
+                          <img
+                            src={parent.fatherImageUrl || profileIcon}
+                            alt="Profile"
+                            className="h-8 w-8 rounded-full mr-2 border"
+                          />
+                          <span>{parent.fatherName}</span>
+                        </div>
                       </td>
 
-                      <td className="px-5 py-2 border-b border-gray-200">
+                      <td className="px-5 py-5 border-b border-gray-200 align-middle">
                         <div className="flex items-center">
-                          {" "}
                           <img
                             src={parent.motherImageUrl || profileIcon}
                             alt="Profile"
                             className="h-8 w-8 rounded-full mr-2"
                           />
-                          <span> {parent.motherName}</span>
+                          <span>{parent.motherName}</span>
                         </div>
                       </td>
-                      <td className="px-5 py-2 border-b border-gray-200">
+                      <td className="px-5 py-5 border-b border-gray-200 align-middle">
                         {parent.phone}
                       </td>
-                      <td className="px-5 py-2 border-b border-gray-200">
+                      <td className="px-5 py-5 border-b border-gray-200 align-middle">
                         {parent.email}
                       </td>
-                      {/* <td className="px-5 py-2 border-b border-gray-200">
-                        {" "}
-                        {parent.children.length}
-                        
-                     
-                      </td> */}
-
-                      <td className=" px-5 py-2 border-b border-gray-200 ">
-                        <div className="flex items-center     py-1">
-                         <div onClick={()=>handleStudentClick(parent.children)}
-                          className="flex bg-pink-100 p-2  border-l border-t border-b  border-r   items-center  rounded-full">
-
+                      <td className="px-5 py-5 border-b border-gray-200 align-middle">
+                        <div
+                          className="flex items-center py-1 cursor-pointer"
+                          onClick={() => handleStudentClick(parent.children)}
+                        >
+                          <div className="flex bg-pink-100 p-2 border rounded-full">
                             {parent.children.map((child, idx) => (
-                            <img
-                              key={idx}
-                              src={child.imageUrl || profileIcon} 
-                              alt={child.name}
-                              className="h-8 w-8  rounded-full"
-                              title={child.name} 
-                            />
-                          ))}
-                        
-                          
-                          <span  className="ml-2  font-normal ">{parent.children.length} Child </span>{" "} 
-                          
+                              <img
+                                key={idx}
+                                src={child.imageUrl || profileIcon}
+                                alt={child.name}
+                                className="h-8 w-8 rounded-full"
+                                title={child.name}
+                              />
+                            ))}
+                            <span className="ml-2 font-normal">
+                              {parent.children.length} Child
+                            </span>
                           </div>
-                          {/* Display the count next to the images */}
-
-                          
                         </div>
                       </td>
                     </tr>
@@ -168,12 +160,12 @@ fetchData();
               </table>
             </div>
             <Sidebar
-            isOpen={isSidebarOpen}
-            onClose={handleSidebarClose}
-            title={`Childern ${selectedChild?.length}`}
-          >
-            <ChildProfile  children={selectedChild} />
-          </Sidebar>
+              isOpen={isSidebarOpen}
+              onClose={handleSidebarClose}
+              title={`Children ${selectedChild?.length}`}
+            >
+              <ChildProfile children={selectedChild} />
+            </Sidebar>
           </div>
         </DashLayout>
       </Layout>

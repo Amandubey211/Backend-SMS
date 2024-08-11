@@ -7,7 +7,6 @@ import {
   FaUserGraduate,
   FaClipboardList,
   FaUniversity,
-  
 } from "react-icons/fa";
 import { TbDashboard } from "react-icons/tb";
 import { RiGraduationCapLine } from "react-icons/ri";
@@ -19,9 +18,8 @@ import { BsBook } from "react-icons/bs";
 import { TbNotebook } from "react-icons/tb";
 
 import { GrUserWorker } from "react-icons/gr";
-import { MdLocalLibrary,MdManageAccounts } from "react-icons/md";
-import { RiParentFill,RiAdminFill } from "react-icons/ri";
-
+import { MdLocalLibrary, MdManageAccounts } from "react-icons/md";
+import { RiParentFill, RiAdminFill } from "react-icons/ri";
 
 const sidebarData = [
   {
@@ -39,14 +37,13 @@ const sidebarData = [
     title: "Users",
     icon: <LuUser />,
     items: [
-    
       {
-        title: "Students",
+        title: "Student",
         icon: <FaUserGraduate />,
         path: "/users/students",
       },
       {
-        title: "Teachers",
+        title: "Teacher",
         icon: <FaChalkboardTeacher />,
         path: "/users/teachers",
       },
@@ -55,9 +52,9 @@ const sidebarData = [
         icon: <MdManageAccounts />,
         path: "/users/accountants",
       },
-     
+
       {
-        title: "Parents",
+        title: "Parent",
         icon: <RiParentFill />,
         path: "/users/parents",
       },
@@ -133,4 +130,3 @@ const sidebarData = [
 ];
 
 export default sidebarData;
-

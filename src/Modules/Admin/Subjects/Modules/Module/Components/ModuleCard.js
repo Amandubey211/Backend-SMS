@@ -102,7 +102,7 @@ const ModuleCard = ({
       {menuOpen && (
         <div
           ref={menuRef}
-          className="absolute -top-8 right-12 bg-white border rounded-lg shadow-lg w-48 z-10"
+          className="absolute top-0 right-12 bg-white border rounded-lg shadow-lg w-48 z-10"
         >
           <ul className="py-2">
             <li
@@ -131,7 +131,7 @@ const ModuleCard = ({
             >
               <FaCopy className="mr-2" /> Duplicate
             </li>
-            <li
+            {/* <li
               className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
               onClick={(e) => {
                 e.stopPropagation();
@@ -140,8 +140,8 @@ const ModuleCard = ({
               }}
             >
               <FaIndent className="mr-2" /> Increase indent
-            </li>
-            <li
+            </li> */}
+            {/* <li
               className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
               onClick={(e) => {
                 e.stopPropagation();
@@ -150,7 +150,7 @@ const ModuleCard = ({
               }}
             >
               <FaShareAlt className="mr-2" /> Share to Commons
-            </li>
+            </li> */}
             <li
               className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
               onClick={(e) => {
