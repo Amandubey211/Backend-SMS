@@ -17,11 +17,17 @@ const UnAssignedStudentList = () => {
   const { cid } = useParams();
   const sections = useSelector((state) => state.Class.sectionsList);
 
-  useEffect(() => {
-    const fetchStudents = async () => {
+  // Define the fetchStudents function inside the component
+  const fetchStudents = async () => {
+    try {
       const data = await fetchUnassignedStudents(cid);
       setUnassignedStudents(data);
-    };
+    } catch (error) {
+      toast.error("Failed to load students");
+    }
+  };
+
+  useEffect(() => {
     fetchStudents();
   }, [cid, fetchUnassignedStudents]);
 
@@ -32,7 +38,6 @@ const UnAssignedStudentList = () => {
   const filteredStudents = unassigned.filter((student) =>
     student.firstName.toLowerCase().includes(searchQuery.toLowerCase())
   );
-  console.log("filtered students--", filteredStudents);
 
   const handleSidebarOpen = (student) => {
     setSelectedStudent(student);
@@ -46,10 +51,9 @@ const UnAssignedStudentList = () => {
 
   const getSectionName = (sectionId) => {
     const section = sections.find((sec) => sec._id === sectionId);
-    if (section) {
-      return { name: section.sectionName, color: "text-gray-500" };
-    }
-    return { name: "No Section Assigned", color: "text-red-500" };
+    return section
+      ? { name: section.sectionName, color: "text-gray-500" }
+      : { name: "No Section Assigned", color: "text-red-500" };
   };
 
   if (loading) return <div>Loading...</div>;
@@ -57,7 +61,7 @@ const UnAssignedStudentList = () => {
     toast.error(error);
     return <div>Failed to load students</div>;
   }
-  
+
   return (
     <div className="w-80 p-4 bg-white border-r">
       <div className="mb-4">
@@ -78,16 +82,21 @@ const UnAssignedStudentList = () => {
           <li key={index} className="flex items-center justify-between py-2">
             <div className="flex items-center">
               <img
-                src={student.profile || `https://randomuser.me/api/portraits/med/${index % 2 === 0 ? "women" : "men"
-                  }/${index}.jpg`}
+                src={
+                  student.profile ||
+                  `https://randomuser.me/api/portraits/med/${
+                    index % 2 === 0 ? "women" : "men"
+                  }/${index}.jpg`
+                }
                 alt={student.firstName}
                 className="w-10 h-10 rounded-full mr-3"
               />
               <div>
                 <div className="text-sm font-medium">{student.firstName}</div>
                 <div
-                  className={`text-xs ${getSectionName(student?.presentSectionId).color
-                    }`}
+                  className={`text-xs ${
+                    getSectionName(student?.presentSectionId).color
+                  }`}
                 >
                   {getSectionName(student?.presentSectionId).name}
                 </div>
@@ -116,6 +125,7 @@ const UnAssignedStudentList = () => {
               selectedStudent.profile ||
               "https://avatars.githubusercontent.com/u/109097090?v=4"
             }
+            onAssignmentComplete={fetchStudents}
           />
         </Sidebar>
       )}

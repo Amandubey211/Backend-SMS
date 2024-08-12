@@ -1,16 +1,22 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
+import { useParams } from "react-router-dom";
 import useAssignStudentToGroup from "../../../../Hooks/AuthHooks/Staff/Admin/Students/useAssignStudentToGroup ";
-import useGetGroupsByClass from "../../../../Hooks/AuthHooks/Staff/Admin/Groups/useGetGroupByClass";
-import useFetchSection from "../../../../Hooks/AuthHooks/Staff/Admin/Sections/useFetchSection";
 
-const AssignStudent = ({ name, imageUrl, section, studentId }) => {
+const AssignStudent = ({
+  name,
+  imageUrl,
+  section,
+  studentId,
+  onAssignmentComplete,
+}) => {
   const [sectionId, setSectionId] = useState("");
   const [groupId, setGroupId] = useState("");
   const AllSections = useSelector((store) => store.Class.sectionsList);
   const AllGroups = useSelector((store) => store.Class.groupsList);
-  const { assignStudentToGroup, assignStudentToSection, error, loading } = useAssignStudentToGroup();
+  const { assignStudentToGroup, assignStudentToSection, error, loading } =
+    useAssignStudentToGroup();
 
   const handleSectionChange = (e) => {
     setSectionId(e.target.value);
@@ -23,14 +29,19 @@ const AssignStudent = ({ name, imageUrl, section, studentId }) => {
       return;
     }
     if (!sectionId) {
-      toast.error("Please select a group.");
+      toast.error("Please select a section.");
       return;
     }
     try {
-      await assignStudentToSection(studentId, sectionId)
+      await assignStudentToSection(studentId, sectionId);
       await assignStudentToGroup(studentId, groupId);
       toast.success("Student assigned to group successfully!");
+
+      if (onAssignmentComplete) {
+        onAssignmentComplete();
+      }
     } catch (error) {
+      console.log(error);
       toast.error(error.message);
     }
   };
@@ -62,7 +73,7 @@ const AssignStudent = ({ name, imageUrl, section, studentId }) => {
           className="block w-full p-2 border border-gray-300 rounded-lg"
           disabled={loading}
         >
-          <option value="">All Section</option>
+          <option value="">All Sections</option>
           {AllSections?.map((section) => (
             <option key={section._id} value={section._id}>
               {section.sectionName}
@@ -91,10 +102,11 @@ const AssignStudent = ({ name, imageUrl, section, studentId }) => {
       <div className="mt-auto mb-8">
         <button
           type="submit"
-          className={`w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md ${loading
-            ? "opacity-50 cursor-not-allowed"
-            : "hover:from-pink-600 hover:to-purple-600"
-            }`}
+          className={`w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md ${
+            loading
+              ? "opacity-50 cursor-not-allowed"
+              : "hover:from-pink-600 hover:to-purple-600"
+          }`}
           disabled={loading}
         >
           {loading ? "Assigning..." : "Assign Student"}
