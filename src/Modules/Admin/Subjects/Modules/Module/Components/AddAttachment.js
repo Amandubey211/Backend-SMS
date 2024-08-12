@@ -179,7 +179,7 @@ const AddAttachment = ({ chapterData, onClose, fetchModules }) => {
           </div>
         )}
 
-        <div className="mt-4">
+        <div className="mt-4 mb-8">
           <button
             type="submit"
             className={`w-full bg-gradient-to-r from-purple-400 to-pink-400 text-white py-2 px-4 rounded-md hover:from-purple-500 hover:to-pink-500 transition duration-500 ease-in-out transform ${
