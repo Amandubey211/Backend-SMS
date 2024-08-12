@@ -7,6 +7,7 @@ import {
   FaTrashAlt,
   FaArrowRight,
 } from "react-icons/fa";
+import { GrAttachment } from "react-icons/gr";
 import ChapterItem from "./ChapterItem";
 import useDeleteChapter from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useDeleteChapter";
 import DeleteModal from "../../../../../../Components/Common/DeleteModal";
@@ -84,6 +85,12 @@ const Chapter = ({
           </div>
         </div>
         <div className="flex items-center space-x-2 relative">
+          <button
+            className="border p-2 rounded-full hover:bg-gray-50"
+            aria-label="Add Attachment"
+          >
+            <GrAttachment />
+          </button>
           <button
             className="border p-2 rounded-full hover:bg-gray-50 relative"
             onClick={toggleMenu}
