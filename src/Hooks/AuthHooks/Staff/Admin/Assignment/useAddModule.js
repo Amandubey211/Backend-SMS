@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { baseUrl } from "../../../../../config/Common";
 
-const useAddModule = (fetchModules) => {
+const useAddModule = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
@@ -42,7 +42,6 @@ const useAddModule = (fetchModules) => {
         if (response.data && response.data.success) {
           setSuccess(response.data.msg);
           toast.success(response.data.msg);
-          fetchModules(); // Refetch modules after adding
           return { success: true, msg: response.data.msg };
         } else {
           const errorMsg = response.data?.msg || "Failed to add module.";
@@ -53,13 +52,14 @@ const useAddModule = (fetchModules) => {
         const errorMessage =
           err.response?.data?.msg || "Error in adding module.";
         toast.error(errorMessage);
+        console.log(err);
         setError(errorMessage);
         return { success: false, error: errorMessage };
       } finally {
         setLoading(false);
       }
     },
-    [role, sid, fetchModules]
+    [role, sid]
   );
 
   return { loading, error, success, addModule };

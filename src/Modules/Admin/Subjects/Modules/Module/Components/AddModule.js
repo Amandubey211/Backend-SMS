@@ -62,27 +62,27 @@ const AddModule = ({ data, onClose, onModuleAdded }) => {
     if (data) {
       // Edit module
       await editModule(data._id, moduleTitle, selectedFile);
-      if (editSuccess) {
-        toast.success("Module updated successfully");
-        setModuleTitle("");
-        clearImage();
-        onModuleAdded(); // Notify the parent component
-        onClose(); // Close the sidebar
-      } else if (editError) {
-        toast.error(editError);
-      }
+      // if (editSuccess) {
+      // toast.success("Module updated successfully");
+      setModuleTitle("");
+      clearImage();
+      // onModuleAdded(); // Notify the parent component
+      onClose(); // Close the sidebar
+      // } else if (editError) {
+      //   toast.error(editError);
+      // }
     } else {
       // Add module
-      const result = await addModule(moduleTitle, selectedFile || preview);
-      if (result && result.success) {
-        toast.success("Module added successfully");
-        setModuleTitle("");
-        clearImage();
-        onModuleAdded(); // Notify the parent component
-        onClose(); // Close the sidebar
-      } else if (result && result.error) {
-        toast.error(result.error);
-      }
+      // const result = await addModule(moduleTitle, selectedFile || preview);
+      await addModule(moduleTitle, selectedFile || preview);
+
+      setModuleTitle("");
+      clearImage();
+      // onModuleAdded(); // Notify the parent component
+      onClose(); // Close the sidebar
+      // } else if (result && result.error) {
+      //   toast.error(result.error);
+      // }
     }
   };
 

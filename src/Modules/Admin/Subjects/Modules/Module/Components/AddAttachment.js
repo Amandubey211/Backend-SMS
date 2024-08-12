@@ -179,7 +179,7 @@ const AddAttachment = ({ chapterData, onClose, fetchModules }) => {
           </div>
         )}
 
-        <div className="flex-shrink-0 mt-4 mb-8">
+        <div className="mt-4">
           <button
             type="submit"
             className={`w-full bg-gradient-to-r from-purple-400 to-pink-400 text-white py-2 px-4 rounded-md hover:from-purple-500 hover:to-pink-500 transition duration-500 ease-in-out transform ${
@@ -190,40 +190,40 @@ const AddAttachment = ({ chapterData, onClose, fetchModules }) => {
             {loading ? "Uploading..." : "Upload Attachments"}
           </button>
         </div>
+      </form>
 
-        {modalOpen && (
-          <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75 z-50 transition-opacity duration-500 ease-in-out">
-            <div className="bg-white p-2 rounded-lg relative max-h-full max-w-3xl w-full overflow-y-auto shadow-lg transform transition-transform duration-500 ease-in-out scale-100">
-              <button
-                onClick={closeModal}
-                className="absolute top-2 right-2 p-2 px-3 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 text-white hover:from-pink-600 hover:to-purple-600 transition-colors duration-500 ease-in-out shadow-lg"
-              >
-                ✕
-              </button>
-              <div className="flex justify-center">
-                <div className="overflow-y-auto max-h-[80vh] w-full">
-                  {selectedPreview &&
-                    (isImage(files[previews.indexOf(selectedPreview)]) ? (
-                      <img
-                        src={selectedPreview}
-                        alt="Preview"
-                        className="max-h-[80vh] object-contain rounded-md"
-                      />
-                    ) : (
-                      <embed
-                        src={selectedPreview}
-                        type="application/pdf"
-                        width="700"
-                        height="800"
-                        className="max-h-[80vh] overflow-y-auto rounded-md"
-                      />
-                    ))}
-                </div>
+      {modalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75 z-50 transition-opacity duration-500 ease-in-out">
+          <div className="bg-white p-2 rounded-lg relative max-h-full max-w-3xl w-full overflow-y-auto shadow-lg transform transition-transform duration-500 ease-in-out scale-100">
+            <button
+              onClick={closeModal}
+              className="absolute top-2 right-2 p-2 px-3 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 text-white hover:from-pink-600 hover:to-purple-600 transition-colors duration-500 ease-in-out shadow-lg"
+            >
+              ✕
+            </button>
+            <div className="flex justify-center">
+              <div className="overflow-y-auto max-h-[80vh] w-full">
+                {selectedPreview &&
+                  (isImage(files[previews.indexOf(selectedPreview)]) ? (
+                    <img
+                      src={selectedPreview}
+                      alt="Preview"
+                      className="max-h-[80vh] object-contain rounded-md"
+                    />
+                  ) : (
+                    <embed
+                      src={selectedPreview}
+                      type="application/pdf"
+                      width="700"
+                      height="800"
+                      className="max-h-[80vh] overflow-y-auto rounded-md"
+                    />
+                  ))}
               </div>
             </div>
           </div>
-        )}
-      </form>
+        </div>
+      )}
     </div>
   );
 };

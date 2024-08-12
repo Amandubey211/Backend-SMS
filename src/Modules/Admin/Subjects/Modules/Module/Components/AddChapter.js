@@ -12,6 +12,7 @@ const AddChapter = ({ chapterData, isEditing, onClose, fetchModules }) => {
   const [chapterTitle, setChapterTitle] = useState("");
 
   const { loading: addLoading, error, success, addChapter } = useAddChapter();
+  console.log(success, "sdfsdfsdf");
   const {
     loading: updateLoading,
     error: updateError,
@@ -66,27 +67,27 @@ const AddChapter = ({ chapterData, isEditing, onClose, fetchModules }) => {
         selectedModule?.moduleId,
         chapterData._id
       );
-      if (updateSuccess) {
-        toast.success(updateSuccess);
-        onClose();
-        fetchModules(); // Refetch after updating a chapter
-      }
-      if (updateError) {
-        toast.error(updateError);
-      }
+      // if (updateSuccess) {
+      // toast.success(updateSuccess);
+      onClose();
+      // fetchModules(); // Refetch after updating a chapter
+      // }
+      // if (updateError) {
+      //   toast.error(updateError);
+      // }
     } else {
       await addChapter(chapterTitle, thumbnail, selectedModule?.moduleId);
-      if (success) {
-        toast.success(success);
-        setChapterTitle("");
-        clearImage();
-        onClose();
-        fetchModules(); // Refetch after adding a chapter
-      }
-      if (error) {
-        toast.error(error);
-      }
+      // if (success) {
+      // toast.success(success);
+      setChapterTitle("");
+      clearImage();
+      onClose();
+      // fetchModules(); // Refetch after adding a chapter
     }
+    // if (error) {
+    //   toast.error(error);
+    // }
+    // }
   };
 
   return (
