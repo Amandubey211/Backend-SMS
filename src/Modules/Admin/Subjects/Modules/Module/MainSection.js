@@ -130,15 +130,12 @@ const MainSection = () => {
 
   const confirmDelete = async () => {
     if (deleteTarget.type === "Module") {
-      const result = await deleteModule(deleteTarget.id);
-      if (result.success) {
-        toast.success(`${deleteTarget.type} deleted successfully!`);
-        setIsDeleteModalOpen(false);
-        setDeleteTarget(null);
-        fetchModules();
-      } else {
-        toast.error(`Failed to delete ${deleteTarget.type}.`);
-      }
+      await deleteModule(deleteTarget.id);
+
+      toast.success(`${deleteTarget.type} deleted successfully!`);
+      setIsDeleteModalOpen(false);
+      setDeleteTarget(null);
+      fetchModules();
     }
   };
 
@@ -149,6 +146,7 @@ const MainSection = () => {
   const handleEditChapter = (chapter) => {
     setSidebarContent(
       <AddChapter
+        fetchModules={fetchModules}
         chapterData={chapter}
         isEditing={true}
         onClose={() => {

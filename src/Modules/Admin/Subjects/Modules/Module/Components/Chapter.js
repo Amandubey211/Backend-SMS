@@ -77,6 +77,7 @@ const Chapter = ({
     try {
       await deleteChapter(moduleId, chapterId);
       setModalOpen(false);
+      fetchModules();
       onDelete();
     } catch (error) {
       console.error("Error deleting chapter:", error);

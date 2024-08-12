@@ -44,12 +44,11 @@ const ModuleCard = ({
   };
 
   const handleDelete = async () => {
-    const result = await deleteModule(moduleId);
-    if (result.success) {
-      onDelete();
-      setIsDeleteModalOpen(false); // Close the modal on successful deletion
-      fetchModules(); // Refetch modules after deletion
-    }
+    await deleteModule(moduleId);
+
+    onDelete();
+    setIsDeleteModalOpen(false); // Close the modal on successful deletion
+    fetchModules(); // Refetch modules after deletion
   };
 
   const handleMove = (e) => {
