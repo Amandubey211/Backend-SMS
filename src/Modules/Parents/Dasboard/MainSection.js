@@ -10,6 +10,7 @@ import { CiMoneyBill } from "react-icons/ci";
 import { RiMoneyDollarBoxFill } from "react-icons/ri";
 import { RiCalendarCheckLine } from "react-icons/ri";
 import { baseUrl } from '../../../config/Common.js';
+
 const fetchDashboardData = async () => {
   try {
     const token = localStorage.getItem('parent:token');
@@ -31,6 +32,7 @@ const fetchDashboardData = async () => {
 
 const ParentSection = () => {
   const [cardData, setCardData] = useState(initialCardData);
+  const [numberOfChildren, setNumberOfChildren] = useState(0);
 
   useEffect(() => {
     const getData = async () => {
@@ -70,6 +72,8 @@ const ParentSection = () => {
             iconBackground: "bg-purple-500",
           },
         ]);
+
+        setNumberOfChildren(data.childrenCount || 0);
       }
     };
 
@@ -78,29 +82,27 @@ const ParentSection = () => {
 
   return (
     <div className="h-full w-full">
-    <div className="w-full p-2">
+      <div className="w-full">
         <div className="flex flex-wrap justify-center gap-3 py-4 ">
-            {cardData?.map((item, index) => (
-                <DashCard key={index} {...item} />
-            ))}
+          {cardData?.map((item, index) => (
+            <DashCard key={index} {...item} />
+          ))}
         </div>
         <div className="flex flex-wrap justify-between items-start border-y">
-           
-            <div className="w-2/5">
-                <StudentParentCard />
-            </div>
-            <div className="w-3/5 border-r">
-                <NoticeBoard />
-            </div>
+          <div className="w-2/5">
+            <StudentParentCard />
+          </div>
+          <div className="w-3/5 border-r">
+            <NoticeBoard numberOfChildren={numberOfChildren} />
+          </div>
         </div>
         <div className="flex justify-between items-start border-y">
-            <div className="w-full">
-                <AccountingSection />
-            </div>
+          <div className="w-full">
+            <AccountingSection />
+          </div>
         </div>
+      </div>
     </div>
-</div>
-
   );
 };
 
