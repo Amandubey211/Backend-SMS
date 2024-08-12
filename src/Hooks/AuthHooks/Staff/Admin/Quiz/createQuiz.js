@@ -39,7 +39,7 @@ const useCreateQuiz = () => {
         chapterId,
         thumbnail,
       } = quizData;
-      console.log(quizData)
+      console.log(quizData);
 
       const missingFields = [];
 
@@ -61,7 +61,6 @@ const useCreateQuiz = () => {
         //   const result = await uploadImage(thumbnail);
         //   imageUrl = result.secure_url;
         // }
-
 
         const token = localStorage.getItem(`${role}:token`);
 
@@ -103,7 +102,6 @@ const useCreateQuiz = () => {
         const { quiz } = response.data;
 
         setLoading(false);
-        toast.success("Quiz created successfully");
         return { success: true, quiz };
       } catch (err) {
         const errorMessage =
