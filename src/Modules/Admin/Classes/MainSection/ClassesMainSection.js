@@ -21,8 +21,8 @@ const ClassesMainSection = () => {
 
   return (
     <div className="min-h-screen p-4">
-      <div className="flex justify-between">
-        <h1 className="text-lg opacity-50">All Classes</h1>
+      <div className="flex justify-end">
+        {/* <h1 className="text-lg opacity-50">All Classes</h1> */}
         <button
           onClick={handleSidebarOpen}
           className="px-4 py-2 rounded-md bg-gradient-to-r from-pink-100 to-purple-200"

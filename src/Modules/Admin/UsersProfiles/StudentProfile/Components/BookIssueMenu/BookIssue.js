@@ -4,6 +4,7 @@ import axios from "axios";
 import { baseUrl } from "../../../../../../config/Common";
 import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { GoAlertFill } from "react-icons/go";
 
 const BookIssue = () => {
   const [bookIssueData, setBookIssueData] = useState([]);
@@ -59,7 +60,7 @@ const BookIssue = () => {
   }, [bookIssueData, filters.status]);
 
   return (
-    <div className="min-h-screen p-4 bg-gray-50">
+    <div className="min-h-screen p-4 ">
       <div className="flex justify-between items-center mb-4">
 
       </div>
@@ -109,12 +110,20 @@ const BookIssue = () => {
               <th className="px-5 py-3 border-b border-gray-200">Status</th>
             </tr>
           </thead>
-          <tbody>
+          {filteredBookIssueData.length > 0 ?  <tbody>
             {filteredBookIssueData?.map((item) => (
               <BookIssueRow key={item.id} item={item} />
 
             ))}
-          </tbody>
+          </tbody>: <tr className="w-full text-center text-gray-500 ">
+          <td className="px-5 py-2" colSpan="6">
+          <div className="flex  items-center justify-center flex-col text-2xl my-[10rem] h-auto">
+        <GoAlertFill className="text-[5rem]" />
+       No  Data Found
+      </div>
+          </td>
+        </tr>}
+        
         </table>
       </div>
     </div>

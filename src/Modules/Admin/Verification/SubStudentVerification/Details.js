@@ -11,12 +11,15 @@ const formatDate = (dateString) => {
 
 const Details = ({ student }) => {
   return (
-    <div className="w-full max-w-4xl bg-white rounded-lg overflow-hidden ">
+    <div className="w-full max-w-4xl bg-white rounded-lg overflow-hidden">
       <div className="p-6">
         <div className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4 mb-6">
           <img
             className="w-16 h-16 rounded-full"
-            src={student.profile || "https://avatars.githubusercontent.com/u/109097090?v=4"} // Placeholder image, replace with actual profile picture URL from student object
+            src={
+              student.profile ||
+              "https://avatars.githubusercontent.com/u/109097090?v=4"
+            } // Placeholder image, replace with actual profile picture URL from student object
             alt={`${student?.firstName} ${student?.lastName}`}
           />
           <div className="text-center sm:text-left">
@@ -32,7 +35,7 @@ const Details = ({ student }) => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
             <div className="bg-gray-100 rounded-md p-4 transition-opacity duration-500 ease-in-out hover:opacity-80">
               <span className="font-medium text-gray-700">Email:</span>
-              <p className="text-gray-600">{student?.email}</p>
+              <p className="text-gray-600 truncate w-full">{student?.email}</p>
             </div>
             <div className="bg-gray-100 rounded-md p-4 transition-opacity duration-500 ease-in-out hover:opacity-80">
               <span className="font-medium text-gray-700">Contact Number:</span>
@@ -111,9 +114,11 @@ const Details = ({ student }) => {
             </div>
             <div className="bg-gray-100 rounded-md p-4 transition-opacity duration-500 ease-in-out hover:opacity-80">
               <span className="font-medium text-gray-700">
-              Student Applied for Class:
+                Student Applied for Class:
               </span>
-              <p className="text-gray-600">{student?.applyingClass?.className}</p>
+              <p className="text-gray-600">
+                {student?.applyingClass?.className}
+              </p>
             </div>
             <div className="bg-gray-100 rounded-md p-4 transition-opacity duration-500 ease-in-out hover:opacity-80">
               <span className="font-medium text-gray-700">

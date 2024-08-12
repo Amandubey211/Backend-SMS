@@ -10,7 +10,7 @@ const useAssignStudentToGroup = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const role = useSelector((store) => store.Auth.role);
-  const { fetchUnassignedStudents } = useGetUnassignedStudents()
+  const { fetchUnassignedStudents } = useGetUnassignedStudents();
   const { cid } = useParams(); // Assuming 'cid' is the class ID needed for some operations
 
   const assignStudentToGroup = async (studentId, groupId) => {
@@ -26,7 +26,7 @@ const useAssignStudentToGroup = () => {
           headers: { Authentication: token },
         }
       );
-      console.log(response.data)
+      console.log(response.data);
 
       toast.success("Student assigned to group successfully!");
       setLoading(false);
@@ -54,7 +54,7 @@ const useAssignStudentToGroup = () => {
           headers: { Authentication: token },
         }
       );
-      console.log(response.data)
+      console.log(response.data);
 
       toast.success("Student assigned to group successfully!");
       setLoading(false);
@@ -67,7 +67,7 @@ const useAssignStudentToGroup = () => {
       setLoading(false);
       throw new Error(errorMessage); // This ensures that the error can be handled further up if needed
     }
-  }
+  };
 
   const moveStudentToSection = async (studentId, sectionId) => {
     setLoading(true);
@@ -82,7 +82,7 @@ const useAssignStudentToGroup = () => {
           headers: { Authentication: token },
         }
       );
-      console.log(response.data)
+      console.log(response.data);
 
       toast.success("Student moved to section successfully!");
       setLoading(false);
@@ -95,14 +95,14 @@ const useAssignStudentToGroup = () => {
       setLoading(false);
       throw new Error(errorMessage);
     }
-  }
+  };
 
   const removeStudentFromGroup = async (studentId, groupId) => {
     setLoading(true);
     setError(null);
     try {
       const token = localStorage.getItem(`${role}:token`);
-      const classId = cid
+      const classId = cid;
       const response = await axios.put(
         `${baseUrl}/admin/delStudentFrmGroup`,
         { studentId, groupId },
@@ -112,7 +112,7 @@ const useAssignStudentToGroup = () => {
       );
 
       toast.success("Student removed from group successfully!");
-      fetchUnassignedStudents(classId)
+      fetchUnassignedStudents(classId);
       setLoading(false);
       return response.data;
     } catch (err) {
@@ -123,14 +123,14 @@ const useAssignStudentToGroup = () => {
       setLoading(false);
       throw new Error(errorMessage);
     }
-  }
+  };
 
   const editStudent = async (studentId, groupId, sectionId) => {
     setLoading(true);
     setError(null);
     try {
       const token = localStorage.getItem(`${role}:token`);
-      const classId = cid
+      const classId = cid;
       const response = await axios.put(
         `${baseUrl}/admin/editStudent/${studentId}`,
         { groupId, sectionId, classId: `${cid}` },
@@ -139,7 +139,7 @@ const useAssignStudentToGroup = () => {
         }
       );
       toast.success("Student Updated successfully!");
-      fetchUnassignedStudents(classId)
+      fetchUnassignedStudents(classId);
       setLoading(false);
       return response.data;
     } catch (err) {
@@ -150,9 +150,17 @@ const useAssignStudentToGroup = () => {
       setLoading(false);
       throw new Error(errorMessage);
     }
-  }
+  };
 
-  return { assignStudentToGroup, assignStudentToSection, moveStudentToSection, removeStudentFromGroup, editStudent, loading, error };
+  return {
+    assignStudentToGroup,
+    assignStudentToSection,
+    moveStudentToSection,
+    removeStudentFromGroup,
+    editStudent,
+    loading,
+    error,
+  };
 };
 
 export default useAssignStudentToGroup;

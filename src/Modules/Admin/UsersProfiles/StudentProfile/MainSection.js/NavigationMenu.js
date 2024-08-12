@@ -3,7 +3,7 @@ import React from "react";
 
 const NavigationMenu = ({ activeItem, setActiveItem, items }) => {
   return (
-    <div className="flex flex-col min-h-screen h-full space-y-4 bg-gray-100 text-start items-center">
+    <div className="flex flex-col py-8  h-auto space-y-4 bg-gray-100 text-start items-center">
       {items.map((item, index) => (
         <button
           key={index}

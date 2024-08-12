@@ -52,7 +52,6 @@ const useUpdateQuiz = () => {
       setError(null);
 
       try {
-        
         const token = localStorage.getItem(`${role}:token`);
 
         const response = await axios.put(
@@ -91,7 +90,6 @@ const useUpdateQuiz = () => {
         const { quiz } = response.data;
 
         setLoading(false);
-        toast.success("Quiz updated successfully");
         return { success: true, quiz };
       } catch (err) {
         const errorMessage =

@@ -5,9 +5,9 @@ const TableRow = ({ student, onRowClick }) => {
     <tr className="border-b hover:bg-gray-50 ">
       <td className="p-3 flex items-center cursor-pointer" onClick={onRowClick}>
         <img
-          src={student?.profile || "https://avatars.githubusercontent.com/u/109097090?v=4"}
+          src={student?.studentProfile}
           alt={student.studentName}
-          className="w-10 h-10 rounded-full mr-3"
+          className="w-10 h-10 rounded-full mr-3 bg-gray-500"
         />
         <div>
           <div className="font-medium">{student.studentName}</div>

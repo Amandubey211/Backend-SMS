@@ -12,7 +12,7 @@ import LibraryTable from "../../../Components/Parents/Libary/LibraryList";
 const ParentSection = () => {
   return (
     <div className="h-full  w-full">
-      <div className=" w-full p-2">
+      <div className=" w-full">
         
         
         <div className="flex flex-wrap justify-between items-start  border-y">

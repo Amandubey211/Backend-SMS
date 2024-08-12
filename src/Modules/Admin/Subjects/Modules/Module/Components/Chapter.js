@@ -6,11 +6,19 @@ import {
   FaPen,
   FaTrashAlt,
   FaArrowRight,
+  FaFilePdf,
+  FaFileWord,
+  FaFilePowerpoint,
+  FaEye,
 } from "react-icons/fa";
+import { RiDeleteBin5Line } from "react-icons/ri";
+import { GrAttachment } from "react-icons/gr";
 import ChapterItem from "./ChapterItem";
 import useDeleteChapter from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useDeleteChapter";
+import useDeleteAttachment from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useDeleteAttachment";
 import DeleteModal from "../../../../../../Components/Common/DeleteModal";
-import toast from "react-hot-toast";
+import Sidebar from "../../../../../../Components/Common/Sidebar";
+import AddAttachment from "./AddAttachment";
 
 const Chapter = ({
   title,
@@ -20,14 +28,22 @@ const Chapter = ({
   chapterId,
   moduleId,
   quizzes,
+  attachments,
   isExpanded,
   onToggle,
   onEdit,
   onDelete,
+  fetchModules,
 }) => {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [modalOpen, setModalOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [attachmentsExpanded, setAttachmentsExpanded] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState(null);
+  const [previewType, setPreviewType] = useState(null);
+
   const { loading, error, success, deleteChapter } = useDeleteChapter();
+  const { deleteAttachment } = useDeleteAttachment(fetchModules);
   const menuRef = useRef(null);
 
   const toggleMenu = (e) => {
@@ -35,7 +51,6 @@ const Chapter = ({
     setMenuOpen((prevState) => !prevState);
   };
 
-  // Close menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (menuRef.current && !menuRef.current.contains(e.target)) {
@@ -55,35 +70,92 @@ const Chapter = ({
   }, [menuOpen]);
 
   const handleDelete = () => {
-    setModalOpen(true);
+    setDeleteModalOpen(true);
     setMenuOpen(false);
   };
 
   const confirmDelete = async () => {
     try {
       await deleteChapter(moduleId, chapterId);
-      setModalOpen(false);
+      setDeleteModalOpen(false);
+      fetchModules();
       onDelete();
     } catch (error) {
       console.error("Error deleting chapter:", error);
     }
   };
 
+  const handleAddAttachment = () => {
+    setIsSidebarOpen(true);
+  };
+
+  const handleSidebarClose = () => {
+    setIsSidebarOpen(false);
+  };
+
+  const handleDeleteAttachment = async (attachmentUrl) => {
+    console.log(attachmentUrl, "sdfsdf");
+    try {
+      await deleteAttachment(moduleId, chapterId, [attachmentUrl]);
+    } catch (error) {
+      console.error("Error deleting attachment:", error);
+    }
+  };
+
+  const toggleAttachments = () => {
+    setAttachmentsExpanded((prev) => !prev);
+  };
+
+  const getFileIcon = (type) => {
+    switch (type) {
+      case "application/pdf":
+        return <FaFilePdf className="text-red-500" size={24} />;
+      case "application/msword":
+      case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+        return <FaFileWord className="text-blue-500" size={24} />;
+      case "application/vnd.ms-powerpoint":
+      case "application/vnd.openxmlformats-officedocument.presentationml.presentation":
+        return <FaFilePowerpoint className="text-orange-500" size={24} />;
+      default:
+        return null;
+    }
+  };
+
+  const openPreviewModal = (url, type) => {
+    setPreviewUrl(url);
+    setPreviewType(type);
+  };
+
+  const closePreviewModal = () => {
+    setPreviewUrl(null);
+    setPreviewType(null);
+  };
+
   return (
     <div className="mb-4 p-1 bg-white rounded-lg border-b relative">
-      <div className="flex items-center justify-between mb-2">
+      {/* Chapter Content */}
+      <div className="flex items-center justify-between mb-2 relative">
         <div className="flex items-center">
           <img
             src={imageUrl}
             alt={`Chapter ${chapterNumber}`}
             className="w-12 h-12 mr-4 rounded-lg"
           />
-          <div>
-            <h2 className="font-semibold text-md">{title}</h2>
-            <p className="text-gray-500">Chapter {chapterNumber}</p>
+          <div className="flex items-center">
+            <div>
+              <h2 className="font-semibold text-md">{title}</h2>
+              <p className="text-gray-500">Chapter {chapterNumber}</p>
+            </div>
           </div>
         </div>
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2 relative">
+          <button
+            className="border p-2 rounded-full hover:bg-gray-50"
+            aria-label="Add Attachment"
+            onClick={handleAddAttachment}
+          >
+            <GrAttachment />
+          </button>
           <button
             className="border p-2 rounded-full hover:bg-gray-50 relative"
             onClick={toggleMenu}
@@ -126,7 +198,6 @@ const Chapter = ({
                   className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
                   onClick={(e) => {
                     e.stopPropagation();
-                    toast.success("No Figma ");
                   }}
                   role="menuitem"
                 >
@@ -144,6 +215,72 @@ const Chapter = ({
           </button>
         </div>
       </div>
+      {attachments.length > 0 && (
+        <div className="flex items-center justify-end  mb-2">
+          <div className="flex items-center">
+            <button
+              className="flex items-center space-x-1 text-sm font-semibold text-purple-800 hover:underline   "
+              onClick={toggleAttachments}
+            >
+              <span>Attachments ({attachments.length})</span>
+              {attachmentsExpanded ? (
+                <FaChevronUp className="ml-1" />
+              ) : (
+                <FaChevronDown className="ml-1" />
+              )}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {attachmentsExpanded && attachments.length > 0 && (
+        <div className="mt-2">
+          <div className="grid grid-cols-1 gap-2 mb-2">
+            {attachments.map((attachment, index) => (
+              <div
+                key={index}
+                className="flex flex-col p-2 border rounded-md transform transition duration-100 hover:shadow-md"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    {getFileIcon(attachment.type) || (
+                      <img
+                        src={attachment.url}
+                        alt={attachment.name}
+                        className="h-8 w-8 object-cover rounded-md"
+                      />
+                    )}
+                    <div className="flex flex-col ml-4">
+                      <p className="text-gray-700 text-sm truncate max-w-xs">
+                        {attachment.name}
+                      </p>
+                      <p className="text-md">{attachment.label}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <button
+                      onClick={() =>
+                        openPreviewModal(attachment.url, attachment.type)
+                      }
+                      className="text-green-500 transition p-1 border rounded-full transform hover:scale-110 cursor-pointer"
+                      aria-label="Preview"
+                    >
+                      <FaEye size={20} />
+                    </button>
+                    <button
+                      type="button"
+                      className="text-red-500 transition p-1 border rounded-full transform hover:scale-110 cursor-pointer"
+                      onClick={() => handleDeleteAttachment(attachment.url)}
+                    >
+                      <RiDeleteBin5Line size={20} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
       {isExpanded && (
         <div className="ml-10 py-2">
           {assignments.length || quizzes.length ? (
@@ -176,11 +313,66 @@ const Chapter = ({
       )}
 
       <DeleteModal
-        isOpen={modalOpen}
-        onClose={() => setModalOpen(false)}
+        isOpen={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
         onConfirm={confirmDelete}
         title={title}
       />
+
+      {isSidebarOpen && (
+        <Sidebar
+          width="60%"
+          isOpen={isSidebarOpen}
+          onClose={handleSidebarClose}
+          title="Add Attachment"
+        >
+          <AddAttachment
+            chapterData={{ title, chapterId, moduleId }}
+            onClose={handleSidebarClose}
+            fetchModules={fetchModules}
+          />
+        </Sidebar>
+      )}
+
+      {previewUrl && (
+        <div
+          className="fixed inset-0 flex items-center justify-center z-50"
+          role="dialog"
+          aria-modal="true"
+        >
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50 transition-opacity duration-300"
+            onClick={closePreviewModal}
+          ></div>
+          <div className="bg-white rounded-lg overflow-hidden shadow-xl transform transition-transform duration-300 max-w-3xl w-full p-6 relative">
+            <button
+              onClick={closePreviewModal}
+              className="absolute top-2 right-2 p-2 px-3 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 text-white hover:from-pink-600 hover:to-purple-600 transition-colors duration-500 ease-in-out shadow-lg"
+            >
+              ✕
+            </button>
+            <div className="flex justify-center">
+              <div className="overflow-y-auto max-h-[80vh] w-full">
+                {previewType === "application/pdf" ? (
+                  <embed
+                    src={previewUrl}
+                    type="application/pdf"
+                    width="100%"
+                    height="500px"
+                    className="max-h-[80vh] overflow-y-auto rounded-md"
+                  />
+                ) : (
+                  <img
+                    src={previewUrl}
+                    alt="Preview"
+                    className="max-h-[80vh] w-full object-contain rounded-md"
+                  />
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

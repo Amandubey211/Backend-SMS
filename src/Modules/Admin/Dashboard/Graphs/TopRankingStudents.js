@@ -2,7 +2,7 @@ import React from "react";
 import TopRanker from "../../../../Assets/DashboardAssets/Aman dubey.png";
 import { MdKeyboardArrowDown } from "react-icons/md";
 import { ReactComponent as CrownIcon } from "../../../../Assets/DashboardAssets/SVG/crown.svg";
-
+import nodataimg from '../../../../Assets/DashboardAssets/nodata.png'
 const TopRankingStudents = () => {
   const topStudents = [
     {
@@ -57,9 +57,10 @@ const TopRankingStudents = () => {
   ];
 
   return (
-    <div className="bg-white p-5">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold text-gray-600">Top Ranking Students (Dummy Data)</h2>
+    <div className="bg-white p-4">
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-semibold ">Top Ranking Students</h2>
+
         <div className="relative">
           <select className="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
             <option>Class: 5</option>
@@ -70,11 +71,17 @@ const TopRankingStudents = () => {
           </div>
         </div>
       </div>
-      <div className="grid grid-cols-3 gap-4 mb-4">
-        {topStudents.slice(0, 3).map((student, index) => (
+
+      <div className="gap-4 w-full h-full py-20">
+        <img src={nodataimg} alt='image' className="w-full h-full"/>
+        {/* {topStudents.slice(0, 3).map((student, index) => (
           <div key={index} className="text-center p-4 border rounded-lg relative">
+
             {index === 1 && (
-              <div className="absolute left-1/2 transform -translate-x-1/2" style={{ top: "17px" }}>
+              <div
+                className="absolute left-1/2 transform -translate-x-1/2"
+                style={{ top: "17px" }}
+              >
                 <CrownIcon className="w-8 h-8" />
               </div>
             )}
@@ -85,7 +92,10 @@ const TopRankingStudents = () => {
                 alt={student.name}
               />
               {index !== 1 && (
-                <h3 className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-full text-md mb-1 mt font-medium bg-white px-2" style={{ paddingBottom: "7px" }}>
+                <h3
+                  className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-full text-md mb-1 mt font-medium bg-white px-2"
+                  style={{ paddingBottom: "7px" }}
+                >
                   Top {index === 0 ? 2 : 3}
                 </h3>
               )}
@@ -96,7 +106,7 @@ const TopRankingStudents = () => {
               style={{
                 background: "linear-gradient(to right, #fce7f3, #e9d5ff)",
               }}
-              className="px-2 rounded-sm"
+              className="px-3 rounded-sm"
             >
               <span
                 style={{
@@ -109,9 +119,9 @@ const TopRankingStudents = () => {
               </span>
             </span>
           </div>
-        ))}
+        ))} */}
       </div>
-      <div className="flex flex-col gap-2">
+      {/* <div className="flex flex-col gap-2">
         {topStudents.slice(3).map((student, index) => (
           <div
             key={index}
@@ -146,7 +156,7 @@ const TopRankingStudents = () => {
             <span>Roll: {student.roll}</span>
           </div>
         ))}
-      </div>
+      </div> */}
     </div>
   );
 };

@@ -42,7 +42,6 @@ const CreateAssignmentForm = ({
   const { cid } = useParams();
 
   useEffect(() => {
-    // Fetch modules if not available in the Redux store
     if (!moduleList || moduleList.length === 0) {
       fetchModules();
     }
@@ -103,6 +102,7 @@ const CreateAssignmentForm = ({
           ))}
         </select>
       </div>
+
       <div className="mb-4">
         <label className="block text-gray-700" htmlFor="chapter-select">
           Chapter
@@ -112,15 +112,23 @@ const CreateAssignmentForm = ({
           className="mt-1 block w-full pl-3 pr-10 py-2 text-base border focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
           value={selectedChapter}
           onChange={handleChapterChange}
+          disabled={!selectedModule} // Disable the dropdown if no module is selected
         >
-          <option value="">Select</option>
-          {chapters.map((chapter) => (
-            <option key={chapter._id} value={chapter._id}>
-              {chapter.name}
-            </option>
-          ))}
+          {selectedModule ? (
+            <>
+              <option value="">Select</option>
+              {chapters.map((chapter) => (
+                <option key={chapter._id} value={chapter._id}>
+                  {chapter.name}
+                </option>
+              ))}
+            </>
+          ) : (
+            <option value="">Select module first</option>
+          )}
         </select>
       </div>
+
       <GradeOption
         displayGrade={displayGrade}
         setDisplayGrade={setDisplayGrade}
@@ -133,7 +141,7 @@ const CreateAssignmentForm = ({
         allowedAttempts={allowedAttempts}
         handleChange={handleChange}
       />
-      {allowedAttempts == "true" && (
+      {allowedAttempts === true && (
         <NumberOfAttemptsInput
           numberOfAttempts={numberOfAttempts}
           handleChange={handleChange}

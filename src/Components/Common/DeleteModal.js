@@ -4,8 +4,14 @@ import { createPortal } from "react-dom";
 import { RiCloseLine } from "react-icons/ri";
 import { ImSpinner3 } from "react-icons/im";
 
-// Hook for trapping focus within a modal
-function useFocusTrap(modalRef, isOpen) {
+const DeleteModal = ({ isOpen, onClose, onConfirm, title }) => {
+  const [inputValue, setInputValue] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const modalRef = useRef(null);
+  const closeButtonRef = useRef(null);
+  const confirmButtonRef = useRef(null);
+
   useEffect(() => {
     if (!isOpen || !modalRef.current) return;
 
@@ -22,6 +28,8 @@ function useFocusTrap(modalRef, isOpen) {
     const focusableElements = modalRef.current.querySelectorAll(
       focusableSelectors.join(", ")
     );
+
+    if (focusableElements.length === 0) return;
 
     const firstElement = focusableElements[0];
     const lastElement = focusableElements[focusableElements.length - 1];
@@ -44,26 +52,15 @@ function useFocusTrap(modalRef, isOpen) {
       }
     };
 
-    // Initially focus the first element
-    if (firstElement) {
-      firstElement.focus();
-    }
+    // Initially focus the close button or the first focusable element
+    closeButtonRef.current.focus();
 
     document.addEventListener("keydown", handleKeyDown);
 
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [isOpen, modalRef]);
-}
-
-const DeleteModal = ({ isOpen, onClose, onConfirm, title }) => {
-  const [inputValue, setInputValue] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const modalRef = useRef(null);
-
-  useFocusTrap(modalRef, isOpen);
+  }, [isOpen]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -117,7 +114,11 @@ const DeleteModal = ({ isOpen, onClose, onConfirm, title }) => {
           <h3 id="delete-modal-title" className="text-lg font-semibold">
             Delete {title}
           </h3>
-          <button onClick={onClose} aria-label="Close modal">
+          <button
+            ref={closeButtonRef}
+            onClick={onClose}
+            aria-label="Close modal"
+          >
             <RiCloseLine className="text-gray-700 w-6 h-6" />
           </button>
         </div>
@@ -145,6 +146,7 @@ const DeleteModal = ({ isOpen, onClose, onConfirm, title }) => {
               Cancel
             </button>
             <button
+              ref={confirmButtonRef}
               className={`px-4 py-2 rounded-md flex items-center ${
                 isMatching
                   ? "bg-red-500 text-white cursor-pointer"

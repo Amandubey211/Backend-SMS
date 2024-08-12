@@ -20,7 +20,7 @@ const GroupList = ({
   const [activeMenu, setActiveMenu] = useState(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [editingGroup, setEditingGroup] = useState(null);
-  const { fetchUnassignedStudents } = useGetUnassignedStudents()
+  const { fetchUnassignedStudents } = useGetUnassignedStudents();
   const { deleteGroup, loading } = useCreateGroup();
   const { isModalOpen, modalData, openModal, closeModal } = useDeleteModal();
 
@@ -53,7 +53,7 @@ const GroupList = ({
   const closeSidebar = () => {
     setIsSidebarOpen(false);
     setEditingGroup(null);
-  }
+  };
   return (
     <div className="w-full max-w-4xl bg-white">
       <div className="flex items-center justify-between mb-4 p-2">
@@ -145,8 +145,9 @@ const GroupList = ({
                   )}
                 </div>
                 <svg
-                  className={`w-7 h-7 text-gray-500 transform p-1 border rounded-full transition-transform ${expandedGroupIndex === groupIndex ? "rotate-180" : ""
-                    }`}
+                  className={`w-7 h-7 text-gray-500 transform p-1 border rounded-full transition-transform ${
+                    expandedGroupIndex === groupIndex ? "rotate-180" : ""
+                  }`}
                   onClick={() =>
                     setExpandedGroupIndex((prevExpandedGroupIndex) =>
                       prevExpandedGroupIndex === groupIndex ? null : groupIndex

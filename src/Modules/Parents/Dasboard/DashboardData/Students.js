@@ -1,27 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { baseUrl } from '../../../../config/Common';
+import { FaChild } from 'react-icons/fa'; // Importing an icon for the no children message
 
 const StudentCard = ({ student, index }) => {
   const defaultImage = "https://via.placeholder.com/150"; // Placeholder image URL
   const profileImage = student.profile || defaultImage; // Use the student profile image or the default image
 
   return (
-    <div className="border rounded-lg p-4 mb-4 text-center shadow-lg relative">
-      <div className="absolute top-2 left-2 bg-gray-200 text-gray-800 py-1 px-2 rounded-full">
-        Child {index + 1}
+    <div className="border-r border-b p-4 mb-4 text-center relative border-gray-300">
+      <div className="absolute top-2 left-2 bg-gray-100 text-gray-800 py-1 px-2 rounded-l-sm rounded-r-sm text-sm">
+        Child: {index + 1}
       </div>
       <img
         src={profileImage}
         alt={student.name}
-        className="w-24 h-24 rounded-full mx-auto mb-4"
+        className="w-20 h-20 rounded-full mx-auto mb-2"
         onError={(e) => { e.target.onerror = null; e.target.src = defaultImage; }} // Fallback to default image if the provided src fails
       />
-      <h2 className="text-xl font-semibold mb-2">{student.name}</h2>
-      <div className="text-gray-700">
+      <h2 className="text-lg font-semibold mb-1">{student.name}</h2>
+      <div className="text-gray-600 text-sm mb-1">
         Class: {student.class} | Id: {student.admissionNumber} | Section: {student.section}
       </div>
-      <div className="text-green-500">Group: {student.group}</div>
+      <div className="text-green-500 text-sm">Group: {student.group}</div>
     </div>
   );
 };
@@ -90,8 +91,17 @@ const StudentParentCard = () => {
     return <div>Error: {error}</div>;
   }
 
+  if (students.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full text-center">
+        <FaChild className="text-gray-400 text-6xl mb-4" />
+        <p className="text-gray-600 text-lg">No Children Found!</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="p-6">
+    <div className="p-0">
       {students.slice(0, 3).map((student, index) => (
         <StudentCard key={student.id} student={student} index={index} />
       ))}

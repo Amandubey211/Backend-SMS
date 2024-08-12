@@ -240,7 +240,7 @@ const EventScheduler = () => {
           <div className="my-4 w-full h-40 flex rounded-sm gap-20 pl-10 relative ">
             {currentPage > 0 && (
               <div
-                className="p-1 rounded-full text-purple-500 bg-black border-2 cursor-pointer absolute left-0 top-1/2 transform -translate-y-1/2"
+                className="p-1 rounded-full text-purple-500 bg-white border-2 cursor-pointer absolute left-0 top-1/2 transform -translate-y-1/2"
                 onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 0))}
               >
                 <IoIosArrowBack />

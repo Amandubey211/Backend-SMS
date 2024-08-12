@@ -59,12 +59,10 @@ const useCreateAssignment = () => {
           }
         );
 
-        const { data } = response.data;
-
-        console.log(data);
-        setLoading(false);
-        toast.success("Assignment created successfully");
-        return { success: true, data };
+        if (response.data.success) {
+          toast.success("Assignment created successfully");
+          return { success: true, data: response.data.assignment };
+        }
       } catch (err) {
         const errorMessage =
           err.response?.data?.message || "Failed to create assignment";

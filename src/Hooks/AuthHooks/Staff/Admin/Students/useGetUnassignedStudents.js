@@ -8,7 +8,7 @@ const useGetUnassignedStudents = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const role = useSelector((store) => store.Auth.role);
-  
+
   const fetchUnassignedStudents = useCallback(
     async (classId) => {
       setLoading(true);
@@ -23,7 +23,7 @@ const useGetUnassignedStudents = () => {
             },
           }
         );
-        console.log(response.data)
+        console.log(response.data);
 
         if (response.data.status) {
           return response.data?.data;

@@ -7,13 +7,12 @@ import {
   FaUserGraduate,
   FaClipboardList,
   FaUniversity,
-  
 } from "react-icons/fa";
 import { FcAlarmClock, FcMoneyTransfer } from "react-icons/fc";
 import { FcHome } from "react-icons/fc";
 import { FcReading } from "react-icons/fc";
 import { FcAdvertising } from "react-icons/fc";
-
+import { FcCalendar } from "react-icons/fc";  // Import calendar icon for events
 
 import { TbDashboard } from "react-icons/tb";
 import { RiGraduationCapLine } from "react-icons/ri";
@@ -24,10 +23,9 @@ import { RiUserAddLine } from "react-icons/ri";
 import { BsBook } from "react-icons/bs";
 import { TbNotebook } from "react-icons/tb";
 import { GrUserWorker } from "react-icons/gr";
-import { MdLocalLibrary,MdManageAccounts } from "react-icons/md";
-import { RiParentFill,RiAdminFill } from "react-icons/ri";
+import { MdLocalLibrary, MdManageAccounts } from "react-icons/md";
+import { RiParentFill, RiAdminFill } from "react-icons/ri";
 import { FcManager } from "react-icons/fc";
-
 
 const sidebarData = [
   {
@@ -40,7 +38,6 @@ const sidebarData = [
     icon: <FcManager  />,
     path: `/children`,
   },
-
   {
     title: "Finance",
     icon: <FcMoneyTransfer />,
@@ -60,6 +57,11 @@ const sidebarData = [
     title: "Announcements",
     icon: <FcAdvertising />,
     path: "/parentannounce",
+  },
+  {
+    title: "Events", // Added Events option
+    icon: <FcCalendar />, // Added icon for Events
+    path: "/parentevents",
   },
 ];
 

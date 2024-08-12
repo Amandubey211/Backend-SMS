@@ -8,7 +8,11 @@ const AllowedAttemptsSelect = ({ allowedAttempts, handleChange }) => (
     <select
       name="allowedAttempts"
       value={allowedAttempts}
-      onChange={handleChange}
+      onChange={(e) =>
+        handleChange({
+          target: { name: "allowedAttempts", value: e.target.value === "true" },
+        })
+      }
       className="mb-4 w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
     >
       <option value="">Select</option>

@@ -216,7 +216,6 @@ const DocumentUploadForm = ({
                 "Upload Document & Apply"
               )}
             </button>
-            )}
           </div>
         </>
       )}

@@ -5,18 +5,13 @@ import Sidebar from "../../../Components/Common/Sidebar";
 import { notices } from "../../Admin/dummyData/dummyData";
 import AllNotice from "./AllNotice";
 
-
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { MdQueryBuilder } from "react-icons/md";
 
-
-
 const Announce = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeIndex, setActiveIndex] = useState(0);
-
- 
 
   const filteredNotices = notices.filter((notice) =>
     notice.title.toLowerCase().includes(searchTerm.toLowerCase())
@@ -48,12 +43,9 @@ const Announce = () => {
                     Search
                   </span>
                 </button>
-               
               </div>
 
-              <div>
-            
-              </div>
+              <div></div>
             </div>
 
             <div className="   mt-5  rounded-lg overflow-auto">
@@ -81,13 +73,9 @@ const Announce = () => {
 
                         <div className="flex flex-row gap-[50px] text-xs">
                           <div className="flex   flex-wrap  justify-center items-center  ">
-                            
-                           
-
                             <MdQueryBuilder
                               style={{
                                 color: "gray",
-                               
                               }}
                               className=" text-gray-400 text-xl"
                             />
@@ -119,8 +107,6 @@ const Announce = () => {
                     )}
                   </div>
                 </div>
-
-               
               ))}
             </div>
           </div>
@@ -128,7 +114,6 @@ const Announce = () => {
       </Layout>
     </>
   );
-
 };
 
 export default Announce;

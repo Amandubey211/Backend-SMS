@@ -1,11 +1,9 @@
-import React, { useState, useEffect  } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Sidebar from "../../../../Components/Common/Sidebar";
-import Layout from "../../../../Components/Common/Layout";
-import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 import axios from "axios";
 import { baseUrl } from "../../../../config/Common";
-
+import Layout from "../../../../Components/Common/ParentLayout";
+import { FaMoneyBillWave } from "react-icons/fa"; // Importing an icon for the no fees message
 
 const uniqueFilterOptions = (data, key) => {
   return [...new Set(data.map((item) => item[key]))].sort();
@@ -13,20 +11,16 @@ const uniqueFilterOptions = (data, key) => {
 
 const AccountingSection = () => {
   const navigate = useNavigate();
-  const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [filters, setFilters] = useState({
     class: "",
     section: "",
     feesType: "",
     status: "Everyone",
   });
-  const [selectedStatus, setSelectedStatus] = useState("Everyone");
   const [data, setData] = useState([]);
   const [totalUnpaidFees, setTotalUnpaidFees] = useState("");
   const [totalPaidFees, setTotalPaidFees] = useState("");
   const [error, setError] = useState("");
-
-  useNavHeading("Parent Accounting");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -44,7 +38,6 @@ const AccountingSection = () => {
         });
 
         setData(response.data.fees);
-        console.log(response.data)
         setTotalUnpaidFees(response.data.totalUnpaidFees);
         setTotalPaidFees(response.data.totalPaidFees);
       } catch (error) {
@@ -57,9 +50,6 @@ const AccountingSection = () => {
   const classes = uniqueFilterOptions(data, "class");
   const sections = uniqueFilterOptions(data, "section");
   const feesTypes = uniqueFilterOptions(data, "feesType");
-
-  const handleSidebarOpen = () => setSidebarOpen(true);
-  const handleSidebarClose = () => setSidebarOpen(false);
 
   const filteredData = data.filter(
     (item) =>
@@ -74,60 +64,88 @@ const AccountingSection = () => {
   return (
     <Layout title="Accounting">
       <div className="p-4">
-        
-      <div className="flex justify-between items-center mb-4">
-    <h2 className="text-md font-bold text-gray-600">Accounting</h2>
-    <button className="text-blue-500"  onClick={() => navigate("/parentfinance")}>
-      See All
-    </button>
-</div>
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-lg font-normal text-gray-600">Accounting</h2>
+          <button
+            className="text-transparent bg-clip-text bg-gradient-to-r from-[#C83B62] to-[#7F35CD] font-normal"
+            onClick={() => navigate("/parentfinance")}
+          >
+            See All
+          </button>
+        </div>
 
-        
         <div className="p-4">
-          <div className="overflow-x-auto  shadow rounded-lg">
-            <table className="min-w-full leading-normal">
-              <thead>
-                <tr className="text-left text-gray-700 bg-gray-100">
-                  <th className="px-5 py-3 border-b-2 border-gray-200">Fees Type</th>
-                  <th className="px-5 py-3 border-b-2 border-gray-200">Paid By</th>
-                  <th className="px-5 py-3 border-b-2 border-gray-200">Due Date</th>
-                  <th className="px-5 py-3 border-b-2 border-gray-200">Amount</th>
-                  <th className="px-5 py-3 border-b-2 border-gray-200">Status</th>
-                  {/* <th className="px-5 py-3 border-b-2 border-gray-200">Action</th> */}
-                </tr>
-              </thead>
-              <tbody>
-                {filteredData.map((item, index) => (
-                  <tr key={index} className="text-left text-gray-700 bg-gray-100">
-                    <td className="px-5 py-2 border-b border-gray-200 flex items-center">
-                      {item.feeType}
-                    </td>
-                    <td className="px-5 py-2 border-b border-gray-200">
-  {item.paidBy || "------"}
-</td>
-
-                    <td className="px-5 py-2 border-b border-gray-200">
-                      {item.dueDate}
-                    </td>
-                    <td className="px-5 py-2 border-b border-gray-200">
-                      {item.amount}
-                    </td>
-                    <td className="px-5 py-2 border-b border-gray-200">
-                      <span
-                        className={`inline-block px-3 py-1 text-xs font-bold rounded-full ${
-                          item.status === "Paid"
-                            ? " text-green-400"
-                            : " text-red-500"
-                        }`}
-                      >
-                        {item.status}
-                      </span>
-                    </td>
-                    
+          <div className="overflow-x-auto shadow rounded-lg">
+            {filteredData.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-64 text-center">
+                <FaMoneyBillWave className="text-gray-400 text-6xl mb-4" />
+                <p className="text-gray-600 text-lg">No Fees Yet</p>
+              </div>
+            ) : (
+              <table className="min-w-full leading-normal">
+                <thead>
+                  <tr className="text-left text-gray-700 bg-[#F9FAFC]">
+                    <th className="px-5 py-3 border-b-2 border-gray-200 font-normal">Fees Type</th>
+                    <th className="px-5 py-3 border-b-2 border-gray-200 font-normal">Paid By</th>
+                    <th className="px-5 py-3 border-b-2 border-gray-200 font-normal">Due Date</th>
+                    <th className="px-5 py-3 border-b-2 border-gray-200 font-normal">Amount</th>
+                    <th className="px-5 py-3 border-b-2 border-gray-200 font-normal">Status</th>
+                    <th className="px-5 py-3 border-b-2 border-gray-200 font-normal">Action</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="space-y-2">
+                  {filteredData.map((item, index) => (
+                    <tr key={index} className="text-left text-gray-700 bg-white shadow-sm">
+                      <td className="px-5 py-4 border-b border-gray-200">
+                        {item.feeType}
+                      </td>
+                      <td className="px-5 py-4 border-b border-gray-200">
+                        {item.paidBy || "------"}
+                      </td>
+                      <td className="px-5 py-4 border-b border-gray-200">
+                        {item.dueDate}
+                      </td>
+                      <td className="px-5 py-4 border-b border-gray-200">
+                        {item.amount}
+                      </td>
+                      <td className="px-5 py-4 border-b border-gray-200">
+                        <span
+                          className={`inline-block px-3 py-1 font-medium rounded-full ${item.status === "Paid"
+                              ? "text-[#0D9755]"
+                              : "text-red-500"
+                            }`}
+                        >
+                          {item.status}
+                        </span>
+                      </td>
+                      <td className="px-5 py-4 border-b border-gray-200">
+                        {item.status === "Unpaid" ? (
+                          <button
+                            className="text-white bg-gradient-to-r from-[#C83B62] to-[#7F35CD] hover:bg-gradient-to-l px-4 py-1  font-normal rounded-md transition duration-300 ease-in-out"
+                            style={{ minWidth: "100px", height: "36px" }} // Ensure consistent button width and height
+                          >
+                            Pay Now
+                          </button>
+                        ) : (
+                          <span
+                            className="text-[#0D9755] bg-[#E9F8EB] font-normal px-4 py-1 rounded-md inline-block"
+                            style={{
+                              width: "100px",  // Set a fixed width to match "Pay Now" button
+                              height: "36px",  // Ensure height matches "Pay Now" button
+                              display: "flex",
+                              justifyContent: "center",
+                              alignItems: "center"
+                            }}
+                          >
+                            Completed
+                          </span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
           </div>
         </div>
       </div>
