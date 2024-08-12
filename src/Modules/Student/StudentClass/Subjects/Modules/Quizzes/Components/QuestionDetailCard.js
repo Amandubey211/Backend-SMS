@@ -1,7 +1,7 @@
 
 //--------------
 
-import React from 'react';
+import React,{useState} from 'react';
 import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import AssignmentDetail from '../../../Component/AssignmentDetail';
@@ -10,6 +10,8 @@ import DateDetail from '../../../Component/DateDetail';
 
 const QuestionDetailCard = ({ quiz,timeLeft ,totalTime}) => {
   const { name, quizType, availableFrom, totalPoints, allowNumberOfAttempts, timeLimit } = quiz; // destructure quiz object
+  const [showTime, setShowTime] = useState(true);
+
   const commentsData = [
     {
       avatar: "https://avatars.githubusercontent.com/u/109097090?v=4", // Replace with actual image URL
@@ -58,7 +60,7 @@ const QuestionDetailCard = ({ quiz,timeLeft ,totalTime}) => {
 
   return (
     <div className="flex flex-col gap-24 bg-white" aria-label="Question Detail Card">
-      <div className="mb-auto p-3">
+      {/* <div className="mb-auto p-3">
         {quizQuestionDetails.map((detail, index) => {
           if (detail.type === "quizz") {
             return <AssignmentDetail key={index} label={detail.label} extra={detail.extra} value={detail.value} />;
@@ -129,17 +131,87 @@ const QuestionDetailCard = ({ quiz,timeLeft ,totalTime}) => {
             />
           </div>
         </div>
-      </div>
-      <div className="mb-4 h-52 overflow-y-scroll">
-        {commentsData.map((comment, index) => (
-          <CommentCard
-            key={index}
-            avatar={comment.avatar}
-            name={comment.name}
-            timestamp={comment.timestamp}
-            comment={comment.comment}
-          />
-        ))}
+      </div> */}
+      <div className="mb-auto">
+        {quizQuestionDetails.map((detail, index) =>
+          detail.type === "quizz" ? (
+            <AssignmentDetail
+              key={index}
+              label={detail.label}
+              value={detail.value}
+            />
+          ) : (
+            <DateDetail
+              key={index}
+              label={detail.label}
+              value={detail.value}
+              labelAbove={detail.labelAbove}
+            />
+          )
+        )}
+        <div className="flex justify-center items-center">
+          <button
+            onClick={() => setShowTime(!showTime)}
+            className="mt-4 bg-gradient-to-r from-pink-500 to-purple-500 text-white py-1 px-3  rounded-md"
+          >
+            {showTime ? "Hide Time" : "Show Time"}
+          </button>{" "}
+        </div>
+        {showTime && (
+          <div className="flex justify-around mt-4">
+            <div style={{ width: 70, height: 70 }}>
+              <CircularProgressbar
+                value={hourPercentage}
+                text={`${hours} Hours`}
+                styles={{
+                  path: {
+                    stroke: `rgba(25, 246, 138, 0.8)`,
+                  },
+                  text: {
+                    fill: "#000",
+                  },
+                  trail: {
+                    stroke: "#d6d6d6",
+                  },
+                }}
+              />
+            </div>
+            <div style={{ width: 70, height: 70 }}>
+              <CircularProgressbar
+                value={minutePercentage}
+                text={`${minutes} Min`}
+                styles={{
+                  path: {
+                    stroke: `rgba(25, 246, 138, 0.8)`,
+                  },
+                  text: {
+                    fill: "#000",
+                  },
+                  trail: {
+                    stroke: "#d6d6d6",
+                  },
+                }}
+              />
+            </div>
+            <div style={{ width: 70, height: 70 }}>
+              <CircularProgressbar
+                value={secondPercentage}
+                text={`${seconds} Sec`}
+                styles={{
+                  path: {
+                    stroke: `rgba(25, 246, 138, 0.8)`,
+                  },
+                  text: {
+                    fill: "#000",
+                  },
+                  trail: {
+                    stroke: "#d6d6d6",
+                  },
+                }}
+              />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

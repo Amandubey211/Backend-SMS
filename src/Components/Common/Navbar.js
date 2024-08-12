@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { CiMail, CiSearch } from "react-icons/ci";
 import { TbBell } from "react-icons/tb";
 import { IoLanguage, IoSettingsOutline } from "react-icons/io5";
@@ -11,8 +11,8 @@ import useStaffLogout from "../../Hooks/AuthHooks/Staff/useStaffLogOut";
 import { RiTimeZoneLine } from "react-icons/ri";
 import { IoIosLogOut } from "react-icons/io";
 
-const IconButton = ({ icon: Icon, label }) => (
-  <button aria-label={label}>
+const IconButton = ({ icon: Icon, label, onClick }) => (
+  <button onClick={onClick} aria-label={label}>
     <Icon className="w-8 h-8 text-purple-500 p-1 border rounded-full" />
   </button>
 );
@@ -67,6 +67,7 @@ const Navbar = ({ hideSearchbar, hideAvatarList, hideStudentView }) => {
   );
   const navigate = useNavigate();
   const [showSetting, setShowSetting] = useState(false);
+  const dropdownRef = useRef(null);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const openModal = () => {
@@ -82,69 +83,77 @@ const Navbar = ({ hideSearchbar, hideAvatarList, hideStudentView }) => {
     setIsModalOpen(false);
   };
   const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+  const handleClickOutside = (event) => {
+    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      setShowSetting(false);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   return (
     <div className="sticky top-0 left-0 right-0 z-20 bg-white border-b shadow-sm">
-      <div className="flex items-center p-2 bg-white">
+      <div className="flex items-center p-2 py-3 bg-white">
         <LeftHeading leftHeading={leftHeading} navigate={navigate} />
 
-        <div className="flex items-center space-x-2 border-l ml-3 pl-3">
-          <div>
-            <IconButton icon={CiMail} label="Mail" />
-          </div>
-          <div>
-            <IconButton icon={TbBell} label="Notifications" />
-          </div>
+        <div className="flex items-center space-x-2 border-l ml-3 pl-3 relative">
+          <IconButton icon={CiMail} label="Mail" />
+          <IconButton icon={TbBell} label="Notifications" />
+          <IconButton
+            icon={IoSettingsOutline}
+            label="Settings"
+            onClick={() => setShowSetting(!showSetting)}
+          />
 
-          <div className="relative">
-            <div onClick={() => setShowSetting(!showSetting)}>
-              <IconButton icon={IoSettingsOutline} label="Settings" />
-            </div>
-            {showSetting ? (
-              <div className="absolute top-9 right-0 w-[auto] h-[auto] bg-white rounded-lg shadow-lg border px-4 py-4 flex flex-col gap-2 z-[1000]">
-                <button
-                  className="flex items-center flex-row gap-2 font-semibold hover:border-b-2 w-[100%]"
-                  onClick={() => navigate("/users/admin")}
-                >
-                  <span>
-                    <FaUser />
-                  </span>
-                  Profile
-                </button>
-                <div className="flex items-center flex-row gap-2 font-semibold hover:border-b-2 w-full">
-                  <span>
-                    <IoLanguage />
-                  </span>
-                  <select className="border-none outline-none bg-transparent">
-                    <option value="english">English</option>
-                    <option value="arabic">Arabic</option>
-                    <option value="Hindi">Hindi</option>
-                  </select>
-                </div>
-                <button className="flex items-center flex-row gap-2 font-semibold hover:border-b-2 w-[100%]">
-                  <span>
-                    <RiTimeZoneLine />
-                  </span>
-                  {timeZone}
-                </button>
-                <button
-                  className="flex items-center flex-row gap-2 font-semibold hover:border-b-2 w-[100%]"
-                  onClick={openModal}
-                >
-                  Logout
-                  <span>
-                    <IoIosLogOut />
-                  </span>
-                </button>
+          {showSetting && (
+            <div
+              ref={dropdownRef}
+              className="absolute top-9 right-0 bg-white rounded-lg shadow-lg border px-4 py-3 flex flex-col gap-2 z-50 w-56"
+            >
+              <button
+                className="flex items-center gap-2 text-sm font-semibold text-gray-700 hover:text-purple-500 transition-transform duration-200 hover:bg-gray-100 px-3 py-2 rounded-md transform hover:translate-x-2"
+                onClick={() => navigate("/users/admin")}
+              >
+                <FaUser className="text-lg" />
+                Profile
+              </button>
+
+              <div className="flex items-center gap-2 text-sm font-semibold text-gray-700 hover:text-purple-500 transition-transform duration-200 hover:bg-gray-100 px-3 py-2 rounded-md transform hover:translate-x-2">
+                <IoLanguage className="text-lg" />
+                <select className="border-none outline-none bg-transparent text-gray-700 cursor-pointer">
+                  <option value="english">English</option>
+                  <option value="arabic">Arabic</option>
+                  <option value="Hindi">Hindi</option>
+                </select>
               </div>
-            ) : null}
-            <LogoutConfirmationModal
-              isOpen={isModalOpen}
-              onClose={closeModal}
-              onConfirm={logout}
-            />
-          </div>
+
+              <div className="flex items-center gap-2 text-sm font-semibold text-gray-700 hover:bg-gray-100 px-3 py-2 rounded-md">
+                <RiTimeZoneLine className="text-lg" />
+                <span>{timeZone}</span>
+              </div>
+
+              <button
+                className="flex items-center gap-2 text-sm font-semibold text-red-600 hover:text-red-800 transition-transform duration-200 hover:bg-gray-100 px-3 py-2 rounded-md transform hover:translate-x-2"
+                onClick={openModal}
+              >
+                <IoIosLogOut className="text-lg" />
+                Logout
+              </button>
+            </div>
+          )}
         </div>
       </div>
+      <LogoutConfirmationModal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        onConfirm={logout}
+      />
     </div>
   );
 };

@@ -13,12 +13,12 @@ import toast, { Toaster } from "react-hot-toast";
 import useAssignQuizGrade from "../../../../../../Hooks/AuthHooks/Staff/Admin/SpeedGrade/Quiz/useAssignQuizGrade";
 import useAssignAssignmentGrade from "../../../../../../Hooks/AuthHooks/Staff/Admin/SpeedGrade/Assignment/useAssignAssignmentGrade";
 
-const SubmissionDetails = ({ details, student }) => {
+const SubmissionDetails = ({ details, student, initialGrade }) => {
   const [isModalOpen, setModalOpen] = useState(false);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [criteriaList, setCriteriaList] = useState([]);
   const [existingRubricId, setExistingRubricId] = useState(null);
-  const [grade, setGrade] = useState(0);
+  const [grade, setGrade] = useState(initialGrade || 0);
   const [attemptDate, setAttemptDate] = useState("");
   const [status, setStatus] = useState("Missing");
   const { type } = useParams();
@@ -37,7 +37,6 @@ const SubmissionDetails = ({ details, student }) => {
 
   const loading =
     type === "Assignment" ? assignGradeLoading : assignQuizGradeLoading;
-  const error = type === "Assignment" ? assignGradeError : assignQuizGradeError;
 
   const { dueDate, points, totalPoints, comments, files } =
     details?.assignmentId || details?.quizId || {};
@@ -61,14 +60,18 @@ const SubmissionDetails = ({ details, student }) => {
 
   useEffect(() => {
     // Reset state variables when new details are selected
-    setGrade(details.grade || details.score || 0); // Use score for quizzes and grade for assignments
+    setGrade(initialGrade); // Use initial grade passed from AssignmentDetails
     setAttemptDate(
       details.submittedAt
         ? new Date(details.submittedAt).toISOString().split("T")[0]
         : ""
     );
     setStatus(details.status || "Missing");
-  }, [details]);
+  }, [details, initialGrade]);
+
+  const handleTotalGradeUpdate = (newGrade) => {
+    setGrade(newGrade);
+  };
 
   const handleViewRubric = () => {
     setModalOpen(true);
@@ -196,7 +199,6 @@ const SubmissionDetails = ({ details, student }) => {
 
   return (
     <div className="flex flex-col h-full">
-      {/* <Toaster position="top-right" reverseOrder={false} /> */}
       <div className="flex gap-2 p-2 justify-center items-center border-b pb-3">
         <button className="flex items-center bg-white border text-sm gap-1 border-gray-300 font-semibold py-2 px-4 rounded-full hover:bg-gray-100 focus:outline-none">
           <RxPerson className="inline-block" />
@@ -327,14 +329,8 @@ const SubmissionDetails = ({ details, student }) => {
         </div>
       </div>
 
-      <div className="p-4 mb-14 border-t border-gray-200">
-        {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
-        <div className="space-y-2 flex-col flex justify-center items-center mb-2">
-          <button className="w-48 p-1 border border-purple-300 text-green-600 rounded-full hover:bg-purple-50 focus:outline-none flex items-center justify-center space-x-2">
-            <FaRegComment className="inline-block" />
-            <span className="text-sm"> View Comments ({commentCount})</span>
-          </button>
-        </div>
+      <div className="p-4 mb-10 border-t border-gray-200">
+        {/* {error && <p className="text-red-500 text-sm mb-2">{error}</p>} */}
         <button
           className="w-full py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold rounded-md shadow-md hover:from-purple-500 hover:to-pink-500 focus:outline-none"
           onClick={handleSubmitGrade}

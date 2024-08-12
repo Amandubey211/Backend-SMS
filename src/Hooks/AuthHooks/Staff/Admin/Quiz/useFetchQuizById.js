@@ -9,7 +9,6 @@ const useFetchQuizById = () => {
   const [error, setError] = useState(null);
   const [quiz, setQuiz] = useState(null);
 
-  
   const { role } = useSelector((store) => store.Auth);
 
   const fetchQuizById = useCallback(
@@ -22,7 +21,7 @@ const useFetchQuizById = () => {
         const response = await axios.get(`${baseUrl}/admin/quiz/${quizId}`, {
           headers: { Authentication: token },
         });
-        console.log("quiz response",response.data)
+        console.log("quiz Fetched response", response.data);
         if (response.data.success) {
           setQuiz(response.data.quiz);
         } else {

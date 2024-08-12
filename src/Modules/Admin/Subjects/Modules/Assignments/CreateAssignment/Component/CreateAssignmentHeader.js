@@ -51,7 +51,6 @@ const CreateAssignmentHeader = ({
         <button
           onClick={() => {
             onSave(true);
-            toast.success("Saved and Published", { position: "bottom-left" });
           }}
           className="flex-grow rounded-md py-2 px-4 text-center bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200 transition"
         >
@@ -62,7 +61,6 @@ const CreateAssignmentHeader = ({
         <button
           onClick={() => {
             onSave(false);
-            toast.success("Saved", { position: "bottom-left" });
           }}
           className="px-4 py-2 text-white font-semibold rounded-md bg-gradient-to-r from-purple-500 to-red-500 hover:from-purple-600 hover:to-red-600 transition"
         >

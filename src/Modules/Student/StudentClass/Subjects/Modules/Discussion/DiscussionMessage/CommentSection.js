@@ -1,7 +1,17 @@
+
 import React from 'react';
 import Comment from './Components/Comment';
 
-const CommentSection = ({ comments, deleteComment, deleteReply, addNestedReply, activeReplyId, setActiveReplyId }) => {
+const CommentSection = ({
+  comments,
+  deleteComment,
+  deleteReply,
+  addNestedReply,
+  activeReplyId,
+  setActiveReplyId,
+  activeReplyParentId,
+  setActiveReplyParentId
+}) => {
   return (
     <div className="w-full h-full">
       {comments.map((comment) => (
@@ -13,6 +23,8 @@ const CommentSection = ({ comments, deleteComment, deleteReply, addNestedReply, 
           addNestedReply={addNestedReply}
           activeReplyId={activeReplyId}
           setActiveReplyId={setActiveReplyId}
+          activeReplyParentId={activeReplyParentId}
+          setActiveReplyParentId={setActiveReplyParentId}
         />
       ))}
     </div>

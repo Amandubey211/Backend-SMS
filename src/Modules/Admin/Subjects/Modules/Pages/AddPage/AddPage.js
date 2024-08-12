@@ -19,7 +19,7 @@ const AddPage = () => {
   const [publish, setPublish] = useState(false);
   const [loadingType, setLoadingType] = useState(""); // Separate loading state for each button
   const isSidebarOpen = useSelector((state) => state.sidebar.isOpen);
-  const sidebarWidth = isSidebarOpen ? "15%" : "7%"; 
+  const sidebarWidth = isSidebarOpen ? "15%" : "7%";
   const {
     createPage,
     loading: createLoading,
@@ -71,14 +71,14 @@ const AddPage = () => {
         await createPage(pageData);
       }
 
-      if (createSuccess || updateSuccess) {
-        // Reset the form if the operation is successful
-        setTitle("");
-        setEditorContent("");
-        setEditPermission("Only Instructor");
-        setPublishDate("");
-        setPublish(false);
-      }
+      // if (createSuccess || updateSuccess) {
+      //   // Reset the form if the operation is successful
+      //   setTitle("");
+      //   setEditorContent("");
+      //   setEditPermission("Only Instructor");
+      //   setPublishDate("");
+      //   setPublish(false);
+      // }
     } catch (error) {
       console.error("Error saving page:", error);
     } finally {
@@ -92,7 +92,7 @@ const AddPage = () => {
         isUpdating ? "Update Page | Student Diwan" : "Add Page | Student Diwan"
       }
     >
-    <div className="flex w-full min-h-screen">
+      <div className="flex w-full min-h-screen">
         <SideMenubar />
         <div
           className={`ml-${sidebarWidth} transition-all duration-500 flex-1 h-full`}

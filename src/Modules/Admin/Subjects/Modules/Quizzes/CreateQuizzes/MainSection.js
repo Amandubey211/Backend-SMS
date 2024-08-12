@@ -26,7 +26,7 @@ const initialFormState = {
   assignTo: "",
   showOneQuestionAtATime: "",
   questionType: "",
-  section: null,
+  sectionId: null,
   allowShuffleAnswers: false,
   dueDate: "",
   availableFrom: "",
@@ -35,7 +35,7 @@ const initialFormState = {
   timeLimit: "",
   moduleId: null,
   chapterId: null,
-  group: null,
+  groupId: null,
 };
 
 const initialAnswersState = [
@@ -191,9 +191,9 @@ const MainSection = ({ setIsEditing }) => {
       publish,
     };
     if (formState.assignTo === "Section") {
-      quizData.sectionId = formState.section || null;
+      quizData.sectionId = formState.sectionId || null;
     } else if (formState.assignTo === "Group") {
-      quizData.groupId = formState.group || null;
+      quizData.groupId = formState.groupId || null;
     }
     if (isEditing) {
       const result = await updateQuiz(quizId, quizData);

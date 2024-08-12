@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useLocation, NavLink } from "react-router-dom";
+import { useLocation, NavLink, useNavigate } from "react-router-dom";
 import StudentDiwanLogo from "../../Assets/HomeAssets/StudentDiwanLogo.png";
 import smallLogo from "../../Assets/SideBarAsset/smallLogo.png";
 import sidebarData from "./DataFile/sidebarData.js";
@@ -20,7 +20,7 @@ const SideMenubar = () => {
   const dispatch = useDispatch();
   const location = useLocation();
   const { staffLogout } = useStaffLogout();
-
+  const navigate = useNavigate();
   const { isOpen, role, userDetails } = useSelector((state) => ({
     isOpen: state.sidebar.isOpen,
     role: state.Auth.role,
@@ -52,7 +52,9 @@ const SideMenubar = () => {
       setIsLoggingOut(false);
     }
   };
-
+  const HandleNavigate = () => {
+    navigate("/users/admin");
+  };
   return (
     <nav
       className={`fixed top-0 left-0 bottom-0 transition-all duration-300 p-1 px-3 z-30 border-r flex flex-col bg-white ${
@@ -199,8 +201,10 @@ const SideMenubar = () => {
             "https://avatars.githubusercontent.com/u/109097090?v=4"
           }
           alt="Profile"
-          className={`${isOpen ? "w-10 h-10" : "w-8 h-8"} rounded-full`}
+          className={`${isOpen ? "w-10 h-10" : "w-8 h-8"} cursor-pointer rounded-full`}
+          onClick={HandleNavigate}
         />
+
         {isOpen && (
           <div className="flex-1 ml-3">
             <h2 className="font-semibold">

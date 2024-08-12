@@ -3,10 +3,9 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-import useGetModulesForStudent from "./useGetModulesForStudent";
 import { baseUrl } from "../../../../../config/Common";
 
-const useDeleteModule = (fetchModules) => {
+const useDeleteModule = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
@@ -35,7 +34,6 @@ const useDeleteModule = (fetchModules) => {
         if (response.data && response.data.success) {
           setSuccess(response.data.msg || "Module deleted successfully!");
           toast.success(response.data.msg || "Module deleted successfully!");
-          fetchModules(); // Refetch modules after deletion
           return { success: true };
         } else {
           const errorMsg = response.data.msg || "Failed to delete module.";
@@ -53,7 +51,7 @@ const useDeleteModule = (fetchModules) => {
         setLoading(false);
       }
     },
-    [role, sid, fetchModules]
+    [role, sid]
   );
 
   return { loading, error, success, deleteModule };

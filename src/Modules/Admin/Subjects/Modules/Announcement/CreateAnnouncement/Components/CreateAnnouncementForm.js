@@ -19,7 +19,7 @@ const CreateAnnouncementForm = ({
         groupId={groupId}
         assignTitle="Post To"
         assignTo={postTo}
-        section={sectionId}
+        sectionId={sectionId}
         handleChange={handleChange}
       />
       <div className="mb-4">

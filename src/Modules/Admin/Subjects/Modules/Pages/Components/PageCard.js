@@ -8,6 +8,7 @@ import { CiUser } from "react-icons/ci";
 import { NavLink, useParams } from "react-router-dom";
 import useDeletePage from "../../../../../../Hooks/AuthHooks/Staff/Admin/Page/useDeletePage"; // Adjust the import path as needed
 import DeleteModal from "../../../../../../Components/Common/DeleteModal";
+import Spinner from "../../../../../../Components/Common/Spinner";
 
 const PageCard = ({
   title,
@@ -92,11 +93,7 @@ const PageCard = ({
       >
         <IoTrashOutline className="h-5 w-5" />
       </div>
-      {loading && (
-        <p className="absolute top-2 left-2 text-sm text-gray-500">
-          Deleting...
-        </p>
-      )}
+      {loading && <Spinner />}
       {error && (
         <p className="absolute top-2 left-2 text-sm text-red-500">{error}</p>
       )}
