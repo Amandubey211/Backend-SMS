@@ -66,7 +66,7 @@ const AnnouncementList = () => {
               <AnnouncementCard
                 key={announcement._id}
                 title={announcement.title}
-                section={announcement.sectionName || "N/A Section"}
+                section={announcement.postTo || "N/A Section"}
                 date={announcement.createdAt}
                 id={announcement._id}
                 color={announcement.color}

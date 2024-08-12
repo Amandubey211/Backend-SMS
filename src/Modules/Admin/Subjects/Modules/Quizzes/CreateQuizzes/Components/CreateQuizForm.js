@@ -238,6 +238,7 @@ const CreateQuizForm = ({
             ))}
           </select>
         </div>
+
         <div className="mb-4">
           <label className="block text-gray-700" htmlFor="chapter-select">
             Chapter
@@ -248,15 +249,23 @@ const CreateQuizForm = ({
             value={chapterId}
             name="chapterId"
             onChange={handleChange}
+            disabled={!moduleId} // Disable the dropdown if no module is selected
           >
-            <option value="">Select</option>
-            {chapters.map((chapter) => (
-              <option key={chapter._id} value={chapter._id}>
-                {chapter.name}
-              </option>
-            ))}
+            {moduleId ? (
+              <>
+                <option value="">Select</option>
+                {chapters.map((chapter) => (
+                  <option key={chapter._id} value={chapter._id}>
+                    {chapter.name}
+                  </option>
+                ))}
+              </>
+            ) : (
+              <option value="">Select module first</option>
+            )}
           </select>
         </div>
+
         <DateInput
           label="Available from"
           name="availableFrom"

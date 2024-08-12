@@ -13,6 +13,7 @@ const useUpdateAssignment = () => {
       console.log(`${pair[0]}: ${pair[1]}`);
     }
   };
+
   const updateAssignment = useCallback(
     async (assignmentId, assignmentData, sectionId) => {
       const {
@@ -34,24 +35,6 @@ const useUpdateAssignment = () => {
         thumbnail,
       } = assignmentData;
 
-      //const missingFields = [];
-
-      // if (!name) missingFields.push("Assignment Name");
-      // if (!content) missingFields.push("Content");
-      // if (!points) missingFields.push("Points");
-      // if (!grade) missingFields.push("Grade");
-      // if (!submissionType) missingFields.push("Submission Type");
-      // if (!allowNumberOfAttempts) missingFields.push("Number of Attempts");
-      // if (!assignTo) missingFields.push("Assign To");
-      // if (!sectionId) missingFields.push("Section");
-      // if (!dueDate) missingFields.push("Due Date");
-      // if (!availableFrom) missingFields.push("Available From");
-
-      // if (missingFields.length > 0) {
-      //   toast.error(`Please fill out the following fields: ${missingFields.join(", ")}`);
-      //   return { success: false, error: "Validation Error" };
-      // }
-
       setLoading(true);
       setError(null);
 
@@ -63,7 +46,15 @@ const useUpdateAssignment = () => {
       formData.append("grade", grade);
       formData.append("submissionType", submissionType);
       formData.append("allowedAttempts", allowedAttempts);
-      formData.append("allowNumberOfAttempts", allowNumberOfAttempts);
+
+      // Only append allowNumberOfAttempts if it's a valid number
+      if (
+        allowNumberOfAttempts !== null &&
+        allowNumberOfAttempts !== undefined
+      ) {
+        formData.append("allowNumberOfAttempts", allowNumberOfAttempts);
+      }
+
       formData.append("assignTo", assignTo);
       if (sectionId) {
         formData.append("sectionId", sectionId);

@@ -5,7 +5,6 @@ import EditorComponent from "../../../Component/AdminEditor";
 import Sidebar from "../../../../../../Components/Common/Sidebar";
 import useCreateAssignment from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/createAssignment";
 import useUpdateAssignment from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useUpdateAssignment";
-import toast from "react-hot-toast";
 import CreateAssignmentForm from "./Component/CreateAssignmentForm";
 import AddNewCriteriaForm from "../../Rubric/Components/AddNewCriteriaForm";
 
@@ -13,8 +12,8 @@ const initialFormState = {
   points: "",
   displayGrade: false,
   submissionType: "",
-  allowedAttempts: "false", // Default to "Unlimited"
-  numberOfAttempts: "",
+  allowedAttempts: true, // Default to "Unlimited"
+  numberOfAttempts: null,
   assignTo: "",
   sectionId: null,
   dueDate: "",
@@ -89,10 +88,14 @@ const MainSection = ({ setIsEditing }) => {
 
   const handleSave = async (publish) => {
     // Adjust allowedAttempts and numberOfAttempts based on the select option
-    const allowedAttempts = formState.allowedAttempts === "true";
-    const allowNumberOfAttempts = allowedAttempts
-      ? formState.numberOfAttempts
-      : null;
+    const allowedAttempts = formState.allowedAttempts === true;
+    let allowNumberOfAttempts = null;
+
+    if (allowedAttempts) {
+      allowNumberOfAttempts = formState.numberOfAttempts
+        ? Number(formState.numberOfAttempts)
+        : null;
+    }
 
     const assignmentData = {
       name: assignmentName,
@@ -120,19 +123,13 @@ const MainSection = ({ setIsEditing }) => {
       assignmentData.groupId = formState.groupId || null;
     }
 
-    try {
-      if (isEditing) {
-        // Use the local isEditing state
-        let sectionId = formState.sectionId || null;
-        await updateAssignment(assignmentId, assignmentData, sectionId);
-        toast.success("Assignment updated successfully.");
-      } else {
-        const response = await createAssignment(assignmentData);
-        setAssignmentId(response.data._id); // Set assignment ID after creation
-        toast.success("Assignment created successfully.");
-      }
-    } catch (error) {
-      toast.error("Failed to save the assignment. Please try again.");
+    if (isEditing) {
+      let sectionId = formState.sectionId || null;
+      await updateAssignment(assignmentId, assignmentData, sectionId);
+    } else {
+      const response = await createAssignment(assignmentData);
+      console.log(response);
+      setAssignmentId(response.data._id); // Set assignment ID after creation
     }
   };
 
