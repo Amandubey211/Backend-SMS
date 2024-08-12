@@ -31,12 +31,10 @@ const MainSection = () => {
 
   const { deleteModule } = useDeleteModule(fetchModules);
 
-  // Fetch modules on component mount
   useEffect(() => {
     fetchModules();
   }, [fetchModules]);
 
-  // Update selected module when modulesData changes
   useEffect(() => {
     if (modulesData && modulesData.modules.length > 0) {
       dispatch(
@@ -113,14 +111,12 @@ const MainSection = () => {
     const currentIndex = modulesData.modules.findIndex(
       (mod) => mod._id === module._id
     );
-    console.log(modulesData);
-    console.log(currentIndex);
 
     setSidebarContent(
       <MoveModule
         moduleId={selectedModule.moduleId}
         currentPosition={currentIndex}
-        modulesData={modulesData} // Pass modulesData directly
+        modulesData={modulesData}
         onClose={handleMoveSidebarClose}
       />
     );
@@ -137,9 +133,9 @@ const MainSection = () => {
       const result = await deleteModule(deleteTarget.id);
       if (result.success) {
         toast.success(`${deleteTarget.type} deleted successfully!`);
-        setIsDeleteModalOpen(false); // Close the modal on successful deletion
+        setIsDeleteModalOpen(false);
         setDeleteTarget(null);
-        fetchModules(); // Refetch modules after successful deletion
+        fetchModules();
       } else {
         toast.error(`Failed to delete ${deleteTarget.type}.`);
       }
@@ -147,10 +143,9 @@ const MainSection = () => {
   };
 
   const handleModuleAdded = useCallback(() => {
-    fetchModules(); // Refetch modules after adding a module
+    fetchModules();
   }, [fetchModules]);
 
-  // Handle editing a chapter
   const handleEditChapter = (chapter) => {
     setSidebarContent(
       <AddChapter
@@ -158,7 +153,7 @@ const MainSection = () => {
         isEditing={true}
         onClose={() => {
           handleSidebarClose();
-          fetchModules(); // Refetch after editing a chapter
+          fetchModules();
         }}
       />
     );
@@ -198,6 +193,7 @@ const MainSection = () => {
                 imageUrl={chapter.thumbnail}
                 assignments={chapter.assignments}
                 quizzes={chapter.quizzes}
+                attachments={chapter.attachments} // Pass attachments to Chapter
                 isExpanded={expandedChapters.includes(index + 1)}
                 onToggle={() => handleToggle(index + 1)}
                 onDelete={() =>
@@ -209,6 +205,7 @@ const MainSection = () => {
                   })
                 }
                 onEdit={() => handleEditChapter(chapter)}
+                fetchModules={fetchModules} // Pass fetchModules for re-fetching
               />
             ))
           ) : (
@@ -240,7 +237,7 @@ const MainSection = () => {
                 }
                 onSelect={() => handleModuleSelect(module)}
                 onEdit={() => handleEditModule(module)}
-                onMove={() => handleMoveModule(module)} // Pass the function here
+                onMove={() => handleMoveModule(module)}
                 onDelete={() =>
                   handleDelete({
                     type: "Module",
@@ -276,14 +273,14 @@ const MainSection = () => {
               <AddChapter
                 onClose={() => {
                   handleSidebarClose();
-                  fetchModules(); // Refetch after closing the sidebar
+                  fetchModules();
                 }}
               />
             ) : sidebarContent === "module" ? (
               <AddModule
                 onClose={() => {
                   handleSidebarClose();
-                  fetchModules(); // Refetch after closing the sidebar
+                  fetchModules();
                 }}
                 onModuleAdded={handleModuleAdded}
               />
@@ -298,7 +295,7 @@ const MainSection = () => {
             onClose={handleMoveSidebarClose}
             title="Move Module"
           >
-            {sidebarContent} {/* Pass the module data to the sidebar content */}
+            {sidebarContent}
           </Sidebar>
         )}
         {isDeleteModalOpen && (
