@@ -1,4 +1,6 @@
 import React from "react";
+import { FaBook } from "react-icons/fa";
+import { GoAlertFill } from "react-icons/go";
 
 const FinanceTable = ({ feesDetails }) => {
   console.log(feesDetails);
@@ -14,7 +16,7 @@ const FinanceTable = ({ feesDetails }) => {
           <th className="px-5 py-3 border-b-2 border-gray-200">Action</th>
         </tr>
       </thead>
-      <tbody>
+      {feesDetails.length > 0 ?<tbody>
         {feesDetails?.map((item, index) => (
           <tr key={index} className="text-left text-gray-700">
             <td className="px-5 py-2 border-b border-gray-200">{item.feeType}</td>
@@ -39,7 +41,20 @@ const FinanceTable = ({ feesDetails }) => {
             </td>
           </tr>
         ))}
-      </tbody>
+      </tbody>:
+     <tr>
+
+     <td className="   text-center text-2xl py-10 text-gray-400" colSpan={6} >
+      <div className="flex  items-center justify-center flex-col text-2xl">
+        <GoAlertFill className="text-[5rem]" />
+       No  Data Found
+      </div>
+     
+     </td>
+   </tr>
+   
+      }
+      
     </table>
   );
 };

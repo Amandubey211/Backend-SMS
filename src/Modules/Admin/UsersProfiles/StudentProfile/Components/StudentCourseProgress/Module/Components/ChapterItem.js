@@ -29,11 +29,10 @@ const ChapterItem = ({ type, title }) => {
       <div className="p-2  bg-white rounded-full">{getIcon(type)}</div>
       <div className='flex flex-col gap-1 justify-center flex-grow'> 
         <p className="font-semibold">{title}</p>
-        <p className="text-green-500 text-sm ">{type.charAt(0).toUpperCase() + type.slice(1)}</p>
+        {/* <p className="text-green-500 text-sm ">{type.charAt(0).toUpperCase() + type.slice(1)}</p> */}
       </div>
       <div className="flex items-center gap-3">
         <FaCheckCircle className="text-green-500" />
-        <FaEllipsisV className="text-green-500" />
       </div>
     </div>
   );

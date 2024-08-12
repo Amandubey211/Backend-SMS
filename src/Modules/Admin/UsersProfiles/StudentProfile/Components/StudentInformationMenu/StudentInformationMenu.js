@@ -14,7 +14,7 @@ const StudentInformationMenu = ({ student }) => (
 
       <div className="flex ">
         <ParentInformation parents={student} />
-        <div className="w-[70%] bg-sky-300">
+        <div className="w-[70%] ">
           <StudentProfile student={student} />
         </div>
       </div>

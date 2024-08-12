@@ -5,44 +5,6 @@ import { baseUrl } from '../../../../../../../config/Common';
 import { useSelector } from 'react-redux';
 import axios from 'axios';
 
-const subjects = [
-    {
-      name: "Bangla 1st paper",
-      startDate: "01-05-2024",
-      totalModules: 25,
-      completedModules: 17,
-      progress: 85
-    },
-    {
-      name: "Bangla 2nd paper",
-      startDate: "01-05-2024",
-      totalModules: 25,
-      completedModules: 17,
-      progress: 85
-    },
-    {
-      name: "Bangla 2nd paper",
-      startDate: "01-05-2024",
-      totalModules: 25,
-      completedModules: 17,
-      progress: 85
-    },
-    {
-      name: "Bangla 2nd paper",
-      startDate: "01-05-2024",
-      totalModules: 25,
-      completedModules: 17,
-      progress: 85
-    },
-    {
-      name: "Bangla 2nd paper",
-      startDate: "01-05-2024",
-      totalModules: 25,
-      completedModules: 17,
-      progress: 85
-    },
-    // More subjects...
-  ];
  
 const AllSubjects = () => {
   const [studentSubjects,setStudentSubjects] = useState([]);
@@ -60,7 +22,7 @@ const AllSubjects = () => {
         });
 
         setStudentSubjects(response.data.subjects);
-        console.log(response.data.subjects);
+
       } catch (err) {
         console.error('Error fetching subjects:', err);
       }

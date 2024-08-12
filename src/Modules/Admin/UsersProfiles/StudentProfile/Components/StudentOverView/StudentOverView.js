@@ -23,8 +23,8 @@ const StudentOverView = () => {
           <AttendanceGraph />
         </div>
         <div className='flex justify-between  w-[100%]  border-t-2'> 
-        <p className="px-4 w-[50%] font-bold text-gray-500" >Student Grade (dummy data)</p>
-        <p className=" flex-1 text-left font-bold text-gray-500 px-10" >Task (dummy data)</p>
+        <p className="px-4 w-[50%] font-bold text-gray-500" >Student Grade </p>
+        <p className=" flex-1 text-left font-bold text-gray-500 px-10" >Task</p>
         </div>
         <div className="flex flex-row h-[300px] bg-white  h-[20rem]">
        

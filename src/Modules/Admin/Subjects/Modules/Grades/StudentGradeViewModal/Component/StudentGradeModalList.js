@@ -34,8 +34,9 @@ const sortData = (data, arrangeBy) => {
 
 const StudentModalGradeList = ({ data, filters }) => {
 
-console.log(data);
-
+  const filteredData = data?.filter((item) => {
+    return filters.status ? item.status === filters.status : true;
+  })
   if (data?.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-10 text-gray-500">
@@ -68,7 +69,7 @@ console.log(data);
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
-          {data?.map((item, index) => (
+          {filteredData?.map((item, index) => (
             <tr key={index}>
               <td className={`px-6 py-4 whitespace-nowrap ${getBoldClass(item)}`}>
                 <div className="text-sm text-gray-900">{item.Name}</div>
