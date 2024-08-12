@@ -8,7 +8,7 @@ import { Doughnut } from 'react-chartjs-2';
 import { Chart, ArcElement, Tooltip, Legend } from 'chart.js';
 Chart.register(ArcElement, Tooltip, Legend);
 
-const TaskChart = ({ totalTasks = 12, completedTasks = 5 }) => {
+const TaskChart = ({ totalTasks = 100, completedTasks = 0 }) => {
     const completedPercentage = Math.round((completedTasks / totalTasks) * 100);
     const missingPercentage = 100 - completedPercentage;
 

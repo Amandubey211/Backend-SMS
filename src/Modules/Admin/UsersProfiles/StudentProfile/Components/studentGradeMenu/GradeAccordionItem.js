@@ -9,8 +9,11 @@ import {
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { baseUrl } from "../../../../../../config/Common";
-import subjectIcon from '../../../../../../Assets/DashboardAssets/subjectIcon.png'
-const GradeAccordionItem = ({ grades, getData }) => {
+import subjectIcon from '../../../../../../Assets/DashboardAssets/subjectIcon.png';
+import { FiLoader } from "react-icons/fi";
+import { FaBook } from "react-icons/fa";
+import { GoAlertFill } from "react-icons/go";
+const GradeAccordionItem = ({ grades, getData,loading }) => {
   const [isOpen, setIsOpen] = useState(null);
 
   const toggleOpen = (index) => {
@@ -51,7 +54,6 @@ const GradeAccordionItem = ({ grades, getData }) => {
           headers: { Authentication: token },
         });
         setStudentSubjects(response.data.subjects);
-        console.log(response.data.subjects);
       } catch (err) {
         console.error("Error fetching subjects:", err);
       }
@@ -63,17 +65,14 @@ const GradeAccordionItem = ({ grades, getData }) => {
   return (
     <>
       {studentSubjects.map((i, index) => (
-        <div key={i._id} className="border-b p-3">
+        <div key={i._id} className="border-b p-3" onClick={() => { if (isOpen !== index) getData(i._id)}}>
           <div
             className="cursor-pointer py-3 px-5 flex items-center justify-between"
             onClick={() => toggleOpen(index)}
           >
             <div className="flex justify-center items-center gap-3 ">
               <div className="border rounded-full p-2">
-  <img
-                src={subjectIcon}
-                className="h-10 w-10 rounded-full bg-contain "
-              />
+              <FaBook  className="text-[2rem] text-pink-400"/>
               </div>
             
               <span className="font-bold">{i.name}</span>
@@ -83,55 +82,68 @@ const GradeAccordionItem = ({ grades, getData }) => {
               {isOpen === index ? (
                 <MdKeyboardArrowUp className="border rounded text-black" />
               ) : (
-                <MdKeyboardArrowDown onClick={() => getData(i._id)} />
+                <MdKeyboardArrowDown  />
               )}
             </span>
           </div>
 
           {isOpen === index && (
             <div className="p-3">
-              <table className="min-w-full py-3 px-5">
-                <thead className="border-b">
-                  <tr className="text-left">
-                    <th className="px-5 py-2">Name</th>
-                    <th className="px-5 py-2">Due</th>
-                    <th className="px-5 py-2">Submit</th>
-                    <th className="px-5 py-2">Status</th>
-                    <th className="px-5 py-2">Score</th>
-                  </tr>
-                </thead>
-                <tbody className="w-full ">
+             <table className="min-w-full py-3 px-5">
+  <thead className="border-b">
+    <tr className="text-left">
+      <th className="px-5 py-2">Name</th>
+      <th className="px-5 py-2">Due</th>
+      <th className="px-5 py-2">Submit</th>
+      <th className="px-5 py-2">Status</th>
+      <th className="px-5 py-2">Score</th>
+    </tr>
+  </thead>
+  {loading ? (
+   <tr>
+   <td className="text-center text-2xl py-10 text-gray-400" colSpan={6} >
+    <div className="flex w-full flex-col items-center">
+    <FiLoader className="animate-spin mr-2 w-[2rem] h-[2rem] " />
+    <p className="text-gray-800 text-sm">Loading...</p>
+    </div>
+   </td>
+ </tr>
+  ) : (
+    <tbody className="w-full">
+      {grades?.length > 0 ? (
+        grades.map((i, idx) => (
+          <tr key={idx} className="bg-white">
+            <td className="px-5 py-2 flex items-center w-[10rem]">
+              <span>{i?.Name}</span>
+            </td>
+            <td className="px-5 py-2">{i?.dueDate.slice(0, 10)}</td>
+            <td className="px-5 py-2">{i?.submittedDate.slice(0, 10)}</td>
+            <td className="px-5 py-2">
+              <span
+                className={`${getColorForStatus(
+                  'submit'
+                )} font-medium `}
+              >
+                Missed
+              </span>
+            </td>
+            <td className="px-5 py-2">{i?.score}</td>
+          </tr>
+        ))
+      ) : (
+        <tr className="w-full text-center text-gray-500 py-2">
+          <td className="px-5 py-2" colSpan="5">
+          <div className="flex  items-center justify-center flex-col text-2xl">
+        <GoAlertFill className="text-[3rem]" />
+       No  Data Found
+      </div>
+          </td>
+        </tr>
+      )}
+    </tbody>
+  )}
+</table>
 
-              { grades.length > 0 ? grades.map((i, idx) => (
-                <tr key={idx} className="bg-white ">
-                  {/* <td className="px-5 py-2">{evalItem.name}</td> */}
-                  <td className="px-5 py-2 flex items-center">
-                    <span>{i?.title}
-                    </span>
-                  </td>
-                  <td className="px-5 py-2">{i?.dueDate}</td>
-                  <td className="px-5 py-2">{i.submitedAt}</td>
-                  {/* <td className="px-5 py-2">{evalItem.status}</td> */}
-                  <td className="px-5 py-2">
-                    <span
-                      className={`${getColorForStatus(
-                        'submit'
-                      )} font-medium `}
-                    >
-                      {" "}
-                      {'Missed'}{" "}
-                    </span>
-                  </td>
-                  <td className="px-5 py-2">{i?.score}</td>
-                </tr>
-              )):<tr className="w-full text-center text-gray-500 py-2">
-              <td className="px-5 py-2" colSpan="5">
-                No Grades found
-              </td>
-            </tr>
-                }
-            </tbody>
-              </table>
             </div>
           )}
         </div>
