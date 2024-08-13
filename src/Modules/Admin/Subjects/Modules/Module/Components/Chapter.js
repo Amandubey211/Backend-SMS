@@ -10,6 +10,7 @@ import {
   FaFileWord,
   FaFilePowerpoint,
   FaEye,
+  FaSpinner,
 } from "react-icons/fa";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import { GrAttachment } from "react-icons/gr";
@@ -94,9 +95,8 @@ const Chapter = ({
   };
 
   const handleDeleteAttachment = async (attachmentUrl) => {
-    console.log(attachmentUrl, "sdfsdf");
     try {
-      await deleteAttachment(moduleId, chapterId, [attachmentUrl]);
+      await deleteAttachment(moduleId, chapterId, attachmentUrl);
     } catch (error) {
       console.error("Error deleting attachment:", error);
     }
@@ -144,7 +144,31 @@ const Chapter = ({
           <div className="flex items-center">
             <div>
               <h2 className="font-semibold text-md">{title}</h2>
-              <p className="text-gray-500">Chapter {chapterNumber}</p>
+              <div className="flex items-center gap-1 ">
+                <p className="text-gray-500">Chapter {chapterNumber}</p>
+
+                {attachments.length > 0 && (
+                  <div className="flex items-center justify-between  ">
+                    <div className="flex items-center">
+                      <button
+                        className="flex items-center space-x-1 px-3 text-sm font-semibold bg-gradient-to-r from-pink-100 to-purple-200 rounded-md py-1 "
+                        onClick={toggleAttachments}
+                      >
+                        <span className="text-gradient  ">
+                          Attachments ({attachments.length})
+                        </span>
+                        <span>
+                          {attachmentsExpanded ? (
+                            <FaChevronUp className="ml-1 text-purple-700" />
+                          ) : (
+                            <FaChevronDown className="ml-1 text-purple-800" />
+                          )}
+                        </span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -215,23 +239,6 @@ const Chapter = ({
           </button>
         </div>
       </div>
-      {attachments.length > 0 && (
-        <div className="flex items-center justify-end  mb-2">
-          <div className="flex items-center">
-            <button
-              className="flex items-center space-x-1 text-sm font-semibold text-purple-800 hover:underline   "
-              onClick={toggleAttachments}
-            >
-              <span>Attachments ({attachments.length})</span>
-              {attachmentsExpanded ? (
-                <FaChevronUp className="ml-1" />
-              ) : (
-                <FaChevronDown className="ml-1" />
-              )}
-            </button>
-          </div>
-        </div>
-      )}
 
       {attachmentsExpanded && attachments.length > 0 && (
         <div className="mt-2">
@@ -271,8 +278,13 @@ const Chapter = ({
                       type="button"
                       className="text-red-500 transition p-1 border rounded-full transform hover:scale-110 cursor-pointer"
                       onClick={() => handleDeleteAttachment(attachment.url)}
+                      disabled={loading} // Disable button while loading
                     >
-                      <RiDeleteBin5Line size={20} />
+                      {loading ? (
+                        <FaSpinner size={20} className="animate-spin" />
+                      ) : (
+                        <RiDeleteBin5Line size={20} />
+                      )}
                     </button>
                   </div>
                 </div>

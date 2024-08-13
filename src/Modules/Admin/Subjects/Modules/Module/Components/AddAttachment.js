@@ -4,6 +4,7 @@ import { RiEyeFill, RiDeleteBin5Line } from "react-icons/ri";
 import { AiOutlineFilePdf } from "react-icons/ai";
 import { MdOutlineDocumentScanner } from "react-icons/md";
 import useUploadChapterFiles from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useUploadChapterFiles";
+import toast from "react-hot-toast";
 
 const AddAttachment = ({ chapterData, onClose, fetchModules }) => {
   const [files, setFiles] = useState([]);
@@ -73,15 +74,15 @@ const AddAttachment = ({ chapterData, onClose, fetchModules }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await uploadChapterFiles(chapterData.chapterId, files, labels); // Call the upload function with the necessary data
+    if (files.length > 0) {
+      await uploadChapterFiles(chapterData.chapterId, files, labels);
+    } else {
+      toast.error("Please select at least one file.");
+    }
   };
 
   const isImage = (file) => {
-    if (!file) {
-      console.error("isImage called with undefined file:", file);
-      return false;
-    }
-    return file.type.startsWith("image/");
+    return file && file.type.startsWith("image/");
   };
 
   const getFileIcon = (file, index) => {
@@ -166,11 +167,10 @@ const AddAttachment = ({ chapterData, onClose, fetchModules }) => {
                   <div className="mt-2">
                     <input
                       type="text"
-                      placeholder="Enter label for this document"
+                      placeholder="Enter label for this document (optional)"
                       value={labels[index] || ""}
                       onChange={(e) => handleLabelChange(e, index)}
                       className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition duration-500 ease-in-out"
-                      required
                     />
                   </div>
                 </div>

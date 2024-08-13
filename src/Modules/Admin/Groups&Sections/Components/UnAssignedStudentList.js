@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from "react";
-import useGetUnassignedStudents from "../../../../Hooks/AuthHooks/Staff/Admin/Students/useGetUnassignedStudents";
+import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import { PiPlusLight } from "react-icons/pi";
@@ -7,35 +6,22 @@ import Sidebar from "../../../../Components/Common/Sidebar";
 import AssignStudent from "./AssignStudent";
 import { useSelector } from "react-redux";
 
-const UnAssignedStudentList = () => {
-  const [unassigned, setUnassignedStudents] = useState([]);
+const UnAssignedStudentList = ({
+  fetchGroups,
+  fetchStudents,
+  unassignedStudents,
+}) => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const { fetchUnassignedStudents, loading, error } =
-    useGetUnassignedStudents();
   const { cid } = useParams();
   const sections = useSelector((state) => state.Class.sectionsList);
-
-  // Define the fetchStudents function inside the component
-  const fetchStudents = async () => {
-    try {
-      const data = await fetchUnassignedStudents(cid);
-      setUnassignedStudents(data);
-    } catch (error) {
-      toast.error("Failed to load students");
-    }
-  };
-
-  useEffect(() => {
-    fetchStudents();
-  }, [cid, fetchUnassignedStudents]);
 
   const handleSearch = (e) => {
     setSearchQuery(e.target.value);
   };
 
-  const filteredStudents = unassigned.filter((student) =>
+  const filteredStudents = unassignedStudents.filter((student) =>
     student.firstName.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -55,12 +41,6 @@ const UnAssignedStudentList = () => {
       ? { name: section.sectionName, color: "text-gray-500" }
       : { name: "No Section Assigned", color: "text-red-500" };
   };
-
-  if (loading) return <div>Loading...</div>;
-  if (error) {
-    toast.error(error);
-    return <div>Failed to load students</div>;
-  }
 
   return (
     <div className="w-80 p-4 bg-white border-r">
@@ -125,7 +105,10 @@ const UnAssignedStudentList = () => {
               selectedStudent.profile ||
               "https://avatars.githubusercontent.com/u/109097090?v=4"
             }
-            onAssignmentComplete={fetchStudents}
+            onAssignmentComplete={() => {
+              fetchStudents();
+              fetchGroups();
+            }}
           />
         </Sidebar>
       )}
