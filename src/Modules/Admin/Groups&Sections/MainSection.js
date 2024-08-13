@@ -106,7 +106,7 @@ const MainSection = () => {
             unassignedStudents={unassignedStudents}
           />
         </div>
-        <div className="flex-grow h-full">
+        <div className="flex-grow h-full border-l">
           {loadingByClass || loadingBySection ? (
             <Spinner />
           ) : errorMessage ? (

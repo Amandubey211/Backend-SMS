@@ -43,7 +43,7 @@ const UnAssignedStudentList = ({
   };
 
   return (
-    <div className="w-80 p-4 bg-white border-r">
+    <div className="w-80 p-4 bg-white ">
       <div className="mb-4">
         <h2 className="text-md font-semibold">
           Unassigned Students{" "}

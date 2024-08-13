@@ -5,6 +5,7 @@ import { AiOutlineFilePdf } from "react-icons/ai";
 import { MdOutlineDocumentScanner } from "react-icons/md";
 import useUploadChapterFiles from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useUploadChapterFiles";
 import toast from "react-hot-toast";
+import { ImSpinner3 } from "react-icons/im";
 
 const AddAttachment = ({ chapterData, onClose, fetchModules }) => {
   const [files, setFiles] = useState([]);
@@ -103,17 +104,20 @@ const AddAttachment = ({ chapterData, onClose, fetchModules }) => {
   };
 
   return (
-    <div className="h-full flex flex-col">
-      <form onSubmit={handleSubmit} className="flex flex-col h-full">
+    <div className="h-full flex flex-col ">
+      <form
+        onSubmit={handleSubmit}
+        className="flex flex-col justify-between h-full p-2"
+      >
         <div
-          className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-gray-300 rounded-md cursor-pointer hover:border-indigo-500 hover:bg-gray-100 transition duration-500 ease-in-out flex-shrink-0"
+          className="flex flex-col px-6 items-center justify-center py-2  h-40 border-2 border-dashed border-gray-300 rounded-md cursor-pointer hover:border-indigo-500 hover:bg-gray-100 transition duration-500 ease-in-out "
           onDragOver={handleDragOver}
           onDrop={handleDrop}
           onClick={handleSelectFiles}
         >
           <IoCloudUploadOutline
             size={50}
-            className="text-gray-400 mb-2 animate-bounce transition"
+            className="text-gray-400 my-2 animate-bounce transition"
           />
           <p className="text-gray-500">Drag & Drop or Click to Browse Files</p>
           <p className="text-gray-400">Select single or multiple files</p>
@@ -187,7 +191,13 @@ const AddAttachment = ({ chapterData, onClose, fetchModules }) => {
             }`}
             disabled={loading}
           >
-            {loading ? "Uploading..." : "Upload Attachments"}
+            {loading ? (
+              <div className="flex justify-center ">
+                <ImSpinner3 size={20} className="animate-spin text-gray-700" />
+              </div>
+            ) : (
+              "Upload Attachments"
+            )}
           </button>
         </div>
       </form>

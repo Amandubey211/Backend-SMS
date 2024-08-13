@@ -14,7 +14,9 @@ const AssignStudent = ({
   const [sectionId, setSectionId] = useState("");
   const [groupId, setGroupId] = useState("");
   const AllSections = useSelector((store) => store.Class.sectionsList);
-  const AllGroups = useSelector((store) => store.Class.groupsList);
+  // const AllGroups = useSelector((store) => store.Class.groupsList);
+  const AllGroups = useSelector((store) => store.Class.class.groups);
+  console.log(AllGroups);
   const { assignStudentToGroup, assignStudentToSection, error, loading } =
     useAssignStudentToGroup();
 
