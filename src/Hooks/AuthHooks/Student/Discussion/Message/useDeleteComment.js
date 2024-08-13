@@ -2,49 +2,47 @@ import { useState, useCallback } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
-import { baseUrl } from "../../../../../../config/Common";
+import { baseUrl } from "../../../../../config/Common";
 
-const useToggleLikeMessage = () => {
+const useDeleteComment = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
+  
   const { role } = useSelector((store) => store.Auth);
 
-  const toggleLikeMessage = useCallback(
-    async (messageId) => {
+  const deleteComment = useCallback(
+    async (commentId) => {
       setLoading(true);
       setError(null);
-      console.log(messageId,"sdfsdf");
+
       try {
         const token = localStorage.getItem(`${role}:token`);
-        const response = await axios.put(
-          `${baseUrl}/admin/likeDiscussions/${messageId}`,
-          {},
+        const response = await axios.delete(
+          `${baseUrl}/admin/deleteCommentDiscussion/${commentId}`,
           {
             headers: { Authentication: token },
           }
         );
 
         if (response.data.status) {
-          // do if success
-          
+          toast.success("Comment deleted successfully");
         } else {
-          toast.error("Failed to toggle like");
-          setError("Failed to toggle like");
+          toast.error("Failed to delete comment");
+          setError("Failed to delete comment");
         }
       } catch (err) {
         const errorMessage =
-          err.response?.data?.message || "Error toggling like";
+          err.response?.data?.message || "Error deleting comment";
         toast.error(errorMessage);
         setError(errorMessage);
       } finally {
         setLoading(false);
       }
     },
-    [baseUrl, role]
+    [role]
   );
 
-  return { loading, error, toggleLikeMessage };
+  return { loading, error, deleteComment };
 };
 
-export default useToggleLikeMessage;
+export default useDeleteComment;

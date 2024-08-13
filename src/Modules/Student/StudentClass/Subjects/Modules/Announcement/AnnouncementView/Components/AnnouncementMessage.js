@@ -15,7 +15,9 @@ const AnnouncementMessage = ({ announcement }) => {
   const [activeReplyParentId, setActiveReplyParentId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
   // const announcementId=announcement._id
+
   useEffect(() => {
     const fetchComments = async () => {
       setLoading(true);
@@ -199,7 +201,7 @@ const AnnouncementMessage = ({ announcement }) => {
     try {
       const token = localStorage.getItem("student:token");
       const response = await fetch(
-        `${baseUrl}/admin/deleteComment/${commentId}`,
+        `${baseUrl}/admin/deleteCommentannouncement/${commentId}`,
         {
           method: "DELETE",
           headers: {
@@ -223,55 +225,187 @@ const AnnouncementMessage = ({ announcement }) => {
 
   const deleteReply = async (commentId, replyId) => {
     try {
+      console.log(
+        `Attempting to delete reply with ID: ${replyId} from comment with ID: ${commentId}`
+      );
+
       const token = localStorage.getItem("student:token");
-      const response = await fetch(`${baseUrl}/admin/deleteReply/${replyId}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(
+        `${baseUrl}/admin/deleteCommentannouncement/${replyId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authentication: token,
+          },
+        }
+      );
 
       if (!response.ok) {
         throw new Error(`Failed to delete reply, status: ${response.status}`);
       }
 
-      const deleteReplyRecursively = (comments) => {
-        return comments.map((comment) => {
+      // Update the comments state to remove the deleted reply
+      setComments((currentComments) =>
+        currentComments.map((comment) => {
           if (comment.id === commentId) {
-            return {
-              ...comment,
-              replies: comment.replies.filter((reply) => reply.id !== replyId),
-            };
-          } else if (comment.replies.length > 0) {
-            return {
-              ...comment,
-              replies: deleteReplyRecursively(comment.replies),
-            };
+            // Only update the replies of the comment that contains the deleted reply
+            const updatedReplies = comment.replies.filter(
+              (reply) => reply.id !== replyId
+            );
+            return { ...comment, replies: updatedReplies };
           }
           return comment;
-        });
-      };
+        })
+      );
 
-      setComments(deleteReplyRecursively(comments));
-      toast.success("Reply Deleted");
+      toast.success("Reply Deleted Successfully");
     } catch (error) {
       console.error("Error deleting reply:", error);
+      toast.error(`Failed to delete reply: ${error.message}`);
+    }
+  };
+  const toggleLike = async (id) => {
+    try {
+      const token = localStorage.getItem("student:token");
+      const url = `${baseUrl}/admin/likeAnnouncementComment/${id}`;
+
+      const response = await fetch(url, {
+        method: "PUT",
+        headers: {
+          Authentication: token,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to toggle like, status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      if (data.status) {
+        const updatedItem = data.data;
+
+        setComments((prevComments) => {
+          const updateLikesRecursively = (comments) => {
+            return comments.map((comment) => {
+              if (comment.id === id) {
+                return {
+                  ...comment,
+                  likes: updatedItem.likes.length,
+                };
+              } else if (comment.replies.length > 0) {
+                return {
+                  ...comment,
+                  replies: updateLikesRecursively(comment.replies),
+                };
+              }
+              return comment;
+            });
+          };
+
+          return updateLikesRecursively(prevComments);
+        });
+        return updatedItem;
+      } else {
+        throw new Error("Failed to toggle like: " + data.message);
+      }
+    } catch (error) {
+      console.error("Error toggling like:", error);
+      toast.error("Failed to toggle like.");
+      throw error;
+    }
+  };
+
+  const editComment = async (commentId, newText) => {
+    try {
+      const token = localStorage.getItem("student:token");
+      const response = await fetch(
+        `${baseUrl}/admin/editCommentAnnouncement/${commentId}`,
+        {
+          method: "PUT",
+          headers: {
+            Authentication: token,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ content: newText }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Failed to edit comment, status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      if (data.status) {
+        setComments((prevComments) =>
+          prevComments.map((comment) =>
+            comment.id === commentId ? { ...comment, text: newText } : comment
+          )
+        );
+      }
+    } catch (error) {
+      console.error("Error editing comment:", error);
+      toast.error("Failed to edit comment.");
+    }
+  };
+
+  const editReply = async (replyId, newText) => {
+    try {
+      const token = localStorage.getItem("student:token");
+      const response = await fetch(
+        `${baseUrl}/admin/editCommentAnnouncement/${replyId}`,
+        {
+          method: "PUT",
+          headers: {
+            Authentication: token,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ content: newText }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Failed to edit reply, status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      if (data.status) {
+        const updateReplyRecursively = (comments) =>
+          comments.map((comment) =>
+            comment.replies
+              ? {
+                  ...comment,
+                  replies: comment.replies.map((reply) =>
+                    reply.id === replyId ? { ...reply, text: newText } : reply
+                  ),
+                }
+              : comment
+          );
+
+        setComments((prevComments) => updateReplyRecursively(prevComments));
+      }
+    } catch (error) {
+      console.error("Error editing reply:", error);
+      toast.error("Failed to edit reply.");
     }
   };
 
   const handleSearch = (query) => {
     setSearchQuery(query);
   };
+  
+  const filterCommentsRecursively = (comments, query) => {
+    return comments.filter((comment) => {
+      const author = comment.author ? comment.author.toLowerCase() : "";
+      const isAuthorMatch = author.includes(query.toLowerCase());
+      const isReplyMatch = comment.replies?.some(
+        (reply) => filterCommentsRecursively([reply], query).length > 0
+      );
+      return isAuthorMatch || isReplyMatch;
+    });
+  };
 
-  const filteredComments = comments.filter((comment) => {
-    const searchInComment = comment.author
-      .toLowerCase()
-      .includes(searchQuery.toLowerCase());
-    const searchInReplies = comment.replies.some((reply) =>
-      reply.author.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-    return searchInComment || searchInReplies;
-  });
+  const filteredComments = filterCommentsRecursively(comments, searchQuery);
+  console.log("Filtered Comments:", filteredComments);
 
   if (loading) {
     return (
@@ -297,6 +431,9 @@ const AnnouncementMessage = ({ announcement }) => {
           setActiveReplyId={setActiveReplyId}
           activeReplyParentId={activeReplyParentId}
           setActiveReplyParentId={setActiveReplyParentId}
+          toggleLike={toggleLike}
+          editComment={editComment} // Pass editComment
+          editReply={editReply}
         />
       </div>
       <div className="flex-none h-[15%]">

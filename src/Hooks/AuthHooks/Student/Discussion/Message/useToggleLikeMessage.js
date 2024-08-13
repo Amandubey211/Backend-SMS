@@ -2,7 +2,7 @@ import { useState, useCallback } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
-import { baseUrl } from "../../../../../../config/Common";
+import { baseUrl } from "../../../../../config/Common";
 
 const useToggleLikeMessage = () => {
   const [loading, setLoading] = useState(false);
@@ -14,7 +14,7 @@ const useToggleLikeMessage = () => {
     async (messageId) => {
       setLoading(true);
       setError(null);
-      console.log(messageId,"sdfsdf");
+
       try {
         const token = localStorage.getItem(`${role}:token`);
         const response = await axios.put(
@@ -26,8 +26,8 @@ const useToggleLikeMessage = () => {
         );
 
         if (response.data.status) {
-          // do if success
-          
+          toast.success("Like toggled successfully");
+          return response.data.data; // Return the updated data
         } else {
           toast.error("Failed to toggle like");
           setError("Failed to toggle like");
@@ -41,7 +41,7 @@ const useToggleLikeMessage = () => {
         setLoading(false);
       }
     },
-    [baseUrl, role]
+    [role]
   );
 
   return { loading, error, toggleLikeMessage };

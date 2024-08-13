@@ -10,7 +10,10 @@ const CommentSection = ({
   activeReplyId,
   setActiveReplyId,
   activeReplyParentId,
-  setActiveReplyParentId
+  setActiveReplyParentId,
+  toggleLike,
+  editComment, // Pass editComment
+  editReply
 }) => {
   return (
     <div className="w-full h-full">
@@ -18,13 +21,17 @@ const CommentSection = ({
         <Comment
           key={comment.id}
           comment={comment}
-          deleteComment={deleteComment}
+          toggleLike={toggleLike}
           deleteReply={deleteReply}
-          addNestedReply={addNestedReply}
           activeReplyId={activeReplyId}
+          deleteComment={deleteComment}
+          addNestedReply={addNestedReply}
           setActiveReplyId={setActiveReplyId}
           activeReplyParentId={activeReplyParentId}
           setActiveReplyParentId={setActiveReplyParentId}
+          editComment={editComment} // Pass editComment
+  editReply={editReply} 
+          
         />
       ))}
     </div>
