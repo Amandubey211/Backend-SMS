@@ -9,10 +9,12 @@ import Layout from '../../../../../Components/Common/Layout';
 import DashLayout from '../../../../../Components/Admin/AdminDashLayout';
 import useGetAllStudents from '../../../../../Hooks/AuthHooks/Staff/Admin/Students/useGetAllStudents';
 import { useSelector } from 'react-redux';
+import { GoAlertFill } from 'react-icons/go';
+import { FiLoader } from 'react-icons/fi';
 // Layout DashLayout
 
 const AllStudents = () => {
-  const { fetchAllStudents } = useGetAllStudents();
+  const { fetchAllStudents,loading } = useGetAllStudents();
   const students = useSelector((store) => store.Students.allStudent);
   useEffect(() => {
     fetchAllStudents();
@@ -24,8 +26,14 @@ const AllStudents = () => {
   return (
     <Layout title="All students">
       <DashLayout>
+      {loading?<div className="flex w-full h-[90vh] flex-col items-center justify-center">
+    <FiLoader className="animate-spin mr-2 w-[3rem] h-[3rem] " />
+    <p className="text-gray-800 text-lg">Loading...</p>
+    </div>:
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
-    {students.map((student) => (
+    {
+      students.length > 0 ?
+    students.map((student) => (
       <NavLink 
         key={student.id} 
         to={`/user/${student?._id}`} 
@@ -44,8 +52,13 @@ const AllStudents = () => {
         </div>
         
       </NavLink>
-    ))}
-  </div>
+    )):  <div>
+    <div className="flex w-[80vw] text-gray-500 h-[90vh] items-center justify-center flex-col text-2xl">
+<GoAlertFill className="text-[5rem]" />
+No  Data Found
+</div>
+</div>}
+  </div>}
   </DashLayout>
     </Layout>
   );

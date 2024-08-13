@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { dummyTeachers } from "./dummyData/dummyData";
-import { FiUserPlus } from "react-icons/fi";
+import { FiLoader, FiUserPlus } from "react-icons/fi";
 import { BiTrash } from "react-icons/bi";
 import Layout from "../../../../Components/Common/Layout";
 import DashLayout from "../../../../Components/Admin/AdminDashLayout";
@@ -13,10 +13,11 @@ import useDeleteUser from "../../../../Hooks/AuthHooks/Staff/Admin/staff/useDele
 import AddUser from "../StaffProfile/AddUser";
 import profileIcon from '../../../../Assets/DashboardAssets/profileIcon.png'
 import DeleteConfirmatiomModal from "../../../../Components/Common/DeleteConfirmationModal";
+import { GoAlertFill } from "react-icons/go";
 const AllTeachers = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [teacherData, setTeacherData] = useState(null);
-  const { fetchTeachers } = useGetAllTeachers();
+  const { fetchTeachers,loading } = useGetAllTeachers();
  const [teacherId,setTeacherId] =useState()
   const teachers = useSelector((store) => store.Teachers.allTeachers);
   useEffect(() => {
@@ -53,6 +54,10 @@ const AllTeachers = () => {
   return (
     <Layout title="All Teachers">
       <DashLayout>
+      {loading?<div className="flex w-full h-[90vh] flex-col items-center justify-center">
+    <FiLoader className="animate-spin mr-2 w-[3rem] h-[3rem] " />
+    <p className="text-gray-800 text-lg">Loading...</p>
+    </div>:
         <div className="p-4">
           <div className="flex justify-between items-center mb-4 border-b-2 h-20">
             <h2 className="text-xl font-semibold flex itmes-center gap-2">All Teachers <span className="bg-purple-400 px-2 text-sm py-1 rounded-full">{teachers?.length}</span></h2>
@@ -65,7 +70,8 @@ const AllTeachers = () => {
             </button>
           </div>
           <div className="flex flex-wrap  gap-4">
-            {teachers.map((teacher, index) => (
+            {teachers.length >0 ?
+            teachers.map((teacher, index) => (
               <div
                 className=" relative w-full sm:w-1/2 md:w-1/3 lg:w-1/4 px-1 mb-4 flex flex-col
                  rounded-lg hover:shadow-lg  border p-2"
@@ -102,7 +108,12 @@ const AllTeachers = () => {
                   </div>
                 
               </div>
-            ))}
+            )):  <div>
+            <div className="flex w-[80vw] text-gray-500 h-[90vh] items-center justify-center flex-col text-2xl">
+    <GoAlertFill className="text-[5rem]" />
+   No  Data Found
+  </div>
+        </div>}
           </div>
           <SidebarSlide
             isOpen={isSidebarOpen}
@@ -120,7 +131,7 @@ const AllTeachers = () => {
   onClose={closeModal}
   onConfirm={deleteTeacher}
 />
-        </div>
+        </div>}
       </DashLayout>
     </Layout>
   );

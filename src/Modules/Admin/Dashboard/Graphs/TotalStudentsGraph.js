@@ -21,9 +21,9 @@ const TotalStudentsGraphjs = () => {
 
   if (!dashboardData || (dashboardData.maleStudents === 0 && dashboardData.femaleStudents === 0)) {
     return (
-      <div className="max-w-xs px-2 py-4 h-full">
+      <div className="max-w-xs px-2  h-full">
         <h2 className="text-2xl font-semibold">Total Student</h2>
-        <div className="flex flex-col items-center justify-center my-10">
+        <div className="flex flex-col items-center justify-center ">
           <FaCalendarAlt className="text-gray-400 text-6xl mb-4" />
           <p className="text-gray-500 text-xl">No student data found</p>
         </div>
@@ -89,7 +89,7 @@ const TotalStudentsGraphjs = () => {
           </div>
         </div>
       </div>
-      <div className="flex justify-around mt-4 text-lg">
+      <div className="flex justify-around mt-4 text-lg pl-10 w-[20rem] gap-2">
         <div className="flex flex-col items-start">
           <div className="w-16 h-1 bg-[#8F77F3] rounded-full mb-1"></div>
           <div className="text-left">

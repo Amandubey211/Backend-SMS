@@ -7,14 +7,15 @@ import ProfileCard from '../SubComponents/ProfileCard';
 import useGetAllStaff from "../../../../Hooks/AuthHooks/Staff/Admin/staff/useGetAllStaff";
 import { useSelector } from "react-redux";
 import AddUser from "../StaffProfile/AddUser";
-
+import { GoAlertFill } from "react-icons/go";
+import { FiLoader } from "react-icons/fi";
 const AllLibrarian = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarContent, setSidebarContent] = useState(null);
   const [selectedLibrarian, setSelectedLibrarian] = useState(null);
   const [librarianData, setLibrarianData] = useState(null);
   const allLibrarian = useSelector((store) => store.Staff.allLibrarian);
-  const { fetchStaff } = useGetAllStaff();
+  const { fetchStaff,loading } = useGetAllStaff();
 
   useEffect(() => {
     fetchStaff();
@@ -48,9 +49,9 @@ const AllLibrarian = () => {
       case "viewLibrarian":
         return <ViewLibrarian librarian={selectedLibrarian} />;
       case "addLibrarian":
-        return <AddUser role="libranian" data={librarianData} />;
+        return <AddUser role="librarian" data={librarianData} />;
       case "editLibrarian":
-        return <AddUser role="libranian" data={librarianData} />;
+        return <AddUser role="librarian" data={librarianData} />;
       default:
         return <div>Select an action</div>;
     }
@@ -58,7 +59,10 @@ const AllLibrarian = () => {
 
   return (
     <Layout title="All Librarian">
-      <DashLayout>
+      <DashLayout>{loading?  <div className="flex w-full h-[90vh] flex-col items-center justify-center">
+    <FiLoader className="animate-spin mr-2 w-[3rem] h-[3rem] " />
+    <p className="text-gray-800 text-lg">Loading...</p>
+    </div>:
         <div className="p-4">
           <div className="flex justify-between items-center mb-4 border-b-2 h-20">
             <h2 className="text-xl font-semibold">All Librarian <span className="bg-purple-400 px-2 text-sm py-1 rounded-full">{allLibrarian?.length}</span></h2>
@@ -70,14 +74,24 @@ const AllLibrarian = () => {
             </button>
           </div>
           <div className="flex flex-wrap -mx-2">
-            {allLibrarian.map((librarian, index) => (
+            {
+              allLibrarian.length > 0 ?
+            
+           allLibrarian.map((librarian, index) => (
               <ProfileCard
                 key={index}
                 profile={librarian}
                 onClick={handleAppointmentClick}
                 editUser={editUser}
               />
-            ))}
+            )):
+            <div>
+                <div className="flex w-[80vw] text-gray-500 h-[90vh] items-center justify-center flex-col text-2xl">
+        <GoAlertFill className="text-[5rem]" />
+       No  Data Found
+      </div>
+            </div>
+            }
           </div>
           <SidebarSlide
             key={sidebarContent} // Use the key to force re-render
@@ -92,7 +106,7 @@ const AllLibrarian = () => {
           >
             {renderSidebarContent()}
           </SidebarSlide>
-        </div>
+        </div>}
       </DashLayout>
     </Layout>
   );
