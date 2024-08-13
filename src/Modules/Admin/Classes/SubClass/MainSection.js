@@ -11,6 +11,7 @@ import { FcGraduationCap, FcCalendar } from "react-icons/fc";
 import { useSelector } from "react-redux";
 import useGetClassDetails from "../../../../Hooks/AuthHooks/Staff/Admin/Class/usegetClassDetails";
 import NoDataFound from "../../../../Components/Common/NoDataFound";
+import Spinner from "../../../../Components/Common/Spinner";
 
 const colors = [
   "bg-yellow-300",
@@ -31,7 +32,7 @@ const MainSection = () => {
   const [editSubject, setEditSubject] = useState(null); // New state for editing
   const classDetails = useSelector((store) => store.Class.class);
 
-  const { fetchClassDetails } = useGetClassDetails();
+  const { fetchClassDetails, loading } = useGetClassDetails();
   const { cid } = useParams();
 
   useEffect(() => {
@@ -96,48 +97,56 @@ const MainSection = () => {
 
   return (
     <>
-      <div className="flex flex-wrap justify-center gap-3 p-4">
-        {staticIconData.map((item, index) => (
-          <NavIconCard
-            key={index}
-            icon={item.icon}
-            text={item.text}
-            url={item.url}
-          />
-        ))}
-      </div>
-      <div className="px-5">
-        <ButtonGroup
-          onAddNewSubject={handleAddNewSubject}
-          selectedTab={selectedTab}
-          setSelectedTab={setSelectedTab}
-        />
-        <div className="grid grid-cols-3 gap-4 mb-10">
-          {filteredSubjects.length > 0 ? (
-            filteredSubjects.map((subject, index) => (
-              <SubjectCard
-                key={index}
-                data={{
-                  ...subject,
-                  teacherName: subject.teacherId
-                    ? subject.teacherId.fullName
-                    : "No Instructor Assigned",
-                  teacherImage: subject.teacherId?.profile,
-                  teacherRole: subject.teacherId?.role || "Teacher",
-                }}
-                Class={cid}
-                subjectId={subject._id}
-                backgroundColor={getColor(index)}
-                onEdit={handleEditSubject}
-              />
-            ))
-          ) : (
-            <p className="col-span-3 text-center text-gray-500">
-              <NoDataFound title="Subject" />
-            </p>
-          )}
+      {loading ? (
+        <div className="flex justify-center items-center h-screen">
+          <Spinner /> {/* Display Spinner while loading */}
         </div>
-      </div>
+      ) : (
+        <>
+          <div className="flex flex-wrap justify-center gap-3 p-4">
+            {staticIconData.map((item, index) => (
+              <NavIconCard
+                key={index}
+                icon={item.icon}
+                text={item.text}
+                url={item.url}
+              />
+            ))}
+          </div>
+          <div className="px-5">
+            <ButtonGroup
+              onAddNewSubject={handleAddNewSubject}
+              selectedTab={selectedTab}
+              setSelectedTab={setSelectedTab}
+            />
+            <div className="grid grid-cols-3 gap-4 mb-10">
+              {filteredSubjects.length > 0 ? (
+                filteredSubjects.map((subject, index) => (
+                  <SubjectCard
+                    key={index}
+                    data={{
+                      ...subject,
+                      teacherName: subject.teacherId
+                        ? subject.teacherId.fullName
+                        : "No Instructor Assigned",
+                      teacherImage: subject.teacherId?.profile,
+                      teacherRole: subject.teacherId?.role || "Teacher",
+                    }}
+                    Class={cid}
+                    subjectId={subject._id}
+                    backgroundColor={getColor(index)}
+                    onEdit={handleEditSubject}
+                  />
+                ))
+              ) : (
+                <p className="col-span-3 text-center text-gray-500">
+                  <NoDataFound title="Subject" />
+                </p>
+              )}
+            </div>
+          </div>
+        </>
+      )}
       <Sidebar
         title={editSubject ? "Edit Subject" : "Add New Subject"}
         isOpen={isSidebarOpen}

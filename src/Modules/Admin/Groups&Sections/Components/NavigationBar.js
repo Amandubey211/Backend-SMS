@@ -27,18 +27,20 @@ const NavigationBar = ({ onSectionChange, selectedSection, fetchSections }) => {
   const closeSidebar = () => {
     setSidebarType(null);
     setEditingSection(null);
+    fetchSections(cid); // Ensure sections are refetched after sidebar closes
   };
 
   const handleDeleteConfirm = async () => {
     if (modalData) {
       await deleteSection(modalData._id);
       closeModal();
-      fetchSections(cid);
+      fetchSections(cid); // Refetch sections after deletion
     }
   };
 
   const handleSectionChange = (section, sectionId) => {
     onSectionChange(section, sectionId);
+    fetchSections(cid); // Refetch sections after section change
   };
 
   const handleEditSection = (section) => {
@@ -48,7 +50,7 @@ const NavigationBar = ({ onSectionChange, selectedSection, fetchSections }) => {
 
   const handleSectionSubmitSuccess = () => {
     fetchSections(cid); // Refresh sections list
-    closeSidebar()
+    closeSidebar();
   };
 
   const getButtonClass = (section) => {

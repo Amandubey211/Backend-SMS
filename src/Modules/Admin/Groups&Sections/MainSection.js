@@ -8,13 +8,15 @@ import { useDispatch } from "react-redux";
 import { setStudentGrade } from "../../../Redux/Slices/AdminSlice";
 import StudentGradeModal from "../Subjects/Modules/Grades/StudentGradeViewModal/StudentGradeModal";
 import useGetGroupsByClass from "../../../Hooks/AuthHooks/Staff/Admin/Groups/useGetGroupByClass";
-import useGetGroupsByClassAndSection from "../../../Hooks/AuthHooks/Staff/Admin/Groups/useGetGroupsByClassAndSection ";
 import Spinner from "../../../Components/Common/Spinner";
+import useGetUnassignedStudents from "../../../Hooks/AuthHooks/Staff/Admin/Students/useGetUnassignedStudents";
+import useGetGroupsByClassAndSection from "../../../Hooks/AuthHooks/Staff/Admin/Groups/useGetGroupsByClassAndSection ";
 
 const MainSection = () => {
   const [activeSection, setActiveSection] = useState("Everyone");
   const [activeSectionId, setActiveSectionId] = useState(null);
   const [groupList, setGroupList] = useState([]);
+  const [unassignedStudents, setUnassignedStudents] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const dispatch = useDispatch();
   const { fetchSection } = useFetchSection();
@@ -30,6 +32,7 @@ const MainSection = () => {
     loading: loadingBySection,
     error: errorBySection,
   } = useGetGroupsByClassAndSection();
+  const { fetchUnassignedStudents } = useGetUnassignedStudents();
 
   const fetchGroups = async () => {
     if (cid) {
@@ -43,11 +46,21 @@ const MainSection = () => {
     }
   };
 
+  const fetchStudents = async () => {
+    try {
+      const data = await fetchUnassignedStudents(cid);
+      setUnassignedStudents(data);
+    } catch (error) {
+      console.error("Failed to load students");
+    }
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       if (cid) {
         await fetchSection(cid);
         await fetchGroups();
+        await fetchStudents();
       }
     };
     fetchData();
@@ -63,6 +76,7 @@ const MainSection = () => {
   const handleSectionChange = (section, sectionId) => {
     setActiveSection(section);
     setActiveSectionId(sectionId);
+    fetchGroups();
   };
 
   const handleSeeGradeClick = (student) => {
@@ -78,17 +92,21 @@ const MainSection = () => {
   const errorMessage = errorByClass || errorBySection;
 
   return (
-    <div>
+    <div className="flex flex-col h-screen">
       <NavigationBar
         onSectionChange={handleSectionChange}
         selectedSection={activeSection}
         fetchSections={fetchSection}
       />
-      <div className="flex gap-1 h-screen">
+      <div className="flex flex-grow">
         <div className="w-80 h-full flex-shrink-0">
-          <UnAssignedStudentList />
+          <UnAssignedStudentList
+            fetchGroups={fetchGroups}
+            fetchStudents={fetchStudents}
+            unassignedStudents={unassignedStudents}
+          />
         </div>
-        <div className="flex-grow h-full">
+        <div className="flex-grow h-full border-l">
           {loadingByClass || loadingBySection ? (
             <Spinner />
           ) : errorMessage ? (
@@ -101,6 +119,7 @@ const MainSection = () => {
               onSeeGradeClick={handleSeeGradeClick}
               groupList={groupList}
               fetchGroups={fetchGroups}
+              fetchStudents={fetchStudents}
             />
           )}
         </div>

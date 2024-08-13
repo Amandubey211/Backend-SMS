@@ -15,7 +15,6 @@ const AddGroup = ({ group, isUpdate, groupId, onClose, fetchGroups }) => {
     group?.students || []
   );
   const [leader, setLeader] = useState(group?.leader || null);
-  //const [sectionId, setSectionId] = useState(group?.sectionId || "");
   const [isDropdownOpen, setDropdownOpen] = useState(false);
 
   const allSections = useSelector((store) => store.Class.sectionsList);
@@ -29,7 +28,6 @@ const AddGroup = ({ group, isUpdate, groupId, onClose, fetchGroups }) => {
       setSeatLimit(group.seatLimit);
       setSelectedStudents(group.students);
       setLeader(group.leader);
-      //setSectionId(group.sectionId);
     }
   }, [isUpdate, group]);
 
@@ -75,13 +73,8 @@ const AddGroup = ({ group, isUpdate, groupId, onClose, fetchGroups }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // if (!sectionId) {
-    //   toast.error("Please select a section.");
-    //   return;
-    // }
 
     const formData = {
-      //sectionId,
       classId: cid,
       groupName,
       seatLimit,
@@ -92,8 +85,8 @@ const AddGroup = ({ group, isUpdate, groupId, onClose, fetchGroups }) => {
     try {
       if (isUpdate) {
         await updateGroup(formData, groupId);
-        fetchGroups();
-        onClose();
+        fetchGroups(); // Refetch data after update
+        onClose(); // Close sidebar after update
       } else {
         await createGroup(formData);
         // Reset form fields
@@ -101,7 +94,7 @@ const AddGroup = ({ group, isUpdate, groupId, onClose, fetchGroups }) => {
         setSeatLimit("");
         setSelectedStudents([]);
         setLeader(null);
-        //setSectionId("");
+        fetchGroups(); // Refetch data after create
       }
     } catch (err) {
       toast.error(err.message || "Something went wrong");
@@ -146,25 +139,6 @@ const AddGroup = ({ group, isUpdate, groupId, onClose, fetchGroups }) => {
               placeholder="Type Here"
               required
             />
-          </div>
-          <div>
-            {/* <label className="block text-sm font-medium text-gray-700 mb-1">
-              Section
-            </label>
-            <select
-              value={sectionId}
-              onChange={(e) => setSectionId(e.target.value)}
-              className="block w-full p-2 border border-gray-300 rounded-lg transition duration-300"
-              disabled={loading}
-              aria-label="Select Section"
-            >
-              <option value="">Choose</option>
-              {allSections.map((section) => (
-                <option key={section._id} value={section._id}>
-                  {section.sectionName}
-                </option>
-              ))}
-            </select> */}
           </div>
           <div>
             <label
@@ -267,10 +241,11 @@ const AddGroup = ({ group, isUpdate, groupId, onClose, fetchGroups }) => {
               {selectedStudents.map((student) => (
                 <div
                   key={student._id}
-                  className={`px-2 py-1 rounded-lg mr-2 mb-2 cursor-pointer bg-gray-100 transition duration-300 ${leader && leader._id === student._id
+                  className={`px-2 py-1 rounded-lg mr-2 mb-2 cursor-pointer bg-gray-100 transition duration-300 ${
+                    leader && leader._id === student._id
                       ? "border border-pink-500"
                       : ""
-                    }`}
+                  }`}
                   onClick={() => handleLeaderClick(student)}
                   role="button"
                   aria-pressed={leader && leader._id === student._id}
