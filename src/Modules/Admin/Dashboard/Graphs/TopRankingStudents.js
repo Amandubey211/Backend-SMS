@@ -57,7 +57,7 @@ const TopRankingStudents = () => {
   ];
 
   return (
-    <div className="bg-white p-4">
+    <div className="bg-white p-4 ">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-semibold ">Top Ranking Students</h2>
 
@@ -72,8 +72,8 @@ const TopRankingStudents = () => {
         </div>
       </div>
 
-      <div className="gap-4 w-full h-full py-20">
-        <img src={nodataimg} alt='image' className="w-full h-full"/>
+      <div className=" flex  w-full h-auto  py-20 ">
+        <img src={nodataimg} alt='image' className="w-full"/>
         {/* {topStudents.slice(0, 3).map((student, index) => (
           <div key={index} className="text-center p-4 border rounded-lg relative">
 

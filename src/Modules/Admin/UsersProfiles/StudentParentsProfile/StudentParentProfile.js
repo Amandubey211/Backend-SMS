@@ -7,6 +7,8 @@ import Sidebar from "../../../../Components/Common/Sidebar";
 import useGetAllParents from "../../../../Hooks/AuthHooks/Staff/Admin/parent/useGetAllParents";
 import { useSelector } from "react-redux";
 import profileIcon from "../../../../Assets/DashboardAssets/profileIcon.png";
+import { GoAlertFill } from "react-icons/go";
+import { FiLoader } from "react-icons/fi";
 
 const uniqueFilterOptions = (data, key) => {
   return [
@@ -37,7 +39,7 @@ const StudentParentProfile = () => {
     setSelectedChild(child);
     setSidebarOpen(true);
   };
-  const { fetchAllParents } = useGetAllParents();
+  const { fetchAllParents,loading } = useGetAllParents();
   const allParents = useSelector((store) => store.Parents.allParents);
   useEffect(() => {
     async function fetchData() {
@@ -57,6 +59,10 @@ const StudentParentProfile = () => {
     <>
       <Layout title="Parents">
         <DashLayout>
+{loading? <div className="flex w-full h-[90vh] flex-col items-center justify-center">
+    <FiLoader className="animate-spin mr-2 w-[3rem] h-[3rem] " />
+    <p className="text-gray-800 text-lg">Loading...</p>
+    </div>:
           <div className="min-h-screen p-4 ">
             <h2 className="text-xl font-semibold mb-4">
               All Parents{" "}
@@ -104,7 +110,8 @@ const StudentParentProfile = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredParents.map((parent, index) => (
+                  {filteredParents.length >0 ?
+                  filteredParents.map((parent, index) => (
                     <tr key={index} className="text-left text-gray-700">
                       <td className="px-5 py-5 border-b border-gray-200 align-middle">
                         <div className="flex items-center">
@@ -155,7 +162,17 @@ const StudentParentProfile = () => {
                         </div>
                       </td>
                     </tr>
-                  ))}
+                  )): 
+                  <tr>
+
+                  <td className="   text-center text-2xl py-10 text-gray-400" colSpan={6} >
+                   <div className="flex  items-center justify-center flex-col text-2xl">
+                     <GoAlertFill className="text-[5rem]" />
+                    No  Data Found
+                   </div>
+                  
+                  </td>
+                </tr>}
                 </tbody>
               </table>
             </div>
@@ -166,7 +183,7 @@ const StudentParentProfile = () => {
             >
               <ChildProfile children={selectedChild} />
             </Sidebar>
-          </div>
+          </div>}
         </DashLayout>
       </Layout>
     </>

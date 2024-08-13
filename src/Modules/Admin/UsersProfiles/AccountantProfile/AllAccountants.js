@@ -7,6 +7,8 @@ import ProfileCard from '../SubComponents/ProfileCard'; // Import the generic Pr
 import { useSelector } from "react-redux";
 import useGetAllStaff from "../../../../Hooks/AuthHooks/Staff/Admin/staff/useGetAllStaff";
 import AddUser from "../StaffProfile/AddUser";
+import { FiLoader } from "react-icons/fi";
+import { GoAlertFill } from "react-icons/go";
 
 const AllAccountants = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -14,7 +16,7 @@ const AllAccountants = () => {
   const [selectedAccountant, setSelectedAccountant] = useState(null);
   const [accountantData, setAccountantData] = useState(null);
   const allAccountant = useSelector((store) => store.Staff.allAccountant);
-  const { fetchStaff } = useGetAllStaff();
+  const { fetchStaff,loading } = useGetAllStaff();
 
   useEffect(() => {
     fetchStaff();
@@ -58,6 +60,10 @@ const AllAccountants = () => {
   return (
     <Layout title="All Accountants">
       <DashLayout>
+      {loading?<div className="flex w-full h-[90vh] flex-col items-center justify-center">
+    <FiLoader className="animate-spin mr-2 w-[3rem] h-[3rem] " />
+    <p className="text-gray-800 text-lg">Loading...</p>
+    </div>:
         <div className="p-4">
           <div className="flex justify-between items-center mb-4 border-b-2 h-20">
             <h2 className="text-xl font-semibold">All Accountants <span className="bg-purple-400 px-2 text-sm py-1 rounded-full  ">{allAccountant?.length}</span></h2>
@@ -67,14 +73,21 @@ const AllAccountants = () => {
             </button>
           </div>
           <div className="flex flex-wrap -mx-2">
-            {allAccountant.map((accountant, index) => (
+
+            {allAccountant.length >0 ?
+            allAccountant.map((accountant, index) => (
               <ProfileCard
                 key={index}
                 profile={accountant}
                 onClick={handleAccountantClick}
                 editUser={editUser} // Pass the editUser function as a prop
               />
-            ))}
+            )):  <div>
+            <div className="flex w-[80vw] text-gray-500 h-[90vh] items-center justify-center flex-col text-2xl">
+    <GoAlertFill className="text-[5rem]" />
+   No  Data Found
+  </div>
+        </div>}
           </div>
           <SidebarSlide
             key={sidebarContent} // Use the key to force re-render
@@ -87,7 +100,7 @@ const AllAccountants = () => {
           >
             {renderSidebarContent()}
           </SidebarSlide>
-        </div>
+        </div>}
       </DashLayout>
     </Layout>
   );
