@@ -9,10 +9,7 @@ const StudentOverView = () => {
   return (
     <>
       <div className="flex flex-col">
-        <div className="flex flex-1 flex-col p-4">
-          <span className="font-bold text-gray-900">My Courses</span>
-          <span className="text-gray-500">Total 5 course remainng </span>
-        </div>
+    
 
         <div className="" >
           <AllSubjects />
