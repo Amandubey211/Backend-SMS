@@ -21,6 +21,8 @@ const useGetGroupsByClass = () => {
           headers: { Authentication: token },
         });
 
+        console.log(response.data, "sdfsdf--------------");
+
         if (response.data.status) {
           dispatch(setGroupsList(response.data.data));
           return response.data.data;

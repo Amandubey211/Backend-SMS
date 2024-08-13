@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import { useParams } from "react-router-dom";
+import useGetGroupsByClass from "../../../../Hooks/AuthHooks/Staff/Admin/Groups/useGetGroupByClass";
 import useAssignStudentToGroup from "../../../../Hooks/AuthHooks/Staff/Admin/Students/useAssignStudentToGroup ";
 
 const AssignStudent = ({
@@ -14,9 +15,14 @@ const AssignStudent = ({
   const [sectionId, setSectionId] = useState("");
   const [groupId, setGroupId] = useState("");
   const AllSections = useSelector((store) => store.Class.sectionsList);
-  // const AllGroups = useSelector((store) => store.Class.groupsList);
-  const AllGroups = useSelector((store) => store.Class.class.groups);
-  console.log(AllGroups);
+  const { fetchGroupsByClass } = useGetGroupsByClass();
+  const AllGroups = useSelector((store) => store.Class.groupsList);
+  const { cid } = useParams();
+
+  useEffect(() => {
+    fetchGroupsByClass(cid);
+  }, [cid, fetchGroupsByClass]);
+
   const { assignStudentToGroup, assignStudentToSection, error, loading } =
     useAssignStudentToGroup();
 
@@ -93,7 +99,11 @@ const AssignStudent = ({
           className="block w-full p-2 border border-gray-300 rounded-lg"
           disabled={loading}
         >
-          <option value="">Choose Group</option>
+          <option value="">
+            {AllGroups && AllGroups.length > 0
+              ? "Choose Group"
+              : "No Group Found"}
+          </option>
           {AllGroups?.map((group) => (
             <option key={group?._id} value={group?._id}>
               {group?.groupName}

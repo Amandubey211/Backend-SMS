@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { useParams } from "react-router-dom";
-import toast from "react-hot-toast";
+// import { useParams } from "react-router-dom";
+// import toast from "react-hot-toast";
 import { PiPlusLight } from "react-icons/pi";
 import Sidebar from "../../../../Components/Common/Sidebar";
 import AssignStudent from "./AssignStudent";
@@ -14,7 +14,7 @@ const UnAssignedStudentList = ({
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const { cid } = useParams();
+  // const { cid } = useParams();
   const sections = useSelector((state) => state.Class.sectionsList);
 
   const handleSearch = (e) => {
@@ -59,7 +59,10 @@ const UnAssignedStudentList = ({
       </div>
       <ul>
         {filteredStudents.map((student, index) => (
-          <li key={index} className="flex items-center justify-between py-2">
+          <li
+            key={index}
+            className="flex items-center justify-between border-b py-2"
+          >
             <div className="flex items-center">
               <img
                 src={
