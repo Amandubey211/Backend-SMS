@@ -23,11 +23,17 @@ const ClassSlice = createSlice({
       state.sectionsList = action.payload;
     },
     setGroupsList: (state, action) => {
-      state.groupsList = action.payload
+      state.groupsList = action.payload;
     },
   },
 });
 
-export const { setClass, setTeacherAssign, setClassList, setSectionsList, setGroupsList } = ClassSlice.actions;
+export const {
+  setClass,
+  setTeacherAssign,
+  setClassList,
+  setSectionsList,
+  setGroupsList,
+} = ClassSlice.actions;
 
 export default ClassSlice.reducer;

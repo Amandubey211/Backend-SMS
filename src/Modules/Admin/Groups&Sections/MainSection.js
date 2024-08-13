@@ -45,6 +45,7 @@ const MainSection = () => {
       setGroupList(data);
     }
   };
+  console.log(groupList, "sdfghgf");
 
   const fetchStudents = async () => {
     try {
