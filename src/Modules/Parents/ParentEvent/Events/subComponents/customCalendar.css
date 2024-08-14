@@ -1,0 +1,104 @@
+/* customCalendar.css */
+
+/* Targets the days on the month view */
+.rbc-day-bg {
+    border: 1px solid #d9e4f0;
+     /* Blue border */
+     border-radius: 13px;
+}
+
+/* Optional: Change border color for today specifically */
+.rbc-today {
+    /* border: 2px solid #dc3545 !important; */
+     /* Red border */
+    border-radius: 13px;
+}
+
+/* Targets the whole cell in the month view */
+.rbc-date-cell {
+    padding: 5px;
+    /* border: 1px solid green;  */
+    /* Green border for the date cell itself */
+}
+
+/* schedulerStyles.css */
+.custom-time-table-cell, .custom-date-table-cell {
+    border-radius: 18px !important; /* Ensures this style is applied */
+    border: 12px solid #ccc !important; /* Additional custom styling */
+}
+  
+
+/* Targets the div that contains the date number in the Month View */
+
+
+.MuiTableCell-root.Cell-cell .Cell-text {
+   /* border-radius: 6px !important;  Apply rounded corners
+
+    background-color: #1d99f3 !important;  Background color 
+
+    border: 1px solid #5c1bd4 !important; Border color */
+    
+    border-radius: 6px !important;
+    text-align: center;
+    
+     border: 1px solid #e0dbea;
+    
+     height:  100%;
+
+}
+.Cell-text{
+    font-weight: bold;
+    
+}
+/* Specific targeting for days that belong to other months */
+.MuiTableCell-root.Cell-cell .Cell-otherMonth {
+    /* color: #ccc; 
+    Dim the text color for days not in the current month 
+    */
+    color: #ccc
+}
+
+
+/* Increase the text size and customize the appearance of day headers */
+.Cell-dayOfWeek {
+    font-size: 16px;  /* Increase the font size */
+    font-weight: bold;  /* Make the font bold */
+    color: #ff0101;  /* Dark gray text color */
+    padding: 8px;  /* Add padding to make the text more prominent */
+    background-color: #f4f4f4;  /* Light gray background */
+    border-radius: 8px;  /* Rounded corners */
+    text-align: center;  /* Center the text */
+}
+
+/* Style the cells containing the days for better visual separation */
+.css-1bzx5rb-MuiTableCell-root {
+    border: 1px solid #ccc;  /* Add a subtle border */
+    padding: 5px;  /* Padding for better spacing */
+    margin: 2px;  /* Space between day headers */
+    background-color: #e8e8e8;  /* Slightly different background to distinguish days */
+}
+
+/* Custom styles for the 'Today' button */
+.TodayButton-button {
+    background-image: linear-gradient(to right, #ec4899, #7c3aed); /* from-pink-500 to-purple-500 */
+    color: white; /* text-white */
+    padding: 0.5rem 1rem; /* py-2 px-4 */
+    border-radius: 0.375rem; /* rounded-md */
+    transition: background-color 0.3s; /* Smooth transition for hover effect */
+}
+
+.TodayButton-button:hover {
+    background-image: linear-gradient(to right, #db2777, #6d28d9); /* hover:from-pink-600 hover:to-purple-600 */
+}
+
+/* Target the specific button and change text color to white */
+.TodayButton-button.MuiButton-outlinedPrimary {
+    color: white;  /* Set text color to white */
+}
+
+/* Target the specific select input and change text color to white and add a gradient background */
+.Switcher-input.css-11u53oe-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input {
+    color: white;  /* Set text color to white */
+    background: linear-gradient(to right, #ec4899, #7c3aed);  /* Gradient from pink to purple */
+    border-radius: 4px;  /* Optional: adds rounded corners to the input */
+}

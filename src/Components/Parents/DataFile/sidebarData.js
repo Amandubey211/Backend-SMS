@@ -61,7 +61,7 @@ const sidebarData = [
   {
     title: "Events", // Added Events option
     icon: <FcCalendar />, // Added icon for Events
-    path: "/parentevents",
+    path: "/parent/events",
   },
 ];
 
