@@ -1,15 +1,16 @@
 import { useState, useEffect } from "react";
-import { baseUrl } from "../../../../../config/Common";
+// import { baseUrl } from "../../../../../config/Common";
 import { useSelector } from "react-redux";
+import { baseUrl } from "../../../../../config/Common";
 
-export const useFetchCommentsByDiscussion = (discussionId, setComments) => {
+export const useFetchCommentsByAnnouncement = (announcementId, setComments) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const studentId = useSelector((state) => state.Common.studentId);
-  console.log("student id 🐪🐪🐪🐪🐪🐪🐪", studentId);
+  console.log("student id ", studentId);
 
   useEffect(() => {
-    console.log("student id 🐪🐪🐪🐪🐪🐪🐪", studentId);
+    console.log("student id", studentId);
     const fetchComments = async () => {
       setLoading(true);
       try {
@@ -17,7 +18,7 @@ export const useFetchCommentsByDiscussion = (discussionId, setComments) => {
         if (!token) throw new Error("Authentication token not found");
 
         const response = await fetch(
-          `${baseUrl}/admin/getDiscussionComment/${discussionId}`,
+          `${baseUrl}/admin/getAnnouncementComment/${announcementId}`,
           {
             headers: {
               Authentication: token,
@@ -32,12 +33,13 @@ export const useFetchCommentsByDiscussion = (discussionId, setComments) => {
         }
 
         const data = await response.json();
-        console.log("data in hooks====>❤️❤️❤️❤️❤️", data);
+        console.log("data in hooks", data);
         if (data.status) {
           const formattedComments = data.data.map((comment) => ({
             id: comment._id,
             author: comment.createdBy,
-            authorID: comment.creatorID,
+            // authorID: comment.creatorID,
+            authorID: comment.userId,
             role: comment.role,
             time: new Date(comment.createdAt).toLocaleTimeString([], {
               hour: "2-digit",
@@ -59,13 +61,13 @@ export const useFetchCommentsByDiscussion = (discussionId, setComments) => {
     };
 
     fetchComments();
-  }, [discussionId]);
+  }, [announcementId]);
 
   const formatReplies = (replies) => {
     return replies.map((reply) => ({
       id: reply._id,
       author: reply.createdBy,
-      authorID: reply.creatorID,
+      authorID: reply.userId,
       role: reply.role,
       time: new Date(reply.createdAt).toLocaleTimeString([], {
         hour: "2-digit",

@@ -26,6 +26,7 @@ const SideMenubar = () => {
     role: state.Auth.role,
     userDetails: state.Auth.userDetail,
   }));
+  
 
   const [openItems, setOpenItems] = useState([]);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false); // State to control the modal visibility

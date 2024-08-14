@@ -13,6 +13,7 @@ const CommentSection = ({
   toggleLike,
   editComment, // Pass editComment
   editReply,
+  currentUserId,
 }) => {
   return (
     <div className="w-full h-full">
@@ -21,15 +22,16 @@ const CommentSection = ({
           key={comment.id}
           comment={comment}
           toggleLike={toggleLike}
-          deleteComment={deleteComment}
           deleteReply={deleteReply}
-          addNestedReply={addNestedReply}
           activeReplyId={activeReplyId}
+          deleteComment={deleteComment}
+          addNestedReply={addNestedReply}
           setActiveReplyId={setActiveReplyId}
           activeReplyParentId={activeReplyParentId}
           setActiveReplyParentId={setActiveReplyParentId}
           editComment={editComment} // Pass editComment
           editReply={editReply}
+          currentUserId={currentUserId}
         />
       ))}
     </div>

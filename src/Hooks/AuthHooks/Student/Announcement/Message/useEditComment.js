@@ -1,5 +1,3 @@
-
-
 import { baseUrl } from "../../../../../config/Common";
 import toast from "react-hot-toast";
 
@@ -8,7 +6,7 @@ export const useEditComment = (comments, setComments) => {
     try {
       const token = localStorage.getItem("student:token");
       const response = await fetch(
-        `${baseUrl}/admin/editCommentDiscussion/${commentId}`,
+        `${baseUrl}/admin/editCommentAnnouncement/${commentId}`,
         {
           method: "PUT",
           headers: {

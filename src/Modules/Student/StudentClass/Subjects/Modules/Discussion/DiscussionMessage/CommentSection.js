@@ -1,6 +1,5 @@
-
-import React from 'react';
-import Comment from './Components/Comment';
+import React from "react";
+import Comment from "./Components/Comment";
 
 const CommentSection = ({
   comments,
@@ -13,7 +12,8 @@ const CommentSection = ({
   setActiveReplyParentId,
   toggleLike,
   editComment, // Pass editComment
-  editReply
+  editReply,
+  currentUserId,
 }) => {
   return (
     <div className="w-full h-full">
@@ -30,8 +30,8 @@ const CommentSection = ({
           activeReplyParentId={activeReplyParentId}
           setActiveReplyParentId={setActiveReplyParentId}
           editComment={editComment} // Pass editComment
-  editReply={editReply} 
-          
+          editReply={editReply}
+          currentUserId={currentUserId}
         />
       ))}
     </div>

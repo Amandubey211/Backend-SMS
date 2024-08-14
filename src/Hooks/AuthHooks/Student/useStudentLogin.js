@@ -36,6 +36,7 @@ const useStudentLogin = () => {
         studentDetails
       );
       console.log("Login response:", data);
+      console.log("USER id:", data.userId);
 
       if (data.success) {
         localStorage.setItem(TOKEN_STORAGE_KEY, `Bearer ${data.token}`);

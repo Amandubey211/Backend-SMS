@@ -5,7 +5,7 @@ export const useToggleLikeMessage = (comments, setComments) => {
   const toggleLike = async (id) => {
     try {
       const token = localStorage.getItem("student:token");
-      const url = `${baseUrl}/admin/likeDiscussions/${id}`;
+      const url = `${baseUrl}/admin/likeAnnouncementComment/${id}`;
 
       const response = await fetch(url, {
         method: "PUT",

@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { FaRegHeart, FaRegComment, FaTrashAlt } from "react-icons/fa";
 import Reply from "./Reply";
@@ -6,9 +5,11 @@ import InputComment from "./InputComment";
 import toast from "react-hot-toast";
 import { MdOutlineEdit } from "react-icons/md";
 import { RxCross2 } from "react-icons/rx";
+import { useSelector } from "react-redux";
 
 const Comment = ({
   comment,
+  toggleLike,
   deleteComment,
   deleteReply,
   addNestedReply,
@@ -16,18 +17,26 @@ const Comment = ({
   setActiveReplyId,
   activeReplyParentId,
   setActiveReplyParentId,
-  toggleLike,
   editComment,
   editReply,
+  // currentUserId,
 }) => {
+  const currentUserId = useSelector((state) => state.Common.studentId);
+
   const [showReplies, setShowReplies] = useState(false);
   const [showReplyForm, setShowReplyForm] = useState(false);
   const [likes, setLikes] = useState(comment.likes);
-  const commentID = comment.id;
   const [isEditing, setIsEditing] = useState(false);
-  const [editText, setEditText] = useState(comment.text); 
+  const [editText, setEditText] = useState(comment.text);
 
-  
+  // Console logs to debug
+  console.log("Comment Component:", comment);
+  console.log("currentUserId:", currentUserId);
+  console.log("comment.authorID:", comment.authorID);
+  console.log(
+    "Comparison Result:",
+    String(currentUserId).trim() === String(comment.authorID).trim()
+  );
 
   const handleEditComment = async () => {
     if (editText.trim() && editText !== comment.text) {
@@ -37,18 +46,17 @@ const Comment = ({
       setIsEditing(false);
     }
   };
+
   const handleCancelEdit = () => {
     setIsEditing(false);
-    setEditText(comment.text); 
+    setEditText(comment.text);
   };
+
   const handleDeleteComment = () => {
     deleteComment(comment.id);
   };
-  const handleDeleteReply = (commentID, replyId) => {
-    console.log(
-      `COMMENT COMONEN:==>reply with ID:  ${replyId} from comment with ID: ${commentID}`
-    );
 
+  const handleDeleteReply = (commentID, replyId) => {
     deleteReply(commentID, replyId);
   };
 
@@ -63,6 +71,7 @@ const Comment = ({
       setShowReplyForm(false);
     }
   };
+
   const handleToggleLike = async () => {
     try {
       const updatedComment = await toggleLike(comment.id);
@@ -71,6 +80,7 @@ const Comment = ({
       toast.error("Failed to toggle like.");
     }
   };
+
   return (
     <div className="bg-white p-2 mb-4 border rounded-lg shadow-md">
       <div className="flex items-center mb-2">
@@ -88,43 +98,44 @@ const Comment = ({
           )}
           <span className="text-sm text-gray-500">{comment.time}</span>
         </div>
-        <div className="ml-auto flex space-x-2">
-          <MdOutlineEdit
-            className="text-gray-500 text-xl cursor-pointer"
-            onClick={() => setIsEditing(true)}
-          />
-          <RxCross2
-            className="text-red-500 text-xl cursor-pointer"
-            onClick={handleDeleteComment}
-          />
-        </div>
-      </div>
-      {isEditing ? (
-        <>
-          <div className="flex flex-col mb-2">
-            <textarea
-              className="w-full border rounded p-2"
-              value={editText}
-              onChange={(e) => setEditText(e.target.value)}
-            />
-          <div className="flex justify-end gap-2 mt-2">
-          <button
-            className="mt-2 self-end bg-blue-500 text-white px-4 py-1 rounded"
-            onClick={handleEditComment}
-          >
-            Save
-          </button>
 
-          <button
+        {String(currentUserId).trim() === String(comment.authorID).trim() && (
+          <div className="ml-auto flex space-x-2">
+            <MdOutlineEdit
+              className="text-gray-500 text-xl cursor-pointer"
+              onClick={() => setIsEditing(true)}
+            />
+            <RxCross2
+              className="text-red-500 text-xl cursor-pointer"
+              onClick={handleDeleteComment}
+            />
+          </div>
+        )}
+      </div>
+
+      {isEditing ? (
+        <div className="flex flex-col mb-2">
+          <textarea
+            className="w-full border rounded p-2"
+            value={editText}
+            onChange={(e) => setEditText(e.target.value)}
+          />
+          <div className="flex justify-end gap-2 mt-2">
+            <button
+              className="mt-2 self-end bg-blue-500 text-white px-4 py-1 rounded"
+              onClick={handleEditComment}
+            >
+              Save
+            </button>
+
+            <button
               className="mt-2 self-end bg-red-500 text-white px-4 py-1 rounded"
               onClick={handleCancelEdit}
             >
               Cancel
             </button>
-
           </div>
-          </div>
-        </>
+        </div>
       ) : (
         <>
           <p className="text-gray-700 mb-2">{comment.text}</p>
@@ -140,6 +151,7 @@ const Comment = ({
             />
             <span className="ml-1 text-gray-500">Reply</span>
           </div>
+
           {showReplyForm && (
             <div className="mt-2">
               <InputComment
@@ -148,6 +160,7 @@ const Comment = ({
               />
             </div>
           )}
+
           <div className="mt-4">
             {showReplies ? (
               <>
@@ -162,6 +175,7 @@ const Comment = ({
                     setActiveReplyId={setActiveReplyId}
                     toggleLike={toggleLike}
                     editReply={editReply}
+                    currentUserId={currentUserId}
                   />
                 ))}
                 <div
