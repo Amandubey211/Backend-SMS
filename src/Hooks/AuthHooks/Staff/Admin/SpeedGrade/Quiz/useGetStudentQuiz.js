@@ -25,16 +25,16 @@ const useGetStudentQuiz = () => {
           setQuizDetails(response.data.data); // Store the quiz details in local state
           return response.data.data;
         } else {
-          toast.error(
-            response.data.message ||
-              "Failed to fetch quiz details. Please try again."
-          );
+          // toast.error(
+          //   response.data.message ||
+          //     "Failed to fetch quiz details. Please try again."
+          // );
           return null;
         }
       } catch (err) {
         const errorMessage =
           err.response?.data?.message || "Failed to fetch quiz details";
-        toast.error(errorMessage);
+        // toast.error(errorMessage);
         setError(errorMessage);
         return null;
       } finally {

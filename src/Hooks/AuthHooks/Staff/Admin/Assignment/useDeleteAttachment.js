@@ -12,7 +12,7 @@ const useDeleteAttachment = (fetchModules) => {
   const role = useSelector((store) => store.Auth.role);
 
   const deleteAttachment = useCallback(
-    async (subjectId, chapterId, fileUrl) => {
+    async (chapterId, subjectId, fileUrl) => {
       // Renamed `fileUrls` to `fileUrl` to match the backend
       setLoading(true);
       setError(null);

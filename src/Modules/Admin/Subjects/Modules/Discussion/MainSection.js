@@ -64,7 +64,10 @@ const MainSection = () => {
           </div>
         ) : (
           <>
-            <PinnedDiscussions discussions={pinnedDiscussions} />
+            <PinnedDiscussions
+              discussions={pinnedDiscussions}
+              fetchClassDiscussions={fetchClassDiscussions} // Pass the refetch method
+            />
             <div className="p-3">
               <div className="flex items-center gap-2 ml-3 mb-2">
                 <GoDiscussionClosed className="text-xl text-green-600" />
@@ -74,7 +77,11 @@ const MainSection = () => {
               {filteredDiscussions.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {filteredDiscussions.map((discussion, index) => (
-                    <DiscussionCard key={index} discussion={discussion} />
+                    <DiscussionCard
+                      key={index}
+                      discussion={discussion}
+                      fetchClassDiscussions={fetchClassDiscussions} // Pass the refetch method
+                    />
                   ))}
                 </div>
               ) : (

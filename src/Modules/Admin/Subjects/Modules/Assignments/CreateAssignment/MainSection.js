@@ -2,11 +2,9 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useLocation } from "react-router-dom";
 import CreateAssignmentHeader from "./Component/CreateAssignmentHeader";
 import EditorComponent from "../../../Component/AdminEditor";
-import Sidebar from "../../../../../../Components/Common/Sidebar";
 import useCreateAssignment from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/createAssignment";
 import useUpdateAssignment from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useUpdateAssignment";
 import CreateAssignmentForm from "./Component/CreateAssignmentForm";
-import AddNewCriteriaForm from "../../Rubric/Components/AddNewCriteriaForm";
 
 const initialFormState = {
   points: "",
@@ -33,10 +31,10 @@ const MainSection = ({ setIsEditing }) => {
   const [editorContent, setEditorContent] = useState("");
   const [formState, setFormState] = useState(initialFormState);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
-  const [isEditing, setLocalIsEditing] = useState(false); // Define isEditing state locally
+  const [isEditing, setLocalIsEditing] = useState(false);
   const [assignmentId, setAssignmentId] = useState("");
   const [criteriaList, setCriteriaList] = useState([]);
-  const [existingRubricId, setExistingRubricId] = useState(null);
+  const [existingRubricId, setExistingRubricId] = useState(null); // Initialize here
 
   const { createAssignment, loading: createLoading } = useCreateAssignment();
   const { updateAssignment, loading: updateLoading } = useUpdateAssignment();
@@ -68,6 +66,7 @@ const MainSection = ({ setIsEditing }) => {
         chapterId: assignment.chapterId || null,
         groupId: assignment?.groupId || null,
       });
+      setExistingRubricId(assignment.rubricId || null); // Set the existing rubric ID if present
     } else {
       setLocalIsEditing(false); // Set the local isEditing state
       setIsEditing(false); // Inform the parent component that we're creating
@@ -128,7 +127,6 @@ const MainSection = ({ setIsEditing }) => {
       await updateAssignment(assignmentId, assignmentData, sectionId);
     } else {
       const response = await createAssignment(assignmentData);
-      console.log(response);
       setAssignmentId(response.data._id); // Set assignment ID after creation
     }
   };
@@ -141,6 +139,7 @@ const MainSection = ({ setIsEditing }) => {
         isEditing={isEditing} // Pass the local isEditing state
         criteriaList={criteriaList}
         setCriteriaList={setCriteriaList}
+        existingRubricId={existingRubricId} // Pass the existingRubricId here
         setExistingRubricId={setExistingRubricId}
         assignmentId={assignmentId} // Pass assignment ID to header
       />
@@ -164,20 +163,6 @@ const MainSection = ({ setIsEditing }) => {
           />
         </div>
       </div>
-      <Sidebar
-        isOpen={isSidebarOpen}
-        onClose={handleSidebarClose}
-        title="Add New Criteria"
-      >
-        <AddNewCriteriaForm
-          onSave={(criteria) =>
-            setFormState((prev) => ({
-              ...prev,
-              criteria: [...prev.criteria, criteria],
-            }))
-          }
-        />
-      </Sidebar>
     </div>
   );
 };

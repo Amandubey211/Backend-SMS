@@ -23,24 +23,24 @@ const MainSection = () => {
         <div className="p-4 bg-white border">
           {loading && <Spinner />}
           {error && <NoDataFound title="Announcement" />}
-          {announcement ? (
-            <>
-              {announcement.attachment && (
-                <img
-                  src={announcement.attachment || "default_image_url_here"}
-                  alt="Announcement"
-                  className=" w-full h-full "
-                />
-              )}
-
-              <div
-                className="text-gray-700 mb-6"
-                dangerouslySetInnerHTML={{ __html: announcement.content }}
+          {/* {announcement ? ( */}
+          <>
+            {announcement && announcement?.attachment && (
+              <img
+                src={announcement?.attachment || "default_image_url_here"}
+                alt="Announcement"
+                className=" w-full h-full "
               />
-            </>
-          ) : (
-            <NoDataFound title="Announcement" />
-          )}
+            )}
+
+            <div
+              className="text-gray-700 mb-6"
+              dangerouslySetInnerHTML={{ __html: announcement?.content }}
+            />
+          </>
+          {/* // ) : (
+          //   <NoDataFound title="Announcement" />
+          // )} */}
         </div>
       </div>
     </div>

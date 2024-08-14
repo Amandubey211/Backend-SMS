@@ -24,9 +24,10 @@ const useGetGroupsByClass = () => {
         console.log(response.data, "sdfsdf--------------");
 
         if (response.data.status) {
-          dispatch(setGroupsList(response.data.data));
+          // dispatch(setGroupsList(response.data.data));
           return response.data.data;
         } else {
+          dispatch(setGroupsList([]));
           toast.error("Failed to fetch groups. Please try again.");
           return [];
         }

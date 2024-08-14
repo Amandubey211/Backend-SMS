@@ -13,6 +13,8 @@ import {
 import useDeleteModule from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useDeleteModule";
 import toast from "react-hot-toast";
 import DeleteModal from "../../../../../../Components/Common/DeleteModal";
+import { BsPatchCheckFill } from "react-icons/bs";
+import { MdOutlineBlock } from "react-icons/md";
 
 const ModuleCard = ({
   title,
@@ -84,9 +86,9 @@ const ModuleCard = ({
 
           <div className="flex items-center space-x-2">
             {isPublished ? (
-              <FaCheckCircle className="text-green-500" />
+              <BsPatchCheckFill className="text-green-600 p-1 border rounded-full h-8 w-8" />
             ) : (
-              <FaBan className="text-gray-500" />
+              <MdOutlineBlock className="text-gray-600  p-1 border rounded-full h-7 w-7" />
             )}
             <button
               className="bg-gray-100 p-2 rounded-full hover:bg-gray-200"
