@@ -1,4 +1,3 @@
-
 import { baseUrl } from "../../../../../config/Common";
 import toast from "react-hot-toast";
 
@@ -7,7 +6,7 @@ export const useDeleteComment = (comments, setComments) => {
     try {
       const token = localStorage.getItem("student:token");
       const response = await fetch(
-        `${baseUrl}/admin/deleteCommentDiscussion/${commentId}`,
+        `${baseUrl}/admin/deleteCommentannouncement/${commentId}`,
         {
           method: "DELETE",
           headers: {
@@ -31,6 +30,3 @@ export const useDeleteComment = (comments, setComments) => {
 
   return { deleteComment };
 };
-
-
-

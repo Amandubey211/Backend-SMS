@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { baseUrl } from "../../../../../config/Common";
 
-export const useAddComment = (discussionId, comments, setComments) => {
+export const useAddComment = (announcementId, comments, setComments) => {
   const addComment = async (text) => {
     try {
       const token = localStorage.getItem("student:token");
       const response = await fetch(
-        `${baseUrl}/admin/createCommentDiscussion/${discussionId}/replies`,
+        `${baseUrl}/admin/createCommentAnnouncement/${announcementId}/replies`,
         {
           method: "POST",
           headers: {

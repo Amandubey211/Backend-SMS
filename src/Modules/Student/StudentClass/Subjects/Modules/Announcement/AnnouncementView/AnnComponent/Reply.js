@@ -4,6 +4,7 @@ import InputComment from "./InputComment";
 import toast from "react-hot-toast";
 import { MdOutlineEdit } from "react-icons/md";
 import { RxCross2 } from "react-icons/rx";
+import { useSelector } from "react-redux";
 
 const Reply = ({
   reply,
@@ -14,14 +15,25 @@ const Reply = ({
   setActiveReplyId,
   toggleLike,
   editReply,
+  // currentUserId,
 }) => {
+  const currentUserId = useSelector((state) => state.Common.studentId);
+
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(reply.text);
 
-  const handleCancelEdit = () => {
-    setIsEditing(false);
-    setEditText(reply.text);
-  };
+  // Console logs to debug
+  console.log("Reply Component:", reply);
+  console.log("currentUserId:", currentUserId);
+  console.log("reply.authorId:", reply.authorID);
+
+  const normalizedCurrentUserId = String(currentUserId).trim().toString();
+  const normalizedReplyAuthorId = String(reply.authorID).trim().toString();
+
+  console.log(
+    "Comparison Result:",
+    normalizedCurrentUserId === normalizedReplyAuthorId
+  );
 
   const handleEditReply = async () => {
     if (editText.trim() && editText !== reply.text) {
@@ -31,11 +43,13 @@ const Reply = ({
       setIsEditing(false);
     }
   };
-  const handleDelete = () => {
-    console.log(
-      ` REPLY COMPOMENT==> reply with ID: ${reply.id} from comment with ID: ${commentId}`
-    );
 
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+    setEditText(reply.text);
+  };
+
+  const handleDelete = () => {
     deleteReply(commentId, reply.id);
   };
 
@@ -45,18 +59,20 @@ const Reply = ({
 
   const handleAddNestedReply = (text) => {
     if (text.trim()) {
-      addNestedReply(reply.id, text, true);
+      addNestedReply(reply.id, text);
       setActiveReplyId(null);
     }
   };
+
   const handleToggleLike = async () => {
     try {
       const updatedReply = await toggleLike(reply.id);
+      // Optionally update local state or re-fetch replies if needed
     } catch (error) {
-      console.log("Failed to toggle like.", error);
       toast.error("Failed to toggle like.");
     }
   };
+
   return (
     <div className="ml-8 mt-2 ps-4 bg-gray-100 p-2 rounded-lg border shadow-sm">
       <div className="flex items-center mb-2">
@@ -74,16 +90,20 @@ const Reply = ({
           )}
           <span className="text-sm text-gray-500">{reply.time}</span>
         </div>
-        <div className="ml-auto gap-2 flex space-x-2">
-          <MdOutlineEdit
-            className="text-gray-500 text-xl cursor-pointer"
-            onClick={() => setIsEditing(true)}
-          />
-          <RxCross2
-            className="text-red-500 text-xl cursor-pointer"
-            onClick={handleDelete}
-          />
-        </div>
+
+        {/* {String(currentUserId).trim() === String(reply.authorId).trim() && ( */}
+        {normalizedCurrentUserId === normalizedReplyAuthorId && (
+          <div className="ml-auto gap-2 flex space-x-2">
+            <MdOutlineEdit
+              className="text-gray-500 text-xl cursor-pointer"
+              onClick={() => setIsEditing(true)}
+            />
+            <RxCross2
+              className="text-red-500 text-xl cursor-pointer"
+              onClick={handleDelete}
+            />
+          </div>
+        )}
       </div>
 
       {isEditing ? (
@@ -123,6 +143,7 @@ const Reply = ({
             />
             <span className="ml-1 text-gray-500">Reply</span>
           </div>
+
           {activeReplyId === reply.id && (
             <div className="mt-4">
               <InputComment
@@ -131,6 +152,7 @@ const Reply = ({
               />
             </div>
           )}
+
           <div className="mt-4 ml-4">
             {reply.replies &&
               reply.replies.map((nestedReply) => (
@@ -144,6 +166,7 @@ const Reply = ({
                   setActiveReplyId={setActiveReplyId}
                   toggleLike={toggleLike}
                   editReply={editReply}
+                  currentUserId={currentUserId}
                 />
               ))}
           </div>

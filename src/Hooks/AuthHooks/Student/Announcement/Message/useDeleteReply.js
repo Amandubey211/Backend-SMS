@@ -1,4 +1,3 @@
-
 import { baseUrl } from "../../../../../config/Common";
 import toast from "react-hot-toast";
 
@@ -6,7 +5,7 @@ export const useDeleteReply = (comments, setComments) => {
   const deleteReply = async (commentId, replyId) => {
     try {
       const token = localStorage.getItem("student:token");
-      const deleteUrl = `${baseUrl}/admin/deleteCommentDiscussion/${replyId}`;
+      const deleteUrl = `${baseUrl}/admin/deleteCommentannouncement/${replyId}`;
 
       const response = await fetch(deleteUrl, {
         method: "DELETE",

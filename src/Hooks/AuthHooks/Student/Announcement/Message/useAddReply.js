@@ -1,7 +1,7 @@
 import { baseUrl } from "../../../../../config/Common";
 
 export const useAddReply = (
-  discussionId,
+  announcementId,
   comments,
   setComments,
   setActiveReplyId,
@@ -11,7 +11,7 @@ export const useAddReply = (
     try {
       const token = localStorage.getItem("student:token");
       const response = await fetch(
-        `${baseUrl}/admin/createCommentDiscussion/${discussionId}/replies`,
+        `${baseUrl}/admin/createCommentAnnouncement/${announcementId}/replies`,
         {
           method: "POST",
           headers: {
