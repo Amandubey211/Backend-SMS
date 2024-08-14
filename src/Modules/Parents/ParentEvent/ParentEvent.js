@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Calendar } from "antd";
 import Layout from "../../../Components/Common/Layout";
-import StudentDashLayout from "../../../Components/Student/StudentDashLayout";
+import ParentDashLayout from "../../../Components/Parents/ParentDashLayout"; // Use ParentDashLayout
 import EventCard from "./Events/subComponents/EventCard";
 import Sidebar from "../../../Components/Common/Sidebar";
 import ViewEvent from "./Events/subComponents/ViewEvent";
@@ -11,7 +11,7 @@ import { format, parseISO, isValid } from "date-fns";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
 import { IoCalendarOutline } from "react-icons/io5";
 
-const StudentEvent = () => {
+const ParentEvent = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
@@ -147,11 +147,11 @@ const StudentEvent = () => {
   return (
     <>
       <Layout title="Event">
-        <StudentDashLayout>
+        <ParentDashLayout>  {/* Replace with ParentDashLayout */}
           <div className="min-h-screen p-4 bg-gray-50">
             <div className="flex flex-row justify-between">
               <h1 className="mb-2 bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent font-semibold bg-clip-text">
-                Student Events
+                Parent Events
               </h1>
             </div>
 
@@ -286,10 +286,10 @@ const StudentEvent = () => {
               {renderSidebarContent()}
             </Sidebar>
           </div>
-        </StudentDashLayout>
+        </ParentDashLayout> {/* Ensure to replace here as well */}
       </Layout>
     </>
   );
 };
 
-export default StudentEvent;
+export default ParentEvent;
