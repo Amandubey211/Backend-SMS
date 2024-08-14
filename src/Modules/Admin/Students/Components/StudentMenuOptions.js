@@ -9,10 +9,17 @@ import { BsArrow90DegRight } from "react-icons/bs";
 import { MdOutlineModeEditOutline } from "react-icons/md";
 import { RiDeleteBin2Line } from "react-icons/ri";
 import { TfiStatsUp } from "react-icons/tfi";
-import useAssignStudentToGroup from "../../../../Hooks/AuthHooks/Staff/Admin/Students/useAssignStudentToGroup ";
 import DeleteModal from "../../../../Components/Common/DeleteModal";
+import useAssignStudentToGroup from "../../../../Hooks/AuthHooks/Staff/Admin/Students/useAssignStudentToGroup ";
 
-const StudentMenuOptions = ({ studentId, studentName, groupId, fetchGroups, onSeeGradeClick }) => {
+const StudentMenuOptions = ({
+  studentId,
+  studentName,
+  groupId,
+  fetchGroups,
+  fetchStudents,
+  onSeeGradeClick,
+}) => {
   const [showMenu, setShowMenu] = useState(null);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarContent, setSidebarContent] = useState(null);
@@ -55,15 +62,29 @@ const StudentMenuOptions = ({ studentId, studentName, groupId, fetchGroups, onSe
       } else {
         const sidebarComponents = {
           "Promote Class": <PromoteClass studentId={studentId} />,
-          "Move to Section": <MoveToSection studentId={studentId} fetchGroups={fetchGroups} onClose={handleSidebarClose} />,
-          "Edit Student": <EditStudent studentId={studentId} fetchGroups={fetchGroups} onClose={handleSidebarClose} />,
-          "Delete Student": <DeleteStudent studentId={studentId} groupId={groupId} />,
+          "Move to Section": (
+            <MoveToSection
+              studentId={studentId}
+              fetchGroups={fetchGroups}
+              onClose={handleSidebarClose}
+            />
+          ),
+          "Edit Student": (
+            <EditStudent
+              studentId={studentId}
+              fetchGroups={fetchGroups}
+              onClose={handleSidebarClose}
+            />
+          ),
+          "Delete Student": (
+            <DeleteStudent studentId={studentId} groupId={groupId} />
+          ),
         };
 
         handleSidebarOpen(action, sidebarComponents[action]);
       }
     },
-    [studentId]
+    [studentId, fetchGroups]
   );
 
   const handleSidebarOpen = (title, content) => {
@@ -82,11 +103,14 @@ const StudentMenuOptions = ({ studentId, studentName, groupId, fetchGroups, onSe
     try {
       await removeStudentFromGroup(studentId, groupId);
       fetchGroups();
+      fetchStudents();
       setModalOpen(false);
+      handleSidebarClose();
     } catch (error) {
       console.error("Error removing student:", error);
     }
   };
+
   return (
     <>
       <button

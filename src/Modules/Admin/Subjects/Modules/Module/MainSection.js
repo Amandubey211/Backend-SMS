@@ -37,17 +37,18 @@ const MainSection = () => {
 
   useEffect(() => {
     if (modulesData && modulesData.modules.length > 0) {
-      dispatch(
-        setSelectedModule({
-          moduleId: modulesData.modules[0]._id,
-          name: modulesData.modules[0].moduleName,
-          chapters: modulesData.modules[0].chapters,
-        })
-      );
-    } else {
-      dispatch(setSelectedModule({}));
+      // Check if selectedModule is empty
+      if (!selectedModule || Object.keys(selectedModule).length === 0) {
+        dispatch(
+          setSelectedModule({
+            moduleId: modulesData.modules[0]._id,
+            name: modulesData.modules[0].moduleName,
+            chapters: modulesData.modules[0].chapters,
+          })
+        );
+      }
     }
-  }, [dispatch, modulesData]);
+  }, [dispatch, modulesData, selectedModule]);
 
   const handleToggle = (chapterNumber) => {
     setExpandedChapters((prev) =>
