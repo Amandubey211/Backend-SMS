@@ -5,6 +5,7 @@ import { MdKeyboardArrowDown } from "react-icons/md";
 import { GoDiscussionClosed } from "react-icons/go";
 import SubjectSideBar from "../../Component/SubjectSideBar";
 import useFetchAllPages from "../../../../../../Hooks/AuthHooks/Student/Page/useFetchAllPages";
+import Spinner from "../../../../../../Components/Common/Spinner";
 
 const MainSection = () => {
   const { loading, error, fetchAllPages, pages } = useFetchAllPages();
@@ -34,7 +35,7 @@ const MainSection = () => {
             <MdKeyboardArrowDown className="text-gray-500 h-8 w-8" />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {loading && <p>Loading...</p>}
+            {loading && <Spinner/>}
             {error && <p>{error}</p>}
             {!loading && !error && filteredPages.length === 0 && (
               <div className="flex flex-col h-96 w-full items-center justify-center text-gray-500">
