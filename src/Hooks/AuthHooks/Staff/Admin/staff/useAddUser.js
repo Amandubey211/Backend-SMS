@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import { baseUrl } from "../../../../../config/Common";
 import useGetAllStaff from "./useGetAllStaff";
 import useCreateSalary from "../../../../CommonHooks/useCreateSalary";
+import useGetAllTeachers from "../Teacher/useGetAllTeacher";
 
 const useAddUser = () => {
   const [loading, setLoading] = useState(false);
@@ -12,6 +13,7 @@ const useAddUser = () => {
   const adminRole = useSelector((store) => store.Auth.role);
   const { fetchStaff } = useGetAllStaff()
   const { createSalary } = useCreateSalary()
+  const {fetchTeachers} = useGetAllTeachers()
   
   const addUser = useCallback(
 
@@ -61,7 +63,13 @@ const useAddUser = () => {
         console.log(data);
         setLoading(false);
         toast.success("User added successfully");
-        fetchStaff();
+       
+        if(role=='teacher'){
+          fetchTeachers()
+        }else{
+          fetchStaff();
+        }
+        
         createSalary('unpaid', 'pay now')
         return { success: true, data };
       } catch (err) {
