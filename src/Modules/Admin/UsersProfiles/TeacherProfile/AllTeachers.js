@@ -14,6 +14,8 @@ import AddUser from "../StaffProfile/AddUser";
 import profileIcon from '../../../../Assets/DashboardAssets/profileIcon.png'
 import DeleteConfirmatiomModal from "../../../../Components/Common/DeleteConfirmationModal";
 import { GoAlertFill } from "react-icons/go";
+import { MdBlock, MdOutlinePublishedWithChanges } from "react-icons/md";
+import ProfileCard from "../SubComponents/ProfileCard";
 const AllTeachers = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [teacherData, setTeacherData] = useState(null);
@@ -72,42 +74,13 @@ const AllTeachers = () => {
           <div className="flex flex-wrap  gap-4">
             {teachers.length >0 ?
             teachers.map((teacher, index) => (
-              <div
-                className=" relative w-full sm:w-1/2 md:w-1/3 lg:w-1/4 px-1 mb-4 flex flex-col
-                 rounded-lg hover:shadow-lg  border p-2"
-                key={index}
-              >
-                  <div className=" absolute right-0 flex flex-col px-4 gap-2 justify-end ">
-                    <button className=" bg-transparent p-2 rounded-full border  " onClick={(event)=>editUser(event,teacher)}>
-                      <FiUserPlus className="text-sm text-green-500 "   />
-                    </button>
-                    <button className=" bg-transparent p-2 rounded-full border" onClick={(event)=>{event.stopPropagation();openModal();setTeacherId(teacher._id)}}>
-                      <BiTrash className="text-sm text-red-500  "  />
-                    </button>
-                  </div>
-
-                  <div className="flex flex-col h-[80%] justify-center items-center  py-3">
-                    <img
-                      className=" object-cover rounded-full w-[100px] h-[100px] border"
-
-                      src={teacher.profile ||profileIcon }
-
-
-
-                      alt={teacher.name}
-                    />
-                    <h3 className="text-lg font-medium">{teacher.fullName}</h3>
-                    <p className="text-gray-500">{teacher.position}</p>
-                  </div>
-
-                  <div className="p-4 text-center justify-center items-center border-t-2  ">
-                    {/* <h3 className="text-lg font-medium">{teacher.name}</h3>
-                    <p className="text-gray-500">{teacher.subject}</p> */}
-                    <p className="text-gray-600 ">Phone: </p>
-                    <p className="text-gray-600 ">{teacher.mobileNumber}</p>
-                  </div>
-                
-              </div>
+             
+              <ProfileCard
+              key={index}
+              profile={teacher}
+              editUser={editUser}
+              onClick={()=>{}}
+            />
             )):  <div>
             <div className="flex w-[80vw] text-gray-500 h-[90vh] items-center justify-center flex-col text-2xl">
     <GoAlertFill className="text-[5rem]" />

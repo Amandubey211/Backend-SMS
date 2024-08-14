@@ -1,51 +1,155 @@
 import TimelineItem from "antd/es/timeline/TimelineItem";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { VerticalTimeline, VerticalTimelineElement }  from 'react-vertical-timeline-component';
 
 import { Bs0CircleFill } from "react-icons/bs";
 import { GoAlertFill } from "react-icons/go";
+import { useSelector } from "react-redux";
+import axios from "axios";
+import { baseUrl } from "../../../../../../../config/Common";
+import { AiOutlineEye } from "react-icons/ai";
 
 const StudentProfile = ({student}) => {
-  
+  const role = useSelector((store) => store.Auth.role);
+  const [documents,setDocuments] = useState([])
+  const getdocumnets = async()=>{
+    try {
+      const token = localStorage.getItem(`${role}:token`);
+      const response = await axios.get(`${baseUrl}/admin/documents/student/${student._id}`, {
+        headers: {
+          Authentication: `${token}`
+        },
+      });
 
+     console.log(response.data);
+     setDocuments(response?.data?.documents.documents)
+     
+    } catch (error) {
+      console.error('Error fetching documents data:', error);
+    }
+  } 
+  useEffect(()=>{
+    getdocumnets()
+  },[])
+  const [preview, setPreview] = useState(null);
+  const [previewType, setPreviewType] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
+
+  const openModal = () => {
+    setModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setModalOpen(false);
+  };
+
+  const handlePreviewClick = (url, type) => {
+    if (url) {
+      setPreview(url);
+      setPreviewType(type);
+      openModal();
+    } else {
+      console.error("Invalid URL:", url);
+    }
+  };
+  const colors = [
+    "bg-yellow-300",
+    "bg-blue-300",
+    "bg-green-300",
+    "bg-red-300",
+    "bg-purple-300",
+    "bg-pink-300",
+  ];
+  
+  const getColor = (index) => colors[index % colors.length];
   return (
     <div className="bg-white  h-full  px-7 py-2 ">
     <h2 className="text-base font-normal text-gray-600 mb-3">Educational Documents</h2>
+    {
+      documents.length > 0 ?
+      <div className=" w-[30rem] p-2  rounded-lg mb-3 ">
+      <h3 className="text-lg font-semibold mb-4 text-gray-800">
+        Document Previews
+      </h3>
+      <div className=" flex w-full">
+        {documents?.map((doc, index) => (
+          <div
+            key={index}
+            className={`${getColor(
+              index
+            )} p-4 border rounded-lg shadow-md transform transition-transform hover:scale-105`}
+          >
+            {doc.documentType.startsWith("image/") ? (
+              <img
+                src={doc?.documentUrl}
+                alt={`Document ${index + 1}`}
+                className="w-full h-40 object-cover mb-2 rounded-md"
+              />
+            ) : (
+              <embed
+                src={doc?.documentUrl}
+                type={doc.documentType}
+                className="w-full h-40 mb-2 rounded-md"
+              />
+            )}
+            <div className="flex justify-between items-center">
+              <p className="text-white">
+                <span className="font-medium">Document {index + 1}:</span>{" "}
+                {doc?.documentLabel}
+              </p>
+              <button
+                title="Open Modal"
+                className="p-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-full shadow-lg hover:from-pink-600 hover:to-purple-600 transition-all duration-200"
+                onClick={() =>
+                  handlePreviewClick(doc?.documentUrl, doc.documentType)
+                }
+              >
+                <AiOutlineEye size={20} />
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+    
+    :
     <div className="flex  items-center justify-center flex-col text-2xl h-full text-gray-500">
         <GoAlertFill className="text-[5rem]" />
        No  Data Found
-      </div>
-    {/* <VerticalTimeline className="border-l-4 border-l-black" >
-    {[1].map((item)=>(
-        <VerticalTimelineElement
-        className="vertical-timeline-element--work"
-        contentArrowStyle={{ borderRight: '7px solid lightblue' }}
-        iconStyle={{ 
-          background: 'black', 
-          color: 'white', 
-          boxShadow: '0 0 0 4px black', 
-          border: '2px solid black', 
-          borderRadius: '50%', 
-          width: '3px', 
-          height: '3px', 
-          lineHeight: '30px', 
-          textAlign: 'center', 
-          fontSize: '16px', 
-          display: 'flex', 
-          alignItems: 'center', 
-          justifyContent: 'center',
-          marginLeft:'-.2rem'
-        }}
-        >
-       <div className="px-10  flex flex-col my-[-.7rem] h-[5rem]">
-       <div className="flex  items-center justify-center flex-col text-2xl">
-        <GoAlertFill className="text-[5rem]" />
-       No  Data Found
-      </div>
-       </div>
-      </VerticalTimelineElement>
-    ))}
-    </VerticalTimeline> */}
+      </div>}
+      {modalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75 z-50">
+          <div className="bg-white p-4 rounded-lg relative max-h-full overflow-y-auto shadow-lg">
+            <button
+              onClick={closeModal}
+              className="absolute top-2 right-2 p-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-full shadow-lg hover:from-pink-600 hover:to-purple-600 transition-colors duration-200"
+            >
+              ✕
+            </button>
+            <div>
+              {preview ? (
+                previewType.startsWith("image/") ? (
+                  <img
+                    src={preview}
+                    alt="Preview"
+                    className="max-h-[80vh] object-contain"
+                  />
+                ) : (
+                  <embed
+                    src={preview}
+                    type={previewType}
+                    className="w-full h-[80vh] object-contain"
+                  />
+                )
+              ) : (
+                <p className="text-center text-gray-500">
+                  No preview available
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
   </div>
   );
 };
