@@ -20,6 +20,7 @@ import useDeleteAttachment from "../../../../../../Hooks/AuthHooks/Staff/Admin/A
 import DeleteModal from "../../../../../../Components/Common/DeleteModal";
 import Sidebar from "../../../../../../Components/Common/Sidebar";
 import AddAttachment from "./AddAttachment";
+import { useParams } from "react-router-dom";
 
 const Chapter = ({
   title,
@@ -42,7 +43,7 @@ const Chapter = ({
   const [attachmentsExpanded, setAttachmentsExpanded] = useState(false);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [previewType, setPreviewType] = useState(null);
-
+  const { sid } = useParams();
   const { loading, error, success, deleteChapter } = useDeleteChapter();
   const { deleteAttachment, loading: attachmentDeleting } =
     useDeleteAttachment(fetchModules);
@@ -101,7 +102,7 @@ const Chapter = ({
     setAttachmentLoading((prev) => ({ ...prev, [attachmentUrl]: true }));
 
     try {
-      await deleteAttachment(moduleId, chapterId, attachmentUrl);
+      await deleteAttachment(chapterId, sid, attachmentUrl);
     } catch (error) {
       console.error("Error deleting attachment:", error);
     } finally {

@@ -9,46 +9,40 @@ const useGetRubricBySubjectId = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [rubrics, setRubrics] = useState([]);
-//   const dispatch = useDispatch();
+  //   const dispatch = useDispatch();
   const role = useSelector((store) => store.Auth.role);
-  
+
   const { sid } = useParams();
 
-  const fetchRubricBySubjectId = useCallback(
-    async () => {
-      setLoading(true);
-      setError(null);
+  const fetchRubricBySubjectId = useCallback(async () => {
+    setLoading(true);
+    setError(null);
 
-      try {
-        const token = localStorage.getItem(`${role}:token`);
+    try {
+      const token = localStorage.getItem(`${role}:token`);
 
-        const response = await axios.get(
-          `${baseUrl}/admin/rubric/subject/${sid}`,
-          {
-            headers: {
-              Authentication: token,
-            },
-          
-          }
-        );
-        
-        console.log(response.data);
-        if (response.data && response.data.success) {
-          setRubrics(response.data.rubrics);
-        //   dispatch(setRubrics(response.data.rubrics));
-        } else {
-          setError(response.data.message || "Failed to fetch rubrics.");
+      const response = await axios.get(
+        `${baseUrl}/admin/rubric/subject/${sid}`,
+        {
+          headers: {
+            Authentication: token,
+          },
         }
-      } catch (err) {
-        setError(
-          err.response?.data?.message || "Error in fetching rubrics"
-        );
-      } finally {
-        setLoading(false);
+      );
+
+      console.log(response.data);
+      if (response.data && response.data.success) {
+        setRubrics(response.data.rubrics);
+        //   dispatch(setRubrics(response.data.rubrics));
+      } else {
+        setError(response.data.message || "Failed to fetch rubrics.");
       }
-    },
-    [role, baseUrl, ]
-  );
+    } catch (err) {
+      setError(err.response?.data?.message || "Error in fetching rubrics");
+    } finally {
+      setLoading(false);
+    }
+  }, [role, baseUrl]);
 
   return { loading, error, rubrics, fetchRubricBySubjectId };
 };

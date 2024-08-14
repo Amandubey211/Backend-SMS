@@ -1,11 +1,13 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { HiOutlinePlus } from "react-icons/hi2";
+import { CiBoxList } from "react-icons/ci";
 import RubricModalRow from "./RubricModalRow";
 import toast from "react-hot-toast";
 import useGetFilteredAssignments from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useGetFilteredAssignments";
 import useGetFilteredQuizzes from "../../../../../../Hooks/AuthHooks/Staff/Admin/Quiz/useGetFilteredQuizzes";
-import useGetRubric from "../../../../../../Hooks/AuthHooks/Staff/Admin/Rubric/useGetRubric";
+import useGetRubricByAssignment from "../../../../../../Hooks/AuthHooks/Staff/Admin/Rubric/useGetRubricByAssignment";
 import { useParams } from "react-router-dom";
+import Spinner from "../../../../../../Components/Common/Spinner"; // Import your Spinner component
 
 const AddRubricModal = ({
   type, // Can be "assignment", "quiz", or undefined
@@ -36,7 +38,7 @@ const AddRubricModal = ({
   const { sid } = useParams();
   const { fetchFilteredAssignments, assignments } = useGetFilteredAssignments();
   const { fetchFilteredQuizzes, quizzes } = useGetFilteredQuizzes();
-  const { getRubric } = useGetRubric();
+  const { getRubric, loading } = useGetRubricByAssignment();
 
   useEffect(() => {
     fetchFilteredAssignments(sid);
@@ -174,24 +176,14 @@ const AddRubricModal = ({
 
     try {
       if (editMode) {
-        const result = await onSubmit(rubricData);
-        if (result.success) {
-          toast.success("Rubric updated successfully.");
-          onClose();
-        } else {
-          throw new Error(result.error || "Update operation failed");
-        }
+        await onSubmit(rubricData);
+        onClose();
       } else {
-        const result = await onSubmit(rubricData);
-        if (result.success) {
-          toast.success("Rubric created successfully.");
-          onClose();
-        } else {
-          throw new Error(result.error || "Create operation failed");
-        }
+        await onSubmit(rubricData);
+        onClose();
       }
     } catch (error) {
-      toast.error(error.message);
+      console.log(error, "in Rubric");
     }
   };
 
@@ -313,17 +305,31 @@ const AddRubricModal = ({
               </div>
             ))}
           </div>
-          {criteriaList?.map((item, index) => (
-            <RubricModalRow
-              key={index}
-              data={item}
-              criteriaIndex={index}
-              onDeleteCriteria={handleDeleteCriteria}
-              onAddRating={handleAddRating}
-              onEditCriteria={onEditCriteria}
-            />
-          ))}
+          {loading ? (
+            <div className="flex justify-center items-center h-full">
+              <Spinner />
+            </div>
+          ) : criteriaList.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-full text-center">
+              <CiBoxList className="text-6xl text-gray-300" />
+              <p className="mt-4 text-sm text-gray-600">
+                No criteria added yet
+              </p>
+            </div>
+          ) : (
+            criteriaList.map((item, index) => (
+              <RubricModalRow
+                key={index}
+                data={item}
+                criteriaIndex={index}
+                onDeleteCriteria={handleDeleteCriteria}
+                onAddRating={handleAddRating}
+                onEditCriteria={onEditCriteria}
+              />
+            ))
+          )}
         </div>
+
         <div className="flex justify-between items-center p-4 border-t">
           <button
             onClick={onAddCriteria}
@@ -338,6 +344,7 @@ const AddRubricModal = ({
             Total Points: {selectedAssignmentPoints}
           </div>
         </div>
+
         <div className="flex justify-end gap-3 items-center p-2 mb-2">
           <button
             onClick={onClose}
