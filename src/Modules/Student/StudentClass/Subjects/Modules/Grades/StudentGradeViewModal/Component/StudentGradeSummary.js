@@ -11,9 +11,15 @@ const StudentGradeSummary = ({ studentGrade }) => {
     groupQuiz,
     attendance,
     totalScore,
+    totalGroupAssignmentScore,
+    totalGroupQuizScore,
+    totalQuizCompletedScore,
+    total
+
   } = studentGrade;
 
   return (
+
     // <div className="flex-none w-1/4 border-l flex flex-col   items-center">
       // <div className="text-center border-b p-4">
       //   <img
@@ -76,23 +82,23 @@ const StudentGradeSummary = ({ studentGrade }) => {
         <div className="flex justify-between mb-2">
           <p className="text-sm">Assignment</p>
           {/* <p className="text-sm">{assignment} / 1000</p> */}
-          <p className="text-sm">720 / 1000</p>
+          <p className="text-sm">{totalScore} /{assignment} </p>
         </div>
         <div className="flex justify-between mb-2">
           <p className="text-sm">Group Assignment</p>
-          <p className="text-sm">{groupAssignment || "0"} / 500</p>
+          <p className="text-sm">{groupAssignment} /{totalGroupAssignmentScore} </p>
         </div>
         <div className="flex justify-between mb-2">
           <p className="text-sm">Quiz</p>
-          <p className="text-sm">{quiz || "0"} / 250</p>
+          <p className="text-sm">{totalQuizCompletedScore } /{quiz}</p>
         </div>
         <div className="flex justify-between mb-2">
           <p className="text-sm">Group Quiz</p>
-          <p className="text-sm">{groupQuiz || "0"} / 330</p>
+          <p className="text-sm">{groupQuiz } /{totalGroupQuizScore} </p>
         </div>
         <div className="flex justify-between mb-2">
           <p className="text-sm">Attendance</p>
-          <p className="text-sm">{attendance} / 135 DAY</p>
+          <p className="text-sm">{attendance} </p>
         </div>
       </div>
       </div>
@@ -100,7 +106,7 @@ const StudentGradeSummary = ({ studentGrade }) => {
       <div className="border-t mt-4 flex p-3 justify-between px-4 gap-1">
         <p className="text-lg font-semibold">Total Score:</p>
         <p className="text-pink-500 text-xl font-semibold">
-          {totalScore || "1480.00"}
+          {total }
         </p>
       </div>
       </div>

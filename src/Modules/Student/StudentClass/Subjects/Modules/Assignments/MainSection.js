@@ -423,6 +423,7 @@ const MainSection = () => {
   };
 
   if (loading) {
+    
     return <Spinner />;
   }
 
