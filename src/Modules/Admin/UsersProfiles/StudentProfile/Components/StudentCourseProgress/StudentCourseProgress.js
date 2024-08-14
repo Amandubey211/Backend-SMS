@@ -8,6 +8,7 @@ import { useParams } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import SubjectCard from './allSubjects/SubjectCard'
 import { FiLoader } from 'react-icons/fi'
+import { GoAlertFill } from 'react-icons/go'
 const StudentCourseProgress = ({student}) => {
   const [studentSubjects,setStudentSubjects] = useState([]);
   const [selectedSubjectId,setSelectedSubjectId] = useState();
@@ -46,11 +47,16 @@ const StudentCourseProgress = ({student}) => {
     <div className='py-2 max-w-[68vw]'>
     <div className='pb-2'>
       <div className='flex flex-row gap-2 p-4  overflow-x-auto max-w-full '>
-        {studentSubjects.map((subject, index) => (
+        {studentSubjects.length > 0?
+        studentSubjects.map((subject, index) => (
           <div key={index} className='min-w-max' onClick={()=>setSelectedSubjectId(subject._id)}>
             <SubjectCard subject={subject} i={index} />
           </div>
-        ))}
+        )):<div className="flex w-full h-full text-gray-500  items-center justify-center flex-col text-xl">
+        <GoAlertFill className="text-[3rem]" />
+        No  Data Found
+        </div>
+      }
       </div>
     </div>
     <div className='border-t-2'>

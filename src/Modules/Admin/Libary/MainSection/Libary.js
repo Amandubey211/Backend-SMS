@@ -11,16 +11,22 @@ import TabButton from "../Subclasss/component/TabButton";
 import { baseUrl } from "../../../../config/Common";
 import { useSelector } from "react-redux";
 import DeleteConfirmatiomModal from "../../../../Components/Common/DeleteConfirmationModal";
+import { fi } from "date-fns/locale";
+import { GoAlertFill } from "react-icons/go";
+import { FiLoader } from "react-icons/fi";
 
 const Library = () => {
   const [filters, setFilters] = useState({ class: "", category: "" });
+  const [loading,setLoading] = useState(false)
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("Library");
   const [books, setBooks] = useState([]);
   const role = useSelector((store) => store.Auth.role);
   const token = localStorage.getItem(`${role}:token`);
   const fetchBooks = async () => {
+    
     try {
+      setLoading(true)
       const response = await axios.get(`${baseUrl}/admin/all/book`, {
         headers: {
           Authentication: `${token}`,
@@ -29,8 +35,10 @@ const Library = () => {
       if (response.data.success) {
         setBooks(response.data.books);
       }
+      setLoading(false)
     } catch (error) {
       console.error("Error fetching books:", error);
+      setLoading(false)
     }
   };
   useEffect(() => {
@@ -66,6 +74,10 @@ const Library = () => {
   return (
     <Layout title="Library | Student Diwan">
       <DashLayout>
+        {loading?<div className="flex w-full h-[90vh] flex-col items-center justify-center">
+    <FiLoader className="animate-spin mr-2 w-[3rem] h-[3rem] " />
+    <p className="text-gray-800 text-lg">Loading...</p>
+    </div>:
         <div className="min-h-screen p-4 bg-gray-50">
           <div className="flex flex-col items-start mb-4 gap-5">
             <div className="flex gap-7">
@@ -114,7 +126,9 @@ const Library = () => {
                 </button>
               </div>
               <div className="grid grid-cols-3 gap-4 p-4">
-                {filteredBooks.map((book) => (
+                {
+                  filteredBooks.length > 0 ?
+                filteredBooks.map((book) => (
                   <BookCard
                     key={book._id}
                     id={book._id}
@@ -127,7 +141,12 @@ const Library = () => {
                     coverImageUrl={book.image}
                     onupdate = {fetchBooks}
                   />
-                ))}
+                )):
+                <div className="flex w-[80vw] h-[80vh] text-gray-500  items-center justify-center flex-col text-2xl">
+        <GoAlertFill className="text-[5rem]" />
+        No  Data Found
+        </div>
+              }
               </div>
             </>
           )}
@@ -140,7 +159,7 @@ const Library = () => {
             <AddBook onupdate={fetchBooks} />
           </Sidebar>
     
-        </div>
+        </div>}
       </DashLayout>
     </Layout>
   );

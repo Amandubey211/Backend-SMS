@@ -10,9 +10,12 @@ import { baseUrl } from "../../../../config/Common";
 import { useSelector } from "react-redux";
 import { MdCancel } from "react-icons/md";
 import { HiDotsVertical } from "react-icons/hi";
+import { FiLoader } from "react-icons/fi";
+import { GoAlertFill } from "react-icons/go";
 
 const BookIssue = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
+  const [loading,setLoading] = useState(false);
   const [showEditMenu, setShowEditMenu] = useState({show:false,index:0});
   const [filters, setFilters] = useState({
     classLevel: "",
@@ -27,15 +30,18 @@ const BookIssue = () => {
       Authentication: `${token}`,
     };
   };
-  const get_issue_books = ()=>{
-    axios.get(`${baseUrl}/admin/all/bookIssue`, { headers: getAuthHeaders() })
-    .then(response => {
+  const get_issue_books = async()=>{
+    try{
+      setLoading(true)
+   const response = await  axios.get(`${baseUrl}/admin/all/bookIssue`, { headers: getAuthHeaders() })
       if (response.data.success) {
         setData(response.data.books);
-        console.log(response.data.books);
+        setLoading(false)
       }
-    })
-    .catch(error => console.error('Error fetching data:', error));
+    }catch(error){
+      console.log('Error fetching data:', error)
+    setLoading(false)
+  }
   }
 
   useEffect(() => {
@@ -86,6 +92,11 @@ const DeleteBook=(id)=>{
 
 }
   return (
+    <>
+    {loading?<div className="flex w-full h-[90vh] flex-col items-center justify-center">
+      <FiLoader className="animate-spin mr-2 w-[3rem] h-[3rem] " />
+      <p className="text-gray-800 text-lg">Loading...</p>
+      </div>:
     <div className="min-h-screen p-4 bg-gray-50">
       <div className="flex justify-between items-center mb-4">
         <div className="flex space-x-4">
@@ -128,7 +139,8 @@ const DeleteBook=(id)=>{
             </tr>
           </thead>
           <tbody>
-            {filteredData.map((item,index) => (
+            {filteredData.length > 0 ?
+            filteredData.map((item,index) => (
               <tr key={item._id} className="hover:bg-gray-50 relative">
                 <td className="px-6 py-4 border-b border-gray-200">{item.studentId?.firstName}</td>
                 <td className="px-6 py-4 border-b border-gray-200">{item.classId?.className} & {item.sectionId?.sectionName}</td>
@@ -161,7 +173,18 @@ const DeleteBook=(id)=>{
         }
                 </td>
               </tr>
-            ))}
+            )):
+            <tr>
+
+                  <td className="   text-center text-2xl py-10 text-gray-400" colSpan={6} >
+                   <div className="flex  items-center justify-center flex-col text-2xl">
+                     <GoAlertFill className="text-[5rem]" />
+                    No  Data Found
+                   </div>
+                  
+                  </td>
+                </tr>
+            }
           </tbody>
         </table>
       </div>
@@ -173,7 +196,7 @@ const DeleteBook=(id)=>{
       >
         <AddIssue onClose={handleSidebarClose} onAddSuccess={handleAddSuccess} editIssueData={editIssueData}  onupdate={get_issue_books} />
       </Sidebar>
-    </div>
+    </div>}</>
   );
 };
 

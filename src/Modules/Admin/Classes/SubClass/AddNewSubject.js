@@ -70,14 +70,15 @@ const AddNewSubject = ({ onClose, subject }) => {
       toast.error("Subject name is required.");
       return false;
     }
-    if (!activeIconId) {
-      toast.error("Subject icon is required.");
-      return false;
-    }
-    if (!selectedColor) {
-      toast.error("Subject color is required.");
-      return false;
-    }
+    // curently not required but dont remove it might required in the text phase
+    // if (!activeIconId) {
+    //   toast.error("Subject icon is required.");
+    //   return false;
+    // }
+    // if (!selectedColor) {
+    //   toast.error("Subject color is required.");
+    //   return false;
+    // }
     return true;
   }, [subjectTitle, activeIconId, selectedColor]);
 

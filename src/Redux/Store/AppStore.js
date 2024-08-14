@@ -36,6 +36,7 @@ const commonPersistConfig = {
     "selectedSubject",
     "selectedAssignmentName",
     "studentId",
+    "selectedModule",
   ], // Persist NavbarData and selectedClassName
 };
 

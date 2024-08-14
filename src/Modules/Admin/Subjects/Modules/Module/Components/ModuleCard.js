@@ -45,7 +45,6 @@ const ModuleCard = ({
 
   const handleDelete = async () => {
     await deleteModule(moduleId);
-
     onDelete();
     setIsDeleteModalOpen(false); // Close the modal on successful deletion
     fetchModules(); // Refetch modules after deletion

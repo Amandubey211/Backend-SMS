@@ -8,6 +8,8 @@ import ProfileCard from "../SubComponents/ProfileCard";
 import useGetAllStaff from "../../../../Hooks/AuthHooks/Staff/Admin/staff/useGetAllStaff";
 import { useSelector } from "react-redux";
 import AddUser from "./AddUser";
+import { FiLoader } from "react-icons/fi";
+import { GoAlertFill } from "react-icons/go";
 
 const AllStaff = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -15,7 +17,7 @@ const AllStaff = () => {
   const [selectedStaff, setSelectedStaff] = useState(null);
   const [staffData, setStaffData] = useState(null);
   const staff = useSelector((store) => store.Staff.allStaff);
-  const { fetchStaff } = useGetAllStaff();
+  const { fetchStaff,loading } = useGetAllStaff();
 
   useEffect(() => {
     fetchStaff();
@@ -61,6 +63,10 @@ const AllStaff = () => {
   return (
     <Layout title="All Staff">
       <DashLayout>
+      {loading?  <div className="flex w-full h-[90vh] flex-col items-center justify-center">
+    <FiLoader className="animate-spin mr-2 w-[3rem] h-[3rem] " />
+    <p className="text-gray-800 text-lg">Loading...</p>
+    </div>:
         <div className="p-4">
           <div className="flex justify-between items-center mb-4  border-b-2 h-20">
             <h2 className="text-xl font-semibold">All Staff <span className="bg-purple-400 px-2 text-sm py-1 rounded-full  ">{staff?.length}</span></h2>
@@ -72,14 +78,20 @@ const AllStaff = () => {
             </button>
           </div>
           <div className="flex flex-wrap -mx-2">
-            {staff.map((profile, index) => (
+            {staff.length >0 ?
+            staff.map((profile, index) => (
               <ProfileCard
                 key={index}
                 profile={profile}
                 onClick={handleStaffClick}
                 editUser={editUser}
               />
-            ))}
+            )):  <div>
+            <div className="flex w-[80vw] text-gray-500 h-[90vh] items-center justify-center flex-col text-2xl">
+    <GoAlertFill className="text-[5rem]" />
+   No  Data Found
+  </div>
+        </div>}
           </div>
           <SidebarSlide
             key={sidebarContent} // Use the key to force re-render
@@ -95,7 +107,7 @@ const AllStaff = () => {
           >
             {renderSidebarContent()}
           </SidebarSlide>
-        </div>
+        </div>}
       </DashLayout>
     </Layout>
   );

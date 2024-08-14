@@ -14,7 +14,7 @@ const useUploadChapterFiles = (fetchModules) => {
   const { sid } = useParams(); // Assuming subjectId (sid) is in the URL params
 
   const uploadChapterFiles = useCallback(
-    async (chapterId, documents, documentLabels) => {
+    async (chapterId, documents, documentLabels = []) => {
       setLoading(true);
       setError(null);
       setSuccess(null);
@@ -57,7 +57,7 @@ const useUploadChapterFiles = (fetchModules) => {
         setLoading(false);
       }
     },
-    [role, baseUrl, sid, fetchModules]
+    [role, sid, fetchModules]
   );
 
   return { loading, error, success, uploadChapterFiles };
