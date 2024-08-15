@@ -1,5 +1,3 @@
-
-
 import React, { useState } from "react";
 import CommentsHeader from "./CommentsHeader";
 import CommentSection from "./CommentSection";
@@ -17,8 +15,6 @@ import { useEditComment } from "../../../../../../../../Hooks/AuthHooks/Student/
 import { useEditReply } from "../../../../../../../../Hooks/AuthHooks/Student/Announcement/Message/useEditReply";
 import { useToggleLikeMessage } from "../../../../../../../../Hooks/AuthHooks/Student/Announcement/Message/useToggleLikeMessage";
 
-
-
 const AnnouncementMessage = ({ announcement }) => {
   const { _id } = useParams();
   const [comments, setComments] = useState([]);
@@ -26,10 +22,8 @@ const AnnouncementMessage = ({ announcement }) => {
   const [activeReplyId, setActiveReplyId] = useState(null);
   const [activeReplyParentId, setActiveReplyParentId] = useState(null);
 
-  const { loading, error, studentId } = useFetchCommentsByAnnouncement(
-    announcement._id,
-    setComments
-  );
+  const { loading, error, studentId, fetchComments } =
+    useFetchCommentsByAnnouncement(announcement._id, setComments);
   const { addComment } = useAddComment(announcement._id, comments, setComments);
   const { addNestedReply } = useAddReply(
     announcement._id,
@@ -46,6 +40,10 @@ const AnnouncementMessage = ({ announcement }) => {
 
   const handleSearch = (query) => {
     setSearchQuery(query);
+  };
+
+  const handleRefresh = () => {
+    fetchComments();
   };
 
   const filterCommentsRecursively = (comments, query) => {
@@ -80,7 +78,10 @@ const AnnouncementMessage = ({ announcement }) => {
       ) : (
         <>
           <div className="flex-none h-[10%]">
-            <CommentsHeader handleSearch={handleSearch} />
+            <CommentsHeader
+              handleSearch={handleSearch}
+              handleRefresh={handleRefresh}
+            />
           </div>
           <div className="h-[70%] overflow-y-scroll no-scrollbar px-6">
             <CommentSection

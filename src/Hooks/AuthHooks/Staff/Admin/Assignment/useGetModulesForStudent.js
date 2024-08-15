@@ -82,7 +82,8 @@ const useGetModulesForStudent = () => {
     } finally {
       setLoading(false);
     }
-  }, [role, dispatch, cid, sid, selectedModule]); // Include selectedModule as a dependency
+  // }, [role, dispatch, cid, sid, selectedModule]); // Include selectedModule as a dependency
+  }, [role, dispatch, cid, sid]); // Include selectedModule as a dependency
 
   return { loading, error, modulesData, fetchModules };
 };

@@ -20,7 +20,7 @@ const Tabs = ({ quiz,children, activeTab, setActiveTab, onTabChange, createPage,
               <span className="text-green-600 font-medium mr-2">{quizType}</span>
               <span className="mx-2">|</span>
               <FaCalendarAlt className="w-4 h-4 mr-2" />
-              <span className="text-sm">Available From: {availableFrom}</span>
+              <span className="text-sm">Available From: {availableFrom.slice(0,10)}</span>
             </div>
           </div>
         )}

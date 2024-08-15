@@ -1,5 +1,3 @@
-
-
 import React, { useState } from "react";
 import CommentSection from "./CommentSection";
 import CommentsHeader from "./Components/CommentsHeader";
@@ -17,8 +15,6 @@ import { useEditComment } from "../../../../../../../Hooks/AuthHooks/Student/Dis
 import { useEditReply } from "../../../../../../../Hooks/AuthHooks/Student/Discussion/Message/useEditReply";
 import { useToggleLikeMessage } from "../../../../../../../Hooks/AuthHooks/Student/Discussion/Message/useToggleLikeMessage";
 
-
-
 const DiscussionMessage = ({ discussion }) => {
   const { _id } = useParams();
   const [comments, setComments] = useState([]);
@@ -26,10 +22,8 @@ const DiscussionMessage = ({ discussion }) => {
   const [activeReplyId, setActiveReplyId] = useState(null);
   const [activeReplyParentId, setActiveReplyParentId] = useState(null);
 
-  const { loading, error, studentId } = useFetchCommentsByDiscussion(
-    discussion._id,
-    setComments
-  );
+  const { loading, error, studentId, fetchComments } =
+    useFetchCommentsByDiscussion(discussion._id, setComments);
   const { addComment } = useAddComment(discussion._id, comments, setComments);
   const { addNestedReply } = useAddReply(
     discussion._id,
@@ -46,6 +40,10 @@ const DiscussionMessage = ({ discussion }) => {
 
   const handleSearch = (query) => {
     setSearchQuery(query);
+  };
+
+  const handleRefresh = () => {
+    fetchComments();
   };
 
   const filterCommentsRecursively = (comments, query) => {
@@ -80,7 +78,10 @@ const DiscussionMessage = ({ discussion }) => {
       ) : (
         <>
           <div className="flex-none h-[10%]">
-            <CommentsHeader handleSearch={handleSearch} />
+            <CommentsHeader
+              handleSearch={handleSearch}
+              handleRefresh={handleRefresh}
+            />
           </div>
           <div className="h-[70%] overflow-y-scroll no-scrollbar px-6">
             <CommentSection
