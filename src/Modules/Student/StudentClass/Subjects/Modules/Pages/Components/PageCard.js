@@ -23,6 +23,11 @@ const PageCard = ({ title, authorName, publishDate, updateDate, id, readOnly }) 
               src="https://avatars.githubusercontent.com/u/109097090?v=4"
               alt={authorName}
             />
+            {/* <img
+              className="h-7 w-7 rounded-full"
+              src="https://avatars.githubusercontent.com/u/109097090?v=4"
+              alt={authorName}
+            /> */}
             <span className="ml-2 text-gray-700">{authorName}</span>
           </div>
         </div>

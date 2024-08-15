@@ -5,7 +5,7 @@ import DiscussionMessage from "../../DiscussionMessage/DiscussionMessage";
 import Sidebar from "../../../../../../../../Components/Common/Sidebar";
 import { ImSpinner3 } from 'react-icons/im';
 import { FaExclamationTriangle } from 'react-icons/fa';
-
+import { CiUser } from "react-icons/ci";
 const Header = ({ discussion }) => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
 console.log(
@@ -25,14 +25,23 @@ console.log(
   return (
     <div className="flex items-end justify-between p-2 px-4 border-b">
       <div className="flex items-center">
-        <img
+      {discussion?.authorProfile ? (
+          <img
+            src={discussion.authorProfile}
+            alt="Profile"
+            className="w-10 h-10 rounded-full"
+          />
+        ) : (
+          <CiUser className="w-10 h-10 rounded-full text-gray-500" />
+        )}
+        {/* <img
           src={
             discussion?.authorProfile ||
             "https://avatars.githubusercontent.com/u/109097090?v=4"
           }
           alt="Profile"
           className="w-10 h-10 rounded-full"
-        />
+        /> */}
         <div className="ml-3">
           <h1 className="text-lg font-semibold">
             {discussion?.title || "Discussion Title"}
