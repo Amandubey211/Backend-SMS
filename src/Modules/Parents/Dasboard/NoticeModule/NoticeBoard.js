@@ -6,6 +6,7 @@ import { message } from "antd";
 import { format } from 'date-fns'; // Import format function from date-fns
 import { baseUrl } from "../../../../config/Common";
 import { FaBell } from "react-icons/fa"; // Importing an icon for the no notices message
+import Spinner from "../../../../Components/Common/Spinner"; // Import Spinner
 
 // Define the gradient backgrounds
 const gradientBackgrounds = [
@@ -17,7 +18,7 @@ const gradientBackgrounds = [
 
 const NoticeBoard = ({ numberOfChildren }) => {
   const [notices, setNotices] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true); // Loading state
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -68,11 +69,11 @@ const NoticeBoard = ({ numberOfChildren }) => {
         console.log("Sorted and Filtered Notices:", latestNotices);
 
         setNotices(latestNotices);
-        setLoading(false);
+        setLoading(false); // Set loading to false after data is fetched
       } catch (error) {
         console.error("Failed to fetch notices:", error);
         message.error("Failed to fetch notices");
-        setLoading(false);
+        setLoading(false); // Set loading to false even on error
       }
     };
 
@@ -80,7 +81,7 @@ const NoticeBoard = ({ numberOfChildren }) => {
   }, [numberOfChildren]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <Spinner />; // Show spinner while loading
   }
 
   const truncateText = (text, maxLength) => {

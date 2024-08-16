@@ -7,6 +7,7 @@ import { IoCalendarOutline } from "react-icons/io5";
 
 import announcementIcon from "../../../../Assets/DashboardAssets/Images/image1.png";
 import toast from "react-hot-toast";
+import Spinner from "../../../../Components/Common/Spinner"; // Import Spinner
 import { baseUrl } from "../../../../config/Common.js";
 
 const AllNotice = () => {
@@ -14,6 +15,7 @@ const AllNotice = () => {
   const [activeIndex, setActiveIndex] = useState(null);
   const [notices, setNotices] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const backgroundColors = [
     'bg-blue-300',
@@ -21,7 +23,6 @@ const AllNotice = () => {
     'bg-yellow-300',
     'bg-pink-300',
     'bg-purple-300',
-    // Add more colors as needed
   ];
 
   useEffect(() => {
@@ -34,9 +35,10 @@ const AllNotice = () => {
           },
         });
         setNotices(response.data.notices);
-        setLoading(false);
       } catch (error) {
+        setError("Failed to fetch notices");
         toast.error("Failed to fetch notices");
+      } finally {
         setLoading(false);
       }
     };
@@ -51,10 +53,6 @@ const AllNotice = () => {
   const toggleAccordion = (index) => {
     setActiveIndex(activeIndex === index ? null : index);
   };
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
 
   const formatDate = (isoDate) => {
     const date = new Date(isoDate);
@@ -91,7 +89,16 @@ const AllNotice = () => {
             </div>
 
             <div className="mt-5 rounded-lg overflow-auto">
-              {filteredNotices.length > 0 ? (
+              {loading ? (
+                <div className="flex justify-center items-center h-full">
+                  <Spinner />
+                </div>
+              ) : error ? (
+                <div className="flex flex-col items-center justify-center h-full text-center">
+                  <IoCalendarOutline style={{ width: '30px', height: '30px', marginBottom: '10px' }} />
+                  <p className="text-gray-600 text-lg">Failed to fetch notices.</p>
+                </div>
+              ) : filteredNotices.length > 0 ? (
                 filteredNotices.map((notice, index) => (
                   <div key={notice.id} className="border">
                     <div
@@ -112,8 +119,7 @@ const AllNotice = () => {
                           </h2>
                           <div className="flex flex-row gap-[50px] text-xs">
                             <div className="flex flex-wrap justify-center items-center">
-                            <IoCalendarOutline style={{ width: '20px', height: '20px' }} />
-
+                              <IoCalendarOutline style={{ width: '20px', height: '20px' }} />
                               <span className="text-sm p-1 font-[400] text-[#7F7F7F]">
                                 {formatDate(notice.startDate)}
                               </span>
@@ -149,9 +155,8 @@ const AllNotice = () => {
                 ))
               ) : (
                 <div className="flex flex-col items-center justify-center h-full">
-                  <IoCalendarOutline style={{ width: '20px', height: '20px' }} />
-
-                  <p className="text-gray-500">No Notices are available.</p>
+                  <IoCalendarOutline style={{ width: '30px', height: '30px', marginBottom: '10px' }} />
+                  <p className="text-gray-600 text-lg">No Notices are available.</p>
                 </div>
               )}
             </div>

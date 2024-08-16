@@ -6,13 +6,15 @@ import { baseUrl } from '../../../config/Common';
 import presentIcon from '../../../Assets/ParentAssets/svg/present.svg';
 import absentIcon from '../../../Assets/ParentAssets/svg/absent.svg';
 import leaveIcon from '../../../Assets/ParentAssets/svg/leave.png';
-import './ChildrenAttendance.css'; 
+import { FaExclamationTriangle } from 'react-icons/fa'; // Importing an icon for error display
+import './ChildrenAttendance.css';
 
 const Calendar = () => {
   const [attendanceData, setAttendanceData] = useState([]);
   const [month, setMonth] = useState(new Date().getMonth() + 1);
   const [year, setYear] = useState(new Date().getFullYear());
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const fetchAttendanceData = async (selectedMonth, selectedYear) => {
     console.log('Fetching attendance data...', { selectedMonth, selectedYear });
@@ -22,6 +24,7 @@ const Calendar = () => {
 
     if (!studentId || !selectedMonth || !selectedYear) {
       console.error('Student ID, month, and year are required');
+      setError('Student ID, month, and year are required');
       setLoading(false);
       return;
     }
@@ -34,11 +37,13 @@ const Calendar = () => {
 
       if (response.data && response.data.report && response.data.report.report) {
         setAttendanceData(response.data.report.report);
+        setError(null);
       } else {
         throw new Error('No attendance data available');
       }
     } catch (error) {
       console.error('Error fetching attendance data:', error.message);
+      setError('Unable to fetch attendance');
     } finally {
       setLoading(false);
     }
@@ -57,13 +62,22 @@ const Calendar = () => {
   return (
     <div className="calendar-container">
       <Spin spinning={loading} size="large" tip="Loading...">
-        <div className="attendance-card-wrapper">
-          <AttendanceCard attendanceData={attendanceData} />
-        </div>
-        <AntdCalendar 
-          onPanelChange={handlePanelChange}
-          dateCellRender={(value) => dateCellRender(value, attendanceData)}
-        />
+        {error ? (
+          <div className="flex flex-col items-center justify-center h-full text-center">
+            <FaExclamationTriangle className="text-6xl text-gray-400 mb-4" />
+            <p className="text-gray-500">{error}</p>
+          </div>
+        ) : (
+          <>
+            <div className="attendance-card-wrapper">
+              <AttendanceCard attendanceData={attendanceData} />
+            </div>
+            <AntdCalendar 
+              onPanelChange={handlePanelChange}
+              dateCellRender={(value) => dateCellRender(value, attendanceData)}
+            />
+          </>
+        )}
       </Spin>
     </div>
   );
