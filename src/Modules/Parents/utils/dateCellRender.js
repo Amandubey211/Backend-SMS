@@ -1,5 +1,4 @@
 import React from 'react';
-import { Badge } from 'antd';
 import presentIcon from '../../../Assets/ParentAssets/svg/present.svg';
 import absentIcon from '../../../Assets/ParentAssets/svg/absent.svg';
 import leaveIcon from '../../../Assets/ParentAssets/svg/leave.png';

@@ -1,63 +1,24 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Select } from 'antd';
+import { Card } from 'antd';
 import { CheckCircleOutlined, CloseCircleOutlined, ClockCircleOutlined } from '@ant-design/icons';
-import axios from 'axios';
-import { baseUrl } from '../../../config/Common';
 
-const { Option } = Select;
-
-const AttendanceCard = () => {
-  const currentDate = new Date();
-  const [month, setMonth] = useState(currentDate.getMonth() + 1);
-  const [year, setYear] = useState(currentDate.getFullYear());
+const AttendanceCard = ({ attendanceData }) => {
   const [summary, setSummary] = useState({ presentCount: 0, absentCount: 0, leaveCount: 0 });
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  const fetchAttendanceSummary = async (selectedMonth, selectedYear) => {
-    const token = localStorage.getItem('parent:token');
-    const childrenData = JSON.parse(localStorage.getItem('childrenData'));
-    const studentId = childrenData && childrenData[0] ? childrenData[0].id : null;
-
-    if (!studentId || !selectedMonth || !selectedYear) {
-      setError('Student ID, month, and year are required');
-      setLoading(false);
-      return;
-    }
-
-    try {
-      const response = await axios.get(`${baseUrl}/api/studentDashboard/myAttendance`, {
-        headers: { Authentication: `${token}` },
-        params: { studentId, month: selectedMonth, year: selectedYear }
-      });
-
-      if (response.data && response.data.report && response.data.report.summary) {
-        setSummary(response.data.report.summary);
-      } else {
-        throw new Error('No report summary available');
-      }
-    } catch (error) {
-      setError('🚨 Error fetching attendance summary: Please try again later. 🚨');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   useEffect(() => {
-    fetchAttendanceSummary(month, year);
-  }, [month, year]);
+    if (attendanceData && attendanceData.length > 0) {
+      const presentCount = attendanceData.filter(item => item.status === 'present').length;
+      const absentCount = attendanceData.filter(item => item.status === 'absent').length;
+      const leaveCount = attendanceData.filter(item => item.status === 'leave').length;
 
-  const handleMonthChange = (newMonth) => {
-    setMonth(parseInt(newMonth));
-    setLoading(true);
-    fetchAttendanceSummary(parseInt(newMonth), year);
-  };
-
-  const handleYearChange = (newYear) => {
-    setYear(parseInt(newYear));
-    setLoading(true);
-    fetchAttendanceSummary(month, parseInt(newYear));
-  };
+      setSummary({ presentCount, absentCount, leaveCount });
+      setLoading(false);  // Loading is complete after processing data
+    } else {
+      setSummary({ presentCount: 0, absentCount: 0, leaveCount: 0 });
+      setLoading(false);  // Even if no data, we stop loading
+    }
+  }, [attendanceData]);
 
   const summaryData = [
     { title: 'Present', value: summary.presentCount, icon: 'present', color: 'bg-green-100' },
@@ -69,14 +30,6 @@ const AttendanceCard = () => {
     return <div className="text-center text-xl p-4">Loading...</div>;
   }
 
-  if (error) {
-    return (
-      <div className="text-red-600 text-center font-bold text-xl p-4">
-        {error}
-      </div>
-    );
-  }
-
   return (
     <div className="flex flex-col items-center">
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 mt-10 justify-between">
@@ -84,7 +37,6 @@ const AttendanceCard = () => {
           <CardComponent key={index} data={item} />
         ))}
       </div>
-      
     </div>
   );
 };
@@ -95,6 +47,8 @@ const CardComponent = ({ data }) => {
     absent: <CloseCircleOutlined className="text-2xl" />,
     leave: <ClockCircleOutlined className="text-2xl" />
   };
+
+  console.log(`Rendering CardComponent for: ${data.title} with value: ${data.value}`);
 
   return (
     <Card className={`h-[95px] w-[200px] ${data.color} rounded-lg shadow-md flex flex-col items-center justify-center`}>
