@@ -34,7 +34,10 @@ const MainSection = ({ setIsEditing }) => {
   const [isEditing, setLocalIsEditing] = useState(false);
   const [assignmentId, setAssignmentId] = useState("");
   const [criteriaList, setCriteriaList] = useState([]);
-  const [existingRubricId, setExistingRubricId] = useState(null); // Initialize here
+  const [existingRubricId, setExistingRubricId] = useState(null);
+
+  const [saveLoading, setSaveLoading] = useState(false);
+  const [publishLoading, setPublishLoading] = useState(false);
 
   const { createAssignment, loading: createLoading } = useCreateAssignment();
   const { updateAssignment, loading: updateLoading } = useUpdateAssignment();
@@ -47,8 +50,8 @@ const MainSection = ({ setIsEditing }) => {
       const assignment = location.state.assignment;
       setAssignmentName(assignment.name || "");
       setEditorContent(assignment.content || "");
-      setLocalIsEditing(true); // Set the local isEditing state
-      setIsEditing(true); // Inform the parent component that we're editing
+      setLocalIsEditing(true);
+      setIsEditing(true);
       setAssignmentId(assignment._id);
       setFormState({
         points: assignment.points || "",
@@ -66,10 +69,10 @@ const MainSection = ({ setIsEditing }) => {
         chapterId: assignment.chapterId || null,
         groupId: assignment?.groupId || null,
       });
-      setExistingRubricId(assignment.rubricId || null); // Set the existing rubric ID if present
+      setExistingRubricId(assignment.rubricId || null);
     } else {
-      setLocalIsEditing(false); // Set the local isEditing state
-      setIsEditing(false); // Inform the parent component that we're creating
+      setLocalIsEditing(false);
+      setIsEditing(false);
     }
   }, [location.state, setIsEditing]);
 
@@ -78,7 +81,6 @@ const MainSection = ({ setIsEditing }) => {
 
   const handleFormChange = (e) => {
     const { name, value } = e.target;
-
     setFormState((prev) => ({
       ...prev,
       [name]: value,
@@ -86,48 +88,63 @@ const MainSection = ({ setIsEditing }) => {
   };
 
   const handleSave = async (publish) => {
-    // Adjust allowedAttempts and numberOfAttempts based on the select option
-    const allowedAttempts = formState.allowedAttempts === true;
-    let allowNumberOfAttempts = null;
+    try {
+      if (publish) {
+        setPublishLoading(true);
+      } else {
+        setSaveLoading(true);
+      }
 
-    if (allowedAttempts) {
-      allowNumberOfAttempts = formState.numberOfAttempts
-        ? Number(formState.numberOfAttempts)
-        : null;
-    }
+      const allowedAttempts = formState.allowedAttempts === true;
+      let allowNumberOfAttempts = null;
 
-    const assignmentData = {
-      name: assignmentName,
-      content: editorContent,
-      points: formState.points,
-      grade: formState.displayGrade,
-      submissionType: formState.submissionType,
-      allowedAttempts, // boolean value
-      allowNumberOfAttempts, // either null or number
-      assignTo: formState.assignTo,
-      dueDate: formState.dueDate,
-      availableFrom: formState.availableFrom,
-      until: formState.until,
-      thumbnail: formState.thumbnail,
-      classId: cid,
-      subjectId: sid,
-      moduleId: formState.moduleId,
-      chapterId: formState.chapterId,
-      publish,
-    };
+      if (allowedAttempts) {
+        allowNumberOfAttempts = formState.numberOfAttempts
+          ? Number(formState.numberOfAttempts)
+          : null;
+      }
 
-    if (formState.assignTo === "Section") {
-      assignmentData.sectionId = formState.sectionId || null;
-    } else if (formState.assignTo === "Group") {
-      assignmentData.groupId = formState.groupId || null;
-    }
+      const assignmentData = {
+        name: assignmentName,
+        content: editorContent,
+        points: formState.points,
+        grade: formState.displayGrade,
+        submissionType: formState.submissionType,
+        allowedAttempts,
+        allowNumberOfAttempts,
+        assignTo: formState?.assignTo,
+        dueDate: formState.dueDate,
+        availableFrom: formState.availableFrom,
+        until: formState.until,
+        thumbnail: formState.thumbnail,
+        classId: cid,
+        subjectId: sid,
+        moduleId: formState.moduleId,
+        chapterId: formState.chapterId,
+        publish,
+      };
 
-    if (isEditing) {
-      let sectionId = formState.sectionId || null;
-      await updateAssignment(assignmentId, assignmentData, sectionId);
-    } else {
-      const response = await createAssignment(assignmentData);
-      setAssignmentId(response.data._id); // Set assignment ID after creation
+      if (formState.assignTo === "Section") {
+        assignmentData.sectionId = formState.sectionId || null;
+      } else if (formState.assignTo === "Group") {
+        assignmentData.groupId = formState.groupId || null;
+      }
+
+      if (isEditing) {
+        let sectionId = formState.sectionId || null;
+        await updateAssignment(assignmentId, assignmentData, sectionId);
+      } else {
+        const response = await createAssignment(assignmentData);
+        setAssignmentId(response?.data?._id);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      if (publish) {
+        setPublishLoading(false);
+      } else {
+        setSaveLoading(false);
+      }
     }
   };
 
@@ -138,12 +155,14 @@ const MainSection = ({ setIsEditing }) => {
         id={assignmentId}
         AssignmentcreateLoading={createLoading}
         AssignmentupdateLoading={updateLoading}
-        isEditing={isEditing} // Pass the local isEditing state
+        isEditing={isEditing}
         criteriaList={criteriaList}
         setCriteriaList={setCriteriaList}
-        existingRubricId={existingRubricId} // Pass the existingRubricId here
+        existingRubricId={existingRubricId}
         setExistingRubricId={setExistingRubricId}
-        assignmentId={assignmentId} // Pass assignment ID to header
+        assignmentId={assignmentId}
+        saveLoading={saveLoading}
+        publishLoading={publishLoading}
       />
       <div className="w-full flex ">
         <div className="w-[70%]">

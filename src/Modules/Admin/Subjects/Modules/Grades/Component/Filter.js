@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 const Filter = ({ onFilterChange, onClose }) => {
   const classDetails = useSelector((store) => store.Class.class);
   console.log(classDetails);
-  
+
   return (
     <div className="flex flex-col h-full p-2">
       <div className="flex flex-col mb-4">
@@ -15,11 +15,11 @@ const Filter = ({ onFilterChange, onClose }) => {
           className="px-4 py-2 border w-full rounded-md focus:outline-none focus:ring-2 focus:ring-blue-300"
           onChange={(e) => onFilterChange("section", e.target.value)}
         >
-                  <option value="">All</option>
-            { classDetails?.sections.map((i)=>(
+          <option value="">All</option>
+          {classDetails?.sections?.map((i) => (
             <>
-            <option value={i._id}>{i?.sectionName}</option>
-              </>
+              <option value={i._id}>{i?.sectionName}</option>
+            </>
           ))}
         </select>
       </div>
@@ -30,11 +30,11 @@ const Filter = ({ onFilterChange, onClose }) => {
           className="px-4 py-2 border w-full rounded-md focus:outline-none focus:ring-2 focus:ring-blue-300"
           onChange={(e) => onFilterChange("group", e.target.value)}
         >
-                  <option value="">All</option>
-            { classDetails?.groups.map((i)=>(
+          <option value="">All</option>
+          {classDetails?.groups?.map((i) => (
             <>
-            <option value={i._id}>{i?.groupName}</option>
-              </>
+              <option value={i._id}>{i?.groupName}</option>
+            </>
           ))}
         </select>
       </div>

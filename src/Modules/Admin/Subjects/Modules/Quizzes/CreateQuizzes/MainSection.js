@@ -62,6 +62,8 @@ const MainSection = ({ setIsEditing }) => {
   const [questionType, setQuestionType] = useState("multiple choice");
   const [isEditing, setLocalIsEditing] = useState(false); // Local isEditing state
   const [editingQuestionId, setEditingQuestionId] = useState(null);
+  const [criteriaList, setCriteriaList] = useState([]);
+  const [existingRubricId, setExistingRubricId] = useState(null); // Initialize here
 
   const { createQuiz, loading: createLoading } = useCreateQuiz();
   const { updateQuiz, loading: updateLoading } = useUpdateQuiz();
@@ -114,6 +116,7 @@ const MainSection = ({ setIsEditing }) => {
       setAnswers(quiz.answers || initialAnswersState);
       setRightAnswerComment(quiz.rightAnswerComment || "");
       setWrongAnswerComment(quiz.wrongAnswerComment || "");
+      setExistingRubricId(quiz.rubricId || null);
     }
   }, [quiz, setIsEditing]);
 
@@ -267,6 +270,10 @@ const MainSection = ({ setIsEditing }) => {
         onSave={handleSave}
         isEditing={isEditing}
         quizId={quizId}
+        criteriaList={criteriaList} // Pass criteriaList state
+        setCriteriaList={setCriteriaList} // Pass setCriteriaList function
+        existingRubricId={existingRubricId} // Pass existingRubricId
+        setExistingRubricId={setExistingRubricId} // Pass setExistingRubricId
       />
 
       <div className="w-full flex">

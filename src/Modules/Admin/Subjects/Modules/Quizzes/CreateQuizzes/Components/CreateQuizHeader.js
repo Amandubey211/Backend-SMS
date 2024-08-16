@@ -4,6 +4,10 @@ import { useNavigate } from "react-router-dom";
 import AddRubricModal from "../../../Rubric/Components/AddRubricModal";
 import Sidebar from "../../../../../../../Components/Common/Sidebar";
 import AddNewCriteriaForm from "../../../Rubric/Components/AddNewCriteriaForm";
+import useCreateQuizRubric from "../../../../../../../Hooks/AuthHooks/Staff/Admin/Rubric/useCreateQuizRubric";
+import useUpdateRubric from "../../../../../../../Hooks/AuthHooks/Staff/Admin/Rubric/useUpdateRubric";
+import toast from "react-hot-toast";
+import useGetRubricBySubjectId from "../../../../../../../Hooks/AuthHooks/Staff/Admin/Rubric/useGetRubricBySubjectId";
 
 const CreateQuizHeader = ({
   onSave,
@@ -17,6 +21,46 @@ const CreateQuizHeader = ({
   const navigate = useNavigate();
   const [isModalOpen, setModalOpen] = useState(false);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
+  const { fetchRubricBySubjectId } = useGetRubricBySubjectId();
+  const { createQuizRubric, loading: createLoading } = useCreateQuizRubric();
+  const { updateRubric, loading: updateLoading } = useUpdateRubric();
+  const [editMode, setEditMode] = useState(false);
+
+  const handleAddCriteria = () => {
+    setSidebarOpen(true);
+  };
+
+  const handleSaveCriteria = (criteria) => {
+    setCriteriaList([...criteriaList, criteria]);
+    setSidebarOpen(false);
+  };
+
+  const handleSubmit = async (rubricData) => {
+    if (existingRubricId) {
+      const result = await updateRubric(existingRubricId, rubricData);
+      if (result.success) {
+        fetchRubricBySubjectId();
+        toast.success("Rubric updated successfully.");
+        setModalOpen(false);
+        // setRubricToEdit(null);
+        setEditMode(false);
+      } else {
+        toast.error(result.error || "Failed to update rubric.");
+      }
+    } else {
+      const result = await createQuizRubric(rubricData);
+      if (result.success) {
+        fetchRubricBySubjectId();
+        toast.success("Rubric created successfully.");
+        setModalOpen(false);
+        // setRubricToEdit(null);
+        setCriteriaList([]); // Clear criteria after creation
+        setExistingRubricId(result.data._id); // Ensure this is called
+      } else {
+        toast.error(result.error || "Failed to create rubric.");
+      }
+    }
+  };
 
   return (
     <div className="flex items-center justify-between p-2 bg-white border-b border-gray-300 shadow-sm">
@@ -59,11 +103,13 @@ const CreateQuizHeader = ({
           type="quiz"
           isOpen={isModalOpen}
           onClose={() => setModalOpen(false)}
-          onAddCriteria={() => setSidebarOpen(true)} // Pass down function to open sidebar
+          onSubmit={handleSubmit}
+          editMode={editMode}
+          onAddCriteria={handleAddCriteria}
+          setExistingRubricId={setExistingRubricId}
           criteriaList={criteriaList} // Pass criteriaList state
           setCriteriaList={setCriteriaList} // Pass setCriteriaList function
           QuizId={quizId} // Pass the QuizId prop
-          setExistingRubricId={setExistingRubricId} // Ensure this function is passed down
         />
         <Sidebar
           isOpen={isSidebarOpen}

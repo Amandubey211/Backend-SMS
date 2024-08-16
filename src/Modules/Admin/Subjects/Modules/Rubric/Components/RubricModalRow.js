@@ -6,12 +6,14 @@ import RatingCard from "./RatingCard";
 import AddNewRatingForm from "./AddNewRatingForm";
 import EditRatingForm from "./EditRatingForm";
 import Sidebar from "../../../../../../Components/Common/Sidebar";
+
 const RubricModalRow = ({
   data,
   criteriaIndex,
   onDeleteCriteria,
   onAddRating,
-  onEditCriteria, // Add this line
+  onEditCriteria,
+  readonly, // Add readonly prop
 }) => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [isEditSidebarOpen, setEditSidebarOpen] = useState(false);
@@ -75,20 +77,22 @@ const RubricModalRow = ({
               />
               <p className="text-sm text-gray-500">Range</p>
             </div>
-            <div className="flex gap-2">
-              <button
-                className="text-red-600"
-                onClick={() => onDeleteCriteria(criteriaIndex)}
-              >
-                <RiDeleteBin5Line />
-              </button>
-              <button
-                className="text-green-600"
-                onClick={() => onEditCriteria(criteriaIndex)} // Update this line
-              >
-                <TbEdit />
-              </button>
-            </div>
+            {!readonly && ( // Hide buttons in readonly mode
+              <div className="flex gap-2">
+                <button
+                  className="text-red-600"
+                  onClick={() => onDeleteCriteria(criteriaIndex)}
+                >
+                  <RiDeleteBin5Line />
+                </button>
+                <button
+                  className="text-green-600"
+                  onClick={() => onEditCriteria(criteriaIndex)}
+                >
+                  <TbEdit />
+                </button>
+              </div>
+            )}
           </div>
         </div>
         <div className="flex justify-start flex-wrap w-[70%] gap-1 px-4 py-2">
@@ -98,15 +102,18 @@ const RubricModalRow = ({
               rating={rating}
               onDeleteRating={() => handleDeleteRating(index)}
               onEditRating={() => handleEditRating(index)}
+              readonly={readonly} // Pass readonly to RatingCard
             />
           ))}
-          <button
-            className="flex flex-col justify-center border-dashed  w-44 h-40 items-center text-purple-600 text-xl gap-1 border-2  border-black border-opacity-65  hover:border-opacity-100 rounded-md px-5"
-            onClick={() => setSidebarOpen(true)}
-          >
-            <HiOutlinePlus />
-            <span className="text-gray-500 text-sm">Add Rating</span>
-          </button>
+          {!readonly && ( // Hide "Add Rating" button in readonly mode
+            <button
+              className="flex flex-col justify-center border-dashed  w-44 h-40 items-center text-purple-600 text-xl gap-1 border-2  border-black border-opacity-65  hover:border-opacity-100 rounded-md px-5"
+              onClick={() => setSidebarOpen(true)}
+            >
+              <HiOutlinePlus />
+              <span className="text-gray-500 text-sm">Add Rating</span>
+            </button>
+          )}
         </div>
         <div className="flex flex-col justify-center items-center px-4 py-2">
           <p className="font-medium text-gray-900">Total Points</p>
@@ -117,24 +124,28 @@ const RubricModalRow = ({
             readOnly
           />
         </div>
-        <Sidebar
-          title="Add New Rating"
-          isOpen={isSidebarOpen}
-          onClose={() => setSidebarOpen(false)}
-        >
-          <AddNewRatingForm onAddNewRating={handleAddNewRating} />
-        </Sidebar>
-        {currentEditRating && (
-          <Sidebar
-            title="Edit Rating"
-            isOpen={isEditSidebarOpen}
-            onClose={() => setEditSidebarOpen(false)}
-          >
-            <EditRatingForm
-              currentRating={currentEditRating}
-              onUpdateRating={handleUpdateRating}
-            />
-          </Sidebar>
+        {!readonly && ( // Only show the sidebars if not in readonly mode
+          <>
+            <Sidebar
+              title="Add New Rating"
+              isOpen={isSidebarOpen}
+              onClose={() => setSidebarOpen(false)}
+            >
+              <AddNewRatingForm onAddNewRating={handleAddNewRating} />
+            </Sidebar>
+            {currentEditRating && (
+              <Sidebar
+                title="Edit Rating"
+                isOpen={isEditSidebarOpen}
+                onClose={() => setEditSidebarOpen(false)}
+              >
+                <EditRatingForm
+                  currentRating={currentEditRating}
+                  onUpdateRating={handleUpdateRating}
+                />
+              </Sidebar>
+            )}
+          </>
         )}
       </div>
     </div>

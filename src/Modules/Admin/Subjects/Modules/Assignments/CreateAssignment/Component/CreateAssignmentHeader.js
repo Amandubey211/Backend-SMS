@@ -19,7 +19,9 @@ const CreateAssignmentHeader = ({
   setExistingRubricId,
   AssignmentupdateLoading,
   AssignmentcreateLoading,
-  assignmentId, // Receive assignment ID as prop
+  assignmentId,
+  saveLoading, // Add this prop
+  publishLoading, // Add this prop
 }) => {
   const navigate = useNavigate();
   const [isModalOpen, setModalOpen] = useState(false);
@@ -60,8 +62,8 @@ const CreateAssignmentHeader = ({
         toast.success("Rubric created successfully.");
         setModalOpen(false);
         setRubricToEdit(null);
-        setCriteriaList([]); // Clear criteria after creation
-        setExistingRubricId(result.data._id); // Ensure this is called
+        setCriteriaList([]);
+        setExistingRubricId(result.data._id);
       } else {
         toast.error(result.error || "Failed to create rubric.");
       }
@@ -86,7 +88,6 @@ const CreateAssignmentHeader = ({
             className="flex items-center px-4 py-2 border border-gray-300 rounded-md text-pink-500 hover:bg-gray-100 transition"
           >
             <span className="mr-1">+</span>
-            {/* <span>{isEditing ? "Edit" : "Add"} Rubric</span> */}
             <span>{false ? "Edit" : "Add"} Rubric</span>
           </button>
         ) : (
@@ -95,7 +96,6 @@ const CreateAssignmentHeader = ({
             className="flex items-center px-4 py-2 border border-gray-300 rounded-md text-pink-500 hover:bg-gray-100 transition"
           >
             <span className="mr-1">+</span>
-            {/* <span>{isEditing ? "Edit" : "Add"} Rubric</span> */}
             <span>{false ? "Edit" : "Add"} Rubric</span>
           </button>
         )}
@@ -103,10 +103,11 @@ const CreateAssignmentHeader = ({
         <button
           onClick={() => onSave(true)}
           className="flex-grow rounded-md py-2 px-4 text-center bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200 transition"
+          disabled={publishLoading}
         >
           <span className="bg-clip-text text-transparent bg-gradient-to-r from-rose-500 to-indigo-500">
-            {AssignmentcreateLoading || AssignmentupdateLoading
-              ? "please wait.."
+            {publishLoading
+              ? "please wait..."
               : isEditing
               ? "Update & Publish"
               : "Save & Publish"}
@@ -115,10 +116,9 @@ const CreateAssignmentHeader = ({
         <button
           onClick={() => onSave(false)}
           className="px-4 py-2 text-white font-semibold rounded-md bg-gradient-to-r from-purple-500 to-red-500 hover:from-purple-600 hover:to-red-600 transition"
+          disabled={saveLoading}
         >
-          {AssignmentcreateLoading || AssignmentupdateLoading
-            ? "please wait.."
-            : "Save"}
+          {saveLoading ? "please wait..." : "Save"}
         </button>
         <AddRubricModal
           type="assignment"
@@ -129,7 +129,7 @@ const CreateAssignmentHeader = ({
           setCriteriaList={setCriteriaList}
           onAddCriteria={handleAddCriteria}
           setExistingRubricId={setExistingRubricId}
-          AssignmentId={assignmentId} // Pass assignment ID to modal
+          AssignmentId={assignmentId}
           editMode={editMode}
           readonly={false}
           createLoading={createLoading}
