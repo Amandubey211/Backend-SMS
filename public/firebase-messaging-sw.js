@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 
 importScripts('https://www.gstatic.com/firebasejs/9.1.3/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/9.1.3/firebase-messaging-compat.js');
@@ -66,8 +65,7 @@ messaging.onBackgroundMessage((payload) => {
   const notificationOptions = {
     body: payload.notification.body || 'Background Message body.',
     icon: payload.notification.icon || '/firebase-logo.png'
-  };
-useEffect(()=>{},[])
+  }
   // Save notification to IndexedDB
   saveNotificationToIndexedDB(payload.notification);
 
