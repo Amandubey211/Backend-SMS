@@ -96,14 +96,15 @@ const AssignmentDetailCard = ({
         criteriaList={criteriaList}
         setCriteriaList={setCriteriaList}
         setExistingRubricId={setExistingRubricId}
+        readonly={true} // Set readonly to true
       />
-      <Sidebar
+      {/* <Sidebar
         isOpen={isSidebarOpen}
         onClose={() => setSidebarOpen(false)}
         title="Add New Criteria"
       >
         <AddNewCriteriaForm />
-      </Sidebar>
+      </Sidebar> */}
     </div>
   );
 };

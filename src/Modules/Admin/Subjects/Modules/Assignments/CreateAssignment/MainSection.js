@@ -136,6 +136,8 @@ const MainSection = ({ setIsEditing }) => {
       <CreateAssignmentHeader
         onSave={handleSave}
         id={assignmentId}
+        AssignmentcreateLoading={createLoading}
+        AssignmentupdateLoading={updateLoading}
         isEditing={isEditing} // Pass the local isEditing state
         criteriaList={criteriaList}
         setCriteriaList={setCriteriaList}

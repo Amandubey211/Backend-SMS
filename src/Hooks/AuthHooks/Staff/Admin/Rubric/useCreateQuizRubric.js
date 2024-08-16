@@ -16,7 +16,7 @@ const useCreateQuizRubric = () => {
     if (!rubricData.criteria || rubricData.criteria.length === 0) {
       return "At least one criterion is required.";
     }
-    if (!rubricData.quizId) {
+    if (!rubricData.quizId || rubricData.quizId.trim() === "") {
       return "Quiz ID is required.";
     }
     if (!rubricData.totalScore || rubricData.totalScore <= 0) {
@@ -40,10 +40,10 @@ const useCreateQuizRubric = () => {
       try {
         const token = localStorage.getItem(`${role}:token`);
         const response = await axios.post(
-          `${baseUrl}/quiz/create_rubric`,
+          `${baseUrl}/admin/quiz/create_rubric`,
           rubricData,
           {
-            headers: { Authorization: `Bearer ${token}` },
+            headers: { Authentication: token },
           }
         );
 
