@@ -6,8 +6,8 @@ import AddRubricModal from "../../../Rubric/Components/AddRubricModal";
 import Sidebar from "../../../../../../../Components/Common/Sidebar";
 import AddNewCriteriaForm from "../../../Rubric/Components/AddNewCriteriaForm";
 import useGetRubricBySubjectId from "../../../../../../../Hooks/AuthHooks/Staff/Admin/Rubric/useGetRubricBySubjectId";
-import useCreateRubric from "../../../../../../../Hooks/AuthHooks/Staff/Admin/Rubric/useCreateRubric";
 import useUpdateRubric from "../../../../../../../Hooks/AuthHooks/Staff/Admin/Rubric/useUpdateRubric";
+import useCreateAssignmentRubric from "../../../../../../../Hooks/AuthHooks/Staff/Admin/Rubric/useCreateAssignmentRubric";
 
 const CreateAssignmentHeader = ({
   onSave,
@@ -17,6 +17,8 @@ const CreateAssignmentHeader = ({
   setCriteriaList,
   existingRubricId,
   setExistingRubricId,
+  AssignmentupdateLoading,
+  AssignmentcreateLoading,
   assignmentId, // Receive assignment ID as prop
 }) => {
   const navigate = useNavigate();
@@ -26,7 +28,8 @@ const CreateAssignmentHeader = ({
   const [editMode, setEditMode] = useState(false);
 
   const { fetchRubricBySubjectId } = useGetRubricBySubjectId();
-  const { createRubric, loading: createLoading } = useCreateRubric();
+  const { createAssignmentRubric, loading: createLoading } =
+    useCreateAssignmentRubric();
   const { updateRubric, loading: updateLoading } = useUpdateRubric();
 
   const handleAddCriteria = () => {
@@ -51,7 +54,7 @@ const CreateAssignmentHeader = ({
         toast.error(result.error || "Failed to update rubric.");
       }
     } else {
-      const result = await createRubric(rubricData);
+      const result = await createAssignmentRubric(rubricData);
       if (result.success) {
         fetchRubricBySubjectId(id);
         toast.success("Rubric created successfully.");
@@ -77,26 +80,45 @@ const CreateAssignmentHeader = ({
         </h1>
       </div>
       <div className="flex items-center space-x-2">
-        <button
-          onClick={() => setModalOpen(true)}
-          className="flex items-center px-4 py-2 border border-gray-300 rounded-md text-pink-500 hover:bg-gray-100 transition"
-        >
-          <span className="mr-1">+</span>
-          <span>{editMode ? "Edit" : "Add"} Rubric</span>
-        </button>
+        {isEditing ? (
+          <button
+            onClick={() => setModalOpen(true)}
+            className="flex items-center px-4 py-2 border border-gray-300 rounded-md text-pink-500 hover:bg-gray-100 transition"
+          >
+            <span className="mr-1">+</span>
+            {/* <span>{isEditing ? "Edit" : "Add"} Rubric</span> */}
+            <span>{false ? "Edit" : "Add"} Rubric</span>
+          </button>
+        ) : (
+          <button
+            onClick={() => toast.error("First Create the Assignment ")}
+            className="flex items-center px-4 py-2 border border-gray-300 rounded-md text-pink-500 hover:bg-gray-100 transition"
+          >
+            <span className="mr-1">+</span>
+            {/* <span>{isEditing ? "Edit" : "Add"} Rubric</span> */}
+            <span>{false ? "Edit" : "Add"} Rubric</span>
+          </button>
+        )}
+
         <button
           onClick={() => onSave(true)}
           className="flex-grow rounded-md py-2 px-4 text-center bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200 transition"
         >
           <span className="bg-clip-text text-transparent bg-gradient-to-r from-rose-500 to-indigo-500">
-            {isEditing ? "Update & Publish" : "Save & Publish"}
+            {AssignmentcreateLoading || AssignmentupdateLoading
+              ? "please wait.."
+              : isEditing
+              ? "Update & Publish"
+              : "Save & Publish"}
           </span>
         </button>
         <button
           onClick={() => onSave(false)}
           className="px-4 py-2 text-white font-semibold rounded-md bg-gradient-to-r from-purple-500 to-red-500 hover:from-purple-600 hover:to-red-600 transition"
         >
-          Save
+          {AssignmentcreateLoading || AssignmentupdateLoading
+            ? "please wait.."
+            : "Save"}
         </button>
         <AddRubricModal
           type="assignment"
@@ -109,6 +131,7 @@ const CreateAssignmentHeader = ({
           setExistingRubricId={setExistingRubricId}
           AssignmentId={assignmentId} // Pass assignment ID to modal
           editMode={editMode}
+          readonly={false}
           createLoading={createLoading}
           updateLoading={updateLoading}
         />

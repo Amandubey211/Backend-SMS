@@ -1,4 +1,3 @@
-// MainSection Component
 import React, { useState, lazy, Suspense, useEffect } from "react";
 import RubricHeader from "./Components/RubricHeader";
 import RubricCard from "./Components/RubricCard";
@@ -8,10 +7,11 @@ import SubjectSideBar from "../../Component/SubjectSideBar";
 import useGetRubricBySubjectId from "../../../../../Hooks/AuthHooks/Staff/Admin/Rubric/useGetRubricBySubjectId";
 import useDeleteRubric from "../../../../../Hooks/AuthHooks/Staff/Admin/Rubric/useDeleteRubric";
 import useUpdateRubric from "../../../../../Hooks/AuthHooks/Staff/Admin/Rubric/useUpdateRubric";
-import useCreateRubric from "../../../../../Hooks/AuthHooks/Staff/Admin/Rubric/useCreateRubric";
+import useCreateQuizRubric from "../../../../../Hooks/AuthHooks/Staff/Admin/Rubric/useCreateQuizRubric";
 import { useParams } from "react-router-dom";
 import Spinner from "../../../../../Components/Common/Spinner";
 import NoDataFound from "../../../../../Components/Common/NoDataFound";
+import useCreateAssignmentRubric from "../../../../../Hooks/AuthHooks/Staff/Admin/Rubric/useCreateAssignmentRubric";
 
 const AddRubricModal = lazy(() => import("./Components/AddRubricModal"));
 
@@ -30,7 +30,10 @@ const MainSection = () => {
     useGetRubricBySubjectId();
   const { deleteRubric } = useDeleteRubric();
   const { updateRubric, loading: updateLoading } = useUpdateRubric();
-  const { createRubric, loading: createLoading } = useCreateRubric();
+  const { createAssignmentRubric, loading: createAssignmentLoading } =
+    useCreateAssignmentRubric();
+  const { createQuizRubric, loading: createQuizLoading } =
+    useCreateQuizRubric();
 
   const { sid } = useParams();
 
@@ -81,7 +84,7 @@ const MainSection = () => {
     setEditMode(true);
   };
 
-  const handleSubmit = async (rubricData) => {
+  const handleSubmit = async (rubricData, type) => {
     if (existingRubricId) {
       const result = await updateRubric(existingRubricId, rubricData);
       if (result.success) {
@@ -91,8 +94,12 @@ const MainSection = () => {
         setEditMode(false);
       }
     } else {
-      console.log(rubricData, "creating");
-      const result = await createRubric(rubricData);
+      let result;
+      if (type === "createQuizRubric") {
+        result = await createQuizRubric(rubricData);
+      } else {
+        result = await createAssignmentRubric(rubricData);
+      }
       if (result.success) {
         fetchRubricBySubjectId(sid);
         setModalOpen(false);
@@ -145,7 +152,7 @@ const MainSection = () => {
               onDeleteCriteria={handleDeleteCriteria}
               onEditCriteria={handleEditCriteria}
               onSubmit={handleSubmit}
-              createLoading={createLoading}
+              createLoading={createAssignmentLoading || createQuizLoading}
               updateLoading={updateLoading}
               editMode={editMode}
               AssignmentId={selectedAssignmentId} // Use these props to set IDs

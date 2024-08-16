@@ -43,6 +43,7 @@ const Chapter = ({
   const [attachmentsExpanded, setAttachmentsExpanded] = useState(false);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [previewType, setPreviewType] = useState(null);
+  const [attachmentToDelete, setAttachmentToDelete] = useState(null);
   const { sid } = useParams();
   const { loading, error, success, deleteChapter } = useDeleteChapter();
   const { deleteAttachment, loading: attachmentDeleting } =
@@ -98,15 +99,25 @@ const Chapter = ({
     setIsSidebarOpen(false);
   };
 
-  const handleDeleteAttachment = async (attachmentUrl) => {
-    setAttachmentLoading((prev) => ({ ...prev, [attachmentUrl]: true }));
+  const handleDeleteAttachment = async () => {
+    if (!attachmentToDelete) return;
+
+    setAttachmentLoading((prev) => ({
+      ...prev,
+      [attachmentToDelete.url]: true,
+    }));
 
     try {
-      await deleteAttachment(chapterId, sid, attachmentUrl);
+      await deleteAttachment(chapterId, sid, attachmentToDelete.url);
     } catch (error) {
       console.error("Error deleting attachment:", error);
     } finally {
-      setAttachmentLoading((prev) => ({ ...prev, [attachmentUrl]: false }));
+      setAttachmentLoading((prev) => ({
+        ...prev,
+        [attachmentToDelete.url]: false,
+      }));
+      setAttachmentToDelete(null); // Reset the state after deletion
+      setDeleteModalOpen(false); // Close the modal after deletion
     }
   };
 
@@ -285,7 +296,10 @@ const Chapter = ({
                     <button
                       type="button"
                       className="text-red-500 transition p-1 border rounded-full transform hover:scale-110 cursor-pointer"
-                      onClick={() => handleDeleteAttachment(attachment.url)}
+                      onClick={() => {
+                        setAttachmentToDelete(attachment); // Set the attachment to delete
+                        setDeleteModalOpen(true); // Open the delete confirmation modal
+                      }}
                       disabled={attachmentLoading[attachment.url]} // Disable button while loading
                     >
                       {attachmentLoading[attachment.url] ? (
@@ -335,11 +349,20 @@ const Chapter = ({
         </div>
       )}
 
+      {/* Delete Modal for Chapter */}
       <DeleteModal
         isOpen={deleteModalOpen}
         onClose={() => setDeleteModalOpen(false)}
         onConfirm={confirmDelete}
         title={title}
+      />
+
+      {/* Delete Modal for Attachment */}
+      <DeleteModal
+        isOpen={deleteModalOpen && attachmentToDelete !== null}
+        onClose={() => setDeleteModalOpen(false)}
+        onConfirm={handleDeleteAttachment}
+        title={attachmentToDelete?.label || ""}
       />
 
       {isSidebarOpen && (
@@ -348,7 +371,6 @@ const Chapter = ({
           isOpen={isSidebarOpen}
           onClose={handleSidebarClose}
           title={`Add Attachment (${title})`}
-          // title={`Add Attachment`}
         >
           <AddAttachment
             chapterData={{ title, chapterId, moduleId }}

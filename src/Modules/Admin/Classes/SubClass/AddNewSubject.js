@@ -5,6 +5,7 @@ import EditorSelector from "./Components/EditorSelector";
 import useCreateSubject from "../../../../Hooks/AuthHooks/Staff/Admin/useCreateSubject";
 import { useParams } from "react-router-dom";
 import { ImSpinner3 } from "react-icons/im";
+import AssignTeacher from "../../Teachers/AssignTeacher";
 
 const dummyColors = [
   "#34D399",
@@ -162,7 +163,7 @@ const AddNewSubject = ({ onClose, subject }) => {
   );
 
   return (
-    <div className="flex flex-col h-full p-4">
+    <div className="flex flex-col h-full p-4 overflow-y-auto">
       <div className="mb-4">
         <label
           htmlFor="subject-title"
@@ -180,6 +181,7 @@ const AddNewSubject = ({ onClose, subject }) => {
           aria-required="true"
         />
       </div>
+      {/* <AssignTeacher /> */}
 
       <div className="mb-4">
         <EditorSelector
