@@ -148,12 +148,11 @@ const AddRubricModal = ({
       return;
     }
 
-    const selectedData =
-      type === "assignment"
-        ? assignments.find((a) => a._id === selectedAssignmentId)
-        : quizzes.find((q) => q._id === selectedQuizId);
+    const selectedData = selectedAssignmentId
+      ? assignments.find((a) => a._id === selectedAssignmentId)
+      : quizzes.find((q) => q._id === selectedQuizId);
 
-    const totalScore = criteriaList.reduce((acc, criterion) => {
+    const totalScore = criteriaList?.reduce((acc, criterion) => {
       return (
         acc +
         criterion.ratings.reduce(
@@ -163,8 +162,9 @@ const AddRubricModal = ({
       );
     }, 0);
 
-    const maxPoints =
-      type === "assignment" ? selectedData?.points : selectedData?.totalPoints;
+    const maxPoints = selectedAssignmentId
+      ? selectedData?.points
+      : selectedData?.totalPoints;
 
     if (totalScore != maxPoints) {
       toast.error(`Total points shoud be equal to  ${maxPoints}`);
@@ -183,17 +183,33 @@ const AddRubricModal = ({
       if (selectedAssignmentId) {
         const result = await onSubmit(rubricData, "createAssignmentRubric");
         if (result.success) {
-          toast.success(`Rubric for ${type} created successfully`);
+          toast.success(
+            `Rubric for ${
+              type ?? selectedAssignmentId ? "Assignment" : "Quiz"
+            } created successfully`
+          );
         } else {
-          toast.error(`Failed to create rubric for ${type}`);
+          toast.error(
+            `Failed to create rubric for ${
+              type ?? selectedAssignmentId ? "Assignment" : "Quiz"
+            }`
+          );
         }
         onClose();
       } else {
         const result = await onSubmit(rubricData, "createQuizRubric");
         if (result.success) {
-          toast.success(`Rubric for ${type} created successfully`);
+          toast.success(
+            `Rubric for ${
+              type ?? selectedAssignmentId ? "Assignment" : "Quiz"
+            } created successfully`
+          );
         } else {
-          toast.error(`Failed to create rubric for ${type}`);
+          toast.error(
+            `Failed to create rubric for ${
+              type ?? selectedAssignmentId ? "Assignment" : "Quiz"
+            }`
+          );
         }
         onClose();
       }
@@ -284,7 +300,7 @@ const AddRubricModal = ({
                 className="block w-full pl-3 pr-10 py-2 text-base border rounded-md cursor-pointer focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                 onClick={() => !readonly && setDropdownOpen2(!dropdownOpen2)}
               >
-                {quizzes.find((q) => q._id === selectedQuizId)?.name ||
+                {quizzes?.find((q) => q._id === selectedQuizId)?.name ||
                   "Select"}
               </div>
               {dropdownOpen2 && (
@@ -328,7 +344,7 @@ const AddRubricModal = ({
             <div className="flex justify-center items-center h-full">
               <Spinner />
             </div>
-          ) : criteriaList.length === 0 ? (
+          ) : criteriaList?.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center">
               <CiBoxList className="text-6xl text-gray-300" />
               <p className="mt-4 text-sm text-gray-600">
@@ -336,7 +352,7 @@ const AddRubricModal = ({
               </p>
             </div>
           ) : (
-            criteriaList.map((item, index) => (
+            criteriaList?.map((item, index) => (
               <RubricModalRow
                 key={index}
                 data={item}
@@ -350,7 +366,11 @@ const AddRubricModal = ({
           )}
         </div>
 
-        <div className="flex justify-between items-center p-4 border-t">
+        <div
+          className={`flex ${
+            !readonly ? "justify-between" : "justify-end"
+          }  items-center p-4 border-t `}
+        >
           {!readonly && (
             <button
               onClick={onAddCriteria}

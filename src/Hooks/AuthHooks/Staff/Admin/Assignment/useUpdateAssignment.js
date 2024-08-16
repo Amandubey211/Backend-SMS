@@ -34,7 +34,27 @@ const useUpdateAssignment = () => {
         publish,
         thumbnail,
       } = assignmentData;
+      // const {
+      const missingFields = [];
 
+      // if (!name) missingFields.push("Assignment Name");
+      // if (!content) missingFields.push("Content");
+      // if (!points) missingFields.push("Points");
+      // if (!grade) missingFields.push("Grade");
+      // if (!submissionType) missingFields.push("Submission Type");
+      // if (!allowedAttempts) missingFields.push("Allowed Attempts");
+      // if (!allowNumberOfAttempts) missingFields.push("Number of Attempts");
+      if (!assignTo) missingFields.push("Assign To");
+      // if (!sectionId) missingFields.push("Section");
+      // if (!dueDate) missingFields.push("Due Date");
+      // if (!availableFrom) missingFields.push("Available From");
+
+      if (missingFields.length > 0) {
+        toast.error(
+          `Please fill out the following fields: ${missingFields.join(", ")}`
+        );
+        return { success: false, error: "Validation Error" };
+      }
       setLoading(true);
       setError(null);
 
