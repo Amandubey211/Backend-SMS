@@ -6,75 +6,67 @@ import { baseUrl } from '../../../config/Common';
 
 const { Option } = Select;
 
-const AttendanceCard = ({ initialMonth, initialYear }) => {
+const AttendanceCard = () => {
   const currentDate = new Date();
-  const [month, setMonth] = useState(initialMonth || currentDate.getMonth() + 1); // Months are 0-indexed in JavaScript Date
-  const [year, setYear] = useState(initialYear || currentDate.getFullYear());
-  const [summary, setSummary] = useState({
-    presentCount: 0,
-    absentCount: 0,
-    leaveCount: 0
-  });
+  const [month, setMonth] = useState(currentDate.getMonth() + 1);
+  const [year, setYear] = useState(currentDate.getFullYear());
+  const [summary, setSummary] = useState({ presentCount: 0, absentCount: 0, leaveCount: 0 });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const fetchAttendanceSummary = async (selectedMonth, selectedYear) => {
+    const token = localStorage.getItem('parent:token');
+    const childrenData = JSON.parse(localStorage.getItem('childrenData'));
+    const studentId = childrenData && childrenData[0] ? childrenData[0].id : null;
+
+    if (!studentId || !selectedMonth || !selectedYear) {
+      setError('Student ID, month, and year are required');
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const response = await axios.get(`${baseUrl}/api/studentDashboard/myAttendance`, {
+        headers: { Authentication: `${token}` },
+        params: { studentId, month: selectedMonth, year: selectedYear }
+      });
+
+      if (response.data && response.data.report && response.data.report.summary) {
+        setSummary(response.data.report.summary);
+      } else {
+        throw new Error('No report summary available');
+      }
+    } catch (error) {
+      setError('🚨 Error fetching attendance summary: Please try again later. 🚨');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchAttendanceSummary = async () => {
-      const token = localStorage.getItem('parent:token');
-      const childrenData = JSON.parse(localStorage.getItem('childrenData'));
-      const studentId = childrenData && childrenData[0] ? childrenData[0].id : null;
-
-      if (!studentId || !month || !year) {
-        console.error('Student ID, month, and year are required');
-        setError('Student ID, month, and year are required');
-        setLoading(false);
-        return;
-      }
-
-      try {
-        const response = await axios.get(`${baseUrl}/parent/api/attendance`, {
-          headers: {
-            Authentication: `${token}`
-          },
-          params: {
-            studentId,
-            month,
-            year
-          }
-        });
-
-        if (response.data && response.data.report && response.data.report.summary) {
-          setSummary(response.data.report.summary);
-        } else {
-          throw new Error('No report summary available');
-        }
-      } catch (error) {
-        console.error('Error fetching attendance summary:', error);
-        setError('🚨 Error fetching attendance summary: Please try again later. 🚨');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAttendanceSummary();
+    fetchAttendanceSummary(month, year);
   }, [month, year]);
 
   const handleMonthChange = (newMonth) => {
     setMonth(parseInt(newMonth));
     setLoading(true);
+    fetchAttendanceSummary(parseInt(newMonth), year);
   };
 
   const handleYearChange = (newYear) => {
     setYear(parseInt(newYear));
     setLoading(true);
+    fetchAttendanceSummary(month, parseInt(newYear));
   };
 
-  const months = Array.from({ length: 12 }, (_, i) => i + 1);
-  const currentYear = new Date().getFullYear();
-  const years = Array.from({ length: 10 }, (_, i) => currentYear - 5 + i);
+  const summaryData = [
+    { title: 'Present', value: summary.presentCount, icon: 'present', color: 'bg-green-100' },
+    { title: 'Absent', value: summary.absentCount, icon: 'absent', color: 'bg-red-100' },
+    { title: 'Leave', value: summary.leaveCount, icon: 'leave', color: 'bg-purple-100' }
+  ];
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div className="text-center text-xl p-4">Loading...</div>;
   }
 
   if (error) {
@@ -85,26 +77,21 @@ const AttendanceCard = ({ initialMonth, initialYear }) => {
     );
   }
 
-  const summaryData = [
-    { title: 'Present', value: summary.presentCount, icon: 'present', color: 'bg-green-200' },
-    { title: 'Absent', value: summary.absentCount, icon: 'absent', color: 'bg-red-200' },
-    { title: 'Leave', value: summary.leaveCount, icon: 'leave', color: 'bg-yellow-200' }
-  ];
-
   return (
-    <div className="flex flex-col items-center overflow-hidden">
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-[15vw] mt-10 justify-between px-16">
+    <div className="flex flex-col items-center">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 mt-10 justify-between">
         {summaryData.map((item, index) => (
           <CardComponent key={index} data={item} />
         ))}
       </div>
       <div className="mt-4 text-xl font-semibold text-center">
         <Select
-          style={{ width: 120, marginRight: 10 }}
+          className="mr-2"
+          style={{ width: 120 }}
           onChange={handleMonthChange}
           value={month}
         >
-          {months.map((m) => (
+          {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
             <Option key={m} value={m}>
               {m}
             </Option>
@@ -115,13 +102,12 @@ const AttendanceCard = ({ initialMonth, initialYear }) => {
           onChange={handleYearChange}
           value={year}
         >
-          {years.map((y) => (
+          {Array.from({ length: 10 }, (_, i) => currentDate.getFullYear() - 5 + i).map((y) => (
             <Option key={y} value={y}>
               {y}
             </Option>
           ))}
         </Select>
-        {/* {`${month}-${year}`} */}
       </div>
     </div>
   );

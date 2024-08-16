@@ -6,12 +6,10 @@ import ParentDashLayout from "../../../Components/Parents/ParentDashLayout";
 
 function ChildrenAttendance() {
   return (
-    <Layout title="Parent Finance">
+    <Layout title="Parent Attendance">
       <ParentDashLayout>
-        
-       <AttendanceCard/>
-            <Calendar />
-       
+        <AttendanceCard/>
+        <Calendar />
       </ParentDashLayout>
     </Layout>
   );
