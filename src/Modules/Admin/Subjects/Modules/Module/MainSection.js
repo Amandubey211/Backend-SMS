@@ -33,21 +33,7 @@ const MainSection = () => {
 
   useEffect(() => {
     fetchModules();
-  }, [fetchModules]);
-
-  useEffect(() => {
-    if (modulesData && modulesData.modules.length > 0) {
-      dispatch(
-        setSelectedModule({
-          moduleId: modulesData.modules[0]._id,
-          name: modulesData.modules[0].moduleName,
-          chapters: modulesData.modules[0].chapters,
-        })
-      );
-    } else {
-      dispatch(setSelectedModule({}));
-    }
-  }, [dispatch, modulesData]);
+  }, []);
 
   const handleToggle = (chapterNumber) => {
     setExpandedChapters((prev) =>
@@ -229,7 +215,8 @@ const MainSection = () => {
                 moduleNumber={index + 1}
                 imageUrl={module.thumbnail}
                 moduleId={module._id}
-                isPublished={module.isPublished}
+                // isPublished={module.isPublished}
+                isPublished={true}
                 isSelected={
                   selectedModule && selectedModule.moduleId === module._id
                 }
@@ -248,13 +235,19 @@ const MainSection = () => {
             ))}
           </div>
         </div>
-        <button
-          onClick={openAddModule}
-          className="bg-gradient-to-r from-purple-400 to-pink-400 text-white p-4 fixed rounded-full shadow-md bottom-4 right-4"
-          aria-label="Add Module"
-        >
-          <RiAddFill size={24} />
-        </button>
+        <div className="relative">
+          <button
+            onClick={openAddModule}
+            className="bg-gradient-to-r from-purple-400 to-pink-400 text-white p-4 fixed rounded-full shadow-md bottom-4 right-4 transform transition-transform duration-300 hover:scale-110"
+            aria-label="Add Module"
+          >
+            <RiAddFill size={24} />
+          </button>
+          <span className="absolute bottom-14 right-1/2 transform translate-x-1/2 bg-black text-white text-sm p-2 rounded opacity-0 transition-opacity duration-300 hover:opacity-100 pointer-events-none">
+            Add Module
+          </span>
+        </div>
+
         {isSidebarOpen && (
           <Sidebar
             isOpen={isSidebarOpen}

@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import { baseUrl } from "../../../../../config/Common";
 
-const useCreateRubric = () => {
+const useCreateAssignmentRubric = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const role = useSelector((store) => store.Auth.role);
@@ -12,7 +12,7 @@ const useCreateRubric = () => {
   const validateRubricData = (rubricData) => {
     console.log(rubricData, "Create hook ");
     if (!rubricData.name) {
-      return "Rubric name is sdfsdfrequired.";
+      return "Rubric name is required.";
     }
     if (!rubricData.criteria || rubricData.criteria.length === 0) {
       return "At least one criterion is required.";
@@ -23,7 +23,7 @@ const useCreateRubric = () => {
     return null;
   };
 
-  const createRubric = useCallback(
+  const createAssignmentRubric = useCallback(
     async (rubricData) => {
       setLoading(true);
       setError(null);
@@ -62,12 +62,13 @@ const useCreateRubric = () => {
 
         return { success: false, error: errorMessage };
       } finally {
+        setLoading(false);
       }
     },
     [role]
   );
 
-  return { createRubric, loading, error };
+  return { createAssignmentRubric, loading, error };
 };
 
-export default useCreateRubric;
+export default useCreateAssignmentRubric;

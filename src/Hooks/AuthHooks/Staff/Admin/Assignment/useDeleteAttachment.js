@@ -12,7 +12,8 @@ const useDeleteAttachment = (fetchModules) => {
   const role = useSelector((store) => store.Auth.role);
 
   const deleteAttachment = useCallback(
-    async (subjectId, chapterId, fileUrls) => {
+    async (chapterId, subjectId, fileUrl) => {
+      // Renamed `fileUrls` to `fileUrl` to match the backend
       setLoading(true);
       setError(null);
       setSuccess(null);
@@ -24,16 +25,15 @@ const useDeleteAttachment = (fetchModules) => {
           {
             subjectId,
             chapterId,
-            fileUrls,
+            fileUrl, // Send single fileUrl to match the backend expectation
           },
           {
-            headers: {
-              Authentication: token,
-            },
+            headers: { Authentication: token },
           }
         );
 
-        if (response.data && response.data.success) {
+        if (response.status === 200) {
+          // Check for status code instead of `response.data.success`
           setSuccess(response.data.message);
           toast.success(response.data.message);
           fetchModules(); // Refetch modules after deleting the attachment

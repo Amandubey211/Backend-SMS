@@ -101,8 +101,8 @@ const MainSection = () => {
             <TotalEarningsGraph />
           </div>
         </div>
-        <div className="flex flex-wrap justify-between items-start border-y">
-          <div className="w-full md:w-2/3 h-full border-r">
+        <div className="flex flex-wrap justify-between items-start border-y h-[33rem]">
+          <div className="w-full md:w-2/3 h-full border-r ">
             <TopRankingStudents />
           </div>
           <div className="w-full h-full flex flex-col md:w-1/3 ps-3">

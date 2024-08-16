@@ -105,7 +105,7 @@ const ChapterItem = ({ type, title, id, isPublished }) => {
           />
         ) : (
           <MdOutlineBlock
-            className="text-gray-600"
+            className="text-gray-600  p-1 border rounded-full h-7 w-7"
             aria-label="Not Published"
           />
         )}

@@ -29,7 +29,8 @@ const AddUser = ({ role ,data}) => {
     profile: null,
     teacherCV: null,
     employeeID: '',
-    role: role
+    role: role,
+    active:true
   });
   useEffect(()=>{
    if(data){

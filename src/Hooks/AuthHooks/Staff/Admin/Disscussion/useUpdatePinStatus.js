@@ -2,15 +2,12 @@ import { useState, useCallback } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
-import useFetchClassDiscussions from "./useFetchClassDiscussions";
 import { baseUrl } from "../../../../../config/Common";
 
 const useUpdatePinStatus = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const { role } = useSelector((store) => store.Auth);
-  
-  const {fetchClassDiscussions} = useFetchClassDiscussions()
 
   const updatePinStatus = useCallback(
     async (discussionId, isPinned) => {
@@ -30,8 +27,7 @@ const useUpdatePinStatus = () => {
           toast.success(
             `Discussion ${isPinned ? "pinned" : "unpinned"} successfully`
           );
-        //   fetchClassDiscussions()
-
+          return response.data.data; // Return the updated discussion data
         } else {
           toast.error(response.data.message || "Failed to update pin status");
           setError(response.data.message || "Failed to update pin status");
@@ -44,6 +40,7 @@ const useUpdatePinStatus = () => {
       } finally {
         setLoading(false);
       }
+      return null;
     },
     [role, baseUrl]
   );

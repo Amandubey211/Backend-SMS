@@ -60,78 +60,7 @@ const QuestionDetailCard = ({ quiz,timeLeft ,totalTime}) => {
 
   return (
     <div className="flex flex-col gap-24 bg-white" aria-label="Question Detail Card">
-      {/* <div className="mb-auto p-3">
-        {quizQuestionDetails.map((detail, index) => {
-          if (detail.type === "quizz") {
-            return <AssignmentDetail key={index} label={detail.label} extra={detail.extra} value={detail.value} />;
-          } else if (detail.type === "date") {
-            return <DateDetail key={index} label={detail.label} value={detail.value} />;
-          }
-          return null;
-        })}
-        <div className="flex justify-around mt-4">
-          <div style={{ width: 70, height: 70 }}>
-            <CircularProgressbar
-              value={hourPercentage}
-              text={`${hours} Hours`}
-              styles={{
-                path: {
-                  stroke: `rgba(25, 246, 138, 0.8)`,
-                },
-                text: {
-                  fill: '#000',
-                },
-                trail: {
-                  stroke: '#d6d6d6',
-                },
-                background: {
-                  fill: '#3e98c7',
-                },
-              }}
-            />
-          </div>
-          <div style={{ width: 70, height: 70 }}>
-            <CircularProgressbar
-              value={minutePercentage}
-              text={`${minutes} Min`}
-              styles={{
-                path: {
-                  stroke: `rgba(25, 246, 138, 0.8)`,
-                },
-                text: {
-                  fill: '#000',
-                },
-                trail: {
-                  stroke: '#d6d6d6',
-                },
-                background: {
-                  fill: '#3e98c7',
-                },
-              }}
-            />
-          </div>
-          <div style={{ width: 70, height: 70 }}>
-            <CircularProgressbar
-              value={secondPercentage}
-              text={`${seconds} Sec`}
-              styles={{
-                path: {
-                  stroke: `rgba(25, 246, 138, 0.8)`,
-                },
-                text: {
-                  fill: '#000',
-                },
-                trail: {
-                  stroke: '#d6d6d6',
-                },
-                background: {
-                  fill: '#3e98c7',
-                },
-              }}
-            />
-          </div>
-        </div>
-      </div> */}
+      
       <div className="mb-auto">
         {quizQuestionDetails.map((detail, index) =>
           detail.type === "quizz" ? (

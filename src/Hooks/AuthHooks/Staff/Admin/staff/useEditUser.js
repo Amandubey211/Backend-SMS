@@ -12,7 +12,7 @@ const useEditUser = () => {
   const EditUser = useCallback(
     async (userData,address,id) => {
       const { firstName, lastName, email, mobileNumber, role, position,
-        dob, gender, employeeID, monthlySalary,profile} = userData;
+        dob, gender, employeeID, monthlySalary,profile,active} = userData;
 
         const missingFields = [];
  

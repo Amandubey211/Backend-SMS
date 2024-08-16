@@ -6,6 +6,7 @@
 import React from 'react';
 import { Doughnut } from 'react-chartjs-2';
 import { Chart, ArcElement, Tooltip, Legend } from 'chart.js';
+import { GoAlertFill } from 'react-icons/go';
 Chart.register(ArcElement, Tooltip, Legend);
 
 const TaskChart = ({ totalTasks = 100, completedTasks = 0 }) => {
@@ -49,11 +50,14 @@ const TaskChart = ({ totalTasks = 100, completedTasks = 0 }) => {
 
     return (
         <>
-       
+       {completedTasks == 0 ?<div className="flex w-full h-full text-gray-500  items-center justify-center flex-col text-xl">
+        <GoAlertFill className="text-[3rem]" />
+        No  Data Found
+        </div>:
         <div className=" flex-1 p-5 flex flex-col justify-start items-start h-[15rem] ">
    
               <Doughnut data={data} options={options} />
-            </div>
+            </div>}
 </>
     );
 };

@@ -23,7 +23,7 @@ import StudentLibrary from "../Modules/Student/Library/StudentLibrary.js";
 import StaffLogin from "../Modules/LoginPages/Staff/StaffLogin.js";
 import ForgetPassword from "../Modules/LoginPages/Student/Login/ForgetPassword/ForgetPassword.js";
 import AttendanceMain from "../Modules/Student/Attendance/AttendanceMain.js";
-
+import ParentEvent from "../Modules/Parents/ParentEvent/ParentEvent";
 import QIDLogin from "../Modules/LoginPages/Student/Login/QIDLogin.js";
 
 // lazy loaded routes
@@ -229,6 +229,8 @@ const StudentDash = lazy(() =>
 const ParentDash = lazy(() =>
   import("../Modules/Parents/Dasboard/ParentDash.js")
 );
+
+
 const MyChildren = lazy(() =>
   import("../Modules/Parents/Childrens/ChildScreen.js")
 );
@@ -887,6 +889,13 @@ function App() {
     {
       path: "/parentchildnotice",
       element: <ParentStudentNotice />,
+      errorElement: <Error />,
+    },
+    {
+      path: "/parent/events",
+      element: (
+        <ProtectRoute Component={ParentEvent} allowedRoles={["parent"]} />
+      ),
       errorElement: <Error />,
     },
     {

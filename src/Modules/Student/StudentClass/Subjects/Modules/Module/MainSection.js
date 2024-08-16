@@ -70,6 +70,7 @@ const MainSection = () => {
                 quizzes={chapter.quizzes}
                 isExpanded={expandedChapters.includes(chapter._id)}
                 onToggle={() => handleToggle(chapter._id)}
+                attachments={chapter.attachments}
               />
             ))
           ) : (

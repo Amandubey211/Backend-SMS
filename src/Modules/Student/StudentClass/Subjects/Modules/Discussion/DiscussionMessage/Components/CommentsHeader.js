@@ -1,7 +1,8 @@
-import React from 'react';
-import { FaSearch } from 'react-icons/fa';
+import React from "react";
+import { FaSearch } from "react-icons/fa";
+import { FiRefreshCw } from "react-icons/fi";
 
-const CommentsHeader = ({ handleSearch }) => {
+const CommentsHeader = ({ handleSearch, handleRefresh }) => {
   return (
     <div className="flex items-center gap-2 p-4 bg-white w-full border-b h-full">
       <div className="relative flex items-center w-full max-w-xs">
@@ -15,6 +16,13 @@ const CommentsHeader = ({ handleSearch }) => {
       </div>
       <button className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-sm hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
         Unread
+      </button>
+      <button
+        onClick={handleRefresh}
+        className="absolute top-12 right-12 text-gray-600 rounded-full p-2 focus:outline-none transform transition-transform duration-300 hover:rotate-180"
+        aria-label="Refresh discussion"
+      >
+        <FiRefreshCw size={24} />
       </button>
     </div>
   );

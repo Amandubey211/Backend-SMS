@@ -1,11 +1,10 @@
-
-
-import React from 'react';
-import { FaRegHeart, FaRegComment, FaTrashAlt } from 'react-icons/fa';
-import InputComment from './InputComment'; // Using the existing InputComment component
-import toast from 'react-hot-toast';
+import React, { useState } from "react";
+import { FaRegHeart, FaRegComment, FaTrashAlt } from "react-icons/fa";
+import InputComment from "./InputComment";
+import toast from "react-hot-toast";
 import { MdOutlineEdit } from "react-icons/md";
 import { RxCross2 } from "react-icons/rx";
+import { useSelector } from "react-redux";
 
 const Reply = ({
   reply,
@@ -13,15 +12,45 @@ const Reply = ({
   deleteReply,
   addNestedReply,
   activeReplyId,
-  setActiveReplyId
+  setActiveReplyId,
+  toggleLike,
+  editReply,
+  // currentUserId,
 }) => {
-  const handleDeleteReply = () => {
-    if (reply.isUserCreated) {
-      deleteReply(commentId, reply.id);
-      toast.success('Reply Deleted');
+  const currentUserId = useSelector((state) => state.Common.studentId);
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [editText, setEditText] = useState(reply.text);
+
+  // Console logs to debug
+  console.log("Reply Component:", reply);
+  console.log("currentUserId:", currentUserId);
+  console.log("reply.authorId:", reply.authorID);
+
+  const normalizedCurrentUserId = String(currentUserId).trim().toString();
+  const normalizedReplyAuthorId = String(reply.authorID).trim().toString();
+
+  console.log(
+    "Comparison Result:",
+    normalizedCurrentUserId === normalizedReplyAuthorId
+  );
+
+  const handleEditReply = async () => {
+    if (editText.trim() && editText !== reply.text) {
+      await editReply(reply.id, editText);
+      setIsEditing(false);
     } else {
-      toast.error('You can only delete replies you created.');
+      setIsEditing(false);
     }
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+    setEditText(reply.text);
+  };
+
+  const handleDelete = () => {
+    deleteReply(commentId, reply.id);
   };
 
   const handleReplyClick = () => {
@@ -30,8 +59,17 @@ const Reply = ({
 
   const handleAddNestedReply = (text) => {
     if (text.trim()) {
-      addNestedReply(reply.id, text, true);
-      setActiveReplyId(null); // Optionally, close the reply form after submission
+      addNestedReply(reply.id, text);
+      setActiveReplyId(null);
+    }
+  };
+
+  const handleToggleLike = async () => {
+    try {
+      const updatedReply = await toggleLike(reply.id);
+      // Optionally update local state or re-fetch replies if needed
+    } catch (error) {
+      toast.error("Failed to toggle like.");
     }
   };
 
@@ -52,39 +90,88 @@ const Reply = ({
           )}
           <span className="text-sm text-gray-500">{reply.time}</span>
         </div>
-        <div className="ml-auto gap-2 flex space-x-2">
-          <MdOutlineEdit className="text-gray-500 text-xl cursor-pointer" />
-          <RxCross2 className="text-red-500 text-xl cursor-pointer" onClick={handleDeleteReply} />
-        </div>
+
+        {/* {String(currentUserId).trim() === String(reply.authorId).trim() && ( */}
+        {normalizedCurrentUserId === normalizedReplyAuthorId && (
+          <div className="ml-auto gap-2 flex space-x-2">
+            <MdOutlineEdit
+              className="text-gray-500 text-xl cursor-pointer"
+              onClick={() => setIsEditing(true)}
+            />
+            <RxCross2
+              className="text-red-500 text-xl cursor-pointer"
+              onClick={handleDelete}
+            />
+          </div>
+        )}
       </div>
-      <p className="text-gray-700 mb-2">{reply.text}</p>
-      <div className="flex items-center mb-2 pt-2 border-t">
-        <FaRegHeart className="text-gray-500 cursor-pointer" />
-        <span className="ml-1 text-gray-500">{reply.likes}</span>
-        <FaRegComment className="ml-4 text-gray-500 cursor-pointer" onClick={handleReplyClick} />
-        <span className="ml-1 text-gray-500">Reply</span>
-      </div>
-      {activeReplyId === reply.id && (
-        <div className="mt-4">
-          <InputComment
-            addComment={handleAddNestedReply}
-            placeholder="Write a reply..."
+
+      {isEditing ? (
+        <div className="flex flex-col mb-2">
+          <textarea
+            className="w-full border rounded p-2"
+            value={editText}
+            onChange={(e) => setEditText(e.target.value)}
           />
+          <div className="flex justify-end gap-2 mt-2">
+            <button
+              className="mt-2 self-end bg-blue-500 text-white px-4 py-1 rounded"
+              onClick={handleEditReply}
+            >
+              Save
+            </button>
+            <button
+              className="mt-2 self-end bg-red-500 text-white px-4 py-1 rounded"
+              onClick={handleCancelEdit}
+            >
+              Cancel
+            </button>
+          </div>
         </div>
+      ) : (
+        <>
+          <p className="text-gray-700 mb-2">{reply.text}</p>
+          <div className="flex items-center mb-2 pt-2 border-t">
+            <FaRegHeart
+              className="text-gray-500 cursor-pointer"
+              onClick={handleToggleLike}
+            />
+            <span className="ml-1 text-gray-500">{reply.likes}</span>
+            <FaRegComment
+              className="ml-4 text-gray-500 cursor-pointer"
+              onClick={handleReplyClick}
+            />
+            <span className="ml-1 text-gray-500">Reply</span>
+          </div>
+
+          {activeReplyId === reply.id && (
+            <div className="mt-4">
+              <InputComment
+                addComment={handleAddNestedReply}
+                placeholder="Write a reply..."
+              />
+            </div>
+          )}
+
+          <div className="mt-4 ml-4">
+            {reply.replies &&
+              reply.replies.map((nestedReply) => (
+                <Reply
+                  key={nestedReply.id}
+                  reply={nestedReply}
+                  commentId={commentId}
+                  deleteReply={deleteReply}
+                  addNestedReply={addNestedReply}
+                  activeReplyId={activeReplyId}
+                  setActiveReplyId={setActiveReplyId}
+                  toggleLike={toggleLike}
+                  editReply={editReply}
+                  currentUserId={currentUserId}
+                />
+              ))}
+          </div>
+        </>
       )}
-      <div className="mt-4 ml-4">
-        {reply.replies && reply.replies.map((nestedReply) => (
-          <Reply
-            key={nestedReply.id}
-            reply={nestedReply}
-            commentId={commentId}
-            deleteReply={deleteReply}
-            addNestedReply={addNestedReply}
-            activeReplyId={activeReplyId}
-            setActiveReplyId={setActiveReplyId}
-          />
-        ))}
-      </div>
     </div>
   );
 };

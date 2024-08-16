@@ -4,25 +4,21 @@ import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import { baseUrl } from "../../../../../config/Common";
 
-const useGetRubric = () => {
+const useGetRubricById = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [rubric, setRubric] = useState(null);
   const role = useSelector((store) => store.Auth.role);
 
   const getRubric = useCallback(
-    async (assignmentId) => {
+    async (id) => {
       setLoading(true);
       setError(null);
       try {
-        
         const token = localStorage.getItem(`${role}:token`);
-        const response = await axios.get(
-          `${baseUrl}/admin/rubric/${assignmentId}`,
-          {
-            headers: { Authentication: token },
-          }
-        );
+        const response = await axios.get(`${baseUrl}/admin/rubric/${id}`, {
+          headers: { Authentication: token },
+        });
         console.log(response.data);
         if (response.data.success) {
           setRubric(response.data.rubric);
@@ -36,6 +32,8 @@ const useGetRubric = () => {
         setLoading(false);
         setError(errorMessage);
         return { success: false, error: errorMessage };
+      } finally {
+        setLoading(false);
       }
     },
     [role]
@@ -44,4 +42,4 @@ const useGetRubric = () => {
   return { getRubric, loading, error, rubric };
 };
 
-export default useGetRubric;
+export default useGetRubricById;

@@ -1,27 +1,26 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback } from "react";
 import { LuUser } from "react-icons/lu";
 import { GiImperialCrown } from "react-icons/gi";
 import { TbDotsVertical } from "react-icons/tb";
 import { FaUsers } from "react-icons/fa";
 import useCreateGroup from "../../../../Hooks/AuthHooks/Staff/Admin/useCreateGroup";
 import StudentMenuOptions from "../../Students/Components/StudentMenuOptions";
-import AddGroup from "./AddGroup"; // Adjust the import path as necessary
+import AddGroup from "./AddGroup";
 import useDeleteModal from "../../../../Hooks/CommonHooks/useDeleteModal";
 import DeleteModal from "../../../../Components/Common/DeleteModal";
-import useGetUnassignedStudents from "../../../../Hooks/AuthHooks/Staff/Admin/Students/useGetUnassignedStudents";
 
 const GroupList = ({
   selectedSection,
   onSeeGradeClick,
   groupList,
   fetchGroups,
+  fetchStudents,
 }) => {
   const [expandedGroupIndex, setExpandedGroupIndex] = useState(null);
   const [activeMenu, setActiveMenu] = useState(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [editingGroup, setEditingGroup] = useState(null);
-  const { fetchUnassignedStudents } = useGetUnassignedStudents();
-  const { deleteGroup, loading } = useCreateGroup();
+  const { deleteGroup } = useCreateGroup();
   const { isModalOpen, modalData, openModal, closeModal } = useDeleteModal();
 
   const handleMenuToggle = useCallback((groupIndex) => {
@@ -48,14 +47,17 @@ const GroupList = ({
     await deleteGroup(modalData._id);
     closeModal();
     fetchGroups();
+    fetchStudents();
   };
 
   const closeSidebar = () => {
     setIsSidebarOpen(false);
     setEditingGroup(null);
+    fetchGroups();
   };
+
   return (
-    <div className="w-full max-w-4xl bg-white">
+    <div className="w-full p-1 bg-white">
       <div className="flex items-center justify-between mb-4 p-2">
         <h2 className="text-lg font-semibold ps-4">
           Groups <span className="text-gray-500">({groupList?.length})</span>
@@ -240,8 +242,9 @@ const GroupList = ({
                           studentId={student._id}
                           studentName={student.firstName}
                           groupId={group._id}
-                          onSeeGradeClick={onSeeGradeClick}
                           fetchGroups={fetchGroups}
+                          fetchStudents={fetchStudents}
+                          onSeeGradeClick={onSeeGradeClick}
                         />
                       </div>
                     </li>

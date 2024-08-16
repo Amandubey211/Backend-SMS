@@ -1,10 +1,12 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { HiOutlinePlus } from "react-icons/hi2";
+import { CiBoxList } from "react-icons/ci";
 import RubricModalRow from "./RubricModalRow";
 import toast from "react-hot-toast";
 import useGetFilteredAssignments from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useGetFilteredAssignments";
 import useGetFilteredQuizzes from "../../../../../../Hooks/AuthHooks/Staff/Admin/Quiz/useGetFilteredQuizzes";
-import useGetRubric from "../../../../../../Hooks/AuthHooks/Staff/Admin/Rubric/useGetRubric";
+import useGetRubricById from "../../../../../../Hooks/AuthHooks/Staff/Admin/Rubric/useGetRubricById.js";
+import Spinner from "../../../../../../Components/Common/Spinner"; // Import your Spinner component
 import { useParams } from "react-router-dom";
 
 const AddRubricModal = ({
@@ -22,6 +24,7 @@ const AddRubricModal = ({
   AssignmentId, // Use this to fetch rubric for a specific assignment
   QuizId, // To fetch rubric for a specific quiz
   setExistingRubricId, // Pass this function as a prop
+  readonly = false, // Readonly prop for view-only mode
 }) => {
   const [rubricName, setRubricName] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -36,7 +39,7 @@ const AddRubricModal = ({
   const { sid } = useParams();
   const { fetchFilteredAssignments, assignments } = useGetFilteredAssignments();
   const { fetchFilteredQuizzes, quizzes } = useGetFilteredQuizzes();
-  const { getRubric } = useGetRubric();
+  const { getRubric, loading } = useGetRubricById();
 
   useEffect(() => {
     fetchFilteredAssignments(sid);
@@ -145,11 +148,11 @@ const AddRubricModal = ({
       return;
     }
 
-    const selectedAssignment = assignments.find(
-      (a) => a._id === selectedAssignmentId
-    );
+    const selectedData = selectedAssignmentId
+      ? assignments.find((a) => a._id === selectedAssignmentId)
+      : quizzes.find((q) => q._id === selectedQuizId);
 
-    const totalScore = criteriaList.reduce((acc, criterion) => {
+    const totalScore = criteriaList?.reduce((acc, criterion) => {
       return (
         acc +
         criterion.ratings.reduce(
@@ -159,8 +162,12 @@ const AddRubricModal = ({
       );
     }, 0);
 
-    if (totalScore > (selectedAssignment?.points || 0)) {
-      toast.error("Total points cannot exceed the assignment's points.");
+    const maxPoints = selectedAssignmentId
+      ? selectedData?.points
+      : selectedData?.totalPoints;
+
+    if (totalScore != maxPoints) {
+      toast.error(`Total points shoud be equal to  ${maxPoints}`);
       return;
     }
 
@@ -173,31 +180,47 @@ const AddRubricModal = ({
     };
 
     try {
-      if (editMode) {
-        const result = await onSubmit(rubricData);
+      if (selectedAssignmentId) {
+        const result = await onSubmit(rubricData, "createAssignmentRubric");
         if (result.success) {
-          toast.success("Rubric updated successfully.");
-          onClose();
+          toast.success(
+            `Rubric for ${
+              type ?? selectedAssignmentId ? "Assignment" : "Quiz"
+            } created successfully`
+          );
         } else {
-          throw new Error(result.error || "Update operation failed");
+          toast.error(
+            `Failed to create rubric for ${
+              type ?? selectedAssignmentId ? "Assignment" : "Quiz"
+            }`
+          );
         }
+        onClose();
       } else {
-        const result = await onSubmit(rubricData);
+        const result = await onSubmit(rubricData, "createQuizRubric");
         if (result.success) {
-          toast.success("Rubric created successfully.");
-          onClose();
+          toast.success(
+            `Rubric for ${
+              type ?? selectedAssignmentId ? "Assignment" : "Quiz"
+            } created successfully`
+          );
         } else {
-          throw new Error(result.error || "Create operation failed");
+          toast.error(
+            `Failed to create rubric for ${
+              type ?? selectedAssignmentId ? "Assignment" : "Quiz"
+            }`
+          );
         }
+        onClose();
       }
     } catch (error) {
-      toast.error(error.message);
+      console.log(error, "in Rubric");
     }
   };
 
-  const selectedAssignmentPoints = selectedAssignmentId
+  const selectedPoints = selectedAssignmentId
     ? assignments.find((a) => a._id === selectedAssignmentId)?.points
-    : 0;
+    : quizzes.find((q) => q._id === selectedQuizId)?.totalPoints;
 
   return (
     <div
@@ -212,7 +235,7 @@ const AddRubricModal = ({
       >
         <div className="flex justify-between items-center p-1">
           <h2 className="text-lg font-semibold">
-            {editMode ? "Update" : "Add"} Rubric
+            {editMode ? "Update" : readonly ? "View" : "Add"} Rubric
           </h2>
           <button
             onClick={onClose}
@@ -232,6 +255,7 @@ const AddRubricModal = ({
               onChange={(e) => setRubricName(e.target.value)}
               className="block w-full p-2 border rounded-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
               placeholder="Type here"
+              disabled={readonly}
             />
           </div>
 
@@ -240,7 +264,7 @@ const AddRubricModal = ({
               <label className="block text-gray-700 mb-1">Assignment</label>
               <div
                 className="block w-full pl-3 pr-10 py-2 text-base border rounded-md cursor-pointer focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                onClick={() => setDropdownOpen(!dropdownOpen)}
+                onClick={() => !readonly && setDropdownOpen(!dropdownOpen)}
               >
                 {assignments.find((a) => a._id === selectedAssignmentId)
                   ?.name || "Select"}
@@ -274,9 +298,9 @@ const AddRubricModal = ({
               <label className="block text-gray-700 mb-1">Quizzes</label>
               <div
                 className="block w-full pl-3 pr-10 py-2 text-base border rounded-md cursor-pointer focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                onClick={() => setDropdownOpen2(!dropdownOpen2)}
+                onClick={() => !readonly && setDropdownOpen2(!dropdownOpen2)}
               >
-                {quizzes.find((q) => q._id === selectedQuizId)?.name ||
+                {quizzes?.find((q) => q._id === selectedQuizId)?.name ||
                   "Select"}
               </div>
               {dropdownOpen2 && (
@@ -301,8 +325,11 @@ const AddRubricModal = ({
             </div>
           )}
         </div>
-
-        <div className="m-2 overflow-auto border h-[47vh]">
+        <div
+          className={`m-2 overflow-auto border ${
+            readonly ? "h-[60vh]" : "h-[47vh]"
+          } `}
+        >
           <div className="flex px-4 font-semibold justify-between items-center p-2 w-full bg-gradient-to-r from-pink-100 to-purple-100">
             {["Criteria", "Ratings", "Point"].map((heading, idx) => (
               <div
@@ -313,52 +340,76 @@ const AddRubricModal = ({
               </div>
             ))}
           </div>
-          {criteriaList?.map((item, index) => (
-            <RubricModalRow
-              key={index}
-              data={item}
-              criteriaIndex={index}
-              onDeleteCriteria={handleDeleteCriteria}
-              onAddRating={handleAddRating}
-              onEditCriteria={onEditCriteria}
-            />
-          ))}
+          {loading ? (
+            <div className="flex justify-center items-center h-full">
+              <Spinner />
+            </div>
+          ) : criteriaList?.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-full text-center">
+              <CiBoxList className="text-6xl text-gray-300" />
+              <p className="mt-4 text-sm text-gray-600">
+                No criteria added yet
+              </p>
+            </div>
+          ) : (
+            criteriaList?.map((item, index) => (
+              <RubricModalRow
+                key={index}
+                data={item}
+                criteriaIndex={index}
+                onDeleteCriteria={handleDeleteCriteria}
+                onAddRating={handleAddRating}
+                onEditCriteria={onEditCriteria}
+                readonly={readonly} // Pass readonly to RubricModalRow
+              />
+            ))
+          )}
         </div>
-        <div className="flex justify-between items-center p-4 border-t">
-          <button
-            onClick={onAddCriteria}
-            className="flex items-center gap-2 font-semibold p-2 rounded-md bg-gradient-to-r from-pink-100 to-purple-100 hover:shadow-md transition-shadow duration-300"
-          >
-            <HiOutlinePlus className="text-red-600 text-2xl" />
-            <span className="bg-gradient-to-r from-red-500 to-purple-500 bg-clip-text text-transparent">
-              Add New Criteria
-            </span>
-          </button>
+
+        <div
+          className={`flex ${
+            !readonly ? "justify-between" : "justify-end"
+          }  items-center p-4 border-t `}
+        >
+          {!readonly && (
+            <button
+              onClick={onAddCriteria}
+              className="flex items-center gap-2 font-semibold p-2 rounded-md bg-gradient-to-r from-pink-100 to-purple-100 hover:shadow-md transition-shadow duration-300"
+            >
+              <HiOutlinePlus className="text-red-600 text-2xl" />
+              <span className="bg-gradient-to-r from-red-500 to-purple-500 bg-clip-text text-transparent">
+                Add New Criteria
+              </span>
+            </button>
+          )}
           <div className="text-transparent text-xl font-bold bg-clip-text bg-gradient-to-r from-pink-500 to-purple-500">
-            Total Points: {selectedAssignmentPoints}
+            Total Points: {selectedPoints}
           </div>
         </div>
-        <div className="flex justify-end gap-3 items-center p-2 mb-2">
-          <button
-            onClick={onClose}
-            className="text-gray-600 bg-gray-100 hover:bg-gray-200 p-2 px-4 rounded-md"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={handleSubmit}
-            disabled={createLoading || updateLoading}
-            className="flex items-center gap-2 font-semibold p-2 px-4 rounded-md bg-gradient-to-r from-pink-100 to-purple-100 hover:shadow-md transition-shadow duration-300"
-          >
-            <span className="bg-gradient-to-r from-red-500 to-purple-500 bg-clip-text text-transparent">
-              {createLoading || updateLoading
-                ? "Loading..."
-                : editMode
-                ? "Update Rubric"
-                : "Save Rubric"}
-            </span>
-          </button>
-        </div>
+
+        {!readonly && (
+          <div className="flex justify-end gap-3 items-center p-2 mb-2">
+            <button
+              onClick={onClose}
+              className="text-gray-600 bg-gray-100 hover:bg-gray-200 p-2 px-4 rounded-md"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleSubmit}
+              disabled={createLoading || updateLoading}
+              className="flex items-center gap-2 font-semibold p-2 px-4 rounded-md bg-gradient-to-r from-pink-100 to-purple-100 hover:shadow-md transition-shadow duration-300"
+            >
+              {createLoading || updateLoading ? (
+                "please wait..."
+              ) : (
+                <span className="bg-gradient-to-r from-red-500 to-purple-500 bg-clip-text text-transparent">
+                  {editMode ? "Update Rubric" : "Save Rubric"}
+                </span>
+              )}
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

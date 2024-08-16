@@ -2,11 +2,9 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useLocation } from "react-router-dom";
 import CreateAssignmentHeader from "./Component/CreateAssignmentHeader";
 import EditorComponent from "../../../Component/AdminEditor";
-import Sidebar from "../../../../../../Components/Common/Sidebar";
 import useCreateAssignment from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/createAssignment";
 import useUpdateAssignment from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useUpdateAssignment";
 import CreateAssignmentForm from "./Component/CreateAssignmentForm";
-import AddNewCriteriaForm from "../../Rubric/Components/AddNewCriteriaForm";
 
 const initialFormState = {
   points: "",
@@ -33,10 +31,13 @@ const MainSection = ({ setIsEditing }) => {
   const [editorContent, setEditorContent] = useState("");
   const [formState, setFormState] = useState(initialFormState);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
-  const [isEditing, setLocalIsEditing] = useState(false); // Define isEditing state locally
+  const [isEditing, setLocalIsEditing] = useState(false);
   const [assignmentId, setAssignmentId] = useState("");
   const [criteriaList, setCriteriaList] = useState([]);
   const [existingRubricId, setExistingRubricId] = useState(null);
+
+  const [saveLoading, setSaveLoading] = useState(false);
+  const [publishLoading, setPublishLoading] = useState(false);
 
   const { createAssignment, loading: createLoading } = useCreateAssignment();
   const { updateAssignment, loading: updateLoading } = useUpdateAssignment();
@@ -49,8 +50,8 @@ const MainSection = ({ setIsEditing }) => {
       const assignment = location.state.assignment;
       setAssignmentName(assignment.name || "");
       setEditorContent(assignment.content || "");
-      setLocalIsEditing(true); // Set the local isEditing state
-      setIsEditing(true); // Inform the parent component that we're editing
+      setLocalIsEditing(true);
+      setIsEditing(true);
       setAssignmentId(assignment._id);
       setFormState({
         points: assignment.points || "",
@@ -68,9 +69,10 @@ const MainSection = ({ setIsEditing }) => {
         chapterId: assignment.chapterId || null,
         groupId: assignment?.groupId || null,
       });
+      setExistingRubricId(assignment.rubricId || null);
     } else {
-      setLocalIsEditing(false); // Set the local isEditing state
-      setIsEditing(false); // Inform the parent component that we're creating
+      setLocalIsEditing(false);
+      setIsEditing(false);
     }
   }, [location.state, setIsEditing]);
 
@@ -79,7 +81,6 @@ const MainSection = ({ setIsEditing }) => {
 
   const handleFormChange = (e) => {
     const { name, value } = e.target;
-
     setFormState((prev) => ({
       ...prev,
       [name]: value,
@@ -87,49 +88,63 @@ const MainSection = ({ setIsEditing }) => {
   };
 
   const handleSave = async (publish) => {
-    // Adjust allowedAttempts and numberOfAttempts based on the select option
-    const allowedAttempts = formState.allowedAttempts === true;
-    let allowNumberOfAttempts = null;
+    try {
+      if (publish) {
+        setPublishLoading(true);
+      } else {
+        setSaveLoading(true);
+      }
 
-    if (allowedAttempts) {
-      allowNumberOfAttempts = formState.numberOfAttempts
-        ? Number(formState.numberOfAttempts)
-        : null;
-    }
+      const allowedAttempts = formState.allowedAttempts === true;
+      let allowNumberOfAttempts = null;
 
-    const assignmentData = {
-      name: assignmentName,
-      content: editorContent,
-      points: formState.points,
-      grade: formState.displayGrade,
-      submissionType: formState.submissionType,
-      allowedAttempts, // boolean value
-      allowNumberOfAttempts, // either null or number
-      assignTo: formState.assignTo,
-      dueDate: formState.dueDate,
-      availableFrom: formState.availableFrom,
-      until: formState.until,
-      thumbnail: formState.thumbnail,
-      classId: cid,
-      subjectId: sid,
-      moduleId: formState.moduleId,
-      chapterId: formState.chapterId,
-      publish,
-    };
+      if (allowedAttempts) {
+        allowNumberOfAttempts = formState.numberOfAttempts
+          ? Number(formState.numberOfAttempts)
+          : null;
+      }
 
-    if (formState.assignTo === "Section") {
-      assignmentData.sectionId = formState.sectionId || null;
-    } else if (formState.assignTo === "Group") {
-      assignmentData.groupId = formState.groupId || null;
-    }
+      const assignmentData = {
+        name: assignmentName,
+        content: editorContent,
+        points: formState.points,
+        grade: formState.displayGrade,
+        submissionType: formState.submissionType,
+        allowedAttempts,
+        allowNumberOfAttempts,
+        assignTo: formState?.assignTo,
+        dueDate: formState.dueDate,
+        availableFrom: formState.availableFrom,
+        until: formState.until,
+        thumbnail: formState.thumbnail,
+        classId: cid,
+        subjectId: sid,
+        moduleId: formState.moduleId,
+        chapterId: formState.chapterId,
+        publish,
+      };
 
-    if (isEditing) {
-      let sectionId = formState.sectionId || null;
-      await updateAssignment(assignmentId, assignmentData, sectionId);
-    } else {
-      const response = await createAssignment(assignmentData);
-      console.log(response);
-      setAssignmentId(response.data._id); // Set assignment ID after creation
+      if (formState.assignTo === "Section") {
+        assignmentData.sectionId = formState.sectionId || null;
+      } else if (formState.assignTo === "Group") {
+        assignmentData.groupId = formState.groupId || null;
+      }
+
+      if (isEditing) {
+        let sectionId = formState.sectionId || null;
+        await updateAssignment(assignmentId, assignmentData, sectionId);
+      } else {
+        const response = await createAssignment(assignmentData);
+        setAssignmentId(response?.data?._id);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      if (publish) {
+        setPublishLoading(false);
+      } else {
+        setSaveLoading(false);
+      }
     }
   };
 
@@ -138,11 +153,16 @@ const MainSection = ({ setIsEditing }) => {
       <CreateAssignmentHeader
         onSave={handleSave}
         id={assignmentId}
-        isEditing={isEditing} // Pass the local isEditing state
+        AssignmentcreateLoading={createLoading}
+        AssignmentupdateLoading={updateLoading}
+        isEditing={isEditing}
         criteriaList={criteriaList}
         setCriteriaList={setCriteriaList}
+        existingRubricId={existingRubricId}
         setExistingRubricId={setExistingRubricId}
-        assignmentId={assignmentId} // Pass assignment ID to header
+        assignmentId={assignmentId}
+        saveLoading={saveLoading}
+        publishLoading={publishLoading}
       />
       <div className="w-full flex ">
         <div className="w-[70%]">
@@ -164,20 +184,6 @@ const MainSection = ({ setIsEditing }) => {
           />
         </div>
       </div>
-      <Sidebar
-        isOpen={isSidebarOpen}
-        onClose={handleSidebarClose}
-        title="Add New Criteria"
-      >
-        <AddNewCriteriaForm
-          onSave={(criteria) =>
-            setFormState((prev) => ({
-              ...prev,
-              criteria: [...prev.criteria, criteria],
-            }))
-          }
-        />
-      </Sidebar>
     </div>
   );
 };

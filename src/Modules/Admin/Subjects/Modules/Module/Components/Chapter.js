@@ -11,6 +11,7 @@ import {
   FaFilePowerpoint,
   FaEye,
 } from "react-icons/fa";
+import { ImSpinner3 } from "react-icons/im";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import { GrAttachment } from "react-icons/gr";
 import ChapterItem from "./ChapterItem";
@@ -19,6 +20,7 @@ import useDeleteAttachment from "../../../../../../Hooks/AuthHooks/Staff/Admin/A
 import DeleteModal from "../../../../../../Components/Common/DeleteModal";
 import Sidebar from "../../../../../../Components/Common/Sidebar";
 import AddAttachment from "./AddAttachment";
+import { useParams } from "react-router-dom";
 
 const Chapter = ({
   title,
@@ -41,9 +43,13 @@ const Chapter = ({
   const [attachmentsExpanded, setAttachmentsExpanded] = useState(false);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [previewType, setPreviewType] = useState(null);
-
+  const [attachmentToDelete, setAttachmentToDelete] = useState(null);
+  const { sid } = useParams();
   const { loading, error, success, deleteChapter } = useDeleteChapter();
-  const { deleteAttachment } = useDeleteAttachment(fetchModules);
+  const { deleteAttachment, loading: attachmentDeleting } =
+    useDeleteAttachment(fetchModules);
+  const [attachmentLoading, setAttachmentLoading] = useState({});
+
   const menuRef = useRef(null);
 
   const toggleMenu = (e) => {
@@ -93,12 +99,25 @@ const Chapter = ({
     setIsSidebarOpen(false);
   };
 
-  const handleDeleteAttachment = async (attachmentUrl) => {
-    console.log(attachmentUrl, "sdfsdf");
+  const handleDeleteAttachment = async () => {
+    if (!attachmentToDelete) return;
+
+    setAttachmentLoading((prev) => ({
+      ...prev,
+      [attachmentToDelete.url]: true,
+    }));
+
     try {
-      await deleteAttachment(moduleId, chapterId, [attachmentUrl]);
+      await deleteAttachment(chapterId, sid, attachmentToDelete.url);
     } catch (error) {
       console.error("Error deleting attachment:", error);
+    } finally {
+      setAttachmentLoading((prev) => ({
+        ...prev,
+        [attachmentToDelete.url]: false,
+      }));
+      setAttachmentToDelete(null); // Reset the state after deletion
+      setDeleteModalOpen(false); // Close the modal after deletion
     }
   };
 
@@ -144,7 +163,31 @@ const Chapter = ({
           <div className="flex items-center">
             <div>
               <h2 className="font-semibold text-md">{title}</h2>
-              <p className="text-gray-500">Chapter {chapterNumber}</p>
+              <div className="flex items-center gap-1">
+                <p className="text-gray-500">Chapter {chapterNumber}</p>
+
+                {attachments.length > 0 && (
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <button
+                        className="flex items-center space-x-1 px-3 text-sm font-semibold bg-gradient-to-r from-pink-100 to-purple-200 rounded-md py-1"
+                        onClick={toggleAttachments}
+                      >
+                        <span className="text-gradient">
+                          Attachments ({attachments.length})
+                        </span>
+                        <span>
+                          {attachmentsExpanded ? (
+                            <FaChevronUp className="ml-1 text-purple-700" />
+                          ) : (
+                            <FaChevronDown className="ml-1 text-purple-800" />
+                          )}
+                        </span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -215,23 +258,6 @@ const Chapter = ({
           </button>
         </div>
       </div>
-      {attachments.length > 0 && (
-        <div className="flex items-center justify-end  mb-2">
-          <div className="flex items-center">
-            <button
-              className="flex items-center space-x-1 text-sm font-semibold text-purple-800 hover:underline   "
-              onClick={toggleAttachments}
-            >
-              <span>Attachments ({attachments.length})</span>
-              {attachmentsExpanded ? (
-                <FaChevronUp className="ml-1" />
-              ) : (
-                <FaChevronDown className="ml-1" />
-              )}
-            </button>
-          </div>
-        </div>
-      )}
 
       {attachmentsExpanded && attachments.length > 0 && (
         <div className="mt-2">
@@ -270,9 +296,20 @@ const Chapter = ({
                     <button
                       type="button"
                       className="text-red-500 transition p-1 border rounded-full transform hover:scale-110 cursor-pointer"
-                      onClick={() => handleDeleteAttachment(attachment.url)}
+                      onClick={() => {
+                        setAttachmentToDelete(attachment); // Set the attachment to delete
+                        setDeleteModalOpen(true); // Open the delete confirmation modal
+                      }}
+                      disabled={attachmentLoading[attachment.url]} // Disable button while loading
                     >
-                      <RiDeleteBin5Line size={20} />
+                      {attachmentLoading[attachment.url] ? (
+                        <ImSpinner3
+                          size={20}
+                          className="animate-spin text-gray-700"
+                        />
+                      ) : (
+                        <RiDeleteBin5Line size={20} />
+                      )}
                     </button>
                   </div>
                 </div>
@@ -312,6 +349,7 @@ const Chapter = ({
         </div>
       )}
 
+      {/* Delete Modal for Chapter */}
       <DeleteModal
         isOpen={deleteModalOpen}
         onClose={() => setDeleteModalOpen(false)}
@@ -319,12 +357,20 @@ const Chapter = ({
         title={title}
       />
 
+      {/* Delete Modal for Attachment */}
+      <DeleteModal
+        isOpen={deleteModalOpen && attachmentToDelete !== null}
+        onClose={() => setDeleteModalOpen(false)}
+        onConfirm={handleDeleteAttachment}
+        title={attachmentToDelete?.label || ""}
+      />
+
       {isSidebarOpen && (
         <Sidebar
           width="60%"
           isOpen={isSidebarOpen}
           onClose={handleSidebarClose}
-          title="Add Attachment"
+          title={`Add Attachment (${title})`}
         >
           <AddAttachment
             chapterData={{ title, chapterId, moduleId }}

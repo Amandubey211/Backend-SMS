@@ -4,12 +4,14 @@ import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
 import { baseUrl } from "../../../../../config/Common";
 import useGetAllStaff from "./useGetAllStaff";
+import useGetAllTeachers from "../Teacher/useGetAllTeacher";
 
 const useDeleteUser = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
-  const  { fetchStaff} = useGetAllStaff()
+  const  { fetchStaff} = useGetAllStaff();
+  const {fetchTeachers} = useGetAllTeachers()
   const { role } = useSelector((store) => store.Auth);
   const deleteUser = useCallback(
     async (uid) => {
@@ -33,7 +35,10 @@ const useDeleteUser = () => {
         if (response.data.success) {
           setSuccess(true);
           toast.success("User deleted successfully");
-          fetchStaff()
+  
+            fetchTeachers()
+      
+            fetchStaff();
         } else {
           toast.error("Failed to delete User");
           setError("Failed to delete User");

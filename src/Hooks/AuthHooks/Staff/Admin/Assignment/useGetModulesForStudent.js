@@ -3,6 +3,7 @@ import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { setModules } from "../../../../../Redux/Slices/Admin/SubjectSlice";
+import { setSelectedModule } from "../../../../../Redux/Slices/Common/CommonSlice";
 import { baseUrl } from "../../../../../config/Common";
 
 const useGetModulesForStudent = () => {
@@ -13,6 +14,7 @@ const useGetModulesForStudent = () => {
   const role = useSelector((store) => store.Auth.role);
   const { cid, sid } = useParams();
   const dispatch = useDispatch();
+  const selectedModule = useSelector((store) => store.Common.selectedModule);
 
   const fetchModules = useCallback(async () => {
     setLoading(true);
@@ -33,8 +35,42 @@ const useGetModulesForStudent = () => {
       );
 
       if (response.data?.success) {
-        dispatch(setModules(response.data.data.modules)); // Update Redux
+        const fetchedModules = response.data.data.modules;
+        dispatch(setModules(fetchedModules)); // Update Redux
         setModulesData(response.data.data); // Update local state
+
+        // Check if the selectedModule is empty or the moduleId doesn't exist in fetchedModules
+        const selectedModuleExists = fetchedModules.find(
+          (module) => module._id === selectedModule.moduleId
+        );
+
+        if (!selectedModule || !selectedModuleExists) {
+          // Set the first module as the selectedModule
+          const firstModule = fetchedModules[0];
+          if (firstModule) {
+            dispatch(
+              setSelectedModule({
+                moduleId: firstModule._id,
+                name: firstModule.moduleName,
+                chapters: firstModule.chapters,
+              })
+            );
+          }
+        } else {
+          // If selectedModule exists, update it with the fetched data
+          const updatedSelectedModule = fetchedModules.find(
+            (module) => module._id === selectedModule.moduleId
+          );
+          if (updatedSelectedModule) {
+            dispatch(
+              setSelectedModule({
+                moduleId: updatedSelectedModule._id,
+                name: updatedSelectedModule.moduleName,
+                chapters: updatedSelectedModule.chapters,
+              })
+            );
+          }
+        }
       } else {
         dispatch(setModules([]));
         setError(response.data.msg || "Failed to fetch modules.");
@@ -46,7 +82,8 @@ const useGetModulesForStudent = () => {
     } finally {
       setLoading(false);
     }
-  }, [role, dispatch, cid, sid]); // All dependencies included
+  // }, [role, dispatch, cid, sid, selectedModule]); // Include selectedModule as a dependency
+  }, [role, dispatch, cid, sid]); // Include selectedModule as a dependency
 
   return { loading, error, modulesData, fetchModules };
 };
