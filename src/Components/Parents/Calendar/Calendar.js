@@ -1,63 +1,103 @@
-import React, { useState, useEffect } from 'react';
-import { Calendar as AntCalendar } from 'antd';
-import { dateCellRender } from '../../../Modules/Parents/utils/dateCellRender';
-import './ChildrenAttendance.css';
+import React, { useEffect, useState } from 'react';
+import { Calendar as AntdCalendar, Spin } from 'antd';
+import AttendanceCard from '../../../Modules/Parents/Attendance/AttendanceCard';
 import axios from 'axios';
 import { baseUrl } from '../../../config/Common';
+import presentIcon from '../../../Assets/ParentAssets/svg/present.svg';
+import absentIcon from '../../../Assets/ParentAssets/svg/absent.svg';
+import leaveIcon from '../../../Assets/ParentAssets/svg/leave.png';
+import './ChildrenAttendance.css'; 
 
 const Calendar = () => {
   const [attendanceData, setAttendanceData] = useState([]);
+  const [month, setMonth] = useState(new Date().getMonth() + 1);
+  const [year, setYear] = useState(new Date().getFullYear());
+  const [loading, setLoading] = useState(true);
 
-  const fetchAttendanceData = async (year, month) => {
+  const fetchAttendanceData = async (selectedMonth, selectedYear) => {
+    console.log('Fetching attendance data...', { selectedMonth, selectedYear });
     const token = localStorage.getItem('parent:token');
     const childrenData = JSON.parse(localStorage.getItem('childrenData'));
     const studentId = childrenData && childrenData[0] ? childrenData[0].id : null;
 
-    if (!studentId) {
-      console.error('No student ID found');
+    if (!studentId || !selectedMonth || !selectedYear) {
+      console.error('Student ID, month, and year are required');
+      setLoading(false);
       return;
     }
 
     try {
-      const response = await axios.get(`${baseUrl}/parent/api/attendance`, {
-        headers: {
-          Authentication: `${token}`
-        },
-        params: {
-          studentId,
-          month: month + 1, 
-          year
-        }
+      const response = await axios.get(`${baseUrl}/api/studentDashboard/myAttendance`, {
+        headers: { Authentication: `${token}` },
+        params: { studentId, month: selectedMonth, year: selectedYear }
       });
 
-      const data = response.data.report.attendanceEntries.map(entry => ({
-        date: entry.date,
-        status: entry.status
-      }));
-      setAttendanceData(data);
+      if (response.data && response.data.report && response.data.report.report) {
+        setAttendanceData(response.data.report.report);
+      } else {
+        throw new Error('No attendance data available');
+      }
     } catch (error) {
-      console.error('Error fetching attendance data:', error);
+      console.error('Error fetching attendance data:', error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const onPanelChange = (value) => {
-    const year = value.year();
-    const month = value.month();
-    fetchAttendanceData(year, month);
-  };
-
   useEffect(() => {
-    const now = new Date();
-    fetchAttendanceData(now.getFullYear(), now.getMonth());
-  }, []);
+    fetchAttendanceData(month, year);
+  }, [month, year]);
+
+  const handlePanelChange = (value) => {
+    setMonth(value.month() + 1);
+    setYear(value.year());
+    setLoading(true);
+  };
 
   return (
     <div className="calendar-container">
-      <AntCalendar 
-        cellRender={(value) => dateCellRender(value, attendanceData)} 
-        onPanelChange={onPanelChange} 
-      />
+      <Spin spinning={loading} size="large" tip="Loading...">
+        <div className="attendance-card-wrapper">
+          <AttendanceCard attendanceData={attendanceData} />
+        </div>
+        <AntdCalendar 
+          onPanelChange={handlePanelChange}
+          dateCellRender={(value) => dateCellRender(value, attendanceData)}
+        />
+      </Spin>
     </div>
+  );
+};
+
+const dateCellRender = (value, attendanceData) => {
+  const listData = attendanceData.filter(entry => 
+    new Date(entry.date).toDateString() === value.toDate().toDateString()
+  );
+
+  return (
+    <ul className="events">
+      {listData.map((item) => {
+        let icon;
+        switch (item.status) {
+          case 'present':
+            icon = <img src={presentIcon} alt="Present" className="icon-class" />;
+            break;
+          case 'absent':
+            icon = <img src={absentIcon} alt="Absent" className="icon-class" />;
+            break;
+          case 'leave':
+            icon = <img src={leaveIcon} alt="Leave" className="icon-class" />;
+            break;
+          default:
+            return null;
+        }
+        return (
+          <li key={item.date}>
+            {icon} {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
+          </li>
+        );
+      })}
+    </ul>
   );
 };
 
