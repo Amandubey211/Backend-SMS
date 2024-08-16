@@ -84,31 +84,7 @@ const AttendanceCard = () => {
           <CardComponent key={index} data={item} />
         ))}
       </div>
-      <div className="mt-4 text-xl font-semibold text-center">
-        <Select
-          className="mr-2"
-          style={{ width: 120 }}
-          onChange={handleMonthChange}
-          value={month}
-        >
-          {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
-            <Option key={m} value={m}>
-              {m}
-            </Option>
-          ))}
-        </Select>
-        <Select
-          style={{ width: 120 }}
-          onChange={handleYearChange}
-          value={year}
-        >
-          {Array.from({ length: 10 }, (_, i) => currentDate.getFullYear() - 5 + i).map((y) => (
-            <Option key={y} value={y}>
-              {y}
-            </Option>
-          ))}
-        </Select>
-      </div>
+      
     </div>
   );
 };

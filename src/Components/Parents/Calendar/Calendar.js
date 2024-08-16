@@ -1,19 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar as AntCalendar } from 'antd';
 import { dateCellRender } from '../../../Modules/Parents/utils/dateCellRender';
+import './ChildrenAttendance.css';
 import axios from 'axios';
 import { baseUrl } from '../../../config/Common';
-import './ChildrenAttendance.css';
 
 const Calendar = () => {
   const [attendanceData, setAttendanceData] = useState([]);
-  const [summary, setSummary] = useState({
-    presentCount: 0,
-    absentCount: 0,
-    leaveCount: 0
-  });
+  const [year, setYear] = useState(new Date().getFullYear());
+  const [month, setMonth] = useState(new Date().getMonth() + 1); // +1 because months are 0-indexed
 
   const fetchAttendanceData = async (year, month) => {
+    console.log(`API call initiated: Fetching attendance data for Year: ${year}, Month: ${month}`);
+    
     const token = localStorage.getItem('parent:token');
     const childrenData = JSON.parse(localStorage.getItem('childrenData'));
     const studentId = childrenData && childrenData[0] ? childrenData[0].id : null;
@@ -29,33 +28,43 @@ const Calendar = () => {
           Authentication: `${token}`
         },
         params: {
-          month: month + 1, 
+          month,
           year,
           studentId
         }
       });
 
-      const { report, summary } = response.data.report;
+      console.log('API response received:', response.data);
 
-      setAttendanceData(report.map(entry => ({
+      const data = response.data.report.report.map(entry => ({
         date: entry.date,
         status: entry.status
-      })));
-      setSummary(summary);
+      }));
+
+      console.log('Processed attendance data:', data);
+
+      setAttendanceData(data);
     } catch (error) {
       console.error('Error fetching attendance data:', error);
     }
   };
 
   const onPanelChange = (value) => {
-    const year = value.year();
-    const month = value.month();
-    fetchAttendanceData(year, month);
+    const newYear = value.year();
+    const newMonth = value.month() + 1; // month is 0-indexed
+
+    console.log(`Month/Year changed: New Year: ${newYear}, New Month: ${newMonth}`);
+
+    setYear(newYear);
+    setMonth(newMonth);
+
+    // Fetch data for the new month/year
+    fetchAttendanceData(newYear, newMonth);
   };
 
   useEffect(() => {
-    const now = new Date();
-    fetchAttendanceData(now.getFullYear(), now.getMonth());
+    console.log('Initial fetch of attendance data.');
+    fetchAttendanceData(year, month);
   }, []);
 
   return (
@@ -64,17 +73,6 @@ const Calendar = () => {
         cellRender={(value) => dateCellRender(value, attendanceData)} 
         onPanelChange={onPanelChange} 
       />
-      <div className="summary-cards">
-        <div className="summary-card bg-green-100">
-          <p>Present: {summary.presentCount}</p>
-        </div>
-        <div className="summary-card bg-red-100">
-          <p>Absent: {summary.absentCount}</p>
-        </div>
-        <div className="summary-card bg-purple-100">
-          <p>Leave: {summary.leaveCount}</p>
-        </div>
-      </div>
     </div>
   );
 };
