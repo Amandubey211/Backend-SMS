@@ -1,58 +1,57 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Spin } from 'antd';
-import { CheckCircleOutlined, CloseCircleOutlined, ClockCircleOutlined } from '@ant-design/icons';
+import checkboxIcon from '../../../Assets/ParentAssets/svg/checkbox.svg';
+import crossIcon from '../../../Assets/ParentAssets/svg/cross.svg';
+import leaveIcon from '../../../Assets/ParentAssets/svg/leave.png';
 
-const AttendanceCard = ({ attendanceData, isLoading }) => {
+const AttendanceCard = ({ attendanceData }) => {
   const [summary, setSummary] = useState({ presentCount: 0, absentCount: 0, leaveCount: 0 });
 
   useEffect(() => {
-    if (attendanceData && attendanceData.length > 0) {
+    if (attendanceData) {
       const presentCount = attendanceData.filter(item => item.status === 'present').length;
       const absentCount = attendanceData.filter(item => item.status === 'absent').length;
       const leaveCount = attendanceData.filter(item => item.status === 'leave').length;
 
       setSummary({ presentCount, absentCount, leaveCount });
-    } else {
-      setSummary({ presentCount: 0, absentCount: 0, leaveCount: 0 });
     }
   }, [attendanceData]);
 
   const summaryData = [
-    { title: 'Present', value: summary.presentCount, icon: 'present', color: 'bg-green-100' },
-    { title: 'Absent', value: summary.absentCount, icon: 'absent', color: 'bg-red-100' },
-    { title: 'Leave', value: summary.leaveCount, icon: 'leave', color: 'bg-purple-100' }
+    { title: 'Total Present', value: summary.presentCount, icon: checkboxIcon, color: 'bg-green-100' },
+    { title: 'Total Absent', value: summary.absentCount, icon: crossIcon, color: 'bg-red-100' },
+    { title: 'Total Leave', value: summary.leaveCount, icon: leaveIcon, color: 'bg-purple-100', isGradient: true }
   ];
 
   return (
     <div className="flex flex-col items-center">
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 mt-10 justify-between">
-        {isLoading ? (
-          <Spin tip="Loading..." size="large" />
-        ) : (
-          summaryData.map((item, index) => (
-            <CardComponent key={index} data={item} />
-          ))
-        )}
+        {summaryData.map((item, index) => (
+          <CardComponent key={index} data={item} />
+        ))}
       </div>
     </div>
   );
 };
 
 const CardComponent = ({ data }) => {
-  const iconComponents = {
-    present: <CheckCircleOutlined className="text-2xl" />,
-    absent: <CloseCircleOutlined className="text-2xl" />,
-    leave: <ClockCircleOutlined className="text-2xl" />
-  };
-
-  console.log(`Rendering CardComponent for: ${data.title} with value: ${data.value}`);
+  const cardStyle = data.isGradient
+    ? 'bg-gradient-to-b from-[#FAECF0] to-[#F3EBFB]' // Apply gradient background
+    : data.color; // Use solid color for other cards
 
   return (
-    <Card className={`h-[95px] w-[200px] ${data.color} rounded-lg shadow-md flex flex-col items-center justify-center`}>
-      <div className="text-[15px]">{iconComponents[data.icon]}</div>
-      <div className="text-[15px] font-bold">{data.value}</div>
-      <div className="text-[15px]">{data.title}</div>
-    </Card>
+    <div
+      className={`h-[90px] w-[313px] rounded-lg shadow-md p-4 flex items-center justify-between ${cardStyle}`}
+    >
+      <div className="flex items-center">
+        <div className="bg-white rounded-full p-2 shadow-sm mr-3">
+          <img src={data.icon} alt={data.title} className="w-6 h-6" />
+        </div>
+        <div className="flex flex-col">
+          <span className="text-lg font-semibold">{data.value}</span>
+          <span className="text-sm font-medium text-gray-600">{data.title}</span>
+        </div>
+      </div>
+    </div>
   );
 };
 
