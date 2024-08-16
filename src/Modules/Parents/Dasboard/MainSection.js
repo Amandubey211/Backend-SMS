@@ -10,6 +10,7 @@ import { CiMoneyBill } from "react-icons/ci";
 import { RiMoneyDollarBoxFill } from "react-icons/ri";
 import { RiCalendarCheckLine } from "react-icons/ri";
 import { baseUrl } from '../../../config/Common.js';
+import Spinner from "../../../Components/Common/Spinner"; // Import Spinner
 
 const fetchDashboardData = async () => {
   try {
@@ -33,6 +34,7 @@ const fetchDashboardData = async () => {
 const ParentSection = () => {
   const [cardData, setCardData] = useState(initialCardData);
   const [numberOfChildren, setNumberOfChildren] = useState(0);
+  const [loading, setLoading] = useState(true); // Add loading state
 
   useEffect(() => {
     const getData = async () => {
@@ -75,10 +77,15 @@ const ParentSection = () => {
 
         setNumberOfChildren(data.childrenCount || 0);
       }
+      setLoading(false); // Set loading to false once data is fetched
     };
 
     getData();
   }, []);
+
+  if (loading) {
+    return <Spinner />; // Show spinner while loading
+  }
 
   return (
     <div className="h-full w-full">

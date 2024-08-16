@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import ChildCard from "../../../Components/Parents/Children/ChildCard";
 import { baseUrl } from "../../../config/Common";
+import Spinner from "../../../Components/Common/Spinner";
+import { FaChild } from 'react-icons/fa';
 
 const MyChildren = () => {
   const [students, setStudents] = useState([]);
@@ -11,7 +13,7 @@ const MyChildren = () => {
     const fetchStudents = async () => {
       try {
         const userData = JSON.parse(localStorage.getItem('userData'));
-        console.log(userData)
+        console.log(userData);
         const token = localStorage.getItem('parent:token');
 
         if (!userData) {
@@ -69,11 +71,25 @@ const MyChildren = () => {
   }, []);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <Spinner />;
   }
 
   if (error) {
-    return <div>Error: {error}</div>;
+    return (
+      <div className="flex flex-col items-center justify-center h-full text-center py-10">
+        <FaChild className="text-gray-400 text-6xl mb-4" />
+        <p className="text-gray-600 text-lg">Unable to fetch children data!</p>
+      </div>
+    );
+  }
+
+  if (students.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full text-center py-10">
+        <FaChild className="text-gray-400 text-6xl mb-4" />
+        <p className="text-gray-600 text-lg">No Children Found!</p>
+      </div>
+    );
   }
 
   return (

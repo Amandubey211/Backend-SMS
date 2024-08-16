@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { baseUrl } from '../../../../config/Common';
-import { FaChild } from 'react-icons/fa'; // Importing an icon for the no children message
+import { FaChild } from 'react-icons/fa';
+import Spinner from "../../../../Components/Common/Spinner"; // Import Spinner
 
 const StudentCard = ({ student, index }) => {
-  const defaultImage = "https://via.placeholder.com/150"; // Placeholder image URL
-  const profileImage = student.profile || defaultImage; // Use the student profile image or the default image
+  const defaultImage = "https://via.placeholder.com/150";
+  const profileImage = student.profile || defaultImage;
 
   return (
     <div className="border-r border-b p-4 mb-4 text-center relative border-gray-300">
@@ -16,7 +17,7 @@ const StudentCard = ({ student, index }) => {
         src={profileImage}
         alt={student.name}
         className="w-20 h-20 rounded-full mx-auto mb-2"
-        onError={(e) => { e.target.onerror = null; e.target.src = defaultImage; }} // Fallback to default image if the provided src fails
+        onError={(e) => { e.target.onerror = null; e.target.src = defaultImage; }}
       />
       <h2 className="text-lg font-semibold mb-1">{student.name}</h2>
       <div className="text-gray-600 text-sm mb-1">
@@ -83,34 +84,32 @@ const StudentParentCard = () => {
     fetchStudents();
   }, []);
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
-
-  if (students.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center h-full text-center">
-        <FaChild className="text-gray-400 text-6xl mb-4" />
-        <p className="text-gray-600 text-lg">No Children Found!</p>
-      </div>
-    );
-  }
+  const renderErrorOrNoChildren = (message) => (
+    <div className="flex flex-col items-center justify-center h-full text-center py-10"> {/* Added padding */}
+      <FaChild className="text-gray-400 text-6xl mb-4" />
+      <p className="text-gray-600 text-lg">{message}</p>
+    </div>
+  );
 
   return (
-    <div className="p-0">
-      {students.slice(0, 3).map((student, index) => (
-        <StudentCard key={student.id} student={student} index={index} />
-      ))}
-      {students.length > 3 && (
-        <div className="text-center mt-4">
-          <Link to="/children" className="bg-blue-500 text-white py-2 px-4 rounded-full hover:bg-blue-700">
-            Show All
-          </Link>
-        </div>
+    <div className="p-4"> {/* Added padding */}
+      <h2 className="text-lg font-semibold mb-4">My Children</h2> {/* Heading */}
+      {loading && <Spinner />} {/* Show spinner while loading */}
+      {!loading && error && renderErrorOrNoChildren("No Children Data Found!")} {/* Show icon with error message */}
+      {!loading && !error && students.length === 0 && renderErrorOrNoChildren("No Children Found!")} {/* Show icon with no children message */}
+      {!loading && !error && students.length > 0 && (
+        <>
+          {students.slice(0, 3).map((student, index) => (
+            <StudentCard key={student.id} student={student} index={index} />
+          ))}
+          {students.length > 3 && (
+            <div className="text-center mt-4">
+              <Link to="/children" className="bg-blue-500 text-white py-2 px-4 rounded-full hover:bg-blue-700">
+                Show All
+              </Link>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

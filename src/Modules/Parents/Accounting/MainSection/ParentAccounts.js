@@ -4,6 +4,7 @@ import axios from "axios";
 import { baseUrl } from "../../../../config/Common";
 import Layout from "../../../../Components/Common/ParentLayout";
 import { FaMoneyBillWave } from "react-icons/fa"; // Importing an icon for the no fees message
+import Spinner from "../../../../Components/Common/Spinner"; // Import Spinner
 
 const uniqueFilterOptions = (data, key) => {
   return [...new Set(data.map((item) => item[key]))].sort();
@@ -21,6 +22,7 @@ const AccountingSection = () => {
   const [totalUnpaidFees, setTotalUnpaidFees] = useState("");
   const [totalPaidFees, setTotalPaidFees] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true); // Loading state
 
   useEffect(() => {
     const fetchData = async () => {
@@ -40,8 +42,10 @@ const AccountingSection = () => {
         setData(response.data.fees);
         setTotalUnpaidFees(response.data.totalUnpaidFees);
         setTotalPaidFees(response.data.totalPaidFees);
+        setLoading(false); // Set loading to false after data is fetched
       } catch (error) {
         console.error("Error fetching data:", error);
+        setLoading(false); // Set loading to false even on error
       }
     };
     fetchData();
@@ -60,6 +64,10 @@ const AccountingSection = () => {
         (filters.status === "Paid" && item.status === "Paid") ||
         (filters.status === "Unpaid" && item.status === "Unpaid"))
   );
+
+  if (loading) {
+    return <Spinner />; // Show spinner while loading
+  }
 
   return (
     <Layout title="Accounting">

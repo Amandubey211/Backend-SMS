@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { Calendar } from "antd";
 import Layout from "../../../Components/Common/Layout";
-import ParentDashLayout from "../../../Components/Parents/ParentDashLayout"; // Use ParentDashLayout
+import ParentDashLayout from "../../../Components/Parents/ParentDashLayout"; 
 import EventCard from "./Events/subComponents/EventCard";
 import Sidebar from "../../../Components/Common/Sidebar";
 import ViewEvent from "./Events/subComponents/ViewEvent";
-import "./Events/subComponents/customCalendar.css";
+import Spinner from "../../../Components/Common/Spinner"; // Import Spinner
+import { IoCalendarOutline } from "react-icons/io5"; // Import the calendar icon for empty states
 import { baseUrl } from "../../../config/Common";
 import { format, parseISO, isValid } from "date-fns";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
-import { IoCalendarOutline } from "react-icons/io5";
 
 const ParentEvent = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -23,11 +23,15 @@ const ParentEvent = () => {
     month: currentDate.getMonth(),
     year: currentDate.getFullYear(),
   });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const itemsPerPage = 4;
 
   useEffect(() => {
     const fetchEvents = async () => {
+      setLoading(true);
+      setError(null);
       try {
         const token = localStorage.getItem("parent:token");
         if (!token) {
@@ -56,9 +60,14 @@ const ParentEvent = () => {
           }));
           setEvents(formattedEvents);
           filterAndSortEvents(formattedEvents, selectedMonthYear);
+        } else {
+          setError("No events found");
         }
       } catch (error) {
         console.error("Failed to fetch events:", error);
+        setError("Failed to fetch events");
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -147,7 +156,7 @@ const ParentEvent = () => {
   return (
     <>
       <Layout title="Event">
-        <ParentDashLayout>  {/* Replace with ParentDashLayout */}
+        <ParentDashLayout>
           <div className="min-h-screen p-4 bg-gray-50">
             <div className="flex flex-row justify-between">
               <h1 className="mb-2 bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent font-semibold bg-clip-text">
@@ -156,15 +165,16 @@ const ParentEvent = () => {
             </div>
 
             <div className="my-4 w-full h-40 flex rounded-sm gap-20 pl-10 relative ">
-              {currentPage > 0 && (
-                <div
-                  className="p-1 rounded-full text-purple-500 bg-white border-2 cursor-pointer absolute left-0 top-1/2 transform -translate-y-1/2"
-                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 0))}
-                >
-                  <IoIosArrowBack />
+              {loading ? (
+                <div className="flex justify-center items-center w-full h-full">
+                  <Spinner />
                 </div>
-              )}
-              {paginatedEvents.length === 0 ? (
+              ) : error ? (
+                <div className="flex flex-col items-center justify-center w-full h-full text-gray-500">
+                  <IoCalendarOutline className="text-6xl" />
+                  <span>{error}</span>
+                </div>
+              ) : paginatedEvents.length === 0 ? (
                 <div className="flex flex-col items-center justify-center w-full h-full text-gray-500">
                   <IoCalendarOutline className="text-6xl" />
                   <span>No Events in this Month</span>
@@ -286,7 +296,7 @@ const ParentEvent = () => {
               {renderSidebarContent()}
             </Sidebar>
           </div>
-        </ParentDashLayout> {/* Ensure to replace here as well */}
+        </ParentDashLayout>
       </Layout>
     </>
   );

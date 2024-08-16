@@ -2,17 +2,19 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Layout from "../../../../Components/Common/Layout";
 import ParentDashLayout from "../../../../Components/Parents/ParentDashLayout.js";
-import { MdQueryBuilder, MdAnnouncement } from "react-icons/md";  // Importing the announcement icon
+import { MdQueryBuilder, MdAnnouncement } from "react-icons/md";
 import { FcAlarmClock } from "react-icons/fc";
-import toast from "react-hot-toast";
-import { baseUrl } from "../../../../config/Common.js";
 import { MdExpandLess, MdExpandMore } from 'react-icons/md';
+import toast from "react-hot-toast";
+import Spinner from "../../../../Components/Common/Spinner"; // Import Spinner
+import { baseUrl } from "../../../../config/Common.js";
 
 const ParentAnnounce = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeIndex, setActiveIndex] = useState(null);
   const [ancmts, setAncmts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchAncmts = async () => {
@@ -24,9 +26,10 @@ const ParentAnnounce = () => {
           },
         });
         setAncmts(response.data.events);
-        setLoading(false);
       } catch (error) {
+        setError("Failed to fetch announcements");
         toast.error("Failed to fetch announcements");
+      } finally {
         setLoading(false);
       }
     };
@@ -43,7 +46,11 @@ const ParentAnnounce = () => {
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex justify-center items-center h-full">
+        <Spinner />
+      </div>
+    );
   }
 
   return (
@@ -71,7 +78,12 @@ const ParentAnnounce = () => {
               </div>
             </div>
 
-            {filteredAncmts.length === 0 ? (
+            {error ? (
+              <div className="flex flex-col items-center justify-center h-64">
+                <MdAnnouncement className="text-4xl text-gray-400" />
+                <p className="mt-2 text-gray-500">Failed to fetch announcements.</p>
+              </div>
+            ) : filteredAncmts.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-64">
                 <MdAnnouncement className="text-4xl text-gray-400" />
                 <p className="mt-2 text-gray-500">No Announcements Found</p>
