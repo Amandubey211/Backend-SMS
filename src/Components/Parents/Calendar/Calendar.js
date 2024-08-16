@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Calendar as AntdCalendar } from 'antd';
+import { Calendar as AntdCalendar, Spin } from 'antd';
 import AttendanceCard from '../../../Modules/Parents/Attendance/AttendanceCard';
 import axios from 'axios';
 import { baseUrl } from '../../../config/Common';
@@ -33,7 +33,6 @@ const Calendar = () => {
       });
 
       if (response.data && response.data.report && response.data.report.report) {
-        console.log('Attendance data fetched:', response.data.report.report);
         setAttendanceData(response.data.report.report);
       } else {
         throw new Error('No attendance data available');
@@ -50,7 +49,6 @@ const Calendar = () => {
   }, [month, year]);
 
   const handlePanelChange = (value) => {
-    console.log('Panel change detected:', value);
     setMonth(value.month() + 1);
     setYear(value.year());
     setLoading(true);
@@ -58,19 +56,20 @@ const Calendar = () => {
 
   return (
     <div className="calendar-container">
-      <div className="attendance-card-wrapper">
-        {!loading && <AttendanceCard attendanceData={attendanceData} />}
-      </div>
-      <AntdCalendar 
-        onPanelChange={handlePanelChange}
-        dateCellRender={(value) => dateCellRender(value, attendanceData)}
-      />
+      <Spin spinning={loading} size="large" tip="Loading...">
+        <div className="attendance-card-wrapper">
+          <AttendanceCard attendanceData={attendanceData} />
+        </div>
+        <AntdCalendar 
+          onPanelChange={handlePanelChange}
+          dateCellRender={(value) => dateCellRender(value, attendanceData)}
+        />
+      </Spin>
     </div>
   );
 };
 
 const dateCellRender = (value, attendanceData) => {
-  console.log('Rendering date cell:', value.toDate().toDateString());
   const listData = attendanceData.filter(entry => 
     new Date(entry.date).toDateString() === value.toDate().toDateString()
   );
@@ -78,7 +77,6 @@ const dateCellRender = (value, attendanceData) => {
   return (
     <ul className="events">
       {listData.map((item) => {
-        console.log('Rendering icon for:', item.status, item.date);
         let icon;
         switch (item.status) {
           case 'present':

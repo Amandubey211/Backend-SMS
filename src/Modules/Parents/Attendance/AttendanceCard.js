@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Card } from 'antd';
+import { Card, Spin } from 'antd';
 import { CheckCircleOutlined, CloseCircleOutlined, ClockCircleOutlined } from '@ant-design/icons';
 
-const AttendanceCard = ({ attendanceData }) => {
+const AttendanceCard = ({ attendanceData, isLoading }) => {
   const [summary, setSummary] = useState({ presentCount: 0, absentCount: 0, leaveCount: 0 });
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (attendanceData && attendanceData.length > 0) {
@@ -13,10 +12,8 @@ const AttendanceCard = ({ attendanceData }) => {
       const leaveCount = attendanceData.filter(item => item.status === 'leave').length;
 
       setSummary({ presentCount, absentCount, leaveCount });
-      setLoading(false);  // Loading is complete after processing data
     } else {
       setSummary({ presentCount: 0, absentCount: 0, leaveCount: 0 });
-      setLoading(false);  // Even if no data, we stop loading
     }
   }, [attendanceData]);
 
@@ -26,16 +23,16 @@ const AttendanceCard = ({ attendanceData }) => {
     { title: 'Leave', value: summary.leaveCount, icon: 'leave', color: 'bg-purple-100' }
   ];
 
-  if (loading) {
-    return <div className="text-center text-xl p-4">Loading...</div>;
-  }
-
   return (
     <div className="flex flex-col items-center">
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 mt-10 justify-between">
-        {summaryData.map((item, index) => (
-          <CardComponent key={index} data={item} />
-        ))}
+        {isLoading ? (
+          <Spin tip="Loading..." size="large" />
+        ) : (
+          summaryData.map((item, index) => (
+            <CardComponent key={index} data={item} />
+          ))
+        )}
       </div>
     </div>
   );
