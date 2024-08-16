@@ -45,6 +45,8 @@ const useStaffLogin = () => {
 
     try {
       const deviceToken = await requestPermissionAndGetToken();
+      console.log(deviceToken);
+      
       const userdetail = { email, password, deviceToken };
       const { data } = await axios.post(
         `${baseUrl}/auth/staff/login`,
