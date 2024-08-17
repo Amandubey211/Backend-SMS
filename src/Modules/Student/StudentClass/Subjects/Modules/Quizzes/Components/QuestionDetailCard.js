@@ -11,7 +11,6 @@ import DateDetail from '../../../Component/DateDetail';
 const QuestionDetailCard = ({ quiz,timeLeft ,totalTime}) => {
   const { name, quizType, availableFrom, totalPoints, allowNumberOfAttempts, timeLimit } = quiz; // destructure quiz object
   const [showTime, setShowTime] = useState(true);
-
   const commentsData = [
     {
       avatar: "https://avatars.githubusercontent.com/u/109097090?v=4", // Replace with actual image URL

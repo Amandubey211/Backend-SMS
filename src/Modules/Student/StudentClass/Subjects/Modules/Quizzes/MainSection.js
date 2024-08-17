@@ -1,29 +1,264 @@
 
-import React, { useState, useEffect, useCallback } from 'react';
-import SubjectSideBar from '../../Component/SubjectSideBar';
-import QuizzDetailCard from './Components/QuizzDetailCard';
-import QuizInstructionSection from './Components/QuizInstructionSection';
-import QuizQuestions from './Components/QuizQuestions';
-import QuestionDetailCard from './Components/QuestionDetailCard';
-import QuizResults from './Components/QuizResults';
-import QuizResultSummary from './Components/QuizResultSummary';
-import Tabs from './Components/Tabs';
-import { useSelector } from 'react-redux';
+
+// -------------this is now main 👆--------------------
+
+
+// import React, { useState,useEffect, useCallback } from "react";
+// import SubjectSideBar from "../../Component/SubjectSideBar";
+// import QuizzDetailCard from "./Components/QuizzDetailCard";
+// import QuizInstructionSection from "./Components/QuizInstructionSection";
+// import QuizQuestions from "./Components/QuizQuestions";
+// import QuestionDetailCard from "./Components/QuestionDetailCard";
+// import QuizResults from "./Components/QuizResults";
+// import QuizResultSummary from "./Components/QuizResultSummary";
+// import Tabs from "./Components/Tabs";
+// import { useSelector } from "react-redux";
+// import useFetchAttemptHistory from "../../../../../../Hooks/StudentHooks/Quiz/useFetchAttemptHistory";
+// import useSubmitQuiz from "../../../../../../Hooks/StudentHooks/Quiz/useSubmitQuiz";
+
+
+
+// const MainSection = ({ quiz }) => {
+//   const quizId = quiz._id;
+//   const { selectedClass, selectedSection, selectedSubject, studentId } = useSelector(
+//     (state) => state.Common
+//   );
+//   const [activeTab, setActiveTab] = useState("instructions");
+//   const [selectedOptions, setSelectedOptions] = useState({});
+//   const [totalTime, setTotalTime] = useState(0);
+//   const [timeLeft, setTimeLeft] = useState(0);
+//   const [quizStarted, setQuizStarted] = useState(false);
+//   const [quizSubmitted, setQuizSubmitted] = useState(false);
+//   const [attemptHistory, setAttemptHistory] = useState([]);
+//   const [quizResults, setQuizResults] = useState({
+//     totalPoints: 0,
+//     correctAnswers: 0,
+//     wrongAnswers: 0,
+//   });
+
+//   const { timeLimit, allowNumberOfAttempts, showOneQuestionOnly } = quiz;
+//   const quizDuration = timeLimit * 60;
+
+//   // Custom hook to fetch attempt history
+//   useFetchAttemptHistory(quizId, allowNumberOfAttempts, setAttemptHistory, setQuizSubmitted);
+
+//   // Custom hook to handle quiz submission
+//   const {submitQuiz} = useSubmitQuiz(quizId, attemptHistory, setAttemptHistory, allowNumberOfAttempts);
+
+//   useEffect(() => {
+//     let timer;
+//     if (quizStarted && timeLeft > 0) {
+//       timer = setInterval(() => {
+//         setTimeLeft((prevTime) => {
+//           if (prevTime <= 1) {
+//             clearInterval(timer);
+//             setQuizStarted(false);
+//             handleSubmit(); // Automatically submit when timer reaches 0
+//             return 0;
+//           }
+//           return prevTime - 1;
+//         });
+//       }, 1000);
+//     }
+
+//     return () => clearInterval(timer);
+//   }, [quizStarted, timeLeft]);
+
+//   const handleOptionChange = (questionIndex, selectedOption) => {
+//     setSelectedOptions((prev) => ({
+//       ...prev,
+//       [questionIndex]: selectedOption,
+//     }));
+//   };
+
+//   const handleTabChange = useCallback(
+//     (tab) => {
+//       if (tab === "questions") {
+//         if (!quizStarted) {
+//           setTimeLeft(quizDuration);
+//           setTotalTime(quizDuration);
+//           setQuizStarted(true);
+//         }
+//       }
+//       setActiveTab(tab);
+//     },
+//     [quizStarted, quizDuration]
+//   );
+
+//   const handleSubmit = useCallback(async () => {
+//     let totalPoints = 0;
+//     let correctAnswers = 0;
+//     let wrongAnswers = 0;
+//     const questionsWithSelectedOptions = quiz.questions.map((question, index) => {
+//       const selectedOption = selectedOptions[index];
+//       const isCorrect = selectedOption && selectedOption === question.correctAnswer;
+
+//       if (selectedOption) {
+//         if (isCorrect) {
+//           correctAnswers += 1;
+//           totalPoints += question.questionPoint;
+//         } else {
+//           wrongAnswers += 1;
+//         }
+//       }
+//       return {
+//         questionId: question._id,
+//         selectedOption,
+//         isCorrect,
+//       };
+//     });
+
+//     const newAttempt = await submitQuiz(questionsWithSelectedOptions, totalTime - timeLeft);
+
+//     if (newAttempt) {
+//       setAttemptHistory((prev) => [...prev, newAttempt]);
+//       setQuizSubmitted(true);  // Set quizSubmitted to true immediately after successful submission
+//       setQuizResults({
+//         totalPoints: totalPoints,
+//         correctAnswers: correctAnswers,
+//         wrongAnswers: wrongAnswers,
+//       });
+//     }
+
+//     setQuizStarted(false); // Stop the timer
+//   }, [selectedOptions, submitQuiz, totalTime, timeLeft, quiz.questions]);
+
+
+//   const hasRemainingAttempts = () => {
+//     return allowNumberOfAttempts === 0 || attemptHistory.length < allowNumberOfAttempts;
+//   };
+
+//   return (
+//     <div className="flex">
+//       <SubjectSideBar />
+//       <div className="w-[65%] border-x">
+//         <Tabs
+//           activeTab={activeTab}
+//           setActiveTab={handleTabChange}
+//           onTabChange={handleTabChange}
+//           quizSubmitted={quizSubmitted}
+//           hasAttempted={attemptHistory.length > 0}
+//           quiz={quiz}
+//           hasRemainingAttempts={hasRemainingAttempts()}
+//         >
+//           {(activeTab) => (
+//             <div className="h-full">
+//               {activeTab === "instructions" && <QuizInstructionSection quiz={quiz} />}
+//               {activeTab === "questions" && (
+//                 <>
+//                   {!quizSubmitted && hasRemainingAttempts() ? (
+//                     <QuizQuestions
+//                       questions={quiz.questions}
+//                       selectedOptions={selectedOptions}
+//                       handleOptionChange={handleOptionChange}
+//                       showOneQuestionOnly={showOneQuestionOnly}
+//                       handleSubmit={handleSubmit}
+//                     />
+//                   ) : (
+//                     <QuizResults questions={quiz.questions} selectedOptions={selectedOptions} />
+//                   )}
+//                 </>
+//               )}
+//             </div>
+//           )}
+//         </Tabs>
+//       </div>
+//       <div className="w-[30%]">
+//         {activeTab === "instructions" && <QuizzDetailCard quiz={quiz} />}
+//         {activeTab === "questions" && !quizSubmitted && (
+//           <QuestionDetailCard timeLeft={timeLeft} totalTime={totalTime} quiz={quiz} />
+//         )}
+//         {activeTab === "questions" && quizSubmitted && (
+//           <QuizResultSummary
+//             totalPoints={quizResults.totalPoints}
+//             correctAnswers={quizResults.correctAnswers}
+//             wrongAnswers={quizResults.wrongAnswers}
+//             attemptHistory={attemptHistory}
+//             quizId={quizId}
+//           />
+//         )}
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default MainSection;
+
+// -------------this is now main 2 👆--------------------
+
+
+import React, { useState, useEffect, useCallback } from "react";
+import SubjectSideBar from "../../Component/SubjectSideBar";
+import QuizzDetailCard from "./Components/QuizzDetailCard";
+import QuizInstructionSection from "./Components/QuizInstructionSection";
+import QuizQuestions from "./Components/QuizQuestions";
+import QuestionDetailCard from "./Components/QuestionDetailCard";
+import QuizResults from "./Components/QuizResults";
+import QuizResultSummary from "./Components/QuizResultSummary";
+import Tabs from "./Components/Tabs";
+import { useSelector } from "react-redux";
+import useFetchAttemptHistory from "../../../../../../Hooks/StudentHooks/Quiz/useFetchAttemptHistory";
+import useSubmitQuiz from "../../../../../../Hooks/StudentHooks/Quiz/useSubmitQuiz";
+import { useNavigate, useBeforeUnload } from "react-router-dom";
 
 const MainSection = ({ quiz }) => {
   const quizId = quiz._id;
-  const { selectedClass, selectedSection, selectedSubject, studentId } = useSelector((state) => state.Common);
-  const [activeTab, setActiveTab] = useState('instructions');
+  const { selectedClass, selectedSection, selectedSubject, studentId } = useSelector(
+    (state) => state.Common
+  );
+  const [activeTab, setActiveTab] = useState("instructions");
   const [selectedOptions, setSelectedOptions] = useState({});
   const [totalTime, setTotalTime] = useState(0);
   const [timeLeft, setTimeLeft] = useState(0);
   const [quizStarted, setQuizStarted] = useState(false);
   const [quizSubmitted, setQuizSubmitted] = useState(false);
-  const [quizResults, setQuizResults] = useState({ totalPoints: 0, correctAnswers: 0, wrongAnswers: 0 });
   const [attemptHistory, setAttemptHistory] = useState([]);
-  
-  const { timeLimit } = quiz;
+  const [quizResults, setQuizResults] = useState({
+    totalPoints: 0,
+    correctAnswers: 0,
+    wrongAnswers: 0,
+  });
+
+  const { timeLimit, allowNumberOfAttempts, showOneQuestionOnly } = quiz;
   const quizDuration = timeLimit * 60;
+
+  const navigate = useNavigate();
+
+  // Custom hook to fetch attempt history
+  useFetchAttemptHistory(quizId, allowNumberOfAttempts, setAttemptHistory, setQuizSubmitted);
+
+  // Custom hook to handle quiz submission
+  const { submitQuiz } = useSubmitQuiz(quizId, attemptHistory, setAttemptHistory, allowNumberOfAttempts);
+
+  useBeforeUnload((event) => {
+    if (quizStarted && !quizSubmitted) {
+      event.preventDefault();
+      event.returnValue = ""; // Trigger the native browser confirmation dialog
+    }
+  });
+
+  useEffect(() => {
+    const handleNavigation = (e) => {
+      if (quizStarted && !quizSubmitted) {
+        const confirmLeave = window.confirm(
+          "You are about to leave the quiz. Your submission will not be saved. Are you sure you want to leave?"
+        );
+        if (!confirmLeave) {
+          e.preventDefault(); // Prevent navigation
+        } else {
+          navigate(e.target.location.pathname); // Allow navigation
+        }
+      }
+    };
+
+    // Override the default behavior of link clicks
+    const links = document.querySelectorAll("a");
+    links.forEach((link) => link.addEventListener("click", handleNavigation));
+
+    return () => {
+      links.forEach((link) => link.removeEventListener("click", handleNavigation));
+    };
+  }, [quizStarted, quizSubmitted, navigate]);
 
   useEffect(() => {
     let timer;
@@ -33,7 +268,7 @@ const MainSection = ({ quiz }) => {
           if (prevTime <= 1) {
             clearInterval(timer);
             setQuizStarted(false);
-            handleSubmit();  // Automatically submit when timer reaches 0
+            handleSubmit(); // Automatically submit when timer reaches 0
             return 0;
           }
           return prevTime - 1;
@@ -42,87 +277,7 @@ const MainSection = ({ quiz }) => {
     }
 
     return () => clearInterval(timer);
-  }, [quizStarted, timeLeft]);  // Only depend on timeLeft and quizStarted
-
-  useEffect(() => {
-    const fetchAttemptHistory = async () => {
-      try {
-        const token = localStorage.getItem('student:token');
-        if (!token) {
-          throw new Error('Authentication token not found');
-        }
-        const response = await fetch(`http://localhost:8080/student/studentquiz/${quizId}/attempt`, {
-          headers: {
-            // Authorization: token,
-            Authentication: token,
-
-          },
-        });
-        if (!response.ok) {
-          throw new Error(`Failed to fetch attempt history, status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        if (data.success && data.submission) {
-          setAttemptHistory(data.submission);
-          setQuizSubmitted(data.submission.length > 0);
-        } else {
-          setQuizSubmitted(false); // Reset to false if no submission found
-          console.error("No attempt history data or unsuccessful response");
-        }
-      } catch (error) {
-        console.error("Failed to fetch attempt history:", error);
-      }
-    };
-
-    fetchAttemptHistory();
-  }, [quizId]);
-
-  const submitQuiz = async (answers, timeTaken) => {
-    try {
-      const token = localStorage.getItem('student:token');
-      if (!token) {
-        throw new Error('Authentication token not found');
-      }
-
-      const response = await fetch(`http://localhost:8080/student/studentquiz/submit/${quizId}`, {
-        method: 'POST',
-        headers: {
-          // 'Authorization': token,
-          Authentication: token,
-
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ studentAnswers: answers, timeTaken }),
-      });
-
-      const data = await response.json();
-      console.log("data is ",data)
-      if (response.ok) {
-        setQuizSubmitted(true);
-        setQuizResults({
-          totalPoints: data.score,
-          correctAnswers: data.rightAnswer,
-          wrongAnswers: data.wrongAnswer,
-        });
-
-        setAttemptHistory(prev => [
-          ...prev,
-          {
-            attempts: prev.length + 1,
-            score: data.score,
-            rightAnswer: data.rightAnswer,
-            wrongAnswer: data.wrongAnswer,
-            questions: answers,
-          }
-        ]);
-      } else {
-        console.error('Failed to submit quiz:', data.message);
-      }
-    } catch (error) {
-      console.error('Error submitting quiz:', error);
-    }
-  };
+  }, [quizStarted, timeLeft]);
 
   const handleOptionChange = (questionIndex, selectedOption) => {
     setSelectedOptions((prev) => ({
@@ -131,18 +286,27 @@ const MainSection = ({ quiz }) => {
     }));
   };
 
-  const handleTabChange = useCallback((tab) => {
-    if (tab === 'questions') {
-      if (!quizStarted) {
-        setTimeLeft(quizDuration);
-        setTotalTime(quizDuration);
-        setQuizStarted(true);
+  const handleTabChange = useCallback(
+    (tab) => {
+      if (tab === "instructions") {
+        // Allow navigation to instructions at any time
+        setActiveTab(tab);
+        return;
       }
-    }
-    setActiveTab(tab);
-  }, [quizStarted, quizDuration]);
 
-  const handleSubmit = useCallback(() => {
+      if (tab === "questions") {
+        if (!quizStarted) {
+          setTimeLeft(quizDuration);
+          setTotalTime(quizDuration);
+          setQuizStarted(true);
+        }
+      }
+      setActiveTab(tab);
+    },
+    [quizStarted, quizDuration]
+  );
+
+  const handleSubmit = useCallback(async () => {
     let totalPoints = 0;
     let correctAnswers = 0;
     let wrongAnswers = 0;
@@ -165,20 +329,24 @@ const MainSection = ({ quiz }) => {
       };
     });
 
-    const newAttempt = {
-      attemptNumber: attemptHistory.length + 1,
-      totalPoints,
-      correctAnswers,
-      wrongAnswers,
-      questions: questionsWithSelectedOptions,
-    };
+    const newAttempt = await submitQuiz(questionsWithSelectedOptions, totalTime - timeLeft);
 
-    setQuizResults(newAttempt);
-    setQuizSubmitted(true);
+    if (newAttempt) {
+      setAttemptHistory((prev) => [...prev, newAttempt]);
+      setQuizSubmitted(true); // Set quizSubmitted to true immediately after successful submission
+      setQuizResults({
+        totalPoints: totalPoints,
+        correctAnswers: correctAnswers,
+        wrongAnswers: wrongAnswers,
+      });
+    }
+
     setQuizStarted(false); // Stop the timer
-    submitQuiz(questionsWithSelectedOptions, totalTime - timeLeft);
-    setAttemptHistory((prev) => [...prev, newAttempt]);
-  }, [selectedOptions, attemptHistory, quiz.questions, submitQuiz, totalTime, timeLeft]);
+  }, [selectedOptions, submitQuiz, totalTime, timeLeft, quiz.questions]);
+
+  const hasRemainingAttempts = () => {
+    return allowNumberOfAttempts === 0 || attemptHistory.length < allowNumberOfAttempts;
+  };
 
   return (
     <div className="flex">
@@ -191,28 +359,21 @@ const MainSection = ({ quiz }) => {
           quizSubmitted={quizSubmitted}
           hasAttempted={attemptHistory.length > 0}
           quiz={quiz}
+          hasRemainingAttempts={hasRemainingAttempts()}
         >
           {(activeTab) => (
-            <div className='h-full'>
-              {activeTab === 'instructions' && (
-                <QuizInstructionSection quiz={quiz} />
-              )}
-              {activeTab === 'questions' && (
+            <div className="h-full">
+              {activeTab === "instructions" && <QuizInstructionSection quiz={quiz} />}
+              {activeTab === "questions" && (
                 <>
-                  {!quizSubmitted ? (
-                    <>
-                      <QuizQuestions
-                        questions={quiz.questions}
-                        selectedOptions={selectedOptions}
-                        handleOptionChange={handleOptionChange}
-                      />
-                      <button
-                        onClick={handleSubmit}
-                        className="mt-4 bg-blue-500 text-white py-2 px-4 rounded-md"
-                      >
-                        Submit All
-                      </button>
-                    </>
+                  {!quizSubmitted && hasRemainingAttempts() ? (
+                    <QuizQuestions
+                      questions={quiz.questions}
+                      selectedOptions={selectedOptions}
+                      handleOptionChange={handleOptionChange}
+                      showOneQuestionOnly={showOneQuestionOnly}
+                      handleSubmit={handleSubmit}
+                    />
                   ) : (
                     <QuizResults questions={quiz.questions} selectedOptions={selectedOptions} />
                   )}
@@ -223,11 +384,11 @@ const MainSection = ({ quiz }) => {
         </Tabs>
       </div>
       <div className="w-[30%]">
-        {activeTab === 'instructions' && <QuizzDetailCard quiz={quiz} />}
-        {activeTab === 'questions' && !quizSubmitted && (
+        {activeTab === "instructions" && <QuizzDetailCard quiz={quiz} />}
+        {activeTab === "questions" && !quizSubmitted && (
           <QuestionDetailCard timeLeft={timeLeft} totalTime={totalTime} quiz={quiz} />
         )}
-        {activeTab === 'questions' && quizSubmitted && (
+        {activeTab === "questions" && quizSubmitted && (
           <QuizResultSummary
             totalPoints={quizResults.totalPoints}
             correctAnswers={quizResults.correctAnswers}
@@ -242,5 +403,3 @@ const MainSection = ({ quiz }) => {
 };
 
 export default MainSection;
-
-
