@@ -11,9 +11,9 @@ const CreateQuizForm = ({
   quizType,
   allowShuffleAnswers,
   lockQuestionsAfterAnswering,
-  numberOfAttempts,
-  showOneQuestionAtATime,
-  allowMultiple,
+  allowNumberOfAttempts,
+  showOneQuestionOnly,
+  allowedAttempts,
   assignTo,
   timeLimit,
   sectionId,
@@ -118,23 +118,23 @@ const CreateQuizForm = ({
         <div className="flex items-center">
           <input
             type="checkbox"
-            id="allowMultiple"
-            name="allowMultiple"
-            checked={allowMultiple}
+            id="allowedAttempts"
+            name="allowedAttempts"
+            checked={allowedAttempts}
             onChange={handleChange}
             className="mr-2 p-3"
           />
-          <label htmlFor="allowMultiple" className="text-gray-700">
+          <label htmlFor="allowedAttempts" className="text-gray-700">
             Allow Multiple Attempts
           </label>
         </div>
 
-        {!allowMultiple && (
+        {!allowedAttempts && (
           <LabeledInput
             label="Allowed Attempts"
-            name="numberOfAttempts"
+            name="allowNumberOfAttempts"
             type="number"
-            value={numberOfAttempts}
+            value={allowNumberOfAttempts}
             onChange={handleChange}
           />
         )}
@@ -182,8 +182,8 @@ const CreateQuizForm = ({
         <div className="space-y-4">
           <LabeledSelect
             label="Show one question at a time"
-            name="showOneQuestionAtATime"
-            value={showOneQuestionAtATime}
+            name="showOneQuestionOnly"
+            value={showOneQuestionOnly}
             onChange={handleChange}
             options={[
               { value: "Yes", label: "Yes" },
