@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from "react";
 import AddRubricModal from "../../Rubric/Components/AddRubricModal";
-import Sidebar from "../../../../../../Components/Common/Sidebar";
 import AssignmentDetail from "../../../Component/AssignmentDetail";
 import DateDetail from "../../../Component/DateDetail";
 import SpeedGradeButton from "../../../Component/SpeedGradeButton";
 import ButtonsGroup from "../../../Component/ButtonsGroup";
 import RubricButton from "./RubricButton";
-import AddNewCriteriaForm from "../../Rubric/Components/AddNewCriteriaForm";
 import Spinner from "../../../../../../Components/Common/Spinner";
 import NoDataFound from "../../../../../../Components/Common/NoDataFound";
 

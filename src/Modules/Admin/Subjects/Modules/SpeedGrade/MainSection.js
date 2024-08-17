@@ -12,10 +12,6 @@ import useGetStudentQuiz from "../../../../../Hooks/AuthHooks/Staff/Admin/SpeedG
 const MainSection = () => {
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [totalGrade, setTotalGrade] = useState(0);
-  const [
-    totalMarksForMultipleChoiceAndTrueFalse,
-    setTotalMarksForMultipleChoiceAndTrueFalse,
-  ] = useState(0);
   const { sgid, type } = useParams();
 
   // Determine which hook to use based on the `type` parameter
@@ -51,9 +47,8 @@ const MainSection = () => {
   const error = type === "Assignment" ? assignmentError : quizError;
   const details = type === "Assignment" ? assignmentDetails : quizDetails;
 
-  const handleTotalGradeUpdate = (grade, totalMarks) => {
+  const handleTotalGradeUpdate = (grade) => {
     setTotalGrade(grade);
-    setTotalMarksForMultipleChoiceAndTrueFalse(totalMarks);
   };
 
   return (
@@ -95,9 +90,6 @@ const MainSection = () => {
                 details={details}
                 student={selectedStudent}
                 initialGrade={totalGrade}
-                totalMarksForMultipleChoiceAndTrueFalse={
-                  totalMarksForMultipleChoiceAndTrueFalse
-                }
               />
             ) : (
               <div className="flex-grow flex flex-col items-center justify-center text-gray-400">

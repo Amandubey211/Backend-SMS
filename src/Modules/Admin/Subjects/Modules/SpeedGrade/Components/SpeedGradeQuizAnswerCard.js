@@ -17,6 +17,7 @@ const SpeedGradeQuizAnswerCard = ({
 
   const handleTextGradeChange = (e) => {
     const inputGrade = e.target.value;
+
     setTextGrade(inputGrade);
   };
 

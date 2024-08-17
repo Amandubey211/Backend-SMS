@@ -9,25 +9,21 @@ const AssignmentDetails = ({ student, details, type, onTotalGradeUpdate }) => {
 
     const { questions } = details.assignmentId || details.quizId || {};
     let initialGrade = 0;
-    let totalMarksForMultipleChoiceAndTrueFalse = 0;
 
     if (questions && questions.length > 0) {
       initialGrade = questions.reduce((total, question) => {
         const answer = details.answers.find(
           (ans) => ans.questionId === question._id
         );
-        if (question.type !== "text" && answer) {
-          totalMarksForMultipleChoiceAndTrueFalse += question.questionPoint;
-          if (answer.isCorrect) {
-            return total + question.questionPoint;
-          }
+        if (question.type !== "text" && answer && answer.isCorrect) {
+          return total + question.questionPoint;
         }
         return total;
       }, 0);
     }
 
     setTotalTextGrade(initialGrade);
-    onTotalGradeUpdate(initialGrade, totalMarksForMultipleChoiceAndTrueFalse);
+    onTotalGradeUpdate(initialGrade);
   }, [student, details, onTotalGradeUpdate]);
 
   const handleUpdateTextQuestionGrade = (gradeDifference) => {
@@ -40,15 +36,29 @@ const AssignmentDetails = ({ student, details, type, onTotalGradeUpdate }) => {
     return null; // Return null if no student or details are selected
   }
 
+  const { content, assignmentId, grade, score, quizId } = details;
   const { name, points, dueDate, questions, totalPoints } =
-    details.assignmentId || details.quizId || {};
+    assignmentId || quizId || {};
+
+  const quizType = quizId?.quizType; // Safely accessing quizType
 
   return (
     <div className="bg-white">
       <div className="flex justify-between items-center mb-4 border-b pb-2">
         <div>
-          <h2 className="text-xl font-medium mb-1 capitalize">
+          <h2 className="text-xl font-medium mb-1 capitalize flex items-center">
             {name || "Untitled"}
+            {quizType && (
+              <span
+                className={`ml-2 px-2 py-1 rounded-lg text-xs font-semibold ${
+                  quizType === "Practice"
+                    ? "bg-yellow-100 text-yellow-800"
+                    : "bg-green-100 text-green-800"
+                }`}
+              >
+                {quizType === "Practice" ? "Practice Type" : "Graded Type"}
+              </span>
+            )}
           </h2>
           <p className="text-gray-500">
             Submission Date:{" "}
@@ -58,7 +68,7 @@ const AssignmentDetails = ({ student, details, type, onTotalGradeUpdate }) => {
         <div className="text-right">
           <p className="text-gray-500 mb-1">Points</p>
           <p className="text-green-500 font-bold text-md">
-            {type === "Quiz" ? totalTextGrade || 0 : points || 0}/
+            {type === "Quiz" ? score || 0 : grade || 0}/
             {type === "Quiz" ? totalPoints : points}
           </p>
         </div>
@@ -66,7 +76,7 @@ const AssignmentDetails = ({ student, details, type, onTotalGradeUpdate }) => {
 
       {type === "Assignment" ? (
         <div className="text-gray-700 mb-4">
-          <div dangerouslySetInnerHTML={{ __html: details.content }} />
+          <div dangerouslySetInnerHTML={{ __html: content }} />
         </div>
       ) : (
         <div className="space-y-4">
