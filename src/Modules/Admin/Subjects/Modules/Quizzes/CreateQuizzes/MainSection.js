@@ -20,11 +20,10 @@ const initialFormState = {
   points: "",
   quizType: "",
   submissionFormat: "",
-  allowedAttempts: 1,
-  allowMultiple: false,
-  numberOfAttempts: "",
+  allowedAttempts: false,
+  allowNumberOfAttempts: 1,
   assignTo: "",
-  showOneQuestionAtATime: "",
+  showOneQuestionOnly: false,
   questionType: "",
   sectionId: null,
   allowShuffleAnswers: false,
@@ -95,18 +94,18 @@ const MainSection = ({ setIsEditing }) => {
         points: quiz.points || "",
         quizType: quiz.quizType || "",
         submissionFormat: quiz.submissionFormat || "",
-        allowedAttempts: quiz.allowedAttempts || 1,
-        allowMultiple: quiz.allowMultiple || false,
-        numberOfAttempts: quiz.numberOfAttempts || "",
+        allowedAttempts: quiz?.allowedAttempts || false,
+        // allowMultiple: quiz.allowMultiple || false,
+        allowNumberOfAttempts: quiz.allowNumberOfAttempts || 1,
         assignTo: quiz.assignTo || "",
-        showOneQuestionAtATime: quiz.showOneQuestionAtATime || "",
+        showOneQuestionOnly: quiz.showOneQuestionOnly || false,
         questionType: quiz.questionType || "",
         section: quiz?.sectionId || null,
         allowShuffleAnswers: quiz.allowShuffleAnswers || false,
         dueDate: quiz.dueDate || "",
         availableFrom: quiz.availableFrom || "",
         lockQuestionsAfterAnswering: quiz.lockQuestionsAfterAnswering || false,
-        until: quiz.until || "DD/MM/YY",
+        until: quiz.until || null,
         timeLimit: quiz.timeLimit || "",
         moduleId: quiz.moduleId || null,
         chapterId: quiz.chapterId || null,
@@ -199,6 +198,7 @@ const MainSection = ({ setIsEditing }) => {
       quizData.groupId = formState.groupId || null;
     }
     if (isEditing) {
+      console.log(quizData, "----------");
       const result = await updateQuiz(quizId, quizData);
       if (result.success) {
         setActiveTab("questions");
