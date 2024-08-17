@@ -1,6 +1,7 @@
 import React from "react";
 import { IoCalendarOutline, IoBookOutline } from "react-icons/io5";
 import { NavLink, useParams } from "react-router-dom";
+import { CiUser } from "react-icons/ci";
 
 const PageCard = ({ title, authorName, publishDate, updateDate, id, readOnly }) => {
   const formatDate = (dateString) => {
@@ -18,11 +19,13 @@ const PageCard = ({ title, authorName, publishDate, updateDate, id, readOnly }) 
         <div className="text-center mb-4 mt-2">
           <h2 className="font-semibold">{title}</h2>
           <div className="flex items-center justify-center mt-2">
-            <img
+          <CiUser className="w-3 h-3 rounded-full text-gray-500" />
+
+            {/* <img
               className="h-7 w-7 rounded-full"
               src="https://avatars.githubusercontent.com/u/109097090?v=4"
               alt={authorName}
-            />
+            /> */}
             {/* <img
               className="h-7 w-7 rounded-full"
               src="https://avatars.githubusercontent.com/u/109097090?v=4"

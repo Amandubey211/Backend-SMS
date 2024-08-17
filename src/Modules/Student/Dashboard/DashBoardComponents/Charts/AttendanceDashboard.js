@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import AttendanceChart from './AttendanceChart'; // Replace with your actual component import
 import { baseUrl } from '../../../../../config/Common';
+import Spinner from '../../../../../Components/Common/Spinner';
 
 const AttendanceDashboard = () => {
   const [attendanceSummary, setAttendanceSummary] = useState(null);
@@ -42,7 +43,11 @@ const AttendanceDashboard = () => {
   }, []);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <>
+        <Spinner/>
+      </>
+    )
   }
 
   if (error) {

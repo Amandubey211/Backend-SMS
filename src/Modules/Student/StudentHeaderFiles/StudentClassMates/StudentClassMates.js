@@ -6,6 +6,7 @@ import { shallowEqual, useSelector } from "react-redux";
 import ProfileCard from "./ProfileCard";
 import { baseUrl } from "../../../../config/Common";
 import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
+import Spinner from "../../../../Components/Common/Spinner";
 
 const StudentClassMates = () => {
   const { selectedClass, selectedClassName } = useSelector(
@@ -66,7 +67,10 @@ const StudentClassMates = () => {
   }, [cid, selectedClass]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <Spinner/>
+    )
+    ;
   }
 
   return (

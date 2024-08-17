@@ -4,6 +4,7 @@ import ChapterItem from "./ChapterItem";
 import { useSelector } from "react-redux";
 import { toast } from 'react-hot-toast';
 import { baseUrl } from "../../../../../../../config/Common";
+import Spinner from "../../../../../../../Components/Common/Spinner";
 
 const Dummy = [
   {
@@ -73,7 +74,11 @@ const ModuleDetails = ({ isExpanded, classId, studentId }) => {
   }, [isExpanded, selectedClass, selectedSubject]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <>
+        <Spinner/>
+      </>
+    )
   }
 
   return (
