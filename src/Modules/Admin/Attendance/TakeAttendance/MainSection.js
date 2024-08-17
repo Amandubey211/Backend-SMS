@@ -18,7 +18,7 @@ const MainSection = () => {
 
   const [students, setStudents] = useState([]);
   const [selectedDate, setSelectedDate] = useState(new Date()); // State for selected date
-  
+
   const resetDate = () => {
     setSelectedDate(new Date());
   };
@@ -56,6 +56,7 @@ const MainSection = () => {
       sectionId: filters.sectionId,
       date: selectedDate,
       studentEntry: students
+        .filter(student => student.attendanceStatus !== "not marked")
         .map((student) => ({
           studentId: student.studentId,
           status: student.attendanceStatus

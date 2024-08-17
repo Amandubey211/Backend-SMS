@@ -9,11 +9,16 @@ import AddRubricModal from "../../Rubric/Components/AddRubricModal";
 import Sidebar from "../../../../../../Components/Common/Sidebar";
 import AddNewCriteriaForm from "../../Rubric/Components/AddNewCriteriaForm";
 import { useParams } from "react-router-dom";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 import useAssignQuizGrade from "../../../../../../Hooks/AuthHooks/Staff/Admin/SpeedGrade/Quiz/useAssignQuizGrade";
 import useAssignAssignmentGrade from "../../../../../../Hooks/AuthHooks/Staff/Admin/SpeedGrade/Assignment/useAssignAssignmentGrade";
 
-const SubmissionDetails = ({ details, student, initialGrade }) => {
+const SubmissionDetails = ({
+  details,
+  student,
+  initialGrade,
+  totalMarksForMultipleChoiceAndTrueFalse,
+}) => {
   const [isModalOpen, setModalOpen] = useState(false);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [criteriaList, setCriteriaList] = useState([]);
@@ -40,11 +45,10 @@ const SubmissionDetails = ({ details, student, initialGrade }) => {
 
   const { dueDate, points, totalPoints, comments, files } =
     details?.assignmentId || details?.quizId || {};
-  const { content } = details;
 
   const maxPoints = type === "Quiz" ? totalPoints : points;
 
-  const wordCount = content ? content.split(/\s+/).length : 0;
+  const wordCount = details.content ? details.content.split(/\s+/).length : 0;
   const today = new Date();
   const due = new Date(dueDate);
   const daysDifference = Math.ceil((due - today) / (1000 * 60 * 60 * 24));
@@ -68,18 +72,6 @@ const SubmissionDetails = ({ details, student, initialGrade }) => {
     );
     setStatus(details.status || "Missing");
   }, [details, initialGrade]);
-
-  const handleTotalGradeUpdate = (newGrade) => {
-    setGrade(newGrade);
-  };
-
-  const handleViewRubric = () => {
-    setModalOpen(true);
-  };
-
-  const handleAddCriteria = () => {
-    setSidebarOpen(true);
-  };
 
   const handleGradeChange = (e) => {
     const inputGrade = e.target.value;
@@ -134,51 +126,6 @@ const SubmissionDetails = ({ details, student, initialGrade }) => {
     type,
   ]);
 
-  const renderWordCount = () => {
-    if (wordCount === 0) {
-      return (
-        <div className="flex flex-col items-center justify-center text-gray-500 mt-4">
-          <AiOutlineFileText className="text-4xl" aria-hidden="true" />
-          <p className="mt-2 text-sm">No content submitted</p>
-        </div>
-      );
-    } else {
-      return (
-        <div className="flex items-center space-x-2 mb-3">
-          <RiFileWord2Line className="text-blue-500" />
-          <span className="font-medium text-sm">Word Count:</span>
-          <span className="text-green-500">{wordCount} Words</span>
-        </div>
-      );
-    }
-  };
-
-  const renderFiles = () => {
-    if (!files || files.length === 0) {
-      return (
-        <div className="flex flex-col items-center justify-center text-gray-500 mt-7">
-          <FaFileAlt className="text-xl" aria-hidden="true" />
-          <p className="mt-1 text-sm">No files uploaded</p>
-        </div>
-      );
-    } else {
-      return (
-        <ul className="space-y-2 text-sm">
-          {files.map((file, index) => (
-            <li
-              key={index}
-              className="flex items-center space-x-2 text-blue-500"
-            >
-              <a href="#" className="hover:underline">
-                {file}
-              </a>
-            </li>
-          ))}
-        </ul>
-      );
-    }
-  };
-
   const renderSubmissionDetails = () => {
     if (wordCount === 0 && (!files || files.length === 0)) {
       return (
@@ -190,8 +137,29 @@ const SubmissionDetails = ({ details, student, initialGrade }) => {
     } else {
       return (
         <>
-          {renderWordCount()}
-          {renderFiles()}
+          {/* Word Count */}
+          {wordCount > 0 && (
+            <div className="flex items-center space-x-2 mb-3">
+              <RiFileWord2Line className="text-blue-500" />
+              <span className="font-medium text-sm">Word Count:</span>
+              <span className="text-green-500">{wordCount} Words</span>
+            </div>
+          )}
+          {/* Files */}
+          {files && files.length > 0 && (
+            <ul className="space-y-2 text-sm">
+              {files.map((file, index) => (
+                <li
+                  key={index}
+                  className="flex items-center space-x-2 text-blue-500"
+                >
+                  <a href="#" className="hover:underline">
+                    {file}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )}
         </>
       );
     }
@@ -200,7 +168,10 @@ const SubmissionDetails = ({ details, student, initialGrade }) => {
   return (
     <div className="flex flex-col h-full">
       <div className="flex gap-2 p-2 justify-center items-center border-b pb-3">
-        <button className="flex items-center bg-white border text-sm gap-1 border-gray-300 font-semibold py-2 px-4 rounded-full hover:bg-gray-100 focus:outline-none">
+        {/* Total Marks Display */}
+
+        {/* Grade Display */}
+        <div className="flex items-center bg-white border text-sm gap-1 border-gray-300 font-semibold py-2 px-4 rounded-full hover:bg-gray-100 focus:outline-none">
           <RxPerson className="inline-block" />
           <span>
             Graded:{" "}
@@ -208,18 +179,18 @@ const SubmissionDetails = ({ details, student, initialGrade }) => {
               {grade !== "" ? `${grade}` : "N/A"}
             </span>
           </span>
-        </button>
+        </div>
 
         <button
           className="flex items-center bg-gradient-to-r text-sm gap-1 from-pink-100 to-purple-100 font-semibold py-2 px-4 rounded-full hover:from-purple-200 hover:to-pink-200 focus:outline-none"
-          onClick={handleViewRubric}
+          onClick={() => setModalOpen(true)}
         >
           <AiOutlineEye className="inline-block text-gradient" />
           <span className="text-gradient">View Rubric</span>
         </button>
       </div>
 
-      <div className="flex-grow overflow-y-auto no-scrollbar ">
+      <div className="flex-grow overflow-y-auto no-scrollbar">
         <div className="flex p-2 justify-between items-center mb-1">
           <h3 className="text-lg font-semibold">Submission</h3>
           <span
@@ -248,7 +219,14 @@ const SubmissionDetails = ({ details, student, initialGrade }) => {
               onChange={(e) => setAttemptDate(e.target.value)}
             />
           </div>
-
+          <div>
+            <p className="text-gray-500 mb-1">
+              Total Marks for MCQs & True/False:
+            </p>
+            <p className="text-green-500 font-bold text-md">
+              {totalMarksForMultipleChoiceAndTrueFalse || 0}
+            </p>
+          </div>
           <div>
             <label className="block text-sm font-medium text-gray-500">
               Grade{" "}
@@ -330,7 +308,6 @@ const SubmissionDetails = ({ details, student, initialGrade }) => {
       </div>
 
       <div className="p-4 mb-10 border-t border-gray-200">
-        {/* {error && <p className="text-red-500 text-sm mb-2">{error}</p>} */}
         <button
           className="w-full py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold rounded-md shadow-md hover:from-purple-500 hover:to-pink-500 focus:outline-none"
           onClick={handleSubmitGrade}
@@ -348,7 +325,7 @@ const SubmissionDetails = ({ details, student, initialGrade }) => {
         criteriaList={criteriaList}
         setCriteriaList={setCriteriaList}
         setExistingRubricId={setExistingRubricId}
-        onAddCriteria={handleAddCriteria}
+        onAddCriteria={() => setSidebarOpen(true)}
       />
 
       <Sidebar
