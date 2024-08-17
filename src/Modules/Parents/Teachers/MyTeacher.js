@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import TeacherCards from '../../../Components/Parents/Teachers/TeacherCard';
 import axios from 'axios';
 import { baseUrl } from '../../../config/Common';
+import Spinner from '../../../Components/Common/Spinner'; // Importing the Spinner component
+import { FaChalkboardTeacher } from 'react-icons/fa'; // Importing an icon for the "No Teachers Found" state
 
 const MyTeacher = () => {
     const [instructors, setTeachers] = useState([]);
@@ -20,7 +22,6 @@ const MyTeacher = () => {
 
                 const { email } = userData;
 
-
                 if (!token) {
                     throw new Error("No token found");
                 }
@@ -34,17 +35,14 @@ const MyTeacher = () => {
                     }
                 });
 
-                if (!response.data) {
-
-
+                if (!response.data || !response.data.instructors || response.data.instructors.length === 0) {
                     throw new Error("No teachers data found");
                 }
-                console.log(response.data.instructors)
 
                 setTeachers(response.data.instructors); // Assuming the data is an array of teachers
             } catch (error) {
                 console.error('Failed to fetch teachers:', error);
-                setError(error.message);
+                setError("Unable to fetch teachers");
             } finally {
                 setLoading(false);
             }
@@ -54,19 +52,37 @@ const MyTeacher = () => {
     }, []);
 
     if (loading) {
-        return <div>Loading...</div>;
+        return (
+            <div className="flex justify-center items-center h-full">
+                <Spinner /> {/* Show spinner while loading */}
+            </div>
+        );
     }
 
     if (error) {
-        return <div>Error: {error}</div>;
+        return (
+            <div className="flex flex-col items-center justify-center h-full text-center">
+                <FaChalkboardTeacher className="text-6xl text-gray-400 mb-4" />
+                <p className="text-gray-500">{error}</p>
+            </div>
+        );
+    }
+
+    if (instructors.length === 0) {
+        return (
+            <div className="flex flex-col items-center justify-center h-full text-center">
+                <FaChalkboardTeacher className="text-6xl text-gray-400 mb-4" />
+                <p className="text-gray-500">No Teachers Found</p>
+            </div>
+        );
     }
 
     return (
         <div className="h-full w-full">
             <div className="w-full p-2">
                 <div className="flex-wrap flex items-start">
-                    {instructors.map(instructors => (
-                        <TeacherCards key={instructors.id} instructors={instructors} />
+                    {instructors.map(instructor => (
+                        <TeacherCards key={instructor.id} instructor={instructor} />
                     ))}
                 </div>
             </div>
