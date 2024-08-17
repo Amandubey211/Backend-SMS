@@ -8,12 +8,12 @@ import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 
 
-const StudentAttendance = () => {
-    const {cid} = useParams()
+const StudentAttendance = ({student}) => {
+    const role = useSelector((store) => store.Auth.role);
     const [attendanceData, setAttendanceData] = useState({})
     const [currentDate, setCurrentDate] = useState(moment());
     const [summary, setSummary] = useState({ presentCount: 0, absentCount: 0, leaveCount: 0 });
-    const role = useSelector((store) => store.Auth.role);
+   
     const fetchAttendance = async (month, year) => {
         try {
             const token = localStorage.getItem(`${role}:token`)
@@ -21,20 +21,21 @@ const StudentAttendance = () => {
                 throw new Error('Authentication not found');
             }
 
-            const response = await axios.get(`${baseUrl}/api/teacher/attendance/studentAttendance?startDate=2000-05-10&endDate=${currentDate}&studentId=${cid}`, {
-                
+            const response = await axios.get(`${baseUrl}/api/studentDashboard/myAttendance`, {
+                params: { month, year,studentId:student._id },
                 headers: {
                     'Authentication': token
                 }
             })
+
             const { report, summary } = response.data.report;
             const attendanceMap = report.reduce((acc, entry) => {
-                acc[entry.date.slice(0,10)] = entry.status;
+                acc[entry.date] = entry.status;
                 return acc;
             }, {});
-            console.log(response);
             setAttendanceData(attendanceMap);
             setSummary(summary);
+
         } catch (error) {
             console.error("Failed to fetch Attendance:", error);
         }
@@ -48,6 +49,7 @@ const StudentAttendance = () => {
         setCurrentDate(value);
     };
 
+
     return (
             <div className="container mx-auto py-4">
                 <AttendanceSummary present={summary.presentCount} absent={summary.absentCount} leave={summary.leaveCount} />
@@ -60,3 +62,15 @@ const StudentAttendance = () => {
 };
 
 export default StudentAttendance;
+
+
+
+
+
+
+
+
+
+
+
+

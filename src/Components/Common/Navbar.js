@@ -10,6 +10,8 @@ import LogoutConfirmationModal from "./LogoutConfirmationModal";
 import useStaffLogout from "../../Hooks/AuthHooks/Staff/useStaffLogOut";
 import { RiTimeZoneLine } from "react-icons/ri";
 import { IoIosLogOut } from "react-icons/io";
+import Sidebar from "./Sidebar";
+import NotificationBar from "./NotificationBar";
 
 const IconButton = ({ icon: Icon, label, onClick }) => (
   <button onClick={onClick} aria-label={label}>
@@ -62,6 +64,47 @@ const SearchBar = () => (
 );
 
 const Navbar = ({ hideSearchbar, hideAvatarList, hideStudentView }) => {
+  const [isOpenNotification,setIsOpenNotification] = useState(false);
+  const [notificationCount,setNotificationCount] = useState(0);
+  useEffect(()=>{
+    function getNotificationsFromIndexedDB() {
+      return new Promise((resolve, reject) => {
+        const dbPromise = indexedDB.open('firebase-messaging-store', 1);
+        dbPromise.onsuccess = function(event) {
+          const db = event.target.result;
+          const transaction = db.transaction(['notifications'], 'readonly');
+          const objectStore = transaction.objectStore('notifications');
+          const request = objectStore.getAll();
+
+          request.onsuccess = function() {
+            resolve(request.result);
+
+          };
+
+          request.onerror = function(event) {
+            reject(event);
+          };
+        };
+
+        dbPromise.onerror = function(event) {
+          reject(event);
+        };
+      });
+    };
+    getNotificationsFromIndexedDB().then((notifications) => {
+      console.log('Retrieved notifications from IndexedDB:', notifications);
+      localStorage.setItem('NotificationCount',notifications.length)
+      // Display notifications in your UI
+    }).catch((error) => {
+      console.error('Failed to retrieve notifications from IndexedDB:', error);
+    });
+  },[])
+  useEffect(()=>{
+    setNotificationCount(localStorage.getItem('NotificationCount'));
+  },[localStorage.getItem('NotificationCount'),notificationCount]);
+  const openNotification = ()=>{
+    setIsOpenNotification(true)
+    }
   const leftHeading = useSelector(
     (store) => store.Common.NavbarData.leftHeading
   );
@@ -104,7 +147,12 @@ const Navbar = ({ hideSearchbar, hideAvatarList, hideStudentView }) => {
 
         <div className="flex items-center space-x-2 border-l ml-3 pl-3 relative">
           <IconButton icon={CiMail} label="Mail" />
-          <IconButton icon={TbBell} label="Notifications" />
+          <div onClick={()=>openNotification()} className="relative flex items-center cursor-pointer">
+             <IconButton icon={TbBell} label="Notifications" />
+             <p className="absolute top-[-5px] right-0 bg-purple-500 rounded-full
+              text-white w-[20px] h-[20px] flex justify-center items-center ">{notificationCount}</p>
+          </div>
+         
           <IconButton
             icon={IoSettingsOutline}
             label="Settings"
@@ -154,6 +202,9 @@ const Navbar = ({ hideSearchbar, hideAvatarList, hideStudentView }) => {
         onClose={closeModal}
         onConfirm={logout}
       />
+      <Sidebar  isOpen={isOpenNotification} onClose={()=> setIsOpenNotification(false)} title={'Recent Notifications'} >
+              <NotificationBar/>
+            </Sidebar>
     </div>
   );
 };

@@ -30,13 +30,13 @@ const SingleStudent = () => {
   }
   const renderContent = () => {
     const menuComponents = {
-      "OverView": <StudentOverView />,
+      "OverView": <StudentOverView student={student} />,
       "Course Progress": <StudentCourseProgress student={student} />,
       "Finance": <StudentFinance student={student} />,
       "Information": <StudentInformationMenu student={student} />,
       "Parents": <ParentsProfile student={student} />,
       "Grades": <StudentGradesAccordion student={student} />,
-      "Attendance": <StudentAttendance  />,
+      "Attendance": <StudentAttendance  student={student} />,
       "Book Issue": <BookIssue  />
     };
     return menuComponents[activeItem] || <div>Select a menu item</div>;
