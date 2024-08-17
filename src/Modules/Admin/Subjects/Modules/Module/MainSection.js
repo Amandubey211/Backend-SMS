@@ -283,7 +283,10 @@ const MainSection = () => {
         {isMoveSidebarOpen && (
           <Sidebar
             isOpen={isMoveSidebarOpen}
-            onClose={handleMoveSidebarClose}
+            onClose={() => {
+              handleSidebarClose();
+              fetchModules();
+            }}
             title="Move Module"
           >
             {sidebarContent}

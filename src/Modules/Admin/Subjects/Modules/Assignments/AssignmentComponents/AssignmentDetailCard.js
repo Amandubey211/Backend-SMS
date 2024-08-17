@@ -92,7 +92,7 @@ const AssignmentDetailCard = ({
         AssignmentId={selectedAssignmentId} // Pass the selected assignment ID
         isOpen={isModalOpen}
         onClose={() => setModalOpen(false)}
-        onAddCriteria={() => setSidebarOpen(true)}
+        // onAddCriteria={() => setSidebarOpen(true)}
         criteriaList={criteriaList}
         setCriteriaList={setCriteriaList}
         setExistingRubricId={setExistingRubricId}
