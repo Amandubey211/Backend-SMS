@@ -42,7 +42,7 @@ const SubmissionDetails = ({ details, student, initialGrade }) => {
   const loading =
     type === "Assignment" ? assignGradeLoading : assignQuizGradeLoading;
 
-  const { dueDate, points, totalPoints, comments } =
+  const { dueDate, points, totalPoints, comments, media } =
     details?.assignmentId || details?.quizId || {};
   const { content } = details;
 
@@ -139,21 +139,21 @@ const SubmissionDetails = ({ details, student, initialGrade }) => {
   ]);
 
   const dummyFiles = [
-    {
-      url: "https://res.cloudinary.com/dhksqayts/image/upload/v1723784726/subjects/66a9e9203e9c5429f9f5b673/chapters/66ab5a5ea62c56abdbe41280/lamck4rqzyhaybbq1d8u.pdf",
-      title: "Assignment image 1",
-      type: "application/pdf",
-    },
-    {
-      url: "https://res.cloudinary.com/dhksqayts/image/upload/v1723623488/subjects/66a9e9203e9c5429f9f5b673/chapters/66b0acd88bf0bc11a3955362/xtlligurgjrj2smp5wtp.png",
-      title: "Assignment image 2",
-      type: "image/png",
-    },
-    {
-      url: "https://res.cloudinary.com/dhksqayts/image/upload/v1723784726/subjects/66a9e9203e9c5429f9f5b673/chapters/66ab5a5ea62c56abdbe41280/lamck4rqzyhaybbq1d8u.pdf",
-      title: "Assignment image 3",
-      type: "application/pdf",
-    },
+    // {
+    //   url: "https://res.cloudinary.com/dhksqayts/image/upload/v1723784726/subjects/66a9e9203e9c5429f9f5b673/chapters/66ab5a5ea62c56abdbe41280/lamck4rqzyhaybbq1d8u.pdf",
+    //   title: "Assignment image 1",
+    //   type: "application/pdf",
+    // },
+    // {
+    //   url: "https://res.cloudinary.com/dhksqayts/image/upload/v1723623488/subjects/66a9e9203e9c5429f9f5b673/chapters/66b0acd88bf0bc11a3955362/xtlligurgjrj2smp5wtp.png",
+    //   title: "Assignment image 2",
+    //   type: "image/png",
+    // },
+    // {
+    //   url: "https://res.cloudinary.com/dhksqayts/image/upload/v1723784726/subjects/66a9e9203e9c5429f9f5b673/chapters/66ab5a5ea62c56abdbe41280/lamck4rqzyhaybbq1d8u.pdf",
+    //   title: "Assignment image 3",
+    //   type: "application/pdf",
+    // },
   ];
 
   const openPreviewModal = (url, type) => {
@@ -196,16 +196,19 @@ const SubmissionDetails = ({ details, student, initialGrade }) => {
     } else {
       return (
         <>
-          <h1 className="font-semibold text-gray-500  bg-gray-50 py-1"> Uploaded Files</h1>
+          <h1 className="font-semibold text-gray-500  bg-gray-50 py-1">
+            {" "}
+            Uploaded Files
+          </h1>
 
           <ul className="space-y-2 text-sm">
-            {dummyFiles.map((file, index) => (
+            {dummyFiles?.map((file, index) => (
               <li
                 key={index}
                 className="flex items-center justify-between bg-white p-2 border rounded-md shadow-sm hover:shadow-md transition-shadow"
               >
                 <div className="flex items-center space-x-2">
-                  {file.type.startsWith("image/") ? (
+                  {file?.type?.startsWith("image/") ? (
                     <img
                       src={file.url}
                       alt={file.title}
@@ -227,15 +230,6 @@ const SubmissionDetails = ({ details, student, initialGrade }) => {
                     {file.title}
                   </a>
                 </div>
-                <button
-                  className="text-blue-500 hover:text-blue-700"
-                  onClick={() => openPreviewModal(file.url, file.type)}
-                >
-                  <AiOutlineEye
-                    className="w-5 h-5 text-green-400"
-                    aria-hidden="true"
-                  />
-                </button>
               </li>
             ))}
           </ul>
@@ -255,7 +249,7 @@ const SubmissionDetails = ({ details, student, initialGrade }) => {
     } else {
       return (
         <>
-          {renderWordCount()}
+          {details?.assignmentId && <> {renderWordCount()}</>}
           {renderFiles()}
         </>
       );
