@@ -35,10 +35,12 @@ const StudentGradeModal = ({ isOpen, onClose }) => {
 
   const studentGrade = useSelector((store) => store.Admin.studentGrade);
   // console.log(studentGrade._id)
-  const { error, fetchStudentGrades, grades, loading, totals } =
-    useFetchStudentGrades();
+  const { error, fetchStudentGrades, grades, loading, totals } = useFetchStudentGrades();
   useEffect(() => {
-    fetchStudentGrades(studentGrade.studentId, filters.module, filters.chapter, filters.arrangeBy);
+    if(isOpen){
+      fetchStudentGrades(studentGrade.studentId, filters.module, filters.chapter, filters.arrangeBy);
+    }
+   
   }, [studentGrade, fetchStudentGrades, filters]);
 
   return (
