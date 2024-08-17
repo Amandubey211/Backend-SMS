@@ -232,7 +232,7 @@ const TotalAttendanceGraph = () => {
                 style={{ alignSelf: "flex-start" }}
               ></div>
               <div className="flex items-center">
-                <div className="text-gray-700">Total Female</div>
+                <div className="text-gray-700">Total Female Att.</div>
                 <div className="ml-2 font-bold">
                   {attendanceData ? attendanceData.totalFemaleAttendance : 0}
                 </div>
@@ -244,7 +244,7 @@ const TotalAttendanceGraph = () => {
                 style={{ alignSelf: "flex-start" }}
               ></div>
               <div className="flex items-center">
-                <div className="text-gray-700">Total Male</div>
+                <div className="text-gray-700">Total Male Att.</div>
                 <div className="ml-2 font-bold">
                   {attendanceData ? attendanceData.totalMaleAttendance : 0}
                 </div>

@@ -4,7 +4,6 @@ import TableRow from "./TableRow";
 import { FaExclamationTriangle } from "react-icons/fa";
 
 const StudentTable = ({ students, onRowClick }) => {
-  console.log(students, "--------------------------");
   return (
     <div className="p-4 bg-white">
       {students.length > 0 ? (

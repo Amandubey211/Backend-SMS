@@ -7,10 +7,12 @@ import { useSelector } from "react-redux";
 import useGetModulesForStudent from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useGetModulesForStudent";
 import useGetFilteredQuizzes from "../../../../../../Hooks/AuthHooks/Staff/Admin/Quiz/useGetFilteredQuizzes";
 import useGetFilteredAssignments from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useGetFilteredAssignments";
+import { useParams } from "react-router-dom";
 
 const GradeHeader = ({ onSearch, onFilterChange }) => {
   const [search, setSearch] = useState("");
   const [open, setOpen] = useState(false);
+  const {sid} = useParams()
   const handleSearchChange = (e) => {
   
        setSearch(e.target.value);
@@ -26,7 +28,7 @@ const GradeHeader = ({ onSearch, onFilterChange }) => {
   const { error, fetchFilteredQuizzes, loading, quizzes } = useGetFilteredQuizzes();
   const {fetchFilteredAssignments} =useGetFilteredAssignments()
   useEffect(()=>{
-    fetchFilteredAssignments();
+    fetchFilteredAssignments(sid);
     fetchFilteredQuizzes();
   },[])
   return (
