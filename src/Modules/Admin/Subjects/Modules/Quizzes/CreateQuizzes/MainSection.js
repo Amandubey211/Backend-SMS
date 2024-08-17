@@ -21,7 +21,7 @@ const initialFormState = {
   quizType: "",
   submissionFormat: "",
   allowedAttempts: false,
-  allowNumberOfAttempts: 1,
+  allowNumberOfAttempts: 0,
   assignTo: "",
   showOneQuestionOnly: false,
   questionType: "",
@@ -128,6 +128,7 @@ const MainSection = ({ setIsEditing }) => {
   const handleQuestionChange = (content) => setQuestion(content);
   const handleFormChange = (e) => {
     const { name, value, type, checked } = e.target;
+
     setFormState((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
