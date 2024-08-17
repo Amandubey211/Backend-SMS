@@ -29,12 +29,14 @@ const initialFormState = {
   allowShuffleAnswers: false,
   dueDate: "",
   availableFrom: "",
-  lockQuestionsAfterAnswering: false,
+  lockQuestionAfterAnswering: false,
   until: "",
   timeLimit: "",
   moduleId: null,
   chapterId: null,
   groupId: null,
+  studentSeeAnswer: false,
+  showAnswerDate: "",
 };
 
 const initialAnswersState = [
@@ -102,9 +104,11 @@ const MainSection = ({ setIsEditing }) => {
         questionType: quiz.questionType || "",
         section: quiz?.sectionId || null,
         allowShuffleAnswers: quiz.allowShuffleAnswers || false,
+        studentSeeAnswer: quiz.studentSeeAnswer || false,
+        showAnswerDate: quiz.showAnswerDate || "",
         dueDate: quiz.dueDate || "",
         availableFrom: quiz.availableFrom || "",
-        lockQuestionsAfterAnswering: quiz.lockQuestionsAfterAnswering || false,
+        lockQuestionAfterAnswering: quiz.lockQuestionAfterAnswering || false,
         until: quiz.until || null,
         timeLimit: quiz.timeLimit || "",
         moduleId: quiz.moduleId || null,

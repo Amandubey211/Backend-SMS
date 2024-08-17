@@ -10,7 +10,7 @@ import useGetModulesForStudent from "../../../../../../../Hooks/AuthHooks/Staff/
 const CreateQuizForm = ({
   quizType,
   allowShuffleAnswers,
-  lockQuestionsAfterAnswering,
+  lockQuestionAfterAnswering,
   allowNumberOfAttempts,
   showOneQuestionOnly,
   allowedAttempts,
@@ -146,13 +146,13 @@ const CreateQuizForm = ({
           <h3 className="text-gray-700 mb-1">
             Students See the Correct Answer
           </h3>
-          <div className="flex items-center mb-4">
+          <div className="flex items-center mb-2">
             <input
               type="radio"
               id="seeAnswerYes"
               name="studentSeeAnswer"
-              value="yes"
-              checked={studentSeeAnswer === "yes"}
+              value="true"
+              checked={studentSeeAnswer === "true" || studentSeeAnswer === true}
               onChange={handleChange}
               className="mr-2"
             />
@@ -163,14 +163,16 @@ const CreateQuizForm = ({
               type="radio"
               id="seeAnswerNo"
               name="studentSeeAnswer"
-              value="no"
-              checked={studentSeeAnswer === "no"}
+              value="false"
+              checked={
+                studentSeeAnswer === "false" || studentSeeAnswer === false
+              }
               onChange={handleChange}
               className="mr-2"
             />
             <label htmlFor="seeAnswerNo">No</label>
           </div>
-          {studentSeeAnswer === "yes" && (
+          {(studentSeeAnswer === "true" || studentSeeAnswer === true) && (
             <DateInput
               label="Select Date"
               name="showAnswerDate"
@@ -186,21 +188,21 @@ const CreateQuizForm = ({
             value={showOneQuestionOnly}
             onChange={handleChange}
             options={[
-              { value: "Yes", label: "Yes" },
-              { value: "No", label: "No" },
+              { value: "true", label: "Yes" },
+              { value: "false", label: "No" },
             ]}
           />
           <div className="flex items-center">
             <input
               type="checkbox"
-              id="lockQuestionsAfterAnswering"
-              name="lockQuestionsAfterAnswering"
-              checked={lockQuestionsAfterAnswering}
+              id="lockQuestionAfterAnswering"
+              name="lockQuestionAfterAnswering"
+              checked={lockQuestionAfterAnswering}
               onChange={handleChange}
               className="mr-2 p-3"
             />
             <label
-              htmlFor="lockQuestionsAfterAnswering"
+              htmlFor="lockQuestionAfterAnswering"
               className="text-gray-700"
             >
               Lock questions after answering
