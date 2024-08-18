@@ -2,58 +2,77 @@ import React, { useEffect, useState } from "react";
 import DashCard from "./Dashcard.js";
 // import TotalAttendanceGraph from "./Graphs/TotalAttendanceGraph.js";
 import { cardData } from "./DashboardData/CardData.js";
-// import TotalEarningsGraph from "./Graphs/TotalEarningsGraph.js";
-// import TotalStudentsGraphjs from "./Graphs/TotalStudentsGraph.js";
-// import TopRankingStudents from "./Graphs/TopRankingStudents.js";
-// import Library from "./LibraryModule/Library.js";
-// import Events from "./EventModule/Event.js";
-// import BestPerformersChart from "./Graphs/BestPerformancGraph.js";
-// import performanceData from "./DashboardData/PerformanceData.js";
-// import noticeData from "./DashboardData/NoticeData.js";
-// import Notice from "./NoticeModule/Notice.js";
-// import NoticeBoard from "./NoticeModule/NoticeBoard.js";
-// import SubjectsSlider from "./DashBoardComponents/allSubjects/SubjectsSlider.js";
+
 import AllSubjects from "./DashBoardComponents/allSubjects/AllSubjects.js";
 import AttendanceChart from "./DashBoardComponents/Charts/AttendanceChart.js";
 import StudentGradePieChart from "./DashBoardComponents/Charts/StudentGradePieChart.js";
 import TaskCompletionChart from "./DashBoardComponents/Charts/TaskCompletionChart.js";
-// import StudentRecentGradeTable from "../StudentClass/Subjects/Modules/Grades/StudentGradeViewModal/Component/GradeAccordionItem.js";
-import StudentRecentGradeTable from "./DashBoardComponents/StudentRecentGradeTable.js";
+import StudentRecentGrade from "./DashBoardComponents/StudentRecentGrade.js";
+// import StudentRecentGradeTable from "./DashBoardComponents/StudentRecentGradeTable.js";
 import StudentDashFeeCard from "./DashBoardComponents/StudentDashFeeCard.js";
 import AttendanceDashboard from "./DashBoardComponents/Charts/AttendanceDashboard.js";
 import axios from "axios";
 import { baseUrl } from "../../../config/Common.js";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 const StudentMainSection = () => {
   // const{studentId}=useSelector((state)=>state.common)
+  const navigate = useNavigate();
+
   const [cardData, setCardData] = useState([]);
   const [subjects, setSubjects] = useState([]);
   const [paidFees, setPaidFees] = useState(0);
   const [unpaidFees, setUnpaidFees] = useState(0);
-  const { selectedClass, studentId,selectedSection, selectedSubject } = useSelector((state) => state.Common);
+  const { selectedClass, studentId, selectedSection, selectedSubject } =
+    useSelector((state) => state.Common);
 
   const fetchDashboardDetails = async () => {
     // const { selectedClass, studentId,selectedSection, selectedSubject } = useSelector((state) => state.Common);
 
-    const token = localStorage.getItem('student:token')
+    const token = localStorage.getItem("student:token");
     try {
       // const response = await axios.get(`${baseUrl}/api/studentDashboard/dashboard/student`,
-      const response = await axios.get(`${baseUrl}/api/studentDashboard/${studentId}/realDashboard`,
+      const response = await axios.get(
+        `${baseUrl}/api/studentDashboard/${studentId}/realDashboard`,
         {
           headers: {
-            Authentication: token
-          }
+            Authentication: token,
+          },
         }
       ); // Replace with your API endpoint
       const { data } = response.data;
-      console.log("response in dashboard",response.data)
+      console.log("response in dashboard", response);
       // console.log("response in dashboard",data)
       const formattedData = [
-        { label: 'Upcoming Exam', value: data.upcomingExam, bgColor: 'bg-green-100', textColor: 'text-black-500', icon: '📝' },
-        { label: 'Due Fees', value: data.dueFees, bgColor: 'bg-red-100', textColor: 'text-black-500', icon: '💸' },
-        { label: 'Event', value: data.events, bgColor: 'bg-blue-100', textColor: 'text-black-500', icon: '📅' },
-        { label: 'Notice', value: data.notices, bgColor: 'bg-yellow-100', textColor: 'text-black-500', icon: '🔔' },
+        {
+          label: "Upcoming Exam",
+          value: data.upcomingExam,
+          bgColor: "bg-green-100",
+          textColor: "text-black-500",
+          icon: "📝",
+        },
+        {
+          label: "Due Fees",
+          value: data.dueFees,
+          bgColor: "bg-red-100",
+          textColor: "text-black-500",
+          icon: "💸",
+        },
+        {
+          label: "Event",
+          value: data.events,
+          bgColor: "bg-blue-100",
+          textColor: "text-black-500",
+          icon: "📅",
+        },
+        {
+          label: "Notice",
+          value: data.notices,
+          bgColor: "bg-yellow-100",
+          textColor: "text-black-500",
+          icon: "🔔",
+        },
       ];
 
       setCardData(formattedData);
@@ -61,7 +80,7 @@ const StudentMainSection = () => {
       setPaidFees(data.totalPaidFees);
       setUnpaidFees(data.dueFees);
     } catch (error) {
-      console.error('Error fetching dashboard details:', error);
+      console.error("Error fetching dashboard details:", error);
     }
   };
 
@@ -80,16 +99,21 @@ const StudentMainSection = () => {
           </div>
         </div>
         <div className="flex flex-1   w-full">
-
           <div className="w-[30%]">
             {/* left slider */}
             <div className="p-5">
               <div className="flex justify-between items-center mb-2">
-                <h2 className="text-lg font-semibold text-gray-800 font-semibold">My Subject</h2>
-                <p className="text-sm text-purple-500 cursor-pointer font-bold">See all</p>
+                <h2 className="text-lg font-semibold text-gray-800 font-semibold">
+                  My Subject
+                </h2>
+                <p className="text-sm text-purple-500 cursor-pointer font-bold">
+                  See all
+                </p>
               </div>
               <div>
-                <p className="text-sm text-gray-500">A total of {subjects.length} Courses are in Progress</p>
+                <p className="text-sm text-gray-500">
+                  A total of {subjects.length} Courses are in Progress
+                </p>
               </div>
             </div>
             <AllSubjects subjects={subjects} />
@@ -137,10 +161,22 @@ const StudentMainSection = () => {
         <div className="flex border">
           <div className="w-[65%] ">
             <div className="flex justify-between items-center p-4">
-              <h4 className="text-lg font-semibold text-gray-800 font-semibold">Recent Exam Results</h4>
-              <p className="text-sm text-purple-500 cursor-pointer font-bold">See All</p>
+              <h4 className="text-lg font-semibold text-gray-800 font-semibold">
+                Recent Exam Results
+              </h4>
+              <p
+                onClick={() => {
+                  navigate(
+                    `/student_class/${selectedClass}/${selectedSection}/grades`
+                  );
+                }}
+                className="text-sm text-purple-500 cursor-pointer font-bold"
+              >
+                See All
+              </p>
             </div>
-            <StudentRecentGradeTable />
+            <StudentRecentGrade />
+            {/* <StudentRecentGradeTable /> */}
           </div>
           <div className=" border-l border-gray-300 w-[35%]">
             <div className=" flex flex-col border-b border-gray-200 py-5">
