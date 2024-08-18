@@ -17,21 +17,29 @@ import AllSubjects from "./DashBoardComponents/allSubjects/AllSubjects.js";
 import AttendanceChart from "./DashBoardComponents/Charts/AttendanceChart.js";
 import StudentGradePieChart from "./DashBoardComponents/Charts/StudentGradePieChart.js";
 import TaskCompletionChart from "./DashBoardComponents/Charts/TaskCompletionChart.js";
+// import StudentRecentGradeTable from "../StudentClass/Subjects/Modules/Grades/StudentGradeViewModal/Component/GradeAccordionItem.js";
 import StudentRecentGradeTable from "./DashBoardComponents/StudentRecentGradeTable.js";
 import StudentDashFeeCard from "./DashBoardComponents/StudentDashFeeCard.js";
 import AttendanceDashboard from "./DashBoardComponents/Charts/AttendanceDashboard.js";
 import axios from "axios";
 import { baseUrl } from "../../../config/Common.js";
+import { useSelector } from "react-redux";
+
 const StudentMainSection = () => {
+  // const{studentId}=useSelector((state)=>state.common)
   const [cardData, setCardData] = useState([]);
   const [subjects, setSubjects] = useState([]);
   const [paidFees, setPaidFees] = useState(0);
   const [unpaidFees, setUnpaidFees] = useState(0);
+  const { selectedClass, studentId,selectedSection, selectedSubject } = useSelector((state) => state.Common);
 
   const fetchDashboardDetails = async () => {
+    // const { selectedClass, studentId,selectedSection, selectedSubject } = useSelector((state) => state.Common);
+
     const token = localStorage.getItem('student:token')
     try {
-      const response = await axios.get(`${baseUrl}/api/studentDashboard/dashboard/student`,
+      // const response = await axios.get(`${baseUrl}/api/studentDashboard/dashboard/student`,
+      const response = await axios.get(`${baseUrl}/api/studentDashboard/${studentId}/realDashboard`,
         {
           headers: {
             Authentication: token
@@ -39,7 +47,8 @@ const StudentMainSection = () => {
         }
       ); // Replace with your API endpoint
       const { data } = response.data;
-
+      console.log("response in dashboard",response.data)
+      // console.log("response in dashboard",data)
       const formattedData = [
         { label: 'Upcoming Exam', value: data.upcomingExam, bgColor: 'bg-green-100', textColor: 'text-black-500', icon: '📝' },
         { label: 'Due Fees', value: data.dueFees, bgColor: 'bg-red-100', textColor: 'text-black-500', icon: '💸' },
