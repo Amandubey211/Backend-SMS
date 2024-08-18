@@ -70,3 +70,5 @@ const Tabs = ({ quiz, children, activeTab, setActiveTab, onTabChange, createPage
 };
 
 export default Tabs;
+
+

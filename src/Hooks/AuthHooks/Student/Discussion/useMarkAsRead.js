@@ -14,9 +14,10 @@ const useMarkAsRead = () => {
       }
 
       const response = await fetch(
-        `${baseUrl}/student/markAsRead/${discussionId}`,
+        // `${baseUrl}/student/markAsRead/${discussionId}`,
+        `${baseUrl}/admin/discussion/readstatus/${discussionId}`,
         {
-          method: "POST",
+          method: "PUT",
           headers: {
             Authentication: token,
           },
