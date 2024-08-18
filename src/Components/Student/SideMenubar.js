@@ -25,7 +25,9 @@ const SideMenubar = () => {
     userDetails: state.Auth.userDetail,
     role: state.Auth.role,
   }));
-
+console.log(" userdetails in sidemenubar",userDetails)
+console.log(" role in sidemenubar",role)
+// console.log(" userdetails in sidemenubar",userDetails)
   const [openItems, setOpenItems] = useState([]);
 
   const toggleDropdown = (title) => {
