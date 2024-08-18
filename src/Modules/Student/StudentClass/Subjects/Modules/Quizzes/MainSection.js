@@ -34,6 +34,7 @@ const MainSection = ({ quiz }) => {
     allowNumberOfAttempts,
     showOneQuestionOnly,
     allowedAttempts,
+  
   } = quiz;
   const quizDuration = timeLimit * 60;
 
@@ -65,13 +66,26 @@ const MainSection = ({ quiz }) => {
   useEffect(() => {
     const handleNavigation = (e) => {
       if (quizStarted && !quizSubmitted) {
+        e.preventDefault()
         const confirmLeave = window.confirm(
           "You are about to leave the quiz. Your submission will not be saved. Are you sure you want to leave?"
         );
-        if (!confirmLeave) {
-          e.preventDefault(); // Prevent navigation
-        } else {
-          navigate(e.target.location.pathname); // Allow navigation
+        // if (!confirmLeave) {
+        //   e.preventDefault(); // Prevent navigation
+        // } else {
+          
+        //   navigate(e.target.location.pathname); // Allow navigation
+        // }
+
+        if (confirmLeave) {
+          // If confirmed, use React Router's navigate to go to the intended location if available
+          // Fallback to using the href property of the clicked link if it's a navigation event triggered by an <a> tag
+          if (e.target.tagName === 'A' && e.target.href) {
+            navigate(e.target.getAttribute('href'));
+          } else {
+            // Handle other cases or log an error/anomaly if needed
+            console.error('Attempted to navigate without a clear target or href.');
+          }
         }
       }
     };
@@ -244,6 +258,7 @@ const MainSection = ({ quiz }) => {
             timeLeft={timeLeft}
             totalTime={totalTime}
             quiz={quiz}
+            numberOfQuestions={quiz.questions.length} 
           />
         )}
         {activeTab === "questions" && quizSubmitted && (

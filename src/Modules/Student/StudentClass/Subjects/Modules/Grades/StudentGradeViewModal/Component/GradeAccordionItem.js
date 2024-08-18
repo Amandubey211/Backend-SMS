@@ -133,6 +133,7 @@ import {
 } from "react-icons/md";
 
 const GradeAccordionItem = ({ grade }) => {
+  console.log("grade isss",grade)
   const [isOpen, setIsOpen] = useState(true);
 
   const toggleOpen = () => setIsOpen(!isOpen);
