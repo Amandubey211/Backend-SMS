@@ -9,6 +9,9 @@ const DashCard = ({
   iconBackground,
 
 }) => {
+  // Log the props to see what values are being received
+  console.log("DashCard Props:", { label, value, bgColor, textColor, icon, iconBackground });
+
   return (
     <div
       // to={url}
