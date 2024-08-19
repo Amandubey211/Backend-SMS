@@ -40,10 +40,17 @@ const MediaUpload = ({ onSubmit }) => {
           return axios.post(cloudinaryUrl, formData);
         })
       );
-
-      const fileUrls = responses.map((res) => res.data.secure_url);
-      onSubmit(fileUrls);
-      toast.success("Files uploaded successfully");
+      const mediaData = responses.map((res, index) => ({
+        url: res.data.secure_url,
+        name: files[index].name,
+        type: files[index].type
+    }));
+    onSubmit(mediaData);
+    toast.success("Files uploaded successfully");
+    
+      // const fileUrls = responses.map((res) => res.data.secure_url);
+      // onSubmit(fileUrls);
+      // toast.success("Files uploaded successfully");
     } catch (error) {
       console.error("Error uploading files to Cloudinary", error);
       setError("Error uploading files. Please try again.");
