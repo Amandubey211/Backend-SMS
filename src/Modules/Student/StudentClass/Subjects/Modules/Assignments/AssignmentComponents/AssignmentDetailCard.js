@@ -16,7 +16,8 @@ const AssignmentDetailCard = ({
     assignmentData?.allowedAttempts !== false &&
     assignmentData?.allowNumberOfAttempts
       ? assignmentData.allowNumberOfAttempts
-      : "N/A";
+      : "Unlimited";
+      // : "N/A";
 
   const dueDate = assignmentData?.dueDate ?? "N/A";
   const submittingBy = assignmentData?.submittingBy ?? "N/A";
