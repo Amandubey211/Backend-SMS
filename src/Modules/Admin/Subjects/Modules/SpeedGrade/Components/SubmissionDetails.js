@@ -1,15 +1,16 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { AiOutlineFileText } from "react-icons/ai";
-import { FaRegComment, FaFileAlt } from "react-icons/fa";
+import { CiTextAlignJustify } from "react-icons/ci";
+
+import { FaFileAlt, FaFilePdf } from "react-icons/fa";
 import { IoCalendarOutline } from "react-icons/io5";
 import { RxPerson } from "react-icons/rx";
 import { AiOutlineEye } from "react-icons/ai";
 import { RiFileWord2Line } from "react-icons/ri";
 import AddRubricModal from "../../Rubric/Components/AddRubricModal";
-import Sidebar from "../../../../../../Components/Common/Sidebar";
-import AddNewCriteriaForm from "../../Rubric/Components/AddNewCriteriaForm";
+
 import { useParams } from "react-router-dom";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 import useAssignQuizGrade from "../../../../../../Hooks/AuthHooks/Staff/Admin/SpeedGrade/Quiz/useAssignQuizGrade";
 import useAssignAssignmentGrade from "../../../../../../Hooks/AuthHooks/Staff/Admin/SpeedGrade/Assignment/useAssignAssignmentGrade";
 
@@ -22,6 +23,9 @@ const SubmissionDetails = ({ details, student, initialGrade }) => {
   const [attemptDate, setAttemptDate] = useState("");
   const [status, setStatus] = useState("Missing");
   const { type } = useParams();
+
+  const [previewUrl, setPreviewUrl] = useState(null);
+  const [previewType, setPreviewType] = useState(null);
 
   const {
     loading: assignGradeLoading,
@@ -38,7 +42,7 @@ const SubmissionDetails = ({ details, student, initialGrade }) => {
   const loading =
     type === "Assignment" ? assignGradeLoading : assignQuizGradeLoading;
 
-  const { dueDate, points, totalPoints, comments, files } =
+  const { dueDate, points, totalPoints, comments, media } =
     details?.assignmentId || details?.quizId || {};
   const { content } = details;
 
@@ -134,12 +138,40 @@ const SubmissionDetails = ({ details, student, initialGrade }) => {
     type,
   ]);
 
+  const dummyFiles = [
+    // {
+    //   url: "https://res.cloudinary.com/dhksqayts/image/upload/v1723784726/subjects/66a9e9203e9c5429f9f5b673/chapters/66ab5a5ea62c56abdbe41280/lamck4rqzyhaybbq1d8u.pdf",
+    //   title: "Assignment image 1",
+    //   type: "application/pdf",
+    // },
+    // {
+    //   url: "https://res.cloudinary.com/dhksqayts/image/upload/v1723623488/subjects/66a9e9203e9c5429f9f5b673/chapters/66b0acd88bf0bc11a3955362/xtlligurgjrj2smp5wtp.png",
+    //   title: "Assignment image 2",
+    //   type: "image/png",
+    // },
+    // {
+    //   url: "https://res.cloudinary.com/dhksqayts/image/upload/v1723784726/subjects/66a9e9203e9c5429f9f5b673/chapters/66ab5a5ea62c56abdbe41280/lamck4rqzyhaybbq1d8u.pdf",
+    //   title: "Assignment image 3",
+    //   type: "application/pdf",
+    // },
+  ];
+
+  const openPreviewModal = (url, type) => {
+    setPreviewUrl(url);
+    setPreviewType(type);
+  };
+
+  const closePreviewModal = () => {
+    setPreviewUrl(null);
+    setPreviewType(null);
+  };
+
   const renderWordCount = () => {
     if (wordCount === 0) {
       return (
-        <div className="flex flex-col items-center justify-center text-gray-500 mt-4">
-          <AiOutlineFileText className="text-4xl" aria-hidden="true" />
-          <p className="mt-2 text-sm">No content submitted</p>
+        <div className="flex flex-col items-center justify-center text-gray-500 my-4">
+          <CiTextAlignJustify className="text-4xl" aria-hidden="true" />
+          <p className="mt-2 text-sm">No Text submitted</p>
         </div>
       );
     } else {
@@ -154,7 +186,7 @@ const SubmissionDetails = ({ details, student, initialGrade }) => {
   };
 
   const renderFiles = () => {
-    if (!files || files.length === 0) {
+    if (!dummyFiles || dummyFiles.length === 0) {
       return (
         <div className="flex flex-col items-center justify-center text-gray-500 mt-7">
           <FaFileAlt className="text-xl" aria-hidden="true" />
@@ -163,24 +195,51 @@ const SubmissionDetails = ({ details, student, initialGrade }) => {
       );
     } else {
       return (
-        <ul className="space-y-2 text-sm">
-          {files.map((file, index) => (
-            <li
-              key={index}
-              className="flex items-center space-x-2 text-blue-500"
-            >
-              <a href="#" className="hover:underline">
-                {file}
-              </a>
-            </li>
-          ))}
-        </ul>
+        <>
+          <h1 className="font-semibold text-gray-500  bg-gray-50 py-1">
+            {" "}
+            Uploaded Files
+          </h1>
+
+          <ul className="space-y-2 text-sm">
+            {dummyFiles?.map((file, index) => (
+              <li
+                key={index}
+                className="flex items-center justify-between bg-white p-2 border rounded-md shadow-sm hover:shadow-md transition-shadow"
+              >
+                <div className="flex items-center space-x-2">
+                  {file?.type?.startsWith("image/") ? (
+                    <img
+                      src={file.url}
+                      alt={file.title}
+                      className="w-6 h-6 object-cover rounded"
+                    />
+                  ) : file.type === "application/pdf" ? (
+                    <FaFilePdf className="text-red-500 w-6 h-6" />
+                  ) : (
+                    <FaFileAlt className="text-gray-500 w-6 h-6" />
+                  )}
+                  <a
+                    href="#"
+                    className="text-green-500 hover:underline"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      openPreviewModal(file.url, file.type);
+                    }}
+                  >
+                    {file.title}
+                  </a>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </>
       );
     }
   };
 
   const renderSubmissionDetails = () => {
-    if (wordCount === 0 && (!files || files.length === 0)) {
+    if (wordCount === 0 && (!dummyFiles || dummyFiles.length === 0)) {
       return (
         <div className="flex flex-col items-center justify-center text-gray-500 mt-4">
           <FaFileAlt className="text-4xl" aria-hidden="true" />
@@ -190,7 +249,7 @@ const SubmissionDetails = ({ details, student, initialGrade }) => {
     } else {
       return (
         <>
-          {renderWordCount()}
+          {details?.assignmentId && <> {renderWordCount()}</>}
           {renderFiles()}
         </>
       );
@@ -202,12 +261,16 @@ const SubmissionDetails = ({ details, student, initialGrade }) => {
       <div className="flex gap-2 p-2 justify-center items-center border-b pb-3">
         <button className="flex items-center bg-white border text-sm gap-1 border-gray-300 font-semibold py-2 px-4 rounded-full hover:bg-gray-100 focus:outline-none">
           <RxPerson className="inline-block" />
-          <span>
-            Graded:{" "}
-            <span className=" text-purple-500">
-              {grade !== "" ? `${grade}` : "N/A"}
+          {details?.quizId?.quizType !== "Practice" ? (
+            <span>
+              Graded:{" "}
+              <span className=" text-purple-500">
+                {grade !== "" ? `${grade}` : "N/A"}
+              </span>
             </span>
-          </span>
+          ) : (
+            <span>Pratice </span>
+          )}
         </button>
 
         <button
@@ -236,89 +299,92 @@ const SubmissionDetails = ({ details, student, initialGrade }) => {
               Due Date: <span>{new Date(dueDate).toLocaleDateString()}</span>
             </span>
           </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Attempt Date
-            </label>
-            <input
-              type="date"
-              className="mt-1 block w-full border border-gray-300 bg-white rounded-lg px-3 py-2 shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
-              value={attemptDate}
-              onChange={(e) => setAttemptDate(e.target.value)}
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-500">
-              Grade{" "}
-              <span className="text-xs font-normal text-pink-500 italic">
-                (Out of {type === "Quiz" ? totalPoints : points || 0})
-              </span>
-            </label>
-            <input
-              type="number"
-              value={grade}
-              onChange={handleGradeChange}
-              className="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-500">
-              Status
-            </label>
-            <div className="flex items-center space-x-4 mt-1">
-              <div className="flex items-center">
-                <input
-                  id="status-submit"
-                  name="status"
-                  type="radio"
-                  className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
-                  checked={status === "Submit"}
-                  onChange={() => setStatus("Submit")}
-                />
-                <label
-                  htmlFor="status-submit"
-                  className="ml-2 block text-sm text-green-500"
-                >
-                  Submit
+          {details?.quizId?.quizType !== "Practice" && (
+            <>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Attempt Date
                 </label>
-              </div>
-              <div className="flex items-center">
                 <input
-                  id="status-excused"
-                  name="status"
-                  type="radio"
-                  className="h-4 w-4 text-yellow-500 focus:ring-yellow-500 border-gray-300"
-                  checked={status === "Excused"}
-                  onChange={() => setStatus("Excused")}
+                  type="date"
+                  className="mt-1 block w-full border border-gray-300 bg-white rounded-lg px-3 py-2 shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                  value={attemptDate}
+                  onChange={(e) => setAttemptDate(e.target.value)}
                 />
-                <label
-                  htmlFor="status-excused"
-                  className="ml-2 block text-sm text-yellow-400"
-                >
-                  Excused
-                </label>
               </div>
-              <div className="flex items-center">
+
+              <div>
+                <label className="block text-sm font-medium text-gray-500">
+                  Grade{" "}
+                  <span className="text-xs font-normal text-pink-500 italic">
+                    (Out of {type === "Quiz" ? totalPoints : points || 0})
+                  </span>
+                </label>
                 <input
-                  id="status-missing"
-                  name="status"
-                  type="radio"
-                  className="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300"
-                  checked={status === "Missing"}
-                  onChange={() => setStatus("Missing")}
+                  type="number"
+                  value={grade}
+                  onChange={handleGradeChange}
+                  className="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
                 />
-                <label
-                  htmlFor="status-missing"
-                  className="ml-2 block text-sm text-red-700"
-                >
-                  Missing
-                </label>
               </div>
-            </div>
-          </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-500">
+                  Status
+                </label>
+                <div className="flex items-center space-x-4 mt-1">
+                  <div className="flex items-center">
+                    <input
+                      id="status-submit"
+                      name="status"
+                      type="radio"
+                      className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
+                      checked={status === "Submit"}
+                      onChange={() => setStatus("Submit")}
+                    />
+                    <label
+                      htmlFor="status-submit"
+                      className="ml-2 block text-sm text-green-500"
+                    >
+                      Submit
+                    </label>
+                  </div>
+                  <div className="flex items-center">
+                    <input
+                      id="status-excused"
+                      name="status"
+                      type="radio"
+                      className="h-4 w-4 text-yellow-500 focus:ring-yellow-500 border-gray-300"
+                      checked={status === "Excused"}
+                      onChange={() => setStatus("Excused")}
+                    />
+                    <label
+                      htmlFor="status-excused"
+                      className="ml-2 block text-sm text-yellow-400"
+                    >
+                      Excused
+                    </label>
+                  </div>
+                  <div className="flex items-center">
+                    <input
+                      id="status-missing"
+                      name="status"
+                      type="radio"
+                      className="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300"
+                      checked={status === "Missing"}
+                      onChange={() => setStatus("Missing")}
+                    />
+                    <label
+                      htmlFor="status-missing"
+                      className="ml-2 block text-sm text-red-700"
+                    >
+                      Missing
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
         </div>
 
         <div className="mt-3">
@@ -328,36 +394,68 @@ const SubmissionDetails = ({ details, student, initialGrade }) => {
           <div className="space-y-2 px-3 p-2">{renderSubmissionDetails()}</div>
         </div>
       </div>
-
-      <div className="p-4 mb-10 border-t border-gray-200">
-        {/* {error && <p className="text-red-500 text-sm mb-2">{error}</p>} */}
-        <button
-          className="w-full py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold rounded-md shadow-md hover:from-purple-500 hover:to-pink-500 focus:outline-none"
-          onClick={handleSubmitGrade}
-          disabled={loading}
-        >
-          {loading ? "Submitting..." : "Submit Grade →"}
-        </button>
-      </div>
+      {details?.quizId?.quizType !== "Practice" && (
+        <div className="p-4 mb-10 border-t border-gray-200">
+          <button
+            className="w-full py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold rounded-md shadow-md hover:from-purple-500 hover:to-pink-500 focus:outline-none"
+            onClick={handleSubmitGrade}
+            disabled={loading}
+          >
+            {loading ? "Submitting..." : "Submit Grade →"}
+          </button>
+        </div>
+      )}
 
       <AddRubricModal
         type={type === "Assignment" ? "assignment" : "quiz"}
         isOpen={isModalOpen}
         onClose={() => setModalOpen(false)}
-        assignmentId={details._id}
         criteriaList={criteriaList}
+        AssignmentId={details?.assignmentId?._id}
+        QuizId={details?.quizId?._id}
         setCriteriaList={setCriteriaList}
         setExistingRubricId={setExistingRubricId}
-        onAddCriteria={handleAddCriteria}
+        readonly={true}
       />
 
-      <Sidebar
-        isOpen={isSidebarOpen}
-        onClose={() => setSidebarOpen(false)}
-        title="Add New Criteria"
-      >
-        <AddNewCriteriaForm />
-      </Sidebar>
+      {previewUrl && (
+        <div
+          className="fixed inset-0 flex items-center justify-center z-50"
+          role="dialog"
+          aria-modal="true"
+        >
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50 transition-opacity duration-300"
+            onClick={closePreviewModal}
+          ></div>
+          <div className="bg-white rounded-lg overflow-hidden shadow-xl transform transition-transform duration-300 max-w-3xl w-full p-6 relative">
+            <button
+              onClick={closePreviewModal}
+              className="absolute top-2 right-2 p-2 px-3 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 text-white hover:from-pink-600 hover:to-purple-600 transition-colors duration-500 ease-in-out shadow-lg"
+            >
+              ✕
+            </button>
+            <div className="flex justify-center">
+              <div className="overflow-y-auto max-h-[80vh] w-full">
+                {previewType === "application/pdf" ? (
+                  <iframe
+                    src={previewUrl}
+                    width="100%"
+                    height="500px"
+                    className="max-h-[80vh] overflow-y-auto rounded-md"
+                  />
+                ) : (
+                  <img
+                    src={previewUrl}
+                    alt="Preview"
+                    className="max-h-[80vh] w-full object-contain rounded-md"
+                  />
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

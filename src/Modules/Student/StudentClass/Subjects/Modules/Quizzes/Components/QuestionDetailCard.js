@@ -8,10 +8,9 @@ import AssignmentDetail from '../../../Component/AssignmentDetail';
 import CommentCard from './CommentCard';
 import DateDetail from '../../../Component/DateDetail';
 
-const QuestionDetailCard = ({ quiz,timeLeft ,totalTime}) => {
+const QuestionDetailCard = ({ quiz,timeLeft ,totalTime,numberOfQuestions}) => {
   const { name, quizType, availableFrom, totalPoints, allowNumberOfAttempts, timeLimit } = quiz; // destructure quiz object
   const [showTime, setShowTime] = useState(true);
-
   const commentsData = [
     {
       avatar: "https://avatars.githubusercontent.com/u/109097090?v=4", // Replace with actual image URL
@@ -37,7 +36,7 @@ const QuestionDetailCard = ({ quiz,timeLeft ,totalTime}) => {
   const quizQuestionDetails = [
     { label: "Allow Attempts", value: allowNumberOfAttempts, type: "quizz" },
     { label: "Quiz Point", value: `${totalPoints} Point`, type: "quizz" },
-    { label: "Questions", value: "25", type: "quizz" },
+    { label: "Questions", value: `${numberOfQuestions} `, type: "quizz" },
     { label: "Time Limit", value: formatTime(timeLimit), type: "quizz" },
     { label: "You can see the correct Answer", value: "02/10/2024", type: "date" },
   ];

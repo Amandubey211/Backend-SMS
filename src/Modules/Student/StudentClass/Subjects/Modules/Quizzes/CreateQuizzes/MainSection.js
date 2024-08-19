@@ -8,6 +8,7 @@ import CreateQuestionForm from "./Components/CreateQuestionForm";
 import AnswerSection from "./Components/AnswerSection";
 import QuestionList from "./Components/QuestionList";
 import AddQuestionButton from "./Components/AddQuestionButton";
+import Spinner from "../../../../../../../Components/Common/Spinner";
 
 const MainSection = () => {
   const [activeTab, setActiveTab] = useState("instructions");
@@ -117,7 +118,7 @@ const MainSection = () => {
             {(activeTab) => (
               <div className="h-full">
                 {activeTab === "instructions" ? (
-                  <Suspense fallback={<div>Loading...</div>}>
+                  <Suspense fallback={<div><Spinner/> </div>}>
                     <Editor
                       assignmentLabel="Quiz Instructions"
                       assignmentName={assignmentName}
@@ -127,7 +128,7 @@ const MainSection = () => {
                     />
                   </Suspense>
                 ) : (
-                  <Suspense fallback={<div>Loading...</div>}>
+                  <Suspense fallback={<div><Spinner/> </div>}>
                     <div>
                       <h2 className="text-gradient text-2xl font-semibold mb-4">
                         Questions:

@@ -909,7 +909,7 @@ function App() {
       errorElement: <Error />,
     },
     {
-      path: "/checkprogress",
+      path: "/checkprogress/:studentId",
       element: <CheckProgress />,
       errorElement: <Error />,
     },
@@ -918,7 +918,7 @@ function App() {
       element: <ParentAnnounce />,
       errorElement: <Error />,
     },
-    { path: "/childgrade", element: <ChildGrade />, errorElement: <Error /> },
+    { path: "/childgrade/:studentId", element: <ChildGrade />, errorElement: <Error /> },
   ]);
 
   return (

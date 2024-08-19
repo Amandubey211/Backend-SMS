@@ -40,12 +40,25 @@ const AssignmentDetails = ({ student, details, type, onTotalGradeUpdate }) => {
   const { name, points, dueDate, questions, totalPoints } =
     assignmentId || quizId || {};
 
+  const quizType = quizId?.quizType; // Safely accessing quizType
+
   return (
     <div className="bg-white">
       <div className="flex justify-between items-center mb-4 border-b pb-2">
         <div>
-          <h2 className="text-xl font-medium mb-1 capitalize">
+          <h2 className="text-xl font-medium mb-1 capitalize flex items-center">
             {name || "Untitled"}
+            {quizType && (
+              <span
+                className={`ml-2 px-2 py-1 rounded-lg text-xs font-semibold ${
+                  quizType === "Practice"
+                    ? "bg-yellow-100 text-yellow-800"
+                    : "bg-green-100 text-green-800"
+                }`}
+              >
+                {quizType === "Practice" ? "Practice Type" : "Graded Type"}
+              </span>
+            )}
           </h2>
           <p className="text-gray-500">
             Submission Date:{" "}
@@ -55,7 +68,7 @@ const AssignmentDetails = ({ student, details, type, onTotalGradeUpdate }) => {
         <div className="text-right">
           <p className="text-gray-500 mb-1">Points</p>
           <p className="text-green-500 font-bold text-md">
-            {type === "Quiz" ? score : grade}/
+            {type === "Quiz" ? score || 0 : grade || 0}/
             {type === "Quiz" ? totalPoints : points}
           </p>
         </div>

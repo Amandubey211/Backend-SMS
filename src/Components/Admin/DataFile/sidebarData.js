@@ -59,7 +59,7 @@ const sidebarData = [
         path: "/users/parents",
       },
       {
-        title: "librarian",
+        title: "Librarian",
         icon: <MdLocalLibrary />,
         path: "/users/librarian",
       },

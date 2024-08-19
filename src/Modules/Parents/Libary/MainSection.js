@@ -1,14 +1,6 @@
 import React from "react";
 import LibraryTable from "../../../Components/Parents/Libary/LibraryList";
 
-// import TotalAttendanceGraph from "./Graphs/TotalAttendanceGraph";
-// import TotalEarningsGraph from "./Graphs/TotalEarningsGraph";
-// import TotalStudentsGraphjs from "./Graphs/TotalStudentsGraph.js";
-// import TopRankingStudents from "./Graphs/TopRankingStudents.js";
-// import Library from "./LibraryModule/Library.js";
-// import Events from "./EventModule/Event.js";
-// import BestPerformersChart from "./Graphs/BestPerformancGraph.js";
-// import performanceData from "./DashboardData/PerformanceData.js";
 const ParentSection = () => {
   return (
     <div className="h-full  w-full">

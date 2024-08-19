@@ -3,6 +3,8 @@ import { Table, message } from 'antd';
 import axios from 'axios';
 import { format } from 'date-fns';
 import { baseUrl } from '../../../config/Common';
+import Spinner from "../../../Components/Common/Spinner"; // Importing Spinner
+import { FaBookOpen } from "react-icons/fa"; // Importing an icon for no data or error messages
 
 const LibraryTable = () => {
   const [data, setData] = useState([]);
@@ -107,7 +109,8 @@ const LibraryTable = () => {
     <div className="p-6">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-xl font-bold">Library Status</h1>
-        <div className="flex space-x-4"> Status
+        <div className="flex space-x-4">
+          Status
           <label className="radio-container" style={{ position: 'relative', paddingLeft: '32px', cursor: 'pointer' }}>
             <input
               type="radio"
@@ -154,7 +157,7 @@ const LibraryTable = () => {
               onChange={() => handleFilterChange('Pending')}
               style={{ display: 'none' }}
             />
-            <span style={{ position: 'relative' , paddingLeft: '20px'}}>
+            <span style={{ position: 'relative', paddingLeft: '20px' }}>
               Pending
               <span style={{
                 content: '',
@@ -221,7 +224,24 @@ const LibraryTable = () => {
           </label>
         </div>
       </div>
-      <Table columns={columns} dataSource={filteredData} rowKey="_id" loading={loading} />
+
+      {loading ? (
+        <div className="flex justify-center items-center h-full">
+          <Spinner />
+        </div>
+      ) : error ? (
+        <div className="flex flex-col items-center justify-center h-full text-center">
+          <FaBookOpen className="text-gray-400 text-6xl mb-4" />
+          <p className="text-gray-600 text-lg">Failed to fetch library data</p>
+        </div>
+      ) : filteredData.length === 0 ? (
+        <div className="flex flex-col items-center justify-center h-full text-center">
+          <FaBookOpen className="text-gray-400 text-6xl mb-4" />
+          <p className="text-gray-600 text-lg">No Library Data Found</p>
+        </div>
+      ) : (
+        <Table columns={columns} dataSource={filteredData} rowKey="_id" />
+      )}
     </div>
   );
 };

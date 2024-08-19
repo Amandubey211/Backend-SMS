@@ -18,6 +18,7 @@ const CommonSlice = createSlice({
     studentId: null,
     selectedClassName: "",
     selectedSubjectName: "",
+    selectedSectionName: "",
   },
   reducers: {
     setLeftHeading: (state, action) => {
@@ -50,6 +51,9 @@ const CommonSlice = createSlice({
     setSelectedSectionId: (state, action) => {
       state.selectedSection = action.payload;
     },
+    setSelectedSectionName: (state, action) => {
+      state.selectedSectionName = action.payload;
+    },
   },
 });
 
@@ -63,6 +67,7 @@ export const {
   setSelectedModule,
   setSelectedAssignmentname,
   setSelectedSectionId,
+  setSelectedSectionName
 } = CommonSlice.actions;
 
 export default CommonSlice.reducer;

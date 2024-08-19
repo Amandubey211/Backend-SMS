@@ -20,22 +20,23 @@ const initialFormState = {
   points: "",
   quizType: "",
   submissionFormat: "",
-  allowedAttempts: 1,
-  allowMultiple: false,
-  numberOfAttempts: "",
+  allowedAttempts: false,
+  allowNumberOfAttempts: 0,
   assignTo: "",
-  showOneQuestionAtATime: "",
+  showOneQuestionOnly: false,
   questionType: "",
   sectionId: null,
   allowShuffleAnswers: false,
   dueDate: "",
   availableFrom: "",
-  lockQuestionsAfterAnswering: false,
+  lockQuestionAfterAnswering: false,
   until: "",
   timeLimit: "",
   moduleId: null,
   chapterId: null,
   groupId: null,
+  studentSeeAnswer: false,
+  showAnswerDate: "",
 };
 
 const initialAnswersState = [
@@ -95,18 +96,20 @@ const MainSection = ({ setIsEditing }) => {
         points: quiz.points || "",
         quizType: quiz.quizType || "",
         submissionFormat: quiz.submissionFormat || "",
-        allowedAttempts: quiz.allowedAttempts || 1,
-        allowMultiple: quiz.allowMultiple || false,
-        numberOfAttempts: quiz.numberOfAttempts || "",
+        allowedAttempts: quiz?.allowedAttempts || false,
+        // allowMultiple: quiz.allowMultiple || false,
+        allowNumberOfAttempts: quiz.allowNumberOfAttempts || 1,
         assignTo: quiz.assignTo || "",
-        showOneQuestionAtATime: quiz.showOneQuestionAtATime || "",
+        showOneQuestionOnly: quiz.showOneQuestionOnly || false,
         questionType: quiz.questionType || "",
         section: quiz?.sectionId || null,
         allowShuffleAnswers: quiz.allowShuffleAnswers || false,
+        studentSeeAnswer: quiz.studentSeeAnswer || false,
+        showAnswerDate: quiz.showAnswerDate || "",
         dueDate: quiz.dueDate || "",
         availableFrom: quiz.availableFrom || "",
-        lockQuestionsAfterAnswering: quiz.lockQuestionsAfterAnswering || false,
-        until: quiz.until || "DD/MM/YY",
+        lockQuestionAfterAnswering: quiz.lockQuestionAfterAnswering || false,
+        until: quiz.until || null,
         timeLimit: quiz.timeLimit || "",
         moduleId: quiz.moduleId || null,
         chapterId: quiz.chapterId || null,
@@ -125,6 +128,7 @@ const MainSection = ({ setIsEditing }) => {
   const handleQuestionChange = (content) => setQuestion(content);
   const handleFormChange = (e) => {
     const { name, value, type, checked } = e.target;
+
     setFormState((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
@@ -199,6 +203,7 @@ const MainSection = ({ setIsEditing }) => {
       quizData.groupId = formState.groupId || null;
     }
     if (isEditing) {
+      console.log(quizData, "----------");
       const result = await updateQuiz(quizId, quizData);
       if (result.success) {
         setActiveTab("questions");

@@ -11,13 +11,13 @@ import { requestPermissionAndGetToken } from "../../NotificationHooks/Notificati
 import axios from "axios";
 import { baseUrl } from "../../../config/Common.js";
 import { setLeftHeading } from "../../../Redux/Slices/Common/CommonSlice.js";
-import useCreateSalary from "../../CommonHooks/useCreateSalary.js";
+// import useCreateSalary from "../../CommonHooks/useCreateSalary.js";
 
 const useStaffLogin = () => {
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { createSalary } = useCreateSalary()
+  // const { createSalary } = useCreateSalary();
   const validateEmail = (email) => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return re.test(String(email).toLowerCase());
@@ -46,7 +46,6 @@ const useStaffLogin = () => {
     try {
       const deviceToken = await requestPermissionAndGetToken();
       console.log(deviceToken);
-      
       const userdetail = { email, password, deviceToken };
       const { data } = await axios.post(
         `${baseUrl}/auth/staff/login`,
@@ -76,7 +75,7 @@ const useStaffLogin = () => {
         toast.success("Logged in successfully", {
           position: "bottom-left",
         });
-        createSalary('unpaid','pay now')
+        // createSalary('unpaid','pay now')
       } else {
         toast.error(data.message || "Login failed. Please try again.");
       }

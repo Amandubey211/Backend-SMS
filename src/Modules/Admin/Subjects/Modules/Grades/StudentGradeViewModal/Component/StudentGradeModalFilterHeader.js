@@ -10,7 +10,8 @@ const StudentGradeModalFilterHeader = ({ filters, onFilterChange }) => {
   const { loading, error, fetchModules } = useGetModulesForStudent();
   useEffect(()=>{
     fetchModules();
-    console.log(moduleList);
+    const module = moduleList?.filter((i)=>i._id==filters?.module);
+    setChapters(module[0]?.chapters)
   },[])
   const handleChange = (e) => {
     const { name, value } = e.target;

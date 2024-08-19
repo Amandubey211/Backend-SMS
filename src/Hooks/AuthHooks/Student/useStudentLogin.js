@@ -46,7 +46,14 @@ const useStudentLogin = () => {
         dispatch(setAuth(true));
         dispatch(setStudentId(data.userId));
         dispatch(setRole(data.role));
-        dispatch(setUerDetails(data.user));
+        const user = {
+          schoolId: data?.schoolId,
+          userId: data?.userId,
+          profile: data?.profile,
+          fullName: data?.fullName,
+        };
+        dispatch(setUerDetails(user));
+        // dispatch(setUerDetails(data.user));
         console.log("data",data);
         if (data.isVerifiedSchoolId) {
           navigate("/student_dash");

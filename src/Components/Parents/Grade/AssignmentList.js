@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Tag, Collapse, Typography, message } from 'antd';
+import { Table, Tag, Collapse, Typography } from 'antd';
 import axios from 'axios';
 import { baseUrl } from '../../../config/Common';
+import Spinner from '../../../Components/Common/Spinner';
+import { FaExclamationTriangle } from 'react-icons/fa';
 
 const { Panel } = Collapse;
 const { Text } = Typography;
@@ -73,12 +75,17 @@ const AssignmentList = () => {
           headers: { Authentication: token }
         });
 
-        setSubjects(response.data.subjects);
-        setLoading(false);
+        if (response.data && response.data.subjects) {
+          setSubjects(response.data.subjects);
+          setError(null);
+        } else {
+          throw new Error('No subjects data available');
+        }
       } catch (err) {
-        setError('Failed to load subjects');
-        setLoading(false);
+        setError('Unable to fetch subjects');
         console.error('Error fetching subjects:', err);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -98,40 +105,60 @@ const AssignmentList = () => {
         headers: { Authentication: token }
       });
 
-      setAssignments(response.data.assignments);
-      setLoading(false);
+      if (response.data && response.data.assignments) {
+        setAssignments(response.data.assignments);
+        setError(null);
+      } else {
+        throw new Error('No assignments data available');
+      }
     } catch (err) {
-      setError('Failed to fetch assignments');
-      setLoading(false);
-      message.error('Failed to fetch assignments');
+      setError('Unable to fetch assignments');
       console.error('Error fetching assignments:', err);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="p-6  rounded-lg shadow-lg">
-      <h1 className="text-4xl font-bold  mb-8 p-4 text-gradient from-purple-500 via-pink-500 to-red-500 border-b-2 border-white">Assignments</h1>
-      {error && <p className="text-red-500">{error}</p>}
-      <Collapse
-        accordion
-        bordered={false}
-        defaultActiveKey={['1']}
-        ghost
-        expandIconPosition="right"
-        className="bg-transparent"
-        onChange={(key) => handlePanelClick(key)}
-      >
-        {subjects.map(subject => (
-          <Panel
-            header={
-              <div className="flex items-center text-white">
-                <Text className="text-lg text-gradient font-semibold">{subject.name}</Text>
-              </div>
-            }
-            key={subject._id}
-            className="bg-gradient rounded-lg shadow-md p-4 mb-4"
-          >
-            {loading ? <p>Loading...</p> : (
+    <div className="p-6 rounded-lg shadow-lg">
+      <h1 className="text-4xl font-bold mb-8 p-4 text-gradient from-purple-500 via-pink-500 to-red-500 border-b-2 border-white">Assignments</h1>
+      {loading && (
+        <div className="flex justify-center items-center h-full">
+          <Spinner />
+        </div>
+      )}
+      {!loading && error && (
+        <div className="flex flex-col items-center justify-center h-full text-center">
+          <FaExclamationTriangle className="text-6xl text-gray-400 mb-4" />
+          <p className="text-gray-500">Unable to Fetch Assignment</p>
+        </div>
+      )}
+      {!loading && !error && subjects.length === 0 && (
+        <div className="flex flex-col items-center justify-center h-full text-center">
+          <FaExclamationTriangle className="text-6xl text-gray-400 mb-4" />
+          <p className="text-gray-500">No Data Yet</p>
+        </div>
+      )}
+      {!loading && !error && subjects.length > 0 && (
+        <Collapse
+          accordion
+          bordered={false}
+          defaultActiveKey={['1']}
+          ghost
+          expandIconPosition="right"
+          className="bg-transparent"
+          onChange={(key) => handlePanelClick(key)}
+        >
+          {subjects.map(subject => (
+            <Panel
+              header={
+                <div className="flex items-center text-white">
+                  <Text className="text-lg text-gradient font-semibold">{subject.name}</Text>
+                </div>
+              }
+              key={subject._id}
+              className="bg-gradient rounded-lg shadow-md p-4 mb-4"
+            >
               <Table
                 columns={columns}
                 dataSource={assignments}
@@ -139,10 +166,10 @@ const AssignmentList = () => {
                 bordered
                 className="bg-gray-50 rounded-lg shadow-md"
               />
-            )}
-          </Panel>
-        ))}
-      </Collapse>
+            </Panel>
+          ))}
+        </Collapse>
+      )}
     </div>
   );
 };

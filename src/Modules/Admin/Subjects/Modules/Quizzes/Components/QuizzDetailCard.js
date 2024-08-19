@@ -1,10 +1,22 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import DateDetail from "../../../Component/DateDetail";
 import AssignmentDetail from "../../../Component/AssignmentDetail";
 import ButtonsGroup from "../../../Component/ButtonsGroup";
 import SpeedGradeButton from "../../../Component/SpeedGradeButton";
+import RubricButton from "../../Assignments/AssignmentComponents/RubricButton";
+import AddRubricModal from "../../Rubric/Components/AddRubricModal";
 
 const QuizzDetailCard = ({ quiz, onRefresh, isPublish }) => {
+  const [isModalOpen, setModalOpen] = useState(false);
+  const [isSidebarOpen, setSidebarOpen] = useState(false);
+  const [criteriaList, setCriteriaList] = useState([]);
+  const [existingRubricId, setExistingRubricId] = useState(null);
+  const [selectedQuizId, setSelectedQuizId] = useState("");
+  useEffect(() => {
+    if (quiz && quiz._id) {
+      setSelectedQuizId(quiz._id);
+    }
+  }, [quiz]);
   const quizDetails = [
     {
       label: "Quiz Point",
@@ -56,7 +68,9 @@ const QuizzDetailCard = ({ quiz, onRefresh, isPublish }) => {
       type: "date",
     },
   ];
-
+  const handleViewRubric = () => {
+    setModalOpen(true);
+  };
   return (
     <div className="p-3 bg-white" aria-label="Quiz Card">
       <ButtonsGroup data={quiz} type="Quiz" onRefresh={onRefresh} />
@@ -92,6 +106,18 @@ const QuizzDetailCard = ({ quiz, onRefresh, isPublish }) => {
           return null;
         })}
       </div>
+      <RubricButton onClick={handleViewRubric} />
+      <AddRubricModal
+        type="quiz"
+        QuizId={selectedQuizId}
+        isOpen={isModalOpen}
+        onClose={() => setModalOpen(false)}
+        // onAddCriteria={() => setSidebarOpen(true)}
+        criteriaList={criteriaList}
+        setCriteriaList={setCriteriaList}
+        setExistingRubricId={setExistingRubricId}
+        readonly={true} // Set readonly to true
+      />
     </div>
   );
 };

@@ -47,6 +47,8 @@ const useUpdateQuiz = () => {
         );
         return { success: false, error: "Validation Error" };
       }
+      console.log(quizData);
+      console.log(lockQuestionAfterAnswering, "=======");
 
       setLoading(true);
       setError(null);
