@@ -146,7 +146,7 @@ const Navbar = ({ hideSearchbar, hideAvatarList, hideStudentView }) => {
 
   return (
     <div className="sticky top-0 left-0 right-0 z-20 bg-white border-b shadow-sm">
-      <div className="flex items-center p-2 py-3 bg-white">
+      <div className="flex items-center p-2 py-3 bg-white ">
         <LeftHeading leftHeading={leftHeading} navigate={navigate} />
 
         <div className="flex items-center space-x-2 border-l ml-3 pl-3 relative">

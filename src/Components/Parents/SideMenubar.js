@@ -31,11 +31,11 @@ const SideMenubar = () => {
 
   return (
     <nav
-      className={`transition-all duration-300 h-screen p-1 z-10 bg-white border-r flex flex-col ${
+      className={`transition-all duration-300 h-screen p-1 z-50 bg-white border-r flex flex-col ${
         isOpen ? "w-[15%]" : "w-[7%]"
       }`}
     >
-      <NavLink to="/parent_dash" className="relative flex items-center justify-center border-b pb-1">
+      <NavLink to="/parent_dash" className="relative flex items-center justify-center border-b pb-1" style={{ zIndex: 1001 }}>
         <img
           src={isOpen ? StudentDiwanLogo : smallLogo}
           alt="Logo"
@@ -44,8 +44,8 @@ const SideMenubar = () => {
           }`}
         />
         <button onClick={() => dispatch(toggleSidebar())}
-          className="focus:outline-none absolute bottom-0 right-0">
-          <div className="p-1 rounded-full text-purple-500 -mr-4 -mb-4 z-40 bg-white border-2">
+          className="focus:outline-none absolute bottom-0 right-0" >
+          <div className="p-1 rounded-full text-purple-500 -mr-4 -mb-4 z-40   bg-white border-2">
             {isOpen ? <IoIosArrowBack /> : <IoIosArrowForward />}
           </div>
         </button>
