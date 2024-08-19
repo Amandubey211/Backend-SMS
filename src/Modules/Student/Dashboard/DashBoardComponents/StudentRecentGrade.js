@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import Spinner from "../../../../Components/Common/Spinner";
 import { useNavigate } from "react-router-dom";
+import { GoAlertFill } from "react-icons/go";
+
 
 const StudentRecentGrade = () => {
   const { selectedClass, studentId } = useSelector((state) => state.Common);
@@ -43,16 +45,19 @@ const StudentRecentGrade = () => {
     return status === "Submit"
       ? "text-green-500"
       : status === "Excused"
-      ? "text-yellow-500"
-      : status === "Missing"
-      ? "text-red-500"
-      : "text-gray-500"; // Optional: default color for any other status
+        ? "text-yellow-500"
+        : status === "Missing"
+          ? "text-red-500"
+          : "text-gray-500"; // Optional: default color for any other status
   };
 
   if (!gradesData) {
-    return "No data found";
+    return <div className="flex text-gray-500  items-center justify-center">
+      <GoAlertFill className="text-[5rem]" />
+      No  Data Found
+    </div>;
   }
-  const sortedGrades = gradesData?.sort((a, b) => new Date(b.submittedDate) - new Date(a.submittedDate)).slice(0,5);
+  const sortedGrades = gradesData?.sort((a, b) => new Date(b.submittedDate) - new Date(a.submittedDate)).slice(0, 5);
 
   return (
     <div className="py-3">
@@ -70,7 +75,7 @@ const StudentRecentGrade = () => {
           {sortedGrades?.map((evalItem, idx) => (
             <tr key={idx} className="bg-white">
               <td className="px-5 py-2 flex flex-col">
-                <span>{evalItem.Name	}</span>
+                <span>{evalItem.Name}</span>
                 <span className="text-xs text-gray-500">{evalItem.type}</span>
               </td>
 

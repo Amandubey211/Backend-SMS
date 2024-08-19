@@ -113,6 +113,8 @@ import GradeAccordionItem from "./StudentGradeViewModal/Component/GradeAccordion
 import StudentGradeSummary from "./StudentGradeViewModal/Component/StudentGradeSummary";
 import { setStudentGrade } from "../../../../../../Redux/Slices/AdminSlice";
 import Spinner from "../../../../../../Components/Common/Spinner";
+import { GoAlertFill } from "react-icons/go";
+
 
 const MainSection = ( ) => {
   const { selectedClass, selectedSection, selectedSubject, studentId } =
@@ -171,7 +173,10 @@ const MainSection = ( ) => {
   };
 
   if (!gradesData) {
-    return (<Spinner/>)
+    return <div className="flex text-gray-500  items-center justify-center">
+      <GoAlertFill className="text-[5rem]" />
+      No  Data Found
+    </div>;
   }
   console.log("gradesData",gradesData)
 
