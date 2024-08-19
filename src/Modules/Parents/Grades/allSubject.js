@@ -6,7 +6,6 @@ import SubjectCard from '../../Admin/UsersProfiles/StudentProfile/Components/Stu
 import { baseUrl } from '../../../config/Common'
 import MainSection from './MainSection.js'
 const AllSubject = ({studentId}) => {
-    console.log('------------',studentId);
     const students = JSON.parse(localStorage.getItem('childrenData'));
     const student = students?.find((i)=>i.id == studentId ) 
   const [studentSubjects,setStudentSubjects] = useState([]);
@@ -46,7 +45,7 @@ const AllSubject = ({studentId}) => {
       <div className='flex flex-col gap-2 p-4 w-[25%]  '>
         {studentSubjects.length > 0?
         studentSubjects.map((subject, index) => (
-          <div key={index} className={`min-w-max ${subject._id == selectedSubjectId?'border border-black rounded-lg':''}`} onClick={()=>setSelectedSubjectId(subject._id)}>
+          <div key={index} className={`w-[270px] ${subject._id == selectedSubjectId?'border border-black rounded-lg':''}`} onClick={()=>setSelectedSubjectId(subject._id)}>
             <SubjectCard subject={subject} i={index} />
           </div>
         )):<div className="flex w-full h-full text-gray-500  items-center justify-center flex-col text-xl">
