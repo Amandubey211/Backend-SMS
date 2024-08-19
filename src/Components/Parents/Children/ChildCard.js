@@ -22,7 +22,7 @@ const ChildCard = ({ student }) => {
                 {/* Navigation buttons */}
                 <div className="flex space-x-4 mb-4">
                     <button className="bg-purple-200 text-purple-800 py-2 px-4 rounded uppercase" onClick={() => navigate("/teacher")}>Teachers</button>
-                    <button className="bg-purple-200 text-purple-800 py-2 px-4 rounded uppercase" onClick={() => navigate("/childgrade")}>Grades</button>
+                    <button className="bg-purple-200 text-purple-800 py-2 px-4 rounded uppercase" onClick={() => navigate(`/childgrade/${student.id}`)}>Grades</button>
                     <button className="bg-purple-200 text-purple-800 py-2 px-4 rounded uppercase" onClick={() => navigate("/attendance")}>Attendance</button>
                 </div>
                 <div>
