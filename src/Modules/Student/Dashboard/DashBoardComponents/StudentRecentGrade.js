@@ -50,7 +50,7 @@ const StudentRecentGrade = () => {
   };
 
   if (!gradesData) {
-    return <Spinner />;
+    return "No data found";
   }
   const sortedGrades = gradesData?.sort((a, b) => new Date(b.submittedDate) - new Date(a.submittedDate)).slice(0,5);
 
@@ -67,7 +67,7 @@ const StudentRecentGrade = () => {
           </tr>
         </thead>
         <tbody>
-          {sortedGrades.map((evalItem, idx) => (
+          {sortedGrades?.map((evalItem, idx) => (
             <tr key={idx} className="bg-white">
               <td className="px-5 py-2 flex flex-col">
                 <span>{evalItem.Name	}</span>
