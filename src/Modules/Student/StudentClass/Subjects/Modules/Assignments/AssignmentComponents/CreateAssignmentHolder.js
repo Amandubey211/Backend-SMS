@@ -65,7 +65,7 @@ const CreateAssignmentHolder = ({
 
       if (response.ok && data.success) {
         toast.success("Assignment submitted successfully");
-        onSubmit && onSubmit(); // Optional callback
+        //onSubmit && onSubmit(); // Optional callback
       } else {
         toast.error(data.message || "Failed to submit assignment");
         console.error("Failed to submit assignment with response:", data);
