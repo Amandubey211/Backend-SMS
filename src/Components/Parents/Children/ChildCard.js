@@ -26,7 +26,7 @@ const ChildCard = ({ student }) => {
                     <button className="bg-purple-200 text-purple-800 py-2 px-4 rounded uppercase" onClick={() => navigate("/attendance")}>Attendance</button>
                 </div>
                 <div>
-                    <button className="bg-green-200 text-green-800 py-2 px-4 rounded uppercase" onClick={() => navigate("/checkprogress")}>Check Subject Progress</button>
+                    <button className="bg-green-200 text-green-800 py-2 px-4 rounded uppercase" onClick={() => navigate(`/checkprogress/${student.id}`)}>Check Subject Progress</button>
                 </div>
             </div>
         </div>

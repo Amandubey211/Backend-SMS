@@ -909,7 +909,7 @@ function App() {
       errorElement: <Error />,
     },
     {
-      path: "/checkprogress",
+      path: "/checkprogress/:studentId",
       element: <CheckProgress />,
       errorElement: <Error />,
     },
