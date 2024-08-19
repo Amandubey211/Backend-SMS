@@ -1,6 +1,10 @@
 import React from "react";
+import { useSelector } from "react-redux";
 
 const StudentGradeSummary = ({ studentGrade }) => {
+
+  const SectionName = useSelector((store) => store.Common.selectedSectionName);
+console.log("SectionName",SectionName)
   const {
     avatar,
     name,
@@ -72,7 +76,7 @@ const StudentGradeSummary = ({ studentGrade }) => {
           alt="Profile"
         />
         <h2 className="mt-4 text-lg font-semibold">{name}</h2>
-        <p className="text-gray-500">{section}</p>
+        <p className="text-gray-500">{SectionName}</p>
       </div>
 
       </div>

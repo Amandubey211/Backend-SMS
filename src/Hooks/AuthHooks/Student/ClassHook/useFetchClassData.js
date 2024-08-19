@@ -5,6 +5,7 @@ import {
   setSelectedClass,
   setSelectedClassName,
   setSelectedSectionId,
+  setSelectedSectionName
 } from "../../../../Redux/Slices/Common/CommonSlice";
 import { baseUrl } from "../../../../config/Common";
 
@@ -30,10 +31,12 @@ const useFetchClassData = () => {
         });
 
           console.log(response.data.data.section.sectionId)
+          console.log(response.data.data.section.sectionName	)
         if (response.data.status && response.data.data) {
           setClassData(response.data.data);
           // dispatch(setSelectedSectionId(response.data.data.section.sectionId))
           dispatch(setSelectedSectionId(response.data.data.section.sectionId))
+          dispatch(setSelectedSectionName(response.data.data.section.sectionName))
           dispatch(setSelectedClass(response.data.data.classId));
           dispatch(setSelectedClassName(response.data.data.className));
         } else {
