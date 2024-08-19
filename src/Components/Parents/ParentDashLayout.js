@@ -11,7 +11,7 @@ const ParentDashLayout = ({
 }) => {
   const isSidebarOpen = useSelector((state) => state.sidebar.isOpen);
   return (
-    <div className="flex w-full h-full">
+    <div className="flex w-full h-full  ">
       <SideMenubar />
 
       <div

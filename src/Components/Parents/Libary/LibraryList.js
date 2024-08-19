@@ -55,13 +55,14 @@ const LibraryTable = () => {
 
   const columns = [
     {
+
       title: 'Issue Book',
       dataIndex: 'bookName',
       key: 'bookName',
       render: (text, record) => (
         <div className="flex items-center">
           <img
-            src={record.bookId.imageUrl} // Assuming the book image URL is stored in bookId.imageUrl
+            src={record.image}
             alt={record.bookName}
             className="h-12 w-12 rounded-full mr-4"
           />

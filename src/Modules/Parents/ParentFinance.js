@@ -170,7 +170,7 @@ const ParentFinanceTable = () => {
             )}
           </div>
           {/* right */}
-          <div className="w-[20%] border p-4 h-screen">
+          <div className="w-[20%] border p-4 h-auto">
             <div className="flex flex-col gap-5">
               {error ? (
                 <div className="flex flex-col items-center justify-center h-full text-center">
@@ -222,9 +222,9 @@ const ParentFinanceTable = () => {
                     <span className="text-xl font-bold bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent bg-clip-text">
                       {totalPaidFees}
                     </span>
-                    <button className="flex items-center border border-blue-800 p-1 w-full justify-center px-5 rounded-full">
+                    {/* <button className="flex items-center border border-blue-800 p-1 w-full justify-center px-5 rounded-full">
                       <span className="text-blue-800">View All Expenses</span>
-                    </button>
+                    </button> */}
                   </div>
                 </>
               )}
