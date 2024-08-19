@@ -199,7 +199,7 @@ const GradeAccordionItem = ({ grade }) => {
                       <div className="flex flex-col">
                         <span>{evalItem.moduleName}</span>
                         <span className="text-xs text-green-700">
-                          {evalItem.chapterId}
+                          {evalItem.chapterName}
                         </span>
                       </div>
                     </td>
