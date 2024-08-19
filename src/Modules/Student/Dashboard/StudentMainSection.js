@@ -220,7 +220,7 @@ import StudentDashFeeCard from "./DashBoardComponents/StudentDashFeeCard.js";
 import axios from "axios";
 import { baseUrl } from "../../../config/Common.js";
 import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const StudentMainSection = () => {
   const navigate = useNavigate();
@@ -330,7 +330,9 @@ const StudentMainSection = () => {
                 My Subject
               </h2>
               <p className="text-sm text-purple-500 cursor-pointer font-bold">
-                See all
+                <Link to="/student_class">
+                  See all
+                </Link>
               </p>
             </div>
             <p className="text-sm text-gray-500">
