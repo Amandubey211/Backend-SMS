@@ -237,26 +237,26 @@ const StudentMainSection = () => {
 
     try {
       // Make both API requests simultaneously
-      const [dashboardResponse, realDashboardResponse] = await Promise.all([
+      const [dashboardResponse] = await Promise.all([
         axios.get(`${baseUrl}/api/studentDashboard/dashboard/student`, {
           headers: {
             Authentication: token,
           },
         }),
-        axios.get(
-          `${baseUrl}/api/studentDashboard/${studentId}/realDashboard`,
-          {
-            headers: {
-              Authentication: token,
-            },
-          }
-        ),
+        // axios.get(
+        //   `${baseUrl}/api/studentDashboard/${studentId}/realDashboard`,
+        //   {
+        //     headers: {
+        //       Authentication: token,
+        //     },
+        //   }
+        // ),
       ]);
 
       const dashboardData = dashboardResponse.data;
-      const realDashboardData = realDashboardResponse.data;
-      console.log("dashboardData", dashboardData);
-      console.log("realDashboardData", realDashboardData);
+      // const realDashboardData = realDashboardResponse.data;
+      // console.log("dashboardData", dashboardData);
+      // console.log("realDashboardData", realDashboardData);
       const formattedData = [
         {
           label: "Upcoming Exam",
@@ -286,26 +286,26 @@ const StudentMainSection = () => {
           textColor: "text-black-500",
           icon: "🔔",
         },
-        {
-          label: "Total Teachers",
-          value: realDashboardData.totalTeachers,
-          bgColor: "bg-purple-100",
-          textColor: "text-black-500",
-          icon: "👩‍🏫",
-        },
-        {
-          label: "Total Classmates",
-          value: realDashboardData.totalClassmates,
-          bgColor: "bg-orange-100",
-          textColor: "text-black-500",
-          icon: "👨‍🎓",
-        },
+        // {
+        //   label: "Total Teachers",
+        //   value: realDashboardData.totalTeachers,
+        //   bgColor: "bg-purple-100",
+        //   textColor: "text-black-500",
+        //   icon: "👩‍🏫",
+        // },
+        // {
+        //   label: "Total Classmates",
+        //   value: realDashboardData.totalClassmates,
+        //   bgColor: "bg-orange-100",
+        //   textColor: "text-black-500",
+        //   icon: "👨‍🎓",
+        // },
       ];
 
       setCardData(formattedData);
-      setSubjects(realDashboardData.subjects);
-      setPaidFees(realDashboardData.totalPaidFees);
-      setUnpaidFees(realDashboardData.dueFees);
+      setSubjects(dashboardData.data.subjects);
+      setPaidFees(dashboardData.data.totalPaidFees);
+      setUnpaidFees(dashboardData.data.dueFees);
     } catch (error) {
       console.error("Error fetching dashboard details:", error);
     }
