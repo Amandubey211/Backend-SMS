@@ -34,7 +34,7 @@ const sidebarData = [
     path: "/parent_dash",
   },
   {
-    title: "Childrens",
+    title: "Children",
     icon: <FcManager  />,
     path: `/children`,
   },
