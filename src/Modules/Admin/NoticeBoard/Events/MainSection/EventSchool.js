@@ -13,6 +13,7 @@ import "../subComponents/customCalendar.css";
 import toast from "react-hot-toast";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
 import { IoCalendarOutline } from "react-icons/io5"; // Importing a calendar icon
+import { useSelector } from "react-redux";
 
 const EventScheduler = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -28,11 +29,12 @@ const EventScheduler = () => {
   });
 
   const itemsPerPage = 4;
-
+  const role = useSelector((store) => store.Auth.role)
+  const token = localStorage.getItem(`${role}:token`);
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const events = await getEvents();
+        const events = await getEvents(token);
         const mappedEvents = events.map((event) => ({
           ...event,
           startDate: parseISO(event.date),
@@ -150,10 +152,10 @@ const EventScheduler = () => {
 
     try {
       if (selectedEvent) {
-        await updateEvent(selectedEvent._id, eventData);
+        await updateEvent(selectedEvent._id, eventData,token);
         toast.success("Event updated successfully!");
       } else {
-        const result = await createEvent(eventData);
+        const result = await createEvent(eventData, token);
         if (result?.success) {
           toast.success(result.msg || "Event created successfully!");
           refreshEvents(); // Refresh the events list to show new events
@@ -170,7 +172,7 @@ const EventScheduler = () => {
 
   const handleDeleteEvent = async () => {
     try {
-      await deleteEvent(selectedEvent._id);
+      await deleteEvent(selectedEvent._id,token);
       handleSidebarClose();
       refreshEvents();
       toast.success("Event deleted successfully!");
@@ -236,7 +238,7 @@ const EventScheduler = () => {
               Add New Event
             </button>
           </div>
-          
+
           <div className="my-4 w-full h-40 flex rounded-sm gap-20 pl-10 relative ">
             {currentPage > 0 && (
               <div
@@ -337,8 +339,8 @@ const EventScheduler = () => {
                     <div className="flex space-x-2">
                       <button
                         className={`border rounded px-2 py-1 ${type === "month"
-                            ? "bg-gradient-to-r from-pink-500 to-purple-500 text-white"
-                            : ""
+                          ? "bg-gradient-to-r from-pink-500 to-purple-500 text-white"
+                          : ""
                           }`}
                         onClick={() => onTypeChange("month")}
                       >
@@ -346,8 +348,8 @@ const EventScheduler = () => {
                       </button>
                       <button
                         className={`border rounded px-2 py-1 ${type === "year"
-                            ? "bg-gradient-to-r from-pink-500 to-purple-500 text-white"
-                            : ""
+                          ? "bg-gradient-to-r from-pink-500 to-purple-500 text-white"
+                          : ""
                           }`}
                         onClick={() => onTypeChange("year")}
                       >

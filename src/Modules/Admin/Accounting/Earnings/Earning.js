@@ -244,9 +244,9 @@ const Earning = () => {
               </div>
               <h2 className="text-lg font-semibold text-gray-800">Total Expenses</h2>
               <p className="text-3xl mb-5 font-bold text-gradient bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-pink-500">{totalExpense} QR</p>
-              <Link to="/accounting/expenses" className="mt-4 px-4 py-2 border border-red-500 text-red-500 rounded-full">
+              {/* <Link to="/accounting/expenses" className="mt-4 px-4 py-2 border border-red-500 text-red-500 rounded-full">
               View All Expenses
-              </Link>
+              </Link> */}
             </div>
           </div>
 

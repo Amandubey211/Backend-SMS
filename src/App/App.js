@@ -321,12 +321,12 @@ function App() {
     },
     {
       path: "/class",
-      element: <ProtectRoute Component={Classes} allowedRoles={["admin"]} />,
+      element: <ProtectRoute Component={Classes} allowedRoles={["admin", "teacher"]} />,
       errorElement: <Error />,
     },
     {
       path: "/class/:cid",
-      element: <ProtectRoute Component={Class} allowedRoles={["admin"]} />,
+      element: <ProtectRoute Component={Class} allowedRoles={["admin", "teacher"]} />,
       errorElement: <Error />,
     },
     {
@@ -353,19 +353,19 @@ function App() {
     },
     {
       path: "/class/:cid/teachers",
-      element: <ProtectRoute Component={Teachers} allowedRoles={["admin"]} />,
+      element: <ProtectRoute Component={Teachers} allowedRoles={["admin", "teacher"]} />,
       errorElement: <Error />,
     },
     {
       path: "/class/:cid/section_group",
       element: (
-        <ProtectRoute Component={Group_Section} allowedRoles={["admin"]} />
+        <ProtectRoute Component={Group_Section} allowedRoles={["admin", "teacher"]} />
       ),
       errorElement: <Error />,
     },
     {
       path: "/class/:cid/students",
-      element: <ProtectRoute Component={Students} allowedRoles={["admin"]} />,
+      element: <ProtectRoute Component={Students} allowedRoles={["admin", "teacher"]} />,
       errorElement: <Error />,
     },
     {
@@ -596,7 +596,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={EventSchool}
-          allowedRoles={["admin", "librarian", "peon"]}
+          allowedRoles={["admin", "teacher", "librarian", "peon"]}
         />
       ),
       errorElement: <Error />,
@@ -606,7 +606,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={Announce}
-          allowedRoles={["admin", "librarian", "peon"]}
+          allowedRoles={["admin", "teacher", "librarian", "peon"]}
         />
       ),
       errorElement: <Error />,

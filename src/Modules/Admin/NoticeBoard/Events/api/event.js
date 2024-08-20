@@ -1,9 +1,10 @@
 import axios from 'axios';
 import { baseUrl } from '../../../../../config/Common';
+import { useSelector } from 'react-redux';
 
-const token = localStorage.getItem('admin:token');
 
-export const getEvents = async () => {
+export const getEvents = async (token) => {
+
   try {
     const response = await axios.get(`${baseUrl}/admin/all/events`, {
       headers: {
@@ -17,7 +18,7 @@ export const getEvents = async () => {
   }
 };
 
-export const createEvent = async (eventData) => {
+export const createEvent = async (eventData,token) => {
   try {
     const formData = new FormData();
     Object.keys(eventData).forEach(key => {
@@ -41,7 +42,7 @@ export const createEvent = async (eventData) => {
   }
 };
 
-export const updateEvent = async (eventId, eventData) => {
+export const updateEvent = async (eventId, eventData,token) => {
   try {
     const formData = new FormData();
     Object.keys(eventData).forEach(key => {
@@ -65,7 +66,7 @@ export const updateEvent = async (eventId, eventData) => {
   }
 };
 
-export const deleteEvent = async (eventId) => {
+export const deleteEvent = async (eventId,token) => {
   try {
     const response = await axios.delete(`${baseUrl}/admin/delete/event/${eventId}`, {
       headers: {
