@@ -4,7 +4,7 @@ import HomeLeft from "./HomeLeft.js";
 import Layout from "../../Components/Common/Layout";
 const home = () => {
   return (
-    <Layout title="Welcome | Student Dwan App">
+    <Layout title="Welcome | Student Diwan">
       <div className="grid grid-cols-1 md:grid-cols-12 h-screen">
         <div className="md:col-span-7  flex items-center justify-center">
           <HomeLeft />
