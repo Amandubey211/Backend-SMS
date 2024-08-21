@@ -4,12 +4,12 @@ import { FaExclamationTriangle } from "react-icons/fa";
 import { BsPatchCheckFill } from "react-icons/bs";
 import { ImSpinner3 } from "react-icons/im";
 import { NavLink, useParams } from "react-router-dom";
+import NoDataFound from "../../../../../Components/Common/NoDataFound";
+import Spinner from "../../../../../Components/Common/Spinner";
 
 const List = ({ data, icon, title, type, loading, error }) => {
   const { cid, sid } = useParams();
   const [searchQuery, setSearchQuery] = useState("");
-  console.log(data[0]?._id, "sdfsdf");
-  console.log(data, "data for assignment");
 
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
@@ -29,43 +29,44 @@ const List = ({ data, icon, title, type, loading, error }) => {
 
   return (
     <div className="bg-white p-5 w-full">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold text-gradient">
-          {title}
-          <span className="border rounded-full text-sm p-1 px-2 ml-1 text-gray-500">
-            {filteredData.length}
-          </span>
-        </h2>
-        <div className="relative">
-          <div className="relative flex items-center max-w-xs w-full mr-4">
-            <input
-              type="text"
-              placeholder="Search here"
-              value={searchQuery}
-              onChange={handleSearchChange}
-              className="px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-purple-300 w-full"
-            />
-            <button className="absolute right-3">
-              <CiSearch className="w-5 h-5 text-gray-500" />
-            </button>
+      {!loading && !error && filteredData.length > 0 && (
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-semibold text-gradient">
+            {title}
+            <span className="border rounded-full text-sm p-1 px-2 ml-1 text-gray-500">
+              {filteredData.length}
+            </span>
+          </h2>
+          <div className="relative">
+            <div className="relative flex items-center max-w-xs w-full mr-4">
+              <input
+                type="text"
+                placeholder="Search here"
+                value={searchQuery}
+                onChange={handleSearchChange}
+                className="px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-purple-300 w-full"
+              />
+              <button className="absolute right-3">
+                <CiSearch className="w-5 h-5 text-gray-500" />
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+      )}
       {loading ? (
         <div className="flex flex-col items-center justify-center py-10 text-gray-500">
-          <ImSpinner3 className="w-12 h-12 animate-spin mb-3" />
-          <p className="text-lg font-semibold">Loading...</p>
+          <Spinner />
         </div>
-      ) : error ? (
-        <div className="flex flex-col items-center justify-center py-10 text-gray-500">
-          <FaExclamationTriangle className="w-12 h-12 mb-3" />
-          <p className="text-lg font-semibold">{error}</p>
-        </div>
-      ) : filteredData.length > 0 ? (
+      ) : // error ? (
+      //   <div className="flex flex-col items-center justify-center py-10 text-gray-500">
+      //     <FaExclamationTriangle className="w-12 h-12 mb-3" />
+      //     <p className="text-lg font-semibold">{error}</p>
+      //   </div>
+      // ) :
+      filteredData.length > 0 ? (
         <ul className="border-t p-4">
           {filteredData.map((item) => (
             <NavLink
-              // to={`/student_class/${cid}/section/${sid}/assignments/${item.assignmentId}/view`}
               to={`/student_class/${cid}/${sid}/assignments/${item.assignmentId}/view`}
               key={item.assignmentId}
               className="flex items-center mb-3 gap-3 p-1 rounded-lg"
@@ -99,9 +100,8 @@ const List = ({ data, icon, title, type, loading, error }) => {
           ))}
         </ul>
       ) : (
-        <div className="flex flex-col items-center justify-center py-10 text-gray-500">
-          <FaExclamationTriangle className="w-12 h-12 mb-3" />
-          <p className="text-lg font-semibold">No data found</p>
+        <div className="h-full w-full flex justify-center items-center">
+          <NoDataFound title="Chapters" />
         </div>
       )}
     </div>
