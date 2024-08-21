@@ -121,7 +121,7 @@ const ModuleCard = ({
             >
               <FaArrowRight className="mr-2" /> Move to...
             </li>
-            <li
+            {/* <li
               className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
               onClick={(e) => {
                 e.stopPropagation();
@@ -130,7 +130,7 @@ const ModuleCard = ({
               }}
             >
               <FaCopy className="mr-2" /> Duplicate
-            </li>
+            </li> */}
             {/* <li
               className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
               onClick={(e) => {

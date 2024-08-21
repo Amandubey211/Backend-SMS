@@ -19,7 +19,6 @@ import useDeleteModule from "../../../../../Hooks/AuthHooks/Staff/Admin/Assignme
 const MainSection = () => {
   const [expandedChapters, setExpandedChapters] = useState([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [isMoveSidebarOpen, setIsMoveSidebarOpen] = useState(false);
   const [sidebarContent, setSidebarContent] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
@@ -33,7 +32,7 @@ const MainSection = () => {
 
   useEffect(() => {
     fetchModules();
-  }, []);
+  }, [fetchModules]);
 
   const handleToggle = (chapterNumber) => {
     setExpandedChapters((prev) =>
@@ -63,10 +62,6 @@ const MainSection = () => {
   const handleSidebarClose = () => {
     setIsSidebarOpen(false);
     setSidebarContent(null);
-  };
-
-  const handleMoveSidebarClose = () => {
-    setIsMoveSidebarOpen(false);
   };
 
   const handleModuleSelect = (module) => {
@@ -103,10 +98,10 @@ const MainSection = () => {
         moduleId={selectedModule.moduleId}
         currentPosition={currentIndex}
         modulesData={modulesData}
-        onClose={handleMoveSidebarClose}
+        onClose={handleSidebarClose} // Ensure proper closing
       />
     );
-    setIsMoveSidebarOpen(true);
+    setIsSidebarOpen(true);
   };
 
   const handleDelete = (target) => {
@@ -119,9 +114,9 @@ const MainSection = () => {
       await deleteModule(deleteTarget.id);
 
       toast.success(`${deleteTarget.type} deleted successfully!`);
-      setIsDeleteModalOpen(false);
+      setIsDeleteModalOpen(false); // Close the modal after successful deletion
       setDeleteTarget(null);
-      fetchModules();
+      fetchModules(); // Refresh the modules list after deletion
     }
   };
 
@@ -215,7 +210,6 @@ const MainSection = () => {
                 moduleNumber={index + 1}
                 imageUrl={module.thumbnail}
                 moduleId={module._id}
-                // isPublished={module.isPublished}
                 isPublished={true}
                 isSelected={
                   selectedModule && selectedModule.moduleId === module._id
@@ -278,18 +272,6 @@ const MainSection = () => {
             ) : (
               sidebarContent
             )}
-          </Sidebar>
-        )}
-        {isMoveSidebarOpen && (
-          <Sidebar
-            isOpen={isMoveSidebarOpen}
-            onClose={() => {
-              handleSidebarClose();
-              fetchModules();
-            }}
-            title="Move Module"
-          >
-            {sidebarContent}
           </Sidebar>
         )}
         {isDeleteModalOpen && (
