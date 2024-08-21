@@ -62,7 +62,7 @@ const LibraryTable = () => {
       render: (text, record) => (
         <div className="flex items-center">
           <img
-            src={record.image}
+            src={record.bookId.image}
             alt={record.bookName}
             className="h-12 w-12 rounded-full mr-4"
           />

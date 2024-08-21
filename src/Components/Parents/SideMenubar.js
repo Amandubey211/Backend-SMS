@@ -31,7 +31,7 @@ const SideMenubar = () => {
 
   return (
     <nav
-      className={`transition-all duration-300 h-screen p-1 z-50 bg-white border-r flex flex-col ${
+      className={`sticky top-0 transition-all duration-300 h-screen p-1 z-50 bg-white border-r flex flex-col ${
         isOpen ? "w-[15%]" : "w-[7%]"
       }`}
     >
@@ -133,7 +133,7 @@ const SideMenubar = () => {
       </div>
 
       {/* Logout button at the bottom */}
-      <div className="mt-auto p-2">
+      <div className="mt-auto p-2 sticky">
         <button
           onClick={parentLogout}  // Logout function tied to button click
           className="flex items-center justify-center w-full text-gray-700 hover:text-white hover:bg-gray-900 p-2 rounded-lg"
