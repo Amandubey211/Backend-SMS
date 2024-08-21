@@ -10,25 +10,25 @@ import { setSelectedModule } from "../../../../../Redux/Slices/Common/CommonSlic
 import useGetModulesForStudent from "../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useGetModulesForStudent";
 import MoveModule from "./Components/MoveModule";
 import AddChapter from "./Components/AddChapter";
-import DeleteModal from "../../../../../Components/Common/DeleteModal";
-import toast from "react-hot-toast";
+// import DeleteModal from "../../../../../Components/Common/DeleteModal";
+// import toast from "react-hot-toast";
 import Spinner from "../../../../../Components/Common/Spinner";
 import NoDataFound from "../../../../../Components/Common/NoDataFound";
-import useDeleteModule from "../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useDeleteModule";
+// import useDeleteModule from "../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useDeleteModule";
 
 const MainSection = () => {
   const [expandedChapters, setExpandedChapters] = useState([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [sidebarContent, setSidebarContent] = useState(null);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [deleteTarget, setDeleteTarget] = useState(null);
+  // const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  // const [deleteTarget, setDeleteTarget] = useState(null);
 
   const dispatch = useDispatch();
   const selectedModule = useSelector((state) => state.Common.selectedModule);
   const { error, fetchModules, loading, modulesData } =
     useGetModulesForStudent();
 
-  const { deleteModule } = useDeleteModule(fetchModules);
+  // const { deleteModule } = useDeleteModule();
 
   useEffect(() => {
     fetchModules();
@@ -104,21 +104,24 @@ const MainSection = () => {
     setIsSidebarOpen(true);
   };
 
-  const handleDelete = (target) => {
-    setDeleteTarget(target);
-    setIsDeleteModalOpen(true);
-  };
+  // const handleDelete = (target) => {
+  //   setDeleteTarget(target);
+  //   setIsDeleteModalOpen(true);
+  // };
 
-  const confirmDelete = async () => {
-    if (deleteTarget.type === "Module") {
-      await deleteModule(deleteTarget.id);
-
-      toast.success(`${deleteTarget.type} deleted successfully!`);
-      setIsDeleteModalOpen(false); // Close the modal after successful deletion
-      setDeleteTarget(null);
-      fetchModules(); // Refresh the modules list after deletion
-    }
-  };
+  // const confirmDelete = async () => {
+  //   if (deleteTarget.type === "Module") {
+  //     try {
+  //       await deleteModule(deleteTarget.id);
+  //       toast.success(`${deleteTarget.type} deleted successfully!`);
+  //       setIsDeleteModalOpen(false); // Close the modal after successful deletion
+  //       setDeleteTarget(null);
+  //       fetchModules(); // Refresh the modules list after deletion
+  //     } catch (error) {
+  //       toast.error("Failed to delete module");
+  //     }
+  //   }
+  // };
 
   const handleModuleAdded = useCallback(() => {
     fetchModules();
@@ -175,14 +178,14 @@ const MainSection = () => {
                 attachments={chapter.attachments} // Pass attachments to Chapter
                 isExpanded={expandedChapters.includes(index + 1)}
                 onToggle={() => handleToggle(index + 1)}
-                onDelete={() =>
-                  handleDelete({
-                    type: "Chapter",
-                    name: chapter.name,
-                    id: chapter._id,
-                    moduleId: selectedModule.moduleId,
-                  })
-                }
+                // onDelete={() =>
+                //   handleDelete({
+                //     type: "Chapter",
+                //     name: chapter.name,
+                //     id: chapter._id,
+                //     moduleId: selectedModule.moduleId,
+                //   })
+                // }
                 onEdit={() => handleEditChapter(chapter)}
                 fetchModules={fetchModules} // Pass fetchModules for re-fetching
               />
@@ -217,13 +220,13 @@ const MainSection = () => {
                 onSelect={() => handleModuleSelect(module)}
                 onEdit={() => handleEditModule(module)}
                 onMove={() => handleMoveModule(module)}
-                onDelete={() =>
-                  handleDelete({
-                    type: "Module",
-                    name: module.moduleName,
-                    id: module._id,
-                  })
-                }
+                // onDelete={() =>
+                //   handleDelete({
+                //     type: "Module",
+                //     name: module.moduleName,
+                //     id: module._id,
+                //   })
+                // }
                 fetchModules={fetchModules}
               />
             ))}
@@ -274,14 +277,14 @@ const MainSection = () => {
             )}
           </Sidebar>
         )}
-        {isDeleteModalOpen && (
+        {/* {isDeleteModalOpen && (
           <DeleteModal
             isOpen={isDeleteModalOpen}
             onClose={() => setIsDeleteModalOpen(false)}
             onConfirm={confirmDelete}
-            title={deleteTarget ? deleteTarget.name : ""}
+            title={deleteTarget ? deleteTarget.name : "delete"}
           />
-        )}
+        )} */}
       </div>
     </div>
   );

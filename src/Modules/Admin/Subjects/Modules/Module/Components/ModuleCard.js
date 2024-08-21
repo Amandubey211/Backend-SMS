@@ -1,17 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
-import {
-  FaEllipsisV,
-  FaCheckCircle,
-  FaBan,
-  FaPen,
-  FaCopy,
-  FaArrowRight,
-  FaIndent,
-  FaShareAlt,
-  FaTrashAlt,
-} from "react-icons/fa";
+import { FaEllipsisV, FaPen, FaArrowRight, FaTrashAlt } from "react-icons/fa";
 import useDeleteModule from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useDeleteModule";
-import toast from "react-hot-toast";
 import DeleteModal from "../../../../../../Components/Common/DeleteModal";
 import { BsPatchCheckFill } from "react-icons/bs";
 import { MdOutlineBlock } from "react-icons/md";
@@ -24,15 +13,15 @@ const ModuleCard = ({
   isSelected,
   onSelect,
   onEdit,
-  onMove, // Function to open the MoveModule sidebar
-  onDelete,
+  onMove,
+  // onDelete,
   moduleId,
   fetchModules,
 }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const menuRef = useRef();
-  const { loading, deleteModule } = useDeleteModule();
+  const { deleteModule } = useDeleteModule();
 
   const toggleMenu = (e) => {
     e.stopPropagation();
@@ -47,7 +36,7 @@ const ModuleCard = ({
 
   const handleDelete = async () => {
     await deleteModule(moduleId);
-    onDelete();
+
     setIsDeleteModalOpen(false); // Close the modal on successful deletion
     fetchModules(); // Refetch modules after deletion
   };
@@ -121,36 +110,6 @@ const ModuleCard = ({
             >
               <FaArrowRight className="mr-2" /> Move to...
             </li>
-            {/* <li
-              className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
-              onClick={(e) => {
-                e.stopPropagation();
-                toast.success("Duplicated");
-                setMenuOpen(false);
-              }}
-            >
-              <FaCopy className="mr-2" /> Duplicate
-            </li> */}
-            {/* <li
-              className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
-              onClick={(e) => {
-                e.stopPropagation();
-                toast.success("Increased indent");
-                setMenuOpen(false);
-              }}
-            >
-              <FaIndent className="mr-2" /> Increase indent
-            </li> */}
-            {/* <li
-              className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
-              onClick={(e) => {
-                e.stopPropagation();
-                toast.success("Shared to Commons");
-                setMenuOpen(false);
-              }}
-            >
-              <FaShareAlt className="mr-2" /> Share to Commons
-            </li> */}
             <li
               className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
               onClick={(e) => {
