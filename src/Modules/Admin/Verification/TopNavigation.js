@@ -27,7 +27,7 @@ const TopNavigation = ({
           }`}
           onClick={() => setActiveTab("unverified")}
         >
-          Unverified Students({unVerifiedStudents.length})
+          Unverified Students ({unVerifiedStudents.length})
         </h1>
         <h1
           className={`text-xl font-semibold p-1 border rounded-2xl px-4 cursor-pointer transition-all duration-300 ${
@@ -37,7 +37,7 @@ const TopNavigation = ({
           }`}
           onClick={() => setActiveTab("rejected")}
         >
-          Rejected Students({rejectedStudents.length})
+          Rejected Students ({rejectedStudents.length})
         </h1>
       </div>
 
