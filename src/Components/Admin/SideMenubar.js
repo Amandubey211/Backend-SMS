@@ -26,7 +26,6 @@ const SideMenubar = () => {
     role: state.Auth.role,
     userDetails: state.Auth.userDetail,
   }));
-  
 
   const [openItems, setOpenItems] = useState([]);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false); // State to control the modal visibility
@@ -202,7 +201,9 @@ const SideMenubar = () => {
             "https://avatars.githubusercontent.com/u/109097090?v=4"
           }
           alt="Profile"
-          className={`${isOpen ? "w-10 h-10" : "w-8 h-8"} cursor-pointer rounded-full`}
+          className={`${
+            isOpen ? "w-10 h-10" : "w-8 h-8"
+          } cursor-pointer rounded-full`}
           onClick={HandleNavigate}
         />
 

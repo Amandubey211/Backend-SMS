@@ -64,9 +64,8 @@ const SearchBar = () => (
 );
 
 const Navbar = ({ hideSearchbar, hideAvatarList, hideStudentView }) => {
-
-  const [isOpenNotification,setIsOpenNotification] = useState(false);
-  const [notificationCount,setNotificationCount] = useState(0);
+  const [isOpenNotification, setIsOpenNotification] = useState(false);
+  const [notificationCount, setNotificationCount] = useState(0);
   // useEffect(()=>{
   //   function getNotificationsFromIndexedDB() {
   //     return new Promise((resolve, reject) => {
@@ -88,7 +87,6 @@ const Navbar = ({ hideSearchbar, hideAvatarList, hideStudentView }) => {
   //         };
   //       };
 
-
   //       dbPromise.onerror = function(event) {
   //         reject(event);
   //       };
@@ -105,9 +103,9 @@ const Navbar = ({ hideSearchbar, hideAvatarList, hideStudentView }) => {
   // useEffect(()=>{
   //   setNotificationCount(localStorage.getItem('NotificationCount'));
   // },[localStorage.getItem('NotificationCount'),notificationCount]);
-  const openNotification = ()=>{
-    setIsOpenNotification(true)
-    }
+  const openNotification = () => {
+    setIsOpenNotification(true);
+  };
 
   const leftHeading = useSelector(
     (store) => store.Common.NavbarData.leftHeading
@@ -162,11 +160,17 @@ const Navbar = ({ hideSearchbar, hideAvatarList, hideStudentView }) => {
         <div className="flex items-center space-x-2 border-l ml-3 pl-3 relative">
           <IconButton icon={CiMail} label="Mail" />
 
-          <div onClick={()=>openNotification()} className="relative flex items-center cursor-pointer">
-             <IconButton icon={TbBell} label="Notifications" />
-             <p className="absolute top-[-5px] right-0 bg-purple-500 rounded-full
-              text-white w-[20px] h-[20px] flex justify-center items-center ">{notificationCount||0}</p>
-
+          <div
+            onClick={() => openNotification()}
+            className="relative flex items-center cursor-pointer"
+          >
+            <IconButton icon={TbBell} label="Notifications" />
+            <p
+              className="absolute top-[-5px] right-0 bg-purple-500 rounded-full
+              text-white w-[20px] h-[20px] flex justify-center items-center "
+            >
+              {notificationCount || 0}
+            </p>
           </div>
 
           <IconButton
@@ -219,10 +223,13 @@ const Navbar = ({ hideSearchbar, hideAvatarList, hideStudentView }) => {
         onConfirm={logout}
       />
 
-      <Sidebar  isOpen={isOpenNotification} onClose={()=> setIsOpenNotification(false)} title={'Recent Notifications'} >
-              {/* <NotificationBar/> */}
-            </Sidebar>
-
+      <Sidebar
+        isOpen={isOpenNotification}
+        onClose={() => setIsOpenNotification(false)}
+        title={"Recent Notifications"}
+      >
+        {/* <NotificationBar/> */}
+      </Sidebar>
     </div>
   );
 };

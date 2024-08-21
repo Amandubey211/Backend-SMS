@@ -5,12 +5,15 @@ import ModuleCard from "./Components/ModuleCard";
 import { useSelector, useDispatch } from "react-redux";
 import { setSelectedModule } from "../../../../../../Redux/Slices/Common/CommonSlice";
 import useGetModulesForStudent from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useGetModulesForStudent";
+import NoDataFound from "../../../../../../Components/Common/NoDataFound";
+import Spinner from "../../../../../../Components/Common/Spinner";
 
 const MainSection = () => {
   const [expandedChapters, setExpandedChapters] = useState([]);
   const dispatch = useDispatch();
   const selectedModule = useSelector((state) => state.Common.selectedModule);
-  const { error, fetchModules, loading, modulesData } = useGetModulesForStudent();
+  const { error, fetchModules, loading, modulesData } =
+    useGetModulesForStudent();
 
   useEffect(() => {
     fetchModules();
@@ -54,12 +57,9 @@ const MainSection = () => {
       <SubjectSideBar />
       <div className="w-[60%] bg-white p-2 border-l">
         <div className="bg-white p-2 rounded-lg">
-          <div className="flex justify-between px-4 mb-3 items-center">
-            <h1 className="text-md font-semibold">
-              {selectedModule.name ? selectedModule.name : "Select a Module"}
-            </h1>
-          </div>
-          {selectedModule.chapters && selectedModule.chapters.length > 0 ? (
+          {loading ? (
+            <Spinner />
+          ) : selectedModule.name && selectedModule.chapters.length > 0 ? (
             selectedModule.chapters.map((chapter, index) => (
               <Chapter
                 key={index}
@@ -74,35 +74,47 @@ const MainSection = () => {
               />
             ))
           ) : (
-            <p>No Chapters Found.</p>
+            <div className="h-full w-full flex justify-center items-center">
+              <NoDataFound title="Chapters" />
+            </div>
           )}
         </div>
       </div>
       <div className="w-[35%] p-2 border">
         <div className="bg-white p-4 rounded-lg">
-          <div className="flex items-center gap-1 mb-2">
-            <h1 className="text-xl font-semibold">All Modules</h1>
-            <p className="bg-gradient-to-r from-pink-100 to-purple-200 font-semibold rounded-full p-1 px-2">
-              <span className="text-gradient">
-                {modulesData?.modules.length || 0}
-              </span>
-            </p>
-          </div>
-          <div className="grid grid-cols-1 gap-2">
-            {modulesData?.modules.map((module, index) => (
-              <ModuleCard
-                key={index}
-                title={module.moduleName}
-                moduleNumber={index + 1}
-                imageUrl={module.thumbnail}
-                isCompleted={module.isPublished}
-                isSelected={
-                  selectedModule && selectedModule.moduleId === module._id
-                }
-                onSelect={() => handleModuleSelect(module)}
-              />
-            ))}
-          </div>
+          {loading ? (
+            <Spinner />
+          ) : modulesData?.modules.length > 0 ? (
+            <>
+              <div className="flex items-center gap-1 mb-2">
+                <h1 className="text-xl font-semibold">All Modules</h1>
+                <p className="bg-gradient-to-r from-pink-100 to-purple-200 font-semibold rounded-full p-1 px-2">
+                  <span className="text-gradient">
+                    {modulesData?.modules.length || 0}
+                  </span>
+                </p>
+              </div>
+              <div className="grid grid-cols-1 gap-2">
+                {modulesData.modules.map((module, index) => (
+                  <ModuleCard
+                    key={index}
+                    title={module.moduleName}
+                    moduleNumber={index + 1}
+                    imageUrl={module.thumbnail}
+                    isCompleted={module.isPublished}
+                    isSelected={
+                      selectedModule && selectedModule.moduleId === module._id
+                    }
+                    onSelect={() => handleModuleSelect(module)}
+                  />
+                ))}
+              </div>
+            </>
+          ) : (
+            <div className="h-full w-full flex justify-center items-center">
+              <NoDataFound title="Modules" />
+            </div>
+          )}
         </div>
       </div>
     </div>

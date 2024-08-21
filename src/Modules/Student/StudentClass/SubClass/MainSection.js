@@ -1,4 +1,3 @@
-// MainSection.js
 import React, { useMemo } from "react";
 import NavIconCard from "./Components/NavIconCard";
 import SubjectCard from "./SubjectCard";
@@ -12,6 +11,7 @@ import {
   setSelectedSubjectName,
 } from "../../../../Redux/Slices/Common/CommonSlice";
 import Spinner from "../../../../Components/Common/Spinner";
+import NoDataFound from "../../../../Components/Common/NoDataFound";
 
 const colors = [
   "bg-yellow-300",
@@ -32,6 +32,7 @@ const MainSection = () => {
     dispatch(setSelectedSubject(subjectId));
     dispatch(setSelectedSubjectName(subjectName));
   };
+
   const iconData = useMemo(
     () =>
       classData && [
@@ -89,17 +90,21 @@ const MainSection = () => {
         ))}
       </div>
       <div className="px-5">
-        <div className="grid grid-cols-3 gap-4">
-          {classData.subjects.map((subject, index) => (
-            <SubjectCard
-              key={index}
-              data={subject}
-              classId={classData.classId}
-              onSubjectClick={handleSubjectClick}
-              backgroundColor={getColor(index)}
-            />
-          ))}
-        </div>
+        {classData.subjects.length > 0 ? (
+          <div className="grid grid-cols-3 gap-4">
+            {classData.subjects.map((subject, index) => (
+              <SubjectCard
+                key={index}
+                data={subject}
+                classId={classData.classId}
+                onSubjectClick={handleSubjectClick}
+                backgroundColor={getColor(index)}
+              />
+            ))}
+          </div>
+        ) : (
+          <NoDataFound title="Subjects" />
+        )}
       </div>
     </>
   );

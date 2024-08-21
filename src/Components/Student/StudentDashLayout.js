@@ -1,27 +1,35 @@
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import Navbar from "../Common/Navbar";
-import { toggleSidebar } from "../../Redux/Slices/Common/SidebarSlice";
 import SideMenubar from "./SideMenubar";
 
-const StudentDashLayout = ({ children, hideSearchbar, hideAvatarList,hideStudentView }) => {
-  const dispatch = useDispatch();
+const StudentDashLayout = ({
+  children,
+  hideSearchbar,
+  hideAvatarList,
+  hideStudentView,
+}) => {
   const isSidebarOpen = useSelector((state) => state.sidebar.isOpen);
+  const sidebarWidth = isSidebarOpen ? "15%" : "7%"; // Adjust the width based on sidebar state
 
   return (
-    <div className="flex w-full h-full">
-      <SideMenubar isOpen={isSidebarOpen} />
+    <div className="flex w-full min-h-screen ">
+      {/* Sidebar is fixed on the left */}
+      <SideMenubar />
       <div
-        className={`transition-all duration-300 h-screen ${
-          isSidebarOpen ? "w-4/5" : "w-full"
-        } flex-1`}
+        className={`ml-${sidebarWidth} transition-all duration-500 flex-1 h-full`}
+        style={{
+          marginLeft: sidebarWidth,
+        }}
       >
+        {/* Navbar is sticky and stays at the top */}
         <Navbar
           hideSearchbar={hideSearchbar}
           hideAvatarList={hideAvatarList}
           hideStudentView={hideStudentView}
         />
-        <main className="w-full  h-screen overflow-y-scroll no-scrollbar ">
+        {/* Main content area */}
+        <main className="w-full min-h-screen h-screen overflow-y-scroll no-scrollbar  ">
           {children}
         </main>
       </div>
