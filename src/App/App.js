@@ -25,6 +25,7 @@ import ForgetPassword from "../Modules/LoginPages/Student/Login/ForgetPassword/F
 import AttendanceMain from "../Modules/Student/Attendance/AttendanceMain.js";
 import ParentEvent from "../Modules/Parents/ParentEvent/ParentEvent";
 import QIDLogin from "../Modules/LoginPages/Student/Login/QIDLogin.js";
+import ParentProfile from "../Components/Parents/ParentProfile.js";
 
 // lazy loaded routes
 const SpeedGrade = lazy(() =>
@@ -913,6 +914,7 @@ function App() {
       element: <CheckProgress />,
       errorElement: <Error />,
     },
+    { path: "/users/parent/profile", element: <ParentProfile />, errorElement: <Error /> },
     {
       path: "/parentannounce",
       element: <ParentAnnounce />,
@@ -920,7 +922,7 @@ function App() {
     },
     { path: "/childgrade/:studentId", element: <ChildGrade />, errorElement: <Error /> },
   ]);
-
+ 
   return (
     <>
       {!isOnline && <Offline />}

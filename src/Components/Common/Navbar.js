@@ -143,6 +143,16 @@ const Navbar = ({ hideSearchbar, hideAvatarList, hideStudentView }) => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+  const role = useSelector((store) => store.Auth.role);
+  const navigateProfile = ()=>{
+       if(role== 'parent'){
+      navigate("/users/parent/profile")
+       }
+       if(role=='admin'){
+         navigate("/users/admin")
+       }
+     
+  }
 
   return (
     <div className="sticky top-0 left-0 right-0 z-20 bg-white border-b shadow-sm">
@@ -172,7 +182,7 @@ const Navbar = ({ hideSearchbar, hideAvatarList, hideStudentView }) => {
             >
               <button
                 className="flex items-center gap-2 text-sm font-semibold text-gray-700 hover:text-purple-500 transition-transform duration-200 hover:bg-gray-100 px-3 py-2 rounded-md transform hover:translate-x-2"
-                onClick={() => navigate("/users/admin")}
+                onClick={navigateProfile}
               >
                 <FaUser className="text-lg" />
                 Profile
