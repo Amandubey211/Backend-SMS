@@ -82,7 +82,7 @@ const ButtonsGroup = ({ data, type, onRefresh }) => {
     const updatedData = {
       ...data,
       publish: !data?.publish, // Toggle publish status safely with optional chaining
-      allowNumberOfAttempts: data.allowNumberOfAttempts ?? 1,
+      allowNumberOfAttempts: data.allowNumberOfAttempts || null,
       points: data.points ?? 0,
     };
 
