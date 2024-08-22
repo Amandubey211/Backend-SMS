@@ -149,11 +149,17 @@ const Navbar = ({ hideSearchbar, hideAvatarList, hideStudentView }) => {
        if(role=='admin'){
          navigate("/users/admin")
        }
+       if(role=='student'){
+        navigate("/users/student/profile")
+       }
+       if(role=='teacher'| 'accountant'|'librarian'|'staff'){
+        navigate("/users/my/profile")
+       }
      
   }
 
   return (
-    <div className="sticky top-0 left-0 right-0 z-20 bg-white border-b shadow-sm">
+    <div className="sticky top-0 left-0 right-0 z-20 bg-white border-b shadow-sm ">
       <div className="flex items-center p-2 py-3 bg-white ">
         <LeftHeading leftHeading={leftHeading} navigate={navigate} />
 

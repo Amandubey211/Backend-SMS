@@ -75,19 +75,19 @@ const ParentProfile = () => {
               />
               <div className="flex flex-row justify-between w-full">
                 <h2 className="text-xl font-semibold">{userData?.fatherName || userData?.motherName || userData?.guardianName}</h2>
-                <button
+                {/* <button
                   onClick={handleSidebarOpen}
                   className="px-4 inline-flex items-center border border-transparent text-sm font-medium shadow-sm bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-md hover:from-pink-600 hover:to-purple-600"
                 >
                   Edit
-                </button>
+                </button> */}
               </div>
             </div>
             <h3 className="text-lg font-semibold mb-4">Personal Information</h3>
             <div className="flex flex-row gap-28 px-6 py-8 border items-center rounded-md">
               <div className="flex flex-col gap-5">
                 <div className="flex flex-col">
-                  <span className="font-normal text-gray-500">Name</span>
+                  <span className="font-normal text-gray-500">Father's Name</span>
                   <span className="font-medium text-gray-800">
                     {userData?.fatherName}
                   </span>
