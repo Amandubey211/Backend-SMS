@@ -26,106 +26,119 @@ const sidebarData = [
     title: "Dashboard",
     icon: <TbDashboard />,
     path: `/dashboard`,
+    roles: ["admin", "teacher", "librarian", "accountant", "peon"],
   },
   {
     title: "Classes",
     icon: <RiGraduationCapLine />,
     path: `/class`,
+    roles: ["admin", "teacher"],
   },
-
   {
     title: "Users",
     icon: <LuUser />,
+    roles: ["admin", "teacher"],
     items: [
       {
         title: "Student",
         icon: <FaUserGraduate />,
         path: "/users/students",
+        roles: ["admin", "teacher"],
       },
+      {
+        title: "Parent",
+        icon: <RiParentFill />,
+        path: "/users/parents",
+        roles: ["admin", "teacher"],
+      },
+      // Other user roles for admin only
       {
         title: "Teacher",
         icon: <FaChalkboardTeacher />,
         path: "/users/teachers",
+        roles: ["admin"],
       },
       {
         title: "Accountant",
         icon: <MdManageAccounts />,
         path: "/users/accountants",
-      },
-
-      {
-        title: "Parent",
-        icon: <RiParentFill />,
-        path: "/users/parents",
+        roles: ["admin"],
       },
       {
         title: "Librarian",
         icon: <MdLocalLibrary />,
         path: "/users/librarian",
+        roles: ["admin"],
       },
       {
         title: "Staff",
         icon: <GrUserWorker />,
         path: "/users/staffs",
+        roles: ["admin"],
       },
     ],
   },
   {
     title: "Accounting",
     icon: <HiOutlineCalculator />,
+    roles: ["admin", "accountant"],
     items: [
       {
         title: "Earning",
         icon: <FaClipboardList />,
         path: "/accounting/earning",
+        roles: ["admin", "accountant"],
       },
       {
         title: "Student Fees",
         icon: <FaClipboardList />,
         path: "/accounting/studentfees",
+        roles: ["admin", "accountant"],
       },
       {
         title: "Expenses",
         icon: <FaUniversity />,
         path: "/accounting/expenses",
+        roles: ["admin", "accountant"],
       },
     ],
   },
   {
     title: "NoticeBoard",
     icon: <TbNotebook />,
+    roles: ["admin", "teacher", "librarian"],
     items: [
       {
         title: "Announcements",
         icon: <FaClipboardList />,
         path: "/noticeboard/announcements",
+        roles: ["admin", "teacher", "librarian"],
       },
       {
         title: "Events",
         icon: <FaBook />,
         path: "/noticeboard/events",
+        roles: ["admin", "teacher", "librarian"],
       },
     ],
   },
-  // {
-  //   title: "Graduated",
-  //   icon: <PiCertificateLight />,
-  //   path: "/graduated",
-  // },
   {
     title: "Admissions",
     icon: <RiUserAddLine />,
     path: "/admissions",
+    roles: ["admin"],
   },
   {
     title: "Library",
     icon: <BsBook />,
     path: "/library",
+    roles: ["admin", "librarian"],
   },
   {
     title: "Verification",
     icon: <FaUserGraduate />,
     path: "/verify_students",
+    roles: ["admin"],
   },
 ];
 

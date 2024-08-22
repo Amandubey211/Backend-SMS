@@ -15,16 +15,41 @@ const AddAttachment = ({ chapterData, onClose, fetchModules }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const fileInputRef = useRef(null);
 
+  const FILE_SIZE_LIMIT = 10 * 1024 * 1024; // 10MB in bytes
+
   const { loading, uploadChapterFiles } = useUploadChapterFiles(fetchModules);
 
   const handleFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files);
-    setFiles((prevFiles) => [...prevFiles, ...selectedFiles]);
-    setPreviews((prevPreviews) => [
-      ...prevPreviews,
-      ...selectedFiles.map((file) => URL.createObjectURL(file)),
-    ]);
-    setLabels((prevLabels) => [...prevLabels, ...selectedFiles.map(() => "")]);
+    // selectedFiles.forEach((file) => {
+    //   if (file.size > FILE_SIZE_LIMIT) {
+    //     toast.error(`File ${file.name} exceeds the 10MB limit.`);
+    //   }
+    // });
+    const validFiles = selectedFiles.filter(
+      (file) => file.size <= FILE_SIZE_LIMIT
+    );
+    const invalidFiles = selectedFiles.filter(
+      (file) => file.size > FILE_SIZE_LIMIT
+    );
+
+    if (validFiles.length > 0) {
+      setFiles((prevFiles) => [...prevFiles, ...validFiles]);
+      setPreviews((prevPreviews) => [
+        ...prevPreviews,
+        ...validFiles.map((file) => URL.createObjectURL(file)),
+      ]);
+      setLabels((prevLabels) => [...prevLabels, ...validFiles.map(() => "")]);
+    }
+
+    if (invalidFiles.length > 0) {
+      setFiles((prevFiles) => [...prevFiles, ...invalidFiles]);
+      setPreviews((prevPreviews) => [
+        ...prevPreviews,
+        ...invalidFiles.map((file) => URL.createObjectURL(file)),
+      ]);
+      setLabels((prevLabels) => [...prevLabels, ...invalidFiles.map(() => "")]);
+    }
   };
 
   const handleDragOver = (e) => {
@@ -34,12 +59,35 @@ const AddAttachment = ({ chapterData, onClose, fetchModules }) => {
   const handleDrop = (e) => {
     e.preventDefault();
     const droppedFiles = Array.from(e.dataTransfer.files);
-    setFiles((prevFiles) => [...prevFiles, ...droppedFiles]);
-    setPreviews((prevPreviews) => [
-      ...prevPreviews,
-      ...droppedFiles.map((file) => URL.createObjectURL(file)),
-    ]);
-    setLabels((prevLabels) => [...prevLabels, ...droppedFiles.map(() => "")]);
+    droppedFiles.forEach((file) => {
+      if (file.size > FILE_SIZE_LIMIT) {
+        toast.error(`File ${file.name} exceeds the 10MB limit.`);
+      }
+    });
+    const validFiles = droppedFiles.filter(
+      (file) => file.size <= FILE_SIZE_LIMIT
+    );
+    const invalidFiles = droppedFiles.filter(
+      (file) => file.size > FILE_SIZE_LIMIT
+    );
+
+    if (validFiles.length > 0) {
+      setFiles((prevFiles) => [...prevFiles, ...validFiles]);
+      setPreviews((prevPreviews) => [
+        ...prevPreviews,
+        ...validFiles.map((file) => URL.createObjectURL(file)),
+      ]);
+      setLabels((prevLabels) => [...prevLabels, ...validFiles.map(() => "")]);
+    }
+
+    if (invalidFiles.length > 0) {
+      setFiles((prevFiles) => [...prevFiles, ...invalidFiles]);
+      setPreviews((prevPreviews) => [
+        ...prevPreviews,
+        ...invalidFiles.map((file) => URL.createObjectURL(file)),
+      ]);
+      setLabels((prevLabels) => [...prevLabels, ...invalidFiles.map(() => "")]);
+    }
   };
 
   const handleRemoveFile = (index) => {
@@ -75,10 +123,11 @@ const AddAttachment = ({ chapterData, onClose, fetchModules }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (files.length > 0) {
-      await uploadChapterFiles(chapterData.chapterId, files, labels);
+    const validFiles = files.filter((file) => file.size <= FILE_SIZE_LIMIT);
+    if (validFiles.length > 0) {
+      await uploadChapterFiles(chapterData.chapterId, validFiles, labels);
     } else {
-      toast.error("Please select at least one file.");
+      toast.error("Please select at least one valid file.");
     }
   };
 
@@ -136,7 +185,11 @@ const AddAttachment = ({ chapterData, onClose, fetchModules }) => {
               {files.map((file, index) => (
                 <div
                   key={index}
-                  className="flex flex-col p-2 border rounded-md transform transition duration-100 hover:shadow-md"
+                  className={`flex flex-col p-2 border rounded-md transform transition duration-100 hover:shadow-md ${
+                    file.size > FILE_SIZE_LIMIT
+                      ? "border-red-500"
+                      : "border-gray-300"
+                  }`}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
@@ -148,6 +201,11 @@ const AddAttachment = ({ chapterData, onClose, fetchModules }) => {
                         <p className="text-gray-500 text-xs">
                           {(file.size / 1024).toFixed(2)} KB
                         </p>
+                        {file.size > FILE_SIZE_LIMIT && (
+                          <p className="text-red-500 text-xs">
+                            File exceeds the 10MB limit.
+                          </p>
+                        )}
                       </div>
                     </div>
                     <div className="flex items-center space-x-2">
@@ -175,6 +233,7 @@ const AddAttachment = ({ chapterData, onClose, fetchModules }) => {
                       value={labels[index] || ""}
                       onChange={(e) => handleLabelChange(e, index)}
                       className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition duration-500 ease-in-out"
+                      disabled={file.size > FILE_SIZE_LIMIT}
                     />
                   </div>
                 </div>
