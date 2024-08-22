@@ -5,7 +5,6 @@ import {
   FaChevronUp,
   FaPen,
   FaTrashAlt,
-  FaArrowRight,
   FaFilePdf,
   FaFileWord,
   FaFilePowerpoint,
@@ -31,8 +30,6 @@ const Chapter = ({
   moduleId,
   quizzes,
   attachments,
-  isExpanded,
-  onToggle,
   onEdit,
   onDelete,
   fetchModules,
@@ -40,12 +37,12 @@ const Chapter = ({
   const [menuOpen, setMenuOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [attachmentsExpanded, setAttachmentsExpanded] = useState(false);
+  const [chapterExpanded, setChapterExpanded] = useState(false);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [previewType, setPreviewType] = useState(null);
   const [attachmentToDelete, setAttachmentToDelete] = useState(null);
   const { sid } = useParams();
-  const { loading, error, success, deleteChapter } = useDeleteChapter();
+  const { loading, deleteChapter } = useDeleteChapter();
   const { deleteAttachment, loading: attachmentDeleting } =
     useDeleteAttachment(fetchModules);
   const [attachmentLoading, setAttachmentLoading] = useState({});
@@ -116,13 +113,13 @@ const Chapter = ({
         ...prev,
         [attachmentToDelete.url]: false,
       }));
-      setAttachmentToDelete(null); // Reset the state after deletion
-      setDeleteModalOpen(false); // Close the modal after deletion
+      setAttachmentToDelete(null);
+      setDeleteModalOpen(false);
     }
   };
 
-  const toggleAttachments = () => {
-    setAttachmentsExpanded((prev) => !prev);
+  const toggleChapter = () => {
+    setChapterExpanded((prev) => !prev);
   };
 
   const getFileIcon = (type) => {
@@ -152,7 +149,7 @@ const Chapter = ({
 
   return (
     <div className="mb-4 p-1 bg-white rounded-lg border-b relative">
-      {/* Chapter Content */}
+      {/* Chapter Header */}
       <div className="flex items-center justify-between mb-2 relative">
         <div className="flex items-center">
           <img
@@ -160,47 +157,43 @@ const Chapter = ({
             alt={`Chapter ${chapterNumber}`}
             className="w-12 h-12 mr-4 rounded-lg"
           />
-          <div className="flex items-center">
-            <div>
-              <h2 className="font-semibold text-md">{title}</h2>
-              <div className="flex items-center gap-1">
-                <p className="text-gray-500">Chapter {chapterNumber}</p>
+          <div className="flex flex-col">
+            <h2 className="font-semibold text-md">{title}</h2>
+            <div className="flex gap-1 items-center">
+              <p className="text-gray-500">Chapter {chapterNumber}</p>
 
-                {attachments.length > 0 && (
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center">
-                      <button
-                        className="flex items-center space-x-1 px-3 text-sm font-semibold bg-gradient-to-r from-pink-100 to-purple-200 rounded-md py-1"
-                        onClick={toggleAttachments}
-                      >
-                        <span className="text-gradient">
-                          Attachments ({attachments.length})
-                        </span>
-                        <span>
-                          {attachmentsExpanded ? (
-                            <FaChevronUp className="ml-1 text-purple-700" />
-                          ) : (
-                            <FaChevronDown className="ml-1 text-purple-800" />
-                          )}
-                        </span>
-                      </button>
+              {attachments.length > 0 && (
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <div className="flex items-center space-x-1 px-3 text-sm font-semibold bg-gradient-to-r from-pink-100 to-purple-200 rounded-md py-1">
+                      <span className="text-gradient">
+                        Attachments ({attachments.length})
+                      </span>
                     </div>
                   </div>
-                )}
-              </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
         <div className="flex items-center space-x-2 relative">
+          <div className="relative">
+            <button
+              className="border p-2 rounded-full hover:bg-gray-100 text-red-600"
+              aria-label="Add Attachment"
+              onClick={handleAddAttachment}
+            >
+              <GrAttachment />
+            </button>
+            {attachments.length > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-100 opacity-90 text-red-900 text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                {attachments.length}
+              </span>
+            )}
+          </div>
+
           <button
-            className="border p-2 rounded-full hover:bg-gray-50"
-            aria-label="Add Attachment"
-            onClick={handleAddAttachment}
-          >
-            <GrAttachment />
-          </button>
-          <button
-            className="border p-2 rounded-full hover:bg-gray-50 relative"
+            className="border p-2 rounded-full hover:bg-gray-100 relative"
             onClick={toggleMenu}
             aria-expanded={menuOpen}
             aria-haspopup="menu"
@@ -237,121 +230,128 @@ const Chapter = ({
                 >
                   <FaTrashAlt className="mr-2" /> Delete
                 </li>
-                <li
-                  className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                  }}
-                  role="menuitem"
-                >
-                  <FaArrowRight className="mr-2" /> Move
-                </li>
               </ul>
             </div>
           )}
           <button
-            className="border p-2 rounded-full hover:bg-gray-50"
-            onClick={onToggle}
+            className="border p-2 rounded-full hover:bg-gray-100"
+            onClick={toggleChapter}
             aria-label="Toggle Chapter"
+            aria-expanded={chapterExpanded}
+            aria-controls={`chapter-content-${chapterId}`}
           >
-            {isExpanded ? <FaChevronUp /> : <FaChevronDown />}
+            {chapterExpanded ? <FaChevronUp /> : <FaChevronDown />}
           </button>
         </div>
       </div>
 
-      {attachmentsExpanded && attachments.length > 0 && (
-        <div className="mt-2">
-          <div className="grid grid-cols-1 gap-2 mb-2">
-            {attachments.map((attachment, index) => (
-              <div
-                key={index}
-                className="flex flex-col p-2 border rounded-md transform transition duration-100 hover:shadow-md"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    {getFileIcon(attachment.type) || (
-                      <img
-                        src={attachment.url}
-                        alt={attachment.name}
-                        className="h-8 w-8 object-cover rounded-md"
-                      />
-                    )}
-                    <div className="flex flex-col ml-4">
-                      <p className="text-gray-700 text-sm truncate max-w-xs">
-                        {attachment.name}
-                      </p>
-                      <p className="text-md">{attachment.label}</p>
+      {/* Chapter Content */}
+      {chapterExpanded && (
+        <div
+          id={`chapter-content-${chapterId}`}
+          className="mt-2 transition-all duration-300 ease-in-out"
+        >
+          <div className="flex flex-col space-y-4">
+            {/* Attachments */}
+            {attachments.length > 0 && (
+              <div>
+                <h3 className="text-sm font-semibold text-green-600">
+                  Attachments ({attachments.length})
+                </h3>
+                <div className="grid grid-cols-1 gap-2 mb-2">
+                  {attachments.map((attachment, index) => (
+                    <div
+                      key={index}
+                      className="flex flex-col p-2 border rounded-md transform transition duration-100 hover:shadow-md"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center">
+                          {getFileIcon(attachment.type) || (
+                            <img
+                              src={attachment.url}
+                              alt={attachment.name}
+                              className="h-8 w-8 object-cover rounded-md"
+                            />
+                          )}
+                          <div className="flex flex-col ml-4">
+                            <p className="text-gray-700 text-sm truncate max-w-xs">
+                              {attachment.name}
+                            </p>
+                            <p className="text-md">{attachment.label}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <button
+                            onClick={() =>
+                              openPreviewModal(attachment.url, attachment.type)
+                            }
+                            className="text-green-500 transition p-1 border rounded-full transform hover:scale-110 cursor-pointer"
+                            aria-label="Preview"
+                          >
+                            <FaEye size={20} />
+                          </button>
+                          <button
+                            type="button"
+                            className="text-red-500 transition p-1 border rounded-full transform hover:scale-110 cursor-pointer"
+                            onClick={() => {
+                              setAttachmentToDelete(attachment);
+                              setDeleteModalOpen(true);
+                            }}
+                            disabled={attachmentLoading[attachment.url]}
+                          >
+                            {attachmentLoading[attachment.url] ? (
+                              <ImSpinner3
+                                size={20}
+                                className="animate-spin text-gray-700"
+                              />
+                            ) : (
+                              <RiDeleteBin5Line size={20} />
+                            )}
+                          </button>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <button
-                      onClick={() =>
-                        openPreviewModal(attachment.url, attachment.type)
-                      }
-                      className="text-green-500 transition p-1 border rounded-full transform hover:scale-110 cursor-pointer"
-                      aria-label="Preview"
-                    >
-                      <FaEye size={20} />
-                    </button>
-                    <button
-                      type="button"
-                      className="text-red-500 transition p-1 border rounded-full transform hover:scale-110 cursor-pointer"
-                      onClick={() => {
-                        setAttachmentToDelete(attachment); // Set the attachment to delete
-                        setDeleteModalOpen(true); // Open the delete confirmation modal
-                      }}
-                      disabled={attachmentLoading[attachment.url]} // Disable button while loading
-                    >
-                      {attachmentLoading[attachment.url] ? (
-                        <ImSpinner3
-                          size={20}
-                          className="animate-spin text-gray-700"
-                        />
-                      ) : (
-                        <RiDeleteBin5Line size={20} />
-                      )}
-                    </button>
-                  </div>
+                  ))}
                 </div>
               </div>
-            ))}
+            )}
+
+            {/* Assignments and Quizzes */}
+            <div>
+              {assignments.length || quizzes.length ? (
+                <>
+                  {assignments.map((assignment, index) => (
+                    <ChapterItem
+                      key={index}
+                      type="assignment"
+                      title={assignment.name}
+                      id={assignment._id}
+                      isPublished={assignment.isPublished}
+                    />
+                  ))}
+                  {quizzes.map((quiz, index) => (
+                    <ChapterItem
+                      key={index}
+                      type="quiz"
+                      title={quiz.name}
+                      id={quiz._id}
+                      isPublished={quiz.isPublished}
+                    />
+                  ))}
+                </>
+              ) : (
+                <p className="py-2 bg-gray-50 italic text-gray-500 text-center">
+                  No Data found
+                </p>
+              )}
+            </div>
           </div>
-        </div>
-      )}
-      {isExpanded && (
-        <div className="ml-10 py-2">
-          {assignments.length || quizzes.length ? (
-            <>
-              {assignments.map((assignment, index) => (
-                <ChapterItem
-                  key={index}
-                  type="assignment"
-                  title={assignment.name}
-                  id={assignment._id}
-                  isPublished={assignment.isPublished}
-                />
-              ))}
-              {quizzes.map((quiz, index) => (
-                <ChapterItem
-                  key={index}
-                  type="quiz"
-                  title={quiz.name}
-                  id={quiz._id}
-                  isPublished={quiz.isPublished}
-                />
-              ))}
-            </>
-          ) : (
-            <p className="py-2 bg-gray-50 italic text-gray-500 text-center">
-              No Data found
-            </p>
-          )}
         </div>
       )}
 
       {/* Delete Modal for Chapter */}
       <DeleteModal
-        isOpen={deleteModalOpen}
+        isOpen={deleteModalOpen && attachmentToDelete === null}
         onClose={() => setDeleteModalOpen(false)}
         onConfirm={confirmDelete}
         title={title}
