@@ -26,6 +26,8 @@ import AttendanceMain from "../Modules/Student/Attendance/AttendanceMain.js";
 import ParentEvent from "../Modules/Parents/ParentEvent/ParentEvent";
 import QIDLogin from "../Modules/LoginPages/Student/Login/QIDLogin.js";
 import ParentProfile from "../Components/Parents/ParentProfile.js";
+import StudentProfile from "../Modules/Student/profile/StudentProfile.js";
+import StaffMyProfile from "../Components/Common/StaffMyProfile.js";
 
 // lazy loaded routes
 const SpeedGrade = lazy(() =>
@@ -665,6 +667,16 @@ function App() {
     },
     { path: "/users/staffs", element: <AllStaff />, errorElement: <Error /> },
     { path: "/users/admin", element: <UserProfile />, errorElement: <Error /> },
+    {
+      path: "/users/my/profile",
+      element: (
+        <ProtectRoute
+          Component={StaffMyProfile}
+          allowedRoles={['teacher', 'accountant', 'librarian', 'staff']}
+        />
+      ),
+      errorElement: <Error />,
+    },
     // Student------------------------------------------------------------------------------
     {
       path: "/student_dash",
@@ -857,6 +869,14 @@ function App() {
       ),
       errorElement: <Error />,
     },
+    {
+      path: "/users/student/profile",
+      element: (
+        <ProtectRoute Component={StudentProfile} allowedRoles={["student"]} />
+      ),
+      errorElement: <Error />,
+    },
+   
     {
       path: "/student_library",
       element: (

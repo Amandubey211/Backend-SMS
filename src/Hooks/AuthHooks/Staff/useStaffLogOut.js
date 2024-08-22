@@ -13,10 +13,7 @@ const useStaffLogout = () => {
 
   const staffLogout = () => {
     const roles = ["admin", "teacher", "accountant", "librarian", "peon"];
-    roles.forEach((role) => {
-      localStorage.removeItem(`${role}:token`);
-    });
-
+    localStorage.clear()
     dispatch(setAuth(false));
     dispatch(setRole(null));
     dispatch(setUerDetails(null));

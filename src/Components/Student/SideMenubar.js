@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useLocation, NavLink } from "react-router-dom";
+import { useLocation, NavLink, useNavigate } from "react-router-dom";
 import StudentDiwanLogo from "../../Assets/HomeAssets/StudentDiwanLogo.png";
 import smallLogo from "../../Assets/SideBarAsset/smallLogo.png";
 import sidebarData from "./DataFile/sidebarData";
@@ -12,7 +12,7 @@ import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleSidebar } from "../../Redux/Slices/Common/SidebarSlice";
 import useStudentLogout from "../../Hooks/AuthHooks/Student/useStudentLogout";
-
+import ProfileIcon from '../../Assets/DashboardAssets/profileIcon.png'
 const isActivePath = (path, locationPath) => locationPath.startsWith(path);
 
 const SideMenubar = () => {
@@ -37,10 +37,10 @@ console.log(" role in sidemenubar",role)
         : [...prevOpenItems, title]
     );
   };
-
+const navigate = useNavigate()
   return (
     <nav
-      className={`transition-all duration-300 h-screen p-1 z-10 px-3 bg-white border-r flex flex-col justify-between ${
+      className={`transition-all   duration-300 h-screen p-1 z-30 px-3 bg-white border-r flex flex-col justify-between ${
         isOpen ? "w-[15%]" : "w-[7%]"
       }`}
       aria-label="Sidebar"
@@ -178,20 +178,20 @@ console.log(" role in sidemenubar",role)
         </div>
       </div>
 
-      <div className="mt-auto p-2">
+      <div className={`fixed bottom-1  h-[3rem]  flex flex- row items-center justify-center border-t w-auto ${isOpen? "w-[14%]" : "w-[7%]"}  `}>
         <div className="flex items-center justify-between">
           <img
             src={
-              userDetails?.profile ||
-              "https://avatars.githubusercontent.com/u/109097090?v=4"
+              userDetails?.profile || ProfileIcon
             }
             alt="Profile"
-            className={`${isOpen ? "w-10 h-10" : "w-8 h-8"} rounded-full`}
+            className={`${isOpen ? "w-10 h-10" : "w-8 h-8"} rounded-full cursor-pointer`}
+            onClick={()=>navigate('/users/student/profile')}
           />
           {isOpen && (
             <div className="ml-4">
               <h2 className="text-sm font-semibold">
-                {userDetails?.fullName || "User Name"}
+                {userDetails?.fullName?.slice(0,8) || "User Name"}
               </h2>
               <p className="text-gray-500 capitalize">{role}</p>
             </div>

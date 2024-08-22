@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import Navbar from "../Common/Navbar";
 import { toggleSidebar } from "../../Redux/Slices/Common/SidebarSlice";
 import SideMenubar from "./SideMenubar";
+import { Toaster } from "react-hot-toast";
 
 const StudentDashLayout = ({ children, hideSearchbar, hideAvatarList,hideStudentView }) => {
   const dispatch = useDispatch();
@@ -10,6 +11,7 @@ const StudentDashLayout = ({ children, hideSearchbar, hideAvatarList,hideStudent
 
   return (
     <div className="flex w-full h-full">
+      <Toaster/>
       <SideMenubar isOpen={isSidebarOpen} />
       <div
         className={`transition-all duration-300 h-screen ${
