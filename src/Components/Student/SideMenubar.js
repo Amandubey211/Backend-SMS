@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useLocation, NavLink } from "react-router-dom";
+import { useLocation, NavLink, useNavigate } from "react-router-dom";
 import StudentDiwanLogo from "../../Assets/HomeAssets/StudentDiwanLogo.png";
 import smallLogo from "../../Assets/SideBarAsset/smallLogo.png";
 import sidebarData from "./DataFile/sidebarData";
@@ -12,7 +12,7 @@ import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleSidebar } from "../../Redux/Slices/Common/SidebarSlice";
 import useStudentLogout from "../../Hooks/AuthHooks/Student/useStudentLogout";
-
+import ProfileIcon from '../../Assets/DashboardAssets/profileIcon.png'
 const isActivePath = (path, locationPath) => locationPath.startsWith(path);
 
 const SideMenubar = () => {
@@ -35,6 +35,7 @@ const SideMenubar = () => {
         : [...prevOpenItems, title]
     );
   };
+
 
   const handleLogout = () => {
     studentLogout();
@@ -178,35 +179,38 @@ const SideMenubar = () => {
         </ul>
       </div>
 
-      {/* Avatar section placed always at the bottom */}
-      <div className="p-2 border-t flex items-center justify-between">
-        <img
-          src={
-            userDetails?.profile ||
-            "https://avatars.githubusercontent.com/u/109097090?v=4"
-          }
-          alt="Profile"
-          className={`${
-            isOpen ? "w-10 h-10" : "w-8 h-8"
-          } cursor-pointer rounded-full`}
-        />
-
-        {isOpen && (
-          <div className="flex-1 ml-3">
-            <h2 className="font-semibold">{userDetails?.fullName || "User"}</h2>
-            <p className="text-gray-500 capitalize text-sm">{role}</p>
-          </div>
-        )}
-        <button
-          title="logout"
-          onClick={handleLogout}
-          className="ml-3"
-          aria-label="Logout"
-        >
-          <FiLogOut
-            className={`${isOpen ? "w-7 h-7" : "w-5 h-5"} text-gray-500`}
+      <div className={`fixed bottom-1  h-[3rem]  flex flex- row items-center justify-center border-t w-auto ${isOpen? "w-[14%]" : "w-[7%]"}  `}>
+        <div className="flex items-center justify-between">
+          <img
+            src={
+              userDetails?.profile || ProfileIcon
+            }
+            alt="Profile"
+            className={`${isOpen ? "w-10 h-10" : "w-8 h-8"} rounded-full cursor-pointer`}
+            onClick={()=>navigate('/users/student/profile')}
           />
-        </button>
+          {isOpen && (
+            <div className="ml-4">
+              <h2 className="text-sm font-semibold">
+                {userDetails?.fullName?.slice(0,8) || "User Name"}
+              </h2>
+              <p className="text-gray-500 capitalize">{role}</p>
+            </div>
+          )}
+          <button
+            title="logout"
+            onClick={studentLogout}
+            className="ml-3"
+            aria-label="Logout"
+          >
+            <FiLogOut
+              className={`${isOpen ? "w-7 h-7" : "w-5 h-5"} text-gray-500  ${
+                !isOpen && "ml-0"
+              }`}
+            />
+          </button>
+        </div>
+
       </div>
     </nav>
   );

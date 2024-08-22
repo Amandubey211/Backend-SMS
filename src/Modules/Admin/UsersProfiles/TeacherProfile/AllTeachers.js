@@ -16,6 +16,7 @@ import DeleteConfirmatiomModal from "../../../../Components/Common/DeleteConfirm
 import { GoAlertFill } from "react-icons/go";
 import { MdBlock, MdOutlinePublishedWithChanges } from "react-icons/md";
 import ProfileCard from "../SubComponents/ProfileCard";
+import ViewTeacher from "./SingleTeacher";
 const AllTeachers = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [teacherData, setTeacherData] = useState(null);
@@ -28,8 +29,12 @@ const AllTeachers = () => {
     // fetchSubjects(cid);
     console.log(teachers);
   }, []);
-
-  const handleSidebarOpen = () => {setSidebarOpen(true);setTeacherData(null)};
+  const [sidebarContent, setSidebarContent] = useState(null);
+  const [selectedStaff, setSelectedStaff] = useState(null);
+  const handleSidebarOpen = () => {setSidebarOpen(true);
+    setTeacherData(null)
+    setSidebarContent("addTeacher");
+  };
   const handleSidebarClose = () => setSidebarOpen(false);
   const {deleteUser,error} = useDeleteUser()
  const deleteTeacher = async()=>{
@@ -42,6 +47,7 @@ const AllTeachers = () => {
  const editUser = async(event,data)=>{
   setSidebarOpen(true);
   setTeacherData(data);
+  setSidebarContent("editTecaher");
   event.stopPropagation();
  }
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -53,6 +59,23 @@ const AllTeachers = () => {
     setIsModalOpen(false);
   };
 
+  const handleStaffClick = (staff) => {
+    setSelectedStaff(staff);
+    setSidebarContent("viewTeacher");
+    setSidebarOpen(true);
+  };
+  const renderSidebarContent = () => {
+    switch (sidebarContent) {
+      case "viewTeacher":
+        return <ViewTeacher staff={selectedStaff} />;
+        case "addTeacher":
+          return <AddUser role="staff"  />;
+        case "editTecaher":
+          return <AddUser role="staff" data={selectedStaff} />;
+        default:
+        return <div>Select an action</div>;
+    }
+  };
   return (
     <Layout title="All Teachers">
       <DashLayout>
@@ -79,7 +102,7 @@ const AllTeachers = () => {
               key={index}
               profile={teacher}
               editUser={editUser}
-              onClick={()=>{}}
+              onClick={handleStaffClick}
             />
             )):  <div>
             <div className="flex w-[80vw] text-gray-500 h-[90vh] items-center justify-center flex-col text-2xl">
@@ -88,23 +111,26 @@ const AllTeachers = () => {
   </div>
         </div>}
           </div>
-          <SidebarSlide
-            isOpen={isSidebarOpen}
-            onClose={handleSidebarClose}
-            title="Add New Teacher"
-            width="70%"
-            
-             // Custom width
-            // Custom height
-          >
-            <AddUser role={'teacher'}  data={teacherData}/>
-          </SidebarSlide>
           <DeleteConfirmatiomModal
   isOpen={isModalOpen}
   onClose={closeModal}
   onConfirm={deleteTeacher}
 />
         </div>}
+        <SidebarSlide
+            key={sidebarContent} 
+            isOpen={isSidebarOpen}
+            onClose={handleSidebarClose}
+            title={
+              <span className="bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent bg-clip-text">
+                {sidebarContent === "viewTeacher" ? "Quick View of Staff" : "Add/Edit Staff"}
+              </span>
+            }
+            width="70%"
+            height="auto"
+          >
+            {renderSidebarContent()}
+          </SidebarSlide>
       </DashLayout>
     </Layout>
   );

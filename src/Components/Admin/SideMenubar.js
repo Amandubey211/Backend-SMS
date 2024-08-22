@@ -13,7 +13,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { toggleSidebar } from "../../Redux/Slices/Common/SidebarSlice.js";
 import useStaffLogout from "../../Hooks/AuthHooks/Staff/useStaffLogOut.js";
 import LogoutConfirmationModal from "../Common/LogoutConfirmationModal.js";
-
+import profileIcon from '../../Assets/DashboardAssets/profileIcon.png'
 const isActivePath = (path, locationPath) => locationPath.startsWith(path);
 const SideMenubar = () => {
   const dispatch = useDispatch();
@@ -27,8 +27,10 @@ const SideMenubar = () => {
   }));
 
   const [openItems, setOpenItems] = useState([]);
-  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false); 
+  const [isLoggingOut, setIsLoggingOut] = useState(false); 
+
 
   const toggleDropdown = (title) => {
     setOpenItems((prevOpenItems) =>
@@ -202,8 +204,7 @@ const SideMenubar = () => {
       <div className="p-2 border-t flex items-center justify-between">
         <img
           src={
-            userDetails?.profile ||
-            "https://avatars.githubusercontent.com/u/109097090?v=4"
+            userDetails?.profile || profileIcon
           }
           alt="Profile"
           className={`${
@@ -215,7 +216,7 @@ const SideMenubar = () => {
         {isOpen && (
           <div className="flex-1 ml-3">
             <h2 className="font-semibold">
-              {userDetails?.fullName || userDetails?.adminName || "User"}
+              {userDetails?.firstName?.slice(0,8) || userDetails?.adminName?.slice(0,8) || "User"}
             </h2>
             <p className="text-gray-500 capitalize text-sm">{role}</p>
           </div>
