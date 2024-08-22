@@ -12,7 +12,7 @@ import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleSidebar } from "../../Redux/Slices/Common/SidebarSlice";
 import useStudentLogout from "../../Hooks/AuthHooks/Student/useStudentLogout";
-import ProfileIcon from '../../Assets/DashboardAssets/profileIcon.png'
+import ProfileIcon from "../../Assets/DashboardAssets/profileIcon.png";
 const isActivePath = (path, locationPath) => locationPath.startsWith(path);
 
 const SideMenubar = () => {
@@ -25,7 +25,7 @@ const SideMenubar = () => {
     userDetails: state.Auth.userDetail,
     role: state.Auth.role,
   }));
-
+  const navigate = useNavigate();
   const [openItems, setOpenItems] = useState([]);
 
   const toggleDropdown = (title) => {
@@ -35,7 +35,6 @@ const SideMenubar = () => {
         : [...prevOpenItems, title]
     );
   };
-
 
   const handleLogout = () => {
     studentLogout();
@@ -179,20 +178,24 @@ const SideMenubar = () => {
         </ul>
       </div>
 
-      <div className={`fixed bottom-1  h-[3rem]  flex flex- row items-center justify-center border-t w-auto ${isOpen? "w-[14%]" : "w-[7%]"}  `}>
+      <div
+        className={`fixed bottom-1  h-[3rem]  flex flex- row items-center justify-center border-t w-auto ${
+          isOpen ? "w-[14%]" : "w-[7%]"
+        }  `}
+      >
         <div className="flex items-center justify-between">
           <img
-            src={
-              userDetails?.profile || ProfileIcon
-            }
+            src={userDetails?.profile || ProfileIcon}
             alt="Profile"
-            className={`${isOpen ? "w-10 h-10" : "w-8 h-8"} rounded-full cursor-pointer`}
-            onClick={()=>navigate('/users/student/profile')}
+            className={`${
+              isOpen ? "w-10 h-10" : "w-8 h-8"
+            } rounded-full cursor-pointer`}
+            onClick={() => navigate("/users/student/profile")}
           />
           {isOpen && (
             <div className="ml-4">
               <h2 className="text-sm font-semibold">
-                {userDetails?.fullName?.slice(0,8) || "User Name"}
+                {userDetails?.fullName?.slice(0, 8) || "User Name"}
               </h2>
               <p className="text-gray-500 capitalize">{role}</p>
             </div>
@@ -210,7 +213,6 @@ const SideMenubar = () => {
             />
           </button>
         </div>
-
       </div>
     </nav>
   );
