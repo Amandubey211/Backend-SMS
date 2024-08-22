@@ -162,7 +162,7 @@ const Chapter = ({
             <div className="flex gap-1 items-center">
               <p className="text-gray-500">Chapter {chapterNumber}</p>
 
-              {attachments.length > 0 && (
+              {/* {attachments.length > 0 && (
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
                     <div className="flex items-center space-x-1 px-3 text-sm font-semibold bg-gradient-to-r from-pink-100 to-purple-200 rounded-md py-1">
@@ -172,7 +172,7 @@ const Chapter = ({
                     </div>
                   </div>
                 </div>
-              )}
+              )} */}
             </div>
           </div>
         </div>
@@ -274,9 +274,10 @@ const Chapter = ({
                             />
                           )}
                           <div className="flex flex-col ml-4">
-                            <p className="text-gray-700 text-sm truncate max-w-xs">
+                            <p className="text-gray-700 text-sm truncate max-w-xs overflow-hidden whitespace-nowrap">
                               {attachment.name}
                             </p>
+
                             <p className="text-md">{attachment.label}</p>
                           </div>
                         </div>
@@ -318,7 +319,9 @@ const Chapter = ({
 
             {/* Assignments and Quizzes */}
             <div>
-              {assignments.length || quizzes.length ? (
+              {assignments.length > 0 ||
+              quizzes.length > 0 ||
+              attachments.length > 0 ? (
                 <>
                   {assignments.map((assignment, index) => (
                     <ChapterItem
@@ -362,7 +365,7 @@ const Chapter = ({
         isOpen={deleteModalOpen && attachmentToDelete !== null}
         onClose={() => setDeleteModalOpen(false)}
         onConfirm={handleDeleteAttachment}
-        title={attachmentToDelete?.label || ""}
+        title={attachmentToDelete?.label || "Delete Attachment"}
       />
 
       {isSidebarOpen && (
