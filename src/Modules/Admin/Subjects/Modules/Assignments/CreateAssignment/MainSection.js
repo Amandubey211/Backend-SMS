@@ -10,7 +10,7 @@ const initialFormState = {
   points: "",
   displayGrade: false,
   submissionType: "",
-  allowedAttempts: true, // Default to "Unlimited"
+  allowedAttempts: false,
   numberOfAttempts: null,
   assignTo: "",
   sectionId: null,

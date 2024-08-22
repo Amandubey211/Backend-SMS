@@ -21,11 +21,6 @@ const AddAttachment = ({ chapterData, onClose, fetchModules }) => {
 
   const handleFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files);
-    // selectedFiles.forEach((file) => {
-    //   if (file.size > FILE_SIZE_LIMIT) {
-    //     toast.error(`File ${file.name} exceeds the 10MB limit.`);
-    //   }
-    // });
     const validFiles = selectedFiles.filter(
       (file) => file.size <= FILE_SIZE_LIMIT
     );
@@ -59,11 +54,6 @@ const AddAttachment = ({ chapterData, onClose, fetchModules }) => {
   const handleDrop = (e) => {
     e.preventDefault();
     const droppedFiles = Array.from(e.dataTransfer.files);
-    droppedFiles.forEach((file) => {
-      if (file.size > FILE_SIZE_LIMIT) {
-        toast.error(`File ${file.name} exceeds the 10MB limit.`);
-      }
-    });
     const validFiles = droppedFiles.filter(
       (file) => file.size <= FILE_SIZE_LIMIT
     );
@@ -170,6 +160,7 @@ const AddAttachment = ({ chapterData, onClose, fetchModules }) => {
           />
           <p className="text-gray-500">Drag & Drop or Click to Browse Files</p>
           <p className="text-gray-400">Select single or multiple files</p>
+          <p className="text-gray-400">Maximum file size: 10MB</p>
           <input
             type="file"
             multiple

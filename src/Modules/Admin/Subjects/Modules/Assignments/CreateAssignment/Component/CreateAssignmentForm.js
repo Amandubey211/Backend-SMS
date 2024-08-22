@@ -33,20 +33,10 @@ const CreateAssignmentForm = ({
   const [chapters, setChapters] = useState([]);
   const [selectedModule, setSelectedModule] = useState(moduleId || "");
   const [selectedChapter, setSelectedChapter] = useState(chapterId || "");
-  const {
-    fetchGroupsByClass,
-    loading: groupLoading,
-    error: groupError,
-  } = useGetGroupsByClass();
-  const groupsList = useSelector((store) => store.Class.groupsList);
-  const { cid } = useParams();
 
   useEffect(() => {
     if (!moduleList || moduleList.length === 0) {
       fetchModules();
-    }
-    if (!groupsList || groupsList.length === 0) {
-      fetchGroupsByClass(cid);
     }
   }, [moduleList, fetchModules]);
 

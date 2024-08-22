@@ -26,7 +26,7 @@ const DashLayout = ({
           hideAvatarList={hideAvatarList}
           hideStudentView={hideStudentView}
         />
-        <main className="w-full min-h-screen h-screen overflow-y-scroll no-scrollbar p-4">
+        <main className="w-full min-h-screen h-screen overflow-y-scroll no-scrollbar ">
           {children}
         </main>
       </div>
