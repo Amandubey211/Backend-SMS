@@ -8,6 +8,7 @@ import axios from "axios";
 import { baseUrl } from "../../config/Common";
 import Spinner from "../../Components/Common/Spinner";
 import { GoAlertFill } from "react-icons/go"; // Import the GoAlertFill icon
+import NoDataFound from "../../Components/Common/NoDataFound";
 
 const FinanceTable = () => {
   const [filters, setFilters] = useState({
@@ -89,10 +90,7 @@ const FinanceTable = () => {
                     <FeeTable feesDetails={filteredFeesDetails} />
                   </>
                 ) : (
-                  <div className="flex items-center justify-center flex-col text-2xl h-full text-gray-500">
-                    <GoAlertFill className="text-[5rem]" />
-                    No Data Found
-                  </div>
+                  <NoDataFound />
                 )}
               </>
             )}

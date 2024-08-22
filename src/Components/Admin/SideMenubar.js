@@ -26,7 +26,6 @@ const SideMenubar = () => {
     role: state.Auth.role,
     userDetails: state.Auth.userDetail,
   }));
-  
 
   const [openItems, setOpenItems] = useState([]);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false); 
@@ -200,7 +199,9 @@ const SideMenubar = () => {
             userDetails?.profile || profileIcon
           }
           alt="Profile"
-          className={`${isOpen ? "w-10 h-10" : "w-8 h-8"} cursor-pointer rounded-full`}
+          className={`${
+            isOpen ? "w-10 h-10" : "w-8 h-8"
+          } cursor-pointer rounded-full`}
           onClick={HandleNavigate}
         />
 

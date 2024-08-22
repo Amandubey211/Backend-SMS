@@ -5,8 +5,9 @@ import { useParams } from "react-router-dom";
 import { shallowEqual, useSelector } from "react-redux";
 import ProfileCard from "./ProfileCard";
 import { baseUrl } from "../../../../config/Common";
-import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 import Spinner from "../../../../Components/Common/Spinner";
+import NoDataFound from "../../../../Components/Common/NoDataFound";
+import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 
 const StudentTeacher = () => {
   const { selectedClass, selectedClassName } = useSelector(
@@ -68,9 +69,7 @@ const StudentTeacher = () => {
   }, [selectedClass]);
 
   if (loading) {
-    return (
-<Spinner/>
-    )
+    return <Spinner />;
   }
 
   return (
@@ -86,9 +85,13 @@ const StudentTeacher = () => {
             </div>
           </div>
           <div className="flex flex-wrap -mx-2">
-            {teachers.map((teacher, index) => (
-              <ProfileCard key={index} profile={teacher} />
-            ))}
+            {teachers.length > 0 ? (
+              teachers.map((teacher, index) => (
+                <ProfileCard key={index} profile={teacher} />
+              ))
+            ) : (
+              <NoDataFound title="Teachers" />
+            )}
           </div>
         </div>
       </DashLayout>
