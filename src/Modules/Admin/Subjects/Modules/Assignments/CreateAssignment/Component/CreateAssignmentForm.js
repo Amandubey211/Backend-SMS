@@ -35,10 +35,10 @@ const CreateAssignmentForm = ({
   const [selectedChapter, setSelectedChapter] = useState(chapterId || "");
 
   useEffect(() => {
-    if (!moduleList || moduleList.length === 0) {
-      fetchModules();
-    }
-  }, [moduleList, fetchModules]);
+    // if (!moduleList || moduleList.length === 0) {
+    fetchModules();
+    // }
+  }, [fetchModules]);
 
   useEffect(() => {
     if (selectedModule) {
@@ -160,9 +160,9 @@ const CreateAssignmentForm = ({
         value={dueDate}
         handleChange={handleChange}
       />
-      <button className="py-2 text-green-500 font-medium rounded-md hover:text-green-800 transition">
+      {/* <button className="py-2 text-green-500 font-medium rounded-md hover:text-green-800 transition">
         + Add Assign
-      </button>
+      </button> */}
     </div>
   );
 };

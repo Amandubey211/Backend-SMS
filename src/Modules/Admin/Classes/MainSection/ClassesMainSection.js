@@ -5,6 +5,7 @@ import AddNewClass from "./AddNewClass";
 import { useSelector } from "react-redux";
 import Spinner from "../../../../Components/Common/Spinner";
 import useGetAllClasses from "../../../../Hooks/AuthHooks/Staff/Admin/Class/useGetAllClasses";
+import NoDataFound from "../../../../Components/Common/NoDataFound"; // Import the NoDataFound component
 
 const ClassesMainSection = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -35,7 +36,9 @@ const ClassesMainSection = () => {
       {loading ? (
         <Spinner />
       ) : error ? (
-        <p className="text-red-500 p-4">{error}</p>
+        <NoDataFound title="Classes" />
+      ) : classes.length === 0 ? (
+        <NoDataFound title="Classes" /> // Use NoDataFound when no classes are found
       ) : (
         <div className="grid grid-cols-1 gap-4 mt-4 sm:grid-cols-2 lg:grid-cols-4">
           {classes?.map((cls) => (
