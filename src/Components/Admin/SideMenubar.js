@@ -53,7 +53,13 @@ const SideMenubar = () => {
   };
 
   const HandleNavigate = () => {
-    navigate("/users/admin");
+    if(role=='admin'){
+       navigate("/users/admin");   
+    }
+    if(role=='teacher' || 'accountant' || 'librarian' || 'staff'){
+      navigate("/users/my/profile"); 
+    }
+
   };
 
   const filteredSidebarData = sidebarData.filter((item) =>
