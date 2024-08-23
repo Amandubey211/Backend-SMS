@@ -1,44 +1,28 @@
 import React, { useEffect, useState } from "react";
+import { FaBook } from "react-icons/fa";
+const SubjectCard = ({ subject, i }) => {
+  const { name, startDate, modules, completedModules, progress } = subject;
+  const [bgColor, setBgColor] = useState("");
 
-const SubjectCard = ({ subject,i}) => {
-  const { name, startDate, modules,    completedModules, progress } = subject;
-  const [bgColor,setBgColor] =useState('')
   useEffect(() => {
-    console.log(i);
-  
-    // Map of colors for each value from 1 to 6
-    const colorMap = {
-      1: 'green',
-      2: 'red',
-      3: 'blue',
-      4: 'orange',
-      5: 'yellow',
-      6: 'red',
-      7: 'purple',
-      8: 'cyan',
-      9: 'magenta',
-      10: 'lime',
-    };
-    setBgColor(colorMap[1]); 
-  
-  }, []); 
-  
+    const colorMap = [
+      "green-500", "red-500", "blue-500", "orange-500", "yellow-500", "purple-500",
+      "pink-500", "indigo-500", "teal-500", "cyan-500", "amber-500", "lime-500",
+      "emerald-500", "fuchsia-500", "rose-500", "violet-500", "sky-500", "slate-500",
+      "zinc-500", "neutral-500"
+    ];
+    setBgColor(colorMap[i]);
+
+  }, [i]);
+
   return (
     <div
       className="bg-white shadow-lg hover:shadow-2xl cursor-pointer 
        rounded-lg p-4  flex-none border border-gray-300 flex flex-col gap-3"
       style={{ width: "265px" }}
     >
-      {/* <h3 className="text-xl font-semibold">{name}</h3>
-      <p className="text-gray-500">Started: {startDate}</p>
-      <p className="text-gray-500">{completedModules}/{totalModules} Modules</p> */}
-
       <div className="flex items-center gap-2">
-        <img
-          src="https://plus.unsplash.com/premium_photo-1666900440561-94dcb6865554?q=80&w=1854&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA/3D/3D"
-          alt="Profile"
-          className="h-10 w-10 mr-2 rounded-lg "
-        />
+      <FaBook className="text-[2.2rem] text-pink-400" />
         <div className="flex flex-col">
           <span>{name}</span>
           <span className="text-[12px] text-gray-600">Started: {startDate}</span>
@@ -47,13 +31,14 @@ const SubjectCard = ({ subject,i}) => {
 
       <div className="w-full bg-gray-200 rounded-full h-1.5 dark:bg-gray-700">
         <div
-          className={`bg-blue-600 h-1.5 rounded-full`}
-          style={{ width: `${progress}%` }}
+          className={`h-1.5 rounded-full bg-${bgColor}`}
+          style={{ width: `${progress}%`, }}
         ></div>
       </div>
       <div className="flex flex-row justify-between">
-        <p className="text-right text-sm text-gray-500">0/{modules?.length} Module</p>
-      <p className="text-right text-sm text-gray-500">0/ Completed</p></div>
+        <p className="text-right text-sm text-gray-500">{completedModules||0}/{modules?.length} Modules</p>
+        <p className="text-right text-sm text-gray-500">{completedModules} Completed</p>
+      </div>
     </div>
   );
 };

@@ -157,14 +157,6 @@ const ParentProfile = () => {
                 </button>
               </div>
             </div> 
-            <SidebarSlide
-              isOpen={isSidebarOpen}
-              onClose={handleSidebarClose}
-              title="Edit Profile"
-              width="50%"
-            >
-              <EditParentProfile data={userData} />
-            </SidebarSlide>
           </div>
           </ParentDashLayout>
     </>
