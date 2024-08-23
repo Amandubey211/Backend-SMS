@@ -4,9 +4,18 @@ import BookItem from "./BookItem";
 import useGetBooks from "../../../../Hooks/AuthHooks/Staff/Admin/LibraryBooks/useGetBooks";
 import { FaBook } from "react-icons/fa"; // For "No data found" icon
 import Spinner from "../../../../Components/Common/Spinner";
+import { useSelector } from "react-redux";
+import useGetFilteredIssueBooks from "../../../../Hooks/AuthHooks/Staff/Admin/LibraryBooks/useGetFilteredIssueBooks";
 
 const Library = () => {
-  const { loading, error, books } = useGetBooks();
+  const role = useSelector((store) => store.Auth.role);
+  const { loading: booksLoading, error: booksError, books } = useGetBooks();
+  const { loading: issueBooksLoading, error: issueBooksError, books: issueBooks } = useGetFilteredIssueBooks();
+
+  const loading = role === 'teacher' ? issueBooksLoading : booksLoading;
+  const error = role === 'teacher' ? issueBooksError : booksError;
+  const booksData = role === 'teacher' ? issueBooks : books;
+
   const navigate = useNavigate();
 
   const handleViewAllClick = () => {
@@ -23,7 +32,8 @@ const Library = () => {
   }
 
   // Display only the top 5 latest books
-  const latestBooks = books.slice(0, 5);
+  const latestBooks = booksData.slice(0, 5);
+  console.log("latestbooks--", latestBooks);
 
   return (
     <div className="p-4 bg-white">
@@ -42,10 +52,15 @@ const Library = () => {
         latestBooks.map((book) => (
           <BookItem
             key={book._id}
-            image={book.image || "https://via.placeholder.com/50"}
-            title={book.name}
-            category={book.category}
-            copies={book.copies}
+            image={role === "teacher" ? book.bookId?.image : book.image || "https://via.placeholder.com/50"}
+            title={role === "teacher" ? book.bookId?.name : book.name}
+            category={role === "teacher" ? book.bookId?.category : book.category}
+            copies={role !== "teacher" ? book.copies : undefined}
+            available={role !== "teacher" ? 350 : undefined} 
+            studentName={role === "teacher" ? (book.studentId ? book.studentId.fullName : null) : undefined}
+            status={role === "teacher" ? book.status : undefined}
+            issueDate={role === "teacher" ? book.issueDate : undefined}
+            role={role}
           />
         ))
       )}
