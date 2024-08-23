@@ -67,15 +67,19 @@ const EditorComponent = ({
   const modules = {
     toolbar: {
       container: [
-        [{ header: [1, 2, 3, false] }],
-        ["bold", "italic", "underline", "strike"], // toggled buttons
-        [{ script: "sub" }, { script: "super" }], // superscript/subscript
-        ["clean"],
-        [{ align: [] }],
-        [{ list: "bullet" }, { list: "ordered" }],
-        [{ color: [] }, { background: [] }],
-        ["link", "image", "video"],
-        ["blockquote", "code-block"],
+        [{ header: [1, 2, 3, false] }, { title: "Heading" }],
+        ["bold", "italic", "underline", "strike", { title: "Bold" }], // toggled buttons
+        [
+          { script: "sub" },
+          { script: "super" },
+          { title: "Subscript/Superscript" },
+        ],
+        ["clean", { title: "Clear Formatting" }],
+        [{ align: [] }, { title: "Align" }],
+        [{ list: "bullet" }, { list: "ordered" }, { title: "List" }],
+        [{ color: [] }, { background: [] }, { title: "Color/Background" }],
+        ["link", "image", "video", { title: "Link/Image/Video" }],
+        ["blockquote", "code-block", { title: "Blockquote/Code Block" }],
       ],
       handlers: {
         image: handleImageUpload,
@@ -168,6 +172,31 @@ const EditorComponent = ({
           @keyframes spin {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
+          }
+
+          /* Tooltip styles */
+          .ql-toolbar .ql-picker-item:hover::after,
+          .ql-toolbar .ql-stroke:hover::after,
+          .ql-toolbar .ql-fill:hover::after,
+          .ql-toolbar .ql-picker-label:hover::after {
+            content: attr(title);
+            position: absolute;
+            background-color: #333;
+            color: #fff;
+            padding: 5px;
+            border-radius: 5px;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+            font-size: 12px;
+          }
+
+          .ql-toolbar .ql-picker-item,
+          .ql-toolbar .ql-stroke,
+          .ql-toolbar .ql-fill,
+          .ql-toolbar .ql-picker-label {
+            position: relative;
           }
         `}
       </style>

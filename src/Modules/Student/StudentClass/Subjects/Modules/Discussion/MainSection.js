@@ -7,6 +7,8 @@ import { MdKeyboardArrowDown } from "react-icons/md";
 import { GoDiscussionClosed } from "react-icons/go";
 import SubjectSideBar from "../../Component/SubjectSideBar";
 import useFetchClassDiscussions from "../../../../../../Hooks/AuthHooks/Staff/Admin/Disscussion/useFetchClassDiscussions";
+import NoDataFound from "../../../../../../Components/Common/NoDataFound";
+import Spinner from "../../../../../../Components/Common/Spinner"; // Assuming you have a Spinner component
 
 const MainSection = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -42,48 +44,46 @@ const MainSection = () => {
     (discussion) => discussion.isPinned
   );
 
-  // if (loading) {
-  //   return <div>Loading...</div>;
-  // }
-
-  // if (error) {
-  //   return <div>Error: {error}</div>;
-  // }
-
   return (
     <div className="flex">
       <SubjectSideBar />
-      <div className="w-full p-3 border-l">
-        <DiscussionHeader
-          onSearch={handleSearch}
-          onFilterChange={handleFilterChange}
-          loading={loading}
-          error={error}
-        />
-        <PinnedDiscussions discussions={pinnedDiscussions} />
-        <div className="p-3">
-          <div className="flex items-center gap-2 ml-3 mb-2">
-            <GoDiscussionClosed className="text-xl text-green-600" />
-            <h2 className="text-xl">All Discussions</h2>
-            <MdKeyboardArrowDown className="text-gray-500 h-8 w-8" />
+      <div className="w-full h-full p-3 border-l flex flex-col">
+        {loading ? (
+          <div className="flex justify-center items-center w-full h-screen">
+            <Spinner />
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {filteredDiscussions.length > 0 ? (
-              filteredDiscussions.map((discussion) => (
-                <DiscussionCard key={discussion._id} discussion={discussion} />
-              ))
-            ) : (
-              <div className="flex justify-center items-center w-full h-full ">
-                <div className="flex flex-col items-center justify-center h-full">
-                  <GoDiscussionClosed className="text-gray-400 w-24 h-24 mb-4" />
-                  <p className="text-gray-500 text-lg">
-                    No discussions available
-                  </p>
-                </div>
+        ) : (
+          <>
+            <DiscussionHeader
+              onSearch={handleSearch}
+              onFilterChange={handleFilterChange}
+              loading={loading}
+              error={error}
+            />
+            <PinnedDiscussions discussions={pinnedDiscussions} />
+            <div className="p-3 w-full flex-grow flex flex-col">
+              <div className="flex items-center gap-2 ml-3 mb-2">
+                <GoDiscussionClosed className="text-xl text-green-600" />
+                <h2 className="text-xl">All Discussions</h2>
+                <MdKeyboardArrowDown className="text-gray-500 h-8 w-8" />
               </div>
-            )}
-          </div>
-        </div>
+              <div className="flex-grow flex justify-center items-center">
+                {filteredDiscussions.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
+                    {filteredDiscussions.map((discussion) => (
+                      <DiscussionCard
+                        key={discussion._id}
+                        discussion={discussion}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <NoDataFound title="Discussions" />
+                )}
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

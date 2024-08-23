@@ -152,7 +152,7 @@ const EventScheduler = () => {
 
     try {
       if (selectedEvent) {
-        await updateEvent(selectedEvent._id, eventData,token);
+        await updateEvent(selectedEvent._id, eventData, token);
         toast.success("Event updated successfully!");
       } else {
         const result = await createEvent(eventData, token);
@@ -172,7 +172,7 @@ const EventScheduler = () => {
 
   const handleDeleteEvent = async () => {
     try {
-      await deleteEvent(selectedEvent._id,token);
+      await deleteEvent(selectedEvent._id, token);
       handleSidebarClose();
       refreshEvents();
       toast.success("Event deleted successfully!");
@@ -218,10 +218,10 @@ const EventScheduler = () => {
     "#FBB778", // orange
   ];
 
-  const paginatedEvents = filteredEvents.slice(
-    currentPage * itemsPerPage,
-    (currentPage + 1) * itemsPerPage
-  );
+  const paginatedEvents = filteredEvents
+    .filter(event => event.startDate >= currentDate) // Filter events from the current date onward
+    .slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage);
+
 
   return (
     <Layout title="Event">

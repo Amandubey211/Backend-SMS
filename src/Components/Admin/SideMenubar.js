@@ -13,9 +13,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { toggleSidebar } from "../../Redux/Slices/Common/SidebarSlice.js";
 import useStaffLogout from "../../Hooks/AuthHooks/Staff/useStaffLogOut.js";
 import LogoutConfirmationModal from "../Common/LogoutConfirmationModal.js";
-import profileIcon from '../../Assets/DashboardAssets/profileIcon.png'
+import profileIcon from "../../Assets/DashboardAssets/profileIcon.png";
 const isActivePath = (path, locationPath) => locationPath.startsWith(path);
-
 const SideMenubar = () => {
   const dispatch = useDispatch();
   const location = useLocation();
@@ -26,11 +25,10 @@ const SideMenubar = () => {
     role: state.Auth.role,
     userDetails: state.Auth.userDetail,
   }));
-  
 
   const [openItems, setOpenItems] = useState([]);
-  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false); 
-  const [isLoggingOut, setIsLoggingOut] = useState(false); 
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
   const toggleDropdown = (title) => {
     setOpenItems((prevOpenItems) =>
@@ -47,12 +45,13 @@ const SideMenubar = () => {
   const confirmLogout = async () => {
     setIsLoggingOut(true);
     try {
-      await staffLogout(); // Perform the actual logout
-      setIsLogoutModalOpen(false); // Close modal after confirmation
+      await staffLogout();
+      setIsLogoutModalOpen(false);
     } finally {
       setIsLoggingOut(false);
     }
   };
+
   const HandleNavigate = () => {
     if(role=='admin'){
        navigate("/users/admin");   
@@ -62,6 +61,11 @@ const SideMenubar = () => {
     }
 
   };
+
+  const filteredSidebarData = sidebarData.filter((item) =>
+    item.roles.includes(role)
+  );
+
   return (
     <nav
       className={`fixed top-0 left-0 bottom-0 transition-all duration-300 p-1 px-3 z-30 border-r flex flex-col bg-white ${
@@ -93,15 +97,14 @@ const SideMenubar = () => {
         </button>
       </div>
 
-      {/* Sidebar menu list with scroll overflow */}
       <div className="flex-grow overflow-y-auto no-scrollbar">
         {isOpen && <h2 className="text-gray-500 my-1">MENU</h2>}
         <ul className={`space-y-1 ${!isOpen && "mt-3"}`}>
-          {sidebarData.map((item, index) => (
+          {filteredSidebarData.map((item, index) => (
             <React.Fragment key={index}>
               {item.items ? (
                 <div
-                  className={`flex items-center w-full p-2 rounded-lg cursor-pointer  ${
+                  className={`flex items-center w-full p-2 rounded-lg cursor-pointer ${
                     isActivePath(item.path, location.pathname) ||
                     (item.items &&
                       item.items.some((subItem) =>
@@ -171,28 +174,30 @@ const SideMenubar = () => {
                   ))) &&
                 item.items && (
                   <ul id={`submenu-${index}`} className="pl-2 space-y-2">
-                    {item.items.map((subItem, subIndex) => (
-                      <NavLink
-                        key={subIndex}
-                        to={subItem.path}
-                        className={({ isActive }) =>
-                          `flex items-center p-2 rounded-lg ${
-                            isActive ||
-                            isActivePath(subItem.path, location.pathname)
-                              ? "text-purple-500 bg-purple-100"
-                              : "text-gray-700 hover:bg-gray-100"
-                          } ${isOpen ? "" : "justify-center"}`
-                        }
-                        aria-label={subItem.title}
-                      >
-                        {subItem.icon}
-                        {isOpen && (
-                          <span role="presentation" className="ml-3">
-                            {subItem.title}
-                          </span>
-                        )}
-                      </NavLink>
-                    ))}
+                    {item.items
+                      .filter((subItem) => subItem.roles.includes(role))
+                      .map((subItem, subIndex) => (
+                        <NavLink
+                          key={subIndex}
+                          to={subItem.path}
+                          className={({ isActive }) =>
+                            `flex items-center p-2 rounded-lg ${
+                              isActive ||
+                              isActivePath(subItem.path, location.pathname)
+                                ? "text-purple-500 bg-purple-100"
+                                : "text-gray-700 hover:bg-gray-100"
+                            } ${isOpen ? "" : "justify-center"}`
+                          }
+                          aria-label={subItem.title}
+                        >
+                          {subItem.icon}
+                          {isOpen && (
+                            <span role="presentation" className="ml-3">
+                              {subItem.title}
+                            </span>
+                          )}
+                        </NavLink>
+                      ))}
                   </ul>
                 )}
             </React.Fragment>
@@ -202,25 +207,27 @@ const SideMenubar = () => {
 
       <div className="p-2 border-t flex items-center justify-between">
         <img
-          src={
-            userDetails?.profile || profileIcon
-          }
+          src={userDetails?.profile || profileIcon}
           alt="Profile"
-          className={`${isOpen ? "w-10 h-10" : "w-8 h-8"} cursor-pointer rounded-full`}
+          className={`${
+            isOpen ? "w-10 h-10" : "w-8 h-8"
+          } cursor-pointer rounded-full`}
           onClick={HandleNavigate}
         />
 
         {isOpen && (
           <div className="flex-1 ml-3">
             <h2 className="font-semibold">
-              {userDetails?.firstName?.slice(0,8) || userDetails?.adminName?.slice(0,8) || "User"}
+              {userDetails?.firstName?.slice(0, 8) ||
+                userDetails?.adminName?.slice(0, 8) ||
+                "User"}
             </h2>
             <p className="text-gray-500 capitalize text-sm">{role}</p>
           </div>
         )}
         <button
           title="logout"
-          onClick={handleLogout} // Open the logout confirmation modal
+          onClick={handleLogout}
           className="ml-3"
           aria-label="Logout"
         >

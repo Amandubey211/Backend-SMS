@@ -4,6 +4,7 @@ import { BsPatchCheckFill } from "react-icons/bs";
 import { AiOutlineEdit, AiOutlineDelete } from "react-icons/ai";
 import { HiOutlineDotsVertical } from "react-icons/hi";
 import { useNavigate, useParams } from "react-router-dom";
+import { ImSpinner3 } from "react-icons/im";
 import useDeleteQuiz from "../../../../Hooks/AuthHooks/Staff/Admin/Quiz/useDeleteQuiz";
 import useDeleteAssignment from "../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useDeleteAssignment";
 import useUpdateAssignment from "../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useUpdateAssignment";
@@ -17,16 +18,9 @@ const ButtonsGroup = ({ data, type, onRefresh }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const menuRef = useRef();
 
-  const {
-    loading: quizLoading,
-    error: quizError,
-    deleteQuiz,
-  } = useDeleteQuiz();
-  const {
-    loading: assignmentLoading,
-    error: assignmentError,
-    deleteAssignment,
-  } = useDeleteAssignment();
+  const { loading: quizLoading, deleteQuiz } = useDeleteQuiz();
+  const { loading: assignmentLoading, deleteAssignment } =
+    useDeleteAssignment();
   const { updateAssignment, loading: updateAssignmentLoading } =
     useUpdateAssignment();
   const { updateQuiz, loading: updateQuizLoading } = useUpdateQuiz();
@@ -72,7 +66,7 @@ const ButtonsGroup = ({ data, type, onRefresh }) => {
     if (type === "Assignment") {
       success = await deleteAssignment(data._id);
     }
-    if (success && !quizError && !assignmentError) {
+    if (success && !quizLoading && !assignmentLoading) {
       onRefresh(); // Trigger data refetch
     }
   };
@@ -82,7 +76,7 @@ const ButtonsGroup = ({ data, type, onRefresh }) => {
     const updatedData = {
       ...data,
       publish: !data?.publish, // Toggle publish status safely with optional chaining
-      allowNumberOfAttempts: data.allowNumberOfAttempts ?? 1,
+      allowNumberOfAttempts: data.allowNumberOfAttempts || null,
       points: data.points ?? 0,
     };
 
@@ -100,6 +94,7 @@ const ButtonsGroup = ({ data, type, onRefresh }) => {
 
   // Use a default value if publish is not present or data is null
   const isPublished = data?.publish ?? false;
+  const isUpdating = updateQuizLoading || updateAssignmentLoading;
 
   return (
     <div className="relative flex justify-center gap-2 items-center w-full p-2 text-gray-700">
@@ -107,9 +102,11 @@ const ButtonsGroup = ({ data, type, onRefresh }) => {
         className="flex items-center space-x-1 px-4 py-1 border rounded-md border-gray-300 text-gray-600 hover:bg-gray-100 transition"
         aria-label={isPublished ? "Unpublish" : "Publish"}
         onClick={handlePublishToggle}
-        disabled={updateQuizLoading || updateAssignmentLoading || !data}
+        disabled={isUpdating || !data}
       >
-        {isPublished ? (
+        {isUpdating ? (
+          <ImSpinner3 className="animate-spin text-gray-500" />
+        ) : isPublished ? (
           <>
             <BsPatchCheckFill aria-hidden="true" className="text-green-600" />
             <span>Publish</span>

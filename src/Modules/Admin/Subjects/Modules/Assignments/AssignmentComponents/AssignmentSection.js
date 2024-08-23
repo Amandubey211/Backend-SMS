@@ -1,12 +1,14 @@
 import React from "react";
 import { FaPlayCircle } from "react-icons/fa";
+import Spinner from "../../../../../../Components/Common/Spinner";
+import NoDataFound from "../../../../../../Components/Common/NoDataFound";
 
 const AssignmentSection = ({ assignment, loading, error }) => {
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error}</p>;
+  if (loading) return <Spinner />;
+  if (error) return <NoDataFound />;
 
   if (!assignment) return null;
-console.log(assignment)
+  console.log(assignment);
   const { name, content, thumbnail, type, videoThumbnailUrl } = assignment;
 
   return (
@@ -14,10 +16,17 @@ console.log(assignment)
       <h2 className="text-2xl font-semibold mb-2">{name}</h2>
       <p className="text-sm text-green-600 mb-4">Assignment</p>
       {/* <img src={thumbnail} alt="Assignment" className="w-full rounded-lg mb-4" /> */}
-      <div dangerouslySetInnerHTML={{ __html: content }} className="text-gray-700 mb-6" />
+      <div
+        dangerouslySetInnerHTML={{ __html: content }}
+        className="text-gray-700 mb-6"
+      />
       {videoThumbnailUrl && (
         <div className="relative">
-          <img src={videoThumbnailUrl} alt="Video Thumbnail" className="w-full rounded-lg" />
+          <img
+            src={videoThumbnailUrl}
+            alt="Video Thumbnail"
+            className="w-full rounded-lg"
+          />
           <FaPlayCircle className="absolute text-white text-6xl inset-0 m-auto" />
         </div>
       )}

@@ -233,7 +233,6 @@ const ParentDash = lazy(() =>
   import("../Modules/Parents/Dasboard/ParentDash.js")
 );
 
-
 const MyChildren = lazy(() =>
   import("../Modules/Parents/Childrens/ChildScreen.js")
 );
@@ -940,7 +939,11 @@ function App() {
       element: <ParentAnnounce />,
       errorElement: <Error />,
     },
-    { path: "/childgrade/:studentId", element: <ChildGrade />, errorElement: <Error /> },
+    {
+      path: "/childgrade/:studentId",
+      element: <ChildGrade />,
+      errorElement: <Error />,
+    },
   ]);
  
   return (
