@@ -32,7 +32,6 @@ const EditorComponent = ({
         process.env.REACT_APP_CLOUDINARY_URL,
         formData
       );
-      console.log(response.data);
       if (response.data.secure_url) {
         const imageUrl = response.data.secure_url;
 
@@ -70,12 +69,29 @@ const EditorComponent = ({
     input.click();
   }, [handleImageUpload]);
 
+  // Print the content of the editor
+  const handlePrint = useCallback(() => {
+    if (editor.current) {
+      const printWindow = window.open("", "PRINT", "height=600,width=800");
+      printWindow.document.write(`
+        <html>
+        <head><title>Print</title></head>
+        <body>${editor.current.value}</body>
+        </html>
+      `);
+      printWindow.document.close(); // Necessary for some browsers
+      printWindow.focus(); // Necessary for some browsers
+      printWindow.print();
+      printWindow.close();
+    }
+  }, []);
+
   // Jodit Editor Configuration
   const config = useMemo(
     () => ({
       readonly: false,
       height: isCreateQuestion ? 300 : 400,
-      spellcheck: true, // Enable spellcheck
+      spellcheck: true, // Enable browser's native spellcheck in the editor
       toolbarSticky: true,
       toolbarAdaptive: false,
       showCharsCounter: true, // Show character counter
@@ -85,6 +101,7 @@ const EditorComponent = ({
       askBeforePasteFromWord: false,
       removeButtons: ["powered-by-jodit"], // Remove "Powered by Jodit"
       buttons: [
+        "font", // Font family selector
         "fontsize", // Font size selector
         "bold",
         "italic",
@@ -98,22 +115,31 @@ const EditorComponent = ({
         "ol",
         "outdent",
         "indent",
-        "link",
-        {
-          name: "image",
-          icon: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M21 7h-3.17l-1.24-1.45A2.01 2.01 0 0014.88 5h-5.76c-.71 0-1.37.39-1.71 1.05L6.17 7H3c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2zm-9 11c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" fill="currentColor"/>
-            </svg>`,
-          exec: triggerImageUpload,
-          tooltip: "Upload Image",
-        },
+        "symbols",
         "brush", // Font color/brush tool
-        "video",
-        "table", // Include Table
+
         "undo", // Add Undo button
         "redo", // Add Redo button
+        "spellcheck",
+
+        "table", // Include Table
+
+        {
+          name: "image",
+          tooltip: "Upload Image",
+          exec: triggerImageUpload,
+        },
+
+        "video",
+        "file",
+        "link",
         "preview", // Include Preview
         "fullsize", // Include Fullscreen
+        {
+          name: "print",
+          tooltip: "Print Content",
+          exec: handlePrint,
+        },
       ],
       events: {
         change: (newContent) => {
@@ -124,7 +150,7 @@ const EditorComponent = ({
         },
       },
     }),
-    [isCreateQuestion, onEditorChange, triggerImageUpload]
+    [isCreateQuestion, onEditorChange, triggerImageUpload, handlePrint]
   );
 
   return (
@@ -142,7 +168,7 @@ const EditorComponent = ({
               value={assignmentName}
               onChange={(e) => onNameChange(e.target.value)}
               className="w-full p-2 border border-gray-300 rounded-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              spellCheck="false" // Disabling spell check at the input level
+              spellCheck="true" // Enable spell check in input field
             />
           </div>
         </div>

@@ -5,6 +5,7 @@ import { useParams } from "react-router-dom";
 import { setModules } from "../../../../../Redux/Slices/Admin/SubjectSlice";
 import { setSelectedModule } from "../../../../../Redux/Slices/Common/CommonSlice";
 import { baseUrl } from "../../../../../config/Common";
+import toast from "react-hot-toast";
 
 const useGetModulesForStudent = () => {
   const [loading, setLoading] = useState(false);
@@ -40,8 +41,8 @@ const useGetModulesForStudent = () => {
         setModulesData(response.data.data); // Update local state
 
         // Check if the selectedModule is empty or the moduleId doesn't exist in fetchedModules
-        const selectedModuleExists = fetchedModules.find(
-          (module) => module._id === selectedModule.moduleId
+        const selectedModuleExists = fetchedModules?.find(
+          (module) => module?._id === selectedModule?.moduleId
         );
 
         if (!selectedModule || !selectedModuleExists) {
@@ -58,8 +59,8 @@ const useGetModulesForStudent = () => {
           }
         } else {
           // If selectedModule exists, update it with the fetched data
-          const updatedSelectedModule = fetchedModules.find(
-            (module) => module._id === selectedModule.moduleId
+          const updatedSelectedModule = fetchedModules?.find(
+            (module) => module?._id === selectedModule?.moduleId
           );
           if (updatedSelectedModule) {
             dispatch(
