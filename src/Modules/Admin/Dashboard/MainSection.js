@@ -132,12 +132,12 @@ const MainSection = () => {
         </div>
       </div>
       <div className="flex flex-wrap justify-between items-start border-y">
-        // <div className="w-full md:w-1/2 p-2">
-        //   <NoticeBoard />
-        // </div>
-        // <div className="w-full md:w-1/2 p-2">
-        //   <Events />
-        // </div>
+        <div className="w-full md:w-1/2 p-2">
+          <NoticeBoard />
+        </div>
+        <div className="w-full md:w-1/2 p-2">
+          <Events />
+        </div>
       </div>
     </div>
   );
