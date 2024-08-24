@@ -43,7 +43,7 @@ const NoticeBoard = () => {
   return (
     <div className="p-2">
       <div className="flex justify-between p-4 items-center px-6">
-        <h2 className="text-xl font-semibold text-gray-600">Notice Boardz</h2>
+        <h2 className="text-xl font-semibold text-gray-600">Notice Board</h2>
         <button className="text-blue-500" onClick={() => navigate('/noticeboard/announcements')}>View All</button>
       </div>
       {topNotices.length === 0 ? (
