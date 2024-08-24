@@ -43,7 +43,7 @@ const MainSection = () => {
       iconBackground: "bg-[#564FFD]",
     },
     {
-      label: "Teacher",
+      label: "Teacher---hai",
       value:
         typeof dashboardData?.teachers === "number"
           ? dashboardData.teachers
