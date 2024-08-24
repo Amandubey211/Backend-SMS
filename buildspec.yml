@@ -11,8 +11,7 @@ phases:
     commands:
       - echo Build started on `date`
       - npm run build
-      - echo Invalidating CloudFront cache...
-      - aws cloudfront create-invalidation --distribution-id E2Y3G8AHSNNLI1 --paths "/*"
+    
 
 artifacts:
   files:
