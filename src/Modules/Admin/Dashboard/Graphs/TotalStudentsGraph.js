@@ -20,8 +20,9 @@ const TotalStudentsGraphjs = () => {
   }, [fetchAdminDashboardData]);
 
   useEffect(() => {
+
     if (role === "teacher" && selectedClass) {
-      console.log("dashboardData", dashboardData);
+      
 
       const selectedClassData = dashboardData?.studentData?.find(
         (classItem) => classItem.classId === selectedClass
@@ -40,8 +41,8 @@ const TotalStudentsGraphjs = () => {
       }
     } else {
       setClassData({
-        maleStudents: dashboardData?.studentData[0].maleStudents || 0,
-        femaleStudents: dashboardData?.studentData[0].femaleStudents || 0,
+        maleStudents: dashboardData?.studentData[0]?.maleStudents || 0,
+        femaleStudents: dashboardData?.studentData[0]?.femaleStudents || 0,
       });
     }
   }, [selectedClass, dashboardData, role]);

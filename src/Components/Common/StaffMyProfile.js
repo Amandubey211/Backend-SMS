@@ -12,8 +12,6 @@ import DashLayout from "../Admin/AdminDashLayout";
 const StaffMyProfile = () => {
     const { userDetail } = useGetUserDetail();
   const user = useSelector((store) => store.Auth.userDetail);
-  const [profileData, setProfileData] = useState(user);
-
   useEffect(() => {
     const getData = async () => {
       await  userDetail();
@@ -21,9 +19,6 @@ const StaffMyProfile = () => {
     getData();
   }, []);
 
-  useEffect(() => {
-    setProfileData(user);
-  }, [profileData]);
 
   const [passwordData, setPasswordData] = useState({
     currentPassword: "",
@@ -61,17 +56,17 @@ const StaffMyProfile = () => {
         <div className="flex flex-col w-full p-4 gap-3">
           <div className="flex items-center px-6 py-4 gap-3 border rounded-md">
             <img
-              src={profileData?.profile ? profileData?.profile : profileIcon}
+              src={user?.profile ? user?.profile : profileIcon}
               alt="Profile"
               className="w-20 h-20 rounded-full shadow-lg border"
             />
             <div className="flex flex-row justify-between w-full">
-               <h2 className="text-xl font-semibold">{profileData?.fullName}</h2>
+               <h2 className="text-xl font-semibold">{user?.fullName}</h2>
               <button
                // onClick={handleSidebarOpen}
                 className="px-4 inline-flex items-center border border-transparent text-sm font-medium shadow-sm bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-md hover:from-pink-600 hover:to-purple-600"
               >
-               {profileData?.active ? 'Active':'Deactive'}
+               {user?.active ? 'Active':'Deactive'}
               </button> 
             </div>
           </div>
@@ -81,14 +76,14 @@ const StaffMyProfile = () => {
               <div className="flex flex-col">
                 <span className="font-normal text-gray-500">Full Name</span>
                 <span className="font-medium text-gray-800">
-                  {profileData?.fullName}
+                  {user?.fullName}
                 </span>
               </div>
               <div className="flex flex-col gap-5">
               <div className="flex flex-col">
                 <span className="font-normal text-gray-500">Email</span>
                 <span className="font-medium text-gray-800">
-                  {profileData?.email || '-'}
+                  {user?.email}
                 </span>
               </div>
               
@@ -98,14 +93,14 @@ const StaffMyProfile = () => {
               <div className="flex flex-col">
                 <span className="font-normal text-gray-500">Mobile Number</span>
                 <span className="font-medium text-gray-800">
-                  {profileData?.mobileNumber || '-'}
+                  {user?.mobileNumber}
                 </span>
               </div>
               <div className="flex flex-col gap-5">
               <div className="flex flex-col">
                 <span className="font-normal text-gray-500">Position</span>
                 <span className="font-medium text-gray-800">
-                  {profileData?.position || '-'}
+                  {user?.position }
                 </span>
               </div>
               
@@ -165,7 +160,7 @@ const StaffMyProfile = () => {
             title="Edit Profile"
             width="50%"
           >
-            <EditStudentProfile data={profileData} />
+            <EditStudentProfile data={user} />
           </SidebarSlide> */}
         </div>
         </DashLayout>
