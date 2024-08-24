@@ -1,26 +1,5 @@
 version: 0.2
 
-phases:
-  install:
-    runtime-versions:
-<<<<<<< HEAD
-      nodejs: 16
-    commands:
-      - echo Installing NPM dependencies...
-      - npm install
-  build:
-    commands:
-      - echo Building the React app...
-      - npm run build
-  post_build:
-    commands:
-      - echo Build completed
-
-artifacts:
-  base-directory: build
-  files:
-    - '**/*'
-=======
       nodejs: 18
     commands:
       - echo Installing source NPM dependencies...
@@ -34,4 +13,4 @@ artifacts:
   files:
     - '**/*'
   base-directory: build
->>>>>>> 63fa02f0aae1e867c5f894ada6f40b82d2987c78
+
