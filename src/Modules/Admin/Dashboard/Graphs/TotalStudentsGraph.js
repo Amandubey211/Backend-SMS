@@ -6,7 +6,8 @@ import Fallback from "../../../../Components/Common/Fallback";
 import { useSelector } from "react-redux";
 
 const TotalStudentsGraphjs = () => {
-  const { loading, error, dashboardData, fetchAdminDashboardData } = useGetAdminDashboardData();
+  const { loading, error, dashboardData, fetchAdminDashboardData } =
+    useGetAdminDashboardData();
   const role = useSelector((store) => store.Auth.role);
   const [selectedClass, setSelectedClass] = useState("");
   const [classData, setClassData] = useState({
@@ -19,7 +20,7 @@ const TotalStudentsGraphjs = () => {
   }, [fetchAdminDashboardData]);
 
   useEffect(() => {
-    console.log("dashboardData", dashboardData);
+
     if (role === "teacher" && selectedClass) {
       
 
@@ -58,7 +59,10 @@ const TotalStudentsGraphjs = () => {
     return <p>Error: {error}</p>;
   }
 
-  if (!dashboardData || (classData.maleStudents === 0 && classData.femaleStudents === 0)) {
+  if (
+    !dashboardData ||
+    (classData.maleStudents === 0 && classData.femaleStudents === 0)
+  ) {
     return (
       <div className="max-w-xs px-2 h-full">
         <h2 className="text-2xl font-semibold">Total Students</h2>
@@ -73,7 +77,7 @@ const TotalStudentsGraphjs = () => {
   const data = {
     datasets: [
       {
-        data: [classData.maleStudents, classData.femaleStudents],
+        data: [classData.maleStudents || 0, classData.femaleStudents || 0],
         backgroundColor: ["#23C55E", "#8F77F3"],
         borderWidth: 0,
         cutout: "70%",
@@ -112,10 +116,9 @@ const TotalStudentsGraphjs = () => {
     },
   };
 
-
   return (
     <div className="max-w-xs px-2 py-4 h-full">
-      <div className="flex flex-col md:flex-row justify-between items-center" >
+      <div className="flex flex-col md:flex-row justify-between items-center">
         <h2 className="text-2xl font-semibold mb-4 md:mb-0">Total Students</h2>
         {role === "teacher" && (
           <div className="mb-4 md:mb-0">
@@ -135,12 +138,17 @@ const TotalStudentsGraphjs = () => {
         )}
       </div>
 
-      <div className="relative p-8 my-5 mb-12" style={{ width: "300px", height: "300px" }}>
+      <div
+        className="relative p-8 my-5 mb-12"
+        style={{ width: "300px", height: "300px" }}
+      >
         <Doughnut data={data} options={options} />
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="text-center">
             <span className="block text-sm font-medium">Total Students</span>
-            <span className="block text-xl font-bold">{classData.maleStudents + classData.femaleStudents}</span>
+            <span className="block text-xl font-bold">
+              {classData.maleStudents + classData.femaleStudents}
+            </span>
           </div>
         </div>
       </div>
@@ -149,14 +157,18 @@ const TotalStudentsGraphjs = () => {
           <div className="w-16 h-1 bg-[#8F77F3] rounded-full mb-1"></div>
           <div className="text-left">
             <span className="text-gray-700">Female Students</span>
-            <div className="font-bold text-gray-700">{classData.femaleStudents}</div>
+            <div className="font-bold text-gray-700">
+              {classData.femaleStudents}
+            </div>
           </div>
         </div>
         <div className="flex flex-col items-start">
           <div className="w-16 h-1 bg-[#23C55E] rounded-full mb-1"></div>
           <div className="text-left">
             <span className="text-gray-700">Male Students</span>
-            <div className="font-bold text-gray-700">{classData.maleStudents}</div>
+            <div className="font-bold text-gray-700">
+              {classData.maleStudents}
+            </div>
           </div>
         </div>
       </div>

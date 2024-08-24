@@ -9,8 +9,8 @@ import useStaffLogin from "../../../Hooks/AuthHooks/Staff/useStaffLogin";
 
 const StaffLoginForm = () => {
   const [staffCredentials, setStaffCredentials] = useState({
-    email: "",
-    password: "",
+    email: "blissshinetour@gmail.com",
+    password: "123456",
   });
   const { loading, staffLogin } = useStaffLogin();
   const [showPassword, setShowPassword] = useState(false);
@@ -47,7 +47,7 @@ const StaffLoginForm = () => {
             </div>
             <span>LMS Home</span>
           </NavLink>
-          <h2 className="text-2xl font-semibold mb-6">Staff  Account</h2>
+          <h2 className="text-2xl font-semibold mb-6">Staff Account</h2>
           <form onSubmit={handleSubmit}>
             <h6>Login in using:</h6>
             <div className="mb-4">

@@ -81,10 +81,27 @@ const StudentInfo = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setStudentInfo({
-      ...studentInfo,
-      [name]: value,
-    });
+
+    if (name === "dateOfBirth") {
+      const age = calculateAge(new Date(value));
+      setStudentInfo({
+        ...studentInfo,
+        [name]: value,
+        age: age,
+      });
+    } else {
+      setStudentInfo({
+        ...studentInfo,
+        [name]: value,
+      });
+    }
+  };
+
+  // Helper function to calculate age based on DOB
+  const calculateAge = (dob) => {
+    const diffMs = Date.now() - dob.getTime();
+    const ageDate = new Date(diffMs);
+    return Math.abs(ageDate.getUTCFullYear() - 1970);
   };
 
   const handleAddressChange = (e, type) => {
@@ -235,7 +252,6 @@ const StudentInfo = () => {
             toast.error("Failed to upload the document");
           }
         }
-
       } else {
         toast.error("Failed to save student details.");
       }
@@ -283,19 +299,19 @@ const StudentInfo = () => {
           <ParentInfo
             studentInfo={studentInfo}
             handleInputChange={handleInputChange}
-          // dont remove  the below code --------------------
-          // fatherImagePreview={fatherImagePreview}
-          // motherImagePreview={motherImagePreview}
-          // handleFatherImageChange={handleFatherImageChange}
-          // handleMotherImageChange={handleMotherImageChange}
-          // handleRemoveFatherImage={() => {
-          //   setFatherImagePreview(null);
-          //   setStudentInfo({ ...studentInfo, fatherImage: null });
-          // }}
-          // handleRemoveMotherImage={() => {
-          //   setMotherImagePreview(null);
-          //   setStudentInfo({ ...studentInfo, motherImage: null });
-          // }}
+            // dont remove  the below code --------------------
+            // fatherImagePreview={fatherImagePreview}
+            // motherImagePreview={motherImagePreview}
+            // handleFatherImageChange={handleFatherImageChange}
+            // handleMotherImageChange={handleMotherImageChange}
+            // handleRemoveFatherImage={() => {
+            //   setFatherImagePreview(null);
+            //   setStudentInfo({ ...studentInfo, fatherImage: null });
+            // }}
+            // handleRemoveMotherImage={() => {
+            //   setMotherImagePreview(null);
+            //   setStudentInfo({ ...studentInfo, motherImage: null });
+            // }}
           />
           <DocumentUploadForm
             type="Admin"
