@@ -5,13 +5,16 @@ phases:
     runtime-versions:
       nodejs: 18
     commands:
-      - echo Installing source NPM dependencies...
+      - echo "Installing NPM dependencies..."
       - npm install
   build:
     commands:
-      - echo Build started on `date`
+      - echo "Build started on `date`"
       - npm run build
-    
+  post_build:
+    commands:
+      - echo "Invalidating CloudFront cache..."
+      - aws cloudfront create-invalidation --distribution-id E2Y3G8AHSNNLI1 --paths "/*"
 
 artifacts:
   files:
