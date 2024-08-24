@@ -43,7 +43,7 @@ const MainSection = () => {
       iconBackground: "bg-[#564FFD]",
     },
     {
-      label: "Teacher---hai",
+      label: "Teacher",
       value:
         typeof dashboardData?.teachers === "number"
           ? dashboardData.teachers
@@ -132,9 +132,9 @@ const MainSection = () => {
         </div>
       </div>
       <div className="flex flex-wrap justify-between items-start border-y">
-        <div className="w-full md:w-1/2 p-2">
+        {/* <div className="w-full md:w-1/2 p-2">
           <NoticeBoard />
-        </div>
+        </div> */}
         <div className="w-full md:w-1/2 p-2">
           <Events />
         </div>
