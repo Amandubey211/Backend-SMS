@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useLocation, NavLink } from "react-router-dom";
+import { useLocation, NavLink, useNavigate } from "react-router-dom";
 import StudentDiwanLogo from "../../Assets/HomeAssets/StudentDiwanLogo.png";
 import { MdOutlineKeyboardArrowUp, MdOutlineKeyboardArrowDown } from "react-icons/md";
 import sidebarData from "./DataFile/sidebarData.js";
@@ -9,18 +9,22 @@ import { useDispatch, useSelector } from "react-redux";
 import smallLogo from "../../Assets/SideBarAsset/smallLogo.png";
 import { toggleSidebar } from "../../Redux/Slices/Common/SidebarSlice.js";
   import  useParentLogout  from '../../Hooks/AuthHooks/Parent/useParentLogout.js';  
-
+import LogoutConfirmationModal from "../Common/LogoutConfirmationModal.js";
+import profileIcon from "../../Assets/DashboardAssets/profileIcon.png";
 const isActivePath = (path, locationPath) => {
   return locationPath.startsWith(path);
 };
 
 const SideMenubar = () => {
-  const isOpen = useSelector((state) => state.sidebar.isOpen);
   const location = useLocation();
   const [openItems, setOpenItems] = useState([]);
   const dispatch = useDispatch();
-  const { parentLogout } = useParentLogout(); // Use the hook
-
+  const { parentLogout } = useParentLogout();
+  const { isOpen, role, userDetails } = useSelector((state) => ({
+    isOpen: state.sidebar.isOpen,
+    role: state.Auth.role,
+    userDetails: state?.Auth?.userDetail,
+  }));
   const toggleDropdown = (title) => {
     if (openItems.includes(title)) {
       setOpenItems(openItems.filter((item) => item !== title));
@@ -28,10 +32,25 @@ const SideMenubar = () => {
       setOpenItems([...openItems, title]);
     }
   };
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false); 
+  const [isLoggingOut, setIsLoggingOut] = useState(false); 
+  const handleLogout = () => {
+    setIsLogoutModalOpen(true);
+  };
 
+  const confirmLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      await parentLogout(); 
+      setIsLogoutModalOpen(false); 
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
+const navigate = useNavigate()
   return (
     <nav
-      className={`transition-all duration-300 h-screen p-1 z-50 bg-white border-r flex flex-col ${
+      className={`sticky top-0 transition-all duration-300 h-screen p-1 z-50 bg-white border-r flex flex-col ${
         isOpen ? "w-[15%]" : "w-[7%]"
       }`}
     >
@@ -131,17 +150,41 @@ const SideMenubar = () => {
           ))}
         </ul>
       </div>
+      <div className={`fixed bottom-1  h-[3rem]  flex flex- row items-center justify-center border-t w-auto ${isOpen? "w-[14%]" : "w-[7%]"}  `}>
+        <img
+          src={
+            userDetails?.profile || profileIcon
+          }
+          alt="Profile"
+          className={`${isOpen ? "w-10 h-10" : "w-8 h-8"} cursor-pointer rounded-full`}
+          onClick={()=>navigate('/users/parent/profile')}
+        />
 
-      {/* Logout button at the bottom */}
-      <div className="mt-auto p-2">
+        {isOpen && (
+          <div className="flex-1 ml-3">
+            <h2 className="font-semibold">
+              {userDetails?.fatherName?.slice(0,8) || "User"}
+            </h2>
+            <p className="text-gray-500 capitalize text-sm">{role}</p>
+          </div>
+        )}
         <button
-          onClick={parentLogout}  // Logout function tied to button click
-          className="flex items-center justify-center w-full text-gray-700 hover:text-white hover:bg-gray-900 p-2 rounded-lg"
+          title="logout"
+          onClick={handleLogout} 
+          className="ml-3"
+          aria-label="Logout"
         >
-          <FiLogOut className={`${isOpen ? "w-6 h-6" : "w-4 h-4"}`} />
-          {isOpen && <span className="ml-2">Logout</span>}
+          <FiLogOut
+            className={`${isOpen ? "w-7 h-7" : "w-5 h-5"} text-gray-500`}
+          />
         </button>
       </div>
+      <LogoutConfirmationModal
+        isOpen={isLogoutModalOpen}
+        onClose={() => setIsLogoutModalOpen(false)}
+        onConfirm={confirmLogout}
+        loading={isLoggingOut}
+      />
     </nav>
   );
 };

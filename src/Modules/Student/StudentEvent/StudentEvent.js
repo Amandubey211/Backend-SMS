@@ -107,7 +107,9 @@ const StudentEvent = () => {
           return (
             <li
               key={event.id}
-              className={`inline-block px-2 py-1 rounded text-white ${bgColors[index % bgColors.length]} shadow-md cursor-pointer`}
+              className={`inline-block px-2 py-1 rounded text-white ${
+                bgColors[index % bgColors.length]
+              } shadow-md cursor-pointer`}
               onClick={() => handleStickerClick(event)}
             >
               {event.title} - {timeString}
@@ -155,11 +157,13 @@ const StudentEvent = () => {
               </h1>
             </div>
 
-            <div className="my-4 w-full h-40 flex rounded-sm gap-20 pl-10 relative ">
+            <div className="my-4 w-full h-40 flex rounded-sm gap-8 pl-8 relative ">
               {currentPage > 0 && (
                 <div
                   className="p-1 rounded-full text-purple-500 bg-white border-2 cursor-pointer absolute left-0 top-1/2 transform -translate-y-1/2"
-                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 0))}
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.max(prev - 1, 0))
+                  }
                 >
                   <IoIosArrowBack />
                 </div>
@@ -254,19 +258,21 @@ const StudentEvent = () => {
                       </select>
                       <div className="flex space-x-2">
                         <button
-                          className={`border rounded px-2 py-1 ${type === "month"
-                            ? "bg-gradient-to-r from-pink-500 to-purple-500 text-white"
-                            : ""
-                            }`}
+                          className={`border rounded px-2 py-1 ${
+                            type === "month"
+                              ? "bg-gradient-to-r from-pink-500 to-purple-500 text-white"
+                              : ""
+                          }`}
                           onClick={() => onTypeChange("month")}
                         >
                           Month
                         </button>
                         <button
-                          className={`border rounded px-2 py-1 ${type === "year"
-                            ? "bg-gradient-to-r from-pink-500 to-purple-500 text-white"
-                            : ""
-                            }`}
+                          className={`border rounded px-2 py-1 ${
+                            type === "year"
+                              ? "bg-gradient-to-r from-pink-500 to-purple-500 text-white"
+                              : ""
+                          }`}
                           onClick={() => onTypeChange("year")}
                         >
                           Year

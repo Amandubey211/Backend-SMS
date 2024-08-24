@@ -37,7 +37,7 @@ const MainSection = () => {
             <div className="h-full">
               {activeTab === "instructions" &&
                 (loading ? (
-                  <div>Loading...</div>
+                  <Spinner />
                 ) : (
                   <QuizInstructionSection content={quiz?.content} />
                 ))}

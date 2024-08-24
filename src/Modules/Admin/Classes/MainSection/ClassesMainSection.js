@@ -3,9 +3,9 @@ import ClassCard from "./ClassCard";
 import Sidebar from "../../../../Components/Common/Sidebar";
 import AddNewClass from "./AddNewClass";
 import { useSelector } from "react-redux";
-import { PiSpinner } from "react-icons/pi";
-import useGetAllClasses from "../../../../Hooks/AuthHooks/Staff/Admin/Class/useGetAllClasses";
 import Spinner from "../../../../Components/Common/Spinner";
+import useGetAllClasses from "../../../../Hooks/AuthHooks/Staff/Admin/Class/useGetAllClasses";
+import NoDataFound from "../../../../Components/Common/NoDataFound"; // Import the NoDataFound component
 
 const ClassesMainSection = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -16,13 +16,15 @@ const ClassesMainSection = () => {
   const handleSidebarClose = () => setSidebarOpen(false);
 
   useEffect(() => {
-    fetchClasses();
-  }, [fetchClasses]);
+    // Fetch classes only if there are no classes loaded yet
+    if (classes.length === 0) {
+      fetchClasses();
+    }
+  }, [classes.length, fetchClasses]);
 
   return (
     <div className="min-h-screen p-4">
       <div className="flex justify-end">
-        {/* <h1 className="text-lg opacity-50">All Classes</h1> */}
         <button
           onClick={handleSidebarOpen}
           className="px-4 py-2 rounded-md bg-gradient-to-r from-pink-100 to-purple-200"
@@ -34,7 +36,9 @@ const ClassesMainSection = () => {
       {loading ? (
         <Spinner />
       ) : error ? (
-        <p className="text-red-500 p-4">{error}</p>
+        <NoDataFound title="Classes" />
+      ) : classes.length === 0 ? (
+        <NoDataFound title="Classes" /> // Use NoDataFound when no classes are found
       ) : (
         <div className="grid grid-cols-1 gap-4 mt-4 sm:grid-cols-2 lg:grid-cols-4">
           {classes?.map((cls) => (

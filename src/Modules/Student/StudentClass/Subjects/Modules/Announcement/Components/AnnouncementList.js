@@ -5,6 +5,7 @@ import { useParams } from "react-router-dom";
 import AnnouncementHeader from "./AnnouncementHeader";
 import AnnouncementCard from "./AnnouncementCard";
 import useGetAllAnnouncements from "../../../../../../../Hooks/AuthHooks/Staff/Admin/Announcement/useGetAllAnnouncements";
+import NoDataFound from "../../../../../../../Components/Common/NoDataFound";
 
 const AnnouncementList = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -42,10 +43,7 @@ const AnnouncementList = () => {
 
       {/* No Announcements Found */}
       {!loading && !error && filteredAnnouncements.length === 0 && (
-        <div className="flex flex-col items-center justify-center h-72">
-          <FaExclamationCircle className="text-6xl text-gray-400" />
-          <p className="mt-4 text-gray-600">No announcements found</p>
-        </div>
+        <NoDataFound title="announcements" />
       )}
 
       {/* Display Announcements */}

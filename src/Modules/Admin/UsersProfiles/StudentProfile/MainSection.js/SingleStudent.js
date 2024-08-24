@@ -45,7 +45,7 @@ const SingleStudent = () => {
   return (
     <Layout title="Student Details">
       <DashLayout>
-        <div className="flex gap-2 bl-gray-500  ">
+        <div className="flex gap-2   ">
           <div className="flex flex-col  h-auto w-[25%]">
             <StudentProfile student={student} />
             <NavigationMenu activeItem={activeItem} setActiveItem={setActiveItem} items={[

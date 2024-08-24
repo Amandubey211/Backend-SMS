@@ -5,8 +5,9 @@ import { useParams } from "react-router-dom";
 import { shallowEqual, useSelector } from "react-redux";
 import ProfileCard from "./ProfileCard";
 import { baseUrl } from "../../../../config/Common";
-import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 import Spinner from "../../../../Components/Common/Spinner";
+import NoDataFound from "../../../../Components/Common/NoDataFound";
+import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 
 const StudentClassMates = () => {
   const { selectedClass, selectedClassName } = useSelector(
@@ -20,6 +21,7 @@ const StudentClassMates = () => {
   const [classmates, setClassmates] = useState([]);
   const [loading, setLoading] = useState(true);
   useNavHeading(selectedClassName, "Classmates");
+
   useEffect(() => {
     console.log("cid from URL params:", cid);
     console.log("Class ID from Redux (selectedClass):", selectedClass);
@@ -46,7 +48,9 @@ const StudentClassMates = () => {
         );
 
         if (!response.ok) {
-          throw new Error(`Failed to fetch classmates, status: ${response.status}`);
+          throw new Error(
+            `Failed to fetch classmates, status: ${response.status}`
+          );
         }
 
         const data = await response.json();
@@ -67,10 +71,7 @@ const StudentClassMates = () => {
   }, [cid, selectedClass]);
 
   if (loading) {
-    return (
-      <Spinner/>
-    )
-    ;
+    return <Spinner />;
   }
 
   return (
@@ -80,14 +81,21 @@ const StudentClassMates = () => {
           <div className="flex items-center mb-4 gap-3">
             <h2 className="text-xl font-semibold">My Classmates </h2>
             <div className="flex justify-center items-center bg-gradient-to-br from-pink-100 via-purple-100 to-blue-100 rounded-full w-[25px] h-[25px] border border-gray-300">
-
-              <p className="text-lg font-semibold text-purple-500">{classmates.length || 0}</p>
+              <p className="text-lg font-semibold text-purple-500">
+                {classmates.length || 0}
+              </p>
             </div>
           </div>
           <div className="flex flex-wrap -mx-2">
-            {classmates.map((classmate, index) => (
-              <ProfileCard key={index} profile={classmate} />
-            ))}
+            {classmates.length > 0 ? (
+              classmates.map((classmate, index) => (
+                <ProfileCard key={index} profile={classmate} />
+              ))
+            ) : (
+              <div className="h-full w-full flex justify-center items-center">
+                <NoDataFound title="Classmates" />
+              </div>
+            )}
           </div>
         </div>
       </DashLayout>

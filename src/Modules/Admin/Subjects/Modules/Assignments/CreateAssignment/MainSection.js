@@ -10,7 +10,7 @@ const initialFormState = {
   points: "",
   displayGrade: false,
   submissionType: "",
-  allowedAttempts: true, // Default to "Unlimited"
+  allowedAttempts: false,
   numberOfAttempts: null,
   assignTo: "",
   sectionId: null,
@@ -76,77 +76,93 @@ const MainSection = ({ setIsEditing }) => {
     }
   }, [location.state, setIsEditing]);
 
-  const handleNameChange = (name) => setAssignmentName(name);
-  const handleEditorChange = (content) => setEditorContent(content);
+  const handleNameChange = useCallback((name) => setAssignmentName(name), []);
+  const handleEditorChange = useCallback(
+    (content) => setEditorContent(content),
+    []
+  );
 
-  const handleFormChange = (e) => {
+  const handleFormChange = useCallback((e) => {
     const { name, value } = e.target;
     setFormState((prev) => ({
       ...prev,
       [name]: value,
     }));
-  };
+  }, []);
 
-  const handleSave = async (publish) => {
-    try {
-      if (publish) {
-        setPublishLoading(true);
-      } else {
-        setSaveLoading(true);
+  const handleSave = useCallback(
+    async (publish) => {
+      try {
+        if (publish) {
+          setPublishLoading(true);
+        } else {
+          setSaveLoading(true);
+        }
+
+        const allowedAttempts = formState.allowedAttempts === true;
+        let allowNumberOfAttempts = null;
+
+        if (allowedAttempts) {
+          allowNumberOfAttempts = formState.numberOfAttempts
+            ? Number(formState.numberOfAttempts)
+            : null;
+        }
+
+        const assignmentData = {
+          name: assignmentName,
+          content: editorContent,
+          points: formState.points,
+          grade: formState.displayGrade,
+          submissionType: formState.submissionType,
+          allowedAttempts,
+          allowNumberOfAttempts,
+          assignTo: formState?.assignTo,
+          dueDate: formState.dueDate,
+          availableFrom: formState.availableFrom,
+          until: formState.until,
+          thumbnail: formState.thumbnail,
+          classId: cid,
+          subjectId: sid,
+          moduleId: formState.moduleId,
+          chapterId: formState.chapterId,
+          publish,
+        };
+
+        if (formState.assignTo === "Section") {
+          assignmentData.sectionId = formState.sectionId || null;
+        } else if (formState.assignTo === "Group") {
+          assignmentData.groupId = formState.groupId || null;
+        }
+
+        if (isEditing) {
+          let sectionId = formState.sectionId || null;
+          await updateAssignment(assignmentId, assignmentData, sectionId);
+        } else {
+          const response = await createAssignment(assignmentData);
+          setAssignmentId(response?.data?._id);
+        }
+      } catch (error) {
+        console.log(error);
+      } finally {
+        if (publish) {
+          setPublishLoading(false);
+        } else {
+          setSaveLoading(false);
+        }
       }
-
-      const allowedAttempts = formState.allowedAttempts === true;
-      let allowNumberOfAttempts = null;
-
-      if (allowedAttempts) {
-        allowNumberOfAttempts = formState.numberOfAttempts
-          ? Number(formState.numberOfAttempts)
-          : null;
-      }
-
-      const assignmentData = {
-        name: assignmentName,
-        content: editorContent,
-        points: formState.points,
-        grade: formState.displayGrade,
-        submissionType: formState.submissionType,
-        allowedAttempts,
-        allowNumberOfAttempts,
-        assignTo: formState?.assignTo,
-        dueDate: formState.dueDate,
-        availableFrom: formState.availableFrom,
-        until: formState.until,
-        thumbnail: formState.thumbnail,
-        classId: cid,
-        subjectId: sid,
-        moduleId: formState.moduleId,
-        chapterId: formState.chapterId,
-        publish,
-      };
-
-      if (formState.assignTo === "Section") {
-        assignmentData.sectionId = formState.sectionId || null;
-      } else if (formState.assignTo === "Group") {
-        assignmentData.groupId = formState.groupId || null;
-      }
-
-      if (isEditing) {
-        let sectionId = formState.sectionId || null;
-        await updateAssignment(assignmentId, assignmentData, sectionId);
-      } else {
-        const response = await createAssignment(assignmentData);
-        setAssignmentId(response?.data?._id);
-      }
-    } catch (error) {
-      console.log(error);
-    } finally {
-      if (publish) {
-        setPublishLoading(false);
-      } else {
-        setSaveLoading(false);
-      }
-    }
-  };
+    },
+    [
+      assignmentName,
+      editorContent,
+      formState,
+      isEditing,
+      cid,
+      sid,
+      assignmentId,
+      updateAssignment,
+      createAssignment,
+    ]
+  );
 
   return (
     <div className="flex flex-col w-full">

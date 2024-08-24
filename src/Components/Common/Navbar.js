@@ -64,9 +64,8 @@ const SearchBar = () => (
 );
 
 const Navbar = ({ hideSearchbar, hideAvatarList, hideStudentView }) => {
-
-  const [isOpenNotification,setIsOpenNotification] = useState(false);
-  const [notificationCount,setNotificationCount] = useState(0);
+  const [isOpenNotification, setIsOpenNotification] = useState(false);
+  const [notificationCount, setNotificationCount] = useState(0);
   // useEffect(()=>{
   //   function getNotificationsFromIndexedDB() {
   //     return new Promise((resolve, reject) => {
@@ -88,7 +87,6 @@ const Navbar = ({ hideSearchbar, hideAvatarList, hideStudentView }) => {
   //         };
   //       };
 
-
   //       dbPromise.onerror = function(event) {
   //         reject(event);
   //       };
@@ -105,9 +103,9 @@ const Navbar = ({ hideSearchbar, hideAvatarList, hideStudentView }) => {
   // useEffect(()=>{
   //   setNotificationCount(localStorage.getItem('NotificationCount'));
   // },[localStorage.getItem('NotificationCount'),notificationCount]);
-  const openNotification = ()=>{
-    setIsOpenNotification(true)
-    }
+  const openNotification = () => {
+    setIsOpenNotification(true);
+  };
 
   const leftHeading = useSelector(
     (store) => store.Common.NavbarData.leftHeading
@@ -143,20 +141,42 @@ const Navbar = ({ hideSearchbar, hideAvatarList, hideStudentView }) => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+  const role = useSelector((store) => store.Auth.role);
+  const navigateProfile = ()=>{
+       if(role== 'parent'){
+      navigate("/users/parent/profile")
+       }
+       if(role=='admin'){
+         navigate("/users/admin")
+       }
+       if(role=='student'){
+        navigate("/users/student/profile")
+       }
+       if(role=='teacher'| 'accountant'|'librarian'|'staff'){
+        navigate("/users/my/profile")
+       }
+     
+  }
 
   return (
-    <div className="sticky top-0 left-0 right-0 z-20 bg-white border-b shadow-sm">
+    <div className="sticky top-0 left-0 right-0 z-20 bg-white border-b shadow-sm ">
       <div className="flex items-center p-2 py-3 bg-white ">
         <LeftHeading leftHeading={leftHeading} navigate={navigate} />
 
         <div className="flex items-center space-x-2 border-l ml-3 pl-3 relative">
           <IconButton icon={CiMail} label="Mail" />
 
-          <div onClick={()=>openNotification()} className="relative flex items-center cursor-pointer">
-             <IconButton icon={TbBell} label="Notifications" />
-             <p className="absolute top-[-5px] right-0 bg-purple-500 rounded-full
-              text-white w-[20px] h-[20px] flex justify-center items-center ">{notificationCount||0}</p>
-
+          <div
+            onClick={() => openNotification()}
+            className="relative flex items-center cursor-pointer"
+          >
+            <IconButton icon={TbBell} label="Notifications" />
+            <p
+              className="absolute top-[-5px] right-0 bg-purple-500 rounded-full
+              text-white w-[20px] h-[20px] flex justify-center items-center "
+            >
+              {notificationCount || 0}
+            </p>
           </div>
 
           <IconButton
@@ -172,7 +192,7 @@ const Navbar = ({ hideSearchbar, hideAvatarList, hideStudentView }) => {
             >
               <button
                 className="flex items-center gap-2 text-sm font-semibold text-gray-700 hover:text-purple-500 transition-transform duration-200 hover:bg-gray-100 px-3 py-2 rounded-md transform hover:translate-x-2"
-                onClick={() => navigate("/users/admin")}
+                onClick={navigateProfile}
               >
                 <FaUser className="text-lg" />
                 Profile
@@ -209,10 +229,13 @@ const Navbar = ({ hideSearchbar, hideAvatarList, hideStudentView }) => {
         onConfirm={logout}
       />
 
-      <Sidebar  isOpen={isOpenNotification} onClose={()=> setIsOpenNotification(false)} title={'Recent Notifications'} >
-              {/* <NotificationBar/> */}
-            </Sidebar>
-
+      <Sidebar
+        isOpen={isOpenNotification}
+        onClose={() => setIsOpenNotification(false)}
+        title={"Recent Notifications"}
+      >
+        {/* <NotificationBar/> */}
+      </Sidebar>
     </div>
   );
 };

@@ -8,7 +8,7 @@ const useParentLogout = () => {
   const navigate = useNavigate();
 
   const parentLogout = () => {
-    localStorage.removeItem('parent:token');
+    localStorage.clear();
     dispatch(setAuth(false));
     dispatch(setRole(null));
     navigate("/parentlogin");

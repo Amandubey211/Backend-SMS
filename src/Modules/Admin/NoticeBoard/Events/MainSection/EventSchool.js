@@ -152,7 +152,7 @@ const EventScheduler = () => {
 
     try {
       if (selectedEvent) {
-        await updateEvent(selectedEvent._id, eventData,token);
+        await updateEvent(selectedEvent._id, eventData, token);
         toast.success("Event updated successfully!");
       } else {
         const result = await createEvent(eventData, token);
@@ -172,7 +172,7 @@ const EventScheduler = () => {
 
   const handleDeleteEvent = async () => {
     try {
-      await deleteEvent(selectedEvent._id,token);
+      await deleteEvent(selectedEvent._id, token);
       handleSidebarClose();
       refreshEvents();
       toast.success("Event deleted successfully!");
@@ -218,15 +218,15 @@ const EventScheduler = () => {
     "#FBB778", // orange
   ];
 
-  const paginatedEvents = filteredEvents.slice(
-    currentPage * itemsPerPage,
-    (currentPage + 1) * itemsPerPage
-  );
+  const paginatedEvents = filteredEvents
+    .filter(event => event.startDate >= currentDate) // Filter events from the current date onward
+    .slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage);
+
 
   return (
     <Layout title="Event">
       <DashLayout>
-        <div className="min-h-screen p-4 bg-gray-50">
+        <div className="min-h-screen p-4 bg-gray-50  max-w-screen ">
           <div className="flex flex-row justify-between">
             <h1 className="mb-2 bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent font-semibold bg-clip-text">
               Student Events
@@ -239,7 +239,7 @@ const EventScheduler = () => {
             </button>
           </div>
 
-          <div className="my-4 w-full h-40 flex rounded-sm gap-20 pl-10 relative ">
+          <div className="my-4 h-40 flex rounded-sm gap-8 pl-8 relative   ">
             {currentPage > 0 && (
               <div
                 className="p-1 rounded-full text-purple-500 bg-white border-2 cursor-pointer absolute left-0 top-1/2 transform -translate-y-1/2"
@@ -249,7 +249,7 @@ const EventScheduler = () => {
               </div>
             )}
             {paginatedEvents.length === 0 ? (
-              <div className="flex flex-col items-center justify-center w-full h-full text-gray-500">
+              <div className="flex flex-col items-center justify-center  h-full text-gray-500 w-full">
                 <IoCalendarOutline className="text-6xl" />
                 <span>No Events in this Month</span>
               </div>
@@ -266,7 +266,7 @@ const EventScheduler = () => {
             )}
             {(currentPage + 1) * itemsPerPage < filteredEvents.length && (
               <div
-                className="p-1 rounded-full text-purple-500 bg-white border-2 cursor-pointer absolute right-0 top-1/2 transform -translate-y-1/2"
+                className="p-1 rounded-full text-purple-500 bg-white border-2 cursor-pointer absolute right-0 top-1/2 transform -translate-y-1/2 z-[50]"
                 onClick={() => setCurrentPage((prev) => prev + 1)}
               >
                 <IoIosArrowForward />

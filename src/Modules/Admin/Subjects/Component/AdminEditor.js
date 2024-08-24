@@ -1,6 +1,5 @@
-import React, { useState, useCallback, useRef } from "react";
-import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css";
+import React, { useState, useRef, useCallback, useMemo } from "react";
+import JoditEditor from "jodit-react";
 import axios from "axios";
 import { ImSpinner3 } from "react-icons/im";
 import toast, { Toaster } from "react-hot-toast";
@@ -15,97 +14,118 @@ const EditorComponent = ({
   inputPlaceHolder,
   isCreateQuestion,
 }) => {
-  const quillRef = useRef(null);
+  const editor = useRef(null);
   const [loading, setLoading] = useState(false);
 
   // Handle image upload and display
-  const handleImageUpload = useCallback(async () => {
-    const input = document.createElement("input");
-    input.setAttribute("type", "file");
-    input.setAttribute("accept", "image/*");
-    input.click();
+  const handleImageUpload = useCallback(async (file) => {
+    if (!file) return;
 
-    input.onchange = async () => {
-      const file = input.files[0];
-      if (!file) return;
+    setLoading(true);
 
-      setLoading(true);
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", process.env.REACT_APP_CLOUDINARY_PRESET);
 
-      const reader = new FileReader();
-      reader.onload = () => {
-        const quill = quillRef.current.getEditor();
-        const range = quill.getSelection();
-        quill.insertEmbed(range.index, "image", reader.result);
-      };
-      reader.readAsDataURL(file); // Show a preview of the image locally
-
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("upload_preset", process.env.REACT_APP_CLOUDINARY_PRESET);
-
-      try {
-        const response = await axios.post(
-          process.env.REACT_APP_CLOUDINARY_URL,
-          formData
-        );
+    try {
+      const response = await axios.post(
+        process.env.REACT_APP_CLOUDINARY_URL,
+        formData
+      );
+      console.log(response.data);
+      if (response.data.secure_url) {
         const imageUrl = response.data.secure_url;
-        const quill = quillRef.current.getEditor();
-        const range = quill.getSelection();
-        quill.deleteText(range.index, 1); // Remove the local preview
-        quill.insertEmbed(range.index, "image", imageUrl); // Insert the uploaded image URL
-        toast.success("Image Uploaded");
-      } catch (error) {
-        console.error("Error uploading image to Cloudinary", error);
-        toast.error("Error uploading image. Please try again.");
-      } finally {
-        setLoading(false);
+
+        // Insert the image using insertHTML
+        if (editor.current) {
+          const imgHTML = `<img src="${imageUrl}" alt="Image" />`;
+          editor.current.selection.insertHTML(imgHTML); // Insert HTML
+          toast.success("Image Uploaded Successfully");
+        } else {
+          toast.error("Failed to insert image into the editor.");
+          console.error("Editor instance is not defined.");
+        }
+      } else {
+        toast.error("Image upload failed. No secure URL returned.");
       }
-    };
+    } catch (error) {
+      console.error("Error uploading image to Cloudinary", error);
+      toast.error("Error uploading image. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  // Quill modules and formats for toolbar configuration
-  const modules = {
-    toolbar: {
-      container: [
-        [{ header: [1, 2, 3, false] }],
-        ["bold", "italic", "underline", "strike"], // toggled buttons
-        [{ script: "sub" }, { script: "super" }], // superscript/subscript
-        ["clean"],
-        [{ align: [] }],
-        [{ list: "bullet" }, { list: "ordered" }],
-        [{ color: [] }, { background: [] }],
-        ["link", "image", "video"],
-        ["blockquote", "code-block"],
+  // File input creation and handling
+  const triggerImageUpload = useCallback(() => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.onchange = (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        handleImageUpload(file);
+      }
+    };
+    input.click();
+  }, [handleImageUpload]);
+
+  // Jodit Editor Configuration
+  const config = useMemo(
+    () => ({
+      readonly: false,
+      height: isCreateQuestion ? 300 : 400,
+      spellcheck: true, // Enable spellcheck
+      toolbarSticky: true,
+      toolbarAdaptive: false,
+      showCharsCounter: true, // Show character counter
+      showWordsCounter: true, // Show word counter
+      showXPathInStatusbar: false,
+      askBeforePasteHTML: false,
+      askBeforePasteFromWord: false,
+      removeButtons: ["powered-by-jodit"], // Remove "Powered by Jodit"
+      buttons: [
+        "fontsize", // Font size selector
+        "bold",
+        "italic",
+        "underline",
+        "strikethrough",
+        "hr", // Add Horizontal Rule
+        "superscript",
+        "subscript",
+        "align",
+        "ul",
+        "ol",
+        "outdent",
+        "indent",
+        "link",
+        {
+          name: "image",
+          icon: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M21 7h-3.17l-1.24-1.45A2.01 2.01 0 0014.88 5h-5.76c-.71 0-1.37.39-1.71 1.05L6.17 7H3c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2zm-9 11c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" fill="currentColor"/>
+            </svg>`,
+          exec: triggerImageUpload,
+          tooltip: "Upload Image",
+        },
+        "brush", // Font color/brush tool
+        "video",
+        "table", // Include Table
+        "undo", // Add Undo button
+        "redo", // Add Redo button
+        "preview", // Include Preview
+        "fullsize", // Include Fullscreen
       ],
-      handlers: {
-        image: handleImageUpload,
+      events: {
+        change: (newContent) => {
+          onEditorChange(newContent);
+        },
+        afterInit: (editorInstance) => {
+          editor.current = editorInstance;
+        },
       },
-    },
-  };
-
-  const formats = [
-    "header",
-    "bold",
-    "italic",
-    "underline",
-    "strike",
-    "blockquote",
-    "code-block",
-    "list",
-    "bullet",
-    "align",
-    "color",
-    "background",
-    "link",
-    "image",
-    "video",
-    "script",
-  ];
-
-  // Handle content changes in the editor
-  const handleEditorChange = (content, delta, source, editor) => {
-    onEditorChange(editor.getHTML());
-  };
+    }),
+    [isCreateQuestion, onEditorChange, triggerImageUpload]
+  );
 
   return (
     <div className="relative w-full bg-white mb-3 p-2">
@@ -122,19 +142,17 @@ const EditorComponent = ({
               value={assignmentName}
               onChange={(e) => onNameChange(e.target.value)}
               className="w-full p-2 border border-gray-300 rounded-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              spellCheck="false" // Disabling spell check at the input level
             />
           </div>
         </div>
       )}
 
-      <ReactQuill
-        ref={quillRef}
+      <JoditEditor
+        ref={editor}
         value={editorContent}
-        onChange={handleEditorChange}
-        className={`bg-white p-2 ${isCreateQuestion ? "h-60" : "h-96"}`}
-        theme="snow"
-        modules={modules}
-        formats={formats}
+        config={config}
+        tabIndex={1} // tabIndex of textarea
       />
 
       {loading && (
@@ -152,13 +170,7 @@ const EditorComponent = ({
             zIndex: 10,
           }}
         >
-          <ImSpinner3
-            style={{
-              fontSize: "48px",
-              color: "#007bff",
-              animation: "spin 1s linear infinite",
-            }}
-          />
+          <ImSpinner3 className="text-4xl text-gray-500 animate-spin" />
         </div>
       )}
 
@@ -168,6 +180,14 @@ const EditorComponent = ({
           @keyframes spin {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
+          }
+
+          /* Ensure toolbar buttons are aligned properly */
+          .jodit-toolbar-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px;
           }
         `}
       </style>

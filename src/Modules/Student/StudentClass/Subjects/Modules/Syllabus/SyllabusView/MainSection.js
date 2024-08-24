@@ -11,7 +11,9 @@ import Spinner from "../../../../../../../Components/Common/Spinner";
 
 const MainSection = () => {
   const { cid } = useParams();
-  const selectedSubjectId = useSelector(state => state.Common.selectedSubject);
+  const selectedSubjectId = useSelector(
+    (state) => state.Common.selectedSubject
+  );
   const { loading, error, syllabi, fetchSyllabus } = useFetchSyllabus();
 
   useEffect(() => {
@@ -20,25 +22,42 @@ const MainSection = () => {
     }
   }, [selectedSubjectId, cid, fetchSyllabus]);
 
-  if (loading) return <Spinner />;
-  if (error) return <p>Error: {error}</p>;
-  if (!syllabi.length)
-    return (
+  let content;
+
+  if (loading) {
+    content = (
+      <div className="flex flex-col items-center justify-center h-full">
+        <Spinner />
+      </div>
+    );
+  } else if (error) {
+    content = (
+      <div className="flex flex-col items-center justify-center h-full">
+        <p className="text-red-500">Error: {error}</p>
+      </div>
+    );
+  } else if (!syllabi.length) {
+    content = (
       <div className="flex flex-col items-center justify-center h-full">
         <AiOutlineFileAdd size={64} className="text-gray-500" />
         <p className="text-gray-500 mt-4">No syllabus has been created yet.</p>
       </div>
     );
-
-  return (
-    <div className="flex">
-      <SubjectSideBar />
-      <div className="border-l w-full p-4">
+  } else {
+    content = (
+      <div>
         <SyllabusHeader />
         {syllabi.map((syllabusItem) => (
           <SyllabusSection key={syllabusItem._id} syllabus={syllabusItem} />
         ))}
       </div>
+    );
+  }
+
+  return (
+    <div className="flex">
+      <SubjectSideBar />
+      <div className="border-l w-full p-4">{content}</div>
     </div>
   );
 };
