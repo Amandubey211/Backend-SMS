@@ -1,6 +1,12 @@
 import React from "react";
+import { useSelector } from "react-redux";
 
-const ButtonGroup = ({ onAddNewSubject, selectedTab, setSelectedTab }) => {
+const ButtonGroup = ({
+  onAddNewSubject,
+  selectedTab,
+  setSelectedTab,
+  role,
+}) => {
   return (
     <div className="flex justify-between items-center mb-8">
       <div className="flex space-x-4">
@@ -25,15 +31,17 @@ const ButtonGroup = ({ onAddNewSubject, selectedTab, setSelectedTab }) => {
           Draft
         </button>
       </div>
-      <button
-        onClick={onAddNewSubject}
-        className="flex items-center border border-gray-300 ps-5  py-0 rounded-full"
-      >
-        <span className="mr-2">Add New Subject</span>
-        <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full w-12 h-12 flex items-center justify-center">
-          <span className="text-3xl -mt-2">+</span>
-        </div>
-      </button>
+      {role === "admin" && (
+        <button
+          onClick={onAddNewSubject}
+          className="flex items-center border border-gray-300 ps-5  py-0 rounded-full"
+        >
+          <span className="mr-2">Add New Subject</span>
+          <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full w-12 h-12 flex items-center justify-center">
+            <span className="text-3xl -mt-2">+</span>
+          </div>
+        </button>
+      )}
     </div>
   );
 };

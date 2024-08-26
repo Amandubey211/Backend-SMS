@@ -42,7 +42,6 @@ const MainSection = () => {
     setIsModalOpen(false);
     dispatch(setStudentGrade({}));
   };
-
   return (
     <div className="p-2 w-full">
       <NavigationBar

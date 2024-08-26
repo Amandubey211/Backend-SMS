@@ -63,12 +63,27 @@ const StudentSignUpForm = () => {
   const { docloading, saveDocument } = useSaveDocument();
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
+
+  const calculateAge = (dob) => {
+    const birthDate = new Date(dob);
+    const difference = Date.now() - birthDate.getTime();
+    const ageDate = new Date(difference);
+    return Math.abs(ageDate.getUTCFullYear() - 1970);
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setStudentDetails((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+
+    setStudentDetails((prev) => {
+      let updatedDetails = { ...prev, [name]: value };
+
+      if (name === "dateOfBirth") {
+        const age = calculateAge(value);
+        updatedDetails.age = age;
+      }
+
+      return updatedDetails;
+    });
   };
 
   const handleImageChange = (e) => {
@@ -144,17 +159,21 @@ const StudentSignUpForm = () => {
 
     try {
       const formData = new FormData();
-      for (const key in studentDetails) {
-        if (studentDetails.hasOwnProperty(key)) {
+
+      // Exclude the age field before appending other fields
+      const { age, ...detailsWithoutAge } = studentDetails;
+
+      for (const key in detailsWithoutAge) {
+        if (detailsWithoutAge.hasOwnProperty(key)) {
           if (key === "permanentAddress" || key === "residentialAddress") {
-            const address = studentDetails[key];
+            const address = detailsWithoutAge[key];
             for (const field in address) {
               if (address.hasOwnProperty(field)) {
                 formData.append(`${key}.${field}`, address[field]);
               }
             }
           } else {
-            formData.append(key, studentDetails[key]);
+            formData.append(key, detailsWithoutAge[key]);
           }
         }
       }

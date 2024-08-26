@@ -31,6 +31,7 @@ const MainSection = () => {
   const [selectedTab, setSelectedTab] = useState("Published");
   const [editSubject, setEditSubject] = useState(null); // New state for editing
   const classDetails = useSelector((store) => store.Class.class);
+  const role = useSelector((store) => store.Auth.role);
 
   const { fetchClassDetails, loading } = useGetClassDetails();
   const { cid } = useParams();
@@ -115,6 +116,7 @@ const MainSection = () => {
           </div>
           <div className="px-5">
             <ButtonGroup
+              role={role}
               onAddNewSubject={handleAddNewSubject}
               selectedTab={selectedTab}
               setSelectedTab={setSelectedTab}
@@ -123,6 +125,7 @@ const MainSection = () => {
               {filteredSubjects.length > 0 ? (
                 filteredSubjects.map((subject, index) => (
                   <SubjectCard
+                    role={role}
                     key={index}
                     data={{
                       ...subject,

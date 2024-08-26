@@ -7,7 +7,12 @@ import useFetchTeachersByClass from "../../../Hooks/AuthHooks/Staff/Admin/Teache
 
 const AssignTeacher = lazy(() => import("./AssignTeacher"));
 
-const NavigationBar = ({ onSectionChange, selectedSection, totalTeachers }) => {
+const NavigationBar = ({
+  onSectionChange,
+  selectedSection,
+  totalTeachers,
+  role,
+}) => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const Sections = useSelector((store) => store.Class.sectionsList);
   const { fetchTeachersByClass } = useFetchTeachersByClass();
@@ -49,15 +54,17 @@ const NavigationBar = ({ onSectionChange, selectedSection, totalTeachers }) => {
             {totalTeachers}
           </span>
         </div>
-        <button
-          onClick={handleSidebarOpen}
-          className="flex items-center border border-gray-300 ps-5 py-0 rounded-full"
-        >
-          <span className="mr-2">Assign Instructor</span>
-          <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full w-12 h-12 flex items-center justify-center">
-            <span className="text-3xl -mt-2">+</span>
-          </div>
-        </button>
+        {role === "admin" && (
+          <button
+            onClick={handleSidebarOpen}
+            className="flex items-center border border-gray-300 ps-5 py-0 rounded-full"
+          >
+            <span className="mr-2">Assign Instructor</span>
+            <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full w-12 h-12 flex items-center justify-center">
+              <span className="text-3xl -mt-2">+</span>
+            </div>
+          </button>
+        )}
       </div>
       <Sidebar
         isOpen={isSidebarOpen}
