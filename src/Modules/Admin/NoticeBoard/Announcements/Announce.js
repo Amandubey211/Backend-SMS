@@ -12,7 +12,7 @@ import {
   useDeleteNotice,
   useUpdateNotice,
 } from "../../../../Hooks/AuthHooks/Staff/Admin/Notices/useNoticeActions";
-import Modal from "react-modal";
+import DeleteModal from "../../../../Components/Common/DeleteModal";
 
 const Announce = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -327,68 +327,12 @@ const Announce = () => {
       </Layout>
 
       {/* Modal for confirming delete */}
-      <Modal
+      <DeleteModal
         isOpen={isDeleteModalOpen}
-        onRequestClose={handleDeleteModalClose}
-        style={{
-          content: {
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            right: "auto",
-            bottom: "auto",
-            transform: "translate(-50%, -50%)",
-            background: "white",
-            padding: "20px",
-            boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
-            borderRadius: "8px",
-            width: "300px",
-            textAlign: "center",
-          },
-          overlay: {
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: "rgba(0, 0, 0, 0.5)",
-            zIndex: 1000,
-          },
-        }}
-      >
-        <h2 style={{ marginBottom: "10px" }}>Confirm Delete</h2>
-        <p style={{ marginBottom: "20px" }}>
-          Are you sure you want to delete this notice?
-        </p>
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <button
-            onClick={confirmDelete}
-            style={{
-              background: "red",
-              color: "white",
-              padding: "10px 20px",
-              border: "none",
-              borderRadius: "5px",
-              cursor: "pointer",
-            }}
-          >
-            Yes, Delete
-          </button>
-          <button
-            onClick={handleDeleteModalClose}
-            style={{
-              background: "gray",
-              color: "white",
-              padding: "10px 20px",
-              border: "none",
-              borderRadius: "5px",
-              cursor: "pointer",
-            }}
-          >
-            Cancel
-          </button>
-        </div>
-      </Modal>
+        onClose={handleDeleteModalClose}
+        onConfirm={confirmDelete}
+        title="Notice"
+      />
     </>
   );
 };

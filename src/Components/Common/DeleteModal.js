@@ -52,7 +52,6 @@ const DeleteModal = ({ isOpen, onClose, onConfirm, title }) => {
       }
     };
 
-    // Initially focus the close button or the first focusable element
     closeButtonRef.current.focus();
 
     document.addEventListener("keydown", handleKeyDown);
@@ -73,8 +72,13 @@ const DeleteModal = ({ isOpen, onClose, onConfirm, title }) => {
 
   const handleOutsideClick = (e) => {
     if (e.target.id === "modal-container") {
+      e.stopPropagation(); // Prevent modal close from triggering other events
       onClose();
     }
+  };
+
+  const handleInsideClick = (e) => {
+    e.stopPropagation(); // Prevent click event from propagating to parent elements
   };
 
   const handleChange = (e) => {
@@ -109,6 +113,7 @@ const DeleteModal = ({ isOpen, onClose, onConfirm, title }) => {
       <div
         ref={modalRef}
         className="bg-white rounded-lg overflow-hidden shadow-lg transform transition-transform duration-300 w-11/12 md:w-1/3"
+        onClick={handleInsideClick} // Stop propagation of clicks inside the modal
       >
         <div className="flex justify-between items-center p-4 border-b">
           <h3 id="delete-modal-title" className="text-lg font-semibold">
@@ -116,7 +121,10 @@ const DeleteModal = ({ isOpen, onClose, onConfirm, title }) => {
           </h3>
           <button
             ref={closeButtonRef}
-            onClick={onClose}
+            onClick={(e) => {
+              e.stopPropagation(); // Ensure the click doesn't propagate
+              onClose();
+            }}
             aria-label="Close modal"
           >
             <RiCloseLine className="text-gray-700 w-6 h-6" />
@@ -140,7 +148,10 @@ const DeleteModal = ({ isOpen, onClose, onConfirm, title }) => {
           <div className="mt-4 flex justify-end space-x-2">
             <button
               className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md"
-              onClick={onClose}
+              onClick={(e) => {
+                e.stopPropagation(); // Ensure the click doesn't propagate
+                onClose();
+              }}
               aria-label="Cancel"
             >
               Cancel
