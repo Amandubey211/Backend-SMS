@@ -11,7 +11,14 @@ import { CiUser } from "react-icons/ci";
 import useCreateSubject from "../../../../Hooks/AuthHooks/Staff/Admin/useCreateSubject";
 import DeleteModal from "../../../../Components/Common/DeleteModal";
 
-const SubjectCard = ({ data, backgroundColor, Class, onEdit, subjectId }) => {
+const SubjectCard = ({
+  data,
+  backgroundColor,
+  Class,
+  onEdit,
+  subjectId,
+  role,
+}) => {
   const dispatch = useDispatch();
   const { deleteSubject, loading } = useCreateSubject();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -37,22 +44,24 @@ const SubjectCard = ({ data, backgroundColor, Class, onEdit, subjectId }) => {
     <div
       className={`relative rounded-xl p-4 shadow-lg ${backgroundColor} transition-transform duration-300 transform hover:scale-105 hover:shadow-2xl group`}
     >
-      <div className="absolute top-2 right-2 flex flex-col space-y-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-        <button
-          onClick={() => onEdit(data)}
-          className="bg-white p-1 rounded-full shadow hover:bg-gray-200"
-        >
-          <MdOutlineModeEdit className="text-green-800 bg-green-50 p-1 text-3xl rounded-full cursor-pointer" />
-        </button>
-        <button
-          className="bg-white p-1 rounded-full shadow hover:bg-gray-200"
-          disabled={loading}
-          aria-busy={loading ? "true" : "false"}
-          onClick={openModal}
-        >
-          <RiDeleteBin6Line className="text-red-800 bg-red-50 p-1 text-3xl rounded-full cursor-pointer" />
-        </button>
-      </div>
+      {role === "admin" && (
+        <div className="absolute top-2 right-2 flex flex-col space-y-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <button
+            onClick={() => onEdit(data)}
+            className="bg-white p-1 rounded-full shadow hover:bg-gray-200"
+          >
+            <MdOutlineModeEdit className="text-green-800 bg-green-50 p-1 text-3xl rounded-full cursor-pointer" />
+          </button>
+          <button
+            className="bg-white p-1 rounded-full shadow hover:bg-gray-200"
+            disabled={loading}
+            aria-busy={loading ? "true" : "false"}
+            onClick={openModal}
+          >
+            <RiDeleteBin6Line className="text-red-800 bg-red-50 p-1 text-3xl rounded-full cursor-pointer" />
+          </button>
+        </div>
+      )}
       <div className="flex justify-between items-center mb-4">
         <button
           className={`border border-white rounded-full px-4 py-1 ${

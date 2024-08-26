@@ -3,7 +3,7 @@ import useGetAllSchools from "../../../../Hooks/AuthHooks/Staff/Admin/useGetAllS
 import SelectInput from "./SelectInput";
 import TextInput from "./TextInput";
 import RadioGroup from "./RadioGroup";
-
+import { RiImageAddFill } from "react-icons/ri";
 const PersonalInformationForm = ({
   studentDetails,
   handleChange,
@@ -13,7 +13,6 @@ const PersonalInformationForm = ({
 }) => {
   const { fetchSchools, schoolList } = useGetAllSchools();
 
-  // Ensure options are in the correct format for the SelectInput component
   const religionOptions = [
     { value: "Islam", label: "Islam" },
     { value: "Christianity", label: "Christianity" },
@@ -52,7 +51,7 @@ const PersonalInformationForm = ({
               accept="image/*"
               required
             />
-            <div className="h-32 w-32 rounded-full border border-gray-300 shadow-sm overflow-hidden cursor-pointer bg-gray-100 flex items-center justify-center">
+            <div className="h-36 w-36 rounded-full border border-pink-400 shadow-sm overflow-hidden cursor-pointer bg-pink-50 flex items-center justify-center">
               {imagePreview ? (
                 <img
                   src={imagePreview}
@@ -60,7 +59,10 @@ const PersonalInformationForm = ({
                   className="h-full w-full object-cover"
                 />
               ) : (
-                <span className="text-gray-500">Upload Image</span>
+                <div className="flex flex-col items-center justify-center gap-2 ">
+                  <RiImageAddFill className="text-4xl text-pink-400" />
+                  <span className="text-pink-500">Upload Image</span>
+                </div>
               )}
             </div>
           </div>
@@ -117,6 +119,7 @@ const PersonalInformationForm = ({
           placeholder="Age*"
           type="number"
           required
+          readOnly
         />
         <div className="flex flex-col mt-1 w-full">
           <select

@@ -1,10 +1,10 @@
 import React, { useCallback } from "react";
-import { NavLink, useParams } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 const NavigationBar = ({ setActiveSection, activeSection, totalStudents }) => {
-  const { cid } = useParams();
   const Sections = useSelector((store) => store.Class.sectionsList);
+  const role = useSelector((store) => store.Auth.role);
 
   const getButtonClass = useCallback(
     (section) => {
@@ -31,15 +31,17 @@ const NavigationBar = ({ setActiveSection, activeSection, totalStudents }) => {
             {totalStudents}
           </span>
         </div>
-        <NavLink
-          to="/admissions"
-          className="flex items-center border border-gray-300 ps-5 py-0 rounded-full"
-        >
-          <span className="mr-2">Add New Students</span>
-          <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full w-12 h-12 flex items-center justify-center">
-            <span className="text-3xl -mt-2">+</span>
-          </div>
-        </NavLink>
+        {role === "admin" && (
+          <NavLink
+            to="/admissions"
+            className="flex items-center border border-gray-300 ps-5 py-0 rounded-full"
+          >
+            <span className="mr-2">Add New Students</span>
+            <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full w-12 h-12 flex items-center justify-center">
+              <span className="text-3xl -mt-2">+</span>
+            </div>
+          </NavLink>
+        )}
       </div>
       <div className="flex space-x-2 px-5">
         <button
