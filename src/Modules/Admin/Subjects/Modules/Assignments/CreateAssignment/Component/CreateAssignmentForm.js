@@ -33,22 +33,12 @@ const CreateAssignmentForm = ({
   const [chapters, setChapters] = useState([]);
   const [selectedModule, setSelectedModule] = useState(moduleId || "");
   const [selectedChapter, setSelectedChapter] = useState(chapterId || "");
-  const {
-    fetchGroupsByClass,
-    loading: groupLoading,
-    error: groupError,
-  } = useGetGroupsByClass();
-  const groupsList = useSelector((store) => store.Class.groupsList);
-  const { cid } = useParams();
 
   useEffect(() => {
-    if (!moduleList || moduleList.length === 0) {
-      fetchModules();
-    }
-    if (!groupsList || groupsList.length === 0) {
-      fetchGroupsByClass(cid);
-    }
-  }, [moduleList, fetchModules]);
+    // if (!moduleList || moduleList.length === 0) {
+    fetchModules();
+    // }
+  }, [fetchModules]);
 
   useEffect(() => {
     if (selectedModule) {
@@ -170,9 +160,9 @@ const CreateAssignmentForm = ({
         value={dueDate}
         handleChange={handleChange}
       />
-      <button className="py-2 text-green-500 font-medium rounded-md hover:text-green-800 transition">
+      {/* <button className="py-2 text-green-500 font-medium rounded-md hover:text-green-800 transition">
         + Add Assign
-      </button>
+      </button> */}
     </div>
   );
 };

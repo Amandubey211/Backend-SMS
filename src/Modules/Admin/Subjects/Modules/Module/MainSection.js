@@ -10,30 +10,22 @@ import { setSelectedModule } from "../../../../../Redux/Slices/Common/CommonSlic
 import useGetModulesForStudent from "../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useGetModulesForStudent";
 import MoveModule from "./Components/MoveModule";
 import AddChapter from "./Components/AddChapter";
-import DeleteModal from "../../../../../Components/Common/DeleteModal";
-import toast from "react-hot-toast";
 import Spinner from "../../../../../Components/Common/Spinner";
 import NoDataFound from "../../../../../Components/Common/NoDataFound";
-import useDeleteModule from "../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useDeleteModule";
 
 const MainSection = () => {
   const [expandedChapters, setExpandedChapters] = useState([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [isMoveSidebarOpen, setIsMoveSidebarOpen] = useState(false);
   const [sidebarContent, setSidebarContent] = useState(null);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [deleteTarget, setDeleteTarget] = useState(null);
 
   const dispatch = useDispatch();
   const selectedModule = useSelector((state) => state.Common.selectedModule);
   const { error, fetchModules, loading, modulesData } =
     useGetModulesForStudent();
 
-  const { deleteModule } = useDeleteModule(fetchModules);
-
   useEffect(() => {
     fetchModules();
-  }, []);
+  }, [fetchModules]);
 
   const handleToggle = (chapterNumber) => {
     setExpandedChapters((prev) =>
@@ -65,10 +57,6 @@ const MainSection = () => {
     setSidebarContent(null);
   };
 
-  const handleMoveSidebarClose = () => {
-    setIsMoveSidebarOpen(false);
-  };
-
   const handleModuleSelect = (module) => {
     dispatch(
       setSelectedModule({
@@ -94,7 +82,7 @@ const MainSection = () => {
   };
 
   const handleMoveModule = (module) => {
-    const currentIndex = modulesData.modules.findIndex(
+    const currentIndex = modulesData?.modules?.findIndex(
       (mod) => mod._id === module._id
     );
 
@@ -103,26 +91,10 @@ const MainSection = () => {
         moduleId={selectedModule.moduleId}
         currentPosition={currentIndex}
         modulesData={modulesData}
-        onClose={handleMoveSidebarClose}
+        onClose={handleSidebarClose} // Ensure proper closing
       />
     );
-    setIsMoveSidebarOpen(true);
-  };
-
-  const handleDelete = (target) => {
-    setDeleteTarget(target);
-    setIsDeleteModalOpen(true);
-  };
-
-  const confirmDelete = async () => {
-    if (deleteTarget.type === "Module") {
-      await deleteModule(deleteTarget.id);
-
-      toast.success(`${deleteTarget.type} deleted successfully!`);
-      setIsDeleteModalOpen(false);
-      setDeleteTarget(null);
-      fetchModules();
-    }
+    setIsSidebarOpen(true);
   };
 
   const handleModuleAdded = useCallback(() => {
@@ -151,9 +123,9 @@ const MainSection = () => {
         <div className="bg-white p-2 rounded-lg">
           <div className="flex justify-between px-4 mb-3 items-center">
             <h1 className="text-lg font-semibold">
-              {selectedModule.name ? selectedModule.name : "Select a Module"}
+              {selectedModule?.name ? selectedModule.name : "Select a Module"}
             </h1>
-            {selectedModule.name && (
+            {selectedModule?.name && (
               <button
                 onClick={openAddChapter}
                 className="px-4 py-2 rounded-md bg-gradient-to-r from-pink-100 to-purple-200"
@@ -166,28 +138,21 @@ const MainSection = () => {
             <Spinner />
           ) : error ? (
             <NoDataFound />
-          ) : selectedModule.chapters && selectedModule.chapters.length > 0 ? (
-            selectedModule.chapters.map((chapter, index) => (
+          ) : selectedModule?.chapters &&
+            selectedModule?.chapters.length > 0 ? (
+            selectedModule?.chapters?.map((chapter, index) => (
               <Chapter
                 key={index}
-                title={chapter.name}
+                title={chapter?.name}
                 chapterNumber={index + 1}
-                chapterId={chapter._id}
+                chapterId={chapter?._id}
                 moduleId={selectedModule.moduleId}
                 imageUrl={chapter.thumbnail}
-                assignments={chapter.assignments}
-                quizzes={chapter.quizzes}
-                attachments={chapter.attachments} // Pass attachments to Chapter
+                assignments={chapter?.assignments}
+                quizzes={chapter?.quizzes}
+                attachments={chapter?.attachments} // Pass attachments to Chapter
                 isExpanded={expandedChapters.includes(index + 1)}
                 onToggle={() => handleToggle(index + 1)}
-                onDelete={() =>
-                  handleDelete({
-                    type: "Chapter",
-                    name: chapter.name,
-                    id: chapter._id,
-                    moduleId: selectedModule.moduleId,
-                  })
-                }
                 onEdit={() => handleEditChapter(chapter)}
                 fetchModules={fetchModules} // Pass fetchModules for re-fetching
               />
@@ -215,7 +180,6 @@ const MainSection = () => {
                 moduleNumber={index + 1}
                 imageUrl={module.thumbnail}
                 moduleId={module._id}
-                // isPublished={module.isPublished}
                 isPublished={true}
                 isSelected={
                   selectedModule && selectedModule.moduleId === module._id
@@ -223,13 +187,13 @@ const MainSection = () => {
                 onSelect={() => handleModuleSelect(module)}
                 onEdit={() => handleEditModule(module)}
                 onMove={() => handleMoveModule(module)}
-                onDelete={() =>
-                  handleDelete({
-                    type: "Module",
-                    name: module.moduleName,
-                    id: module._id,
-                  })
-                }
+                // onDelete={() =>
+                //   handleDelete({
+                //     type: "Module",
+                //     name: module.moduleName,
+                //     id: module._id,
+                //   })
+                // }
                 fetchModules={fetchModules}
               />
             ))}
@@ -279,26 +243,6 @@ const MainSection = () => {
               sidebarContent
             )}
           </Sidebar>
-        )}
-        {isMoveSidebarOpen && (
-          <Sidebar
-            isOpen={isMoveSidebarOpen}
-            onClose={() => {
-              handleSidebarClose();
-              fetchModules();
-            }}
-            title="Move Module"
-          >
-            {sidebarContent}
-          </Sidebar>
-        )}
-        {isDeleteModalOpen && (
-          <DeleteModal
-            isOpen={isDeleteModalOpen}
-            onClose={() => setIsDeleteModalOpen(false)}
-            onConfirm={confirmDelete}
-            title={deleteTarget ? deleteTarget.name : ""}
-          />
         )}
       </div>
     </div>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Suspense } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useLocation } from "react-router-dom";
 import CreateQuizHeader from "./Components/CreateQuizHeader";
 import Tabs from "../Components/Tabs";
@@ -20,8 +20,8 @@ const initialFormState = {
   points: "",
   quizType: "",
   submissionFormat: "",
-  allowedAttempts: false,
-  allowNumberOfAttempts: 0,
+  allowedAttempts: true,
+  allowNumberOfAttempts: 1,
   assignTo: "",
   showOneQuestionOnly: false,
   questionType: "",
@@ -96,8 +96,7 @@ const MainSection = ({ setIsEditing }) => {
         points: quiz.points || "",
         quizType: quiz.quizType || "",
         submissionFormat: quiz.submissionFormat || "",
-        allowedAttempts: quiz?.allowedAttempts || false,
-        // allowMultiple: quiz.allowMultiple || false,
+        allowedAttempts: quiz?.allowedAttempts,
         allowNumberOfAttempts: quiz.allowNumberOfAttempts || 1,
         assignTo: quiz.assignTo || "",
         showOneQuestionOnly: quiz.showOneQuestionOnly || false,
@@ -123,26 +122,45 @@ const MainSection = ({ setIsEditing }) => {
     }
   }, [quiz, setIsEditing]);
 
-  const handleNameChange = (name) => setAssignmentName(name);
-  const handleInstructionChange = (content) => setInstruction(content);
-  const handleQuestionChange = (content) => setQuestion(content);
-  const handleFormChange = (e) => {
+  const handleNameChange = useCallback((name) => setAssignmentName(name), []);
+  const handleInstructionChange = useCallback(
+    (content) => setInstruction(content),
+    []
+  );
+  const handleQuestionChange = useCallback(
+    (content) => setQuestion(content),
+    []
+  );
+
+  const handleFormChange = useCallback((e) => {
     const { name, value, type, checked } = e.target;
 
-    setFormState((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
-  };
+    setFormState((prev) => {
+      const updatedState = {
+        ...prev,
+        [name]: type === "checkbox" ? checked : value,
+      };
 
-  const handleAnswerChange = (index, e) => {
-    const { name, value } = e.target;
-    const newAnswers = [...answers];
-    newAnswers[index][name] = value;
-    setAnswers(newAnswers);
-  };
+      // If allowedAttempts is true, set allowNumberOfAttempts to null
+      if (name === "allowedAttempts" && checked === true) {
+        updatedState.allowNumberOfAttempts = null;
+      }
 
-  const addNewQuestion = async () => {
+      return updatedState;
+    });
+  }, []);
+
+  const handleAnswerChange = useCallback(
+    (index, e) => {
+      const { name, value } = e.target;
+      const newAnswers = [...answers];
+      newAnswers[index][name] = value;
+      setAnswers(newAnswers);
+    },
+    [answers]
+  );
+
+  const addNewQuestion = useCallback(async () => {
     const correctOption = answers.find((answer) => answer.isCorrect);
     const newQuestion = {
       questionText: question,
@@ -159,77 +177,107 @@ const MainSection = ({ setIsEditing }) => {
       resetQuestionForm();
       fetchQuizById(quizId); // Refetch quiz
     }
-  };
+  }, [
+    answers,
+    question,
+    questionPoint,
+    questionType,
+    rightAnswerComment,
+    wrongAnswerComment,
+    addQuestion,
+    quizId,
+    fetchQuizById,
+  ]);
 
-  const deleteQuestionHandler = async (questionId) => {
-    const result = await deleteQuestion(quizId, questionId);
-    if (result.success) {
-      setQuestionState((prev) => prev.filter((q) => q._id !== questionId));
-      fetchQuizById(quizId); // Refetch quiz
-    }
-  };
+  const deleteQuestionHandler = useCallback(
+    async (questionId) => {
+      const result = await deleteQuestion(quizId, questionId);
+      if (result.success) {
+        setQuestionState((prev) => prev.filter((q) => q._id !== questionId));
+        fetchQuizById(quizId); // Refetch quiz
+      }
+    },
+    [deleteQuestion, quizId, fetchQuizById]
+  );
 
-  const editQuestionHandler = (questionId) => {
-    const questionToEdit = questionState.find((q) => q._id === questionId);
-    setQuestion(questionToEdit.questionText);
-    setAnswers(questionToEdit.options);
-    setRightAnswerComment(questionToEdit.correctAnswerComment);
-    setWrongAnswerComment(questionToEdit.inCorrectAnswerComment);
-    setQuestionPoint(questionToEdit.questionPoint);
-    setQuestionType(questionToEdit.type);
-    setEditingQuestionId(questionToEdit._id);
-    handleSidebarOpen();
-  };
+  const editQuestionHandler = useCallback(
+    (questionId) => {
+      const questionToEdit = questionState.find((q) => q._id === questionId);
+      setQuestion(questionToEdit.questionText);
+      setAnswers(questionToEdit.options);
+      setRightAnswerComment(questionToEdit.correctAnswerComment);
+      setWrongAnswerComment(questionToEdit.inCorrectAnswerComment);
+      setQuestionPoint(questionToEdit.questionPoint);
+      setQuestionType(questionToEdit.type);
+      setEditingQuestionId(questionToEdit._id);
+      handleSidebarOpen();
+    },
+    [questionState, handleSidebarOpen]
+  );
 
-  const handleAddNewQuestion = () => {
+  const handleAddNewQuestion = useCallback(() => {
     resetQuestionForm();
     handleSidebarOpen();
-  };
+  }, [handleSidebarOpen]);
 
-  const handleSave = async (publish) => {
-    const quizData = {
-      ...formState,
-      name: assignmentName,
-      content: instruction,
-      correctAnswerComment: rightAnswerComment,
-      inCorrectAnswerComment: wrongAnswerComment,
-      classId: cid,
-      subjectId: sid,
-      publish,
-    };
-    if (formState.assignTo === "Section") {
-      quizData.sectionId = formState.sectionId || null;
-    } else if (formState.assignTo === "Group") {
-      quizData.groupId = formState.groupId || null;
-    }
-    if (isEditing) {
-      console.log(quizData, "----------");
-      const result = await updateQuiz(quizId, quizData);
-      if (result.success) {
-        setActiveTab("questions");
-        if (publish) {
-          toast.success("Quiz updated and published successfully");
-        } else {
-          toast.success("Quiz updated successfully");
-        }
+  const handleSave = useCallback(
+    async (publish) => {
+      const quizData = {
+        ...formState,
+        name: assignmentName,
+        content: instruction,
+        correctAnswerComment: rightAnswerComment,
+        inCorrectAnswerComment: wrongAnswerComment,
+        classId: cid,
+        subjectId: sid,
+        publish,
+      };
+      if (formState.assignTo === "Section") {
+        quizData.sectionId = formState.sectionId || null;
+      } else if (formState.assignTo === "Group") {
+        quizData.groupId = formState.groupId || null;
       }
-    } else {
-      const result = await createQuiz(quizData);
-      if (result.success) {
-        setActiveTab("questions");
-        setQuizId(result.quiz._id);
-        if (publish) {
-          toast.success("Quiz created and published successfully");
-        } else {
-          toast.success("Quiz created successfully");
+      if (isEditing) {
+        const result = await updateQuiz(quizId, quizData);
+        if (result.success) {
+          setActiveTab("questions");
+          if (publish) {
+            toast.success("Quiz updated and published successfully");
+          } else {
+            toast.success("Quiz updated successfully");
+          }
         }
       } else {
-        toast.error("Failed to create quiz");
+        const result = await createQuiz(quizData);
+        if (result.success) {
+          setActiveTab("questions");
+          setQuizId(result.quiz._id);
+          if (publish) {
+            toast.success("Quiz created and published successfully");
+          } else {
+            toast.success("Quiz created successfully");
+          }
+        } else {
+          toast.error("Failed to create quiz");
+        }
       }
-    }
-  };
+    },
+    [
+      formState,
+      assignmentName,
+      instruction,
+      rightAnswerComment,
+      wrongAnswerComment,
+      cid,
+      sid,
+      isEditing,
+      quizId,
+      updateQuiz,
+      createQuiz,
+    ]
+  );
 
-  const updateQuestion = async () => {
+  const updateQuestion = useCallback(async () => {
     const correctOption = answers.find((answer) => answer.isCorrect);
     const updatedQuestion = {
       questionText: question,
@@ -257,9 +305,21 @@ const MainSection = ({ setIsEditing }) => {
     } else {
       toast.error("Failed to update question");
     }
-  };
+  }, [
+    answers,
+    question,
+    questionPoint,
+    questionType,
+    rightAnswerComment,
+    wrongAnswerComment,
+    quizId,
+    editingQuestionId,
+    editQuestion,
+    questionState,
+    handleSidebarClose,
+  ]);
 
-  const resetQuestionForm = () => {
+  const resetQuestionForm = useCallback(() => {
     setQuestion("");
     setAnswers(initialAnswersState);
     setRightAnswerComment("");
@@ -267,7 +327,7 @@ const MainSection = ({ setIsEditing }) => {
     setQuestionPoint(1);
     setQuestionType("multiple choice");
     setEditingQuestionId(null);
-  };
+  }, []);
 
   return (
     <div className="flex flex-col w-full">
@@ -297,14 +357,12 @@ const MainSection = ({ setIsEditing }) => {
             {(activeTab) => (
               <div className="h-full">
                 {activeTab === "instructions" ? (
-                  <Suspense fallback={<div>Loading...</div>}>
-                    <QuizInstructions
-                      assignmentName={assignmentName}
-                      instruction={instruction}
-                      handleNameChange={handleNameChange}
-                      handleInstructionChange={handleInstructionChange}
-                    />
-                  </Suspense>
+                  <QuizInstructions
+                    assignmentName={assignmentName}
+                    instruction={instruction}
+                    handleNameChange={handleNameChange}
+                    handleInstructionChange={handleInstructionChange}
+                  />
                 ) : (
                   <QuestionListView
                     quizId={quizId}

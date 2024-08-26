@@ -16,7 +16,6 @@ const useFetchSection = () => {
       setError(null);
 
       try {
-       
         const token = localStorage.getItem(`${role}:token`);
         const response = await axios.get(
           `${baseUrl}/admin/getSectionByclass/${classId}`,
@@ -26,13 +25,17 @@ const useFetchSection = () => {
         );
 
         const { data } = response.data;
-        console.log(data)
-        dispatch(setSectionsList(data));
+        if (data.length > 0) {
+          dispatch(setSectionsList(data));
+        } else {
+          dispatch(setSectionsList([]));
+        }
         setLoading(false);
         return { success: true, data };
       } catch (err) {
         const errorMessage =
           err.response?.data?.message || "Failed to fetch section data";
+        dispatch(setSectionsList([])); // Clear the sections list on error
         setError(errorMessage);
         setLoading(false);
         return { success: false, error: errorMessage };

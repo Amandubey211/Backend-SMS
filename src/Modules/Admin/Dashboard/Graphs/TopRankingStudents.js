@@ -2,7 +2,7 @@ import React from "react";
 import TopRanker from "../../../../Assets/DashboardAssets/Aman dubey.png";
 import { MdKeyboardArrowDown } from "react-icons/md";
 import { ReactComponent as CrownIcon } from "../../../../Assets/DashboardAssets/SVG/crown.svg";
-import nodataimg from '../../../../Assets/DashboardAssets/nodata.png'
+import nodataimg from "../../../../Assets/DashboardAssets/nodata.png";
 const TopRankingStudents = () => {
   const topStudents = [
     {
@@ -60,20 +60,22 @@ const TopRankingStudents = () => {
     <div className="bg-white p-4 ">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-semibold ">Top Ranking Students</h2>
-
+        {/* 
         <div className="relative">
           <select className="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
             <option>Class: 5</option>
+
             {/* Add other class options here */}
-          </select>
+        {/* </select>
           <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
             <MdKeyboardArrowDown />
           </div>
-        </div>
+        </div> */}{" "}
+        {/* */}
       </div>
 
       <div className=" flex  w-full h-auto  py-20 ">
-        <img src={nodataimg} alt='image' className="w-full"/>
+        <img src={nodataimg} alt="image" className="w-full" />
         {/* {topStudents.slice(0, 3).map((student, index) => (
           <div key={index} className="text-center p-4 border rounded-lg relative">
 

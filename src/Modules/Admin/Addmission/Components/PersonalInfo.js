@@ -66,6 +66,7 @@ const PersonalInfo = ({ studentInfo, handleInputChange }) => {
           <option>Buddhism</option>
         </select>
       </div>
+
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="block text-gray-700">Blood Group</label>
@@ -75,7 +76,7 @@ const PersonalInfo = ({ studentInfo, handleInputChange }) => {
             value={studentInfo.bloodGroup}
             onChange={handleInputChange}
           >
-            <option value="">Choose Options</option>
+            <option value="">Choose </option>
             <option>O+</option>
             <option>O-</option>
             <option>A+</option>
@@ -96,6 +97,7 @@ const PersonalInfo = ({ studentInfo, handleInputChange }) => {
             className="mt-1 p-2 block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
             value={studentInfo.age}
             onChange={handleInputChange}
+            readOnly
           />
         </div>
       </div>

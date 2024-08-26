@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import { useSelector } from "react-redux";
 import useFetchSection from "../../../../Hooks/AuthHooks/Staff/Admin/Sections/useFetchSection";
-
 import { useParams } from "react-router-dom";
 import { createSelector } from "reselect";
 import useGetGroupsByClass from "../../../../Hooks/AuthHooks/Staff/Admin/Groups/useGetGroupByClass";
@@ -14,7 +13,7 @@ const selectSections = createSelector(
 const SectionSelect = ({ sectionId, handleChange, groupId, assignTo }) => {
   const { error, fetchSection, loading } = useFetchSection();
   const {
-    error: grpopError,
+    error: groupError,
     fetchGroupsByClass,
     loading: groupLoading,
   } = useGetGroupsByClass();
@@ -22,25 +21,13 @@ const SectionSelect = ({ sectionId, handleChange, groupId, assignTo }) => {
   const AllSections = useSelector(selectSections);
   const groupsList = useSelector((store) => store.Class.groupsList);
 
-  // const groups = section
-  //   ? AllSections.find((sec) => sec._id === section)?.groups
-  //   : AllSections.reduce((acc, sec) => acc.concat(sec.groups), []);
-
   useEffect(() => {
-    if (!AllSections.length) {
-      fetchSection(cid);
-    }
-    if (!groupsList || groupsList.length === 0) {
-      fetchGroupsByClass(cid);
-    }
-  }, [fetchSection, fetchGroupsByClass]);
+    fetchSection(cid);
+    fetchGroupsByClass(cid);
+  }, [fetchSection, fetchGroupsByClass, cid]);
 
-  if (loading) {
-    return <p>Loading sections...</p>;
-  }
-
-  if (error) {
-    return <p>Error loading sections: {error}</p>;
+  if (loading || groupLoading) {
+    return <p>Loading...</p>;
   }
 
   return (
@@ -57,16 +44,19 @@ const SectionSelect = ({ sectionId, handleChange, groupId, assignTo }) => {
             className="block w-full mb-4 p-2 border border-gray-300 rounded-lg"
           >
             <option value="">Choose Section</option>
-            {AllSections.map((section) => (
-              <option key={section._id} value={section._id}>
-                {section.sectionName}
-              </option>
-            ))}
+            {AllSections.length > 0 ? (
+              AllSections.map((section) => (
+                <option key={section._id} value={section._id}>
+                  {section.sectionName}
+                </option>
+              ))
+            ) : (
+              <option disabled>No Section available</option>
+            )}
           </select>
         </div>
       )}
       {assignTo === "Group" && (
-        // if section needs to be removed , just remove it from below
         <>
           <div className="mt-4">
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -77,15 +67,18 @@ const SectionSelect = ({ sectionId, handleChange, groupId, assignTo }) => {
               name="groupId"
               onChange={handleChange}
               className="block w-full p-2 border border-gray-300 rounded-lg"
-              disabled={loading}
+              disabled={loading || groupLoading}
             >
               <option value="">Choose Group</option>
-              {groupsList.map((group) => (
-                <option key={group._id} value={group._id}>
-                  {group.groupName}
-                  {/* {group.name} */}
-                </option>
-              ))}
+              {groupsList.length > 0 ? (
+                groupsList.map((group) => (
+                  <option key={group._id} value={group._id}>
+                    {group.groupName}
+                  </option>
+                ))
+              ) : (
+                <option disabled>No groups available</option>
+              )}
             </select>
           </div>
         </>

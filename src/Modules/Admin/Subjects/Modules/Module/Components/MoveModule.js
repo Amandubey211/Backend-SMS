@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import useMoveModule from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useMoveModule";
-import Spinner from "../../../../../../Components/Common/Spinner";
 
 const MoveModule = ({ moduleId, currentPosition, modulesData, onClose }) => {
   const [selectedIndex, setSelectedIndex] = useState(currentPosition);
@@ -10,7 +9,7 @@ const MoveModule = ({ moduleId, currentPosition, modulesData, onClose }) => {
   const handleIndexChange = (index) => {
     setSelectedIndex(index);
   };
-  console.log(currentPosition,"sdfsdf");
+
   const handleMove = async () => {
     if (selectedIndex === currentPosition) {
       return; // Do nothing if the selected index is the same as the current position

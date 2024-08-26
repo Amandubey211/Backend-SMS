@@ -21,27 +21,22 @@ const useGetGroupsByClass = () => {
           headers: { Authentication: token },
         });
 
-        console.log(response.data, "sdfsdf--------------");
-
-        if (response.data.status) {
-         dispatch(setGroupsList(response.data.data));
-          return response.data.data;
+        if (response.data.success && response.data.data.length > 0) {
+          dispatch(setGroupsList(response.data.data));
         } else {
           dispatch(setGroupsList([]));
-          toast.error("Failed to fetch groups. Please try again.");
-          return [];
+          toast.error("No groups found for this class.");
         }
       } catch (err) {
         const errorMessage =
           err.response?.data?.message || "Failed to fetch groups";
-        toast.error(errorMessage);
         setError(errorMessage);
-        return [];
+        dispatch(setGroupsList([])); // Clear the groups list on error
       } finally {
         setLoading(false);
       }
     },
-    [baseUrl, dispatch, role]
+    [dispatch, role]
   );
 
   return { loading, error, fetchGroupsByClass };

@@ -130,7 +130,8 @@ const Announce = () => {
                   </span>
                 </button>
               </div>
-              <button
+              {
+                role === 'admin'&& <button
                 onClick={handleSidebarOpen}
                 className="p-2 border border-red-300 rounded bg-pink-100 text-center flex justify-center items-center"
               >
@@ -138,6 +139,8 @@ const Announce = () => {
                   Add Notice
                 </span>
               </button>
+              }
+             
             </div>
             <div className="mt-5 rounded-lg overflow-auto">
               {filteredNotices.map((notice, index) => (

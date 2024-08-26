@@ -23,15 +23,11 @@ const ParentEvent = () => {
     month: currentDate.getMonth(),
     year: currentDate.getFullYear(),
   });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   const itemsPerPage = 4;
 
   useEffect(() => {
     const fetchEvents = async () => {
-      setLoading(true);
-      setError(null);
       try {
         const token = localStorage.getItem("parent:token");
         if (!token) {
@@ -60,14 +56,9 @@ const ParentEvent = () => {
           }));
           setEvents(formattedEvents);
           filterAndSortEvents(formattedEvents, selectedMonthYear);
-        } else {
-          setError("No events found");
         }
       } catch (error) {
         console.error("Failed to fetch events:", error);
-        setError("Failed to fetch events");
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -116,7 +107,9 @@ const ParentEvent = () => {
           return (
             <li
               key={event.id}
-              className={`inline-block px-2 py-1 rounded text-white ${bgColors[index % bgColors.length]} shadow-md cursor-pointer`}
+              className={`inline-block px-2 py-1 rounded text-white ${
+                bgColors[index % bgColors.length]
+              } shadow-md cursor-pointer`}
               onClick={() => handleStickerClick(event)}
             >
               {event.title} - {timeString}
@@ -160,21 +153,22 @@ const ParentEvent = () => {
           <div className="min-h-screen p-4 bg-gray-50">
             <div className="flex flex-row justify-between">
               <h1 className="mb-2 bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent font-semibold bg-clip-text">
-                Parent Events
+                 Events
               </h1>
             </div>
 
-            <div className="my-4 w-full h-40 flex rounded-sm gap-20 pl-10 relative ">
-              {loading ? (
-                <div className="flex justify-center items-center w-full h-full">
-                  <Spinner />
+            <div className="my-4 w-full h-40 flex rounded-sm gap-8 pl-8 relative ">
+              {currentPage > 0 && (
+                <div
+                  className="p-1 rounded-full text-purple-500 bg-white border-2 cursor-pointer absolute left-0 top-1/2 transform -translate-y-1/2"
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.max(prev - 1, 0))
+                  }
+                >
+                  <IoIosArrowBack />
                 </div>
-              ) : error ? (
-                <div className="flex flex-col items-center justify-center w-full h-full text-gray-500">
-                  <IoCalendarOutline className="text-6xl" />
-                  <span>{error}</span>
-                </div>
-              ) : paginatedEvents.length === 0 ? (
+              )}
+              {paginatedEvents.length === 0 ? (
                 <div className="flex flex-col items-center justify-center w-full h-full text-gray-500">
                   <IoCalendarOutline className="text-6xl" />
                   <span>No Events in this Month</span>
@@ -264,19 +258,21 @@ const ParentEvent = () => {
                       </select>
                       <div className="flex space-x-2">
                         <button
-                          className={`border rounded px-2 py-1 ${type === "month"
-                            ? "bg-gradient-to-r from-pink-500 to-purple-500 text-white"
-                            : ""
-                            }`}
+                          className={`border rounded px-2 py-1 ${
+                            type === "month"
+                              ? "bg-gradient-to-r from-pink-500 to-purple-500 text-white"
+                              : ""
+                          }`}
                           onClick={() => onTypeChange("month")}
                         >
                           Month
                         </button>
                         <button
-                          className={`border rounded px-2 py-1 ${type === "year"
-                            ? "bg-gradient-to-r from-pink-500 to-purple-500 text-white"
-                            : ""
-                            }`}
+                          className={`border rounded px-2 py-1 ${
+                            type === "year"
+                              ? "bg-gradient-to-r from-pink-500 to-purple-500 text-white"
+                              : ""
+                          }`}
                           onClick={() => onTypeChange("year")}
                         >
                           Year
