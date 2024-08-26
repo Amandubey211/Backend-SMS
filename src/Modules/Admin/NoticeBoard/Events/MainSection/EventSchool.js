@@ -12,7 +12,7 @@ import { format, parseISO, isValid } from "date-fns";
 import "../subComponents/customCalendar.css";
 import toast from "react-hot-toast";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
-import { IoCalendarOutline } from "react-icons/io5"; // Importing a calendar icon
+import { IoCalendarOutline } from "react-icons/io5";
 import { useSelector } from "react-redux";
 
 const EventScheduler = () => {
@@ -31,6 +31,7 @@ const EventScheduler = () => {
   const itemsPerPage = 4;
   const role = useSelector((store) => store.Auth.role);
   const token = localStorage.getItem(`${role}:token`);
+
   useEffect(() => {
     const fetchEvents = async () => {
       try {
@@ -157,8 +158,8 @@ const EventScheduler = () => {
         const result = await createEvent(eventData, token);
         if (result?.success) {
           toast.success(result.msg || "Event created successfully!");
-          refreshEvents(); // Refresh the events list to show new events
-          handleSidebarClose(); // Close the sidebar after success
+          refreshEvents();
+          handleSidebarClose();
         } else {
           toast.error("Failed to create event.");
         }
@@ -211,21 +212,16 @@ const EventScheduler = () => {
     }
   };
 
-  const bgColors = [
-    "#FF6C9C", // pink
-    "#E24DFF", // purple
-    "#21AEE7", // blue
-    "#FBB778", // orange
-  ];
+  const bgColors = ["#FF6C9C", "#E24DFF", "#21AEE7", "#FBB778"];
 
   const paginatedEvents = filteredEvents
-    .filter((event) => event.startDate >= currentDate) // Filter events from the current date onward
+    .filter((event) => event.startDate >= currentDate)
     .slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage);
 
   return (
     <Layout title="Event">
       <DashLayout>
-        <div className="min-h-screen p-4 bg-gray-50  max-w-screen ">
+        <div className="min-h-screen p-4 bg-gray-50 max-w-screen">
           <div className="flex flex-row justify-between">
             <h1 className="mb-2 bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent font-semibold bg-clip-text">
               Student Events
@@ -240,7 +236,7 @@ const EventScheduler = () => {
             )}
           </div>
 
-          <div className="my-4 h-40 flex rounded-sm gap-8 pl-8 relative   ">
+          <div className="my-4 h-40 flex rounded-sm gap-8 pl-8 relative">
             {currentPage > 0 && (
               <div
                 className="p-1 rounded-full text-purple-500 bg-white border-2 cursor-pointer absolute left-0 top-1/2 transform -translate-y-1/2"
@@ -250,7 +246,7 @@ const EventScheduler = () => {
               </div>
             )}
             {paginatedEvents.length === 0 ? (
-              <div className="flex flex-col items-center justify-center  h-full text-gray-500 w-full">
+              <div className="flex flex-col items-center justify-center h-full text-gray-500 w-full">
                 <IoCalendarOutline className="text-6xl" />
                 <span>No Events in this Month</span>
               </div>
@@ -275,7 +271,7 @@ const EventScheduler = () => {
             )}
           </div>
 
-          <hr className="my-6 border-t-2 mt-12 " />
+          <hr className="my-6 border-t-2 mt-12" />
           <div className="py-7">
             <Calendar
               dateCellRender={handleDateCellRender}
