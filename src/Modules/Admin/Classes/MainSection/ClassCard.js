@@ -40,7 +40,6 @@ const ClassCard = ({
   const handleConfirmDelete = () => {
     setModalOpen(false);
     deleteClass(classId);
-    toast.success(`${className} deleted successfully!`);
   };
 
   const handleCloseModal = () => {

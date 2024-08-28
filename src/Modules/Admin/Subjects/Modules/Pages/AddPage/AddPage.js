@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Layout from "../../../../../../Components/Common/Layout";
 import SideMenubar from "../../../../../../Components/Admin/SideMenubar";
 import AddPageHeader from "./AddPageHeader";
@@ -16,10 +16,11 @@ const AddPage = () => {
   const [editPermission, setEditPermission] = useState("Only Instructor");
   const [publishAt, setPublishDate] = useState("");
   const [isUpdating, setIsUpdating] = useState(false);
-  const [publish, setPublish] = useState(false);
   const [loadingType, setLoadingType] = useState(""); // Separate loading state for each button
+
   const isSidebarOpen = useSelector((state) => state.sidebar.isOpen);
   const sidebarWidth = isSidebarOpen ? "15%" : "7%";
+
   const {
     createPage,
     loading: createLoading,
@@ -38,7 +39,6 @@ const AddPage = () => {
       setTitle(state.page.title || "");
       setEditorContent(state.page.content || "");
       setEditPermission(state.page.editPermission || "Only Instructor");
-      setPublish(state.page.publish || false);
       if (state.page.publishAt) {
         setPublishDate(
           new Date(state.page.publishAt).toISOString().substring(0, 10)
@@ -48,43 +48,60 @@ const AddPage = () => {
     }
   }, [state]);
 
-  const handleNameChange = (name) => setTitle(name);
-  const handleEditorChange = (content) => setEditorContent(content);
-  const handleEditPermissionChange = (e) => setEditPermission(e.target.value);
-  const handlePublishDateChange = (e) => setPublishDate(e.target.value);
+  const handleNameChange = useCallback((name) => setTitle(name), []);
+  const handleEditorChange = useCallback(
+    (content) => setEditorContent(content),
+    []
+  );
+  const handleEditPermissionChange = useCallback(
+    (e) => setEditPermission(e.target.value),
+    []
+  );
+  const handlePublishDateChange = useCallback(
+    (e) => setPublishDate(e.target.value),
+    []
+  );
 
-  const handleSave = async (shouldPublish) => {
-    const pageData = {
+  const handleSave = useCallback(
+    async (shouldPublish) => {
+      const pageData = {
+        title,
+        content: editorContent,
+        editPermission,
+        publishAt,
+        publish: shouldPublish,
+      };
+
+      setLoadingType(shouldPublish ? "publish" : "save");
+
+      try {
+        if (isUpdating) {
+          await updatePage(state?.page._id, pageData);
+        } else {
+          await createPage(pageData);
+        }
+
+        // Handle success scenario if needed
+      } catch (error) {
+        console.error("Error saving page:", error);
+      } finally {
+        setLoadingType("");
+      }
+    },
+    [
       title,
-      content: editorContent,
+      editorContent,
       editPermission,
       publishAt,
-      publish: shouldPublish,
-    };
+      isUpdating,
+      state,
+      createPage,
+      updatePage,
+    ]
+  );
 
-    setLoadingType(shouldPublish ? "publish" : "save");
-
-    try {
-      if (isUpdating) {
-        await updatePage(state?.page._id, pageData);
-      } else {
-        await createPage(pageData);
-      }
-
-      // if (createSuccess || updateSuccess) {
-      //   // Reset the form if the operation is successful
-      //   setTitle("");
-      //   setEditorContent("");
-      //   setEditPermission("Only Instructor");
-      //   setPublishDate("");
-      //   setPublish(false);
-      // }
-    } catch (error) {
-      console.error("Error saving page:", error);
-    } finally {
-      setLoadingType("");
-    }
-  };
+  const loading = createLoading || updateLoading;
+  const error = createError || updateError;
 
   return (
     <Layout
@@ -141,9 +158,9 @@ const AddPage = () => {
               />
             </div>
           </div>
-          {(createError || updateError) && (
+          {error && (
             <p role="alert" className="text-red-400 text-current my-4">
-              {createError || updateError}
+              {error}
             </p>
           )}
         </div>
@@ -152,4 +169,4 @@ const AddPage = () => {
   );
 };
 
-export default AddPage;
+export default React.memo(AddPage);

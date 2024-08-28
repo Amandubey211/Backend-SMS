@@ -17,6 +17,7 @@ const PageCard = ({
   updateDate,
   id,
   profile,
+  publish,
   onDeleteSuccess,
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -30,10 +31,9 @@ const PageCard = ({
 
   const handleDelete = async () => {
     await deletePage(id);
-    if (success) {
-      onDeleteSuccess(); // Refetch the pages after successful deletion
-      setIsModalOpen(false);
-    }
+
+    onDeleteSuccess(); // Refetch the pages after successful deletion
+    setIsModalOpen(false);
   };
 
   const openDeleteModal = () => {
@@ -71,7 +71,7 @@ const PageCard = ({
         <div className="flex flex-col items-start">
           <div className="flex items-center">
             <IoCalendarOutline className="mr-1" />
-            <span>Publish</span>
+            {publish ? <span>Publish</span> : <span>Unpublish</span>}
           </div>
           <div className="text-lg text-gray-600 capitalize">
             <span>{formatDate(publishDate)}</span>

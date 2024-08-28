@@ -28,13 +28,16 @@ const CreateAnnouncementHeader = ({ onSave, loading, isEditing }) => {
         <button
           onClick={() => {
             onSave();
-            toast.success("Saved and Published", { position: "bottom-left" });
           }}
           className="flex-grow rounded-md py-2 px-6 text-center border bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200 transition"
           disabled={loading}
         >
           <span className="text-gradient">
-            {loading ? "Saving..." : isEditing ? "Update Announcement" : "Submit Announcement"}
+            {loading
+              ? "Saving..."
+              : isEditing
+              ? "Update Announcement"
+              : "Submit Announcement"}
           </span>
         </button>
       </div>
