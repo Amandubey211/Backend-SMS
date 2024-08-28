@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import { useLocation, useParams, useNavigate } from "react-router-dom";
 import Layout from "../../../../../../Components/Common/Layout";
 import SideMenubar from "../../../../../../Components/Admin/SideMenubar";
@@ -53,60 +53,78 @@ const AddDiscussion = () => {
 
   const isEditing = Boolean(state?.discussion?._id);
 
-  const handleNameChange = (e) => {
+  const handleNameChange = useCallback((e) => {
     setAssignmentName(e.target.value);
-  };
+  }, []);
 
-  const handleEditorChange = (content) => {
+  const handleEditorChange = useCallback((content) => {
     setEditorContent(content);
-  };
+  }, []);
 
-  const handleFileChange = (e) => {
+  const handleFileChange = useCallback((e) => {
     setFile(e.target.files[0]);
-  };
+  }, []);
 
-  const handleFormChange = (e) => {
+  const handleFormChange = useCallback((e) => {
     const { name, value } = e.target;
     setFormState((prev) => ({
       ...prev,
       [name]: value,
     }));
-  };
+  }, []);
 
-  const handleSave = async (publish) => {
-    const discussionData = {
-      title: assignmentName,
-      content: editorContent,
-      pointsPossible: formState.pointsPossible || 0,
-      graded: formState.graded || false,
-      allowThreadedReplies: formState.option === "threadedReplies",
-      mustPostBeforeSeeingReplies: formState.option === "postBeforeReplies",
-      assignTo: formState.assignTo,
-      sectionId: formState.assignTo === "Section" ? formState.sectionId : null,
-      groupId: formState.assignTo === "Group" ? formState.groupId : null,
-      dueDate: formState.dueDate,
-      availableFrom: formState.availableFrom,
-      availableUntil: formState.availableUntil,
-      attachment: file,
-      classId: cid,
-      publish, // Add publish flag here
-    };
+  const handleSave = useCallback(
+    async (publish) => {
+      const discussionData = {
+        title: assignmentName,
+        content: editorContent,
+        pointsPossible: formState.pointsPossible || 0,
+        graded: formState.graded || false,
+        allowThreadedReplies: formState.option === "threadedReplies",
+        mustPostBeforeSeeingReplies: formState.option === "postBeforeReplies",
+        assignTo: formState.assignTo,
+        sectionId:
+          formState.assignTo === "Section" ? formState.sectionId : null,
+        groupId: formState.assignTo === "Group" ? formState.groupId : null,
+        dueDate: formState.dueDate,
+        availableFrom: formState.availableFrom,
+        availableUntil: formState.availableUntil,
+        attachment: file,
+        classId: cid,
+        publish,
+      };
 
-    if (isEditing) {
-      await updateDiscussion(state.discussion._id, discussionData);
-    } else {
-      await createDiscussion(discussionData);
-    }
+      if (isEditing) {
+        await updateDiscussion(state.discussion._id, discussionData);
+      } else {
+        await createDiscussion(discussionData);
+      }
 
-    if (createSuccess || updateSuccess) {
-      navigate(`/class/${cid}/${sid}/discussions`);
-    }
-  };
+      if (createSuccess || updateSuccess) {
+        navigate(`/class/${cid}/${sid}/discussions`);
+      }
+    },
+    [
+      assignmentName,
+      editorContent,
+      formState,
+      file,
+      isEditing,
+      createDiscussion,
+      updateDiscussion,
+      state,
+      cid,
+      sid,
+      navigate,
+      createSuccess,
+      updateSuccess,
+    ]
+  );
 
   const loading = createLoading || updateLoading;
   const error = createError || updateError;
   const isSidebarOpen = useSelector((state) => state.sidebar.isOpen);
-  const sidebarWidth = isSidebarOpen ? "15%" : "7%"; // Adjust the width based on sidebar state
+  const sidebarWidth = isSidebarOpen ? "15%" : "7%";
 
   return (
     <Layout
@@ -156,11 +174,11 @@ const AddDiscussion = () => {
                 <Spinner />
               </p>
             )}
-            {/* {error && (
+            {error && (
               <p role="alert" className="text-red-400 text-current my-4">
                 {error}
               </p>
-            )} */}
+            )}
           </>
         </div>
       </div>
@@ -168,4 +186,4 @@ const AddDiscussion = () => {
   );
 };
 
-export default AddDiscussion;
+export default React.memo(AddDiscussion);

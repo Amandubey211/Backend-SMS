@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback, useMemo } from "react";
+import React, { memo, useState, useRef, useCallback, useMemo } from "react";
 import JoditEditor from "jodit-react";
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
@@ -14,7 +14,7 @@ const EditorComponent = ({
   isCreateQuestion,
 }) => {
   const editor = useRef(null);
-  const [loading, setLoading] = useState(false);
+  // const [loading, setLoading] = useState(false);
   const [scrollPosition, setScrollPosition] = useState(0);
 
   // Function to create and show a custom progress bar below the toolbar
@@ -114,7 +114,7 @@ const EditorComponent = ({
         if (editorInstance) {
           removeProgressBar(editorInstance, progressBar); // Remove progress bar
         }
-        setLoading(false);
+        // setLoading(false);
         // Restore the scroll position
         window.scrollTo(0, scrollPosition);
       }
@@ -137,21 +137,21 @@ const EditorComponent = ({
   }, [handleImageUpload]);
 
   // Print the content of the editor
-  const handlePrint = useCallback(() => {
-    if (editor.current) {
-      const printWindow = window.open("", "PRINT", "height=600,width=800");
-      printWindow.document.write(`
-        <html>
-        <head><title>Print</title></head>
-        <body>${editor.current.value}</body>
-        </html>
-      `);
-      printWindow.document.close(); // Necessary for some browsers
-      printWindow.focus(); // Necessary for some browsers
-      printWindow.print();
-      printWindow.close();
-    }
-  }, []);
+  // const handlePrint = useCallback(() => {
+  //   if (editor.current) {
+  //     const printWindow = window.open("", "PRINT", "height=600,width=800");
+  //     printWindow.document.write(`
+  //       <html>
+  //       <head><title>Print</title></head>
+  //       <body>${editor.current.value}</body>
+  //       </html>
+  //     `);
+  //     printWindow.document.close(); // Necessary for some browsers
+  //     printWindow.focus(); // Necessary for some browsers
+  //     printWindow.print();
+  //     printWindow.close();
+  //   }
+  // }, []);
 
   // Jodit Editor Configuration
   const config = useMemo(
@@ -202,11 +202,12 @@ const EditorComponent = ({
         "link",
         "preview", // Include Preview
         "fullsize", // Include Fullscreen
-        {
-          name: "print",
-          tooltip: "Print Content",
-          exec: handlePrint,
-        },
+        "print",
+        // {
+        //   name: "print",
+        //   tooltip: "Print Content",
+        //   exec: handlePrint,
+        // },
       ],
       events: {
         change: (newContent) => {
@@ -217,7 +218,7 @@ const EditorComponent = ({
         },
       },
     }),
-    [isCreateQuestion, onEditorChange, triggerImageUpload, handlePrint]
+    [isCreateQuestion, onEditorChange, triggerImageUpload]
   );
 
   return (
@@ -251,4 +252,4 @@ const EditorComponent = ({
   );
 };
 
-export default EditorComponent;
+export default memo(EditorComponent);

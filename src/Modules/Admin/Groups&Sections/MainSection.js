@@ -45,7 +45,6 @@ const MainSection = () => {
       setGroupList(data);
     }
   };
-  console.log(groupList, "sdfghgf");
 
   const fetchStudents = async () => {
     try {
@@ -98,6 +97,7 @@ const MainSection = () => {
         onSectionChange={handleSectionChange}
         selectedSection={activeSection}
         fetchSections={fetchSection}
+        fetchGroups={fetchGroups}
       />
       <div className="flex flex-grow">
         <div className="w-80 h-full flex-shrink-0">

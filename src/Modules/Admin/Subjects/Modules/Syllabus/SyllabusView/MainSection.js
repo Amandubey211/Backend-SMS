@@ -70,12 +70,14 @@ const MainSection = () => {
       <SubjectSideBar />
       <div className="border-l w-full p-4 relative">
         {renderContent()}
-        <NavLink
-          to={`/class/${cid}/${sid}/syllabus/create_syllabus`}
-          className="bg-gradient-to-r from-purple-400 to-pink-400 text-white p-4 fixed rounded-full shadow-md bottom-4 right-4"
-        >
-          <RiAddFill size={24} />
-        </NavLink>
+        {syllabi && syllabi.length === 0 && (
+          <NavLink
+            to={`/class/${cid}/${sid}/syllabus/create_syllabus`}
+            className="bg-gradient-to-r from-purple-400 to-pink-400 text-white p-4 fixed rounded-full shadow-md bottom-4 right-4"
+          >
+            <RiAddFill size={24} />
+          </NavLink>
+        )}
       </div>
     </div>
   );

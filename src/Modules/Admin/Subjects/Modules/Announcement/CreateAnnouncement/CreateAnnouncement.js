@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useLocation, useParams } from "react-router-dom";
 import Layout from "../../../../../../Components/Common/Layout";
 import SideMenubar from "../../../../../../Components/Admin/SideMenubar";
@@ -39,6 +39,7 @@ const CreateAnnouncement = () => {
   const { cid } = useParams();
   const isSidebarOpen = useSelector((state) => state.sidebar.isOpen);
   const sidebarWidth = isSidebarOpen ? "15%" : "7%";
+
   useEffect(() => {
     if (announcement) {
       setAssignmentName(announcement.title || "");
@@ -56,27 +57,27 @@ const CreateAnnouncement = () => {
     }
   }, [announcement]);
 
-  const handleNameChange = (e) => {
+  const handleNameChange = useCallback((e) => {
     setAssignmentName(e.target.value);
-  };
+  }, []);
 
-  const handleEditorChange = (content) => {
+  const handleEditorChange = useCallback((content) => {
     setEditorContent(content);
-  };
+  }, []);
 
-  const handleFileChange = (e) => {
+  const handleFileChange = useCallback((e) => {
     setFile(e.target.files[0]);
-  };
+  }, []);
 
-  const handleFormChange = (e) => {
+  const handleFormChange = useCallback((e) => {
     const { name, value } = e.target;
     setFormState((prev) => ({
       ...prev,
       [name]: value,
     }));
-  };
+  }, []);
 
-  const handleSave = async () => {
+  const handleSave = useCallback(async () => {
     const announcementData = {
       title: assignmentName,
       content: editorContent,
@@ -107,7 +108,16 @@ const CreateAnnouncement = () => {
         console.log("Announcement created successfully", result);
       }
     }
-  };
+  }, [
+    assignmentName,
+    editorContent,
+    formState,
+    file,
+    cid,
+    announcement,
+    editAnnouncement,
+    createAnnouncement,
+  ]);
 
   const loading = createLoading || editLoading;
   const error = createError || editError;
@@ -163,4 +173,4 @@ const CreateAnnouncement = () => {
   );
 };
 
-export default CreateAnnouncement;
+export default React.memo(CreateAnnouncement);

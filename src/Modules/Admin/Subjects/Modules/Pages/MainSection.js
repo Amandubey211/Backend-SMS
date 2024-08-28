@@ -52,6 +52,7 @@ const MainSection = () => {
                   authorName={page.authorName}
                   publishDate={page.createdAt}
                   updateDate={page.updatedAt}
+                  publish={page.publish}
                   onDeleteSuccess={fetchAllPages} // Pass the refetch function
                 />
               ))}

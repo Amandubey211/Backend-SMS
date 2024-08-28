@@ -44,9 +44,10 @@ const Header = ({ discussion, refetchDiscussion }) => {
 
   const confirmDelete = async () => {
     await deleteDiscussion(discussion._id);
-    if (deleteSuccess) {
+    // if (deleteSuccess) {
       navigate(`/class/${cid}/${sid}/discussions`);
-    }
+      setModalOpen(false)
+    // }
   };
 
   const handleClickOutside = (event) => {
@@ -182,7 +183,7 @@ const Header = ({ discussion, refetchDiscussion }) => {
         isOpen={isModalOpen}
         onClose={() => setModalOpen(false)}
         onConfirm={confirmDelete}
-        title={discussion.title || "this discussion"}
+        title={discussion.title || "discussion"}
       />
     </div>
   );

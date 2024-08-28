@@ -11,7 +11,12 @@ import { useParams } from "react-router-dom";
 
 const AddGroup = lazy(() => import("./AddGroup"));
 
-const NavigationBar = ({ onSectionChange, selectedSection, fetchSections }) => {
+const NavigationBar = ({
+  onSectionChange,
+  selectedSection,
+  fetchSections,
+  fetchGroups,
+}) => {
   const [sidebarType, setSidebarType] = useState(null);
   const [hoveredSection, setHoveredSection] = useState(null);
   const [editingSection, setEditingSection] = useState(null); // Track editing section
@@ -139,7 +144,7 @@ const NavigationBar = ({ onSectionChange, selectedSection, fetchSections }) => {
         title="Add New Group"
       >
         <Suspense fallback={<div>Loading...</div>}>
-          <AddGroup />
+          <AddGroup fetchGroups={fetchGroups}    onClose={closeSidebar} />
         </Suspense>
       </Sidebar>
 
