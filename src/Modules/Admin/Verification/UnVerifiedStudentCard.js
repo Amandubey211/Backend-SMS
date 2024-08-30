@@ -1,5 +1,6 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
+import { CiUser } from "react-icons/ci";
 
 const UnVerifiedStudentCard = ({ student, color }) => {
   return (
@@ -18,12 +19,16 @@ const UnVerifiedStudentCard = ({ student, color }) => {
         </div>
       </div>
       <div className="flex items-center mt-4">
-        <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-white">
-          <img
-            src={student.profile ||"https://avatars.githubusercontent.com/u/109097090?v=4" }
-            alt="Student"
-            className="w-full h-full object-cover"
-          />
+        <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-white flex justify-center items-center bg-white text-gray-800">
+          {student.profile ? (
+            <img
+              src={student.profile}
+              alt="Student"
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <CiUser size={24} />
+          )}
         </div>
         <div className="ml-3">
           <p className="text-sm font-medium">QID: {student?.Q_Id}</p>

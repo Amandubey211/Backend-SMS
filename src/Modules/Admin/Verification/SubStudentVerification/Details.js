@@ -1,4 +1,5 @@
 import React from "react";
+import { CiUser } from "react-icons/ci";
 
 const formatDate = (dateString) => {
   if (!dateString) return "";
@@ -14,14 +15,17 @@ const Details = ({ student }) => {
     <div className="w-full max-w-4xl bg-white rounded-lg overflow-hidden">
       <div className="p-6">
         <div className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4 mb-6">
-          <img
-            className="w-16 h-16 rounded-full"
-            src={
-              student.profile ||
-              "https://avatars.githubusercontent.com/u/109097090?v=4"
-            } // Placeholder image, replace with actual profile picture URL from student object
-            alt={`${student?.firstName} ${student?.lastName}`}
-          />
+          <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-white flex justify-center items-center bg-gray-200 text-gray-800">
+            {student?.profile ? (
+              <img
+                className="w-full h-full object-cover"
+                src={student.profile}
+                alt={`${student?.firstName} ${student?.lastName}`}
+              />
+            ) : (
+              <CiUser size={32} />
+            )}
+          </div>
           <div className="text-center sm:text-left">
             <h2 className="text-xl capitalize font-semibold text-gray-800">{`${student?.firstName} ${student?.lastName}`}</h2>
             <p className="text-gray-600">{student?.role}</p>
@@ -124,7 +128,9 @@ const Details = ({ student }) => {
               <span className="font-medium text-gray-700">
                 Verified Documents:
               </span>
-              <p className="text-gray-600">{student?.isVerifiedDocuments}</p>
+              <p className="text-gray-600">
+                {student?.isVerifiedDocuments ? "Yes" : "No"}
+              </p>
             </div>
             <div className="bg-gray-100 rounded-md p-4 transition-opacity duration-500 ease-in-out hover:opacity-80">
               <span className="font-medium text-gray-700">
