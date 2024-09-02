@@ -1,11 +1,12 @@
 import React from "react";
 import { MdOutlineCall, MdEmail, MdOutlinePerson, MdOutlineLocationOn } from "react-icons/md";
-
+import profileIcon from '../../../../Assets/DashboardAssets/profileIcon.png'
 const ViewAccountant = ({ accountant }) => {
+  
   return (
     <div className="flex flex-col">
     <div className="flex flex-col justify-center items-center py-3">
-      <img className="object-cover rounded-full w-[100px] h-[100px]" src={accountant.profile} alt={accountant.name} />
+      <img className="object-cover rounded-full w-[100px] h-[100px]" src={accountant.profile || profileIcon} alt={accountant.name} />
       <h3 className="text-lg font-medium">{accountant.name}</h3>
       <p className="text-gray-500">{accountant.email}</p>
     </div>
@@ -14,7 +15,7 @@ const ViewAccountant = ({ accountant }) => {
         <MdOutlineCall className='text-pink-600 text-2xl p-1 border border-pink-200 rounded-full' />
         <div className="flex flex-col justify-center">
           <span className="font-medium">Phone</span>
-          <span className="text-gray-500 text-sm">{accountant.phone}</span>
+          <span className="text-gray-500 text-sm">{accountant.mobileNumber}</span>
         </div>
       </div>
       <div className="flex h-full p-4 gap-5 items-start">

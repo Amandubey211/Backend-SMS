@@ -1,11 +1,11 @@
 import React from "react";
 import { MdOutlineCall, MdEmail, MdOutlineLocationOn, MdOutlinePerson } from "react-icons/md";
-
+import profileIcon from '../../../../Assets/DashboardAssets/profileIcon.png'
 const ViewStaff = ({ staff }) => {
   return (
     <div className="flex flex-col">
       <div className="flex flex-col justify-center items-center py-3">
-        <img className="object-cover rounded-full w-[100px] h-[100px]" src={staff.profile} alt={staff.name} />
+        <img className="object-cover rounded-full w-[100px] h-[100px]" src={staff.profile || profileIcon} alt={staff.name} />
         <h3 className="text-lg font-medium">{staff.firstName}</h3>
         <p className="text-gray-500">{staff.email}</p>
       </div>
