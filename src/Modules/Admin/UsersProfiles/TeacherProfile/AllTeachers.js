@@ -45,10 +45,10 @@ const AllTeachers = () => {
   setIsModalOpen(false);
  }
  const editUser = async(event,data)=>{
-  setSidebarOpen(true);
-  setTeacherData(data);
-  setSidebarContent("editTecaher");
   event.stopPropagation();
+  setSidebarContent("editTecaher");
+  setSidebarOpen(true);
+  setSelectedStaff(data);
  }
     const [isModalOpen, setIsModalOpen] = useState(false);
   const openModal = () => {
@@ -71,7 +71,7 @@ const AllTeachers = () => {
         case "addTeacher":
           return <AddUser role="staff"  />;
         case "editTecaher":
-          return <AddUser role="staff" data={selectedStaff} />;
+          return <AddUser  role = {'teacher'} data={selectedStaff} />;
         default:
         return <div>Select an action</div>;
     }
@@ -94,7 +94,7 @@ const AllTeachers = () => {
               <span>Add New Teacher</span>
             </button>
           </div>
-          <div className="flex flex-wrap  gap-4">
+          <div className="flex flex-wrap -mx-2">
             {teachers.length >0 ?
             teachers.map((teacher, index) => (
              

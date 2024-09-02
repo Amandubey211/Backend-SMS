@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import toast from "react-hot-toast";
 import useGetAllTeachers from "../../../Hooks/AuthHooks/Staff/Admin/Teacher/useGetAllTeacher";
 import { useSelector } from "react-redux";
 // import useFetchSubjects from "../../../Hooks/AuthHooks/Staff/Admin/useFetchSubjects";

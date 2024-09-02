@@ -53,13 +53,22 @@ const SideMenubar = () => {
   };
 
   const HandleNavigate = () => {
-    if(role=='admin'){
-       navigate("/users/admin");   
-    }
-    if(role=='teacher' || 'accountant' || 'librarian' || 'staff'){
-      navigate("/users/my/profile"); 
-    }
+    if (role === "admin") {
+      navigate("/users/admin");
+    } else if (
+      role === "teacher" ||
+      role === "accountant" ||
+      role === "librarian" ||
+      role === "staff"
+    ) {
+      navigate("/users/my/profile");
+    } else {
+      // Handle any other roles or add a default navigation
 
+      console.warn(
+        "Role not recognized. Navigation not defined for this role."
+      );
+    }
   };
 
   const filteredSidebarData = sidebarData.filter((item) =>

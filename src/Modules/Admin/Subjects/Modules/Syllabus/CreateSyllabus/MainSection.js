@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useLocation, useParams } from "react-router-dom";
 import CreateSyllabusHeader from "./Components/CreateSyllabusHeader";
 import SideMenubar from "../../../../../../Components/Admin/SideMenubar";
@@ -33,15 +33,15 @@ const MainSection = ({ setIsEditing }) => {
     setIsEditing(Boolean(state?.syllabus?._id));
   }, [state, setIsEditing]);
 
-  const handleNameChange = (name) => {
+  const handleNameChange = useCallback((name) => {
     setAssignmentName(name);
-  };
+  }, []);
 
-  const handleEditorChange = (content) => {
+  const handleEditorChange = useCallback((content) => {
     setEditorContent(content);
-  };
+  }, []);
 
-  const handleSave = async () => {
+  const handleSave = useCallback(async () => {
     const data = {
       title: assignmentName,
       content: editorContent,
@@ -53,7 +53,7 @@ const MainSection = ({ setIsEditing }) => {
     } else {
       await createSyllabus(data);
     }
-  };
+  }, [assignmentName, editorContent, sid, state, editSyllabus, createSyllabus]);
 
   const loading = createLoading || editLoading;
   const error = createError || editError;
@@ -93,4 +93,4 @@ const MainSection = ({ setIsEditing }) => {
   );
 };
 
-export default MainSection;
+export default React.memo(MainSection);

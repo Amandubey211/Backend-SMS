@@ -8,10 +8,12 @@ import useGetStudentsByClassAndSection from '../../../../Hooks/AuthHooks/Staff/A
 import axios from 'axios';
 import { baseUrl } from '../../../../config/Common';
 import toast from 'react-hot-toast';
+import { FiLoader } from 'react-icons/fi';
 const MassFee = ({onUpdate}) => {
   const [sectionData, setSectionData] = useState([]);
   const [studentData, setStudentData] = useState([]);
  const [classData, setClassData] = useState([]);
+ const [loading,setLoading] = useState(false);
   const role = useSelector((store) => store.Auth.role);
   const token = localStorage.getItem(`${role}:token`);
   const { classList, sectionsList } = useSelector((store) => store.Class);
@@ -42,21 +44,24 @@ const MassFee = ({onUpdate}) => {
     if (name === 'class') {
       const findClass = classList.find((item) => item.className === value);
       if (findClass) {
-          await fetchSection(findClass._id);
+        setLoading(true);
+         const classSections =  await fetchSection(findClass._id);
+         console.log(classSections);  
+         
           const students = await fetchStudentsByClassAndSection(findClass._id);
 
           setStudentData(students.map((item) => ({
               value: item.firstName + item.lastName,
               label: `${item.firstName } ID:${item?.admissionNumber}`,
-            
-              
 
           })));
-          console.log(students);
-          setSectionData(sectionsList.map((item) => ({
+          setSectionData(classSections?.data.map((item) => ({
               value: item.sectionName,
-              label: item.sectionName
+              label: item.sectionName,
+              id:item._id
           })));
+         
+          setLoading(false);
       } else {
           console.log('Class not found');
       }
@@ -67,7 +72,15 @@ const MassFee = ({onUpdate}) => {
     e.preventDefault();
     console.log('Submitting Single Fee:', formData);
     const selectedClass = classList.find(item => item.className === formData.class);
-    const students = await fetchStudentsByClassAndSection(selectedClass?._id);
+    let students;
+    if(formData.section){
+      const section = sectionData.find((item) => item.value === formData.section);
+
+     students = await fetchStudentsByClassAndSection(section.id);
+    }else{
+       students = await fetchStudentsByClassAndSection(selectedClass?._id);  
+    }
+  
 
     const selectedStudents = students.map((item)=>{return item._id});
     console.log(selectedStudents);
@@ -108,7 +121,9 @@ const MassFee = ({onUpdate}) => {
   };
 
   return (
-    <form className="space-y-4" onSubmit={handleSubmit}>
+    <>{loading?<div className='w-full h-[60vh] flex items-center justify-center'>
+      <FiLoader className="animate-spin mr-2 w-[3rem] h-[3rem] " />
+    </div>: <form className="space-y-4" onSubmit={handleSubmit}>
        <div className='flex justify-between px-4'>
       <FormSelect id="class" label="Class" options={classData} value={formData.class} onChange={handleChange} required />
       <FormSelect id="section" label="Section" options={sectionData} value={formData.section} onChange={handleChange}  />
@@ -119,7 +134,7 @@ const MassFee = ({onUpdate}) => {
       <button type="submit" className="w-full flex justify-center border border-transparent shadow-sm text-sm font-medium  bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600">
         Add New Fees
       </button>
-    </form>
+    </form>}</>
   );
 };
 

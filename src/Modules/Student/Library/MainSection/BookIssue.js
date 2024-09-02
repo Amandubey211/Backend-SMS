@@ -7,6 +7,7 @@ import { bookIssueData } from "../../studentDummyData/studentDummyData";
 import FormField from "../../../Admin/Accounting/subClass/component/FormField";
 import axios from "axios";
 import { baseUrl } from "../../../../config/Common";
+import { FaExclamationTriangle } from "react-icons/fa"; // Import the icon
 
 const BookIssue = () => {
   const [bookIssueData, setBookIssueData] = useState([]);
@@ -28,24 +29,23 @@ const BookIssue = () => {
   const fetchBookIssues = async () => {
     console.log("Fetching book issues...");
     try {
-      const token = localStorage.getItem('student:token');
+      const token = localStorage.getItem("student:token");
       console.log("Token in student book issue:", token);
 
       if (!token) {
-        throw new Error('Authentication token not found');
+        throw new Error("Authentication token not found");
       }
 
       const response = await axios.get(`${baseUrl}/student/issue/books`, {
         headers: {
-          'Authentication': token
-        }
+          Authentication: token,
+        },
       });
 
       const data = response.data?.booksIssue.reverse();
       console.log("Data parsed:", data);
 
       setBookIssueData(data);
-
     } catch (error) {
       console.error("Failed to fetch book issues:", error);
     }
@@ -59,13 +59,13 @@ const BookIssue = () => {
     if (filters.status === "All") {
       return bookIssueData;
     }
-    return bookIssueData.filter(item => item.status === filters.status);
+    return bookIssueData.filter((item) => item.status === filters.status);
   }, [bookIssueData, filters.status]);
 
   return (
     <div className="min-h-screen p-4 bg-gray-50">
       <div className="flex justify-between items-center mb-4">
-
+        {/* Your other content */}
       </div>
       <div className="flex gap-3 mb-5">
         {["All", "Pending", "Return"].map((status) => (
@@ -80,20 +80,20 @@ const BookIssue = () => {
                 className="hidden"
               />
               <div
-                className={`h-5 w-5 rounded-full mr-2 flex items-center justify-center border-2 ${filters.status === status
-                  ? "border-green-500 bg-green-500"
-                  : "border-gray-300"
-                  }`}
+                className={`h-5 w-5 rounded-full mr-2 flex items-center justify-center border-2 ${
+                  filters.status === status
+                    ? "border-green-500 bg-green-500"
+                    : "border-gray-300"
+                }`}
               >
                 {filters.status === status && (
                   <div className="h-3 w-3 bg-white rounded-full"></div>
                 )}
               </div>
               <span
-                className={`transition-colors duration-200 ${filters.status === status
-                  ? "text-red-700"
-                  : "text-gray-700"
-                  }`}
+                className={`transition-colors duration-200 ${
+                  filters.status === status ? "text-red-700" : "text-gray-700"
+                }`}
               >
                 {status}
               </span>
@@ -102,24 +102,36 @@ const BookIssue = () => {
         ))}
       </div>
       <div className="overflow-x-auto bg-white shadow rounded-lg">
-        <table className="min-w-full">
-          <thead>
-            <tr className="text-left text-gray-700 bg-gray-100">
-              <th className="px-5 py-3 border-b border-gray-200">Issue Book</th>
-              <th className="px-5 py-3 border-b border-gray-200">Author</th>
-              <th className="px-5 py-3 border-b border-gray-200">Category</th>
-              <th className="px-5 py-3 border-b border-gray-200">Issue Date</th>
-              <th className="px-5 py-3 border-b border-gray-200">Return Date</th>
-              <th className="px-5 py-3 border-b border-gray-200">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredBookIssueData?.map((item) => (
-              <BookIssueRow key={item.id} item={item} />
-
-            ))}
-          </tbody>
-        </table>
+        {filteredBookIssueData.length === 0 ? ( // Check if there's no data
+          <div className="flex flex-col items-center justify-center py-10 text-gray-500">
+            <FaExclamationTriangle className="w-12 h-12 mb-3" />
+            <p className="text-lg font-semibold">No data found</p>
+          </div>
+        ) : (
+          <table className="min-w-full">
+            <thead>
+              <tr className="text-left text-gray-700 bg-gray-100">
+                <th className="px-5 py-3 border-b border-gray-200">
+                  Issue Book
+                </th>
+                <th className="px-5 py-3 border-b border-gray-200">Author</th>
+                <th className="px-5 py-3 border-b border-gray-200">Category</th>
+                <th className="px-5 py-3 border-b border-gray-200">
+                  Issue Date
+                </th>
+                <th className="px-5 py-3 border-b border-gray-200">
+                  Return Date
+                </th>
+                <th className="px-5 py-3 border-b border-gray-200">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredBookIssueData.map((item) => (
+                <BookIssueRow key={item.id} item={item} />
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
     </div>
   );

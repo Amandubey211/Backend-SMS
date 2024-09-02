@@ -66,43 +66,43 @@ const SearchBar = () => (
 const Navbar = ({ hideSearchbar, hideAvatarList, hideStudentView }) => {
   const [isOpenNotification, setIsOpenNotification] = useState(false);
   const [notificationCount, setNotificationCount] = useState(0);
-  // useEffect(()=>{
-  //   function getNotificationsFromIndexedDB() {
-  //     return new Promise((resolve, reject) => {
-  //       const dbPromise = indexedDB.open('firebase-messaging-store', 1);
-  //       dbPromise.onsuccess = function(event) {
-  //         const db = event.target.result;
-  //         const transaction = db.transaction(['notifications'], 'readonly');
-  //         const objectStore = transaction.objectStore('notifications');
-  //         const request = objectStore.getAll();
+   useEffect(()=>{
+     function getNotificationsFromIndexedDB() {
+       return new Promise((resolve, reject) => {
+         const dbPromise = indexedDB.open('firebase-messaging-store', 1);
+         dbPromise.onsuccess = function(event) {
+           const db = event.target.result;
+           const transaction = db.transaction(['notifications'], 'readonly');
+           const objectStore = transaction.objectStore('notifications');
+           const request = objectStore.getAll();
 
-  //         request.onsuccess = function() {
-  //           resolve(request.result);
+           request.onsuccess = function() {
+             resolve(request.result);
 
-  //         };
+           };
 
-  //         request.onerror = function(event) {
+           request.onerror = function(event) {
 
-  //           reject(event);
-  //         };
-  //       };
+             reject(event);
+           };
+         };
 
-  //       dbPromise.onerror = function(event) {
-  //         reject(event);
-  //       };
-  //     });
-  //   };
-  //   getNotificationsFromIndexedDB().then((notifications) => {
-  //     console.log('Retrieved notifications from IndexedDB:', notifications);
-  //     localStorage.setItem('NotificationCount',notifications?.length)
-  //     // Display notifications in your UI
-  //   }).catch((error) => {
-  //     console.error('Failed to retrieve notifications from IndexedDB:', error);
-  //   });
-  // },[])
-  // useEffect(()=>{
-  //   setNotificationCount(localStorage.getItem('NotificationCount'));
-  // },[localStorage.getItem('NotificationCount'),notificationCount]);
+         dbPromise.onerror = function(event) {
+           reject(event);
+         };
+       });
+     };
+     getNotificationsFromIndexedDB().then((notifications) => {
+       console.log('Retrieved notifications from IndexedDB:', notifications);
+       localStorage.setItem('NotificationCount',notifications?.length)
+       // Display notifications in your UI
+     }).catch((error) => {
+       console.error('Failed to retrieve notifications from IndexedDB:', error);
+     });
+   },[])
+   useEffect(()=>{
+     setNotificationCount(localStorage.getItem('NotificationCount'));
+   },[localStorage.getItem('NotificationCount'),notificationCount]);
   const openNotification = () => {
     setIsOpenNotification(true);
   };
@@ -234,7 +234,7 @@ const Navbar = ({ hideSearchbar, hideAvatarList, hideStudentView }) => {
         onClose={() => setIsOpenNotification(false)}
         title={"Recent Notifications"}
       >
-        {/* <NotificationBar/> */}
+       <NotificationBar/>
       </Sidebar>
     </div>
   );

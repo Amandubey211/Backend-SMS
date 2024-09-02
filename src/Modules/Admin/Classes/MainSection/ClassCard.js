@@ -1,20 +1,23 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
+import { useDispatch, useSelector } from "react-redux";
+import { NavLink } from "react-router-dom";
+import toast from "react-hot-toast";
+import { TbEdit } from "react-icons/tb";
+import { RiDeleteBin6Line } from "react-icons/ri";
+
 import leftLogo from "../../../../Assets/ClassesAssets/ClassCardLeftLogo.png";
 import RightLogo from "../../../../Assets/ClassesAssets/ClassCardRightLogo.png";
 import centerLogo from "../../../../Assets/ClassesAssets/ClassCardCenterLogo.png";
-import { NavLink } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { setSelectedClass } from "../../../../Redux/Slices/Common/CommonSlice";
-import { TbEdit } from "react-icons/tb";
-import { RiDeleteBin6Line } from "react-icons/ri";
-import toast from "react-hot-toast";
+
 import Sidebar from "../../../../Components/Common/Sidebar";
 import AddNewClass from "./AddNewClass";
 import useCreateClass from "../../../../Hooks/AuthHooks/Staff/Admin/Class/useCreateClass";
 import DeleteModal from "../../../../Components/Common/DeleteModal";
+import { setSelectedClass } from "../../../../Redux/Slices/Common/CommonSlice";
 
 const ClassCard = ({
+  role,
   className,
   teachersCount,
   students,
@@ -30,7 +33,6 @@ const ClassCard = ({
   const handleSidebarOpen = () => setSidebarOpen(true);
   const handleSidebarClose = () => setSidebarOpen(false);
 
-
   const handleDeleteClick = () => {
     setModalOpen(true);
   };
@@ -38,9 +40,7 @@ const ClassCard = ({
   const handleConfirmDelete = () => {
     setModalOpen(false);
     deleteClass(classId);
-    toast.success(`${className} deleted successfully!`);
   };
-
 
   const handleCloseModal = () => {
     setModalOpen(false);
@@ -61,22 +61,24 @@ const ClassCard = ({
             alt="class_logo"
           />
         </div>
-        <div className="absolute top-2 right-2 flex flex-col space-y-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <button
-            onClick={handleSidebarOpen}
-            className="bg-white p-1 rounded-full shadow hover:bg-gray-200"
-          >
-            <TbEdit className="w-5 h-5  text-green-500" />
-          </button>
-          <button
-            disabled={loading}
-            aria-busy={loading ? "true" : "false"}
-            onClick={handleDeleteClick}
-            className="bg-white p-1 rounded-full shadow hover:bg-gray-200"
-          >
-            <RiDeleteBin6Line className="w-5 h-5 text-red-500" />
-          </button>
-        </div>
+        {role === "admin" && (
+          <div className="absolute top-2 right-2 flex flex-col space-y-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <button
+              onClick={handleSidebarOpen}
+              className="bg-white p-1 rounded-full shadow hover:bg-gray-200"
+            >
+              <TbEdit className="w-5 h-5  text-green-500" />
+            </button>
+            <button
+              disabled={loading}
+              aria-busy={loading ? "true" : "false"}
+              onClick={handleDeleteClick}
+              className="bg-white p-1 rounded-full shadow hover:bg-gray-200"
+            >
+              <RiDeleteBin6Line className="w-5 h-5 text-red-500" />
+            </button>
+          </div>
+        )}
         <NavLink
           to={`/class/${classId}`}
           onClick={() => dispatch(setSelectedClass(className))}
@@ -103,19 +105,27 @@ const ClassCard = ({
           </div>
         </div>
       </div>
-      <Sidebar
-        isOpen={isSidebarOpen}
-        onClose={handleSidebarClose}
-        title="Update Class"
-      >
-        <AddNewClass className={className} classId={classId} isUpdate={true} />
-      </Sidebar>
-      <DeleteModal
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-        onConfirm={handleConfirmDelete}
-        title={className}
-      />
+      {role === "admin" && (
+        <>
+          <Sidebar
+            isOpen={isSidebarOpen}
+            onClose={handleSidebarClose}
+            title="Update Class"
+          >
+            <AddNewClass
+              className={className}
+              classId={classId}
+              isUpdate={true}
+            />
+          </Sidebar>
+          <DeleteModal
+            isOpen={isModalOpen}
+            onClose={handleCloseModal}
+            onConfirm={handleConfirmDelete}
+            title={className}
+          />
+        </>
+      )}
     </>
   );
 };

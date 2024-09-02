@@ -64,18 +64,18 @@
 
 import React from "react";
 import { MdOutlineCall, MdEmail, MdOutlineLocationOn, MdOutlinePersonPin } from "react-icons/md";
-
+import profileIcon from '../../../../Assets/DashboardAssets/profileIcon.png'
 const ViewLibrarian = ({ librarian }) => {
   return (
     <div className="flex flex-col">
       <div className="flex flex-col justify-center items-center py-3">
-        <img className="object-cover rounded-full w-[100px] h-[100px]" src={librarian.profile} alt={librarian.name} />
+        <img className="object-cover rounded-full w-[100px] h-[100px]" src={librarian.profile || profileIcon} alt={librarian.name} />
         <h3 className="text-lg font-medium">{librarian.name}</h3>
         <p className="text-gray-500">{librarian.email}</p>
       </div>
       <div className="flex flex-col gap-4 p-4">
         <InfoItem icon={<MdEmail className="text-pink-600 text-2xl"/>} label="Email" value={librarian.email} />
-        <InfoItem icon={<MdOutlineCall className="text-pink-600 text-2xl"/>} label="Phone" value={librarian.phone} />
+        <InfoItem icon={<MdOutlineCall className="text-pink-600 text-2xl"/>} label="Phone" value={librarian.mobileNumber} />
         <InfoItem icon={<MdOutlinePersonPin className="text-pink-600 text-2xl"/>} label="Gender" value={librarian.gender} />
         <InfoItem icon={<MdOutlineCall className="text-pink-600 text-2xl"/>} label="Salary" value={`$${librarian.salary}`} />
         <InfoItem icon={<MdOutlineLocationOn className="text-pink-600 text-2xl"/>} label="Address" value={librarian.address.city} />

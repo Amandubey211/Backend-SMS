@@ -183,12 +183,12 @@ const AddNewSubject = ({ onClose, subject }) => {
       </div>
       {/* <AssignTeacher /> */}
 
-      <div className="mb-4">
+      {/* <div className="mb-4">
         <EditorSelector
           selectedUsers={selectedUsers}
           setSelectedUsers={setSelectedUsers}
         />
-      </div>
+      </div> */}
 
       <div className="flex mb-4">
         <button

@@ -1,19 +1,19 @@
-import React from 'react';
-import { MdAccessTime, MdLocationOn, MdPersonOutline } from 'react-icons/md';
-import { BiCalendarEvent } from 'react-icons/bi';
-import { format, isValid, parse } from 'date-fns';
+import React from "react";
+import { MdAccessTime, MdLocationOn, MdPersonOutline } from "react-icons/md";
+import { BiCalendarEvent } from "react-icons/bi";
+import { format, isValid, parse } from "date-fns";
 
-const ViewEvent = ({ event, onDelete, onEdit }) => {
+const ViewEvent = ({ event, onDelete, onEdit, role }) => {
   // Default placeholder for missing data
   const defaultEvent = {
-    image: '',
-    date: '',
-    time: '',
-    title: 'No Title Available',
-    type: 'N/A',
-    location: 'N/A',
-    director: 'N/A',
-    description: 'No description available',
+    image: "",
+    date: "",
+    time: "",
+    title: "No Title Available",
+    type: "N/A",
+    location: "N/A",
+    director: "N/A",
+    description: "No description available",
     students: [],
   };
 
@@ -21,32 +21,35 @@ const ViewEvent = ({ event, onDelete, onEdit }) => {
   const safeEvent = { ...defaultEvent, ...event };
 
   const formatDateTime = (date, time) => {
-    let formattedDate = 'Invalid date';
-    let formattedTime = 'Invalid time';
+    let formattedDate = "Invalid date";
+    let formattedTime = "Invalid time";
 
     try {
       // Parse the date
       const parsedDate = new Date(date);
       if (isValid(parsedDate)) {
-        formattedDate = format(parsedDate, 'd MMMM yyyy');
+        formattedDate = format(parsedDate, "d MMMM yyyy");
       }
 
       // Parse the time
       if (time) {
         let parsedTime;
         // Check if time includes AM/PM
-        if (time.toLowerCase().includes('am') || time.toLowerCase().includes('pm')) {
-          parsedTime = parse(time, 'hh:mm a', new Date());
+        if (
+          time.toLowerCase().includes("am") ||
+          time.toLowerCase().includes("pm")
+        ) {
+          parsedTime = parse(time, "hh:mm a", new Date());
         } else {
           // Parse as 24-hour format
-          parsedTime = parse(time, 'HH:mm', new Date());
+          parsedTime = parse(time, "HH:mm", new Date());
         }
         if (isValid(parsedTime)) {
-          formattedTime = format(parsedTime, 'hh:mm a');
+          formattedTime = format(parsedTime, "hh:mm a");
         }
       }
     } catch (error) {
-      console.error('Error formatting date/time:', error, { date, time });
+      console.error("Error formatting date/time:", error, { date, time });
     }
 
     return { date: formattedDate, time: formattedTime };
@@ -55,11 +58,18 @@ const ViewEvent = ({ event, onDelete, onEdit }) => {
   const { date, time } = formatDateTime(safeEvent.date, safeEvent.time);
 
   return (
-    <div className="px-4 bg-white rounded-lg overflow-auto" style={{ maxHeight: '90vh' }}>
+    <div
+      className="px-4 bg-white rounded-lg overflow-auto"
+      style={{ maxHeight: "90vh" }}
+    >
       <div className="flex flex-col gap-2">
         <div className="flex flex-col gap-2">
           {safeEvent.image && (
-            <img className="h-[200px] w-full rounded" src={safeEvent.image} alt="Event" />
+            <img
+              className="h-[200px] w-full rounded"
+              src={safeEvent.image}
+              alt="Event"
+            />
           )}
           <div className="flex gap-5">
             <div className="flex justify-center items-center">
@@ -103,28 +113,30 @@ const ViewEvent = ({ event, onDelete, onEdit }) => {
                 <img
                   key={index}
                   className="h-8 w-8 rounded-full"
-                  src={student.photo || ''}
-                  alt={student.name || 'Student'}
+                  src={student.photo || ""}
+                  alt={student.name || "Student"}
                 />
               ))}
             </div>
           </div>
           <div className="text-sm text-gray-600">{safeEvent.description}</div>
         </div>
-        <div className="flex gap-4">
-          <button
-            className="bg-red-500 text-white px-4 py-2 rounded"
-            onClick={onDelete}
-          >
-            Delete
-          </button>
-          <button
-            className="bg-blue-500 text-white px-4 py-2 rounded"
-            onClick={onEdit}
-          >
-            Edit
-          </button>
-        </div>
+        {role === "admin" && (
+          <div className="flex gap-4">
+            <button
+              className="bg-red-500 text-white px-4 py-2 rounded"
+              onClick={onDelete}
+            >
+              Delete
+            </button>
+            <button
+              className="bg-blue-500 text-white px-4 py-2 rounded"
+              onClick={onEdit}
+            >
+              Edit
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

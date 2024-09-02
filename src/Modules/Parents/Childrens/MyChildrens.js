@@ -93,13 +93,34 @@ const MyChildren = () => {
   }
 
   return (
-    <div className="h-full w-full">
-      <div className="w-full p-2">
-        <div className="min-h-screen flex-wrap flex items-start">
-          {students.map(student => (
-            <ChildCard key={student.id} student={student} />
-          ))}
-        </div>
+    <div className="h-full w-full p-4">
+      <div className="text-xl font-semibold mb-6 flex items-center">
+    Childs 
+    <div 
+        className="ml-2 flex items-center justify-center rounded-full" 
+        style={{
+            background: 'linear-gradient(to right, #FAECF0 0%, #F3EBFB 100%)', // Background of the circle
+            width: '40px', // Circle diameter
+            height: '40px', // Circle diameter
+        }}
+    >
+        <span 
+            style={{
+                background: 'linear-gradient(to right, #C83B62 0%, #7F35CD 100%)', // Gradient text color
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+            }}
+            className="text-xl font-semibold"
+        >
+            {students.length.toString().padStart(2, '0')}
+        </span>
+    </div>
+</div>
+
+      <div className="flex flex-wrap justify-start items-start">
+        {students.map(student => (
+          <ChildCard key={student.id} student={student} />
+        ))}
       </div>
     </div>
   );

@@ -96,7 +96,7 @@ const MainSection = ({ setIsEditing }) => {
         points: quiz.points || "",
         quizType: quiz.quizType || "",
         submissionFormat: quiz.submissionFormat || "",
-        allowedAttempts: quiz?.allowedAttempts || true,
+        allowedAttempts: quiz?.allowedAttempts,
         allowNumberOfAttempts: quiz.allowNumberOfAttempts || 1,
         assignTo: quiz.assignTo || "",
         showOneQuestionOnly: quiz.showOneQuestionOnly || false,
@@ -135,10 +135,19 @@ const MainSection = ({ setIsEditing }) => {
   const handleFormChange = useCallback((e) => {
     const { name, value, type, checked } = e.target;
 
-    setFormState((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
+    setFormState((prev) => {
+      const updatedState = {
+        ...prev,
+        [name]: type === "checkbox" ? checked : value,
+      };
+
+      // If allowedAttempts is true, set allowNumberOfAttempts to null
+      if (name === "allowedAttempts" && checked === true) {
+        updatedState.allowNumberOfAttempts = null;
+      }
+
+      return updatedState;
+    });
   }, []);
 
   const handleAnswerChange = useCallback(

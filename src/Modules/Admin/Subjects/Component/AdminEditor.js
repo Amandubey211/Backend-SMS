@@ -1,7 +1,6 @@
-import React, { useState, useRef, useCallback, useMemo } from "react";
+import React, { memo, useState, useRef, useCallback, useMemo } from "react";
 import JoditEditor from "jodit-react";
 import axios from "axios";
-import { ImSpinner3 } from "react-icons/im";
 import toast, { Toaster } from "react-hot-toast";
 
 const EditorComponent = ({
@@ -15,46 +14,113 @@ const EditorComponent = ({
   isCreateQuestion,
 }) => {
   const editor = useRef(null);
-  const [loading, setLoading] = useState(false);
+  // const [loading, setLoading] = useState(false);
+  const [scrollPosition, setScrollPosition] = useState(0);
+
+  // Function to create and show a custom progress bar below the toolbar
+  const showProgressBar = (editorInstance) => {
+    const toolbar = editorInstance.toolbar.container;
+    const progressBarContainer = document.createElement("div");
+    progressBarContainer.style.position = "relative";
+    progressBarContainer.style.top = "0";
+    progressBarContainer.style.left = "0";
+    progressBarContainer.style.width = "100%";
+    progressBarContainer.style.height = "5px";
+    progressBarContainer.style.backgroundColor = "#f0f0f0"; // Lighter background color for contrast
+
+    const progressBar = document.createElement("div");
+    progressBar.style.width = "0%";
+    progressBar.style.height = "100%";
+    progressBar.style.backgroundColor = "#C71585"; // Dark pink color
+    progressBar.style.transition = "width 0.3s";
+
+    progressBarContainer.appendChild(progressBar);
+    toolbar.parentNode.insertBefore(progressBarContainer, toolbar.nextSibling);
+
+    return progressBar;
+  };
+
+  // Function to update the progress bar
+  const updateProgressBar = (progressBar, percentage) => {
+    if (progressBar) {
+      progressBar.style.width = `${percentage}%`;
+    }
+  };
+
+  // Function to remove the progress bar
+  const removeProgressBar = (editorInstance, progressBar) => {
+    if (progressBar) {
+      progressBar.style.width = "100%";
+      setTimeout(() => {
+        if (progressBar.parentNode) {
+          progressBar.parentNode.remove();
+        }
+      }, 500);
+    }
+  };
 
   // Handle image upload and display
-  const handleImageUpload = useCallback(async (file) => {
-    if (!file) return;
+  const handleImageUpload = useCallback(
+    async (file) => {
+      if (!file) return;
 
-    setLoading(true);
+      const editorInstance = editor.current;
+      let progressBar;
 
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("upload_preset", process.env.REACT_APP_CLOUDINARY_PRESET);
+      // Save the current scroll position
+      setScrollPosition(window.scrollY);
 
-    try {
-      const response = await axios.post(
-        process.env.REACT_APP_CLOUDINARY_URL,
-        formData
-      );
-      console.log(response.data);
-      if (response.data.secure_url) {
-        const imageUrl = response.data.secure_url;
-
-        // Insert the image using insertHTML
-        if (editor.current) {
-          const imgHTML = `<img src="${imageUrl}" alt="Image" />`;
-          editor.current.selection.insertHTML(imgHTML); // Insert HTML
-          toast.success("Image Uploaded Successfully");
-        } else {
-          toast.error("Failed to insert image into the editor.");
-          console.error("Editor instance is not defined.");
-        }
-      } else {
-        toast.error("Image upload failed. No secure URL returned.");
+      if (editorInstance) {
+        progressBar = showProgressBar(editorInstance); // Show custom progress bar below toolbar
       }
-    } catch (error) {
-      console.error("Error uploading image to Cloudinary", error);
-      toast.error("Error uploading image. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("upload_preset", process.env.REACT_APP_CLOUDINARY_PRESET);
+
+      try {
+        const response = await axios.post(
+          process.env.REACT_APP_CLOUDINARY_URL,
+          formData,
+          {
+            onUploadProgress: (progressEvent) => {
+              const percentage = Math.round(
+                (progressEvent.loaded * 100) / progressEvent.total
+              );
+              updateProgressBar(progressBar, percentage); // Update progress bar
+            },
+          }
+        );
+
+        if (response.data.secure_url) {
+          const imageUrl = response.data.secure_url;
+
+          // Insert the image using insertHTML
+          if (editorInstance) {
+            const imgHTML = `<img src="${imageUrl}" alt="Image" />`;
+            editorInstance.selection.insertHTML(imgHTML); // Insert HTML
+            toast.success("Image Uploaded Successfully");
+          } else {
+            toast.error("Failed to insert image into the editor.");
+            console.error("Editor instance is not defined.");
+          }
+        } else {
+          toast.error("Image upload failed. No secure URL returned.");
+        }
+      } catch (error) {
+        console.error("Error uploading image to Cloudinary", error);
+        toast.error("Error uploading image. Please try again.");
+      } finally {
+        if (editorInstance) {
+          removeProgressBar(editorInstance, progressBar); // Remove progress bar
+        }
+        // setLoading(false);
+        // Restore the scroll position
+        window.scrollTo(0, scrollPosition);
+      }
+    },
+    [scrollPosition]
+  );
 
   // File input creation and handling
   const triggerImageUpload = useCallback(() => {
@@ -70,12 +136,29 @@ const EditorComponent = ({
     input.click();
   }, [handleImageUpload]);
 
+  // Print the content of the editor
+  // const handlePrint = useCallback(() => {
+  //   if (editor.current) {
+  //     const printWindow = window.open("", "PRINT", "height=600,width=800");
+  //     printWindow.document.write(`
+  //       <html>
+  //       <head><title>Print</title></head>
+  //       <body>${editor.current.value}</body>
+  //       </html>
+  //     `);
+  //     printWindow.document.close(); // Necessary for some browsers
+  //     printWindow.focus(); // Necessary for some browsers
+  //     printWindow.print();
+  //     printWindow.close();
+  //   }
+  // }, []);
+
   // Jodit Editor Configuration
   const config = useMemo(
     () => ({
       readonly: false,
       height: isCreateQuestion ? 300 : 400,
-      spellcheck: true, // Enable spellcheck
+      spellcheck: true, // Enable browser's native spellcheck in the editor
       toolbarSticky: true,
       toolbarAdaptive: false,
       showCharsCounter: true, // Show character counter
@@ -85,6 +168,7 @@ const EditorComponent = ({
       askBeforePasteFromWord: false,
       removeButtons: ["powered-by-jodit"], // Remove "Powered by Jodit"
       buttons: [
+        "font", // Font family selector
         "fontsize", // Font size selector
         "bold",
         "italic",
@@ -98,22 +182,32 @@ const EditorComponent = ({
         "ol",
         "outdent",
         "indent",
-        "link",
-        {
-          name: "image",
-          icon: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M21 7h-3.17l-1.24-1.45A2.01 2.01 0 0014.88 5h-5.76c-.71 0-1.37.39-1.71 1.05L6.17 7H3c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2zm-9 11c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" fill="currentColor"/>
-            </svg>`,
-          exec: triggerImageUpload,
-          tooltip: "Upload Image",
-        },
+        "symbols",
         "brush", // Font color/brush tool
-        "video",
-        "table", // Include Table
+
         "undo", // Add Undo button
         "redo", // Add Redo button
+        "spellcheck",
+
+        "table", // Include Table
+
+        {
+          name: "image",
+          tooltip: "Upload Image",
+          exec: triggerImageUpload,
+        },
+
+        "video",
+        "file",
+        "link",
         "preview", // Include Preview
         "fullsize", // Include Fullscreen
+        "print",
+        // {
+        //   name: "print",
+        //   tooltip: "Print Content",
+        //   exec: handlePrint,
+        // },
       ],
       events: {
         change: (newContent) => {
@@ -142,7 +236,7 @@ const EditorComponent = ({
               value={assignmentName}
               onChange={(e) => onNameChange(e.target.value)}
               className="w-full p-2 border border-gray-300 rounded-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              spellCheck="false" // Disabling spell check at the input level
+              spellCheck="true" // Enable spell check in input field
             />
           </div>
         </div>
@@ -154,45 +248,8 @@ const EditorComponent = ({
         config={config}
         tabIndex={1} // tabIndex of textarea
       />
-
-      {loading && (
-        <div
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            backgroundColor: "transparent", // Transparent background
-            zIndex: 10,
-          }}
-        >
-          <ImSpinner3 className="text-4xl text-gray-500 animate-spin" />
-        </div>
-      )}
-
-      {/* Inline CSS for spinner animation */}
-      <style>
-        {`
-          @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-          }
-
-          /* Ensure toolbar buttons are aligned properly */
-          .jodit-toolbar-button {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            padding: 4px;
-          }
-        `}
-      </style>
     </div>
   );
 };
 
-export default EditorComponent;
+export default memo(EditorComponent);

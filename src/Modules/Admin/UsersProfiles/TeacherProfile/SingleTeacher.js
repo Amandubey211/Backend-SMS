@@ -1,17 +1,17 @@
 import React from "react";
 import { MdOutlineCall, MdEmail, MdOutlineLocationOn, MdOutlinePerson } from "react-icons/md";
-
+import profileIcon from '../../../../Assets/DashboardAssets/profileIcon.png'
 const ViewTeacher = ({ staff }) => {
   return (
     <div className="flex flex-col">
       <div className="flex flex-col justify-center items-center py-3">
-        <img className="object-cover rounded-full w-[100px] h-[100px]" src={staff.profile} alt={staff.name} />
+        <img className="object-cover rounded-full w-[100px] h-[100px]" src={staff.profile || profileIcon} alt={staff.name} />
         <h3 className="text-lg font-medium">{staff.firstName}</h3>
         <p className="text-gray-500">{staff.email}</p>
       </div>
       <div className="flex flex-col gap-4 p-4">
         <InfoItem icon={<MdEmail className="text-pink-600 text-2xl"/>} label="Email" value={staff.email} />
-        <InfoItem icon={<MdOutlineCall className="text-pink-600 text-2xl"/>} label="Phone" value={staff.phone} />
+        <InfoItem icon={<MdOutlineCall className="text-pink-600 text-2xl"/>} label="Phone" value={staff.mobileNumber} />
         <InfoItem icon={<MdOutlinePerson className="text-pink-600 text-2xl"/>} label="Gender" value={staff.gender} />
         <InfoItem icon={<MdOutlineLocationOn className="text-pink-600 text-2xl"/>} label="Address" value={staff.address.city} />
       </div>

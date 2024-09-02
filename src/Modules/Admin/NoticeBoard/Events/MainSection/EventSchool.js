@@ -12,7 +12,7 @@ import { format, parseISO, isValid } from "date-fns";
 import "../subComponents/customCalendar.css";
 import toast from "react-hot-toast";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
-import { IoCalendarOutline } from "react-icons/io5"; // Importing a calendar icon
+import { IoCalendarOutline } from "react-icons/io5";
 import { useSelector } from "react-redux";
 
 const EventScheduler = () => {
@@ -29,8 +29,9 @@ const EventScheduler = () => {
   });
 
   const itemsPerPage = 4;
-  const role = useSelector((store) => store.Auth.role)
+  const role = useSelector((store) => store.Auth.role);
   const token = localStorage.getItem(`${role}:token`);
+
   useEffect(() => {
     const fetchEvents = async () => {
       try {
@@ -83,9 +84,7 @@ const EventScheduler = () => {
       const mappedEvents = updatedEvents.map((event) => ({
         ...event,
         startDate: parseISO(event.date),
-        endDate: new Date(
-          new Date(event.date).getTime() + 2 * 60 * 60 * 1000
-        ),
+        endDate: new Date(new Date(event.date).getTime() + 2 * 60 * 60 * 1000),
       }));
 
       setEvents(mappedEvents);
@@ -121,8 +120,9 @@ const EventScheduler = () => {
           return (
             <li
               key={event._id}
-              className={`inline-block px-2 py-1 rounded text-white ${bgColors[index % bgColors.length]
-                } shadow-md cursor-pointer`}
+              className={`inline-block px-2 py-1 rounded text-white ${
+                bgColors[index % bgColors.length]
+              } shadow-md cursor-pointer`}
               onClick={() => handleStickerClick(event)}
             >
               {event.title} - {timeString}
@@ -158,8 +158,8 @@ const EventScheduler = () => {
         const result = await createEvent(eventData, token);
         if (result?.success) {
           toast.success(result.msg || "Event created successfully!");
-          refreshEvents(); // Refresh the events list to show new events
-          handleSidebarClose(); // Close the sidebar after success
+          refreshEvents();
+          handleSidebarClose();
         } else {
           toast.error("Failed to create event.");
         }
@@ -187,6 +187,7 @@ const EventScheduler = () => {
       case "viewEvent":
         return (
           <ViewEvent
+            role={role}
             event={selectedEvent}
             onDelete={handleDeleteEvent}
             onEdit={() => {
@@ -211,35 +212,31 @@ const EventScheduler = () => {
     }
   };
 
-  const bgColors = [
-    "#FF6C9C", // pink
-    "#E24DFF", // purple
-    "#21AEE7", // blue
-    "#FBB778", // orange
-  ];
+  const bgColors = ["#FF6C9C", "#E24DFF", "#21AEE7", "#FBB778"];
 
   const paginatedEvents = filteredEvents
-    .filter(event => event.startDate >= currentDate) // Filter events from the current date onward
+    .filter((event) => event.startDate >= currentDate)
     .slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage);
-
 
   return (
     <Layout title="Event">
       <DashLayout>
-        <div className="min-h-screen p-4 bg-gray-50  max-w-screen ">
+        <div className="min-h-screen p-4 bg-gray-50 max-w-screen">
           <div className="flex flex-row justify-between">
             <h1 className="mb-2 bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent font-semibold bg-clip-text">
               Student Events
             </h1>
-            <button
-              className="h-10 inline-flex items-center border border-transparent text-sm font-medium shadow-sm bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600"
-              onClick={handleAddEventClick}
-            >
-              Add New Event
-            </button>
+            {role === "admin" && (
+              <button
+                className="h-10 inline-flex items-center border border-transparent text-sm font-medium shadow-sm bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600"
+                onClick={handleAddEventClick}
+              >
+                Add New Event
+              </button>
+            )}
           </div>
 
-          <div className="my-4 h-40 flex rounded-sm gap-8 pl-8 relative   ">
+          <div className="my-4 h-40 flex rounded-sm gap-8 pl-8 relative">
             {currentPage > 0 && (
               <div
                 className="p-1 rounded-full text-purple-500 bg-white border-2 cursor-pointer absolute left-0 top-1/2 transform -translate-y-1/2"
@@ -249,7 +246,7 @@ const EventScheduler = () => {
               </div>
             )}
             {paginatedEvents.length === 0 ? (
-              <div className="flex flex-col items-center justify-center  h-full text-gray-500 w-full">
+              <div className="flex flex-col items-center justify-center h-full text-gray-500 w-full">
                 <IoCalendarOutline className="text-6xl" />
                 <span>No Events in this Month</span>
               </div>
@@ -274,7 +271,7 @@ const EventScheduler = () => {
             )}
           </div>
 
-          <hr className="my-6 border-t-2 mt-12 " />
+          <hr className="my-6 border-t-2 mt-12" />
           <div className="py-7">
             <Calendar
               dateCellRender={handleDateCellRender}
@@ -338,19 +335,21 @@ const EventScheduler = () => {
                     </select>
                     <div className="flex space-x-2">
                       <button
-                        className={`border rounded px-2 py-1 ${type === "month"
-                          ? "bg-gradient-to-r from-pink-500 to-purple-500 text-white"
-                          : ""
-                          }`}
+                        className={`border rounded px-2 py-1 ${
+                          type === "month"
+                            ? "bg-gradient-to-r from-pink-500 to-purple-500 text-white"
+                            : ""
+                        }`}
                         onClick={() => onTypeChange("month")}
                       >
                         Month
                       </button>
                       <button
-                        className={`border rounded px-2 py-1 ${type === "year"
-                          ? "bg-gradient-to-r from-pink-500 to-purple-500 text-white"
-                          : ""
-                          }`}
+                        className={`border rounded px-2 py-1 ${
+                          type === "year"
+                            ? "bg-gradient-to-r from-pink-500 to-purple-500 text-white"
+                            : ""
+                        }`}
                         onClick={() => onTypeChange("year")}
                       >
                         Year
@@ -369,8 +368,8 @@ const EventScheduler = () => {
                 {sidebarContent === "viewEvent"
                   ? "View Event"
                   : sidebarContent === "addEvent"
-                    ? "Add New Event"
-                    : "Update Event"}
+                  ? "Add New Event"
+                  : "Update Event"}
               </span>
             }
           >
