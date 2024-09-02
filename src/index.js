@@ -3,10 +3,9 @@ import ReactDOM from "react-dom/client";
 import App from "./App/App";
 import { Provider } from "react-redux";
 import { AppStore } from "./Redux/Store/AppStore";
-
 // Register the Service Worker
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('../public/firebase-messaging-sw.js')
+  navigator.serviceWorker.register('/firebase-messaging-sw.js')
     .then((registration) => {
       console.log('Service Worker registration successful with scope: ', registration.scope);
     })
