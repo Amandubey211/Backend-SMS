@@ -31,7 +31,7 @@ const getIcon = (type) => {
   }
 };
 
-const ChapterItem = ({ type, title, id, isPublished }) => {
+const ChapterItem = ({ type, title, id, isPublished , fetchModules}) => {
   const { sid, cid } = useParams();
   const [menuOpen, setMenuOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
@@ -71,6 +71,7 @@ const ChapterItem = ({ type, title, id, isPublished }) => {
       } else if (type === "quiz") {
         await deleteQuiz(id);
       }
+      fetchModules()
       setMenuOpen(false);
     } catch (error) {
       console.error("Error deleting item:", error);
