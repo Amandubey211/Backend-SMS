@@ -127,7 +127,7 @@ const AnnouncementCommentSection = () => {
         )}
         {filteredComments.map((comment) => (
           <AnnouncementComment
-            key={comment._id}
+            key={comment?._id}
             comment={comment}
             activeReplyId={activeReplyId}
             setActiveReplyId={setActiveReplyId}

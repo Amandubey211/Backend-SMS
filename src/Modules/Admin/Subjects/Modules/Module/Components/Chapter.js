@@ -325,6 +325,7 @@ const Chapter = ({
                 <>
                   {assignments.map((assignment, index) => (
                     <ChapterItem
+                      fetchModules={fetchModules}
                       key={index}
                       type="assignment"
                       title={assignment.name}
@@ -334,6 +335,7 @@ const Chapter = ({
                   ))}
                   {quizzes.map((quiz, index) => (
                     <ChapterItem
+                      fetchModules={fetchModules}
                       key={index}
                       type="quiz"
                       title={quiz.name}
@@ -365,7 +367,7 @@ const Chapter = ({
         isOpen={deleteModalOpen && attachmentToDelete !== null}
         onClose={() => setDeleteModalOpen(false)}
         onConfirm={handleDeleteAttachment}
-        title={attachmentToDelete?.label || "Delete Attachment"}
+        title={attachmentToDelete?.label || "Attachment"}
       />
 
       {isSidebarOpen && (
