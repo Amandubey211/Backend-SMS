@@ -92,7 +92,7 @@ const StudentFinance = ({ student }) => {
             <FinanceCard
               icon={<FaUserFriends className="text-red-300 text-[2.5rem] font-bold border border-red-300 p-2 rounded-full" />}
               label="Parents Account Total Paid"
-              value={student?.finance?.parentsAccountTotalPaid | 0}
+              value={student?.finance?.parentsAccountTotalPaid || '0 QR'}
               onButtonClick={() => console.log("Message clicked")}
               buttonLabel={null}
             />

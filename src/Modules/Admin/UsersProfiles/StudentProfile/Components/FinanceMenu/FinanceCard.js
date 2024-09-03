@@ -10,7 +10,7 @@ const FinanceCard = ({ icon, label, value, buttonLabel, onButtonClick }) => {
       <div className="flex flex-col items-center text-center text-xs"> 
         <span className="font-xs  font-semibold">{label}</span>
         <span className="text-lg font-bold bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent bg-clip-text">
-          {value} QR
+          {value} 
         </span>
       </div>
       {buttonLabel != null ?<button className="flex  items-center border justify-center px-3 py-1 bg-pink-100 rounded-full" onClick={onButtonClick}>
