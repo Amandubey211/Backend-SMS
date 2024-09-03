@@ -13,6 +13,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { toggleSidebar } from "../../Redux/Slices/Common/SidebarSlice";
 import useStudentLogout from "../../Hooks/AuthHooks/Student/useStudentLogout";
 import ProfileIcon from "../../Assets/DashboardAssets/profileIcon.png";
+import LogoutConfirmationModal from "../Common/LogoutConfirmationModal";
 const isActivePath = (path, locationPath) => locationPath.startsWith(path);
 
 const SideMenubar = () => {
@@ -36,8 +37,23 @@ const SideMenubar = () => {
     );
   };
 
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+
+
+
   const handleLogout = () => {
-    studentLogout();
+    setIsLogoutModalOpen(true);
+  };
+
+  const confirmLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      await studentLogout();
+      setIsLogoutModalOpen(false);
+    } finally {
+      setIsLoggingOut(false);
+    }
   };
 
   return (
@@ -202,7 +218,7 @@ const SideMenubar = () => {
           )}
           <button
             title="logout"
-            onClick={studentLogout}
+            onClick={handleLogout}
             className="ml-3"
             aria-label="Logout"
           >
@@ -213,6 +229,12 @@ const SideMenubar = () => {
             />
           </button>
         </div>
+        <LogoutConfirmationModal
+        isOpen={isLogoutModalOpen}
+        onClose={() => setIsLogoutModalOpen(false)}
+        onConfirm={confirmLogout}
+        loading={isLoggingOut}
+      />
       </div>
     </nav>
   );

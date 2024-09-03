@@ -47,9 +47,11 @@ const AllStudents = () => {
           <p className=" font-bold">{student.firstName}</p>
             <p className="text-gray-600 w-[50%]"><span className="font-medium">ID:</span>{student.admissionNumber}</p> 
           </div>
-         
-        <p className="text-gray-600"><span className="font-medium">Parents:</span> {student.fatherName} & </p>
-        <p className="text-gray-600"> {student.motherName}  </p>
+         <div className='flex flex-col w-[50%]'>
+        <p className="text-gray-600"><span className="font-medium">Parents:</span> {student?.fatherName.slice(0,7)}..</p>
+        <p className="text-gray-600">  & {student?.motherName}  </p>
+         </div>
+
         </div>
         
       </NavLink>
