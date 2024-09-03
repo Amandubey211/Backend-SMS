@@ -1,42 +1,52 @@
 import React from 'react';
 import { useNavigate } from "react-router-dom";
+import rightArrow from '../../../Assets/ParentAssets/svg/right-arrow.svg'; // Ensure this path is correct
 
 const ChildCard = ({ student }) => {
     const navigate = useNavigate();
-    
+
     // Define styles for the primary button container
     const primaryButtonContainerStyle = {
         background: 'linear-gradient(to right, #FAECF0 0%, #F3EBFB 100%)', // Gradient background
         borderRadius: '5px',  // Rounded corners for the container
-        padding: '8px', // Padding inside the container
+        padding: '6px 12px', // Reduced padding to match the design
         display: 'inline-block', // Inline to ensure buttons are side by side
         margin: '0 5px', // Space between button containers
         cursor: 'pointer',
         transition: 'box-shadow 0.3s ease-in-out', // Transition for shadow
     };
 
-    // Define styles for the primary button text
-    const primaryButtonStyle = {
-        color: '#C83B62', // Text color
-        textTransform: 'uppercase',
-        display: 'inline-block',
+    // Define styles for the primary button text with gradient
+    const primaryButtonTextGradientStyle = {
+        background: 'linear-gradient(to right, #C83B62, #7F35CD)',
+        WebkitBackgroundClip: 'text',
+        WebkitTextFillColor: 'transparent',
+        fontWeight: '500', // Increased thickness of the text
+        fontSize: '14px',
         textAlign: 'center',
-        width: 'auto',
+        textTransform: 'uppercase',
     };
 
     // Define styles for the secondary button
     const secondaryButtonStyle = {
         background: '#E9F8EB',
-        color: '#228B22',
-        padding: '10px 20px',
+        color: '#0D9755',
+        padding: '10px 16px', // Padding adjusted to match design
         borderRadius: '8px',
         textTransform: 'uppercase',
+        fontSize: '14px', // Smaller font size to match the design
         transition: 'box-shadow 0.3s ease-in-out', // Transition for shadow
         cursor: 'pointer',
-        margin: '0 10px',
-        display: 'inline-block',
-        textAlign: 'center',
-        width: 'auto',
+        display: 'flex', // Flexbox for aligning text and icon
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: '12px', // Space between buttons and this secondary button
+        fontWeight: '500'
+    };
+
+    const arrowIconStyle = {
+        marginLeft: '8px', // Space between text and icon
+        fill: '#0D9755', // Color of the icon
     };
 
     // Define styles for the card container with hover effect
@@ -58,7 +68,7 @@ const ChildCard = ({ student }) => {
         >
             <div className="flex flex-col items-center">
                 {/* Profile image centered at the top */}
-                <img className="w-16 h-16 rounded-full mb-4" src={student.profile} alt={student.name} />
+                <img className="w-20 h-20 rounded-full mb-4" src={student.profile} alt={student.name} />
             
                 <p className="font-semibold text-center mb-4">{student.name}</p>
 
@@ -78,7 +88,7 @@ const ChildCard = ({ student }) => {
                         onMouseEnter={(e) => (e.currentTarget.style.boxShadow = '0px 4px 8px rgba(0, 0, 0, 0.2)')}
                         onMouseLeave={(e) => (e.currentTarget.style.boxShadow = 'none')}
                     >
-                        <div style={primaryButtonStyle}>Instructors</div>
+                        <div style={primaryButtonTextGradientStyle}>Instructors</div>
                     </div>
                     <div
                         style={primaryButtonContainerStyle}
@@ -86,7 +96,7 @@ const ChildCard = ({ student }) => {
                         onMouseEnter={(e) => (e.currentTarget.style.boxShadow = '0px 4px 8px rgba(0, 0, 0, 0.2)')}
                         onMouseLeave={(e) => (e.currentTarget.style.boxShadow = 'none')}
                     >
-                        <div style={primaryButtonStyle}>Grades</div>
+                        <div style={primaryButtonTextGradientStyle}>Grades</div>
                     </div>
                     <div
                         style={primaryButtonContainerStyle}
@@ -94,7 +104,7 @@ const ChildCard = ({ student }) => {
                         onMouseEnter={(e) => (e.currentTarget.style.boxShadow = '0px 4px 8px rgba(0, 0, 0, 0.2)')}
                         onMouseLeave={(e) => (e.currentTarget.style.boxShadow = 'none')}
                     >
-                        <div style={primaryButtonStyle}>Attendance</div>
+                        <div style={primaryButtonTextGradientStyle}>Attendance</div>
                     </div>
                 </div>
 
@@ -106,6 +116,7 @@ const ChildCard = ({ student }) => {
                     onMouseLeave={(e) => (e.currentTarget.style.boxShadow = 'none')}
                 >
                     Check Subject Progress
+                    <img src={rightArrow} alt="Right Arrow" style={arrowIconStyle} />
                 </div>
             </div>
         </div>

@@ -70,7 +70,7 @@ const AccountingSection = () => {
   }
 
   return (
-    <Layout title="Accounting">
+    <Layout title="Parents | Dashboard">
       <div className="p-4">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg font-normal text-gray-600">Accounting</h2>

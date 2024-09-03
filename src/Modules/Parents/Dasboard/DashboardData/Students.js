@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';  // Import useNavigate
 import { baseUrl } from '../../../../config/Common';
 import { FaChild } from 'react-icons/fa';
 import Spinner from "../../../../Components/Common/Spinner"; // Import Spinner
@@ -8,8 +8,14 @@ const StudentCard = ({ student, index }) => {
   const defaultImage = "https://via.placeholder.com/150";
   const profileImage = student.profile || defaultImage;
 
+  // Fallback values for fields
+  const studentClass = student.class || "N/A";
+  const admissionNumber = student.admissionNumber || "N/A";
+  const section = student.section || "N/A";
+  const group = student.group || "N/A";
+
   return (
-    <div className="border-r border-b p-4 pb-4 pt-6 text-center relative border-gray-300">
+    <div className="border-b p-4 pb-4 pt-6 text-center relative border-gray-300"> {/* Removed border-r */}
       <div className="absolute top-2 left-2 bg-gray-100 text-gray-800 py-1 px-2 rounded-l-sm rounded-r-sm text-sm">
         Child: {index + 1}
       </div>
@@ -19,11 +25,11 @@ const StudentCard = ({ student, index }) => {
         className="w-20 h-20 rounded-full mx-auto mb-2"
         onError={(e) => { e.target.onerror = null; e.target.src = defaultImage; }}
       />
-      <h2 className="text-lg font-semibold mb-1">{student.name}</h2>
+      <h2 className="text-lg font-semibold mb-1">{student.name || "N/A"}</h2>
       <div className="text-gray-600 text-sm mb-1">
-        Class: {student.class} | Id: {student.admissionNumber} | Section: {student.section}
+        Class: {studentClass} | Id: {admissionNumber} | Section: {section}
       </div>
-      <div className="text-green-500 text-sm">Group: {student.group}</div>
+      <div className="text-green-600 text-sm">Group: {group}</div>
     </div>
   );
 };
@@ -32,6 +38,7 @@ const StudentParentCard = () => {
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();  // Use useNavigate for navigation
 
   useEffect(() => {
     const fetchStudents = async () => {
@@ -85,25 +92,28 @@ const StudentParentCard = () => {
   }, []);
 
   const renderErrorOrNoChildren = (message) => (
-    <div className="flex flex-col items-center justify-center h-full text-center py-10"> {/* Added padding */}
+    <div className="flex flex-col items-center justify-center h-full text-center py-10">
       <FaChild className="text-gray-400 text-6xl mb-4" />
       <p className="text-gray-600 text-lg">{message}</p>
     </div>
   );
 
   return (
-    <div className="relative"> {/* Added relative to position See All */}
-      {!loading && !error && students.length > 3 && (
-        <div className="absolute top-0 right-0">
-          <Link to="/children" className="text-pink-500 hover:text-pink-700 font-semibold">
+    <div className="relative border-r border-gray-300"> {/* Added border-r to cover entire section */}
+      <div className="flex justify-between p-4 items-center px-6">
+        <h2 className="text-md font-bold text-gray-600">My Children</h2>
+        {!loading && !error && students.length > 3 && (
+          <button
+            className="text-transparent bg-clip-text bg-gradient-to-r from-[#C83B62] to-[#7F35CD] font-normal"
+            onClick={() => navigate("/children")}
+          >
             See All
-          </Link>
-        </div>
-      )}
-      {/* <h2 className="text-lg font-semibold mb-4">My Children</h2> Heading */}
-      {loading && <Spinner />} {/* Show spinner while loading */}
-      {!loading && error && renderErrorOrNoChildren("No Children Data Found!")} {/* Show icon with error message */}
-      {!loading && !error && students.length === 0 && renderErrorOrNoChildren("No Children Found!")} {/* Show icon with no children message */}
+          </button>
+        )}
+      </div>
+      {loading && <Spinner />}
+      {!loading && error && renderErrorOrNoChildren("No Children Data Found!")}
+      {!loading && !error && students.length === 0 && renderErrorOrNoChildren("No Children Found!")}
       {!loading && !error && students.length > 0 && (
         <>
           {students.slice(0, 3).map((student, index) => (
@@ -114,6 +124,5 @@ const StudentParentCard = () => {
     </div>
   );
 };
-
 
 export default StudentParentCard;
