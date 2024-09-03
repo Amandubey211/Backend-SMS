@@ -164,7 +164,7 @@ const Navbar = ({ hideSearchbar, hideAvatarList, hideStudentView }) => {
         <LeftHeading leftHeading={leftHeading} navigate={navigate} />
 
         <div className="flex items-center space-x-2 border-l ml-3 pl-3 relative">
-          <IconButton icon={CiMail} label="Mail" />
+          {/* <IconButton icon={CiMail} label="Mail" /> */}
 
           <div
             onClick={() => openNotification()}

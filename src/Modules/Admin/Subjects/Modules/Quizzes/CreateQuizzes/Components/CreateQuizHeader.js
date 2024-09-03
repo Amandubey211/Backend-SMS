@@ -25,24 +25,36 @@ const CreateQuizHeader = ({
   const { createQuizRubric, loading: createLoading } = useCreateQuizRubric();
   const { updateRubric, loading: updateLoading } = useUpdateRubric();
   const [editMode, setEditMode] = useState(false);
-
+  const [criteriaToEdit, setCriteriaToEdit] = useState(null);
   const handleAddCriteria = () => {
     setSidebarOpen(true);
   };
-
-  const handleSaveCriteria = (criteria) => {
-    setCriteriaList([...criteriaList, criteria]);
+  const handleAddNewCriteria = (newCriteria) => {
+    if (editMode) {
+      setCriteriaList(
+        criteriaList?.map((crit, index) =>
+          index === criteriaToEdit.index ? newCriteria : crit
+        )
+      );
+    } else {
+      setCriteriaList([...criteriaList, newCriteria]);
+    }
     setSidebarOpen(false);
+    setEditMode(false);
+    setCriteriaToEdit(null);
   };
 
+  const handleEditCriteria = (index) => {
+    setCriteriaToEdit({ ...criteriaList[index], index });
+    setSidebarOpen(true);
+    // setEditMode(true);
+  };
   const handleSubmit = async (rubricData) => {
     if (existingRubricId) {
       const result = await updateRubric(existingRubricId, rubricData);
       if (result.success) {
         fetchRubricBySubjectId();
-        toast.success("Rubric updated successfully.");
         setModalOpen(false);
-        // setRubricToEdit(null);
         setEditMode(false);
       } else {
         toast.error(result.error || "Failed to update rubric.");
@@ -53,7 +65,6 @@ const CreateQuizHeader = ({
         fetchRubricBySubjectId();
         toast.success("Rubric created successfully.");
         setModalOpen(false);
-        // setRubricToEdit(null);
         setCriteriaList([]); // Clear criteria after creation
         setExistingRubricId(result.data._id); // Ensure this is called
       } else {
@@ -78,8 +89,8 @@ const CreateQuizHeader = ({
           onClick={() => setModalOpen(true)}
           className="flex items-center px-4 py-2 border border-gray-300 rounded-md text-pink-500 hover:bg-gray-100 transition"
         >
-          <span className="mr-1">+</span>
-          <span>Add Rubric</span>
+          {!isEditing && <span className="mr-1">+</span>}
+          <span>{isEditing ? "Edit Rubric" : "Add Rubric "}</span>
         </button>
         <button
           onClick={() => {
@@ -106,6 +117,7 @@ const CreateQuizHeader = ({
           onSubmit={handleSubmit}
           editMode={editMode}
           onAddCriteria={handleAddCriteria}
+          onEditCriteria={handleEditCriteria}
           setExistingRubricId={setExistingRubricId}
           criteriaList={criteriaList} // Pass criteriaList state
           setCriteriaList={setCriteriaList} // Pass setCriteriaList function
@@ -116,7 +128,11 @@ const CreateQuizHeader = ({
           onClose={() => setSidebarOpen(false)} // Pass down function to close sidebar
           title="Add New Criteria"
         >
-          <AddNewCriteriaForm />
+          <AddNewCriteriaForm
+            onSave={handleAddNewCriteria}
+            initialData={criteriaToEdit}
+            editMode={editMode}
+          />
         </Sidebar>
       </div>
     </div>

@@ -8,7 +8,7 @@ import useNavHeading from "../../../Hooks/CommonHooks/useNavHeading .js";
 const ParentDash = () => {
   useNavHeading("My Child","Teachers");
   return (
-    <Layout title="Parents | Student diwan">
+    <Layout title="Parents | Instrutors">
       <DashLayout children={<MyTeacher/>} hideAvatarList={false} />
     </Layout>
   );

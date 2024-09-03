@@ -3,7 +3,6 @@ import Sidebar from "../../../../Components/Common/Sidebar";
 import PromoteClass from "./PromoteClass";
 import MoveToSection from "./MoveToSection";
 import EditStudent from "./EditStudent";
-import DeleteStudent from "./DeleteStudent";
 import { HiOutlineDotsVertical } from "react-icons/hi";
 import { BsArrow90DegRight } from "react-icons/bs";
 import { MdOutlineModeEditOutline } from "react-icons/md";
@@ -75,9 +74,6 @@ const StudentMenuOptions = ({
               fetchGroups={fetchGroups}
               onClose={handleSidebarClose}
             />
-          ),
-          "Delete Student": (
-            <DeleteStudent studentId={studentId} groupId={groupId} />
           ),
         };
 
@@ -163,7 +159,7 @@ const StudentMenuOptions = ({
         isOpen={isModalOpen}
         onClose={() => setModalOpen(false)}
         onConfirm={handleDeleteConfirm}
-        title={studentName}
+        title={studentName || "Student"}
       />
     </>
   );

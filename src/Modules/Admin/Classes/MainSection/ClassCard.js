@@ -113,6 +113,7 @@ const ClassCard = ({
             title="Update Class"
           >
             <AddNewClass
+              onClose={handleSidebarClose}
               className={className}
               classId={classId}
               isUpdate={true}

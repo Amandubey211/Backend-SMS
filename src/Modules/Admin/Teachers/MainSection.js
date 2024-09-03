@@ -2,8 +2,6 @@ import React, { useEffect, useState, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
-import { FaExclamationTriangle, FaUsers } from "react-icons/fa";
-
 import TeacherCard from "./TeacherCard";
 import NavigationBar from "./NavigationBar";
 import Spinner from "../../../Components/Common/Spinner";
@@ -82,7 +80,7 @@ const MainSection = () => {
             <NoDataFound />
           </div>
         )}
-        {!loading && !assignedTeachers.length && (
+        {assignedTeachers.length < 1 && (
           <div className="flex h-full w-full justify-center items-center">
             <NoDataFound title="Teacher" />
           </div>
