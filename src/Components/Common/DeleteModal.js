@@ -98,7 +98,11 @@ const DeleteModal = ({ isOpen, onClose, onConfirm, title }) => {
     }
   };
 
-  const isMatching = inputValue.toLowerCase() === title.toLowerCase();
+  // Ensure title is a string before using trim
+  const trimmedTitle = title ? title.trim() : "";
+
+  const isMatching =
+    inputValue.trim().toLowerCase() === trimmedTitle.toLowerCase();
 
   return createPortal(
     <div
@@ -117,7 +121,7 @@ const DeleteModal = ({ isOpen, onClose, onConfirm, title }) => {
       >
         <div className="flex justify-between items-center p-4 border-b">
           <h3 id="delete-modal-title" className="text-lg font-semibold">
-            Delete {title}
+            Delete {trimmedTitle}
           </h3>
           <button
             ref={closeButtonRef}
@@ -133,16 +137,16 @@ const DeleteModal = ({ isOpen, onClose, onConfirm, title }) => {
         <div className="p-4">
           <p id="delete-modal-description">
             Type the name{" "}
-            <span className="text-red-400 select-none">{title}</span> to confirm
-            deletion:
+            <span className="text-red-400 select-none">{trimmedTitle}</span> to
+            confirm deletion:
           </p>
           <input
             type="text"
             value={inputValue}
             onChange={handleChange}
             className="mt-2 p-2 border rounded w-full"
-            placeholder={`Type "${title}"`}
-            aria-label={`Type "${title}" to confirm`}
+            placeholder={`Type "${trimmedTitle}"`}
+            aria-label={`Type "${trimmedTitle}" to confirm`}
           />
           {error && <p className="mt-2 text-red-500">{error}</p>}
           <div className="mt-4 flex justify-end space-x-2">
@@ -164,7 +168,6 @@ const DeleteModal = ({ isOpen, onClose, onConfirm, title }) => {
                   : "bg-gray-300 text-gray-500 cursor-not-allowed"
               }`}
               onClick={isMatching ? handleConfirm : null}
-
               disabled={!isMatching}
               aria-label="Delete"
             >

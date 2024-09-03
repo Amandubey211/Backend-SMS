@@ -3,7 +3,7 @@ import classIcons from "../../Dashboard/DashboardData/ClassIconData";
 import toast from "react-hot-toast";
 import useCreateClass from "../../../../Hooks/AuthHooks/Staff/Admin/Class/useCreateClass";
 
-const AddNewClass = ({ className, isUpdate, classId }) => {
+const AddNewClass = ({ className, isUpdate, classId, onClose }) => {
   const [activeIconId, setActiveIconId] = useState(null);
   const [newClassName, setNewClassName] = useState(className);
   const { createClass, updateClass, loading } = useCreateClass();
@@ -35,6 +35,7 @@ const AddNewClass = ({ className, isUpdate, classId }) => {
       if (isUpdate) {
         console.log("classId---", classId);
         updateClass(classData, classId);
+        onClose();
         // toast.success("Class updated successfully!");
         // Add update class logic here
       } else {

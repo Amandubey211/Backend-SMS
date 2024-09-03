@@ -48,10 +48,10 @@ const NavigationBar = ({
   return (
     <>
       <div className="flex justify-between items-center p-4">
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-2 ">
           <h1 className="text-xl font-semibold">All Instructors</h1>
-          <span className="bg-purple-200 text-purple-700 rounded-full px-2 py-1 text-sm">
-            {totalTeachers}
+          <span className="bg-purple-200 text-purple-700 rounded-full w-7 h-7  flex justify-center items-center text-sm">
+            <span>{totalTeachers}</span>
           </span>
         </div>
         {role === "admin" && (
@@ -80,7 +80,7 @@ const NavigationBar = ({
           className={getButtonClass("Everyone")}
           onClick={() => handleSectionChange("Everyone", cid)}
         >
-          Everyone
+          Everyone {selectedSection === "Everyone" && `(${totalTeachers})`}
         </button>
         {Sections?.map((item) => (
           <button
@@ -88,7 +88,8 @@ const NavigationBar = ({
             className={getButtonClass(item.sectionName)}
             onClick={() => handleSectionChange(item.sectionName, item._id)}
           >
-            {item.sectionName}
+            {item.sectionName}{" "}
+            {selectedSection === item.sectionName && `(${totalTeachers})`}
           </button>
         ))}
       </div>

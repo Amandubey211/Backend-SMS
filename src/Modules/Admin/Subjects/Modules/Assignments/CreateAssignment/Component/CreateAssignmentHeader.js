@@ -17,8 +17,6 @@ const CreateAssignmentHeader = ({
   setCriteriaList,
   existingRubricId,
   setExistingRubricId,
-  AssignmentupdateLoading,
-  AssignmentcreateLoading,
   assignmentId,
   saveLoading, // Add this prop
   publishLoading, // Add this prop
@@ -26,9 +24,8 @@ const CreateAssignmentHeader = ({
   const navigate = useNavigate();
   const [isModalOpen, setModalOpen] = useState(false);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
-  const [rubricToEdit, setRubricToEdit] = useState(null);
   const [editMode, setEditMode] = useState(false);
-
+  const [criteriaToEdit, setCriteriaToEdit] = useState(null);
   const { fetchRubricBySubjectId } = useGetRubricBySubjectId();
   const { createAssignmentRubric, loading: createLoading } =
     useCreateAssignmentRubric();
@@ -38,9 +35,19 @@ const CreateAssignmentHeader = ({
     setSidebarOpen(true);
   };
 
-  const handleSaveCriteria = (criteria) => {
-    setCriteriaList([...criteriaList, criteria]);
+  const handleAddNewCriteria = (newCriteria) => {
+    if (editMode) {
+      setCriteriaList(
+        criteriaList?.map((crit, index) =>
+          index === criteriaToEdit.index ? newCriteria : crit
+        )
+      );
+    } else {
+      setCriteriaList([...criteriaList, newCriteria]);
+    }
     setSidebarOpen(false);
+    setEditMode(false);
+    setCriteriaToEdit(null);
   };
 
   const handleSubmit = async (rubricData) => {
@@ -48,9 +55,7 @@ const CreateAssignmentHeader = ({
       const result = await updateRubric(existingRubricId, rubricData);
       if (result.success) {
         fetchRubricBySubjectId(id);
-        toast.success("Rubric updated successfully.");
         setModalOpen(false);
-        setRubricToEdit(null);
         setEditMode(false);
       } else {
         toast.error(result.error || "Failed to update rubric.");
@@ -61,7 +66,6 @@ const CreateAssignmentHeader = ({
         fetchRubricBySubjectId(id);
         toast.success("Rubric created successfully.");
         setModalOpen(false);
-        setRubricToEdit(null);
         setCriteriaList([]);
         setExistingRubricId(result.data._id);
       } else {
@@ -69,7 +73,11 @@ const CreateAssignmentHeader = ({
       }
     }
   };
-
+  const handleEditCriteria = (index) => {
+    setCriteriaToEdit({ ...criteriaList[index], index });
+    setSidebarOpen(true);
+    setEditMode(true);
+  };
   return (
     <div className="flex items-center justify-between p-2 bg-white border-b border-gray-300 shadow-sm">
       <div className="flex items-center">
@@ -126,6 +134,7 @@ const CreateAssignmentHeader = ({
           onSubmit={handleSubmit}
           onClose={() => setModalOpen(false)}
           criteriaList={criteriaList}
+          onEditCriteria={handleEditCriteria}
           setCriteriaList={setCriteriaList}
           onAddCriteria={handleAddCriteria}
           setExistingRubricId={setExistingRubricId}
@@ -140,7 +149,11 @@ const CreateAssignmentHeader = ({
           onClose={() => setSidebarOpen(false)}
           title="Add New Criteria"
         >
-          <AddNewCriteriaForm onSave={handleSaveCriteria} />
+          <AddNewCriteriaForm
+            onSave={handleAddNewCriteria}
+            initialData={criteriaToEdit}
+            editMode={editMode}
+          />
         </Sidebar>
       </div>
     </div>

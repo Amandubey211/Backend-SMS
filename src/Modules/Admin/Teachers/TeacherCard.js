@@ -17,9 +17,7 @@ const TeacherCard = ({ teacher, role, onEditClick }) => {
   const handleConfirmDelete = useCallback(async () => {
     try {
       await unassignTeacher(teacher._id);
-      toast.success(`${teacher.fullName} deleted successfully!`);
     } catch (error) {
-      toast.error(`Failed to delete ${teacher.fullName}: ${error.message}`);
     } finally {
       setIsModalOpen(false);
     }

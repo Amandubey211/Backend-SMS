@@ -8,6 +8,8 @@ import { MdOutlineBlock } from "react-icons/md";
 import useDeleteQuiz from "../../../../../../Hooks/AuthHooks/Staff/Admin/Quiz/useDeleteQuiz";
 import useDeleteAssignment from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useDeleteAssignment";
 import DeleteModal from "../../../../../../Components/Common/DeleteModal";
+import Spinner from "../../../../../../Components/Common/Spinner";
+import NoDataFound from "../../../../../../Components/Common/NoDataFound";
 
 const List = ({ data, icon, title, type, loading, error, refetchData }) => {
   const { cid, sid } = useParams();
@@ -54,9 +56,12 @@ const List = ({ data, icon, title, type, loading, error, refetchData }) => {
   const confirmDelete = async () => {
     if (type === "Assignment") {
       await deleteAssignment(currentDeleteId);
+      refetchData();
+
     }
     if (type === "Quiz") {
       await deleteQuiz(currentDeleteId);
+      refetchData();
     }
   };
 
@@ -105,14 +110,10 @@ const List = ({ data, icon, title, type, loading, error, refetchData }) => {
       <ul className="border-t p-4">
         {loading ? (
           <div className="flex flex-col items-center justify-center py-10 text-gray-500">
-            <ImSpinner3 className="w-12 h-12 animate-spin mb-3" />
-            <p className="text-lg font-semibold">Loading...</p>
+            <Spinner />
           </div>
         ) : error ? (
-          <div className="flex flex-col items-center justify-center py-10 text-gray-500">
-            <FaExclamationTriangle className="w-12 h-12 mb-3" />
-            <p className="text-lg font-semibold">No Data Found</p>
-          </div>
+          <NoDataFound />
         ) : filteredData.length > 0 ? (
           filteredData.reverse().map((item) => (
             <div key={item._id} className="relative mb-3">

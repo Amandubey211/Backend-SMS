@@ -26,7 +26,6 @@ const useDeleteAssignment = () => {
 
         const { data } = response.data;
 
-        console.log(data);
         setLoading(false);
         toast.success("Assignment deleted successfully");
         return { success: true, data };
