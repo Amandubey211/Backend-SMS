@@ -9,7 +9,7 @@ const StudentCard = ({ student, index }) => {
   const profileImage = student.profile || defaultImage;
 
   return (
-    <div className="border-r border-b p-4 mb-4 text-center relative border-gray-300">
+    <div className="border-r border-b p-4 pb-4 pt-6 text-center relative border-gray-300">
       <div className="absolute top-2 left-2 bg-gray-100 text-gray-800 py-1 px-2 rounded-l-sm rounded-r-sm text-sm">
         Child: {index + 1}
       </div>
@@ -92,8 +92,15 @@ const StudentParentCard = () => {
   );
 
   return (
-    <div className="p-4"> {/* Added padding */}
-      <h2 className="text-lg font-semibold mb-4">My Children</h2> {/* Heading */}
+    <div className="relative"> {/* Added relative to position See All */}
+      {!loading && !error && students.length > 3 && (
+        <div className="absolute top-0 right-0">
+          <Link to="/children" className="text-pink-500 hover:text-pink-700 font-semibold">
+            See All
+          </Link>
+        </div>
+      )}
+      {/* <h2 className="text-lg font-semibold mb-4">My Children</h2> Heading */}
       {loading && <Spinner />} {/* Show spinner while loading */}
       {!loading && error && renderErrorOrNoChildren("No Children Data Found!")} {/* Show icon with error message */}
       {!loading && !error && students.length === 0 && renderErrorOrNoChildren("No Children Found!")} {/* Show icon with no children message */}
@@ -102,17 +109,11 @@ const StudentParentCard = () => {
           {students.slice(0, 3).map((student, index) => (
             <StudentCard key={student.id} student={student} index={index} />
           ))}
-          {students.length > 3 && (
-            <div className="text-center mt-4">
-              <Link to="/children" className="bg-blue-500 text-white py-2 px-4 rounded-full hover:bg-blue-700">
-                Show All
-              </Link>
-            </div>
-          )}
         </>
       )}
     </div>
   );
 };
+
 
 export default StudentParentCard;
