@@ -24,7 +24,9 @@ const SideMenubar = () => {
     isOpen: state.sidebar.isOpen,
     role: state.Auth.role,
     userDetails: state?.Auth?.userDetail,
+
   }));
+  
   const toggleDropdown = (title) => {
     if (openItems.includes(title)) {
       setOpenItems(openItems.filter((item) => item !== title));
