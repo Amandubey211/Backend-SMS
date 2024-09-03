@@ -16,7 +16,7 @@ const sidebarData = [
     path: "/parent_dash",
   },
   {
-    title: "Children",
+    title: "My Childs",
     icon: <img src={mychildsIcon} alt="Children Icon" style={{ width: '24px', height: '24px' }} />,
     path: `/children`,
   },

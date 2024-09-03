@@ -8,10 +8,21 @@ import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { useDispatch, useSelector } from "react-redux";
 import smallLogo from "../../Assets/SideBarAsset/smallLogo.png";
 import { toggleSidebar } from "../../Redux/Slices/Common/SidebarSlice.js";
-  import  useParentLogout  from '../../Hooks/AuthHooks/Parent/useParentLogout.js';  
+import useParentLogout from '../../Hooks/AuthHooks/Parent/useParentLogout.js';
 import LogoutConfirmationModal from "../Common/LogoutConfirmationModal.js";
 import profileIcon from "../../Assets/DashboardAssets/profileIcon.png";
+
+// Updated function to handle more paths
 const isActivePath = (path, locationPath) => {
+  if (path === "/children" && (
+      locationPath.startsWith("/children") ||
+      locationPath.startsWith("/checkprogress") ||
+      locationPath.startsWith("/childgrade") ||
+      locationPath.startsWith("/attendance") ||
+      locationPath.startsWith("/teacher")
+    )) {
+    return true;
+  }
   return locationPath.startsWith(path);
 };
 
@@ -34,8 +45,9 @@ const SideMenubar = () => {
       setOpenItems([...openItems, title]);
     }
   };
-  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false); 
-  const [isLoggingOut, setIsLoggingOut] = useState(false); 
+
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const handleLogout = () => {
     setIsLogoutModalOpen(true);
   };
@@ -43,13 +55,15 @@ const SideMenubar = () => {
   const confirmLogout = async () => {
     setIsLoggingOut(true);
     try {
-      await parentLogout(); 
-      setIsLogoutModalOpen(false); 
+      await parentLogout();
+      setIsLogoutModalOpen(false);
     } finally {
       setIsLoggingOut(false);
     }
   };
-const navigate = useNavigate()
+
+  const navigate = useNavigate();
+
   return (
     <nav
       className={`sticky top-0 transition-all duration-300 h-screen p-1 z-50 bg-white border-r flex flex-col ${
@@ -64,9 +78,8 @@ const navigate = useNavigate()
             isOpen ? "w-36 pt-1" : "h-12"
           }`}
         />
-        <button onClick={() => dispatch(toggleSidebar())}
-          className="focus:outline-none absolute bottom-0 right-0" >
-          <div className="p-1 rounded-full text-purple-500 -mr-4 -mb-4 z-40   bg-white border-2">
+        <button onClick={() => dispatch(toggleSidebar())} className="focus:outline-none absolute bottom-0 right-0">
+          <div className="p-1 rounded-full text-purple-500 -mr-4 -mb-4 z-40 bg-white border-2">
             {isOpen ? <IoIosArrowBack /> : <IoIosArrowForward />}
           </div>
         </button>
@@ -86,14 +99,9 @@ const navigate = useNavigate()
                   onClick={() => toggleDropdown(item.title)}
                 >
                   <div className={`flex justify-center items-center`}>
-                    <span className={`${!isOpen && "text-xl"}`}>
-                      {item.icon}
-                    </span>
+                    <span className={`${!isOpen && "text-xl"}`}>{item.icon}</span>
                     {isOpen && (
-                      <span
-                        role="presentation"
-                        className="ml-3 flex items-center"
-                      >
+                      <span role="presentation" className="ml-3 flex items-center">
                         {item.title}
                       </span>
                     )}
@@ -135,7 +143,7 @@ const navigate = useNavigate()
                       key={subIndex}
                       to={subItem.path}
                       className={({ isActive }) =>
-                        `flex items-center p-2 rounded-lg : "justify-center"}`
+                        `flex items-center p-2 rounded-lg ${isActive ? "text-purple-500 bg-purple-100" : "text-gray-700 hover:bg-gray-100"}`
                       }
                     >
                       {subItem.icon}
@@ -152,33 +160,28 @@ const navigate = useNavigate()
           ))}
         </ul>
       </div>
-      <div className={`fixed bottom-1  h-[3rem]  flex flex- row items-center justify-center border-t w-auto ${isOpen? "w-[14%]" : "w-[7%]"}  `}>
+      <div className={`fixed bottom-1 h-[3rem] flex flex-row items-center justify-center border-t w-auto ${isOpen ? "w-[14%]" : "w-[7%]"}`}>
         <img
-          src={
-            userDetails?.profile || profileIcon
-          }
+          src={userDetails?.profile || profileIcon}
           alt="Profile"
           className={`${isOpen ? "w-10 h-10" : "w-8 h-8"} cursor-pointer rounded-full`}
-          onClick={()=>navigate('/users/parent/profile')}
+          onClick={() => navigate('/users/parent/profile')}
         />
-
         {isOpen && (
           <div className="flex-1 ml-3">
             <h2 className="font-semibold">
-              {userDetails?.fatherName?.slice(0,8) || "User"}
+              {userDetails?.fatherName?.slice(0, 8) || "User"}
             </h2>
             <p className="text-gray-500 capitalize text-sm">{role}</p>
           </div>
         )}
         <button
           title="logout"
-          onClick={handleLogout} 
+          onClick={handleLogout}
           className="ml-3"
           aria-label="Logout"
         >
-          <FiLogOut
-            className={`${isOpen ? "w-7 h-7" : "w-5 h-5"} text-gray-500`}
-          />
+          <FiLogOut className={`${isOpen ? "w-7 h-7" : "w-5 h-5"} text-gray-500`} />
         </button>
       </div>
       <LogoutConfirmationModal
