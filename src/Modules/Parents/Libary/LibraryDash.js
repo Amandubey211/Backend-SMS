@@ -6,9 +6,9 @@ import ParentDashLayout from "../../../Components/Parents/ParentDashLayout.js";
 import useNavHeading from "../../../Hooks/CommonHooks/useNavHeading .js";
 import ParentSection from "./MainSection.js";
 const LibraryDash = () => {
-  useNavHeading("Class 9");
+  useNavHeading("Library");
   return (
-    <Layout title="Parents | Student diwan">
+    <Layout title="Parents | Library">
       <ParentDashLayout children={<ParentSection />} hideAvatarList={true} />
     </Layout>
   );

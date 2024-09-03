@@ -72,7 +72,7 @@ const ParentFinanceTable = () => {
   );
 
   return (
-    <Layout title="Parent Finance">
+    <Layout title="Parents | Finance">
       <ParentDashLayout hideAvatarList={true}>
         <div className="flex">
           <div className="flex flex-col w-[80%] h-full">
