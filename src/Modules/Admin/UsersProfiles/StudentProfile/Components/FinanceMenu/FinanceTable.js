@@ -22,7 +22,7 @@ const FinanceTable = ({ feesDetails }) => {
             <td className="px-5 py-2 border-b border-gray-200">{item.feeType}</td>
             <td className="px-5 py-2 border-b border-gray-200">{item.paidBy}</td>
             <td className="px-5 py-2 border-b border-gray-200">{item.dueDate}</td>
-            <td className="px-5 py-2 border-b border-gray-200">{item.amount} QR</td>
+            <td className="px-5 py-2 border-b border-gray-200">{item.amount}</td>
             <td className="px-5 py-2 border-b border-gray-200">
               <span className={`px-3 py-1 text-xs font-semibold rounded-full ${item.status === "Paid" ? "bg-green-200 text-green-800" : "bg-red-200 text-red-800"}`}>
                 {item.status}
