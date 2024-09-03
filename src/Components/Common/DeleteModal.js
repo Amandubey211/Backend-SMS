@@ -164,6 +164,7 @@ const DeleteModal = ({ isOpen, onClose, onConfirm, title }) => {
                   : "bg-gray-300 text-gray-500 cursor-not-allowed"
               }`}
               onClick={isMatching ? handleConfirm : null}
+
               disabled={!isMatching}
               aria-label="Delete"
             >
