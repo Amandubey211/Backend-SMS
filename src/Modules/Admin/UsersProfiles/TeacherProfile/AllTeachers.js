@@ -69,7 +69,7 @@ const AllTeachers = () => {
       case "viewTeacher":
         return <ViewTeacher staff={selectedStaff} />;
         case "addTeacher":
-          return <AddUser role="staff"  />;
+          return <AddUser role="teacher"  />;
         case "editTecaher":
           return <AddUser  role = {'teacher'} data={selectedStaff} />;
         default:
@@ -126,8 +126,8 @@ const AllTeachers = () => {
                 {sidebarContent === "viewTeacher" ? "Quick View of Staff" : "Add/Edit Staff"}
               </span>
             }
-            width="70%"
-            height="auto"
+            width="60%"
+            height="100%"
           >
             {renderSidebarContent()}
           </SidebarSlide>

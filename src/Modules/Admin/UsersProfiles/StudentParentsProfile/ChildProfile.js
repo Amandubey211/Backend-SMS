@@ -33,7 +33,7 @@ const ChildProfile = ({ children }) => {
         </div>
         
         <div>
-        <button className=" border p-2 w-[300px] rounded bg-pink-100 text-center flex justify-center items-center  " onClick={()=>navigate(`/user/${child?.id}`)}>
+        <button className=" border p-2 w-[300px] rounded bg-pink-100 text-center flex justify-center items-center  " onClick={()=>navigate(`/users/students/${child?.id}`)}>
         <span className="font-semibold bg-gradient-to-r from-pink-500   to-purple-500 inline-block text-transparent bg-clip-text">
         View Profile
                   </span>

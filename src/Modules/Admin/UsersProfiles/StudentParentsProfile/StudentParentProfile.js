@@ -9,6 +9,7 @@ import { useSelector } from "react-redux";
 import profileIcon from "../../../../Assets/DashboardAssets/profileIcon.png";
 import { GoAlertFill } from "react-icons/go";
 import { FiLoader } from "react-icons/fi";
+import useGetAllStudents from "../../../../Hooks/AuthHooks/Staff/Admin/Students/useGetAllStudents";
 
 const uniqueFilterOptions = (data, key) => {
   return [
@@ -19,6 +20,10 @@ const uniqueFilterOptions = (data, key) => {
 };
 
 const StudentParentProfile = () => {
+  const { fetchAllStudents } = useGetAllStudents();
+  useEffect(() => {
+    fetchAllStudents();
+  }, []);
   const [selectedChild, setSelectedChild] = useState(null);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
 

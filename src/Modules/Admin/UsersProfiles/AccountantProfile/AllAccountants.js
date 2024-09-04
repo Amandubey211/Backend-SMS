@@ -96,7 +96,8 @@ const AllAccountants = () => {
             title={<span className="bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent bg-clip-text">
               {sidebarContent === "viewAccountant" ? "Quick View of Accountant" : "Add/Edit Accountant"}
             </span>}
-            width="70%"
+            width="60%"
+            height="100%"
           >
             {renderSidebarContent()}
           </SidebarSlide>

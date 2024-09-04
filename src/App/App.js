@@ -638,7 +638,7 @@ function App() {
       element: <AllStudents />,
       errorElement: <Error />,
     },
-    { path: "/user/:cid", element: <SingleStudent />, errorElement: <Error /> },
+    { path: "/users/students/:cid", element: <SingleStudent />, errorElement: <Error /> },
     {
       path: "/users/teachers",
       element: <AllTeachers />,

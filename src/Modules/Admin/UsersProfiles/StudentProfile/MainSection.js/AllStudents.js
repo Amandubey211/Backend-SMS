@@ -36,7 +36,7 @@ const AllStudents = () => {
     students.map((student) => (
       <NavLink 
         key={student.id} 
-        to={`/user/${student?._id}`} 
+        to={`/users/students/${student?._id}`} 
         className="block p-6 bg-white rounded-lg shadow-lg hover:bg-gray-100 transition border items-center justify-center"
       >
    <div className='flex w-full items-center'>
