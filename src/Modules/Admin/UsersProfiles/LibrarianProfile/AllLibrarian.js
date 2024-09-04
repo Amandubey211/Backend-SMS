@@ -102,7 +102,8 @@ const AllLibrarian = () => {
                 {sidebarContent === "viewLibrarian" ? "Quick View of Librarian" : "Add/Edit Librarian"}
               </span>
             }
-            width="70%"
+            width="60%"
+            height="100%"
           >
             {renderSidebarContent()}
           </SidebarSlide>

@@ -102,8 +102,8 @@ const AllStaff = () => {
                 {sidebarContent === "viewStaff" ? "Quick View of Staff" : "Add/Edit Staff"}
               </span>
             }
-            width="70%"
-            height="auto"
+            width="60%"
+            height="100%"
           >
             {renderSidebarContent()}
           </SidebarSlide>

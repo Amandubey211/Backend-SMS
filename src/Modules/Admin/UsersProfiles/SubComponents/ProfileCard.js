@@ -1,6 +1,6 @@
 
 import React ,{useState}from "react";
-import { FiUserPlus } from 'react-icons/fi';
+import { FiLoader, FiUserPlus } from 'react-icons/fi';
 import { BiTrash } from 'react-icons/bi';
 import useDeleteUser from "../../../../Hooks/AuthHooks/Staff/Admin/staff/useDeleteUser";
 import profileIcon from '../../../../Assets/DashboardAssets/profileIcon.png'
@@ -14,7 +14,7 @@ import toast from "react-hot-toast";
 import useGetAllStaff from "../../../../Hooks/AuthHooks/Staff/Admin/staff/useGetAllStaff";
 import useGetAllTeachers from "../../../../Hooks/AuthHooks/Staff/Admin/Teacher/useGetAllTeacher";
 const ProfileCard = ({ profile, onClick,editUser}) => {
-  const {deleteUser} = useDeleteUser();
+  const {deleteUser,loading:deactivateLoading} = useDeleteUser();
  
    const [isModalOpen, setIsModalOpen] = useState(false);
   const openModal = () => {
@@ -26,12 +26,13 @@ const ProfileCard = ({ profile, onClick,editUser}) => {
   };
   const deleteTeacher = async()=>{
 
+  
     await deleteUser(profile._id);
     setIsModalOpen(false);
 
    };
   const role = useSelector((store) => store.Auth.role);
-  const {fetchStaff, loading,} = useGetAllStaff()
+  const {fetchStaff, loading} = useGetAllStaff()
   const {fetchTeachers} = useGetAllTeachers()
   const activateUser = async (event,id)=>{
     event.stopPropagation()
@@ -53,13 +54,14 @@ const ProfileCard = ({ profile, onClick,editUser}) => {
   return (
     <div className="relative w-full sm:w-1/2 md:w-1/3 lg:w-1/4 px-2 mb-4">
       
-      <div onClick={() => onClick(profile)}
+      
+       <div onClick={() => onClick(profile)}
         className="block p-6 bg-white rounded-lg hover:shadow-lg  transition cursor-pointer border"
       >
         {profile?.active?null:<span className=" flex my-[-.5rem] text-red-600 font-bold text-sm">Deactivated</span>}
         <div className="absolute right-0 top-0 flex flex-col px-4 py-2 gap-2 justify-start">
          {profile?.active? <button className="bg-transparent p-2 rounded-full border hover:bg-gray-200 transition" onClick={(event)=>editUser(event,profile)}>
-            <FiUserPlus className="text-sm text-green-500" />
+         {deactivateLoading?     <FiLoader className="animate-spin  w-[1rem] h-[1rem] " /> :  <FiUserPlus className="text-sm text-green-500" />}
           </button>:null}
           {profile?.active? <button className="bg-transparent p-2 rounded-full border hover:bg-gray-200 transition" title="Deactivated">
             <MdBlock className="text-sm text-red-500" onClick={(event)=>{event.stopPropagation();openModal()}} />
@@ -78,12 +80,12 @@ const ProfileCard = ({ profile, onClick,editUser}) => {
           <p className="text-gray-600">Phone: {profile.mobileNumber}</p>
         </div>
       </div>
-      <DeleteConfirmatiomModal
+      {deactivateLoading? '' : <DeleteConfirmatiomModal
   isOpen={isModalOpen}
   onClose={closeModal}
   onConfirm={deleteTeacher}
   text={'Deactivate'}
-/>
+/>}
     </div>
   );
 };
