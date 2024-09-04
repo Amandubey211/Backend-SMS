@@ -8,10 +8,10 @@ const useGetStudentsByClassAndSection = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const role = useSelector((store) => store.Auth.role);
-  
+
   const fetchStudentsByClassAndSection = useCallback(
     async (id) => {
-      console.log(id,"Frontend")
+      console.log(id, "Frontend");
       setLoading(true);
       setError(null);
       try {
@@ -19,7 +19,6 @@ const useGetStudentsByClassAndSection = () => {
         const response = await axios.get(`${baseUrl}/admin/student/${id}`, {
           headers: { Authentication: token },
         });
-        console.log(response.data)
         if (response.data.status) {
           return response.data?.data;
         } else {
