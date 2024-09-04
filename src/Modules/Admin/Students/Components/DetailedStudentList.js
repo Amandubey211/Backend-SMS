@@ -41,6 +41,7 @@ const DetailedStudentList = ({ activeSection, onSeeGradeClick, students }) => {
 };
 
 const StudentInfo = React.memo(({ student, index, onSeeGradeClick }) => (
+
   <>
     <div className="flex items-center w-1/4">
       <img
@@ -58,20 +59,22 @@ const StudentInfo = React.memo(({ student, index, onSeeGradeClick }) => (
         <div className="text-sm font-medium truncate">
           {student?.firstName} {student?.lastName}
         </div>
+
         <div className="text-xs text-gray-500 truncate">
           {student?.admissionNumber || index}
         </div>
+
       </div>
     </div>
     <StudentDetails student={student} />
     <div className="flex items-center w-1/6">
-      <button
+      {/* <button
         className="px-3 py-1 text-green-500 font-semibold text-sm border border-green-500 rounded-lg"
         onClick={() => onSeeGradeClick(student)}
         aria-label={`See Grade for ${student?.firstName} ${student?.lastName}`}
       >
         See Grade
-      </button>
+      </button> */}
     </div>
   </>
 ));
@@ -81,22 +84,23 @@ const StudentDetails = React.memo(({ student }) => (
     <div className="flex flex-col gap-1 items-start justify-start w-1/5 ml-5 truncate">
       <div className="text-sm text-gray-500">Class</div>
       <div className="text-sm text-gray-500 truncate">
-        {student?.className || "09"}
+        {student?.className || "N/A"}
       </div>
     </div>
     <div className="flex flex-col gap-1 items-start justify-center w-1/5 truncate">
       <div className="text-sm text-gray-500 truncate">
-        {student?.sectionName || "Section"}
+        {student?.sectionName || "N/A"}
+
       </div>
       <div className="text-sm text-gray-500 truncate">{`Group-${
-        student?.group || "Accounting"
+        student?.groups[0]?.groupName || "N/A"
       }`}</div>
     </div>
     <div className="flex flex-col text-sm gap-1 items-start justify-start w-1/4 truncate">
       <div className="truncate">{student.email}</div>
       <div className="truncate">{student.contactNumber}</div>
     </div>
-    <div className="flex flex-col text-sm gap-1 items-start justify-start w-1/4 truncate">
+    <div className="flex pl-10 flex-col text-sm gap-1 items-start justify-start w-1/4 truncate">
       <div>Parent</div>
       <div className="truncate">{student.guardianContactNumber}</div>
     </div>
