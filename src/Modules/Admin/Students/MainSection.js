@@ -8,6 +8,7 @@ import { useParams } from "react-router-dom";
 import useGetStudentsByClassAndSection from "../../../Hooks/AuthHooks/Staff/Admin/Students/useGetStudentsByClassAndSection";
 import Spinner from "../../../Components/Common/Spinner";
 import { FaUsers } from "react-icons/fa";
+
 const MainSection = () => {
   const [activeSection, setActiveSection] = useState("Everyone");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -17,13 +18,14 @@ const MainSection = () => {
     useGetStudentsByClassAndSection();
   const { cid } = useParams();
 
+  // Optimized useCallback to fetch students and filter by section
   const fetchStudents = useCallback(
     async (section) => {
       const data = await fetchStudentsByClassAndSection(cid);
       setStudents(
         section === "Everyone"
           ? data
-          : data.filter((student) => student.section === section)
+          : data.filter((student) => student.sectionName === section)
       );
     },
     [cid, fetchStudentsByClassAndSection]
@@ -44,6 +46,7 @@ const MainSection = () => {
     setIsModalOpen(false);
     dispatch(setStudentGrade({}));
   };
+
   return (
     <div className="p-2 w-full">
       <NavigationBar

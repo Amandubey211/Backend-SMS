@@ -6,14 +6,14 @@ const DetailedStudentList = ({ activeSection, onSeeGradeClick, students }) => {
   const filteredStudents =
     activeSection === "Everyone"
       ? students
-      : students.filter((student) => student.section === activeSection);
+      : students.filter((student) => student.sectionName === activeSection);
 
   return (
     <div className="w-full p-4 bg-white">
       {filteredStudents.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-64 text-center text-gray-500">
           <FaUsers className="text-6xl mb-4" />
-          <p className="">No students found in this section.</p>
+          <p>No students found in this section.</p>
         </div>
       ) : (
         <ul>
@@ -86,6 +86,7 @@ const StudentDetails = React.memo(({ student }) => (
     <div className="flex flex-col gap-1 items-start justify-center w-1/5 truncate">
       <div className="text-sm text-gray-500 truncate">
         {student?.sectionName || "N/A"}
+
       </div>
       <div className="text-sm text-gray-500 truncate">{`Group-${
         student?.groups[0]?.groupName || "N/A"
