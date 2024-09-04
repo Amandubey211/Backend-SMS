@@ -69,7 +69,7 @@ const AllTeachers = () => {
       case "viewTeacher":
         return <ViewTeacher staff={selectedStaff} />;
         case "addTeacher":
-          return <AddUser role="staff"  />;
+          return <AddUser role="teacher"  />;
         case "editTecaher":
           return <AddUser  role = {'teacher'} data={selectedStaff} />;
         default:
