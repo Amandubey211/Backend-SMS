@@ -34,6 +34,8 @@ const MainSection = () => {
   }, [activeSection, fetchStudents]);
 
   const handleSeeGradeClick = (student) => {
+    console.log('---------',student);
+    
     dispatch(setStudentGrade(student));
     setIsModalOpen(true);
   };
@@ -65,7 +67,7 @@ const MainSection = () => {
           students={students}
         />
       )}
-      <StudentGradeModal isOpen={isModalOpen} onClose={handleCloseModal} />
+      <StudentGradeModal  isOpen={isModalOpen} onClose={handleCloseModal} />
     </div>
   );
 };
