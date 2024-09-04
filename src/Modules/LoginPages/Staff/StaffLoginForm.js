@@ -9,8 +9,8 @@ import useStaffLogin from "../../../Hooks/AuthHooks/Staff/useStaffLogin";
 
 const StaffLoginForm = () => {
   const [staffCredentials, setStaffCredentials] = useState({
-    email: "blissshinetour@gmail.com",
-    password: "123456",
+    email: "",
+    password: "",
   });
   const { loading, staffLogin } = useStaffLogin();
   const [showPassword, setShowPassword] = useState(false);

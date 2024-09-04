@@ -59,7 +59,11 @@ const StudentInfo = React.memo(({ student, index, onSeeGradeClick }) => (
         <div className="text-sm font-medium truncate">
           {student?.firstName} {student?.lastName}
         </div>
-      
+
+        <div className="text-xs text-gray-500 truncate">
+          {student?.admissionNumber || index}
+        </div>
+
       </div>
     </div>
     <StudentDetails student={student} />
