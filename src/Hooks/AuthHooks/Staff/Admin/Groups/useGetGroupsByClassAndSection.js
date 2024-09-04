@@ -1,17 +1,18 @@
 import { useState, useCallback } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { baseUrl } from "../../../../../config/Common";
+import { setGroupsList } from "../../../../../Redux/Slices/Admin/ClassSlice";
 
 const useGetGroupsByClassAndSection = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const role = useSelector((store) => store.Auth.role);
+  const dispatch = useDispatch();
 
   const fetchGroupsByClassAndSection = useCallback(
     async (classId, sectionId) => {
-      console.log(classId, sectionId);
       setLoading(true);
       setError(null);
       try {
@@ -22,8 +23,8 @@ const useGetGroupsByClassAndSection = () => {
             headers: { Authentication: token },
           }
         );
-        console.log(response.data);
         if (response.data.status) {
+          dispatch(setGroupsList(response.data.data));
           return response.data.data;
         } else {
           toast.error("Failed to fetch groups. Please try again.");
@@ -39,7 +40,7 @@ const useGetGroupsByClassAndSection = () => {
         setLoading(false);
       }
     },
-    [baseUrl, role]
+    [role, dispatch]
   );
 
   return { loading, error, fetchGroupsByClassAndSection };

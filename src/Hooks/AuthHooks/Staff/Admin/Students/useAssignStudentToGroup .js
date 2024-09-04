@@ -56,7 +56,7 @@ const useAssignStudentToGroup = () => {
       );
       console.log(response.data);
 
-      toast.success("Student assigned to group successfully!");
+      toast.success("Student assigned to Section successfully");
       setLoading(false);
       return response.data;
     } catch (err) {

@@ -1,27 +1,28 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
+import { useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { setStudentGrade } from "../../../Redux/Slices/AdminSlice";
+import useFetchSection from "../../../Hooks/AuthHooks/Staff/Admin/Sections/useFetchSection";
+import useGetGroupsByClass from "../../../Hooks/AuthHooks/Staff/Admin/Groups/useGetGroupByClass";
+import useGetGroupsByClassAndSection from "../../../Hooks/AuthHooks/Staff/Admin/Groups/useGetGroupsByClassAndSection";
+import useGetUnassignedStudents from "../../../Hooks/AuthHooks/Staff/Admin/Students/useGetUnassignedStudents";
 import NavigationBar from "./Components/NavigationBar";
 import UnAssignedStudentList from "./Components/UnAssignedStudentList";
 import GroupList from "./Components/GroupList";
-import useFetchSection from "../../../Hooks/AuthHooks/Staff/Admin/Sections/useFetchSection";
-import { useParams } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { setStudentGrade } from "../../../Redux/Slices/AdminSlice";
 import StudentGradeModal from "../Subjects/Modules/Grades/StudentGradeViewModal/StudentGradeModal";
-import useGetGroupsByClass from "../../../Hooks/AuthHooks/Staff/Admin/Groups/useGetGroupByClass";
 import Spinner from "../../../Components/Common/Spinner";
-import useGetUnassignedStudents from "../../../Hooks/AuthHooks/Staff/Admin/Students/useGetUnassignedStudents";
-import useGetGroupsByClassAndSection from "../../../Hooks/AuthHooks/Staff/Admin/Groups/useGetGroupsByClassAndSection ";
 
 const MainSection = () => {
   const [activeSection, setActiveSection] = useState("Everyone");
   const [activeSectionId, setActiveSectionId] = useState(null);
-  const [groupList, setGroupList] = useState([]);
   const [unassignedStudents, setUnassignedStudents] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const groupList = useSelector((store) => store.Class.groupsList);
   const dispatch = useDispatch();
-  const { fetchSection } = useFetchSection();
   const { cid } = useParams();
 
+  const { fetchSection } = useFetchSection();
   const {
     fetchGroupsByClass,
     loading: loadingByClass,
@@ -34,26 +35,30 @@ const MainSection = () => {
   } = useGetGroupsByClassAndSection();
   const { fetchUnassignedStudents } = useGetUnassignedStudents();
 
-  const fetchGroups = async () => {
+  const fetchGroups = useCallback(async () => {
     if (cid) {
-      let data;
       if (activeSection === "Everyone") {
-        data = await fetchGroupsByClass(cid);
+        await fetchGroupsByClass(cid);
       } else {
-        data = await fetchGroupsByClassAndSection(cid, activeSectionId);
+        await fetchGroupsByClassAndSection(cid, activeSectionId);
       }
-      setGroupList(data);
     }
-  };
+  }, [
+    cid,
+    activeSection,
+    activeSectionId,
+    fetchGroupsByClass,
+    fetchGroupsByClassAndSection,
+  ]);
 
-  const fetchStudents = async () => {
+  const fetchStudents = useCallback(async () => {
     try {
       const data = await fetchUnassignedStudents(cid);
       setUnassignedStudents(data);
     } catch (error) {
       console.error("Failed to load students");
     }
-  };
+  }, [cid, fetchUnassignedStudents]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -64,20 +69,16 @@ const MainSection = () => {
       }
     };
     fetchData();
-  }, [
-    cid,
-    activeSection,
-    activeSectionId,
-    fetchSection,
-    fetchGroupsByClass,
-    fetchGroupsByClassAndSection,
-  ]);
+  }, [cid, fetchSection, fetchGroups, fetchStudents]);
 
-  const handleSectionChange = (section, sectionId) => {
-    setActiveSection(section);
-    setActiveSectionId(sectionId);
-    fetchGroups();
-  };
+  const handleSectionChange = useCallback(
+    (section, sectionId) => {
+      setActiveSection(section);
+      setActiveSectionId(sectionId);
+      fetchGroups(); // Optimized, ensures no duplicate calls
+    },
+    [fetchGroups]
+  );
 
   const handleSeeGradeClick = (student) => {
     dispatch(setStudentGrade(student));

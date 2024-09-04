@@ -1,25 +1,23 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, memo } from "react";
+import { useSelector } from "react-redux";
 import { LuUser } from "react-icons/lu";
 import { GiImperialCrown } from "react-icons/gi";
 import { TbDotsVertical } from "react-icons/tb";
 import { FaUsers } from "react-icons/fa";
 import useCreateGroup from "../../../../Hooks/AuthHooks/Staff/Admin/useCreateGroup";
-import StudentMenuOptions from "../../Students/Components/StudentMenuOptions";
-import AddGroup from "./AddGroup";
 import useDeleteModal from "../../../../Hooks/CommonHooks/useDeleteModal";
 import DeleteModal from "../../../../Components/Common/DeleteModal";
+import StudentMenuOptions from "../../Students/Components/StudentMenuOptions";
+import AddGroup from "./AddGroup";
 
-const GroupList = ({
-  selectedSection,
-  onSeeGradeClick,
-  groupList,
-  fetchGroups,
-  fetchStudents,
-}) => {
+const GroupList = ({ onSeeGradeClick, fetchGroups, fetchStudents }) => {
   const [expandedGroupIndex, setExpandedGroupIndex] = useState(null);
   const [activeMenu, setActiveMenu] = useState(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [editingGroup, setEditingGroup] = useState(null);
+  const [searchQuery, setSearchQuery] = useState(""); // State for search query
+
+  const groupList = useSelector((store) => store.Class.groupsList);
   const { deleteGroup } = useCreateGroup();
   const { isModalOpen, modalData, openModal, closeModal } = useDeleteModal();
 
@@ -50,34 +48,43 @@ const GroupList = ({
     fetchStudents();
   };
 
-  const closeSidebar = () => {
+  const closeSidebar = useCallback(() => {
     setIsSidebarOpen(false);
     setEditingGroup(null);
     fetchGroups();
-  };
+  }, [fetchGroups]);
+
+  // Filter groups based on search query
+  const filteredGroups = groupList.filter((group) =>
+    group.groupName.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <div className="w-full p-1 bg-white">
       <div className="flex items-center justify-between mb-4 p-2">
         <h2 className="text-lg font-semibold ps-4">
-          Groups <span className="text-gray-500">({groupList?.length})</span>
+          Groups{" "}
+          <span className="text-gray-500">({filteredGroups.length})</span>
         </h2>
         <div className="relative">
           <input
             type="text"
-            placeholder="Select Group"
+            placeholder="Search by group name"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)} // Update search query
             className="w-full px-3 py-2 border rounded-md"
-            aria-label="Select Group"
+            aria-label="Search by group name"
           />
         </div>
       </div>
-      {groupList?.length === 0 ? (
+
+      {filteredGroups.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-64 text-center text-gray-500">
           <FaUsers className="text-6xl mb-4" />
-          <p>No groups found in this section.</p>
+          <p>No groups found.</p>
         </div>
       ) : (
-        groupList?.map((group, groupIndex) => (
+        filteredGroups.map((group, groupIndex) => (
           <div key={groupIndex} className="mb-2">
             <div className="flex items-center justify-between py-3 bg-gray-50">
               <h3
@@ -97,7 +104,7 @@ const GroupList = ({
                   )
                 }
               >
-                {group?.groupName || " Group Name"}
+                {group?.groupName || "Group Name"}
               </h3>
               <div className="flex items-center space-x-2 relative">
                 <div className="flex items-center space-x-1 border p-1 rounded-full px-4">
@@ -278,4 +285,4 @@ const GroupList = ({
   );
 };
 
-export default React.memo(GroupList);
+export default memo(GroupList);
