@@ -37,6 +37,8 @@ const StudentGradeModal = ({ isOpen, onClose }) => {
   // console.log(studentGrade._id)
   const { error, fetchStudentGrades, grades, loading, totals } = useFetchStudentGrades();
   useEffect(() => {
+    console.log('--',studentGrade);
+    
     if(isOpen){
       fetchStudentGrades(studentGrade.studentId, filters.module, filters.chapter, filters.arrangeBy);
     }
