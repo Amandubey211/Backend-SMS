@@ -5,6 +5,7 @@ import FormSelect from "../../Accounting/subClass/component/FormSelect";
 import useAddUser from "../../../../Hooks/AuthHooks/Staff/Admin/staff/useAddUser";
 import useGetAllTeachers from "../../../../Hooks/AuthHooks/Staff/Admin/Teacher/useGetAllTeacher";
 import useEditUser from "../../../../Hooks/AuthHooks/Staff/Admin/staff/useEditUser";
+import { FiLoader } from "react-icons/fi";
 
 const AddUser = ({ role ,data}) => {
   const [imagePreview, setImagePreview] = useState(null);
@@ -156,7 +157,7 @@ const AddUser = ({ role ,data}) => {
      
     }
   };
-  const {EditUser,} = useEditUser();
+ const {EditUser,loading: editUserLoading} = useEditUser();
   const editUserHandel = async()=>{
     console.log(teacherData);
    await EditUser(teacherData,address,data?._id);
@@ -326,18 +327,18 @@ const AddUser = ({ role ,data}) => {
           </div>
         </div>
        {data? <div
-          disabled={loading}
+          disabled={editUserLoading}
           className="bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-10 rounded-md hover:from-pink-600 hover:to-purple-600 cursor-pointer w-[11rem]"
           onClick={editUserHandel}
         >
-          {loading?'Loading...'  :'Update Staff'}
+          {editUserLoading?<FiLoader className="animate-spin  w-[1rem] h-[1rem] ml-10 " />  :'Update Staff'}
         </div>:
         <button
         disabled={loading}
           type="submit"
           className="bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-10 rounded-md hover:from-pink-600 hover:to-purple-600"
         >
-        {loading?'Loading...'  :'Add New Staff'}
+        {loading? <FiLoader className="animate-spin  w-[1rem] h-[1rem] ml-10 " />  :'Add New Staff'}
         </button>}
       </form>
     </div>
