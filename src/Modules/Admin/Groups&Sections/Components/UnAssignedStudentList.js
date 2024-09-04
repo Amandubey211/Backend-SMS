@@ -1,6 +1,4 @@
 import React, { useState } from "react";
-// import { useParams } from "react-router-dom";
-// import toast from "react-hot-toast";
 import { PiPlusLight } from "react-icons/pi";
 import Sidebar from "../../../../Components/Common/Sidebar";
 import AssignStudent from "./AssignStudent";
@@ -14,7 +12,6 @@ const UnAssignedStudentList = ({
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
-  // const { cid } = useParams();
   const sections = useSelector((state) => state.Class.sectionsList);
 
   const handleSearch = (e) => {
@@ -98,7 +95,7 @@ const UnAssignedStudentList = ({
         <Sidebar
           isOpen={isSidebarOpen}
           onClose={handleSidebarClose}
-          title="Assign Group"
+          title="Assign Section"
         >
           <AssignStudent
             name={selectedStudent.firstName}

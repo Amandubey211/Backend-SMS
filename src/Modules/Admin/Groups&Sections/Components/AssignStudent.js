@@ -32,18 +32,18 @@ const AssignStudent = ({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!groupId) {
-      toast.error("Please select a group.");
-      return;
-    }
+    // if (!groupId) {
+    //   toast.error("Please select a group.");
+    //   return;
+    // }
     if (!sectionId) {
       toast.error("Please select a section.");
       return;
     }
     try {
       await assignStudentToSection(studentId, sectionId);
-      await assignStudentToGroup(studentId, groupId);
-      toast.success("Student assigned to group successfully!");
+      // await assignStudentToGroup(studentId, groupId);
+      // toast.success("Student assigned to Section successfully!");
 
       if (onAssignmentComplete) {
         onAssignmentComplete();
@@ -89,7 +89,7 @@ const AssignStudent = ({
           ))}
         </select>
       </div>
-      <div className="mt-4">
+      {/* <div className="mt-4">
         <label className="block text-sm font-medium text-gray-700 mb-1">
           Group
         </label>
@@ -110,7 +110,7 @@ const AssignStudent = ({
             </option>
           ))}
         </select>
-      </div>
+      </div> */}
       <div className="mt-auto mb-8">
         <button
           type="submit"

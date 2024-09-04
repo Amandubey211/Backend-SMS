@@ -1,13 +1,13 @@
-import React, { useState, lazy, Suspense } from "react";
-import Sidebar from "../../../../Components/Common/Sidebar";
+import React, { useState, lazy, Suspense, useCallback } from "react";
 import { useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
+import Sidebar from "../../../../Components/Common/Sidebar";
 import { RiDeleteBin5Line, RiEdit2Line } from "react-icons/ri";
-import useDeleteSection from "../../../../Hooks/AuthHooks/Staff/Admin/Sections/useDeleteSection";
 import { PiSpinner } from "react-icons/pi";
+import useDeleteSection from "../../../../Hooks/AuthHooks/Staff/Admin/Sections/useDeleteSection";
 import useDeleteModal from "../../../../Hooks/CommonHooks/useDeleteModal";
 import DeleteModal from "../../../../Components/Common/DeleteModal";
-import AddSection from "./AddSection"; // Use the same AddSection component for both add and edit
-import { useParams } from "react-router-dom";
+import AddSection from "./AddSection";
 
 const AddGroup = lazy(() => import("./AddGroup"));
 
@@ -24,16 +24,18 @@ const NavigationBar = ({
   const Sections = useSelector((store) => store.Class.sectionsList);
 
   const { deleteSection, loading } = useDeleteSection();
-
   const { isModalOpen, modalData, openModal, closeModal } = useDeleteModal();
 
-  const openAddGroupSidebar = () => setSidebarType("addGroup");
-  const openAddSectionSidebar = () => setSidebarType("addSection");
-  const closeSidebar = () => {
+  const openAddGroupSidebar = useCallback(() => setSidebarType("addGroup"), []);
+  const openAddSectionSidebar = useCallback(
+    () => setSidebarType("addSection"),
+    []
+  );
+  const closeSidebar = useCallback(() => {
     setSidebarType(null);
     setEditingSection(null);
-    fetchSections(cid); // Ensure sections are refetched after sidebar closes
-  };
+    fetchSections(cid);
+  }, [cid, fetchSections]);
 
   const handleDeleteConfirm = async () => {
     if (modalData) {
@@ -43,26 +45,31 @@ const NavigationBar = ({
     }
   };
 
-  const handleSectionChange = (section, sectionId) => {
-    onSectionChange(section, sectionId);
-    fetchSections(cid); // Refetch sections after section change
-  };
+  const handleSectionChange = useCallback(
+    (section, sectionId) => {
+      onSectionChange(section, sectionId);
+      fetchSections(cid); // Refetch sections after section change
+    },
+    [cid, onSectionChange, fetchSections]
+  );
 
-  const handleEditSection = (section) => {
+  const handleEditSection = useCallback((section) => {
     setEditingSection(section);
     setSidebarType("editSection");
-  };
+  }, []);
 
-  const handleSectionSubmitSuccess = () => {
-    fetchSections(cid); // Refresh sections list
+  const handleSectionSubmitSuccess = useCallback(() => {
+    fetchSections(cid);
     closeSidebar();
-  };
+  }, [cid, fetchSections, closeSidebar]);
 
-  const getButtonClass = (section) => {
-    return selectedSection === section
-      ? "relative px-4 py-2 rounded-full bg-gradient-to-r from-red-400 to-purple-500 text-white"
-      : "relative px-4 py-2 rounded-full border border-gray-300 hover:border-red-400 hover:bg-gray-100";
-  };
+  const getButtonClass = useCallback(
+    (section) =>
+      selectedSection === section
+        ? "relative px-4 py-2 rounded-full bg-gradient-to-r from-red-400 to-purple-500 text-white"
+        : "relative px-4 py-2 rounded-full border border-gray-300 hover:border-red-400 hover:bg-gray-100",
+    [selectedSection]
+  );
 
   return (
     <>
@@ -144,7 +151,7 @@ const NavigationBar = ({
         title="Add New Group"
       >
         <Suspense fallback={<div>Loading...</div>}>
-          <AddGroup fetchGroups={fetchGroups}    onClose={closeSidebar} />
+          <AddGroup fetchGroups={fetchGroups} onClose={closeSidebar} />
         </Suspense>
       </Sidebar>
 
