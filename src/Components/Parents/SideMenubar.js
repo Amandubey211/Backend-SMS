@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation, NavLink, useNavigate } from "react-router-dom";
 import StudentDiwanLogo from "../../Assets/HomeAssets/StudentDiwanLogo.png";
 import { MdOutlineKeyboardArrowUp, MdOutlineKeyboardArrowDown } from "react-icons/md";
@@ -11,6 +11,7 @@ import { toggleSidebar } from "../../Redux/Slices/Common/SidebarSlice.js";
 import useParentLogout from '../../Hooks/AuthHooks/Parent/useParentLogout.js';
 import LogoutConfirmationModal from "../Common/LogoutConfirmationModal.js";
 import profileIcon from "../../Assets/DashboardAssets/profileIcon.png";
+import useGetUserDetail from "../../Hooks/AuthHooks/Staff/useGetUserDetail.js";
 
 // Updated function to handle more paths
 const isActivePath = (path, locationPath) => {
@@ -31,6 +32,13 @@ const SideMenubar = () => {
   const [openItems, setOpenItems] = useState([]);
   const dispatch = useDispatch();
   const { parentLogout } = useParentLogout();
+  const { userDetail } = useGetUserDetail();
+  useEffect(() => {
+    const getData = async () => {
+      await userDetail();
+    };
+    getData();
+  }, []);
   const { isOpen, role, userDetails } = useSelector((state) => ({
     isOpen: state.sidebar.isOpen,
     role: state.Auth.role,

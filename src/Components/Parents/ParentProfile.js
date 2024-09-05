@@ -8,6 +8,7 @@ import useChangePassword from "../../Hooks/AuthHooks/Staff/Admin/resetPassword/u
 import ParentDashLayout from "./ParentDashLayout";
 import EditParentProfile from "./EditParentProfile";
 import SidebarSlide from "../Common/SidebarSlide";
+import Layout from "../Common/ParentLayout";
 
 const ParentProfile = () => {
   const { userDetail } = useGetUserDetail();
@@ -65,6 +66,7 @@ const ParentProfile = () => {
 
   return (
     <>
+    <Layout title='My Profile'>
      <ParentDashLayout>
           <div className="flex flex-col w-full p-4 gap-3 ">
             <div className="flex items-center px-6 py-4 gap-3 border rounded-md">
@@ -159,6 +161,7 @@ const ParentProfile = () => {
             </div> 
           </div>
           </ParentDashLayout>
+          </Layout>
     </>
   );
 };
