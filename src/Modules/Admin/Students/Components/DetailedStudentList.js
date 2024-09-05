@@ -91,15 +91,15 @@ const StudentDetails = React.memo(({ student }) => (
       <div className="text-sm text-gray-500 truncate">
         {student?.sectionName || "N/A"}
       </div>
-      <div className="text-sm text-gray-500 truncate">{`Group-${
+      <div className="text-sm text-gray-500 truncate">{`${
         student?.groups[0]?.groupName || "N/A"
       }`}</div>
     </div>
-    <div className="flex flex-col text-sm gap-1 items-start justify-start w-1/4 truncate">
+    <div className="flex flex-col pl-8 text-sm gap-1 items-start justify-start w-1/3 truncate">
       <div className="truncate">{student.email}</div>
       <div className="truncate">{student.contactNumber}</div>
     </div>
-    <div className="flex pl-10 flex-col text-sm gap-1 items-start justify-start w-1/4 truncate">
+    <div className="flex pl-20 flex-col text-sm gap-1 items-start justify-start w-1/4 truncate">
       <div>Parent</div>
       <div className="truncate">{student.guardianContactNumber}</div>
     </div>
