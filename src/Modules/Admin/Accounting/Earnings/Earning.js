@@ -11,6 +11,8 @@ import { HiOutlineBanknotes } from "react-icons/hi2";
 import { baseUrl } from "../../../../config/Common";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import Spinner from "../../../../Components/Common/Spinner";
+import NoDataFound from "../../../../Components/Common/NoDataFound";
 
 const Earning = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -47,8 +49,8 @@ const Earning = () => {
     try {
       const response = await fetch(`${baseUrl}/admin/total_amount`, {
         headers: {
-          Authentication: `${token}`
-        }
+          Authentication: `${token}`,
+        },
       });
       const data = await response.json();
       if (response.ok && data.success) {
@@ -57,7 +59,7 @@ const Earning = () => {
         setTotalFees(data.totalFees);
         setRemainingBalance(data.remainingBalance);
       } else {
-        throw new Error(data.msg || 'Failed to fetch total amounts');
+        throw new Error(data.msg || "Failed to fetch total amounts");
       }
     } catch (err) {
       message.error(err.message);
@@ -70,14 +72,14 @@ const Earning = () => {
     try {
       const response = await fetch(`${baseUrl}/admin/getearning`, {
         headers: {
-          Authentication: `${token}`
-        }
+          Authentication: `${token}`,
+        },
       });
       const data = await response.json();
       if (response.ok) {
         setEarnings(data.earnings);
       } else {
-        throw new Error(data.msg || 'Failed to fetch data');
+        throw new Error(data.msg || "Failed to fetch data");
       }
     } catch (err) {
       setError(err.message);
@@ -89,19 +91,22 @@ const Earning = () => {
   const handleDelete = async (earningId) => {
     const token = localStorage.getItem(`${role}:token`);
     try {
-      const response = await fetch(`${baseUrl}/admin/deleteEarning/${earningId}`, {
-        method: 'DELETE',
-        headers: {
-          Authentication: `${token}`
+      const response = await fetch(
+        `${baseUrl}/admin/deleteEarning/${earningId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authentication: `${token}`,
+          },
         }
-      });
+      );
       const data = await response.json();
       if (response.ok) {
-        message.success('Earning deleted successfully');
+        message.success("Earning deleted successfully");
         fetchEarnings();
         fetchTotalAmounts();
       } else {
-        throw new Error(data.msg || 'Failed to delete earning');
+        throw new Error(data.msg || "Failed to delete earning");
       }
     } catch (err) {
       message.error(err.message);
@@ -110,10 +115,10 @@ const Earning = () => {
 
   const formatDate = (isoDate) => {
     const date = new Date(isoDate);
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
     });
   };
 
@@ -127,30 +132,50 @@ const Earning = () => {
       <DashLayout>
         <div className="min-h-screen flex">
           <div className="w-[75%] border-r">
-            <div className="w-full h-20 p-4 border-b flex justify-between items-center" style={{ maxHeight: "90vh" }}>
+            <div
+              className="w-full h-20 p-4 border-b flex justify-between items-center"
+              style={{ maxHeight: "90vh" }}
+            >
               <span>All Earnings</span>
-              <button onClick={handleSidebarOpen} className="flex items-center border border-gray-300 ps-5 py-0 rounded-full">
+              <button
+                onClick={handleSidebarOpen}
+                className="flex items-center border border-gray-300 ps-5 py-0 rounded-full"
+              >
                 <span className="mr-2">Add New Earning</span>
                 <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full w-10 h-10 flex items-center justify-center">
                   <span className="text-2xl -mt-2">+</span>
                 </div>
               </button>
             </div>
-            {loading ? <p>Loading...</p> : error ? <p>Error: {error}</p> : (
+            {loading ? (
+              <Spinner />
+            ) : error ? (
+              <NoDataFound />
+            ) : (
               <div className="overflow-x-auto h-full bg-white shadow rounded-lg ">
                 <table className="min-w-full leading-normal">
                   <thead>
-                    <tr className="text-center text-gray-700 bg-gray-100 ">
-                      <th className="px-5 py-3 border-b-2 border-gray-200">Earning Reason</th>
-                      <th className="px-5 py-3 border-b-2 border-gray-200">From</th>
-                      <th className="px-5 py-3 border-b-2 border-gray-200">Earning Date</th>
-                      <th className="px-5 py-3 border-b-2 border-gray-200">Amount</th>
-                      <th className="px-5 py-3 border-b-2 border-gray-200">Action</th>
+                    <tr className="text-left text-gray-700 bg-gray-100 ">
+                      <th className="px-5 py-3 border-b-2 border-gray-200">
+                        Earning Reason
+                      </th>
+                      <th className="px-5 py-3 border-b-2 border-gray-200">
+                        From
+                      </th>
+                      <th className="px-5 py-3 border-b-2 border-gray-200">
+                        Earning Date
+                      </th>
+                      <th className="px-5 py-3 border-b-2 border-gray-200">
+                        Amount
+                      </th>
+                      <th className="px-5 py-3 border-b-2 border-gray-200">
+                        Action
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
                     {earnings.map((item, index) => (
-                      <tr key={index} className="text-center text-gray-700">
+                      <tr key={index} className=" text-gray-700">
                         <td className="px-5 py-2 border-b border-gray-200">
                           {item.description}
                         </td>
@@ -208,8 +233,12 @@ const Earning = () => {
                   <GiMoneyStack size={40} color="red" />
                 </div>
               </div>
-              <h2 className="text-lg font-semibold text-gray-800">Remaining Balance</h2>
-              <p className="text-3xl font-bold text-gradient bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-pink-500">{remainingBalance} QR</p>
+              <h2 className="text-lg font-semibold text-gray-800">
+                Remaining Balance
+              </h2>
+              <p className="text-3xl font-bold text-gradient bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-pink-500">
+                {remainingBalance} QR
+              </p>
             </div>
 
             <div className="bg-white shadow rounded-lg p-4 w-full max-w-xs text-center border border-gray-200">
@@ -217,10 +246,13 @@ const Earning = () => {
                 <div className="bg-white rounded-full p-4 border border-green-500">
                   <GiMoneyStack size={40} color="green" />
                 </div>
-
               </div>
-              <h2 className="text-lg font-semibold text-gray-800">Total Earning</h2>
-              <p className="text-3xl font-bold text-gradient bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-pink-500">{totalEarnings} QR</p>
+              <h2 className="text-lg font-semibold text-gray-800">
+                Total Earning
+              </h2>
+              <p className="text-3xl font-bold text-gradient bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-pink-500">
+                {totalEarnings} QR
+              </p>
             </div>
 
             <div className="bg-white shadow rounded-lg p-4 w-full max-w-xs text-center border border-gray-200">
@@ -229,9 +261,16 @@ const Earning = () => {
                   <GiTakeMyMoney className="size-10 text-blue-400" />
                 </div>
               </div>
-              <h2 className="text-lg font-semibold text-gray-800">Total Student Fees</h2>
-              <p className="text-3xl mb-5 font-bold text-gradient bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-pink-500">{totalFees} QR</p>
-              <Link to="/accounting/studentfees" className="mt-4 px-4 py-2 border border-blue-500 text-blue-500 rounded-full">
+              <h2 className="text-lg font-semibold text-gray-800">
+                Total Student Fees
+              </h2>
+              <p className="text-3xl mb-5 font-bold text-gradient bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-pink-500">
+                {totalFees} QR
+              </p>
+              <Link
+                to="/accounting/studentfees"
+                className="mt-4 px-4 py-2 border border-blue-500 text-blue-500 rounded-full"
+              >
                 View All Fees
               </Link>
             </div>
@@ -242,8 +281,12 @@ const Earning = () => {
                   <HiOutlineBanknotes className="size-10 text-red-500" />
                 </div>
               </div>
-              <h2 className="text-lg font-semibold text-gray-800">Total Expenses</h2>
-              <p className="text-3xl mb-5 font-bold text-gradient bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-pink-500">{totalExpense} QR</p>
+              <h2 className="text-lg font-semibold text-gray-800">
+                Total Expenses
+              </h2>
+              <p className="text-3xl mb-5 font-bold text-gradient bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-pink-500">
+                {totalExpense} QR
+              </p>
               {/* <Link to="/accounting/expenses" className="mt-4 px-4 py-2 border border-red-500 text-red-500 rounded-full">
               View All Expenses
               </Link> */}
@@ -255,7 +298,11 @@ const Earning = () => {
             onClose={handleSidebarClose}
             title="Add New Earnings"
           >
-            <AddEarning fetchEarning={fetchEarnings} fetchTotalAmounts={fetchTotalAmounts} handleSidebarClose={handleSidebarClose} />
+            <AddEarning
+              fetchEarning={fetchEarnings}
+              fetchTotalAmounts={fetchTotalAmounts}
+              handleSidebarClose={handleSidebarClose}
+            />
           </Sidebar>
 
           <Sidebar
