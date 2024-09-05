@@ -40,8 +40,6 @@ const SideMenubar = () => {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
-
-
   const handleLogout = () => {
     setIsLogoutModalOpen(true);
   };
@@ -230,11 +228,11 @@ const SideMenubar = () => {
           </button>
         </div>
         <LogoutConfirmationModal
-        isOpen={isLogoutModalOpen}
-        onClose={() => setIsLogoutModalOpen(false)}
-        onConfirm={confirmLogout}
-        loading={isLoggingOut}
-      />
+          isOpen={isLogoutModalOpen}
+          onClose={() => setIsLogoutModalOpen(false)}
+          onConfirm={confirmLogout}
+          loading={isLoggingOut}
+        />
       </div>
     </nav>
   );

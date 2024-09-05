@@ -7,8 +7,8 @@ import FeeCard from "./StudentFinance/FeeCard";
 import axios from "axios";
 import { baseUrl } from "../../config/Common";
 import Spinner from "../../Components/Common/Spinner";
-import { GoAlertFill } from "react-icons/go"; // Import the GoAlertFill icon
 import NoDataFound from "../../Components/Common/NoDataFound";
+import { GoAlertFill } from "react-icons/go";
 
 const FinanceTable = () => {
   const [filters, setFilters] = useState({
@@ -19,36 +19,26 @@ const FinanceTable = () => {
   const [totalUnpaidFees, setTotalUnpaidFees] = useState("");
   const [totalPaidFees, setTotalPaidFees] = useState("");
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null); // New state for error handling
 
+  // Fetch Fees Details
   const fetchFeesDetails = async () => {
-    console.log("Fetching fees details...");
     try {
       const token = localStorage.getItem("student:token");
-      console.log("Token is:", token);
-
-      if (!token) {
-        throw new Error("Authentication token not found");
-      }
+      if (!token) throw new Error("Authentication token not found");
 
       const response = await axios.get(`${baseUrl}/student/my_fees`, {
-        headers: {
-          Authentication: token,
-        },
+        headers: { Authentication: token },
       });
 
-      console.log("Response received:", response);
       const data = response.data;
-      console.log("Data parsed:", data);
-
       if (data) {
         setFeesDetails(data.fees.reverse());
         setTotalUnpaidFees(data.totalUnpaidFees);
         setTotalPaidFees(data.totalPaidFees);
-      } else {
-        console.log("No fees data or unsuccessful response");
       }
     } catch (error) {
-      console.error("Failed to fetch fees details:", error);
+      setError("Failed to fetch fees details. Please try again later.");
     } finally {
       setLoading(false);
     }
@@ -58,11 +48,13 @@ const FinanceTable = () => {
     fetchFeesDetails();
   }, []);
 
+  // Handle Filter Change
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
     setFilters((prev) => ({ ...prev, [name]: value }));
   };
 
+  // Filtered Data
   const filteredFeesDetails = feesDetails.filter(
     (item) =>
       (filters.feesType === "" || item.feeType === filters.feesType) &&
@@ -74,32 +66,33 @@ const FinanceTable = () => {
       <StudentDashLayout>
         <div className="flex">
           <div className="flex flex-col w-[80%] h-full">
+            {/* Filter always on top */}
+            <FilterContainer
+              filters={filters}
+              feesDetails={feesDetails}
+              handleFilterChange={handleFilterChange}
+            />
+
             {loading ? (
               <div className="w-full h-screen flex flex-col items-center justify-center">
                 <Spinner />
               </div>
+            ) : error ? (
+              <div className="alert-error flex items-center p-4">
+                <GoAlertFill className="text-red-600 mr-2" />
+                <span>{error}</span>
+              </div>
+            ) : filteredFeesDetails.length > 0 ? (
+              <FeeTable feesDetails={filteredFeesDetails} />
             ) : (
-              <>
-                {filteredFeesDetails.length > 0 ? (
-                  <>
-                    <FilterContainer
-                      filters={filters}
-                      feesDetails={feesDetails}
-                      handleFilterChange={handleFilterChange}
-                    />
-                    <FeeTable feesDetails={filteredFeesDetails} />
-                  </>
-                ) : (
-                  <NoDataFound />
-                )}
-              </>
+              <NoDataFound />
             )}
           </div>
 
+          {/* Summary Card Section */}
           {!loading && (
             <div className="w-[20%] border p-4 h-screen">
               <h3 className="mb-5 text-gray-500">Your Finance Details</h3>
-
               <div className="flex flex-col gap-5">
                 <FeeCard
                   title="Total Unpaid Fees"

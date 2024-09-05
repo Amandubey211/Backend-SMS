@@ -34,12 +34,12 @@ const sidebarData = [
     items: [
       {
         title: "Notice",
-        icon: <FaClipboardList />,
+        // icon: <FaClipboardList />,
         path: "/student/noticeboard/announcements",
       },
       {
         title: "Events",
-        icon: <FcAdvertising />,
+        // icon: <FcAdvertising />,
         path: "/student/noticeboard/events",
       },
     ],

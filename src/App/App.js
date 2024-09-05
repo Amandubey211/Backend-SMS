@@ -19,10 +19,8 @@ import AllAccountants from "../Modules/Admin/UsersProfiles/AccountantProfile/All
 import StudentParentProfile from "../Modules/Admin/UsersProfiles/StudentParentsProfile/StudentParentProfile.js";
 import UserProfile from "../Modules/Admin/UsersProfiles/AdminProfile/UserProfile.js";
 import "./App.css";
-import StudentLibrary from "../Modules/Student/Library/StudentLibrary.js";
 import StaffLogin from "../Modules/LoginPages/Staff/StaffLogin.js";
 import ForgetPassword from "../Modules/LoginPages/Student/Login/ForgetPassword/ForgetPassword.js";
-import AttendanceMain from "../Modules/Student/Attendance/AttendanceMain.js";
 import ParentEvent from "../Modules/Parents/ParentEvent/ParentEvent";
 import QIDLogin from "../Modules/LoginPages/Student/Login/QIDLogin.js";
 import ParentProfile from "../Components/Parents/ParentProfile.js";
@@ -323,12 +321,16 @@ function App() {
     },
     {
       path: "/class",
-      element: <ProtectRoute Component={Classes} allowedRoles={["admin", "teacher"]} />,
+      element: (
+        <ProtectRoute Component={Classes} allowedRoles={["admin", "teacher"]} />
+      ),
       errorElement: <Error />,
     },
     {
       path: "/class/:cid",
-      element: <ProtectRoute Component={Class} allowedRoles={["admin", "teacher"]} />,
+      element: (
+        <ProtectRoute Component={Class} allowedRoles={["admin", "teacher"]} />
+      ),
       errorElement: <Error />,
     },
     {
@@ -355,19 +357,32 @@ function App() {
     },
     {
       path: "/class/:cid/teachers",
-      element: <ProtectRoute Component={Teachers} allowedRoles={["admin", "teacher"]} />,
+      element: (
+        <ProtectRoute
+          Component={Teachers}
+          allowedRoles={["admin", "teacher"]}
+        />
+      ),
       errorElement: <Error />,
     },
     {
       path: "/class/:cid/section_group",
       element: (
-        <ProtectRoute Component={Group_Section} allowedRoles={["admin", "teacher"]} />
+        <ProtectRoute
+          Component={Group_Section}
+          allowedRoles={["admin", "teacher"]}
+        />
       ),
       errorElement: <Error />,
     },
     {
       path: "/class/:cid/students",
-      element: <ProtectRoute Component={Students} allowedRoles={["admin", "teacher"]} />,
+      element: (
+        <ProtectRoute
+          Component={Students}
+          allowedRoles={["admin", "teacher"]}
+        />
+      ),
       errorElement: <Error />,
     },
     {
@@ -638,7 +653,11 @@ function App() {
       element: <AllStudents />,
       errorElement: <Error />,
     },
-    { path: "/users/students/:cid", element: <SingleStudent />, errorElement: <Error /> },
+    {
+      path: "/users/students/:cid",
+      element: <SingleStudent />,
+      errorElement: <Error />,
+    },
     {
       path: "/users/teachers",
       element: <AllTeachers />,
@@ -671,7 +690,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={StaffMyProfile}
-          allowedRoles={['teacher', 'accountant', 'librarian', 'staff']}
+          allowedRoles={["teacher", "accountant", "librarian", "staff"]}
         />
       ),
       errorElement: <Error />,
@@ -875,7 +894,7 @@ function App() {
       ),
       errorElement: <Error />,
     },
-   
+
     {
       path: "/student_library",
       element: (
@@ -933,7 +952,11 @@ function App() {
       element: <CheckProgress />,
       errorElement: <Error />,
     },
-    { path: "/users/parent/profile", element: <ParentProfile />, errorElement: <Error /> },
+    {
+      path: "/users/parent/profile",
+      element: <ParentProfile />,
+      errorElement: <Error />,
+    },
     {
       path: "/parentannounce",
       element: <ParentAnnounce />,
@@ -945,7 +968,7 @@ function App() {
       errorElement: <Error />,
     },
   ]);
- 
+
   return (
     <>
       {!isOnline && <Offline />}
