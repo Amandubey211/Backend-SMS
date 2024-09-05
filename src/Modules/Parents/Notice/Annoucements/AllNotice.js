@@ -3,7 +3,7 @@ import axios from "axios";
 import Layout from "../../../../Components/Common/Layout";
 import ParentDashLayout from "../../../../Components/Parents/ParentDashLayout.js";
 import { MdExpandMore, MdExpandLess } from "react-icons/md";
-import { IoCalendarOutline } from "react-icons/io5";
+import CalendarIcon from '../../../../Assets/ParentAssets/svg/calender.svg'; // Updated Import
 
 import announcementIcon from "../../../../Assets/DashboardAssets/Images/image1.png";
 import toast from "react-hot-toast";
@@ -95,7 +95,7 @@ const AllNotice = () => {
                 </div>
               ) : error ? (
                 <div className="flex flex-col items-center justify-center h-full text-center">
-                  <IoCalendarOutline style={{ width: '30px', height: '30px', marginBottom: '10px' }} />
+                  <img src={CalendarIcon} style={{ width: '40px', height: '40px', marginBottom: '10px' }} alt="calendar" />
                   <p className="text-gray-600 text-lg">Failed to fetch notices.</p>
                 </div>
               ) : filteredNotices.length > 0 ? (
@@ -119,7 +119,7 @@ const AllNotice = () => {
                           </h2>
                           <div className="flex flex-row gap-[50px] text-xs">
                             <div className="flex flex-wrap justify-center items-center">
-                              <IoCalendarOutline style={{ width: '20px', height: '20px' }} />
+                              <img src={CalendarIcon} alt="calendar" style={{ width: '25px', height: '25px', marginRight: '5px' }} />
                               <span className="text-sm p-1 font-[400] text-[#7F7F7F]">
                                 {formatDate(notice.startDate)}
                               </span>
@@ -141,8 +141,12 @@ const AllNotice = () => {
                             </div>
                           </div>
                         </div>
-                        <div className="flex items-center">
-                          {activeIndex === index ? <MdExpandLess className="text-xl" /> : <MdExpandMore className="text-xl" />}
+                        <div className="flex items-center justify-center w-[40px] h-[40px] rounded-full border border-gray-300">
+                          {activeIndex === index ? (
+                            <MdExpandLess className="text-xl text-gray-700" />
+                          ) : (
+                            <MdExpandMore className="text-xl text-gray-700" />
+                          )}
                         </div>
                       </div>
                     </div>
@@ -155,7 +159,7 @@ const AllNotice = () => {
                 ))
               ) : (
                 <div className="flex flex-col items-center justify-center h-full">
-                  <IoCalendarOutline style={{ width: '30px', height: '30px', marginBottom: '10px' }} />
+                  <img src={CalendarIcon} style={{ width: '40px', height: '40px', marginBottom: '10px' }} alt="calendar" />
                   <p className="text-gray-600 text-lg">No Notices are available.</p>
                 </div>
               )}
