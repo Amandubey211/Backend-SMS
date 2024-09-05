@@ -7,7 +7,6 @@ import { baseUrl } from "../../../config/Common";
 import Chapter from "../../Admin/UsersProfiles/StudentProfile/Components/StudentCourseProgress/Module/Components/Chapter";
 import ModuleCard from "../../Admin/UsersProfiles/StudentProfile/Components/StudentCourseProgress/Module/Components/ModuleCard";
 
-
 const MainSection = ({ student, selectedSubjectId }) => {
   const [expandedChapters, setExpandedChapters] = useState(null);
   const [modules, setModules] = useState([]);
@@ -21,18 +20,19 @@ const MainSection = ({ student, selectedSubjectId }) => {
     try {
       const token = localStorage.getItem(`${role}:token`);
       if (!token) {
-        throw new Error('Authentication token not found');
+        throw new Error("Authentication token not found");
       }
-      const response = await axios.get(`${baseUrl}/admin/parent/classes/${student.presentClassId}/modules/${subjectId}/studentId/${student.id}`, {
-        headers: { Authentication: token },
-
-      });
+      const response = await axios.get(
+        `${baseUrl}/admin/parent/classes/${student.presentClassId}/modules/${subjectId}/studentId/${student.id}`,
+        {
+          headers: { Authentication: token },
+        }
+      );
       const modulesData = response.data.data.modules;
       setModules(modulesData);
       setChapters(modulesData[0]?.chapters || []);
-      console.log('Modules fetched:', modulesData);
     } catch (err) {
-      console.error('Error fetching modules:', err);
+      console.error("Error fetching modules:", err);
     }
   }, [role, student.presentClassId, student.id]);
 
@@ -45,7 +45,7 @@ const MainSection = ({ student, selectedSubjectId }) => {
 
   const selectModule = (module) => {
     setChapters(module?.chapters || []);
-    window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
   };
 
   useEffect(() => {
@@ -53,12 +53,14 @@ const MainSection = ({ student, selectedSubjectId }) => {
       try {
         const token = localStorage.getItem(`parent:token`);
         if (!token) {
-          throw new Error('Authentication token not found');
+          throw new Error("Authentication token not found");
         }
-        const response = await axios.get(`${baseUrl}/api/studentDashboard/subjects/${student.id}`, {
-          headers: { Authentication: token },
-        });
-
+        const response = await axios.get(
+          `${baseUrl}/api/studentDashboard/subjects/${student.id}`,
+          {
+            headers: { Authentication: token },
+          }
+        );
         const subjects = response.data.subjects;
         setStudentSubjects(subjects);
         if (subjects?.length > 0) {
@@ -66,7 +68,7 @@ const MainSection = ({ student, selectedSubjectId }) => {
           setSelectedSubject(firstSubjectId);
         }
       } catch (err) {
-        console.error('Error fetching subjects:', err);
+        console.error("Error fetching subjects:", err);
       }
     };
 
@@ -81,9 +83,6 @@ const MainSection = ({ student, selectedSubjectId }) => {
     <div className="flex min-h-screen my-2">
       <div className="w-[65%] bg-white p-2 border-l">
         <div className="bg-white p-2 rounded-lg">
-          <div className="flex justify-between items-center mb-5">
-            {/* Add Chapter Button (if needed) */}
-          </div>
           {chapters.length > 0 ? (
             chapters.map((chapter, index) => (
               <Chapter
@@ -108,27 +107,28 @@ const MainSection = ({ student, selectedSubjectId }) => {
           )}
         </div>
       </div>
+
+      {/* Sidebar for Subject and Module Info */}
       <div className="w-[35%] p-2 border-l-2">
+        {/* "All Modules" at the Top */}
         <div className="bg-white p-4 rounded-lg">
-          <div className="flex items-center gap-1 mb-2">
-            <p className="bg-gradient-to-r from-pink-100 to-purple-200 font-semibold rounded-full p-1 px-2">
-              <span className="text-gradient">{modules?.length}</span>
-            </p>
+          <div className="flex justify-between items-center mb-2">
+            <h2 className="text-lg font-semibold">All Modules</h2>
           </div>
           <div className="grid grid-cols-1 gap-2">
             {modules?.map((module, index) => (
               <div
                 key={index}
                 onClick={() => selectModule(module)}
-                className={`cursor-pointer ${
+                className={`cursor-pointer p-2 rounded-lg shadow-md transition-all duration-200 ${
                   module?.chapters[0]?._id === chapters[0]?._id
-                    ? 'border border-stone-900 rounded-lg'
-                    : ''
+                    ? "bg-purple-100"
+                    : "hover:bg-gray-50"
                 }`}
               >
                 <ModuleCard
                   title={module.moduleName}
-                  moduleNumber={module.moduleNumber}
+                  moduleNumber={module.moduleNumber}  
                   imageUrl={module.thumbnail}
                   isCompleted={module.isCompleted}
                 />
