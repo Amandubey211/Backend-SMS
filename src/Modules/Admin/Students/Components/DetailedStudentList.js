@@ -86,7 +86,6 @@ const StudentDetails = React.memo(({ student }) => (
     <div className="flex flex-col gap-1 items-start justify-center w-1/5 truncate">
       <div className="text-sm text-gray-500 truncate">
         {student?.sectionName || "N/A"}
-
       </div>
       <div className="text-sm text-gray-500 truncate">{`Group-${
         student?.groups[0]?.groupName || "N/A"
