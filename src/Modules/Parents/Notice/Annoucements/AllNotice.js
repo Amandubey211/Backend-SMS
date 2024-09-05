@@ -151,7 +151,7 @@ const AllNotice = () => {
                       </div>
                     </div>
                     {activeIndex === index && (
-                      <div className="p-2 text-[#4D4D4D]">
+                      <div className="p-2 pl-6 text-[#4D4D4D]">
                         <p>{notice.description}</p>
                       </div>
                     )}
