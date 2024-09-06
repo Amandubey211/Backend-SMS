@@ -39,7 +39,7 @@ const MyTeacher = () => {
                     throw new Error("No teachers data found");
                 }
 
-                setTeachers(response.data.instructors); 
+                setTeachers(response.data.instructors);
             } catch (error) {
                 console.error('Failed to fetch teachers:', error);
                 setError("Unable to fetch teachers");
@@ -54,7 +54,7 @@ const MyTeacher = () => {
     if (loading) {
         return (
             <div className="flex justify-center items-center h-full">
-                <Spinner /> 
+                <Spinner />
             </div>
         );
     }
@@ -79,19 +79,19 @@ const MyTeacher = () => {
 
     return (
         <div className="h-full w-full p-4">
-            <div className="text-lg font-medium mb-4 flex items-center"> {/* Reduced size here */}
+            <div className="text-lg font-medium mb-4 flex items-center">
                 Child Instructors
                 <div
                     className="ml-2 flex items-center justify-center rounded-full"
                     style={{
-                        background: 'linear-gradient(to right, #FAECF0 0%, #F3EBFB 100%)', // Background of the circle
-                        width: '32px', // Reduced circle size
-                        height: '32px', // Reduced circle size
+                        background: 'linear-gradient(to right, #FAECF0 0%, #F3EBFB 100%)',
+                        width: '32px',
+                        height: '32px',
                     }}
                 >
                     <span
                         style={{
-                            background: 'linear-gradient(to right, #C83B62 0%, #7F35CD 100%)', // Gradient text color
+                            background: 'linear-gradient(to right, #C83B62 0%, #7F35CD 100%)',
                             WebkitBackgroundClip: 'text',
                             WebkitTextFillColor: 'transparent',
                         }}
@@ -102,7 +102,7 @@ const MyTeacher = () => {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="flex flex-wrap justify-start"> {/* Flexbox to replace grid */}
                 {instructors.map(instructor => (
                     <TeacherCards key={instructor.id} instructor={instructor} />
                 ))}

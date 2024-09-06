@@ -2,7 +2,7 @@ import React from 'react';
 
 const TeacherCard = ({ instructor }) => {
     return (
-        <div className="relative w-full md:w-64 h-auto rounded-lg overflow-hidden shadow-md border border-gray-200 p-6 m-2 flex flex-col items-center transition-transform duration-300 hover:scale-105 hover:shadow-lg bg-white">
+        <div className="relative w-full md:w-64 h-auto rounded-lg overflow-hidden shadow-md border border-gray-200 p-6 m-2 mr-5 flex flex-col items-center transition-transform duration-300 hover:scale-105 hover:shadow-lg bg-white">
             <div className="w-full flex flex-col items-center">
                 <img 
                     className="w-28 h-28 rounded-full mt-2 mb-3 object-cover" // Adjusted size and margin for a better look
