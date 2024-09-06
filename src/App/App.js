@@ -713,13 +713,13 @@ function App() {
       ),
       errorElement: <Error />,
     },
-    // {
-    //   path: "/student_class/:cid/teachers",
-    //   element: (
-    //     <ProtectRoute Component={StudentTeacher} allowedRoles={["student"]} />
-    //   ),
-    //   errorElement: <Error />,
-    // },
+    {
+      path: "/student_class/:cid/teachers",
+      element: (
+        <ProtectRoute Component={StudentTeacher} allowedRoles={["student"]} />
+      ),
+      errorElement: <Error />,
+    },
     {
       path: "/student_class/:cid/classmates",
       element: (
@@ -777,13 +777,7 @@ function App() {
       ),
       errorElement: <Error />,
     },
-    {
-      path: "/student_class/class/:cid/teachers",
-      element: (
-        <ProtectRoute Component={StudentTeacher} allowedRoles={["student"]} />
-      ),
-      errorElement: <Error />,
-    },
+
     {
       path: "/student_class/class/:cid/attendance",
       element: (
