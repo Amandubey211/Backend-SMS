@@ -67,10 +67,10 @@ const VerificationForm = ({ email, studentId }) => {
           >
             <option value="">Select verification status</option>
             <option value="verified">Verified</option>
-            <option value="reject">Rejected</option>
+            <option value="rejected">Rejected</option>
           </select>
         </div>
-        {verificationStatus === "reject" ? (
+        {verificationStatus === "rejected" ? (
           <div className="mb-4">
             <label
               className="text-gray-600 font-medium"
@@ -137,7 +137,7 @@ const VerificationForm = ({ email, studentId }) => {
         >
           {loading
             ? "Processing..."
-            : verificationStatus === "reject"
+            : verificationStatus === "rejected"
             ? "Reject Student"
             : "Verify Student"}
         </button>
