@@ -32,13 +32,13 @@ const SpeedGrade = lazy(() =>
   import("../Modules/Admin/Subjects/Modules/SpeedGrade/SpeedGrade.js")
 );
 const StudentFinance = lazy(() =>
-  import("../Modules/Student/StudentFinance/StudentFinance.js")
+  import("../Modules/Student/Finance/StudentFinance.js")
 );
 const StudentEvent = lazy(() =>
   import("../Modules/Student/StudentEvent/StudentEvent.js")
 );
 const StudentAnnounce = lazy(() =>
-  import("../Modules/Student/Announcements/StudentAnnounce.js")
+  import("../Modules/Student/NoticeBoard/StudentAnnounce.js")
 );
 const StudentLibrarySection = lazy(() =>
   import("../Modules/Student/Library/MainSection/Libary.js")
@@ -267,7 +267,9 @@ const StudentClassMates = lazy(() =>
   )
 );
 const StudentAttendance = lazy(() =>
-  import("../Modules/Student/StudentClass/SubClass/Components/Attendance/AttendanceMain.js")
+  import(
+    "../Modules/Student/StudentClass/SubClass/Components/Attendance/AttendanceMain.js"
+  )
 );
 const Dash = lazy(() => import("../Modules/Admin/Dashboard/Dash.js"));
 

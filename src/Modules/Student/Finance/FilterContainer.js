@@ -1,7 +1,6 @@
 import React from "react";
-import { MdRadioButtonChecked } from "react-icons/md"; // Importing the radio button checked icon from react-icons
 import { GoDotFill } from "react-icons/go";
-import FormField from "../subClass/component/FormField";
+import FormField from "../Component/FormField";
 
 const uniqueFilterOptions = (data, key) => {
   return [...new Set(data.map((item) => item[key]))].sort();
