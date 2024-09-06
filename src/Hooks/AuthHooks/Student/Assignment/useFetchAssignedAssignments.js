@@ -27,53 +27,44 @@ const useFetchAssignedAssignments = (sectionId) => {
     [cacheKey]
   );
 
-  const fetchFilteredAssignments = useCallback(
-    async (sectionId, moduleId, chapterId) => {
-      setLoading(true);
-      setError(null);
+  const fetchFilteredAssignments = useCallback(async () => {
+    setLoading(true);
+    setError(null);
 
-      const token = localStorage.getItem(`${role}:token`);
-      if (!token) {
-        setError("Authentication token not found");
-        setLoading(false);
-        return;
-      }
+    const token = localStorage.getItem(`${role}:token`);
+    if (!token) {
+      setError("Authentication token not found");
+      setLoading(false);
+      return;
+    }
 
-      try {
-        const response = await axios.get(
-          // const response = await fetch(`http://localhost:8080/student/studentAssignment/class/${selectedClass}/section/${selectedSection}?subjectId=${selectedSubject}`, {
-
-          `${baseUrl}/student/studentAssignment/class/${cid}/section/${sectionId}?subjectId=${selectedSubject}`,
-          {
-            headers: {
-              Authentication: token,
-            },
-            params: {
-              subjectId: sid,
-              moduleId,
-              chapterId,
-            },
-          }
-        );
-
-        if (response.data.success && response.data.data) {
-          setAssignments(response.data.data);
-          dispatch(setAssignment(response.data.data));
-
-          localStorage.setItem(cacheKey, JSON.stringify(response.data.data)); // Cache the data
-        } else {
-          throw new Error(
-            response.data.message || "Failed to fetch assignments"
-          );
+    try {
+      const response = await axios.get(
+        `${baseUrl}/student/studentAssignment/class/${cid}`,
+        {
+          headers: {
+            Authentication: token,
+          },
+          params: {
+            subjectId: sid,
+          },
         }
-      } catch (error) {
-        setError(error.message);
-      } finally {
-        setLoading(false);
+      );
+
+      if (response.data.success && response.data.data) {
+        setAssignments(response.data.data);
+        dispatch(setAssignment(response.data.data));
+
+        localStorage.setItem(cacheKey, JSON.stringify(response.data.data)); // Cache the data
+      } else {
+        throw new Error(response.data.message || "Failed to fetch assignments");
       }
-    },
-    [cid, role, sid, cacheKey]
-  );
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  }, [cid, role, sid, cacheKey]);
 
   useEffect(() => {
     if (cachedData) {
