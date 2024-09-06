@@ -1,21 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
-import profileIcon from '../../../Assets/DashboardAssets/profileIcon.png';
+import profileIcon from "../../../Assets/DashboardAssets/profileIcon.png";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-//import EditStudentProfile from "./EditStudentProfile";
 import useChangePassword from "../../../Hooks/AuthHooks/Staff/Admin/resetPassword/useResetPassword";
 import useGetUserDetail from "../../../Hooks/AuthHooks/Staff/useGetUserDetail";
 import StudentDashLayout from "../../../Components/Student/StudentDashLayout";
 
 const StudentProfile = () => {
-    const { userDetail } = useGetUserDetail();
+  const { userDetail } = useGetUserDetail();
   const student = useSelector((store) => store.Auth.userDetail);
   const [studentData, setStudentData] = useState(student);
 
   useEffect(() => {
     const getData = async () => {
-      await  userDetail();
+      await userDetail();
     };
     getData();
   }, []);
@@ -64,7 +63,7 @@ const StudentProfile = () => {
 
   return (
     <>
-     <StudentDashLayout>
+      <StudentDashLayout>
         <div className="flex flex-col w-full p-4 gap-3">
           <div className="flex items-center px-6 py-4 gap-3 border rounded-md">
             <img
@@ -73,13 +72,13 @@ const StudentProfile = () => {
               className="w-20 h-20 rounded-full shadow-lg border"
             />
             <div className="flex flex-row justify-between w-full">
-               <h2 className="text-xl font-semibold">{studentData?.fullName}</h2>
+              <h2 className="text-xl font-semibold">{studentData?.fullName}</h2>
               <button
-               // onClick={handleSidebarOpen}
+                // onClick={handleSidebarOpen}
                 className="px-4 inline-flex items-center border border-transparent text-sm font-medium shadow-sm bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-md hover:from-pink-600 hover:to-purple-600"
               >
-               Enrollment : {studentData?.enrollmentStatus}
-              </button> 
+                Enrollment : {studentData?.enrollmentStatus}
+              </button>
             </div>
           </div>
           <h3 className="text-lg font-semibold mb-4">Personal Information</h3>
@@ -92,28 +91,42 @@ const StudentProfile = () => {
                 </span>
               </div>
               <div className="flex flex-col">
-                <span className="font-normal text-gray-500">Contact Number</span>
-                <span className="font-medium text-gray-800">{studentData?.contactNumber}</span>
+                <span className="font-normal text-gray-500">
+                  Contact Number
+                </span>
+                <span className="font-medium text-gray-800">
+                  {studentData?.contactNumber}
+                </span>
               </div>
             </div>
             <div className="flex flex-col gap-5">
               <div className="flex flex-col">
-                <span className="font-normal text-gray-500">Admission Number</span>
-                <span className="font-medium text-gray-800">{studentData?.admissionNumber|| '-'}</span>
+                <span className="font-normal text-gray-500">
+                  Admission Number
+                </span>
+                <span className="font-medium text-gray-800">
+                  {studentData?.admissionNumber || "-"}
+                </span>
               </div>
               <div className="flex flex-col">
                 <span className="font-normal text-gray-500">Email</span>
-                <span className="font-medium text-gray-800">{studentData?.email|| '-'}</span>
+                <span className="font-medium text-gray-800">
+                  {studentData?.email || "-"}
+                </span>
               </div>
             </div>
             <div className="flex flex-col gap-5">
               <div className="flex flex-col">
                 <span className="font-normal text-gray-500">Date Of Birth</span>
-                <span className="font-medium text-gray-800">{studentData?.dateOfBirth?.slice(0,10)|| '-'}</span>
+                <span className="font-medium text-gray-800">
+                  {studentData?.dateOfBirth?.slice(0, 10) || "-"}
+                </span>
               </div>
               <div className="flex flex-col">
                 <span className="font-normal text-gray-500">Nationality</span>
-                <span className="font-medium text-gray-800">{studentData?.nationality|| '-'}</span>
+                <span className="font-medium text-gray-800">
+                  {studentData?.nationality || "-"}
+                </span>
               </div>
             </div>
           </div>
@@ -130,7 +143,7 @@ const StudentProfile = () => {
             />
             <div className="flex flex-row items-center gap-2">
               <input
-                type={showPassword ? 'text' : 'password'}
+                type={showPassword ? "text" : "password"}
                 name="newPassword"
                 value={passwordData.newPassword}
                 onChange={(e) => handleInputChange(e, setPasswordData)}
@@ -138,7 +151,11 @@ const StudentProfile = () => {
                 placeholder="New Password"
               />
               <span className="text-2xl cursor-pointer">
-                {!showPassword ? <FaEye onClick={() => setShowPassword(true)} /> : <FaEyeSlash onClick={() => setShowPassword(false)} />}
+                {!showPassword ? (
+                  <FaEye onClick={() => setShowPassword(true)} />
+                ) : (
+                  <FaEyeSlash onClick={() => setShowPassword(false)} />
+                )}
               </span>
             </div>
             <input
@@ -173,7 +190,7 @@ const StudentProfile = () => {
             <EditStudentProfile data={studentData} />
           </SidebarSlide> */}
         </div>
-        </StudentDashLayout>
+      </StudentDashLayout>
     </>
   );
 };

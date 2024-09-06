@@ -3,12 +3,9 @@ import { LuUser } from "react-icons/lu";
 import { BsBook } from "react-icons/bs";
 import { NavLink, useParams } from "react-router-dom";
 import ClassCardBookImg from "../../../../Assets/ClassesAssets/ClassCardBook.png";
-import { useSelector } from "react-redux";
 import { TbProgress } from "react-icons/tb";
 
 const SubjectCard = ({ data, backgroundColor, classId, onSubjectClick }) => {
-
-
   return (
     <div
       className={`relative rounded-xl p-4 shadow-lg ${backgroundColor}`}
@@ -25,9 +22,7 @@ const SubjectCard = ({ data, backgroundColor, classId, onSubjectClick }) => {
         </button>
         <TbProgress size={50} color={"white"} />
       </div>
-      <NavLink
-        to={`/student_class/${classId}/${data.subjectId}/module`}
-      >
+      <NavLink to={`/student_class/${classId}/${data.subjectId}/module`}>
         <h2 className="text-xl font-bold text-white w-[65%]">
           {data.subjectName}
         </h2>

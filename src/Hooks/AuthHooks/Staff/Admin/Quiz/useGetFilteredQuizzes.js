@@ -11,8 +11,8 @@ const useGetFilteredQuizzes = () => {
     quizzes: [],
   });
   const role = useSelector((store) => store.Auth.role);
-  
-  const { cid } = useParams();
+
+  const { sid } = useParams();
 
   const fetchFilteredQuizzes = useCallback(
     async (moduleId, chapterId, publish) => {
@@ -26,13 +26,17 @@ const useGetFilteredQuizzes = () => {
           ...(publish !== undefined && { publish }),
         };
 
-        const response = await axios.get(`${baseUrl}/admin/quizzes/${cid}`, {
+        const response = await axios.get(`${baseUrl}/admin/quizzes/${sid}`, {
           headers: { Authentication: token },
           params,
         });
 
         if (response.data?.success) {
-          setState({ loading: false, error: null, quizzes: response.data.quizzes });
+          setState({
+            loading: false,
+            error: null,
+            quizzes: response.data.quizzes,
+          });
         } else {
           setState((prevState) => ({
             ...prevState,
@@ -48,7 +52,7 @@ const useGetFilteredQuizzes = () => {
         }));
       }
     },
-    [role, baseUrl, cid]
+    [role, baseUrl, sid]
   );
 
   return { ...state, fetchFilteredQuizzes };

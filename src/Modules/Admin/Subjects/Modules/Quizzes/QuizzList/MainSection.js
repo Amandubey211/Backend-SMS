@@ -13,7 +13,8 @@ const MainSection = () => {
     chapterId: "",
     publish: null,
   });
-  const { error, fetchFilteredQuizzes, loading, quizzes } = useGetFilteredQuizzes();
+  const { error, fetchFilteredQuizzes, loading, quizzes } =
+    useGetFilteredQuizzes();
 
   const refetchQuizzes = useCallback(() => {
     fetchFilteredQuizzes(filters.moduleId, filters.chapterId, filters.publish);
