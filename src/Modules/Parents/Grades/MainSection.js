@@ -6,6 +6,7 @@ import { GoAlertFill } from "react-icons/go";
 import { baseUrl } from "../../../config/Common";
 import Chapter from "../../Admin/UsersProfiles/StudentProfile/Components/StudentCourseProgress/Module/Components/Chapter";
 import ModuleCard from "../../Admin/UsersProfiles/StudentProfile/Components/StudentCourseProgress/Module/Components/ModuleCard";
+import useNavHeading from "../../../Hooks/CommonHooks/useNavHeading .js";
 
 const MainSection = ({ student, selectedSubjectId }) => {
   const [expandedChapters, setExpandedChapters] = useState(null);
@@ -14,6 +15,7 @@ const MainSection = ({ student, selectedSubjectId }) => {
   const [studentSubjects, setStudentSubjects] = useState([]);
   const [selectedSubject, setSelectedSubject] = useState();
   const role = useSelector((store) => store.Auth.role);
+  useNavHeading("My Childs", "Subject Progress");
 
   // Memoize the fetchModules function to prevent unnecessary re-creations
   const fetchModules = useCallback(async (subjectId) => {

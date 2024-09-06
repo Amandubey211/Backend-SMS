@@ -9,6 +9,8 @@ import { CiMoneyCheck1 } from "react-icons/ci";
 import { baseUrl } from "../../config/Common.js";
 import Spinner from "../../Components/Common/Spinner"; // Import Spinner
 import { FaMoneyBillWave } from "react-icons/fa";
+import useNavHeading from "../../Hooks/CommonHooks/useNavHeading .js";
+
 const uniqueFilterOptions = (data, key) => {
   return [...new Set(data.map((item) => item[key]))].sort();
 };
@@ -24,7 +26,7 @@ const ParentFinanceTable = () => {
   const [totalPaidFees, setTotalPaidFees] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
-
+  useNavHeading("Finance");
   useEffect(() => {
     const fetchFeesData = async () => {
       try {
@@ -69,6 +71,7 @@ const ParentFinanceTable = () => {
       (filters.feesType === "" || item.feeType === filters.feesType) &&
       (filters.status === "Everyone" || item.status === filters.status)
   );
+  
 
   return (
     <Layout title="Parents | Finance">

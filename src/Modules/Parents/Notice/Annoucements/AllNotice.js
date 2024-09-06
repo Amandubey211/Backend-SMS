@@ -4,7 +4,7 @@ import Layout from "../../../../Components/Common/Layout";
 import ParentDashLayout from "../../../../Components/Parents/ParentDashLayout.js";
 import { MdExpandMore, MdExpandLess } from "react-icons/md";
 import CalendarIcon from '../../../../Assets/ParentAssets/svg/calender.svg'; // Updated Import
-
+import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading .js";
 import announcementIcon from "../../../../Assets/DashboardAssets/Images/image1.png";
 import toast from "react-hot-toast";
 import Spinner from "../../../../Components/Common/Spinner"; // Import Spinner
@@ -16,6 +16,7 @@ const AllNotice = () => {
   const [notices, setNotices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  useNavHeading("Notice");
 
   const backgroundColors = [
     'bg-blue-300',
@@ -65,11 +66,11 @@ const AllNotice = () => {
 
   return (
     <>
-      <Layout title="Event">
+      <Layout title="Parent | Notice Board">
         <ParentDashLayout hideAvatarList={true}>
           <div className="p-4">
             <h1 className="mb-2 bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent font-semibold bg-clip-text">
-              Parents Notice Board
+              Students Notice Board
             </h1>
             <div className="flex p-[10px] justify-between">
               <div className="flex gap-4">

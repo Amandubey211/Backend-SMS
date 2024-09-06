@@ -10,6 +10,7 @@ import { IoCalendarOutline } from "react-icons/io5"; // Import the calendar icon
 import { baseUrl } from "../../../config/Common";
 import { format, parseISO, isValid } from "date-fns";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
+import useNavHeading from "../../../Hooks/CommonHooks/useNavHeading .js";
 
 const ParentEvent = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -23,6 +24,7 @@ const ParentEvent = () => {
     month: currentDate.getMonth(),
     year: currentDate.getFullYear(),
   });
+  useNavHeading("Parent All Events");
 
   const itemsPerPage = 4;
 
@@ -148,7 +150,7 @@ const ParentEvent = () => {
 
   return (
     <>
-      <Layout title="Event">
+      <Layout title="Parent | Event">
         <ParentDashLayout>
           <div className="min-h-screen p-4 bg-gray-50">
             <div className="flex flex-row justify-between">

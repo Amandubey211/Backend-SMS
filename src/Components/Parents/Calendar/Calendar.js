@@ -58,6 +58,7 @@ const Calendar = () => {
     setYear(value.year());
     setLoading(true);
   };
+  useNavHeading("My Childs", "Attendance");
 
   return (
     <div className="calendar-container">
