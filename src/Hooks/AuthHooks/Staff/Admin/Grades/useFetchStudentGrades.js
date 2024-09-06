@@ -29,12 +29,16 @@ const useFetchStudentGrades = () => {
         if (moduleId) params.moduleId = moduleId;
         if (chapterId) params.chapterId = chapterId;
         if (arrangeBy) params.arrangeBy = arrangeBy;
+        if(sid){
+           params.subjectId = sid
+        }
+       
       setLoading(true);
       setError(null);
       try {
         const token = localStorage.getItem(`${role}:token`);
         const response = await axios.get(
-          `${baseUrl}/admin/grades/student/${studentId}/class/${cid}/?subjectId=${sid}`,
+          `${baseUrl}/admin/grades/student/${studentId}/class/${cid}/`,
           {
             headers: { Authentication: token },
             params:params
