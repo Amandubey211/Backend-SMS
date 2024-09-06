@@ -24,21 +24,21 @@ import ForgetPassword from "../Modules/LoginPages/Student/Login/ForgetPassword/F
 import ParentEvent from "../Modules/Parents/ParentEvent/ParentEvent";
 import QIDLogin from "../Modules/LoginPages/Student/Login/QIDLogin.js";
 import ParentProfile from "../Components/Parents/ParentProfile.js";
-import StudentProfile from "../Modules/Student/profile/StudentProfile.js";
 import StaffMyProfile from "../Components/Common/StaffMyProfile.js";
+import StudentProfile from "../Modules/Student/profile/StudentProfile.js";
 
 // lazy loaded routes
 const SpeedGrade = lazy(() =>
   import("../Modules/Admin/Subjects/Modules/SpeedGrade/SpeedGrade.js")
 );
 const StudentFinance = lazy(() =>
-  import("../Modules/Student/StudentFinance.js")
+  import("../Modules/Student/Finance/StudentFinance.js")
 );
 const StudentEvent = lazy(() =>
   import("../Modules/Student/StudentEvent/StudentEvent.js")
 );
 const StudentAnnounce = lazy(() =>
-  import("../Modules/Student/Announcements/StudentAnnounce.js")
+  import("../Modules/Student/NoticeBoard/StudentAnnounce.js")
 );
 const StudentLibrarySection = lazy(() =>
   import("../Modules/Student/Library/MainSection/Libary.js")
@@ -258,16 +258,18 @@ const ParentAnnounce = lazy(() =>
 );
 const StudentTeacher = lazy(() =>
   import(
-    "../Modules/Student/StudentHeaderFiles/StudentTeacher/StudentTeacher.js"
+    "../Modules/Student/StudentClass/SubClass/Components/Teacher/StudentTeacher.js"
   )
 );
 const StudentClassMates = lazy(() =>
   import(
-    "../Modules/Student/StudentHeaderFiles/StudentClassMates/StudentClassMates.js"
+    "../Modules/Student/StudentClass/SubClass/Components/ClassMates/StudentClassMates.js"
   )
 );
 const StudentAttendance = lazy(() =>
-  import("../Modules/Student/Attendance/AttendanceMain.js")
+  import(
+    "../Modules/Student/StudentClass/SubClass/Components/Attendance/AttendanceMain.js"
+  )
 );
 const Dash = lazy(() => import("../Modules/Admin/Dashboard/Dash.js"));
 
@@ -711,13 +713,13 @@ function App() {
       ),
       errorElement: <Error />,
     },
-    {
-      path: "/student_class/:cid/teachers",
-      element: (
-        <ProtectRoute Component={StudentTeacher} allowedRoles={["student"]} />
-      ),
-      errorElement: <Error />,
-    },
+    // {
+    //   path: "/student_class/:cid/teachers",
+    //   element: (
+    //     <ProtectRoute Component={StudentTeacher} allowedRoles={["student"]} />
+    //   ),
+    //   errorElement: <Error />,
+    // },
     {
       path: "/student_class/:cid/classmates",
       element: (
@@ -890,7 +892,10 @@ function App() {
     {
       path: "/users/student/profile",
       element: (
-        <ProtectRoute Component={StudentProfile} allowedRoles={["student"]} />
+        <ProtectRoute
+          Component={<StudentProfile />}
+          allowedRoles={["student"]}
+        />
       ),
       errorElement: <Error />,
     },

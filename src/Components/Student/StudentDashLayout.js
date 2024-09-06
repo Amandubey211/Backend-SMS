@@ -15,9 +15,7 @@ const StudentDashLayout = ({
 
   return (
     <div className="flex w-full h-full">
-      <Toaster/>
       <SideMenubar isOpen={isSidebarOpen} />
-
 
       <div
         className={`ml-${sidebarWidth} transition-all duration-500 flex-1 h-full`}
@@ -32,7 +30,7 @@ const StudentDashLayout = ({
           hideStudentView={hideStudentView}
         />
         {/* Main content area */}
-        <main className="w-full min-h-screen h-screen overflow-y-scroll no-scrollbar  ">
+        <main className="w-full h-[90%] overflow-y-scroll no-scrollbar  ">
           {children}
         </main>
       </div>

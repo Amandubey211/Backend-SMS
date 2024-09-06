@@ -109,10 +109,10 @@ const StudentMainSection = () => {
           </div>
           <div className="flex  flex-row items-center w-full justify-around">
             <div className="flex flex-col border-gray-200 w-1/2">
-              <div className=" border-gray-300 w-full pt-5 pb-3">
+              <div className=" border-gray-300 w-full pt-5 pb-3 ps-2">
                 <h1 className="text-xl px-2">Student Grade</h1>
               </div>
-              <div className="flex justify-between px-3 w-full">
+              <div className="flex justify-between px-3 w-full ps-4">
                 <p>Total Point: 90%</p>
                 <select className="select-exam-type">
                   <option value="exam-type">Exam Type</option>
@@ -124,7 +124,7 @@ const StudentMainSection = () => {
               </div>
             </div>
             <div className="flex flex-col  border-l border-gray-200 w-1/2">
-              <div className="w-full py-5">
+              <div className="w-full py-5 ps-3 ">
                 <h1 className="text-xl px-2 mb-2">Task</h1>
                 <p className="px-2">5/12 assignments have been completed</p>
               </div>
