@@ -34,15 +34,16 @@ const StudentMainSection = () => {
       <>
         <AnnouncementViewHeader announcement={announcement} />
         <div className="p-4 bg-white">
-          <div className="relative w-full h-64 md:h-80 lg:h-96 overflow-hidden rounded-lg mb-4">
-            <img
-              src={
-                announcement.attachment || "https://via.placeholder.com/600x400"
-              }
-              alt="Announcement"
-              className="absolute top-0 left-0 w-full h-full object-cover"
-            />
-          </div>
+          {announcement.attachment && (
+            <div className="relative w-full h-64 md:h-80 lg:h-96 overflow-hidden rounded-lg mb-4">
+              <img
+                src={announcement.attachment}
+                alt="Announcement"
+                className="absolute top-0 left-0 w-full h-full object-cover"
+              />
+            </div>
+          )}
+
           <div
             className="text-gray-700 mb-6"
             dangerouslySetInnerHTML={{ __html: announcement.content }}

@@ -1,82 +1,13 @@
-// import React from "react";
-// import { FaChevronDown, FaChevronUp, FaEllipsisV } from "react-icons/fa";
-// import ChapterItem from "./ChapterItem";
-
-// const Chapter = ({
-//   title,
-//   chapterNumber,
-//   imageUrl,
-//   assignments,
-//   quizzes,
-//   isExpanded,
-//   onToggle,
-// }) => {
-//   const combinedItems = [
-//     ...assignments.map((assignment) => ({
-//       ...assignment,
-//       type: "assignment",
-//     })),
-//     ...quizzes.map((quiz) => ({
-//       ...quiz,
-//       type: "quiz",
-//     })),
-//   ];
-
-//   return (
-//     <div className="mb-4 p-1 bg-white rounded-lg border-b">
-//       <div className="flex items-center justify-between mb-2">
-//         <div className="flex items-center">
-//           <img
-//             src={imageUrl}
-//             alt="Chapter"
-//             className="w-12 h-12 mr-4 rounded-lg"
-//           />
-//           <div>
-//             <h2 className="font-semibold text-lg">{title}</h2>
-//             <p className="text-gray-500">Chapter {chapterNumber}</p>
-//           </div>
-//         </div>
-//         <div className="flex items-center space-x-2">
-//           <button className="border p-2 rounded-full hover:bg-gray-50">
-//             <FaEllipsisV />
-//           </button>
-//           <button
-//             className="border p-2 rounded-full hover:bg-gray-50"
-//             onClick={onToggle}
-//           >
-//             {isExpanded ? <FaChevronUp /> : <FaChevronDown />}
-//           </button>
-//         </div>
-//       </div>
-//       {isExpanded && (
-//         <div className="ml-10 py-2">
-//           {combinedItems.length > 0 ? (
-//             combinedItems.map((item, index) => (
-//               <ChapterItem
-//                 key={index}
-//                 type={item.type}
-//                 title={item.name}
-//                 id={item._id}
-//                 isPublished={item.isPublished}
-//               />
-//             ))
-//           ) : (
-//             <p className="py-2 bg-gray-50 italic text-gray-500 text-center">
-//               No Data found
-//             </p>
-//           )}
-//         </div>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default Chapter;
-
-
-
 import React, { useState } from "react";
-import { FaChevronDown, FaChevronUp, FaFilePdf, FaFileWord, FaFilePowerpoint, FaEllipsisV, FaEye } from "react-icons/fa";
+import {
+  FaChevronDown,
+  FaChevronUp,
+  FaFilePdf,
+  FaFileWord,
+  FaFilePowerpoint,
+  FaEllipsisV,
+  FaEye,
+} from "react-icons/fa";
 import ChapterItem from "./ChapterItem";
 
 const Chapter = ({
@@ -109,8 +40,8 @@ const Chapter = ({
   };
 
   const openPreviewModal = (url, type, attachment) => {
-    console.log("Opening preview for:", attachment);  // Console log the attachment
-    console.log("Opening preview for:", url);  // Console log the attachment
+    console.log("Opening preview for:", attachment); // Console log the attachment
+    console.log("Opening preview for:", url); // Console log the attachment
     setPreviewUrl(url);
     setPreviewType(type);
   };
@@ -172,9 +103,6 @@ const Chapter = ({
           </div>
         </div>
         <div className="flex items-center space-x-2">
-          <button className="border p-2 rounded-full hover:bg-gray-50">
-            <FaEllipsisV />
-          </button>
           <button
             className="border p-2 rounded-full hover:bg-gray-50"
             onClick={onToggle}
@@ -187,46 +115,47 @@ const Chapter = ({
       {attachmentsExpanded && attachments.length > 0 && (
         <div className="mt-2">
           <div className="grid grid-cols-1 gap-2 mb-2">
-          {attachments.map((attachment, index) => {
-  console.log("Attachment:", attachment); // This will log each attachment object to the console
-
-  return (
-    <div
-      key={index}
-      className="flex flex-col p-2 border rounded-md transform transition duration-100 hover:shadow-md"
-    >
-      <div className="flex items-center justify-between">
-        <div className="flex items-center">
-          {getFileIcon(attachment.type) || (
-            <img
-              src={attachment.url}
-              alt={attachment.name}
-              className="h-8 w-8 object-cover rounded-md"
-            />
-          )}
-          <div className="flex flex-col ml-4">
-            <p className="text-gray-700 text-sm truncate max-w-xs">
-              {attachment.name}
-            </p>
-            <p className="text-md">{attachment.label}</p>
-          </div>
-        </div>
-        <div className="flex items-center space-x-2">
-          <button
-            onClick={() =>
-              openPreviewModal(attachment.url, attachment.type, attachment)
-            }
-            className="text-green-500 transition p-1 border rounded-full transform hover:scale-110 cursor-pointer"
-            aria-label="Preview"
-          >
-            <FaEye size={20} />
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-})}
-
+            {attachments.map((attachment, index) => {
+              return (
+                <div
+                  key={index}
+                  className="flex flex-col p-2 border rounded-md transform transition duration-100 hover:shadow-md"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      {getFileIcon(attachment.type) || (
+                        <img
+                          src={attachment.url}
+                          alt={attachment.name}
+                          className="h-8 w-8 object-cover rounded-md"
+                        />
+                      )}
+                      <div className="flex flex-col ml-4">
+                        <p className="text-gray-700 text-sm truncate max-w-xs">
+                          {attachment.name}
+                        </p>
+                        <p className="text-md">{attachment.label}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <button
+                        onClick={() =>
+                          openPreviewModal(
+                            attachment.url,
+                            attachment.type,
+                            attachment
+                          )
+                        }
+                        className="text-green-500 transition p-1 border rounded-full transform hover:scale-110 cursor-pointer"
+                        aria-label="Preview"
+                      >
+                        <FaEye size={20} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}

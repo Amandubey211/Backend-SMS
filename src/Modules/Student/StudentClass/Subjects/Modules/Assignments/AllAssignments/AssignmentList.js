@@ -12,7 +12,7 @@ const AssignmentList = () => {
   useNavHeading(className, subjectName);
 
   return (
-    <Layout title={`Assignment List | Student Diwan`}>
+    <Layout title={`Assignments | Student Diwan`}>
       <StudentDashLayout children={<MainSection />} hideSearchbar={true} />
     </Layout>
   );

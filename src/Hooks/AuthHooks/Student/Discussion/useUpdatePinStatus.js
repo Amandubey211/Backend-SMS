@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { baseUrl } from "../../../../config/Common";
 
-
 const useUpdatePinStatus = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -9,13 +8,14 @@ const useUpdatePinStatus = () => {
   const updatePinStatus = async (discussionId, isPinned) => {
     setLoading(true);
     try {
+      // not in use
       const token = localStorage.getItem("student:token");
       if (!token) {
         throw new Error("Authentication token not found");
       }
 
       const response = await fetch(
-        `${baseUrl}/student/updatePinStatus/${discussionId}`,
+        `${baseUrl}//discussion/pinstatus/${discussionId}`,
         {
           method: "POST",
           headers: {
@@ -27,7 +27,9 @@ const useUpdatePinStatus = () => {
       );
 
       if (!response.ok) {
-        throw new Error(`Failed to update pin status, status: ${response.status}`);
+        throw new Error(
+          `Failed to update pin status, status: ${response.status}`
+        );
       }
 
       const data = await response.json();

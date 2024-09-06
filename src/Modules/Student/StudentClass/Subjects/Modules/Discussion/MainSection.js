@@ -8,7 +8,7 @@ import { GoDiscussionClosed } from "react-icons/go";
 import SubjectSideBar from "../../Component/SubjectSideBar";
 import useFetchClassDiscussions from "../../../../../../Hooks/AuthHooks/Staff/Admin/Disscussion/useFetchClassDiscussions";
 import NoDataFound from "../../../../../../Components/Common/NoDataFound";
-import Spinner from "../../../../../../Components/Common/Spinner"; // Assuming you have a Spinner component
+import Spinner from "../../../../../../Components/Common/Spinner";
 
 const MainSection = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -60,7 +60,10 @@ const MainSection = () => {
               loading={loading}
               error={error}
             />
-            <PinnedDiscussions discussions={pinnedDiscussions} />
+            <PinnedDiscussions
+              discussions={pinnedDiscussions}
+              refetchClassDiscussions={fetchClassDiscussions} // Pass refetch function
+            />
             <div className="p-3 w-full flex-grow flex flex-col">
               <div className="flex items-center gap-2 ml-3 mb-2">
                 <GoDiscussionClosed className="text-xl text-green-600" />
@@ -74,6 +77,7 @@ const MainSection = () => {
                       <DiscussionCard
                         key={discussion._id}
                         discussion={discussion}
+                        refetchClassDiscussions={fetchClassDiscussions} // Pass refetch function
                       />
                     ))}
                   </div>

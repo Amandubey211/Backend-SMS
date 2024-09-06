@@ -44,9 +44,9 @@ const GradeAccordionItem = ({ grade }) => {
         </div>
         <span>
           {isOpen ? (
-            <MdKeyboardArrowUp className="border rounded text-2xl text-black" />
+            <MdKeyboardArrowUp className="border rounded-full text-3xl text-black" />
           ) : (
-            <MdKeyboardArrowDown className="border rounded text-2xl text-black" />
+            <MdKeyboardArrowDown className="border rounded-full text-3xl text-black" />
           )}
         </span>
       </div>
