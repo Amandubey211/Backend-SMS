@@ -8,6 +8,7 @@ import { MdExpandLess, MdExpandMore } from 'react-icons/md';
 import toast from "react-hot-toast";
 import Spinner from "../../../../Components/Common/Spinner"; // Import Spinner
 import { baseUrl } from "../../../../config/Common.js";
+import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading .js";
 
 const ParentAnnounce = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -15,6 +16,7 @@ const ParentAnnounce = () => {
   const [ancmts, setAncmts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  useNavHeading("Announcement");
 
   useEffect(() => {
     const fetchAncmts = async () => {
@@ -55,11 +57,11 @@ const ParentAnnounce = () => {
 
   return (
     <>
-      <Layout title="Event">
+      <Layout title="Parent | Announcement">
         <ParentDashLayout hideAvatarList={true}>
           <div className="p-4">
             <h1 className="mb-2 bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent font-semibold bg-clip-text">
-              Parent Announcement Board
+              Student Announcement Board
             </h1>
             <div className="flex p-[10px] justify-between">
               <div className="flex gap-4">
