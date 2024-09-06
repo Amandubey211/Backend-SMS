@@ -66,37 +66,14 @@ const StudentClassMates = () => {
     }
   }, [cid, selectedClass]);
 
-  // Render loading spinner while fetching data
   if (loading) return <Spinner />;
-
-  // Render error state with a retry button
-  if (error) {
-    return (
-      <Layout title="Error">
-        <DashLayout>
-          <div className="p-4 flex flex-col items-center justify-center">
-            <p className="text-red-500 text-lg mb-4">
-              {error || "Something went wrong"}
-            </p>
-            <button
-              onClick={fetchClassmates}
-              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
-              aria-label="Retry fetching classmates"
-            >
-              Retry
-            </button>
-          </div>
-        </DashLayout>
-      </Layout>
-    );
-  }
 
   return (
     <Layout title="My Classmates">
       <DashLayout>
         <div className="p-4">
           <div className="flex items-center mb-4 gap-3">
-            <h2 className="text-xl font-semibold">My Classmates</h2>
+            <h2 className="text-xl text-gray-600 font-semibold">My Classmates</h2>
             <div
               className="flex justify-center items-center bg-gradient-to-br from-pink-100 via-purple-100 to-blue-100 rounded-full w-[25px] h-[25px] border border-gray-300"
               aria-label={`Number of classmates: ${classmates.length}`}

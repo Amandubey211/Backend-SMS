@@ -51,7 +51,7 @@ const MainSection = () => {
                     key={page._id}
                     id={page._id}
                     title={page.title}
-                    authorName={page.authorName}
+                    author={page.author}
                     publishDate={page.createdAt}
                     updateDate={page.updatedAt}
                     readOnly

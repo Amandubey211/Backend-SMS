@@ -81,16 +81,16 @@ const MainSection = () => {
 
     content = (
       <div className="flex flex-row w-full h-full">
-        <div className="w-3/4 p-4 min-h-full">
+        <div className="w-[70%] p-4 min-h-full">
           <GradeAccordionItem grade={gradesData.grades} />
         </div>
-        <div className="w-1/4 h-full border-l border-gray-200">
+        <div className="w-[30%] h-full border-l border-gray-200">
           <StudentGradeSummary studentGrade={studentData} />
         </div>
       </div>
     );
   }
-
+  console.log(gradesData,"sdfsdf");
   return (
     <div className="flex w-full h-full">
       <SubjectSideBar />
