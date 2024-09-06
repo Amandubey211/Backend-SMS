@@ -70,7 +70,7 @@ const AllNotice = () => {
         <ParentDashLayout hideAvatarList={true}>
           <div className="p-4">
             <h1 className="mb-2 bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent font-semibold bg-clip-text">
-              Students Notice Board
+              Child Notice Board
             </h1>
             <div className="flex p-[10px] justify-between">
               <div className="flex gap-4">
