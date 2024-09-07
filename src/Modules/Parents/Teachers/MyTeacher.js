@@ -4,8 +4,10 @@ import axios from 'axios';
 import { baseUrl } from '../../../config/Common';
 import Spinner from '../../../Components/Common/Spinner';
 import { FaChalkboardTeacher } from 'react-icons/fa';
-
+import { useParams } from 'react-router-dom';
 const MyTeacher = () => {
+    const studentId = useParams().ssid;
+    
     const [instructors, setTeachers] = useState([]);
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -29,7 +31,7 @@ const MyTeacher = () => {
                     throw new Error("No guardian email found");
                 }
 
-                const response = await axios.get(`${baseUrl}/parent/api/instructors?guardianEmail=${encodeURIComponent(email)}`, {
+                const response = await axios.get(`${baseUrl}/parent/api/instructors?studentId=${studentId}`, {
                     headers: {
                         'Authentication': `${token}`
                     }
