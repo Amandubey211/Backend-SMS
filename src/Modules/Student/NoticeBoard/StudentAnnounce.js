@@ -9,6 +9,7 @@ import NoDataFound from "../../../Components/Common/NoDataFound";
 import Spinner from "../../../Components/Common/Spinner";
 import { baseUrl } from "../../../config/Common";
 import announcementIcon from "../../../Assets/StudentAssets/announcement.png";
+import useNavHeading from "../../../Hooks/CommonHooks/useNavHeading ";
 
 // NoticeItem Component (Reused for each notice)
 const NoticeItem = ({
@@ -95,6 +96,7 @@ const StudentAnnounce = () => {
   const [activeIndex, setActiveIndex] = useState(null);
   const [notices, setNotices] = useState([]);
   const [loading, setLoading] = useState(true); // Loading state
+  useNavHeading("Notice");
 
   const formatDate = (isoDate) => {
     return new Date(isoDate).toLocaleDateString("en-US", {
@@ -147,7 +149,6 @@ const StudentAnnounce = () => {
   if (loading) {
     return <Spinner />; // Show Spinner while loading
   }
-
   return (
     <Layout title="Event">
       <DashLayout>
