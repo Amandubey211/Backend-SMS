@@ -7,8 +7,8 @@ const StudentProfileCard = ({ student }) => {
       <img src={student.profile || profileIcon} alt="student_image" className="rounded-full w-[100px] h-[100px] bg-gray-300 border" />
       <span className="font-bold">{student.fullName}</span>
       <div className="flex gap-4 font-medium text-gray-500 flex-row text-sm ">
-        <span className="text-black">Class: <span className="text-gray-500" >{student?.className || 'N/A'}</span> <span className="text-gray-300">|</span> </span> 
-        <span className="text-black">Section: <span className="text-gray-500" >{student?.sectionName || 'N/A'}</span></span>
+        <span className="text-black">Class: <span className="text-gray-500" >{student?.presentClassId.className || 'N/A'}</span> <span className="text-gray-300">|</span> </span> 
+        <span className="text-black">Section: <span className="text-gray-500" >{student?.presentSectionId.sectionName || 'N/A'}</span></span>
       </div>
       <span>ID: <span className="text-gray-500">{student?.admissionNumber|| 'N/A'}</span></span>
       <div className="border rounded-md px-9 py-1 border-red-300 ">

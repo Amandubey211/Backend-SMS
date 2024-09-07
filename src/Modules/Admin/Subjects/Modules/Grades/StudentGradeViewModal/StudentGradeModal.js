@@ -91,6 +91,7 @@ const StudentGradeModal = ({ isOpen, onClose }) => {
                 </div>
               </div>
               <StudentGradeSummary studentGrade={grades} />
+              
             </div>
           </div>
         </div></>}

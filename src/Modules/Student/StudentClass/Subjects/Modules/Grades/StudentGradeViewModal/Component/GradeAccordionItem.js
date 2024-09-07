@@ -91,11 +91,11 @@ const GradeAccordionItem = ({ grade }) => {
                       </div>
                     </td>
                     <td className="px-2 text-sm py-2">
-                      {evalItem.dueDate ? evalItem.dueDate.slice(0, 10) : "N/A"}
+                      {evalItem?.dueDate ? evalItem?.dueDate?.slice(0, 10) : "N/A"}
                     </td>
                     <td className="px-2 text-sm py-2">
-                      {evalItem.submittedDate
-                        ? evalItem.submittedDate.slice(0, 10)
+                      {evalItem?.submittedDate
+                        ? evalItem?.submittedDate?.slice(0, 10)
                         : "N/A"}
                     </td>
                     <td className="px-2 py-2">
@@ -107,7 +107,7 @@ const GradeAccordionItem = ({ grade }) => {
                         {evalItem.status}
                       </span>
                     </td>
-                    <td className="px-2 py-2">{evalItem.score || "N/A"}</td>
+                    <td className="px-2 py-2">{evalItem.score||0}</td>
                   </tr>
                 ))}
               </tbody>
