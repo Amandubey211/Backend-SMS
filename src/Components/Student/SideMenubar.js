@@ -62,7 +62,7 @@ const SideMenubar = () => {
       aria-label="Sidebar"
     >
       <div className="relative flex items-center justify-center border-b pb-1">
-        <NavLink to="/dashboard" aria-label="Dashboard">
+        <NavLink to="/student_dash" aria-label="Dashboard">
           <img
             src={isOpen ? StudentDiwanLogo : smallLogo}
             alt="Logo"
