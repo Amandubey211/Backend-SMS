@@ -64,7 +64,6 @@ const List = ({
         </div>
       </div>
 
-      {/* Show NoDataFound if error or no data is found */}
       {error || filteredData.length === 0 ? (
         <div className="h-full w-full flex justify-center items-center py-10">
           <NoDataFound title={type === "Assignment" ? "Assignment" : "Quiz"} />
