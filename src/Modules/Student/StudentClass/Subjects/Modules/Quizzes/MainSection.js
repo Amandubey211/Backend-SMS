@@ -32,7 +32,6 @@ const MainSection = ({ quiz }) => {
 
   const { timeLimit, allowNumberOfAttempts, showOneQuestionOnly } = quiz;
   const quizDuration = timeLimit * 60;
-  const navigate = useNavigate();
 
   // Fetch attempt history (allows for null attempts)
   useFetchAttemptHistory(
@@ -160,7 +159,7 @@ const MainSection = ({ quiz }) => {
               )}
               {activeTab === "questions" && (
                 <>
-                  {!quizSubmitted && hasRemainingAttempts() ? (
+                  {quizSubmitted && hasRemainingAttempts() ? (
                     <QuizQuestions
                       questions={quiz.questions}
                       selectedOptions={selectedOptions}
@@ -182,7 +181,10 @@ const MainSection = ({ quiz }) => {
       </div>
       <div className="w-[30%]">
         {activeTab === "instructions" && <QuizzDetailCard quiz={quiz} />}
-        {activeTab === "questions" && !quizSubmitted && (
+        {((activeTab === "questions" && !quizSubmitted) ||
+          (activeTab === "questions" &&
+            quizSubmitted &&
+            hasRemainingAttempts())) && (
           <QuestionDetailCard
             timeLeft={timeLeft}
             totalTime={totalTime}

@@ -1,10 +1,7 @@
-//--------------
-
 import React, { useState } from "react";
-import { CircularProgressbar } from "react-circular-progressbar";
+import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 import AssignmentDetail from "../../../Component/AssignmentDetail";
-import CommentCard from "./CommentCard";
 import DateDetail from "../../../Component/DateDetail";
 
 const QuestionDetailCard = ({
@@ -20,24 +17,9 @@ const QuestionDetailCard = ({
     totalPoints,
     allowNumberOfAttempts,
     timeLimit,
-  } = quiz; // destructure quiz object
+  } = quiz; // Destructure quiz object
+
   const [showTime, setShowTime] = useState(true);
-  const commentsData = [
-    {
-      avatar: "https://avatars.githubusercontent.com/u/109097090?v=4", // Replace with actual image URL
-      name: "Mr Teacher",
-      timestamp: "Feb/02 /09:02",
-      comment:
-        "Hi Sir Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore.",
-    },
-    {
-      avatar: "https://avatars.githubusercontent.com/u/109097090?v=4", // Replace with actual image URL
-      name: "Mr Teacher",
-      timestamp: "Feb/02 /09:02",
-      comment:
-        "Hi Sir Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore.",
-    },
-  ];
 
   const formatTime = (seconds) => {
     const h = String(Math.floor(seconds / 3600)).padStart(2, "0");
@@ -47,9 +29,19 @@ const QuestionDetailCard = ({
   };
 
   const quizQuestionDetails = [
-    { label: "Allow Attempts", value: allowNumberOfAttempts, type: "quizz" },
-    { label: "Quiz Point", value: `${totalPoints} Point`, type: "quizz" },
-    { label: "Questions", value: `${numberOfQuestions} `, type: "quizz" },
+    {
+      label: "Allow Attempts",
+      value: allowNumberOfAttempts,
+      type: "quizz",
+      extra: "Time",
+    },
+    { label: "Quiz Point", value: totalPoints, type: "quizz", extra: "Point" },
+    {
+      label: "Question",
+      value: numberOfQuestions,
+      type: "quizz",
+      extra: "Question",
+    },
     { label: "Time Limit", value: formatTime(timeLimit), type: "quizz" },
     {
       label: "You can see the correct Answer",
@@ -61,22 +53,26 @@ const QuestionDetailCard = ({
   // Convert timeLimit to seconds if it's not already
   const timeLimitInSeconds = timeLimit * 60;
 
-  // Calculate hours, minutes, and seconds from timeLimitInSeconds
+  // Calculate hours, minutes, and seconds from timeLeft
   const hours = Math.floor(timeLeft / 3600);
   const minutes = Math.floor((timeLeft % 3600) / 60);
   const seconds = timeLeft % 60;
 
-  const totalHours = Math.floor(timeLeft / 3600);
+  const totalHours = Math.floor(timeLimitInSeconds / 3600);
   const totalMinutes = 60; // Max minutes value is always 60
   const totalSeconds = 60; // Max seconds value is always 60
 
+  // Calculate percentage for the circular progress bars
   const hourPercentage = totalHours ? (hours / totalHours) * 100 : 0;
   const minutePercentage = (minutes / totalMinutes) * 100;
   const secondPercentage = (seconds / totalSeconds) * 100;
 
+  // Darker color for circular progress bars
+  const darkerGreen = `rgba(0, 128, 0, 0.9)`; // Dark green color
+
   return (
     <div
-      className="flex flex-col gap-24 bg-white"
+      className="flex flex-col gap-7 py-1 px-4 bg-white rounded-lg shadow-md"
       aria-label="Question Detail Card"
     >
       <div className="mb-auto">
@@ -86,6 +82,7 @@ const QuestionDetailCard = ({
               key={index}
               label={detail.label}
               value={detail.value}
+              extra={detail.extra}
             />
           ) : (
             <DateDetail
@@ -96,65 +93,62 @@ const QuestionDetailCard = ({
             />
           )
         )}
+
+        {/* Show/Hide Time Button */}
         <div className="flex justify-center items-center">
           <button
             onClick={() => setShowTime(!showTime)}
-            className="mt-4 bg-gradient-to-r from-pink-500 to-purple-500 text-white py-1 px-3  rounded-md"
+            className="mt-4 bg-gradient-to-r from-pink-500 to-purple-500 text-white py-1 px-3 rounded-md shadow-sm hover:bg-opacity-90"
           >
             {showTime ? "Hide Time" : "Show Time"}
-          </button>{" "}
+          </button>
         </div>
+
+        {/* Time Progress Bars */}
         {showTime && (
-          <div className="flex justify-around mt-4">
+          <div className="flex justify-around mt-6">
+            {/* Circular Progress for Hours */}
             <div style={{ width: 70, height: 70 }}>
               <CircularProgressbar
                 value={hourPercentage}
-                text={`${hours} Hours`}
-                styles={{
-                  path: {
-                    stroke: `rgba(25, 246, 138, 0.8)`,
-                  },
-                  text: {
-                    fill: "#000",
-                  },
-                  trail: {
-                    stroke: "#d6d6d6",
-                  },
-                }}
+                text={`${String(hours).padStart(2, "0")}\nHours`}
+                styles={buildStyles({
+                  textColor: "#000",
+                  pathColor: darkerGreen,
+                  trailColor: "#e0e0e0", // Light gray
+                  textSize: "20px",
+                  lineHeight: "1.2", // Adjust text line height inside the circle
+                })}
               />
             </div>
+
+            {/* Circular Progress for Minutes */}
             <div style={{ width: 70, height: 70 }}>
               <CircularProgressbar
                 value={minutePercentage}
-                text={`${minutes} Min`}
-                styles={{
-                  path: {
-                    stroke: `rgba(25, 246, 138, 0.8)`,
-                  },
-                  text: {
-                    fill: "#000",
-                  },
-                  trail: {
-                    stroke: "#d6d6d6",
-                  },
-                }}
+                text={`${String(minutes).padStart(2, "0")}\nMin`}
+                styles={buildStyles({
+                  textColor: "#000",
+                  pathColor: darkerGreen,
+                  trailColor: "#e0e0e0", // Light gray
+                  textSize: "20px",
+                  lineHeight: "1.2", // Adjust text line height inside the circle
+                })}
               />
             </div>
+
+            {/* Circular Progress for Seconds */}
             <div style={{ width: 70, height: 70 }}>
               <CircularProgressbar
                 value={secondPercentage}
-                text={`${seconds} Sec`}
-                styles={{
-                  path: {
-                    stroke: `rgba(25, 246, 138, 0.8)`,
-                  },
-                  text: {
-                    fill: "#000",
-                  },
-                  trail: {
-                    stroke: "#d6d6d6",
-                  },
-                }}
+                text={`${String(seconds).padStart(2, "0")}\nSec`}
+                styles={buildStyles({
+                  textColor: "#000",
+                  pathColor: darkerGreen,
+                  trailColor: "#e0e0e0", // Light gray
+                  textSize: "20px",
+                  lineHeight: "1.2", // Adjust text line height inside the circle
+                })}
               />
             </div>
           </div>
