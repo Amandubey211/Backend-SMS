@@ -37,7 +37,8 @@ const useFetchAttemptHistory = (
 
           if (allowedAttempts) {
             // Unlimited attempts, so always allow quiz submission
-            setQuizSubmitted(false);
+            // setQuizSubmitted(false);
+            setQuizSubmitted(true);
           } else {
             // Limited attempts based on allowNumberOfAttempts
             setQuizSubmitted(data.submission.length >= allowNumberOfAttempts);

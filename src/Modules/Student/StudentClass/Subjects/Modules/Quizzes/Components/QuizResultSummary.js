@@ -169,21 +169,6 @@ const QuizResultSummary = ({
               </div>
             );
           })}
-          {/* {attemptHistory.map((attempt, index) => 
-          
-          (
-            <div
-              key={index}
-              className="p-2 border rounded-md mt-2 cursor-pointer hover:bg-gray-100"
-              onClick={() => handleAttemptClick(attempt)}
-            >
-              <div className="font-medium">Attempt-{attempt.attempts}</div>
-              <div>ID: {attempt._id}</div>
-              <div>Total Points: {attempt.score}</div>
-              <div>Correct Answers: {attempt.rightAnswer}</div>
-              <div>Wrong Answers: {attempt.wrongAnswer}</div>
-            </div>
-          ))} */}
         </div>
         {selectedAttempt && (
           <>
