@@ -7,6 +7,7 @@ import axios from "axios";
 import { baseUrl } from "../../../../config/Common";
 import TabButton from "../../../Admin/Libary/Subclasss/component/TabButton";
 import Spinner from "../../../../Components/Common/Spinner";
+import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 
 const Library = () => {
   const [filters, setFilters] = useState({
@@ -16,7 +17,7 @@ const Library = () => {
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true); // New loading state
   const [activeTab, setActiveTab] = useState("Library");
-
+  useNavHeading("Library");
   const fetchBooks = async () => {
     setLoading(true); // Set loading to true when fetching starts
     try {
