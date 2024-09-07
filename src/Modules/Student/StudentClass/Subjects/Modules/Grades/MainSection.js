@@ -5,13 +5,14 @@ import GradeAccordionItem from "./StudentGradeViewModal/Component/GradeAccordion
 import StudentGradeSummary from "./StudentGradeViewModal/Component/StudentGradeSummary";
 import Spinner from "../../../../../../Components/Common/Spinner";
 import NoDataFound from "../../../../../../Components/Common/NoDataFound";
+import { useParams } from "react-router-dom";
 
 const MainSection = () => {
   const { selectedClass, studentId } = useSelector((state) => state.Common);
   const [gradesData, setGradesData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
+const {sid} = useParams();
   useEffect(() => {
     if (!studentId || !selectedClass) return;
 
@@ -23,7 +24,7 @@ const MainSection = () => {
         }
 
         const response = await fetch(
-          `http://localhost:8080/admin/grades/student/${studentId}/class/${selectedClass}`,
+          `http://localhost:8080/admin/grades/student/${studentId}/class/${selectedClass}/?subjectId=${sid}`,
           {
             headers: {
               Authentication: token,

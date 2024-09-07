@@ -3,8 +3,9 @@ import { AiOutlinePrinter } from "react-icons/ai";
 import {toast} from "react-hot-toast"
 import { useSelector } from "react-redux";
 import useGetModulesForStudent from "../../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useGetModulesForStudent";
+import { useParams } from "react-router-dom";
 const StudentGradeModalFilterHeader = ({ filters, onFilterChange }) => {
-
+const {sid} = useParams()
   let [chapters,setChapters] = useState([])
   const moduleList = useSelector((store) => store.Subject.modules);
   const { loading, error, fetchModules } = useGetModulesForStudent();
@@ -39,7 +40,7 @@ const StudentGradeModalFilterHeader = ({ filters, onFilterChange }) => {
           <option value="group quiz">Group Quiz</option>
         </select>
       </div>
-      <div className="flex flex-col flex-grow">
+      {sid ?  <> <div className="flex flex-col flex-grow">
         <label className="text-sm font-medium text-gray-700">Modules</label>
         <select
           name="module"
@@ -68,7 +69,7 @@ const StudentGradeModalFilterHeader = ({ filters, onFilterChange }) => {
             <option value={i._id}>{i.name}</option>
           ))}
         </select>
-      </div>
+      </div></>:null}
       <div className="flex flex-col flex-grow">
         <label className="text-sm font-medium text-gray-700">Status</label>
         <select

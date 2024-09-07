@@ -1,13 +1,13 @@
 import React from "react";
 
-const StudentGradeSummary = ({ studentGrade }) => {
-  console.log('--',studentGrade);
+const StudentGradeSummary = ({ studentGrade,studentData }) => {
+  console.log('kkkkkkkk',studentData);
   
   const {
-    student,
     totalScoreOfSubmitAssignments,
     totalQuizCompletedScore,
     total,
+    student,
     attendance,
     totalGroupAssignmentScore,
     submittedGroupAssignmentScore,
@@ -27,7 +27,7 @@ const StudentGradeSummary = ({ studentGrade }) => {
           alt="Profile"
         />
         <h2 className="mt-4 text-lg font-semibold">{student?.firstName}</h2>
-        <p className="text-gray-500">{student?.sectionName || "Section A"}</p>
+        {/* <p className="text-gray-500">{studentData?.sectionName}</p> */}
       </div>
       <div className="mt-4 p-3">
         <h3 className="text-md font-semibold mb-4">Grade Summary</h3>
