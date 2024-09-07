@@ -5,9 +5,10 @@ import { baseUrl } from '../../../config/Common';
 import Spinner from '../../../Components/Common/Spinner';
 import { FaChalkboardTeacher } from 'react-icons/fa';
 import { useParams } from 'react-router-dom';
+
 const MyTeacher = () => {
     const studentId = useParams().ssid;
-    
+
     const [instructors, setTeachers] = useState([]);
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -37,14 +38,14 @@ const MyTeacher = () => {
                     }
                 });
 
-                if (!response.data || !response.data.instructors || response.data.instructors.length === 0) {
-                    throw new Error("No teachers data found");
+                if (!response.data || response.data.instructors.length === 0) {
+                    setTeachers([]);  // No instructors found, but it's not an error
+                } else {
+                    setTeachers(response.data.instructors);
                 }
-
-                setTeachers(response.data.instructors);
             } catch (error) {
-                console.error('Failed to fetch teachers:', error);
-                setError("Unable to fetch teachers");
+                console.error('Failed to fetch instructors:', error);
+                setError("Unable to fetch instructors");
             } finally {
                 setLoading(false);
             }
@@ -74,7 +75,7 @@ const MyTeacher = () => {
         return (
             <div className="flex flex-col items-center justify-center h-full text-center">
                 <FaChalkboardTeacher className="text-6xl text-gray-400 mb-4" />
-                <p className="text-gray-500">No Teachers Found</p>
+                <p className="text-gray-500">No Instructors Found!</p>
             </div>
         );
     }
@@ -104,7 +105,7 @@ const MyTeacher = () => {
                 </div>
             </div>
 
-            <div className="flex flex-wrap justify-start"> {/* Flexbox to replace grid */}
+            <div className="flex flex-wrap justify-start">
                 {instructors.map(instructor => (
                     <TeacherCards key={instructor.id} instructor={instructor} />
                 ))}
