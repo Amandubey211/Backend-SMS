@@ -16,14 +16,14 @@ const ProfileCard = ({ profile, onClick }) => {
         tabIndex="0"
       >
         {/* Top Right Icon Buttons */}
-        <div className="absolute right-4 top-3 flex flex-col gap-2">
+        {/* <div className="absolute right-4 top-3 flex flex-col gap-2">
           <button
             className="bg-transparent p-2 rounded-full border border-gray-300 hover:bg-gray-100 transition"
             aria-label="Start a discussion"
           >
             <BiChat className="text-green-500 text-lg" />
           </button>
-        </div>
+        </div> */}
 
         {/* Profile Image */}
         <div className="mb-2 flex flex-col justify-center items-center py-3">
