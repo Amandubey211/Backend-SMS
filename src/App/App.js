@@ -922,7 +922,7 @@ function App() {
     // parent----------------------------------------------------------------
     { path: "/parent_dash", element: <ParentDash />, errorElement: <Error /> },
     { path: "/children", element: <MyChildren />, errorElement: <Error /> },
-    { path: "/teacher", element: <MyTeacher />, errorElement: <Error /> },
+    { path: "/teacher/:ssid", element: <MyTeacher />, errorElement: <Error /> },
     { path: "/attendance", element: <Calendar />, errorElement: <Error /> },
     {
       path: "/parentchildnotice",

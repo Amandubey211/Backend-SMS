@@ -35,11 +35,11 @@ const sidebarData = [
     icon: <img src={noticeboardIcon} alt="Notice Board Icon" style={{ width: '24px', height: '24px' }} />,
     path: "/parentchildnotice",
   },
-  {
-    title: "Announcements",
-    icon: <img src={announcementIcon} alt="Announcements Icon" style={{ width: '24px', height: '24px' }} />,
-    path: "/parentannounce",
-  },
+  // {
+  //   title: "Announcements",
+  //   icon: <img src={announcementIcon} alt="Announcements Icon" style={{ width: '24px', height: '24px' }} />,
+  //   path: "/parentannounce",
+  // },
   {
     title: "Events", // Added Events option
     icon: <img src={eventsIcon} alt="Events Icon" style={{ width: '24px', height: '24px' }} />,
