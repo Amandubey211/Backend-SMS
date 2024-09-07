@@ -20,7 +20,7 @@ const QIDLogin = () => {
     verify(StudentID);
   };
   return (
-    <div className="relative h-full bg-gray-100 w-full">
+    <div className="relative h-screen bg-gray-100 w-full">
       <div className="absolute top-0 right-0 p-6">
         <Logo />
       </div>

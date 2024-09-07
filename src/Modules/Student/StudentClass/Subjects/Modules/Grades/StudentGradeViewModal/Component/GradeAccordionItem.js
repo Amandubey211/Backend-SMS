@@ -19,11 +19,11 @@ const GradeAccordionItem = ({ grade }) => {
     : [];
 
   const getColorForStatus = (status) => {
-    return status.toLowerCase() === "submit"
+    return status?.toLowerCase() === "submit"
       ? "text-green-500"
-      : status.toLowerCase() === "excused"
+      : status?.toLowerCase() === "excused"
       ? "text-yellow-500"
-      : status.toLowerCase() === "missing"
+      : status?.toLowerCase() === "missing"
       ? "text-red-500"
       : "text-gray-500";
   };
