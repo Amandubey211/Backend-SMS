@@ -5,7 +5,7 @@ import { baseUrl } from "../../../../config/Common";
 import { useParams } from "react-router-dom";
 import { setAssignment } from "../../../../Redux/Slices/Student/SubjectSlice";
 
-const useFetchAssignedAssignments = (sectionId) => {
+const useFetchAssignedAssignments = () => {
   const { selectedClass, selectedSection, selectedSubject } = useSelector(
     (state) => state.Common
   );
@@ -19,8 +19,8 @@ const useFetchAssignedAssignments = (sectionId) => {
 
   // Caching
   const cacheKey = useMemo(
-    () => `assignments-${cid}-${sectionId}-${sid}`,
-    [cid, sectionId, sid]
+    () => `assignments-${cid}-${selectedSection}-${sid}`,
+    [cid, selectedSection, sid]
   );
   const cachedData = useMemo(
     () => JSON.parse(localStorage.getItem(cacheKey)),
@@ -28,7 +28,7 @@ const useFetchAssignedAssignments = (sectionId) => {
   );
 
   const fetchFilteredAssignments = useCallback(
-    async (sectionId, moduleId, chapterId) => {
+    async (subjectId, moduleId = "", chapterId = "") => {
       setLoading(true);
       setError(null);
 
@@ -41,18 +41,10 @@ const useFetchAssignedAssignments = (sectionId) => {
 
       try {
         const response = await axios.get(
-          // const response = await fetch(`http://localhost:8080/student/studentAssignment/class/${selectedClass}/section/${selectedSection}?subjectId=${selectedSubject}`, {
-
-          `${baseUrl}/student/studentAssignment/class/${cid}/section/${sectionId}?subjectId=${selectedSubject}`,
+          `${baseUrl}/student/studentAssignment/class/${cid}`,
           {
-            headers: {
-              Authentication: token,
-            },
-            params: {
-              subjectId: sid,
-              moduleId,
-              chapterId,
-            },
+            headers: { Authentication: token },
+            params: { subjectId, moduleId, chapterId },
           }
         );
 
@@ -66,13 +58,13 @@ const useFetchAssignedAssignments = (sectionId) => {
             response.data.message || "Failed to fetch assignments"
           );
         }
-      } catch (error) {
-        setError(error.message);
+      } catch (err) {
+        setError(err.message || "Error fetching assignments");
       } finally {
         setLoading(false);
       }
     },
-    [cid, role, sid, cacheKey]
+    [cid, role, cacheKey, dispatch]
   );
 
   useEffect(() => {
@@ -80,14 +72,12 @@ const useFetchAssignedAssignments = (sectionId) => {
       setAssignments(cachedData);
       setLoading(false);
     } else {
-      fetchFilteredAssignments(sectionId, "", "");
+      fetchFilteredAssignments(sid, "", "");
     }
-  }, [sectionId, fetchFilteredAssignments, cachedData]);
-
-  const memoizedAssignments = useMemo(() => assignments, [assignments]);
+  }, [sid, fetchFilteredAssignments, cachedData]);
 
   return {
-    assignments: memoizedAssignments,
+    assignments,
     loading,
     error,
     fetchFilteredAssignments,

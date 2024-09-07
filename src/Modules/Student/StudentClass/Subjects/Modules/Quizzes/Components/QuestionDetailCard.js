@@ -1,35 +1,48 @@
-
 //--------------
 
-import React,{useState} from 'react';
-import { CircularProgressbar } from 'react-circular-progressbar';
-import 'react-circular-progressbar/dist/styles.css';
-import AssignmentDetail from '../../../Component/AssignmentDetail';
-import CommentCard from './CommentCard';
-import DateDetail from '../../../Component/DateDetail';
+import React, { useState } from "react";
+import { CircularProgressbar } from "react-circular-progressbar";
+import "react-circular-progressbar/dist/styles.css";
+import AssignmentDetail from "../../../Component/AssignmentDetail";
+import CommentCard from "./CommentCard";
+import DateDetail from "../../../Component/DateDetail";
 
-const QuestionDetailCard = ({ quiz,timeLeft ,totalTime,numberOfQuestions}) => {
-  const { name, quizType, availableFrom, totalPoints, allowNumberOfAttempts, timeLimit } = quiz; // destructure quiz object
+const QuestionDetailCard = ({
+  quiz,
+  timeLeft,
+  totalTime,
+  numberOfQuestions,
+}) => {
+  const {
+    name,
+    quizType,
+    availableFrom,
+    totalPoints,
+    allowNumberOfAttempts,
+    timeLimit,
+  } = quiz; // destructure quiz object
   const [showTime, setShowTime] = useState(true);
   const commentsData = [
     {
       avatar: "https://avatars.githubusercontent.com/u/109097090?v=4", // Replace with actual image URL
       name: "Mr Teacher",
       timestamp: "Feb/02 /09:02",
-      comment: "Hi Sir Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore."
+      comment:
+        "Hi Sir Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore.",
     },
     {
       avatar: "https://avatars.githubusercontent.com/u/109097090?v=4", // Replace with actual image URL
       name: "Mr Teacher",
       timestamp: "Feb/02 /09:02",
-      comment: "Hi Sir Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore."
+      comment:
+        "Hi Sir Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore.",
     },
   ];
 
   const formatTime = (seconds) => {
-    const h = String(Math.floor(seconds / 3600)).padStart(2, '0');
-    const m = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
-    const s = String(seconds % 60).padStart(2, '0');
+    const h = String(Math.floor(seconds / 3600)).padStart(2, "0");
+    const m = String(Math.floor((seconds % 3600) / 60)).padStart(2, "0");
+    const s = String(seconds % 60).padStart(2, "0");
     return `${h}:${m}:${s}`;
   };
 
@@ -38,7 +51,11 @@ const QuestionDetailCard = ({ quiz,timeLeft ,totalTime,numberOfQuestions}) => {
     { label: "Quiz Point", value: `${totalPoints} Point`, type: "quizz" },
     { label: "Questions", value: `${numberOfQuestions} `, type: "quizz" },
     { label: "Time Limit", value: formatTime(timeLimit), type: "quizz" },
-    { label: "You can see the correct Answer", value: "02/10/2024", type: "date" },
+    {
+      label: "You can see the correct Answer",
+      value: "02/10/2024",
+      type: "date",
+    },
   ];
 
   // Convert timeLimit to seconds if it's not already
@@ -58,8 +75,10 @@ const QuestionDetailCard = ({ quiz,timeLeft ,totalTime,numberOfQuestions}) => {
   const secondPercentage = (seconds / totalSeconds) * 100;
 
   return (
-    <div className="flex flex-col gap-24 bg-white" aria-label="Question Detail Card">
-      
+    <div
+      className="flex flex-col gap-24 bg-white"
+      aria-label="Question Detail Card"
+    >
       <div className="mb-auto">
         {quizQuestionDetails.map((detail, index) =>
           detail.type === "quizz" ? (

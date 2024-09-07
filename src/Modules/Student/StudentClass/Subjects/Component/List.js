@@ -39,42 +39,42 @@ const List = ({
     );
   }
 
-  // if (error) {
-  //   return <NoDataFound />;
-  // }
-
   return (
     <div className="bg-white p-5 w-full">
-      {filteredData.length > 0 && (
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold text-gradient">
-            {title}
-            <span className="border rounded-full text-sm p-1 px-2 ml-1 text-gray-500">
-              {filteredData.length}
-            </span>
-          </h2>
-          <div className="relative">
-            <div className="relative flex items-center max-w-xs w-full mr-4">
-              <input
-                type="text"
-                placeholder="Search here"
-                value={searchQuery}
-                onChange={handleSearchChange}
-                className="px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-purple-300 w-full"
-              />
-              <button className="absolute right-3">
-                <CiSearch className="w-5 h-5 text-gray-500" />
-              </button>
-            </div>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-semibold text-gradient">
+          {title}
+          <span className="border rounded-full text-sm p-1 px-2 ml-1 text-gray-500">
+            {filteredData.length}
+          </span>
+        </h2>
+        <div className="relative">
+          <div className="relative flex items-center max-w-xs w-full mr-4">
+            <input
+              type="text"
+              placeholder="Search here"
+              value={searchQuery}
+              onChange={handleSearchChange}
+              className="px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-purple-300 w-full"
+            />
+            <button className="absolute right-3">
+              <CiSearch className="w-5 h-5 text-gray-500" />
+            </button>
           </div>
         </div>
-      )}
-      {filteredData.length > 0 ? (
+      </div>
+
+      {/* Show NoDataFound if error or no data is found */}
+      {error || filteredData.length === 0 ? (
+        <div className="h-full w-full flex justify-center items-center py-10">
+          <NoDataFound title={type === "Assignment" ? "Assignment" : "Quiz"} />
+        </div>
+      ) : (
         <ul className="border-t p-4">
           {filteredData.map((item) => (
             <NavLink
-              to={navLinkPath(cid, sid, item)} // Create dynamic navigation link
-              key={item._id || item.assignmentId} // Use either _id or assignmentId
+              to={navLinkPath(cid, sid, item)}
+              key={item._id || item.assignmentId}
               className="flex items-center mb-3 gap-3 p-1 rounded-lg"
             >
               <div className="text-green-600 p-2 border rounded-full">
@@ -84,11 +84,10 @@ const List = ({
                 <div className="flex flex-col gap-1 justify-center flex-grow">
                   <div>
                     <h3 className="text-md font-semibold mb-1">
-                      {getItemName(item)}{" "}
-                      {/* Get item name (assignment/quiz) */}
+                      {getItemName(item)}
                     </h3>
                     <p className="text-sm text-gray-500">
-                      {getItemDetails(item)} {/* Get item details */}
+                      {getItemDetails(item)}
                     </p>
                   </div>
                 </div>
@@ -99,10 +98,6 @@ const List = ({
             </NavLink>
           ))}
         </ul>
-      ) : (
-        <div className="h-full w-full flex justify-center items-center py-10">
-          <NoDataFound title={type === "Assignment" ? "Assignment" : "Quiz"} />
-        </div>
       )}
     </div>
   );

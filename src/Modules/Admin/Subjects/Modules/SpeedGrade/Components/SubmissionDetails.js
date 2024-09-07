@@ -42,9 +42,9 @@ const SubmissionDetails = ({ details, student, initialGrade }) => {
   const loading =
     type === "Assignment" ? assignGradeLoading : assignQuizGradeLoading;
 
-  const { dueDate, points, totalPoints, comments, media } =
+  const { dueDate, points, totalPoints, comments  } =
     details?.assignmentId || details?.quizId || {};
-  const { content } = details;
+  const { content ,media} = details;
 
   const maxPoints = type === "Quiz" ? totalPoints : points;
 
@@ -165,7 +165,7 @@ const SubmissionDetails = ({ details, student, initialGrade }) => {
     setPreviewUrl(null);
     setPreviewType(null);
   };
-
+  console.log("media", media);
   const renderWordCount = () => {
     if (wordCount === 0) {
       return (
@@ -186,7 +186,7 @@ const SubmissionDetails = ({ details, student, initialGrade }) => {
   };
 
   const renderFiles = () => {
-    if (!dummyFiles || dummyFiles.length === 0) {
+    if (!media || media.length === 0) {
       return (
         <div className="flex flex-col items-center justify-center text-gray-500 mt-7">
           <FaFileAlt className="text-xl" aria-hidden="true" />
@@ -202,7 +202,7 @@ const SubmissionDetails = ({ details, student, initialGrade }) => {
           </h1>
 
           <ul className="space-y-2 text-sm">
-            {dummyFiles?.map((file, index) => (
+            {media?.map((file, index) => (
               <li
                 key={index}
                 className="flex items-center justify-between bg-white p-2 border rounded-md shadow-sm hover:shadow-md transition-shadow"
@@ -211,7 +211,7 @@ const SubmissionDetails = ({ details, student, initialGrade }) => {
                   {file?.type?.startsWith("image/") ? (
                     <img
                       src={file.url}
-                      alt={file.title}
+                      alt={file.name}
                       className="w-6 h-6 object-cover rounded"
                     />
                   ) : file.type === "application/pdf" ? (
@@ -227,7 +227,9 @@ const SubmissionDetails = ({ details, student, initialGrade }) => {
                       openPreviewModal(file.url, file.type);
                     }}
                   >
-                    {file.title}
+                    {/* {file.name} */}
+
+                    File {index+1}
                   </a>
                 </div>
               </li>
