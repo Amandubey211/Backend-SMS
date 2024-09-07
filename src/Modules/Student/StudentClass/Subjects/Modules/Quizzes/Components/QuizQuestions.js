@@ -1,16 +1,22 @@
-
-
 import React, { useState } from "react";
 import QuizQuestionCard from "./QuizQuestionCard";
 
 const QuizQuestions = ({
   questions,
   selectedOptions,
-  handleOptionChange,
+  setSelectedOptions, // Make sure you pass this correctly from MainSection
   showOneQuestionOnly,
   handleSubmit,
 }) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+
+  // Handle option change for each question
+  const handleOptionChange = (questionIndex, selectedOption) => {
+    setSelectedOptions((prevSelectedOptions) => ({
+      ...prevSelectedOptions,
+      [questionIndex]: selectedOption, // Update the selected option for the current question
+    }));
+  };
 
   const handleNextQuestion = () => {
     if (currentQuestionIndex < questions.length - 1) {
@@ -25,7 +31,7 @@ const QuizQuestions = ({
   };
 
   if (showOneQuestionOnly) {
-    // If showOneQuestionOnly is true, display one question at a time
+    // Show one question at a time
     const question = questions[currentQuestionIndex];
 
     return (
@@ -34,7 +40,7 @@ const QuizQuestions = ({
           question={question}
           questionIndex={currentQuestionIndex}
           selectedOption={selectedOptions[currentQuestionIndex]}
-          handleOptionChange={handleOptionChange}
+          handleOptionChange={handleOptionChange} // Pass the handler to change options
         />
         <div className="flex justify-between mt-4">
           <button
@@ -64,7 +70,7 @@ const QuizQuestions = ({
     );
   }
 
-  // If showOneQuestionOnly is false, display all questions at once
+  // Show all questions at once
   return (
     <div className="w-full p-1">
       <div className="flex justify-start mb-2 font-medium text-xl">
@@ -77,7 +83,7 @@ const QuizQuestions = ({
             question={question}
             questionIndex={questionIndex}
             selectedOption={selectedOptions[questionIndex]}
-            handleOptionChange={handleOptionChange}
+            handleOptionChange={handleOptionChange} // Pass the handler to change options
           />
         ))}
       </div>

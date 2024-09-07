@@ -25,9 +25,11 @@ import ParentEvent from "../Modules/Parents/ParentEvent/ParentEvent";
 import QIDLogin from "../Modules/LoginPages/Student/Login/QIDLogin.js";
 import ParentProfile from "../Components/Parents/ParentProfile.js";
 import StaffMyProfile from "../Components/Common/StaffMyProfile.js";
-import StudentProfile from "../Modules/Student/profile/StudentProfile.js";
 
 // lazy loaded routes
+const StudentProfile = lazy(() =>
+  import("../Modules/Student/profile/StudentProfile.js")
+);
 const SpeedGrade = lazy(() =>
   import("../Modules/Admin/Subjects/Modules/SpeedGrade/SpeedGrade.js")
 );
@@ -886,10 +888,7 @@ function App() {
     {
       path: "/users/student/profile",
       element: (
-        <ProtectRoute
-          Component={<StudentProfile />}
-          allowedRoles={["student"]}
-        />
+        <ProtectRoute Component={StudentProfile} allowedRoles={["student"]} />
       ),
       errorElement: <Error />,
     },

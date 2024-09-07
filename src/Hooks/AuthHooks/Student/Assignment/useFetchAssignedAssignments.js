@@ -5,7 +5,7 @@ import { baseUrl } from "../../../../config/Common";
 import { useParams } from "react-router-dom";
 import { setAssignment } from "../../../../Redux/Slices/Student/SubjectSlice";
 
-const useFetchAssignedAssignments = (sectionId) => {
+const useFetchAssignedAssignments = () => {
   const { selectedClass, selectedSection, selectedSubject } = useSelector(
     (state) => state.Common
   );
@@ -19,66 +19,65 @@ const useFetchAssignedAssignments = (sectionId) => {
 
   // Caching
   const cacheKey = useMemo(
-    () => `assignments-${cid}-${sectionId}-${sid}`,
-    [cid, sectionId, sid]
+    () => `assignments-${cid}-${selectedSection}-${sid}`,
+    [cid, selectedSection, sid]
   );
   const cachedData = useMemo(
     () => JSON.parse(localStorage.getItem(cacheKey)),
     [cacheKey]
   );
 
-  const fetchFilteredAssignments = useCallback(async () => {
-    setLoading(true);
-    setError(null);
+  const fetchFilteredAssignments = useCallback(
+    async (subjectId, moduleId = "", chapterId = "") => {
+      setLoading(true);
+      setError(null);
 
-    const token = localStorage.getItem(`${role}:token`);
-    if (!token) {
-      setError("Authentication token not found");
-      setLoading(false);
-      return;
-    }
-
-    try {
-      const response = await axios.get(
-        `${baseUrl}/student/studentAssignment/class/${cid}`,
-        {
-          headers: {
-            Authentication: token,
-          },
-          params: {
-            subjectId: sid,
-          },
-        }
-      );
-
-      if (response.data.success && response.data.data) {
-        setAssignments(response.data.data);
-        dispatch(setAssignment(response.data.data));
-
-        localStorage.setItem(cacheKey, JSON.stringify(response.data.data)); // Cache the data
-      } else {
-        throw new Error(response.data.message || "Failed to fetch assignments");
+      const token = localStorage.getItem(`${role}:token`);
+      if (!token) {
+        setError("Authentication token not found");
+        setLoading(false);
+        return;
       }
-    } catch (error) {
-      setError(error.message);
-    } finally {
-      setLoading(false);
-    }
-  }, [cid, role, sid, cacheKey]);
+
+      try {
+        const response = await axios.get(
+          `${baseUrl}/student/studentAssignment/class/${cid}`,
+          {
+            headers: { Authentication: token },
+            params: { subjectId, moduleId, chapterId },
+          }
+        );
+
+        if (response.data.success && response.data.data) {
+          setAssignments(response.data.data);
+          dispatch(setAssignment(response.data.data));
+
+          localStorage.setItem(cacheKey, JSON.stringify(response.data.data)); // Cache the data
+        } else {
+          throw new Error(
+            response.data.message || "Failed to fetch assignments"
+          );
+        }
+      } catch (err) {
+        setError(err.message || "Error fetching assignments");
+      } finally {
+        setLoading(false);
+      }
+    },
+    [cid, role, cacheKey, dispatch]
+  );
 
   useEffect(() => {
     if (cachedData) {
       setAssignments(cachedData);
       setLoading(false);
     } else {
-      fetchFilteredAssignments(sectionId, "", "");
+      fetchFilteredAssignments(sid, "", "");
     }
-  }, [sectionId, fetchFilteredAssignments, cachedData]);
-
-  const memoizedAssignments = useMemo(() => assignments, [assignments]);
+  }, [sid, fetchFilteredAssignments, cachedData]);
 
   return {
-    assignments: memoizedAssignments,
+    assignments,
     loading,
     error,
     fetchFilteredAssignments,

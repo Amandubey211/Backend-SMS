@@ -1,6 +1,3 @@
-
-
-
 import React from "react";
 import { FaPlayCircle } from "react-icons/fa";
 
@@ -9,7 +6,9 @@ const QuizInstructionSection = React.memo(({ quiz }) => {
 
   return (
     <div className="max-w-3xl mx-auto p-2 bg-white ">
-      <h1 className="mb-2 text-xl text-gray-500 font-semibold">Quiz Instructions:</h1>
+      <h1 className="mb-2 text-xl text-gray-500 font-semibold">
+        Quiz Instructions:
+      </h1>
       <div className="relative mb-6">
         {thumbnail && (
           <img
@@ -29,4 +28,3 @@ const QuizInstructionSection = React.memo(({ quiz }) => {
 });
 
 export default QuizInstructionSection;
-

@@ -1,6 +1,12 @@
 import { useEffect } from "react";
 
-const useFetchAttemptHistory = (quizId, allowNumberOfAttempts, setAttemptHistory, setQuizSubmitted) => {
+const useFetchAttemptHistory = (
+  quizId,
+  allowedAttempts, // Check if attempts are unlimited
+  allowNumberOfAttempts, // If allowedAttempts is false, use this to limit attempts
+  setAttemptHistory,
+  setQuizSubmitted
+) => {
   useEffect(() => {
     const fetchAttemptHistory = async () => {
       try {
@@ -19,13 +25,23 @@ const useFetchAttemptHistory = (quizId, allowNumberOfAttempts, setAttemptHistory
         );
 
         if (!response.ok) {
-          throw new Error(`Failed to fetch attempt history, status: ${response.status}`);
+          throw new Error(
+            `Failed to fetch attempt history, status: ${response.status}`
+          );
         }
 
         const data = await response.json();
+
         if (data.success && data.submission) {
           setAttemptHistory(data.submission);
-          setQuizSubmitted(data.submission.length >= allowNumberOfAttempts);
+
+          if (allowedAttempts) {
+            // Unlimited attempts, so always allow quiz submission
+            setQuizSubmitted(false);
+          } else {
+            // Limited attempts based on allowNumberOfAttempts
+            setQuizSubmitted(data.submission.length >= allowNumberOfAttempts);
+          }
         } else {
           setQuizSubmitted(false);
           console.error("No attempt history data or unsuccessful response");
@@ -36,11 +52,13 @@ const useFetchAttemptHistory = (quizId, allowNumberOfAttempts, setAttemptHistory
     };
 
     fetchAttemptHistory();
-  }, [quizId, allowNumberOfAttempts, setAttemptHistory, setQuizSubmitted]);
+  }, [
+    quizId,
+    allowedAttempts,
+    allowNumberOfAttempts,
+    setAttemptHistory,
+    setQuizSubmitted,
+  ]);
 };
 
 export default useFetchAttemptHistory;
-
-
-
-

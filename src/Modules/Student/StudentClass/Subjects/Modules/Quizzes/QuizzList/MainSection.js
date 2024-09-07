@@ -1,32 +1,26 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import SubjectSideBar from "../../../Component/SubjectSideBar";
 import FilterCard from "../../../Component/FilterCard";
 import { RiFileUnknowLine } from "react-icons/ri";
-import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import useFetchQuizzes from "../../../../../../../Hooks/AuthHooks/Student/Quiz/useFetchQuizzes";
 import List from "../../../Component/List";
 
 const QuizMainSection = () => {
-  const { cid, sid } = useParams();
   const { selectedClass, selectedSubject } = useSelector(
     (state) => state.Common
   );
 
-  const [filters, setFilters] = useState({
-    moduleId: "",
-    chapterId: "",
-  });
-
+  const [filters, setFilters] = useState({ moduleId: "", chapterId: "" });
   const { quizzes, loading, error, fetchFilteredQuizzes } = useFetchQuizzes(
     selectedClass,
     selectedSubject
   );
 
+  // Refetch quizzes based on updated filters
   const refetchQuizzes = useCallback(() => {
-    const { moduleId, chapterId } = filters;
-    fetchFilteredQuizzes(selectedClass, selectedSubject, moduleId, chapterId);
-  }, [filters, selectedClass, selectedSubject, fetchFilteredQuizzes]);
+    fetchFilteredQuizzes(filters.moduleId, filters.chapterId);
+  }, [filters, fetchFilteredQuizzes]);
 
   useEffect(() => {
     refetchQuizzes();

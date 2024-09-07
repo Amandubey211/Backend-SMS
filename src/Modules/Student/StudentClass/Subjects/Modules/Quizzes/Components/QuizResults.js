@@ -8,8 +8,7 @@ const QuizResults = ({ questions, selectedOptions }) => {
 
   questions.forEach((question, index) => {
     const selectedOption = selectedOptions[index];
-    const isCorrect =
-      selectedOption && selectedOption === question.correctAnswer;
+    const isCorrect = selectedOption === question.correctAnswer;
 
     if (selectedOption) {
       if (isCorrect) {
@@ -26,28 +25,25 @@ const QuizResults = ({ questions, selectedOptions }) => {
       <div className="mb-6">
         <h2 className="text-xl font-bold text-gray-800 mb-4">Quiz Results</h2>
         <ul className="list-none space-y-2">
-          <li className=" font-mono">
+          <li className="font-mono">
             Total Attempted Questions:
-            <span className="text-blue-600  font-semibold">
+            <span className="text-blue-600 font-semibold">
               {correctAnswers + wrongAnswers}
             </span>
           </li>
-          <li className=" font-mono">
-            {" "}
-            Points:{" "}
-            <span className="text-blue-600  font-semibold">{totalPoints}</span>
+          <li className="font-mono">
+            Points:
+            <span className="text-blue-600 font-semibold">{totalPoints}</span>
           </li>
-          <li className=" font-mono">
-            Correct Answers:{" "}
+          <li className="font-mono">
+            Correct Answers:
             <span className="text-green-600 font-semibold">
               {correctAnswers}
             </span>
           </li>
-          <li className=" font-mono">
-            Wrong Answers:{" "}
-            <strong>
-              <span className="text-red-600 ">{wrongAnswers}</span>
-            </strong>
+          <li className="font-mono">
+            Wrong Answers:
+            <span className="text-red-600">{wrongAnswers}</span>
           </li>
         </ul>
       </div>

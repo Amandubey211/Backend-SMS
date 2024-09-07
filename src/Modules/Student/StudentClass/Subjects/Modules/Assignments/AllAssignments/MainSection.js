@@ -4,7 +4,7 @@ import FilterCard from "../../../Component/FilterCard";
 import { RiListCheck3 } from "react-icons/ri";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-import useGetFilteredAssignments from "../../../../../../../Hooks/AuthHooks/Student/Assignment/useFetchAssignedAssignments";
+import useFetchAssignedAssignments from "../../../../../../../Hooks/AuthHooks/Student/Assignment/useFetchAssignedAssignments";
 import List from "../../../Component/List";
 
 const AssignmentMainSection = () => {
@@ -14,7 +14,7 @@ const AssignmentMainSection = () => {
   const { cid, sid, subjectId } = useParams();
 
   const { loading, error, assignments, fetchFilteredAssignments } =
-    useGetFilteredAssignments();
+    useFetchAssignedAssignments();
   const [filters, setFilters] = useState({ moduleId: "", chapterId: "" });
 
   // Fetch assignments based on selected filters

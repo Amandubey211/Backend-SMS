@@ -63,6 +63,7 @@ const FilterCard = ({ filters, setFilters }) => {
           ))}
         </select>
       </div>
+
       <div className="mb-4">
         <label className="block text-gray-700" htmlFor="chapter-select">
           Chapter
@@ -81,6 +82,7 @@ const FilterCard = ({ filters, setFilters }) => {
           ))}
         </select>
       </div>
+
       <button
         onClick={handleApplyFilters}
         className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-2 rounded-full focus:outline-none transform transition-transform duration-300 hover:scale-105"
