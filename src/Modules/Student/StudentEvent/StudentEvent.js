@@ -10,6 +10,7 @@ import { baseUrl } from "../../../config/Common";
 import { format, parseISO, isValid } from "date-fns";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
 import { IoCalendarOutline } from "react-icons/io5";
+import useNavHeading from "../../../Hooks/CommonHooks/useNavHeading ";
 
 const StudentEvent = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -23,7 +24,7 @@ const StudentEvent = () => {
     month: currentDate.getMonth(),
     year: currentDate.getFullYear(),
   });
-
+  useNavHeading("Event");
   const itemsPerPage = 4;
 
   useEffect(() => {

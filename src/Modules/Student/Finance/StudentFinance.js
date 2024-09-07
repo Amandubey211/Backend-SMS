@@ -9,6 +9,7 @@ import { baseUrl } from "../../../config/Common";
 import Spinner from "../../../Components/Common/Spinner";
 import NoDataFound from "../../../Components/Common/NoDataFound";
 import { GoAlertFill } from "react-icons/go";
+import useNavHeading from "../../../Hooks/CommonHooks/useNavHeading ";
 
 const StudentFinance = () => {
   const [filters, setFilters] = useState({
@@ -20,7 +21,7 @@ const StudentFinance = () => {
   const [totalPaidFees, setTotalPaidFees] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null); // New state for error handling
-
+  useNavHeading("Finance");
   // Fetch Fees Details
   const fetchFeesDetails = async () => {
     try {
