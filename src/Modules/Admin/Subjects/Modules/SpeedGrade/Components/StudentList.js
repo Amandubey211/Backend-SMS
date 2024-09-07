@@ -77,7 +77,7 @@ function StudentList({ onSelectStudent }) {
       {loading && <Spinner />}
       {error && <p className="text-center text-red-500">{error}</p>}
       {!loading && !filteredStudents.length && <NoDataFound title="Students" />}
-      <div className="flex-grow overflow-y-auto space-y-2">
+      <div className="flex-grow overflow-y-auto space-y-2 ">
         {filteredStudents.map((student, index) => (
           <div
             key={student._id}
