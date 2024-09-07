@@ -26,8 +26,11 @@ const useAssignTeacher = () => {
           headers: { Authentication: token },
         }
       );
-
-      toast.success("Teacher assigned successfully!");
+ if(response.data.success == false){
+  toast.error(response.data.message);
+ }else{
+  toast.success("Teacher assigned successfully!");
+ }
       console.log(response.data, "sdfsdf");
       fetchTeachersByClass(cid)
       setLoading(false);

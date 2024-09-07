@@ -96,9 +96,8 @@ const LibraryTable = () => {
       key: 'status',
       render: (status) => (
         <span
-          className={`inline-block px-3 py-1 rounded-full text-sm ${
-            status === 'Return' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-          }`}
+          className={`inline-block px-3 py-1 rounded-full text-sm ${status === 'Return' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+            }`}
         >
           {status}
         </span>
@@ -107,7 +106,7 @@ const LibraryTable = () => {
   ];
 
   return (
-    <div className="p-6">
+    <div className="p-6 pt-5">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-xl font-bold">Library Status</h1>
         <div className="flex space-x-4">
@@ -236,10 +235,11 @@ const LibraryTable = () => {
           <p className="text-gray-600 text-lg">Failed to fetch library data</p>
         </div>
       ) : filteredData.length === 0 ? (
-        <div className="flex flex-col items-center justify-center h-full text-center">
+        <div className="flex flex-col items-center justify-center h-screen text-center">
           <FaBookOpen className="text-gray-400 text-6xl mb-4" />
           <p className="text-gray-600 text-lg">No Library Data Found</p>
         </div>
+
       ) : (
         <Table columns={columns} dataSource={filteredData} rowKey="_id" />
       )}

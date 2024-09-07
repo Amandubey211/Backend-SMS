@@ -19,11 +19,11 @@ const GradeAccordionItem = ({ grade }) => {
     : [];
 
   const getColorForStatus = (status) => {
-    return status.toLowerCase() === "submit"
+    return status?.toLowerCase() === "submit"
       ? "text-green-500"
-      : status.toLowerCase() === "excused"
+      : status?.toLowerCase() === "excused"
       ? "text-yellow-500"
-      : status.toLowerCase() === "missing"
+      : status?.toLowerCase() === "missing"
       ? "text-red-500"
       : "text-gray-500";
   };
@@ -44,9 +44,9 @@ const GradeAccordionItem = ({ grade }) => {
         </div>
         <span>
           {isOpen ? (
-            <MdKeyboardArrowUp className="border rounded text-2xl text-black" />
+            <MdKeyboardArrowUp className="border rounded-full text-3xl text-black" />
           ) : (
-            <MdKeyboardArrowDown className="border rounded text-2xl text-black" />
+            <MdKeyboardArrowDown className="border rounded-full text-3xl text-black" />
           )}
         </span>
       </div>
@@ -91,11 +91,11 @@ const GradeAccordionItem = ({ grade }) => {
                       </div>
                     </td>
                     <td className="px-2 text-sm py-2">
-                      {evalItem.dueDate ? evalItem.dueDate.slice(0, 10) : "N/A"}
+                      {evalItem?.dueDate ? evalItem?.dueDate?.slice(0, 10) : "N/A"}
                     </td>
                     <td className="px-2 text-sm py-2">
-                      {evalItem.submittedDate
-                        ? evalItem.submittedDate.slice(0, 10)
+                      {evalItem?.submittedDate
+                        ? evalItem?.submittedDate?.slice(0, 10)
                         : "N/A"}
                     </td>
                     <td className="px-2 py-2">
@@ -107,7 +107,7 @@ const GradeAccordionItem = ({ grade }) => {
                         {evalItem.status}
                       </span>
                     </td>
-                    <td className="px-2 py-2">{evalItem.score || "N/A"}</td>
+                    <td className="px-2 py-2">{evalItem.score||0}</td>
                   </tr>
                 ))}
               </tbody>

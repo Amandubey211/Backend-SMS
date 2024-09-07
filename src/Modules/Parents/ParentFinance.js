@@ -6,9 +6,10 @@ import { MdAccessTime, MdMoneyBillWave } from "react-icons/md";
 import { GiExpense } from "react-icons/gi";
 import { LuPocket } from "react-icons/lu";
 import { CiMoneyCheck1 } from "react-icons/ci";
-import { FaMoneyBillWave } from "react-icons/fa"; // Icon for no data/error message
 import { baseUrl } from "../../config/Common.js";
 import Spinner from "../../Components/Common/Spinner"; // Import Spinner
+import { FaMoneyBillWave } from "react-icons/fa";
+import useNavHeading from "../../Hooks/CommonHooks/useNavHeading .js";
 
 const uniqueFilterOptions = (data, key) => {
   return [...new Set(data.map((item) => item[key]))].sort();
@@ -25,7 +26,7 @@ const ParentFinanceTable = () => {
   const [totalPaidFees, setTotalPaidFees] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
-
+  useNavHeading("Finance");
   useEffect(() => {
     const fetchFeesData = async () => {
       try {
@@ -70,6 +71,7 @@ const ParentFinanceTable = () => {
       (filters.feesType === "" || item.feeType === filters.feesType) &&
       (filters.status === "Everyone" || item.status === filters.status)
   );
+  
 
   return (
     <Layout title="Parents | Finance">
@@ -143,6 +145,7 @@ const ParentFinanceTable = () => {
                       <th className="px-5 py-3 border-b-2 border-gray-200 font-normal">Due Date</th>
                       <th className="px-5 py-3 border-b-2 border-gray-200 font-normal">Amount</th>
                       <th className="px-5 py-3 border-b-2 border-gray-200 font-normal">Status</th>
+                      <th className="px-5 py-3 border-b-2 border-gray-200 font-normal">Action</th>
                     </tr>
                   </thead>
                   <tbody className="space-y-2">
@@ -161,6 +164,20 @@ const ParentFinanceTable = () => {
                           >
                             {item.status}
                           </span>
+                        </td>
+                        <td className="px-5 py-4 border-b border-gray-200">
+                          {item.status === "Paid" ? (
+                            <button
+                              className="bg-[#E9F8EB] text-[#0D9755] font-semibold px-4 py-1 rounded-md"
+                              disabled
+                            >
+                              Completed
+                            </button>
+                          ) : (
+                            <button className="bg-gradient-to-r from-[#C83B62] to-[#7F35CD] text-white font-semibold px-4 py-1 rounded-md">
+                              Pay Now
+                            </button>
+                          )}
                         </td>
                       </tr>
                     ))}
@@ -192,9 +209,10 @@ const ParentFinanceTable = () => {
                     <span className="text-xl font-bold bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent bg-clip-text">
                       {totalUnpaidFees}
                     </span>
-                    <button className="flex items-center border border-blue-800 p-1 w-full justify-center px-5 rounded-full">
-                      <span className="text-blue-800">Pay Now</span>
+                    <button className="flex items-center bg-gradient-to-r from-[#C83B62] to-[#7F35CD] p-1 w-full justify-center px-5 rounded-full">
+                      <span className="text-white">Pay Now</span>
                     </button>
+
                   </div>
                   <div className="px-7 py-2 flex flex-1 flex-col justify-around items-center gap-3 border border-gray-300 rounded-lg">
                     <div className="border border-black flex items-center justify-center p-1.5 rounded-full">
@@ -222,15 +240,11 @@ const ParentFinanceTable = () => {
                     <span className="text-xl font-bold bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent bg-clip-text">
                       {totalPaidFees}
                     </span>
-                    {/* <button className="flex items-center border border-blue-800 p-1 w-full justify-center px-5 rounded-full">
-                      <span className="text-blue-800">View All Expenses</span>
-                    </button> */}
                   </div>
                 </>
               )}
             </div>
           </div>
-
         </div>
       </ParentDashLayout>
     </Layout>

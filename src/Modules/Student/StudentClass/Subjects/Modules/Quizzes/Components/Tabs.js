@@ -1,15 +1,29 @@
-
 import React from "react";
 import { FaCalendarAlt } from "react-icons/fa";
 
-const Tabs = ({ quiz, children, activeTab, setActiveTab, onTabChange, createPage, quizSubmitted, hasAttempted, hasRemainingAttempts }) => {
+const Tabs = ({
+  quiz,
+  children,
+  activeTab,
+  setActiveTab,
+  onTabChange, // Can be optional
+  createPage,
+  quizSubmitted,
+  hasAttempted,
+  hasRemainingAttempts,
+}) => {
   const handleTabClick = (tab) => {
-    if (tab === 'questions' && !hasRemainingAttempts) {
-      alert('No more attempts allowed.');
+    if (tab === "questions" && !hasRemainingAttempts) {
+      alert("No more attempts allowed.");
       return;
     }
+
     setActiveTab(tab);
-    onTabChange(tab);
+
+    // Call onTabChange only if it exists
+    if (onTabChange && typeof onTabChange === "function") {
+      onTabChange(tab);
+    }
   };
 
   const { name, quizType, availableFrom } = quiz;
@@ -21,10 +35,14 @@ const Tabs = ({ quiz, children, activeTab, setActiveTab, onTabChange, createPage
           <div>
             <h2 className="text-xl font-semibold mb-1">{name}</h2>
             <div className="flex items-center text-gray-500">
-              <span className="text-green-600 font-medium mr-2">{quizType}</span>
+              <span className="text-green-600 font-medium mr-2">
+                {quizType}
+              </span>
               <span className="mx-2">|</span>
               <FaCalendarAlt className="w-4 h-4 mr-2" />
-              <span className="text-sm">Available From: {availableFrom.slice(0, 10)}</span>
+              <span className="text-sm">
+                Available From: {availableFrom.slice(0, 10)}
+              </span>
             </div>
           </div>
         )}
@@ -70,5 +88,3 @@ const Tabs = ({ quiz, children, activeTab, setActiveTab, onTabChange, createPage
 };
 
 export default Tabs;
-
-

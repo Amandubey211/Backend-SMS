@@ -1,28 +1,23 @@
 import React, { useState, useCallback, useEffect } from "react";
 import SubjectSideBar from "../../../Component/SubjectSideBar";
-import List from "../../../Component/List";
 import FilterCard from "../../../Component/FilterCard";
 import { RiListCheck3 } from "react-icons/ri";
-import useFetchAssignedAssignments from "../../../../../../../Hooks/AuthHooks/Student/Assignment/useFetchAssignedAssignments";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-import useGetFilteredAssignments from "../../../../../../../Hooks/AuthHooks/Student/Assignment/useFetchAssignedAssignments";
+import useFetchAssignedAssignments from "../../../../../../../Hooks/AuthHooks/Student/Assignment/useFetchAssignedAssignments";
+import List from "../../../Component/List";
 
-const MainSection = () => {
+const AssignmentMainSection = () => {
   const { selectedClass, selectedSection, selectedSubject } = useSelector(
     (state) => state.Common
   );
-
-  const { cid, sid, subjectId } = useParams(); // Ensure subjectId is part of the route parameters
+  const { cid, sid, subjectId } = useParams();
 
   const { loading, error, assignments, fetchFilteredAssignments } =
-    useGetFilteredAssignments();
+    useFetchAssignedAssignments();
+  const [filters, setFilters] = useState({ moduleId: "", chapterId: "" });
 
-  const [filters, setFilters] = useState({
-    moduleId: "",
-    chapterId: "",
-  });
-
+  // Fetch assignments based on selected filters
   const refetchAssignments = useCallback(() => {
     const { moduleId, chapterId } = filters;
     fetchFilteredAssignments(sid, moduleId, chapterId);
@@ -31,6 +26,12 @@ const MainSection = () => {
   useEffect(() => {
     refetchAssignments();
   }, [refetchAssignments]);
+
+  const getItemName = (item) => item.title;
+  const getItemDetails = (item) =>
+    `Module: ${item.module} | Chapter: ${item.chapter}`;
+  const navLinkPath = (cid, sid, item) =>
+    `/student_class/${cid}/${sid}/assignments/${item.assignmentId}/view`;
 
   return (
     <div className="flex">
@@ -43,7 +44,9 @@ const MainSection = () => {
           icon={<RiListCheck3 />}
           loading={loading}
           error={error}
-          refetchData={refetchAssignments}
+          getItemName={getItemName}
+          getItemDetails={getItemDetails}
+          navLinkPath={navLinkPath}
         />
       </div>
       <div className="w-[30%] p-2">
@@ -53,4 +56,4 @@ const MainSection = () => {
   );
 };
 
-export default MainSection;
+export default AssignmentMainSection;

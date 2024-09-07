@@ -19,13 +19,15 @@ const MainSection = () => {
     fetchModules();
   }, [fetchModules]);
 
+  // Select the first module when modules are fetched
   useEffect(() => {
-    if (modulesData && modulesData.modules.length > 0) {
+    if (modulesData?.modules?.length) {
+      const firstModule = modulesData.modules[0];
       dispatch(
         setSelectedModule({
-          moduleId: modulesData.modules[0]._id,
-          name: modulesData.modules[0].moduleName,
-          chapters: modulesData.modules[0].chapters,
+          moduleId: firstModule._id,
+          name: firstModule.moduleName,
+          chapters: firstModule.chapters,
         })
       );
     } else {
@@ -33,7 +35,7 @@ const MainSection = () => {
     }
   }, [dispatch, modulesData]);
 
-  const handleToggle = (chapterId) => {
+  const toggleChapter = (chapterId) => {
     setExpandedChapters((prev) =>
       prev.includes(chapterId)
         ? prev.filter((id) => id !== chapterId)
@@ -41,7 +43,7 @@ const MainSection = () => {
     );
   };
 
-  const handleModuleSelect = (module) => {
+  const selectModule = (module) => {
     dispatch(
       setSelectedModule({
         moduleId: module._id,
@@ -52,70 +54,69 @@ const MainSection = () => {
     setExpandedChapters([]);
   };
 
+  // Render chapters if available
+  const renderChapters = () => {
+    if (loading) return <Spinner />;
+    if (error) return <NoDataFound title="Chapters" error={error} />;
+    if (!selectedModule?.chapters?.length)
+      return <NoDataFound title="Chapters" />;
+
+    return selectedModule.chapters.map((chapter, index) => (
+      <Chapter
+        key={index}
+        title={chapter.name}
+        chapterNumber={index + 1}
+        imageUrl={chapter.thumbnail}
+        assignments={chapter.assignments}
+        quizzes={chapter.quizzes}
+        isExpanded={expandedChapters.includes(chapter._id)}
+        onToggle={() => toggleChapter(chapter._id)}
+        attachments={chapter.attachments}
+      />
+    ));
+  };
+
+  // Render modules if available
+  const renderModules = () => {
+    if (loading) return <Spinner />;
+    if (error) return <NoDataFound title="Modules" error={error} />;
+    if (!modulesData?.modules?.length) return <NoDataFound title="Modules" />;
+
+    return (
+      <>
+        <div className="flex items-center gap-1 mb-2">
+          <h1 className="text-xl font-semibold">All Modules</h1>
+          <p className="bg-gradient-to-r from-pink-100 to-purple-200 font-semibold rounded-full p-1 px-2">
+            <span className="text-gradient">
+              {modulesData?.modules.length || 0}
+            </span>
+          </p>
+        </div>
+        <div className="grid grid-cols-1 gap-2">
+          {modulesData.modules.map((module, index) => (
+            <ModuleCard
+              key={index}
+              title={module.moduleName}
+              moduleNumber={index + 1}
+              imageUrl={module.thumbnail}
+              isCompleted={module.isPublished}
+              isSelected={selectedModule?.moduleId === module._id}
+              onSelect={() => selectModule(module)}
+            />
+          ))}
+        </div>
+      </>
+    );
+  };
+
   return (
     <div className="flex min-h-screen">
       <SubjectSideBar />
       <div className="w-[60%] bg-white p-2 border-l">
-        <div className="bg-white p-2 rounded-lg">
-          {loading ? (
-            <Spinner />
-          ) : selectedModule.name && selectedModule.chapters.length > 0 ? (
-            selectedModule.chapters.map((chapter, index) => (
-              <Chapter
-                key={index}
-                title={chapter.name}
-                chapterNumber={index + 1}
-                imageUrl={chapter.thumbnail}
-                assignments={chapter.assignments}
-                quizzes={chapter.quizzes}
-                isExpanded={expandedChapters.includes(chapter._id)}
-                onToggle={() => handleToggle(chapter._id)}
-                attachments={chapter.attachments}
-              />
-            ))
-          ) : (
-            <div className="h-full w-full flex justify-center items-center">
-              <NoDataFound title="Chapters" />
-            </div>
-          )}
-        </div>
+        <div className="bg-white p-2 rounded-lg">{renderChapters()}</div>
       </div>
       <div className="w-[35%] p-2 border">
-        <div className="bg-white p-4 rounded-lg">
-          {loading ? (
-            <Spinner />
-          ) : modulesData?.modules.length > 0 ? (
-            <>
-              <div className="flex items-center gap-1 mb-2">
-                <h1 className="text-xl font-semibold">All Modules</h1>
-                <p className="bg-gradient-to-r from-pink-100 to-purple-200 font-semibold rounded-full p-1 px-2">
-                  <span className="text-gradient">
-                    {modulesData?.modules.length || 0}
-                  </span>
-                </p>
-              </div>
-              <div className="grid grid-cols-1 gap-2">
-                {modulesData.modules.map((module, index) => (
-                  <ModuleCard
-                    key={index}
-                    title={module.moduleName}
-                    moduleNumber={index + 1}
-                    imageUrl={module.thumbnail}
-                    isCompleted={module.isPublished}
-                    isSelected={
-                      selectedModule && selectedModule.moduleId === module._id
-                    }
-                    onSelect={() => handleModuleSelect(module)}
-                  />
-                ))}
-              </div>
-            </>
-          ) : (
-            <div className="h-full w-full flex justify-center items-center">
-              <NoDataFound title="Modules" />
-            </div>
-          )}
-        </div>
+        <div className="bg-white p-4 rounded-lg">{renderModules()}</div>
       </div>
     </div>
   );

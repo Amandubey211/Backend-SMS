@@ -7,12 +7,10 @@ import { useSelector } from "react-redux";
 
 const StudentClass = () => {
   const className = useSelector((store) => store.Common.selectedClassName);
-  console.log(className)
   useNavHeading(className);
 
   return (
     <Layout title={`My Class | Student diwan`}>
-       {/* hideAvatarList={true} */}
       <StudentDashLayout children={<MainSection />} />;
     </Layout>
   );

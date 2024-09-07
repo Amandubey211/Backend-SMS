@@ -81,7 +81,7 @@ const ChildCard = ({ student }) => {
                 <div className="flex justify-between space-x-2 mb-4 w-full">
                     <div
                         style={primaryButtonContainerStyle}
-                        onClick={() => navigate("/teacher")}
+                        onClick={() => navigate(`/teacher/${student.id}`)}
                     >
                         <div style={primaryButtonTextGradientStyle}>Instructors</div>
                     </div>

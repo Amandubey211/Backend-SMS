@@ -1,37 +1,47 @@
 import React from "react";
 import DateDetail from "../../../Component/DateDetail";
 import AssignmentDetail from "../../../Component/AssignmentDetail";
-import ButtonsGroup from "../../../Component/ButtonsGroup";
-import SpeedGradeButton from "../../../Component/SpeedGradeButton";
-import { useParams } from "react-router-dom";
+
+// Utility function to convert minutes to hours and minutes
+const formatTimeLimit = (minutes) => {
+  const hrs = Math.floor(minutes / 60); // Calculate hours
+  const mins = minutes % 60; // Remaining minutes
+  return `${hrs > 0 ? `${hrs} hr` : ""} ${
+    mins > 0 ? `${mins} Minute` : ""
+  }`.trim();
+};
 
 const QuizzDetailCard = ({ quiz }) => {
-  const { qid } = useParams();
-  console.log("quiz in quiz detail card", quiz); //will be using this to fetch the data
-  const {
-    name,
-    quizType,
-    availableFrom,
-    totalPoints,
-    allowNumberOfAttempts,
-    timeLimit,
-  } = quiz; // dependent
-
   const quizDetails = [
-    { label: "Quiz Name", value: quiz.name, type: "quizz" },
+    { label: "Due Date", value: quiz.dueDate, type: "date" },
     { label: "Quiz Type", value: quiz.quizType, type: "quizz" },
-    { label: "Available From", value: quiz.availableFrom, type: "date" },
-    { label: "Total Points", value: quiz.totalPoints, type: "quizz" },
+    {
+      label: "Quiz Points",
+      value: quiz.totalPoints,
+      type: "quizz",
+      extra: "Point",
+    },
     {
       label: "Allow Attempts",
       value: quiz.allowNumberOfAttempts,
       type: "quizz",
+      extra: "Time",
     },
-    { label: "Time Limit", value: quiz.timeLimit, type: "quizz" },
-    // Add more quiz properties as needed
+    {
+      label: "Questions",
+      value: quiz.questions?.length,
+      type: "quizz",
+      extra: "Question",
+    },
+    {
+      label: "Time Limit",
+      value: formatTimeLimit(quiz.timeLimit),
+      type: "quizz",
+    },
   ];
+
   return (
-    <div className="p-3 bg-white" aria-label="Quiz Card">
+    <div className="px-4 ">
       {quizDetails.map((detail, index) => {
         if (detail.type === "quizz") {
           return (

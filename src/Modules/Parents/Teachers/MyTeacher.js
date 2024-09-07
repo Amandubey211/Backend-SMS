@@ -2,10 +2,13 @@ import React, { useState, useEffect } from 'react';
 import TeacherCards from '../../../Components/Parents/Teachers/TeacherCard';
 import axios from 'axios';
 import { baseUrl } from '../../../config/Common';
-import Spinner from '../../../Components/Common/Spinner'; // Importing the Spinner component
-import { FaChalkboardTeacher } from 'react-icons/fa'; // Importing an icon for the "No Teachers Found" state
+import Spinner from '../../../Components/Common/Spinner';
+import { FaChalkboardTeacher } from 'react-icons/fa';
+import { useParams } from 'react-router-dom';
 
 const MyTeacher = () => {
+    const studentId = useParams().ssid;
+
     const [instructors, setTeachers] = useState([]);
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -29,20 +32,20 @@ const MyTeacher = () => {
                     throw new Error("No guardian email found");
                 }
 
-                const response = await axios.get(`${baseUrl}/parent/api/instructors?guardianEmail=${encodeURIComponent(email)}`, {
+                const response = await axios.get(`${baseUrl}/parent/api/instructors?studentId=${studentId}`, {
                     headers: {
                         'Authentication': `${token}`
                     }
                 });
 
-                if (!response.data || !response.data.instructors || response.data.instructors.length === 0) {
-                    throw new Error("No teachers data found");
+                if (!response.data || response.data.instructors.length === 0) {
+                    setTeachers([]);  // No instructors found, but it's not an error
+                } else {
+                    setTeachers(response.data.instructors);
                 }
-
-                setTeachers(response.data.instructors); // Assuming the data is an array of teachers
             } catch (error) {
-                console.error('Failed to fetch teachers:', error);
-                setError("Unable to fetch teachers");
+                console.error('Failed to fetch instructors:', error);
+                setError("Unable to fetch instructors");
             } finally {
                 setLoading(false);
             }
@@ -54,7 +57,7 @@ const MyTeacher = () => {
     if (loading) {
         return (
             <div className="flex justify-center items-center h-full">
-                <Spinner /> {/* Show spinner while loading */}
+                <Spinner />
             </div>
         );
     }
@@ -72,19 +75,40 @@ const MyTeacher = () => {
         return (
             <div className="flex flex-col items-center justify-center h-full text-center">
                 <FaChalkboardTeacher className="text-6xl text-gray-400 mb-4" />
-                <p className="text-gray-500">No Teachers Found</p>
+                <p className="text-gray-500">No Instructors Found!</p>
             </div>
         );
     }
 
     return (
-        <div className="h-full w-full">
-            <div className="w-full p-2">
-                <div className="flex-wrap flex items-start">
-                    {instructors.map(instructor => (
-                        <TeacherCards key={instructor.id} instructor={instructor} />
-                    ))}
+        <div className="h-full w-full p-4">
+            <div className="text-lg font-medium mb-4 flex items-center">
+                Child Instructors
+                <div
+                    className="ml-2 flex items-center justify-center rounded-full"
+                    style={{
+                        background: 'linear-gradient(to right, #FAECF0 0%, #F3EBFB 100%)',
+                        width: '32px',
+                        height: '32px',
+                    }}
+                >
+                    <span
+                        style={{
+                            background: 'linear-gradient(to right, #C83B62 0%, #7F35CD 100%)',
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                        }}
+                        className="text-lg font-semibold"
+                    >
+                        {instructors.length.toString().padStart(2, '0')}
+                    </span>
                 </div>
+            </div>
+
+            <div className="flex flex-wrap justify-start">
+                {instructors.map(instructor => (
+                    <TeacherCards key={instructor.id} instructor={instructor} />
+                ))}
             </div>
         </div>
     );

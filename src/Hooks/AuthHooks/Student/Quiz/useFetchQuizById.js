@@ -23,7 +23,7 @@ const useFetchQuizById = (quizId) => {
         },
       });
 
-      console.log(response)
+      console.log(response);
       if (response.data.success) {
         setQuiz(response.data.quiz);
       } else {

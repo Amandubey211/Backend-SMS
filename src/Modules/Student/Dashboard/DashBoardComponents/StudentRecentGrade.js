@@ -88,7 +88,7 @@ const StudentRecentGrade = () => {
                 </div>
               </td>
 
-              <td className="px-5 py-2">{evalItem.submittedDate.slice(0, 10)}</td>
+              <td className="px-5 py-2">{evalItem?.submittedDate?.slice(0, 10)}</td>
               <td className="px-5 py-2">
                 <span className={`${getColorForStatus(evalItem.status)} font-medium`}>
                   {evalItem.status}

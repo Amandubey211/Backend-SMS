@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation, NavLink, useNavigate } from "react-router-dom";
 import StudentDiwanLogo from "../../Assets/HomeAssets/StudentDiwanLogo.png";
 import { MdOutlineKeyboardArrowUp, MdOutlineKeyboardArrowDown } from "react-icons/md";
@@ -11,16 +11,17 @@ import { toggleSidebar } from "../../Redux/Slices/Common/SidebarSlice.js";
 import useParentLogout from '../../Hooks/AuthHooks/Parent/useParentLogout.js';
 import LogoutConfirmationModal from "../Common/LogoutConfirmationModal.js";
 import profileIcon from "../../Assets/DashboardAssets/profileIcon.png";
+import useGetUserDetail from "../../Hooks/AuthHooks/Staff/useGetUserDetail.js";
 
 // Updated function to handle more paths
 const isActivePath = (path, locationPath) => {
   if (path === "/children" && (
-      locationPath.startsWith("/children") ||
-      locationPath.startsWith("/checkprogress") ||
-      locationPath.startsWith("/childgrade") ||
-      locationPath.startsWith("/attendance") ||
-      locationPath.startsWith("/teacher")
-    )) {
+    locationPath.startsWith("/children") ||
+    locationPath.startsWith("/checkprogress") ||
+    locationPath.startsWith("/childgrade") ||
+    locationPath.startsWith("/attendance") ||
+    locationPath.startsWith("/teacher")
+  )) {
     return true;
   }
   return locationPath.startsWith(path);
@@ -31,13 +32,20 @@ const SideMenubar = () => {
   const [openItems, setOpenItems] = useState([]);
   const dispatch = useDispatch();
   const { parentLogout } = useParentLogout();
+  const { userDetail } = useGetUserDetail();
+  useEffect(() => {
+    const getData = async () => {
+      await userDetail();
+    };
+    getData();
+  }, []);
   const { isOpen, role, userDetails } = useSelector((state) => ({
     isOpen: state.sidebar.isOpen,
     role: state.Auth.role,
     userDetails: state?.Auth?.userDetail,
 
   }));
-  
+
   const toggleDropdown = (title) => {
     if (openItems.includes(title)) {
       setOpenItems(openItems.filter((item) => item !== title));
@@ -66,17 +74,15 @@ const SideMenubar = () => {
 
   return (
     <nav
-      className={`sticky top-0 transition-all duration-300 h-screen p-1 z-50 bg-white border-r flex flex-col ${
-        isOpen ? "w-[15%]" : "w-[7%]"
-      }`}
+      className={`sticky top-0 transition-all duration-300 h-screen p-1 z-50 bg-white border-r flex flex-col ${isOpen ? "w-[15%]" : "w-[7%]"
+        }`}
     >
       <NavLink to="/parent_dash" className="relative flex items-center justify-center border-b pb-1" style={{ zIndex: 1001 }}>
         <img
           src={isOpen ? StudentDiwanLogo : smallLogo}
           alt="Logo"
-          className={`transition-width duration-300 ${
-            isOpen ? "w-36 pt-1" : "h-12"
-          }`}
+          className={`transition-width duration-300 ${isOpen ? "w-36 pt-1" : "h-12"
+            }`}
         />
         <button onClick={() => dispatch(toggleSidebar())} className="focus:outline-none absolute bottom-0 right-0">
           <div className="p-1 rounded-full text-purple-500 -mr-4 -mb-4 z-40 bg-white border-2">
@@ -91,11 +97,10 @@ const SideMenubar = () => {
             <React.Fragment key={index}>
               {item.items ? (
                 <div
-                  className={`flex items-center w-full p-2 rounded-lg cursor-pointer ${
-                    isActivePath(item.path, location.pathname)
+                  className={`flex items-center w-full p-2 rounded-lg cursor-pointer ${isActivePath(item.path, location.pathname)
                       ? "bg-purple-100 text-purple-500"
                       : "text-gray-700 hover:bg-gray-100"
-                  } ${isOpen ? "justify-between" : "justify-center"}`}
+                    } ${isOpen ? "justify-between" : "justify-center"}`}
                   onClick={() => toggleDropdown(item.title)}
                 >
                   <div className={`flex justify-center items-center`}>
@@ -121,11 +126,20 @@ const SideMenubar = () => {
                   key={index}
                   to={item.path}
                   className={({ isActive }) =>
-                    `flex items-center p-2 rounded-lg ${
-                      isActive || isActivePath(item.path, location.pathname)
-                        ? "text-purple-500 bg-purple-100"
-                        : "text-gray-700 hover:bg-gray-100"
+                    `flex items-center p-2 rounded-lg ${isActive || isActivePath(item.path, location.pathname)
+                      ? "bg-gradient-to-r from-[#FAECF0] to-[#F3EBFB]"
+                      : "text-gray-700 hover:bg-gray-100"
                     } ${isOpen ? "" : "justify-center"}`
+                  }
+                  style={({ isActive }) =>
+                    isActive
+                      ? {
+                        WebkitBackgroundClip: "text",
+                        WebkitTextFillColor: "black",
+                        backgroundImage: "linear-gradient(to right, #C83B62, #7F35CD)", // For text gradient
+                        background: "linear-gradient(to right, #FAECF0, #F3EBFB)", // For background gradient
+                      }
+                      : { color: "inherit" } // Keep normal color for inactive links
                   }
                 >
                   <span className={`${!isOpen && "text-xl"}`}>{item.icon}</span>
@@ -135,6 +149,7 @@ const SideMenubar = () => {
                     </span>
                   )}
                 </NavLink>
+
               )}
               {openItems.includes(item.title) && item.items && (
                 <ul className="pl-2 space-y-2">

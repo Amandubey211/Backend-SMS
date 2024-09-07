@@ -34,18 +34,18 @@ const useDeleteUser = () => {
 
         if (response.data.success) {
           setSuccess(true);
-          toast.success("User deleted successfully");
+          toast.success("User deactivated successfully");
   
             fetchTeachers()
       
             fetchStaff();
         } else {
-          toast.error("Failed to delete User");
-          setError("Failed to delete User");
+          toast.error("Failed to deactivated User");
+          setError("Failed to deactivated User");
         }
       } catch (err) {
         const errorMessage =
-          err.response?.data?.message || "Error deleting User";
+          err.response?.data?.message || "Error deactivated User";
         toast.error(errorMessage);
         setError(errorMessage);
       } finally {

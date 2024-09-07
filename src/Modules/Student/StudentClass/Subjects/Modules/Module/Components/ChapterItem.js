@@ -5,7 +5,7 @@ import { RiListCheck3, RiFileUnknowLine } from "react-icons/ri";
 import { GoDiscussionClosed } from "react-icons/go";
 import { FiFileText } from "react-icons/fi";
 import { NavLink, useParams } from "react-router-dom";
-import { ReactComponent as Logo } from '../../../../../../../../src/Assets/StudentAssets/logo.svg';
+import { ReactComponent as Logo } from "../../../../../../../../src/Assets/StudentAssets/logo.svg";
 
 const getIcon = (type) => {
   switch (type) {
@@ -39,10 +39,7 @@ const ChapterItem = ({ type, title, id, isPublished }) => {
   }
 
   return (
-    <NavLink
-      to={url}
-      className="flex items-center mb-3 gap-3 rounded-lg"
-    >
+    <NavLink to={url} className="flex items-center mb-3 gap-3 rounded-lg">
       <div className="p-2 bg-white rounded-full">{getIcon(type)}</div>
       <div className="flex flex-col gap-1 justify-center flex-grow">
         <p className="font-semibold">{title}</p>
@@ -56,7 +53,6 @@ const ChapterItem = ({ type, title, id, isPublished }) => {
         ) : (
           <MdOutlineBlock className="text-gray-600" />
         )}
-        <FaEllipsisV className="text-green-500" />
       </div>
     </NavLink>
   );

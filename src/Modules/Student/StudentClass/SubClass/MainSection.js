@@ -71,29 +71,9 @@ const MainSection = () => {
 
   if (error) {
     return (
-      // <div className="flex flex-col items-center justify-center h-screen">
-      //   <h1 className="text-3xl text-red-500">{error}</h1>
-      // </div>
-
       <div className="flex flex-col items-center justify-center h-screen ">
-      <div className="flex flex-col items-center bg-white shadow-lg p-10 rounded-lg">
-        <FaExclamationTriangle className="text-red-500 text-6xl mb-4" />
-        {/* <h1 className="text-2xl font-semibold text-red-600 mb-2">
-          Oops! Something Went Wrong
-        </h1> */}
-        <p className="text-lg text-gray-700 text-center">
-          {error}
-        </p>
-        <button
-          onClick={() => window.location.reload()}
-          className="mt-6 bg-red-500 text-white px-6 py-2 rounded-full hover:bg-red-600 transition duration-300"
-        >
-          Try Again
-        </button>
+        <NoDataFound  />
       </div>
-    </div>
-
-
     );
   }
 

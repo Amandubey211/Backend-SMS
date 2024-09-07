@@ -8,7 +8,7 @@ import absentIcon from '../../../Assets/ParentAssets/svg/absent.svg';
 import leaveIcon from '../../../Assets/ParentAssets/svg/leave.png';
 import { FaExclamationTriangle } from 'react-icons/fa'; // Importing an icon for error display
 import './ChildrenAttendance.css';
-
+import useNavHeading from "../../../Hooks/CommonHooks/useNavHeading .js";
 const Calendar = () => {
   const [attendanceData, setAttendanceData] = useState([]);
   const [month, setMonth] = useState(new Date().getMonth() + 1);
@@ -58,6 +58,7 @@ const Calendar = () => {
     setYear(value.year());
     setLoading(true);
   };
+  useNavHeading("My Childs", "Attendance");
 
   return (
     <div className="calendar-container">

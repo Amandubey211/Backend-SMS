@@ -1,55 +1,36 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import SubjectSideBar from "../../../Component/SubjectSideBar";
-import List from "../Component/List";
 import FilterCard from "../../../Component/FilterCard";
 import { RiFileUnknowLine } from "react-icons/ri";
-import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import useFetchQuizzes from "../../../../../../../Hooks/AuthHooks/Student/Quiz/useFetchQuizzes";
-import { FaEllipsisV, FaExclamationTriangle } from "react-icons/fa";
-import Spinner from "../../../../../../../Components/Common/Spinner";
+import List from "../../../Component/List";
 
-const MainSection = () => {
-  const { cid, sid } = useParams();
+const QuizMainSection = () => {
   const { selectedClass, selectedSubject } = useSelector(
     (state) => state.Common
   );
 
-  const [filters, setFilters] = useState({
-    moduleId: "",
-    chapterId: "",
-  });
-
-  // Use the custom hook for fetching quizzes with filters
+  const [filters, setFilters] = useState({ moduleId: "", chapterId: "" });
   const { quizzes, loading, error, fetchFilteredQuizzes } = useFetchQuizzes(
     selectedClass,
     selectedSubject
   );
 
+  // Refetch quizzes based on updated filters
   const refetchQuizzes = useCallback(() => {
-    const { moduleId, chapterId } = filters;
-    fetchFilteredQuizzes(selectedClass, selectedSubject, moduleId, chapterId);
-  }, [filters, selectedClass, selectedSubject, fetchFilteredQuizzes]);
+    fetchFilteredQuizzes(filters.moduleId, filters.chapterId);
+  }, [filters, fetchFilteredQuizzes]);
 
   useEffect(() => {
     refetchQuizzes();
   }, [refetchQuizzes]);
 
-  // if (loading) {
-  //   return (
-  //     <Spinner/>
-  //   )
-  // }
-
-  // if (error) {
-  //   return (
-
-  //     <div className="flex flex-col items-center justify-center py-10 text-gray-500">
-  //       <FaExclamationTriangle className="w-12 h-12 mb-3" />
-  //       <p className="text-lg font-semibold">No data found</p>
-  //     </div>
-  //   )
-  // }
+  const getItemName = (item) => item.name;
+  const getItemDetails = (item) =>
+    `Total Points: ${item.totalPoints} | Type: ${item.quizType}`;
+  const navLinkPath = (cid, sid, item) =>
+    `/student_class/${cid}/${sid}/quizzes/${item._id}/view`;
 
   return (
     <div className="flex">
@@ -57,11 +38,14 @@ const MainSection = () => {
       <div className="w-[65%] border-l">
         <List
           type="Quiz"
-          title="All Quizes"
+          title="All Quizzes"
           data={quizzes}
           icon={<RiFileUnknowLine />}
           loading={loading}
           error={error}
+          getItemName={getItemName}
+          getItemDetails={getItemDetails}
+          navLinkPath={navLinkPath}
         />
       </div>
       <div className="w-[30%] p-2">
@@ -71,4 +55,4 @@ const MainSection = () => {
   );
 };
 
-export default MainSection;
+export default QuizMainSection;

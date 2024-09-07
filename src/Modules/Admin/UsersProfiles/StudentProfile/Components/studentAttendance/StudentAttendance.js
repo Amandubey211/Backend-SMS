@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import AttendanceSummary from  '../../../../../Student/Attendance/AttendanceSummary';
-import CalendarHeader from '../../../../../Student/Attendance/Calender';
+import AttendanceSummary from  '../../../../../Student/StudentClass/SubClass/Components/Attendance/AttendanceSummary';
+import CalendarHeader from '../../../../../Student/StudentClass/SubClass/Components/Attendance/Calender';
 import axios from 'axios';
 import moment from 'moment';
 import { baseUrl } from '../../../../../../config/Common';

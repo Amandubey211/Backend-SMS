@@ -40,7 +40,7 @@ const StudentGradeModal = ({ isOpen, onClose }) => {
     console.log('--',studentGrade);
     
     if(isOpen){
-      fetchStudentGrades(studentGrade.studentId, filters.module, filters.chapter, filters.arrangeBy);
+      fetchStudentGrades(studentGrade.studentId||studentGrade._id, filters.module, filters.chapter, filters.arrangeBy);
     }
    
   }, [studentGrade, fetchStudentGrades, filters]);
@@ -91,6 +91,7 @@ const StudentGradeModal = ({ isOpen, onClose }) => {
                 </div>
               </div>
               <StudentGradeSummary studentGrade={grades} />
+              
             </div>
           </div>
         </div></>}

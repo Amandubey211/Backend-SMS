@@ -69,7 +69,7 @@ const AddEvent = ({ onSave }) => {
           imagePreview: null,
         });
 
-        onSave(eventData, result); // Pass eventData to onSave to notify parent component
+        // onSave(eventData, result); // Pass eventData to onSave to notify parent component
       } else {
         toast.error("Failed to create event.");
       }
