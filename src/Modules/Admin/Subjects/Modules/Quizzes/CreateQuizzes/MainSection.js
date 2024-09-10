@@ -97,7 +97,7 @@ const MainSection = ({ setIsEditing }) => {
         quizType: quiz.quizType || "",
         submissionFormat: quiz.submissionFormat || "",
         allowedAttempts: quiz?.allowedAttempts,
-        allowNumberOfAttempts: quiz.allowNumberOfAttempts || 1,
+        allowNumberOfAttempts: quiz?.allowNumberOfAttempts,
         assignTo: quiz.assignTo || "",
         showOneQuestionOnly: quiz.showOneQuestionOnly || false,
         questionType: quiz.questionType || "",
