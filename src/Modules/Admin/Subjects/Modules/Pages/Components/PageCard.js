@@ -6,6 +6,8 @@ import {
 } from "react-icons/io5";
 import { CiUser } from "react-icons/ci";
 import { NavLink, useParams } from "react-router-dom";
+import { SiBookstack } from "react-icons/si";
+
 import useDeletePage from "../../../../../../Hooks/AuthHooks/Staff/Admin/Page/useDeletePage"; // Adjust the import path as needed
 import DeleteModal from "../../../../../../Components/Common/DeleteModal";
 import Spinner from "../../../../../../Components/Common/Spinner";
@@ -48,7 +50,7 @@ const PageCard = ({
     <div className="relative max-w-xs bg-white rounded-lg border flex flex-col justify-between transition-shadow duration-300 hover:shadow-lg group">
       <NavLink to={`/class/${cid}/${sid}/page/${id}/view`}>
         <div className="flex justify-center p-3">
-          <IoBookOutline className="text-green-500 h-24 w-24" />
+          <SiBookstack className="text-green-500 h-20 w-20" />
         </div>
         <div className="text-center mb-4 mt-2">
           <h2 className="font-semibold">{title}</h2>
