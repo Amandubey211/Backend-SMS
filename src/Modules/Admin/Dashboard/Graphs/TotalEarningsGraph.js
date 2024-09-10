@@ -66,12 +66,15 @@ const TotalEarningsGraph = () => {
   if (loading) {
     return <Spinner />;
   }
+  if (error || !earningsData) {
+    return "No Data";
+  }
 
   if (
     error ||
     !earningsData ||
-    (earningsData.earningsData.length === 0 &&
-      earningsData.expensesData.length === 0)
+    (earningsData?.earningsData?.length === 0 &&
+      earningsData?.expensesData?.length === 0)
   ) {
     return (
       <div className="p-4 bg-white">
@@ -103,7 +106,9 @@ const TotalEarningsGraph = () => {
             <div className="flex items-center">
               <div className="text-gray-700">Total Collections</div>
               <div className="ml-2 font-bold mr-1">
-                {earningsData ? earningsData.totalEarnings.toLocaleString() : 0}
+                {earningsData
+                  ? earningsData?.totalEarnings?.toLocaleString()
+                  : 0}
               </div>
               <div className="text-gray-700">QR</div>
             </div>
@@ -116,7 +121,7 @@ const TotalEarningsGraph = () => {
             <div className="flex items-center">
               <div className="text-gray-700">Total Expenses</div>
               <div className="ml-2 font-bold mr-1">
-                {earningsData ? earningsData.totalExpenses.toLocaleString() : 0}
+                {earningsData ? earningsData.totalExpenses?.toLocaleString() : 0}
               </div>
               <div className="text-gray-700">QR</div>
             </div>
@@ -134,11 +139,11 @@ const TotalEarningsGraph = () => {
   } = earningsData;
 
   const data = {
-    labels: earnings.map((item) => `${item.day}`),
+    labels: earnings?.map((item) => `${item.day}`),
     datasets: [
       {
         label: "Total Collections",
-        data: earnings.map((item) => item.amount),
+        data: earnings?.map((item) => item.amount),
         borderColor: "#7C3AED",
         borderWidth: 3,
         fill: true,
@@ -162,7 +167,7 @@ const TotalEarningsGraph = () => {
       },
       {
         label: "Total Expenses",
-        data: expenses.map((item) => item.amount),
+        data: expenses?.map((item) => item.amount),
         borderColor: "#EA580C",
         borderWidth: 3,
         fill: false,
@@ -186,13 +191,13 @@ const TotalEarningsGraph = () => {
             setTooltipData(null);
             return;
           }
-          const value = tooltipModel.dataPoints[0].raw.toLocaleString();
-          const day = tooltipModel.dataPoints[0].dataIndex + 1;
+          const value = tooltipModel?.dataPoints[0].raw?.toLocaleString();
+          const day = tooltipModel?.dataPoints[0]?.dataIndex + 1;
           const date = new Date();
           date.setDate(day);
           const formattedDate = `${day}${getOrdinalSuffix(
             day
-          )} ${date.toLocaleString("default", { month: "long" })}`;
+          )} ${date?.toLocaleString("default", { month: "long" })}`;
           setTooltipData({
             value,
             formattedDate,
@@ -210,7 +215,7 @@ const TotalEarningsGraph = () => {
         beginAtZero: true,
         ticks: {
           callback: function (value) {
-            return value.toLocaleString() + " QR";
+            return value?.toLocaleString() + " QR";
           },
         },
         grid: {
@@ -275,7 +280,7 @@ const TotalEarningsGraph = () => {
           <div className="flex items-center">
             <div className="text-gray-700">Total Collections</div>
             <div className="ml-2 font-bold mr-1">
-              {totalEarnings.toLocaleString()}
+              {totalEarnings?.toLocaleString()}
             </div>
             <div className="text-gray-700">QR</div>
           </div>
@@ -288,7 +293,7 @@ const TotalEarningsGraph = () => {
           <div className="flex items-center">
             <div className="text-gray-700">Total Expenses</div>
             <div className="ml-2 font-bold mr-1">
-              {totalExpenses.toLocaleString()}
+              {totalExpenses?.toLocaleString()}
             </div>
             <div className="text-gray-700">QR</div>
           </div>
