@@ -6,6 +6,7 @@ const AuthSlice = createSlice({
     isLoggedIn: false,
     step: 1,
     role: null,
+    // isAcademicYearActive:null,
     userDetail: {},
   },
   reducers: {
@@ -15,6 +16,9 @@ const AuthSlice = createSlice({
     setStep: (state, action) => {
       state.step = action.payload;
     },
+    // setAcademicYear: (state, action) => {
+    //   state.isAcademicYearActive = action.payload;
+    // },
     setRole: (state, action) => {
       state.role = action.payload;
     },

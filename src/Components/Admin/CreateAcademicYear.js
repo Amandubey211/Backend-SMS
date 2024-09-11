@@ -9,7 +9,7 @@ const CreateAcademicYear = () => {
     year: "",
     startDate: "",
     endDate: "",
-    isActive: false,
+    isActive: true,
   });
   const { loading, createYear } = useCreateAcademicYear();
   const navigate = useNavigate();

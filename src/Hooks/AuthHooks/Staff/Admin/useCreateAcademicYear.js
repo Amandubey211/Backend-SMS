@@ -25,6 +25,8 @@ const useCreateAcademicYear = () => {
 
       if (data.success) {
         toast.success("Academic Year created successfully");
+        // localStorage.removeItem(`isAcademicYearActive`);
+        localStorage.setItem(`isAcademicYearActive`, true);
         navigate("/dashboard");
       } else {
         toast.error(data.message || "Failed to create Academic Year");
