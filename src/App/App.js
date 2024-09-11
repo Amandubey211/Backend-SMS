@@ -25,6 +25,7 @@ import ParentEvent from "../Modules/Parents/ParentEvent/ParentEvent";
 import QIDLogin from "../Modules/LoginPages/Student/Login/QIDLogin.js";
 import ParentProfile from "../Components/Parents/ParentProfile.js";
 import StaffMyProfile from "../Components/Common/StaffMyProfile.js";
+// import CreateAcademicYear from "../Components/Admin/CreateAcademicYear.js";
 
 // lazy loaded routes
 const CreateAcademicYear = lazy(() =>
@@ -318,6 +319,14 @@ function App() {
       element: <ForgetPassword />,
       errorElement: <Error />,
     },
+    {
+      path: "/create_academicYear",
+      element: (
+        <ProtectRoute Component={CreateAcademicYear} allowedRoles={["admin"]} />
+      ),
+      errorElement: <Error />,
+    },
+
     //Admin--------------------------------------------------------------------------
     {
       path: "/dashboard",
@@ -326,6 +335,13 @@ function App() {
       ),
       errorElement: <Error />,
     },
+    // {
+    //   path: "/create_academicYear",
+    //   element: (
+    //     <ProtectRoute Component={CreateAcademicYear} allowedRoles={["admin"]} />
+    //   ),
+    //   errorElement: <Error />,
+    // },
     {
       path: "/class",
       element: (
@@ -383,13 +399,6 @@ function App() {
       errorElement: <Error />,
     },
 
-    {
-      path: "/create_academicYear",
-      element: (
-        <ProtectRoute Component={CreateAcademicYear} allowedRoles={["admin"]} />
-      ),
-      errorElement: <Error />,
-    },
     {
       path: "/class/:cid/students",
       element: (

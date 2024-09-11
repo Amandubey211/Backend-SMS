@@ -1,15 +1,40 @@
 import React from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { Navigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { Navigate, useLocation } from "react-router-dom";
 
 const ProtectRoute = ({ Component, allowedRoles }) => {
   const isSignedIn = useSelector((store) => store.Auth.isLoggedIn);
   const userRole = useSelector((store) => store.Auth.role);
+  const isAcademicYearActive = JSON.parse(
+    localStorage.getItem("isAcademicYearActive")
+  );
+  const location = useLocation();
 
+  // If user is not signed in or role is not allowed, redirect to login page
   if (!isSignedIn || (allowedRoles && !allowedRoles.includes(userRole))) {
-    return <Navigate to="/" />;
+    return <Navigate to="/" replace />;
   }
 
+  // If the user is admin and trying to access the academic year creation page
+  // but the academic year is already active, redirect to dashboard
+  if (
+    userRole === "admin" &&
+    isAcademicYearActive === true &&
+    location.pathname === "/create_academicYear"
+  ) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  // If academic year is not active and user is trying to access other pages, redirect to create academic year
+  if (
+    userRole === "admin" &&
+    isAcademicYearActive === false &&
+    location.pathname !== "/create_academicYear"
+  ) {
+    return <Navigate to="/create_academicYear" replace />;
+  }
+
+  // Otherwise, render the protected component
   return <Component />;
 };
 

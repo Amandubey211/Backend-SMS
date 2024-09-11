@@ -77,6 +77,10 @@ const useStaffLogin = () => {
         if (data.role === "admin" && data.isAcademicYearActive === false) {
           // Redirect to create academic year page
           toast.success("Please create an academic year");
+          localStorage.setItem(
+            `isAcademicYearActive`,
+            data.isAcademicYearActive
+          );
           navigate("/create_academicYear");
         } else {
           // Redirect to dashboard
