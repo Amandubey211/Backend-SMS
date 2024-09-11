@@ -27,6 +27,9 @@ import ParentProfile from "../Components/Parents/ParentProfile.js";
 import StaffMyProfile from "../Components/Common/StaffMyProfile.js";
 
 // lazy loaded routes
+const CreateAcademicYear = lazy(() =>
+  import("../Components/Admin/CreateAcademicYear.js")
+);
 const StudentProfile = lazy(() =>
   import("../Modules/Student/profile/StudentProfile.js")
 );
@@ -376,6 +379,14 @@ function App() {
           Component={Group_Section}
           allowedRoles={["admin", "teacher"]}
         />
+      ),
+      errorElement: <Error />,
+    },
+
+    {
+      path: "/create_academicYear",
+      element: (
+        <ProtectRoute Component={CreateAcademicYear} allowedRoles={["admin"]} />
       ),
       errorElement: <Error />,
     },
