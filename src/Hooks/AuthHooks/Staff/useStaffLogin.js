@@ -11,13 +11,12 @@ import { requestPermissionAndGetToken } from "../../NotificationHooks/Notificati
 import axios from "axios";
 import { baseUrl } from "../../../config/Common.js";
 import { setLeftHeading } from "../../../Redux/Slices/Common/CommonSlice.js";
-// import useCreateSalary from "../../CommonHooks/useCreateSalary.js";
 
 const useStaffLogin = () => {
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  // const { createSalary } = useCreateSalary();
+
   const validateEmail = (email) => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return re.test(String(email).toLowerCase());
@@ -45,7 +44,6 @@ const useStaffLogin = () => {
 
     try {
       const deviceToken = await requestPermissionAndGetToken();
-      console.log(deviceToken);
       const userdetail = { email, password, deviceToken };
       const { data } = await axios.post(
         `${baseUrl}/auth/staff/login`,
@@ -53,17 +51,20 @@ const useStaffLogin = () => {
       );
 
       if (data.success) {
+        // Store token based on user role
         localStorage.setItem(`${data.role}:token`, `Bearer ${data.token}`);
         localStorage.removeItem(process.env.REACT_APP_PARENT_TOKEN_STORAGE_KEY);
         localStorage.removeItem(
           process.env.REACT_APP_STUDENT_TOKEN_STORAGE_KEY
         );
 
+        // Set redux state for authentication and role
         dispatch(setAuth(true));
         dispatch(setRole(data.role));
 
         dispatch(setLeftHeading(data.role));
         console.log(data);
+
         const user = {
           schoolId: data?.schoolId,
           userId: data?.userId,
@@ -71,11 +72,20 @@ const useStaffLogin = () => {
           fullName: data?.fullName,
         };
         dispatch(setUerDetails(user));
-        navigate(`/dashboard`);
+
+        // Check if the user is an admin and if the academic year is active
+        if (data.role === "admin" && data.isAcademicYearActive === false) {
+          // Redirect to create academic year page
+          toast.success("Please create an academic year");
+          navigate("/create_academicYear");
+        } else {
+          // Redirect to dashboard
+          navigate("/dashboard");
+        }
+
         toast.success("Logged in successfully", {
           position: "bottom-left",
         });
-        // createSalary('unpaid','pay now')
       } else {
         toast.error(data.message || "Login failed. Please try again.");
       }
