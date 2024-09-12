@@ -1,0 +1,59 @@
+{
+    "AdminPanel": {
+        "menuHeading": "Menu",
+        "dashboard": "Dashboard",
+        "classes": "Classes",
+        "users": "Users",
+        "usersSubList": {
+            "student": "Student",
+            "parent": "Parent",
+            "teacher": "Teacher",
+            "accountant": "Accountant",
+            "librarian": "Librarian",
+            "staff": "Staff"
+        },
+        "accounting": "Accounting",
+        "accountingSubList": {
+            "earning": "Earning",
+            "studentFees": "Student Fees",
+            "expenses": "Expenses"
+        },
+        "noticeBoard": "NoticeBoard",
+        "noticeBoardSubList": {
+            "announcements": "Announcements",
+            "events": "Events"
+        },
+        "admissions": "Admissions",
+        "library": "Library",
+        "verification": "Verification",
+        "adminSection": {
+            "adminName": "Admin",
+            "adminRole": "Admin Role"
+        },
+        "logoutPrompt": {
+            "confirmLogoutHeading": "Confirm Logout",
+            "confirmLogoutBody": "Are you sure you want to logout?",
+            "logoutButton": "Logout",
+            "cancelButton": "Cancel"
+        }
+    },
+    "parentPanel": {
+        "menuHeading": "Menu",
+        "dashboard": "Dashboard",
+        "myChilds": "My Childs",
+        "finance": "Finance",
+        "library": "Library",
+        "noticeBoard": "Notice Board",
+        "events": "Events",
+        "parentSection": {
+            "parentName": "Parent Name",
+            "parentRole": "Parent"
+        },
+        "logoutPrompt": {
+            "confirmLogoutHeading": "Confirm Logout",
+            "confirmLogoutBody": "Are you sure you want to logout?",
+            "logoutButton": "Logout",
+            "cancelButton": "Cancel"
+        }
+    }
+}
