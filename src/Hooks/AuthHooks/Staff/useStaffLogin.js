@@ -2,6 +2,7 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import {
+  setAcademicYear,
   setAuth,
   setRole,
   setUerDetails,
@@ -11,6 +12,26 @@ import { requestPermissionAndGetToken } from "../../NotificationHooks/Notificati
 import axios from "axios";
 import { baseUrl } from "../../../config/Common.js";
 import { setLeftHeading } from "../../../Redux/Slices/Common/CommonSlice.js";
+
+// Helper function to format the date
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = date.getFullYear();
+  return `${day}-${month}-${year}`;
+};
+
+// Helper function to format the academic year
+const formatAcademicYear = (academicYear, startDate, endDate) => {
+  const formattedStartDate = formatDate(startDate);
+  const formattedEndDate = formatDate(endDate);
+  return {
+    academicYear,
+    startDate: formattedStartDate,
+    endDate: formattedEndDate,
+  };
+};
 
 const useStaffLogin = () => {
   const [loading, setLoading] = useState(false);
@@ -83,7 +104,22 @@ const useStaffLogin = () => {
           );
           navigate("/create_academicYear");
         } else {
-          // Redirect to dashboard
+          // Format the academic year details
+          const formattedAcademicYear = formatAcademicYear(
+            data.academicYear.year,
+            data.academicYear.startDate,
+            data.academicYear.endDate
+          );
+          console.log("Formatted Academic Year:", formattedAcademicYear);
+
+          // Store the formatted academic year in Redux
+          dispatch(
+            setAcademicYear({
+              ...formattedAcademicYear, // Store the formatted string
+              isActive: data.isAcademicYearActive,
+            })
+          );
+
           navigate("/dashboard");
         }
 
