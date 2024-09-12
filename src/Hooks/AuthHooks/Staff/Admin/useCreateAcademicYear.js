@@ -3,13 +3,15 @@ import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { baseUrl } from "../../../..//config/Common";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { setAcademicYear } from "../../../../Redux/Slices/Auth/AuthSlice";
 
 const useCreateAcademicYear = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const role = useSelector((store) => store.Auth.role);
   const token = localStorage.getItem(`${role}:token`);
+  const dispatch = useDispatch();
   const createYear = async (yearData) => {
     try {
       setLoading(true);
@@ -27,7 +29,12 @@ const useCreateAcademicYear = () => {
         toast.success("Academic Year created successfully");
         // localStorage.removeItem(`isAcademicYearActive`);
         localStorage.setItem(`isAcademicYearActive`, true);
+
         navigate("/dashboard");
+
+        if (yearData.isActive) {
+          dispatch(setAcademicYear(yearData));
+        }
       } else {
         toast.error(data.message || "Failed to create Academic Year");
       }

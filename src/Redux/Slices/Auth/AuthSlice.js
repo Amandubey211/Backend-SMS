@@ -6,6 +6,7 @@ const AuthSlice = createSlice({
     isLoggedIn: false,
     step: 1,
     role: null,
+    AcademicYear: {},
     // isAcademicYearActive:null,
     userDetail: {},
   },
@@ -16,9 +17,9 @@ const AuthSlice = createSlice({
     setStep: (state, action) => {
       state.step = action.payload;
     },
-    // setAcademicYear: (state, action) => {
-    //   state.isAcademicYearActive = action.payload;
-    // },
+    setAcademicYear: (state, action) => {
+      state.AcademicYear = action.payload;
+    },
     setRole: (state, action) => {
       state.role = action.payload;
     },
@@ -28,6 +29,7 @@ const AuthSlice = createSlice({
   },
 });
 
-export const { setAuth, setRole, setStep, setUerDetails } = AuthSlice.actions;
+export const { setAuth, setRole, setStep, setUerDetails, setAcademicYear } =
+  AuthSlice.actions;
 
 export default AuthSlice.reducer;
