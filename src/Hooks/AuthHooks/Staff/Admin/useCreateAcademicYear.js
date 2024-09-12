@@ -33,7 +33,7 @@ const useCreateAcademicYear = () => {
         navigate("/dashboard");
 
         if (yearData.isActive) {
-          dispatch(setAcademicYear(yearData));
+          dispatch(setAcademicYear([yearData]));
         }
       } else {
         toast.error(data.message || "Failed to create Academic Year");

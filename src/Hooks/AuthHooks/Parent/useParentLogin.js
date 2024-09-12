@@ -44,12 +44,14 @@ const useParentLogin = () => {
 
       if (data.success) {
         const token = `Bearer ${data.token}`;
-        
+
         // Save the entire response in localStorage
-        localStorage.setItem('userData', JSON.stringify(data));
+        localStorage.setItem("userData", JSON.stringify(data));
         localStorage.setItem(`${data.role}:token`, token);
         localStorage.removeItem(process.env.REACT_APP_STAFF_TOKEN_STORAGE_KEY);
-        localStorage.removeItem(process.env.REACT_APP_STUDENT_TOKEN_STORAGE_KEY);
+        localStorage.removeItem(
+          process.env.REACT_APP_STUDENT_TOKEN_STORAGE_KEY
+        );
 
         dispatch(setAuth(true));
         dispatch(setRole(data.role)); // dynamic role from backend

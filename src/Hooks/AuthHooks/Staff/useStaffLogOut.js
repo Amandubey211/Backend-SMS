@@ -4,7 +4,7 @@ import {
   setAcademicYear,
   setAuth,
   setRole,
-  setUerDetails,
+  setUserDetails,
 } from "../../../Redux/Slices/Auth/AuthSlice.js";
 import toast from "react-hot-toast";
 import {
@@ -31,7 +31,7 @@ const useStaffLogout = () => {
     dispatch(setAuth(false));
     dispatch(setRole(null));
     dispatch(setAcademicYear({}));
-    dispatch(setUerDetails(null));
+    dispatch(setUserDetails(null));
     dispatch(setSelectedClass(null));
     dispatch(setSelectedSubject(null));
     dispatch(setSelectedModule(null));

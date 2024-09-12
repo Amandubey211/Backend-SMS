@@ -17,12 +17,14 @@ const Navbar = () => {
   const [showSetting, setShowSetting] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
+
   const leftHeading = useSelector(
     (store) => store.Common.NavbarData.leftHeading
   );
   const role = useSelector((store) => store.Auth.role);
-  const AcademicYear = useSelector(
-    (store) => store.Auth.AcademicYear.academicYear
+  const activeAcademicYear = useSelector(
+    (store) =>
+      store.Auth?.AcademicYear?.find((year) => year?.isActive)?.academicYear
   );
 
   const { staffLogout } = useStaffLogout();
@@ -95,8 +97,8 @@ const Navbar = () => {
 
         <div className="flex items-center space-x-2 ml-3 pl-3 relative">
           {role === "admin" || role === "teacher" || role === "accountant" ? (
-            <div className="border-r px-4 font-semibold text-gradient ">
-              {AcademicYear}
+            <div className="border-r px-4 font-semibold text-gradient">
+              {activeAcademicYear && activeAcademicYear}
             </div>
           ) : null}
 

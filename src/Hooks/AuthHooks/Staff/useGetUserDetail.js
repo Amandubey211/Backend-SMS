@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   setAuth,
   setRole,
-  setUerDetails,
+  setUserDetails,
 } from "../../../Redux/Slices/Auth/AuthSlice.js";
 import axios from "axios";
 import { baseUrl } from "../../../config/Common.js";
@@ -26,7 +26,7 @@ const useGetUserDetail = () => {
         dispatch(setAuth(true));
         dispatch(setRole(data.user.role));
 
-        dispatch(setUerDetails(data.user));
+        dispatch(setUserDetails(data.user));
       } else {
         toast.error("Something is wrong");
       }

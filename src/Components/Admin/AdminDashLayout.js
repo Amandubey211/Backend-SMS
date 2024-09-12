@@ -13,7 +13,7 @@ const DashLayout = ({
   const sidebarWidth = isSidebarOpen ? "15%" : "7%"; // Adjust the width based on sidebar state
 
   return (
-    <div className="flex w-full min-h-screen overflow-x-hidden">
+    <div className="flex w-full min-h-screen overflow-x-hidden  ">
       <SideMenubar />
       <div
         className={`transition-all duration-500 flex-1 h-full ml-${sidebarWidth}`}
@@ -26,7 +26,7 @@ const DashLayout = ({
           hideAvatarList={hideAvatarList}
           hideStudentView={hideStudentView}
         />
-        <main className="w-full min-h-screen h-screen overflow-y-scroll ">
+        <main className="w-full min-h-screen h-screen overflow-y-scroll no-scrollbar ">
           {children}
         </main>
       </div>
