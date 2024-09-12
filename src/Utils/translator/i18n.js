@@ -1,39 +1,22 @@
 // src/i18n.js
 import i18n from "i18next";
-import { initReactI18next, useTranslation } from "react-i18next";
+import { initReactI18next } from "react-i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
-
-// Language resources
-const resources = {
-  en: {
-    translation: {
-      welcome: "Welcome",
-      profile: "Profile",
-      logout: "Logout",
-    },
-  },
-  fr: {
-    translation: {
-      welcome: "Bienvenue",
-      profile: "Profil",
-      logout: "Se déconnecter",
-    },
-  },
-  hi: {
-    translation: {
-      welcome: "स्वागत है",
-      profile: "प्रोफ़ाइल",
-      logout: "लॉग आउट",
-    },
-  },
-};
+import HttpBackend from "i18next-http-backend"; // Load translations from files
 
 i18n
+  .use(HttpBackend) // Use the backend to load translations
   .use(LanguageDetector) // Automatically detect the user's language
   .use(initReactI18next) // Bind React with i18next
   .init({
-    resources,
+    backend: {
+      loadPath: (lng, ns) => {
+        return `/locales/${lng}/${ns}.json`;
+      }
+    },
     fallbackLng: "en", // Fallback language if detection fails
+    ns: ['language','setting'], // Specify your namespace
+    defaultNS: 'language', // Set default namespace
     detection: {
       // Language detection options
       order: [
@@ -46,6 +29,7 @@ i18n
         "subdomain",
       ],
       caches: ["localStorage", "cookie"], // Save detected language in cache
+ 
     },
     interpolation: {
       escapeValue: false, // React already escapes values
