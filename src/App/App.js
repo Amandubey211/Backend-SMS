@@ -25,7 +25,9 @@ import ParentEvent from "../Modules/Parents/ParentEvent/ParentEvent";
 import QIDLogin from "../Modules/LoginPages/Student/Login/QIDLogin.js";
 import ParentProfile from "../Components/Parents/ParentProfile.js";
 import StaffMyProfile from "../Components/Common/StaffMyProfile.js";
-
+import '../Utils/translator/i18n.js'
+import i18next from "i18next";
+import { useSelector } from "react-redux";
 // lazy loaded routes
 
 const Academic = lazy(() =>
@@ -995,6 +997,13 @@ function App() {
       errorElement: <Error />,
     },
   ]);
+
+
+  const selectedLanguage = useSelector((state) => state.Auth.selectedLanguage);
+   console.log("selectedLanguage is :", selectedLanguage)
+  useEffect(() => {
+    i18next.changeLanguage(selectedLanguage); // Set the initial language from Redux
+  }, [selectedLanguage]);
 
   return (
     <>
