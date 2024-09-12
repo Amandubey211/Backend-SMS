@@ -9,6 +9,7 @@ const AuthSlice = createSlice({
     AcademicYear: {},
     // isAcademicYearActive:null,
     userDetail: {},
+    selectedLanguage: "EN",
   },
   reducers: {
     setAuth: (state, action) => {
@@ -26,10 +27,19 @@ const AuthSlice = createSlice({
     setUerDetails: (state, action) => {
       state.userDetail = action.payload;
     },
+    setSelectedLanguage: (state, action) => {
+      state.selectedLanguage = action.payload;
+    },
   },
 });
 
-export const { setAuth, setRole, setStep, setUerDetails, setAcademicYear } =
-  AuthSlice.actions;
+export const {
+  setAuth,
+  setRole,
+  setStep,
+  setUerDetails,
+  setAcademicYear,
+  setSelectedLanguage,
+} = AuthSlice.actions;
 
 export default AuthSlice.reducer;
