@@ -1,0 +1,62 @@
+{
+    "adminPanel": {
+        "headers": {
+            "dashboardPage": "Admin",
+            "classes": "Classes",
+            "student": "Admin",
+            "parent": "Admin",
+            "teacher": "Admin",
+            "accountant": "Admin",
+            "librarian": "Admin",
+            "staff": "Admin",
+            "earning": "Admin",
+            "studentFees": "Accounting",
+            "expenses": "Admin",
+            "announcements": "Student Notice Board",
+            "events": "Admin",
+            "admissions": "Admin",
+            "library": "Admin",
+            "verification": "Admin",
+            "notifications": {
+                "icon": "bell",
+                "notificationCount": 0,
+                "recentNotifications": [],
+                "clearAllOption": true
+            },
+            "profileMenu": {
+                "profileOptions": [
+                    {
+                        "label": "Profile",
+                        "icon": "user",
+                        "action": "/profile"
+                    },
+                    {
+                        "label": "Language",
+                        "icon": "language",
+                        "currentLanguage": "English",
+                        "languages": [
+                            {
+                                "label": "English",
+                                "code": "en"
+                            },
+                            {
+                                "label": "Hindi",
+                                "code": "hi"
+                            }
+                        ]
+                    },
+                    {
+                        "label": "Timezone",
+                        "icon": "clock",
+                        "currentZone": "Asia/Calcutta"
+                    },
+                    {
+                        "label": "Logout",
+                        "icon": "logout",
+                        "action": "/logout"
+                    }
+                ]
+            }
+        }
+    }
+}

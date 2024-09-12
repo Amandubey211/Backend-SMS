@@ -1,18 +1,33 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { IoIosArrowForward, IoIosArrowBack, IoIosArrowDown } from "react-icons/io";
+import {
+  IoIosArrowForward,
+  IoIosArrowBack,
+  IoIosArrowDown,
+} from "react-icons/io";
 import { FaCalendarAlt } from "react-icons/fa";
 import useGetFilteredEvents from "../../../../Hooks/AuthHooks/Staff/Admin/Dashboard/useGetFilteredEvents";
 import Spinner from "../../../../Components/Common/Spinner";
 import EventItem from "./EventItem";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
 const monthNames = [
-  "JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE",
-  "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"
+  "JANUARY",
+  "FEBRUARY",
+  "MARCH",
+  "APRIL",
+  "MAY",
+  "JUNE",
+  "JULY",
+  "AUGUST",
+  "SEPTEMBER",
+  "OCTOBER",
+  "NOVEMBER",
+  "DECEMBER",
 ];
 
 const Events = () => {
-  const { error, events, fetchFilteredEvents, loading } = useGetFilteredEvents();
+  const { error, events, fetchFilteredEvents, loading } =
+    useGetFilteredEvents();
   const navigate = useNavigate();
 
   const currentMonth = new Date().getMonth() + 1; // Months are zero-indexed
@@ -21,7 +36,7 @@ const Events = () => {
   const [date, setDate] = useState({ month: currentMonth, year: currentYear });
 
   const fetchEvents = useCallback(() => {
-    fetchFilteredEvents(date.month, date.year);
+    fetchFilteredEvents?.(date.month, date.year);
   }, [date, fetchFilteredEvents]);
 
   useEffect(() => {
@@ -31,65 +46,71 @@ const Events = () => {
   const handleMonthChange = (e) => {
     setDate((prevDate) => ({
       ...prevDate,
-      month: parseInt(e.target.value)
+      month: parseInt(e?.target?.value) || prevDate.month,
     }));
   };
 
   const handleYearChange = (e) => {
     setDate((prevDate) => ({
       ...prevDate,
-      year: parseInt(e.target.value)
+      year: parseInt(e?.target?.value) || prevDate.year,
     }));
   };
 
   const handlePreviousMonth = () => {
     setDate((prevDate) => {
-      const newMonth = prevDate.month === 1 ? 12 : prevDate.month - 1;
-      const newYear = prevDate.month === 1 ? prevDate.year - 1 : prevDate.year;
+      const newMonth = prevDate?.month === 1 ? 12 : prevDate?.month - 1;
+      const newYear =
+        prevDate?.month === 1 ? prevDate?.year - 1 : prevDate?.year;
       return { month: newMonth, year: newYear };
     });
   };
 
   const handleNextMonth = () => {
     setDate((prevDate) => {
-      const newMonth = prevDate.month === 12 ? 1 : prevDate.month + 1;
-      const newYear = prevDate.month === 12 ? prevDate.year + 1 : prevDate.year;
+      const newMonth = prevDate?.month === 12 ? 1 : prevDate?.month + 1;
+      const newYear =
+        prevDate?.month === 12 ? prevDate?.year + 1 : prevDate?.year;
       return { month: newMonth, year: newYear };
     });
   };
 
   const handleViewAll = () => {
-    navigate("/noticeboard/events");
+    navigate?.("/noticeboard/events");
   };
 
   const handleUpdateEvent = (updatedEvent) => {
-    // Logic to update the event in the list
-    const updatedEvents = events.map(event =>
-      event.id === updatedEvent.id ? updatedEvent : event
+    const updatedEvents = events?.map((event) =>
+      event?.id === updatedEvent?.id ? updatedEvent : event
     );
-    // Assuming fetchFilteredEvents updates the events state
-    fetchFilteredEvents(updatedEvents);
+    fetchFilteredEvents?.(updatedEvents);
   };
 
-  const top5Events = events.slice(0, 5);
+  const top5Events = events?.slice?.(0, 5) || [];
 
   return (
     <div className="max-w-4xl mx-auto text-gray-600 bg-white p-4">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-medium">Event</h2>
         <div className="flex items-center gap-3">
-          <button className="p-1 border rounded-full" onClick={handlePreviousMonth}>
+          <button
+            className="p-1 border rounded-full"
+            onClick={handlePreviousMonth}
+          >
             <IoIosArrowBack />
           </button>
           <h3 className="text-lg font-medium">
-            {monthNames[date.month - 1]} {date.year}
+            {monthNames?.[date?.month - 1]} {date?.year}
           </h3>
           <button className="p-1 border rounded-full" onClick={handleNextMonth}>
             <IoIosArrowForward />
           </button>
         </div>
 
-        <button className="text-blue-500 hover:underline ml-2" onClick={handleViewAll}>
+        <button
+          className="text-blue-500 hover:underline ml-2"
+          onClick={handleViewAll}
+        >
           View All
         </button>
       </div>
@@ -105,14 +126,18 @@ const Events = () => {
           </div>
         ) : error ? (
           <p>Error: {error}</p>
-        ) : top5Events.length === 0 ? (
+        ) : top5Events?.length === 0 ? (
           <div className="flex flex-col items-center justify-center my-10">
             <FaCalendarAlt className="text-gray-400 text-6xl mb-4" />
             <p className="text-gray-500 text-xl">No events found</p>
           </div>
         ) : (
-          top5Events.map((event) => (
-            <EventItem key={event.id} event={event} onUpdate={handleUpdateEvent} />
+          top5Events?.map((event) => (
+            <EventItem
+              key={event?.id}
+              event={event}
+              onUpdate={handleUpdateEvent}
+            />
           ))
         )}
       </div>
