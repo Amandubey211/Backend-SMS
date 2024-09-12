@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import {
   setAuth,
   setRole,
-  setUerDetails,
+  setUserDetails,
 } from "../../../Redux/Slices/Auth/AuthSlice.js";
 import toast from "react-hot-toast";
 
@@ -16,7 +16,7 @@ const useStudentLogout = () => {
 
     dispatch(setAuth(false));
     dispatch(setRole(null));
-    dispatch(setUerDetails({}));
+    dispatch(setUserDetails({}));
     navigate("/studentlogin");
 
     toast.success("Logged out successfully", {

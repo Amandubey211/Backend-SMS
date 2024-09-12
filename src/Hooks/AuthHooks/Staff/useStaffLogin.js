@@ -5,7 +5,7 @@ import {
   setAcademicYear,
   setAuth,
   setRole,
-  setUerDetails,
+  setUserDetails,
 } from "../../../Redux/Slices/Auth/AuthSlice.js";
 import { useNavigate } from "react-router-dom";
 import { requestPermissionAndGetToken } from "../../NotificationHooks/NotificationHooks.js";
@@ -92,7 +92,7 @@ const useStaffLogin = () => {
           profile: data?.profile,
           fullName: data?.fullName,
         };
-        dispatch(setUerDetails(user));
+        dispatch(setUserDetails(user));
 
         // Check if the user is an admin and if the academic year is active
         if (data.role === "admin" && data.isAcademicYearActive === false) {
@@ -114,10 +114,12 @@ const useStaffLogin = () => {
 
           // Store the formatted academic year in Redux
           dispatch(
-            setAcademicYear({
-              ...formattedAcademicYear, // Store the formatted string
-              isActive: data.isAcademicYearActive,
-            })
+            setAcademicYear([
+              {
+                ...formattedAcademicYear, // Store the formatted string
+                isActive: data.isAcademicYearActive,
+              },
+            ])
           );
 
           navigate("/dashboard");
