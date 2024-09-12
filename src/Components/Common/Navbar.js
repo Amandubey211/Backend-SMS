@@ -1,31 +1,33 @@
 import React, { useState, useEffect } from "react";
 import { TbBell } from "react-icons/tb";
+import { IoSettingsOutline } from "react-icons/io5";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import IconButton from "./IconButton";
 import LeftHeading from "./LeftHeading";
-import SearchBar from "./SearchBar";
 import LogoutConfirmationModal from "./LogoutConfirmationModal";
 import useStaffLogout from "../../Hooks/AuthHooks/Staff/useStaffLogOut";
 import Sidebar from "./Sidebar";
 import NotificationBar from "./NotificationBar";
-import NotificationDropdown from "./NotificationDropdown";
-import { IoSettingsOutline } from "react-icons/io5";
+import SettingDropdown from "./SettingDropdown";
 
 const Navbar = () => {
   const [isOpenNotification, setIsOpenNotification] = useState(false);
   const [notificationCount, setNotificationCount] = useState(0);
   const [showSetting, setShowSetting] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const navigate = useNavigate();
   const leftHeading = useSelector(
     (store) => store.Common.NavbarData.leftHeading
   );
   const role = useSelector((store) => store.Auth.role);
+  const AcademicYear = useSelector(
+    (store) => store.Auth.AcademicYear.academicYear
+  );
+
   const { staffLogout } = useStaffLogout();
 
-  // Function to fetch notifications from IndexedDB
+  // Fetch notifications from IndexedDB
   const getNotificationsFromIndexedDB = () => {
     return new Promise((resolve, reject) => {
       const dbPromise = indexedDB.open("firebase-messaging-store", 1);
@@ -86,38 +88,60 @@ const Navbar = () => {
   };
 
   return (
-    <div className="sticky top-0 left-0 right-0 z-20 bg-white border-b shadow-sm ">
-      <div className="flex items-center p-2 py-3 bg-white ">
+    <div className="sticky top-0 left-0 right-0 z-20 bg-white border-b shadow-sm">
+      <div className="flex items-center p-2 py-2.5 bg-white">
+        {/* Left Heading */}
         <LeftHeading leftHeading={leftHeading} navigate={navigate} />
 
-        <div className="flex items-center space-x-2 border-l ml-3 pl-3 relative">
-          <IconButton
-            icon={TbBell}
-            label="Notifications"
-            onClick={() => setIsOpenNotification(true)}
-          />
-          <p className="absolute top-[-5px] right-0 bg-purple-500 rounded-full text-white w-[20px] h-[20px] flex justify-center items-center ">
-            {notificationCount || 0}
-          </p>
+        <div className="flex items-center space-x-2 ml-3 pl-3 relative">
+          {role === "admin" || role === "teacher" || role === "accountant" ? (
+            <div className="border-r px-4 font-semibold text-gradient ">
+              {AcademicYear}
+            </div>
+          ) : null}
+
+          {/* Notification Icon with Count */}
+          <div className="relative">
+            <IconButton
+              icon={TbBell}
+              label="Notifications"
+              onClick={() => setIsOpenNotification(true)}
+              className="hover:bg-gray-200 rounded-full transition-all duration-200"
+            />
+            {/* Notification Count */}
+            {notificationCount > 0 && (
+              <div className="absolute top-0 right-0 bg-purple-500 rounded-full text-white w-[20px] h-[20px] flex justify-center items-center text-sm">
+                {notificationCount}
+              </div>
+            )}
+          </div>
+
+          {/* Settings Icon */}
           <IconButton
             icon={IoSettingsOutline}
             label="Settings"
             onClick={() => setShowSetting(!showSetting)}
+            className="hover:bg-gray-200 rounded-full transition-all duration-200"
           />
-          <NotificationDropdown
+
+          {/* Dropdown for Settings */}
+          <SettingDropdown
             showSetting={showSetting}
             setShowSetting={setShowSetting}
             navigateProfile={navigateProfile}
             openModal={() => setIsModalOpen(true)}
-            timeZone={timeZone}
           />
         </div>
       </div>
+
+      {/* Logout Confirmation Modal */}
       <LogoutConfirmationModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onConfirm={logout}
       />
+
+      {/* Notification Sidebar */}
       <Sidebar
         isOpen={isOpenNotification}
         onClose={() => setIsOpenNotification(false)}

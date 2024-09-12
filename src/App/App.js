@@ -25,9 +25,12 @@ import ParentEvent from "../Modules/Parents/ParentEvent/ParentEvent";
 import QIDLogin from "../Modules/LoginPages/Student/Login/QIDLogin.js";
 import ParentProfile from "../Components/Parents/ParentProfile.js";
 import StaffMyProfile from "../Components/Common/StaffMyProfile.js";
-// import CreateAcademicYear from "../Components/Admin/CreateAcademicYear.js";
 
 // lazy loaded routes
+
+const Academic = lazy(() =>
+  import("../Modules/Admin/AcademicYear/Academic.js")
+);
 const CreateAcademicYear = lazy(() =>
   import("../Components/Admin/CreateAcademicYear.js")
 );
@@ -324,6 +327,12 @@ function App() {
       element: (
         <ProtectRoute Component={CreateAcademicYear} allowedRoles={["admin"]} />
       ),
+      errorElement: <Error />,
+    },
+
+    {
+      path: "/dashboard/academic",
+      element: <ProtectRoute Component={Academic} allowedRoles={["admin"]} />,
       errorElement: <Error />,
     },
 
