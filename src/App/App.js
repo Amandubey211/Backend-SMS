@@ -27,6 +27,13 @@ import ParentProfile from "../Components/Parents/ParentProfile.js";
 import StaffMyProfile from "../Components/Common/StaffMyProfile.js";
 
 // lazy loaded routes
+
+const Academic = lazy(() =>
+  import("../Modules/Admin/AcademicYear/Academic.js")
+);
+const CreateAcademicYear = lazy(() =>
+  import("../Components/Admin/CreateAcademicYear.js")
+);
 const StudentProfile = lazy(() =>
   import("../Modules/Student/profile/StudentProfile.js")
 );
@@ -315,6 +322,20 @@ function App() {
       element: <ForgetPassword />,
       errorElement: <Error />,
     },
+    {
+      path: "/create_academicYear",
+      element: (
+        <ProtectRoute Component={CreateAcademicYear} allowedRoles={["admin"]} />
+      ),
+      errorElement: <Error />,
+    },
+
+    {
+      path: "/dashboard/academic",
+      element: <ProtectRoute Component={Academic} allowedRoles={["admin"]} />,
+      errorElement: <Error />,
+    },
+
     //Admin--------------------------------------------------------------------------
     {
       path: "/dashboard",
@@ -323,6 +344,13 @@ function App() {
       ),
       errorElement: <Error />,
     },
+    // {
+    //   path: "/create_academicYear",
+    //   element: (
+    //     <ProtectRoute Component={CreateAcademicYear} allowedRoles={["admin"]} />
+    //   ),
+    //   errorElement: <Error />,
+    // },
     {
       path: "/class",
       element: (
@@ -379,6 +407,7 @@ function App() {
       ),
       errorElement: <Error />,
     },
+
     {
       path: "/class/:cid/students",
       element: (

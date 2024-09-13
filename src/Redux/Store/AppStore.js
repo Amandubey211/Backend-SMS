@@ -18,7 +18,7 @@ import parentsReducer from "../Slices/Admin/parentsSilce.js";
 const authPersistConfig = {
   key: "auth",
   storage,
-  whitelist: ["isLoggedIn", "role", "userDetail"], // Only persist these fields
+  whitelist: ["isLoggedIn", "role", "userDetail", "AcademicYear"], // Only persist these fields
 };
 
 const persistedAuthReducer = persistReducer(
