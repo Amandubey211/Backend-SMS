@@ -55,9 +55,9 @@ const AuthSlice = createSlice({
       .addCase(staffLogin.fulfilled, (state, action) => {
         state.loading = false;
         state.isLoggedIn = true;
-        state.role = action.payload.role;
-        state.token = action.payload.token;
-        state.AcademicYear = action.payload.academicYear;
+        // state.role = action.payload.role;
+        // state.token = action.payload.token;
+        // state.AcademicYear = action.payload.academicYear;
         localStorage.setItem("token", action.payload.token);
       })
       .addCase(staffLogin.rejected, (state, action) => {
@@ -114,8 +114,8 @@ const AuthSlice = createSlice({
       .addCase(parentLogin.fulfilled, (state, action) => {
         state.loading = false;
         state.isLoggedIn = true;
-        state.role = action.payload.role;
-        state.token = action.payload.token;
+        // state.role = action.payload.role;
+        // state.token = action.payload.token;
         localStorage.setItem("token", action.payload.token);
       })
       .addCase(parentLogin.rejected, (state, action) => {
@@ -131,6 +131,11 @@ const AuthSlice = createSlice({
   },
 });
 
-export const { setToken, setRole, setAcademicYear, resetState,setSelectedLanguage } =
-  AuthSlice.actions;
+export const {
+  setToken,
+  setRole,
+  setAcademicYear,
+  resetState,
+  setSelectedLanguage,
+} = AuthSlice.actions;
 export default AuthSlice.reducer;

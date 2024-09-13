@@ -32,7 +32,7 @@ export const staffLogin = createAsyncThunk(
         localStorage.removeItem(
           process.env.REACT_APP_STUDENT_TOKEN_STORAGE_KEY
         );
-        console.log(data,"ddddddddddddd")
+        console.log(data, "ddddddddddddd");
 
         // Dispatch user details to userSlice
         dispatch(
@@ -41,6 +41,8 @@ export const staffLogin = createAsyncThunk(
             userId: data?.userId,
             profile: data?.profile,
             fullName: data?.fullName,
+            email: data?.email,
+
             // studentId: data?.studentId, // Assuming studentId exists
           })
         );
