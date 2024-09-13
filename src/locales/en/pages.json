@@ -1,0 +1,946 @@
+{
+  "EntryPage": {
+    "welcome": "Welcome to the LMS!",
+    "chooseAccountType": "Choose an account type to proceed:",
+    "staffAccount": "Staff Account",
+    "staffDescription": "I'm an Instructor/School Admin/IT Specialist",
+    "studentAccount": "Student Account",
+    "studentDescription": "I'm a Student",
+    "parentAccount": "Parent Account",
+    "parentDescription": "I'm a Parent/Legal Guardian",
+    "lmsHomeButton": "LMS Home",
+    "studentLoginInfoCard(i)": [
+      "Information",
+      "If you have already applied, please wait for your login credentials. It may take 4-5 working days. For any queries, contact us at:",
+      "Phone: 123-456-7890"
+    ]
+  },
+  "AdminPanel": {
+    "dashboardPage": {
+      "cards": {
+        "studentCard": "Students",
+        "teacherCard": "Teacher",
+        "parentCard": "Parent",
+        "staffCard": "Staff"
+      },
+      "AttendanceSections": {
+        "heading": "Today's Attendance",
+        "totalFemaleAttendance": "Total Male Att. {{Count}}",
+        "totalMaleAttendance": "Total Male Att. {{Count}}",
+        "Months": [
+          "January",
+          "February",
+          "March",
+          "April",
+          "May",
+          "June",
+          "July",
+          "August",
+          "September",
+          "October",
+          "November",
+          "December"
+        ],
+        "Year": [
+          "Current Year",
+          "Previous Year"
+        ]
+      },
+      "EarningsSections": {
+        "heading": "Earnings",
+        "totalCollections": "Total Collections",
+        "totalExpenses": "Total Expenses",
+        "QR": "QR",
+        "months": [
+          "This Months",
+          "Last Month"
+        ]
+      },
+      "topRankingStudentsSection": {
+        "heading": "Top Ranking Students",
+        "No Data Found": "Not enough data to show a graph yet"
+      },
+      "totalStudentsSection": {
+        "heading": "Total Students",
+        "femaleStudents": "Female Students",
+        "maleStudents": "Male Students"
+      },
+      "bestPerformersSection": {
+        "heading": "Best Performers",
+        "filter": [
+          "Week",
+          "Month",
+          "Year"
+        ]
+      },
+      "librarySection": {
+        "heading": "Library"
+      },
+      "noticeBoardSection": {
+        "heading": "Notice Board"
+      },
+      "eventSection": {
+        "heading": "Events",
+        "filter": [
+          "JANUARY",
+          "FEBRUARY",
+          "MARCH",
+          "APRIL",
+          "MAY",
+          "JUNE",
+          "JULY",
+          "AUGUST",
+          "SEPTEMBER",
+          "OCTOBER",
+          "NOVEMBER",
+          "DECEMBER"
+        ],
+        "tableHeading": [
+          "Event Name",
+          "Event Type",
+          "Start Date"
+        ]
+      }
+    },
+    "classesPage": {
+      "header": {
+        "title": "Classes",
+        "addNewClassButton": "+ Add New Class"
+      },
+      "classCard": {
+        "teachersCount": "0 Teachers",
+        "studentsLabel": "Students",
+        "sectionsLabel": "Section",
+        "groupsLabel": "Group"
+      },
+      "addClassModal": {
+        "title": "Add New Class",
+        "classNamePlaceholder": "Type here",
+        "classIconsLabel": "Class Icons",
+        "addClassButton": "Add New Class"
+      },
+      "classIcons": {
+        "icon1": "Chalkboard",
+        "icon2": "Math Board",
+        "icon3": "Books and Apple",
+        "icon4": "Calculator",
+        "icon5": "Desk Lamp",
+        "icon6": "Paint Palette",
+        "icon7": "Basketball",
+        "icon8": "Graduation Cap",
+        "icon9": "Backpack"
+      }
+    },
+    "parentPage": {
+      "header": {
+        "title": "All Parents",
+        "totalCount": "{{count}}",
+        "filters": {
+          "classLabel": "Class",
+          "sectionLabel": "Section",
+          "selectClassPlaceholder": "Select Class",
+          "selectSectionPlaceholder": "Select Section"
+        }
+      },
+      "table": {
+        "columns": {
+          "fatherName": "Parents Father",
+          "motherName": "Parents Mother",
+          "phone": "Phone",
+          "email": "Email",
+          "children": "Childs"
+        }
+      },
+      "childPopup": {
+        "header": "Children {{childCount}}",
+        "childDetails": {
+          "name": "{{childName}}",
+          "idLabel": "Id:",
+          "classLabel": "Class",
+          "sectionLabel": "Section",
+          "viewProfileButton": "View Profile"
+        }
+      }
+    },
+    "teachersPage": {
+      "header": {
+        "title": "All Teachers",
+        "totalCount": "{{count}}",
+        "addTeacherButton": "+ Add New Teacher"
+      },
+      "addEditModal": {
+        "title": "Add/Edit Staff",
+        "imageUpload": {
+          "dropHereText": "Drop Your Image here",
+          "browseText": "Click to browse"
+        },
+        "fields": {
+          "firstName": "First Name",
+          "lastName": "Last Name",
+          "monthlySalary": "Monthly Salary",
+          "employeeID": "Employee ID",
+          "dateOfBirth": "Date of Birth",
+          "bloodGroup": "Blood Group",
+          "religion": "Religion",
+          "gender": "Gender",
+          "position": "Position"
+        },
+        "dropdowns": {
+          "gender": {
+            "label": "Select Gender",
+            "options": {
+              "male": "Male",
+              "female": "Female",
+              "other": "Other"
+            }
+          },
+          "bloodGroup": {
+            "label": "Select Blood Group",
+            "options": {
+              "O+": "O+",
+              "A+": "A+",
+              "B+": "B+",
+              "AB+": "AB+"
+            }
+          },
+          "religion": {
+            "label": "Select Religion",
+            "options": {
+              "islam": "Islam",
+              "christianity": "Christianity",
+              "hinduism": "Hinduism",
+              "other": "Other"
+            }
+          }
+        },
+        "addressSection": {
+          "title": "Address",
+          "mobileNumber": "Mobile Number",
+          "email": "Email",
+          "country": "Country",
+          "state": "State",
+          "city": "City",
+          "postalCode": "Postal Code",
+          "street": "Street",
+          "chooseFile": "Choose file"
+        },
+        "submitButton": "Add New Staff",
+        "editButton": "Edit Staff"
+      }
+    },
+    "accountantPage": {
+      "header": {
+        "title": "All Accountants",
+        "totalCount": "{{count}}",
+        "addAccountantButton": "Add New Accountant"
+      },
+      "addEditModal": {
+        "title": "Add/Edit Accountant",
+        "imageUpload": {
+          "dropHereText": "Drop Your Image here",
+          "browseText": "Click to browse"
+        },
+        "fields": {
+          "firstName": "First Name",
+          "lastName": "Last Name",
+          "monthlySalary": "Monthly Salary",
+          "employeeID": "Employee ID",
+          "dateOfBirth": "Date of Birth",
+          "bloodGroup": "Blood Group",
+          "religion": "Religion",
+          "gender": "Gender",
+          "position": "Position"
+        },
+        "dropdowns": {
+          "gender": {
+            "label": "Select Gender",
+            "options": {
+              "male": "Male",
+              "female": "Female",
+              "other": "Other"
+            }
+          },
+          "bloodGroup": {
+            "label": "Select Blood Group",
+            "options": {
+              "O+": "O+",
+              "A+": "A+",
+              "B+": "B+",
+              "AB+": "AB+"
+            }
+          },
+          "religion": {
+            "label": "Select Religion",
+            "options": {
+              "islam": "Islam",
+              "christianity": "Christianity",
+              "hinduism": "Hinduism",
+              "other": "Other"
+            }
+          }
+        },
+        "addressSection": {
+          "title": "Address",
+          "mobileNumber": "Mobile Number",
+          "email": "Email",
+          "country": "Country",
+          "state": "State",
+          "city": "City",
+          "postalCode": "Postal Code",
+          "street": "Street",
+          "chooseFile": "Choose file"
+        },
+        "submitButton": "Add New Staff",
+        "editButton": "Edit Staff"
+      }
+    },
+    "librarianPage": {
+      "header": {
+        "title": "All Librarian",
+        "totalCount": "{{count}}",
+        "addLibrarianButton": "Add New Librarian"
+      },
+      "addEditModal": {
+        "title": "Add/Edit Librarian",
+        "imageUpload": {
+          "dropHereText": "Drop Your Image here",
+          "browseText": "Click to browse"
+        },
+        "fields": {
+          "firstName": "First Name",
+          "lastName": "Last Name",
+          "monthlySalary": "Monthly Salary",
+          "employeeID": "Employee ID",
+          "dateOfBirth": "Date of Birth",
+          "bloodGroup": "Blood Group",
+          "religion": "Religion",
+          "gender": "Gender",
+          "position": "Position"
+        },
+        "dropdowns": {
+          "gender": {
+            "label": "Select Gender",
+            "options": {
+              "male": "Male",
+              "female": "Female",
+              "other": "Other"
+            }
+          },
+          "bloodGroup": {
+            "label": "Select Blood Group",
+            "options": {
+              "O+": "O+",
+              "A+": "A+",
+              "B+": "B+",
+              "AB+": "AB+"
+            }
+          },
+          "religion": {
+            "label": "Select Religion",
+            "options": {
+              "islam": "Islam",
+              "christianity": "Christianity",
+              "hinduism": "Hinduism",
+              "other": "Other"
+            }
+          }
+        },
+        "addressSection": {
+          "title": "Address",
+          "mobileNumber": "Mobile Number",
+          "email": "Email",
+          "country": "Country",
+          "state": "State",
+          "city": "City",
+          "postalCode": "Postal Code",
+          "street": "Street",
+          "chooseFile": "Choose file"
+        },
+        "submitButton": "Add New Staff",
+        "editButton": "Edit Staff"
+      }
+    },
+    "staffPage": {
+      "header": {
+        "title": "All Staff",
+        "totalCount": "{{count}}",
+        "addStaffButton": "Add New Staff"
+      },
+      "addEditModal": {
+        "title": "Add/Edit Staff",
+        "imageUpload": {
+          "dropHereText": "Drop Your Image here",
+          "browseText": "Click to browse"
+        },
+        "fields": {
+          "firstName": "First Name",
+          "lastName": "Last Name",
+          "monthlySalary": "Monthly Salary",
+          "employeeID": "Employee ID",
+          "dateOfBirth": "Date of Birth",
+          "bloodGroup": "Blood Group",
+          "religion": "Religion",
+          "gender": "Gender",
+          "position": "Position"
+        },
+        "dropdowns": {
+          "gender": {
+            "label": "Select Gender",
+            "options": {
+              "male": "Male",
+              "female": "Female",
+              "other": "Other"
+            }
+          },
+          "bloodGroup": {
+            "label": "Select Blood Group",
+            "options": {
+              "O+": "O+",
+              "A+": "A+",
+              "B+": "B+",
+              "AB+": "AB+"
+            }
+          },
+          "religion": {
+            "label": "Select Religion",
+            "options": {
+              "islam": "Islam",
+              "christianity": "Christianity",
+              "hinduism": "Hinduism",
+              "other": "Other"
+            }
+          }
+        },
+        "addressSection": {
+          "title": "Address",
+          "mobileNumber": "Mobile Number",
+          "email": "Email",
+          "country": "Country",
+          "state": "State",
+          "city": "City",
+          "postalCode": "Postal Code",
+          "street": "Street",
+          "chooseFile": "Choose file"
+        },
+        "submitButton": "Add New Staff",
+        "editButton": "Edit Staff"
+      }
+    },
+    "earningPage": {
+      "header": {
+        "title": "All Earnings",
+        "addEarningButton": "Add New Earning"
+      },
+      "table": {
+        "columns": {
+          "earningReason": "Earning Reason",
+          "from": "From",
+          "earningDate": "Earning Date",
+          "amount": "Amount",
+          "action": "Action"
+        }
+      },
+      "cards": {
+        "remainingBalance": {
+          "title": "Remaining Balance",
+          "amount": "{{amount}} QR"
+        },
+        "totalEarning": {
+          "title": "Total Earning",
+          "amount": "{{amount}} QR"
+        },
+        "totalStudentFees": {
+          "title": "Total Student Fees",
+          "amount": "{{amount}} QR",
+          "viewAllFeesButton": "View All Fees"
+        },
+        "totalExpenses": {
+          "title": "Total Expenses",
+          "amount": "{{amount}} QR"
+        }
+      },
+      "addEditModal": {
+        "title": "Add New Earnings",
+        "fields": {
+          "from": "From",
+          "amount": "Amount",
+          "earningDate": "Earning Date",
+          "description": "Description"
+        },
+        "submitButton": "Add New Earning",
+        "editButton": "Edit Earning"
+      }
+    },
+    "studentFeesPage": {
+      "header": {
+        "title": "Student Fees",
+        "addNewFees": "Add New Fees"
+      },
+      "filters": {
+        "class": {
+          "label": "Class",
+          "placeholder": "Select Class",
+          "options": [
+            "Class 1",
+            "Class 2"
+          ]
+        },
+        "feesType": {
+          "label": "Fees Type",
+          "placeholder": "Select Fees Type",
+          "options": [
+            "Tuition Fees",
+            "Transport Fees"
+          ]
+        },
+        "paymentStatus": {
+          "label": "Payment Status",
+          "options": {
+            "everyone": "Everyone",
+            "paid": "Paid",
+            "unpaid": "Unpaid"
+          }
+        }
+      },
+      "table": {
+        "columns": {
+          "name": "Name",
+          "class": "Class",
+          "feesType": "Fees Type",
+          "dueDate": "Due Date",
+          "amount": "Amount",
+          "status": "Status",
+          "action": "Action"
+        },
+        "rows": []
+      },
+      "modals": {
+        "addNewFees": {
+          "title": "Add New Fees",
+          "feesType": {
+            "label": "Fees Type",
+            "options": {
+              "single": "Single",
+              "mass": "Mass"
+            }
+          },
+          "form": {
+            "class": {
+              "label": "Class",
+              "placeholder": "Select Class"
+            },
+            "section": {
+              "label": "Section",
+              "placeholder": "Select Section"
+            },
+            "studentId": {
+              "label": "Student ID",
+              "placeholder": "Select Student ID"
+            },
+            "feesType": {
+              "label": "Fees Type",
+              "placeholder": "Select Fees Type"
+            },
+            "dueDate": {
+              "label": "Due Date",
+              "placeholder": "dd/mm/yyyy"
+            },
+            "amount": {
+              "label": "Amount",
+              "placeholder": "Enter Amount"
+            },
+            "submitButton": "Add New Fees"
+          }
+        }
+      }
+    },
+    "expensesPage": {
+      "tabs": {
+        "teacherSalary": "Teacher's Salary",
+        "staffSalary": "Staff Salary",
+        "otherExpenses": "Other Expenses"
+      },
+      "filters": {
+        "allExpenses": "All Expenses",
+        "paidExpenses": "Paid Expenses",
+        "dueExpenses": "Due Expenses",
+        "monthFilter": "Month",
+        "allMonth": "All Month",
+        "months": {
+          "january": "January",
+          "february": "February",
+          "march": "March",
+          "april": "April",
+          "may": "May",
+          "june": "June",
+          "july": "July",
+          "august": "August",
+          "september": "September",
+          "october": "October",
+          "november": "November",
+          "december": "December"
+        }
+      },
+      "teacherSalaryTable": {
+        "header": {
+          "teacherName": "Teacher's Name",
+          "contactInfo": "Contact Info",
+          "salaryMonth": "Salary Month",
+          "salaryAmount": "Salary Amount",
+          "paidDate": "Paid Date",
+          "status": "Status",
+          "action": "Action"
+        }
+      },
+      "staffSalaryTable": {
+        "header": {
+          "staffName": "Staff Name",
+          "contactInfo": "Contact Info",
+          "salaryMonth": "Salary Month",
+          "salaryAmount": "Salary Amount",
+          "paidDate": "Paid Date",
+          "status": "Status",
+          "action": "Action"
+        }
+      },
+      "otherExpensesTable": {
+        "header": {
+          "expensesReason": "Expenses Reason",
+          "amount": "Amount",
+          "expenseDate": "Expense Date",
+          "status": "Status",
+          "action": "Action"
+        }
+      },
+      "addExpenseModal": {
+        "title": "Add New Expense",
+        "fields": {
+          "amount": "Amount",
+          "status": {
+            "paid": "Paid Expenses",
+            "due": "Due Expenses"
+          },
+          "expenseDate": "Expense Date",
+          "expenseReason": "Expense Reason"
+        },
+        "button": "Add New Expense"
+      }
+    },
+    "announcementPage": {
+      "title": "Student Notice Board",
+      "searchPlaceholder": "Search by Notice",
+      "searchButton": "Search",
+      "addNoticeButton": "Add Notice",
+      "modal": {
+        "title": "Create New Notice",
+        "eventNamePlaceholder": "Event Name",
+        "startDatePlaceholder": "Start Date",
+        "endDatePlaceholder": "End Date",
+        "noticeDetailsPlaceholder": "Notice Details",
+        "priority": {
+          "high": "High priority",
+          "low": "Low priority"
+        },
+        "addButton": "Add Event"
+      }
+    },
+    "eventPage": {
+      "title": "Student Events",
+      "noEvents": "No Events in this Month",
+      "addNewEvent": "Add New Event",
+      "monthSelector": {
+        "yearLabel": "Year",
+        "monthLabel": "Month",
+        "yearOptions": [
+          "2023",
+          "2024",
+          "2025"
+        ],
+        "monthOptions": [
+          "January",
+          "February",
+          "March",
+          "April",
+          "May",
+          "June",
+          "July",
+          "August",
+          "September",
+          "October",
+          "November",
+          "December"
+        ]
+      },
+      "eventModal": {
+        "title": "Add New Event",
+        "uploadImage": "Drop Your Image here",
+        "browseText": "Click to browse",
+        "formFields": {
+          "eventName": "Event Name",
+          "date": "Date",
+          "eventTime": "Event Time",
+          "location": "Location",
+          "eventDirector": "Event Director",
+          "eventType": "Event Type",
+          "description": "Description"
+        },
+        "submitButton": "Add Event"
+      }
+    },
+    "admissionFormPage": {
+      "title": "Student Information",
+      "imageUpload": {
+        "label": "Drop Your Image Here",
+        "browse": "Click to browse"
+      },
+      "formFields": {
+        "firstName": {
+          "label": "First Name",
+          "placeholder": ""
+        },
+        "lastName": {
+          "label": "Last Name",
+          "placeholder": ""
+        },
+        "dob": {
+          "label": "Date of Birth",
+          "placeholder": "dd/mm/yyyy"
+        },
+        "gender": {
+          "label": "Gender",
+          "options": [
+            "Choose Options",
+            "Male",
+            "Female"
+          ]
+        },
+        "religion": {
+          "label": "Religion",
+          "options": [
+            "Choose Options",
+            "Islam",
+            "Christianity",
+            "Hinduism",
+            "Other"
+          ]
+        },
+        "bloodGroup": {
+          "label": "Blood Group",
+          "options": [
+            "Choose",
+            "O+",
+            "O-",
+            "A+",
+            "A-",
+            "B+",
+            "B-",
+            "AB+",
+            "AB-"
+          ]
+        },
+        "age": {
+          "label": "Age",
+          "placeholder": "00"
+        },
+        "contactInfo": {
+          "label": "Contact Info",
+          "phone": {
+            "label": "Phone",
+            "placeholder": "000-000-0000"
+          },
+          "emergencyNumber": {
+            "label": "Emergency Number",
+            "placeholder": "000-000-0000"
+          },
+          "email": {
+            "label": "Email",
+            "placeholder": "studentdiwan@gmail.com"
+          }
+        },
+        "permanentAddress": {
+          "label": "Permanent Address",
+          "street": {
+            "label": "Street",
+            "placeholder": "Street*"
+          },
+          "city": {
+            "label": "City",
+            "placeholder": "City*"
+          },
+          "state": {
+            "label": "State",
+            "placeholder": "State*"
+          },
+          "postalCode": {
+            "label": "Postal Code",
+            "placeholder": "Postal Code*"
+          },
+          "country": {
+            "label": "Country",
+            "placeholder": "Country*"
+          },
+          "residentialCheckbox": "Residential Address is the same as Permanent Address"
+        },
+        "residentialAddress": {
+          "label": "Residential Address",
+          "street": {
+            "label": "Street",
+            "placeholder": "Street*"
+          },
+          "city": {
+            "label": "City",
+            "placeholder": "City*"
+          },
+          "state": {
+            "label": "State",
+            "placeholder": "State*"
+          },
+          "postalCode": {
+            "label": "Postal Code",
+            "placeholder": "Postal Code*"
+          },
+          "country": {
+            "label": "Country",
+            "placeholder": "Country*"
+          }
+        },
+        "placeOfBirth": {
+          "label": "Place of Birth",
+          "placeholder": "Place"
+        },
+        "admissionToClass": {
+          "label": "Admission to Class",
+          "applyingFor": {
+            "label": "Applying For",
+            "options": [
+              "Choose Options",
+              "Class 1",
+              "Class 2"
+            ]
+          },
+          "qid": {
+            "label": "QID",
+            "placeholder": ""
+          },
+          "transportRequirement": {
+            "label": "Transport Requirement",
+            "options": [
+              "YES",
+              "NO"
+            ]
+          },
+          "enrollmentStatus": {
+            "label": "Enrollment Status",
+            "options": [
+              "Select",
+              "Full Time",
+              "Part Time"
+            ]
+          }
+        },
+        "parentInfo": {
+          "label": "Parent Information",
+          "fatherName": {
+            "label": "Father Name",
+            "placeholder": ""
+          },
+          "motherName": {
+            "label": "Mother Name",
+            "placeholder": ""
+          },
+          "guardianName": {
+            "label": "Guardian Name",
+            "placeholder": ""
+          },
+          "relationToStudent": {
+            "label": "Relation to Student",
+            "placeholder": ""
+          },
+          "email": {
+            "label": "Email",
+            "placeholder": ""
+          },
+          "phone": {
+            "label": "Phone",
+            "placeholder": ""
+          }
+        },
+        "documentUpload": {
+          "label": "Document Upload",
+          "uploadInstructions": "Browse Files, Drag and drop files here"
+        },
+        "addStudentButton": "Add Student"
+      }
+    },
+    "libraryPage": {
+      "tabs": {
+        "libraryTab": "Library",
+        "bookIssueTab": "Book Issue"
+      },
+      "filters": {
+        "classDropdown": "Select Class",
+        "categoryDropdown": "Select Category",
+        "sectionDropdown": "Select Section"
+      },
+      "noDataFoundMessage": "No Data Found",
+      "addBookButton": "Add Books",
+      "addBookModal": {
+        "title": "Add New Book",
+        "bookNameLabel": "Book Name",
+        "authorNameLabel": "Author Name",
+        "classDropdownLabel": "Select Class",
+        "categoryDropdownLabel": "Category",
+        "copiesLabel": "Copies",
+        "addButton": "Add Book",
+        "imageUpload": {
+          "dropText": "Drop Your Image here",
+          "clickToBrowse": "Click to browse"
+        }
+      },
+      "bookIssue": {
+        "classDropdown": "Select Class",
+        "sectionDropdown": "Select Section",
+        "studentLabel": "Student",
+        "classAndSectionLabel": "Class & Section",
+        "issueBookLabel": "Issue Book",
+        "authorLabel": "Author",
+        "dateLabel": "Date",
+        "statusLabel": "Status",
+        "actionLabel": "Action",
+        "addBookIssueButton": "Add Book Issue",
+        "addBookIssueModal": {
+          "title": "Edit Book Issue",
+          "classDropdownLabel": "Select Class",
+          "sectionDropdownLabel": "Select Section",
+          "studentDropdownLabel": "Select Student",
+          "bookDropdownLabel": "Select Book",
+          "authorNameLabel": "Author Name",
+          "issueDateLabel": "Issue Date",
+          "returnDateLabel": "Return Date",
+          "statusDropdownLabel": "Select Status",
+          "statusOptions": {
+            "pending": "Pending",
+            "returned": "Returned"
+          },
+          "addButton": "Add Book Issue"
+        }
+      }
+    },
+    "verification_page": {
+      "tabs": [
+        {
+          "label": "Unverified Students",
+          "count": 1,
+          "status": "active",
+          "color": "purple"
+        },
+        {
+          "label": "Rejected Students",
+          "count": 0,
+          "status": "inactive",
+          "color": "grey"
+        }
+      ]
+    }
+  }
+}
