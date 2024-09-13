@@ -2,7 +2,6 @@ import React from "react";
 import { useSelector } from "react-redux";
 import Navbar from "../Common/Navbar";
 import SideMenubar from "./SideMenubar";
-import { Toaster } from "react-hot-toast";
 
 const StudentDashLayout = ({
   children,
@@ -10,7 +9,7 @@ const StudentDashLayout = ({
   hideAvatarList,
   hideStudentView,
 }) => {
-  const isSidebarOpen = useSelector((state) => state.sidebar.isOpen);
+  const isSidebarOpen = useSelector((state) => state.User.sidebar.isOpen);
   const sidebarWidth = isSidebarOpen ? "15%" : "7%"; // Adjust the width based on sidebar state
 
   return (

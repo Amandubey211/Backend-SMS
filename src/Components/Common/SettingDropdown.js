@@ -5,10 +5,10 @@ import { IoIosLogOut } from "react-icons/io";
 import { NavLink } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { FaGraduationCap } from "react-icons/fa";
-import { setSelectedLanguage } from "../../Redux/Slices/Auth/AuthSlice";
 import { useTranslation } from "react-i18next";
 import i18next from "i18next";
 import { gt } from "../../Utils/translator/translation";
+import { setSelectedLanguage } from "../../Store/Slices/Common/Auth/reducers/authSlice";
 
 const SettingDropdown = ({
   showSetting,
@@ -18,7 +18,7 @@ const SettingDropdown = ({
 }) => {
   const dropdownRef = useRef(null);
   const dispatch = useDispatch();
-  const {t}=useTranslation();
+  const { t } = useTranslation();
 
   // Accessing language and role from the Redux store
   const selectedLanguage = useSelector((store) => store.Auth.selectedLanguage);
@@ -35,10 +35,10 @@ const SettingDropdown = ({
   };
   // Language change handler
   const handleLanguageChange = (lang) => {
-
-    console.log("lang is", lang)
+    console.log("lang is", lang);
     // Change the language using i18next
-    i18next.changeLanguage(lang)
+    i18next
+      .changeLanguage(lang)
       .then(() => {
         // Update the selected language in Redux only after i18next changes the language
         dispatch(setSelectedLanguage(lang)); // Redux action to update the language
@@ -60,8 +60,6 @@ const SettingDropdown = ({
   const listItemClass =
     "flex items-center gap-2 text-sm font-semibold text-gray-700 hover:text-purple-500 transition-transform duration-200 hover:bg-gray-100 px-3 py-2 rounded-md transform hover:translate-x-1";
 
-
-
   return (
     showSetting && (
       <div
@@ -70,14 +68,21 @@ const SettingDropdown = ({
       >
         {/* Profile Button with active state */}
         <NavLink
-          to="/users/admin"
+          to={
+            role === "admin"
+              ? `/users/admin`
+              : role === "student"
+              ? "/users/student/profile"
+              : ""
+          }
           className={({ isActive }) =>
-            `${listItemClass} ${isActive ? "text-purple-600 bg-purple-100 " : ""
+            `${listItemClass} ${
+              isActive ? "text-purple-600 bg-purple-100 " : ""
             }`
           }
         >
           <FaUser className="text-lg" />
-          {t("Profile",gt.setting)}
+          {t("Profile", gt.setting)}
         </NavLink>
 
         {/* Admin Section */}
@@ -85,12 +90,13 @@ const SettingDropdown = ({
           <NavLink
             to="/dashboard/academic"
             className={({ isActive }) =>
-              `${listItemClass} ${isActive ? "text-purple-600 bg-purple-100 " : ""
+              `${listItemClass} ${
+                isActive ? "text-purple-600 bg-purple-100 " : ""
               }`
             }
           >
             <FaGraduationCap className="text-lg" />
-            {t("Academic",gt.setting)}
+            {t("Academic", gt.setting)}
           </NavLink>
         )}
 
@@ -101,7 +107,7 @@ const SettingDropdown = ({
             onClick={() => setShowLanguageOptions(!showLanguageOptions)}
           >
             <IoLanguage className="text-lg" />
-            {t("Language",gt.language)} ({selectedLanguage})
+            {t("Language", gt.language)} ({selectedLanguage})
           </div>
 
           {showLanguageOptions && (
@@ -113,7 +119,6 @@ const SettingDropdown = ({
                 { lang: "en", label: "English", flag: "🇬🇧" },
                 { lang: "ar", label: "Arabic", flag: "🇸🇦" },
                 { lang: "hi", label: "Hindi", flag: "🇮🇳" },
-
               ].map(({ lang, label, flag }) => (
                 <div
                   key={lang}
@@ -125,7 +130,14 @@ const SettingDropdown = ({
                     {flag}
                   </span>
 
-                  {selectedLanguage === 'en' ? label : <span>{t(label,gt.language)}<sub>({label})</sub></span>}
+                  {selectedLanguage === "en" ? (
+                    label
+                  ) : (
+                    <span>
+                      {t(label, gt.language)}
+                      <sub>({label})</sub>
+                    </span>
+                  )}
                 </div>
               ))}
             </div>
@@ -138,7 +150,7 @@ const SettingDropdown = ({
           onClick={openModal}
         >
           <IoIosLogOut className="text-lg" />
-          {t("Logout",gt.setting)}
+          {t("Logout", gt.setting)}
         </button>
       </div>
     )

@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import Logo from "../../../../Components/Common/Logo";
 import { FaEye } from "react-icons/fa";
 import { PiEyeClosedFill } from "react-icons/pi";
-import useStudentLogin from "../../../../Hooks/AuthHooks/Student/useStudentLogin";
+import { useDispatch, useSelector } from "react-redux";
+import { studentLogin } from "../../../../Store/Slices/Common/Auth/actions/studentActions";
 import toast from "react-hot-toast";
 import { LuLoader } from "react-icons/lu";
 import { FcInfo } from "react-icons/fc";
@@ -17,20 +18,25 @@ const StudentLoginForm = () => {
     password: "",
   });
   const [showPassword, setShowPassword] = useState(false);
-  const { loading, studentLogin } = useStudentLogin();
-  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const { loading } = useSelector((state) => state.Auth);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [modalIsOpen, setModalIsOpen] = useState(false);
 
-  const HandleSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!studentDetails.email || !studentDetails.password) {
       toast.error("Please add the required details");
       return;
     }
-    const success = await studentLogin(studentDetails);
-    if (success) {
-      navigate("/student_dash");
-    }
+    dispatch(studentLogin(studentDetails))
+      .unwrap()
+      .then(({ redirect }) => {
+        navigate(redirect);
+      })
+      .catch((error) => {
+        toast.error(error);
+      });
   };
 
   const openModal = () => setModalIsOpen(true);
@@ -58,7 +64,7 @@ const StudentLoginForm = () => {
               <FcInfo className="text-2xl" />
             </button>
           </div>
-          <form onSubmit={HandleSubmit}>
+          <form onSubmit={handleSubmit}>
             <h6>Login in using:</h6>
             <div className="mb-4">
               <input
@@ -124,15 +130,6 @@ const StudentLoginForm = () => {
               )}
             </button>
           </form>
-          <div className="text-center py-2">
-            <span className="opacity-70">New to Student Diwan?</span>{" "}
-            <NavLink
-              className="text-indigo-600 hover:text-indigo-900"
-              to="/signUp"
-            >
-              Apply Now
-            </NavLink>
-          </div>
         </div>
       </div>
 
