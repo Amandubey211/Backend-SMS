@@ -18,9 +18,9 @@ const financeSlice = createSlice({
 
     name: "studentFinance",
     initialState,
-    reducers: { 
+    reducers: {
         setFilters: (state, action) => {
-          state.filters = action.payload;
+            state.filters = action.payload;
         }
     },
 
@@ -37,12 +37,11 @@ const financeSlice = createSlice({
                 state.totalUnpaidFees = action.payload.totalUnpaidFees;
             })
             .addCase(StudentFinanceDetails.rejected, (state, action) => {
-                console.log(action , "abjbsjbs------------------")
                 state.loading = false;
                 state.error = action.payload;
             })
     }
 })
 
-export const {setFilters}=financeSlice.actions;
+export const { setFilters } = financeSlice.actions;
 export default financeSlice.reducer;
