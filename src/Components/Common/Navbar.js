@@ -22,10 +22,13 @@ const Navbar = () => {
   const role = useSelector((store) => store.Auth.role);
   const activeAcademicYear = useSelector((store) => {
     if (role === "admin" || role === "teacher" || role === "accountant") {
+
+
       return store.Auth?.AcademicYear?.find((year) => year?.isActive)
         ?.academicYear;
     }
     return null; // Or provide a default value if necessary
+
   });
 
   const { staffLogout } = useStaffLogout();
