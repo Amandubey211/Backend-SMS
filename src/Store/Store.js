@@ -8,7 +8,7 @@ import userReducer from "./Slices/Common/User/reducers/userSlice"; // Importing 
 const authPersistConfig = {
   key: "auth",
   storage,
-  whitelist: ["isLoggedIn", "role", "userDetail", "AcademicYear", "token"], // Fields to persist
+  whitelist: ["isLoggedIn", "role", "AcademicYear", "token"], // Fields to persist
 };
 
 // Persist configuration for the User slice (formerly CommonSlice)
@@ -16,6 +16,7 @@ const userPersistConfig = {
   key: "user",
   storage,
   whitelist: [
+    "userDetails",
     "navbar", // Persist NavbarData
     "classInfo.selectedClass",
     "classInfo.selectedClassName",
