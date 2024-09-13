@@ -1,16 +1,28 @@
 import React from "react";
 import { GoDotFill } from "react-icons/go";
 import FormField from "../Component/FormField";
+import { useDispatch, useSelector } from "react-redux";
+import { setFilters } from "../../../Redux/Slices/Student/Finance/financeSlice";
 
 const uniqueFilterOptions = (data, key) => {
-  return [...new Set(data.map((item) => item[key]))].sort();
+  return [...new Set(data?.map((item) => item[key]))]?.sort();
 };
 
-const FilterContainer = ({ filters, feesDetails, handleFilterChange }) => {
-  const feesTypes = uniqueFilterOptions(feesDetails, "feeType").map((type) => ({
+const FilterContainer = () => {
+
+  const { filters, stdFinanceData } = useSelector((store) => store.studentFinance);
+  const dispatch = useDispatch();
+  const feesTypes = uniqueFilterOptions(stdFinanceData, "feeType")?.map((type) => ({
     label: type,
     value: type,
   }));
+
+  // Handle Filter Change
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    dispatch(setFilters({ ...filters, [name]: value }));
+  };
+
 
   return (
     <div className="filter-container flex gap-16  p-6 items-center bg-white shadow-sm rounded-lg">
@@ -43,11 +55,10 @@ const FilterContainer = ({ filters, feesDetails, handleFilterChange }) => {
                 aria-checked={filters.status === status}
               />
               <div
-                className={`h-5 w-5 rounded-full mr-2 flex items-center justify-center border-2 transition-colors duration-300 ${
-                  filters.status === status
-                    ? "border-green-500"
-                    : "border-gray-300"
-                }`}
+                className={`h-5 w-5 rounded-full mr-2 flex items-center justify-center border-2 transition-colors duration-300 ${filters.status === status
+                  ? "border-green-500"
+                  : "border-gray-300"
+                  }`}
               >
                 {/* Icon for selected radio button */}
                 {filters.status === status && (
@@ -55,9 +66,8 @@ const FilterContainer = ({ filters, feesDetails, handleFilterChange }) => {
                 )}
               </div>
               <span
-                className={`transition-colors duration-300 text-md ${
-                  filters.status === status ? "text-gradient" : "text-gray-600"
-                } hover:text-pink-500 focus:outline-none`}
+                className={`transition-colors duration-300 text-md ${filters.status === status ? "text-gradient" : "text-gray-600"
+                  } hover:text-pink-500 focus:outline-none`}
               >
                 {status === "Everyone" ? "All" : `${status} Student`}
               </span>

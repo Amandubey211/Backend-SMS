@@ -13,7 +13,7 @@ import StudentQuizReducer from "../Slices/StudentQuiz/StudentQuizSlice.js";
 import studentReducer from "../Slices/Admin/StudentSlice.js";
 import staffReducer from "../Slices/Admin/StaffSlice.js";
 import parentsReducer from "../Slices/Admin/parentsSilce.js";
-
+import studentFinanceReducer from "../Slices/Student/Finance/financeSlice.js"
 // Persist configuration for Auth slice
 const authPersistConfig = {
   key: "auth",
@@ -61,6 +61,7 @@ const AppStore = configureStore({
     StudentQuiz: StudentQuizReducer,
     Students: studentReducer,
     Parents: parentsReducer,
+    studentFinance:studentFinanceReducer
   },
 });
 

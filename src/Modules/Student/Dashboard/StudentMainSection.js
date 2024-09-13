@@ -98,7 +98,7 @@ const StudentMainSection = () => {
               </p>
             </div>
             <p className="text-sm text-gray-500">
-              A total of {subjects.length} Courses are in Progress
+              A total of {subjects?.length} Courses are in Progress
             </p>
           </div>
           <AllSubjects subjects={subjects} />
