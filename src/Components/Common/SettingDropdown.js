@@ -5,10 +5,10 @@ import { IoIosLogOut } from "react-icons/io";
 import { NavLink } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { FaGraduationCap } from "react-icons/fa";
-import { setSelectedLanguage } from "../../Redux/Slices/Auth/AuthSlice";
 import { useTranslation } from "react-i18next";
 import i18next from "i18next";
 import { gt } from "../../Utils/translator/translation";
+import { setSelectedLanguage } from "../../Store/Slices/Common/Auth/reducers/authSlice";
 
 const SettingDropdown = ({
   showSetting,

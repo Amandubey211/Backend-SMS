@@ -19,6 +19,7 @@ const initialState = {
   AcademicYear: [],
   loading: false,
   error: null,
+  selectedLanguage: "EN",
 };
 
 const AuthSlice = createSlice({
@@ -30,6 +31,9 @@ const AuthSlice = createSlice({
     },
     setRole: (state, action) => {
       state.role = action.payload;
+    },
+    setSelectedLanguage: (state, action) => {
+      state.selectedLanguage = action.payload;
     },
     setAcademicYear: (state, action) => {
       state.AcademicYear = action.payload;
@@ -127,6 +131,6 @@ const AuthSlice = createSlice({
   },
 });
 
-export const { setToken, setRole, setAcademicYear, resetState } =
+export const { setToken, setRole, setAcademicYear, resetState,setSelectedLanguage } =
   AuthSlice.actions;
 export default AuthSlice.reducer;
