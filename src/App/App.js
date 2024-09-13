@@ -25,7 +25,7 @@ import ParentEvent from "../Modules/Parents/ParentEvent/ParentEvent";
 import QIDLogin from "../Modules/LoginPages/Student/Login/QIDLogin.js";
 import ParentProfile from "../Components/Parents/ParentProfile.js";
 import StaffMyProfile from "../Components/Common/StaffMyProfile.js";
-import '../Utils/translator/i18n.js'
+import "../Utils/translator/i18n.js";
 import i18next from "i18next";
 import { useSelector } from "react-redux";
 // lazy loaded routes
@@ -998,9 +998,8 @@ function App() {
     },
   ]);
 
-
   const selectedLanguage = useSelector((state) => state.Auth.selectedLanguage);
-   console.log("selectedLanguage is :", selectedLanguage)
+  console.log("selectedLanguage is :", selectedLanguage);
   useEffect(() => {
     i18next.changeLanguage(selectedLanguage); // Set the initial language from Redux
   }, [selectedLanguage]);
@@ -1016,3 +1015,42 @@ function App() {
 }
 
 export default App;
+
+// import React, { useEffect, useState } from "react";
+// import Offline from "../Components/Common/Offline.js";
+// import AllRoutes from "../Route/AllRoute.js";
+// import { useFirebaseMessaging } from "../Hooks/NotificationHooks/NotificationHooks.js";
+// import i18next from "i18next";
+// import { useSelector } from "react-redux";
+
+// function App() {
+//   const [isOnline, setIsOnline] = useState(window.navigator.onLine);
+//   useFirebaseMessaging();
+
+//   useEffect(() => {
+//     const handleOnline = () => setIsOnline(true);
+//     const handleOffline = () => setIsOnline(false);
+
+//     window.addEventListener("online", handleOnline);
+//     window.addEventListener("offline", handleOffline);
+
+//     return () => {
+//       window.removeEventListener("online", handleOnline);
+//       window.removeEventListener("offline", handleOffline);
+//     };
+//   }, []);
+
+//   const selectedLanguage = useSelector((state) => state.Auth.selectedLanguage);
+//   useEffect(() => {
+//     i18next.changeLanguage(selectedLanguage); // Set the initial language from Redux
+//   }, [selectedLanguage]);
+
+//   return (
+//     <>
+//       {!isOnline && <Offline />}
+//       <AllRoutes />
+//     </>
+//   );
+// }
+
+// export default App;

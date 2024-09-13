@@ -4,12 +4,21 @@ import Spinner from "../../../../Components/Common/Spinner";
 import { useNavigate } from "react-router-dom";
 import { GoAlertFill } from "react-icons/go";
 
-
 const StudentRecentGrade = () => {
-  const { selectedClass, studentId } = useSelector((state) => state.Common);
+  // Update useSelector to correctly access state from userSlice
+  const { selectedClass, selectedSection } = useSelector(
+    (state) => state.User.classInfo
+  );
+  const { studentId } = useSelector((state) => state.User.userDetails);
+
   const [gradesData, setGradesData] = useState(null);
+  const [loading, setLoading] = useState(true); // Loading state for better UX
+
   useEffect(() => {
-    if (!studentId || !selectedClass) return;
+    if (!studentId || !selectedClass) {
+      setLoading(false); // Stop loading if essential data is missing
+      return;
+    }
 
     const fetchGradesData = async () => {
       try {
@@ -35,6 +44,8 @@ const StudentRecentGrade = () => {
         setGradesData(data.grades || []); // Assuming 'grades' is the key in the response
       } catch (error) {
         console.error("Error fetching grades data:", error);
+      } finally {
+        setLoading(false); // Stop loading once the fetch is done
       }
     };
 
@@ -45,19 +56,30 @@ const StudentRecentGrade = () => {
     return status === "Submit"
       ? "text-green-500"
       : status === "Excused"
-        ? "text-yellow-500"
-        : status === "Missing"
-          ? "text-red-500"
-          : "text-gray-500"; // Optional: default color for any other status
+      ? "text-yellow-500"
+      : status === "Missing"
+      ? "text-red-500"
+      : "text-gray-500"; // Optional: default color for any other status
   };
 
-  if (!gradesData) {
-    return <div className="flex text-gray-500  items-center justify-center">
-      <GoAlertFill className="text-[5rem]" />
-      No  Data Found
-    </div>;
+  // Show loading spinner while data is being fetched
+  if (loading) {
+    return <Spinner />;
   }
-  const sortedGrades = gradesData?.sort((a, b) => new Date(b.submittedDate) - new Date(a.submittedDate)).slice(0, 5);
+
+  // Show "No Data Found" if there is no grades data
+  if (!gradesData || gradesData.length === 0) {
+    return (
+      <div className="flex text-gray-500 items-center justify-center">
+        <GoAlertFill className="text-[5rem]" />
+        No Data Found
+      </div>
+    );
+  }
+
+  const sortedGrades = gradesData
+    ?.sort((a, b) => new Date(b.submittedDate) - new Date(a.submittedDate))
+    .slice(0, 5); // Sort and limit to the 5 most recent grades
 
   return (
     <div className="py-3">
@@ -88,9 +110,15 @@ const StudentRecentGrade = () => {
                 </div>
               </td>
 
-              <td className="px-5 py-2">{evalItem?.submittedDate?.slice(0, 10)}</td>
               <td className="px-5 py-2">
-                <span className={`${getColorForStatus(evalItem.status)} font-medium`}>
+                {evalItem?.submittedDate?.slice(0, 10)}
+              </td>
+              <td className="px-5 py-2">
+                <span
+                  className={`${getColorForStatus(
+                    evalItem.status
+                  )} font-medium`}
+                >
                   {evalItem.status}
                 </span>
               </td>
