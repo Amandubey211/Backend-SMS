@@ -2,8 +2,10 @@ import React, { useState } from "react";
 import { useNavigate, NavLink } from "react-router-dom";
 import toast from "react-hot-toast";
 import { LuLoader } from "react-icons/lu";
-import useCreateAcademicYear from "../../Hooks/AuthHooks/Staff/Admin/useCreateAcademicYear";
+import { useDispatch, useSelector } from "react-redux";
+import { createAcademicYear } from "../../Store/Slices/Common/Auth/actions/staffActions"; // Ensure correct path
 import Logo from "../Common/Logo";
+
 const CreateAcademicYear = () => {
   const [yearData, setYearData] = useState({
     year: "",
@@ -11,15 +13,27 @@ const CreateAcademicYear = () => {
     endDate: "",
     isActive: true,
   });
-  const { loading, createYear } = useCreateAcademicYear();
+
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { loading } = useSelector((state) => state.Auth); // Get loading state from Redux store
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!yearData.year || !yearData.startDate || !yearData.endDate) {
       return toast.error("Please fill all the fields");
     }
-    createYear(yearData, navigate);
+
+    // Dispatch the createAcademicYear action
+    dispatch(createAcademicYear(yearData))
+      .unwrap()
+      .then(() => {
+        navigate("/dashboard"); // Redirect to dashboard on success
+      })
+      .catch((error) => {
+        // Handle error
+        toast.error(error);
+      });
   };
 
   return (
@@ -105,6 +119,7 @@ const CreateAcademicYear = () => {
             <button
               type="submit"
               className="w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600"
+              disabled={loading}
             >
               {loading ? (
                 <div className="flex justify-center">

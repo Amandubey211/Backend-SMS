@@ -1,13 +1,11 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App/App";
-import { Provider } from "react-redux";
-import { AppStore } from "./Redux/Store/AppStore";
+import { Provider } from "react-redux"; // Redux provider
+import { PersistGate } from "redux-persist/integration/react"; // PersistGate from redux-persist
+import { store, persistor } from "./Store/Store"; // Import store and persistor
 
-// Comment out the i18n setup and the i18nextProvider
-// import { I18nextProvider } from "react-i18next";
-// import i18n from "./Utils/i18n";
-
+// Service worker registration
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker
     .register("/firebase-messaging-sw.js")
@@ -24,10 +22,10 @@ if ("serviceWorker" in navigator) {
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-  // <React.StrictMode>
-  <Provider store={AppStore}>
-    {/* Remove the I18nextProvider */}
-    <App /> {/* This is your main app component */}
+  <Provider store={store}>
+    {/* PersistGate delays rendering until persisted state is loaded */}
+    <PersistGate loading={null} persistor={persistor}>
+      <App /> {/* This is your main app component */}
+    </PersistGate>
   </Provider>
-  // </React.StrictMode>
 );
