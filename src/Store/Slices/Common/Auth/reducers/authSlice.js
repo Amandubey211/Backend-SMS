@@ -19,7 +19,7 @@ const initialState = {
   AcademicYear: [],
   loading: false,
   error: null,
-  selectedLanguage: "EN",
+  selectedLanguage: "en",
 };
 
 const AuthSlice = createSlice({

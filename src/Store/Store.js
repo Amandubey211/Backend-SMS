@@ -9,7 +9,7 @@ import studentFinanceReducer from './Slices/Student/Finance/financeSlice';
 const authPersistConfig = {
   key: "auth",
   storage,
-  whitelist: ["isLoggedIn", "role", "AcademicYear", "token"], // Fields to persist
+  whitelist: ["isLoggedIn", "role", "AcademicYear", "token","selectedLanguage"], // Fields to persist
 };
 
 // Persist configuration for the User slice (formerly CommonSlice)
