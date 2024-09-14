@@ -1,6 +1,10 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
+import { gt } from "../../../Utils/translator/translation";
 
 const FormField = ({ id, name, label, value, onChange, options }) => {
+  const {t}=useTranslation();
+
   return (
     <div className="form-field mb-4">
       {/* Label */}
@@ -8,7 +12,7 @@ const FormField = ({ id, name, label, value, onChange, options }) => {
         htmlFor={id}
         className="block text-gray-500 text-sm font-medium mb-2"
       >
-        {label}
+        {t(label,gt.stdFinance)}
       </label>
 
       {/* Select box */}
@@ -19,10 +23,10 @@ const FormField = ({ id, name, label, value, onChange, options }) => {
         onChange={onChange}
         className=" border border-gray-300 bg-white text-gray-700 rounded-md p-2 w-72 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500 transition-all"
       >
-        <option value="">All</option>
+        <option value="">{"All"}</option>
         {options.map((option) => (
           <option key={option.value} value={option.value}>
-            {option.label}
+           {option.label}
           </option>
         ))}
       </select>

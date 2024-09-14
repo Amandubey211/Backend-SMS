@@ -72,12 +72,11 @@ const SettingDropdown = ({
             role === "admin"
               ? `/users/admin`
               : role === "student"
-              ? "/users/student/profile"
-              : ""
+                ? "/users/student/profile"
+                : ""
           }
           className={({ isActive }) =>
-            `${listItemClass} ${
-              isActive ? "text-purple-600 bg-purple-100 " : ""
+            `${listItemClass} ${isActive ? "text-purple-600 bg-purple-100 " : ""
             }`
           }
         >
@@ -90,8 +89,7 @@ const SettingDropdown = ({
           <NavLink
             to="/dashboard/academic"
             className={({ isActive }) =>
-              `${listItemClass} ${
-                isActive ? "text-purple-600 bg-purple-100 " : ""
+              `${listItemClass} ${isActive ? "text-purple-600 bg-purple-100 " : ""
               }`
             }
           >
@@ -116,8 +114,8 @@ const SettingDropdown = ({
               style={{ marginTop: "4px" }} // To avoid overlap
             >
               {[
+                { lang: "ar", label: "Arabic", flag: "🇶🇦" },
                 { lang: "en", label: "English", flag: "🇬🇧" },
-                { lang: "ar", label: "Arabic", flag: "🇸🇦" },
                 { lang: "hi", label: "Hindi", flag: "🇮🇳" },
               ].map(({ lang, label, flag }) => (
                 <div
