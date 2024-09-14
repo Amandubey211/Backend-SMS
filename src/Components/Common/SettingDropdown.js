@@ -23,7 +23,7 @@ const SettingDropdown = ({
   // Accessing language and role from the Redux store
   const selectedLanguage = useSelector((store) => store.Auth.selectedLanguage);
   const role = useSelector((store) => store.Auth.role);
-
+ console.log("cgdfg",selectedLanguage)
   const [showLanguageOptions, setShowLanguageOptions] = useState(false);
 
   // Handling clicks outside the dropdown

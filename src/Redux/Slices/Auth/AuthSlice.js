@@ -8,7 +8,7 @@ const AuthSlice = createSlice({
     role: null,
     AcademicYear: [], // Changed to array for multiple years
     userDetail: {},
-    selectedLanguage: "EN",
+    selectedLanguage: "en",
   },
   reducers: {
     setAuth: (state, action) => {

@@ -998,11 +998,6 @@ function App() {
     },
   ]);
 
-  const selectedLanguage = useSelector((state) => state.Auth.selectedLanguage);
-  console.log("selectedLanguage is :", selectedLanguage);
-  useEffect(() => {
-    i18next.changeLanguage(selectedLanguage); // Set the initial language from Redux
-  }, [selectedLanguage]);
 
   return (
     <>
