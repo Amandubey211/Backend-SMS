@@ -6,7 +6,9 @@ import FeeTable from "./FeeTable";
 import FeeCard from "./FeeCard";
 import useNavHeading from "../../../Hooks/CommonHooks/useNavHeading ";
 import { useDispatch, useSelector } from "react-redux";
-import { StudentFinanceDetails } from "../../../Redux/Slices/Student/Finance/finance.action";
+import { useTranslation } from "react-i18next";
+import { StudentFinanceDetails } from "../../../Store/Slices/Student/Finance/finance.action";
+import { gt } from "../../../Utils/translator/translation";
 
 
 const StudentFinance = () => {
@@ -16,8 +18,9 @@ const StudentFinance = () => {
   const { stdFinanceData, totalPaidFees, totalUnpaidFees, error,
     loading, filters } = useSelector((store) => store.studentFinance)
 
+  const { t } = useTranslation();
   useNavHeading("Finance");
-  console.log("error oss", error)
+
 
 
   // Filtered Data 
@@ -46,17 +49,17 @@ const StudentFinance = () => {
           </div>
 
           {/* Summary Card Section */}
-            <div className="w-[20%] border border-x border-b border-t-0 p-4">
-              <h3 className="mb-5 text-gray-500">Your Finance Details</h3>
-              <div className="flex flex-col gap-5">
-                <FeeCard
-                  title="Total Unpaid Fees"
-                  amount={totalUnpaidFees}
-                  buttonText="Pay Now"
-                />
-                <FeeCard title="Total Paid Fees" amount={totalPaidFees} />
-              </div>
+          <div className="w-[20%] border border-x border-b border-t-0 p-4">
+            <h3 className="mb-5 text-gray-500">{t(`Your Finance Details`, gt.stdFinance)}</h3>
+            <div className="flex flex-col gap-5">
+              <FeeCard
+                title="Total Unpaid Fees"
+                amount={totalUnpaidFees}
+                buttonText="Pay Now"
+              />
+              <FeeCard title="Total Paid Fees" amount={totalPaidFees} />
             </div>
+          </div>
         </div>
       </StudentDashLayout>
     </Layout>

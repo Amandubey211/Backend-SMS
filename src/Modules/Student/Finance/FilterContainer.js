@@ -2,7 +2,10 @@ import React from "react";
 import { GoDotFill } from "react-icons/go";
 import FormField from "../Component/FormField";
 import { useDispatch, useSelector } from "react-redux";
-import { setFilters } from "../../../Redux/Slices/Student/Finance/financeSlice";
+import { setFilters } from "../../../Store/Slices/Student/Finance/financeSlice";
+import { gt } from "../../../Utils/translator/translation";
+import { useTranslation } from "react-i18next";
+
 
 const uniqueFilterOptions = (data, key) => {
   return [...new Set(data?.map((item) => item[key]))]?.sort();
@@ -12,6 +15,8 @@ const FilterContainer = () => {
 
   const { filters, stdFinanceData } = useSelector((store) => store.studentFinance);
   const dispatch = useDispatch();
+  const { t } = useTranslation();
+
   const feesTypes = uniqueFilterOptions(stdFinanceData, "feeType")?.map((type) => ({
     label: type,
     value: type,
@@ -41,7 +46,7 @@ const FilterContainer = () => {
 
       {/* Status */}
       <div className="flex flex-col w-2/3">
-        <label className="text-gray-500 text-sm font-medium mb-2">Status</label>
+        <label className="text-gray-500 text-sm font-medium mb-2">{t(`Status`, gt.stdFinance)}</label>
         <div className="flex gap-5">
           {["Everyone", "Paid", "Unpaid"].map((status) => (
             <label key={status} className="flex items-center cursor-pointer">
@@ -69,7 +74,8 @@ const FilterContainer = () => {
                 className={`transition-colors duration-300 text-md ${filters.status === status ? "text-gradient" : "text-gray-600"
                   } hover:text-pink-500 focus:outline-none`}
               >
-                {status === "Everyone" ? "All" : `${status} Student`}
+                {status === "Everyone" ? t("All", gt.stdFinance) : t(status, gt.stdFinance)}
+
               </span>
             </label>
           ))}

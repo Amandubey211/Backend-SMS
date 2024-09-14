@@ -15,7 +15,7 @@ i18n
       }
     },
     fallbackLng: "en", // Fallback language if detection fails
-    ns: ['language','setting'], // Specify your namespace
+    ns: ['language','setting','stdFinance'], // Specify your namespace
     defaultNS: 'language', // Set default namespace
     detection: {
       // Language detection options
