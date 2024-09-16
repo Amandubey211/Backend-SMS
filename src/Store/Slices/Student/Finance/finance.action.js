@@ -32,7 +32,7 @@ export const StudentFinanceDetails = createAsyncThunk(
     } catch (error) {
       console.log("Error in StudentFinanceDetails:", error);
       // Return a detailed error message with `rejectWithValue` for better control
-      return rejectWithValue(error.response?.data?.message || error.message);
+      return rejectWithValue(error?.response?.data?.message || error?.message || "Something Went Wrong!");
     }
   }
 )
