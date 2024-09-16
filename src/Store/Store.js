@@ -4,7 +4,7 @@ import storage from "redux-persist/lib/storage"; // Defaults to localStorage for
 import authReducer from "./Slices/Common/Auth/reducers/authSlice"; // Importing the auth slice reducer
 import userReducer from "./Slices/Common/User/reducers/userSlice"; // Importing the user slice reducer
 import studentFinanceReducer from './Slices/Student/Finance/financeSlice';
-  
+import studentLibraryBooksReducer from './Slices/Student/Library/libararySlice';  
 // Persist configuration for the Auth slice
 const authPersistConfig = {
   key: "auth",
@@ -39,8 +39,8 @@ const store = configureStore({
   reducer: {
     Auth: persistedAuthReducer, // Using persisted auth reducer
     User: persistedUserReducer, // Using persisted user reducer
-    studentFinance:studentFinanceReducer
-
+    studentFinance:studentFinanceReducer,
+    studentLibraryBooks:studentLibraryBooksReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

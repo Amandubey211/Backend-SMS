@@ -4,13 +4,12 @@
     "Everyone": "सभी",
     "Paid": "भुगतान किया गया",
     "Unpaid": "अवैतनिक",
-    "Fees Type": "फीस प्रकार",
+    "Fees Type": "शुल्क प्रकार",
     "All": "सभी",
-    "Paid By": "द्वारा भुगतान किया गया",
+    "Paid By": "भुगतानकर्ता",
     "Due Date": "नियत तारीख",
     "Amount": "राशि",
     "Pay Now": "अभी भुगतान करें",
-    "Total Unpaid Fees": "कुल अवैतनिक फीस",
-    "Total Paid Fees": "कुल भुगतान की गई फीस"
-  }
-  
+    "Total Unpaid Fees": "कुल अवैतनिक शुल्क",
+    "Total Paid Fees": "कुल भुगतान की गई राशि"
+}
