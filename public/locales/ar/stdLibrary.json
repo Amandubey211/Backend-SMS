@@ -1,4 +1,13 @@
 {
     "Library": "مكتبة",
-    "Book Issue": "إصدار الكتاب"
+    "Book Issue": "إصدار الكتاب",
+    "Issue Book": "إصدار الكتاب",
+    "Author": "المؤلف",
+    "Category": "الفئة",
+    "Issue Date": "تاريخ الإصدار",
+    "Return Date": "تاريخ العودة",
+    "Status": "الحالة",
+    "All": "الكل",
+    "Pending": "قيد الانتظار",
+    "Return": "إرجاع"
 }
