@@ -1,4 +1,13 @@
 {
     "Library": "पुस्तकालय",
-    "Book Issue": "पुस्तक निर्गमन"
+    "Book Issue": "पुस्तक निर्गम",
+    "Issue Book": "पुस्तक जारी करें",
+    "Author": "लेखक",
+    "Category": "श्रेणी",
+    "Issue Date": "निर्गम तिथि",
+    "Return Date": "वापसी तिथि",
+    "Status": "स्थिति",
+    "All": "सभी",
+    "Pending": "लंबित",
+    "Return": "वापसी"
 }
