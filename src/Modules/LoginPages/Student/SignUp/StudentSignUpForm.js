@@ -1,16 +1,20 @@
+// StudentSignUpForm.js
+
 import React, { useRef, useState } from "react";
-import toast from "react-hot-toast";
 import Logo from "../../../../Components/Common/Logo";
-import useSaveDetails from "../../../../Hooks/AuthHooks/Student/useSaveDetails";
-import useSaveDocument from "../../../../Hooks/AuthHooks/Student/useSaveDocuments";
 import PersonalInformationForm from "./PersonalInformationForm";
 import AddressForm from "./AddressForm";
 import DocumentUploadForm from "./DocumentUploadForm";
 import NavigationLink from "./NavigationLink";
-import validateStudentDetails from "../../../../Validataions/Student/validateStudentDetails";
 import { useSelector, useDispatch } from "react-redux";
-import { setStep } from "../../../../Redux/Slices/Auth/AuthSlice";
 import { useNavigate } from "react-router-dom";
+import {
+  registerStudentDetails,
+  uploadStudentDocuments,
+} from "../../../../Store/Slices/Common/Auth/actions/studentActions";
+import { setStep } from "../../../../Store/Slices/Common/User/reducers/userSlice";
+import validateStudentDetails from "../../../../Validataions/Student/validateStudentDetails";
+import { toast } from "react-hot-toast";
 
 const StudentSignUpForm = () => {
   const fileInputRef = useRef(null);
@@ -27,6 +31,8 @@ const StudentSignUpForm = () => {
     motherName: "",
     fatherName: "",
     guardianName: "",
+    guardianRelationToStudent: "",
+    guardianEmail: "",
     guardianContactNumber: "",
     Q_Id: "",
     permanentAddress: {
@@ -45,24 +51,30 @@ const StudentSignUpForm = () => {
     },
     emergencyNumber: "",
     schoolId: "",
-    profile: "",
+    profile: "", // Ensure this is present
+    enrollmentStatus: "",
+    transportRequirement: "",
   });
+
   const [studentDocuments, setStudentDocuments] = useState({
     documentLabels: [""],
     documents: [],
     schoolId: studentDetails.schoolId,
     email: studentDetails.email,
   });
-  const step = useSelector((store) => store.Auth.step);
+
+  const step = useSelector((store) => store.User.step);
   const dispatch = useDispatch();
   const [sameAddress, setSameAddress] = useState(false);
   const [preview, setPreview] = useState([]);
   const [imagePreview, setImagePreview] = useState(null);
-  const [profile, setProfile] = useState(null);
-  const { loading, saveDetails } = useSaveDetails();
-  const { docloading, saveDocument } = useSaveDocument();
-  const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
+
+  const { loading } = useSelector((state) => state.Auth);
+  const [validationErrors, setValidationErrors] = useState({});
+
+  // Refs for input fields
+  const inputRefs = useRef({});
 
   const calculateAge = (dob) => {
     const birthDate = new Date(dob);
@@ -84,47 +96,16 @@ const StudentSignUpForm = () => {
 
       return updatedDetails;
     });
-  };
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file && file.type.startsWith("image")) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result);
-        setProfile(file);
-      };
-      reader.readAsDataURL(file);
-    } else {
-      toast.error("Please upload a valid image file.");
-    }
-  };
-
-  const handleNext = async (e) => {
-    e.preventDefault();
-
-    if (!studentDetails.email) {
-      toast.error("Email is required");
-      return;
-    }
-
-    const validationErrors = validateStudentDetails(studentDetails);
-
-    if (Object.keys(validationErrors).length > 0) {
-      toast.error(Object.values(validationErrors)[0]);
-      return;
-    }
-
-    try {
-      dispatch(setStep(2)); // Move to the next step
-    } catch (error) {
-      console.error("Error in submitting student details:", error);
-      toast.error("Please try again");
+    // Remove the validation error if this field is corrected
+    if (validationErrors[name]) {
+      setValidationErrors({});
     }
   };
 
   const handleAddressChange = (e, type) => {
     const { name, value } = e.target;
+
     setStudentDetails((prev) => ({
       ...prev,
       [type]: {
@@ -132,6 +113,11 @@ const StudentSignUpForm = () => {
         [name]: value,
       },
     }));
+
+    // Remove the validation error if this address field is corrected
+    if (validationErrors[type] && validationErrors[type][name]) {
+      setValidationErrors({});
+    }
   };
 
   const handleSameAddressChange = (e) => {
@@ -141,21 +127,90 @@ const StudentSignUpForm = () => {
         ...prev,
         residentialAddress: { ...prev.permanentAddress },
       }));
+      // Remove validation errors for residentialAddress
+      if (validationErrors.residentialAddress) {
+        setValidationErrors({});
+      }
     }
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file && file.type.startsWith("image")) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+        // Update studentDetails.profile
+        setStudentDetails((prev) => ({
+          ...prev,
+          profile: file,
+        }));
+        // Remove validation error for profile
+        if (validationErrors.profile) {
+          setValidationErrors({});
+        }
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setValidationErrors({
+        profile: "Please upload a valid image file.",
+      });
+    }
+  };
+
+  // Helper function to get the first error field
+  function getFirstErrorField(errors) {
+    for (const key in errors) {
+      if (typeof errors[key] === "object" && errors[key] !== null) {
+        const nestedKey = getFirstErrorField(errors[key]);
+        return `${key}_${nestedKey}`;
+      } else {
+        return key;
+      }
+    }
+  }
+
+  // Helper function to set only the first error in validationErrors
+  function setFirstError(obj, errors, pathArray) {
+    const key = pathArray[0];
+    if (pathArray.length === 1) {
+      obj[key] = errors[key];
+    } else {
+      obj[key] = {};
+      setFirstError(obj[key], errors[key], pathArray.slice(1));
+    }
+  }
+
+  const handleNext = async (e) => {
+    e.preventDefault();
+
+    const errors = validateStudentDetails(studentDetails);
+
+    if (Object.keys(errors).length > 0) {
+      // Get the first error field, including nested fields
+      const firstErrorField = getFirstErrorField(errors);
+
+      // Construct validationErrors object with only the first error
+      let firstError = {};
+      setFirstError(firstError, errors, firstErrorField.split("_"));
+
+      setValidationErrors(firstError);
+
+      // Focus on the first invalid input
+      if (inputRefs.current[firstErrorField]) {
+        inputRefs.current[firstErrorField].focus();
+      }
+
+      return;
+    } else {
+      setValidationErrors({});
+    }
+
+    dispatch(setStep(2));
   };
 
   const handleDocumentSubmit = async (e) => {
     e.preventDefault();
-
-    if (!studentDetails.email) {
-      toast.error("Email is required");
-      return;
-    }
-
-    if (!studentDetails.schoolId) {
-      toast.error("School ID is required");
-      return;
-    }
 
     try {
       const formData = new FormData();
@@ -172,39 +227,57 @@ const StudentSignUpForm = () => {
                 formData.append(`${key}.${field}`, address[field]);
               }
             }
+          } else if (key === "profile") {
+            formData.append("profile", detailsWithoutAge.profile);
           } else {
             formData.append(key, detailsWithoutAge[key]);
           }
         }
       }
 
-      if (profile) {
-        formData.append("profile", profile);
-      }
+      // Dispatch the registerStudentDetails Thunk
+      const resultAction = await dispatch(registerStudentDetails(formData));
 
-      const response = await saveDetails(formData);
+      if (registerStudentDetails.fulfilled.match(resultAction)) {
+        // Student details saved successfully, now upload documents
+        const docUploadData = {
+          email: studentDetails.email,
+          schoolId: studentDetails.schoolId,
+          studentDocuments,
+        };
 
-      if (response.success) {
-        toast.success("Details Saved Successfully");
-        const documentResponse = await saveDocument(
-          studentDetails.email,
-          studentDetails.schoolId,
-          studentDocuments
+        const docResultAction = await dispatch(
+          uploadStudentDocuments(docUploadData)
         );
-        if (documentResponse?.success) {
-          toast.success("Documents uploaded successfully!");
-          setShowModal(true);
+
+        if (uploadStudentDocuments.fulfilled.match(docResultAction)) {
+          // Documents uploaded successfully
+          toast.success(
+            "Registration Successful! Please wait for verification."
+          );
+
+          // Optionally navigate or reset form
           dispatch(setStep(1));
           navigate("/studentlogin");
         } else {
-          toast.error("Failed to upload the document");
+          // Handle document upload error
+          const errorMessage =
+            docResultAction.payload ||
+            "Document upload failed. Please try again.";
+          toast.error(errorMessage);
         }
       } else {
-        toast.error("Failed to save student details.");
+        // Handle student details save error
+        const errorMessage =
+          resultAction.payload || "Registration failed. Please try again.";
+        toast.error(errorMessage);
       }
     } catch (error) {
+      // Network error or unexpected error
       console.error("Error in submitting documents:", error);
-      toast.error("An error occurred while submitting the documents.");
+      toast.error(
+        "Network error occurred. Please check your connection and try again."
+      );
     }
   };
 
@@ -215,7 +288,9 @@ const StudentSignUpForm = () => {
   const handlePhotoChange = (e) => {
     const files = Array.from(e.target.files);
     if (files.length + studentDocuments.documents.length > 3) {
-      toast.error("You can upload a maximum of 3 documents.");
+      setValidationErrors({
+        documents: "You can upload a maximum of 3 documents.",
+      });
       return;
     }
 
@@ -235,6 +310,11 @@ const StudentSignUpForm = () => {
       };
       reader.readAsDataURL(file);
     });
+
+    // Remove validation error for documents if any
+    if (validationErrors.documents) {
+      setValidationErrors({});
+    }
   };
 
   const handleClearPhoto = () => {
@@ -262,6 +342,8 @@ const StudentSignUpForm = () => {
                 imagePreview={imagePreview}
                 setImagePreview={setImagePreview}
                 handleImageChange={handleImageChange}
+                validationErrors={validationErrors}
+                inputRefs={inputRefs}
               />
 
               <AddressForm
@@ -270,7 +352,11 @@ const StudentSignUpForm = () => {
                 handleAddressChange={(e) =>
                   handleAddressChange(e, "permanentAddress")
                 }
+                validationErrors={validationErrors.permanentAddress || {}}
+                inputRefs={inputRefs}
+                prefix="permanentAddress_"
               />
+
               <div className="mb-4 mt-2">
                 <input
                   type="checkbox"
@@ -289,13 +375,21 @@ const StudentSignUpForm = () => {
                   handleAddressChange={(e) =>
                     handleAddressChange(e, "residentialAddress")
                   }
+                  validationErrors={validationErrors.residentialAddress || {}}
+                  inputRefs={inputRefs}
+                  prefix="residentialAddress_"
                 />
+              )}
+              {validationErrors.form && (
+                <div className="text-red-500 text-center mb-4">
+                  {validationErrors.form}
+                </div>
               )}
               <div className="flex items-center justify-center mt-4">
                 <button
                   type="submit"
                   className={`w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600 text-center`}
-                  disabled={loading || docloading}
+                  disabled={loading}
                 >
                   {loading ? "Saving Please Wait..." : "Next"}
                 </button>
@@ -314,30 +408,12 @@ const StudentSignUpForm = () => {
               setStudentDocuments={setStudentDocuments}
               fileInputRef={fileInputRef}
               handleDocumentSubmit={handleDocumentSubmit}
-              docloading={docloading}
+              loading={loading}
+              validationErrors={validationErrors}
             />
           )}
         </div>
       </div>
-      {showModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75 z-50">
-          <div className="bg-white p-4 rounded-lg shadow-lg">
-            <h2 className="text-xl font-semibold mb-4">
-              Registration Successful
-            </h2>
-            <p className="mb-4">
-              You will receive your login credentials at your registered email
-              address. Please wait for verification.
-            </p>
-            <button
-              onClick={() => setShowModal(false)}
-              className="bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600"
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

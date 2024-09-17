@@ -3,13 +3,19 @@ import { persistStore, persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage"; // Defaults to localStorage for web
 import authReducer from "./Slices/Common/Auth/reducers/authSlice"; // Importing the auth slice reducer
 import userReducer from "./Slices/Common/User/reducers/userSlice"; // Importing the user slice reducer
-import studentFinanceReducer from './Slices/Student/Finance/financeSlice';
-  
+import studentFinanceReducer from "./Slices/Student/Finance/financeSlice";
+
 // Persist configuration for the Auth slice
 const authPersistConfig = {
   key: "auth",
   storage,
-  whitelist: ["isLoggedIn", "role", "AcademicYear", "token","selectedLanguage"], // Fields to persist
+  whitelist: [
+    "isLoggedIn",
+    "role",
+    "AcademicYear",
+    "token",
+    "selectedLanguage",
+  ], // Fields to persist
 };
 
 // Persist configuration for the User slice (formerly CommonSlice)
@@ -39,8 +45,7 @@ const store = configureStore({
   reducer: {
     Auth: persistedAuthReducer, // Using persisted auth reducer
     User: persistedUserReducer, // Using persisted user reducer
-    studentFinance:studentFinanceReducer
-
+    studentFinance: studentFinanceReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

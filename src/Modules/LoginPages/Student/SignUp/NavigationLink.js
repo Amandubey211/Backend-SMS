@@ -32,7 +32,7 @@ const Navigation = () => {
           <span>Back</span>
         </NavLink>
       )}
-      <span className="opacity-75 text-xs text-red-600">
+      <span className="opacity-75 text-xs text-gray-500">
         ( * ) indicates Required
       </span>
     </div>
