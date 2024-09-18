@@ -7,9 +7,9 @@ import { GoAlertFill } from "react-icons/go";
 const StudentRecentGrade = () => {
   // Update useSelector to correctly access state from userSlice
   const { selectedClass, selectedSection } = useSelector(
-    (state) => state.User.classInfo
+    (state) => state.common.user.classInfo
   );
-  const { studentId } = useSelector((state) => state.User.userDetails);
+  const { studentId } = useSelector((state) => state.common.user.userDetails);
 
   const [gradesData, setGradesData] = useState(null);
   const [loading, setLoading] = useState(true); // Loading state for better UX
