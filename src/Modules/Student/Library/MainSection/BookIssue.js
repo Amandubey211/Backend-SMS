@@ -117,7 +117,7 @@ const BookIssue = () => {
                 </tr>
               )}
 
-              {!loading && !error && !issueBooks?.length === 0 && (filteredBookIssueData.map((item) => (
+              {!loading && !error && !issueBooks?.length === 0 && (filteredBookIssueData()?.map((item) => (
                 <BookIssueRow key={item.id} item={item} />
               )))}
             </tbody>

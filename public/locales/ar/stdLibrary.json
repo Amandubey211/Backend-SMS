@@ -9,5 +9,12 @@
     "Status": "الحالة",
     "All": "الكل",
     "Pending": "قيد الانتظار",
-    "Return": "إرجاع"
+    "Return": "إرجاع",
+    "Unknown Title": "عنوان غير معروف",
+    "Unknown Author": "مؤلف غير معروف",
+    "Unknown Category": "فئة غير معروفة",
+    "No Status": "لا توجد حالة",
+    "Class": "الصف",
+    "Copies": "نسخ",
+    "Available": "متاح"
 }
