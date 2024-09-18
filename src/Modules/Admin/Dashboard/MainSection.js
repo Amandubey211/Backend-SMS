@@ -23,7 +23,7 @@ const MainSection = () => {
   const { dashboardData, error, fetchAdminDashboardData, loading } =
     useGetAdminDashboardData();
   const { role } = useSelector((state) => ({
-    role: state.Auth.role,
+    role: state.common.auth.role,
   }));
 
   useEffect(() => {

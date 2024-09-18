@@ -4,7 +4,7 @@ import { NavLink } from "react-router-dom";
 import { setStep } from "../../../../Redux/Slices/Auth/AuthSlice";
 
 const Navigation = () => {
-  const step = useSelector((store) => store.Auth.step);
+  const step = useSelector((store) => store.common.auth.step);
   const dispatch = useDispatch();
   return (
     <div className="flex justify-between items-center px-1">

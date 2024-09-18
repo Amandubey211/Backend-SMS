@@ -6,7 +6,7 @@ import useNavHeading from "../../../Hooks/CommonHooks/useNavHeading .js";
 import { useSelector } from "react-redux";
 
 const Academic = () => {
-  const role = useSelector((store) => store.Auth.role);
+  const role = useSelector((store) => store.common.auth.role);
   useNavHeading(role, `Academic`);
   return (
     <Layout title={` Academics  | Student Diwan`}>

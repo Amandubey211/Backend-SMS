@@ -63,14 +63,14 @@ const StudentSignUpForm = () => {
     email: studentDetails.email,
   });
 
-  const step = useSelector((store) => store.User.step);
+  const step = useSelector((store) => store.common.user.step);
   const dispatch = useDispatch();
   const [sameAddress, setSameAddress] = useState(false);
   const [preview, setPreview] = useState([]);
   const [imagePreview, setImagePreview] = useState(null);
   const navigate = useNavigate();
 
-  const { loading } = useSelector((state) => state.Auth);
+  const { loading } = useSelector((state) => state.common.auth);
   const [validationErrors, setValidationErrors] = useState({});
 
   // Refs for input fields

@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { Bar } from "react-chartjs-2";
 import useGetAttendanceData from "../../../../Hooks/AuthHooks/Staff/Admin/Dashboard/useGetAttendanceData";
 import { FiCalendar } from "react-icons/fi";
-import Fallback from "../../../../Components/Common/Fallback";
 import Spinner from "../../../../Components/Common/Spinner";
 
 const TotalAttendanceGraph = () => {

@@ -23,9 +23,9 @@ const SideMenubar = () => {
   const navigate = useNavigate();
 
   const { isOpen, role, userDetails } = useSelector((state) => ({
-    isOpen: state.User.sidebar.isOpen,
-    role: state.Auth.role,
-    userDetails: state.User.userDetails, // Updated to fetch from User slice
+    isOpen: state.common.user.sidebar.isOpen,
+    role: state.common.auth.role,
+    userDetails: state.common.user.userDetails, // Updated to fetch from User slice
   }));
 
   const [openItems, setOpenItems] = useState([]);

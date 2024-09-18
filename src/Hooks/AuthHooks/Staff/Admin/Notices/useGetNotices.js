@@ -9,7 +9,8 @@ const useGetNotices = () => {
   const [error, setError] = useState(null);
   const [notices, setNotices] = useState([]);
 
-  const role = useSelector((store) => store.Auth.role);
+  const role = useSelector((store) => store.common.auth.role);
+  
 
   const fetchNotices = useCallback(async () => {
     setLoading(true);

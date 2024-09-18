@@ -8,13 +8,18 @@ import { useSelector } from "react-redux";
 import useGetFilteredIssueBooks from "../../../../Hooks/AuthHooks/Staff/Admin/LibraryBooks/useGetFilteredIssueBooks";
 
 const Library = () => {
-  const role = useSelector((store) => store.Auth.role);
-  const { loading: booksLoading, error: booksError, books } = useGetBooks();
-  const { loading: issueBooksLoading, error: issueBooksError, books: issueBooks } = useGetFilteredIssueBooks();
+  const role = useSelector((store) => store.common.auth.role);
 
-  const loading = role === 'teacher' ? issueBooksLoading : booksLoading;
-  const error = role === 'teacher' ? issueBooksError : booksError;
-  const booksData = role === 'teacher' ? issueBooks : books;
+  const { loading: booksLoading, error: booksError, books } = useGetBooks();
+  const {
+    loading: issueBooksLoading,
+    error: issueBooksError,
+    books: issueBooks,
+  } = useGetFilteredIssueBooks();
+
+  const loading = role === "teacher" ? issueBooksLoading : booksLoading;
+  const error = role === "teacher" ? issueBooksError : booksError;
+  const booksData = role === "teacher" ? issueBooks : books;
 
   const navigate = useNavigate();
 
@@ -52,12 +57,24 @@ const Library = () => {
         latestBooks.map((book) => (
           <BookItem
             key={book._id}
-            image={role === "teacher" ? book.bookId?.image : book.image || "https://via.placeholder.com/50"}
+            image={
+              role === "teacher"
+                ? book.bookId?.image
+                : book.image || "https://via.placeholder.com/50"
+            }
             title={role === "teacher" ? book.bookId?.name : book.name}
-            category={role === "teacher" ? book.bookId?.category : book.category}
+            category={
+              role === "teacher" ? book.bookId?.category : book.category
+            }
             copies={role !== "teacher" ? book.copies : undefined}
-            available={role !== "teacher" ? 350 : undefined} 
-            studentName={role === "teacher" ? (book.studentId ? book.studentId.fullName : null) : undefined}
+            available={role !== "teacher" ? 350 : undefined}
+            studentName={
+              role === "teacher"
+                ? book.studentId
+                  ? book.studentId.fullName
+                  : null
+                : undefined
+            }
             status={role === "teacher" ? book.status : undefined}
             issueDate={role === "teacher" ? book.issueDate : undefined}
             role={role}

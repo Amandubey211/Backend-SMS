@@ -9,27 +9,34 @@ const useGetEarningsData = () => {
   const [error, setError] = useState(null);
   const [earningsData, setEarningsData] = useState(null);
 
-  const role = useSelector((store) => store.Auth.role);
+  const role = useSelector((store) => store.common.auth.role);
 
-  const fetchEarningsData = useCallback(async (month, year, includeUnpaidExpenses) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const token = localStorage.getItem(`${role}:token`);
-      const response = await axios.get(`${baseUrl}/admin/dashboard/earnings`, {
-        headers: { Authentication: token },
-        params: { month, year, includeUnpaidExpenses }
-      });
+  const fetchEarningsData = useCallback(
+    async (month, year, includeUnpaidExpenses) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const token = localStorage.getItem(`${role}:token`);
+        const response = await axios.get(
+          `${baseUrl}/admin/dashboard/earnings`,
+          {
+            headers: { Authentication: token },
+            params: { month, year, includeUnpaidExpenses },
+          }
+        );
 
-      setEarningsData(response.data);
-      setLoading(false);
-    } catch (err) {
-      const errorMessage = err.response?.data?.message || "Failed to fetch earnings data";
-      toast.error(errorMessage);
-      setLoading(false);
-      setError(errorMessage);
-    }
-  }, [role]);
+        setEarningsData(response.data);
+        setLoading(false);
+      } catch (err) {
+        const errorMessage =
+          err.response?.data?.message || "Failed to fetch earnings data";
+        toast.error(errorMessage);
+        setLoading(false);
+        setError(errorMessage);
+      }
+    },
+    [role]
+  );
 
   return { loading, error, earningsData, fetchEarningsData };
 };

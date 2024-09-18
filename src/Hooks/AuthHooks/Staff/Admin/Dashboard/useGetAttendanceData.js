@@ -9,7 +9,8 @@ const useGetAttendanceData = () => {
   const [error, setError] = useState(null);
   const [attendanceData, setAttendanceData] = useState(null);
 
-  const role = useSelector((store) => store.Auth.role);
+  const role = useSelector((store) => store.common.auth.role);
+  
 
   const fetchAttendanceData = useCallback(async (month, year) => {
     setLoading(true);

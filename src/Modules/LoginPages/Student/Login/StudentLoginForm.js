@@ -18,7 +18,7 @@ const StudentLoginForm = () => {
     password: "",
   });
   const [showPassword, setShowPassword] = useState(false);
-  const { loading } = useSelector((state) => state.Auth);
+  const { loading } = useSelector((state) => state.common.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [modalIsOpen, setModalIsOpen] = useState(false);

@@ -12,7 +12,7 @@ import { FaEye } from "react-icons/fa";
 import { FaEyeSlash } from "react-icons/fa";
 const UserProfile = () => {
   const { userDetail } = useGetUserDetail();
-  const user = useSelector((store) => store.User.userDetails);
+  const user = useSelector((store) => store.common.user.userDetails);
 
   useEffect(() => {
     const getData = async () => {

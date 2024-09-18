@@ -11,7 +11,7 @@ import { baseUrl } from "../../../config/Common.js";
 
 const useGetUserDetail = () => {
   const [loading, setLoading] = useState(false);
-  const role = useSelector((store) => store.Auth.role);
+  const role = useSelector((store) => store.common.auth.role);
   const dispatch = useDispatch();
   const userDetail = async () => {
     setLoading(true);

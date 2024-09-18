@@ -3,7 +3,9 @@ import { persistStore, persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage"; // Defaults to localStorage for web
 import authReducer from "./Slices/Common/Auth/reducers/authSlice"; // Importing the auth slice reducer
 import userReducer from "./Slices/Common/User/reducers/userSlice"; // Importing the user slice reducer
-import studentFinanceReducer from "./Slices/Student/Finance/financeSlice";
+import studentFinanceReducer from "./Slices/Student/Finance/financeSlice"; // Importing finance slice
+import classReducer from "./Slices/Admin/Class/reducer/classSlice"; // Importing the combined admin reducer
+import { combineReducers } from "redux";
 
 // Persist configuration for the Auth slice
 const authPersistConfig = {
@@ -18,7 +20,7 @@ const authPersistConfig = {
   ], // Fields to persist
 };
 
-// Persist configuration for the User slice (formerly CommonSlice)
+// Persist configuration for the User slice
 const userPersistConfig = {
   key: "user",
   storage,
@@ -36,16 +38,20 @@ const userPersistConfig = {
   ], // Whitelist fields based on the refined state structure in userSlice
 };
 
-// Apply the persist reducer to the Auth and User slices
-const persistedAuthReducer = persistReducer(authPersistConfig, authReducer);
-const persistedUserReducer = persistReducer(userPersistConfig, userReducer);
-
+// Combine the Auth and User reducers under a Common entity
+const commonReducer = combineReducers({
+  auth: persistReducer(authPersistConfig, authReducer),
+  user: persistReducer(userPersistConfig, userReducer),
+});
+const AdminReducer = combineReducers({
+  class: classReducer,
+});
 // Create the store
 const store = configureStore({
   reducer: {
-    Auth: persistedAuthReducer, // Using persisted auth reducer
-    User: persistedUserReducer, // Using persisted user reducer
-    studentFinance: studentFinanceReducer,
+    common: commonReducer, // Grouping Auth and User under Common
+    studentFinance: studentFinanceReducer, // Other slices remain unchanged
+    admin: AdminReducer, // Grouping all admin-related reducers
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
