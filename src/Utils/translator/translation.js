@@ -3,5 +3,7 @@ export const gt = {
     language: { ns: 'language' },
     setting: { ns: 'setting' },
     stdFinance: { ns: 'stdFinance' },
-    stdLibrary: { ns: 'stdLibrary' }
+    stdLibrary: { ns: 'stdLibrary' },
+    stdNoticeboard: { ns: 'stdNoticeboard' },
+
 }
