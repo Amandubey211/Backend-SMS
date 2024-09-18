@@ -20,9 +20,9 @@ const StudentMainSection = () => {
 
   // Get necessary values from user slice instead of common slice
   const { selectedClass, selectedSection } = useSelector(
-    (state) => state.User.classInfo // Updated to get from the user slice
+    (state) => state.common.user.classInfo // Updated to get from the user slice
   );
-  const { studentId } = useSelector((state) => state.User.userDetails); // Updated to get from userDetails
+  // const { studentId } = useSelector((state) => state.common.user.userDetails); // Updated to get from userDetails
 
   const fetchDashboardDetails = async () => {
     const token = localStorage.getItem("student:token");
