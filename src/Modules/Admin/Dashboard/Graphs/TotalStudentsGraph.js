@@ -8,7 +8,8 @@ import { useSelector } from "react-redux";
 const TotalStudentsGraphjs = () => {
   const { loading, error, dashboardData, fetchAdminDashboardData } =
     useGetAdminDashboardData();
-  const role = useSelector((store) => store.Auth.role);
+  const role = useSelector((store) => store.common.auth.role);
+
   const [selectedClass, setSelectedClass] = useState("");
   const [classData, setClassData] = useState({
     maleStudents: 0,
@@ -20,10 +21,7 @@ const TotalStudentsGraphjs = () => {
   }, [fetchAdminDashboardData]);
 
   useEffect(() => {
-
     if (role === "teacher" && selectedClass) {
-      
-
       const selectedClassData = dashboardData?.studentData?.find(
         (classItem) => classItem.classId === selectedClass
       );

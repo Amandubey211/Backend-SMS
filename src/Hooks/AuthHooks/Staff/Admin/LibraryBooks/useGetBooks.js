@@ -9,7 +9,8 @@ const useGetBooks = () => {
   const [error, setError] = useState(null);
   const [books, setBooks] = useState([]);
 
-  const role = useSelector((store) => store.Auth.role);
+  const role = useSelector((store) => store.common.auth.role);
+  
 
   const fetchBooks = useCallback(async () => {
     setLoading(true);

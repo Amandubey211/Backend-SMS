@@ -9,7 +9,8 @@ const useGetFilteredEvents = () => {
   const [error, setError] = useState(null);
   const [events, setEvents] = useState([]);
 
-  const role = useSelector((store) => store.Auth.role);
+  const role = useSelector((store) => store.common.auth.role);
+  
   
 
   const fetchFilteredEvents = useCallback(async (month, year) => {

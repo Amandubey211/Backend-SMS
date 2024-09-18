@@ -16,7 +16,7 @@ const StaffLoginForm = () => {
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { loading } = useSelector((state) => state.Auth); // Get loading state from Redux store
+  const { loading } = useSelector((state) => state.common.auth); // Get loading state from Redux store
 
   const [showPassword, setShowPassword] = useState(false);
 
@@ -42,7 +42,7 @@ const StaffLoginForm = () => {
       .then((result) => {
         // Success logic, check if there's a redirect path
         if (result.redirect) {
-          console.log(result.redirect,"Redirection url | Success")
+          console.log(result.redirect, "Redirection url | Success");
           navigate(result.redirect);
         }
       })

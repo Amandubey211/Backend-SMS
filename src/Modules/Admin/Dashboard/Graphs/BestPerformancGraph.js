@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Bar } from "react-chartjs-2";
-import { Chart as ChartJS } from "chart.js/auto";
 import { weekData, monthData, yearData } from "./GraphData/BestPerformanceData";
 
 const BestPerformanceChart = () => {
@@ -35,9 +34,7 @@ const BestPerformanceChart = () => {
       </div>
 
       <div className="w-full p-3">
-
-        <div  className="h-70">
-
+        <div className="h-70">
           <Bar
             data={data}
             options={{

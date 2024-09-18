@@ -10,7 +10,7 @@ const useGetAllClasses = () => {
   const [error, setError] = useState(null);
 
   const dispatch = useDispatch();
-  const role = useSelector((store) => store.Auth.role);
+  const role = useSelector((store) => store.common.auth.role);
 
   const fetchClasses = useCallback(async () => {
     setLoading(true);

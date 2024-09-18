@@ -998,7 +998,6 @@ function App() {
     },
   ]);
 
-
   return (
     <>
       {!isOnline && <Offline />}

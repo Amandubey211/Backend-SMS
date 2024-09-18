@@ -9,7 +9,7 @@ const useGetAdminDashboardData = () => {
   const [error, setError] = useState(null);
   const [dashboardData, setDashboardData] = useState(null);
 
-  const role = useSelector((store) => store.Auth.role);
+  const role = useSelector((store) => store.common.auth.role);
   
 
   const fetchAdminDashboardData = useCallback(async () => {

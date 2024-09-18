@@ -7,27 +7,26 @@ import { baseUrl } from "../../../../../config/Common";
 const useEditAdmin = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const adminRole = useSelector((store) => store.Auth.role);
+  const adminRole = useSelector((store) => store.common.auth.role);
   const EditAdmin = useCallback(
     async (AdminData) => {
-       setLoading(true);
-       setError(null);
- 
-       try {
-         
-         const token = localStorage.getItem(`${adminRole}:token`);
-         const formData = new FormData();
-         Object.keys(AdminData).forEach(key => {
-           formData.append(key, AdminData[key]);
-         });  
+      setLoading(true);
+      setError(null);
+
+      try {
+        const token = localStorage.getItem(`${adminRole}:token`);
+        const formData = new FormData();
+        Object.keys(AdminData).forEach((key) => {
+          formData.append(key, AdminData[key]);
+        });
         const response = await axios.put(
           `${baseUrl}/admin/update/admin_profile`,
           formData,
           {
-            headers: {       
+            headers: {
               Authentication: token,
-              'Content-Type': 'multipart/form-data',
-             },
+              "Content-Type": "multipart/form-data",
+            },
           }
         );
 
@@ -40,7 +39,7 @@ const useEditAdmin = () => {
       } catch (err) {
         const errorMessage =
           err.response?.data?.message || "Failed to Update Admin";
-        toast.error('Failed to Edit Admin');
+        toast.error("Failed to Edit Admin");
         console.log(err);
         setLoading(false);
         setError(errorMessage);

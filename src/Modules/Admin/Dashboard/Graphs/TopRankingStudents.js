@@ -1,7 +1,5 @@
 import React from "react";
 import TopRanker from "../../../../Assets/DashboardAssets/Aman dubey.png";
-import { MdKeyboardArrowDown } from "react-icons/md";
-import { ReactComponent as CrownIcon } from "../../../../Assets/DashboardAssets/SVG/crown.svg";
 import nodataimg from "../../../../Assets/DashboardAssets/nodata.png";
 const TopRankingStudents = () => {
   const topStudents = [

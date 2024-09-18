@@ -3,8 +3,8 @@ import { useSelector } from "react-redux";
 import { Navigate, useLocation } from "react-router-dom";
 
 const ProtectRoute = ({ Component, allowedRoles }) => {
-  const isSignedIn = useSelector((store) => store.Auth.isLoggedIn);
-  const userRole = useSelector((store) => store.Auth.role);
+  const isSignedIn = useSelector((store) => store.common.auth.isLoggedIn);
+  const userRole = useSelector((store) => store.common.auth.role);
   console.log(isSignedIn, userRole,"---------------------");
   const isAcademicYearActive = JSON.parse(
     localStorage.getItem("isAcademicYearActive")

@@ -8,7 +8,8 @@ import { baseUrl } from "../../../../../config/Common";
 const useUpdateNotice = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const role = useSelector((store) => store.Auth.role);
+  const role = useSelector((store) => store.common.auth.role);
+  
 
   const updateNotice = async (noticeId, updatedData) => {
     setLoading(true);
