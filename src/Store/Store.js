@@ -3,9 +3,14 @@ import { persistStore, persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage"; // Defaults to localStorage for web
 import authReducer from "./Slices/Common/Auth/reducers/authSlice"; // Importing the auth slice reducer
 import userReducer from "./Slices/Common/User/reducers/userSlice"; // Importing the user slice reducer
-import studentFinanceReducer from "./Slices/Student/Finance/financeSlice"; // Importing finance slice
+
 import classReducer from "./Slices/Admin/Class/reducer/classSlice"; // Importing the combined admin reducer
 import { combineReducers } from "redux";
+
+
+import studentFinanceReducer from './Slices/Student/Finance/financeSlice';
+import studentLibraryBooksReducer from './Slices/Student/Library/libararySlice'; 
+import studentIssueBooksReducer from './Slices/Student/Library/bookIssuesSlice'; 
 
 // Persist configuration for the Auth slice
 const authPersistConfig = {
@@ -49,9 +54,16 @@ const AdminReducer = combineReducers({
 // Create the store
 const store = configureStore({
   reducer: {
+
     common: commonReducer, // Grouping Auth and User under Common
-    studentFinance: studentFinanceReducer, // Other slices remain unchanged
+  // Other slices remain unchanged
     admin: AdminReducer, // Grouping all admin-related reducers
+
+// Using persisted user reducer
+    studentFinance:studentFinanceReducer,
+    studentLibraryBooks:studentLibraryBooksReducer,
+    studentIssueBooks:studentIssueBooksReducer,
+
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

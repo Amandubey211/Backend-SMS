@@ -35,7 +35,7 @@ const FeeTable = ({ feesDetails }) => {
           {error && (
             <tr>
               <td colSpan="5" className="text-center py-10 text-red-600">
-                <GoAlertFill className="inline-block mb-2 w-12 h-12 mb-3" />
+                <GoAlertFill className="inline-block w-12 h-12 mb-3" />
                 <p className="text-lg font-semibold">{error}</p>
               </td>
             </tr>

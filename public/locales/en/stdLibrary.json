@@ -1,0 +1,13 @@
+{
+    "Library": "Library",
+    "Book Issue": "Book Issue",
+    "Issue Book": "Issue Book",
+    "Author": "Author",
+    "Category": "Category",
+    "Issue Date": "Issue Date",
+    "Return Date": "Return Date",
+    "Status": "Status",
+    "All":"All",
+    "Pending":"Pending",
+    "Return":"Return"
+}
