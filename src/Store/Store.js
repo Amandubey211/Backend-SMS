@@ -9,10 +9,10 @@ import { combineReducers } from "redux";
 
 
 import studentFinanceReducer from './Slices/Student/Finance/financeSlice';
-import studentLibraryBooksReducer from './Slices/Student/Library/libararySlice'; 
-import studentIssueBooksReducer from './Slices/Student/Library/bookIssuesSlice'; 
+import studentLibraryBooksReducer from './Slices/Student/Library/libararySlice';
+import studentIssueBooksReducer from './Slices/Student/Library/bookIssuesSlice';
 
-import parentPanelReducer from "./Slices/Parent/dashboardSlice";
+import parentPanelReducer from "../Store/Slices/Parent/Dashboard/dashboardSlice";
 
 import studentAnnouncementReducer from "../Store/Slices/Student/Noticeboard/noticeSlice";
 
@@ -60,17 +60,17 @@ const store = configureStore({
   reducer: {
 
     common: commonReducer, // Grouping Auth and User under Common
-  // Other slices remain unchanged
+    // Other slices remain unchanged
     admin: AdminReducer, // Grouping all admin-related reducers
 
-// Using persisted user reducer
-    studentFinance:studentFinanceReducer,
-    studentLibraryBooks:studentLibraryBooksReducer,
-    studentIssueBooks:studentIssueBooksReducer,
+    // Using persisted user reducer
+    studentFinance: studentFinanceReducer,
+    studentLibraryBooks: studentLibraryBooksReducer,
+    studentIssueBooks: studentIssueBooksReducer,
 
-    Parent: parentPanelReducer
+    Parent: parentPanelReducer,
 
-    studentAnnouncement:studentAnnouncementReducer,
+    studentAnnouncement: studentAnnouncementReducer,
 
 
   },

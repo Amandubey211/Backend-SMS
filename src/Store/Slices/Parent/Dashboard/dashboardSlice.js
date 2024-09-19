@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
-import { baseUrl } from '../../../config/Common';
+import { baseUrl } from '../../../../config/Common';
 
 // Async thunk for fetching parent dashboard data
 export const fetchParentDashboardData = createAsyncThunk(
