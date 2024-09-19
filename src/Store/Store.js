@@ -1,34 +1,29 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { persistStore, persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage"; // Defaults to localStorage for web
+import { combineReducers } from "redux";
+
+// common
 import authReducer from "./Slices/Common/Auth/reducers/authSlice"; // Importing the auth slice reducer
 import userReducer from "./Slices/Common/User/reducers/userSlice"; // Importing the user slice reducer
+
+// admin
 import teacherReducer from "./Slices/Admin/Class/Teachers/teacherSlice";
 import classReducer from "./Slices/Admin/Class/reducer/classSlice"; // Importing the combined admin reducer
 import subjectReducer from "./Slices/Admin/Class/Subject/subjectSlice";
-import { combineReducers } from "redux";
-
 import sectionReducer from "./Slices/Admin/Class/Section_Groups/groupSectionSlice";
+import classStudentReducer from "./Slices/Admin/Class/Students/studentSlice";
+import attendanceReducer from "./Slices/Admin/Class/Attendence/attendanceSlice";
+
+// student
 import studentFinanceReducer from "./Slices/Student/Finance/financeSlice";
 import studentLibraryBooksReducer from "./Slices/Student/Library/libararySlice";
 import studentIssueBooksReducer from "./Slices/Student/Library/bookIssuesSlice";
-import studentReducer from "./Slices/Admin/Class/Students/studentSlice";
-import attendanceReducer from "./Slices/Admin/Class/Attendence/attendanceSlice";
-
-
-
-import studentFinanceReducer from './Slices/Student/Finance/financeSlice';
-import studentLibraryBooksReducer from './Slices/Student/Library/libararySlice';
-import studentIssueBooksReducer from './Slices/Student/Library/bookIssuesSlice';
-
-import parentPanelReducer from "../Store/Slices/Parent/Dashboard/dashboardSlice";
-
 import studentAnnouncementReducer from "../Store/Slices/Student/Noticeboard/noticeSlice";
+import studentEventReducer from "../Store/Slices/Student/Noticeboard/eventsSlice";
 
-import studentEventReducer from '../Store/Slices/Student/Noticeboard/eventsSlice';
-
-
-
+// parent
+import parentPanelReducer from "../Store/Slices/Parent/Dashboard/dashboardSlice";
 
 // Persist configuration for the Auth slice
 const authPersistConfig = {
@@ -65,17 +60,17 @@ const AdminReducer = combineReducers({
   subject: subjectReducer,
   group_section: sectionReducer,
   teacher: teacherReducer,
-  students: studentReducer,
+  students: classStudentReducer,
   attendance: attendanceReducer,
 });
 
-const studentReducer=combineReducers({
-  studentFinance:studentFinanceReducer,
-  studentLibraryBooks:studentLibraryBooksReducer,
-  studentIssueBooks:studentIssueBooksReducer,
-  studentAnnouncement:studentAnnouncementReducer,
-  studentEvent:studentEventReducer,
-})
+const studentReducer = combineReducers({
+  studentFinance: studentFinanceReducer,
+  studentLibraryBooks: studentLibraryBooksReducer,
+  studentIssueBooks: studentIssueBooksReducer,
+  studentAnnouncement: studentAnnouncementReducer,
+  studentEvent: studentEventReducer,
+});
 // Create the store
 const store = configureStore({
   reducer: {
@@ -83,15 +78,13 @@ const store = configureStore({
     // Other slices remain unchanged
     admin: AdminReducer, // Grouping all admin-related reducers
 
-
     // Using persisted user reducer
-    studentFinance: studentFinanceReducer,
-    studentLibraryBooks: studentLibraryBooksReducer,
-    studentIssueBooks: studentIssueBooksReducer,
+    // studentFinance: studentFinanceReducer,
+    // studentLibraryBooks: studentLibraryBooksReducer,
+    // studentIssueBooks: studentIssueBooksReducer,
 
     student: studentReducer,
     Parent: parentPanelReducer,
-
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
