@@ -21,9 +21,11 @@ const SettingDropdown = ({
   const { t } = useTranslation();
 
   // Accessing language and role from the Redux store
-  const selectedLanguage = useSelector((store) => store.Auth.selectedLanguage);
-  const role = useSelector((store) => store.Auth.role);
- console.log("cgdfg",selectedLanguage)
+  const selectedLanguage = useSelector(
+    (store) => store.common.auth.selectedLanguage
+  );
+  const role = useSelector((store) => store.common.auth.role);
+  console.log("cgdfg", selectedLanguage);
   const [showLanguageOptions, setShowLanguageOptions] = useState(false);
 
   // Handling clicks outside the dropdown
@@ -72,11 +74,12 @@ const SettingDropdown = ({
             role === "admin"
               ? `/users/admin`
               : role === "student"
-                ? "/users/student/profile"
-                : ""
+              ? "/users/student/profile"
+              : ""
           }
           className={({ isActive }) =>
-            `${listItemClass} ${isActive ? "text-purple-600 bg-purple-100 " : ""
+            `${listItemClass} ${
+              isActive ? "text-purple-600 bg-purple-100 " : ""
             }`
           }
         >
@@ -89,7 +92,8 @@ const SettingDropdown = ({
           <NavLink
             to="/dashboard/academic"
             className={({ isActive }) =>
-              `${listItemClass} ${isActive ? "text-purple-600 bg-purple-100 " : ""
+              `${listItemClass} ${
+                isActive ? "text-purple-600 bg-purple-100 " : ""
               }`
             }
           >

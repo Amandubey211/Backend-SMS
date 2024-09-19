@@ -1,7 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
 import { Line } from "react-chartjs-2";
 import { Chart as ChartJS, registerables } from "chart.js";
-import Fallback from "../../../../Components/Common/Fallback";
 import { FiCalendar } from "react-icons/fi";
 import useGetEarningsData from "../../../../Hooks/AuthHooks/Staff/Admin/Dashboard/useGetEarningsData";
 import Spinner from "../../../../Components/Common/Spinner";
@@ -121,7 +120,9 @@ const TotalEarningsGraph = () => {
             <div className="flex items-center">
               <div className="text-gray-700">Total Expenses</div>
               <div className="ml-2 font-bold mr-1">
-                {earningsData ? earningsData.totalExpenses?.toLocaleString() : 0}
+                {earningsData
+                  ? earningsData.totalExpenses?.toLocaleString()
+                  : 0}
               </div>
               <div className="text-gray-700">QR</div>
             </div>

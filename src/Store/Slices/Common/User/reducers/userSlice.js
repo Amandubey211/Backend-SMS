@@ -7,11 +7,13 @@ import {
 
 const initialState = {
   userDetails: {}, // Storing user details directly, including studentId if applicable
+  step: 1,
   classInfo: {
     selectedClass: null,
     selectedClassName: "",
     selectedSection: null,
     selectedSectionName: "",
+
     selectedModule: {
       moduleId: null,
       name: null,
@@ -63,6 +65,9 @@ const userSlice = createSlice({
     },
     setSelectedSubjectName: (state, action) => {
       state.subjectInfo.selectedSubjectName = action.payload;
+    },
+    setStep: (state, action) => {
+      state.step = action.payload;
     },
     setSelectedAssignmentName: (state, action) => {
       state.subjectInfo.selectedAssignmentName = action.payload;
@@ -156,6 +161,7 @@ export const {
   setUserDetails,
   setStudentId,
   resetUserState,
+  setStep,
   toggleSidebar,
 } = userSlice.actions;
 

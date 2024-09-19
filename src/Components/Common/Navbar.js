@@ -18,16 +18,16 @@ const Navbar = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
 
-  const leftHeading = useSelector((store) => store.User.navbar.leftHeading);
-  const role = useSelector((store) => store.Auth.role);
+  const leftHeading = useSelector(
+    (store) => store.common.user.navbar.leftHeading
+  );
+  const role = useSelector((store) => store.common.auth.role);
   const activeAcademicYear = useSelector((store) => {
     if (role === "admin" || role === "teacher" || role === "accountant") {
-
-
-      return store.Auth?.AcademicYear?.find((year) => year?.isActive)?.academicYear;
+      return store.common.auth?.AcademicYear?.find((year) => year?.isActive)
+        ?.academicYear;
     }
     return null; // Or provide a default value if necessary
-
   });
 
   const { staffLogout } = useStaffLogout();

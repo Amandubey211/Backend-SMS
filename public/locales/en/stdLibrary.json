@@ -7,7 +7,14 @@
     "Issue Date": "Issue Date",
     "Return Date": "Return Date",
     "Status": "Status",
-    "All":"All",
-    "Pending":"Pending",
-    "Return":"Return"
+    "All": "All",
+    "Pending": "Pending",
+    "Return": "Return",
+    "Unknown Title": "Unknown Title",
+    "Unknown Author": "Unknown Author",
+    "Unknown Category": "Unknown Category",
+    "No Status": "No Status",
+    "Class": "Class",
+    "Copies": "Copies",
+    "Available": "Available"
 }

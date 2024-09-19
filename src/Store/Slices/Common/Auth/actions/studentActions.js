@@ -98,3 +98,80 @@ export const qidVerification = createAsyncThunk(
     }
   }
 );
+
+// / Thunk for registering student details
+export const registerStudentDetails = createAsyncThunk(
+  "auth/registerStudentDetails",
+  async (formData, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(
+        `${baseUrl}/student/student_register`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      if (response.data.success) {
+        toast.success("Registered Successfully");
+        return response.data;
+      } else {
+        return rejectWithValue(
+          response.data.msg || "Failed to save student details."
+        );
+      }
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.msg ||
+        "An error occurred while submitting the details.";
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
+// Thunk for uploading student documents
+export const uploadStudentDocuments = createAsyncThunk(
+  "auth/uploadStudentDocuments",
+  async ({ email, schoolId, studentDocuments }, { rejectWithValue }) => {
+    try {
+      if (!email) {
+        return rejectWithValue("Email is required");
+      }
+      if (!schoolId) {
+        return rejectWithValue("School ID is required");
+      }
+
+      const formData = new FormData();
+      formData.append("email", email);
+      formData.append("schoolId", schoolId);
+      studentDocuments.documents.forEach(({ file, label }) => {
+        formData.append(`documents`, file);
+        formData.append(`documentLabels`, label);
+      });
+
+      const response = await axios.post(
+        `${baseUrl}/student/upload_documents`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      if (response.data.success) {
+        return response.data;
+      } else {
+        return rejectWithValue(
+          response.data.msg || "Failed to upload the document"
+        );
+      }
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.msg ||
+        "An error occurred while uploading the documents.";
+      return rejectWithValue(errorMessage);
+    }
+  }
+);

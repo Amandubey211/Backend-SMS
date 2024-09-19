@@ -23,9 +23,9 @@ const SideMenubar = () => {
   const navigate = useNavigate();
 
   const { isOpen, userDetails, role } = useSelector((state) => ({
-    isOpen: state.User.sidebar.isOpen, // Redux state for sidebar toggle
-    userDetails: state.User.userDetails, // Redux state for user details
-    role: state.Auth.role,
+    isOpen: state.common.user.sidebar.isOpen, // Redux state for sidebar toggle
+    userDetails: state.common.user.userDetails, // Redux state for user details
+    role: state.common.auth.role,
   }));
 
   const [openItems, setOpenItems] = useState([]);

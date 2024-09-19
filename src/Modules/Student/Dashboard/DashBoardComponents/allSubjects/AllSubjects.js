@@ -8,8 +8,8 @@ import { baseUrl } from "../../../../../config/Common";
 
 const AllSubjects = () => {
   const [studentSubjects, setStudentSubjects] = useState([]);
-  const { role } = useSelector((state) => state.Auth); // Access role from Auth slice
-  const { studentId } = useSelector((state) => state.User.userDetails); // Access studentId from User slice
+  const { role } = useSelector((state) => state.common.auth); // Access role from Auth slice
+  const { studentId } = useSelector((state) => state.common.user.userDetails); // Access studentId from User slice
 
   const { cid } = useParams(); // cid is used but not in current logic; keep it if needed for future use
 

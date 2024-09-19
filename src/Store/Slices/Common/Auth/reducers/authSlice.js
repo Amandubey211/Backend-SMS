@@ -10,6 +10,8 @@ import {
   studentLogin,
   studentLogout,
   qidVerification,
+  registerStudentDetails,
+  uploadStudentDocuments,
 } from "../actions/studentActions";
 
 const initialState = {
@@ -127,6 +129,32 @@ const AuthSlice = createSlice({
         state.role = null;
         state.token = null;
         localStorage.removeItem("token");
+      })
+      .addCase(registerStudentDetails.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.signupSuccess = false;
+      })
+      .addCase(registerStudentDetails.fulfilled, (state) => {
+        state.loading = false;
+        state.signupSuccess = true;
+      })
+      .addCase(registerStudentDetails.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+        state.signupSuccess = false;
+      })
+      // Upload student documents
+      .addCase(uploadStudentDocuments.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(uploadStudentDocuments.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(uploadStudentDocuments.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
   },
 });

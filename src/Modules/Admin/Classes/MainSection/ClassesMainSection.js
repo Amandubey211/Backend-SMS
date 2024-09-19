@@ -1,31 +1,47 @@
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import ClassCard from "./ClassCard";
 import Sidebar from "../../../../Components/Common/Sidebar";
 import AddNewClass from "./AddNewClass";
 import Spinner from "../../../../Components/Common/Spinner";
-import useGetAllClasses from "../../../../Hooks/AuthHooks/Staff/Admin/Class/useGetAllClasses";
-import NoDataFound from "../../../../Components/Common/NoDataFound"; // Import the NoDataFound component
+import NoDataFound from "../../../../Components/Common/NoDataFound";
+import { fetchAllClasses } from "../../../../Store/Slices/Admin/Class/actions/classThunk";
 
 const ClassesMainSection = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
-  const { loading, error, fetchClasses } = useGetAllClasses();
-  const classes = useSelector((store) => store.Class.classList);
-  const role = useSelector((store) => store.Auth.role);
+  const [editingClass, setEditingClass] = useState(null); // For handling update
 
-  const handleSidebarOpen = () => setSidebarOpen(true);
-  const handleSidebarClose = () => setSidebarOpen(false);
+  const dispatch = useDispatch();
+  const { classes, loading, error } = useSelector((store) => store.admin.class);
+  const role = useSelector((store) => store.common.auth.role);
+
+  // Handle the sidebar open for adding a new class (clear the form)
+  const handleAddNewClass = () => {
+    setEditingClass(null); // Clear form for new class
+    setSidebarOpen(true);
+  };
+
+  // Handle sidebar open for editing (preload the form)
+  const handleEditClass = (classData) => {
+    setEditingClass(classData); // Preload form with class data
+    setSidebarOpen(true);
+  };
+
+  const handleSidebarClose = () => {
+    setSidebarOpen(false);
+    setEditingClass(null); // Reset editingClass when closing the sidebar
+  };
 
   useEffect(() => {
-    fetchClasses();
-  }, [fetchClasses]);
+    dispatch(fetchAllClasses());
+  }, [dispatch]);
 
   return (
     <div className="min-h-screen p-4">
       {role === "admin" && (
         <div className="flex justify-end">
           <button
-            onClick={handleSidebarOpen}
+            onClick={handleAddNewClass} // Open for adding new class
             className="px-4 py-2 rounded-md bg-gradient-to-r from-pink-100 to-purple-200"
             aria-label="Add New Class"
           >
@@ -38,19 +54,15 @@ const ClassesMainSection = () => {
       ) : error ? (
         <NoDataFound title="Classes" />
       ) : classes.length === 0 ? (
-        <NoDataFound title="Classes" /> // Use NoDataFound when no classes are found
+        <NoDataFound title="Classes" />
       ) : (
         <div className="grid grid-cols-1 gap-4 mt-4 sm:grid-cols-2 lg:grid-cols-4">
           {classes?.map((cls) => (
             <ClassCard
               role={role}
               key={cls._id}
-              teachersCount={cls.teachersCount}
-              groups={cls.groupsCount}
-              sections={cls.sectionsCount}
-              students={cls.studentsCount}
-              className={cls.className}
-              classId={cls._id}
+              classData={cls}
+              onEdit={() => handleEditClass(cls)} // Pass class data for editing
             />
           ))}
         </div>
@@ -59,9 +71,13 @@ const ClassesMainSection = () => {
         <Sidebar
           isOpen={isSidebarOpen}
           onClose={handleSidebarClose}
-          title="Add New Class"
+          title={editingClass ? "Update Class" : "Add New Class"}
         >
-          <AddNewClass />
+          <AddNewClass
+            onClose={handleSidebarClose}
+            classData={editingClass} // Preload data if editing
+            isUpdate={!!editingClass} // Boolean flag for update mode
+          />
         </Sidebar>
       )}
     </div>

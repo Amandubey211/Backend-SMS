@@ -2,36 +2,31 @@ import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { useDispatch, useSelector } from "react-redux";
 import { NavLink } from "react-router-dom";
-import toast from "react-hot-toast";
 import { TbEdit } from "react-icons/tb";
 import { RiDeleteBin6Line } from "react-icons/ri";
+import { deleteClass } from "../../../../Store/Slices/Admin/Class/actions/classThunk"; // Import the delete thunk
+import { setSelectedClass } from "../../../../Store/Slices/Common/User/reducers/userSlice";
 
 import leftLogo from "../../../../Assets/ClassesAssets/ClassCardLeftLogo.png";
 import RightLogo from "../../../../Assets/ClassesAssets/ClassCardRightLogo.png";
 import centerLogo from "../../../../Assets/ClassesAssets/ClassCardCenterLogo.png";
-
 import Sidebar from "../../../../Components/Common/Sidebar";
 import AddNewClass from "./AddNewClass";
-import useCreateClass from "../../../../Hooks/AuthHooks/Staff/Admin/Class/useCreateClass";
 import DeleteModal from "../../../../Components/Common/DeleteModal";
-import { setSelectedClass } from "../../../../Redux/Slices/Common/CommonSlice";
 
-const ClassCard = ({
-  role,
-  className,
-  teachersCount,
-  students,
-  sections,
-  groups,
-  classId,
-}) => {
+const ClassCard = ({ role, classData, onEdit }) => {
   const dispatch = useDispatch();
-  const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [isModalOpen, setModalOpen] = useState(false);
-  const { deleteClass, loading } = useCreateClass();
+  const loading = useSelector((state) => state.admin.class.loading); // Access loading state directly
 
-  const handleSidebarOpen = () => setSidebarOpen(true);
-  const handleSidebarClose = () => setSidebarOpen(false);
+  const {
+    className,
+    teachersCount,
+    studentsCount,
+    sectionsCount,
+    groupsCount,
+    _id: classId,
+  } = classData;
 
   const handleDeleteClick = () => {
     setModalOpen(true);
@@ -39,7 +34,7 @@ const ClassCard = ({
 
   const handleConfirmDelete = () => {
     setModalOpen(false);
-    deleteClass(classId);
+    dispatch(deleteClass(classId)); // Dispatch deleteClass thunk
   };
 
   const handleCloseModal = () => {
@@ -64,7 +59,7 @@ const ClassCard = ({
         {role === "admin" && (
           <div className="absolute top-2 right-2 flex flex-col space-y-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
             <button
-              onClick={handleSidebarOpen}
+              onClick={() => onEdit(classData)}
               className="bg-white p-1 rounded-full shadow hover:bg-gray-200"
             >
               <TbEdit className="w-5 h-5  text-green-500" />
@@ -93,32 +88,20 @@ const ClassCard = ({
         <div className="flex justify-between items-center px-3">
           <div className="flex flex-col items-center gap-1">
             <p className="opacity-50">Students</p>
-            <span className="font-bold">{students}</span>
+            <span className="font-bold">{studentsCount}</span>
           </div>
           <div className="flex border-x px-4 border-opacity-45 border-black flex-col items-center gap-1">
             <p className="opacity-50">Section</p>
-            <span className="font-bold">{sections}</span>
+            <span className="font-bold">{sectionsCount}</span>
           </div>
           <div className="flex items-center flex-col gap-1">
             <p className="opacity-50">Group</p>
-            <span className="font-bold">{groups}</span>
+            <span className="font-bold">{groupsCount}</span>
           </div>
         </div>
       </div>
       {role === "admin" && (
         <>
-          <Sidebar
-            isOpen={isSidebarOpen}
-            onClose={handleSidebarClose}
-            title="Update Class"
-          >
-            <AddNewClass
-              onClose={handleSidebarClose}
-              className={className}
-              classId={classId}
-              isUpdate={true}
-            />
-          </Sidebar>
           <DeleteModal
             isOpen={isModalOpen}
             onClose={handleCloseModal}
@@ -132,12 +115,9 @@ const ClassCard = ({
 };
 
 ClassCard.propTypes = {
-  className: PropTypes.string.isRequired,
-  teachersCount: PropTypes.number.isRequired,
-  students: PropTypes.number.isRequired,
-  sections: PropTypes.number.isRequired,
-  groups: PropTypes.number.isRequired,
-  classId: PropTypes.string.isRequired,
+  role: PropTypes.string.isRequired,
+  classData: PropTypes.object.isRequired,
+  onEdit: PropTypes.func.isRequired,
 };
 
 export default ClassCard;
