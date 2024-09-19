@@ -7,12 +7,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { gt } from "../../../../Utils/translator/translation";
 import { useTranslation } from "react-i18next";
 
+
 const NoticeItem = ({
     notice,
     index,
     formatDate,
 }) => {
-    const { activeIndex } = useSelector((store) => store.studentAnnouncement);
+    const { activeIndex } = useSelector((store) => store.student.studentAnnouncement);
     const dispatch = useDispatch();
     const { t } = useTranslation();
 

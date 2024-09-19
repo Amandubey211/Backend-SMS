@@ -17,7 +17,7 @@ import TabButton from "../../../Admin/Libary/Subclasss/component/TabButton";
 
 const Library = () => {
   const dispatch = useDispatch();
-  const { loading: libraryLoading, error: libraryError, libararyBooks, filters, activeTab } = useSelector((store) => store.studentLibraryBooks);
+  const { loading: libraryLoading, error: libraryError, libararyBooks, filters, activeTab } = useSelector((store) => store.student.studentLibraryBooks);
   const { t } = useTranslation();
 
   useNavHeading("Library");

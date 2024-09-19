@@ -59,6 +59,14 @@ const commonReducer = combineReducers({
 const AdminReducer = combineReducers({
   class: classReducer,
 });
+
+const studentReducer=combineReducers({
+  studentFinance:studentFinanceReducer,
+  studentLibraryBooks:studentLibraryBooksReducer,
+  studentIssueBooks:studentIssueBooksReducer,
+  studentAnnouncement:studentAnnouncementReducer,
+  studentEvent:studentEventReducer,
+})
 // Create the store
 const store = configureStore({
   reducer: {
@@ -66,23 +74,8 @@ const store = configureStore({
     common: commonReducer, // Grouping Auth and User under Common
     // Other slices remain unchanged
     admin: AdminReducer, // Grouping all admin-related reducers
-
-
-// Using persisted user reducer
-    studentFinance:studentFinanceReducer,
-    studentLibraryBooks:studentLibraryBooksReducer,
-    studentIssueBooks:studentIssueBooksReducer,
-    studentAnnouncement:studentAnnouncementReducer,
-    studentEvent:studentEventReducer
-
-
-
+    student: studentReducer,
     Parent: parentPanelReducer,
-
-
-  
-
-
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

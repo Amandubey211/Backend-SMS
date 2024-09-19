@@ -16,7 +16,7 @@ const StudentFinance = () => {
 
   const dispatch = useDispatch();
   const { stdFinanceData, totalPaidFees, totalUnpaidFees, error,
-    loading, filters } = useSelector((store) => store.studentFinance)
+    loading, filters } = useSelector((store) => store.student.studentFinance)
 
   const { t } = useTranslation();
   useNavHeading("Finance");
