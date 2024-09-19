@@ -1,48 +1,48 @@
 import React, { useState, useCallback, memo } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { LuUser } from "react-icons/lu";
 import { GiImperialCrown } from "react-icons/gi";
 import { TbDotsVertical } from "react-icons/tb";
 import { FaUsers } from "react-icons/fa";
-import useCreateGroup from "../../../../Hooks/AuthHooks/Staff/Admin/useCreateGroup";
+import { deleteGroup } from "../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
 import useDeleteModal from "../../../../Hooks/CommonHooks/useDeleteModal";
 import DeleteModal from "../../../../Components/Common/DeleteModal";
-import StudentMenuOptions from "../../Students/Components/StudentMenuOptions";
 import AddGroup from "./AddGroup";
 
-const GroupList = ({ onSeeGradeClick, fetchGroups, fetchStudents }) => {
+const GroupList = ({
+  groupList,
+  fetchGroups,
+  fetchStudents,
+  onSeeGradeClick,
+}) => {
   const [expandedGroupIndex, setExpandedGroupIndex] = useState(null);
   const [activeMenu, setActiveMenu] = useState(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [editingGroup, setEditingGroup] = useState(null);
-  const [searchQuery, setSearchQuery] = useState(""); // State for search query
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const groupList = useSelector((store) => store.Class.groupsList);
-  const { deleteGroup } = useCreateGroup();
+  const dispatch = useDispatch();
   const { isModalOpen, modalData, openModal, closeModal } = useDeleteModal();
 
-  const handleMenuToggle = useCallback((groupIndex) => {
+  const handleMenuToggle = (groupIndex) => {
     setActiveMenu((prevActiveMenu) =>
       prevActiveMenu === groupIndex ? null : groupIndex
     );
-  }, []);
+  };
 
-  const handleEdit = useCallback((group) => {
+  const handleEdit = (group) => {
     setEditingGroup(group);
     setIsSidebarOpen(true);
     setActiveMenu(null);
-  }, []);
+  };
 
-  const handleDelete = useCallback(
-    (group) => {
-      openModal(group);
-      setActiveMenu(null);
-    },
-    [openModal]
-  );
+  const handleDelete = (group) => {
+    openModal(group);
+    setActiveMenu(null);
+  };
 
   const handleDeleteConfirm = async () => {
-    await deleteGroup(modalData._id);
+    await dispatch(deleteGroup(modalData._id));
     closeModal();
     fetchGroups();
     fetchStudents();
@@ -71,9 +71,8 @@ const GroupList = ({ onSeeGradeClick, fetchGroups, fetchStudents }) => {
             type="text"
             placeholder="Search by group name"
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)} // Update search query
+            onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full px-3 py-2 border rounded-md"
-            aria-label="Search by group name"
           />
         </div>
       </div>
@@ -90,15 +89,6 @@ const GroupList = ({ onSeeGradeClick, fetchGroups, fetchStudents }) => {
               <h3
                 className="text-lg font-semibold text-gradient ps-2 cursor-pointer"
                 onClick={() =>
-                  setExpandedGroupIndex((prevExpandedGroupIndex) =>
-                    prevExpandedGroupIndex === groupIndex ? null : groupIndex
-                  )
-                }
-                aria-expanded={expandedGroupIndex === groupIndex}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) =>
-                  e.key === "Enter" &&
                   setExpandedGroupIndex((prevExpandedGroupIndex) =>
                     prevExpandedGroupIndex === groupIndex ? null : groupIndex
                   )
@@ -121,8 +111,6 @@ const GroupList = ({ onSeeGradeClick, fetchGroups, fetchStudents }) => {
                   <div
                     className="w-7 h-7 flex items-center justify-center rounded-full border cursor-pointer"
                     onClick={() => handleMenuToggle(groupIndex)}
-                    aria-haspopup="true"
-                    aria-expanded={activeMenu === groupIndex}
                   >
                     <TbDotsVertical className="w-6 h-6 text-gray-500" />
                   </div>
@@ -131,22 +119,12 @@ const GroupList = ({ onSeeGradeClick, fetchGroups, fetchStudents }) => {
                       <div
                         className="px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer"
                         onClick={() => handleEdit(group)}
-                        role="menuitem"
-                        tabIndex={0}
-                        onKeyDown={(e) =>
-                          e.key === "Enter" && handleEdit(group)
-                        }
                       >
                         Edit
                       </div>
                       <div
                         className="px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer"
                         onClick={() => handleDelete(group)}
-                        role="menuitem"
-                        tabIndex={0}
-                        onKeyDown={(e) =>
-                          e.key === "Enter" && handleDelete(group)
-                        }
                       >
                         Delete
                       </div>
@@ -165,16 +143,6 @@ const GroupList = ({ onSeeGradeClick, fetchGroups, fetchStudents }) => {
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                  aria-expanded={expandedGroupIndex === groupIndex}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={(e) =>
-                    e.key === "Enter" &&
-                    setExpandedGroupIndex((prevExpandedGroupIndex) =>
-                      prevExpandedGroupIndex === groupIndex ? null : groupIndex
-                    )
-                  }
                 >
                   <path
                     strokeLinecap="round"
@@ -185,6 +153,7 @@ const GroupList = ({ onSeeGradeClick, fetchGroups, fetchStudents }) => {
                 </svg>
               </div>
             </div>
+
             {expandedGroupIndex === groupIndex && (
               <ul className="border-t border-gray-200">
                 {group.students.length === 0 ? (
@@ -239,21 +208,11 @@ const GroupList = ({ onSeeGradeClick, fetchGroups, fetchStudents }) => {
                         <button
                           onClick={() => onSeeGradeClick(student)}
                           className="px-3 py-1 text-green-500 font-semibold text-sm border border-green-500 rounded-md"
-                          aria-label={`See grade of ${student.firstName} ${student.lastName}`}
                         >
                           See Grade
                         </button>
                       </div>
-                      <div className="flex-shrink-0 w-1/8 relative">
-                        <StudentMenuOptions
-                          studentId={student._id}
-                          studentName={student.firstName}
-                          groupId={group._id}
-                          fetchGroups={fetchGroups}
-                          fetchStudents={fetchStudents}
-                          onSeeGradeClick={onSeeGradeClick}
-                        />
-                      </div>
+                      <div className="flex-shrink-0 w-1/8 relative"></div>
                     </li>
                   ))
                 )}
@@ -262,6 +221,7 @@ const GroupList = ({ onSeeGradeClick, fetchGroups, fetchStudents }) => {
           </div>
         ))
       )}
+
       {isSidebarOpen && (
         <div className="fixed inset-0 z-50 flex justify-end bg-black bg-opacity-50">
           <div className="bg-white h-full w-full max-w-md shadow-lg p-4 overflow-y-auto">

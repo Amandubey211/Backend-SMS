@@ -3,15 +3,16 @@ import { persistStore, persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage"; // Defaults to localStorage for web
 import authReducer from "./Slices/Common/Auth/reducers/authSlice"; // Importing the auth slice reducer
 import userReducer from "./Slices/Common/User/reducers/userSlice"; // Importing the user slice reducer
-
+import teacherReducer from "./Slices/Admin/Class/Teachers/teacherSlice";
 import classReducer from "./Slices/Admin/Class/reducer/classSlice"; // Importing the combined admin reducer
+import subjectReducer from "./Slices/Admin/Class/Subject/subjectSlice";
 import { combineReducers } from "redux";
-
-
-import studentFinanceReducer from './Slices/Student/Finance/financeSlice';
-import studentLibraryBooksReducer from './Slices/Student/Library/libararySlice'; 
-import studentIssueBooksReducer from './Slices/Student/Library/bookIssuesSlice'; 
-
+import sectionReducer from "./Slices/Admin/Class/Section_Groups/groupSectionSlice";
+import studentFinanceReducer from "./Slices/Student/Finance/financeSlice";
+import studentLibraryBooksReducer from "./Slices/Student/Library/libararySlice";
+import studentIssueBooksReducer from "./Slices/Student/Library/bookIssuesSlice";
+import studentReducer from "./Slices/Admin/Class/Students/studentSlice";
+import attendanceReducer from "./Slices/Admin/Class/Attendence/attendanceSlice";
 // Persist configuration for the Auth slice
 const authPersistConfig = {
   key: "auth",
@@ -32,15 +33,9 @@ const userPersistConfig = {
   whitelist: [
     "userDetails",
     "navbar", // Persist NavbarData
-    "classInfo.selectedClass",
-    "classInfo.selectedClassName",
-    "classInfo.selectedSection",
-    "classInfo.selectedSectionName",
-    "subjectInfo.selectedSubject",
-    "subjectInfo.selectedSubjectName",
-    "subjectInfo.selectedAssignmentName",
-    "user.studentId", // Persist studentId
-  ], // Whitelist fields based on the refined state structure in userSlice
+    "classInfo", // Persist the entire classInfo object
+    "subjectInfo", // Persist the entire subjectInfo object
+  ], // Whitelt fields based on the refined state structure in userSlicesed on the refined state structure in userSlice
 };
 
 // Combine the Auth and User reducers under a Common entity
@@ -50,20 +45,23 @@ const commonReducer = combineReducers({
 });
 const AdminReducer = combineReducers({
   class: classReducer,
+  subject: subjectReducer,
+  group_section: sectionReducer,
+  teacher: teacherReducer,
+  students: studentReducer,
+  attendance: attendanceReducer,
 });
 // Create the store
 const store = configureStore({
   reducer: {
-
     common: commonReducer, // Grouping Auth and User under Common
-  // Other slices remain unchanged
+    // Other slices remain unchanged
     admin: AdminReducer, // Grouping all admin-related reducers
 
-// Using persisted user reducer
-    studentFinance:studentFinanceReducer,
-    studentLibraryBooks:studentLibraryBooksReducer,
-    studentIssueBooks:studentIssueBooksReducer,
-
+    // Using persisted user reducer
+    studentFinance: studentFinanceReducer,
+    studentLibraryBooks: studentLibraryBooksReducer,
+    studentIssueBooks: studentIssueBooksReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

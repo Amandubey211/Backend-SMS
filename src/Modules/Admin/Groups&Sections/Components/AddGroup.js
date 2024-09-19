@@ -2,12 +2,16 @@ import React, { useEffect, useState, useCallback } from "react";
 import toast from "react-hot-toast";
 import { GiImperialCrown } from "react-icons/gi";
 import { FaChevronDown, FaTimes } from "react-icons/fa";
-import useCreateGroup from "../../../../Hooks/AuthHooks/Staff/Admin/useCreateGroup";
-import useGetStudentsByClassAndSection from "../../../../Hooks/AuthHooks/Staff/Admin/Students/useGetStudentsByClassAndSection";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  createGroup,
+  updateGroup,
+  fetchUnassignedStudents,
+} from "../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
 import { useParams } from "react-router-dom";
+import { FaUserSlash } from "react-icons/fa"; // Import an icon for no students
 
-const AddGroup = ({ group, isUpdate, groupId, onClose, fetchGroups }) => {
+const AddGroup = ({ group, isUpdate, groupId, onClose }) => {
   const [groupName, setGroupName] = useState(group?.groupName || "");
   const [seatLimit, setSeatLimit] = useState(group?.seatLimit || "");
   const [students, setStudents] = useState([]);
@@ -17,9 +21,11 @@ const AddGroup = ({ group, isUpdate, groupId, onClose, fetchGroups }) => {
   const [leader, setLeader] = useState(group?.leader || null);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
 
-  const allSections = useSelector((store) => store.Class.sectionsList);
-  const { createGroup, updateGroup, loading, error } = useCreateGroup();
-  const { fetchStudentsByClassAndSection } = useGetStudentsByClassAndSection();
+  const unassignedStudents = useSelector(
+    (store) => store.admin.group_section.unassignedStudentsList
+  );
+  const { loading, error } = useSelector((store) => store.admin.group_section);
+  const dispatch = useDispatch();
   const { cid } = useParams();
 
   useEffect(() => {
@@ -32,25 +38,18 @@ const AddGroup = ({ group, isUpdate, groupId, onClose, fetchGroups }) => {
   }, [isUpdate, group]);
 
   useEffect(() => {
-    const fetchStudents = async () => {
-      if (cid) {
-        const data = await fetchStudentsByClassAndSection(cid);
-        setStudents(data);
-      }
-    };
-
-    fetchStudents();
-  }, [cid, fetchStudentsByClassAndSection]);
+    dispatch(fetchUnassignedStudents(cid));
+  }, [cid, dispatch]);
 
   const handleStudentSelect = useCallback(
     (studentId) => {
-      const student = students.find((s) => s._id === studentId);
+      const student = unassignedStudents.find((s) => s._id === studentId);
       if (student && !selectedStudents.some((s) => s._id === studentId)) {
         setSelectedStudents((prev) => [...prev, student]);
       }
       setDropdownOpen(false);
     },
-    [students, selectedStudents]
+    [unassignedStudents, selectedStudents]
   );
 
   const handleLeaderClick = useCallback((student) => {
@@ -84,85 +83,51 @@ const AddGroup = ({ group, isUpdate, groupId, onClose, fetchGroups }) => {
 
     try {
       if (isUpdate) {
-        await updateGroup(formData, groupId);
-        fetchGroups(); // Refetch data after update
-        onClose(); // Close sidebar after update
+        await dispatch(updateGroup({ groupId, formData }));
+        onClose();
       } else {
-        await createGroup(formData);
-        // Reset form fields
+        await dispatch(createGroup(formData));
         setGroupName("");
         setSeatLimit("");
         setSelectedStudents([]);
         setLeader(null);
-        fetchGroups(); // Refetch data after create
       }
     } catch (err) {
       toast.error(err.message || "Something went wrong");
     }
   };
 
-  const toggleDropdown = (e) => {
-    e.stopPropagation(); // Prevent form submission
-    setDropdownOpen(!isDropdownOpen);
-  };
-
   return (
-    <form
-      className="flex flex-col no-scrollbar h-full animate-fadeIn animate-slideIn"
-      onSubmit={handleSubmit}
-    >
+    <form className="flex flex-col h-full" onSubmit={handleSubmit}>
       <div className="bg-white h-[80%] overflow-y-auto rounded-lg p-4 w-full max-w-md">
-        {isUpdate && (
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-semibold">
-              {isUpdate ? "Update Group" : "Add New Group"}
-            </h2>
-            <button type="button" onClick={onClose} aria-label="Close modal">
-              <FaTimes className="text-gray-500" />
-            </button>
-          </div>
-        )}
+        <div className="flex justify-between items-center mb-4"></div>
         <div className="flex flex-col space-y-4">
           <div>
-            <label
-              htmlFor="group-name"
-              className="block text-sm font-medium text-gray-700"
-            >
+            <label className="block text-sm font-medium text-gray-700">
               Group Name
             </label>
             <input
               type="text"
-              id="group-name"
               value={groupName}
               onChange={(e) => setGroupName(e.target.value)}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition duration-300"
-              placeholder="Type Here"
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
               required
             />
           </div>
           <div>
-            <label
-              htmlFor="seat-limit"
-              className="block text-sm font-medium text-gray-700"
-            >
+            <label className="block text-sm font-medium text-gray-700">
               Max. Number Of Students
             </label>
             <input
               type="number"
-              id="seat-limit"
               value={seatLimit}
               onChange={(e) => setSeatLimit(e.target.value)}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition duration-300"
-              placeholder="50"
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
               required
-              aria-label="Seat Limit"
             />
           </div>
-          <div className="relative w-full">
-            <label
-              htmlFor="student-selector"
-              className="block text-sm font-medium text-gray-700"
-            >
+          <div className="relative">
+            <label className="block text-sm font-medium text-gray-700">
               Select Students
             </label>
             <div className="border border-gray-300 rounded-md p-2 flex flex-wrap">
@@ -170,50 +135,47 @@ const AddGroup = ({ group, isUpdate, groupId, onClose, fetchGroups }) => {
                 <div
                   key={student._id}
                   className="bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-md px-2 py-1 m-1 flex items-center space-x-1 truncate"
-                  style={{ maxWidth: "8rem" }}
                 >
-                  <span className="truncate">
+                  <span>
                     {student.firstName} {student.lastName}
                   </span>
                   <button
                     type="button"
                     onClick={() => handleRemoveStudent(student._id)}
-                    aria-label={`Remove ${student.firstName} ${student.lastName}`}
                   >
-                    <FaTimes className="w-4 h-4" />
+                    <FaTimes />
                   </button>
                 </div>
               ))}
               <button
-                id="student-selector"
                 type="button"
-                onClick={toggleDropdown}
-                className="ml-auto flex items-center px-2 py-1"
-                aria-label="Select Students"
+                onClick={() => setDropdownOpen(!isDropdownOpen)}
+                className="ml-auto flex items-center"
               >
-                <FaChevronDown className="w-4 h-4" />
+                <FaChevronDown />
               </button>
             </div>
             {isDropdownOpen && (
-              <div
-                className="absolute mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg z-10"
-                role="listbox"
-                aria-labelledby="student-selector"
-              >
-                {students.map((student) => (
-                  <button
-                    key={student._id}
-                    type="button"
-                    onClick={() => handleStudentSelect(student._id)}
-                    className="block w-full text-left px-4 py-2 hover:bg-gray-100"
-                    role="option"
-                    aria-selected={selectedStudents.some(
-                      (s) => s._id === student._id
-                    )}
-                  >
-                    {student.firstName} {student.lastName}
-                  </button>
-                ))}
+              <div className="absolute mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg z-10">
+                {unassignedStudents.length === 0 ? (
+                  <div className="text-center p-4">
+                    <FaUserSlash className="text-2xl text-gray-400 mx-auto" />
+                    <p className="text-sm text-gray-500">
+                      No students available in this class.
+                    </p>
+                  </div>
+                ) : (
+                  unassignedStudents.map((student) => (
+                    <button
+                      key={student._id}
+                      type="button"
+                      onClick={() => handleStudentSelect(student._id)}
+                      className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                    >
+                      {student.firstName} {student.lastName}
+                    </button>
+                  ))
+                )}
               </div>
             )}
           </div>
@@ -222,18 +184,13 @@ const AddGroup = ({ group, isUpdate, groupId, onClose, fetchGroups }) => {
               Name Of Team Leader (Optional)
             </label>
             {leader && (
-              <div className="flex items-center space-x-2 px-3 bg-gradient-to-r rounded-lg text-white from-pink-500 to-purple-500 transition duration-300">
-                <GiImperialCrown className="text-yellow-400 text-xl" />
-                <span className="py-1 rounded-lg">
+              <div className="flex items-center space-x-2 bg-gradient-to-r rounded-lg text-white from-pink-500 to-purple-500">
+                <GiImperialCrown className="text-yellow-400" />
+                <span>
                   {leader.firstName} {leader.lastName}
                 </span>
-                <button
-                  type="button"
-                  onClick={handleRemoveLeader}
-                  className="p-1 text-xl font-bold"
-                  aria-label="Remove Leader"
-                >
-                  &times;
+                <button type="button" onClick={handleRemoveLeader}>
+                  <FaTimes />
                 </button>
               </div>
             )}
@@ -241,14 +198,12 @@ const AddGroup = ({ group, isUpdate, groupId, onClose, fetchGroups }) => {
               {selectedStudents.map((student) => (
                 <div
                   key={student._id}
-                  className={`px-2 py-1 rounded-lg mr-2 mb-2 cursor-pointer bg-gray-100 transition duration-300 ${
+                  className={`px-2 py-1 rounded-lg cursor-pointer ${
                     leader && leader._id === student._id
                       ? "border border-pink-500"
                       : ""
                   }`}
                   onClick={() => handleLeaderClick(student)}
-                  role="button"
-                  aria-pressed={leader && leader._id === student._id}
                 >
                   {student.firstName} {student.lastName}
                 </div>
@@ -260,11 +215,8 @@ const AddGroup = ({ group, isUpdate, groupId, onClose, fetchGroups }) => {
       <div className="mt-auto mb-8">
         <button
           type="submit"
-          className="w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600 transition duration-300 transform"
+          className="w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md"
           disabled={loading}
-          aria-label={
-            loading ? "Saving..." : isUpdate ? "Update Group" : "Add Group"
-          }
         >
           {loading ? "Saving..." : isUpdate ? "Update Group" : "Add Group"}
         </button>

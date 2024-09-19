@@ -3,7 +3,6 @@ import { FaUsers } from "react-icons/fa";
 import StudentMenuOptions from "./StudentMenuOptions";
 
 const DetailedStudentList = ({ activeSection, onSeeGradeClick, students }) => {
-  
   const filteredStudents =
     activeSection === "Everyone"
       ? students
@@ -42,7 +41,6 @@ const DetailedStudentList = ({ activeSection, onSeeGradeClick, students }) => {
 };
 
 const StudentInfo = React.memo(({ student, index, onSeeGradeClick }) => (
-
   <>
     <div className="flex items-center w-1/4">
       <img
@@ -64,24 +62,25 @@ const StudentInfo = React.memo(({ student, index, onSeeGradeClick }) => (
         <div className="text-xs text-gray-500 truncate">
           {student?.admissionNumber || index}
         </div>
-
       </div>
     </div>
     <StudentDetails student={student} />
     <div className="flex items-center w-1/6">
-       <button
+      <button
         className="px-3 py-1 text-green-500 font-semibold text-sm border border-green-500 rounded-lg"
-        onClick={() => {onSeeGradeClick(student);console.log(student)}}
+        onClick={() => {
+          onSeeGradeClick(student);
+          console.log(student);
+        }}
         aria-label={`See Grade for ${student?.firstName} ${student?.lastName}`}
       >
         See Grade
-      </button> 
+      </button>
     </div>
   </>
 ));
 
 const StudentDetails = React.memo(({ student }) => (
- 
   <>
     <div className="flex flex-col gap-1 items-start justify-start w-1/5 ml-5 truncate">
       <div className="text-sm text-gray-500">Class</div>

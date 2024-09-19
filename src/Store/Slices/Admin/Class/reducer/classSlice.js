@@ -4,19 +4,29 @@ import {
   createClass,
   updateClass,
   deleteClass,
+  fetchClassDetails,
 } from "../actions/classThunk";
 
 const initialState = {
-  classes: [],
-  loading: false,
-  error: null,
-  lastFetched: null,
+  classes: [], // List of all classes
+  classDetails: null, // Specific class details for a selected class
+  loading: false, // Loading state for fetching data
+  error: null, // Error state
 };
 
 const classSlice = createSlice({
   name: "class",
   initialState,
-  reducers: {},
+  reducers: {
+    // Action to set the class details
+    setClass(state, action) {
+      state.classDetails = action.payload;
+    },
+    // Optionally, we can also add a reset action for clearing the state when needed
+    resetClassDetails(state) {
+      state.classDetails = null;
+    },
+  },
   extraReducers: (builder) => {
     // Fetch all classes lifecycle
     builder
@@ -27,9 +37,23 @@ const classSlice = createSlice({
       .addCase(fetchAllClasses.fulfilled, (state, action) => {
         state.loading = false;
         state.classes = action.payload;
-        state.lastFetched = Date.now();
       })
       .addCase(fetchAllClasses.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+
+    // Fetch specific class details lifecycle
+    builder
+      .addCase(fetchClassDetails.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchClassDetails.fulfilled, (state, action) => {
+        state.loading = false;
+        state.classDetails = action.payload; // Set the class details in the state
+      })
+      .addCase(fetchClassDetails.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
@@ -40,9 +64,9 @@ const classSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(createClass.fulfilled, (state, action) => {
+      .addCase(createClass.fulfilled, (state) => {
         state.loading = false;
-        state.classes.push(action.payload); // Add newly created class to the list
+        // No need to manually add the created class; refetching the list will update the classes
       })
       .addCase(createClass.rejected, (state, action) => {
         state.loading = false;
@@ -50,23 +74,14 @@ const classSlice = createSlice({
       });
 
     // Update class lifecycle
-    builder.addCase(updateClass.pending, (state) => {
-      state.loading = true;
-      state.error = null;
-    });
     builder
-      .addCase(updateClass.fulfilled, (state, action) => {
+      .addCase(updateClass.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateClass.fulfilled, (state) => {
         state.loading = false;
-        console.log(action.payload,"payload");
-        const index = state.classes.findIndex(
-          (cls) => cls._id === action.payload.classId
-        );
-        if (index !== -1) {
-          console.log("Updating class at index:", index); // Log the index being updated
-          console.log("Old class data:", state.classes[index]); // Log old data
-          state.classes[index] = { ...state.classes[index], ...action.payload }; // Merge updated data
-          console.log("Updated class data:", state.classes[index]); // Log updated data
-        }
+        // No need to manually update the class details, we will refetch the list after updates
       })
       .addCase(updateClass.rejected, (state, action) => {
         state.loading = false;
@@ -81,9 +96,7 @@ const classSlice = createSlice({
       })
       .addCase(deleteClass.fulfilled, (state, action) => {
         state.loading = false;
-        state.classes = state.classes.filter(
-          (cls) => cls._id !== action.payload
-        );
+        // No need to manually remove the class; refetching the list will handle updates
       })
       .addCase(deleteClass.rejected, (state, action) => {
         state.loading = false;
@@ -92,4 +105,5 @@ const classSlice = createSlice({
   },
 });
 
+export const { setClass, resetClassDetails } = classSlice.actions; // Export actions to set/reset class details
 export default classSlice.reducer;

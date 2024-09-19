@@ -15,7 +15,6 @@ const useCreateSubject = () => {
     setLoading(true);
     setError(null);
     try {
-
       const token = localStorage.getItem(`${role}:token`);
       const response = await axios.post(
         `${baseUrl}/admin/subject`,
@@ -43,39 +42,48 @@ const useCreateSubject = () => {
     setError(null);
     try {
       const token = localStorage.getItem(`${role}:token`);
-      const response = await axios.put(`${baseUrl}/admin/subject/${subjectId}`, subject, {
-        headers: { Authentication: token },
-      });
+      const response = await axios.put(
+        `${baseUrl}/admin/subject/${subjectId}`,
+        subject,
+        {
+          headers: { Authentication: token },
+        }
+      );
       setLoading(false);
       console.log("update subject--", response.data);
       fetchClassDetails(subject.classId);
       return { success: true };
     } catch (err) {
-      const errorMessage = err.response?.data?.msg || "Failed to update subject";
+      const errorMessage =
+        err.response?.data?.msg || "Failed to update subject";
       setLoading(false);
       setError(errorMessage);
     }
-  }
+  };
 
   const deleteSubject = async (subjectId, classId) => {
     setLoading(true);
     setError(null);
     try {
       const token = localStorage.getItem(`${role}:token`);
-      const response = await axios.delete(`${baseUrl}/admin/subject/${subjectId}`, {
-        headers: { Authentication: token },
-      });
+      const response = await axios.delete(
+        `${baseUrl}/admin/subject/${subjectId}`,
+        {
+          headers: { Authentication: token },
+        }
+      );
       setLoading(false);
       console.log("deleted subject--", response.data);
       toast.success("Subject deleted successfully!");
       fetchClassDetails(classId);
       return { success: true };
     } catch (err) {
-      const errorMessage = err.response?.data?.msg || "Failed to delete subject";
+      const errorMessage =
+        err.response?.data?.msg || "Failed to delete subject";
       setLoading(false);
       setError(errorMessage);
     }
-  }
+  };
 
   return { createSubject, deleteSubject, updateSubject, loading, error };
 };

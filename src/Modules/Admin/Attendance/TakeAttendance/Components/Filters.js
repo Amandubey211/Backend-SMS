@@ -1,31 +1,29 @@
-import React, { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
+import React, { useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+
 import { useParams } from "react-router-dom";
-import useFetchSection from "../../../../../Hooks/AuthHooks/Staff/Admin/Sections/useFetchSection";
-import useGetGroupsByClass from "../../../../../Hooks/AuthHooks/Staff/Admin/Groups/useGetGroupByClass";
-import { GrPowerReset } from "react-icons/gr";
+import { FiRefreshCw } from "react-icons/fi";
+import {
+  fetchGroupsByClass,
+  fetchSectionsByClass,
+} from "../../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
 
-const Filters = ({ filters, onFilterChange, resetDate }) => {
+const Filters = ({ filters, onFilterChange }) => {
   const { sectionId, groupId } = filters;
-  const AllSections = useSelector((store) => store.Class.sectionsList);
+  const dispatch = useDispatch();
   const { cid } = useParams();
-  const { fetchSection } = useFetchSection();
-  const className = useSelector((store) => store.Common.selectedClass);
-  const { fetchGroupsByClass } = useGetGroupsByClass();
-  const groups = useSelector((store) => store.Class.groupsList);
+
+  const sections = useSelector(
+    (state) => state.admin.group_section.sectionsList
+  );
+  const groups = useSelector((state) => state.admin.group_section.groupsList);
 
   useEffect(() => {
-    const fetchData = async () => {
-      await fetchSection(cid);
-    };
-    fetchData();
-  }, [fetchSection, cid]);
-  console.log(groups, "sssssssssss");
-  useEffect(() => {
-    if (!groups || groups.length === 0) {
-      fetchGroupsByClass(cid);
+    if (cid) {
+      dispatch(fetchSectionsByClass(cid));
+      dispatch(fetchGroupsByClass(cid));
     }
-  }, [groups, fetchGroupsByClass, cid]);
+  }, [dispatch, cid]);
 
   const handleSectionChange = (e) => {
     onFilterChange("sectionId", e.target.value);
@@ -38,7 +36,6 @@ const Filters = ({ filters, onFilterChange, resetDate }) => {
   const handleAllChange = () => {
     onFilterChange("sectionId", "");
     onFilterChange("groupId", "");
-    resetDate();
   };
 
   return (
@@ -52,7 +49,7 @@ const Filters = ({ filters, onFilterChange, resetDate }) => {
             onChange={handleSectionChange}
           >
             <option value="">Reset</option>
-            {AllSections.map((section) => (
+            {sections.map((section) => (
               <option key={section._id} value={section._id}>
                 {section.sectionName}
               </option>
@@ -77,12 +74,11 @@ const Filters = ({ filters, onFilterChange, resetDate }) => {
       </div>
       <div className="flex items-center">
         <button
-          className="rounded p-2 flex items-center justify-center"
-          title="Reset All"
           onClick={handleAllChange}
-          style={{ marginTop: "20px" }}
+          className=" text-gray-600 rounded-full p-2 focus:outline-none transform transition-transform duration-300 hover:rotate-180"
+          aria-label="Refresh attendence"
         >
-          <GrPowerReset className="size-10 text-gray-700" />
+          <FiRefreshCw size={24} />
         </button>
       </div>
     </div>

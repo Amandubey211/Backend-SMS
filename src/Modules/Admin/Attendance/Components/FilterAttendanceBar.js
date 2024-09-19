@@ -1,57 +1,42 @@
 import React, { useState, useEffect } from "react";
 import { IoCalendarOutline } from "react-icons/io5";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import {
   MdOutlineKeyboardArrowDown,
   MdOutlineKeyboardArrowUp,
 } from "react-icons/md";
 import { useParams } from "react-router-dom";
-import useFetchSection from "../../../../Hooks/AuthHooks/Staff/Admin/Sections/useFetchSection";
-import useGetGroupsByClass from "../../../../Hooks/AuthHooks/Staff/Admin/Groups/useGetGroupByClass";
-
-const months = [
-  { name: "January", number: 1 },
-  { name: "February", number: 2 }, // Assuming leap year for example
-  { name: "March", number: 3 },
-  { name: "April", number: 4 },
-  { name: "May", number: 5 },
-  { name: "June", number: 6 },
-  { name: "July", number: 7 },
-  { name: "August", number: 8 },
-  { name: "September", number: 9 },
-  { name: "October", number: 10 },
-  { name: "November", number: 11 },
-  { name: "December", number: 12 },
-];
+import { months } from "./Data/AttendenceData";
+import {
+  fetchGroupsByClass,
+  fetchSectionsByClass,
+} from "../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
 
 const FilterAttendanceBar = ({ filters, onFilterChange }) => {
   const { sectionId, groupId, month } = filters;
   const [isSectionDropdownOpen, setIsSectionDropdownOpen] = useState(false);
   const [isGroupDropdownOpen, setIsGroupDropdownOpen] = useState(false);
   const [isMonthDropdownOpen, setIsMonthDropdownOpen] = useState(false);
-  const AllSections = useSelector((store) => store.Class.sectionsList);
+
+  const dispatch = useDispatch();
   const { cid } = useParams();
-  const { fetchSection } = useFetchSection();
-  const { fetchGroupsByClass } = useGetGroupsByClass()
-  const groups = useSelector((store) => store.Class.groupsList)
 
-  const toggleDropdown = (setter, currentState) => {
-    setter(!currentState);
-  };
+  const sections = useSelector(
+    (state) => state.admin.group_section.sectionsList
+  );
+  const groups = useSelector((state) => state.admin.group_section.groupsList);
 
   useEffect(() => {
-    const fetchData = async () => {
-      await fetchSection(cid);
-    };
-    fetchData();
-  }, [fetchSection]);
-
-  useEffect(() => {
-    if (!groups || groups.length === 0) {
-      fetchGroupsByClass(cid)
+    if (cid) {
+      dispatch(fetchSectionsByClass(cid));
     }
-  }, [groups, fetchGroupsByClass])
+  }, [cid, dispatch]);
 
+  useEffect(() => {
+    if (cid) {
+      dispatch(fetchGroupsByClass(cid));
+    }
+  }, [cid, dispatch]);
 
   const handleSectionChange = (value) => {
     onFilterChange("sectionId", value);
@@ -65,123 +50,123 @@ const FilterAttendanceBar = ({ filters, onFilterChange }) => {
   };
 
   const handleMonthChange = (value) => {
-    console.log(value);
     onFilterChange("month", value);
     setIsMonthDropdownOpen(false);
   };
 
-  useEffect(() => {
-    // Set the current month initially
-    const currentMonth = new Date().toLocaleString("default", {
-      month: "long",
-    });
-    if (!month) {
-      onFilterChange("month", currentMonth);
-    }
-  }, [month, onFilterChange]);
-
   return (
     <div className="flex items-center justify-between space-x-4 p-3">
-      <div className="flex gap-3 items-center">
+      <div className="flex items-center gap-4">
+        {/* Section Dropdown */}
         <div className="relative w-48">
-          <div className="relative">
-            <div
-              className="block w-full p-2 border border-gray-300 rounded-lg appearance-none cursor-pointer transition-transform duration-300"
-              onClick={() =>
-                toggleDropdown(setIsSectionDropdownOpen, isSectionDropdownOpen)
-              }
-            >
-              {AllSections.find((section) => section._id === sectionId)
-                ?.sectionName || "All Sections"}
-              <div className="absolute inset-y-0 right-0 flex items-center px-2 text-gray-700 cursor-pointer transition-transform transform duration-300 ease-in-out hover:translate-y-1">
+          <div
+            className="relative"
+            onClick={() => setIsSectionDropdownOpen(!isSectionDropdownOpen)}
+          >
+            <div className="block w-full p-2 border border-gray-300 rounded-lg cursor-pointer">
+              {sections.length > 0 ? (
+                sections.find((section) => section._id === sectionId)
+                  ?.sectionName || "All Sections"
+              ) : (
+                <span className="text-gray-500">No sections found</span>
+              )}
+              <span className="absolute right-0 p-2">
                 {isSectionDropdownOpen ? (
-                  <MdOutlineKeyboardArrowUp className="fill-current h-7 w-7" />
+                  <MdOutlineKeyboardArrowUp />
                 ) : (
-                  <MdOutlineKeyboardArrowDown className="fill-current h-7 w-7" />
+                  <MdOutlineKeyboardArrowDown />
                 )}
-              </div>
+              </span>
             </div>
             {isSectionDropdownOpen && (
               <div className="absolute z-10 w-full bg-white border border-gray-300 rounded-lg mt-1">
-                {AllSections.map((section) => (
-                  <div
-                    key={section._id}
-                    className="p-2 cursor-pointer hover:bg-gray-100 transition-transform duration-300 ease-in-out hover:translate-x-1"
-                    onClick={() => handleSectionChange(section._id)}
-                  >
-                    {section.sectionName}
-                  </div>
-                ))}
+                {sections.length > 0 ? (
+                  sections.map((section) => (
+                    <div
+                      key={section._id}
+                      className="p-2 cursor-pointer hover:bg-gray-100"
+                      onClick={() => handleSectionChange(section._id)}
+                    >
+                      {section.sectionName}
+                    </div>
+                  ))
+                ) : (
+                  <div className="p-2 text-gray-500">No sections available</div>
+                )}
               </div>
             )}
           </div>
         </div>
+
+        {/* Group Dropdown */}
         <div className="relative w-48">
-          <div className="relative">
-            <div
-              className="block w-full p-2 border border-gray-300 rounded-lg appearance-none cursor-pointer transition-transform duration-300"
-              onClick={() =>
-                toggleDropdown(setIsGroupDropdownOpen, isGroupDropdownOpen)
-              }
-            >
-              {groups.find((group) => group._id === groupId)?.groupName ||
-                "All Groups"}
-              <div className="absolute inset-y-0 right-0 flex items-center px-2 text-gray-700 cursor-pointer transition-transform transform duration-300 ease-in-out hover:translate-y-1">
+          <div
+            className="relative"
+            onClick={() => setIsGroupDropdownOpen(!isGroupDropdownOpen)}
+          >
+            <div className="block w-full p-2 border border-gray-300 rounded-lg cursor-pointer">
+              {groups.length > 0 ? (
+                groups.find((group) => group._id === groupId)?.groupName ||
+                "All Groups"
+              ) : (
+                <span className="text-gray-500">No groups found</span>
+              )}
+              <span className="absolute right-0 p-2">
                 {isGroupDropdownOpen ? (
-                  <MdOutlineKeyboardArrowUp className="fill-current h-7 w-7" />
+                  <MdOutlineKeyboardArrowUp />
                 ) : (
-                  <MdOutlineKeyboardArrowDown className="fill-current h-7 w-7" />
+                  <MdOutlineKeyboardArrowDown />
                 )}
-              </div>
+              </span>
             </div>
             {isGroupDropdownOpen && (
               <div className="absolute z-10 w-full bg-white border border-gray-300 rounded-lg mt-1">
-                {groups.map((group) => (
-                  <div
-                    key={group._id}
-                    className="p-2 cursor-pointer hover:bg-gray-100 transition-transform duration-300 ease-in-out hover:translate-x-1"
-                    onClick={() => handleGroupChange(group._id)}
-                  >
-                    {group.groupName}
-                  </div>
-                ))}
+                {groups.length > 0 ? (
+                  groups.map((group) => (
+                    <div
+                      key={group._id}
+                      className="p-2 cursor-pointer hover:bg-gray-100"
+                      onClick={() => handleGroupChange(group._id)}
+                    >
+                      {group.groupName}
+                    </div>
+                  ))
+                ) : (
+                  <div className="p-2 text-gray-500">No groups available</div>
+                )}
               </div>
             )}
           </div>
         </div>
       </div>
+
+      {/* Month Dropdown */}
       <div className="relative w-64">
         <div
-          className="flex items-center cursor-pointer transition-transform duration-300"
-          style={{
-            background: "linear-gradient(to right, #fce7f3, #e9d5ff)",
-            padding: "8px 16px",
-            borderRadius: "8px",
-          }}
-          onClick={() =>
-            toggleDropdown(setIsMonthDropdownOpen, isMonthDropdownOpen)
-          }
+          className="flex items-center cursor-pointer p-2 bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 rounded-lg"
+          onClick={() => setIsMonthDropdownOpen(!isMonthDropdownOpen)}
         >
-          <IoCalendarOutline className="text-purple-500 mr-2 text-2xl" />
-          <div className="block appearance-none w-full bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 text-gradient px-4 pr-8 rounded leading-tight focus:outline-none">
+          <IoCalendarOutline className="text-white mr-2" />
+          <span className="text-white">
             {months.find((monthObj) => monthObj.number === month)?.name ||
               "Select Month"}
-          </div>
-          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+          </span>
+          <span className="ml-auto">
             {isMonthDropdownOpen ? (
-              <MdOutlineKeyboardArrowUp className="fill-current h-7 w-7" />
+              <MdOutlineKeyboardArrowUp />
             ) : (
-              <MdOutlineKeyboardArrowDown className="fill-current h-7 w-7" />
+              <MdOutlineKeyboardArrowDown />
             )}
-          </div>
+          </span>
         </div>
         {isMonthDropdownOpen && (
           <div className="absolute z-10 w-full bg-white border border-gray-300 rounded-lg mt-1">
             {months.map((monthObj) => (
               <div
                 key={monthObj.name}
-                className={`p-1 ps-8  cursor-pointer hover:bg-gray-100 transition-transform duration-300 ease-in-out hover:translate-x-2 ${month === monthObj.number ? "bg-gray-200" : ""
-                  }`}
+                className={`p-2 cursor-pointer ${
+                  month === monthObj.number ? "bg-gray-200" : ""
+                }`}
                 onClick={() => handleMonthChange(monthObj.number)}
               >
                 {monthObj.name}

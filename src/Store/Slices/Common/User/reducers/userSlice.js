@@ -45,6 +45,9 @@ const userSlice = createSlice({
     toggleSidebar: (state) => {
       state.sidebar.isOpen = !state.sidebar.isOpen;
     },
+    closeSidebar: (state) => {
+      state.sidebar.isOpen = false;
+    },
     setSelectedClass: (state, action) => {
       state.classInfo.selectedClass = action.payload;
     },
@@ -162,6 +165,7 @@ export const {
   setStudentId,
   resetUserState,
   setStep,
+  closeSidebar,
   toggleSidebar,
 } = userSlice.actions;
 

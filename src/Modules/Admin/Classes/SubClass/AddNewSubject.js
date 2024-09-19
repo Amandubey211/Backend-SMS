@@ -1,11 +1,13 @@
 import React, { useEffect, useState, useMemo, useCallback } from "react";
 import classIcons from "../../Dashboard/DashboardData/ClassIconData";
 import toast from "react-hot-toast";
-import EditorSelector from "./Components/EditorSelector";
-import useCreateSubject from "../../../../Hooks/AuthHooks/Staff/Admin/useCreateSubject";
+import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { ImSpinner3 } from "react-icons/im";
-import AssignTeacher from "../../Teachers/AssignTeacher";
+import {
+  createSubject,
+  updateSubject,
+} from "../../../../Store/Slices/Admin/Class/Subject/subjectThunks";
 
 const dummyColors = [
   "#34D399",
@@ -18,15 +20,6 @@ const dummyColors = [
   "#10B981",
   "#F59E0B",
   "#6366F1",
-  "#6EE7B7",
-  "#9333EA",
-  "#F43F5E",
-  "#FB923C",
-  "#F87171",
-  "#14B8A6",
-  "#60A5FA",
-  "#D97706",
-  "#4B5563",
 ];
 
 const AddNewSubject = ({ onClose, subject }) => {
@@ -34,22 +27,16 @@ const AddNewSubject = ({ onClose, subject }) => {
   const [selectedColor, setSelectedColor] = useState("");
   const [activeIconId, setActiveIconId] = useState(null);
   const [subjectTitle, setSubjectTitle] = useState("");
-  const [selectedUsers, setSelectedUsers] = useState([]);
-  const {
-    createSubject,
-    updateSubject,
-    loading: apiLoading,
-    error,
-  } = useCreateSubject();
-  const [loading, setLoading] = useState({ save: false, publish: false });
+
+  const dispatch = useDispatch();
   const { cid } = useParams();
+  const loading = useSelector((state) => state.admin.subject.loading);
 
   useEffect(() => {
     if (subject) {
       setSelectedColor(subject.color || "");
       setActiveIconId(subject.icon || null);
       setSubjectTitle(subject.name || "");
-      setSelectedUsers(subject.users || []);
     } else {
       resetForm();
     }
@@ -59,11 +46,6 @@ const AddNewSubject = ({ onClose, subject }) => {
     setSelectedColor("");
     setActiveIconId(null);
     setSubjectTitle("");
-    setSelectedUsers([]);
-  }, []);
-
-  const handleIconClick = useCallback((id) => {
-    setActiveIconId(id);
   }, []);
 
   const validateInputs = useCallback(() => {
@@ -71,17 +53,17 @@ const AddNewSubject = ({ onClose, subject }) => {
       toast.error("Subject name is required.");
       return false;
     }
-    // curently not required but dont remove it might required in the text phase
-    // if (!activeIconId) {
-    //   toast.error("Subject icon is required.");
-    //   return false;
-    // }
-    // if (!selectedColor) {
-    //   toast.error("Subject color is required.");
-    //   return false;
-    // }
     return true;
-  }, [subjectTitle, activeIconId, selectedColor]);
+  }, [subjectTitle]);
+
+  const hasChanges = () => {
+    if (!subject) return false;
+    return (
+      subjectTitle !== subject.name ||
+      selectedColor !== subject.color ||
+      activeIconId !== subject.icon
+    );
+  };
 
   const handleSave = async (publish = false) => {
     if (!validateInputs()) return;
@@ -92,33 +74,21 @@ const AddNewSubject = ({ onClose, subject }) => {
       isPublished: publish,
       icon: activeIconId,
       color: selectedColor,
-      users: selectedUsers,
     };
 
-    setLoading((prev) => ({ ...prev, [publish ? "publish" : "save"]: true }));
-
-    try {
-      let result;
-      if (subject) {
-        result = await updateSubject(subject._id, subjectData);
-        if (result.success) {
-          toast.success("Subject updated successfully");
-          onClose();
-        } else {
-          toast.error("Failed to update subject");
-        }
-      } else {
-        result = await createSubject(subjectData);
-        if (result.success) {
-          toast.success("Subject created successfully");
-          onClose();
-        } else {
-          toast.error("Failed to create subject");
-        }
+    if (subject) {
+      // Dispatch update only if there are changes
+      if (!hasChanges()) {
+        toast("No changes detected.");
+        return;
       }
-    } finally {
-      setLoading({ save: false, publish: false });
+      dispatch(updateSubject({ subjectId: subject._id, subjectData }));
+      toast.success("Subject updated successfully");
+    } else {
+      dispatch(createSubject(subjectData));
+      toast.success("Subject created successfully");
     }
+    onClose();
   };
 
   const iconGrid = useMemo(
@@ -126,7 +96,7 @@ const AddNewSubject = ({ onClose, subject }) => {
       classIcons.map((data) => (
         <button
           key={data.id}
-          onClick={() => handleIconClick(data.id)}
+          onClick={() => setActiveIconId(data.id)}
           className={`h-16 w-16 p-1 rounded-lg border focus:outline-none transition duration-300 ease-in-out ${
             activeIconId === data.id
               ? "bg-gradient-to-r from-pink-600 to-purple-600 border-pink-500"
@@ -142,7 +112,7 @@ const AddNewSubject = ({ onClose, subject }) => {
           />
         </button>
       )),
-    [activeIconId, handleIconClick]
+    [activeIconId]
   );
 
   const colorGrid = useMemo(
@@ -178,17 +148,8 @@ const AddNewSubject = ({ onClose, subject }) => {
           onChange={(e) => setSubjectTitle(e.target.value)}
           className="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
           placeholder="Type here"
-          aria-required="true"
         />
       </div>
-      {/* <AssignTeacher /> */}
-
-      {/* <div className="mb-4">
-        <EditorSelector
-          selectedUsers={selectedUsers}
-          setSelectedUsers={setSelectedUsers}
-        />
-      </div> */}
 
       <div className="flex mb-4">
         <button
@@ -199,7 +160,6 @@ const AddNewSubject = ({ onClose, subject }) => {
           }`}
           onClick={() => setActiveTab("icon")}
           aria-controls="icon-tab"
-          aria-selected={activeTab === "icon"}
         >
           Subject Icon
         </button>
@@ -211,65 +171,46 @@ const AddNewSubject = ({ onClose, subject }) => {
           }`}
           onClick={() => setActiveTab("color")}
           aria-controls="color-tab"
-          aria-selected={activeTab === "color"}
         >
           Frame Color
         </button>
       </div>
 
       <div
-        id="icon-tab"
-        className={`flex-grow ${activeTab === "icon" ? "block" : "hidden"}`}
+        className={`grid grid-cols-5 gap-4 ${
+          activeTab === "icon" ? "block" : "hidden"
+        }`}
       >
-        <div className="grid grid-cols-5 gap-4 mt-2">{iconGrid}</div>
+        {iconGrid}
       </div>
-
       <div
-        id="color-tab"
-        className={`flex-grow ${activeTab === "color" ? "block" : "hidden"}`}
+        className={`grid grid-cols-6 gap-2 ${
+          activeTab === "color" ? "block" : "hidden"
+        }`}
       >
-        <div className="grid grid-cols-6 gap-2 mt-2">{colorGrid}</div>
+        {colorGrid}
       </div>
 
-      <div className="mb-4 flex justify-between items-center space-x-4">
+      <div className="mt-auto pt-4 flex justify-between space-x-2 sticky bottom-0 bg-white py-4">
         <button
           onClick={() => handleSave(true)}
-          className="flex-grow rounded-md py-2 text-center"
-          style={{
-            background: "linear-gradient(to right, #fce7f3, #e9d5ff)",
-          }}
-          disabled={loading.publish}
-          aria-busy={loading.publish}
+          className="w-full py-2 rounded-md bg-gradient-to-r from-pink-500 to-purple-500 text-white"
+          disabled={loading}
         >
-          {loading.publish ? (
-            <ImSpinner3 className="animate-spin mx-auto text-lg" />
+          {loading ? (
+            <ImSpinner3 className="animate-spin mx-auto" />
           ) : (
-            <span
-              style={{
-                background: "linear-gradient(to right, #f43f5e, #8b5cf6)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-              }}
-            >
-              Save & Publish
-            </span>
+            "Save & Publish"
           )}
         </button>
         <button
           onClick={() => handleSave(false)}
-          className="flex-grow px-6 py-2 text-white font-semibold rounded-md bg-gradient-to-r from-purple-500 to-red-500 hover:from-purple-600 hover:to-red-600 text-center"
-          disabled={loading.save}
-          aria-busy={loading.save}
+          className="w-full py-2 rounded-md bg-gradient-to-r from-purple-500 to-red-500 text-white"
+          disabled={loading}
         >
-          {loading.save ? (
-            <ImSpinner3 className="animate-spin mx-auto text-lg" />
-          ) : (
-            "Save"
-          )}
+          {loading ? <ImSpinner3 className="animate-spin mx-auto" /> : "Save"}
         </button>
       </div>
-
-      {error && <p className="text-red-500 text-center">{error}</p>}
     </div>
   );
 };

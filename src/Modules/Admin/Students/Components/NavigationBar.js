@@ -3,8 +3,10 @@ import { NavLink } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 const NavigationBar = ({ setActiveSection, activeSection, totalStudents }) => {
-  const Sections = useSelector((store) => store.Class.sectionsList);
-  const role = useSelector((store) => store.Auth.role);
+  const Sections = useSelector(
+    (store) => store.admin.group_section.sectionsList
+  ); // Assuming this comes from another slice
+  const role = useSelector((store) => store.common.auth.role);
 
   const getButtonClass = useCallback(
     (section) => {
