@@ -13,8 +13,8 @@ import { useTranslation } from "react-i18next";
 
 const BookIssue = () => {
 
-  const { loading, error, issueBooks, filters } = useSelector((store) => store.studentIssueBooks);
-  const {  activeTab } = useSelector((store) => store.studentLibraryBooks);
+  const { loading, error, issueBooks, filters } = useSelector((store) => store.student.studentIssueBooks);
+  const {  activeTab } = useSelector((store) => store.student.studentLibraryBooks);
  
   const dispatch = useDispatch();
   const { t } = useTranslation();

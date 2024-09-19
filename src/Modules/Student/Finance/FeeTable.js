@@ -7,7 +7,7 @@ import { gt } from "../../../Utils/translator/translation";
 import { useTranslation } from "react-i18next";
 
 const FeeTable = ({ feesDetails }) => {
-  const { loading, error } = useSelector((store) => store.studentFinance);
+  const { loading, error } = useSelector((store) => store.student.studentFinance);
   const { t } = useTranslation();
   return (
     <div className="relative overflow-x-auto">

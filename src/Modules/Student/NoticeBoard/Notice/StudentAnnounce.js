@@ -16,7 +16,7 @@ import { gt } from "../../../../Utils/translator/translation";
 
 const StudentAnnounce = () => {
 
-  const { loading, error, noticeData, activeIndex, searchTerm } = useSelector((store) => store.studentAnnouncement);
+  const { loading, error, noticeData, activeIndex, searchTerm } = useSelector((store) => store.student.studentAnnouncement);
   const dispatch = useDispatch();
   const {t}=useTranslation();
   useNavHeading("Notice");

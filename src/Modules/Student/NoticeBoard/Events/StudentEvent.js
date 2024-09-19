@@ -15,7 +15,7 @@ import EventCard from "./EventCard";
 import Sidebar from "./Sidebar";
 
 const StudentEvent = () => {
-  const { eventData, filteredEvents, currentPage, selectedEvent, sidebarContent, isSidebarOpen, itemsPerPage, currentDate } = useSelector((store) => store.studentEvent);
+  const { eventData, filteredEvents, currentPage, selectedEvent, sidebarContent, isSidebarOpen, itemsPerPage, currentDate } = useSelector((store) => store.student.studentEvent);
   const dispatch = useDispatch();
   const [selectedMonthYear, setSelectedMonthYear] = useState({
     month: currentDate.getMonth(),
