@@ -15,7 +15,7 @@ const initialState = {
     activeTab:"Library",
 }
 
-const librarySlice = createSlice({
+const stdLibrarySlice = createSlice({
     name: "studentLibrary",
     initialState,
     reducers: {
@@ -45,5 +45,5 @@ const librarySlice = createSlice({
 })
 
 
-export const {setFilters,setActiveTab} = librarySlice.actions;
-export default librarySlice.reducer;
+export const {setFilters,setActiveTab} = stdLibrarySlice.actions;
+export default stdLibrarySlice.reducer;

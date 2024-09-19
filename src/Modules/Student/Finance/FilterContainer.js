@@ -13,7 +13,7 @@ const uniqueFilterOptions = (data, key) => {
 
 const FilterContainer = () => {
 
-  const { filters, stdFinanceData } = useSelector((store) => store.studentFinance);
+  const { filters, stdFinanceData } = useSelector((store) => store.student.studentFinance);
   const dispatch = useDispatch();
   const { t } = useTranslation();
 

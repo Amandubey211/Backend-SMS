@@ -46,10 +46,10 @@ const StudentFinance = lazy(() =>
   import("../Modules/Student/Finance/StudentFinance.js")
 );
 const StudentEvent = lazy(() =>
-  import("../Modules/Student/StudentEvent/StudentEvent.js")
+  import("../Modules/Student/NoticeBoard/Events/StudentEvent.js")
 );
 const StudentAnnounce = lazy(() =>
-  import("../Modules/Student/NoticeBoard/StudentAnnounce.js")
+   import ('../Modules/Student/NoticeBoard/Notice/StudentAnnounce.js')
 );
 const StudentLibrarySection = lazy(() =>
   import("../Modules/Student/Library/MainSection/Libary.js")

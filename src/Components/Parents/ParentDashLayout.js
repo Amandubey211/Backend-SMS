@@ -10,7 +10,7 @@ const ParentDashLayout = ({
   hideAvatarList,
   hideStudentView,
 }) => {
-  const isSidebarOpen = useSelector((state) => state.User.sidebar.isOpen);
+  const isSidebarOpen = useSelector((state) => state.common.user.sidebar.isOpen);
   return (
     <div className="flex w-full h-full  ">
      <Toaster />

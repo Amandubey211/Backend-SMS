@@ -7,12 +7,29 @@ import teacherReducer from "./Slices/Admin/Class/Teachers/teacherSlice";
 import classReducer from "./Slices/Admin/Class/reducer/classSlice"; // Importing the combined admin reducer
 import subjectReducer from "./Slices/Admin/Class/Subject/subjectSlice";
 import { combineReducers } from "redux";
+
 import sectionReducer from "./Slices/Admin/Class/Section_Groups/groupSectionSlice";
 import studentFinanceReducer from "./Slices/Student/Finance/financeSlice";
 import studentLibraryBooksReducer from "./Slices/Student/Library/libararySlice";
 import studentIssueBooksReducer from "./Slices/Student/Library/bookIssuesSlice";
 import studentReducer from "./Slices/Admin/Class/Students/studentSlice";
 import attendanceReducer from "./Slices/Admin/Class/Attendence/attendanceSlice";
+
+
+
+import studentFinanceReducer from './Slices/Student/Finance/financeSlice';
+import studentLibraryBooksReducer from './Slices/Student/Library/libararySlice';
+import studentIssueBooksReducer from './Slices/Student/Library/bookIssuesSlice';
+
+import parentPanelReducer from "../Store/Slices/Parent/Dashboard/dashboardSlice";
+
+import studentAnnouncementReducer from "../Store/Slices/Student/Noticeboard/noticeSlice";
+
+import studentEventReducer from '../Store/Slices/Student/Noticeboard/eventsSlice';
+
+
+
+
 // Persist configuration for the Auth slice
 const authPersistConfig = {
   key: "auth",
@@ -51,6 +68,14 @@ const AdminReducer = combineReducers({
   students: studentReducer,
   attendance: attendanceReducer,
 });
+
+const studentReducer=combineReducers({
+  studentFinance:studentFinanceReducer,
+  studentLibraryBooks:studentLibraryBooksReducer,
+  studentIssueBooks:studentIssueBooksReducer,
+  studentAnnouncement:studentAnnouncementReducer,
+  studentEvent:studentEventReducer,
+})
 // Create the store
 const store = configureStore({
   reducer: {
@@ -58,10 +83,15 @@ const store = configureStore({
     // Other slices remain unchanged
     admin: AdminReducer, // Grouping all admin-related reducers
 
+
     // Using persisted user reducer
     studentFinance: studentFinanceReducer,
     studentLibraryBooks: studentLibraryBooksReducer,
     studentIssueBooks: studentIssueBooksReducer,
+
+    student: studentReducer,
+    Parent: parentPanelReducer,
+
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
