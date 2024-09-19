@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { useDispatch, useSelector } from 'react-redux';
 import DashCard from "../Dasboard/Dashcard.js";
 import { cardData as initialCardData } from '../Dasboard/DashboardData/CardData.js';
 import AccountingSection from "../Accounting/MainSection/ParentAccounts.js";
@@ -11,87 +12,58 @@ import { RiMoneyDollarBoxFill } from "react-icons/ri";
 import { RiCalendarCheckLine } from "react-icons/ri";
 import { baseUrl } from '../../../config/Common.js';
 import Spinner from "../../../Components/Common/Spinner"; // Import Spinner
-
-const fetchDashboardData = async () => {
-  try {
-    const token = localStorage.getItem('parent:token');
-    const response = await axios.get(`${baseUrl}/parent/api/dashboard/sections`, {
-      headers: {
-        Authentication: `${token}`
-      }
-    });
-    if (response.data.success) {
-      return response.data;
-    } else {
-      throw new Error('Failed to fetch data');
-    }
-  } catch (error) {
-    console.error(error);
-    return null;
-  }
-};
+import { fetchParentDashboardData } from '../../../Store/Slices/Parent/Dashboard/dashboardSlice.js';
 
 const ParentSection = () => {
-  const [cardData, setCardData] = useState(initialCardData);
-  const [numberOfChildren, setNumberOfChildren] = useState(0);
-  const [loading, setLoading] = useState(true); // Add loading state
+  const dispatch = useDispatch();
+
+  // Get the data from Redux
+  const { dashboardData = {}, loading } = useSelector((state) => state.Parent || {});
 
   useEffect(() => {
-    const getData = async () => {
-      const data = await fetchDashboardData();
-      if (data) {
-        setCardData([
-          {
-            label: "Due Fees",
-            value: data.dueFees.toString(),
-            bgColor: "bg-rose-200",
-            textColor: "text-rose-500",
-            icon: <CiMoneyBill />,
-            iconBackground: "bg-rose-800",
-          },
-          {
-            label: "Upcoming Exams",
-            value: data.upcomingExamsCount.toString(),
-            bgColor: "bg-green-200",
-            textColor: "text-green-500",
-            icon: <RiBookOpenLine />,
-            iconBackground: "bg-green-800",
-          },
-          {
-            label: "Result Published",
-            value: data.publishedResultsCount.toString(),
-            bgColor: "bg-teal-100",
-            textColor: "text-teal-700",
-            icon: <RiCalendarCheckLine />,
-            iconBackground: "bg-teal-400",
-          },
-          {
-            label: "Total Expense",
-            value: data.totalExpenses.toString(),
-            bgColor: "bg-purple-200",
-            textColor: "text-purple-400",
-            icon: <RiMoneyDollarBoxFill />,
-            iconBackground: "bg-purple-500",
-          },
-        ]);
-
-        setNumberOfChildren(data.childrenCount || 0);
-      }
-      setLoading(false); // Set loading to false once data is fetched
-    };
-
-    getData();
-  }, []);
+    dispatch(fetchParentDashboardData());
+  }, [dispatch]);
 
   if (loading) {
-    return <Spinner />; // Show spinner while loading
+    return <Spinner />;
   }
+
+  const cardData = [
+    {
+      label: "Due Fees",
+      value: dashboardData.dueFees?.toString() || "0",
+      bgColor: "bg-rose-200",
+      textColor: "text-rose-500",
+      icon: <CiMoneyBill />,
+    },
+    {
+      label: "Upcoming Exams",
+      value: dashboardData.upcomingExamsCount?.toString() || "0",
+      bgColor: "bg-green-200",
+      textColor: "text-green-500",
+      icon: <RiBookOpenLine />,
+    },
+    {
+      label: "Result Published",
+      value: dashboardData.publishedResultsCount?.toString() || "0",
+      bgColor: "bg-teal-100",
+      textColor: "text-teal-700",
+      icon: <RiCalendarCheckLine />,
+    },
+    {
+      label: "Total Expense",
+      value: dashboardData.totalExpenses?.toString() || "0",
+      bgColor: "bg-purple-200",
+      textColor: "text-purple-400",
+      icon: <RiMoneyDollarBoxFill />,
+    },
+  ];
 
   return (
     <div className="h-full w-full">
       <div className="w-full">
-        <div className="flex flex-wrap justify-center gap-3 py-4 ">
-          {cardData?.map((item, index) => (
+        <div className="flex flex-wrap justify-center gap-3 py-4">
+          {cardData.map((item, index) => (
             <DashCard key={index} {...item} />
           ))}
         </div>
@@ -100,7 +72,7 @@ const ParentSection = () => {
             <StudentParentCard />
           </div>
           <div className="w-3/5 border-r">
-            <NoticeBoard numberOfChildren={numberOfChildren} />
+            <NoticeBoard numberOfChildren={dashboardData.childrenCount || 0} />
           </div>
         </div>
         <div className="flex justify-between items-start border-y">
@@ -114,3 +86,5 @@ const ParentSection = () => {
 };
 
 export default ParentSection;
+
+

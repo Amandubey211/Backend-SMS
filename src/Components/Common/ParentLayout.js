@@ -4,7 +4,7 @@ import { Toaster } from "react-hot-toast";
 import useNavHeading from "../../Hooks/CommonHooks/useNavHeading ";
 import { useSelector } from "react-redux";
 const Layout = ({ children, title, description, keywords, author }) => {
-  const role = useSelector((store) => store.Auth.role);
+  const role = useSelector((store) => store.common.auth.role);
   useNavHeading(role);
   return (
     <div>
