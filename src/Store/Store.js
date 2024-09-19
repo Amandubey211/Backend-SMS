@@ -11,7 +11,11 @@ import { combineReducers } from "redux";
 import studentFinanceReducer from './Slices/Student/Finance/financeSlice';
 import studentLibraryBooksReducer from './Slices/Student/Library/libararySlice'; 
 import studentIssueBooksReducer from './Slices/Student/Library/bookIssuesSlice'; 
+
+import parentPanelReducer from "./Slices/Parent/dashboardSlice";
+
 import studentAnnouncementReducer from "../Store/Slices/Student/Noticeboard/noticeSlice";
+
 // Persist configuration for the Auth slice
 const authPersistConfig = {
   key: "auth",
@@ -63,7 +67,11 @@ const store = configureStore({
     studentFinance:studentFinanceReducer,
     studentLibraryBooks:studentLibraryBooksReducer,
     studentIssueBooks:studentIssueBooksReducer,
+
+    Parent: parentPanelReducer
+
     studentAnnouncement:studentAnnouncementReducer,
+
 
   },
   middleware: (getDefaultMiddleware) =>
