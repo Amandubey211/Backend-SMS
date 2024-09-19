@@ -12,7 +12,7 @@ import { RiMoneyDollarBoxFill } from "react-icons/ri";
 import { RiCalendarCheckLine } from "react-icons/ri";
 import { baseUrl } from '../../../config/Common.js';
 import Spinner from "../../../Components/Common/Spinner"; // Import Spinner
-import { fetchParentDashboardData } from "../../../Store/Slices/Parent/dashboardSlice.js";
+import { fetchParentDashboardData } from '../../../Store/Slices/Parent/Dashboard/dashboardSlice.js';
 
 const ParentSection = () => {
   const dispatch = useDispatch();
