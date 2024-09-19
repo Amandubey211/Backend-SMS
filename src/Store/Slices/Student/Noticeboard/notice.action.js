@@ -12,7 +12,7 @@ export const studentNotice = createAsyncThunk(
         }
         try {
 
-            const res = await axios.get(`${baseUrl}/student/all/notices`, {
+            const res = await axios.get(`${baseUrl}/admin/all/notices`, {
                 headers: { Authentication: token }
             });
 

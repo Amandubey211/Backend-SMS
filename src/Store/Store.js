@@ -16,6 +16,10 @@ import parentPanelReducer from "../Store/Slices/Parent/Dashboard/dashboardSlice"
 
 import studentAnnouncementReducer from "../Store/Slices/Student/Noticeboard/noticeSlice";
 
+import studentEventReducer from '../Store/Slices/Student/Noticeboard/eventsSlice';
+
+
+
 // Persist configuration for the Auth slice
 const authPersistConfig = {
   key: "auth",
@@ -63,14 +67,20 @@ const store = configureStore({
     // Other slices remain unchanged
     admin: AdminReducer, // Grouping all admin-related reducers
 
-    // Using persisted user reducer
-    studentFinance: studentFinanceReducer,
-    studentLibraryBooks: studentLibraryBooksReducer,
-    studentIssueBooks: studentIssueBooksReducer,
+
+// Using persisted user reducer
+    studentFinance:studentFinanceReducer,
+    studentLibraryBooks:studentLibraryBooksReducer,
+    studentIssueBooks:studentIssueBooksReducer,
+    studentAnnouncement:studentAnnouncementReducer,
+    studentEvent:studentEventReducer
+
+
 
     Parent: parentPanelReducer,
 
-    studentAnnouncement: studentAnnouncementReducer,
+
+  
 
 
   },
