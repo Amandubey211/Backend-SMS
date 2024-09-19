@@ -7,7 +7,7 @@ const useNavHeading = (heading, subheading) => {
 
   useEffect(() => {
     dispatch(setLeftHeading([heading, subheading]));
-  }, [dispatch, heading, subheading]);
+  }, [dispatch, heading, subheading]); // Effect runs only when `heading` or `subheading` changes
 };
 
 export default useNavHeading;

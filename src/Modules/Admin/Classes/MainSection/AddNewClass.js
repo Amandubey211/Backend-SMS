@@ -30,10 +30,25 @@ const AddNewClass = ({ classData, isUpdate, onClose }) => {
     setActiveIconId(id);
   };
 
+  const hasChanges = () => {
+    if (!classData) return false;
+    return (
+      newClassName !== classData.className ||
+      activeIconId !== classData.classIcons
+    );
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!newClassName || !activeIconId) {
       toast.error("Please provide a class name and select an icon.");
+      return;
+    }
+
+    // Only dispatch the update if there are changes
+    if (isUpdate && !hasChanges()) {
+      toast("No changes detected.");
       return;
     }
 
@@ -44,7 +59,7 @@ const AddNewClass = ({ classData, isUpdate, onClose }) => {
 
     try {
       if (isUpdate) {
-        // Dispatch the updateClass thunk
+        // Dispatch the updateClass thunk only if there are changes
         dispatch(
           updateClass({ classData: classDetails, classId: classData._id })
         );

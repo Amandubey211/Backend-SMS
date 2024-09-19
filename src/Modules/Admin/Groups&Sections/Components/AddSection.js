@@ -1,40 +1,43 @@
 import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  createSection,
+  updateSection,
+} from "../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
 import { useParams } from "react-router-dom";
-import useCreateSection from "../../../../Hooks/AuthHooks/Staff/Admin/Sections/useCreateSection";
 import toast from "react-hot-toast";
 
-const AddSection = ({ initialSection = null, onSubmitSuccess, onCancel }) => {
-  const [sectionName, setSectionName] = useState(initialSection?.sectionName || "");
+const AddSection = ({ initialSection = null, onCancel }) => {
+  const [sectionName, setSectionName] = useState("");
+  const dispatch = useDispatch();
   const { cid } = useParams();
-  const { createSection, updateSection, loading, error } = useCreateSection();
+  const loading = useSelector((state) => state.admin.group_section.loading);
 
+  // Reset form when initialSection changes
   useEffect(() => {
-    if (error) {
-      toast.error(error);
+    if (initialSection) {
+      setSectionName(initialSection.sectionName);
+    } else {
+      setSectionName(""); // Clear the form when there's no initial section
     }
-  }, [error]);
+  }, [initialSection]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const sectionData = { sectionName, classId: cid };
 
-    const sectionData = {
-      sectionName,
-      classId: cid,
-    };
-    
-    if (initialSection) {
-      // Update section
-      await updateSection({
-        ...sectionData,
-        sectionId: initialSection._id, // Pass sectionId for updating
-      });
-    } else {
-      // Create new section
-      await createSection(sectionData);
+    try {
+      if (initialSection) {
+        await dispatch(
+          updateSection({ sectionId: initialSection._id, sectionData })
+        );
+      } else {
+        await dispatch(createSection(sectionData));
+      }
+      onCancel();
+    } catch (error) {
+      toast.error(error.message || "Something went wrong");
     }
-    onSubmitSuccess(); // Notify parent of success to refresh list
-    onCancel(); // Close the sidebar
-
   };
 
   return (
@@ -53,7 +56,7 @@ const AddSection = ({ initialSection = null, onSubmitSuccess, onCancel }) => {
               id="section-name"
               value={sectionName}
               onChange={(e) => setSectionName(e.target.value)}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
               placeholder="Type Here"
               required
             />
@@ -63,7 +66,7 @@ const AddSection = ({ initialSection = null, onSubmitSuccess, onCancel }) => {
       <div className="mt-auto mb-8">
         <button
           type="submit"
-          className="w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600"
+          className="w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md"
           disabled={loading}
         >
           {loading
@@ -71,8 +74,8 @@ const AddSection = ({ initialSection = null, onSubmitSuccess, onCancel }) => {
               ? "Updating Section..."
               : "Adding Section..."
             : initialSection
-              ? "Update Section"
-              : "Add Section"}
+            ? "Update Section"
+            : "Add Section"}
         </button>
       </div>
     </form>

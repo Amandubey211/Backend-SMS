@@ -9,7 +9,7 @@ import { useParams } from "react-router-dom";
 const useCreateGroup = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const role = useSelector((store) => store.Auth.role);
+  const role = useSelector((store) => store.common.auth.role);
   const { fetchUnassignedStudents } = useGetUnassignedStudents();
   const { cid } = useParams();
   const createGroup = async (groupData) => {

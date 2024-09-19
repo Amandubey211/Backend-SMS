@@ -5,13 +5,11 @@ import { NavLink } from "react-router-dom";
 import { TbEdit } from "react-icons/tb";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { deleteClass } from "../../../../Store/Slices/Admin/Class/actions/classThunk"; // Import the delete thunk
-import { setSelectedClass } from "../../../../Store/Slices/Common/User/reducers/userSlice";
+import { setSelectedClassName } from "../../../../Store/Slices/Common/User/reducers/userSlice";
 
 import leftLogo from "../../../../Assets/ClassesAssets/ClassCardLeftLogo.png";
 import RightLogo from "../../../../Assets/ClassesAssets/ClassCardRightLogo.png";
 import centerLogo from "../../../../Assets/ClassesAssets/ClassCardCenterLogo.png";
-import Sidebar from "../../../../Components/Common/Sidebar";
-import AddNewClass from "./AddNewClass";
 import DeleteModal from "../../../../Components/Common/DeleteModal";
 
 const ClassCard = ({ role, classData, onEdit }) => {
@@ -76,7 +74,7 @@ const ClassCard = ({ role, classData, onEdit }) => {
         )}
         <NavLink
           to={`/class/${classId}`}
-          onClick={() => dispatch(setSelectedClass(className))}
+          onClick={() => dispatch(setSelectedClassName(className))}
           className="flex flex-col gap-1 justify-center items-center -mt-4"
         >
           <h2 className="text-xl font-bold text-purple-600 capitalize">

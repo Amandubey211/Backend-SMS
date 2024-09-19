@@ -1,23 +1,13 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { baseUrl } from "../../../../../config/Common";
+import { setClass } from "../reducer/classSlice";
+import { setSubjects } from "../Subject/subjectSlice";
 
-const CACHE_DURATION = 10 * 60 * 1000; // Cache duration set to 10 minutes
-
-// Fetch all classes (with caching)
+// Fetch all classes
 export const fetchAllClasses = createAsyncThunk(
   "class/fetchAllClasses",
   async (_, { getState, rejectWithValue }) => {
-    const { class: classState } = getState().admin; // Access the class state
-    const { lastFetched } = classState;
-
-    // Check if data is stale or still valid based on cache duration
-    if (lastFetched && Date.now() - lastFetched < CACHE_DURATION) {
-      console.log("Using cached class data.");
-      return classState.classes; // Return cached classes if data is fresh
-    }
-
-    // If data is stale or missing, make the API request
     const { common } = getState();
     const token = common.auth.token;
 
@@ -35,7 +25,31 @@ export const fetchAllClasses = createAsyncThunk(
     }
   }
 );
+export const fetchClassDetails = createAsyncThunk(
+  "class/fetchClassDetails",
+  async (classId, { rejectWithValue, getState, dispatch }) => {
+    const { common } = getState();
+    const token = common.auth.token;
 
+    try {
+      const response = await axios.get(`${baseUrl}/admin/class/${classId}`, {
+        headers: { Authentication: `Bearer ${token}` },
+      });
+
+      console.log(response.data);
+      // Dispatch the class and subjects to the Redux store
+      dispatch(setClass(response.data?.data));
+      dispatch(setSubjects(response.data?.data?.subjects));
+
+      return response.data?.data; // Return the class details
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message || "Failed to fetch class details";
+      console.error("Error fetching class details:", errorMessage);
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
 // Create a new class
 export const createClass = createAsyncThunk(
   "class/createClass",
@@ -77,14 +91,19 @@ export const updateClass = createAsyncThunk(
         }
       );
 
-      console.log('Updated class data:', response.data); // Log the updated data
-      return { ...response.data, classId }; // Return updated class data with ID
+      // After the update, refetch all classes to get the latest data
+      dispatch(fetchAllClasses());
+
+      return response.data; // Return success message
     } catch (error) {
-      const errorMessage = error.response?.data?.msg || "Failed to update class";
+      const errorMessage =
+        error.response?.data?.msg || "Failed to update class";
+      console.error("Error updating class:", errorMessage);
       return rejectWithValue(errorMessage);
     }
   }
 );
+
 // Delete a class
 export const deleteClass = createAsyncThunk(
   "class/deleteClass",
@@ -103,7 +122,7 @@ export const deleteClass = createAsyncThunk(
       // After successful deletion, refetch the class list
       dispatch(fetchAllClasses());
 
-      return response.data; // Return confirmation of deletion
+      return classId; // Return deleted class ID
     } catch (error) {
       const errorMessage =
         error.response?.data?.msg || "Failed to delete class";

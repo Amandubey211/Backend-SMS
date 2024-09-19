@@ -1,9 +1,11 @@
 import React from "react";
+import { useSelector } from "react-redux";
 import { navData } from "../../Components/Data/NavData";
 import AttendanceNavCard from "../../Components/AttendanceNavCard";
 
-const Statistics = ({ attendanceData }) => {
-  // Map attendanceData to navData structure
+const Statistics = () => {
+  const stats = useSelector((state) => state.admin.attendance.stats);
+
   const dataMapping = {
     "Total Students": "totalStudents",
     "Present Today": "presentCount",
@@ -11,17 +13,17 @@ const Statistics = ({ attendanceData }) => {
     "Leave Today": "leaveCount",
   };
 
-  const mappedData = navData.map(item => {
+  const mappedData = navData.map((item) => {
     const key = dataMapping[item.label.trim()];
     return {
       ...item,
-      value: attendanceData[key] || 0,
+      value: stats[key] || 0,
     };
   });
 
   return (
     <div className="space-y-2 w-full">
-      {mappedData?.map(item => (
+      {mappedData?.map((item) => (
         <AttendanceNavCard
           key={item.label}
           label={item.label}

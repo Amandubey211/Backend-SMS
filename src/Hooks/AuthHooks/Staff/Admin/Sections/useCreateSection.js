@@ -5,13 +5,11 @@ import toast from "react-hot-toast";
 import useFetchSection from "./useFetchSection";
 import { baseUrl } from "../../../../../config/Common";
 
-
-
 const useCreateSection = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const role = useSelector((store) => store.Auth.role);
-  const { fetchSection } = useFetchSection()
+  const role = useSelector((store) => store.common.auth.role);
+  const { fetchSection } = useFetchSection();
   const createSection = async (sectionData) => {
     setLoading(true);
     setError(null); // Reset error state before new request
@@ -25,9 +23,9 @@ const useCreateSection = () => {
         }
       );
       if (data.success) {
-        toast.success("Section Created ")
+        toast.success("Section Created ");
       }
-      fetchSection(sectionData.classId)
+      fetchSection(sectionData.classId);
     } catch (err) {
       setError(err.response?.data?.message || err.message);
     } finally {
@@ -40,7 +38,7 @@ const useCreateSection = () => {
     setError(null);
     try {
       const token = localStorage.getItem(`${role}:token`);
-      const sectionId = sectionData.sectionId
+      const sectionId = sectionData.sectionId;
       const { data } = await axios.put(
         `${baseUrl}/admin/editSection/${sectionId}`,
         sectionData,
@@ -49,14 +47,14 @@ const useCreateSection = () => {
         }
       );
       if (data.success) {
-        toast.success("Section Updated Successfully ")
+        toast.success("Section Updated Successfully ");
       }
     } catch (err) {
       setError(err.response?.data?.message || err.message);
     } finally {
       setLoading(false);
     }
-  }
+  };
   return { createSection, updateSection, loading, error };
 };
 
