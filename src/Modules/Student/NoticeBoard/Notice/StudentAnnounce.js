@@ -95,7 +95,7 @@ const StudentAnnounce = () => {
             </div>
            
           ) : filteredNotices().length > 0 ? (
-            filteredNotices().reverse().map((notice, index) => (
+            filteredNotices()?.map((notice, index) => (
               <NoticeItem
                 key={notice.id}
                 notice={notice}

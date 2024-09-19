@@ -12,6 +12,9 @@ import studentFinanceReducer from './Slices/Student/Finance/financeSlice';
 import studentLibraryBooksReducer from './Slices/Student/Library/libararySlice'; 
 import studentIssueBooksReducer from './Slices/Student/Library/bookIssuesSlice'; 
 import studentAnnouncementReducer from "../Store/Slices/Student/Noticeboard/noticeSlice";
+import studentEventReducer from '../Store/Slices/Student/Noticeboard/eventsSlice';
+
+
 // Persist configuration for the Auth slice
 const authPersistConfig = {
   key: "auth",
@@ -64,7 +67,7 @@ const store = configureStore({
     studentLibraryBooks:studentLibraryBooksReducer,
     studentIssueBooks:studentIssueBooksReducer,
     studentAnnouncement:studentAnnouncementReducer,
-
+    studentEvent:studentEventReducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
