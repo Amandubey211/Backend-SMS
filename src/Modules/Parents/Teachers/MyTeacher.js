@@ -32,7 +32,7 @@ const MyTeacher = () => {
                     throw new Error("No guardian email found");
                 }
 
-                const response = await axios.get(`${baseUrl}/parent/api/instructors?studentId=${studentId}`, {
+                const response = await axios.get(`${baseUrl}/parent/api/instructors/${studentId}`, {
                     headers: {
                         'Authentication': `${token}`
                     }
