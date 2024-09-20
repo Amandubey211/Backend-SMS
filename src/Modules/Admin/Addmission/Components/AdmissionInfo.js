@@ -12,7 +12,7 @@ const AdmissionInfo = ({ studentInfo, handleInputChange }) => {
   // const { fetchSchools, schoolList } = useGetAllSchools();
   const { cid } = useParams();
 
-  const classList = useSelector((store) => store.Class.classList);
+  const classList = useSelector((store) => store.admin.class.classes);
 
   useEffect(() => {
     fetchClasses(cid);

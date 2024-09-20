@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useParams, useNavigate, NavLink } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { AiOutlineEye } from "react-icons/ai";
-import VerificationForm from "./VerificationForm";
 import Details from "./Details";
 
 const colors = [
@@ -19,22 +18,19 @@ const getColor = (index) => colors[index % colors.length];
 const StudentDetail = () => {
   const { sid } = useParams();
   const navigate = useNavigate();
-  const unverifiedstudent = useSelector(
-    (store) => store.Admin.unVerifiedStudents
+  const { unVerifiedStudents, rejectedStudents } = useSelector(
+    (store) => store.admin.verification
+  );
+  const student = [...unVerifiedStudents, ...rejectedStudents].find(
+    (student) => student._id === sid
   );
 
-  const student = unverifiedstudent.find((student) => student._id === sid);
   const [preview, setPreview] = useState(null);
   const [previewType, setPreviewType] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
 
-  const openModal = () => {
-    setModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setModalOpen(false);
-  };
+  const openModal = () => setModalOpen(true);
+  const closeModal = () => setModalOpen(false);
 
   const handlePreviewClick = (url, type) => {
     if (url) {
@@ -51,23 +47,21 @@ const StudentDetail = () => {
   }
 
   return (
-    <div className="container  p-2">
-      <div className="flex ">
-        <NavLink
-          onClick={() => navigate(-1)}
-          className="flex items-center gap-2 mt-5 ps-4 text-sm text-gray-500 hover:text-gray-700"
-        >
-          <div className="w-6 h-6 flex justify-center items-center border rounded-full text-xl">
-            &larr;
-          </div>
-          <span>Back</span>
-        </NavLink>
-      </div>
+    <div className="container p-2 w-full ">
+      <NavLink
+        onClick={() => navigate(-1)}
+        className="flex items-center gap-2 mt-5 ps-6 text-sm text-gray-500 hover:text-gray-700"
+      >
+        <div className="w-6 h-6 flex justify-center items-center border rounded-full text-xl">
+          &larr;
+        </div>
+        <span>Back</span>
+      </NavLink>
 
-      <div className="bg-white p-2  ">
+      <div className="bg-white p-2">
         <Details student={student} />
 
-        <div className=" p-2  rounded-lg mb-3 ">
+        <div className="p-2 rounded-lg mb-3">
           <h3 className="text-lg font-semibold mb-4 text-gray-800">
             Document Previews
           </h3>
@@ -77,7 +71,7 @@ const StudentDetail = () => {
                 key={index}
                 className={`${getColor(
                   index
-                )} p-4 border rounded-lg shadow-md transform transition-transform hover:scale-105`}
+                )} p-4 border rounded-lg shadow-md transform hover:scale-105 transition-transform`}
               >
                 {doc.documentType.startsWith("image/") ? (
                   <img
@@ -99,7 +93,7 @@ const StudentDetail = () => {
                   </p>
                   <button
                     title="Open Modal"
-                    className="p-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-full shadow-lg hover:from-pink-600 hover:to-purple-600 transition-all duration-200"
+                    className="p-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-full shadow-lg hover:from-pink-600 hover:to-purple-600"
                     onClick={() =>
                       handlePreviewClick(doc?.documentUrl, doc.documentType)
                     }
@@ -111,8 +105,6 @@ const StudentDetail = () => {
             ))}
           </div>
         </div>
-
-        <VerificationForm email={student.email} studentId={student._id} />
       </div>
 
       {modalOpen && (
@@ -120,7 +112,7 @@ const StudentDetail = () => {
           <div className="bg-white p-4 rounded-lg relative max-h-full overflow-y-auto shadow-lg">
             <button
               onClick={closeModal}
-              className="absolute top-2 right-2 p-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-full shadow-lg hover:from-pink-600 hover:to-purple-600 transition-colors duration-200"
+              className="absolute top-2 right-2 p-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-full shadow-lg hover:from-pink-600 hover:to-purple-600"
             >
               ✕
             </button>

@@ -9,7 +9,7 @@ import useGetUnassignedStudents from "./useGetUnassignedStudents";
 const useAssignStudentToGroup = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const role = useSelector((store) => store.Auth.role);
+  const role = useSelector((store) => store.common.auth.role);
   const { fetchUnassignedStudents } = useGetUnassignedStudents();
   const { cid } = useParams(); // Assuming 'cid' is the class ID needed for some operations
 

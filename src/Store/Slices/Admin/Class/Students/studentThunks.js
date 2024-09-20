@@ -8,13 +8,11 @@ import toast from "react-hot-toast";
 export const fetchStudentsByClassAndSection = createAsyncThunk(
   "students/fetchByClassAndSection",
   async (classId, { getState, rejectWithValue }) => {
-    const role = getState().auth.role; // Assuming you have a separate slice for auth
-    const token =
-      getState().common.auth.token || localStorage.getItem(`${role}:token`);
+    const token = getState().common.auth.token;
 
     try {
       const response = await axios.get(`${baseUrl}/admin/student/${classId}`, {
-        headers: { Authentication: token },
+        headers: { Authentication: `Bearer ${token}` },
       });
       return response.data.data;
     } catch (error) {
@@ -30,13 +28,11 @@ export const fetchStudentsByClassAndSection = createAsyncThunk(
 export const fetchAllStudents = createAsyncThunk(
   "students/fetchAll",
   async (_, { getState, rejectWithValue }) => {
-    const role = getState().auth.role;
-    const token =
-      getState().common.auth.token || localStorage.getItem(`${role}:token`);
+    const token = getState().common.auth.token;
 
     try {
       const response = await axios.get(`${baseUrl}/admin/all/students`, {
-        headers: { Authentication: token },
+        headers: { Authentication: `Bearer ${token}` },
       });
       return response.data.data;
     } catch (error) {
