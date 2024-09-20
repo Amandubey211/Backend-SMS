@@ -1,44 +1,56 @@
-import React, { useEffect, useState } from "react";
-
-import { useSelector } from "react-redux";
+import React, { useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import UnVerifiedStudentCard from "./UnVerifiedStudentCard";
-import useGetRejectedStudents from "../../../Hooks/AuthHooks/Staff/Admin/Students/useGetRejectedStudents";
+import { fetchRejectedStudents } from "../../../Store/Slices/Admin/Verification/VerificationThunks";
+import Spinner from "../../../Components/Common/Spinner";
 
-const RejectStudents = ({ getColor, searchQuery }) => {
-  const [filteredStudents, setFilteredStudents] = useState([]);
-  const { getRejectedStudents } = useGetRejectedStudents();
-  const students = useSelector((store) => store.Admin.rejectedStudents);
-  console.log(students);
-
-  useEffect(() => {
-    getRejectedStudents();
-  }, []);
+const RejectStudents = () => {
+  const dispatch = useDispatch();
+  const { rejectedStudents, loading } = useSelector(
+    (state) => state.admin.verification
+  );
 
   useEffect(() => {
-    const filtered = students.filter(
-      (student) =>
-        !searchQuery ||
-        student.email.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-    setFilteredStudents(filtered);
-  }, [searchQuery, students]);
+    if (rejectedStudents.length === 0) {
+      dispatch(fetchRejectedStudents());
+    }
+  }, [dispatch, rejectedStudents.length]);
 
-  return (
-    <div className="animate-fadeIn">
-      {filteredStudents?.length === 0 && (
-        <p className="text-center text-gray-500">No Rejected Student found.</p>
-      )}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredStudents?.map((student, index) => (
-          <UnVerifiedStudentCard
-            key={student._id}
-            student={student}
-            color={getColor(index)}
-          />
-        ))}
+  if (loading) {
+    return (
+      <div className="text-center">
+        <Spinner />
       </div>
+    );
+  }
+
+  if (rejectedStudents.length === 0) {
+    return (
+      <p className="text-center text-gray-500">No Rejected Students found.</p>
+    );
+  }
+
+  // Colors for student cards
+  const colors = [
+    "bg-yellow-300",
+    "bg-blue-300",
+    "bg-green-300",
+    "bg-red-300",
+    "bg-purple-300",
+    "bg-pink-300",
+  ];
+  const getColor = (index) => colors[index % colors.length];
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {rejectedStudents.map((student, index) => (
+        <UnVerifiedStudentCard
+          key={student._id}
+          student={student}
+          color={getColor(index)}
+        />
+      ))}
     </div>
   );
 };
 
-export default RejectStudents;
+export default React.memo(RejectStudents);

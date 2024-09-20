@@ -14,7 +14,7 @@ import subjectReducer from "./Slices/Admin/Class/Subject/subjectSlice";
 import sectionReducer from "./Slices/Admin/Class/Section_Groups/groupSectionSlice";
 import classStudentReducer from "./Slices/Admin/Class/Students/studentSlice";
 import attendanceReducer from "./Slices/Admin/Class/Attendence/attendanceSlice";
-
+import verificationReducer from "./Slices/Admin/Verification/VerificationSlice";
 // student
 import studentFinanceReducer from "./Slices/Student/Finance/financeSlice";
 import studentLibraryBooksReducer from "./Slices/Student/Library/libararySlice";
@@ -62,6 +62,7 @@ const AdminReducer = combineReducers({
   teacher: teacherReducer,
   students: classStudentReducer,
   attendance: attendanceReducer,
+  verification: verificationReducer,
 });
 
 const studentReducer = combineReducers({

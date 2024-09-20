@@ -39,4 +39,4 @@ const UnVerifiedStudentCard = ({ student, color }) => {
   );
 };
 
-export default UnVerifiedStudentCard;
+export default React.memo(UnVerifiedStudentCard);

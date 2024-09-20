@@ -14,7 +14,9 @@ import useSaveDocument from "../../../Hooks/AuthHooks/Student/useSaveDocuments";
 import StudentCard from "./Components/StudentCard";
 
 const StudentInfo = () => {
-  const schoolId = useSelector((store) => store.Auth.userDetail.schoolId);
+  const schoolId = useSelector(
+    (store) => store.common.user.userDetails.schoolId
+  );
   const [studentInfo, setStudentInfo] = useState({
     firstName: "",
     lastName: "",

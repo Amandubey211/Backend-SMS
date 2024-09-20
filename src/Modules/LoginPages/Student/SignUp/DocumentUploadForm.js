@@ -103,8 +103,8 @@ const DocumentUploadForm = ({
   return (
     <form onSubmit={handleDocumentSubmit}>
       <h3 className="text-lg font-semibold mb-4">Document Upload</h3>
-      {validationErrors.documents && (
-        <div className="text-red-500 mb-4">{validationErrors.documents}</div>
+      {validationErrors?.documents && (
+        <div className="text-red-500 mb-4">{validationErrors?.documents}</div>
       )}
       <div className="grid grid-cols-1 gap-4">
         {studentDocuments.documents &&
