@@ -1,3 +1,5 @@
+// src/Store/Slices/Admin/Verification/VerificationThunks.js
+
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -52,7 +54,7 @@ export const fetchRejectedStudents = createAsyncThunk(
 // Verify Student and Send Credentials
 export const verifyStudent = createAsyncThunk(
   "verification/verifyStudent",
-  async (verificationDetails, { rejectWithValue, getState, dispatch }) => {
+  async (verificationDetails, { rejectWithValue, getState }) => {
     try {
       const { common } = getState(); // Get state
       const token = common.auth.token; // Extract token
@@ -61,7 +63,7 @@ export const verifyStudent = createAsyncThunk(
       const verifyResponse = await axios.put(
         `${baseUrl}/admin/verify_student_info`,
         verificationDetails,
-        { headers: { Authentication: `Bearer ${token}` } } // Use token in headers
+        { headers: { Authentication: `Bearer ${token}` } }
       );
 
       if (!verifyResponse.data.success) {
@@ -72,7 +74,7 @@ export const verifyStudent = createAsyncThunk(
 
       toast.success(verifyResponse.data.msg || "Student verified successfully");
 
-      // Step 2: Assign Class to Student (only if student is verified)
+      // Step 2: Assign Class to Student (if verified)
       if (verificationDetails.isVerifiedDocuments === "verified") {
         const assignClassDetails = {
           studentId: verificationDetails.studentId,
@@ -82,7 +84,7 @@ export const verifyStudent = createAsyncThunk(
         const assignResponse = await axios.put(
           `${baseUrl}/admin/assign_class`,
           assignClassDetails,
-          { headers: { Authentication: `Bearer ${token}` } } // Use token in headers
+          { headers: { Authentication: `Bearer ${token}` } }
         );
 
         if (!assignResponse.data.success) {
@@ -103,7 +105,7 @@ export const verifyStudent = createAsyncThunk(
       const sendCredentialsResponse = await axios.post(
         `${baseUrl}/admin/send_login_credential`,
         mailConfiguration,
-        { headers: { Authentication: `Bearer ${token}` } } // Use token in headers
+        { headers: { Authentication: `Bearer ${token}` } }
       );
 
       if (!sendCredentialsResponse.data.success) {
@@ -129,11 +131,11 @@ export const verifyStudent = createAsyncThunk(
 // Assign Class to Student
 export const assignClassToStudent = createAsyncThunk(
   "verification/assignClassToStudent",
-  async (classDetails, { rejectWithValue }) => {
+  async (classDetails, { rejectWithValue, getState }) => {
     try {
-      const token = localStorage.getItem(
-        process.env.REACT_APP_ADMIN_TOKEN_STORAGE_KEY
-      );
+      const { common } = getState(); // Get state
+      const token = common.auth.token; // Extract token
+
       const { data } = await axios.put(
         `${baseUrl}/admin/assign_class`,
         classDetails,
