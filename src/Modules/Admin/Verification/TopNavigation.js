@@ -1,16 +1,17 @@
+// src/Modules/Admin/Verification/TopNavigation.js
+
 import React from "react";
 import { CiSearch } from "react-icons/ci";
-import { useSelector } from "react-redux";
-
-const TopNavigation = ({
-  activeTab,
+import { useSelector, useDispatch } from "react-redux";
+import {
   setActiveTab,
-  searchQuery,
   setSearchQuery,
-}) => {
-  const { unVerifiedStudents, rejectedStudents } = useSelector(
-    (state) => state.admin.verification
-  );
+} from "../../../Store/Slices/Admin/Verification/VerificationSlice";
+
+const TopNavigation = () => {
+  const dispatch = useDispatch();
+  const { unVerifiedStudents, rejectedStudents, activeTab, searchQuery } =
+    useSelector((state) => state.admin.verification);
 
   return (
     <div className="flex justify-between items-center mb-6">
@@ -22,7 +23,7 @@ const TopNavigation = ({
               ? "text-purple-500 bg-purple-100"
               : "text-gray-700 hover:bg-gray-100"
           }`}
-          onClick={() => setActiveTab("unverified")}
+          onClick={() => dispatch(setActiveTab("unverified"))}
         >
           Unverified Students ({unVerifiedStudents.length})
         </h1>
@@ -34,7 +35,7 @@ const TopNavigation = ({
               ? "text-purple-500 bg-purple-100"
               : "text-gray-700 hover:bg-gray-100"
           }`}
-          onClick={() => setActiveTab("rejected")}
+          onClick={() => dispatch(setActiveTab("rejected"))}
         >
           Rejected Students ({rejectedStudents.length})
         </h1>
@@ -46,7 +47,7 @@ const TopNavigation = ({
           type="text"
           placeholder="Search By Email"
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          onChange={(e) => dispatch(setSearchQuery(e.target.value))}
           className="px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-purple-300 w-full transition-all duration-300"
         />
         <button className="absolute right-3">
