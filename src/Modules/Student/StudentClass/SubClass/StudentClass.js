@@ -6,7 +6,7 @@ import StudentDashLayout from "../../../../Components/Student/StudentDashLayout"
 import { useSelector } from "react-redux";
 
 const StudentClass = () => {
-  const className = useSelector((store) => store.Common.selectedClassName);
+  const className = useSelector((store) => store?.Common?.selectedClassName);
   useNavHeading(className);
 
   return (
