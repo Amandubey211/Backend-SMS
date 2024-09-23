@@ -1,8 +1,11 @@
 import React from "react";
 import { MdAccessTime, MdLocationOn, MdPersonOutline } from "react-icons/md";
 import { BiCalendarEvent } from "react-icons/bi";
+import { useTranslation } from "react-i18next";
+import { gt } from "../../../../Utils/translator/translation";
 
 const Sidebar = ({ isOpen, onClose, event }) => {
+  const {t}=useTranslation();
   if (!isOpen) return null;
 
   const formatDateTime = (date) => {
@@ -27,14 +30,14 @@ const Sidebar = ({ isOpen, onClose, event }) => {
           &times;
         </button>
         {event && (
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-1">
             <img
               src={event.image}
               alt={event.title}
               className="w-full h-48 object-cover mb-4 rounded"
             />
             <div className="flex justify-around items-center mb-4">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1">
                 <BiCalendarEvent className="text-pink-500 text-2xl" />
                 <span className="text-pink-500">{startDateTime.date}</span>
               </div>
@@ -45,29 +48,29 @@ const Sidebar = ({ isOpen, onClose, event }) => {
             </div>
             <h1 className="text-2xl font-bold text-gray-800">{event.title}</h1>
             <div className="flex flex-col gap-2">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1">
                 <MdLocationOn className="text-purple-500 text-2xl" />
                 <div>
-                  <span className="text-gray-400">Location</span>
+                  <span className="text-gray-400">{t('Location',gt.stdEvents)}</span>
                   <p className="text-gray-800">{event.location}</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
                 <MdPersonOutline className="text-blue-500 text-2xl" />
                 <div>
-                  <span className="text-gray-400">Event Director</span>
+                  <span className="text-gray-400">{t("Event Director",gt.stdEvents)}</span>
                   <p className="text-gray-800">{event.director}</p>
                 </div>
               </div>
               <div>
-                <span className="text-gray-400">Event Type</span>
-                <p className="text-gray-800">{event.type || "No Type Available"}</p>
+                <span className="text-gray-400">{t("Event Type",gt.stdEvents)}</span>
+                <p className="text-gray-800">{event.type || t("No Type Available")}</p>
               </div>
               <div>
-                <span className="text-gray-400">Event name</span>
+                <span className="text-gray-400">{t("Event name",gt.stdEvents)}</span>
                 <p className="text-gray-800">{event.title}</p>
               </div>
-              <div className="text-sm text-gray-600">{event.description || "No Details Available"}</div>
+              <p className="text-sm text-gray-600 ml-5">{event.description || t("No Details Available")}</p>
             </div>
           </div>
         )}

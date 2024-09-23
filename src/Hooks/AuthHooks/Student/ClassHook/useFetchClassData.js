@@ -14,7 +14,7 @@ const useFetchClassData = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const dispatch = useDispatch();
-  const role = useSelector((store) => store.Auth.role);
+  const role = useSelector((store) => store?.Auth?.role);
 
   // useEffect(() => {
   //   const fetchClassData = async () => {

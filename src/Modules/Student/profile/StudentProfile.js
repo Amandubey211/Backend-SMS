@@ -9,7 +9,7 @@ import StudentDashLayout from "../../../Components/Student/StudentDashLayout";
 
 const StudentProfile = () => {
   const { userDetail } = useGetUserDetail();
-  const student = useSelector((store) => store.Auth.userDetail);
+  const student = useSelector((store) => store.common.user.userDetail);
   const [studentData, setStudentData] = useState(student);
 
   useEffect(() => {

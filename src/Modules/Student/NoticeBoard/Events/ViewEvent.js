@@ -3,10 +3,12 @@ import { ReactComponent as CalendarIcon } from '../../../../Assets/StudentAssets
 import { ReactComponent as ClockIcon } from '../../../../Assets/StudentAssets/clock-icon.svg';
 import { ReactComponent as LocationIcon } from '../../../../Assets/StudentAssets/location-icon.svg';
 import { ReactComponent as PersonIcon } from '../../../../Assets/StudentAssets/person-icon.svg';
+import { gt } from "../../../../Utils/translator/translation";
+import { useTranslation } from "react-i18next";
 
 const ViewEvent = ({ event }) => {
   console.log("event is ", event);
-
+  const {t}=useTranslation();
   const formatDateTime = (date) => {
     const options = { year: "numeric", month: "long", day: "numeric" };
     const timeOptions = { hour: "2-digit", minute: "2-digit", hour12: true };
@@ -51,8 +53,8 @@ const ViewEvent = ({ event }) => {
                 <LocationIcon className="text-white" />
               </div>
               <div className="flex flex-col ml-2">
-                <span className="text-gray-400">Location</span>
-                <span className="text-lg">{event.location || 'No Location Available'}</span>
+                <span className="text-gray-400">{t('Location',gt.stdEvents)}</span>
+                <span className="text-lg">{event.location || t('No Location Available',gt.stdEvents)}</span>
               </div>
             </div>
           </div>
@@ -68,8 +70,8 @@ const ViewEvent = ({ event }) => {
                 <PersonIcon className="text-white" />
               </div>
               <div className="flex flex-col ml-2">
-                <span className="text-gray-400">Event Director</span>
-                <span className="text-lg">{event.director || 'No Director Available'}</span>
+                <span className="text-gray-400">{t('Event Director',gt.stdEvents)}</span>
+                <span className="text-lg">{event.director || t('No Director Available',gt.stdEvents)}</span>
               </div>
             </div>
           </div>
@@ -83,13 +85,13 @@ const ViewEvent = ({ event }) => {
 
         {/* Event Type */}
         <div className="flex flex-col mt-4">
-          <span className="text-gray-400">Event Type</span>
+          <span className="text-gray-400">{t('Event Type',gt.stdEvents)}</span>
           <span className="text-lg">{event.type || 'No Type Available'}</span>
         </div>
 
         {/* Event Description */}
         <div className="text-lg leading-[1.875] mt-4" style={{ color: "#7F7F7F", fontFamily: "", fontSize: "16px", fontStyle: "normal", fontWeight: "400" }}>
-          {event.description || 'No Details Available'}
+          {event.description || t('No Details Available',gt.stdEvents)}
         </div>
       </div>
     </div>

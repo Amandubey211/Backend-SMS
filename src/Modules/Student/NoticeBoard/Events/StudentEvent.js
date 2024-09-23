@@ -9,21 +9,39 @@ import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
 import { IoCalendarOutline } from "react-icons/io5";
 import { useDispatch, useSelector } from "react-redux";
 import { stdEvent } from "../../../../Store/Slices/Student/Noticeboard/events.action";
-import { setCurrentPage, setFilteredEvents, setSelectedEvent, setSidebarContent, setSidebarOpen } from "../../../../Store/Slices/Student/Noticeboard/eventsSlice";
+import {
+  setCurrentPage,
+  setFilteredEvents,
+  setSelectedEvent,
+  setSidebarContent,
+  setSidebarOpen,
+} from "../../../../Store/Slices/Student/Noticeboard/eventsSlice";
 import ViewEvent from "./ViewEvent";
 import EventCard from "./EventCard";
 import Sidebar from "./Sidebar";
+import { useTranslation } from "react-i18next";
+import { gt } from "../../../../Utils/translator/translation";
 
 const StudentEvent = () => {
-  const { eventData, filteredEvents, currentPage, selectedEvent, sidebarContent, isSidebarOpen, itemsPerPage, currentDate } = useSelector((store) => store.student.studentEvent);
+  const {
+    eventData,
+    filteredEvents,
+    currentPage,
+    selectedEvent,
+    sidebarContent,
+    isSidebarOpen,
+    itemsPerPage,
+    currentDate,
+  } = useSelector((store) => store.student.studentEvent);
   const dispatch = useDispatch();
+  const { t } = useTranslation();
   const [selectedMonthYear, setSelectedMonthYear] = useState({
     month: currentDate.getMonth(),
     year: currentDate.getFullYear(),
-  })
-  console.log("I am in inside1 :", eventData)
+  });
+  console.log("I am in inside1 :", eventData);
 
-  console.log("I am in inside :", filteredEvents)
+  console.log("I am in inside :", filteredEvents);
   // card colour
   const bgColors = [
     "bg-pink-500",
@@ -45,16 +63,18 @@ const StudentEvent = () => {
   const filterAndSortEvents = (eventData, selectedMonthYear) => {
     const filtered = eventData.filter((event) => {
       const eventDate = new Date(event.startDate);
-      console.log("event date is: ", eventDate)
-      return eventDate.getMonth() === selectedMonthYear?.month && eventDate?.getFullYear() === selectedMonthYear.year;
+      console.log("event date is: ", eventDate);
+      return (
+        eventDate.getMonth() === selectedMonthYear?.month &&
+        eventDate?.getFullYear() === selectedMonthYear.year
+      );
     });
 
     const sorted = filtered.sort((a, b) => a.startDate - b.startDate);
-    console.log("sorted event :", sorted)
+    console.log("sorted event :", sorted);
     dispatch(setFilteredEvents(sorted));
     dispatch(setCurrentPage(0));
   };
-
 
   // calender function
   const handleDateCellRender = (value) => {
@@ -83,8 +103,9 @@ const StudentEvent = () => {
           return (
             <li
               key={event.id}
-              className={`inline-block px-2 py-1 rounded text-white ${bgColors[index % bgColors.length]
-                } shadow-md cursor-pointer`}
+              className={`inline-block px-2 py-1 rounded text-white ${
+                bgColors[index % bgColors.length]
+              } shadow-md cursor-pointer`}
               onClick={() => handleStickerClick(event)}
             >
               {event.title} - {timeString}
@@ -95,7 +116,6 @@ const StudentEvent = () => {
     );
   };
 
-
   // event card function
   const handleStickerClick = (event) => {
     dispatch(setSelectedEvent(event));
@@ -103,40 +123,36 @@ const StudentEvent = () => {
     dispatch(setSidebarOpen(true));
   };
 
-
   // View event function
   const renderSidebarContent = () => {
     switch (sidebarContent) {
       case "viewEvent":
         return <ViewEvent event={selectedEvent} />;
       default:
-        return <div>Select an action</div>;
+        return <div>{t("Select an action",gt.stdEvents)}</div>;
     }
   };
-
 
   // sidebar function
   const handleSidebarView = () => {
     dispatch(setSidebarOpen(false));
-  }
+  };
 
   // pagination
   const paginatedEvents = filteredEvents?.slice(
     currentPage * itemsPerPage,
     (currentPage + 1) * itemsPerPage
   );
-  console.log("pagination event is :", paginatedEvents)
+  console.log("pagination event is :", paginatedEvents);
   const handlePagination = () => {
     dispatch(setCurrentPage((prev) => Math.max(prev - 1, 0)));
-  }
+  };
 
   const handleFilterPage = () => {
     dispatch(setCurrentPage((prev) => prev + 1));
-  }
+  };
 
   // selected Month and Year
-
-
 
   return (
     <>
@@ -145,7 +161,7 @@ const StudentEvent = () => {
           <div className="min-h-screen p-4 bg-gray-50">
             <div className="flex flex-row justify-between">
               <h1 className="mb-2 bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent font-semibold bg-clip-text">
-                Student Events
+                {t("Student Events", gt.stdEvents)}
               </h1>
             </div>
 
@@ -161,7 +177,7 @@ const StudentEvent = () => {
               {paginatedEvents?.length === 0 ? (
                 <div className="flex flex-col items-center justify-center w-full h-full text-gray-500">
                   <IoCalendarOutline className="text-6xl" />
-                  <span>No Events in this Month</span>
+                  <span>{t("No Events in this Month",gt.stdEvents)}</span>
                 </div>
               ) : (
                 paginatedEvents?.map((event, index) => (
@@ -199,7 +215,7 @@ const StudentEvent = () => {
                   for (let index = start; index < end; index++) {
                     monthOptions.push(
                       <option key={index} value={index}>
-                        {months[index]}
+                        {t(months[index],gt.month)}
                       </option>
                     );
                   }
@@ -210,7 +226,7 @@ const StudentEvent = () => {
                   for (let i = year - 10; i < year + 10; i += 1) {
                     options.push(
                       <option className="bg-white" key={i} value={i}>
-                        {i}
+                        {t(i,gt.date)}
                       </option>
                     );
                   }
@@ -225,7 +241,7 @@ const StudentEvent = () => {
                           setSelectedMonthYear((prev) => ({
                             ...prev,
                             year: newYear,
-                          }))
+                          }));
                           onChange(now);
                         }}
                       >
@@ -248,22 +264,24 @@ const StudentEvent = () => {
                       </select>
                       <div className="flex space-x-2">
                         <button
-                          className={`border rounded px-2 py-1 ${type === "month"
-                            ? "bg-gradient-to-r from-pink-500 to-purple-500 text-white"
-                            : ""
-                            }`}
+                          className={`border rounded px-2 py-1 ${
+                            type === "month"
+                              ? "bg-gradient-to-r from-pink-500 to-purple-500 text-white"
+                              : ""
+                          }`}
                           onClick={() => onTypeChange("month")}
                         >
-                          Month
+                          {t("Month", gt.month)}
                         </button>
                         <button
-                          className={`border rounded px-2 py-1 ${type === "year"
-                            ? "bg-gradient-to-r from-pink-500 to-purple-500 text-white"
-                            : ""
-                            }`}
+                          className={`border rounded px-2 py-1 ${
+                            type === "year"
+                              ? "bg-gradient-to-r from-pink-500 to-purple-500 text-white"
+                              : ""
+                          }`}
                           onClick={() => onTypeChange("year")}
                         >
-                          Year
+                          {t("Year", gt.month)}
                         </button>
                       </div>
                     </div>
