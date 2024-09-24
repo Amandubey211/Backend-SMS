@@ -7,6 +7,7 @@ import { useParams } from "react-router-dom";
 const StudentGradesAccordion = () => {
   const { studentId } = useParams();
   const students = JSON.parse(localStorage.getItem('childrenData'));
+  console.log("This is students ",students);
   const student = students?.find((i) => i.id === studentId);
   const [grades, setGrades] = useState();
   const [loading, setLoading] = useState();
@@ -22,7 +23,7 @@ const StudentGradesAccordion = () => {
     try {
       const token = localStorage.getItem(`parent:token`);
       const response = await axios.get(
-        `${baseUrl}/admin/grades/student/${student.id}/class/${student.presentClassId}/?subjectId=${subjectId}`,
+        `${baseUrl}/admin/grades/student/${student.id}/class/${student.presentClassId}`,
         {
           headers: { Authentication: token },
           params: params,

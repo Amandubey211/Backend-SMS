@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAccountingData } from '../../../../Store/Slices/Parent/Dashboard/dashboardThunks'; // Redux action to fetch accounting data
@@ -6,7 +6,7 @@ import Layout from "../../../../Components/Common/ParentLayout";
 import { FaMoneyBillWave } from "react-icons/fa"; // Icon for no fees message
 import Spinner from "../../../../Components/Common/Spinner"; // Spinner component
 
-// Utility function to get unique filter options from the data
+// Utility function to get unique filter options from the data (no useMemo here)
 const uniqueFilterOptions = (data, key) => {
   return [...new Set(data.map((item) => item[key]))].sort();
 };
@@ -26,41 +26,43 @@ const AccountingSection = () => {
   // Redux state for accounting data
   const { accountingData, loading, error } = useSelector((state) => state.Parent.dashboard);
   
-
   // Dispatch action to fetch accounting data on component mount
   useEffect(() => {
-    dispatch(fetchAccountingData());
-  }, [dispatch]);
+    if (!accountingData?.fees?.length) {
+      dispatch(fetchAccountingData());
+    }
+  }, [dispatch, accountingData]);
 
   // Check if accountingData exists and has fees data
   const { fees = [], totalUnpaidFees = "", totalPaidFees = "" } = accountingData || {};
 
-  // Get unique filter options from fees data
-  const classes = uniqueFilterOptions(fees, "class");
-  const sections = uniqueFilterOptions(fees, "section");
-  const feesTypes = uniqueFilterOptions(fees, "feeType");
+  // Memoize the filter options inside the component itself
+  const classes = useMemo(() => uniqueFilterOptions(fees, "class"), [fees]);
+  const sections = useMemo(() => uniqueFilterOptions(fees, "section"), [fees]);
+  const feesTypes = useMemo(() => uniqueFilterOptions(fees, "feeType"), [fees]);
 
-  // Apply filters to the fees data
-  const filteredData = fees.filter((item) => {
-  
-    // Updated individual filter conditions to handle undefined filters
-    const classCondition = filters.class === "" || !item.class || item.class === filters.class;
-    const sectionCondition = filters.section === "" || !item.section || item.section === filters.section;
-    const feeTypeCondition = !filters.feeType || item.feeType === filters.feeType; // Handle undefined filters
-    const statusCondition = filters.status === "Everyone" || item.status === filters.status;
-  
-  
-    // Only allow items that pass all conditions
-    return classCondition && sectionCondition && feeTypeCondition && statusCondition;
-  });
-  
+  // Apply filters to the fees data, useMemo to optimize the filtered data calculation
+  const filteredData = useMemo(() => {
+    return fees.filter((item) => {
+      const classCondition = filters.class === "" || !item.class || item.class === filters.class;
+      const sectionCondition = filters.section === "" || !item.section || item.section === filters.section;
+      const feeTypeCondition = !filters.feeType || item.feeType === filters.feeType;
+      const statusCondition = filters.status === "Everyone" || item.status === filters.status;
+      return classCondition && sectionCondition && feeTypeCondition && statusCondition;
+    });
+  }, [fees, filters]);
+
+  // Handle navigation using useCallback to prevent re-creation on every render
+  const handleNavigate = useCallback(() => {
+    navigate("/parentfinance");
+  }, [navigate]);
 
   if (loading) {
-    return <Spinner />; // Show loading spinner
+    return <Spinner />; 
   }
 
   if (error) {
-    return <p>Error: {error}</p>; // Show error message
+    return <p>Error: {error}</p>;
   }
 
   return (
@@ -70,7 +72,7 @@ const AccountingSection = () => {
           <h2 className="text-lg font-normal text-gray-600">Accounting</h2>
           <button
             className="text-transparent bg-clip-text bg-gradient-to-r from-[#C83B62] to-[#7F35CD] font-normal"
-            onClick={() => navigate("/parentfinance")}
+            onClick={handleNavigate}
           >
             See All
           </button>
