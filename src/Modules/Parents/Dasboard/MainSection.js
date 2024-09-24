@@ -1,8 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import DashCard from "../Dasboard/Dashcard.js";
-import { cardData as initialCardData } from '../Dasboard/DashboardData/CardData.js';
 import AccountingSection from "../Accounting/MainSection/ParentAccounts.js";
 import StudentParentCard from "../Dasboard/DashboardData/Students.js";
 import NoticeBoard from "../Dasboard/NoticeModule/NoticeBoard.js";
@@ -10,74 +8,83 @@ import { RiBookOpenLine } from "react-icons/ri";
 import { CiMoneyBill } from "react-icons/ci";
 import { RiMoneyDollarBoxFill } from "react-icons/ri";
 import { RiCalendarCheckLine } from "react-icons/ri";
-import { baseUrl } from '../../../config/Common.js';
-import Spinner from "../../../Components/Common/Spinner"; // Import Spinner
-import { fetchParentDashboardData } from '../../../Store/Slices/Parent/Dashboard/dashboardSlice.js';
+import Spinner from "../../../Components/Common/Spinner";
+
+// Thunks for fetching each section's data
+import { fetchDashboardCards, fetchNotices, fetchChildren, fetchAccountingData } from '../../../Store/Slices/Parent/Dashboard/dashboardThunks';
 
 const ParentSection = () => {
   const dispatch = useDispatch();
 
   // Get the data from Redux
-  const { dashboardData = {}, loading } = useSelector((state) => state.Parent || {});
+  const { cardsData = {}, childrenData = [], notices = [], accountingData = {}, loading, error } = useSelector((state) => state.dashboard || {});
 
   useEffect(() => {
-    dispatch(fetchParentDashboardData());
+    console.log("Dispatching fetch actions");
+    dispatch(fetchDashboardCards());
+    dispatch(fetchChildren());
+    dispatch(fetchNotices());
+    dispatch(fetchAccountingData());
   }, [dispatch]);
-
-  if (loading) {
-    return <Spinner />;
-  }
-
+  
+  useEffect(() => {
+    console.log("Redux state for cardsData: ", cardsData);  // Debugging Redux state for card data
+  }, [cardsData]);
+  
   const cardData = [
     {
       label: "Due Fees",
-      value: dashboardData.dueFees?.toString() || "0",
+      value: cardsData?.dueFees?.toString() || "0",  // Debugging value
       bgColor: "bg-rose-200",
       textColor: "text-rose-500",
       icon: <CiMoneyBill />,
     },
     {
       label: "Upcoming Exams",
-      value: dashboardData.upcomingExamsCount?.toString() || "0",
+      value: cardsData?.upcomingExamsCount?.toString() || "0",  // Debugging value
       bgColor: "bg-green-200",
       textColor: "text-green-500",
       icon: <RiBookOpenLine />,
     },
     {
       label: "Result Published",
-      value: dashboardData.publishedResultsCount?.toString() || "0",
+      value: cardsData?.publishedResultsCount?.toString() || "0",  // Debugging value
       bgColor: "bg-teal-100",
       textColor: "text-teal-700",
       icon: <RiCalendarCheckLine />,
     },
     {
       label: "Total Expense",
-      value: dashboardData.totalExpenses?.toString() || "0",
+      value: cardsData?.totalExpenses?.toString() || "0",  // Debugging value
       bgColor: "bg-purple-200",
       textColor: "text-purple-400",
       icon: <RiMoneyDollarBoxFill />,
     },
   ];
-
+  
+  console.log("Final card data: ", cardData);   // Debugging card data to ensure mapping is correct
+  
   return (
     <div className="h-full w-full">
       <div className="w-full">
         <div className="flex flex-wrap justify-center gap-3 py-4">
+          {console.log(cardData)}
           {cardData.map((item, index) => (
             <DashCard key={index} {...item} />
+            
           ))}
         </div>
         <div className="flex flex-wrap justify-between items-start border-y">
           <div className="w-2/5">
-            <StudentParentCard />
+            <StudentParentCard students={childrenData} />
           </div>
           <div className="w-3/5 border-r">
-            <NoticeBoard numberOfChildren={dashboardData.childrenCount || 0} />
+            <NoticeBoard notices={notices} numberOfChildren={childrenData.length || 0} />
           </div>
         </div>
         <div className="flex justify-between items-start border-y">
           <div className="w-full">
-            <AccountingSection />
+            <AccountingSection accountingData={accountingData} />
           </div>
         </div>
       </div>
@@ -86,5 +93,3 @@ const ParentSection = () => {
 };
 
 export default ParentSection;
-
-

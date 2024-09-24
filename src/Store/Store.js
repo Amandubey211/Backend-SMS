@@ -22,9 +22,13 @@ import studentIssueBooksReducer from "./Slices/Student/Library/bookIssuesSlice";
 import studentAnnouncementReducer from "../Store/Slices/Student/Noticeboard/noticeSlice";
 import studentEventReducer from "../Store/Slices/Student/Noticeboard/eventsSlice";
 
-// parent
-import parentPanelReducer from "../Store/Slices/Parent/Dashboard/dashboardSlice";
 
+// parent
+import dashboardReducer from '../Store/Slices/Parent/Dashboard/dashboardSlice';
+import financeReducer from '../Store/Slices/Parent/Finance/financeSlice';
+import noticeReducer from '../Store/Slices/Parent/NoticeBoard/noticeSlice';
+import childrenReducer from '../Store/Slices/Parent/Children/childrenSlice';
+import libraryReducer from '../Store/Slices/Parent/Library/librarySlices';
 // Persist configuration for the Auth slice
 const authPersistConfig = {
   key: "auth",
@@ -71,6 +75,17 @@ const studentReducer = combineReducers({
   studentAnnouncement: studentAnnouncementReducer,
   studentEvent: studentEventReducer,
 });
+
+
+const ParentReducer = combineReducers({
+  dashboard: dashboardReducer,
+  finance: financeReducer,
+  children: childrenReducer,
+  notice: noticeReducer,
+  library: libraryReducer
+});
+
+
 // Create the store
 const store = configureStore({
   reducer: {
@@ -84,7 +99,7 @@ const store = configureStore({
     // studentIssueBooks: studentIssueBooksReducer,
 
     student: studentReducer,
-    Parent: parentPanelReducer,
+    Parent: ParentReducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

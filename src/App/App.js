@@ -264,9 +264,7 @@ const CheckProgress = lazy(() =>
 const ChildGrade = lazy(() =>
   import("../Modules/Parents/GradeChild/GradeChild.js")
 );
-const ParentAnnounce = lazy(() =>
-  import("../Modules/Parents/Notice/Annoucements/Announce.js")
-);
+
 const StudentTeacher = lazy(() =>
   import(
     "../Modules/Student/StudentClass/SubClass/Components/Teacher/StudentTeacher.js"
@@ -984,11 +982,6 @@ function App() {
     {
       path: "/users/parent/profile",
       element: <ParentProfile />,
-      errorElement: <Error />,
-    },
-    {
-      path: "/parentannounce",
-      element: <ParentAnnounce />,
       errorElement: <Error />,
     },
     {

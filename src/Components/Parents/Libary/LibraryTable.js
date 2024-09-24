@@ -1,61 +1,32 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { Table, message } from 'antd';
-import axios from 'axios';
-import { format } from 'date-fns';
-import { baseUrl } from '../../../config/Common';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchLibraryBooks } from '../../../Store/Slices/Parent/Library/libraryThunks'; // Redux Thunk for fetching data
 import Spinner from "../../../Components/Common/Spinner"; // Importing Spinner
 import { FaBookOpen } from "react-icons/fa"; // Importing an icon for no data or error messages
 
 const LibraryTable = () => {
-  const [data, setData] = useState([]);
+  const dispatch = useDispatch();
+  const { books, loading, error } = useSelector((state) => state.Parent.library); // Fetch state from Redux
   const [statusFilter, setStatusFilter] = useState('All');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
 
+  // Fetch library books when the component mounts using Redux thunk
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      setError(null);
-      const token = localStorage.getItem('parent:token');
-      try {
-        const response = await axios.get(`${baseUrl}/parent/all/bookIssue`, {
-          headers: {
-            Authentication: `${token}`
-          }
-        });
-
-        const mappedData = response.data.books.map(book => ({
-          ...book,
-          issueDate: format(new Date(book.issueDate), 'dd/MM/yyyy'),
-          returnDate: format(new Date(book.returnDate), 'dd/MM/yyyy'),
-          bookName: book.bookId.name,
-          bookCategory: book.bookId.category,
-        }));
-        console.log(mappedData);
-        setData(mappedData);
-      } catch (err) {
-        setError(err.message);
-        message.error('Failed to fetch data');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
+    dispatch(fetchLibraryBooks());
+  }, [dispatch]);
 
   const handleFilterChange = (value) => {
     setStatusFilter(value);
   };
 
-  const filteredData = data.filter((item) => {
-    if (statusFilter === 'All') return true;
-    return item.status === statusFilter;
-  });
+  // Memoize the filtered data to avoid unnecessary recalculations
+  const filteredData = useMemo(() => {
+    if (statusFilter === 'All') return books;
+    return books.filter((item) => item.status === statusFilter);
+  }, [statusFilter, books]);
 
-  const columns = [
+  const columns = useMemo(() => [
     {
-
       title: 'Issue Book',
       dataIndex: 'bookName',
       key: 'bookName',
@@ -103,7 +74,8 @@ const LibraryTable = () => {
         </span>
       ),
     },
-  ];
+  ], []);
+
 
   return (
     <div className="p-6 pt-5">
@@ -234,13 +206,7 @@ const LibraryTable = () => {
           <FaBookOpen className="text-gray-400 text-6xl mb-4" />
           <p className="text-gray-600 text-lg">Failed to fetch library data</p>
         </div>
-      ) : filteredData.length === 0 ? (
-        <div className="flex flex-col items-center justify-center h-screen text-center">
-          <FaBookOpen className="text-gray-400 text-6xl mb-4" />
-          <p className="text-gray-600 text-lg">No Library Data Found</p>
-        </div>
-
-      ) : (
+      ) :(
         <Table columns={columns} dataSource={filteredData} rowKey="_id" />
       )}
     </div>
