@@ -1,5 +1,5 @@
 import React, { useEffect, useCallback, useState } from 'react';
-import { Calendar as AntdCalendar, Spin } from 'antd';
+import { Calendar as AntdCalendar } from 'antd';
 import AttendanceCard from '../../../Modules/Parents/Attendance/AttendanceCard.js';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchAttendance } from '../../../Store/Slices/Parent/Children/childrenThunks';
@@ -9,6 +9,7 @@ import absentIcon from '../../../Assets/ParentAssets/svg/absent.svg';
 import leaveIcon from '../../../Assets/ParentAssets/svg/leave.png';
 import './ChildrenAttendance.css';
 import useNavHeading from "../../../Hooks/CommonHooks/useNavHeading .js";
+import CustomSpinner from '../../../Components/Common/Spinner.js'; // Custom loading spinner
 
 const MyChildAttendance = () => {
   const dispatch = useDispatch();
@@ -70,7 +71,7 @@ const MyChildAttendance = () => {
   // Memoize the content rendering to avoid unnecessary re-renders
   const renderContent = useCallback(() => {
     if (loading) {
-      return <Spin spinning={loading} size="large" tip="Loading..." />;
+      return <CustomSpinner tip="Loading attendance data..." />;
     }
 
     if (error) {
@@ -82,15 +83,7 @@ const MyChildAttendance = () => {
       );
     }
 
-    // If there's no attendance data, handle gracefully
-    // if (attendance.length === 0) {
-    //   return (
-    //     <div className="flex flex-col items-center justify-center h-full text-center">
-    //       <FaExclamationTriangle className="text-6xl text-gray-400 mb-4" />
-    //       <p className="text-gray-500">No attendance data available for the selected period.</p>
-    //     </div>
-    //   );
-    // }
+
 
     return (
       <>

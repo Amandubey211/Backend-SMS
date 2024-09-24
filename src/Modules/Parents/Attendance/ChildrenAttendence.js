@@ -1,5 +1,5 @@
 import React from 'react';
-import MyChildAttendance from '../../../Components/Parents/Calendar/MyChildAttendance';
+import MyChildAttendance from '../../../Components/Parents/ChildAttendance/MyChildAttendance';
 import Layout from "../../../Components/Common/Layout";
 import ParentDashLayout from "../../../Components/Parents/ParentDashLayout";
 
