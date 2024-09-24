@@ -8,7 +8,7 @@ const DashCard = ({
   icon,
 }) => {
   // Debugging to ensure data is coming through
-  console.log("DashCard Props - Label:", label, "Value:", value, "Background:", bgColor, "Text Color:", textColor, "Icon:", icon);
+  // console.log("DashCard Props - Label:", label, "Value:", value, "Background:", bgColor, "Text Color:", textColor, "Icon:", icon);
 
   return (
     <div className={`p-3 px-6 w-[24%] rounded-lg border ${bgColor} hover:shadow-lg transition-shadow duration-200`}>

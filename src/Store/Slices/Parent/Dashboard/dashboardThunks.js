@@ -10,27 +10,24 @@ export const fetchDashboardCards = createAsyncThunk(
     const token = localStorage.getItem("parent:token");
 
     if (!token) {
-      toast.error("No token found");
-      return null;
+      throw new Error("No token found");
     }
 
-    try {
-      const response = await axios.get(`${baseUrl}/parent/api/dashboard/sections`, {
-        headers: {
-          Authentication: `${token}`,
-        },
-      });
+    const response = await axios.get(`${baseUrl}/parent/api/dashboard/sections`, {
+      headers: {
+        Authentication: `${token}`,
+      },
+    });
 
-      console.log("API Response for Dashboard Cards:", response.data);  // Ensure the structure of the response
-      return response.data;  // Return the entire response data if it matches the component's expectations
-    } catch (error) {
-      const errorMessage = error.response?.data?.message || "Failed to fetch dashboard cards";
-      console.error("Error fetching dashboard cards:", errorMessage);
-      toast.error(errorMessage);
-      return null; // Return null or an empty object if data fails to fetch
+    if (response.data.success) {
+      console.log("API Response for Dashboard Cards:", response.data);
+      return response.data;
+    } else {
+      throw new Error("Failed to fetch dashboard data");
     }
   }
 );
+
 
 // Fetch notices
 export const fetchNotices = createAsyncThunk(

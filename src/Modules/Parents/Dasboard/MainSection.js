@@ -17,7 +17,7 @@ const ParentSection = () => {
   const dispatch = useDispatch();
 
   // Get the data from Redux
-  const { cardsData = {}, childrenData = [], notices = [], accountingData = {}, loading, error } = useSelector((state) => state.dashboard || {});
+  const { cardsData = {}, childrenData = [], notices = [], accountingData = {}, loading, error } = useSelector((state) => state.Parent.dashboard || {});
 
   useEffect(() => {
     console.log("Dispatching fetch actions");
@@ -28,8 +28,13 @@ const ParentSection = () => {
   }, [dispatch]);
   
   useEffect(() => {
-    console.log("Redux state for cardsData: ", cardsData);  // Debugging Redux state for card data
+    if (cardsData && Object.keys(cardsData).length > 0) {
+      console.log("Final card data: ", cardsData);
+    } else {
+      console.log("No card data found");
+    }
   }, [cardsData]);
+  
   
   const cardData = [
     {

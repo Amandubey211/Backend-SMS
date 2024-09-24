@@ -7,6 +7,7 @@ import {
 } from "./dashboardThunks";
 
 const initialState = {
+  dashboardData: null,  // Will hold the cards and notices, etc.
   cardsData: null,
   notices: [],
   childrenData: [],
@@ -31,14 +32,15 @@ const dashboardSlice = createSlice({
     // Dashboard Cards
     builder
       .addCase(fetchDashboardCards.fulfilled, (state, action) => {
-        state.cardsData = action.payload;  // Updating state with the correct data
-        console.log("Fetched card data:", action.payload);  
+        state.cardsData = action.payload;  // Make sure action.payload is being passed correctly
+        state.loading = false;
+        console.log("Fetched card data:", action.payload);
       })
       .addCase(fetchDashboardCards.pending, (state) => {
         state.loading = true;
       })
       .addCase(fetchDashboardCards.rejected, (state, action) => {
-        state.error = action.payload;
+        state.error = action.error.message;
         state.loading = false;
       });
 
@@ -54,7 +56,7 @@ const dashboardSlice = createSlice({
       })
       .addCase(fetchNotices.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
+        state.error = action.error.message;
       });
 
     // Children Data
@@ -69,7 +71,7 @@ const dashboardSlice = createSlice({
       })
       .addCase(fetchChildren.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
+        state.error = action.error.message;
       });
 
     // Accounting Data
@@ -88,7 +90,7 @@ const dashboardSlice = createSlice({
       })
       .addCase(fetchAccountingData.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
+        state.error = action.error.message;
       });
   },
 });
