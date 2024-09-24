@@ -1,5 +1,5 @@
 import React from "react";
-import LibraryTable from "../../../Components/Parents/Libary/LibraryList";
+import LibraryTable from "../../../Components/Parents/Libary/LibraryTable";
 
 const ParentSection = () => {
   return (

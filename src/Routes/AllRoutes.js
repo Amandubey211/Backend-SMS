@@ -107,6 +107,14 @@ const ParentFinance = lazy(() =>
 const ChildGrade = lazy(() =>
   import("../Modules/Parents/GradeChild/GradeChild.js")
 );
+const ParentEvent = lazy(() => 
+  import("../Modules/Parents/ParentEvent/ParentEvent.js")
+);
+
+
+
+
+
 const Dash = lazy(() => import("../Modules/Admin/Dashboard/Dash.js"));
 
 // Define your routes in an array
@@ -232,6 +240,12 @@ const routes = [
     element: <ChildGrade />,
     errorElement: <Error />,
   },
+  {
+    path: "/parent/events",
+    element: <ProtectRoute Component={ParentEvent} allowedRoles={["parent"]} />,
+    errorElement: <Error />,
+  },
+  
 ];
 
 // Create the browser router

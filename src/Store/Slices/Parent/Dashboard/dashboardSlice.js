@@ -1,52 +1,99 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
-import { baseUrl } from '../../../../config/Common';
+import { createSlice } from "@reduxjs/toolkit";
+import {
+  fetchDashboardCards,
+  fetchNotices,
+  fetchChildren,
+  fetchAccountingData
+} from "./dashboardThunks";
 
-// Async thunk for fetching parent dashboard data
-export const fetchParentDashboardData = createAsyncThunk(
-  'parent/fetchDashboardData',
-  async (_, { rejectWithValue }) => {
-    try {
-      const token = localStorage.getItem('parent:token');
-      const response = await axios.get(`${baseUrl}/parent/api/dashboard`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error.response?.data?.msg || 'Error fetching dashboard data');
-    }
-  }
-);
+const initialState = {
+  dashboardData: null,  // Will hold the cards and notices, etc.
+  cardsData: null,
+  notices: [],
+  childrenData: [],
+  accountingData: {
+    fees: [],
+    totalPaidFees: "",
+    totalUnpaidFees: "",
+  },
+  loading: false,
+  error: null,
+};
 
-const parentSlice = createSlice({
-  name: 'parent',
-  initialState: {
-    dashboardData: {
-      dueFees: 0,
-      upcomingExamsCount: 0,
-      publishedResultsCount: 0,
-      totalExpenses: 0,
-      childrenCount: 0,
-      notices: [],
-      finance: [],
+const dashboardSlice = createSlice({
+  name: "dashboard",
+  initialState,
+  reducers: {
+    clearError(state) {
+      state.error = null;
     },
-    loading: false,
-    error: null,
   },
   extraReducers: (builder) => {
-    builder.addCase(fetchParentDashboardData.pending, (state) => {
-      state.loading = true;
-      state.error = null;
-    });
-    builder.addCase(fetchParentDashboardData.fulfilled, (state, action) => {
-      state.dashboardData = action.payload;
-      state.loading = false;
-    });
-    builder.addCase(fetchParentDashboardData.rejected, (state, action) => {
-      state.loading = false;
-      state.error = action.payload;
-    });
+    // Dashboard Cards
+    builder
+      .addCase(fetchDashboardCards.fulfilled, (state, action) => {
+        state.cardsData = action.payload;  // Make sure action.payload is being passed correctly
+        state.loading = false;
+        console.log("Fetched card data:", action.payload);
+      })
+      .addCase(fetchDashboardCards.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchDashboardCards.rejected, (state, action) => {
+        state.error = action.error.message;
+        state.loading = false;
+      });
+
+    // Notices
+    builder
+      .addCase(fetchNotices.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchNotices.fulfilled, (state, action) => {
+        state.loading = false;
+        state.notices = action.payload;
+      })
+      .addCase(fetchNotices.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      });
+
+    // Children Data
+    builder
+      .addCase(fetchChildren.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchChildren.fulfilled, (state, action) => {
+        state.loading = false;
+        state.childrenData = action.payload;
+      })
+      .addCase(fetchChildren.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      });
+
+    // Accounting Data
+    builder
+      .addCase(fetchAccountingData.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchAccountingData.fulfilled, (state, action) => {
+        state.loading = false;
+        state.accountingData = {
+          fees: action.payload.fees,
+          totalPaidFees: action.payload.totalPaidFees,
+          totalUnpaidFees: action.payload.totalUnpaidFees,
+        };
+      })
+      .addCase(fetchAccountingData.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      });
   },
 });
 
-export default parentSlice.reducer;
+export const { clearError } = dashboardSlice.actions;
+export default dashboardSlice.reducer;

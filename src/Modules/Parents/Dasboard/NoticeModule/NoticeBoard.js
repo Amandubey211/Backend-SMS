@@ -1,14 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import Notice from "./Notice";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import { message } from "antd";
-import { format } from 'date-fns'; // Import format function from date-fns
-import { baseUrl } from "../../../../config/Common";
-import { FaBell } from "react-icons/fa"; // Importing an icon for the no notices message
-import Spinner from "../../../../Components/Common/Spinner"; // Import Spinner
+import { format } from 'date-fns';
+import { FaBell } from "react-icons/fa";
+import Spinner from "../../../../Components/Common/Spinner";
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchNotices } from '../../../../Store/Slices/Parent/Dashboard/dashboardThunks';
 
-// Define the gradient backgrounds
 const gradientBackgrounds = [
   "linear-gradient(90deg, #FBB778 0%, #F9B279 100%)",
   "linear-gradient(90deg, #FF7AA5 0%, #FF5B92 80%)",
@@ -17,72 +16,60 @@ const gradientBackgrounds = [
 ];
 
 const NoticeBoard = ({ numberOfChildren }) => {
-  const [notices, setNotices] = useState([]);
-  const [loading, setLoading] = useState(true); // Loading state
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  // Get the notices and loading state from Redux
+  const { notices = [], loading = false, error = null } = useSelector((state) => state.Parent.dashboard);
+
   useEffect(() => {
-    const fetchNotices = async () => {
-      try {
-        const token = localStorage.getItem("parent:token");
-        const response = await axios.get(`${baseUrl}/admin/all/notices`, {
-          headers: {
-            Authentication: `${token}`, 
-          },
-        });
-
-        console.log("Fetched Notices:", response.data.notices);
-
-        const formattedNotices = response.data.notices.map(notice => {
-          let startDate, endDate;
-
-          try {
-            startDate = format(new Date(notice.startDate), 'yyyy-MM-dd');
-          } catch (e) {
-            console.error(`Invalid start date value for notice "${notice.title}":`, notice.startDate);
-            startDate = "Invalid Date";
-          }
-
-          try {
-            endDate = format(new Date(notice.endDate), 'yyyy-MM-dd');
-          } catch (e) {
-            console.error(`Invalid end date value for notice "${notice.title}":`, notice.endDate);
-            endDate = "Invalid Date";
-          }
-
-          return {
-            ...notice,
-            startDate,
-            endDate
-          };
-        });
-
-        // Determine the number of notices to show based on the number of children
-        const numberOfNoticesToShow = numberOfChildren > 1 ? 5 : 3;
-
-        // Sort notices by startDate in descending order (most recent first) and slice according to the number of children
-        const latestNotices = formattedNotices
-          .filter(notice => notice.startDate !== "Invalid Date") // Filter out notices with invalid dates
-          .sort((a, b) => new Date(b.startDate) - new Date(a.startDate))
-          .slice(0, numberOfNoticesToShow);
-
-        console.log("Sorted and Filtered Notices:", latestNotices);
-
-        setNotices(latestNotices);
-        setLoading(false); // Set loading to false after data is fetched
-      } catch (error) {
-        console.error("Failed to fetch notices:", error);
-        message.error("Failed to fetch notices");
-        setLoading(false); // Set loading to false even on error
-      }
-    };
-
-    fetchNotices();
-  }, [numberOfChildren]);
+    dispatch(fetchNotices()); // Fetch notices using Redux thunk
+  }, [dispatch]);
 
   if (loading) {
-    return <Spinner />; // Show spinner while loading
+    return <Spinner />;
   }
+
+  if (error) {
+    message.error("Failed to fetch notices");
+    return <p>Error: {error}</p>;
+  }
+
+  const formattedNotices = notices.map((notice) => {
+    let startDate = "Invalid Date", endDate = "Invalid Date";
+
+    if (notice.startDate) {
+      try {
+        startDate = format(new Date(notice.startDate), 'yyyy-MM-dd');
+      } catch (e) {
+        console.error(`Invalid start date value for notice "${notice.title}":`, notice.startDate);
+      }
+    }
+
+    if (notice.endDate) {
+      try {
+        endDate = format(new Date(notice.endDate), 'yyyy-MM-dd');
+      } catch (e) {
+        console.error(`Invalid end date value for notice "${notice.title}":`, notice.endDate);
+      }
+    }
+
+    return {
+      ...notice,
+      startDate,
+      endDate
+    };
+  });
+
+
+  const numberOfNoticesToShow = numberOfChildren > 1 ? 5 : 3;
+
+
+  const latestNotices = formattedNotices
+    .filter((notice) => notice.startDate !== "Invalid Date")
+    .sort((a, b) => new Date(b.startDate) - new Date(a.startDate))
+    .slice(0, numberOfNoticesToShow);
+
 
   const truncateText = (text, maxLength) => {
     return text.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
@@ -99,13 +86,13 @@ const NoticeBoard = ({ numberOfChildren }) => {
           See All
         </button>
       </div>
-      {notices.length === 0 ? (
+      {latestNotices.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-full text-center">
           <FaBell className="text-gray-400 text-6xl mb-4" />
           <p className="text-gray-600 text-lg">No Notices Available</p>
         </div>
       ) : (
-        notices.map((notice, index) => (
+        latestNotices.map((notice, index) => (
           <Notice
             key={index}
             image={notice.image}
@@ -114,7 +101,7 @@ const NoticeBoard = ({ numberOfChildren }) => {
             endDate={notice.endDate}
             priority={notice.priority}
             content={truncateText(notice.description, 50)}
-            backgroundColor={gradientBackgrounds[index % gradientBackgrounds.length]} // Apply dynamic background
+            backgroundColor={gradientBackgrounds[index % gradientBackgrounds.length]}
           />
         ))
       )}
