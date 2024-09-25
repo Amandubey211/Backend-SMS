@@ -9,6 +9,7 @@ import useNavHeading from "../../../../../../Hooks/CommonHooks/useNavHeading ";
 import { stdClassTeacher } from "../../../../../../Store/Slices/Student/MyClass/Class/classTeacher/classTeacher.action";
 import Spinner from "../../../../../../Components/Common/Spinner";
 import { GoAlertFill } from "react-icons/go";
+import TeacherModal from "./TeacherModal";
 
 
 const StudentTeacher = () => {
@@ -16,11 +17,23 @@ const StudentTeacher = () => {
   const dispatch = useDispatch();
   const { teacherData, loading, error } = useSelector((store) => store?.student?.studentClassTeacher);
   const { classId } = useParams();
+  const [selectedTeacher, setSelectedTeacher] = useState(null); // Modal state
+
+  
   // useNavHeading(selectedClassName, "Teachers");
 
   useEffect(() => {
     dispatch(stdClassTeacher({ classId }))
   }, [dispatch, classId]);
+
+  const handleProfileClick = (teacher) => {
+    setSelectedTeacher(teacher); // Set selected classmate for modal
+  };
+  console.log("selected teacher is",selectedTeacher)
+
+  const closeModal = () => {
+    setSelectedTeacher(null); // Close modal
+  };
 
   return (
     <Layout title="My Class Teachers">
@@ -46,7 +59,7 @@ const StudentTeacher = () => {
               </div>
             ) : teacherData?.length > 0 ? (
               teacherData.map((teacher, index) => (
-                <ProfileCard key={index} profile={teacher} />
+                <ProfileCard key={index} profile={teacher}   onClick={() => handleProfileClick(teacher)} />
               ))
             ) : (
               <div className="w-full flex flex-col items-center justify-center py-20">
@@ -55,6 +68,12 @@ const StudentTeacher = () => {
             )}
           </div>
         </div>
+        {selectedTeacher && (
+          <TeacherModal 
+            teacher={selectedTeacher} 
+            onClose={closeModal} 
+          />
+        )}
       </DashLayout>
     </Layout>
   );

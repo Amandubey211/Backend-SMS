@@ -41,10 +41,10 @@ const MainSection = () => {
           if (classData?.section) {
             if (classData?.groups?.length > 0) {
               // 1st condition: Section assigned and group exists
-              return `${classData.section.sectionName} - ${classData.groups[0].groupName}`;
+              return `Section: (${classData?.section?.sectionName}) - Group: (${classData?.groups?.length})`;
             } else {
               // 3rd condition: Section exists but no groups found
-              return `${classData.section.sectionName} - No group found`;
+              return `Section: (${classData?.section?.sectionName}) -Group: (${0})`;
             }
           } else {
             // 2nd condition: Section not assigned
@@ -77,7 +77,7 @@ const MainSection = () => {
     dispatch(stdClass());
   }, [dispatch])
 
-  console.log("std class data : ", classData.classId)
+  console.log("std class data : ", classData)
   return (
     <>
       <div className="flex flex-wrap justify-center gap-3 p-4">
@@ -87,6 +87,7 @@ const MainSection = () => {
             icon={item?.icon}
             text={item?.text}
             url={item?.url}
+            loading={loading}
           />
         ))}
       </div>

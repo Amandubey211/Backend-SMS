@@ -39,7 +39,7 @@ const stdLibrarySlice = createSlice({
             })
             .addCase(libraryBooksStudent.rejected, (state,action) => {
                 state.loading = false;
-                state.error = action.payload;
+                state.error = action.payload  || true;
             })
     }
 })
