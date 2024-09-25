@@ -6,7 +6,7 @@ import ClassCardBookImg from "../../../../Assets/ClassesAssets/ClassCardBook.png
 import { TbProgress } from "react-icons/tb";
 import profileImage from '../../../../Assets/DashboardAssets/profileIcon.png'
 
-const SubjectCard = ({ data, backgroundColor, classId, onSubjectClick }) => {
+const SubjectCard = ({data,backgroundColor, classId, onSubjectClick }) => {
   console.log("Subjects is : ", data);
 
   return (
@@ -49,7 +49,7 @@ const SubjectCard = ({ data, backgroundColor, classId, onSubjectClick }) => {
           />
         </div>
         <div className="ml-3">
-          <p className="text-white font-semibold">{data?.teacher}</p>
+          <p className="text-white font-semibold">{data?.teacher || "No teacher assigned"}</p>
           <p className="text-white text-sm">Teacher</p>
         </div>
       </div>
