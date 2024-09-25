@@ -22,7 +22,7 @@ import studentIssueBooksReducer from "./Slices/Student/Library/bookIssuesSlice";
 import studentAnnouncementReducer from "../Store/Slices/Student/Noticeboard/noticeSlice";
 import studentEventReducer from "../Store/Slices/Student/Noticeboard/eventsSlice";
 import studentClassReducer from '../Store/Slices/Student/MyClass/Class/classSlice';
-
+import studentClassTeacherReducer from '../Store/Slices/Student/MyClass/Class/classTeacher/classTeacherSlice';
 // parent
 import dashboardReducer from '../Store/Slices/Parent/Dashboard/dashboardSlice';
 import financeReducer from '../Store/Slices/Parent/Finance/financeSlice';
@@ -75,7 +75,8 @@ const studentReducer = combineReducers({
   studentIssueBooks: studentIssueBooksReducer,
   studentAnnouncement: studentAnnouncementReducer,
   studentEvent: studentEventReducer,
-  studentClass:studentClassReducer
+  studentClass:studentClassReducer,
+  studentClassTeacher:studentClassTeacherReducer
 });
 
 

@@ -70,9 +70,9 @@ const StudentMainSection = () => {
       ];
 
       setCardData(formattedData);
-      setSubjects(dashboardData.data.subjects);
-      setPaidFees(dashboardData.data.totalPaidFees);
-      setUnpaidFees(dashboardData.data.dueFees);
+      setSubjects(dashboardData?.data?.subjects);
+      setPaidFees(dashboardData?.data?.totalPaidFees);
+      setUnpaidFees(dashboardData?.data?.dueFees);
     } catch (error) {
       console.error("Error fetching dashboard details:", error);
     }

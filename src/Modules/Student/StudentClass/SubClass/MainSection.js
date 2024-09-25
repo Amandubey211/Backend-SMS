@@ -77,16 +77,16 @@ const MainSection = () => {
     dispatch(stdClass());
   }, [dispatch])
 
-  console.log("std class data : ", classData)
+  console.log("std class data : ", classData.classId)
   return (
     <>
       <div className="flex flex-wrap justify-center gap-3 p-4">
         {iconData?.map((item, index) => (
           <NavIconCard
             key={index}
-            icon={item.icon}
-            text={item.text}
-            url={item.url}
+            icon={item?.icon}
+            text={item?.text}
+            url={item?.url}
           />
         ))}
       </div>
@@ -113,6 +113,7 @@ const MainSection = () => {
               <div className="grid grid-cols-3 gap-4 mt-5 h-full">
                 {classData?.subjects?.map((subject, index) => {
                   // Log the subject to the console
+                  console.log("fsdfhdsfhsdfsdkf----------------f][][pd", subject)
                   return (
                     <SubjectCard
                       key={index}

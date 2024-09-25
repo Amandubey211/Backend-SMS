@@ -28,7 +28,7 @@ export const studentNotice = createAsyncThunk(
 
         }
         catch (error) {
-            console.log("Error in libraryBooksStudent", error);
+            console.log("Error in student notice", error);
             return rejectWithValue((error?.response?.data?.message || error?.message || "Something Went Wrong!"))
         }
     }
