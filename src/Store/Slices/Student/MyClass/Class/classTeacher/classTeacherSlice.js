@@ -27,7 +27,7 @@ export const classTeacherSlice=createSlice({
        })
        .addCase(stdClassTeacher.rejected,(state,action)=>{
         state.loading=false;
-        state.error=action.payload;
+        state.error=action.payload  || true;
        })
     }
 });

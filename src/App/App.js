@@ -752,7 +752,7 @@ function App() {
       errorElement: <Error />,
     },
     {
-      path: "/student_class/:cid/classmates",
+      path: "/student_class/:classId/classmates",
       element: (
         <ProtectRoute
           Component={StudentClassMates}

@@ -1,8 +1,8 @@
 import React from "react";
 import profileImage from '../../../../../../Assets/DashboardAssets/profileIcon.png'
-const ProfileCard = ({ profile }) => {
+const ProfileCard = ({ profile, onClick }) => {
   return (
-    <div className=" relative w-full sm:w-1/2 md:w-1/3 lg:w-1/4 px-2 mb-4">
+    <div onClick={onClick} className=" relative w-full sm:w-1/2 md:w-1/3 lg:w-1/4 px-2 mb-4">
       <div
         className="block p-6 bg-white rounded-lg shadow-lg hover:bg-gray-100 transition cursor-pointer"
       >

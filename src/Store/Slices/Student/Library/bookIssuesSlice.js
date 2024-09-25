@@ -34,7 +34,7 @@ const stdIssueBooksslice = createSlice({
             .addCase(studentIssueBooks.rejected, (state, action) => {
                 state.loading = false;
                 console.log("gyugyugyug",action.payload)
-                state.error = action.payload;
+                state.error = action.payload  || true;
             })
     }
 })

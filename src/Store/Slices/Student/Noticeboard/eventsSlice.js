@@ -51,7 +51,7 @@ const stdEventsSlice = createSlice({
             })
             .addCase(stdEvent.rejected, (state, action) => {
                 state.loading = false;
-                state.error = action.payload;
+                state.error = action.payload  || true;
             })
     }
 });

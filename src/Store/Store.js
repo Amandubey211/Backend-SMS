@@ -23,6 +23,7 @@ import studentAnnouncementReducer from "../Store/Slices/Student/Noticeboard/noti
 import studentEventReducer from "../Store/Slices/Student/Noticeboard/eventsSlice";
 import studentClassReducer from '../Store/Slices/Student/MyClass/Class/classSlice';
 import studentClassTeacherReducer from '../Store/Slices/Student/MyClass/Class/classTeacher/classTeacherSlice';
+import studentClassmateReducer from '../Store/Slices/Student/MyClass/Class/classMates/classmateSlice';
 // parent
 import dashboardReducer from '../Store/Slices/Parent/Dashboard/dashboardSlice';
 import financeReducer from '../Store/Slices/Parent/Finance/financeSlice';
@@ -76,7 +77,8 @@ const studentReducer = combineReducers({
   studentAnnouncement: studentAnnouncementReducer,
   studentEvent: studentEventReducer,
   studentClass:studentClassReducer,
-  studentClassTeacher:studentClassTeacherReducer
+  studentClassTeacher:studentClassTeacherReducer,
+  studentClassmate:studentClassmateReducer,
 });
 
 
