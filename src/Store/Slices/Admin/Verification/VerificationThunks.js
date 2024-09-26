@@ -4,7 +4,6 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { baseUrl } from "../../../../config/Common";
-
 // Fetch Unverified Students
 export const fetchUnverifiedStudents = createAsyncThunk(
   "verification/fetchUnverifiedStudents",
@@ -19,6 +18,11 @@ export const fetchUnverifiedStudents = createAsyncThunk(
           headers: { Authentication: `Bearer ${token}` }, // Use token in headers
         }
       );
+
+      if (!response.data.students || response.data.students.length === 0) {
+        return rejectWithValue("No unverified students found.");
+      }
+
       return response.data.students;
     } catch (error) {
       return rejectWithValue(
@@ -42,6 +46,11 @@ export const fetchRejectedStudents = createAsyncThunk(
           headers: { Authentication: `Bearer ${token}` }, // Use token in headers
         }
       );
+
+      if (!response.data.students || response.data.students.length === 0) {
+        return rejectWithValue("No rejected students found.");
+      }
+
       return response.data.students;
     } catch (error) {
       return rejectWithValue(
@@ -50,11 +59,10 @@ export const fetchRejectedStudents = createAsyncThunk(
     }
   }
 );
-
 // Verify Student and Send Credentials
 export const verifyStudent = createAsyncThunk(
   "verification/verifyStudent",
-  async (verificationDetails, { rejectWithValue, getState }) => {
+  async (verificationDetails, { rejectWithValue, getState, dispatch }) => {
     try {
       const { common } = getState(); // Get state
       const token = common.auth.token; // Extract token
@@ -94,6 +102,9 @@ export const verifyStudent = createAsyncThunk(
         }
 
         toast.success(assignResponse.data.msg || "Class assigned successfully");
+        dispatch(fetchUnverifiedStudents());
+      } else {
+        dispatch(fetchRejectedStudents());
       }
 
       // Step 3: Send Login Credentials after Verification

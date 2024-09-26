@@ -1,49 +1,65 @@
 import React from "react";
 import { MdAccessTime } from "react-icons/md";
-import { format, parse } from "date-fns";
+import { format, parseISO, isValid } from "date-fns";
+import { useDispatch } from "react-redux";
+import {
+  setSelectedEvent,
+  setSidebarContent,
+} from "../../../../../Store/Slices/Admin/Events/eventSlice"; // Use action from slice
 
-const EventCard = ({ event, color, onClick }) => {
-  // Format date
-  const formattedDate = format(new Date(event.startDate), "MMM d, yyyy");
+const colors = ["bg-yellow-300", "bg-blue-300", "bg-green-300"];
 
-  // Parse and format the time
-  let formattedTime = "Invalid time";
-  try {
-    if (event.time) {
-      // Attempt to parse the time from a 24-hour format
-      const [hours, minutes] = event.time.split(":");
-      const parsedTime = new Date();
-      parsedTime.setHours(parseInt(hours), parseInt(minutes));
+// Hash function to generate a numeric index for a string (e.g., studentId)
+const hashCode = (str) => {
+  let hash = 0;
+  if (str.length === 0) return hash;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = (hash << 5) - hash + char;
+    hash = hash & hash; // Convert to 32-bit integer
+  }
+  return Math.abs(hash);
+};
 
-      // Format it to 12-hour format with AM/PM
-      formattedTime = format(parsedTime, "hh:mm a");
-    } else {
-      // Fallback if event.time is not provided, use startDate
-      formattedTime = format(new Date(event.startDate), "hh:mm a");
+const EventCard = ({ event }) => {
+  const dispatch = useDispatch();
+
+  // Safely parse and format the event date
+  const eventDate = parseISO(event.date); // Parse ISO string properly
+  const formattedDate = isValid(eventDate)
+    ? format(eventDate, "MMM d, yyyy")
+    : "Invalid date";
+
+  // Safely parse and format the event time
+  let formattedTime = "No time"; // Default fallback for time
+  if (event.time) {
+    try {
+      const time = new Date(`1970-01-01T${event.time}:00`); // Ensure time is in correct format
+      formattedTime = isValid(time) ? format(time, "hh:mm a") : "Invalid time";
+    } catch (error) {
+      console.error("Error formatting time:", error);
     }
-  } catch (error) {
-    console.error("Error formatting time:", error, event.time);
   }
 
-  const formattedDescription = event.description || "No description available";
-  const truncateText = (text, maxLength) => {
-    return text.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
+  // Assign a random color based on eventId or another unique identifier
+  const colorIndex = hashCode(event?._id || "AmanDubey") % colors?.length;
+  const color = colors[colorIndex];
+
+  const handleClick = () => {
+    dispatch(setSelectedEvent(event)); // Use direct action dispatch
+    dispatch(setSidebarContent("viewEvent"));
   };
+
   return (
-    
     <div
-      className="flex flex-col justify-between rounded-xl p-4 text-white shadow-lg m-2 cursor-pointer"
-      style={{ backgroundColor: color, width: "220px", height: "180px" }}
-      onClick={() => onClick(event)}
+      className={`flex flex-col justify-between rounded-lg p-4 text-white shadow-lg m-2 cursor-pointer ${color}  transition`}
+      style={{ width: "220px", height: "180px" }}
+      onClick={handleClick}
     >
       <div className="flex items-start">
-        <div
-          className="flex items-center justify-center bg-white rounded-lg p-2 w-12 h-12 text-2xl font-bold"
-          style={{ color }}
-        >
-          {format(new Date(event.startDate), "d")}
+        <div className="flex items-center justify-center bg-white rounded-lg p-2 w-12 h-12 text-2xl font-bold text-purple-500">
+          {isValid(eventDate) ? format(eventDate, "d") : "N/A"}
         </div>
-
         <div className="flex flex-col ml-2">
           <span className="text-lg font-semibold">{event.title}</span>
           <div className="flex items-center">
@@ -52,8 +68,8 @@ const EventCard = ({ event, color, onClick }) => {
           </div>
         </div>
       </div>
-      <div className="flex flex-col mt-2 font-inter text-sm font-semibold leading-[1.5]">
-        <span>{truncateText(formattedDescription, 20)}</span>
+      <div className="flex flex-col mt-2 text-sm font-semibold leading-5">
+        <span>{event.description || "No description available"}</span>
         <span>{formattedDate}</span>
       </div>
     </div>

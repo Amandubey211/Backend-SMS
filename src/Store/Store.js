@@ -15,6 +15,8 @@ import sectionReducer from "./Slices/Admin/Class/Section_Groups/groupSectionSlic
 import classStudentReducer from "./Slices/Admin/Class/Students/studentSlice";
 import attendanceReducer from "./Slices/Admin/Class/Attendence/attendanceSlice";
 import verificationReducer from "./Slices/Admin/Verification/VerificationSlice";
+import adminLibraryReducer from "./Slices/Admin/Library/LibrarySlice";
+import adminEventReducer from "./Slices/Admin/Events/eventSlice";
 // student
 import studentFinanceReducer from "./Slices/Student/Finance/financeSlice";
 import studentLibraryBooksReducer from "./Slices/Student/Library/libararySlice";
@@ -63,6 +65,8 @@ const AdminReducer = combineReducers({
   students: classStudentReducer,
   attendance: attendanceReducer,
   verification: verificationReducer,
+  library: adminLibraryReducer,
+  events: adminEventReducer,
 });
 
 const studentReducer = combineReducers({

@@ -1,10 +1,13 @@
 import React, { useState } from "react";
-import ImageUpload from "../../../Addmission/Components/ImageUpload";
-import FormInput from "../../../Accounting/subClass/component/FormInput";
-import useCreateEvent from "../../../../../Hooks/AuthHooks/Staff/Admin/Events/useCreateEvent";
+import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
+import FormInput from "../../../Accounting/subClass/component/FormInput";
+import ImageUpload from "../../../Addmission/Components/ImageUpload";
+import { createEventThunk } from "../../../../../Store/Slices/Admin/Events/eventThunks";
+import { FiLoader } from "react-icons/fi";
 
-const AddEvent = ({ onSave }) => {
+const AddEvent = () => {
+  const dispatch = useDispatch();
   const [eventData, setEventData] = useState({
     title: "",
     location: "",
@@ -17,8 +20,7 @@ const AddEvent = ({ onSave }) => {
     imagePreview: null,
   });
 
-  const { loading, createEvent } = useCreateEvent();
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const Loading = useSelector((state) => state.admin.events.loading); // Get loading state
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -34,65 +36,40 @@ const AddEvent = ({ onSave }) => {
     });
   };
 
-  const handleImageRemove = () => {
-    setEventData({ ...eventData, image: null, imagePreview: null });
+  const handleRemoveImage = () => {
+    setEventData({
+      ...eventData,
+      image: null,
+      imagePreview: null,
+    });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (isSubmitting) return; // Prevent multiple submissions
-    setIsSubmitting(true); // Set submission state immediately
-
-    // Check if all required fields are filled
-    if (!eventData.title || !eventData.date || !eventData.time || !eventData.image) {
+    if (
+      !eventData.title ||
+      !eventData.date ||
+      !eventData.time ||
+      !eventData.image
+    ) {
       toast.error("Please fill in all required fields.");
-      setIsSubmitting(false);
       return;
     }
-
-    try {
-      const result = await createEvent(eventData);
-      if (result?.success) {
-        toast.success(result.msg || "Event created successfully!");
-
-        // Reset form fields
-        setEventData({
-          title: "",
-          location: "",
-          date: "",
-          time: "",
-          director: "",
-          type: "",
-          description: "",
-          image: null,
-          imagePreview: null,
-        });
-
-        // onSave(eventData, result); // Pass eventData to onSave to notify parent component
-      } else {
-        toast.error("Failed to create event.");
-      }
-    } catch (error) {
-      console.error("Error during event creation:", error);
-      toast.error("Error creating event.");
-    } finally {
-      setIsSubmitting(false); // Reset submission state after processing
-    }
+    await dispatch(createEventThunk(eventData));
+    toast.success("Event created successfully!");
   };
 
-
-
   return (
-    <div className="p-4 bg-gray-50 border rounded-lg overflow-auto" style={{ maxHeight: "90vh" }}>
+    <div
+      className="p-4 rounded-lg overflow-auto no-scrollbar"
+      style={{ maxHeight: "90vh" }}
+    >
       <form className="space-y-4" onSubmit={handleSubmit}>
-        <div className="image-upload-container">
-          <ImageUpload
-            imagePreview={eventData.imagePreview}
-            handleImageChange={handleImageChange}
-            handleRemoveImage={handleImageRemove}
-          />
-        </div>
+        <ImageUpload
+          imagePreview={eventData.imagePreview}
+          handleImageChange={handleImageChange}
+          handleRemoveImage={handleRemoveImage} // Pass handleRemoveImage to ImageUpload component
+        />
         <FormInput
           id="title"
           name="title"
@@ -101,26 +78,24 @@ const AddEvent = ({ onSave }) => {
           onChange={handleInputChange}
           required
         />
-        <div className="flex justify-between">
-          <FormInput
-            id="date"
-            name="date"
-            label="Date"
-            type="date"
-            value={eventData.date}
-            onChange={handleInputChange}
-            required
-          />
-          <FormInput
-            id="time"
-            name="time"
-            label="Event Time"
-            type="time"
-            value={eventData.time}
-            onChange={handleInputChange}
-            required
-          />
-        </div>
+        <FormInput
+          id="date"
+          name="date"
+          label="Date"
+          type="date"
+          value={eventData.date}
+          onChange={handleInputChange}
+          required
+        />
+        <FormInput
+          id="time"
+          name="time"
+          label="Event Time"
+          type="time"
+          value={eventData.time}
+          onChange={handleInputChange}
+          required
+        />
         <FormInput
           id="location"
           name="location"
@@ -128,22 +103,20 @@ const AddEvent = ({ onSave }) => {
           value={eventData.location}
           onChange={handleInputChange}
         />
-        <div className="flex justify-between">
-          <FormInput
-            id="director"
-            name="director"
-            label="Event Director"
-            value={eventData.director}
-            onChange={handleInputChange}
-          />
-          <FormInput
-            id="type"
-            name="type"
-            label="Event Type"
-            value={eventData.type}
-            onChange={handleInputChange}
-          />
-        </div>
+        <FormInput
+          id="director"
+          name="director"
+          label="Event Director"
+          value={eventData.director}
+          onChange={handleInputChange}
+        />
+        <FormInput
+          id="type"
+          name="type"
+          label="Event Type"
+          value={eventData.type}
+          onChange={handleInputChange}
+        />
         <FormInput
           id="description"
           name="description"
@@ -151,14 +124,12 @@ const AddEvent = ({ onSave }) => {
           type="textarea"
           value={eventData.description}
           onChange={handleInputChange}
-          multiline
         />
         <button
           type="submit"
-          className="w-full mt-4 p-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600"
-          disabled={loading || isSubmitting} // Ensure button is disabled on submit
+          className="w-full flex justify-center items-center mt-4 h-10 bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md"
         >
-          {loading ? "Adding Event..." : "Add Event"}
+          {Loading ? <FiLoader className="animate-spin mr-2" /> : "Add Event"}
         </button>
       </form>
     </div>

@@ -13,7 +13,7 @@ import NoDataFound from "../../../../Components/Common/NoDataFound";
 import { gt } from "../../../../Utils/translator/translation";
 import { studentIssueBooks } from "../../../../Store/Slices/Student/Library/bookIssues.action";
 import { libraryBooksStudent } from "../../../../Store/Slices/Student/Library/libarary.action";
-import TabButton from "../../../Admin/Libary/Subclasss/component/TabButton";
+import TabButton from "../../../Admin/Libary/Components/TabButton";
 
 const Library = () => {
   const dispatch = useDispatch();
