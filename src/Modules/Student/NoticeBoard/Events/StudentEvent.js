@@ -205,6 +205,9 @@ const StudentEvent = () => {
               <Calendar
                 dateCellRender={handleDateCellRender}
                 headerRender={({ value, type, onChange, onTypeChange }) => {
+                  const StartAcademicYear = 2015;
+                  const lastAcademicYear = 2050;
+
                   const start = 0;
                   const end = 12;
                   const monthOptions = [];
@@ -223,7 +226,7 @@ const StudentEvent = () => {
                   const year = value.year();
                   const month = value.month();
                   const options = [];
-                  for (let i = year - 10; i < year + 10; i += 1) {
+                  for (let i = StartAcademicYear; i <= lastAcademicYear; i++) {
                     options.push(
                       <option className="bg-white" key={i} value={i}>
                         {t(i,gt.date)}
@@ -262,7 +265,7 @@ const StudentEvent = () => {
                       >
                         {monthOptions}
                       </select>
-                      <div className="flex space-x-2">
+                      {/* <div className="flex space-x-2">
                         <button
                           className={`border rounded px-2 py-1 ${
                             type === "month"
@@ -283,7 +286,7 @@ const StudentEvent = () => {
                         >
                           {t("Year", gt.month)}
                         </button>
-                      </div>
+                      </div> */}
                     </div>
                   );
                 }}

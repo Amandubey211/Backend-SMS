@@ -26,6 +26,8 @@ import studentEventReducer from "../Store/Slices/Student/Noticeboard/eventsSlice
 import studentClassReducer from '../Store/Slices/Student/MyClass/Class/classSlice';
 import studentClassTeacherReducer from '../Store/Slices/Student/MyClass/Class/classTeacher/classTeacherSlice';
 import studentClassmateReducer from '../Store/Slices/Student/MyClass/Class/classMates/classmateSlice';
+import studentAttendancereducer from '../Store/Slices/Student/MyClass/Class/Attendance/stdAttendanceSlice';
+
 // parent
 import dashboardReducer from '../Store/Slices/Parent/Dashboard/dashboardSlice';
 import financeReducer from '../Store/Slices/Parent/Finance/financeSlice';
@@ -89,6 +91,7 @@ const studentReducer = combineReducers({
   studentClass:studentClassReducer,
   studentClassTeacher:studentClassTeacherReducer,
   studentClassmate:studentClassmateReducer,
+  studentAttendance:studentAttendancereducer,
 });
 
 
