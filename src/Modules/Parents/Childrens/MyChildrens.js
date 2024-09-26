@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import ChildCard from "../../../Components/Parents/Children/ChildCard";
 import Spinner from "../../../Components/Common/Spinner";
 import { FaChild } from 'react-icons/fa';
-import { fetchChildren } from "../../../Store/Slices/Parent/Children/childrenThunks";
+import { fetchChildren } from "../../../Store/Slices/Parent/Children/children.action";
 
 // Memoization for performance optimization
 const MyChildren = () => {

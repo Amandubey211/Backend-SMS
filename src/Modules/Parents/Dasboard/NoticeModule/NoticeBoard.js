@@ -6,7 +6,7 @@ import { format } from 'date-fns';
 import { FaBell } from "react-icons/fa";
 import Spinner from "../../../../Components/Common/Spinner";
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchNotices } from '../../../../Store/Slices/Parent/Dashboard/dashboardThunks';
+import { fetchNotices } from '../../../../Store/Slices/Parent/Dashboard/dashboard.action';
 
 // Gradient backgrounds for the notices
 const gradientBackgrounds = [

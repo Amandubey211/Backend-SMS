@@ -1,7 +1,7 @@
 import React, { useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import { useDispatch, useSelector } from 'react-redux'; // Import Redux hooks
-import { fetchChildren } from '../../../../Store/Slices/Parent/Dashboard/dashboardThunks'; // Import Redux action
+import { fetchChildren } from '../../../../Store/Slices/Parent/Dashboard/dashboard.action'; // Import Redux action
 import Spinner from "../../../../Components/Common/Spinner"; // Import Spinner
 import { FaChild } from 'react-icons/fa';
 

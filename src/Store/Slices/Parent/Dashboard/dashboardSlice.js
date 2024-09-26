@@ -4,7 +4,7 @@ import {
   fetchNotices,
   fetchChildren,
   fetchAccountingData
-} from "./dashboardThunks";
+} from "./dashboard.action";
 
 const initialState = {
   dashboardData: null,  // Will hold the cards and notices, etc.

@@ -58,3 +58,42 @@ export const fetchAttendance = createAsyncThunk(
     }
   }
 );
+
+
+
+// Thunk to fetch teachers
+export const fetchTeachers = createAsyncThunk(
+  "children/fetchTeachers",
+  async (studentId, { rejectWithValue }) => {
+    const token = localStorage.getItem("parent:token");
+    const userData = JSON.parse(localStorage.getItem("userData"));
+
+    if (!userData || !userData.email) {
+      toast.error("No guardian email found");
+      return rejectWithValue("No guardian email found");
+    }
+
+    if (!token) {
+      toast.error("No token found");
+      return rejectWithValue("No token found");
+    }
+
+    try {
+      const response = await axios.get(`${baseUrl}/parent/api/instructors/${studentId}`, {
+        headers: {
+          Authentication: `${token}`,
+        },
+      });
+
+      if (!response.data || response.data.instructors.length === 0) {
+        return [];  // No instructors found
+      }
+
+      return response.data.instructors;
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || "Failed to fetch instructors";
+      toast.error(errorMessage);
+      return rejectWithValue(errorMessage);
+    }
+  }
+);

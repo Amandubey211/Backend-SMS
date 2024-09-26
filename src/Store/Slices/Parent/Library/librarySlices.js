@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { fetchLibraryBooks } from './libraryThunks';
+import { fetchLibraryBooks } from './library.action';
 
 const initialState = {
   books: [],

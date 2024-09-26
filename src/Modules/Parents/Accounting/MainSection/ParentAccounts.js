@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchAccountingData } from '../../../../Store/Slices/Parent/Dashboard/dashboardThunks'; // Redux action to fetch accounting data
+import { fetchAccountingData } from '../../../../Store/Slices/Parent/Dashboard/dashboard.action'; // Redux action to fetch accounting data
 import Layout from "../../../../Components/Common/ParentLayout";
 import { FaMoneyBillWave } from "react-icons/fa"; // Icon for no fees message
 import Spinner from "../../../../Components/Common/Spinner"; // Spinner component

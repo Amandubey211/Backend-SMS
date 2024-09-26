@@ -1,6 +1,6 @@
 // eventSlice.js
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchAllEvents, addNewEvent } from "./event.action";
+import { fetchAllEvents } from "./event.action";
 
 const initialState = {
   events: [],

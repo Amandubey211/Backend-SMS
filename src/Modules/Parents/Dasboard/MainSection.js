@@ -11,7 +11,7 @@ import { RiCalendarCheckLine } from "react-icons/ri";
 import Spinner from "../../../Components/Common/Spinner";
 
 // Thunks for fetching each section's data
-import { fetchDashboardCards, fetchNotices, fetchChildren, fetchAccountingData } from '../../../Store/Slices/Parent/Dashboard/dashboardThunks';
+import { fetchDashboardCards, fetchNotices, fetchChildren, fetchAccountingData } from '../../../Store/Slices/Parent/Dashboard/dashboard.action.js';
 
 const ParentSection = () => {
   const dispatch = useDispatch();
