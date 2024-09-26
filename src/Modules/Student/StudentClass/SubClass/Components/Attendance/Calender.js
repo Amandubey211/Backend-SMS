@@ -21,7 +21,7 @@ const CalendarHeader = ({ attendanceData, onPanelChange }) => {
   const dateCellRender = (value) => {
     const dateStr = value.format('YYYY-MM-DD');
     const status = attendanceData[dateStr];
-console.log("date____",dateStr,status,value,attendanceData);
+// console.log("date____",dateStr,status,value,attendanceData);
     return (
       status ? (
         <div className='flex flex-col items-center'>

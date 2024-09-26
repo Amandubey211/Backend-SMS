@@ -21,7 +21,7 @@ export const stdClassmate = createAsyncThunk(
             return data;
 
         } catch (error) {
-            console.log("Error in student class teacher", error);
+            console.log("Error in student classmate", error);
             return rejectWithValue((error?.response?.data?.message || error?.message || "Something Went Wrong!"))
         }
     }
