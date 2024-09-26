@@ -28,10 +28,8 @@ const AccountingSection = () => {
   
   // Dispatch action to fetch accounting data on component mount
   useEffect(() => {
-    if (!accountingData?.fees?.length) {
       dispatch(fetchAccountingData());
-    }
-  }, [dispatch, accountingData]);
+  }, [dispatch]);
 
   // Check if accountingData exists and has fees data
   const { fees = [], totalUnpaidFees = "", totalPaidFees = "" } = accountingData || {};

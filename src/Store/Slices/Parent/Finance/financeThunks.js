@@ -6,12 +6,13 @@ import toast from "react-hot-toast";
 // Fetch finance data for parent
 export const fetchParentFinanceData = createAsyncThunk(
   "dashboard/fetchAccountingData",
-  async () => {
+  async (_, { rejectWithValue }) => {
     const token = localStorage.getItem("parent:token");
 
     if (!token) {
-      toast.error("Token not found");
-      return null;
+      const errorMessage = "Token not found";
+      toast.error(errorMessage);
+      return rejectWithValue(errorMessage); // Reject with custom message if no token is found
     }
 
     try {
@@ -24,7 +25,8 @@ export const fetchParentFinanceData = createAsyncThunk(
     } catch (error) {
       const errorMessage = error.response?.data?.message || "Failed to fetch accounting data";
       toast.error(errorMessage);
-      return null;
+      return rejectWithValue(errorMessage); // Reject with custom error message
     }
   }
 );
+

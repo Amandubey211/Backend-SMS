@@ -17,16 +17,13 @@ const initialState = {
     totalUnpaidFees: "",
   },
   loading: false,
-  error: null,
+  error: false,
 };
 
 const dashboardSlice = createSlice({
   name: "dashboard",
   initialState,
   reducers: {
-    clearError(state) {
-      state.error = null;
-    },
   },
   extraReducers: (builder) => {
     // Dashboard Cards
@@ -38,9 +35,10 @@ const dashboardSlice = createSlice({
       })
       .addCase(fetchDashboardCards.pending, (state) => {
         state.loading = true;
+        state.error = false;
       })
       .addCase(fetchDashboardCards.rejected, (state, action) => {
-        state.error = action.error.message;
+        state.error = action.payload;
         state.loading = false;
       });
 
@@ -48,7 +46,7 @@ const dashboardSlice = createSlice({
     builder
       .addCase(fetchNotices.pending, (state) => {
         state.loading = true;
-        state.error = null;
+        state.error = false;
       })
       .addCase(fetchNotices.fulfilled, (state, action) => {
         state.loading = false;
@@ -56,14 +54,14 @@ const dashboardSlice = createSlice({
       })
       .addCase(fetchNotices.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message;
+        state.error = action.payload;
       });
 
     // Children Data
     builder
       .addCase(fetchChildren.pending, (state) => {
         state.loading = true;
-        state.error = null;
+        state.error = false;
       })
       .addCase(fetchChildren.fulfilled, (state, action) => {
         state.loading = false;
@@ -71,14 +69,14 @@ const dashboardSlice = createSlice({
       })
       .addCase(fetchChildren.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message;
+        state.error = action.payload;
       });
 
     // Accounting Data
     builder
       .addCase(fetchAccountingData.pending, (state) => {
         state.loading = true;
-        state.error = null;
+        state.error = false;
       })
       .addCase(fetchAccountingData.fulfilled, (state, action) => {
         state.loading = false;
@@ -90,7 +88,7 @@ const dashboardSlice = createSlice({
       })
       .addCase(fetchAccountingData.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message;
+        state.error = action.payload;
       });
   },
 });

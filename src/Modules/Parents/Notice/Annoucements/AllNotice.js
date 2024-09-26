@@ -12,32 +12,42 @@ import { fetchAllNotices } from "../../../../Store/Slices/Parent/NoticeBoard/not
 const AllNotice = () => {
   const dispatch = useDispatch();
   
-  // Using Redux state with a fallback default to handle no data edge case
-  const { notices = [], loading, error } = useSelector((state) => state.Parent.notice);
+  // Accessing the notices, loading, and error from Redux state
+  const { notices, loading, error } = useSelector((state) => state.Parent.notice);
   
   const [searchTerm, setSearchTerm] = useState("");
   const [activeIndex, setActiveIndex] = useState(null);
+  
+  // Custom hook for setting navigation heading
   useNavHeading("Notice");
 
-  const backgroundColors = useMemo(() => ['bg-blue-300', 'bg-green-300', 'bg-yellow-300', 'bg-pink-300', 'bg-purple-300'], []);
-
-  // Optimized fetch - only dispatch on mount or if notices are empty
+  // Side effect: Dispatches fetch action on mount
   useEffect(() => {
-    if (notices.length === 0) {
-      dispatch(fetchAllNotices());
-    }
-  }, [dispatch, notices]);
+    dispatch(fetchAllNotices());
+  }, [dispatch]);  // Only runs on mount or if `dispatch` changes
+  
+  // Memoized array for background colors
+  const backgroundColors = useMemo(() => [
+    'bg-blue-300', 
+    'bg-green-300', 
+    'bg-yellow-300', 
+    'bg-pink-300', 
+    'bg-purple-300'
+  ], []);
 
+  // Memoized filtered notices based on search term
   const filteredNotices = useMemo(() => {
     return notices.filter((notice) =>
       notice.title?.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [notices, searchTerm]);
 
+  // Accordion toggle function
   const toggleAccordion = (index) => {
     setActiveIndex(activeIndex === index ? null : index);
   };
 
+  // Date formatting helper
   const formatDate = (isoDate) => {
     const date = new Date(isoDate);
     return date.toLocaleDateString('en-US', {

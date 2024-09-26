@@ -5,9 +5,14 @@ import { baseUrl } from "../../../../config/Common";
 // Fetch library books thunk
 export const fetchLibraryBooks = createAsyncThunk(
   'library/fetchLibraryBooks',
-  async (_, { getState }) => {
+  async (_, { rejectWithValue }) => {
+    const token = localStorage.getItem('parent:token');
+
+    if (!token) {
+      return rejectWithValue("No token found");
+    }
+
     try {
-      const token = localStorage.getItem('parent:token');
       const response = await axios.get(`${baseUrl}/parent/all/bookIssue`, {
         headers: {
           Authentication: `${token}`,
@@ -22,7 +27,8 @@ export const fetchLibraryBooks = createAsyncThunk(
         bookCategory: book.bookId.category,
       }));
     } catch (error) {
-      throw new Error(error.message || "Failed to fetch library data.");
+      const errorMessage = error.response?.data?.message || "Failed to fetch library data.";
+      return rejectWithValue(errorMessage);
     }
   }
 );
