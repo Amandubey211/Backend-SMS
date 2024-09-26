@@ -42,7 +42,6 @@ export const fetchAttendance = createAsyncThunk(
       const response = await fetch(`${baseUrl}/api/studentDashboard/myAttendance?studentId=${studentId}&month=${month}&year=${year}`, {
         method: 'GET',
         headers: {
-          'Content-Type': 'application/json',
           'Authentication': `${token}`
         }
       });

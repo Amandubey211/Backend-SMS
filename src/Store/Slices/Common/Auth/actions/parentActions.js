@@ -1,6 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
-import { resetState } from "../reducers/authSlice";
+import { resetState, setRole, setToken } from "../reducers/authSlice";
 import { baseUrl } from "../../../../../config/Common";
 import { setUserDetails } from "../../User/reducers/userSlice";
 
@@ -19,6 +19,9 @@ export const parentLogin = createAsyncThunk(
         localStorage.setItem("userData", JSON.stringify(data));
         localStorage.setItem(`${data.role}:token`, token);
 
+        dispatch(setToken(data.token)); // Store token in state
+        dispatch(setRole(data.role)); // Set role
+
         dispatch(
           setUserDetails({
             userId: data?.userId,
@@ -26,7 +29,11 @@ export const parentLogin = createAsyncThunk(
             fullName: data?.fullName,
           })
         );
-        return { role: data.role, token: data.token };
+        console.log("Parent Dashhhh :",data.token);
+        
+
+
+        return { redirect: "/parent_dash" };
       } else {
         return rejectWithValue(data.message || "Login failed.");
       }

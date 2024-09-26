@@ -13,6 +13,7 @@ import {
   registerStudentDetails,
   uploadStudentDocuments,
 } from "../actions/studentActions";
+import { redirect } from "react-router-dom";
 
 const initialState = {
   isLoggedIn: false,
@@ -116,9 +117,7 @@ const AuthSlice = createSlice({
       .addCase(parentLogin.fulfilled, (state, action) => {
         state.loading = false;
         state.isLoggedIn = true;
-        // state.role = action.payload.role;
-        // state.token = action.payload.token;
-        localStorage.setItem("token", action.payload.token);
+        
       })
       .addCase(parentLogin.rejected, (state, action) => {
         state.loading = false;

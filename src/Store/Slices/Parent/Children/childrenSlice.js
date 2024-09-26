@@ -5,7 +5,7 @@ const initialState = {
   children: [],
   attendance: [],
   loading: false,
-  error: null,
+  error: false,
 };
 
 const childrenSlice = createSlice({
@@ -17,7 +17,7 @@ const childrenSlice = createSlice({
       // Handle fetching children
       .addCase(fetchChildren.pending, (state) => {
         state.loading = true;
-        state.error = null;
+        state.error = false;
       })
       .addCase(fetchChildren.fulfilled, (state, action) => {
         state.loading = false;
@@ -25,12 +25,12 @@ const childrenSlice = createSlice({
       })
       .addCase(fetchChildren.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message;
+        state.error = action.payload;
       })
       // Handle fetching attendance
       .addCase(fetchAttendance.pending, (state) => {
         state.loading = true;
-        state.error = null;
+        state.error = false;
       })
       .addCase(fetchAttendance.fulfilled, (state, action) => {
         state.loading = false;
@@ -38,7 +38,7 @@ const childrenSlice = createSlice({
       })
       .addCase(fetchAttendance.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message;
+        state.error = action.payload;
       });
   },
 });

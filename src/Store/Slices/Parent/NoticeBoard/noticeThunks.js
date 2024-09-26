@@ -6,18 +6,17 @@ import toast from "react-hot-toast";
 // Async thunk to fetch all notices
 export const fetchAllNotices = createAsyncThunk(
   "dashboard/fetchNotices",
-  async () => {
+  async (_, { rejectWithValue }) => {
     const token = localStorage.getItem("parent:token");
 
     if (!token) {
       toast.error("No token found");
-      return [];
+      return rejectWithValue("No token found");
     }
 
     try {
       const response = await axios.get(`${baseUrl}/admin/all/notices`, {
         headers: {
-         
           Authentication: `${token}`,
         },
       });
@@ -26,7 +25,7 @@ export const fetchAllNotices = createAsyncThunk(
     } catch (error) {
       const errorMessage = error.response?.data?.message || "Failed to fetch notices";
       toast.error(errorMessage);
-      return [];
+      return rejectWithValue(errorMessage);
     }
   }
 );

@@ -1,21 +1,18 @@
 import React, { useState, useEffect, useMemo } from "react";
 import Layout from "../../Components/Common/Layout";
 import ParentDashLayout from "../../Components/Parents/ParentDashLayout.js";
-import { MdAccessTime, MdMoneyBillWave } from "react-icons/md";
+import { MdAccessTime } from "react-icons/md";
 import { GiExpense } from "react-icons/gi";
-import { LuPocket } from "react-icons/lu";
-import { CiMoneyCheck1 } from "react-icons/ci";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchParentFinanceData } from "../../Store/Slices/Parent/Finance/financeThunks.js";
 import Spinner from "../../Components/Common/Spinner";
 import { FaMoneyBillWave } from "react-icons/fa";
 import useNavHeading from "../../Hooks/CommonHooks/useNavHeading .js";
-
 const ParentFinanceTable = () => {
   const dispatch = useDispatch();
-  
+
   // Accessing the redux state, setting default fallback values to prevent errors
-  const { financeData = [], totalUnpaidFees = 0, totalPaidFees = 0, loading, error } = useSelector(
+  const { financeData, totalUnpaidFees = 0, totalPaidFees = 0, loading, error } = useSelector(
     (state) => state.Parent.finance
   );
 
@@ -24,20 +21,13 @@ const ParentFinanceTable = () => {
     status: "Everyone",
   });
 
+  // Custom hook for setting navigation heading
   useNavHeading("Finance");
 
-  // Fetch finance data only if not already available
+  // Fetch finance data on mount or if dispatch changes
   useEffect(() => {
-    if (financeData.length === 0) {
-      dispatch(fetchParentFinanceData());
-    }
-  }, [dispatch, financeData]);
-
-  // Update filters based on user input
-  const handleFilterChange = (e) => {
-    const { name, value } = e.target;
-    setFilters((prev) => ({ ...prev, [name]: value }));
-  };
+    dispatch(fetchParentFinanceData());
+  }, [dispatch]);
 
   // Memoized filtering logic for better performance
   const filteredFeesDetails = useMemo(() => {
@@ -54,6 +44,12 @@ const ParentFinanceTable = () => {
     if (filters.status === "Unpaid") return "No Unpaid Entries Available";
     return "No data available for the selected filter";
   }, [filters.status]);
+
+  // Update filters based on user input
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    setFilters((prev) => ({ ...prev, [name]: value }));
+  };
 
   return (
     <Layout title="Parents | Finance">
@@ -79,11 +75,10 @@ const ParentFinanceTable = () => {
                             className="hidden"
                           />
                           <div
-                            className={`h-5 w-5 rounded-full mr-2 flex items-center justify-center border-2 ${
-                              filters.status === status
+                            className={`h-5 w-5 rounded-full mr-2 flex items-center justify-center border-2 ${filters.status === status
                                 ? "border-green-500 bg-white"
                                 : "border-gray-300 bg-white"
-                            }`}
+                              }`}
                             style={{ position: 'relative' }}
                           >
                             {filters.status === status && (
@@ -100,9 +95,8 @@ const ParentFinanceTable = () => {
                             )}
                           </div>
                           <span
-                            className={`transition-colors duration-200 ${
-                              filters.status === status ? "text-green-700" : "text-gray-700"
-                            }`}
+                            className={`transition-colors duration-200 ${filters.status === status ? "text-green-700" : "text-gray-700"
+                              }`}
                             style={{ paddingLeft: "2px" }}
                           >
                             {status}
@@ -137,9 +131,8 @@ const ParentFinanceTable = () => {
                           <td className="px-5 py-4 border-b border-gray-200">{item.amount || 'No Amount'}</td>
                           <td className="px-5 py-4 border-b border-gray-200">
                             <span
-                              className={`inline-block px-3 py-1 font-semibold rounded-full ${
-                                item.status === "Paid" ? "text-[#0D9755]" : "text-red-500"
-                              }`}
+                              className={`inline-block px-3 py-1 font-semibold rounded-full ${item.status === "Paid" ? "text-[#0D9755]" : "text-red-500"
+                                }`}
                             >
                               {item.status || 'No Status'}
                             </span>

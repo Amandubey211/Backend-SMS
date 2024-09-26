@@ -6,7 +6,7 @@ const initialState = {
   totalUnpaidFees: 0,
   totalPaidFees: 0,
   loading: false,
-  error: null,
+  error: false,
 };
 
 const financeSlice = createSlice({
@@ -19,7 +19,7 @@ const financeSlice = createSlice({
       state.totalPaidFees = action.payload.totalPaidFees;
     },
     clearError(state) {
-      state.error = null;
+      state.error = false;
     },
   },
   extraReducers: (builder) => {

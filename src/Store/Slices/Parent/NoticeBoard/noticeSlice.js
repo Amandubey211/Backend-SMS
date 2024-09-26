@@ -7,14 +7,14 @@ const noticeSlice = createSlice({
   initialState: {
     notices: [],
     loading: false,
-    error: null,
+    error: false,
   },
   reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(fetchAllNotices.pending, (state) => {
         state.loading = true;
-        state.error = null;
+        state.error = false;
       })
       .addCase(fetchAllNotices.fulfilled, (state, action) => {
         state.loading = false;

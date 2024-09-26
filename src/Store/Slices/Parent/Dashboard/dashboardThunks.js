@@ -6,24 +6,29 @@ import toast from "react-hot-toast";
 // Fetch dashboard cards
 export const fetchDashboardCards = createAsyncThunk(
   "dashboard/fetchCards",
-  async () => {
+  async (_, { rejectWithValue }) => {
     const token = localStorage.getItem("parent:token");
 
     if (!token) {
-      throw new Error("No token found");
+      return rejectWithValue("No token found");
     }
 
-    const response = await axios.get(`${baseUrl}/parent/api/dashboard/sections`, {
-      headers: {
-        Authentication: `${token}`,
-      },
-    });
+    try {
+      const response = await axios.get(`${baseUrl}/parent/api/dashboard/sections`, {
+        headers: {
+          Authentication: `${token}`,
+        },
+      });
 
-    if (response.data.success) {
-      console.log("API Response for Dashboard Cards:", response.data);
-      return response.data;
-    } else {
-      throw new Error("Failed to fetch dashboard data");
+      if (response.data.success) {
+        console.log("API Response for Dashboard Cards:", response.data);
+        return response.data;
+      } else {
+        return rejectWithValue("Failed to fetch dashboard data");
+      }
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || "Failed to fetch dashboard data";
+      return rejectWithValue(errorMessage);
     }
   }
 );
@@ -32,8 +37,12 @@ export const fetchDashboardCards = createAsyncThunk(
 // Fetch notices
 export const fetchNotices = createAsyncThunk(
   "dashboard/fetchNotices",
-  async () => {
+  async (_, { rejectWithValue }) => {
     const token = localStorage.getItem("parent:token");
+
+    if (!token) {
+      return rejectWithValue("No token found");
+    }
 
     try {
       const response = await axios.get(`${baseUrl}/admin/all/notices`, {
@@ -47,21 +56,23 @@ export const fetchNotices = createAsyncThunk(
     } catch (error) {
       const errorMessage = error.response?.data?.message || "Failed to fetch notices";
       toast.error(errorMessage);
-      return [];  // Return an empty array or null if notices fail to load
+      return rejectWithValue(errorMessage);  // Reject with the error message instead of returning []
     }
   }
 );
 
+
 // Fetch children data
 export const fetchChildren = createAsyncThunk(
   "dashboard/fetchChildren",
-  async () => {
+  async (_, { rejectWithValue }) => {
     const userData = JSON.parse(localStorage.getItem("userData"));
     const token = localStorage.getItem("parent:token");
 
     if (!userData || !userData.email) {
-      toast.error("No guardian email found");
-      return null;
+      const errorMessage = "No guardian email found";
+      toast.error(errorMessage);
+      return rejectWithValue(errorMessage); // Reject if userData or email is not found
     }
 
     try {
@@ -78,19 +89,22 @@ export const fetchChildren = createAsyncThunk(
       const errorMessage =
         error.response?.data?.message || "Failed to fetch children data";
       toast.error(errorMessage);
-      return []; // Return an empty array or null if children data fails to load
+      return rejectWithValue(errorMessage); // Reject with the error message instead of returning []
     }
   }
 );
 
+
 // Fetch accounting data (fees, paid, unpaid, etc.)
 export const fetchAccountingData = createAsyncThunk(
   "dashboard/fetchAccountingData",
-  async () => {
+  async (_, { rejectWithValue }) => {
     const token = localStorage.getItem("parent:token");
+
     if (!token) {
-      toast.error("Token not found");
-      return null;
+      const errorMessage = "Token not found";
+      toast.error(errorMessage);
+      return rejectWithValue(errorMessage); // Reject if the token is missing
     }
 
     try {
@@ -103,7 +117,8 @@ export const fetchAccountingData = createAsyncThunk(
     } catch (error) {
       const errorMessage = error.response?.data?.message || "Failed to fetch accounting data";
       toast.error(errorMessage);
-      return null;  // Return null or an empty object if accounting data fails to load
+      return rejectWithValue(errorMessage);  // Reject with error message instead of returning null
     }
   }
 );
+
