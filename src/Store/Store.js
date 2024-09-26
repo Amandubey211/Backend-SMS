@@ -30,6 +30,12 @@ import financeReducer from '../Store/Slices/Parent/Finance/financeSlice';
 import noticeReducer from '../Store/Slices/Parent/NoticeBoard/noticeSlice';
 import childrenReducer from '../Store/Slices/Parent/Children/childrenSlice';
 import libraryReducer from '../Store/Slices/Parent/Library/librarySlices';
+import eventReducer from "../Store/Slices/Parent/Events/eventSlice";
+
+
+
+
+
 // Persist configuration for the Auth slice
 const authPersistConfig = {
   key: "auth",
@@ -87,7 +93,8 @@ const ParentReducer = combineReducers({
   finance: financeReducer,
   children: childrenReducer,
   notice: noticeReducer,
-  library: libraryReducer
+  library: libraryReducer,
+  events: eventReducer
 });
 
 
