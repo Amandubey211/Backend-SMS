@@ -2,7 +2,7 @@ import React, { useEffect, useCallback, useState } from 'react';
 import { Calendar as AntdCalendar } from 'antd';
 import AttendanceCard from '../../../Modules/Parents/Attendance/AttendanceCard.js';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchAttendance } from '../../../Store/Slices/Parent/Children/childrenThunks';
+import { fetchAttendance } from '../../../Store/Slices/Parent/Children/children.action.js';
 import { FaExclamationTriangle } from 'react-icons/fa'; // Error icon
 import presentIcon from '../../../Assets/ParentAssets/svg/present.svg';
 import absentIcon from '../../../Assets/ParentAssets/svg/absent.svg';

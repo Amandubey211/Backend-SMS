@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { Table, message } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchLibraryBooks } from '../../../Store/Slices/Parent/Library/libraryThunks'; // Redux Thunk for fetching data
+import { fetchLibraryBooks } from '../../../Store/Slices/Parent/Library/library.action'; // Redux Thunk for fetching data
 import Spinner from "../../../Components/Common/Spinner"; // Importing Spinner
 import { FaBookOpen } from "react-icons/fa"; // Importing an icon for no data or error messages
 

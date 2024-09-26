@@ -7,7 +7,7 @@ import CalendarIcon from '../../../../Assets/ParentAssets/svg/calender.svg';
 import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading .js";
 import announcementIcon from "../../../../Assets/DashboardAssets/Images/image1.png";
 import Spinner from "../../../../Components/Common/Spinner";
-import { fetchAllNotices } from "../../../../Store/Slices/Parent/NoticeBoard/noticeThunks";
+import { fetchAllNotices } from "../../../../Store/Slices/Parent/NoticeBoard/notice.action.js";
 
 const AllNotice = () => {
   const dispatch = useDispatch();

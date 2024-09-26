@@ -4,7 +4,7 @@ import ParentDashLayout from "../../Components/Parents/ParentDashLayout.js";
 import { MdAccessTime } from "react-icons/md";
 import { GiExpense } from "react-icons/gi";
 import { useSelector, useDispatch } from "react-redux";
-import { fetchParentFinanceData } from "../../Store/Slices/Parent/Finance/financeThunks.js";
+import { fetchParentFinanceData } from "../../Store/Slices/Parent/Finance/finance.action.js";
 import Spinner from "../../Components/Common/Spinner";
 import { FaMoneyBillWave } from "react-icons/fa";
 import useNavHeading from "../../Hooks/CommonHooks/useNavHeading .js";

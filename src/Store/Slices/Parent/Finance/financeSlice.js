@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchParentFinanceData } from "./financeThunks";
+import { fetchParentFinanceData } from "./finance.action";
 
 const initialState = {
   financeData: [],

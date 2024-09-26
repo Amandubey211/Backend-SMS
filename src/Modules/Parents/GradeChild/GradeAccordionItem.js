@@ -1,4 +1,3 @@
-import axios from "axios";
 import React, { useEffect, useState } from "react";
 import {
   MdOutlineQuiz,
@@ -10,51 +9,48 @@ import { useParams } from "react-router-dom";
 import { FaBook } from "react-icons/fa";
 import { GoAlertFill } from "react-icons/go";
 import { FiLoader } from "react-icons/fi";
-import { baseUrl } from "../../../config/Common";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchGrades, fetchChildren } from "../../../Store/Slices/Parent/Children/children.action"; // Import correct Redux actions
 
-const GradeAccordionItem = ({ grades, getData, loading, onToggleSidebar }) => {
+const GradeAccordionItem = ({ onToggleSidebar }) => {
   const [isOpen, setIsOpen] = useState(null);
-  const [studentSubjects, setStudentSubjects] = useState([]);
   const { studentId } = useParams();
+  const dispatch = useDispatch();
 
-  const toggleOpen = (index) => {
-    const newOpenState = isOpen === index ? null : index;
-    setIsOpen(newOpenState);
-    onToggleSidebar(newOpenState !== null); // Toggle sidebar visibility based on accordion state
-  };
+  // Get subjects and grades from Redux state
+  const { children: studentSubjects, grades, loading } = useSelector((state) => state.Parent.children);
 
   useEffect(() => {
-    const fetchSubjects = async () => {
-      try {
-        const token = localStorage.getItem(`parent:token`);
-        if (!token) {
-          throw new Error("Authentication token not found");
-        }
-        const response = await axios.get(`${baseUrl}/api/studentDashboard/subjects/${studentId}`, {
-          headers: { Authentication: token },
-        });
-        setStudentSubjects(response.data.subjects);
-      } catch (err) {
-        console.error("Error fetching subjects:", err);
-      }
-    };
+    // Fetch subjects (children) on component mount
+    if (studentSubjects.length === 0) {
+      dispatch(fetchChildren()); // Fetch subjects from Redux state
+    }
+  }, [dispatch, studentSubjects.length]);
 
-    fetchSubjects();
-  }, [studentId]);
+  const toggleOpen = (index, subjectId) => {
+    const newOpenState = isOpen === index ? null : index;
+    setIsOpen(newOpenState);
+    onToggleSidebar(newOpenState !== null);
+
+    if (newOpenState !== null && !grades?.[subjectId]) {
+      // Fetch grades if not already available in Redux state
+      dispatch(fetchGrades({ studentId, subjectId }));
+    }
+  };
 
   return (
     <>
-      {studentSubjects.map((i, index) => (
-        <div key={i._id} className="border-b p-3" onClick={() => { if (isOpen !== index) getData(i._id); }}>
+      {studentSubjects?.map((subject, index) => (
+        <div key={subject?._id} className="border-b p-3">
           <div
             className="cursor-pointer py-3 px-5 flex items-center justify-between"
-            onClick={() => toggleOpen(index)}
+            onClick={() => toggleOpen(index, subject?._id)}
           >
             <div className="flex justify-center items-center gap-3">
               <div className="border rounded-full p-2">
                 <FaBook className="text-[2rem] text-pink-400" />
               </div>
-              <span className="font-bold">{i.name}</span>
+              <span className="font-bold">{subject?.name}</span>
             </div>
             <span>
               {isOpen === index ? (
@@ -88,20 +84,20 @@ const GradeAccordionItem = ({ grades, getData, loading, onToggleSidebar }) => {
                   </tr>
                 ) : (
                   <tbody className="w-full">
-                    {grades?.length > 0 ? (
-                      grades.map((i, idx) => (
+                    {grades?.[subject?._id]?.length > 0 ? (
+                      grades?.[subject?._id]?.map((grade, idx) => (
                         <tr key={idx} className="bg-white">
                           <td className="px-5 py-2 flex items-center w-[10rem]">
-                            <span>{i?.Name}</span>
+                            <span>{grade?.Name}</span>
                           </td>
-                          <td className="px-5 py-2">{i?.dueDate.slice(0, 10)}</td>
-                          <td className="px-5 py-2">{i?.submittedDate.slice(0, 10)}</td>
+                          <td className="px-5 py-2">{grade?.dueDate?.slice(0, 10)}</td>
+                          <td className="px-5 py-2">{grade?.submittedDate?.slice(0, 10)}</td>
                           <td className="px-5 py-2">
-                            <span className={`${i?.status === 'Submit' ? 'text-green-500' : 'text-red-500'} font-medium`}>
-                              {i?.status}
+                            <span className={`${grade?.status === 'Submit' ? 'text-green-500' : 'text-red-500'} font-medium`}>
+                              {grade?.status}
                             </span>
                           </td>
-                          <td className="px-5 py-2 text-center">{i?.score}</td>
+                          <td className="px-5 py-2 text-center">{grade?.score}</td>
                         </tr>
                       ))
                     ) : (
