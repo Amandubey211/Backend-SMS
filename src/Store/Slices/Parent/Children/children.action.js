@@ -97,3 +97,28 @@ export const fetchTeachers = createAsyncThunk(
     }
   }
 );
+
+
+// Thunk to fetch grades for a specific student and subject
+export const fetchGrades = createAsyncThunk(
+  'children/fetchGrades',
+  async ({ studentId, subjectId }, { rejectWithValue }) => {
+    const token = localStorage.getItem('parent:token');
+    if (!token) {
+      toast.error("Authentication token not found");
+      return rejectWithValue("Authentication token not found");
+    }
+
+    try {
+      const response = await axios.get(`${baseUrl}/api/studentDashboard/subjects/${studentId}`, {
+        headers: { Authentication: token },
+      });
+      
+      return response.data.grades;  // Assuming the response has a grades field
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || 'Error fetching grades';
+      toast.error(errorMessage);
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
