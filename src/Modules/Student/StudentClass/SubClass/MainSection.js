@@ -15,6 +15,7 @@ import { stdClass } from "../../../../Store/Slices/Student/MyClass/Class/class.a
 import SubjectCard from "./SubjectCard";
 import { Modal } from "antd";
 import SectionGroupModal from "./Components/Section/SectionModal";
+import { NavLink } from "react-router-dom";
 
 
 const colors = [
@@ -80,11 +81,11 @@ const MainSection = () => {
     setIsModalVisible(false); // Hide the modal
   };
 
-  const handleSubjectClick = ({ subjectId, subjectName }) => {
-    console.log("Subject Clicked!")
-    // dispatch(setSelectedSubject(subjectId));
-    // dispatch(setSelectedSubjectName(subjectName));
-  };
+  // const handleSubjectClick = ({ subjectId, subjectName }) => {
+  //   console.log("Subject Clicked!")
+  //   dispatch(setSelectedSubject(subjectId));
+  //   dispatch(setSelectedSubjectName(subjectName));
+  // };
 
 
 
@@ -132,7 +133,7 @@ const MainSection = () => {
                     key={index}
                     data={subject}
                     classId={classData?.classId}
-                    onSubjectClick={handleSubjectClick}
+                    // onSubjectClick={handleSubjectClick}
                     backgroundColor={getColor(index)}
                   />
                 ))}

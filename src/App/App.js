@@ -762,7 +762,7 @@ function App() {
       errorElement: <Error />,
     },
     {
-      path: "/student_class/:cid/attendance",
+      path: "/student_class/:classId/attendance",
       element: (
         <ProtectRoute
           Component={StudentAttendance}

@@ -103,9 +103,8 @@ const StudentEvent = () => {
           return (
             <li
               key={event.id}
-              className={`inline-block px-2 py-1 rounded text-white ${
-                bgColors[index % bgColors.length]
-              } shadow-md cursor-pointer`}
+              className={`inline-block px-2 py-1 rounded text-white ${bgColors[index % bgColors.length]
+                } shadow-md cursor-pointer`}
               onClick={() => handleStickerClick(event)}
             >
               {event.title} - {timeString}
@@ -129,7 +128,7 @@ const StudentEvent = () => {
       case "viewEvent":
         return <ViewEvent event={selectedEvent} />;
       default:
-        return <div>{t("Select an action",gt.stdEvents)}</div>;
+        return <div>{t("Select an action", gt.stdEvents)}</div>;
     }
   };
 
@@ -177,7 +176,7 @@ const StudentEvent = () => {
               {paginatedEvents?.length === 0 ? (
                 <div className="flex flex-col items-center justify-center w-full h-full text-gray-500">
                   <IoCalendarOutline className="text-6xl" />
-                  <span>{t("No Events in this Month",gt.stdEvents)}</span>
+                  <span>{t("No Events in this Month", gt.stdEvents)}</span>
                 </div>
               ) : (
                 paginatedEvents?.map((event, index) => (
@@ -218,7 +217,7 @@ const StudentEvent = () => {
                   for (let index = start; index < end; index++) {
                     monthOptions.push(
                       <option key={index} value={index}>
-                        {t(months[index],gt.month)}
+                        {t(months[index], gt.month)}
                       </option>
                     );
                   }
@@ -229,27 +228,13 @@ const StudentEvent = () => {
                   for (let i = StartAcademicYear; i <= lastAcademicYear; i++) {
                     options.push(
                       <option className="bg-white" key={i} value={i}>
-                        {t(i,gt.date)}
+                        {t(i, gt.date)}
                       </option>
                     );
                   }
                   return (
                     <div className="flex items-center space-x-2 justify-end mt-2 pt-2 mb-4">
-                      <select
-                        className="border rounded px-2 py-1"
-                        value={year}
-                        onChange={(event) => {
-                          const newYear = parseInt(event.target.value, 10);
-                          const now = value.clone().year(newYear);
-                          setSelectedMonthYear((prev) => ({
-                            ...prev,
-                            year: newYear,
-                          }));
-                          onChange(now);
-                        }}
-                      >
-                        {options}
-                      </select>
+
                       <select
                         className="border rounded px-2 py-1"
                         value={month}
@@ -264,6 +249,21 @@ const StudentEvent = () => {
                         }}
                       >
                         {monthOptions}
+                      </select>
+                      <select
+                        className="border rounded px-2 py-1"
+                        value={year}
+                        onChange={(event) => {
+                          const newYear = parseInt(event.target.value, 10);
+                          const now = value.clone().year(newYear);
+                          setSelectedMonthYear((prev) => ({
+                            ...prev,
+                            year: newYear,
+                          }));
+                          onChange(now);
+                        }}
+                      >
+                        {options}
                       </select>
                       {/* <div className="flex space-x-2">
                         <button
