@@ -5,6 +5,7 @@ import { useSelector, useDispatch } from "react-redux";
 import UnVerifiedStudentCard from "./UnVerifiedStudentCard";
 import { fetchRejectedStudents } from "../../../Store/Slices/Admin/Verification/VerificationThunks";
 import Spinner from "../../../Components/Common/Spinner";
+import { FaUserSlash } from "react-icons/fa";
 
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
 
@@ -48,7 +49,13 @@ const RejectStudents = () => {
 
   if (filteredStudents.length === 0) {
     return (
-      <p className="text-center text-gray-500">No Rejected Students found.</p>
+      <div className="flex flex-col justify-center items-center h-64">
+        <FaUserSlash className="text-6xl text-gray-400 mb-4" /> {/* Big Icon */}
+        <p className="text-center text-gray-500 text-xl">
+          No Unverified Students found.
+        </p>{" "}
+        {/* Text below icon */}
+      </div>
     );
   }
 

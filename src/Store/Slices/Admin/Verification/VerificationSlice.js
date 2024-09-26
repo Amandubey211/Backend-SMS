@@ -49,6 +49,7 @@ const verificationSlice = createSlice({
       .addCase(fetchUnverifiedStudents.rejected, (state, action) => {
         state.loadingUnverified = false;
         state.error = action.payload;
+        state.unVerifiedStudents = []; // Ensure no loop on empty data
       })
       // Fetch Rejected Students
       .addCase(fetchRejectedStudents.pending, (state) => {
@@ -63,6 +64,7 @@ const verificationSlice = createSlice({
       .addCase(fetchRejectedStudents.rejected, (state, action) => {
         state.loadingRejected = false;
         state.error = action.payload;
+        state.rejectedStudents = []; // Ensure no loop on empty data
       })
       // Verify Student
       .addCase(verifyStudent.pending, (state) => {
@@ -71,10 +73,10 @@ const verificationSlice = createSlice({
       })
       .addCase(verifyStudent.fulfilled, (state, action) => {
         state.loadingUnverified = false;
-        const updatedStudent = action.payload;
-        state.unVerifiedStudents = state.unVerifiedStudents.filter(
-          (student) => student._id !== updatedStudent._id
-        );
+        // const updatedStudent = action.payload;
+        // state.unVerifiedStudents = state.unVerifiedStudents.filter(
+        //   (student) => student._id !== updatedStudent._id
+        // );
       })
       .addCase(verifyStudent.rejected, (state, action) => {
         state.loadingUnverified = false;

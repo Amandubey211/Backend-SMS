@@ -1,23 +1,16 @@
-// src/components/AdmissionInfo.js
-
 import React, { useEffect } from "react";
-// import useGetAllSchools from "../../../../Hooks/AuthHooks/Staff/Admin/useGetAllSchool";
 import { useParams } from "react-router-dom";
-import { useSelector } from "react-redux";
-import useGetAllClasses from "../../../../Hooks/AuthHooks/Staff/Admin/Class/useGetAllClasses";
+import { useDispatch, useSelector } from "react-redux";
 import SelectInput from "../../../LoginPages/Student/SignUp/SelectInput";
+import { fetchAllClasses } from "../../../../Store/Slices/Admin/Class/actions/classThunk";
 
 const AdmissionInfo = ({ studentInfo, handleInputChange }) => {
-  const { fetchClasses } = useGetAllClasses();
-  // const { fetchSchools, schoolList } = useGetAllSchools();
-  const { cid } = useParams();
-
   const classList = useSelector((store) => store.admin.class.classes);
-
+  const dispatch = useDispatch();
   useEffect(() => {
-    fetchClasses(cid);
-    // fetchSchools();
-    // console.log(schoolList);
+    if (classList.length === 0) {
+      dispatch(fetchAllClasses());
+    }
   }, []);
   return (
     <div className="mt-6">

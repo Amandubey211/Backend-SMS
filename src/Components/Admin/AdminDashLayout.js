@@ -9,7 +9,9 @@ const DashLayout = ({
   hideAvatarList,
   hideStudentView,
 }) => {
-  const isSidebarOpen = useSelector((state) => state.common.user.sidebar.isOpen);
+  const isSidebarOpen = useSelector(
+    (state) => state.common.user.sidebar.isOpen
+  );
   const sidebarWidth = isSidebarOpen ? "15%" : "7%"; // Adjust the width based on sidebar state
 
   return (
