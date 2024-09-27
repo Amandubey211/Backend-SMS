@@ -2,6 +2,7 @@ import React from "react";
 import { MdAccessTime } from "react-icons/md";
 import { format, parseISO, isValid } from "date-fns";
 import { useDispatch } from "react-redux";
+
 import {
   setSelectedEvent,
   setSidebarContent,
@@ -52,8 +53,7 @@ const EventCard = ({ event }) => {
 
   return (
     <div
-      className={`flex flex-col justify-between rounded-lg p-4 text-white shadow-lg m-2 cursor-pointer ${color}  transition`}
-      style={{ width: "220px", height: "180px" }}
+      className={`flex flex-col justify-between rounded-lg p-4 h-48 w-56 text-white shadow-lg m-2 cursor-pointer ${color}  transition`}
       onClick={handleClick}
     >
       <div className="flex items-start">
@@ -68,8 +68,10 @@ const EventCard = ({ event }) => {
           </div>
         </div>
       </div>
-      <div className="flex flex-col mt-2 text-sm font-semibold leading-5">
-        <span>{event.description || "No description available"}</span>
+      <div className="flex flex-col mt-2  text-sm font-semibold leading-5">
+        <p className="truncate">
+          {event.description || "No description available"}
+        </p>
         <span>{formattedDate}</span>
       </div>
     </div>

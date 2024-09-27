@@ -9,7 +9,9 @@ import { fetchAllClasses } from "../../../../Store/Slices/Admin/Class/actions/cl
 const AddBook = () => {
   const dispatch = useDispatch();
   const classList = useSelector((state) => state.admin.class.classes);
-  const addbookLoading = useSelector((state) => state.admin.library);
+  const addbookLoading = useSelector(
+    (state) => state.admin.library.addbookloading
+  );
 
   const [bookData, setBookData] = useState({
     bookName: "",
