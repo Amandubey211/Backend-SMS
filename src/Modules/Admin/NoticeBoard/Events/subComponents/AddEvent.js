@@ -60,78 +60,94 @@ const AddEvent = () => {
   };
 
   return (
-    <div
-      className="p-4 rounded-lg overflow-auto no-scrollbar"
-      style={{ maxHeight: "90vh" }}
-    >
-      <form className="space-y-4" onSubmit={handleSubmit}>
-        <ImageUpload
-          imagePreview={eventData.imagePreview}
-          handleImageChange={handleImageChange}
-          handleRemoveImage={handleRemoveImage} // Pass handleRemoveImage to ImageUpload component
-        />
-        <FormInput
-          id="title"
-          name="title"
-          label="Event Name"
-          value={eventData.title}
-          onChange={handleInputChange}
-          required
-        />
-        <FormInput
-          id="date"
-          name="date"
-          label="Date"
-          type="date"
-          value={eventData.date}
-          onChange={handleInputChange}
-          required
-        />
-        <FormInput
-          id="time"
-          name="time"
-          label="Event Time"
-          type="time"
-          value={eventData.time}
-          onChange={handleInputChange}
-          required
-        />
-        <FormInput
-          id="location"
-          name="location"
-          label="Location"
-          value={eventData.location}
-          onChange={handleInputChange}
-        />
-        <FormInput
-          id="director"
-          name="director"
-          label="Event Director"
-          value={eventData.director}
-          onChange={handleInputChange}
-        />
-        <FormInput
-          id="type"
-          name="type"
-          label="Event Type"
-          value={eventData.type}
-          onChange={handleInputChange}
-        />
-        <FormInput
-          id="description"
-          name="description"
-          label="Description"
-          type="textarea"
-          value={eventData.description}
-          onChange={handleInputChange}
-        />
+    <div className="flex flex-col h-full border-t max-w-xl mx-auto bg-white ">
+      {/* Scrollable content area */}
+      <div className="flex-grow overflow-auto p-4 no-scrollbar">
+        <form className="space-y-4 mb-8" onSubmit={handleSubmit}>
+          <ImageUpload
+            imagePreview={eventData.imagePreview}
+            handleImageChange={handleImageChange}
+            handleRemoveImage={handleRemoveImage} // Pass handleRemoveImage to ImageUpload component
+          />
+          <FormInput
+            id="title"
+            name="title"
+            label="Event Name"
+            value={eventData.title}
+            onChange={handleInputChange}
+            required
+          />
+          <FormInput
+            id="date"
+            name="date"
+            label="Date"
+            type="date"
+            value={eventData.date}
+            onChange={handleInputChange}
+            required
+          />
+          <FormInput
+            id="time"
+            name="time"
+            label="Event Time"
+            type="time"
+            value={eventData.time}
+            onChange={handleInputChange}
+            required
+          />
+          <FormInput
+            id="location"
+            name="location"
+            label="Location"
+            value={eventData.location}
+            onChange={handleInputChange}
+          />
+          <FormInput
+            id="director"
+            name="director"
+            label="Event Director"
+            value={eventData.director}
+            onChange={handleInputChange}
+          />
+          <FormInput
+            id="type"
+            name="type"
+            label="Event Type"
+            value={eventData.type}
+            onChange={handleInputChange}
+          />
+
+          {/* Replacing FormInput for description with textarea */}
+          <div>
+            <label
+              htmlFor="description"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Description
+            </label>
+            <textarea
+              id="description"
+              name="description"
+              value={eventData.description}
+              onChange={handleInputChange}
+              rows={5} // Adjust row count as needed
+              className="mt-1 block w-full rounded-md border p-2 border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              placeholder="Enter event description"
+            />
+          </div>
+        </form>
+      </div>
+
+      {/* Sticky Add Event button */}
+      <div className="p-4 bg-white border-t border-gray-200 sticky bottom-0 flex gap-4">
         <button
           type="submit"
-          className="w-full flex justify-center items-center mt-4 h-10 bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md"
+          className="w-full flex justify-center items-center bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md"
+          onClick={handleSubmit}
         >
           {Loading ? <FiLoader className="animate-spin mr-2" /> : "Add Event"}
         </button>
-      </form>
+      </div>
     </div>
   );
 };

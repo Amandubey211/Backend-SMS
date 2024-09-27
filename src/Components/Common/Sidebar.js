@@ -90,7 +90,9 @@ const Sidebar = ({ isOpen, title, onClose, children, width }) => {
           className="flex justify-between items-center px-2"
           id="sidebar-title"
         >
-          <h1 className="font-semibold">{title || "Please give title"}</h1>
+          <h1 className="font-semibold text-gradient">
+            {title || "Please give title"}
+          </h1>
           <button
             ref={closeButtonRef}
             onClick={onClose}

@@ -1,166 +1,204 @@
-import React, { useState } from "react";
-import FormInput from "../../Accounting/subClass/component/FormInput";
-import { baseUrl } from "../../../../config/Common";
-import { useSelector } from "react-redux";
+import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
+import { resetEditMode } from "../../../../Store/Slices/Admin/Announcement/announcementSlice";
+import {
+  createAnnouncementThunk,
+  updateAnnouncementThunk,
+} from "../../../../Store/Slices/Admin/Announcement/announcementThunk";
+import { FiLoader } from "react-icons/fi"; // Icon for the spinner
 
-const AddAnnouncement = ({ onSuccess, onClose }) => {
-  const [imagePreview, setImagePreview] = useState(null);
-  const [noticeData, setNoticeData] = useState({
-    noticeTitle: "",
+const AddAnnouncement = ({ isEditing, onClose }) => {
+  const dispatch = useDispatch();
+  const { selectedNotice, loading } = useSelector(
+    (state) => state.admin.announcements
+  );
+
+  const [announcementData, setAnnouncementData] = useState({
+    title: "",
     startDate: "",
     endDate: "",
-    noticeDetails: "",
-    noticePriority: "High priority",
-    notice: null,
+    description: "",
+    priority: "High priority",
   });
-  const role = useSelector((store) => store.Auth.role);
-  const [selectedStatus, setSelectedStatus] = useState("High priority");
-  const token = localStorage.getItem(`${role}:token`);
 
-  // Handle input changes for all fields
+  useEffect(() => {
+    if (isEditing && selectedNotice) {
+      setAnnouncementData({
+        title: selectedNotice.title,
+        startDate: selectedNotice.startDate.split("T")[0], // Format date to yyyy-MM-dd
+        endDate: selectedNotice.endDate.split("T")[0],
+        description: selectedNotice.description,
+        priority: selectedNotice.priority,
+      });
+    } else {
+      setAnnouncementData({
+        title: "",
+        startDate: "",
+        endDate: "",
+        description: "",
+        priority: "High priority",
+      });
+    }
+  }, [isEditing, selectedNotice]);
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setNoticeData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setAnnouncementData({ ...announcementData, [name]: value });
   };
 
-  const handleRemoveImage = () => {
-    setImagePreview(null);
-    setNoticeData((prev) => ({
-      ...prev,
-      notice: null,
-    }));
-  };
-
-  const handleStatusChange = (status) => {
-    setSelectedStatus(status);
-    setNoticeData((prev) => ({
-      ...prev,
-      noticePriority: status,
-    }));
+  const handlePriorityChange = (e) => {
+    setAnnouncementData({ ...announcementData, priority: e.target.value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const postData = {
-      title: noticeData.noticeTitle,
-      startDate: noticeData.startDate,
-      endDate: noticeData.endDate,
-      description: noticeData.noticeDetails,
-      priority: noticeData.noticePriority,
-    };
-
-    try {
-      const response = await fetch(`${baseUrl}/admin/create_notice`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authentication: `${token}`,
-        },
-        body: JSON.stringify(postData),
-      });
-
-      const responseData = await response.json();
-
-      if (response.ok) {
-        console.log("Announcement data submitted successfully:", responseData);
-        toast.success("Announcement created successfully!");
-        onSuccess(); // Trigger success action
-        onClose(); // Close the sidebar
-      } else {
-        console.error("Failed to submit Announcement data:", responseData);
-      }
-    } catch (error) {
-      console.error("Error submitting Announcement data:", error);
+    if (
+      !announcementData.title ||
+      !announcementData.startDate ||
+      !announcementData.endDate
+    ) {
+      toast.error("Please fill in all required fields.");
+      return;
     }
+
+    if (isEditing) {
+      await dispatch(
+        updateAnnouncementThunk({
+          noticeId: selectedNotice._id,
+          updatedData: announcementData,
+        })
+      );
+    } else {
+      await dispatch(createAnnouncementThunk(announcementData));
+    }
+    onClose(); // Close the sidebar after submit
   };
 
   return (
-    <div className="flex flex-col h-full p-4 bg-gray-50 border rounded-lg">
-      <form
-        className="space-y-4 h-[90%] flex flex-col justify-between"
-        onSubmit={handleSubmit}
-      >
-        <div className="flex flex-col justify-between">
-          <div className="flex flex-col gap-4">
-            <FormInput
-              id="noticeTitle"
-              label="Event Name"
-              value={noticeData.noticeTitle}
+    <div className="p-4 space-y-6">
+      <form onSubmit={handleSubmit}>
+        {/* Title */}
+        <div className="mb-4">
+          <label
+            htmlFor="title"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Title
+          </label>
+          <input
+            type="text"
+            id="title"
+            name="title"
+            value={announcementData.title}
+            onChange={handleInputChange}
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            required
+          />
+        </div>
+
+        {/* Start Date and End Date */}
+        <div className="flex gap-4 mb-4">
+          <div className="flex-1">
+            <label
+              htmlFor="startDate"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Available from
+            </label>
+            <input
+              type="date"
+              id="startDate"
+              name="startDate"
+              value={announcementData.startDate}
               onChange={handleInputChange}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              required
             />
-            <div className="flex justify-between">
-              <FormInput
-                id="startDate"
-                label="Start Date"
-                type="date"
-                value={noticeData.startDate}
-                onChange={handleInputChange}
-                required
-              />
-              <FormInput
-                id="endDate"
-                label="End Date"
-                type="date"
-                value={noticeData.endDate}
-                onChange={handleInputChange}
-                required
-              />
-            </div>
-            <FormInput
-              id="noticeDetails"
-              label="Notice Details"
-              value={noticeData.noticeDetails}
+          </div>
+          <div className="flex-1">
+            <label
+              htmlFor="endDate"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Until
+            </label>
+            <input
+              type="date"
+              id="endDate"
+              name="endDate"
+              value={announcementData.endDate}
               onChange={handleInputChange}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              required
             />
-            <div className="flex items-center space-x-4">
-              {["High priority", "Low priority"].map((status) => (
-                <label key={status} className="flex items-center cursor-pointer">
-                  <input
-                    type="radio"
-                    name="noticePriority"
-                    value={status}
-                    checked={noticeData.noticePriority === status}
-                    onChange={() => handleStatusChange(status)}
-                    className="hidden"
-                  />
-                  <div
-                    className={`h-5 w-5 rounded-full mr-2 flex items-center justify-center border-2 ${
-                      selectedStatus === status
-                        ? "border-green-500 bg-green-500"
-                        : "border-gray-300"
-                    }`}
-                  >
-                    {selectedStatus === status && (
-                      <div className="h-3 w-3 bg-white rounded-full"></div>
-                    )}
-                  </div>
-                  <span
-                    className={`transition-colors duration-200 ${
-                      selectedStatus === status
-                        ? "text-red-700"
-                        : "text-gray-700"
-                    }`}
-                  >
-                    {status}
-                  </span>
-                </label>
-              ))}
-            </div>
           </div>
         </div>
-        <div className="flex justify-end">
-          <button
-            type="submit"
-            className="w-full mt-4 p-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600"
+
+        {/* Description */}
+        <div className="mb-4">
+          <label
+            htmlFor="description"
+            className="block text-sm font-medium text-gray-700"
           >
-            Add Event
-          </button>
+            Event Details
+          </label>
+          <textarea
+            id="description"
+            name="description"
+            value={announcementData.description}
+            onChange={handleInputChange}
+            rows={4}
+            placeholder="Type here"
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            required
+          />
         </div>
+
+        {/* Priority */}
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700">
+            Priority
+          </label>
+          <div className="mt-2 space-x-4">
+            <label className="inline-flex items-center">
+              <input
+                type="radio"
+                name="priority"
+                value="High priority"
+                checked={announcementData.priority === "High priority"}
+                onChange={handlePriorityChange}
+                className="form-radio text-green-500"
+              />
+              <span className="ml-2">High Priority</span>
+            </label>
+            <label className="inline-flex items-center">
+              <input
+                type="radio"
+                name="priority"
+                value="Low priority"
+                checked={announcementData.priority === "Low priority"}
+                onChange={handlePriorityChange}
+                className="form-radio text-gray-500"
+              />
+              <span className="ml-2">Low Priority</span>
+            </label>
+          </div>
+        </div>
+
+        {/* Submit Button */}
+        <button
+          type="submit"
+          className="w-full mt-4 p-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md flex justify-center items-center"
+        >
+          {loading ? (
+            <FiLoader className="animate-spin mr-2" />
+          ) : isEditing ? (
+            "Update Notice"
+          ) : (
+            "Add Notice"
+          )}
+        </button>
       </form>
     </div>
   );

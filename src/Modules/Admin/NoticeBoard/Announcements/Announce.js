@@ -5,102 +5,63 @@ import Sidebar from "../../../../Components/Common/Sidebar";
 import AddAnnouncement from "./AddAnnouncement";
 import { MdQueryBuilder, MdExpandMore, MdExpandLess } from "react-icons/md";
 import { FiEdit, FiTrash2 } from "react-icons/fi";
-import axios from "axios";
-import { baseUrl } from "../../../../config/Common";
-import { useSelector } from "react-redux";
+import { IoSearchCircleOutline, IoCalendarOutline } from "react-icons/io5"; // For no results placeholder
+import { useDispatch, useSelector } from "react-redux";
 import {
-  useDeleteNotice,
-  useUpdateNotice,
-} from "../../../../Hooks/AuthHooks/Staff/Admin/Notices/useNoticeActions";
+  fetchAnnouncementsThunk,
+  deleteAnnouncementThunk,
+} from "../../../../Store/Slices/Admin/Announcement/announcementThunk";
+import {
+  setSelectedNotice,
+  setEditMode,
+  resetEditMode,
+} from "../../../../Store/Slices/Admin/Announcement/announcementSlice";
 import DeleteModal from "../../../../Components/Common/DeleteModal";
 
 const Announce = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [notices, setNotices] = useState([]);
-  const [activeIndex, setActiveIndex] = useState(0);
+  const [activeIndex, setActiveIndex] = useState(null); // For accordion behavior
   const [isSidebarOpen, setSidebarOpen] = useState(false);
-  const [isEditSidebarOpen, setEditSidebarOpen] = useState(false);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
   const [noticeToDelete, setNoticeToDelete] = useState(null);
-  const [editFormData, setEditFormData] = useState({
-    title: "",
-    startDate: "",
-    endDate: "",
-    description: "",
-    priority: "High priority",
-  });
 
-  const role = useSelector((store) => store.Auth.role);
-  const { updateNotice } = useUpdateNotice();
-  const { deleteNotice } = useDeleteNotice();
+  const dispatch = useDispatch();
+  const { notices, editMode } = useSelector(
+    (state) => state.admin.announcements
+  );
+  const role = useSelector((store) => store.common.auth.role);
 
   useEffect(() => {
-    fetchNotices();
-  }, []);
+    dispatch(fetchAnnouncementsThunk());
+  }, [dispatch]);
 
-  const fetchNotices = async () => {
-    const token = localStorage.getItem(`${role}:token`);
-    try {
-      const response = await axios.get(`${baseUrl}/admin/all/notices`, {
-        headers: {
-          Authentication: token,
-        },
-      });
-      if (response.data.success) {
-        setNotices(response.data.notices);
-      }
-    } catch (error) {
-      console.error("Failed to fetch notices", error);
-    }
-  };
-
+  // Filter notices based on search term
   const filteredNotices = notices.filter((notice) =>
-    notice.title.toLowerCase().includes(searchTerm.toLowerCase())
+    notice.title?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const toggleAccordion = (index) => {
-    setActiveIndex(activeIndex === index ? null : index);
+  // Handle opening add announcement sidebar
+  const handleSidebarOpen = () => {
+    dispatch(resetEditMode()); // Reset edit mode to make sure data is cleared
+    setSidebarOpen(true);
   };
-
-  const handleSidebarOpen = () => setSidebarOpen(true);
   const handleSidebarClose = () => setSidebarOpen(false);
 
+  // Handle opening edit sidebar
   const handleEditSidebarOpen = (notice) => {
-    setEditFormData({
-      ...notice,
-      startDate: new Date(notice.startDate).toISOString().split("T")[0],
-      endDate: new Date(notice.endDate).toISOString().split("T")[0],
-    });
-    setEditSidebarOpen(true);
+    dispatch(setSelectedNotice(notice));
+    dispatch(setEditMode(true));
+    setSidebarOpen(true); // Open the sidebar
   };
 
-  const handleEditSidebarClose = () => setEditSidebarOpen(false);
-
-  const handleEditChange = (e) => {
-    setEditFormData({
-      ...editFormData,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const handleEditNotice = async () => {
-    await updateNotice(editFormData._id, editFormData);
-    setNotices(
-      notices.map((notice) =>
-        notice._id === editFormData._id ? editFormData : notice
-      )
-    );
-    setEditSidebarOpen(false);
-  };
-
+  // Handle notice delete confirmation
   const handleDeleteNotice = (noticeId) => {
     setNoticeToDelete(noticeId);
     setDeleteModalOpen(true);
   };
 
   const confirmDelete = async () => {
-    await deleteNotice(noticeToDelete);
-    setNotices(notices.filter((notice) => notice._id !== noticeToDelete));
+    await dispatch(deleteAnnouncementThunk(noticeToDelete));
     setDeleteModalOpen(false);
     setNoticeToDelete(null);
   };
@@ -110,9 +71,13 @@ const Announce = () => {
     setNoticeToDelete(null);
   };
 
+  const toggleAccordion = (index) => {
+    setActiveIndex(activeIndex === index ? null : index);
+  };
+
   return (
     <>
-      <Layout title="Event">
+      <Layout title="Announcement">
         <DashLayout>
           <div className="p-4">
             <h1 className="mb-2 bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent font-semibold bg-clip-text">
@@ -144,189 +109,124 @@ const Announce = () => {
                 </button>
               )}
             </div>
+
             <div className="mt-5 rounded-lg overflow-auto">
-              {filteredNotices.map((notice, index) => (
-                <div key={notice._id} className="border">
-                  <div
-                    className={`cursor-pointer p-2 flex flex-col ${
-                      activeIndex === index ? "bg-gray-100" : "bg-white"
-                    }`}
-                    onClick={() => toggleAccordion(index)}
-                  >
-                    <div className="flex gap-6 px-3 py-2">
-                      <img
-                        className="h-10 w-10 rounded"
-                        src={
-                          notice.imageUrl ||
-                          "https://cdn-icons-png.freepik.com/512/1060/1060360.png"
-                        }
-                        alt="notice-image"
-                      />
-                      <div className="flex flex-col gap-3 mt-[-5px] flex-grow">
-                        <h2 className="font-[500] text-[#4D4D4D]">
-                          {notice.title}
-                        </h2>
-                        <div className="flex flex-row gap-[50px] text-xs">
-                          <div className="flex flex-wrap justify-center items-center">
-                            <MdQueryBuilder className="text-gray-400 text-xl" />
-                            <span className="text-sm p-1 font-[400] text-[#7F7F7F]">
-                              {new Date(notice.startDate).toLocaleDateString()}
-                            </span>
-                          </div>
-                          <div className="px-2 text-xs bg-pink-100 text-center flex justify-center items-center">
-                            <span
-                              className={`${
+              {filteredNotices.length === 0 ? (
+                <div className="flex flex-col justify-center items-center h-64">
+                  <IoSearchCircleOutline className="text-6xl text-gray-400" />
+                  <p className="mt-2 text-gray-500">No results found</p>
+                </div>
+              ) : (
+                filteredNotices.map((notice, index) => (
+                  <div key={notice._id} className="border mb-2">
+                    <div
+                      className={`cursor-pointer p-2 flex flex-col ${
+                        activeIndex === index ? "bg-gray-100" : "bg-white"
+                      }`}
+                      onClick={() => toggleAccordion(index)}
+                    >
+                      <div className="flex gap-6 px-3 py-2">
+                        <div className="h-16 w-16 flex justify-center items-center bg-blue-500 rounded-sm">
+                          <img
+                            className="h-10 w-10 "
+                            src={
+                              notice.imageUrl ||
+                              "https://cdn-icons-png.freepik.com/512/1060/1060360.png"
+                            }
+                            alt="notice-image"
+                          />
+                        </div>
+
+                        <div className="flex flex-col gap-3 mt-[-5px] flex-grow">
+                          <h2 className="font-semibold text-xl ">
+                            {notice.title}
+                          </h2>
+                          <div className="flex flex-row gap-4 text-xs">
+                            <div className="flex flex-wrap justify-center items-center">
+                              <IoCalendarOutline className="text-gray-400 text-lg" />
+                              <span className="text-sm p-1 font-[400] text-[#7F7F7F]">
+                                {new Date(notice.startDate).toLocaleDateString(
+                                  "en-US",
+                                  {
+                                    year: "numeric",
+                                    month: "long",
+                                    day: "numeric",
+                                  }
+                                )}
+                              </span>
+                            </div>
+                            <div
+                              className={`px-4  ${
                                 notice.priority === "High priority"
-                                  ? "font-semibold bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent bg-clip-text"
-                                  : "text-blue-500 font-bold"
-                              }`}
+                                  ? "bg-pink-100 "
+                                  : "bg-gray-100"
+                              } text-xs rounded-full  text-center flex justify-center items-center`}
                             >
-                              {notice.priority}
-                            </span>
+                              <span
+                                className={`${
+                                  notice.priority === "High priority"
+                                    ? "font-semibold bg-gradient-to-r  from-pink-500 to-purple-500 inline-block text-transparent bg-clip-text"
+                                    : "text-gray-500"
+                                }`}
+                              >
+                                {notice.priority}
+                              </span>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                      <div className="flex justify-end items-center ml-auto gap-2">
-                        {role === "admin" && (
-                          <>
-                            <FiEdit
-                              className="text-gray-400 text-xl cursor-pointer"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleEditSidebarOpen(notice);
-                              }}
-                            />
-                            <FiTrash2
-                              className="text-gray-400 text-xl cursor-pointer"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleDeleteNotice(notice._id);
-                              }}
-                            />
-                          </>
-                        )}
-                        {activeIndex === index ? (
-                          <MdExpandLess className="text-gray-400 text-xl cursor-pointer" />
-                        ) : (
-                          <MdExpandMore className="text-gray-400 text-xl cursor-pointer" />
-                        )}
+                        <div className="flex justify-end items-center ml-auto gap-2">
+                          {role === "admin" && (
+                            <>
+                              <FiEdit
+                                className="text-gray-400 text-xl cursor-pointer"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleEditSidebarOpen(notice);
+                                }}
+                              />
+                              <FiTrash2
+                                className="text-gray-400 text-xl cursor-pointer"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDeleteNotice(notice._id);
+                                }}
+                              />
+                            </>
+                          )}
+                          {activeIndex === index ? (
+                            <MdExpandLess className="text-gray-400 text-xl cursor-pointer" />
+                          ) : (
+                            <MdExpandMore className="text-gray-400 text-xl cursor-pointer" />
+                          )}
+                        </div>
                       </div>
                     </div>
+                    {activeIndex === index && (
+                      <div className="p-2 text-[#4D4D4D]">
+                        <p>{notice.description}</p>
+                      </div>
+                    )}
                   </div>
-                  {activeIndex === index && (
-                    <div className="p-2 text-[#4D4D4D]">
-                      <p>{notice.description}</p>
-                    </div>
-                  )}
-                </div>
-              ))}
+                ))
+              )}
             </div>
-            {role === "admin" && (
-              <Sidebar
-                isOpen={isSidebarOpen}
-                onClose={handleSidebarClose}
-                title="Create New Notice"
-              >
-                <AddAnnouncement
-                  onSuccess={fetchNotices}
-                  onClose={handleSidebarClose}
-                />
-              </Sidebar>
-            )}
-            {role === "admin" && (
-              <Sidebar
-                isOpen={isEditSidebarOpen}
-                onClose={handleEditSidebarClose}
-                title="Edit Notice"
-              >
-                <div className="p-4">
-                  <h2 className="text-lg font-semibold mb-4">Edit Notice</h2>
-                  <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700">
-                      Event Name
-                    </label>
-                    <input
-                      type="text"
-                      name="title"
-                      value={editFormData.title}
-                      onChange={handleEditChange}
-                      className="mt-1 p-2 border rounded w-full"
-                    />
-                  </div>
-                  <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700">
-                      Start Date
-                    </label>
-                    <input
-                      type="date"
-                      name="startDate"
-                      value={editFormData.startDate}
-                      onChange={handleEditChange}
-                      className="mt-1 p-2 border rounded w-full"
-                    />
-                  </div>
-                  <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700">
-                      End Date
-                    </label>
-                    <input
-                      type="date"
-                      name="endDate"
-                      value={editFormData.endDate}
-                      onChange={handleEditChange}
-                      className="mt-1 p-2 border rounded w-full"
-                    />
-                  </div>
-                  <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700">
-                      Notice Details
-                    </label>
-                    <textarea
-                      name="description"
-                      value={editFormData.description}
-                      onChange={handleEditChange}
-                      className="mt-1 p-2 border rounded w-full"
-                    />
-                  </div>
-                  <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700">
-                      Priority
-                    </label>
-                    <div className="mt-1 flex items-center">
-                      <input
-                        type="radio"
-                        name="priority"
-                        value="High priority"
-                        checked={editFormData.priority === "High priority"}
-                        onChange={handleEditChange}
-                        className="mr-2"
-                      />
-                      <span className="mr-4">High priority</span>
-                      <input
-                        type="radio"
-                        name="priority"
-                        value="Low priority"
-                        checked={editFormData.priority === "Low priority"}
-                        onChange={handleEditChange}
-                        className="mr-2"
-                      />
-                      <span>Low priority</span>
-                    </div>
-                  </div>
-                  <button
-                    onClick={handleEditNotice}
-                    className="bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded"
-                  >
-                    Edit Changes
-                  </button>
-                </div>
-              </Sidebar>
-            )}
+
+            {/* Sidebar for adding/updating notice */}
+            <Sidebar
+              isOpen={isSidebarOpen}
+              onClose={handleSidebarClose}
+              title={editMode ? "Edit Notice" : "Add Notice"}
+            >
+              <AddAnnouncement
+                isEditing={editMode}
+                onClose={handleSidebarClose} // Pass sidebar close handler
+              />
+            </Sidebar>
           </div>
         </DashLayout>
       </Layout>
 
-      {/* Modal for confirming delete */}
+      {/* Delete confirmation modal */}
       <DeleteModal
         isOpen={isDeleteModalOpen}
         onClose={handleDeleteModalClose}
