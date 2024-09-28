@@ -25,7 +25,7 @@ const BookCard = ({ book }) => {
   };
 
   return (
-    <div className="border p-2 bg-white rounded-lg shadow overflow-hidden relative">
+    <div className="border p-2 bg-white rounded-lg shadow capitalize overflow-hidden relative">
       <div className="w-full h-40 flex">
         <img
           src={image}

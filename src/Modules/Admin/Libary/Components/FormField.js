@@ -1,18 +1,20 @@
-// FormField.js
-const FormField = ({ id, label, value, onChange, options }) => {
+// src/Modules/Admin/Libary/Components/FormField.js
+import React from "react";
+
+const FormField = ({ id, name, label, value, onChange, options, width }) => {
   return (
-    <div>
+    <div className="w-full">
       <label htmlFor={id} className="block text-sm font-medium text-gray-700">
         {label}
       </label>
       <select
         id={id}
-        name={id}
+        name={name}
         value={value}
         onChange={onChange}
-        className="mt-1 block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-lg"
+        className="block mt-1 p-2 border w-52 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
       >
-        <option value="">Select {label}</option>
+        <option value=""> Choose</option>
         {options?.map((option) => (
           <option key={option} value={option}>
             {option}

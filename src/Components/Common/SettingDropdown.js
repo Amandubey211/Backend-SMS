@@ -25,7 +25,6 @@ const SettingDropdown = ({
     (store) => store.common.auth.selectedLanguage
   );
   const role = useSelector((store) => store.common.auth.role);
-  console.log("cgdfg", selectedLanguage);
   const [showLanguageOptions, setShowLanguageOptions] = useState(false);
 
   // Handling clicks outside the dropdown
