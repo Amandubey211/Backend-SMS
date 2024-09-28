@@ -1,5 +1,4 @@
 // src/Store/Slices/Admin/Library/LibrarySlice.js
-
 import { createSlice } from "@reduxjs/toolkit";
 import {
   fetchBooksThunk,
@@ -14,30 +13,39 @@ const initialState = {
   books: [],
   addbookloading: false,
   bookIssues: [],
-  classList: [],
-  sectionList: [],
-  studentList: [],
   loading: false,
   error: null,
   filters: {
     class: "",
     category: "",
+    classLevel: "",
+    section: "",
   },
+  activeTab: "Library", // Moved tab management here
+  isSidebarOpen: false,
+  editIssueData: null, // Moved edit issue data management here
 };
 
 const librarySlice = createSlice({
   name: "library",
   initialState,
   reducers: {
-    // Update filters for filtering books
     setFilters(state, action) {
       const { key, value } = action.payload;
       state.filters[key] = value;
     },
+    setActiveTab(state, action) {
+      state.activeTab = action.payload; // Tab switching managed here
+    },
+    toggleSidebar(state, action) {
+      state.isSidebarOpen = action.payload; // Sidebar toggling managed here
+    },
+    setEditIssueData(state, action) {
+      state.editIssueData = action.payload; // Set edit issue data
+    },
   },
   extraReducers: (builder) => {
     builder
-      // Fetch Books
       .addCase(fetchBooksThunk.pending, (state) => {
         state.loading = true;
       })
@@ -49,19 +57,16 @@ const librarySlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      // Add Book
       .addCase(addBookThunk.pending, (state) => {
         state.addbookloading = true;
       })
-      .addCase(addBookThunk.fulfilled, (state, action) => {
+      .addCase(addBookThunk.fulfilled, (state) => {
         state.addbookloading = false;
-        // state.books.push(action.payload);
       })
       .addCase(addBookThunk.rejected, (state, action) => {
         state.addbookloading = false;
         state.error = action.payload;
       })
-      // Delete Book
       .addCase(deleteBookThunk.pending, (state) => {
         state.loading = true;
       })
@@ -73,7 +78,6 @@ const librarySlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      // Update Book
       .addCase(updateBookThunk.pending, (state) => {
         state.loading = true;
       })
@@ -90,7 +94,6 @@ const librarySlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      // Fetch Book Issues
       .addCase(fetchBookIssuesThunk.pending, (state) => {
         state.loading = true;
       })
@@ -102,20 +105,11 @@ const librarySlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      // Issue Book
       .addCase(issueBookThunk.pending, (state) => {
         state.loading = true;
       })
       .addCase(issueBookThunk.fulfilled, (state, action) => {
         state.loading = false;
-        const existingIndex = state.bookIssues.findIndex(
-          (issue) => issue._id === action.payload._id
-        );
-        if (existingIndex >= 0) {
-          state.bookIssues[existingIndex] = action.payload;
-        } else {
-          state.bookIssues.push(action.payload);
-        }
       })
       .addCase(issueBookThunk.rejected, (state, action) => {
         state.loading = false;
@@ -124,6 +118,7 @@ const librarySlice = createSlice({
   },
 });
 
-export const { setFilters } = librarySlice.actions;
+export const { setFilters, setActiveTab, toggleSidebar, setEditIssueData } =
+  librarySlice.actions;
 
 export default librarySlice.reducer;
