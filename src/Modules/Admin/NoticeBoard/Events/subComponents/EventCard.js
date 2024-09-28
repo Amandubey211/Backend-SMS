@@ -6,7 +6,7 @@ import { useDispatch } from "react-redux";
 import {
   setSelectedEvent,
   setSidebarContent,
-} from "../../../../../Store/Slices/Admin/Events/eventSlice"; // Use action from slice
+} from "../../../../../Store/Slices/Admin/NoticeBoard/Events/eventSlice"; // Use action from slice
 
 const colors = ["bg-yellow-300", "bg-blue-300", "bg-green-300"];
 

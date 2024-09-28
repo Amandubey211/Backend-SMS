@@ -6,13 +6,13 @@ import {
   updateEventThunk,
   deleteEventThunk,
   fetchEventsThunk,
-} from "../../../../../Store/Slices/Admin/Events/eventThunks";
+} from "../../../../../Store/Slices/Admin/NoticeBoard/Events/eventThunks";
 import {
   setSelectedEvent,
   resetSelectedEvent,
   setSidebarContent,
   resetSidebarContent,
-} from "../../../../../Store/Slices/Admin/Events/eventSlice";
+} from "../../../../../Store/Slices/Admin/NoticeBoard/Events/eventSlice";
 import { format, isValid } from "date-fns";
 import toast from "react-hot-toast";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";

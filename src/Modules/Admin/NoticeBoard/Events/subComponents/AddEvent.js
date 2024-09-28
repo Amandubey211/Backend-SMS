@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import FormInput from "../../../Accounting/subClass/component/FormInput";
 import ImageUpload from "../../../Addmission/Components/ImageUpload";
-import { createEventThunk } from "../../../../../Store/Slices/Admin/Events/eventThunks";
+import { createEventThunk } from "../../../../../Store/Slices/Admin/NoticeBoard/Events/eventThunks";
 import { FiLoader } from "react-icons/fi";
 
 const AddEvent = () => {

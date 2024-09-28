@@ -4,8 +4,8 @@ import { MdAccessTime, MdPersonOutline } from "react-icons/md";
 import { FaCalendarDays } from "react-icons/fa6";
 import { CiLocationOn } from "react-icons/ci";
 import { format, isValid } from "date-fns";
-import { setSidebarContent } from "../../../../../Store/Slices/Admin/Events/eventSlice";
-import { deleteEventThunk } from "../../../../../Store/Slices/Admin/Events/eventThunks";
+import { setSidebarContent } from "../../../../../Store/Slices/Admin/NoticeBoard/Events/eventSlice";
+import { deleteEventThunk } from "../../../../../Store/Slices/Admin/NoticeBoard/Events/eventThunks";
 
 const ViewEvent = () => {
   const dispatch = useDispatch();

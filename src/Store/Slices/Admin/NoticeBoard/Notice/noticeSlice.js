@@ -1,12 +1,10 @@
-// src/Store/Slices/Admin/Announcements/announcementSlice.js
-
 import { createSlice } from "@reduxjs/toolkit";
 import {
-  fetchAnnouncementsThunk,
-  createAnnouncementThunk,
-  updateAnnouncementThunk,
-  deleteAnnouncementThunk,
-} from "./announcementThunk";
+  fetchNoticesThunk,
+  createNoticeThunk,
+  updateNoticeThunk,
+  deleteNoticeThunk,
+} from "./noticeThunks";
 
 const initialState = {
   notices: [],
@@ -14,10 +12,11 @@ const initialState = {
   editMode: false,
   loading: false,
   error: null,
+  titleToDelete: "", // State to hold the title of the notice to be deleted
 };
 
-const announcementSlice = createSlice({
-  name: "announcements",
+const noticeSlice = createSlice({
+  name: "notice",
   initialState,
   reducers: {
     setSelectedNotice: (state, action) => {
@@ -30,43 +29,49 @@ const announcementSlice = createSlice({
       state.editMode = false;
       state.selectedNotice = null;
     },
+    setTitleToDelete: (state, action) => {
+      state.titleToDelete = action.payload; // Set the title for the delete modal
+    },
+    resetTitleToDelete: (state) => {
+      state.titleToDelete = ""; // Reset the title
+    },
   },
   extraReducers: (builder) => {
     builder
-      // Fetch Announcements
-      .addCase(fetchAnnouncementsThunk.pending, (state) => {
+      // Fetch Notices
+      .addCase(fetchNoticesThunk.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchAnnouncementsThunk.fulfilled, (state, action) => {
+      .addCase(fetchNoticesThunk.fulfilled, (state, action) => {
         state.notices = action.payload;
         state.loading = false;
       })
-      .addCase(fetchAnnouncementsThunk.rejected, (state, action) => {
+      .addCase(fetchNoticesThunk.rejected, (state, action) => {
         state.error = action.error.message;
         state.loading = false;
       })
 
-      // Create Announcement
-      .addCase(createAnnouncementThunk.pending, (state) => {
+      // Create Notice
+      .addCase(createNoticeThunk.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(createAnnouncementThunk.fulfilled, (state, action) => {
+      .addCase(createNoticeThunk.fulfilled, (state, action) => {
         state.notices.push(action.payload);
         state.loading = false;
       })
-      .addCase(createAnnouncementThunk.rejected, (state, action) => {
+      .addCase(createNoticeThunk.rejected, (state, action) => {
         state.error = action.error.message;
         state.loading = false;
       })
 
-      // Update Announcement
-      .addCase(updateAnnouncementThunk.pending, (state) => {
+      // Update Notice
+      .addCase(updateNoticeThunk.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(updateAnnouncementThunk.fulfilled, (state, action) => {
+      .addCase(updateNoticeThunk.fulfilled, (state, action) => {
         const index = state.notices.findIndex(
           (notice) => notice._id === action.payload._id
         );
@@ -75,23 +80,23 @@ const announcementSlice = createSlice({
         }
         state.loading = false;
       })
-      .addCase(updateAnnouncementThunk.rejected, (state, action) => {
+      .addCase(updateNoticeThunk.rejected, (state, action) => {
         state.error = action.error.message;
         state.loading = false;
       })
 
-      // Delete Announcement
-      .addCase(deleteAnnouncementThunk.pending, (state) => {
+      // Delete Notice
+      .addCase(deleteNoticeThunk.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(deleteAnnouncementThunk.fulfilled, (state, action) => {
+      .addCase(deleteNoticeThunk.fulfilled, (state, action) => {
         state.notices = state.notices.filter(
           (notice) => notice._id !== action.payload
         );
         state.loading = false;
       })
-      .addCase(deleteAnnouncementThunk.rejected, (state, action) => {
+      .addCase(deleteNoticeThunk.rejected, (state, action) => {
         state.error = action.error.message;
         state.loading = false;
       });
@@ -99,8 +104,13 @@ const announcementSlice = createSlice({
 });
 
 // Export actions
-export const { setSelectedNotice, setEditMode, resetEditMode } =
-  announcementSlice.actions;
+export const {
+  setSelectedNotice,
+  setEditMode,
+  resetEditMode,
+  setTitleToDelete,
+  resetTitleToDelete,
+} = noticeSlice.actions;
 
 // Export reducer
-export default announcementSlice.reducer;
+export default noticeSlice.reducer;

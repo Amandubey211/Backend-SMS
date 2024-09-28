@@ -49,7 +49,7 @@ const StudentEvent = lazy(() =>
   import("../Modules/Student/NoticeBoard/Events/StudentEvent.js")
 );
 const StudentAnnounce = lazy(() =>
-   import ('../Modules/Student/NoticeBoard/Notice/StudentAnnounce.js')
+  import("../Modules/Student/NoticeBoard/Notice/StudentAnnounce.js")
 );
 const StudentLibrarySection = lazy(() =>
   import("../Modules/Student/Library/MainSection/Libary.js")
@@ -104,8 +104,8 @@ const Events = lazy(() =>
 const EventSchool = lazy(() =>
   import("../Modules/Admin/NoticeBoard/Events/MainSection/EventSchool.js")
 );
-const Announce = lazy(() =>
-  import("../Modules/Admin/NoticeBoard/Announcements/Announce.js")
+const AdminNotice = lazy(() =>
+  import("../Modules/Admin/NoticeBoard/Notice/AdminNotice.js")
 );
 const Earning = lazy(() =>
   import("../Modules/Admin/Accounting/Earnings/Earning.js")
@@ -631,7 +631,7 @@ function App() {
       errorElement: <Error />,
     },
     {
-      path: "accounting/studentfees",
+      path: "/accounting/studentfees",
       element: (
         <ProtectRoute
           Component={AccountingSection}
@@ -642,7 +642,7 @@ function App() {
     },
     { path: "library", element: <Libary />, errorElement: <Error /> },
     {
-      path: "noticeboard/events",
+      path: "/noticeboard/events",
       element: (
         <ProtectRoute
           Component={EventSchool}
@@ -652,10 +652,10 @@ function App() {
       errorElement: <Error />,
     },
     {
-      path: "/noticeboard/announcements",
+      path: "/noticeboard/notice",
       element: (
         <ProtectRoute
-          Component={Announce}
+          Component={AdminNotice}
           allowedRoles={["admin", "teacher", "librarian", "peon"]}
         />
       ),
