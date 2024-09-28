@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 import { format } from "date-fns";
 import FormInput from "../../../Accounting/subClass/component/FormInput";
 import ImageUpload from "../../../Addmission/Components/ImageUpload";
-import { updateEventThunk } from "../../../../../Store/Slices/Admin/Events/eventThunks";
+import { updateEventThunk } from "../../../../../Store/Slices/Admin/NoticeBoard/Events/eventThunks";
 
 const UpdateEvent = () => {
   const dispatch = useDispatch();

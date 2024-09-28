@@ -16,19 +16,18 @@ import classStudentReducer from "./Slices/Admin/Class/Students/studentSlice";
 import attendanceReducer from "./Slices/Admin/Class/Attendence/attendanceSlice";
 import verificationReducer from "./Slices/Admin/Verification/VerificationSlice";
 import adminLibraryReducer from "./Slices/Admin/Library/LibrarySlice";
-import adminEventReducer from "./Slices/Admin/Events/eventSlice";
-import adminAnnouncementReducer from "./Slices/Admin/Announcement/announcementSlice";
+import adminEventReducer from "./Slices/Admin/NoticeBoard/Events/eventSlice";
+import adminNoticeReducer from "./Slices/Admin/NoticeBoard/Notice/noticeSlice";
 // student
 import studentFinanceReducer from "./Slices/Student/Finance/financeSlice";
 import studentLibraryBooksReducer from "./Slices/Student/Library/libararySlice";
 import studentIssueBooksReducer from "./Slices/Student/Library/bookIssuesSlice";
 import studentAnnouncementReducer from "../Store/Slices/Student/Noticeboard/noticeSlice";
 import studentEventReducer from "../Store/Slices/Student/Noticeboard/eventsSlice";
-import studentClassReducer from '../Store/Slices/Student/MyClass/Class/classSlice';
-import studentClassTeacherReducer from '../Store/Slices/Student/MyClass/Class/classTeacher/classTeacherSlice';
-import studentClassmateReducer from '../Store/Slices/Student/MyClass/Class/classMates/classmateSlice';
-import studentAttendancereducer from '../Store/Slices/Student/MyClass/Class/Attendance/stdAttendanceSlice';
-
+import studentClassReducer from "../Store/Slices/Student/MyClass/Class/classSlice";
+import studentClassTeacherReducer from "../Store/Slices/Student/MyClass/Class/classTeacher/classTeacherSlice";
+import studentClassmateReducer from "../Store/Slices/Student/MyClass/Class/classMates/classmateSlice";
+import studentAttendancereducer from "../Store/Slices/Student/MyClass/Class/Attendance/stdAttendanceSlice";
 
 // parent
 import dashboardReducer from "../Store/Slices/Parent/Dashboard/dashboardSlice";
@@ -78,7 +77,7 @@ const AdminReducer = combineReducers({
   verification: verificationReducer,
   library: adminLibraryReducer,
   events: adminEventReducer,
-  announcements: adminAnnouncementReducer,
+  notice: adminNoticeReducer,
 });
 
 const studentReducer = combineReducers({
@@ -87,11 +86,10 @@ const studentReducer = combineReducers({
   studentIssueBooks: studentIssueBooksReducer,
   studentAnnouncement: studentAnnouncementReducer,
   studentEvent: studentEventReducer,
-  studentClass:studentClassReducer,
-  studentClassTeacher:studentClassTeacherReducer,
-  studentClassmate:studentClassmateReducer,
-  studentAttendance:studentAttendancereducer,
-
+  studentClass: studentClassReducer,
+  studentClassTeacher: studentClassTeacherReducer,
+  studentClassmate: studentClassmateReducer,
+  studentAttendance: studentAttendancereducer,
 });
 
 const ParentReducer = combineReducers({

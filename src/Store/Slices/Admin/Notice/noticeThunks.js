@@ -1,6 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
-import { baseUrl } from "../../../../config/Common";
+import { baseUrl } from "../../../../../config/Common";
 
 // Fetch all announcements
 export const fetchAnnouncementsThunk = createAsyncThunk(
