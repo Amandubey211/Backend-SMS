@@ -1,14 +1,18 @@
 import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import CustomCalendar from "./Components/Calendar";
 import Filters from "./Components/Filters";
 import AttendanceTable from "./Components/AttendanceTable";
 import Statistics from "./Components/Stats";
 import Header from "./Components/Header";
-import useMarkAttendance from "../../../../Hooks/AuthHooks/Staff/Admin/Attendance/useMarkAttendance";
-import useGetAttendanceByClassSectionGroupAndDate from "../../../../Hooks/AuthHooks/Staff/Admin/Attendance/useGetAttendanceByClassSectionGroupAndDate";
+
 import { useParams } from "react-router-dom";
 import Spinner from "../../../../Components/Common/Spinner";
 import NoDataFound from "../../../../Components/Common/NoDataFound";
+import {
+  fetchAttendanceByClassSectionGroupDate,
+  markAttendance,
+} from "../../../../Store/Slices/Admin/Class/Attendence/attendanceThunks";
 
 const MainSection = () => {
   const [filters, setFilters] = useState({
@@ -16,26 +20,14 @@ const MainSection = () => {
     groupId: "",
   });
 
-  const [students, setStudents] = useState([]);
-  const [selectedDate, setSelectedDate] = useState(new Date()); // State for selected date
+  const [selectedDate, setSelectedDate] = useState(new Date());
 
-  const resetDate = () => {
-    setSelectedDate(new Date());
-  };
-
-  const {
-    markAttendance,
-    loading: markingLoading,
-    error: markingError,
-  } = useMarkAttendance();
-  const {
-    fetchAttendance,
-    loading: fetchingLoading,
-    error: fetchingError,
-    attendanceData,
-    fetchAttendanceByClass
-  } = useGetAttendanceByClassSectionGroupAndDate();
+  const dispatch = useDispatch();
   const { cid } = useParams();
+
+  const { attendanceData, loading, error } = useSelector(
+    (state) => state.admin.attendance
+  );
 
   const handleFilterChange = (name, value) => {
     setFilters((prevFilters) => ({
@@ -44,77 +36,61 @@ const MainSection = () => {
     }));
   };
 
+  const handleMarkAttendance = async () => {
+    const attendanceToMark = attendanceData
+      .filter((student) => student.attendanceStatus !== "not marked")
+      .map((student) => ({
+        studentId: student.studentId,
+        status: student.attendanceStatus,
+      }));
 
-
-  const handleMarkAttendance = async (attendanceData) => {
-    await markAttendance(attendanceData);
-  };
-
-  const handleSubmitAttendance = () => {
-    const attendanceData = {
-      classId: cid,
-      sectionId: filters.sectionId,
-      date: selectedDate,
-      studentEntry: students
-        .filter(student => student.attendanceStatus !== "not marked")
-        .map((student) => ({
-          studentId: student.studentId,
-          status: student.attendanceStatus
-        }))
-
-    };
-
-    handleMarkAttendance(attendanceData);
-    // console.log(attendanceData.date)
+    dispatch(
+      markAttendance({
+        classId: cid,
+        sectionId: filters.sectionId,
+        date: selectedDate,
+        studentEntry: attendanceToMark,
+      })
+    );
   };
 
   useEffect(() => {
-    //if (filters?.sectionId || filters?.groupId) {
-    fetchAttendanceByClass(cid, selectedDate, filters?.sectionId, filters?.groupId);
-    //}
-  }, [filters?.sectionId, filters?.groupId, fetchAttendanceByClass, selectedDate,]);
-
-  console.log("attendanceData Main--", attendanceData);
-
+    if (cid) {
+      dispatch(
+        fetchAttendanceByClassSectionGroupDate({
+          classId: cid,
+          sectionId: filters.sectionId,
+          groupId: filters.groupId,
+          date: selectedDate,
+        })
+      );
+    }
+  }, [dispatch, cid, filters.sectionId, filters.groupId, selectedDate]);
 
   return (
     <div className="flex min-h-screen w-full">
-      {/* This section should take 70% of the space */}
       <div className="w-8/12 p-4 bg-white border-r flex flex-col">
-        <Header onSubmit={handleSubmitAttendance} loading={markingLoading} />
         <div className="flex-grow">
-          <Filters filters={filters} onFilterChange={handleFilterChange} resetDate={resetDate} />
-          {fetchingLoading ? (
-            <Spinner />
-          ) : fetchingError ? (
-            <NoDataFound title="Attendence" />
+          <Filters filters={filters} onFilterChange={handleFilterChange} />
+          {loading ? (
+            <div className="h-96 flex justify-center items-center">
+              <Spinner />
+            </div>
+          ) : error ? (
+            <NoDataFound title="Attendance" />
           ) : (
-            <AttendanceTable
-              filters={filters}
-              //attendanceData={attendanceData}
-              // loading={markingLoading}
-              students={students}
-              setStudents={setStudents}
-              selectedDate={selectedDate}
-            />
+            <AttendanceTable students={attendanceData} />
           )}
         </div>
       </div>
-      {/* This section should take 30% of the space */}
       <div className="w-4/12 p-4 bg-white flex flex-col">
-        <div className="flex justify-center items-center">
-          <button
-            className="px-6 py-2 mb-2 w-full bg-gradient-to-r from-pink-500 to-purple-500 hover:bg-gradient-to-r hover:from-pink-700 hover:to-purple-700 text-white rounded-md shadow-lg"
-            onClick={handleSubmitAttendance}
-          >
-            {markingLoading ? "Marking.." : "Submit Attendance"}
-          </button>
-        </div>
+        <Header onSubmit={handleMarkAttendance} />
+
         <div className="flex justify-center">
           <CustomCalendar
             selectedDate={selectedDate}
             setSelectedDate={setSelectedDate}
-          />{" "}
+          />
         </div>
         <div className="flex-grow p-3 mt-1 w-full">
           <Statistics attendanceData={attendanceData} />

@@ -1,10 +1,13 @@
 import React, { useState } from "react";
-import ImageUpload from "../../../Addmission/Components/ImageUpload";
-import FormInput from "../../../Accounting/subClass/component/FormInput";
-import useCreateEvent from "../../../../../Hooks/AuthHooks/Staff/Admin/Events/useCreateEvent";
+import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
+import FormInput from "../../../Accounting/subClass/component/FormInput";
+import ImageUpload from "../../../Addmission/Components/ImageUpload";
+import { createEventThunk } from "../../../../../Store/Slices/Admin/NoticeBoard/Events/eventThunks";
+import { FiLoader } from "react-icons/fi";
 
-const AddEvent = ({ onSave }) => {
+const AddEvent = () => {
+  const dispatch = useDispatch();
   const [eventData, setEventData] = useState({
     title: "",
     location: "",
@@ -17,8 +20,7 @@ const AddEvent = ({ onSave }) => {
     imagePreview: null,
   });
 
-  const { loading, createEvent } = useCreateEvent();
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const Loading = useSelector((state) => state.admin.events.loading); // Get loading state
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -34,74 +36,47 @@ const AddEvent = ({ onSave }) => {
     });
   };
 
-  const handleImageRemove = () => {
-    setEventData({ ...eventData, image: null, imagePreview: null });
+  const handleRemoveImage = () => {
+    setEventData({
+      ...eventData,
+      image: null,
+      imagePreview: null,
+    });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (isSubmitting) return; // Prevent multiple submissions
-    setIsSubmitting(true); // Set submission state immediately
-
-    // Check if all required fields are filled
-    if (!eventData.title || !eventData.date || !eventData.time || !eventData.image) {
+    if (
+      !eventData.title ||
+      !eventData.date ||
+      !eventData.time ||
+      !eventData.image
+    ) {
       toast.error("Please fill in all required fields.");
-      setIsSubmitting(false);
       return;
     }
-
-    try {
-      const result = await createEvent(eventData);
-      if (result?.success) {
-        toast.success(result.msg || "Event created successfully!");
-
-        // Reset form fields
-        setEventData({
-          title: "",
-          location: "",
-          date: "",
-          time: "",
-          director: "",
-          type: "",
-          description: "",
-          image: null,
-          imagePreview: null,
-        });
-
-        // onSave(eventData, result); // Pass eventData to onSave to notify parent component
-      } else {
-        toast.error("Failed to create event.");
-      }
-    } catch (error) {
-      console.error("Error during event creation:", error);
-      toast.error("Error creating event.");
-    } finally {
-      setIsSubmitting(false); // Reset submission state after processing
-    }
+    await dispatch(createEventThunk(eventData));
+    toast.success("Event created successfully!");
   };
 
-
-
   return (
-    <div className="p-4 bg-gray-50 border rounded-lg overflow-auto" style={{ maxHeight: "90vh" }}>
-      <form className="space-y-4" onSubmit={handleSubmit}>
-        <div className="image-upload-container">
+    <div className="flex flex-col h-full border-t max-w-xl mx-auto bg-white ">
+      {/* Scrollable content area */}
+      <div className="flex-grow overflow-auto p-4 no-scrollbar">
+        <form className="space-y-4 mb-8" onSubmit={handleSubmit}>
           <ImageUpload
             imagePreview={eventData.imagePreview}
             handleImageChange={handleImageChange}
-            handleRemoveImage={handleImageRemove}
+            handleRemoveImage={handleRemoveImage} // Pass handleRemoveImage to ImageUpload component
           />
-        </div>
-        <FormInput
-          id="title"
-          name="title"
-          label="Event Name"
-          value={eventData.title}
-          onChange={handleInputChange}
-          required
-        />
-        <div className="flex justify-between">
+          <FormInput
+            id="title"
+            name="title"
+            label="Event Name"
+            value={eventData.title}
+            onChange={handleInputChange}
+            required
+          />
           <FormInput
             id="date"
             name="date"
@@ -120,15 +95,13 @@ const AddEvent = ({ onSave }) => {
             onChange={handleInputChange}
             required
           />
-        </div>
-        <FormInput
-          id="location"
-          name="location"
-          label="Location"
-          value={eventData.location}
-          onChange={handleInputChange}
-        />
-        <div className="flex justify-between">
+          <FormInput
+            id="location"
+            name="location"
+            label="Location"
+            value={eventData.location}
+            onChange={handleInputChange}
+          />
           <FormInput
             id="director"
             name="director"
@@ -143,24 +116,38 @@ const AddEvent = ({ onSave }) => {
             value={eventData.type}
             onChange={handleInputChange}
           />
-        </div>
-        <FormInput
-          id="description"
-          name="description"
-          label="Description"
-          type="textarea"
-          value={eventData.description}
-          onChange={handleInputChange}
-          multiline
-        />
+
+          {/* Replacing FormInput for description with textarea */}
+          <div>
+            <label
+              htmlFor="description"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Description
+            </label>
+            <textarea
+              id="description"
+              name="description"
+              value={eventData.description}
+              onChange={handleInputChange}
+              rows={5} // Adjust row count as needed
+              className="mt-1 block w-full rounded-md border p-2 border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              placeholder="Enter event description"
+            />
+          </div>
+        </form>
+      </div>
+
+      {/* Sticky Add Event button */}
+      <div className="p-4 bg-white border-t border-gray-200 sticky bottom-0 flex gap-4">
         <button
           type="submit"
-          className="w-full mt-4 p-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600"
-          disabled={loading || isSubmitting} // Ensure button is disabled on submit
+          className="w-full flex justify-center items-center bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md"
+          onClick={handleSubmit}
         >
-          {loading ? "Adding Event..." : "Add Event"}
+          {Loading ? <FiLoader className="animate-spin mr-2" /> : "Add Event"}
         </button>
-      </form>
+      </div>
     </div>
   );
 };

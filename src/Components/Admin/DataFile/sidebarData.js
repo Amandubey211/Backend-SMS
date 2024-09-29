@@ -111,7 +111,7 @@ const sidebarData = [
       {
         title: "Announcements",
         icon: <FaClipboardList />,
-        path: "/noticeboard/announcements",
+        path: "/noticeboard/notice",
         roles: ["admin", "teacher", "librarian"],
       },
       {

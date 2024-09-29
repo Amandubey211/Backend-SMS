@@ -1,72 +1,66 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import { baseUrl } from "../../../../config/Common";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchAccountingData } from '../../../../Store/Slices/Parent/Dashboard/dashboard.action'; // Redux action to fetch accounting data
 import Layout from "../../../../Components/Common/ParentLayout";
-import { FaMoneyBillWave } from "react-icons/fa"; // Importing an icon for the no fees message
-import Spinner from "../../../../Components/Common/Spinner"; // Import Spinner
+import { FaMoneyBillWave } from "react-icons/fa"; // Icon for no fees message
+import Spinner from "../../../../Components/Common/Spinner"; // Spinner component
 
+// Utility function to get unique filter options from the data (no useMemo here)
 const uniqueFilterOptions = (data, key) => {
   return [...new Set(data.map((item) => item[key]))].sort();
 };
 
 const AccountingSection = () => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  // Filters state
   const [filters, setFilters] = useState({
     class: "",
     section: "",
     feesType: "",
-    status: "Everyone",
+    status: "Everyone", // Default to show all statuses
   });
-  const [data, setData] = useState([]);
-  const [totalUnpaidFees, setTotalUnpaidFees] = useState("");
-  const [totalPaidFees, setTotalPaidFees] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(true); // Loading state
 
+  // Redux state for accounting data
+  const { accountingData, loading, error } = useSelector((state) => state.Parent.dashboard);
+  
+  // Dispatch action to fetch accounting data on component mount
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const token = localStorage.getItem("parent:token");
-        if (!token) {
-          console.error("Token not found");
-          return;
-        }
+      dispatch(fetchAccountingData());
+  }, [dispatch]);
 
-        const response = await axios.get(`${baseUrl}/parent/api/fees`, {
-          headers: {
-            Authentication: `${token}`,
-          },
-        });
+  // Check if accountingData exists and has fees data
+  const { fees = [], totalUnpaidFees = "", totalPaidFees = "" } = accountingData || {};
 
-        setData(response.data.fees);
-        setTotalUnpaidFees(response.data.totalUnpaidFees);
-        setTotalPaidFees(response.data.totalPaidFees);
-        setLoading(false); // Set loading to false after data is fetched
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        setLoading(false); // Set loading to false even on error
-      }
-    };
-    fetchData();
-  }, []);
+  // Memoize the filter options inside the component itself
+  const classes = useMemo(() => uniqueFilterOptions(fees, "class"), [fees]);
+  const sections = useMemo(() => uniqueFilterOptions(fees, "section"), [fees]);
+  const feesTypes = useMemo(() => uniqueFilterOptions(fees, "feeType"), [fees]);
 
-  const classes = uniqueFilterOptions(data, "class");
-  const sections = uniqueFilterOptions(data, "section");
-  const feesTypes = uniqueFilterOptions(data, "feesType");
+  // Apply filters to the fees data, useMemo to optimize the filtered data calculation
+  const filteredData = useMemo(() => {
+    return fees.filter((item) => {
+      const classCondition = filters.class === "" || !item.class || item.class === filters.class;
+      const sectionCondition = filters.section === "" || !item.section || item.section === filters.section;
+      const feeTypeCondition = !filters.feeType || item.feeType === filters.feeType;
+      const statusCondition = filters.status === "Everyone" || item.status === filters.status;
+      return classCondition && sectionCondition && feeTypeCondition && statusCondition;
+    });
+  }, [fees, filters]);
 
-  const filteredData = data.filter(
-    (item) =>
-      (filters.class === "" || item.class === filters.class) &&
-      (filters.section === "" || item.section === filters.section) &&
-      (filters.feesType === "" || item.feesType === filters.feesType) &&
-      (filters.status === "Everyone" ||
-        (filters.status === "Paid" && item.status === "Paid") ||
-        (filters.status === "Unpaid" && item.status === "Unpaid"))
-  );
+  // Handle navigation using useCallback to prevent re-creation on every render
+  const handleNavigate = useCallback(() => {
+    navigate("/parentfinance");
+  }, [navigate]);
 
   if (loading) {
-    return <Spinner />; // Show spinner while loading
+    return <Spinner />; 
+  }
+
+  if (error) {
+    return <p>Error: {error}</p>;
   }
 
   return (
@@ -76,7 +70,7 @@ const AccountingSection = () => {
           <h2 className="text-lg font-normal text-gray-600">Accounting</h2>
           <button
             className="text-transparent bg-clip-text bg-gradient-to-r from-[#C83B62] to-[#7F35CD] font-normal"
-            onClick={() => navigate("/parentfinance")}
+            onClick={handleNavigate}
           >
             See All
           </button>
@@ -108,7 +102,7 @@ const AccountingSection = () => {
                         {item.feeType}
                       </td>
                       <td className="px-5 py-4 border-b border-gray-200">
-                        {item.paidBy || "------"}
+                        {item.paidBy || "N/A"}
                       </td>
                       <td className="px-5 py-4 border-b border-gray-200">
                         {item.dueDate}
@@ -119,8 +113,8 @@ const AccountingSection = () => {
                       <td className="px-5 py-4 border-b border-gray-200">
                         <span
                           className={`inline-block px-3 py-1 font-medium rounded-full ${item.status === "Paid"
-                              ? "text-[#0D9755]"
-                              : "text-red-500"
+                            ? "text-[#0D9755]"
+                            : "text-red-500"
                             }`}
                         >
                           {item.status}
@@ -130,7 +124,7 @@ const AccountingSection = () => {
                         {item.status === "Unpaid" ? (
                           <button
                             className="text-white bg-gradient-to-r from-[#C83B62] to-[#7F35CD] hover:bg-gradient-to-l px-4 py-1  font-normal rounded-md transition duration-300 ease-in-out"
-                            style={{ minWidth: "100px", height: "36px" }} // Ensure consistent button width and height
+                            style={{ minWidth: "100px", height: "36px" }}
                           >
                             Pay Now
                           </button>

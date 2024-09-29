@@ -1,52 +1,53 @@
-// src/components/TopNavigation.js
+// src/Modules/Admin/Verification/TopNavigation.js
 
 import React from "react";
 import { CiSearch } from "react-icons/ci";
-import { useSelector } from "react-redux";
-
-const TopNavigation = ({
-  totalUnVerified,
-  totalRejected,
-  activeTab,
+import { useSelector, useDispatch } from "react-redux";
+import {
   setActiveTab,
-  searchQuery,
-  handleSearchChange,
-}) => {
-  const unVerifiedStudents = useSelector(
-    (store) => store.Admin.unVerifiedStudents
-  );
-  const rejectedStudents = useSelector((store) => store.Admin.rejectedStudents);
+  setSearchQuery,
+} from "../../../Store/Slices/Admin/Verification/VerificationSlice";
+
+const TopNavigation = () => {
+  const dispatch = useDispatch();
+  const { unVerifiedStudents, rejectedStudents, activeTab, searchQuery } =
+    useSelector((state) => state.admin.verification);
+
   return (
     <div className="flex justify-between items-center mb-6">
       <div className="flex gap-2 items-center">
+        {/* Unverified Students Tab */}
         <h1
           className={`text-xl font-semibold p-1 border rounded-2xl px-4 cursor-pointer transition-all duration-300 ${
             activeTab === "unverified"
-              ? "text-purple-500  bg-purple-100"
+              ? "text-purple-500 bg-purple-100"
               : "text-gray-700 hover:bg-gray-100"
           }`}
-          onClick={() => setActiveTab("unverified")}
+          onClick={() => dispatch(setActiveTab("unverified"))}
         >
           Unverified Students ({unVerifiedStudents.length})
         </h1>
+
+        {/* Rejected Students Tab */}
         <h1
           className={`text-xl font-semibold p-1 border rounded-2xl px-4 cursor-pointer transition-all duration-300 ${
             activeTab === "rejected"
               ? "text-purple-500 bg-purple-100"
               : "text-gray-700 hover:bg-gray-100"
           }`}
-          onClick={() => setActiveTab("rejected")}
+          onClick={() => dispatch(setActiveTab("rejected"))}
         >
           Rejected Students ({rejectedStudents.length})
         </h1>
       </div>
 
+      {/* Search input */}
       <div className="relative flex items-center max-w-xs w-full mr-4">
         <input
           type="text"
           placeholder="Search By Email"
           value={searchQuery}
-          onChange={handleSearchChange}
+          onChange={(e) => dispatch(setSearchQuery(e.target.value))}
           className="px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-purple-300 w-full transition-all duration-300"
         />
         <button className="absolute right-3">
@@ -57,4 +58,4 @@ const TopNavigation = ({
   );
 };
 
-export default TopNavigation;
+export default React.memo(TopNavigation);

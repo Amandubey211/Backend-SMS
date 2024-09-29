@@ -4,7 +4,6 @@ import DashLayout from "../../../../Components/Admin/AdminDashLayout";
 import TeacherSalary from "./components/TeacherSalary";
 import StaffSalary from "./components/StaffSalary";
 import OtherExpenses from "./components/OtherExpenses";
-import TabButton from "../../Libary/Subclasss/component/TabButton";
 import Sidebar from "../../../../Components/Common/Sidebar";
 import PaySalary from "./components/PaySalary";
 import AddEarning from "../Earnings/AddEarning";
@@ -19,6 +18,7 @@ import axios from "axios";
 import { baseUrl } from "../../../../config/Common.js";
 import AddExpense from "./components/AddExpense.js";
 import { useSelector } from "react-redux";
+import TabButton from "../../Libary/Components/TabButton.js";
 
 const Expenses = () => {
   const [activeTab, setActiveTab] = useState("TeacherSalary");

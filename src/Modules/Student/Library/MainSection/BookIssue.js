@@ -5,55 +5,35 @@ import { baseUrl } from "../../../../config/Common";
 import BookIssueRow from "../SubClass/component/BookIssueRow";
 import NoDataFound from "../../../../Components/Common/NoDataFound";
 import Spinner from "../../../../Components/Common/Spinner"; // Import the Spinner
+import { useDispatch, useSelector } from "react-redux";
+import { setFilters } from "../../../../Store/Slices/Student/Library/bookIssuesSlice";
+import { GoAlertFill } from "react-icons/go";
+import { gt } from "../../../../Utils/translator/translation";
+import { useTranslation } from "react-i18next";
 
 const BookIssue = () => {
-  const [bookIssueData, setBookIssueData] = useState([]);
-  const [filters, setFilters] = useState({
-    classLevel: "",
-    category: "",
-    status: "All",
-  });
-  const [loading, setLoading] = useState(true); // Add loading state
+
+  const { loading, error, issueBooks, filters } = useSelector((store) => store?.student?.studentIssueBooks);
+  const {  activeTab } = useSelector((store) => store?.student?.studentLibraryBooks);
+ 
+  const dispatch = useDispatch();
+  const { t } = useTranslation();
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
-    setFilters((prev) => ({ ...prev, [name]: value }));
+    dispatch(setFilters({ ...filters, [name]: value }));
   };
 
-  const fetchBookIssues = async () => {
-    setLoading(true); // Set loading to true when fetching starts
-    try {
-      const token = localStorage.getItem("student:token");
-
-      if (!token) {
-        throw new Error("Authentication token not found");
-      }
-
-      const response = await axios.get(`${baseUrl}/student/issue/books`, {
-        headers: { Authentication: token },
-      });
-
-      setBookIssueData(response.data?.booksIssue.reverse());
-    } catch (error) {
-      console.error("Failed to fetch book issues:", error);
-    } finally {
-      setLoading(false); // Set loading to false once fetching is complete
+  const filteredBookIssueData = () => {
+    if (filters?.status === "All") {
+      return issueBooks;
     }
+    return issueBooks.filter((item) => item.status === filters.status);
   };
 
-  useEffect(() => {
-    fetchBookIssues();
-  }, []);
-
-  const filteredBookIssueData = useMemo(() => {
-    if (filters.status === "All") {
-      return bookIssueData;
-    }
-    return bookIssueData.filter((item) => item.status === filters.status);
-  }, [bookIssueData, filters.status]);
 
   return (
-    <div className="min-h-screen">
+    <div className="">
       {/* Radio buttons for filtering */}
       <div className="flex gap-4 mb-4 ps-5">
         {["All", "Pending", "Return"].map((status) => (
@@ -67,11 +47,10 @@ const BookIssue = () => {
               className="hidden"
             />
             <div
-              className={`h-5 w-5 rounded-full mr-2 flex items-center justify-center border-2 transition-colors duration-300 ${
-                filters.status === status
-                  ? "border-green-500"
-                  : "border-gray-300"
-              }`}
+              className={`h-5 w-5 rounded-full mr-2 flex items-center justify-center border-2 transition-colors duration-300 ${filters.status === status
+                ? "border-green-500"
+                : "border-gray-300"
+                }`}
             >
               {/* Icon for selected radio button */}
               {filters.status === status && (
@@ -79,11 +58,10 @@ const BookIssue = () => {
               )}
             </div>
             <span
-              className={`transition-colors duration-300 text-md ${
-                filters.status === status ? "text-gradient" : "text-gray-600"
-              } hover:text-pink-500 focus:outline-none`}
+              className={`transition-colors duration-300 text-md ${filters.status === status ? "text-gradient" : "text-gray-600"
+                } hover:text-pink-500 focus:outline-none`}
             >
-              {status}
+              {t(status,gt.stdLibrary)}
             </span>
           </label>
         ))}
@@ -91,39 +69,60 @@ const BookIssue = () => {
 
       {/* Table Section */}
       <div className="overflow-x-auto bg-white">
-        {loading ? (
-          <div className="flex justify-center items-center py-10">
-            <Spinner />
-          </div>
-        ) : filteredBookIssueData.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-10 text-gray-500">
-            <NoDataFound />
-          </div>
-        ) : (
+        {
           <table className="min-w-full text-sm">
             <thead>
               <tr className="text-left text-gray-600 bg-gray-100">
                 <th className="px-5 py-3 border-b border-gray-200">
-                  Issue Book
+                  {t('Issue Book', gt.stdLibrary)}
                 </th>
-                <th className="px-5 py-3 border-b border-gray-200">Author</th>
-                <th className="px-5 py-3 border-b border-gray-200">Category</th>
+                <th className="px-5 py-3 border-b border-gray-200"> {t('Author', gt.stdLibrary)} </th>
+                <th className="px-5 py-3 border-b border-gray-200"> {t('Category', gt.stdLibrary)} </th>
                 <th className="px-5 py-3 border-b border-gray-200">
-                  Issue Date
+                  {t('Issue Date', gt.stdLibrary)}
                 </th>
                 <th className="px-5 py-3 border-b border-gray-200">
-                  Return Date
+                  {t('Return Date', gt.stdLibrary)}
                 </th>
-                <th className="px-5 py-3 border-b border-gray-200">Status</th>
+                <th className="px-5 py-3 border-b border-gray-200">{t('Status', gt.stdLibrary)}</th>
               </tr>
             </thead>
-            <tbody>
-              {filteredBookIssueData.map((item) => (
+            <tbody role="rowgroup">
+
+              {/* Display Loading Spinner */}
+              {loading && (
+                <tr>
+                  <td colSpan="6" className="text-center py-10">
+                    <Spinner />
+                  </td>
+                </tr>
+              )}
+
+              {/* Display Error Message */}
+              { !loading && activeTab == "BookIssue"  &&  error && (
+                <tr>
+                  <td colSpan="6" className="text-center py-20 text-red-600">
+                    <GoAlertFill className="inline-block mb-2 w-12 h-12 mb-3" />
+                    <p className="text-lg font-semibold">{error}</p>
+                  </td>
+                </tr>
+              )}
+
+              {/* Display No Data Found */}
+              {!loading && !error && issueBooks?.length === 0 && (
+                <tr>
+                  <td colSpan="6" className="text-center py-20">
+                    <NoDataFound />
+                  </td>
+                </tr>
+              )}
+
+              {!loading && !error && !issueBooks?.length === 0 && (filteredBookIssueData()?.map((item) => (
                 <BookIssueRow key={item.id} item={item} />
-              ))}
+              )))}
             </tbody>
           </table>
-        )}
+        }
       </div>
     </div>
   );

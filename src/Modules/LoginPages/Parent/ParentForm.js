@@ -1,27 +1,46 @@
 import React, { useState } from "react";
 import Logo from "../../../Components/Common/Logo";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { FaEye } from "react-icons/fa";
 import { PiEyeClosedFill } from "react-icons/pi";
 import toast from "react-hot-toast";
-import useParentLogin from "../../../Hooks/AuthHooks/Parent/useParentLogin";
+// import useParentLogin from "../../../Hooks/AuthHooks/Parent/useParentLogin";
 import { LuLoader } from "react-icons/lu";
-
+import { useDispatch, useSelector } from "react-redux";
+import {parentLogin} from "../../../Store/Slices/Common/Auth/actions/parentActions"
 const ParentForm = () => {
   const [parentDetails, setParentDetails] = useState({
     email: "",
     password: "",
   });
-  const { loading, parentLogin } = useParentLogin();
-  const [showPassword, setShowPassword] = useState(false);
 
+  const dispatch = useDispatch()
+  // const { loading, parentLogin } = useParentLogin();
+  const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
+  const {loading} = useSelector((store) => store.common.auth)
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!parentDetails.email || !parentDetails.password) {
       return toast.error("Please add the required details");
     }
-    parentLogin(parentDetails);
+
+    console.log("Parent Details: ", parentDetails)
+    dispatch(parentLogin(parentDetails))
+
+    .then(({ redirect }) => {
+      console.log("This is redirect ::  ", redirect)
+      navigate('/parent_dash');
+    })
+
+
+  
+    .catch((error) => {
+      toast.error(error);
+    });
   };
+  
+
 
   return (
     <div className="relative h-full bg-gray-100 w-full">

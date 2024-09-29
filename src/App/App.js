@@ -25,8 +25,17 @@ import ParentEvent from "../Modules/Parents/ParentEvent/ParentEvent";
 import QIDLogin from "../Modules/LoginPages/Student/Login/QIDLogin.js";
 import ParentProfile from "../Components/Parents/ParentProfile.js";
 import StaffMyProfile from "../Components/Common/StaffMyProfile.js";
-
+import "../Utils/translator/i18n.js";
+import i18next from "i18next";
+import { useSelector } from "react-redux";
 // lazy loaded routes
+
+const Academic = lazy(() =>
+  import("../Modules/Admin/AcademicYear/Academic.js")
+);
+const CreateAcademicYear = lazy(() =>
+  import("../Components/Admin/CreateAcademicYear.js")
+);
 const StudentProfile = lazy(() =>
   import("../Modules/Student/profile/StudentProfile.js")
 );
@@ -37,10 +46,10 @@ const StudentFinance = lazy(() =>
   import("../Modules/Student/Finance/StudentFinance.js")
 );
 const StudentEvent = lazy(() =>
-  import("../Modules/Student/StudentEvent/StudentEvent.js")
+  import("../Modules/Student/NoticeBoard/Events/StudentEvent.js")
 );
 const StudentAnnounce = lazy(() =>
-  import("../Modules/Student/NoticeBoard/StudentAnnounce.js")
+  import("../Modules/Student/NoticeBoard/Notice/StudentAnnounce.js")
 );
 const StudentLibrarySection = lazy(() =>
   import("../Modules/Student/Library/MainSection/Libary.js")
@@ -95,8 +104,8 @@ const Events = lazy(() =>
 const EventSchool = lazy(() =>
   import("../Modules/Admin/NoticeBoard/Events/MainSection/EventSchool.js")
 );
-const Announce = lazy(() =>
-  import("../Modules/Admin/NoticeBoard/Announcements/Announce.js")
+const AdminNotice = lazy(() =>
+  import("../Modules/Admin/NoticeBoard/Notice/AdminNotice.js")
 );
 const Earning = lazy(() =>
   import("../Modules/Admin/Accounting/Earnings/Earning.js")
@@ -255,9 +264,7 @@ const CheckProgress = lazy(() =>
 const ChildGrade = lazy(() =>
   import("../Modules/Parents/GradeChild/GradeChild.js")
 );
-const ParentAnnounce = lazy(() =>
-  import("../Modules/Parents/Notice/Annoucements/Announce.js")
-);
+
 const StudentTeacher = lazy(() =>
   import(
     "../Modules/Student/StudentClass/SubClass/Components/Teacher/StudentTeacher.js"
@@ -315,6 +322,20 @@ function App() {
       element: <ForgetPassword />,
       errorElement: <Error />,
     },
+    {
+      path: "/create_academicYear",
+      element: (
+        <ProtectRoute Component={CreateAcademicYear} allowedRoles={["admin"]} />
+      ),
+      errorElement: <Error />,
+    },
+
+    {
+      path: "/dashboard/academic",
+      element: <ProtectRoute Component={Academic} allowedRoles={["admin"]} />,
+      errorElement: <Error />,
+    },
+
     //Admin--------------------------------------------------------------------------
     {
       path: "/dashboard",
@@ -323,6 +344,13 @@ function App() {
       ),
       errorElement: <Error />,
     },
+    // {
+    //   path: "/create_academicYear",
+    //   element: (
+    //     <ProtectRoute Component={CreateAcademicYear} allowedRoles={["admin"]} />
+    //   ),
+    //   errorElement: <Error />,
+    // },
     {
       path: "/class",
       element: (
@@ -379,6 +407,7 @@ function App() {
       ),
       errorElement: <Error />,
     },
+
     {
       path: "/class/:cid/students",
       element: (
@@ -602,7 +631,7 @@ function App() {
       errorElement: <Error />,
     },
     {
-      path: "accounting/studentfees",
+      path: "/accounting/studentfees",
       element: (
         <ProtectRoute
           Component={AccountingSection}
@@ -613,7 +642,7 @@ function App() {
     },
     { path: "library", element: <Libary />, errorElement: <Error /> },
     {
-      path: "noticeboard/events",
+      path: "/noticeboard/events",
       element: (
         <ProtectRoute
           Component={EventSchool}
@@ -623,10 +652,10 @@ function App() {
       errorElement: <Error />,
     },
     {
-      path: "/noticeboard/announcements",
+      path: "/noticeboard/notice",
       element: (
         <ProtectRoute
-          Component={Announce}
+          Component={AdminNotice}
           allowedRoles={["admin", "teacher", "librarian", "peon"]}
         />
       ),
@@ -716,14 +745,14 @@ function App() {
       errorElement: <Error />,
     },
     {
-      path: "/student_class/:cid/teachers",
+      path: "/student_class/:classId/teachers",
       element: (
         <ProtectRoute Component={StudentTeacher} allowedRoles={["student"]} />
       ),
       errorElement: <Error />,
     },
     {
-      path: "/student_class/:cid/classmates",
+      path: "/student_class/:classId/classmates",
       element: (
         <ProtectRoute
           Component={StudentClassMates}
@@ -733,7 +762,7 @@ function App() {
       errorElement: <Error />,
     },
     {
-      path: "/student_class/:cid/attendance",
+      path: "/student_class/:classId/attendance",
       element: (
         <ProtectRoute
           Component={StudentAttendance}
@@ -956,11 +985,6 @@ function App() {
       errorElement: <Error />,
     },
     {
-      path: "/parentannounce",
-      element: <ParentAnnounce />,
-      errorElement: <Error />,
-    },
-    {
       path: "/childgrade/:studentId",
       element: <ChildGrade />,
       errorElement: <Error />,
@@ -978,3 +1002,42 @@ function App() {
 }
 
 export default App;
+
+// import React, { useEffect, useState } from "react";
+// import Offline from "../Components/Common/Offline.js";
+// import AllRoutes from "../Route/AllRoute.js";
+// import { useFirebaseMessaging } from "../Hooks/NotificationHooks/NotificationHooks.js";
+// import i18next from "i18next";
+// import { useSelector } from "react-redux";
+
+// function App() {
+//   const [isOnline, setIsOnline] = useState(window.navigator.onLine);
+//   useFirebaseMessaging();
+
+//   useEffect(() => {
+//     const handleOnline = () => setIsOnline(true);
+//     const handleOffline = () => setIsOnline(false);
+
+//     window.addEventListener("online", handleOnline);
+//     window.addEventListener("offline", handleOffline);
+
+//     return () => {
+//       window.removeEventListener("online", handleOnline);
+//       window.removeEventListener("offline", handleOffline);
+//     };
+//   }, []);
+
+//   const selectedLanguage = useSelector((state) => state.Auth.selectedLanguage);
+//   useEffect(() => {
+//     i18next.changeLanguage(selectedLanguage); // Set the initial language from Redux
+//   }, [selectedLanguage]);
+
+//   return (
+//     <>
+//       {!isOnline && <Offline />}
+//       <AllRoutes />
+//     </>
+//   );
+// }
+
+// export default App;

@@ -40,9 +40,9 @@ const SideMenubar = () => {
     getData();
   }, []);
   const { isOpen, role, userDetails } = useSelector((state) => ({
-    isOpen: state.sidebar.isOpen,
-    role: state.Auth.role,
-    userDetails: state?.Auth?.userDetail,
+    isOpen: state.common.user.sidebar.isOpen,
+    role: state.common.auth.role,
+    userDetails: state?.common.user?.userDetails,
 
   }));
 

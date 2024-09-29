@@ -1,18 +1,23 @@
 import React, { useState } from "react";
+import { useSelector } from "react-redux";
 import { PiPlusLight } from "react-icons/pi";
+import { FaUserSlash } from "react-icons/fa"; // Placeholder icon
 import Sidebar from "../../../../Components/Common/Sidebar";
 import AssignStudent from "./AssignStudent";
-import { useSelector } from "react-redux";
 
 const UnAssignedStudentList = ({
+  unassignedStudents,
   fetchGroups,
   fetchStudents,
-  unassignedStudents,
 }) => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const sections = useSelector((state) => state.Class.sectionsList);
+
+  // Fetch sections from the Redux store
+  const sections = useSelector(
+    (store) => store.admin.group_section.sectionsList
+  );
 
   const handleSearch = (e) => {
     setSearchQuery(e.target.value);
@@ -40,7 +45,7 @@ const UnAssignedStudentList = ({
   };
 
   return (
-    <div className="w-80 p-4 bg-white ">
+    <div className="w-80 p-4 bg-white">
       <div className="mb-4">
         <h2 className="text-md font-semibold">
           Unassigned Students{" "}
@@ -54,43 +59,53 @@ const UnAssignedStudentList = ({
           className="mt-2 w-full px-3 py-2 border rounded-full"
         />
       </div>
-      <ul>
-        {filteredStudents.map((student, index) => (
-          <li
-            key={index}
-            className="flex items-center justify-between border-b py-2"
-          >
-            <div className="flex items-center">
-              <img
-                src={
-                  student.profile ||
-                  `https://randomuser.me/api/portraits/med/${
-                    index % 2 === 0 ? "women" : "men"
-                  }/${index}.jpg`
-                }
-                alt={student.firstName}
-                className="w-10 h-10 rounded-full mr-3"
-              />
-              <div>
-                <div className="text-sm font-medium">{student.firstName}</div>
-                <div
-                  className={`text-xs ${
-                    getSectionName(student?.presentSectionId).color
-                  }`}
-                >
-                  {getSectionName(student?.presentSectionId).name}
+
+      {/* Check if there are no students */}
+      {filteredStudents.length === 0 ? (
+        <div className="flex flex-col items-center justify-center h-64 text-center text-gray-500">
+          <FaUserSlash className="text-2xl mb-4" />
+          <p>No students found.</p>
+        </div>
+      ) : (
+        <ul>
+          {filteredStudents.map((student, index) => (
+            <li
+              key={index}
+              className="flex items-center justify-between border-b py-2"
+            >
+              <div className="flex items-center">
+                <img
+                  src={
+                    student.profile ||
+                    `https://randomuser.me/api/portraits/med/${
+                      index % 2 === 0 ? "women" : "men"
+                    }/${index}.jpg`
+                  }
+                  alt={student.firstName}
+                  className="w-10 h-10 rounded-full mr-3"
+                />
+                <div>
+                  <div className="text-sm font-medium">{student.firstName}</div>
+                  <div
+                    className={`text-xs ${
+                      getSectionName(student?.presentSectionId).color
+                    }`}
+                  >
+                    {getSectionName(student?.presentSectionId).name}
+                  </div>
                 </div>
               </div>
-            </div>
-            <button
-              onClick={() => handleSidebarOpen(student)}
-              className="text-center rounded-full border font-semibold text-xl p-1"
-            >
-              <PiPlusLight className="text-green-600" />
-            </button>
-          </li>
-        ))}
-      </ul>
+              <button
+                onClick={() => handleSidebarOpen(student)}
+                className="text-center rounded-full border font-semibold text-xl p-1"
+              >
+                <PiPlusLight className="text-green-600" />
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+
       {selectedStudent && (
         <Sidebar
           isOpen={isSidebarOpen}

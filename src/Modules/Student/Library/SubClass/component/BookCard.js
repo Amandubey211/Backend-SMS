@@ -1,5 +1,7 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { BsThreeDotsVertical } from "react-icons/bs";
+import { gt } from "../../../../../Utils/translator/translation";
 
 const BookCard = ({
   title,
@@ -10,6 +12,9 @@ const BookCard = ({
   available,
   coverImageUrl,
 }) => {
+
+  const { t } = useTranslation();
+
   return (
     <div className="relative border p-2 bg-white rounded-lg shadow-sm  overflow-hidden capitalize">
       <div className="flex border-b pb-2">
@@ -23,15 +28,15 @@ const BookCard = ({
         {/* Book Info */}
         <div className="ml-5 ">
           <div className="flex flex-col">
-            <span className=" text-gray-500">Class</span>
+            <span className=" text-gray-500">{t('Class',gt.stdLibrary)}</span>
             <span className=" font-bold text-gradient mb-1">{classLevel}</span>
             {/* <span className="text-lg  font-bold text-gradient mb-1">10</span> */}
 
-            <span className=" text-gray-500">Copies</span>
+            <span className=" text-gray-500">{t('Copies',gt.stdLibrary)}</span>
             <span className=" text-lg font-bold text-gradient mb-1">
               {copies}
             </span>
-            <span className=" text-gray-500">Available</span>
+            <span className=" text-gray-500">{t('Available',gt.stdLibrary)}</span>
             <span className="text-lg  font-bold text-gradient">
               {available}
             </span>
@@ -43,7 +48,7 @@ const BookCard = ({
       <div className="mt-3 ps-2 pb-2">
         <h3 className="text-lg font-bold  text-gray-800">{title}</h3>
         <p className="text-sm font-medium text-gradient">{category}</p>
-        <p className="text-sm text-gray-500 mt-3">Author</p>
+        <p className="text-sm text-gray-500 mt-3">{t('Author',gt.stdLibrary)}</p>
         <p className="text-base text-gray-700">{author}</p>
       </div>
 

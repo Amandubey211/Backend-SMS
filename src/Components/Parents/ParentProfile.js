@@ -12,7 +12,7 @@ import Layout from "../Common/ParentLayout";
 
 const ParentProfile = () => {
   const { userDetail } = useGetUserDetail();
-  const user = useSelector((store) => store.Auth.userDetail);
+  const user = useSelector((store) => store.common.user.userDetails);
   const [userData, setUserData] = useState(user);
 
   useEffect(() => {

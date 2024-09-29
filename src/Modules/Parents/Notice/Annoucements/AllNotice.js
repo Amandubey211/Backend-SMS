@@ -1,60 +1,53 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import React, { useState, useEffect, useMemo } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import Layout from "../../../../Components/Common/Layout";
 import ParentDashLayout from "../../../../Components/Parents/ParentDashLayout.js";
 import { MdExpandMore, MdExpandLess } from "react-icons/md";
-import CalendarIcon from '../../../../Assets/ParentAssets/svg/calender.svg'; // Updated Import
+import CalendarIcon from '../../../../Assets/ParentAssets/svg/calender.svg'; 
 import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading .js";
 import announcementIcon from "../../../../Assets/DashboardAssets/Images/image1.png";
-import toast from "react-hot-toast";
-import Spinner from "../../../../Components/Common/Spinner"; // Import Spinner
-import { baseUrl } from "../../../../config/Common.js";
+import Spinner from "../../../../Components/Common/Spinner";
+import { fetchAllNotices } from "../../../../Store/Slices/Parent/NoticeBoard/notice.action.js";
 
 const AllNotice = () => {
+  const dispatch = useDispatch();
+  
+  // Accessing the notices, loading, and error from Redux state
+  const { notices, loading, error } = useSelector((state) => state.Parent.notice);
+  
   const [searchTerm, setSearchTerm] = useState("");
   const [activeIndex, setActiveIndex] = useState(null);
-  const [notices, setNotices] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  
+  // Custom hook for setting navigation heading
   useNavHeading("Notice");
 
-  const backgroundColors = [
-    'bg-blue-300',
-    'bg-green-300',
-    'bg-yellow-300',
-    'bg-pink-300',
-    'bg-purple-300',
-  ];
-
+  // Side effect: Dispatches fetch action on mount
   useEffect(() => {
-    const fetchNotices = async () => {
-      try {
-        const token = localStorage.getItem("parent:token");
-        const response = await axios.get(`${baseUrl}/admin/all/notices`, {
-          headers: {
-            Authentication: `${token}`,
-          },
-        });
-        setNotices(response.data.notices);
-      } catch (error) {
-        setError("Failed to fetch notices");
-        toast.error("Failed to fetch notices");
-      } finally {
-        setLoading(false);
-      }
-    };
+    dispatch(fetchAllNotices());
+  }, [dispatch]);  // Only runs on mount or if `dispatch` changes
+  
+  // Memoized array for background colors
+  const backgroundColors = useMemo(() => [
+    'bg-blue-300', 
+    'bg-green-300', 
+    'bg-yellow-300', 
+    'bg-pink-300', 
+    'bg-purple-300'
+  ], []);
 
-    fetchNotices();
-  }, []);
+  // Memoized filtered notices based on search term
+  const filteredNotices = useMemo(() => {
+    return notices.filter((notice) =>
+      notice.title?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [notices, searchTerm]);
 
-  const filteredNotices = notices.filter((notice) =>
-    notice.title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
+  // Accordion toggle function
   const toggleAccordion = (index) => {
     setActiveIndex(activeIndex === index ? null : index);
   };
 
+  // Date formatting helper
   const formatDate = (isoDate) => {
     const date = new Date(isoDate);
     return date.toLocaleDateString('en-US', {
@@ -101,7 +94,7 @@ const AllNotice = () => {
                 </div>
               ) : filteredNotices.length > 0 ? (
                 filteredNotices.map((notice, index) => (
-                  <div key={notice.id} className="border">
+                  <div key={notice.id || index} className="border">
                     <div
                       className={`cursor-pointer p-2 flex flex-col bg-white`}
                       onClick={() => toggleAccordion(index)}
@@ -116,13 +109,13 @@ const AllNotice = () => {
                         </div>
                         <div className="flex flex-col gap-3 mt-[-5px] flex-1">
                           <h2 className="font-[500] text-[#4D4D4D]" style={{ fontStyle: "inter" }}>
-                            {notice.title}
+                            {notice.title || 'Untitled'}
                           </h2>
                           <div className="flex flex-row gap-[50px] text-xs">
                             <div className="flex flex-wrap justify-center items-center">
                               <img src={CalendarIcon} alt="calendar" style={{ width: '25px', height: '25px', marginRight: '5px' }} />
                               <span className="text-sm p-1 font-[400] text-[#7F7F7F]">
-                                {formatDate(notice.startDate)}
+                                {formatDate(notice.startDate) || 'No Date'}
                               </span>
                             </div>
                             <div
@@ -137,7 +130,7 @@ const AllNotice = () => {
                                   : "text-gray-500"
                                   }`}
                               >
-                                {notice.priority}
+                                {notice.priority || 'Low priority'}
                               </span>
                             </div>
                           </div>
@@ -153,7 +146,7 @@ const AllNotice = () => {
                     </div>
                     {activeIndex === index && (
                       <div className="p-2 pl-6 text-[#4D4D4D]">
-                        <p>{notice.description}</p>
+                        <p>{notice.description || 'No description available.'}</p>
                       </div>
                     )}
                   </div>

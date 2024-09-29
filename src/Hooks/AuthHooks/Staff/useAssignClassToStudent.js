@@ -3,8 +3,6 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import { baseUrl } from "../../../config/Common";
 
-
-
 const useAssignClassToStudent = () => {
   const [loading, setLoading] = useState(false);
 

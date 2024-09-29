@@ -1,7 +1,10 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { GiBookmarklet } from "react-icons/gi"; // Import the bookmark icon
+import { gt } from "../../../../../Utils/translator/translation";
 
 const BookIssueRow = ({ item }) => {
+  const { t } = useTranslation();
   const formatDate = (isoDate) => {
     if (!isoDate) return "N/A"; // Handle missing dates
     const date = new Date(isoDate);
@@ -21,7 +24,7 @@ const BookIssueRow = ({ item }) => {
             {item?.bookId?.image ? (
               <img
                 src={item.bookId.image}
-                alt={`${item?.bookId?.name || "Unknown Title"} cover`}
+                alt={`${item?.bookId?.name} || ${t("Unknown Title", gt.stdLibrary)} cover`}
                 className="h-full w-full object-cover"
               />
             ) : (
@@ -30,7 +33,7 @@ const BookIssueRow = ({ item }) => {
           </div>
           <div className="flex flex-col ml-4">
             <span className="font-medium text-gray-800">
-              {item?.bookId?.name || "Unknown Title"}
+              {item?.bookId?.name} || {t("Unknown Title", gt.stdLibrary)}
             </span>
           </div>
         </div>
@@ -39,14 +42,14 @@ const BookIssueRow = ({ item }) => {
       {/* Author */}
       <td className="px-5 py-4 border-b border-gray-200">
         <span className="text-gray-800">
-          {item?.author || "Unknown Author"}
+          {item?.author} || {t("Unknown Author", gt.stdLibrary)}
         </span>
       </td>
 
       {/* Category */}
       <td className="px-5 py-4 border-b border-gray-200">
         <span className="text-gray-800">
-          {item?.bookId?.category || "Unknown Category"}
+          {item?.bookId?.category} || {t("Unknown Category", gt.stdLibrary)}
         </span>
       </td>
 
@@ -63,13 +66,12 @@ const BookIssueRow = ({ item }) => {
       {/* Status */}
       <td className="px-5 py-4 border-b border-gray-200">
         <span
-          className={`inline-block px-3 py-1 text-md font-semibold rounded-full ${
-            item?.status === "Return"
+          className={`inline-block px-3 py-1 text-md font-semibold rounded-full ${item?.status === "Return"
               ? "bg-green-100 text-green-800"
               : "bg-blue-100 text-gray-600"
-          }`}
+            }`}
         >
-          {item?.status || "No Status"}
+          {item?.status}||{t("No Status",gt.stdLibrary)}
         </span>
       </td>
     </tr>

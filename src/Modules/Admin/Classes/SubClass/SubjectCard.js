@@ -3,13 +3,13 @@ import { LuUser } from "react-icons/lu";
 import { BsBook } from "react-icons/bs";
 import { NavLink } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { setSelectedSubject } from "../../../../Redux/Slices/Common/CommonSlice";
-import Icon1 from "../../../../Assets/ClassesAssets/SubClassAssets/SubjectIcons/image1.png";
 import { MdOutlineModeEdit } from "react-icons/md";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { CiUser } from "react-icons/ci";
-import useCreateSubject from "../../../../Hooks/AuthHooks/Staff/Admin/useCreateSubject";
 import DeleteModal from "../../../../Components/Common/DeleteModal";
+import { deleteSubject } from "../../../../Store/Slices/Admin/Class/Subject/subjectThunks";
+import SubjectIcon from "../../../../Assets/ClassesAssets/SubClassAssets/SubjectIcons/image1.png";
+import { setSelectedSubjectName } from "../../../../Store/Slices/Common/User/reducers/userSlice";
 
 const SubjectCard = ({
   data,
@@ -20,28 +20,16 @@ const SubjectCard = ({
   role,
 }) => {
   const dispatch = useDispatch();
-  const { deleteSubject, loading } = useCreateSubject();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleDelete = async () => {
-    try {
-      await deleteSubject(subjectId, Class);
-      setIsModalOpen(false);
-    } catch (error) {
-      console.error("Error deleting subject:", error);
-    }
-  };
-
-  const openModal = () => {
-    setIsModalOpen(true);
-  };
-
-  const closeModal = () => {
+  const handleDelete = () => {
+    dispatch(deleteSubject({ subjectId, classId: Class }));
     setIsModalOpen(false);
   };
 
   return (
     <div
+      onClick={() => dispatch(setSelectedSubjectName(data?.name))}
       className={`relative rounded-xl p-4 shadow-lg ${backgroundColor} transition-transform duration-300 transform hover:scale-105 hover:shadow-2xl group`}
     >
       {role === "admin" && (
@@ -54,14 +42,21 @@ const SubjectCard = ({
           </button>
           <button
             className="bg-white p-1 rounded-full shadow hover:bg-gray-200"
-            disabled={loading}
-            aria-busy={loading ? "true" : "false"}
-            onClick={openModal}
+            onClick={() => setIsModalOpen(true)}
           >
             <RiDeleteBin6Line className="text-red-800 bg-red-50 p-1 text-3xl rounded-full cursor-pointer" />
           </button>
         </div>
       )}
+
+      {/* Modal for Delete Confirmation */}
+      <DeleteModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onConfirm={handleDelete}
+        title={data.name}
+      />
+
       <div className="flex justify-between items-center mb-4">
         <button
           className={`border border-white rounded-full px-4 py-1 ${
@@ -73,12 +68,9 @@ const SubjectCard = ({
           {data.isPublished ? "Published" : "Unpublished"}
         </button>
       </div>
-      <NavLink
-        to={`/class/${Class}/${data._id}/module`}
-        onClick={() => dispatch(setSelectedSubject(data.name))}
-        className="block"
-      >
-        <h2 className="text-xl font-bold capitalize text-white w-[65%] transition-colors duration-300">
+
+      <NavLink to={`/class/${Class}/${data._id}/module`} className="block">
+        <h2 className="text-xl font-bold capitalize text-white transition-colors duration-300">
           {data.name}
         </h2>
         <div className="flex items-center mt-2 text-white">
@@ -93,6 +85,7 @@ const SubjectCard = ({
           </span>
         </div>
       </NavLink>
+
       <div className="flex items-center mt-12">
         {data.teacherImage ? (
           <img
@@ -110,16 +103,11 @@ const SubjectCard = ({
           <p className="text-white text-sm">{data.teacherRole || "Teacher"}</p>
         </div>
       </div>
+
       <img
-        src={data.icon || Icon1}
+        src={SubjectIcon}
         alt="icon"
         className="absolute bottom-6 right-6 h-28 transition-transform duration-300 transform hover:scale-110"
-      />
-      <DeleteModal
-        isOpen={isModalOpen}
-        onClose={closeModal}
-        onConfirm={handleDelete}
-        title={data.name}
       />
     </div>
   );

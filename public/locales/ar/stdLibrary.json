@@ -1,0 +1,20 @@
+{
+    "Library": "مكتبة",
+    "Book Issue": "إصدار الكتاب",
+    "Issue Book": "إصدار الكتاب",
+    "Author": "المؤلف",
+    "Category": "الفئة",
+    "Issue Date": "تاريخ الإصدار",
+    "Return Date": "تاريخ العودة",
+    "Status": "الحالة",
+    "All": "الكل",
+    "Pending": "قيد الانتظار",
+    "Return": "إرجاع",
+    "Unknown Title": "عنوان غير معروف",
+    "Unknown Author": "مؤلف غير معروف",
+    "Unknown Category": "فئة غير معروفة",
+    "No Status": "لا توجد حالة",
+    "Class": "الصف",
+    "Copies": "نسخ",
+    "Available": "متاح"
+}

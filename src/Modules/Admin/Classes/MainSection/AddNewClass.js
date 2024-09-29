@@ -1,45 +1,72 @@
 import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import classIcons from "../../Dashboard/DashboardData/ClassIconData";
 import toast from "react-hot-toast";
-import useCreateClass from "../../../../Hooks/AuthHooks/Staff/Admin/Class/useCreateClass";
+import {
+  createClass,
+  updateClass,
+} from "../../../../Store/Slices/Admin/Class/actions/classThunk";
 
-const AddNewClass = ({ className, isUpdate, classId, onClose }) => {
-  const [activeIconId, setActiveIconId] = useState(null);
-  const [newClassName, setNewClassName] = useState(className);
-  const { createClass, updateClass, loading } = useCreateClass();
+const AddNewClass = ({ classData, isUpdate, onClose }) => {
+  const [activeIconId, setActiveIconId] = useState(null); // Icon state
+  const [newClassName, setNewClassName] = useState(""); // Class name state
 
+  const dispatch = useDispatch();
+  const loading = useSelector((state) => state.admin.class.loading);
+
+  // Preload class details if updating
   useEffect(() => {
-    if (isUpdate && className) {
-      setNewClassName(className);
+    if (isUpdate && classData) {
+      setNewClassName(classData.className); // Preload class name
+      setActiveIconId(classData.classIcons); // Preload class icon
+    } else {
+      // Clear form when not updating
+      setNewClassName("");
+      setActiveIconId(null);
     }
-  }, [isUpdate, className]);
+  }, [isUpdate, classData]);
 
   const handleIconClick = (gradeLevel, id) => {
     setActiveIconId(id);
   };
 
+  const hasChanges = () => {
+    if (!classData) return false;
+    return (
+      newClassName !== classData.className ||
+      activeIconId !== classData.classIcons
+    );
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!newClassName || !activeIconId) {
       toast.error("Please provide a class name and select an icon.");
       return;
     }
 
-    const classData = {
+    // Only dispatch the update if there are changes
+    if (isUpdate && !hasChanges()) {
+      toast("No changes detected.");
+      return;
+    }
+
+    const classDetails = {
       className: newClassName,
       classIcons: activeIconId,
     };
 
     try {
-      console.log("isUpdate--", isUpdate);
       if (isUpdate) {
-        console.log("classId---", classId);
-        updateClass(classData, classId);
+        // Dispatch the updateClass thunk only if there are changes
+        dispatch(
+          updateClass({ classData: classDetails, classId: classData._id })
+        );
         onClose();
-        // toast.success("Class updated successfully!");
-        // Add update class logic here
       } else {
-        createClass(classData);
+        // Dispatch the createClass thunk
+        dispatch(createClass(classDetails));
         // Reset form fields
         setNewClassName("");
         setActiveIconId(null);
@@ -90,7 +117,7 @@ const AddNewClass = ({ className, isUpdate, classId, onClose }) => {
             ))}
           </div>
         </div>
-        <div className=" mb-9">
+        <div className="mb-9">
           <button
             type="submit"
             className="w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600"

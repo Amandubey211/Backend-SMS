@@ -8,7 +8,6 @@ const useMarkAttendance = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const role = useSelector((store) => store.Auth.role);
-  
 
   const markAttendance = useCallback(
     async (attendanceData) => {

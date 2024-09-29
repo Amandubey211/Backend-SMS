@@ -1,10 +1,5 @@
 import React from "react";
-// import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-// import {
-//   faClock,
-//   faTrash,
-//   faCalendarDays,
-// } from "@fortawesome/free-solid-svg-icons";
+
 import { MdCalendarMonth } from "react-icons/md";
 
 const Notice = ({ notice, onToggle, isActive }) => (

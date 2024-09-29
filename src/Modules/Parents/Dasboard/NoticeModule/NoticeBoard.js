@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useCallback } from "react";
 import Notice from "./Notice";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import { message } from "antd";
-import { format } from 'date-fns'; // Import format function from date-fns
-import { baseUrl } from "../../../../config/Common";
-import { FaBell } from "react-icons/fa"; // Importing an icon for the no notices message
-import Spinner from "../../../../Components/Common/Spinner"; // Import Spinner
+import { format } from 'date-fns';
+import { FaBell } from "react-icons/fa";
+import Spinner from "../../../../Components/Common/Spinner";
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchNotices } from '../../../../Store/Slices/Parent/Dashboard/dashboard.action';
 
-// Define the gradient backgrounds
+// Gradient backgrounds for the notices
 const gradientBackgrounds = [
   "linear-gradient(90deg, #FBB778 0%, #F9B279 100%)",
   "linear-gradient(90deg, #FF7AA5 0%, #FF5B92 80%)",
@@ -17,76 +17,84 @@ const gradientBackgrounds = [
 ];
 
 const NoticeBoard = ({ numberOfChildren }) => {
-  const [notices, setNotices] = useState([]);
-  const [loading, setLoading] = useState(true); // Loading state
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  // Get the notices and loading state from Redux
+  const { notices = [], loading = false, error = null } = useSelector((state) => state.Parent.dashboard);
+
+  // Fetch notices on component mount
   useEffect(() => {
-    const fetchNotices = async () => {
-      try {
-        const token = localStorage.getItem("parent:token");
-        const response = await axios.get(`${baseUrl}/admin/all/notices`, {
-          headers: {
-            Authentication: `${token}`, 
-          },
-        });
+    if (!notices.length) {
+      dispatch(fetchNotices()); // Fetch notices using Redux thunk
+    }
+  }, [dispatch, notices]);
 
-        console.log("Fetched Notices:", response.data.notices);
+  // Handle navigate click using useCallback to prevent re-creation on each render
+  const handleNavigate = useCallback(() => {
+    navigate("/parentchildnotice");
+  }, [navigate]);
 
-        const formattedNotices = response.data.notices.map(notice => {
-          let startDate, endDate;
+  // Memoize the formatted notices to avoid recalculations on each render
+  const formattedNotices = useMemo(() => {
+    return notices.map((notice) => {
+      let startDate = "Invalid Date", endDate = "Invalid Date";
 
-          try {
-            startDate = format(new Date(notice.startDate), 'yyyy-MM-dd');
-          } catch (e) {
-            console.error(`Invalid start date value for notice "${notice.title}":`, notice.startDate);
-            startDate = "Invalid Date";
-          }
-
-          try {
-            endDate = format(new Date(notice.endDate), 'yyyy-MM-dd');
-          } catch (e) {
-            console.error(`Invalid end date value for notice "${notice.title}":`, notice.endDate);
-            endDate = "Invalid Date";
-          }
-
-          return {
-            ...notice,
-            startDate,
-            endDate
-          };
-        });
-
-        // Determine the number of notices to show based on the number of children
-        const numberOfNoticesToShow = numberOfChildren > 1 ? 5 : 3;
-
-        // Sort notices by startDate in descending order (most recent first) and slice according to the number of children
-        const latestNotices = formattedNotices
-          .filter(notice => notice.startDate !== "Invalid Date") // Filter out notices with invalid dates
-          .sort((a, b) => new Date(b.startDate) - new Date(a.startDate))
-          .slice(0, numberOfNoticesToShow);
-
-        console.log("Sorted and Filtered Notices:", latestNotices);
-
-        setNotices(latestNotices);
-        setLoading(false); // Set loading to false after data is fetched
-      } catch (error) {
-        console.error("Failed to fetch notices:", error);
-        message.error("Failed to fetch notices");
-        setLoading(false); // Set loading to false even on error
+      if (notice.startDate) {
+        try {
+          startDate = format(new Date(notice.startDate), 'yyyy-MM-dd');
+        } catch (e) {
+          console.error(`Invalid start date value for notice "${notice.title}":`, notice.startDate);
+        }
       }
-    };
 
-    fetchNotices();
-  }, [numberOfChildren]);
+      if (notice.endDate) {
+        try {
+          endDate = format(new Date(notice.endDate), 'yyyy-MM-dd');
+        } catch (e) {
+          console.error(`Invalid end date value for notice "${notice.title}":`, notice.endDate);
+        }
+      }
 
+      return {
+        ...notice,
+        startDate,
+        endDate
+      };
+    });
+  }, [notices]);
+
+  // Get the number of notices to show based on the number of children
+  const numberOfNoticesToShow = useMemo(() => (numberOfChildren > 1 ? 5 : 3), [numberOfChildren]);
+
+  // Memoize latest notices filtering and sorting
+  const latestNotices = useMemo(() => {
+    return formattedNotices
+      .filter((notice) => notice.startDate !== "Invalid Date")
+      .sort((a, b) => new Date(b.startDate) - new Date(a.startDate))
+      .slice(0, numberOfNoticesToShow);
+  }, [formattedNotices, numberOfNoticesToShow]);
+
+  // Utility function to truncate text
+  const truncateText = useCallback((text, maxLength) => {
+    return text && text.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
+  }, []);
+
+  // Loading state
   if (loading) {
-    return <Spinner />; // Show spinner while loading
+    return <Spinner />;
   }
 
-  const truncateText = (text, maxLength) => {
-    return text.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
-  };
+  // Error state handling
+  if (error) {
+    message.error("Failed to fetch notices");
+    return (
+      <div className="flex flex-col items-center justify-center h-full text-center">
+        <FaBell className="text-gray-400 text-6xl mb-4" />
+        <p className="text-gray-600 text-lg">Error loading notices. Please try again later.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="p-2">
@@ -94,27 +102,27 @@ const NoticeBoard = ({ numberOfChildren }) => {
         <h2 className="text-md font-bold text-gray-600">Noticeboard</h2>
         <button
           className="text-transparent bg-clip-text bg-gradient-to-r from-[#C83B62] to-[#7F35CD]"
-          onClick={() => navigate("/parentchildnotice")}
+          onClick={handleNavigate}
         >
           See All
         </button>
       </div>
-      {notices.length === 0 ? (
+      {latestNotices.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-full text-center">
           <FaBell className="text-gray-400 text-6xl mb-4" />
           <p className="text-gray-600 text-lg">No Notices Available</p>
         </div>
       ) : (
-        notices.map((notice, index) => (
+        latestNotices.map((notice, index) => (
           <Notice
             key={index}
-            image={notice.image}
-            title={notice.title}
-            startDate={notice.startDate}
-            endDate={notice.endDate}
-            priority={notice.priority}
-            content={truncateText(notice.description, 50)}
-            backgroundColor={gradientBackgrounds[index % gradientBackgrounds.length]} // Apply dynamic background
+            image={notice.image || ""}
+            title={notice.title || "Untitled"}
+            startDate={notice.startDate || "N/A"}
+            endDate={notice.endDate || "N/A"}
+            priority={notice.priority || "Normal"}
+            content={truncateText(notice.description || "", 50)}
+            backgroundColor={gradientBackgrounds[index % gradientBackgrounds.length]}
           />
         ))
       )}

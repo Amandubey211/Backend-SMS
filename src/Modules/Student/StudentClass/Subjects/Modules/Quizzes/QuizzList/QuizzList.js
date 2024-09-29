@@ -7,7 +7,7 @@ import { useSelector } from "react-redux";
 
 const QuizzList = () => {
   const subjectName = useSelector((store) => store.Common.selectedSubjectName);
-  const className = useSelector((store) => store.Common.selectedClassName);
+  const className = useSelector((store) => store?.Common?.selectedClassName);
 
   useNavHeading(className, subjectName);
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import Calendar from '../../../Components/Parents/Calendar/Calendar';
+import MyChildAttendance from '../../../Components/Parents/ChildAttendance/MyChildAttendance';
 import Layout from "../../../Components/Common/Layout";
 import ParentDashLayout from "../../../Components/Parents/ParentDashLayout";
 
@@ -7,7 +7,7 @@ function ChildrenAttendance() {
   return (
     <Layout title="Parent Attendance">
       <ParentDashLayout>
-        <Calendar />
+        <MyChildAttendance />
       </ParentDashLayout>
     </Layout>
   );

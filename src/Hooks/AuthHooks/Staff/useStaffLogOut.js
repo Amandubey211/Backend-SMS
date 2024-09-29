@@ -1,9 +1,10 @@
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import {
+  setAcademicYear,
   setAuth,
   setRole,
-  setUerDetails,
+  setUserDetails,
 } from "../../../Redux/Slices/Auth/AuthSlice.js";
 import toast from "react-hot-toast";
 import {
@@ -23,13 +24,14 @@ const useStaffLogout = () => {
   const navigate = useNavigate();
 
   const staffLogout = async () => {
-    const roles = ["admin", "teacher", "accountant", "librarian", "peon"];
+    // const roles = ["admin", "teacher", "accountant", "librarian", "peon"];
 
     // Clear local storage and Redux state
     localStorage.clear();
     dispatch(setAuth(false));
     dispatch(setRole(null));
-    dispatch(setUerDetails(null));
+    dispatch(setAcademicYear({}));
+    dispatch(setUserDetails(null));
     dispatch(setSelectedClass(null));
     dispatch(setSelectedSubject(null));
     dispatch(setSelectedModule(null));
