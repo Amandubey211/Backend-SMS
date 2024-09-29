@@ -110,7 +110,7 @@ const ParentEvent = () => {
     const nav = document.querySelector("nav");
     if (nav) {
      // nav.style.opacity = ""; // Set the opacity to 50%
-      nav.style.zIndex = "10";   // Lower the z-index
+      nav.style.zIndex = "-1";   // Lower the z-index
       nav.style.transition = "opacity 0.3s ease"; // Smooth transition effect
     }
   };
