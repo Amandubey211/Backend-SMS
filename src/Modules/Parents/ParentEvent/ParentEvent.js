@@ -11,12 +11,11 @@ import { format, parseISO, isValid } from "date-fns";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
 import useNavHeading from "../../../Hooks/CommonHooks/useNavHeading .js";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchAllEvents } from "../../../Store/Slices/Parent/Events/event.action.js"; 
-
+import { fetchAllEvents } from "../../../Store/Slices/Parent/Events/event.action.js";
 
 const ParentEvent = () => {
   const dispatch = useDispatch();
-  const { events, loading, error } = useSelector((state) => state.Parent.events); // Access events from Redux state
+  const { events, loading } = useSelector((state) => state.Parent.events); // Access events from Redux state
   const [currentDate, setCurrentDate] = useState(new Date());
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
@@ -106,7 +105,28 @@ const ParentEvent = () => {
     setSelectedEvent(event);
     setSidebarContent("viewEvent");
     setSidebarOpen(true);
+  
+    // Apply inline styles to the <nav> to dim it
+    const nav = document.querySelector("nav");
+    if (nav) {
+     // nav.style.opacity = ""; // Set the opacity to 50%
+      nav.style.zIndex = "10";   // Lower the z-index
+      nav.style.transition = "opacity 0.3s ease"; // Smooth transition effect
+    }
   };
+  
+  const closeSidebar = () => {
+    setSidebarOpen(false);
+  
+    // Remove inline styles from the <nav> when closing the sidebar
+    const nav = document.querySelector("nav");
+    if (nav) {
+      nav.style.opacity = ""; // Reset opacity to default
+      nav.style.zIndex = "";  // Reset z-index to default
+      nav.style.transition = ""; // Reset transition to default
+    }
+  };
+  
 
   const renderSidebarContent = () => {
     switch (sidebarContent) {
@@ -170,8 +190,7 @@ const ParentEvent = () => {
                       />
                     ))
                   )}
-                  {(currentPage + 1) * itemsPerPage <
-                    filteredEvents.length && (
+                  {(currentPage + 1) * itemsPerPage < filteredEvents.length && (
                     <div
                       className="p-1 rounded-full text-purple-500 bg-white border-2 cursor-pointer absolute right-0 top-1/2 transform -translate-y-1/2"
                       onClick={() => setCurrentPage((prev) => prev + 1)}
@@ -272,7 +291,7 @@ const ParentEvent = () => {
                 </div>
                 <Sidebar
                   isOpen={isSidebarOpen}
-                  onClose={() => setSidebarOpen(false)}
+                  onClose={closeSidebar}
                   title="View Event"
                   event={selectedEvent}
                 >
@@ -288,4 +307,3 @@ const ParentEvent = () => {
 };
 
 export default ParentEvent;
-

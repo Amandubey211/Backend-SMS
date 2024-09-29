@@ -122,3 +122,60 @@ export const fetchGrades = createAsyncThunk(
     }
   }
 );
+
+
+
+
+// Fetch modules for a specific subject
+export const fetchModules = createAsyncThunk(
+  "children/fetchModules",
+  async ({ studentId, subjectId, presentClassId }, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem("parent:token");
+      if (!token) {
+        toast.error("Authentication token not found");
+        return rejectWithValue("Authentication token not found");
+      }
+
+      const response = await axios.get(
+        `${baseUrl}/admin/parent/classes/${presentClassId}/modules/${subjectId}/studentId/${studentId}`,
+        {
+          headers: { Authentication: token },
+        }
+      );
+      return response.data.data.modules;
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message || "Failed to fetch modules";
+      toast.error(errorMessage);
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
+// Fetch subjects for a student
+export const fetchSubjects = createAsyncThunk(
+  "children/fetchSubjects",
+  async (studentId, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem("parent:token");
+      if (!token) {
+        toast.error("Authentication token not found");
+        return rejectWithValue("Authentication token not found");
+      }
+
+      const response = await axios.get(
+        `${baseUrl}/api/studentDashboard/subjects/${studentId}`,
+        {
+          headers: { Authentication: token },
+        }
+      );
+      return response.data.subjects;
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message || "Failed to fetch subjects";
+      toast.error(errorMessage);
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
