@@ -37,10 +37,10 @@ const ProfileCard = ({ profile, onClick }) => {
 
         {/* Additional Information */}
         <div className="p-4 text-center">
-          <p className="text-gray-400 text-sm mb-1 font-semibold">
+          {/* <p className="text-gray-400 text-sm mb-1 font-semibold">
             <span>ID: </span>
             {profile?.admissionNumber || "N/A"}
-          </p>
+          </p> */}
           <div className="text-gray-600 font-semibold text-md">
             <span>Group: {firstGroup || "N/A"}
             </span>

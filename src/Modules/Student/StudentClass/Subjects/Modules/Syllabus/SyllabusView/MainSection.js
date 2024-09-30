@@ -3,61 +3,55 @@ import React, { useEffect } from "react";
 import SubjectSideBar from "../../../Component/SubjectSideBar";
 import SyllabusHeader from "./Components/SyllabusHeader";
 import SyllabusSection from "./Components/SyllabusSection";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { AiOutlineFileAdd } from "react-icons/ai";
 import useFetchSyllabus from "../../../../../../../Hooks/AuthHooks/Staff/Admin/Syllabus/useFetchSyllabus";
 import Spinner from "../../../../../../../Components/Common/Spinner";
+import { stdSyllabus } from "../../../../../../../Store/Slices/Student/MyClass/Class/Subjects/Syllabus/syllabus.action";
+import { GoAlertFill } from "react-icons/go";
+import NoDataFound from "../../../../../../../Components/Common/NoDataFound";
+import { useTranslation } from "react-i18next";
 
 const MainSection = () => {
-  const { cid } = useParams();
-  const selectedSubjectId = useSelector(
-    (state) => state.Common.selectedSubject
-  );
-  const { loading, error, syllabi, fetchSyllabus } = useFetchSyllabus();
+  const { loading, error, syllabusData } = useSelector((store) => store?.student?.studentSyllabus);
+  const dispatch = useDispatch();
+  const { cid, sid } = useParams();
+ 
 
+  console.log("use param in syllabus:===>",cid,sid)
   useEffect(() => {
-    if (selectedSubjectId) {
-      fetchSyllabus(selectedSubjectId, cid);
-    }
-  }, [selectedSubjectId, cid, fetchSyllabus]);
-
-  let content;
-
-  if (loading) {
-    content = (
-      <div className="flex flex-col items-center justify-center h-full">
-        <Spinner />
-      </div>
-    );
-  } else if (error) {
-    content = (
-      <div className="flex flex-col items-center justify-center h-full">
-        <p className="text-red-500">Error: {error}</p>
-      </div>
-    );
-  } else if (!syllabi.length) {
-    content = (
-      <div className="flex flex-col items-center justify-center h-full">
-        <AiOutlineFileAdd size={64} className="text-gray-500" />
-        <p className="text-gray-500 mt-4">No syllabus has been created yet.</p>
-      </div>
-    );
-  } else {
-    content = (
-      <div>
-        <SyllabusHeader />
-        {syllabi.map((syllabusItem) => (
-          <SyllabusSection key={syllabusItem._id} syllabus={syllabusItem} />
-        ))}
-      </div>
-    );
-  }
+    dispatch(stdSyllabus({ classId: cid, subjectId: sid }));
+  }, [dispatch,cid,sid]);
 
   return (
     <div className="flex">
       <SubjectSideBar />
-      <div className="border-l w-full p-4">{content}</div>
+      <div className="w-full border-l pt-2">
+        <SyllabusHeader />
+        <div className="w-full p-4">
+          {loading ? (
+            <div className="w-full flex flex-col items-center justify-center py-20">
+              <Spinner />
+            </div>
+          ) : error ? (
+            <div className="flex flex-col items-center justify-center py-20">
+              <GoAlertFill className="inline-block w-12 h-12 mb-3" />
+              <p className="text-lg font-semibold">{error}</p>
+            </div>
+          ) : syllabusData?.length > 0 ? (
+            <div>
+              {syllabusData?.map((syllabusItem) => (
+                <SyllabusSection key={syllabusItem?._id} syllabus={syllabusItem} />
+              ))}
+            </div>
+          ) : (
+            <div className="w-full flex flex-col items-center justify-center py-20">
+              <NoDataFound title="Syllabus" />
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 };

@@ -15,7 +15,7 @@ i18n
       }
     },
     fallbackLng: "en", // Fallback language if detection fails
-    ns: ['date','month','language','setting','stdFinance','stdLibrary','stdNoticeboard','stdEvents'], // Specify your namespace
+    ns: ['date','month','language','setting','stdFinance','stdLibrary','stdNoticeboard','stdEvents','stdSyllabus'], // Specify your namespace
     defaultNS: 'language', // Set default namespace
     detection: {
       // Language detection options
