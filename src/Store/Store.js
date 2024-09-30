@@ -17,13 +17,15 @@ import classStudentReducer from "./Slices/Admin/Class/Students/studentSlice";
 import attendanceReducer from "./Slices/Admin/Class/Attendence/attendanceSlice";
 import verificationReducer from "./Slices/Admin/Verification/VerificationSlice";
 import adminLibraryReducer from "./Slices/Admin/Library/LibrarySlice";
-import adminEventReducer from "./Slices/Admin/Events/eventSlice";
+import adminEventReducer from "./Slices/Admin/NoticeBoard/Events/eventSlice";
+import adminNoticeReducer from "./Slices/Admin/NoticeBoard/Notice/noticeSlice";
 // student
 import studentFinanceReducer from "./Slices/Student/Finance/financeSlice";
 import studentLibraryBooksReducer from "./Slices/Student/Library/libararySlice";
 import studentIssueBooksReducer from "./Slices/Student/Library/bookIssuesSlice";
 import studentAnnouncementReducer from "../Store/Slices/Student/Noticeboard/noticeSlice";
 import studentEventReducer from "../Store/Slices/Student/Noticeboard/eventsSlice";
+
 import studentClassReducer from '../Store/Slices/Student/MyClass/Class/classSlice';
 import studentClassTeacherReducer from '../Store/Slices/Student/MyClass/Class/classTeacher/classTeacherSlice';
 import studentClassmateReducer from '../Store/Slices/Student/MyClass/Class/classMates/classmateSlice';
@@ -33,15 +35,17 @@ import studentModuleReducer from '../Store/Slices/Student/MyClass/Class/Subjects
 import studentSyllabusReducer from '../Store/Slices/Student/MyClass/Class/Subjects/Syllabus/syllabusSlice'
 import studentPagesReducer from '../Store/Slices/Student/MyClass/Class/Subjects/Pages/pagesSlice';
 
+
 // parent
-import dashboardReducer from '../Store/Slices/Parent/Dashboard/dashboardSlice';
-import financeReducer from '../Store/Slices/Parent/Finance/financeSlice';
-import noticeReducer from '../Store/Slices/Parent/NoticeBoard/noticeSlice';
-import childrenReducer from '../Store/Slices/Parent/Children/childrenSlice';
-import libraryReducer from '../Store/Slices/Parent/Library/librarySlices';
+import dashboardReducer from "../Store/Slices/Parent/Dashboard/dashboardSlice";
+import financeReducer from "../Store/Slices/Parent/Finance/financeSlice";
+import noticeReducer from "../Store/Slices/Parent/NoticeBoard/noticeSlice";
+import childrenReducer from "../Store/Slices/Parent/Children/childrenSlice";
+import libraryReducer from "../Store/Slices/Parent/Library/librarySlices";
 import eventReducer from "../Store/Slices/Parent/Events/eventSlice";
 
 
+// Persist configuration for the Auth slice
 
 const authPersistConfig = {
   key: "auth",
@@ -92,6 +96,7 @@ const AdminReducer = combineReducers({
   verification: verificationReducer,
   library: adminLibraryReducer,
   events: adminEventReducer,
+  notice: adminNoticeReducer,
 });
 
 const studentReducer = combineReducers({
@@ -108,8 +113,8 @@ const studentReducer = combineReducers({
   studentModule: studentModuleReducer,
   studentSyllabus: studentSyllabusReducer,
   studentPages: studentPagesReducer,
-});
 
+});
 
 const ParentReducer = combineReducers({
   dashboard: dashboardReducer,
@@ -117,9 +122,8 @@ const ParentReducer = combineReducers({
   children: childrenReducer,
   notice: noticeReducer,
   library: libraryReducer,
-  events: eventReducer
+  events: eventReducer,
 });
-
 
 // Create the store
 const store = configureStore({
@@ -134,7 +138,7 @@ const store = configureStore({
     // studentIssueBooks: studentIssueBooksReducer,
 
     student: studentReducer,
-    Parent: ParentReducer
+    Parent: ParentReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

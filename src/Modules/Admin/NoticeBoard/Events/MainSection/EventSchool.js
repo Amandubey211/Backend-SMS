@@ -6,13 +6,13 @@ import {
   updateEventThunk,
   deleteEventThunk,
   fetchEventsThunk,
-} from "../../../../../Store/Slices/Admin/Events/eventThunks";
+} from "../../../../../Store/Slices/Admin/NoticeBoard/Events/eventThunks";
 import {
   setSelectedEvent,
   resetSelectedEvent,
   setSidebarContent,
   resetSidebarContent,
-} from "../../../../../Store/Slices/Admin/Events/eventSlice";
+} from "../../../../../Store/Slices/Admin/NoticeBoard/Events/eventSlice";
 import { format, isValid } from "date-fns";
 import toast from "react-hot-toast";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
@@ -24,6 +24,7 @@ import Sidebar from "../../../../../Components/Common/Sidebar";
 import AddEvent from "../subComponents/AddEvent";
 import UpdateEvent from "../subComponents/UpdateEvent";
 import ViewEvent from "../subComponents/ViewEvent";
+import useNavHeading from "../../../../../Hooks/CommonHooks/useNavHeading ";
 
 const EventScheduler = () => {
   const [currentPage, setCurrentPage] = useState(0);
@@ -48,6 +49,7 @@ const EventScheduler = () => {
     dispatch(resetSelectedEvent());
     dispatch(resetSidebarContent());
   };
+  useNavHeading(role, "Events");
 
   const handleSaveEvent = async (eventData) => {
     try {
@@ -64,19 +66,55 @@ const EventScheduler = () => {
     }
   };
 
-  const handleDeleteEvent = async () => {
-    try {
-      await dispatch(deleteEventThunk(selectedEvent._id));
-      toast.success("Event deleted successfully!");
-      handleSidebarClose();
-    } catch (error) {
-      toast.error("Failed to delete event");
-    }
-  };
+  // const handleDeleteEvent = async () => {
+  //   try {
+  //     await dispatch(deleteEventThunk(selectedEvent._id));
+  //     toast.success("Event deleted successfully!");
+  //     handleSidebarClose();
+  //   } catch (error) {
+  //     toast.error("Failed to delete event");
+  //   }
+  // };
 
   const handleEventClick = (event) => {
     dispatch(setSelectedEvent(event));
     dispatch(setSidebarContent("viewEvent"));
+  };
+
+  // Predefined background colors for events
+  const colors = [
+    "bg-blue-200",
+    "bg-green-200",
+    "bg-pink-200",
+    "bg-purple-200",
+    "bg-yellow-200",
+  ];
+
+  // Custom date cell render for the calendar
+  const handleDateCellRender = (value) => {
+    const formattedDate = format(value.toDate(), "yyyy-MM-dd");
+    const dayEvents = events.filter((event) => {
+      const eventDate = new Date(event.date);
+      return (
+        isValid(eventDate) && format(eventDate, "yyyy-MM-dd") === formattedDate
+      );
+    });
+
+    return (
+      <ul className="events space-y-1">
+        {dayEvents.map((event, index) => (
+          <li
+            key={event._id}
+            className={`event-item cursor-pointer ${
+              colors[index % colors.length]
+            } p-1 rounded text-sm`}
+            onClick={() => handleEventClick(event)} // Handle each individual event click
+          >
+            {event.title}
+          </li>
+        ))}
+      </ul>
+    );
   };
 
   const sidebarTitle =
@@ -142,26 +180,85 @@ const EventScheduler = () => {
 
           {/* Calendar Date Render */}
           <Calendar
-            dateCellRender={(value) => {
-              const formattedDate = format(value.toDate(), "yyyy-MM-dd");
-              const dayEvents = events.filter((event) => {
-                const eventDate = new Date(event.startDate);
-                return (
-                  isValid(eventDate) &&
-                  format(eventDate, "yyyy-MM-dd") === formattedDate
+            dateCellRender={handleDateCellRender}
+            headerRender={({ value, type, onChange, onTypeChange }) => {
+              const start = 0;
+              const end = 12;
+              const monthOptions = [];
+
+              const localeData = value.localeData();
+              const months = localeData.monthsShort();
+
+              for (let index = start; index < end; index++) {
+                monthOptions.push(
+                  <option key={index} value={index}>
+                    {months[index]}
+                  </option>
                 );
-              });
+              }
+
+              const year = value.year();
+              const month = value.month();
+              const yearOptions = [];
+              for (let i = year - 10; i < year + 10; i++) {
+                yearOptions.push(
+                  <option key={i} value={i}>
+                    {i}
+                  </option>
+                );
+              }
 
               return (
-                <ul className="events space-y-1">
-                  {dayEvents.map((event) => (
-                    <li key={event._id} className="event-item">
-                      {event.title}
-                    </li>
-                  ))}
-                </ul>
+                <div className="flex items-center space-x-2 justify-end mt-2 pt-2 mb-4">
+                  <select
+                    className="border rounded px-2 py-1"
+                    value={year}
+                    onChange={(event) => {
+                      const newYear = parseInt(event.target.value, 10);
+                      const now = value.clone().year(newYear);
+                      onChange(now);
+                    }}
+                  >
+                    {yearOptions}
+                  </select>
+                  <select
+                    className="border rounded px-2 py-1"
+                    value={month}
+                    onChange={(event) => {
+                      const newMonth = parseInt(event.target.value, 10);
+                      const now = value.clone().month(newMonth);
+                      onChange(now);
+                    }}
+                  >
+                    {monthOptions}
+                  </select>
+                  <div className="flex space-x-2">
+                    <button
+                      className={`border rounded px-2 py-1 ${
+                        type === "month"
+                          ? "bg-gradient-to-r from-pink-500 to-purple-500 text-white"
+                          : ""
+                      }`}
+                      onClick={() => onTypeChange("month")}
+                    >
+                      Month
+                    </button>
+                    <button
+                      className={`border rounded px-2 py-1 ${
+                        type === "year"
+                          ? "bg-gradient-to-r from-pink-500 to-purple-500 text-white"
+                          : ""
+                      }`}
+                      onClick={() => onTypeChange("year")}
+                    >
+                      Year
+                    </button>
+                  </div>
+                </div>
               );
             }}
+            // Customize week day display
+            className="custom-calendar"
           />
 
           {/* Sidebar for Event Actions */}

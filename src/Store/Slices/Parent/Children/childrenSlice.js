@@ -1,17 +1,25 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchChildren, fetchAttendance, fetchTeachers, fetchGrades } from './children.action';
+import {
+  fetchChildren,
+  fetchAttendance,
+  fetchTeachers,
+  fetchGrades,
+  fetchModules,
+  fetchSubjects,
+} from "./children.action";
 
 const initialState = {
   children: [],
-  grades: {},  // Object to store grades by subjectId
+  subjects: [],
+  modules: [],
+  grades: {},
   attendance: [],
-  teachers: [],
   loading: false,
   error: null,
 };
 
 const childrenSlice = createSlice({
-  name: 'children',
+  name: "children",
   initialState,
   reducers: {},
   extraReducers: (builder) => {
@@ -66,9 +74,37 @@ const childrenSlice = createSlice({
       .addCase(fetchGrades.fulfilled, (state, action) => {
         state.loading = false;
         const { subjectId } = action.meta.arg;
-        state.grades[subjectId] = action.payload;  // Store grades by subjectId
+        state.grades[subjectId] = action.payload;
       })
       .addCase(fetchGrades.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      // Handle fetching modules
+      .addCase(fetchModules.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchModules.fulfilled, (state, action) => {
+        state.loading = false;
+        state.modules = action.payload;
+      })
+      .addCase(fetchModules.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      // Handle fetching subjects
+      .addCase(fetchSubjects.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchSubjects.fulfilled, (state, action) => {
+        state.loading = false;
+        state.subjects = action.payload;
+      })
+      .addCase(fetchSubjects.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

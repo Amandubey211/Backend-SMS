@@ -1,27 +1,36 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { FaExclamationTriangle } from "react-icons/fa";
+import { FaExclamationCircle } from "react-icons/fa";
 
 const Error = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="h-screen w-screen flex flex-col items-center justify-center bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500">
-      <div className="text-white flex flex-col justify-center items-center ">
-        <FaExclamationTriangle className="text-9xl  mb-3" />
-        <h1 className="text-9xl font-extrabold animate-pulse">404</h1>
-        <p className="text-2xl mt-4 animate-fade-in-up">Page Not Found</p>
-        <p className="text-lg mt-2 animate-fade-in-up delay-1s">
-          The page you are looking for might have been removed, had its name
-          changed, or is temporarily unavailable.
-        </p>
+    <div className="h-screen w-screen flex items-center justify-center bg-white">
+      <div className="flex items-center space-x-8">
+        {/* Left side: Icon and button */}
+        <div className="flex flex-col items-center animate-fade-in-left">
+          <FaExclamationCircle className="text-6xl text-gray-500 mb-4 animate-bounce-slow" />
+          <button
+            className="px-6 py-2 bg-red-500 text-white rounded-md font-medium shadow-md hover:bg-red-600 transition-transform transform hover:scale-105 focus:outline-none animate-pulse"
+            onClick={() => navigate(-1)}
+          >
+            Go Back
+          </button>
+        </div>
+        {/* Separator */}
+        <div className="border-l-2 border-gray-400 h-24 animate-fade-in"></div>{" "}
+        {/* Gray separator */}
+        {/* Right side: 404 and message */}
+        <div className="flex flex-col items-start animate-fade-in-right">
+          <h1 className="text-4xl font-bold text-gray-800">404</h1>
+          <p className="text-xl text-gray-600">Page Not Found</p>
+          <p className="text-md text-gray-500 max-w-md mt-2">
+            Sorry, the page you are looking for might have been removed or is
+            temporarily unavailable.
+          </p>
+        </div>
       </div>
-      <button
-        className="mt-10 px-6 py-3 bg-white text-purple-700 font-semibold rounded-md shadow-lg hover:bg-purple-700 hover:text-white hover:shadow-xl transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-purple-300"
-        onClick={() => navigate(-1)}
-      >
-        Go Back
-      </button>
     </div>
   );
 };

@@ -1,9 +1,9 @@
 // src/Store/Slices/Admin/Library/LibraryThunks.js
-
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { baseUrl } from "../../../../config/Common";
 import toast from "react-hot-toast";
+import { toggleSidebar } from "./LibrarySlice";
 
 // Fetch Books Thunk
 export const fetchBooksThunk = createAsyncThunk(
@@ -18,7 +18,7 @@ export const fetchBooksThunk = createAsyncThunk(
       });
       return response.data.books;
     } catch (error) {
-      toast.error("Failed to fetch books.");
+      // toast.error("Failed to fetch books.");
       return rejectWithValue(error.response?.data || error.message);
     }
   }
@@ -27,7 +27,7 @@ export const fetchBooksThunk = createAsyncThunk(
 // Add Book Thunk
 export const addBookThunk = createAsyncThunk(
   "library/addBook",
-  async (bookData, { rejectWithValue, getState }) => {
+  async (bookData, { rejectWithValue, getState, dispatch }) => {
     const { common } = getState();
     const token = common.auth.token;
 
@@ -36,6 +36,8 @@ export const addBookThunk = createAsyncThunk(
         headers: { Authentication: `Bearer ${token}` },
       });
       toast.success("Book added successfully!");
+      dispatch(toggleSidebar());
+      dispatch(fetchBooksThunk());
       return response.data.book;
     } catch (error) {
       toast.error("Failed to add book.");
@@ -67,7 +69,7 @@ export const deleteBookThunk = createAsyncThunk(
 // Update Book Thunk
 export const updateBookThunk = createAsyncThunk(
   "library/updateBook",
-  async ({ bookId, formData }, { rejectWithValue, getState }) => {
+  async ({ bookId, formData }, { rejectWithValue, getState, dispatch }) => {
     const { common } = getState();
     const token = common.auth.token;
 
@@ -80,6 +82,7 @@ export const updateBookThunk = createAsyncThunk(
         }
       );
       toast.success("Book updated successfully!");
+      dispatch(fetchBooksThunk());
       return response.data.book;
     } catch (error) {
       toast.error("Failed to update book.");
@@ -92,26 +95,16 @@ export const updateBookThunk = createAsyncThunk(
 export const fetchBookIssuesThunk = createAsyncThunk(
   "library/fetchBookIssues",
   async (_, { rejectWithValue, getState }) => {
-    const { admin } = getState(); // get the current state from Redux
-    const token = admin.common.auth.token;
-
-    // Check if book issues are already fetched
-    if (admin.library.bookIssues.length > 0) {
-      return admin.library.bookIssues; // Return existing book issues to prevent refetching
-    }
+    const { common } = getState();
+    const token = common.auth.token;
 
     try {
       const response = await axios.get(`${baseUrl}/admin/all/bookIssue`, {
         headers: { Authentication: `Bearer ${token}` },
       });
-
-      if (!response.data.books || response.data.books.length === 0) {
-        return rejectWithValue("No book issues found.");
-      }
-
-      return response.data.books; // return book issues if found
+      return response.data.books; // Adjusted field name
     } catch (error) {
-      toast.error("Failed to fetch book issues.");
+      // toast.error("Failed to fetch book issues.");
       return rejectWithValue(error.response?.data || error.message);
     }
   }
@@ -120,12 +113,13 @@ export const fetchBookIssuesThunk = createAsyncThunk(
 // Issue Book Thunk
 export const issueBookThunk = createAsyncThunk(
   "library/issueBook",
-  async (issueData, { rejectWithValue, getState }) => {
+  async (issueData, { rejectWithValue, getState, dispatch }) => {
     const { common } = getState();
     const token = common.auth.token;
 
     try {
       const { id, ...bookIssueData } = issueData;
+
       const url = id
         ? `${baseUrl}/admin/update/bookIssue/${id}`
         : `${baseUrl}/admin/issue_book`;
@@ -142,7 +136,14 @@ export const issueBookThunk = createAsyncThunk(
         },
       });
 
-      toast.success("Book issue processed successfully!");
+      dispatch(fetchBookIssuesThunk());
+
+      toast.success(
+        id
+          ? "Book issue updated successfully!"
+          : "Book issue created successfully!"
+      );
+
       return response.data.book;
     } catch (error) {
       toast.error("Failed to process book issue.");

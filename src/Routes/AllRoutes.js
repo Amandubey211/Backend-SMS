@@ -217,27 +217,38 @@ const routes = [
   // Parent Routes
   {
     path: "/parent_dash",
-    element: <ParentDash />,
+    element: <ProtectRoute Component={ParentDash} allowedRoles={["parent"]} />,
     errorElement: <Error />,
   },
+  
   {
     path: "/children",
-    element: <MyChildren />,
+    element: <ProtectRoute Component={MyChildren} allowedRoles={["parent"]} />, // Protected route for children
     errorElement: <Error />,
   },
   {
     path: "/attendance",
-    element: <Calendar />,
+    element: <ProtectRoute Component={Calendar} allowedRoles={["parent"]} />, // Protected attendance route
     errorElement: <Error />,
   },
   {
     path: "/parentfinance",
-    element: <ParentFinance />,
+    element: <ProtectRoute Component={ParentFinance} allowedRoles={["parent"]} />, // Protected finance route
     errorElement: <Error />,
   },
   {
     path: "/childgrade/:studentId",
-    element: <ChildGrade />,
+    element: <ProtectRoute Component={ChildGrade} allowedRoles={["parent"]} />, // Protect this as well
+    errorElement: <Error />,
+  },
+  {
+    path: "/checkprogress/:studentId",
+    element: <ProtectRoute Component={CheckProgress} allowedRoles={["parent"]} />, // Protected check progress route
+    errorElement: <Error />,
+  },
+  {
+    path: "/users/parent/profile",
+    element: <ProtectRoute Component={ParentProfile} allowedRoles={["parent"]} />, // Protect the profile route
     errorElement: <Error />,
   },
   {
