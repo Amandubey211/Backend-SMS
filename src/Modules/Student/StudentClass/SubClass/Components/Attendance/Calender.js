@@ -19,7 +19,7 @@ const getStatusIcon = (status) => {
   }
 };
 
-const CalendarHeader = ({ attendanceData, onPanelChange }) => {
+const CalendarHeader = ({ attendanceData, onPanelChange, currentDate }) => {
   const { t } = useTranslation();
   const StartAcademicYear = 2015;
   const lastAcademicYear = 2050;
@@ -97,7 +97,7 @@ const CalendarHeader = ({ attendanceData, onPanelChange }) => {
   };
 
 
-  return <Calendar dateCellRender={dateCellRender} onPanelChange={onPanelChange} headerRender={headerRender} />;
+  return <Calendar dateCellRender={dateCellRender} onPanelChange={()=>onPanelChange(currentDate)} headerRender={headerRender} />;
 };
 
 export default CalendarHeader;

@@ -40,6 +40,7 @@ const AttendanceMain = () => {
               <CalendarHeader
                 attendanceData={attendanceData}
                 onPanelChange={onPanelChange}
+                currentDate={currentDate}
               />
               }
         </div>

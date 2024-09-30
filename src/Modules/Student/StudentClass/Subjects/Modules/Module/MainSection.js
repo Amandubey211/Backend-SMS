@@ -3,25 +3,28 @@ import SubjectSideBar from "../../Component/SubjectSideBar";
 import Chapter from "./Components/Chapter";
 import ModuleCard from "./Components/ModuleCard";
 import { useSelector, useDispatch } from "react-redux";
-import { setSelectedModule } from "../../../../../../Redux/Slices/Common/CommonSlice";
 import useGetModulesForStudent from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useGetModulesForStudent";
 import NoDataFound from "../../../../../../Components/Common/NoDataFound";
 import Spinner from "../../../../../../Components/Common/Spinner";
+import { stdModule } from "../../../../../../Store/Slices/Student/MyClass/Class/Subjects/Modules/module.action";
+import { useParams } from "react-router-dom";
+import { setExpandedChapters, setSelectedModule } from "../../../../../../Store/Slices/Student/MyClass/Class/Subjects/Modules/moduleSlice";
 
 const MainSection = () => {
-  const [expandedChapters, setExpandedChapters] = useState([]);
+  const { loading, error, modulesData,selectedModule,subjectName,expandedChapters } = useSelector((store) => store?.student?.studentModule);
   const dispatch = useDispatch();
-  const selectedModule = useSelector((state) => state.Common.selectedModule);
-  const { error, fetchModules, loading, modulesData } =
-    useGetModulesForStudent();
-
+  const { cid, sid } = useParams();
+  // const { error, fetchModules, loading, modulesData } =
+  //   useGetModulesForStudent();
+  // const [expandedChapters, setExpandedChapters] = useState([]);
   useEffect(() => {
-    fetchModules();
-  }, [fetchModules]);
+    dispatch(stdModule({ cid, sid }));
+    // fetchModules();
+  }, [dispatch]);
 
   // Select the first module when modules are fetched
   useEffect(() => {
-    if (modulesData?.modules?.length) {
+    if (modulesData?.modules?.length>0) {
       const firstModule = modulesData.modules[0];
       dispatch(
         setSelectedModule({
@@ -31,9 +34,13 @@ const MainSection = () => {
         })
       );
     } else {
-      dispatch(setSelectedModule({}));
+      dispatch(setSelectedModule({
+        moduleId: null,
+        name: null,
+        chapters: [],
+      }));
     }
-  }, [dispatch, modulesData]);
+  }, [dispatch]);
 
   const toggleChapter = (chapterId) => {
     setExpandedChapters((prev) =>
@@ -46,9 +53,9 @@ const MainSection = () => {
   const selectModule = (module) => {
     dispatch(
       setSelectedModule({
-        moduleId: module._id,
-        name: module.moduleName,
-        chapters: module.chapters,
+        moduleId: module?._id,
+        name: module?.moduleName,
+        chapters: module?.chapters,
       })
     );
     setExpandedChapters([]);

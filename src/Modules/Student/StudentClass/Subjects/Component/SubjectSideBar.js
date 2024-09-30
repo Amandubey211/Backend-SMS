@@ -1,11 +1,15 @@
 import React from "react";
+import { useSelector } from "react-redux";
 import { NavLink, useLocation, useParams } from "react-router-dom";
 
 const SubjectSideBar = () => {
   const location = useLocation();
   const { cid, sid } = useParams();
+  // const { classId } = useSelector((store) => store?.student?.studentClass?.classData);
+  // const { subjectId } = useSelector((store) => store?.student?.studentSubject?.subject);
 
-  const formattedSid = sid.toLowerCase().replace(/ /g, "_");
+
+  // const formattedSid = sid?.toLowerCase().replace(/ /g, "_");
 
   const menuItems = [
     { name: "Module", path: "module" },
@@ -19,14 +23,14 @@ const SubjectSideBar = () => {
   ];
 
   const getBasePath = (item) =>
-    `/student_class/${cid}/${formattedSid}/${item.path}`;
+    `/student_class/${cid}/${sid}/${item?.path}`;
 
   return (
     <div className="flex flex-col min-h-screen h-full w-[18%] space-y-4 p-4">
       {menuItems.map((item, index) => {
         const basePath = getBasePath(item);
         const isActive = location.pathname.includes(
-          `/student_class/${cid}/${formattedSid}/${item.path}`
+          `/student_class/${cid}/${sid}/${item.path}`
         );
 
         return (
