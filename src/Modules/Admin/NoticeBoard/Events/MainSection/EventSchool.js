@@ -24,6 +24,7 @@ import Sidebar from "../../../../../Components/Common/Sidebar";
 import AddEvent from "../subComponents/AddEvent";
 import UpdateEvent from "../subComponents/UpdateEvent";
 import ViewEvent from "../subComponents/ViewEvent";
+import useNavHeading from "../../../../../Hooks/CommonHooks/useNavHeading ";
 
 const EventScheduler = () => {
   const [currentPage, setCurrentPage] = useState(0);
@@ -48,6 +49,7 @@ const EventScheduler = () => {
     dispatch(resetSelectedEvent());
     dispatch(resetSidebarContent());
   };
+  useNavHeading(role, "Events");
 
   const handleSaveEvent = async (eventData) => {
     try {
@@ -64,15 +66,15 @@ const EventScheduler = () => {
     }
   };
 
-  const handleDeleteEvent = async () => {
-    try {
-      await dispatch(deleteEventThunk(selectedEvent._id));
-      toast.success("Event deleted successfully!");
-      handleSidebarClose();
-    } catch (error) {
-      toast.error("Failed to delete event");
-    }
-  };
+  // const handleDeleteEvent = async () => {
+  //   try {
+  //     await dispatch(deleteEventThunk(selectedEvent._id));
+  //     toast.success("Event deleted successfully!");
+  //     handleSidebarClose();
+  //   } catch (error) {
+  //     toast.error("Failed to delete event");
+  //   }
+  // };
 
   const handleEventClick = (event) => {
     dispatch(setSelectedEvent(event));

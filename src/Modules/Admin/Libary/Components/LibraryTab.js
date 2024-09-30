@@ -1,4 +1,3 @@
-// src/Modules/Admin/Libary/MainSection/LibraryTab.js
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import BookCard from "../Components/BookCard";
@@ -13,8 +12,10 @@ const LibraryTab = ({ handleSidebarOpen }) => {
   // Get unique class levels and categories for book filtering
   const classLevels = [
     ...new Set(books.map((book) => book.classId?.className)),
-  ];
-  const categories = [...new Set(books.map((book) => book.category))];
+  ].filter(Boolean); // Remove empty class names
+  const categories = [...new Set(books.map((book) => book.category))].filter(
+    Boolean
+  ); // Remove empty categories
 
   // Filter books based on selected filters
   const filteredBooks = books.filter((book) => {
@@ -83,7 +84,9 @@ const LibraryTab = ({ handleSidebarOpen }) => {
         {filteredBooks.length > 0 ? (
           filteredBooks.map((book) => <BookCard key={book._id} book={book} />)
         ) : (
-          <NoDataFound message="No Books Found" />
+          <div className="h-96 w-full  flex justify-center items-center">
+            <NoDataFound message="No Books Found" />
+          </div>
         )}
       </div>
     </>
