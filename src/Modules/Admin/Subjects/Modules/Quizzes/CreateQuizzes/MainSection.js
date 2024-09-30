@@ -18,7 +18,7 @@ import QuestionForm from "./Components/QuestionForm";
 
 const initialFormState = {
   points: "",
-  quizType: "",
+  quizType: "Practice",
   submissionFormat: "",
   allowedAttempts: true,
   allowNumberOfAttempts: 1,

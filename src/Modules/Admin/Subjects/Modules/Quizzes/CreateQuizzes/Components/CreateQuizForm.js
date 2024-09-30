@@ -32,10 +32,10 @@ const CreateQuizForm = ({
   const moduleList = useSelector((store) => store.Subject.modules);
   useEffect(() => {
     // Fetch modules if not available in the Redux store
-    if (!moduleList || moduleList.length === 0) {
-      fetchModules();
-    }
-  }, [moduleList, fetchModules]);
+    // if (!moduleList || moduleList.length === 0) {
+    fetchModules();
+    // }
+  }, []);
 
   useEffect(() => {
     if (moduleId) {

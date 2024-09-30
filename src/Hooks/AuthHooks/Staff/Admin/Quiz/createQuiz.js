@@ -15,7 +15,7 @@ const useCreateQuiz = () => {
     async (quizData) => {
       const {
         name,
-        quizType,
+        // quizType,
         allowShuffleAnswers,
         timeLimit,
         studentSeeAnswer,
@@ -44,7 +44,7 @@ const useCreateQuiz = () => {
       const missingFields = [];
 
       if (!name) missingFields.push("Quiz Name");
-      if (!quizType) missingFields.push("Quiz Type");
+      // if (!quizType) missingFields.push("Quiz Type");
       if (missingFields.length > 0) {
         toast.error(
           `Please fill out the following fields: ${missingFields.join(", ")}`
