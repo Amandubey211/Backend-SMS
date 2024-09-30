@@ -63,9 +63,9 @@ const StudentParentCard = () => {
   }, [navigate]);
 
   return (
-    <div className="relative border-r border-gray-300">
-      <div className="flex justify-between p-4 items-center px-6">
-        <h2 className="text-md font-bold text-gray-600">My Children</h2>
+    <div className="relative h-3/5">
+      <div className="flex justify-between p-4 pb-3 items-center px-6">
+        <h2 className="text-lg font-semibold text-gray-600">My Children</h2>
         {!loading && !error && students?.length > 3 && (
           <button
             className="text-transparent bg-clip-text bg-gradient-to-r from-[#C83B62] to-[#7F35CD] font-normal"
@@ -75,18 +75,22 @@ const StudentParentCard = () => {
           </button>
         )}
       </div>
-      {loading && <Spinner />} {/* Custom spinner used here */}
-      {!loading && error && renderErrorOrNoChildren("No Children Data Found!")}
-      {!loading && !error && students?.length === 0 && renderErrorOrNoChildren("No Children Found!")}
-      {!loading && !error && students?.length > 0 && (
-        <>
-          {students.slice(0, 3).map((student, index) => (
-            <StudentCard key={student.id} student={student} index={index} />
-          ))}
-        </>
-      )}
+  
+      {/* Conditionally apply overflow-x-auto, shadow, and rounded-lg only when there's no data */}
+      <div className={`${(loading || error || students?.length === 0) ? 'overflow-x-auto shadow rounded-lg p-4 m-3' : ''}`}>
+        {loading && <Spinner />} {/* Custom spinner used here */}
+        {!loading && error && renderErrorOrNoChildren("No Children Data Found!")}
+        {!loading && !error && students?.length === 0 && renderErrorOrNoChildren("No Children Found!")}
+        {!loading && !error && students?.length > 0 && (
+          <>
+            {students.slice(0, 3).map((student, index) => (
+              <StudentCard key={student.id} student={student} index={index} />
+            ))}
+          </>
+        )}
+      </div>
     </div>
   );
-};
+}
 
 export default React.memo(StudentParentCard);

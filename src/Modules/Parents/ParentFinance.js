@@ -12,7 +12,7 @@ const ParentFinanceTable = () => {
   const dispatch = useDispatch();
 
   // Accessing the redux state, setting default fallback values to prevent errors
-  const { financeData, totalUnpaidFees = 0, totalPaidFees = 0, loading, error } = useSelector(
+  const { financeData, totalUnpaidFees, totalPaidFees, loading, error } = useSelector(
     (state) => state.Parent.finance
   );
 

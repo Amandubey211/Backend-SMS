@@ -91,8 +91,12 @@ export const fetchTeachers = createAsyncThunk(
 
       return response.data.instructors;
     } catch (error) {
-      const errorMessage = error.response?.data?.message || "Failed to fetch instructors";
-      toast.error(errorMessage);
+
+
+      const errorMessage = error.response?.data?.message || error.message || "Failed to fetch instructors";
+      // toast.error(errorMessage);
+
+
       return rejectWithValue(errorMessage);
     }
   }
@@ -102,7 +106,7 @@ export const fetchTeachers = createAsyncThunk(
 // Thunk to fetch grades for a specific student and subject
 export const fetchGrades = createAsyncThunk(
   'children/fetchGrades',
-  async ({ studentId, subjectId }, { rejectWithValue }) => {
+  async ({ studentId }, { rejectWithValue }) => {
     const token = localStorage.getItem('parent:token');
     if (!token) {
       toast.error("Authentication token not found");

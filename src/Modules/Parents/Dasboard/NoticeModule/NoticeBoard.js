@@ -3,7 +3,7 @@ import Notice from "./Notice";
 import { useNavigate } from "react-router-dom";
 import { message } from "antd";
 import { format } from 'date-fns';
-import { FaBell } from "react-icons/fa";
+import { FaBell } from "react-icons/fa"; // Keeping the bell icon for consistency
 import Spinner from "../../../../Components/Common/Spinner";
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchNotices } from '../../../../Store/Slices/Parent/Dashboard/dashboard.action';
@@ -80,26 +80,42 @@ const NoticeBoard = ({ numberOfChildren }) => {
     return text && text.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
   }, []);
 
-  // Loading state
+  // Loading state with spinner correctly placed below the heading
   if (loading) {
-    return <Spinner />;
+    return (
+      <div className="p-4 border-l border-gray-300"> {/* Apply the left border here */}
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-lg font-semibold text-gray-600">Noticeboard</h2> {/* Semi-bold and correct heading */}
+        </div>
+        <div className="flex flex-col items-center justify-center h-64 text-center overflow-x-auto shadow rounded-lg p-4">
+          <div className="flex justify-center items-center"> {/* Spinner positioned similarly to 'My Children' */}
+            <Spinner />
+          </div>
+        </div>
+      </div>
+    );
   }
 
   // Error state handling
   if (error) {
     message.error("Failed to fetch notices");
     return (
-      <div className="flex flex-col items-center justify-center h-full text-center">
-        <FaBell className="text-gray-400 text-6xl mb-4" />
-        <p className="text-gray-600 text-lg">Error loading notices. Please try again later.</p>
+      <div className="p-4 border-l border-gray-300"> {/* Apply the left border here */}
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-lg font-semibold text-gray-600">Noticeboard</h2> {/* Keeping the heading intact */}
+        </div>
+        <div className="flex flex-col items-center justify-center h-64 text-center overflow-x-auto shadow rounded-lg p-4"> {/* Consistent layout */}
+          <FaBell className="text-gray-400 text-6xl mb-4" />
+          <p className="text-gray-600 text-lg">{error}</p> {/* Display the original Redux error message */}
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="p-2">
+    <div className="p-2 border-l border-gray-300"> {/* Apply the left border here */}
       <div className="flex justify-between p-4 items-center px-6">
-        <h2 className="text-md font-bold text-gray-600">Noticeboard</h2>
+        <h2 className="text-md font-semibold text-gray-600">Noticeboard</h2> {/* Semi-bold heading */}
         <button
           className="text-transparent bg-clip-text bg-gradient-to-r from-[#C83B62] to-[#7F35CD]"
           onClick={handleNavigate}
@@ -108,7 +124,7 @@ const NoticeBoard = ({ numberOfChildren }) => {
         </button>
       </div>
       {latestNotices.length === 0 ? (
-        <div className="flex flex-col items-center justify-center h-full text-center">
+        <div className="flex flex-col items-center justify-center h-full text-center overflow-x-auto shadow rounded-lg p-4">
           <FaBell className="text-gray-400 text-6xl mb-4" />
           <p className="text-gray-600 text-lg">No Notices Available</p>
         </div>
