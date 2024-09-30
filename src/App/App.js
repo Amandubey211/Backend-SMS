@@ -948,47 +948,62 @@ function App() {
     },
 
     // parent----------------------------------------------------------------
-    { path: "/parent_dash", element: <ParentDash />, errorElement: <Error /> },
-    { path: "/children", element: <MyChildren />, errorElement: <Error /> },
-    { path: "/teacher/:ssid", element: <MyTeacher />, errorElement: <Error /> },
-    { path: "/attendance", element: <Calendar />, errorElement: <Error /> },
+    {
+      path: "/parent_dash",
+      element: <ProtectRoute Component={ParentDash} allowedRoles={["parent"]} />,
+      errorElement: <Error />,
+    },
+    {
+      path: "/children",
+      element: <ProtectRoute Component={MyChildren} allowedRoles={["parent"]} />,
+      errorElement: <Error />,
+    },
+    {
+      path: "/teacher/:ssid",
+      element: <ProtectRoute Component={MyTeacher} allowedRoles={["parent"]} />,
+      errorElement: <Error />,
+    },
+    {
+      path: "/attendance",
+      element: <ProtectRoute Component={Calendar} allowedRoles={["parent"]} />,
+      errorElement: <Error />,
+    },
     {
       path: "/parentchildnotice",
-      element: <ParentStudentNotice />,
+      element: <ProtectRoute Component={ParentStudentNotice} allowedRoles={["parent"]} />,
       errorElement: <Error />,
     },
     {
       path: "/parent/events",
-      element: (
-        <ProtectRoute Component={ParentEvent} allowedRoles={["parent"]} />
-      ),
+      element: <ProtectRoute Component={ParentEvent} allowedRoles={["parent"]} />,
       errorElement: <Error />,
     },
     {
       path: "/parentlibrary",
-      element: <LibraryParent />,
+      element: <ProtectRoute Component={LibraryParent} allowedRoles={["parent"]} />,
       errorElement: <Error />,
     },
     {
       path: "/parentfinance",
-      element: <ParentFinance />,
+      element: <ProtectRoute Component={ParentFinance} allowedRoles={["parent"]} />,
       errorElement: <Error />,
     },
     {
       path: "/checkprogress/:studentId",
-      element: <CheckProgress />,
+      element: <ProtectRoute Component={CheckProgress} allowedRoles={["parent"]} />,
       errorElement: <Error />,
     },
     {
       path: "/users/parent/profile",
-      element: <ParentProfile />,
+      element: <ProtectRoute Component={ParentProfile} allowedRoles={["parent"]} />,
       errorElement: <Error />,
     },
     {
       path: "/childgrade/:studentId",
-      element: <ChildGrade />,
+      element: <ProtectRoute Component={ChildGrade} allowedRoles={["parent"]} />,
       errorElement: <Error />,
     },
+    
   ]);
 
   return (
