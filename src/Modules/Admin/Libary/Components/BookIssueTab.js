@@ -1,11 +1,12 @@
-// src/Modules/Admin/Libary/MainSection/BookIssueTab.js
-import React from "react";
-import { useSelector } from "react-redux";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchSectionsByClass } from "../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
 import FormField from "../Components/FormField";
 import NoDataFound from "../../../../Components/Common/NoDataFound";
 import BookIssueRow from "../Components/BookIssueRow";
 
 const BookIssueTab = ({ handleSidebarOpen, setEditIssueData }) => {
+  const dispatch = useDispatch();
   const { bookIssues, books } = useSelector((state) => state.admin.library);
   const classList = useSelector((store) => store.admin.class.classes);
   const sectionList = useSelector(
@@ -23,18 +24,24 @@ const BookIssueTab = ({ handleSidebarOpen, setEditIssueData }) => {
   const handleIssueFilterChange = (e) => {
     const { name, value } = e.target;
     setLocalFilters((prev) => ({ ...prev, [name]: value }));
+
+    // If the classLevel changes, fetch sections for that class
+    if (name === "classLevel" && value) {
+      dispatch(fetchSectionsByClass(value)); // Dispatch the thunk to fetch sections by classId
+    }
   };
 
   // Filter book issues based on class, section, book, and status
   const filteredBookIssues = bookIssues.filter((issue) => {
     const matchesClass =
       !localFilters.classLevel ||
-      issue.classId?.className === localFilters.classLevel;
+      (issue.classId && issue.classId._id === localFilters.classLevel);
     const matchesSection =
       !localFilters.section ||
-      issue.sectionId?.sectionName === localFilters.section;
+      (issue.sectionId && issue.sectionId._id === localFilters.section);
     const matchesBook =
-      !localFilters.book || issue.bookId?.name === localFilters.book;
+      !localFilters.book ||
+      (issue.bookId && issue.bookId._id === localFilters.book);
     const matchesStatus =
       !localFilters.status ||
       issue.status.toLowerCase() === localFilters.status.toLowerCase();
@@ -52,7 +59,10 @@ const BookIssueTab = ({ handleSidebarOpen, setEditIssueData }) => {
             label="Class"
             value={localFilters.classLevel}
             onChange={handleIssueFilterChange}
-            options={classList?.map((cls) => cls.className)}
+            options={classList?.map((cls) => ({
+              value: cls._id,
+              label: cls.className,
+            }))} // Pass value and label
           />
           <FormField
             id="section"
@@ -60,7 +70,11 @@ const BookIssueTab = ({ handleSidebarOpen, setEditIssueData }) => {
             label="Section"
             value={localFilters.section}
             onChange={handleIssueFilterChange}
-            options={sectionList?.map((section) => section.sectionName)}
+            options={sectionList?.map((section) => ({
+              value: section._id,
+              label: section.sectionName,
+            }))} // Pass value and label
+            disabled={!localFilters.classLevel} // Disable if no class is selected
           />
           <FormField
             id="book"
@@ -68,7 +82,10 @@ const BookIssueTab = ({ handleSidebarOpen, setEditIssueData }) => {
             label="Book"
             value={localFilters.book}
             onChange={handleIssueFilterChange}
-            options={books?.map((book) => book.name)}
+            options={books?.map((book) => ({
+              value: book._id,
+              label: book.name,
+            }))} // Pass value and label
           />
           <FormField
             id="status"
@@ -76,7 +93,10 @@ const BookIssueTab = ({ handleSidebarOpen, setEditIssueData }) => {
             label="Status"
             value={localFilters.status}
             onChange={handleIssueFilterChange}
-            options={["Pending", "Returned"]}
+            options={[
+              { value: "Pending", label: "Pending" },
+              { value: "Returned", label: "Returned" },
+            ]}
           />
         </div>
         <button
@@ -102,8 +122,13 @@ const BookIssueTab = ({ handleSidebarOpen, setEditIssueData }) => {
           </thead>
           <tbody>
             {filteredBookIssues.length > 0 ? (
-              filteredBookIssues.map((issue, index) => (
-                <BookIssueRow key={issue._id} item={issue} />
+              filteredBookIssues.map((issue) => (
+                <BookIssueRow
+                  key={issue._id}
+                  item={issue}
+                  setEditIssueData={setEditIssueData} // Pass down the function
+                  handleSidebarOpen={handleSidebarOpen} // Open sidebar for editing
+                />
               ))
             ) : (
               <tr>

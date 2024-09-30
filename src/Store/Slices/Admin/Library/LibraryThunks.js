@@ -3,6 +3,7 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { baseUrl } from "../../../../config/Common";
 import toast from "react-hot-toast";
+import { toggleSidebar } from "./LibrarySlice";
 
 // Fetch Books Thunk
 export const fetchBooksThunk = createAsyncThunk(
@@ -17,7 +18,7 @@ export const fetchBooksThunk = createAsyncThunk(
       });
       return response.data.books;
     } catch (error) {
-      toast.error("Failed to fetch books.");
+      // toast.error("Failed to fetch books.");
       return rejectWithValue(error.response?.data || error.message);
     }
   }
@@ -35,6 +36,7 @@ export const addBookThunk = createAsyncThunk(
         headers: { Authentication: `Bearer ${token}` },
       });
       toast.success("Book added successfully!");
+      dispatch(toggleSidebar());
       dispatch(fetchBooksThunk());
       return response.data.book;
     } catch (error) {
@@ -102,7 +104,7 @@ export const fetchBookIssuesThunk = createAsyncThunk(
       });
       return response.data.books; // Adjusted field name
     } catch (error) {
-      toast.error("Failed to fetch book issues.");
+      // toast.error("Failed to fetch book issues.");
       return rejectWithValue(error.response?.data || error.message);
     }
   }

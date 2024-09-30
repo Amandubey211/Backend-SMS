@@ -1,4 +1,3 @@
-// src/Modules/Admin/Libary/MainSection/LibraryAndBookIssue.js
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Layout from "../../../../Components/Common/Layout";
@@ -13,28 +12,51 @@ import {
 import LibraryTab from "../Components/LibraryTab";
 import AddIssue from "../Components/AddIssue";
 import AddBook from "../Components/AddBook";
-
 import BookIssueTab from "../Components/BookIssueTab";
+import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
+import { fetchAllClasses } from "../../../../Store/Slices/Admin/Class/actions/classThunk";
+import { fetchAllStudents } from "../../../../Store/Slices/Admin/Class/Students/studentThunks";
 
 const LibraryAndBookIssue = () => {
   const dispatch = useDispatch();
-  const { books, bookIssues, loading } = useSelector(
-    (state) => state.admin.library
-  );
-
+  const { books, bookIssues, loading, addBookSuccess, addIssueSuccess } =
+    useSelector((state) => state.admin.library);
+  const classList = useSelector((state) => state.admin.class.classes);
+  const StudentList = useSelector((store) => store.admin.students.studentsList);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("Library");
   const [editIssueData, setEditIssueData] = useState(null);
 
-  // Fetch books and book issues data on component mount
+  // Fetch books, book issues, classes, and students on component mount
   useEffect(() => {
     if (!books.length) dispatch(fetchBooksThunk());
     if (!bookIssues.length) dispatch(fetchBookIssuesThunk());
-  }, [dispatch, books.length, bookIssues.length]);
+    if (!classList.length) dispatch(fetchAllClasses());
+    if (!StudentList.length) dispatch(fetchAllStudents());
+  }, [
+    dispatch,
+    books.length,
+    bookIssues.length,
+    classList.length,
+    StudentList.length,
+  ]);
+
+  // Close sidebar automatically after a successful add or edit operation
+  useEffect(() => {
+    if (addBookSuccess || addIssueSuccess) {
+      setSidebarOpen(false);
+      setEditIssueData(null); // Reset edit data
+    }
+  }, [addBookSuccess, addIssueSuccess]);
 
   // Sidebar controls
   const handleSidebarOpen = () => setSidebarOpen(true);
-  const handleSidebarClose = () => setSidebarOpen(false);
+  const handleSidebarClose = () => {
+    setSidebarOpen(false);
+    setEditIssueData(null); // Reset edit data after closing the sidebar
+  };
+  const currentPath = activeTab === "Library" ? "Library" : "Book Issue";
+  useNavHeading("Admin", currentPath);
 
   return (
     <Layout title="Library & Book Issues | Admin Panel">
@@ -70,9 +92,19 @@ const LibraryAndBookIssue = () => {
             )}
 
             {/* Sidebar for Add/Edit Book or Issue */}
-            <Sidebar isOpen={isSidebarOpen} onClose={handleSidebarClose}>
+            <Sidebar
+              isOpen={isSidebarOpen}
+              onClose={handleSidebarClose}
+              title={
+                activeTab === "Library"
+                  ? "Add New Book"
+                  : editIssueData
+                  ? "Edit Book Issue"
+                  : "Add Book Issue"
+              } // Dynamically set the sidebar title
+            >
               {activeTab === "Library" ? (
-                <AddBook />
+                <AddBook onClose={handleSidebarClose} />
               ) : (
                 <AddIssue
                   editIssueData={editIssueData}
