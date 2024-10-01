@@ -42,7 +42,7 @@ const GradeAccordionItem = memo(({ onToggleSidebar }) => {
       <div className="flex justify-center items-center h-screen">
         <div className="flex items-center flex-col text-center">
           <GoAlertFill className="text-[3rem] text-gray-400" />
-          <p className="text-xl font-bold text-gray-600">
+          <p className="text-xl font-semibold text-gray-600">
             {error || "Something went wrong. Please try again later."}: Please Check your Network.
           </p>
         </div>
