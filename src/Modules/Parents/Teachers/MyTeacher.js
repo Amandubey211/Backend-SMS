@@ -29,12 +29,14 @@ const MyTeacher = () => {
         );
     }
 
+
+    
     // Handling error state
     if (error) {
         return (
             <div className="flex flex-col items-center justify-center h-full text-center">
                 <FaChalkboardTeacher className="text-6xl text-gray-400 mb-4" />
-                <p className="text-gray-500">{error || 'Something went wrong while fetching instructors.'}</p>
+                <p className="text-gray-500">{error}: Unable to Fetch Instructors</p>
             </div>
         );
     }

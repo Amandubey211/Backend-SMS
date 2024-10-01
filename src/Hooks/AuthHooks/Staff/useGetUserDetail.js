@@ -33,7 +33,7 @@ const useGetUserDetail = () => {
     } catch (error) {
       const errorMessage =
         error.response?.data?.msg || "Something went wrong. Please try again.";
-      toast.error(errorMessage);
+      // toast.error(errorMessage);
       console.error("Error during get user datat:", error);
     } finally {
       setLoading(false);

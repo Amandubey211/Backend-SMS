@@ -8,12 +8,12 @@ import { FaChild } from 'react-icons/fa';
 // Memoized StudentCard to prevent unnecessary re-renders
 const StudentCard = React.memo(({ student, index }) => {
   const defaultImage = "https://via.placeholder.com/150";
-  const profileImage = student.profile || defaultImage;
+  const profileImage = student?.profile || defaultImage;
 
-  const studentClass = student.class || "N/A";
-  const admissionNumber = student.admissionNumber || "N/A";
-  const section = student.section || "N/A";
-  const group = student.group || "N/A";
+  const studentClass = student?.class || "N/A";
+  const admissionNumber = student?.admissionNumber || "N/A";
+  const section = student?.section || "N/A";
+  const group = student?.group || "N/A";
 
   return (
     <div className="border-b p-4 pb-4 pt-6 text-center relative border-gray-300">
@@ -22,11 +22,11 @@ const StudentCard = React.memo(({ student, index }) => {
       </div>
       <img
         src={profileImage}
-        alt={student.name}
+        alt={student?.name || 'Unknown'}
         className="w-20 h-20 rounded-full mx-auto mb-2"
         onError={(e) => { e.target.onerror = null; e.target.src = defaultImage; }}
       />
-      <h2 className="text-lg font-semibold mb-1">{student.name || "N/A"}</h2>
+      <h2 className="text-lg font-semibold mb-1">{student?.name || "N/A"}</h2>
       <div className="text-gray-600 text-sm mb-1">
         Class: {studentClass} | Id: {admissionNumber} | Section: {section}
       </div>
@@ -38,9 +38,9 @@ const StudentCard = React.memo(({ student, index }) => {
 const StudentParentCard = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  
-  // Use Redux state for students with caching to prevent redundant fetching
-  const { childrenData: students, loading, error } = useSelector((state) => state.Parent.dashboard);
+
+  // Use Redux state for students with optional chaining and caching
+  const { childrenData: students = [], loading = false, error = null } = useSelector((state) => state?.Parent?.dashboard || {});
 
   // Fetch students only once when the component mounts
   useEffect(() => {
@@ -49,7 +49,7 @@ const StudentParentCard = () => {
     }
   }, [dispatch, students]);
 
-  // Memoize renderErrorOrNoChildren to prevent re-creating it on each render
+  // Memoized error or no data message rendering
   const renderErrorOrNoChildren = useCallback((message) => (
     <div className="flex flex-col items-center justify-center h-full text-center py-10">
       <FaChild className="text-gray-400 text-6xl mb-4" />
@@ -57,15 +57,25 @@ const StudentParentCard = () => {
     </div>
   ), []);
 
-  // Memoize navigation to prevent re-creating the function on each render
+  // Memoized navigation function
   const handleNavigate = useCallback(() => {
     navigate("/children");
   }, [navigate]);
 
+  // Memoized function to render the error message
+  const renderErrorMessage = useCallback(() => {
+    return (
+      <div className="flex flex-col items-center justify-center mt-6">
+        <FaChild className="text-gray-400 text-8xl mb-4" />
+        <p className="text-gray-600 text-lg text-center mt-2">{error}: Unable to fetch Child Data</p>
+      </div>
+    );
+  }, [error]);
+
   return (
-    <div className="relative border-r border-gray-300">
-      <div className="flex justify-between p-4 items-center px-6">
-        <h2 className="text-md font-bold text-gray-600">My Children</h2>
+    <div className="relative h-3/5">
+      <div className="flex justify-between p-4 pb-3 items-center px-6">
+        <h2 className="text-lg font-semibold text-gray-600">My Children</h2>
         {!loading && !error && students?.length > 3 && (
           <button
             className="text-transparent bg-clip-text bg-gradient-to-r from-[#C83B62] to-[#7F35CD] font-normal"
@@ -75,18 +85,22 @@ const StudentParentCard = () => {
           </button>
         )}
       </div>
-      {loading && <Spinner />} {/* Custom spinner used here */}
-      {!loading && error && renderErrorOrNoChildren("No Children Data Found!")}
-      {!loading && !error && students?.length === 0 && renderErrorOrNoChildren("No Children Found!")}
-      {!loading && !error && students?.length > 0 && (
-        <>
-          {students.slice(0, 3).map((student, index) => (
-            <StudentCard key={student.id} student={student} index={index} />
-          ))}
-        </>
-      )}
+
+      {/* Conditionally apply overflow-x-auto, shadow, and rounded-lg only when there's no data */}
+      <div className={`${(loading || error || students?.length === 0) ? 'overflow-x-auto shadow rounded-lg p-4 m-3' : ''}`}>
+        {loading && <Spinner />} {/* Custom spinner used here */}
+        {!loading && error && renderErrorMessage()} {/* Render the original error message */}
+        {!loading && !error && students?.length === 0 && renderErrorOrNoChildren("No Children Found!")}
+        {!loading && !error && students?.length > 0 && (
+          <>
+            {students.slice(0, 3).map((student, index) => (
+              <StudentCard key={student?.id || index} student={student} index={index} />
+            ))}
+          </>
+        )}
+      </div>
     </div>
   );
-};
+}
 
 export default React.memo(StudentParentCard);
