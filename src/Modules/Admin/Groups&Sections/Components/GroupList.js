@@ -1,17 +1,21 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { LuUser } from "react-icons/lu";
 import { GiImperialCrown } from "react-icons/gi";
 import { TbDotsVertical } from "react-icons/tb";
 import { FaUsers } from "react-icons/fa";
+import { HiOutlineTrash, HiOutlinePencilAlt } from "react-icons/hi"; // Modern edit and delete icons
 import {
   deleteGroup,
   fetchGroupsByClass,
+  fetchUnassignedStudents,
 } from "../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
 import DeleteModal from "../../../../Components/Common/DeleteModal";
 import AddGroup from "./AddGroup";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import Spinner from "../../../../Components/Common/Spinner";
+import { useParams } from "react-router-dom";
+import Sidebar from "../../../../Components/Common/Sidebar";
 
 const GroupList = ({ onSeeGradeClick }) => {
   const [expandedGroupIndex, setExpandedGroupIndex] = useState(null);
@@ -23,10 +27,12 @@ const GroupList = ({ onSeeGradeClick }) => {
   const [groupToDelete, setGroupToDelete] = useState(null);
 
   const dispatch = useDispatch();
-  const { cid } = useSelector((store) => store.common.auth); // Fetch class ID from the Redux store
+  const { cid } = useParams(); // Fetch class ID from the Redux store
   const { groupsList, loading, error } = useSelector(
     (store) => store.admin.group_section
   );
+
+  const menuRefs = useRef([]); // Reference for each menu
 
   const handleMenuToggle = (groupIndex) => {
     setActiveMenu((prevActiveMenu) =>
@@ -46,22 +52,41 @@ const GroupList = ({ onSeeGradeClick }) => {
   };
 
   const handleDeleteConfirm = async () => {
-    await dispatch(deleteGroup(groupToDelete._id));
+    dispatch(deleteGroup(groupToDelete._id));
+    dispatch(fetchGroupsByClass(cid)); // Refetch groups after deletion
+    dispatch(fetchUnassignedStudents(cid));
     setIsDeleteModalOpen(false);
     setGroupToDelete(null);
-    dispatch(fetchGroupsByClass(cid)); // Refetch groups after deletion
   };
 
   const closeSidebar = useCallback(() => {
     setIsSidebarOpen(false);
     setEditingGroup(null);
-    dispatch(fetchGroupsByClass(cid)); // Refetch groups after editing
-  }, [dispatch, cid]);
+  }, [dispatch]);
 
   // Filter groups based on search query
   const filteredGroups = groupsList.filter((group) =>
     group.groupName.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  // Close the menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRefs.current) {
+        const isClickedOutside = menuRefs.current.every(
+          (menuRef, idx) => menuRef && !menuRef.contains(event.target)
+        );
+        if (isClickedOutside) {
+          setActiveMenu(null); // Close the menu
+        }
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   return (
     <div className="w-full p-1 bg-white">
@@ -85,7 +110,8 @@ const GroupList = ({ onSeeGradeClick }) => {
         <Spinner />
       ) : error || filteredGroups.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-full text-center text-gray-500">
-          <FaUsers className="text-6xl mb-4" />
+          <FaUsers className="text-6xl mb-4 text-blue-500" />{" "}
+          {/* Colored Icon */}
           <p>No groups found.</p>
         </div>
       ) : (
@@ -104,7 +130,7 @@ const GroupList = ({ onSeeGradeClick }) => {
               </h3>
               <div className="flex items-center space-x-2 relative">
                 <div className="flex items-center space-x-1 border p-1 rounded-full px-4">
-                  <LuUser />
+                  <LuUser className="text-green-500" /> {/* Colored Icon */}
                   <span className="text-gray-500">
                     Students{" "}
                     <span className="text-gradient">
@@ -113,25 +139,40 @@ const GroupList = ({ onSeeGradeClick }) => {
                     </span>
                   </span>
                 </div>
-                <div className="relative">
+                <div
+                  className="relative"
+                  ref={(el) => (menuRefs.current[groupIndex] = el)} // Attach reference to each group
+                >
                   <div
-                    className="w-7 h-7 flex items-center justify-center rounded-full border cursor-pointer"
+                    className={`w-7 h-7 flex items-center justify-center rounded-full border cursor-pointer ${
+                      activeMenu === groupIndex ? "bg-blue-100" : ""
+                    }`} // Add active state style here
                     onClick={() => handleMenuToggle(groupIndex)}
                   >
-                    <TbDotsVertical className="w-6 h-6 text-gray-500" />
+                    <TbDotsVertical
+                      className={`w-6 h-6 ${
+                        activeMenu === groupIndex
+                          ? "text-blue-500" // Active state color
+                          : "text-gray-500"
+                      }`}
+                    />
                   </div>
                   {activeMenu === groupIndex && (
                     <div className="absolute right-0 mt-2 w-32 bg-white border rounded-md shadow-lg z-10">
                       <div
-                        className="px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer"
+                        className="px-4 py-2 flex items-center text-gray-700 hover:bg-gray-100 cursor-pointer"
                         onClick={() => handleEdit(group)}
                       >
+                        <HiOutlinePencilAlt className="text-blue-500 mr-2" />{" "}
+                        {/* Colored Edit Icon */}
                         Edit
                       </div>
                       <div
-                        className="px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer"
+                        className="px-4 py-2 flex items-center text-gray-700 hover:bg-gray-100 cursor-pointer"
                         onClick={() => handleDeleteClick(group)}
                       >
+                        <HiOutlineTrash className="text-red-500 mr-2" />{" "}
+                        {/* Colored Delete Icon */}
                         Delete
                       </div>
                     </div>
@@ -230,18 +271,18 @@ const GroupList = ({ onSeeGradeClick }) => {
         ))
       )}
 
-      {isSidebarOpen && (
-        <div className="fixed inset-0 z-50 flex justify-end bg-black bg-opacity-50">
-          <div className="bg-white h-full w-full max-w-md shadow-lg p-4 overflow-y-auto">
-            <AddGroup
-              group={editingGroup}
-              isUpdate={!!editingGroup}
-              groupId={editingGroup?._id}
-              onClose={closeSidebar}
-            />
-          </div>
-        </div>
-      )}
+      <Sidebar
+        isOpen={isSidebarOpen}
+        onClose={closeSidebar}
+        title="Update Group"
+      >
+        <AddGroup
+          group={editingGroup}
+          isUpdate={!!editingGroup}
+          groupId={editingGroup?._id}
+          onClose={closeSidebar}
+        />
+      </Sidebar>
 
       <DeleteModal
         isOpen={isDeleteModalOpen}

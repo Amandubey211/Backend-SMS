@@ -8,6 +8,7 @@ import {
   updateGroup,
   fetchUnassignedStudents,
   fetchGroupsByClass,
+  fetchSectionsByClass,
 } from "../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
 import { useParams } from "react-router-dom";
 import { FaUserSlash } from "react-icons/fa";
@@ -18,6 +19,7 @@ const AddGroup = ({ group, isUpdate, groupId, onClose }) => {
   const [selectedStudents, setSelectedStudents] = useState([]);
   const [leader, setLeader] = useState(null);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
+  const [seatLimitError, setSeatLimitError] = useState(""); // Add error state for seat limit
 
   const dispatch = useDispatch();
   const { cid } = useParams();
@@ -32,10 +34,10 @@ const AddGroup = ({ group, isUpdate, groupId, onClose }) => {
   // Preload data when editing a group
   useEffect(() => {
     if (isUpdate && group) {
-      setGroupName(group.groupName || ""); // Set group name
-      setSeatLimit(group.seatLimit || 5); // Set seat limit
-      setSelectedStudents(group.students || []); // Set selected students
-      setLeader(group.leader || null); // Set leader
+      setGroupName(group?.groupName || ""); // Set group name
+      setSeatLimit(group?.seatLimit || 5); // Set seat limit
+      setSelectedStudents(group?.students || []); // Set selected students
+      setLeader(group?.leader || null); // Set leader
     }
   }, [isUpdate, group]); // Triggered only when editing
 
@@ -75,6 +77,14 @@ const AddGroup = ({ group, isUpdate, groupId, onClose }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Validate seat limit
+    if (seatLimit <= 0) {
+      setSeatLimitError("Seat limit must be a positive number");
+      return;
+    } else {
+      setSeatLimitError("");
+    }
+
     const formData = {
       classId: cid,
       groupName,
@@ -86,16 +96,17 @@ const AddGroup = ({ group, isUpdate, groupId, onClose }) => {
     try {
       if (isUpdate) {
         await dispatch(updateGroup({ groupId, formData }));
-
-        onClose();
       } else {
         await dispatch(createGroup(formData));
         setGroupName("");
-        setSeatLimit("");
+        setSeatLimit(5); // Reset seat limit
         setSelectedStudents([]);
         setLeader(null);
       }
+      onClose();
+      dispatch(fetchSectionsByClass(cid)); // Fetch sections again after adding or editing
       dispatch(fetchGroupsByClass(cid));
+      dispatch(fetchUnassignedStudents(cid));
     } catch (err) {
       toast.error(err.message || "Something went wrong");
     }
@@ -129,12 +140,15 @@ const AddGroup = ({ group, isUpdate, groupId, onClose }) => {
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
               required
             />
+            {seatLimitError && (
+              <p className="text-red-500 text-sm">{seatLimitError}</p>
+            )}
           </div>
           <div className="relative">
             <label className="block text-sm font-medium text-gray-700">
               Select Students
             </label>
-            <div className="border border-gray-300 rounded-md p-2 flex flex-wrap">
+            <div className="border border-gray-300 rounded-md p-3 flex flex-wrap">
               {selectedStudents.map((student) => (
                 <div
                   key={student._id}
@@ -222,10 +236,9 @@ const AddGroup = ({ group, isUpdate, groupId, onClose }) => {
           className="w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md"
           disabled={loading}
         >
-          {loading ? "Saving..." : isUpdate ? "Update Group" : "Add Group"}
+          {loading ? "Please Wait..." : isUpdate ? "Update Group" : "Add Group"}
         </button>
       </div>
-      {error && <p className="text-red-500 text-center">{error}</p>}
     </form>
   );
 };

@@ -34,8 +34,7 @@ const NavigationBar = ({ onSectionChange, selectedSection }) => {
   const closeSidebar = useCallback(() => {
     setSidebarType(null);
     setEditingSection(null);
-    dispatch(fetchSectionsByClass(cid)); // Fetch sections again after adding or editing
-  }, [dispatch, cid]);
+  }, [dispatch]);
 
   const handleDeleteConfirm = async () => {
     await dispatch(deleteSection(sectionToDelete._id));

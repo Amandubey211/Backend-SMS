@@ -99,12 +99,12 @@ const groupSectionSlice = createSlice({
       })
       .addCase(updateGroup.fulfilled, (state, action) => {
         state.loading = false;
-        const index = state.groupsList.findIndex(
-          (group) => group._id === action.payload._id
-        );
-        if (index !== -1) {
-          state.groupsList[index] = action.payload;
-        }
+        // const index = state.groupsList.findIndex(
+        //   (group) => group._id === action.payload._id
+        // );
+        // if (index !== -1) {
+        //   state.groupsList[index] = action.payload;
+        // }
       })
       .addCase(updateGroup.rejected, (state, action) => {
         state.loading = false;
@@ -178,9 +178,6 @@ const groupSectionSlice = createSlice({
       })
       .addCase(assignStudentToSection.fulfilled, (state, action) => {
         state.loading = false;
-        state.unassignedStudentsList = state.unassignedStudentsList.filter(
-          (student) => student._id !== action.payload._id
-        );
       })
       .addCase(assignStudentToSection.rejected, (state, action) => {
         state.loading = false;
@@ -193,17 +190,17 @@ const groupSectionSlice = createSlice({
       })
       .addCase(removeStudentFromGroup.fulfilled, (state, action) => {
         state.loading = false;
-        const groupIndex = state.groupsList.findIndex(
-          (group) => group._id === action.payload.groupId
-        );
-        if (groupIndex !== -1) {
-          const studentIndex = state.groupsList[groupIndex].students.findIndex(
-            (student) => student._id === action.payload.studentId
-          );
-          if (studentIndex !== -1) {
-            state.groupsList[groupIndex].students.splice(studentIndex, 1);
-          }
-        }
+        // const groupIndex = state.groupsList.findIndex(
+        //   (group) => group._id === action.payload.groupId
+        // );
+        // if (groupIndex !== -1) {
+        //   const studentIndex = state.groupsList[groupIndex].students.findIndex(
+        //     (student) => student._id === action.payload.studentId
+        //   );
+        //   if (studentIndex !== -1) {
+        //     state.groupsList[groupIndex].students.splice(studentIndex, 1);
+        //   }
+        // }
       })
       .addCase(removeStudentFromGroup.rejected, (state, action) => {
         state.loading = false;

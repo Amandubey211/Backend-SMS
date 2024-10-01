@@ -4,27 +4,21 @@ import Sidebar from "../../../../Components/Common/Sidebar";
 import { PiPlusLight } from "react-icons/pi";
 import { FaUserSlash } from "react-icons/fa";
 import AssignStudent from "./AssignStudent";
-import {
-  fetchGroupsByClass,
-  fetchUnassignedStudents,
-} from "../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
-
+import { PiStudentThin } from "react-icons/pi";
 const UnAssignedStudentList = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const dispatch = useDispatch();
   const { unassignedStudentsList, sectionsList } = useSelector(
     (store) => store.admin.group_section
   );
-  const { cid } = useSelector((store) => store.common.auth);
 
   const handleSearch = (e) => {
     setSearchQuery(e.target.value);
   };
 
-  const filteredStudents = unassignedStudentsList.filter((student) =>
+  const filteredStudents = unassignedStudentsList?.filter((student) =>
     student.firstName.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -36,8 +30,6 @@ const UnAssignedStudentList = () => {
   const handleSidebarClose = () => {
     setSidebarOpen(false);
     setSelectedStudent(null);
-    dispatch(fetchUnassignedStudents(cid)); // Refetch unassigned students
-    dispatch(fetchGroupsByClass(cid)); // Refetch groups after assignment
   };
 
   const getSectionName = (sectionId) => {
@@ -66,7 +58,8 @@ const UnAssignedStudentList = () => {
       {/* Check if there are no students */}
       {filteredStudents.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-64 text-center text-gray-500">
-          <FaUserSlash className="text-2xl mb-4" />
+          <PiStudentThin className="text-5xl mb-2" />
+
           <p>No students found.</p>
         </div>
       ) : (
@@ -78,12 +71,7 @@ const UnAssignedStudentList = () => {
             >
               <div className="flex items-center">
                 <img
-                  src={
-                    student.profile ||
-                    `https://randomuser.me/api/portraits/med/${
-                      index % 2 === 0 ? "women" : "men"
-                    }/${index}.jpg`
-                  }
+                  src={student.profile || "NA"}
                   alt={student.firstName}
                   className="w-10 h-10 rounded-full mr-3"
                 />

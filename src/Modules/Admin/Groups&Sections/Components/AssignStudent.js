@@ -5,6 +5,8 @@ import toast from "react-hot-toast";
 import {
   assignStudentToSection,
   fetchGroupsByClass,
+  fetchSectionsByClass,
+  fetchUnassignedStudents,
 } from "../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
 
 const AssignStudent = ({
@@ -15,18 +17,16 @@ const AssignStudent = ({
   onAssignmentComplete,
 }) => {
   const [sectionId, setSectionId] = useState("");
-  const [groupId, setGroupId] = useState("");
   const AllSections = useSelector(
     (store) => store.admin.group_section.sectionsList
   );
-  const AllGroups = useSelector(
-    (store) => store.admin.group_section.groupsList
-  );
+
   const { cid } = useParams();
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(fetchGroupsByClass(cid));
+    // if (AllSections.length === 0)
+    dispatch(fetchSectionsByClass(cid));
   }, [cid, dispatch]);
 
   const handleSubmit = async (e) => {
@@ -38,10 +38,11 @@ const AssignStudent = ({
     }
     try {
       await dispatch(assignStudentToSection({ studentId, sectionId }));
-      if (onAssignmentComplete) {
-        onAssignmentComplete();
-      }
+
+      dispatch(fetchUnassignedStudents(cid)); // Refetch unassigned students
+      dispatch(fetchGroupsByClass(cid)); // Refetch groups after assignment
     } catch (error) {
+      console.log(error, "sdfsdf");
       toast.error(error.message || "Something went wrong");
     }
   };
