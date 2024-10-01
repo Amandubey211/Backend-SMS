@@ -12,7 +12,7 @@ export const fetchAllEvents = createAsyncThunk(
 
     if (!token) {
       const errorMessage = "Token not found";
-      toast.error(errorMessage);
+      // toast.error(errorMessage);
       return rejectWithValue(errorMessage); // Reject with custom error
     }
 
@@ -24,9 +24,8 @@ export const fetchAllEvents = createAsyncThunk(
       });
       return response.data.events;
     } catch (error) {
-      const errorMessage =
-        error.response?.data?.message || "Failed to fetch events";
-      toast.error(errorMessage);
+      const errorMessage = error.response?.data?.message || error.message ||"Failed to fetch events";
+      // toast.error(errorMessage);
       return rejectWithValue(errorMessage);
     }
   }

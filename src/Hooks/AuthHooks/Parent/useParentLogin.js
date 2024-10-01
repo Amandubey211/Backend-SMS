@@ -65,7 +65,7 @@ const useParentLogin = () => {
     } catch (error) {
       const errorMessage =
         error.response?.data?.msg || "Something went wrong. Please try again.";
-      toast.error(errorMessage);
+      // toast.error(errorMessage);
       console.error("Error during parent login:", error);
     } finally {
       setLoading(false);

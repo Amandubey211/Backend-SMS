@@ -5,12 +5,12 @@ import { MdAccessTime, MdMoneyBillWave } from "react-icons/md";
 import StudentGradesAccordion from "./StudentGradesAccordion.js";
 import useNavHeading from "../../../Hooks/CommonHooks/useNavHeading .js";
 const GradeChild = () => {
-  useNavHeading("My Child","Grades");
+  useNavHeading("My Child", "Grades");
   return (
     <>
       <Layout title="Grades">
         <ParentDashLayout hideAvatarList={true}>
-  <StudentGradesAccordion/>
+          <StudentGradesAccordion />
         </ParentDashLayout>
       </Layout>
     </>

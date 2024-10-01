@@ -1,13 +1,14 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { Table, message } from 'antd';
+import { Table } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchLibraryBooks } from '../../../Store/Slices/Parent/Library/library.action'; // Redux Thunk for fetching data
 import Spinner from "../../../Components/Common/Spinner"; // Importing Spinner
 import { FaBookOpen } from "react-icons/fa"; // Importing an icon for no data or error messages
-
+import { FaChild } from "react-icons/fa";
+import { RiSignalWifiErrorFill } from "react-icons/ri";
 const LibraryTable = () => {
   const dispatch = useDispatch();
-  const { books, loading, error } = useSelector((state) => state.Parent.library); // Fetch state from Redux
+  const { books = [], loading = false, error = null } = useSelector((state) => state?.Parent?.library || {}); // Optional chaining and default values
   const [statusFilter, setStatusFilter] = useState('All');
 
   // Fetch library books when the component mounts using Redux thunk
@@ -15,14 +16,15 @@ const LibraryTable = () => {
     dispatch(fetchLibraryBooks());
   }, [dispatch]);
 
+  // Handle filter change
   const handleFilterChange = (value) => {
     setStatusFilter(value);
   };
 
-  // Memoize the filtered data to avoid unnecessary recalculations
+  // Memoized filtered data to avoid unnecessary recalculations
   const filteredData = useMemo(() => {
     if (statusFilter === 'All') return books;
-    return books.filter((item) => item.status === statusFilter);
+    return books.filter((item) => item?.status?.toLowerCase() === statusFilter.toLowerCase()); // Fixed 'Returned' issue
   }, [statusFilter, books]);
 
   const columns = useMemo(() => [
@@ -33,11 +35,11 @@ const LibraryTable = () => {
       render: (text, record) => (
         <div className="flex items-center">
           <img
-            src={record.bookId.image}
-            alt={record.bookName}
+            src={record?.bookId?.image || "/placeholder.png"} // Fallback for missing image
+            alt={record?.bookName || "Unknown Book"}
             className="h-12 w-12 rounded-full mr-4"
           />
-          <span>{record.bookName}</span>
+          <span>{record?.bookName || 'Unknown'}</span>
         </div>
       ),
     },
@@ -67,22 +69,39 @@ const LibraryTable = () => {
       key: 'status',
       render: (status) => (
         <span
-          className={`inline-block px-3 py-1 rounded-full text-sm ${status === 'Return' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-            }`}
+          className={`inline-block px-3 py-1 rounded-full text-sm ${status === 'Return' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}
         >
           {status}
         </span>
       ),
     },
-  ], []);
+  ], []); // Columns memoized
 
+  const renderErrorMessage = () => {
+    const isNetworkError = error?.toLowerCase().includes("network error");
+  
+    return (
+      <div className="flex flex-col items-center justify-center h-full text-center py-10">
+        {isNetworkError ? (
+          <RiSignalWifiErrorFill className="text-gray-400 text-8xl mb-6" />
+        ) : (
+          <FaBookOpen className="text-gray-400 text-8xl mb-6" />
+        )}
+        <p className="text-gray-600 text-lg text-center mt-2">
+          {error}: "Unable to fetch Library data!"
+        </p>
+      </div>
+    );
+  };
+  
 
+  // Rendering component
   return (
     <div className="p-6 pt-5">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-xl font-bold">Library Status</h1>
         <div className="flex space-x-4">
-          Status
+          <span>Status</span>
           <label className="radio-container" style={{ position: 'relative', paddingLeft: '32px', cursor: 'pointer' }}>
             <input
               type="radio"
@@ -95,7 +114,6 @@ const LibraryTable = () => {
             <span style={{ position: 'relative', paddingLeft: '20px' }}>
               All
               <span style={{
-                content: '',
                 position: 'absolute',
                 top: '50%',
                 left: '0',
@@ -132,7 +150,6 @@ const LibraryTable = () => {
             <span style={{ position: 'relative', paddingLeft: '20px' }}>
               Pending
               <span style={{
-                content: '',
                 position: 'absolute',
                 top: '50%',
                 left: '0',
@@ -169,7 +186,6 @@ const LibraryTable = () => {
             <span style={{ position: 'relative', paddingLeft: '20px' }}>
               Return
               <span style={{
-                content: '',
                 position: 'absolute',
                 top: '50%',
                 left: '0',
@@ -202,11 +218,8 @@ const LibraryTable = () => {
           <Spinner />
         </div>
       ) : error ? (
-        <div className="flex flex-col items-center justify-center h-full text-center">
-          <FaBookOpen className="text-gray-400 text-6xl mb-4" />
-          <p className="text-gray-600 text-lg">Failed to fetch library data</p>
-        </div>
-      ) :(
+        renderErrorMessage() // Error message below the table heading
+      ) : (
         <Table columns={columns} dataSource={filteredData} rowKey="_id" />
       )}
     </div>

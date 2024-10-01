@@ -1,31 +1,29 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, memo } from "react";
 import {
-  MdOutlineQuiz,
-  MdAssignment,
   MdKeyboardArrowUp,
   MdKeyboardArrowDown,
 } from "react-icons/md";
-import { useParams } from "react-router-dom";
 import { FaBook } from "react-icons/fa";
 import { GoAlertFill } from "react-icons/go";
 import { FiLoader } from "react-icons/fi";
+import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchGrades, fetchChildren } from "../../../Store/Slices/Parent/Children/children.action"; // Import correct Redux actions
+import { fetchGrades, fetchChildren } from "../../../Store/Slices/Parent/Children/children.action";
 
-const GradeAccordionItem = ({ onToggleSidebar }) => {
+const GradeAccordionItem = memo(({ onToggleSidebar }) => {
   const [isOpen, setIsOpen] = useState(null);
   const { studentId } = useParams();
   const dispatch = useDispatch();
 
-  // Get subjects and grades from Redux state
-  const { children: studentSubjects, grades, loading } = useSelector((state) => state.Parent.children);
+  // Get subjects, grades, loading, and error from Redux state
+  const { children: studentSubjects, grades, loading, error } = useSelector((state) => state.Parent.children);
 
   useEffect(() => {
     // Fetch subjects (children) on component mount
-    if (studentSubjects.length === 0) {
+    if (studentSubjects?.length === 0) {
       dispatch(fetchChildren()); // Fetch subjects from Redux state
     }
-  }, [dispatch, studentSubjects.length]);
+  }, [dispatch, studentSubjects?.length]);
 
   const toggleOpen = (index, subjectId) => {
     const newOpenState = isOpen === index ? null : index;
@@ -33,10 +31,25 @@ const GradeAccordionItem = ({ onToggleSidebar }) => {
     onToggleSidebar(newOpenState !== null);
 
     if (newOpenState !== null && !grades?.[subjectId]) {
-      // Fetch grades if not already available in Redux state
+      // Lazy load grades when the accordion is opened
       dispatch(fetchGrades({ studentId, subjectId }));
     }
   };
+
+  // Error Handling UI
+  if (error) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="flex items-center flex-col text-center">
+          <GoAlertFill className="text-[3rem] text-gray-400" />
+          <p className="text-xl font-bold text-gray-600">
+            {error || "Something went wrong. Please try again later."}: Please Check your Network.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
 
   return (
     <>
@@ -50,7 +63,7 @@ const GradeAccordionItem = ({ onToggleSidebar }) => {
               <div className="border rounded-full p-2">
                 <FaBook className="text-[2rem] text-pink-400" />
               </div>
-              <span className="font-bold">{subject?.name}</span>
+              <span className="font-bold">{subject?.name || "Unknown Subject"}</span>
             </div>
             <span>
               {isOpen === index ? (
@@ -88,24 +101,24 @@ const GradeAccordionItem = ({ onToggleSidebar }) => {
                       grades?.[subject?._id]?.map((grade, idx) => (
                         <tr key={idx} className="bg-white">
                           <td className="px-5 py-2 flex items-center w-[10rem]">
-                            <span>{grade?.Name}</span>
+                            <span>{grade?.Name || "No Name Available"}</span>
                           </td>
-                          <td className="px-5 py-2">{grade?.dueDate?.slice(0, 10)}</td>
-                          <td className="px-5 py-2">{grade?.submittedDate?.slice(0, 10)}</td>
+                          <td className="px-5 py-2">{grade?.dueDate?.slice(0, 10) || "N/A"}</td>
+                          <td className="px-5 py-2">{grade?.submittedDate?.slice(0, 10) || "N/A"}</td>
                           <td className="px-5 py-2">
                             <span className={`${grade?.status === 'Submit' ? 'text-green-500' : 'text-red-500'} font-medium`}>
-                              {grade?.status}
+                              {grade?.status || "No Status"}
                             </span>
                           </td>
-                          <td className="px-5 py-2 text-center">{grade?.score}</td>
+                          <td className="px-5 py-2 text-center">{grade?.score ?? "N/A"}</td>
                         </tr>
                       ))
                     ) : (
                       <tr className="w-full text-center text-gray-500 py-2">
                         <td className="px-5 py-2" colSpan="5">
                           <div className="flex items-center justify-center flex-col text-2xl">
-                            <GoAlertFill className="text-[3rem]" />
-                            No Data Found
+                            <GoAlertFill className="text-[3rem] text-gray-400" />
+                            <p>No Data Found</p>
                           </div>
                         </td>
                       </tr>
@@ -119,6 +132,6 @@ const GradeAccordionItem = ({ onToggleSidebar }) => {
       ))}
     </>
   );
-};
+});
+export default React.memo(GradeAccordionItem);
 
-export default GradeAccordionItem;

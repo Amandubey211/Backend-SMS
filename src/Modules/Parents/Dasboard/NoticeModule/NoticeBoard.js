@@ -21,7 +21,7 @@ const NoticeBoard = ({ numberOfChildren }) => {
   const navigate = useNavigate();
 
   // Get the notices and loading state from Redux
-  const { notices = [], loading = false, error = null } = useSelector((state) => state.Parent.dashboard);
+  const { notices, loading, error} = useSelector((state) => state.Parent.dashboard);
 
   // Fetch notices on component mount
   useEffect(() => {
