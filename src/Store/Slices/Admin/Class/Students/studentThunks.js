@@ -18,7 +18,7 @@ export const fetchStudentsByClassAndSection = createAsyncThunk(
     } catch (error) {
       const errorMessage =
         error.response?.data?.message || "Failed to fetch students";
-      toast.error(errorMessage);
+      // toast.error(errorMessage);
       return rejectWithValue(errorMessage);
     }
   }
@@ -38,7 +38,7 @@ export const fetchAllStudents = createAsyncThunk(
     } catch (error) {
       const errorMessage =
         error.response?.data?.message || "Failed to fetch all students";
-      toast.error(errorMessage);
+      // toast.error(errorMessage);
       return rejectWithValue(errorMessage);
     }
   }

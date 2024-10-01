@@ -16,7 +16,6 @@ import { FaUsers } from "react-icons/fa";
 const MainSection = () => {
   const [activeSection, setActiveSection] = useState("Everyone");
   const [activeSectionId, setActiveSectionId] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const dispatch = useDispatch();
   const { cid } = useParams();

@@ -13,8 +13,7 @@ import { FaUserSlash } from "react-icons/fa"; // Import an icon for no students
 
 const AddGroup = ({ group, isUpdate, groupId, onClose }) => {
   const [groupName, setGroupName] = useState(group?.groupName || "");
-  const [seatLimit, setSeatLimit] = useState(group?.seatLimit || "");
-  const [students, setStudents] = useState([]);
+  const [seatLimit, setSeatLimit] = useState(group?.seatLimit || 5);
   const [selectedStudents, setSelectedStudents] = useState(
     group?.students || []
   );

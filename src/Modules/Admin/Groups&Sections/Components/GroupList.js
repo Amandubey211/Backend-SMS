@@ -8,6 +8,7 @@ import { deleteGroup } from "../../../../Store/Slices/Admin/Class/Section_Groups
 import useDeleteModal from "../../../../Hooks/CommonHooks/useDeleteModal";
 import DeleteModal from "../../../../Components/Common/DeleteModal";
 import AddGroup from "./AddGroup";
+import { BsThreeDotsVertical } from "react-icons/bs";
 
 const GroupList = ({
   groupList,
@@ -212,7 +213,9 @@ const GroupList = ({
                           See Grade
                         </button>
                       </div>
-                      <div className="flex-shrink-0 w-1/8 relative"></div>
+                      <div className="flex-shrink-0 w-1/8 relative">
+                        <BsThreeDotsVertical />
+                      </div>
                     </li>
                   ))
                 )}
