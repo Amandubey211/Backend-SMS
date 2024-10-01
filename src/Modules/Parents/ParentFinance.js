@@ -3,7 +3,7 @@ import Layout from "../../Components/Common/Layout";
 import ParentDashLayout from "../../Components/Parents/ParentDashLayout.js";
 import { MdAccessTime } from "react-icons/md";
 import { GiExpense } from "react-icons/gi";
-import { RiSignalWifiErrorFill } from "react-icons/ri"; // Imported network error icon
+import { RiSignalWifiErrorFill } from "react-icons/ri";
 import { FaMoneyBillWave } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchParentFinanceData } from "../../Store/Slices/Parent/Finance/finance.action.js";
