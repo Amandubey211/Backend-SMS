@@ -48,7 +48,7 @@ const TeacherCard = ({ teacher }) => {
         <div className="font-bold text-xl mb-1">
           {teacher.firstName} {teacher.lastName}
         </div>
-        <p className="text-gray-700 text-sm">{role}</p>
+        <p className="text-gray-700 text-sm ">Instructor</p>
       </div>
       <div className="text-center mt-4 border-t pt-2 w-full">
         <p className="text-gray-500 text-xs uppercase">Phone</p>

@@ -51,7 +51,7 @@ const BookIssueTab = ({ handleSidebarOpen, setEditIssueData }) => {
 
   return (
     <>
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex justify-between items-end mb-4">
         <div className="flex space-x-4">
           <FormField
             id="classLevel"
@@ -132,7 +132,7 @@ const BookIssueTab = ({ handleSidebarOpen, setEditIssueData }) => {
               ))
             ) : (
               <tr>
-                <td colSpan="7">
+                <td colSpan="7" className="h-80">
                   <NoDataFound message="No Book Issues Found" />
                 </td>
               </tr>

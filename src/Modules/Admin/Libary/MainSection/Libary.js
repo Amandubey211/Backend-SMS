@@ -27,7 +27,6 @@ const LibraryAndBookIssue = () => {
   const [activeTab, setActiveTab] = useState("Library");
   const [editIssueData, setEditIssueData] = useState(null);
 
-  // Fetch books, book issues, classes, and students on component mount
   useEffect(() => {
     if (!books.length) dispatch(fetchBooksThunk());
     if (!bookIssues.length) dispatch(fetchBookIssuesThunk());
@@ -41,19 +40,17 @@ const LibraryAndBookIssue = () => {
     StudentList.length,
   ]);
 
-  // Close sidebar automatically after a successful add or edit operation
   useEffect(() => {
     if (addBookSuccess || addIssueSuccess) {
       setSidebarOpen(false);
-      setEditIssueData(null); // Reset edit data
+      setEditIssueData(null);
     }
   }, [addBookSuccess, addIssueSuccess]);
 
-  // Sidebar controls
   const handleSidebarOpen = () => setSidebarOpen(true);
   const handleSidebarClose = () => {
     setSidebarOpen(false);
-    setEditIssueData(null); // Reset edit data after closing the sidebar
+    setEditIssueData(null);
   };
   const currentPath = activeTab === "Library" ? "Library" : "Book Issue";
   useNavHeading("Admin", currentPath);
@@ -64,7 +61,7 @@ const LibraryAndBookIssue = () => {
         {loading ? (
           <Spinner />
         ) : (
-          <div className="min-h-screen p-4">
+          <div className="min-h-screen p-4 flex flex-col">
             {/* Tab Buttons */}
             <div className="flex gap-7 mb-4">
               <TabButton
@@ -82,14 +79,16 @@ const LibraryAndBookIssue = () => {
             </div>
 
             {/* Tab Content */}
-            {activeTab === "Library" ? (
-              <LibraryTab handleSidebarOpen={handleSidebarOpen} />
-            ) : (
-              <BookIssueTab
-                handleSidebarOpen={handleSidebarOpen}
-                setEditIssueData={setEditIssueData}
-              />
-            )}
+            <div className="flex-1">
+              {activeTab === "Library" ? (
+                <LibraryTab handleSidebarOpen={handleSidebarOpen} />
+              ) : (
+                <BookIssueTab
+                  handleSidebarOpen={handleSidebarOpen}
+                  setEditIssueData={setEditIssueData}
+                />
+              )}
+            </div>
 
             {/* Sidebar for Add/Edit Book or Issue */}
             <Sidebar
@@ -101,7 +100,7 @@ const LibraryAndBookIssue = () => {
                   : editIssueData
                   ? "Edit Book Issue"
                   : "Add Book Issue"
-              } // Dynamically set the sidebar title
+              }
             >
               {activeTab === "Library" ? (
                 <AddBook onClose={handleSidebarClose} />

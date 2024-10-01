@@ -9,43 +9,33 @@ const LibraryTab = ({ handleSidebarOpen }) => {
   const dispatch = useDispatch();
   const { books, filters } = useSelector((state) => state.admin.library);
 
-  // Get unique class levels and categories for book filtering
   const classLevels = [
     ...new Set(books.map((book) => book.classId?.className)),
-  ].filter(Boolean); // Remove empty class names
+  ].filter(Boolean);
   const categories = [...new Set(books.map((book) => book.category))].filter(
     Boolean
-  ); // Remove empty categories
+  );
 
-  // Filter books based on selected filters
   const filteredBooks = books.filter((book) => {
     const bookClassName = book.classId?.className?.toLowerCase() || "";
     const bookCategory = book.category?.toLowerCase() || "";
     const selectedClass = filters.class?.toLowerCase() || "";
     const selectedCategory = filters.category?.toLowerCase() || "";
 
-    // Only return books that match both selected class and category
     if (selectedClass && selectedCategory) {
       return (
         bookClassName === selectedClass && bookCategory === selectedCategory
       );
     }
-
-    // Return books that match only the selected class
     if (selectedClass && !selectedCategory) {
       return bookClassName === selectedClass;
     }
-
-    // Return books that match only the selected category
     if (!selectedClass && selectedCategory) {
       return bookCategory === selectedCategory;
     }
-
-    // If no filters are applied, return all books
     return true;
   });
 
-  // Handle filter change
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
     dispatch(setFilters({ key: name, value }));
@@ -54,7 +44,7 @@ const LibraryTab = ({ handleSidebarOpen }) => {
   return (
     <>
       <div className="flex justify-between items-end space-x-2">
-        <div className="flex gap-6">
+        <div className="flex gap-4">
           <FormField
             id="class"
             name="class"
@@ -80,11 +70,15 @@ const LibraryTab = ({ handleSidebarOpen }) => {
         </button>
       </div>
 
-      <div className="grid grid-cols-3 gap-4 p-4">
+      <div className="flex justify-center items-center w-full min-h-[70vh]">
         {filteredBooks.length > 0 ? (
-          filteredBooks.map((book) => <BookCard key={book._id} book={book} />)
+          <div className="grid grid-cols-3 gap-4 w-full p-4">
+            {filteredBooks.map((book) => (
+              <BookCard key={book._id} book={book} />
+            ))}
+          </div>
         ) : (
-          <div className="h-96 w-full  flex justify-center items-center">
+          <div className="flex justify-center items-center min-h-[50vh]">
             <NoDataFound message="No Books Found" />
           </div>
         )}
