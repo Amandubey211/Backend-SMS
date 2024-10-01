@@ -14,11 +14,11 @@ import {
 } from "./groupSectionThunks";
 
 const initialState = {
-  sectionsList: [],
-  groupsList: [],
-  unassignedStudentsList: [],
-  loading: false,
-  error: null,
+  sectionsList: [], // List of all sections
+  groupsList: [], // List of all groups
+  unassignedStudentsList: [], // List of unassigned students
+  loading: false, // Loading state
+  error: null, // Error state
 };
 
 const groupSectionSlice = createSlice({
@@ -218,4 +218,5 @@ export const {
   setUnassignedStudentsList,
   clearError,
 } = groupSectionSlice.actions;
+
 export default groupSectionSlice.reducer;

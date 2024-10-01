@@ -1,29 +1,32 @@
-import React, { useState, useCallback, memo } from "react";
+import React, { useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { LuUser } from "react-icons/lu";
 import { GiImperialCrown } from "react-icons/gi";
 import { TbDotsVertical } from "react-icons/tb";
 import { FaUsers } from "react-icons/fa";
-import { deleteGroup } from "../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
-import useDeleteModal from "../../../../Hooks/CommonHooks/useDeleteModal";
+import {
+  deleteGroup,
+  fetchGroupsByClass,
+} from "../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
 import DeleteModal from "../../../../Components/Common/DeleteModal";
 import AddGroup from "./AddGroup";
 import { BsThreeDotsVertical } from "react-icons/bs";
+import Spinner from "../../../../Components/Common/Spinner";
 
-const GroupList = ({
-  groupList,
-  fetchGroups,
-  fetchStudents,
-  onSeeGradeClick,
-}) => {
+const GroupList = ({ onSeeGradeClick }) => {
   const [expandedGroupIndex, setExpandedGroupIndex] = useState(null);
   const [activeMenu, setActiveMenu] = useState(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [editingGroup, setEditingGroup] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [groupToDelete, setGroupToDelete] = useState(null);
 
   const dispatch = useDispatch();
-  const { isModalOpen, modalData, openModal, closeModal } = useDeleteModal();
+  const { cid } = useSelector((store) => store.common.auth); // Fetch class ID from the Redux store
+  const { groupsList, loading, error } = useSelector(
+    (store) => store.admin.group_section
+  );
 
   const handleMenuToggle = (groupIndex) => {
     setActiveMenu((prevActiveMenu) =>
@@ -32,31 +35,31 @@ const GroupList = ({
   };
 
   const handleEdit = (group) => {
-    setEditingGroup(group);
-    setIsSidebarOpen(true);
-    setActiveMenu(null);
+    setEditingGroup(group); // Set the selected group to be edited
+    setIsSidebarOpen(true); // Open the sidebar for editing
   };
 
-  const handleDelete = (group) => {
-    openModal(group);
-    setActiveMenu(null);
+  // Trigger modal for confirming group deletion
+  const handleDeleteClick = (group) => {
+    setGroupToDelete(group); // Set the group to be deleted
+    setIsDeleteModalOpen(true); // Open the delete modal
   };
 
   const handleDeleteConfirm = async () => {
-    await dispatch(deleteGroup(modalData._id));
-    closeModal();
-    fetchGroups();
-    fetchStudents();
+    await dispatch(deleteGroup(groupToDelete._id));
+    setIsDeleteModalOpen(false);
+    setGroupToDelete(null);
+    dispatch(fetchGroupsByClass(cid)); // Refetch groups after deletion
   };
 
   const closeSidebar = useCallback(() => {
     setIsSidebarOpen(false);
     setEditingGroup(null);
-    fetchGroups();
-  }, [fetchGroups]);
+    dispatch(fetchGroupsByClass(cid)); // Refetch groups after editing
+  }, [dispatch, cid]);
 
   // Filter groups based on search query
-  const filteredGroups = groupList.filter((group) =>
+  const filteredGroups = groupsList.filter((group) =>
     group.groupName.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -78,8 +81,10 @@ const GroupList = ({
         </div>
       </div>
 
-      {filteredGroups.length === 0 ? (
-        <div className="flex flex-col items-center justify-center h-64 text-center text-gray-500">
+      {loading ? (
+        <Spinner />
+      ) : error || filteredGroups.length === 0 ? (
+        <div className="flex flex-col items-center justify-center h-full text-center text-gray-500">
           <FaUsers className="text-6xl mb-4" />
           <p>No groups found.</p>
         </div>
@@ -125,7 +130,7 @@ const GroupList = ({
                       </div>
                       <div
                         className="px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer"
-                        onClick={() => handleDelete(group)}
+                        onClick={() => handleDeleteClick(group)}
                       >
                         Delete
                       </div>
@@ -150,7 +155,7 @@ const GroupList = ({
                     strokeLinejoin="round"
                     strokeWidth="2"
                     d="M19 9l-7 7-7-7"
-                  ></path>
+                  />
                 </svg>
               </div>
             </div>
@@ -233,19 +238,19 @@ const GroupList = ({
               isUpdate={!!editingGroup}
               groupId={editingGroup?._id}
               onClose={closeSidebar}
-              fetchGroups={fetchGroups}
             />
           </div>
         </div>
       )}
+
       <DeleteModal
-        isOpen={isModalOpen}
-        onClose={closeModal}
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
         onConfirm={handleDeleteConfirm}
-        title={modalData?.groupName || ""}
+        title={groupToDelete?.groupName || ""}
       />
     </div>
   );
 };
 
-export default memo(GroupList);
+export default GroupList;

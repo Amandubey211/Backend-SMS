@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import toast from "react-hot-toast";
 import { GiImperialCrown } from "react-icons/gi";
 import { FaChevronDown, FaTimes } from "react-icons/fa";
@@ -7,34 +7,37 @@ import {
   createGroup,
   updateGroup,
   fetchUnassignedStudents,
+  fetchGroupsByClass,
 } from "../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
 import { useParams } from "react-router-dom";
-import { FaUserSlash } from "react-icons/fa"; // Import an icon for no students
+import { FaUserSlash } from "react-icons/fa";
 
 const AddGroup = ({ group, isUpdate, groupId, onClose }) => {
-  const [groupName, setGroupName] = useState(group?.groupName || "");
-  const [seatLimit, setSeatLimit] = useState(group?.seatLimit || 5);
-  const [selectedStudents, setSelectedStudents] = useState(
-    group?.students || []
-  );
-  const [leader, setLeader] = useState(group?.leader || null);
+  const [groupName, setGroupName] = useState("");
+  const [seatLimit, setSeatLimit] = useState(5);
+  const [selectedStudents, setSelectedStudents] = useState([]);
+  const [leader, setLeader] = useState(null);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
 
-  const unassignedStudents = useSelector(
-    (store) => store.admin.group_section.unassignedStudentsList
-  );
-  const { loading, error } = useSelector((store) => store.admin.group_section);
   const dispatch = useDispatch();
   const { cid } = useParams();
 
+  // Get unassigned students and loading/error state from Redux store
+  const { unassignedStudents, loading, error } = useSelector((store) => ({
+    unassignedStudents: store.admin.group_section.unassignedStudentsList,
+    loading: store.admin.group_section.loading,
+    error: store.admin.group_section.error,
+  }));
+
+  // Preload data when editing a group
   useEffect(() => {
     if (isUpdate && group) {
-      setGroupName(group.groupName);
-      setSeatLimit(group.seatLimit);
-      setSelectedStudents(group.students);
-      setLeader(group.leader);
+      setGroupName(group.groupName || ""); // Set group name
+      setSeatLimit(group.seatLimit || 5); // Set seat limit
+      setSelectedStudents(group.students || []); // Set selected students
+      setLeader(group.leader || null); // Set leader
     }
-  }, [isUpdate, group]);
+  }, [isUpdate, group]); // Triggered only when editing
 
   useEffect(() => {
     dispatch(fetchUnassignedStudents(cid));
@@ -83,6 +86,7 @@ const AddGroup = ({ group, isUpdate, groupId, onClose }) => {
     try {
       if (isUpdate) {
         await dispatch(updateGroup({ groupId, formData }));
+
         onClose();
       } else {
         await dispatch(createGroup(formData));
@@ -91,6 +95,7 @@ const AddGroup = ({ group, isUpdate, groupId, onClose }) => {
         setSelectedStudents([]);
         setLeader(null);
       }
+      dispatch(fetchGroupsByClass(cid));
     } catch (err) {
       toast.error(err.message || "Something went wrong");
     }

@@ -1,9 +1,12 @@
 import React, { useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-import Sidebar from "../../../../Components/Common/Sidebar";
 import { RiDeleteBin5Line, RiEdit2Line } from "react-icons/ri";
-import { deleteSection } from "../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
+import Sidebar from "../../../../Components/Common/Sidebar";
+import {
+  deleteSection,
+  fetchSectionsByClass,
+} from "../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
 import AddSection from "./AddSection";
 import AddGroup from "./AddGroup";
 import DeleteModal from "../../../../Components/Common/DeleteModal";
@@ -18,26 +21,26 @@ const NavigationBar = ({ onSectionChange, selectedSection }) => {
   const dispatch = useDispatch();
   const { cid } = useParams();
 
-  // Fetch sections from Redux store
   const sections = useSelector(
     (store) => store.admin.group_section.sectionsList
   );
 
-  // Handle Sidebar operations
   const openAddGroupSidebar = useCallback(() => setSidebarType("addGroup"), []);
   const openAddSectionSidebar = useCallback(() => {
     setSidebarType("addSection");
-    setEditingSection(null); // Ensure no section is being edited when adding a new section
-  }, []);
-  const closeSidebar = useCallback(() => {
-    setSidebarType(null);
     setEditingSection(null);
   }, []);
 
+  const closeSidebar = useCallback(() => {
+    setSidebarType(null);
+    setEditingSection(null);
+    dispatch(fetchSectionsByClass(cid)); // Fetch sections again after adding or editing
+  }, [dispatch, cid]);
+
   const handleDeleteConfirm = async () => {
     await dispatch(deleteSection(sectionToDelete._id));
-    closeSidebar();
     setDeleteModalOpen(false);
+    dispatch(fetchSectionsByClass(cid)); // Fetch sections after deletion
   };
 
   const handleEditSection = useCallback((section) => {
@@ -111,6 +114,7 @@ const NavigationBar = ({ onSectionChange, selectedSection }) => {
         </button>
       </div>
 
+      {/* Sidebars for adding/editing sections and groups */}
       <Sidebar
         isOpen={sidebarType === "addSection"}
         onClose={closeSidebar}
@@ -122,7 +126,7 @@ const NavigationBar = ({ onSectionChange, selectedSection }) => {
       <Sidebar
         isOpen={sidebarType === "addGroup"}
         onClose={closeSidebar}
-        title="Add New Group"
+        title="New Group"
       >
         <AddGroup onClose={closeSidebar} />
       </Sidebar>
