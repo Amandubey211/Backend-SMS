@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import NavSection from "./Components/NavSection";
 import FilterAttendanceBar from "./Components/FilterAttendanceBar";
 import AttendanceTable from "./Components/AttendanceTable";
@@ -6,44 +6,22 @@ import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import Spinner from "../../../Components/Common/Spinner";
 import NoDataFound from "../../../Components/Common/NoDataFound";
-import { months } from "./Components/Data/AttendenceData";
-import {
-  fetchAttendance,
-  fetchAttendanceByClassSectionGroupDate,
-} from "../../../Store/Slices/Admin/Class/Attendence/attendanceThunks";
+import { fetchStudentsMonthAttendanceList } from "../../../Store/Slices/Admin/Class/Attendence/attendanceThunks";
 
 const MainSection = () => {
-  const currentMonthIndex = new Date().getMonth();
-  const currentMonthName = months[currentMonthIndex].number;
-
-  const [filters, setFilters] = useState({
-    sectionId: "",
-    groupId: "",
-    month: currentMonthName,
-    filter: "",
-  });
-
-  const { cid } = useParams();
   const dispatch = useDispatch();
+  const { cid } = useParams(); // Get class ID from URL
 
-  // Access attendance data, statistics, loading, and error from Redux
-  const { attendanceData, attendanceStat, loading, error } = useSelector(
+  const { loading, error, filters } = useSelector(
     (state) => state.admin.attendance
   );
 
-  const handleFilterChange = (name, value) => {
-    setFilters((prevFilters) => ({
-      ...prevFilters,
-      [name]: value,
-    }));
-  };
-
   useEffect(() => {
     if (cid && filters.month) {
-      console.log("sdfsdfsdfsdf");
-      const year = "2024";
+      const year = new Date().getFullYear(); // Use the current year dynamically
+
       dispatch(
-        fetchAttendanceByClassSectionGroupDate({
+        fetchStudentsMonthAttendanceList({
           classId: cid,
           sectionId: filters.sectionId,
           groupId: filters.groupId,
@@ -56,23 +34,14 @@ const MainSection = () => {
 
   return (
     <div className="p-4">
-      <NavSection
-        onFilterChange={(newFilter) => handleFilterChange("filter", newFilter)}
-      />
-      <FilterAttendanceBar
-        filters={filters}
-        onFilterChange={handleFilterChange}
-      />
+      <NavSection />
+      <FilterAttendanceBar />
       {loading ? (
         <Spinner />
       ) : error ? (
-        <NoDataFound title="Attendence" />
+        <NoDataFound title="Attendance" />
       ) : (
-        <AttendanceTable
-          filter={filters.filter}
-          attendanceData={attendanceData}
-          filters={filters}
-        />
+        <AttendanceTable />
       )}
     </div>
   );

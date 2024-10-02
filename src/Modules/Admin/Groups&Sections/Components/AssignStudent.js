@@ -9,13 +9,7 @@ import {
   fetchUnassignedStudents,
 } from "../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
 
-const AssignStudent = ({
-  name,
-  imageUrl,
-  section,
-  studentId,
-  onAssignmentComplete,
-}) => {
+const AssignStudent = ({ name, imageUrl, section, studentId }) => {
   const [sectionId, setSectionId] = useState("");
   const AllSections = useSelector(
     (store) => store.admin.group_section.sectionsList
@@ -24,10 +18,18 @@ const AssignStudent = ({
   const { cid } = useParams();
   const dispatch = useDispatch();
 
+  // Preload the sectionId if the student already has a section
   useEffect(() => {
-    // if (AllSections.length === 0)
-    dispatch(fetchSectionsByClass(cid));
-  }, [cid, dispatch]);
+    if (AllSections.length === 0) dispatch(fetchSectionsByClass(cid));
+
+    // If the student already has a section assigned, preload it in the dropdown
+    const sectionToPreload = AllSections.find(
+      (sec) => sec.sectionName === section
+    );
+    if (sectionToPreload) {
+      setSectionId(sectionToPreload._id);
+    }
+  }, [cid, dispatch, section, AllSections]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -41,8 +43,8 @@ const AssignStudent = ({
 
       dispatch(fetchUnassignedStudents(cid)); // Refetch unassigned students
       dispatch(fetchGroupsByClass(cid)); // Refetch groups after assignment
+      toast.success("Student assigned successfully!");
     } catch (error) {
-      console.log(error, "sdfsdf");
       toast.error(error.message || "Something went wrong");
     }
   };

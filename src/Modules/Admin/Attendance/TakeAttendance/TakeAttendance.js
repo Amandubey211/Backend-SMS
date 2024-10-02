@@ -10,7 +10,7 @@ const TakeAttendance = () => {
     (store) => store.common.user.classInfo.selectedClassName
   );
 
-  useNavHeading(className, "Attendance");
+  useNavHeading(className, "Take Attendance");
   return (
     <Layout title={`Take Attendance | Student Diwan`}>
       <DashLayout children={<MainSection />} hideStudentView={true} />

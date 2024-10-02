@@ -1,14 +1,15 @@
 import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-
 import { useParams } from "react-router-dom";
 import { FiRefreshCw } from "react-icons/fi";
 import {
   fetchGroupsByClass,
   fetchSectionsByClass,
 } from "../../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
+import { setFilters } from "../../../../../Store/Slices/Admin/Class/Attendence/attendanceSlice";
 
-const Filters = ({ filters, onFilterChange }) => {
+const Filters = ({ isSectionInvalid }) => {
+  const { filters } = useSelector((state) => state.admin.attendance);
   const { sectionId, groupId } = filters;
   const dispatch = useDispatch();
   const { cid } = useParams();
@@ -25,17 +26,12 @@ const Filters = ({ filters, onFilterChange }) => {
     }
   }, [dispatch, cid]);
 
-  const handleSectionChange = (e) => {
-    onFilterChange("sectionId", e.target.value);
-  };
-
-  const handleGroupChange = (e) => {
-    onFilterChange("groupId", e.target.value);
+  const handleFilterChange = (name, value) => {
+    dispatch(setFilters({ [name]: value }));
   };
 
   const handleAllChange = () => {
-    onFilterChange("sectionId", "");
-    onFilterChange("groupId", "");
+    dispatch(setFilters({ sectionId: "", groupId: "" }));
   };
 
   return (
@@ -44,11 +40,13 @@ const Filters = ({ filters, onFilterChange }) => {
         <div className="flex flex-col">
           <label className="text-gray-600 mb-1">Section</label>
           <select
-            className="border rounded p-2 w-56"
+            className={`border rounded p-2 w-56 transition-all duration-300 ${
+              isSectionInvalid ? "border-red-500" : "border-gray-300"
+            }`} // Apply red border if section is invalid
             value={sectionId}
-            onChange={handleSectionChange}
+            onChange={(e) => handleFilterChange("sectionId", e.target.value)}
           >
-            <option value="">Reset</option>
+            <option value="">Choose Section</option>
             {sections.map((section) => (
               <option key={section._id} value={section._id}>
                 {section.sectionName}
@@ -59,11 +57,11 @@ const Filters = ({ filters, onFilterChange }) => {
         <div className="flex flex-col">
           <label className="text-gray-600 mb-1">Group</label>
           <select
-            className="border rounded p-2 w-56"
+            className="border rounded p-2 w-56 border-gray-300"
             value={groupId}
-            onChange={handleGroupChange}
+            onChange={(e) => handleFilterChange("groupId", e.target.value)}
           >
-            <option value="">Reset Group</option>
+            <option value="">Choose Group</option>
             {groups.map((group) => (
               <option key={group._id} value={group._id}>
                 {group.groupName}
@@ -74,9 +72,10 @@ const Filters = ({ filters, onFilterChange }) => {
       </div>
       <div className="flex items-center">
         <button
+          title="Reset"
           onClick={handleAllChange}
-          className=" text-gray-600 rounded-full p-2 focus:outline-none transform transition-transform duration-300 hover:rotate-180"
-          aria-label="Refresh attendence"
+          className="text-gray-600 rounded-full p-2 focus:outline-none transform transition-transform duration-300 hover:rotate-180"
+          aria-label="Refresh attendance"
         >
           <FiRefreshCw size={24} />
         </button>

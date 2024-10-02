@@ -32,9 +32,13 @@ export const fetchClassDetails = createAsyncThunk(
     const token = common.auth.token;
 
     try {
-      const response = await axios.get(`${baseUrl}/admin/class/${classId}`, {
-        headers: { Authentication: `Bearer ${token}` },
-      });
+      const response = await axios.get(
+        `${baseUrl}/admin/class/${classId}`,
+
+        {
+          headers: { Authentication: `Bearer ${token}` },
+        }
+      );
 
       console.log(response.data);
       // Dispatch the class and subjects to the Redux store

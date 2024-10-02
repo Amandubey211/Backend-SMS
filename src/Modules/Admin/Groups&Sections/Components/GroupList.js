@@ -27,7 +27,7 @@ const GroupList = ({ onSeeGradeClick }) => {
   const [groupToDelete, setGroupToDelete] = useState(null);
 
   const dispatch = useDispatch();
-  const { cid } = useParams(); // Fetch class ID from the Redux store
+  const { cid } = useParams();
   const { groupsList, loading, error } = useSelector(
     (store) => store.admin.group_section
   );
@@ -52,9 +52,9 @@ const GroupList = ({ onSeeGradeClick }) => {
   };
 
   const handleDeleteConfirm = async () => {
-    dispatch(deleteGroup(groupToDelete._id));
-    dispatch(fetchGroupsByClass(cid)); // Refetch groups after deletion
+    dispatch(deleteGroup(groupToDelete?._id));
     dispatch(fetchUnassignedStudents(cid));
+    dispatch(fetchGroupsByClass(cid)); // Refetch groups after deletion
     setIsDeleteModalOpen(false);
     setGroupToDelete(null);
   };
@@ -105,14 +105,17 @@ const GroupList = ({ onSeeGradeClick }) => {
           />
         </div>
       </div>
-
-      {loading ? (
-        <Spinner />
-      ) : error || filteredGroups.length === 0 ? (
-        <div className="flex flex-col items-center justify-center h-full text-center text-gray-500">
-          <FaUsers className="text-6xl mb-4 text-blue-500" />{" "}
-          {/* Colored Icon */}
-          <p>No groups found.</p>
+      {loading || filteredGroups.length === 0 ? (
+        <div className="flex flex-col items-center justify-center h-96 text-center text-gray-500">
+          {loading ? (
+            <Spinner />
+          ) : (
+            <>
+              <FaUsers className="text-8xl mb-1 text-pink-400" />{" "}
+              {/* Colored Icon */}
+              <p>No groups found.</p>
+            </>
+          )}
         </div>
       ) : (
         filteredGroups.map((group, groupIndex) => (

@@ -9,19 +9,17 @@ const getDaysInMonth = (month) => {
   return new Date(new Date().getFullYear(), month, 0).getDate();
 };
 
-const AttendanceTable = ({ filter, filters }) => {
+const AttendanceTable = () => {
+  const { monthlyAttendance, filters } = useSelector(
+    (state) => state.admin.attendance
+  );
   const { month } = filters;
 
-  // Fetch attendance data directly from the Redux store
-  const attendanceData = useSelector(
-    (state) => state.admin.attendance.attendanceData
-  );
-
-  const transformData = (attendanceData) => {
+  const transformData = (monthlyAttendance) => {
     const daysInMonth = getDaysInMonth(month);
     const students = {};
 
-    attendanceData.forEach((record) => {
+    monthlyAttendance.forEach((record) => {
       const { studentId, name, admissionNumber, profile, attendanceStatus } =
         record;
 
@@ -61,7 +59,7 @@ const AttendanceTable = ({ filter, filters }) => {
     }
   };
 
-  const filteredStudents = transformData(attendanceData);
+  const filteredStudents = transformData(monthlyAttendance);
 
   return (
     <div className="overflow-x-auto">
