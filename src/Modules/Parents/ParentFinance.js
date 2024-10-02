@@ -9,8 +9,10 @@ import { useSelector, useDispatch } from "react-redux";
 import { fetchParentFinanceData } from "../../Store/Slices/Parent/Finance/finance.action.js";
 import Spinner from "../../Components/Common/Spinner";
 import useNavHeading from "../../Hooks/CommonHooks/useNavHeading .js";
+import { useTranslation } from "react-i18next"; // Importing translation hook
 
 const ParentFinanceTable = () => {
+  const { t } = useTranslation("prtFinance"); // Initialize translation hook
   const dispatch = useDispatch();
 
   // Accessing the redux state, with optional chaining to avoid errors.
@@ -24,7 +26,7 @@ const ParentFinanceTable = () => {
   });
 
   // Custom hook for setting navigation heading
-  useNavHeading("Finance");
+  useNavHeading(t("Finance"));
 
   // Fetch finance data on mount or if dispatch changes
   useEffect(() => {
@@ -42,10 +44,10 @@ const ParentFinanceTable = () => {
 
   // Caching the no data message for performance
   const noDataMessage = useMemo(() => {
-    if (filters.status === "Paid") return "No Paid Entries Available";
-    if (filters.status === "Unpaid") return "No Unpaid Entries Available";
-    return "No Finance Data Available for Now";
-  }, [filters.status]);
+    if (filters.status === "Paid") return t("No Paid Entries Available");
+    if (filters.status === "Unpaid") return t("No Unpaid Entries Available");
+    return t("No Finance Data Available for Now");
+  }, [filters.status, t]);
 
   // Update filters based on user input
   const handleFilterChange = (e) => {
@@ -67,7 +69,7 @@ const ParentFinanceTable = () => {
               <MdAccessTime className="text-gray-400 text-8xl mb-6" />
             )}
             <p className="text-gray-600 text-lg">
-              {error || "Error"}: Failed to fetch finance data.
+              {error || t("Error")}: {t("Failed to fetch finance data")}
             </p>
           </div>
         </td>
@@ -76,7 +78,7 @@ const ParentFinanceTable = () => {
   };
 
   return (
-    <Layout title="Parents | Finance">
+    <Layout title={t("Finance")}>
       <ParentDashLayout hideAvatarList={true}>
         <div className="flex">
           {/* Main content area */}
@@ -120,7 +122,7 @@ const ParentFinanceTable = () => {
                           }`}
                         style={{ paddingLeft: "2px" }}
                       >
-                        {status}
+                        {t(status)}
                       </span>
                     </label>
                   </div>
@@ -132,12 +134,12 @@ const ParentFinanceTable = () => {
             <table className="min-w-full leading-normal">
               <thead>
                 <tr className="text-left text-gray-700 bg-[#F9FAFC]">
-                  <th className="px-5 py-3 border-b-2 border-gray-200 font-normal">Fee Type</th>
-                  <th className="px-5 py-3 border-b-2 border-gray-200 font-normal">Paid By</th>
-                  <th className="px-5 py-3 border-b-2 border-gray-200 font-normal">Due Date</th>
-                  <th className="px-5 py-3 border-b-2 border-gray-200 font-normal">Amount</th>
-                  <th className="px-5 py-3 border-b-2 border-gray-200 font-normal">Status</th>
-                  <th className="px-5 py-3 border-b-2 border-gray-200 font-normal">Action</th>
+                  <th className="px-5 py-3 border-b-2 border-gray-200 font-normal">{t("Fee Type")}</th>
+                  <th className="px-5 py-3 border-b-2 border-gray-200 font-normal">{t("Paid By")}</th>
+                  <th className="px-5 py-3 border-b-2 border-gray-200 font-normal">{t("Due Date")}</th>
+                  <th className="px-5 py-3 border-b-2 border-gray-200 font-normal">{t("Amount")}</th>
+                  <th className="px-5 py-3 border-b-2 border-gray-200 font-normal">{t("Status")}</th>
+                  <th className="px-5 py-3 border-b-2 border-gray-200 font-normal">{t("Action")}</th>
                 </tr>
               </thead>
               <tbody className="space-y-2">
@@ -153,7 +155,7 @@ const ParentFinanceTable = () => {
                 ) : filteredFeesDetails.length > 0 ? (
                   filteredFeesDetails.map((item, index) => (
                     <tr key={index} className="text-left text-gray-700 bg-white shadow-sm">
-                      <td className="px-5 py-4 border-b border-gray-200">{item?.feeType || "No Fee Type"}</td>
+                      <td className="px-5 py-4 border-b border-gray-200">{item?.feeType || t("No Fee Type")}</td>
                       <td className="px-5 py-4 border-b border-gray-200">{item?.paidBy || "------"}</td>
                       <td className="px-5 py-4 border-b border-gray-200">{item?.dueDate || "No Due Date"}</td>
                       <td className="px-5 py-4 border-b border-gray-200">{item?.amount || "No Amount"}</td>
@@ -165,11 +167,11 @@ const ParentFinanceTable = () => {
                       <td className="px-5 py-4 border-b border-gray-200">
                         {item?.status === "Paid" ? (
                           <button className="bg-[#E9F8EB] text-[#0D9755] font-semibold px-4 py-1 rounded-md" disabled>
-                            Completed
+                            {t("Completed")}
                           </button>
                         ) : (
                           <button className="bg-gradient-to-r from-[#C83B62] to-[#7F35CD] text-white font-semibold px-4 py-1 rounded-md">
-                            Pay Now
+                            {t("Pay Now")}
                           </button>
                         )}
                       </td>
@@ -196,19 +198,19 @@ const ParentFinanceTable = () => {
                   <div className="border border-black flex items-center justify-center p-1.5 rounded-full">
                     <MdAccessTime className="text-2xl text-red-400" />
                   </div>
-                  <span className="text-sm">Total Unpaid Fees</span>
+                  <span className="text-sm">{t("Total Unpaid Fees")}</span>
                   <span className="text-xl font-bold bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent bg-clip-text">
                     {totalUnpaidFees || "0"}
                   </span>
                   <button className="flex items-center bg-gradient-to-r from-[#C83B62] to-[#7F35CD] p-1 w-full justify-center px-5 rounded-full">
-                    <span className="text-white">Pay Now</span>
+                    <span className="text-white">{t("Pay Now")}</span>
                   </button>
                 </div>
                 <div className="px-7 py-2 flex flex-1 flex-col justify-around items-center gap-3 border border-gray-300 rounded-lg">
                   <div className="border border-black flex items-center justify-center p-1.5 rounded-full">
                     <GiExpense className="text-2xl text-red-400" />
                   </div>
-                  <span className="text-sm">Total Paid Fees</span>
+                  <span className="text-sm">{t("Total Paid Fees")}</span>
                   <span className="text-xl font-bold bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent bg-clip-text">
                     {totalPaidFees || "0"}
                   </span>

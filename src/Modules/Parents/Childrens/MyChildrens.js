@@ -5,10 +5,14 @@ import Spinner from "../../../Components/Common/Spinner";
 import { FaChild } from 'react-icons/fa';
 import { fetchChildren } from "../../../Store/Slices/Parent/Children/children.action";
 import { RiSignalWifiErrorFill } from "react-icons/ri";
+import { useTranslation } from "react-i18next"; // Import useTranslation from i18next
+
 // Memoization for performance optimization
 const MyChildren = () => {
   const dispatch = useDispatch();
   const { children, loading, error } = useSelector((state) => state?.Parent?.children || {});
+  
+  const { t } = useTranslation('prtChildrens'); // Correctly set the translation namespace
 
   // Fetching children data using Redux thunk
   useEffect(() => {
@@ -30,12 +34,11 @@ const MyChildren = () => {
           <FaChild className="text-gray-400 text-8xl mb-6" />
         )}
         <p className="text-gray-600 text-lg text-center mt-2">
-          {isNetworkError ? "Network Error" : error}: "Unable to fetch children data!"
+          {isNetworkError ? t("Network Error") : error}: {t("Unable to fetch children data!")}
         </p>
       </div>
     );
   };
-  
 
   // Handle conditional rendering based on the state of loading, error, and children data
   const renderContent = useCallback(() => {
@@ -51,7 +54,7 @@ const MyChildren = () => {
       return (
         <div className="flex flex-col items-center justify-center h-full text-center py-10">
           <FaChild className="text-gray-400 text-8xl mb-6" />
-          <p className="text-gray-600 text-lg">No Children Found!</p>
+          <p className="text-gray-600 text-lg">{t("No Children Found!")}</p>
         </div>
       );
     }
@@ -60,7 +63,7 @@ const MyChildren = () => {
       <div className="h-full w-full p-4">
         <div className="text-lg font-medium mb-4 flex items-center">
           {/* Title with children count */}
-          Childs
+          {t("Childs")} {/* Translation applied for "Childs" */}
           <div
             className="ml-2 flex items-center justify-center rounded-full"
             style={{
@@ -90,7 +93,7 @@ const MyChildren = () => {
         </div>
       </div>
     );
-  }, [loading, error, memoizedChildren]);
+  }, [loading, error, memoizedChildren, t]);
 
   return renderContent();
 };

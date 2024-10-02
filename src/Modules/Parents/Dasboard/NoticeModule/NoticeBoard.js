@@ -7,6 +7,7 @@ import { FaBell } from "react-icons/fa"; // Keeping the bell icon for consistenc
 import Spinner from "../../../../Components/Common/Spinner";
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchNotices } from '../../../../Store/Slices/Parent/Dashboard/dashboard.action';
+import { useTranslation } from "react-i18next"; // Import useTranslation from i18next
 
 // Gradient backgrounds for the notices
 const gradientBackgrounds = [
@@ -19,9 +20,10 @@ const gradientBackgrounds = [
 const NoticeBoard = ({ numberOfChildren }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { t } = useTranslation('prtNotices'); // Use i18n translation hook with namespace 'prtNotices'
 
   // Get the notices and loading state from Redux
-  const { notices, loading, error} = useSelector((state) => state.Parent.dashboard);
+  const { notices, loading, error } = useSelector((state) => state.Parent.dashboard);
 
   // Fetch notices on component mount
   useEffect(() => {
@@ -85,7 +87,7 @@ const NoticeBoard = ({ numberOfChildren }) => {
     return (
       <div className="p-4 border-l border-gray-300"> {/* Apply the left border here */}
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-semibold text-gray-600">Noticeboard</h2> {/* Semi-bold and correct heading */}
+          <h2 className="text-lg font-semibold text-gray-600">{t("Noticeboard")}</h2> {/* Use translation for "Noticeboard" */}
         </div>
         <div className="flex flex-col items-center justify-center h-64 text-center overflow-x-auto shadow rounded-lg p-4">
           <div className="flex justify-center items-center"> {/* Spinner positioned similarly to 'My Children' */}
@@ -98,15 +100,15 @@ const NoticeBoard = ({ numberOfChildren }) => {
 
   // Error state handling
   if (error) {
-    message.error("Failed to fetch notices");
+    message.error(t("Failed to fetch notices")); // Add translation for error message
     return (
       <div className="p-4 border-l border-gray-300"> {/* Apply the left border here */}
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-semibold text-gray-600">Noticeboard</h2> {/* Keeping the heading intact */}
+          <h2 className="text-lg font-semibold text-gray-600">{t("Noticeboard")}</h2> {/* Use translation for "Noticeboard" */}
         </div>
         <div className="flex flex-col items-center justify-center h-64 text-center overflow-x-auto shadow rounded-lg p-4"> {/* Consistent layout */}
           <FaBell className="text-gray-400 text-6xl mb-4" />
-          <p className="text-gray-600 text-lg">{error}: Unable to fetch Notices</p> {/* Display the original Redux error message */}
+          <p className="text-gray-600 text-lg">{t("Unable to fetch Notices")}</p> {/* Translated error message */}
         </div>
       </div>
     );
@@ -115,31 +117,38 @@ const NoticeBoard = ({ numberOfChildren }) => {
   return (
     <div className="p-2 border-l border-gray-300"> {/* Apply the left border here */}
       <div className="flex justify-between p-4 items-center px-6">
-        <h2 className="text-md font-semibold text-gray-600">Noticeboard</h2> {/* Semi-bold heading */}
+        <h2 className="text-md font-semibold text-gray-600">{t("Noticeboard")}</h2> {/* Use translation for "Noticeboard" */}
         <button
           className="text-transparent bg-clip-text bg-gradient-to-r from-[#C83B62] to-[#7F35CD]"
           onClick={handleNavigate}
         >
-          See All
+          {t("See All")} {/* Use translation for "See All" */}
         </button>
       </div>
       {latestNotices.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-full text-center overflow-x-auto shadow rounded-lg p-4">
           <FaBell className="text-gray-400 text-6xl mb-4" />
-          <p className="text-gray-600 text-lg">No Notices Available</p>
+          <p className="text-gray-600 text-lg">{t("No Notices Available")}</p> {/* Use translation for "No Notices Available" */}
         </div>
       ) : (
         latestNotices.map((notice, index) => (
           <Notice
-            key={index}
-            image={notice.image || ""}
-            title={notice.title || "Untitled"}
-            startDate={notice.startDate || "N/A"}
-            endDate={notice.endDate || "N/A"}
-            priority={notice.priority || "Normal"}
-            content={truncateText(notice.description || "", 50)}
-            backgroundColor={gradientBackgrounds[index % gradientBackgrounds.length]}
-          />
+          key={index}
+          image={notice.image || ""}
+          title={notice.title || t("Untitled")} 
+          startDate={notice.startDate || "N/A"}
+          endDate={notice.endDate || "N/A"}
+          priority={
+            <span 
+              className={notice.priority === "High priority" ? "bg-pink-200 text-pink-600 font-semibold px-2 py-1 rounded-md" : "bg-gray-200 text-gray-600 font-semibold px-2 py-1 rounded-md"}
+            >
+              {t(notice.priority === "High priority" ? "High Priority" : "Low Priority")}
+            </span>
+          }
+          content={truncateText(notice.description || "", 50)}
+          backgroundColor={gradientBackgrounds[index % gradientBackgrounds.length]}
+        />
+        
         ))
       )}
     </div>

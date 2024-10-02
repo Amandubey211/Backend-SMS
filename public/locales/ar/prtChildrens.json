@@ -1,0 +1,17 @@
+{
+  "My Children": "أطفالي",
+  "Childs": "الأطفال",
+  "Class": "الصف",
+  "Id": "الهوية",
+  "Section": "القسم",
+  "Group": "المجموعة",
+  "See All": "عرض الكل",
+  "No Children Found!": "لم يتم العثور على أطفال!",
+  "Error": "خطأ",
+  "Unable to fetch children data!": "غير قادر على جلب بيانات الأطفال!",
+  "Network Error": "خطأ في الشبكة",
+  "Instructors": "المدرسون",
+  "Grades": "الدرجات",
+  "Attendance": "الحضور",
+  "Check Subject Progress": "تحقق من تقدم المادة"
+}
