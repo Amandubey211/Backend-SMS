@@ -31,13 +31,12 @@ const ProfileCard = ({ profile, onClick,editUser}) => {
     setIsModalOpen(false);
 
    };
-  const role = useSelector((store) => store.Auth.role);
   const {fetchStaff, loading} = useGetAllStaff()
   const {fetchTeachers} = useGetAllTeachers()
   const activateUser = async (event,id)=>{
     event.stopPropagation()
     try {
-      const token = localStorage.getItem(`${role}:token`);
+      const token = localStorage.getItem(`admin:token`);
       const { data } = await axios.put(`${baseUrl}/admin/update_active_status`,{staffId:id,active:true}, {
         headers: { Authentication: token },
       });

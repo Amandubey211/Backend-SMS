@@ -1,34 +1,26 @@
 import React, { useEffect, useState } from "react";
-import { dummyTeachers } from "./dummyData/dummyData";
 import { FiLoader, FiUserPlus } from "react-icons/fi";
-import { BiTrash } from "react-icons/bi";
 import Layout from "../../../../Components/Common/Layout";
 import DashLayout from "../../../../Components/Admin/AdminDashLayout";
-import { NavLink } from "react-router-dom";
 import SidebarSlide from "../../../../Components/Common/SidebarSlide";
 import AddTeacher from "./AddTeacher";
-import useGetAllTeachers from "../../../../Hooks/AuthHooks/Staff/Admin/Teacher/useGetAllTeacher";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import useDeleteUser from "../../../../Hooks/AuthHooks/Staff/Admin/staff/useDeleteUser";
 import AddUser from "../StaffProfile/AddUser";
-import profileIcon from '../../../../Assets/DashboardAssets/profileIcon.png'
 import DeleteConfirmatiomModal from "../../../../Components/Common/DeleteConfirmationModal";
 import { GoAlertFill } from "react-icons/go";
-import { MdBlock, MdOutlinePublishedWithChanges } from "react-icons/md";
 import ProfileCard from "../SubComponents/ProfileCard";
 import ViewTeacher from "./SingleTeacher";
+import { fetchAllTeachers } from "../../../../Store/Slices/Admin/Class/Teachers/teacherThunks";
 const AllTeachers = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [teacherData, setTeacherData] = useState(null);
-  const { fetchTeachers,loading } = useGetAllTeachers();
- const [teacherId,setTeacherId] =useState()
-  const teachers = useSelector((store) => store.Teachers.allTeachers);
+ const [teacherId,setTeacherId] =useState();
+ const {allTeachers,loading} = useSelector((store)=>store.admin.teacher)
+  const dispatch = useDispatch();
   useEffect(() => {
-    
-    fetchTeachers();
-    // fetchSubjects(cid);
-    console.log(teachers);
-  }, []);
+    dispatch(fetchAllTeachers())
+  }, [dispatch]);
   const [sidebarContent, setSidebarContent] = useState(null);
   const [selectedStaff, setSelectedStaff] = useState(null);
   const handleSidebarOpen = () => {setSidebarOpen(true);
@@ -40,7 +32,7 @@ const AllTeachers = () => {
  const deleteTeacher = async()=>{
   await deleteUser(teacherId);
   if(!error){
-    fetchTeachers();
+    dispatch(fetchAllTeachers())
   }
   setIsModalOpen(false);
  }
@@ -85,7 +77,7 @@ const AllTeachers = () => {
     </div>:
         <div className="p-4">
           <div className="flex justify-between items-center mb-4 border-b-2 h-20">
-            <h2 className="text-xl font-semibold flex itmes-center gap-2">All Teachers <span className="bg-purple-400 px-2 text-sm py-1 rounded-full">{teachers?.length}</span></h2>
+            <h2 className="text-xl font-semibold flex itmes-center gap-2">All Teachers <span className="bg-purple-400 px-2 text-sm py-1 rounded-full">{allTeachers?.length}</span></h2>
             <button
               onClick={handleSidebarOpen}
               className="bg-purple-500 text-white px-4 py-2 rounded-md flex items-center space-x-2"
@@ -95,8 +87,8 @@ const AllTeachers = () => {
             </button>
           </div>
           <div className="flex flex-wrap -mx-2">
-            {teachers.length >0 ?
-            teachers.map((teacher, index) => (
+            {allTeachers.length >0 ?
+            allTeachers.map((teacher, index) => (
              
               <ProfileCard
               key={index}

@@ -1,20 +1,17 @@
 
-
-
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { dummyStudentsList } from "../dummyData/dummyData";
 // import Layout from "../../../../Components/Common/Layout";
 // import DashLayout from "../../../../Components/Admin/AdminDashLayout";
 import StudentProfile from "./StudentProfileCard";
 import NavigationMenu from './NavigationMenu.js'
-import BookIssue from "../Components/BookIssueMenu/BookIssue";
-import ParentsProfile from "../Components/ParentMenu/ParentsProfile";
-import StudentFinance from "../Components/FinanceMenu/StudentFinance";
-import StudentAttendance from "../Components/studentAttendance/StudentAttendance";
-import StudentInformationMenu from "../Components/StudentInformationMenu/StudentInformationMenu";
-import StudentCourseProgress from "../Components/StudentCourseProgress/StudentCourseProgress";
-import StudentGradesAccordion from "../Components/studentGradeMenu/StudentGradesAccordion";
+// import BookIssue from "../Components/BookIssueMenu/BookIssue";
+// import ParentsProfile from "../Components/ParentMenu/ParentsProfile";
+// import StudentFinance from "../Components/FinanceMenu/StudentFinance";
+// import StudentAttendance from "../Components/studentAttendance/StudentAttendance";
+// import StudentInformationMenu from "../Components/StudentInformationMenu/StudentInformationMenu";
+// import StudentCourseProgress from "../Components/StudentCourseProgress/StudentCourseProgress";
+// import StudentGradesAccordion from "../Components/studentGradeMenu/StudentGradesAccordion";
 import StudentOverView from "../Components/StudentOverView/StudentOverView";
 import Layout from "../../../../../Components/Common/Layout";
 import DashLayout from "../../../../../Components/Admin/AdminDashLayout";
@@ -22,8 +19,8 @@ import { useSelector } from "react-redux";
 
 const SingleStudent = () => {
   const { cid } = useParams();
-  const students = useSelector((store) => store.Students.allStudent);
-  const student = students.find((s) => s._id === cid);
+  const {allStudents,loading} = useSelector((store) => store.admin.all_students);
+  const student = allStudents.find((s) => s._id === cid);
   const [activeItem, setActiveItem] = useState("OverView");
   if (!student) {
     return <div className="text-center text-red-500">Student not found</div>;
@@ -31,13 +28,13 @@ const SingleStudent = () => {
   const renderContent = () => {
     const menuComponents = {
       "OverView": <StudentOverView student={student} />,
-      "Course Progress": <StudentCourseProgress student={student} />,
-      "Finance": <StudentFinance student={student} />,
-      "Information": <StudentInformationMenu student={student} />,
-      "Parents": <ParentsProfile student={student} />,
-      "Grades": <StudentGradesAccordion student={student} />,
-      "Attendance": <StudentAttendance  student={student} />,
-      "Book Issue": <BookIssue  />
+      // "Course Progress": <StudentCourseProgress student={student} />,
+      // "Finance": <StudentFinance student={student} />,
+      // "Information": <StudentInformationMenu student={student} />,
+      // "Parents": <ParentsProfile student={student} />,
+      // "Grades": <StudentGradesAccordion student={student} />,
+      // "Attendance": <StudentAttendance  student={student} />,
+      // "Book Issue": <BookIssue  />
     };
     return menuComponents[activeItem] || <div>Select a menu item</div>;
   };

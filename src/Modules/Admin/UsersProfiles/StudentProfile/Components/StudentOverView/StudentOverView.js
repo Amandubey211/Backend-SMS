@@ -1,14 +1,14 @@
 import React from "react";
-import AttendanceGraph from "./AttendanceGraph";
-import StudentGradePieChart from "./StudentGradePieChart";
-import TaskChart from "./TaskChart";
-import AllSubjects from "../StudentCourseProgress/allSubjects/AllSubjects";
+// import AttendanceGraph from "./AttendanceGraph";
+// import StudentGradePieChart from "./StudentGradePieChart";
+// import TaskChart from "./TaskChart";
+// import AllSubjects from "../StudentCourseProgress/allSubjects/AllSubjects";
 
 const StudentOverView = () => {
 
   return (
     <>
-      <div className="flex flex-col">
+      {/* <div className="flex flex-col">
     
 
         <div className="" >
@@ -31,7 +31,7 @@ const StudentOverView = () => {
         </div>
 
         
-      </div>
+      </div> */}
     </>
   );
 };
