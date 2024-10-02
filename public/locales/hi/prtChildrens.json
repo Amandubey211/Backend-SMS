@@ -1,0 +1,17 @@
+{
+  "My Children": "मेरे बच्चे",
+  "Childs": "बच्चे",
+  "Class": "कक्षा",
+  "Id": "पहचान",
+  "Section": "अनुभाग",
+  "Group": "समूह",
+  "See All": "सभी देखें",
+  "No Children Found!": "कोई बच्चा नहीं मिला!",
+  "Error": "त्रुटि",
+  "Unable to fetch children data!": "बच्चे का डेटा लाने में असमर्थ",
+  "Network Error": "नेटवर्क त्रुटि",
+  "Instructors": "अनुदेशक",
+  "Grades": "ग्रेड",
+  "Attendance": "उपस्थिति",
+  "Check Subject Progress": "विषय प्रगति जांचें"
+}

@@ -4,79 +4,63 @@ import DashCard from "../Dasboard/Dashcard.js";
 import AccountingSection from "../Accounting/MainSection/ParentAccounts.js";
 import StudentParentCard from "../Dasboard/DashboardData/Students.js";
 import NoticeBoard from "../Dasboard/NoticeModule/NoticeBoard.js";
-import { RiBookOpenLine } from "react-icons/ri";
+import { RiBookOpenLine, RiMoneyDollarBoxFill, RiCalendarCheckLine } from "react-icons/ri";
 import { CiMoneyBill } from "react-icons/ci";
-import { RiMoneyDollarBoxFill } from "react-icons/ri";
-import { RiCalendarCheckLine } from "react-icons/ri";
 import Spinner from "../../../Components/Common/Spinner";
-
-// Thunks for fetching each section's data
+import { useTranslation } from 'react-i18next'; // Import i18next hook
 import { fetchDashboardCards, fetchNotices, fetchChildren, fetchAccountingData } from '../../../Store/Slices/Parent/Dashboard/dashboard.action.js';
 
 const ParentSection = () => {
   const dispatch = useDispatch();
-
-  // Get the data from Redux
+  const { t } = useTranslation(); // Initialize translation function
+  
   const { cardsData = {}, childrenData = [], notices = [], accountingData = {}, loading, error } = useSelector((state) => state.Parent.dashboard || {});
 
   useEffect(() => {
-    console.log("Dispatching fetch actions");
     dispatch(fetchDashboardCards());
     dispatch(fetchChildren());
     dispatch(fetchNotices());
     dispatch(fetchAccountingData());
   }, [dispatch]);
-  
-  useEffect(() => {
-    if (cardsData && Object.keys(cardsData).length > 0) {
-      console.log("Final card data: ", cardsData);
-    } else {
-      console.log("No card data found");
-    }
-  }, [cardsData]);
-  
-  
+
   const cardData = [
     {
-      label: "Due Fees",
-      value: cardsData?.dueFees?.toString() || "0",  // Debugging value
+      label: t("Due Fees", { ns: "stdFinance" }), // Translation key for Due Fees
+      value: cardsData?.dueFees?.toString() || "0",
       bgColor: "bg-rose-200",
       textColor: "text-rose-500",
       icon: <CiMoneyBill />,
     },
     {
-      label: "Upcoming Exams",
-      value: cardsData?.upcomingExamsCount?.toString() || "0",  // Debugging value
+      label: t("Upcoming Exams", { ns: "stdFinance" }), // Translation key for Upcoming Exams
+      value: cardsData?.upcomingExamsCount?.toString() || "0",
       bgColor: "bg-green-200",
       textColor: "text-green-500",
       icon: <RiBookOpenLine />,
     },
     {
-      label: "Result Published",
-      value: cardsData?.publishedResultsCount?.toString() || "0",  // Debugging value
+      label: t("Result Published", { ns: "stdFinance" }), // Translation key for Result Published
+      value: cardsData?.publishedResultsCount?.toString() || "0",
       bgColor: "bg-teal-100",
       textColor: "text-teal-700",
       icon: <RiCalendarCheckLine />,
     },
     {
-      label: "Total Expense",
-      value: cardsData?.totalExpenses?.toString() || "0",  // Debugging value
+      label: t("Total Expense", { ns: "stdFinance" }), // Translation key for Total Expense
+      value: cardsData?.totalExpenses?.toString() || "0",
       bgColor: "bg-purple-200",
       textColor: "text-purple-400",
       icon: <RiMoneyDollarBoxFill />,
     },
   ];
   
-  console.log("Final card data: ", cardData);   // Debugging card data to ensure mapping is correct
-  
+
   return (
     <div className="h-full w-full">
       <div className="w-full">
         <div className="flex flex-wrap justify-center gap-3 py-4">
-          {console.log(cardData)}
           {cardData.map((item, index) => (
             <DashCard key={index} {...item} />
-            
           ))}
         </div>
         <div className="flex flex-wrap justify-between items-start border-y">

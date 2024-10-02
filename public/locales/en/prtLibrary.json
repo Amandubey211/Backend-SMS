@@ -1,0 +1,19 @@
+{
+  "Library": "Library",
+  "Books Available": "Books Available",
+  "Issued Books": "Issued Books",
+  "Due Date": "Due Date",
+  "Author": "Author",
+  "Category": "Category",
+  "Return Book": "Return Book",
+  "No Books Found": "No Books Found",
+  "Issue Book": "Issue Book",
+  "Status": "Status",
+  "Search": "Search",
+  "All": "All",
+  "Pending": "Pending",
+  "Returned": "Returned",
+  "No data available": "No data available",
+  "Unable to fetch Library data": "Unable to fetch Library data",
+  "Error": "Error"
+}
