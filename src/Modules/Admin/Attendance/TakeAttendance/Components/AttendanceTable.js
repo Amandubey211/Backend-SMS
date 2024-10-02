@@ -1,10 +1,24 @@
 import React from "react";
-import { FaCheckSquare } from "react-icons/fa";
-import { FaSquareXmark, FaRegCircleDot } from "react-icons/fa6";
+import { useDispatch, useSelector } from "react-redux";
+import { FaCheckCircle, FaTimesCircle, FaCircle } from "react-icons/fa";
+import { updateStudentAttendanceStatus } from "../../../../../Store/Slices/Admin/Class/Attendence/attendanceSlice";
+import toast from "react-hot-toast"; // Importing the toast
 
-const AttendanceTable = ({ students }) => {
-  const handleAttendanceChange = (studentId, type) => {
-    // Implement attendance change logic here
+const AttendanceTable = () => {
+  const dispatch = useDispatch();
+  const { attendanceData, filters } = useSelector(
+    (state) => state.admin.attendance
+  ); // Filters from Redux
+
+  const handleAttendanceChange = (studentId, status) => {
+    // Check if sectionId is selected when clicking Present, Absent, or Leave
+    if (!filters.sectionId) {
+      toast.error("Please select a section first."); // Displaying the toast message
+      return;
+    }
+
+    // If sectionId is valid, update the student's attendance status
+    dispatch(updateStudentAttendanceStatus({ studentId, status }));
   };
 
   return (
@@ -24,8 +38,8 @@ const AttendanceTable = ({ students }) => {
             </tr>
           </thead>
           <tbody>
-            {students.length > 0 ? (
-              students.map((student, index) => (
+            {attendanceData.length > 0 ? (
+              attendanceData.map((student, index) => (
                 <tr
                   key={student.studentId}
                   className="text-center border-b h-12"
@@ -49,7 +63,7 @@ const AttendanceTable = ({ students }) => {
                       }
                       className="p-2 rounded"
                     >
-                      <FaCheckSquare
+                      <FaCheckCircle
                         className={`text-green-500 ${
                           student.attendanceStatus === "present"
                             ? "opacity-100"
@@ -66,7 +80,7 @@ const AttendanceTable = ({ students }) => {
                       }
                       className="p-2 rounded"
                     >
-                      <FaSquareXmark
+                      <FaTimesCircle
                         className={`text-red-500 ${
                           student.attendanceStatus === "absent"
                             ? "opacity-100"
@@ -83,7 +97,7 @@ const AttendanceTable = ({ students }) => {
                       }
                       className="p-2 rounded-full"
                     >
-                      <FaRegCircleDot
+                      <FaCircle
                         className={`text-yellow-500 ${
                           student.attendanceStatus === "leave"
                             ? "opacity-100"

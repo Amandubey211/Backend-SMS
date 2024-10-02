@@ -1,18 +1,20 @@
 import React, { useState, useEffect } from "react";
-import { IoCalendarOutline } from "react-icons/io5";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   MdOutlineKeyboardArrowDown,
   MdOutlineKeyboardArrowUp,
 } from "react-icons/md";
+import { IoCalendarOutline } from "react-icons/io5";
 import { useParams } from "react-router-dom";
 import { months } from "./Data/AttendenceData";
 import {
-  fetchGroupsByClass,
   fetchSectionsByClass,
+  fetchGroupsByClass,
 } from "../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
+import { setFilters } from "../../../../Store/Slices/Admin/Class/Attendence/attendanceSlice";
 
-const FilterAttendanceBar = ({ filters, onFilterChange }) => {
+const FilterAttendanceBar = () => {
+  const { filters } = useSelector((state) => state.admin.attendance);
   const { sectionId, groupId, month } = filters;
   const [isSectionDropdownOpen, setIsSectionDropdownOpen] = useState(false);
   const [isGroupDropdownOpen, setIsGroupDropdownOpen] = useState(false);
@@ -29,29 +31,12 @@ const FilterAttendanceBar = ({ filters, onFilterChange }) => {
   useEffect(() => {
     if (cid) {
       dispatch(fetchSectionsByClass(cid));
-    }
-  }, [cid, dispatch]);
-
-  useEffect(() => {
-    if (cid) {
       dispatch(fetchGroupsByClass(cid));
     }
   }, [cid, dispatch]);
 
-  const handleSectionChange = (value) => {
-    onFilterChange("sectionId", value);
-    onFilterChange("groupId", ""); // Reset group when changing sections
-    setIsSectionDropdownOpen(false);
-  };
-
-  const handleGroupChange = (value) => {
-    onFilterChange("groupId", value);
-    setIsGroupDropdownOpen(false);
-  };
-
-  const handleMonthChange = (value) => {
-    onFilterChange("month", value);
-    setIsMonthDropdownOpen(false);
+  const handleFilterChange = (name, value) => {
+    dispatch(setFilters({ [name]: value }));
   };
 
   return (
@@ -80,12 +65,21 @@ const FilterAttendanceBar = ({ filters, onFilterChange }) => {
             </div>
             {isSectionDropdownOpen && (
               <div className="absolute z-10 w-full bg-white border border-gray-300 rounded-lg mt-1">
+                {/* Add a reset option */}
+                <div
+                  className="p-2 cursor-pointer hover:bg-gray-100"
+                  onClick={() => handleFilterChange("sectionId", "")} // Reset section
+                >
+                  All Sections
+                </div>
                 {sections.length > 0 ? (
                   sections.map((section) => (
                     <div
                       key={section._id}
                       className="p-2 cursor-pointer hover:bg-gray-100"
-                      onClick={() => handleSectionChange(section._id)}
+                      onClick={() =>
+                        handleFilterChange("sectionId", section._id)
+                      }
                     >
                       {section.sectionName}
                     </div>
@@ -121,12 +115,19 @@ const FilterAttendanceBar = ({ filters, onFilterChange }) => {
             </div>
             {isGroupDropdownOpen && (
               <div className="absolute z-10 w-full bg-white border border-gray-300 rounded-lg mt-1">
+                {/* Add a reset option */}
+                <div
+                  className="p-2 cursor-pointer hover:bg-gray-100"
+                  onClick={() => handleFilterChange("groupId", "")} // Reset group
+                >
+                  All Groups
+                </div>
                 {groups.length > 0 ? (
                   groups.map((group) => (
                     <div
                       key={group._id}
                       className="p-2 cursor-pointer hover:bg-gray-100"
-                      onClick={() => handleGroupChange(group._id)}
+                      onClick={() => handleFilterChange("groupId", group._id)}
                     >
                       {group.groupName}
                     </div>
@@ -160,14 +161,14 @@ const FilterAttendanceBar = ({ filters, onFilterChange }) => {
           </span>
         </div>
         {isMonthDropdownOpen && (
-          <div className="absolute z-10 w-full bg-white border border-gray-300 rounded-lg mt-1">
+          <div className="absolute z-10  w-full bg-white border border-gray-300 rounded-lg mt-1">
             {months.map((monthObj) => (
               <div
                 key={monthObj.name}
-                className={`p-2 cursor-pointer ${
+                className={`p-1 ps-4 hover:bg-gray-100 cursor-pointer ${
                   month === monthObj.number ? "bg-gray-200" : ""
                 }`}
-                onClick={() => handleMonthChange(monthObj.number)}
+                onClick={() => handleFilterChange("month", monthObj.number)}
               >
                 {monthObj.name}
               </div>

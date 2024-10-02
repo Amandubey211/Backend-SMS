@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import Sidebar from "../../../../Components/Common/Sidebar";
 import { PiPlusLight } from "react-icons/pi";
-import { FaUserSlash } from "react-icons/fa";
 import AssignStudent from "./AssignStudent";
 import { PiStudentThin } from "react-icons/pi";
 const UnAssignedStudentList = () => {
@@ -108,7 +107,6 @@ const UnAssignedStudentList = () => {
             section={getSectionName(selectedStudent?.presentSectionId).name}
             studentId={selectedStudent?._id}
             imageUrl={selectedStudent.profile}
-            onAssignmentComplete={handleSidebarClose} // Automatically fetch groups and students after assignment
           />
         </Sidebar>
       )}

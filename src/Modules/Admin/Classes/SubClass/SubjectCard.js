@@ -98,11 +98,11 @@ const SubjectCard = ({
         )}
         <div className="ml-3 capitalize">
           <p className="text-white font-semibold">
-            {data?.teacherId.firstName + data?.teacherId.lastName ||
+            {data?.teacherId?.firstName + data?.teacherId?.lastName ||
               "No Instructor Assigned"}
           </p>
           <p className="text-white text-sm">
-            {data?.teacherId.role || "Teacher"}
+            {data?.teacherId?.role || "Teacher"}
           </p>
         </div>
       </div>
