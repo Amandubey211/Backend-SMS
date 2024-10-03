@@ -164,7 +164,7 @@ const StudentEvent = () => {
   };
 
   // selected Month and Year
-
+console.log("dsdfasasasa",paginatedEvents)
   return (
     <>
       <Layout title="Event">
@@ -188,7 +188,7 @@ const StudentEvent = () => {
               {loading && !error? (<div className="flex flex-col items-center justify-center w-full h-full text-gray-500">
                 <Spinner />
               </div>
-              ) : error || paginatedEvents?.length === 0 ? (
+              ) : (!loading && paginatedEvents?.length === 0) ? (
                 <div className="flex flex-col items-center justify-center w-full h-full text-gray-500">
                   <IoCalendarOutline className="text-6xl" />
                   <span>{t("No Events in this Month", gt.stdEvents)}</span>

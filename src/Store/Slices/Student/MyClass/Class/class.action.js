@@ -8,18 +8,22 @@ import { setShowError } from "../../../Common/Alerts/alertsSlice";
 
 export const stdClass = createAsyncThunk(
     'class/studentClass',
-    async (_, { rejectWithValue,dispatch }) => {
+    async (_, { rejectWithValue, dispatch }) => {
         const token = localStorage.getItem("student:token");
-        if(!token) {
-           return rejectWithValue("Authentication failed!");
+        if (!token) {
+            dispatch(setShowError(true));
+
+            return rejectWithValue("Authentication failed!");
         }
         try {
+            dispatch(setShowError(false));
+
             const res = await axios.get(`${baseUrl}/student/my_class`, {
                 headers: {
                     Authentication: token,
                 },
             });
-           console.log("data in action class :",res.data.data)
+            console.log("data in action class :", res.data.data)
             const data = res?.data?.data;
             return data;
         } catch (error) {

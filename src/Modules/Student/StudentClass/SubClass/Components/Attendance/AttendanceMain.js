@@ -41,7 +41,7 @@ const AttendanceMain = () => {
             <div className="w-full flex flex-col items-center justify-center py-20">
               <Spinner />
             </div>
-            : error || attendanceData?.length===0?
+            : (!loading || attendanceData?.length===0)?
               <div className="w-full flex flex-col items-center justify-center py-20">
               <NoDataFound/>
               </div>

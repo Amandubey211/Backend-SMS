@@ -127,7 +127,7 @@ const MainSection = () => {
             <Spinner />
           </div>
         )
-          : (error || classData?.subjects?.length === 0) ? (
+          : (!loading && (Object.keys(classData).length === 0 || classData?.subjects?.length === 0)) ? (
             <div className="flex flex-col items-center justify-center py-20">
               <NoDataFound title="Subject" />
             </div>

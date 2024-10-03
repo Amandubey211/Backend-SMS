@@ -59,16 +59,18 @@ const StudentTeacher = () => {
               <div className="w-full flex flex-col items-center justify-center py-20">
                 <Spinner />
               </div>
-            ) : error ? (
-              <div className="w-full flex flex-col items-center justify-center py-20">
-                <GoAlertFill className="inline-block w-12 h-12 mb-3" />
-                <p className="text-lg font-semibold">{error}</p>
-              </div>
-            ) : teacherData?.length > 0 ? (
+            ) 
+            // : error ? (
+            //   <div className="w-full flex flex-col items-center justify-center py-20">
+            //     <GoAlertFill className="inline-block w-12 h-12 mb-3" />
+            //     <p className="text-lg font-semibold">{error}</p>
+            //   </div>
+            // ) 
+            : teacherData?.length > 0 ? (
               teacherData.map((teacher, index) => (
                 <ProfileCard key={index} profile={teacher} onClick={() => handleProfileClick(teacher)} />
               ))
-            ) : (
+            ) :(!loading && teacherData?.length === 0 ) && (
               <div className="w-full flex flex-col items-center justify-center py-20">
                 <NoDataFound title="Teachers" />
               </div>

@@ -9,6 +9,7 @@ import { useTranslation } from "react-i18next";
 const FeeTable = ({ feesDetails }) => {
   const { loading, error } = useSelector((store) => store.student.studentFinance);
   const { t } = useTranslation();
+
   return (
     <div className="relative overflow-x-auto">
       <table className="min-w-full leading-normal" role="table">
@@ -42,7 +43,7 @@ const FeeTable = ({ feesDetails }) => {
           )} */}
 
           {/* Display No Data Found */}
-          {(error || feesDetails?.length === 0) && (
+          {(!loading && feesDetails?.length === 0) && (
             <tr>
               <td colSpan="5" className="text-center py-5">
                 <NoDataFound />
@@ -51,7 +52,7 @@ const FeeTable = ({ feesDetails }) => {
           )}
 
           {/* Display Fees Data */}
-          {!loading && !error && feesDetails?.reverse()?.map((item, index) => (
+          {!loading  && feesDetails?.reverse()?.map((item, index) => (
             <tr key={index} className="text-left text-gray-700" role="row">
               <td className="px-5 py-2 border-b border-gray-200" role="cell">
                 {item?.feeType}
