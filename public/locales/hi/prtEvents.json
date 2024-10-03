@@ -1,11 +1,28 @@
 {
-    "Event Name": "आयोजन का नाम",
-    "Event Description": "आयोजन विवरण",
-    "Event Date": "आयोजन की तारीख",
-    "Location": "स्थान",
-    "No Events Found": "कोई आयोजन नहीं मिला",
-    "View Details": "विवरण देखें",
-    "Director": "निर्देशक",
-    "Type": "प्रकार"
-  }
-  
+  "Event Name": "इवेंट का नाम",
+  "Event Description": "इवेंट का विवरण",
+  "Event Date": "इवेंट की तारीख",
+  "Location": "स्थान",
+  "No Events Found": "कोई इवेंट नहीं मिला",
+  "View Details": "विवरण देखें",
+  "Director": "निर्देशक",
+  "Type": "प्रकार",
+  "Parent All Events": "माता-पिता के सभी इवेंट्स",
+  "Invalid Time": "अमान्य समय",
+  "Select an action": "कोई कार्रवाई चुनें",
+  "No Events in this Month": "इस महीने कोई इवेंट नहीं है",
+  "Events": "इवेंट्स",
+  "Parent | Event": "माता-पिता | इवेंट",
+  "Unable to fetch events": "इवेंट प्राप्त करने में असमर्थ",
+  "View Event": "इवेंट देखें",
+  "No Location Available": "कोई स्थान उपलब्ध नहीं है",
+  "No Director Available": "कोई निर्देशक उपलब्ध नहीं है",
+  "No Type Available": "कोई प्रकार उपलब्ध नहीं है",
+  "No Details Available": "कोई विवरण उपलब्ध नहीं है",
+  "Invalid Date": "अमान्य तारीख",
+  "No Title Available": "कोई शीर्षक उपलब्ध नहीं है",
+  "Event Image": "इवेंट छवि",
+  "Event Type": "इवेंट प्रकार",
+  "Event Time": "इवेंट समय",
+  "Event Director": "इवेंट निदेशक"
+}

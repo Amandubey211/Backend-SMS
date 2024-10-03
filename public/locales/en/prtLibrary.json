@@ -4,6 +4,7 @@
   "Issued Books": "Issued Books",
   "Due Date": "Due Date",
   "Author": "Author",
+  "Author Name": "Author Name",
   "Category": "Category",
   "Return Book": "Return Book",
   "No Books Found": "No Books Found",
@@ -15,5 +16,11 @@
   "Returned": "Returned",
   "No data available": "No data available",
   "Unable to fetch Library data": "Unable to fetch Library data",
-  "Error": "Error"
+  "Error": "Error",
+  "Library Status": "Library Status",
+  "Issue Date": "Issue Date",
+  "Return Date": "Return Date",
+  "Unknown": "Unknown",
+  "Unknown Book": "Unknown Book",
+  "N/A": "N/A"
 }

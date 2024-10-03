@@ -72,7 +72,7 @@ const AllNotice = () => {
           <img src={CalendarIcon} style={{ width: '40px', height: '40px', marginBottom: '10px' }} alt="calendar" />
         )}
         <p className="text-gray-600 text-lg text-center mt-2">
-          {t("Error")}: {t("Failed to fetch notices")}
+          {error}: {t("Failed to fetch notices")}
         </p>
       </div>
     );

@@ -94,7 +94,8 @@ const SideMenubar = () => {
         </button>
       </NavLink>
       <div className="mt-4 p-2">
-        {isOpen && <h2 className="text-gray-500">{t("Menu")}</h2>} {/* Translated Menu Title */}
+        {isOpen && <h2 className="text-gray-500 mb-2 ml-4">{t("Menu")}</h2>} {/* Translated Menu Title */}
+        <hr/>
         <ul className="mt-1 space-y-2 flex-grow">
           {sidebarData.map((item, index) => (
             <React.Fragment key={index}>

@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useCallback } from "react";
 import Notice from "./Notice";
 import { useNavigate } from "react-router-dom";
-import { message } from "antd";
+
 import { format } from 'date-fns';
 import { FaBell } from "react-icons/fa"; // Keeping the bell icon for consistency
 import Spinner from "../../../../Components/Common/Spinner";
@@ -100,7 +100,7 @@ const NoticeBoard = ({ numberOfChildren }) => {
 
   // Error state handling
   if (error) {
-    message.error(t("Failed to fetch notices")); // Add translation for error message
+  
     return (
       <div className="p-4 border-l border-gray-300"> {/* Apply the left border here */}
         <div className="flex justify-between items-center mb-4">
@@ -108,7 +108,7 @@ const NoticeBoard = ({ numberOfChildren }) => {
         </div>
         <div className="flex flex-col items-center justify-center h-64 text-center overflow-x-auto shadow rounded-lg p-4"> {/* Consistent layout */}
           <FaBell className="text-gray-400 text-6xl mb-4" />
-          <p className="text-gray-600 text-lg">{t("Unable to fetch Notices")}</p> {/* Translated error message */}
+          <p className="text-gray-600 text-lg">{error}: {t("Unable to fetch Notices")}</p> {/* Translated error message */}
         </div>
       </div>
     );

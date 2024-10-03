@@ -4,8 +4,11 @@ import ParentDashLayout from "../../../Components/Parents/ParentDashLayout.js";
 import { MdAccessTime, MdMoneyBillWave } from "react-icons/md";
 import StudentGradesAccordion from "./StudentGradesAccordion.js";
 import useNavHeading from "../../../Hooks/CommonHooks/useNavHeading .js";
+import { useTranslation } from "react-i18next";
+
 const GradeChild = () => {
-  useNavHeading("My Child", "Grades");
+  const { t } = useTranslation('prtChildrens');
+  useNavHeading(t("My Child"), t("Grades"));
   return (
     <>
       <Layout title="Grades">

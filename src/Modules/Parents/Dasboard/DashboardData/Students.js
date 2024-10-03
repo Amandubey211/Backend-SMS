@@ -70,7 +70,7 @@ const StudentParentCard = () => {
     return (
       <div className="flex flex-col items-center justify-center mt-6">
         <FaChild className="text-gray-400 text-8xl mb-4" />
-        <p className="text-gray-600 text-lg text-center mt-2">{t("Error")}: {error} - {t("Unable to fetch Child Data")}</p>
+        <p className="text-gray-600 text-lg text-center mt-2">{error}: {t("Unable to fetch Child Data")}</p>
       </div>
     );
   }, [error, t]);

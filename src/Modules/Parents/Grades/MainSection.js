@@ -5,14 +5,16 @@ import { fetchModules, fetchSubjects } from "../../../Store/Slices/Parent/Childr
 import Chapter from "../../Admin/UsersProfiles/StudentProfile/Components/StudentCourseProgress/Module/Components/Chapter";
 import ModuleCard from "../../Admin/UsersProfiles/StudentProfile/Components/StudentCourseProgress/Module/Components/ModuleCard";
 import useNavHeading from "../../../Hooks/CommonHooks/useNavHeading .js";
+import { useTranslation } from "react-i18next";
 
 const MainSection = ({ student, selectedSubjectId, setSelectedSubjectId }) => {
+  const { t } = useTranslation('prtChildrens'); 
   const dispatch = useDispatch();
   const [expandedChapters, setExpandedChapters] = useState(null);
 
   const { modules, subjects, loading, error } = useSelector((state) => state.Parent.children);
 
-  useNavHeading("My Childs", "Subject Progress");
+  useNavHeading(t("My Childs"), t("Subject Progress"));
 
   // Fetch subjects when student.id is available
   useEffect(() => {

@@ -69,7 +69,7 @@ const ParentFinanceTable = () => {
               <MdAccessTime className="text-gray-400 text-8xl mb-6" />
             )}
             <p className="text-gray-600 text-lg">
-              {error || t("Error")}: {t("Failed to fetch finance data")}
+              {error}: {t("Failed to fetch finance data")}
             </p>
           </div>
         </td>

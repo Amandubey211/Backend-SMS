@@ -1,11 +1,28 @@
 {
-    "Event Name": "اسم الحدث",
-    "Event Description": "وصف الحدث",
-    "Event Date": "تاريخ الحدث",
-    "Location": "الموقع",
-    "No Events Found": "لم يتم العثور على أحداث",
-    "View Details": "عرض التفاصيل",
-    "Director": "المدير",
-    "Type": "النوع"
-  }
-  
+  "Event Name": "اسم الحدث",
+  "Event Description": "وصف الحدث",
+  "Event Date": "تاريخ الحدث",
+  "Location": "الموقع",
+  "No Events Found": "لم يتم العثور على أحداث",
+  "View Details": "عرض التفاصيل",
+  "Director": "المخرج",
+  "Type": "النوع",
+  "Parent All Events": "كل الأحداث للوالدين",
+  "Invalid Time": "وقت غير صالح",
+  "Select an action": "اختر إجراءً",
+  "No Events in this Month": "لا توجد أحداث في هذا الشهر",
+  "Events": "الأحداث",
+  "Parent | Event": "الوالد | الحدث",
+  "Unable to fetch events": "غير قادر على جلب الأحداث",
+  "View Event": "عرض الحدث",
+  "No Location Available": "لا يوجد موقع متاح",
+  "No Director Available": "لا يوجد مخرج متاح",
+  "No Type Available": "لا يوجد نوع متاح",
+  "No Details Available": "لا توجد تفاصيل متاحة",
+  "Invalid Date": "تاريخ غير صالح",
+  "No Title Available": "لا يوجد عنوان متاح",
+  "Event Image": "صورة الحدث",
+  "Event Type": "نوع الحدث",
+  "Event Time": "وقت الحدث",
+  "Event Director": "مدير الحدث"
+}
