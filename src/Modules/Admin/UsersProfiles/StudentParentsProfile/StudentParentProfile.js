@@ -165,7 +165,6 @@ const StudentParentProfile = () => {
                     </tr>
                   )): 
                   <tr>
-
                   <td className="   text-center text-2xl py-10 text-gray-400" colSpan={6} >
                    <div className="flex  items-center justify-center flex-col text-2xl">
                      <GoAlertFill className="text-[5rem]" />

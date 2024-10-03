@@ -18,6 +18,7 @@ import adminEventReducer from "./Slices/Admin/NoticeBoard/Events/eventSlice";
 import adminNoticeReducer from "./Slices/Admin/NoticeBoard/Notice/noticeSlice";
 import allStudentReducer from "./Slices/Admin/Users/Students/studentSlice";
 import allParentReducer from "./Slices/Admin/Users/Parents/parentSilce";
+import allstaffReducer from "./Slices/Admin/Users/Staff/staffSlice";
 // student
 import studentFinanceReducer from "./Slices/Student/Finance/financeSlice";
 import studentLibraryBooksReducer from "./Slices/Student/Library/libararySlice";
@@ -80,6 +81,7 @@ const AdminReducer = combineReducers({
   notice: adminNoticeReducer,
   all_students:allStudentReducer,
   all_parents:allParentReducer,
+  all_staff:allstaffReducer,
 });
 
 const studentReducer = combineReducers({

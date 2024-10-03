@@ -118,7 +118,7 @@ const AllTeachers = () => {
                 {sidebarContent === "viewTeacher" ? "Quick View of Staff" : "Add/Edit Staff"}
               </span>
             }
-            width="60%"
+            width= {sidebarContent === "viewTeacher" ? "30%" : "60%"}
             height="100%"
           >
             {renderSidebarContent()}

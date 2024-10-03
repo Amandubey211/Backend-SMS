@@ -4,24 +4,21 @@ import DashLayout from "../../../../Components/Admin/AdminDashLayout";
 import SidebarSlide from "../../../../Components/Common/SidebarSlide";
 import ViewLibrarian from "./ViewLibrarian";
 import ProfileCard from '../SubComponents/ProfileCard';
-import useGetAllStaff from "../../../../Hooks/AuthHooks/Staff/Admin/staff/useGetAllStaff";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import AddUser from "../StaffProfile/AddUser";
 import { GoAlertFill } from "react-icons/go";
 import { FiLoader } from "react-icons/fi";
+import { fetchAllStaff } from "../../../../Store/Slices/Admin/Users/Staff/staff.action";
 const AllLibrarian = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarContent, setSidebarContent] = useState(null);
   const [selectedLibrarian, setSelectedLibrarian] = useState(null);
   const [librarianData, setLibrarianData] = useState(null);
-  const allLibrarian = useSelector((store) => store.Staff.allLibrarian);
-  const { fetchStaff,loading } = useGetAllStaff();
-
+  const {librarian,loading} = useSelector((store) => store.admin.all_staff);
+const dispatch = useDispatch()
   useEffect(() => {
-    fetchStaff();
-    console.log(allLibrarian);
-  }, []);
-
+    dispatch(fetchAllStaff())
+  }, [dispatch]);
   const handleSidebarOpen = () => setSidebarOpen(true);
   const handleSidebarClose = () => setSidebarOpen(false);
 
@@ -65,7 +62,7 @@ const AllLibrarian = () => {
     </div>:
         <div className="p-4">
           <div className="flex justify-between items-center mb-4 border-b-2 h-20">
-            <h2 className="text-xl font-semibold">All Librarian <span className="bg-purple-400 px-2 text-sm py-1 rounded-full">{allLibrarian?.length}</span></h2>
+            <h2 className="text-xl font-semibold">All Librarian <span className="bg-purple-400 px-2 text-sm py-1 rounded-full">{librarian?.length}</span></h2>
             <button
               onClick={handleAddLibrarianClick}
               className="bg-purple-500 text-white px-4 py-2 rounded-md flex items-center space-x-2"
@@ -75,9 +72,9 @@ const AllLibrarian = () => {
           </div>
           <div className="flex flex-wrap -mx-2">
             {
-              allLibrarian.length > 0 ?
+              librarian.length > 0 ?
             
-           allLibrarian.map((librarian, index) => (
+              librarian.map((librarian, index) => (
               <ProfileCard
                 key={index}
                 profile={librarian}
@@ -102,7 +99,7 @@ const AllLibrarian = () => {
                 {sidebarContent === "viewLibrarian" ? "Quick View of Librarian" : "Add/Edit Librarian"}
               </span>
             }
-            width="60%"
+            width={sidebarContent === "viewTeacher" ? "30%" : "60%"}
             height="100%"
           >
             {renderSidebarContent()}
