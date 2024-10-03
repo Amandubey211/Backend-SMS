@@ -24,7 +24,6 @@ export const fetchAllNotices = createAsyncThunk(
       return response.data.notices;
     } catch (error) {
       const errorMessage = error.response?.data?.message || error.message ||"Failed to fetch notices";
-      // toast.error(errorMessage);
       return rejectWithValue(errorMessage);
     }
   }
