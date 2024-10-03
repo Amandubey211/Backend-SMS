@@ -14,4 +14,5 @@ export const gt = {
   prtEvents: { ns: "prtEvents" },      
   prtLibrary: { ns: "prtLibrary" },
   prtSidebar: { ns: "prtSidebar" },
+  prtProfile: { ns: "prtProfile" },
 };

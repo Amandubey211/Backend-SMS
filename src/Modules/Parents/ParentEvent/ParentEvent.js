@@ -7,7 +7,7 @@ import Sidebar from "../../../Components/Common/Sidebar";
 import ViewEvent from "./Events/subComponents/ViewEvent";
 import Spinner from "../../../Components/Common/Spinner";
 import { IoCalendarOutline } from "react-icons/io5";
-import { format, parseISO, isValid } from "date-fns";
+import { format, parseISO, parse, isValid } from "date-fns";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
 import useNavHeading from "../../../Hooks/CommonHooks/useNavHeading .js";
 import { useDispatch, useSelector } from "react-redux";
@@ -63,44 +63,45 @@ const ParentEvent = () => {
     setCurrentPage(0);
   };
 
-  const handleDateCellRender = (value) => {
-    const formattedDate = format(value.toDate(), "yyyy-MM-dd");
-    const dayEvents = filteredEvents.filter(
-      (event) => format(event?.startDate, "yyyy-MM-dd") === formattedDate
-    );
+const handleDateCellRender = (value) => {
+  const formattedDate = format(value.toDate(), 'yyyy-MM-dd');
+  const dayEvents = filteredEvents.filter(
+    (event) => format(event?.startDate, 'yyyy-MM-dd') === formattedDate
+  );
 
-    const bgColors = [
-      "bg-pink-500",
-      "bg-purple-500",
-      "bg-blue-500",
-      "bg-indigo-500",
-    ];
+  const bgColors = ['bg-pink-500', 'bg-purple-500', 'bg-blue-500', 'bg-indigo-500'];
 
-    return (
-      <ul className="events space-y-1 max-h-20 overflow-y-auto">
-        {dayEvents.map((event, index) => {
-          const eventTime = event?.time
-            ? new Date(`${format(event?.startDate, "yyyy-MM-dd")}T${event?.time}`)
-            : event?.startDate;
-          const timeString = isValid(eventTime)
-            ? format(eventTime, "hh:mm a")
-            : "Invalid Time";
+  return (
+    <ul className="events space-y-1 max-h-20 overflow-y-auto">
+      {dayEvents.map((event, index) => {
+        // Parse time from event, support both 24-hour and 12-hour formats
+        let eventTime = event?.time
+          ? parse(event?.time, 'hh:mm a', new Date()) // Try parsing as 12-hour format first
+          : event?.startDate;
 
-          return (
-            <li
-              key={event?.id}
-              className={`inline-block px-2 py-1 rounded text-white ${
-                bgColors[index % bgColors.length]
-              } shadow-md cursor-pointer`}
-              onClick={() => handleStickerClick(event)}
-            >
-              {event?.title} - {timeString}
-            </li>
-          );
-        })}
-      </ul>
-    );
-  };
+        if (!isValid(eventTime)) {
+          eventTime = parse(event?.time, 'HH:mm', new Date()); // Fallback for 24-hour format
+        }
+
+        const timeString = isValid(eventTime)
+          ? format(eventTime, 'hh:mm a')  // Always display in 12-hour format
+          : 'Invalid Time';
+
+        return (
+          <li
+            key={event?.id}
+            className={`inline-block px-2 py-1 rounded text-white ${
+              bgColors[index % bgColors.length]
+            } shadow-md cursor-pointer`}
+            onClick={() => handleStickerClick(event)}
+          >
+            {event?.title} - {timeString}
+          </li>
+        );
+      })}
+    </ul>
+  );
+};
 
   const handleStickerClick = (event) => {
     setSelectedEvent(event);
