@@ -48,7 +48,7 @@ const StudentAnnounce = () => {
   }
   useEffect(() => {
     dispatch(studentNotice())
-  }, [dispatch]);
+  }, [dispatch,studentNotice]);
 
    return (
     <Layout title="Event">
@@ -112,7 +112,7 @@ const StudentAnnounce = () => {
                 formatDate={formatDate}
               />
             ))
-          ) : (
+          ) : (error || filteredNotices().length === 0) && (
             <div className="flex flex-col justify-center items-center text-center min-h-[300px]">
             <NoDataFound title="Notices" /> 
             </div>

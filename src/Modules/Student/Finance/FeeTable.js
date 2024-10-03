@@ -42,7 +42,7 @@ const FeeTable = ({ feesDetails }) => {
           )} */}
 
           {/* Display No Data Found */}
-          {!loading  && feesDetails?.length === 0 && (
+          {(error || feesDetails?.length === 0) && (
             <tr>
               <td colSpan="5" className="text-center py-5">
                 <NoDataFound />

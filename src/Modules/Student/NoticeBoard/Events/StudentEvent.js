@@ -66,7 +66,7 @@ const StudentEvent = () => {
 
   useEffect(() => {
     dispatch(stdEvent());
-  }, [dispatch]);
+  }, [dispatch,stdEvent]);
 
   useEffect(() => {
     filterAndSortEvents(eventData, selectedMonthYear);

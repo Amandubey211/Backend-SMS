@@ -45,7 +45,7 @@ const Library = () => {
     } else if (activeTab === "BookIssue") {
       dispatch(studentIssueBooks());
     }
-  }, [dispatch, activeTab]);
+  }, [dispatch,libraryBooksStudent,studentIssueBooks, activeTab]);
 
   const libraryContent = () => {
     if (libraryLoading) {
