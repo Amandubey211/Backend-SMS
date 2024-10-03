@@ -1,16 +1,20 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { baseUrl } from "../../../../../../config/Common";
+import { ErrorMsg } from "../../../../Common/Alerts/errorhandling.action";
+import { setShowError } from "../../../../Common/Alerts/alertsSlice";
 
 
 export const stdClassmate = createAsyncThunk(
     'classmate/studentClassmate',
-    async ({classId}, { rejectWithValue }) => {
+    async ({ classId }, { rejectWithValue, dispatch }) => {
         const token = localStorage.getItem("student:token");
         if (!token) {
             return rejectWithValue("Authentication failed!");
         }
         try {
+            dispatch(setShowError(false));
+
             const res = await axios.get(`${baseUrl}/student/my_classmates/${classId}`, {
                 headers: {
                     Authentication: token
@@ -22,7 +26,9 @@ export const stdClassmate = createAsyncThunk(
 
         } catch (error) {
             console.log("Error in student classmate", error);
-            return rejectWithValue((error?.response?.data?.message || error?.message || "Something Went Wrong!"))
+            const err = ErrorMsg(error);
+            dispatch(setShowError(true));
+            return rejectWithValue(err.message);
         }
     }
 )

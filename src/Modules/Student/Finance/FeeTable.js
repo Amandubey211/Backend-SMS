@@ -32,17 +32,17 @@ const FeeTable = ({ feesDetails }) => {
           )}
 
           {/* Display Error Message */}
-          {error && (
+          {/* {error && (
             <tr>
               <td colSpan="5" className="text-center py-10 text-red-600">
                 <GoAlertFill className="inline-block w-12 h-12 mb-3" />
                 <p className="text-lg font-semibold">{error}</p>
               </td>
             </tr>
-          )}
+          )} */}
 
           {/* Display No Data Found */}
-          {!loading && !error && feesDetails?.length === 0 && (
+          {(error || feesDetails?.length === 0) && (
             <tr>
               <td colSpan="5" className="text-center py-5">
                 <NoDataFound />

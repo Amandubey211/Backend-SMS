@@ -10,15 +10,23 @@ import { useDispatch, useSelector } from "react-redux";
 import Spinner from "../../../../../../Components/Common/Spinner";
 import { GoAlertFill } from "react-icons/go";
 import ClassmateModal from "./ClassmateModal";
+import { setShowError } from "../../../../../../Store/Slices/Common/Alerts/alertsSlice";
+import OfflineModal from "../../../../../../Components/Common/Offline";
 
 const StudentClassMates = () => {
   const { classmateData, loading, error } = useSelector(
     (store) => store?.student?.studentClassmate
   );
+  const { showError } = useSelector((store) => store?.common?.alertMsg);
+
   const dispatch = useDispatch();
   const { classId } = useParams();
   const [selectedClassmate, setSelectedClassmate] = useState(null); // Modal state
   // useNavHeading(selectedClassName, "Classmates");
+
+  const handleDismiss = () => {
+    dispatch(setShowError(false));
+  }
 
   useEffect(() => {
     dispatch(stdClassmate({ classId }));
@@ -61,9 +69,9 @@ const StudentClassMates = () => {
           ) : classmateData?.length > 0 ? (
             <div className="flex flex-wrap -mx-2">
               {classmateData?.map((classmate, index) => (
-                <ProfileCard 
-                  key={index} 
-                  profile={classmate} 
+                <ProfileCard
+                  key={index}
+                  profile={classmate}
                   onClick={() => handleProfileClick(classmate)} // Open modal on click
                 />
               ))}
@@ -77,10 +85,13 @@ const StudentClassMates = () => {
 
         {/* Render the modal if a classmate is selected */}
         {selectedClassmate && (
-          <ClassmateModal 
-            classmate={selectedClassmate} 
-            onClose={closeModal} 
+          <ClassmateModal
+            classmate={selectedClassmate}
+            onClose={closeModal}
           />
+        )}
+        {!loading && showError && (
+          <OfflineModal error={error} onDismiss={handleDismiss} />
         )}
       </DashLayout>
     </Layout>

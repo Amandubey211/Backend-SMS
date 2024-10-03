@@ -12,11 +12,15 @@ import { GoAlertFill } from "react-icons/go";
 import NoticeItem from "./NoticeItem";
 import { useTranslation } from "react-i18next";
 import { gt } from "../../../../Utils/translator/translation";
+import { setShowError } from "../../../../Store/Slices/Common/Alerts/alertsSlice";
+import OfflineModal from "../../../../Components/Common/Offline";
 
 
 const StudentAnnounce = () => {
 
   const { loading, error, noticeData, activeIndex, searchTerm } = useSelector((store) => store.student.studentAnnouncement);
+  const {showError}=useSelector((store)=>store?.common?.alertMsg);
+  
   const dispatch = useDispatch();
   const {t}=useTranslation();
   useNavHeading("Notice");
@@ -39,10 +43,12 @@ const StudentAnnounce = () => {
     dispatch(setSearchTerm(e.target.value));
   }
 
-
+  const handleDismiss = () => {
+    dispatch(setShowError(false));
+  }
   useEffect(() => {
     dispatch(studentNotice())
-  }, [dispatch]);
+  }, [dispatch,studentNotice]);
 
    return (
     <Layout title="Event">
@@ -88,13 +94,16 @@ const StudentAnnounce = () => {
             <div className="flex flex-col justify-center items-center text-center min-h-[300px]">
               <Spinner /> 
             </div>
-          ) : error ? (
-            <div className="flex flex-col justify-center items-center text-center min-h-[300px] ">
-                <GoAlertFill className="mb-2 w-12 h-12" />
-               <p className="text-lg font-semibold">{error}</p>
-            </div>
+          )
+          //  : 
+          // error ? (
+          //   <div className="flex flex-col justify-center items-center text-center min-h-[300px] ">
+          //       <GoAlertFill className="mb-2 w-12 h-12" />
+          //      <p className="text-lg font-semibold">{error}</p>
+          //   </div>
            
-          ) : filteredNotices().length > 0 ? (
+          // ) 
+          : filteredNotices().length > 0 ? (
             filteredNotices()?.map((notice, index) => (
               <NoticeItem
                 key={notice.id}
@@ -103,12 +112,15 @@ const StudentAnnounce = () => {
                 formatDate={formatDate}
               />
             ))
-          ) : (
+          ) : (error || filteredNotices().length === 0) && (
             <div className="flex flex-col justify-center items-center text-center min-h-[300px]">
             <NoDataFound title="Notices" /> 
             </div>
           )}
         </div>
+        {!loading && showError && (
+            <OfflineModal error={error} onDismiss={handleDismiss} />
+          )}
       </DashLayout>
     </Layout>
   );

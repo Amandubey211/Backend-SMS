@@ -6,7 +6,7 @@ import { combineReducers } from "redux";
 // common
 import authReducer from "./Slices/Common/Auth/reducers/authSlice"; // Importing the auth slice reducer
 import userReducer from "./Slices/Common/User/reducers/userSlice"; // Importing the user slice reducer
-
+import alertReducer from "./Slices/Common/Alerts/alertsSlice";
 // admin
 import teacherReducer from "./Slices/Admin/Class/Teachers/teacherSlice";
 import classReducer from "./Slices/Admin/Class/reducer/classSlice"; // Importing the combined admin reducer
@@ -78,6 +78,7 @@ const stdSubjectPersistConfig = {
 const commonReducer = combineReducers({
   auth: persistReducer(authPersistConfig, authReducer),
   user: persistReducer(userPersistConfig, userReducer),
+  alertMsg: alertReducer,
 });
 const AdminReducer = combineReducers({
   class: classReducer,

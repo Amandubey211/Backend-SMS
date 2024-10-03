@@ -8,10 +8,19 @@ import { setCurrentDate } from "../../../../../../Store/Slices/Student/MyClass/C
 import { stdAttendance } from "../../../../../../Store/Slices/Student/MyClass/Class/Attendance/stdAttendance.action";
 import { GoAlertFill } from "react-icons/go";
 import Spinner from "../../../../../../Components/Common/Spinner";
+import OfflineModal from "../../../../../../Components/Common/Offline";
+import { setShowError } from "../../../../../../Store/Slices/Common/Alerts/alertsSlice";
+import NoDataFound from "../../../../../../Components/Common/NoDataFound";
 
 const AttendanceMain = () => {
   const { loading, error, attendanceData, summary, currentDate } = useSelector((store) => store?.student?.studentAttendance);
   const dispatch = useDispatch();
+  const {showError}=useSelector((store)=>store?.common?.alertMsg);
+
+
+  const handleDismiss = () => {
+    dispatch(setShowError(false));
+  }
   useEffect(() => {
     const month = currentDate.month() + 1;
     const year = currentDate.year();
@@ -32,11 +41,11 @@ const AttendanceMain = () => {
             <div className="w-full flex flex-col items-center justify-center py-20">
               <Spinner />
             </div>
-            : error ?
+            : error || attendanceData?.length===0?
               <div className="w-full flex flex-col items-center justify-center py-20">
-                <GoAlertFill className="inline-block w-12 h-12 mb-3" />
-                <p className="text-lg font-semibold">{error}</p>
-              </div> :
+              <NoDataFound/>
+              </div>
+               :
               <CalendarHeader
                 attendanceData={attendanceData}
                 onPanelChange={onPanelChange}
@@ -45,6 +54,9 @@ const AttendanceMain = () => {
               }
         </div>
       </div>
+      {!loading && showError && (
+            <OfflineModal error={error} onDismiss={handleDismiss} />
+          )}
     </StudentDashLayout>
   );
 };

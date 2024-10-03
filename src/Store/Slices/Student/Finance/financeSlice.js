@@ -21,7 +21,8 @@ const financeSlice = createSlice({
     reducers: {
         setFilters: (state, action) => {
             state.filters = action.payload;
-        }
+        },
+  
     },
 
     extraReducers: (builder) => {

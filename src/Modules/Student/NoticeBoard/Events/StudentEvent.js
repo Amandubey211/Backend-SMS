@@ -21,6 +21,9 @@ import EventCard from "./EventCard";
 import Sidebar from "./Sidebar";
 import { useTranslation } from "react-i18next";
 import { gt } from "../../../../Utils/translator/translation";
+import OfflineModal from "../../../../Components/Common/Offline";
+import { setShowError } from "../../../../Store/Slices/Common/Alerts/alertsSlice";
+import Spinner from "../../../../Components/Common/Spinner";
 
 const StudentEvent = () => {
   const {
@@ -32,7 +35,11 @@ const StudentEvent = () => {
     isSidebarOpen,
     itemsPerPage,
     currentDate,
+    loading,
+    error
   } = useSelector((store) => store.student.studentEvent);
+  const { showError } = useSelector((store) => store?.common?.alertMsg);
+
   const dispatch = useDispatch();
   const { t } = useTranslation();
   const [selectedMonthYear, setSelectedMonthYear] = useState({
@@ -52,9 +59,14 @@ const StudentEvent = () => {
 
   useNavHeading("Event");
 
+  const handleDismiss = () => {
+    dispatch(setShowError(false));
+  }
+
+
   useEffect(() => {
     dispatch(stdEvent());
-  }, [dispatch]);
+  }, [dispatch,stdEvent]);
 
   useEffect(() => {
     filterAndSortEvents(eventData, selectedMonthYear);
@@ -173,7 +185,10 @@ const StudentEvent = () => {
                   <IoIosArrowBack />
                 </div>
               )}
-              {paginatedEvents?.length === 0 ? (
+              {loading && !error? (<div className="flex flex-col items-center justify-center w-full h-full text-gray-500">
+                <Spinner />
+              </div>
+              ) : error || paginatedEvents?.length === 0 ? (
                 <div className="flex flex-col items-center justify-center w-full h-full text-gray-500">
                   <IoCalendarOutline className="text-6xl" />
                   <span>{t("No Events in this Month", gt.stdEvents)}</span>
@@ -301,6 +316,9 @@ const StudentEvent = () => {
               {renderSidebarContent()}
             </Sidebar>
           </div>
+          {!loading && showError && (
+            <OfflineModal error={error} onDismiss={handleDismiss} />
+          )}
         </StudentDashLayout>
       </Layout>
     </>

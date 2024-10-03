@@ -1,16 +1,19 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { baseUrl } from "../../../../config/Common";
+import { ErrorMsg } from "../../Common/Alerts/errorhandling.action";
+import { setShowError } from "../../Common/Alerts/alertsSlice";
 
 
 export const libraryBooksStudent = createAsyncThunk(
     'books/libraryBooksStudent',
-    async (_, { rejectWithValue }) => {
+    async (_, { rejectWithValue, dispatch }) => {
         const token = localStorage.getItem("student:token");
         if (!token) {
             return rejectWithValue(`Authentication failed!`);
         }
         try {
+            dispatch(setShowError(false));
 
             const res = await axios.get(`${baseUrl}/admin/all/book`, {
                 headers: { Authentication: token }
@@ -22,7 +25,9 @@ export const libraryBooksStudent = createAsyncThunk(
         }
         catch (error) {
             console.log("Error in libraryBooksStudent", error);
-            return rejectWithValue((error?.response?.data?.message || error?.message || "Something Went Wrong!"))
+            const err = ErrorMsg(error);
+            dispatch(setShowError(true));
+            return rejectWithValue(err.message);
         }
     }
 )

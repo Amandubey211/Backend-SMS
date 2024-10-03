@@ -14,10 +14,13 @@ import { gt } from "../../../../Utils/translator/translation";
 import { studentIssueBooks } from "../../../../Store/Slices/Student/Library/bookIssues.action";
 import { libraryBooksStudent } from "../../../../Store/Slices/Student/Library/libarary.action";
 import TabButton from "../../../Admin/Libary/Components/TabButton";
+import OfflineModal from "../../../../Components/Common/Offline";
+import { setShowError } from "../../../../Store/Slices/Common/Alerts/alertsSlice";
 
 const Library = () => {
   const dispatch = useDispatch();
   const { loading: libraryLoading, error: libraryError, libararyBooks, filters, activeTab } = useSelector((store) => store.student.studentLibraryBooks);
+  const {showError}=useSelector((store)=>store?.common?.alertMsg);
   const { t } = useTranslation();
 
   useNavHeading("Library");
@@ -32,13 +35,17 @@ const Library = () => {
       (filters.category === "" || book.category === filters.category)
   );
 
+  const handleDismiss = () => {
+    dispatch(setShowError(false));
+  }
+
   useEffect(() => {
     if (activeTab === "Library") {
       dispatch(libraryBooksStudent());
     } else if (activeTab === "BookIssue") {
       dispatch(studentIssueBooks());
     }
-  }, [dispatch, activeTab]);
+  }, [dispatch,libraryBooksStudent,studentIssueBooks, activeTab]);
 
   const libraryContent = () => {
     if (libraryLoading) {
@@ -49,16 +56,16 @@ const Library = () => {
       );
     }
 
-    if (libraryError && activeTab === "Library") {
-      return (
-        <div className="flex flex-col justify-center items-center text-center min-h-[300px] py-20 text-red-600">
-          <GoAlertFill className="mb-2 w-12 h-12" />
-          <p className="text-lg font-semibold">{libraryError}</p>
-        </div>
-      );
-    }
+    // if (libraryError && activeTab === "Library") {
+    //   return (
+    //     <div className="flex flex-col justify-center items-center text-center min-h-[300px] py-20 text-red-600">
+    //       <GoAlertFill className="mb-2 w-12 h-12" />
+    //       <p className="text-lg font-semibold">{libraryError}</p>
+    //     </div>
+    //   );
+    // }
 
-    if (!libraryLoading && !libraryError && filteredBooks?.length === 0 && activeTab === "Library") {
+    if (!libraryLoading  && filteredBooks?.length === 0 && activeTab === "Library") {
       return (
         <div className="text-center py-20">
           <NoDataFound />
@@ -111,6 +118,9 @@ const Library = () => {
 
           {activeTab === "Library" ? libraryContent() : bookIssueContent()}
         </div>
+        {!libraryLoading && showError && (
+            <OfflineModal error={libraryError} onDismiss={handleDismiss} />
+          )}
       </StudentDashLayout>
     </Layout>
   );
