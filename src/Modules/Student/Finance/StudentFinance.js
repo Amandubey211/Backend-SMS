@@ -9,6 +9,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import { StudentFinanceDetails } from "../../../Store/Slices/Student/Finance/finance.action";
 import { gt } from "../../../Utils/translator/translation";
+import Offline from "../../../Components/Common/Offline";
+import { setShowError } from "../../../Store/Slices/Common/Alerts/alertsSlice";
 
 
 const StudentFinance = () => {
@@ -18,6 +20,7 @@ const StudentFinance = () => {
   const { stdFinanceData, totalPaidFees, totalUnpaidFees, error,
     loading, filters } = useSelector((store) => store?.student?.studentFinance)
 
+    const {showError}=useSelector((store)=>store?.common?.alertMsg);
   const { t } = useTranslation();
   useNavHeading("Finance");
 
@@ -30,39 +33,51 @@ const StudentFinance = () => {
       (filters.status === "Everyone" || item.status === filters.status)
   );
 
+  const handleDismiss = () => {
+    dispatch(setShowError(false));
+  }
+
   useEffect(() => {
-    dispatch(StudentFinanceDetails())
-  }, [dispatch]);
+    dispatch(StudentFinanceDetails());
+
+  }, [dispatch,StudentFinanceDetails]);
+
+
 
   return (
-    <Layout title="Student Finance">
-      <StudentDashLayout>
-        <div className="flex">
-          <div className="flex flex-col w-[100%] h-full">
-            {/* Filter always on top */}
-            <FilterContainer />
+    <>
+      <Layout title="Student Finance">
+        <StudentDashLayout>
+          <div className="flex">
+            <div className="flex flex-col w-[100%] h-full">
+              {/* Filter always on top */}
+              <FilterContainer />
 
 
-            <FeeTable feesDetails={filteredFeesDetails} />
+              <FeeTable feesDetails={filteredFeesDetails} />
 
 
-          </div>
+            </div>
 
-          {/* Summary Card Section */}
-          <div className="w-[20%] border border-x border-b border-t-0 p-4">
-            <h3 className="mb-5 text-gray-500">{t(`Your Finance Details`, gt.stdFinance)}</h3>
-            <div className="flex flex-col gap-5">
-              <FeeCard
-                title="Total Unpaid Fees"
-                amount={totalUnpaidFees}
-                buttonText="Pay Now"
-              />
-              <FeeCard title="Total Paid Fees" amount={totalPaidFees} />
+            {/* Summary Card Section */}
+            <div className="w-[20%] border border-x border-b border-t-0 p-4">
+              <h3 className="mb-5 text-gray-500">{t(`Your Finance Details`, gt.stdFinance)}</h3>
+              <div className="flex flex-col gap-5">
+                <FeeCard
+                  title="Total Unpaid Fees"
+                  amount={totalUnpaidFees}
+                  buttonText="Pay Now"
+                />
+                <FeeCard title="Total Paid Fees" amount={totalPaidFees} />
+              </div>
             </div>
           </div>
-        </div>
-      </StudentDashLayout>
-    </Layout>
+          {!loading && showError && (
+            <Offline error={error} onDismiss={handleDismiss} />
+          )}
+        </StudentDashLayout>
+      </Layout>
+    </>
   );
 };
 

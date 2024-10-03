@@ -10,12 +10,14 @@ import { setFilters } from "../../../../Store/Slices/Student/Library/bookIssuesS
 import { GoAlertFill } from "react-icons/go";
 import { gt } from "../../../../Utils/translator/translation";
 import { useTranslation } from "react-i18next";
+import { setShowError } from "../../../../Store/Slices/Common/Alerts/alertsSlice";
+import OfflineModal from "../../../../Components/Common/Offline";
 
 const BookIssue = () => {
 
   const { loading, error, issueBooks, filters } = useSelector((store) => store?.student?.studentIssueBooks);
   const {  activeTab } = useSelector((store) => store?.student?.studentLibraryBooks);
- 
+  const {showError}=useSelector((store)=>store?.common?.alertMsg);
   const dispatch = useDispatch();
   const { t } = useTranslation();
 
@@ -31,6 +33,9 @@ const BookIssue = () => {
     return issueBooks.filter((item) => item.status === filters.status);
   };
 
+  const handleDismiss = () => {
+    dispatch(setShowError(false));
+  }
 
   return (
     <div className="">
@@ -99,17 +104,17 @@ const BookIssue = () => {
               )}
 
               {/* Display Error Message */}
-              { !loading && activeTab == "BookIssue"  &&  error && (
+              {/* { !loading && activeTab == "BookIssue"  &&  error && (
                 <tr>
                   <td colSpan="6" className="text-center py-20 text-red-600">
                     <GoAlertFill className="inline-block mb-2 w-12 h-12 mb-3" />
                     <p className="text-lg font-semibold">{error}</p>
                   </td>
                 </tr>
-              )}
+              )} */}
 
               {/* Display No Data Found */}
-              {!loading && !error && issueBooks?.length === 0 && (
+              {!loading  && issueBooks?.length === 0 && (
                 <tr>
                   <td colSpan="6" className="text-center py-20">
                     <NoDataFound />
@@ -124,6 +129,9 @@ const BookIssue = () => {
           </table>
         }
       </div>
+      {!loading && showError && (
+            <OfflineModal error={error} onDismiss={handleDismiss} />
+          )}
     </div>
   );
 };
