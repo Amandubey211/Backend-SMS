@@ -12,5 +12,6 @@
   "No Date": "कोई तारीख नहीं",
   "No description available": "कोई विवरण उपलब्ध नहीं है",
   "Child Notice Board": "बच्चों का सूचना पटल",
-  "No Notices are available": "कोई सूचना उपलब्ध नहीं है"
+  "No Notices are available": "कोई सूचना उपलब्ध नहीं है",
+  "Unable to fetch Notices": "सूचनाएं लाने में असमर्थ"
 }

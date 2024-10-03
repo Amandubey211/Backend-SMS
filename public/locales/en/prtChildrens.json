@@ -1,5 +1,7 @@
 {
   "My Children": "My Children",
+  "My Childs": "My Childs",
+  "My Child": "My Child",
   "Childs": "Children",
   "Class": "Class",
   "Id": "ID",
@@ -13,5 +15,26 @@
   "Instructors": "Instructors",
   "Grades": "Grades",
   "Attendance": "Attendance",
-  "Check Subject Progress": "Check Subject Progress"
+
+
+  "Check Subject Progress": "Check Subject Progress",
+  "Unable to fetch Child Data": "Unable to fetch Child Data",
+  "No Data Found": "No Data Found",
+  "Grade Summary": "Grade Summary",
+  "Assignment": "Assignment",
+  "Group Assignment": "Group Assignment",
+  "Quiz": "Quiz",
+  "Group Quiz": "Group Quiz",
+  "Total Score": "Total Score",
+  "Days": "Days",
+
+  "Unable to Fetch Instructors": "Unable to Fetch Instructors",
+  "Child Instructors": "Child Instructors",
+  "No Instructors Found": "No Instructors Found",
+  "Phone": "Phone",
+  "Teachers": "Teachers",
+
+  "Total Present": "Total Present",
+  "Total Absent": "Total Absent",
+  "Total Leave": "Total Leave"
 }

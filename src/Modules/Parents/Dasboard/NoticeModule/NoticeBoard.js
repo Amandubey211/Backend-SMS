@@ -108,7 +108,7 @@ const NoticeBoard = ({ numberOfChildren }) => {
         </div>
         <div className="flex flex-col items-center justify-center h-64 text-center overflow-x-auto shadow rounded-lg p-4"> {/* Consistent layout */}
           <FaBell className="text-gray-400 text-6xl mb-4" />
-          <p className="text-gray-600 text-lg">{t("Unable to fetch Notices")}</p> {/* Translated error message */}
+          <p className="text-gray-600 text-lg">{error}: {t("Unable to fetch Notices")}</p> {/* Translated error message */}
         </div>
       </div>
     );

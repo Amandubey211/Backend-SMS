@@ -12,5 +12,6 @@
   "No Date": "لا يوجد تاريخ",
   "No description available": "لا يوجد وصف متاح",
   "Child Notice Board": "لوحة إعلانات الأطفال",
-  "No Notices are available": "لا توجد إعلانات متاحة"
+  "No Notices are available": "لا توجد إعلانات متاحة",
+  "Unable to fetch Notices": "غير قادر على جلب الإشعارات"
 }

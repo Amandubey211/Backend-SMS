@@ -102,7 +102,7 @@ const AccountingSection = () => {
               // Error message displayed in the center with an icon and Redux error message
               <div className="flex flex-col items-center justify-center h-64 text-center">
                 <FaExclamationCircle className="text-gray-400 text-4xl mb-4" />
-                <p className="text-gray-600 text-lg">{t("Error")}: {t("Failed to fetch finance data")}</p>
+                <p className="text-gray-600 text-lg">{error}: {t("Failed to fetch finance data")}</p>
               </div>
             ) : filteredData.length === 0 ? (
               // No data available, show icon and message

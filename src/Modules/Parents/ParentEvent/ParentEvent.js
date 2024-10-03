@@ -13,8 +13,10 @@ import useNavHeading from "../../../Hooks/CommonHooks/useNavHeading .js";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllEvents } from "../../../Store/Slices/Parent/Events/event.action.js";
 import { RiSignalWifiErrorFill } from "react-icons/ri";
+import { useTranslation } from "react-i18next"; // Import useTranslation
 
 const ParentEvent = () => {
+  const { t } = useTranslation('prtEvents'); // Initialize translation hook
   const dispatch = useDispatch();
   const { events, loading, error } = useSelector((state) => state?.Parent?.events || {}); // Optional chaining for safety
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -28,7 +30,7 @@ const ParentEvent = () => {
     year: currentDate.getFullYear(),
   });
 
-  useNavHeading("Parent All Events");
+  useNavHeading(t("Parent All Events"));
 
   const itemsPerPage = 4;
 
@@ -162,7 +164,7 @@ const handleDateCellRender = (value) => {
             ) : error ? (
               <div className="flex flex-col items-center justify-center py-4">
                 <RiSignalWifiErrorFill className="text-gray-400 text-8xl mb-6" />
-                <p className="text-gray-600 font-semibold">{error}: Unable to fetch events</p>
+                <p className="text-gray-600 font-semibold">{error}: {t("Unable to fetch events")}</p>
               </div>
             ) : paginatedEvents.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-4">

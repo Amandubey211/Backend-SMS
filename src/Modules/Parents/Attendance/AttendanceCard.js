@@ -2,8 +2,11 @@ import React, { useEffect, useState } from 'react';
 import checkboxIcon from '../../../Assets/ParentAssets/svg/checkbox.svg';
 import crossIcon from '../../../Assets/ParentAssets/svg/cross.svg';
 import leaveIcon from '../../../Assets/ParentAssets/svg/leave.png';
+import { useTranslation } from "react-i18next";
 
 const AttendanceCard = ({ attendanceData }) => {
+  const { t } = useTranslation('prtChildrens');
+
   const [summary, setSummary] = useState({ presentCount: 0, absentCount: 0, leaveCount: 0 });
 
   useEffect(() => {
@@ -15,11 +18,13 @@ const AttendanceCard = ({ attendanceData }) => {
       setSummary({ presentCount, absentCount, leaveCount });
     }
   }, [attendanceData]);
-
+  const totalPresent = t("Total Present")
+  const totalAbsent = t("Total Absent")
+  const totalLeave = t("Total Leave")
   const summaryData = [
-    { title: 'Total Present', value: summary.presentCount, icon: checkboxIcon, color: 'bg-green-100' },
-    { title: 'Total Absent', value: summary.absentCount, icon: crossIcon, color: 'bg-red-100' },
-    { title: 'Total Leave', value: summary.leaveCount, icon: leaveIcon, color: 'bg-purple-100', isGradient: true }
+    { title: totalPresent, value: summary.presentCount, icon: checkboxIcon, color: 'bg-green-100' },
+    { title: totalAbsent, value: summary.absentCount, icon: crossIcon, color: 'bg-red-100' },
+    { title: totalLeave, value: summary.leaveCount, icon: leaveIcon, color: 'bg-purple-100', isGradient: true }
   ];
 
   return (
