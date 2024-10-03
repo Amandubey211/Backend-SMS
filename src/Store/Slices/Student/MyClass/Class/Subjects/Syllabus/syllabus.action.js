@@ -12,6 +12,7 @@ export const stdSyllabus = createAsyncThunk(
 
         const token = localStorage.getItem("student:token");
         if (!token) {
+            dispatch(setShowError(true));
             return rejectWithValue("Authentication failed!");
         }
 

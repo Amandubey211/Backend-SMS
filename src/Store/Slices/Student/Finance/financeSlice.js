@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { StudentFinanceDetails } from "./finance.action";
+import { setShowError } from "../../Common/Alerts/alertsSlice";
 
 
 const initialState = {

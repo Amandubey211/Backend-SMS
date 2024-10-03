@@ -11,9 +11,9 @@ import { setShowError } from "../../Common/Alerts/alertsSlice";
 export const StudentFinanceDetails = createAsyncThunk(
   `fees/StudentFinanceDetails`,
   async (_, { rejectWithValue, dispatch }) => {
-    // dispatch(setShowError(false));
     const token = localStorage.getItem("student:token");
     if (!token) {
+      dispatch(setShowError(true));
       return rejectWithValue(`Authentication failed!`);
     }
     

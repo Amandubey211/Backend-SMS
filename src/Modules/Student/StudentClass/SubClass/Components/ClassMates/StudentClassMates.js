@@ -61,12 +61,14 @@ const StudentClassMates = () => {
             <div className="w-full flex flex-col items-center justify-center py-20">
               <Spinner />
             </div>
-          ) : error ? (
-            <div className="w-full flex flex-col items-center justify-center py-20">
-              <GoAlertFill className="inline-block w-12 h-12 mb-3" />
-              <p className="text-lg font-semibold">{error}</p>
-            </div>
-          ) : classmateData?.length > 0 ? (
+          )
+          //  : error ? (
+          //   <div className="w-full flex flex-col items-center justify-center py-20">
+          //     <GoAlertFill className="inline-block w-12 h-12 mb-3" />
+          //     <p className="text-lg font-semibold">{error}</p>
+          //   </div>
+          // ) 
+          : classmateData?.length > 0 ? (
             <div className="flex flex-wrap -mx-2">
               {classmateData?.map((classmate, index) => (
                 <ProfileCard
@@ -76,7 +78,7 @@ const StudentClassMates = () => {
                 />
               ))}
             </div>
-          ) : (
+          ) : (!loading && classmateData?.length === 0) && (
             <div className="w-full flex flex-col items-center justify-center py-20">
               <NoDataFound title="No Classmates Found" />
             </div>
