@@ -18,6 +18,7 @@
 
 
   "Check Subject Progress": "Check Subject Progress",
+  "Subject Progress": "Subject Progress",
   "Unable to fetch Child Data": "Unable to fetch Child Data",
   "No Data Found": "No Data Found",
   "Grade Summary": "Grade Summary",
@@ -27,6 +28,13 @@
   "Group Quiz": "Group Quiz",
   "Total Score": "Total Score",
   "Days": "Days",
+  "All Modules": "All Modules",
+  "Edit": "Edit",
+  "Duplicate": "Duplicate",
+  "Move to...": "Move to...",
+  "Increase indent": "Increase indent",
+  "Share to Commons": "Share to Commons",
+  "Remove": "Remove",
 
   "Unable to Fetch Instructors": "Unable to Fetch Instructors",
   "Child Instructors": "Child Instructors",

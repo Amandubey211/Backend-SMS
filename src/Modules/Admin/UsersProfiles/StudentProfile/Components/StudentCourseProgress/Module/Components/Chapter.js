@@ -6,9 +6,9 @@ const Chapter = ({
   title,
   chapterNumber,
   imageUrl,
-  assignments,
-  quizzes,
- isExpanded,
+  assignments = [], // Ensure default empty array
+  quizzes = [],     // Ensure default empty array
+  isExpanded,
   onToggle,
   id
 }) => {
