@@ -18,9 +18,11 @@ const AttendanceCard = ({ attendanceData }) => {
       setSummary({ presentCount, absentCount, leaveCount });
     }
   }, [attendanceData]);
-  const totalPresent = t("Total Present")
-  const totalAbsent = t("Total Absent")
-  const totalLeave = t("Total Leave")
+
+  const totalPresent = t("Total Present");
+  const totalAbsent = t("Total Absent");
+  const totalLeave = t("Total Leave");
+
   const summaryData = [
     { title: totalPresent, value: summary.presentCount, icon: checkboxIcon, color: 'bg-green-100' },
     { title: totalAbsent, value: summary.absentCount, icon: crossIcon, color: 'bg-red-100' },
@@ -45,7 +47,7 @@ const CardComponent = ({ data }) => {
 
   return (
     <div
-      className={`h-[90px] w-[313px] rounded-lg shadow-md p-4 flex items-center justify-between ${cardStyle}`}
+      className={`h-[90px] w-[313px] rounded-lg shadow-md p-4 flex items-center justify-between ${cardStyle} transform transition-all duration-300 ease-in-out hover:shadow-xl hover:scale-105`}
     >
       <div className="flex items-center">
         <div className="bg-white rounded-full p-2 shadow-sm mr-3">
