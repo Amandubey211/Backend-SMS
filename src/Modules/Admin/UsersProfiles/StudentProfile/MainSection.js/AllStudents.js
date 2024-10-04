@@ -31,8 +31,8 @@ const AllStudents = () => {
       allStudents?.length > 0 ?
       allStudents?.map((student) => (
         <div className={`bg-pink-300 p-6 rounded-lg shadow-md text-white relative`}>
-          <div className="absolute top-4 right-4 bg-white text-gray-800 font-semibold py-1 px-3 rounded-full shadow-md hover:bg-gray-200 transition-colors">
-          <HiMiniCheckBadge className='text-green-500' />
+          <div className="absolute top-4 right-4 bg-white rounded-full  ">
+          <HiMiniCheckBadge className='text-green-500 text-2xl ' />
           </div>
         <NavLink
           to={`/users/students/${student?._id}`} 

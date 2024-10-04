@@ -15,7 +15,7 @@ export const fetchAllParent = createAsyncThunk(
       });
       return response.data;
     } catch (error) {
-      toast.error("Failed to fetch parent.");
+     
       return rejectWithValue(error.response?.data || error.message);
     }
   }

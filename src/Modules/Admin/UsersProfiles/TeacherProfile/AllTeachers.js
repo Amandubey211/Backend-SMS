@@ -3,11 +3,8 @@ import { FiLoader, FiUserPlus } from "react-icons/fi";
 import Layout from "../../../../Components/Common/Layout";
 import DashLayout from "../../../../Components/Admin/AdminDashLayout";
 import SidebarSlide from "../../../../Components/Common/SidebarSlide";
-import AddTeacher from "./AddTeacher";
 import { useDispatch, useSelector } from "react-redux";
-import useDeleteUser from "../../../../Hooks/AuthHooks/Staff/Admin/staff/useDeleteUser";
 import AddUser from "../StaffProfile/AddUser";
-import DeleteConfirmatiomModal from "../../../../Components/Common/DeleteConfirmationModal";
 import { GoAlertFill } from "react-icons/go";
 import ProfileCard from "../SubComponents/ProfileCard";
 import ViewTeacher from "./SingleTeacher";
@@ -15,8 +12,8 @@ import { fetchAllTeachers } from "../../../../Store/Slices/Admin/Class/Teachers/
 const AllTeachers = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [teacherData, setTeacherData] = useState(null);
- const [teacherId,setTeacherId] =useState();
- const {allTeachers,loading} = useSelector((store)=>store.admin.teacher)
+  const {allTeachers} = useSelector((store)=>store.admin.teacher);
+  const {loading} = useSelector((store)=>store.admin.all_staff);
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(fetchAllTeachers())
@@ -28,29 +25,12 @@ const AllTeachers = () => {
     setSidebarContent("addTeacher");
   };
   const handleSidebarClose = () => setSidebarOpen(false);
-  const {deleteUser,error} = useDeleteUser()
- const deleteTeacher = async()=>{
-  await deleteUser(teacherId);
-  if(!error){
-    dispatch(fetchAllTeachers())
-  }
-  setIsModalOpen(false);
- }
  const editUser = async(event,data)=>{
   event.stopPropagation();
   setSidebarContent("editTecaher");
   setSidebarOpen(true);
   setSelectedStaff(data);
  }
-    const [isModalOpen, setIsModalOpen] = useState(false);
-  const openModal = () => {
-    setIsModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-  };
-
   const handleStaffClick = (staff) => {
     setSelectedStaff(staff);
     setSidebarContent("viewTeacher");
@@ -103,11 +83,6 @@ const AllTeachers = () => {
   </div>
         </div>}
           </div>
-          <DeleteConfirmatiomModal
-  isOpen={isModalOpen}
-  onClose={closeModal}
-  onConfirm={deleteTeacher}
-/>
         </div>}
         <SidebarSlide
             key={sidebarContent} 

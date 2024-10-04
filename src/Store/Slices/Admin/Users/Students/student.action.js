@@ -17,7 +17,7 @@ export const fetchAllStudents = createAsyncThunk(
       });
       return response.data.data;
     } catch (error) {
-      toast.error("Failed to fetch students.");
+     
       return rejectWithValue(error.response?.data || error.message);
     }
   }

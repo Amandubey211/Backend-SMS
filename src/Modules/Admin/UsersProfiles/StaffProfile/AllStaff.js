@@ -98,7 +98,7 @@ const dispatch = useDispatch()
                 {sidebarContent === "viewStaff" ? "Quick View of Staff" : "Add/Edit Staff"}
               </span>
             }
-            width={sidebarContent === "viewTeacher" ? "30%" : "60%"}
+            width={sidebarContent === "viewStaff" ? "30%" : "60%"}
             height="100%"
           >
             {renderSidebarContent()}

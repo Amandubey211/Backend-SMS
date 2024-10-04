@@ -95,7 +95,7 @@ const dispatch = useDispatch()
             title={<span className="bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent bg-clip-text">
               {sidebarContent === "viewAccountant" ? "Quick View of Accountant" : "Add/Edit Accountant"}
             </span>}
-            width={sidebarContent === "viewTeacher" ? "30%" : "60%"}
+            width={sidebarContent === "viewAccountant" ? "30%" : "60%"}
             height="100%"
           >
             {renderSidebarContent()}
