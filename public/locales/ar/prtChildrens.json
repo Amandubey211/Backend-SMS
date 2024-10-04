@@ -16,7 +16,16 @@
   "Grades": "الدرجات",
   "Attendance": "الحضور",
   "Check Subject Progress": "تحقق من تقدم المادة",
+  "Subject Progress": "تقدم الموضوع",
   "Unable to fetch Child Data": "غير قادر على جلب بيانات الطفل",
+  "All Modules": "كل الوحدات",
+  "Edit": "تعديل",
+  "Duplicate": "نسخ",
+  "Move to...": "نقل إلى...",
+  "Increase indent": "زيادة المسافة البادئة",
+  "Share to Commons": "مشاركة إلى العموم",
+  "Remove": "إزالة",
+  
 
 
   "No Data Found": "لم يتم العثور على بيانات",

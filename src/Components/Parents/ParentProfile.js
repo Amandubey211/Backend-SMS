@@ -40,7 +40,7 @@ const ParentProfile = () => {
     // Logic to update profile
     console.log("Profile updated:", userData);
   };
-
+  console.log("Profile updated:", userData);
   const { ChangePassword } = useChangePassword();
 
   const updatePassword = () => {
