@@ -27,7 +27,7 @@ const StudentMainSection = () => {
   const [feesError, setFeesError] = useState(null);
   const [cache, setCache] = useState({});
   const [loading, setLoading] = useState(true); // Added loading state for data fetching
-
+  const [gradeData, setGradeData] = useState(null);
   const { selectedClass, selectedSection } = useSelector(
     (state) => state?.common?.user?.classInfo // Updated to get from the user slice with optional chaining
   );
@@ -140,19 +140,17 @@ const StudentMainSection = () => {
 
   const fetchStudentGrades = async () => {
     const token = localStorage.getItem("student:token");
-  
     const classId = localStorage.getItem("classId");
-  
     const persistUserString = localStorage.getItem("persist:user");
     const persistUserObject = JSON.parse(persistUserString);
     const userDetails = JSON.parse(persistUserObject.userDetails);
     const studentId = userDetails.userId;
-  
+
     if (!studentId || !classId) {
       console.error("Invalid student or class ID.");
       return;
     }
-  
+
     try {
       const response = await axios.get(
         `${baseUrl}/admin/grades/student/${studentId}/class/${classId}`,
@@ -162,19 +160,18 @@ const StudentMainSection = () => {
           },
         }
       );
-      return response.data.grades; // Return the grades data for further use
+      setGradeData(response.data); // Store the grades data in state
     } catch (error) {
       console.error("Error fetching student grades:", error);
-      throw new Error("Failed to load student grades. Please try again later.");
+      setError("Failed to load student grades. Please try again later.");
     }
   };
-  
 
   useEffect(() => {
     fetchDashboardDetails();
     fetchSubjects();
     fetchTasks();
-    fetchStudentGrades();
+    fetchStudentGrades(); // Fetch and store the grades data
   }, []);
 
   return (
@@ -191,7 +188,7 @@ const StudentMainSection = () => {
       </div>
 
       <div className="flex flex-1 w-full">
-        <div className="w-[30%]">
+        <div className="w-[30%] border-r border-gray-200">
           <div className="p-5">
             <div className="flex justify-between items-center mb-2">
               <h2 className="text-xl font-semibold text-gray-600">My Subject</h2>
@@ -227,20 +224,27 @@ const StudentMainSection = () => {
           <div className="w-full">
             <AttendanceDashboard />
           </div>
-          <div className="flex flex-row items-center w-full justify-around">
-            <div className="flex flex-col border-gray-200 w-1/2">
+          <div className="flex flex-row w-full justify-around">
+            <div className="flex flex-col border-r border-gray-200 w-1/2">
               <div className="border-gray-300 w-full pt-5 pb-3 ps-2 pl-4">
                 <h1 className="text-xl ml-2 font-semibold text-gray-600">Student Grade</h1>
               </div>
               <div className="flex justify-between px-3 w-full ps-4">
                 <p>Total Point: 90%</p>
-                <select className="select-exam-type">
+                <select
+                  className="select-exam-type border border-gray-300 rounded-md px-3 py-2 hover:shadow-md focus:outline-none focus:ring focus:ring-gray-300"
+                >
                   <option value="exam-type">Exam Type</option>
                   <option value="practical-exam">Practical Exam</option>
                 </select>
+
               </div>
               <div className="flex-1">
-                <StudentGradePieChart />
+                {gradeData ? (
+                  <StudentGradePieChart gradesData={gradeData} />
+                ) : (
+                  <Spinner />
+                )}
               </div>
             </div>
             <div className="flex flex-col border-l border-gray-200 w-1/2">
