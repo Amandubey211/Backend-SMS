@@ -170,7 +170,7 @@ const StudentMainSection = () => {
           <div className="flex flex-row items-center w-full justify-around">
             <div className="flex flex-col border-gray-200 w-1/2">
               <div className="border-gray-300 w-full pt-5 pb-3 ps-2 pl-4">
-                <h1 className="text-xl font-semibold text-gray-600">Student Grade</h1>
+                <h1 className="text-xl ml-2 font-semibold text-gray-600">Student Grade</h1>
               </div>
               <div className="flex justify-between px-3 w-full ps-4">
                 <p>Total Point: 90%</p>
