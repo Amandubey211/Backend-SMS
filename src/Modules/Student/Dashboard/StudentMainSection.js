@@ -11,9 +11,9 @@ import { baseUrl } from "../../../config/Common.js";
 import { useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { AiOutlineWarning, AiOutlineDollarCircle, AiOutlineBook, AiOutlineCheckCircle, AiOutlineExclamationCircle, AiOutlineFileText } from "react-icons/ai";
-import { FaMoneyBillWave} from "react-icons/fa";
 import { IoNewspaperOutline } from "react-icons/io5";
-import { TbCards } from "react-icons/tb";
+import { PiMoneyWavyDuotone } from "react-icons/pi";
+import { PiMoneyWavy } from "react-icons/pi";
 
 const StudentMainSection = () => {
   const navigate = useNavigate();
@@ -67,7 +67,7 @@ const StudentMainSection = () => {
 
   const fetchDashboardDetails = async () => {
     const token = localStorage.getItem("student:token");
-    
+
     if (cache.dashboardData) {
       // Use cached data if available
       const { dashboardData } = cache;
@@ -127,21 +127,24 @@ const StudentMainSection = () => {
   return (
     <div className="flex flex-col border-b border-gray-200">
       <div className="border-b border-gray-200 flex flex-wrap justify-center gap-3 py-4">
-        {error && (
-          <div className="w-full flex flex-col items-center justify-center text-gray-500">
-            <TbCards size={50} />
-            <span className="mt-4 text-lg font-semibold text-center">{error}</span>
-          </div>
-        )}
-        {cardData?.map((item, index) => (
+
+
+        {/* Use cardData or Fallback with Default Data */}
+        {(cardData?.length ? cardData : [
+          { label: "Upcoming Exam", value: 0, icon: "📝", bgColor: "bg-green-100", textColor: "text-green-600" },
+          { label: "Due Fees", value: 0, icon: "💸", bgColor: "bg-red-100", textColor: "text-red-600" },
+          { label: "Event", value: 0, icon: "📅", bgColor: "bg-blue-100", textColor: "text-blue-600" },
+          { label: "Notice", value: 0, icon: "🔔", bgColor: "bg-yellow-100", textColor: "text-yellow-600" }
+        ]).map((item, index) => (
           <DashCard key={index} {...item} />
         ))}
       </div>
+
       <div className="flex flex-1 w-full">
         <div className="w-[30%]">
           <div className="p-5">
             <div className="flex justify-between items-center mb-2">
-              <h2 className="text-lg font-semibold text-gray-800">My Subject</h2>
+              <h2 className="text-xl font-semibold text-gray-600">My Subject</h2>
               <p className="text-sm text-purple-500 cursor-pointer font-bold">
                 <Link to="/student_class">See all</Link>
               </p>
@@ -158,7 +161,7 @@ const StudentMainSection = () => {
             ) : null}
           </div>
           <AllSubjects subjects={subjects} />
-         
+
         </div>
         <div className="w-[70%] flex flex-col flex-wrap border-l border-r">
           <div className="w-full">
@@ -166,8 +169,8 @@ const StudentMainSection = () => {
           </div>
           <div className="flex flex-row items-center w-full justify-around">
             <div className="flex flex-col border-gray-200 w-1/2">
-              <div className="border-gray-300 w-full pt-5 pb-3 ps-2">
-                <h1 className="text-xl px-2">Student Grade</h1>
+              <div className="border-gray-300 w-full pt-5 pb-3 ps-2 pl-4">
+                <h1 className="text-xl font-semibold text-gray-600">Student Grade</h1>
               </div>
               <div className="flex justify-between px-3 w-full ps-4">
                 <p>Total Point: 90%</p>
@@ -182,7 +185,7 @@ const StudentMainSection = () => {
             </div>
             <div className="flex flex-col border-l border-gray-200 w-1/2">
               <div className="w-full py-5 ps-3">
-                <h1 className="text-xl px-2 mb-2">Task</h1>
+                <h1 className="text-xl font-semibold text-gray-600 px-2 mb-2">Task</h1>
                 <p className="px-2">5/12 assignments have been completed</p>
               </div>
               <div className="flex-1">
@@ -195,7 +198,7 @@ const StudentMainSection = () => {
       <div className="flex border">
         <div className="w-[65%]">
           <div className="flex justify-between items-center p-4">
-            <h4 className="text-lg font-semibold text-gray-800">Recent Exam Results</h4>
+            <h4 className="text-xl font-semibold text-gray-600">Recent Exam Results</h4>
             <p
               onClick={() => {
                 if (selectedClass && selectedSection) {
@@ -209,16 +212,16 @@ const StudentMainSection = () => {
               See All
             </p>
           </div>
-          <div className="text-gray-500 flex flex-col items-center mt-4">
-            <IoNewspaperOutline  size={40} />
+          <div className="text-gray-500 flex flex-col items-center mt-9">
+            <IoNewspaperOutline size={70} />
             <span className="mt-4 text-lg font-semibold text-center">No Exam Results for Now</span>
           </div>
         </div>
         <div className="border-l border-gray-300 w-[35%]">
           {unpaidFees === 0 ? (
-            <div className="text-gray-500 flex flex-col items-center mt-4">
-              <AiOutlineDollarCircle size={80} />
-              <span className="mt-4 text-lg font-semibold text-center">No unpaid fees at the moment.</span>
+            <div className="text-gray-500 flex flex-col items-center mt-4 mb-6">
+              <PiMoneyWavy  size={80} />
+              <span className="mt-4 text-lg font-semibold text-center">No unpaid fees at the moment</span>
             </div>
           ) : (
             <div className="flex flex-col border-b border-gray-200 py-5">
@@ -230,11 +233,11 @@ const StudentMainSection = () => {
               />
             </div>
           )}
-    
+          <hr />
           {paidFees === 0 ? (
             <div className="text-gray-500 flex flex-col items-center mt-7">
-              <FaMoneyBillWave size={80} />
-              <span className="mt-4 text-lg font-semibold text-center mb-8">No paid fees available.</span>
+              <PiMoneyWavyDuotone  size={80} />
+              <span className="mt-4 text-lg font-semibold text-center mb-8">No paid fees available</span>
             </div>
           ) : (
             <div className="flex flex-col py-5">
