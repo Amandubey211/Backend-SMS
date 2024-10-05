@@ -2,11 +2,13 @@ import React, { useEffect, useState } from "react";
 import AttendanceChart from "./AttendanceChart"; // Replace with your actual component import
 import { baseUrl } from "../../../../../config/Common";
 import Spinner from "../../../../../Components/Common/Spinner";
+import { FaUserGraduate } from "react-icons/fa";
 
 const AttendanceDashboard = () => {
   const [attendanceSummary, setAttendanceSummary] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [cache, setCache] = useState({});
 
   useEffect(() => {
     const fetchAttendanceSummary = async () => {
@@ -14,6 +16,13 @@ const AttendanceDashboard = () => {
         const token = localStorage.getItem("student:token");
         if (!token) {
           throw new Error("Authentication token not found");
+        }
+
+        // Check if data is cached
+        if (cache.attendanceSummary) {
+          setAttendanceSummary(cache.attendanceSummary);
+          setLoading(false);
+          return;
         }
 
         const response = await fetch(
@@ -28,109 +37,51 @@ const AttendanceDashboard = () => {
           throw new Error("Failed to fetch data");
         }
         const data = await response.json();
-        console.log("attendance symmyary data", data);
-        setAttendanceSummary(data.data.attendanceSummary);
+        console.log("attendance summary data", data);
+        setAttendanceSummary(data?.data?.attendanceSummary);
+        setCache((prev) => ({ ...prev, attendanceSummary: data?.data?.attendanceSummary }));
         setLoading(false);
       } catch (error) {
         console.error("Error fetching attendance summary:", error);
-        setError("Failed to fetch attendance data");
+        setError("Unable to fetch attendance data");
         setLoading(false);
       }
     };
 
     fetchAttendanceSummary();
-  }, []);
-
-  if (loading) {
-    return <Spinner />;
-  }
-
-  if (error) {
-    return <div>{error}</div>;
-  }
-
-  // Prepare data for the AttendanceChart component
-  const attendanceData = [
-    {
-      month: "January",
-      present: attendanceSummary.present[0],
-      absent: attendanceSummary.absent[0],
-      leave: attendanceSummary.leave[0],
-    },
-    {
-      month: "February",
-      present: attendanceSummary.present[1],
-      absent: attendanceSummary.absent[1],
-      leave: attendanceSummary.leave[1],
-    },
-    {
-      month: "March",
-      present: attendanceSummary.present[2],
-      absent: attendanceSummary.absent[2],
-      leave: attendanceSummary.leave[2],
-    },
-    {
-      month: "April",
-      present: attendanceSummary.present[3],
-      absent: attendanceSummary.absent[3],
-      leave: attendanceSummary.leave[3],
-    },
-    {
-      month: "May",
-      present: attendanceSummary.present[4],
-      absent: attendanceSummary.absent[4],
-      leave: attendanceSummary.leave[4],
-    },
-    {
-      month: "June",
-      present: attendanceSummary.present[5],
-      absent: attendanceSummary.absent[5],
-      leave: attendanceSummary.leave[5],
-    },
-    {
-      month: "July",
-      present: attendanceSummary.present[6],
-      absent: attendanceSummary.absent[6],
-      leave: attendanceSummary.leave[6],
-    },
-    {
-      month: "August",
-      present: attendanceSummary.present[7],
-      absent: attendanceSummary.absent[7],
-      leave: attendanceSummary.leave[7],
-    },
-    {
-      month: "September",
-      present: attendanceSummary.present[8],
-      absent: attendanceSummary.absent[8],
-      leave: attendanceSummary.leave[8],
-    },
-    {
-      month: "October",
-      present: attendanceSummary.present[9],
-      absent: attendanceSummary.absent[9],
-      leave: attendanceSummary.leave[9],
-    },
-    {
-      month: "November",
-      present: attendanceSummary.present[10],
-      absent: attendanceSummary.absent[10],
-      leave: attendanceSummary.leave[10],
-    },
-    {
-      month: "December",
-      present: attendanceSummary.present[11],
-      absent: attendanceSummary.absent[11],
-      leave: attendanceSummary.leave[11],
-    },
-  ];
+  }, [cache]);
 
   return (
-    <div className="attendance-dashboard w-[100%] border-b  p-5">
-      <h1 className="text-xl">Attendance</h1>
-      <div className="justify-center text-center w-full ">
-        <AttendanceChart data={attendanceData} />
-      </div>
+    <div className="attendance-dashboard w-[100%] border-b p-5">
+      <h1 className="text-xl font-semibold text-gray-600">Attendance</h1>
+      {loading ? (
+        <div className="flex items-center justify-center mt-4">
+          <Spinner />
+        </div>
+      ) : error ? (
+        <div className="flex flex-col items-center justify-center text-gray-500 mt-4">
+          <FaUserGraduate size={80} />
+          <span className="mt-4 text-lg font-semibold">{error}</span>
+        </div>
+      ) : !attendanceSummary ? (
+        <div className="flex flex-col items-center justify-center text-gray-500 mt-4">
+          <FaUserGraduate size={80} />
+          <span className="mt-4 text-lg font-semibold">No attendance data available</span>
+        </div>
+      ) : (
+        <div className="justify-center text-center w-full">
+          <AttendanceChart data={
+            [
+              "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"
+            ].map((month, index) => ({
+              month,
+              present: attendanceSummary?.present?.[index] || 0,
+              absent: attendanceSummary?.absent?.[index] || 0,
+              leave: attendanceSummary?.leave?.[index] || 0,
+            }))
+          } />
+        </div>
+      )}
     </div>
   );
 };
