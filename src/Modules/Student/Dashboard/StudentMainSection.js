@@ -7,13 +7,13 @@ import TaskCompletionChart from "./DashBoardComponents/Charts/TaskCompletionChar
 import StudentRecentGrade from "./DashBoardComponents/StudentRecentGrade.js";
 import StudentDashFeeCard from "./DashBoardComponents/StudentDashFeeCard.js";
 import axios from "axios";
+import Spinner from "../../../Components/Common/Spinner";
 import { baseUrl } from "../../../config/Common.js";
 import { useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import { AiOutlineWarning, AiOutlineDollarCircle, AiOutlineBook, AiOutlineCheckCircle, AiOutlineExclamationCircle, AiOutlineFileText } from "react-icons/ai";
+import { AiOutlineBook } from "react-icons/ai";
 import { IoNewspaperOutline } from "react-icons/io5";
-import { PiMoneyWavyDuotone } from "react-icons/pi";
-import { PiMoneyWavy } from "react-icons/pi";
+import { PiMoneyWavyDuotone, PiMoneyWavy } from "react-icons/pi";
 
 const StudentMainSection = () => {
   const navigate = useNavigate();
@@ -26,8 +26,8 @@ const StudentMainSection = () => {
   const [subjectError, setSubjectError] = useState(null);
   const [feesError, setFeesError] = useState(null);
   const [cache, setCache] = useState({});
+  const [loading, setLoading] = useState(true); // Added loading state for data fetching
 
-  // Get necessary values from user slice instead of common slice
   const { selectedClass, selectedSection } = useSelector(
     (state) => state?.common?.user?.classInfo // Updated to get from the user slice with optional chaining
   );
@@ -69,7 +69,6 @@ const StudentMainSection = () => {
     const token = localStorage.getItem("student:token");
 
     if (cache.dashboardData) {
-      // Use cached data if available
       const { dashboardData } = cache;
       setCardData(formatDashboardData(dashboardData));
       setPaidFees(dashboardData?.data?.totalPaidFees);
@@ -87,8 +86,7 @@ const StudentMainSection = () => {
       ]);
 
       const dashboardData = dashboardResponse?.data;
-
-      setCache((prev) => ({ ...prev, dashboardData })); // Cache the data
+      setCache((prev) => ({ ...prev, dashboardData }));
       setCardData(formatDashboardData(dashboardData));
       setPaidFees(dashboardData?.data?.totalPaidFees);
       setUnpaidFees(dashboardData?.data?.dueFees);
@@ -98,42 +96,43 @@ const StudentMainSection = () => {
     }
   };
 
-  const fetchSubjects = async () => {
+  const fetchTasks = async () => {
     try {
-      // Retrieve the JSON string from localStorage
-      const persistUserString = localStorage.getItem('persist:user');
       const token = localStorage.getItem("student:token");
-  
-      // Parse the JSON string to get an object
-      const persistUserObject = JSON.parse(persistUserString);
-  
-      // Access the userId from the nested userDetails object
-      const userDetails = JSON.parse(persistUserObject.userDetails);
-      const userId = userDetails.userId;
-  
-      // Make the API call with userId in the URL and set the Authorization header
-      const response = await axios.get(`${baseUrl}/api/studentDashboard/subjects/${userId}`, {
+      const response = await axios.get(`${baseUrl}/api/studentDashboard/tasks`, {
         headers: {
-          Authentication: token, // Setting the Authorization header
+          Authentication: token,
         },
       });
-  
+
+      console.log(response.data.tasks);
+    } catch (error) {
+      console.error("Error fetching tasks:", error);
+      setTaskError("No task data available.");
+    }
+  };
+
+  const fetchSubjects = async () => {
+    setLoading(true); // Set loading to true when starting the fetch
+    try {
+      const persistUserString = localStorage.getItem('persist:user');
+      const token = localStorage.getItem("student:token");
+      const persistUserObject = JSON.parse(persistUserString);
+      const userDetails = JSON.parse(persistUserObject.userDetails);
+      const userId = userDetails.userId;
+
+      const response = await axios.get(`${baseUrl}/api/studentDashboard/subjects/${userId}`, {
+        headers: {
+          Authentication: token,
+        },
+      });
+
       setSubjects(response?.data?.subjects);
     } catch (error) {
       console.error("Error fetching subjects:", error);
       setSubjectError("No subjects found.");
-    }
-  };
-  
-  
-
-  const fetchTasks = async () => {
-    try {
-      const response = await axios.get(`${baseUrl}/api/studentDashboard/tasks`);
-      // Handle tasks data accordingly (currently not used)
-    } catch (error) {
-      console.error("Error fetching tasks:", error);
-      setTaskError("No task data available.");
+    } finally {
+      setLoading(false); // Ensure loading is set to false after fetch
     }
   };
 
@@ -146,9 +145,6 @@ const StudentMainSection = () => {
   return (
     <div className="flex flex-col border-b border-gray-200">
       <div className="border-b border-gray-200 flex flex-wrap justify-center gap-3 py-4">
-
-
-        {/* Use cardData or Fallback with Default Data */}
         {(cardData?.length ? cardData : [
           { label: "Upcoming Exam", value: 0, icon: "📝", bgColor: "bg-green-100", textColor: "text-green-600" },
           { label: "Due Fees", value: 0, icon: "💸", bgColor: "bg-red-100", textColor: "text-red-600" },
@@ -160,27 +156,38 @@ const StudentMainSection = () => {
       </div>
 
       <div className="flex flex-1 w-full">
-      <div className="w-[30%]">
-      <div className="p-5">
-        <div className="flex justify-between items-center mb-2">
-          <h2 className="text-xl font-semibold text-gray-600">My Subject</h2>
-          <p className="text-sm text-purple-500 cursor-pointer font-bold">
-            <Link to="/student_class">See all</Link>
-          </p>
-        </div>
-        {subjectError ? (
-          <div className="text-gray-500 flex flex-col items-center mt-7 mb-5">
-            <AiOutlineBook size={50} />
-            <span className="mt-4 text-lg font-semibold text-center">{subjectError}</span>
+        <div className="w-[30%]">
+          <div className="p-5">
+            <div className="flex justify-between items-center mb-2">
+              <h2 className="text-xl font-semibold text-gray-600">My Subject</h2>
+              <p className="text-sm text-purple-500 cursor-pointer font-bold">
+                <Link to="/student_class">See all</Link>
+              </p>
+            </div>
+            {loading ? (
+              <div className="flex justify-center items-center py-5">
+                <Spinner />
+              </div>
+            ) : subjectError ? (
+              <div className="text-gray-500 flex flex-col items-center mt-7 mb-5">
+                <AiOutlineBook size={50} />
+                <span className="mt-4 text-lg font-semibold text-center">{subjectError}</span>
+              </div>
+            ) : subjects?.length > 0 ? (
+              <div>
+                <p className="text-sm text-gray-500">
+                  A total of {subjects.length} Courses are in Progress
+                </p>
+                <AllSubjects subjects={subjects} />
+              </div>
+            ) : (
+              <div className="text-gray-500 flex flex-col items-center mt-7 mb-5">
+                <AiOutlineBook size={50} />
+                <span className="mt-4 text-lg font-semibold text-center">No Data Found</span>
+              </div>
+            )}
           </div>
-        ) : subjects?.length > 0 ? (
-          <p className="text-sm text-gray-500">
-            A total of {subjects.length} Courses are in Progress
-          </p>
-        ) : null}
-      </div>
-      <AllSubjects subjects={subjects} />
-    </div>
+        </div>
         <div className="w-[70%] flex flex-col flex-wrap border-l border-r">
           <div className="w-full">
             <AttendanceDashboard />
@@ -238,7 +245,7 @@ const StudentMainSection = () => {
         <div className="border-l border-gray-300 w-[35%]">
           {unpaidFees === 0 ? (
             <div className="text-gray-500 flex flex-col items-center mt-4 mb-6">
-              <PiMoneyWavy  size={80} />
+              <PiMoneyWavy size={80} />
               <span className="mt-4 text-lg font-semibold text-center">No unpaid fees at the moment</span>
             </div>
           ) : (
@@ -254,7 +261,7 @@ const StudentMainSection = () => {
           <hr />
           {paidFees === 0 ? (
             <div className="text-gray-500 flex flex-col items-center mt-7">
-              <PiMoneyWavyDuotone  size={80} />
+              <PiMoneyWavyDuotone size={80} />
               <span className="mt-4 text-lg font-semibold text-center mb-8">No paid fees available</span>
             </div>
           ) : (

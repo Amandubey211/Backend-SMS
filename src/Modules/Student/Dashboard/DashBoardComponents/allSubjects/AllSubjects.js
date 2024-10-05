@@ -6,7 +6,7 @@ const AllSubjects = ({ subjects }) => {
   const progressBarColors = ["#FF7AA5", "#5278FF", "#FBB778", "#33C4FE", "#FF7AA5"];
 
   return (
-    <div className="px-4">
+    <div className="px-1">
       <div className="mt-4">
         {subjects && subjects.length > 0 ? (
           <div className="mt-4">
