@@ -60,20 +60,31 @@
 // export default TaskChart;
 
 import React from 'react';
-import { Doughnut } from 'react-chartjs-2';
+import { Doughnut, Pie } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 const TaskCompletionChart = () => {
   const data = {
-    labels: ['Completed Tasks', 'Missing Tasks'],
+    labels: ["Completed Task", "Incomplete Task"],
     datasets: [
       {
-        data: [75, 25], // Example data: 75% completed, 25% missing
-        backgroundColor: ['rgba(75, 192, 192, 0.6)', 'rgba(255, 99, 132, 0.6)'],
-        borderColor: ['rgba(75, 192, 192, 1)', 'rgba(255, 99, 132, 1)'],
-        borderWidth: 1,
+        data: [67,21], // Percentage or total points for each subject
+        backgroundColor: [
+          
+          "#7B61FF",
+          "#FFD700",
+        ],
+        hoverBackgroundColor: [
+          
+          "#7B61FF",
+          "#FFD700",
+        ],
+        borderWidth: 5,
+        
+        borderRadius: 10,
+        borderColor: "#ffffff", // White borders make segments distinct
       },
     ],
   };
@@ -81,20 +92,21 @@ const TaskCompletionChart = () => {
   const options = {
     responsive: true,
     maintainAspectRatio: true,
-    cutout: '80%',
+    cutout: '70%',
     plugins: {
       legend: {
-        display: true, // Hide the legend
-        position: 'bottom',
+        display: true,
+        position: "bottom",
+        labels: {
+          boxWidth: 20,
+          padding: 8,
+          usePointStyle: true,
+        },
       },
       tooltip: {
         callbacks: {
-          label: function (context) {
-            const label = context.label || '';
-            const value = context.raw || 0;
-            const total = context.dataset.data.reduce((sum, val) => sum + val, 0);
-            const percentage = ((value / total) * 100).toFixed(2);
-            return ` ${percentage}% (${value})`;
+          label: function (tooltipItem) {
+            return tooltipItem.label + ": " + tooltipItem.raw + "%";
           },
         },
       },
@@ -104,7 +116,7 @@ const TaskCompletionChart = () => {
   return (
     <div className="flex-1 flex justify-center items-center h-full">
       <div style={{ width: "290px", height: "290px" , marginTop:"10px"}}>
-        <Doughnut data={data} options={options} />
+        <Pie data={data} options={options} />
       </div>
     </div>
   );

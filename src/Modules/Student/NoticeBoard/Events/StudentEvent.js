@@ -4,7 +4,7 @@ import "../Events/customCalendar.css";
 import Layout from "../../../../Components/Common/Layout";
 import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 import StudentDashLayout from "../../../../Components/Student/StudentDashLayout";
-import { format, parseISO, isValid } from "date-fns";
+import { format, parse, isValid } from "date-fns";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
 import { IoCalendarOutline } from "react-icons/io5";
 import { useDispatch, useSelector } from "react-redux";
@@ -90,36 +90,38 @@ const StudentEvent = () => {
 
   // calender function
   const handleDateCellRender = (value) => {
-    const formattedDate = format(value.toDate(), "yyyy-MM-dd");
-    const dayEvents = filteredEvents?.filter(
-      (event) => format(event?.startDate, "yyyy-MM-dd") === formattedDate
+    const formattedDate = format(value.toDate(), 'yyyy-MM-dd');
+    const dayEvents = filteredEvents.filter(
+      (event) => format(event?.startDate, 'yyyy-MM-dd') === formattedDate
     );
-
-    const bgColors = [
-      "bg-pink-500",
-      "bg-purple-500",
-      "bg-blue-500",
-      "bg-indigo-500",
-    ];
-
+  
+    const bgColors = ['bg-pink-500', 'bg-purple-500', 'bg-blue-500', 'bg-indigo-500'];
+  
     return (
       <ul className="events space-y-1 max-h-20 overflow-y-auto">
         {dayEvents.map((event, index) => {
-          const eventTime = event.time
-            ? new Date(`${format(event.startDate, "yyyy-MM-dd")}T${event.time}`)
-            : event.startDate;
+          // Parse time from event, support both 24-hour and 12-hour formats
+          let eventTime = event?.time
+            ? parse(event?.time, 'hh:mm a', new Date()) // Try parsing as 12-hour format first
+            : event?.startDate;
+  
+          if (!isValid(eventTime)) {
+            eventTime = parse(event?.time, 'HH:mm', new Date()); // Fallback for 24-hour format
+          }
+  
           const timeString = isValid(eventTime)
-            ? format(eventTime, "hh:mm a")
-            : "Invalid Time";
-
+            ? format(eventTime, 'hh:mm a')  // Always display in 12-hour format
+            : 'Invalid Time';
+  
           return (
             <li
-              key={event.id}
-              className={`inline-block px-2 py-1 rounded text-white ${bgColors[index % bgColors.length]
-                } shadow-md cursor-pointer`}
+              key={event?.id}
+              className={`inline-block px-2 py-1 rounded text-white ${
+                bgColors[index % bgColors.length]
+              } shadow-md cursor-pointer`}
               onClick={() => handleStickerClick(event)}
             >
-              {event.title} - {timeString}
+              {event?.title} - {timeString}
             </li>
           );
         })}
@@ -280,28 +282,6 @@ console.log("dsdfasasasa",paginatedEvents)
                       >
                         {options}
                       </select>
-                      {/* <div className="flex space-x-2">
-                        <button
-                          className={`border rounded px-2 py-1 ${
-                            type === "month"
-                              ? "bg-gradient-to-r from-pink-500 to-purple-500 text-white"
-                              : ""
-                          }`}
-                          onClick={() => onTypeChange("month")}
-                        >
-                          {t("Month", gt.month)}
-                        </button>
-                        <button
-                          className={`border rounded px-2 py-1 ${
-                            type === "year"
-                              ? "bg-gradient-to-r from-pink-500 to-purple-500 text-white"
-                              : ""
-                          }`}
-                          onClick={() => onTypeChange("year")}
-                        >
-                          {t("Year", gt.month)}
-                        </button>
-                      </div> */}
                     </div>
                   );
                 }}

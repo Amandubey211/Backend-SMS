@@ -44,20 +44,19 @@ const AllSubjects = () => {
 
   return (
     <div className="px-4">
-      <div className="flex flex-1 flex-col p-4">
+      {/* My Courses Section */}  {/* Updated title */}
+        <hr/>
+      <div className="mt-4">
         <span className="font-bold text-gray-900">My Courses</span>
-        <span className="text-gray-500">
-          Total {studentSubjects?.length || 0} course(s) remaining
-        </span>
+        {studentSubjects.length > 0 ? (
+          <SubjectsSlider subjects={studentSubjects} />
+        ) : (
+          <div className="flex w-full h-full text-gray-500 items-center justify-center flex-col text-2xl mt-4 mb-8">
+            <GoAlertFill className="text-[4rem]" />
+            <span className="mt-2 text-xl font-semibold text-center">No Data Found</span>
+          </div>
+        )}
       </div>
-      {studentSubjects.length > 0 ? (
-        <SubjectsSlider subjects={studentSubjects} />
-      ) : (
-        <div className="flex w-full h-full text-gray-500 items-center justify-center flex-col text-2xl">
-          <GoAlertFill className="text-[5rem]" />
-          No Data Found
-        </div>
-      )}
     </div>
   );
 };
