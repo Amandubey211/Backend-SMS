@@ -115,8 +115,8 @@ const StudentMainSection = () => {
   const fetchSubjects = async () => {
     setLoading(true); // Set loading to true when starting the fetch
     try {
-      const persistUserString = localStorage.getItem('persist:user');
       const token = localStorage.getItem("student:token");
+      const persistUserString = localStorage.getItem('persist:user');
       const persistUserObject = JSON.parse(persistUserString);
       const userDetails = JSON.parse(persistUserObject.userDetails);
       const userId = userDetails.userId;
@@ -136,10 +136,45 @@ const StudentMainSection = () => {
     }
   };
 
+
+
+  const fetchStudentGrades = async () => {
+    const token = localStorage.getItem("student:token");
+  
+    const classId = localStorage.getItem("classId");
+  
+    const persistUserString = localStorage.getItem("persist:user");
+    const persistUserObject = JSON.parse(persistUserString);
+    const userDetails = JSON.parse(persistUserObject.userDetails);
+    const studentId = userDetails.userId;
+  
+    if (!studentId || !classId) {
+      console.error("Invalid student or class ID.");
+      return;
+    }
+  
+    try {
+      const response = await axios.get(
+        `${baseUrl}/admin/grades/student/${studentId}/class/${classId}`,
+        {
+          headers: {
+            Authentication: token,
+          },
+        }
+      );
+      return response.data.grades; // Return the grades data for further use
+    } catch (error) {
+      console.error("Error fetching student grades:", error);
+      throw new Error("Failed to load student grades. Please try again later.");
+    }
+  };
+  
+
   useEffect(() => {
     fetchDashboardDetails();
     fetchSubjects();
     fetchTasks();
+    fetchStudentGrades();
   }, []);
 
   return (
