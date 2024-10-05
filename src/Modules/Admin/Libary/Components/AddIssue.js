@@ -88,7 +88,7 @@ const AddIssue = ({ onClose }) => {
   };
 
   return (
-    <form className="space-y-4" onSubmit={handleSubmit}>
+    <form className="h-auto" onSubmit={handleSubmit}>
       <label htmlFor="class">Class</label>
       <select
         id="class"

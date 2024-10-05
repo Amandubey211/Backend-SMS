@@ -5,36 +5,42 @@ import { useParams } from "react-router-dom";
 // import DashLayout from "../../../../Components/Admin/AdminDashLayout";
 import StudentProfile from "./StudentProfileCard";
 import NavigationMenu from './NavigationMenu.js'
-// import BookIssue from "../Components/BookIssueMenu/BookIssue";
-// import ParentsProfile from "../Components/ParentMenu/ParentsProfile";
-// import StudentFinance from "../Components/FinanceMenu/StudentFinance";
-// import StudentAttendance from "../Components/studentAttendance/StudentAttendance";
-// import StudentInformationMenu from "../Components/StudentInformationMenu/StudentInformationMenu";
+ import BookIssue from "../Components/BookIssueMenu/BookIssue";
+ import ParentsProfile from "../Components/ParentMenu/ParentsProfile";
+ import StudentFinance from "../Components/FinanceMenu/StudentFinance";
+ import StudentAttendance from "../Components/studentAttendance/StudentAttendance";
+ import StudentInformationMenu from "../Components/StudentInformationMenu/StudentInformationMenu";
 // import StudentCourseProgress from "../Components/StudentCourseProgress/StudentCourseProgress";
-// import StudentGradesAccordion from "../Components/studentGradeMenu/StudentGradesAccordion";
+ import StudentGradesAccordion from "../Components/studentGradeMenu/StudentGradesAccordion";
 import StudentOverView from "../Components/StudentOverView/StudentOverView";
 import Layout from "../../../../../Components/Common/Layout";
 import DashLayout from "../../../../../Components/Admin/AdminDashLayout";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchAllStudents } from "../../../../../Store/Slices/Admin/Users/Students/student.action.js";
+
 
 const SingleStudent = () => {
   const { cid } = useParams();
   const {allStudents,loading} = useSelector((store) => store.admin.all_students);
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(fetchAllStudents());
+  }, [dispatch])
   const student = allStudents.find((s) => s._id === cid);
   const [activeItem, setActiveItem] = useState("OverView");
-  if (!student) {
-    return <div className="text-center text-red-500">Student not found</div>;
+  if (!loading && !student) {
+    return <div className="text-center my-10">Student not found</div>;
   }
   const renderContent = () => {
     const menuComponents = {
       "OverView": <StudentOverView student={student} />,
       // "Course Progress": <StudentCourseProgress student={student} />,
-      // "Finance": <StudentFinance student={student} />,
-      // "Information": <StudentInformationMenu student={student} />,
-      // "Parents": <ParentsProfile student={student} />,
-      // "Grades": <StudentGradesAccordion student={student} />,
-      // "Attendance": <StudentAttendance  student={student} />,
-      // "Book Issue": <BookIssue  />
+       "Finance": <StudentFinance student={student} />,
+       "Information": <StudentInformationMenu student={student} />,
+       "Parents": <ParentsProfile student={student} />,
+      "Grades": <StudentGradesAccordion student={student} />,
+       "Attendance": <StudentAttendance  student={student} />,
+       "Book Issue": <BookIssue  />
     };
     return menuComponents[activeItem] || <div>Select a menu item</div>;
   };

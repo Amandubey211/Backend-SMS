@@ -1,36 +1,16 @@
-import TimelineItem from "antd/es/timeline/TimelineItem";
-import React, { useEffect, useState } from "react";
-import { VerticalTimeline, VerticalTimelineElement }  from 'react-vertical-timeline-component';
 
-import { Bs0CircleFill } from "react-icons/bs";
+import React, { useEffect, useState } from "react";
 import { GoAlertFill } from "react-icons/go";
-import { useSelector } from "react-redux";
-import axios from "axios";
-import { baseUrl } from "../../../../../../../config/Common";
+import { useDispatch, useSelector } from "react-redux";
 import { AiOutlineEye } from "react-icons/ai";
+import { fetchStudentDocument } from "../../../../../../../Store/Slices/Admin/Users/Students/student.action";
 
 const StudentProfile = ({student}) => {
-  const role = useSelector((store) => store.Auth.role);
-  const [documents,setDocuments] = useState([])
-  const getdocumnets = async()=>{
-    try {
-      const token = localStorage.getItem(`${role}:token`);
-      const response = await axios.get(`${baseUrl}/admin/documents/student/${student._id}`, {
-        headers: {
-          Authentication: `${token}`
-        },
-      });
-
-     console.log(response.data);
-     setDocuments(response?.data?.documents.documents)
-     
-    } catch (error) {
-      console.error('Error fetching documents data:', error);
-    }
-  } 
+  const {studentDocument,loading} = useSelector((store) => store.admin.all_students);
+   const dispatch = useDispatch()
   useEffect(()=>{
-    getdocumnets()
-  },[])
+    dispatch(fetchStudentDocument(student._id))
+  },[dispatch])
   const [preview, setPreview] = useState(null);
   const [previewType, setPreviewType] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
@@ -64,15 +44,15 @@ const StudentProfile = ({student}) => {
   const getColor = (index) => colors[index % colors.length];
   return (
     <div className="bg-white  h-full  px-7 py-2 ">
-    <h2 className="text-base font-normal text-gray-600 mb-3">Educational Documents</h2>
+    <h2 className="text-base font-semibold text-gray-600 mb-3">Educational Documents</h2>
     {
-      documents.length > 0 ?
+      studentDocument.length > 0 ?
       <div className=" w-[30rem] p-2  rounded-lg mb-3 ">
       <h3 className="text-lg font-semibold mb-4 text-gray-800">
         Document Previews
       </h3>
       <div className=" flex w-full">
-        {documents?.map((doc, index) => (
+        {studentDocument?.map((doc, index) => (
           <div
             key={index}
             className={`${getColor(

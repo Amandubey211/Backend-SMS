@@ -13,7 +13,7 @@ const AllTeachers = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [teacherData, setTeacherData] = useState(null);
   const {allTeachers} = useSelector((store)=>store.admin.teacher);
-  const {loading} = useSelector((store)=>store.admin.all_staff);
+ const {loading} = useSelector((store)=>store.admin.all_staff);
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(fetchAllTeachers())
