@@ -43,7 +43,7 @@ const AttendanceDashboard = () => {
         setLoading(false);
       } catch (error) {
         console.error("Error fetching attendance summary:", error);
-        setError("Failed to fetch attendance data");
+        setError("Unable to fetch attendance data");
         setLoading(false);
       }
     };
@@ -51,14 +51,14 @@ const AttendanceDashboard = () => {
     fetchAttendanceSummary();
   }, [cache]);
 
-  if (loading) {
-    return <Spinner />;
-  }
-
   return (
     <div className="attendance-dashboard w-[100%] border-b p-5">
-      <h1 className="text-xl">Attendance</h1>
-      {error ? (
+      <h1 className="text-xl font-semibold text-gray-600">Attendance</h1>
+      {loading ? (
+        <div className="flex items-center justify-center mt-4">
+          <Spinner />
+        </div>
+      ) : error ? (
         <div className="flex flex-col items-center justify-center text-gray-500 mt-4">
           <FaUserGraduate size={80} />
           <span className="mt-4 text-lg font-semibold">{error}</span>

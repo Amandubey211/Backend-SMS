@@ -45,9 +45,9 @@ const AllSubjects = () => {
   return (
     <div className="px-4">
       {/* My Courses Section */}  {/* Updated title */}
-        <hr/>
+      <hr className="-mx-4" /> {/* Remove parent padding to make line full width */}
       <div className="mt-4">
-        <span className="font-bold text-gray-900">My Courses</span>
+        <span className="text-xl font-semibold text-gray-600">My Courses</span>
         {studentSubjects.length > 0 ? (
           <SubjectsSlider subjects={studentSubjects} />
         ) : (
