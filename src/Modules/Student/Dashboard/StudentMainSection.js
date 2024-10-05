@@ -100,13 +100,32 @@ const StudentMainSection = () => {
 
   const fetchSubjects = async () => {
     try {
-      const response = await axios.get(`${baseUrl}/api/studentDashboard/subjects`);
+      // Retrieve the JSON string from localStorage
+      const persistUserString = localStorage.getItem('persist:user');
+      const token = localStorage.getItem("student:token");
+  
+      // Parse the JSON string to get an object
+      const persistUserObject = JSON.parse(persistUserString);
+  
+      // Access the userId from the nested userDetails object
+      const userDetails = JSON.parse(persistUserObject.userDetails);
+      const userId = userDetails.userId;
+  
+      // Make the API call with userId in the URL and set the Authorization header
+      const response = await axios.get(`${baseUrl}/api/studentDashboard/subjects/${userId}`, {
+        headers: {
+          Authentication: token, // Setting the Authorization header
+        },
+      });
+  
       setSubjects(response?.data?.subjects);
     } catch (error) {
       console.error("Error fetching subjects:", error);
       setSubjectError("No subjects found.");
     }
   };
+  
+  
 
   const fetchTasks = async () => {
     try {
@@ -141,28 +160,27 @@ const StudentMainSection = () => {
       </div>
 
       <div className="flex flex-1 w-full">
-        <div className="w-[30%]">
-          <div className="p-5">
-            <div className="flex justify-between items-center mb-2">
-              <h2 className="text-xl font-semibold text-gray-600">My Subject</h2>
-              <p className="text-sm text-purple-500 cursor-pointer font-bold">
-                <Link to="/student_class">See all</Link>
-              </p>
-            </div>
-            {subjectError ? (
-              <div className="text-gray-500 flex flex-col items-center mt-7 mb-5">
-                <AiOutlineBook size={50} />
-                <span className="mt-4 text-lg font-semibold text-center">{subjectError}</span>
-              </div>
-            ) : subjects?.length > 0 ? (
-              <p className="text-sm text-gray-500">
-                A total of {subjects.length} Courses are in Progress
-              </p>
-            ) : null}
-          </div>
-          <AllSubjects subjects={subjects} />
-
+      <div className="w-[30%]">
+      <div className="p-5">
+        <div className="flex justify-between items-center mb-2">
+          <h2 className="text-xl font-semibold text-gray-600">My Subject</h2>
+          <p className="text-sm text-purple-500 cursor-pointer font-bold">
+            <Link to="/student_class">See all</Link>
+          </p>
         </div>
+        {subjectError ? (
+          <div className="text-gray-500 flex flex-col items-center mt-7 mb-5">
+            <AiOutlineBook size={50} />
+            <span className="mt-4 text-lg font-semibold text-center">{subjectError}</span>
+          </div>
+        ) : subjects?.length > 0 ? (
+          <p className="text-sm text-gray-500">
+            A total of {subjects.length} Courses are in Progress
+          </p>
+        ) : null}
+      </div>
+      <AllSubjects subjects={subjects} />
+    </div>
         <div className="w-[70%] flex flex-col flex-wrap border-l border-r">
           <div className="w-full">
             <AttendanceDashboard />
