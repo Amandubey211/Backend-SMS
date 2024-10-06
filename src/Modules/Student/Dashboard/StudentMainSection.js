@@ -14,6 +14,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { AiOutlineBook } from "react-icons/ai";
 import { IoNewspaperOutline } from "react-icons/io5";
 import { PiMoneyWavyDuotone, PiMoneyWavy } from "react-icons/pi";
+import { GiSchoolBag } from "react-icons/gi"
 
 const StudentMainSection = () => {
   const navigate = useNavigate();
@@ -25,8 +26,10 @@ const StudentMainSection = () => {
   const [taskError, setTaskError] = useState(null);
   const [subjectError, setSubjectError] = useState(null);
   const [feesError, setFeesError] = useState(null);
+  const [dashboardAttendance, setDashboardAttendance] = useState(null);
+  const [attendanceError, setAttendanceError] = useState(null);
   const [cache, setCache] = useState({});
-  const [loading, setLoading] = useState(true); // Added loading state for data fetching
+  const [loading, setLoading] = useState(true);
   const [gradeData, setGradeData] = useState(null);
   const { selectedClass, selectedSection } = useSelector(
     (state) => state?.common?.user?.classInfo // Updated to get from the user slice with optional chaining
@@ -70,9 +73,11 @@ const StudentMainSection = () => {
 
     if (cache.dashboardData) {
       const { dashboardData } = cache;
+      const { attendanceSummary } = dashboardData.data; // Destructure attendanceSummary from cached data
       setCardData(formatDashboardData(dashboardData));
       setPaidFees(dashboardData?.data?.totalPaidFees);
       setUnpaidFees(dashboardData?.data?.dueFees);
+      setDashboardAttendance(attendanceSummary); // Set cached attendance data
       return;
     }
 
@@ -86,15 +91,19 @@ const StudentMainSection = () => {
       ]);
 
       const dashboardData = dashboardResponse?.data;
-      setCache((prev) => ({ ...prev, dashboardData }));
+      const { attendanceSummary } = dashboardData.data; // Destructure attendanceSummary from fetched data
+      setCache((prev) => ({ ...prev, dashboardData })); // Cache the response data
       setCardData(formatDashboardData(dashboardData));
       setPaidFees(dashboardData?.data?.totalPaidFees);
       setUnpaidFees(dashboardData?.data?.dueFees);
+      setDashboardAttendance(attendanceSummary); // Set attendance data from API response
+      setAttendanceError(null); // Reset the error when data is successfully fetched
     } catch (error) {
       console.error("Error fetching dashboard details:", error);
-      setError("Failed to load dashboard details. Please try again later.");
+      setAttendanceError("Failed to load attendance data. Please try again later."); // Set error state
     }
   };
+
 
   const fetchTasks = async () => {
     try {
@@ -222,8 +231,12 @@ const StudentMainSection = () => {
         </div>
         <div className="w-[70%] flex flex-col flex-wrap border-l border-r">
           <div className="w-full">
-            <AttendanceDashboard />
+            <AttendanceDashboard
+              attendanceSummary={dashboardAttendance}
+              error={attendanceError}  // <-- Pass the error state here
+            />
           </div>
+
           <div className="flex flex-row w-full justify-around">
             <div className="flex flex-col border-r border-gray-200 w-1/2">
               <div className="border-gray-300 w-full pt-5 pb-3 ps-2 pl-4">
@@ -239,13 +252,22 @@ const StudentMainSection = () => {
                 </select>
 
               </div>
+
+
               <div className="flex-1">
-                {gradeData ? (
+                {error ? (
+                  <div className="flex flex-col items-center justify-center h-full text-gray-500">
+                    <GiSchoolBag size={50} />
+                    <p className="mt-4 text-lg font-semibold">Failed to load student grades.</p>
+                    {/* <p className="text-sm">{error}</p> Optionally, display the error message */}
+                  </div>
+                ) : gradeData ? (
                   <StudentGradePieChart gradesData={gradeData} />
                 ) : (
                   <Spinner />
                 )}
               </div>
+
             </div>
             <div className="flex flex-col border-l border-gray-200 w-1/2">
               <div className="w-full py-5 ps-3">
