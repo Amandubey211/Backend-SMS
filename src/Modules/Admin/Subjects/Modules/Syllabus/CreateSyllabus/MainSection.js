@@ -3,33 +3,26 @@ import { useLocation, useParams } from "react-router-dom";
 import CreateSyllabusHeader from "./Components/CreateSyllabusHeader";
 import SideMenubar from "../../../../../../Components/Admin/SideMenubar";
 import EditorComponent from "../../../Component/AdminEditor";
-import useCreateSyllabus from "../../../../../../Hooks/AuthHooks/Staff/Admin/Syllabus/useCreateSyllabus";
-import useEditSyllabus from "../../../../../../Hooks/AuthHooks/Staff/Admin/Syllabus/useEditSyllabus";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  createSyllabus,
+  editSyllabus,
+} from "../../../../../../Store/Slices/Admin/Class/Syllabus/syllabusThunk";
 import Spinner from "../../../../../../Components/Common/Spinner";
 
 const MainSection = ({ setIsEditing }) => {
   const { state } = useLocation();
-  const { sid } = useParams();
+  const { cid, sid } = useParams();
   const [assignmentName, setAssignmentName] = useState(
     state?.syllabus?.title || ""
   );
   const [editorContent, setEditorContent] = useState(
     state?.syllabus?.content || ""
   );
-  const {
-    loading: createLoading,
-    error: createError,
-    createSyllabus,
-  } = useCreateSyllabus();
-  const {
-    loading: editLoading,
-    error: editError,
-    editSyllabus,
-  } = useEditSyllabus();
+  const dispatch = useDispatch();
+  const loading = useSelector((state) => state.admin.syllabus.loading);
 
   useEffect(() => {
-    // Set the isEditing state in the parent based on whether we are editing or creating
     setIsEditing(Boolean(state?.syllabus?._id));
   }, [state, setIsEditing]);
 
@@ -49,15 +42,17 @@ const MainSection = ({ setIsEditing }) => {
     };
 
     if (state?.syllabus?._id) {
-      await editSyllabus(state.syllabus._id, data);
+      await dispatch(
+        editSyllabus({ syllabusId: state.syllabus._id, data, cid })
+      );
     } else {
-      await createSyllabus(data);
+      await dispatch(createSyllabus(data));
     }
-  }, [assignmentName, editorContent, sid, state, editSyllabus, createSyllabus]);
+  }, [assignmentName, editorContent, sid, state, dispatch]);
 
-  const loading = createLoading || editLoading;
-  const error = createError || editError;
-  const isSidebarOpen = useSelector((state) => state.sidebar.isOpen);
+  const isSidebarOpen = useSelector(
+    (state) => state.common.user.sidebar.isOpen
+  );
   const sidebarWidth = isSidebarOpen ? "15%" : "7%";
 
   return (
@@ -83,11 +78,6 @@ const MainSection = ({ setIsEditing }) => {
           onEditorChange={handleEditorChange}
         />
         {loading && <Spinner />}
-        {error && (
-          <p role="alert" className="text-red-400 text-current my-4">
-            {error}
-          </p>
-        )}
       </div>
     </div>
   );

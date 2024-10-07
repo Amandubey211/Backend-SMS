@@ -14,26 +14,17 @@ import { ImSpinner3 } from "react-icons/im";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import { GrAttachment } from "react-icons/gr";
 import ChapterItem from "./ChapterItem";
-import useDeleteChapter from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useDeleteChapter";
-import useDeleteAttachment from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useDeleteAttachment";
 import DeleteModal from "../../../../../../Components/Common/DeleteModal";
 import Sidebar from "../../../../../../Components/Common/Sidebar";
 import AddAttachment from "./AddAttachment";
+import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
+import { deleteChapter } from "../../../../../../Store/Slices/Admin/Class/Module/chapterThunk";
+import { fetchModules } from "../../../../../../Store/Slices/Admin/Class/Module/moduleThunk";
+import toast from "react-hot-toast";
+import { deleteAttachmentThunk } from "../../../../../../Store/Slices/Admin/Class/Module/attachmentThunk";
 
-const Chapter = ({
-  title,
-  chapterNumber,
-  imageUrl,
-  assignments,
-  chapterId,
-  moduleId,
-  quizzes,
-  attachments,
-  onEdit,
-  onDelete,
-  fetchModules,
-}) => {
+const Chapter = ({ onEdit, chapterNumber, chapter }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -41,11 +32,22 @@ const Chapter = ({
   const [previewUrl, setPreviewUrl] = useState(null);
   const [previewType, setPreviewType] = useState(null);
   const [attachmentToDelete, setAttachmentToDelete] = useState(null);
-  const { sid } = useParams();
-  const { loading, deleteChapter } = useDeleteChapter();
-  const { deleteAttachment, loading: attachmentDeleting } =
-    useDeleteAttachment(fetchModules);
   const [attachmentLoading, setAttachmentLoading] = useState({});
+
+  const {
+    _id: chapterId,
+    name: title,
+    thumbnail: imageUrl,
+    assignments,
+    attachments,
+    quizzes,
+  } = chapter;
+
+  const dispatch = useDispatch();
+  const { cid, sid } = useParams();
+  const { moduleId } = useSelector(
+    (state) => state.admin.module.selectedModule
+  );
 
   const menuRef = useRef(null);
 
@@ -79,12 +81,11 @@ const Chapter = ({
 
   const confirmDelete = async () => {
     try {
-      await deleteChapter(moduleId, chapterId);
+      await dispatch(deleteChapter({ moduleId, chapterId, sid }));
       setDeleteModalOpen(false);
-      fetchModules();
-      onDelete();
+      dispatch(fetchModules({ cid, sid }));
     } catch (error) {
-      console.error("Error deleting chapter:", error);
+      toast.error("Error deleting chapter.");
     }
   };
 
@@ -105,9 +106,16 @@ const Chapter = ({
     }));
 
     try {
-      await deleteAttachment(chapterId, sid, attachmentToDelete.url);
+      await dispatch(
+        deleteAttachmentThunk({
+          chapterId,
+          subjectId: sid,
+          fileUrl: attachmentToDelete.url,
+        })
+      );
+      toast.success("Attachment deleted successfully");
     } catch (error) {
-      console.error("Error deleting attachment:", error);
+      toast.error("Error deleting attachment.");
     } finally {
       setAttachmentLoading((prev) => ({
         ...prev,
@@ -161,18 +169,6 @@ const Chapter = ({
             <h2 className="font-semibold text-md">{title}</h2>
             <div className="flex gap-1 items-center">
               <p className="text-gray-500">Chapter {chapterNumber}</p>
-
-              {/* {attachments.length > 0 && (
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <div className="flex items-center space-x-1 px-3 text-sm font-semibold bg-gradient-to-r from-pink-100 to-purple-200 rounded-md py-1">
-                      <span className="text-gradient">
-                        Attachments ({attachments.length})
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              )} */}
             </div>
           </div>
         </div>
@@ -277,7 +273,6 @@ const Chapter = ({
                             <p className="text-gray-700 text-sm truncate max-w-xs overflow-hidden whitespace-nowrap">
                               {attachment.name}
                             </p>
-
                             <p className="text-md">{attachment.label}</p>
                           </div>
                         </div>
@@ -319,13 +314,10 @@ const Chapter = ({
 
             {/* Assignments and Quizzes */}
             <div>
-              {assignments.length > 0 ||
-              quizzes.length > 0 ||
-              attachments.length > 0 ? (
+              {assignments.length > 0 || quizzes.length > 0 ? (
                 <>
                   {assignments.map((assignment, index) => (
                     <ChapterItem
-                      fetchModules={fetchModules}
                       key={index}
                       type="assignment"
                       title={assignment.name}
@@ -335,7 +327,6 @@ const Chapter = ({
                   ))}
                   {quizzes.map((quiz, index) => (
                     <ChapterItem
-                      fetchModules={fetchModules}
                       key={index}
                       type="quiz"
                       title={quiz.name}
@@ -346,7 +337,7 @@ const Chapter = ({
                 </>
               ) : (
                 <p className="py-2 bg-gray-50 italic text-gray-500 text-center">
-                  No Data found
+                  No Assignment or Quizz
                 </p>
               )}
             </div>
@@ -378,9 +369,8 @@ const Chapter = ({
           title={`Add Attachment (${title})`}
         >
           <AddAttachment
-            chapterData={{ title, chapterId, moduleId }}
+            chapterData={{ title, chapterId, sid }}
             onClose={handleSidebarClose}
-            fetchModules={fetchModules}
           />
         </Sidebar>
       )}

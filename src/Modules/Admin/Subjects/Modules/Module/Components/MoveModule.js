@@ -1,11 +1,13 @@
 import React, { useState } from "react";
-import useMoveModule from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useMoveModule";
+import { useDispatch } from "react-redux";
+import { moveModule } from "../../../../../../Store/Slices/Admin/Class/Module/moduleThunk";
+import { useParams } from "react-router-dom";
 
 const MoveModule = ({ moduleId, currentPosition, modulesData, onClose }) => {
   const [selectedIndex, setSelectedIndex] = useState(currentPosition);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { moveModule, loading } = useMoveModule();
-
+  const dispatch = useDispatch();
+  const { sid } = useParams();
   const handleIndexChange = (index) => {
     setSelectedIndex(index);
   };
@@ -16,7 +18,7 @@ const MoveModule = ({ moduleId, currentPosition, modulesData, onClose }) => {
     }
 
     setIsSubmitting(true);
-    await moveModule(moduleId, selectedIndex);
+    await dispatch(moveModule({ moduleId, newIndex: selectedIndex, sid }));
     setIsSubmitting(false);
     onClose();
   };
@@ -31,7 +33,7 @@ const MoveModule = ({ moduleId, currentPosition, modulesData, onClose }) => {
           Select New Position
         </label>
         <div className="space-y-2">
-          {modulesData?.modules.map((_, index) => (
+          {modulesData?.map((_, index) => (
             <div
               key={index}
               onClick={() => handleIndexChange(index)}
@@ -54,10 +56,10 @@ const MoveModule = ({ moduleId, currentPosition, modulesData, onClose }) => {
 
       <button
         onClick={handleMove}
-        disabled={loading || isSubmitting || selectedIndex === currentPosition}
+        disabled={isSubmitting || selectedIndex === currentPosition}
         className="w-full my-6 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-md shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-purple-300 focus:ring-opacity-50 transform transition-transform duration-300 ease-in-out hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        {loading || isSubmitting ? "Please Wait..." : "Move Module"}
+        {isSubmitting ? "Please Wait..." : "Move Module"}
       </button>
     </div>
   );

@@ -1,5 +1,7 @@
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState, useCallback } from "react";
 import { useLocation, useParams, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+
 import Layout from "../../../../../../Components/Common/Layout";
 import SideMenubar from "../../../../../../Components/Admin/SideMenubar";
 import AddDiscussionHeader from "./Components/AddDiscussionHeader";
@@ -7,15 +9,18 @@ import CreateDiscussionForm from "./Components/CreateDiscussionForm";
 import TopicTitleInput from "./Components/TopicTitleInput";
 import FileInput from "./Components/FileInput";
 import EditorComponent from "../../../Component/AdminEditor";
-import useCreateDiscussion from "../../../../../../Hooks/AuthHooks/Staff/Admin/Disscussion/useCreateDiscussion";
-import useUpdateDiscussion from "../../../../../../Hooks/AuthHooks/Staff/Admin/Disscussion/useUpdateDiscussion";
 import Spinner from "../../../../../../Components/Common/Spinner";
-import { useSelector } from "react-redux";
+import {
+  createDiscussion,
+  updateDiscussion,
+} from "../../../../../../Store/Slices/Admin/Class/Discussion/discussionThunks";
 
 const AddDiscussion = () => {
   const { state } = useLocation();
+
   const { cid, sid } = useParams();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const [assignmentName, setAssignmentName] = useState(
     state?.discussion?.title || ""
@@ -38,39 +43,22 @@ const AddDiscussion = () => {
     availableUntil: state?.discussion?.availableUntil || "",
   });
 
-  const {
-    createDiscussion,
-    loading: createLoading,
-    error: createError,
-    success: createSuccess,
-  } = useCreateDiscussion();
-  const {
-    updateDiscussion,
-    loading: updateLoading,
-    error: updateError,
-    success: updateSuccess,
-  } = useUpdateDiscussion();
+  const isEditing = Boolean(state?.admin?.discussion?._id);
+  const isLoading = useSelector((state) => state.admin.discussions.loading);
+  const error = useSelector((state) => state.admin.discussions.error);
 
-  const isEditing = Boolean(state?.discussion?._id);
-
-  const handleNameChange = useCallback((e) => {
-    setAssignmentName(e.target.value);
-  }, []);
-
-  const handleEditorChange = useCallback((content) => {
-    setEditorContent(content);
-  }, []);
-
-  const handleFileChange = useCallback((e) => {
-    setFile(e.target.files[0]);
-  }, []);
-
+  const handleNameChange = useCallback(
+    (e) => setAssignmentName(e.target.value),
+    []
+  );
+  const handleEditorChange = useCallback(
+    (content) => setEditorContent(content),
+    []
+  );
+  const handleFileChange = useCallback((e) => setFile(e.target.files[0]), []);
   const handleFormChange = useCallback((e) => {
     const { name, value } = e.target;
-    setFormState((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormState((prev) => ({ ...prev, [name]: value }));
   }, []);
 
   const handleSave = useCallback(
@@ -95,13 +83,18 @@ const AddDiscussion = () => {
       };
 
       if (isEditing) {
-        await updateDiscussion(state.discussion._id, discussionData);
+        dispatch(
+          updateDiscussion({
+            discussionId: state.discussion._id,
+            discussionData,
+          })
+        )
+          .unwrap()
+          .then(() => navigate(`/class/${cid}/${sid}/discussions`));
       } else {
-        await createDiscussion(discussionData);
-      }
-
-      if (createSuccess || updateSuccess) {
-        navigate(`/class/${cid}/${sid}/discussions`);
+        dispatch(createDiscussion({ discussionData, cid }))
+          .unwrap()
+          .then(() => navigate(`/class/${cid}/${sid}/discussions`));
       }
     },
     [
@@ -110,20 +103,17 @@ const AddDiscussion = () => {
       formState,
       file,
       isEditing,
-      createDiscussion,
-      updateDiscussion,
+      dispatch,
       state,
       cid,
       sid,
       navigate,
-      createSuccess,
-      updateSuccess,
     ]
   );
 
-  const loading = createLoading || updateLoading;
-  const error = createError || updateError;
-  const isSidebarOpen = useSelector((state) => state.sidebar.isOpen);
+  const isSidebarOpen = useSelector(
+    (state) => state.common.user.sidebar.isOpen
+  );
   const sidebarWidth = isSidebarOpen ? "15%" : "7%";
 
   return (
@@ -138,9 +128,7 @@ const AddDiscussion = () => {
         <SideMenubar />
         <div
           className={`ml-${sidebarWidth} transition-all duration-500 flex-1 h-full`}
-          style={{
-            marginLeft: sidebarWidth,
-          }}
+          style={{ marginLeft: sidebarWidth }}
         >
           <>
             <AddDiscussionHeader onSave={handleSave} isUpdating={isEditing} />
@@ -169,11 +157,7 @@ const AddDiscussion = () => {
                 />
               </div>
             </div>
-            {loading && (
-              <p role="status">
-                <Spinner />
-              </p>
-            )}
+            {isLoading && <Spinner />}
             {error && (
               <p role="alert" className="text-red-400 text-current my-4">
                 {error}

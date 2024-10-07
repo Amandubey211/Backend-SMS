@@ -5,7 +5,11 @@ import { NavLink } from "react-router-dom";
 import { TbEdit } from "react-icons/tb";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { deleteClass } from "../../../../Store/Slices/Admin/Class/actions/classThunk"; // Import the delete thunk
-import { setSelectedClassName } from "../../../../Store/Slices/Common/User/reducers/userSlice";
+import {
+  setSelectedClass,
+  setSelectedClassId,
+  setSelectedClassName,
+} from "../../../../Store/Slices/Common/User/reducers/userSlice";
 
 import leftLogo from "../../../../Assets/ClassesAssets/ClassCardLeftLogo.png";
 import RightLogo from "../../../../Assets/ClassesAssets/ClassCardRightLogo.png";
@@ -74,7 +78,10 @@ const ClassCard = ({ role, classData, onEdit }) => {
         )}
         <NavLink
           to={`/class/${classId}`}
-          onClick={() => dispatch(setSelectedClassName(className))}
+          onClick={() => {
+            dispatch(setSelectedClassName(className));
+            dispatch(setSelectedClassId(classId));
+          }}
           className="flex flex-col gap-1 justify-center items-center -mt-4"
         >
           <h2 className="text-xl font-bold text-purple-600 capitalize">

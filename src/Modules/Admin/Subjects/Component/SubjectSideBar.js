@@ -26,8 +26,9 @@ const SubjectSideBar = () => {
     <div className="flex flex-col min-h-screen h-full w-[18%] space-y-4 p-4">
       {menuItems.map((item, index) => {
         const basePath = getBasePath(item);
-        const isActive = location.pathname.includes(`/class/${cid}/${formattedSid}/${item.path}`);
-
+        const isActive = location.pathname.includes(
+          `/class/${cid}/${formattedSid}/${item.path}`
+        );
 
         return (
           <NavLink

@@ -1,29 +1,27 @@
 import React, { useState, useEffect } from "react";
 import { FaTimes } from "react-icons/fa";
-import { FiLoader } from "react-icons/fi"; // Importing a loader icon
+import { FiLoader } from "react-icons/fi"; // For loader icon
+import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import { useParams } from "react-router-dom";
-import useAddModule from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useAddModule";
-import useEditModule from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useEditModule";
+import {
+  addModule,
+  editModule,
+} from "../../../../../../Store/Slices/Admin/Class/Module/moduleThunk";
+import { setSelectedModule } from "../../../../../../Store/Slices/Admin/Class/Module/moduleSlice";
 
-const AddModule = ({ data, onClose, onModuleAdded }) => {
-  const { sid } = useParams();
+const AddModule = ({ data, onClose }) => {
+  const dispatch = useDispatch();
+  const { sid } = useParams(); // Assuming the subjectId is present in the URL
+
   const [selectedFile, setSelectedFile] = useState(null);
   const [preview, setPreview] = useState(null);
   const [moduleTitle, setModuleTitle] = useState("");
 
-  const {
-    loading: addLoading,
-    error: addError,
-    success: addSuccess,
-    addModule,
-  } = useAddModule();
-  const {
-    loading: editLoading,
-    error: editError,
-    success: editSuccess,
-    editModule,
-  } = useEditModule();
+  // Access selected module from the Redux store
+  const { selectedModule, moduleLoading, error } = useSelector(
+    (state) => state.admin.module
+  );
 
   useEffect(() => {
     if (data) {
@@ -49,40 +47,50 @@ const AddModule = ({ data, onClose, onModuleAdded }) => {
     setPreview(null);
   };
 
+  const clearForm = () => {
+    setModuleTitle("");
+    clearImage();
+  };
+
   const handleSubmit = async () => {
     if (!moduleTitle) {
       toast.error("Module title is required");
       return;
     }
+
     if (!selectedFile && !preview) {
       toast.error("Module image is required");
       return;
     }
 
-    if (data) {
-      // Edit module
-      await editModule(data._id, moduleTitle, selectedFile);
-      // if (editSuccess) {
-      // toast.success("Module updated successfully");
-      setModuleTitle("");
-      clearImage();
-      // onModuleAdded(); // Notify the parent component
-      onClose(); // Close the sidebar
-      // } else if (editError) {
-      //   toast.error(editError);
-      // }
-    } else {
-      // Add module
-      // const result = await addModule(moduleTitle, selectedFile || preview);
-      await addModule(moduleTitle, selectedFile || preview);
+    const moduleData = {
+      name: moduleTitle,
+      thumbnail: selectedFile || preview,
+      subjectId: sid,
+    };
 
-      setModuleTitle("");
-      clearImage();
-      // onModuleAdded(); // Notify the parent component
-      onClose(); // Close the sidebar
-      // } else if (result && result.error) {
-      //   toast.error(result.error);
-      // }
+    if (data) {
+      // Editing existing module
+      await dispatch(editModule({ ...moduleData, moduleId: data._id }));
+      // If the edited module is the currently selected module, update it
+      if (selectedModule && selectedModule.moduleId === data._id) {
+        dispatch(
+          setSelectedModule({
+            moduleId: data._id,
+            name: moduleTitle,
+            chapters: selectedModule.chapters, // Keep chapters intact
+          })
+        );
+      }
+    } else {
+      // Adding new module
+      await dispatch(addModule(moduleData));
+    }
+
+    // After successful submission, clear form and close modal
+    if (!moduleLoading && !error) {
+      clearForm();
+      onClose();
     }
   };
 
@@ -197,12 +205,10 @@ const AddModule = ({ data, onClose, onModuleAdded }) => {
           onClick={handleSubmit}
           type="submit"
           className="w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600 flex justify-center items-center"
-          disabled={addLoading || editLoading}
+          disabled={moduleLoading}
         >
-          {(addLoading || editLoading) && (
-            <FiLoader className="animate-spin mr-2" />
-          )}
-          {addLoading || editLoading
+          {moduleLoading && <FiLoader className="animate-spin mr-2" />}
+          {moduleLoading
             ? data
               ? "Updating Module..."
               : "Adding Module..."

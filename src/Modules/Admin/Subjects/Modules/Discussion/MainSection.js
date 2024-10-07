@@ -1,20 +1,30 @@
 import React, { useEffect, useState } from "react";
-import DiscussionCard from "./Components/DiscussionCard";
-import PinnedDiscussions from "./Components/PinnedDiscussions";
-import DiscussionHeader from "./Components/DiscussionHeader";
+import { useDispatch, useSelector } from "react-redux";
+import { useParams, NavLink } from "react-router-dom";
 import { MdKeyboardArrowDown } from "react-icons/md";
 import { GoDiscussionClosed } from "react-icons/go";
 import { RiAddFill } from "react-icons/ri";
-import { NavLink, useParams } from "react-router-dom";
-import SubjectSideBar from "../../Component/SubjectSideBar";
-import useFetchClassDiscussions from "../../../../../Hooks/AuthHooks/Staff/Admin/Disscussion/useFetchClassDiscussions";
+import DiscussionCard from "./Components/DiscussionCard";
+import PinnedDiscussions from "./Components/PinnedDiscussions";
+import DiscussionHeader from "./Components/DiscussionHeader";
 import Spinner from "../../../../../Components/Common/Spinner";
 import NoDataFound from "../../../../../Components/Common/NoDataFound";
+import SubjectSideBar from "../../Component/SubjectSideBar";
+import { fetchClassDiscussions } from "../../../../../Store/Slices/Admin/Class/Discussion/discussionThunks";
 
 const MainSection = () => {
+  const dispatch = useDispatch();
   const [searchQuery, setSearchQuery] = useState("");
   const [filter, setFilter] = useState("all");
   const { cid, sid } = useParams();
+
+  const { discussions, loading, error } = useSelector(
+    (state) => state.admin.discussions
+  );
+
+  useEffect(() => {
+    dispatch(fetchClassDiscussions({ cid }));
+  }, [dispatch, cid]);
 
   const handleSearch = (query) => {
     setSearchQuery(query);
@@ -23,13 +33,6 @@ const MainSection = () => {
   const handleFilterChange = (filter) => {
     setFilter(filter);
   };
-
-  const { discussions, error, fetchClassDiscussions, loading } =
-    useFetchClassDiscussions();
-
-  useEffect(() => {
-    fetchClassDiscussions();
-  }, [fetchClassDiscussions]);
 
   const filteredDiscussions = discussions.filter((discussion) => {
     const matchesSearch = discussion.title
@@ -55,7 +58,7 @@ const MainSection = () => {
           onFilterChange={handleFilterChange}
         />
         {loading ? (
-          <Spinner /> // Show spinner while loading
+          <Spinner />
         ) : error ? (
           <div className="flex justify-center">
             <p role="alert" className="text-red-400 my-4">
@@ -66,7 +69,9 @@ const MainSection = () => {
           <>
             <PinnedDiscussions
               discussions={pinnedDiscussions}
-              fetchClassDiscussions={fetchClassDiscussions} // Pass the refetch method
+              fetchClassDiscussions={() =>
+                dispatch(fetchClassDiscussions({ cid }))
+              }
             />
             <div className="p-3">
               <div className="flex items-center gap-2 ml-3 mb-2">
@@ -80,7 +85,9 @@ const MainSection = () => {
                     <DiscussionCard
                       key={index}
                       discussion={discussion}
-                      fetchClassDiscussions={fetchClassDiscussions} // Pass the refetch method
+                      fetchClassDiscussions={() =>
+                        dispatch(fetchClassDiscussions({ cid }))
+                      }
                     />
                   ))}
                 </div>

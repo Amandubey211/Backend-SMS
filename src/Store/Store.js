@@ -18,6 +18,11 @@ import verificationReducer from "./Slices/Admin/Verification/VerificationSlice";
 import adminLibraryReducer from "./Slices/Admin/Library/LibrarySlice";
 import adminEventReducer from "./Slices/Admin/NoticeBoard/Events/eventSlice";
 import adminNoticeReducer from "./Slices/Admin/NoticeBoard/Notice/noticeSlice";
+import adminModuleReducer from "./Slices/Admin/Class/Module/moduleSlice";
+import adminSyllabusReducer from "./Slices/Admin/Class/Syllabus/syllabusSlice";
+import adminPageReducer from "./Slices/Admin/Class/Page/pageSlice";
+import adminDiscussionReducer from "./Slices/Admin/Class/Discussion/discussionSlice";
+import adminAnnouncementReducer from "./Slices/Admin/Class/Announcement/announcementSlice";
 // student
 import studentFinanceReducer from "./Slices/Student/Finance/financeSlice";
 import studentLibraryBooksReducer from "./Slices/Student/Library/libararySlice";
@@ -60,12 +65,12 @@ const authPersistConfig = {
 const userPersistConfig = {
   key: "user",
   storage,
-  whitelist: [
-    "userDetails",
-    "navbar", // Persist NavbarData
-    "classInfo", // Persist the entire classInfo object
-    "subjectInfo", // Persist the entire subjectInfo object
-  ], // Whitelt fields based on the refined state structure in userSlicesed on the refined state structure in userSlice
+  // whitelist: [
+  //   "userDetails",
+  //   "navbar", // Persist NavbarData
+  //   "classInfo", // Persist the entire classInfo object
+  //   "subjectInfo", // Persist the entire subjectInfo object
+  // ], // Whitelt fields based on the refined state structure in userSlicesed on the refined state structure in userSlice
 };
 
 const stdSubjectPersistConfig = {
@@ -90,6 +95,11 @@ const AdminReducer = combineReducers({
   library: adminLibraryReducer,
   events: adminEventReducer,
   notice: adminNoticeReducer,
+  module: adminModuleReducer,
+  syllabus: adminSyllabusReducer,
+  pages: adminPageReducer,
+  discussions: adminDiscussionReducer,
+  announcements: adminAnnouncementReducer,
 });
 
 const studentReducer = combineReducers({

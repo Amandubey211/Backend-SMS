@@ -2,15 +2,18 @@ import React, { useState, useRef, useEffect, Suspense } from "react";
 import { AiOutlineEdit } from "react-icons/ai";
 import { MdOutlineBlock } from "react-icons/md";
 import { BsPatchCheckFill } from "react-icons/bs";
-import { FaBan } from "react-icons/fa6";
 import { HiOutlineDotsVertical } from "react-icons/hi";
 import { BsChat } from "react-icons/bs";
 import { MdDelete } from "react-icons/md";
 import Sidebar from "../../../../../../../Components/Common/Sidebar";
 import { useNavigate, useParams } from "react-router-dom";
-import useDeleteDiscussion from "../../../../../../../Hooks/AuthHooks/Staff/Admin/Disscussion/useDeleteDiscussion";
-import useUpdateDiscussion from "../../../../../../../Hooks/AuthHooks/Staff/Admin/Disscussion/useUpdateDiscussion";
+import { useDispatch, useSelector } from "react-redux";
+
 import DeleteModal from "../../../../../../../Components/Common/DeleteModal";
+import {
+  deleteDiscussion,
+  updateDiscussion,
+} from "../../../../../../../Store/Slices/Admin/Class/Discussion/discussionThunks";
 
 const DiscussionMessage = React.lazy(() =>
   import("../../DiscussionMessage/DiscussionMessage")
@@ -19,21 +22,17 @@ const DiscussionMessage = React.lazy(() =>
 const Header = ({ discussion, refetchDiscussion }) => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [isMenuOpen, setMenuOpen] = useState(false);
-  const [isModalOpen, setModalOpen] = useState(false); // State for modal
-  const [isPublished, setIsPublished] = useState(discussion.publish); // State for publish status
+  const [isModalOpen, setModalOpen] = useState(false);
+  const [isPublished, setIsPublished] = useState(discussion.publish);
 
   const navigate = useNavigate();
   const { cid, sid } = useParams();
   const menuRef = useRef(null);
+  const dispatch = useDispatch();
 
-  const {
-    deleteDiscussion,
-    loading: deleteLoading,
-    error: deleteError,
-    success: deleteSuccess,
-  } = useDeleteDiscussion();
-
-  const { loading: updateLoading, updateDiscussion } = useUpdateDiscussion();
+  const { loading: deleteLoading, error: deleteError } = useSelector(
+    (state) => state.admin.discussions
+  );
 
   const handleSidebarOpen = () => setSidebarOpen(true);
   const handleSidebarClose = () => setSidebarOpen(false);
@@ -43,11 +42,9 @@ const Header = ({ discussion, refetchDiscussion }) => {
   };
 
   const confirmDelete = async () => {
-    await deleteDiscussion(discussion._id);
-    // if (deleteSuccess) {
-      navigate(`/class/${cid}/${sid}/discussions`);
-      setModalOpen(false)
-    // }
+    await dispatch(deleteDiscussion({ discussionId: discussion._id }));
+    navigate(`/class/${cid}/${sid}/discussions`);
+    setModalOpen(false);
   };
 
   const handleClickOutside = (event) => {
@@ -74,11 +71,14 @@ const Header = ({ discussion, refetchDiscussion }) => {
       publish: !isPublished, // Toggle publish status
     };
 
-    const success = await updateDiscussion(discussion._id, updatedData);
-    if (success) {
-      setIsPublished(!isPublished); // Update local state if successful
-      refetchDiscussion(); // Refetch discussion data after update
-    }
+    await dispatch(
+      updateDiscussion({
+        discussionId: discussion._id,
+        discussionData: updatedData,
+      })
+    );
+    setIsPublished(!isPublished); // Update local state if successful
+    refetchDiscussion(); // Refetch discussion data after update
   };
 
   return (
@@ -105,7 +105,6 @@ const Header = ({ discussion, refetchDiscussion }) => {
               isPublished ? "Unpublish Discussion" : "Publish Discussion"
             }
             onClick={handlePublishToggle}
-            disabled={updateLoading}
           >
             {isPublished ? (
               <>
@@ -139,7 +138,7 @@ const Header = ({ discussion, refetchDiscussion }) => {
             aria-label="More Options"
             onClick={() => setMenuOpen((prev) => !prev)}
           >
-            <HiOutlineDotsVertical aria-hidden="true" className="" />
+            <HiOutlineDotsVertical aria-hidden="true" />
           </button>
           {isMenuOpen && (
             <div
@@ -173,7 +172,7 @@ const Header = ({ discussion, refetchDiscussion }) => {
             onClose={handleSidebarClose}
           >
             <Suspense fallback={<div>Loading...</div>}>
-              <DiscussionMessage />
+              {/* <DiscussionMessage /> */}
             </Suspense>
           </Sidebar>
         </div>

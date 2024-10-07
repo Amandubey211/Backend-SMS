@@ -1,25 +1,30 @@
-// MainSection.js
 import React, { useEffect } from "react";
 import { useNavigate, useParams, NavLink } from "react-router-dom";
 import { AiOutlineFileAdd } from "react-icons/ai";
 import { RiAddFill } from "react-icons/ri";
+import { useDispatch, useSelector } from "react-redux";
 import SubjectSideBar from "../../../Component/SubjectSideBar";
 import SyllabusHeader from "./Components/SyllabusHeader";
 import SyllabusSection from "./Components/SyllabusSection";
-import useFetchSyllabus from "../../../../../../Hooks/AuthHooks/Staff/Admin/Syllabus/useFetchSyllabus";
-import useDeleteSyllabus from "../../../../../../Hooks/AuthHooks/Staff/Admin/Syllabus/useDeleteSyllabus";
+import {
+  fetchSyllabus,
+  deleteSyllabus,
+} from "../../../../../../Store/Slices/Admin/Class/Syllabus/syllabusThunk";
 import Spinner from "../../../../../../Components/Common/Spinner";
 import NoDataFound from "../../../../../../Components/Common/NoDataFound";
 
 const MainSection = () => {
-  const { fetchSyllabus, loading, error, syllabi } = useFetchSyllabus();
-  const { deleteSyllabus, loading: deleteLoading } = useDeleteSyllabus();
+  const dispatch = useDispatch();
   const { cid, sid } = useParams();
   const navigate = useNavigate();
 
+  const { syllabi, loading, error } = useSelector(
+    (state) => state.admin.syllabus
+  );
+
   useEffect(() => {
-    fetchSyllabus(sid, cid);
-  }, [sid, cid, fetchSyllabus]);
+    dispatch(fetchSyllabus({ subjectId: sid, classId: cid }));
+  }, [dispatch, sid, cid]);
 
   const handleEditClick = (syllabus) => {
     navigate(`/class/${cid}/${sid}/syllabus/create_syllabus`, {
@@ -28,12 +33,12 @@ const MainSection = () => {
   };
 
   const handleDeleteClick = async (syllabusId) => {
-    await deleteSyllabus(syllabusId);
-    fetchSyllabus(sid, cid); // Refresh the syllabus after deletion
+    await dispatch(deleteSyllabus(syllabusId));
+    dispatch(fetchSyllabus({ subjectId: sid, classId: cid }));
   };
 
   const renderContent = () => {
-    if (loading || deleteLoading) {
+    if (loading) {
       return <Spinner />;
     }
 
