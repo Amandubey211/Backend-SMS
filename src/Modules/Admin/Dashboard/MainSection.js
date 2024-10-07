@@ -92,53 +92,70 @@ const MainSection = () => {
           <DashCard key={index} {...item} />
         ))}
       </div>
+
+
       <div
-        className={`flex flex-wrap  ${
-          role !== "teacher" ? "justify-between" : "justify-center"
-        } items-start border-y`}
+        className={`flex flex-wrap relative ${role !== "teacher" ? "justify-between" : "justify-center"} items-start border-y`}
       >
-        <div
-          className={`w-[95%] ${role !== "teacher" ? "md:w-1/2" : "w-1/2"} p-2`}
-        >
+        {/* Middle Border - only visible when role is not "teacher" */}
+        {role !== "teacher" && (
+          <div className="absolute left-1/2 transform -translate-x-1/2 h-full border-l border-gray-300"></div>
+        )}
+
+        <div className={`w-[95%] ${role !== "teacher" ? "md:w-1/2" : "w-1/2"} p-2`}>
           <TotalAttendanceGraph />
         </div>
+
         {role !== "teacher" && (
           <div className="w-full md:w-1/2 p-2">
             <TotalEarningsGraph />
           </div>
         )}
       </div>
-      <div className="flex flex-wrap justify-between items-start border-y h-[33rem]">
+
+
+
+      <div className="flex flex-wrap justify-between items-start border-y h-[33rem] relative">
+        {/* Middle Border */}
+        <div className="absolute left-2/3 transform -translate-x-1/2 h-full border-l border-gray-300"></div>
+
         <div className="w-full md:w-2/3 h-full p-2">
           <TopRankingStudents />
         </div>
-        {/* / we have to update the Total Student Graps after modification of the Backend , as per the requirement given my jawairia */}
 
         <div className="w-full h-full flex flex-col md:w-1/3 p-2">
-          <TotalStudentsGraphjs
-            maleStudents={dashboardData?.maleStudents || 0}
-            femaleStudents={dashboardData?.femaleStudents || 0}
-          />
+          {/* We have to update the Total Student Graphs after modification of the Backend, as per the requirement given by Jawairia */}
+          <TotalStudentsGraphjs />
         </div>
       </div>
-      <div className="flex flex-wrap items-start justify-between border-y">
+
+      <div className="flex flex-wrap items-start justify-between border-y relative">
+        {/* Middle Border */}
+        <div className="absolute left-1/2 transform -translate-x-1/2 h-full border-l border-gray-300"></div>
+
         <div className="w-full md:w-1/2 p-2">
           <BestPerformersChart data={performanceData} />
         </div>
-        <div className="w-full md:w-1/2 p-2">
-          {/* / we have to update the Total Student Graps after modification of the Backend , as per the requirement given my jawairia */}
 
+        <div className="w-full md:w-1/2 p-2">
+          {/* We have to update the Total Student Graphs after modification of the Backend, as per the requirement given by Jawairia */}
           <Library />
         </div>
       </div>
-      <div className="flex flex-wrap justify-between items-start border-y">
+
+      <div className="flex flex-wrap justify-between items-start border-y relative">
+        {/* Middle Border */}
+        <div className="absolute left-1/2 transform -translate-x-1/2 h-full border-l border-gray-300"></div>
+
         <div className="w-full md:w-1/2 p-2">
           <NoticeBoard />
         </div>
+
         <div className="w-full md:w-1/2 p-2">
           <Events />
         </div>
       </div>
+
     </div>
   );
 };

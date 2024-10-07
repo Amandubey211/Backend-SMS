@@ -2,7 +2,8 @@ import React, { useRef, useState, useEffect } from "react";
 import { Line } from "react-chartjs-2";
 import { Chart as ChartJS, registerables } from "chart.js";
 import { FiCalendar } from "react-icons/fi";
-import useGetEarningsData from "../../../../Hooks/AuthHooks/Staff/Admin/Dashboard/useGetEarningsData";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchEarningsData } from "../../../../Store/Slices/Admin/Dashboard/adminDashboard.action"; // Make sure the path is correct
 import Spinner from "../../../../Components/Common/Spinner";
 
 ChartJS.register(...registerables);
@@ -12,9 +13,10 @@ const TotalEarningsGraph = () => {
   const [tooltipData, setTooltipData] = useState(null);
   const [selectedOption, setSelectedOption] = useState("currentMonth");
 
-  const { loading, error, earningsData, fetchEarningsData } =
-    useGetEarningsData();
+  const dispatch = useDispatch();
+  const { loading, error, earningsData } = useSelector((state) => state?.admin?.adminDashboard);
 
+  // Function to dispatch the fetchEarningsData action
   const fetchDashboardData = (option) => {
     const date = new Date();
     let month = date.getMonth() + 1;
@@ -28,27 +30,17 @@ const TotalEarningsGraph = () => {
       includeUnpaidExpenses = false;
     }
 
-    fetchEarningsData(month, year, includeUnpaidExpenses);
+
+    // Dispatch fetchEarningsData with necessary parameters
+    dispatch(fetchEarningsData({ month, year, includeUnpaidExpenses }));
   };
 
+  // Fetch data whenever selectedOption changes
   useEffect(() => {
     fetchDashboardData(selectedOption);
   }, [selectedOption]);
 
-  const getOrdinalSuffix = (day) => {
-    if (day > 3 && day < 21) return "th";
-    switch (day % 10) {
-      case 1:
-        return "st";
-      case 2:
-        return "nd";
-      case 3:
-        return "rd";
-      default:
-        return "th";
-    }
-  };
-
+  // Handle tooltip outside click
   const handleOutsideClick = (event) => {
     if (chartRef.current && !chartRef.current.canvas.contains(event.target)) {
       setTooltipData(null);
@@ -65,12 +57,12 @@ const TotalEarningsGraph = () => {
   if (loading) {
     return <Spinner />;
   }
+
   if (error || !earningsData) {
     return "No Data";
   }
 
   if (
-    error ||
     !earningsData ||
     (earningsData?.earningsData?.length === 0 &&
       earningsData?.expensesData?.length === 0)
@@ -138,6 +130,22 @@ const TotalEarningsGraph = () => {
     totalEarnings,
     totalExpenses,
   } = earningsData;
+
+
+  // Function to get the ordinal suffix of a number
+  const getOrdinalSuffix = (day) => {
+    if (day > 3 && day < 21) return "th";
+    switch (day % 10) {
+      case 1:
+        return "st";
+      case 2:
+        return "nd";
+      case 3:
+        return "rd";
+      default:
+        return "th";
+    }
+  };
 
   const data = {
     labels: earnings?.map((item) => `${item.day}`),

@@ -1,11 +1,12 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { fetchNotices, fetchFilteredEvents, fetchFilteredIssueBooks, fetchAdminDashboardData } from './adminDashboard.action';
+import { fetchNotices, fetchFilteredEvents, fetchFilteredIssueBooks, fetchAdminDashboardData, fetchEarningsData, fetchAttendanceData } from './adminDashboard.action';
 
 const initialState = {
   notices: [],
   events: [],
   books: [],
   dashboardData: null,
+  earningsData: null,
   loading: false,
   error: null,
 };
@@ -73,6 +74,35 @@ const adminDashboardSlice = createSlice({
       .addCase(fetchAdminDashboardData.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || 'Failed to fetch dashboard data'; // Handle error
+      })
+
+    // Handle fetching earnings data
+    builder
+      .addCase(fetchEarningsData.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchEarningsData.fulfilled, (state, action) => {
+        state.loading = false;
+        state.earningsData = action.payload;
+      })
+      .addCase(fetchEarningsData.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      
+      // Handle fetchAttendanceData
+      .addCase(fetchAttendanceData.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchAttendanceData.fulfilled, (state, action) => {
+        state.loading = false;
+        state.attendanceData = action.payload; // Set the fetched attendance data
+      })
+      .addCase(fetchAttendanceData.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload; // Set the error message
       });
   },
 });
