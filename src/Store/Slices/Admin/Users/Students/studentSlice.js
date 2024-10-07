@@ -1,15 +1,17 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchAllStudents, fetchStudentAttendance, fetchStudentDocument, fetchStudentFinance, fetchStudentGrades, fetchStudentSubjects, studentIssueBooks } from "./student.action";
+import { fetchAllStudents, fetchAttendanceData, fetchStudentAttendance, fetchStudentDocument, fetchStudentFinance, fetchStudentGrades, fetchStudentSubjectProgress, fetchStudentSubjects, studentIssueBooks } from "./student.action";
 const initialState = {
     allStudents:[],
     student:{},
     studentDocument:[],
     StudentAttendance:{},
+    attendanceData:{},
     StudentAttendanceSummary:{},
     studentSubjects:[],
     bookIssue:[],
     feesDetails:{},
     bookIssue:[],
+    studentSubjectProgress:[],
     grades:{},
     error:null,
     loading:false,
@@ -116,6 +118,30 @@ const allStudentSlice = createSlice({
           state.feesDetails = action.payload;
         })
         .addCase(fetchStudentFinance.rejected, (state, action) => {
+          state.loading = false;
+          state.error = action.payload;
+        })
+        .addCase(fetchStudentSubjectProgress.pending, (state) => {
+          state.loading = true;
+          state.error = null;
+        })
+        .addCase(fetchStudentSubjectProgress.fulfilled, (state, action) => {
+          state.loading = false;
+          state.studentSubjectProgress = action.payload;
+        })
+        .addCase(fetchStudentSubjectProgress.rejected, (state, action) => {
+          state.loading = false;
+          state.error = action.payload;
+        })
+        .addCase(fetchAttendanceData.pending, (state) => {
+          state.loading = true;
+          state.error = null;
+        })
+        .addCase(fetchAttendanceData.fulfilled, (state, action) => {
+          state.loading = false;
+          state.attendanceData = action.payload;
+        })
+        .addCase(fetchAttendanceData.rejected, (state, action) => {
           state.loading = false;
           state.error = action.payload;
         });

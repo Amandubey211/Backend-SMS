@@ -135,3 +135,37 @@ export const fetchStudentFinance = createAsyncThunk(
       }
   }
 )
+export const fetchStudentSubjectProgress = createAsyncThunk(
+  'student/studentSubjectProgress',
+  async (id, { rejectWithValue,getState }) => {
+    const { common } = getState();
+    const token = common.auth.token;
+      try {
+          const response = await axios.get(`${baseUrl}/admin/course/subjects/student/${id}`, {
+              headers: { Authentication:  `Bearer ${token}` }
+          });
+        return response.data.data
+      }
+      catch (error) {
+          return rejectWithValue((error?.response?.data?.message || error?.message || "Something Went Wrong!"))
+
+      }
+  }
+)
+export const fetchAttendanceData = createAsyncThunk(
+  'student/AttendanceData',
+  async (id, { rejectWithValue,getState }) => {
+    const { common } = getState();
+    const token = common.auth.token;
+      try {
+          const response = await axios.get(`${baseUrl}/api/teacher/attendance/getYearlyAttendance/${id}`, {
+              headers: { Authentication:  `Bearer ${token}` }
+          });
+        return response.data.data
+      }
+      catch (error) {
+          return rejectWithValue((error?.response?.data?.message || error?.message || "Something Went Wrong!"))
+
+      }
+  }
+)

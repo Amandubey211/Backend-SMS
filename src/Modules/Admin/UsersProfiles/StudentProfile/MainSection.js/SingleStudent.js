@@ -10,7 +10,7 @@ import NavigationMenu from './NavigationMenu.js'
  import StudentFinance from "../Components/FinanceMenu/StudentFinance";
  import StudentAttendance from "../Components/studentAttendance/StudentAttendance";
  import StudentInformationMenu from "../Components/StudentInformationMenu/StudentInformationMenu";
-// import StudentCourseProgress from "../Components/StudentCourseProgress/StudentCourseProgress";
+ import StudentCourseProgress from "../Components/StudentCourseProgress/StudentCourseProgress";
  import StudentGradesAccordion from "../Components/studentGradeMenu/StudentGradesAccordion";
 import StudentOverView from "../Components/StudentOverView/StudentOverView";
 import Layout from "../../../../../Components/Common/Layout";
@@ -34,7 +34,7 @@ const SingleStudent = () => {
   const renderContent = () => {
     const menuComponents = {
       "OverView": <StudentOverView student={student} />,
-      // "Course Progress": <StudentCourseProgress student={student} />,
+       "Course Progress": <StudentCourseProgress student={student} />,
        "Finance": <StudentFinance student={student} />,
        "Information": <StudentInformationMenu student={student} />,
        "Parents": <ParentsProfile student={student} />,

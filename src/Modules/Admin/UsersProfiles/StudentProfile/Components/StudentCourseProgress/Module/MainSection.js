@@ -40,33 +40,6 @@ const MainSection = ({ student,selectedSubjectId }) => {
     setChapters(module?.chapters || []);
     window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
   }
-
-  useEffect(() => {
-    const fetchSubjects = async () => {
-      try {
-        const token = localStorage.getItem(`${role}:token`);
-        if (!token) {
-          throw new Error('Authentication token not found');
-        }
-        const response = await axios.get(`${baseUrl}/api/studentDashboard/subjects/${cid}`, {
-          headers: { Authentication: token }
-        });
-
-        const subjects = response.data.subjects;
-        setStudentSubjects(subjects);
-        if (subjects?.length > 0) {
-          const firstSubjectId = subjects[0]._id;
-          setSelectedSubject(firstSubjectId);
-         
-        }
-      } catch (err) {
-        console.error('Error fetching subjects:', err);
-      }
-    };
-
-    fetchSubjects();
-  }, []);
-
   const handleToggle = (id) => {
     if (expandedChapters == id) {
       setExpandedChapters(null)

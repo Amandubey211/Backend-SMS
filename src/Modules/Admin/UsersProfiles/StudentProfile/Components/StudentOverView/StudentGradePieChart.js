@@ -1,36 +1,57 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Pie } from "react-chartjs-2";
 import "chart.js/auto";
-import { color } from "@cloudinary/url-gen/qualifiers/background";
-import { GoAlertFill } from 'react-icons/go';
+import { useSelector } from "react-redux";
 
 const StudentGradePieChart = () => {
-  const dataValues = [0, 0, 0, 0, 0, 0,0]; // Replace with your actual data values
+  const { studentSubjectProgress } = useSelector((store) => store.admin.all_students);
 
-  const colors = ["#FF6384", "#36A2EB", "#FFCE56", "#FF9F40", "#4BC0C0", "#9966FF",];
+  // Extract subject names and percentage values
+  const labels = studentSubjectProgress.map(subject => subject.subjectName);
+  const dataValues = studentSubjectProgress.map(subject => subject.percentageValue);
+
+  const colors = ["#FF6384", "#36A2EB", "#FFCE56", "#FF9F40", "#4BC0C0", "#9966FF"];
+
+  // Check if all data values are 0
+  const allZero = dataValues.every(value => value === 0);
 
   const data = {
-    labels: ["Bangla", "English", "Math", "Islam", "Accounting", "Arobi",],
+    labels: labels,
     datasets: [
       {
         data: dataValues,
-        backgroundColor: dataValues.map(value => value === 0 ? "gray" : colors[dataValues.indexOf(value)]), 
-        hoverBackgroundColor: dataValues.map(value => value === 0 ? "gray" : colors[dataValues.indexOf(value)]),
+        backgroundColor: allZero 
+          ? Array(dataValues.length).fill("gray") // Set all slices to gray if all data is 0
+          : dataValues.map(value => value === 0 ? "gray" : colors[dataValues.indexOf(value) % colors.length]), 
+        hoverBackgroundColor: allZero 
+          ? Array(dataValues.length).fill("gray") 
+          : dataValues.map(value => value === 0 ? "gray" : colors[dataValues.indexOf(value) % colors.length]),
         borderWidth: 5,
         borderRadius: 10,
-        borderColor: "#ffffff", // White borders make segments distinct
+        borderColor: "#ffffff",
+      },
+    ],
+  };
+  const Edata = {
+    labels: ["Progress is 0%"],
+    datasets: [
+      {
+        data: "100",
+        backgroundColor:"#4BC0C0",
+        hoverBackgroundColor:"#4BC0C0",
+        borderWidth: 5,
+        borderRadius: 10,
+        borderColor: "#ffffff",
       },
     ],
   };
 
   const options = {
     responsive: true,
-    color:'gary',
     plugins: {
       legend: {
         display: true,
         position: "bottom",
-      
         labels: {
           boxWidth: 20,
           padding: 20,
@@ -49,19 +70,9 @@ const StudentGradePieChart = () => {
   };
 
   return (
-    <>
-    {
- 
-    dataValues.sort((a, b) => a - b)[dataValues.length-1] == 0?<div className="flex w-full h-full text-gray-500  items-center justify-center flex-col text-xl">
-        <GoAlertFill className="text-[3rem]" />
-        No  Data Found
-        </div>:
-     <div className="flex-1 p-5 flex flex-row justify-start items-start">
-      <Pie data={data} options={options} />
-    </div>  
-    }
-    </>
-   
+    <div className="flex-1 p-5 flex flex-row justify-start items-start">
+      <Pie data={allZero?Edata:data} options={allZero?{}:options} />
+    </div>
   );
 };
 
