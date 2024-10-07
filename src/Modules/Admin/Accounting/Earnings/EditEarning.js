@@ -1,65 +1,49 @@
 import React, { useState, useEffect } from 'react';
 import FormInput from '../subClass/component/FormInput';
-import axios from 'axios';
-import { baseUrl } from '../../../../config/Common';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { resetFormData, setFormData, setIsEditSidebarOpen } from '../../../../Store/Slices/Admin/Accounting/Earning/earningSlice';
+import { fetchEarning, fetchTotalAmounts, updateEarning } from '../../../../Store/Slices/Admin/Accounting/Earning/earning.action';
 
-const EditEarning = ({ earning, onClose, onUpdate, fetchTotalAmounts }) => {
-    const [formData, setFormData] = useState({
-        paymentDate: '',
-        amount: '',
-        description: '',
-        paymentStatus: '',
-        paymentFrom: '',
-    });
+const EditEarning = () => {
+    const { editEarning, formData } = useSelector((store) => store?.admin?.earning)
+    const dispatch = useDispatch();
 
     useEffect(() => {
-        if (earning) {
-            console.log("earning---", earning);
-            setFormData({
-                paymentDate: earning.dateOfEarning.split('T')[0],
-                amount: earning.amount,
-                description: earning.description,
-                paymentStatus: earning.paymentStatus,
-                paymentFrom: earning.from,
-            });
+        if (editEarning) {
+            dispatch(setFormData({
+                paymentDate: editEarning.dateOfEarning.split('T')[0],
+                amount: editEarning.amount,
+                description: editEarning.description,
+                paymentStatus: editEarning.paymentStatus,
+                paymentFrom: editEarning.from,
+            }));
         }
-    }, [earning]);
-    const role = useSelector((store) => store.Auth.role);
+    }, [editEarning, dispatch]);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const token = localStorage.getItem(`${role}:token`);
-
-        if (!token) {
-            console.error('Authentication token is not available.');
-            return;
-        }
-
-        const payload = {
+        const updatedEarning = {
             from: formData.paymentFrom,
             amount: formData.amount,
             dateOfEarning: formData.paymentDate,
             description: formData.description,
         };
 
-        try {
-            const response = await axios.put(`${baseUrl}/admin/updateEarning/${earning._id}`, payload, {
-                headers: {
-                    Authentication: `${token}`
-                },
+        dispatch(updateEarning({ id: editEarning._id, updatedEarning }))
+            .then(() => {
+                dispatch(fetchTotalAmounts());
+                dispatch(fetchEarning());
+                dispatch(setIsEditSidebarOpen(false));
+                dispatch(resetFormData()); 
+            })
+            .catch((err) => {
+                console.error("Error updating earning", err);
             });
-            console.log('Earning saved successfully:', response.data);
-            onUpdate();
-            onClose();
-            fetchTotalAmounts();
-        } catch (error) {
-            console.error('Error saving the earning:', error.response ? error.response.data.msg : error.message);
-        }
     };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
+        dispatch(setFormData({ [name]: value }));
     };
 
     return (
@@ -72,7 +56,7 @@ const EditEarning = ({ earning, onClose, onUpdate, fetchTotalAmounts }) => {
                 Update Earning
             </button>
         </form>
-    );
+    )
 };
 
 export default EditEarning;
