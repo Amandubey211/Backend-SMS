@@ -51,9 +51,9 @@ const Sidebar = ({ isOpen, title, onClose, children, width = "35%" }) => {
       document.addEventListener("keydown", trapFocus);
 
       // Focus the close button when the sidebar is opened
-      if (closeButtonRef.current) {
-        closeButtonRef.current.focus();
-      }
+      // if (closeButtonRef.current) {
+      //   closeButtonRef.current.focus();
+      // }
     } else {
       document.removeEventListener("mousedown", handleClickOutside);
       document.removeEventListener("keydown", trapFocus);
@@ -63,7 +63,7 @@ const Sidebar = ({ isOpen, title, onClose, children, width = "35%" }) => {
       document.removeEventListener("mousedown", handleClickOutside);
       document.removeEventListener("keydown", trapFocus);
     };
-  }, [isOpen, onClose, trapFocus]);
+  }, [isOpen, onClose,]);
 
   return (
     <div
