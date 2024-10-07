@@ -119,7 +119,7 @@ const MainSection = () => {
 
       <div className="px-5">
         <h1 className="text-2xl ml-5 mt-5 font-semibold">
-          Your Subjects ({classData?.subjects?.length || 0})
+          My Subjects ({classData?.subjects?.length || 0})
         </h1>
 
         {loading ? (

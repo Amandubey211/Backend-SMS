@@ -15,7 +15,7 @@ const StudentDashLayout = ({
   const sidebarWidth = isSidebarOpen ? "15%" : "7%"; // Adjust the width based on sidebar state
 
   return (
-    <div className="flex w-full h-full">
+    <div className="flex w-full h-full border">
       <SideMenubar isOpen={isSidebarOpen} />
 
       <div
@@ -31,7 +31,7 @@ const StudentDashLayout = ({
           hideStudentView={hideStudentView}
         />
         {/* Main content area */}
-        <main className="w-full h-[90%] overflow-y-scroll no-scrollbar  ">
+        <main className="w-full h-[90vh] mt-[0.1vh] ">
           {children}
         </main>
       </div>
