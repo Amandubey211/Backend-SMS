@@ -9,27 +9,84 @@ import { baseUrl } from '../../../../config/Common';
 export const fetchAdminDashboardData = createAsyncThunk(
     'adminDashboard/fetchAdminDashboardData',
     async (_, { rejectWithValue, getState }) => {
-      const { role } = getState().common.auth;
-      const token = localStorage.getItem(`${role}:token`);
-      
-      if (!token) {
-        return rejectWithValue('Authentication failed!');
-      }
-  
-      try {
-        const response = await axios.get(`${baseUrl}/admin/dashboard`, {
-          headers: {
-            Authentication: token,
-          },
-        });
-  
-        return response?.data; // Returning the dashboard data
-      } catch (error) {
-        console.error('Error in fetchAdminDashboardData:', error);
-        return rejectWithValue(error.message); // Passing error to the reducer
-      }
+        const { role } = getState().common.auth;
+        const token = localStorage.getItem(`${role}:token`);
+
+        if (!token) {
+            return rejectWithValue('Authentication failed!');
+        }
+
+        try {
+            const response = await axios.get(`${baseUrl}/admin/dashboard`, {
+                headers: {
+                    Authentication: token,
+                },
+            });
+
+            return response?.data; // Returning the dashboard data
+        } catch (error) {
+            console.error('Error in fetchAdminDashboardData:', error);
+            return rejectWithValue(error.message); // Passing error to the reducer
+        }
     }
-  );
+);
+
+
+// Fetch Attendance Data
+export const fetchAttendanceData = createAsyncThunk(
+    'adminDashboard/fetchAttendanceData',
+    async ({ month, year }, { rejectWithValue, getState }) => {
+        const { role } = getState().common.auth;
+        const token = localStorage.getItem(`${role}:token`);
+
+        if (!token) {
+            return rejectWithValue('Authentication failed!');
+        }
+
+        try {
+            const response = await axios.get(`${baseUrl}/admin/dashboard/attendance`, {
+                headers: {
+                    Authentication: token,
+                },
+                params: { month, year },
+            });
+
+            return response?.data; // Returning the attendance data
+        } catch (error) {
+            console.error('Error in fetchAttendanceData:', error);
+            return rejectWithValue(error.message); // Return error message
+        }
+    }
+);
+
+
+// Fetch Earnings Data
+export const fetchEarningsData = createAsyncThunk(
+    'adminDashboard/fetchEarningsData',
+    async ({ month, year, includeUnpaidExpenses }, { rejectWithValue, getState }) => {
+        const { role } = getState().common.auth;
+        const token = localStorage.getItem(`${role}:token`);
+
+        if (!token) {
+            return rejectWithValue('Authentication failed!');
+        }
+
+        try {
+            const response = await axios.get(`${baseUrl}/admin/dashboard/earnings`, {
+                headers: {
+                    Authentication: token,
+                },
+                params: { month, year, includeUnpaidExpenses },
+            });
+
+            return response?.data; // Returning the earnings data
+        } catch (error) {
+            console.error('Error in fetchEarningsData:', error);
+            return rejectWithValue(error.message); // Passing error to the reducer
+        }
+    }
+);
+
 
 
 // Fetch Notices
