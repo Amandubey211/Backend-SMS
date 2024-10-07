@@ -19,6 +19,7 @@ import adminLibraryReducer from "./Slices/Admin/Library/LibrarySlice";
 import adminEventReducer from "./Slices/Admin/NoticeBoard/Events/eventSlice";
 import adminNoticeReducer from "./Slices/Admin/NoticeBoard/Notice/noticeSlice";
 // student
+import studentDashboardReducer from "./Slices/Student/Dashboard/studentDashboardSlices";
 import studentFinanceReducer from "./Slices/Student/Finance/financeSlice";
 import studentLibraryBooksReducer from "./Slices/Student/Library/libararySlice";
 import studentIssueBooksReducer from "./Slices/Student/Library/bookIssuesSlice";
@@ -94,6 +95,7 @@ const AdminReducer = combineReducers({
 });
 
 const studentReducer = combineReducers({
+  studentDashboard: studentDashboardReducer,
   studentFinance: studentFinanceReducer,
   studentLibraryBooks: studentLibraryBooksReducer,
   studentIssueBooks: studentIssueBooksReducer,
