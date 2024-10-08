@@ -13,7 +13,6 @@ const initialState = {
     selectedClassName: "",
     selectedSection: null,
     selectedSectionName: "",
-
     selectedModule: {
       moduleId: null,
       name: null,

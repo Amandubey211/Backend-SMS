@@ -15,6 +15,7 @@ const StudentGradeSummary = ({ studentGrade }) => {
     totalGroupQuizScore,
     totalQuizCompletedScore,
     total,
+    totalAssignmentScore,
   } = studentGrade;
 
   return (
@@ -28,7 +29,7 @@ const StudentGradeSummary = ({ studentGrade }) => {
               alt="Profile"
             />
             <h2 className="mt-4 text-lg font-semibold">{name}</h2>
-            {/* <p className="text-gray-500">{section}</p> */}
+             <p className="text-gray-500">{section}</p> 
           </div>
         </div>
         <div>
@@ -38,13 +39,13 @@ const StudentGradeSummary = ({ studentGrade }) => {
               <p className="text-sm">Assignment</p>
               {/* <p className="text-sm">{assignment} / 1000</p> */}
               <p className="text-sm">
-                {totalScore} /{assignment}{" "}
+                {totalAssignmentScore} /{assignment}
               </p>
             </div>
             <div className="flex justify-between mb-2">
               <p className="text-sm">Group Assignment</p>
               <p className="text-sm">
-                {groupAssignment} /{totalGroupAssignmentScore}{" "}
+                {groupAssignment} /{totalGroupAssignmentScore}
               </p>
             </div>
             <div className="flex justify-between mb-2">
