@@ -7,8 +7,19 @@ const initialState = {
   books: [],
   dashboardData: null,
   earningsData: null,
-  loading: false,
-  error: null,
+  attendanceData: null,
+  loadingNotices: false,
+  loadingEvents: false,
+  loadingBooks: false,
+  loadingDashboard: false,
+  loadingEarnings: false,
+  loadingAttendance: false,
+  errorNotices: null,
+  errorEvents: null,
+  errorBooks: null,
+  errorDashboard: null,
+  errorEarnings: null,
+  errorAttendance: null,
 };
 
 const adminDashboardSlice = createSlice({
@@ -19,90 +30,91 @@ const adminDashboardSlice = createSlice({
     // Handle fetching notices
     builder
       .addCase(fetchNotices.pending, (state) => {
-        state.loading = true;
-        state.error = null;
+        state.loadingNotices = true;
+        state.errorNotices = null;
       })
       .addCase(fetchNotices.fulfilled, (state, action) => {
-        state.loading = false;
+        state.loadingNotices = false;
         state.notices = action.payload;
       })
       .addCase(fetchNotices.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload || 'Failed to fetch notices';
+        state.loadingNotices = false;
+        state.errorNotices = action.payload || 'Failed to fetch notices';
       });
 
     // Handle fetching events
     builder
       .addCase(fetchFilteredEvents.pending, (state) => {
-        state.loading = true;
-        state.error = null;
+        state.loadingEvents = true;
+        state.errorEvents = null;
       })
       .addCase(fetchFilteredEvents.fulfilled, (state, action) => {
-        state.loading = false;
+        state.loadingEvents = false;
         state.events = action.payload;
       })
       .addCase(fetchFilteredEvents.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload || 'Failed to fetch events';
+        state.loadingEvents = false;
+        state.errorEvents = action.payload || 'Failed to fetch events';
       });
 
     // Handle fetching filtered issue books
     builder
       .addCase(fetchFilteredIssueBooks.pending, (state) => {
-        state.loading = true;
-        state.error = null;
+        state.loadingBooks = true;
+        state.errorBooks = null;
       })
       .addCase(fetchFilteredIssueBooks.fulfilled, (state, action) => {
-        state.loading = false;
+        state.loadingBooks = false;
         state.books = action.payload;
       })
       .addCase(fetchFilteredIssueBooks.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload || 'Failed to fetch issued books';
-      })
+        state.loadingBooks = false;
+        state.errorBooks = action.payload || 'Failed to fetch issued books';
+      });
 
     // Handle fetching admin dashboard data
     builder
       .addCase(fetchAdminDashboardData.pending, (state) => {
-        state.loading = true;
-        state.error = null;
+        state.loadingDashboard = true;
+        state.errorDashboard = null;
       })
       .addCase(fetchAdminDashboardData.fulfilled, (state, action) => {
-        state.loading = false;
+        state.loadingDashboard = false;
         state.dashboardData = action.payload; // Set dashboard data on success
       })
       .addCase(fetchAdminDashboardData.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload || 'Failed to fetch dashboard data'; // Handle error
-      })
+        state.loadingDashboard = false;
+        state.errorDashboard = action.payload || 'Failed to fetch dashboard data'; // Handle error
+      });
 
     // Handle fetching earnings data
     builder
       .addCase(fetchEarningsData.pending, (state) => {
-        state.loading = true;
-        state.error = null;
+        state.loadingEarnings = true;
+        state.errorEarnings = null;
       })
       .addCase(fetchEarningsData.fulfilled, (state, action) => {
-        state.loading = false;
+        state.loadingEarnings = false;
         state.earningsData = action.payload;
       })
       .addCase(fetchEarningsData.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      })
-      
-      // Handle fetchAttendanceData
+        state.loadingEarnings = false;
+        state.errorEarnings = action.payload || 'Failed to fetch earnings data';
+      });
+
+    // Handle fetching attendance data
+    builder
       .addCase(fetchAttendanceData.pending, (state) => {
-        state.loading = true;
-        state.error = null;
+        state.loadingAttendance = true;
+        state.errorAttendance = null;
       })
       .addCase(fetchAttendanceData.fulfilled, (state, action) => {
-        state.loading = false;
+        state.loadingAttendance = false;
         state.attendanceData = action.payload; // Set the fetched attendance data
       })
       .addCase(fetchAttendanceData.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload; // Set the error message
+        state.loadingAttendance = false;
+        state.errorAttendance = action.payload || 'Failed to fetch attendance data';
       });
   },
 });

@@ -1,4 +1,4 @@
-import React from "react";
+import React, {memo} from "react";
 
 const DashCard = ({
   label,
@@ -29,4 +29,4 @@ const DashCard = ({
   );
 };
 
-export default DashCard;
+export default memo(DashCard);
