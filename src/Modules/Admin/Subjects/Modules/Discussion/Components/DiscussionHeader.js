@@ -1,9 +1,8 @@
-
-import React, { useState } from 'react';
-import { CiSearch } from 'react-icons/ci';
+import React, { useState } from "react";
+import { CiSearch } from "react-icons/ci";
 
 const DiscussionHeader = ({ onSearch, onFilterChange }) => {
-  const [filter, setFilter] = useState('all');
+  const [filter, setFilter] = useState("all");
 
   const handleFilterChange = (event) => {
     const value = event.target.value;
@@ -36,7 +35,7 @@ const DiscussionHeader = ({ onSearch, onFilterChange }) => {
               type="radio"
               name="filter"
               value="all"
-              checked={filter === 'all'}
+              checked={filter === "all"}
               onChange={handleFilterChange}
               className="custom-radio"
             />
@@ -47,7 +46,7 @@ const DiscussionHeader = ({ onSearch, onFilterChange }) => {
               type="radio"
               name="filter"
               value="unread"
-              checked={filter === 'unread'}
+              checked={filter === "unread"}
               onChange={handleFilterChange}
               className="custom-radio"
             />
@@ -58,7 +57,7 @@ const DiscussionHeader = ({ onSearch, onFilterChange }) => {
               type="radio"
               name="filter"
               value="read"
-              checked={filter === 'read'}
+              checked={filter === "read"}
               onChange={handleFilterChange}
               className="custom-radio"
             />

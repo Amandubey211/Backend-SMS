@@ -21,16 +21,18 @@ import verificationReducer from "./Slices/Admin/Verification/VerificationSlice";
 import adminLibraryReducer from "./Slices/Admin/Library/LibrarySlice";
 import adminEventReducer from "./Slices/Admin/NoticeBoard/Events/eventSlice";
 import adminNoticeReducer from "./Slices/Admin/NoticeBoard/Notice/noticeSlice";
-
-
-
-
+import adminModuleReducer from "./Slices/Admin/Class/Module/moduleSlice";
+import adminSyllabusReducer from "./Slices/Admin/Class/Syllabus/syllabusSlice";
+import adminPageReducer from "./Slices/Admin/Class/Page/pageSlice";
+import adminDiscussionReducer from "./Slices/Admin/Class/Discussion/discussionSlice";
+import adminAnnouncementReducer from "./Slices/Admin/Class/Announcement/announcementSlice";
 import allStudentReducer from "./Slices/Admin/Users/Students/studentSlice";
 import allParentReducer from "./Slices/Admin/Users/Parents/parentSilce";
 import allstaffReducer from "./Slices/Admin/Users/Staff/staffSlice";
 import earningReducer from "./Slices/Admin/Accounting/Earning/earningSlice";
 import studentFeesReducer from "./Slices/Admin/Accounting/StudentFees/studentFeesSlice";
 import expensesReducer from "./Slices/Admin/Accounting/Expenses/expensesSlice"
+
 
 // student
 import studentDashboardReducer from "./Slices/Student/Dashboard/studentDashboardSlices";
@@ -39,7 +41,6 @@ import studentLibraryBooksReducer from "./Slices/Student/Library/libararySlice";
 import studentIssueBooksReducer from "./Slices/Student/Library/bookIssuesSlice";
 import studentAnnouncementReducer from "../Store/Slices/Student/Noticeboard/noticeSlice";
 import studentEventReducer from "../Store/Slices/Student/Noticeboard/eventsSlice";
-
 import studentClassReducer from "../Store/Slices/Student/MyClass/Class/classSlice";
 import studentClassTeacherReducer from "../Store/Slices/Student/MyClass/Class/classTeacher/classTeacherSlice";
 import studentClassmateReducer from "../Store/Slices/Student/MyClass/Class/classMates/classmateSlice";
@@ -75,12 +76,12 @@ const authPersistConfig = {
 const userPersistConfig = {
   key: "user",
   storage,
-  whitelist: [
-    "userDetails",
-    "navbar", // Persist NavbarData
-    "classInfo", // Persist the entire classInfo object
-    "subjectInfo", // Persist the entire subjectInfo object
-  ], // Whitelt fields based on the refined state structure in userSlicesed on the refined state structure in userSlice
+  // whitelist: [
+  //   "userDetails",
+  //   "navbar", // Persist NavbarData
+  //   "classInfo", // Persist the entire classInfo object
+  //   "subjectInfo", // Persist the entire subjectInfo object
+  // ], // Whitelt fields based on the refined state structure in userSlicesed on the refined state structure in userSlice
 };
 
 const stdSubjectPersistConfig = {
@@ -107,13 +108,18 @@ const AdminReducer = combineReducers({
   library: adminLibraryReducer,
   events: adminEventReducer,
   notice: adminNoticeReducer,
-
+  module: adminModuleReducer,
+  syllabus: adminSyllabusReducer,
+  pages: adminPageReducer,
+  discussions: adminDiscussionReducer,
+  announcements: adminAnnouncementReducer,
   all_students:allStudentReducer,
   all_parents:allParentReducer,
   all_staff:allstaffReducer,
   earning: earningReducer,
   student_fees: studentFeesReducer,
   expenses: expensesReducer,
+
 });
 
 const studentReducer = combineReducers({

@@ -9,7 +9,7 @@ const initialState = {
   userDetails: {}, // Storing user details directly, including studentId if applicable
   step: 1,
   classInfo: {
-    selectedClass: null,
+    selectedClassId: null,
     selectedClassName: "",
     selectedSection: null,
     selectedSectionName: "",
@@ -22,7 +22,7 @@ const initialState = {
   },
   sidebar: { isOpen: true },
   subjectInfo: {
-    selectedSubject: null,
+    selectedSubjectId: null,
     selectedSubjectName: "",
     selectedAssignmentName: null,
   },
@@ -48,8 +48,8 @@ const userSlice = createSlice({
     closeSidebar: (state) => {
       state.sidebar.isOpen = false;
     },
-    setSelectedClass: (state, action) => {
-      state.classInfo.selectedClass = action.payload;
+    setSelectedClassId: (state, action) => {
+      state.classInfo.selectedClassId = action.payload;
     },
     setSelectedClassName: (state, action) => {
       state.classInfo.selectedClassName = action.payload;
@@ -63,8 +63,8 @@ const userSlice = createSlice({
     setSelectedModule: (state, action) => {
       state.classInfo.selectedModule = action.payload;
     },
-    setSelectedSubject: (state, action) => {
-      state.subjectInfo.selectedSubject = action.payload;
+    setSelectedSubjectId: (state, action) => {
+      state.subjectInfo.selectedSubjectId = action.payload;
     },
     setSelectedSubjectName: (state, action) => {
       state.subjectInfo.selectedSubjectName = action.payload;
@@ -153,12 +153,12 @@ const userSlice = createSlice({
 
 export const {
   setLeftHeading,
-  setSelectedClass,
+  setSelectedClassId,
   setSelectedClassName,
   setSelectedSectionId,
   setSelectedSectionName,
   setSelectedModule,
-  setSelectedSubject,
+  setSelectedSubjectId,
   setSelectedSubjectName,
   setSelectedAssignmentName,
   setUserDetails,

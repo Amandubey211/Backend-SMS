@@ -9,7 +9,10 @@ import { CiUser } from "react-icons/ci";
 import DeleteModal from "../../../../Components/Common/DeleteModal";
 import { deleteSubject } from "../../../../Store/Slices/Admin/Class/Subject/subjectThunks";
 import SubjectIcon from "../../../../Assets/ClassesAssets/SubClassAssets/SubjectIcons/image1.png";
-import { setSelectedSubjectName } from "../../../../Store/Slices/Common/User/reducers/userSlice";
+import {
+  setSelectedSubjectId,
+  setSelectedSubjectName,
+} from "../../../../Store/Slices/Common/User/reducers/userSlice";
 
 const SubjectCard = ({
   data,
@@ -29,7 +32,10 @@ const SubjectCard = ({
 
   return (
     <div
-      onClick={() => dispatch(setSelectedSubjectName(data?.name))}
+      onClick={() => {
+        dispatch(setSelectedSubjectName(data?.name));
+        dispatch(setSelectedSubjectId(subjectId));
+      }}
       className={`relative rounded-xl p-4 shadow-lg ${backgroundColor} transition-transform duration-300 transform hover:scale-105 hover:shadow-2xl group`}
     >
       {role === "admin" && (

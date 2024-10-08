@@ -4,13 +4,17 @@ import SideMenubar from "../../../../../../Components/Admin/SideMenubar";
 import AddPageHeader from "./AddPageHeader";
 import EditorComponent from "../../../Component/AdminEditor";
 import DateInput from "../../../Component/DateInput";
-import useCreatePage from "../../../../../../Hooks/AuthHooks/Staff/Admin/Page/useCreatePage";
-import useUpdatePage from "../../../../../../Hooks/AuthHooks/Staff/Admin/Page/useUpdatePage";
-import { useLocation } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+
+import { useLocation, useParams } from "react-router-dom";
+import {
+  createPage,
+  updatePage,
+} from "../../../../../../Store/Slices/Admin/Class/Page/pageThunk";
 
 const AddPage = () => {
   const { state } = useLocation();
+  const dispatch = useDispatch();
   const [title, setTitle] = useState("");
   const [editorContent, setEditorContent] = useState("");
   const [editPermission, setEditPermission] = useState("Only Instructor");
@@ -18,21 +22,12 @@ const AddPage = () => {
   const [isUpdating, setIsUpdating] = useState(false);
   const [loadingType, setLoadingType] = useState(""); // Separate loading state for each button
 
-  const isSidebarOpen = useSelector((state) => state.sidebar.isOpen);
+  const isSidebarOpen = useSelector(
+    (state) => state.common.user.sidebar.isOpen
+  );
   const sidebarWidth = isSidebarOpen ? "15%" : "7%";
-
-  const {
-    createPage,
-    loading: createLoading,
-    error: createError,
-    success: createSuccess,
-  } = useCreatePage();
-  const {
-    updatePage,
-    loading: updateLoading,
-    error: updateError,
-    success: updateSuccess,
-  } = useUpdatePage();
+  const { cid } = useParams();
+  const { loading, error } = useSelector((state) => state.admin.pages);
 
   useEffect(() => {
     if (state?.page) {
@@ -76,12 +71,10 @@ const AddPage = () => {
 
       try {
         if (isUpdating) {
-          await updatePage(state?.page._id, pageData);
+          await dispatch(updatePage({ pageId: state?.page._id, pageData }));
         } else {
-          await createPage(pageData);
+          await dispatch(createPage({ pageData, cid }));
         }
-
-        // Handle success scenario if needed
       } catch (error) {
         console.error("Error saving page:", error);
       } finally {
@@ -95,13 +88,9 @@ const AddPage = () => {
       publishAt,
       isUpdating,
       state,
-      createPage,
-      updatePage,
+      dispatch,
     ]
   );
-
-  const loading = createLoading || updateLoading;
-  const error = createError || updateError;
 
   return (
     <Layout
@@ -113,9 +102,7 @@ const AddPage = () => {
         <SideMenubar />
         <div
           className={`ml-${sidebarWidth} transition-all duration-500 flex-1 h-full`}
-          style={{
-            marginLeft: sidebarWidth,
-          }}
+          style={{ marginLeft: sidebarWidth }}
         >
           <AddPageHeader
             onSave={handleSave}
@@ -149,7 +136,6 @@ const AddPage = () => {
                   <option>Instructor and TA</option>
                 </select>
               </div>
-
               <DateInput
                 label="Publish at"
                 name="publishAt"
@@ -158,6 +144,9 @@ const AddPage = () => {
               />
             </div>
           </div>
+          {loading && (
+            <p className="text-center my-4 text-indigo-600">Saving...</p>
+          )}
           {error && (
             <p role="alert" className="text-red-400 text-current my-4">
               {error}

@@ -2,24 +2,27 @@ import React, { useEffect, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import Header from "./Components/Header";
 import SubjectSideBar from "../../../Component/SubjectSideBar";
-import useFetchDiscussionById from "../../../../../../Hooks/AuthHooks/Staff/Admin/Disscussion/useFetchDiscussionById";
+import { useDispatch, useSelector } from "react-redux";
 import Spinner from "../../../../../../Components/Common/Spinner";
 import NoDataFound from "../../../../../../Components/Common/NoDataFound";
+import { fetchDiscussionById } from "../../../../../../Store/Slices/Admin/Class/Discussion/discussionThunks";
 
 const MainSection = () => {
   const { did } = useParams();
-  const { discussion, error, fetchDiscussionById, loading } =
-    useFetchDiscussionById();
+  const dispatch = useDispatch();
 
-  // Callback function to refetch discussion
+  const { discussion, loading, error } = useSelector(
+    (state) => state.admin.discussions
+  );
+
+  // Callback to refetch the discussion
   const handleRefetchDiscussion = useCallback(() => {
-    console.log("Refetching discussion...");
-    fetchDiscussionById(did);
-  }, [did, fetchDiscussionById]);
+    dispatch(fetchDiscussionById({ did }));
+  }, [dispatch, did]);
 
   useEffect(() => {
-    fetchDiscussionById(did);
-  }, [did, fetchDiscussionById]);
+    handleRefetchDiscussion();
+  }, [handleRefetchDiscussion]);
 
   if (loading) return <Spinner />;
   if (error) return <NoDataFound />;
@@ -29,14 +32,12 @@ const MainSection = () => {
     <div className="flex">
       <SubjectSideBar />
       <div className="border-l w-full">
-        {/* Pass refetchDiscussion as a prop to Header */}
         <Header
           discussion={discussion}
           refetchDiscussion={handleRefetchDiscussion}
         />
         <div className="p-6 bg-white">
           <h1 className="text-lg font-semibold">{discussion.title}</h1>
-
           <div className="text-gray-700 mb-3">
             <div dangerouslySetInnerHTML={{ __html: discussion.content }} />
           </div>
