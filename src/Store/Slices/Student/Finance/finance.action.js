@@ -23,7 +23,6 @@ export const StudentFinanceDetails = createAsyncThunk(
       const res = await axios.get(`${baseUrl}/student/my_fees`, {
         headers: { Authentication: token },
       });
-
       const data = res?.data;
 
       return data;

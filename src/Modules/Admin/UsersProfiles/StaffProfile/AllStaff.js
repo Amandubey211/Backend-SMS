@@ -1,29 +1,25 @@
 import React, { useEffect, useState } from "react";
-import { dummyStaff } from './dummyData/dummyData';  // Import staff data
 import Layout from '../../../../Components/Common/Layout';
 import DashLayout from '../../../../Components/Admin/AdminDashLayout';
 import SidebarSlide from '../../../../Components/Common/SidebarSlide';
 import ViewStaff from "./ViewStaff";
 import ProfileCard from "../SubComponents/ProfileCard";
-import useGetAllStaff from "../../../../Hooks/AuthHooks/Staff/Admin/staff/useGetAllStaff";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import AddUser from "./AddUser";
 import { FiLoader } from "react-icons/fi";
 import { GoAlertFill } from "react-icons/go";
+import { fetchAllStaff } from "../../../../Store/Slices/Admin/Users/Staff/staff.action";
 
 const AllStaff = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarContent, setSidebarContent] = useState(null);
   const [selectedStaff, setSelectedStaff] = useState(null);
   const [staffData, setStaffData] = useState(null);
-  const staff = useSelector((store) => store.Staff.allStaff);
-  const { fetchStaff,loading } = useGetAllStaff();
-
+  const {staff,loading} = useSelector((store) => store.admin.all_staff);
+const dispatch = useDispatch()
   useEffect(() => {
-    fetchStaff();
-    // fetchSubjects(cid);
-    console.log(staff);
-  }, []);
+    dispatch(fetchAllStaff())
+  }, [dispatch]);
 
   const handleSidebarOpen = () => setSidebarOpen(true);
   const handleSidebarClose = () => setSidebarOpen(false);
@@ -102,7 +98,7 @@ const AllStaff = () => {
                 {sidebarContent === "viewStaff" ? "Quick View of Staff" : "Add/Edit Staff"}
               </span>
             }
-            width="60%"
+            width={sidebarContent === "viewStaff" ? "30%" : "60%"}
             height="100%"
           >
             {renderSidebarContent()}

@@ -2,10 +2,10 @@ import React, { useEffect, useState } from "react";
 import ImageUpload from "../../Addmission/Components/ImageUpload";
 import FormInput from "../../Accounting/subClass/component/FormInput";
 import FormSelect from "../../Accounting/subClass/component/FormSelect";
-import useAddUser from "../../../../Hooks/AuthHooks/Staff/Admin/staff/useAddUser";
-import useGetAllTeachers from "../../../../Hooks/AuthHooks/Staff/Admin/Teacher/useGetAllTeacher";
 import useEditUser from "../../../../Hooks/AuthHooks/Staff/Admin/staff/useEditUser";
 import { FiLoader } from "react-icons/fi";
+import { useDispatch, useSelector } from "react-redux";
+import { addUser ,editUser} from "../../../../Store/Slices/Admin/Users/Staff/staff.action";
 
 const AddUser = ({ role ,data}) => {
   const [imagePreview, setImagePreview] = useState(null);
@@ -145,25 +145,16 @@ const AddUser = ({ role ,data}) => {
     setImagePreview(null);
   };
 
-  const { fetchTeachers } = useGetAllTeachers();
-  const { addUser, error, loading } = useAddUser();
-
-  const handleSubmit = async (e) => {
+  const {loading,error}  = useSelector((store)=>store.admin.all_staff)
+   const dispatch = useDispatch()
+  const handleSubmit = (e) => {
     e.preventDefault();
     teacherData.role = role
-    await addUser(teacherData,address);
-    if (!error) {
-      fetchTeachers();
-     
-    }
+     dispatch(addUser({userData:teacherData,address}));
+
   };
- const {EditUser,loading: editUserLoading} = useEditUser();
-  const editUserHandel = async()=>{
-    console.log(teacherData);
-   await EditUser(teacherData,address,data?._id);
-   if (!error) {
-    fetchTeachers();
-  }
+  const editUserHandel = ()=>{
+   dispatch(editUser({userData:teacherData,address,id:data?._id}))
   }
 
   return (
@@ -187,6 +178,7 @@ const AddUser = ({ role ,data}) => {
                 name="firstName"
                 value={teacherData.firstName}
                 onChange={handleInputChange}
+                required={true}
               />
               <FormInput
                 id="lastName"
@@ -194,6 +186,7 @@ const AddUser = ({ role ,data}) => {
                 name="lastName"
                 value={teacherData.lastName}
                 onChange={handleInputChange}
+                required={true}
               />
               <FormInput
                 id="dob"
@@ -202,6 +195,7 @@ const AddUser = ({ role ,data}) => {
                 name="dob"
                 value={teacherData.dob}
                 onChange={handleInputChange}
+                required={true}
               />
               <FormSelect
                 id="religion"
@@ -210,6 +204,7 @@ const AddUser = ({ role ,data}) => {
                 name="religion"
                 value={teacherData.religion}
                 onChange={handleInputChange}
+                required={true}
               />
               <FormSelect
                 id="gender"
@@ -218,6 +213,7 @@ const AddUser = ({ role ,data}) => {
                 name="gender"
                 value={teacherData.gender}
                 onChange={handleInputChange}
+                required={true}
               />
             </div>
             <div className="flex flex-col gap-3">
@@ -228,6 +224,7 @@ const AddUser = ({ role ,data}) => {
                 name="monthlySalary"
                 value={teacherData.monthlySalary}
                 onChange={handleInputChange}
+                required={true}
               />
               <FormInput
                 id="employeeID"
@@ -235,6 +232,7 @@ const AddUser = ({ role ,data}) => {
                 name="employeeID"
                 value={teacherData.employeeID}
                 onChange={handleInputChange}
+                required={true}
               />
               <FormSelect
                 id="bloodGroup"
@@ -243,6 +241,7 @@ const AddUser = ({ role ,data}) => {
                 name="bloodGroup"
                 value={teacherData.bloodGroup}
                 onChange={handleInputChange}
+                required={true}
               />
               <FormInput
                 id="position"
@@ -250,6 +249,7 @@ const AddUser = ({ role ,data}) => {
                 name="position"
                 value={teacherData.position}
                 onChange={handleInputChange}
+                required={true}
               />
             </div>
           </div>
@@ -262,6 +262,7 @@ const AddUser = ({ role ,data}) => {
                 name="mobileNumber"
                 value={teacherData.mobileNumber}
                 onChange={handleInputChange}
+                required={true}
               />
               <FormInput
                 id="email"
@@ -269,6 +270,7 @@ const AddUser = ({ role ,data}) => {
                 name="email"
                 value={teacherData.email}
                 onChange={handleInputChange}
+                required={true}
               />
             </div>
             <div className="flex flex-col gap-5">
@@ -279,6 +281,7 @@ const AddUser = ({ role ,data}) => {
                   name="country"
                   value={address.country}
                   onChange={handleAddressInputChange}
+                  required={true}
                 />
                 <FormInput
                   id="state"
@@ -286,6 +289,7 @@ const AddUser = ({ role ,data}) => {
                   name="state"
                   value={address.state}
                   onChange={handleAddressInputChange}
+                  required={true}
                 />
               </div>
             </div>
@@ -297,6 +301,7 @@ const AddUser = ({ role ,data}) => {
                   name="city"
                   value={address.city}
                   onChange={handleAddressInputChange}
+                  required={true}
                 />
                 <FormInput
                   id="postalCode"
@@ -304,6 +309,7 @@ const AddUser = ({ role ,data}) => {
                   name="postalCode"
                   value={address.postalCode}
                   onChange={handleAddressInputChange}
+                  required={true}
                 />
               </div>
             </div>
@@ -314,6 +320,7 @@ const AddUser = ({ role ,data}) => {
                 name="street"
                 value={address.street}
                 onChange={handleAddressInputChange}
+                required={true}
               />
             </div>
             <div className="w-[50%] h-25 flex items-center p-4 bg-white border-2 border-dashed border-gray-300 rounded-lg">
@@ -327,18 +334,18 @@ const AddUser = ({ role ,data}) => {
           </div>
         </div>
        {data? <div
-          disabled={editUserLoading}
+          disabled={loading}
           className="bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-10 rounded-md hover:from-pink-600 hover:to-purple-600 cursor-pointer w-[11rem]"
           onClick={editUserHandel}
         >
-          {editUserLoading?<FiLoader className="animate-spin  w-[1rem] h-[1rem] ml-10 " />  :'Update Staff'}
+          {loading?<FiLoader className="animate-spin  w-[1rem] h-[1rem] ml-10 " />  :'Update User'}
         </div>:
         <button
         disabled={loading}
           type="submit"
           className="bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-10 rounded-md hover:from-pink-600 hover:to-purple-600"
         >
-        {loading? <FiLoader className="animate-spin  w-[1rem] h-[1rem] ml-10 " />  :'Add New Staff'}
+        {loading? <FiLoader className="animate-spin  w-[1rem] h-[1rem] ml-10 " />  :'Add New User'}
         </button>}
       </form>
     </div>

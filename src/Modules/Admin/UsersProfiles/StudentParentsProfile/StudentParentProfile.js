@@ -5,11 +5,13 @@ import FormField from "../../Accounting/subClass/component/FormField";
 import ChildProfile from "./ChildProfile";
 import Sidebar from "../../../../Components/Common/Sidebar";
 import useGetAllParents from "../../../../Hooks/AuthHooks/Staff/Admin/parent/useGetAllParents";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import profileIcon from "../../../../Assets/DashboardAssets/profileIcon.png";
 import { GoAlertFill } from "react-icons/go";
 import { FiLoader } from "react-icons/fi";
 import useGetAllStudents from "../../../../Hooks/AuthHooks/Staff/Admin/Students/useGetAllStudents";
+import { fetchAllParent } from "../../../../Store/Slices/Admin/Users/Parents/parent.action";
+import { fetchAllStudents } from "../../../../Store/Slices/Admin/Users/Students/student.action";
 
 const uniqueFilterOptions = (data, key) => {
   return [
@@ -20,10 +22,12 @@ const uniqueFilterOptions = (data, key) => {
 };
 
 const StudentParentProfile = () => {
-  const { fetchAllStudents } = useGetAllStudents();
-  useEffect(() => {
-    fetchAllStudents();
-  }, []);
+  const {allParents,loading} = useSelector((store)=>store.admin.all_parents);
+  const dispatch = useDispatch()
+  useEffect(()=>{
+    dispatch(fetchAllParent());
+    dispatch(fetchAllStudents());    
+  },[dispatch])
   const [selectedChild, setSelectedChild] = useState(null);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
 
@@ -44,14 +48,6 @@ const StudentParentProfile = () => {
     setSelectedChild(child);
     setSidebarOpen(true);
   };
-  const { fetchAllParents,loading } = useGetAllParents();
-  const allParents = useSelector((store) => store.Parents.allParents);
-  useEffect(() => {
-    async function fetchData() {
-      await fetchAllParents();
-    }
-    fetchData();
-  }, []);
   const filteredParents = allParents.filter((parent) =>
     parent.children.some(
       (child) =>
@@ -64,7 +60,7 @@ const StudentParentProfile = () => {
     <>
       <Layout title="Parents">
         <DashLayout>
-{loading? <div className="flex w-full h-[90vh] flex-col items-center justify-center">
+       {loading? <div className="flex w-full h-[90vh] flex-col items-center justify-center">
     <FiLoader className="animate-spin mr-2 w-[3rem] h-[3rem] " />
     <p className="text-gray-800 text-lg">Loading...</p>
     </div>:
@@ -169,7 +165,6 @@ const StudentParentProfile = () => {
                     </tr>
                   )): 
                   <tr>
-
                   <td className="   text-center text-2xl py-10 text-gray-400" colSpan={6} >
                    <div className="flex  items-center justify-center flex-col text-2xl">
                      <GoAlertFill className="text-[5rem]" />
