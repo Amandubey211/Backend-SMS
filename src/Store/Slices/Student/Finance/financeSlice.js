@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { StudentFinanceDetails } from "./finance.action";
+import { setShowError } from "../../Common/Alerts/alertsSlice";
 
 
 const initialState = {
@@ -21,7 +22,8 @@ const financeSlice = createSlice({
     reducers: {
         setFilters: (state, action) => {
             state.filters = action.payload;
-        }
+        },
+  
     },
 
     extraReducers: (builder) => {

@@ -1,0 +1,16 @@
+{
+  "My Profile": "मेरी प्रोफ़ाइल",
+  "Profile": "प्रोफ़ाइल",
+  "Personal Information": "व्यक्तिगत जानकारी",
+  "Father's Name": "पिता का नाम",
+  "Email": "ईमेल",
+  "Mother's Name": "माता का नाम",
+  "Guardian's Name": "अभिभावक का नाम",
+  "Reset Your Password": "अपना पासवर्ड रीसेट करें",
+  "Current Password": "वर्तमान पासवर्ड",
+  "New Password": "नया पासवर्ड",
+  "Re-enter Password": "पासवर्ड फिर से दर्ज करें",
+  "Update Password": "पासवर्ड अपडेट करें",
+  "Cancel": "रद्द करें",
+  "Passwords do not match.": "पासवर्ड मेल नहीं खाते।"
+}

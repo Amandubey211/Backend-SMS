@@ -25,7 +25,7 @@ const useGetNotices = () => {
       setLoading(false);
     } catch (err) {
       const errorMessage = err.response?.data?.message || "Failed to fetch notices";
-      toast.error(errorMessage);
+      // toast.error(errorMessage);
       setLoading(false);
       setError(errorMessage);
     }

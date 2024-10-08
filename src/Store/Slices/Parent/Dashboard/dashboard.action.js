@@ -27,7 +27,7 @@ export const fetchDashboardCards = createAsyncThunk(
         return rejectWithValue("Failed to fetch dashboard data");
       }
     } catch (error) {
-      const errorMessage = error.response?.data?.message || "Failed to fetch dashboard data";
+      const errorMessage = error.response?.data?.message || error.message ||"Failed to fetch dashboard data";
       return rejectWithValue(errorMessage);
     }
   }
@@ -54,9 +54,9 @@ export const fetchNotices = createAsyncThunk(
       console.log("API Response for Notices:", response.data.notices); // Log API response
       return response.data.notices;
     } catch (error) {
-      const errorMessage = error.response?.data?.message || "Failed to fetch notices";
-      toast.error(errorMessage);
-      return rejectWithValue(errorMessage);  // Reject with the error message instead of returning []
+      const errorMessage = error.response?.data?.message || error.message || "Failed to fetch notices";
+      // toast.error(errorMessage);
+      return rejectWithValue(errorMessage);  // Reject with the error message
     }
   }
 );
@@ -71,7 +71,7 @@ export const fetchChildren = createAsyncThunk(
 
     if (!userData || !userData.email) {
       const errorMessage = "No guardian email found";
-      toast.error(errorMessage);
+      // toast.error(errorMessage);
       return rejectWithValue(errorMessage); // Reject if userData or email is not found
     }
 
@@ -87,8 +87,8 @@ export const fetchChildren = createAsyncThunk(
       return response.data.children;
     } catch (error) {
       const errorMessage =
-        error.response?.data?.message || "Failed to fetch children data";
-      toast.error(errorMessage);
+        error.response?.data?.message || error.message || "Failed to fetch children data";
+      // toast.error(errorMessage);
       return rejectWithValue(errorMessage); // Reject with the error message instead of returning []
     }
   }
@@ -103,7 +103,7 @@ export const fetchAccountingData = createAsyncThunk(
 
     if (!token) {
       const errorMessage = "Token not found";
-      toast.error(errorMessage);
+      // toast.error(errorMessage);
       return rejectWithValue(errorMessage); // Reject if the token is missing
     }
 
@@ -115,8 +115,8 @@ export const fetchAccountingData = createAsyncThunk(
       });
       return response.data;
     } catch (error) {
-      const errorMessage = error.response?.data?.message || "Failed to fetch accounting data";
-      toast.error(errorMessage);
+      const errorMessage = error.response?.data?.message || error.message ||"Failed to fetch accounting data";
+      // toast.error(errorMessage);
       return rejectWithValue(errorMessage);  // Reject with error message instead of returning null
     }
   }

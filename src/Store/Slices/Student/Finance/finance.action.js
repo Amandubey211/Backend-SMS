@@ -2,17 +2,24 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { baseUrl } from "../../../../config/Common";
 import axios from "axios";
+import { ErrorMsg } from "../../Common/Alerts/errorhandling.action";
+import { setShowError } from "../../Common/Alerts/alertsSlice";
+
 
 
 // fetch student fees details
 export const StudentFinanceDetails = createAsyncThunk(
   `fees/StudentFinanceDetails`,
-  async (_, { rejectWithValue }) => {
+  async (_, { rejectWithValue, dispatch }) => {
     const token = localStorage.getItem("student:token");
     if (!token) {
+      dispatch(setShowError(true));
       return rejectWithValue(`Authentication failed!`);
     }
+    
     try {
+      dispatch(setShowError(false));
+
       const res = await axios.get(`${baseUrl}/student/my_fees`, {
         headers: { Authentication: token },
       });
@@ -21,8 +28,9 @@ export const StudentFinanceDetails = createAsyncThunk(
       return data;
     } catch (error) {
       console.log("Error in StudentFinanceDetails:", error);
-      // Return a detailed error message with `rejectWithValue` for better control
-      return rejectWithValue(error?.response?.data?.message || error?.message || "Something Went Wrong!");
+      const err = ErrorMsg(error);
+      dispatch(setShowError(true));
+      return rejectWithValue(err.message);
     }
   }
 )

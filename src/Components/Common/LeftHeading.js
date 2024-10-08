@@ -8,7 +8,7 @@ const LeftHeading = ({ leftHeading, navigate }) => {
     <div className="flex-1 text-md font-semibold ps-4 capitalize">
       {subHeading ? (
         <div className="flex items-center gap-1">
-          <span className="opacity-55 font-bold flex items-center text-gray-500">
+          <span className="opacity-55  flex items-center text-gray-500">
             <button
               onClick={() => navigate(-1)}
               className="mr-1 capitalize"

@@ -10,8 +10,10 @@ import leaveIcon from '../../../Assets/ParentAssets/svg/leave.png';
 import './ChildrenAttendance.css';
 import useNavHeading from "../../../Hooks/CommonHooks/useNavHeading .js";
 import CustomSpinner from '../../../Components/Common/Spinner.js'; // Custom loading spinner
+import { useTranslation } from "react-i18next"; // Import useTranslation
 
 const MyChildAttendance = () => {
+  const { t } = useTranslation('prtChildrens'); // Initialize translation hook
   const dispatch = useDispatch();
   const { attendance, loading, error, children } = useSelector((state) => state.Parent.children); // Access Redux state
   const [month, setMonth] = useState(new Date().getMonth() + 1);
@@ -33,7 +35,7 @@ const MyChildAttendance = () => {
     setYear(value.year());
   };
 
-  useNavHeading("My Childs", "Attendance");
+  useNavHeading(t("My Childs"), t("Attendance"));
 
   // Move dateCellRender function outside of any callback to follow React Hooks rules
   const dateCellRender = useCallback((value) => {

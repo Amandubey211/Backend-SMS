@@ -16,7 +16,7 @@ const MainSection = () => {
   const { cid } = useParams();
   const dispatch = useDispatch();
 
-  const { assignedTeachers, loading, error, selectedSection } = useSelector(
+  const { assignedTeachers, loading, error } = useSelector(
     (state) => state.admin.teacher
   );
   const role = useSelector((state) => state.common.auth.role);
@@ -46,6 +46,11 @@ const MainSection = () => {
   const handleSidebarSubmit = useCallback(
     (e) => {
       e.preventDefault();
+      if (!subjectId || !sectionId) {
+        alert("Both Subject and Section are required.");
+        return;
+      }
+
       const assignData = {
         teacherId: selectedTeacher._id,
         classId: cid,
@@ -63,7 +68,9 @@ const MainSection = () => {
       <NavigationBar />
       <div className="flex flex-wrap justify-start px-2 items-center">
         {loading ? (
-          <Spinner />
+          <div className="h-96 w-full flex justify-center items-center">
+            <Spinner />
+          </div>
         ) : error ? (
           <div className="h-96 w-full flex justify-center items-center">
             <NoDataFound />

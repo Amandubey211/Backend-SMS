@@ -5,6 +5,7 @@ import { combineReducers } from "redux";
 // common
 import authReducer from "./Slices/Common/Auth/reducers/authSlice"; // Importing the auth slice reducer
 import userReducer from "./Slices/Common/User/reducers/userSlice"; // Importing the user slice reducer
+import alertReducer from "./Slices/Common/Alerts/alertsSlice";
 // admin
 import teacherReducer from "./Slices/Admin/Class/Teachers/teacherSlice";
 import classReducer from "./Slices/Admin/Class/reducer/classSlice"; // Importing the combined admin reducer
@@ -16,19 +17,29 @@ import verificationReducer from "./Slices/Admin/Verification/VerificationSlice";
 import adminLibraryReducer from "./Slices/Admin/Library/LibrarySlice";
 import adminEventReducer from "./Slices/Admin/NoticeBoard/Events/eventSlice";
 import adminNoticeReducer from "./Slices/Admin/NoticeBoard/Notice/noticeSlice";
+
 import allStudentReducer from "./Slices/Admin/Users/Students/studentSlice";
 import allParentReducer from "./Slices/Admin/Users/Parents/parentSilce";
 import allstaffReducer from "./Slices/Admin/Users/Staff/staffSlice";
+import earningReducer from "./Slices/Admin/Accounting/Earning/earningSlice";
+import studentFeesReducer from "./Slices/Admin/Accounting/StudentFees/studentFeesSlice";
+import expensesReducer from "./Slices/Admin/Accounting/Expenses/expensesSlice"
 // student
+import studentDashboardReducer from "./Slices/Student/Dashboard/studentDashboardSlices";
 import studentFinanceReducer from "./Slices/Student/Finance/financeSlice";
 import studentLibraryBooksReducer from "./Slices/Student/Library/libararySlice";
 import studentIssueBooksReducer from "./Slices/Student/Library/bookIssuesSlice";
 import studentAnnouncementReducer from "../Store/Slices/Student/Noticeboard/noticeSlice";
 import studentEventReducer from "../Store/Slices/Student/Noticeboard/eventsSlice";
+
 import studentClassReducer from "../Store/Slices/Student/MyClass/Class/classSlice";
 import studentClassTeacherReducer from "../Store/Slices/Student/MyClass/Class/classTeacher/classTeacherSlice";
 import studentClassmateReducer from "../Store/Slices/Student/MyClass/Class/classMates/classmateSlice";
-import studentAttendancereducer from "../Store/Slices/Student/MyClass/Class/Attendance/stdAttendanceSlice";
+import studentAttendanceReducer from "../Store/Slices/Student/MyClass/Class/Attendance/stdAttendanceSlice";
+import studentSubjectReducer from "../Store/Slices/Student/MyClass/Class/Subjects/subjectSlice";
+import studentModuleReducer from "../Store/Slices/Student/MyClass/Class/Subjects/Modules/moduleSlice";
+import studentSyllabusReducer from "../Store/Slices/Student/MyClass/Class/Subjects/Syllabus/syllabusSlice";
+import studentPagesReducer from "../Store/Slices/Student/MyClass/Class/Subjects/Pages/pagesSlice";
 
 // parent
 import dashboardReducer from "../Store/Slices/Parent/Dashboard/dashboardSlice";
@@ -39,6 +50,7 @@ import libraryReducer from "../Store/Slices/Parent/Library/librarySlices";
 import eventReducer from "../Store/Slices/Parent/Events/eventSlice";
 
 // Persist configuration for the Auth slice
+
 const authPersistConfig = {
   key: "auth",
   storage,
@@ -63,10 +75,17 @@ const userPersistConfig = {
   ], // Whitelt fields based on the refined state structure in userSlicesed on the refined state structure in userSlice
 };
 
+const stdSubjectPersistConfig = {
+  key: "stdSubject",
+  storage,
+  whitelist: ["subject"],
+};
+
 // Combine the Auth and User reducers under a Common entity
 const commonReducer = combineReducers({
   auth: persistReducer(authPersistConfig, authReducer),
   user: persistReducer(userPersistConfig, userReducer),
+  alertMsg: alertReducer,
 });
 const AdminReducer = combineReducers({
   class: classReducer,
@@ -79,12 +98,17 @@ const AdminReducer = combineReducers({
   library: adminLibraryReducer,
   events: adminEventReducer,
   notice: adminNoticeReducer,
+
   all_students:allStudentReducer,
   all_parents:allParentReducer,
   all_staff:allstaffReducer,
+  earning: earningReducer,
+  student_fees: studentFeesReducer,
+  expenses: expensesReducer,
 });
 
 const studentReducer = combineReducers({
+  studentDashboard: studentDashboardReducer,
   studentFinance: studentFinanceReducer,
   studentLibraryBooks: studentLibraryBooksReducer,
   studentIssueBooks: studentIssueBooksReducer,
@@ -93,7 +117,14 @@ const studentReducer = combineReducers({
   studentClass: studentClassReducer,
   studentClassTeacher: studentClassTeacherReducer,
   studentClassmate: studentClassmateReducer,
-  studentAttendance: studentAttendancereducer,
+  studentAttendance: studentAttendanceReducer,
+  studentSubject: persistReducer(
+    stdSubjectPersistConfig,
+    studentSubjectReducer
+  ),
+  studentModule: studentModuleReducer,
+  studentSyllabus: studentSyllabusReducer,
+  studentPages: studentPagesReducer,
 });
 
 const ParentReducer = combineReducers({

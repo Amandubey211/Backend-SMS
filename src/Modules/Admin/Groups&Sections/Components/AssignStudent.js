@@ -5,29 +5,31 @@ import toast from "react-hot-toast";
 import {
   assignStudentToSection,
   fetchGroupsByClass,
+  fetchSectionsByClass,
+  fetchUnassignedStudents,
 } from "../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
 
-const AssignStudent = ({
-  name,
-  imageUrl,
-  section,
-  studentId,
-  onAssignmentComplete,
-}) => {
+const AssignStudent = ({ name, imageUrl, section, studentId }) => {
   const [sectionId, setSectionId] = useState("");
-  const [groupId, setGroupId] = useState("");
   const AllSections = useSelector(
     (store) => store.admin.group_section.sectionsList
   );
-  const AllGroups = useSelector(
-    (store) => store.admin.group_section.groupsList
-  );
+
   const { cid } = useParams();
   const dispatch = useDispatch();
 
+  // Preload the sectionId if the student already has a section
   useEffect(() => {
-    dispatch(fetchGroupsByClass(cid));
-  }, [cid, dispatch]);
+    if (AllSections.length === 0) dispatch(fetchSectionsByClass(cid));
+
+    // If the student already has a section assigned, preload it in the dropdown
+    const sectionToPreload = AllSections.find(
+      (sec) => sec.sectionName === section
+    );
+    if (sectionToPreload) {
+      setSectionId(sectionToPreload._id);
+    }
+  }, [cid, dispatch, section, AllSections]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -38,9 +40,10 @@ const AssignStudent = ({
     }
     try {
       await dispatch(assignStudentToSection({ studentId, sectionId }));
-      if (onAssignmentComplete) {
-        onAssignmentComplete();
-      }
+
+      dispatch(fetchUnassignedStudents(cid)); // Refetch unassigned students
+      dispatch(fetchGroupsByClass(cid)); // Refetch groups after assignment
+      toast.success("Student assigned successfully!");
     } catch (error) {
       toast.error(error.message || "Something went wrong");
     }

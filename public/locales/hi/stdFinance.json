@@ -11,5 +11,12 @@
     "Amount": "राशि",
     "Pay Now": "अभी भुगतान करें",
     "Total Unpaid Fees": "कुल अवैतनिक शुल्क",
-    "Total Paid Fees": "कुल भुगतान की गई राशि"
+    "Total Paid Fees": "कुल भुगतान की गई राशि",
+
+
+    
+    "Due Fees": "शुल्क बकाया",
+    "Upcoming Exams": "आगामी परीक्षाएँ",
+    "Result Published": "परिणाम प्रकाशित",
+    "Total Expense": "कुल खर्च"
 }

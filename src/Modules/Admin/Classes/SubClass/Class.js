@@ -9,7 +9,7 @@ const Class = () => {
   const className = useSelector(
     (store) => store.common.user.classInfo.selectedClassName
   );
-  useNavHeading(className);
+  useNavHeading("Class", className);
 
   return (
     <Layout title={`${className} | Student diwan`}>

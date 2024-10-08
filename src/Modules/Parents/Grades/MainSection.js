@@ -5,14 +5,16 @@ import { fetchModules, fetchSubjects } from "../../../Store/Slices/Parent/Childr
 import Chapter from "../../Admin/UsersProfiles/StudentProfile/Components/StudentCourseProgress/Module/Components/Chapter";
 import ModuleCard from "../../Admin/UsersProfiles/StudentProfile/Components/StudentCourseProgress/Module/Components/ModuleCard";
 import useNavHeading from "../../../Hooks/CommonHooks/useNavHeading .js";
+import { useTranslation } from "react-i18next";
 
 const MainSection = ({ student, selectedSubjectId, setSelectedSubjectId }) => {
+  const { t } = useTranslation('prtChildrens'); 
   const dispatch = useDispatch();
   const [expandedChapters, setExpandedChapters] = useState(null);
 
   const { modules, subjects, loading, error } = useSelector((state) => state.Parent.children);
 
-  useNavHeading("My Childs", "Subject Progress");
+  useNavHeading(t("My Childs"), t("Subject Progress"));
 
   // Fetch subjects when student.id is available
   useEffect(() => {
@@ -54,11 +56,11 @@ const MainSection = ({ student, selectedSubjectId, setSelectedSubjectId }) => {
           {/* Show loading or error state */}
           {loading ? (
             <div className="flex justify-center items-center my-20 h-full w-full">
-              <p className="text-gray-500">Loading data...</p>
+              <p className="text-gray-500">{t("Loading data")}...</p>
             </div>
           ) : error ? (
             <div className="flex justify-center items-center my-20 h-full w-full">
-              <p className="text-gray-500">Error loading data: {error}</p>
+              <p className="text-gray-500">{t("Error loading data")}: {error}</p>
             </div>
           ) : modules?.length > 0 ? (
             modules?.map((module, index) => (
@@ -89,7 +91,7 @@ const MainSection = ({ student, selectedSubjectId, setSelectedSubjectId }) => {
       <div className="w-[35%] p-2 border-l-2">
         <div className="bg-white p-4 rounded-lg">
           <div className="flex justify-between items-center mb-2">
-            <h2 className="text-lg font-semibold">All Modules</h2>
+            <h2 className="text-lg font-semibold">{t("All Modules")}</h2>
           </div>
           <div className="grid grid-cols-1 gap-2">
             {modules?.length > 0 ? (
@@ -113,7 +115,7 @@ const MainSection = ({ student, selectedSubjectId, setSelectedSubjectId }) => {
               <div className="flex justify-center items-center font-bold text-gray-500 my-20 h-full w-full">
                 <div className="flex items-center justify-center flex-col text-2xl">
                   <GoAlertFill className="text-[5rem] text-gray-500" />
-                  No Modules Found
+                  {t("No Modules Found")}
                 </div>
               </div>
             )}

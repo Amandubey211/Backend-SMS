@@ -1,4 +1,3 @@
-// src/Modules/Admin/Libary/Components/AddIssue.js
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { issueBookThunk } from "../../../../Store/Slices/Admin/Library/LibraryThunks";
@@ -6,9 +5,9 @@ import { fetchSectionsByClass } from "../../../../Store/Slices/Admin/Class/Secti
 import { fetchStudentsByClassAndSection } from "../../../../Store/Slices/Admin/Class/Students/studentThunks";
 import FormInput from "../../Accounting/subClass/component/FormInput";
 
-const AddIssue = ({ onClose }) => {
+const AddIssue = ({ onClose, editIssueData }) => {
   const dispatch = useDispatch();
-  const { books, editIssueData } = useSelector((state) => state.admin.library);
+  const { books } = useSelector((state) => state.admin.library);
   const sectionList = useSelector(
     (state) => state.admin.group_section.sectionsList
   );
@@ -23,11 +22,13 @@ const AddIssue = ({ onClose }) => {
     authorName: "",
     issueDate: "",
     returnDate: "",
-    status: "",
+    status: "Pending",
   });
 
+  // Reset form when switching between add and edit modes
   useEffect(() => {
     if (editIssueData) {
+      // Populate the form with the data for editing
       setIssueData({
         class: editIssueData.classId?._id || "",
         section: editIssueData.sectionId?._id || "",
@@ -38,22 +39,38 @@ const AddIssue = ({ onClose }) => {
         returnDate: editIssueData.returnDate?.slice(0, 10) || "",
         status: editIssueData.status || "",
       });
+
+      // Fetch sections for the selected class
       if (editIssueData.classId?._id) {
         dispatch(fetchSectionsByClass(editIssueData.classId._id));
       }
+
+      // Fetch students for the selected section
       if (editIssueData.sectionId?._id) {
         dispatch(fetchStudentsByClassAndSection(editIssueData.sectionId._id));
       }
+    } else {
+      // Reset form for adding a new issue
+      setIssueData({
+        class: "",
+        section: "",
+        student: "",
+        book: "",
+        authorName: "",
+        issueDate: "",
+        returnDate: "",
+        status: "Pending",
+      });
     }
   }, [editIssueData, dispatch]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     if (name === "class") {
-      dispatch(fetchSectionsByClass(value));
+      dispatch(fetchSectionsByClass(value)); // Fetch sections when class changes
     }
     if (name === "section") {
-      dispatch(fetchStudentsByClassAndSection(value));
+      dispatch(fetchStudentsByClassAndSection(value)); // Fetch students when section changes
     }
     setIssueData((prev) => ({
       ...prev,
@@ -88,117 +105,155 @@ const AddIssue = ({ onClose }) => {
   };
 
   return (
-    <form className="h-auto" onSubmit={handleSubmit}>
-      <label htmlFor="class">Class</label>
-      <select
-        id="class"
-        name="class"
-        value={issueData.class}
-        onChange={handleInputChange}
-        required
-        className="w-full p-2 border rounded"
-      >
-        <option value="">Select Class</option>
-        {classList.map((cls) => (
-          <option key={cls._id} value={cls._id}>
-            {cls.className}
-          </option>
-        ))}
-      </select>
 
-      <label htmlFor="section">Section</label>
-      <select
-        id="section"
-        name="section"
-        value={issueData.section}
-        onChange={handleInputChange}
-        className="w-full p-2 border rounded"
-      >
-        <option value="">Select Section</option>
-        {sectionList.map((section) => (
-          <option key={section._id} value={section._id}>
-            {section.sectionName}
-          </option>
-        ))}
-      </select>
+    <form className="flex flex-col h-full space-y-6" onSubmit={handleSubmit}>
+      <div className="flex-1 overflow-auto no-scrollbar px-5 space-y-4">
+        <div>
+          <label
+            htmlFor="class"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Class
+          </label>
+          <select
+            id="class"
+            name="class"
+            value={issueData.class}
+            onChange={handleInputChange}
+            required
+            className="block w-full p-2 mt-1 border rounded focus:ring-indigo-500 focus:border-indigo-500"
+          >
+            <option value="">Select Class</option>
+            {classList.map((cls) => (
+              <option key={cls._id} value={cls._id}>
+                {cls.className}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label
+            htmlFor="section"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Section
+          </label>
+          <select
+            id="section"
+            name="section"
+            value={issueData.section}
+            onChange={handleInputChange}
+            className="block w-full p-2 mt-1 border rounded focus:ring-indigo-500 focus:border-indigo-500"
+          >
+            <option value="">Select Section</option>
+            {sectionList.map((section) => (
+              <option key={section._id} value={section._id}>
+                {section.sectionName}
+              </option>
+            ))}
+          </select>
+        </div>
 
-      <label htmlFor="student">Student</label>
-      <select
-        id="student"
-        name="student"
-        value={issueData.student}
-        onChange={handleInputChange}
-        required
-        className="w-full p-2 border rounded"
-      >
-        <option value="">Select Student</option>
-        {studentList.map((student) => (
-          <option key={student._id} value={student._id}>
-            {student.firstName} {student.lastName}
-          </option>
-        ))}
-      </select>
+        <div>
+          <label
+            htmlFor="student"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Student
+          </label>
+          <select
+            id="student"
+            name="student"
+            value={issueData.student}
+            onChange={handleInputChange}
+            required
+            className="block w-full p-2 mt-1 border rounded focus:ring-indigo-500 focus:border-indigo-500"
+          >
+            <option value="">Select Student</option>
+            {studentList.map((student) => (
+              <option key={student._id} value={student._id}>
+                {student.firstName} {student.lastName}
+              </option>
+            ))}
+          </select>
+        </div>
 
-      <label htmlFor="book">Book</label>
-      <select
-        id="book"
-        name="book"
-        value={issueData.book}
-        onChange={handleInputChange}
-        className="w-full p-2 border rounded"
-      >
-        <option value="">Select Book</option>
-        {books.map((book) => (
-          <option key={book._id} value={book._id}>
-            {book.name}
-          </option>
-        ))}
-      </select>
+        <div>
+          <label
+            htmlFor="book"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Book
+          </label>
+          <select
+            id="book"
+            name="book"
+            value={issueData.book}
+            onChange={handleInputChange}
+            className="block w-full p-2 mt-1 border rounded focus:ring-indigo-500 focus:border-indigo-500"
+          >
+            <option value="">Select Book</option>
+            {books.map((book) => (
+              <option key={book._id} value={book._id}>
+                {book.name}
+              </option>
+            ))}
+          </select>
+        </div>
 
-      <FormInput
-        id="authorName"
-        name="authorName"
-        label="Author Name"
-        value={issueData.authorName}
-        onChange={handleInputChange}
-      />
-      <FormInput
-        id="issueDate"
-        name="issueDate"
-        label="Issue Date"
-        type="date"
-        value={issueData.issueDate}
-        onChange={handleInputChange}
-        required
-      />
-      <FormInput
-        id="returnDate"
-        name="returnDate"
-        label="Return Date"
-        type="date"
-        value={issueData.returnDate}
-        onChange={handleInputChange}
-        required
-      />
+        <FormInput
+          id="authorName"
+          name="authorName"
+          label="Author Name"
+          value={issueData.authorName}
+          onChange={handleInputChange}
+        />
+        <FormInput
+          id="issueDate"
+          name="issueDate"
+          label="Issue Date"
+          type="date"
+          value={issueData.issueDate}
+          onChange={handleInputChange}
+          required
+        />
+        <FormInput
+          id="returnDate"
+          name="returnDate"
+          label="Return Date"
+          type="date"
+          value={issueData.returnDate}
+          onChange={handleInputChange}
+          required
+        />
 
-      <label htmlFor="status">Status</label>
-      <select
-        id="status"
-        name="status"
-        value={issueData.status}
-        onChange={handleInputChange}
-        className="w-full p-2 border rounded"
-      >
-        <option value="Pending">Pending</option>
-        <option value="Returned">Returned</option>
-      </select>
-
-      <button
-        type="submit"
-        className="w-full mt-4 p-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md"
-      >
-        {editIssueData ? "Edit Book Issue" : "Add Book Issue"}
-      </button>
+        <div className="pb-8">
+          <label
+            htmlFor="status"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Status
+          </label>
+          <select
+            id="status"
+            name="status"
+            value={issueData.status}
+            onChange={handleInputChange}
+            className="block w-full p-2 mt-1 border rounded focus:ring-indigo-500 focus:border-indigo-500"
+          >
+            <option value="Pending">Pending</option>
+            <option value="Returned">Returned</option>
+          </select>
+        </div>
+      </div>
+      <div className="sticky bottom-0 w-full bg-white pb-3 px-5">
+        <button
+          type="submit"
+          className="w-full p-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-md hover:from-pink-600 hover:to-purple-600"
+        >
+          {editIssueData ? "Edit Book Issue" : "Add Book Issue"}
+        </button>
+      </div>
     </form>
   );
 };

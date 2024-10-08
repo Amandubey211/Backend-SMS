@@ -21,11 +21,13 @@ import {
   setTitleToDelete,
   resetTitleToDelete,
 } from "../../../../Store/Slices/Admin/NoticeBoard/Notice/noticeSlice";
+import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 
 const AdminNotice = () => {
   const { loading, error, notices, editMode, titleToDelete } = useSelector(
     (store) => store.admin.notice
   );
+  const Role = useSelector((store) => store.common.auth.role);
   const dispatch = useDispatch();
 
   const [isSidebarOpen, setSidebarOpen] = useState(false); // Sidebar state
@@ -73,9 +75,9 @@ const AdminNotice = () => {
     dispatch(setEditMode(true));
     setSidebarOpen(true); // Open sidebar with edit mode
   };
-
+  useNavHeading(Role, "Notices");
   return (
-    <Layout title="Admin Notice Board">
+    <Layout title=" Notice | Student diwan">
       <DashLayout>
         <div className="p-5">
           <h1 className="bg-gradient-to-r from-pink-500 to-purple-500 text-transparent bg-clip-text font-semibold">
