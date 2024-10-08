@@ -6,7 +6,11 @@ import { combineReducers } from "redux";
 import authReducer from "./Slices/Common/Auth/reducers/authSlice"; // Importing the auth slice reducer
 import userReducer from "./Slices/Common/User/reducers/userSlice"; // Importing the user slice reducer
 import alertReducer from "./Slices/Common/Alerts/alertsSlice";
+
+
+
 // admin
+import adminDashboardReducer from "./Slices/Admin/Dashboard/adminDashboardSlice";
 import teacherReducer from "./Slices/Admin/Class/Teachers/teacherSlice";
 import classReducer from "./Slices/Admin/Class/reducer/classSlice"; // Importing the combined admin reducer
 import subjectReducer from "./Slices/Admin/Class/Subject/subjectSlice";
@@ -18,12 +22,16 @@ import adminLibraryReducer from "./Slices/Admin/Library/LibrarySlice";
 import adminEventReducer from "./Slices/Admin/NoticeBoard/Events/eventSlice";
 import adminNoticeReducer from "./Slices/Admin/NoticeBoard/Notice/noticeSlice";
 
+
+
+
 import allStudentReducer from "./Slices/Admin/Users/Students/studentSlice";
 import allParentReducer from "./Slices/Admin/Users/Parents/parentSilce";
 import allstaffReducer from "./Slices/Admin/Users/Staff/staffSlice";
 import earningReducer from "./Slices/Admin/Accounting/Earning/earningSlice";
 import studentFeesReducer from "./Slices/Admin/Accounting/StudentFees/studentFeesSlice";
 import expensesReducer from "./Slices/Admin/Accounting/Expenses/expensesSlice"
+
 // student
 import studentDashboardReducer from "./Slices/Student/Dashboard/studentDashboardSlices";
 import studentFinanceReducer from "./Slices/Student/Finance/financeSlice";
@@ -88,6 +96,7 @@ const commonReducer = combineReducers({
   alertMsg: alertReducer,
 });
 const AdminReducer = combineReducers({
+  adminDashboard: adminDashboardReducer,
   class: classReducer,
   subject: subjectReducer,
   group_section: sectionReducer,

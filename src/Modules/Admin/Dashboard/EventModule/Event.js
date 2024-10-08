@@ -1,14 +1,14 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, memo } from "react";
 import {
   IoIosArrowForward,
   IoIosArrowBack,
-  IoIosArrowDown,
 } from "react-icons/io";
 import { FaCalendarAlt } from "react-icons/fa";
-import useGetFilteredEvents from "../../../../Hooks/AuthHooks/Staff/Admin/Dashboard/useGetFilteredEvents";
 import Spinner from "../../../../Components/Common/Spinner";
 import EventItem from "./EventItem";
 import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux"; // Import Redux hooks
+import { fetchFilteredEvents } from "../../../../Store/Slices/Admin/Dashboard/adminDashboard.action"; // Import the action
 
 const monthNames = [
   "JANUARY",
@@ -26,9 +26,11 @@ const monthNames = [
 ];
 
 const Events = () => {
-  const { error, events, fetchFilteredEvents, loading } =
-    useGetFilteredEvents();
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  // Extract events, loading, and error from the Redux store
+  const { events, loading, error } = useSelector((state) => state.admin.adminDashboard);
 
   const currentMonth = new Date().getMonth() + 1; // Months are zero-indexed
   const currentYear = new Date().getFullYear();
@@ -36,8 +38,8 @@ const Events = () => {
   const [date, setDate] = useState({ month: currentMonth, year: currentYear });
 
   const fetchEvents = useCallback(() => {
-    fetchFilteredEvents?.(date.month, date.year);
-  }, [date, fetchFilteredEvents]);
+    dispatch(fetchFilteredEvents({ month: date.month, year: date.year }));
+  }, [date, dispatch]);
 
   useEffect(() => {
     fetchEvents();
@@ -80,10 +82,7 @@ const Events = () => {
   };
 
   const handleUpdateEvent = (updatedEvent) => {
-    const updatedEvents = events?.map((event) =>
-      event?.id === updatedEvent?.id ? updatedEvent : event
-    );
-    fetchFilteredEvents?.(updatedEvents);
+    // For now, this function can be a placeholder as events will be re-fetched when updating
   };
 
   const top5Events = events?.slice?.(0, 5) || [];
@@ -108,7 +107,7 @@ const Events = () => {
         </div>
 
         <button
-          className="text-blue-500 hover:underline ml-2"
+          className="text-black border border-gray-300 px-4 py-2 rounded-md hover:shadow-md transition duration-300 ease-in-out"
           onClick={handleViewAll}
         >
           View All
@@ -125,7 +124,10 @@ const Events = () => {
             <Spinner />
           </div>
         ) : error ? (
-          <p>Error: {error}</p>
+          <div className="flex flex-col items-center justify-center my-10">
+            <FaCalendarAlt className="text-red-400 text-6xl mb-4" />
+            <p className="text-gray-500 text-xl">Error: {error}</p>
+          </div>
         ) : top5Events?.length === 0 ? (
           <div className="flex flex-col items-center justify-center my-10">
             <FaCalendarAlt className="text-gray-400 text-6xl mb-4" />
@@ -145,4 +147,4 @@ const Events = () => {
   );
 };
 
-export default Events;
+export default memo(Events);
