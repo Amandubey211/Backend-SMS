@@ -18,7 +18,7 @@ const Notice = ({ title, date, priority, content, image, backgroundColor, descri
           className="h-16 w-16 rounded-md flex items-center justify-center"
           style={{ backgroundColor }}
         >
-          <img src={image} alt="icon" className="h-8 w-8 object-contain" />
+          <img src={image} alt="icon" className="h-12 w-12 object-contain" />
         </div>
       </div>
       <div className="flex flex-col gap-1 flex-grow">
