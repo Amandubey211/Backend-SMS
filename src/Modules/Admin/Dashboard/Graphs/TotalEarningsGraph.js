@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, memo } from "react";
 import { Line } from "react-chartjs-2";
 import { Chart as ChartJS, registerables } from "chart.js";
 import { FiCalendar } from "react-icons/fi";
@@ -312,4 +312,4 @@ const TotalEarningsGraph = () => {
   );
 };
 
-export default TotalEarningsGraph;
+export default memo(TotalEarningsGraph);

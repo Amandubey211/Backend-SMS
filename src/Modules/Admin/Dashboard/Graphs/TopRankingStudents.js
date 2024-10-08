@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo }from "react";
 import TopRanker from "../../../../Assets/DashboardAssets/Aman dubey.png";
 import nodataimg from "../../../../Assets/DashboardAssets/nodata.png";
 const TopRankingStudents = () => {
@@ -161,4 +161,4 @@ const TopRankingStudents = () => {
   );
 };
 
-export default TopRankingStudents;
+export default memo(TopRankingStudents);

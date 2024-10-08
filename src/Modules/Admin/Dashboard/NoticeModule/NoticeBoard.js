@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, memo } from "react";
 import Notice from "./Notice";
 import Fallback from "../../../../Components/Common/Fallback";
 import { useNavigate } from "react-router-dom"; // Updated import
@@ -82,4 +82,4 @@ const NoticeBoard = () => {
   );
 };
 
-export default NoticeBoard;
+export default memo(NoticeBoard);

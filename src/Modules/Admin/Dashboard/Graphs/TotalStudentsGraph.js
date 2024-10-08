@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, memo } from "react";
 import { Doughnut } from "react-chartjs-2";
 import { PiStudentBold } from "react-icons/pi"; // No data/error icon
 import Spinner from "../../../../Components/Common/Spinner"; // Import default spinner
@@ -171,4 +171,4 @@ const TotalStudentsGraphjs = () => {
   );
 };
 
-export default TotalStudentsGraphjs;
+export default memo(TotalStudentsGraphjs);

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, memo } from "react";
 import {
   IoIosArrowForward,
   IoIosArrowBack,
@@ -112,8 +112,6 @@ const Events = () => {
         >
           View All
         </button>
-
-
       </div>
       <div className="grid grid-cols-3 gap-4 py-3 font-semibold text-left border-y border-gray-200">
         <h1>Event Name</h1>
@@ -149,4 +147,4 @@ const Events = () => {
   );
 };
 
-export default Events;
+export default memo(Events);

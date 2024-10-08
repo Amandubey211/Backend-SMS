@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, memo } from "react";
 import { useNavigate } from "react-router-dom";
 import BookItem from "./BookItem";
 import { FaBook } from "react-icons/fa"; // For "No data found" icon
@@ -83,4 +83,4 @@ const Library = () => {
   );
 };
 
-export default Library;
+export default memo(Library);

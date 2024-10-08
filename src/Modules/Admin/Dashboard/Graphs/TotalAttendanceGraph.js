@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, memo } from "react";
 import { Bar } from "react-chartjs-2";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAttendanceData } from "../../../../Store/Slices/Admin/Dashboard/adminDashboard.action"; // Adjust path if needed
@@ -282,4 +282,4 @@ const TotalAttendanceGraph = () => {
   );
 };
 
-export default TotalAttendanceGraph;
+export default memo(TotalAttendanceGraph);
