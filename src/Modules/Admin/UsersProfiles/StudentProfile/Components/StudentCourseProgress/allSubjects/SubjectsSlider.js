@@ -5,7 +5,7 @@ import { color } from "@cloudinary/url-gen/qualifiers/background";
 const SubjectsSlider = ({ subjects }) => {
  
   return (
-    <div className="flex  flex-wrap ml-[-10px] gap-4 ">
+    <div className="flex  flex-wrap ml-[-10px] gap-4">
 
       {subjects.map((subject, index) => (
         <>

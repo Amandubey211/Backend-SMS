@@ -2,25 +2,23 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import FormInput from '../../subClass/component/FormInput';
 import { baseUrl } from '../../../../../config/Common';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { createExpense } from '../../../../../Store/Slices/Admin/Accounting/Expenses/expenses.action';
 
 const AddExpense = ({ onCreate }) => {
+
+  const dispatch = useDispatch();
+
   const [formData, setFormData] = useState({
     amount: '',
     date: '',
     reason: '',
     status: 'paid', // Default to paid
   });
-  const role = useSelector((store) => store.Auth.role);
+  //const role = useSelector((store) => store.Auth.role);
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Submitting New Expense:', formData);
-    const token = localStorage.getItem(`${role}:token`);
-
-    if (!token) {
-      console.error('Authentication token is not available.');
-      return;
-    }
+    //console.log('Submitting New Expense:', formData);
 
     const payload = {
       amount: formData.amount,
@@ -29,26 +27,19 @@ const AddExpense = ({ onCreate }) => {
       status: formData.status === 'Paid Expenses' ? 'paid' : 'unpaid',
     };
 
-    const config = {
-      headers: {
-        'Content-Type': 'application/json',
-        'Authentication': `${token}`
-      }
-    };
+    //const response = await axios.post(`${baseUrl}/api/admin/expenses/`, payload, config);
+    //console.log('Expense saved successfully:', response.data);
 
-    try {
-      const response = await axios.post(`${baseUrl}/api/admin/expenses/`, payload, config);
-      console.log('Expense saved successfully:', response.data);
+    dispatch(createExpense({ payload })).then(() => {
       setFormData({
         amount: '',
         date: '',
         reason: '',
         status: 'paid',
       });
-      onCreate();  // Call the onCreate callback to refresh the expenses list
-    } catch (error) {
-      console.error('Error saving the expense:', error.response ? error.response.data.message : error.message);
-    }
+      onCreate();
+    })
+
   };
 
   const handleChange = (e) => {

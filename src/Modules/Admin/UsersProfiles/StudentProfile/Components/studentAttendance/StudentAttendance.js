@@ -1,49 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import AttendanceSummary from  '../../../../../Student/StudentClass/SubClass/Components/Attendance/AttendanceSummary';
 import CalendarHeader from '../../../../../Student/StudentClass/SubClass/Components/Attendance/Calender';
-import axios from 'axios';
 import moment from 'moment';
-import { baseUrl } from '../../../../../../config/Common';
-import { useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
-
-
-const StudentAttendance = ({student}) => {
-    const role = useSelector((store) => store.Auth.role);
-    const [attendanceData, setAttendanceData] = useState({})
+import { useDispatch, useSelector } from 'react-redux';
+import { FaCheckCircle, FaDoorOpen, FaTimesCircle } from 'react-icons/fa';
+import { fetchStudentAttendance } from '../../../../../../Store/Slices/Admin/Users/Students/student.action';
+import { FiLoader } from 'react-icons/fi';
+const StudentAttendance = ({ student }) => {
     const [currentDate, setCurrentDate] = useState(moment());
-    const [summary, setSummary] = useState({ presentCount: 0, absentCount: 0, leaveCount: 0 });
-   
-    const fetchAttendance = async (month, year) => {
-        try {
-            const token = localStorage.getItem(`${role}:token`)
-            if (!token) {
-                throw new Error('Authentication not found');
-            }
-
-            const response = await axios.get(`${baseUrl}/api/studentDashboard/myAttendance`, {
-                params: { month, year,studentId:student._id },
-                headers: {
-                    'Authentication': token
-                }
-            })
-
-            const { report, summary } = response.data.report;
-            const attendanceMap = report.reduce((acc, entry) => {
-                acc[entry.date] = entry.status;
-                return acc;
-            }, {});
-            setAttendanceData(attendanceMap);
-            setSummary(summary);
-
-        } catch (error) {
-            console.error("Failed to fetch Attendance:", error);
-        }
-    }
-
+    const { StudentAttendance, StudentAttendanceSummary, loading } = useSelector((store) => store.admin.all_students);
+    const dispatch = useDispatch();
     useEffect(() => {
-        fetchAttendance(currentDate.month() + 1, currentDate.year());
-    }, [currentDate])
+        dispatch(fetchStudentAttendance({month:currentDate.month() + 1, year:currentDate.year(),studentId:student?._id}));
+    }, [dispatch, currentDate])
 
     const onPanelChange = (value) => {
         setCurrentDate(value);
@@ -51,13 +19,45 @@ const StudentAttendance = ({student}) => {
 
 
     return (
-            <div className="container mx-auto py-4">
-                <AttendanceSummary present={summary.presentCount} absent={summary.absentCount} leave={summary.leaveCount} />
-                <div className='border-b border-t border-gray-200 my-4 p-4'>
-                    <CalendarHeader attendanceData={attendanceData}
-                        onPanelChange={onPanelChange} />
+        loading? <div className="flex w-full h-[90vh] flex-col items-center justify-center">
+            <FiLoader className="animate-spin mr-2 w-[3rem] h-[3rem] " />
+            <p className="text-gray-800 text-lg">Loading...</p>
+            </div>:
+        <div className="container mx-auto py-4">
+            <div className="flex justify-around px-4  space-x-4">
+                <div className="flex items-center bg-green-100 p-4 pl-10 rounded-lg w-1/3">
+                    <div className='bg-white rounded-full p-4'>
+                        <FaCheckCircle className="text-3xl text-green-500" />
+                    </div>
+                    <div className="flex flex-col items-start ml-4">
+                        <span className="text-3xl text-gray-700">{StudentAttendanceSummary?.presentCount || 0}</span>
+                        <span className="mt-1 text-green-600">Total Present</span>
+                    </div>
+                </div>
+                <div className="flex items-center bg-red-100 p-4 rounded-lg w-1/3">
+                    <div className='bg-white rounded-full p-4'>
+                        <FaTimesCircle className="text-3xl text-red-500" />
+                    </div>
+                    <div className="flex flex-col items-start ml-4">
+                        <span className="text-3xl text-gray-700">{StudentAttendanceSummary?.absentCount || 0}</span>
+                        <span className="mt-1 text-red-600">Total Absent</span>
+                    </div>
+                </div>
+                <div className="flex items-center bg-purple-100 p-4 rounded-lg w-1/3">
+                    <div className='bg-white rounded-full p-4'>
+                        <FaDoorOpen className="text-3xl text-purple-500" />
+                    </div>
+                    <div className="flex flex-col items-start ml-4">
+                        <span className="text-3xl text-gray-700">{StudentAttendanceSummary?.leaveCount || 0}</span>
+                        <span className="mt-1 text-purple-600">Total Leave</span>
+                    </div>
                 </div>
             </div>
+            <div className='border-b border-t border-gray-200 my-4 p-4'>
+                <CalendarHeader attendanceData={StudentAttendance}
+                    onPanelChange={onPanelChange} />
+            </div>
+        </div>
     );
 };
 

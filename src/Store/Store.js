@@ -2,7 +2,6 @@ import { configureStore } from "@reduxjs/toolkit";
 import { persistStore, persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage"; // Defaults to localStorage for web
 import { combineReducers } from "redux";
-
 // common
 import authReducer from "./Slices/Common/Auth/reducers/authSlice"; // Importing the auth slice reducer
 import userReducer from "./Slices/Common/User/reducers/userSlice"; // Importing the user slice reducer
@@ -24,6 +23,14 @@ import adminEventReducer from "./Slices/Admin/NoticeBoard/Events/eventSlice";
 import adminNoticeReducer from "./Slices/Admin/NoticeBoard/Notice/noticeSlice";
 
 
+
+
+import allStudentReducer from "./Slices/Admin/Users/Students/studentSlice";
+import allParentReducer from "./Slices/Admin/Users/Parents/parentSilce";
+import allstaffReducer from "./Slices/Admin/Users/Staff/staffSlice";
+import earningReducer from "./Slices/Admin/Accounting/Earning/earningSlice";
+import studentFeesReducer from "./Slices/Admin/Accounting/StudentFees/studentFeesSlice";
+import expensesReducer from "./Slices/Admin/Accounting/Expenses/expensesSlice"
 
 // student
 import studentDashboardReducer from "./Slices/Student/Dashboard/studentDashboardSlices";
@@ -100,6 +107,13 @@ const AdminReducer = combineReducers({
   library: adminLibraryReducer,
   events: adminEventReducer,
   notice: adminNoticeReducer,
+
+  all_students:allStudentReducer,
+  all_parents:allParentReducer,
+  all_staff:allstaffReducer,
+  earning: earningReducer,
+  student_fees: studentFeesReducer,
+  expenses: expensesReducer,
 });
 
 const studentReducer = combineReducers({

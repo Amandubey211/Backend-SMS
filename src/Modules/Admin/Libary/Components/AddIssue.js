@@ -105,6 +105,7 @@ const AddIssue = ({ onClose, editIssueData }) => {
   };
 
   return (
+
     <form className="flex flex-col h-full space-y-6" onSubmit={handleSubmit}>
       <div className="flex-1 overflow-auto no-scrollbar px-5 space-y-4">
         <div>
@@ -130,7 +131,6 @@ const AddIssue = ({ onClose, editIssueData }) => {
             ))}
           </select>
         </div>
-
         <div>
           <label
             htmlFor="section"

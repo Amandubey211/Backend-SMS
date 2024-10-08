@@ -1,63 +1,35 @@
 import React, { useState, useEffect, useMemo } from "react";
 import BookIssueRow from "../../../../../Student/Library/SubClass/component/BookIssueRow";
-import axios from "axios";
-import { baseUrl } from "../../../../../../config/Common";
 import { useParams } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { GoAlertFill } from "react-icons/go";
+import { FiLoader } from "react-icons/fi";
+import { studentIssueBooks } from "../../../../../../Store/Slices/Admin/Users/Students/student.action";
 
 const BookIssue = () => {
-  const [bookIssueData, setBookIssueData] = useState([]);
-  const [isSidebarOpen, setSidebarOpen] = useState(false);
-  const { cid } = useParams();
+  const { cid:id } = useParams();
   const [filters, setFilters] = useState({
     classLevel: "",
     category: "",
     status: "All",
   });
 
-  const handleSidebarOpen = () => setSidebarOpen(true);
-  const handleSidebarClose = () => setSidebarOpen(false);
-
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
     setFilters((prev) => ({ ...prev, [name]: value }));
   };
-  const role = useSelector((store) => store.Auth.role);
-  const fetchBookIssues = async () => {
-
-    try {
-      const token = localStorage.getItem(`${role}:token`);
-      if (!token) {
-        throw new Error('Authentication token not found');
-      }
-
-      const response = await axios.get(`${baseUrl}/admin/all/bookIssue/?studentId=${cid}`, {
-        headers: {
-          'Authentication': token
-        }
-      });
-
-      const data = response.data?.books?.reverse();
-      console.log("Data parsed:", data);
-
-      setBookIssueData(data);
-
-    } catch (error) {
-      console.error("Failed to fetch book issues:", error);
-    }
-  };
-
+  const {bookIssue,loading} = useSelector((store) => store.admin.all_students);
+   const dispatch = useDispatch()
   useEffect(() => {
-    fetchBookIssues();
-  }, []);
+    dispatch(studentIssueBooks(id))
+  }, [dispatch]);
 
   const filteredBookIssueData = useMemo(() => {
     if (filters.status === "All") {
-      return bookIssueData;
+      return bookIssue;
     }
-    return bookIssueData.filter(item => item.status === filters.status);
-  }, [bookIssueData, filters.status]);
+    return bookIssue.filter(item => item.status === filters.status);
+  }, [bookIssue, filters.status]);
 
   return (
     <div className="min-h-screen p-4 ">
@@ -98,6 +70,10 @@ const BookIssue = () => {
           </div>
         ))}
       </div>
+      {loading?<div className="flex w-full h-[90vh] flex-col items-center justify-center">
+    <FiLoader className="animate-spin mr-2 w-[3rem] h-[3rem] " />
+    <p className="text-gray-800 text-lg">Loading...</p>
+    </div>:
       <div className="overflow-x-auto bg-white shadow rounded-lg">
         <table className="min-w-full">
           <thead>
@@ -111,7 +87,7 @@ const BookIssue = () => {
             </tr>
           </thead>
           {filteredBookIssueData.length > 0 ?  <tbody>
-            {filteredBookIssueData?.map((item) => (
+            {filteredBookIssueData?.reverse().map((item) => (
               <BookIssueRow key={item.id} item={item} />
 
             ))}
@@ -125,7 +101,7 @@ const BookIssue = () => {
         </tr>}
         
         </table>
-      </div>
+      </div>}
     </div>
   );
 };

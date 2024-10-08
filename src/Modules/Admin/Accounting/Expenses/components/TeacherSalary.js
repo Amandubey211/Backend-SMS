@@ -4,8 +4,8 @@ import PaySalary from "./PaySalary";
 import { fetchApi } from '../api/api';
 import { baseUrl } from "../../../../../config/Common";
 import axios from "axios";
-import { useSelector } from "react-redux";
-
+import { useDispatch, useSelector } from "react-redux";
+import { fetchSalaries, updateSalary } from "../../../../../Store/Slices/Admin/Accounting/Expenses/expenses.action";
 const DropdownMenu = ({ onEditClick }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
@@ -57,32 +57,32 @@ const TeacherRow = React.memo(({ teacher, onPayClick, onEditClick }) => (
   <tr className="bg-white">
     <td className="px-5 py-3 border-b border-gray-200 flex items-center">
       {teacher.staffId?.profile ? (
-        <img src={teacher.staffId?.profile} alt="Profile" className="w-10 h-10 rounded-full mr-3" />
+        <img src={teacher?.staffId?.profile} alt="Profile" className="w-10 h-10 rounded-full mr-3" />
       ) : (
         <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center mr-3">
           <span className="text-gray-700 font-semibold">
-            {teacher.staffId?.fullName[0]}
+            {teacher?.staffId?.fullName[0]}
           </span>
         </div>
       )}
       <div>
-        <div>{teacher.staffId?.fullName}</div>
-        <div className="text-sm text-gray-500">{teacher.staffId?.position}</div>
+        <div>{teacher?.staffId?.fullName}</div>
+        <div className="text-sm text-gray-500">{teacher?.staffId?.position}</div>
       </div>
     </td>
-    <td className="px-5 py-2 border-b border-gray-200">{teacher.staffId?.mobileNumber}</td>
-    <td className="px-5 py-2 border-b border-gray-200">{teacher.month}</td>
-    <td className="px-5 py-2 border-b border-gray-200">{teacher.salaryAmount} QR</td>
+    <td className="px-5 py-2 border-b border-gray-200">{teacher?.staffId?.mobileNumber}</td>
+    <td className="px-5 py-2 border-b border-gray-200">{teacher?.month}</td>
+    <td className="px-5 py-2 border-b border-gray-200">{teacher?.salaryAmount} QR</td>
     <td className="px-5 py-2 border-b border-gray-200">
-      {teacher.paidDate ? new Date(teacher.paidDate).toLocaleDateString() : "---"}
+      {teacher?.paidDate ? new Date(teacher?.paidDate).toLocaleDateString() : "---"}
     </td>
     <td className="px-5 py-2 border-b border-gray-200">
-      <span className={`px-3 py-1 text-xs font-semibold ${teacher.status === "paid" ? " text-green-800" : " text-red-800"}`}>
-        {teacher.status}
+      <span className={`px-3 py-1 text-xs font-semibold ${teacher?.status === "paid" ? " text-green-800" : " text-red-800"}`}>
+        {teacher?.status}
       </span>
     </td>
     <td className="px-5 py-2 border-b border-gray-200 flex items-center justify-between space-x-2">
-      {teacher.status === "paid" ? (
+      {teacher?.status === "paid" ? (
         <span className="inline-flex items-center border border-transparent text-xs font-medium shadow-sm bg-green-200 text-green-800 py-1 px-2 rounded-md">
           Completed
         </span>
@@ -99,59 +99,29 @@ const TeacherRow = React.memo(({ teacher, onPayClick, onEditClick }) => (
   </tr>
 ));
 
-const TeacherSalary = ({ initialTeacherData, selectedOption, selectedMonth }) => {
-  const [teacherData, setTeacherData] = useState(initialTeacherData || []);
+const TeacherSalary = ({ selectedOption, selectedMonth }) => {
+
+  const { teacherSalaries, loading } = useSelector((store) => store?.admin?.expenses)
+
+  const dispatch = useDispatch();
+
   const [selectedTeacher, setSelectedTeacher] = useState(null);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [isEditSidebarOpen, setEditSidebarOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const role = useSelector((store) => store.Auth.role);
-  const token = localStorage.getItem(`${role}:token`);
-
-  // Fetch salaries based on filter
-  const fetchSalaries = useCallback(async (query, month) => {
-    try {
-      const year = new Date().getFullYear();
-      const response = await axios.get(`${baseUrl}/admin/staff/get_salary?salaryRole=teacher&status=${query}&month=${month}&year=${year}`,
-        {
-          headers: {
-            Authentication: token
-          }
-        }
-      );
-      setTeacherData(response.data.salaryRecords);
-
-    } catch (error) {
-      console.error('Error fetching salaries:', error);
-    }
-  }, [token]);
 
   useEffect(() => {
-    fetchSalaries(selectedOption, selectedMonth);
-  }, [selectedOption, selectedMonth, fetchSalaries]);
+    dispatch(fetchSalaries({ query: selectedOption, activeTab: "TeacherSalary", month: selectedMonth }))
+  }, [selectedOption, selectedMonth, dispatch]);
 
   // Handle clicking the pay button
   const handlePayClick = (teacher) => {
     setSelectedTeacher(teacher);
     setSidebarOpen(true);
   };
+
   const handleEditClick = (teacher) => {
     setSelectedTeacher(teacher);
     setEditSidebarOpen(true);
-  };
-  // Handle salary update
-  const handleUpdateSalary = async (salaryDetails) => {
-    setLoading(true);
-    try {
-      await fetchApi(`${baseUrl}/admin/staff/update_salary`, "PUT", salaryDetails, token);
-      // Reload the salaries after update
-      await fetchSalaries(selectedOption, selectedMonth);
-      handleSidebarClose();
-    } catch (error) {
-      console.error("Failed to update salary:", error);
-    } finally {
-      setLoading(false);
-    }
   };
 
   // Close the sidebar
@@ -163,6 +133,14 @@ const TeacherSalary = ({ initialTeacherData, selectedOption, selectedMonth }) =>
   const handleEditSidebarClose = () => {
     setEditSidebarOpen(false);
     setSelectedTeacher(null);
+  };
+
+  const handleUpdateSalary = (salaryDetails) => {
+    dispatch(updateSalary({ salaryDetails })).then(() => {
+      dispatch(fetchSalaries({ query: selectedOption, activeTab: "TeacherSalary", month: selectedMonth }))
+      handleSidebarClose();
+      handleEditSidebarClose();
+    })
   };
 
   return (
@@ -180,13 +158,13 @@ const TeacherSalary = ({ initialTeacherData, selectedOption, selectedMonth }) =>
           </tr>
         </thead>
         <tbody>
-          {teacherData?.reverse()?.map((teacher, index) => (
+          {teacherSalaries?.map((teacher, index) => (
             <TeacherRow key={index} teacher={teacher} onPayClick={handlePayClick} onEditClick={handleEditClick} />
           ))}
         </tbody>
       </table>
       <Sidebar isOpen={isSidebarOpen} onClose={handleSidebarClose} title="Add Transaction">
-        <PaySalary teacher={selectedTeacher} onSave={handleUpdateSalary} />
+        <PaySalary teacher={selectedTeacher} onSave={handleUpdateSalary} onClose={handleSidebarClose} />
       </Sidebar>
 
       <Sidebar
@@ -249,8 +227,6 @@ const TeacherSalary = ({ initialTeacherData, selectedOption, selectedMonth }) =>
           </div>
         )}
       </Sidebar>
-
-
     </div>
   );
 };

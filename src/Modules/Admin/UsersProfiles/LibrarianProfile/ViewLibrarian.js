@@ -77,7 +77,6 @@ const ViewLibrarian = ({ librarian }) => {
         <InfoItem icon={<MdEmail className="text-pink-600 text-2xl"/>} label="Email" value={librarian.email} />
         <InfoItem icon={<MdOutlineCall className="text-pink-600 text-2xl"/>} label="Phone" value={librarian.mobileNumber} />
         <InfoItem icon={<MdOutlinePersonPin className="text-pink-600 text-2xl"/>} label="Gender" value={librarian.gender} />
-        <InfoItem icon={<MdOutlineCall className="text-pink-600 text-2xl"/>} label="Salary" value={`$${librarian.salary}`} />
         <InfoItem icon={<MdOutlineLocationOn className="text-pink-600 text-2xl"/>} label="Address" value={librarian.address.city} />
       </div>
     </div>
