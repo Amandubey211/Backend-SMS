@@ -6,7 +6,7 @@ const priorityClasses = {
 };
 
 
-const Notice = ({ title, date, priority, content, image, backgroundColor }) => {
+const Notice = ({ title, date, priority, content, image, backgroundColor, descriptionLength }) => {
 
   const truncateText = (text, maxLength) => {
     return text.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
@@ -34,7 +34,7 @@ const Notice = ({ title, date, priority, content, image, backgroundColor }) => {
             {priority}
           </span>
         </div>
-        <p className="text-gray-600">{truncateText(content, 50)}</p>
+        <p className="text-gray-600">{truncateText(content, descriptionLength.descriptionLength)}</p>
       </div>
     </div>
   );

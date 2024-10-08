@@ -22,7 +22,7 @@ const generateRandomColor = () => {
   return colors[Math.floor(Math.random() * colors.length)];
 };
 
-const NoticeBoard = () => {
+const NoticeBoard = (descriptionLength) => {
   const dispatch = useDispatch(); // Use useDispatch to dispatch actions
   const navigate = useNavigate(); // Use useNavigate for navigation
 
@@ -75,6 +75,7 @@ const NoticeBoard = () => {
             priority={notice.priority}
             content={notice.description} // Changed 'content' to 'description' based on API response
             backgroundColor={generateRandomColor()}
+            descriptionLength={descriptionLength}
           />
         ))
       )}
