@@ -35,17 +35,16 @@ const TotalAttendanceGraph = () => {
           const match = str.match(/\d+/);
           return match ? parseInt(match[0]) : Infinity;
         };
-      
+
         const numA = extractNumber(a.className);
         const numB = extractNumber(b.className);
-      
+
         if (numA !== numB) {
           return numA - numB;
         } else {
           return a.className.localeCompare(b.className);
         }
       });
-      
 
       const labels = sortedAttendance.map((item) => item.className);
 
@@ -111,31 +110,6 @@ const TotalAttendanceGraph = () => {
     setGender(e.target.value);
   };
 
-  // Handle Loading State
-  if (loading) {
-    return <Spinner />;
-  }
-
-  // Handle Error State with Icon
-  if (error) {
-    return (
-      <div className="flex flex-col items-center justify-center h-64">
-        <FiAlertCircle className="w-12 h-12 text-red-500 mb-2" />
-        <p className="text-red-500">{`Error: ${error}`}</p>
-      </div>
-    );
-  }
-
-  // Handle No Data Available
-  if (!attendanceData || attendanceData.attendanceData.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center h-64">
-        <FiCalendar className="w-12 h-12 text-gray-400 mb-2" />
-        <p className="text-gray-400">No Attendance Data Found</p>
-      </div>
-    );
-  }
-
   // Generate array of years dynamically
   const availableYears = [
     { label: "Current Year", value: "Current Year" },
@@ -191,7 +165,21 @@ const TotalAttendanceGraph = () => {
           </select>
         </div>
       </div>
-      {graphData ? (
+      {loading ? (
+        <div className="flex flex-col items-center justify-center">
+          <Spinner />
+        </div>
+      ) : error ? (
+        <div className="flex flex-col items-center justify-center text-gray-400">
+          <FiAlertCircle className="w-12 h-12 mb-2" />
+          <p>{`Error: ${error}`}</p>
+        </div>
+      ) : !attendanceData || attendanceData.attendanceData.length === 0 ? (
+        <div className="flex flex-col items-center justify-center text-gray-400">
+          <FiCalendar className="w-12 h-12 mb-2" />
+          <p>No Attendance Data Found</p>
+        </div>
+      ) : graphData ? (
         <>
           <div style={{ height: "300px" }}>
             <Bar
@@ -272,12 +260,7 @@ const TotalAttendanceGraph = () => {
             </div>
           </div>
         </>
-      ) : (
-        <div className="flex flex-col items-center justify-center h-64">
-          <FiCalendar className="w-12 h-12 text-gray-400" />
-          <p className="text-gray-400">No Attendance Data Found</p>
-        </div>
-      )}
+      ) : null}
     </div>
   );
 };

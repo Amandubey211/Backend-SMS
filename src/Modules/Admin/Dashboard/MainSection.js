@@ -17,12 +17,13 @@ import { ReactComponent as ParentIcon } from "../../../Assets/DashboardAssets/SV
 import { ReactComponent as StaffIcon } from "../../../Assets/DashboardAssets/SVG/staff.svg";
 import { RiDashboardFill } from "react-icons/ri";
 import Spinner from "../../../Components/Common/Spinner";
-import NoDataFound from "../../../Components/Common/NoDataFound";
 import { useSelector } from "react-redux";
 
 const MainSection = () => {
   const { dashboardData, error, fetchAdminDashboardData, loading } =
     useGetAdminDashboardData();
+
+    
   const { role } = useSelector((state) => ({
     role: state.common.auth.role,
   }));

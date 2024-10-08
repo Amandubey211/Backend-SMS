@@ -58,18 +58,18 @@ const TotalStudentsGraphjs = () => {
 
       {/* Conditionally render spinner, error, no data message, or the pie chart */}
       {loading ? (
-        <div className="flex justify-center items-center h-[200px]">
+        <div className="flex flex-col items-center justify-center">
           <Spinner /> {/* Centered spinner */}
         </div>
       ) : error ? (
-        <div className="flex flex-col items-center justify-center h-[200px]">
-          <PiStudentBold className="text-red-400 text-6xl mb-4" />
-          <p className="text-gray-500 text-xl">Error: {error}</p>
+        <div className="flex flex-col items-center justify-center text-gray-400">
+          <PiStudentBold className="text-6xl mb-4" />
+          <p className="text-xl">Error: {error}</p>
         </div>
       ) : !dashboardData || (classData.maleStudents === 0 && classData.femaleStudents === 0) ? (
-        <div className="flex flex-col items-center justify-center h-[200px]">
-          <PiStudentBold className="text-gray-400 text-6xl mb-4" />
-          <p className="text-gray-500 text-xl">No student data found</p>
+        <div className="flex flex-col items-center justify-center text-gray-400">
+          <PiStudentBold className="text-6xl mb-4" />
+          <p className="text-xl">No student data found</p>
         </div>
       ) : (
         <>
