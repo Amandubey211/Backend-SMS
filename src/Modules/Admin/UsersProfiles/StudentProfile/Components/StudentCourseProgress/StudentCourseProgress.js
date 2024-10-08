@@ -17,7 +17,6 @@ const StudentCourseProgress = ({student}) => {
       )
     });
   }, []);
-
   const fetchModules = (subjectId)=>{
     dispatch(
       fetchCourseProgress({ studentId: cid, subjectId: subjectId })
@@ -25,9 +24,9 @@ const StudentCourseProgress = ({student}) => {
   }
   return (
     <>
-  {loading?<div className='w-full h-[50vh] flex items-center justify-center'>
-    <FiLoader className="animate-spin mr-2 w-[2rem] h-[2rem]  " />
-    <p className="text-gray-800 text-sm ">Loading...</p>
+  {loading?<div className='w-full h-[90vh] flex items-center justify-center'>
+    <FiLoader className="animate-spin mr-2 w-[3rem] h-[3rem]  " />
+    <p className="text-gray-800 text-lg ">Loading...</p>
   </div>:
     <div className='py-2 max-w-[68vw]'>
     <div className='pb-2'>
