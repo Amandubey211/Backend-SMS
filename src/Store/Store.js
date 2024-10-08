@@ -2,12 +2,15 @@ import { configureStore } from "@reduxjs/toolkit";
 import { persistStore, persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage"; // Defaults to localStorage for web
 import { combineReducers } from "redux";
-
 // common
 import authReducer from "./Slices/Common/Auth/reducers/authSlice"; // Importing the auth slice reducer
 import userReducer from "./Slices/Common/User/reducers/userSlice"; // Importing the user slice reducer
+import alertReducer from "./Slices/Common/Alerts/alertsSlice";
+
+
 
 // admin
+import adminDashboardReducer from "./Slices/Admin/Dashboard/adminDashboardSlice";
 import teacherReducer from "./Slices/Admin/Class/Teachers/teacherSlice";
 import classReducer from "./Slices/Admin/Class/reducer/classSlice"; // Importing the combined admin reducer
 import subjectReducer from "./Slices/Admin/Class/Subject/subjectSlice";
@@ -23,13 +26,21 @@ import adminSyllabusReducer from "./Slices/Admin/Class/Syllabus/syllabusSlice";
 import adminPageReducer from "./Slices/Admin/Class/Page/pageSlice";
 import adminDiscussionReducer from "./Slices/Admin/Class/Discussion/discussionSlice";
 import adminAnnouncementReducer from "./Slices/Admin/Class/Announcement/announcementSlice";
+import allStudentReducer from "./Slices/Admin/Users/Students/studentSlice";
+import allParentReducer from "./Slices/Admin/Users/Parents/parentSilce";
+import allstaffReducer from "./Slices/Admin/Users/Staff/staffSlice";
+import earningReducer from "./Slices/Admin/Accounting/Earning/earningSlice";
+import studentFeesReducer from "./Slices/Admin/Accounting/StudentFees/studentFeesSlice";
+import expensesReducer from "./Slices/Admin/Accounting/Expenses/expensesSlice"
+
+
 // student
+import studentDashboardReducer from "./Slices/Student/Dashboard/studentDashboardSlices";
 import studentFinanceReducer from "./Slices/Student/Finance/financeSlice";
 import studentLibraryBooksReducer from "./Slices/Student/Library/libararySlice";
 import studentIssueBooksReducer from "./Slices/Student/Library/bookIssuesSlice";
 import studentAnnouncementReducer from "../Store/Slices/Student/Noticeboard/noticeSlice";
 import studentEventReducer from "../Store/Slices/Student/Noticeboard/eventsSlice";
-
 import studentClassReducer from "../Store/Slices/Student/MyClass/Class/classSlice";
 import studentClassTeacherReducer from "../Store/Slices/Student/MyClass/Class/classTeacher/classTeacherSlice";
 import studentClassmateReducer from "../Store/Slices/Student/MyClass/Class/classMates/classmateSlice";
@@ -83,8 +94,10 @@ const stdSubjectPersistConfig = {
 const commonReducer = combineReducers({
   auth: persistReducer(authPersistConfig, authReducer),
   user: persistReducer(userPersistConfig, userReducer),
+  alertMsg: alertReducer,
 });
 const AdminReducer = combineReducers({
+  adminDashboard: adminDashboardReducer,
   class: classReducer,
   subject: subjectReducer,
   group_section: sectionReducer,
@@ -100,9 +113,17 @@ const AdminReducer = combineReducers({
   pages: adminPageReducer,
   discussions: adminDiscussionReducer,
   announcements: adminAnnouncementReducer,
+  all_students:allStudentReducer,
+  all_parents:allParentReducer,
+  all_staff:allstaffReducer,
+  earning: earningReducer,
+  student_fees: studentFeesReducer,
+  expenses: expensesReducer,
+
 });
 
 const studentReducer = combineReducers({
+  studentDashboard: studentDashboardReducer,
   studentFinance: studentFinanceReducer,
   studentLibraryBooks: studentLibraryBooksReducer,
   studentIssueBooks: studentIssueBooksReducer,

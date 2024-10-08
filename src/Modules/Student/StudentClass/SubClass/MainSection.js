@@ -16,6 +16,8 @@ import SubjectCard from "./SubjectCard";
 import { Modal } from "antd";
 import SectionGroupModal from "./Components/Section/SectionModal";
 import { NavLink } from "react-router-dom";
+import { setShowError } from "../../../../Store/Slices/Common/Alerts/alertsSlice";
+import OfflineModal from "../../../../Components/Common/Offline";
 
 
 const colors = [
@@ -31,6 +33,8 @@ const getColor = (index) => colors[index % colors.length];
 
 const MainSection = () => {
   const { classData, loading, error } = useSelector((store) => store?.student?.studentClass);
+  const { showError } = useSelector((store) => store?.common?.alertMsg);
+
   const dispatch = useDispatch();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [modalData, setModalData] = useState(null);
@@ -87,6 +91,9 @@ const MainSection = () => {
   //   dispatch(setSelectedSubjectName(subjectName));
   // };
 
+  const handleDismiss = () => {
+    dispatch(setShowError(false));
+  }
 
 
   useEffect(() => {
@@ -112,40 +119,40 @@ const MainSection = () => {
 
       <div className="px-5">
         <h1 className="text-2xl ml-5 mt-5 font-semibold">
-          Your Subjects ({classData?.subjects?.length || 0})
+          My Subjects ({classData?.subjects?.length || 0})
         </h1>
 
         {loading ? (
           <div className="w-full  flex flex-col items-center justify-center py-20">
             <Spinner />
           </div>
-        ) : error ? (
-          <div className="flex flex-col items-center justify-center py-20">
-            <GoAlertFill className="inline-block w-12 h-12 mb-3" />
-            <p className="text-lg font-semibold">{error}</p>
-          </div>
-        ) : (
-          <div>
-            {classData?.subjects?.length > 0 ? (
-              <div className="grid grid-cols-3 gap-4 mt-5 h-full">
-                {classData?.subjects?.map((subject, index) => (
-                  <SubjectCard
-                    key={index}
-                    data={subject}
-                    classId={classData?.classId}
-                    // onSubjectClick={handleSubjectClick}
-                    backgroundColor={getColor(index)}
-                  />
-                ))}
-              </div>
-            ) : (
-              <div className="w-full  flex flex-col items-center justify-center py-20">
-                <NoDataFound title="Subject" />
+        )
+          : (!loading && (Object.keys(classData).length === 0 || classData?.subjects?.length === 0)) ? (
+            <div className="flex flex-col items-center justify-center py-20">
+              <NoDataFound title="Subject" />
+            </div>
+          )
+            : (
+              <div>
+                {classData?.subjects?.length > 0 && (
+                  <div className="grid grid-cols-3 gap-4 mt-5 h-full">
+                    {classData?.subjects?.map((subject, index) => (
+                      <SubjectCard
+                        key={index}
+                        data={subject}
+                        classId={classData?.classId}
+                        // onSubjectClick={handleSubjectClick}
+                        backgroundColor={getColor(index)}
+                      />
+                    ))}
+                  </div>
+                )}
               </div>
             )}
-          </div>
-        )}
       </div>
+      {!loading && showError && (
+        <OfflineModal error={error} onDismiss={handleDismiss} />
+      )}
 
       {/* Modal for Section and group*/}
       {modalData && (<SectionGroupModal

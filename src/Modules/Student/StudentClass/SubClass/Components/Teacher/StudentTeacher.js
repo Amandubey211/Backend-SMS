@@ -10,6 +10,8 @@ import { stdClassTeacher } from "../../../../../../Store/Slices/Student/MyClass/
 import Spinner from "../../../../../../Components/Common/Spinner";
 import { GoAlertFill } from "react-icons/go";
 import TeacherModal from "./TeacherModal";
+import OfflineModal from "../../../../../../Components/Common/Offline";
+import { setShowError } from "../../../../../../Store/Slices/Common/Alerts/alertsSlice";
 
 
 const StudentTeacher = () => {
@@ -18,8 +20,9 @@ const StudentTeacher = () => {
   const { teacherData, loading, error } = useSelector((store) => store?.student?.studentClassTeacher);
   const { classId } = useParams();
   const [selectedTeacher, setSelectedTeacher] = useState(null); // Modal state
+  const {showError}=useSelector((store)=>store?.common?.alertMsg);
 
-  
+
   // useNavHeading(selectedClassName, "Teachers");
 
   useEffect(() => {
@@ -29,11 +32,15 @@ const StudentTeacher = () => {
   const handleProfileClick = (teacher) => {
     setSelectedTeacher(teacher); // Set selected classmate for modal
   };
-  console.log("selected teacher is",selectedTeacher)
+  console.log("selected teacher is", selectedTeacher)
 
   const closeModal = () => {
     setSelectedTeacher(null); // Close modal
   };
+
+  const handleDismiss = () => {
+    dispatch(setShowError(false));
+  }
 
   return (
     <Layout title="My Class Teachers">
@@ -52,16 +59,18 @@ const StudentTeacher = () => {
               <div className="w-full flex flex-col items-center justify-center py-20">
                 <Spinner />
               </div>
-            ) : error ? (
-              <div className="w-full flex flex-col items-center justify-center py-20">
-                <GoAlertFill className="inline-block w-12 h-12 mb-3" />
-                <p className="text-lg font-semibold">{error}</p>
-              </div>
-            ) : teacherData?.length > 0 ? (
+            ) 
+            // : error ? (
+            //   <div className="w-full flex flex-col items-center justify-center py-20">
+            //     <GoAlertFill className="inline-block w-12 h-12 mb-3" />
+            //     <p className="text-lg font-semibold">{error}</p>
+            //   </div>
+            // ) 
+            : teacherData?.length > 0 ? (
               teacherData.map((teacher, index) => (
-                <ProfileCard key={index} profile={teacher}   onClick={() => handleProfileClick(teacher)} />
+                <ProfileCard key={index} profile={teacher} onClick={() => handleProfileClick(teacher)} />
               ))
-            ) : (
+            ) :(!loading && teacherData?.length === 0 ) && (
               <div className="w-full flex flex-col items-center justify-center py-20">
                 <NoDataFound title="Teachers" />
               </div>
@@ -69,10 +78,14 @@ const StudentTeacher = () => {
           </div>
         </div>
         {selectedTeacher && (
-          <TeacherModal 
-            teacher={selectedTeacher} 
-            onClose={closeModal} 
+          <TeacherModal
+            teacher={selectedTeacher}
+            onClose={closeModal}
           />
+        )}
+
+        {!loading && showError && (
+          <OfflineModal error={error} onDismiss={handleDismiss} />
         )}
       </DashLayout>
     </Layout>

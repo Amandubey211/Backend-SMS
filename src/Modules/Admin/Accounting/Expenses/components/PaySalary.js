@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-const PaySalary = ({ teacher, onSave }) => {
+const PaySalary = ({ teacher, onSave, onClose }) => {
   const [salaryAmount, setSalaryAmount] = useState(teacher ? teacher.salaryAmount : 0);
 
   useEffect(() => {
@@ -22,6 +22,7 @@ const PaySalary = ({ teacher, onSave }) => {
     };
     console.log("salaryDetails", salaryDetails);
     onSave(salaryDetails);
+    onClose();
   };
 
   return (

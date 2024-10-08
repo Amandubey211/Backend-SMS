@@ -34,7 +34,7 @@ const MyChildren = () => {
           <FaChild className="text-gray-400 text-8xl mb-6" />
         )}
         <p className="text-gray-600 text-lg text-center mt-2">
-          {isNetworkError ? t("Network Error") : error}: {t("Unable to fetch children data!")}
+          {error}: {t("Unable to fetch children data!")}
         </p>
       </div>
     );

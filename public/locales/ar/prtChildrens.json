@@ -1,5 +1,7 @@
 {
   "My Children": "أطفالي",
+  "My Childs": "أطفالي",
+  "My Child": "طفلي",
   "Childs": "الأطفال",
   "Class": "الصف",
   "Id": "الهوية",
@@ -10,8 +12,39 @@
   "Error": "خطأ",
   "Unable to fetch children data!": "غير قادر على جلب بيانات الأطفال!",
   "Network Error": "خطأ في الشبكة",
-  "Instructors": "المدرسون",
+  "Instructors": "المعلمون",
   "Grades": "الدرجات",
   "Attendance": "الحضور",
-  "Check Subject Progress": "تحقق من تقدم المادة"
+  "Check Subject Progress": "تحقق من تقدم المادة",
+  "Subject Progress": "تقدم الموضوع",
+  "Unable to fetch Child Data": "غير قادر على جلب بيانات الطفل",
+  "All Modules": "كل الوحدات",
+  "Edit": "تعديل",
+  "Duplicate": "نسخ",
+  "Move to...": "نقل إلى...",
+  "Increase indent": "زيادة المسافة البادئة",
+  "Share to Commons": "مشاركة إلى العموم",
+  "Remove": "إزالة",
+  
+
+
+  "No Data Found": "لم يتم العثور على بيانات",
+  "Grade Summary": "ملخص الدرجة",
+  "Assignment": "الواجب",
+  "Group Assignment": "واجب جماعي",
+  "Quiz": "اختبار",
+  "Group Quiz": "اختبار جماعي",
+  "Total Score": "إجمالي النقاط",
+  "Days": "أيام",
+
+
+  "Unable to Fetch Instructors": "غير قادر على جلب المعلمين",
+  "Child Instructors": "مدربو الأطفال",
+  "No Instructors Found": "لم يتم العثور على معلمين",
+  "Phone": "الهاتف",
+  "Teachers": "المعلمون",
+
+  "Total Present": "إجمالي الحضور",
+  "Total Absent": "إجمالي الغياب",
+  "Total Leave": "إجمالي الإجازات"
 }

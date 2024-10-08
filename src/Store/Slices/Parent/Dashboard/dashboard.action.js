@@ -1,7 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { baseUrl } from "../../../../config/Common";
-import toast from "react-hot-toast";
+
 
 // Fetch dashboard cards
 export const fetchDashboardCards = createAsyncThunk(
@@ -55,7 +55,7 @@ export const fetchNotices = createAsyncThunk(
       return response.data.notices;
     } catch (error) {
       const errorMessage = error.response?.data?.message || error.message || "Failed to fetch notices";
-      // toast.error(errorMessage);
+      
       return rejectWithValue(errorMessage);  // Reject with the error message
     }
   }
@@ -71,7 +71,7 @@ export const fetchChildren = createAsyncThunk(
 
     if (!userData || !userData.email) {
       const errorMessage = "No guardian email found";
-      // toast.error(errorMessage);
+
       return rejectWithValue(errorMessage); // Reject if userData or email is not found
     }
 
@@ -88,7 +88,7 @@ export const fetchChildren = createAsyncThunk(
     } catch (error) {
       const errorMessage =
         error.response?.data?.message || error.message || "Failed to fetch children data";
-      // toast.error(errorMessage);
+
       return rejectWithValue(errorMessage); // Reject with the error message instead of returning []
     }
   }
@@ -103,7 +103,7 @@ export const fetchAccountingData = createAsyncThunk(
 
     if (!token) {
       const errorMessage = "Token not found";
-      // toast.error(errorMessage);
+
       return rejectWithValue(errorMessage); // Reject if the token is missing
     }
 
@@ -116,7 +116,7 @@ export const fetchAccountingData = createAsyncThunk(
       return response.data;
     } catch (error) {
       const errorMessage = error.response?.data?.message || error.message ||"Failed to fetch accounting data";
-      // toast.error(errorMessage);
+
       return rejectWithValue(errorMessage);  // Reject with error message instead of returning null
     }
   }

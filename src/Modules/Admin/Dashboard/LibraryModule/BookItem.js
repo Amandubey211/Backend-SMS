@@ -2,7 +2,7 @@ import React from "react";
 
 const BookItem = ({ image, title, category, copies, available, studentName, status, issueDate, role }) => {
   return (
-    <div className="flex items-center justify-between bg-white p-4 border border-gray-200 rounded-lg mb-4 shadow-sm">
+    <div className="flex items-center justify-between bg-white p-4 border border-gray-200 rounded-lg mb-4 shadow-sm hover:shadow-lg hover:translate-y-[-3px] transition-all duration-300 ease-in-out cursor-default">
       <div className="flex items-center">
         <img className="w-16 h-16 rounded-lg mr-6" src={image} alt={title} />
         <div className="flex flex-col">

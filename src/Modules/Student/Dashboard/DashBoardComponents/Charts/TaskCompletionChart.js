@@ -1,79 +1,26 @@
-
-
-
-// //--------------------------------
-
-// import React from 'react';
-// import { Doughnut } from 'react-chartjs-2';
-// import { Chart, ArcElement, Tooltip, Legend } from 'chart.js';
-// Chart.register(ArcElement, Tooltip, Legend);
-
-// const TaskChart = ({ totalTasks = 12, completedTasks = 5 }) => {
-//     const completedPercentage = Math.round((completedTasks / totalTasks) * 100);
-//     const missingPercentage = 100 - completedPercentage;
-
-//     const data = {
-//         labels: ['Completed Task', 'Missing Task'],
-//         datasets: [
-//             {
-//                 data: [completedPercentage, missingPercentage],
-//                 backgroundColor: [
-//                     'rgba(255, 99, 132, 0.6)', // Pink for completed
-//                     'rgba(200, 200, 200, 0.6)'  // Grey for missing
-//                 ],
-//                 borderColor: [
-//                     'rgba(255, 99, 132, 1)',
-//                     'rgba(200, 200, 200, 1)'
-//                 ],
-//                 borderWidth: 1,
-//                 cutout: '70%'
-//             }
-//         ]
-//     };
-
-//     const options = {
-//         responsive: true,
-//         plugins: {
-//             legend: {
-//                 display: false
-//             },
-//             tooltip: {
-//                 callbacks: {
-//                     label: function(tooltipItem) {
-//                         return `${tooltipItem.label}: ${tooltipItem.raw}%`;
-//                     }
-//                 }
-//             }
-//         },
-//         maintainAspectRatio: false
-//     };
-
-//     return (
-//         <div className=" flex-1 p-5 flex flex-row justify-start items-start ">
-
-//             <Doughnut data={data} options={options} />
-//             </div>
-
-//     );
-// };
-
-// export default TaskChart;
-
 import React from 'react';
-import { Doughnut } from 'react-chartjs-2';
+import { Pie } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 const TaskCompletionChart = () => {
   const data = {
-    labels: ['Completed Tasks', 'Missing Tasks'],
+    labels: ["Completed Task", "Incomplete Task"],
     datasets: [
       {
-        data: [75, 25], // Example data: 75% completed, 25% missing
-        backgroundColor: ['rgba(75, 192, 192, 0.6)', 'rgba(255, 99, 132, 0.6)'],
-        borderColor: ['rgba(75, 192, 192, 1)', 'rgba(255, 99, 132, 1)'],
-        borderWidth: 1,
+        data: [67, 21], // Percentage or total points for each subject
+        backgroundColor: [
+          "#7B61FF",
+          "#FFD700",
+        ],
+        hoverBackgroundColor: [
+          "#7B61FF",
+          "#FFD700",
+        ],
+        borderWidth: 5,
+        borderRadius: 10,
+        borderColor: "#ffffff", // White borders make segments distinct
       },
     ],
   };
@@ -81,30 +28,58 @@ const TaskCompletionChart = () => {
   const options = {
     responsive: true,
     maintainAspectRatio: true,
-    cutout: '80%',
+    cutout: '70%',
     plugins: {
       legend: {
-        display: true, // Hide the legend
-        position: 'bottom',
+        display: false, // Disable built-in legend to prevent duplication
       },
       tooltip: {
         callbacks: {
-          label: function (context) {
-            const label = context.label || '';
-            const value = context.raw || 0;
-            const total = context.dataset.data.reduce((sum, val) => sum + val, 0);
-            const percentage = ((value / total) * 100).toFixed(2);
-            return ` ${percentage}% (${value})`;
+          label: function (tooltipItem) {
+            return tooltipItem.label + ": " + tooltipItem.raw + "%";
           },
         },
+      },
+    },
+    layout: {
+      padding: {
+        bottom: 30, // Space below the chart for custom legend
       },
     },
   };
 
   return (
-    <div className="flex-1 flex justify-center items-center h-full">
-      <div style={{ width: "290px", height: "290px" , marginTop:"10px"}}>
-        <Doughnut data={data} options={options} />
+    <div className="flex flex-col items-center">
+      {/* Chart container */}
+      <div className="w-[350px] h-[350px] mt-6">
+        <Pie data={data} options={options} />
+      </div>
+      {/* Custom legend container */}
+      <div className="flex items-center justify-center mt-6 space-x-8">
+        <div className="flex items-center">
+          <div
+            style={{
+              width: '14px',
+              height: '14px',
+              backgroundColor: "#7B61FF",
+              borderRadius: '50%',
+              marginRight: '8px',
+            }}
+          ></div>
+          <span className="text-sm text-gray-700">Completed Task</span>
+        </div>
+        <div className="flex items-center">
+          <div
+            style={{
+              width: '14px',
+              height: '14px',
+              backgroundColor: "#FFD700",
+              borderRadius: '50%',
+              marginRight: '8px',
+            }}
+          ></div>
+          <span className="text-sm text-gray-700">Incomplete Task</span>
+        </div>
       </div>
     </div>
   );

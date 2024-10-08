@@ -1,5 +1,7 @@
 {
   "My Children": "मेरे बच्चे",
+  "My Childs": "मेरे बच्चे",
+  "My Child": "मेरा बच्चा",
   "Childs": "बच्चे",
   "Class": "कक्षा",
   "Id": "पहचान",
@@ -10,8 +12,36 @@
   "Error": "त्रुटि",
   "Unable to fetch children data!": "बच्चे का डेटा लाने में असमर्थ",
   "Network Error": "नेटवर्क त्रुटि",
-  "Instructors": "अनुदेशक",
+  "Instructors": "शिक्षक",
   "Grades": "ग्रेड",
   "Attendance": "उपस्थिति",
-  "Check Subject Progress": "विषय प्रगति जांचें"
+  "Check Subject Progress": "विषय प्रगति जांचें",
+  "Subject Progress": "विषय प्रगति",
+  "Unable to fetch Child Data": "बच्चे का डेटा प्राप्त करने में असमर्थ",
+  "All Modules": "सभी मॉड्यूल्स",
+  "Edit": "संपादित करें",
+  "Duplicate": "डुप्लिकेट",
+  "Move to...": "यहां ले जाएं...",
+  "Increase indent": "इंडेंट बढ़ाएं",
+  "Share to Commons": "कॉमन्स में साझा करें",
+  "Remove": "हटाएं",
+
+  "No Data Found": "कोई डेटा नहीं मिला",
+  "Grade Summary": "ग्रेड सारांश",
+  "Assignment": "असाइनमेंट",
+  "Group Assignment": "समूह असाइनमेंट",
+  "Quiz": "प्रश्नोत्तरी",
+  "Group Quiz": "समूह प्रश्नोत्तरी",
+  "Total Score": "कुल स्कोर",
+  "Days": "दिन",
+
+  "Unable to Fetch Instructors": "शिक्षकों को प्राप्त करने में असमर्थ",
+  "Child Instructors": "बच्चों के शिक्षक",
+  "No Instructors Found": "कोई शिक्षक नहीं मिला",
+  "Phone": "फ़ोन",
+  "Teachers": "शिक्षक",
+
+  "Total Present": "कुल उपस्थिति",
+  "Total Absent": "कुल अनुपस्थिति",
+  "Total Leave": "कुल अवकाश"
 }
