@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchAllStudents, fetchAttendanceData, fetchStudentAttendance, fetchStudentDocument, fetchStudentFinance, fetchStudentGrades, fetchStudentSubjectProgress, fetchStudentSubjects, studentIssueBooks } from "./student.action";
+import { fetchAllStudents, fetchAttendanceData, fetchCourseProgress, fetchStudentAttendance, fetchStudentDocument, fetchStudentFinance, fetchStudentGrades, fetchStudentSubjectProgress, fetchStudentSubjects, studentIssueBooks } from "./student.action";
 const initialState = {
     allStudents:[],
     student:{},
@@ -12,6 +12,7 @@ const initialState = {
     feesDetails:{},
     bookIssue:[],
     studentSubjectProgress:[],
+    courseProgress:{},
     grades:{},
     error:null,
     loading:false,
@@ -142,6 +143,18 @@ const allStudentSlice = createSlice({
           state.attendanceData = action.payload;
         })
         .addCase(fetchAttendanceData.rejected, (state, action) => {
+          state.loading = false;
+          state.error = action.payload;
+        })
+        .addCase(fetchCourseProgress.pending, (state) => {
+          state.loading = true;
+          state.error = null;
+        })
+        .addCase(fetchCourseProgress.fulfilled, (state, action) => {
+          state.loading = false;
+          state.courseProgress = action.payload;
+        })
+        .addCase(fetchCourseProgress.rejected, (state, action) => {
           state.loading = false;
           state.error = action.payload;
         });

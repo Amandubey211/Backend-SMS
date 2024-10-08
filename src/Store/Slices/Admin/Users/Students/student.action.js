@@ -169,3 +169,23 @@ export const fetchAttendanceData = createAsyncThunk(
       }
   }
 )
+
+export const fetchCourseProgress = createAsyncThunk(
+  'student/courseProgress',
+  async (ids, { rejectWithValue,getState }) => {
+    const { common } = getState();
+    const token = common.auth.token;
+      try {
+          const response = await axios.get(`${baseUrl}/admin/course/progress/student/${ids.studentId}/subject/${ids.subjectId}`, {
+              headers: { Authentication:  `Bearer ${token}` }
+          });
+        
+        return response.data.data;
+
+      }
+      catch (error) {
+          return rejectWithValue((error?.response?.data?.message || error?.message || "Something Went Wrong!"))
+
+      }
+  }
+)
