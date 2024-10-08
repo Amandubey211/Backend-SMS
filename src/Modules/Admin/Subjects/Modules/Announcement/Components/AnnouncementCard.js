@@ -5,7 +5,6 @@ import { BiDotsVerticalRounded } from "react-icons/bi";
 import { AiOutlineCheck } from "react-icons/ai";
 import { useDispatch } from "react-redux";
 import { markAsReadAnnouncement } from "../../../../../../Store/Slices/Admin/Class/Announcement/announcementThunk";
-import toast from "react-hot-toast";
 
 const AnnouncementCard = ({
   title,
@@ -13,8 +12,8 @@ const AnnouncementCard = ({
   section,
   _id,
   color,
-  attachment,
   isRead,
+  createdAt,
 }) => {
   const { sid, cid } = useParams();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -64,7 +63,9 @@ const AnnouncementCard = ({
           <div className="flex justify-center items-center gap-1 mt-5 text-gray-500">
             <IoCalendarOutline />
             <p className="text-md">Posted on:</p>
-            <p className="text-xs">{new Date(date).toLocaleDateString()}</p>
+            <p className="text-md">
+              {new Date(createdAt).toLocaleDateString()}
+            </p>
           </div>
         </NavLink>
         <div className="flex flex-col gap-2 text-xl relative">

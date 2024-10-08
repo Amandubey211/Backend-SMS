@@ -21,17 +21,17 @@ const ViewEvent = () => {
   }
 
   // Format event date and time
-  const formattedDate = isValid(new Date(selectedEvent.date))
-    ? format(new Date(selectedEvent.date), "d MMM yyyy")
+  const formattedDate = isValid(new Date(selectedEvent?.date))
+    ? format(new Date(selectedEvent?.date), "d MMM yyyy")
     : "Invalid date";
 
-  const formattedTime = selectedEvent.time
-    ? format(new Date(`1970-01-01T${selectedEvent.time}`), "hh:mm a")
+  const formattedTime = selectedEvent?.time
+    ? format(new Date(`1970-01-01T${selectedEvent?.time}`), "hh:mm a")
     : "No time";
 
   // Handler for delete event
   const handleDelete = () => {
-    dispatch(deleteEventThunk(selectedEvent._id));
+    dispatch(deleteEventThunk(selectedEvent?._id));
   };
 
   // Handler for editing event
