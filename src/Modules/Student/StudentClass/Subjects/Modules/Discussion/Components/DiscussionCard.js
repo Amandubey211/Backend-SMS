@@ -7,36 +7,43 @@ import { MdMarkEmailRead } from "react-icons/md";
 import { NavLink, useParams } from "react-router-dom";
 import useMarkAsRead from "../../../../../../../Hooks/AuthHooks/Student/Discussion/useMarkAsRead";
 import useUpdatePinStatus from "../../../../../../../Hooks/AuthHooks/Staff/Admin/Disscussion/useUpdatePinStatus";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchStudentDiscussion, markAsReadStudentDiscussion, updateStudentPinStatus } from "../../../../../../../Store/Slices/Student/MyClass/Class/Subjects/Discussion/discussion.action";
+import { setIsMenuOpen } from "../../../../../../../Store/Slices/Student/MyClass/Class/Subjects/Discussion/discussionSlice";
 
-const DiscussionCard = ({ discussion, refetchClassDiscussions }) => {
+const DiscussionCard = ({ discussion }) => {
+
+  const dispatch = useDispatch();
+  const { loading } = useSelector((store) => store?.student?.studentDiscussion)
+
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { sid, cid } = useParams();
+
   const lastReply =
     discussion.replies.length > 0
       ? discussion.replies[discussion.replies.length - 1]
       : null;
-  const { updatePinStatus, loading: pinLoading } = useUpdatePinStatus();
-  const { markAsRead, loading: readLoading } = useMarkAsRead();
+
   const [isPinned, setIsPinned] = useState(discussion.isPinned);
-  const [isMenuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
 
-  const handlePinClick = async () => {
-    const updatedDiscussion = await updatePinStatus(discussion._id, !isPinned);
-    if (updatedDiscussion) {
-      setIsPinned(updatedDiscussion.isPinned);
-      // Refetch discussions to reflect the change
-      refetchClassDiscussions();
-    }
+  const handlePinClick = () => {
+    dispatch(updateStudentPinStatus({ discussionId: discussion._id, isPinned: !isPinned }))
+      .then(() => {
+        dispatch(fetchStudentDiscussion(cid))
+      })
   };
 
-  const handleMarkAsReadClick = async () => {
-    await markAsRead(discussion._id);
-    setMenuOpen(false);
+  const handleMarkAsReadClick = () => {
+    dispatch(markAsReadStudentDiscussion(discussion._id)).then(() => {
+      setIsMenuOpen(false);
+      dispatch(fetchStudentDiscussion(cid))
+    })
   };
 
   const handleClickOutside = (event) => {
     if (menuRef.current && !menuRef.current.contains(event.target)) {
-      setMenuOpen(false);
+      setIsMenuOpen(false)
     }
   };
 
@@ -52,13 +59,17 @@ const DiscussionCard = ({ discussion, refetchClassDiscussions }) => {
     };
   }, [isMenuOpen]);
 
+  useEffect(() => {
+    setIsPinned(discussion.isPinned);
+  }, [discussion.isPinned]);
+
   return (
     <div className="p-4 bg-white shadow rounded-lg border transition-transform transform hover:scale-105 hover:shadow-lg">
       <div className="flex items-center justify-end space-x-2 mb-4 relative">
         {/* Pin button */}
         <button
           onClick={handlePinClick}
-          disabled={pinLoading}
+          disabled={loading}
           className="transition-transform transform hover:scale-110"
           aria-label={isPinned ? "Unpin discussion" : "Pin discussion"}
         >
@@ -72,7 +83,7 @@ const DiscussionCard = ({ discussion, refetchClassDiscussions }) => {
         {/* Ellipsis menu button */}
         <button
           className="border w-7 h-7 p-1 rounded-full transition-transform transform hover:scale-110"
-          onClick={() => setMenuOpen((prev) => !prev)}
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
           aria-label="More options"
         >
           <FaEllipsisV />
@@ -87,10 +98,10 @@ const DiscussionCard = ({ discussion, refetchClassDiscussions }) => {
             <button
               className="flex items-center space-x-2 px-4 py-2 text-blue-600 hover:bg-gray-100 w-full transition-transform transform hover:scale-105"
               onClick={handleMarkAsReadClick}
-              disabled={readLoading}
+              disabled={loading}
             >
               <MdMarkEmailRead aria-hidden="true" />
-              <span>{readLoading ? "Marking..." : "Mark as Read"}</span>
+              <span>{loading ? "Marking..." : "Mark as Read"}</span>
             </button>
           </div>
         )}

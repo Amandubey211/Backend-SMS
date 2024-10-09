@@ -10,28 +10,24 @@ const CommentSection = ({
   setActiveReplyId,
   activeReplyParentId,
   setActiveReplyParentId,
-  toggleLike,
+  //toggleLike,
   editComment, // Pass editComment
   editReply,
-  currentUserId,
+  //currentUserId,
 }) => {
   return (
     <div className="w-full h-full">
-      {comments.map((comment) => (
+      {comments?.map((comment) => (
         <Comment
-          key={comment.id}
+          key={comment._id}
           comment={comment}
-          toggleLike={toggleLike}
           deleteReply={deleteReply}
           activeReplyId={activeReplyId}
-          deleteComment={deleteComment}
           addNestedReply={addNestedReply}
           setActiveReplyId={setActiveReplyId}
           activeReplyParentId={activeReplyParentId}
           setActiveReplyParentId={setActiveReplyParentId}
-          editComment={editComment} // Pass editComment
           editReply={editReply}
-          currentUserId={currentUserId}
         />
       ))}
     </div>
