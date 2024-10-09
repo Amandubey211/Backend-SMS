@@ -37,7 +37,7 @@ import studentSubjectReducer from "../Store/Slices/Student/MyClass/Class/Subject
 import studentModuleReducer from "../Store/Slices/Student/MyClass/Class/Subjects/Modules/moduleSlice";
 import studentSyllabusReducer from "../Store/Slices/Student/MyClass/Class/Subjects/Syllabus/syllabusSlice";
 import studentPagesReducer from "../Store/Slices/Student/MyClass/Class/Subjects/Pages/pagesSlice";
-
+import studentDiscussionReducer from "../Store/Slices/Student/MyClass/Class/Subjects/Discussion/discussionSlice"
 // parent
 import dashboardReducer from "../Store/Slices/Parent/Dashboard/dashboardSlice";
 import financeReducer from "../Store/Slices/Parent/Finance/financeSlice";
@@ -118,6 +118,7 @@ const studentReducer = combineReducers({
   studentModule: studentModuleReducer,
   studentSyllabus: studentSyllabusReducer,
   studentPages: studentPagesReducer,
+  studentDiscussion: studentDiscussionReducer,
 });
 
 const ParentReducer = combineReducers({

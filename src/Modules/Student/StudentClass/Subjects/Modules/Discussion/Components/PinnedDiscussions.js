@@ -3,7 +3,7 @@ import DiscussionCard from "./DiscussionCard";
 import { MdKeyboardArrowDown, MdKeyboardArrowUp } from "react-icons/md";
 import { TbPin } from "react-icons/tb";
 
-const PinnedDiscussions = ({ discussions, refetchClassDiscussions }) => {
+const PinnedDiscussions = ({ discussions }) => {
   const [isVisible, setIsVisible] = useState(true);
 
   const toggleVisibility = () => {
@@ -44,7 +44,7 @@ const PinnedDiscussions = ({ discussions, refetchClassDiscussions }) => {
             <DiscussionCard
               key={index}
               discussion={discussion}
-              refetchClassDiscussions={refetchClassDiscussions} // Passing the refetch function
+              //refetchClassDiscussions={refetchClassDiscussions} // Passing the refetch function
             />
           ))}
         </div>

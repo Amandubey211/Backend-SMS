@@ -247,18 +247,18 @@ const ExpenseRow = ({ item, index, handlePayClick, handleDelete, handleEditSideb
   }, [openDropdown]);
 
   return (
-    <tr key={item._id} className="bg-white">
-      <td className="px-5 py-2 border-b border-gray-200">{item.reason}</td>
-      <td className="px-5 py-2 border-b border-gray-200">{item.amount} QR</td>
-      <td className="px-5 py-2 border-b border-gray-200">{new Date(item.date).toLocaleDateString()}</td>
-      <td className="px-5 py-2 border-b border-gray-200">
+    <tr key={item._id} className="bg-white border border-gray-200">
+      <td className="px-5 py-2">{item.reason}</td>
+      <td className="px-5 py-2">{item.amount} QR</td>
+      <td className="px-5 py-2">{new Date(item.date).toLocaleDateString()}</td>
+      <td className="px-5 py-2">
         <span
           className={`px-3 py-1 text-xs font-semibold rounded-full ${item.status === "paid" ? "text-green-800" : "text-red-800"}`}
         >
           {item.status}
         </span>
       </td>
-      <td className="px-5 py-2 border-b border-gray-200 flex items-center justify-between relative">
+      <td className="px-5 py-2 flex items-center justify-between relative">
         {item.status === "paid" ? (
           <span className="inline-flex items-center border border-transparent text-xs font-medium shadow-sm bg-green-200 text-green-800 py-1 px-2 rounded-md">
             Completed

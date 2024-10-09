@@ -5,37 +5,47 @@ import { MdOutlineEdit } from "react-icons/md";
 import { RxCross2 } from "react-icons/rx";
 import toast from "react-hot-toast";
 import InputComment from "./InputComment";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { createStudentDiscussionReply, deleteStudentDiscussionReply, editStudentDiscussionReply, fetchStudentCommentsByDiscussion, toggleLikeStudentDiscussion } from "../../../../../../../../Store/Slices/Student/MyClass/Class/Subjects/Discussion/discussion.action";
+import { FcLike } from "react-icons/fc";
 
 const Reply = ({
   reply,
   commentId,
-  deleteReply,
-  addNestedReply,
+  //deleteReply,
+  //addNestedReply,
   activeReplyId,
   setActiveReplyId,
-  toggleLike,
+  //toggleLike,
   editReply,
   // currentUserId,
 }) => {
-  const currentUserId = useSelector((state) => state.Common.studentId);
+  const { userId } = useSelector((store) => store?.common?.user?.userDetails);
+  const currentUserId = userId;
+  const { discussion } = useSelector((store) => store?.student?.studentDiscussion)
+  const dispatch = useDispatch()
 
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(reply.text);
+  const [likes, setLikes] = useState(reply.likes);
 
   // Console logs to debug
-  console.log("Reply Component:",reply);
-  console.log("currentUserId:", currentUserId);
-  console.log("reply.authorId:", reply.authorID);
+  const [likesCount, setLikesCount] = useState(reply.likes.length);
+  const [isLiked, setIsLiked] = useState(
+    reply.likes.some((like) => like.userId === userId)
+  );
 
   const normalizedCurrentUserId = String(currentUserId).trim().toString();
-const normalizedReplyAuthorId = String(reply.authorID).trim().toString();
+  const normalizedReplyAuthorId = String(reply.creatorID).trim().toString();
 
-console.log("Comparison Result:", normalizedCurrentUserId === normalizedReplyAuthorId);
+  console.log("reply Result:", reply);
+  console.log("activeReplyId", activeReplyId);
 
-  const handleEditReply = async () => {
+
+  const handleEditReply = () => {
     if (editText.trim() && editText !== reply.text) {
-      await editReply(reply.id, editText);
+      dispatch(editStudentDiscussionReply({ replyId: reply._id, newText: editText }))
+      //await editReply(reply.id, editText);
       setIsEditing(false);
     } else {
       setIsEditing(false);
@@ -48,45 +58,62 @@ console.log("Comparison Result:", normalizedCurrentUserId === normalizedReplyAut
   };
 
   const handleDelete = () => {
-    deleteReply(commentId, reply.id);
+    //deleteReply(commentId, reply.id);
+    dispatch(deleteStudentDiscussionReply(reply._id))
+    dispatch(fetchStudentCommentsByDiscussion({ discussionId: discussion._id }))
   };
 
   const handleReplyClick = () => {
-    setActiveReplyId(activeReplyId === reply.id ? null : reply.id);
+    setActiveReplyId(activeReplyId === reply._id ? null : reply._id);
   };
 
   const handleAddNestedReply = (text) => {
     if (text.trim()) {
-      addNestedReply(reply.id, text);
+      dispatch(createStudentDiscussionReply({ discussionId: discussion._id, replyId: reply._id, text: text }))
       setActiveReplyId(null);
     }
   };
 
-  const handleToggleLike = async () => {
-    try {
-      const updatedReply = await toggleLike(reply.id);
-      // Optionally update local state or re-fetch replies if needed
-    } catch (error) {
-      toast.error("Failed to toggle like.");
-    }
+  const handleToggleLike = () => {
+    const originalIsLiked = isLiked;
+    const originalLikesCount = likesCount;
+    dispatch(toggleLikeStudentDiscussion({ id: reply._id })).then(() => {
+      setIsLiked(!isLiked);
+      setLikesCount(isLiked ? likesCount - 1 : likesCount + 1);
+    }).catch(() => {
+      setIsLiked(originalIsLiked);
+      setLikesCount(originalLikesCount);
+    })
   };
 
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const options = { year: "numeric", month: "short", day: "numeric" };
+    const timeOptions = { hour: "2-digit", minute: "2-digit" };
+    return `${date.toLocaleDateString(
+      undefined,
+      options
+    )} at ${date.toLocaleTimeString(undefined, timeOptions)}`;
+  };
+
+  const formattedDate = formatDate(reply?.createdAt);
+
   return (
-    <div className="ml-8 mt-2 ps-4 bg-gray-100 p-2 rounded-lg border shadow-sm">
+    <div className="ml-8 mt-2 ps-4 bg-white p-2 rounded-lg border shadow-sm">
       <div className="flex items-center mb-2">
         <img
-          src={reply.avatarUrl}
+          src={reply.profile}
           alt="avatar"
           className="w-10 h-10 rounded-full mr-3"
         />
         <div>
-          <h4 className="text-lg font-semibold">{reply.author}</h4>
+          <h4 className="text-lg font-semibold">{reply?.createdBy}</h4>
           {reply.role && (
             <span className="mr-2 px-2 text-xs font-medium text-green-800 border-green-500 border rounded-full">
               {reply.role}
             </span>
           )}
-          <span className="text-sm text-gray-500">{reply.time}</span>
+          <span className="text-sm text-gray-500">{formattedDate}</span>
         </div>
 
         {/* {String(currentUserId).trim() === String(reply.authorId).trim() && ( */}
@@ -128,13 +155,24 @@ console.log("Comparison Result:", normalizedCurrentUserId === normalizedReplyAut
         </div>
       ) : (
         <>
-          <p className="text-gray-700 mb-2">{reply.text}</p>
+          <p className="text-gray-700 mb-2">{reply.content}</p>
           <div className="flex items-center mb-2 pt-2 border-t">
-            <FaRegHeart
+            {/* <FaRegHeart
               className="text-gray-500 cursor-pointer"
               onClick={handleToggleLike}
-            />
-            <span className="ml-1 text-gray-500">{reply.likes}</span>
+            /> */}
+            {isLiked ? (
+              <FcLike
+                className="text-gray-500 cursor-pointer"
+                onClick={handleToggleLike}
+              />
+            ) : (
+              <FaRegHeart
+                className="text-gray-500 cursor-pointer"
+                onClick={handleToggleLike}
+              />
+            )}
+            <span className="ml-1 text-gray-500">{likesCount}</span>
             <FaRegComment
               className="ml-4 text-gray-500 cursor-pointer"
               onClick={handleReplyClick}
@@ -142,7 +180,7 @@ console.log("Comparison Result:", normalizedCurrentUserId === normalizedReplyAut
             <span className="ml-1 text-gray-500">Reply</span>
           </div>
 
-          {activeReplyId === reply.id && (
+          {activeReplyId === reply._id && (
             <div className="mt-4">
               <InputComment
                 addComment={handleAddNestedReply}
@@ -155,14 +193,14 @@ console.log("Comparison Result:", normalizedCurrentUserId === normalizedReplyAut
             {reply.replies &&
               reply.replies.map((nestedReply) => (
                 <Reply
-                  key={nestedReply.id}
+                  key={nestedReply._id}
                   reply={nestedReply}
                   commentId={commentId}
-                  deleteReply={deleteReply}
-                  addNestedReply={addNestedReply}
+                  //deleteReply={deleteReply}
+                  //addNestedReply={addNestedReply}
                   activeReplyId={activeReplyId}
                   setActiveReplyId={setActiveReplyId}
-                  toggleLike={toggleLike}
+                  //toggleLike={toggleLike}
                   editReply={editReply}
                   currentUserId={currentUserId}
                 />
