@@ -38,7 +38,7 @@ const Sidebar = ({ student, closeSidebar }) => {
             <img
               src={student.profile}
               alt={student.firstName}
-              className="w-20 h-20 rounded-full border-2 border-gray-300 mr-4"
+              className="w-20 h-20 p-0.5 rounded-full border-2 border-gray-300 mr-4"
             />
             <div>
               <h2 className="text-2xl font-semibold">{student.firstName} {student.lastName}</h2>
