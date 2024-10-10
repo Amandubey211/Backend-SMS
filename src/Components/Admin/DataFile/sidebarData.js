@@ -16,7 +16,7 @@ import { PiCertificateLight } from "react-icons/pi";
 import { RiUserAddLine } from "react-icons/ri";
 import { BsBook } from "react-icons/bs";
 import { TbNotebook } from "react-icons/tb";
-
+import { BsCheckCircle } from "react-icons/bs";
 import { GrUserWorker } from "react-icons/gr";
 import { MdLocalLibrary, MdManageAccounts } from "react-icons/md";
 import { RiParentFill, RiAdminFill } from "react-icons/ri";
@@ -136,9 +136,16 @@ const sidebarData = [
   },
   {
     title: "Verification",
-    icon: <FaUserGraduate />,
+    icon: <BsCheckCircle />,
     path: "/verify_students",
     roles: ["admin"],
+  },
+  {
+    title: "Graduate",
+    icon: <FaUserGraduate />,
+    roles: ["admin"],
+    path: `/graduates`
+
   },
 ];
 
