@@ -43,7 +43,7 @@ const Reply = ({
 
 
   const handleEditReply = () => {
-    if (editText.trim() && editText !== reply.text) {
+    if (editText.trim() && editText !== reply.content) {
       dispatch(editStudentDiscussionReply({ replyId: reply._id, newText: editText }))
       //await editReply(reply.id, editText);
       setIsEditing(false);
@@ -54,7 +54,7 @@ const Reply = ({
 
   const handleCancelEdit = () => {
     setIsEditing(false);
-    setEditText(reply.text);
+    setEditText(reply.content);
   };
 
   const handleDelete = () => {
@@ -102,15 +102,15 @@ const Reply = ({
     <div className="ml-8 mt-2 ps-4 bg-white p-2 rounded-lg border shadow-sm">
       <div className="flex items-center mb-2">
         <img
-          src={reply.profile}
+          src={reply?.profile}
           alt="avatar"
           className="w-10 h-10 rounded-full mr-3"
         />
         <div>
           <h4 className="text-lg font-semibold">{reply?.createdBy}</h4>
-          {reply.role && (
+          {reply?.role && (
             <span className="mr-2 px-2 text-xs font-medium text-green-800 border-green-500 border rounded-full">
-              {reply.role}
+              {reply?.role}
             </span>
           )}
           <span className="text-sm text-gray-500">{formattedDate}</span>
@@ -155,7 +155,7 @@ const Reply = ({
         </div>
       ) : (
         <>
-          <p className="text-gray-700 mb-2">{reply.content}</p>
+          <p className="text-gray-700 mb-2">{reply?.content}</p>
           <div className="flex items-center mb-2 pt-2 border-t">
             {/* <FaRegHeart
               className="text-gray-500 cursor-pointer"

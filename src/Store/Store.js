@@ -50,6 +50,7 @@ import studentModuleReducer from "../Store/Slices/Student/MyClass/Class/Subjects
 import studentSyllabusReducer from "../Store/Slices/Student/MyClass/Class/Subjects/Syllabus/syllabusSlice";
 import studentPagesReducer from "../Store/Slices/Student/MyClass/Class/Subjects/Pages/pagesSlice";
 import studentDiscussionReducer from "../Store/Slices/Student/MyClass/Class/Subjects/Discussion/discussionSlice"
+import studentAnnounceReducer from "../Store/Slices/Student/MyClass/Class/Subjects/Announcement/announcementSlice"
 // parent
 import dashboardReducer from "../Store/Slices/Parent/Dashboard/dashboardSlice";
 import financeReducer from "../Store/Slices/Parent/Finance/financeSlice";
@@ -113,9 +114,9 @@ const AdminReducer = combineReducers({
   pages: adminPageReducer,
   discussions: adminDiscussionReducer,
   announcements: adminAnnouncementReducer,
-  all_students:allStudentReducer,
-  all_parents:allParentReducer,
-  all_staff:allstaffReducer,
+  all_students: allStudentReducer,
+  all_parents: allParentReducer,
+  all_staff: allstaffReducer,
   earning: earningReducer,
   student_fees: studentFeesReducer,
   expenses: expensesReducer,
@@ -141,6 +142,7 @@ const studentReducer = combineReducers({
   studentSyllabus: studentSyllabusReducer,
   studentPages: studentPagesReducer,
   studentDiscussion: studentDiscussionReducer,
+  studentAnnounce: studentAnnounceReducer,
 });
 
 const ParentReducer = combineReducers({
