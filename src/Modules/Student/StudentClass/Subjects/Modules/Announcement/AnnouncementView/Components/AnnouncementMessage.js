@@ -1,55 +1,43 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import CommentsHeader from "./CommentsHeader";
 import CommentSection from "./CommentSection";
 import InputComment from "./InputComment";
 import { useParams } from "react-router-dom";
 import { ImSpinner3 } from "react-icons/im";
 import { FaExclamationTriangle } from "react-icons/fa";
+import { useDispatch, useSelector } from "react-redux";
+import { createStudentAnnounceComment, fetchStudentAnnounceComments } from "../../../../../../../../Store/Slices/Student/MyClass/Class/Subjects/Announcement/announcement.action";
 
-import { useFetchCommentsByAnnouncement } from "../../../../../../../../Hooks/AuthHooks/Student/Announcement/Message/useFetchCommentsByAnnouncement";
-import { useAddComment } from "../../../../../../../../Hooks/AuthHooks/Student/Announcement/Message/useAddComment";
-import { useAddReply } from "../../../../../../../../Hooks/AuthHooks/Student/Announcement/Message/useAddReply";
-import { useDeleteComment } from "../../../../../../../../Hooks/AuthHooks/Student/Announcement/Message/useDeleteComment";
-import { useDeleteReply } from "../../../../../../../../Hooks/AuthHooks/Student/Announcement/Message/useDeleteReply";
-import { useEditComment } from "../../../../../../../../Hooks/AuthHooks/Student/Announcement/Message/useEditComment";
-import { useEditReply } from "../../../../../../../../Hooks/AuthHooks/Student/Announcement/Message/useEditReply";
-import { useToggleLikeMessage } from "../../../../../../../../Hooks/AuthHooks/Student/Announcement/Message/useToggleLikeMessage";
-
-const AnnouncementMessage = ({ announcement }) => {
+const AnnouncementMessage = () => {
   const { _id } = useParams();
-  const [comments, setComments] = useState([]);
+  const dispatch = useDispatch();
+  const { loadingComments, errorComments, announcement, comments } = useSelector((store) => store?.student?.studentAnnounce)
+
+  //const [comments, setComments] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeReplyId, setActiveReplyId] = useState(null);
   const [activeReplyParentId, setActiveReplyParentId] = useState(null);
 
-  const { loading, error, studentId, fetchComments } =
-    useFetchCommentsByAnnouncement(announcement._id, setComments);
-  const { addComment } = useAddComment(announcement._id, comments, setComments);
-  const { addNestedReply } = useAddReply(
-    announcement._id,
-    comments,
-    setComments,
-    setActiveReplyId,
-    setActiveReplyParentId
-  );
-  const { deleteComment } = useDeleteComment(comments, setComments);
-  const { deleteReply } = useDeleteReply(comments, setComments);
-  const { editComment } = useEditComment(comments, setComments);
-  const { editReply } = useEditReply(comments, setComments);
-  const { toggleLike } = useToggleLikeMessage(comments, setComments);
+  useEffect(() => {
+    if (announcement && announcement?._id) {
+      dispatch(fetchStudentAnnounceComments({ aid: announcement._id }));
+    }
+  }, [announcement?._id, dispatch]);
 
   const handleSearch = (query) => {
     setSearchQuery(query);
   };
 
   const handleRefresh = () => {
-    fetchComments();
+    if (announcement?._id) {
+      dispatch(fetchStudentAnnounceComments({ aid: announcement._id }))
+    }
   };
 
   const filterCommentsRecursively = (comments, query) => {
     return comments.filter((comment) => {
-      const author = comment.author ? comment.author.toLowerCase() : "";
-      const isAuthorMatch = author.includes(query.toLowerCase());
+      const author = comment?.author ? comment.author.toLowerCase() : "";
+      const isAuthorMatch = author?.includes(query.toLowerCase());
       const isReplyMatch = comment.replies?.some(
         (reply) => filterCommentsRecursively([reply], query).length > 0
       );
@@ -61,18 +49,18 @@ const AnnouncementMessage = ({ announcement }) => {
 
   return (
     <div className="h-screen flex flex-col">
-      {loading ? (
+      {loadingComments ? (
         <>
           <div className="flex flex-col items-center justify-center py-10 text-gray-500">
             <ImSpinner3 className="w-12 h-12 animate-spin mb-3" />
             <p className="text-lg font-semibold">Loading comments...</p>
           </div>
         </>
-      ) : error ? (
+      ) : errorComments ? (
         <>
           <div className="flex flex-col items-center justify-center py-10 text-gray-500">
             <FaExclamationTriangle className="w-12 h-12 mb-3" />
-            <p className="text-lg font-semibold">{error}</p>
+            <p className="text-lg font-semibold">{errorComments}</p>
           </div>
         </>
       ) : (
@@ -86,21 +74,21 @@ const AnnouncementMessage = ({ announcement }) => {
           <div className="h-[70%] overflow-y-scroll no-scrollbar px-6">
             <CommentSection
               comments={filteredComments}
-              deleteComment={deleteComment}
-              deleteReply={deleteReply}
-              addNestedReply={addNestedReply}
+              //deleteComment={deleteComment}
+              //deleteReply={deleteReply}
+              //addNestedReply={addNestedReply}
               activeReplyId={activeReplyId}
               setActiveReplyId={setActiveReplyId}
               activeReplyParentId={activeReplyParentId}
               setActiveReplyParentId={setActiveReplyParentId}
-              toggleLike={toggleLike}
-              editComment={editComment}
-              editReply={editReply}
-              currentUserId={studentId}
+            //toggleLike={toggleLike}
+            //editComment={editComment}
+            //editReply={editReply}
+            //currentUserId={studentId}
             />
           </div>
           <div className="flex-none h-[15%]">
-            <InputComment addComment={addComment} />
+            <InputComment addComment={(comment) => dispatch(createStudentAnnounceComment({ aid: announcement._id, text: comment }))} />
           </div>
         </>
       )}

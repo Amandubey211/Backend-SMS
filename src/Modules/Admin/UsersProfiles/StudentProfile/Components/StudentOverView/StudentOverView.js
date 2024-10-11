@@ -9,8 +9,6 @@ const StudentOverView = () => {
   return (
     <>
        <div className="flex flex-col">
-    
-
         <div className="" >
           <AllSubjects />
         </div>
