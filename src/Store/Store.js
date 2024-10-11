@@ -31,6 +31,9 @@ import earningReducer from "./Slices/Admin/Accounting/Earning/earningSlice";
 import studentFeesReducer from "./Slices/Admin/Accounting/StudentFees/studentFeesSlice";
 import expensesReducer from "./Slices/Admin/Accounting/Expenses/expensesSlice";
 import adminRubricReducer from "./Slices/Admin/Class/Rubric/rubricSlice";
+import adminDiscussionCommentsReducer from "./Slices/Admin/Class/Discussion/Comments/discussionCommentsSlice";
+import adminCommentReducer from "./Slices/Admin/Class/Comment/commentsSlice";
+import adminAnnouncementCommentsReducer from "./Slices/Admin/Class/Announcement/Comment/announcementCommentsSlice";
 
 // student
 import studentDashboardReducer from "./Slices/Student/Dashboard/studentDashboardSlices";
@@ -113,6 +116,10 @@ const AdminReducer = combineReducers({
   discussions: adminDiscussionReducer,
   announcements: adminAnnouncementReducer,
   rubrics: adminRubricReducer,
+  discussionComments: adminDiscussionCommentsReducer,
+  announcementComments: adminAnnouncementCommentsReducer,
+  comments: adminCommentReducer,
+
   all_students: allStudentReducer,
   all_parents: allParentReducer,
   all_staff: allstaffReducer,

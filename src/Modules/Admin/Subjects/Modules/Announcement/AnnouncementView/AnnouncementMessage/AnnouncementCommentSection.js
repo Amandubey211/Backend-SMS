@@ -1,40 +1,33 @@
 import React, { useEffect, useState } from "react";
-import useFetchCommentsByAnnouncement from "../../../../../../../Hooks/AuthHooks/Staff/Admin/Announcement/Comments/useFetchCommentsByAnnouncement";
+import { useDispatch, useSelector } from "react-redux";
 import AnnouncementCommentsHeader from "./Components/AnnouncementCommentsHeader";
 import AnnouncementComment from "./Components/AnnouncementComment";
 import AnnouncementInputComment from "./Components/AnnouncementInputComment";
-import { FaRegCommentDots, FaSpinner } from "react-icons/fa"; // Import FaSpinner for loading
-import useAddCommentToAnnouncement from "../../../../../../../Hooks/AuthHooks/Staff/Admin/Announcement/Comments/useAddCommentToAnnouncement";
-import useAddReplyToAnnouncement from "../../../../../../../Hooks/AuthHooks/Staff/Admin/Announcement/Comments/useAddReplyToAnnouncement";
-import useDeleteAnnouncementComment from "../../../../../../../Hooks/AuthHooks/Staff/Admin/Announcement/Comments/useDeleteAnnouncementComment";
+import { FaRegCommentDots } from "react-icons/fa";
+import {
+  fetchAnnouncementComments,
+  addAnnouncementComment,
+  addAnnouncementReply,
+  deleteAnnouncementComment,
+  toggleLikeAnnouncementComment,
+} from "../../../../../../../Store/Slices/Admin/Class/Announcement/Comment/announcementCommentsThunks";
 import Spinner from "../../../../../../../Components/Common/Spinner";
+import { useParams } from "react-router-dom";
 
 const AnnouncementCommentSection = () => {
-  const { comments, error, fetchComments, loading } =
-    useFetchCommentsByAnnouncement();
+  const dispatch = useDispatch();
+  const { comments, loading, error } = useSelector(
+    (state) => state.admin.announcementComments
+  );
+
+  const { aid: announcementId } = useParams();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeReplyId, setActiveReplyId] = useState(null);
   const [localComments, setLocalComments] = useState([]);
 
-  const {
-    addComment,
-    loading: addCommentLoading,
-    error: addCommentError,
-  } = useAddCommentToAnnouncement();
-  const {
-    addReply,
-    loading: addReplyLoading,
-    error: addReplyError,
-  } = useAddReplyToAnnouncement();
-  const {
-    deleteComment,
-    loading: deleteCommentLoading,
-    error: deleteCommentError,
-  } = useDeleteAnnouncementComment();
-
   useEffect(() => {
-    fetchComments();
-  }, []);
+    dispatch(fetchAnnouncementComments(announcementId));
+  }, [dispatch, announcementId]);
 
   useEffect(() => {
     setLocalComments(comments);
@@ -45,13 +38,13 @@ const AnnouncementCommentSection = () => {
   };
 
   const handleRefresh = () => {
-    fetchComments();
+    dispatch(fetchAnnouncementComments(announcementId));
   };
 
   const handleAddComment = async (text) => {
     try {
-      await addComment(text);
-      fetchComments(); // Refresh comments after adding
+      await dispatch(addAnnouncementComment({ announcementId, text }));
+      dispatch(fetchAnnouncementComments(announcementId)); // Refresh comments after adding
     } catch (error) {
       console.error("Error adding comment:", error);
     }
@@ -59,16 +52,8 @@ const AnnouncementCommentSection = () => {
 
   const addNestedReply = async (parentId, text) => {
     try {
-      const newReply = await addReply(parentId, text);
-
-      const updatedComments = localComments.map((comment) => {
-        if (comment._id === parentId) {
-          return { ...comment, replies: [newReply, ...comment.replies] };
-        }
-        return comment;
-      });
-      setLocalComments(updatedComments);
-      setActiveReplyId(null);
+      await dispatch(addAnnouncementReply({ announcementId, parentId, text }));
+      dispatch(fetchAnnouncementComments(announcementId));
     } catch (error) {
       console.error("Error adding reply:", error);
     }
@@ -76,27 +61,13 @@ const AnnouncementCommentSection = () => {
 
   const handleDeleteComment = async (commentId) => {
     try {
-      await deleteComment(commentId);
-      // Optimistically update the state
-      const updatedComments = localComments.filter(
-        (comment) => comment._id !== commentId
-      );
-      setLocalComments(updatedComments);
+      await dispatch(deleteAnnouncementComment(commentId));
     } catch (error) {
       console.error("Error deleting comment:", error);
     }
   };
 
-  // Sorting comments: Admin comments first, then by likes within each group
-  const sortedComments = [...localComments].sort((a, b) => {
-    if (a.role === "admin" && b.role !== "admin") return -1;
-    if (a.role !== "admin" && b.role === "admin") return 1;
-    if (a.likes.length !== b.likes.length)
-      return b.likes.length - a.likes.length;
-    return 0;
-  });
-
-  const filteredComments = sortedComments.filter((comment) => {
+  const filteredComments = localComments.filter((comment) => {
     const searchInComment = comment.createdBy
       ? comment.createdBy.toLowerCase().includes(searchQuery.toLowerCase())
       : false;
@@ -127,12 +98,12 @@ const AnnouncementCommentSection = () => {
         )}
         {filteredComments.map((comment) => (
           <AnnouncementComment
-            key={comment?._id}
+            key={comment._id}
             comment={comment}
             activeReplyId={activeReplyId}
             setActiveReplyId={setActiveReplyId}
-            addNestedReply={addNestedReply} // Pass addNestedReply to AnnouncementComment
-            handleDeleteComment={handleDeleteComment} // Pass handleDeleteComment to AnnouncementComment
+            addNestedReply={addNestedReply}
+            handleDeleteComment={handleDeleteComment}
           />
         ))}
       </div>
