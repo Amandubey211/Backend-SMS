@@ -1,3 +1,5 @@
+// src/components/Components/RubricCard.js
+
 import React, { useState } from "react";
 import { MdOutlineModeEditOutline } from "react-icons/md";
 import { RiDeleteBin2Line } from "react-icons/ri";

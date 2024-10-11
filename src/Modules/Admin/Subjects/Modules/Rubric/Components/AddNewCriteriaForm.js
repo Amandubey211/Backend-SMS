@@ -1,4 +1,7 @@
-import React, { useEffect, useState } from "react";
+// src/components/Components/AddNewCriteriaForm.js
+
+import React, { useState, useEffect } from "react";
+
 const AddNewCriteriaForm = ({ onSave, initialData, editMode }) => {
   const [criteriaData, setCriteriaData] = useState({
     title: "",
