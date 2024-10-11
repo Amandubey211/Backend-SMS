@@ -172,7 +172,7 @@ const Header = ({ discussion, refetchDiscussion }) => {
             onClose={handleSidebarClose}
           >
             <Suspense fallback={<div>Loading...</div>}>
-              {/* <DiscussionMessage /> */}
+              <DiscussionMessage />
             </Suspense>
           </Sidebar>
         </div>

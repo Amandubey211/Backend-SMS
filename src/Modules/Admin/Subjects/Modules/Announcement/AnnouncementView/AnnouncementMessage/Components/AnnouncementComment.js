@@ -1,36 +1,32 @@
 import React, { useState } from "react";
 import { FaRegHeart, FaRegComment } from "react-icons/fa";
 import { FcLike } from "react-icons/fc";
-import toast from "react-hot-toast";
 import { MdOutlineEdit } from "react-icons/md";
 import { RxCross2 } from "react-icons/rx";
-import { useSelector } from "react-redux";
-import AnnouncementReply from "./AnnouncementReply";
+import toast from "react-hot-toast";
+import { useDispatch, useSelector } from "react-redux";
 import AnnouncementInputComment from "./AnnouncementInputComment";
-import useToggleLikeAnnouncementComment from "../../../../../../../../Hooks/AuthHooks/Staff/Admin/Announcement/Comments/useToggleLikeAnnouncementComment";
-import useEditAnnouncementComment from "../../../../../../../../Hooks/AuthHooks/Staff/Admin/Announcement/Comments/useEditAnnouncementComment";
+import AnnouncementReply from "./AnnouncementReply";
+import {
+  toggleLikeAnnouncementComment,
+  deleteAnnouncementComment,
+} from "../../../../../../../../Store/Slices/Admin/Class/Announcement/Comment/announcementCommentsThunks";
 
 const AnnouncementComment = ({
   comment,
   activeReplyId,
   setActiveReplyId,
   addNestedReply,
-  handleDeleteComment,
 }) => {
-  const [showReplies, setShowReplies] = useState(false);
-  const { toggleLikeComment } = useToggleLikeAnnouncementComment();
-  const { editComment } = useEditAnnouncementComment();
-  const { role } = useSelector((store) => store.Auth);
+  const dispatch = useDispatch();
+  const { role } = useSelector((state) => state.common.auth);
   const [isLiked, setIsLiked] = useState(
     comment.likes.some((like) => like.userId === role)
   );
   const [likesCount, setLikesCount] = useState(comment.likes.length);
   const [isEditing, setIsEditing] = useState(false);
   const [editedContent, setEditedContent] = useState(comment.content);
-
-  const handleReplyClick = (replyId) => {
-    setActiveReplyId(activeReplyId === replyId ? null : replyId);
-  };
+  const [showReplies, setShowReplies] = useState(false);
 
   const handleLikeComment = async () => {
     const originalIsLiked = isLiked;
@@ -40,39 +36,30 @@ const AnnouncementComment = ({
     setLikesCount(isLiked ? likesCount - 1 : likesCount + 1);
 
     try {
-      await toggleLikeComment(comment._id);
-    } catch (err) {
+      await dispatch(toggleLikeAnnouncementComment(comment._id));
+    } catch (error) {
       setIsLiked(originalIsLiked);
       setLikesCount(originalLikesCount);
-      toast.error(err.message);
+      toast.error(error.message);
     }
   };
 
-  const handleEditComment = async () => {
+  const handleDeleteComment = async () => {
     try {
-      const updatedComment = await editComment(comment._id, editedContent);
-      setIsEditing(false);
-      if (updatedComment) {
-        setEditedContent(updatedComment.content); // Update the content in state
-        comment.content = updatedComment.content; // Update original comment content
-      }
+      await dispatch(deleteAnnouncementComment(comment._id));
     } catch (error) {
-      toast.error("Failed to edit comment");
+      toast.error("Failed to delete comment");
     }
   };
 
-  // Format the date using built-in JavaScript methods
+  const handleReplyClick = (replyId) => {
+    setActiveReplyId(activeReplyId === replyId ? null : replyId);
+  };
+
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    const options = { year: "numeric", month: "short", day: "numeric" };
-    const timeOptions = { hour: "2-digit", minute: "2-digit" };
-    return `${date.toLocaleDateString(
-      undefined,
-      options
-    )} at ${date.toLocaleTimeString(undefined, timeOptions)}`;
+    return date.toLocaleString();
   };
-
-  const formattedDate = formatDate(comment.createdAt);
 
   return (
     <div className="bg-white p-4 mb-4 rounded-md shadow-sm">
@@ -89,7 +76,9 @@ const AnnouncementComment = ({
               {comment.role}
             </span>
           )}
-          <span className="text-sm text-gray-500">{formattedDate}</span>
+          <span className="text-sm text-gray-500">
+            {formatDate(comment.createdAt)}
+          </span>
         </div>
         <div className="ml-auto flex space-x-2">
           <MdOutlineEdit
@@ -100,16 +89,16 @@ const AnnouncementComment = ({
           />
           <RxCross2
             className="text-red-500 cursor-pointer text-xl"
-            onClick={() => handleDeleteComment(comment._id)} // Call handleDeleteComment
+            onClick={handleDeleteComment} // Delete comment
           />
         </div>
       </div>
       {isEditing ? (
         <AnnouncementInputComment
-          addComment={handleEditComment}
+          addComment={() => {}}
           placeholder="Edit your comment..."
           initialText={editedContent}
-          onChange={setEditedContent} // Pass function to update editedContent
+          onChange={setEditedContent}
         />
       ) : (
         <p className="text-gray-700 mb-2">{comment.content}</p>
@@ -133,8 +122,10 @@ const AnnouncementComment = ({
         />
         <span className="ml-1 text-gray-500">Reply</span>
       </div>
+
+      {/* Replies Section */}
       {showReplies && comment.replies.length > 0 && (
-        <div className="ml-10">
+        <div className="">
           {comment.replies.map((reply) => (
             <AnnouncementReply
               key={reply._id}
@@ -160,6 +151,7 @@ const AnnouncementComment = ({
           View {comment.replies.length} more replies
         </div>
       )}
+
       {activeReplyId === comment._id && (
         <div className="mt-4">
           <AnnouncementInputComment

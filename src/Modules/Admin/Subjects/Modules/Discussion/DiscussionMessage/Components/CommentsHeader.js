@@ -1,6 +1,6 @@
-import React from 'react';
-import { FaSearch } from 'react-icons/fa';
-import { FiRefreshCw } from 'react-icons/fi';
+import React from "react";
+import { FaSearch } from "react-icons/fa";
+import { FiRefreshCw } from "react-icons/fi";
 
 const CommentsHeader = ({ handleSearch, handleRefresh }) => {
   return (

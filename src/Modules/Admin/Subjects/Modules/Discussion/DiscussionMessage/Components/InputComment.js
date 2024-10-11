@@ -5,7 +5,7 @@ const emojis = ["😀", "😂", "😍", "😢", "😡"];
 
 const InputComment = ({
   addComment,
-  placeholder = "Write Something...",
+  placeholder = "Write something...",
   initialText = "",
 }) => {
   const [text, setText] = useState(initialText);
@@ -38,24 +38,6 @@ const InputComment = ({
     }, 3000);
   };
 
-  useEffect(() => {
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-    };
-  }, []);
-
-  const handleEmojiListMouseEnter = () => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
-  };
-
-  const handleEmojiListMouseLeave = () => {
-    setShowEmojis(false);
-  };
-
   return (
     <div className="flex items-center p-1 bg-white mb-3 rounded-full border border-gray-300 relative">
       <form onSubmit={handleAddComment} className="relative flex-grow">
@@ -76,16 +58,14 @@ const InputComment = ({
         </div>
         {showEmojis && (
           <div
-            className="absolute right-10 bottom-full mb-2 flex space-x-2 bg-white p-2 rounded shadow-md transition-opacity duration-300 ease-in-out transform opacity-100 animate-slide-in"
-            onMouseEnter={handleEmojiListMouseEnter}
-            onMouseLeave={handleEmojiListMouseLeave}
+            className="absolute right-10 bottom-full mb-2 flex space-x-2 bg-white p-2 rounded shadow-md"
             ref={emojiListRef}
           >
             {emojis.map((emoji, index) => (
               <span
                 key={index}
                 onClick={() => handleEmojiClick(emoji)}
-                className="cursor-pointer hover:animate-bounce transform transition-transform duration-300 ease-in-out hover:scale-125"
+                className="cursor-pointer"
               >
                 {emoji}
               </span>

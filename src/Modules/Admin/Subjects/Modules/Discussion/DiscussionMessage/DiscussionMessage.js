@@ -1,129 +1,72 @@
 import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import CommentSection from "./CommentSection";
 import CommentsHeader from "./Components/CommentsHeader";
 import InputComment from "./Components/InputComment";
-import useAddComment from "../../../../../../Hooks/AuthHooks/Staff/Admin/Disscussion/Message/useAddComment";
-import useAddReply from "../../../../../../Hooks/AuthHooks/Staff/Admin/Disscussion/Message/useAddReply";
-import useDeleteComment from "../../../../../../Hooks/AuthHooks/Staff/Admin/Disscussion/Message/useDeleteComment";
-import useDeleteReply from "../../../../../../Hooks/AuthHooks/Staff/Admin/Disscussion/Message/useDeleteReply";
-import useFetchCommentsByDiscussion from "../../../../../../Hooks/AuthHooks/Staff/Admin/Disscussion/Message/useFetchCommentsByDiscussion";
+import {
+  fetchComments,
+  addComment,
+  addReply,
+  deleteComment,
+  deleteReply,
+} from "../../../../../../Store/Slices/Admin/Class/Discussion/Comments/commentsThunks";
+import {
+  setActiveReplyId,
+  resetActiveReplyId,
+} from "../../../../../../Store/Slices/Admin/Class/Discussion/Comments/discussionCommentsSlice";
 import toast from "react-hot-toast";
+import { useParams } from "react-router-dom";
 
 const DiscussionMessage = () => {
-  const { addComment: addNewComment } = useAddComment();
-  const { addReply: addNewReply } = useAddReply();
-  const { deleteComment: deleteExistingComment } = useDeleteComment();
-  const { deleteReply: deleteExistingReply } = useDeleteReply();
-  const { comments, error, fetchComments, loading } =
-    useFetchCommentsByDiscussion();
+  const dispatch = useDispatch();
+  const { comments, loading, error, activeReplyId } = useSelector(
+    (state) => state.admin.discussionComments
+  );
+
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeReplyId, setActiveReplyId] = useState(null);
-  const [localComments, setLocalComments] = useState([]);
-
+  const [localComments, setLocalComments] = useState(comments);
+  const { did: discussionId } = useParams();
+  // Fetch comments when component mounts
   useEffect(() => {
-    fetchComments();
-  }, []);
+    dispatch(fetchComments(discussionId));
+  }, [dispatch]);
 
+  // Update local comments whenever Redux comments change
   useEffect(() => {
     setLocalComments(comments);
   }, [comments]);
 
-  useEffect(() => {
-    return () => {
-      fetchComments();
-    };
-  }, []);
-
-  const addComment = async (text) => {
-    const newComment = {
-      _id: Date.now().toString(), // temporary ID
-      createdBy: "You",
-      content: text,
-      createdAt: new Date().toISOString(),
-      replies: [],
-      likes: [],
-    };
-
-    // Optimistic update
-    const updatedComments = [newComment, ...localComments];
-    setLocalComments(updatedComments);
-
-    try {
-      await addNewComment(text);
-    } catch (error) {
-      toast.error("Failed to add comment");
-      setLocalComments(localComments); // Revert on error
-    }
+  // Add a new comment
+  const handleAddComment = async (text) => {
+    dispatch(addComment({ discussionId, text }));
   };
 
-  const addNestedReply = async (id, text) => {
-    const newReply = {
-      _id: Date.now().toString(), // temporary ID
-      createdBy: "You",
-      content: text,
-      createdAt: new Date().toISOString(),
-      likes: [],
-    };
-
-    // Optimistic update
-    const updatedComments = localComments.map((comment) => {
-      if (comment._id === id) {
-        return { ...comment, replies: [newReply, ...comment.replies] };
-      }
-      return comment;
-    });
-    setLocalComments(updatedComments);
-
-    try {
-      await addNewReply(id, text);
-    } catch (error) {
-      toast.error("Failed to add reply");
-      setLocalComments(localComments); // Revert on error
-    }
-    setActiveReplyId(null);
+  // Add a reply to a comment
+  const handleAddReply = async (id, text) => {
+    dispatch(addReply({ discussionId, parentId: id, text }));
   };
 
+  // Delete a comment
+  const handleDeleteComment = (commentId) => {
+    dispatch(deleteComment(commentId));
+  };
+
+  // Delete a reply
+  const handleDeleteReply = (replyId) => {
+    dispatch(deleteReply(replyId));
+  };
+
+  // Handle search query
   const handleSearch = (query) => {
     setSearchQuery(query);
   };
 
+  // Refresh the comments list
   const handleRefresh = () => {
-    fetchComments();
+    dispatch(fetchComments(discussionId));
   };
 
-  const deleteComment = async (commentId) => {
-    // Optimistic update
-    const updatedComments = localComments.filter(
-      (comment) => comment._id !== commentId
-    );
-    setLocalComments(updatedComments);
-
-    try {
-      await deleteExistingComment(commentId);
-    } catch (error) {
-      toast.error("Failed to delete comment");
-      setLocalComments(localComments); // Revert on error
-    }
-  };
-
-  const deleteReply = async (replyId) => {
-    // Optimistic update
-    const updatedComments = localComments.map((comment) => {
-      return {
-        ...comment,
-        replies: comment.replies.filter((reply) => reply._id !== replyId),
-      };
-    });
-    setLocalComments(updatedComments);
-
-    try {
-      await deleteExistingReply(replyId);
-    } catch (error) {
-      toast.error("Failed to delete reply");
-      setLocalComments(localComments); // Revert on error
-    }
-  };
-
+  // Filter comments based on search query
   const filteredComments = localComments.filter((comment) => {
     const searchInComment = comment.createdBy
       ? comment.createdBy.toLowerCase().includes(searchQuery.toLowerCase())
@@ -147,17 +90,17 @@ const DiscussionMessage = () => {
       <div className="h-[70%] overflow-y-scroll no-scrollbar px-6">
         <CommentSection
           comments={filteredComments}
-          deleteComment={deleteComment}
-          deleteReply={deleteReply}
-          addNestedReply={addNestedReply}
+          deleteComment={handleDeleteComment}
+          deleteReply={handleDeleteReply}
+          addNestedReply={handleAddReply}
           activeReplyId={activeReplyId}
-          setActiveReplyId={setActiveReplyId}
+          setActiveReplyId={(id) => dispatch(setActiveReplyId(id))}
           loading={loading}
           error={error}
         />
       </div>
       <div className="flex-none h-[15%]">
-        <InputComment addComment={addComment} />
+        <InputComment addComment={handleAddComment} />
       </div>
     </div>
   );

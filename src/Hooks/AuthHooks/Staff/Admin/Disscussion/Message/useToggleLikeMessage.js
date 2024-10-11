@@ -14,7 +14,7 @@ const useToggleLikeMessage = () => {
     async (messageId) => {
       setLoading(true);
       setError(null);
-      console.log(messageId,"sdfsdf");
+      console.log(messageId, "sdfsdf");
       try {
         const token = localStorage.getItem(`${role}:token`);
         const response = await axios.put(
@@ -27,7 +27,6 @@ const useToggleLikeMessage = () => {
 
         if (response.data.status) {
           // do if success
-          
         } else {
           toast.error("Failed to toggle like");
           setError("Failed to toggle like");

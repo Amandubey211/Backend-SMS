@@ -31,6 +31,9 @@ import earningReducer from "./Slices/Admin/Accounting/Earning/earningSlice";
 import studentFeesReducer from "./Slices/Admin/Accounting/StudentFees/studentFeesSlice";
 import expensesReducer from "./Slices/Admin/Accounting/Expenses/expensesSlice";
 import adminRubricReducer from "./Slices/Admin/Class/Rubric/rubricSlice";
+import adminDiscussionCommentsReducer from "./Slices/Admin/Class/Discussion/Comments/discussionCommentsSlice";
+import adminCommentReducer from "./Slices/Admin/Class/Comment/commentsSlice";
+import adminAnnouncementCommentsReducer from "./Slices/Admin/Class/Announcement/Comment/announcementCommentsSlice";
 
 // student
 import studentDashboardReducer from "./Slices/Student/Dashboard/studentDashboardSlices";
@@ -47,8 +50,8 @@ import studentSubjectReducer from "../Store/Slices/Student/MyClass/Class/Subject
 import studentModuleReducer from "../Store/Slices/Student/MyClass/Class/Subjects/Modules/moduleSlice";
 import studentSyllabusReducer from "../Store/Slices/Student/MyClass/Class/Subjects/Syllabus/syllabusSlice";
 import studentPagesReducer from "../Store/Slices/Student/MyClass/Class/Subjects/Pages/pagesSlice";
-import studentDiscussionReducer from "../Store/Slices/Student/MyClass/Class/Subjects/Discussion/discussionSlice"
-import studentAnnounceReducer from "../Store/Slices/Student/MyClass/Class/Subjects/Announcement/announcementSlice"
+import studentDiscussionReducer from "../Store/Slices/Student/MyClass/Class/Subjects/Discussion/discussionSlice";
+import studentAnnounceReducer from "../Store/Slices/Student/MyClass/Class/Subjects/Announcement/announcementSlice";
 // parent
 import dashboardReducer from "../Store/Slices/Parent/Dashboard/dashboardSlice";
 import financeReducer from "../Store/Slices/Parent/Finance/financeSlice";
@@ -113,6 +116,10 @@ const AdminReducer = combineReducers({
   discussions: adminDiscussionReducer,
   announcements: adminAnnouncementReducer,
   rubrics: adminRubricReducer,
+  discussionComments: adminDiscussionCommentsReducer,
+  announcementComments: adminAnnouncementCommentsReducer,
+  comments: adminCommentReducer,
+
   all_students: allStudentReducer,
   all_parents: allParentReducer,
   all_staff: allstaffReducer,

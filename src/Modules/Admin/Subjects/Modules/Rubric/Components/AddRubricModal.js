@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { HiOutlinePlus } from "react-icons/hi2";
-import { CiBoxList } from "react-icons/ci"; // Icon for no data placeholder
+import { CiBoxList } from "react-icons/ci";
 import RubricModalRow from "./RubricModalRow";
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
@@ -35,8 +35,6 @@ const AddRubricModal = ({
     AssignmentId || ""
   );
   const [selectedQuizId, setSelectedQuizId] = useState(QuizId || "");
-  const [totalPoints, setTotalPoints] = useState(0); // To store the total points from the selected assignment/quiz
-  const [selectLoading, setSelectLoading] = useState(false); // Loading state for rubric data
 
   const dropdownRef = useRef(null);
   const dropdownRef2 = useRef(null);
@@ -45,7 +43,7 @@ const AddRubricModal = ({
 
   // Redux state
   const { assignments, quizzes, loading } = useSelector(
-    (state) => state.admin.rubrics
+    (state) => state.rubric
   );
 
   // Fetch filtered assignments and quizzes when modal opens
@@ -60,29 +58,16 @@ const AddRubricModal = ({
   useEffect(() => {
     if (isOpen && (AssignmentId || QuizId)) {
       const rubricId = AssignmentId || QuizId;
-      setSelectLoading(true); // Start loading for rubric data
       dispatch(getRubricByIdThunk(rubricId)).then((result) => {
         if (result.success) {
           setCriteriaList(result.rubric.criteria);
           setRubricName(result.rubric.name);
           setExistingRubricId(result.rubric._id);
-
-          if (AssignmentId) {
-            setTotalPoints(
-              assignments.find((a) => a._id === AssignmentId)?.totalPoints || 0
-            );
-          } else if (QuizId) {
-            setTotalPoints(
-              quizzes.find((q) => q._id === QuizId)?.totalPoints || 0
-            );
-          }
         } else {
-          setCriteriaList([]); // Show empty row if no data is available
+          setCriteriaList([]);
           setRubricName("");
           setExistingRubricId(null);
-          setTotalPoints(0); // Reset total points if no data
         }
-        setSelectLoading(false); // Stop loading
       });
     }
   }, [
@@ -90,8 +75,6 @@ const AddRubricModal = ({
     AssignmentId,
     QuizId,
     dispatch,
-    assignments,
-    quizzes,
     setCriteriaList,
     setExistingRubricId,
   ]);
@@ -121,7 +104,6 @@ const AddRubricModal = ({
     setSelectedQuizId("");
     setCriteriaList([]);
     setRubricName("");
-    setTotalPoints(0); // Reset total points
     setExistingRubricId(null);
   };
 
@@ -130,24 +112,8 @@ const AddRubricModal = ({
       resetSelection();
     } else {
       setSelectedAssignmentId(id);
-      setSelectedQuizId(""); // Hide quiz selection when assignment is selected
-      setSelectLoading(true); // Start loading
-      dispatch(getRubricByIdThunk(id)).then((result) => {
-        if (result.success) {
-          setCriteriaList(result.rubric.criteria); // Display rubric data
-          setRubricName(result.rubric.name);
-          setTotalPoints(
-            assignments.find((a) => a._id === id)?.totalPoints || 0
-          ); // Set total points for the selected assignment
-          setExistingRubricId(result.rubric._id);
-        } else {
-          setCriteriaList([]); // Show empty row if no data is available
-          setTotalPoints(
-            assignments.find((a) => a._id === id)?.totalPoints || 0
-          ); // Set total points even if no rubric data
-        }
-        setSelectLoading(false); // Stop loading
-      });
+      setSelectedQuizId("");
+      dispatch(getRubricByIdThunk(id));
     }
     setDropdownOpen(false);
   };
@@ -157,21 +123,8 @@ const AddRubricModal = ({
       resetSelection();
     } else {
       setSelectedQuizId(id);
-      setSelectedAssignmentId(""); // Hide assignment selection when quiz is selected
-      setSelectLoading(true); // Start loading
-      dispatch(getRubricByIdThunk(id)).then((result) => {
-        if (result.success) {
-          setCriteriaList(result.rubric.criteria); // Display rubric data
-          setRubricName(result.rubric.name);
-          setTotalPoints(quizzes.find((q) => q._id === id)?.totalPoints || 0); // Set total points for the selected quiz
-          setExistingRubricId(result.rubric._id);
-        } else {
-          setCriteriaList([]); // Show empty row if no data is available
-          setRubricName("");
-          setTotalPoints(quizzes.find((q) => q._id === id)?.totalPoints || 0); // Set total points even if no rubric data
-        }
-        setSelectLoading(false); // Stop loading
-      });
+      setSelectedAssignmentId("");
+      dispatch(getRubricByIdThunk(id));
     }
     setDropdownOpen2(false);
   };
@@ -191,11 +144,6 @@ const AddRubricModal = ({
   };
 
   const handleSubmit = async () => {
-    if (!rubricName) {
-      toast.error("Rubric name is required."); // Show toast if rubric name is empty
-      return;
-    }
-
     const targetId = selectedAssignmentId || selectedQuizId;
     if (!targetId) {
       toast.error("Please select either an assignment or a quiz.");
@@ -264,8 +212,7 @@ const AddRubricModal = ({
             />
           </div>
 
-          {/* Show only one select box based on selection */}
-          {selectedQuizId === "" && (
+          {(selectedQuizId === "" || !selectedAssignmentId) && (
             <div className="p-2 flex-1 relative" ref={dropdownRef}>
               <label className="block text-gray-700 mb-1">Assignment</label>
               <div
@@ -277,37 +224,29 @@ const AddRubricModal = ({
               </div>
               {dropdownOpen && (
                 <ul className="absolute left-0 right-0 mt-2 max-h-72 overflow-auto bg-white border rounded-md shadow-lg z-10 py-2">
-                  {assignments.length === 0 ? (
-                    <li className="flex items-center justify-center py-2 text-gray-500">
-                      <CiBoxList className="mr-2" /> No assignments available
+                  <li
+                    onClick={() => handleSelectAssignmentChange("reset")}
+                    className="px-4 py-2 hover:bg-gray-100 transition duration-300 transform cursor-pointer hover:translate-x-[-8px] ps-6 text-red-600"
+                  >
+                    Reset
+                  </li>
+                  {assignments.map((assignment) => (
+                    <li
+                      key={assignment._id}
+                      onClick={() =>
+                        handleSelectAssignmentChange(assignment._id)
+                      }
+                      className="px-4 py-2 hover:bg-gray-100 transition duration-300 transform cursor-pointer hover:translate-x-[-8px] ps-6"
+                    >
+                      {assignment.name}
                     </li>
-                  ) : (
-                    <>
-                      <li
-                        onClick={() => handleSelectAssignmentChange("reset")}
-                        className="px-4 py-2 hover:bg-gray-100 transition duration-300 transform cursor-pointer hover:translate-x-[-8px] ps-6 text-red-600"
-                      >
-                        Reset
-                      </li>
-                      {assignments.map((assignment) => (
-                        <li
-                          key={assignment._id}
-                          onClick={() =>
-                            handleSelectAssignmentChange(assignment._id)
-                          }
-                          className="px-4 py-2 hover:bg-gray-100 transition duration-300 transform cursor-pointer hover:translate-x-[-8px] ps-6"
-                        >
-                          {assignment.name}
-                        </li>
-                      ))}
-                    </>
-                  )}
+                  ))}
                 </ul>
               )}
             </div>
           )}
 
-          {selectedAssignmentId === "" && (
+          {(selectedAssignmentId === "" || !selectedQuizId) && (
             <div className="p-2 flex-1 relative" ref={dropdownRef2}>
               <label className="block text-gray-700 mb-1">Quizzes</label>
               <div
@@ -319,29 +258,21 @@ const AddRubricModal = ({
               </div>
               {dropdownOpen2 && (
                 <ul className="absolute left-0 right-0 mt-2 max-h-72 overflow-auto bg-white border rounded-md shadow-lg z-10 py-2">
-                  {quizzes.length === 0 ? (
-                    <li className="flex items-center justify-center py-4 text-gray-500">
-                      <CiBoxList className="mr-2" /> No quizzes available
+                  <li
+                    onClick={() => handleSelectQuizChange("reset")}
+                    className="px-4 py-2 hover:bg-gray-100 transition duration-300 transform cursor-pointer hover:translate-x-[-8px] ps-6 text-red-600"
+                  >
+                    Reset
+                  </li>
+                  {quizzes.map((quiz) => (
+                    <li
+                      key={quiz._id}
+                      onClick={() => handleSelectQuizChange(quiz._id)}
+                      className="px-4 py-2 hover:bg-gray-100 transition duration-300 transform cursor-pointer hover:translate-x-[-8px] ps-6"
+                    >
+                      {quiz.name}
                     </li>
-                  ) : (
-                    <>
-                      <li
-                        onClick={() => handleSelectQuizChange("reset")}
-                        className="px-4 py-2 hover:bg-gray-100 transition duration-300 transform cursor-pointer hover:translate-x-[-8px] ps-6 text-red-600"
-                      >
-                        Reset
-                      </li>
-                      {quizzes.map((quiz) => (
-                        <li
-                          key={quiz._id}
-                          onClick={() => handleSelectQuizChange(quiz._id)}
-                          className="px-4 py-2 hover:bg-gray-100 transition duration-300 transform cursor-pointer hover:translate-x-[-8px] ps-6"
-                        >
-                          {quiz.name}
-                        </li>
-                      ))}
-                    </>
-                  )}
+                  ))}
                 </ul>
               )}
             </div>
@@ -363,7 +294,7 @@ const AddRubricModal = ({
               </div>
             ))}
           </div>
-          {selectLoading ? (
+          {loading ? (
             <div className="flex justify-center items-center h-full">
               <Spinner />
             </div>
@@ -406,9 +337,16 @@ const AddRubricModal = ({
             </button>
           )}
           <div className="text-transparent text-xl font-bold bg-clip-text bg-gradient-to-r from-pink-500 to-purple-500">
-            {selectedAssignmentId
-              ? `Total Assignment Points: ${totalPoints}`
-              : `Total Quiz Points: ${totalPoints}`}
+            Total Points:{" "}
+            {criteriaList.reduce(
+              (acc, criterion) =>
+                acc +
+                criterion.ratings.reduce(
+                  (ratingAcc, rating) => ratingAcc + Number(rating.ratingScore),
+                  0
+                ),
+              0
+            )}
           </div>
         </div>
 

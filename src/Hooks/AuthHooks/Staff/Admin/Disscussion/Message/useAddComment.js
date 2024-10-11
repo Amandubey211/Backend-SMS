@@ -8,7 +8,7 @@ import { baseUrl } from "../../../../../../config/Common";
 const useAddComment = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  
+
   const { role } = useSelector((store) => store.Auth);
   const { did: discussionId } = useParams();
   const addComment = useCallback(

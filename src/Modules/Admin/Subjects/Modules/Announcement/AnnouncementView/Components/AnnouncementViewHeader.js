@@ -9,12 +9,13 @@ import Sidebar from "../../../../../../../Components/Common/Sidebar";
 import DeleteModal from "../../../../../../../Components/Common/DeleteModal";
 import AnnouncementCommentSection from "../AnnouncementMessage/AnnouncementCommentSection";
 import { deleteAnnouncement } from "../../../../../../../Store/Slices/Admin/Class/Announcement/announcementThunk";
+import CommentModule from "../../../Comment/CommentModule";
 
 const AnnouncementViewHeader = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [isModalOpen, setModalOpen] = useState(false);
-  const { cid, sid } = useParams();
+  const { cid, sid, did: announcementId } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -158,7 +159,7 @@ const AnnouncementViewHeader = () => {
             isOpen={isSidebarOpen}
             onClose={handleSidebarClose}
           >
-            {/* <AnnouncementCommentSection /> */} comment section
+            <AnnouncementCommentSection />
           </Sidebar>
         </div>
       </div>
