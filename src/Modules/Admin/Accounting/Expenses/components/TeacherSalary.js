@@ -54,8 +54,8 @@ const DropdownMenu = ({ onEditClick }) => {
 };
 
 const TeacherRow = React.memo(({ teacher, onPayClick, onEditClick }) => (
-  <tr className="bg-white">
-    <td className="px-5 py-3 border-b border-gray-200 flex items-center">
+  <tr className="bg-white border border-gray-200">
+    <td className="px-5 py-3  flex items-center">
       {teacher.staffId?.profile ? (
         <img src={teacher?.staffId?.profile} alt="Profile" className="w-10 h-10 rounded-full mr-3" />
       ) : (
@@ -70,18 +70,18 @@ const TeacherRow = React.memo(({ teacher, onPayClick, onEditClick }) => (
         <div className="text-sm text-gray-500">{teacher?.staffId?.position}</div>
       </div>
     </td>
-    <td className="px-5 py-2 border-b border-gray-200">{teacher?.staffId?.mobileNumber}</td>
-    <td className="px-5 py-2 border-b border-gray-200">{teacher?.month}</td>
-    <td className="px-5 py-2 border-b border-gray-200">{teacher?.salaryAmount} QR</td>
-    <td className="px-5 py-2 border-b border-gray-200">
+    <td className="px-5 py-2 ">{teacher?.staffId?.mobileNumber}</td>
+    <td className="px-5 py-2 ">{teacher?.month}</td>
+    <td className="px-5 py-2 ">{teacher?.salaryAmount} QR</td>
+    <td className="px-5 py-2 ">
       {teacher?.paidDate ? new Date(teacher?.paidDate).toLocaleDateString() : "---"}
     </td>
-    <td className="px-5 py-2 border-b border-gray-200">
+    <td className="px-5 py-2 ">
       <span className={`px-3 py-1 text-xs font-semibold ${teacher?.status === "paid" ? " text-green-800" : " text-red-800"}`}>
         {teacher?.status}
       </span>
     </td>
-    <td className="px-5 py-2 border-b border-gray-200 flex items-center justify-between space-x-2">
+    <td className="px-5 py-2  flex items-center justify-between space-x-2">
       {teacher?.status === "paid" ? (
         <span className="inline-flex items-center border border-transparent text-xs font-medium shadow-sm bg-green-200 text-green-800 py-1 px-2 rounded-md">
           Completed

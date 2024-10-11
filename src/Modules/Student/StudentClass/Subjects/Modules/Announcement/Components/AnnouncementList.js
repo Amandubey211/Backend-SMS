@@ -4,22 +4,25 @@ import { ImSpinner3 } from "react-icons/im";
 import { useParams } from "react-router-dom";
 import AnnouncementHeader from "./AnnouncementHeader";
 import AnnouncementCard from "./AnnouncementCard";
-import useGetAllAnnouncements from "../../../../../../../Hooks/AuthHooks/Staff/Admin/Announcement/useGetAllAnnouncements";
 import NoDataFound from "../../../../../../../Components/Common/NoDataFound";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchStudentAnnounce } from "../../../../../../../Store/Slices/Student/MyClass/Class/Subjects/Announcement/announcement.action";
 
 const AnnouncementList = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const { loading, error, fetchAnnouncements, announcementData } =
-    useGetAllAnnouncements();
+  const dispatch = useDispatch();
+  const { loading, error, announcementData } = useSelector((store) => store?.student?.studentAnnounce)
+
   const { cid } = useParams();
 
   useEffect(() => {
-    fetchAnnouncements(cid);
-  }, [cid, fetchAnnouncements]);
+    dispatch(fetchStudentAnnounce(cid))
+  }, [cid, dispatch]);
 
   const filteredAnnouncements = announcementData.filter((card) =>
     card.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
+  console.log(filteredAnnouncements, "filteredAnnouncements");
 
   return (
     <div className="w-full ps-3">

@@ -18,17 +18,19 @@ const MainSection = () => {
     dispatch(stdModule({ cid, sid }));
   }, [dispatch]);
 
+
   // Select the first module when modules are fetched
   useEffect(() => {
     if (modulesData?.length > 0) {
       const firstModule = modulesData[0];
       dispatch(
         setSelectedModule({
-          moduleId: firstModule._id,
-          name: firstModule.moduleName,
-          chapters: firstModule.chapters,
+          moduleId: firstModule?._id,
+          name: firstModule?.moduleName,
+          chapters: firstModule?.chapters,
         })
       );
+      dispatch(setExpandedChapters([])); 
     } else {
       dispatch(setSelectedModule({
         moduleId: null,
@@ -36,8 +38,7 @@ const MainSection = () => {
         chapters: [],
       }));
     }
-  }, [dispatch]);
-
+  }, [dispatch, modulesData]);
 
   const toggleChapter = (chapterId) => {
     dispatch(setExpandedChapters(
@@ -55,8 +56,10 @@ const MainSection = () => {
         chapters: module?.chapters,
       })
     );
+
     dispatch(setExpandedChapters([]));
   };
+
 
   // Render chapters if available
   const renderChapters = () => {
