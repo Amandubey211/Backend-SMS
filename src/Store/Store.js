@@ -7,8 +7,6 @@ import authReducer from "./Slices/Common/Auth/reducers/authSlice"; // Importing 
 import userReducer from "./Slices/Common/User/reducers/userSlice"; // Importing the user slice reducer
 import alertReducer from "./Slices/Common/Alerts/alertsSlice";
 
-
-
 // admin
 import adminDashboardReducer from "./Slices/Admin/Dashboard/adminDashboardSlice";
 import teacherReducer from "./Slices/Admin/Class/Teachers/teacherSlice";
@@ -31,8 +29,8 @@ import allParentReducer from "./Slices/Admin/Users/Parents/parentSilce";
 import allstaffReducer from "./Slices/Admin/Users/Staff/staffSlice";
 import earningReducer from "./Slices/Admin/Accounting/Earning/earningSlice";
 import studentFeesReducer from "./Slices/Admin/Accounting/StudentFees/studentFeesSlice";
-import expensesReducer from "./Slices/Admin/Accounting/Expenses/expensesSlice"
-
+import expensesReducer from "./Slices/Admin/Accounting/Expenses/expensesSlice";
+import adminRubricReducer from "./Slices/Admin/Class/Rubric/rubricSlice";
 
 // student
 import studentDashboardReducer from "./Slices/Student/Dashboard/studentDashboardSlices";
@@ -113,13 +111,13 @@ const AdminReducer = combineReducers({
   pages: adminPageReducer,
   discussions: adminDiscussionReducer,
   announcements: adminAnnouncementReducer,
-  all_students:allStudentReducer,
-  all_parents:allParentReducer,
-  all_staff:allstaffReducer,
+  rubrics: adminRubricReducer,
+  all_students: allStudentReducer,
+  all_parents: allParentReducer,
+  all_staff: allstaffReducer,
   earning: earningReducer,
   student_fees: studentFeesReducer,
   expenses: expensesReducer,
-
 });
 
 const studentReducer = combineReducers({
