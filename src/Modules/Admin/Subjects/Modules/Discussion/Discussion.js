@@ -7,7 +7,6 @@ import { useSelector } from "react-redux";
 
 const Discussion = () => {
   const className = useSelector(
-    // (store) => store.common.classInfo.selectedClassName
     (store) => store.common.user.classInfo.selectedClassName
   );
   const subjectName = useSelector(

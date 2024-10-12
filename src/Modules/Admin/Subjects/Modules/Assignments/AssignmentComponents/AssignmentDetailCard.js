@@ -16,7 +16,6 @@ const AssignmentDetailCard = ({
   isPublish,
 }) => {
   const [isModalOpen, setModalOpen] = useState(false);
-  const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [criteriaList, setCriteriaList] = useState([]);
   const [existingRubricId, setExistingRubricId] = useState(null);
   const [selectedAssignmentId, setSelectedAssignmentId] = useState("");
@@ -33,7 +32,6 @@ const AssignmentDetailCard = ({
 
   if (loading) return <Spinner />;
   if (error) return <NoDataFound />;
-
   if (!assignment) return <NoDataFound />;
 
   const {
@@ -48,11 +46,7 @@ const AssignmentDetailCard = ({
 
   return (
     <div className="max-w-sm p-4 bg-white" aria-label="Assignment Card">
-      <ButtonsGroup
-        type="Assignment"
-        data={assignment}
-        onRefresh={onRefresh} // Pass the refresh callback
-      />
+      <ButtonsGroup type="Assignment" data={assignment} onRefresh={onRefresh} />
 
       <SpeedGradeButton
         type="Assignment"
@@ -87,22 +81,14 @@ const AssignmentDetailCard = ({
 
       <AddRubricModal
         type="assignment"
-        AssignmentId={selectedAssignmentId} // Pass the selected assignment ID
+        AssignmentId={selectedAssignmentId}
         isOpen={isModalOpen}
         onClose={() => setModalOpen(false)}
-        // onAddCriteria={() => setSidebarOpen(true)}
         criteriaList={criteriaList}
         setCriteriaList={setCriteriaList}
         setExistingRubricId={setExistingRubricId}
-        readonly={true} // Set readonly to true
+        readonly={true}
       />
-      {/* <Sidebar
-        isOpen={isSidebarOpen}
-        onClose={() => setSidebarOpen(false)}
-        title="Add New Criteria"
-      >
-        <AddNewCriteriaForm />
-      </Sidebar> */}
     </div>
   );
 };

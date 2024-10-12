@@ -34,6 +34,7 @@ import adminRubricReducer from "./Slices/Admin/Class/Rubric/rubricSlice";
 import adminDiscussionCommentsReducer from "./Slices/Admin/Class/Discussion/Comments/discussionCommentsSlice";
 import adminCommentReducer from "./Slices/Admin/Class/Comment/commentsSlice";
 import adminAnnouncementCommentsReducer from "./Slices/Admin/Class/Announcement/Comment/announcementCommentsSlice";
+import adminAssignmentReducer from "./Slices/Admin/Class/Assignment/assignmentSlice";
 
 // student
 import studentDashboardReducer from "./Slices/Student/Dashboard/studentDashboardSlices";
@@ -119,6 +120,7 @@ const AdminReducer = combineReducers({
   discussionComments: adminDiscussionCommentsReducer,
   announcementComments: adminAnnouncementCommentsReducer,
   comments: adminCommentReducer,
+  assignments: adminAssignmentReducer,
 
   all_students: allStudentReducer,
   all_parents: allParentReducer,
