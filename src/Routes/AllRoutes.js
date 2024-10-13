@@ -94,7 +94,7 @@ const StudentClass = lazy(() =>
   import("../Modules/Student/StudentClass/SubClass/StudentClass.js")
 );
 const ParentDash = lazy(() =>
-  import("../Modules/Parents/Dasboard/ParentDash.js")
+  import("../Modules/Parents/Dashboard/ParentDash.js")
 );
 const MyChildren = lazy(() =>
   import("../Modules/Parents/Childrens/ChildScreen.js")

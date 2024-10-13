@@ -77,7 +77,7 @@ export const fetchChildren = createAsyncThunk(
 
     try {
       const response = await axios.get(
-        `${baseUrl}/parent/api/children?email=${encodeURIComponent(userData.email)}`,
+        `${baseUrl}/parent/api/children`,
         {
           headers: {
             Authentication: `${token}`,
