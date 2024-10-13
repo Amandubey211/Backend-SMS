@@ -17,7 +17,7 @@ const gradientBackgrounds = [
   "linear-gradient(90deg, #FBB778 0%, #F9B279 100%)"
 ];
 
-const NoticeBoard = ({ numberOfChildren }) => {
+const NoticeBoard = ({ textTrimCount }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { t } = useTranslation('prtNotices'); // Use i18n translation hook with namespace 'prtNotices'
@@ -153,7 +153,7 @@ const NoticeBoard = ({ numberOfChildren }) => {
               {t(notice.priority === "High priority" ? "High Priority" : "Low Priority")}
             </span>
           }
-          content={truncateText(notice.description || "", 50)}
+          content={truncateText(notice.description || "", textTrimCount)}
           backgroundColor={gradientBackgrounds[index % gradientBackgrounds.length]}
         />
       ))}

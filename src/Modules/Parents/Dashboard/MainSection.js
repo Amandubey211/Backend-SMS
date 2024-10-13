@@ -20,7 +20,7 @@ const ParentSection = () => {
             <StudentParentCard/>
           </div>
           <div className="w-3/5 border-r">
-            <NoticeBoard/>
+            <NoticeBoard textTrimCount={74}/>
           </div>
         </div>
         <div className="flex justify-between items-start border-y">

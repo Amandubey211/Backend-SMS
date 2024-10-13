@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAccountingData } from '../../../../Store/Slices/Parent/Dashboard/dashboard.action'; // Redux action to fetch accounting data
 import Layout from "../../../../Components/Common/ParentLayout";
-import { FaExclamationCircle, FaMoneyBillWave } from "react-icons/fa"; // Icon for error and no data message
+import { FaExclamationCircle, FaMoneyBillWave } from "react-icons/fa"; // Icons for error and no data message
+import { IoArrowBackCircleOutline, IoArrowForwardCircleOutline } from "react-icons/io5"; // Icons for pagination arrows
 import Spinner from "../../../../Components/Common/Spinner"; // Spinner component
 import { useTranslation } from "react-i18next"; // Import useTranslation from i18next
 
@@ -16,6 +17,10 @@ const AccountingSection = () => {
   const { t } = useTranslation('prtFinance'); // Initialize i18next hook with prtFinance namespace
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const rowsPerPage = 5;
 
   // Filters state
   const [filters, setFilters] = useState({
@@ -58,6 +63,25 @@ const AccountingSection = () => {
     });
   }, [fees, filters]);
 
+  // Calculate total pages for pagination
+  const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+
+  // Determine which data to show on the current page
+  const paginatedData = useMemo(() => {
+    const startIndex = (currentPage - 1) * rowsPerPage;
+    const endIndex = startIndex + rowsPerPage;
+    return filteredData.slice(startIndex, endIndex);
+  }, [currentPage, filteredData]);
+
+  // Handle page change with left and right arrows
+  const handleNextPage = useCallback(() => {
+    setCurrentPage((prevPage) => (prevPage < totalPages ? prevPage + 1 : prevPage));
+  }, [totalPages]);
+
+  const handlePrevPage = useCallback(() => {
+    setCurrentPage((prevPage) => (prevPage > 1 ? prevPage - 1 : prevPage));
+  }, []);
+
   // Handle navigation using useCallback to prevent re-creation on every render
   const handleNavigate = useCallback(() => {
     navigate("/parentfinance");
@@ -71,18 +95,37 @@ const AccountingSection = () => {
           <h2 className="text-lg font-semibold text-gray-600 text-center">
             {t("Finance")}
           </h2>
-          {!error && filteredData.length > 0 && (
-            <button
-              className="text-transparent bg-clip-text bg-gradient-to-r from-[#C83B62] to-[#7F35CD] font-normal"
-              onClick={handleNavigate}
-            >
-              {t("See All")}
-            </button>
+          {!error && paginatedData.length > 0 && (
+            <div className="flex items-center space-x-4">
+              <button
+                className="text-gray-500"
+                onClick={handlePrevPage}
+                disabled={currentPage === 1}
+              >
+                <IoArrowBackCircleOutline className="inline-block text-2xl" />
+              </button>
+              <span className="font-normal text-gray-600">
+                {`${currentPage.toString().padStart(2, '0')} / ${totalPages.toString().padStart(2, '0')}`}
+              </span>
+              <button
+                className="text-gray-500"
+                onClick={handleNextPage}
+                disabled={currentPage === totalPages}
+              >
+                <IoArrowForwardCircleOutline className="inline-block text-2xl" />
+              </button>
+              <button
+                className="text-transparent bg-clip-text bg-gradient-to-r from-[#C83B62] to-[#7F35CD] font-normal"
+                onClick={handleNavigate}
+              >
+                {t("See All")}
+              </button>
+            </div>
           )}
         </div>
 
         <div className="p-4">
-          {/* Adjusting the table layout to show all rows without scrolling */}
+          {/* Adjusting the table layout to show rows based on pagination */}
           <div className="shadow rounded-lg">
             {loading ? (
               // Show spinner when loading
@@ -96,69 +139,45 @@ const AccountingSection = () => {
                 <FaExclamationCircle className="text-gray-400 text-4xl mb-4" />
                 <p className="text-gray-600 text-lg">{error}: {t("Unable to fetch Fees")}</p>
               </>
-            ) : filteredData.length === 0 ? (
+            ) : paginatedData.length === 0 ? (
               // No data available, show icon and message
               <>
                 <FaMoneyBillWave className="text-gray-400 text-6xl mb-4" />
                 <p className="text-gray-600 text-lg">{t("No Fees Yet")}</p>
               </>
             ) : (
-              // Display table without scroll (all rows at once)
-              <table className="min-w-full table-auto leading-normal">
+              // Display paginated data in table
+
+              <table className="min-w-full table-fixed leading-normal">
                 <thead>
                   <tr className="text-left text-gray-700 bg-[#F9FAFC]">
-                    <th className="px-5 py-3 border-b-2 border-gray-200 font-normal">{t("Fee Type")}</th>
-                    <th className="px-5 py-3 border-b-2 border-gray-200 font-normal">{t("Paid By")}</th>
-                    <th className="px-5 py-3 border-b-2 border-gray-200 font-normal">{t("Due Date")}</th>
-                    <th className="px-5 py-3 border-b-2 border-gray-200 font-normal">{t("Amount")}</th>
-                    <th className="px-5 py-3 border-b-2 border-gray-200 font-normal">{t("Status")}</th>
-                    <th className="px-5 py-3 border-b-2 border-gray-200 font-normal">{t("Action")}</th>
+                    <th className="px-5 py-3 border-b-2 border-gray-200 font-normal w-1/5">{t("Fee Type")}</th>
+                    <th className="px-5 py-3 border-b-2 border-gray-200 font-normal w-1/5">{t("Paid By")}</th>
+                    <th className="px-5 py-3 border-b-2 border-gray-200 font-normal w-1/5">{t("Due Date")}</th>
+                    <th className="px-5 py-3 border-b-2 border-gray-200 font-normal w-1/5">{t("Amount")}</th>
+                    <th className="px-5 py-3 border-b-2 border-gray-200 font-normal w-1/5">{t("Status")}</th>
+                    <th className="px-5 py-3 border-b-2 border-gray-200 font-normal w-1/5">{t("Action")}</th>
                   </tr>
                 </thead>
                 <tbody className="space-y-2">
-                  {filteredData.map((item, index) => (
+                  {paginatedData.map((item, index) => (
                     <tr key={index} className="text-left text-gray-700 bg-white shadow-sm">
+                      <td className="px-5 py-4 border-b border-gray-200 truncate">{item?.feeType ?? t("No Fee Type")}</td>
+                      <td className="px-5 py-4 border-b border-gray-200">{item?.paidBy ?? "N/A"}</td>
+                      <td className="px-5 py-4 border-b border-gray-200">{item?.dueDate ?? "N/A"}</td>
+                      <td className="px-5 py-4 border-b border-gray-200">{item?.amount ?? "N/A"}</td>
                       <td className="px-5 py-4 border-b border-gray-200">
-                        {item?.feeType ?? t("No Fee Type")}
-                      </td>
-                      <td className="px-5 py-4 border-b border-gray-200">
-                        {item?.paidBy ?? "N/A"}
-                      </td>
-                      <td className="px-5 py-4 border-b border-gray-200">
-                        {item?.dueDate ?? "N/A"}
-                      </td>
-                      <td className="px-5 py-4 border-b border-gray-200">
-                        {item?.amount ?? "N/A"}
-                      </td>
-                      <td className="px-5 py-4 border-b border-gray-200">
-                        <span
-                          className={`inline-block px-3 py-1 font-medium rounded-full ${item?.status === "Paid"
-                            ? "text-[#0D9755]"
-                            : "text-red-500"
-                            }`}
-                        >
+                        <span className={`inline-block px-3 py-1 font-medium rounded-full ${item?.status === "Paid" ? "text-[#0D9755]" : "text-red-500"}`}>
                           {item?.status ?? "N/A"}
                         </span>
                       </td>
                       <td className="px-5 py-4 border-b border-gray-200">
                         {item?.status === "Unpaid" ? (
-                          <button
-                            className="text-white bg-gradient-to-r from-[#C83B62] to-[#7F35CD] hover:bg-gradient-to-l px-4 py-1  font-normal rounded-md transition duration-300 ease-in-out"
-                            style={{ minWidth: "100px", height: "36px" }}
-                          >
+                          <button className="text-white bg-gradient-to-r from-[#C83B62] to-[#7F35CD] hover:bg-gradient-to-l px-4 py-1 font-normal rounded-md transition duration-300 ease-in-out" style={{ minWidth: "100px", height: "36px" }}>
                             {t("Pay Now")}
                           </button>
                         ) : (
-                          <span
-                            className="text-[#0D9755] bg-[#E9F8EB] font-normal px-4 py-1 rounded-md inline-block"
-                            style={{
-                              width: "100px",  // Set a fixed width to match "Pay Now" button
-                              height: "36px",  // Ensure height matches "Pay Now" button
-                              display: "flex",
-                              justifyContent: "center",
-                              alignItems: "center"
-                            }}
-                          >
+                          <span className="text-[#0D9755] bg-[#E9F8EB] font-normal px-4 py-1 rounded-md inline-block" style={{ width: "100px", height: "36px", display: "flex", justifyContent: "center", alignItems: "center" }}>
                             {t("Completed")}
                           </span>
                         )}
@@ -167,6 +186,7 @@ const AccountingSection = () => {
                   ))}
                 </tbody>
               </table>
+
             )}
           </div>
         </div>
