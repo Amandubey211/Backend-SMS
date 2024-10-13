@@ -240,7 +240,7 @@ const StudentDash = lazy(() =>
   import("../Modules/Student/Dashboard/StudentDash.js")
 );
 const ParentDash = lazy(() =>
-  import("../Modules/Parents/Dasboard/ParentDash.js")
+  import("../Modules/Parents/Dashboard/ParentDash.js")
 );
 
 const MyChildren = lazy(() =>

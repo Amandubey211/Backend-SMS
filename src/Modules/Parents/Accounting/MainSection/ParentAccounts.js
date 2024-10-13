@@ -25,8 +25,12 @@ const AccountingSection = () => {
     status: "Everyone", // Default to show all statuses
   });
 
-  // Redux state for accounting data, now with error message from Redux
-  const { accountingData, loading, error } = useSelector((state) => state?.Parent?.dashboard || {});
+  // Redux state for accounting data
+  const {
+    accountingData,
+    loadingAccounting: loading, // Alias loading state for simplicity
+    errorAccounting: error // Alias error state for simplicity
+  } = useSelector((state) => state?.Parent?.dashboard || {});
 
   // Dispatch action to fetch accounting data on component mount
   useEffect(() => {
@@ -59,33 +63,14 @@ const AccountingSection = () => {
     navigate("/parentfinance");
   }, [navigate]);
 
-  // Cache and optimize rendering with conditional rendering
-  if (loading) {
-    return (
-      <Layout title={t("Finance")}>
-        <div className="p-4">
-          {/* Accounting Section Header */}
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-semibold text-gray-600">{t("Finance")}</h2>
-          </div>
-
-          <div className="p-4">
-            <div className="overflow-x-auto shadow rounded-lg flex flex-col items-center justify-center h-64 text-center">
-              <Spinner />
-              <p className="text-gray-600">{t("Loading...")}</p>
-            </div>
-          </div>
-        </div>
-      </Layout>
-    );
-  }
-
   return (
     <Layout title={t("Finance")}>
       <div className="p-4">
         {/* Accounting Section Header */}
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-semibold text-gray-600">{t("Finance")}</h2>
+          <h2 className="text-lg font-semibold text-gray-600 text-center">
+            {t("Finance")}
+          </h2>
           {!error && filteredData.length > 0 && (
             <button
               className="text-transparent bg-clip-text bg-gradient-to-r from-[#C83B62] to-[#7F35CD] font-normal"
@@ -97,21 +82,29 @@ const AccountingSection = () => {
         </div>
 
         <div className="p-4">
-          <div className="overflow-x-auto shadow rounded-lg">
-            {error ? (
-              // Error message displayed in the center with an icon and Redux error message
-              <div className="flex flex-col items-center justify-center h-64 text-center">
+          {/* Adjusting the table layout to show all rows without scrolling */}
+          <div className="shadow rounded-lg">
+            {loading ? (
+              // Show spinner when loading
+              <>
+                <Spinner />
+                <p className="text-gray-600">{t("Loading...")}</p>
+              </>
+            ) : error ? (
+              // Show error message when error occurs
+              <>
                 <FaExclamationCircle className="text-gray-400 text-4xl mb-4" />
-                <p className="text-gray-600 text-lg">{error}: {t("Failed to fetch finance data")}</p>
-              </div>
+                <p className="text-gray-600 text-lg">{error}: {t("Unable to fetch Fees")}</p>
+              </>
             ) : filteredData.length === 0 ? (
               // No data available, show icon and message
-              <div className="flex flex-col items-center justify-center h-64 text-center">
+              <>
                 <FaMoneyBillWave className="text-gray-400 text-6xl mb-4" />
                 <p className="text-gray-600 text-lg">{t("No Fees Yet")}</p>
-              </div>
+              </>
             ) : (
-              <table className="min-w-full leading-normal">
+              // Display table without scroll (all rows at once)
+              <table className="min-w-full table-auto leading-normal">
                 <thead>
                   <tr className="text-left text-gray-700 bg-[#F9FAFC]">
                     <th className="px-5 py-3 border-b-2 border-gray-200 font-normal">{t("Fee Type")}</th>
