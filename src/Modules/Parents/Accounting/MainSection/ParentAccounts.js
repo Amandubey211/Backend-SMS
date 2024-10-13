@@ -137,7 +137,7 @@ const AccountingSection = () => {
               // Show error message when error occurs
               <>
                 <FaExclamationCircle className="text-gray-400 text-4xl mb-4" />
-                <p className="text-gray-600 text-lg">{error}: {t("Unable to fetch Fees")}</p>
+                <p className="text-gray-600 text-lg"> {error}: {t("Unable to fetch Fees")}</p>
               </>
             ) : paginatedData.length === 0 ? (
               // No data available, show icon and message
