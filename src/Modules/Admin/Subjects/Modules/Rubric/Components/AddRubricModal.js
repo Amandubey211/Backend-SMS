@@ -69,7 +69,7 @@ const AddRubricModal = ({
 
           if (AssignmentId) {
             setTotalPoints(
-              assignments.find((a) => a._id === AssignmentId)?.totalPoints || 0
+              assignments.find((a) => a._id === AssignmentId)?.points || 0
             );
           } else if (QuizId) {
             setTotalPoints(
@@ -136,9 +136,7 @@ const AddRubricModal = ({
         if (result.success) {
           setCriteriaList(result.rubric.criteria); // Display rubric data
           setRubricName(result.rubric.name);
-          setTotalPoints(
-            assignments.find((a) => a._id === id)?.totalPoints || 0
-          ); // Set total points for the selected assignment
+          setTotalPoints(assignments.find((a) => a._id === id)?.points || 0); // Set total points for the selected assignment
           setExistingRubricId(result.rubric._id);
         } else {
           setCriteriaList([]); // Show empty row if no data is available

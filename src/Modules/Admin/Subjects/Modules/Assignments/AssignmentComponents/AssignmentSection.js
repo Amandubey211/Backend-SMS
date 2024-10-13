@@ -2,13 +2,16 @@ import React from "react";
 import { FaPlayCircle } from "react-icons/fa";
 import Spinner from "../../../../../../Components/Common/Spinner";
 import NoDataFound from "../../../../../../Components/Common/NoDataFound";
+import { useSelector } from "react-redux";
 
-const AssignmentSection = ({ assignment, loading, error }) => {
+const AssignmentSection = () => {
+  const { assignmentDetails, loading, error } = useSelector(
+    (store) => store.admin.assignments
+  );
   if (loading) return <Spinner />;
-  if (error) return <NoDataFound />;
-  if (!assignment) return null;
+  if (error || !assignmentDetails) return <NoDataFound />;
 
-  const { name, content, videoThumbnailUrl } = assignment;
+  const { name, content, videoThumbnailUrl } = assignmentDetails;
 
   return (
     <div className="max-w-3xl mx-auto p-6 bg-white">

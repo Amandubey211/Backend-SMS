@@ -168,13 +168,14 @@ export const fetchAssignmentByIdThunk = createAsyncThunk(
     try {
       const token = getState().common.auth.token;
       const response = await axios.get(
-        1`${baseUrl}/admin/assignment/${assignmentId}`,
+        `${baseUrl}/admin/assignment/${assignmentId}`,
         {
           headers: {
             Authentication: `Bearer ${token}`,
           },
         }
       );
+      console.log(response.data, "ddddddddddddd");
       if (response.data.success) {
         return response.data.assignment; // Return the fetched assignment data
       } else {

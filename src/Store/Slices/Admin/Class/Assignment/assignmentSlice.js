@@ -5,6 +5,7 @@ import {
   fetchAssignmentsByClassThunk,
   deleteAssignmentThunk,
   fetchFilteredAssignments,
+  fetchAssignmentByIdThunk,
 } from "./assignmentThunks"; // Import thunks
 
 // Initial state for the assignment slice
@@ -116,6 +117,19 @@ const assignmentSlice = createSlice({
       .addCase(fetchFilteredAssignments.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Failed to fetch filtered assignments";
+      });
+    builder
+      .addCase(fetchAssignmentByIdThunk.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchAssignmentByIdThunk.fulfilled, (state, action) => {
+        state.loading = false;
+        state.assignmentDetails = action.payload; // Set assignment details
+      })
+      .addCase(fetchAssignmentByIdThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Failed to fetch assignment";
       });
   },
 });

@@ -9,33 +9,22 @@ import { useParams } from "react-router-dom";
 const MainSection = () => {
   const { aid: assignmentId } = useParams();
   const dispatch = useDispatch();
-  // const [refreshKey, setRefreshKey] = useState(0);
 
-  // Accessing assignment details from the store
   const {
     assignmentDetails: assignment,
     loading,
     error,
   } = useSelector((state) => state.admin.assignments);
 
-  // Fetch assignment by ID
   useEffect(() => {
     dispatch(fetchAssignmentByIdThunk(assignmentId));
   }, [assignmentId, dispatch]);
-
-  // const handleDataRefresh = () => {
-  //   setRefreshKey((oldKey) => oldKey + 1); // Trigger refetch
-  // };
 
   return (
     <div className="flex">
       <SubjectSideBar />
       <div className="w-[65%] border">
-        <AssignmentSection
-          assignment={assignment}
-          loading={loading}
-          error={error}
-        />
+        <AssignmentSection />
       </div>
       <div className="w-[30%]">
         <AssignmentDetailCard
@@ -43,7 +32,6 @@ const MainSection = () => {
           assignment={assignment}
           loading={loading}
           error={error}
-          // onRefresh={handleDataRefresh}d
         />
       </div>
     </div>
