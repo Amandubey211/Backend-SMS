@@ -7,7 +7,7 @@ import { baseUrl } from "../../../../../config/Common";
 const useUpdateQuiz = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const role = useSelector((store) => store.Auth.role);
+  const role = useSelector((store) => store.common.auth.role);
 
   const updateQuiz = useCallback(
     async (quizId, quizData) => {

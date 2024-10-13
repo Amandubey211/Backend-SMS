@@ -1,30 +1,28 @@
-import React, { useState, useEffect, useMemo, useCallback } from "react";
-import SubjectSideBar from "../../../Component/SubjectSideBar";
+import React, { useEffect, useMemo } from "react";
 import { RiListCheck3, RiAddFill } from "react-icons/ri";
 import { NavLink, useParams } from "react-router-dom";
-import useGetFilteredAssignments from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useGetFilteredAssignments";
+import { useDispatch, useSelector } from "react-redux";
+import SubjectSideBar from "../../../Component/SubjectSideBar";
 import FilterCard from "../Component/FilterCard";
 import List from "../Component/List";
+import { fetchFilteredAssignments } from "../../../../../../Store/Slices/Admin/Class/Assignment/assignmentThunks";
 
 const MainSection = () => {
   const { sid, cid } = useParams();
-  const { loading, error, assignments, fetchFilteredAssignments } =
-    useGetFilteredAssignments();
+  const dispatch = useDispatch();
+  const { assignments, loading, error } = useSelector(
+    (state) => state.admin.assignments
+  );
 
-  const [filters, setFilters] = useState({
+  const [filters, setFilters] = React.useState({
     moduleId: "",
     chapterId: "",
     publish: null,
   });
 
-  const refetchAssignments = useCallback(() => {
-    const { moduleId, chapterId, publish } = filters;
-    fetchFilteredAssignments(sid, moduleId, chapterId, publish);
-  }, [filters, sid, fetchFilteredAssignments]);
-
   useEffect(() => {
-    refetchAssignments();
-  }, [refetchAssignments]);
+    dispatch(fetchFilteredAssignments({ sid, ...filters }));
+  }, [dispatch, sid, filters]);
 
   const navLinkStyles = useMemo(
     () => ({
@@ -45,7 +43,6 @@ const MainSection = () => {
           icon={<RiListCheck3 />}
           loading={loading}
           error={error}
-          refetchData={refetchAssignments}
         />
       </div>
       <div className="w-[30%] p-2">

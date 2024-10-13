@@ -7,7 +7,7 @@ import { baseUrl } from "../../../../../config/Common";
 const useUpdateAssignment = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const role = useSelector((store) => store.Auth.role);
+  const role = useSelector((store) => store.common.auth.role);
   const logFormData = (formData) => {
     for (let pair of formData.entries()) {
       console.log(`${pair[0]}: ${pair[1]}`);

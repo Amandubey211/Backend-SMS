@@ -1,43 +1,24 @@
 import React, { useState, useEffect, useRef } from "react";
 import { CiSearch } from "react-icons/ci";
-import { FaEllipsisV, FaExclamationTriangle, FaTrashAlt } from "react-icons/fa";
+import { FaEllipsisV, FaTrashAlt } from "react-icons/fa";
 import { BsPatchCheckFill } from "react-icons/bs";
-import { NavLink, useParams } from "react-router-dom";
-import { ImSpinner3 } from "react-icons/im";
 import { MdOutlineBlock } from "react-icons/md";
-import useDeleteQuiz from "../../../../../../Hooks/AuthHooks/Staff/Admin/Quiz/useDeleteQuiz";
-import useDeleteAssignment from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useDeleteAssignment";
+import { NavLink, useParams } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { deleteAssignmentThunk } from "../../../../../../Store/Slices/Admin/Class/Assignment/assignmentThunks";
 import DeleteModal from "../../../../../../Components/Common/DeleteModal";
 import Spinner from "../../../../../../Components/Common/Spinner";
 import NoDataFound from "../../../../../../Components/Common/NoDataFound";
 
-const List = ({ data, icon, title, type, loading, error, refetchData }) => {
+const List = ({ data, icon, title, type, loading, error }) => {
   const { cid, sid } = useParams();
+  const dispatch = useDispatch(); // Hook to dispatch actions
   const [searchQuery, setSearchQuery] = useState("");
   const [activeMenu, setActiveMenu] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentDeleteId, setCurrentDeleteId] = useState(null);
   const [currentDeleteTitle, setCurrentDeleteTitle] = useState("");
-  const menuRef = useRef(null); // Reference to the menu
-
-  const {
-    loading: deleteQuizLoading,
-    error: deleteQuizError,
-    success: deleteQuizSuccess,
-    deleteQuiz,
-  } = useDeleteQuiz();
-  const {
-    loading: deleteAssignmentLoading,
-    error: deleteAssignmentError,
-    success: deleteAssignmentSuccess,
-    deleteAssignment,
-  } = useDeleteAssignment();
-
-  useEffect(() => {
-    if (deleteQuizSuccess || deleteAssignmentSuccess) {
-      refetchData();
-    }
-  }, [deleteQuizSuccess, deleteAssignmentSuccess, refetchData]);
+  const menuRef = useRef(null);
 
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
@@ -54,22 +35,16 @@ const List = ({ data, icon, title, type, loading, error, refetchData }) => {
   };
 
   const confirmDelete = async () => {
-    if (type === "Assignment") {
-      await deleteAssignment(currentDeleteId);
-      refetchData();
-
-    }
-    if (type === "Quiz") {
-      await deleteQuiz(currentDeleteId);
-      refetchData();
-    }
+    // Call delete assignment thunk directly
+    await dispatch(deleteAssignmentThunk(currentDeleteId));
+    setIsModalOpen(false);
   };
 
   const filteredData = data.filter((item) =>
     item.name?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Click outside to close menu
+  // Close menu on outside click
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
@@ -92,21 +67,20 @@ const List = ({ data, icon, title, type, loading, error, refetchData }) => {
             {filteredData.length}
           </span>
         </h2>
-        <div className="relative">
-          <div className="relative flex items-center max-w-xs w-full mr-4">
-            <input
-              type="text"
-              placeholder="Search here"
-              value={searchQuery}
-              onChange={handleSearchChange}
-              className="px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-purple-300 w-full"
-            />
-            <button className="absolute right-3">
-              <CiSearch className="w-5 h-5 text-gray-500" />
-            </button>
-          </div>
+        <div className="relative flex items-center max-w-xs w-full mr-4">
+          <input
+            type="text"
+            placeholder="Search here"
+            value={searchQuery}
+            onChange={handleSearchChange}
+            className="px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-purple-300 w-full"
+          />
+          <button className="absolute right-3">
+            <CiSearch className="w-5 h-5 text-gray-500" />
+          </button>
         </div>
       </div>
+
       <ul className="border-t p-4">
         {loading ? (
           <div className="flex flex-col items-center justify-center py-10 text-gray-500">
@@ -144,12 +118,12 @@ const List = ({ data, icon, title, type, loading, error, refetchData }) => {
                     <p className="text-sm text-gray-500 capitalize">
                       {type === "Assignment" ? (
                         <>
-                          Module : {item.moduleName || "N/A"} | Chapter :{" "}
+                          Module: {item.moduleName || "N/A"} | Chapter:{" "}
                           {item.chapterName || "N/A"}
                         </>
                       ) : (
                         <>
-                          Total Points : {item.totalPoints} | Type :{" "}
+                          Total Points: {item.totalPoints} | Type:{" "}
                           {item.quizType}
                         </>
                       )}
@@ -169,25 +143,16 @@ const List = ({ data, icon, title, type, loading, error, refetchData }) => {
                     />
                     {activeMenu === item._id && (
                       <div
-                        ref={menuRef} // Attach ref to menu
+                        ref={menuRef}
                         className="absolute top-full right-0 mt-2 w-48 bg-white border border-gray-300 rounded-md shadow-lg"
                       >
                         <button
                           onClick={() => handleDelete(item._id, item.name)}
                           className="flex items-center space-x-2 px-4 py-2 hover:bg-red-100 w-full text-left"
-                          aria-label={`Delete ${type}`}
                         >
-                          <FaTrashAlt
-                            aria-hidden="true"
-                            className="text-red-600"
-                          />
+                          <FaTrashAlt className="text-red-600" />
                           <span>Delete</span>
                         </button>
-                        {(deleteQuizError || deleteAssignmentError) && (
-                          <div className="text-red-600 text-sm px-4 py-2">
-                            {deleteQuizError || deleteAssignmentError}
-                          </div>
-                        )}
                       </div>
                     )}
                   </div>
@@ -197,8 +162,7 @@ const List = ({ data, icon, title, type, loading, error, refetchData }) => {
           ))
         ) : (
           <div className="flex flex-col items-center justify-center py-10 text-gray-500">
-            <FaExclamationTriangle className="w-12 h-12 mb-3" />
-            <p className="text-lg font-semibold">No data found</p>
+            <NoDataFound />
           </div>
         )}
       </ul>
