@@ -16,8 +16,9 @@ const MainSection = () => {
   const dispatch  = useDispatch()
 
   useEffect(() => {
-        setModules(courseProgress?.module || []);
-        setChapters(courseProgress?.module?.chapters || []);
+        setModules(courseProgress?courseProgress?.module||[] : [])
+          setChapters(courseProgress ?courseProgress?.module[0]?.chapters||[] : []); 
+       
   }, [courseProgress]);
   
 

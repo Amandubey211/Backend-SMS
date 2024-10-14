@@ -12,7 +12,11 @@ import adminDashboardReducer from "./Slices/Admin/Dashboard/adminDashboardSlice"
 import teacherReducer from "./Slices/Admin/Class/Teachers/teacherSlice";
 import classReducer from "./Slices/Admin/Class/reducer/classSlice"; // Importing the combined admin reducer
 import subjectReducer from "./Slices/Admin/Class/Subject/subjectSlice";
+import subjectGradesReducer from "./Slices/Admin/Class/grades/gradesSlice";
+import subjectAssignmentReducer from "./Slices/Admin/Class/Assignments/assignmentSlice";
+import subjectQuizReducer from "./Slices/Admin/Class/Quiz/quizSlice";
 import sectionReducer from "./Slices/Admin/Class/Section_Groups/groupSectionSlice";
+
 import classStudentReducer from "./Slices/Admin/Class/Students/studentSlice";
 import attendanceReducer from "./Slices/Admin/Class/Attendence/attendanceSlice";
 import verificationReducer from "./Slices/Admin/Verification/VerificationSlice";
@@ -128,6 +132,10 @@ const AdminReducer = combineReducers({
   earning: earningReducer,
   student_fees: studentFeesReducer,
   expenses: expensesReducer,
+  subject_grades:subjectGradesReducer,
+  subject_assignment:subjectAssignmentReducer,
+  subject_quiz:subjectQuizReducer,
+
 });
 
 const studentReducer = combineReducers({

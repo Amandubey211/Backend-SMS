@@ -17,7 +17,7 @@ export const fetchAllStudents = createAsyncThunk(
       });
       return response.data.data;
     } catch (error) {
-     
+      toast.error("Something is wrong");
       return rejectWithValue(error.response?.data || error.message);
     }
   }
@@ -181,6 +181,25 @@ export const fetchCourseProgress = createAsyncThunk(
           });
         
         return response.data.data;
+
+      }
+      catch (error) {
+          return rejectWithValue((error?.response?.data?.message || error?.message || "Something Went Wrong!"))
+
+      }
+  }
+)
+export const fetchStudentTask = createAsyncThunk(
+  'student/studentTask',
+  async (id, { rejectWithValue,getState }) => {
+    const { common } = getState();
+    const token = common.auth.token;
+      try {
+          const response = await axios.get(`${baseUrl}/admin/task/student/${id.studentId}`, {
+              headers: { Authentication:  `Bearer ${token}` }
+          });
+        
+        return response.data.completedTask;
 
       }
       catch (error) {

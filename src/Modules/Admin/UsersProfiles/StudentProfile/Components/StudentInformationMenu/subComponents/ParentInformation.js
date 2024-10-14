@@ -9,11 +9,11 @@ const ParentInformation = ({ parents }) => (
     <InformationItem icon={MdOutlinePerson} title="Mother Name" value={parents?.motherName} />
     <InformationItem icon={MdPhone} title="Phone" value={parents?.guardianContactNumber} />
     <InformationItem icon={MdEmail} title="Email" value={parents?.
-guardianEmail
-} />
-    <InformationItem icon={MdOutlineLocationOn} title="Address" value={parents?.permanentAddress?.
-street
-} />
+      guardianEmail
+    } />
+    <InformationItem icon={MdOutlineLocationOn} title="Address" value={`${parents?.permanentAddress?.
+      country}, ${parents?.permanentAddress?.city}, ${parents?.permanentAddress?.
+          street}`} />
   </div>
 );
 
