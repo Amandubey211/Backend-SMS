@@ -29,7 +29,7 @@ const AssignmentDetailCard = () => {
   const handleViewRubric = () => {
     setModalOpen(true);
   };
-  const isPublish = assignment.isPublish;
+  const isPublish = assignment?.publish;
   if (loading) return <Spinner />;
   if (error || !assignment) return <NoDataFound />;
 

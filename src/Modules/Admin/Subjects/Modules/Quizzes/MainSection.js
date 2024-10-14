@@ -4,22 +4,25 @@ import QuizzDetailCard from "./Components/QuizzDetailCard";
 import QuizInstructionSection from "./Components/QuizInstructionSection";
 import Tabs from "./Components/Tabs";
 import QuizQuestions from "./Components/QuizQuestions";
-import useFetchQuizById from "../../../../../Hooks/AuthHooks/Staff/Admin/Quiz/useFetchQuizById";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchQuizByIdThunk } from "../../../../../Store/Slices/Admin/Class/Quiz/quizThunks"; // Use the thunk
 import { useParams } from "react-router-dom";
 import Spinner from "../../../../../Components/Common/Spinner";
 
 const MainSection = () => {
   const [activeTab, setActiveTab] = useState("instructions");
   const { qid } = useParams();
-  const { error, fetchQuizById, loading, quiz } = useFetchQuizById();
-  console.log(quiz);
-  useEffect(() => {
-    fetchQuizById(qid); // Initial fetch
-  }, [qid, fetchQuizById]);
+  const dispatch = useDispatch();
+  const { loading, quizzDetail: quiz } = useSelector(
+    (state) => state.admin.quizzes
+  );
 
-  // Define onRefresh to trigger a refetch
+  useEffect(() => {
+    dispatch(fetchQuizByIdThunk(qid)); // Fetch quiz by ID
+  }, [qid, dispatch]);
+
   const onRefresh = () => {
-    fetchQuizById(qid);
+    dispatch(fetchQuizByIdThunk(qid)); // Refetch quiz
   };
 
   return (

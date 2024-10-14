@@ -6,9 +6,12 @@ import { useSelector } from "react-redux";
 import useNavHeading from "../../../../../../Hooks/CommonHooks/useNavHeading ";
 
 const QuizzList = () => {
-  const className = useSelector((store) => store.Common.selectedClass);
-  const subjectName = useSelector((store) => store.Common.selectedSubject);
-  console.log(className, subjectName);
+  const className = useSelector(
+    (store) => store.common.user.classInfo.selectedClassName
+  );
+  const subjectName = useSelector(
+    (store) => store.common.user.subjectInfo.selectedSubjectName
+  );
   useNavHeading(className, subjectName);
   return (
     <Layout title={`Quiz List | Student Diwan`}>

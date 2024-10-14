@@ -26,7 +26,9 @@ const Tabs = ({
               <span className="text-green-600 font-medium mr-2">Quiz</span>
               <span className="mx-2">|</span>
               <FaCalendarAlt className="w-4 h-4 mr-2" />
-              <span className="text-sm">Available From: {new Date(availableFrom).toLocaleDateString()}</span>
+              <span className="text-sm">
+                Available From: {new Date(availableFrom).toLocaleDateString()}
+              </span>
             </div>
           </div>
         )}
