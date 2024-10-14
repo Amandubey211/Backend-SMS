@@ -9,8 +9,8 @@ const InformationSection = ({ student }) => {
 
       <div className="flex flex-row w-full">
 <div className="flex-1">
-     <InformationItem icon={MdOutlineLocationOn} title="Address" value={student?.residentialAddress?.
-street} />
+     <InformationItem icon={MdOutlineLocationOn} title="Address" value={`${student?.residentialAddress?.
+street?.slice(0,80)}`} />
       <InformationItem icon={MdMale} title="Gender" value={student?.gender} />
       <InformationItem icon={MdTempleHindu} title="Religion" value={student?.religion} />
      

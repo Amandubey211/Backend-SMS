@@ -3,23 +3,34 @@
 
 //--------------------------------
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Doughnut } from 'react-chartjs-2';
 import { Chart, ArcElement, Tooltip, Legend } from 'chart.js';
 import { GoAlertFill } from 'react-icons/go';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchStudentTask } from '../../../../../../Store/Slices/Admin/Users/Students/student.action';
+import { useParams } from 'react-router-dom';
 Chart.register(ArcElement, Tooltip, Legend);
 
-const TaskChart = ({ totalTasks = 100, completedTasks = 0 }) => {
-    const completedPercentage = Math.round((completedTasks / totalTasks) * 100);
-    const missingPercentage = 100 - completedPercentage;
+const TaskChart = () => {
+    const {cid} = useParams()
+    const {completedTask} = useSelector((store) => store.admin.all_students);
+    const [missingPercentage,setMissingPercentage] = useState(0)
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(fetchStudentTask(cid)).then(()=>{
+        setMissingPercentage(100-completedTask)
+    });
+  }, [dispatch])
 
     const data = {
         datasets: [
             {
-                data: [completedPercentage, missingPercentage],
+               
+                data: [completedTask,missingPercentage],
                 backgroundColor: [
-                    'rgba(255, 99, 132, 0.6)', // Pink for completed
-                    'rgba(200, 200, 200, 0.6)'  // Grey for missing
+                    'pink', 
+                    'orange'  
                 ],
                 borderColor: [
                     'rgba(255, 99, 132, 1)',
@@ -27,7 +38,8 @@ const TaskChart = ({ totalTasks = 100, completedTasks = 0 }) => {
                 ],
                 borderWidth: 1,
                 cutout: '70%'
-            }
+            },
+            
         ]
     };
 
@@ -50,14 +62,13 @@ const TaskChart = ({ totalTasks = 100, completedTasks = 0 }) => {
 
     return (
         <>
-       {completedTasks == 0 ?<div className="flex w-full h-full text-gray-500  items-center justify-center flex-col text-xl">
-        <GoAlertFill className="text-[3rem]" />
-        No  Data Found
-        </div>:
-        <div className=" flex-1 p-5 flex flex-col justify-start items-start h-[15rem] ">
-   
+            <div className=" flex-1 p-5 flex flex-col justify-start items-start h-[15rem] ">
+              <div className='flex flex-row gap-10 mb-4'>
+              <p className='text-gray-500'>Completed <spna className='text-pink-600 font-bold'>{completedTask}%</spna></p>
+              <p className='text-gray-500'>Remaining <spna className='text-yellow-700 font-bold'>{missingPercentage}%</spna></p>
+              </div>
               <Doughnut data={data} options={options} />
-            </div>}
+            </div>
 </>
     );
 };
