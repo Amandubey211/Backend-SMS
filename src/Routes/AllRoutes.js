@@ -8,6 +8,7 @@ import ParentLogin from "../Modules/LoginPages/Parent/ParentLogin";
 import StudentLogin from "../Modules/LoginPages/Student/Login/StudentLogin.js";
 import StudentSignUp from "../Modules/LoginPages/Student/SignUp/StudentSignUp.js";
 import ResetPassword from "../Modules/LoginPages/Student/ResetPassword/ResetPassword.js";
+import GraduationPage from "../Modules/Admin/Graduation/GraduationPage.js";
 
 // Lazy load components
 const Academic = lazy(() => import("../Modules/Admin/AcademicYear/Academic.js"));
@@ -93,7 +94,7 @@ const StudentClass = lazy(() =>
   import("../Modules/Student/StudentClass/SubClass/StudentClass.js")
 );
 const ParentDash = lazy(() =>
-  import("../Modules/Parents/Dasboard/ParentDash.js")
+  import("../Modules/Parents/Dashboard/ParentDash.js")
 );
 const MyChildren = lazy(() =>
   import("../Modules/Parents/Childrens/ChildScreen.js")
@@ -179,6 +180,13 @@ const routes = [
   {
     path: "/class/:cid/:sid/grades",
     element: <ProtectRoute Component={SpeedGrade} allowedRoles={["admin", "teacher"]} />,
+    errorElement: <Error />,
+  },
+  {
+    path: "/graduates",
+    element: (
+      <ProtectRoute Component={GraduationPage} allowedRoles={["admin"]} />
+    ),
     errorElement: <Error />,
   },
 

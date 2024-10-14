@@ -8,7 +8,6 @@ import { setShowError } from "../../../../Common/Alerts/alertsSlice";
 export const stdClassTeacher = createAsyncThunk(
     'classTecher/stdClassTeacher',
     async ({ classId }, { rejectWithValue, dispatch }) => {
-        console.log("id-------->", classId)
         const token = localStorage.getItem("student:token");
         if (!token) {
             dispatch(setShowError(true));

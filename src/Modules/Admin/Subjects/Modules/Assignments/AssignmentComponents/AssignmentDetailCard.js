@@ -7,16 +7,15 @@ import ButtonsGroup from "../../../Component/ButtonsGroup";
 import RubricButton from "./RubricButton";
 import Spinner from "../../../../../../Components/Common/Spinner";
 import NoDataFound from "../../../../../../Components/Common/NoDataFound";
+import { useSelector } from "react-redux";
 
-const AssignmentDetailCard = ({
-  assignment,
-  loading,
-  error,
-  onRefresh,
-  isPublish,
-}) => {
+const AssignmentDetailCard = () => {
+  const {
+    assignmentDetails: assignment,
+    loading,
+    error,
+  } = useSelector((store) => store.admin.assignments);
   const [isModalOpen, setModalOpen] = useState(false);
-  const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [criteriaList, setCriteriaList] = useState([]);
   const [existingRubricId, setExistingRubricId] = useState(null);
   const [selectedAssignmentId, setSelectedAssignmentId] = useState("");
@@ -30,11 +29,9 @@ const AssignmentDetailCard = ({
   const handleViewRubric = () => {
     setModalOpen(true);
   };
-
+  const isPublish = assignment.isPublish;
   if (loading) return <Spinner />;
-  if (error) return <NoDataFound />;
-
-  if (!assignment) return <NoDataFound />;
+  if (error || !assignment) return <NoDataFound />;
 
   const {
     points,
@@ -48,11 +45,7 @@ const AssignmentDetailCard = ({
 
   return (
     <div className="max-w-sm p-4 bg-white" aria-label="Assignment Card">
-      <ButtonsGroup
-        type="Assignment"
-        data={assignment}
-        onRefresh={onRefresh} // Pass the refresh callback
-      />
+      <ButtonsGroup type="Assignment" />
 
       <SpeedGradeButton
         type="Assignment"
@@ -87,22 +80,14 @@ const AssignmentDetailCard = ({
 
       <AddRubricModal
         type="assignment"
-        AssignmentId={selectedAssignmentId} // Pass the selected assignment ID
+        AssignmentId={selectedAssignmentId}
         isOpen={isModalOpen}
         onClose={() => setModalOpen(false)}
-        // onAddCriteria={() => setSidebarOpen(true)}
         criteriaList={criteriaList}
         setCriteriaList={setCriteriaList}
         setExistingRubricId={setExistingRubricId}
-        readonly={true} // Set readonly to true
+        readonly={true}
       />
-      {/* <Sidebar
-        isOpen={isSidebarOpen}
-        onClose={() => setSidebarOpen(false)}
-        title="Add New Criteria"
-      >
-        <AddNewCriteriaForm />
-      </Sidebar> */}
     </div>
   );
 };

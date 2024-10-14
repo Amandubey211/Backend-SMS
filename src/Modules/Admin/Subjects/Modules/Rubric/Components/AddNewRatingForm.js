@@ -1,3 +1,5 @@
+// src/components/Components/AddNewRatingForm.js
+
 import React, { useState } from "react";
 import toast from "react-hot-toast";
 
@@ -5,18 +7,6 @@ const AddNewRatingForm = ({ onAddNewRating }) => {
   const [markType, setMarkType] = useState("");
   const [points, setPoints] = useState("");
   const [description, setDescription] = useState("");
-
-  const handleMarkTypeChange = (e) => {
-    setMarkType(e.target.value);
-  };
-
-  const handlePointsChange = (e) => {
-    setPoints(e.target.value);
-  };
-
-  const handleDescriptionChange = (e) => {
-    setDescription(e.target.value);
-  };
 
   const handleSubmit = () => {
     const newRating = {
@@ -41,7 +31,7 @@ const AddNewRatingForm = ({ onAddNewRating }) => {
         <input
           type="text"
           value={markType}
-          onChange={handleMarkTypeChange}
+          onChange={(e) => setMarkType(e.target.value)}
           className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           placeholder="Type here"
         />
@@ -53,7 +43,7 @@ const AddNewRatingForm = ({ onAddNewRating }) => {
         <input
           type="text"
           value={points}
-          onChange={handlePointsChange}
+          onChange={(e) => setPoints(e.target.value)}
           className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           placeholder="Type here"
         />
@@ -64,7 +54,7 @@ const AddNewRatingForm = ({ onAddNewRating }) => {
         </label>
         <textarea
           value={description}
-          onChange={handleDescriptionChange}
+          onChange={(e) => setDescription(e.target.value)}
           className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           placeholder="Type here"
         />

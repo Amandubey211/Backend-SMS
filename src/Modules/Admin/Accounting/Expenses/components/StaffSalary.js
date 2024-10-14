@@ -58,8 +58,8 @@ const DropdownMenu = ({ onEditClick }) => {
 // Memoized row component
 const SalaryRow = React.memo(({ staff, onPayClick, onEditClick }) => {
   return (
-    <tr className="bg-white">
-      <td className="px-5 py-3 border-b border-gray-200 flex items-center">
+    <tr className="bg-white border border-gray-200 ">
+      <td className="px-5 py-3 flex items-center">
         {staff.staffId?.profile ? (
           <img src={staff.staffId?.profile} alt="Profile" className="w-10 h-10 rounded-full mr-3" />
         ) : (
@@ -74,18 +74,18 @@ const SalaryRow = React.memo(({ staff, onPayClick, onEditClick }) => {
           <div className="text-sm text-gray-500">{staff.staffId?.position}</div>
         </div>
       </td>
-      <td className="px-5 py-2 border-b border-gray-200">{staff.staffId?.mobileNumber}</td>
-      <td className="px-5 py-2 border-b border-gray-200">{staff.month}</td>
-      <td className="px-5 py-2 border-b border-gray-200">{staff.salaryAmount} QR</td>
-      <td className="px-5 py-2 border-b border-gray-200">
+      <td className="px-5 py-2">{staff.staffId?.mobileNumber}</td>
+      <td className="px-5 py-2">{staff.month}</td>
+      <td className="px-5 py-2">{staff.salaryAmount} QR</td>
+      <td className="px-5 py-2">
         {staff.paidDate ? new Date(staff.paidDate).toLocaleDateString() : "---"}
       </td>
-      <td className="px-5 py-2 border-b border-gray-200">
+      <td className="px-5 py-2">
         <span className={`px-3 py-1 text-xs font-semibold ${staff.status === "paid" ? " text-green-800" : " text-red-800"}`}>
           {staff.status}
         </span>
       </td>
-      <td className="px-5 py-2 border-b border-gray-200 flex items-center justify-between space-x-2">
+      <td className="px-5 py-2 flex items-center justify-between space-x-2">
         {staff.status === "paid" ? (
           <span className="inline-flex items-center border border-transparent text-xs font-medium shadow-sm bg-green-200 text-green-800 py-1 px-2 rounded-md">
             Completed

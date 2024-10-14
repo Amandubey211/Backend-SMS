@@ -12,7 +12,6 @@ const useGetAssignmentById = () => {
   //   const dispatch = useDispatch();
   const { aid } = useParams();
   const role = useSelector((store) => store.Auth.role);
-  
 
   const fetchAssignmentById = useCallback(async () => {
     setLoading(true);

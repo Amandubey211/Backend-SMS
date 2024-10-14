@@ -28,6 +28,7 @@ import StaffMyProfile from "../Components/Common/StaffMyProfile.js";
 import "../Utils/translator/i18n.js";
 import i18next from "i18next";
 import { useSelector } from "react-redux";
+import GraduationPage from "../Modules/Admin/Graduation/GraduationPage.js";
 // lazy loaded routes
 
 const Academic = lazy(() =>
@@ -239,7 +240,7 @@ const StudentDash = lazy(() =>
   import("../Modules/Student/Dashboard/StudentDash.js")
 );
 const ParentDash = lazy(() =>
-  import("../Modules/Parents/Dasboard/ParentDash.js")
+  import("../Modules/Parents/Dashboard/ParentDash.js")
 );
 
 const MyChildren = lazy(() =>
@@ -699,6 +700,13 @@ function App() {
     {
       path: "/users/accountants",
       element: <AllAccountants />,
+      errorElement: <Error />,
+    },
+    {
+      path: "/graduates",
+      element: (
+        <ProtectRoute Component={GraduationPage} allowedRoles={["admin"]} />
+      ),
       errorElement: <Error />,
     },
     {

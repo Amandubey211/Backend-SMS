@@ -10,8 +10,13 @@ import useDeleteAssignment from "../../../../Hooks/AuthHooks/Staff/Admin/Assignm
 import useUpdateAssignment from "../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useUpdateAssignment";
 import useUpdateQuiz from "../../../../Hooks/AuthHooks/Staff/Admin/Quiz/useUpdateQuiz";
 import DeleteModal from "../../../../Components/Common/DeleteModal";
+import { useSelector } from "react-redux";
 
-const ButtonsGroup = ({ data, type, onRefresh }) => {
+const ButtonsGroup = ({ type }) => {
+  const { assignmentDetails: data } = useSelector(
+    (store) => store.admin.assignments
+  );
+
   const navigate = useNavigate();
   const { sid, cid } = useParams();
   const [showMenu, setShowMenu] = useState(false);
@@ -67,7 +72,6 @@ const ButtonsGroup = ({ data, type, onRefresh }) => {
       success = await deleteAssignment(data._id);
     }
     if (success && !quizLoading && !assignmentLoading) {
-      onRefresh(); // Trigger data refetch
     }
   };
 
@@ -87,9 +91,9 @@ const ButtonsGroup = ({ data, type, onRefresh }) => {
       success = await updateAssignment(data._id, updatedData);
     }
 
-    if (success) {
-      onRefresh(); // Trigger data refetch
-    }
+    // if (success) {
+    //   onRefresh(); // Trigger data refetch
+    // }
   };
 
   // Use a default value if publish is not present or data is null

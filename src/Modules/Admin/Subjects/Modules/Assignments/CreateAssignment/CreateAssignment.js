@@ -5,7 +5,9 @@ import SideMenubar from "../../../../../../Components/Admin/SideMenubar";
 import { useSelector } from "react-redux";
 
 const CreateAssignment = () => {
-  const isSidebarOpen = useSelector((state) => state.sidebar.isOpen);
+  const isSidebarOpen = useSelector(
+    (state) => state.common.user.sidebar.isOpen
+  );
   const sidebarWidth = isSidebarOpen ? "15%" : "7%";
 
   const [isEditing, setIsEditing] = useState(false);

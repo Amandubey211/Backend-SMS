@@ -7,8 +7,6 @@ import authReducer from "./Slices/Common/Auth/reducers/authSlice"; // Importing 
 import userReducer from "./Slices/Common/User/reducers/userSlice"; // Importing the user slice reducer
 import alertReducer from "./Slices/Common/Alerts/alertsSlice";
 
-
-
 // admin
 import adminDashboardReducer from "./Slices/Admin/Dashboard/adminDashboardSlice";
 import teacherReducer from "./Slices/Admin/Class/Teachers/teacherSlice";
@@ -35,8 +33,12 @@ import allParentReducer from "./Slices/Admin/Users/Parents/parentSilce";
 import allstaffReducer from "./Slices/Admin/Users/Staff/staffSlice";
 import earningReducer from "./Slices/Admin/Accounting/Earning/earningSlice";
 import studentFeesReducer from "./Slices/Admin/Accounting/StudentFees/studentFeesSlice";
-import expensesReducer from "./Slices/Admin/Accounting/Expenses/expensesSlice"
-
+import expensesReducer from "./Slices/Admin/Accounting/Expenses/expensesSlice";
+import adminRubricReducer from "./Slices/Admin/Class/Rubric/rubricSlice";
+import adminDiscussionCommentsReducer from "./Slices/Admin/Class/Discussion/Comments/discussionCommentsSlice";
+import adminCommentReducer from "./Slices/Admin/Class/Comment/commentsSlice";
+import adminAnnouncementCommentsReducer from "./Slices/Admin/Class/Announcement/Comment/announcementCommentsSlice";
+import adminAssignmentReducer from "./Slices/Admin/Class/Assignment/assignmentSlice";
 
 // student
 import studentDashboardReducer from "./Slices/Student/Dashboard/studentDashboardSlices";
@@ -53,7 +55,8 @@ import studentSubjectReducer from "../Store/Slices/Student/MyClass/Class/Subject
 import studentModuleReducer from "../Store/Slices/Student/MyClass/Class/Subjects/Modules/moduleSlice";
 import studentSyllabusReducer from "../Store/Slices/Student/MyClass/Class/Subjects/Syllabus/syllabusSlice";
 import studentPagesReducer from "../Store/Slices/Student/MyClass/Class/Subjects/Pages/pagesSlice";
-
+import studentDiscussionReducer from "../Store/Slices/Student/MyClass/Class/Subjects/Discussion/discussionSlice";
+import studentAnnounceReducer from "../Store/Slices/Student/MyClass/Class/Subjects/Announcement/announcementSlice";
 // parent
 import dashboardReducer from "../Store/Slices/Parent/Dashboard/dashboardSlice";
 import financeReducer from "../Store/Slices/Parent/Finance/financeSlice";
@@ -117,9 +120,15 @@ const AdminReducer = combineReducers({
   pages: adminPageReducer,
   discussions: adminDiscussionReducer,
   announcements: adminAnnouncementReducer,
-  all_students:allStudentReducer,
-  all_parents:allParentReducer,
-  all_staff:allstaffReducer,
+  rubrics: adminRubricReducer,
+  discussionComments: adminDiscussionCommentsReducer,
+  announcementComments: adminAnnouncementCommentsReducer,
+  comments: adminCommentReducer,
+  assignments: adminAssignmentReducer,
+
+  all_students: allStudentReducer,
+  all_parents: allParentReducer,
+  all_staff: allstaffReducer,
   earning: earningReducer,
   student_fees: studentFeesReducer,
   expenses: expensesReducer,
@@ -147,6 +156,8 @@ const studentReducer = combineReducers({
   studentModule: studentModuleReducer,
   studentSyllabus: studentSyllabusReducer,
   studentPages: studentPagesReducer,
+  studentDiscussion: studentDiscussionReducer,
+  studentAnnounce: studentAnnounceReducer,
 });
 
 const ParentReducer = combineReducers({

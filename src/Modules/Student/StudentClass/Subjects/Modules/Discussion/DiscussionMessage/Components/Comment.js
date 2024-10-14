@@ -5,42 +5,41 @@ import { RxCross2 } from "react-icons/rx";
 import toast from "react-hot-toast";
 import Reply from "./Reply";
 import InputComment from "./InputComment";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { createStudentDiscussionReply, deleteStudentDiscussionComment, deleteStudentDiscussionReply, editStudentDiscussionComment, fetchStudentCommentsByDiscussion, toggleLikeStudentDiscussion } from "../../../../../../../../Store/Slices/Student/MyClass/Class/Subjects/Discussion/discussion.action";
+import { FcLike } from "react-icons/fc";
 
 const Comment = ({
   comment,
-  toggleLike,
-  deleteComment,
-  deleteReply,
-  addNestedReply,
+  //deleteReply,
+  //addNestedReply,
   activeReplyId,
   setActiveReplyId,
   activeReplyParentId,
   setActiveReplyParentId,
-  editComment,
-  editReply,
-  // currentUserId,
+  //editReply,
 }) => {
-  const currentUserId = useSelector((state) => state.Common.studentId);
+  const { userId } = useSelector((store) => store?.common?.user?.userDetails);
+  const currentUserId = userId;
+  const { discussion } = useSelector((store) => store?.student?.studentDiscussion)
+  const dispatch = useDispatch();
 
   const [showReplies, setShowReplies] = useState(false);
   const [showReplyForm, setShowReplyForm] = useState(false);
   const [likes, setLikes] = useState(comment.likes);
   const [isEditing, setIsEditing] = useState(false);
-  const [editText, setEditText] = useState(comment.text);
+  const [editText, setEditText] = useState(comment.content);
 
   // Console logs to debug
-  console.log("Comment Component:", comment);
-  console.log("currentUserId:", currentUserId);
-  console.log("comment.authorID:", comment.authorID);
-  console.log(
-    "Comparison Result:",
-    String(currentUserId).trim() === String(comment.authorID).trim()
+  const [likesCount, setLikesCount] = useState(comment.likes.length);
+  const [isLiked, setIsLiked] = useState(
+    comment.likes.some((like) => like.userId === userId)
   );
 
   const handleEditComment = async () => {
-    if (editText.trim() && editText !== comment.text) {
-      await editComment(comment.id, editText);
+    if (editText.trim() && editText !== comment.content) {
+      //await editComment(comment.id, editText);
+      dispatch(editStudentDiscussionComment({ commentId: comment._id, newText: editText }))
       setIsEditing(false);
     } else {
       setIsEditing(false);
@@ -49,57 +48,78 @@ const Comment = ({
 
   const handleCancelEdit = () => {
     setIsEditing(false);
-    setEditText(comment.text);
+    setEditText(comment.content);
   };
 
   const handleDeleteComment = () => {
-    deleteComment(comment.id);
+    dispatch(deleteStudentDiscussionComment({ commentId: comment._id })).then(() => {
+      dispatch(fetchStudentCommentsByDiscussion({ discussionId: discussion._id }))
+    })
   };
 
   const handleDeleteReply = (commentID, replyId) => {
-    deleteReply(commentID, replyId);
+    //deleteReply(commentID, replyId);
+    dispatch(deleteStudentDiscussionReply(replyId))
   };
 
   const handleReplyClick = () => {
     setShowReplyForm(!showReplyForm);
-    setActiveReplyParentId(comment.id);
+    setActiveReplyParentId(comment._id);
   };
 
   const handleAddReply = (text) => {
     if (text.trim()) {
-      addNestedReply(comment.id, text);
+      dispatch(createStudentDiscussionReply({ discussionId: discussion._id, replyId: comment._id, text: text }))
       setShowReplyForm(false);
     }
   };
 
-  const handleToggleLike = async () => {
-    try {
-      const updatedComment = await toggleLike(comment.id);
-      setLikes(updatedComment.likes);
-    } catch (error) {
-      toast.error("Failed to toggle like.");
-    }
+  const handleToggleLike = () => {
+    const originalIsLiked = isLiked;
+    const originalLikesCount = likesCount;
+
+    dispatch(toggleLikeStudentDiscussion({ id: comment._id })).then(() => {
+      setIsLiked(!isLiked);
+      setLikesCount(isLiked ? likesCount - 1 : likesCount + 1);
+    }).catch(() => {
+      setIsLiked(originalIsLiked);
+      setLikesCount(originalLikesCount);
+    })
+
   };
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const options = { year: "numeric", month: "short", day: "numeric" };
+    const timeOptions = { hour: "2-digit", minute: "2-digit" };
+    return `${date.toLocaleDateString(
+      undefined,
+      options
+    )} at ${date.toLocaleTimeString(undefined, timeOptions)}`;
+  };
+
+  const formattedDate = formatDate(comment?.createdAt);
+  console.log("comments-------", comment);
 
   return (
     <div className="bg-white p-2 mb-4 border rounded-lg shadow-md">
       <div className="flex items-center mb-2">
         <img
-          src={comment.avatarUrl}
+          src={comment?.profile}
           alt="avatar"
           className="w-10 h-10 rounded-full mr-3"
         />
         <div>
-          <h4 className="text-lg font-semibold">{comment.author}</h4>
-          {comment.role && (
+          <h4 className="text-lg font-semibold">{comment?.createdBy}</h4>
+          {comment?.role && (
             <span className="mr-2 px-2 text-xs font-medium text-green-800 border-green-500 border rounded-full">
-              {comment.role}
+              {comment?.role}
             </span>
           )}
-          <span className="text-sm text-gray-500">{comment.time}</span>
+          <span className="text-sm text-gray-500">{formattedDate}</span>
         </div>
 
-        {String(currentUserId).trim() === String(comment.authorID).trim() && (
+        {String(currentUserId).trim() === String(comment.creatorID).trim() && (
           <div className="ml-auto flex space-x-2">
             <MdOutlineEdit
               className="text-gray-500 text-xl cursor-pointer"
@@ -138,13 +158,24 @@ const Comment = ({
         </div>
       ) : (
         <>
-          <p className="text-gray-700 mb-2">{comment.text}</p>
+          <p className="text-gray-700 mb-2">{comment?.content}</p>
           <div className="flex items-center mb-2 pt-3 border-t">
-            <FaRegHeart
+            {/* <FaRegHeart
               className="text-gray-500 cursor-pointer"
               onClick={handleToggleLike}
-            />
-            <span className="ml-1 text-gray-500">{comment.likes}</span>
+            /> */}
+            {isLiked ? (
+              <FcLike
+                className="text-gray-500 cursor-pointer"
+                onClick={handleToggleLike}
+              />
+            ) : (
+              <FaRegHeart
+                className="text-gray-500 cursor-pointer"
+                onClick={handleToggleLike}
+              />
+            )}
+            <span className="ml-1 text-gray-500">{likesCount}</span>
             <FaRegComment
               className="ml-4 text-gray-500 cursor-pointer"
               onClick={handleReplyClick}
@@ -166,15 +197,15 @@ const Comment = ({
               <>
                 {comment.replies.map((reply) => (
                   <Reply
-                    key={reply.id}
+                    key={reply._id}
                     reply={reply}
-                    commentId={comment.id}
-                    deleteReply={handleDeleteReply}
-                    addNestedReply={addNestedReply}
+                    commentId={comment?._id}
+                    //deleteReply={handleDeleteReply}
+                    //addNestedReply={addNestedReply}
                     activeReplyId={activeReplyId}
                     setActiveReplyId={setActiveReplyId}
-                    toggleLike={toggleLike}
-                    editReply={editReply}
+                    //toggleLike={toggleLike}
+                    //editReply={editReply}
                     currentUserId={currentUserId}
                   />
                 ))}
@@ -186,12 +217,12 @@ const Comment = ({
                 </div>
               </>
             ) : (
-              comment.replies.length > 0 && (
+              comment?.replies?.length > 0 && (
                 <div
                   className="text-blue-500 cursor-pointer mt-2"
                   onClick={() => setShowReplies(true)}
                 >
-                  View {comment.replies.length} more replies
+                  View {comment?.replies?.length} more replies
                 </div>
               )
             )}

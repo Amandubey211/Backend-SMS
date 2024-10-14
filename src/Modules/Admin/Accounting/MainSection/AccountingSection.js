@@ -162,23 +162,23 @@ const AccountingSection = () => {
               </thead>
               <tbody>
                 {filteredData?.reverse()?.map((item, index) => (
-                  <tr key={index} className="text-left text-gray-700 bg-gray-100">
-                    <td className="px-5 py-2 border-b border-gray-200 flex flex-row gap-2">
+                  <tr key={index} className="text-left text-gray-700 border border-gray-200 bg-gray-100 bg-white">
+                    <td className="px-5 py-2 flex flex-row gap-2">
                       <img src={item?.studentId?.profile} alt="img" className="w-10 h-10 rounded-full" />
                       <div className="flex flex-col">
                         <span>{item?.studentId?.fullName}</span>
                         <span>ID: {item?.studentId?.admissionNumber}</span>
                       </div>
                     </td>
-                    <td className="px-5 py-2 border-b border-gray-200">
+                    <td className="px-5 py-2">
                       {item.studentId?.presentClassId?.className}
                     </td>
-                    <td className="px-5 py-2 border-b border-gray-200">{item?.feeType}</td>
-                    <td className="px-5 py-2 border-b border-gray-200">
+                    <td className="px-5 py-2">{item?.feeType}</td>
+                    <td className="px-5 py-2">
                       {new Date(item?.dueDate).toLocaleDateString()}
                     </td>
-                    <td className="px-5 py-2 border-b border-gray-200">{item?.amount}</td>
-                    <td className="px-5 py-2 border-b border-gray-200">
+                    <td className="px-5 py-2">{item?.amount}</td>
+                    <td className="px-5 py-2">
                       <span
                         className={`inline-block px-3 py-1 text-xs font-semibold rounded-full ${item.status === "paid"
                           ? "bg-green-200 text-green-800"
@@ -188,7 +188,7 @@ const AccountingSection = () => {
                         {item?.status}
                       </span>
                     </td>
-                    <td className="pl-10 py-4 border-b border-gray-200 relative">
+                    <td className="pl-10 py-4 relative">
                       <div
                         className="text-indigo-600 hover:text-indigo-900 cursor-pointer font-bold items-center"
                         onClick={() => setShowEditMenu({ show: true, index: index })}
