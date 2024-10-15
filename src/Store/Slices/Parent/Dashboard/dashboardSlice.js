@@ -7,7 +7,6 @@ import {
 } from "./dashboard.action";
 
 const initialState = {
-  dashboardData: null,  // Will hold the cards and notices, etc.
   cardsData: null,
   notices: [],
   childrenData: [],
@@ -16,70 +15,74 @@ const initialState = {
     totalPaidFees: "",
     totalUnpaidFees: "",
   },
-  loading: false,
-  error: false,
+  loadingCards: false,
+  loadingNotices: false,
+  loadingChildren: false,
+  loadingAccounting: false,
+  errorCards: null,
+  errorNotices: null,
+  errorChildren: null,
+  errorAccounting: null,
 };
 
 const dashboardSlice = createSlice({
   name: "dashboard",
   initialState,
-  reducers: {
-  },
+  reducers: {},
   extraReducers: (builder) => {
     // Dashboard Cards
     builder
-      .addCase(fetchDashboardCards.fulfilled, (state, action) => {
-        state.cardsData = action.payload;  // Make sure action.payload is being passed correctly
-        state.loading = false;
-        console.log("Fetched card data:", action.payload);
-      })
       .addCase(fetchDashboardCards.pending, (state) => {
-        state.loading = true;
-        state.error = false;
+        state.loadingCards = true;
+        state.errorCards = null;
+      })
+      .addCase(fetchDashboardCards.fulfilled, (state, action) => {
+        state.loadingCards = false;
+        state.cardsData = action.payload;
       })
       .addCase(fetchDashboardCards.rejected, (state, action) => {
-        state.error = action.payload;
-        state.loading = false;
+        state.loadingCards = false;
+        state.errorCards = action.payload || 'Failed to fetch dashboard cards';
       });
 
     // Notices
     builder
       .addCase(fetchNotices.pending, (state) => {
-        state.loading = true;
-        state.error = false;
+        state.loadingNotices = true;
+        state.errorNotices = null;
       })
       .addCase(fetchNotices.fulfilled, (state, action) => {
-        state.loading = false;
+        state.loadingNotices = false;
         state.notices = action.payload;
       })
       .addCase(fetchNotices.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
+        state.loadingNotices = false;
+        state.errorNotices = action.payload ||'Failed to fetch notices';
       });
 
     // Children Data
     builder
       .addCase(fetchChildren.pending, (state) => {
-        state.loading = true;
-        state.error = false;
+        state.loadingChildren = true;
+        state.errorChildren = null;
       })
       .addCase(fetchChildren.fulfilled, (state, action) => {
-        state.loading = false;
+        state.loadingChildren = false;
         state.childrenData = action.payload;
       })
       .addCase(fetchChildren.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
+        state.loadingChildren = false;
+        state.errorChildren = action.payload || 'Failed to fetch children data';
       });
 
     // Accounting Data
     builder
       .addCase(fetchAccountingData.pending, (state) => {
-        state.loading = true;
-        state.error = false;
+        state.loadingAccounting = true;
+        state.errorAccounting = null;
       })
       .addCase(fetchAccountingData.fulfilled, (state, action) => {
-        state.loading = false;
+        state.loadingAccounting = false;
         state.accountingData = {
           fees: action.payload.fees,
           totalPaidFees: action.payload.totalPaidFees,
@@ -87,11 +90,10 @@ const dashboardSlice = createSlice({
         };
       })
       .addCase(fetchAccountingData.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
+        state.loadingAccounting = false;
+        state.errorAccounting = action.payload || 'Failed to fetch accounting data';
       });
   },
 });
 
-export const { clearError } = dashboardSlice.actions;
 export default dashboardSlice.reducer;

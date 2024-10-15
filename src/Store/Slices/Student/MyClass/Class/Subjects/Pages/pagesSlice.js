@@ -1,11 +1,12 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { stdPages } from "./pages.action";
+import { fetchPageView, stdPages } from "./pages.action";
 
 
 const initialState = {
     loading: false,
     error: false,
     pagesData: [],
+    pageView:{},
 };
 
 const stdPagesSlice = createSlice({
@@ -23,6 +24,18 @@ const stdPagesSlice = createSlice({
                 state.pagesData = action.payload;
             })
             .addCase(stdPages.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload || true;
+            })
+            .addCase(fetchPageView.pending, (state, action) => {
+                state.loading = true;
+                state.error = false;
+            })
+            .addCase(fetchPageView.fulfilled, (state, action) => {
+                state.loading = false;
+                state.pageView = action.payload;
+            })
+            .addCase(fetchPageView.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload || true;
             })

@@ -1,3 +1,4 @@
+
 import { createSlice } from "@reduxjs/toolkit";
 import { fetchFilteredQuizzesThunk, fetchQuizByIdThunk } from "./quizThunks"; // Import thunks
 
@@ -54,3 +55,4 @@ const quizSlice = createSlice({
 export const { clearError, clearSuccess } = quizSlice.actions;
 
 export default quizSlice.reducer;
+

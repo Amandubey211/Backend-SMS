@@ -32,7 +32,7 @@ const StudentCourseProgress = ({student}) => {
     <div className='pb-2'>
       <div className='flex flex-row gap-2 p-4  overflow-x-auto max-w-full '>
         {studentSubjectProgress.length > 0?
-        studentSubjectProgress.map((subject, index) => (
+        studentSubjectProgress?.map((subject, index) => (
           <div key={index} className='min-w-max' onClick={()=>fetchModules(subject.subjectId)}>
             <SubjectCard subject={subject} i={index} />
           </div>

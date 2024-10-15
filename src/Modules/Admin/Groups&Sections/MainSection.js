@@ -12,11 +12,14 @@ import UnAssignedStudentList from "./Components/UnAssignedStudentList";
 import GroupList from "./Components/GroupList";
 import Spinner from "../../../Components/Common/Spinner";
 import { FaUsers } from "react-icons/fa";
+import StudentGradeModal from "../Subjects/Modules/Grades/StudentGradeViewModal/StudentGradeModal";
+import { fetchStudentGrades, fetchStudentSubjectProgress } from "../../../Store/Slices/Admin/Users/Students/student.action";
 
 const MainSection = () => {
   const [activeSection, setActiveSection] = useState("Everyone");
   const [activeSectionId, setActiveSectionId] = useState(null);
-
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [studentData, setStudentData] = useState();
   const dispatch = useDispatch();
   const { cid } = useParams();
 
@@ -67,7 +70,15 @@ const MainSection = () => {
   );
 
   const onSeeGradeClick = (student) => {
-    console.log("Student grade clicked", student);
+    setStudentData(student);
+    setIsModalOpen(true);
+    const params = {};
+      dispatch(fetchStudentGrades({params,studentId:student?._id,studentClassId:cid}));
+      dispatch(fetchStudentSubjectProgress(student?._id));
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
   };
 
   return (
@@ -83,6 +94,7 @@ const MainSection = () => {
         <div className="flex-grow h-full border-l">
           <GroupList onSeeGradeClick={onSeeGradeClick} />
         </div>
+        <StudentGradeModal isOpen={isModalOpen} onClose={handleCloseModal} student={studentData} /> 
       </div>
     </div>
   );

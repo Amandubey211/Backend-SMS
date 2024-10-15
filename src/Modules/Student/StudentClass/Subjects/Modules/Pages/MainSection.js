@@ -39,19 +39,19 @@ const MainSection = () => {
           handleSearchChange={(e) => handleSearch(e.target.value)}
         />
         <div className="p-3 flex-grow flex flex-col">
-          <div className="flex items-center gap-2 ml-3 mb-2">
+          <div className="flex items-center gap-2 ml-3">
             <GoDiscussionClosed className="text-xl text-green-600" />
             <h2 className="text-xl">All Pages</h2>
             <MdKeyboardArrowDown className="text-gray-500 h-8 w-8" />
           </div>
-          <div className="flex-grow flex justify-center items-center">
+          <div className="flex-grow flex justify-center items-start my-10">
             {loading && <Spinner />}
             {error && <p>{error}</p>}
             {!loading && !error && filteredPages.length === 0 && (
               <NoDataFound title="Pages" />
             )}
             {!loading && !error && filteredPages.length > 0 && (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full ">
                 {filteredPages?.map((page) => (
                   <PageCard
                     key={page?._id}

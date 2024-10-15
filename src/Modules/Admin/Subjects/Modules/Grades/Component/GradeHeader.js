@@ -3,34 +3,23 @@ import { CiSearch } from "react-icons/ci";
 import { VscSettings } from "react-icons/vsc";
 import Sidebar from "../../../../../../Components/Common/Sidebar";
 import Filter from "./Filter";
-import { useSelector } from "react-redux";
-import useGetModulesForStudent from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useGetModulesForStudent";
-import useGetFilteredQuizzes from "../../../../../../Hooks/AuthHooks/Staff/Admin/Quiz/useGetFilteredQuizzes";
-import useGetFilteredAssignments from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useGetFilteredAssignments";
+import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-
 const GradeHeader = ({ onSearch, onFilterChange }) => {
   const [search, setSearch] = useState("");
   const [open, setOpen] = useState(false);
-  const {sid} = useParams()
+  const {cid, sid} = useParams()
   const handleSearchChange = (e) => {
-  
        setSearch(e.target.value);
     onSearch(e.target.value);
    
   };
-
   const handleFilterChange = (name, value) => {
     onFilterChange(name, value);
   };
-  const moduleList = useSelector((store) => store.Subject.modules);
-  const  assignments = useSelector((store) => store.Subject.assignments);
-  const { error, fetchFilteredQuizzes, loading, quizzes } = useGetFilteredQuizzes();
-  const {fetchFilteredAssignments} =useGetFilteredAssignments()
-  useEffect(()=>{
-    fetchFilteredAssignments(sid);
-    fetchFilteredQuizzes();
-  },[])
+  const {modules:moduleList} = useSelector((state) => state.admin.module);
+  const  {assignments} = useSelector((store) => store.admin.subject_assignment);
+  const  {quizzes} = useSelector((store) => store.admin.subject_quiz);
   return (
     <div className="p-2 bg-white  ">
       <h2 className="text-xl ps-2 font-semibold mb-3">All Grades</h2>
@@ -41,7 +30,7 @@ const GradeHeader = ({ onSearch, onFilterChange }) => {
             <input
               type="text"
               placeholder="Search"
-              className="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-300 w-[15rem]"
+              className="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-300 w-[13rem]"
               value={search}
               onChange={handleSearchChange}
             />
@@ -54,7 +43,7 @@ const GradeHeader = ({ onSearch, onFilterChange }) => {
           <label className="text-gray-600 mb-1">Module</label>
           <select
             name="moduleId"
-            className="px-4 py-2 border w-40 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-300"
+            className="px-4 py-2 border w-[13rem] rounded-md focus:outline-none focus:ring-2 focus:ring-blue-300"
             onChange={(e) =>  handleFilterChange("moduleId", e.target.value)}
           >
             <option value="">All</option>
@@ -70,7 +59,7 @@ const GradeHeader = ({ onSearch, onFilterChange }) => {
           <label className="text-gray-600 mb-1">Assignment</label>
           <select
             name="assignmentId"
-            className="px-4 py-2 border w-40 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-300"
+            className="px-4 py-2 border w-[13rem] rounded-md focus:outline-none focus:ring-2 focus:ring-blue-300"
             onChange={(e) => handleFilterChange("assignmentId", e.target.value)}
           >
                <option value="">All</option>
@@ -85,7 +74,7 @@ const GradeHeader = ({ onSearch, onFilterChange }) => {
           <label className="text-gray-600 mb-1">Quizzes</label>
           <select
             name="quizId"
-            className="px-4 py-2 border w-40 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-300"
+            className="px-4 py-2 border w-[13rem] rounded-md focus:outline-none focus:ring-2 focus:ring-blue-300"
             onChange={(e) => handleFilterChange("quizId", e.target.value)}
           >
                     <option value="">All</option>
@@ -96,16 +85,16 @@ const GradeHeader = ({ onSearch, onFilterChange }) => {
           ))}
           </select>
         </div>
-        <button
+        {/* <button
           onClick={() => setOpen(true)}
           className="p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-300"
         >
           <VscSettings className="w-5 h-5 text-gray-500" />
-        </button>
+        </button> */}
       </div>
-      <Sidebar title="Filter" isOpen={open} onClose={() => setOpen(!open)}>
+      {/* <Sidebar title="Filter" isOpen={open} onClose={() => setOpen(!open)}>
         <Filter onFilterChange={handleFilterChange} onClose={() => setOpen(!open)} />
-      </Sidebar>
+      </Sidebar> */}
     </div>
   );
 };

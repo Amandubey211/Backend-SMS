@@ -27,3 +27,25 @@ export const stdPages = createAsyncThunk(
         }
     }
 )
+export const fetchPageView = createAsyncThunk(
+    'pages/pageView',
+    async (pageId, { rejectWithValue }) => {
+        const token = localStorage.getItem("student:token");
+        if (!token) {
+            return rejectWithValue("Authentication failed!");
+        }
+
+        try {
+            const res = await axios.get(`${baseUrl}/student/pages/${pageId}`, {
+                headers: {
+                    Authentication: token
+                }
+            });
+            const data = res?.data
+            return data;
+
+        } catch (error) {
+            return rejectWithValue((error?.response?.data?.message || error?.message || "Something Went Wrong!"))
+        }
+    }
+)
