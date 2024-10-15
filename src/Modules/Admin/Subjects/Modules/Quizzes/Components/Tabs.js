@@ -1,5 +1,6 @@
 import React from "react";
 import { FaCalendarAlt } from "react-icons/fa";
+import { useSelector } from "react-redux";
 
 const Tabs = ({
   children,
@@ -8,20 +9,23 @@ const Tabs = ({
   onTabChange,
   createPage,
   handleSidebarOpen,
-  title,
-  availableFrom,
 }) => {
   const handleTabClick = (tab) => {
     setActiveTab(tab);
     onTabChange(tab);
   };
 
+  const { quizzDetail } = useSelector((store) => store.admin.quizzes);
+  const { name, availableFrom } = quizzDetail || {};
+
   return (
     <>
       <div className="flex justify-between items-center p-2 px-3 border-b">
         {!createPage && (
           <div>
-            <h2 className="text-xl font-semibold mb-1">{title}</h2>
+            <h2 className="text-xl font-semibold mb-1">
+              {name || "Quiz Name"}
+            </h2>
             <div className="flex items-center text-gray-500">
               <span className="text-green-600 font-medium mr-2">Quiz</span>
               <span className="mx-2">|</span>
