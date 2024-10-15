@@ -10,7 +10,11 @@ import useDeleteAssignment from "../../../../Hooks/AuthHooks/Staff/Admin/Assignm
 import useUpdateAssignment from "../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useUpdateAssignment";
 import useUpdateQuiz from "../../../../Hooks/AuthHooks/Staff/Admin/Quiz/useUpdateQuiz";
 import DeleteModal from "../../../../Components/Common/DeleteModal";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  deleteAssignmentThunk,
+  updateAssignmentThunk,
+} from "../../../../Store/Slices/Admin/Class/Assignment/assignmentThunks";
 
 const ButtonsGroup = ({ type }) => {
   const { assignmentDetails: data } = useSelector(
@@ -22,10 +26,10 @@ const ButtonsGroup = ({ type }) => {
   const [showMenu, setShowMenu] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const menuRef = useRef();
+  const dispatch = useDispatch();
 
   const { loading: quizLoading, deleteQuiz } = useDeleteQuiz();
-  const { loading: assignmentLoading, deleteAssignment } =
-    useDeleteAssignment();
+
   const { updateAssignment, loading: updateAssignmentLoading } =
     useUpdateAssignment();
   const { updateQuiz, loading: updateQuizLoading } = useUpdateQuiz();
@@ -64,14 +68,11 @@ const ButtonsGroup = ({ type }) => {
 
   const confirmDelete = async () => {
     if (!data) return; // Prevent action if data is null
-    let success = false;
     if (type === "Quiz") {
-      success = await deleteQuiz(data._id);
+      await deleteQuiz(data._id);
     }
     if (type === "Assignment") {
-      success = await deleteAssignment(data._id);
-    }
-    if (success && !quizLoading && !assignmentLoading) {
+      dispatch(deleteAssignmentThunk(data._id));
     }
   };
 
@@ -88,7 +89,10 @@ const ButtonsGroup = ({ type }) => {
     if (type === "Quiz") {
       success = await updateQuiz(data._id, updatedData);
     } else if (type === "Assignment") {
-      success = await updateAssignment(data._id, updatedData);
+      const assignmentId = data._id;
+      dispatch(
+        updateAssignmentThunk({ assignmentId, assignmentData: updatedData })
+      );
     }
 
     // if (success) {

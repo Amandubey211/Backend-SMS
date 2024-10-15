@@ -6,13 +6,17 @@ import { useSelector } from "react-redux";
 
 const CreateQuizzes = () => {
   const [isEditing, setIsEditing] = useState(false);
-  const isSidebarOpen = useSelector((state) => state.sidebar.isOpen);
+  const isSidebarOpen = useSelector(
+    (state) => state.common.user.sidebar.isOpen
+  );
   const sidebarWidth = isSidebarOpen ? "15%" : "7%"; // Adjust the width based on sidebar state
 
   return (
     <Layout
       title={
-        isEditing ? "Update Quiz | Student Diwan" : "Create Quiz | Student Diwan"
+        isEditing
+          ? "Update Quiz | Student Diwan"
+          : "Create Quiz | Student Diwan"
       }
     >
       <div className="flex w-full min-h-screen">
