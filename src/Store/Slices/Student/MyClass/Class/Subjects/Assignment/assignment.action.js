@@ -2,12 +2,13 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { setShowError } from "../../../../../Common/Alerts/alertsSlice";
 import { ErrorMsg } from "../../../../../Common/Alerts/errorhandling.action";
+import { baseUrl } from "../../../../../../../config/Common";
 
 
 
 export const stdGetAssignment = createAsyncThunk(
     'assignment/stdGetAssignment',
-    async (_, { rejectWithValue }) => {
+    async (_, { rejectWithValue, dispatch }) => {
 
         const token = localStorage.getItem("student:token");
         if (!token) {
@@ -36,7 +37,7 @@ export const stdGetAssignment = createAsyncThunk(
 
 export const stdDoAssignment = createAsyncThunk(
     'assignment/stdDoAssignment',
-    async ({}, { rejectWithValue }) => {
+    async ({}, { rejectWithValue, dispatch }) => {
 
         const token = localStorage.getItem("student:token");
         if (!token) {

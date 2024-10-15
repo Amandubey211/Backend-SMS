@@ -53,10 +53,12 @@ import studentClassmateReducer from "../Store/Slices/Student/MyClass/Class/class
 import studentAttendanceReducer from "../Store/Slices/Student/MyClass/Class/Attendance/stdAttendanceSlice";
 import studentSubjectReducer from "../Store/Slices/Student/MyClass/Class/Subjects/subjectSlice";
 import studentModuleReducer from "../Store/Slices/Student/MyClass/Class/Subjects/Modules/moduleSlice";
+import studentAssignmentReducer from "../Store/Slices/Student/MyClass/Class/Subjects/Assignment/assignmentSlice";
 import studentSyllabusReducer from "../Store/Slices/Student/MyClass/Class/Subjects/Syllabus/syllabusSlice";
 import studentPagesReducer from "../Store/Slices/Student/MyClass/Class/Subjects/Pages/pagesSlice";
 import studentDiscussionReducer from "../Store/Slices/Student/MyClass/Class/Subjects/Discussion/discussionSlice";
 import studentAnnounceReducer from "../Store/Slices/Student/MyClass/Class/Subjects/Announcement/announcementSlice";
+
 // parent
 import dashboardReducer from "../Store/Slices/Parent/Dashboard/dashboardSlice";
 import financeReducer from "../Store/Slices/Parent/Finance/financeSlice";
@@ -154,10 +156,12 @@ const studentReducer = combineReducers({
     studentSubjectReducer
   ),
   studentModule: studentModuleReducer,
+  studentAssignment: studentAssignmentReducer,
   studentSyllabus: studentSyllabusReducer,
   studentPages: studentPagesReducer,
   studentDiscussion: studentDiscussionReducer,
   studentAnnounce: studentAnnounceReducer,
+ 
 });
 
 const ParentReducer = combineReducers({
