@@ -2,7 +2,6 @@ import React, { useEffect } from "react";
 import EditorComponent from "../../../../Component/AdminEditor";
 import AnswerSection from "./AnswerSection";
 import AddQuestionButton from "./AddQuestionButton";
-import { AiOutlineInfoCircle } from "react-icons/ai";
 import { BsCheck } from "react-icons/bs";
 
 const QuestionForm = ({
@@ -39,14 +38,6 @@ const QuestionForm = ({
     }
   }, [questionType, setAnswers]);
 
-  const handleQuestionTypeChange = (e) => {
-    setQuestionType(e.target.value);
-  };
-
-  const handleQuestionPointChange = (e) => {
-    setQuestionPoint(e.target.value);
-  };
-
   return (
     <div className="h-full pb-16 overflow-y-scroll">
       <div className="flex justify-between items-center px-5 pt-3 space-x-4">
@@ -57,7 +48,7 @@ const QuestionForm = ({
           <input
             type="number"
             value={questionPoint}
-            onChange={handleQuestionPointChange}
+            onChange={(e) => setQuestionPoint(e.target.value)}
             className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
           />
         </div>
@@ -67,7 +58,7 @@ const QuestionForm = ({
           </label>
           <select
             value={questionType}
-            onChange={handleQuestionTypeChange}
+            onChange={(e) => setQuestionType(e.target.value)}
             className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
           >
             <option value="multiple choice">Multiple Choice</option>
@@ -77,7 +68,7 @@ const QuestionForm = ({
         </div>
       </div>
 
-      <h2 className="text-gradient text-2xl font-semibold px-5 pt-3">
+      <h2 className="text-gradient text-xl font-semibold px-5 pt-3">
         Write Question
       </h2>
       <EditorComponent
@@ -148,28 +139,6 @@ const QuestionForm = ({
               />
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4 mt-6">
-            <div className="flex items-center space-x-2">
-              <input
-                type="text"
-                name="rightAnswerComment"
-                value={rightAnswerComment}
-                onChange={(e) => setRightAnswerComment(e.target.value)}
-                placeholder="Type Right Answer Comment"
-                className="w-full p-3 border border-green-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-              />
-            </div>
-            <div className="flex items-center space-x-2">
-              <input
-                type="text"
-                name="wrongAnswerComment"
-                value={wrongAnswerComment}
-                onChange={(e) => setWrongAnswerComment(e.target.value)}
-                placeholder="Type Wrong Answer Comment"
-                className="w-full p-3 border border-red-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500"
-              />
-            </div>
-          </div>
         </div>
       )}
 
@@ -177,7 +146,6 @@ const QuestionForm = ({
         <div className="p-6 bg-white space-y-6">
           <h2 className="text-xl font-semibold">Answer Section</h2>
           <div className="flex items-center space-x-2">
-            <AiOutlineInfoCircle className="text-gray-500" />
             <p className="text-gray-500">
               The student has to answer in the blank input
             </p>
