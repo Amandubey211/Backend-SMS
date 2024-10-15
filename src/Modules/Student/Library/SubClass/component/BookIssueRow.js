@@ -33,7 +33,7 @@ const BookIssueRow = ({ item }) => {
           </div>
           <div className="flex flex-col ml-4">
             <span className="font-medium text-gray-800">
-              {item?.bookId?.name} || {t("Unknown Title", gt.stdLibrary)}
+             { item?.bookId?.name || t("Unknown Title", gt.stdLibrary)}
             </span>
           </div>
         </div>
@@ -42,14 +42,14 @@ const BookIssueRow = ({ item }) => {
       {/* Author */}
       <td className="px-5 py-4 border-b border-gray-200">
         <span className="text-gray-800">
-          {item?.author} || {t("Unknown Author", gt.stdLibrary)}
+          {item?.author || t("Unknown Author", gt.stdLibrary)}
         </span>
       </td>
 
       {/* Category */}
       <td className="px-5 py-4 border-b border-gray-200">
         <span className="text-gray-800">
-          {item?.bookId?.category} || {t("Unknown Category", gt.stdLibrary)}
+          {item?.bookId?.category || t("Unknown Category", gt.stdLibrary)}
         </span>
       </td>
 
@@ -71,7 +71,7 @@ const BookIssueRow = ({ item }) => {
               : "bg-blue-100 text-gray-600"
             }`}
         >
-          {item?.status}||{t("No Status",gt.stdLibrary)}
+          {item?.status || t("No Status",gt.stdLibrary)}
         </span>
       </td>
     </tr>

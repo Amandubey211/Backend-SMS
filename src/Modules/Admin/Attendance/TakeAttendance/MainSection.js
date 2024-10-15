@@ -5,7 +5,6 @@ import Filters from "./Components/Filters";
 import AttendanceTable from "./Components/AttendanceTable";
 import Statistics from "./Components/Stats";
 import Header from "./Components/Header";
-
 import { useParams } from "react-router-dom";
 import Spinner from "../../../../Components/Common/Spinner";
 import NoDataFound from "../../../../Components/Common/NoDataFound";
@@ -13,30 +12,29 @@ import {
   fetchAttendanceByClassSectionGroupDate,
   markAttendance,
 } from "../../../../Store/Slices/Admin/Class/Attendence/attendanceThunks";
+import { setSelectedDate } from "../../../../Store/Slices/Admin/Class/Attendence/attendanceSlice";
+import toast from "react-hot-toast";
 
 const MainSection = () => {
-  const [filters, setFilters] = useState({
-    sectionId: "",
-    groupId: "",
-  });
-
-  const [selectedDate, setSelectedDate] = useState(new Date());
-
   const dispatch = useDispatch();
   const { cid } = useParams();
 
-  const { attendanceData, loading, error } = useSelector(
+  const { attendanceData, loading, error, filters, selectedDate } = useSelector(
     (state) => state.admin.attendance
   );
 
-  const handleFilterChange = (name, value) => {
-    setFilters((prevFilters) => ({
-      ...prevFilters,
-      [name]: value,
-    }));
-  };
+  const [isSectionInvalid, setIsSectionInvalid] = useState(false);
 
   const handleMarkAttendance = async () => {
+    // Validate sectionId before dispatching the markAttendance action
+    if (!filters.sectionId) {
+      toast.error("Please select a section first.");
+      setIsSectionInvalid(true);
+      return;
+    }
+
+    setIsSectionInvalid(false); // Reset invalid state if section is valid
+
     const attendanceToMark = attendanceData
       .filter((student) => student.attendanceStatus !== "not marked")
       .map((student) => ({
@@ -71,7 +69,7 @@ const MainSection = () => {
     <div className="flex min-h-screen w-full">
       <div className="w-8/12 p-4 bg-white border-r flex flex-col">
         <div className="flex-grow">
-          <Filters filters={filters} onFilterChange={handleFilterChange} />
+          <Filters isSectionInvalid={isSectionInvalid} />
           {loading ? (
             <div className="h-96 flex justify-center items-center">
               <Spinner />
@@ -83,17 +81,22 @@ const MainSection = () => {
           )}
         </div>
       </div>
-      <div className="w-4/12 p-4 bg-white flex flex-col">
-        <Header onSubmit={handleMarkAttendance} />
+
+      {/* Adjust the layout here */}
+      <div className="w-4/12 p-4 bg-white flex flex-col space-y-4">
+        {/* Keep enough vertical space for the stats below */}
+        <Header onSubmit={handleMarkAttendance} loading={loading} />
 
         <div className="flex justify-center">
           <CustomCalendar
             selectedDate={selectedDate}
-            setSelectedDate={setSelectedDate}
+            setSelectedDate={(date) => dispatch(setSelectedDate(date))}
           />
         </div>
-        <div className="flex-grow p-3 mt-1 w-full">
-          <Statistics attendanceData={attendanceData} />
+
+        {/* Ensure enough space for stats */}
+        <div className="flex-grow overflow-auto p-3  w-full">
+          <Statistics />
         </div>
       </div>
     </div>

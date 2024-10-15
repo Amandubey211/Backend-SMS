@@ -1,26 +1,23 @@
 import React, { useState, useEffect } from "react";
 import { FaTimes } from "react-icons/fa";
-import { FiLoader } from "react-icons/fi"; // Importing a loader icon
+import { FiLoader } from "react-icons/fi"; // For loading spinner icon
+import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
-import useAddChapter from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useAddChapter";
-import useUpdateChapter from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useUpdateChapter";
-import { useSelector } from "react-redux";
+import {
+  addChapter,
+  editChapter,
+} from "../../../../../../Store/Slices/Admin/Class/Module/chapterThunk";
+import { useParams } from "react-router-dom";
 
-const AddChapter = ({ chapterData, isEditing, onClose, fetchModules }) => {
+const AddChapter = ({ chapterData, isEditing, onClose }) => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [preview, setPreview] = useState(null);
   const [chapterTitle, setChapterTitle] = useState("");
-
-  const { loading: addLoading, error, success, addChapter } = useAddChapter();
-  console.log(success, "sdfsdfsdf");
-  const {
-    loading: updateLoading,
-    error: updateError,
-    success: updateSuccess,
-    updateChapter,
-  } = useUpdateChapter();
-
-  const selectedModule = useSelector((store) => store.Common.selectedModule);
+  const { cid, sid } = useParams();
+  const dispatch = useDispatch();
+  const { selectedModule, loading, modules } = useSelector(
+    (state) => state.admin.module
+  );
 
   useEffect(() => {
     if (isEditing && chapterData) {
@@ -48,6 +45,7 @@ const AddChapter = ({ chapterData, isEditing, onClose, fetchModules }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!chapterTitle) {
       toast.error("Chapter title is required");
       return;
@@ -60,43 +58,48 @@ const AddChapter = ({ chapterData, isEditing, onClose, fetchModules }) => {
 
     const thumbnail = selectedFile ? selectedFile : null;
 
-    if (isEditing) {
-      await updateChapter(
-        chapterTitle,
-        thumbnail,
-        selectedModule?.moduleId,
-        chapterData._id
-      );
-      // if (updateSuccess) {
-      // toast.success(updateSuccess);
-      onClose();
-      // fetchModules(); // Refetch after updating a chapter
-      // }
-      // if (updateError) {
-      //   toast.error(updateError);
-      // }
-    } else {
-      await addChapter(chapterTitle, thumbnail, selectedModule?.moduleId);
-      // if (success) {
-      // toast.success(success);
+    try {
+      if (isEditing) {
+        // Dispatching edit chapter action
+        await dispatch(
+          editChapter({
+            name: chapterTitle,
+            thumbnail,
+            moduleId: selectedModule?.moduleId,
+            chapterId: chapterData._id,
+            sid,
+          })
+        ).unwrap(); // Unwrap the promise to handle errors
+      } else {
+        // Dispatching add chapter action
+        await dispatch(
+          addChapter({
+            name: chapterTitle,
+            thumbnail,
+            moduleId: selectedModule?.moduleId,
+            sid,
+          })
+        ).unwrap(); // Unwrap the promise to handle errors
+      }
+
       setChapterTitle("");
       clearImage();
       onClose();
-      // fetchModules(); // Refetch after adding a chapter
+      // dispatch(fetchModules({ cid, sid }));
+    } catch (error) {
+      console.log(error, "////////");
+      toast.error(error);
     }
-    // if (error) {
-    //   toast.error(error);
-    // }
-    // }
   };
 
   return (
     <form className="flex flex-col h-full p-2" onSubmit={handleSubmit}>
       <div className="bg-white rounded-lg">
+        {/* Chapter Image Upload */}
         <div className="mb-4">
           <label
             className="block text-gray-700 text-sm font-semibold opacity-60 mb-2"
-            htmlFor="moduleImage"
+            htmlFor="chapterImage"
           >
             Chapter Image
           </label>
@@ -170,7 +173,7 @@ const AddChapter = ({ chapterData, isEditing, onClose, fetchModules }) => {
                 </svg>
                 <input
                   type="file"
-                  id="moduleImage"
+                  id="chapterImage"
                   accept="image/*"
                   onChange={handleFileChange}
                   className="absolute inset-0 opacity-0 cursor-pointer"
@@ -179,16 +182,18 @@ const AddChapter = ({ chapterData, isEditing, onClose, fetchModules }) => {
             )}
           </div>
         </div>
+
+        {/* Chapter Title Input */}
         <div>
           <label
             className="block text-gray-700 text-sm font-semibold opacity-60 mb-2"
-            htmlFor="moduleTitle"
+            htmlFor="chapterTitle"
           >
             Chapter Title
           </label>
           <input
             type="text"
-            id="moduleTitle"
+            id="chapterTitle"
             value={chapterTitle}
             onChange={(e) => setChapterTitle(e.target.value)}
             placeholder="Type here"
@@ -196,16 +201,16 @@ const AddChapter = ({ chapterData, isEditing, onClose, fetchModules }) => {
           />
         </div>
       </div>
+
+      {/* Submit Button */}
       <div className="mt-auto mb-8">
         <button
           type="submit"
           className="w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600 flex justify-center items-center"
-          disabled={addLoading || updateLoading}
+          disabled={loading}
         >
-          {addLoading || updateLoading ? (
-            <FiLoader className="animate-spin mr-2" />
-          ) : null}
-          {addLoading || updateLoading
+          {loading ? <FiLoader className="animate-spin mr-2" /> : null}
+          {loading
             ? isEditing
               ? "Updating Chapter..."
               : "Adding Chapter..."

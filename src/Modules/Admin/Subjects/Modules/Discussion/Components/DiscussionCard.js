@@ -5,8 +5,11 @@ import { BsPatchCheckFill } from "react-icons/bs";
 import { GoDiscussionClosed } from "react-icons/go";
 import { MdMarkEmailRead } from "react-icons/md";
 import { NavLink, useParams } from "react-router-dom";
-import useUpdatePinStatus from "../../../../../../Hooks/AuthHooks/Staff/Admin/Disscussion/useUpdatePinStatus";
-import useMarkAsReadDiscussion from "../../../../../../Hooks/AuthHooks/Staff/Admin/Disscussion/useMarkAsReadDiscussion";
+import { useDispatch } from "react-redux";
+import {
+  markAsReadDiscussion,
+  updatePinStatus,
+} from "../../../../../../Store/Slices/Admin/Class/Discussion/discussionThunks";
 
 const DiscussionCard = ({ discussion, fetchClassDiscussions }) => {
   const { sid, cid } = useParams();
@@ -14,15 +17,16 @@ const DiscussionCard = ({ discussion, fetchClassDiscussions }) => {
     discussion.replies.length > 0
       ? discussion.replies[discussion.replies.length - 1]
       : null;
-  const { updatePinStatus, loading: pinLoading } = useUpdatePinStatus();
-  const { markAsReadDiscussion, loading: readLoading } =
-    useMarkAsReadDiscussion();
+
+  const dispatch = useDispatch();
   const [isPinned, setIsPinned] = useState(discussion.isPinned);
   const [isMenuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
 
   const handlePinClick = async () => {
-    const updatedDiscussion = await updatePinStatus(discussion._id, !isPinned);
+    const updatedDiscussion = await dispatch(
+      updatePinStatus({ discussionId: discussion._id, isPinned: !isPinned })
+    );
     if (updatedDiscussion) {
       setIsPinned(updatedDiscussion.isPinned);
       fetchClassDiscussions(); // Refetch discussions after pin/unpin
@@ -30,7 +34,7 @@ const DiscussionCard = ({ discussion, fetchClassDiscussions }) => {
   };
 
   const handleMarkAsReadClick = async () => {
-    await markAsReadDiscussion(discussion._id);
+    await dispatch(markAsReadDiscussion({ discussionId: discussion._id }));
     setMenuOpen(false);
     fetchClassDiscussions(); // Refetch discussions after marking as read
   };
@@ -64,7 +68,7 @@ const DiscussionCard = ({ discussion, fetchClassDiscussions }) => {
       <div className="flex items-center justify-end space-x-2 mb-4 relative">
         <button
           onClick={handlePinClick}
-          disabled={pinLoading}
+          disabled={discussion.pinLoading}
           className="transition-transform transform hover:scale-110"
         >
           {isPinned ? (
@@ -89,10 +93,13 @@ const DiscussionCard = ({ discussion, fetchClassDiscussions }) => {
             <button
               className="flex items-center space-x-2 px-4 py-2 text-blue-600 hover:bg-gray-100 w-full transition-transform transform hover:scale-105"
               onClick={handleMarkAsReadClick}
-              disabled={readLoading}
+              disabled={discussion.readLoading}
             >
               <MdMarkEmailRead aria-hidden="true" />
-              <span> {readLoading ? "Marking.." : "Mark as Read"}</span>
+              <span>
+                {" "}
+                {discussion.readLoading ? "Marking.." : "Mark as Read"}
+              </span>
             </button>
           </div>
         )}

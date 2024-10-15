@@ -27,7 +27,7 @@ const EditBook = ({ book, onClose }) => {
       setBookData({
         bookName: book?.name || "",
         authorName: book?.author || "",
-        class: book?.classId || "", // Preselect the class from bookId.classId
+        class: book?.classId?._id || "", // Preselect the class from bookId.classId
         category: book?.category || "",
         copies: book?.copies || 0,
         bookImage: null,

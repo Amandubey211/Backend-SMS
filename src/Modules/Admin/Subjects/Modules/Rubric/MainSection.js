@@ -1,21 +1,28 @@
+// src/components/MainSection.js
+
 import React, { useState, lazy, Suspense, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
+import {
+  fetchRubricsBySubjectId,
+  deleteRubricThunk,
+  updateRubricThunk,
+  createAssignmentRubricThunk,
+  createQuizRubricThunk,
+} from "../../../../../Store/Slices/Admin/Class/Rubric/rubricThunks";
 import RubricHeader from "./Components/RubricHeader";
 import RubricCard from "./Components/RubricCard";
 import Sidebar from "../../../../../Components/Common/Sidebar";
 import AddNewCriteriaForm from "./Components/AddNewCriteriaForm";
 import SubjectSideBar from "../../Component/SubjectSideBar";
-import useGetRubricBySubjectId from "../../../../../Hooks/AuthHooks/Staff/Admin/Rubric/useGetRubricBySubjectId";
-import useDeleteRubric from "../../../../../Hooks/AuthHooks/Staff/Admin/Rubric/useDeleteRubric";
-import useUpdateRubric from "../../../../../Hooks/AuthHooks/Staff/Admin/Rubric/useUpdateRubric";
-import useCreateQuizRubric from "../../../../../Hooks/AuthHooks/Staff/Admin/Rubric/useCreateQuizRubric";
-import { useParams } from "react-router-dom";
 import Spinner from "../../../../../Components/Common/Spinner";
 import NoDataFound from "../../../../../Components/Common/NoDataFound";
-import useCreateAssignmentRubric from "../../../../../Hooks/AuthHooks/Staff/Admin/Rubric/useCreateAssignmentRubric";
 
 const AddRubricModal = lazy(() => import("./Components/AddRubricModal"));
 
 const MainSection = () => {
+  const dispatch = useDispatch();
+  const { sid } = useParams();
   const [isModalOpen, setModalOpen] = useState(false);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [criteria, setCriteria] = useState([]);
@@ -26,20 +33,15 @@ const MainSection = () => {
   const [selectedQuizId, setSelectedQuizId] = useState("");
   const [existingRubricId, setExistingRubricId] = useState(null);
 
-  const { error, fetchRubricBySubjectId, loading, rubrics } =
-    useGetRubricBySubjectId();
-  const { deleteRubric } = useDeleteRubric();
-  const { updateRubric, loading: updateLoading } = useUpdateRubric();
-  const { createAssignmentRubric, loading: createAssignmentLoading } =
-    useCreateAssignmentRubric();
-  const { createQuizRubric, loading: createQuizLoading } =
-    useCreateQuizRubric();
+  // Accessing the Redux state
+  const { rubrics, loading, error } = useSelector(
+    (state) => state.admin.rubrics
+  );
 
-  const { sid } = useParams();
-
+  // Fetching rubrics when component mounts or subject ID changes
   useEffect(() => {
-    fetchRubricBySubjectId(sid);
-  }, [sid, fetchRubricBySubjectId]);
+    dispatch(fetchRubricsBySubjectId(sid));
+  }, [sid, dispatch]);
 
   const handleAddNewCriteria = (newCriteria) => {
     if (editMode) {
@@ -67,9 +69,9 @@ const MainSection = () => {
   };
 
   const handleDeleteRubric = async (rubricId) => {
-    const result = await deleteRubric(rubricId);
+    const result = await dispatch(deleteRubricThunk(rubricId));
     if (result.success) {
-      fetchRubricBySubjectId(sid);
+      dispatch(fetchRubricsBySubjectId(sid)); // Refetch rubrics after deletion
     }
   };
 
@@ -79,16 +81,18 @@ const MainSection = () => {
     setCriteria(rubric.criteria);
     setSelectedAssignmentId(rubric.assignmentId?._id || "");
     setSelectedQuizId(rubric.quizId?._id || "");
-    setExistingRubricId(rubric._id); // Set existing rubric ID
+    setExistingRubricId(rubric._id);
     setModalOpen(true);
     setEditMode(true);
   };
 
   const handleSubmit = async (rubricData, type) => {
     if (existingRubricId) {
-      const result = await updateRubric(existingRubricId, rubricData);
+      const result = await dispatch(
+        updateRubricThunk(existingRubricId, rubricData)
+      );
       if (result.success) {
-        fetchRubricBySubjectId(sid);
+        dispatch(fetchRubricsBySubjectId(sid));
         setModalOpen(false);
         setRubricToEdit(null);
         setEditMode(false);
@@ -96,12 +100,12 @@ const MainSection = () => {
     } else {
       let result;
       if (type === "createQuizRubric") {
-        result = await createQuizRubric(rubricData);
+        result = await dispatch(createQuizRubricThunk(rubricData));
       } else {
-        result = await createAssignmentRubric(rubricData);
+        result = await dispatch(createAssignmentRubricThunk(rubricData));
       }
       if (result.success) {
-        fetchRubricBySubjectId(sid);
+        dispatch(fetchRubricsBySubjectId(sid));
         setModalOpen(false);
       }
     }
@@ -114,7 +118,7 @@ const MainSection = () => {
     setRubricToEdit(null);
     setSelectedAssignmentId("");
     setSelectedQuizId("");
-    setExistingRubricId(null); // Reset existing rubric ID
+    setExistingRubricId(null);
   };
 
   return (
@@ -132,7 +136,7 @@ const MainSection = () => {
                 rubricId={rubric._id}
                 title={rubric.name}
                 criteria={rubric.criteria.length}
-                points={rubric.totalScore}
+                points={rubric?.totalScore}
                 onDelete={() => handleDeleteRubric(rubric._id)}
                 onEdit={() => handleEditRubric(rubric._id)}
               />
@@ -152,12 +156,10 @@ const MainSection = () => {
               onDeleteCriteria={handleDeleteCriteria}
               onEditCriteria={handleEditCriteria}
               onSubmit={handleSubmit}
-              createLoading={createAssignmentLoading || createQuizLoading}
-              updateLoading={updateLoading}
               editMode={editMode}
-              AssignmentId={selectedAssignmentId} // Use these props to set IDs
+              AssignmentId={selectedAssignmentId}
               QuizId={selectedQuizId}
-              setExistingRubricId={setExistingRubricId} // Allow setting existing rubric ID
+              setExistingRubricId={setExistingRubricId}
             />
           )}
         </Suspense>

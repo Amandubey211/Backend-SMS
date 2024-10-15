@@ -2,33 +2,29 @@ import React, { useEffect, useState } from "react";
 import SubjectSideBar from "../../Component/SubjectSideBar";
 import AssignmentDetailCard from "./AssignmentComponents/AssignmentDetailCard";
 import AssignmentSection from "./AssignmentComponents/AssignmentSection";
-import useGetAssignmentById from "../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useGetAssignmentById";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchAssignmentByIdThunk } from "../../../../../Store/Slices/Admin/Class/Assignment/assignmentThunks";
 import { useParams } from "react-router-dom";
 
 const MainSection = () => {
-  const { assignmentId } = useParams();
-  const [refreshKey, setRefreshKey] = useState(0); // State to trigger refetch
+  const { aid: assignmentId } = useParams();
+  const dispatch = useDispatch();
 
-  const { assignment, error, fetchAssignmentById, loading } =
-    useGetAssignmentById();
+  const {
+    assignmentDetails: assignment,
+    loading,
+    error,
+  } = useSelector((state) => state.admin.assignments);
 
   useEffect(() => {
-    fetchAssignmentById(assignmentId);
-  }, [assignmentId, fetchAssignmentById, refreshKey]); // Include refreshKey as a dependency
-
-  const handleDataRefresh = () => {
-    setRefreshKey((oldKey) => oldKey + 1); // Update refreshKey to trigger refetch
-  };
+    dispatch(fetchAssignmentByIdThunk(assignmentId));
+  }, [assignmentId, dispatch]);
 
   return (
     <div className="flex">
       <SubjectSideBar />
       <div className="w-[65%] border">
-        <AssignmentSection
-          assignment={assignment}
-          loading={loading}
-          error={error}
-        />
+        <AssignmentSection />
       </div>
       <div className="w-[30%]">
         <AssignmentDetailCard
@@ -36,7 +32,6 @@ const MainSection = () => {
           assignment={assignment}
           loading={loading}
           error={error}
-          onRefresh={handleDataRefresh} // Pass the refresh callback
         />
       </div>
     </div>

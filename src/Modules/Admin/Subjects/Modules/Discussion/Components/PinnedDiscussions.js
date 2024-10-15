@@ -40,7 +40,7 @@ const PinnedDiscussions = ({ discussions, fetchClassDiscussions }) => {
             <DiscussionCard
               key={index}
               discussion={discussion}
-              fetchClassDiscussions={fetchClassDiscussions} // Pass the refetch method
+              fetchClassDiscussions={fetchClassDiscussions}
             />
           ))}
         </div>

@@ -1,16 +1,12 @@
 import React, { useState } from "react";
-import {
-  IoCalendarOutline,
-  IoBookOutline,
-  IoTrashOutline,
-} from "react-icons/io5";
+import { IoCalendarOutline, IoTrashOutline } from "react-icons/io5";
 import { CiUser } from "react-icons/ci";
 import { NavLink, useParams } from "react-router-dom";
 import { SiBookstack } from "react-icons/si";
-
-import useDeletePage from "../../../../../../Hooks/AuthHooks/Staff/Admin/Page/useDeletePage"; // Adjust the import path as needed
-import DeleteModal from "../../../../../../Components/Common/DeleteModal";
+import { useDispatch, useSelector } from "react-redux";
 import Spinner from "../../../../../../Components/Common/Spinner";
+import { deletePage } from "../../../../../../Store/Slices/Admin/Class/Page/pageThunk";
+import DeleteModal from "../../../../../../Components/Common/DeleteModal";
 
 const PageCard = ({
   title,
@@ -24,7 +20,8 @@ const PageCard = ({
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { cid, sid } = useParams();
-  const { loading, error, success, deletePage } = useDeletePage();
+  const dispatch = useDispatch();
+  const { loading, error } = useSelector((state) => state.admin.pages);
 
   const formatDate = (dateString) => {
     const options = { year: "numeric", month: "short", day: "numeric" };
@@ -32,8 +29,7 @@ const PageCard = ({
   };
 
   const handleDelete = async () => {
-    await deletePage(id);
-
+    await dispatch(deletePage({ pid: id }));
     onDeleteSuccess(); // Refetch the pages after successful deletion
     setIsModalOpen(false);
   };
@@ -64,7 +60,6 @@ const PageCard = ({
             ) : (
               <CiUser className="h-6 w-6" />
             )}
-
             <span className="ml-2 text-gray-700">{authorName}</span>
           </div>
         </div>

@@ -5,8 +5,10 @@ import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchTeachers } from '../../../Store/Slices/Parent/Children/children.action'; // Import the thunk
 import Spinner from '../../../Components/Common/Spinner';
+import { useTranslation } from "react-i18next";
 
 const MyTeacher = () => {
+    const { t } = useTranslation('prtChildrens');
     const { ssid: studentId } = useParams(); // Get student ID from the route parameters
     const dispatch = useDispatch();
     
@@ -29,12 +31,14 @@ const MyTeacher = () => {
         );
     }
 
+
+    
     // Handling error state
     if (error) {
         return (
             <div className="flex flex-col items-center justify-center h-full text-center">
                 <FaChalkboardTeacher className="text-6xl text-gray-400 mb-4" />
-                <p className="text-gray-500">{error || 'Something went wrong while fetching instructors.'}</p>
+                <p className="text-gray-500">{error}: {t("Unable to Fetch Instructors")}</p>
             </div>
         );
     }
@@ -44,7 +48,7 @@ const MyTeacher = () => {
         return (
             <div className="flex flex-col items-center justify-center h-full text-center">
                 <FaChalkboardTeacher className="text-6xl text-gray-400 mb-4" />
-                <p className="text-gray-500">No Instructors Found!</p>
+                <p className="text-gray-500">{t("No Instructors Found")}!</p>
             </div>
         );
     }
@@ -53,7 +57,7 @@ const MyTeacher = () => {
     return (
         <div className="h-full w-full p-4">
             <div className="text-lg font-medium mb-4 flex items-center">
-                Child Instructors
+                {t("Child Instructors")}
                 <div
                     className="ml-2 flex items-center justify-center rounded-full"
                     style={{

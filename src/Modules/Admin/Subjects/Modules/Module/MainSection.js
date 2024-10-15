@@ -6,26 +6,48 @@ import ModuleCard from "./Components/ModuleCard";
 import Sidebar from "../../../../../Components/Common/Sidebar";
 import AddModule from "./Components/AddModule";
 import { RiAddFill } from "react-icons/ri";
-import { setSelectedModule } from "../../../../../Redux/Slices/Common/CommonSlice";
-import useGetModulesForStudent from "../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useGetModulesForStudent";
 import MoveModule from "./Components/MoveModule";
 import AddChapter from "./Components/AddChapter";
 import Spinner from "../../../../../Components/Common/Spinner";
 import NoDataFound from "../../../../../Components/Common/NoDataFound";
+import { fetchModules } from "../../../../../Store/Slices/Admin/Class/Module/moduleThunk";
+import { setSelectedModule } from "../../../../../Store/Slices/Admin/Class/Module/moduleSlice";
+import { useParams } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const MainSection = () => {
   const [expandedChapters, setExpandedChapters] = useState([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [sidebarContent, setSidebarContent] = useState(null);
-
+  const { sid, cid } = useParams();
   const dispatch = useDispatch();
-  const selectedModule = useSelector((state) => state.Common.selectedModule);
-  const { error, fetchModules, loading, modulesData } =
-    useGetModulesForStudent();
+  const {
+    selectedModule,
+    modules: modulesData,
+    error,
+    moduleLoading,
+    chapterLoading,
+    attachmentLoading,
+  } = useSelector((state) => state.admin.module);
 
   useEffect(() => {
-    fetchModules();
-  }, [fetchModules]);
+    if (cid && sid) {
+      dispatch(fetchModules({ cid, sid }));
+    }
+  }, [dispatch, cid, sid]);
+
+  // Auto-select the first module if no module is selected
+  useEffect(() => {
+    if (!selectedModule && modulesData?.length > 0) {
+      dispatch(
+        setSelectedModule({
+          moduleId: modulesData[0]._id,
+          name: modulesData[0].moduleName,
+          chapters: modulesData[0].chapters,
+        })
+      );
+    }
+  }, [dispatch, selectedModule, modulesData]);
 
   const handleToggle = (chapterNumber) => {
     setExpandedChapters((prev) =>
@@ -36,14 +58,7 @@ const MainSection = () => {
   };
 
   const openAddChapter = () => {
-    setSidebarContent(
-      <AddChapter
-        onClose={() => {
-          handleSidebarClose();
-          fetchModules(); // Refetch after adding a chapter
-        }}
-      />
-    );
+    setSidebarContent("chapter");
     setIsSidebarOpen(true);
   };
 
@@ -74,7 +89,7 @@ const MainSection = () => {
         data={module}
         onClose={() => {
           handleSidebarClose();
-          fetchModules(); // Refetch after editing a module
+          dispatch(fetchModules()); // Refetch after editing a module
         }}
       />
     );
@@ -82,35 +97,32 @@ const MainSection = () => {
   };
 
   const handleMoveModule = (module) => {
-    const currentIndex = modulesData?.modules?.findIndex(
+    if (!selectedModule || !selectedModule.moduleId) {
+      toast.error("No module selected to move.");
+      return;
+    }
+
+    const currentIndex = modulesData?.findIndex(
       (mod) => mod._id === module._id
     );
 
     setSidebarContent(
       <MoveModule
-        moduleId={selectedModule.moduleId}
+        moduleId={selectedModule.moduleId} // Ensure selectedModule exists
         currentPosition={currentIndex}
         modulesData={modulesData}
-        onClose={handleSidebarClose} // Ensure proper closing
+        onClose={handleSidebarClose}
       />
     );
     setIsSidebarOpen(true);
   };
 
-  const handleModuleAdded = useCallback(() => {
-    fetchModules();
-  }, [fetchModules]);
-
   const handleEditChapter = (chapter) => {
     setSidebarContent(
       <AddChapter
-        fetchModules={fetchModules}
         chapterData={chapter}
         isEditing={true}
-        onClose={() => {
-          handleSidebarClose();
-          fetchModules();
-        }}
+        onClose={handleSidebarClose}
       />
     );
     setIsSidebarOpen(true);
@@ -134,7 +146,7 @@ const MainSection = () => {
               </button>
             )}
           </div>
-          {loading ? (
+          {chapterLoading ? (
             <Spinner />
           ) : error ? (
             <NoDataFound />
@@ -143,18 +155,11 @@ const MainSection = () => {
             selectedModule?.chapters?.map((chapter, index) => (
               <Chapter
                 key={index}
-                title={chapter?.name}
                 chapterNumber={index + 1}
-                chapterId={chapter?._id}
-                moduleId={selectedModule.moduleId}
-                imageUrl={chapter.thumbnail}
-                assignments={chapter?.assignments}
-                quizzes={chapter?.quizzes}
-                attachments={chapter?.attachments} // Pass attachments to Chapter
+                chapter={chapter}
                 isExpanded={expandedChapters.includes(index + 1)}
                 onToggle={() => handleToggle(index + 1)}
                 onEdit={() => handleEditChapter(chapter)}
-                fetchModules={fetchModules} // Pass fetchModules for re-fetching
               />
             ))
           ) : (
@@ -167,34 +172,16 @@ const MainSection = () => {
           <div className="flex items-center gap-1 mb-2">
             <h1 className="text-xl font-semibold">All Modules</h1>
             <p className="bg-gradient-to-r from-pink-100 flex justify-center items-center to-purple-200 font-semibold rounded-full w-6 h-6">
-              <span className="text-gradient">
-                {modulesData?.modules.length}
-              </span>
+              <span className="text-gradient">{modulesData?.length}</span>
             </p>
           </div>
           <div className="grid grid-cols-1 gap-2">
-            {modulesData?.modules.map((module, index) => (
+            {modulesData?.map((module) => (
               <ModuleCard
-                key={index}
-                title={module.moduleName}
-                moduleNumber={index + 1}
-                imageUrl={module.thumbnail}
-                moduleId={module._id}
-                isPublished={true}
-                isSelected={
-                  selectedModule && selectedModule.moduleId === module._id
-                }
+                module={module}
                 onSelect={() => handleModuleSelect(module)}
                 onEdit={() => handleEditModule(module)}
                 onMove={() => handleMoveModule(module)}
-                // onDelete={() =>
-                //   handleDelete({
-                //     type: "Module",
-                //     name: module.moduleName,
-                //     id: module._id,
-                //   })
-                // }
-                fetchModules={fetchModules}
               />
             ))}
           </div>
@@ -225,20 +212,9 @@ const MainSection = () => {
             }
           >
             {sidebarContent === "chapter" ? (
-              <AddChapter
-                onClose={() => {
-                  handleSidebarClose();
-                  fetchModules();
-                }}
-              />
+              <AddChapter onClose={handleSidebarClose} />
             ) : sidebarContent === "module" ? (
-              <AddModule
-                onClose={() => {
-                  handleSidebarClose();
-                  fetchModules();
-                }}
-                onModuleAdded={handleModuleAdded}
-              />
+              <AddModule onClose={handleSidebarClose} />
             ) : (
               sidebarContent
             )}

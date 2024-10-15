@@ -19,7 +19,7 @@ const AddDiscussionHeader = ({ onSave, isUpdating }) => {
       <div className="flex items-center space-x-2">
         <button
           onClick={() => {
-            onSave(true); // Pass publish as true
+            onSave(true); // Save and publish the discussion
           }}
           className="flex-grow rounded-md py-2 px-6 text-center bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200 transition"
         >
@@ -29,7 +29,7 @@ const AddDiscussionHeader = ({ onSave, isUpdating }) => {
         </button>
         <button
           onClick={() => {
-            onSave(false); // Pass publish as false
+            onSave(false); // Save without publishing
           }}
           className="flex-grow rounded-md py-2 px-6 text-center bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200 transition"
         >

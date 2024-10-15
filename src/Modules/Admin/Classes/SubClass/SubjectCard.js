@@ -9,7 +9,10 @@ import { CiUser } from "react-icons/ci";
 import DeleteModal from "../../../../Components/Common/DeleteModal";
 import { deleteSubject } from "../../../../Store/Slices/Admin/Class/Subject/subjectThunks";
 import SubjectIcon from "../../../../Assets/ClassesAssets/SubClassAssets/SubjectIcons/image1.png";
-import { setSelectedSubjectName } from "../../../../Store/Slices/Common/User/reducers/userSlice";
+import {
+  setSelectedSubjectId,
+  setSelectedSubjectName,
+} from "../../../../Store/Slices/Common/User/reducers/userSlice";
 
 const SubjectCard = ({
   data,
@@ -29,7 +32,10 @@ const SubjectCard = ({
 
   return (
     <div
-      onClick={() => dispatch(setSelectedSubjectName(data?.name))}
+      onClick={() => {
+        dispatch(setSelectedSubjectName(data?.name));
+        dispatch(setSelectedSubjectId(subjectId));
+      }}
       className={`relative rounded-xl p-4 shadow-lg ${backgroundColor} transition-transform duration-300 transform hover:scale-105 hover:shadow-2xl group`}
     >
       {role === "admin" && (
@@ -87,9 +93,9 @@ const SubjectCard = ({
       </NavLink>
 
       <div className="flex items-center mt-12">
-        {data.teacherImage ? (
+        {data.teacherId?.profile ? (
           <img
-            src={data.teacherImage}
+            src={data.teacherId?.profile}
             alt="teacher"
             className="w-12 h-12 rounded-full transition-transform duration-300 transform hover:scale-110"
           />
@@ -98,9 +104,12 @@ const SubjectCard = ({
         )}
         <div className="ml-3 capitalize">
           <p className="text-white font-semibold">
-            {data.teacherName || "No Instructor Assigned"}
+            {data?.teacherId?.firstName + data?.teacherId?.lastName ||
+              "No Instructor Assigned"}
           </p>
-          <p className="text-white text-sm">{data.teacherRole || "Teacher"}</p>
+          <p className="text-white text-sm">
+            {data?.teacherId?.role || "Teacher"}
+          </p>
         </div>
       </div>
 

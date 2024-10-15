@@ -1,32 +1,28 @@
+// src/Modules/Admin/Libary/Components/BookIssueRow.js
 import React, { useState, useEffect, useRef } from "react";
 import { HiDotsVertical } from "react-icons/hi";
 import { MdEdit } from "react-icons/md";
-import Sidebar from "../../../../Components/Common/Sidebar"; // Assuming you have the Sidebar component
-import EditBook from "../Components/EditBook"; // Assuming you have the EditBook component
+import Sidebar from "../../../../Components/Common/Sidebar";
+import AddIssue from "../Components/AddIssue"; // Now using AddIssue instead of EditBook
 
-const BookIssueRow = ({ item }) => {
+const BookIssueRow = ({ item, handleSidebarOpen, setEditIssueData }) => {
   const [showMenu, setShowMenu] = useState(false);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
-  const [editBookData, setEditBookData] = useState(null); // Store selected book for editing
   const menuRef = useRef(null);
 
   const handleMenuToggle = () => {
     setShowMenu(!showMenu);
   };
 
-  const handleSidebarOpen = () => {
-    // Pass the book data and class information for editing
-    setEditBookData({
-      ...item.bookId,
-      classId: item.classId?._id || "", // Pass the classId directly from item
-    });
+  const handleSidebarEditOpen = () => {
+    setEditIssueData(item); // Set the current book issue data for editing
     setSidebarOpen(true);
     setShowMenu(false);
   };
 
   const handleSidebarClose = () => {
     setSidebarOpen(false);
-    setEditBookData(null); // Reset the selected book after closing
+    setEditIssueData(null); // Reset the selected book issue data after closing
   };
 
   const handleClickOutside = (e) => {
@@ -60,11 +56,13 @@ const BookIssueRow = ({ item }) => {
         </div>
       </td>
       <td className="px-5 py-2 border-b border-gray-200">
-        <div className="text-base">class-{item.classId?.className}</div>
-        <div className="text-[12px]">section-{item.sectionId?.sectionName}</div>
+        <div className="text-base">{item.classId?.className}</div>
+        <div className="text-sm text-green-500">
+          {item.sectionId?.sectionName}
+        </div>
       </td>
-      <td className="px-5 py-3 border-b border-gray-200">
-        <div className="flex items-center">
+      <td className="px-5 py-2 border-b border-gray-200   ">
+        <div className="flex items-center bg-pink-50 rounded-lg p-1">
           <img
             src={item.bookId?.image}
             alt="Book"
@@ -83,7 +81,7 @@ const BookIssueRow = ({ item }) => {
       </td>
       <td className="px-5 py-2 border-b border-gray-200">
         <div>Issue: {new Date(item.issueDate).toLocaleDateString()}</div>
-        <div>Return: {new Date(item.dueDate).toLocaleDateString()}</div>
+        <div>Return: {new Date(item.returnDate).toLocaleDateString()}</div>
       </td>
       <td className="px-5 py-2 border-b border-gray-200">
         <span
@@ -100,15 +98,20 @@ const BookIssueRow = ({ item }) => {
       </td>
       <td className="px-5 py-2 border-b border-gray-200 relative">
         {/* Dots Menu */}
-        <HiDotsVertical className="cursor-pointer" onClick={handleMenuToggle} />
+        <div className="border rounded-full p-1 h-8 hover:bg-gray-200  w-8 flex justify-center items-center">
+          <HiDotsVertical
+            className="cursor-pointer "
+            onClick={handleMenuToggle}
+          />
+        </div>
 
         {showMenu && (
           <div
-            ref={menuRef} // Attach ref to the menu
+            ref={menuRef}
             className="absolute top-full right-0 w-24 bg-white border rounded-lg shadow-lg z-10"
           >
             <button
-              onClick={handleSidebarOpen}
+              onClick={handleSidebarEditOpen}
               className="flex items-center gap-2 p-2 hover:bg-gray-200 w-full text-left"
             >
               <MdEdit className="text-gray-500" />
@@ -117,16 +120,18 @@ const BookIssueRow = ({ item }) => {
           </div>
         )}
 
-        {/* Sidebar for Editing */}
+        {/* Sidebar for Editing Book Issue */}
         <Sidebar
           isOpen={isSidebarOpen}
           onClose={handleSidebarClose}
           title="Edit Book Issue"
           width="40%"
         >
-          {/* Pass the book data to EditBook */}
-          {editBookData && (
-            <EditBook book={editBookData} onClose={handleSidebarClose} />
+          {item && (
+            <AddIssue
+              editIssueData={item} // Pass the current issue data for editing
+              onClose={handleSidebarClose}
+            />
           )}
         </Sidebar>
       </td>

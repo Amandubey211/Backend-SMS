@@ -11,7 +11,7 @@ export const fetchParentFinanceData = createAsyncThunk(
 
     if (!token) {
       const errorMessage = "Token not found";
-      toast.error(errorMessage);
+      // toast.error(errorMessage);
       return rejectWithValue(errorMessage); // Reject with custom message if no token is found
     }
 
@@ -23,8 +23,8 @@ export const fetchParentFinanceData = createAsyncThunk(
       });
       return response.data;
     } catch (error) {
-      const errorMessage = error.response?.data?.message || "Failed to fetch accounting data";
-      toast.error(errorMessage);
+      const errorMessage = error.response?.data?.message || error.message ||"Failed to fetch accounting data";
+      // toast.error(errorMessage);
       return rejectWithValue(errorMessage); // Reject with custom error message
     }
   }

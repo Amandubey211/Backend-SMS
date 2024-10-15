@@ -10,15 +10,23 @@ import { useDispatch, useSelector } from "react-redux";
 import Spinner from "../../../../../../Components/Common/Spinner";
 import { GoAlertFill } from "react-icons/go";
 import ClassmateModal from "./ClassmateModal";
+import { setShowError } from "../../../../../../Store/Slices/Common/Alerts/alertsSlice";
+import OfflineModal from "../../../../../../Components/Common/Offline";
 
 const StudentClassMates = () => {
   const { classmateData, loading, error } = useSelector(
     (store) => store?.student?.studentClassmate
   );
+  const { showError } = useSelector((store) => store?.common?.alertMsg);
+
   const dispatch = useDispatch();
   const { classId } = useParams();
   const [selectedClassmate, setSelectedClassmate] = useState(null); // Modal state
   // useNavHeading(selectedClassName, "Classmates");
+
+  const handleDismiss = () => {
+    dispatch(setShowError(false));
+  }
 
   useEffect(() => {
     dispatch(stdClassmate({ classId }));
@@ -53,22 +61,24 @@ const StudentClassMates = () => {
             <div className="w-full flex flex-col items-center justify-center py-20">
               <Spinner />
             </div>
-          ) : error ? (
-            <div className="w-full flex flex-col items-center justify-center py-20">
-              <GoAlertFill className="inline-block w-12 h-12 mb-3" />
-              <p className="text-lg font-semibold">{error}</p>
-            </div>
-          ) : classmateData?.length > 0 ? (
+          )
+          //  : error ? (
+          //   <div className="w-full flex flex-col items-center justify-center py-20">
+          //     <GoAlertFill className="inline-block w-12 h-12 mb-3" />
+          //     <p className="text-lg font-semibold">{error}</p>
+          //   </div>
+          // ) 
+          : classmateData?.length > 0 ? (
             <div className="flex flex-wrap -mx-2">
               {classmateData?.map((classmate, index) => (
-                <ProfileCard 
-                  key={index} 
-                  profile={classmate} 
+                <ProfileCard
+                  key={index}
+                  profile={classmate}
                   onClick={() => handleProfileClick(classmate)} // Open modal on click
                 />
               ))}
             </div>
-          ) : (
+          ) : (!loading && classmateData?.length === 0) && (
             <div className="w-full flex flex-col items-center justify-center py-20">
               <NoDataFound title="No Classmates Found" />
             </div>
@@ -77,10 +87,13 @@ const StudentClassMates = () => {
 
         {/* Render the modal if a classmate is selected */}
         {selectedClassmate && (
-          <ClassmateModal 
-            classmate={selectedClassmate} 
-            onClose={closeModal} 
+          <ClassmateModal
+            classmate={selectedClassmate}
+            onClose={closeModal}
           />
+        )}
+        {!loading && showError && (
+          <OfflineModal error={error} onDismiss={handleDismiss} />
         )}
       </DashLayout>
     </Layout>

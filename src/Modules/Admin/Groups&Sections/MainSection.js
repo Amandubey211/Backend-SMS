@@ -12,26 +12,29 @@ import UnAssignedStudentList from "./Components/UnAssignedStudentList";
 import GroupList from "./Components/GroupList";
 import Spinner from "../../../Components/Common/Spinner";
 import { FaUsers } from "react-icons/fa";
+import StudentGradeModal from "../Subjects/Modules/Grades/StudentGradeViewModal/StudentGradeModal";
+import { fetchStudentGrades, fetchStudentSubjectProgress } from "../../../Store/Slices/Admin/Users/Students/student.action";
 
 const MainSection = () => {
   const [activeSection, setActiveSection] = useState("Everyone");
   const [activeSectionId, setActiveSectionId] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+  const [studentData, setStudentData] = useState();
   const dispatch = useDispatch();
   const { cid } = useParams();
 
   // Centralized state from the Redux store for sections, groups, and unassigned students
-  const { sectionsList, groupsList, loading, error, unassignedStudentsList } =
-    useSelector((store) => store.admin.group_section);
+  const { loading, error, unassignedStudentsList } = useSelector(
+    (store) => store.admin.group_section
+  );
 
   // Fetch groups by class or section
-  const fetchGroups = useCallback(async () => {
+  const fetchGroups = useCallback(() => {
     if (cid) {
       if (activeSection === "Everyone") {
-        await dispatch(fetchGroupsByClass(cid));
+        dispatch(fetchGroupsByClass(cid));
       } else {
-        await dispatch(
+        dispatch(
           fetchGroupsByClassAndSection({
             classId: cid,
             sectionId: activeSectionId,
@@ -42,13 +45,9 @@ const MainSection = () => {
   }, [cid, activeSection, activeSectionId, dispatch]);
 
   // Fetch unassigned students
-  const fetchStudents = useCallback(async () => {
+  const fetchStudents = useCallback(() => {
     if (cid) {
-      try {
-        await dispatch(fetchUnassignedStudents(cid));
-      } catch (error) {
-        console.error("Failed to load students");
-      }
+      dispatch(fetchUnassignedStudents(cid));
     }
   }, [cid, dispatch]);
 
@@ -69,8 +68,17 @@ const MainSection = () => {
     },
     [fetchGroups]
   );
+
   const onSeeGradeClick = (student) => {
-    console.log("Student grade clicked", student);
+    setStudentData(student);
+    setIsModalOpen(true);
+    const params = {};
+      dispatch(fetchStudentGrades({params,studentId:student?._id,studentClassId:cid}));
+      dispatch(fetchStudentSubjectProgress(student?._id));
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
   };
 
   return (
@@ -81,30 +89,12 @@ const MainSection = () => {
       />
       <div className="flex flex-grow">
         <div className="w-80 h-full flex-shrink-0">
-          <UnAssignedStudentList
-            unassignedStudents={unassignedStudentsList}
-            fetchGroups={fetchGroups}
-            fetchStudents={fetchStudents}
-          />
+          <UnAssignedStudentList />
         </div>
         <div className="flex-grow h-full border-l">
-          {loading ? (
-            <Spinner />
-          ) : error ? (
-            <div className="flex flex-col items-center justify-center h-full text-center text-gray-500">
-              <FaUsers className="text-6xl mb-4" />
-              <p>No groups found.</p>
-            </div>
-          ) : (
-            <GroupList
-              onSeeGradeClick={onSeeGradeClick}
-              groupList={groupsList}
-              selectedSection={activeSection}
-              fetchGroups={fetchGroups}
-              fetchStudents={fetchStudents}
-            />
-          )}
+          <GroupList onSeeGradeClick={onSeeGradeClick} />
         </div>
+        <StudentGradeModal isOpen={isModalOpen} onClose={handleCloseModal} student={studentData} /> 
       </div>
     </div>
   );

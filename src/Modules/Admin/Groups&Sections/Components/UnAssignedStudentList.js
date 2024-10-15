@@ -1,29 +1,23 @@
 import React, { useState } from "react";
-import { useSelector } from "react-redux";
-import { PiPlusLight } from "react-icons/pi";
-import { FaUserSlash } from "react-icons/fa"; // Placeholder icon
+import { useSelector, useDispatch } from "react-redux";
 import Sidebar from "../../../../Components/Common/Sidebar";
+import { PiPlusLight } from "react-icons/pi";
 import AssignStudent from "./AssignStudent";
-
-const UnAssignedStudentList = ({
-  unassignedStudents,
-  fetchGroups,
-  fetchStudents,
-}) => {
+import { PiStudentThin } from "react-icons/pi";
+const UnAssignedStudentList = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Fetch sections from the Redux store
-  const sections = useSelector(
-    (store) => store.admin.group_section.sectionsList
+  const { unassignedStudentsList, sectionsList } = useSelector(
+    (store) => store.admin.group_section
   );
 
   const handleSearch = (e) => {
     setSearchQuery(e.target.value);
   };
 
-  const filteredStudents = unassignedStudents.filter((student) =>
+  const filteredStudents = unassignedStudentsList?.filter((student) =>
     student.firstName.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -38,7 +32,7 @@ const UnAssignedStudentList = ({
   };
 
   const getSectionName = (sectionId) => {
-    const section = sections.find((sec) => sec._id === sectionId);
+    const section = sectionsList.find((sec) => sec._id === sectionId);
     return section
       ? { name: section.sectionName, color: "text-gray-500" }
       : { name: "No Section Assigned", color: "text-red-500" };
@@ -63,7 +57,8 @@ const UnAssignedStudentList = ({
       {/* Check if there are no students */}
       {filteredStudents.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-64 text-center text-gray-500">
-          <FaUserSlash className="text-2xl mb-4" />
+          <PiStudentThin className="text-5xl mb-2" />
+
           <p>No students found.</p>
         </div>
       ) : (
@@ -75,12 +70,7 @@ const UnAssignedStudentList = ({
             >
               <div className="flex items-center">
                 <img
-                  src={
-                    student.profile ||
-                    `https://randomuser.me/api/portraits/med/${
-                      index % 2 === 0 ? "women" : "men"
-                    }/${index}.jpg`
-                  }
+                  src={student.profile || "NA"}
                   alt={student.firstName}
                   className="w-10 h-10 rounded-full mr-3"
                 />
@@ -116,14 +106,7 @@ const UnAssignedStudentList = ({
             name={selectedStudent.firstName}
             section={getSectionName(selectedStudent?.presentSectionId).name}
             studentId={selectedStudent?._id}
-            imageUrl={
-              selectedStudent.profile ||
-              "https://avatars.githubusercontent.com/u/109097090?v=4"
-            }
-            onAssignmentComplete={() => {
-              fetchStudents();
-              fetchGroups();
-            }}
+            imageUrl={selectedStudent.profile}
           />
         </Sidebar>
       )}

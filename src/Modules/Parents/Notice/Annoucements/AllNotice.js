@@ -3,29 +3,32 @@ import { useSelector, useDispatch } from "react-redux";
 import Layout from "../../../../Components/Common/Layout";
 import ParentDashLayout from "../../../../Components/Parents/ParentDashLayout.js";
 import { MdExpandMore, MdExpandLess } from "react-icons/md";
-import CalendarIcon from '../../../../Assets/ParentAssets/svg/calender.svg'; 
+import { RiSignalWifiErrorFill } from "react-icons/ri"; // Imported network error icon
+import CalendarIcon from '../../../../Assets/ParentAssets/svg/calender.svg';
 import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading .js";
 import announcementIcon from "../../../../Assets/DashboardAssets/Images/image1.png";
 import Spinner from "../../../../Components/Common/Spinner";
 import { fetchAllNotices } from "../../../../Store/Slices/Parent/NoticeBoard/notice.action.js";
+import { useTranslation } from "react-i18next"; // Import useTranslation
 
 const AllNotice = () => {
+  const { t } = useTranslation('prtNotices'); // Initialize translation hook
   const dispatch = useDispatch();
   
   // Accessing the notices, loading, and error from Redux state
-  const { notices, loading, error } = useSelector((state) => state.Parent.notice);
+  const { notices, loading, error } = useSelector((state) => state?.Parent?.notice || {});
   
   const [searchTerm, setSearchTerm] = useState("");
   const [activeIndex, setActiveIndex] = useState(null);
   
   // Custom hook for setting navigation heading
-  useNavHeading("Notice");
+  useNavHeading(t("Child Notice Board"));
 
   // Side effect: Dispatches fetch action on mount
   useEffect(() => {
     dispatch(fetchAllNotices());
-  }, [dispatch]);  // Only runs on mount or if `dispatch` changes
-  
+  }, [dispatch]);
+
   // Memoized array for background colors
   const backgroundColors = useMemo(() => [
     'bg-blue-300', 
@@ -38,7 +41,7 @@ const AllNotice = () => {
   // Memoized filtered notices based on search term
   const filteredNotices = useMemo(() => {
     return notices.filter((notice) =>
-      notice.title?.toLowerCase().includes(searchTerm.toLowerCase())
+      notice?.title?.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [notices, searchTerm]);
 
@@ -57,44 +60,60 @@ const AllNotice = () => {
     });
   };
 
+  // Error message rendering for notices
+  const renderErrorMessage = () => {
+    const isNetworkError = error?.toLowerCase().includes("network error");
+  
+    return (
+      <div className="flex flex-col items-center justify-center mt-6">
+        {isNetworkError ? (
+          <RiSignalWifiErrorFill className="text-gray-400 text-8xl mb-6" />
+        ) : (
+          <img src={CalendarIcon} style={{ width: '40px', height: '40px', marginBottom: '10px' }} alt="calendar" />
+        )}
+        <p className="text-gray-600 text-lg text-center mt-2">
+          {error}: {t("Failed to fetch notices")}
+        </p>
+      </div>
+    );
+  };
+
   return (
     <>
-      <Layout title="Parent | Notice Board">
+      <Layout title={t("Noticeboard")}>
         <ParentDashLayout hideAvatarList={true}>
           <div className="p-4">
             <h1 className="mb-2 bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent font-semibold bg-clip-text">
-              Child Notice Board
+              {t("Child Notice Board")}
             </h1>
             <div className="flex p-[10px] justify-between">
               <div className="flex gap-4">
                 <input
                   type="text"
-                  placeholder="Search by Notice"
+                  placeholder={t("Search by Notice")}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="p-2 border rounded w-[250px]"
                 />
                 <button className="border w-[100px] rounded bg-pink-100 text-center flex justify-center items-center">
                   <span className="font-semibold bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent bg-clip-text">
-                    Search
+                    {t("Search")}
                   </span>
                 </button>
               </div>
             </div>
 
+            {/* Show loading spinner, error message, or notices */}
             <div className="mt-5 rounded-lg overflow-auto">
               {loading ? (
                 <div className="flex justify-center items-center h-full">
                   <Spinner />
                 </div>
               ) : error ? (
-                <div className="flex flex-col items-center justify-center h-full text-center">
-                  <img src={CalendarIcon} style={{ width: '40px', height: '40px', marginBottom: '10px' }} alt="calendar" />
-                  <p className="text-gray-600 text-lg">Failed to fetch notices.</p>
-                </div>
+                renderErrorMessage() // Error message with icon below search bar
               ) : filteredNotices.length > 0 ? (
                 filteredNotices.map((notice, index) => (
-                  <div key={notice.id || index} className="border">
+                  <div key={notice.id || index} className="border mb-4">
                     <div
                       className={`cursor-pointer p-2 flex flex-col bg-white`}
                       onClick={() => toggleAccordion(index)}
@@ -109,28 +128,28 @@ const AllNotice = () => {
                         </div>
                         <div className="flex flex-col gap-3 mt-[-5px] flex-1">
                           <h2 className="font-[500] text-[#4D4D4D]" style={{ fontStyle: "inter" }}>
-                            {notice.title || 'Untitled'}
+                            {notice?.title || t("Untitled")}
                           </h2>
                           <div className="flex flex-row gap-[50px] text-xs">
                             <div className="flex flex-wrap justify-center items-center">
                               <img src={CalendarIcon} alt="calendar" style={{ width: '25px', height: '25px', marginRight: '5px' }} />
                               <span className="text-sm p-1 font-[400] text-[#7F7F7F]">
-                                {formatDate(notice.startDate) || 'No Date'}
+                                {formatDate(notice?.startDate) || t("No Date")}
                               </span>
                             </div>
                             <div
-                              className={`px-3 text-xs text-center flex justify-center items-center rounded-full ${notice.priority === "High priority"
+                              className={`px-3 text-xs text-center flex justify-center items-center rounded-full ${notice?.priority === t("High Priority")
                                 ? "bg-[#FAECF0]"
                                 : "bg-[#F2F5FB] border border-[#F2F5FB]"
                                 }`}
                             >
                               <span
-                                className={`${notice.priority === "High priority"
+                                className={`${notice?.priority === t("High Priority")
                                   ? "font-semibold bg-gradient-to-r from-[#C83B62] to-[#7F35CD] inline-block text-transparent bg-clip-text"
                                   : "text-gray-500"
                                   }`}
                               >
-                                {notice.priority || 'Low priority'}
+                                {notice?.priority || t("Low Priority")}
                               </span>
                             </div>
                           </div>
@@ -146,7 +165,7 @@ const AllNotice = () => {
                     </div>
                     {activeIndex === index && (
                       <div className="p-2 pl-6 text-[#4D4D4D]">
-                        <p>{notice.description || 'No description available.'}</p>
+                        <p>{notice?.description || t("No description available")}</p>
                       </div>
                     )}
                   </div>
@@ -154,7 +173,7 @@ const AllNotice = () => {
               ) : (
                 <div className="flex flex-col items-center justify-center h-full">
                   <img src={CalendarIcon} style={{ width: '40px', height: '40px', marginBottom: '10px' }} alt="calendar" />
-                  <p className="text-gray-600 text-lg">No Notices are available.</p>
+                  <p className="text-gray-600 text-lg">{t("No Notices are available")}</p>
                 </div>
               )}
             </div>

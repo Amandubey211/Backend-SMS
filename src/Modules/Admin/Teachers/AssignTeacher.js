@@ -25,6 +25,8 @@ const AssignTeacher = () => {
   // Fetch teachers, subjects, and sections on component mount
   useEffect(() => {
     dispatch(fetchAllTeachers());
+
+    console.log();
     dispatch(fetchSubjects(cid));
   }, [dispatch, cid]);
 
@@ -73,7 +75,7 @@ const AssignTeacher = () => {
           >
             <option value="">Choose</option>
             {allSubjects?.map((subject) => (
-              <option key={subject._id} value={subject._id}>
+              <option key={subject?.subjectId} value={subject?.subjectId}>
                 {subject.subjectName}
               </option>
             ))}

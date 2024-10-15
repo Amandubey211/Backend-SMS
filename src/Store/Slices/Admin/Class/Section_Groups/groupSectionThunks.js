@@ -2,7 +2,6 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { baseUrl } from "../../../../../config/Common";
 import toast from "react-hot-toast";
-import { setGroupsList } from "./groupSectionSlice"; // Ensure this path is correct
 
 // Fetch Groups by Class
 export const fetchGroupsByClass = createAsyncThunk(
@@ -15,62 +14,30 @@ export const fetchGroupsByClass = createAsyncThunk(
       });
       return response.data.data;
     } catch (error) {
-      const errorMessage =
-        error.response?.data?.message || "Failed to fetch groups";
-      // toast.error(errorMessage);
-      return rejectWithValue(errorMessage);
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch groups"
+      );
     }
   }
 );
 
-// Fetch Groups by Class and Section (Thunk)
+// Fetch Groups by Class and Section
 export const fetchGroupsByClassAndSection = createAsyncThunk(
   "group/fetchGroupsByClassAndSection",
   async ({ classId, sectionId }, { getState, rejectWithValue, dispatch }) => {
-    const token = getState().common.auth.token; // Get token from Redux store
-
-    try {
-      const response = await axios.get(
-        `${baseUrl}/admin/group/class/${classId}/section/${sectionId}`,
-        {
-          headers: { Authentication: `Bearer ${token}` }, // Use token from Redux
-        }
-      );
-
-      if (response.data.status) {
-        dispatch(setGroupsList(response.data.data));
-        return response.data.data;
-      } else {
-        // toast.error("Failed to fetch groups. Please try again.");
-        return rejectWithValue("Failed to fetch groups");
-      }
-    } catch (err) {
-      const errorMessage =
-        err.response?.data?.message || "Failed to fetch groups";
-      toast.error(errorMessage);
-      return rejectWithValue(errorMessage);
-    }
-  }
-);
-
-// Fetch Sections by Class
-export const fetchSectionsByClass = createAsyncThunk(
-  "group/fetchSectionsByClass",
-  async (classId, { getState, rejectWithValue }) => {
     try {
       const token = getState().common.auth.token;
       const response = await axios.get(
-        `${baseUrl}/admin/getSectionByclass/${classId}`,
+        `${baseUrl}/admin/group/class/${classId}/section/${sectionId}`,
         {
           headers: { Authentication: `Bearer ${token}` },
         }
       );
       return response.data.data;
     } catch (error) {
-      const errorMessage =
-        error.response?.data?.message || "Failed to fetch sections";
-      toast.error(errorMessage);
-      return rejectWithValue(errorMessage);
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch groups"
+      );
     }
   }
 );
@@ -89,10 +56,9 @@ export const fetchUnassignedStudents = createAsyncThunk(
       );
       return response.data.data;
     } catch (error) {
-      const errorMessage =
-        error.response?.data?.message || "Failed to fetch unassigned students";
-      // toast.error(errorMessage);
-      return rejectWithValue(errorMessage);
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch unassigned students"
+      );
     }
   }
 );
@@ -109,10 +75,10 @@ export const createGroup = createAsyncThunk(
       toast.success("Group added successfully!");
       return response.data.data;
     } catch (error) {
-      const errorMessage =
-        error.response?.data?.message || "Failed to create group";
-      toast.error(errorMessage);
-      return rejectWithValue(errorMessage);
+      toast.error(error.response?.data?.message || "Failed to create group");
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to create group"
+      );
     }
   }
 );
@@ -133,10 +99,10 @@ export const updateGroup = createAsyncThunk(
       toast.success("Group updated successfully!");
       return response.data.data;
     } catch (error) {
-      const errorMessage =
-        error.response?.data?.message || "Failed to update group";
-      toast.error(errorMessage);
-      return rejectWithValue(errorMessage);
+      toast.error(error.response?.data?.message || "Failed to update group");
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to update group"
+      );
     }
   }
 );
@@ -147,20 +113,40 @@ export const deleteGroup = createAsyncThunk(
   async (groupId, { getState, rejectWithValue }) => {
     try {
       const token = getState().common.auth.token;
-      const response = await axios.delete(`${baseUrl}/admin/group/${groupId}`, {
+      await axios.delete(`${baseUrl}/admin/group/${groupId}`, {
         headers: { Authentication: `Bearer ${token}` },
       });
       toast.success("Group deleted successfully!");
       return groupId;
     } catch (error) {
-      const errorMessage =
-        error.response?.data?.message || "Failed to delete group";
-      toast.error(errorMessage);
-      return rejectWithValue(errorMessage);
+      toast.error(error.response?.data?.message || "Failed to delete group");
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to delete group"
+      );
     }
   }
 );
 
+// Fetch Sections by Class
+export const fetchSectionsByClass = createAsyncThunk(
+  "group/fetchSectionsByClass",
+  async (classId, { getState, rejectWithValue }) => {
+    try {
+      const token = getState().common.auth.token;
+      const response = await axios.get(
+        `${baseUrl}/admin/getSectionByclass/${classId}`,
+        {
+          headers: { Authentication: `Bearer ${token}` },
+        }
+      );
+      return response.data.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch sections"
+      );
+    }
+  }
+);
 // Create Section
 export const createSection = createAsyncThunk(
   "section/createSection",
@@ -177,10 +163,10 @@ export const createSection = createAsyncThunk(
       toast.success("Section created successfully!");
       return response.data.data;
     } catch (error) {
-      const errorMessage =
-        error.response?.data?.message || "Failed to create section";
-      toast.error(errorMessage);
-      return rejectWithValue(errorMessage);
+      toast.error(error.response?.data?.message || "Failed to create section");
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to create section"
+      );
     }
   }
 );
@@ -201,10 +187,10 @@ export const updateSection = createAsyncThunk(
       toast.success("Section updated successfully!");
       return response.data.section;
     } catch (error) {
-      const errorMessage =
-        error.response?.data?.message || "Failed to update section";
-      toast.error(errorMessage);
-      return rejectWithValue(errorMessage);
+      toast.error(error.response?.data?.message || "Failed to update section");
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to update section"
+      );
     }
   }
 );
@@ -215,19 +201,16 @@ export const deleteSection = createAsyncThunk(
   async (sectionId, { getState, rejectWithValue }) => {
     try {
       const token = getState().common.auth.token;
-      const response = await axios.delete(
-        `${baseUrl}/admin/section/${sectionId}`,
-        {
-          headers: { Authentication: `Bearer ${token}` },
-        }
-      );
+      await axios.delete(`${baseUrl}/admin/section/${sectionId}`, {
+        headers: { Authentication: `Bearer ${token}` },
+      });
       toast.success("Section deleted successfully!");
       return sectionId;
     } catch (error) {
-      const errorMessage =
-        error.response?.data?.message || "Failed to delete section";
-      toast.error(errorMessage);
-      return rejectWithValue(errorMessage);
+      toast.error(error.response?.data?.message || "Failed to delete section");
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to delete section"
+      );
     }
   }
 );
@@ -248,10 +231,12 @@ export const assignStudentToSection = createAsyncThunk(
       toast.success("Student assigned to section successfully!");
       return response.data.data;
     } catch (error) {
-      const errorMessage =
-        error.response?.data?.message || "Failed to assign student to section";
-      toast.error(errorMessage);
-      return rejectWithValue(errorMessage);
+      toast.error(
+        error.response?.data?.message || "Failed to assign student to section"
+      );
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to assign student to section"
+      );
     }
   }
 );
@@ -272,10 +257,12 @@ export const removeStudentFromGroup = createAsyncThunk(
       toast.success("Student removed from group successfully!");
       return response.data.data;
     } catch (error) {
-      const errorMessage =
-        error.response?.data?.message || "Failed to remove student from group";
-      toast.error(errorMessage);
-      return rejectWithValue(errorMessage);
+      toast.error(
+        error.response?.data?.message || "Failed to remove student from group"
+      );
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to remove student from group"
+      );
     }
   }
 );

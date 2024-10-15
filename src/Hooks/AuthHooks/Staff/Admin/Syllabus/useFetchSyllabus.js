@@ -9,7 +9,6 @@ const useFetchSyllabus = () => {
   const [error, setError] = useState(null);
   const [syllabi, setSyllabi] = useState([]);
 
-  
   const { role } = useSelector((store) => store.Auth);
 
   const fetchSyllabus = useCallback(

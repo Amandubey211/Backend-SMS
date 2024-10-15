@@ -1,4 +1,3 @@
-// SyllabusHeader.js
 import React, { useState, useRef, useEffect } from "react";
 import { AiOutlineEdit } from "react-icons/ai";
 import { HiOutlineDotsVertical } from "react-icons/hi";

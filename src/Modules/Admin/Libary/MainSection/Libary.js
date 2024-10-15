@@ -1,4 +1,3 @@
-// src/Modules/Admin/Libary/MainSection/LibraryAndBookIssue.js
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Layout from "../../../../Components/Common/Layout";
@@ -13,28 +12,48 @@ import {
 import LibraryTab from "../Components/LibraryTab";
 import AddIssue from "../Components/AddIssue";
 import AddBook from "../Components/AddBook";
-
 import BookIssueTab from "../Components/BookIssueTab";
+import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
+import { fetchAllClasses } from "../../../../Store/Slices/Admin/Class/actions/classThunk";
+import { fetchAllStudents } from "../../../../Store/Slices/Admin/Class/Students/studentThunks";
 
 const LibraryAndBookIssue = () => {
   const dispatch = useDispatch();
-  const { books, bookIssues, loading } = useSelector(
-    (state) => state.admin.library
-  );
-
+  const { books, bookIssues, loading, addBookSuccess, addIssueSuccess } =
+    useSelector((state) => state.admin.library);
+  const classList = useSelector((state) => state.admin.class.classes);
+  const StudentList = useSelector((store) => store.admin.students.studentsList);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("Library");
   const [editIssueData, setEditIssueData] = useState(null);
 
-  // Fetch books and book issues data on component mount
   useEffect(() => {
     if (!books.length) dispatch(fetchBooksThunk());
     if (!bookIssues.length) dispatch(fetchBookIssuesThunk());
-  }, [dispatch, books.length, bookIssues.length]);
+    if (!classList.length) dispatch(fetchAllClasses());
+    if (!StudentList.length) dispatch(fetchAllStudents());
+  }, [
+    dispatch,
+    books.length,
+    bookIssues.length,
+    classList.length,
+    StudentList.length,
+  ]);
 
-  // Sidebar controls
+  useEffect(() => {
+    if (addBookSuccess || addIssueSuccess) {
+      setSidebarOpen(false);
+      setEditIssueData(null);
+    }
+  }, [addBookSuccess, addIssueSuccess]);
+
   const handleSidebarOpen = () => setSidebarOpen(true);
-  const handleSidebarClose = () => setSidebarOpen(false);
+  const handleSidebarClose = () => {
+    setSidebarOpen(false);
+    setEditIssueData(null);
+  };
+  const currentPath = activeTab === "Library" ? "Library" : "Book Issue";
+  useNavHeading("Admin", currentPath);
 
   return (
     <Layout title="Library & Book Issues | Admin Panel">
@@ -42,7 +61,7 @@ const LibraryAndBookIssue = () => {
         {loading ? (
           <Spinner />
         ) : (
-          <div className="min-h-screen p-4">
+          <div className="min-h-screen p-4 flex flex-col">
             {/* Tab Buttons */}
             <div className="flex gap-7 mb-4">
               <TabButton
@@ -60,19 +79,31 @@ const LibraryAndBookIssue = () => {
             </div>
 
             {/* Tab Content */}
-            {activeTab === "Library" ? (
-              <LibraryTab handleSidebarOpen={handleSidebarOpen} />
-            ) : (
-              <BookIssueTab
-                handleSidebarOpen={handleSidebarOpen}
-                setEditIssueData={setEditIssueData}
-              />
-            )}
+            <div className="flex-1">
+              {activeTab === "Library" ? (
+                <LibraryTab handleSidebarOpen={handleSidebarOpen} />
+              ) : (
+                <BookIssueTab
+                  handleSidebarOpen={handleSidebarOpen}
+                  setEditIssueData={setEditIssueData}
+                />
+              )}
+            </div>
 
             {/* Sidebar for Add/Edit Book or Issue */}
-            <Sidebar isOpen={isSidebarOpen} onClose={handleSidebarClose}>
+            <Sidebar
+              isOpen={isSidebarOpen}
+              onClose={handleSidebarClose}
+              title={
+                activeTab === "Library"
+                  ? "Add New Book"
+                  : editIssueData
+                  ? "Edit Book Issue"
+                  : "Add Book Issue"
+              }
+            >
               {activeTab === "Library" ? (
-                <AddBook />
+                <AddBook onClose={handleSidebarClose} />
               ) : (
                 <AddIssue
                   editIssueData={editIssueData}

@@ -27,7 +27,7 @@ export const fetchLibraryBooks = createAsyncThunk(
         bookCategory: book.bookId.category,
       }));
     } catch (error) {
-      const errorMessage = error.response?.data?.message || "Failed to fetch library data.";
+      const errorMessage = error.response?.data?.message || error.message ||"Failed to fetch library data.";
       return rejectWithValue(errorMessage);
     }
   }

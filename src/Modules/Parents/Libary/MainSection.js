@@ -7,7 +7,7 @@ const ParentSection = () => {
       <div className=" w-full">
         
         
-        <div className="flex flex-wrap justify-between items-start  border-y">
+        <div className="flex flex-wrap justify-between items-start">
           <div className="w-full  border-r" >
             <LibraryTable />
           </div>

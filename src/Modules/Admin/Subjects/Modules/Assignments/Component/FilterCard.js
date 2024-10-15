@@ -1,13 +1,26 @@
-import React, { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
-import { FiRefreshCw } from "react-icons/fi";
+import { useDispatch, useSelector } from "react-redux";
+import { FiRefreshCw, FiAlertCircle } from "react-icons/fi"; // Import the alert icon
+import { fetchModules } from "../../../../../../Store/Slices/Admin/Class/Module/moduleThunk";
+import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 const FilterCard = ({ filters, setFilters }) => {
   const [publishStatus, setPublishStatus] = useState(filters.publish || null);
   const [selectedModule, setSelectedModule] = useState(filters.moduleId || "");
-  const [selectedChapter, setSelectedChapter] = useState(filters.chapterId || "");
+  const [selectedChapter, setSelectedChapter] = useState(
+    filters.chapterId || ""
+  );
   const [chapters, setChapters] = useState([]);
-  const moduleList = useSelector((store) => store.Subject.modules);
+
+  const moduleList = useSelector((store) => store.admin.module.modules);
+  const { sid, cid } = useParams();
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (!moduleList.length) {
+      dispatch(fetchModules({ cid, sid }));
+    }
+  }, [moduleList.length, dispatch, cid, sid]);
 
   useEffect(() => {
     if (selectedModule) {
@@ -57,8 +70,6 @@ const FilterCard = ({ filters, setFilters }) => {
     borderRadius: "50%",
     border: `2px solid ${checked ? color : "#d1d5db"}`,
     backgroundColor: checked ? color : "transparent",
-    display: "inline-block",
-    verticalAlign: "middle",
     cursor: "pointer",
   });
 
@@ -71,7 +82,9 @@ const FilterCard = ({ filters, setFilters }) => {
       >
         <FiRefreshCw size={24} />
       </button>
+
       <h2 className="text-lg font-semibold mb-4">Filter</h2>
+
       <div className="mb-4">
         <fieldset>
           <legend className="sr-only">Publish Status</legend>
@@ -93,7 +106,6 @@ const FilterCard = ({ filters, setFilters }) => {
               <input
                 type="radio"
                 name="publishStatus"
-                tabIndex="0"
                 value="false"
                 checked={publishStatus === "false"}
                 onChange={() => togglePublishStatus("false")}
@@ -106,8 +118,11 @@ const FilterCard = ({ filters, setFilters }) => {
           </div>
         </fieldset>
       </div>
+
       <div className="mb-4">
-        <label className="block text-gray-700" htmlFor="module-select">Module</label>
+        <label className="block text-gray-700" htmlFor="module-select">
+          Module
+        </label>
         <select
           id="module-select"
           className="mt-1 block w-full pl-3 pr-10 border py-2 text-base focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
@@ -122,22 +137,36 @@ const FilterCard = ({ filters, setFilters }) => {
           ))}
         </select>
       </div>
+
       <div className="mb-4">
-        <label className="block text-gray-700" htmlFor="chapter-select">Chapter</label>
+        <label className="block text-gray-700" htmlFor="chapter-select">
+          Chapter
+        </label>
         <select
           id="chapter-select"
           className="mt-1 block w-full pl-3 pr-10 py-2 text-base border focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
           value={selectedChapter}
           onChange={(e) => setSelectedChapter(e.target.value)}
+          disabled={!selectedModule} // Disable the chapter select if no module is selected
         >
-          <option value="">Select</option>
-          {chapters.map((chapter) => (
-            <option key={chapter._id} value={chapter._id}>
-              {chapter.name}
+          {!selectedModule ? (
+            <option value="">
+              <FiAlertCircle className="inline mr-1" />
+              Please select the module
             </option>
-          ))}
+          ) : (
+            <>
+              <option value="">Select</option>
+              {chapters.map((chapter) => (
+                <option key={chapter._id} value={chapter._id}>
+                  {chapter.name}
+                </option>
+              ))}
+            </>
+          )}
         </select>
       </div>
+
       <button
         onClick={handleApplyFilters}
         className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-2 rounded-full focus:outline-none transform transition-transform duration-300 hover:scale-105"

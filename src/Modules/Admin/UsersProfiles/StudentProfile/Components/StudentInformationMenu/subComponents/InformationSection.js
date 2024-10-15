@@ -5,12 +5,12 @@ import { MdOutlineLocationOn, MdMale, MdTempleHindu, MdEmail, MdBloodtype, MdCak
 const InformationSection = ({ student }) => {
   return (
     <div className="flex flex-col h-full w-full p-2 ">
-      <h2 className="text-base font-normal text-gray-600">Student Information</h2>
+      <h2 className="text-base font-semibold text-gray-600 ">Student Information</h2>
 
       <div className="flex flex-row w-full">
 <div className="flex-1">
-     <InformationItem icon={MdOutlineLocationOn} title="Address" value={student?.residentialAddress?.
-street} />
+     <InformationItem icon={MdOutlineLocationOn} title="Address" value={`${student?.residentialAddress?.
+street?.slice(0,80)}`} />
       <InformationItem icon={MdMale} title="Gender" value={student?.gender} />
       <InformationItem icon={MdTempleHindu} title="Religion" value={student?.religion} />
      

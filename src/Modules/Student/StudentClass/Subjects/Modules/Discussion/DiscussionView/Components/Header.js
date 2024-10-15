@@ -6,26 +6,34 @@ import Sidebar from "../../../../../../../../Components/Common/Sidebar";
 import { ImSpinner3 } from 'react-icons/im';
 import { FaExclamationTriangle } from 'react-icons/fa';
 import { CiUser } from "react-icons/ci";
-const Header = ({ discussion }) => {
-  const [isSidebarOpen, setSidebarOpen] = useState(false);
-console.log(
+import { useDispatch, useSelector } from "react-redux";
+import { setSidebarOpen } from "../../../../../../../../Store/Slices/Student/MyClass/Class/Subjects/Discussion/discussionSlice";
+const Header = () => {
+  const dispatch = useDispatch();
+  const { discussion, isSidebarOpen } = useSelector((store) => store?.student?.studentDiscussion)
 
-  "disccussion",discussion
-)
-  const handleSidebarOpen = () => setSidebarOpen(true);
-  const handleSidebarClose = () => setSidebarOpen(false);
+  //const [isSidebarOpen, setSidebarOpen] = useState(false);
+  console.log("disccussion", discussion)
+  const handleSidebarOpen = () => {
+    //setSidebarOpen(true)
+    dispatch(setSidebarOpen(true))
+  };
+  const handleSidebarClose = () => {
+    dispatch(setSidebarOpen(false))
+    //setSidebarOpen(false);
+  }
 
   const formatDate = (dateString) => {
     const options = { year: "numeric", month: "long", day: "numeric" };
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
-  
+
   if (!discussion) return <p>No discussion found.</p>;
 
   return (
     <div className="flex items-end justify-between p-2 px-4 border-b">
       <div className="flex items-center">
-      {discussion?.authorProfile ? (
+        {discussion?.authorProfile ? (
           <img
             src={discussion.authorProfile}
             alt="Profile"
@@ -81,7 +89,7 @@ console.log(
             isOpen={isSidebarOpen}
             onClose={handleSidebarClose}
           >
-            <DiscussionMessage discussion={discussion}   />
+            <DiscussionMessage />
           </Sidebar>
         </div>
       </div>

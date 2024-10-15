@@ -1,3 +1,5 @@
+// src/components/Components/RubricModalRow.js
+
 import React, { useState, useEffect } from "react";
 import { HiOutlinePlus } from "react-icons/hi2";
 import { RiDeleteBin5Line } from "react-icons/ri";
@@ -13,7 +15,7 @@ const RubricModalRow = ({
   onDeleteCriteria,
   onAddRating,
   onEditCriteria,
-  readonly, // Add readonly prop
+  readonly,
 }) => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [isEditSidebarOpen, setEditSidebarOpen] = useState(false);
@@ -77,7 +79,7 @@ const RubricModalRow = ({
               />
               <p className="text-sm text-gray-500">Range</p>
             </div>
-            {!readonly && ( // Hide buttons in readonly mode
+            {!readonly && (
               <div className="flex gap-2">
                 <button
                   className="text-red-600"
@@ -102,10 +104,10 @@ const RubricModalRow = ({
               rating={rating}
               onDeleteRating={() => handleDeleteRating(index)}
               onEditRating={() => handleEditRating(index)}
-              readonly={readonly} // Pass readonly to RatingCard
+              readonly={readonly}
             />
           ))}
-          {!readonly && ( // Hide "Add Rating" button in readonly mode
+          {!readonly && (
             <button
               className="flex flex-col justify-center border-dashed  w-44 h-40 items-center text-purple-600 text-xl gap-1 border-2  border-black border-opacity-65  hover:border-opacity-100 rounded-md px-5"
               onClick={() => setSidebarOpen(true)}
@@ -124,7 +126,7 @@ const RubricModalRow = ({
             readOnly
           />
         </div>
-        {!readonly && ( // Only show the sidebars if not in readonly mode
+        {!readonly && (
           <>
             <Sidebar
               title="Add New Rating"

@@ -1,11 +1,15 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useParams, useLocation } from "react-router-dom";
 import CreateAssignmentHeader from "./Component/CreateAssignmentHeader";
 import EditorComponent from "../../../Component/AdminEditor";
-import useCreateAssignment from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/createAssignment";
-import useUpdateAssignment from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useUpdateAssignment";
 import CreateAssignmentForm from "./Component/CreateAssignmentForm";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  createAssignmentThunk,
+  updateAssignmentThunk,
+} from "../../../../../../Store/Slices/Admin/Class/Assignment/assignmentThunks";
 
+// Memoized initial form state to avoid re-initialization
 const initialFormState = {
   points: "",
   displayGrade: false,
@@ -26,11 +30,12 @@ const initialFormState = {
 const MainSection = ({ setIsEditing }) => {
   const { cid, sid } = useParams();
   const location = useLocation();
+  const dispatch = useDispatch();
 
+  // State management
   const [assignmentName, setAssignmentName] = useState("");
   const [editorContent, setEditorContent] = useState("");
   const [formState, setFormState] = useState(initialFormState);
-  const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [isEditing, setLocalIsEditing] = useState(false);
   const [assignmentId, setAssignmentId] = useState("");
   const [criteriaList, setCriteriaList] = useState([]);
@@ -39,12 +44,7 @@ const MainSection = ({ setIsEditing }) => {
   const [saveLoading, setSaveLoading] = useState(false);
   const [publishLoading, setPublishLoading] = useState(false);
 
-  const { createAssignment, loading: createLoading } = useCreateAssignment();
-  const { updateAssignment, loading: updateLoading } = useUpdateAssignment();
-
-  const handleSidebarOpen = useCallback(() => setSidebarOpen(true), []);
-  const handleSidebarClose = useCallback(() => setSidebarOpen(false), []);
-
+  // Preload the assignment if editing
   useEffect(() => {
     if (location.state && location.state.assignment) {
       const assignment = location.state.assignment;
@@ -76,6 +76,7 @@ const MainSection = ({ setIsEditing }) => {
     }
   }, [location.state, setIsEditing]);
 
+  // Memoized handler functions to avoid unnecessary re-creation
   const handleNameChange = useCallback((name) => setAssignmentName(name), []);
   const handleEditorChange = useCallback(
     (content) => setEditorContent(content),
@@ -90,6 +91,7 @@ const MainSection = ({ setIsEditing }) => {
     }));
   }, []);
 
+  // Optimized save function using useCallback
   const handleSave = useCallback(
     async (publish) => {
       try {
@@ -99,7 +101,7 @@ const MainSection = ({ setIsEditing }) => {
           setSaveLoading(true);
         }
 
-        const allowedAttempts = formState.allowedAttempts === true;
+        const allowedAttempts = formState.allowedAttempts === "true";
         let allowNumberOfAttempts = null;
 
         if (allowedAttempts) {
@@ -136,9 +138,13 @@ const MainSection = ({ setIsEditing }) => {
 
         if (isEditing) {
           let sectionId = formState.sectionId || null;
-          await updateAssignment(assignmentId, assignmentData, sectionId);
+          await dispatch(
+            updateAssignmentThunk({ assignmentId, assignmentData, sectionId })
+          );
         } else {
-          const response = await createAssignment(assignmentData);
+          const response = await dispatch(
+            createAssignmentThunk(assignmentData)
+          );
           setAssignmentId(response?.data?._id);
         }
       } catch (error) {
@@ -159,8 +165,7 @@ const MainSection = ({ setIsEditing }) => {
       cid,
       sid,
       assignmentId,
-      updateAssignment,
-      createAssignment,
+      dispatch,
     ]
   );
 
@@ -169,18 +174,16 @@ const MainSection = ({ setIsEditing }) => {
       <CreateAssignmentHeader
         onSave={handleSave}
         id={assignmentId}
-        AssignmentcreateLoading={createLoading}
-        AssignmentupdateLoading={updateLoading}
         isEditing={isEditing}
         criteriaList={criteriaList}
         setCriteriaList={setCriteriaList}
         existingRubricId={existingRubricId}
         setExistingRubricId={setExistingRubricId}
-        assignmentId={assignmentId}
         saveLoading={saveLoading}
         publishLoading={publishLoading}
       />
-      <div className="w-full flex ">
+      <div className="w-full flex">
+        {/* Prevent unnecessary re-renders by memoizing */}
         <div className="w-[70%]">
           <EditorComponent
             assignmentLabel="Assignment Name"

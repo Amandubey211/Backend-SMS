@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { FaBook } from "react-icons/fa";
 const SubjectCard = ({ subject, i }) => {
-  const { name, startDate, modules, completedModules, progress } = subject;
+  const { subjectName,started,totalModule,completedModule,percentageValue} = subject;
   const [bgColor, setBgColor] = useState("");
 
   useEffect(() => {
@@ -24,20 +24,20 @@ const SubjectCard = ({ subject, i }) => {
       <div className="flex items-center gap-2">
       <FaBook className="text-[2.2rem] text-pink-400" />
         <div className="flex flex-col">
-          <span>{name}</span>
-          <span className="text-[12px] text-gray-600">Started: {startDate}</span>
+          <span>{subjectName}</span>
+          <span className="text-[12px] text-gray-600">Started: {started?.slice(0,10)}</span>
         </div>
       </div>
 
       <div className="w-full bg-gray-200 rounded-full h-1.5 dark:bg-gray-700">
         <div
           className={`h-1.5 rounded-full bg-${bgColor}`}
-          style={{ width: `${progress}%`, }}
+          style={{ width: `${percentageValue}%`, }}
         ></div>
       </div>
       <div className="flex flex-row justify-between">
-        <p className="text-right text-sm text-gray-500">{completedModules||0}/{modules?.length} Modules</p>
-        <p className="text-right text-sm text-gray-500">{completedModules} Completed</p>
+        <p className="text-right text-sm text-gray-500">{completedModule}/{totalModule} Module</p>
+        <p className="text-right text-sm text-gray-500">{percentageValue}%</p>
       </div>
     </div>
   );

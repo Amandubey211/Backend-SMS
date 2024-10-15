@@ -54,10 +54,10 @@ const EventCard = ({ event, onClick }) => {
           {new Date(event.startDate).getDate()}
         </div>
         <div className="flex flex-col ml-2">
-          <span className="text-lg font-semibold">{event?.title}</span>
+          <span className="text-lg font-semibold">{truncateText(event?.title, 11)}</span>
           <div className="flex items-center">
             <MdAccessTime className="mr-2 text-white text-lg" />
-            <span>{formatTime(event?.time)}</span>
+            <span>{event?.time}</span>
           </div>
         </div>
       </div>

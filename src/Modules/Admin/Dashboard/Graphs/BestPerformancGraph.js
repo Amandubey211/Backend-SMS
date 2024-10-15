@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, memo } from "react";
 import { Bar } from "react-chartjs-2";
 import { weekData, monthData, yearData } from "./GraphData/BestPerformanceData";
 
@@ -74,4 +74,4 @@ const BestPerformanceChart = () => {
   );
 };
 
-export default BestPerformanceChart;
+export default memo(BestPerformanceChart);

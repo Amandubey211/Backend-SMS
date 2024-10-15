@@ -7,13 +7,12 @@ import useNavHeading from "../../../../../../Hooks/CommonHooks/useNavHeading ";
 import { useSelector } from "react-redux";
 
 const Grade = () => {
-  const { cid, sid } = useParams();
-  const subjectName = useSelector((store) => store.Common.selectedSubjectName);
-  const className = useSelector((store) => store?.Common?.selectedClassName);
+  const { subjectName } = useSelector((store) => store?.student?.studentSubject?.subject);
+  const { classData } = useSelector((store) => store?.student?.studentClass);
+  const className=classData?.className;
 
   // useNavHeading(cid, sid);
   useNavHeading(className, subjectName);
-
   return (
     <Layout title={`Grade | Student Diwan`}>
       <StudentDashLayout children={<MainSection />} hideSearchbar={true} />

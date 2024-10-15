@@ -23,8 +23,7 @@ export const fetchAllNotices = createAsyncThunk(
       console.log("API Response for Notices:", response.data.notices);
       return response.data.notices;
     } catch (error) {
-      const errorMessage = error.response?.data?.message || "Failed to fetch notices";
-      toast.error(errorMessage);
+      const errorMessage = error.response?.data?.message || error.message ||"Failed to fetch notices";
       return rejectWithValue(errorMessage);
     }
   }
