@@ -53,7 +53,7 @@ const MainSection = ({ setIsEditing }) => {
   const location = useLocation();
   const dispatch = useDispatch();
 
-  const { quizDetail: quiz } = useSelector((state) => state.admin.quizzes);
+  const { quizzDetail: quiz } = useSelector((state) => state.admin.quizzes);
   const [activeTab, setActiveTab] = useState("instructions");
   const [assignmentName, setAssignmentName] = useState("");
   const [instruction, setInstruction] = useState("");
@@ -76,7 +76,8 @@ const MainSection = ({ setIsEditing }) => {
     if (quizIdFromState) {
       setQuizId(quizIdFromState);
       setIsEditing(true);
-      dispatch(fetchQuizByIdThunk(quizIdFromState));
+
+      dispatch(fetchQuizByIdThunk(location.state?.quizId));
     } else {
       setIsEditing(false);
     }
@@ -172,7 +173,6 @@ const MainSection = ({ setIsEditing }) => {
       inCorrectAnswerComment: wrongAnswerComment,
     };
 
-    console.log(quizId, newQuestion, "lllllllllllll");
     dispatch(addQuestionThunk({ quizId, question: newQuestion }));
   }, [
     dispatch,

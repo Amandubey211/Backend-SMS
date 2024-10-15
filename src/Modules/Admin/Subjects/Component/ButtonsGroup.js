@@ -6,8 +6,6 @@ import { HiOutlineDotsVertical } from "react-icons/hi";
 import { useNavigate, useParams } from "react-router-dom";
 import { ImSpinner3 } from "react-icons/im";
 import useDeleteQuiz from "../../../../Hooks/AuthHooks/Staff/Admin/Quiz/useDeleteQuiz";
-import useDeleteAssignment from "../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useDeleteAssignment";
-import useUpdateAssignment from "../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useUpdateAssignment";
 import useUpdateQuiz from "../../../../Hooks/AuthHooks/Staff/Admin/Quiz/useUpdateQuiz";
 import DeleteModal from "../../../../Components/Common/DeleteModal";
 import { useDispatch, useSelector } from "react-redux";
@@ -16,11 +14,7 @@ import {
   updateAssignmentThunk,
 } from "../../../../Store/Slices/Admin/Class/Assignment/assignmentThunks";
 
-const ButtonsGroup = ({ type }) => {
-  const { assignmentDetails: data } = useSelector(
-    (store) => store.admin.assignments
-  );
-
+const ButtonsGroup = ({ type, data, loading }) => {
   const navigate = useNavigate();
   const { sid, cid } = useParams();
   const [showMenu, setShowMenu] = useState(false);
@@ -28,11 +22,9 @@ const ButtonsGroup = ({ type }) => {
   const menuRef = useRef();
   const dispatch = useDispatch();
 
-  const { loading: quizLoading, deleteQuiz } = useDeleteQuiz();
+  const { deleteQuiz } = useDeleteQuiz();
 
-  const { updateAssignment, loading: updateAssignmentLoading } =
-    useUpdateAssignment();
-  const { updateQuiz, loading: updateQuizLoading } = useUpdateQuiz();
+  const { updateQuiz } = useUpdateQuiz();
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -102,7 +94,7 @@ const ButtonsGroup = ({ type }) => {
 
   // Use a default value if publish is not present or data is null
   const isPublished = data?.publish ?? false;
-  const isUpdating = updateQuizLoading || updateAssignmentLoading;
+  const isUpdating = loading;
 
   return (
     <div className="relative flex justify-center gap-2 items-center w-full p-2 text-gray-700">

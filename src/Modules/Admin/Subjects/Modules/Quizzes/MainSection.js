@@ -21,10 +21,6 @@ const MainSection = () => {
     dispatch(fetchQuizByIdThunk(qid)); // Fetch quiz by ID
   }, [qid, dispatch]);
 
-  const onRefresh = () => {
-    dispatch(fetchQuizByIdThunk(qid)); // Refetch quiz
-  };
-
   return (
     <div className="flex">
       <SubjectSideBar />
@@ -33,33 +29,19 @@ const MainSection = () => {
           onTabChange={setActiveTab}
           setActiveTab={setActiveTab}
           activeTab={activeTab}
-          title={quiz?.name}
-          availableFrom={quiz?.availableFrom}
         >
           {(activeTab) => (
             <div className="h-full">
               {activeTab === "instructions" &&
-                (loading ? (
-                  <Spinner />
-                ) : (
-                  <QuizInstructionSection content={quiz?.content} />
-                ))}
+                (loading ? <Spinner /> : <QuizInstructionSection />)}
               {activeTab === "questions" &&
-                (loading ? (
-                  <Spinner />
-                ) : (
-                  <QuizQuestions questions={quiz?.questions} />
-                ))}
+                (loading ? <Spinner /> : <QuizQuestions />)}
             </div>
           )}
         </Tabs>
       </div>
       <div className="w-[30%]">
-        <QuizzDetailCard
-          quiz={quiz}
-          onRefresh={onRefresh}
-          isPublish={quiz?.publish}
-        />
+        <QuizzDetailCard />
       </div>
     </div>
   );

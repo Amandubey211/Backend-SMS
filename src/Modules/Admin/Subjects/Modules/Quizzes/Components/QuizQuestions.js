@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import QuizQuestionCard from "./QuizQuestionCard";
 import { FaQuestionCircle } from "react-icons/fa";
+import { useSelector } from "react-redux";
 
-const QuizQuestions = ({ questions }) => {
+const QuizQuestions = () => {
   const [selectedOptions, setSelectedOptions] = useState({});
-
+  const { quizzDetail } = useSelector((store) => store.admin.quizzes);
+  const { questions } = quizzDetail || {};
   const handleOptionChange = (questionIndex, optionText) => {
     setSelectedOptions({
       ...selectedOptions,
