@@ -6,7 +6,7 @@ import useNavHeading from "../../../../../Hooks/CommonHooks/useNavHeading ";
 import { useSelector } from "react-redux";
 const SpeedGrade = () => {
   const selectedAssignmentName = useSelector(
-    (store) => store.Common.selectedAssignmentName
+    (store) => store.common.user.selectedSectionName
   );
 
   useNavHeading(selectedAssignmentName, "Speed Grade");

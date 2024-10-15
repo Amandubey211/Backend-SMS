@@ -11,7 +11,7 @@ const QuizzDetailCard = () => {
   const [isModalOpen, setModalOpen] = useState(false);
   const [criteriaList, setCriteriaList] = useState([]);
   const [existingRubricId, setExistingRubricId] = useState(null);
-  const { quizzDetail: quiz, loading } = useSelector(
+  const { quizzDetail: quiz, updateLoading } = useSelector(
     (store) => store.admin.quizzes
   );
 
@@ -71,7 +71,7 @@ const QuizzDetailCard = () => {
   };
   return (
     <div className="p-3 bg-white" aria-label="Quiz Card">
-      <ButtonsGroup type="Quiz" data={quiz} loading={loading} />
+      <ButtonsGroup type="Quiz" data={quiz} loading={updateLoading} />
       <p className="text-center text-green-500 italic font-semibold pb-3 border-b">
         Submitted Students : 50/100{" "}
       </p>

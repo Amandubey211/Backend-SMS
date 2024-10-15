@@ -19,7 +19,9 @@ export const fetchFilteredQuizzesThunk = createAsyncThunk(
       };
 
       const response = await axios.get(
-        `${baseUrl}/admin/quizzes/${getState().common.auth.sid}`,
+        `${baseUrl}/admin/quizzes/${
+          getState().common.user.subjectInfo.selectedSubjectId
+        }`,
         {
           headers: {
             Authentication: `Bearer ${token}`,
@@ -67,70 +69,8 @@ export const fetchQuizByIdThunk = createAsyncThunk(
 );
 
 // Thunk to create a quiz rubric
-export const createQuizRubricThunk = createAsyncThunk(
-  "quiz/createRubric",
-  async (rubricData, { getState, rejectWithValue }) => {
-    try {
-      const token = getToken(getState);
 
-      // Validation
-      const validationError = validateRubricData(rubricData);
-      if (validationError) {
-        toast.error(validationError);
-        return rejectWithValue(validationError);
-      }
-
-      const response = await axios.post(
-        `${baseUrl}/admin/quiz/create_rubric`,
-        rubricData,
-        {
-          headers: { Authentication: token },
-        }
-      );
-
-      if (response.data.success) {
-        toast.success("Rubric created successfully");
-        return response.data;
-      } else {
-        throw new Error(response.data.message || "Failed to create rubric");
-      }
-    } catch (error) {
-      toast.error(error.response?.data?.message || error.message);
-      return rejectWithValue(
-        error.response?.data?.message || "Failed to create rubric"
-      );
-    }
-  }
-);
-
-// Thunk to update a quiz rubric
-export const updateQuizRubricThunk = createAsyncThunk(
-  "quiz/updateRubric",
-  async ({ rubricId, rubricData }, { getState, rejectWithValue }) => {
-    try {
-      const token = getToken(getState);
-      const response = await axios.put(
-        `${baseUrl}/admin/rubric/${rubricId}`,
-        rubricData,
-        {
-          headers: { Authentication: token },
-        }
-      );
-
-      if (response.data.success) {
-        toast.success("Rubric updated successfully");
-        return response.data;
-      } else {
-        throw new Error(response.data.message || "Failed to update rubric");
-      }
-    } catch (error) {
-      toast.error(error.response?.data?.message || error.message);
-      return rejectWithValue(
-        error.response?.data?.message || "Failed to update rubric"
-      );
-    }
-  }
-);
+// // Thunk to update a quiz rubric
 
 // Validation function for rubric data
 const validateRubricData = (rubricData) => {
@@ -215,7 +155,7 @@ export const updateQuestionThunk = createAsyncThunk(
 // Delete a Question Thunk
 export const deleteQuestionThunk = createAsyncThunk(
   "quiz/deleteQuestion",
-  async ({ quizId, questionId }, { getState, rejectWithValue }) => {
+  async ({ quizId, questionId }, { getState, rejectWithValue, dispatch }) => {
     try {
       const token = getToken(getState);
       const response = await axios.delete(
@@ -229,6 +169,7 @@ export const deleteQuestionThunk = createAsyncThunk(
 
       if (response.data.success) {
         toast.success("Question deleted successfully");
+        toast.success(quizId);
         return questionId; // Return the deleted question ID
       } else {
         throw new Error(response.data.message || "Failed to delete question");
@@ -275,7 +216,7 @@ export const createQuizThunk = createAsyncThunk(
 // Thunk to update a quiz
 export const updateQuizThunk = createAsyncThunk(
   "quiz/updateQuiz",
-  async ({ quizId, quizData }, { getState, rejectWithValue }) => {
+  async ({ quizId, quizData }, { getState, rejectWithValue, dispatch }) => {
     try {
       const token = getToken(getState);
       const response = await axios.put(
@@ -288,6 +229,7 @@ export const updateQuizThunk = createAsyncThunk(
 
       if (response.data.success) {
         toast.success("Quiz updated successfully");
+        dispatch(fetchQuizByIdThunk(quizId));
         return response.data.quiz;
       } else {
         throw new Error(response.data.message || "Failed to update quiz");
@@ -304,9 +246,10 @@ export const updateQuizThunk = createAsyncThunk(
 // Thunk to delete a quiz
 export const deleteQuizThunk = createAsyncThunk(
   "quiz/deleteQuiz",
-  async (quizId, { getState, rejectWithValue }) => {
+  async (quizId, { getState, rejectWithValue, dispatch }) => {
     try {
       const token = getToken(getState);
+
       const response = await axios.delete(
         `${baseUrl}/admin/delete_quiz/${quizId}`,
         {
@@ -316,6 +259,8 @@ export const deleteQuizThunk = createAsyncThunk(
 
       if (response.data.success) {
         toast.success("Quiz deleted successfully");
+        dispatch(fetchFilteredQuizzesThunk({}));
+
         return quizId; // Return the deleted quiz ID
       } else {
         throw new Error(response.data.message || "Failed to delete quiz");

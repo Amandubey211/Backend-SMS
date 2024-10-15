@@ -1,9 +1,13 @@
-
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchFilteredQuizzesThunk, fetchQuizByIdThunk } from "./quizThunks"; // Import thunks
+import {
+  fetchFilteredQuizzesThunk,
+  fetchQuizByIdThunk,
+  updateQuizThunk,
+} from "./quizThunks"; // Import thunks
 
 const initialState = {
   loading: false,
+  updateLoading: false,
   quizzes: [],
   error: null,
   success: false,
@@ -48,6 +52,18 @@ const quizSlice = createSlice({
       .addCase(fetchQuizByIdThunk.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+      .addCase(updateQuizThunk.pending, (state) => {
+        state.updateLoading = true;
+        state.error = null;
+      })
+      .addCase(updateQuizThunk.fulfilled, (state, action) => {
+        state.updateLoading = false;
+        //state.quizzDetail = action.payload; // Store the fetched quiz
+      })
+      .addCase(updateQuizThunk.rejected, (state, action) => {
+        state.updateLoading = false;
+        state.error = action.payload;
       });
   },
 });
@@ -55,4 +71,3 @@ const quizSlice = createSlice({
 export const { clearError, clearSuccess } = quizSlice.actions;
 
 export default quizSlice.reducer;
-
