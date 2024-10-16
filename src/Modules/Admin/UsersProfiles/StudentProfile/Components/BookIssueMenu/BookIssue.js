@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { GoAlertFill } from "react-icons/go";
 import { FiLoader } from "react-icons/fi";
 import { studentIssueBooks } from "../../../../../../Store/Slices/Admin/Users/Students/student.action";
+import Spinner from "../../../../../../Components/Common/Spinner";
 
 const BookIssue = () => {
   const { cid:id } = useParams();
@@ -71,8 +72,7 @@ const BookIssue = () => {
         ))}
       </div>
       {loading?<div className="flex w-full h-[90vh] flex-col items-center justify-center">
-    <FiLoader className="animate-spin mr-2 w-[3rem] h-[3rem] " />
-    <p className="text-gray-800 text-lg">Loading...</p>
+   <Spinner/>
     </div>:
       <div className="overflow-x-auto bg-white shadow rounded-lg">
         <table className="min-w-full">
@@ -95,7 +95,7 @@ const BookIssue = () => {
           <td className="px-5 py-2" colSpan="6">
           <div className="flex  items-center justify-center flex-col text-2xl my-[10rem] h-auto">
         <GoAlertFill className="text-[5rem]" />
-       No  Data Found
+       No Issue Book Found
       </div>
           </td>
         </tr>}
