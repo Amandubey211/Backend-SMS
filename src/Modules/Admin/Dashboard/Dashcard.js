@@ -1,4 +1,5 @@
 import React, {memo} from "react";
+import { useNavigate } from 'react-router-dom';
 
 const DashCard = ({
   label,
@@ -7,12 +8,14 @@ const DashCard = ({
   textColor,
   icon,
   iconBackground,
-  // url,
+  navigateTo,  // New prop for navigation
 }) => {
+  const navigate = useNavigate();
+
   return (
     <div
-      // to={url}
-      className={`p-3 px-6 w-[24%] rounded-lg border ${bgColor} hover:shadow-lg transition-shadow duration-200`}
+      onClick={() => navigate(navigateTo)} // Add onClick to handle navigation
+      className={`p-3 px-6 w-[24%] rounded-lg border ${bgColor} hover:shadow-lg transition-shadow duration-200 cursor-pointer`}
     >
       <div className="flex gap-4 items-center">
         <div

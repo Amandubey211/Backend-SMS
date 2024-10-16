@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { MdAccessTime, MdPersonOutline } from "react-icons/md";
 import { FaCalendarDays } from "react-icons/fa6";
 import { CiLocationOn } from "react-icons/ci";
-import { format, isValid } from "date-fns";
 import { setSidebarContent } from "../../../../../Store/Slices/Admin/NoticeBoard/Events/eventSlice";
 import { deleteEventThunk } from "../../../../../Store/Slices/Admin/NoticeBoard/Events/eventThunks";
 
@@ -20,14 +19,13 @@ const ViewEvent = () => {
     return <div>No event selected</div>;
   }
 
-  // Format event date and time
-  const formattedDate = isValid(new Date(selectedEvent?.date))
-    ? format(new Date(selectedEvent?.date), "d MMM yyyy")
-    : "Invalid date";
+  // Display event time as is
+  const eventTime = selectedEvent?.time || "No time";
 
-  const formattedTime = selectedEvent?.time
-    ? format(new Date(`1970-01-01T${selectedEvent?.time}`), "hh:mm a")
-    : "No time";
+  // Display formatted date
+  const formattedDate = selectedEvent?.date
+    ? new Date(selectedEvent?.date).toLocaleDateString()
+    : "Invalid date";
 
   // Handler for delete event
   const handleDelete = () => {
@@ -60,7 +58,7 @@ const ViewEvent = () => {
           </div>
           <div className="flex items-center text-blue-500">
             <MdAccessTime className="text-lg mr-1" />
-            <span>{formattedTime}</span>
+            <span>{eventTime}</span>
           </div>
         </div>
 
@@ -114,7 +112,7 @@ const ViewEvent = () => {
       </div>
 
       {/* Sticky footer for buttons */}
-      <div className="p-4 bg-white    border-t sticky bottom-0 flex gap-4">
+      <div className="p-4 bg-white border-t sticky bottom-0 flex gap-4">
         <button
           className="flex items-center justify-center bg-red-500 text-white px-4 py-2 rounded-md w-full"
           onClick={handleDelete}

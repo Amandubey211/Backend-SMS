@@ -13,7 +13,7 @@ const GraduateList = ({ students, onViewDetails }) => {
               <th className="py-3 px-4 text-left text-sm font-semibold text-gray-600">Class</th>
               <th className="py-3 px-4 text-left text-sm font-semibold text-gray-600">Section</th>
               <th className="py-3 px-4 text-left text-sm font-semibold text-gray-600">Group</th>
-              <th className="py-3 px-4 text-left text-sm font-semibold text-gray-600">Academic Year</th>
+              <th className="py-3 px-4 text-left text-sm font-semibold text-gray-600">Graduation Year</th>
               <th className="py-3 px-4 text-left text-sm font-semibold text-gray-600">Email</th>
               <th className="py-3 px-4 text-left text-sm font-semibold text-gray-600">Contact</th>
               <th className="py-3 px-4 text-left text-sm font-semibold text-gray-600">Parent Contact</th>

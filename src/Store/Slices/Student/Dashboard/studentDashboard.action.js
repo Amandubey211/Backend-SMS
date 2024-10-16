@@ -68,18 +68,23 @@ export const fetchTasks = createAsyncThunk(
   'studentDashboard/fetchTasks',
   async (_, { rejectWithValue }) => {
     const token = localStorage.getItem('student:token');
+    const persistUserString = localStorage.getItem('persist:user');
+    const persistUserObject = JSON.parse(persistUserString);
+    const userDetails = JSON.parse(persistUserObject.userDetails);
+    const studentId = userDetails.userId;
+
     if (!token) {
       return rejectWithValue('Authentication failed!');
     }
 
     try {
-      const response = await axios.get(`${baseUrl}/api/studentDashboard/tasks`, {
+      const response = await axios.get(`${baseUrl}/admin/task/student/${studentId}`, {
         headers: {
           Authentication: token,
         },
       });
 
-      return response?.data?.tasks;
+      return response?.data?.completedTask;
     } catch (error) {
       console.error('Error in fetchTasks:', error);
       return rejectWithValue(error.message);
