@@ -50,7 +50,8 @@ const StudentMainSection = () => {
     dispatch(fetchSubjects());         // Fetch subjects
     dispatch(fetchTasks());            // Fetch tasks
     dispatch(fetchStudentGrades());    // Fetch student grades
-  }, [dispatch]); // Only run on component mount
+    dispatch(fetchTasks());    // Fetch student Tasks
+  }, [dispatch]);
 
   return (
     <div className="flex flex-col border-b border-gray-200">

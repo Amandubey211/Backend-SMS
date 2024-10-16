@@ -44,6 +44,15 @@ const AddEvent = () => {
     });
   };
 
+  // Helper function to convert 24-hour time to 12-hour format with AM/PM
+  const formatTimeTo12Hour = (time) => {
+    const [hour, minute] = time.split(":");
+    let hours = parseInt(hour, 10);
+    const suffix = hours >= 12 ? "PM" : "AM";
+    hours = hours % 12 || 12; // Convert 24-hour to 12-hour format
+    return `${hours}:${minute} ${suffix}`;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (
@@ -55,7 +64,12 @@ const AddEvent = () => {
       toast.error("Please fill in all required fields.");
       return;
     }
-    await dispatch(createEventThunk(eventData));
+
+    // Convert the event time to 12-hour format before submission
+    const formattedTime = formatTimeTo12Hour(eventData.time);
+
+    // Dispatch with updated eventData (with formatted time)
+    await dispatch(createEventThunk({ ...eventData, time: formattedTime }));
     toast.success("Event created successfully!");
   };
 
