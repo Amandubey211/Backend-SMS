@@ -118,7 +118,7 @@ const Sidebar = ({ student, closeSidebar }) => {
           {/* Bottom Buttons */}
           <div className="flex gap-4 mt-8 justify-center pb-6"> {/* Moved buttons to the bottom with margin-top and centered */}
             <button className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-all">Edit</button>
-            <button className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-all">Delete</button>
+            <button className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-all">Demote Student</button>
           </div>
         </div>
       </div>
