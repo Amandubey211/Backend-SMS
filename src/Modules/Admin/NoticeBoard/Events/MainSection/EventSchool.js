@@ -61,11 +61,17 @@ const EventScheduler = () => {
         await dispatch(createEventThunk(eventData));
         toast.success("Event created successfully!");
       }
+      
       handleSidebarClose();
+  
+      // Fetch the updated list of events after saving
+      dispatch(fetchEventsThunk()); // Automatically refresh events after creating/updating
+  
     } catch (error) {
       toast.error("Failed to save event");
     }
   };
+  
 
   // const handleDeleteEvent = async () => {
   //   try {
