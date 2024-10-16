@@ -1,24 +1,44 @@
 import React, { useState, useEffect, useRef } from "react";
 import { CiSearch, CiFilter } from "react-icons/ci"; // Icons for search and filter
+import axios from "axios"; // To make API calls for fetching dynamic filter data
 
 const TopNavigationWithFilters = ({ onSearch, onFilterChange }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [showFilter, setShowFilter] = useState(false);
-  const filterRef = useRef(null);
-
   const [filters, setFilters] = useState({
     academicYear: "",
     class: "",
     section: "",
     groupName: "",
   });
+  const [availableFilters, setAvailableFilters] = useState({
+    academicYear: [],
+    classes: [],
+    sections: [],
+    groupName: [],
+  });
 
-  const availableFilters = {
-    academicYear: ["2020-2021", "2021-2022", "2022-2023"],
-    classes: ["Computer Science", "Information Technology", "Software Engineering"],
-    sections: ["A", "B", "C"],
-    groupName: ["CS EXP", "IT EXP", "WD EXP"],
-  };
+  const filterRef = useRef(null);
+
+  // Fetch available filters dynamically from the backend
+  useEffect(() => {
+    const fetchFilterOptions = async () => {
+      try {
+        const response = await axios.get("/api/filters"); // Replace with your actual endpoint
+        const { academicYear, classes, sections, groupName } = response.data;
+        setAvailableFilters({
+          academicYear: academicYear || [],
+          classes: classes || [],
+          sections: sections || [],
+          groupName: groupName || [],
+        });
+      } catch (error) {
+        console.error("Error fetching filter options:", error);
+      }
+    };
+
+    fetchFilterOptions();
+  }, []);
 
   // Handle search query input
   const handleSearchChange = (e) => {
