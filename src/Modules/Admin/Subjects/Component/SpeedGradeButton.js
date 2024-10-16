@@ -3,7 +3,7 @@ import React from "react";
 import { AiOutlineRight } from "react-icons/ai";
 import { BsLightningFill } from "react-icons/bs";
 import { useDispatch } from "react-redux";
-import { NavLink, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import { setSelectedAssignmentName } from "../../../../Store/Slices/Common/User/reducers/userSlice";
 const SpeedGradeButton = ({ sgid, name, isPublish, type }) => {

@@ -6,7 +6,7 @@ import useNavHeading from "../../../../../Hooks/CommonHooks/useNavHeading ";
 import { useSelector } from "react-redux";
 const SpeedGrade = () => {
   const selectedAssignmentName = useSelector(
-    (store) => store.common.user.selectedSectionName
+    (store) => store.common.user.subjectInfo.selectedAssignmentName
   );
 
   useNavHeading(selectedAssignmentName, "Speed Grade");
@@ -14,9 +14,6 @@ const SpeedGrade = () => {
   return (
     <Layout title={`Speed Grade - ${selectedAssignmentName} | Student Diwan`}>
       <DashLayout children={<MainSection />} hideSearchbar={true} />
-      {/* <div className="flex w-full h-full">
-      <SideMenubar />
-      </div> */}
     </Layout>
   );
 };

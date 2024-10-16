@@ -46,23 +46,23 @@ const QuizzDetailCard = () => {
     },
     {
       label: "Student See The correct Answer",
-      value: new Date(
-        quiz?.showAnswerDate || "MM/DD/YYYY"
-      ).toLocaleDateString(),
+      value: quiz?.showAnswerDate
+        ? new Date(quiz?.showAnswerDate).toLocaleDateString()
+        : "DD/MM/YYYY",
       type: "quizz",
     },
     {
       label: "Available From",
       value: quiz?.availableFrom
         ? new Date(quiz?.availableFrom).toLocaleDateString()
-        : "N/A",
+        : "DD/MM/YYY",
       type: "date",
     },
     {
       label: "Due Date",
       value: quiz?.dueDate
         ? new Date(quiz?.dueDate).toLocaleDateString()
-        : "N/A",
+        : "DD/MM/YYY",
       type: "date",
     },
   ];

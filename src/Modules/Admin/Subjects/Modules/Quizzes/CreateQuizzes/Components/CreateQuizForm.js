@@ -116,7 +116,7 @@ const CreateQuizForm = ({
 
         {/* Time Limit Input */}
         <LabeledInput
-          label="Time limit"
+          label="Time limit in Minutes"
           name="timeLimit"
           value={timeLimit}
           onChange={handleChange}

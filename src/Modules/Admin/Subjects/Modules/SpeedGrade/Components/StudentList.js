@@ -1,45 +1,12 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { IoSearchOutline } from "react-icons/io5";
 import { VscSettings } from "react-icons/vsc";
-import { useParams } from "react-router-dom";
 import Spinner from "../../../../../../Components/Common/Spinner";
 import NoDataFound from "../../../../../../Components/Common/NoDataFound";
-import useGetAssignedAssignmentStudents from "../../../../../../Hooks/AuthHooks/Staff/Admin/SpeedGrade/Assignment/useGetAssignedAssignmentStudents";
-import useGetAssignedQuizStudents from "../../../../../../Hooks/AuthHooks/Staff/Admin/SpeedGrade/Quiz/useGetAssignedQuizStudents";
 
-function StudentList({ onSelectStudent }) {
+function StudentList({ onSelectStudent, students }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeIndex, setActiveIndex] = useState(null);
-  const { sgid, type } = useParams(); // Assuming sgid is the assignment ID
-
-  // Determine which hook to use based on the `type` parameter
-  const {
-    error: assignmentError,
-    fetchAssignedStudents: fetchAssignmentStudents,
-    loading: assignmentLoading,
-    students: assignmentStudents,
-  } = useGetAssignedAssignmentStudents();
-
-  const {
-    error: quizError,
-    fetchAssignedStudents: fetchQuizStudents,
-    loading: quizLoading,
-    students: quizStudents,
-  } = useGetAssignedQuizStudents();
-
-  useEffect(() => {
-    if (sgid) {
-      if (type === "Assignment") {
-        fetchAssignmentStudents(sgid);
-      } else if (type === "Quiz") {
-        fetchQuizStudents(sgid);
-      }
-    }
-  }, [sgid, type, fetchAssignmentStudents, fetchQuizStudents]);
-
-  const students = type === "Assignment" ? assignmentStudents : quizStudents;
-  const loading = type === "Assignment" ? assignmentLoading : quizLoading;
-  const error = type === "Assignment" ? assignmentError : quizError;
 
   const filteredStudents = students.filter((student) =>
     student.fullName.toLowerCase().includes(searchTerm.toLowerCase())
@@ -74,9 +41,7 @@ function StudentList({ onSelectStudent }) {
           {students.length}
         </span>
       </div>
-      {loading && <Spinner />}
-      {error && <p className="text-center text-red-500">{error}</p>}
-      {!loading && !filteredStudents.length && <NoDataFound title="Students" />}
+      {!filteredStudents.length && <NoDataFound title="Students" />}
       <div className="flex-grow overflow-y-auto space-y-2 ">
         {filteredStudents.map((student, index) => (
           <div
