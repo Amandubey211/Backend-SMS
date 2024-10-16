@@ -12,7 +12,7 @@ import { GoAlertFill } from "react-icons/go";
 import TeacherModal from "./TeacherModal";
 import OfflineModal from "../../../../../../Components/Common/Offline";
 import { setShowError } from "../../../../../../Store/Slices/Common/Alerts/alertsSlice";
-
+import SidebarSlide from '../../../../../../Components/Common/SidebarSlide'
 
 const StudentTeacher = () => {
 
@@ -28,14 +28,19 @@ const StudentTeacher = () => {
   useEffect(() => {
     dispatch(stdClassTeacher({ classId }))
   }, [dispatch, classId]);
-
+   const [isSidebarOpen,setIsSidebarOpen] = useState(false)
   const handleProfileClick = (teacher) => {
-    setSelectedTeacher(teacher); // Set selected classmate for modal
+  
+    setSelectedTeacher(teacher); 
+    setIsSidebarOpen(true)
   };
   console.log("selected teacher is", selectedTeacher)
 
-  const closeModal = () => {
-    setSelectedTeacher(null); // Close modal
+ 
+
+  const handleSidebarClose = () => {
+    setIsSidebarOpen(false)
+    setSelectedTeacher(null);
   };
 
   const handleDismiss = () => {
@@ -78,10 +83,17 @@ const StudentTeacher = () => {
           </div>
         </div>
         {selectedTeacher && (
-          <TeacherModal
-            teacher={selectedTeacher}
-            onClose={closeModal}
-          />
+         <SidebarSlide
+         isOpen={isSidebarOpen}
+         onClose={handleSidebarClose}
+         title={<span className="bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent bg-clip-text">
+           Quick View of Teacher
+         </span>}
+         width="30%"
+         height="100%"
+       >
+        <TeacherModal teacher={selectedTeacher}/>
+       </SidebarSlide>
         )}
 
         {!loading && showError && (

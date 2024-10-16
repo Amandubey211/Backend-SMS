@@ -1,17 +1,9 @@
 import React from "react";
-import { Modal } from "antd";
 import { FaUserFriends } from "react-icons/fa"; // Using FontAwesome for group icon
 
-const SectionGroupModal = ({ isModalVisible, modalData, handleModalClose }) => {
+const SectionGroupModal = ({ modalData}) => {
     return (
-        <Modal
-            title="Section & Group Details"
-            visible={isModalVisible}
-            onCancel={handleModalClose}
-            footer={null} // No footer buttons
-            centered // Center the modal
-            className="rounded-10" // You can apply custom CSS class for additional styling
-        >
+     
             <div className="p-4">
                 {/* Section Name */}
                 <div className="mb-4">
@@ -41,7 +33,6 @@ const SectionGroupModal = ({ isModalVisible, modalData, handleModalClose }) => {
                     )}
                 </div>
             </div>
-        </Modal>
     );
 };
 
