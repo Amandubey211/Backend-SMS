@@ -12,21 +12,22 @@ const GraduationMainSection = () => {
   const dispatch = useDispatch();
 
   // Accessing Redux state
-  const { graduates, loading, error, selectedGraduate } = useSelector(
+  const { graduates, loading, error, selectedGraduate, total, currentPage, totalPages } = useSelector(
     (state) => state?.admin?.graduates // Access the correct slice
   );
-  
+
   const [filteredStudents, setFilteredStudents] = useState([]); // Filtered students data
+  const [filters, setFilters] = useState({}); // Stores applied filters
   const [isSidebarOpen, setSidebarOpen] = useState(false); // Sidebar visibility state
 
-  // Fetch graduate data on component mount
+  // Fetch graduate data on component mount (initial load without filters)
   useEffect(() => {
-    dispatch(fetchGraduates({})); // Fetch all graduates initially
+    dispatch(fetchGraduates({ page: 1, limit: 10 })); // Fetch all graduates initially with default pagination
   }, [dispatch]);
 
   // Update filtered students whenever the graduates data changes
   useEffect(() => {
-    setFilteredStudents(graduates);
+    setFilteredStudents(graduates); // Update filteredStudents when graduates change
   }, [graduates]);
 
   // Handle real-time search
@@ -41,17 +42,15 @@ const GraduationMainSection = () => {
     setFilteredStudents(filtered);
   };
 
-  // Handle filtering
+  // Handle filter changes
   const handleFilterChange = (filters) => {
-    const filtered = graduates.filter((student) => {
-      return (
-        (!filters.academicYear || student.academicYear === filters.academicYear) &&
-        (!filters.class || student.className === filters.class) &&
-        (!filters.section || student.sectionName === filters.section) &&
-        (!filters.groupName || student.groupName === filters.groupName)
-      );
-    });
-    setFilteredStudents(filtered);
+    setFilters(filters); // Update local filters state
+    dispatch(fetchGraduates({ ...filters, page: 1, limit: 10 })); // Fetch graduates with filters applied
+  };
+
+  // Handle pagination
+  const handlePageChange = (newPage) => {
+    dispatch(fetchGraduates({ ...filters, page: newPage, limit: 10 }));
   };
 
   // Handle "View Details" click to open the sidebar with the selected student's data
@@ -82,7 +81,13 @@ const GraduationMainSection = () => {
       <TopNavigationWithFilters onSearch={handleSearch} onFilterChange={handleFilterChange} />
 
       {/* Display the filtered students */}
-      <GraduateList students={filteredStudents} onViewDetails={handleViewDetails} />
+      <GraduateList
+        students={filteredStudents}
+        onViewDetails={handleViewDetails}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={handlePageChange}
+      />
 
       {/* Sidebar */}
       {isSidebarOpen && selectedGraduate && (

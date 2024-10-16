@@ -19,7 +19,7 @@ const GraduateList = ({ students, onViewDetails }) => {
     if (selectedStudents.length === students.length) {
       setSelectedStudents([]); // Deselect all if all are already selected
     } else {
-      const allStudentIds = students.map((student) => student.id);
+      const allStudentIds = students.map((student) => student._id);
       setSelectedStudents(allStudentIds); // Select all
     }
   };
@@ -66,21 +66,21 @@ const GraduateList = ({ students, onViewDetails }) => {
           <tbody>
             {students.map((student) => (
               <tr
-                key={student.id}
+                key={student._id} // Use _id as the key since that's the ID from backend
                 className="hover:bg-gray-50 transition-all duration-200 border-b"
               >
                 <td className="py-2 px-3 text-center align-middle w-10"> {/* Ensure consistent width and alignment */}
                   <input
                     type="checkbox"
                     className="align-middle"
-                    checked={selectedStudents.includes(student.id)}
-                    onChange={() => handleSelect(student.id)}
+                    checked={selectedStudents.includes(student._id)}
+                    onChange={() => handleSelect(student._id)}
                   />
                 </td>
                 <td className="py-2 px-3">
                   <img
                     src={student.profile}
-                    alt={student.name}
+                    alt={`${student.firstName} ${student.lastName}`}
                     className="w-8 h-8 rounded-full border-2 border-gray-300"
                   />
                 </td>
@@ -88,7 +88,7 @@ const GraduateList = ({ students, onViewDetails }) => {
                   {student.firstName} {student.lastName}
                 </td>
                 <td className="py-2 px-3 text-xs whitespace-nowrap">
-                  {student.academicYear}
+                  {student.academicYear?.year} {/* Ensure academicYear exists */}
                 </td>
                 <td className="py-2 px-3 text-xs truncate max-w-xs">
                   {student.email}

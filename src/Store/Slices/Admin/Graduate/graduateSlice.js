@@ -5,6 +5,9 @@ const initialState = {
   graduates: [],
   loading: false,
   error: null,
+  total: 0, // Added to store total graduates for pagination
+  currentPage: 1,
+  totalPages: 1,
   selectedGraduate: null,
 };
 
@@ -27,7 +30,10 @@ const graduateSlice = createSlice({
       })
       .addCase(fetchGraduates.fulfilled, (state, action) => {
         state.loading = false;
-        state.graduates = action.payload;
+        state.graduates = action.payload.data;
+        state.total = action.payload.total;
+        state.currentPage = action.payload.currentPage;
+        state.totalPages = action.payload.totalPages;
       })
       .addCase(fetchGraduates.rejected, (state, action) => {
         state.loading = false;
