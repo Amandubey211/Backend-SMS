@@ -115,7 +115,7 @@ const Chapter = ({
       {attachmentsExpanded && attachments.length > 0 && (
         <div className="mt-2">
           <div className="grid grid-cols-1 gap-2 mb-2">
-            {attachments.map((attachment, index) => {
+            {attachments?.map((attachment, index) => {
               return (
                 <div
                   key={index}
@@ -123,26 +123,26 @@ const Chapter = ({
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
-                      {getFileIcon(attachment.type) || (
+                      {getFileIcon(attachment?.type) || (
                         <img
-                          src={attachment.url}
-                          alt={attachment.name}
+                          src={attachment?.url}
+                          alt={attachment?.name}
                           className="h-8 w-8 object-cover rounded-md"
                         />
                       )}
                       <div className="flex flex-col ml-4">
                         <p className="text-gray-700 text-sm truncate max-w-xs">
-                          {attachment.name}
+                          {attachment?.name}
                         </p>
-                        <p className="text-md">{attachment.label}</p>
+                        <p className="text-md">{attachment?.label}</p>
                       </div>
                     </div>
                     <div className="flex items-center space-x-2">
                       <button
                         onClick={() =>
                           openPreviewModal(
-                            attachment.url,
-                            attachment.type,
+                            attachment?.url,
+                            attachment?.type,
                             attachment
                           )
                         }
@@ -162,14 +162,14 @@ const Chapter = ({
 
       {isExpanded && (
         <div className="ml-10 py-2">
-          {combinedItems.length > 0 ? (
-            combinedItems.map((item, index) => (
+          {combinedItems?.length > 0 ? (
+            combinedItems?.map((item, index) => (
               <ChapterItem
                 key={index}
-                type={item.type}
-                title={item.name}
-                id={item._id}
-                isPublished={item.isPublished}
+                type={item?.type}
+                title={item?.name}
+                id={item?._id}
+                isPublished={item?.isPublished}
               />
             ))
           ) : (

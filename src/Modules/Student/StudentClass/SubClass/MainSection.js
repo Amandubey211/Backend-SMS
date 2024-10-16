@@ -18,7 +18,9 @@ import SectionGroupModal from "./Components/Section/SectionModal";
 import { NavLink } from "react-router-dom";
 import { setShowError } from "../../../../Store/Slices/Common/Alerts/alertsSlice";
 import OfflineModal from "../../../../Components/Common/Offline";
+import { stdSubjectProgressPercentage } from "../../../../Store/Slices/Student/MyClass/Class/Subjects/subject.action";
 import SidebarSlide from '../../../../Components/Common/SidebarSlide'
+
 
 const colors = [
   "bg-yellow-300",
@@ -38,6 +40,7 @@ const MainSection = () => {
   const dispatch = useDispatch();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [modalData, setModalData] = useState(null);
+  const { subjectProgress } = useSelector((store) => store?.student?.studentSubject);
   const iconData =
     classData && [
       {
@@ -96,8 +99,11 @@ const MainSection = () => {
   }
 
 
+
   useEffect(() => {
     dispatch(stdClass());
+    dispatch(stdSubjectProgressPercentage());
+
   }, [dispatch])
 
   console.log("std class data : ", classData)
@@ -143,6 +149,9 @@ const MainSection = () => {
                         classId={classData?.classId}
                         // onSubjectClick={handleSubjectClick}
                         backgroundColor={getColor(index)}
+                        currentProgress={subjectProgress?.find(
+                          (el) => el?.subjectId === subject?.subjectId
+                        )}
                       />
                     ))}
                   </div>

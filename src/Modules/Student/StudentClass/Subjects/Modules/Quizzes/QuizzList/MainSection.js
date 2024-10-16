@@ -2,35 +2,28 @@ import React, { useState, useEffect, useCallback } from "react";
 import SubjectSideBar from "../../../Component/SubjectSideBar";
 import FilterCard from "../../../Component/FilterCard";
 import { RiFileUnknowLine } from "react-icons/ri";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import useFetchQuizzes from "../../../../../../../Hooks/AuthHooks/Student/Quiz/useFetchQuizzes";
 import List from "../../../Component/List";
+import { useParams } from "react-router-dom";
+import { stdGetQuiz } from "../../../../../../../Store/Slices/Student/MyClass/Class/Subjects/Quizes/quizes.action";
+import { setFilters } from "../../../../../../../Store/Slices/Student/MyClass/Class/Subjects/Quizes/quizesSlice";
 
 const QuizMainSection = () => {
-  const { selectedClass, selectedSubject } = useSelector(
-    (state) => state.Common
-  );
 
-  const [filters, setFilters] = useState({ moduleId: "", chapterId: "" });
-  const { quizzes, loading, error, fetchFilteredQuizzes } = useFetchQuizzes(
-    selectedClass,
-    selectedSubject
-  );
-
-  // Refetch quizzes based on updated filters
-  const refetchQuizzes = useCallback(() => {
-    fetchFilteredQuizzes(filters.moduleId, filters.chapterId);
-  }, [filters, fetchFilteredQuizzes]);
+  const { cid, sid } = useParams();
+  const { loading, error, quizData, filters } = useSelector((store) => store?.student?.studentQuiz);
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    refetchQuizzes();
-  }, [refetchQuizzes]);
+    dispatch(stdGetQuiz({cid, sid, moduleId:filters?.moduleId, chapterId:filters?.chapterId}))
+  }, [dispatch,cid,sid,stdGetQuiz])
 
-  const getItemName = (item) => item.name;
+  const getItemName = (item) => item?.name;
   const getItemDetails = (item) =>
-    `Total Points: ${item.totalPoints} | Type: ${item.quizType}`;
+    `Total Points: ${item?.totalPoints} | Type: ${item?.quizType}`;
   const navLinkPath = (cid, sid, item) =>
-    `/student_class/${cid}/${sid}/quizzes/${item._id}/view`;
+    `/student_class/${cid}/${sid}/quizzes/${item?._id}/view`;
 
   return (
     <div className="flex">
@@ -39,7 +32,7 @@ const QuizMainSection = () => {
         <List
           type="Quiz"
           title="All Quizzes"
-          data={quizzes}
+          data={quizData}
           icon={<RiFileUnknowLine />}
           loading={loading}
           error={error}
@@ -49,7 +42,7 @@ const QuizMainSection = () => {
         />
       </div>
       <div className="w-[30%] p-2">
-        <FilterCard filters={filters} setFilters={setFilters} />
+        {/* <FilterCard filters={filters} setFilters={setFilters}/> */}
       </div>
     </div>
   );

@@ -12,10 +12,11 @@ import useSubmitQuiz from "../../../../../../Hooks/StudentHooks/Quiz/useSubmitQu
 import { useSelector } from "react-redux";
 import { useNavigate, useBeforeUnload } from "react-router-dom";
 
-const MainSection = ({ quiz }) => {
-  const quizId = quiz._id;
-  const { selectedClass, selectedSection, selectedSubject, studentId } =
-    useSelector((state) => state.Common);
+const MainSection = () => {
+  const { loading, error, quizData, filters } = useSelector((store) => store?.student?.studentQuiz);
+  const quizId = quizData ._id;
+  // const { selectedClass, selectedSection, selectedSubject, studentId } =
+  //   useSelector((state) => state.Common);
 
   const [activeTab, setActiveTab] = useState("instructions");
   const [selectedOptions, setSelectedOptions] = useState({});
@@ -30,7 +31,7 @@ const MainSection = ({ quiz }) => {
     wrongAnswers: 0,
   });
 
-  const { timeLimit, allowNumberOfAttempts, showOneQuestionOnly } = quiz;
+  const { timeLimit, allowNumberOfAttempts, showOneQuestionOnly } = quizData ;
   const quizDuration = timeLimit * 60;
 
   // Fetch attempt history (allows for null attempts)
@@ -95,7 +96,7 @@ const MainSection = ({ quiz }) => {
       let correctAnswers = 0;
       let wrongAnswers = 0;
 
-      const questionsWithSelectedOptions = quiz.questions.map(
+      const questionsWithSelectedOptions = quizData .questions.map(
         (question, index) => {
           const selectedOption = selectedOptions[index];
           const isCorrect =
@@ -130,7 +131,7 @@ const MainSection = ({ quiz }) => {
       console.error("Quiz submission failed:", error);
       alert("An error occurred while submitting your quiz. Please try again.");
     }
-  }, [selectedOptions, submitQuiz, totalTime, timeLeft, quiz.questions]);
+  }, [selectedOptions, submitQuiz, totalTime, timeLeft, quizData .questions]);
 
   const hasRemainingAttempts = () => {
     // Only check attempts if allowNumberOfAttempts is not null
@@ -149,19 +150,19 @@ const MainSection = ({ quiz }) => {
           setActiveTab={handleTabChange}
           quizSubmitted={quizSubmitted}
           hasAttempted={attemptHistory.length > 0}
-          quiz={quiz}
+          quiz={quizData}
           hasRemainingAttempts={hasRemainingAttempts()} // Call the attempt check function
         >
           {(activeTab) => (
             <div className="h-full">
               {activeTab === "instructions" && (
-                <QuizInstructionSection quiz={quiz} />
+                <QuizInstructionSection quiz={quizData} />
               )}
               {activeTab === "questions" && (
                 <>
                   {quizSubmitted && hasRemainingAttempts() ? (
                     <QuizQuestions
-                      questions={quiz.questions}
+                      questions={quizData.questions}
                       selectedOptions={selectedOptions}
                       setSelectedOptions={setSelectedOptions}
                       showOneQuestionOnly={showOneQuestionOnly}
@@ -169,7 +170,7 @@ const MainSection = ({ quiz }) => {
                     />
                   ) : (
                     <QuizResults
-                      questions={quiz.questions}
+                      questions={quizData.questions}
                       selectedOptions={selectedOptions}
                     />
                   )}
@@ -180,7 +181,7 @@ const MainSection = ({ quiz }) => {
         </Tabs>
       </div>
       <div className="w-[30%]">
-        {activeTab === "instructions" && <QuizzDetailCard quiz={quiz} />}
+        {activeTab === "instructions" && <QuizzDetailCard quiz={quizData} />}
         {((activeTab === "questions" && !quizSubmitted) ||
           (activeTab === "questions" &&
             quizSubmitted &&
@@ -188,8 +189,8 @@ const MainSection = ({ quiz }) => {
           <QuestionDetailCard
             timeLeft={timeLeft}
             totalTime={totalTime}
-            quiz={quiz}
-            numberOfQuestions={quiz.questions.length}
+            quizData={quizData}
+            numberOfQuestions={quizData.questions.length}
           />
         )}
         {activeTab === "questions" && quizSubmitted && (
