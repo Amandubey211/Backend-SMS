@@ -54,6 +54,7 @@ import studentAttendanceReducer from "../Store/Slices/Student/MyClass/Class/Atte
 import studentSubjectReducer from "../Store/Slices/Student/MyClass/Class/Subjects/subjectSlice";
 import studentModuleReducer from "../Store/Slices/Student/MyClass/Class/Subjects/Modules/moduleSlice";
 import studentAssignmentReducer from "../Store/Slices/Student/MyClass/Class/Subjects/Assignment/assignmentSlice";
+import studentQuizReducer from "../Store/Slices/Student/MyClass/Class/Subjects/Quizes/quizesSlice";
 import studentSyllabusReducer from "../Store/Slices/Student/MyClass/Class/Subjects/Syllabus/syllabusSlice";
 import studentPagesReducer from "../Store/Slices/Student/MyClass/Class/Subjects/Pages/pagesSlice";
 import studentDiscussionReducer from "../Store/Slices/Student/MyClass/Class/Subjects/Discussion/discussionSlice";
@@ -157,6 +158,7 @@ const studentReducer = combineReducers({
   ),
   studentModule: studentModuleReducer,
   studentAssignment: studentAssignmentReducer,
+  studentQuiz: studentQuizReducer,
   studentSyllabus: studentSyllabusReducer,
   studentPages: studentPagesReducer,
   studentDiscussion: studentDiscussionReducer,
