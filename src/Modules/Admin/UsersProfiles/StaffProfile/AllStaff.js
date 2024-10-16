@@ -9,6 +9,7 @@ import AddUser from "./AddUser";
 import { FiLoader } from "react-icons/fi";
 import { GoAlertFill } from "react-icons/go";
 import { fetchAllStaff } from "../../../../Store/Slices/Admin/Users/Staff/staff.action";
+import Spinner from "../../../../Components/Common/Spinner";
 
 const AllStaff = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -60,8 +61,7 @@ const dispatch = useDispatch()
     <Layout title="All Staff">
       <DashLayout>
       {loading?  <div className="flex w-full h-[90vh] flex-col items-center justify-center">
-    <FiLoader className="animate-spin mr-2 w-[3rem] h-[3rem] " />
-    <p className="text-gray-800 text-lg">Loading...</p>
+        <Spinner/>
     </div>:
         <div className="p-4">
           <div className="flex justify-between items-center mb-4  border-b-2 h-20">
@@ -85,7 +85,7 @@ const dispatch = useDispatch()
             )):  <div>
             <div className="flex w-[80vw] text-gray-500 h-[90vh] items-center justify-center flex-col text-2xl">
     <GoAlertFill className="text-[5rem]" />
-   No  Data Found
+   No  Staff data Found
   </div>
         </div>}
           </div>

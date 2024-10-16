@@ -6,29 +6,25 @@ import { HiOutlineDotsVertical } from "react-icons/hi";
 import { useNavigate, useParams } from "react-router-dom";
 import { ImSpinner3 } from "react-icons/im";
 import useDeleteQuiz from "../../../../Hooks/AuthHooks/Staff/Admin/Quiz/useDeleteQuiz";
-import useDeleteAssignment from "../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useDeleteAssignment";
-import useUpdateAssignment from "../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useUpdateAssignment";
 import useUpdateQuiz from "../../../../Hooks/AuthHooks/Staff/Admin/Quiz/useUpdateQuiz";
 import DeleteModal from "../../../../Components/Common/DeleteModal";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  deleteAssignmentThunk,
+  updateAssignmentThunk,
+} from "../../../../Store/Slices/Admin/Class/Assignment/assignmentThunks";
 
-const ButtonsGroup = ({ type }) => {
-  const { assignmentDetails: data } = useSelector(
-    (store) => store.admin.assignments
-  );
-
+const ButtonsGroup = ({ type, data, loading }) => {
   const navigate = useNavigate();
   const { sid, cid } = useParams();
   const [showMenu, setShowMenu] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const menuRef = useRef();
+  const dispatch = useDispatch();
 
-  const { loading: quizLoading, deleteQuiz } = useDeleteQuiz();
-  const { loading: assignmentLoading, deleteAssignment } =
-    useDeleteAssignment();
-  const { updateAssignment, loading: updateAssignmentLoading } =
-    useUpdateAssignment();
-  const { updateQuiz, loading: updateQuizLoading } = useUpdateQuiz();
+  const { deleteQuiz } = useDeleteQuiz();
+
+  const { updateQuiz } = useUpdateQuiz();
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -64,14 +60,11 @@ const ButtonsGroup = ({ type }) => {
 
   const confirmDelete = async () => {
     if (!data) return; // Prevent action if data is null
-    let success = false;
     if (type === "Quiz") {
-      success = await deleteQuiz(data._id);
+      await deleteQuiz(data._id);
     }
     if (type === "Assignment") {
-      success = await deleteAssignment(data._id);
-    }
-    if (success && !quizLoading && !assignmentLoading) {
+      dispatch(deleteAssignmentThunk(data._id));
     }
   };
 
@@ -88,7 +81,10 @@ const ButtonsGroup = ({ type }) => {
     if (type === "Quiz") {
       success = await updateQuiz(data._id, updatedData);
     } else if (type === "Assignment") {
-      success = await updateAssignment(data._id, updatedData);
+      const assignmentId = data._id;
+      dispatch(
+        updateAssignmentThunk({ assignmentId, assignmentData: updatedData })
+      );
     }
 
     // if (success) {
@@ -98,7 +94,7 @@ const ButtonsGroup = ({ type }) => {
 
   // Use a default value if publish is not present or data is null
   const isPublished = data?.publish ?? false;
-  const isUpdating = updateQuizLoading || updateAssignmentLoading;
+  const isUpdating = loading;
 
   return (
     <div className="relative flex justify-center gap-2 items-center w-full p-2 text-gray-700">

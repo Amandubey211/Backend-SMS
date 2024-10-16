@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import QuizQuestionCard from "./QuizQuestionCard";
 import { FaQuestionCircle } from "react-icons/fa";
+import { useSelector } from "react-redux";
 
-const QuizQuestions = ({ questions }) => {
+const QuizQuestions = () => {
   const [selectedOptions, setSelectedOptions] = useState({});
-
+  const { quizzDetail } = useSelector((store) => store.admin.quizzes);
+  const { questions } = quizzDetail || {};
   const handleOptionChange = (questionIndex, optionText) => {
     setSelectedOptions({
       ...selectedOptions,
@@ -16,14 +18,18 @@ const QuizQuestions = ({ questions }) => {
     return (
       <div className="flex flex-col items-center justify-center h-full">
         <FaQuestionCircle className="text-6xl text-gray-400" />
-        <p className="text-xl font-semibold text-gray-600 mt-2">No questions available</p>
+        <p className="text-xl font-semibold text-gray-600 mt-2">
+          No questions available
+        </p>
       </div>
     );
   }
 
   return (
     <div className="w-full p-1">
-      <div className="flex justify-start mb-2 font-medium text-xl">All Question Preview</div>
+      <div className="flex justify-start mb-2 font-medium text-xl">
+        All Question Preview
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {questions.map((question, questionIndex) => (
           <QuizQuestionCard

@@ -18,18 +18,11 @@ const AssignmentDetailCard = () => {
   const [isModalOpen, setModalOpen] = useState(false);
   const [criteriaList, setCriteriaList] = useState([]);
   const [existingRubricId, setExistingRubricId] = useState(null);
-  const [selectedAssignmentId, setSelectedAssignmentId] = useState("");
-
-  useEffect(() => {
-    if (assignment && assignment._id) {
-      setSelectedAssignmentId(assignment._id);
-    }
-  }, [assignment]);
 
   const handleViewRubric = () => {
     setModalOpen(true);
   };
-  const isPublish = assignment.isPublish;
+  const isPublish = assignment?.publish;
   if (loading) return <Spinner />;
   if (error || !assignment) return <NoDataFound />;
 
@@ -45,7 +38,7 @@ const AssignmentDetailCard = () => {
 
   return (
     <div className="max-w-sm p-4 bg-white" aria-label="Assignment Card">
-      <ButtonsGroup type="Assignment" />
+      <ButtonsGroup type="Assignment" data={assignment} loading={loading} />
 
       <SpeedGradeButton
         type="Assignment"
@@ -80,7 +73,7 @@ const AssignmentDetailCard = () => {
 
       <AddRubricModal
         type="assignment"
-        AssignmentId={selectedAssignmentId}
+        AssignmentId={assignment?._id}
         isOpen={isModalOpen}
         onClose={() => setModalOpen(false)}
         criteriaList={criteriaList}

@@ -19,6 +19,7 @@ import { NavLink } from "react-router-dom";
 import { setShowError } from "../../../../Store/Slices/Common/Alerts/alertsSlice";
 import OfflineModal from "../../../../Components/Common/Offline";
 import { stdSubjectProgressPercentage } from "../../../../Store/Slices/Student/MyClass/Class/Subjects/subject.action";
+import SidebarSlide from '../../../../Components/Common/SidebarSlide'
 
 
 const colors = [
@@ -52,9 +53,9 @@ const MainSection = () => {
         text: (() => {
           if (classData?.section) {
             if (classData?.groups?.length > 0) {
-              return `Section: (${classData?.section?.sectionName}) - Group: (${classData?.groups?.length})`;
+              return `${classData?.section?.sectionName} | (${classData?.groups?.length}) Group`;
             } else {
-              return `Section: (${classData?.section?.sectionName}) - Group: (0)`;
+              return `${classData?.section?.sectionName} | 0 Group`;
             }
           } else {
             return "No Section Provided Yet";
@@ -79,7 +80,7 @@ const MainSection = () => {
 
   const handleSectionClick = (section) => {
     setModalData(classData); // Set section data for the modal
-    setIsModalVisible(true); // Show the modal
+    setIsModalVisible(true); 
   };
 
 
@@ -163,11 +164,18 @@ const MainSection = () => {
       )}
 
       {/* Modal for Section and group*/}
-      {modalData && (<SectionGroupModal
-        isModalVisible={isModalVisible}
-        modalData={modalData}
-        handleModalClose={handleModalClose}
-      />)}
+      {modalData && (
+       <SidebarSlide
+         isOpen={isModalVisible}
+         onClose={handleModalClose}
+         title={<span className="bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent bg-clip-text">
+           Sections & groups
+         </span>}
+         width="30%"
+         height="100%"
+       >
+        <SectionGroupModal modalData={modalData}/>
+       </SidebarSlide>)}
     </>
   );
 };

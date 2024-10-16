@@ -7,6 +7,7 @@ import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchStudentFinance } from "../../../../../../Store/Slices/Admin/Users/Students/student.action";
 import { FiLoader } from "react-icons/fi";
+import Spinner from "../../../../../../Components/Common/Spinner";
 const StudentFinance = ({ student }) => {
   const {cid} = useParams();
   const [totalUnpaidFees, setTotalUnpaidFees] = useState("");
@@ -21,8 +22,7 @@ const StudentFinance = ({ student }) => {
   }, [dispatch])
   if (loading) {
     return <div className="flex w-full h-[90vh] flex-col items-center justify-center">
-    <FiLoader className="animate-spin mr-2 w-[3rem] h-[3rem] " />
-    <p className="text-gray-800 text-lg">Loading...</p>
+    <Spinner/>
     </div>;
   }
   return (

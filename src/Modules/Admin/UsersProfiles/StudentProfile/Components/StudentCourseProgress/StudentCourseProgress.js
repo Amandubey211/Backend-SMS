@@ -6,6 +6,7 @@ import { FiLoader } from 'react-icons/fi'
 import { GoAlertFill } from 'react-icons/go'
 import { fetchCourseProgress, fetchStudentSubjectProgress } from '../../../../../../Store/Slices/Admin/Users/Students/student.action'
 import MainSection from './Module/MainSection'
+import Spinner from '../../../../../../Components/Common/Spinner'
 const StudentCourseProgress = ({student}) => {
   const {cid} = useParams()
   const {studentSubjectProgress,loading} = useSelector((store) => store.admin.all_students);
@@ -24,9 +25,8 @@ const StudentCourseProgress = ({student}) => {
   }
   return (
     <>
-  {loading?<div className='w-full h-[90vh] flex items-center justify-center'>
-    <FiLoader className="animate-spin mr-2 w-[3rem] h-[3rem]  " />
-    <p className="text-gray-800 text-lg ">Loading...</p>
+  {loading?<div className='w-full h-[90vh] flex items-center justify-center text-gray-600'>
+    <Spinner/>
   </div>:
     <div className='py-2 max-w-[68vw]'>
     <div className='pb-2'>
@@ -38,7 +38,7 @@ const StudentCourseProgress = ({student}) => {
           </div>
         )):<div className="flex w-full h-full text-gray-500  items-center justify-center flex-col text-xl">
         <GoAlertFill className="text-[3rem]" />
-        No  Data Found
+        No  Module Found
         </div>
       }
       </div>

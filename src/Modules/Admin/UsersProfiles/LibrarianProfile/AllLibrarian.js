@@ -9,6 +9,7 @@ import AddUser from "../StaffProfile/AddUser";
 import { GoAlertFill } from "react-icons/go";
 import { FiLoader } from "react-icons/fi";
 import { fetchAllStaff } from "../../../../Store/Slices/Admin/Users/Staff/staff.action";
+import Spinner from "../../../../Components/Common/Spinner";
 const AllLibrarian = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarContent, setSidebarContent] = useState(null);
@@ -57,8 +58,7 @@ const dispatch = useDispatch()
   return (
     <Layout title="All Librarian">
       <DashLayout>{loading?  <div className="flex w-full h-[90vh] flex-col items-center justify-center">
-    <FiLoader className="animate-spin mr-2 w-[3rem] h-[3rem] " />
-    <p className="text-gray-800 text-lg">Loading...</p>
+        <Spinner/>
     </div>:
         <div className="p-4">
           <div className="flex justify-between items-center mb-4 border-b-2 h-20">
@@ -85,7 +85,7 @@ const dispatch = useDispatch()
             <div>
                 <div className="flex w-[80vw] text-gray-500 h-[90vh] items-center justify-center flex-col text-2xl">
         <GoAlertFill className="text-[5rem]" />
-       No  Data Found
+       No  librarian Found
       </div>
             </div>
             }

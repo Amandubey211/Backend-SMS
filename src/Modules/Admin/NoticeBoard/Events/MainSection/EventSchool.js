@@ -13,7 +13,7 @@ import {
   setSidebarContent,
   resetSidebarContent,
 } from "../../../../../Store/Slices/Admin/NoticeBoard/Events/eventSlice";
-import { format, isValid } from "date-fns";
+import { format, isValid, parse } from "date-fns";
 import toast from "react-hot-toast";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
 import { IoCalendarOutline } from "react-icons/io5";
@@ -25,6 +25,7 @@ import AddEvent from "../subComponents/AddEvent";
 import UpdateEvent from "../subComponents/UpdateEvent";
 import ViewEvent from "../subComponents/ViewEvent";
 import useNavHeading from "../../../../../Hooks/CommonHooks/useNavHeading ";
+
 
 const EventScheduler = () => {
   const [currentPage, setCurrentPage] = useState(0);
@@ -60,11 +61,17 @@ const EventScheduler = () => {
         await dispatch(createEventThunk(eventData));
         toast.success("Event created successfully!");
       }
+      
       handleSidebarClose();
+  
+      // Fetch the updated list of events after saving
+      dispatch(fetchEventsThunk()); // Automatically refresh events after creating/updating
+  
     } catch (error) {
       toast.error("Failed to save event");
     }
   };
+  
 
   // const handleDeleteEvent = async () => {
   //   try {
@@ -82,7 +89,7 @@ const EventScheduler = () => {
   };
 
   // Predefined background colors for events
-  const colors = [
+  const bgColors = [
     "bg-blue-200",
     "bg-green-200",
     "bg-pink-200",
@@ -93,38 +100,50 @@ const EventScheduler = () => {
   // Custom date cell render for the calendar
   const handleDateCellRender = (value) => {
     const formattedDate = format(value.toDate(), "yyyy-MM-dd");
-    const dayEvents = events.filter((event) => {
-      const eventDate = new Date(event.date);
-      return (
-        isValid(eventDate) && format(eventDate, "yyyy-MM-dd") === formattedDate
-      );
-    });
+    const dayEvents = events.filter(
+      (event) => format(new Date(event?.date), "yyyy-MM-dd") === formattedDate
+    );
+
+    const bgColors = ["bg-pink-500", "bg-purple-500", "bg-blue-500", "bg-indigo-500"];
 
     return (
-      <ul className="events space-y-1">
-        {dayEvents.map((event, index) => (
-          <li
-            key={event._id}
-            className={`event-item cursor-pointer ${
-              colors[index % colors.length]
-            } p-1 rounded text-sm`}
-            onClick={() => handleEventClick(event)} // Handle each individual event click
-          >
-            {event.title}
-          </li>
-        ))}
+      <ul className="events space-y-1 max-h-20 overflow-y-auto">
+        {dayEvents.map((event, index) => {
+          let formattedTime = "No time"; // Default fallback for time
+          if (event?.time) {
+            try {
+              // Since all times in the DB are in "hh:mm a" format, directly parse it this way
+              const eventTime = parse(event?.time, "hh:mm a", new Date("1970-01-01"));
+              formattedTime = isValid(eventTime) ? format(eventTime, "hh:mm a") : "No time";
+            } catch (error) {
+              console.error("Error formatting time:", error);
+            }
+          }
+
+          return (
+            <li
+              key={event?._id}
+              className={`inline-block px-2 py-1 rounded text-white ${bgColors[index % bgColors.length]
+                } shadow-md cursor-pointer`}
+              onClick={() => handleEventClick(event)}
+            >
+              {event?.title} - {formattedTime}
+            </li>
+          );
+        })}
       </ul>
     );
   };
+
 
   const sidebarTitle =
     sidebarContent === "viewEvent" && selectedEvent
       ? selectedEvent.title
       : sidebarContent === "addEvent"
-      ? "Add New Event"
-      : sidebarContent === "updateEvent"
-      ? "Update Event"
-      : "Sidebar";
+        ? "Add New Event"
+        : sidebarContent === "updateEvent"
+          ? "Update Event"
+          : "Sidebar";
 
   return (
     <Layout title="Event | Student Diwan">
@@ -177,6 +196,10 @@ const EventScheduler = () => {
               </div>
             )}
           </div>
+
+          {/* Add HR and margin bottom */}
+          <hr className="my-6 border-t-2 mt-12" />
+
 
           {/* Calendar Date Render */}
           <Calendar
@@ -234,21 +257,19 @@ const EventScheduler = () => {
                   </select>
                   <div className="flex space-x-2">
                     <button
-                      className={`border rounded px-2 py-1 ${
-                        type === "month"
+                      className={`border rounded px-2 py-1 ${type === "month"
                           ? "bg-gradient-to-r from-pink-500 to-purple-500 text-white"
                           : ""
-                      }`}
+                        }`}
                       onClick={() => onTypeChange("month")}
                     >
                       Month
                     </button>
                     <button
-                      className={`border rounded px-2 py-1 ${
-                        type === "year"
+                      className={`border rounded px-2 py-1 ${type === "year"
                           ? "bg-gradient-to-r from-pink-500 to-purple-500 text-white"
                           : ""
-                      }`}
+                        }`}
                       onClick={() => onTypeChange("year")}
                     >
                       Year

@@ -53,6 +53,17 @@ const DropdownMenu = ({ onEditClick }) => {
   );
 };
 
+const capitalizeFirstLetter = (str) => {
+  if (!str) return ''; // Handle cases with undefined or empty strings
+  const firstLetter = str.charAt(0);
+  // Check if the first letter is already uppercase
+  if (firstLetter === firstLetter.toUpperCase()) {
+    return str;
+  } else {
+    return firstLetter.toUpperCase() + str.slice(1);
+  }
+};
+
 const TeacherRow = React.memo(({ teacher, onPayClick, onEditClick }) => (
   <tr className="bg-white border border-gray-200">
     <td className="px-5 py-3  flex items-center">
@@ -77,23 +88,24 @@ const TeacherRow = React.memo(({ teacher, onPayClick, onEditClick }) => (
       {teacher?.paidDate ? new Date(teacher?.paidDate).toLocaleDateString() : "---"}
     </td>
     <td className="px-5 py-2 ">
-      <span className={`px-3 py-1 text-xs font-semibold ${teacher?.status === "paid" ? " text-green-800" : " text-red-800"}`}>
-        {teacher?.status}
+      <span className={`px-3 py-1 text-m font-semibold ${teacher?.status === "paid" ? " text-green-800" : " text-red-600"}`}>
+        {capitalizeFirstLetter(teacher?.status)}
       </span>
     </td>
     <td className="px-5 py-2  flex items-center justify-between space-x-2">
       {teacher?.status === "paid" ? (
-        <span className="inline-flex items-center border border-transparent text-xs font-medium shadow-sm bg-green-200 text-green-800 py-1 px-2 rounded-md">
+        <span className="inline-flex items-center border border-transparent text-sm font-medium shadow-sm bg-green-200 text-green-800 py-1.5 px-3 rounded-md">
           Completed
         </span>
       ) : (
         <button
-          className="inline-flex items-center border border-transparent text-xs font-medium shadow-sm bg-gradient-to-r from-pink-500 to-purple-500 text-white py-1 px-2 rounded-md hover:from-pink-600 hover:to-purple-600"
+          className="inline-flex items-center border border-transparent text-sm font-medium shadow-sm bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600"
           onClick={() => onPayClick(teacher)}
         >
           Pay Now
         </button>
       )}
+
       <DropdownMenu onEditClick={() => onEditClick(teacher)} />
     </td>
   </tr>

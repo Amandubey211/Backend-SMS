@@ -16,7 +16,7 @@ import subjectGradesReducer from "./Slices/Admin/Class/grades/gradesSlice";
 import subjectAssignmentReducer from "./Slices/Admin/Class/Assignments/assignmentSlice";
 import subjectQuizReducer from "./Slices/Admin/Class/Quiz/quizSlice";
 import sectionReducer from "./Slices/Admin/Class/Section_Groups/groupSectionSlice";
-
+import graduateReducer from "./Slices/Admin/Graduate/graduateSlice"
 import classStudentReducer from "./Slices/Admin/Class/Students/studentSlice";
 import attendanceReducer from "./Slices/Admin/Class/Attendence/attendanceSlice";
 import verificationReducer from "./Slices/Admin/Verification/VerificationSlice";
@@ -39,6 +39,7 @@ import adminDiscussionCommentsReducer from "./Slices/Admin/Class/Discussion/Comm
 import adminCommentReducer from "./Slices/Admin/Class/Comment/commentsSlice";
 import adminAnnouncementCommentsReducer from "./Slices/Admin/Class/Announcement/Comment/announcementCommentsSlice";
 import adminAssignmentReducer from "./Slices/Admin/Class/Assignment/assignmentSlice";
+import adminQuizReducer from "./Slices/Admin/Class/Quiz/quizSlice";
 
 // student
 import studentDashboardReducer from "./Slices/Student/Dashboard/studentDashboardSlices";
@@ -128,7 +129,8 @@ const AdminReducer = combineReducers({
   announcementComments: adminAnnouncementCommentsReducer,
   comments: adminCommentReducer,
   assignments: adminAssignmentReducer,
-
+  quizzes: adminQuizReducer,
+  graduates: graduateReducer,
   all_students: allStudentReducer,
   all_parents: allParentReducer,
   all_staff: allstaffReducer,
