@@ -6,8 +6,8 @@ const Chapter = ({
   title,
   chapterNumber,
   imageUrl,
-  assignments = [], // Ensure default empty array
-  quizzes = [],     // Ensure default empty array
+  assignments = [], 
+  quizzes = [],     
   isExpanded,
   onToggle,
   id
@@ -53,7 +53,7 @@ const Chapter = ({
               <ChapterItem
                 key={index}
                 type={item.type}
-                title={item.name}
+                title={item.title}
                 id={item._id}
                 isPublished={item.isPublished}
               />

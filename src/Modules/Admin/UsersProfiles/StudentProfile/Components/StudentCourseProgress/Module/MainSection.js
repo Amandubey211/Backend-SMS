@@ -16,8 +16,11 @@ const MainSection = () => {
   const dispatch  = useDispatch()
 
   useEffect(() => {
-        setModules(courseProgress?courseProgress?.module||[] : [])
-          setChapters(courseProgress ?courseProgress?.module[0]?.chapters||[] : []); 
+    setModules(courseProgress?.module||[])
+    if(courseProgress?.module?.length > 0 ){
+          setChapters( courseProgress?.module[0]?.chapters||[]); 
+    }
+     
        
   }, [courseProgress]);
   
@@ -45,19 +48,19 @@ const MainSection = () => {
             chapters.map((chapter, index) => (
               <Chapter
                 key={index}
-                id={chapter._id}
+                id={chapter.chapterId}
                 title={chapter?.name}
                 chapterNumber={index + 1}
                 imageUrl={chapter?.thumbnail}
                 assignments={chapter.assignments}
                 quizzes={chapter.quizzes}
                 isExpanded={expandedChapters}
-                onToggle={() => handleToggle(chapter._id)}
+                onToggle={() => handleToggle(chapter.chapterId)}
               />
             )) : <div className="flex justify-center items-center font-bold text-gray-500 my-20 h-full w-full">
                <div className="flex  items-center justify-center flex-col text-2xl ">
         <GoAlertFill className="text-[5rem] text-gray-500" />
-       No  Data Found
+       No  Chapter Found
       </div>
               </div>}
         </div>
@@ -66,7 +69,7 @@ const MainSection = () => {
         <div className="bg-white p-4 rounded-lg">
           <div className="flex items-center gap-1 mb-2">
             <p className="bg-gradient-to-r from-pink-100 to-purple-200 font-semibold rounded-full p-1 px-2">
-              <span className="text-gradient">{modules?.length}</span>
+              <span className="text-gradient">Modules: {modules?.length}</span>
             </p>
           </div>
           <div className="grid grid-cols-1 gap-2">

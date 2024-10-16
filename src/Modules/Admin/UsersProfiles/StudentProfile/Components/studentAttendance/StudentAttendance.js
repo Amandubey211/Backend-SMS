@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { FaCheckCircle, FaDoorOpen, FaTimesCircle } from 'react-icons/fa';
 import { fetchStudentAttendance } from '../../../../../../Store/Slices/Admin/Users/Students/student.action';
 import { FiLoader } from 'react-icons/fi';
+import Spinner from '../../../../../../Components/Common/Spinner';
 const StudentAttendance = ({ student }) => {
     const [currentDate, setCurrentDate] = useState(moment());
     const { StudentAttendance, StudentAttendanceSummary, loading } = useSelector((store) => store.admin.all_students);
@@ -20,8 +21,7 @@ const StudentAttendance = ({ student }) => {
 
     return (
         loading? <div className="flex w-full h-[90vh] flex-col items-center justify-center">
-            <FiLoader className="animate-spin mr-2 w-[3rem] h-[3rem] " />
-            <p className="text-gray-800 text-lg">Loading...</p>
+          <Spinner/>
             </div>:
         <div className="container mx-auto py-4">
             <div className="flex justify-around px-4  space-x-4">
