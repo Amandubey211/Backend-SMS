@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
-import { useSelector } from 'react-redux';
-import useAssignStudentToGroup from '../../../../Hooks/AuthHooks/Staff/Admin/Students/useAssignStudentToGroup ';
+import React, { useState } from "react";
+import { useSelector } from "react-redux";
+import useAssignStudentToGroup from "../../../../Hooks/AuthHooks/Staff/Admin/Students/useAssignStudentToGroup ";
 
 const EditStudent = ({ studentId, onClose, fetchGroups }) => {
-  const [selectedSection, setSelectedSection] = useState('');
-  const [selectedGroup, setSelectedGroup] = useState('');
+  const [selectedSection, setSelectedSection] = useState("");
+  const [selectedGroup, setSelectedGroup] = useState("");
   const { editStudent, loading, error } = useAssignStudentToGroup();
 
   // Access sectionsList from Redux store
   const sections = useSelector((state) => state.Class.sectionsList);
-  const groups = useSelector((state) => state.Class.groupsList)
+  const groups = useSelector((state) => state.Class.groupsList);
 
   const handleSectionChange = (e) => {
     setSelectedSection(e.target.value);
@@ -23,11 +23,11 @@ const EditStudent = ({ studentId, onClose, fetchGroups }) => {
     e.preventDefault();
 
     try {
-      await editStudent(studentId,selectedGroup, selectedSection);
+      await editStudent(studentId, selectedGroup, selectedSection);
       fetchGroups();
       onClose();
     } catch (err) {
-      console.error('Error moving student to section:', err);
+      console.error("Error moving student to section:", err);
     }
   };
 
@@ -35,7 +35,10 @@ const EditStudent = ({ studentId, onClose, fetchGroups }) => {
     <div>
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
-          <label htmlFor="section" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="section"
+            className="block text-sm font-medium text-gray-700"
+          >
             Select Section
           </label>
           <select
@@ -53,7 +56,10 @@ const EditStudent = ({ studentId, onClose, fetchGroups }) => {
           </select>
         </div>
         <div className="mb-4">
-          <label htmlFor="section" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="section"
+            className="block text-sm font-medium text-gray-700"
+          >
             Select Group
           </label>
           <select
@@ -75,7 +81,7 @@ const EditStudent = ({ studentId, onClose, fetchGroups }) => {
           disabled={loading}
           className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
         >
-          {loading ? 'Updating...' : 'Update Student'}
+          {loading ? "Updating..." : "Update Student"}
         </button>
         {error && <p className="text-red-500 mt-2">{error}</p>}
       </form>

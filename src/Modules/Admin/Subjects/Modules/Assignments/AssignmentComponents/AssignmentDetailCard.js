@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import AddRubricModal from "../../Rubric/Components/AddRubricModal";
 import AssignmentDetail from "../../../Component/AssignmentDetail";
 import DateDetail from "../../../Component/DateDetail";
@@ -22,19 +22,50 @@ const AssignmentDetailCard = () => {
   const handleViewRubric = () => {
     setModalOpen(true);
   };
-  const isPublish = assignment?.publish;
+
   if (loading) return <Spinner />;
   if (error || !assignment) return <NoDataFound />;
 
-  const {
-    points,
-    allowedAttempts,
-    allowNumberOfAttempts,
-    submissionType,
-    assignTo,
-    dueDate,
-    availableFrom,
-  } = assignment;
+  const assignmentDetails = [
+    {
+      label: "Assignment Points",
+      value: `${assignment?.points || "N/A"} Points`,
+      type: "assignment",
+    },
+    {
+      label: "Allowed Attempts",
+      value: `${
+        assignment?.allowNumberOfAttempts
+          ? assignment.allowNumberOfAttempts
+          : "Unlimited"
+      } Times`,
+      type: "assignment",
+    },
+    {
+      label: "Submitting By",
+      value: assignment?.submissionType || "N/A",
+      type: "assignment",
+    },
+    {
+      label: "This Assignment For",
+      value: assignment?.assignTo || "N/A",
+      type: "assignment",
+    },
+    {
+      label: "Available From",
+      value: assignment?.availableFrom
+        ? new Date(assignment.availableFrom).toLocaleDateString()
+        : "DD/MM/YY",
+      type: "date",
+    },
+    {
+      label: "Due Date",
+      value: assignment?.dueDate
+        ? new Date(assignment.dueDate).toLocaleDateString()
+        : "DD/MM/YY",
+      type: "date",
+    },
+  ];
 
   return (
     <div className="max-w-sm p-4 bg-white" aria-label="Assignment Card">
@@ -44,31 +75,32 @@ const AssignmentDetailCard = () => {
         type="Assignment"
         sgid={assignment._id}
         name={assignment.name}
-        isPublish={isPublish}
+        isPublish={assignment?.publish}
       />
 
-      <AssignmentDetail
-        label="Assignment Points"
-        value={`${points || "N/A"} Points`}
-      />
-      <AssignmentDetail
-        label="Allowed Attempts"
-        value={`${allowNumberOfAttempts ? allowNumberOfAttempts : 0} Times`}
-      />
-      <AssignmentDetail label="Submitting By" value={submissionType} />
-      <AssignmentDetail label="This Assignment For" value={assignTo} />
-      <DateDetail
-        label="Due Date"
-        value={dueDate ? new Date(dueDate).toLocaleDateString() : "DD/MM/YY"}
-      />
-      <DateDetail
-        label="Available From"
-        value={
-          availableFrom
-            ? new Date(availableFrom).toLocaleDateString()
-            : "DD/MM/YY"
-        }
-      />
+      <div className="ps-3 ">
+        {assignmentDetails.map((detail, index) => {
+          if (detail.type === "assignment") {
+            return (
+              <AssignmentDetail
+                key={index}
+                label={detail.label}
+                value={detail.value}
+              />
+            );
+          } else if (detail.type === "date") {
+            return (
+              <DateDetail
+                key={index}
+                label={detail.label}
+                value={detail.value}
+              />
+            );
+          }
+          return null;
+        })}
+      </div>
+
       <RubricButton onClick={handleViewRubric} />
 
       <AddRubricModal

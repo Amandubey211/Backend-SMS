@@ -2,13 +2,20 @@ import { createSlice } from "@reduxjs/toolkit";
 import {
   fetchStudentsByClassAndSection,
   fetchAllStudents,
+  promoteStudents,
+  promoteInSameClassStudents,
+  graduateStudents,
+  demoteStudents,
+  fetchGraduates,
 } from "./studentThunks";
 
 const initialState = {
   studentsList: [],
   allStudentsList: [],
+  graduatesList: [],
   loading: false,
   error: null,
+  successMessage: null,
 };
 
 const studentSlice = createSlice({
@@ -23,6 +30,7 @@ const studentSlice = createSlice({
     },
     clearError(state) {
       state.error = null;
+      state.successMessage = null;
     },
   },
   extraReducers: (builder) => {
@@ -50,6 +58,74 @@ const studentSlice = createSlice({
         state.allStudentsList = action.payload;
       })
       .addCase(fetchAllStudents.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Promote Students
+      .addCase(promoteStudents.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.successMessage = null;
+      })
+      .addCase(promoteStudents.fulfilled, (state, action) => {
+        state.loading = false;
+        state.successMessage = "Students promoted successfully";
+      })
+      .addCase(promoteStudents.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Promote Students in Same Class
+      .addCase(promoteInSameClassStudents.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.successMessage = null;
+      })
+      .addCase(promoteInSameClassStudents.fulfilled, (state, action) => {
+        state.loading = false;
+        state.successMessage =
+          "Students promoted in the same class successfully";
+      })
+      .addCase(promoteInSameClassStudents.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Graduate Students
+      .addCase(graduateStudents.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(graduateStudents.fulfilled, (state, action) => {
+        state.loading = false;
+        state.successMessage = "Students graduated successfully";
+      })
+      .addCase(graduateStudents.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Demote Students
+      .addCase(demoteStudents.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(demoteStudents.fulfilled, (state, action) => {
+        state.loading = false;
+        state.successMessage = "Students demoted successfully";
+      })
+      .addCase(demoteStudents.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Fetch Graduates
+      .addCase(fetchGraduates.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchGraduates.fulfilled, (state, action) => {
+        state.loading = false;
+        state.graduatesList = action.payload.data;
+      })
+      .addCase(fetchGraduates.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
