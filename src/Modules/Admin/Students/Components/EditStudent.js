@@ -3,37 +3,37 @@ import { useSelector } from "react-redux";
 import useAssignStudentToGroup from "../../../../Hooks/AuthHooks/Staff/Admin/Students/useAssignStudentToGroup ";
 
 const EditStudent = ({ studentId, onClose, fetchGroups }) => {
-  const [selectedSection, setSelectedSection] = useState("");
-  const [selectedGroup, setSelectedGroup] = useState("");
-  const { editStudent, loading, error } = useAssignStudentToGroup();
+  // const [selectedSection, setSelectedSection] = useState("");
+  // const [selectedGroup, setSelectedGroup] = useState("");
+  // const { editStudent, loading, error } = useAssignStudentToGroup();
 
-  // Access sectionsList from Redux store
-  const sections = useSelector((state) => state.Class.sectionsList);
-  const groups = useSelector((state) => state.Class.groupsList);
+  // // Access sectionsList from Redux store
+  // const sections = useSelector((state) => state.Class.sectionsList);
+  // const groups = useSelector((state) => state.Class.groupsList);
 
-  const handleSectionChange = (e) => {
-    setSelectedSection(e.target.value);
-  };
+  // const handleSectionChange = (e) => {
+  //   setSelectedSection(e.target.value);
+  // };
 
-  const handleGroupChange = (e) => {
-    setSelectedGroup(e.target.value);
-  };
+  // const handleGroupChange = (e) => {
+  //   setSelectedGroup(e.target.value);
+  // };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
 
-    try {
-      await editStudent(studentId, selectedGroup, selectedSection);
-      fetchGroups();
-      onClose();
-    } catch (err) {
-      console.error("Error moving student to section:", err);
-    }
-  };
+  //   try {
+  //     await editStudent(studentId, selectedGroup, selectedSection);
+  //     fetchGroups();
+  //     onClose();
+  //   } catch (err) {
+  //     console.error("Error moving student to section:", err);
+  //   }
+  // };
 
   return (
     <div>
-      <form onSubmit={handleSubmit}>
+      {/* <form onSubmit={handleSubmit}>
         <div className="mb-4">
           <label
             htmlFor="section"
@@ -84,7 +84,8 @@ const EditStudent = ({ studentId, onClose, fetchGroups }) => {
           {loading ? "Updating..." : "Update Student"}
         </button>
         {error && <p className="text-red-500 mt-2">{error}</p>}
-      </form>
+      </form> */}
+      DD
     </div>
   );
 };
