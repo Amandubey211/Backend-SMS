@@ -4,19 +4,22 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-const TaskCompletionChart = () => {
+const TaskCompletionChart = ({ tasks }) => {
+  
+  // Ensure incompleteTask is non-negative
+  const incompletedTask = Math.max(100 - tasks, 0);
   const data = {
-    labels: ["Completed Task", "Incomplete Task"],
+    labels: ["Incomplete Task", "Completed Task"],
     datasets: [
       {
-        data: [67, 21], // Percentage or total points for each subject
+        data: [incompletedTask, tasks], // Ensure correct order: [incompletedTask, completedTask]
         backgroundColor: [
-          "#7B61FF",
-          "#FFD700",
+          "#FFD700",  // Yellow for incomplete tasks
+          "#7B61FF",  // Blue for completed tasks
         ],
         hoverBackgroundColor: [
-          "#7B61FF",
           "#FFD700",
+          "#7B61FF",
         ],
         borderWidth: 5,
         borderRadius: 10,
@@ -61,24 +64,24 @@ const TaskCompletionChart = () => {
             style={{
               width: '14px',
               height: '14px',
-              backgroundColor: "#7B61FF",
+              backgroundColor: "#FFD700", // Yellow for incomplete tasks
               borderRadius: '50%',
               marginRight: '8px',
             }}
           ></div>
-          <span className="text-sm text-gray-700">Completed Task</span>
+          <span className="text-sm text-gray-700">Incomplete Task</span>
         </div>
         <div className="flex items-center">
           <div
             style={{
               width: '14px',
               height: '14px',
-              backgroundColor: "#FFD700",
+              backgroundColor: "#7B61FF", // Blue for completed tasks
               borderRadius: '50%',
               marginRight: '8px',
             }}
           ></div>
-          <span className="text-sm text-gray-700">Incomplete Task</span>
+          <span className="text-sm text-gray-700">Completed Task</span>
         </div>
       </div>
     </div>

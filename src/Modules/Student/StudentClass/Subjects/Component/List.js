@@ -26,7 +26,7 @@ const List = ({
 
   // Filter the data based on the search query
   const filteredData = useMemo(() => {
-    return data.filter((item) =>
+    return data?.filter((item) =>
       getItemName(item).toLowerCase().includes(searchQuery.toLowerCase())
     );
   }, [data, searchQuery, getItemName]);
@@ -45,7 +45,7 @@ const List = ({
         <h2 className="text-xl font-semibold text-gradient">
           {title}
           <span className="border rounded-full text-sm p-1 px-2 ml-1 text-gray-500">
-            {filteredData.length}
+            {filteredData?.length}
           </span>
         </h2>
         <div className="relative">
@@ -64,13 +64,13 @@ const List = ({
         </div>
       </div>
 
-      {error || filteredData.length === 0 ? (
+      {error || filteredData?.length === 0 ? (
         <div className="h-full w-full flex justify-center items-center py-10">
           <NoDataFound title={type === "Assignment" ? "Assignment" : "Quiz"} />
         </div>
       ) : (
         <ul className="border-t p-4">
-          {filteredData.map((item) => (
+          {filteredData?.map((item) => (
             <NavLink
               to={navLinkPath(cid, sid, item)}
               key={item._id || item.assignmentId}

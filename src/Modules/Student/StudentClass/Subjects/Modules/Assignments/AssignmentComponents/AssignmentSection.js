@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import SidebarSlide from "../../../../../../../Components/Common/SidebarSlide";
 import CreateAssignmentHolder from "./CreateAssignmentHolder";
 import { toast } from "react-hot-toast";
+import { useDispatch, useSelector } from "react-redux";
+import { stdDoAssignment } from "../../../../../../../Store/Slices/Student/MyClass/Class/Subjects/Assignment/assignment.action";
 
 const AssignmentSection = ({
   isSubmitted,
@@ -14,12 +16,19 @@ const AssignmentSection = ({
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [attemptsExceeded, setAttemptsExceeded] = useState(false);
 
+  const dispatch = useDispatch();
+  //const {  } = useSelector((store) => store?.student?.studentAssignment);
+
+
+  /*
   const handleAssignment = () => {
-    const currentAttempts = submissionData ? submissionData.attempt : 0;
-    if (currentAttempts >= assignmentData.allowNumberOfAttempts) {
-      toast.error("Maximum number of attempts reached");
-      setAttemptsExceeded(true);
-      return; // Return early to prevent opening the sidebar
+    if (assignmentData?.assignment?.allowedAttempts === true) {
+      const currentAttempts = submissionData ? submissionData.attempt : 0;
+      if (currentAttempts >= assignmentData?.assignment?.allowNumberOfAttempts) {
+        toast.error("Maximum number of attempts reached");
+        setAttemptsExceeded(true);
+        return; // Return early to prevent opening the sidebar
+      }
     }
     setAttemptsExceeded(false);
     setSidebarOpen(true);
@@ -30,19 +39,51 @@ const AssignmentSection = ({
     submissionType,
     submissionComment
   ) => {
-    const currentAttempts = submissionData ? submissionData.attempt : 0;
-    if (currentAttempts >= assignmentData.allowNumberOfAttempts) {
-      toast.error("Maximum number of attempts reached");
-      setSidebarOpen(false);
-      return; // Prevent submission if limit is exceeded
+    if (assignmentData?.assignment?.allowedAttempts === true) {
+      const currentAttempts = submissionData ? submissionData.attempt : 0;
+      if (currentAttempts >= assignmentData?.assignment?.allowNumberOfAttempts) {
+        toast.error("Maximum number of attempts reached");
+        setSidebarOpen(false);
+        return; // Prevent submission if limit is exceeded
+      }
     }
 
     await onResubmit(submissionContent, submissionType, submissionComment);
     onFormSubmit();
     setSidebarOpen(false); // Close the sidebar when the form is submitted
   };
+*/
 
-  const { name, type, content, thumbnail } = assignmentData;
+  const handleAssignment = () => {
+    const currentAttempts = submissionData?.attempt || 0;
+    if (assignmentData?.assignment?.allowedAttempts && currentAttempts >= assignmentData?.assignment?.allowNumberOfAttempts) {
+      toast.error("Maximum number of attempts reached");
+      setAttemptsExceeded(true);
+    } else {
+      setAttemptsExceeded(false);
+      setSidebarOpen(true);
+    }
+  };
+
+  const handleFormSubmit = async (submissionContent, submissionType, submissionComment) => {
+    const currentAttempts = submissionData?.attempt || 0;
+    if (assignmentData?.assignment?.allowedAttempts && currentAttempts >= assignmentData?.assignment?.allowNumberOfAttempts) {
+      toast.error("Maximum number of attempts reached");
+      setSidebarOpen(false);
+      return;
+    }
+
+    dispatch(stdDoAssignment({
+      assignmentId,
+      editorContent: submissionContent,
+      fileUrls: submissionType, 
+      isReattempt: isSubmitted,
+    }));
+
+    setSidebarOpen(false);
+  };
+
+  const { name, submissionType, content, thumbnail } = assignmentData?.assignment;
 
   return (
     <div className="max-w-3xl mx-auto p-6 bg-white">

@@ -74,6 +74,17 @@ const AccountingSection = () => {
     dispatch(setModalOpen(false))
   };
 
+  const capitalizeFirstLetter = (str) => {
+    if (!str) return ''; // Handle cases with undefined or empty strings
+    const firstLetter = str.charAt(0);
+    // Check if the first letter is already uppercase
+    if (firstLetter === firstLetter.toUpperCase()) {
+      return str;
+    } else {
+      return firstLetter.toUpperCase() + str.slice(1);
+    }
+  };
+
   const handleDelete = (feeId) => {
     dispatch(deleteStudentFee(feeId));
     dispatch(fetchFees());
@@ -162,7 +173,7 @@ const AccountingSection = () => {
               </thead>
               <tbody>
                 {filteredData?.reverse()?.map((item, index) => (
-                  <tr key={index} className="text-left text-gray-700 border border-gray-200 bg-gray-100 bg-white">
+                  <tr key={index} className="text-left text-gray-700 border border-gray-200 bg-white">
                     <td className="px-5 py-2 flex flex-row gap-2">
                       <img src={item?.studentId?.profile} alt="img" className="w-10 h-10 rounded-full" />
                       <div className="flex flex-col">
@@ -185,7 +196,7 @@ const AccountingSection = () => {
                           : "bg-red-200 text-red-800"
                           }`}
                       >
-                        {item?.status}
+                        {capitalizeFirstLetter(item?.status)}
                       </span>
                     </td>
                     <td className="pl-10 py-4 relative">

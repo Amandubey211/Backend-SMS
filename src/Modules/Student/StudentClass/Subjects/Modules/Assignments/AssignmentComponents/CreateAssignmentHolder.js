@@ -93,13 +93,13 @@ const CreateAssignmentHolder = ({
         </TabButton>
       </div>
 
-      {activeTab === "Editor" && (
+      {/* {activeTab === "Editor" && (
         <EditorComponent
           editorContent={editorContent}
           onEditorChange={setEditorContent}
           onNext={handleNext}
         />
-      )}
+      )} */}
 
       {activeTab === "MediaUpload" && (
         <>

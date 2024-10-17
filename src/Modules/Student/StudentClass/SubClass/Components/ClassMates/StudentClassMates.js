@@ -12,7 +12,7 @@ import { GoAlertFill } from "react-icons/go";
 import ClassmateModal from "./ClassmateModal";
 import { setShowError } from "../../../../../../Store/Slices/Common/Alerts/alertsSlice";
 import OfflineModal from "../../../../../../Components/Common/Offline";
-
+import SidebarSlide from '../../../../../../Components/Common/SidebarSlide'
 const StudentClassMates = () => {
   const { classmateData, loading, error } = useSelector(
     (store) => store?.student?.studentClassmate
@@ -32,13 +32,16 @@ const StudentClassMates = () => {
     dispatch(stdClassmate({ classId }));
   }, [dispatch, classId]);
 
-
+const [isSidebarOpen,setIsSidebarOpen] = useState(false)
   const handleProfileClick = (classmate) => {
-    setSelectedClassmate(classmate); // Set selected classmate for modal
+    setSelectedClassmate(classmate);
+    setIsSidebarOpen(true) // Set selected classmate for modal
   };
 
   const closeModal = () => {
-    setSelectedClassmate(null); // Close modal
+    setSelectedClassmate(null);
+    setIsSidebarOpen(false)
+     // Close modal
   };
 
   return (
@@ -87,14 +90,25 @@ const StudentClassMates = () => {
 
         {/* Render the modal if a classmate is selected */}
         {selectedClassmate && (
-          <ClassmateModal
+         <SidebarSlide
+         isOpen={isSidebarOpen}
+         onClose={closeModal}
+         title={<span className="bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent bg-clip-text">
+           Classmate
+
+         </span>}
+         width="30%"
+         height="100%"
+       >
+        <ClassmateModal
             classmate={selectedClassmate}
-            onClose={closeModal}
           />
+       </SidebarSlide>
         )}
         {!loading && showError && (
           <OfflineModal error={error} onDismiss={handleDismiss} />
         )}
+        
       </DashLayout>
     </Layout>
   );

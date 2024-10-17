@@ -9,10 +9,11 @@ import { GoAlertFill } from "react-icons/go";
 import ProfileCard from "../SubComponents/ProfileCard";
 import ViewTeacher from "./SingleTeacher";
 import { fetchAllTeachers } from "../../../../Store/Slices/Admin/Class/Teachers/teacherThunks";
+import Spinner from "../../../../Components/Common/Spinner";
 const AllTeachers = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [teacherData, setTeacherData] = useState(null);
-  const {allTeachers} = useSelector((store)=>store.admin.teacher);
+  const {allTeachers,loading:teacherLoading} = useSelector((store)=>store.admin.teacher);
  const {loading} = useSelector((store)=>store.admin.all_staff);
   const dispatch = useDispatch();
   useEffect(() => {
@@ -51,9 +52,9 @@ const AllTeachers = () => {
   return (
     <Layout title="All Teachers">
       <DashLayout>
-      {loading?<div className="flex w-full h-[90vh] flex-col items-center justify-center">
-    <FiLoader className="animate-spin mr-2 w-[3rem] h-[3rem] " />
-    <p className="text-gray-800 text-lg">Loading...</p>
+      {loading | teacherLoading
+       ? <div className="flex w-full h-[90vh] flex-col items-center justify-center">
+        <Spinner/>
     </div>:
         <div className="p-4">
           <div className="flex justify-between items-center mb-4 border-b-2 h-20">
@@ -79,7 +80,7 @@ const AllTeachers = () => {
             )):  <div>
             <div className="flex w-[80vw] text-gray-500 h-[90vh] items-center justify-center flex-col text-2xl">
     <GoAlertFill className="text-[5rem]" />
-   No  Data Found
+   No  Teacher Found
   </div>
         </div>}
           </div>
@@ -90,7 +91,7 @@ const AllTeachers = () => {
             onClose={handleSidebarClose}
             title={
               <span className="bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent bg-clip-text">
-                {sidebarContent === "viewTeacher" ? "Quick View of Staff" : "Add/Edit Staff"}
+                {sidebarContent === "viewTeacher" ? "Quick View of Teacher" : "Add/Edit Teacher"}
               </span>
             }
             width= {sidebarContent === "viewTeacher" ? "30%" : "60%"}

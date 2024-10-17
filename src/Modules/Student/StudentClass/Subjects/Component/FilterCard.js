@@ -8,16 +8,16 @@ const FilterCard = ({ filters, setFilters }) => {
     filters.chapterId || ""
   );
   const [chapters, setChapters] = useState([]);
-  const moduleList = useSelector((store) => store.Subject.modules);
+  const { modulesData } = useSelector((store) => store?.student?.studentModule);
 
   useEffect(() => {
     if (selectedModule) {
-      const module = moduleList.find((mod) => mod._id === selectedModule);
+      const module = modulesData.find((mod) => mod._id === selectedModule);
       setChapters(module ? module.chapters : []);
     } else {
       setChapters([]);
     }
-  }, [selectedModule, moduleList]);
+  }, [selectedModule, modulesData]);
 
   const handleApplyFilters = () => {
     setFilters({ moduleId: selectedModule, chapterId: selectedChapter });
@@ -25,7 +25,7 @@ const FilterCard = ({ filters, setFilters }) => {
 
   const handleModuleChange = (e) => {
     setSelectedModule(e.target.value);
-    setSelectedChapter(""); // Reset chapter when module changes
+    setSelectedChapter(""); 
   };
 
   const handleResetFilters = () => {
@@ -56,7 +56,7 @@ const FilterCard = ({ filters, setFilters }) => {
           onChange={handleModuleChange}
         >
           <option value="">Select</option>
-          {moduleList.map((module) => (
+          {modulesData.map((module) => (
             <option key={module._id} value={module._id}>
               {module.moduleName}
             </option>

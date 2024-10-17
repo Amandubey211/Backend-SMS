@@ -8,7 +8,7 @@ const useFetchQuizzes = (selectedClass, selectedSubject) => {
   const [quizzes, setQuizzes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const role = useSelector((store) => store.Auth.role);
+  // const role = useSelector((store) => store.Auth.role);
   const { cid, sid } = useParams(); // Class ID and Subject ID from params
 
   // Cache key for localStorage
@@ -22,7 +22,7 @@ const useFetchQuizzes = (selectedClass, selectedSubject) => {
       setLoading(true);
       setError(null);
 
-      const token = localStorage.getItem(`${role}:token`);
+      const token = localStorage.getItem(`student:token`);
       if (!token) {
         setError("Authentication token not found");
         setLoading(false);
@@ -50,7 +50,7 @@ const useFetchQuizzes = (selectedClass, selectedSubject) => {
         setLoading(false);
       }
     },
-    [selectedClass, selectedSubject, cacheKey, role]
+    [selectedClass, selectedSubject, cacheKey]
   );
 
   // Fetch data or load from cache on initial render
