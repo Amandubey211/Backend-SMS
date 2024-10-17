@@ -60,8 +60,6 @@ import studentSyllabusReducer from "../Store/Slices/Student/MyClass/Class/Subjec
 import studentPagesReducer from "../Store/Slices/Student/MyClass/Class/Subjects/Pages/pagesSlice";
 import studentDiscussionReducer from "../Store/Slices/Student/MyClass/Class/Subjects/Discussion/discussionSlice";
 import studentAnnounceReducer from "../Store/Slices/Student/MyClass/Class/Subjects/Announcement/announcementSlice";
-import studentAssignmentReducer from "../Store/Slices/Student/MyClass/Class/Subjects/Assignment/assignmentSlice";
-
 // parent
 import dashboardReducer from "../Store/Slices/Parent/Dashboard/dashboardSlice";
 import financeReducer from "../Store/Slices/Parent/Finance/financeSlice";
