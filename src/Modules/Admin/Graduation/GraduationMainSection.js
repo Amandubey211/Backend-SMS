@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import GraduateList from "./Components/GraduateList";
-import Spinner from "../../../Components/Common/Spinner";
-import Error from "../../../Components/Common/Error";
 import TopNavigationWithFilters from "./Components/TopNavigationWithFilters";
 import Sidebar from "./Components/Sidebar";
 import { fetchGraduates, demoteStudents } from "../../../Store/Slices/Admin/Graduate/graduate.action"; // Ensure the correct path
@@ -77,16 +75,6 @@ const GraduationMainSection = () => {
     dispatch(demoteStudents({ studentIds: [studentId] }));
   };
 
-  // Loading state
-  if (loading) {
-    return <Spinner />;
-  }
-
-  // Error state
-  if (error) {
-    return <Error message={error} />;
-  }
-
   return (
     <div className="relative p-5">
       {/* Search and Filter Navigation */}
@@ -102,6 +90,8 @@ const GraduationMainSection = () => {
         totalPages={totalPages}
         onPageChange={handlePageChange}
         onDemoteStudents={handleDemoteStudents} // Pass demote function here
+        loading={loading} // Pass loading state
+        error={error} // Pass error state
       />
 
       {/* Sidebar */}
