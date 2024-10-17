@@ -1,10 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { stdDoAssignment, stdGetAssignment } from "./assignment.action";
+import { stdDoAssignment, stdGetAssignment, stdGetFilteredAssignment } from "./assignment.action";
 
 const initialState = {
     loading: false,
     error: false,
-    assignmentData: []
+    assignmentData: [],
+    assignment: null,
 }
 
 const stdAssignmentSlice = createSlice({
@@ -21,13 +22,13 @@ const stdAssignmentSlice = createSlice({
             })
             .addCase(stdGetAssignment.fulfilled, (state, action) => {
                 state.loading = false;
-                state.assignmentData = action.payload;
+                state.assignment = action.payload;
             })
             .addCase(stdGetAssignment.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload || true;
             })
-            
+
             // for doing assignment
             .addCase(stdDoAssignment.pending, (state, action) => {
                 state.loading = true;
@@ -38,6 +39,19 @@ const stdAssignmentSlice = createSlice({
                 // state.assignmentData = action.payload;
             })
             .addCase(stdDoAssignment.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload || true;
+            })
+
+            .addCase(stdGetFilteredAssignment.pending, (state, action) => {
+                state.loading = true;
+                state.error = false;
+            })
+            .addCase(stdGetFilteredAssignment.fulfilled, (state, action) => {
+                state.loading = false;
+                state.assignmentData = action.payload;
+            })
+            .addCase(stdGetFilteredAssignment.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload || true;
             })
