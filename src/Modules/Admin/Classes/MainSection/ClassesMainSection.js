@@ -38,6 +38,12 @@ const ClassesMainSection = () => {
 
   return (
     <div className="min-h-screen p-4">
+      {/* Conditionally show heading for teachers */}
+      {role === "teacher" && (
+        <h1 className="text-2xl font-semibold mb-4 "></h1>
+      )}
+
+      {/* For Admin: Add new class button */}
       {role === "admin" && (
         <div className="flex justify-end">
           <button
@@ -49,6 +55,7 @@ const ClassesMainSection = () => {
           </button>
         </div>
       )}
+
       {loading ? (
         <Spinner />
       ) : error ? (
@@ -67,6 +74,8 @@ const ClassesMainSection = () => {
           ))}
         </div>
       )}
+
+      {/* Sidebar for adding/editing classes for Admin */}
       {role === "admin" && (
         <Sidebar
           isOpen={isSidebarOpen}

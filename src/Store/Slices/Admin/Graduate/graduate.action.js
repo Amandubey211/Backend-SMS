@@ -31,3 +31,30 @@ export const fetchGraduates = createAsyncThunk(
     }
   }
 );
+
+
+
+
+export const demoteStudents = createAsyncThunk(
+  "students/demoteStudents",
+  async ({ studentIds }, { rejectWithValue, getState }) => {
+    const { role } = getState().common.auth;
+    const token = localStorage.getItem(`${role}:token`);
+
+    if (!token) {
+      return rejectWithValue("Authentication failed!");
+    }
+
+    try {
+      const response = await axios.put(`${baseUrl}/admin/demote/students`, { studentIds }, {
+        headers: {
+          Authentication: token,
+        },
+      });
+
+      return response.data; // Assume success returns the modified students
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || error.message);
+    }
+  }
+);

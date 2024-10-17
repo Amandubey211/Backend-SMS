@@ -1,7 +1,6 @@
-import React, { useState } from "react";
+import React from "react";
 
-const GraduateList = ({ students, onViewDetails }) => {
-  const [selectedStudents, setSelectedStudents] = useState([]);
+const GraduateList = ({ students, selectedStudents, setSelectedStudents, onViewDetails, onDemoteStudents }) => {
 
   // Function to handle individual row selection
   const handleSelect = (studentId) => {
@@ -29,12 +28,24 @@ const GraduateList = ({ students, onViewDetails }) => {
 
   return (
     <div>
-      <h1 className="text-xl font-semibold mb-4">All Graduates</h1>
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-xl font-semibold">All Graduates</h1>
+
+        {selectedStudents.length > 0 && (
+          <button
+            className="px-4 py-2 bg-red-500 text-white rounded-md"
+            onClick={() => onDemoteStudents(selectedStudents)}
+          >
+            {selectedStudents.length === 1 ? "Demote Student" : "Demote All Students"}
+          </button>
+        )}
+      </div>
+
       <div className="overflow-hidden rounded-lg shadow-md">
         <table className="min-w-full bg-white border border-gray-200">
           <thead>
             <tr className="bg-gray-100 border-b">
-              <th className="py-2 px-3 text-center align-middle w-10"> {/* Align center with a fixed width */}
+              <th className="py-2 px-3 text-center align-middle w-10">
                 <input
                   type="checkbox"
                   className="align-middle"
@@ -75,7 +86,7 @@ const GraduateList = ({ students, onViewDetails }) => {
                 key={student._id} // Use _id as the key since that's the ID from backend
                 className="hover:bg-gray-50 transition-all duration-200 border-b"
               >
-                <td className="py-2 px-3 text-center align-middle w-10"> {/* Ensure consistent width and alignment */}
+                <td className="py-2 px-3 text-center align-middle w-10">
                   <input
                     type="checkbox"
                     className="align-middle"
@@ -94,13 +105,13 @@ const GraduateList = ({ students, onViewDetails }) => {
                   {student.firstName} {student.lastName}
                 </td>
                 <td className="py-2 px-3 text-xs whitespace-nowrap">
-                  {student.Q_Id} {/* Display QID */}
+                  {student.Q_Id}
                 </td>
                 <td className="py-2 px-3 text-xs whitespace-nowrap">
-                  {student.admissionNumber} {/* Display Admission Number */}
+                  {student.admissionNumber}
                 </td>
                 <td className="py-2 px-3 text-xs whitespace-nowrap">
-                  {student.academicYear?.year} {/* Ensure academicYear exists */}
+                  {student.academicYear?.year}
                 </td>
                 <td className="py-2 px-3 text-xs truncate max-w-xs">
                   {student.email}
