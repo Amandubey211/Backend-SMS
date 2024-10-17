@@ -49,6 +49,12 @@ const GraduateList = ({ students, onViewDetails }) => {
                 Name
               </th>
               <th className="py-2 px-3 text-left text-xs font-semibold text-gray-600">
+                QID
+              </th>
+              <th className="py-2 px-3 text-left text-xs font-semibold text-gray-600">
+                Admission Number
+              </th>
+              <th className="py-2 px-3 text-left text-xs font-semibold text-gray-600">
                 Graduation Year
               </th>
               <th className="py-2 px-3 text-left text-xs font-semibold text-gray-600">
@@ -86,6 +92,12 @@ const GraduateList = ({ students, onViewDetails }) => {
                 </td>
                 <td className="py-2 px-3 text-xs whitespace-nowrap">
                   {student.firstName} {student.lastName}
+                </td>
+                <td className="py-2 px-3 text-xs whitespace-nowrap">
+                  {student.Q_Id} {/* Display QID */}
+                </td>
+                <td className="py-2 px-3 text-xs whitespace-nowrap">
+                  {student.admissionNumber} {/* Display Admission Number */}
                 </td>
                 <td className="py-2 px-3 text-xs whitespace-nowrap">
                   {student.academicYear?.year} {/* Ensure academicYear exists */}
