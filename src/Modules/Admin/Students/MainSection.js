@@ -7,7 +7,10 @@ import { useParams } from "react-router-dom";
 import Spinner from "../../../Components/Common/Spinner";
 import { FaUsers } from "react-icons/fa";
 import { fetchStudentsByClassAndSection } from "../../../Store/Slices/Admin/Class/Students/studentThunks";
-import { fetchStudentGrades, fetchStudentSubjectProgress } from "../../../Store/Slices/Admin/Users/Students/student.action";
+import {
+  fetchStudentGrades,
+  fetchStudentSubjectProgress,
+} from "../../../Store/Slices/Admin/Users/Students/student.action";
 
 const MainSection = () => {
   const [activeSection, setActiveSection] = useState("Everyone");
@@ -32,13 +35,19 @@ const MainSection = () => {
 
   useEffect(() => {
     fetchStudents(activeSection);
-  }, [activeSection, fetchStudents]); 
+  }, [activeSection, fetchStudents]);
   const handleSeeGradeClick = (student) => {
     setStudentData(student);
     setIsModalOpen(true);
     const params = {};
-      dispatch(fetchStudentGrades({params,studentId:student?._id,studentClassId:cid}));
-      dispatch(fetchStudentSubjectProgress(student?._id));
+    dispatch(
+      fetchStudentGrades({
+        params,
+        studentId: student?._id,
+        studentClassId: cid,
+      })
+    );
+    dispatch(fetchStudentSubjectProgress(student?._id));
   };
 
   const handleCloseModal = () => {
@@ -68,7 +77,11 @@ const MainSection = () => {
           students={students}
         />
       )}
-      <StudentGradeModal isOpen={isModalOpen} onClose={handleCloseModal} student={studentData} /> 
+      <StudentGradeModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        student={studentData}
+      />
     </div>
   );
 };
