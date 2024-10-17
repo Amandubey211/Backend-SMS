@@ -8,8 +8,7 @@ import { baseUrl } from "../../../../../../../config/Common";
 
 export const stdGetAssignment = createAsyncThunk(
     'assignment/stdGetAssignment',
-    async (_, { rejectWithValue, dispatch }) => {
-
+    async (aid, { rejectWithValue, dispatch }) => {
         const token = localStorage.getItem("student:token");
         if (!token) {
             dispatch(setShowError(true));
@@ -18,26 +17,63 @@ export const stdGetAssignment = createAsyncThunk(
 
         try {
             dispatch(setShowError(false));
-            const res = await axios.get(`${baseUrl}/`, {
+            const res = await axios.get(`${baseUrl}/student/studentAssignment/${aid}`, {
                 headers: {
                     Authentication: token
                 }
             });
 
-            const data = res?.data;
-            console.log(data);
+            const data = res?.data?.data;
+            console.log("assifhn--", data);
+            return data;
         } catch (error) {
-            console.log("Error in student class teacher", error);
             const err = ErrorMsg(error);
             dispatch(setShowError(true));
             return rejectWithValue(err.message);
         }
     }
-) 
+)
 
 export const stdDoAssignment = createAsyncThunk(
     'assignment/stdDoAssignment',
-    async ({}, { rejectWithValue, dispatch }) => {
+    async ({ assignmentId, editorContent, fileUrls }, { rejectWithValue, dispatch }) => {
+
+        const token = localStorage.getItem("student:token");
+        if (!token) {
+            dispatch(setShowError(true));
+            return rejectWithValue('Authentication failed!');
+        }
+
+        const submissionData = {
+            content: editorContent,
+            media: fileUrls,
+            type: 'Media Upload',
+            comment: 'No comments',
+        };
+
+        try {
+            dispatch(setShowError(false));
+
+            const res = await axios.post(`${baseUrl}/student/studentAssignment/submit/${assignmentId}`, submissionData, {
+                headers: {
+                    Authentication: token
+                }
+            });
+            const data = res?.data;
+            return data
+
+
+        } catch (error) {
+            const err = ErrorMsg(error);
+            dispatch(setShowError(true));
+            return rejectWithValue(err.message);
+        }
+    }
+)
+
+export const stdGetFilteredAssignment = createAsyncThunk(
+    'assignment/stdGetFilteredAssignment',
+    async ({ cid, subjectId, moduleId, chapterId }, { rejectWithValue, dispatch }) => {
 
         const token = localStorage.getItem("student:token");
         if (!token) {
@@ -47,19 +83,55 @@ export const stdDoAssignment = createAsyncThunk(
 
         try {
             dispatch(setShowError(false));
-            const res = await axios.put(`${baseUrl}/`,{
-                headers: {
-                    Authentication: token
+            const response = await axios.get(
+                `${baseUrl}/student/studentAssignment/class/${cid}`,
+                {
+                    headers: { Authentication: token },
+                    params: { subjectId, moduleId, chapterId },
                 }
-            });
+            );
+            const data = response?.data?.data;
 
-            const data = res?.data;
-            console.log(data);
+            return data
         } catch (error) {
-            console.log("Error in student class teacher", error);
             const err = ErrorMsg(error);
             dispatch(setShowError(true));
             return rejectWithValue(err.message);
         }
     }
-) 
+)
+
+export const stdReattemptAssignment = createAsyncThunk(
+    'assignment/stdReattemptAssignment',
+    async ({ aid, submissionContent, submissionType, submissionComment, fileUrls }, { rejectWithValue, dispatch }) => {
+
+        const token = localStorage.getItem("student:token");
+        if (!token) {
+            dispatch(setShowError(true));
+            return rejectWithValue('Authentication failed!');
+        }
+
+        try {
+            dispatch(setShowError(false));
+            const response = await axios.put(
+                `${baseUrl}/student/studentAssignment/reattempt/${aid}`,
+                {
+                    content: submissionContent,
+                    type: submissionType,
+                    comment: submissionComment,
+                    media: fileUrls,
+                },
+                {
+                    headers: { Authentication: token },
+                    //params: { subjectId, moduleId, chapterId },
+                }
+            );
+            const data = response?.data?.data;
+            return data
+        } catch (error) {
+            const err = ErrorMsg(error);
+            dispatch(setShowError(true));
+            return rejectWithValue(err.message);
+        }
+    }
+)
