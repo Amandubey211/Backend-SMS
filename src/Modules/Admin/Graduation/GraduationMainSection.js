@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import GraduateList from "./Components/GraduateList";
-import Spinner from "../../../Components/Common/Spinner";
-import Error from "../../../Components/Common/Error";
 import TopNavigationWithFilters from "./Components/TopNavigationWithFilters";
 import Sidebar from "./Components/Sidebar";
-import { fetchGraduates } from "../../../Store/Slices/Admin/Graduate/graduate.action"; // Ensure the correct path
+import { fetchGraduates, demoteStudents } from "../../../Store/Slices/Admin/Graduate/graduate.action"; // Ensure the correct path
 import { setSelectedGraduate, clearSelectedGraduate } from "../../../Store/Slices/Admin/Graduate/graduateSlice"; // Ensure the correct path
 
 const GraduationMainSection = () => {
@@ -19,6 +17,7 @@ const GraduationMainSection = () => {
   const [filteredStudents, setFilteredStudents] = useState([]); // Filtered students data
   const [filters, setFilters] = useState({}); // Stores applied filters
   const [isSidebarOpen, setSidebarOpen] = useState(false); // Sidebar visibility state
+  const [selectedStudents, setSelectedStudents] = useState([]); // State to track selected students
 
   // Fetch graduate data on component mount (initial load without filters)
   useEffect(() => {
@@ -65,15 +64,16 @@ const GraduationMainSection = () => {
     setSidebarOpen(false);
   };
 
-  // Loading state
-  if (loading) {
-    return <Spinner />;
-  }
+  // Handle demoting students
+  const handleDemoteStudents = () => {
+    // Dispatch action with selected students' IDs
+    dispatch(demoteStudents({ studentIds: selectedStudents }));
+  };
 
-  // Error state
-  if (error) {
-    return <Error message={error} />;
-  }
+  // Handle Sidebar demotion
+  const handleSidebarDemote = (studentId) => {
+    dispatch(demoteStudents({ studentIds: [studentId] }));
+  };
 
   return (
     <div className="relative p-5">
@@ -83,15 +83,24 @@ const GraduationMainSection = () => {
       {/* Display the filtered students */}
       <GraduateList
         students={filteredStudents}
+        selectedStudents={selectedStudents}
+        setSelectedStudents={setSelectedStudents} // Pass the setter function here
         onViewDetails={handleViewDetails}
         currentPage={currentPage}
         totalPages={totalPages}
         onPageChange={handlePageChange}
+        onDemoteStudents={handleDemoteStudents} // Pass demote function here
+        loading={loading} // Pass loading state
+        error={error} // Pass error state
       />
 
       {/* Sidebar */}
       {isSidebarOpen && selectedGraduate && (
-        <Sidebar student={selectedGraduate} closeSidebar={closeSidebar} />
+        <Sidebar
+          student={selectedGraduate}
+          closeSidebar={closeSidebar}
+          onDemote={() => handleSidebarDemote(selectedGraduate._id)} // Pass demote function
+        />
       )}
     </div>
   );

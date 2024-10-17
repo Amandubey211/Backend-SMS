@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchGraduates } from "./graduate.action";
+import { fetchGraduates, demoteStudents } from "./graduate.action"; // Import demoteStudents action
 
 const initialState = {
   graduates: [],
@@ -9,6 +9,9 @@ const initialState = {
   currentPage: 1,
   totalPages: 1,
   selectedGraduate: null,
+  demotionLoading: false,  // New state for handling demotion loading
+  demotionError: null,     // New state for handling demotion error
+  demotionSuccess: false,  // New state for handling demotion success
 };
 
 const graduateSlice = createSlice({
@@ -21,9 +24,15 @@ const graduateSlice = createSlice({
     clearSelectedGraduate: (state) => {
       state.selectedGraduate = null;
     },
+    resetDemotionState: (state) => {
+      state.demotionLoading = false;
+      state.demotionError = null;
+      state.demotionSuccess = false;
+    },
   },
   extraReducers: (builder) => {
     builder
+      // Fetch Graduates Cases
       .addCase(fetchGraduates.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -38,9 +47,29 @@ const graduateSlice = createSlice({
       .addCase(fetchGraduates.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Failed to fetch graduates";
+      })
+      
+      // Demote Students Cases
+      .addCase(demoteStudents.pending, (state) => {
+        state.demotionLoading = true;
+        state.demotionError = null;
+        state.demotionSuccess = false;
+      })
+      .addCase(demoteStudents.fulfilled, (state) => {
+        state.demotionLoading = false;
+        state.demotionSuccess = true;
+      })
+      .addCase(demoteStudents.rejected, (state, action) => {
+        state.demotionLoading = false;
+        state.demotionError = action.payload || "Failed to demote students";
       });
   },
 });
 
-export const { setSelectedGraduate, clearSelectedGraduate } = graduateSlice.actions;
+export const { 
+  setSelectedGraduate, 
+  clearSelectedGraduate, 
+  resetDemotionState // Export the new demotion reset action
+} = graduateSlice.actions;
+
 export default graduateSlice.reducer;

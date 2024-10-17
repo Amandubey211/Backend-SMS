@@ -12,6 +12,7 @@ const AssignTeacher = lazy(() => import("./AssignTeacher"));
 
 const NavigationBar = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const role = useSelector((store) => store.common.auth.role);
   const dispatch = useDispatch();
   const { cid } = useParams();
   const sections = useSelector(
@@ -54,15 +55,19 @@ const NavigationBar = () => {
             {totalTeachers}
           </span>
         </div>
-        <button
-          onClick={handleSidebarOpen}
-          className="flex items-center border border-gray-300 ps-5 py-0 rounded-full"
-        >
-          <span className="mr-2">Assign Instructor</span>
-          <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full w-12 h-12 flex items-center justify-center">
-            <span className="text-3xl -mt-2">+</span>
-          </div>
-        </button>
+        
+        {/* Conditionally render the Assign Instructor button */}
+        {role !== "teacher" && (
+          <button
+            onClick={handleSidebarOpen}
+            className="flex items-center border border-gray-300 ps-5 py-0 rounded-full"
+          >
+            <span className="mr-2">Assign Instructor</span>
+            <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full w-12 h-12 flex items-center justify-center">
+              <span className="text-3xl -mt-2">+</span>
+            </div>
+          </button>
+        )}
       </div>
 
       <Sidebar
