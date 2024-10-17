@@ -1,36 +1,34 @@
 import React, { useState, useEffect, useRef } from "react";
-import { CiSearch, CiFilter } from "react-icons/ci"; // Icons for search and filter
+import { CiSearch, CiFilter } from "react-icons/ci";
 
 const TopNavigationWithFilters = ({ onSearch, onFilterChange }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [showFilter, setShowFilter] = useState(false);
-  const filterRef = useRef(null);
-
   const [filters, setFilters] = useState({
-    academicYear: "",
-    class: "",
-    section: "",
-    groupName: "",
+    batchStart: "",
+    batchEnd: "",
+    email: "",
+    Q_Id: "",
+    admissionNumber: "",
   });
 
-  const availableFilters = {
-    academicYear: ["2020-2021", "2021-2022", "2022-2023"],
-    classes: ["Computer Science", "Information Technology", "Software Engineering"],
-    sections: ["A", "B", "C"],
-    groupName: ["CS EXP", "IT EXP", "WD EXP"],
-  };
+  const filterRef = useRef(null);
 
   // Handle search query input
   const handleSearchChange = (e) => {
-    setSearchQuery(e.target.value);
-    onSearch(e.target.value); // Call the parent function to filter the list
+    setSearchQuery(e.target.value); // Only update searchQuery locally
   };
 
-  // Handle filter changes
+  // Apply filters and search when user clicks the filter button
+  const applyFilters = () => {
+    const updatedFilters = { ...filters, searchQuery }; // Include search query in the filters
+    onFilterChange(updatedFilters); // Trigger the parent function to fetch the filtered list
+    setShowFilter(false); // Close the filter dropdown after applying
+  };
+
+  // Handle individual filter changes without triggering a query
   const handleFilterChange = (filterName, value) => {
-    const updatedFilters = { ...filters, [filterName]: value };
-    setFilters(updatedFilters);
-    onFilterChange(updatedFilters); // Call the parent function to filter the list
+    setFilters((prevFilters) => ({ ...prevFilters, [filterName]: value }));
   };
 
   // Close filter dropdown when clicking outside
@@ -54,7 +52,7 @@ const TopNavigationWithFilters = ({ onSearch, onFilterChange }) => {
           type="text"
           placeholder="Search by Name or Email"
           value={searchQuery}
-          onChange={handleSearchChange}
+          onChange={handleSearchChange} // Only update locally without triggering a query
           className="px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-purple-300 w-full transition-all duration-300"
         />
         <button className="absolute right-3">
@@ -74,75 +72,81 @@ const TopNavigationWithFilters = ({ onSearch, onFilterChange }) => {
 
         {/* Filter dropdown */}
         {showFilter && (
-          <div className="absolute right-0 mt-2 w-64 bg-white shadow-md rounded-lg p-4">
-            <h3 className="font-semibold mb-2">Filter By</h3>
+          <div className="absolute right-0 mt-2 w-72 bg-white shadow-md rounded-lg p-4 z-50">
+            <h3 className="font-semibold mb-4">Filter By</h3>
 
-            {/* Academic Year Filter */}
+            {/* Batch Start Filter */}
             <div className="mb-4">
-              <label className="block mb-1">Academic Year</label>
-              <select
+              <label className="block mb-1 font-medium">Batch Start (Year)</label>
+              <input
+                type="number"
+                min="1900"
+                max={new Date().getFullYear()}
+                placeholder="Enter Start Year"
                 className="w-full border px-3 py-2 rounded-lg"
-                onChange={(e) => handleFilterChange("academicYear", e.target.value)}
-                value={filters.academicYear}
-              >
-                <option value="">Select Year</option>
-                {availableFilters.academicYear.map((year) => (
-                  <option key={year} value={year}>
-                    {year}
-                  </option>
-                ))}
-              </select>
+                onChange={(e) => handleFilterChange("batchStart", e.target.value)}
+                value={filters.batchStart}
+              />
             </div>
 
-            {/* Class/Department Filter */}
+            {/* Batch End Filter */}
             <div className="mb-4">
-              <label className="block mb-1">Class/Department</label>
-              <select
+              <label className="block mb-1 font-medium">Batch End (Year)</label>
+              <input
+                type="number"
+                min="1900"
+                max={new Date().getFullYear()}
+                placeholder="Enter End Year"
                 className="w-full border px-3 py-2 rounded-lg"
-                onChange={(e) => handleFilterChange("class", e.target.value)}
-                value={filters.class}
-              >
-                <option value="">Select Class</option>
-                {availableFilters.classes.map((classItem) => (
-                  <option key={classItem} value={classItem}>
-                    {classItem}
-                  </option>
-                ))}
-              </select>
+                onChange={(e) => handleFilterChange("batchEnd", e.target.value)}
+                value={filters.batchEnd}
+              />
             </div>
 
-            {/* Section Filter */}
+            {/* Email Filter */}
             <div className="mb-4">
-              <label className="block mb-1">Section</label>
-              <select
+              <label className="block mb-1 font-medium">Email</label>
+              <input
+                type="email"
+                placeholder="Enter Email"
                 className="w-full border px-3 py-2 rounded-lg"
-                onChange={(e) => handleFilterChange("section", e.target.value)}
-                value={filters.section}
-              >
-                <option value="">Select Section</option>
-                {availableFilters.sections.map((section) => (
-                  <option key={section} value={section}>
-                    {section}
-                  </option>
-                ))}
-              </select>
+                onChange={(e) => handleFilterChange("email", e.target.value)}
+                value={filters.email}
+              />
             </div>
 
-            {/* Group Name Filter */}
-            <div>
-              <label className="block mb-1">Group Name</label>
-              <select
+            {/* Q_Id Filter */}
+            <div className="mb-4">
+              <label className="block mb-1 font-medium">Q_Id</label>
+              <input
+                type="text"
+                placeholder="Enter Q_Id"
                 className="w-full border px-3 py-2 rounded-lg"
-                onChange={(e) => handleFilterChange("groupName", e.target.value)}
-                value={filters.groupName}
+                onChange={(e) => handleFilterChange("Q_Id", e.target.value)}
+                value={filters.Q_Id}
+              />
+            </div>
+
+            {/* Admission Number Filter */}
+            <div className="mb-4">
+              <label className="block mb-1 font-medium">Admission Number</label>
+              <input
+                type="text"
+                placeholder="Enter Admission Number"
+                className="w-full border px-3 py-2 rounded-lg"
+                onChange={(e) => handleFilterChange("admissionNumber", e.target.value)}
+                value={filters.admissionNumber}
+              />
+            </div>
+
+            {/* Apply Filters Button */}
+            <div className="flex justify-end">
+              <button
+                className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-all duration-300"
+                onClick={applyFilters} // Only trigger query when the button is clicked
               >
-                <option value="">Select Group</option>
-                {availableFilters.groupName.map((group) => (
-                  <option key={group} value={group}>
-                    {group}
-                  </option>
-                ))}
-              </select>
+                Apply Filters
+              </button>
             </div>
           </div>
         )}

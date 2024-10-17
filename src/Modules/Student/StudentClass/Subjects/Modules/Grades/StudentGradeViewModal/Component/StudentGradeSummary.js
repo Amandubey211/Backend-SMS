@@ -33,31 +33,31 @@ const StudentGradeSummary = ({ studentGrade }) => {
           </div>
         </div>
         <div>
-          <div className=" mt-4 p-3">
+          <div className=" p-3">
             <h3 className="text-md font-semibold mb-4">Grade Summary</h3>
             <div className="flex justify-between mb-2">
               <p className="text-sm">Assignment</p>
               {/* <p className="text-sm">{assignment} / 1000</p> */}
               <p className="text-sm">
-                {totalAssignmentScore} /{assignment}
+                {totalAssignmentScore} / {assignment}
               </p>
             </div>
             <div className="flex justify-between mb-2">
               <p className="text-sm">Group Assignment</p>
               <p className="text-sm">
-                {groupAssignment} /{totalGroupAssignmentScore}
+                {groupAssignment} / {totalGroupAssignmentScore}
               </p>
             </div>
             <div className="flex justify-between mb-2">
               <p className="text-sm">Quiz</p>
               <p className="text-sm">
-                {totalQuizCompletedScore} /{quiz}
+                {totalQuizCompletedScore} / {quiz}
               </p>
             </div>
             <div className="flex justify-between mb-2">
               <p className="text-sm">Group Quiz</p>
               <p className="text-sm">
-                {groupQuiz} /{totalGroupQuizScore}{" "}
+                {groupQuiz} / {totalGroupQuizScore}{" "}
               </p>
             </div>
             <div className="flex justify-between mb-2">

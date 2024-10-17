@@ -16,7 +16,7 @@ import subjectGradesReducer from "./Slices/Admin/Class/grades/gradesSlice";
 import subjectAssignmentReducer from "./Slices/Admin/Class/Assignments/assignmentSlice";
 import subjectQuizReducer from "./Slices/Admin/Class/Quiz/quizSlice";
 import sectionReducer from "./Slices/Admin/Class/Section_Groups/groupSectionSlice";
-
+import graduateReducer from "./Slices/Admin/Graduate/graduateSlice"
 import classStudentReducer from "./Slices/Admin/Class/Students/studentSlice";
 import attendanceReducer from "./Slices/Admin/Class/Attendence/attendanceSlice";
 import verificationReducer from "./Slices/Admin/Verification/VerificationSlice";
@@ -54,11 +54,14 @@ import studentClassmateReducer from "../Store/Slices/Student/MyClass/Class/class
 import studentAttendanceReducer from "../Store/Slices/Student/MyClass/Class/Attendance/stdAttendanceSlice";
 import studentSubjectReducer from "../Store/Slices/Student/MyClass/Class/Subjects/subjectSlice";
 import studentModuleReducer from "../Store/Slices/Student/MyClass/Class/Subjects/Modules/moduleSlice";
+import studentAssignmentReducer from "../Store/Slices/Student/MyClass/Class/Subjects/Assignment/assignmentSlice";
+import studentQuizReducer from "../Store/Slices/Student/MyClass/Class/Subjects/Quizes/quizesSlice";
 import studentSyllabusReducer from "../Store/Slices/Student/MyClass/Class/Subjects/Syllabus/syllabusSlice";
 import studentPagesReducer from "../Store/Slices/Student/MyClass/Class/Subjects/Pages/pagesSlice";
 import studentDiscussionReducer from "../Store/Slices/Student/MyClass/Class/Subjects/Discussion/discussionSlice";
 import studentAnnounceReducer from "../Store/Slices/Student/MyClass/Class/Subjects/Announcement/announcementSlice";
 import studentAssignmentReducer from "../Store/Slices/Student/MyClass/Class/Subjects/Assignment/assignmentSlice";
+
 // parent
 import dashboardReducer from "../Store/Slices/Parent/Dashboard/dashboardSlice";
 import financeReducer from "../Store/Slices/Parent/Finance/financeSlice";
@@ -128,7 +131,7 @@ const AdminReducer = combineReducers({
   comments: adminCommentReducer,
   assignments: adminAssignmentReducer,
   quizzes: adminQuizReducer,
-
+  graduates: graduateReducer,
   all_students: allStudentReducer,
   all_parents: allParentReducer,
   all_staff: allstaffReducer,
@@ -157,6 +160,8 @@ const studentReducer = combineReducers({
     studentSubjectReducer
   ),
   studentModule: studentModuleReducer,
+  studentAssignment: studentAssignmentReducer,
+  studentQuiz: studentQuizReducer,
   studentSyllabus: studentSyllabusReducer,
   studentPages: studentPagesReducer,
   studentDiscussion: studentDiscussionReducer,

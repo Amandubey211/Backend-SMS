@@ -91,7 +91,7 @@ const AllTeachers = () => {
             onClose={handleSidebarClose}
             title={
               <span className="bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent bg-clip-text">
-                {sidebarContent === "viewTeacher" ? "Quick View of Staff" : "Add/Edit Staff"}
+                {sidebarContent === "viewTeacher" ? "Quick View of Teacher" : "Add/Edit Teacher"}
               </span>
             }
             width= {sidebarContent === "viewTeacher" ? "30%" : "60%"}

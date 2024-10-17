@@ -9,7 +9,6 @@ import { baseUrl } from "../../../../../../../config/Common";
 export const stdGetAssignment = createAsyncThunk(
     'assignment/stdGetAssignment',
     async (aid, { rejectWithValue, dispatch }) => {
-
         const token = localStorage.getItem("student:token");
         if (!token) {
             dispatch(setShowError(true));

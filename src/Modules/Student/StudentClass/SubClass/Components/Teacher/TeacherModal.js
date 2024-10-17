@@ -1,39 +1,32 @@
 import React from "react";
 import { AiOutlineClose } from "react-icons/ai";
 import profileImage from "../../../../../../Assets/DashboardAssets/profileIcon.png";
-
-const TeacherModal = ({ teacher, onClose }) => {
-
+import { MdOutlineCall} from "react-icons/md";
+import { GiBlackBook } from "react-icons/gi";
+const TeacherModal = ({ teacher }) => {
+  console.log('---',teacher);
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 animate-fadeIn">
-      <div className="bg-white w-full max-w-md p-6 rounded-lg shadow-lg relative animate-scaleUp">
-        <button
-          onClick={onClose}
-          className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 focus:outline-none"
-        >
-          <AiOutlineClose size={24} />
-        </button>
-
-        {/* Profile Image */}
-        <div className="flex flex-col items-center">
-          <div className="w-24 h-24 mb-4">
-            <img
-              src={teacher?.profile || profileImage}
-              alt={`${teacher?.name}'s Profile`}
-              className="object-cover w-full h-full rounded-full border-4 border-purple-500"
-            />
-          </div>
-        </div>
-
-        {/* Modal Content */}
-        <div className="text-center space-y-4">
-          <h2 className="text-2xl font-bold text-gray-800">{teacher?.name || "N/A"}</h2>
-          <p className="text-gray-600">Subject: {teacher?.subject || "N/A"}</p>
-          <p className="text-gray-600">Phone: {teacher?.phone || "N/A"}</p>
-        </div>
-      </div>
+    <div className="flex flex-col">
+    <div className="flex flex-col justify-center items-center py-3">
+      <img className="object-cover rounded-full w-[100px] h-[100px]" src={teacher?.profile || profileImage} alt={teacher?.name} />
+      <h3 className="text-lg font-medium">{teacher?.name}</h3>
     </div>
+    <div className="flex flex-col gap-4 p-4">
+   
+      <InfoItem icon={<MdOutlineCall className="text-pink-600 text-2xl"/>} label="Phone" value={teacher?.phone} />
+      <InfoItem icon={<GiBlackBook className="text-pink-600 text-2xl"/>} label="subject" value={teacher?.subject} />
+    </div>
+  </div>
+   
   );
 };
-
+const InfoItem = ({ icon, label, value }) => (
+  <div className="flex items-center gap-3">
+    {icon}
+    <div className="flex flex-col">
+      <span className="font-medium">{label}</span>
+      <span className="text-gray-500 text-sm">{value}</span>
+    </div>
+  </div>
+);
 export default TeacherModal;

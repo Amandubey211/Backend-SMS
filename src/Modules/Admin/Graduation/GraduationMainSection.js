@@ -1,37 +1,38 @@
-import React, { useState, useEffect } from "react";
-import GraduateList from "./Components/GraduateList"; // Component for listing graduate students
-import Spinner from "../../../Components/Common/Spinner"; // For loading state
-import Error from "../../../Components/Common/Error"; // For error handling
-import TopNavigationWithFilters from "./Components/TopNavigationWithFilters"; // Search and filter component
-import graduateData from "./DataFile/graduateData.json"; // Hardcoded graduates data
-import Sidebar from "./Components/Sidebar"; // Sidebar for viewing student details
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import GraduateList from "./Components/GraduateList";
+import Spinner from "../../../Components/Common/Spinner";
+import Error from "../../../Components/Common/Error";
+import TopNavigationWithFilters from "./Components/TopNavigationWithFilters";
+import Sidebar from "./Components/Sidebar";
+import { fetchGraduates } from "../../../Store/Slices/Admin/Graduate/graduate.action"; // Ensure the correct path
+import { setSelectedGraduate, clearSelectedGraduate } from "../../../Store/Slices/Admin/Graduate/graduateSlice"; // Ensure the correct path
 
 const GraduationMainSection = () => {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(false);
-  const [students, setStudents] = useState([]); // All students data
+  const dispatch = useDispatch();
+
+  // Accessing Redux state
+  const { graduates, loading, error, selectedGraduate, total, currentPage, totalPages } = useSelector(
+    (state) => state?.admin?.graduates // Access the correct slice
+  );
+
   const [filteredStudents, setFilteredStudents] = useState([]); // Filtered students data
-  const [selectedStudent, setSelectedStudent] = useState(null); // Selected student for sidebar
+  const [filters, setFilters] = useState({}); // Stores applied filters
   const [isSidebarOpen, setSidebarOpen] = useState(false); // Sidebar visibility state
 
+  // Fetch graduate data on component mount (initial load without filters)
   useEffect(() => {
-    // Simulate fetching data
-    setLoading(true);
-    setTimeout(() => {
-      try {
-        setStudents(graduateData); // Load hardcoded data
-        setFilteredStudents(graduateData); // Initialize the filtered students
-        setLoading(false);
-      } catch (e) {
-        setError(true);
-        setLoading(false);
-      }
-    }, 1000); // Simulated delay
-  }, []);
+    dispatch(fetchGraduates({ page: 1, limit: 10 })); // Fetch all graduates initially with default pagination
+  }, [dispatch]);
+
+  // Update filtered students whenever the graduates data changes
+  useEffect(() => {
+    setFilteredStudents(graduates); // Update filteredStudents when graduates change
+  }, [graduates]);
 
   // Handle real-time search
   const handleSearch = (query) => {
-    const filtered = students.filter((student) => {
+    const filtered = graduates.filter((student) => {
       const fullName = `${student.firstName} ${student.lastName}`.toLowerCase();
       return (
         fullName.includes(query.toLowerCase()) ||
@@ -41,37 +42,37 @@ const GraduationMainSection = () => {
     setFilteredStudents(filtered);
   };
 
-  // Handle filtering
+  // Handle filter changes
   const handleFilterChange = (filters) => {
-    const filtered = students.filter((student) => {
-      return (
-        (!filters.academicYear || student.academicYear === filters.academicYear) &&
-        (!filters.class || student.className === filters.class) &&
-        (!filters.section || student.sectionName === filters.section) &&
-        (!filters.groupName || student.groupName === filters.groupName)
-      );
-    });
-    setFilteredStudents(filtered);
+    setFilters(filters); // Update local filters state
+    dispatch(fetchGraduates({ ...filters, page: 1, limit: 10 })); // Fetch graduates with filters applied
+  };
+
+  // Handle pagination
+  const handlePageChange = (newPage) => {
+    dispatch(fetchGraduates({ ...filters, page: newPage, limit: 10 }));
   };
 
   // Handle "View Details" click to open the sidebar with the selected student's data
   const handleViewDetails = (student) => {
-    setSelectedStudent(student);
+    dispatch(setSelectedGraduate(student)); // Set selected student in Redux
     setSidebarOpen(true);
   };
 
   // Close the sidebar
   const closeSidebar = () => {
+    dispatch(clearSelectedGraduate()); // Clear selected student in Redux
     setSidebarOpen(false);
-    setSelectedStudent(null); // Reset student when closing sidebar
   };
 
+  // Loading state
   if (loading) {
     return <Spinner />;
   }
 
+  // Error state
   if (error) {
-    return <Error />;
+    return <Error message={error} />;
   }
 
   return (
@@ -80,11 +81,17 @@ const GraduationMainSection = () => {
       <TopNavigationWithFilters onSearch={handleSearch} onFilterChange={handleFilterChange} />
 
       {/* Display the filtered students */}
-      <GraduateList students={filteredStudents} onViewDetails={handleViewDetails} />
+      <GraduateList
+        students={filteredStudents}
+        onViewDetails={handleViewDetails}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={handlePageChange}
+      />
 
       {/* Sidebar */}
-      {isSidebarOpen && (
-        <Sidebar student={selectedStudent} closeSidebar={closeSidebar} />
+      {isSidebarOpen && selectedGraduate && (
+        <Sidebar student={selectedGraduate} closeSidebar={closeSidebar} />
       )}
     </div>
   );
