@@ -10,6 +10,7 @@ const AddNotice = ({ isEditing, onClose }) => {
 
   const { selectedNotice, loading } = useSelector((state) => state.admin.notice);
   const { classes } = useSelector((state) => state.admin.class); // Assuming classes are stored here
+  const role = useSelector((store) => store.common.auth.role);
 
   const [announcementData, setAnnouncementData] = useState({
     title: "",
