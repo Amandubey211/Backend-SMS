@@ -38,7 +38,7 @@ const sidebarData = [
     title: "Library",
     icon: <BsBook />,
     path: "/library",
-    roles: ["teacher"],
+    roles: ["teacher", "librarian"],
   },
   {
     title: "Users",
@@ -63,6 +63,7 @@ const sidebarData = [
         icon: <FaChalkboardTeacher />,
         path: "/users/teachers",
         roles: ["admin", "accountant"],
+
       },
       {
         title: "Accountant",
@@ -138,7 +139,7 @@ const sidebarData = [
     title: "Library",
     icon: <BsBook />,
     path: "/library",
-    roles: ["admin", "librarian"],
+    roles: ["admin"],
   },
   {
     title: "Verification",
