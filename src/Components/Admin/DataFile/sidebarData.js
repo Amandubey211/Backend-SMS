@@ -43,26 +43,26 @@ const sidebarData = [
   {
     title: "Users",
     icon: <LuUser />,
-    roles: ["admin", "teacher"],
+    roles: ["admin", "teacher","accountant"],
     items: [
       {
         title: "Student",
         icon: <FaUserGraduate />,
         path: "/users/students",
-        roles: ["admin", "teacher"],
+        roles: ["admin", "teacher","accountant"],
       },
       {
         title: "Parent",
         icon: <RiParentFill />,
         path: "/users/parents",
-        roles: ["admin", "teacher"],
+        roles: ["admin", "teacher","accountant"],
       },
       // Other user roles for admin only
       {
         title: "Teacher",
         icon: <FaChalkboardTeacher />,
         path: "/users/teachers",
-        roles: ["admin"],
+        roles: ["admin", "accountant"],
       },
       {
         title: "Accountant",
@@ -74,13 +74,13 @@ const sidebarData = [
         title: "Librarian",
         icon: <MdLocalLibrary />,
         path: "/users/librarian",
-        roles: ["admin"],
+        roles: ["admin","librarian"],
       },
       {
         title: "Staff",
         icon: <GrUserWorker />,
         path: "/users/staffs",
-        roles: ["admin", "teacher"],
+        roles: ["admin", "teacher", "accountant"],
       },
     ],
   },
@@ -112,19 +112,19 @@ const sidebarData = [
   {
     title: "NoticeBoard",
     icon: <TbNotebook />,
-    roles: ["admin", "teacher", "librarian"],
+    roles: ["admin", "teacher", "librarian","accountant"],
     items: [
       {
         title: "Announcements",
         icon: <FaClipboardList />,
         path: "/noticeboard/notice",
-        roles: ["admin", "teacher", "librarian"],
+        roles: ["admin", "teacher", "librarian","accountant"],
       },
       {
         title: "Events",
         icon: <FaBook />,
         path: "/noticeboard/events",
-        roles: ["admin", "teacher", "librarian"],
+        roles: ["admin", "teacher", "librarian","accountant"],
       },
     ],
   },
