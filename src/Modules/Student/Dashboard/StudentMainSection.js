@@ -65,6 +65,7 @@ const StudentMainSection = () => {
                 icon: "📝",
                 bgColor: "bg-green-100",
                 textColor: "text-green-600",
+                url:'/student_dash'
               },
               {
                 label: "Due Fees",
@@ -72,6 +73,7 @@ const StudentMainSection = () => {
                 icon: "💸",
                 bgColor: "bg-red-100",
                 textColor: "text-red-600",
+                url:'/student_finance'
               },
               {
                 label: "Event",
@@ -79,6 +81,7 @@ const StudentMainSection = () => {
                 icon: "📅",
                 bgColor: "bg-blue-100",
                 textColor: "text-blue-600",
+                url:'/'
               },
               {
                 label: "Notice",
@@ -86,6 +89,7 @@ const StudentMainSection = () => {
                 icon: "🔔",
                 bgColor: "bg-yellow-100",
                 textColor: "text-yellow-600",
+                url:'/'
               },
             ]
         ).map((item, index) => (

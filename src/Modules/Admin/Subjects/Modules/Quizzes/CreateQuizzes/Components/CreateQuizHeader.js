@@ -5,10 +5,7 @@ import { useDispatch } from "react-redux";
 import AddRubricModal from "../../../Rubric/Components/AddRubricModal";
 import Sidebar from "../../../../../../../Components/Common/Sidebar";
 import AddNewCriteriaForm from "../../../Rubric/Components/AddNewCriteriaForm";
-import {
-  createQuizRubricThunk,
-  updateQuizRubricThunk,
-} from "../../../../../../../Store/Slices/Admin/Class/Quiz/quizThunks";
+
 import { fetchRubricsBySubjectId } from "../../../../../../../Store/Slices/Admin/Class/Rubric/rubricThunks";
 import toast from "react-hot-toast";
 
@@ -52,42 +49,42 @@ const CreateQuizHeader = ({
     setSidebarOpen(true);
   };
 
-  const handleSubmit = async (rubricData) => {
-    try {
-      if (existingRubricId) {
-        // Update rubric via thunk
-        const result = await dispatch(
-          updateQuizRubricThunk({ rubricId: existingRubricId, rubricData })
-        ).unwrap();
+  // const handleSubmit = async (rubricData) => {
+  //   try {
+  //     if (existingRubricId) {
+  //       // Update rubric via thunk
+  //       const result = await dispatch(
+  //         updateQuizRubricThunk({ rubricId: existingRubricId, rubricData })
+  //       ).unwrap();
 
-        if (result.success) {
-          dispatch(fetchRubricsBySubjectId(sid));
-          setModalOpen(false);
-          setEditMode(false);
-          toast.success("Rubric updated successfully.");
-        } else {
-          toast.error(result.error || "Failed to update rubric.");
-        }
-      } else {
-        // Create rubric via thunk
-        const result = await dispatch(
-          createQuizRubricThunk(rubricData)
-        ).unwrap();
+  //       if (result.success) {
+  //         dispatch(fetchRubricsBySubjectId(sid));
+  //         setModalOpen(false);
+  //         setEditMode(false);
+  //         toast.success("Rubric updated successfully.");
+  //       } else {
+  //         toast.error(result.error || "Failed to update rubric.");
+  //       }
+  //     } else {
+  //       // Create rubric via thunk
+  //       const result = await dispatch(
+  //         createQuizRubricThunk(rubricData)
+  //       ).unwrap();
 
-        if (result.success) {
-          dispatch(fetchRubricsBySubjectId(sid));
-          toast.success("Rubric created successfully.");
-          setModalOpen(false);
-          setCriteriaList([]); // Clear criteria after creation
-          setExistingRubricId(result.data._id); // Ensure this is called
-        } else {
-          toast.error(result.error || "Failed to create rubric.");
-        }
-      }
-    } catch (error) {
-      toast.error("An error occurred while processing the rubric.");
-    }
-  };
+  //       if (result.success) {
+  //         dispatch(fetchRubricsBySubjectId(sid));
+  //         toast.success("Rubric created successfully.");
+  //         setModalOpen(false);
+  //         setCriteriaList([]); // Clear criteria after creation
+  //         setExistingRubricId(result.data._id); // Ensure this is called
+  //       } else {
+  //         toast.error(result.error || "Failed to create rubric.");
+  //       }
+  //     }
+  //   } catch (error) {
+  //     toast.error("An error occurred while processing the rubric.");
+  //   }
+  // };
 
   return (
     <div className="flex items-center justify-between p-2 bg-white border-b border-gray-300 shadow-sm">

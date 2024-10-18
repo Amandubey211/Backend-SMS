@@ -5,7 +5,7 @@ import { MdEdit } from "react-icons/md";
 import Sidebar from "../../../../Components/Common/Sidebar";
 import AddIssue from "../Components/AddIssue"; // Now using AddIssue instead of EditBook
 
-const BookIssueRow = ({ item, handleSidebarOpen, setEditIssueData }) => {
+const BookIssueRow = ({ item, handleSidebarOpen, setEditIssueData, role }) => {
   const [showMenu, setShowMenu] = useState(false);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const menuRef = useRef(null);
@@ -44,7 +44,7 @@ const BookIssueRow = ({ item, handleSidebarOpen, setEditIssueData }) => {
   }, [showMenu]);
 
   return (
-    <tr className="text-left text-gray-700 relative">
+    <tr className="text-left text-gray-700 relative hover:bg-gray-100 hover:shadow-md transition duration-200 ease-in-out">
       <td className="px-5 py-3 border-b border-gray-200">
         <div className="flex items-center">
           <img
@@ -61,7 +61,7 @@ const BookIssueRow = ({ item, handleSidebarOpen, setEditIssueData }) => {
           {item.sectionId?.sectionName}
         </div>
       </td>
-      <td className="px-5 py-2 border-b border-gray-200   ">
+      <td className="px-5 py-2 border-b border-gray-200">
         <div className="flex items-center bg-pink-50 rounded-lg p-1">
           <img
             src={item.bookId?.image}
@@ -85,7 +85,7 @@ const BookIssueRow = ({ item, handleSidebarOpen, setEditIssueData }) => {
       </td>
       <td className="px-5 py-2 border-b border-gray-200">
         <span
-          className={`inline-block px-3 py-1 text-xs font-semibold rounded-full ${
+          className={`inline-block px-3 py-1 text-xs font-semibold rounded-md ${
             item.status === "Returned"
               ? "bg-green-200 text-green-800"
               : item.status === "Pending"
@@ -96,45 +96,48 @@ const BookIssueRow = ({ item, handleSidebarOpen, setEditIssueData }) => {
           {item.status}
         </span>
       </td>
-      <td className="px-5 py-2 border-b border-gray-200 relative">
-        {/* Dots Menu */}
-        <div className="border rounded-full p-1 h-8 hover:bg-gray-200  w-8 flex justify-center items-center">
-          <HiDotsVertical
-            className="cursor-pointer "
-            onClick={handleMenuToggle}
-          />
-        </div>
-
-        {showMenu && (
-          <div
-            ref={menuRef}
-            className="absolute top-full right-0 w-24 bg-white border rounded-lg shadow-lg z-10"
-          >
-            <button
-              onClick={handleSidebarEditOpen}
-              className="flex items-center gap-2 p-2 hover:bg-gray-200 w-full text-left"
-            >
-              <MdEdit className="text-gray-500" />
-              <span>Edit</span>
-            </button>
-          </div>
-        )}
-
-        {/* Sidebar for Editing Book Issue */}
-        <Sidebar
-          isOpen={isSidebarOpen}
-          onClose={handleSidebarClose}
-          title="Edit Book Issue"
-          width="40%"
-        >
-          {item && (
-            <AddIssue
-              editIssueData={item} // Pass the current issue data for editing
-              onClose={handleSidebarClose}
+      {/* Conditionally render the Action column for non-teacher roles */}
+      {role !== "teacher" && (
+        <td className="px-5 py-2 border-b border-gray-200 relative">
+          {/* Dots Menu */}
+          <div className="border rounded-full p-1 h-8 hover:bg-gray-200 w-8 flex justify-center items-center">
+            <HiDotsVertical
+              className="cursor-pointer "
+              onClick={handleMenuToggle}
             />
+          </div>
+
+          {showMenu && (
+            <div
+              ref={menuRef}
+              className="absolute top-full right-0 w-24 bg-white border rounded-lg shadow-lg z-10"
+            >
+              <button
+                onClick={handleSidebarEditOpen}
+                className="flex items-center gap-2 p-2 hover:bg-gray-200 w-full text-left"
+              >
+                <MdEdit className="text-gray-500" />
+                <span>Edit</span>
+              </button>
+            </div>
           )}
-        </Sidebar>
-      </td>
+
+          {/* Sidebar for Editing Book Issue */}
+          <Sidebar
+            isOpen={isSidebarOpen}
+            onClose={handleSidebarClose}
+            title="Edit Book Issue"
+            width="40%"
+          >
+            {item && (
+              <AddIssue
+                editIssueData={item} // Pass the current issue data for editing
+                onClose={handleSidebarClose}
+              />
+            )}
+          </Sidebar>
+        </td>
+      )}
     </tr>
   );
 };

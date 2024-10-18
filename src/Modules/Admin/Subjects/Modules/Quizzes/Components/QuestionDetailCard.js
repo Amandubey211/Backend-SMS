@@ -1,8 +1,8 @@
-import React from 'react';
-import ButtonsGroup from '../../../Component/ButtonsGroup';
-import SpeedGradeButton from '../../../Component/SpeedGradeButton';
-import AssignmentDetail from '../../../Component/AssignmentDetail';
-import CommentCard from './CommentCard';
+import React from "react";
+import ButtonsGroup from "../../../Component/ButtonsGroup";
+import SpeedGradeButton from "../../../Component/SpeedGradeButton";
+import AssignmentDetail from "../../../Component/AssignmentDetail";
+import CommentCard from "./CommentCard";
 
 const QuestionDetailCard = () => {
   const commentsData = [
@@ -10,21 +10,28 @@ const QuestionDetailCard = () => {
       avatar: "https://avatars.githubusercontent.com/u/109097090?v=4", // Replace with actual image URL
       name: "Mr Teacher",
       timestamp: "Feb/02 /09:02",
-      comment: "Hi Sir Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore."
-    }, 
+      comment:
+        "Hi Sir Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore.",
+    },
     {
       avatar: "https://avatars.githubusercontent.com/u/109097090?v=4", // Replace with actual image URL
       name: "Mr Teacher",
       timestamp: "Feb/02 /09:02",
-      comment: "Hi Sir Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore."
-    },  
+      comment:
+        "Hi Sir Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore.",
+    },
   ];
 
   return (
-    <div className="flex flex-col h-full  bg-white" aria-label="Question Detail Card">
+    <div
+      className="flex flex-col h-full  bg-white"
+      aria-label="Question Detail Card"
+    >
       <div className="mb-auto p-3">
         <ButtonsGroup />
-        <p className='text-center text-green-500 italic font-semibold pb-3 border-b' >Submitted Students : 50/100 </p>
+        <p className="text-center text-green-500 italic font-semibold pb-3 border-b">
+          Submitted Students : 50/100{" "}
+        </p>
         <SpeedGradeButton />
         <AssignmentDetail label="Question Point" value="100 Point" />
         <AssignmentDetail label="Question Type" value="Multiple Choice" />

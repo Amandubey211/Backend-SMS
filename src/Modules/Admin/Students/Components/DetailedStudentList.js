@@ -30,6 +30,7 @@ const DetailedStudentList = ({ activeSection, onSeeGradeClick, students }) => {
               <StudentMenuOptions
                 studentName={`${student?.firstName} ${student?.lastName}`}
                 studentId={student._id}
+                student={student}
                 onSeeGradeClick={onSeeGradeClick}
               />
             </li>

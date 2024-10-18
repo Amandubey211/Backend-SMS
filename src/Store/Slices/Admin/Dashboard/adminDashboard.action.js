@@ -113,6 +113,29 @@ export const fetchNotices = createAsyncThunk(
         }
     }
 );
+export const fetchTopStudents = createAsyncThunk(
+    'adminDashboard/TopStudents',
+    async (classId, { rejectWithValue, getState }) => {
+        const { role } = getState().common.auth;
+        const token = localStorage.getItem(`${role}:token`);
+        if (!token) {
+            return rejectWithValue('Authentication failed!');
+        }
+
+        try {
+            const response = await axios.get(`${baseUrl}/admin/top/students/class/${classId}`, {
+                headers: {
+                    Authentication: token,
+                },
+            });
+
+            return response?.data?.topStudents;
+        } catch (error) {
+            console.error('Error in top Students:', error);
+            return rejectWithValue(error.message||'Failed to fetch top students data');
+        }
+    }
+);
 
 
 

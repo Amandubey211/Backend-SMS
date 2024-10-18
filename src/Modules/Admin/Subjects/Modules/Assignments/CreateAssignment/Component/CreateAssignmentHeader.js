@@ -261,6 +261,7 @@ const CreateAssignmentHeader = ({
 
         <AddRubricModal
           isOpen={isModalOpen}
+          AssignmentId={id}
           onSubmit={handleSubmit}
           onClose={() => setModalOpen(false)}
           criteriaList={criteriaList}
@@ -269,6 +270,18 @@ const CreateAssignmentHeader = ({
           setExistingRubricId={setExistingRubricId}
           readonly={false}
         />
+
+        <Sidebar
+          isOpen={isSidebarOpen}
+          onClose={() => setSidebarOpen(false)}
+          title="Add New Criteria"
+        >
+          <AddNewCriteriaForm
+            onSave={handleAddNewCriteria}
+            initialData={criteriaToEdit}
+            editMode={editMode}
+          />
+        </Sidebar>
       </div>
     </div>
   );

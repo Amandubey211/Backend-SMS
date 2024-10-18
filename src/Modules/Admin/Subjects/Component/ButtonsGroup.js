@@ -5,14 +5,16 @@ import { AiOutlineEdit, AiOutlineDelete } from "react-icons/ai";
 import { HiOutlineDotsVertical } from "react-icons/hi";
 import { useNavigate, useParams } from "react-router-dom";
 import { ImSpinner3 } from "react-icons/im";
-import useDeleteQuiz from "../../../../Hooks/AuthHooks/Staff/Admin/Quiz/useDeleteQuiz";
-import useUpdateQuiz from "../../../../Hooks/AuthHooks/Staff/Admin/Quiz/useUpdateQuiz";
 import DeleteModal from "../../../../Components/Common/DeleteModal";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import {
   deleteAssignmentThunk,
   updateAssignmentThunk,
 } from "../../../../Store/Slices/Admin/Class/Assignment/assignmentThunks";
+import {
+  updateQuizThunk,
+  deleteQuizThunk,
+} from "../../../../Store/Slices/Admin/Class/Quiz/quizThunks";
 
 const ButtonsGroup = ({ type, data, loading }) => {
   const navigate = useNavigate();
@@ -21,10 +23,6 @@ const ButtonsGroup = ({ type, data, loading }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const menuRef = useRef();
   const dispatch = useDispatch();
-
-  const { deleteQuiz } = useDeleteQuiz();
-
-  const { updateQuiz } = useUpdateQuiz();
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -61,11 +59,13 @@ const ButtonsGroup = ({ type, data, loading }) => {
   const confirmDelete = async () => {
     if (!data) return; // Prevent action if data is null
     if (type === "Quiz") {
-      await deleteQuiz(data._id);
+      dispatch(deleteQuizThunk(data._id));
     }
     if (type === "Assignment") {
       dispatch(deleteAssignmentThunk(data._id));
     }
+
+    // navigate(-1);
   };
 
   const handlePublishToggle = async () => {
@@ -77,47 +77,53 @@ const ButtonsGroup = ({ type, data, loading }) => {
       points: data.points ?? 0,
     };
 
-    let success = false;
     if (type === "Quiz") {
-      success = await updateQuiz(data._id, updatedData);
+      const quizId = data._id;
+      dispatch(updateQuizThunk({ quizId, quizData: updatedData }));
     } else if (type === "Assignment") {
       const assignmentId = data._id;
       dispatch(
         updateAssignmentThunk({ assignmentId, assignmentData: updatedData })
       );
     }
-
-    // if (success) {
-    //   onRefresh(); // Trigger data refetch
-    // }
   };
 
   // Use a default value if publish is not present or data is null
-  const isPublished = data?.publish ?? false;
+  const isPublished = data?.publish ?? true;
   const isUpdating = loading;
 
   return (
     <div className="relative flex justify-center gap-2 items-center w-full p-2 text-gray-700">
       <button
         className="flex items-center space-x-1 px-4 py-1 border rounded-md border-gray-300 text-gray-600 hover:bg-gray-100 transition"
-        aria-label={isPublished ? "Unpublish" : "Publish"}
+        aria-label={data?.publish ? "Unpublish" : "Publish"}
         onClick={handlePublishToggle}
-        disabled={isUpdating || !data}
+        disabled={loading || !data}
       >
-        {isUpdating ? (
-          <ImSpinner3 className="animate-spin text-gray-500" />
-        ) : isPublished ? (
+        {loading ? (
           <>
-            <BsPatchCheckFill aria-hidden="true" className="text-green-600" />
+            <span className="flex items-center justify-center w-5 h-5">
+              <ImSpinner3 className="animate-spin text-gray-500" />
+            </span>
+            <span>Loading</span>
+          </>
+        ) : data?.publish ? (
+          <>
+            <span className="flex items-center justify-center w-5 h-5">
+              <BsPatchCheckFill aria-hidden="true" className="text-green-600" />
+            </span>
             <span>Publish</span>
           </>
         ) : (
           <>
-            <MdOutlineBlock aria-hidden="true" />
+            <span className="flex items-center justify-center w-5 h-5">
+              <MdOutlineBlock aria-hidden="true" />
+            </span>
             <span>Unpublish</span>
           </>
         )}
       </button>
+
       <button
         onClick={handleEdit}
         className="flex items-center space-x-1 px-4 py-1 border rounded-md border-gray-300 text-green-600 hover:bg-gray-100 transition"

@@ -52,10 +52,10 @@ const Chapter = ({
             combinedItems.map((item, index) => (
               <ChapterItem
                 key={index}
-                type={item.type}
-                title={item.title}
-                id={item._id}
-                isPublished={item.isPublished}
+                type={item?.type}
+                title={item?.title}
+                id={item?._id}
+                submitted={item?.submitted}
               />
             ))
           ) : (

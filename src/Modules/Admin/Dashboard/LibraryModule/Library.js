@@ -27,7 +27,7 @@ const Library = () => {
   // Loading state
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-[200px]"> {/* Centered Spinner */}
+      <div className="flex justify-center items-center h-[200px]">
         <Spinner />
       </div>
     );
@@ -50,16 +50,12 @@ const Library = () => {
     <div className="p-4 bg-white">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-semibold">Library</h2>
-        
-
         <button
           className="text-black border border-gray-300 px-4 py-2 rounded-md hover:shadow-md transition duration-300 ease-in-out"
           onClick={handleViewAllClick}
         >
           View All
         </button>
-
-
       </div>
       {latestBooks.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-[200px]">
@@ -70,11 +66,12 @@ const Library = () => {
         latestBooks.map((book) => (
           <BookItem
             key={book?._id}
-            image={book?.image || "https://via.placeholder.com/50"} // Updated to match API structure
-            title={book?.name || "Untitled Book"} // Updated to match API structure
-            category={book?.category || "Uncategorized"} // Updated to match API structure
-            copies={book?.copies || 0} // Updated to match API structure
-            available={book?.available || 0} // Assuming availability data is missing in this response
+            image={book?.image || "https://via.placeholder.com/50"}
+            title={book?.name || "Untitled Book"}
+            category={book?.category || "Uncategorized"}
+            copies={book?.copies || 0}
+            author={book?.author || "Unknown"}
+            className={book?.classId?.className || "Unknown Class"}
             role={role}
           />
         ))

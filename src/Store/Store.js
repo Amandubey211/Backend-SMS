@@ -16,7 +16,7 @@ import subjectGradesReducer from "./Slices/Admin/Class/grades/gradesSlice";
 import subjectAssignmentReducer from "./Slices/Admin/Class/Assignments/assignmentSlice";
 import subjectQuizReducer from "./Slices/Admin/Class/Quiz/quizSlice";
 import sectionReducer from "./Slices/Admin/Class/Section_Groups/groupSectionSlice";
-import graduateReducer from "./Slices/Admin/Graduate/graduateSlice"
+import graduateReducer from "./Slices/Admin/Graduate/graduateSlice";
 import classStudentReducer from "./Slices/Admin/Class/Students/studentSlice";
 import attendanceReducer from "./Slices/Admin/Class/Attendence/attendanceSlice";
 import verificationReducer from "./Slices/Admin/Verification/VerificationSlice";
@@ -40,6 +40,7 @@ import adminCommentReducer from "./Slices/Admin/Class/Comment/commentsSlice";
 import adminAnnouncementCommentsReducer from "./Slices/Admin/Class/Announcement/Comment/announcementCommentsSlice";
 import adminAssignmentReducer from "./Slices/Admin/Class/Assignment/assignmentSlice";
 import adminQuizReducer from "./Slices/Admin/Class/Quiz/quizSlice";
+import adminSpeedGradeReducer from "./Slices/Admin/Class/SpeedGrade/speedGradeSlice";
 
 // student
 import studentDashboardReducer from "./Slices/Student/Dashboard/studentDashboardSlices";
@@ -129,7 +130,11 @@ const AdminReducer = combineReducers({
   comments: adminCommentReducer,
   assignments: adminAssignmentReducer,
   quizzes: adminQuizReducer,
+
+  speedgrades: adminSpeedGradeReducer,
+
   graduates: graduateReducer,
+
   all_students: allStudentReducer,
   all_parents: allParentReducer,
   all_staff: allstaffReducer,
@@ -139,9 +144,7 @@ const AdminReducer = combineReducers({
   subject_grades: subjectGradesReducer,
   subject_assignment: subjectAssignmentReducer,
   subject_quiz: subjectQuizReducer,
-
 });
-
 const studentReducer = combineReducers({
   studentDashboard: studentDashboardReducer,
   studentFinance: studentFinanceReducer,

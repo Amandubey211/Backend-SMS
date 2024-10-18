@@ -1,18 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
-import { resetEditMode } from "../../../../Store/Slices/Admin/NoticeBoard/Notice/noticeSlice";
-import {
-  createNoticeThunk,
-  updateNoticeThunk,
-} from "../../../../Store/Slices/Admin/NoticeBoard/Notice/noticeThunks";
+import { createNoticeThunk, updateNoticeThunk } from "../../../../Store/Slices/Admin/NoticeBoard/Notice/noticeThunks";
+import { fetchAllClasses } from "../../../../Store/Slices/Admin/Class/actions/classThunk";
 import { FiLoader } from "react-icons/fi"; // Icon for the spinner
 
 const AddNotice = ({ isEditing, onClose }) => {
   const dispatch = useDispatch();
-  const { selectedNotice, loading } = useSelector(
-    (state) => state.admin.notice
-  );
+
+  const { selectedNotice, loading } = useSelector((state) => state.admin.notice);
+  const { classes } = useSelector((state) => state.admin.class); // Assuming classes are stored here
+  const role = useSelector((store) => store.common.auth.role);
 
   const [announcementData, setAnnouncementData] = useState({
     title: "",
@@ -20,16 +18,24 @@ const AddNotice = ({ isEditing, onClose }) => {
     endDate: "",
     description: "",
     priority: "High priority",
+    classId: "", // Add classId to the state
   });
 
+  // Fetch classes when the component mounts
+  useEffect(() => {
+    dispatch(fetchAllClasses());
+  }, [dispatch]);
+
+  // Preload notice data for editing
   useEffect(() => {
     if (isEditing && selectedNotice) {
       setAnnouncementData({
         title: selectedNotice.title,
-        startDate: selectedNotice.startDate.split("T")[0], // Format date to yyyy-MM-dd
+        startDate: selectedNotice.startDate.split("T")[0],
         endDate: selectedNotice.endDate.split("T")[0],
         description: selectedNotice.description,
         priority: selectedNotice.priority,
+        classId: selectedNotice.classId._id || "", // Preload classId for editing
       });
     } else {
       setAnnouncementData({
@@ -38,6 +44,7 @@ const AddNotice = ({ isEditing, onClose }) => {
         endDate: "",
         description: "",
         priority: "High priority",
+        classId: "", // Reset classId
       });
     }
   }, [isEditing, selectedNotice]);
@@ -53,26 +60,20 @@ const AddNotice = ({ isEditing, onClose }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (
-      !announcementData.title ||
-      !announcementData.startDate ||
-      !announcementData.endDate
-    ) {
+    if (!announcementData.title || !announcementData.startDate || !announcementData.endDate || !announcementData.classId) {
       toast.error("Please fill in all required fields.");
       return;
     }
 
     if (isEditing) {
-      await dispatch(
-        updateNoticeThunk({
-          noticeId: selectedNotice._id,
-          updatedData: announcementData,
-        })
-      );
+      await dispatch(updateNoticeThunk({
+        noticeId: selectedNotice._id,
+        updatedData: announcementData,
+      }));
     } else {
       await dispatch(createNoticeThunk(announcementData));
     }
-    onClose(); // Close the sidebar after submit
+    onClose(); // Close the form after submitting
   };
 
   return (
@@ -80,10 +81,7 @@ const AddNotice = ({ isEditing, onClose }) => {
       <form onSubmit={handleSubmit}>
         {/* Title */}
         <div className="mb-4">
-          <label
-            htmlFor="title"
-            className="block text-sm font-medium text-gray-700"
-          >
+          <label htmlFor="title" className="block text-sm font-medium text-gray-700">
             Title
           </label>
           <input
@@ -100,10 +98,7 @@ const AddNotice = ({ isEditing, onClose }) => {
         {/* Start Date and End Date */}
         <div className="flex gap-4 mb-4">
           <div className="flex-1">
-            <label
-              htmlFor="startDate"
-              className="block text-sm font-medium text-gray-700"
-            >
+            <label htmlFor="startDate" className="block text-sm font-medium text-gray-700">
               Available from
             </label>
             <input
@@ -117,10 +112,7 @@ const AddNotice = ({ isEditing, onClose }) => {
             />
           </div>
           <div className="flex-1">
-            <label
-              htmlFor="endDate"
-              className="block text-sm font-medium text-gray-700"
-            >
+            <label htmlFor="endDate" className="block text-sm font-medium text-gray-700">
               Until
             </label>
             <input
@@ -135,12 +127,32 @@ const AddNotice = ({ isEditing, onClose }) => {
           </div>
         </div>
 
+        {/* Class Dropdown */}
+        <div className="mb-4">
+          <label htmlFor="class" className="block text-sm font-medium text-gray-700">
+            Class
+          </label>
+          <select
+            id="class"
+            name="classId"
+            value={announcementData.classId}
+            onChange={handleInputChange}
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            required
+          >
+            <option value="">Select Class</option>
+            {classes &&
+              classes.map((classItem) => (
+                <option key={classItem._id} value={classItem._id}>
+                  {classItem.className}
+                </option>
+              ))}
+          </select>
+        </div>
+
         {/* Description */}
         <div className="mb-4">
-          <label
-            htmlFor="description"
-            className="block text-sm font-medium text-gray-700"
-          >
+          <label htmlFor="description" className="block text-sm font-medium text-gray-700">
             Event Details
           </label>
           <textarea
@@ -157,9 +169,7 @@ const AddNotice = ({ isEditing, onClose }) => {
 
         {/* Priority */}
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">
-            Priority
-          </label>
+          <label className="block text-sm font-medium text-gray-700">Priority</label>
           <div className="mt-2 space-x-4">
             <label className="inline-flex items-center">
               <input
