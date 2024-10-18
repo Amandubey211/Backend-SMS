@@ -35,6 +35,12 @@ const sidebarData = [
     roles: ["admin", "teacher"],
   },
   {
+    title: "Library",
+    icon: <BsBook />,
+    path: "/library",
+    roles: ["teacher"],
+  },
+  {
     title: "Users",
     icon: <LuUser />,
     roles: ["admin", "teacher"],
@@ -74,7 +80,7 @@ const sidebarData = [
         title: "Staff",
         icon: <GrUserWorker />,
         path: "/users/staffs",
-        roles: ["admin"],
+        roles: ["admin", "teacher"],
       },
     ],
   },
@@ -132,7 +138,7 @@ const sidebarData = [
     title: "Library",
     icon: <BsBook />,
     path: "/library",
-    roles: ["admin", "librarian", "teacher"],
+    roles: ["admin", "librarian"],
   },
   {
     title: "Verification",

@@ -15,6 +15,8 @@ const ViewEvent = () => {
     (state) => state.admin.events.deleteLoading
   );
 
+  const role = useSelector((state) => state.common.auth.role); // Fetch role from Redux
+
   if (!selectedEvent) {
     return <div>No event selected</div>;
   }
@@ -113,23 +115,28 @@ const ViewEvent = () => {
 
       {/* Sticky footer for buttons */}
       <div className="p-4 bg-white border-t sticky bottom-0 flex gap-4">
-        <button
-          className="flex items-center justify-center bg-red-500 text-white px-4 py-2 rounded-md w-full"
-          onClick={handleDelete}
-          disabled={deleteLoading}
-        >
-          {deleteLoading ? (
-            <div className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></div>
-          ) : (
-            "Delete"
-          )}
-        </button>
-        <button
-          className="bg-blue-500 text-white px-4 py-2 rounded-md w-full"
-          onClick={handleEdit}
-        >
-          Edit
-        </button>
+        {/* Conditionally render Edit and Delete buttons if role is not "teacher" */}
+        {role !== "teacher" && (
+          <>
+            <button
+              className="flex items-center justify-center bg-red-500 text-white px-4 py-2 rounded-md w-full"
+              onClick={handleDelete}
+              disabled={deleteLoading}
+            >
+              {deleteLoading ? (
+                <div className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></div>
+              ) : (
+                "Delete"
+              )}
+            </button>
+            <button
+              className="bg-blue-500 text-white px-4 py-2 rounded-md w-full"
+              onClick={handleEdit}
+            >
+              Edit
+            </button>
+          </>
+        )}
       </div>
     </div>
   );
