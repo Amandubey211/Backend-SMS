@@ -182,7 +182,7 @@ export const fetchSubjects = createAsyncThunk(
       }
 
       const response = await axios.get(
-        `${baseUrl}/api/studentDashboard/subjects/${studentId}`,
+        `${baseUrl}/admin/course/subjects/student/${studentId}`,
         {
           headers: { Authentication: token },
         }
