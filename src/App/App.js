@@ -341,7 +341,7 @@ function App() {
     {
       path: "/dashboard",
       element: (
-        <ProtectRoute Component={Dash} allowedRoles={["admin", "teacher"]} />
+        <ProtectRoute Component={Dash} allowedRoles={["admin", "teacher", "librarian", "accountant"]} />
       ),
       errorElement: <Error />,
     },
