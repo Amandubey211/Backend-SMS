@@ -4,6 +4,7 @@ import { RiListCheck3,RiFileUnknowLine } from "react-icons/ri";
 import { GoDiscussionClosed } from "react-icons/go";
 
 import { FiFileText } from "react-icons/fi";
+import { AiOutlineCloseCircle } from 'react-icons/ai';
 const getIcon = (type) => {
   switch (type) {
     case 'assignment':
@@ -23,7 +24,7 @@ const getIcon = (type) => {
   }
 };
 
-const ChapterItem = ({ type, title }) => {
+const ChapterItem = ({ type, title,submitted }) => {
   return (
     <div className="flex items-center mb-3 gap-3  rounded-lg ">
       <div className="p-2  bg-white rounded-full">{getIcon(type)}</div>
@@ -31,8 +32,8 @@ const ChapterItem = ({ type, title }) => {
         <p className="font-semibold">{title}</p>
         {/* <p className="text-green-500 text-sm ">{type.charAt(0).toUpperCase() + type.slice(1)}</p> */}
       </div>
-      <div className="flex items-center gap-3">
-        <FaCheckCircle className="text-green-500" />
+      <div className="flex items-center gap-1 text-gray-500 justify-center">
+      Submit: {submitted ? <FaCheckCircle className="text-green-500" />:<AiOutlineCloseCircle  className="text-red-500" />}
       </div>
     </div>
   );
