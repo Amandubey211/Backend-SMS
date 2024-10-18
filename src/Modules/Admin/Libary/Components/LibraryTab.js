@@ -8,6 +8,7 @@ import { setFilters } from "../../../../Store/Slices/Admin/Library/LibrarySlice"
 const LibraryTab = ({ handleSidebarOpen }) => {
   const dispatch = useDispatch();
   const { books, filters } = useSelector((state) => state.admin.library);
+  const role = useSelector((store) => store.common.auth.role);
 
   const classLevels = [
     ...new Set(books.map((book) => book.classId?.className)),
@@ -62,12 +63,13 @@ const LibraryTab = ({ handleSidebarOpen }) => {
             options={categories}
           />
         </div>
-        <button
-          onClick={handleSidebarOpen}
-          className="bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600"
-        >
-          Add Book
-        </button>
+        {role !== "teacher" && (
+          <button
+            onClick={handleSidebarOpen}
+            className="bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600">Add Book
+          </button>
+        )}
+
       </div>
 
       <div className="flex justify-center items-center w-full min-h-[70vh]">

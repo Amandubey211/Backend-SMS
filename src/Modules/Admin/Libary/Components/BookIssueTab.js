@@ -9,6 +9,8 @@ const BookIssueTab = ({ handleSidebarOpen, setEditIssueData }) => {
   const dispatch = useDispatch();
   const { bookIssues, books } = useSelector((state) => state.admin.library);
   const classList = useSelector((store) => store.admin.class.classes);
+  const role = useSelector((store) => store.common.auth.role);
+
   const sectionList = useSelector(
     (store) => store.admin.group_section.sectionsList
   );
@@ -99,25 +101,29 @@ const BookIssueTab = ({ handleSidebarOpen, setEditIssueData }) => {
             ]}
           />
         </div>
-        <button
-          onClick={handleSidebarOpen}
-          className="bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600"
-        >
-          Add Book Issue
-        </button>
+        {role !== "teacher" && (
+          <button
+            onClick={handleSidebarOpen}
+            className="bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600"
+          >
+            Add Book Issue
+          </button>
+        )}
+
       </div>
 
       <div className="overflow-x-auto bg-white shadow rounded-lg">
         <table className="min-w-full">
           <thead>
-            <tr className="text-left text-gray-700 bg-gray-100">
+            <tr className="text-left text-gray-700 bg-gray-200">
               <th className="px-6 py-3">Student</th>
               <th className="px-6 py-3">Class & Section</th>
               <th className="px-6 py-3">Book</th>
               <th className="px-6 py-3">Author</th>
               <th className="px-6 py-3">Issue Date</th>
               <th className="px-6 py-3">Status</th>
-              <th className="px-6 py-3">Action</th>
+              {/* Conditionally render the Action column */}
+              {role !== "teacher" && <th className="px-6 py-3">Action</th>}
             </tr>
           </thead>
           <tbody>
@@ -128,6 +134,7 @@ const BookIssueTab = ({ handleSidebarOpen, setEditIssueData }) => {
                   item={issue}
                   setEditIssueData={setEditIssueData} // Pass down the function
                   handleSidebarOpen={handleSidebarOpen} // Open sidebar for editing
+                  role={role} // Pass role to the row component
                 />
               ))
             ) : (
@@ -139,6 +146,7 @@ const BookIssueTab = ({ handleSidebarOpen, setEditIssueData }) => {
             )}
           </tbody>
         </table>
+
       </div>
     </>
   );
