@@ -2,10 +2,10 @@ import React from "react";
 import TotalAttendanceGraph from "../Graphs/TotalAttendanceGraph";
 import TotalStudentsGraphjs from "../Graphs/TotalStudentsGraph";
 import TopRankingStudents from "../Graphs/TopRankingStudents";
-import BestPerformersChart from "../Graphs/BestPerformancGraph";
+import Library from "../LibraryModule/Library";
 import NoticeBoard from "../NoticeModule/NoticeBoard";
 import Events from "../EventModule/Event";
-import performanceData from "../DashboardData/PerformanceData";
+
 
 const TeacherSection = () => {
   return (
@@ -25,7 +25,7 @@ const TeacherSection = () => {
             <TotalStudentsGraphjs />
           </div>
           <div className="w-full md:w-3/5 p-4">
-            <BestPerformersChart data={performanceData} />
+            <Library />
           </div>
         </div>
       </div>

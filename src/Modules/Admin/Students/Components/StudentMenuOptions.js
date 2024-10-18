@@ -6,7 +6,8 @@ import EditStudent from "./EditStudent";
 import { HiOutlineDotsVertical } from "react-icons/hi";
 import { BsArrow90DegRight } from "react-icons/bs";
 import { MdOutlineModeEditOutline } from "react-icons/md";
-import { RiDeleteBin2Line } from "react-icons/ri";
+import { useSelector } from "react-redux";
+
 import { TfiStatsUp } from "react-icons/tfi";
 import { TfiStatsDown } from "react-icons/tfi";
 import DeleteModal from "../../../../Components/Common/DeleteModal";
@@ -27,6 +28,8 @@ const StudentMenuOptions = ({
   const [sidebarContent, setSidebarContent] = useState(null);
   const [sidebarTitle, setSidebarTitle] = useState("");
   const [isModalOpen, setModalOpen] = useState(false);
+  const role = useSelector((store) => store.common.auth.role);
+
   const menuRef = useRef(null);
   const buttonRef = useRef(null);
 
@@ -109,15 +112,18 @@ const StudentMenuOptions = ({
 
   return (
     <>
-      <button
-        ref={buttonRef}
-        onClick={() => toggleMenu(studentId)}
-        className="p-2"
-        aria-haspopup="true"
-        aria-expanded={showMenu === studentId}
-      >
-        <HiOutlineDotsVertical />
-      </button>
+      {role !== "teacher" && (
+        <button
+          ref={buttonRef}
+          onClick={() => toggleMenu(studentId)}
+          className="p-2"
+          aria-haspopup="true"
+          aria-expanded={showMenu === studentId}
+        >
+          <HiOutlineDotsVertical />
+        </button>
+      )}
+
       {showMenu === studentId && (
         <div
           ref={menuRef}

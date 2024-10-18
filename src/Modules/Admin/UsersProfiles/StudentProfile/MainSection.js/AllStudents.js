@@ -6,7 +6,7 @@ import Layout from '../../../../../Components/Common/Layout';
 import DashLayout from '../../../../../Components/Admin/AdminDashLayout';
 import { useDispatch, useSelector } from 'react-redux';
 import { GoAlertFill } from 'react-icons/go';
-import { FiLoader } from 'react-icons/fi';
+
 import { fetchAllStudents } from '../../../../../Store/Slices/Admin/Users/Students/student.action';
 import { CiUser } from 'react-icons/ci';
 import { HiMiniCheckBadge } from 'react-icons/hi2';
@@ -75,7 +75,6 @@ const AllStudents = () => {
         {loading ? (
           <div className="flex w-full h-[80vh] flex-col items-center justify-center">
             <Spinner/>
-            <p className="text-gray-800 text-lg">Loading...</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">

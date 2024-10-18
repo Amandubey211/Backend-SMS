@@ -132,7 +132,7 @@ const sidebarData = [
     title: "Library",
     icon: <BsBook />,
     path: "/library",
-    roles: ["admin", "librarian"],
+    roles: ["admin", "librarian", "teacher"],
   },
   {
     title: "Verification",
