@@ -27,7 +27,7 @@ const AdminNotice = () => {
   const { loading, error, notices, editMode, titleToDelete } = useSelector(
     (store) => store.admin.notice
   );
-  const Role = useSelector((store) => store.common.auth.role);
+  const role = useSelector((store) => store.common.auth.role);
   const dispatch = useDispatch();
 
   const [isSidebarOpen, setSidebarOpen] = useState(false); // Sidebar state
@@ -75,14 +75,19 @@ const AdminNotice = () => {
     dispatch(setEditMode(true));
     setSidebarOpen(true); // Open sidebar with edit mode
   };
-  useNavHeading(Role, "Notices");
+  useNavHeading(role, "Notices");
   return (
     <Layout title=" Notice | Student diwan">
       <DashLayout>
         <div className="p-5">
           <h1 className="bg-gradient-to-r from-pink-500 to-purple-500 text-transparent bg-clip-text font-semibold">
-            Admin Notice Board
+            {role === "admin" && "Admin Notice Board"}
+            {role === "librarian" && "Librarian Notice Board"}
+            {role === "teacher" && "Teacher Notice Board"}
+            {role === "staff" && "Staff Notice Board"}
+            {role === "accountant" && "Accountant Notice Board"}
           </h1>
+
 
           {/* Search Bar */}
           <div className="flex p-2 justify-between">
