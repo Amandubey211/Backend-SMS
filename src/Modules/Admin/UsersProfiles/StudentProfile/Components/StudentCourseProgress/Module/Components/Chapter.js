@@ -1,17 +1,18 @@
 import React from "react";
-import { FaChevronDown, FaChevronUp, FaEllipsisV } from "react-icons/fa";
+import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import ChapterItem from "./ChapterItem";
 
 const Chapter = ({
-  title,
-  chapterNumber,
+  title = "Untitled Chapter",
+  chapterNumber = "N/A",
   imageUrl,
-  assignments = [], 
-  quizzes = [],     
+  assignments = [],
+  quizzes = [],
   isExpanded,
   onToggle,
   id
 }) => {
+  // Combine assignments and quizzes into one array with their types
   const combinedItems = [
     ...assignments.map((assignment) => ({
       ...assignment,
@@ -24,12 +25,14 @@ const Chapter = ({
   ];
 
   return (
-    <div className="mb-4 p-1 bg-white rounded-lg border-b">
+    <div className="mb-4 p-1 bg-white rounded-lg border-b transition-shadow hover:shadow-md">
+      {/* Chapter Header */}
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center">
+          {/* Chapter Thumbnail */}
           <img
-            src={imageUrl}
-            alt="Chapter"
+            src={imageUrl || "https://via.placeholder.com/50"} // Fallback image if imageUrl is missing
+            alt="Chapter Thumbnail"
             className="w-12 h-12 mr-4 rounded-lg"
           />
           <div>
@@ -37,34 +40,38 @@ const Chapter = ({
             <p className="text-gray-500">Chapter {chapterNumber}</p>
           </div>
         </div>
-        <div className="flex items-center space-x-2">
-          <button
-            className="border p-2 rounded-full hover:bg-gray-50"
-            onClick={onToggle}
-          >
-            {isExpanded == id  ? <FaChevronUp /> : <FaChevronDown />}
-          </button>
-        </div>
+
+        {/* Toggle Button */}
+        <button
+          className="border p-2 rounded-full hover:bg-gray-50"
+          onClick={onToggle}
+          aria-expanded={isExpanded === id}
+          aria-label={isExpanded === id ? "Collapse chapter" : "Expand chapter"}
+        >
+          {isExpanded === id ? <FaChevronUp /> : <FaChevronDown />}
+        </button>
       </div>
-      {isExpanded == id ? (
+
+      {/* Expanded Content */}
+      {isExpanded === id && (
         <div className="ml-10 py-2">
           {combinedItems.length > 0 ? (
             combinedItems.map((item, index) => (
               <ChapterItem
                 key={index}
                 type={item?.type}
-                title={item?.title}
+                title={item?.title || "Untitled"}
                 id={item?._id}
                 submitted={item?.submitted}
               />
             ))
           ) : (
             <p className="py-2 bg-gray-50 italic text-gray-500 text-center">
-              No Data found
+              No data found
             </p>
           )}
         </div>
-      ):null}
+      )}
     </div>
   );
 };
