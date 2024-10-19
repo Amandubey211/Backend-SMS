@@ -66,8 +66,8 @@ const AdminNoticeItem = ({
 
           {/* Action Icons */}
           <div className="flex items-center gap-4">
-            {role === "admin" && (
-              <div>
+            {(role === "admin" || role === "teacher" || role === "accountant") && (
+              <div className="flex items-center gap-4">
                 <BsPencilSquare
                   className="text-blue-500 cursor-pointer"
                   size={20}

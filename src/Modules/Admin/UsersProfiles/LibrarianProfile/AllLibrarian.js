@@ -15,11 +15,12 @@ const AllLibrarian = () => {
   const [sidebarContent, setSidebarContent] = useState(null);
   const [selectedLibrarian, setSelectedLibrarian] = useState(null);
   const [librarianData, setLibrarianData] = useState(null);
-  const {librarian,loading} = useSelector((store) => store.admin.all_staff);
-const dispatch = useDispatch()
+  const { librarian, loading } = useSelector((store) => store.admin.all_staff);
+  const dispatch = useDispatch()
   useEffect(() => {
     dispatch(fetchAllStaff())
   }, [dispatch]);
+  const role = useSelector((store) => store.common.auth.role);
   const handleSidebarOpen = () => setSidebarOpen(true);
   const handleSidebarClose = () => setSidebarOpen(false);
 
@@ -57,37 +58,39 @@ const dispatch = useDispatch()
 
   return (
     <Layout title="All Librarian">
-      <DashLayout>{loading?  <div className="flex w-full h-[90vh] flex-col items-center justify-center">
-        <Spinner/>
-    </div>:
+      <DashLayout>{loading ? <div className="flex w-full h-[90vh] flex-col items-center justify-center">
+        <Spinner />
+      </div> :
         <div className="p-4">
           <div className="flex justify-between items-center mb-4 border-b-2 h-20">
             <h2 className="text-xl font-semibold">All Librarian <span className="bg-purple-400 px-2 text-sm py-1 rounded-full">{librarian?.length}</span></h2>
-            <button
-              onClick={handleAddLibrarianClick}
-              className="bg-purple-500 text-white px-4 py-2 rounded-md flex items-center space-x-2"
-            >
-              <span>Add New Librarian</span>
-            </button>
+            {role === "admin" && (
+              <button
+                onClick={handleAddLibrarianClick}
+                className="bg-purple-500 text-white px-4 py-2 rounded-md flex items-center space-x-2"
+              >
+                <span>Add New Librarian</span>
+              </button>
+            )}
           </div>
           <div className="flex flex-wrap -mx-2">
             {
               librarian.length > 0 ?
-            
-              librarian.map((librarian, index) => (
-              <ProfileCard
-                key={index}
-                profile={librarian}
-                onClick={handleAppointmentClick}
-                editUser={editUser}
-              />
-            )):
-            <div>
-                <div className="flex w-[80vw] text-gray-500 h-[90vh] items-center justify-center flex-col text-2xl">
-        <GoAlertFill className="text-[5rem]" />
-       No  librarian Found
-      </div>
-            </div>
+
+                librarian.map((librarian, index) => (
+                  <ProfileCard
+                    key={index}
+                    profile={librarian}
+                    onClick={handleAppointmentClick}
+                    editUser={editUser}
+                  />
+                )) :
+                <div>
+                  <div className="flex w-[80vw] text-gray-500 h-[90vh] items-center justify-center flex-col text-2xl">
+                    <GoAlertFill className="text-[5rem]" />
+                    No  librarian Found
+                  </div>
+                </div>
             }
           </div>
           <SidebarSlide

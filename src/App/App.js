@@ -714,7 +714,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={StudentParentProfile}
-          allowedRoles={["admin", "teacher","accountant"]}
+          allowedRoles={["admin", "teacher","accountant","librarian"]}
         />
       ),
       errorElement: <Error />,
@@ -731,7 +731,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={StaffMyProfile}
-          allowedRoles={["teacher", "accountant", "librarian", "staff"]}
+          allowedRoles={["teacher", "accountant", "librarian", "staff","librarian"]}
         />
       ),
       errorElement: <Error />,
