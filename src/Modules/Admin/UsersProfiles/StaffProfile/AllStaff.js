@@ -80,7 +80,7 @@ const AllStaff = () => {
               </h2>
 
               {/* Conditionally render the "Add New Staff" button if role is not "teacher" */}
-              {role !== "teacher" && (
+              {role === "admin" && (
                 <button
                   onClick={handleAddStaffClick}
                   className="bg-purple-500 text-white px-4 py-2 rounded-md flex items-center space-x-2"
@@ -97,7 +97,7 @@ const AllStaff = () => {
                     key={index}
                     profile={profile}
                     onClick={handleStaffClick}
-                    editUser={editUser}
+                    editUser={role === "admin" ? editUser : null}
                   />
                 ))
               ) : (

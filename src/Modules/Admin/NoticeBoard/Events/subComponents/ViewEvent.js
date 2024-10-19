@@ -116,7 +116,7 @@ const ViewEvent = () => {
       {/* Sticky footer for buttons */}
       <div className="p-4 bg-white border-t sticky bottom-0 flex gap-4">
         {/* Conditionally render Edit and Delete buttons if role is not "teacher" */}
-        {role !== "teacher" && (
+        {role === "admin" && (
           <>
             <button
               className="flex items-center justify-center bg-red-500 text-white px-4 py-2 rounded-md w-full"

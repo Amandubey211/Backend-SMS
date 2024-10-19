@@ -103,13 +103,15 @@ const AdminNotice = () => {
                 />
               </div>
             </div>
-            <button
-              className="flex items-center justify-center border border-transparent bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold py-2 px-4 rounded-lg shadow-lg transition duration-300 transform hover:scale-105 hover:shadow-xl"
-              onClick={() => setSidebarOpen(true)} // Open sidebar
-            >
-              <FiPlus className="mr-2" />
-              Add Notice
-            </button>
+            {role === "admin" && (
+              <button
+                className="flex items-center justify-center border border-transparent bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold py-2 px-4 rounded-lg shadow-lg transition duration-300 transform hover:scale-105 hover:shadow-xl"
+                onClick={() => setSidebarOpen(true)} // Open sidebar
+              >
+                <FiPlus className="mr-2" />
+                Add Notice
+              </button>
+            )}
           </div>
 
           {/* Notices List */}
