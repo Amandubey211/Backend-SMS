@@ -12,8 +12,10 @@ const AssignmentMainSection = () => {
   const dispatch = useDispatch();
   const { cid, sid, subjectId } = useParams();
 
-  const { assignmentData, loading } = useSelector((store) => store?.student?.studentAssignment);
-  console.log("assignmentData", assignmentData);
+  const { filteredAssignments, loading } = useSelector(
+    (store) => store?.student?.studentAssignment
+  );
+  console.log("assignmentData", filteredAssignments);
 
   const [filters, setFilters] = useState({ moduleId: "", chapterId: "" });
 
@@ -21,7 +23,9 @@ const AssignmentMainSection = () => {
   const refetchAssignments = useCallback(() => {
     const { moduleId, chapterId } = filters;
     //fetchFilteredAssignments(sid, moduleId, chapterId);
-    dispatch(stdGetFilteredAssignment({ cid, subjectId: sid, moduleId, chapterId }))
+    dispatch(
+      stdGetFilteredAssignment({ cid, subjectId: sid, moduleId, chapterId })
+    );
   }, [filters, sid, dispatch]);
 
   useEffect(() => {
@@ -41,7 +45,7 @@ const AssignmentMainSection = () => {
         <List
           type="Assignment"
           title="All Assignments"
-          data={assignmentData}
+          data={filteredAssignments}
           icon={<RiListCheck3 />}
           loading={loading}
           //error={error}

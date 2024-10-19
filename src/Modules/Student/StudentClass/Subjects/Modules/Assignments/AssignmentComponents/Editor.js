@@ -34,9 +34,6 @@
 
 // export default Editor;
 
-
-
-
 import React, { useState, useCallback, useRef } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
@@ -48,7 +45,7 @@ const Editor = ({
   editorContent,
   onEditorChange,
   onNext, // Include onNext to handle moving to the next tab
-  isCreateQuestion
+  isCreateQuestion,
 }) => {
   const quillRef = useRef(null);
   const [loading, setLoading] = useState(false);

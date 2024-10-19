@@ -638,7 +638,7 @@ const SubmissionDetails = ({ details, student, initialGrade }) => {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex gap-2 p-2 justify-center items-center border-b pb-3">
+      {/* <div className="flex gap-2 p-2 justify-center items-center border-b pb-3">
         <button className="flex items-center bg-white border text-sm gap-1 border-gray-300 font-semibold py-2 px-4 rounded-full hover:bg-gray-100 focus:outline-none">
           <RxPerson className="inline-block" />
           <span className="text-purple-500">
@@ -653,7 +653,7 @@ const SubmissionDetails = ({ details, student, initialGrade }) => {
           <AiOutlineEye className="inline-block text-gradient" />
           <span className="text-gradient">View Rubric</span>
         </button>
-      </div>
+      </div> */}
 
       <div className="flex-grow overflow-y-auto no-scrollbar">
         <div className="flex p-2 justify-between items-center mb-1">
@@ -672,92 +672,93 @@ const SubmissionDetails = ({ details, student, initialGrade }) => {
               Due Date: <span>{new Date(dueDate).toLocaleDateString()}</span>
             </span>
           </div>
-          {type === "Quiz" && (
-            <>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Attempt Date
-                </label>
-                <input
-                  type="date"
-                  className="mt-1 block w-full border border-gray-300 bg-white rounded-lg px-3 py-2 shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
-                  value={attemptDate}
-                  onChange={(e) => setAttemptDate(e.target.value)}
-                />
-              </div>
+          {/* details?.quizId?.quizType !== "Practice" */}
+          {/* {type === "Quiz" && ( */}
+          <>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Attempt Date
+              </label>
+              <input
+                type="date"
+                className="mt-1 block w-full border border-gray-300 bg-white rounded-lg px-3 py-2 shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                value={attemptDate}
+                onChange={(e) => setAttemptDate(e.target.value)}
+              />
+            </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-500">
-                  Grade{" "}
-                  <span className="text-xs font-normal text-pink-500 italic">
-                    (Out of {type === "Quiz" ? totalPoints : points || 0})
-                  </span>
-                </label>
-                <input
-                  type="number"
-                  value={grade}
-                  onChange={handleGradeChange}
-                  className="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
-                />
-              </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-500">
+                Grade{" "}
+                <span className="text-xs font-normal text-pink-500 italic">
+                  (Out of {type === "Quiz" ? totalPoints : points || 0})
+                </span>
+              </label>
+              <input
+                type="number"
+                value={grade}
+                onChange={handleGradeChange}
+                className="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+              />
+            </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-500">
-                  Status
-                </label>
-                <div className="flex items-center space-x-4 mt-1">
-                  <div className="flex items-center">
-                    <input
-                      id="status-submit"
-                      name="status"
-                      type="radio"
-                      className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
-                      checked={status === "Submit"}
-                      onChange={() => setStatus("Submit")}
-                    />
-                    <label
-                      htmlFor="status-submit"
-                      className="ml-2 block text-sm text-green-500"
-                    >
-                      Submit
-                    </label>
-                  </div>
-                  <div className="flex items-center">
-                    <input
-                      id="status-excused"
-                      name="status"
-                      type="radio"
-                      className="h-4 w-4 text-yellow-500 focus:ring-yellow-500 border-gray-300"
-                      checked={status === "Excused"}
-                      onChange={() => setStatus("Excused")}
-                    />
-                    <label
-                      htmlFor="status-excused"
-                      className="ml-2 block text-sm text-yellow-400"
-                    >
-                      Excused
-                    </label>
-                  </div>
-                  <div className="flex items-center">
-                    <input
-                      id="status-missing"
-                      name="status"
-                      type="radio"
-                      className="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300"
-                      checked={status === "Missing"}
-                      onChange={() => setStatus("Missing")}
-                    />
-                    <label
-                      htmlFor="status-missing"
-                      className="ml-2 block text-sm text-red-700"
-                    >
-                      Missing
-                    </label>
-                  </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-500">
+                Status
+              </label>
+              <div className="flex items-center space-x-4 mt-1">
+                <div className="flex items-center">
+                  <input
+                    id="status-submit"
+                    name="status"
+                    type="radio"
+                    className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
+                    checked={status === "Submit"}
+                    onChange={() => setStatus("Submit")}
+                  />
+                  <label
+                    htmlFor="status-submit"
+                    className="ml-2 block text-sm text-green-500"
+                  >
+                    Submit
+                  </label>
+                </div>
+                <div className="flex items-center">
+                  <input
+                    id="status-excused"
+                    name="status"
+                    type="radio"
+                    className="h-4 w-4 text-yellow-500 focus:ring-yellow-500 border-gray-300"
+                    checked={status === "Excused"}
+                    onChange={() => setStatus("Excused")}
+                  />
+                  <label
+                    htmlFor="status-excused"
+                    className="ml-2 block text-sm text-yellow-400"
+                  >
+                    Excused
+                  </label>
+                </div>
+                <div className="flex items-center">
+                  <input
+                    id="status-missing"
+                    name="status"
+                    type="radio"
+                    className="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300"
+                    checked={status === "Missing"}
+                    onChange={() => setStatus("Missing")}
+                  />
+                  <label
+                    htmlFor="status-missing"
+                    className="ml-2 block text-sm text-red-700"
+                  >
+                    Missing
+                  </label>
                 </div>
               </div>
-            </>
-          )}
+            </div>
+          </>
+          {/* )} */}
         </div>
 
         <div className="mt-3">

@@ -5,58 +5,21 @@ import { toast } from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { stdDoAssignment } from "../../../../../../../Store/Slices/Student/MyClass/Class/Subjects/Assignment/assignment.action";
 
-const AssignmentSection = ({
-  isSubmitted,
-  onFormSubmit,
-  assignmentData,
-  submissionData,
-  assignmentId,
-  onResubmit,
-}) => {
+const AssignmentSection = ({ isSubmitted, onResubmit }) => {
+  const dispatch = useDispatch();
+  const { assignmentData, submissionData } = useSelector(
+    (store) => store?.student?.studentAssignment
+  );
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [attemptsExceeded, setAttemptsExceeded] = useState(false);
-
-  const dispatch = useDispatch();
-  //const {  } = useSelector((store) => store?.student?.studentAssignment);
-
-
-  /*
-  const handleAssignment = () => {
-    if (assignmentData?.assignment?.allowedAttempts === true) {
-      const currentAttempts = submissionData ? submissionData.attempt : 0;
-      if (currentAttempts >= assignmentData?.assignment?.allowNumberOfAttempts) {
-        toast.error("Maximum number of attempts reached");
-        setAttemptsExceeded(true);
-        return; // Return early to prevent opening the sidebar
-      }
-    }
-    setAttemptsExceeded(false);
-    setSidebarOpen(true);
-  };
-
-  const handleFormSubmit = async (
-    submissionContent,
-    submissionType,
-    submissionComment
-  ) => {
-    if (assignmentData?.assignment?.allowedAttempts === true) {
-      const currentAttempts = submissionData ? submissionData.attempt : 0;
-      if (currentAttempts >= assignmentData?.assignment?.allowNumberOfAttempts) {
-        toast.error("Maximum number of attempts reached");
-        setSidebarOpen(false);
-        return; // Prevent submission if limit is exceeded
-      }
-    }
-
-    await onResubmit(submissionContent, submissionType, submissionComment);
-    onFormSubmit();
-    setSidebarOpen(false); // Close the sidebar when the form is submitted
-  };
-*/
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleAssignment = () => {
     const currentAttempts = submissionData?.attempt || 0;
-    if (assignmentData?.assignment?.allowedAttempts && currentAttempts >= assignmentData?.assignment?.allowNumberOfAttempts) {
+    if (
+      assignmentData?.allowedAttempts &&
+      currentAttempts >= assignmentData?.allowNumberOfAttempts
+    ) {
       toast.error("Maximum number of attempts reached");
       setAttemptsExceeded(true);
     } else {
@@ -65,25 +28,43 @@ const AssignmentSection = ({
     }
   };
 
-  const handleFormSubmit = async (submissionContent, submissionType, submissionComment) => {
-    const currentAttempts = submissionData?.attempt || 0;
-    if (assignmentData?.assignment?.allowedAttempts && currentAttempts >= assignmentData?.assignment?.allowNumberOfAttempts) {
-      toast.error("Maximum number of attempts reached");
+  const handleFormSubmit = async (
+    submissionContent,
+    submissionType,
+    submissionComment
+  ) => {
+    try {
+      setIsSubmitting(true); // Disable submit button while submitting
+      const currentAttempts = submissionData?.attempt || 0;
+      if (
+        assignmentData?.allowedAttempts &&
+        currentAttempts >= assignmentData?.allowNumberOfAttempts
+      ) {
+        toast.error("Maximum number of attempts reached");
+        setIsSubmitting(false);
+        setSidebarOpen(false);
+        return;
+      }
+
+      await dispatch(
+        stdDoAssignment({
+          assignmentId: assignmentData?._id,
+          editorContent: submissionContent,
+          fileUrls: submissionType,
+          isReattempt: isSubmitted,
+        })
+      );
+
+      setIsSubmitting(false);
       setSidebarOpen(false);
-      return;
+      // onResubmit?.(submissionContent, submissionType, submissionComment); // Ensure callback is called if provided
+    } catch (error) {
+      setIsSubmitting(false);
+      toast.error(error?.message || "Error submitting assignment");
     }
-
-    dispatch(stdDoAssignment({
-      assignmentId,
-      editorContent: submissionContent,
-      fileUrls: submissionType, 
-      isReattempt: isSubmitted,
-    }));
-
-    setSidebarOpen(false);
   };
 
-  const { name, submissionType, content, thumbnail } = assignmentData?.assignment;
+  const { name = "Assignment", content = "" } = assignmentData || {};
 
   return (
     <div className="max-w-3xl mx-auto p-6 bg-white">
@@ -97,29 +78,25 @@ const AssignmentSection = ({
         <button
           onClick={handleAssignment}
           className="h-12 inline-flex items-center border border-transparent text-sm font-medium shadow-sm bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600"
-          disabled={attemptsExceeded}
+          disabled={isSubmitting || attemptsExceeded}
         >
           {isSubmitted ? "Re-submit Assignment" : "Start Assignment"}
         </button>
       </div>
-      {/* <img
-        src={thumbnail}
-        alt="Assignment"
-        className="w-full rounded-lg mb-4"
-      /> */}
+
       <div
         className="text-gray-700 mb-6"
         dangerouslySetInnerHTML={{ __html: content }}
       />
+
       <SidebarSlide
         isOpen={isSidebarOpen}
         onClose={() => setSidebarOpen(false)}
         title="Start Assignment"
-        width="60%"
+        width="80%"
       >
         <CreateAssignmentHolder
           onSubmit={handleFormSubmit}
-          assignmentId={assignmentId}
           isReattempt={isSubmitted}
         />
       </SidebarSlide>
