@@ -10,6 +10,8 @@ import ProfileCard from "../SubComponents/ProfileCard";
 import ViewTeacher from "./SingleTeacher";
 import { fetchAllTeachers } from "../../../../Store/Slices/Admin/Class/Teachers/teacherThunks";
 import Spinner from "../../../../Components/Common/Spinner";
+
+
 const AllTeachers = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [teacherData, setTeacherData] = useState(null);
