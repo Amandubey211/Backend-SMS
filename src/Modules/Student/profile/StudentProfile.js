@@ -4,24 +4,12 @@ import toast from "react-hot-toast";
 import profileIcon from "../../../Assets/DashboardAssets/profileIcon.png";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import useChangePassword from "../../../Hooks/AuthHooks/Staff/Admin/resetPassword/useResetPassword";
-import useGetUserDetail from "../../../Hooks/AuthHooks/Staff/useGetUserDetail";
+
 import StudentDashLayout from "../../../Components/Student/StudentDashLayout";
 
 const StudentProfile = () => {
-  const { userDetail } = useGetUserDetail();
-  const student = useSelector((store) => store.common.user.userDetail);
-  const [studentData, setStudentData] = useState(student);
-
-  useEffect(() => {
-    const getData = async () => {
-      await userDetail();
-    };
-    getData();
-  }, []);
-
-  useEffect(() => {
-    setStudentData(student);
-  }, [student]);
+  const {userDetails} = useSelector((store) => store.common.user);
+;
 
   const [passwordData, setPasswordData] = useState({
     currentPassword: "",
@@ -35,7 +23,7 @@ const StudentProfile = () => {
 
   const updateProfile = () => {
     // Logic to update profile
-    console.log("Profile updated:", studentData);
+    console.log("Profile updated:");
   };
 
   const { ChangePassword } = useChangePassword();
@@ -67,17 +55,17 @@ const StudentProfile = () => {
         <div className="flex flex-col w-full p-4 gap-3">
           <div className="flex items-center px-6 py-4 gap-3 border rounded-md">
             <img
-              src={studentData?.profile ? studentData?.profile : profileIcon}
+              src={userDetails?.profile ? userDetails?.profile : profileIcon}
               alt="Profile"
               className="w-20 h-20 rounded-full shadow-lg border"
             />
             <div className="flex flex-row justify-between w-full">
-              <h2 className="text-xl font-semibold">{studentData?.fullName}</h2>
+              <h2 className="text-xl font-semibold">{userDetails?.fullName}</h2>
               <button
                 // onClick={handleSidebarOpen}
                 className="px-4 inline-flex items-center border border-transparent text-sm font-medium shadow-sm bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-md hover:from-pink-600 hover:to-purple-600"
               >
-                Enrollment : {studentData?.enrollmentStatus}
+                Enrollment : {userDetails?.enrollment}
               </button>
             </div>
           </div>
@@ -87,7 +75,7 @@ const StudentProfile = () => {
               <div className="flex flex-col">
                 <span className="font-normal text-gray-500">Full Name</span>
                 <span className="font-medium text-gray-800">
-                  {studentData?.fullName}
+                  {userDetails?.fullName}
                 </span>
               </div>
               <div className="flex flex-col">
@@ -95,7 +83,7 @@ const StudentProfile = () => {
                   Contact Number
                 </span>
                 <span className="font-medium text-gray-800">
-                  {studentData?.contactNumber}
+                  {userDetails?.mobileNumber}
                 </span>
               </div>
             </div>
@@ -105,13 +93,13 @@ const StudentProfile = () => {
                   Admission Number
                 </span>
                 <span className="font-medium text-gray-800">
-                  {studentData?.admissionNumber || "-"}
+                  {userDetails?.admissionNumber || "-"}
                 </span>
               </div>
               <div className="flex flex-col">
                 <span className="font-normal text-gray-500">Email</span>
                 <span className="font-medium text-gray-800">
-                  {studentData?.email || "-"}
+                  {userDetails?.email || "-"}
                 </span>
               </div>
             </div>
@@ -119,13 +107,13 @@ const StudentProfile = () => {
               <div className="flex flex-col">
                 <span className="font-normal text-gray-500">Date Of Birth</span>
                 <span className="font-medium text-gray-800">
-                  {studentData?.dateOfBirth?.slice(0, 10) || "-"}
+                  {userDetails?.dateOfBirth?.slice(0, 10) || "-"}
                 </span>
               </div>
               <div className="flex flex-col">
-                <span className="font-normal text-gray-500">Nationality</span>
+                <span className="font-normal text-gray-500">Q Id</span>
                 <span className="font-medium text-gray-800">
-                  {studentData?.nationality || "-"}
+                  {userDetails?.Q_Id || "-"}
                 </span>
               </div>
             </div>
@@ -187,7 +175,7 @@ const StudentProfile = () => {
             title="Edit Profile"
             width="50%"
           >
-            <EditStudentProfile data={studentData} />
+            <EditStudentProfile data={userDetails} />
           </SidebarSlide> */}
         </div>
       </StudentDashLayout>

@@ -22,12 +22,14 @@ import { fetchAllStudents } from "../../../../../Store/Slices/Admin/Users/Studen
 const SingleStudent = () => {
   const { cid } = useParams();
   const {allStudents,loading} = useSelector((store) => store.admin.all_students);
+  const {role} = useSelector((store) => store.common.auth);
   const dispatch = useDispatch();
+  const [activeItem, setActiveItem] = useState(role == "librarian"?"Information":role == "accountant" ?"Information" :"OverView");
   useEffect(() => {
     dispatch(fetchAllStudents());
   }, [dispatch])
   const student = allStudents.find((s) => s._id === cid);
-  const [activeItem, setActiveItem] = useState("OverView");
+ 
   if (!loading && !student) {
     return <div className="text-center my-10">Student not found</div>;
   }
@@ -38,7 +40,7 @@ const SingleStudent = () => {
        "Finance": <StudentFinance student={student} />,
        "Information": <StudentInformationMenu student={student} />,
        "Parents": <ParentsProfile student={student} />,
-      "Grades": <StudentGradesAccordion student={student} />,
+       "Grades": <StudentGradesAccordion student={student} />,
        "Attendance": <StudentAttendance  student={student} />,
        "Book Issue": <BookIssue  />
     };
@@ -51,10 +53,19 @@ const SingleStudent = () => {
         <div className="flex gap-2   ">
           <div className="flex flex-col  h-auto w-[25%]">
             <StudentProfile student={student} />
-            <NavigationMenu activeItem={activeItem} setActiveItem={setActiveItem} items={[
+            <NavigationMenu activeItem={activeItem} setActiveItem={setActiveItem} items={role == "admin"?[
               "OverView", "Course Progress", "Finance", "Information", 
               "Parents", "Grades", "Attendance", "Book Issue"
-            ]} />
+            ]:role == "teacher" ?[
+              "OverView", "Course Progress",  "Information", 
+              "Parents", "Grades", "Attendance", "Book Issue"
+            ]:role == "accountant" ?[
+                "Information", 
+              "Parents", "Finance",
+            ]:role == "librarian" ?[
+              "Information", 
+            "Parents", "Book Issue",
+          ]:[]} />
           </div>
           <div className="flex w-[75%] border border-l-1 border-l-gray-200">
             <div className="w-full">{renderContent()}</div>

@@ -27,6 +27,9 @@ export const parentLogin = createAsyncThunk(
             userId: data?.userId,
             profile: data?.profile,
             fullName: data?.fullName,
+            email:data?.email,
+            motherName:data?.motherName,
+            guardianName:data?.guardianName,
           })
         );
         console.log("Parent Dashhhh :",data.token);
