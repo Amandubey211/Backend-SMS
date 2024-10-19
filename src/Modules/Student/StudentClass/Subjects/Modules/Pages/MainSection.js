@@ -10,15 +10,19 @@ import NoDataFound from "../../../../../../Components/Common/NoDataFound";
 import { useDispatch, useSelector } from "react-redux";
 import { stdPages } from "../../../../../../Store/Slices/Student/MyClass/Class/Subjects/Pages/pages.action";
 import { useParams } from "react-router-dom";
+import OfflineModal from "../../../../../../Components/Common/Offline";
+import { setShowError } from "../../../../../../Store/Slices/Common/Alerts/alertsSlice";
 
 const MainSection = () => {
   const { loading, error, pagesData } = useSelector((store) => store?.student?.studentPages);
   // const { fetchAllPages, pages } = useFetchAllPages();
   const [searchQuery, setSearchQuery] = useState("");
   const dispatch = useDispatch();
+  const {showError}=useSelector((store)=>store?.common?.alertMsg);
+
   const { cid } = useParams();
   useEffect(() => {
-    dispatch(stdPages({ classId:cid }))
+    dispatch(stdPages({ classId: cid }))
     // fetchAllPages();
   }, [dispatch]);
 
@@ -29,6 +33,10 @@ const MainSection = () => {
   const filteredPages = pagesData?.filter((page) =>
     page?.title?.toLowerCase()?.includes(searchQuery.toLowerCase())
   );
+
+  const handleDismiss = () => {
+    dispatch(setShowError(false));
+  }
 
   return (
     <div className="flex">
@@ -46,8 +54,7 @@ const MainSection = () => {
           </div>
           <div className="flex-grow flex justify-center items-start my-10">
             {loading && <Spinner />}
-            {error && <p>{error}</p>}
-            {!loading && !error && filteredPages.length === 0 && (
+            {!loading && filteredPages.length === 0 && (
               <NoDataFound title="Pages" />
             )}
             {!loading && !error && filteredPages.length > 0 && (
@@ -67,6 +74,9 @@ const MainSection = () => {
             )}
           </div>
         </div>
+        {!loading && showError && (
+          <OfflineModal error={error} onDismiss={handleDismiss} />
+        )}
       </div>
     </div>
   );

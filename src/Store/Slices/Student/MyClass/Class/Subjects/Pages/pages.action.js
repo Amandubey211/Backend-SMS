@@ -1,17 +1,21 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { baseUrl } from "../../../../../../../config/Common";
+import { setShowError } from "../../../../../Common/Alerts/alertsSlice";
+import { ErrorMsg } from "../../../../../Common/Alerts/errorhandling.action";
 
 export const stdPages = createAsyncThunk(
     'pages/stdPages',
-    async ({ classId }, { rejectWithValue }) => {
+    async ({ classId }, { rejectWithValue , dispatch}) => {
         console.log("i am pages class",classId)
         const token = localStorage.getItem("student:token");
         if (!token) {
+            dispatch(setShowError(true));
             return rejectWithValue("Authentication failed!");
         }
 
         try {
+            dispatch(setShowError(false));
             const res = await axios.get(`${baseUrl}/admin/api/pages/class/pages/${classId}`, {
                 headers: {
                     Authentication: token
@@ -23,7 +27,10 @@ export const stdPages = createAsyncThunk(
 
         } catch (error) {
             console.log("Error in student Pages", error);
-            return rejectWithValue((error?.response?.data?.message || error?.message || "Something Went Wrong!"))
+            const err = ErrorMsg(error);
+            dispatch(setShowError(true));
+            return rejectWithValue(err.message);
+            //return rejectWithValue((error?.response?.data?.message || error?.message || "Something Went Wrong!"))
         }
     }
 )
