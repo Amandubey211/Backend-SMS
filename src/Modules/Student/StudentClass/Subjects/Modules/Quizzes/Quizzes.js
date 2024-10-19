@@ -8,7 +8,6 @@ import Spinner from "../../../../../../Components/Common/Spinner";
 import useNavHeading from "../../../../../../Hooks/CommonHooks/useNavHeading ";
 
 const Quizzes = () => {
-  const { qid } = useParams();
   const { subjectName } = useSelector((store) => store?.student?.studentSubject?.subject);
   const { classData } = useSelector((store) => store?.student?.studentClass);
   const className = classData?.className;
@@ -17,7 +16,7 @@ const Quizzes = () => {
   return (
     <Layout title="Quizzes | Student Diwan">
       <StudentDashLayout>
-        <MainSection/>
+        <MainSection />
       </StudentDashLayout>
     </Layout>
   );
