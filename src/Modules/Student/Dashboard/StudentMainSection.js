@@ -23,6 +23,7 @@ import {
 import NoticeBoard from "../../Admin/Dashboard/NoticeModule/NoticeBoard.js";
 import DashboardNoticeBoard from "./DashBoardComponents/Charts/dashboardNoticeBoard.js";
 import { CiMoneyBill } from "react-icons/ci";
+import { fetchStudentSubjectProgress } from "../../../Store/Slices/Admin/Users/Students/student.action.js";
 
 const StudentMainSection = () => {
   const navigate = useNavigate();
@@ -43,10 +44,13 @@ const StudentMainSection = () => {
     tasks,
   } = useSelector((state) => state.student.studentDashboard); 
   const { selectedClass, selectedSection } = useSelector(
-    (state) => state?.common?.user?.classInfo // Assuming classInfo is from another slice
+    (state) => state?.common?.user?.classInfo 
   );
+  const { userDetails } = useSelector((state) => state?.common?.user);
+  const {studentSubjectProgress} = useSelector((store) => store.admin.all_students);
 
   useEffect(() => {
+    dispatch(fetchStudentSubjectProgress(userDetails?.userId));
     dispatch(fetchDashboardDetails()); 
     dispatch(fetchSubjects());        
     dispatch(fetchTasks());           
@@ -123,7 +127,7 @@ const StudentMainSection = () => {
                 <p className="text-sm text-gray-500">
                   A total of {subjects.length} Courses are in Progress
                 </p>
-                <AllSubjects subjects={subjects} />
+                <AllSubjects subjects={studentSubjectProgress} />
               </div>
             ) : (
               <div className="text-gray-500 flex flex-col items-center mt-7 mb-5">
@@ -135,7 +139,7 @@ const StudentMainSection = () => {
             )}
           </div>
         </div>
-        <div className="w-[70%] flex flex-col flex-wrap border-l border-r">
+        <div className="w-[70%] flex flex-col flex-wrap border-l border-r ">
           <div className="w-full">
             <AttendanceDashboard
               attendanceSummary={dashboardAttendance}
