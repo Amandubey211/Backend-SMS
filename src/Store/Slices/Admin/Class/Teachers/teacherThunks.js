@@ -25,7 +25,26 @@ export const fetchAllTeachers = createAsyncThunk(
     }
   }
 );
+// Fetch teachers by class
+export const fetchTeachersByClass = createAsyncThunk(
+  "teachers/fetchByClass",
+  async (classId, { rejectWithValue, getState, dispatch }) => {
+    const token = getState().common.auth.token;
 
+    try {
+      const { data } = await axios.get(`${baseUrl}/admin/teacherByClass`, {
+        params: { id: classId },
+        headers: { Authentication: `Bearer ${token}` },
+      });
+      console.log(data.data, "oooo");
+      dispatch(setTeacherAssign(data.data));
+      dispatch(filterTeachersBySection()); // Filter after fetching teachers
+      return data.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || err.message);
+    }
+  }
+);
 // Assign teacher to a class
 export const assignTeacher = createAsyncThunk(
   "teacher/assignTeacher",
@@ -69,26 +88,6 @@ export const unassignTeacher = createAsyncThunk(
       return rejectWithValue(
         error.response?.data?.message || "Failed to unassign teacher."
       );
-    }
-  }
-);
-
-// Fetch teachers by class
-export const fetchTeachersByClass = createAsyncThunk(
-  "teachers/fetchByClass",
-  async (classId, { rejectWithValue, getState, dispatch }) => {
-    const token = getState().common.auth.token;
-
-    try {
-      const { data } = await axios.get(`${baseUrl}/admin/teacherByClass`, {
-        params: { id: classId },
-        headers: { Authentication: `Bearer ${token}` },
-      });
-      dispatch(setTeacherAssign(data.data));
-      dispatch(filterTeachersBySection()); // Filter after fetching teachers
-      return data.data;
-    } catch (err) {
-      return rejectWithValue(err.response?.data?.message || err.message);
     }
   }
 );

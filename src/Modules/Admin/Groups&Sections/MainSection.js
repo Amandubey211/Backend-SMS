@@ -10,13 +10,12 @@ import {
 import NavigationBar from "./Components/NavigationBar";
 import UnAssignedStudentList from "./Components/UnAssignedStudentList";
 import GroupList from "./Components/GroupList";
-import Spinner from "../../../Components/Common/Spinner";
-import { FaUsers } from "react-icons/fa";
 import StudentGradeModal from "../Subjects/Modules/Grades/StudentGradeViewModal/StudentGradeModal";
 import {
   fetchStudentGrades,
   fetchStudentSubjectProgress,
 } from "../../../Store/Slices/Admin/Users/Students/student.action";
+import { clearGroupsList } from "../../../Store/Slices/Admin/Class/Section_Groups/groupSectionSlice";
 
 const MainSection = () => {
   const [activeSection, setActiveSection] = useState("Everyone");
@@ -25,11 +24,6 @@ const MainSection = () => {
   const [studentData, setStudentData] = useState();
   const dispatch = useDispatch();
   const { cid } = useParams();
-
-  // Centralized state from the Redux store for sections, groups, and unassigned students
-  const { loading, error, unassignedStudentsList } = useSelector(
-    (store) => store.admin.group_section
-  );
 
   // Fetch groups by class or section
   const fetchGroups = useCallback(() => {
@@ -56,11 +50,12 @@ const MainSection = () => {
 
   useEffect(() => {
     if (cid) {
-      dispatch(fetchSectionsByClass(cid));
-      fetchGroups();
-      fetchStudents();
+      dispatch(clearGroupsList()); // Clear stale groups before fetching new ones
+      dispatch(fetchSectionsByClass(cid)); // Fetch sections for the class
+      fetchGroups(); // Fetch groups after clearing
+      fetchStudents(); // Fetch unassigned students for the class
     }
-  }, [cid, dispatch, fetchGroups, fetchStudents]);
+  }, [cid, fetchGroups, fetchStudents, dispatch]);
 
   // Handle section change and fetch corresponding groups
   const handleSectionChange = useCallback(

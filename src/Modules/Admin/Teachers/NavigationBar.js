@@ -55,7 +55,7 @@ const NavigationBar = () => {
             {totalTeachers}
           </span>
         </div>
-        
+
         {/* Conditionally render the Assign Instructor button */}
         {role !== "teacher" && (
           <button
