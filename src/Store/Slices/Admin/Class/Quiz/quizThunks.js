@@ -68,27 +68,6 @@ export const fetchQuizByIdThunk = createAsyncThunk(
   }
 );
 
-// Thunk to create a quiz rubric
-
-// // Thunk to update a quiz rubric
-
-// Validation function for rubric data
-const validateRubricData = (rubricData) => {
-  if (!rubricData.name) {
-    return "Rubric name is required.";
-  }
-  if (!rubricData.criteria || rubricData.criteria.length === 0) {
-    return "At least one criterion is required.";
-  }
-  if (!rubricData.quizId || rubricData.quizId.trim() === "") {
-    return "Quiz ID is required.";
-  }
-  if (!rubricData.totalScore || rubricData.totalScore <= 0) {
-    return "Total score must be greater than 0.";
-  }
-  return null;
-};
-
 // Add a Question Thunk
 export const addQuestionThunk = createAsyncThunk(
   "quiz/addQuestion",
@@ -108,6 +87,7 @@ export const addQuestionThunk = createAsyncThunk(
       if (response.data.success) {
         toast.success("Question added successfully");
         dispatch(fetchQuizByIdThunk(response.data.quiz._id));
+        // dispatch(fetchQuizByIdThunk(quizId))
         return response.data.quiz; // Return the updated quiz data
       } else {
         throw new Error(response.data.message || "Failed to add question");
@@ -124,7 +104,10 @@ export const addQuestionThunk = createAsyncThunk(
 // Update a Question Thunk
 export const updateQuestionThunk = createAsyncThunk(
   "quiz/updateQuestion",
-  async ({ quizId, questionId, question }, { getState, rejectWithValue }) => {
+  async (
+    { quizId, questionId, question },
+    { getState, rejectWithValue, dispatch }
+  ) => {
     try {
       const token = getToken(getState);
       const response = await axios.put(
@@ -139,6 +122,7 @@ export const updateQuestionThunk = createAsyncThunk(
 
       if (response.data.success) {
         toast.success("Question updated successfully");
+        dispatch(fetchQuizByIdThunk(quizId));
         return response.data.quiz; // Return the updated quiz data
       } else {
         throw new Error(response.data.message || "Failed to update question");
@@ -169,7 +153,7 @@ export const deleteQuestionThunk = createAsyncThunk(
 
       if (response.data.success) {
         toast.success("Question deleted successfully");
-        toast.success(quizId);
+        dispatch(fetchQuizByIdThunk(quizId));
         return questionId; // Return the deleted question ID
       } else {
         throw new Error(response.data.message || "Failed to delete question");

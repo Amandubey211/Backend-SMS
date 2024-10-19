@@ -137,7 +137,7 @@ const MediaUpload = ({ onSubmit, onAssignmentSubmit }) => {
   };
 
   return (
-    <div className="w-full p-6 bg-white border border-gray-200 ">
+    <div className="w-full p-6 bg-white border  ">
       <label className="block mb-2 text-sm font-medium text-gray-700">
         Upload Media
       </label>

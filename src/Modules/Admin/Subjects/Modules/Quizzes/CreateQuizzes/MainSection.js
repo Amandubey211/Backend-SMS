@@ -204,15 +204,15 @@ const MainSection = ({ setIsEditing }) => {
         question: updatedQuestion,
       })
     );
-    if (result.payload.success) {
-      setQuestions((prev) =>
-        prev.map((q) => (q._id === editingQuestionId ? updatedQuestion : q))
-      );
-      toast.success("Question updated successfully");
-      setSidebarOpen(false);
-    } else {
-      toast.error("Failed to update question");
-    }
+    // if (result.payload.success) {
+    //   setQuestions((prev) =>
+    //     prev.map((q) => (q._id === editingQuestionId ? updatedQuestion : q))
+    //   );
+    //   toast.success("Question updated successfully");
+    //   setSidebarOpen(false);
+    // } else {
+    //   toast.error("Failed to update question");
+    // }
   }, [
     dispatch,
     quizId,
@@ -230,12 +230,12 @@ const MainSection = ({ setIsEditing }) => {
       const result = await dispatch(
         deleteQuestionThunk({ quizId, questionId })
       );
-      if (result.payload.success) {
-        setQuestions((prev) => prev.filter((q) => q._id !== questionId));
-        toast.success("Question deleted successfully");
-      } else {
-        toast.error("Failed to delete question");
-      }
+      // if (result.payload.success) {
+      //   setQuestions((prev) => prev.filter((q) => q._id !== questionId));
+      //   toast.success("Question deleted successfully");
+      // } else {
+      //   toast.error("Failed to delete question");
+      // }
     },
     [dispatch, quizId]
   );
