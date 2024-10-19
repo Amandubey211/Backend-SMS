@@ -84,7 +84,7 @@ const dispatch = useDispatch()
               )}
             </div>
             <p>{student.studentName}</p>
-            <p className="mb-2">Q Id: <span className="text-gray-600">{student?.Q_Id}</span></p>
+            <p className="mb-2">Adm: <span className="text-gray-600">{student?.admissionNumber}</span></p>
             <span
               style={{
                 background: "linear-gradient(to right, #fce7f3, #e9d5ff)",
@@ -136,7 +136,7 @@ const dispatch = useDispatch()
                 Score: {student?.score}
               </span>
             </div>
-            <span>Q Id: <span className="text-gray-600">{student?.Q_Id}</span></span>
+            <span>Adm: <span className="text-gray-600">{student?.admissionNumber}</span></span>
           </div>
         ))}
       </div>  }

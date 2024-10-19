@@ -3,27 +3,13 @@ import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import profileIcon from '../../Assets/DashboardAssets/profileIcon.png';
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import useGetUserDetail from "../../Hooks/AuthHooks/Staff/useGetUserDetail";
 import useChangePassword from "../../Hooks/AuthHooks/Staff/Admin/resetPassword/useResetPassword";
 import Layout from "./Layout";
 import DashLayout from "../Admin/AdminDashLayout";
 import Spinner from "../../Components/Common/Spinner";
 
 const StaffMyProfile = () => {
-  const { userDetail } = useGetUserDetail();
-  const user = useSelector((store) => store.common.user.userDetails); 
-  const [userData, setUserData] = useState(user); 
-
-  useEffect(() => {
-    const getData = async () => {
-      await userDetail();
-    };
-    getData();
-  }, [userDetail]);
-
-  useEffect(() => {
-    setUserData(user);
-  }, [user]);
+  const {userDetails,loading} = useSelector((store) => store.common.user); 
 
   const [passwordData, setPasswordData] = useState({
     currentPassword: "",
@@ -55,9 +41,7 @@ const StaffMyProfile = () => {
 
   const [showPassword, setShowPassword] = useState(false);
 
-  if (!userData) {
-    return <Spinner />;
-  }
+  
 
   return (
     <>
@@ -67,16 +51,16 @@ const StaffMyProfile = () => {
             {/* Profile Image and Name */}
             <div className="flex items-center px-6 py-4 gap-3 border rounded-md">
               <img
-                src={userData?.profile ? userData?.profile : profileIcon}
+                src={userDetails?.profile ? userDetails?.profile : profileIcon}
                 alt="Profile"
                 className="w-20 h-20 rounded-full shadow-lg border"
               />
               <div className="flex flex-row justify-between w-full">
-                <h2 className="text-xl font-semibold">{`${userData?.firstName || ''} ${userData?.lastName || ''}`}</h2>
+                <h2 className="text-xl font-semibold">{`${userDetails?.firstName || ''} ${userDetails?.lastName || ''}`}</h2>
                 <button
                   className="px-4 inline-flex items-center border border-transparent text-sm font-medium shadow-sm bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-md hover:from-pink-600 hover:to-purple-600"
                 >
-                  {userData?.active ? 'Active' : 'Deactive'}
+                  {userDetails?.active ? 'Active' : 'Deactive'}
                 </button>
               </div>
             </div>
@@ -87,21 +71,21 @@ const StaffMyProfile = () => {
               <div className="flex flex-col gap-5">
                 <div className="flex flex-col">
                   <span className="font-normal text-gray-500">Full Name</span>
-                  <span className="font-medium text-gray-800">{`${userData?.fullName || ''}`}</span>
+                  <span className="font-medium text-gray-800">{`${userDetails?.fullName || ''}`}</span>
                 </div>
                 <div className="flex flex-col">
                   <span className="font-normal text-gray-500">Email</span>
-                  <span className="font-medium text-gray-800">{userData?.email || ''}</span>
+                  <span className="font-medium text-gray-800">{userDetails?.email || ''}</span>
                 </div>
               </div>
               <div className="flex flex-col gap-5">
                 <div className="flex flex-col">
                   <span className="font-normal text-gray-500">Mobile Number</span>
-                  <span className="font-medium text-gray-800">{userData?.mobileNumber || ''}</span>
+                  <span className="font-medium text-gray-800">{userDetails?.mobileNumber || ''}</span>
                 </div>
                 <div className="flex flex-col">
                   <span className="font-normal text-gray-500">Position</span>
-                  <span className="font-medium text-gray-800">{userData?.position || ''}</span>
+                  <span className="font-medium text-gray-800">{userDetails?.position || ''}</span>
                 </div>
               </div>
             </div>
@@ -112,40 +96,21 @@ const StaffMyProfile = () => {
               <div className="flex flex-col gap-5">
                 <div className="flex flex-col">
                   <span className="font-normal text-gray-500">Role</span>
-                  <span className="font-medium text-gray-800">{userData?.role || 'N/A'}</span>
+                  <span className="font-medium text-gray-800">{userDetails?.role || 'N/A'}</span>
                 </div>
                 <div className="flex flex-col">
-                  <span className="font-normal text-gray-500">Subject(s)</span>
-                  <span className="font-medium text-gray-800">
-                    {userData?.subjects?.length > 0 ? userData.subjects.join(", ") : 'N/A'}
-                  </span>
+                  <span className="font-normal text-gray-500">Date of Birth</span>
+                  <span className="font-medium text-gray-800">{userDetails?.dateOfBirth?.slice(0,10) || 'N/A'}</span>
                 </div>
               </div>
               <div className="flex flex-col gap-5">
                 <div className="flex flex-col">
                   <span className="font-normal text-gray-500">Employee ID</span>
-                  <span className="font-medium text-gray-800">{userData?.employeeID || 'N/A'}</span>
+                  <span className="font-medium text-gray-800">{userDetails?.employeeID || 'N/A'}</span>
                 </div>
                 <div className="flex flex-col">
                   <span className="font-normal text-gray-500">Monthly Salary</span>
-                  <span className="font-medium text-gray-800">{userData?.monthlySalary || 'N/A'}</span>
-                </div>
-              </div>
-            </div>
-
-            {/* School Information */}
-            <h3 className="text-lg font-semibold mb-4">School Information</h3>
-            <div className="flex flex-row gap-28 px-6 py-8 border items-center rounded-md">
-              <div className="flex flex-col gap-5">
-                <div className="flex flex-col">
-                  <span className="font-normal text-gray-500">School ID</span>
-                  <span className="font-medium text-gray-800">{userData?.schoolId || 'N/A'}</span>
-                </div>
-                <div className="flex flex-col">
-                  <span className="font-normal text-gray-500">Class IDs</span>
-                  <span className="font-medium text-gray-800">
-                    {userData?.classIds?.length > 0 ? userData.classIds.join(", ") : 'N/A'}
-                  </span>
+                  <span className="font-medium text-gray-800">{userDetails?.monthlySalary || 'N/A'}</span>
                 </div>
               </div>
             </div>

@@ -102,7 +102,7 @@ const AllStudents = () => {
                       </div>
                       <div className="ml-3">
                         <p className="text-sm font-medium">ID: {student?.admissionNumber}</p>
-                        <p className="text-sm">Parent: {student?.parentsName}</p>
+                        <p className="text-sm">Parent: {student?.fatherName || student?.motherName}</p>
                       </div>
                     </div>
                   </NavLink>

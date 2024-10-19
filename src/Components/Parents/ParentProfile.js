@@ -3,7 +3,6 @@ import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import profileIcon from '../../Assets/DashboardAssets/profileIcon.png';
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import useGetUserDetail from "../../Hooks/AuthHooks/Staff/useGetUserDetail";
 import useChangePassword from "../../Hooks/AuthHooks/Staff/Admin/resetPassword/useResetPassword";
 import ParentDashLayout from "./ParentDashLayout";
 import Layout from "../Common/ParentLayout";
@@ -11,21 +10,7 @@ import { useTranslation } from 'react-i18next'; // Import i18next hook
 
 const ParentProfile = () => {
   const { t } = useTranslation('prtProfile'); // Initialize i18next hook
-  const { userDetail } = useGetUserDetail();
-  const user = useSelector((store) => store.common.user.userDetails);
-  const [userData, setUserData] = useState(user);
-
-  useEffect(() => {
-    const getData = async () => {
-      await userDetail();
-    };
-    getData();
-  }, []);
-
-  useEffect(() => {
-    setUserData(user);
-  }, [user]);
-
+  const {userDetails} = useSelector((store) => store.common.user);
   const [passwordData, setPasswordData] = useState({
     currentPassword: "",
     newPassword: "",
@@ -38,9 +23,9 @@ const ParentProfile = () => {
 
   const updateProfile = () => {
     // Logic to update profile
-    console.log("Profile updated:", userData);
+    console.log("Profile updated:");
   };
-  console.log("Profile updated:", userData);
+
   const { ChangePassword } = useChangePassword();
 
   const updatePassword = () => {
@@ -71,12 +56,12 @@ const ParentProfile = () => {
           <div className="flex flex-col w-full p-4 gap-3 ">
             <div className="flex items-center px-6 py-4 gap-3 border rounded-md">
               <img
-                src={userData?.profile ? userData?.profile : profileIcon}
+                src={userDetails?.profile ? userDetails?.profile : profileIcon}
                 alt={t("Profile")}
                 className="w-20 h-20 rounded-full shadow-lg border"
               />
               <div className="flex flex-row justify-between w-full">
-                <h2 className="text-xl font-semibold">{userData?.fatherName || userData?.motherName || userData?.guardianName}</h2>
+                <h2 className="text-xl font-semibold">{userDetails?.fatherName || userDetails?.motherName }</h2>
               </div>
             </div>
             <h3 className="text-lg font-semibold mb-4">{t('Personal Information')}</h3>
@@ -85,24 +70,24 @@ const ParentProfile = () => {
                 <div className="flex flex-col">
                   <span className="font-normal text-gray-500">{t("Father's Name")}</span>
                   <span className="font-medium text-gray-800">
-                    {userData?.fatherName}
+                    {userDetails?.fatherName || userDetails?.guardianName}
                   </span>
                 </div>
                 <div className="flex flex-col">
                   <span className="font-normal text-gray-500">{t("Email")}</span>
-                  <span className="font-medium text-gray-800">{userData?.guardianEmail}</span>
+                  <span className="font-medium text-gray-800">{userDetails?.email}</span>
                 </div>
               </div>
               <div className="flex flex-col gap-5">
                 <div className="flex flex-col">
                   <span className="font-normal text-gray-500">{t("Mother's Name")}</span>
                   <span className="font-medium text-gray-800">
-                    {userData?.motherName || '-'}
+                    {userDetails?.motherName || '-'}
                   </span>
                 </div>
                 <div className="flex flex-col">
                   <span className="font-normal text-gray-500">{t("Guardian's Name")}</span>
-                  <span className="font-medium text-gray-800">{userData?.guardianName || '-'}</span>
+                  <span className="font-medium text-gray-800">{userDetails?.guardianName || '-'}</span>
                 </div>
               </div>
             </div>
