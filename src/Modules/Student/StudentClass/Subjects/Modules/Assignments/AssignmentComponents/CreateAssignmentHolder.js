@@ -23,7 +23,7 @@ const CreateAssignmentHolder = ({ onSubmit }) => {
   };
 
   return (
-    <div className="w-full p-6 bg-gray-100 rounded-lg shadow-lg">
+    <div className="w-full p-4">
       <div className="flex gap-4 mb-4">
         <TabButton
           isActive={activeTab === "Editor"}
