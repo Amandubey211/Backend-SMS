@@ -7,25 +7,35 @@ import Spinner from "../../../../../../Components/Common/Spinner";
 import NoDataFound from "../../../../../../Components/Common/NoDataFound";
 import { useParams } from "react-router-dom";
 import { fetchStudentGrades } from "../../../../../../Store/Slices/Admin/Users/Students/student.action";
+import OfflineModal from "../../../../../../Components/Common/Offline";
+import { setShowError } from "../../../../../../Store/Slices/Common/Alerts/alertsSlice";
 
 const MainSection = () => {
-const {sid,cid} = useParams();
-const {grades,loading} = useSelector((store) => store.admin.all_students);
-const {userDetails,classInfo} = useSelector((store) => store.common.user);
-const dispatch = useDispatch();
-const getStudentGrades = ()=>{
-    const params = {};
-      if (sid){
-        params.subjectId = sid;
-        dispatch(fetchStudentGrades({params,studentId:userDetails?.userId
-          ,studentClassId:cid}));
-      } 
+  const { sid, cid } = useParams();
+  const { grades, loading, error } = useSelector((store) => store.admin.all_students);
+  const { userDetails, classInfo } = useSelector((store) => store.common.user);
+  const dispatch = useDispatch();
+  const { showError } = useSelector((store) => store?.common?.alertMsg);
+
+  const handleDismiss = () => {
+    dispatch(setShowError(false));
   }
-  useEffect(()=>{
+
+  const getStudentGrades = () => {
+    const params = {};
+    if (sid) {
+      params.subjectId = sid;
+      dispatch(fetchStudentGrades({
+        params, studentId: userDetails?.userId
+        , studentClassId: cid
+      }));
+    }
+  }
+  useEffect(() => {
     getStudentGrades();
-    console.log(userDetails,classInfo);
-    
-  },[dispatch])
+    console.log(userDetails, classInfo);
+
+  }, [dispatch])
 
   let content;
   if (loading) {
@@ -36,7 +46,7 @@ const getStudentGrades = ()=>{
     );
   } else if (
     !grades
-) {
+  ) {
     content = <NoDataFound title="Grades" />;
   } else {
     const studentData = {
@@ -72,7 +82,10 @@ const getStudentGrades = ()=>{
       <SubjectSideBar />
       <div className="flex-grow p-4 border-l h-full">
         {content}
-        </div>
+      </div>
+      {!loading && showError && (
+        <OfflineModal error={error} onDismiss={handleDismiss} />
+      )}
     </div>
   );
 };

@@ -10,10 +10,13 @@ import NoDataFound from "../../../../../../Components/Common/NoDataFound";
 import Spinner from "../../../../../../Components/Common/Spinner";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchStudentDiscussion } from "../../../../../../Store/Slices/Student/MyClass/Class/Subjects/Discussion/discussion.action";
+import { setShowError } from "../../../../../../Store/Slices/Common/Alerts/alertsSlice";
+import OfflineModal from "../../../../../../Components/Common/Offline";
 
 const MainSection = () => {
   const { discussionData, loading, error } = useSelector((store) => store?.student?.studentDiscussion)
   const dispatch = useDispatch();
+  const {showError}=useSelector((store)=>store?.common?.alertMsg);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [filter, setFilter] = useState("all");
@@ -31,6 +34,10 @@ const MainSection = () => {
   const handleFilterChange = (filter) => {
     setFilter(filter);
   };
+
+  const handleDismiss = () => {
+    dispatch(setShowError(false));
+  }
 
   const filteredDiscussions = discussionData.filter((discussion) => {
     const matchesSearch = discussion.title
@@ -92,6 +99,9 @@ const MainSection = () => {
           </>
         )}
       </div>
+      {!loading && showError && (
+        <OfflineModal error={error} onDismiss={handleDismiss} />
+      )}
     </div>
   );
 };
