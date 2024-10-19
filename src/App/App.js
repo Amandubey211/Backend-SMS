@@ -647,7 +647,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={EventSchool}
-          allowedRoles={["admin", "teacher", "librarian", "peon"]}
+          allowedRoles={["admin", "teacher", "librarian", "peon", "accountant"]}
         />
       ),
       errorElement: <Error />,
@@ -657,7 +657,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={AdminNotice}
-          allowedRoles={["admin", "teacher", "librarian", "peon"]}
+          allowedRoles={["admin", "teacher", "librarian", "peon", "accountant"]}
         />
       ),
       errorElement: <Error />,
@@ -714,7 +714,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={StudentParentProfile}
-          allowedRoles={["admin", "teacher"]}
+          allowedRoles={["admin", "teacher","accountant"]}
         />
       ),
       errorElement: <Error />,
@@ -1011,7 +1011,7 @@ function App() {
       element: <ProtectRoute Component={ChildGrade} allowedRoles={["parent"]} />,
       errorElement: <Error />,
     },
-    
+
   ]);
 
   return (

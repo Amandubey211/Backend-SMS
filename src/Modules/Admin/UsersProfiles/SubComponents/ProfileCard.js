@@ -40,7 +40,7 @@ const ProfileCard = ({ profile, onClick, editUser }) => {
         )}
 
         {/* Icons: Conditionally rendered if the role is not 'teacher' */}
-        {role !== "teacher" && (
+        {role === "admin" && (
           <div className="absolute right-0 top-0 flex flex-col px-4 py-2 gap-2 justify-start">
             {profile?.active ? (
               <button

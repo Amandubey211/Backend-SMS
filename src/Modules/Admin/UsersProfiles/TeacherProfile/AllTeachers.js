@@ -16,11 +16,9 @@ const AllTeachers = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [teacherData, setTeacherData] = useState(null);
   const { allTeachers, loading: teacherLoading } = useSelector((store) => store.admin.teacher);
-  const role = useSelector((store) => store.common.auth.role);
-
-
   const { loading } = useSelector((store) => store.admin.all_staff);
   const dispatch = useDispatch();
+  const role = useSelector((store) => store.common.auth.role);
   useEffect(() => {
     dispatch(fetchAllTeachers())
   }, [dispatch]);
@@ -65,8 +63,7 @@ const AllTeachers = () => {
           <div className="p-4">
             <div className="flex justify-between items-center mb-4 border-b-2 h-20">
               <h2 className="text-xl font-semibold flex itmes-center gap-2">All Teachers <span className="bg-purple-400 px-2 text-sm py-1 rounded-full">{allTeachers?.length}</span></h2>
-              {/* Conditionally render the "Add New Teacher" button if role is not "teacher" */}
-              {role !== "teacher" && (
+              {role === "admin" && (
                 <button
                   onClick={handleSidebarOpen}
                   className="bg-purple-500 text-white px-4 py-2 rounded-md flex items-center space-x-2"
