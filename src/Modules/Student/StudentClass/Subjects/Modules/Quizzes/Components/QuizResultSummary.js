@@ -41,14 +41,14 @@ const QuizResultSummary = ({
 
 
 
-  useEffect(() => {
-    console.log("QuizResultSummary props:", {
-      totalPoints,
-      correctAnswers,
-      wrongAnswers,
-      attemptHistory,
-    });
-  }, [totalPoints, correctAnswers, wrongAnswers, attemptHistory]);
+  // useEffect(() => {
+  //   console.log("QuizResultSummary props:", {
+  //     totalPoints,
+  //     correctAnswers,
+  //     wrongAnswers,
+  //     attemptHistory,
+  //   });
+  // }, [totalPoints, correctAnswers, wrongAnswers, attemptHistory]);
 
   // const fetchAttemptHistory = async () => {
   //   try {
@@ -101,109 +101,52 @@ const QuizResultSummary = ({
 
 
   return (
-    <div className="p-4 bg-white shadow rounded-lg mb-4 border">
-      <h2 className="text-xl font-semibold mb-3">Quiz Results</h2>
-      {quizQuestionDetails?.map((detail, index) => {
-        if (detail.type === "quizz") {
-          return (
-            <AssignmentDetail
-              key={index}
-              label={detail.label}
-              value={detail.value}
-            />
-          );
-        } else if (detail.type === "date") {
-          return (
-            <DateDetail key={index} label={detail.label} value={detail.value} />
-          );
-        }
-        return null;
-      })}
-
-      <button
-        className="mt-4 bg-blue-500 text-white py-2 px-4 rounded-md"
-        onClick={handleSidebarOpen}
-      >
-        View Attempt History
-      </button>
-
-      <SidebarSlide
-        isOpen={isSidebarOpen}
-        onClose={handleSidebarClose}
-        title={
-          <span className="bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent bg-clip-text">
-            Attempt History
-          </span>
-        }
-        width="40%"
-      >
-        <div className="mt-4 overflow-y-auto" style={{ maxHeight: "80vh" }}>
-          <h3 className="text-lg font-semibold">Attempt History</h3>
-          {attemptHistory?.map((attempt, index) => {
-            console.log(`Attempt ${index + 1}:`, attempt);
-
-            return (
-              <div
-                key={index}
-                className="p-2 border rounded-md mt-2 cursor-pointer hover:bg-gray-100"
-                onClick={() => handleAttemptClick(attempt)}
-              >
-                <h3 className="font-medium text-lg text-blue-600">
-                  Attempt-{attempt.attempts}
-                </h3>
-                <ul className="list-none space-y-1">
-                  <li className=" font-mono">
-                    Time Taken:{" "}
-                    <span className="text-gray-700  font-semibold">
-                      {formatTime(attempt.timeTaken)}
-                    </span>
-                  </li>
-                  <li>
-                    <strong>Total Points:</strong>{" "}
-                    <span className="text-gray-700 font-semibold">
-                      {attempt.score}
-                    </span>
-                  </li>
-                  <li>
-                    <strong>Correct Answers:</strong>{" "}
-                    <span className="text-green-500  font-semibold">
-                      {attempt.rightAnswer}
-                    </span>
-                  </li>
-                  <li>
-                    <strong>Wrong Answers:</strong>{" "}
-                    <span className="text-red-500  font-semibold">
-                      {attempt.wrongAnswer}
-                    </span>
-                  </li>
-                </ul>
-              </div>
-            );
-          })}
-        </div>
-        {selectedAttempt && (
-          <>
-            <h2 className="text-xl font-semibold mb-4">
-              Attempt-{selectedAttempt.attemptNumber}
-            </h2>
-            <div
-              className="flex flex-wrap border overflow-y-auto mb-3 p-9"
-              style={{ maxHeight: "80vh" }}
-            >
-              {selectedAttempt?.questions?.map((question, index) => (
-                <div key={index} className="flex-grow">
-                  <SelectedQuestionCard
-                    question={question}
-                    selectedOption={question.selectedOption}
-                  />
-                </div>
-              ))}
-            </div>
-          </>
-        )}
-      </SidebarSlide>
+    <div className="mt-4 overflow-y-auto" style={{ maxHeight: "80vh" }}>
+      <h3 className="text-lg font-semibold">Attempt History</h3>
+      {Array.isArray(attemptHistory) && attemptHistory.length > 0 ? (
+        attemptHistory.map((attempt, index) => (
+          <div
+            key={index}
+            className="p-2 border rounded-md mt-2 cursor-pointer hover:bg-gray-100"
+            onClick={() => handleAttemptClick(attempt)}
+          >
+            <h3 className="font-medium text-lg text-blue-600">
+              Attempt-{attempt.attempts}
+            </h3>
+            <ul className="list-none space-y-1">
+              <li className="font-mono">
+                Time Taken:{" "}
+                <span className="text-gray-700 font-semibold">
+                  {formatTime(attempt.timeTaken)}
+                </span>
+              </li>
+              <li>
+                <strong>Total Points:</strong>{" "}
+                <span className="text-gray-700 font-semibold">
+                  {attempt.score}
+                </span>
+              </li>
+              <li>
+                <strong>Correct Answers:</strong>{" "}
+                <span className="text-green-500 font-semibold">
+                  {attempt.rightAnswer}
+                </span>
+              </li>
+              <li>
+                <strong>Wrong Answers:</strong>{" "}
+                <span className="text-red-500 font-semibold">
+                  {attempt.wrongAnswer}
+                </span>
+              </li>
+            </ul>
+          </div>
+        ))
+      ) : (
+        <div>No attempt history available.</div>
+      )}
     </div>
   );
+  
 };
 
 export default React.memo(QuizResultSummary);
