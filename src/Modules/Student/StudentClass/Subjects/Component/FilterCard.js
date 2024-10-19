@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { FiRefreshCw } from "react-icons/fi";
+import { stdModule } from "../../../../../Store/Slices/Student/MyClass/Class/Subjects/Modules/module.action";
+import { useParams } from "react-router-dom";
 
 const FilterCard = ({ filters, setFilters }) => {
   const [selectedModule, setSelectedModule] = useState(filters.moduleId || "");
@@ -9,6 +11,11 @@ const FilterCard = ({ filters, setFilters }) => {
   );
   const [chapters, setChapters] = useState([]);
   const { modulesData } = useSelector((store) => store?.student?.studentModule);
+  const dispatch = useDispatch();
+  const { cid, sid } = useParams();
+  useEffect(() => {
+    dispatch(stdModule({ cid, sid }));
+  }, []);
 
   useEffect(() => {
     if (selectedModule) {
@@ -25,7 +32,7 @@ const FilterCard = ({ filters, setFilters }) => {
 
   const handleModuleChange = (e) => {
     setSelectedModule(e.target.value);
-    setSelectedChapter(""); 
+    setSelectedChapter("");
   };
 
   const handleResetFilters = () => {
