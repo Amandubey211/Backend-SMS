@@ -199,7 +199,7 @@ const MainSection = () => {
       <div className="w-[65%] border-x">
         <Tabs
           quizSubmitted={quizSubmitted}
-          hasAttempted={attemptHistory.length > 0}
+          hasAttempted={attemptHistory?.length > 0}
           quiz={itemDetails}
           hasRemainingAttempts={hasRemainingAttempts()}
           onTabChange={handleTabChange}
