@@ -43,26 +43,26 @@ const sidebarData = [
   {
     title: "Users",
     icon: <LuUser />,
-    roles: ["admin", "teacher","accountant"],
+    roles: ["admin", "teacher", "accountant", "librarian"],
     items: [
       {
         title: "Student",
         icon: <FaUserGraduate />,
         path: "/users/students",
-        roles: ["admin", "teacher","accountant"],
+        roles: ["admin", "teacher", "accountant", "librarian"],
       },
       {
         title: "Parent",
         icon: <RiParentFill />,
         path: "/users/parents",
-        roles: ["admin", "teacher","accountant"],
+        roles: ["admin", "teacher", "accountant", "librarian"],
       },
       // Other user roles for admin only
       {
         title: "Teacher",
         icon: <FaChalkboardTeacher />,
         path: "/users/teachers",
-        roles: ["admin", "accountant"],
+        roles: ["admin", "accountant", "librarian"],
 
       },
       {
@@ -75,13 +75,13 @@ const sidebarData = [
         title: "Librarian",
         icon: <MdLocalLibrary />,
         path: "/users/librarian",
-        roles: ["admin","librarian"],
+        roles: ["admin", "librarian"],
       },
       {
         title: "Staff",
         icon: <GrUserWorker />,
         path: "/users/staffs",
-        roles: ["admin", "teacher", "accountant"],
+        roles: ["admin", "teacher", "accountant", "librarian"],
       },
     ],
   },
@@ -113,19 +113,19 @@ const sidebarData = [
   {
     title: "NoticeBoard",
     icon: <TbNotebook />,
-    roles: ["admin", "teacher", "librarian","accountant"],
+    roles: ["admin", "teacher", "librarian", "accountant"],
     items: [
       {
         title: "Announcements",
         icon: <FaClipboardList />,
         path: "/noticeboard/notice",
-        roles: ["admin", "teacher", "librarian","accountant"],
+        roles: ["admin", "teacher", "librarian", "accountant"],
       },
       {
         title: "Events",
         icon: <FaBook />,
         path: "/noticeboard/events",
-        roles: ["admin", "teacher", "librarian","accountant"],
+        roles: ["admin", "teacher", "librarian", "accountant"],
       },
     ],
   },
