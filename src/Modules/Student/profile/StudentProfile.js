@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import profileIcon from "../../../Assets/DashboardAssets/profileIcon.png";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import useChangePassword from "../../../Hooks/AuthHooks/Staff/Admin/resetPassword/useResetPassword";
-
 import StudentDashLayout from "../../../Components/Student/StudentDashLayout";
+import { updatePasswordThunk } from "../../../Store/Slices/Common/User/actions/userActions";
 
 const StudentProfile = () => {
   const {userDetails} = useSelector((store) => store.common.user);
@@ -26,11 +25,11 @@ const StudentProfile = () => {
     console.log("Profile updated:");
   };
 
-  const { ChangePassword } = useChangePassword();
+  const dispatch = useDispatch();
 
   const updatePassword = () => {
     if (passwordData.newPassword === passwordData.confirmPassword) {
-      ChangePassword(passwordData);
+      dispatch(updatePasswordThunk(passwordData))
     } else {
       toast.error("Passwords do not match.");
     }
