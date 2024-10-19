@@ -1,7 +1,11 @@
 import React from "react";
 import SelectedQuestionCard from "./SelectedQuestionCard";
+import { useSelector } from "react-redux";
 
-const QuizResults = ({ questions, selectedOptions }) => {
+const QuizResults = () => {
+
+  const { selectedOptions, itemDetails } = useSelector((store) => store?.student?.studentQuiz);
+  const {questions}=itemDetails;
   let totalPoints = 0;
   let correctAnswers = 0;
   let wrongAnswers = 0;

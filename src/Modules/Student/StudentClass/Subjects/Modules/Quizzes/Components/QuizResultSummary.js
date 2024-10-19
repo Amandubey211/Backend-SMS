@@ -4,6 +4,9 @@ import DateDetail from "../../../Component/DateDetail";
 import SidebarSlide from "../../../../../../../Components/Common/SidebarSlide";
 import SelectedQuestionCard from "./SelectedQuestionCard";
 import { baseUrl } from "../../../../../../../config/Common";
+import { useDispatch, useSelector } from "react-redux";
+import { setSelectedAttempt } from "../../../../../../../Store/Slices/Student/MyClass/Class/Subjects/Quizes/quizesSlice";
+import { fetchAttemptHistory } from "../../../../../../../Store/Slices/Student/MyClass/Class/Subjects/Quizes/quizes.action";
 
 const QuizResultSummary = ({
   totalPoints,
@@ -11,66 +14,13 @@ const QuizResultSummary = ({
   wrongAnswers,
   quizId,
 }) => {
+  const { selectedAttempt, attemptHistory} = useSelector((store) => store?.student?.studentQuiz);
+  const dispatch=useDispatch();
   const [isSidebarOpen, setSidebarOpen] = useState(false);
-  const [selectedAttempt, setSelectedAttempt] = useState(null);
-  const [attemptHistory, setAttemptHistory] = useState([]);
+  // const [selectedAttempt, setSelectedAttempt] = useState(null);
+  // const [attemptHistory, setAttemptHistory] = useState([]);
 
-  useEffect(() => {
-    console.log("QuizResultSummary props:", {
-      totalPoints,
-      correctAnswers,
-      wrongAnswers,
-      attemptHistory,
-    });
-  }, [totalPoints, correctAnswers, wrongAnswers, attemptHistory]);
 
-  const fetchAttemptHistory = async () => {
-    try {
-      const token = localStorage.getItem("student:token");
-      if (!token) {
-        throw new Error("Authentication token not found");
-      }
-
-      const response = await fetch(
-        `${baseUrl}/student/studentquiz/${quizId}/attempt`,
-        {
-          headers: {
-            Authentication: token,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(
-          `Failed to fetch attempt history, status: ${response.status}`
-        );
-      }
-
-      const data = await response.json();
-
-      if (data.success && data.submission) {
-        setAttemptHistory(data.submission);
-      } else {
-        console.error("No attempt history data or unsuccessful response");
-      }
-    } catch (error) {
-      console.error("Failed to fetch attempt history:", error);
-    }
-  };
-
-  const handleAttemptClick = (attempt) => {
-    setSelectedAttempt(attempt);
-  };
-
-  const handleSidebarOpen = () => {
-    fetchAttemptHistory();
-    setSidebarOpen(true);
-  };
-
-  const handleSidebarClose = () => {
-    setSidebarOpen(false);
-    setSelectedAttempt(null);
-  };
   const formatTime = (totalSeconds) => {
     const hours = Math.floor(totalSeconds / 3600);
     const minutes = Math.floor((totalSeconds % 3600) / 60);
@@ -89,10 +39,71 @@ const QuizResultSummary = ({
     { label: "Wrong Answers", value: `${wrongAnswers}`, type: "quizz" },
   ];
 
+
+
+  useEffect(() => {
+    console.log("QuizResultSummary props:", {
+      totalPoints,
+      correctAnswers,
+      wrongAnswers,
+      attemptHistory,
+    });
+  }, [totalPoints, correctAnswers, wrongAnswers, attemptHistory]);
+
+  // const fetchAttemptHistory = async () => {
+  //   try {
+  //     const token = localStorage.getItem("student:token");
+  //     if (!token) {
+  //       throw new Error("Authentication token not found");
+  //     }
+
+  //     const response = await fetch(
+  //       `${baseUrl}/student/studentquiz/${quizId}/attempt`,
+  //       {
+  //         headers: {
+  //           Authentication: token,
+  //         },
+  //       }
+  //     );
+
+  //     if (!response.ok) {
+  //       throw new Error(
+  //         `Failed to fetch attempt history, status: ${response.status}`
+  //       );
+  //     }
+
+  //     const data = await response.json();
+
+  //     if (data.success && data.submission) {
+  //       setAttemptHistory(data.submission);
+  //     } else {
+  //       console.error("No attempt history data or unsuccessful response");
+  //     }
+  //   } catch (error) {
+  //     console.error("Failed to fetch attempt history:", error);
+  //   }
+  // };
+
+  const handleAttemptClick = (attempt) => {
+    dispatch(setSelectedAttempt(attempt));
+  };
+
+  const handleSidebarOpen = () => {
+    dispatch(fetchAttemptHistory({quizId}));
+    setSidebarOpen(true);
+  };
+
+  const handleSidebarClose = () => {
+    setSidebarOpen(false);
+    dispatch(setSelectedAttempt(null));
+  };
+
+
+
   return (
     <div className="p-4 bg-white shadow rounded-lg mb-4 border">
       <h2 className="text-xl font-semibold mb-3">Quiz Results</h2>
-      {quizQuestionDetails.map((detail, index) => {
+      {quizQuestionDetails?.map((detail, index) => {
         if (detail.type === "quizz") {
           return (
             <AssignmentDetail
@@ -128,14 +139,14 @@ const QuizResultSummary = ({
       >
         <div className="mt-4 overflow-y-auto" style={{ maxHeight: "80vh" }}>
           <h3 className="text-lg font-semibold">Attempt History</h3>
-          {attemptHistory.map((attempt, index) => {
+          {attemptHistory?.map((attempt, index) => {
             console.log(`Attempt ${index + 1}:`, attempt);
 
             return (
               <div
                 key={index}
                 className="p-2 border rounded-md mt-2 cursor-pointer hover:bg-gray-100"
-                // onClick={() => handleAttemptClick(attempt)}
+                onClick={() => handleAttemptClick(attempt)}
               >
                 <h3 className="font-medium text-lg text-blue-600">
                   Attempt-{attempt.attempts}
@@ -179,7 +190,7 @@ const QuizResultSummary = ({
               className="flex flex-wrap border overflow-y-auto mb-3 p-9"
               style={{ maxHeight: "80vh" }}
             >
-              {selectedAttempt.questions.map((question, index) => (
+              {selectedAttempt?.questions?.map((question, index) => (
                 <div key={index} className="flex-grow">
                   <SelectedQuestionCard
                     question={question}

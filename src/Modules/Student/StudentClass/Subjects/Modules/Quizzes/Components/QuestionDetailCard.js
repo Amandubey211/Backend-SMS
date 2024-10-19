@@ -17,6 +17,8 @@ const QuestionDetailCard = ({
     totalPoints,
     allowNumberOfAttempts,
     timeLimit,
+    showshowAnswerDate,
+
   } = quiz; // Destructure quiz object
 
   const [showTime, setShowTime] = useState(true);
@@ -33,7 +35,7 @@ const QuestionDetailCard = ({
       label: "Allow Attempts",
       value: allowNumberOfAttempts,
       type: "quizz",
-      extra: "Time",
+      extra: "Times",
     },
     { label: "Quiz Point", value: totalPoints, type: "quizz", extra: "Point" },
     {
@@ -45,7 +47,7 @@ const QuestionDetailCard = ({
     { label: "Time Limit", value: formatTime(timeLimit), type: "quizz" },
     {
       label: "You can see the correct Answer",
-      value: "02/10/2024",
+      value: showshowAnswerDate,
       type: "date",
     },
   ];
@@ -72,24 +74,24 @@ const QuestionDetailCard = ({
 
   return (
     <div
-      className="flex flex-col gap-7 py-1 px-4 bg-white rounded-lg shadow-md"
+      className="flex flex-col gap-7 py-1 pb-6 px-4 bg-white rounded-lg shadow-md"
       aria-label="Question Detail Card"
     >
       <div className="mb-auto">
-        {quizQuestionDetails.map((detail, index) =>
-          detail.type === "quizz" ? (
+        {quizQuestionDetails?.map((detail, index) =>
+          detail?.type === "quizz" ? (
             <AssignmentDetail
               key={index}
-              label={detail.label}
-              value={detail.value}
-              extra={detail.extra}
+              label={detail?.label}
+              value={detail?.value}
+              extra={detail?.extra}
             />
           ) : (
             <DateDetail
               key={index}
-              label={detail.label}
-              value={detail.value}
-              labelAbove={detail.labelAbove}
+              label={detail?.label}
+              value={detail?.value}
+              labelAbove={detail?.labelAbove}
             />
           )
         )}
@@ -116,7 +118,7 @@ const QuestionDetailCard = ({
                   textColor: "#000",
                   pathColor: darkerGreen,
                   trailColor: "#e0e0e0", // Light gray
-                  textSize: "20px",
+                  textSize: "18px",
                   lineHeight: "1.2", // Adjust text line height inside the circle
                 })}
               />
@@ -131,7 +133,7 @@ const QuestionDetailCard = ({
                   textColor: "#000",
                   pathColor: darkerGreen,
                   trailColor: "#e0e0e0", // Light gray
-                  textSize: "20px",
+                  textSize: "18px",
                   lineHeight: "1.2", // Adjust text line height inside the circle
                 })}
               />
@@ -146,7 +148,7 @@ const QuestionDetailCard = ({
                   textColor: "#000",
                   pathColor: darkerGreen,
                   trailColor: "#e0e0e0", // Light gray
-                  textSize: "20px",
+                  textSize: "18px",
                   lineHeight: "1.2", // Adjust text line height inside the circle
                 })}
               />

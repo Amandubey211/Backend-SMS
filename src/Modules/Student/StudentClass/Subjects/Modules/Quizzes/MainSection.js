@@ -9,85 +9,91 @@ import QuizzDetailCard from "./Components/QuizzDetailCard";
 import QuestionDetailCard from "./Components/QuestionDetailCard";
 import useFetchAttemptHistory from "../../../../../../Hooks/StudentHooks/Quiz/useFetchAttemptHistory";
 import useSubmitQuiz from "../../../../../../Hooks/StudentHooks/Quiz/useSubmitQuiz";
-import { useSelector } from "react-redux";
-import { useNavigate, useBeforeUnload } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, useBeforeUnload, useLocation } from "react-router-dom";
+import { setActiveTab, setAttemptHistory, setQuizResults } from "../../../../../../Store/Slices/Student/MyClass/Class/Subjects/Quizes/quizesSlice";
+import { submitQuiz } from "../../../../../../Store/Slices/Student/MyClass/Class/Subjects/Quizes/quizes.action";
 
 const MainSection = () => {
-  const { loading, error, quizData, filters } = useSelector((store) => store?.student?.studentQuiz);
-  const quizId = quizData ._id;
-  // const { selectedClass, selectedSection, selectedSubject, studentId } =
-  //   useSelector((state) => state.Common);
+  const { loading, error, itemDetails, activeTab, selectedOptions,quizResults,attemptHistory } = useSelector((store) => store?.student?.studentQuiz);
+  const quizId = itemDetails?._id;
 
-  const [activeTab, setActiveTab] = useState("instructions");
-  const [selectedOptions, setSelectedOptions] = useState({});
+  const location = useLocation();
+  const dispatch = useDispatch();
+
   const [totalTime, setTotalTime] = useState(0);
   const [timeLeft, setTimeLeft] = useState(0);
   const [quizStarted, setQuizStarted] = useState(false);
   const [quizSubmitted, setQuizSubmitted] = useState(false);
-  const [attemptHistory, setAttemptHistory] = useState([]);
-  const [quizResults, setQuizResults] = useState({
-    totalPoints: 0,
-    correctAnswers: 0,
-    wrongAnswers: 0,
-  });
+  // const [attemptHistory, setAttemptHistory] = useState([]);
 
-  const { timeLimit, allowNumberOfAttempts, showOneQuestionOnly } = quizData ;
+  // console.log("attempt history is===>",attemptHistory)
+  const { timeLimit, allowNumberOfAttempts, showOneQuestionOnly } = itemDetails;
   const quizDuration = timeLimit * 60;
 
   // Fetch attempt history (allows for null attempts)
-  useFetchAttemptHistory(
-    quizId,
-    allowNumberOfAttempts, // Pass this correctly
-    setAttemptHistory,
-    setQuizSubmitted
-  );
+  // useFetchAttemptHistory(
+  //   quizId,
+  //   allowNumberOfAttempts, // Pass this correctly
+  //   setAttemptHistory,
+  //   setQuizSubmitted
+  // );
 
-  const { submitQuiz, isLoading } = useSubmitQuiz(
-    quizId,
-    attemptHistory,
-    setAttemptHistory,
-    allowNumberOfAttempts
-  );
+  // const { isLoading } = useSubmitQuiz(
+  //   quizId,
+  //   attemptHistory,
+  //   setAttemptHistory,
+  //   allowNumberOfAttempts
+  // );
 
+  // useBeforeUnload to handle preventing reload until quiz is submitted
   useBeforeUnload((event) => {
     if (quizStarted && !quizSubmitted) {
       event.preventDefault();
-      event.returnValue = "";
+      event.returnValue = ""; // Show a confirmation dialog before reloading
     }
   });
 
+
+
+  // UseEffect for handling timer logic
   useEffect(() => {
     let timer;
     if (quizStarted && timeLeft > 0) {
+      // Start the timer
       timer = setInterval(() => {
         setTimeLeft((prevTime) => {
           if (prevTime <= 1) {
             clearInterval(timer);
-            setQuizStarted(false);
-            handleSubmit();
+            setQuizStarted(false); // Stop the quiz when time is over
+            handleSubmit(); // Submit the quiz when time is up
             return 0;
           }
           return prevTime - 1;
         });
       }, 1000);
     }
-    return () => clearInterval(timer);
+    return () => clearInterval(timer); // Cleanup the timer on unmount or quiz stop
   }, [quizStarted, timeLeft]);
 
+  // Handle tab switching
   const handleTabChange = useCallback(
     (tab) => {
       if (tab === "instructions") {
-        setActiveTab(tab);
+        dispatch(setActiveTab(tab));
         return;
       }
+
+      // If switching to "questions", start the quiz if not already started
       if (tab === "questions" && !quizStarted) {
-        setTimeLeft(quizDuration);
-        setTotalTime(quizDuration);
-        setQuizStarted(true);
+        setTimeLeft(quizDuration); // Set the time left to the quiz duration
+        setTotalTime(quizDuration); // Set total time
+        setQuizStarted(true); // Start the quiz (i.e., trigger the timer)
       }
-      setActiveTab(tab);
+
+      dispatch(setActiveTab(tab));
     },
-    [quizStarted, quizDuration]
+    [quizStarted, quizDuration, dispatch]
   );
 
   const handleSubmit = useCallback(async () => {
@@ -96,7 +102,7 @@ const MainSection = () => {
       let correctAnswers = 0;
       let wrongAnswers = 0;
 
-      const questionsWithSelectedOptions = quizData .questions.map(
+      const questionsWithSelectedOptions = itemDetails?.questions?.map(
         (question, index) => {
           const selectedOption = selectedOptions[index];
           const isCorrect =
@@ -105,7 +111,7 @@ const MainSection = () => {
           if (selectedOption) {
             if (isCorrect) {
               correctAnswers += 1;
-              totalPoints += question.questionPoint;
+              totalPoints += question?.questionPoint;
             } else {
               wrongAnswers += 1;
             }
@@ -115,64 +121,103 @@ const MainSection = () => {
         }
       );
 
-      const newAttempt = await submitQuiz(
-        questionsWithSelectedOptions,
-        totalTime - timeLeft
-      );
+      const newAttempt = dispatch(submitQuiz(
+        {
+          quizId,
+          answers: questionsWithSelectedOptions,
+          timeTaken: totalTime - timeLeft,
+          attemptHistory
+        }
+      ));
 
       if (newAttempt) {
-        setAttemptHistory((prev) => [...prev, newAttempt]);
+        dispatch(setAttemptHistory((prev) => [...prev, newAttempt]));
         setQuizSubmitted(true);
-        setQuizResults({ totalPoints, correctAnswers, wrongAnswers });
+        dispatch(setQuizResults({ totalPoints, correctAnswers, wrongAnswers }));
       }
 
-      setQuizStarted(false);
+      setQuizStarted(false); // Stop the quiz after submitting
     } catch (error) {
       console.error("Quiz submission failed:", error);
       alert("An error occurred while submitting your quiz. Please try again.");
     }
-  }, [selectedOptions, submitQuiz, totalTime, timeLeft, quizData .questions]);
+  }, [selectedOptions, submitQuiz, totalTime, timeLeft, itemDetails.questions]);
+
+
+
+
 
   const hasRemainingAttempts = () => {
-    // Only check attempts if allowNumberOfAttempts is not null
     if (allowNumberOfAttempts === null) {
       return true; // Unlimited attempts
     }
-    return attemptHistory.length < allowNumberOfAttempts;
+    return attemptHistory?.length < allowNumberOfAttempts;
   };
+
+  // Start timer if the "questions" tab is active (when quiz is already started)
+  useEffect(() => {
+    if (activeTab === "questions" && !quizStarted) {
+      // Trigger timer if the tab is questions but quiz hasn't started yet
+      setTimeLeft(quizDuration);
+      setTotalTime(quizDuration);
+      setQuizStarted(true);
+    }
+  }, [activeTab, quizStarted, quizDuration]);
+
+
+
+
+
+
+  // Custom event listener for submitting quiz on reload
+  useEffect(() => {
+    const handleBeforeUnload = async (event) => {
+      if (quizStarted && !quizSubmitted) {
+        event.preventDefault();
+        event.returnValue = ""; // Standard to show confirmation dialog
+
+        // Submit the quiz before reload
+        await handleSubmit();
+
+        // Allow the page to reload after submission
+        if (quizSubmitted) {
+          event.returnValue = null; // Let the reload happen
+        }
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload); // Cleanup on unmount
+    };
+  }, [quizStarted, quizSubmitted, handleSubmit]);
 
   return (
     <div className="flex">
       <SubjectSideBar />
       <div className="w-[65%] border-x">
         <Tabs
-          activeTab={activeTab}
-          setActiveTab={handleTabChange}
           quizSubmitted={quizSubmitted}
           hasAttempted={attemptHistory.length > 0}
-          quiz={quizData}
-          hasRemainingAttempts={hasRemainingAttempts()} // Call the attempt check function
+          quiz={itemDetails}
+          hasRemainingAttempts={hasRemainingAttempts()}
+          onTabChange={handleTabChange}
+          attemptHistory={attemptHistory}
         >
           {(activeTab) => (
             <div className="h-full">
-              {activeTab === "instructions" && (
-                <QuizInstructionSection quiz={quizData} />
-              )}
+              {activeTab === "instructions" && <QuizInstructionSection />}
               {activeTab === "questions" && (
                 <>
-                  {quizSubmitted && hasRemainingAttempts() ? (
+                  {!quizSubmitted && hasRemainingAttempts() ? (
                     <QuizQuestions
-                      questions={quizData.questions}
-                      selectedOptions={selectedOptions}
-                      setSelectedOptions={setSelectedOptions}
                       showOneQuestionOnly={showOneQuestionOnly}
                       handleSubmit={handleSubmit}
+                      hasRemainingAttempts={hasRemainingAttempts()}
                     />
                   ) : (
-                    <QuizResults
-                      questions={quizData.questions}
-                      selectedOptions={selectedOptions}
-                    />
+                    <QuizResults hasRemainingAttempts={hasRemainingAttempts()} />
                   )}
                 </>
               )}
@@ -181,23 +226,23 @@ const MainSection = () => {
         </Tabs>
       </div>
       <div className="w-[30%]">
-        {activeTab === "instructions" && <QuizzDetailCard quiz={quizData} />}
+        {activeTab === "instructions" && <QuizzDetailCard quiz={itemDetails} />}
         {((activeTab === "questions" && !quizSubmitted) ||
           (activeTab === "questions" &&
             quizSubmitted &&
             hasRemainingAttempts())) && (
-          <QuestionDetailCard
-            timeLeft={timeLeft}
-            totalTime={totalTime}
-            quizData={quizData}
-            numberOfQuestions={quizData.questions.length}
-          />
-        )}
+            <QuestionDetailCard
+              timeLeft={timeLeft}
+              totalTime={totalTime}
+              quiz={itemDetails}
+              numberOfQuestions={itemDetails?.questions?.length}
+            />
+          )}
         {activeTab === "questions" && quizSubmitted && (
           <QuizResultSummary
-            totalPoints={quizResults.totalPoints}
-            correctAnswers={quizResults.correctAnswers}
-            wrongAnswers={quizResults.wrongAnswers}
+            totalPoints={quizResults?.totalPoints}
+            correctAnswers={quizResults?.correctAnswers}
+            wrongAnswers={quizResults?.wrongAnswers}
             attemptHistory={attemptHistory}
             quizId={quizId}
           />
