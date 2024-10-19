@@ -20,6 +20,10 @@ import {
   fetchTasks,
   fetchStudentGrades,
 } from "../../../Store/Slices/Student/Dashboard/studentDashboard.action.js"; // Import the action creators
+import NoticeBoard from "../../Admin/Dashboard/NoticeModule/NoticeBoard.js";
+import DashboardNoticeBoard from "./DashBoardComponents/Charts/dashboardNoticeBoard.js";
+import { CiMoneyBill } from "react-icons/ci";
+import { fetchStudentSubjectProgress } from "../../../Store/Slices/Admin/Users/Students/student.action.js";
 
 const StudentMainSection = () => {
   const navigate = useNavigate();
@@ -38,19 +42,20 @@ const StudentMainSection = () => {
     gradeData,
     error,
     tasks,
-  } = useSelector((state) => state.student.studentDashboard); // Accessing studentDashboard state
-
+  } = useSelector((state) => state.student.studentDashboard); 
   const { selectedClass, selectedSection } = useSelector(
-    (state) => state?.common?.user?.classInfo // Assuming classInfo is from another slice
+    (state) => state?.common?.user?.classInfo 
   );
+  const { userDetails } = useSelector((state) => state?.common?.user);
+  const {studentSubjectProgress} = useSelector((store) => store.admin.all_students);
 
-  // Dispatch actions to fetch all required data
   useEffect(() => {
-    dispatch(fetchDashboardDetails()); // Fetch dashboard details
-    dispatch(fetchSubjects());         // Fetch subjects
-    dispatch(fetchTasks());            // Fetch tasks
-    dispatch(fetchStudentGrades());    // Fetch student grades
-    dispatch(fetchTasks());    // Fetch student Tasks
+    dispatch(fetchStudentSubjectProgress(userDetails?.userId));
+    dispatch(fetchDashboardDetails()); 
+    dispatch(fetchSubjects());        
+    dispatch(fetchTasks());           
+    dispatch(fetchStudentGrades());    
+    dispatch(fetchTasks()); 
   }, [dispatch]);
 
   return (
@@ -70,7 +75,7 @@ const StudentMainSection = () => {
               {
                 label: "Due Fees",
                 value: 0,
-                icon: "💸",
+                icon: <CiMoneyBill />,
                 bgColor: "bg-red-100",
                 textColor: "text-red-600",
                 url:'/student_finance'
@@ -122,7 +127,7 @@ const StudentMainSection = () => {
                 <p className="text-sm text-gray-500">
                   A total of {subjects.length} Courses are in Progress
                 </p>
-                <AllSubjects subjects={subjects} />
+                <AllSubjects subjects={studentSubjectProgress} />
               </div>
             ) : (
               <div className="text-gray-500 flex flex-col items-center mt-7 mb-5">
@@ -134,58 +139,31 @@ const StudentMainSection = () => {
             )}
           </div>
         </div>
-        <div className="w-[70%] flex flex-col flex-wrap border-l border-r">
+        <div className="w-[70%] flex flex-col flex-wrap border-l border-r ">
           <div className="w-full">
             <AttendanceDashboard
               attendanceSummary={dashboardAttendance}
               error={attendanceError} // Pass the error state here
             />
           </div>
-
-          <div className="flex flex-row w-full justify-around">
-            <div className="flex flex-col border-r border-gray-200 w-1/2">
-              <div className="border-gray-300 w-full pt-5 pb-3 ps-2 pl-4">
-                <h1 className="text-xl ml-2 font-semibold text-gray-600">
-                  Student Grade
-                </h1>
-              </div>
-              <div className="flex justify-between px-3 w-full ps-4">
-                <p>Total Point: 90%</p>
-                <select className="select-exam-type border border-gray-300 rounded-md px-3 py-2 hover:shadow-md focus:outline-none focus:ring focus:ring-gray-300">
-                  <option value="exam-type">Exam Type</option>
-                  <option value="practical-exam">Practical Exam</option>
-                </select>
-              </div>
-
-              <div className="flex-1">
-                {error ? (
-                  <div className="flex flex-col items-center justify-center h-full text-gray-500">
-                    <GiSchoolBag size={50} />
-                    <p className="mt-4 text-lg font-semibold">
-                      Failed to load student grades.
-                    </p>
-                  </div>
-                ) : gradeData ? (
-                  <StudentGradePieChart gradesData={gradeData} />
-                ) : (
-                  <Spinner />
-                )}
-              </div>
-            </div>
-            <div className="flex flex-col border-l border-gray-200 w-1/2">
+        </div>
+        
+      </div>
+      <div className="flex flex-row w-[100%] ">
+          <div className="w-[70%]">
+          <DashboardNoticeBoard descriptionLength={58} />
+        </div>
+            <div className="flex flex-col border-l border-gray-200 w-[30%]">
               <div className="w-full py-5 ps-3">
                 <h1 className="text-xl font-semibold text-gray-600 px-2 mb-2">
                   Task
                 </h1>
-                <p className="px-2">5/12 assignments have been completed</p>
               </div>
               <div className="flex-1">
-                <TaskCompletionChart tasks={tasks} />
+                <TaskCompletionChart />
               </div>
             </div>
           </div>
-        </div>
-      </div>
       <div className="flex border">
         <div className="w-[65%]">
           <div className="flex justify-between items-center p-4">
@@ -220,7 +198,7 @@ const StudentMainSection = () => {
           {unpaidFees === 0 ? (
             <div className="text-gray-500 flex flex-col items-center mt-4 mb-6">
               <PiMoneyWavy size={80} />
-              <span className="mt-4 text-lg font-semibold text-center">
+              <span className="mt-4 text-2lx font-semibold text-center">
                 No unpaid fees at the moment
               </span>
             </div>

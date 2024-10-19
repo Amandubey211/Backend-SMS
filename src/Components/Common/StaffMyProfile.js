@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import profileIcon from '../../Assets/DashboardAssets/profileIcon.png';
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import useChangePassword from "../../Hooks/AuthHooks/Staff/Admin/resetPassword/useResetPassword";
 import Layout from "./Layout";
 import DashLayout from "../Admin/AdminDashLayout";
 import Spinner from "../../Components/Common/Spinner";
+import { updatePasswordThunk } from "../../Store/Slices/Common/User/actions/userActions";
 
 const StaffMyProfile = () => {
   const {userDetails,loading} = useSelector((store) => store.common.user); 
@@ -21,13 +21,13 @@ const StaffMyProfile = () => {
     dataSetter((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const { ChangePassword } = useChangePassword();
+ const dispatch = useDispatch();
 
   const updatePassword = () => {
     if (passwordData.newPassword === passwordData.confirmPassword) {
-      ChangePassword(passwordData);
+     dispatch(updatePasswordThunk(passwordData))
     } else {
-      toast.error("Passwords do not match.");
+      toast.error("confirm Password must be same ");
     }
   };
 

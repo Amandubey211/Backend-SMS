@@ -93,14 +93,14 @@ dispatch(fetchStudentSubjects(cid))
                   </tr>
                 ) : (
                   <tbody className="w-full">
-                    {grades?.length > 0 ? (
-                      grades.map((i, idx) => (
+                    {grades?.grades?.length > 0 ? (
+                      grades?.grades.map((i, idx) => (
                         <tr key={idx} className="bg-white">
                           <td className="px-5 py-2 flex items-center w-[10rem]">
                             <span>{i?.Name}</span>
                           </td>
-                          <td className="px-5 py-2">{i?.dueDate.slice(0, 10)}</td>
-                          <td className="px-5 py-2">{i?.submittedDate.slice(0, 10)}</td>
+                          <td className="px-5 py-2">{i?.dueDate?.slice(0, 10)}</td>
+                          <td className="px-5 py-2">{i?.submittedDate?.slice(0, 10)}</td>
                           <td className="px-5 py-2">
                             <span
                               className={`${getColorForStatus(

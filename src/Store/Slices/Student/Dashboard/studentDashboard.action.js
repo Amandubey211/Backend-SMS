@@ -1,6 +1,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { baseUrl } from '../../../../config/Common';
+import { CiMoneyBill } from 'react-icons/ci';
 
 // Fetch Dashboard Details
 export const fetchDashboardDetails = createAsyncThunk(
@@ -137,7 +138,7 @@ const formatDashboardData = (dashboardData) => {
       value: dashboardData?.data?.dueFees,
       bgColor: 'bg-red-100',
       textColor: 'text-black-500',
-      icon: '💸',
+      icon: <CiMoneyBill />,
     },
     {
       label: 'Event',

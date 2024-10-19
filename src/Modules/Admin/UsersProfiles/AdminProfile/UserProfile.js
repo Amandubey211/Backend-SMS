@@ -2,13 +2,13 @@ import React, { useEffect, useState } from "react";
 import Layout from "../../../../Components/Common/Layout";
 import DashLayout from "../../../../Components/Admin/AdminDashLayout";
 import SidebarSlide from "../../../../Components/Common/SidebarSlide";
-import { useSelector } from "react-redux";
-import useChangePassword from "../../../../Hooks/AuthHooks/Staff/Admin/resetPassword/useResetPassword";
+import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import EditAdmin from "./EditProfile";
 import profileIcon from "../../../../Assets/DashboardAssets/profileIcon.png";
 import { FaEye } from "react-icons/fa";
 import { FaEyeSlash } from "react-icons/fa";
+import { updatePasswordThunk } from "../../../../Store/Slices/Common/User/actions/userActions";
 const UserProfile = () => {
   const {userDetails,loading} = useSelector((store) => store.common.user);
 
@@ -33,22 +33,12 @@ const UserProfile = () => {
     console.log("Profile updated:");
   };
 
-  const { ChangePassword } = useChangePassword();
 
+  const dispatch = useDispatch();
   const updatePassword = () => {
     if (passwordData.newPassword === passwordData.confirmPassword) {
-      ChangePassword(passwordData)
-        .then(() => {
-          toast.success("Password updated successfully.");
-          setPasswordData({
-            currentPassword: "",
-            newPassword: "",
-            confirmPassword: "",
-          });
-        })
-        .catch(() => {
-          toast.error("Failed to update password.");
-        });
+      
+      dispatch(updatePasswordThunk(passwordData))
     } else {
       toast.error("Passwords do not match.");
     }

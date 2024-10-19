@@ -1,6 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { baseUrl } from "../../../../../config/Common";
+import toast from "react-hot-toast";
 
 // Fetch user data
 export const fetchUserData = createAsyncThunk(
@@ -46,3 +47,20 @@ export const fetchSubjectData = createAsyncThunk(
     }
   }
 );
+
+export const updatePasswordThunk = createAsyncThunk("User/updatePassword",
+  async(data,{rejectWithValue,getState})=>{
+  const { common } = getState();
+  const token = common.auth.token;
+  try {
+    const response = await axios.put(`${baseUrl}/api/password/change-password`,data, {
+      headers: { Authentication: `Bearer ${token}` },
+    });
+    toast.success('Password update successfully')
+    return response.data;
+  } catch (error) {
+    toast.error('current password is wrong')
+    return rejectWithValue(error.response?.data || error.message);
+  }
+
+})

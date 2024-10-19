@@ -5,7 +5,7 @@ const DashCard = ({
   value = 0,
   bgColor = "bg-gray-200",
   textColor = "text-gray-500",
-  icon = "📅", // Default to Calendar emoji
+  icon = "📅", 
   iconBackground = "bg-white",
 }) => {
   return (

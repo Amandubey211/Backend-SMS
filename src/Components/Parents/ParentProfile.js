@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import profileIcon from '../../Assets/DashboardAssets/profileIcon.png';
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import useChangePassword from "../../Hooks/AuthHooks/Staff/Admin/resetPassword/useResetPassword";
 import ParentDashLayout from "./ParentDashLayout";
 import Layout from "../Common/ParentLayout";
 import { useTranslation } from 'react-i18next'; // Import i18next hook
+import { updatePasswordThunk } from "../../Store/Slices/Common/User/actions/userActions";
 
 const ParentProfile = () => {
   const { t } = useTranslation('prtProfile'); // Initialize i18next hook
@@ -26,11 +26,11 @@ const ParentProfile = () => {
     console.log("Profile updated:");
   };
 
-  const { ChangePassword } = useChangePassword();
 
+  const dispatch = useDispatch();
   const updatePassword = () => {
     if (passwordData.newPassword === passwordData.confirmPassword) {
-      ChangePassword(passwordData)
+      dispatch(updatePasswordThunk(passwordData))
     } else {
       toast.error(t("Passwords do not match.")); // Use translation for toast message
     }
