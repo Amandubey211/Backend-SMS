@@ -24,41 +24,44 @@ const MainSection = ({ selectedSubjectId }) => {
   // Fetch modules and chapters
   useEffect(() => {
     if (!selectedSubjectId) {
+      setModules([]);  // Clear previous modules
+      setSelectedModule(null); // Clear selected module
+      setError(null); // Clear any errors
       console.log("Missing presentClassId or selectedSubjectId:", { selectedSubjectId });
       return;
     }
-
-    console.log("API Call Params:", { presentClassId, selectedSubjectId });
-
+  
     const fetchModulesAndChapters = async () => {
       setLoading(true);
       try {
         const token = localStorage.getItem("parent:token");
         if (!token) throw new Error("Authentication token not found");
-
+  
         const response = await axios.get(
           `${baseUrl}/admin/course/progress/student/${studentId}/subject/${selectedSubjectId}`,
           {
             headers: { Authentication: token },
           }
         );
-
+  
         if (response.data && response.data.data) {
           setModules(response.data.data.module);
         } else {
-          setModules([]);
+          setModules([]); // If no modules found, reset the data
         }
-
+  
         setLoading(false);
       } catch (err) {
         console.error("Error fetching modules:", err);
         setError("Failed to fetch modules.");
+        setModules([]);  // Reset modules on error
         setLoading(false);
       }
     };
-
+  
     fetchModulesAndChapters();
-  }, [presentClassId, selectedSubjectId, studentId]); // Ensure presentClassId is included
+  }, [presentClassId, selectedSubjectId, studentId]); // Dependencies ensure that it reloads when subject changes
+  
 
   const selectModule = (module) => {
     setSelectedModule(module); // Set the selected module when clicked

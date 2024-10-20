@@ -74,12 +74,16 @@ const AllSubject = ({ studentId }) => {
                     className={`w-[270px] transition-all duration-300 transform 
     ${subject.subjectId === selectedSubjectId ? 'bg-gray-100 shadow-lg scale-105' : 'bg-white shadow-md rounded-lg'}`}
                     onClick={() => {
-                      setSelectedSubjectId(subject.subjectId);
-                      console.log('Selected Subject ID:', subject.subjectId);  // Log the selected subject ID
+                      setSelectedSubjectId(null); // Reset first to clear existing data
+                      setTimeout(() => {
+                        setSelectedSubjectId(subject.subjectId);  // Set new subjectId after resetting
+                        console.log('Selected Subject ID:', subject.subjectId);
+                      }, 0); // Using setTimeout ensures state updates properly
                     }}
                   >
                     <SubjectCard subject={subject} i={index} />
                   </div>
+
 
 
 
@@ -93,7 +97,7 @@ const AllSubject = ({ studentId }) => {
             </div>
             <div className='border-t-2 w-[75%]'>
               {console.log("This is studentID: ", studentId, "This is select Subject id: ", selectedSubjectId)}
-              <MainSection selectedSubjectId={selectedSubjectId}/>
+              <MainSection selectedSubjectId={selectedSubjectId} />
 
             </div>
           </div>
