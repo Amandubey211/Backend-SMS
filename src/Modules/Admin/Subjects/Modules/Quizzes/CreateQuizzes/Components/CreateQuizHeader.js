@@ -98,13 +98,13 @@ const CreateQuizHeader = ({
         </h1>
       </div>
       <div className="flex items-center space-x-2">
-        <button
+        {/* <button
           onClick={() => setModalOpen(true)}
           className="flex items-center px-4 py-2 border border-gray-300 rounded-md text-pink-500 hover:bg-gray-100 transition"
         >
           {!isEditing && <span className="mr-1">+</span>}
           <span>{isEditing ? "Edit Rubric" : "Add Rubric"}</span>
-        </button>
+        </button> */}
         <button
           onClick={() => onSave(true)}
           className="flex-grow rounded-md py-2 px-4 text-center bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200 transition"

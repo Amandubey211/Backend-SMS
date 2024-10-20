@@ -48,7 +48,7 @@ const initialAnswersState = [
   { text: "", isCorrect: false },
 ];
 
-const MainSection = ({ setIsEditing }) => {
+const MainSection = ({ setIsEditing, isEditing }) => {
   const { cid, sid } = useParams();
   const location = useLocation();
   const dispatch = useDispatch();
@@ -68,7 +68,7 @@ const MainSection = ({ setIsEditing }) => {
   const [questionType, setQuestionType] = useState("multiple choice");
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [editingQuestionId, setEditingQuestionId] = useState(null);
-  const [isEditing, setLocalIsEditing] = useState(false);
+  // const [isEditing, setLocalIsEditing] = useState(false);
 
   // Fetch quiz by ID if it exists
   useEffect(() => {
@@ -77,21 +77,27 @@ const MainSection = ({ setIsEditing }) => {
       setQuizId(quizIdFromState);
       setIsEditing(true);
 
-      dispatch(fetchQuizByIdThunk(location.state?.quizId));
+      dispatch(fetchQuizByIdThunk(quizIdFromState));
     } else {
+      // Reset form when not editing
       setIsEditing(false);
+      setQuizId(""); // Clear quiz ID
+      setFormState(initialFormState); // Reset form to initial state
+      setAssignmentName(""); // Reset name
+      setInstruction(""); // Reset instructions
+      setQuestions([]); // Reset questions
+      setAnswers(initialAnswersState); // Reset answers
+      setRightAnswerComment(""); // Reset right answer comment
+      setWrongAnswerComment(""); // Reset wrong answer comment
     }
   }, [location.state, dispatch, setIsEditing]);
 
   // Set form values when quiz data is available
   useEffect(() => {
-    console.log("kk", quiz);
-    if (quiz) {
-      setLocalIsEditing(true);
-      setAssignmentName(quiz.name);
-      setInstruction(quiz.content);
-      setQuizId(quiz._id);
-      setQuestions(quiz.questions || []);
+    if (isEditing && quiz) {
+      setAssignmentName(quiz.name || "");
+      setInstruction(quiz.content || "");
+      setQuizId(quiz._id || "");
 
       setFormState((prevState) => ({
         ...prevState,
@@ -120,12 +126,12 @@ const MainSection = ({ setIsEditing }) => {
         chapterId: quiz.chapterId || prevState.chapterId,
         groupId: quiz.groupId || prevState.groupId,
       }));
-      setAnswers(quiz.answers || initialAnswersState);
+      setQuestions(quiz.questions || []); // Preload questions
+      setAnswers(quiz.answers || initialAnswersState); // Preload answers
       setRightAnswerComment(quiz.rightAnswerComment || "");
       setWrongAnswerComment(quiz.wrongAnswerComment || "");
-      // setExistingRubricId(quiz.rubricId || null);
     }
-  }, [quiz]);
+  }, [isEditing, quiz]);
 
   const handleFormChange = useCallback((e) => {
     const { name, value, type, checked } = e.target;
