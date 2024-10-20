@@ -93,7 +93,7 @@ const AllSubject = ({ studentId }) => {
             </div>
             <div className='border-t-2 w-[75%]'>
               {console.log("This is studentID: ", studentId, "This is select Subject id: ", selectedSubjectId)}
-              <MainSection student={studentId} selectedSubjectId={selectedSubjectId} role={role} />
+              <MainSection selectedSubjectId={selectedSubjectId}/>
 
             </div>
           </div>

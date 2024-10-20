@@ -1,64 +1,144 @@
-import React from "react";
-import ChapterItem from "./ChapterItem";
+import React, { useState } from "react";
 import {
-  FaPlus,
-  FaEllipsisV,
   FaChevronDown,
   FaChevronUp,
+  FaFilePdf,
+  FaFileWord,
+  FaFilePowerpoint,
+  FaEye,
 } from "react-icons/fa";
+import { GrAttachment } from "react-icons/gr";
+import ChapterItem from "./ChapterItem";
 
-const Chapter = ({
-  title,
-  chapterNumber,
-  imageUrl,
-  items,
-  isExpanded,
-  onToggle,
-}) => {
+const Chapter = ({ title, chapterNumber, imageUrl, assignments, quizzes, attachments }) => {
+  const [chapterExpanded, setChapterExpanded] = useState(false);
+
+  const toggleChapter = () => {
+    setChapterExpanded((prev) => !prev);
+  };
+
+  const getFileIcon = (type) => {
+    switch (type) {
+      case "application/pdf":
+        return <FaFilePdf className="text-red-500" size={24} />;
+      case "application/msword":
+        return <FaFileWord className="text-blue-500" size={24} />;
+      case "application/vnd.ms-powerpoint":
+        return <FaFilePowerpoint className="text-orange-500" size={24} />;
+      default:
+        return null;
+    }
+  };
+
   return (
-    <div className="mb-4 p-1 bg-white rounded-lg border-b  ">
-      <div className="flex items-center justify-between mb-2 ">
+    <div className="mb-4 p-2 bg-white rounded-lg border-b">
+      {/* Chapter Header */}
+      <div className="flex items-center justify-between mb-2">
         <div className="flex items-center">
           <img
-            src="https://s3-alpha-sig.figma.com/img/1e8c/34c0/7df4f0cd89609a7dca9260aef0718e29?Expires=1719792000&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=hEAoiy2JQWvi-eFKch9ZwRvGK9zl6lqoOEB6axX2Wgfu1EI3mvTsF4782GAunh8~PsawaT7Wh-cQVZMwd4gkZAj5e7lYfHMUWm3~P8Rwqy9L1oyW~A0ejVH1EFkvKDUseEjK1faauIJL65PYstLDCliB1tnyGf~8ORJnwemZcsq2dB0JL0s-Yf~AnFMVQsVMOmj6Xx7R7IsHINtdrlcPAMrvpOXnaMWQ3Of5uZbuvUt--CoWn5KWjjHdEZ0aPOAomCdeXW5HnIernLU9jHxLFJhtNGq98JoLxS53fryI1pyWu7dI8oo8YcC73MeGVhyY~UPoNiGM1xp1cYFp~mgG3Q__"
-            alt="Chapter"
+            src={imageUrl}
+            alt={`Chapter ${chapterNumber}`}
             className="w-12 h-12 mr-4 rounded-lg"
           />
-          <div>
-            <h2 className="font-semibold text-lg">{title}</h2>
+          <div className="flex flex-col">
+            <h2 className="font-semibold text-md">{title}</h2>
             <p className="text-gray-500">Chapter {chapterNumber}</p>
           </div>
         </div>
-        <div className="flex  items-center space-x-2">
-          {/* <button className="border p-2 rounded-full hover:bg-gray-50">
-            <FaPlus className="text-pink-500" />
-          </button>
-          <button className=" border p-2 rounded-full hover:bg-gray-50">
-            <FaEllipsisV />
-          </button> */}
+        <div className="flex items-center space-x-2">
+          {/* Attachments Icon */}
           <button
-            className="border p-2 rounded-full hover:bg-gray-50"
-            onClick={onToggle}
+            className="border p-2 rounded-full hover:bg-gray-100 text-red-600 relative"
+            aria-label="View Attachments"
           >
-            {isExpanded ? <FaChevronUp /> : <FaChevronDown />}
+            <GrAttachment />
+            {attachments?.length > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-100 opacity-90 text-red-900 text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                {attachments.length}
+              </span>
+            )}
+          </button>
+
+          {/* Dropdown Menu */}
+          <button
+            className="border p-2 rounded-full hover:bg-gray-100"
+            onClick={toggleChapter}
+            aria-label="Toggle Chapter"
+          >
+            {chapterExpanded ? <FaChevronUp /> : <FaChevronDown />}
           </button>
         </div>
       </div>
-      {isExpanded && (
-        <div className="ml-10 py-2">
-          {items?.length > 0 ? (
-            items?.map((item, index) => (
-              <ChapterItem
-                key={index}
-                type={item.type}
-                title={item.title}
-                isPublished={item.isPublished}
-                id={item.id}
-              />
-            ))
-          ) : (
-            <p className="text-gray-500">No chapters found</p>
+
+      {/* Chapter Content */}
+      {chapterExpanded && (
+        <div className="mt-2">
+          {/* Attachments Section */}
+          {attachments?.length > 0 && (
+            <div>
+              <h3 className="text-sm font-semibold text-green-600">
+                Attachments ({attachments.length})
+              </h3>
+              <div className="grid grid-cols-1 gap-2 mb-2">
+                {attachments.map((attachment, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center justify-between p-2 border rounded-md hover:shadow-md"
+                  >
+                    <div className="flex items-center">
+                      {getFileIcon(attachment.type) || (
+                        <img
+                          src={attachment.url}
+                          alt={attachment.name}
+                          className="h-8 w-8 object-cover rounded-md"
+                        />
+                      )}
+                      <div className="flex flex-col ml-4">
+                        <p className="text-gray-700 text-sm truncate max-w-xs overflow-hidden whitespace-nowrap">
+                          {attachment.name}
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => alert("Preview clicked")}
+                      className="text-green-500 p-1 border rounded-full hover:scale-110 cursor-pointer"
+                      aria-label="Preview Attachment"
+                    >
+                      <FaEye size={20} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
           )}
+
+          {/* Assignments and Quizzes */}
+          <div>
+            {assignments.length > 0 || quizzes.length > 0 ? (
+              <>
+                {assignments.map((assignment, index) => (
+                  <ChapterItem
+                    key={index}
+                    type="assignment"
+                    title={assignment.title}
+                    submitted={assignment.submitted}
+                  />
+                ))}
+                {quizzes.map((quiz, index) => (
+                  <ChapterItem
+                    key={index}
+                    type="quiz"
+                    title={quiz.title}
+                    submitted={quiz.submitted}
+                  />
+                ))}
+              </>
+            ) : (
+              <p className="py-2 bg-gray-50 italic text-gray-500 text-center">
+                No Assignment or Quiz
+              </p>
+            )}
+          </div>
         </div>
       )}
     </div>
