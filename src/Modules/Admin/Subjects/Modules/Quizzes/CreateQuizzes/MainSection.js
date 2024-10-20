@@ -129,10 +129,21 @@ const MainSection = ({ setIsEditing }) => {
 
   const handleFormChange = useCallback((e) => {
     const { name, value, type, checked } = e.target;
-    setFormState((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
+    let updatedValue = type === "checkbox" ? checked : value;
+
+    // If 'allowedAttempts' is unchecked (false), set 'allowNumberOfAttempts' to null
+    if (name === "allowedAttempts" && !checked) {
+      setFormState((prevState) => ({
+        ...prevState,
+        allowedAttempts: updatedValue,
+        allowNumberOfAttempts: null, // Reset when attempts are disallowed
+      }));
+    } else {
+      setFormState((prevState) => ({
+        ...prevState,
+        [name]: updatedValue,
+      }));
+    }
   }, []);
 
   const handleQuestionChange = useCallback(
@@ -204,15 +215,6 @@ const MainSection = ({ setIsEditing }) => {
         question: updatedQuestion,
       })
     );
-    // if (result.payload.success) {
-    //   setQuestions((prev) =>
-    //     prev.map((q) => (q._id === editingQuestionId ? updatedQuestion : q))
-    //   );
-    //   toast.success("Question updated successfully");
-    //   setSidebarOpen(false);
-    // } else {
-    //   toast.error("Failed to update question");
-    // }
   }, [
     dispatch,
     quizId,
@@ -230,12 +232,6 @@ const MainSection = ({ setIsEditing }) => {
       const result = await dispatch(
         deleteQuestionThunk({ quizId, questionId })
       );
-      // if (result.payload.success) {
-      //   setQuestions((prev) => prev.filter((q) => q._id !== questionId));
-      //   toast.success("Question deleted successfully");
-      // } else {
-      //   toast.error("Failed to delete question");
-      // }
     },
     [dispatch, quizId]
   );

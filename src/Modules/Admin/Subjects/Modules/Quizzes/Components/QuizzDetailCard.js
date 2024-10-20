@@ -24,8 +24,10 @@ const QuizzDetailCard = () => {
     { label: "Quiz Type", value: quiz?.quizType || "N/A", type: "quizz" },
     { label: "Quiz Score", value: "0 out of 10", type: "quizz" },
     {
-      label: "Multiple Attempts",
-      value: quiz?.allowedAttempts ? "Yes" : "No",
+      label: "Allowed Attempts",
+      value: quiz?.allowNumberOfAttempts
+        ? quiz?.allowNumberOfAttempts
+        : "Unlimited",
       type: "quizz",
     },
     { label: "Submitting date", value: "20-5-2024", type: "quizz" },
