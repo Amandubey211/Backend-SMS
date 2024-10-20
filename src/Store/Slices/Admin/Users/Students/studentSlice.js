@@ -166,6 +166,7 @@ const allStudentSlice = createSlice({
         .addCase(fetchStudentTask.fulfilled, (state, action) => {
           state.loading = false;
           state.completedTask = action.payload;
+          console.log('ct---',action.payload)
         })
         .addCase(fetchStudentTask.rejected, (state, action) => {
           state.loading = false;

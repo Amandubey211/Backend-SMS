@@ -9,14 +9,15 @@ import {fetchStudentTask} from "../../../../../Store/Slices/Admin/Users/Students
 Chart.register(ArcElement, Tooltip, Legend);
 const TaskCompletionChart = () => {
     const {completedTask} = useSelector((store) => store.admin.all_students);
+    console.log('---1',completedTask);
     const {userDetails} = useSelector((store) => store.common.user);
     const [missingPercentage,setMissingPercentage] = useState(0)
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(fetchStudentTask(userDetails?._id)).then(()=>{
+    dispatch(fetchStudentTask({id:userDetails?.userId})).then(()=>{
         setMissingPercentage(100-completedTask)
     });
-  }, [dispatch])
+  }, [dispatch,fetchStudentTask])
 
     const data = {
         datasets: [
