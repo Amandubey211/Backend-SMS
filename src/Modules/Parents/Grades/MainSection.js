@@ -46,6 +46,11 @@ const MainSection = ({ selectedSubjectId }) => {
   
         if (response.data && response.data.data) {
           setModules(response.data.data.module);
+
+          // Automatically select the first module and load its chapters
+          if (response.data.data.module.length > 0) {
+            setSelectedModule(response.data.data.module[0]);  // Auto-select the first module
+          }
         } else {
           setModules([]); // If no modules found, reset the data
         }
