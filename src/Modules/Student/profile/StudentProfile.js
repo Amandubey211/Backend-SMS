@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import toast from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
 import profileIcon from "../../../Assets/DashboardAssets/profileIcon.png";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import StudentDashLayout from "../../../Components/Student/StudentDashLayout";
@@ -58,6 +58,7 @@ const StudentProfile = () => {
 
   return (
     <>
+    <Toaster/>
       <StudentDashLayout>
         <div className="flex flex-col w-full p-4 gap-3 ">
           <div className="flex items-center px-6 py-4 gap-3  rounded-md">

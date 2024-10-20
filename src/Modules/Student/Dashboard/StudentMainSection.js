@@ -149,7 +149,7 @@ const StudentMainSection = () => {
         </div>
         
       </div>
-      <div className="flex flex-row w-[100%] ">
+      <div className="flex flex-row w-[100%]  border-t">
           <div className="w-[70%]">
           <DashboardNoticeBoard descriptionLength={58} />
         </div>

@@ -197,14 +197,16 @@ export const fetchCourseProgress = createAsyncThunk(
 )
 export const fetchStudentTask = createAsyncThunk(
   'student/studentTask',
-  async (id, { rejectWithValue, getState }) => {
+  async ({id}, { rejectWithValue, getState }) => {
     const { common } = getState();
     const token = common.auth.token;
     try {
-      const response = await axios.get(`${baseUrl}/admin/task/student/${id.studentId}`, {
+      console.log('function clicked')
+      const response = await axios.get(`${baseUrl}/admin/task/student/${id}`, {
         headers: { Authentication: `Bearer ${token}` }
       });
-
+      console.log('---------',response.data);
+      
       return response.data.completedTask;
 
     }

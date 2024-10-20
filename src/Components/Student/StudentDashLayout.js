@@ -2,6 +2,7 @@ import React from "react";
 import { useSelector } from "react-redux";
 import Navbar from "../Common/Navbar";
 import SideMenubar from "./SideMenubar";
+import { Toaster } from "react-hot-toast";
 
 const StudentDashLayout = ({
   children,
@@ -16,8 +17,9 @@ const StudentDashLayout = ({
 
   return (
     <div className="flex w-full h-auto border-l border-r border-t">
+      <Toaster/>
       <SideMenubar isOpen={isSidebarOpen} />
-
+         
       <div
         className={`ml-${sidebarWidth} transition-all duration-500 flex-1 h-full`}
         style={{
