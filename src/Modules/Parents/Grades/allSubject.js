@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useSelector } from "react-redux";
-import { FiLoader } from 'react-icons/fi';
 import { GoAlertFill } from 'react-icons/go';
 import SubjectCard from '../../Admin/UsersProfiles/StudentProfile/Components/StudentCourseProgress/allSubjects/SubjectCard';
 import { baseUrl } from '../../../config/Common';
 import MainSection from './MainSection.js';
+import Spinner from "../../../Components/Common/Spinner";
 
 const AllSubject = ({ studentId }) => {
   const role = useSelector((store) => store.common.auth.role);
@@ -54,8 +54,7 @@ const AllSubject = ({ studentId }) => {
     <>
       {loading ? (
         <div className='w-full h-[50vh] flex items-center justify-center'>
-          <FiLoader className="animate-spin mr-2 w-[2rem] h-[2rem]" />
-          <p className="text-gray-800 text-sm">Loading...</p>
+          <Spinner />
         </div>
       ) : error ? (
         <div className="flex w-full h-full text-gray-500 items-center justify-center flex-col text-xl">

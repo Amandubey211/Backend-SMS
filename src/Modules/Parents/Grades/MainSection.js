@@ -5,6 +5,7 @@ import { GoAlertFill } from "react-icons/go";
 import Chapter from "./Components/Chapter";
 import ModuleCard from "./Components/ModuleCard";
 import { baseUrl } from '../../../config/Common';
+import Spinner from "../../../Components/Common/Spinner";
 
 const MainSection = ({ selectedSubjectId }) => {
   const [modules, setModules] = useState([]);
@@ -81,11 +82,9 @@ const MainSection = ({ selectedSubjectId }) => {
     <div className="flex min-h-screen my-2">
       <div className="w-[65%] bg-white p-2 border-l">
         <div className="bg-white p-2 rounded-lg">
-          {/* Show loading or error state */}
+          {/* Show loading or error state for Chapters */}
           {loading ? (
-            <div className="flex justify-center items-center my-20 h-full w-full">
-              <p className="text-gray-500">Loading data...</p>
-            </div>
+            <Spinner/>
           ) : error ? (
             <div className="flex justify-center items-center my-20 h-full w-full">
               <p className="text-gray-500">Error loading data: {error}</p>
@@ -101,7 +100,7 @@ const MainSection = ({ selectedSubjectId }) => {
                 assignments={chapter?.assignments || []}
                 quizzes={chapter?.quizzes || []}
                 isExpanded={expandedChapters === chapter?.chapterId}
-                onToggle={() => handleToggle(chapter?.chapterId)}
+                onToggle={() => handleToggle(chapter?.chapterId)}                
               />
             ))
           ) : (
@@ -122,7 +121,9 @@ const MainSection = ({ selectedSubjectId }) => {
             <h2 className="text-lg font-semibold">All Modules</h2>
           </div>
           <div className="grid grid-cols-1 gap-2">
-            {modules?.length > 0 ? (
+            {loading ? ( // Show spinner while loading modules
+              <Spinner />
+            ) : modules?.length > 0 ? (
               modules.map((module, index) => (
                 <div
                   key={index}
