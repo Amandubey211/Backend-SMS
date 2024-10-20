@@ -64,33 +64,30 @@ const DashCard = ({
   ];
 
   return (
-<div className="flex justify-center py-4">
-  {cardData.map((item, index) => (
-    <div 
-      key={index} 
-      className={`p-3 px-6 mx-7 flex-none w-[22%] rounded-lg border ${item.bgColor} hover:shadow-lg transition-shadow duration-200`}
-    >
-      <div className="flex gap-4 items-center">
-        {/* Icon */}
-        <div className={`p-3 bg-white ${item.textColor} rounded-full shadow-2xl text-2xl`}>
-          {item.icon}
+    <div className="flex justify-center py-4"> {/* Adjusted padding */}
+      {cardData.map((item, index) => (
+        <div 
+          key={index} 
+          className={`p-4 px-6 mx-6 flex-none w-[23%] rounded-lg border ${item.bgColor} hover:shadow-lg transition-shadow duration-200`} // Adjusted padding, margin, and width
+        >
+          <div className="flex gap-4 items-center"> {/* Adjusted gap between icon and text */}
+            {/* Icon */}
+            <div className={`p-3 bg-white ${item.textColor} rounded-full shadow-xl text-3xl`}> {/* Adjusted icon size */}
+              {item.icon}
+            </div>
+            
+            {/* Number and Label in a column */}
+            <div className="flex flex-col">
+              {/* Value */}
+              <div className="text-xl font-bold">{item.value}</div> {/* Adjusted value font size */}
+              
+              {/* Label */}
+              <div className={`mt-2 text-md ${item.textColor}`}>{item.label}</div> {/* Adjusted label font size */}
+            </div>
+          </div>
         </div>
-        
-        {/* Number and Label in a column */}
-        <div className="flex flex-col">
-          {/* Value */}
-          <div className="text-xl font-semibold">{item.value}</div>
-          
-          {/* Label */}
-          <div className={`mt-2 ${item.textColor}`}>{item.label}</div>
-        </div>
-      </div>
+      ))}
     </div>
-  ))}
-</div>
-
-
-
   );
 };
 
