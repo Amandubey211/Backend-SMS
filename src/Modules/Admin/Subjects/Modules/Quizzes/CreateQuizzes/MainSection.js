@@ -24,7 +24,7 @@ const initialFormState = {
   submissionFormat: "",
   allowedAttempts: true,
   allowNumberOfAttempts: 1,
-  assignTo: "",
+  assignTo: "Everyone",
   showOneQuestionOnly: false,
   questionType: "",
   sectionId: null,
@@ -269,26 +269,46 @@ const MainSection = ({ setIsEditing, isEditing }) => {
         subjectId: sid,
         publish,
       };
+
+      // If `assignTo` is Section or Group, set the respective ID
       if (formState.assignTo === "Section") {
         quizData.sectionId = formState.sectionId || null;
       } else if (formState.assignTo === "Group") {
         quizData.groupId = formState.groupId || null;
       }
 
+      // Ensure allowedAttempts is properly set as a boolean
+      const allowedAttempts = formState.allowedAttempts === true;
+
+      let allowNumberOfAttempts = null;
+      // Set allowNumberOfAttempts only if allowedAttempts is false (meaning attempts are limited)
+      if (!allowedAttempts && formState.allowNumberOfAttempts) {
+        allowNumberOfAttempts = Number(formState.allowNumberOfAttempts);
+      }
+
+      // Include the allowedAttempts and allowNumberOfAttempts in the quizData
+      quizData.allowedAttempts = allowedAttempts;
+      quizData.allowNumberOfAttempts = allowNumberOfAttempts;
+
       if (isEditing) {
         // Update existing quiz
         dispatch(updateQuizThunk({ quizId, quizData }));
       } else {
         // Create new quiz
+        console.log("quizData", quizData); // Debugging line
         const result = await dispatch(createQuizThunk(quizData));
-        console.log(result, "lllllllllll");
-        if (result.payload._id) {
-          setActiveTab("questions");
-          setQuizId(result.payload._id);
-        }
       }
     },
-    [dispatch, formState, assignmentName, instruction, cid, sid, quizId]
+    [
+      dispatch,
+      formState,
+      assignmentName,
+      instruction,
+      cid,
+      sid,
+      quizId,
+      isEditing,
+    ]
   );
 
   const handleInstructionChange = useCallback((content) => {
