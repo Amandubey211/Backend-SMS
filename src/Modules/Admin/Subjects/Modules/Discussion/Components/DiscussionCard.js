@@ -1,6 +1,11 @@
 import React, { useState, useRef, useEffect } from "react";
 import { FaEllipsisV } from "react-icons/fa";
-import { MdPushPin, MdOutlinePushPin, MdCalendarToday } from "react-icons/md";
+import {
+  MdPushPin,
+  MdOutlinePushPin,
+  MdCalendarToday,
+  MdOutlineBlock,
+} from "react-icons/md";
 import { BsPatchCheckFill } from "react-icons/bs";
 import { GoDiscussionClosed } from "react-icons/go";
 import { MdMarkEmailRead } from "react-icons/md";
@@ -77,7 +82,28 @@ const DiscussionCard = ({ discussion, fetchClassDiscussions }) => {
             <MdOutlinePushPin className="text-gray-400 w-6 h-6" />
           )}
         </button>
-        <BsPatchCheckFill className="text-green-600 w-6 h-6 transition-transform transform hover:scale-110" />
+
+        {/* {discussion.pulish ? (
+          <BsPatchCheckFill className="text-green-600 w-6 h-6 transition-transform transform hover:scale-110" />
+        ) : (
+          <BsPatchCheckFill className="text-green-600 w-6 h-6 transition-transform transform hover:scale-110" />
+        )} */}
+
+        {!discussion.pulish ? (
+          <>
+            <BsPatchCheckFill
+              aria-hidden="true"
+              className="text-green-600 w-6 h-6 transition-transform transform hover:scale-110"
+            />
+          </>
+        ) : (
+          <>
+            <MdOutlineBlock
+              aria-hidden="true"
+              className="text-gray-600 w-6 h-6 transition-transform transform hover:scale-110"
+            />
+          </>
+        )}
 
         <button
           className="border w-7 h-7 p-1 rounded-full transition-transform transform hover:scale-110"

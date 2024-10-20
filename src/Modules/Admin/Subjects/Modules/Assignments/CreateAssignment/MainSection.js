@@ -57,7 +57,7 @@ const MainSection = ({ setIsEditing }) => {
         points: assignment.points || "",
         displayGrade: assignment.grade || false,
         submissionType: assignment.submissionType || "",
-        allowedAttempts: assignment.allowedAttempts ? "true" : "false",
+        allowedAttempts: assignment.allowedAttempts,
         numberOfAttempts: assignment.allowNumberOfAttempts || "",
         assignTo: assignment.assignTo || "",
         sectionId: assignment?.sectionId || null,
@@ -95,15 +95,15 @@ const MainSection = ({ setIsEditing }) => {
   const handleSave = useCallback(
     async (publish) => {
       try {
-        if (publish) {
-          setPublishLoading(true);
-        } else {
-          setSaveLoading(true);
-        }
+        setSaveLoading(!publish);
+        setPublishLoading(publish);
 
-        const allowedAttempts = formState.allowedAttempts === "true";
+        // Ensure allowedAttempts is properly set as a boolean
+        const allowedAttempts = formState.allowedAttempts === true;
+
         let allowNumberOfAttempts = null;
 
+        // Check if allowedAttempts is true, then set allowNumberOfAttempts
         if (allowedAttempts) {
           allowNumberOfAttempts = formState.numberOfAttempts
             ? Number(formState.numberOfAttempts)
@@ -117,8 +117,8 @@ const MainSection = ({ setIsEditing }) => {
           grade: formState.displayGrade,
           submissionType: formState.submissionType,
           allowedAttempts,
-          allowNumberOfAttempts,
-          assignTo: formState?.assignTo,
+          allowNumberOfAttempts, // Send this if allowedAttempts is true
+          assignTo: formState.assignTo,
           dueDate: formState.dueDate,
           availableFrom: formState.availableFrom,
           until: formState.until,
@@ -137,9 +137,8 @@ const MainSection = ({ setIsEditing }) => {
         }
 
         if (isEditing) {
-          let sectionId = formState.sectionId || null;
           await dispatch(
-            updateAssignmentThunk({ assignmentId, assignmentData, sectionId })
+            updateAssignmentThunk({ assignmentId, assignmentData })
           );
         } else {
           const response = await dispatch(
@@ -148,13 +147,10 @@ const MainSection = ({ setIsEditing }) => {
           setAssignmentId(response?.data?._id);
         }
       } catch (error) {
-        console.log(error);
+        console.error(error);
       } finally {
-        if (publish) {
-          setPublishLoading(false);
-        } else {
-          setSaveLoading(false);
-        }
+        setPublishLoading(false);
+        setSaveLoading(false);
       }
     },
     [

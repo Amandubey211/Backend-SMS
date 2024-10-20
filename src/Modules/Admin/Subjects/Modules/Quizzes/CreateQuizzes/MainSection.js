@@ -24,7 +24,7 @@ const initialFormState = {
   submissionFormat: "",
   allowedAttempts: true,
   allowNumberOfAttempts: 1,
-  assignTo: "",
+  assignTo: "Everyone",
   showOneQuestionOnly: false,
   questionType: "",
   sectionId: null,
@@ -48,7 +48,7 @@ const initialAnswersState = [
   { text: "", isCorrect: false },
 ];
 
-const MainSection = ({ setIsEditing }) => {
+const MainSection = ({ setIsEditing, isEditing }) => {
   const { cid, sid } = useParams();
   const location = useLocation();
   const dispatch = useDispatch();
@@ -68,7 +68,7 @@ const MainSection = ({ setIsEditing }) => {
   const [questionType, setQuestionType] = useState("multiple choice");
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [editingQuestionId, setEditingQuestionId] = useState(null);
-  const [isEditing, setLocalIsEditing] = useState(false);
+  // const [isEditing, setLocalIsEditing] = useState(false);
 
   // Fetch quiz by ID if it exists
   useEffect(() => {
@@ -77,21 +77,27 @@ const MainSection = ({ setIsEditing }) => {
       setQuizId(quizIdFromState);
       setIsEditing(true);
 
-      dispatch(fetchQuizByIdThunk(location.state?.quizId));
+      dispatch(fetchQuizByIdThunk(quizIdFromState));
     } else {
+      // Reset form when not editing
       setIsEditing(false);
+      setQuizId(""); // Clear quiz ID
+      setFormState(initialFormState); // Reset form to initial state
+      setAssignmentName(""); // Reset name
+      setInstruction(""); // Reset instructions
+      setQuestions([]); // Reset questions
+      setAnswers(initialAnswersState); // Reset answers
+      setRightAnswerComment(""); // Reset right answer comment
+      setWrongAnswerComment(""); // Reset wrong answer comment
     }
   }, [location.state, dispatch, setIsEditing]);
 
   // Set form values when quiz data is available
   useEffect(() => {
-    console.log("kk", quiz);
-    if (quiz) {
-      setLocalIsEditing(true);
-      setAssignmentName(quiz.name);
-      setInstruction(quiz.content);
-      setQuizId(quiz._id);
-      setQuestions(quiz.questions || []);
+    if (isEditing && quiz) {
+      setAssignmentName(quiz.name || "");
+      setInstruction(quiz.content || "");
+      setQuizId(quiz._id || "");
 
       setFormState((prevState) => ({
         ...prevState,
@@ -120,19 +126,30 @@ const MainSection = ({ setIsEditing }) => {
         chapterId: quiz.chapterId || prevState.chapterId,
         groupId: quiz.groupId || prevState.groupId,
       }));
-      setAnswers(quiz.answers || initialAnswersState);
+      setQuestions(quiz.questions || []); // Preload questions
+      setAnswers(quiz.answers || initialAnswersState); // Preload answers
       setRightAnswerComment(quiz.rightAnswerComment || "");
       setWrongAnswerComment(quiz.wrongAnswerComment || "");
-      // setExistingRubricId(quiz.rubricId || null);
     }
-  }, [quiz]);
+  }, [isEditing, quiz]);
 
   const handleFormChange = useCallback((e) => {
     const { name, value, type, checked } = e.target;
-    setFormState((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
+    let updatedValue = type === "checkbox" ? checked : value;
+
+    // If 'allowedAttempts' is unchecked (false), set 'allowNumberOfAttempts' to null
+    if (name === "allowedAttempts" && !checked) {
+      setFormState((prevState) => ({
+        ...prevState,
+        allowedAttempts: updatedValue,
+        allowNumberOfAttempts: null, // Reset when attempts are disallowed
+      }));
+    } else {
+      setFormState((prevState) => ({
+        ...prevState,
+        [name]: updatedValue,
+      }));
+    }
   }, []);
 
   const handleQuestionChange = useCallback(
@@ -204,15 +221,6 @@ const MainSection = ({ setIsEditing }) => {
         question: updatedQuestion,
       })
     );
-    // if (result.payload.success) {
-    //   setQuestions((prev) =>
-    //     prev.map((q) => (q._id === editingQuestionId ? updatedQuestion : q))
-    //   );
-    //   toast.success("Question updated successfully");
-    //   setSidebarOpen(false);
-    // } else {
-    //   toast.error("Failed to update question");
-    // }
   }, [
     dispatch,
     quizId,
@@ -230,12 +238,6 @@ const MainSection = ({ setIsEditing }) => {
       const result = await dispatch(
         deleteQuestionThunk({ quizId, questionId })
       );
-      // if (result.payload.success) {
-      //   setQuestions((prev) => prev.filter((q) => q._id !== questionId));
-      //   toast.success("Question deleted successfully");
-      // } else {
-      //   toast.error("Failed to delete question");
-      // }
     },
     [dispatch, quizId]
   );
@@ -267,26 +269,46 @@ const MainSection = ({ setIsEditing }) => {
         subjectId: sid,
         publish,
       };
+
+      // If `assignTo` is Section or Group, set the respective ID
       if (formState.assignTo === "Section") {
         quizData.sectionId = formState.sectionId || null;
       } else if (formState.assignTo === "Group") {
         quizData.groupId = formState.groupId || null;
       }
 
+      // Ensure allowedAttempts is properly set as a boolean
+      const allowedAttempts = formState.allowedAttempts === true;
+
+      let allowNumberOfAttempts = null;
+      // Set allowNumberOfAttempts only if allowedAttempts is false (meaning attempts are limited)
+      if (!allowedAttempts && formState.allowNumberOfAttempts) {
+        allowNumberOfAttempts = Number(formState.allowNumberOfAttempts);
+      }
+
+      // Include the allowedAttempts and allowNumberOfAttempts in the quizData
+      quizData.allowedAttempts = allowedAttempts;
+      quizData.allowNumberOfAttempts = allowNumberOfAttempts;
+
       if (isEditing) {
         // Update existing quiz
         dispatch(updateQuizThunk({ quizId, quizData }));
       } else {
         // Create new quiz
+        console.log("quizData", quizData); // Debugging line
         const result = await dispatch(createQuizThunk(quizData));
-        console.log(result, "lllllllllll");
-        if (result.payload._id) {
-          setActiveTab("questions");
-          setQuizId(result.payload._id);
-        }
       }
     },
-    [dispatch, formState, assignmentName, instruction, cid, sid, quizId]
+    [
+      dispatch,
+      formState,
+      assignmentName,
+      instruction,
+      cid,
+      sid,
+      quizId,
+      isEditing,
+    ]
   );
 
   const handleInstructionChange = useCallback((content) => {

@@ -9,6 +9,30 @@ import { useParams } from "react-router-dom";
 import { fetchModules } from "../../../../../../../Store/Slices/Admin/Class/Module/moduleThunk";
 import { format } from "date-fns"; // Import date-fns for formatting
 
+const AllowedAttemptsSelect = ({ allowedAttempts, handleChange }) => {
+  return (
+    <div className="mb-4">
+      <label className="block text-gray-700">Allowed Attempts</label>
+      <select
+        name="allowedAttempts"
+        value={allowedAttempts ? "true" : "false"} // Handle boolean as string
+        onChange={(e) =>
+          handleChange({
+            target: {
+              name: "allowedAttempts",
+              value: e.target.value === "true", // Convert to boolean
+            },
+          })
+        }
+        className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+      >
+        <option value="">Select</option>
+        <option value="false">Limited</option>
+        <option value="true">Unlimited</option>
+      </select>
+    </div>
+  );
+};
 const CreateQuizForm = ({
   quizType,
   allowShuffleAnswers,
@@ -122,7 +146,7 @@ const CreateQuizForm = ({
           onChange={handleChange}
         />
 
-        {/* Allowed Attempts */}
+        {/* Allowed Attempts
         <div className="flex items-center">
           <input
             type="checkbox"
@@ -143,6 +167,23 @@ const CreateQuizForm = ({
             name="allowNumberOfAttempts"
             type="number"
             value={allowNumberOfAttempts}
+            onChange={handleChange}
+          />
+        )} */}
+
+        {/* Allowed Attempts using Select Box */}
+        <AllowedAttemptsSelect
+          allowedAttempts={allowedAttempts}
+          handleChange={handleChange}
+        />
+
+        {/* Conditionally show Number of Attempts input when allowedAttempts is false (i.e., Limited) */}
+        {allowedAttempts === false && (
+          <LabeledInput
+            label="Number of Attempts"
+            name="allowNumberOfAttempts"
+            type="number"
+            value={allowNumberOfAttempts || ""} // Reset to empty if null
             onChange={handleChange}
           />
         )}

@@ -101,6 +101,11 @@ const stdSubjectPersistConfig = {
   whitelist: ["subject"],
 };
 
+const stdClassPersistConfig = {
+  key: "studentClass",
+  storage,
+};
+
 // Combine the Auth and User reducers under a Common entity
 const commonReducer = combineReducers({
   auth: persistReducer(authPersistConfig, authReducer),
@@ -152,7 +157,7 @@ const studentReducer = combineReducers({
   studentIssueBooks: studentIssueBooksReducer,
   studentAnnouncement: studentAnnouncementReducer,
   studentEvent: studentEventReducer,
-  studentClass: studentClassReducer,
+  studentClass: persistReducer(stdClassPersistConfig, studentClassReducer),
   studentClassTeacher: studentClassTeacherReducer,
   studentClassmate: studentClassmateReducer,
   studentAttendance: studentAttendanceReducer,

@@ -117,12 +117,12 @@ const groupSectionSlice = createSlice({
       })
       .addCase(updateGroup.fulfilled, (state, action) => {
         state.loading = false;
-        const index = state.groupsList.findIndex(
-          (group) => group._id === action.payload._id
-        );
-        if (index !== -1) {
-          state.groupsList[index] = action.payload;
-        }
+        // const index = state.groupsList.findIndex(
+        //   (group) => group._id === action.payload._id
+        // );
+        // if (index !== -1) {
+        //   state.groupsList[index] = action.payload;
+        // }
       })
       .addCase(updateGroup.rejected, (state, action) => {
         state.loading = false;
