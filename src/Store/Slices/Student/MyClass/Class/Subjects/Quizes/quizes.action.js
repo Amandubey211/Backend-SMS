@@ -26,7 +26,7 @@ export const stdGetQuiz = createAsyncThunk(
                 params: { subjectId: sid, moduleId, chapterId },
             });
 
-            const data = res?.data?.quizzes;
+            const data = res?.data?.quizzes?.reverse();
             console.log("get quiz data>>>", data);
             return data;
         } catch (error) {

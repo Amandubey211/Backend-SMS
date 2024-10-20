@@ -101,10 +101,10 @@ const QuizResultSummary = ({
 
 
   return (
-    <div className="mt-4 overflow-y-auto" style={{ maxHeight: "80vh" }}>
+    <div className="mt-4 overflow-y-auto px-4"  style={{ maxHeight: "80vh" }}>
       <h3 className="text-lg font-semibold">Attempt History</h3>
       {Array.isArray(attemptHistory) && attemptHistory.length > 0 ? (
-        attemptHistory.map((attempt, index) => (
+        attemptHistory?.map((attempt, index) => (
           <div
             key={index}
             className="p-2 border rounded-md mt-2 cursor-pointer hover:bg-gray-100"

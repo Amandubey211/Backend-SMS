@@ -18,6 +18,7 @@ const initialState = {
 
     //quiz questions
     currentQuestionIndex:0,
+  
 
 
     // attempt history
@@ -59,6 +60,7 @@ const stdQuizSlice = createSlice({
         setAttemptHistory:(state, action) => {
             state.attemptHistory = action.payload;
         },
+       
 
     },
     extraReducers: (builder) => {
@@ -104,7 +106,7 @@ const stdQuizSlice = createSlice({
     }
 });
 
-export const {  setSearchQuery, setActiveTab, setSelectedOptions, setCurrentQuestionIndex, setSelectedAttempt, setQuizResults, setAttemptHistory } = stdQuizSlice.actions;
+export const {  setSearchQuery, setActiveTab, setSelectedOptions, setCurrentQuestionIndex,  setSelectedAttempt, setQuizResults, setAttemptHistory } = stdQuizSlice.actions;
 export default stdQuizSlice.reducer;
 
 

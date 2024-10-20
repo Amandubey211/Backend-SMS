@@ -70,7 +70,7 @@ const List = ({
         </div>
       ) : (
         <ul className="border-t p-4">
-          {filteredData?.reverse()?.map((item) => (
+          {filteredData?.map((item) => (
             <NavLink
               to={navLinkPath(cid, sid, item)}
               key={item._id || item.assignmentId}

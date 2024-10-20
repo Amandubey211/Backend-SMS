@@ -8,7 +8,7 @@ import { setActiveTab } from "../../../../../../../Store/Slices/Student/MyClass/
 const Tabs = ({
   quiz,
   children,
-  onTabChange, 
+  // onTabChange, 
   createPage,
   quizSubmitted,
   hasAttempted,
@@ -30,9 +30,9 @@ const Tabs = ({
     dispatch(setActiveTab(tab));
 
     // Call onTabChange only if it exists
-    if (onTabChange && typeof onTabChange === "function") {
-      onTabChange(tab);
-    }
+    // if (onTabChange && typeof onTabChange === "function") {
+    //   onTabChange(tab);
+    // }
   };
 
   const { name, quizType, availableFrom } = quiz;
@@ -90,7 +90,7 @@ const Tabs = ({
                 activeTab === "questions" ? "text-gradient" : "text-black"
               }`}
             >
-              {quizSubmitted || hasAttempted ? "Retake Quiz" : "Take the Quiz"}
+            {`Quiz Questions`}
             </span>
           </button>
         </div>
