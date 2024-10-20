@@ -16,6 +16,7 @@ const AssignTeacher = () => {
 
   // Extracting required data from Redux store
   const allTeachers = useSelector((state) => state.admin.teacher.allTeachers);
+  console.log(allTeachers, "kkkkkkkkkkkk");
   const allSubjects = useSelector((state) => state.admin.subject.subjects);
   const allSections = useSelector(
     (state) => state.admin.group_section.sectionsList
@@ -26,7 +27,6 @@ const AssignTeacher = () => {
   useEffect(() => {
     dispatch(fetchAllTeachers());
 
-    console.log();
     dispatch(fetchSubjects(cid));
   }, [dispatch, cid]);
 
