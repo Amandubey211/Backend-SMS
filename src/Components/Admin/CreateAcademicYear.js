@@ -16,7 +16,7 @@ const CreateAcademicYear = () => {
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { loading } = useSelector((state) => state.Auth); // Get loading state from Redux store
+  const { loading } = useSelector((state) => state.common.auth); // Get loading state from Redux store
 
   const handleSubmit = (e) => {
     e.preventDefault();
