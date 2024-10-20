@@ -44,7 +44,7 @@ const AllowedAttemptsSelect = ({ allowedAttempts, handleChange }) => {
             },
           })
         }
-        className="mt-1 block w-full pl-3 pr-10 py-2 border focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+        className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
       >
         <option value="">Select</option>
         <option value="true">Limited</option>
