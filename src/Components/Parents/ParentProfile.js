@@ -7,10 +7,12 @@ import ParentDashLayout from "./ParentDashLayout";
 import Layout from "../Common/ParentLayout";
 import { useTranslation } from 'react-i18next'; // Import i18next hook
 import { updatePasswordThunk } from "../../Store/Slices/Common/User/actions/userActions";
+import { ImSpinner3 } from "react-icons/im";
 
 const ParentProfile = () => {
   const { t } = useTranslation('prtProfile'); // Initialize i18next hook
   const {userDetails} = useSelector((store) => store.common.user);
+  const [loading ,setLoading] = useState(false)
   const [passwordData, setPasswordData] = useState({
     currentPassword: "",
     newPassword: "",
@@ -29,13 +31,19 @@ const ParentProfile = () => {
 
   const dispatch = useDispatch();
   const updatePassword = () => {
+    setLoading(true)
     if (passwordData.newPassword === passwordData.confirmPassword) {
-      dispatch(updatePasswordThunk(passwordData))
+     dispatch(updatePasswordThunk(passwordData)).then(()=> {  setLoading(false);   setPasswordData({
+      currentPassword: "",
+      newPassword: "",
+      confirmPassword: "",
+    });})
     } else {
-      toast.error(t("Passwords do not match.")); // Use translation for toast message
+      toast.error("confirm Password must be same ");
+      setLoading(false)
     }
+  
   };
-
   const cancelUpdatePassword = () => {
     setPasswordData({
       currentPassword: "",
@@ -125,10 +133,11 @@ const ParentProfile = () => {
               />
               <div className="flex gap-3">
                 <button
+                disabled={loading}
                   onClick={updatePassword}
                   className="px-4 w-[200px] h-12 inline-flex items-center border border-transparent text-sm font-medium shadow-sm bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-md hover:from-pink-600 hover:to-purple-600 justify-center"
                 >
-                  {t("Update Password")}
+                  { loading ? <ImSpinner3 className="w-8 h-8 animate-spin mb-3 text-white" />: t("Update Password")} 
                 </button>
                 <button
                   onClick={cancelUpdatePassword}

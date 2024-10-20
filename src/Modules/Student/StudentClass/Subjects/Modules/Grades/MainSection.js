@@ -69,7 +69,7 @@ const MainSection = () => {
     content = (
       <div className="flex flex-row w-full h-full">
         <div className="w-[70%] p-4 min-h-full">
-          <GradeAccordionItem grade={grades?.grades} />
+          <GradeAccordionItem grade={grades?.grades || []} />
         </div>
         <div className="w-[30%] h-full border-l border-gray-200">
           <StudentGradeSummary studentGrade={studentData} />

@@ -12,12 +12,8 @@ const GradeAccordionItem = ({ grade }) => {
   const toggleOpen = () => setIsOpen(!isOpen);
 
   // Ensure grade is an array before sorting and mapping
-  const sortedGrades = Array.isArray(grade)
-    ? grade?.grades?.sort(
-        (a, b) => new Date(b.submittedDate) - new Date(a.submittedDate)
-      )
-    : [];
-
+  const sortedGrades = grade?.sort((a, b) => new Date(b.submittedDate) - new Date(a.submittedDate))
+    
   const getColorForStatus = (status) => {
     return status?.toLowerCase() === "submit"
       ? "text-green-500"
@@ -61,7 +57,7 @@ const GradeAccordionItem = ({ grade }) => {
               <thead className="border-b">
                 <tr className="text-left">
                   <th className="px-2 py-1">Name</th>
-                  <th className="px-2 py-1">Module</th>
+                  <th className="px-2 py-1">Chapter</th>
                   <th className="px-2 py-1">Due Date</th>
                   <th className="px-2 py-1">Submit Date</th>
                   <th className="px-2 py-1">Status</th>
@@ -84,10 +80,7 @@ const GradeAccordionItem = ({ grade }) => {
                     </td>
                     <td className="px-2 py-2">
                       <div className="flex flex-col">
-                        <span>{evalItem?.moduleName}</span>
-                        <span className="text-xs text-green-700">
-                          {evalItem?.chapterName}
-                        </span>
+                        <span className="text-xs" > {evalItem?.chapterName?.slice(0,15)}..</span>
                       </div>
                     </td>
                     <td className="px-2 text-sm py-2">

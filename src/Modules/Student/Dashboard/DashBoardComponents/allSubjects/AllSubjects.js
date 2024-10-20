@@ -7,15 +7,15 @@ const AllSubjects = ({ subjects }) => {
 
   return (
     <div className="px-1">
-      <div className="mt-4">
+      <div className="mt-1">
         {subjects && subjects.length > 0 ? (
           <div className="mt-4">
-            {subjects.slice(0, 5).map((subject, index) => {
+            {subjects.slice(0, 2).map((subject, index) => {
               const progressBarColor = progressBarColors[index % progressBarColors.length];
               return (
                 <div
                   key={subject._id}
-                  className="subject-card mb-4 p-4 shadow-md rounded-lg"
+                  className="subject-card mb-1 p-4 shadow-md rounded-lg"
                   style={{
                     transition: "transform 0.3s ease, box-shadow 0.3s ease",
                     boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",

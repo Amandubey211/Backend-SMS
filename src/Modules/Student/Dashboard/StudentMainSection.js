@@ -153,8 +153,8 @@ const StudentMainSection = () => {
           <div className="w-[70%]">
           <DashboardNoticeBoard descriptionLength={58} />
         </div>
-            <div className="flex flex-col border-l border-gray-200 w-[30%]">
-              <div className="w-full py-5 ps-3">
+            <div className="flex flex-col my-4 border-l border-gray-200 w-[30%]">
+              <div className="w-full">
                 <h1 className="text-xl font-semibold text-gray-600 px-2 mb-2">
                   Task
                 </h1>
