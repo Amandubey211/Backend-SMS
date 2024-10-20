@@ -7,18 +7,21 @@ import useFetchQuizzes from "../../../../../../../Hooks/AuthHooks/Student/Quiz/u
 import List from "../../../Component/List";
 import { useParams } from "react-router-dom";
 import { stdGetQuiz } from "../../../../../../../Store/Slices/Student/MyClass/Class/Subjects/Quizes/quizes.action";
-import { setFilters } from "../../../../../../../Store/Slices/Student/MyClass/Class/Subjects/Quizes/quizesSlice";
 import { getItemDetails, getItemName, navLinkPath } from "../Components/path";
 
 const QuizMainSection = () => {
 
   const { cid, sid } = useParams();
-  const { loading, error, quizData, filters } = useSelector((store) => store?.student?.studentQuiz);
+  const { loading, error, quizData } = useSelector((store) => store?.student?.studentQuiz);
   const dispatch = useDispatch();
+
+
+  const [filters, setFilters] = useState({ moduleId: "", chapterId: "" });
+
 
   useEffect(() => {
     dispatch(stdGetQuiz({cid, sid, moduleId:filters?.moduleId, chapterId:filters?.chapterId}))
-  }, [dispatch,cid,sid,stdGetQuiz,setFilters])
+  }, [dispatch,cid,sid,stdGetQuiz,filters])
 
 
   return (

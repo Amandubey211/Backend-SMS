@@ -8,10 +8,7 @@ const initialState = {
     error: false,
     // Quizzes List
     quizData: [],
-    filters: {
-        moduleId: "",
-        chapterId: ""
-    },
+
     searchQuery: "",
 
     // Quiz page
@@ -40,9 +37,7 @@ const stdQuizSlice = createSlice({
     name: 'studentQuiz',
     initialState,
     reducers: {
-        setFilters: (state, action) => {
-            state.filters = action.payload;
-        },
+       
         setSearchQuery: (state, action) => {
             state.searchQuery = action.payload;
         },
@@ -109,7 +104,7 @@ const stdQuizSlice = createSlice({
     }
 });
 
-export const { setFilters, setSearchQuery, setActiveTab, setSelectedOptions, setCurrentQuestionIndex, setSelectedAttempt, setQuizResults, setAttemptHistory } = stdQuizSlice.actions;
+export const {  setSearchQuery, setActiveTab, setSelectedOptions, setCurrentQuestionIndex, setSelectedAttempt, setQuizResults, setAttemptHistory } = stdQuizSlice.actions;
 export default stdQuizSlice.reducer;
 
 
