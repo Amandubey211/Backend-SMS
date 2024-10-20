@@ -49,7 +49,6 @@ export const staffLogin = createAsyncThunk(
             monthlySalary: data?.monthlySalary,
             active: data?.active,
             dateOfBirth: data?.dateOfBirth,
-          
           })
         );
 
@@ -118,17 +117,16 @@ export const staffLogout = createAsyncThunk(
 // **Create Academic Year action**
 export const createAcademicYear = createAsyncThunk(
   "auth/createAcademicYear",
-  async (yearData, { rejectWithValue, dispatch }) => {
+  async (yearData, { rejectWithValue, dispatch, getState }) => {
     try {
-      const role = localStorage.getItem("role"); // Get role from localStorage
-      const token = localStorage.getItem(`${role}:token`); // Get the token from localStorage
-
+      const { common } = getState();
+      const token = common.auth.token;
       // API call to create academic year
       const { data } = await axios.post(
         `${baseUrl}/admin/createAcademicYear`,
         yearData,
         {
-          headers: { Authentication: token },
+          headers: { Authentication: `Bearer ${token}` },
         }
       );
 
