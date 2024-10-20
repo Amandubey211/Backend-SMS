@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useSelector } from "react-redux";
-import { FiLoader } from 'react-icons/fi';
 import { GoAlertFill } from 'react-icons/go';
 import SubjectCard from '../../Admin/UsersProfiles/StudentProfile/Components/StudentCourseProgress/allSubjects/SubjectCard';
 import { baseUrl } from '../../../config/Common';
 import MainSection from './MainSection.js';
+import Spinner from "../../../Components/Common/Spinner";
 
 const AllSubject = ({ studentId }) => {
   const role = useSelector((store) => store.common.auth.role);
@@ -54,8 +54,7 @@ const AllSubject = ({ studentId }) => {
     <>
       {loading ? (
         <div className='w-full h-[50vh] flex items-center justify-center'>
-          <FiLoader className="animate-spin mr-2 w-[2rem] h-[2rem]" />
-          <p className="text-gray-800 text-sm">Loading...</p>
+          <Spinner />
         </div>
       ) : error ? (
         <div className="flex w-full h-full text-gray-500 items-center justify-center flex-col text-xl">
@@ -74,12 +73,16 @@ const AllSubject = ({ studentId }) => {
                     className={`w-[270px] transition-all duration-300 transform 
     ${subject.subjectId === selectedSubjectId ? 'bg-gray-100 shadow-lg scale-105' : 'bg-white shadow-md rounded-lg'}`}
                     onClick={() => {
-                      setSelectedSubjectId(subject.subjectId);
-                      console.log('Selected Subject ID:', subject.subjectId);  // Log the selected subject ID
+                      setSelectedSubjectId(null); // Reset first to clear existing data
+                      setTimeout(() => {
+                        setSelectedSubjectId(subject.subjectId);  // Set new subjectId after resetting
+                        console.log('Selected Subject ID:', subject.subjectId);
+                      }, 0); // Using setTimeout ensures state updates properly
                     }}
                   >
                     <SubjectCard subject={subject} i={index} />
                   </div>
+
 
 
 
@@ -93,7 +96,7 @@ const AllSubject = ({ studentId }) => {
             </div>
             <div className='border-t-2 w-[75%]'>
               {console.log("This is studentID: ", studentId, "This is select Subject id: ", selectedSubjectId)}
-              <MainSection selectedSubjectId={selectedSubjectId}/>
+              <MainSection selectedSubjectId={selectedSubjectId} />
 
             </div>
           </div>

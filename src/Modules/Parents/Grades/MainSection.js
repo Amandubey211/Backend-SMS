@@ -5,6 +5,7 @@ import { GoAlertFill } from "react-icons/go";
 import Chapter from "./Components/Chapter";
 import ModuleCard from "./Components/ModuleCard";
 import { baseUrl } from '../../../config/Common';
+import Spinner from "../../../Components/Common/Spinner";
 
 const MainSection = ({ selectedSubjectId }) => {
   const [modules, setModules] = useState([]);
@@ -24,41 +25,49 @@ const MainSection = ({ selectedSubjectId }) => {
   // Fetch modules and chapters
   useEffect(() => {
     if (!selectedSubjectId) {
+      setModules([]);  // Clear previous modules
+      setSelectedModule(null); // Clear selected module
+      setError(null); // Clear any errors
       console.log("Missing presentClassId or selectedSubjectId:", { selectedSubjectId });
       return;
     }
-
-    console.log("API Call Params:", { presentClassId, selectedSubjectId });
-
+  
     const fetchModulesAndChapters = async () => {
       setLoading(true);
       try {
         const token = localStorage.getItem("parent:token");
         if (!token) throw new Error("Authentication token not found");
-
+  
         const response = await axios.get(
           `${baseUrl}/admin/course/progress/student/${studentId}/subject/${selectedSubjectId}`,
           {
             headers: { Authentication: token },
           }
         );
-
+  
         if (response.data && response.data.data) {
           setModules(response.data.data.module);
-        } else {
-          setModules([]);
-        }
 
+          // Automatically select the first module and load its chapters
+          if (response.data.data.module.length > 0) {
+            setSelectedModule(response.data.data.module[0]);  // Auto-select the first module
+          }
+        } else {
+          setModules([]); // If no modules found, reset the data
+        }
+  
         setLoading(false);
       } catch (err) {
         console.error("Error fetching modules:", err);
         setError("Failed to fetch modules.");
+        setModules([]);  // Reset modules on error
         setLoading(false);
       }
     };
-
+  
     fetchModulesAndChapters();
-  }, [presentClassId, selectedSubjectId, studentId]); // Ensure presentClassId is included
+  }, [presentClassId, selectedSubjectId, studentId]); // Dependencies ensure that it reloads when subject changes
+  
 
   const selectModule = (module) => {
     setSelectedModule(module); // Set the selected module when clicked
@@ -73,11 +82,9 @@ const MainSection = ({ selectedSubjectId }) => {
     <div className="flex min-h-screen my-2">
       <div className="w-[65%] bg-white p-2 border-l">
         <div className="bg-white p-2 rounded-lg">
-          {/* Show loading or error state */}
+          {/* Show loading or error state for Chapters */}
           {loading ? (
-            <div className="flex justify-center items-center my-20 h-full w-full">
-              <p className="text-gray-500">Loading data...</p>
-            </div>
+            <Spinner/>
           ) : error ? (
             <div className="flex justify-center items-center my-20 h-full w-full">
               <p className="text-gray-500">Error loading data: {error}</p>
@@ -93,7 +100,7 @@ const MainSection = ({ selectedSubjectId }) => {
                 assignments={chapter?.assignments || []}
                 quizzes={chapter?.quizzes || []}
                 isExpanded={expandedChapters === chapter?.chapterId}
-                onToggle={() => handleToggle(chapter?.chapterId)}
+                onToggle={() => handleToggle(chapter?.chapterId)}                
               />
             ))
           ) : (
@@ -114,7 +121,9 @@ const MainSection = ({ selectedSubjectId }) => {
             <h2 className="text-lg font-semibold">All Modules</h2>
           </div>
           <div className="grid grid-cols-1 gap-2">
-            {modules?.length > 0 ? (
+            {loading ? ( // Show spinner while loading modules
+              <Spinner />
+            ) : modules?.length > 0 ? (
               modules.map((module, index) => (
                 <div
                   key={index}
