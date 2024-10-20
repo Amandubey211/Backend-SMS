@@ -23,7 +23,7 @@ const ModuleCard = ({ title, moduleNumber, imageUrl }) => {
   }, []);
 
   return (
-    <div className="relative mb-4 border-2 border-rose-400 bg-white rounded-lg">
+    <div className="relative mb-4 border-2 bg-white rounded-lg">
       <img
         src={imageUrl}
         alt={title}
