@@ -34,9 +34,13 @@ import GraduationPage from "../Modules/Admin/Graduation/GraduationPage.js";
 const Academic = lazy(() =>
   import("../Modules/Admin/AcademicYear/Academic.js")
 );
+// const CreateAcademicYear = lazy(() =>
+//   import("../Components/Admin/CreateAcademicYear.js")
+// );
 const CreateAcademicYear = lazy(() =>
   import("../Components/Admin/CreateAcademicYear.js")
 );
+
 const StudentProfile = lazy(() =>
   import("../Modules/Student/profile/StudentProfile.js")
 );
@@ -341,7 +345,10 @@ function App() {
     {
       path: "/dashboard",
       element: (
-        <ProtectRoute Component={Dash} allowedRoles={["admin", "teacher", "librarian", "accountant"]} />
+        <ProtectRoute
+          Component={Dash}
+          allowedRoles={["admin", "teacher", "librarian", "accountant"]}
+        />
       ),
       errorElement: <Error />,
     },
@@ -714,7 +721,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={StudentParentProfile}
-          allowedRoles={["admin", "teacher","accountant","librarian"]}
+          allowedRoles={["admin", "teacher", "accountant", "librarian"]}
         />
       ),
       errorElement: <Error />,
@@ -731,7 +738,13 @@ function App() {
       element: (
         <ProtectRoute
           Component={StaffMyProfile}
-          allowedRoles={["teacher", "accountant", "librarian", "staff","librarian"]}
+          allowedRoles={[
+            "teacher",
+            "accountant",
+            "librarian",
+            "staff",
+            "librarian",
+          ]}
         />
       ),
       errorElement: <Error />,
@@ -958,12 +971,16 @@ function App() {
     // parent----------------------------------------------------------------
     {
       path: "/parent_dash",
-      element: <ProtectRoute Component={ParentDash} allowedRoles={["parent"]} />,
+      element: (
+        <ProtectRoute Component={ParentDash} allowedRoles={["parent"]} />
+      ),
       errorElement: <Error />,
     },
     {
       path: "/children",
-      element: <ProtectRoute Component={MyChildren} allowedRoles={["parent"]} />,
+      element: (
+        <ProtectRoute Component={MyChildren} allowedRoles={["parent"]} />
+      ),
       errorElement: <Error />,
     },
     {
@@ -978,40 +995,56 @@ function App() {
     },
     {
       path: "/parentchildnotice",
-      element: <ProtectRoute Component={ParentStudentNotice} allowedRoles={["parent"]} />,
+      element: (
+        <ProtectRoute
+          Component={ParentStudentNotice}
+          allowedRoles={["parent"]}
+        />
+      ),
       errorElement: <Error />,
     },
     {
       path: "/parent/events",
-      element: <ProtectRoute Component={ParentEvent} allowedRoles={["parent"]} />,
+      element: (
+        <ProtectRoute Component={ParentEvent} allowedRoles={["parent"]} />
+      ),
       errorElement: <Error />,
     },
     {
       path: "/parentlibrary",
-      element: <ProtectRoute Component={LibraryParent} allowedRoles={["parent"]} />,
+      element: (
+        <ProtectRoute Component={LibraryParent} allowedRoles={["parent"]} />
+      ),
       errorElement: <Error />,
     },
     {
       path: "/parentfinance",
-      element: <ProtectRoute Component={ParentFinance} allowedRoles={["parent"]} />,
+      element: (
+        <ProtectRoute Component={ParentFinance} allowedRoles={["parent"]} />
+      ),
       errorElement: <Error />,
     },
     {
       path: "/checkprogress/:studentId",
-      element: <ProtectRoute Component={CheckProgress} allowedRoles={["parent"]} />,
+      element: (
+        <ProtectRoute Component={CheckProgress} allowedRoles={["parent"]} />
+      ),
       errorElement: <Error />,
     },
     {
       path: "/users/parent/profile",
-      element: <ProtectRoute Component={ParentProfile} allowedRoles={["parent"]} />,
+      element: (
+        <ProtectRoute Component={ParentProfile} allowedRoles={["parent"]} />
+      ),
       errorElement: <Error />,
     },
     {
       path: "/childgrade/:studentId",
-      element: <ProtectRoute Component={ChildGrade} allowedRoles={["parent"]} />,
+      element: (
+        <ProtectRoute Component={ChildGrade} allowedRoles={["parent"]} />
+      ),
       errorElement: <Error />,
     },
-
   ]);
 
   return (

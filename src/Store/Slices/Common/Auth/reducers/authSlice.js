@@ -117,7 +117,6 @@ const AuthSlice = createSlice({
       .addCase(parentLogin.fulfilled, (state, action) => {
         state.loading = false;
         state.isLoggedIn = true;
-        
       })
       .addCase(parentLogin.rejected, (state, action) => {
         state.loading = false;
@@ -142,6 +141,18 @@ const AuthSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
         state.signupSuccess = false;
+      })
+
+      .addCase(createAcademicYear.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(createAcademicYear.fulfilled, (state, action) => {
+        state.loading = false;
+      })
+      .addCase(createAcademicYear.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       })
       // Upload student documents
       .addCase(uploadStudentDocuments.pending, (state) => {
