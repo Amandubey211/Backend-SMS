@@ -68,7 +68,7 @@ const FeeTable = ({ feesDetails }) => {
               </td>
               <td className="px-5 py-2 border-b border-gray-200" role="cell">
                 <span
-                  className={`px-3 py-1 text-xs font-semibold rounded-full ${item?.status === "Paid"
+                  className={`inline-block px-3 py-1 text-xs font-semibold rounded-full min-w-[75px] text-center ${item?.status === "Paid"
                       ? "bg-green-200 text-green-800"
                       : "bg-red-200 text-red-800"
                     }`}

@@ -64,7 +64,7 @@ const StudentGradeSummary = ({ studentGrade }) => {
             </div>
             <div className="flex justify-between mb-2">
               <p className="text-sm">Attendance</p>
-              <p className="text-sm">{attendance ? attendance : "0 Days"} </p>
+              <p className="text-sm">{attendance ? `${attendance} Days` : "0 Days"} </p>
             </div>
           </div>
         </div>

@@ -53,9 +53,9 @@ const BookCard = ({
       </div>
 
       {/* Three Dots Icon in Bottom-Right */}
-      <div className="absolute right-4 bottom-4 p-1 border rounded-full">
+      {/* <div className="absolute right-4 bottom-4 p-1 border rounded-full">
         <BsThreeDotsVertical className="text-gray-700 cursor-pointer" />
-      </div>
+      </div> */}
     </div>
   );
 };
