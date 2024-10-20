@@ -5,10 +5,11 @@ import profileIcon from "../../../Assets/DashboardAssets/profileIcon.png";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import StudentDashLayout from "../../../Components/Student/StudentDashLayout";
 import { updatePasswordThunk } from "../../../Store/Slices/Common/User/actions/userActions";
+import { ImSpinner3 } from "react-icons/im";
 
 const StudentProfile = () => {
   const {userDetails} = useSelector((store) => store.common.user);
-;
+;  const [loading ,setLoading] = useState(false)
 
   const [passwordData, setPasswordData] = useState({
     currentPassword: "",
@@ -28,11 +29,18 @@ const StudentProfile = () => {
   const dispatch = useDispatch();
 
   const updatePassword = () => {
+    setLoading(true)
     if (passwordData.newPassword === passwordData.confirmPassword) {
-      dispatch(updatePasswordThunk(passwordData))
+     dispatch(updatePasswordThunk(passwordData)).then(()=> {  setLoading(false);   setPasswordData({
+      currentPassword: "",
+      newPassword: "",
+      confirmPassword: "",
+    });})
     } else {
-      toast.error("Passwords do not match.");
+      toast.error("confirm Password must be same ");
+      setLoading(false)
     }
+  
   };
 
   const cancelUpdatePassword = () => {
@@ -51,8 +59,8 @@ const StudentProfile = () => {
   return (
     <>
       <StudentDashLayout>
-        <div className="flex flex-col w-full p-4 gap-3">
-          <div className="flex items-center px-6 py-4 gap-3 border rounded-md">
+        <div className="flex flex-col w-full p-4 gap-3 ">
+          <div className="flex items-center px-6 py-4 gap-3  rounded-md">
             <img
               src={userDetails?.profile ? userDetails?.profile : profileIcon}
               alt="Profile"
@@ -155,10 +163,11 @@ const StudentProfile = () => {
             />
             <div className="flex gap-3">
               <button
+                disabled={loading}
                 onClick={updatePassword}
                 className="px-4 w-[200px] h-12 inline-flex items-center border border-transparent text-sm font-medium shadow-sm bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-md hover:from-pink-600 hover:to-purple-600 justify-center"
               >
-                Update Password
+                { loading ? <ImSpinner3 className="w-8 h-8 animate-spin mb-3 text-white" />: 'Update Password'}
               </button>
               <button
                 onClick={cancelUpdatePassword}
