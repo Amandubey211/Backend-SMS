@@ -1,15 +1,26 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Layout from "../../../../../../Components/Common/Layout";
 import MainSection from "./MainSection";
 import SideMenubar from "../../../../../../Components/Admin/SideMenubar";
 import { useSelector } from "react-redux";
+import { useLocation } from "react-router-dom";
 
 const CreateQuizzes = () => {
-  const [isEditing, setIsEditing] = useState(false);
+  const location = useLocation();
+  const quizIdFromState = location.state?.quizId;
+
+  // Initialize isEditing state based on quizId in the location state
+  const [isEditing, setIsEditing] = useState(!!quizIdFromState);
+
   const isSidebarOpen = useSelector(
     (state) => state.common.user.sidebar.isOpen
   );
   const sidebarWidth = isSidebarOpen ? "15%" : "7%"; // Adjust the width based on sidebar state
+
+  useEffect(() => {
+    // Update isEditing if location changes
+    setIsEditing(!!quizIdFromState);
+  }, [quizIdFromState]);
 
   return (
     <Layout
@@ -27,7 +38,7 @@ const CreateQuizzes = () => {
             marginLeft: sidebarWidth,
           }}
         >
-          <MainSection setIsEditing={setIsEditing} />
+          <MainSection setIsEditing={setIsEditing} isEditing={isEditing} />
         </div>
       </div>
     </Layout>
