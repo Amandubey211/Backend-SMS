@@ -90,7 +90,7 @@ const Tabs = ({
                 activeTab === "questions" ? "text-gradient" : "text-black"
               }`}
             >
-              {quizSubmitted || hasAttempted || attemptHistory?.length>0 ? "Retake Quiz" : "Take the Quiz"}
+              {quizSubmitted || hasAttempted ? "Retake Quiz" : "Take the Quiz"}
             </span>
           </button>
         </div>
