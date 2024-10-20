@@ -132,6 +132,7 @@ const formatDashboardData = (dashboardData) => {
       bgColor: 'bg-green-100',
       textColor: 'text-black-500',
       icon: '📝',
+      url:'/student_dash'
     },
     {
       label: 'Due Fees',
@@ -139,6 +140,7 @@ const formatDashboardData = (dashboardData) => {
       bgColor: 'bg-red-100',
       textColor: 'text-black-500',
       icon: <CiMoneyBill />,
+         url:'/student_finance'
     },
     {
       label: 'Event',
@@ -146,6 +148,7 @@ const formatDashboardData = (dashboardData) => {
       bgColor: 'bg-blue-100',
       textColor: 'text-black-500',
       icon: '📅',
+         url:'/student/noticeboard/events'
     },
     {
       label: 'Notice',
@@ -153,6 +156,7 @@ const formatDashboardData = (dashboardData) => {
       bgColor: 'bg-yellow-100',
       textColor: 'text-black-500',
       icon: '🔔',
+         url:'/student/noticeboard/announcements'
     },
   ];
 };

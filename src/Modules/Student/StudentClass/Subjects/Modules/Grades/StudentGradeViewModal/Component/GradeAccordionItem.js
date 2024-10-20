@@ -10,9 +10,9 @@ const GradeAccordionItem = ({ grade }) => {
   const [isOpen, setIsOpen] = useState(true);
 
   const toggleOpen = () => setIsOpen(!isOpen);
-
+ 
   // Ensure grade is an array before sorting and mapping
-  const sortedGrades = grade?.sort((a, b) => new Date(b.submittedDate) - new Date(a.submittedDate))
+  // const sortedGrades =  grade?.sort((a, b) => new Date(b.submittedDate) - new Date(a.submittedDate))
     
   const getColorForStatus = (status) => {
     return status?.toLowerCase() === "submit"
@@ -51,7 +51,7 @@ const GradeAccordionItem = ({ grade }) => {
           isOpen ? "max-h-full" : "max-h-0"
         }`}
       >
-        {sortedGrades?.length > 0 ? (
+        {grade?.length > 0 ? (
           <div className="p-1">
             <table className="min-w-full bg-white rounded-lg overflow-hidden">
               <thead className="border-b">
@@ -65,7 +65,7 @@ const GradeAccordionItem = ({ grade }) => {
                 </tr>
               </thead>
               <tbody>
-                {sortedGrades?.map((evalItem, idx) => (
+                {grade?.map((evalItem, idx) => (
                   <tr
                     key={idx}
                     className="bg-white hover:bg-gray-100 transition-shadow duration-200 shadow-md rounded-lg mb-2" // Added margin-bottom for spacing

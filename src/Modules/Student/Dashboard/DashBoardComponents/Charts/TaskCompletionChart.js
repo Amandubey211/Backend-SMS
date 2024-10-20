@@ -8,22 +8,19 @@ import { useParams } from 'react-router-dom';
 import {fetchStudentTask} from "../../../../../Store/Slices/Admin/Users/Students/student.action"
 Chart.register(ArcElement, Tooltip, Legend);
 const TaskCompletionChart = () => {
-    const {completedTask} = useSelector((store) => store.admin.all_students);
+    const {completedTask,inCompletedTask} = useSelector((store) => store.admin.all_students);
     console.log('---1',completedTask);
     const {userDetails} = useSelector((store) => store.common.user);
-    const [missingPercentage,setMissingPercentage] = useState(0)
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(fetchStudentTask({id:userDetails?.userId})).then(()=>{
-        setMissingPercentage(100-completedTask)
-    });
-  }, [dispatch,fetchStudentTask])
+    dispatch(fetchStudentTask({id:userDetails?.userId}))
+  }, [dispatch])
 
     const data = {
         datasets: [
             {
                
-                data: [completedTask,missingPercentage],
+                data: [completedTask,inCompletedTask],
                 backgroundColor: [
                     'pink', 
                     'orange'  
@@ -61,7 +58,7 @@ const TaskCompletionChart = () => {
             <div className=" flex-1 p-5 flex flex-col justify-start items-start h-[17rem] mb-10 ">
               <div className='flex flex-row gap-10 mb-2'>
               <p className='text-gray-500'>Completed <spna className='text-pink-600 font-bold'>{completedTask}%</spna></p>
-              <p className='text-gray-500'>Remaining <spna className='text-yellow-700 font-bold'>{missingPercentage}%</spna></p>
+              <p className='text-gray-500'>Remaining <spna className='text-yellow-700 font-bold'>{inCompletedTask}%</spna></p>
               </div>
               <Doughnut data={data} options={options} />
             </div>

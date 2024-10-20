@@ -8,6 +8,7 @@ const Chapter = ({
   imageUrl,
   assignments = [],
   quizzes = [],
+  attachments=[],
   isExpanded,
   onToggle,
   id
@@ -21,6 +22,10 @@ const Chapter = ({
     ...quizzes.map((quiz) => ({
       ...quiz,
       type: "quiz",
+    })),
+    ...attachments.map((a) => ({
+      ...a,
+      type:a?.type,
     })),
   ];
 
@@ -60,7 +65,8 @@ const Chapter = ({
               <ChapterItem
                 key={index}
                 type={item?.type}
-                title={item?.title || "Untitled"}
+                title={item?.title ||item?.name || "Untitled"}
+                url={item?.url || null}
                 id={item?._id}
                 submitted={item?.submitted}
               />
