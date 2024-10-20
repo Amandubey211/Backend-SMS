@@ -11,7 +11,7 @@ import {
   FaTrashAlt,
 } from 'react-icons/fa';
 
-const ModuleCard = ({ title = "Untitled Module", moduleNumber = "N/A", imageUrl, isCompleted = false }) => {
+const ModuleCard = ({ title = "Untitled Module", moduleNumber = "N/A", imageUrl, isCompleted = false, role }) => {  // Added role prop
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef();
 
@@ -50,26 +50,31 @@ const ModuleCard = ({ title = "Untitled Module", moduleNumber = "N/A", imageUrl,
           </p>
 
           <div className="flex items-center space-x-2">
-            {isCompleted ? (
-              <FaCheckCircle className="text-green-500" />
-            ) : (
-              <FaBan className="text-gray-500" />
-            )}
+            {/* Conditionally Render Icons based on role */}
+            {role !== 'user' && (
+              <>
+                {isCompleted ? (
+                  <FaCheckCircle className="text-green-500" />
+                ) : (
+                  <FaBan className="text-gray-500" />
+                )}
 
-            {/* Dropdown Button */}
-            <button
-              className="bg-gray-100 p-2 rounded-full hover:bg-gray-200 focus:outline-none"
-              onClick={toggleMenu}
-              aria-label="More options"
-            >
-              <FaEllipsisV />
-            </button>
+                {/* Dropdown Button */}
+                <button
+                  className="bg-gray-100 p-2 rounded-full hover:bg-gray-200 focus:outline-none"
+                  onClick={toggleMenu}
+                  aria-label="More options"
+                >
+                  <FaEllipsisV />
+                </button>
+              </>
+            )}
           </div>
         </div>
       </div>
 
       {/* Dropdown Menu */}
-      {menuOpen && (
+      {menuOpen && role !== 'user' && (
         <div ref={menuRef} className="absolute top-12 right-4 bg-white border rounded-lg shadow-lg w-48 z-10">
           <ul className="py-2">
             <li className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">

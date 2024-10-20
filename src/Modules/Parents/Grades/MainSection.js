@@ -5,7 +5,7 @@ import Chapter from "../../Admin/UsersProfiles/StudentProfile/Components/Student
 import ModuleCard from "../../Admin/UsersProfiles/StudentProfile/Components/StudentCourseProgress/Module/Components/ModuleCard";
 import { baseUrl } from '../../../config/Common'; // Ensure the correct base URL is used
 
-const MainSection = ({ student, selectedSubjectId }) => {
+const MainSection = ({ student, selectedSubjectId, role}) => {
   const [modules, setModules] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -79,6 +79,7 @@ const MainSection = ({ student, selectedSubjectId }) => {
                 quizzes={module?.chapters?.quizzes || []}
                 isExpanded={expandedChapters}
                 onToggle={() => handleToggle(module?.moduleId)}
+                role={role}
               />
             ))
           ) : (
@@ -113,6 +114,7 @@ const MainSection = ({ student, selectedSubjectId }) => {
                     moduleNumber={index + 1}
                     imageUrl={module?.thumbnail}
                     isCompleted={module?.isCompleted}
+                    role={role}
                   />
                 </div>
               ))
