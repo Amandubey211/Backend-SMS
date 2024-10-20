@@ -4,6 +4,7 @@ import axios from "axios";
 import { baseUrl } from "../../../config/Common";
 import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { useSelector } from "react-redux";
 
 
 const StudentGradesAccordion = () => {
@@ -16,17 +17,24 @@ const StudentGradesAccordion = () => {
   const [loading, setLoading] = useState(false); // Default to false
   const [showSidebar, setShowSidebar] = useState(false); // State to manage sidebar visibility
 
+
+  // Fetch childrenData and presentClassId from Redux
+  const childrenData = useSelector((state) => state.Parent.children.children);
+  const presentClassId = childrenData && childrenData[0]?.presentClassId;
+  const thestudentId = childrenData && childrenData[0]?.id; // Assuming 'id' is the field for student ID
+
+
   const fetchStudentGrades = async (subjectId, moduleId, chapterId, arrangeBy) => {
     const params = {};
     if (moduleId) params.moduleId = moduleId;
     if (chapterId) params.chapterId = chapterId;
     if (arrangeBy) params.arrangeBy = arrangeBy;
-    
+
     setLoading(true);
     try {
       const token = localStorage.getItem(`parent:token`);
       const response = await axios.get(
-        `${baseUrl}/admin/grades/student/${student?.id}/class/${student?.presentClassId}`,
+        `${baseUrl}/admin/grades/student/${thestudentId}/class/${presentClassId}`,
         {
           headers: { Authentication: token },
           params: params,
@@ -89,7 +97,7 @@ const StudentGradesAccordion = () => {
             <div className="flex justify-between mb-2">
               <p className="text-sm">{t("Quiz")}</p>
               <p className="text-sm">
-                {grades?.totalQuizCompletedScore ?? 0} / {grades?.totalScoreOfAllQuizzes ?? 0} 
+                {grades?.totalQuizCompletedScore ?? 0} / {grades?.totalScoreOfAllQuizzes ?? 0}
               </p>
             </div>
             <div className="flex justify-between mb-2">
