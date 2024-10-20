@@ -1,33 +1,12 @@
 import React, { useState } from "react";
-import {
-  FaChevronDown,
-  FaChevronUp,
-  FaFilePdf,
-  FaFileWord,
-  FaFilePowerpoint,
-  FaEye,
-} from "react-icons/fa";
-import { GrAttachment } from "react-icons/gr";
+import { FaChevronDown, FaChevronUp, FaEye } from "react-icons/fa";
 import ChapterItem from "./ChapterItem";
 
-const Chapter = ({ title, chapterNumber, imageUrl, assignments, quizzes, attachments }) => {
+const Chapter = ({ title, chapterNumber, imageUrl, assignments, quizzes }) => {
   const [chapterExpanded, setChapterExpanded] = useState(false);
 
   const toggleChapter = () => {
     setChapterExpanded((prev) => !prev);
-  };
-
-  const getFileIcon = (type) => {
-    switch (type) {
-      case "application/pdf":
-        return <FaFilePdf className="text-red-500" size={24} />;
-      case "application/msword":
-        return <FaFileWord className="text-blue-500" size={24} />;
-      case "application/vnd.ms-powerpoint":
-        return <FaFilePowerpoint className="text-orange-500" size={24} />;
-      default:
-        return null;
-    }
   };
 
   return (
@@ -46,19 +25,6 @@ const Chapter = ({ title, chapterNumber, imageUrl, assignments, quizzes, attachm
           </div>
         </div>
         <div className="flex items-center space-x-2">
-          {/* Attachments Icon */}
-          <button
-            className="border p-2 rounded-full hover:bg-gray-100 text-red-600 relative"
-            aria-label="View Attachments"
-          >
-            <GrAttachment />
-            {attachments?.length > 0 && (
-              <span className="absolute -top-1 -right-1 bg-red-100 opacity-90 text-red-900 text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                {attachments.length}
-              </span>
-            )}
-          </button>
-
           {/* Dropdown Menu */}
           <button
             className="border p-2 rounded-full hover:bg-gray-100"
@@ -73,45 +39,6 @@ const Chapter = ({ title, chapterNumber, imageUrl, assignments, quizzes, attachm
       {/* Chapter Content */}
       {chapterExpanded && (
         <div className="mt-2">
-          {/* Attachments Section */}
-          {attachments?.length > 0 && (
-            <div>
-              <h3 className="text-sm font-semibold text-green-600">
-                Attachments ({attachments.length})
-              </h3>
-              <div className="grid grid-cols-1 gap-2 mb-2">
-                {attachments.map((attachment, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between p-2 border rounded-md hover:shadow-md"
-                  >
-                    <div className="flex items-center">
-                      {getFileIcon(attachment.type) || (
-                        <img
-                          src={attachment.url}
-                          alt={attachment.name}
-                          className="h-8 w-8 object-cover rounded-md"
-                        />
-                      )}
-                      <div className="flex flex-col ml-4">
-                        <p className="text-gray-700 text-sm truncate max-w-xs overflow-hidden whitespace-nowrap">
-                          {attachment.name}
-                        </p>
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => alert("Preview clicked")}
-                      className="text-green-500 p-1 border rounded-full hover:scale-110 cursor-pointer"
-                      aria-label="Preview Attachment"
-                    >
-                      <FaEye size={20} />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
           {/* Assignments and Quizzes */}
           <div>
             {assignments.length > 0 || quizzes.length > 0 ? (
