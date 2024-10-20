@@ -12,6 +12,7 @@ import {
 } from "../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
 import { useParams } from "react-router-dom";
 import { FaUserSlash } from "react-icons/fa";
+import { fetchStudentsByClassAndSection } from "../../../../Store/Slices/Admin/Class/Students/studentThunks";
 
 const AddGroup = ({ group, isUpdate, groupId, onClose }) => {
   const [groupName, setGroupName] = useState("");
@@ -42,6 +43,8 @@ const AddGroup = ({ group, isUpdate, groupId, onClose }) => {
       setSelectedStudents(group?.students || []); // Set selected students
       setLeader(group?.leader || null); // Set leader
     }
+    const classId = cid;
+    dispatch(fetchStudentsByClassAndSection(classId));
   }, [isUpdate, group]); // Triggered only when editing
 
   useEffect(() => {
