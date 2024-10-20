@@ -149,15 +149,17 @@ const GroupList = ({ onSeeGradeClick }) => {
                     ref={(el) => (menuRefs.current[groupIndex] = el)} // Attach reference to each group
                   >
                     <div
-                      className={`w-7 h-7 flex items-center justify-center rounded-full border cursor-pointer ${activeMenu === groupIndex ? "bg-blue-100" : ""
-                        }`} // Add active state style here
+                      className={`w-7 h-7 flex items-center justify-center rounded-full border cursor-pointer ${
+                        activeMenu === groupIndex ? "bg-blue-100" : ""
+                      }`} // Add active state style here
                       onClick={() => handleMenuToggle(groupIndex)}
                     >
                       <TbDotsVertical
-                        className={`w-6 h-6 ${activeMenu === groupIndex
-                          ? "text-blue-500" // Active state color
-                          : "text-gray-500"
-                          }`}
+                        className={`w-6 h-6 ${
+                          activeMenu === groupIndex
+                            ? "text-blue-500" // Active state color
+                            : "text-gray-500"
+                        }`}
                       />
                     </div>
                     {activeMenu === groupIndex && (
@@ -184,8 +186,9 @@ const GroupList = ({ onSeeGradeClick }) => {
                 )}
 
                 <svg
-                  className={`w-7 h-7 text-gray-500 transform p-1 border rounded-full transition-transform ${expandedGroupIndex === groupIndex ? "rotate-180" : ""
-                    }`}
+                  className={`w-7 h-7 text-gray-500 transform p-1 border rounded-full transition-transform ${
+                    expandedGroupIndex === groupIndex ? "rotate-180" : ""
+                  }`}
                   onClick={() =>
                     setExpandedGroupIndex((prevExpandedGroupIndex) =>
                       prevExpandedGroupIndex === groupIndex ? null : groupIndex
@@ -268,7 +271,6 @@ const GroupList = ({ onSeeGradeClick }) => {
                           <BsThreeDotsVertical />
                         </div>
                       )}
-
                     </li>
                   ))
                 )}

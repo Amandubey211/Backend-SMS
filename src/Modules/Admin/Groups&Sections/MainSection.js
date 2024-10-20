@@ -25,47 +25,41 @@ const MainSection = () => {
   const dispatch = useDispatch();
   const { cid } = useParams();
 
-  // Fetch groups by class or section
-  const fetchGroups = useCallback(() => {
-    if (cid) {
-      if (activeSection === "Everyone") {
-        dispatch(fetchGroupsByClass(cid));
-      } else {
-        dispatch(
-          fetchGroupsByClassAndSection({
-            classId: cid,
-            sectionId: activeSectionId,
-          })
-        );
-      }
-    }
-  }, [cid, activeSection, activeSectionId, dispatch]);
+  // Centralized state from the Redux store for sections, groups, and unassigned students
+  const { loading, error, unassignedStudentsList } = useSelector(
+    (store) => store.admin.group_section
+  );
 
-  // Fetch unassigned students
-  const fetchStudents = useCallback(() => {
+  // Reset groups on class change
+  useEffect(() => {
     if (cid) {
-      dispatch(fetchUnassignedStudents(cid));
+      dispatch(clearGroupsList()); // Clear previous groups to avoid stale data
+      dispatch(fetchSectionsByClass(cid)); // Fetch sections for the class
+      dispatch(fetchGroupsByClass(cid)); // Fetch groups for the new class
+      dispatch(fetchUnassignedStudents(cid)); // Fetch unassigned students
     }
   }, [cid, dispatch]);
 
+  // Handle section change
   useEffect(() => {
-    if (cid) {
-      dispatch(clearGroupsList()); // Clear stale groups before fetching new ones
-      dispatch(fetchSectionsByClass(cid)); // Fetch sections for the class
-      fetchGroups(); // Fetch groups after clearing
-      fetchStudents(); // Fetch unassigned students for the class
+    if (activeSection !== "Everyone" && activeSectionId) {
+      dispatch(
+        fetchGroupsByClassAndSection({
+          classId: cid,
+          sectionId: activeSectionId,
+        })
+      );
+    } else if (activeSection === "Everyone") {
+      dispatch(fetchGroupsByClass(cid));
     }
-  }, [cid, fetchGroups, fetchStudents, dispatch]);
+  }, [activeSectionId, activeSection, cid, dispatch]);
 
-  // Handle section change and fetch corresponding groups
-  const handleSectionChange = useCallback(
-    (section, sectionId) => {
-      setActiveSection(section);
-      setActiveSectionId(sectionId);
-      fetchGroups();
-    },
-    [fetchGroups]
-  );
+  // Handle section change from navigation bar
+  const handleSectionChange = useCallback((section, sectionId) => {
+    setActiveSection(section);
+    setActiveSectionId(sectionId);
+    dispatch(fetchGroupsByClassAndSection({ classId: cid, sectionId }));
+  }, []);
 
   const onSeeGradeClick = (student) => {
     setStudentData(student);

@@ -31,6 +31,9 @@ const AddGroup = ({ group, isUpdate, groupId, onClose }) => {
     error: store.admin.group_section.error,
   }));
 
+  const { studentsList } = useSelector((store) => store.admin.students);
+  console.log(studentsList, "allStudentsList");
+
   // Preload data when editing a group
   useEffect(() => {
     if (isUpdate && group) {
@@ -47,13 +50,13 @@ const AddGroup = ({ group, isUpdate, groupId, onClose }) => {
 
   const handleStudentSelect = useCallback(
     (studentId) => {
-      const student = unassignedStudents.find((s) => s._id === studentId);
+      const student = studentsList.find((s) => s._id === studentId);
       if (student && !selectedStudents.some((s) => s._id === studentId)) {
         setSelectedStudents((prev) => [...prev, student]);
       }
       setDropdownOpen(false);
     },
-    [unassignedStudents, selectedStudents]
+    [studentsList, selectedStudents]
   );
 
   const handleLeaderClick = useCallback((student) => {
@@ -175,7 +178,7 @@ const AddGroup = ({ group, isUpdate, groupId, onClose }) => {
             </div>
             {isDropdownOpen && (
               <div className="absolute mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg z-10">
-                {unassignedStudents.length === 0 ? (
+                {studentsList.length === 0 ? (
                   <div className="text-center p-4">
                     <FaUserSlash className="text-2xl text-gray-400 mx-auto" />
                     <p className="text-sm text-gray-500">
@@ -183,7 +186,7 @@ const AddGroup = ({ group, isUpdate, groupId, onClose }) => {
                     </p>
                   </div>
                 ) : (
-                  unassignedStudents.map((student) => (
+                  studentsList.map((student) => (
                     <button
                       key={student._id}
                       type="button"
