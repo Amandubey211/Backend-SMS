@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { useSelector } from "react-redux";
 import { FiLoader } from 'react-icons/fi';
 import { GoAlertFill } from 'react-icons/go';
 import SubjectCard from '../../Admin/UsersProfiles/StudentProfile/Components/StudentCourseProgress/allSubjects/SubjectCard';
@@ -7,6 +8,7 @@ import { baseUrl } from '../../../config/Common';
 import MainSection from './MainSection.js';
 
 const AllSubject = ({ studentId }) => {
+  const role = useSelector((store) => store.common.auth.role);
   const students = JSON.parse(localStorage.getItem('childrenData')) || [];
   const student = students?.find((i) => i.id == studentId);
   console.log('Student ID:', studentId);
@@ -91,7 +93,7 @@ const AllSubject = ({ studentId }) => {
             </div>
             <div className='border-t-2 w-[75%]'>
               {console.log("This is studentID: ", studentId, "This is select Subject id: ", selectedSubjectId)}
-              <MainSection student={studentId} selectedSubjectId={selectedSubjectId} />
+              <MainSection selectedSubjectId={selectedSubjectId}/>
 
             </div>
           </div>
