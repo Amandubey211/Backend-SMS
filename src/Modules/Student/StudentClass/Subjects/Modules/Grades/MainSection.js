@@ -44,9 +44,7 @@ const MainSection = () => {
         <Spinner />
       </div>
     );
-  } else if (
-    !grades
-  ) {
+  } else if (!grades) {
     content = <NoDataFound title="Grades" />;
   } else {
     const studentData = {
@@ -69,7 +67,8 @@ const MainSection = () => {
     content = (
       <div className="flex flex-row w-full h-full">
         <div className="w-[70%] p-4 min-h-full">
-         <GradeAccordionItem grade={grades?.grades.length > 0 ?grades?.grades : [] } />
+          {/* Optional chaining added here to prevent accessing undefined length */}
+          <GradeAccordionItem grade={grades?.grades?.length > 0 ? grades?.grades : []} />
         </div>
         <div className="w-[30%] h-full border-l border-gray-200">
           <StudentGradeSummary studentGrade={studentData} />
