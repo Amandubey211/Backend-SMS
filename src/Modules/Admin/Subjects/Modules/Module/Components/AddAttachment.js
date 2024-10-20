@@ -92,17 +92,16 @@ const AddAttachment = ({ chapterData, onClose }) => {
     setLabels(updatedLabels);
   };
 
-  console.log(chapterData,"ddd")
+  console.log(chapterData, "ddd");
   const handleSubmit = async (e) => {
     e.preventDefault();
     const validFiles = files.filter((file) => file.size <= FILE_SIZE_LIMIT);
 
-    
     if (validFiles.length > 0) {
       await dispatch(
         addAttachment({
           chapterId: chapterData.chapterId,
-          subjectId: chapterData.sid, 
+          subjectId: chapterData.sid,
           documents: validFiles,
           documentLabels: labels,
         })

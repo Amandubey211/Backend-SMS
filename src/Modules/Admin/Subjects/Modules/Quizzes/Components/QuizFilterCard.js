@@ -5,7 +5,9 @@ import { FiRefreshCw } from "react-icons/fi";
 const QuizFilterCard = ({ filters, setFilters }) => {
   const [publishStatus, setPublishStatus] = useState(filters?.publish || null);
   const [selectedModule, setSelectedModule] = useState(filters?.moduleId || "");
-  const [selectedChapter, setSelectedChapter] = useState(filters?.chapterId || "");
+  const [selectedChapter, setSelectedChapter] = useState(
+    filters?.chapterId || ""
+  );
   const [chapters, setChapters] = useState([]);
   const moduleList = useSelector((store) => store.Subject.modules);
 

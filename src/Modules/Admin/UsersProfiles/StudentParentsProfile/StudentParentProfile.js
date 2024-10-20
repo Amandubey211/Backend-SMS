@@ -12,6 +12,7 @@ import { FiLoader } from "react-icons/fi";
 import useGetAllStudents from "../../../../Hooks/AuthHooks/Staff/Admin/Students/useGetAllStudents";
 import { fetchAllParent } from "../../../../Store/Slices/Admin/Users/Parents/parent.action";
 import { fetchAllStudents } from "../../../../Store/Slices/Admin/Users/Students/student.action";
+import Spinner from "../../../../Components/Common/Spinner";
 
 const uniqueFilterOptions = (data, key) => {
   return [
@@ -61,8 +62,7 @@ const StudentParentProfile = () => {
       <Layout title="Parents">
         <DashLayout>
        {loading? <div className="flex w-full h-[90vh] flex-col items-center justify-center">
-    <FiLoader className="animate-spin mr-2 w-[3rem] h-[3rem] " />
-    <p className="text-gray-800 text-lg">Loading...</p>
+        <Spinner/>
     </div>:
           <div className="min-h-screen p-4 ">
             <h2 className="text-xl font-semibold mb-4">
@@ -168,7 +168,7 @@ const StudentParentProfile = () => {
                   <td className="   text-center text-2xl py-10 text-gray-400" colSpan={6} >
                    <div className="flex  items-center justify-center flex-col text-2xl">
                      <GoAlertFill className="text-[5rem]" />
-                    No  Data Found
+                    No  Parent data Found
                    </div>
                   
                   </td>

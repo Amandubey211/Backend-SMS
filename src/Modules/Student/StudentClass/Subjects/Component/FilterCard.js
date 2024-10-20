@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { FiRefreshCw } from "react-icons/fi";
+import { stdModule } from "../../../../../Store/Slices/Student/MyClass/Class/Subjects/Modules/module.action";
+import { useParams } from "react-router-dom";
 
 const FilterCard = ({ filters, setFilters }) => {
   const [selectedModule, setSelectedModule] = useState(filters.moduleId || "");
@@ -8,16 +10,21 @@ const FilterCard = ({ filters, setFilters }) => {
     filters.chapterId || ""
   );
   const [chapters, setChapters] = useState([]);
-  const moduleList = useSelector((store) => store.Subject.modules);
+  const { modulesData } = useSelector((store) => store?.student?.studentModule);
+  const dispatch = useDispatch();
+  const { cid, sid } = useParams();
+  useEffect(() => {
+    dispatch(stdModule({ cid, sid }));
+  }, []);
 
   useEffect(() => {
     if (selectedModule) {
-      const module = moduleList.find((mod) => mod._id === selectedModule);
+      const module = modulesData.find((mod) => mod._id === selectedModule);
       setChapters(module ? module.chapters : []);
     } else {
       setChapters([]);
     }
-  }, [selectedModule, moduleList]);
+  }, [selectedModule, modulesData]);
 
   const handleApplyFilters = () => {
     setFilters({ moduleId: selectedModule, chapterId: selectedChapter });
@@ -25,7 +32,7 @@ const FilterCard = ({ filters, setFilters }) => {
 
   const handleModuleChange = (e) => {
     setSelectedModule(e.target.value);
-    setSelectedChapter(""); // Reset chapter when module changes
+    setSelectedChapter("");
   };
 
   const handleResetFilters = () => {
@@ -56,7 +63,7 @@ const FilterCard = ({ filters, setFilters }) => {
           onChange={handleModuleChange}
         >
           <option value="">Select</option>
-          {moduleList.map((module) => (
+          {modulesData.map((module) => (
             <option key={module._id} value={module._id}>
               {module.moduleName}
             </option>

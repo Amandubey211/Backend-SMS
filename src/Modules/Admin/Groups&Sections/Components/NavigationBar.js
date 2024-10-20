@@ -17,6 +17,7 @@ const NavigationBar = ({ onSectionChange, selectedSection }) => {
   const [editingSection, setEditingSection] = useState(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [sectionToDelete, setSectionToDelete] = useState(null);
+  const role = useSelector((store) => store.common.auth.role);
 
   const dispatch = useDispatch();
   const { cid } = useParams();
@@ -76,7 +77,7 @@ const NavigationBar = ({ onSectionChange, selectedSection }) => {
               onMouseLeave={() => setHoveredSection(null)}
             >
               {item.sectionName}
-              {hoveredSection === item.sectionName && (
+              {hoveredSection === item.sectionName && role !== "teacher" && (
                 <span className="absolute top-0 right-0 p-1 flex space-x-2 rounded-full bg-white hover:bg-gray-200 text-lg border -m-1 text-red-600 cursor-pointer">
                   <RiEdit2Line
                     className="hover:text-blue-500"
@@ -95,22 +96,28 @@ const NavigationBar = ({ onSectionChange, selectedSection }) => {
               )}
             </button>
           ))}
-          <button
-            onClick={openAddSectionSidebar}
-            className="flex items-center px-4 py-2 border-2 border-dashed border-pink-600 text-gradient rounded-full"
-          >
-            <span className="mr-2">+</span> Add Section
-          </button>
+          {/* Conditionally render the Add Section button only if the role is not "teacher" */}
+          {role !== "teacher" && (
+            <button
+              onClick={openAddSectionSidebar}
+              className="flex items-center px-4 py-2 border-2 border-dashed border-pink-600 text-gradient rounded-full"
+            >
+              <span className="mr-2">+</span> Add Section
+            </button>
+          )}
         </div>
-        <button
-          onClick={openAddGroupSidebar}
-          className="flex items-center border border-gray-300 ps-5 py-0 rounded-full"
-        >
-          <span className="mr-2">Group</span>
-          <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full w-12 h-12 flex items-center justify-center">
-            <span className="text-3xl -mt-2">+</span>
-          </div>
-        </button>
+        {/* Conditionally render the Group button only if the role is not "teacher" */}
+        {role !== "teacher" && (
+          <button
+            onClick={openAddGroupSidebar}
+            className="flex items-center border border-gray-300 ps-5 py-0 rounded-full"
+          >
+            <span className="mr-2">Group</span>
+            <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full w-12 h-12 flex items-center justify-center">
+              <span className="text-3xl -mt-2">+</span>
+            </div>
+          </button>
+        )}
       </div>
 
       {/* Sidebars for adding/editing sections and groups */}

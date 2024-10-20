@@ -98,7 +98,7 @@ const Navbar = () => {
         {/* Left Heading */}
         <LeftHeading leftHeading={leftHeading} navigate={navigate} />
 
-        <div className="flex items-center space-x-2 relative ">
+        <div className="flex items-center space-x-2 relative justify-center  ">
           {role === "admin" || role === "teacher" || role === "accountant" ? (
             <div className="border-r px-4 font-semibold text-gradient">
               {activeAcademicYear && activeAcademicYear}
@@ -123,20 +123,23 @@ const Navbar = () => {
           </div>
 
           {/* Settings Icon */}
-          <IconButton
+         <div>
+         <IconButton
             icon={IoSettingsOutline}
             label="Settings"
             onClick={() => setShowSetting(!showSetting)}
             className="hover:bg-gray-200 rounded-full transition-all duration-200"
           />
+         </div>
 
           {/* Dropdown for Settings */}
-          <SettingDropdown
+          <div> <SettingDropdown
             showSetting={showSetting}
             setShowSetting={setShowSetting}
             navigateProfile={navigateProfile}
             openModal={() => setIsModalOpen(true)}
-          />
+          /></div>
+         
         </div>
       </div>
 

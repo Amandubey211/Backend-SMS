@@ -1,10 +1,11 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { fetchNotices, fetchFilteredEvents, fetchFilteredIssueBooks, fetchAdminDashboardData, fetchEarningsData, fetchAttendanceData } from './adminDashboard.action';
+import { fetchNotices, fetchFilteredEvents, fetchFilteredIssueBooks, fetchAdminDashboardData, fetchEarningsData, fetchAttendanceData, fetchTopStudents } from './adminDashboard.action';
 
 const initialState = {
   notices: [],
   events: [],
   books: [],
+  topStudents:[],
   dashboardData: null,
   earningsData: null,
   attendanceData: null,
@@ -14,12 +15,17 @@ const initialState = {
   loadingDashboard: false,
   loadingEarnings: false,
   loadingAttendance: false,
+  loadingTopStudents: false,
+
+
+  errorTopStudents: null,
   errorNotices: null,
   errorEvents: null,
   errorBooks: null,
   errorDashboard: null,
   errorEarnings: null,
   errorAttendance: null,
+
 };
 
 const adminDashboardSlice = createSlice({
@@ -115,6 +121,21 @@ const adminDashboardSlice = createSlice({
       .addCase(fetchAttendanceData.rejected, (state, action) => {
         state.loadingAttendance = false;
         state.errorAttendance = action.payload || 'Failed to fetch attendance data';
+      });
+    builder
+      .addCase(fetchTopStudents.pending, (state) => {
+        state.loadingTopStudents = true;
+        state.errorTopStudents = null;
+      })
+      .addCase(fetchTopStudents.fulfilled, (state, action) => {
+        state.loadingTopStudents = false;
+        state.topStudents = action.payload; 
+        state.errorTopStudents = null;
+      })
+      .addCase(fetchTopStudents.rejected, (state, action) => {
+        state.loadingTopStudents = false;
+        state.topStudents = []; 
+        state.errorTopStudents = action.payload || 'Failed to fetch top students data';
       });
   },
 });

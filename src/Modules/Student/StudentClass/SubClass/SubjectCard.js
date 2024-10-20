@@ -8,17 +8,18 @@ import profileImage from '../../../../Assets/DashboardAssets/profileIcon.png'
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import { setSubject } from "../../../../Store/Slices/Student/MyClass/Class/Subjects/subjectSlice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 
-const SubjectCard = ({ data, backgroundColor, classId, onSubjectClick }) => {
+const SubjectCard = ({ data, backgroundColor, classId, onSubjectClick, currentProgress }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
   console.log("Subjects is : ", data);
   const percentage = 75;
+  console.log("subject progress", currentProgress)
 
-
-  console.log("subject detail ::==>",data)
+  console.log("subject detail ::==>", data.subjectId)
 
   const handleSubjectClicked = () => {
     dispatch(setSubject({ subjectId: data?.subjectId, subjectName: data?.subjectName }));
@@ -40,44 +41,38 @@ const SubjectCard = ({ data, backgroundColor, classId, onSubjectClick }) => {
     >
       <div className="flex justify-between items-center mb-4">
         <button className="border border-white text-white rounded-full px-4 py-1">
-          {data?.isPublished ? "Publish" : "Unpublish"}
+          {data?.isPublished ? "Active" : "Deactive"}
         </button>
-        {/* <TbProgress size={50} color={"white"} /> */}
-        <div style={{ width: 50, height: 50 }}>
-
-          <CircularProgressbar value={percentage} text={`${percentage}%`}
-
-            styles={buildStyles({
-              // Rotation of path and trail, in number of turns (0-1)
-              rotation: 0.47,
-
-              // Whether to use rounded or flat corners on the ends - can use 'butt' or 'round'
-              strokeLinecap: 'round',
-
-              // Text size
-              textSize: '30px',
-
-              // How long animation takes to go from one percentage to another, in seconds
-              pathTransitionDuration: 0.5,
-
-              // Can specify path transition in more detail, or remove it entirely
-              // pathTransition: 'none',
-
-              // Dynamic path color based on percentage
-              pathColor: percentage < 33
-                ? '#FF6347'  // Red for < 33%
-                : percentage < 50
-                  ? '#FFA500'  // Orange for < 50%
-                  : percentage < 75
-                    ? '#FFD700'  // Yellow for < 75%
-                    : '#32CD32',  // Green for 75% and above
-
-              textColor: '#000',  // Black text color for clarity
-              trailColor: '#f4e7ff',  // Light purple for the empty part
-              backgroundColor: '#DA70D6',  // Light purple/pinkish background color
-            })}
-          />
-        </div>
+        {
+          currentProgress && (
+            <div style={{ width: 50, height: 50 }}>
+              <CircularProgressbar
+                value={currentProgress?.
+                  percentageValue
+                }
+                text={`${currentProgress?.percentageValue
+                  }%`}
+                styles={buildStyles({
+                  rotation: 0.47,
+                  strokeLinecap: 'round',
+                  textSize: '30px',
+                  pathTransitionDuration: 0.5,
+                  pathColor:
+                    percentage < 33
+                      ? '#FF6347' // Red for < 33%
+                      : percentage < 50
+                        ? '#FFA500' // Orange for < 50%
+                        : percentage < 75
+                          ? '#FFD700' // Yellow for < 75%
+                          : '#32CD32', // Green for 75% and above
+                  textColor: '#000', // Black text color for clarity
+                  trailColor: '#f4e7ff', // Light purple for the empty part
+                  backgroundColor: '#DA70D6', // Light purple/pinkish background color
+                })}
+              />
+            </div>
+          )
+        }
 
       </div>
       {/* <NavLink to={`/student_class/${classId}/${data.subjectId}/module`}> */}

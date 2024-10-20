@@ -1,6 +1,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { baseUrl } from '../../../../config/Common';
+import { CiMoneyBill } from 'react-icons/ci';
 
 // Fetch Dashboard Details
 export const fetchDashboardDetails = createAsyncThunk(
@@ -68,18 +69,23 @@ export const fetchTasks = createAsyncThunk(
   'studentDashboard/fetchTasks',
   async (_, { rejectWithValue }) => {
     const token = localStorage.getItem('student:token');
+    const persistUserString = localStorage.getItem('persist:user');
+    const persistUserObject = JSON.parse(persistUserString);
+    const userDetails = JSON.parse(persistUserObject.userDetails);
+    const studentId = userDetails.userId;
+
     if (!token) {
       return rejectWithValue('Authentication failed!');
     }
 
     try {
-      const response = await axios.get(`${baseUrl}/api/studentDashboard/tasks`, {
+      const response = await axios.get(`${baseUrl}/admin/task/student/${studentId}`, {
         headers: {
           Authentication: token,
         },
       });
 
-      return response?.data?.tasks;
+      return response?.data?.completedTask;
     } catch (error) {
       console.error('Error in fetchTasks:', error);
       return rejectWithValue(error.message);
@@ -126,13 +132,15 @@ const formatDashboardData = (dashboardData) => {
       bgColor: 'bg-green-100',
       textColor: 'text-black-500',
       icon: '📝',
+      url:'/student_dash'
     },
     {
       label: 'Due Fees',
       value: dashboardData?.data?.dueFees,
       bgColor: 'bg-red-100',
       textColor: 'text-black-500',
-      icon: '💸',
+      icon: <CiMoneyBill />,
+         url:'/student_finance'
     },
     {
       label: 'Event',
@@ -140,6 +148,7 @@ const formatDashboardData = (dashboardData) => {
       bgColor: 'bg-blue-100',
       textColor: 'text-black-500',
       icon: '📅',
+         url:'/student/noticeboard/events'
     },
     {
       label: 'Notice',
@@ -147,6 +156,7 @@ const formatDashboardData = (dashboardData) => {
       bgColor: 'bg-yellow-100',
       textColor: 'text-black-500',
       icon: '🔔',
+         url:'/student/noticeboard/announcements'
     },
   ];
 };

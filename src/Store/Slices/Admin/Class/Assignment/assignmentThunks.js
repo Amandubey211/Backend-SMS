@@ -41,7 +41,7 @@ export const updateAssignmentThunk = createAsyncThunk(
   "assignment/updateAssignment",
   async (
     { assignmentId, assignmentData, sectionId },
-    { rejectWithValue, getState }
+    { rejectWithValue, getState, dispatch }
   ) => {
     try {
       const token = getToken(getState); // Get token using helper
@@ -59,6 +59,7 @@ export const updateAssignmentThunk = createAsyncThunk(
       );
       if (response.data.success) {
         toast.success("Assignment updated successfully!");
+        dispatch(fetchAssignmentByIdThunk(assignmentId));
         return response.data.assignment; // Return the updated assignment
       } else {
         throw new Error(response.data.message || "Failed to update assignment");

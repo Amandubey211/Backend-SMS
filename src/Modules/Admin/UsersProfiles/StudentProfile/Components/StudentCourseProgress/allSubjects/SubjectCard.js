@@ -1,7 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { FaBook } from "react-icons/fa";
+
 const SubjectCard = ({ subject, i }) => {
-  const { subjectName,started,totalModule,completedModule,percentageValue} = subject;
+  const {
+    subjectName = "No Subject", // Default subject name
+    started = "N/A", // Default started date
+    totalModule = 0, // Default total modules
+    completedModule = 0, // Default completed modules
+    percentageValue = 0, // Default percentage value
+  } = subject;
+
   const [bgColor, setBgColor] = useState("");
 
   useEffect(() => {
@@ -22,22 +30,22 @@ const SubjectCard = ({ subject, i }) => {
       style={{ width: "265px" }}
     >
       <div className="flex items-center gap-2">
-      <FaBook className="text-[2.2rem] text-pink-400" />
+        <FaBook className="text-[2.2rem] text-pink-400" />
         <div className="flex flex-col">
           <span>{subjectName}</span>
-          <span className="text-[12px] text-gray-600">Started: {started?.slice(0,10)}</span>
+          <span className="text-[12px] text-gray-600">Started: {started !== "N/A" ? started.slice(0, 10) : "N/A"}</span>
         </div>
       </div>
 
       <div className="w-full bg-gray-200 rounded-full h-1.5 dark:bg-gray-700">
         <div
           className={`h-1.5 rounded-full bg-${bgColor}`}
-          style={{ width: `${percentageValue}%`, }}
+          style={{ width: `${percentageValue || 0}%`, }} // Ensure valid width
         ></div>
       </div>
       <div className="flex flex-row justify-between">
-        <p className="text-right text-sm text-gray-500">{completedModule}/{totalModule} Module</p>
-        <p className="text-right text-sm text-gray-500">{percentageValue}%</p>
+        <p className="text-right text-sm text-gray-500">{completedModule}/{totalModule} Modules</p>
+        <p className="text-right text-sm text-gray-500">{percentageValue || 0}%</p>
       </div>
     </div>
   );

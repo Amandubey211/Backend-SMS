@@ -16,7 +16,8 @@ const initialState = {
     grades:{},
     error:null,
     loading:false,
-    completedTask:0
+    completedTask:0,
+    inCompletedTask:0,
 }
 const allStudentSlice = createSlice({
     name: "students",
@@ -166,6 +167,7 @@ const allStudentSlice = createSlice({
         .addCase(fetchStudentTask.fulfilled, (state, action) => {
           state.loading = false;
           state.completedTask = action.payload;
+          state.inCompletedTask = 100-action.payload;
         })
         .addCase(fetchStudentTask.rejected, (state, action) => {
           state.loading = false;

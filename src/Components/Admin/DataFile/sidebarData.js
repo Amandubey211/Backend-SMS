@@ -35,28 +35,35 @@ const sidebarData = [
     roles: ["admin", "teacher"],
   },
   {
+    title: "Library",
+    icon: <BsBook />,
+    path: "/library",
+    roles: ["teacher", "librarian"],
+  },
+  {
     title: "Users",
     icon: <LuUser />,
-    roles: ["admin", "teacher"],
+    roles: ["admin", "teacher", "accountant", "librarian"],
     items: [
       {
         title: "Student",
         icon: <FaUserGraduate />,
         path: "/users/students",
-        roles: ["admin", "teacher"],
+        roles: ["admin", "teacher", "accountant", "librarian"],
       },
       {
         title: "Parent",
         icon: <RiParentFill />,
         path: "/users/parents",
-        roles: ["admin", "teacher"],
+        roles: ["admin", "teacher", "accountant", "librarian"],
       },
       // Other user roles for admin only
       {
         title: "Teacher",
         icon: <FaChalkboardTeacher />,
         path: "/users/teachers",
-        roles: ["admin"],
+        roles: ["admin", "accountant", "librarian"],
+
       },
       {
         title: "Accountant",
@@ -68,13 +75,13 @@ const sidebarData = [
         title: "Librarian",
         icon: <MdLocalLibrary />,
         path: "/users/librarian",
-        roles: ["admin"],
+        roles: ["admin", "librarian"],
       },
       {
         title: "Staff",
         icon: <GrUserWorker />,
         path: "/users/staffs",
-        roles: ["admin"],
+        roles: ["admin", "teacher", "accountant", "librarian"],
       },
     ],
   },
@@ -106,19 +113,19 @@ const sidebarData = [
   {
     title: "NoticeBoard",
     icon: <TbNotebook />,
-    roles: ["admin", "teacher", "librarian"],
+    roles: ["admin", "teacher", "librarian", "accountant"],
     items: [
       {
         title: "Announcements",
         icon: <FaClipboardList />,
         path: "/noticeboard/notice",
-        roles: ["admin", "teacher", "librarian"],
+        roles: ["admin", "teacher", "librarian", "accountant"],
       },
       {
         title: "Events",
         icon: <FaBook />,
         path: "/noticeboard/events",
-        roles: ["admin", "teacher", "librarian"],
+        roles: ["admin", "teacher", "librarian", "accountant"],
       },
     ],
   },
@@ -132,7 +139,7 @@ const sidebarData = [
     title: "Library",
     icon: <BsBook />,
     path: "/library",
-    roles: ["admin", "librarian"],
+    roles: ["admin"],
   },
   {
     title: "Verification",

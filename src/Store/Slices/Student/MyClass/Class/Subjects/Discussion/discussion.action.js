@@ -2,18 +2,22 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import { baseUrl } from "../../../../../../../config/Common";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { ErrorMsg } from "../../../../../Common/Alerts/errorhandling.action";
+import { setShowError } from "../../../../../Common/Alerts/alertsSlice";
 
 
 export const fetchStudentDiscussion = createAsyncThunk(
     'discussion/fetchStudentDiscussion',
-    async (cid, { rejectWithValue }) => {
+    async (cid, { rejectWithValue, dispatch }) => {
         const token = localStorage.getItem("student:token");
 
         if (!token) {
+            dispatch(setShowError(true));
             return rejectWithValue("Authentication failed!");
         }
 
         try {
+            dispatch(setShowError(false));
             const response = await axios.get(
                 `${baseUrl}/admin/getDiscussion/class/${cid}`,
                 {
@@ -25,7 +29,11 @@ export const fetchStudentDiscussion = createAsyncThunk(
             return data;
 
         } catch (error) {
-            return rejectWithValue((error?.response?.data?.message || error?.message || "Something Went Wrong!"))
+            console.log("Error in student discussion", error);
+            const err = ErrorMsg(error);
+            dispatch(setShowError(true));
+            return rejectWithValue(err.message);
+            //return rejectWithValue((error?.response?.data?.message || error?.message || "Something Went Wrong!"))
         }
     }
 )

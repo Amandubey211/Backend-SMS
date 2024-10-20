@@ -24,11 +24,6 @@ const DiscussionHeader = ({ onSearch, onFilterChange, loading, error }) => {
           <ImSpinner3 className="w-12 h-12 animate-spin mb-3" />
           <p className="text-lg font-semibold">Loading...</p>
         </div>
-      ) : error ? (
-        <div className="flex flex-col items-center justify-center py-10 text-gray-500">
-          <FaExclamationTriangle className="w-12 h-12 mb-3" />
-          <p className="text-lg font-semibold">{error}</p>
-        </div>
       ) : (
         <div className="flex items-center justify-between space-x-4">
           <div className="relative flex items-center">

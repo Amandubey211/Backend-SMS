@@ -4,7 +4,9 @@ import List from "../../Assignments/Component/List";
 import { RiAddFill, RiFileUnknowLine } from "react-icons/ri";
 import { NavLink, useParams } from "react-router-dom";
 import QuizFilterCard from "../Components/QuizFilterCard";
-import useGetFilteredQuizzes from "../../../../../../Hooks/AuthHooks/Staff/Admin/Quiz/useGetFilteredQuizzes";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchFilteredQuizzesThunk } from "../../../../../../Store/Slices/Admin/Class/Quiz/quizThunks"; // Import the thunk
+import FilterCard from "../../Assignments/Component/FilterCard";
 
 const MainSection = () => {
   const { cid, sid } = useParams();
@@ -13,13 +15,18 @@ const MainSection = () => {
     chapterId: "",
     publish: null,
   });
-  const { error, fetchFilteredQuizzes, loading, quizzes } =
-    useGetFilteredQuizzes();
 
+  const dispatch = useDispatch();
+  const { quizzes, loading, error } = useSelector(
+    (state) => state.admin.quizzes
+  ); // Access state from slice
+
+  // Function to refetch quizzes based on filters
   const refetchQuizzes = useCallback(() => {
-    fetchFilteredQuizzes(filters.moduleId, filters.chapterId, filters.publish);
-  }, [filters, fetchFilteredQuizzes]);
+    dispatch(fetchFilteredQuizzesThunk(filters));
+  }, [dispatch, filters]);
 
+  // Fetch quizzes when the component mounts or filters change
   useEffect(() => {
     refetchQuizzes();
   }, [refetchQuizzes]);
@@ -39,7 +46,7 @@ const MainSection = () => {
         />
       </div>
       <div className="w-[30%] px-2 pt-2">
-        <QuizFilterCard filters={filters} setFilters={setFilters} />
+        <FilterCard filters={filters} setFilters={setFilters} />
       </div>
       <NavLink
         to={`/class/${cid}/${sid}/create_quiz`}

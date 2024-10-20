@@ -5,30 +5,24 @@ import { AiOutlineEdit, AiOutlineDelete } from "react-icons/ai";
 import { HiOutlineDotsVertical } from "react-icons/hi";
 import { useNavigate, useParams } from "react-router-dom";
 import { ImSpinner3 } from "react-icons/im";
-import useDeleteQuiz from "../../../../Hooks/AuthHooks/Staff/Admin/Quiz/useDeleteQuiz";
-import useDeleteAssignment from "../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useDeleteAssignment";
-import useUpdateAssignment from "../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useUpdateAssignment";
-import useUpdateQuiz from "../../../../Hooks/AuthHooks/Staff/Admin/Quiz/useUpdateQuiz";
 import DeleteModal from "../../../../Components/Common/DeleteModal";
-import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
+import {
+  deleteAssignmentThunk,
+  updateAssignmentThunk,
+} from "../../../../Store/Slices/Admin/Class/Assignment/assignmentThunks";
+import {
+  updateQuizThunk,
+  deleteQuizThunk,
+} from "../../../../Store/Slices/Admin/Class/Quiz/quizThunks";
 
-const ButtonsGroup = ({ type }) => {
-  const { assignmentDetails: data } = useSelector(
-    (store) => store.admin.assignments
-  );
-
+const ButtonsGroup = ({ type, data, loading }) => {
   const navigate = useNavigate();
   const { sid, cid } = useParams();
   const [showMenu, setShowMenu] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const menuRef = useRef();
-
-  const { loading: quizLoading, deleteQuiz } = useDeleteQuiz();
-  const { loading: assignmentLoading, deleteAssignment } =
-    useDeleteAssignment();
-  const { updateAssignment, loading: updateAssignmentLoading } =
-    useUpdateAssignment();
-  const { updateQuiz, loading: updateQuizLoading } = useUpdateQuiz();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -64,15 +58,14 @@ const ButtonsGroup = ({ type }) => {
 
   const confirmDelete = async () => {
     if (!data) return; // Prevent action if data is null
-    let success = false;
     if (type === "Quiz") {
-      success = await deleteQuiz(data._id);
+      dispatch(deleteQuizThunk(data._id));
     }
     if (type === "Assignment") {
-      success = await deleteAssignment(data._id);
+      dispatch(deleteAssignmentThunk(data._id));
     }
-    if (success && !quizLoading && !assignmentLoading) {
-    }
+
+    // navigate(-1);
   };
 
   const handlePublishToggle = async () => {
@@ -84,44 +77,53 @@ const ButtonsGroup = ({ type }) => {
       points: data.points ?? 0,
     };
 
-    let success = false;
     if (type === "Quiz") {
-      success = await updateQuiz(data._id, updatedData);
+      const quizId = data._id;
+      dispatch(updateQuizThunk({ quizId, quizData: updatedData }));
     } else if (type === "Assignment") {
-      success = await updateAssignment(data._id, updatedData);
+      const assignmentId = data._id;
+      dispatch(
+        updateAssignmentThunk({ assignmentId, assignmentData: updatedData })
+      );
     }
-
-    // if (success) {
-    //   onRefresh(); // Trigger data refetch
-    // }
   };
 
   // Use a default value if publish is not present or data is null
-  const isPublished = data?.publish ?? false;
-  const isUpdating = updateQuizLoading || updateAssignmentLoading;
+  const isPublished = data?.publish ?? true;
+  const isUpdating = loading;
 
   return (
     <div className="relative flex justify-center gap-2 items-center w-full p-2 text-gray-700">
       <button
         className="flex items-center space-x-1 px-4 py-1 border rounded-md border-gray-300 text-gray-600 hover:bg-gray-100 transition"
-        aria-label={isPublished ? "Unpublish" : "Publish"}
+        aria-label={data?.publish ? "Unpublish" : "Publish"}
         onClick={handlePublishToggle}
-        disabled={isUpdating || !data}
+        disabled={loading || !data}
       >
-        {isUpdating ? (
-          <ImSpinner3 className="animate-spin text-gray-500" />
-        ) : isPublished ? (
+        {loading ? (
           <>
-            <BsPatchCheckFill aria-hidden="true" className="text-green-600" />
+            <span className="flex items-center justify-center w-5 h-5">
+              <ImSpinner3 className="animate-spin text-gray-500" />
+            </span>
+            <span>Loading</span>
+          </>
+        ) : data?.publish ? (
+          <>
+            <span className="flex items-center justify-center w-5 h-5">
+              <BsPatchCheckFill aria-hidden="true" className="text-green-600" />
+            </span>
             <span>Publish</span>
           </>
         ) : (
           <>
-            <MdOutlineBlock aria-hidden="true" />
+            <span className="flex items-center justify-center w-5 h-5">
+              <MdOutlineBlock aria-hidden="true" />
+            </span>
             <span>Unpublish</span>
           </>
         )}
       </button>
+
       <button
         onClick={handleEdit}
         className="flex items-center space-x-1 px-4 py-1 border rounded-md border-gray-300 text-green-600 hover:bg-gray-100 transition"

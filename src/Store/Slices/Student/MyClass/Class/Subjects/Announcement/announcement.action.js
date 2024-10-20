@@ -1,17 +1,21 @@
 import axios from "axios";
 import { baseUrl } from "../../../../../../../config/Common";
 import { createAsyncThunk } from "@reduxjs/toolkit";
+import { setShowError } from "../../../../../Common/Alerts/alertsSlice";
+import { ErrorMsg } from "../../../../../Common/Alerts/errorhandling.action";
 
 export const fetchStudentAnnounce = createAsyncThunk(
     'announce/fetchStudentAnnounce',
-    async (cid, { rejectWithValue }) => {
+    async (cid, { rejectWithValue, dispatch }) => {
         const token = localStorage.getItem("student:token");
 
         if (!token) {
+            dispatch(setShowError(true));
             return rejectWithValue("Authentication failed!");
         }
 
         try {
+            dispatch(setShowError(false));
             const response = await axios.get(
                 `${baseUrl}/admin/announcement/class/${cid}`,
                 {
@@ -23,7 +27,11 @@ export const fetchStudentAnnounce = createAsyncThunk(
             return data;
 
         } catch (error) {
-            return rejectWithValue((error?.response?.data?.message || error?.message || "Something Went Wrong!"))
+            console.log("Error in student Announcement", error);
+            const err = ErrorMsg(error);
+            dispatch(setShowError(true));
+            return rejectWithValue(err.message);
+            //return rejectWithValue((error?.response?.data?.message || error?.message || "Something Went Wrong!"))
         }
     }
 )

@@ -1,17 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
-import {
-  FaEllipsisV,
-  FaCheckCircle,
-  FaBan,
-  FaPen,
-  FaCopy,
-  FaArrowRight,
-  FaIndent,
-  FaShareAlt,
-  FaTrashAlt,
-} from "react-icons/fa";
+import { FaEllipsisV } from "react-icons/fa";
 
-const ModuleCard = ({ title, moduleNumber, imageUrl, isCompleted }) => {
+const ModuleCard = ({ title, moduleNumber, imageUrl }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef();
 
@@ -33,21 +23,18 @@ const ModuleCard = ({ title, moduleNumber, imageUrl, isCompleted }) => {
   }, []);
 
   return (
-    <div className="relative mb-4 border-2 border-rose-400  bg-white rounded-lg ">
+    <div className="relative mb-4 border-2 bg-white rounded-lg">
       <img
         src={imageUrl}
         alt={title}
         className="w-full h-36 object-cover rounded-t-lg"
       />
-      <div className="p-4 " >
+      <div className="p-4">
         <h2 className="font-semibold text-lg">{title}</h2>
         <div className="flex justify-between items-center mt-2">
           <p className="bg-gradient-to-r from-pink-100 to-purple-200 font-semibold rounded-full py-1 px-4">
-            {" "}
-            <span className="text-gradient"> Module {moduleNumber}</span>{" "}
+            Module {moduleNumber}
           </p>
-
-         
         </div>
       </div>
       {menuOpen && (
@@ -57,22 +44,7 @@ const ModuleCard = ({ title, moduleNumber, imageUrl, isCompleted }) => {
         >
           <ul className="py-2">
             <li className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
-              <FaPen className="mr-2" /> Edit
-            </li>
-            <li className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
-              <FaCopy className="mr-2" /> Duplicate
-            </li>
-            <li className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
-              <FaArrowRight className="mr-2" /> Move to...
-            </li>
-            <li className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
-              <FaIndent className="mr-2" /> Increase indent
-            </li>
-            <li className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
-              <FaShareAlt className="mr-2" /> Share to Commons
-            </li>
-            <li className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">
-              <FaTrashAlt className="mr-2" /> Remove
+              <FaEllipsisV className="mr-2" /> Menu Item
             </li>
           </ul>
         </div>

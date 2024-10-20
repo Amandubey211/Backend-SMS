@@ -9,6 +9,7 @@ import { deleteAssignmentThunk } from "../../../../../../Store/Slices/Admin/Clas
 import DeleteModal from "../../../../../../Components/Common/DeleteModal";
 import Spinner from "../../../../../../Components/Common/Spinner";
 import NoDataFound from "../../../../../../Components/Common/NoDataFound";
+import { deleteQuizThunk } from "../../../../../../Store/Slices/Admin/Class/Quiz/quizThunks";
 
 const List = ({ data, icon, title, type, loading, error }) => {
   const { cid, sid } = useParams();
@@ -19,7 +20,6 @@ const List = ({ data, icon, title, type, loading, error }) => {
   const [currentDeleteId, setCurrentDeleteId] = useState(null);
   const [currentDeleteTitle, setCurrentDeleteTitle] = useState("");
   const menuRef = useRef(null);
-
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
   };
@@ -36,7 +36,11 @@ const List = ({ data, icon, title, type, loading, error }) => {
 
   const confirmDelete = async () => {
     // Call delete assignment thunk directly
-    await dispatch(deleteAssignmentThunk(currentDeleteId));
+    if (type === "Quiz") {
+      dispatch(deleteQuizThunk(currentDeleteId));
+    } else {
+      dispatch(deleteAssignmentThunk(currentDeleteId));
+    }
     setIsModalOpen(false);
   };
 

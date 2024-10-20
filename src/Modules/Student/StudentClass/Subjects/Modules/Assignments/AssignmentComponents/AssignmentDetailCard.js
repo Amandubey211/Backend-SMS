@@ -1,49 +1,47 @@
 import React, { useState } from "react";
 import AssignmentDetail from "../../../Component/AssignmentDetail";
 import { FiCalendar } from "react-icons/fi";
-import toast, { Toaster } from "react-hot-toast";
-import CommentSection from "../../../../../StudentClass/Subjects/Component/CommentSection";
+import { useSelector } from "react-redux";
 
-const AssignmentDetailCard = ({
-  isSubmitted,
-  assignmentData,
-  submissionData,
-}) => {
-  // Use optional chaining to safely access properties
-  const points = assignmentData?.points ?? "N/A";
-  // const allowNumberOfAttempts = assignmentData?.allowedAttempts ? assignmentData.allowNumberOfAttempts : 'N/A';
+const AssignmentDetailCard = ({ isSubmitted }) => {
+  const { assignmentData, submissionData } = useSelector(
+    (store) => store?.student?.studentAssignment
+  );
+
+  const points = assignmentData?.points || "N/A";
   const allowNumberOfAttempts =
-    assignmentData?.allowedAttempts !== false &&
-    assignmentData?.allowNumberOfAttempts
+    assignmentData?.allowedAttempts && assignmentData?.allowNumberOfAttempts
       ? assignmentData.allowNumberOfAttempts
       : "Unlimited";
-      // : "N/A";
 
-  const dueDate = assignmentData?.dueDate ?? "N/A";
-  const submittingBy = assignmentData?.submittingBy ?? "N/A";
+  const dueDate =
+    new Date(assignmentData?.dueDate).toLocaleDateString() || "N/A";
+  const submittingBy = assignmentData?.submittingBy || "Everyone";
 
-  const submittedAt = submissionData
+  const submittedAt = submissionData?.submittedAt
     ? new Date(submissionData.submittedAt)
     : null;
   const [currentAttempt, setCurrentAttempt] = useState(
-    submissionData ? submissionData.attempt : 0
+    submissionData?.attempt || 0
   );
 
   const formattedDate = submittedAt
     ? `${submittedAt.toLocaleDateString()} (${submittedAt.toLocaleTimeString(
         [],
-        { hour: "2-digit", minute: "2-digit", hour12: true }
+        {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: true,
+        }
       )})`
-    : "";
+    : "N/A";
 
   return (
-    <div
-      className="max-w-sm p-6 bg-white shadow-md rounded-lg"
-      aria-label="Assignment Card"
-    >
+    <div className="max-w-sm p-6 bg-white " aria-label="Assignment Card">
       <h3 className="mb-4 text-lg font-semibold text-gray-700">
-        Submission Details
+        {isSubmitted ? "Submission Details" : "Assignment Details"}
       </h3>
+
       {isSubmitted && (
         <div className="border p-4 mb-4 rounded-md">
           <p className="flex items-center text-sm mb-2">
@@ -57,18 +55,20 @@ const AssignmentDetailCard = ({
           </p>
         </div>
       )}
-      <AssignmentDetail label="Assignment Point" value={points.toString()} />
+
+      <AssignmentDetail label="Assignment Points" value={points.toString()} />
       <AssignmentDetail
-        label="Attempt"
-        value={`${currentAttempt.toString().padStart(2, "0")}`}
-        extra="Time"
+        label="Current Attempt"
+        value={currentAttempt?.toString().padStart(2, "0")}
+        extra="Times"
       />
       <AssignmentDetail
-        label="Allowed Attempt"
-        value={`${allowNumberOfAttempts.toString().padStart(2, "0")}`}
-        extra="Time"
+        label="Allowed Attempts"
+        value={allowNumberOfAttempts.toString().padStart(2, "0")}
+        extra="Times"
       />
-      {/* <CommentSection /> */}
+      <AssignmentDetail label="Due Date" value={dueDate} />
+      <AssignmentDetail label="Submitted By" value={submittingBy} />
     </div>
   );
 };

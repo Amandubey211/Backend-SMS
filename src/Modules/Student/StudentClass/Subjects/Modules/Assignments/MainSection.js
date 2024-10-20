@@ -3,63 +3,27 @@ import SubjectSideBar from "../../Component/SubjectSideBar";
 import AssignmentDetailCard from "./AssignmentComponents/AssignmentDetailCard";
 import AssignmentSection from "./AssignmentComponents/AssignmentSection";
 import { useParams } from "react-router-dom";
-import { useSelector } from "react-redux";
-import { toast } from "react-hot-toast";
-import { baseUrl } from "../../../../../../config/Common";
+import { useDispatch, useSelector } from "react-redux";
 import Spinner from "../../../../../../Components/Common/Spinner";
+import {
+  stdGetAssignment,
+  stdReattemptAssignment,
+} from "../../../../../../Store/Slices/Student/MyClass/Class/Subjects/Assignment/assignment.action";
+import { toast } from "react-hot-toast";
 
 const MainSection = () => {
-  const { selectedClass, selectedSection, selectedSubject, studentId } =
-    useSelector((state) => state.Common);
-
-  const { cid, sid, aid } = useParams();
-  const [assignmentData, setAssignmentData] = useState(null);
-  const [submissionData, setSubmissionData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const dispatch = useDispatch();
+  const { assignment, loading, error } = useSelector(
+    (store) => store?.student?.studentAssignment
+  );
+  const { aid } = useParams();
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const handleFormSubmit = () => {};
-
   useEffect(() => {
-    const fetchAssignment = async () => {
-      try {
-        const token = localStorage.getItem("student:token");
-        if (!token) {
-          throw new Error("Authentication token not found");
-        }
-
-        const response = await fetch(
-          `${baseUrl}/student/studentAssignment/${aid}`,
-          {
-            headers: {
-              Authentication: token,
-            },
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error(
-            `Failed to fetch assignment, status: ${response.status}`
-          );
-        }
-
-        const data = await response.json();
-        if (data.success && data.data) {
-          setAssignmentData(data.data.assignment);
-          setSubmissionData(data.data.submission || null);
-          setIsSubmitted(!!data.data.submission); // This determines if the assignment was already submitted
-        } else {
-          console.error("No assignment data or unsuccessful response");
-        }
-      } catch (error) {
-        console.error("Failed to fetch assignment:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAssignment();
-  }, [cid, sid, aid]);
+    if (aid) {
+      dispatch(stdGetAssignment(aid));
+    }
+  }, [dispatch, aid]);
 
   const handleResubmit = async (
     submissionContent,
@@ -67,43 +31,24 @@ const MainSection = () => {
     submissionComment
   ) => {
     try {
-      const currentAttempts = submissionData ? submissionData.attempt : 0;
-      if (currentAttempts >= assignmentData.allowNumberOfAttempts) {
-        toast.error("Maximum number of attempts reached");
-        return;
-      }
-
-      const token = localStorage.getItem("student:token");
-      if (!token) {
-        throw new Error("Authentication token not found");
-      }
-
-      const response = await fetch(
-        `${baseUrl}/student/studentAssignment/reattempt/${aid}`,
-        {
-          method: "PUT",
-          headers: {
-            Authentication: token,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            content: submissionContent,
-            type: submissionType,
-            commentText: submissionComment,
-          }),
+      if (assignment?.assignment?.allowedAttempts) {
+        const currentAttempts = assignment?.submission?.attempt || 0;
+        if (currentAttempts >= assignment?.assignment?.allowNumberOfAttempts) {
+          toast.error("Maximum number of attempts reached");
+          return;
         }
-      );
-
-      const data = await response.json();
-      if (response.ok) {
-        setSubmissionData(data.submission);
-        setIsSubmitted(true); // Now we confirm the assignment has been resubmitted
-        toast.success("Assignment resubmitted successfully");
-      } else {
-        toast.error(data.message || "Failed to resubmit assignment");
       }
+
+      await dispatch(
+        stdReattemptAssignment({
+          aid,
+          submissionContent,
+          submissionType,
+          submissionComment,
+        })
+      );
+      setIsSubmitted(true);
     } catch (error) {
-      console.error("Failed to resubmit assignment:", error);
       toast.error("Error resubmitting assignment");
     }
   };
@@ -112,25 +57,25 @@ const MainSection = () => {
     return <Spinner />;
   }
 
+  if (error) {
+    return (
+      <div className="text-red-500 text-center">
+        Failed to load assignment data. Please try again later.
+      </div>
+    );
+  }
+
   return (
     <div className="flex">
       <SubjectSideBar />
       <div className="w-[65%] border">
         <AssignmentSection
           isSubmitted={isSubmitted}
-          onFormSubmit={handleFormSubmit} // Ensure no direct state mutation here
-          assignmentData={assignmentData}
-          submissionData={submissionData}
-          assignmentId={aid}
           onResubmit={handleResubmit}
         />
       </div>
       <div className="w-[30%]">
-        <AssignmentDetailCard
-          isSubmitted={isSubmitted}
-          assignmentData={assignmentData}
-          submissionData={submissionData}
-        />
+        <AssignmentDetailCard isSubmitted={isSubmitted} />
       </div>
     </div>
   );

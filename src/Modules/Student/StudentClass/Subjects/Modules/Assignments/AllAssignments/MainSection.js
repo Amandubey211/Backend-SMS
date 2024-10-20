@@ -2,26 +2,31 @@ import React, { useState, useCallback, useEffect } from "react";
 import SubjectSideBar from "../../../Component/SubjectSideBar";
 import FilterCard from "../../../Component/FilterCard";
 import { RiListCheck3 } from "react-icons/ri";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import useFetchAssignedAssignments from "../../../../../../../Hooks/AuthHooks/Student/Assignment/useFetchAssignedAssignments";
 import List from "../../../Component/List";
+import { stdGetFilteredAssignment } from "../../../../../../../Store/Slices/Student/MyClass/Class/Subjects/Assignment/assignment.action";
 
 const AssignmentMainSection = () => {
-  const { selectedClass, selectedSection, selectedSubject } = useSelector(
-    (state) => state.Common
-  );
+  const dispatch = useDispatch();
   const { cid, sid, subjectId } = useParams();
 
-  const { loading, error, assignments, fetchFilteredAssignments } =
-    useFetchAssignedAssignments();
+  const { filteredAssignments, loading } = useSelector(
+    (store) => store?.student?.studentAssignment
+  );
+  console.log("assignmentData", filteredAssignments);
+
   const [filters, setFilters] = useState({ moduleId: "", chapterId: "" });
 
   // Fetch assignments based on selected filters
   const refetchAssignments = useCallback(() => {
     const { moduleId, chapterId } = filters;
-    fetchFilteredAssignments(sid, moduleId, chapterId);
-  }, [filters, sid, fetchFilteredAssignments]);
+    //fetchFilteredAssignments(sid, moduleId, chapterId);
+    dispatch(
+      stdGetFilteredAssignment({ cid, subjectId: sid, moduleId, chapterId })
+    );
+  }, [filters, sid, dispatch]);
 
   useEffect(() => {
     refetchAssignments();
@@ -40,10 +45,10 @@ const AssignmentMainSection = () => {
         <List
           type="Assignment"
           title="All Assignments"
-          data={assignments}
+          data={filteredAssignments}
           icon={<RiListCheck3 />}
           loading={loading}
-          error={error}
+          //error={error}
           getItemName={getItemName}
           getItemDetails={getItemDetails}
           navLinkPath={navLinkPath}

@@ -42,8 +42,14 @@ export const staffLogin = createAsyncThunk(
             profile: data?.profile,
             fullName: data?.fullName,
             email: data?.email,
-
-            // studentId: data?.studentId, // Assuming studentId exists
+            mobileNumber: data?.mobileNumber,
+            position: data?.position,
+            employeeID: data?.employeeID,
+            role: data?.role,
+            monthlySalary: data?.monthlySalary,
+            active: data?.active,
+            dateOfBirth: data?.dateOfBirth,
+          
           })
         );
 

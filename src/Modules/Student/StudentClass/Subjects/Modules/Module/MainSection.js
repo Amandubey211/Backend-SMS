@@ -8,11 +8,14 @@ import Spinner from "../../../../../../Components/Common/Spinner";
 import { stdModule } from "../../../../../../Store/Slices/Student/MyClass/Class/Subjects/Modules/module.action";
 import { useParams } from "react-router-dom";
 import { setExpandedChapters, setSelectedModule } from "../../../../../../Store/Slices/Student/MyClass/Class/Subjects/Modules/moduleSlice";
+import OfflineModal from "../../../../../../Components/Common/Offline";
+import { setShowError } from "../../../../../../Store/Slices/Common/Alerts/alertsSlice";
 
 const MainSection = () => {
   const { loading, error, modulesData, selectedModule, subjectName, expandedChapters } = useSelector((store) => store?.student?.studentModule);
   const dispatch = useDispatch();
   const { cid, sid } = useParams();
+  const {showError}=useSelector((store)=>store?.common?.alertMsg);
 
   useEffect(() => {
     dispatch(stdModule({ cid, sid }));
@@ -30,7 +33,7 @@ const MainSection = () => {
           chapters: firstModule?.chapters,
         })
       );
-      dispatch(setExpandedChapters([])); 
+      dispatch(setExpandedChapters([]));
     } else {
       dispatch(setSelectedModule({
         moduleId: null,
@@ -60,6 +63,9 @@ const MainSection = () => {
     dispatch(setExpandedChapters([]));
   };
 
+  const handleDismiss = () => {
+    dispatch(setShowError(false));
+  }
 
   // Render chapters if available
   const renderChapters = () => {
@@ -124,6 +130,9 @@ const MainSection = () => {
       <div className="w-[35%] p-2 border h-[100%]">
         <div className="bg-white  rounded-lg  h-[100%] w-[100%]">{renderModules()}</div>
       </div>
+      {!loading && showError && (
+        <OfflineModal error={error} onDismiss={handleDismiss} />
+      )}
     </div>
   );
 };

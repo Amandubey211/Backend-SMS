@@ -58,6 +58,7 @@ const MainSection = () => {
       textColor: "text-purple-700",
       icon: <StudentIcon className="w-10 h-10" />,
       iconBackground: "bg-[#564FFD]",
+      navigateTo: '/users/students',  // Add this line
     },
     {
       label: "Teacher",
@@ -69,6 +70,7 @@ const MainSection = () => {
       textColor: "text-green-700",
       icon: <InstructorIcon className="w-10 h-10" />,
       iconBackground: "bg-[#23BD331A]",
+      navigateTo: '/users/teachers',  // Add this line
     },
     {
       label: "Parents",
@@ -80,6 +82,7 @@ const MainSection = () => {
       textColor: "text-yellow-700",
       icon: <ParentIcon className="w-10 h-10" />,
       iconBackground: "bg-[#F09F04]",
+      navigateTo: '/users/parents',  // Add this line
     },
     {
       label: "Staff",
@@ -91,6 +94,7 @@ const MainSection = () => {
       textColor: "text-pink-700",
       icon: <StaffIcon className="w-10 h-10" />,
       iconBackground: "bg-[#EA2058]",
+      navigateTo: '/users/staffs',  // Add this line
     },
   ];
 

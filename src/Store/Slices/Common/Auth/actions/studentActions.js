@@ -31,10 +31,16 @@ export const studentLogin = createAsyncThunk(
         dispatch(setRole(data.role)); // Set role
         dispatch(
           setUserDetails({
-            schoolId: data.schoolId,
-            userId: data.userId,
-            profile: data.profile,
-            fullName: data.fullName,
+            schoolId: data?.schoolId,
+            userId: data?.userId,
+            profile: data?.profile,
+            fullName: data?.fullName,
+            admissionNumber: data?.admissionNumber,
+            email: data?.email,
+            mobileNumber: data?.mobileNumber,
+            dateOfBirth: data?.dateOfBirth,
+            Q_Id: data?.Q_Id,
+            enrollment:data?.enrollment
           })
         );
 

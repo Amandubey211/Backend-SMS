@@ -12,17 +12,23 @@ import { stdSyllabus } from "../../../../../../../Store/Slices/Student/MyClass/C
 import { GoAlertFill } from "react-icons/go";
 import NoDataFound from "../../../../../../../Components/Common/NoDataFound";
 import { useTranslation } from "react-i18next";
+import OfflineModal from "../../../../../../../Components/Common/Offline";
+import { setShowError } from "../../../../../../../Store/Slices/Common/Alerts/alertsSlice";
 
 const MainSection = () => {
   const { loading, error, syllabusData } = useSelector((store) => store?.student?.studentSyllabus);
   const dispatch = useDispatch();
   const { cid, sid } = useParams();
- 
+  const {showError}=useSelector((store)=>store?.common?.alertMsg);
 
   console.log("use param in syllabus:===>",cid,sid)
   useEffect(() => {
     dispatch(stdSyllabus({ classId: cid, subjectId: sid }));
   }, [dispatch,cid,sid]);
+
+  const handleDismiss = () => {
+    dispatch(setShowError(false));
+  }
 
   return (
     <div className="flex">
@@ -33,11 +39,6 @@ const MainSection = () => {
           {loading ? (
             <div className="w-full flex flex-col items-center justify-center py-20">
               <Spinner />
-            </div>
-          ) : error ? (
-            <div className="flex flex-col items-center justify-center py-20">
-              <GoAlertFill className="inline-block w-12 h-12 mb-3" />
-              <p className="text-lg font-semibold">{error}</p>
             </div>
           ) : syllabusData?.length > 0 ? (
             <div>
@@ -52,6 +53,9 @@ const MainSection = () => {
           )}
         </div>
       </div>
+      {!loading && showError && (
+            <OfflineModal error={error} onDismiss={handleDismiss} />
+          )}
     </div>
   );
 };

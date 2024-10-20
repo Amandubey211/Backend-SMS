@@ -16,7 +16,7 @@ import subjectGradesReducer from "./Slices/Admin/Class/grades/gradesSlice";
 import subjectAssignmentReducer from "./Slices/Admin/Class/Assignments/assignmentSlice";
 import subjectQuizReducer from "./Slices/Admin/Class/Quiz/quizSlice";
 import sectionReducer from "./Slices/Admin/Class/Section_Groups/groupSectionSlice";
-
+import graduateReducer from "./Slices/Admin/Graduate/graduateSlice";
 import classStudentReducer from "./Slices/Admin/Class/Students/studentSlice";
 import attendanceReducer from "./Slices/Admin/Class/Attendence/attendanceSlice";
 import verificationReducer from "./Slices/Admin/Verification/VerificationSlice";
@@ -39,6 +39,8 @@ import adminDiscussionCommentsReducer from "./Slices/Admin/Class/Discussion/Comm
 import adminCommentReducer from "./Slices/Admin/Class/Comment/commentsSlice";
 import adminAnnouncementCommentsReducer from "./Slices/Admin/Class/Announcement/Comment/announcementCommentsSlice";
 import adminAssignmentReducer from "./Slices/Admin/Class/Assignment/assignmentSlice";
+import adminQuizReducer from "./Slices/Admin/Class/Quiz/quizSlice";
+import adminSpeedGradeReducer from "./Slices/Admin/Class/SpeedGrade/speedGradeSlice";
 
 // student
 import studentDashboardReducer from "./Slices/Student/Dashboard/studentDashboardSlices";
@@ -53,6 +55,8 @@ import studentClassmateReducer from "../Store/Slices/Student/MyClass/Class/class
 import studentAttendanceReducer from "../Store/Slices/Student/MyClass/Class/Attendance/stdAttendanceSlice";
 import studentSubjectReducer from "../Store/Slices/Student/MyClass/Class/Subjects/subjectSlice";
 import studentModuleReducer from "../Store/Slices/Student/MyClass/Class/Subjects/Modules/moduleSlice";
+import studentAssignmentReducer from "../Store/Slices/Student/MyClass/Class/Subjects/Assignment/assignmentSlice";
+import studentQuizReducer from "../Store/Slices/Student/MyClass/Class/Subjects/Quizes/quizesSlice";
 import studentSyllabusReducer from "../Store/Slices/Student/MyClass/Class/Subjects/Syllabus/syllabusSlice";
 import studentPagesReducer from "../Store/Slices/Student/MyClass/Class/Subjects/Pages/pagesSlice";
 import studentDiscussionReducer from "../Store/Slices/Student/MyClass/Class/Subjects/Discussion/discussionSlice";
@@ -97,6 +101,11 @@ const stdSubjectPersistConfig = {
   whitelist: ["subject"],
 };
 
+const stdClassPersistConfig = {
+  key: "studentClass",
+  storage,
+};
+
 // Combine the Auth and User reducers under a Common entity
 const commonReducer = combineReducers({
   auth: persistReducer(authPersistConfig, authReducer),
@@ -125,6 +134,11 @@ const AdminReducer = combineReducers({
   announcementComments: adminAnnouncementCommentsReducer,
   comments: adminCommentReducer,
   assignments: adminAssignmentReducer,
+  quizzes: adminQuizReducer,
+
+  speedgrades: adminSpeedGradeReducer,
+
+  graduates: graduateReducer,
 
   all_students: allStudentReducer,
   all_parents: allParentReducer,
@@ -132,12 +146,10 @@ const AdminReducer = combineReducers({
   earning: earningReducer,
   student_fees: studentFeesReducer,
   expenses: expensesReducer,
-  subject_grades:subjectGradesReducer,
-  subject_assignment:subjectAssignmentReducer,
-  subject_quiz:subjectQuizReducer,
-
+  subject_grades: subjectGradesReducer,
+  subject_assignment: subjectAssignmentReducer,
+  subject_quiz: subjectQuizReducer,
 });
-
 const studentReducer = combineReducers({
   studentDashboard: studentDashboardReducer,
   studentFinance: studentFinanceReducer,
@@ -145,7 +157,7 @@ const studentReducer = combineReducers({
   studentIssueBooks: studentIssueBooksReducer,
   studentAnnouncement: studentAnnouncementReducer,
   studentEvent: studentEventReducer,
-  studentClass: studentClassReducer,
+  studentClass: persistReducer(stdClassPersistConfig, studentClassReducer),
   studentClassTeacher: studentClassTeacherReducer,
   studentClassmate: studentClassmateReducer,
   studentAttendance: studentAttendanceReducer,
@@ -154,10 +166,13 @@ const studentReducer = combineReducers({
     studentSubjectReducer
   ),
   studentModule: studentModuleReducer,
+  studentAssignment: studentAssignmentReducer,
+  studentQuiz: studentQuizReducer,
   studentSyllabus: studentSyllabusReducer,
   studentPages: studentPagesReducer,
   studentDiscussion: studentDiscussionReducer,
   studentAnnounce: studentAnnounceReducer,
+  studentAssignment: studentAssignmentReducer,
 });
 
 const ParentReducer = combineReducers({

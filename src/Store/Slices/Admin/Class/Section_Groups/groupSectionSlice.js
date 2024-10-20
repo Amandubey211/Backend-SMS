@@ -11,6 +11,7 @@ import {
   deleteSection,
   assignStudentToSection,
   removeStudentFromGroup,
+  fetchGroupsByClassAndSection,
 } from "./groupSectionThunks";
 
 const initialState = {
@@ -33,6 +34,9 @@ const groupSectionSlice = createSlice({
     },
     setUnassignedStudentsList(state, action) {
       state.unassignedStudentsList = action.payload;
+    },
+    clearGroupsList(state) {
+      state.groupsList = []; // Clear the groups list when switching classes
     },
     clearError(state) {
       state.error = null;
@@ -63,6 +67,20 @@ const groupSectionSlice = createSlice({
         state.groupsList = action.payload;
       })
       .addCase(fetchGroupsByClass.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      // Fetch Group by section
+      .addCase(fetchGroupsByClassAndSection.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchGroupsByClassAndSection.fulfilled, (state, action) => {
+        state.loading = false;
+        state.groupsList = action.payload;
+      })
+      .addCase(fetchGroupsByClassAndSection.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
@@ -190,17 +208,17 @@ const groupSectionSlice = createSlice({
       })
       .addCase(removeStudentFromGroup.fulfilled, (state, action) => {
         state.loading = false;
-        // const groupIndex = state.groupsList.findIndex(
-        //   (group) => group._id === action.payload.groupId
-        // );
-        // if (groupIndex !== -1) {
-        //   const studentIndex = state.groupsList[groupIndex].students.findIndex(
-        //     (student) => student._id === action.payload.studentId
-        //   );
-        //   if (studentIndex !== -1) {
-        //     state.groupsList[groupIndex].students.splice(studentIndex, 1);
-        //   }
-        // }
+        const groupIndex = state.groupsList.findIndex(
+          (group) => group._id === action.payload.groupId
+        );
+        if (groupIndex !== -1) {
+          const studentIndex = state.groupsList[groupIndex].students.findIndex(
+            (student) => student._id === action.payload.studentId
+          );
+          if (studentIndex !== -1) {
+            state.groupsList[groupIndex].students.splice(studentIndex, 1);
+          }
+        }
       })
       .addCase(removeStudentFromGroup.rejected, (state, action) => {
         state.loading = false;
@@ -213,6 +231,7 @@ export const {
   setSectionsList,
   setGroupsList,
   setUnassignedStudentsList,
+  clearGroupsList, // Export the clearGroupsList action
   clearError,
 } = groupSectionSlice.actions;
 

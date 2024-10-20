@@ -60,12 +60,12 @@ const assignmentSlice = createSlice({
       .addCase(updateAssignmentThunk.fulfilled, (state, action) => {
         state.loading = false;
         state.success = true;
-        const index = state.assignments.findIndex(
-          (assignment) => assignment._id === action.payload._id
-        );
-        if (index !== -1) {
-          state.assignments[index] = action.payload;
-        }
+        // const index = state.assignments.findIndex(
+        //   (assignment) => assignment._id === action.payload._id
+        // );
+        // if (index !== -1) {
+        //   state.assignments[index] = action.payload;
+        // }
       })
       .addCase(updateAssignmentThunk.rejected, (state, action) => {
         state.loading = false;

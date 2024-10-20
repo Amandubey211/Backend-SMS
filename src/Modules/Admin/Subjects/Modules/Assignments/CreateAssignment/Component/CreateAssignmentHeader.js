@@ -230,13 +230,13 @@ const CreateAssignmentHeader = ({
         </h1>
       </div>
       <div className="flex items-center space-x-2">
-        <button
+        {/* <button
           onClick={() => setModalOpen(true)}
           className="flex items-center px-4 py-2 border border-gray-300 rounded-md text-pink-500 hover:bg-gray-100 transition"
         >
           <span className="mr-1">+</span>
           <span>{isEditing ? "Edit" : "Add"} Rubric</span>
-        </button>
+        </button> */}
 
         <button
           onClick={() => onSave(true)}
@@ -261,6 +261,7 @@ const CreateAssignmentHeader = ({
 
         <AddRubricModal
           isOpen={isModalOpen}
+          AssignmentId={id}
           onSubmit={handleSubmit}
           onClose={() => setModalOpen(false)}
           criteriaList={criteriaList}
@@ -269,6 +270,18 @@ const CreateAssignmentHeader = ({
           setExistingRubricId={setExistingRubricId}
           readonly={false}
         />
+
+        <Sidebar
+          isOpen={isSidebarOpen}
+          onClose={() => setSidebarOpen(false)}
+          title="Add New Criteria"
+        >
+          <AddNewCriteriaForm
+            onSave={handleAddNewCriteria}
+            initialData={criteriaToEdit}
+            editMode={editMode}
+          />
+        </Sidebar>
       </div>
     </div>
   );

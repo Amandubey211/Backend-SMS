@@ -1,47 +1,76 @@
-import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { useSelector } from "react-redux";
 import { GoAlertFill } from "react-icons/go";
-import { fetchModules, fetchSubjects } from "../../../Store/Slices/Parent/Children/children.action";
-import Chapter from "../../Admin/UsersProfiles/StudentProfile/Components/StudentCourseProgress/Module/Components/Chapter";
-import ModuleCard from "../../Admin/UsersProfiles/StudentProfile/Components/StudentCourseProgress/Module/Components/ModuleCard";
-import useNavHeading from "../../../Hooks/CommonHooks/useNavHeading .js";
-import { useTranslation } from "react-i18next";
+import Chapter from "./Components/Chapter";
+import ModuleCard from "./Components/ModuleCard";
+import { baseUrl } from '../../../config/Common';
+import Spinner from "../../../Components/Common/Spinner";
 
-const MainSection = ({ student, selectedSubjectId, setSelectedSubjectId }) => {
-  const { t } = useTranslation('prtChildrens'); 
-  const dispatch = useDispatch();
+const MainSection = ({ selectedSubjectId }) => {
+  const [modules, setModules] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [expandedChapters, setExpandedChapters] = useState(null);
+  const [selectedModule, setSelectedModule] = useState(null); // Track selected module
 
-  const { modules, subjects, loading, error } = useSelector((state) => state.Parent.children);
+  // Fetch childrenData and presentClassId from Redux
+  const childrenData = useSelector((state) => state.Parent.children.children);
+  const presentClassId = childrenData && childrenData[0]?.presentClassId;
+  const studentId = childrenData && childrenData[0]?.id; // Assuming 'id' is the field for student ID
 
-  useNavHeading(t("My Childs"), t("Subject Progress"));
+  console.log("Children Data:", childrenData);
+  console.log("Student ID:", studentId);
 
-  // Fetch subjects when student.id is available
+  // Fetch modules and chapters
   useEffect(() => {
-    if (student?.id) {
-      dispatch(fetchSubjects(student.id));
+    if (!selectedSubjectId) {
+      setModules([]);  // Clear previous modules
+      setSelectedModule(null); // Clear selected module
+      setError(null); // Clear any errors
+      console.log("Missing presentClassId or selectedSubjectId:", { selectedSubjectId });
+      return;
     }
-  }, [student?.id, dispatch]);
+  
+    const fetchModulesAndChapters = async () => {
+      setLoading(true);
+      try {
+        const token = localStorage.getItem("parent:token");
+        if (!token) throw new Error("Authentication token not found");
+  
+        const response = await axios.get(
+          `${baseUrl}/admin/course/progress/student/${studentId}/subject/${selectedSubjectId}`,
+          {
+            headers: { Authentication: token },
+          }
+        );
+  
+        if (response.data && response.data.data) {
+          setModules(response.data.data.module);
 
-  // Set the first subject as selectedSubjectId after subjects are fetched
-  useEffect(() => {
-    if (subjects?.length > 0 && !selectedSubjectId) {
-      setSelectedSubjectId(subjects[0]?._id);
-    }
-  }, [subjects, selectedSubjectId, setSelectedSubjectId]);
-
-  // Fetch modules when selectedSubjectId and student are available, but only if subjects exist
-  useEffect(() => {
-    if (selectedSubjectId && student?.presentClassId && subjects?.length > 0) {
-      dispatch(fetchModules({
-        studentId: student?.id,
-        subjectId: selectedSubjectId,
-        presentClassId: student?.presentClassId,
-      }));
-    }
-  }, [selectedSubjectId, student?.id, student?.presentClassId, subjects?.length, dispatch]);
+          // Automatically select the first module and load its chapters
+          if (response.data.data.module.length > 0) {
+            setSelectedModule(response.data.data.module[0]);  // Auto-select the first module
+          }
+        } else {
+          setModules([]); // If no modules found, reset the data
+        }
+  
+        setLoading(false);
+      } catch (err) {
+        console.error("Error fetching modules:", err);
+        setError("Failed to fetch modules.");
+        setModules([]);  // Reset modules on error
+        setLoading(false);
+      }
+    };
+  
+    fetchModulesAndChapters();
+  }, [presentClassId, selectedSubjectId, studentId]); // Dependencies ensure that it reloads when subject changes
+  
 
   const selectModule = (module) => {
+    setSelectedModule(module); // Set the selected module when clicked
     window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
   };
 
@@ -53,34 +82,32 @@ const MainSection = ({ student, selectedSubjectId, setSelectedSubjectId }) => {
     <div className="flex min-h-screen my-2">
       <div className="w-[65%] bg-white p-2 border-l">
         <div className="bg-white p-2 rounded-lg">
-          {/* Show loading or error state */}
+          {/* Show loading or error state for Chapters */}
           {loading ? (
-            <div className="flex justify-center items-center my-20 h-full w-full">
-              <p className="text-gray-500">{t("Loading data")}...</p>
-            </div>
+            <Spinner/>
           ) : error ? (
             <div className="flex justify-center items-center my-20 h-full w-full">
-              <p className="text-gray-500">{t("Error loading data")}: {error}</p>
+              <p className="text-gray-500">Error loading data: {error}</p>
             </div>
-          ) : modules?.length > 0 ? (
-            modules?.map((module, index) => (
+          ) : selectedModule ? (
+            selectedModule.chapters.map((chapter, index) => (
               <Chapter
                 key={index}
-                id={module?._id}
-                title={module?.name}
+                id={chapter?.chapterId}
+                title={chapter?.name}
                 chapterNumber={index + 1}
-                imageUrl={module?.thumbnail}
-                assignments={module?.assignments}
-                quizzes={module?.quizzes}
-                isExpanded={expandedChapters}
-                onToggle={() => handleToggle(module?._id)}
+                imageUrl={chapter?.thumbnail}
+                assignments={chapter?.assignments || []}
+                quizzes={chapter?.quizzes || []}
+                isExpanded={expandedChapters === chapter?.chapterId}
+                onToggle={() => handleToggle(chapter?.chapterId)}                
               />
             ))
           ) : (
             <div className="flex justify-center items-center font-bold text-gray-500 my-20 h-full w-full">
               <div className="flex items-center justify-center flex-col text-2xl">
                 <GoAlertFill className="text-[5rem] text-gray-500" />
-                No Data Found
+                No Module Selected
               </div>
             </div>
           )}
@@ -91,21 +118,25 @@ const MainSection = ({ student, selectedSubjectId, setSelectedSubjectId }) => {
       <div className="w-[35%] p-2 border-l-2">
         <div className="bg-white p-4 rounded-lg">
           <div className="flex justify-between items-center mb-2">
-            <h2 className="text-lg font-semibold">{t("All Modules")}</h2>
+            <h2 className="text-lg font-semibold">All Modules</h2>
           </div>
           <div className="grid grid-cols-1 gap-2">
-            {modules?.length > 0 ? (
-              modules?.map((module, index) => (
+            {loading ? ( // Show spinner while loading modules
+              <Spinner />
+            ) : modules?.length > 0 ? (
+              modules.map((module, index) => (
                 <div
                   key={index}
                   onClick={() => selectModule(module)}
                   className={`cursor-pointer p-2 rounded-lg shadow-md transition-all duration-200 ${
-                    module?.chapters[0]?._id === expandedChapters ? "bg-purple-100" : "hover:bg-gray-50"
+                    selectedModule?.moduleId === module.moduleId
+                      ? "bg-purple-100"
+                      : "hover:bg-gray-50"
                   }`}
                 >
                   <ModuleCard
-                    title={module?.moduleName}
-                    moduleNumber={module?.moduleNumber}
+                    title={module?.name}
+                    moduleNumber={index + 1}
                     imageUrl={module?.thumbnail}
                     isCompleted={module?.isCompleted}
                   />
@@ -115,7 +146,7 @@ const MainSection = ({ student, selectedSubjectId, setSelectedSubjectId }) => {
               <div className="flex justify-center items-center font-bold text-gray-500 my-20 h-full w-full">
                 <div className="flex items-center justify-center flex-col text-2xl">
                   <GoAlertFill className="text-[5rem] text-gray-500" />
-                  {t("No Modules Found")}
+                  No Modules Found
                 </div>
               </div>
             )}
