@@ -19,7 +19,7 @@ const SectionGroupModal = ({ modalData}) => {
                                 {modalData?.groups.map((group, index) => (
                                     <li
                                         key={index}
-                                        className="flex items-center gap-2 bg-green-100 p-2 rounded-lg shadow hover:bg-green-200"
+                                        className="flex items-center gap-2 bg-pink-200 p-2 rounded-lg shadow hover:bg-green-200"
                                     >
                                         <FaUserFriends className="text-green-600" />
                                         <span className="text-gray-800 font-medium">{group?.groupName}</span>

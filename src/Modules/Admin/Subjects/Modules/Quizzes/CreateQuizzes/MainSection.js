@@ -282,7 +282,7 @@ const MainSection = ({ setIsEditing, isEditing }) => {
 
       let allowNumberOfAttempts = null;
       // Set allowNumberOfAttempts only if allowedAttempts is false (meaning attempts are limited)
-      if (!allowedAttempts && formState.allowNumberOfAttempts) {
+      if (allowedAttempts && formState.allowNumberOfAttempts) {
         allowNumberOfAttempts = Number(formState.allowNumberOfAttempts);
       }
 
@@ -325,9 +325,8 @@ const MainSection = ({ setIsEditing, isEditing }) => {
 
       <div className="w-full flex">
         <div
-          className={`${
-            activeTab === "instructions" ? "w-[70%]" : "w-full"
-          } border-x`}
+          className={`${activeTab === "instructions" ? "w-[70%]" : "w-full"
+            } border-x`}
         >
           <Tabs
             createPage={true}

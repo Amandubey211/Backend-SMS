@@ -27,8 +27,8 @@ const AllowedAttemptsSelect = ({ allowedAttempts, handleChange }) => {
         className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
       >
         <option value="">Select</option>
-        <option value="false">Limited</option>
-        <option value="true">Unlimited</option>
+        <option value="true">Limited</option>
+        <option value="false">Unlimited</option>
       </select>
     </div>
   );
@@ -178,7 +178,7 @@ const CreateQuizForm = ({
         />
 
         {/* Conditionally show Number of Attempts input when allowedAttempts is false (i.e., Limited) */}
-        {allowedAttempts === false && (
+        {allowedAttempts && (
           <LabeledInput
             label="Number of Attempts"
             name="allowNumberOfAttempts"
