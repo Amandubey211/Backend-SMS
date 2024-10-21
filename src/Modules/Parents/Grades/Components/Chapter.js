@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FaChevronDown, FaChevronUp, FaEye } from "react-icons/fa";
+import { FaChevronDown, FaChevronUp, FaEye, FaFileAlt } from "react-icons/fa";
 import ChapterItem from "./ChapterItem";
 
 const Chapter = ({ title, chapterNumber, imageUrl, assignments, quizzes, attachments = [] }) => {
@@ -16,6 +16,14 @@ const Chapter = ({ title, chapterNumber, imageUrl, assignments, quizzes, attachm
 
   const closePreview = () => {
     setPreviewUrl(null);
+  };
+
+  // Function to truncate lengthy filenames
+  const truncateFileName = (name, length = 30) => {
+    if (name.length > length) {
+      return `${name.substring(0, length)}...`;
+    }
+    return name;
   };
 
   return (
@@ -83,10 +91,13 @@ const Chapter = ({ title, chapterNumber, imageUrl, assignments, quizzes, attachm
               {attachments.map((attachment, index) => (
                 <div key={index} className="flex justify-between items-center mb-2">
                   <div className="flex items-center">
+                    {/* Green PDF Icon */}
                     {attachment.type === "application/pdf" && (
                       <>
-                        <FaEye size={20} className="mr-2 text-red-500" />
-                        <span className="text-gray-700">{attachment.name}</span>
+                        <FaFileAlt size={20} className="mr-2 text-green-500" />
+                        <span className="text-gray-700">
+                          {truncateFileName(attachment.name)}
+                        </span>
                       </>
                     )}
                   </div>
