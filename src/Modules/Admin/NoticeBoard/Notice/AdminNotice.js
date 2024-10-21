@@ -119,7 +119,7 @@ const AdminNotice = () => {
             {loading ? (
               <Spinner />
             ) : error ? (
-              <p>{error}</p>
+              <NoDataFound title="Notices" />
             ) : filteredNotices.length > 0 ? (
               filteredNotices.map((notice, index) => (
                 <AdminNoticeItem

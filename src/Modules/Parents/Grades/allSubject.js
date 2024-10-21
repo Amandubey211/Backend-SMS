@@ -64,7 +64,7 @@ const AllSubject = ({ studentId }) => {
       ) : (
         <div className='py-2 w-full'>
           <div className='pb-2 flex w-full flex-row'>
-            <div className='flex flex-col gap-2 p-4 w-[25%]'>
+            <div className='flex flex-col gap-2 p-4 w-[25%] border-gray-300 border-r'>
               {/* Safeguard against null/undefined and map subjects */}
               {studentSubjects && studentSubjects.length > 0 ? (
                 studentSubjects.map((subject, index) => (
