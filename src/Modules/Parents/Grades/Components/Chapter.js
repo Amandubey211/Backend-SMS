@@ -85,46 +85,46 @@ const Chapter = ({ title, chapterNumber, imageUrl, assignments, quizzes, attachm
           </div>
 
           {/* Attachments (PDF Preview) */}
-{attachments.length > 0 && (
-  <div className="mt-4">
-    <h3 className="text-sm font-semibold text-green-600 mb-2">Attachments ({attachments.length})</h3>
-    {attachments.map((attachment, index) => (
-      <div
-        key={index}
-        className="flex justify-between items-center mb-3 p-3 bg-gray-50 border border-gray-300 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300 ease-in-out"
-      >
-        <div className="flex items-center space-x-4">
-          {/* Independent PDF Icon */}
-          {attachment.type === "application/pdf" && (
-            <div className="flex-shrink-0">
-              <FaFilePdf className="text-red-500" size={24} />
+          {attachments.length > 0 && (
+            <div className="mt-4">
+              <h3 className="text-sm font-semibold text-green-600 mb-2">Attachments ({attachments.length})</h3>
+              {attachments.map((attachment, index) => (
+                <div
+                  key={index}
+                  className="flex justify-between items-center mb-3 p-3 bg-gray-50 border border-gray-300 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300 ease-in-out"
+                >
+                  <div className="flex items-center space-x-4">
+                    {/* Independent PDF Icon */}
+                    {attachment.type === "application/pdf" && (
+                      <div className="flex-shrink-0">
+                        <FaFilePdf className="text-red-500" size={24} />
+                      </div>
+                    )}
+
+                    {/* Name and Label in a Column */}
+                    <div className="flex flex-col">
+                      <span className="text-gray-700 font-semibold">
+                        {truncateFileName(attachment.name)}
+                      </span>
+                      {attachment.label && (
+                        <span className="text-gray-500 text-sm italic">
+                          {attachment.label}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Preview Button */}
+                  <button
+                    className="text-green-500 hover:text-green-600"
+                    onClick={() => openPreview(attachment.url)}
+                  >
+                    <FaEye size={20} />
+                  </button>
+                </div>
+              ))}
             </div>
           )}
-
-          {/* Name and Label in a Column */}
-          <div className="flex flex-col">
-            <span className="text-gray-700 font-semibold">
-              {truncateFileName(attachment.name)}
-            </span>
-            {attachment.label && (
-              <span className="text-gray-500 text-sm italic">
-                {attachment.label}
-              </span>
-            )}
-          </div>
-        </div>
-
-        {/* Preview Button */}
-        <button
-          className="text-green-500 hover:text-green-600"
-          onClick={() => openPreview(attachment.url)}
-        >
-          <FaEye size={20} />
-        </button>
-      </div>
-    ))}
-  </div>
-)}
 
 
         </div>
