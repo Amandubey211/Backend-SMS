@@ -60,7 +60,7 @@ const GraduateList = ({
         )}
       </div>
 
-      <div className="overflow-hidden rounded-lg shadow-md">
+      <div className="overflow-hidden ">
         <table className="min-w-full bg-white border border-gray-200">
           <thead>
             <tr className="bg-gray-100 border-b">
