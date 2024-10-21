@@ -3,6 +3,7 @@ import axios from "axios";
 import { baseUrl } from "../../../../../config/Common";
 import { fetchClassDetails } from "../actions/classThunk";
 import { setSubjects } from "./subjectSlice";
+import toast from "react-hot-toast";
 
 // Fetch subjects by classId
 export const fetchSubjects = createAsyncThunk(
@@ -43,8 +44,9 @@ export const createSubject = createAsyncThunk(
         }
       );
       console.log(subjectData, "aaaaaaaa");
-
-      dispatch(fetchClassDetails(subjectData.classId));
+      toast.success("Subject created successfully");
+      const classId = subjectData.classId;
+      dispatch(fetchClassDetails(classId));
       return response.data.data;
     } catch (error) {
       console.log(error);
@@ -73,8 +75,10 @@ export const updateSubject = createAsyncThunk(
           headers: { Authentication: `Bearer ${token}` },
         }
       );
+      toast.success("Subject updated successfully");
 
-      dispatch(fetchClassDetails(subjectData.classId));
+      const classId = subjectData.classId;
+      dispatch(fetchClassDetails(classId));
       return response.data.data;
     } catch (error) {
       const errorMessage =

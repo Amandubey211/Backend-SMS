@@ -13,34 +13,54 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import Spinner from "../../../../Components/Common/Spinner";
 import NoDataFound from "../../../../Components/Common/NoDataFound";
-import { deleteEarning, fetchEarning, fetchTotalAmounts } from "../../../../Store/Slices/Admin/Accounting/Earning/earning.action";
-import { setEditEarning, setIsEditSidebarOpen, setOpenDropDown, setSidebarOpen } from "../../../../Store/Slices/Admin/Accounting/Earning/earningSlice";
+import {
+  deleteEarning,
+  fetchEarning,
+  fetchTotalAmounts,
+} from "../../../../Store/Slices/Admin/Accounting/Earning/earning.action";
+import {
+  setEditEarning,
+  setIsEditSidebarOpen,
+  setOpenDropDown,
+  setSidebarOpen,
+} from "../../../../Store/Slices/Admin/Accounting/Earning/earningSlice";
 
 const Earning = () => {
-  const { earningData, isSidebarOpen, isEditSidebarOpen, openDropdown, totalEarnings, totalExpense, remainingBalance, totalFees, editEarning, loading, error } = useSelector((store) => store?.admin?.earning);
+  const {
+    earningData,
+    isSidebarOpen,
+    isEditSidebarOpen,
+    openDropdown,
+    totalEarnings,
+    totalExpense,
+    remainingBalance,
+    totalFees,
+    editEarning,
+    loading,
+    error,
+  } = useSelector((store) => store?.admin?.earning);
   const dispatch = useDispatch();
 
   const handleDropdownClose = () => {
-    dispatch(setOpenDropDown(null))
+    dispatch(setOpenDropDown(null));
   };
 
   const handleSidebarOpen = () => {
-    dispatch(setSidebarOpen(true))
-  }
+    dispatch(setSidebarOpen(true));
+  };
   const handleSidebarClose = () => {
-    dispatch(setSidebarOpen(false))
-  }
+    dispatch(setSidebarOpen(false));
+  };
 
   const handleEditSidebarOpen = (earning) => {
-    dispatch(setEditEarning(earning))
-    dispatch(setIsEditSidebarOpen(true))
+    dispatch(setEditEarning(earning));
+    dispatch(setIsEditSidebarOpen(true));
   };
   const handleEditSidebarClose = () => {
-    dispatch(setIsEditSidebarOpen(false))
+    dispatch(setIsEditSidebarOpen(false));
   };
 
   const handleDelete = async (earningId) => {
-
     dispatch(deleteEarning({ id: earningId }))
       .then(() => {
         dispatch(fetchEarning());
@@ -49,7 +69,6 @@ const Earning = () => {
       .catch((err) => {
         console.error("Error deleting earning", err);
       });
-
   };
 
   const formatDate = (isoDate) => {
@@ -62,12 +81,12 @@ const Earning = () => {
   };
 
   const handleDropdownToggle = (index) => {
-    dispatch(setOpenDropDown(openDropdown === index ? null : index))
+    dispatch(setOpenDropDown(openDropdown === index ? null : index));
   };
 
   useEffect(() => {
     dispatch(fetchEarning());
-    dispatch(fetchTotalAmounts())
+    dispatch(fetchTotalAmounts());
   }, [dispatch]);
 
   return (
@@ -90,35 +109,47 @@ const Earning = () => {
                 </div>
               </button>
             </div>
-            {loading ? (
-              <Spinner />
-            ) : error ? (
-              <NoDataFound />
-            ) : (
-              <div className="overflow-x-auto h-full bg-white shadow rounded-lg ">
-                <table className="min-w-full leading-normal">
-                  <thead>
-                    <tr className="text-left text-gray-700 bg-gray-100 ">
-                      <th className="px-5 py-3 border-b-2 border-gray-200">
-                        Earning Reason
-                      </th>
-                      <th className="px-5 py-3 border-b-2 border-gray-200">
-                        From
-                      </th>
-                      <th className="px-5 py-3 border-b-2 border-gray-200">
-                        Earning Date
-                      </th>
-                      <th className="px-5 py-3 border-b-2 border-gray-200">
-                        Amount
-                      </th>
-                      <th className="px-5 py-3 border-b-2 border-gray-200">
-                        Action
-                      </th>
+            <div className="overflow-x-auto h-full bg-white shadow rounded-lg">
+              <table className="min-w-full leading-normal">
+                <thead>
+                  <tr className="text-left text-gray-700 bg-gray-100">
+                    <th className="px-5 py-3 border-b-2 border-gray-200">
+                      Earning Reason
+                    </th>
+                    <th className="px-5 py-3 border-b-2 border-gray-200">
+                      From
+                    </th>
+                    <th className="px-5 py-3 border-b-2 border-gray-200">
+                      Earning Date
+                    </th>
+                    <th className="px-5 py-3 border-b-2 border-gray-200">
+                      Amount
+                    </th>
+                    <th className="px-5 py-3 border-b-2 border-gray-200">
+                      Action
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="h-[300px]">
+                  {" "}
+                  {/* Setting a fixed height for the table body */}
+                  {loading || error || earningData?.length === 0 ? (
+                    <tr>
+                      <td colSpan="5" className="px-5 py-5">
+                        <div className="flex justify-center items-center h-full">
+                          {loading ? (
+                            <Spinner />
+                          ) : error ? (
+                            <NoDataFound />
+                          ) : (
+                            <NoDataFound />
+                          )}
+                        </div>
+                      </td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {earningData?.map((item, index) => (
-                      <tr key={index} className=" text-gray-700">
+                  ) : (
+                    earningData?.map((item, index) => (
+                      <tr key={index} className="text-gray-700">
                         <td className="px-5 py-2 border-b border-gray-200">
                           {item?.description}
                         </td>
@@ -162,11 +193,11 @@ const Earning = () => {
                           )}
                         </td>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
 
           <div className="w-[25%] flex flex-col items-center gap-4 p-4">
@@ -241,8 +272,7 @@ const Earning = () => {
             onClose={handleSidebarClose}
             title="Add New Earnings"
           >
-            <AddEarning
-            />
+            <AddEarning />
           </Sidebar>
 
           <Sidebar
@@ -250,10 +280,7 @@ const Earning = () => {
             onClose={handleEditSidebarClose}
             title="Update Earning"
           >
-            {editEarning && (
-              <EditEarning
-              />
-            )}
+            {editEarning && <EditEarning />}
           </Sidebar>
         </div>
       </DashLayout>

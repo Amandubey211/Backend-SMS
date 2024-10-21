@@ -3,6 +3,7 @@ import Sidebar from "../../../../../Components/Common/Sidebar";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteExpenseById, fetchSalaries, updateExpense } from "../../../../../Store/Slices/Admin/Accounting/Expenses/expenses.action";
 import toast from "react-hot-toast";
+import NoDataFound from "../../../../../Components/Common/NoDataFound";
 
 const OtherExpenses = ({ selectedOption, selectedMonth }) => {
 
@@ -76,30 +77,39 @@ const OtherExpenses = ({ selectedOption, selectedMonth }) => {
 
   return (
     <div>
-      <table className="min-w-full leading-normal mt-4 rounded-lg overflow-hidden">
-        <thead>
-          <tr className="text-left text-gray-700 bg-gray-100">
-            <th className="px-5 py-1 border-b-2 border-gray-200">Serial No.</th>
-            <th className="px-5 py-3 border-b-2 border-gray-200">Expenses Reason</th>
-            <th className="px-5 py-3 border-b-2 border-gray-200">Amount</th>
-            <th className="px-5 py-3 border-b-2 border-gray-200">Expense Date</th>
-            <th className="px-5 py-3 border-b-2 border-gray-200">Status</th>
-            <th className="px-5 py-3 border-b-2 border-gray-200">Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {otherExpenses.map((item, index) => (
-            <ExpenseRow
-              key={item._id}
-              item={item}
-              index={index}
-              handlePayClick={handlePayClick}
-              handleDelete={handleDelete}
-              handleEditSidebarOpen={handleEditSidebarOpen}
-            />
-          ))}
-        </tbody>
-      </table>
+    <table className="min-w-full leading-normal mt-4 rounded-lg overflow-hidden">
+  <thead>
+    <tr className="text-left text-gray-700 bg-gray-100">
+      <th className="px-5 py-1 border-b-2 border-gray-200">Serial No.</th>
+      <th className="px-5 py-3 border-b-2 border-gray-200">Expenses Reason</th>
+      <th className="px-5 py-3 border-b-2 border-gray-200">Amount</th>
+      <th className="px-5 py-3 border-b-2 border-gray-200">Expense Date</th>
+      <th className="px-5 py-3 border-b-2 border-gray-200">Status</th>
+      <th className="px-5 py-3 border-b-2 border-gray-200">Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {otherExpenses?.length === 0 ? (
+      <tr>
+        <td colSpan="6" className="text-center px-5 py-5">
+          <NoDataFound /> {/* Display NoDataFound when no data */}
+        </td>
+      </tr>
+    ) : (
+      otherExpenses?.map((item, index) => (
+        <ExpenseRow
+          key={item._id}
+          item={item}
+          index={index}
+          handlePayClick={handlePayClick}
+          handleDelete={handleDelete}
+          handleEditSidebarOpen={handleEditSidebarOpen}
+        />
+      ))
+    )}
+  </tbody>
+</table>
+
 
       <Sidebar
         isOpen={isSidebarOpen}

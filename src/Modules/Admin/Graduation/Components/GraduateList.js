@@ -9,7 +9,7 @@ const GraduateList = ({
   onViewDetails,
   onDemoteStudents,
   loading,
-  error
+  error,
 }) => {
   // Function to handle individual row selection
   const handleSelect = (studentId) => {
@@ -40,7 +40,7 @@ const GraduateList = ({
     if (error?.status === 404) {
       return "No Graduates Yet!";
     }
-    return "Unable to fetch Graduates!";
+    return "No Graduates Yet";
   };
 
   return (
@@ -53,7 +53,9 @@ const GraduateList = ({
             className="px-4 py-2 bg-red-500 text-white rounded-md"
             onClick={() => onDemoteStudents(selectedStudents)}
           >
-            {selectedStudents.length === 1 ? "Demote Student" : "Demote All Students"}
+            {selectedStudents.length === 1
+              ? "Demote Student"
+              : "Demote All Students"}
           </button>
         )}
       </div>
@@ -111,7 +113,10 @@ const GraduateList = ({
             {error && (
               <tr>
                 <td colSpan="10" className="text-center py-8">
-                  <FaExclamationTriangle className="text-gray-500 mx-auto mb-4" size={40} />
+                  <FaExclamationTriangle
+                    className="text-gray-500 mx-auto mb-4"
+                    size={40}
+                  />
                   <p className="text-gray-500">{getErrorMessage()}</p>
                 </td>
               </tr>
@@ -121,14 +126,19 @@ const GraduateList = ({
             {!loading && !error && students.length === 0 && (
               <tr>
                 <td colSpan="10" className="text-center py-8">
-                  <FaUserGraduate className="text-gray-500 mx-auto mb-4" size={40} />
+                  <FaUserGraduate
+                    className="text-gray-500 mx-auto mb-4"
+                    size={40}
+                  />
                   <p className="text-gray-500">No Graduates Yet</p>
                 </td>
               </tr>
             )}
 
             {/* Data Rows */}
-            {!loading && !error && students.length > 0 &&
+            {!loading &&
+              !error &&
+              students.length > 0 &&
               students.map((student) => (
                 <tr
                   key={student._id} // Use _id as the key since that's the ID from backend

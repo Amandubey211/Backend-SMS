@@ -39,12 +39,12 @@ const subjectSlice = createSlice({
       })
       .addCase(updateSubject.fulfilled, (state, action) => {
         state.loading = false;
-        const index = state.subjects.findIndex(
-          (subject) => subject._id === action.payload._id
-        );
-        if (index !== -1) {
-          state.subjects[index] = action.payload;
-        }
+        // const index = state.subjects.findIndex(
+        //   (subject) => subject._id === action.payload._id
+        // );
+        // if (index !== -1) {
+        //   state.subjects[index] = action.payload;
+        // }
       })
       .addCase(updateSubject.rejected, (state, action) => {
         state.loading = false;
