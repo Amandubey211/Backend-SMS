@@ -10,7 +10,7 @@ const TopRankingStudents = () => {
   const {topStudents, loadingTopStudents,errorTopStudents} = useSelector((state) => state.admin.adminDashboard);
   const { classes } = useSelector((store) => store?.admin?.class);
   const [selectedClass,setSelectedClass] = useState(classes[0]?._id)
- // const {class} = useSelector((state) => state.admin.class);
+
 const dispatch = useDispatch()
   useEffect(() => {
     
