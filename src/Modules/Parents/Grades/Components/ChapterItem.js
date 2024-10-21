@@ -4,6 +4,7 @@ import {
   FaQuestionCircle,
   FaCheckCircle,
   FaEye,
+  FaFilePdf,
 } from "react-icons/fa";
 import { MdOutlineBlock } from "react-icons/md";
 import { RiListCheck3, RiFileUnknowLine } from "react-icons/ri";
@@ -21,9 +22,9 @@ const getIcon = (type) => {
     case "discussions":
       return <FaQuestionCircle className="text-green-500" />;
     case "pdf":
-      return <FaFileAlt className="text-red-500" />;
+      return <FaFilePdf className="text-red-500" size={24}  />;
     default:
-      return <FaFileAlt className="text-green-500" />;
+      return null;
   }
 };
 
