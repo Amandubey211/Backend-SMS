@@ -32,6 +32,7 @@ const MainSection = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const role = useSelector((store) => store.common.auth.role);
+  const [error,setError]=useState(false);
 
   const fetchAcademicYears = async () => {
     setLoading(true);
@@ -41,7 +42,7 @@ const MainSection = () => {
         headers: { Authentication: token },
       });
       if (data?.success) {
-        const formattedYears = data.data.map((year) => ({
+        const formattedYears = data?.data?.map((year) => ({
           _id: year._id,
           academicYear: year.year,
           startDate: formatDate(year.startDate),
@@ -54,6 +55,7 @@ const MainSection = () => {
         toast.error(data.msg || "Failed to fetch academic years.");
       }
     } catch (error) {
+      setError(true)
       toast.error("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
@@ -62,14 +64,18 @@ const MainSection = () => {
 
   // Handle the checkbox change to set only one academic year as active
   const handleCheckboxChange = async (selectedYear) => {
-    // First, uncheck all other years
-    const updatedYears = academicYears.map((year) => ({
-      ...year,
-      isActive: year._id === selectedYear._id, // Set only the selected year as active
-    }));
 
-    setAcademicYears(updatedYears);
-    dispatch(setAcademicYear(updatedYears)); // Update the Redux store
+    if(error){
+      return
+    }
+    // First, uncheck all other years
+  //   const updatedYears = academicYears?.map((year) => ({
+  //     ...year,
+  //     isActive: year._id === selectedYear._id, // Set only the selected year as active
+  //   }));
+  //  console.log("updatedYears",updatedYears)
+  //   setAcademicYears(updatedYears);
+  //   dispatch(setAcademicYear(updatedYears)); // Update the Redux store
 
     // Call the update API to set the selected year as active
     try {
@@ -85,6 +91,14 @@ const MainSection = () => {
         toast.success(
           `Academic year ${selectedYear.academicYear} set as active.`
         );
+            const updatedYears = academicYears?.map((year) => ({
+      ...year,
+      isActive: year._id === selectedYear._id, // Set only the selected year as active
+    }));
+   console.log("updatedYears",updatedYears)
+    setAcademicYears(updatedYears);
+    dispatch(setAcademicYear(updatedYears)); // Update the Redux store
+
       } else {
         toast.error(data.msg || "Failed to update academic year.");
       }

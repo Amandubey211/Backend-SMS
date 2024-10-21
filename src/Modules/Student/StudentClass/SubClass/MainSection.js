@@ -44,7 +44,9 @@ const MainSection = () => {
   const { subjectProgress } = useSelector(
     (store) => store?.student?.studentSubject
   );
-  const iconData = classData && [
+  const {userDetails}=useSelector((store)=>store?.common?.user);
+  const {userId}=userDetails;
+  const iconData =  [
     {
       icon: <SlEyeglass className="text-purple-600" />,
       text: `My Class Teacher (${classData?.teachersCount || 0})`,
@@ -99,14 +101,18 @@ const MainSection = () => {
   };
 
   useEffect(() => {
-    dispatch(stdClass());
-    dispatch(stdSubjectProgressPercentage());
+    dispatch(stdClass()).then(()=>{
+      dispatch(stdSubjectProgressPercentage({studentId:userId}));
+    })
+   
   }, [dispatch]);
 
   console.log("std class data : ", classData);
   return (
     <>
+   
       <div className="flex flex-wrap justify-center gap-3 p-4">
+  
         {iconData?.map((item, index) => (
           <NavIconCard
             key={index}
@@ -116,6 +122,7 @@ const MainSection = () => {
             onClick={item?.onClick} // Trigger onClick for modal if available
             loading={loading}
             error={error}
+            classData={classData}
           />
         ))}
       </div>
@@ -129,13 +136,15 @@ const MainSection = () => {
           <div className="w-full  flex flex-col items-center justify-center py-20">
             <Spinner />
           </div>
-        ) : !loading &&
-          (Object.keys(classData).length === 0 ||
-            classData?.subjects?.length === 0) ? (
+        ) 
+        :   (!loading || !classData) || (!loading   &&
+          ( Object.keys(classData)?.length == 0 ||
+          classData?.subjects?.length == 0)) ? (
           <div className="flex flex-col items-center justify-center py-20">
             <NoDataFound title="Subject" />
           </div>
-        ) : (
+        ) 
+        : (
           <div>
             {classData?.subjects?.length > 0 && (
               <div className="grid grid-cols-3 gap-4 mt-5 h-full">

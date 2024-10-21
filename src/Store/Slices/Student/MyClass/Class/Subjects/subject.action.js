@@ -5,13 +5,13 @@ import { baseUrl } from "../../../../../../config/Common";
 
 export const stdSubjectProgressPercentage = createAsyncThunk(
     'progress/stdSubjectProgressPercentage',
-    async (_, { rejectWithValue, dispatch }) => {
+    async ({studentId}, { rejectWithValue, dispatch }) => {
         const token = localStorage.getItem("student:token");
         if (!token) {
             return rejectWithValue('Authentication failed!');
         }
         try {
-            const res = await axios.get(`${baseUrl}/admin/course/subjects/student`, {
+            const res = await axios.get(`${baseUrl}/admin/course/subjects/student/${studentId}`, {
                 headers: { Authentication: token }
             });
             const data= res?.data?.data;

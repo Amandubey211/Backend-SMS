@@ -132,7 +132,7 @@ export const verifyStudent = createAsyncThunk(
       return verifyResponse.data.student;
     } catch (error) {
       const errorMessage =
-        error.response?.data?.msg || "Something went wrong. Please try again.";
+      error.response?.data?.message || error.response?.data?.msg || "Something went wrong. Please try again.";
       toast.error(errorMessage);
       return rejectWithValue(errorMessage);
     }
@@ -160,7 +160,7 @@ export const assignClassToStudent = createAsyncThunk(
       return rejectWithValue(data.msg || "Failed to assign class");
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.msg || "Something went wrong."
+        error.response?.data?.message ||  error.response?.data?.msg || "Something went wrong."
       );
     }
   }

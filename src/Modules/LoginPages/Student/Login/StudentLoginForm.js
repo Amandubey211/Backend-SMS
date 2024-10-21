@@ -11,7 +11,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import Modal from "../../../../Components/Common/Modal";
 import { AiOutlinePhone } from "react-icons/ai";
 import StudentDiwanLogo from "../../../../Assets/HomeAssets/StudentDiwanLogo.png";
-
+import { IoIosArrowRoundBack } from "react-icons/io";
 const StudentLoginForm = () => {
   const [studentDetails, setStudentDetails] = useState({
     email: "",
@@ -54,7 +54,7 @@ const StudentLoginForm = () => {
             className="text-sm text-gray-500 hover:text-gray-700 mb-4 items-center flex gap-2"
           >
             <div className="rounded-full border text-xl w-6 h-6 flex justify-center items-center">
-              &larr;
+            <IoIosArrowRoundBack/>
             </div>
             <span>LMS Home</span>
           </NavLink>

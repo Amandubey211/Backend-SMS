@@ -26,7 +26,7 @@ const AcademicYearTable = ({
           </tr>
         </thead>
         <tbody className="text-base  text-gray-700">
-          {academicYears.map((year) => (
+          {academicYears?.map((year) => (
             <tr
               key={year._id}
               className={`${

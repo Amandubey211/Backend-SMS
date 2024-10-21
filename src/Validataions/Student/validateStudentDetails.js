@@ -55,9 +55,9 @@ const validateStudentDetails = (details) => {
   if (!details.enrollmentStatus) {
     errors.enrollmentStatus = "Enrollment Status is required";
   }
-  if (!details.transportRequirement) {
-    errors.transportRequirement = "Transport Requirement is required";
-  }
+  // if (!details.transportRequirement) {
+  //   errors.transportRequirement = "Transport Requirement is required";
+  // }
   if (!details.schoolId) {
     errors.schoolId = "School is required";
   }

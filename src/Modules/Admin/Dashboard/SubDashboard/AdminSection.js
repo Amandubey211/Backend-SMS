@@ -13,10 +13,10 @@ const AdminSection = () => {
   return (
     <>
       <div className="flex flex-wrap justify-between items-start border-y h-auto">
-        <div className="w-full md:w-1/2 p-2 border-r border-gray-300">
+        <div className="w-full md:w-1/2 p-2  h-[inherit]">
           <TotalAttendanceGraph />
         </div>
-        <div className="w-full md:w-1/2 p-2">
+        <div className="w-full md:w-1/2 p-2 border-l border-grey-300">
           <TotalEarningsGraph />
         </div>
       </div>

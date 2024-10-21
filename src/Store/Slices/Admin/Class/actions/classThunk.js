@@ -3,6 +3,7 @@ import axios from "axios";
 import { baseUrl } from "../../../../../config/Common";
 import { setClass } from "../reducer/classSlice";
 import { setSubjects } from "../Subject/subjectSlice";
+import toast from "react-hot-toast";
 
 // Fetch all classes
 export const fetchAllClasses = createAsyncThunk(
@@ -66,6 +67,8 @@ export const createClass = createAsyncThunk(
         headers: { Authentication: `Bearer ${token}` }, // Using Authentication header
       });
 
+
+      toast.success("Class Created Sussessfully!")
       // After successful creation, refetch the class list
       dispatch(fetchAllClasses());
 

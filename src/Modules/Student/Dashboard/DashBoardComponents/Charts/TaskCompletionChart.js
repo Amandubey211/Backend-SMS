@@ -23,7 +23,7 @@ const TaskCompletionChart = () => {
                 data: [completedTask,inCompletedTask],
                 backgroundColor: [
                     'pink', 
-                    'orange'  
+                    'rgba(150, 150, 150, 1)'  
                 ],
                 borderColor: [
                     'rgba(255, 99, 132, 1)',
@@ -58,7 +58,7 @@ const TaskCompletionChart = () => {
             <div className=" flex-1 p-5 flex flex-col justify-start items-start h-[17rem] mb-10 ">
               <div className='flex flex-row gap-10 mb-2'>
               <p className='text-gray-500'>Completed <spna className='text-pink-600 font-bold'>{completedTask}%</spna></p>
-              <p className='text-gray-500'>Remaining <spna className='text-yellow-700 font-bold'>{inCompletedTask}%</spna></p>
+              <p className='text-gray-500'>Remaining <spna className='text-gray-700 font-bold'>{inCompletedTask}%</spna></p>
               </div>
               <Doughnut data={data} options={options} />
             </div>

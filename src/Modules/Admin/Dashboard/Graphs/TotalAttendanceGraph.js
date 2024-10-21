@@ -120,7 +120,7 @@ const TotalAttendanceGraph = () => {
   const yearLabel = year === currentYear ? "Current Year" : "Past Year";
 
   return (
-    <div className="bg-white p-4">
+    <div className="bg-white p-4 h-[100%] border border-red">
       <div className="flex justify-between items-center mb-4">
         <div>
           <h2 className="text-xl font-semibold">Today's Attendance</h2>
@@ -174,8 +174,8 @@ const TotalAttendanceGraph = () => {
           <FiAlertCircle className="w-12 h-12 mb-2" />
           <p>{`Error: ${error}`}</p>
         </div>
-      ) : !attendanceData || attendanceData.attendanceData.length === 0 ? (
-        <div className="flex flex-col items-center justify-center text-gray-400">
+      ) : !attendanceData || attendanceData?.attendanceData?.length === 0 ? (
+        <div className="flex flex-col items-center justify-center text-gray-400 h-full">
           <FiCalendar className="w-12 h-12 mb-2" />
           <p>No Attendance Data Found</p>
         </div>

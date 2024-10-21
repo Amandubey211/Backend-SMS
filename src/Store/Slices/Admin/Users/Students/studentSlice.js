@@ -17,7 +17,7 @@ const initialState = {
     error:null,
     loading:false,
     completedTask:0,
-    inCompletedTask:0,
+    inCompletedTask:100,
 }
 const allStudentSlice = createSlice({
     name: "students",
