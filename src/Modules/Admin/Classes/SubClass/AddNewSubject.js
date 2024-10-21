@@ -83,10 +83,8 @@ const AddNewSubject = ({ onClose, subject }) => {
         return;
       }
       dispatch(updateSubject({ subjectId: subject._id, subjectData }));
-      toast.success("Subject updated successfully");
     } else {
       dispatch(createSubject(subjectData));
-      toast.success("Subject created successfully");
     }
     onClose();
   };

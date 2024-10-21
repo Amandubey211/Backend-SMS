@@ -61,9 +61,9 @@ const validateStudentDetails = (details) => {
   if (!details.schoolId) {
     errors.schoolId = "School is required";
   }
-  // if (!details.profile) {
-  //   errors.profile = "Profile image is required";
-  // }
+  if (!details.profile) {
+    errors.profile = "Profile image is required";
+  }
 
   // Validate permanent address
   errors.permanentAddress = {};

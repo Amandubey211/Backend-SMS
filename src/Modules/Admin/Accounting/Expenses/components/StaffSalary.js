@@ -6,6 +6,7 @@ import { baseUrl } from "../../../../../config/Common";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchSalaries, updateSalary } from "../../../../../Store/Slices/Admin/Accounting/Expenses/expenses.action";
+import NoDataFound from "../../../../../Components/Common/NoDataFound";
 
 const DropdownMenu = ({ onEditClick }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -164,24 +165,33 @@ const StaffSalary = ({ selectedOption, selectedMonth }) => {
 
   return (
     <div>
-      <table className="min-w-full leading-normal mt-4 rounded-lg">
-        <thead>
-          <tr className="text-left text-gray-700 bg-gray-100">
-            <th className="px-5 py-3 border-b-2 border-gray-200">Staff Name</th>
-            <th className="px-5 py-3 border-b-2 border-gray-200">Contact Info</th>
-            <th className="px-5 py-3 border-b-2 border-gray-200">Salary Month</th>
-            <th className="px-5 py-3 border-b-2 border-gray-200">Salary Amount</th>
-            <th className="px-5 py-3 border-b-2 border-gray-200">Paid Date</th>
-            <th className="px-5 py-3 border-b-2 border-gray-200">Status</th>
-            <th className="px-5 py-3 border-b-2 border-gray-200">Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {staffSalaries?.map((staff, index) => (
-            <SalaryRow key={index} staff={staff} onPayClick={handlePayClick} onEditClick={handleEditClick} />
-          ))}
-        </tbody>
-      </table>
+     <table className="min-w-full leading-normal mt-4 rounded-lg">
+  <thead>
+    <tr className="text-left text-gray-700 bg-gray-100">
+      <th className="px-5 py-3 border-b-2 border-gray-200">Staff Name</th>
+      <th className="px-5 py-3 border-b-2 border-gray-200">Contact Info</th>
+      <th className="px-5 py-3 border-b-2 border-gray-200">Salary Month</th>
+      <th className="px-5 py-3 border-b-2 border-gray-200">Salary Amount</th>
+      <th className="px-5 py-3 border-b-2 border-gray-200">Paid Date</th>
+      <th className="px-5 py-3 border-b-2 border-gray-200">Status</th>
+      <th className="px-5 py-3 border-b-2 border-gray-200">Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {staffSalaries?.length === 0 ? (
+      <tr>
+        <td colSpan="7" className="text-center px-5 py-5">
+          <NoDataFound /> {/* Display NoDataFound when no data */}
+        </td>
+      </tr>
+    ) : (
+      staffSalaries?.map((staff, index) => (
+        <SalaryRow key={index} staff={staff} onPayClick={handlePayClick} onEditClick={handleEditClick} />
+      ))
+    )}
+  </tbody>
+</table>
+
 
       <Sidebar
         isOpen={isSidebarOpen}
