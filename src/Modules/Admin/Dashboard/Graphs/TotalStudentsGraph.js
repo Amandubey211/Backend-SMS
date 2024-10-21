@@ -53,8 +53,8 @@ const TotalStudentsGraphjs = () => {
   };
 
   return (
-    <div className="max-w-xs px-2 py-4 h-full">
-      <h2 className="text-2xl font-semibold mb-4">Total Students</h2>
+    <div className="flex flex-col items-center justify-center h-full px-2 py-4">
+      <h2 className="text-2xl font-semibold mb-4 text-left w-full">Total Students</h2>
 
       {/* Conditionally render spinner, error, no data message, or the pie chart */}
       {loading ? (
@@ -91,7 +91,7 @@ const TotalStudentsGraphjs = () => {
           )}
 
           {/* Pie chart */}
-          <div className="relative p-8 my-5 mb-12" style={{ width: "300px", height: "300px" }}>
+          <div className="relative my-5" style={{ width: "300px", height: "300px" }}>
             <Doughnut
               data={{
                 datasets: [
@@ -145,7 +145,7 @@ const TotalStudentsGraphjs = () => {
             </div>
           </div>
 
-          <div className="flex justify-around mt-4 text-lg pl-10 w-[20rem] gap-2">
+          <div className="flex justify-around mt-4 text-lg w-[20rem] gap-2">
             <div className="flex flex-col items-start">
               <div className="w-16 h-1 bg-[#8F77F3] rounded-full mb-1"></div>
               <div className="text-left">

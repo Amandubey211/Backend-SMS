@@ -2,7 +2,6 @@ import React, { useEffect, useState, memo } from "react";
 import { Bar } from "react-chartjs-2";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAttendanceData } from "../../../../Store/Slices/Admin/Dashboard/adminDashboard.action"; // Adjust path if needed
-import { FiCalendar, FiAlertCircle } from "react-icons/fi"; // Error and No data icons
 import Spinner from "../../../../Components/Common/Spinner";
 
 const TotalAttendanceGraph = () => {
@@ -14,109 +13,92 @@ const TotalAttendanceGraph = () => {
   const [gender, setGender] = useState("Both"); // New state for gender filter
 
   const dispatch = useDispatch();
-  const { attendanceData, loading, error } = useSelector(
+  const { attendanceData, loading } = useSelector(
     (state) => state?.admin?.adminDashboard
   );
 
   useEffect(() => {
-    console.log(`Fetching data for: month=${month}, year=${year}`);
     dispatch(fetchAttendanceData({ month, year }));
   }, [month, year, dispatch]);
 
   const [graphData, setGraphData] = useState(null);
 
   useEffect(() => {
-    if (attendanceData && attendanceData.attendanceData) {
-      const attendance = attendanceData.attendanceData;
+    const attendance = attendanceData?.attendanceData || [];
 
-      // Sort classes numerically and place unnamed classes at the end
-      const sortedAttendance = [...attendance].sort((a, b) => {
-        const extractNumber = (str) => {
-          const match = str.match(/\d+/);
-          return match ? parseInt(match[0]) : Infinity;
-        };
-
-        const numA = extractNumber(a.className);
-        const numB = extractNumber(b.className);
-
-        if (numA !== numB) {
-          return numA - numB;
-        } else {
-          return a.className.localeCompare(b.className);
-        }
-      });
-
-      const labels = sortedAttendance.map((item) => item.className);
-
-      const femaleAttendance = sortedAttendance.map(
-        (item) => item.femaleAttendance
-      );
-      const maleAttendance = sortedAttendance.map(
-        (item) => item.maleAttendance
-      );
-
-      const filteredData = {
-        labels: labels,
-        datasets: [
-          gender === "Female" || gender === "Both"
-            ? {
-                label: "Female",
-                data: femaleAttendance,
-                backgroundColor: "#8F77F3",
-                borderRadius: 10,
-                borderWidth: 1,
-                stack: "combined",
-                barThickness: 30,
-              }
-            : null,
-          gender === "Male" || gender === "Both"
-            ? {
-                label: "Male",
-                data: maleAttendance,
-                backgroundColor: "#23C55E",
-                borderRadius: 10,
-                borderWidth: 1,
-                stack: "combined",
-                barThickness: 30,
-              }
-            : null,
-        ].filter(Boolean),
+    const sortedAttendance = [...attendance].sort((a, b) => {
+      const extractNumber = (str) => {
+        const match = str.match(/\d+/);
+        return match ? parseInt(match[0]) : Infinity;
       };
 
-      setGraphData(filteredData);
-    } else {
-      setGraphData(null);
-    }
+      const numA = extractNumber(a.className);
+      const numB = extractNumber(b.className);
+
+      if (numA !== numB) {
+        return numA - numB;
+      } else {
+        return a.className.localeCompare(b.className);
+      }
+    });
+
+    const labels = sortedAttendance.map((item) => item.className);
+
+    const femaleAttendance = sortedAttendance.map(
+      (item) => item.femaleAttendance || 0
+    );
+    const maleAttendance = sortedAttendance.map(
+      (item) => item.maleAttendance || 0
+    );
+
+    const filteredData = {
+      labels: labels,
+      datasets: [
+        gender === "Female" || gender === "Both"
+          ? {
+              label: "Female",
+              data: femaleAttendance,
+              backgroundColor: "#8F77F3",
+              borderRadius: 10,
+              borderWidth: 1,
+              stack: "combined",
+              barThickness: 30,
+            }
+          : null,
+        gender === "Male" || gender === "Both"
+          ? {
+              label: "Male",
+              data: maleAttendance,
+              backgroundColor: "#23C55E",
+              borderRadius: 10,
+              borderWidth: 1,
+              stack: "combined",
+              barThickness: 30,
+            }
+          : null,
+      ].filter(Boolean),
+    };
+
+    setGraphData(filteredData);
   }, [attendanceData, gender]);
 
   const handleMonthChange = (e) => {
-    const newMonth = parseInt(e.target.value);
-    console.log(`Month changed to: ${newMonth}`);
-    setMonth(newMonth);
+    setMonth(parseInt(e.target.value));
   };
 
   const handleYearChange = (e) => {
-    const selectedValue = e.target.value;
-    if (selectedValue === "Current Year") {
-      console.log("Year changed to current year");
-      setYear(currentYear);
-    } else if (selectedValue === "Past Year") {
-      console.log("Year changed to past year");
-      setYear(currentYear - 1);
-    }
+    setYear(e.target.value === "Current Year" ? currentYear : currentYear - 1);
   };
 
   const handleGenderChange = (e) => {
     setGender(e.target.value);
   };
 
-  // Generate array of years dynamically
   const availableYears = [
     { label: "Current Year", value: "Current Year" },
     { label: "Past Year", value: "Past Year" },
   ];
 
-  // Determine the label for the current year state
   const yearLabel = year === currentYear ? "Current Year" : "Past Year";
 
   return (
@@ -165,10 +147,12 @@ const TotalAttendanceGraph = () => {
           </select>
         </div>
       </div>
+
       {loading ? (
         <div className="flex flex-col items-center justify-center">
           <Spinner />
         </div>
+
       ) : error ? (
         <div className="flex flex-col items-center justify-center text-gray-400">
           <FiAlertCircle className="w-12 h-12 mb-2" />
@@ -180,10 +164,11 @@ const TotalAttendanceGraph = () => {
           <p>No Attendance Data Found</p>
         </div>
       ) : graphData ? (
+
         <>
           <div style={{ height: "300px" }}>
             <Bar
-              data={graphData}
+              data={graphData || { datasets: [], labels: [] }} // Show empty graph if no data
               options={{
                 scales: {
                   y: {
@@ -202,13 +187,8 @@ const TotalAttendanceGraph = () => {
                 plugins: {
                   tooltip: {
                     backgroundColor: "rgba(0, 0, 0, 0.8)",
-                    titleFont: {
-                      size: 14,
-                      weight: "bold",
-                    },
-                    bodyFont: {
-                      size: 14,
-                    },
+                    titleFont: { size: 14, weight: "bold" },
+                    bodyFont: { size: 14 },
                     displayColors: true,
                     usePointStyle: true,
                     boxWidth: 10,
@@ -224,21 +204,17 @@ const TotalAttendanceGraph = () => {
                       },
                     },
                   },
-                  legend: {
-                    display: false,
-                  },
+                  legend: { display: false },
                 },
                 responsive: true,
                 maintainAspectRatio: false,
               }}
             />
           </div>
+
           <div className="flex justify-around mt-4">
             <div className="flex flex-col items-start">
-              <div
-                className="w-16 h-1 bg-[#8F77F3] rounded-full mb-1"
-                style={{ alignSelf: "flex-start" }}
-              ></div>
+              <div className="w-16 h-1 bg-[#8F77F3] rounded-full mb-1"></div>
               <div className="flex items-center">
                 <div className="text-gray-700">Total Female Att.</div>
                 <div className="ml-2 font-bold">
@@ -247,10 +223,7 @@ const TotalAttendanceGraph = () => {
               </div>
             </div>
             <div className="flex flex-col items-start">
-              <div
-                className="w-16 h-1 bg-[#23C55E] rounded-full mb-1"
-                style={{ alignSelf: "flex-start" }}
-              ></div>
+              <div className="w-16 h-1 bg-[#23C55E] rounded-full mb-1"></div>
               <div className="flex items-center">
                 <div className="text-gray-700">Total Male Att.</div>
                 <div className="ml-2 font-bold">
@@ -260,7 +233,7 @@ const TotalAttendanceGraph = () => {
             </div>
           </div>
         </>
-      ) : null}
+      )}
     </div>
   );
 };
