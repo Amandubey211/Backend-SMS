@@ -120,10 +120,11 @@ const Chapter = ({ title, chapterNumber, imageUrl, assignments, quizzes, attachm
           <div className="bg-white rounded-lg shadow-lg w-full max-w-2xl p-4 relative">
             <button
               onClick={closePreview}
-              className="absolute top-2 right-2 text-red-500"
+              className="absolute top-2 right-2 w-10 h-10 flex items-center justify-center rounded-full bg-gradient-to-r from-pink-500 to-purple-500 text-white hover:from-pink-600 hover:to-purple-600 transition-colors duration-500 ease-in-out shadow-lg"
             >
               ✕
             </button>
+
             <embed
               src={previewUrl}
               type="application/pdf"
