@@ -36,7 +36,7 @@ export const fetchFilteredQuizzesThunk = createAsyncThunk(
         throw new Error(response.data.message || "Failed to fetch quizzes");
       }
     } catch (error) {
-      toast.error(error.response?.data?.message || error.message);
+      //toast.error(error.response?.data?.message || error.message);
       return rejectWithValue(
         error.response?.data?.message || "Failed to fetch quizzes"
       );

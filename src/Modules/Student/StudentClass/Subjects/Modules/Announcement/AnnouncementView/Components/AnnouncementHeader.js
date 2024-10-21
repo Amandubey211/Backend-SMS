@@ -45,7 +45,7 @@ const AnnouncementHeader = () => {
             {/* <img
               src={
                 announcement?.authorProfile ||
-                `https://avatars.githubusercontent.com/u/109097090?v=4`
+                ``
               }
               alt="Profile"
               className="w-10 h-10 rounded-full"

@@ -76,7 +76,7 @@ const AnnouncementViewHeader = () => {
     <div className="flex items-center justify-between p-2 px-4 border-b">
       <div className="flex items-center">
         <img
-          src="https://avatars.githubusercontent.com/u/109097090?v=4"
+          src=""
           alt="Profile"
           className="w-12 h-12 rounded-full"
         />

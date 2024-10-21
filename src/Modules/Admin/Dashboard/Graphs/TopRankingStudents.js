@@ -5,6 +5,8 @@ import { useDispatch, useSelector } from "react-redux";
 import {fetchAllClasses} from '../../../../Store/Slices/Admin/Class/actions/classThunk'
 import Spinner from "../../../../Components/Common/Spinner";
 import NoDataFound from "../../../../Components/Common/NoDataFound";
+import profileIcon from "../../../../Assets/DashboardAssets/profileIcon.png";
+
 const TopRankingStudents = () => {
 
   const {topStudents, loadingTopStudents,errorTopStudents} = useSelector((state) => state.admin.adminDashboard);
@@ -71,8 +73,8 @@ const dispatch = useDispatch()
             <div className="relative mt-10">
               <img
                 className="w-14 h-14 rounded-full mx-auto"
-                src={student?. studentProfile}
-                alt={student?. studentName}
+                src={student?.studentProfile || profileIcon}
+                alt={student?.studentName}
               />
               {index !== 0 && (
                 <h3
@@ -114,7 +116,7 @@ const dispatch = useDispatch()
               <span className="mr-3">{index+1}</span>
               <img
                 className="w-10 h-10 rounded-full mr-4"
-                src={student?.studentProfile}
+                src={student?.studentProfile || profileIcon}
                 alt={student?.studentName}
               />
               <span>{student?.studentName}</span>

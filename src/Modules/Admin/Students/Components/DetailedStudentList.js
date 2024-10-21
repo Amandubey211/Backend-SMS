@@ -1,6 +1,7 @@
 import React from "react";
 import { FaUsers } from "react-icons/fa";
 import StudentMenuOptions from "./StudentMenuOptions";
+import profileIcon from "../../../../Assets/DashboardAssets/profileIcon.png";
 
 const DetailedStudentList = ({ activeSection, onSeeGradeClick, students }) => {
   const filteredStudents =
@@ -46,10 +47,7 @@ const StudentInfo = React.memo(({ student, index, onSeeGradeClick }) => (
     <div className="flex items-center w-1/4">
       <img
         src={
-          student.profile ||
-          `https://randomuser.me/api/portraits/med/${
-            index % 2 === 0 ? "women" : "men"
-          }/${index}.jpg`
+          student.profile || profileIcon
         }
         alt={student.name}
         className="w-10 h-10 rounded-full mr-3"

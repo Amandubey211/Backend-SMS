@@ -4,6 +4,7 @@ import Sidebar from "../../../../Components/Common/Sidebar";
 import { PiPlusLight } from "react-icons/pi";
 import AssignStudent from "./AssignStudent";
 import { PiStudentThin } from "react-icons/pi";
+import profileIcon from "../../../../Assets/DashboardAssets/profileIcon.png";
 const UnAssignedStudentList = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
@@ -70,7 +71,7 @@ const UnAssignedStudentList = () => {
             >
               <div className="flex items-center">
                 <img
-                  src={student.profile || "NA"}
+                  src={student.profile || profileIcon}
                   alt={student.firstName}
                   className="w-10 h-10 rounded-full mr-3"
                 />

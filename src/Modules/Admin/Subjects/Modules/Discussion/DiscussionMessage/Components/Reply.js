@@ -66,7 +66,7 @@ const Reply = ({
         <img
           src={
             reply?.avatarUrl ||
-            "https://avatars.githubusercontent.com/u/109097090?v=4"
+            ""
           }
           alt="avatar"
           className="w-8 h-8 rounded-full mr-3"

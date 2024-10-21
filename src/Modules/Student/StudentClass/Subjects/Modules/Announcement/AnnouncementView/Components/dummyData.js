@@ -6,7 +6,7 @@ const dummycomments = [
     time: '1h ago',
     text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore',
     likes: 102,
-    avatarUrl: 'https://avatars.githubusercontent.com/u/109097090?v=4',
+    avatarUrl: '',
     replies: [
       {
         id: 2,
@@ -15,7 +15,7 @@ const dummycomments = [
         time: '2h ago',
         text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore',
         likes: 34,
-        avatarUrl: 'https://avatars.githubusercontent.com/u/109097090?v=4',
+        avatarUrl: '',
         replies: []
       }
     ]
@@ -27,7 +27,7 @@ const dummycomments = [
     time: '3h ago',
     text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore',
     likes: 56,
-    avatarUrl: 'https://avatars.githubusercontent.com/u/109097090?v=4',
+    avatarUrl: '',
     replies: []
   }
 ];

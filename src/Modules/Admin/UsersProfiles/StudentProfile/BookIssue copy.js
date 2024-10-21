@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-
+import profileIcon from "../../../../Assets/DashboardAssets/profileIcon.png";
 const BookIssue = ({ student }) => {
   const [selectedFilter, setSelectedFilter] = useState("All Expenses");
   if (!student) {
@@ -72,7 +72,7 @@ const BookIssue = ({ student }) => {
               <td className="px-5 py-3 border-b border-gray-200">
                 <div className="flex items-center">
                   <img
-                    src={student.imageUrl}
+                    src={student?.imageUrl || profileIcon}
                     alt="Profile"
                     className="h-8 w-8 mr-2 rounded-full "
                   />

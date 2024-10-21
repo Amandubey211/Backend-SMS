@@ -85,7 +85,7 @@ const Header = ({ discussion, refetchDiscussion }) => {
     <div className="flex items-end justify-between p-2 px-4 border-b">
       <div className="flex items-center">
         <img
-          src="https://avatars.githubusercontent.com/u/109097090?v=4"
+          src=""
           alt="Profile"
           className="w-10 h-10 rounded-full"
         />
