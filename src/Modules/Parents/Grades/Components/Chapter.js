@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { FaChevronDown, FaChevronUp, FaEye, FaFileAlt, FaFilePdf } from "react-icons/fa";
+import { FaChevronDown, FaChevronUp, FaEye, FaFilePdf } from "react-icons/fa";
+import { GrAttachment } from "react-icons/gr";
 import ChapterItem from "./ChapterItem";
 
 const Chapter = ({ title, chapterNumber, imageUrl, assignments, quizzes, attachments = [] }) => {
@@ -16,6 +17,15 @@ const Chapter = ({ title, chapterNumber, imageUrl, assignments, quizzes, attachm
 
   const closePreview = () => {
     setPreviewUrl(null);
+  };
+
+  // Handle the attachment icon click
+  const handleAttachmentClick = () => {
+    if (attachments.length === 1) {
+      openPreview(attachments[0].url); // Open the PDF if there's only one attachment
+    } else if (attachments.length > 1) {
+      setChapterExpanded(true); // Expand the chapter if more than one attachment
+    }
   };
 
   // Function to truncate lengthy filenames
@@ -41,7 +51,21 @@ const Chapter = ({ title, chapterNumber, imageUrl, assignments, quizzes, attachm
             <p className="text-gray-500">Chapter {chapterNumber}</p>
           </div>
         </div>
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2 relative">
+          {attachments.length > 0 && (
+            <div className="relative">
+              <button
+                className="border p-2 rounded-full hover:bg-gray-100 text-red-600"
+                aria-label="View Attachments"
+                onClick={handleAttachmentClick} // Handle click event
+              >
+                <GrAttachment />
+              </button>
+              <span className="absolute -top-1 -right-1 bg-red-100 text-red-900 text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                {attachments.length}
+              </span>
+            </div>
+          )}
           {/* Dropdown Menu */}
           <button
             className="border p-2 rounded-full hover:bg-gray-100"
@@ -125,8 +149,6 @@ const Chapter = ({ title, chapterNumber, imageUrl, assignments, quizzes, attachm
               ))}
             </div>
           )}
-
-
         </div>
       )}
 
