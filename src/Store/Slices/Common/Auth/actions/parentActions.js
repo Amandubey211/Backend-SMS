@@ -3,11 +3,13 @@ import axios from "axios";
 import { resetState, setRole, setToken } from "../reducers/authSlice";
 import { baseUrl } from "../../../../../config/Common";
 import { setUserDetails } from "../../User/reducers/userSlice";
+import toast from "react-hot-toast";
 
 // **Parent login action**
 export const parentLogin = createAsyncThunk(
   "auth/parentLogin",
-  async (parentDetails, { rejectWithValue, dispatch }) => {
+  async ({parentDetails,navigate}, { rejectWithValue, dispatch }) => {
+   
     try {
       const { data } = await axios.post(
         `${baseUrl}/auth/parent/login`,
@@ -33,16 +35,13 @@ export const parentLogin = createAsyncThunk(
           })
         );
         console.log("Parent Dashhhh :",data.token);
-        
-
-
-        return { redirect: "/parent_dash" };
-      } else {
-        return rejectWithValue(data.message || "Login failed.");
-      }
+        navigate("/parent_dash")
+        return data.token;
+      } 
     } catch (error) {
       const errorMessage =
         error.response?.data?.msg || "Something went wrong. Please try again.";
+        toast.error(errorMessage)
       return rejectWithValue(errorMessage);
     }
   }

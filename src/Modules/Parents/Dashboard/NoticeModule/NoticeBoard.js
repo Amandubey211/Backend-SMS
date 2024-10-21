@@ -25,12 +25,12 @@ const NoticeBoard = ({ textTrimCount }) => {
   // Get the notices, loading, and error states from Redux
   const { notices, loadingNotices, errorNotices } = useSelector((state) => state.Parent.dashboard);
 
-  // Fetch notices on component mount
+ 
   useEffect(() => {
     if (!notices.length) {
-      dispatch(fetchNotices()); // Fetch notices using Redux thunk
+      dispatch(fetchNotices()); 
     }
-  }, [dispatch, notices]);
+  }, [dispatch]);
 
   // Handle navigate click using useCallback to prevent re-creation on each render
   const handleNavigate = useCallback(() => {
@@ -112,13 +112,13 @@ const NoticeBoard = ({ textTrimCount }) => {
   }
 
   // No data available state
-  if (!notices.length) {
+  if (!notices?.length) {
     return (
       <div className="p-4 border-l border-gray-300">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg font-semibold text-gray-600">{t("Noticeboard")}</h2>
         </div>
-        <div className="flex flex-col items-center justify-center h-64 text-center overflow-x-auto shadow rounded-lg p-4">
+        <div className="flex flex-col items-center justify-center h-64 text-center overflow-x-auto rounded-lg p-4">
           <FaBell className="text-gray-400 text-6xl mb-4" />
           <p className="text-gray-600 text-lg">{t("No Notices Available")}</p>
         </div>
@@ -137,7 +137,7 @@ const NoticeBoard = ({ textTrimCount }) => {
           {t("See All")}
         </button>
       </div>
-      {latestNotices.map((notice, index) => (
+      {latestNotices?.map((notice, index) => (
         <Notice
           key={index}
           image={notice.image || ""}

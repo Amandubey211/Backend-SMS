@@ -190,7 +190,7 @@ export const fetchSubjects = createAsyncThunk(
       return response.data.subjects;
     } catch (error) {
       const errorMessage =
-        error.response?.data?.message || error.message || "Failed to fetch subjects";
+        error.response?.data?.message || error.message || "No Subject Found ";
       // toast.error(errorMessage);
       return rejectWithValue(errorMessage);
     }

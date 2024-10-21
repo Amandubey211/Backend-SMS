@@ -22,7 +22,7 @@ export const fetchSubjects = createAsyncThunk(
       return data;
     } catch (err) {
       const errorMessage =
-        err.response?.data?.message || "Failed to fetch subjects";
+        err.response?.data?.message || "No Subject Found ";
       return rejectWithValue(errorMessage);
     }
   }
