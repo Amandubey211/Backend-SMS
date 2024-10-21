@@ -2,7 +2,9 @@
 import React from "react";
 import profileIcon from '../../../../../Assets/DashboardAssets/profileIcon.png'
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 const StudentProfileCard = ({ student }) => {
+  const {role} = useSelector((store) => store.common.auth);
   const navigate = useNavigate()
   return (
     <div className="flex flex-col items-center p-3 py-5 gap-2 justify-center">
@@ -13,9 +15,9 @@ const StudentProfileCard = ({ student }) => {
         <span className="text-black">Section: <span className="text-gray-500" >{student?.sectionName || 'N/A'}</span></span>
       </div>
       <span>ID: <span className="text-gray-500">{student?.admissionNumber|| 'N/A'}</span></span>
-      <div className="border rounded-md px-9 py-1 border-red-300 cursor-pointer " onClick={()=>navigate(`/class/${student.presentClassId}`)} >
+     {role == "admin" || "teacher"? <div className="border rounded-md px-9 py-1 border-red-300 cursor-pointer " onClick={()=>navigate(`/class/${student.presentClassId}`)} >
         <span className=' font-semibold bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent bg-clip-text ' > Class</span>
-      </div>
+      </div>:''}
     </div>
   );
 };

@@ -10,7 +10,7 @@ const TopRankingStudents = () => {
   const {topStudents, loadingTopStudents,errorTopStudents} = useSelector((state) => state.admin.adminDashboard);
   const { classes } = useSelector((store) => store?.admin?.class);
   const [selectedClass,setSelectedClass] = useState(classes[0]?._id)
- // const {class} = useSelector((state) => state.admin.class);
+
 const dispatch = useDispatch()
   useEffect(() => {
     
@@ -98,7 +98,7 @@ const dispatch = useDispatch()
                   WebkitTextFillColor: "transparent",
                 }}
               >
-                Score: {student?.score}
+                Score: {student?.score} %
               </span>
             </span>
           </div>
@@ -133,7 +133,7 @@ const dispatch = useDispatch()
                 }}
                 className="px-3"
               >
-                Score: {student?.score}
+                Score: {student?.score} %
               </span>
             </div>
             <span>Adm: <span className="text-gray-600">{student?.admissionNumber}</span></span>

@@ -1,7 +1,6 @@
 
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
-import toast from "react-hot-toast";
 import { baseUrl } from "../../../../../config/Common";
 import { setShowError } from "../../../Common/Alerts/alertsSlice";
 import { ErrorMsg } from "../../../Common/Alerts/errorhandling.action";
@@ -19,7 +18,7 @@ export const fetchAllStudents = createAsyncThunk(
       });
       return response.data.data;
     } catch (error) {
-      toast.error("Something is wrong");
+      
       return rejectWithValue(error.response?.data || error.message);
     }
   }

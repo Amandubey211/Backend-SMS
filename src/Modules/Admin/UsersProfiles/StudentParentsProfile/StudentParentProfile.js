@@ -111,53 +111,53 @@ const StudentParentProfile = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredParents.length >0 ?
-                  filteredParents.map((parent, index) => (
+                  {filteredParents?.length >0 ?
+                  filteredParents?.map((parent, index) => (
                     <tr key={index} className="text-left text-gray-700">
                       <td className="px-5 py-5 border-b border-gray-200 align-middle">
                         <div className="flex items-center">
                           <img
-                            src={parent.fatherImageUrl || profileIcon}
+                            src={parent?.fatherImageUrl || profileIcon}
                             alt="Profile"
                             className="h-8 w-8 rounded-full mr-2 border"
                           />
-                          <span>{parent.fatherName}</span>
+                          <span>{parent?.fatherName}</span>
                         </div>
                       </td>
 
                       <td className="px-5 py-5 border-b border-gray-200 align-middle">
                         <div className="flex items-center">
                           <img
-                            src={parent.motherImageUrl || profileIcon}
+                            src={parent?.motherImageUrl || profileIcon}
                             alt="Profile"
                             className="h-8 w-8 rounded-full mr-2"
                           />
-                          <span>{parent.motherName}</span>
+                          <span>{parent?.motherName}</span>
                         </div>
                       </td>
                       <td className="px-5 py-5 border-b border-gray-200 align-middle">
-                        {parent.phone}
+                        {parent?.phone}
                       </td>
                       <td className="px-5 py-5 border-b border-gray-200 align-middle">
-                        {parent.email}
+                        {parent?.email}
                       </td>
                       <td className="px-5 py-5 border-b border-gray-200 align-middle">
                         <div
                           className="flex items-center py-1 cursor-pointer"
-                          onClick={() => handleStudentClick(parent.children)}
+                          onClick={() => handleStudentClick(parent?.children)}
                         >
                           <div className="flex bg-pink-100 p-2 border rounded-full">
-                            {parent.children.map((child, idx) => (
+                            {parent?.children?.map((child, idx) => (
                               <img
                                 key={idx}
-                                src={child.imageUrl || profileIcon}
-                                alt={child.name}
+                                src={child?.imageUrl || profileIcon}
+                                alt={child?.name}
                                 className="h-8 w-8 rounded-full"
-                                title={child.name}
+                                title={child?.name}
                               />
                             ))}
                             <span className="ml-2 font-normal">
-                              {parent.children.length} Child
+                              {parent?.children?.length} Child
                             </span>
                           </div>
                         </div>
