@@ -95,7 +95,7 @@ const AllStudents = () => {
                     <div className="flex items-center mt-4">
                       <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-white flex justify-center items-center bg-white text-gray-800">
                         {student?.profile ? (
-                          <img src={student?.profile} alt="Student" className="w-full h-full object-cover" />
+                          <img src={student?.profile || profileIcon} alt="Student" className="w-full h-full object-cover" />
                         ) : (
                           <CiUser size={24} />
                         )}

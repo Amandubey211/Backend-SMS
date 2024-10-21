@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { promoteStudents } from "../../../../Store/Slices/Admin/Class/Students/studentThunks";
 import { motion } from "framer-motion"; // For animations
 import DeleteConfirmatiomModal from "../../../../Components/Common/DeleteConfirmationModal";
+import profileIcon from "../../../../Assets/DashboardAssets/profileIcon.png";
 
 const PromoteClass = ({ student }) => {
   const dispatch = useDispatch();
@@ -72,10 +73,7 @@ const PromoteClass = ({ student }) => {
           <div className="flex items-center space-x-4 mb-6">
             <img
               src={
-                student.profile ||
-                `https://randomuser.me/api/portraits/med/${
-                  student._id % 2 === 0 ? "women" : "men"
-                }/${student._id}.jpg`
+                student.profile || profileIcon
               }
               alt={`${student.firstName} ${student.lastName}`}
               className="w-24 h-24 rounded-full"

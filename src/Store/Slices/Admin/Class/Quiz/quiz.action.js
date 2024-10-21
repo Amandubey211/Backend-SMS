@@ -23,7 +23,7 @@ import toast from "react-hot-toast";
         return response.data.quizzes;
 
     } catch (error) {
-        toast.error("Something is wrong");
+        //toast.error("Something is wrong");
         return rejectWithValue(error.response?.data || error.message);
     }
 

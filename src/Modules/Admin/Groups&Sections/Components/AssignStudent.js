@@ -8,6 +8,7 @@ import {
   fetchSectionsByClass,
   fetchUnassignedStudents,
 } from "../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
+import profileIcon from "../../../../Assets/DashboardAssets/profileIcon.png";
 
 const AssignStudent = ({ name, imageUrl, section, studentId }) => {
   const [sectionId, setSectionId] = useState("");
@@ -54,7 +55,7 @@ const AssignStudent = ({ name, imageUrl, section, studentId }) => {
       <div className="bg-white rounded-lg p-4 w-full max-w-md">
         <div className="flex items-center">
           <img
-            src={imageUrl}
+            src={imageUrl || profileIcon}
             alt={name}
             className="w-10 h-10 rounded-full mr-3"
           />

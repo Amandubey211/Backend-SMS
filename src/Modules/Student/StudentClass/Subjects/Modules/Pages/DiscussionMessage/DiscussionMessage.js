@@ -17,7 +17,7 @@ const DiscussionMessage = () => {
       time: 'Just now',
       text: text,
       likes: 0,
-      avatarUrl: 'https://avatars.githubusercontent.com/u/109097090?v=4',
+      avatarUrl: '',
       replies: [],
       isUserCreated: true,
     };
@@ -32,7 +32,7 @@ const DiscussionMessage = () => {
       time: 'Just now',
       text: text,
       likes: 0,
-      avatarUrl: 'https://avatars.githubusercontent.com/u/109097090?v=4',
+      avatarUrl: '',
       replies: [],
       isUserCreated: true,
     };

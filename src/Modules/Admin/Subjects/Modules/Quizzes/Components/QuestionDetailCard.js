@@ -7,14 +7,14 @@ import CommentCard from "./CommentCard";
 const QuestionDetailCard = () => {
   const commentsData = [
     {
-      avatar: "https://avatars.githubusercontent.com/u/109097090?v=4", // Replace with actual image URL
+      avatar: "", // Replace with actual image URL
       name: "Mr Teacher",
       timestamp: "Feb/02 /09:02",
       comment:
         "Hi Sir Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore.",
     },
     {
-      avatar: "https://avatars.githubusercontent.com/u/109097090?v=4", // Replace with actual image URL
+      avatar: "", // Replace with actual image URL
       name: "Mr Teacher",
       timestamp: "Feb/02 /09:02",
       comment:

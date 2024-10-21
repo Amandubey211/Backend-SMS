@@ -16,6 +16,7 @@ import { BsThreeDotsVertical } from "react-icons/bs";
 import Spinner from "../../../../Components/Common/Spinner";
 import { useParams } from "react-router-dom";
 import Sidebar from "../../../../Components/Common/Sidebar";
+import profileIcon from "../../../../Assets/DashboardAssets/profileIcon.png";
 
 const GroupList = ({ onSeeGradeClick }) => {
   const [expandedGroupIndex, setExpandedGroupIndex] = useState(null);
@@ -222,7 +223,7 @@ const GroupList = ({ onSeeGradeClick }) => {
                     >
                       <div className="flex items-center flex-shrink-0 w-1/4">
                         <img
-                          src={student?.profile || ""}
+                          src={student?.profile || profileIcon }
                           alt={student?.firstName || "First"}
                           className="w-10 h-10 rounded-full mr-3"
                         />

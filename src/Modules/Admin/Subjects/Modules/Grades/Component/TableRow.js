@@ -1,11 +1,11 @@
 import React from "react";
-
+import profileIcon from "../../../../../../Assets/DashboardAssets/profileIcon.png";
 const TableRow = ({ student, onRowClick }) => {
   return (
     <tr className="border-b hover:bg-gray-50 ">
       <td className="p-3 flex items-center cursor-pointer" onClick={onRowClick}>
         <img
-          src={student?.studentProfile}
+          src={student?.studentProfile || profileIcon}
           alt={student.studentName}
           className="w-10 h-10 rounded-full mr-3 bg-gray-500"
         />

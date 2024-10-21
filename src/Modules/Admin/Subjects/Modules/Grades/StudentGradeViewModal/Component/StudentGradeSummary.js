@@ -1,5 +1,5 @@
 import React from "react";
-
+import profileIcon from "../../../../../../../Assets/DashboardAssets/profileIcon.png";
 const StudentGradeSummary = ({ grades,studentData }) => {
   return (
     <div className="flex-none w-1/4 border-l">
@@ -7,7 +7,7 @@ const StudentGradeSummary = ({ grades,studentData }) => {
         <img
           className="w-24 h-24 rounded-full mx-auto"
           src={
-            studentData?.profile
+            studentData?.profile || profileIcon
           }
           alt="Profile"
         />

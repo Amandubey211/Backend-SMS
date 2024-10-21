@@ -6,6 +6,7 @@ import {
   assignStudentToSection, // Using the assignStudentToSection thunk
   fetchSectionsByClass,
 } from "../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
+import profileIcon from "../../../../Assets/DashboardAssets/profileIcon.png";
 
 const MoveToSection = ({ student, onClose }) => {
   const [selectedSection, setSelectedSection] = useState("");
@@ -55,7 +56,7 @@ const MoveToSection = ({ student, onClose }) => {
       <div className="bg-white rounded-lg p-4 w-full max-w-md">
         <div className="flex items-center">
           <img
-            src={profile}
+            src={profile || profileIcon}
             alt={firstName}
             className="w-10 h-10 rounded-full mr-3"
           />

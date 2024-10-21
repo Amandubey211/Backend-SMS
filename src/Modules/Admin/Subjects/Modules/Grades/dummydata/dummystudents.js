@@ -12,7 +12,7 @@ const studentsGrades = [
     quizzes: "400 / 6",
     attendance: 25,
     score: "80%",
-    profile: "https://avatars.githubusercontent.com/u/109097090?v=4",
+    profile: "",
   },
   {
     id: 2,
