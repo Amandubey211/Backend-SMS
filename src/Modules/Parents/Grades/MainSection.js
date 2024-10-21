@@ -99,6 +99,7 @@ const MainSection = ({ selectedSubjectId }) => {
                 imageUrl={chapter?.thumbnail}
                 assignments={chapter?.assignments || []}
                 quizzes={chapter?.quizzes || []}
+                attachments={chapter?.attachments || []}
                 isExpanded={expandedChapters === chapter?.chapterId}
                 onToggle={() => handleToggle(chapter?.chapterId)}                
               />

@@ -1,12 +1,29 @@
 import React, { useState } from "react";
-import { FaChevronDown, FaChevronUp, FaEye } from "react-icons/fa";
+import { FaChevronDown, FaChevronUp, FaEye, FaFileAlt } from "react-icons/fa";
 import ChapterItem from "./ChapterItem";
 
-const Chapter = ({ title, chapterNumber, imageUrl, assignments, quizzes }) => {
+const Chapter = ({ title, chapterNumber, imageUrl, assignments, quizzes, attachments = [] }) => {
   const [chapterExpanded, setChapterExpanded] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState(null);
 
   const toggleChapter = () => {
     setChapterExpanded((prev) => !prev);
+  };
+
+  const openPreview = (url) => {
+    setPreviewUrl(url);
+  };
+
+  const closePreview = () => {
+    setPreviewUrl(null);
+  };
+
+  // Function to truncate lengthy filenames
+  const truncateFileName = (name, length = 30) => {
+    if (name.length > length) {
+      return `${name.substring(0, length)}...`;
+    }
+    return name;
   };
 
   return (
@@ -65,6 +82,55 @@ const Chapter = ({ title, chapterNumber, imageUrl, assignments, quizzes }) => {
                 No Assignment or Quiz
               </p>
             )}
+          </div>
+
+          {/* Attachments (PDF Preview) */}
+          {attachments.length > 0 && (
+            <div className="mt-4">
+              <h3 className="text-sm font-semibold text-green-600">Attachments</h3>
+              {attachments.map((attachment, index) => (
+                <div key={index} className="flex justify-between items-center mb-2">
+                  <div className="flex items-center">
+                    {/* Green PDF Icon */}
+                    {attachment.type === "application/pdf" && (
+                      <>
+                        <FaFileAlt size={20} className="mr-2 text-green-500" />
+                        <span className="text-gray-700">
+                          {truncateFileName(attachment.name)}
+                        </span>
+                      </>
+                    )}
+                  </div>
+                  <button
+                    className="text-green-500 hover:text-green-600"
+                    onClick={() => openPreview(attachment.url)}
+                  >
+                    <FaEye size={20} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* PDF Preview Modal */}
+      {previewUrl && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white rounded-lg shadow-lg w-full max-w-2xl p-4 relative">
+            <button
+              onClick={closePreview}
+              className="absolute top-2 right-2 text-red-500"
+            >
+              ✕
+            </button>
+            <embed
+              src={previewUrl}
+              type="application/pdf"
+              width="100%"
+              height="600px"
+              className="rounded-md"
+            />
           </div>
         </div>
       )}
