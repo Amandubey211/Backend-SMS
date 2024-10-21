@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FaChevronDown, FaChevronUp, FaEye, FaFileAlt } from "react-icons/fa";
+import { FaChevronDown, FaChevronUp, FaEye, FaFileAlt, FaFilePdf } from "react-icons/fa";
 import ChapterItem from "./ChapterItem";
 
 const Chapter = ({ title, chapterNumber, imageUrl, assignments, quizzes, attachments = [] }) => {
@@ -87,18 +87,29 @@ const Chapter = ({ title, chapterNumber, imageUrl, assignments, quizzes, attachm
           {/* Attachments (PDF Preview) */}
           {attachments.length > 0 && (
             <div className="mt-4">
-              <h3 className="text-sm font-semibold text-green-600">Attachments</h3>
+              <h3 className="text-sm font-semibold text-green-600 mb-2">Attachments ({attachments.length})</h3>
               {attachments.map((attachment, index) => (
-                <div key={index} className="flex justify-between items-center mb-2">
-                  <div className="flex items-center">
-                    {/* Green PDF Icon */}
-                    {attachment.type === "application/pdf" && (
-                      <>
-                        <FaFileAlt size={20} className="mr-2 text-green-500" />
-                        <span className="text-gray-700">
-                          {truncateFileName(attachment.name)}
-                        </span>
-                      </>
+                <div
+                  key={index}
+                  className="flex justify-between items-center mb-3 p-3 bg-gray-50 border border-gray-300 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300 ease-in-out"
+                >
+                  <div className="flex flex-col items-start space-y-1">
+                    <div className="flex items-center space-x-2">
+                      {/* PDF Icon */}
+                      {attachment.type === "application/pdf" && (
+                        <>
+                          <FaFilePdf className="text-red-500" size={24} />
+                          <span className="text-gray-700 font-semibold">
+                            {truncateFileName(attachment.name)}
+                          </span>
+                        </>
+                      )}
+                    </div>
+                    {/* Display the label below the PDF name */}
+                    {attachment.label && (
+                      <span className="text-gray-500 text-sm italic">
+                        {attachment.label}
+                      </span>
                     )}
                   </div>
                   <button
@@ -111,6 +122,8 @@ const Chapter = ({ title, chapterNumber, imageUrl, assignments, quizzes, attachm
               ))}
             </div>
           )}
+
+
         </div>
       )}
 
