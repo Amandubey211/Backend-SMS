@@ -3,7 +3,7 @@ import { FaChevronDown, FaChevronUp, FaEye, FaFilePdf } from "react-icons/fa";
 import { GrAttachment } from "react-icons/gr";
 import ChapterItem from "./ChapterItem";
 
-const Chapter = ({ title, chapterNumber, imageUrl, assignments, quizzes, attachments = [] }) => {
+const Chapter = ({ title, chapterNumber, imageUrl, assignments, quizzes, attachments = [], moduleName }) => {
   const [chapterExpanded, setChapterExpanded] = useState(false);
   const [previewUrl, setPreviewUrl] = useState(null);
 
@@ -37,43 +37,62 @@ const Chapter = ({ title, chapterNumber, imageUrl, assignments, quizzes, attachm
   };
 
   return (
-    <div className="mb-4 p-2 bg-white rounded-lg border-b">
-      {/* Chapter Header */}
-      <div className="flex items-center justify-between mb-2">
-        <div className="flex items-center">
-          <img
-            src={imageUrl}
-            alt={`Chapter ${chapterNumber}`}
-            className="w-12 h-12 mr-4 rounded-lg"
-          />
-          <div className="flex flex-col">
-            <h2 className="font-semibold text-md">{title}</h2>
-            <p className="text-gray-500">Chapter {chapterNumber}</p>
-          </div>
+    <div>
+      {/* Module Name Box */}
+      {moduleName && (
+        <div className="p-4 bg-gray-100 border border-gray-300 rounded-md mb-4">
+          <h1 className="text-lg font-bold text-gray-700">{moduleName}</h1>
         </div>
-        <div className="flex items-center space-x-2 relative">
-          {attachments.length > 0 && (
-            <div className="relative">
-              <button
-                className="border p-2 rounded-full hover:bg-gray-100 text-red-600"
-                aria-label="View Attachments"
-                onClick={handleAttachmentClick} // Handle click event
-              >
-                <GrAttachment />
-              </button>
-              <span className="absolute -top-1 -right-1 bg-red-100 text-red-900 text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                {attachments.length}
-              </span>
+      )}
+
+      {/* Chapter Row */}
+      <div
+        className="mb-3 p-2 bg-white rounded-lg border cursor-pointer hover:shadow-lg transition-shadow duration-200 ease-in-out"
+        onClick={toggleChapter} // Clicking anywhere on the row will toggle the chapter
+      >
+        {/* Chapter Header */}
+        <div className="flex items-center justify-between m-1">
+          <div className="flex items-center">
+            <img
+              src={imageUrl}
+              alt={`Chapter ${chapterNumber}`}
+              className="w-14 h-14 mr-4 rounded-lg"
+            />
+            <div className="flex flex-col">
+              <h2 className="font-semibold text-md">{title}</h2>
+              <p className="text-gray-500">Chapter {chapterNumber}</p>
             </div>
-          )}
-          {/* Dropdown Menu */}
-          <button
-            className="border p-2 rounded-full hover:bg-gray-100"
-            onClick={toggleChapter}
-            aria-label="Toggle Chapter"
-          >
-            {chapterExpanded ? <FaChevronUp /> : <FaChevronDown />}
-          </button>
+          </div>
+          <div className="flex items-center space-x-2 relative">
+            {attachments.length > 0 && (
+              <div className="relative">
+                <button
+                  className="border p-2 rounded-full hover:bg-gray-100 text-red-600"
+                  aria-label="View Attachments"
+                  onClick={(e) => {
+                    e.stopPropagation(); // Prevent row click when pin is clicked
+                    handleAttachmentClick();
+                  }} // Handle click event
+                >
+                  <GrAttachment />
+                </button>
+                <span className="absolute -top-1 -right-1 bg-red-100 text-red-900 text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                  {attachments.length}
+                </span>
+              </div>
+            )}
+            {/* Dropdown Menu */}
+            <button
+              className="border p-2 rounded-full hover:bg-gray-100"
+              aria-label="Toggle Chapter"
+              onClick={(e) => {
+                e.stopPropagation(); // Prevent row click toggle when button is clicked
+                toggleChapter();
+              }}
+            >
+              {chapterExpanded ? <FaChevronUp /> : <FaChevronDown />}
+            </button>
+          </div>
         </div>
       </div>
 
