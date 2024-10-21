@@ -40,7 +40,7 @@ const GraduateList = ({
     if (error?.status === 404) {
       return "No Graduates Yet!";
     }
-    return "No Graduates Yet";
+    return "No Graduates Found";
   };
 
   return (
