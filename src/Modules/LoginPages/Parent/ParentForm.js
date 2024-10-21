@@ -18,8 +18,8 @@ const ParentForm = () => {
   const dispatch = useDispatch()
   // const { loading, parentLogin } = useParentLogin();
   const [showPassword, setShowPassword] = useState(false);
+  const {loading} = useSelector((store) => store.common.auth);
   const navigate = useNavigate();
-  const {loading} = useSelector((store) => store.common.auth)
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!parentDetails.email || !parentDetails.password) {
@@ -27,18 +27,7 @@ const ParentForm = () => {
     }
 
     console.log("Parent Details: ", parentDetails)
-    dispatch(parentLogin(parentDetails))
-
-    .then(({ redirect }) => {
-      console.log("This is redirect ::  ", redirect)
-      navigate('/parent_dash');
-    })
-
-
-  
-    .catch((error) => {
-      toast.error(error);
-    });
+    dispatch(parentLogin({parentDetails,navigate}))
   };
   
 

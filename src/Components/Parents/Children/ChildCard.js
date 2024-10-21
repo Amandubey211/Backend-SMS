@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from "react-router-dom";
 import rightArrow from '../../../Assets/ParentAssets/svg/right-arrow.svg'; // Ensure this path is correct
 import { useTranslation } from 'react-i18next'; // Import useTranslation hook
-
+import profileIcon from '../../../Assets/DashboardAssets/profileIcon.png'
 const ChildCard = ({ student }) => {
     const navigate = useNavigate();
     const { t } = useTranslation('prtChildrens'); // Initialize i18n
@@ -72,7 +72,7 @@ const ChildCard = ({ student }) => {
             onMouseLeave={(e) => (e.currentTarget.style.boxShadow = '0px 2px 4px rgba(0, 0, 0, 0.1)')}
         >
             <div className="flex flex-col items-center">
-                <img className="w-24 h-24 rounded-full mb-6" src={student.profile} alt={student.name} />
+                <img className="w-24 h-24 rounded-full mb-6 border" src={student?.profile?.length != 0 ?student?.profile:profileIcon  } alt={student.name} />
                 <p className="font-semibold text-center mb-6 text-lg">{student.name}</p>
                 <div className="flex justify-center items-center mb-6 space-x-4 text-sm text-gray-600">
                     <p>{t("Class")}: <span className="font-semibold">{student.class || 'N/A'}</span></p>

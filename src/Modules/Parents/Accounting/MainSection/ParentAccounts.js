@@ -124,9 +124,9 @@ const AccountingSection = () => {
           )}
         </div>
 
-        <div className="p-4">
+        <div className="p-4 flex items-center justify-center w-full ">
           {/* Adjusting the table layout to show rows based on pagination */}
-          <div className="shadow rounded-lg">
+          <div className=" rounded-lg">
             {loading ? (
               // Show spinner when loading
               <>
@@ -141,10 +141,10 @@ const AccountingSection = () => {
               </>
             ) : paginatedData.length === 0 ? (
               // No data available, show icon and message
-              <>
+              <div className="flex flex-col items-center p-10">
                 <FaMoneyBillWave className="text-gray-400 text-6xl mb-4" />
                 <p className="text-gray-600 text-lg">{t("No Fees Yet")}</p>
-              </>
+              </div>
             ) : (
               // Display paginated data in table
 

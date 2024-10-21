@@ -5,12 +5,11 @@ import { fetchChildren } from '../../../../Store/Slices/Parent/Dashboard/dashboa
 import Spinner from "../../../../Components/Common/Spinner";
 import { FaChild } from 'react-icons/fa';
 import { useTranslation } from 'react-i18next';
-
+import profileIcon from '../../../../Assets/DashboardAssets/profileIcon.png'
 // Memoized StudentCard to prevent unnecessary re-renders
 const StudentCard = React.memo(({ student, index }) => {
   const { t } = useTranslation('prtChildrens');
-  const defaultImage = "https://via.placeholder.com/150";
-  const profileImage = student?.profile || defaultImage;
+  const profileImage = student?.profile ;
 
   const studentClass = student?.class || "N/A";
   const admissionNumber = student?.admissionNumber || "N/A";
@@ -18,15 +17,15 @@ const StudentCard = React.memo(({ student, index }) => {
   const group = student?.group || "N/A";
 
   return (
-    <div className="border-b p-4 pb-4 pt-6 text-center relative border-gray-300">
+    <div className=" p-4 pb-4 pt-6 text-center relative border-gray-300">
       <div className="absolute top-2 left-2 bg-gray-100 text-gray-800 py-1 px-2 rounded-l-sm rounded-r-sm text-sm">
         {t("Child")}: {index + 1}
       </div>
       <img
-        src={profileImage}
+        src={profileImage?.length != 0 ? profileImage : profileIcon}
         alt={student?.name || 'Unknown'}
-        className="w-20 h-20 rounded-full mx-auto mb-2"
-        onError={(e) => { e.target.onerror = null; e.target.src = defaultImage; }}
+        className="w-20 h-20 rounded-full mx-auto mb-2 border"
+      
       />
       <h2 className="text-lg font-semibold mb-1">{student?.name || "N/A"}</h2>
       <div className="text-gray-600 text-sm mb-1">

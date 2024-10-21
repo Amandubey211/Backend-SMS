@@ -64,11 +64,11 @@ const DashCard = ({
   ];
 
   return (
-    <div className="flex justify-center py-4"> {/* Adjusted padding */}
+    <div className="flex justify-around py-4 gap-1  w-full px-2"> {/* Adjusted padding */}
       {cardData.map((item, index) => (
         <div 
           key={index} 
-          className={`p-4 px-6 mx-6 flex-none w-[23%] rounded-lg border ${item.bgColor} hover:shadow-lg transition-shadow duration-200`} // Adjusted padding, margin, and width
+          className={`p-4 px-6  flex-none w-[24%]  rounded-lg border ${item.bgColor} hover:shadow-lg transition-shadow duration-200`} // Adjusted padding, margin, and width
         >
           <div className="flex gap-4 items-center"> {/* Adjusted gap between icon and text */}
             {/* Icon */}

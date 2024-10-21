@@ -42,7 +42,7 @@ const AllSubject = ({ studentId }) => {
         setLoading(false);
       } catch (err) {
         console.error('Error fetching subjects:', err);
-        setError('Failed to fetch subjects');
+        setError('No Subject Found ');
         setLoading(false);
       }
     };

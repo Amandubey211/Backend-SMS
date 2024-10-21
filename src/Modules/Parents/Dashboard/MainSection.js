@@ -10,7 +10,7 @@ const ParentSection = () => {
   return (
     <div className="h-full w-full">
       <div className="w-full">
-        <div className="flex flex-wrap justify-center gap-3 py-4">
+        <div className="flex flex-wrap justify-center gap-3 py-4 w-full">
          
             <DashCard/>
           
