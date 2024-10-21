@@ -80,7 +80,7 @@ const MainSection = ({ selectedSubjectId }) => {
 
   return (
     <div className="flex min-h-screen my-2">
-      <div className="w-[65%] bg-white p-2 border-l">
+      <div className="w-[65%] bg-white p-2">
         <div className="bg-white p-2 rounded-lg">
           {/* Show loading or error state for Chapters */}
           {loading ? (
