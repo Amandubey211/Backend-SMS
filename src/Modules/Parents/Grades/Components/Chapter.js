@@ -132,7 +132,7 @@ const Chapter = ({ title, chapterNumber, imageUrl, assignments, quizzes, attachm
                       </span>
                       {attachment.label && (
                         <span className="text-gray-500 text-sm italic">
-                          {attachment.label}
+                          {truncateFileName(attachment.label)}
                         </span>
                       )}
                     </div>
