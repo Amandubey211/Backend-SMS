@@ -159,11 +159,13 @@ const Chapter = ({ title, chapterNumber, imageUrl, assignments, quizzes, attachm
 
                   {/* Preview Button */}
                   <button
-                    className="text-green-500 hover:text-green-600"
                     onClick={() => openPreview(attachment.url)}
+                    className="text-green-500 transition p-1 border rounded-full transform hover:scale-110 cursor-pointer"
+                    aria-label="Preview"
                   >
                     <FaEye size={20} />
                   </button>
+
                 </div>
               ))}
             </div>
@@ -177,10 +179,11 @@ const Chapter = ({ title, chapterNumber, imageUrl, assignments, quizzes, attachm
           <div className="bg-white rounded-lg shadow-lg w-full max-w-2xl p-4 relative">
             <button
               onClick={closePreview}
-              className="absolute top-2 right-2 w-10 h-10 flex items-center justify-center rounded-full bg-gradient-to-r from-pink-500 to-purple-500 text-white hover:from-pink-600 hover:to-purple-600 transition-colors duration-500 ease-in-out shadow-lg"
+              className="absolute top-2 right-2 w-8 h-8 flex items-center justify-center rounded-full bg-gradient-to-r from-pink-500 to-purple-500 text-white hover:from-pink-600 hover:to-purple-600 transition-colors duration-500 ease-in-out shadow-lg"
             >
               ✕
             </button>
+
 
             <embed
               src={previewUrl}
