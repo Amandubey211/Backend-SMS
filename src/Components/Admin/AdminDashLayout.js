@@ -9,11 +9,13 @@ const DashLayout = ({
   hideAvatarList,
   hideStudentView,
 }) => {
-  const isSidebarOpen = useSelector((state) => state.sidebar.isOpen);
+  const isSidebarOpen = useSelector(
+    (state) => state.common.user.sidebar.isOpen
+  );
   const sidebarWidth = isSidebarOpen ? "15%" : "7%"; // Adjust the width based on sidebar state
 
   return (
-    <div className="flex w-full min-h-screen overflow-x-hidden">
+    <div className="flex w-full min-h-screen overflow-x-hidden  ">
       <SideMenubar />
       <div
         className={`transition-all duration-500 flex-1 h-full ml-${sidebarWidth}`}

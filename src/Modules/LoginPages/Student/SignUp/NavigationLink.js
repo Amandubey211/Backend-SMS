@@ -4,7 +4,7 @@ import { NavLink } from "react-router-dom";
 import { setStep } from "../../../../Redux/Slices/Auth/AuthSlice";
 
 const Navigation = () => {
-  const step = useSelector((store) => store.Auth.step);
+  const step = useSelector((store) => store.common.auth.step);
   const dispatch = useDispatch();
   return (
     <div className="flex justify-between items-center px-1">
@@ -32,7 +32,7 @@ const Navigation = () => {
           <span>Back</span>
         </NavLink>
       )}
-      <span className="opacity-75 text-xs text-red-600">
+      <span className="opacity-75 text-xs text-gray-500">
         ( * ) indicates Required
       </span>
     </div>

@@ -1,4 +1,4 @@
-import axios from "axios";
+
 import React, { useEffect, useState } from "react";
 import {
   MdOutlineQuiz,
@@ -6,56 +6,61 @@ import {
   MdKeyboardArrowUp,
   MdKeyboardArrowDown,
 } from "react-icons/md";
+import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
+import { FiLoader } from "react-icons/fi";
 import { FaBook } from "react-icons/fa";
 import { GoAlertFill } from "react-icons/go";
-import { FiLoader } from "react-icons/fi";
-import { baseUrl } from "../../../config/Common";
-
-const GradeAccordionItem = ({ grades, getData, loading, onToggleSidebar }) => {
+import { fetchStudentSubjects } from "../../../Store/Slices/Admin/Users/Students/student.action";
+const GradeAccordionItem = ({  getData }) => {
   const [isOpen, setIsOpen] = useState(null);
-  const [studentSubjects, setStudentSubjects] = useState([]);
-  const { studentId } = useParams();
 
   const toggleOpen = (index) => {
-    const newOpenState = isOpen === index ? null : index;
-    setIsOpen(newOpenState);
-    onToggleSidebar(newOpenState !== null); // Toggle sidebar visibility based on accordion state
+    setIsOpen((prevState) => (prevState === index ? null : index));
   };
 
-  useEffect(() => {
-    const fetchSubjects = async () => {
-      try {
-        const token = localStorage.getItem(`parent:token`);
-        if (!token) {
-          throw new Error("Authentication token not found");
-        }
-        const response = await axios.get(`${baseUrl}/api/studentDashboard/subjects/${studentId}`, {
-          headers: { Authentication: token },
-        });
-        setStudentSubjects(response.data.subjects);
-      } catch (err) {
-        console.error("Error fetching subjects:", err);
-      }
-    };
+  // const getIconForType = (type) => {
+  //   switch (type) {
+  //     case "Quiz":
+  //       return (
+  //         <MdOutlineQuiz style={{ marginRight: 8 }} className="text-blue-500" />
+  //       );
+  //     case "Assignment":
+  //       return (
+  //         <MdAssignment style={{ marginRight: 8 }} className="text-green-500" />
+  //       );
+  //     default:
+  //       return null;
+  //   }
+  // };
+  const getColorForStatus = (status) => {
+    return status === "Submit" ? "text-green-500" : "text-red-500";
+  };
+  const { studentId } = useParams();
+  const {grades,studentSubjects,loading} = useSelector((store) => store.admin.all_students);
+  const dispatch = useDispatch();
+  useEffect(()=>{
+dispatch(fetchStudentSubjects(studentId));
 
-    fetchSubjects();
-  }, [studentId]);
+
+  },[dispatch])
 
   return (
     <>
       {studentSubjects.map((i, index) => (
-        <div key={i._id} className="border-b p-3" onClick={() => { if (isOpen !== index) getData(i._id); }}>
+        <div key={i._id} className="border-b p-3" onClick={() => { if (isOpen !== index) getData(i._id) }}>
           <div
             className="cursor-pointer py-3 px-5 flex items-center justify-between"
             onClick={() => toggleOpen(index)}
           >
-            <div className="flex justify-center items-center gap-3">
+            <div className="flex justify-center items-center gap-3 ">
               <div className="border rounded-full p-2">
                 <FaBook className="text-[2rem] text-pink-400" />
               </div>
-              <span className="font-bold">{i.name}</span>
+
+              <span className="font-bold">{i?.name}</span>
             </div>
+
             <span>
               {isOpen === index ? (
                 <MdKeyboardArrowUp className="border rounded text-black" />
@@ -79,25 +84,30 @@ const GradeAccordionItem = ({ grades, getData, loading, onToggleSidebar }) => {
                 </thead>
                 {loading ? (
                   <tr>
-                    <td className="text-center text-2xl py-10 text-gray-400" colSpan={6}>
+                    <td className="text-center text-2xl py-10 text-gray-400" colSpan={6} >
                       <div className="flex w-full flex-col items-center">
-                        <FiLoader className="animate-spin mr-2 w-[2rem] h-[2rem]" />
+                        <FiLoader className="animate-spin mr-2 w-[2rem] h-[2rem] " />
                         <p className="text-gray-800 text-sm">Loading...</p>
                       </div>
                     </td>
                   </tr>
                 ) : (
                   <tbody className="w-full">
-                    {grades?.length > 0 ? (
-                      grades.map((i, idx) => (
+                    {grades?.grades?.length > 0 ?
+                     (
+                      grades?.grades.map((i, idx) => (
                         <tr key={idx} className="bg-white">
                           <td className="px-5 py-2 flex items-center w-[10rem]">
                             <span>{i?.Name}</span>
                           </td>
-                          <td className="px-5 py-2">{i?.dueDate.slice(0, 10)}</td>
-                          <td className="px-5 py-2">{i?.submittedDate.slice(0, 10)}</td>
+                          <td className="px-5 py-2">{i?.dueDate?.slice(0, 10)}</td>
+                          <td className="px-5 py-2">{i?.submittedDate?.slice(0, 10)}</td>
                           <td className="px-5 py-2">
-                            <span className={`${i?.status === 'Submit' ? 'text-green-500' : 'text-red-500'} font-medium`}>
+                            <span
+                              className={`${getColorForStatus(
+                                i?.status
+                              )} font-medium `}
+                            >
                               {i?.status}
                             </span>
                           </td>
@@ -107,9 +117,9 @@ const GradeAccordionItem = ({ grades, getData, loading, onToggleSidebar }) => {
                     ) : (
                       <tr className="w-full text-center text-gray-500 py-2">
                         <td className="px-5 py-2" colSpan="5">
-                          <div className="flex items-center justify-center flex-col text-2xl">
+                          <div className="flex  items-center justify-center flex-col text-2xl">
                             <GoAlertFill className="text-[3rem]" />
-                            No Data Found
+                            No  Data Found
                           </div>
                         </td>
                       </tr>
@@ -117,6 +127,7 @@ const GradeAccordionItem = ({ grades, getData, loading, onToggleSidebar }) => {
                   </tbody>
                 )}
               </table>
+
             </div>
           )}
         </div>

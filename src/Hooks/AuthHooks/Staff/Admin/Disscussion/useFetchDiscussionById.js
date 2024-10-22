@@ -10,7 +10,6 @@ const useFetchDiscussionById = () => {
   const [error, setError] = useState(null);
   const [discussion, setDiscussion] = useState(null);
 
-  
   const { role } = useSelector((store) => store.Auth);
   const { did } = useParams();
 

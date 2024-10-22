@@ -2,20 +2,22 @@ import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import Header from "./Components/Header";
 import SubjectSideBar from "../../../Component/SubjectSideBar";
-import useFetchDiscussionById from "../../../../../../../Hooks/AuthHooks/Staff/Admin/Disscussion/useFetchDiscussionById";
 import { ImSpinner3 } from "react-icons/im";
 import { FaExclamationTriangle } from "react-icons/fa";
 import NoDataFound from "../../../../../../../Components/Common/NoDataFound";
 import Spinner from "../../../../../../../Components/Common/Spinner";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchStudentDiscussionById } from "../../../../../../../Store/Slices/Student/MyClass/Class/Subjects/Discussion/discussion.action";
 
 const StudentMainSection = () => {
+  const dispatch = useDispatch()
   const { did } = useParams();
-  const { discussion, error, fetchDiscussionById, loading } =
-    useFetchDiscussionById();
+
+  const { discussion, loading, error } = useSelector((store) => store?.student?.studentDiscussion)
 
   useEffect(() => {
-    fetchDiscussionById(did);
-  }, [did, fetchDiscussionById]);
+    dispatch(fetchStudentDiscussionById(did))
+  }, [did, dispatch]);
 
   let content;
 
@@ -31,7 +33,7 @@ const StudentMainSection = () => {
   } else if (discussion) {
     content = (
       <>
-        <Header discussion={discussion} />
+        <Header />
         <div className="p-6 bg-white">
           <h1 className="text-lg font-semibold">{discussion.title}</h1>
           <div className="text-gray-700 mb-3">

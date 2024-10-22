@@ -1,5 +1,5 @@
 import React from "react";
-import LibraryTable from "../../../Components/Parents/Libary/LibraryList";
+import LibraryTable from "../../../Components/Parents/Libary/LibraryTable";
 
 const ParentSection = () => {
   return (
@@ -7,7 +7,7 @@ const ParentSection = () => {
       <div className=" w-full">
         
         
-        <div className="flex flex-wrap justify-between items-start  border-y">
+        <div className="flex flex-wrap justify-between items-start">
           <div className="w-full  border-r" >
             <LibraryTable />
           </div>

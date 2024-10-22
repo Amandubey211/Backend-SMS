@@ -11,7 +11,6 @@ const useEditSyllabus = () => {
   const [error, setError] = useState(null);
   const { cid } = useParams();
 
-  
   const { role } = useSelector((store) => store.Auth);
 
   const editSyllabus = useCallback(

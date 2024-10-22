@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import AddRubricModal from "../../Rubric/Components/AddRubricModal";
 import AssignmentDetail from "../../../Component/AssignmentDetail";
 import DateDetail from "../../../Component/DateDetail";
@@ -7,102 +7,112 @@ import ButtonsGroup from "../../../Component/ButtonsGroup";
 import RubricButton from "./RubricButton";
 import Spinner from "../../../../../../Components/Common/Spinner";
 import NoDataFound from "../../../../../../Components/Common/NoDataFound";
+import { useSelector } from "react-redux";
 
-const AssignmentDetailCard = ({
-  assignment,
-  loading,
-  error,
-  onRefresh,
-  isPublish,
-}) => {
+const AssignmentDetailCard = () => {
+  const {
+    assignmentDetails: assignment,
+    loading,
+    error,
+  } = useSelector((store) => store.admin.assignments);
   const [isModalOpen, setModalOpen] = useState(false);
-  const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [criteriaList, setCriteriaList] = useState([]);
   const [existingRubricId, setExistingRubricId] = useState(null);
-  const [selectedAssignmentId, setSelectedAssignmentId] = useState("");
-
-  useEffect(() => {
-    if (assignment && assignment._id) {
-      setSelectedAssignmentId(assignment._id);
-    }
-  }, [assignment]);
 
   const handleViewRubric = () => {
     setModalOpen(true);
   };
 
   if (loading) return <Spinner />;
-  if (error) return <NoDataFound />;
+  if (error || !assignment) return <NoDataFound />;
 
-  if (!assignment) return <NoDataFound />;
-
-  const {
-    points,
-    allowedAttempts,
-    allowNumberOfAttempts,
-    submissionType,
-    assignTo,
-    dueDate,
-    availableFrom,
-  } = assignment;
+  const assignmentDetails = [
+    {
+      label: "Assignment Points",
+      value: `${assignment?.points || "N/A"} Points`,
+      type: "assignment",
+    },
+    {
+      label: "Allowed Attempts",
+      value: `${
+        assignment?.allowNumberOfAttempts
+          ? assignment.allowNumberOfAttempts
+          : "Unlimited"
+      } Times`,
+      type: "assignment",
+    },
+    {
+      label: "Submitting By",
+      value: assignment?.submissionType || "N/A",
+      type: "assignment",
+    },
+    {
+      label: "This Assignment For",
+      value: assignment?.assignTo || "N/A",
+      type: "assignment",
+    },
+    {
+      label: "Available From",
+      value: assignment?.availableFrom
+        ? new Date(assignment.availableFrom).toLocaleDateString()
+        : "DD/MM/YY",
+      type: "date",
+    },
+    {
+      label: "Due Date",
+      value: assignment?.dueDate
+        ? new Date(assignment.dueDate).toLocaleDateString()
+        : "DD/MM/YY",
+      type: "date",
+    },
+  ];
 
   return (
     <div className="max-w-sm p-4 bg-white" aria-label="Assignment Card">
-      <ButtonsGroup
-        type="Assignment"
-        data={assignment}
-        onRefresh={onRefresh} // Pass the refresh callback
-      />
+      <ButtonsGroup type="Assignment" data={assignment} loading={loading} />
 
       <SpeedGradeButton
         type="Assignment"
         sgid={assignment._id}
         name={assignment.name}
-        isPublish={isPublish}
+        isPublish={assignment?.publish}
       />
 
-      <AssignmentDetail
-        label="Assignment Points"
-        value={`${points || "N/A"} Points`}
-      />
-      <AssignmentDetail
-        label="Allowed Attempts"
-        value={`${allowNumberOfAttempts ? allowNumberOfAttempts : 0} Times`}
-      />
-      <AssignmentDetail label="Submitting By" value={submissionType} />
-      <AssignmentDetail label="This Assignment For" value={assignTo} />
-      <DateDetail
-        label="Due Date"
-        value={dueDate ? new Date(dueDate).toLocaleDateString() : "DD/MM/YY"}
-      />
-      <DateDetail
-        label="Available From"
-        value={
-          availableFrom
-            ? new Date(availableFrom).toLocaleDateString()
-            : "DD/MM/YY"
-        }
-      />
+      <div className="ps-3 ">
+        {assignmentDetails.map((detail, index) => {
+          if (detail.type === "assignment") {
+            return (
+              <AssignmentDetail
+                key={index}
+                label={detail.label}
+                value={detail.value}
+              />
+            );
+          } else if (detail.type === "date") {
+            return (
+              <DateDetail
+                key={index}
+                label={detail.label}
+                value={detail.value}
+              />
+            );
+          }
+          return null;
+        })}
+      </div>
+
       <RubricButton onClick={handleViewRubric} />
 
       <AddRubricModal
         type="assignment"
-        AssignmentId={selectedAssignmentId} // Pass the selected assignment ID
+        AssignmentId={assignment?._id}
         isOpen={isModalOpen}
         onClose={() => setModalOpen(false)}
-        // onAddCriteria={() => setSidebarOpen(true)}
         criteriaList={criteriaList}
         setCriteriaList={setCriteriaList}
         setExistingRubricId={setExistingRubricId}
-        readonly={true} // Set readonly to true
+        readonly={true}
       />
-      {/* <Sidebar
-        isOpen={isSidebarOpen}
-        onClose={() => setSidebarOpen(false)}
-        title="Add New Criteria"
-      >
-        <AddNewCriteriaForm />
-      </Sidebar> */}
     </div>
   );
 };

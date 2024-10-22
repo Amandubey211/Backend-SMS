@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, memo } from "react";
 import { Bar } from "react-chartjs-2";
-import useGetAttendanceData from "../../../../Hooks/AuthHooks/Staff/Admin/Dashboard/useGetAttendanceData";
-import { FiCalendar } from "react-icons/fi";
-import Fallback from "../../../../Components/Common/Fallback";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchAttendanceData } from "../../../../Store/Slices/Admin/Dashboard/adminDashboard.action"; // Adjust path if needed
+import { FiCalendar, FiAlertCircle } from "react-icons/fi"; // Error and No data icons
 import Spinner from "../../../../Components/Common/Spinner";
 
 const TotalAttendanceGraph = () => {
@@ -13,13 +13,15 @@ const TotalAttendanceGraph = () => {
   const [year, setYear] = useState(currentYear);
   const [gender, setGender] = useState("Both"); // New state for gender filter
 
-  const { attendanceData, loading, error, fetchAttendanceData } =
-    useGetAttendanceData();
+  const dispatch = useDispatch();
+  const { attendanceData, loading, error } = useSelector(
+    (state) => state?.admin?.adminDashboard
+  );
 
   useEffect(() => {
     console.log(`Fetching data for: month=${month}, year=${year}`);
-    fetchAttendanceData(month, year);
-  }, [month, year, fetchAttendanceData]);
+    dispatch(fetchAttendanceData({ month, year }));
+  }, [month, year, dispatch]);
 
   const [graphData, setGraphData] = useState(null);
 
@@ -28,7 +30,7 @@ const TotalAttendanceGraph = () => {
       const attendance = attendanceData.attendanceData;
 
       // Sort classes numerically and place unnamed classes at the end
-      const sortedAttendance = attendance.sort((a, b) => {
+      const sortedAttendance = [...attendance].sort((a, b) => {
         const extractNumber = (str) => {
           const match = str.match(/\d+/);
           return match ? parseInt(match[0]) : Infinity;
@@ -108,14 +110,6 @@ const TotalAttendanceGraph = () => {
     setGender(e.target.value);
   };
 
-  if (loading) {
-    return <Spinner />;
-  }
-
-  if (error) {
-    return <p>Error: {error}</p>;
-  }
-
   // Generate array of years dynamically
   const availableYears = [
     { label: "Current Year", value: "Current Year" },
@@ -126,7 +120,7 @@ const TotalAttendanceGraph = () => {
   const yearLabel = year === currentYear ? "Current Year" : "Past Year";
 
   return (
-    <div className="bg-white p-4">
+    <div className="bg-white p-4 h-[100%] border border-red">
       <div className="flex justify-between items-center mb-4">
         <div>
           <h2 className="text-xl font-semibold">Today's Attendance</h2>
@@ -171,7 +165,21 @@ const TotalAttendanceGraph = () => {
           </select>
         </div>
       </div>
-      {graphData ? (
+      {loading ? (
+        <div className="flex flex-col items-center justify-center">
+          <Spinner />
+        </div>
+      ) : error ? (
+        <div className="flex flex-col items-center justify-center text-gray-400">
+          <FiAlertCircle className="w-12 h-12 mb-2" />
+          <p>{`Error: ${error}`}</p>
+        </div>
+      ) : !attendanceData || attendanceData?.attendanceData?.length === 0 ? (
+        <div className="flex flex-col items-center justify-center text-gray-400 h-full">
+          <FiCalendar className="w-12 h-12 mb-2" />
+          <p>No Attendance Data Found</p>
+        </div>
+      ) : graphData ? (
         <>
           <div style={{ height: "300px" }}>
             <Bar
@@ -252,12 +260,7 @@ const TotalAttendanceGraph = () => {
             </div>
           </div>
         </>
-      ) : (
-        <div className="flex flex-col items-center justify-center h-64">
-          <FiCalendar className="w-12 h-12 text-gray-400" />
-          <p className="text-gray-400">No Attendance Data Found</p>
-        </div>
-      )}
+      ) : null}
     </div>
   );
 };

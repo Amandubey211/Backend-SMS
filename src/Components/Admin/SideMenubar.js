@@ -10,20 +10,22 @@ import {
 import { FiLogOut } from "react-icons/fi";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { useDispatch, useSelector } from "react-redux";
-import { toggleSidebar } from "../../Redux/Slices/Common/SidebarSlice.js";
-import useStaffLogout from "../../Hooks/AuthHooks/Staff/useStaffLogOut.js";
+import { staffLogout } from "../../Store/Slices/Common/Auth/actions/staffActions"; // Import staffLogout action
 import LogoutConfirmationModal from "../Common/LogoutConfirmationModal.js";
 import profileIcon from "../../Assets/DashboardAssets/profileIcon.png";
+import { toggleSidebar } from "../../Store/Slices/Common/User/reducers/userSlice.js";
+
 const isActivePath = (path, locationPath) => locationPath.startsWith(path);
+
 const SideMenubar = () => {
   const dispatch = useDispatch();
   const location = useLocation();
-  const { staffLogout } = useStaffLogout();
   const navigate = useNavigate();
+
   const { isOpen, role, userDetails } = useSelector((state) => ({
-    isOpen: state.sidebar.isOpen,
-    role: state.Auth.role,
-    userDetails: state.Auth.userDetail,
+    isOpen: state.common.user.sidebar.isOpen,
+    role: state.common.auth.role,
+    userDetails: state.common.user.userDetails, // Updated to fetch from User slice
   }));
 
   const [openItems, setOpenItems] = useState([]);
@@ -45,8 +47,9 @@ const SideMenubar = () => {
   const confirmLogout = async () => {
     setIsLoggingOut(true);
     try {
-      await staffLogout();
+      await dispatch(staffLogout()).unwrap(); // Dispatch the staffLogout action
       setIsLogoutModalOpen(false);
+      navigate("/stafflogin"); // Redirect to login after logout
     } finally {
       setIsLoggingOut(false);
     }
@@ -63,8 +66,6 @@ const SideMenubar = () => {
     ) {
       navigate("/users/my/profile");
     } else {
-      // Handle any other roles or add a default navigation
-
       console.warn(
         "Role not recognized. Navigation not defined for this role."
       );
@@ -228,7 +229,6 @@ const SideMenubar = () => {
           <div className="flex-1 ml-3">
             <h2 className="font-semibold">
               {userDetails?.fullName?.slice(0, 8) ||
-                userDetails?.adminName?.slice(0, 8) ||
                 "User"}
             </h2>
             <p className="text-gray-500 capitalize text-sm">{role}</p>

@@ -1,240 +1,162 @@
-import React, { useState, useEffect, useRef } from "react";
-import { CiMail, CiSearch } from "react-icons/ci";
+import React, { useState, useEffect } from "react";
 import { TbBell } from "react-icons/tb";
-import { IoLanguage, IoSettingsOutline } from "react-icons/io5";
-import { MdOutlineKeyboardDoubleArrowRight } from "react-icons/md";
-import { FaUser } from "react-icons/fa";
+import { IoSettingsOutline } from "react-icons/io5";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import IconButton from "./IconButton";
+import LeftHeading from "./LeftHeading";
 import LogoutConfirmationModal from "./LogoutConfirmationModal";
 import useStaffLogout from "../../Hooks/AuthHooks/Staff/useStaffLogOut";
-import { RiTimeZoneLine } from "react-icons/ri";
-import { IoIosLogOut } from "react-icons/io";
 import Sidebar from "./Sidebar";
 import NotificationBar from "./NotificationBar";
+import SettingDropdown from "./SettingDropdown";
 
-const IconButton = ({ icon: Icon, label, onClick }) => (
-  <button onClick={onClick} aria-label={label}>
-    <Icon className="w-8 h-8 text-purple-500 p-1 border rounded-full" />
-  </button>
-);
-
-const LeftHeading = ({ leftHeading, navigate }) => (
-  <div className="flex-1 text-md font-semibold ps-4 capitalize">
-    {leftHeading[1] === undefined ? (
-      <span className="text-gradient capitalize">{leftHeading[0]}</span>
-    ) : (
-      <div className="flex items-center gap-1">
-        <span className="opacity-55 font-bold flex items-center text-gray-500">
-          <button
-            onClick={() => navigate(-1)}
-            className="mr-1 capitalize"
-            title="Back"
-            aria-label="Go back"
-          >
-            {leftHeading[0]}
-          </button>
-          <MdOutlineKeyboardDoubleArrowRight
-            className="text-2xl"
-            aria-hidden="true"
-          />
-        </span>
-        <h1 className="text-gradient text-md font-bold">{leftHeading[1]}</h1>
-      </div>
-    )}
-  </div>
-);
-
-const SearchBar = () => (
-  <div className="relative flex items-center max-w-xs w-full mr-2">
-    <label htmlFor="search" className="sr-only">
-      Search
-    </label>
-    <input
-      id="search"
-      type="text"
-      placeholder="Search here"
-      className="px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-purple-300 w-full"
-      aria-label="Search here"
-    />
-    <button className="absolute right-3" aria-label="Search">
-      <CiSearch className="w-5 h-5 text-gray-500" />
-    </button>
-  </div>
-);
-
-const Navbar = ({ hideSearchbar, hideAvatarList, hideStudentView }) => {
+const Navbar = () => {
   const [isOpenNotification, setIsOpenNotification] = useState(false);
   const [notificationCount, setNotificationCount] = useState(0);
-   useEffect(()=>{
-     function getNotificationsFromIndexedDB() {
-       return new Promise((resolve, reject) => {
-         const dbPromise = indexedDB.open('firebase-messaging-store', 1);
-         dbPromise.onsuccess = function(event) {
-           const db = event.target.result;
-           const transaction = db.transaction(['notifications'], 'readonly');
-           const objectStore = transaction.objectStore('notifications');
-           const request = objectStore.getAll();
-
-           request.onsuccess = function() {
-             resolve(request.result);
-
-           };
-
-           request.onerror = function(event) {
-
-             reject(event);
-           };
-         };
-
-         dbPromise.onerror = function(event) {
-           reject(event);
-         };
-       });
-     };
-     getNotificationsFromIndexedDB().then((notifications) => {
-       console.log('Retrieved notifications from IndexedDB:', notifications);
-       localStorage.setItem('NotificationCount',notifications?.length)
-       // Display notifications in your UI
-     }).catch((error) => {
-       console.error('Failed to retrieve notifications from IndexedDB:', error);
-     });
-   },[])
-   useEffect(()=>{
-     setNotificationCount(localStorage.getItem('NotificationCount'));
-   },[localStorage.getItem('NotificationCount'),notificationCount]);
-  const openNotification = () => {
-    setIsOpenNotification(true);
-  };
+  const [showSetting, setShowSetting] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const navigate = useNavigate();
 
   const leftHeading = useSelector(
-    (store) => store.Common.NavbarData.leftHeading
+    (store) => store.common.user.navbar.leftHeading
   );
-  const navigate = useNavigate();
-  const [showSetting, setShowSetting] = useState(false);
-  const dropdownRef = useRef(null);
+  const role = useSelector((store) => store.common.auth.role);
+  const activeAcademicYear = useSelector((store) => {
+    if (role === "admin" || role === "teacher" || role === "accountant") {
+      return store.common.auth?.AcademicYear?.find((year) => year?.isActive)
+        ?.academicYear;
+    }
+    return null; // Or provide a default value if necessary
+  });
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const openModal = () => {
-    setIsModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-  };
   const { staffLogout } = useStaffLogout();
+
+  // Fetch notifications from IndexedDB
+  const getNotificationsFromIndexedDB = () => {
+    return new Promise((resolve, reject) => {
+      const dbPromise = indexedDB.open("firebase-messaging-store", 1);
+
+      dbPromise.onsuccess = function (event) {
+        const db = event.target.result;
+        const transaction = db.transaction(["notifications"], "readonly");
+        const objectStore = transaction.objectStore("notifications");
+        const request = objectStore.getAll();
+
+        request.onsuccess = function () {
+          resolve(request.result);
+        };
+
+        request.onerror = function (event) {
+          reject(event);
+        };
+      };
+
+      dbPromise.onerror = function (event) {
+        reject(event);
+      };
+    });
+  };
+
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const notifications = await getNotificationsFromIndexedDB();
+        localStorage.setItem("NotificationCount", notifications?.length);
+      } catch (error) {
+        console.error("Failed to retrieve notifications:", error);
+      }
+    };
+    fetchNotifications();
+  }, []);
+
+  useEffect(() => {
+    setNotificationCount(localStorage.getItem("NotificationCount"));
+  }, []);
+
+  const navigateProfile = () => {
+    const routes = {
+      parent: "/users/parent/profile",
+      admin: "/users/admin",
+      student: "/users/student/profile",
+      teacher: "/users/my/profile",
+      accountant: "/users/my/profile",
+      librarian: "/users/my/profile",
+      staff: "/users/my/profile",
+    };
+    navigate(routes[role] || "/");
+  };
+
   const logout = async () => {
     await staffLogout();
     setIsModalOpen(false);
   };
-  const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-
-  const handleClickOutside = (event) => {
-    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-      setShowSetting(false);
-    }
-  };
-
-  useEffect(() => {
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-  const role = useSelector((store) => store.Auth.role);
-  const navigateProfile = ()=>{
-       if(role== 'parent'){
-      navigate("/users/parent/profile")
-       }
-       if(role=='admin'){
-         navigate("/users/admin")
-       }
-       if(role=='student'){
-        navigate("/users/student/profile")
-       }
-       if(role=='teacher'| 'accountant'|'librarian'|'staff'){
-        navigate("/users/my/profile")
-       }
-     
-  }
 
   return (
-    <div className="sticky top-0 left-0 right-0 z-20 bg-white border-b shadow-sm ">
-      <div className="flex items-center p-2 py-3 bg-white ">
+    <div className="sticky top-0 left-0 right-0 z-20 bg-white border-b shadow-sm">
+      <div className="flex items-center p-2 py-2.5 bg-white">
+        {/* Left Heading */}
         <LeftHeading leftHeading={leftHeading} navigate={navigate} />
 
-        <div className="flex items-center space-x-2 border-l ml-3 pl-3 relative">
-          {/* <IconButton icon={CiMail} label="Mail" /> */}
+        <div className="flex items-center space-x-2 relative justify-center  ">
+          {role === "admin" || role === "teacher" || role === "accountant" ? (
+            <div className="border-r px-4 font-semibold text-gradient">
+              {activeAcademicYear && activeAcademicYear}
+            </div>
+          ) : null}
 
-          <div
-            onClick={() => openNotification()}
-            className="relative flex items-center cursor-pointer"
-          >
-            <IconButton icon={TbBell} label="Notifications" />
-            <p
-              className="absolute top-[-5px] right-0 bg-purple-500 rounded-full
-              text-white w-[20px] h-[20px] flex justify-center items-center "
-            >
-              {notificationCount || 0}
-            </p>
+          {/* Notification Icon with Count */}
+
+          <div className="relative ">
+            <IconButton
+              icon={TbBell}
+              label="Notifications"
+              onClick={() => setIsOpenNotification(true)}
+              className="hover:bg-gray-200 rounded-full transition-all duration-200"
+            />
+            {/* Notification Count */}
+            {notificationCount > 0 && (
+              <div className="absolute -top-1 -right-1 bg-purple-200 rounded-full  w-[20px] h-[20px] flex justify-center items-center text-sm">
+                <span className="text-gradient">{notificationCount || 0}</span>
+              </div>
+            )}
           </div>
 
-          <IconButton
+          {/* Settings Icon */}
+         <div>
+         <IconButton
             icon={IoSettingsOutline}
             label="Settings"
             onClick={() => setShowSetting(!showSetting)}
+            className="hover:bg-gray-200 rounded-full transition-all duration-200"
           />
+         </div>
 
-          {showSetting && (
-            <div
-              ref={dropdownRef}
-              className="absolute top-9 right-0 bg-white rounded-lg shadow-lg border px-4 py-3 flex flex-col gap-2 z-50 w-56"
-            >
-              <button
-                className="flex items-center gap-2 text-sm font-semibold text-gray-700 hover:text-purple-500 transition-transform duration-200 hover:bg-gray-100 px-3 py-2 rounded-md transform hover:translate-x-2"
-                onClick={navigateProfile}
-              >
-                <FaUser className="text-lg" />
-                Profile
-              </button>
-
-              <div className="flex items-center gap-2 text-sm font-semibold text-gray-700 hover:text-purple-500 transition-transform duration-200 hover:bg-gray-100 px-3 py-2 rounded-md transform hover:translate-x-2">
-                <IoLanguage className="text-lg" />
-                <select className="border-none outline-none bg-transparent text-gray-700 cursor-pointer">
-                  <option value="english">English</option>
-                  <option value="arabic">Arabic</option>
-                  <option value="Hindi">Hindi</option>
-                </select>
-              </div>
-
-              <div className="flex items-center gap-2 text-sm font-semibold text-gray-700 hover:bg-gray-100 px-3 py-2 rounded-md">
-                <RiTimeZoneLine className="text-lg" />
-                <span>{timeZone}</span>
-              </div>
-
-              <button
-                className="flex items-center gap-2 text-sm font-semibold text-red-600 hover:text-red-800 transition-transform duration-200 hover:bg-gray-100 px-3 py-2 rounded-md transform hover:translate-x-2"
-                onClick={openModal}
-              >
-                <IoIosLogOut className="text-lg" />
-                Logout
-              </button>
-            </div>
-          )}
+          {/* Dropdown for Settings */}
+          <div> <SettingDropdown
+            showSetting={showSetting}
+            setShowSetting={setShowSetting}
+            navigateProfile={navigateProfile}
+            openModal={() => setIsModalOpen(true)}
+          /></div>
+         
         </div>
       </div>
+
+      {/* Logout Confirmation Modal */}
       <LogoutConfirmationModal
         isOpen={isModalOpen}
-        onClose={closeModal}
+        onClose={() => setIsModalOpen(false)}
         onConfirm={logout}
       />
 
+      {/* Notification Sidebar */}
       <Sidebar
         isOpen={isOpenNotification}
         onClose={() => setIsOpenNotification(false)}
-        title={"Recent Notifications"}
+        title="Recent Notifications"
       >
-       <NotificationBar/>
+        <NotificationBar />
       </Sidebar>
     </div>
   );

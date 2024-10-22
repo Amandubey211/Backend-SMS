@@ -1,14 +1,12 @@
 import React, { useState } from "react";
-import {
-  IoCalendarOutline,
-  IoBookOutline,
-  IoTrashOutline,
-} from "react-icons/io5";
+import { IoCalendarOutline, IoTrashOutline } from "react-icons/io5";
 import { CiUser } from "react-icons/ci";
 import { NavLink, useParams } from "react-router-dom";
-import useDeletePage from "../../../../../../Hooks/AuthHooks/Staff/Admin/Page/useDeletePage"; // Adjust the import path as needed
-import DeleteModal from "../../../../../../Components/Common/DeleteModal";
+import { SiBookstack } from "react-icons/si";
+import { useDispatch, useSelector } from "react-redux";
 import Spinner from "../../../../../../Components/Common/Spinner";
+import { deletePage } from "../../../../../../Store/Slices/Admin/Class/Page/pageThunk";
+import DeleteModal from "../../../../../../Components/Common/DeleteModal";
 
 const PageCard = ({
   title,
@@ -22,7 +20,8 @@ const PageCard = ({
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { cid, sid } = useParams();
-  const { loading, error, success, deletePage } = useDeletePage();
+  const dispatch = useDispatch();
+  const { loading, error } = useSelector((state) => state.admin.pages);
 
   const formatDate = (dateString) => {
     const options = { year: "numeric", month: "short", day: "numeric" };
@@ -30,8 +29,7 @@ const PageCard = ({
   };
 
   const handleDelete = async () => {
-    await deletePage(id);
-
+    await dispatch(deletePage({ pid: id }));
     onDeleteSuccess(); // Refetch the pages after successful deletion
     setIsModalOpen(false);
   };
@@ -48,7 +46,7 @@ const PageCard = ({
     <div className="relative max-w-xs bg-white rounded-lg border flex flex-col justify-between transition-shadow duration-300 hover:shadow-lg group">
       <NavLink to={`/class/${cid}/${sid}/page/${id}/view`}>
         <div className="flex justify-center p-3">
-          <IoBookOutline className="text-green-500 h-24 w-24" />
+          <SiBookstack className="text-green-500 h-20 w-20" />
         </div>
         <div className="text-center mb-4 mt-2">
           <h2 className="font-semibold">{title}</h2>
@@ -62,7 +60,6 @@ const PageCard = ({
             ) : (
               <CiUser className="h-6 w-6" />
             )}
-
             <span className="ml-2 text-gray-700">{authorName}</span>
           </div>
         </div>

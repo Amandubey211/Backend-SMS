@@ -1,9 +1,11 @@
 import React from 'react';
 import { useNavigate } from "react-router-dom";
 import rightArrow from '../../../Assets/ParentAssets/svg/right-arrow.svg'; // Ensure this path is correct
-
+import { useTranslation } from 'react-i18next'; // Import useTranslation hook
+import profileIcon from '../../../Assets/DashboardAssets/profileIcon.png'
 const ChildCard = ({ student }) => {
     const navigate = useNavigate();
+    const { t } = useTranslation('prtChildrens'); // Initialize i18n
 
     // Define styles for the primary button container with increased width
     const primaryButtonContainerStyle = {
@@ -70,39 +72,39 @@ const ChildCard = ({ student }) => {
             onMouseLeave={(e) => (e.currentTarget.style.boxShadow = '0px 2px 4px rgba(0, 0, 0, 0.1)')}
         >
             <div className="flex flex-col items-center">
-                <img className="w-24 h-24 rounded-full mb-6" src={student.profile} alt={student.name} />
+                <img className="w-24 h-24 rounded-full mb-6 border" src={student?.profile?.length != 0 ?student?.profile:profileIcon  } alt={student.name} />
                 <p className="font-semibold text-center mb-6 text-lg">{student.name}</p>
                 <div className="flex justify-center items-center mb-6 space-x-4 text-sm text-gray-600">
-                    <p>Class: <span className="font-semibold">{student.class || 'N/A'}</span></p>
-                    <p>ID: <span className="font-semibold">{student.admissionNumber || 'N/A'}</span></p>
-                    <p>Section: <span className="font-semibold">{student.section || 'N/A'}</span></p>
-                    <p>Group: <span className="font-semibold">{student.group || 'N/A'}</span></p>
+                    <p>{t("Class")}: <span className="font-semibold">{student.class || 'N/A'}</span></p>
+                    <p>{t("ID")}: <span className="font-semibold">{student.admissionNumber || 'N/A'}</span></p>
+                    <p>{t("Section")}: <span className="font-semibold">{student.section || 'N/A'}</span></p>
+                    <p>{t("Group")}: <span className="font-semibold">{student.group || 'N/A'}</span></p>
                 </div>
                 <div className="flex justify-between space-x-2 mb-4 w-full">
                     <div
                         style={primaryButtonContainerStyle}
                         onClick={() => navigate(`/teacher/${student.id}`)}
                     >
-                        <div style={primaryButtonTextGradientStyle}>Instructors</div>
+                        <div style={primaryButtonTextGradientStyle}>{t("Instructors")}</div>
                     </div>
                     <div
                         style={primaryButtonContainerStyle}
                         onClick={() => navigate(`/childgrade/${student.id}`)}
                     >
-                        <div style={primaryButtonTextGradientStyle}>Grades</div>
+                        <div style={primaryButtonTextGradientStyle}>{t("Grades")}</div>
                     </div>
                     <div
                         style={primaryButtonContainerStyle}
                         onClick={() => navigate("/attendance")}
                     >
-                        <div style={primaryButtonTextGradientStyle}>Attendance</div>
+                        <div style={primaryButtonTextGradientStyle}>{t("Attendance")}</div>
                     </div>
                 </div>
                 <div
                     style={secondaryButtonStyle}
                     onClick={() => navigate(`/checkprogress/${student.id}`)}
                 >
-                    Check Subject Progress
+                    {t("Check Subject Progress")}
                     <img src={rightArrow} alt="Right Arrow" style={arrowIconStyle} />
                 </div>
             </div>

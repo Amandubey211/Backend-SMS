@@ -3,7 +3,7 @@ import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
 
 const Filter = ({ onFilterChange, onClose }) => {
-  const classDetails = useSelector((store) => store.Class.class);
+  const classDetails = useSelector((store) => store.admin.class);
   console.log(classDetails);
 
   return (

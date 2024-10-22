@@ -1,53 +1,27 @@
 import React from "react";
 import { IoCheckmarkCircle, IoCloseCircle } from "react-icons/io5";
 import { FaCircle, FaExclamationCircle } from "react-icons/fa";
-import profileIcon from '../../../../Assets/DashboardAssets/profileIcon.png'
+import profileIcon from "../../../../Assets/DashboardAssets/profileIcon.png";
+import { useSelector } from "react-redux";
 
-const AttendanceTable = ({ filter, attendanceData, filters }) => {
+// Utility to get the number of days in a month
+const getDaysInMonth = (month) => {
+  return new Date(new Date().getFullYear(), month, 0).getDate();
+};
+
+const AttendanceTable = () => {
+  const { monthlyAttendance, filters } = useSelector(
+    (state) => state.admin.attendance
+  );
   const { month } = filters;
 
-  const getDaysInMonth = (month) => {
-    return new Date(new Date().getFullYear(), month, 0).getDate();
-  };
-
-  // const transformData = (attendanceData) => {
-  //   const daysInMonth = getDaysInMonth(month);
-  //   const students = {};
-
-  //   if (attendanceData) {
-  //     attendanceData.forEach((record) => {
-  //       record.attendanceStatus?.forEach((dateRecord) => {
-  //         dateRecord.date?.forEach((entry) => {
-  //           const studentId = entry.studentId;
-  //           if (!students[studentId]) {
-  //             const studentProfile = data.studentProfiles?.find(
-  //               (profile) => profile.studentId === studentId
-  //             );
-  //             students[studentId] = {
-  //               ...studentProfile,
-  //               attendance: Array(daysInMonth).fill("-"), // Default to "-" if no record exists
-  //               total: { present: 0, absent: 0, late: 0, leave: 0 }, // Initialize total attendance counters
-  //             };
-  //           }
-  //           const date = new Date(dateRecord.date).getDate() - 1;
-  //           const statusIcon = getStatusIcon(entry.status);
-  //           students[studentId].attendance[date] = statusIcon;
-  //           students[studentId].total[entry.status]++;
-  //         });
-  //       });
-  //     });
-  //   }
-
-  //   return Object.values(students);
-  // };
-
-
-  const transformData = (attendanceData) => {
+  const transformData = (monthlyAttendance) => {
     const daysInMonth = getDaysInMonth(month);
     const students = {};
 
-    attendanceData.forEach((record) => {
-      const { studentId, name, admissionNumber, profile, attendanceStatus } = record;
+    monthlyAttendance.forEach((record) => {
+      const { studentId, name, admissionNumber, profile, attendanceStatus } =
+        record;
 
       if (!students[studentId]) {
         students[studentId] = {
@@ -70,8 +44,6 @@ const AttendanceTable = ({ filter, attendanceData, filters }) => {
     return Object.values(students);
   };
 
-
-
   const getStatusIcon = (status) => {
     switch (status) {
       case "leave":
@@ -87,8 +59,7 @@ const AttendanceTable = ({ filter, attendanceData, filters }) => {
     }
   };
 
-  const filteredStudents = transformData(attendanceData);
-  console.log("filteredStudents", filteredStudents);
+  const filteredStudents = transformData(monthlyAttendance);
 
   return (
     <div className="overflow-x-auto">
@@ -118,9 +89,7 @@ const AttendanceTable = ({ filter, attendanceData, filters }) => {
                     <div className="flex-shrink-0 h-10 w-10">
                       <img
                         className="h-10 w-10 rounded-full"
-                        src={
-                          student.profile || profileIcon
-                        }
+                        src={student.profile || profileIcon}
                         alt={`${student.firstName} ${student.lastName}`}
                       />
                     </div>

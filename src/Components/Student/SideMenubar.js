@@ -10,24 +10,27 @@ import {
 import { FiLogOut } from "react-icons/fi";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { useDispatch, useSelector } from "react-redux";
-import { toggleSidebar } from "../../Redux/Slices/Common/SidebarSlice";
-import useStudentLogout from "../../Hooks/AuthHooks/Student/useStudentLogout";
+import { toggleSidebar } from "../../Store/Slices/Common/User/reducers/userSlice"; // Importing the toggleSidebar action
+import { studentLogout } from "../../Store/Slices/Common/Auth/actions/studentActions"; // Import studentLogout action
 import ProfileIcon from "../../Assets/DashboardAssets/profileIcon.png";
 import LogoutConfirmationModal from "../Common/LogoutConfirmationModal";
+
 const isActivePath = (path, locationPath) => locationPath.startsWith(path);
 
 const SideMenubar = () => {
   const dispatch = useDispatch();
   const location = useLocation();
-  const { studentLogout } = useStudentLogout();
+  const navigate = useNavigate();
 
   const { isOpen, userDetails, role } = useSelector((state) => ({
-    isOpen: state.sidebar.isOpen,
-    userDetails: state.Auth.userDetail,
-    role: state.Auth.role,
+    isOpen: state.common.user.sidebar.isOpen, // Redux state for sidebar toggle
+    userDetails: state.common.user.userDetails, // Redux state for user details
+    role: state.common.auth.role,
   }));
-  const navigate = useNavigate();
+
   const [openItems, setOpenItems] = useState([]);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
   const toggleDropdown = (title) => {
     setOpenItems((prevOpenItems) =>
@@ -37,9 +40,6 @@ const SideMenubar = () => {
     );
   };
 
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
-
   const handleLogout = () => {
     setIsLogoutModalOpen(true);
   };
@@ -47,8 +47,9 @@ const SideMenubar = () => {
   const confirmLogout = async () => {
     setIsLoggingOut(true);
     try {
-      await studentLogout();
+      await dispatch(studentLogout()).unwrap(); // Dispatch the logout action
       setIsLogoutModalOpen(false);
+      navigate("/studentlogin"); // Redirect to login after logout
     } finally {
       setIsLoggingOut(false);
     }
@@ -74,7 +75,7 @@ const SideMenubar = () => {
         <button
           onClick={(e) => {
             e.stopPropagation();
-            dispatch(toggleSidebar());
+            dispatch(toggleSidebar()); // Dispatch toggleSidebar action
           }}
           className="absolute bottom-0 right-0"
           aria-label="Toggle Sidebar"
@@ -85,7 +86,6 @@ const SideMenubar = () => {
         </button>
       </div>
 
-      {/* Sidebar menu list with scroll overflow */}
       <div className="flex-grow overflow-y-auto no-scrollbar">
         {isOpen && <h2 className="text-gray-500 my-1">MENU</h2>}
         <ul className={`space-y-1 ${!isOpen && "mt-3"}`}>
@@ -93,7 +93,7 @@ const SideMenubar = () => {
             <React.Fragment key={index}>
               {item.items ? (
                 <div
-                  className={`flex items-center w-full p-2 rounded-lg cursor-pointer  ${
+                  className={`flex items-center w-full p-2 rounded-lg cursor-pointer ${
                     isActivePath(item.path, location.pathname) ||
                     (item.items &&
                       item.items.some((subItem) =>

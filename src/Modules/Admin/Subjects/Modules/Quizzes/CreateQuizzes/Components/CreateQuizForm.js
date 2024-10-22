@@ -1,12 +1,38 @@
 import React, { useEffect, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import DateInput from "../../../../Component/DateInput";
 import SectionSelect from "../../../../Component/SectionSelect";
 import AssignToRadios from "../../../../Component/AssignToRadios";
 import LabeledSelect from "./LabeledSelect";
 import LabeledInput from "./LabeledInput";
-import { useSelector } from "react-redux";
-import useGetModulesForStudent from "../../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useGetModulesForStudent";
+import { useParams } from "react-router-dom";
+import { fetchModules } from "../../../../../../../Store/Slices/Admin/Class/Module/moduleThunk";
+import { format } from "date-fns"; // Import date-fns for formatting
 
+const AllowedAttemptsSelect = ({ allowedAttempts, handleChange }) => {
+  return (
+    <div className="mb-4">
+      <label className="block text-gray-700">Allowed Attempts</label>
+      <select
+        name="allowedAttempts"
+        value={allowedAttempts ? "true" : "false"} // Handle boolean as string
+        onChange={(e) =>
+          handleChange({
+            target: {
+              name: "allowedAttempts",
+              value: e.target.value === "true", // Convert to boolean
+            },
+          })
+        }
+        className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+      >
+        <option value="">Select</option>
+        <option value="true">Limited</option>
+        <option value="false">Unlimited</option>
+      </select>
+    </div>
+  );
+};
 const CreateQuizForm = ({
   quizType,
   allowShuffleAnswers,
@@ -26,29 +52,32 @@ const CreateQuizForm = ({
   chapterId,
   groupId,
 }) => {
+  const dispatch = useDispatch();
   const [chapters, setChapters] = useState([]);
-  const { loading, error, fetchModules } = useGetModulesForStudent();
+  const { modules } = useSelector((state) => state.admin.module);
+  const { cid, sid } = useParams();
 
-  const moduleList = useSelector((store) => store.Subject.modules);
   useEffect(() => {
-    // Fetch modules if not available in the Redux store
-    if (!moduleList || moduleList.length === 0) {
-      fetchModules();
+    // Fetch modules if not already present
+    if (!modules || modules.length === 0) {
+      dispatch(fetchModules({ cid, sid }));
     }
-  }, [moduleList, fetchModules]);
+  }, [dispatch, modules]);
 
+  // Populate chapters based on selected module
   useEffect(() => {
     if (moduleId) {
-      const module = moduleList.find((mod) => mod._id === moduleId);
-      if (module) {
-        setChapters(module.chapters);
-      } else {
-        setChapters([]);
-      }
+      const selectedModule = modules.find((mod) => mod._id === moduleId);
+      setChapters(selectedModule ? selectedModule.chapters : []);
     } else {
       setChapters([]);
     }
-  }, [moduleId, moduleList]);
+  }, [moduleId, modules]);
+
+  // Function to format date to "yyyy-MM-dd"
+  const formatDate = (date) => {
+    return date ? format(new Date(date), "yyyy-MM-dd") : "";
+  };
 
   return (
     <div className="max-w-md mx-auto p-4 bg-white space-y-2">
@@ -109,12 +138,15 @@ const CreateQuizForm = ({
           </div>
         </div>
 
+        {/* Time Limit Input */}
         <LabeledInput
-          label="Time limit"
+          label="Time limit in Minutes"
           name="timeLimit"
           value={timeLimit}
           onChange={handleChange}
         />
+
+        {/* Allowed Attempts
         <div className="flex items-center">
           <input
             type="checkbox"
@@ -137,11 +169,31 @@ const CreateQuizForm = ({
             value={allowNumberOfAttempts}
             onChange={handleChange}
           />
+        )} */}
+
+        {/* Allowed Attempts using Select Box */}
+        <AllowedAttemptsSelect
+          allowedAttempts={allowedAttempts}
+          handleChange={handleChange}
+        />
+
+        {/* Conditionally show Number of Attempts input when allowedAttempts is false (i.e., Limited) */}
+        {allowedAttempts && (
+          <LabeledInput
+            label="Number of Attempts"
+            name="allowNumberOfAttempts"
+            type="number"
+            value={allowNumberOfAttempts || ""} // Reset to empty if null
+            onChange={handleChange}
+          />
         )}
 
+        {/* Quiz Restrictions */}
         <h2 className="text-xl font-semibold mt-6 pt-4 border-t">
           Quiz Restrictions
         </h2>
+
+        {/* See Answer Option */}
         <div className="p-2">
           <h3 className="text-gray-700 mb-1">
             Students See the Correct Answer
@@ -176,51 +228,55 @@ const CreateQuizForm = ({
             <DateInput
               label="Select Date"
               name="showAnswerDate"
-              value={showAnswerDate}
+              value={formatDate(showAnswerDate)} // Use formatted date here
               handleChange={handleChange}
             />
           )}
         </div>
-        <div className="space-y-4">
-          <LabeledSelect
-            label="Show one question at a time"
-            name="showOneQuestionOnly"
-            value={showOneQuestionOnly}
+
+        {/* Show One Question at a Time */}
+        <LabeledSelect
+          label="Show one question at a time"
+          name="showOneQuestionOnly"
+          value={showOneQuestionOnly}
+          onChange={handleChange}
+          options={[
+            { value: "true", label: "Yes" },
+            { value: "false", label: "No" },
+          ]}
+        />
+
+        {/* Lock Question After Answering */}
+        <div className="flex items-center">
+          <input
+            type="checkbox"
+            id="lockQuestionAfterAnswering"
+            name="lockQuestionAfterAnswering"
+            checked={lockQuestionAfterAnswering}
             onChange={handleChange}
-            options={[
-              { value: "true", label: "Yes" },
-              { value: "false", label: "No" },
-            ]}
+            className="mr-2 p-3"
           />
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              id="lockQuestionAfterAnswering"
-              name="lockQuestionAfterAnswering"
-              checked={lockQuestionAfterAnswering}
-              onChange={handleChange}
-              className="mr-2 p-3"
-            />
-            <label
-              htmlFor="lockQuestionAfterAnswering"
-              className="text-gray-700"
-            >
-              Lock questions after answering
-            </label>
-          </div>
+          <label htmlFor="lockQuestionAfterAnswering" className="text-gray-700">
+            Lock questions after answering
+          </label>
         </div>
 
+        {/* Assign To Section */}
         <AssignToRadios
           assignTo={assignTo}
           handleChange={handleChange}
           isAssignToLabel={true}
         />
+
+        {/* Section Select */}
         <SectionSelect
           sectionId={sectionId}
           handleChange={handleChange}
           groupId={groupId}
           assignTo={assignTo}
         />
+
+        {/* Module and Chapter Select */}
         <div className="mb-4">
           <label className="block text-gray-700" htmlFor="module-select">
             Module
@@ -233,7 +289,7 @@ const CreateQuizForm = ({
             onChange={handleChange}
           >
             <option value="">Select</option>
-            {moduleList.map((module) => (
+            {modules.map((module) => (
               <option key={module._id} value={module._id}>
                 {module.moduleName}
               </option>
@@ -251,7 +307,7 @@ const CreateQuizForm = ({
             value={chapterId}
             name="chapterId"
             onChange={handleChange}
-            disabled={!moduleId} // Disable the dropdown if no module is selected
+            disabled={!moduleId}
           >
             {moduleId ? (
               <>
@@ -268,16 +324,17 @@ const CreateQuizForm = ({
           </select>
         </div>
 
+        {/* Date Inputs */}
         <DateInput
           label="Available from"
           name="availableFrom"
-          value={availableFrom || "DD/MM/YY"}
+          value={formatDate(availableFrom)} // Format date for input
           handleChange={handleChange}
         />
         <DateInput
           label="Due"
           name="dueDate"
-          value={dueDate || "DD/MM/YY"}
+          value={formatDate(dueDate)} // Format date for input
           handleChange={handleChange}
         />
       </div>

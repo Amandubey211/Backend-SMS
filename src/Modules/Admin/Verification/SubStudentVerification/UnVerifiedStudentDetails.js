@@ -5,7 +5,7 @@ import StudentDetail from "./StudentDetails";
 
 const UnVerifiedStudentDetails = () => {
   return (
-    <Layout title="Student Verification">
+    <Layout title="Detail | Student Diwan">
       <DashLayout children={<StudentDetail />} />;
     </Layout>
   );

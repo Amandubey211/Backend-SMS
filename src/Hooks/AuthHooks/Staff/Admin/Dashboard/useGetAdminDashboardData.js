@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import axios from "axios";
-import toast from "react-hot-toast";
+
 import { useSelector } from "react-redux";
 import { baseUrl } from "../../../../../config/Common";
 
@@ -9,7 +9,7 @@ const useGetAdminDashboardData = () => {
   const [error, setError] = useState(null);
   const [dashboardData, setDashboardData] = useState(null);
 
-  const role = useSelector((store) => store.Auth.role);
+  const role = useSelector((store) => store.common.auth.role);
   
 
   const fetchAdminDashboardData = useCallback(async () => {
@@ -23,9 +23,9 @@ const useGetAdminDashboardData = () => {
 
       setDashboardData(response.data);
       setLoading(false);
-    } catch (err) {
-      const errorMessage = err.response?.data?.message || "Failed to fetch dashboard data";
-      toast.error(errorMessage);
+    } catch (error) {
+      const errorMessage = error.message || "Failed to fetch dashboard data";
+
       setLoading(false);
       setError(errorMessage);
     }

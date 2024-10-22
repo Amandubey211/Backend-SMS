@@ -25,8 +25,22 @@ import ParentEvent from "../Modules/Parents/ParentEvent/ParentEvent";
 import QIDLogin from "../Modules/LoginPages/Student/Login/QIDLogin.js";
 import ParentProfile from "../Components/Parents/ParentProfile.js";
 import StaffMyProfile from "../Components/Common/StaffMyProfile.js";
-
+import "../Utils/translator/i18n.js";
+import i18next from "i18next";
+import { useSelector } from "react-redux";
+import GraduationPage from "../Modules/Admin/Graduation/GraduationPage.js";
 // lazy loaded routes
+
+const Academic = lazy(() =>
+  import("../Modules/Admin/AcademicYear/Academic.js")
+);
+// const CreateAcademicYear = lazy(() =>
+//   import("../Components/Admin/CreateAcademicYear.js")
+// );
+const CreateAcademicYear = lazy(() =>
+  import("../Components/Admin/CreateAcademicYear.js")
+);
+
 const StudentProfile = lazy(() =>
   import("../Modules/Student/profile/StudentProfile.js")
 );
@@ -37,10 +51,10 @@ const StudentFinance = lazy(() =>
   import("../Modules/Student/Finance/StudentFinance.js")
 );
 const StudentEvent = lazy(() =>
-  import("../Modules/Student/StudentEvent/StudentEvent.js")
+  import("../Modules/Student/NoticeBoard/Events/StudentEvent.js")
 );
 const StudentAnnounce = lazy(() =>
-  import("../Modules/Student/NoticeBoard/StudentAnnounce.js")
+  import("../Modules/Student/NoticeBoard/Notice/StudentAnnounce.js")
 );
 const StudentLibrarySection = lazy(() =>
   import("../Modules/Student/Library/MainSection/Libary.js")
@@ -95,8 +109,8 @@ const Events = lazy(() =>
 const EventSchool = lazy(() =>
   import("../Modules/Admin/NoticeBoard/Events/MainSection/EventSchool.js")
 );
-const Announce = lazy(() =>
-  import("../Modules/Admin/NoticeBoard/Announcements/Announce.js")
+const AdminNotice = lazy(() =>
+  import("../Modules/Admin/NoticeBoard/Notice/AdminNotice.js")
 );
 const Earning = lazy(() =>
   import("../Modules/Admin/Accounting/Earnings/Earning.js")
@@ -230,7 +244,7 @@ const StudentDash = lazy(() =>
   import("../Modules/Student/Dashboard/StudentDash.js")
 );
 const ParentDash = lazy(() =>
-  import("../Modules/Parents/Dasboard/ParentDash.js")
+  import("../Modules/Parents/Dashboard/ParentDash.js")
 );
 
 const MyChildren = lazy(() =>
@@ -255,9 +269,7 @@ const CheckProgress = lazy(() =>
 const ChildGrade = lazy(() =>
   import("../Modules/Parents/GradeChild/GradeChild.js")
 );
-const ParentAnnounce = lazy(() =>
-  import("../Modules/Parents/Notice/Annoucements/Announce.js")
-);
+
 const StudentTeacher = lazy(() =>
   import(
     "../Modules/Student/StudentClass/SubClass/Components/Teacher/StudentTeacher.js"
@@ -315,14 +327,38 @@ function App() {
       element: <ForgetPassword />,
       errorElement: <Error />,
     },
+    {
+      path: "/create_academicYear",
+      element: (
+        <ProtectRoute Component={CreateAcademicYear} allowedRoles={["admin"]} />
+      ),
+      errorElement: <Error />,
+    },
+
+    {
+      path: "/dashboard/academic",
+      element: <ProtectRoute Component={Academic} allowedRoles={["admin"]} />,
+      errorElement: <Error />,
+    },
+
     //Admin--------------------------------------------------------------------------
     {
       path: "/dashboard",
       element: (
-        <ProtectRoute Component={Dash} allowedRoles={["admin", "teacher"]} />
+        <ProtectRoute
+          Component={Dash}
+          allowedRoles={["admin", "teacher", "librarian", "accountant"]}
+        />
       ),
       errorElement: <Error />,
     },
+    // {
+    //   path: "/create_academicYear",
+    //   element: (
+    //     <ProtectRoute Component={CreateAcademicYear} allowedRoles={["admin"]} />
+    //   ),
+    //   errorElement: <Error />,
+    // },
     {
       path: "/class",
       element: (
@@ -379,6 +415,7 @@ function App() {
       ),
       errorElement: <Error />,
     },
+
     {
       path: "/class/:cid/students",
       element: (
@@ -602,7 +639,7 @@ function App() {
       errorElement: <Error />,
     },
     {
-      path: "accounting/studentfees",
+      path: "/accounting/studentfees",
       element: (
         <ProtectRoute
           Component={AccountingSection}
@@ -613,21 +650,21 @@ function App() {
     },
     { path: "library", element: <Libary />, errorElement: <Error /> },
     {
-      path: "noticeboard/events",
+      path: "/noticeboard/events",
       element: (
         <ProtectRoute
           Component={EventSchool}
-          allowedRoles={["admin", "teacher", "librarian", "peon"]}
+          allowedRoles={["admin", "teacher", "librarian", "peon", "accountant"]}
         />
       ),
       errorElement: <Error />,
     },
     {
-      path: "/noticeboard/announcements",
+      path: "/noticeboard/notice",
       element: (
         <ProtectRoute
-          Component={Announce}
-          allowedRoles={["admin", "teacher", "librarian", "peon"]}
+          Component={AdminNotice}
+          allowedRoles={["admin", "teacher", "librarian", "peon", "accountant"]}
         />
       ),
       errorElement: <Error />,
@@ -673,11 +710,18 @@ function App() {
       errorElement: <Error />,
     },
     {
+      path: "/graduates",
+      element: (
+        <ProtectRoute Component={GraduationPage} allowedRoles={["admin"]} />
+      ),
+      errorElement: <Error />,
+    },
+    {
       path: "/users/parents",
       element: (
         <ProtectRoute
           Component={StudentParentProfile}
-          allowedRoles={["admin", "teacher"]}
+          allowedRoles={["admin", "teacher", "accountant", "librarian"]}
         />
       ),
       errorElement: <Error />,
@@ -694,7 +738,13 @@ function App() {
       element: (
         <ProtectRoute
           Component={StaffMyProfile}
-          allowedRoles={["teacher", "accountant", "librarian", "staff"]}
+          allowedRoles={[
+            "teacher",
+            "accountant",
+            "librarian",
+            "staff",
+            "librarian",
+          ]}
         />
       ),
       errorElement: <Error />,
@@ -716,14 +766,14 @@ function App() {
       errorElement: <Error />,
     },
     {
-      path: "/student_class/:cid/teachers",
+      path: "/student_class/:classId/teachers",
       element: (
         <ProtectRoute Component={StudentTeacher} allowedRoles={["student"]} />
       ),
       errorElement: <Error />,
     },
     {
-      path: "/student_class/:cid/classmates",
+      path: "/student_class/:classId/classmates",
       element: (
         <ProtectRoute
           Component={StudentClassMates}
@@ -733,7 +783,7 @@ function App() {
       errorElement: <Error />,
     },
     {
-      path: "/student_class/:cid/attendance",
+      path: "/student_class/:classId/attendance",
       element: (
         <ProtectRoute
           Component={StudentAttendance}
@@ -919,13 +969,38 @@ function App() {
     },
 
     // parent----------------------------------------------------------------
-    { path: "/parent_dash", element: <ParentDash />, errorElement: <Error /> },
-    { path: "/children", element: <MyChildren />, errorElement: <Error /> },
-    { path: "/teacher/:ssid", element: <MyTeacher />, errorElement: <Error /> },
-    { path: "/attendance", element: <Calendar />, errorElement: <Error /> },
+    {
+      path: "/parent_dash",
+      element: (
+        <ProtectRoute Component={ParentDash} allowedRoles={["parent"]} />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/children",
+      element: (
+        <ProtectRoute Component={MyChildren} allowedRoles={["parent"]} />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/teacher/:ssid",
+      element: <ProtectRoute Component={MyTeacher} allowedRoles={["parent"]} />,
+      errorElement: <Error />,
+    },
+    {
+      path: "/attendance",
+      element: <ProtectRoute Component={Calendar} allowedRoles={["parent"]} />,
+      errorElement: <Error />,
+    },
     {
       path: "/parentchildnotice",
-      element: <ParentStudentNotice />,
+      element: (
+        <ProtectRoute
+          Component={ParentStudentNotice}
+          allowedRoles={["parent"]}
+        />
+      ),
       errorElement: <Error />,
     },
     {
@@ -937,32 +1012,37 @@ function App() {
     },
     {
       path: "/parentlibrary",
-      element: <LibraryParent />,
+      element: (
+        <ProtectRoute Component={LibraryParent} allowedRoles={["parent"]} />
+      ),
       errorElement: <Error />,
     },
     {
       path: "/parentfinance",
-      element: <ParentFinance />,
+      element: (
+        <ProtectRoute Component={ParentFinance} allowedRoles={["parent"]} />
+      ),
       errorElement: <Error />,
     },
     {
       path: "/checkprogress/:studentId",
-      element: <CheckProgress />,
+      element: (
+        <ProtectRoute Component={CheckProgress} allowedRoles={["parent"]} />
+      ),
       errorElement: <Error />,
     },
     {
       path: "/users/parent/profile",
-      element: <ParentProfile />,
-      errorElement: <Error />,
-    },
-    {
-      path: "/parentannounce",
-      element: <ParentAnnounce />,
+      element: (
+        <ProtectRoute Component={ParentProfile} allowedRoles={["parent"]} />
+      ),
       errorElement: <Error />,
     },
     {
       path: "/childgrade/:studentId",
-      element: <ChildGrade />,
+      element: (
+        <ProtectRoute Component={ChildGrade} allowedRoles={["parent"]} />
+      ),
       errorElement: <Error />,
     },
   ]);
@@ -978,3 +1058,42 @@ function App() {
 }
 
 export default App;
+
+// import React, { useEffect, useState } from "react";
+// import Offline from "../Components/Common/Offline.js";
+// import AllRoutes from "../Route/AllRoute.js";
+// import { useFirebaseMessaging } from "../Hooks/NotificationHooks/NotificationHooks.js";
+// import i18next from "i18next";
+// import { useSelector } from "react-redux";
+
+// function App() {
+//   const [isOnline, setIsOnline] = useState(window.navigator.onLine);
+//   useFirebaseMessaging();
+
+//   useEffect(() => {
+//     const handleOnline = () => setIsOnline(true);
+//     const handleOffline = () => setIsOnline(false);
+
+//     window.addEventListener("online", handleOnline);
+//     window.addEventListener("offline", handleOffline);
+
+//     return () => {
+//       window.removeEventListener("online", handleOnline);
+//       window.removeEventListener("offline", handleOffline);
+//     };
+//   }, []);
+
+//   const selectedLanguage = useSelector((state) => state.Auth.selectedLanguage);
+//   useEffect(() => {
+//     i18next.changeLanguage(selectedLanguage); // Set the initial language from Redux
+//   }, [selectedLanguage]);
+
+//   return (
+//     <>
+//       {!isOnline && <Offline />}
+//       <AllRoutes />
+//     </>
+//   );
+// }
+
+// export default App;

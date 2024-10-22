@@ -4,24 +4,23 @@ import DashLayout from "../../../../Components/Admin/AdminDashLayout";
 import SidebarSlide from "../../../../Components/Common/SidebarSlide";
 import ViewLibrarian from "./ViewLibrarian";
 import ProfileCard from '../SubComponents/ProfileCard';
-import useGetAllStaff from "../../../../Hooks/AuthHooks/Staff/Admin/staff/useGetAllStaff";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import AddUser from "../StaffProfile/AddUser";
 import { GoAlertFill } from "react-icons/go";
 import { FiLoader } from "react-icons/fi";
+import { fetchAllStaff } from "../../../../Store/Slices/Admin/Users/Staff/staff.action";
+import Spinner from "../../../../Components/Common/Spinner";
 const AllLibrarian = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarContent, setSidebarContent] = useState(null);
   const [selectedLibrarian, setSelectedLibrarian] = useState(null);
   const [librarianData, setLibrarianData] = useState(null);
-  const allLibrarian = useSelector((store) => store.Staff.allLibrarian);
-  const { fetchStaff,loading } = useGetAllStaff();
-
+  const { librarian, loading } = useSelector((store) => store.admin.all_staff);
+  const dispatch = useDispatch()
   useEffect(() => {
-    fetchStaff();
-    console.log(allLibrarian);
-  }, []);
-
+    dispatch(fetchAllStaff())
+  }, [dispatch]);
+  const role = useSelector((store) => store.common.auth.role);
   const handleSidebarOpen = () => setSidebarOpen(true);
   const handleSidebarClose = () => setSidebarOpen(false);
 
@@ -59,38 +58,39 @@ const AllLibrarian = () => {
 
   return (
     <Layout title="All Librarian">
-      <DashLayout>{loading?  <div className="flex w-full h-[90vh] flex-col items-center justify-center">
-    <FiLoader className="animate-spin mr-2 w-[3rem] h-[3rem] " />
-    <p className="text-gray-800 text-lg">Loading...</p>
-    </div>:
+      <DashLayout>{loading ? <div className="flex w-full h-[90vh] flex-col items-center justify-center">
+        <Spinner />
+      </div> :
         <div className="p-4">
           <div className="flex justify-between items-center mb-4 border-b-2 h-20">
-            <h2 className="text-xl font-semibold">All Librarian <span className="bg-purple-400 px-2 text-sm py-1 rounded-full">{allLibrarian?.length}</span></h2>
-            <button
-              onClick={handleAddLibrarianClick}
-              className="bg-purple-500 text-white px-4 py-2 rounded-md flex items-center space-x-2"
-            >
-              <span>Add New Librarian</span>
-            </button>
+            <h2 className="text-xl font-semibold">All Librarian <span className="bg-purple-400 px-2 text-sm py-1 rounded-full">{librarian?.length}</span></h2>
+            {role === "admin" && (
+              <button
+                onClick={handleAddLibrarianClick}
+                className="bg-purple-500 text-white px-4 py-2 rounded-md flex items-center space-x-2"
+              >
+                <span>Add New Librarian</span>
+              </button>
+            )}
           </div>
           <div className="flex flex-wrap -mx-2">
             {
-              allLibrarian.length > 0 ?
-            
-           allLibrarian.map((librarian, index) => (
-              <ProfileCard
-                key={index}
-                profile={librarian}
-                onClick={handleAppointmentClick}
-                editUser={editUser}
-              />
-            )):
-            <div>
-                <div className="flex w-[80vw] text-gray-500 h-[90vh] items-center justify-center flex-col text-2xl">
-        <GoAlertFill className="text-[5rem]" />
-       No  Data Found
-      </div>
-            </div>
+              librarian.length > 0 ?
+
+                librarian.map((librarian, index) => (
+                  <ProfileCard
+                    key={index}
+                    profile={librarian}
+                    onClick={handleAppointmentClick}
+                    editUser={editUser}
+                  />
+                )) :
+                <div>
+                  <div className="flex w-[80vw] text-gray-500 h-[90vh] items-center justify-center flex-col text-2xl">
+                    <GoAlertFill className="text-[5rem]" />
+                    No  librarian Found
+                  </div>
+                </div>
             }
           </div>
           <SidebarSlide
@@ -102,7 +102,7 @@ const AllLibrarian = () => {
                 {sidebarContent === "viewLibrarian" ? "Quick View of Librarian" : "Add/Edit Librarian"}
               </span>
             }
-            width="60%"
+            width={sidebarContent === "viewLibrarian" ? "30%" : "60%"}
             height="100%"
           >
             {renderSidebarContent()}

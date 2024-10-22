@@ -2,28 +2,17 @@ import React, { useState } from 'react';
 import FormInput from '../subClass/component/FormInput';
 import axios from 'axios';  // Importing Axios
 import { baseUrl } from '../../../../config/Common';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { message } from "antd";
+import { createEarning, fetchEarning, fetchTotalAmounts } from '../../../../Store/Slices/Admin/Accounting/Earning/earning.action';
+import { resetFormData, setFormData, setSidebarOpen } from '../../../../Store/Slices/Admin/Accounting/Earning/earningSlice';
 
-const AddEarning = ({ fetchEarning, fetchTotalAmounts, handleSidebarClose }) => {
-  const [formData, setFormData] = useState({
-    paymentDate: '',
-    amount: '',
-    description: '',
-    paymentStatus: '',
-    paymentFrom: '',
-  });
-  const role = useSelector((store) => store.Auth.role);
+const AddEarning = () => {
+  const { formData } = useSelector((store) => store?.admin?.earning);
+  const dispatch = useDispatch();
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Submitting New Earning:', formData);
-    const token = localStorage.getItem(`${role}:token`);
-
-    if (!token) {
-      console.error('Authentication token is not available.');
-      return;
-    }
-
 
     const payload = {
       from: formData.paymentFrom,
@@ -31,38 +20,22 @@ const AddEarning = ({ fetchEarning, fetchTotalAmounts, handleSidebarClose }) => 
       dateOfEarning: formData.paymentDate,
       description: formData.description,
     };
-    const config = {
-      headers: {
-        'Content-Type': 'application/json',
-        'Authentication': `${token}`
-      }
-    };
 
-    try {
-
-      const response = await axios.post(`${baseUrl}/admin/addEarning`, payload, config);
-      //console.log('Earning saved successfully:', response);
-      setFormData({
-        paymentDate: '',
-        amount: '',
-        description: '',
-        paymentStatus: '',
-        paymentFrom: '',
+    dispatch(createEarning({ payload: payload }))
+      .then(() => {
+        dispatch(fetchEarning());
+        dispatch(fetchTotalAmounts());
+        dispatch(setSidebarOpen(false));
+        dispatch(resetFormData());
       })
-      if (response.data.success) {
-        message.success('Earning deleted successfully');
-      }
-      fetchEarning();
-      fetchTotalAmounts();
-      handleSidebarClose();
-    } catch (error) {
-      console.error('Error saving the earning:', error.response ? error.response.data.msg : error.message);
-    }
+      .catch((err) => {
+        console.error("Error updating earning", err);
+      });
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    dispatch(setFormData({ [name]: value }))
   };
 
   return (

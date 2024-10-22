@@ -6,20 +6,26 @@ import DiscussionHeader from "./Components/DiscussionHeader";
 import { MdKeyboardArrowDown } from "react-icons/md";
 import { GoDiscussionClosed } from "react-icons/go";
 import SubjectSideBar from "../../Component/SubjectSideBar";
-import useFetchClassDiscussions from "../../../../../../Hooks/AuthHooks/Staff/Admin/Disscussion/useFetchClassDiscussions";
 import NoDataFound from "../../../../../../Components/Common/NoDataFound";
 import Spinner from "../../../../../../Components/Common/Spinner";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchStudentDiscussion } from "../../../../../../Store/Slices/Student/MyClass/Class/Subjects/Discussion/discussion.action";
+import { setShowError } from "../../../../../../Store/Slices/Common/Alerts/alertsSlice";
+import OfflineModal from "../../../../../../Components/Common/Offline";
 
 const MainSection = () => {
+  const { discussionData, loading, error } = useSelector((store) => store?.student?.studentDiscussion)
+  const dispatch = useDispatch();
+  const {showError}=useSelector((store)=>store?.common?.alertMsg);
+
   const [searchQuery, setSearchQuery] = useState("");
   const [filter, setFilter] = useState("all");
+
   const { cid } = useParams();
-  const { discussions, loading, error, fetchClassDiscussions } =
-    useFetchClassDiscussions();
 
   useEffect(() => {
-    fetchClassDiscussions();
-  }, [fetchClassDiscussions]);
+    dispatch(fetchStudentDiscussion(cid))
+  }, [dispatch]);
 
   const handleSearch = (query) => {
     setSearchQuery(query);
@@ -29,7 +35,11 @@ const MainSection = () => {
     setFilter(filter);
   };
 
-  const filteredDiscussions = discussions.filter((discussion) => {
+  const handleDismiss = () => {
+    dispatch(setShowError(false));
+  }
+
+  const filteredDiscussions = discussionData.filter((discussion) => {
     const matchesSearch = discussion.title
       .toLowerCase()
       .includes(searchQuery.toLowerCase());
@@ -40,7 +50,7 @@ const MainSection = () => {
     return matchesSearch && matchesFilter;
   });
 
-  const pinnedDiscussions = discussions.filter(
+  const pinnedDiscussions = discussionData.filter(
     (discussion) => discussion.isPinned
   );
 
@@ -62,7 +72,7 @@ const MainSection = () => {
             />
             <PinnedDiscussions
               discussions={pinnedDiscussions}
-              refetchClassDiscussions={fetchClassDiscussions} // Pass refetch function
+              //refetchClassDiscussions={fetchClassDiscussions}
             />
             <div className="p-3 w-full flex-grow flex flex-col">
               <div className="flex items-center gap-2 ml-3 mb-2">
@@ -77,7 +87,7 @@ const MainSection = () => {
                       <DiscussionCard
                         key={discussion._id}
                         discussion={discussion}
-                        refetchClassDiscussions={fetchClassDiscussions} // Pass refetch function
+                        //refetchClassDiscussions={fetchClassDiscussions} // Pass refetch function
                       />
                     ))}
                   </div>
@@ -89,6 +99,9 @@ const MainSection = () => {
           </>
         )}
       </div>
+      {!loading && showError && (
+        <OfflineModal error={error} onDismiss={handleDismiss} />
+      )}
     </div>
   );
 };

@@ -12,7 +12,6 @@ const useDeleteUser = () => {
   const [success, setSuccess] = useState(false);
   const  { fetchStaff} = useGetAllStaff();
   const {fetchTeachers} = useGetAllTeachers()
-  const { role } = useSelector((store) => store.Auth);
   const deleteUser = useCallback(
     async (uid) => {
       setLoading(true);
@@ -20,7 +19,7 @@ const useDeleteUser = () => {
       setSuccess(false);
 
       try {
-        const token = localStorage.getItem(`${role}:token`);
+        const token = localStorage.getItem(`admin:token`);
 
         const response = await axios.delete(
           `${baseUrl}/admin/delete_staff/${uid}`,
@@ -52,7 +51,7 @@ const useDeleteUser = () => {
         setLoading(false);
       }
     },
-    [role, baseUrl]
+    [ baseUrl]
   );
 
   return { loading, error, success, deleteUser };

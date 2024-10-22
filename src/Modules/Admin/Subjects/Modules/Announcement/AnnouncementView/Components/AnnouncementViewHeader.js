@@ -3,20 +3,26 @@ import { AiOutlineEdit } from "react-icons/ai";
 import { HiOutlineDotsVertical } from "react-icons/hi";
 import { BsChat } from "react-icons/bs";
 import { RiDeleteBin5Line } from "react-icons/ri";
-import Sidebar from "../../../../../../../Components/Common/Sidebar";
 import { useParams, useNavigate } from "react-router-dom";
-import useDeleteAnnouncement from "../../../../../../../Hooks/AuthHooks/Staff/Admin/Announcement/useDeleteAnnouncement";
+import { useDispatch, useSelector } from "react-redux";
+import Sidebar from "../../../../../../../Components/Common/Sidebar";
 import DeleteModal from "../../../../../../../Components/Common/DeleteModal";
 import AnnouncementCommentSection from "../AnnouncementMessage/AnnouncementCommentSection";
+import { deleteAnnouncement } from "../../../../../../../Store/Slices/Admin/Class/Announcement/announcementThunk";
+import CommentModule from "../../../Comment/CommentModule";
 
-const AnnouncementViewHeader = ({ announcement }) => {
+const AnnouncementViewHeader = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [isModalOpen, setModalOpen] = useState(false);
-  const { cid, sid } = useParams();
+  const { cid, sid, did: announcementId } = useParams();
+  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { deleteAnnouncement, loading: deleteLoading } =
-    useDeleteAnnouncement();
+
+  const { announcement, loading: deleteLoading } = useSelector(
+    (state) => state.admin.announcements
+  );
+
   const menuButtonRef = useRef(null);
   const menuRef = useRef(null);
 
@@ -62,7 +68,7 @@ const AnnouncementViewHeader = ({ announcement }) => {
   };
 
   const confirmDelete = async () => {
-    await deleteAnnouncement(announcement._id);
+    await dispatch(deleteAnnouncement(announcement._id));
     setModalOpen(false);
   };
 
@@ -70,7 +76,7 @@ const AnnouncementViewHeader = ({ announcement }) => {
     <div className="flex items-center justify-between p-2 px-4 border-b">
       <div className="flex items-center">
         <img
-          src="https://avatars.githubusercontent.com/u/109097090?v=4"
+          src=""
           alt="Profile"
           className="w-12 h-12 rounded-full"
         />

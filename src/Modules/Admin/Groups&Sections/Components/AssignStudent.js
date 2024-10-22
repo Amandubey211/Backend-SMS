@@ -1,56 +1,52 @@
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import toast from "react-hot-toast";
+import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-import useGetGroupsByClass from "../../../../Hooks/AuthHooks/Staff/Admin/Groups/useGetGroupByClass";
-import useAssignStudentToGroup from "../../../../Hooks/AuthHooks/Staff/Admin/Students/useAssignStudentToGroup ";
+import toast from "react-hot-toast";
+import {
+  assignStudentToSection,
+  fetchGroupsByClass,
+  fetchSectionsByClass,
+  fetchUnassignedStudents,
+} from "../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
+import profileIcon from "../../../../Assets/DashboardAssets/profileIcon.png";
 
-const AssignStudent = ({
-  name,
-  imageUrl,
-  section,
-  studentId,
-  onAssignmentComplete,
-}) => {
+const AssignStudent = ({ name, imageUrl, section, studentId }) => {
   const [sectionId, setSectionId] = useState("");
-  const [groupId, setGroupId] = useState("");
-  const AllSections = useSelector((store) => store.Class.sectionsList);
-  const { fetchGroupsByClass } = useGetGroupsByClass();
-  const AllGroups = useSelector((store) => store.Class.groupsList);
+  const AllSections = useSelector(
+    (store) => store.admin.group_section.sectionsList
+  );
+
   const { cid } = useParams();
+  const dispatch = useDispatch();
 
+  // Preload the sectionId if the student already has a section
   useEffect(() => {
-    fetchGroupsByClass(cid);
-  }, [cid, fetchGroupsByClass]);
+    if (AllSections.length === 0) dispatch(fetchSectionsByClass(cid));
 
-  const { assignStudentToGroup, assignStudentToSection, error, loading } =
-    useAssignStudentToGroup();
-
-  const handleSectionChange = (e) => {
-    setSectionId(e.target.value);
-  };
+    // If the student already has a section assigned, preload it in the dropdown
+    const sectionToPreload = AllSections.find(
+      (sec) => sec.sectionName === section
+    );
+    if (sectionToPreload) {
+      setSectionId(sectionToPreload._id);
+    }
+  }, [cid, dispatch, section, AllSections]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // if (!groupId) {
-    //   toast.error("Please select a group.");
-    //   return;
-    // }
+
     if (!sectionId) {
       toast.error("Please select a section.");
       return;
     }
     try {
-      await assignStudentToSection(studentId, sectionId);
-      // await assignStudentToGroup(studentId, groupId);
-      // toast.success("Student assigned to Section successfully!");
+      await dispatch(assignStudentToSection({ studentId, sectionId }));
 
-      if (onAssignmentComplete) {
-        onAssignmentComplete();
-      }
+      dispatch(fetchUnassignedStudents(cid)); // Refetch unassigned students
+      dispatch(fetchGroupsByClass(cid)); // Refetch groups after assignment
+      toast.success("Student assigned successfully!");
     } catch (error) {
-      console.log(error);
-      toast.error(error.message);
+      toast.error(error.message || "Something went wrong");
     }
   };
 
@@ -59,7 +55,7 @@ const AssignStudent = ({
       <div className="bg-white rounded-lg p-4 w-full max-w-md">
         <div className="flex items-center">
           <img
-            src={imageUrl}
+            src={imageUrl || profileIcon}
             alt={name}
             className="w-10 h-10 rounded-full mr-3"
           />
@@ -77,11 +73,10 @@ const AssignStudent = ({
         </label>
         <select
           value={sectionId}
-          onChange={handleSectionChange}
+          onChange={(e) => setSectionId(e.target.value)}
           className="block w-full p-2 border border-gray-300 rounded-lg"
-          disabled={loading}
         >
-          <option value="">All Sections</option>
+          <option value="">Select Section</option>
           {AllSections?.map((section) => (
             <option key={section._id} value={section._id}>
               {section.sectionName}
@@ -89,42 +84,17 @@ const AssignStudent = ({
           ))}
         </select>
       </div>
-      {/* <div className="mt-4">
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Group
-        </label>
-        <select
-          value={groupId}
-          onChange={(e) => setGroupId(e.target.value)}
-          className="block w-full p-2 border border-gray-300 rounded-lg"
-          disabled={loading}
-        >
-          <option value="">
-            {AllGroups && AllGroups.length > 0
-              ? "Choose Group"
-              : "No Group Found"}
-          </option>
-          {AllGroups?.map((group) => (
-            <option key={group?._id} value={group?._id}>
-              {group?.groupName}
-            </option>
-          ))}
-        </select>
-      </div> */}
       <div className="mt-auto mb-8">
         <button
           type="submit"
           className={`w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md ${
-            loading
-              ? "opacity-50 cursor-not-allowed"
-              : "hover:from-pink-600 hover:to-purple-600"
+            !sectionId ? "opacity-50 cursor-not-allowed" : ""
           }`}
-          disabled={loading}
+          disabled={!sectionId}
         >
-          {loading ? "Assigning..." : "Assign Student"}
+          Assign Student
         </button>
       </div>
-      {error && <p className="text-red-500 text-center">{error}</p>}
     </form>
   );
 };

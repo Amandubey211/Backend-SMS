@@ -1,46 +1,51 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import QuizQuestionCard from "./QuizQuestionCard";
+import { useDispatch, useSelector } from "react-redux";
+import { setCurrentQuestionIndex, setSelectedOptions } from "../../../../../../../Store/Slices/Student/MyClass/Class/Subjects/Quizes/quizesSlice";
+import { useParams } from "react-router-dom";
+import { stdGetSingleQuiz } from "../../../../../../../Store/Slices/Student/MyClass/Class/Subjects/Quizes/quizes.action";
 
 const QuizQuestions = ({
-  questions,
-  selectedOptions,
-  setSelectedOptions, // Make sure you pass this correctly from MainSection
+  // questions,
+  // selectedOptions,
+  // setSelectedOptions, // Make sure you pass this correctly from MainSection
   showOneQuestionOnly,
   handleSubmit,
+  hasRemainingAttempts
 }) => {
+  const { selectedOptions, itemDetails } = useSelector((store) => store?.student?.studentQuiz);
+  const questions = itemDetails?.questions;
+  const dispatch = useDispatch();
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
 
-  // Handle option change for each question
-  const handleOptionChange = (questionIndex, selectedOption) => {
-    setSelectedOptions((prevSelectedOptions) => ({
-      ...prevSelectedOptions,
-      [questionIndex]: selectedOption, // Update the selected option for the current question
-    }));
-  };
+
 
   const handleNextQuestion = () => {
-    if (currentQuestionIndex < questions.length - 1) {
+    if (currentQuestionIndex < questions?.length - 1) {
+      console.log("cqisss111ss==>", currentQuestionIndex)
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     }
   };
 
   const handlePreviousQuestion = () => {
     if (currentQuestionIndex > 0) {
+      console.log("cqisssss==>", currentQuestionIndex)
       setCurrentQuestionIndex(currentQuestionIndex - 1);
     }
   };
 
+
+  // console.log("cqi 2", currentQuestionIndex)
   if (showOneQuestionOnly) {
     // Show one question at a time
     const question = questions[currentQuestionIndex];
-
+    // console.log("cqi", currentQuestionIndex)
     return (
       <div className="w-full p-1">
         <QuizQuestionCard
           question={question}
           questionIndex={currentQuestionIndex}
-          selectedOption={selectedOptions[currentQuestionIndex]}
-          handleOptionChange={handleOptionChange} // Pass the handler to change options
+          // selectedOption={selectedOptions[currentQuestionIndex]}
         />
         <div className="flex justify-between mt-4">
           <button
@@ -50,7 +55,7 @@ const QuizQuestions = ({
           >
             Previous
           </button>
-          {currentQuestionIndex < questions.length - 1 ? (
+          {currentQuestionIndex < questions?.length - 1 ? (
             <button
               onClick={handleNextQuestion}
               className="bg-blue-500 text-white py-2 px-4 rounded-md"
@@ -70,6 +75,8 @@ const QuizQuestions = ({
     );
   }
 
+
+
   // Show all questions at once
   return (
     <div className="w-full p-1">
@@ -77,13 +84,12 @@ const QuizQuestions = ({
         All Questions Preview
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {questions.map((question, questionIndex) => (
+        {questions?.map((question, questionIndex) => (
           <QuizQuestionCard
             key={question._id}
             question={question}
             questionIndex={questionIndex}
-            selectedOption={selectedOptions[questionIndex]}
-            handleOptionChange={handleOptionChange} // Pass the handler to change options
+            // selectedOption={selectedOptions[questionIndex]}
           />
         ))}
       </div>
@@ -99,4 +105,4 @@ const QuizQuestions = ({
   );
 };
 
-export default React.memo(QuizQuestions);
+export default QuizQuestions;

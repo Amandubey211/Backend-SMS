@@ -1,82 +1,62 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import AttendanceSummary from "./AttendanceSummary";
 import CalendarHeader from "./Calender";
 import StudentDashLayout from "../../../../../../Components/Student/StudentDashLayout";
-import axios from "axios";
-import moment from "moment";
-import { baseUrl } from "../../../../../../config/Common";
-
-import { shallowEqual, useSelector } from "react-redux";
 import useNavHeading from "../../../../../../Hooks/CommonHooks/useNavHeading ";
+import { useDispatch, useSelector } from "react-redux";
+import { setCurrentDate } from "../../../../../../Store/Slices/Student/MyClass/Class/Attendance/stdAttendanceSlice";
+import { stdAttendance } from "../../../../../../Store/Slices/Student/MyClass/Class/Attendance/stdAttendance.action";
+import { GoAlertFill } from "react-icons/go";
+import Spinner from "../../../../../../Components/Common/Spinner";
+import OfflineModal from "../../../../../../Components/Common/Offline";
+import { setShowError } from "../../../../../../Store/Slices/Common/Alerts/alertsSlice";
+import NoDataFound from "../../../../../../Components/Common/NoDataFound";
 
 const AttendanceMain = () => {
-  const { selectedClassName } = useSelector(
-    (state) => ({
-      selectedClassName: state.Common.selectedClassName,
-    }),
-    shallowEqual
-  );
-  const [attendanceData, setAttendanceData] = useState({});
-  const [currentDate, setCurrentDate] = useState(moment());
-  const [summary, setSummary] = useState({
-    presentCount: 0,
-    absentCount: 0,
-    leaveCount: 0,
-  });
+  const { loading, error, attendanceData, summary, currentDate } = useSelector((store) => store?.student?.studentAttendance);
+  const dispatch = useDispatch();
+  const {showError}=useSelector((store)=>store?.common?.alertMsg);
 
-  useNavHeading(selectedClassName, "Attendance");
-  const fetchAttendance = async (month, year) => {
-    try {
-      const token = localStorage.getItem("student:token");
-      if (!token) {
-        throw new Error("Authentication not found");
-      }
 
-      const response = await axios.get(
-        `${baseUrl}/api/studentDashboard/myAttendance`,
-        {
-          params: { month, year },
-          headers: {
-            Authentication: token,
-          },
-        }
-      );
-
-      const { report, summary } = response.data.report;
-      const attendanceMap = report.reduce((acc, entry) => {
-        acc[entry.date] = entry.status;
-        return acc;
-      }, {});
-      setAttendanceData(attendanceMap);
-      setSummary(summary);
-    } catch (error) {
-      console.error("Failed to fetch Attendance:", error);
-    }
-  };
-
+  const handleDismiss = () => {
+    dispatch(setShowError(false));
+  }
   useEffect(() => {
-    fetchAttendance(currentDate.month() + 1, currentDate.year());
-  }, [currentDate]);
+    const month = currentDate.month() + 1;
+    const year = currentDate.year();
+    // fetchAttendance(currentDate.month() + 1, currentDate.year());
+    dispatch(stdAttendance({ month, year }))
+  }, [dispatch, currentDate]);
 
   const onPanelChange = (value) => {
-    setCurrentDate(value);
+    dispatch(setCurrentDate(value));
   };
 
   return (
     <StudentDashLayout>
       <div className="container mx-auto py-4">
-        <AttendanceSummary
-          present={summary.presentCount}
-          absent={summary.absentCount}
-          leave={summary.leaveCount}
-        />
+        <AttendanceSummary />
         <div className="border-b border-t border-gray-200 my-4 p-4">
-          <CalendarHeader
-            attendanceData={attendanceData}
-            onPanelChange={onPanelChange}
-          />
+          {loading ?
+            <div className="w-full flex flex-col items-center justify-center py-20">
+              <Spinner />
+            </div>
+            // : (!loading || attendanceData?.length===0)?
+            //   <div className="w-full flex flex-col items-center justify-center py-20">
+            //   <NoDataFound/>
+            //   </div>
+               :
+              <CalendarHeader
+                attendanceData={attendanceData}
+                onPanelChange={onPanelChange}
+                currentDate={currentDate}
+              />
+              }
         </div>
       </div>
+      {!loading && showError && (
+            <OfflineModal error={error} onDismiss={handleDismiss} />
+          )}
     </StudentDashLayout>
   );
 };

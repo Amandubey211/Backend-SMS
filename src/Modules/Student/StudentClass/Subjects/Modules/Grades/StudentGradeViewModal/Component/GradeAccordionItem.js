@@ -10,14 +10,10 @@ const GradeAccordionItem = ({ grade }) => {
   const [isOpen, setIsOpen] = useState(true);
 
   const toggleOpen = () => setIsOpen(!isOpen);
-
+ 
   // Ensure grade is an array before sorting and mapping
-  const sortedGrades = Array.isArray(grade)
-    ? grade.sort(
-        (a, b) => new Date(b.submittedDate) - new Date(a.submittedDate)
-      )
-    : [];
-
+  // const sortedGrades =  grade?.sort((a, b) => new Date(b.submittedDate) - new Date(a.submittedDate))
+    
   const getColorForStatus = (status) => {
     return status?.toLowerCase() === "submit"
       ? "text-green-500"
@@ -55,13 +51,13 @@ const GradeAccordionItem = ({ grade }) => {
           isOpen ? "max-h-full" : "max-h-0"
         }`}
       >
-        {sortedGrades.length > 0 ? (
+        {grade?.length > 0 ? (
           <div className="p-1">
             <table className="min-w-full bg-white rounded-lg overflow-hidden">
               <thead className="border-b">
                 <tr className="text-left">
                   <th className="px-2 py-1">Name</th>
-                  <th className="px-2 py-1">Module</th>
+                  <th className="px-2 py-1">Chapter</th>
                   <th className="px-2 py-1">Due Date</th>
                   <th className="px-2 py-1">Submit Date</th>
                   <th className="px-2 py-1">Status</th>
@@ -69,7 +65,7 @@ const GradeAccordionItem = ({ grade }) => {
                 </tr>
               </thead>
               <tbody>
-                {sortedGrades.map((evalItem, idx) => (
+                {grade?.map((evalItem, idx) => (
                   <tr
                     key={idx}
                     className="bg-white hover:bg-gray-100 transition-shadow duration-200 shadow-md rounded-lg mb-2" // Added margin-bottom for spacing
@@ -77,17 +73,14 @@ const GradeAccordionItem = ({ grade }) => {
                     <td className="px-2 py-2">
                       {" "}
                       {/* Increased padding for better spacing */}
-                      <span>{evalItem.Name}</span>
+                      <span>{evalItem?.Name}</span>
                       <span className="text-xs text-green-400 ml-1">
-                        ({evalItem.type})
+                        ({evalItem?.type})
                       </span>
                     </td>
                     <td className="px-2 py-2">
                       <div className="flex flex-col">
-                        <span>{evalItem.moduleName}</span>
-                        <span className="text-xs text-green-700">
-                          {evalItem.chapterName}
-                        </span>
+                        <span className="text-xs" > {evalItem?.chapterName?.slice(0,15)}..</span>
                       </div>
                     </td>
                     <td className="px-2 text-sm py-2">
@@ -101,13 +94,13 @@ const GradeAccordionItem = ({ grade }) => {
                     <td className="px-2 py-2">
                       <span
                         className={`${getColorForStatus(
-                          evalItem.status
+                          evalItem?.status
                         )} font-medium`}
                       >
-                        {evalItem.status}
+                        {evalItem?.status}
                       </span>
                     </td>
-                    <td className="px-2 py-2">{evalItem.score||0}</td>
+                    <td className="px-2 py-2">{evalItem?.score||0}</td>
                   </tr>
                 ))}
               </tbody>

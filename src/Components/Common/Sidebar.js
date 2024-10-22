@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useCallback } from "react";
 import { RxCross2 } from "react-icons/rx";
 
-const Sidebar = ({ isOpen, title, onClose, children, width }) => {
+const Sidebar = ({ isOpen, title, onClose, children, width = "35%" }) => {
   const sidebarRef = useRef(null);
   const closeButtonRef = useRef(null); // Reference to the close button
 
@@ -51,9 +51,9 @@ const Sidebar = ({ isOpen, title, onClose, children, width }) => {
       document.addEventListener("keydown", trapFocus);
 
       // Focus the close button when the sidebar is opened
-      if (closeButtonRef.current) {
-        closeButtonRef.current.focus();
-      }
+      // if (closeButtonRef.current) {
+      //   closeButtonRef.current.focus();
+      // }
     } else {
       document.removeEventListener("mousedown", handleClickOutside);
       document.removeEventListener("keydown", trapFocus);
@@ -63,7 +63,7 @@ const Sidebar = ({ isOpen, title, onClose, children, width }) => {
       document.removeEventListener("mousedown", handleClickOutside);
       document.removeEventListener("keydown", trapFocus);
     };
-  }, [isOpen, onClose, trapFocus]);
+  }, [isOpen, onClose,]);
 
   return (
     <div
@@ -80,9 +80,8 @@ const Sidebar = ({ isOpen, title, onClose, children, width }) => {
       ></div>
       <div
         ref={sidebarRef}
-        className={`absolute top-0 right-0 ${
-          width ? `w-[${width}]` : "w-1/3"
-        } h-full py-3 px-4 bg-white shadow-lg transform ${
+        style={{ width }}
+        className={`absolute top-0 right-0 h-full py-3 px-4 bg-white shadow-lg transform ${
           isOpen ? "translate-x-0" : "translate-x-full"
         } transition-transform`}
       >
@@ -90,7 +89,9 @@ const Sidebar = ({ isOpen, title, onClose, children, width }) => {
           className="flex justify-between items-center px-2"
           id="sidebar-title"
         >
-          <h1 className="font-semibold">{title || "Please give title"}</h1>
+          <h1 className="font-semibold text-gradient">
+            {title || "Please give title"}
+          </h1>
           <button
             ref={closeButtonRef}
             onClick={onClose}

@@ -10,7 +10,6 @@ const useFetchPageById = () => {
   const [error, setError] = useState(null);
   const [page, setPage] = useState(null);
 
-  
   const { role } = useSelector((store) => store.Auth);
   const { pid } = useParams();
 
@@ -20,13 +19,10 @@ const useFetchPageById = () => {
 
     try {
       const token = localStorage.getItem(`${role}:token`);
-      const response = await axios.get(
-        `${baseUrl}/admin/api/pages/${pid}`,
-        {
-          headers: { Authentication: token },
-        }
-      );
-console.log(response.data)
+      const response = await axios.get(`${baseUrl}/admin/api/pages/${pid}`, {
+        headers: { Authentication: token },
+      });
+      console.log(response.data);
       if (response.data.success) {
         setPage(response.data.data);
       } else {
@@ -34,8 +30,7 @@ console.log(response.data)
         setError("Failed to fetch page");
       }
     } catch (err) {
-      const errorMessage =
-        err.response?.data?.message || "Error fetching page";
+      const errorMessage = err.response?.data?.message || "Error fetching page";
       toast.error(errorMessage);
       setError(errorMessage);
     } finally {

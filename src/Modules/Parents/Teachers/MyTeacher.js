@@ -1,89 +1,63 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import TeacherCards from '../../../Components/Parents/Teachers/TeacherCard';
-import axios from 'axios';
-import { baseUrl } from '../../../config/Common';
-import Spinner from '../../../Components/Common/Spinner';
 import { FaChalkboardTeacher } from 'react-icons/fa';
 import { useParams } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchTeachers } from '../../../Store/Slices/Parent/Children/children.action'; // Import the thunk
+import Spinner from '../../../Components/Common/Spinner';
+import { useTranslation } from "react-i18next";
 
 const MyTeacher = () => {
-    const studentId = useParams().ssid;
-
-    const [instructors, setTeachers] = useState([]);
-    const [error, setError] = useState(null);
-    const [loading, setLoading] = useState(true);
-
+    const { t } = useTranslation('prtChildrens');
+    const { ssid: studentId } = useParams(); // Get student ID from the route parameters
+    const dispatch = useDispatch();
+    
+    // Access the teacher-related data from Redux state
+    const { teachers = [], loading, error } = useSelector((state) => state.Parent.children); // Default empty array for teachers
+    
+    // Fetch teachers when component mounts or when studentId changes
     useEffect(() => {
-        const fetchTeachers = async () => {
-            try {
-                const userData = JSON.parse(localStorage.getItem('userData'));
-                const token = localStorage.getItem('parent:token');
+        if (studentId) {
+            dispatch(fetchTeachers(studentId));
+        }
+    }, [dispatch, studentId]);
 
-                if (!userData) {
-                    throw new Error("No user data found");
-                }
-
-                const { email } = userData;
-
-                if (!token) {
-                    throw new Error("No token found");
-                }
-                if (!email) {
-                    throw new Error("No guardian email found");
-                }
-
-                const response = await axios.get(`${baseUrl}/parent/api/instructors?studentId=${studentId}`, {
-                    headers: {
-                        'Authentication': `${token}`
-                    }
-                });
-
-                if (!response.data || response.data.instructors.length === 0) {
-                    setTeachers([]);  // No instructors found, but it's not an error
-                } else {
-                    setTeachers(response.data.instructors);
-                }
-            } catch (error) {
-                console.error('Failed to fetch instructors:', error);
-                setError("Unable to fetch instructors");
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchTeachers();
-    }, []);
-
+    // Handling the loading state
     if (loading) {
         return (
             <div className="flex justify-center items-center h-full">
-                <Spinner />
+                <Spinner /> {/* Show spinner while data is loading */}
             </div>
         );
     }
 
+
+    
+    // Handling error state
     if (error) {
         return (
             <div className="flex flex-col items-center justify-center h-full text-center">
                 <FaChalkboardTeacher className="text-6xl text-gray-400 mb-4" />
-                <p className="text-gray-500">{error}</p>
+                <p className="text-gray-500">{error}: {t("Unable to Fetch Instructors")}</p>
             </div>
         );
     }
 
-    if (instructors.length === 0) {
+    // Handling case where no teachers are found
+    if (teachers?.length === 0) {
         return (
             <div className="flex flex-col items-center justify-center h-full text-center">
                 <FaChalkboardTeacher className="text-6xl text-gray-400 mb-4" />
-                <p className="text-gray-500">No Instructors Found!</p>
+                <p className="text-gray-500">{t("No Instructors Found")}!</p>
             </div>
         );
     }
 
+    // Render teacher cards if teachers are available
     return (
         <div className="h-full w-full p-4">
             <div className="text-lg font-medium mb-4 flex items-center">
-                Child Instructors
+                {t("Child Instructors")}
                 <div
                     className="ml-2 flex items-center justify-center rounded-full"
                     style={{
@@ -100,14 +74,14 @@ const MyTeacher = () => {
                         }}
                         className="text-lg font-semibold"
                     >
-                        {instructors.length.toString().padStart(2, '0')}
+                        {teachers?.length.toString().padStart(2, '0')} {/* Optional chaining to prevent errors */}
                     </span>
                 </div>
             </div>
 
             <div className="flex flex-wrap justify-start">
-                {instructors.map(instructor => (
-                    <TeacherCards key={instructor.id} instructor={instructor} />
+                {teachers?.map((instructor) => (
+                    <TeacherCards key={instructor?.id} instructor={instructor} /> 
                 ))}
             </div>
         </div>

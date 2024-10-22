@@ -1,4 +1,4 @@
-import axios from "axios";
+
 import React, { useEffect, useState } from "react";
 import {
   MdOutlineQuiz,
@@ -6,61 +6,44 @@ import {
   MdKeyboardArrowUp,
   MdKeyboardArrowDown,
 } from "react-icons/md";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-import { baseUrl } from "../../../../../../config/Common";
-import subjectIcon from '../../../../../../Assets/DashboardAssets/subjectIcon.png';
 import { FiLoader } from "react-icons/fi";
 import { FaBook } from "react-icons/fa";
 import { GoAlertFill } from "react-icons/go";
-const GradeAccordionItem = ({ grades, getData, loading }) => {
+import { fetchStudentSubjects } from "../../../../../../Store/Slices/Admin/Users/Students/student.action";
+const GradeAccordionItem = ({  getData }) => {
   const [isOpen, setIsOpen] = useState(null);
 
   const toggleOpen = (index) => {
     setIsOpen((prevState) => (prevState === index ? null : index));
   };
 
-  const getIconForType = (type) => {
-    switch (type) {
-      case "Quiz":
-        return (
-          <MdOutlineQuiz style={{ marginRight: 8 }} className="text-blue-500" />
-        );
-      case "Assignment":
-        return (
-          <MdAssignment style={{ marginRight: 8 }} className="text-green-500" />
-        );
-      default:
-        return null;
-    }
-  };
+  // const getIconForType = (type) => {
+  //   switch (type) {
+  //     case "Quiz":
+  //       return (
+  //         <MdOutlineQuiz style={{ marginRight: 8 }} className="text-blue-500" />
+  //       );
+  //     case "Assignment":
+  //       return (
+  //         <MdAssignment style={{ marginRight: 8 }} className="text-green-500" />
+  //       );
+  //     default:
+  //       return null;
+  //   }
+  // };
 
   const getColorForStatus = (status) => {
     return status === "Submit" ? "text-green-500" : "text-red-500";
   };
 
   const { cid } = useParams();
-  const [studentSubjects, setStudentSubjects] = useState([]);
-  const role = useSelector((store) => store.Auth.role);
-
-  useEffect(() => {
-    const fetchSubjects = async () => {
-      try {
-        const token = localStorage.getItem(`${role}:token`);
-        if (!token) {
-          throw new Error("Authentication token not found");
-        }
-        const response = await axios.get(`${baseUrl}/api/studentDashboard/subjects/${cid}`, {
-          headers: { Authentication: token },
-        });
-        setStudentSubjects(response.data.subjects);
-      } catch (err) {
-        console.error("Error fetching subjects:", err);
-      }
-    };
-
-    fetchSubjects();
-  }, [cid, role]);
+  const {grades,studentSubjects,loading} = useSelector((store) => store.admin.all_students);
+  const dispatch = useDispatch();
+  useEffect(()=>{
+dispatch(fetchStudentSubjects(cid))
+  },[dispatch])
 
   return (
     <>
@@ -110,14 +93,14 @@ const GradeAccordionItem = ({ grades, getData, loading }) => {
                   </tr>
                 ) : (
                   <tbody className="w-full">
-                    {grades?.length > 0 ? (
-                      grades.map((i, idx) => (
+                    {grades?.grades?.length > 0 ? (
+                      grades?.grades.map((i, idx) => (
                         <tr key={idx} className="bg-white">
                           <td className="px-5 py-2 flex items-center w-[10rem]">
                             <span>{i?.Name}</span>
                           </td>
-                          <td className="px-5 py-2">{i?.dueDate.slice(0, 10)}</td>
-                          <td className="px-5 py-2">{i?.submittedDate.slice(0, 10)}</td>
+                          <td className="px-5 py-2">{i?.dueDate?.slice(0, 10)}</td>
+                          <td className="px-5 py-2">{i?.submittedDate?.slice(0, 10)}</td>
                           <td className="px-5 py-2">
                             <span
                               className={`${getColorForStatus(

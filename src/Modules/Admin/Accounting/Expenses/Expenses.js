@@ -4,7 +4,6 @@ import DashLayout from "../../../../Components/Admin/AdminDashLayout";
 import TeacherSalary from "./components/TeacherSalary";
 import StaffSalary from "./components/StaffSalary";
 import OtherExpenses from "./components/OtherExpenses";
-import TabButton from "../../Libary/Subclasss/component/TabButton";
 import Sidebar from "../../../../Components/Common/Sidebar";
 import PaySalary from "./components/PaySalary";
 import AddEarning from "../Earnings/AddEarning";
@@ -18,16 +17,20 @@ import {
 import axios from "axios";
 import { baseUrl } from "../../../../config/Common.js";
 import AddExpense from "./components/AddExpense.js";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import TabButton from "../../Libary/Components/TabButton.js";
+import { setCurrentExpense, setIsSidebarOpen } from "../../../../Store/Slices/Admin/Accounting/Expenses/expensesSlice.js";
+import { fetchSalaries } from "../../../../Store/Slices/Admin/Accounting/Expenses/expenses.action.js";
 
 const Expenses = () => {
+
+  const { isSidebarOpen, currentExpense } = useSelector((store) => store?.admin?.expenses)
+  const dispatch = useDispatch()
+
   const [activeTab, setActiveTab] = useState("TeacherSalary");
   const [selectedMonth, setSelectedMonth] = useState("");
   const [selectedOption, setSelectedOption] = useState("");
-  const [isSidebarOpen, setSidebarOpen] = useState(false);
-  const [salaryData, setSalaryData] = useState([]);
-  const [currentExpense, setCurrentExpense] = useState(null);
-  const role = useSelector((store) => store.Auth.role);
+
   const options = [{
     label: 'All Expenses',
     value: ''
@@ -55,101 +58,36 @@ const Expenses = () => {
     { value: 'December', label: 'December' }
   ];
 
-  const handleSidebarOpen = () => setSidebarOpen(true);
+  const handleSidebarOpen = () => {
+    dispatch(setIsSidebarOpen(true))
+  };
+
   const handleSidebarClose = () => {
-    setSidebarOpen(false);
-    setCurrentExpense(null); // Clear the current expense when sidebar is closed
-  };
-
-
-  const fetchSalaries = async (query, activeTab, month) => {
-    try {
-      const token = localStorage.getItem(`${role}:token`)
-      const year = new Date().getFullYear()
-      if (activeTab === "TeacherSalary") {
-
-        const response = await axios.get(`${baseUrl}/admin/staff/get_salary?salaryRole=teacher&status=${query}&month=${month}&year=${year}`,
-          {
-            headers: {
-              Authentication: token
-            }
-          }
-        )
-        console.log("response data:", response);
-        //setSelectedOption("")
-        setSalaryData(response.data.salaryRecords)
-      } if (activeTab === "StaffSalary") {
-
-        const response = await axios.get(`${baseUrl}/admin/staff/get_salary?salaryRole=all&status=${query}&month=${month}&year=${year}`,
-          {
-            headers: {
-              Authentication: token
-            }
-          }
-        )
-
-        //setSelectedOption("")
-        setSalaryData(response.data.salaryRecords)
-        console.log("salary data:", salaryData)
-      } if (activeTab === "OtherExpenses") {
-
-        const response = await axios.get(`${baseUrl}/api/admin/expenses?status=${query}&month=${month}&year=${year}`,
-          {
-            headers: {
-              Authentication: token
-            }
-          }
-        )
-        setSalaryData(response.data.data)
-      }
-
-    } catch (error) {
-      console.error('Error fetching expenses:', error);
-    }
-  };
-
-  const fetchExpenseById = async (id) => {
-    try {
-      const response = await getExpenseById(id);
-      setCurrentExpense(response.data);
-      handleSidebarOpen(); // Open the sidebar to show the expense details
-    } catch (error) {
-      console.error('Error fetching expense by id:', error);
-    }
+    dispatch(setIsSidebarOpen(false))
+    dispatch(setCurrentExpense(null));
+    
   };
 
   const handleCreateExpense = async () => {
-    fetchSalaries(selectedOption, activeTab, selectedMonth);
+    dispatch(fetchSalaries({ query: selectedOption, activeTab, month: selectedMonth }))
     handleSidebarClose();
   };
-
-  const handleDeleteExpense = async (id) => {
-    try {
-      await deleteExpense(id);
-      //fetchExpenses(); // Refresh the expenses list
-    } catch (error) {
-      console.error('Error deleting expense:', error);
-    }
-  };
-
 
   const handleFilterChange = (e) => {
     const newData = e.target.value
     setSelectedOption(newData)
-    fetchSalaries(newData, activeTab, selectedMonth);
+    dispatch(fetchSalaries({ query: newData, activeTab, month: selectedMonth }))
   };
 
   const handleMonthChange = (e) => {
     const month = e.target.value;
     setSelectedMonth(month);
-    fetchSalaries(selectedOption, activeTab, month);
+    dispatch(fetchSalaries({ query: selectedOption, activeTab, month }))
   };
 
   useEffect(() => {
-    fetchSalaries(selectedOption, activeTab, selectedMonth);
-
+    dispatch(fetchSalaries({ query: selectedOption, activeTab, month: selectedMonth }));
   }, [activeTab]);
-
 
   return (
     <Layout title="Expenses">
@@ -231,30 +169,31 @@ const Expenses = () => {
 
           {activeTab === "TeacherSalary" && (
             <TeacherSalary
-              initialTeacherData={salaryData}
+              //initialTeacherData={salaryData}
               selectedMonth={selectedMonth}
               selectedOption={selectedOption}
-              onEdit={fetchExpenseById}
-              onDelete={handleDeleteExpense}
+              //onEdit={fetchExpenseById}
+              //onDelete={handleDeleteExpense}
             />
           )}
 
           {activeTab === "StaffSalary" && (
             <StaffSalary
-              staffData={salaryData}
+              //staffData={salaryData}
               selectedMonth={selectedMonth}
               selectedOption={selectedOption}
-              onEdit={fetchExpenseById}
-              onDelete={handleDeleteExpense}
+              //onEdit={fetchExpenseById}
+              //onDelete={handleDeleteExpense}
             />
           )}
 
           {activeTab === "OtherExpenses" && (
             <OtherExpenses
-              expenseData={salaryData}
+              //expenseData={salaryData}
               selectedMonth={selectedMonth}
-              onEdit={fetchExpenseById}
-              onDelete={handleDeleteExpense}
+              selectedOption={selectedOption}
+              //onEdit={fetchExpenseById}
+              //onDelete={handleDeleteExpense}
             />
           )}
 

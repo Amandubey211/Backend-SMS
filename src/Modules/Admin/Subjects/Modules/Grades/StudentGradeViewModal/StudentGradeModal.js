@@ -1,18 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useSelector,useDispatch } from "react-redux";
 import StudentGradeModalFilterHeader from "./Component/StudentGradeModalFilterHeader";
 import StudentModalGradeList from "./Component/StudentGradeModalList";
 import StudentGradeSummary from "./Component/StudentGradeSummary";
-import useFetchStudentGrades from "../../../../../../Hooks/AuthHooks/Staff/Admin/Grades/useFetchStudentGrades";
-import dummyData from "./Component/DummyData";
 import { FiLoader } from "react-icons/fi";
-
-const StudentGradeModal = ({ isOpen, onClose }) => {
+import {fetchStudentGrades} from "../../../../../../Store/Slices/Admin/Users/Students/student.action"
+import { useParams } from "react-router-dom";
+const StudentGradeModal = ({ isOpen, onClose,student }) => {
+  const { cid, sid } = useParams();
   const [filters, setFilters] = useState({
     arrangeBy: "",
     module: "",
     chapter: "",
     status: "",
+    subject:""
   });
 
   const handleFilterChange = (name, value) => {
@@ -20,6 +21,7 @@ const StudentGradeModal = ({ isOpen, onClose }) => {
       ...prevFilters,
       [name]: value,
     }));
+    getStudentGrades()
   };
 
   useEffect(() => {
@@ -32,18 +34,17 @@ const StudentGradeModal = ({ isOpen, onClose }) => {
       document.body.classList.remove("overflow-hidden");
     };
   }, [isOpen]);
-
-  const studentGrade = useSelector((store) => store.Admin.studentGrade);
-  // console.log(studentGrade._id)
-  const { error, fetchStudentGrades, grades, loading, totals } = useFetchStudentGrades();
-  useEffect(() => {
-    console.log('--',studentGrade);
-    
-    if(isOpen){
-      fetchStudentGrades(studentGrade.studentId||studentGrade._id, filters.module, filters.chapter, filters.arrangeBy);
-    }
-   
-  }, [studentGrade, fetchStudentGrades, filters]);
+   const {grades,loading} = useSelector((store) => store.admin.all_students);
+   const dispatch = useDispatch();
+  const getStudentGrades = async()=>{
+    const params = {};
+         if (sid) params.subjectId = sid;
+         if (filters.subject) params.subjectId   = filters.subject;
+         if (filters.module) params.moduleId   = filters.module;
+         if (filters.chapter) params.chapterId = filters.chapter;
+         if (filters.arrangeBy) params.arrangeBy = filters.arrangeBy;
+         dispatch(fetchStudentGrades({params,studentId:student?.studentId || student?._id,studentClassId:cid}));
+     }
 
   return (
     <>
@@ -82,16 +83,15 @@ const StudentGradeModal = ({ isOpen, onClose }) => {
             </div>
             <div className="flex w-full">
               <div className="flex-1">
-                <StudentGradeModalFilterHeader
+                 <StudentGradeModalFilterHeader
                   filters={filters}
                   onFilterChange={handleFilterChange}
-                />
+                /> 
                 <div className="h-96 overflow-y-scroll no-scrollbar">
                   <StudentModalGradeList data={grades.grades} filters={filters} />
                 </div>
               </div>
-              <StudentGradeSummary studentGrade={grades} />
-              
+              <StudentGradeSummary grades={grades} studentData={grades.student} />
             </div>
           </div>
         </div></>}

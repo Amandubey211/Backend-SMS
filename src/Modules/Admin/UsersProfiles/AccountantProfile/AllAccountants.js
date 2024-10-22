@@ -4,23 +4,23 @@ import DashLayout from '../../../../Components/Admin/AdminDashLayout';
 import SidebarSlide from '../../../../Components/Common/SidebarSlide';
 import ViewAccountant from "./ViewAccountant";
 import ProfileCard from '../SubComponents/ProfileCard'; // Import the generic ProfileCard
-import { useSelector } from "react-redux";
-import useGetAllStaff from "../../../../Hooks/AuthHooks/Staff/Admin/staff/useGetAllStaff";
+import { useDispatch, useSelector } from "react-redux";
 import AddUser from "../StaffProfile/AddUser";
 import { FiLoader } from "react-icons/fi";
 import { GoAlertFill } from "react-icons/go";
+import { fetchAllStaff } from "../../../../Store/Slices/Admin/Users/Staff/staff.action";
+import Spinner from "../../../../Components/Common/Spinner";
 
 const AllAccountants = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarContent, setSidebarContent] = useState(null);
   const [selectedAccountant, setSelectedAccountant] = useState(null);
   const [accountantData, setAccountantData] = useState(null);
-  const allAccountant = useSelector((store) => store.Staff.allAccountant);
-  const { fetchStaff,loading } = useGetAllStaff();
-
+  const {accountant,loading} = useSelector((store) => store.admin.all_staff);
+const dispatch = useDispatch()
   useEffect(() => {
-    fetchStaff();
-  }, []);
+    dispatch(fetchAllStaff())
+  }, [dispatch]);
 
   const handleSidebarOpen = () => setSidebarOpen(true);
   const handleSidebarClose = () => setSidebarOpen(false);
@@ -61,12 +61,11 @@ const AllAccountants = () => {
     <Layout title="All Accountants">
       <DashLayout>
       {loading?<div className="flex w-full h-[90vh] flex-col items-center justify-center">
-    <FiLoader className="animate-spin mr-2 w-[3rem] h-[3rem] " />
-    <p className="text-gray-800 text-lg">Loading...</p>
+        <Spinner/>
     </div>:
         <div className="p-4">
           <div className="flex justify-between items-center mb-4 border-b-2 h-20">
-            <h2 className="text-xl font-semibold">All Accountants <span className="bg-purple-400 px-2 text-sm py-1 rounded-full  ">{allAccountant?.length}</span></h2>
+            <h2 className="text-xl font-semibold">All Accountants <span className="bg-purple-400 px-2 text-sm py-1 rounded-full  ">{accountant?.length}</span></h2>
             <button onClick={handleAddAccountantClick}
               className="bg-purple-500 text-white px-4 py-2 rounded-md flex items-center space-x-2">
               <span>Add New Accountant</span>
@@ -74,8 +73,8 @@ const AllAccountants = () => {
           </div>
           <div className="flex flex-wrap -mx-2">
 
-            {allAccountant.length >0 ?
-            allAccountant.map((accountant, index) => (
+            {accountant.length >0 ?
+            accountant.map((accountant, index) => (
               <ProfileCard
                 key={index}
                 profile={accountant}
@@ -85,7 +84,7 @@ const AllAccountants = () => {
             )):  <div>
             <div className="flex w-[80vw] text-gray-500 h-[90vh] items-center justify-center flex-col text-2xl">
     <GoAlertFill className="text-[5rem]" />
-   No  Data Found
+   No  Accountant Found
   </div>
         </div>}
           </div>
@@ -96,7 +95,7 @@ const AllAccountants = () => {
             title={<span className="bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent bg-clip-text">
               {sidebarContent === "viewAccountant" ? "Quick View of Accountant" : "Add/Edit Accountant"}
             </span>}
-            width="60%"
+            width={sidebarContent === "viewAccountant" ? "30%" : "60%"}
             height="100%"
           >
             {renderSidebarContent()}

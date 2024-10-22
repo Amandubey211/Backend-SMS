@@ -5,11 +5,14 @@ import FormField from "../../Accounting/subClass/component/FormField";
 import ChildProfile from "./ChildProfile";
 import Sidebar from "../../../../Components/Common/Sidebar";
 import useGetAllParents from "../../../../Hooks/AuthHooks/Staff/Admin/parent/useGetAllParents";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import profileIcon from "../../../../Assets/DashboardAssets/profileIcon.png";
 import { GoAlertFill } from "react-icons/go";
 import { FiLoader } from "react-icons/fi";
 import useGetAllStudents from "../../../../Hooks/AuthHooks/Staff/Admin/Students/useGetAllStudents";
+import { fetchAllParent } from "../../../../Store/Slices/Admin/Users/Parents/parent.action";
+import { fetchAllStudents } from "../../../../Store/Slices/Admin/Users/Students/student.action";
+import Spinner from "../../../../Components/Common/Spinner";
 
 const uniqueFilterOptions = (data, key) => {
   return [
@@ -20,10 +23,12 @@ const uniqueFilterOptions = (data, key) => {
 };
 
 const StudentParentProfile = () => {
-  const { fetchAllStudents } = useGetAllStudents();
-  useEffect(() => {
-    fetchAllStudents();
-  }, []);
+  const {allParents,loading} = useSelector((store)=>store.admin.all_parents);
+  const dispatch = useDispatch()
+  useEffect(()=>{
+    dispatch(fetchAllParent());
+    dispatch(fetchAllStudents());    
+  },[dispatch])
   const [selectedChild, setSelectedChild] = useState(null);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
 
@@ -44,14 +49,6 @@ const StudentParentProfile = () => {
     setSelectedChild(child);
     setSidebarOpen(true);
   };
-  const { fetchAllParents,loading } = useGetAllParents();
-  const allParents = useSelector((store) => store.Parents.allParents);
-  useEffect(() => {
-    async function fetchData() {
-      await fetchAllParents();
-    }
-    fetchData();
-  }, []);
   const filteredParents = allParents.filter((parent) =>
     parent.children.some(
       (child) =>
@@ -64,9 +61,8 @@ const StudentParentProfile = () => {
     <>
       <Layout title="Parents">
         <DashLayout>
-{loading? <div className="flex w-full h-[90vh] flex-col items-center justify-center">
-    <FiLoader className="animate-spin mr-2 w-[3rem] h-[3rem] " />
-    <p className="text-gray-800 text-lg">Loading...</p>
+       {loading? <div className="flex w-full h-[90vh] flex-col items-center justify-center">
+        <Spinner/>
     </div>:
           <div className="min-h-screen p-4 ">
             <h2 className="text-xl font-semibold mb-4">
@@ -115,53 +111,53 @@ const StudentParentProfile = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredParents.length >0 ?
-                  filteredParents.map((parent, index) => (
+                  {filteredParents?.length >0 ?
+                  filteredParents?.map((parent, index) => (
                     <tr key={index} className="text-left text-gray-700">
                       <td className="px-5 py-5 border-b border-gray-200 align-middle">
                         <div className="flex items-center">
                           <img
-                            src={parent.fatherImageUrl || profileIcon}
+                            src={parent?.fatherImageUrl || profileIcon}
                             alt="Profile"
                             className="h-8 w-8 rounded-full mr-2 border"
                           />
-                          <span>{parent.fatherName}</span>
+                          <span>{parent?.fatherName}</span>
                         </div>
                       </td>
 
                       <td className="px-5 py-5 border-b border-gray-200 align-middle">
                         <div className="flex items-center">
                           <img
-                            src={parent.motherImageUrl || profileIcon}
+                            src={parent?.motherImageUrl || profileIcon}
                             alt="Profile"
                             className="h-8 w-8 rounded-full mr-2"
                           />
-                          <span>{parent.motherName}</span>
+                          <span>{parent?.motherName}</span>
                         </div>
                       </td>
                       <td className="px-5 py-5 border-b border-gray-200 align-middle">
-                        {parent.phone}
+                        {parent?.phone}
                       </td>
                       <td className="px-5 py-5 border-b border-gray-200 align-middle">
-                        {parent.email}
+                        {parent?.email}
                       </td>
                       <td className="px-5 py-5 border-b border-gray-200 align-middle">
                         <div
                           className="flex items-center py-1 cursor-pointer"
-                          onClick={() => handleStudentClick(parent.children)}
+                          onClick={() => handleStudentClick(parent?.children)}
                         >
                           <div className="flex bg-pink-100 p-2 border rounded-full">
-                            {parent.children.map((child, idx) => (
+                            {parent?.children?.map((child, idx) => (
                               <img
                                 key={idx}
-                                src={child.imageUrl || profileIcon}
-                                alt={child.name}
+                                src={child?.imageUrl || profileIcon}
+                                alt={child?.name}
                                 className="h-8 w-8 rounded-full"
-                                title={child.name}
+                                title={child?.name}
                               />
                             ))}
                             <span className="ml-2 font-normal">
-                              {parent.children.length} Child
+                              {parent?.children?.length} Child
                             </span>
                           </div>
                         </div>
@@ -169,11 +165,10 @@ const StudentParentProfile = () => {
                     </tr>
                   )): 
                   <tr>
-
                   <td className="   text-center text-2xl py-10 text-gray-400" colSpan={6} >
                    <div className="flex  items-center justify-center flex-col text-2xl">
                      <GoAlertFill className="text-[5rem]" />
-                    No  Data Found
+                    No  Parent data Found
                    </div>
                   
                   </td>

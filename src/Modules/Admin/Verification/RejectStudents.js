@@ -1,42 +1,69 @@
-import React, { useEffect, useState } from "react";
+// src/Modules/Admin/Verification/RejectStudents.js
 
-import { useSelector } from "react-redux";
+import React, { useEffect, useMemo } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import UnVerifiedStudentCard from "./UnVerifiedStudentCard";
-import useGetRejectedStudents from "../../../Hooks/AuthHooks/Staff/Admin/Students/useGetRejectedStudents";
+import { fetchRejectedStudents } from "../../../Store/Slices/Admin/Verification/VerificationThunks";
+import Spinner from "../../../Components/Common/Spinner";
+import { FaUserSlash } from "react-icons/fa";
 
-const RejectStudents = ({ getColor, searchQuery }) => {
-  const [filteredStudents, setFilteredStudents] = useState([]);
-  const { getRejectedStudents } = useGetRejectedStudents();
-  const students = useSelector((store) => store.Admin.rejectedStudents);
-  console.log(students);
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
+
+const RejectStudents = () => {
+  const dispatch = useDispatch();
+  const {
+    rejectedStudents,
+    loadingRejected,
+    searchQuery,
+    lastFetchedRejected,
+  } = useSelector((state) => state.admin.verification);
 
   useEffect(() => {
-    getRejectedStudents();
-  }, []);
+    const now = Date.now();
+    const isDataStale =
+      !lastFetchedRejected || now - lastFetchedRejected > CACHE_DURATION;
 
-  useEffect(() => {
-    const filtered = students.filter(
-      (student) =>
-        !searchQuery ||
-        student.email.toLowerCase().includes(searchQuery.toLowerCase())
+    if (rejectedStudents.length === 0 || isDataStale) {
+      dispatch(fetchRejectedStudents());
+    }
+  }, [dispatch, rejectedStudents.length, lastFetchedRejected]);
+
+  // Filter rejected students based on search query
+  const filteredStudents = useMemo(() => {
+    if (!searchQuery) return rejectedStudents;
+    return rejectedStudents.filter((student) => {
+      const fullName = `${student.firstName} ${student.lastName}`.toLowerCase();
+      const email = student.email.toLowerCase();
+      const query = searchQuery.toLowerCase();
+      return email.includes(query) || fullName.includes(query);
+    });
+  }, [searchQuery, rejectedStudents]);
+
+  if (loadingRejected) {
+    return (
+      <div className="text-center">
+        <Spinner />
+      </div>
     );
-    setFilteredStudents(filtered);
-  }, [searchQuery, students]);
+  }
+
+  if (filteredStudents.length === 0) {
+    return (
+      <div className="flex flex-col justify-center items-center h-64">
+        <FaUserSlash className="text-6xl text-gray-400 mb-4" /> {/* Big Icon */}
+        <p className="text-center text-gray-500 text-xl">
+          No Unverified Students found.
+        </p>{" "}
+        {/* Text below icon */}
+      </div>
+    );
+  }
 
   return (
-    <div className="animate-fadeIn">
-      {filteredStudents?.length === 0 && (
-        <p className="text-center text-gray-500">No Rejected Student found.</p>
-      )}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredStudents?.map((student, index) => (
-          <UnVerifiedStudentCard
-            key={student._id}
-            student={student}
-            color={getColor(index)}
-          />
-        ))}
-      </div>
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {filteredStudents.map((student) => (
+        <UnVerifiedStudentCard key={student._id} studentId={student._id} />
+      ))}
     </div>
   );
 };

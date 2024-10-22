@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import AnnouncementHeader from "./AnnouncementHeader";
 import AnnouncementCard from "./AnnouncementCard";
-import useGetAllAnnouncements from "../../../../../../Hooks/AuthHooks/Staff/Admin/Announcement/useGetAllAnnouncements";
-import { useParams } from "react-router-dom";
-import { ImSpinner3 } from "react-icons/im";
-import { AiOutlineFileSearch } from "react-icons/ai";
 import Spinner from "../../../../../../Components/Common/Spinner";
+import { AiOutlineFileSearch } from "react-icons/ai";
+import { fetchAnnouncements } from "../../../../../../Store/Slices/Admin/Class/Announcement/announcementThunk";
+import { useParams } from "react-router-dom";
 
+// Define an array of colors for random selection.
 const colors = [
   "#efc42f",
   "#ee69b6",
@@ -20,6 +21,7 @@ const colors = [
   "#5ac67c",
 ];
 
+// Utility function to get a random color
 const getRandomColor = () => {
   const randomIndex = Math.floor(Math.random() * colors.length);
   return colors[randomIndex];
@@ -27,29 +29,24 @@ const getRandomColor = () => {
 
 const AnnouncementList = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [coloredAnnouncements, setColoredAnnouncements] = useState([]);
+  const dispatch = useDispatch();
+  const { loading, announcements } = useSelector(
+    (store) => store.admin.announcements
+  );
   const { cid } = useParams();
-  const { error, fetchAnnouncements, loading, announcementData } =
-    useGetAllAnnouncements();
 
+  // Fetch announcements on component mount
   useEffect(() => {
-    const fetchData = async () => {
-      await fetchAnnouncements(cid);
-    };
+    dispatch(fetchAnnouncements(cid));
+  }, [dispatch, cid]);
 
-    fetchData();
-  }, [fetchAnnouncements, cid]);
+  // Add random colors to each announcement
+  const coloredAnnouncements = announcements.map((announcement) => ({
+    ...announcement,
+    color: getRandomColor(),
+  }));
 
-  useEffect(() => {
-    if (announcementData.length) {
-      const coloredData = announcementData.map((announcement) => ({
-        ...announcement,
-        color: getRandomColor(),
-      }));
-      setColoredAnnouncements(coloredData);
-    }
-  }, [announcementData]);
-
+  // Filter announcements based on the search term
   const filteredAnnouncements = coloredAnnouncements.filter((announcement) =>
     announcement.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -63,14 +60,7 @@ const AnnouncementList = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-2">
           {filteredAnnouncements.length > 0 ? (
             filteredAnnouncements.map((announcement) => (
-              <AnnouncementCard
-                key={announcement._id}
-                title={announcement.title}
-                section={announcement.postTo || "N/A Section"}
-                date={announcement.createdAt}
-                id={announcement._id}
-                color={announcement.color}
-              />
+              <AnnouncementCard key={announcement._id} {...announcement} />
             ))
           ) : (
             <div className="flex flex-col items-center justify-center col-span-full py-10 text-gray-500">

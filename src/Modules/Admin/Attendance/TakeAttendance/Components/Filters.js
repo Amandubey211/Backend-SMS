@@ -1,44 +1,37 @@
-import React, { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
+import React, { useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import { useParams } from "react-router-dom";
-import useFetchSection from "../../../../../Hooks/AuthHooks/Staff/Admin/Sections/useFetchSection";
-import useGetGroupsByClass from "../../../../../Hooks/AuthHooks/Staff/Admin/Groups/useGetGroupByClass";
-import { GrPowerReset } from "react-icons/gr";
+import { FiRefreshCw } from "react-icons/fi";
+import {
+  fetchGroupsByClass,
+  fetchSectionsByClass,
+} from "../../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
+import { setFilters } from "../../../../../Store/Slices/Admin/Class/Attendence/attendanceSlice";
 
-const Filters = ({ filters, onFilterChange, resetDate }) => {
+const Filters = ({ isSectionInvalid }) => {
+  const { filters } = useSelector((state) => state.admin.attendance);
   const { sectionId, groupId } = filters;
-  const AllSections = useSelector((store) => store.Class.sectionsList);
+  const dispatch = useDispatch();
   const { cid } = useParams();
-  const { fetchSection } = useFetchSection();
-  const className = useSelector((store) => store.Common.selectedClass);
-  const { fetchGroupsByClass } = useGetGroupsByClass();
-  const groups = useSelector((store) => store.Class.groupsList);
+
+  const sections = useSelector(
+    (state) => state.admin.group_section.sectionsList
+  );
+  const groups = useSelector((state) => state.admin.group_section.groupsList);
 
   useEffect(() => {
-    const fetchData = async () => {
-      await fetchSection(cid);
-    };
-    fetchData();
-  }, [fetchSection, cid]);
-  console.log(groups, "sssssssssss");
-  useEffect(() => {
-    if (!groups || groups.length === 0) {
-      fetchGroupsByClass(cid);
+    if (cid) {
+      dispatch(fetchSectionsByClass(cid));
+      dispatch(fetchGroupsByClass(cid));
     }
-  }, [groups, fetchGroupsByClass, cid]);
+  }, [dispatch, cid]);
 
-  const handleSectionChange = (e) => {
-    onFilterChange("sectionId", e.target.value);
-  };
-
-  const handleGroupChange = (e) => {
-    onFilterChange("groupId", e.target.value);
+  const handleFilterChange = (name, value) => {
+    dispatch(setFilters({ [name]: value }));
   };
 
   const handleAllChange = () => {
-    onFilterChange("sectionId", "");
-    onFilterChange("groupId", "");
-    resetDate();
+    dispatch(setFilters({ sectionId: "", groupId: "" }));
   };
 
   return (
@@ -47,12 +40,14 @@ const Filters = ({ filters, onFilterChange, resetDate }) => {
         <div className="flex flex-col">
           <label className="text-gray-600 mb-1">Section</label>
           <select
-            className="border rounded p-2 w-56"
+            className={`border rounded p-2 w-56 transition-all duration-300 ${
+              isSectionInvalid ? "border-red-500" : "border-gray-300"
+            }`} // Apply red border if section is invalid
             value={sectionId}
-            onChange={handleSectionChange}
+            onChange={(e) => handleFilterChange("sectionId", e.target.value)}
           >
-            <option value="">Reset</option>
-            {AllSections.map((section) => (
+            <option value="">Choose Section</option>
+            {sections.map((section) => (
               <option key={section._id} value={section._id}>
                 {section.sectionName}
               </option>
@@ -62,11 +57,11 @@ const Filters = ({ filters, onFilterChange, resetDate }) => {
         <div className="flex flex-col">
           <label className="text-gray-600 mb-1">Group</label>
           <select
-            className="border rounded p-2 w-56"
+            className="border rounded p-2 w-56 border-gray-300"
             value={groupId}
-            onChange={handleGroupChange}
+            onChange={(e) => handleFilterChange("groupId", e.target.value)}
           >
-            <option value="">Reset Group</option>
+            <option value="">Choose Group</option>
             {groups.map((group) => (
               <option key={group._id} value={group._id}>
                 {group.groupName}
@@ -77,12 +72,12 @@ const Filters = ({ filters, onFilterChange, resetDate }) => {
       </div>
       <div className="flex items-center">
         <button
-          className="rounded p-2 flex items-center justify-center"
-          title="Reset All"
+          title="Reset"
           onClick={handleAllChange}
-          style={{ marginTop: "20px" }}
+          className="text-gray-600 rounded-full p-2 focus:outline-none transform transition-transform duration-300 hover:rotate-180"
+          aria-label="Refresh attendance"
         >
-          <GrPowerReset className="size-10 text-gray-700" />
+          <FiRefreshCw size={24} />
         </button>
       </div>
     </div>

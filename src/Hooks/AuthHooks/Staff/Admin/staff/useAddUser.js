@@ -10,16 +10,25 @@ import useGetAllTeachers from "../Teacher/useGetAllTeacher";
 const useAddUser = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const adminRole = useSelector((store) => store.Auth.role);
-  const { fetchStaff } = useGetAllStaff()
-  const { createSalary } = useCreateSalary()
-  const {fetchTeachers} = useGetAllTeachers()
-  
-  const addUser = useCallback(
+  const adminRole = useSelector((store) => store.common.auth.role);
+  const { fetchStaff } = useGetAllStaff();
+  const { createSalary } = useCreateSalary();
+  const { fetchTeachers } = useGetAllTeachers();
 
+  const addUser = useCallback(
     async (userData, address) => {
-      const { firstName, lastName, email, mobileNumber, role, position,
-        dob, gender, employeeID, monthlySalary } = userData;
+      const {
+        firstName,
+        lastName,
+        email,
+        mobileNumber,
+        role,
+        position,
+        dob,
+        gender,
+        employeeID,
+        monthlySalary,
+      } = userData;
 
       const missingFields = [];
 
@@ -36,25 +45,26 @@ const useAddUser = () => {
       if (!address) missingFields.push("Address");
 
       if (missingFields.length > 0) {
-        toast.error(`Please fill out the following fields: ${missingFields.join(", ")}`);
+        toast.error(
+          `Please fill out the following fields: ${missingFields.join(", ")}`
+        );
         return { success: false, error: "Validation Error" };
       }
       setLoading(true);
       setError(null);
 
       try {
-
         const token = localStorage.getItem(`${adminRole}:token`);
         const formData = new FormData();
-        Object.keys(userData).forEach(key => {
+        Object.keys(userData).forEach((key) => {
           formData.append(key, userData[key]);
         });
-        formData.append('address', JSON.stringify(address));
+        formData.append("address", JSON.stringify(address));
         const response = await axios.post(
           `${baseUrl}/admin/staff_register`, // Adjust the API endpoint as needed
           formData,
           {
-            headers: { Authentication: token, },
+            headers: { Authentication: token },
           }
         );
 
@@ -63,14 +73,14 @@ const useAddUser = () => {
         console.log(data);
         setLoading(false);
         toast.success("User added successfully");
-       
-        if(role=='teacher'){
-          fetchTeachers()
-        }else{
+
+        if (role == "teacher") {
+          fetchTeachers();
+        } else {
           fetchStaff();
         }
-        
-        createSalary('unpaid', 'pay now')
+
+        createSalary("unpaid", "pay now");
         return { success: true, data };
       } catch (err) {
         const errorMessage =

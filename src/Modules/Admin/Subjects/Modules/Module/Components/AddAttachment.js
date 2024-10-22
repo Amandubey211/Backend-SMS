@@ -3,11 +3,12 @@ import { IoCloudUploadOutline } from "react-icons/io5";
 import { RiEyeFill, RiDeleteBin5Line } from "react-icons/ri";
 import { AiOutlineFilePdf } from "react-icons/ai";
 import { MdOutlineDocumentScanner } from "react-icons/md";
-import useUploadChapterFiles from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useUploadChapterFiles";
-import toast from "react-hot-toast";
 import { ImSpinner3 } from "react-icons/im";
+import { useDispatch, useSelector } from "react-redux";
+import toast from "react-hot-toast";
+import { addAttachment } from "../../../../../../Store/Slices/Admin/Class/Module/attachmentThunk";
 
-const AddAttachment = ({ chapterData, onClose, fetchModules }) => {
+const AddAttachment = ({ chapterData, onClose }) => {
   const [files, setFiles] = useState([]);
   const [previews, setPreviews] = useState([]);
   const [labels, setLabels] = useState([]);
@@ -15,9 +16,10 @@ const AddAttachment = ({ chapterData, onClose, fetchModules }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const fileInputRef = useRef(null);
 
-  const FILE_SIZE_LIMIT = 10 * 1024 * 1024; // 10MB in bytes
+  const dispatch = useDispatch();
+  const loading = useSelector((state) => state.admin.module.loading);
 
-  const { loading, uploadChapterFiles } = useUploadChapterFiles(fetchModules);
+  const FILE_SIZE_LIMIT = 10 * 1024 * 1024; // 10MB in bytes
 
   const handleFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files);
@@ -38,12 +40,7 @@ const AddAttachment = ({ chapterData, onClose, fetchModules }) => {
     }
 
     if (invalidFiles.length > 0) {
-      setFiles((prevFiles) => [...prevFiles, ...invalidFiles]);
-      setPreviews((prevPreviews) => [
-        ...prevPreviews,
-        ...invalidFiles.map((file) => URL.createObjectURL(file)),
-      ]);
-      setLabels((prevLabels) => [...prevLabels, ...invalidFiles.map(() => "")]);
+      toast.error("Some files exceed the 10MB limit and were not added.");
     }
   };
 
@@ -57,9 +54,6 @@ const AddAttachment = ({ chapterData, onClose, fetchModules }) => {
     const validFiles = droppedFiles.filter(
       (file) => file.size <= FILE_SIZE_LIMIT
     );
-    const invalidFiles = droppedFiles.filter(
-      (file) => file.size > FILE_SIZE_LIMIT
-    );
 
     if (validFiles.length > 0) {
       setFiles((prevFiles) => [...prevFiles, ...validFiles]);
@@ -68,15 +62,6 @@ const AddAttachment = ({ chapterData, onClose, fetchModules }) => {
         ...validFiles.map((file) => URL.createObjectURL(file)),
       ]);
       setLabels((prevLabels) => [...prevLabels, ...validFiles.map(() => "")]);
-    }
-
-    if (invalidFiles.length > 0) {
-      setFiles((prevFiles) => [...prevFiles, ...invalidFiles]);
-      setPreviews((prevPreviews) => [
-        ...prevPreviews,
-        ...invalidFiles.map((file) => URL.createObjectURL(file)),
-      ]);
-      setLabels((prevLabels) => [...prevLabels, ...invalidFiles.map(() => "")]);
     }
   };
 
@@ -101,21 +86,27 @@ const AddAttachment = ({ chapterData, onClose, fetchModules }) => {
     setModalOpen(false);
   };
 
-  const handleSelectFiles = () => {
-    fileInputRef.current.click();
-  };
-
   const handleLabelChange = (e, index) => {
     const updatedLabels = [...labels];
     updatedLabels[index] = e.target.value;
     setLabels(updatedLabels);
   };
 
+  console.log(chapterData, "ddd");
   const handleSubmit = async (e) => {
     e.preventDefault();
     const validFiles = files.filter((file) => file.size <= FILE_SIZE_LIMIT);
+
     if (validFiles.length > 0) {
-      await uploadChapterFiles(chapterData.chapterId, validFiles, labels);
+      await dispatch(
+        addAttachment({
+          chapterId: chapterData.chapterId,
+          subjectId: chapterData.sid,
+          documents: validFiles,
+          documentLabels: labels,
+        })
+      );
+      // onClose(); // Close the attachment modal after successful upload
     } else {
       toast.error("Please select at least one valid file.");
     }
@@ -143,23 +134,22 @@ const AddAttachment = ({ chapterData, onClose, fetchModules }) => {
   };
 
   return (
-    <div className="h-full flex flex-col ">
+    <div className="h-full flex flex-col">
       <form
         onSubmit={handleSubmit}
         className="flex flex-col justify-between h-full p-2"
       >
         <div
-          className="flex flex-col px-6 items-center justify-center py-2  h-40 border-2 border-dashed border-gray-300 rounded-md cursor-pointer hover:border-indigo-500 hover:bg-gray-100 transition duration-500 ease-in-out "
+          className="flex flex-col px-6 items-center justify-center py-2 h-40 border-2 border-dashed border-gray-300 rounded-md cursor-pointer hover:border-indigo-500 hover:bg-gray-100 transition duration-500 ease-in-out"
           onDragOver={handleDragOver}
           onDrop={handleDrop}
-          onClick={handleSelectFiles}
+          onClick={() => fileInputRef.current.click()}
         >
           <IoCloudUploadOutline
             size={50}
             className="text-gray-400 my-2 animate-bounce transition"
           />
           <p className="text-gray-500">Drag & Drop or Click to Browse Files</p>
-          <p className="text-gray-400">Select single or multiple files</p>
           <p className="text-gray-400">Maximum file size: 10MB</p>
           <input
             type="file"

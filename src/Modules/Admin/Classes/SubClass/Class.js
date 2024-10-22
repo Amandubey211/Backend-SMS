@@ -6,8 +6,10 @@ import { useSelector } from "react-redux";
 import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 
 const Class = () => {
-  const className = useSelector((store) => store.Common.selectedClass);
-  useNavHeading(className);
+  const className = useSelector(
+    (store) => store.common.user.classInfo.selectedClassName
+  );
+  useNavHeading("Class", className);
 
   return (
     <Layout title={`${className} | Student diwan`}>

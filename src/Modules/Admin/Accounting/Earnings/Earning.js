@@ -9,108 +9,66 @@ import { GiMoneyStack } from "react-icons/gi";
 import { GiTakeMyMoney } from "react-icons/gi";
 import { HiOutlineBanknotes } from "react-icons/hi2";
 import { baseUrl } from "../../../../config/Common";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import Spinner from "../../../../Components/Common/Spinner";
 import NoDataFound from "../../../../Components/Common/NoDataFound";
+import {
+  deleteEarning,
+  fetchEarning,
+  fetchTotalAmounts,
+} from "../../../../Store/Slices/Admin/Accounting/Earning/earning.action";
+import {
+  setEditEarning,
+  setIsEditSidebarOpen,
+  setOpenDropDown,
+  setSidebarOpen,
+} from "../../../../Store/Slices/Admin/Accounting/Earning/earningSlice";
 
 const Earning = () => {
-  const [isSidebarOpen, setSidebarOpen] = useState(false);
-  const [earnings, setEarnings] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [isEditSidebarOpen, setEditSidebarOpen] = useState(false);
-  const [editEarning, setEditEarning] = useState(null);
-  const [totalEarnings, setTotalEarnings] = useState(0);
-  const [totalExpense, setTotalExpense] = useState(0);
-  const [totalFees, setTotalFees] = useState(0);
-  const [remainingBalance, setRemainingBalance] = useState(0);
-  const [openDropdown, setOpenDropdown] = useState(null);
-  const role = useSelector((store) => store.Auth.role);
-  const handleDropdownToggle = (index) => {
-    setOpenDropdown(openDropdown === index ? null : index);
-  };
+  const {
+    earningData,
+    isSidebarOpen,
+    isEditSidebarOpen,
+    openDropdown,
+    totalEarnings,
+    totalExpense,
+    remainingBalance,
+    totalFees,
+    editEarning,
+    loading,
+    error,
+  } = useSelector((store) => store?.admin?.earning);
+  const dispatch = useDispatch();
 
   const handleDropdownClose = () => {
-    setOpenDropdown(null);
+    dispatch(setOpenDropDown(null));
   };
 
-  const handleSidebarOpen = () => setSidebarOpen(true);
-  const handleSidebarClose = () => setSidebarOpen(false);
+  const handleSidebarOpen = () => {
+    dispatch(setSidebarOpen(true));
+  };
+  const handleSidebarClose = () => {
+    dispatch(setSidebarOpen(false));
+  };
 
   const handleEditSidebarOpen = (earning) => {
-    setEditEarning(earning);
-    setEditSidebarOpen(true);
+    dispatch(setEditEarning(earning));
+    dispatch(setIsEditSidebarOpen(true));
   };
-  const handleEditSidebarClose = () => setEditSidebarOpen(false);
-
-  const fetchTotalAmounts = async () => {
-    const token = localStorage.getItem(`${role}:token`);
-    try {
-      const response = await fetch(`${baseUrl}/admin/total_amount`, {
-        headers: {
-          Authentication: `${token}`,
-        },
-      });
-      const data = await response.json();
-      if (response.ok && data.success) {
-        setTotalEarnings(data.totalEarning);
-        setTotalExpense(data.totalExpense);
-        setTotalFees(data.totalFees);
-        setRemainingBalance(data.remainingBalance);
-      } else {
-        throw new Error(data.msg || "Failed to fetch total amounts");
-      }
-    } catch (err) {
-      message.error(err.message);
-    }
-  };
-  const fetchEarnings = async () => {
-    setLoading(true);
-    setError(null);
-    const token = localStorage.getItem(`${role}:token`);
-    try {
-      const response = await fetch(`${baseUrl}/admin/getearning`, {
-        headers: {
-          Authentication: `${token}`,
-        },
-      });
-      const data = await response.json();
-      if (response.ok) {
-        setEarnings(data.earnings);
-      } else {
-        throw new Error(data.msg || "Failed to fetch data");
-      }
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
+  const handleEditSidebarClose = () => {
+    dispatch(setIsEditSidebarOpen(false));
   };
 
   const handleDelete = async (earningId) => {
-    const token = localStorage.getItem(`${role}:token`);
-    try {
-      const response = await fetch(
-        `${baseUrl}/admin/deleteEarning/${earningId}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authentication: `${token}`,
-          },
-        }
-      );
-      const data = await response.json();
-      if (response.ok) {
-        message.success("Earning deleted successfully");
-        fetchEarnings();
-        fetchTotalAmounts();
-      } else {
-        throw new Error(data.msg || "Failed to delete earning");
-      }
-    } catch (err) {
-      message.error(err.message);
-    }
+    dispatch(deleteEarning({ id: earningId }))
+      .then(() => {
+        dispatch(fetchEarning());
+        dispatch(fetchTotalAmounts());
+      })
+      .catch((err) => {
+        console.error("Error deleting earning", err);
+      });
   };
 
   const formatDate = (isoDate) => {
@@ -122,10 +80,14 @@ const Earning = () => {
     });
   };
 
+  const handleDropdownToggle = (index) => {
+    dispatch(setOpenDropDown(openDropdown === index ? null : index));
+  };
+
   useEffect(() => {
-    fetchEarnings();
-    fetchTotalAmounts();
-  }, []);
+    dispatch(fetchEarning());
+    dispatch(fetchTotalAmounts());
+  }, [dispatch]);
 
   return (
     <Layout title="Accounting">
@@ -147,46 +109,58 @@ const Earning = () => {
                 </div>
               </button>
             </div>
-            {loading ? (
-              <Spinner />
-            ) : error ? (
-              <NoDataFound />
-            ) : (
-              <div className="overflow-x-auto h-full bg-white shadow rounded-lg ">
-                <table className="min-w-full leading-normal">
-                  <thead>
-                    <tr className="text-left text-gray-700 bg-gray-100 ">
-                      <th className="px-5 py-3 border-b-2 border-gray-200">
-                        Earning Reason
-                      </th>
-                      <th className="px-5 py-3 border-b-2 border-gray-200">
-                        From
-                      </th>
-                      <th className="px-5 py-3 border-b-2 border-gray-200">
-                        Earning Date
-                      </th>
-                      <th className="px-5 py-3 border-b-2 border-gray-200">
-                        Amount
-                      </th>
-                      <th className="px-5 py-3 border-b-2 border-gray-200">
-                        Action
-                      </th>
+            <div className="overflow-x-auto h-full bg-white shadow rounded-lg">
+              <table className="min-w-full leading-normal">
+                <thead>
+                  <tr className="text-left text-gray-700 bg-gray-100">
+                    <th className="px-5 py-3 border-b-2 border-gray-200">
+                      Earning Reason
+                    </th>
+                    <th className="px-5 py-3 border-b-2 border-gray-200">
+                      From
+                    </th>
+                    <th className="px-5 py-3 border-b-2 border-gray-200">
+                      Earning Date
+                    </th>
+                    <th className="px-5 py-3 border-b-2 border-gray-200">
+                      Amount
+                    </th>
+                    <th className="px-5 py-3 border-b-2 border-gray-200">
+                      Action
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="h-[300px]">
+                  {" "}
+                  {/* Setting a fixed height for the table body */}
+                  {loading || error || earningData?.length === 0 ? (
+                    <tr>
+                      <td colSpan="5" className="px-5 py-5">
+                        <div className="flex justify-center items-center h-full">
+                          {loading ? (
+                            <Spinner />
+                          ) : error ? (
+                            <NoDataFound />
+                          ) : (
+                            <NoDataFound />
+                          )}
+                        </div>
+                      </td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {earnings.map((item, index) => (
-                      <tr key={index} className=" text-gray-700">
+                  ) : (
+                    earningData?.map((item, index) => (
+                      <tr key={index} className="text-gray-700">
                         <td className="px-5 py-2 border-b border-gray-200">
-                          {item.description}
+                          {item?.description}
                         </td>
                         <td className="px-5 py-2 border-b border-gray-200">
-                          {item.from}
+                          {item?.from}
                         </td>
                         <td className="px-5 py-2 border-b border-gray-200">
-                          {formatDate(item.dateOfEarning)}
+                          {formatDate(item?.dateOfEarning)}
                         </td>
                         <td className="px-5 py-2 border-b border-gray-200">
-                          {item.amount} QR
+                          {item?.amount} QR
                         </td>
                         <td className="px-5 py-2 border-b border-gray-200 font-bold relative">
                           <button
@@ -219,11 +193,11 @@ const Earning = () => {
                           )}
                         </td>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
 
           <div className="w-[25%] flex flex-col items-center gap-4 p-4">
@@ -298,11 +272,7 @@ const Earning = () => {
             onClose={handleSidebarClose}
             title="Add New Earnings"
           >
-            <AddEarning
-              fetchEarning={fetchEarnings}
-              fetchTotalAmounts={fetchTotalAmounts}
-              handleSidebarClose={handleSidebarClose}
-            />
+            <AddEarning />
           </Sidebar>
 
           <Sidebar
@@ -310,14 +280,7 @@ const Earning = () => {
             onClose={handleEditSidebarClose}
             title="Update Earning"
           >
-            {editEarning && (
-              <EditEarning
-                earning={editEarning}
-                onClose={handleEditSidebarClose}
-                onUpdate={fetchEarnings}
-                fetchTotalAmounts={fetchTotalAmounts}
-              />
-            )}
+            {editEarning && <EditEarning />}
           </Sidebar>
         </div>
       </DashLayout>

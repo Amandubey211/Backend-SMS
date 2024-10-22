@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useLocation, useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import Layout from "../../../../../../Components/Common/Layout";
 import SideMenubar from "../../../../../../Components/Admin/SideMenubar";
 import CreateAnnouncementHeader from "./Components/CreateAnnouncementHeader";
@@ -7,12 +8,14 @@ import CreateAnnouncementForm from "./Components/CreateAnnouncementForm";
 import TopicTitleInput from "../../Discussion/AddDiscussion/Components/TopicTitleInput";
 import FileInput from "../../Discussion/AddDiscussion/Components/FileInput";
 import EditorComponent from "../../../Component/AdminEditor";
-import useCreateAnnouncement from "../../../../../../Hooks/AuthHooks/Staff/Admin/Announcement/useCreateAnnouncement";
-import useEditAnnouncement from "../../../../../../Hooks/AuthHooks/Staff/Admin/Announcement/useEditAnnouncement";
-import { useSelector } from "react-redux";
+import {
+  createAnnouncement,
+  editAnnouncement,
+} from "../../../../../../Store/Slices/Admin/Class/Announcement/announcementThunk";
 
 const CreateAnnouncement = () => {
   const location = useLocation();
+  const dispatch = useDispatch();
   const { announcement } = location.state || {};
   const [assignmentName, setAssignmentName] = useState("");
   const [editorContent, setEditorContent] = useState("");
@@ -26,18 +29,10 @@ const CreateAnnouncement = () => {
     groupId: "",
   });
 
-  const {
-    createAnnouncement,
-    loading: createLoading,
-    error: createError,
-  } = useCreateAnnouncement();
-  const {
-    editAnnouncement,
-    loading: editLoading,
-    error: editError,
-  } = useEditAnnouncement();
   const { cid } = useParams();
-  const isSidebarOpen = useSelector((state) => state.sidebar.isOpen);
+  const isSidebarOpen = useSelector(
+    (state) => state.common.user.sidebar.isOpen
+  );
   const sidebarWidth = isSidebarOpen ? "15%" : "7%";
 
   useEffect(() => {
@@ -93,20 +88,16 @@ const CreateAnnouncement = () => {
 
     if (announcement?._id) {
       // Edit announcement
-      const result = await editAnnouncement(
-        announcement._id,
-        announcementData,
-        files
+      dispatch(
+        editAnnouncement({
+          id: announcement._id,
+          data: announcementData,
+          files,
+        })
       );
-      if (result) {
-        console.log("Announcement updated successfully", result);
-      }
     } else {
       // Create announcement
-      const result = await createAnnouncement(announcementData, files);
-      if (result) {
-        console.log("Announcement created successfully", result);
-      }
+      dispatch(createAnnouncement({ data: announcementData, files }));
     }
   }, [
     assignmentName,
@@ -115,12 +106,10 @@ const CreateAnnouncement = () => {
     file,
     cid,
     announcement,
-    editAnnouncement,
-    createAnnouncement,
+    dispatch,
   ]);
 
-  const loading = createLoading || editLoading;
-  const error = createError || editError;
+  const loading = useSelector((state) => state.admin.announcements.loading);
   const isEditing = !!announcement?._id;
 
   return (
@@ -135,38 +124,36 @@ const CreateAnnouncement = () => {
             marginLeft: sidebarWidth,
           }}
         >
-          <>
-            <CreateAnnouncementHeader
-              onSave={handleSave}
-              loading={loading}
-              isEditing={isEditing}
-            />
-            <div className="flex w-full">
-              <div className="w-[75%]">
-                <div className="flex flex-col md:flex-row items-center gap-4 px-4 pt-3">
-                  <TopicTitleInput
-                    value={assignmentName}
-                    onChange={handleNameChange}
-                  />
-                  <FileInput onChange={handleFileChange} file={file} />
-                </div>
+          <CreateAnnouncementHeader
+            onSave={handleSave}
+            loading={loading}
+            isEditing={isEditing}
+          />
+          <div className="flex w-full">
+            <div className="w-[75%]">
+              <div className="flex flex-col md:flex-row items-center gap-4 px-4 pt-3">
+                <TopicTitleInput
+                  value={assignmentName}
+                  onChange={handleNameChange}
+                />
+                <FileInput onChange={handleFileChange} file={file} />
+              </div>
 
-                <EditorComponent
-                  hideInput={true}
-                  assignmentLabel="Discussion Name"
-                  editorContent={editorContent}
-                  onNameChange={handleNameChange}
-                  onEditorChange={handleEditorChange}
-                />
-              </div>
-              <div className="w-[25%] border-l min-h-screen px-4 py-2">
-                <CreateAnnouncementForm
-                  handleChange={handleFormChange}
-                  {...formState}
-                />
-              </div>
+              <EditorComponent
+                hideInput={true}
+                assignmentLabel="Discussion Name"
+                editorContent={editorContent}
+                onNameChange={handleNameChange}
+                onEditorChange={handleEditorChange}
+              />
             </div>
-          </>
+            <div className="w-[25%] border-l min-h-screen px-4 py-2">
+              <CreateAnnouncementForm
+                handleChange={handleFormChange}
+                {...formState}
+              />
+            </div>
+          </div>
         </div>
       </div>
     </Layout>

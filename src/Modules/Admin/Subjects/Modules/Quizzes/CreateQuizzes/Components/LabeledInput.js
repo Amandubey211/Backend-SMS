@@ -1,7 +1,7 @@
 // LabeledInput.jsx
-import React from 'react';
+import React from "react";
 
-const LabeledInput = ({ label, name, value, onChange, type = 'text' }) => (
+const LabeledInput = ({ label, name, value, onChange, type = "text" }) => (
   <div>
     <label className="block mb-2 text-gray-700">{label}</label>
     <input

@@ -6,11 +6,13 @@ import StudentDashLayout from "../../../../Components/Student/StudentDashLayout"
 import { useSelector } from "react-redux";
 
 const StudentClass = () => {
-  const className = useSelector((store) => store.Common.selectedClassName);
-  useNavHeading(className);
+  const { classData } = useSelector((store) => store?.student?.studentClass);
+
+  const className = classData?.className;
+  useNavHeading(` ${className}`);
 
   return (
-    <Layout title={`My Class | Student diwan`}>
+    <Layout title={`My Class - ${className} | Student diwan`}>
       <StudentDashLayout children={<MainSection />} />;
     </Layout>
   );

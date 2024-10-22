@@ -1,9 +1,9 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, memo } from "react";
 import { Line } from "react-chartjs-2";
 import { Chart as ChartJS, registerables } from "chart.js";
-import Fallback from "../../../../Components/Common/Fallback";
 import { FiCalendar } from "react-icons/fi";
-import useGetEarningsData from "../../../../Hooks/AuthHooks/Staff/Admin/Dashboard/useGetEarningsData";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchEarningsData } from "../../../../Store/Slices/Admin/Dashboard/adminDashboard.action"; // Make sure the path is correct
 import Spinner from "../../../../Components/Common/Spinner";
 
 ChartJS.register(...registerables);
@@ -13,9 +13,10 @@ const TotalEarningsGraph = () => {
   const [tooltipData, setTooltipData] = useState(null);
   const [selectedOption, setSelectedOption] = useState("currentMonth");
 
-  const { loading, error, earningsData, fetchEarningsData } =
-    useGetEarningsData();
+  const dispatch = useDispatch();
+  const { loading, error, earningsData } = useSelector((state) => state?.admin?.adminDashboard);
 
+  // Function to dispatch the fetchEarningsData action
   const fetchDashboardData = (option) => {
     const date = new Date();
     let month = date.getMonth() + 1;
@@ -29,27 +30,17 @@ const TotalEarningsGraph = () => {
       includeUnpaidExpenses = false;
     }
 
-    fetchEarningsData(month, year, includeUnpaidExpenses);
+
+    // Dispatch fetchEarningsData with necessary parameters
+    dispatch(fetchEarningsData({ month, year, includeUnpaidExpenses }));
   };
 
+  // Fetch data whenever selectedOption changes
   useEffect(() => {
     fetchDashboardData(selectedOption);
   }, [selectedOption]);
 
-  const getOrdinalSuffix = (day) => {
-    if (day > 3 && day < 21) return "th";
-    switch (day % 10) {
-      case 1:
-        return "st";
-      case 2:
-        return "nd";
-      case 3:
-        return "rd";
-      default:
-        return "th";
-    }
-  };
-
+  // Handle tooltip outside click
   const handleOutsideClick = (event) => {
     if (chartRef.current && !chartRef.current.canvas.contains(event.target)) {
       setTooltipData(null);
@@ -67,11 +58,14 @@ const TotalEarningsGraph = () => {
     return <Spinner />;
   }
 
+  if (error || !earningsData) {
+    return "No Data";
+  }
+
   if (
-    error ||
     !earningsData ||
-    (earningsData.earningsData.length === 0 &&
-      earningsData.expensesData.length === 0)
+    (earningsData?.earningsData?.length === 0 &&
+      earningsData?.expensesData?.length === 0)
   ) {
     return (
       <div className="p-4 bg-white">
@@ -103,7 +97,9 @@ const TotalEarningsGraph = () => {
             <div className="flex items-center">
               <div className="text-gray-700">Total Collections</div>
               <div className="ml-2 font-bold mr-1">
-                {earningsData ? earningsData.totalEarnings.toLocaleString() : 0}
+                {earningsData
+                  ? earningsData?.totalEarnings?.toLocaleString()
+                  : 0}
               </div>
               <div className="text-gray-700">QR</div>
             </div>
@@ -116,7 +112,9 @@ const TotalEarningsGraph = () => {
             <div className="flex items-center">
               <div className="text-gray-700">Total Expenses</div>
               <div className="ml-2 font-bold mr-1">
-                {earningsData ? earningsData.totalExpenses.toLocaleString() : 0}
+                {earningsData
+                  ? earningsData.totalExpenses?.toLocaleString()
+                  : 0}
               </div>
               <div className="text-gray-700">QR</div>
             </div>
@@ -133,12 +131,28 @@ const TotalEarningsGraph = () => {
     totalExpenses,
   } = earningsData;
 
+
+  // Function to get the ordinal suffix of a number
+  const getOrdinalSuffix = (day) => {
+    if (day > 3 && day < 21) return "th";
+    switch (day % 10) {
+      case 1:
+        return "st";
+      case 2:
+        return "nd";
+      case 3:
+        return "rd";
+      default:
+        return "th";
+    }
+  };
+
   const data = {
-    labels: earnings.map((item) => `${item.day}`),
+    labels: earnings?.map((item) => `${item.day}`),
     datasets: [
       {
         label: "Total Collections",
-        data: earnings.map((item) => item.amount),
+        data: earnings?.map((item) => item.amount),
         borderColor: "#7C3AED",
         borderWidth: 3,
         fill: true,
@@ -162,7 +176,7 @@ const TotalEarningsGraph = () => {
       },
       {
         label: "Total Expenses",
-        data: expenses.map((item) => item.amount),
+        data: expenses?.map((item) => item.amount),
         borderColor: "#EA580C",
         borderWidth: 3,
         fill: false,
@@ -186,13 +200,13 @@ const TotalEarningsGraph = () => {
             setTooltipData(null);
             return;
           }
-          const value = tooltipModel.dataPoints[0].raw.toLocaleString();
-          const day = tooltipModel.dataPoints[0].dataIndex + 1;
+          const value = tooltipModel?.dataPoints[0].raw?.toLocaleString();
+          const day = tooltipModel?.dataPoints[0]?.dataIndex + 1;
           const date = new Date();
           date.setDate(day);
           const formattedDate = `${day}${getOrdinalSuffix(
             day
-          )} ${date.toLocaleString("default", { month: "long" })}`;
+          )} ${date?.toLocaleString("default", { month: "long" })}`;
           setTooltipData({
             value,
             formattedDate,
@@ -210,7 +224,7 @@ const TotalEarningsGraph = () => {
         beginAtZero: true,
         ticks: {
           callback: function (value) {
-            return value.toLocaleString() + " QR";
+            return value?.toLocaleString() + " QR";
           },
         },
         grid: {
@@ -275,7 +289,7 @@ const TotalEarningsGraph = () => {
           <div className="flex items-center">
             <div className="text-gray-700">Total Collections</div>
             <div className="ml-2 font-bold mr-1">
-              {totalEarnings.toLocaleString()}
+              {totalEarnings?.toLocaleString()}
             </div>
             <div className="text-gray-700">QR</div>
           </div>
@@ -288,7 +302,7 @@ const TotalEarningsGraph = () => {
           <div className="flex items-center">
             <div className="text-gray-700">Total Expenses</div>
             <div className="ml-2 font-bold mr-1">
-              {totalExpenses.toLocaleString()}
+              {totalExpenses?.toLocaleString()}
             </div>
             <div className="text-gray-700">QR</div>
           </div>
@@ -298,4 +312,4 @@ const TotalEarningsGraph = () => {
   );
 };
 
-export default TotalEarningsGraph;
+export default memo(TotalEarningsGraph);

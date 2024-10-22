@@ -1,0 +1,18 @@
+export const gt = {
+  date: { ns: "date" },
+  month: { ns: "month" },
+  language: { ns: "language" },
+  setting: { ns: "setting" },
+  stdFinance: { ns: "stdFinance" },
+  stdLibrary: { ns: "stdLibrary" },
+  stdNoticeboard: { ns: "stdNoticeboard" },
+  stdEvents: { ns: "stdEvents" },
+  stdSyllabus: { ns: "stdSyllabus" },
+  prtFinance: { ns: "prtFinance" },   
+  prtChildrens: { ns: "prtChildrens" }, 
+  prtNotices: { ns: "prtNotices" },    
+  prtEvents: { ns: "prtEvents" },      
+  prtLibrary: { ns: "prtLibrary" },
+  prtSidebar: { ns: "prtSidebar" },
+  prtProfile: { ns: "prtProfile" },
+};

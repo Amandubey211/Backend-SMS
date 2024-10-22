@@ -1,132 +1,103 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { setStudentGrade } from "../../../Redux/Slices/AdminSlice";
-import useFetchSection from "../../../Hooks/AuthHooks/Staff/Admin/Sections/useFetchSection";
-import useGetGroupsByClass from "../../../Hooks/AuthHooks/Staff/Admin/Groups/useGetGroupByClass";
-import useGetGroupsByClassAndSection from "../../../Hooks/AuthHooks/Staff/Admin/Groups/useGetGroupsByClassAndSection";
-import useGetUnassignedStudents from "../../../Hooks/AuthHooks/Staff/Admin/Students/useGetUnassignedStudents";
+import { useParams } from "react-router-dom";
+import {
+  fetchSectionsByClass,
+  fetchGroupsByClassAndSection,
+  fetchUnassignedStudents,
+  fetchGroupsByClass,
+} from "../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
 import NavigationBar from "./Components/NavigationBar";
 import UnAssignedStudentList from "./Components/UnAssignedStudentList";
 import GroupList from "./Components/GroupList";
 import StudentGradeModal from "../Subjects/Modules/Grades/StudentGradeViewModal/StudentGradeModal";
-import Spinner from "../../../Components/Common/Spinner";
+import {
+  fetchStudentGrades,
+  fetchStudentSubjectProgress,
+} from "../../../Store/Slices/Admin/Users/Students/student.action";
+import { clearGroupsList } from "../../../Store/Slices/Admin/Class/Section_Groups/groupSectionSlice";
 
 const MainSection = () => {
   const [activeSection, setActiveSection] = useState("Everyone");
   const [activeSectionId, setActiveSectionId] = useState(null);
-  const [unassignedStudents, setUnassignedStudents] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const groupList = useSelector((store) => store.Class.groupsList);
+  const [studentData, setStudentData] = useState();
   const dispatch = useDispatch();
   const { cid } = useParams();
 
-  const { fetchSection } = useFetchSection();
-  const {
-    fetchGroupsByClass,
-    loading: loadingByClass,
-    error: errorByClass,
-  } = useGetGroupsByClass();
-  const {
-    fetchGroupsByClassAndSection,
-    loading: loadingBySection,
-    error: errorBySection,
-  } = useGetGroupsByClassAndSection();
-  const { fetchUnassignedStudents } = useGetUnassignedStudents();
-
-  const fetchGroups = useCallback(async () => {
-    if (cid) {
-      if (activeSection === "Everyone") {
-        await fetchGroupsByClass(cid);
-      } else {
-        await fetchGroupsByClassAndSection(cid, activeSectionId);
-      }
-    }
-  }, [
-    cid,
-    activeSection,
-    activeSectionId,
-    fetchGroupsByClass,
-    fetchGroupsByClassAndSection,
-  ]);
-
-  const fetchStudents = useCallback(async () => {
-    try {
-      const data = await fetchUnassignedStudents(cid);
-      setUnassignedStudents(data);
-    } catch (error) {
-      console.error("Failed to load students");
-    }
-  }, [cid, fetchUnassignedStudents]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      if (cid) {
-        await fetchSection(cid);
-        await fetchGroups();
-        await fetchStudents();
-      }
-    };
-    fetchData();
-  }, [cid, fetchSection, fetchGroups, fetchStudents]);
-
-  const handleSectionChange = useCallback(
-    (section, sectionId) => {
-      setActiveSection(section);
-      setActiveSectionId(sectionId);
-      fetchGroups(); // Optimized, ensures no duplicate calls
-    },
-    [fetchGroups]
+  // Centralized state from the Redux store for sections, groups, and unassigned students
+  const { loading, error, unassignedStudentsList } = useSelector(
+    (store) => store.admin.group_section
   );
 
-  const handleSeeGradeClick = (student) => {
-    dispatch(setStudentGrade(student));
+  // Reset groups on class change
+  useEffect(() => {
+    if (cid) {
+      dispatch(clearGroupsList()); // Clear previous groups to avoid stale data
+      dispatch(fetchSectionsByClass(cid)); // Fetch sections for the class
+      dispatch(fetchGroupsByClass(cid)); // Fetch groups for the new class
+      dispatch(fetchUnassignedStudents(cid)); // Fetch unassigned students
+    }
+  }, [cid, dispatch]);
+
+  // Handle section change
+  useEffect(() => {
+    if (activeSection !== "Everyone" && activeSectionId) {
+      dispatch(
+        fetchGroupsByClassAndSection({
+          classId: cid,
+          sectionId: activeSectionId,
+        })
+      );
+    } else if (activeSection === "Everyone") {
+      dispatch(fetchGroupsByClass(cid));
+    }
+  }, [activeSectionId, activeSection, cid, dispatch]);
+
+  // Handle section change from navigation bar
+  const handleSectionChange = useCallback((section, sectionId) => {
+    setActiveSection(section);
+    setActiveSectionId(sectionId);
+    dispatch(fetchGroupsByClassAndSection({ classId: cid, sectionId }));
+  }, []);
+
+  const onSeeGradeClick = (student) => {
+    setStudentData(student);
     setIsModalOpen(true);
+    const params = {};
+    dispatch(
+      fetchStudentGrades({
+        params,
+        studentId: student?._id,
+        studentClassId: cid,
+      })
+    );
+    dispatch(fetchStudentSubjectProgress(student?._id));
   };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
-    dispatch(setStudentGrade({}));
   };
-
-  const errorMessage = errorByClass || errorBySection;
 
   return (
     <div className="flex flex-col h-screen">
       <NavigationBar
         onSectionChange={handleSectionChange}
         selectedSection={activeSection}
-        fetchSections={fetchSection}
-        fetchGroups={fetchGroups}
       />
       <div className="flex flex-grow">
         <div className="w-80 h-full flex-shrink-0">
-          <UnAssignedStudentList
-            fetchGroups={fetchGroups}
-            fetchStudents={fetchStudents}
-            unassignedStudents={unassignedStudents}
-          />
+          <UnAssignedStudentList />
         </div>
         <div className="flex-grow h-full border-l">
-          {loadingByClass || loadingBySection ? (
-            <Spinner />
-          ) : errorMessage ? (
-            <div className="flex justify-center items-center h-full text-red-600">
-              {errorMessage}
-            </div>
-          ) : (
-            <GroupList
-              selectedSection={activeSection}
-              onSeeGradeClick={handleSeeGradeClick}
-              groupList={groupList}
-              fetchGroups={fetchGroups}
-              fetchStudents={fetchStudents}
-            />
-          )}
+          <GroupList onSeeGradeClick={onSeeGradeClick} />
         </div>
+        <StudentGradeModal
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          student={studentData}
+        />
       </div>
-      <StudentGradeModal isOpen={isModalOpen} onClose={handleCloseModal} />
     </div>
   );
 };

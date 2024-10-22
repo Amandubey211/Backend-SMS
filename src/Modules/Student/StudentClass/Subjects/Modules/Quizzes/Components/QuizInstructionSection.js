@@ -1,8 +1,13 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { FaPlayCircle } from "react-icons/fa";
+import { useDispatch, useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
+import { stdGetSingleQuiz } from "../../../../../../../Store/Slices/Student/MyClass/Class/Subjects/Quizes/quizes.action";
 
-const QuizInstructionSection = React.memo(({ quiz }) => {
-  const { content, thumbnail } = quiz;
+const QuizInstructionSection = () => {
+
+  const { itemDetails } = useSelector((store) => store?.student?.studentQuiz);
+  const { content, thumbnail } = itemDetails;
 
   return (
     <div className="max-w-3xl mx-auto p-2 bg-white ">
@@ -25,6 +30,6 @@ const QuizInstructionSection = React.memo(({ quiz }) => {
       />
     </div>
   );
-});
+};
 
 export default QuizInstructionSection;

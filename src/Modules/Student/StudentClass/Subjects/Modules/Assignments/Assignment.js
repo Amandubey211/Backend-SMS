@@ -7,10 +7,10 @@ import Layout from "../../../../../../Components/Common/Layout";
 import { useSelector } from "react-redux";
 
 const Assignment = () => {
-  const { cid, sid } = useParams();
-  // useNavHeading(cid, sid);
-  const subjectName = useSelector((store) => store.Common.selectedSubjectName);
-  const className = useSelector((store) => store.Common.selectedClassName);
+  const { subjectName } = useSelector((store) => store?.student?.studentSubject?.subject);
+  const { classData } = useSelector((store) => store?.student?.studentClass);
+  const className=classData?.className;
+
   useNavHeading(className, subjectName);
 
   return (

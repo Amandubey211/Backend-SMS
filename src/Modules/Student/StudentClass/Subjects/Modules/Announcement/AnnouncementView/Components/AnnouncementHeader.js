@@ -5,8 +5,10 @@ import { FaExclamationTriangle } from "react-icons/fa";
 import AnnouncementMessage from "./AnnouncementMessage";
 import Sidebar from "../../../../../../../../Components/Common/Sidebar";
 import { CiUser } from "react-icons/ci";
+import { useSelector } from "react-redux";
 
-const AnnouncementHeader = ({ announcement, loading, error }) => {
+const AnnouncementHeader = () => {
+  const { loading, error, announcement } = useSelector((store) => store?.student?.studentAnnounce)
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const handleSidebarOpen = () => setSidebarOpen(true);
   const handleSidebarClose = () => setSidebarOpen(false);
@@ -31,19 +33,19 @@ const AnnouncementHeader = ({ announcement, loading, error }) => {
       ) : (
         <>
           <div className="flex items-center">
-          {announcement?.authorProfile ? (
-          <img
-            src={announcement.authorProfile}
-            alt="Profile"
-            className="w-10 h-10 rounded-full"
-          />
-        ) : (
-          <CiUser className="w-10 h-10 rounded-full text-gray-500" />
-        )}
+            {announcement?.authorProfile ? (
+              <img
+                src={announcement?.authorProfile}
+                alt="Profile"
+                className="w-10 h-10 rounded-full"
+              />
+            ) : (
+              <CiUser className="w-10 h-10 rounded-full text-gray-500" />
+            )}
             {/* <img
               src={
                 announcement?.authorProfile ||
-                `https://avatars.githubusercontent.com/u/109097090?v=4`
+                ``
               }
               alt="Profile"
               className="w-10 h-10 rounded-full"

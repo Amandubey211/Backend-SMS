@@ -1,210 +1,186 @@
-import React, { useState, useEffect } from 'react';
-import { RxCross2 } from "react-icons/rx";
-import { format, parse } from 'date-fns';
+import React, { useState, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import toast from "react-hot-toast";
+import { format } from "date-fns";
+import FormInput from "../../../Accounting/subClass/component/FormInput";
+import ImageUpload from "../../../Addmission/Components/ImageUpload";
+import { updateEventThunk } from "../../../../../Store/Slices/Admin/NoticeBoard/Events/eventThunks";
 
-const UpdateEvent = ({ event, onSave, onClose }) => {
+// Helper function to convert 12-hour time to 24-hour format
+const convertTo24HourFormat = (time12h) => {
+  const [time, modifier] = time12h.split(" ");
+  let [hours, minutes] = time.split(":");
+  if (hours === "12") {
+    hours = "00";
+  }
+  if (modifier === "PM") {
+    hours = parseInt(hours, 10) + 12;
+  }
+  return `${hours}:${minutes}`;
+};
+
+const UpdateEvent = () => {
+  const dispatch = useDispatch();
+  const selectedEvent = useSelector(
+    (state) => state.admin.events.selectedEvent
+  );
+  const loading = useSelector((state) => state.admin.events.loading);
+
   const [eventData, setEventData] = useState({
-    title: '',
-    description: '',
-    date: '',
-    time: '',
-    type: '',
-    location: '',
-    director: '',
+    title: "",
+    location: "",
+    date: "",
+    time: "",
+    director: "",
+    type: "",
+    description: "",
     image: null,
     imagePreview: null,
   });
 
   useEffect(() => {
-    if (event) {
+    if (selectedEvent) {
       setEventData({
-        title: event.title || '',
-        description: event.description || '',
-        date: event.date ? new Date(event.date).toISOString().split('T')[0] : '',
-        time: event.time ? formatTime(event.time) : '', // Use helper to handle 24-hour format
-        type: event.type || '',
-        location: event.location || '',
-        director: event.director || '',
-        image: event.image || null,
-        imagePreview: event.image || null,
+        title: selectedEvent.title,
+        location: selectedEvent.location,
+        date: format(new Date(selectedEvent.date), "yyyy-MM-dd"), // Format date to yyyy-MM-dd
+        time: convertTo24HourFormat(selectedEvent.time), // Convert time to 24-hour format
+        director: selectedEvent.director,
+        type: selectedEvent.type,
+        description: selectedEvent.description,
+        image: selectedEvent.image,
+        imagePreview: selectedEvent.image ? selectedEvent.image : null,
       });
     }
-  }, [event]);
+  }, [selectedEvent]);
 
-  const formatTime = (time) => {
-    if (!time) return '';
-    try {
-      const parsedTime = parse(time, 'HH:mm', new Date());
-      if (isNaN(parsedTime)) {
-        console.error("Invalid time value:", time);
-        return '';
-      }
-      return format(parsedTime, 'HH:mm');
-    } catch (error) {
-      console.error("Error formatting time:", error, time);
-      return '';
-    }
-  };
-
-  const handleChange = (e) => {
+  const handleInputChange = (e) => {
     const { name, value } = e.target;
     setEventData({ ...eventData, [name]: value });
   };
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
-    setEventData({ ...eventData, image: file, imagePreview: URL.createObjectURL(file) });
+    setEventData({
+      ...eventData,
+      image: file,
+      imagePreview: file ? URL.createObjectURL(file) : null,
+    });
   };
 
-  const handleImageRemove = () => {
-    setEventData({ ...eventData, image: null, imagePreview: null });
+  const handleRemoveImage = () => {
+    setEventData({
+      ...eventData,
+      image: null,
+      imagePreview: null,
+    });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onSave(eventData);
+    if (
+      !eventData.title ||
+      !eventData.date ||
+      !eventData.time ||
+      !eventData.image
+    ) {
+      toast.error("Please fill in all required fields.");
+      return;
+    }
+
+    // Dispatch the update event thunk
+    await dispatch(updateEventThunk({ eventId: selectedEvent._id, eventData }));
+    toast.success("Event updated successfully!");
   };
 
   return (
-    <div className="p-4 overflow-y-auto" style={{ maxHeight: '90vh' }}>
-      <h2 className="text-lg font-semibold mb-4">Update Event</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="mb-4">
-          <label htmlFor="image" className="block text-gray-700">Event Image</label>
-          <div className="relative">
-            {eventData.imagePreview ? (
-              <div>
-                <img src={eventData.imagePreview} alt="Event" className="w-full h-40 object-cover rounded" />
-                <button
-                  type="button"
-                  onClick={handleImageRemove}
-                  className="absolute top-0 right-0 p-1 bg-white rounded-full shadow"
-                >
-                  <RxCross2 className="text-xl" />
-                </button>
-              </div>
-            ) : (
-              <input
-                type="file"
-                id="image"
-                name="image"
-                accept="image/*"
-                onChange={handleImageChange}
-                className="border px-3 py-2 w-full rounded"
-              />
-            )}
-          </div>
-        </div>
-        <div className="mb-4">
-          <label htmlFor="title" className="block text-gray-700">Title</label>
-          <input
-            type="text"
+    <div className="flex flex-col h-full max-w-xl mx-auto border-t bg-white">
+      {/* Scrollable content area */}
+      <div className="flex-grow overflow-auto p-4 no-scrollbar">
+        <form className="space-y-4 mb-8" onSubmit={handleSubmit}>
+          <ImageUpload
+            imagePreview={eventData.imagePreview}
+            handleImageChange={handleImageChange}
+            handleRemoveImage={handleRemoveImage}
+          />
+          <FormInput
             id="title"
             name="title"
+            label="Event Name"
             value={eventData.title}
-            onChange={handleChange}
-            className="border px-3 py-2 w-full rounded"
+            onChange={handleInputChange}
             required
           />
-        </div>
-        <div className="flex gap-4 mb-4">
-          <div className="w-1/2">
-            <label htmlFor="date" className="block text-gray-700">Date</label>
-            <input
-              type="date"
-              id="date"
-              name="date"
-              value={eventData.date}
-              onChange={handleChange}
-              className="border px-3 py-2 w-full rounded"
-              required
-            />
-          </div>
-          <div className="w-1/2">
-            <label htmlFor="time" className="block text-gray-700">Time</label>
-            <input
-              type="time"
-              id="time"
-              name="time"
-              value={eventData.time}
-              onChange={handleChange}
-              className="border px-3 py-2 w-full rounded"
-              required
-            />
-          </div>
-        </div>
-        <div className="mb-4">
-          <label htmlFor="location" className="block text-gray-700">Location</label>
-          <input
-            type="text"
+          <FormInput
+            id="date"
+            name="date"
+            label="Date"
+            type="date"
+            value={eventData.date}
+            onChange={handleInputChange}
+            required
+          />
+          <FormInput
+            id="time"
+            name="time"
+            label="Event Time"
+            type="time"
+            value={eventData.time}
+            onChange={handleInputChange}
+            required
+          />
+          <FormInput
             id="location"
             name="location"
+            label="Location"
             value={eventData.location}
-            onChange={handleChange}
-            className="border px-3 py-2 w-full rounded"
-            required
+            onChange={handleInputChange}
           />
-        </div>
-        <div className="flex gap-4 mb-4">
-          <div className="w-1/2">
-            <label htmlFor="type" className="block text-gray-700">Event Type</label>
-            <input
-              type="text"
-              id="type"
-              name="type"
-              value={eventData.type}
-              onChange={handleChange}
-              className="border px-3 py-2 w-full rounded"
-              required
+          <FormInput
+            id="director"
+            name="director"
+            label="Event Director"
+            value={eventData.director}
+            onChange={handleInputChange}
+          />
+          <FormInput
+            id="type"
+            name="type"
+            label="Event Type"
+            value={eventData.type}
+            onChange={handleInputChange}
+          />
+
+          <div>
+            <label
+              htmlFor="description"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Description
+            </label>
+            <textarea
+              id="description"
+              name="description"
+              value={eventData.description}
+              onChange={handleInputChange}
+              rows={5}
+              className="mt-1 block w-full rounded-md border border-gray-700  p-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              placeholder="Enter event description"
             />
           </div>
-          <div className="w-1/2">
-            <label htmlFor="director" className="block text-gray-700">Event Director</label>
-            <input
-              type="text"
-              id="director"
-              name="director"
-              value={eventData.director}
-              onChange={handleChange}
-              className="border px-3 py-2 w-full rounded"
-              required
-            />
-          </div>
-        </div>
-        <div className="mb-4">
-          <label htmlFor="description" className="block text-gray-700">Event Details</label>
-          <textarea
-            id="description"
-            name="description"
-            value={eventData.description}
-            onChange={handleChange}
-            className="border px-3 py-2 w-full rounded"
-            rows="4"
-            required
-          />
-        </div>
-        <div className="flex justify-center">
-          <button
-            type="submit"
-            className="bg-gradient-to-r from-pink-500 to-purple-500 text-white px-20 py-2 rounded"
-          >
-            Save Changes
-          </button>
-        </div>
-      </form>
-      <style jsx>{`
-        ::-webkit-scrollbar {
-          width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-          background: #f1f1f1;
-        }
-        ::-webkit-scrollbar-thumb {
-          background-color: #888;
-          border-radius: 10px;
-          border: 3px solid #f1f1f1;
-        }
-      `}</style>
+        </form>
+      </div>
+
+      {/* Sticky Update button */}
+      <div className="p-2 bg-white border-t border-gray-200 sticky bottom-0 flex gap-4">
+        <button
+          type="submit"
+          className="w-full flex justify-center items-center bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md"
+          onClick={handleSubmit}
+        >
+          {loading ? "Updating..." : "Update Event"}
+        </button>
+      </div>
     </div>
   );
 };

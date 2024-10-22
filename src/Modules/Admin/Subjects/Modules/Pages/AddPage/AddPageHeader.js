@@ -45,7 +45,7 @@ const AddPageHeader = ({ onSave, isUpdating, loadingType }) => {
             {loadingType === "publish" ? (
               <>
                 <ImSpinner8 className="animate-spin mr-2" />
-                {isUpdating ? "Updating..." : "Saving..."}
+                {isUpdating ? "Updating..." : "Publishing..."}
               </>
             ) : isUpdating ? (
               "Update & Publish"

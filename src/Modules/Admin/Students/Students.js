@@ -6,7 +6,9 @@ import useNavHeading from "../../../Hooks/CommonHooks/useNavHeading ";
 import { useSelector } from "react-redux";
 
 const Students = () => {
-  const className = useSelector((store) => store.Common.selectedClass);
+  const className = useSelector(
+    (store) => store.common.user.classInfo.selectedClassName
+  );
 
   useNavHeading(className, "Students");
   return (

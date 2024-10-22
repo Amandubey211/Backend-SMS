@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import NavIconCard from "./Components/NavIconCard";
 import ButtonGroup from "./Components/ButtonGroup";
 import SubjectCard from "./SubjectCard";
@@ -8,10 +9,9 @@ import { useParams } from "react-router-dom";
 import { FaSchool } from "react-icons/fa";
 import { SlEyeglass } from "react-icons/sl";
 import { FcGraduationCap, FcCalendar } from "react-icons/fc";
-import { useSelector } from "react-redux";
-import useGetClassDetails from "../../../../Hooks/AuthHooks/Staff/Admin/Class/usegetClassDetails";
 import NoDataFound from "../../../../Components/Common/NoDataFound";
 import Spinner from "../../../../Components/Common/Spinner";
+import { fetchClassDetails } from "../../../../Store/Slices/Admin/Class/actions/classThunk";
 
 const colors = [
   "bg-yellow-300",
@@ -30,15 +30,17 @@ const MainSection = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedTab, setSelectedTab] = useState("Published");
   const [editSubject, setEditSubject] = useState(null); // New state for editing
-  const classDetails = useSelector((store) => store.Class.class);
-  const role = useSelector((store) => store.Auth.role);
+  const classDetails = useSelector((store) => store.admin.class.classDetails); // Use classDetails from Redux
+  const role = useSelector((store) => store.common.auth.role);
+  const loading = useSelector((store) => store.admin.class.loading);
 
-  const { fetchClassDetails, loading } = useGetClassDetails();
+  const dispatch = useDispatch();
   const { cid } = useParams();
 
+  // Fetch class details using the thunk
   useEffect(() => {
-    fetchClassDetails(cid);
-  }, [fetchClassDetails, cid]);
+    dispatch(fetchClassDetails(cid));
+  }, [dispatch, cid]);
 
   // Static icon data
   const staticIconData = [
@@ -105,7 +107,7 @@ const MainSection = () => {
       ) : (
         <>
           <div className="flex flex-wrap justify-center gap-3 p-4">
-            {staticIconData.map((item, index) => (
+            {staticIconData?.map((item, index) => (
               <NavIconCard
                 key={index}
                 icon={item.icon}

@@ -1,7 +1,17 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { FaEllipsisV, FaCheckCircle, FaBan, FaPen, FaCopy, FaArrowRight, FaIndent, FaShareAlt, FaTrashAlt } from 'react-icons/fa';
+import {
+  FaEllipsisV,
+  FaCheckCircle,
+  FaBan,
+  FaPen,
+  FaCopy,
+  FaArrowRight,
+  FaIndent,
+  FaShareAlt,
+  FaTrashAlt,
+} from 'react-icons/fa';
 
-const ModuleCard = ({ title, moduleNumber, imageUrl, isCompleted }) => {
+const ModuleCard = ({ title = "Untitled Module", moduleNumber = "N/A", imageUrl, isCompleted = false, role }) => {  // Added role prop
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef();
 
@@ -23,30 +33,48 @@ const ModuleCard = ({ title, moduleNumber, imageUrl, isCompleted }) => {
   }, []);
 
   return (
-    <div className="relative mb-4 border-gradient bg-white rounded-lg shadow-md">
-      <img src={imageUrl} alt={title} className="w-full h-36 object-cover rounded-t-lg" />
+    <div className="relative mb-4 bg-white rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
+      {/* Module Thumbnail */}
+      <img
+        src={imageUrl || "https://via.placeholder.com/150"} // Fallback image if imageUrl is missing
+        alt={title}
+        className="w-full h-36 object-cover rounded-t-lg"
+      />
+
+      {/* Module Info */}
       <div className="p-4">
         <h2 className="font-semibold text-lg">{title}</h2>
         <div className="flex justify-between items-center mt-2">
-          <p className="bg-gradient-to-r from-pink-100 to-purple-200 font-semibold rounded-full py-1 px-4">    <span className="text-gradient"> Module {moduleNumber}</span>  </p>
-       
+          <p className="bg-gradient-to-r from-pink-100 to-purple-200 font-semibold rounded-full py-1 px-4">
+            Module {moduleNumber}
+          </p>
+
           <div className="flex items-center space-x-2">
-            {isCompleted ? (
-              <FaCheckCircle className="text-green-500" />
-            ) : (
-              <FaBan className="text-gray-500" />
+            {/* Conditionally Render Icons based on role */}
+            {role !== 'user' && (
+              <>
+                {isCompleted ? (
+                  <FaCheckCircle className="text-green-500" />
+                ) : (
+                  <FaBan className="text-gray-500" />
+                )}
+
+                {/* Dropdown Button */}
+                <button
+                  className="bg-gray-100 p-2 rounded-full hover:bg-gray-200 focus:outline-none"
+                  onClick={toggleMenu}
+                  aria-label="More options"
+                >
+                  <FaEllipsisV />
+                </button>
+              </>
             )}
-            <button
-              className="bg-gray-100 p-2 rounded-full hover:bg-gray-200"
-              onClick={toggleMenu}
-            >
-              
-              <FaEllipsisV />
-            </button>
           </div>
         </div>
       </div>
-      {menuOpen && (
+
+      {/* Dropdown Menu */}
+      {menuOpen && role !== 'user' && (
         <div ref={menuRef} className="absolute top-12 right-4 bg-white border rounded-lg shadow-lg w-48 z-10">
           <ul className="py-2">
             <li className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">

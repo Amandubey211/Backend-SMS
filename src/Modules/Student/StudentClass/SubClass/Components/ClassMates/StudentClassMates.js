@@ -2,71 +2,47 @@ import React, { useState, useEffect } from "react";
 import Layout from "../../../../../../Components/Common/Layout";
 import DashLayout from "../../../../../../Components/Student/StudentDashLayout";
 import { useParams } from "react-router-dom";
-import { shallowEqual, useSelector } from "react-redux";
 import ProfileCard from "./ProfileCard";
-import { baseUrl } from "../../../../../../config/Common";
-import Spinner from "../../../../../../Components/Common/Spinner";
 import NoDataFound from "../../../../../../Components/Common/NoDataFound";
-import useNavHeading from "../../../../../../Hooks/CommonHooks/useNavHeading ";
-
+// import useNavHeading from "../../../../../../Hooks/CommonHooks/useNavHeading ";
+import { stdClassmate } from "../../../../../../Store/Slices/Student/MyClass/Class/classMates/classmate.action";
+import { useDispatch, useSelector } from "react-redux";
+import Spinner from "../../../../../../Components/Common/Spinner";
+import { GoAlertFill } from "react-icons/go";
+import ClassmateModal from "./ClassmateModal";
+import { setShowError } from "../../../../../../Store/Slices/Common/Alerts/alertsSlice";
+import OfflineModal from "../../../../../../Components/Common/Offline";
+import SidebarSlide from '../../../../../../Components/Common/SidebarSlide'
 const StudentClassMates = () => {
-  const { selectedClass, selectedClassName } = useSelector(
-    (state) => ({
-      selectedClass: state.Common.selectedClass,
-      selectedClassName: state.Common.selectedClassName,
-    }),
-    shallowEqual
+  const { classmateData, loading, error } = useSelector(
+    (store) => store?.student?.studentClassmate
   );
-  const { cid } = useParams();
-  const [classmates, setClassmates] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { showError } = useSelector((store) => store?.common?.alertMsg);
 
-  useNavHeading(selectedClassName, "Classmates");
+  const dispatch = useDispatch();
+  const { classId } = useParams();
+  const [selectedClassmate, setSelectedClassmate] = useState(null); // Modal state
+  // useNavHeading(selectedClassName, "Classmates");
 
-  const fetchClassmates = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const token = localStorage.getItem("student:token");
-      if (!token) throw new Error("Authentication token not found");
-
-      const response = await fetch(
-        `${baseUrl}/student/my_classmates/${selectedClass}`,
-        {
-          headers: { Authentication: token },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(
-          `Failed to fetch classmates, status: ${response.status}`
-        );
-      }
-
-      const data = await response.json();
-      if (data.status && data.data) {
-        setClassmates(data.data);
-      } else {
-        throw new Error("No classmates data available");
-      }
-    } catch (error) {
-      setError(error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const handleDismiss = () => {
+    dispatch(setShowError(false));
+  }
 
   useEffect(() => {
-    if (selectedClass) {
-      fetchClassmates();
-    } else {
-      setError("Class ID is undefined");
-      setLoading(false);
-    }
-  }, [cid, selectedClass]);
+    dispatch(stdClassmate({ classId }));
+  }, [dispatch, classId]);
 
-  if (loading) return <Spinner />;
+const [isSidebarOpen,setIsSidebarOpen] = useState(false)
+  const handleProfileClick = (classmate) => {
+    setSelectedClassmate(classmate);
+    setIsSidebarOpen(true) // Set selected classmate for modal
+  };
+
+  const closeModal = () => {
+    setSelectedClassmate(null);
+    setIsSidebarOpen(false)
+     // Close modal
+  };
 
   return (
     <Layout title="My Classmates">
@@ -76,26 +52,65 @@ const StudentClassMates = () => {
             <h2 className="text-xl text-gray-600 font-semibold">My Classmates</h2>
             <div
               className="flex justify-center items-center bg-gradient-to-br from-pink-100 via-purple-100 to-blue-100 rounded-full w-[25px] h-[25px] border border-gray-300"
-              aria-label={`Number of classmates: ${classmates.length}`}
+              aria-label={`Number of classmates: ${classmateData?.length || 0}`}
             >
               <p className="text-lg font-semibold text-purple-500">
-                {classmates.length || 0}
+                {classmateData?.length || 0}
               </p>
             </div>
           </div>
-          <div className="flex flex-wrap -mx-2">
-            {classmates.length > 0 ? (
-              classmates.map((classmate, index) => (
-                <ProfileCard key={index} profile={classmate} />
-              ))
-            ) : (
+
+          {loading ? (
+            <div className="w-full flex flex-col items-center justify-center py-20">
+              <Spinner />
+            </div>
+          )
+          //  : error ? (
+          //   <div className="w-full flex flex-col items-center justify-center py-20">
+          //     <GoAlertFill className="inline-block w-12 h-12 mb-3" />
+          //     <p className="text-lg font-semibold">{error}</p>
+          //   </div>
+          // ) 
+          : classmateData?.length > 0 ? (
+            <div className="flex flex-wrap -mx-2">
+              {classmateData?.map((classmate, index) => (
+                <ProfileCard
+                  key={index}
+                  profile={classmate}
+                  onClick={() => handleProfileClick(classmate)} // Open modal on click
+                />
+              ))}
+            </div>
+          ) : (!loading && classmateData?.length === 0) && (
+            <div className="w-full flex flex-col items-center justify-center py-20">
               <NoDataFound title="No Classmates Found" />
-            )}
-          </div>
+            </div>
+          )}
         </div>
+
+        {/* Render the modal if a classmate is selected */}
+        {selectedClassmate && (
+         <SidebarSlide
+         isOpen={isSidebarOpen}
+         onClose={closeModal}
+         title={<span className="bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent bg-clip-text">
+           Classmate
+
+         </span>}
+         width="30%"
+         height="100%"
+       >
+        <ClassmateModal
+            classmate={selectedClassmate}
+          />
+       </SidebarSlide>
+        )}
+        {!loading && showError && (
+          <OfflineModal error={error} onDismiss={handleDismiss} />
+        )}
+        
       </DashLayout>
     </Layout>
   );
 };
-
 export default StudentClassMates;

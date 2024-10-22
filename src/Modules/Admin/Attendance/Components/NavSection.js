@@ -1,19 +1,19 @@
-import React, { useEffect, useState } from "react";
-import { navData } from "./Data/NavData";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useParams, NavLink } from "react-router-dom";
+import { fetchAttendanceStats } from "../../../../Store/Slices/Admin/Class/Attendence/attendanceThunks";
 import AttendanceNavCard from "./AttendanceNavCard";
-import toast from "react-hot-toast";
-import { NavLink, useParams } from "react-router-dom";
-import useGetAttendanceByClassSectionGroupAndDate from "../../../../Hooks/AuthHooks/Staff/Admin/Attendance/useGetAttendanceByClassSectionGroupAndDate";
+import { navData } from "./Data/NavData";
 
-const NavSection = ({ onFilterChange }) => {
-  const [selectedFilter, setSelectedFilter] = useState("all");
-  const { fetchAttendanceStats, attendanceStat } = useGetAttendanceByClassSectionGroupAndDate()
-  const { cid } = useParams()
-  const handleFilterChange = (filter) => {
-    toast.success(filter)
-    setSelectedFilter(filter);
-    onFilterChange(filter);
-  };
+const NavSection = () => {
+  const dispatch = useDispatch();
+  const { cid } = useParams();
+
+  const attendanceStat = useSelector(
+    (state) => state.admin.attendance.stats || {}
+  );
+
+  // Mapping the correct stat keys to navData
   const dataMapping = {
     "Total Students": "totalStudents",
     "Present Today": "totalPresent",
@@ -21,40 +21,42 @@ const NavSection = ({ onFilterChange }) => {
     "Leave Today": "totalLeave",
   };
 
-  const mappedData = navData.map(item => {
-    const key = dataMapping[item.label.trim()];
-    return {
-      ...item,
-      value: attendanceStat[key] || 0,
-    };
-  });
+  // Directly map `navData` and use `attendanceStat` values.
+  const mappedData = navData.map((item) => ({
+    ...item,
+    value: attendanceStat[dataMapping[item.label.trim()]] || 0, // Map values from the attendanceStat object
+  }));
 
   useEffect(() => {
-    fetchAttendanceStats(cid)
-  }, [])
-  
+    if (cid) {
+      dispatch(fetchAttendanceStats(cid));
+    }
+  }, [cid, dispatch]);
+
   return (
     <div>
-      <div className="flex items-center justify-between mb-3 ">
+      <div className="flex items-center justify-between mb-3">
         <h2 className="text-xl font-semibold text-gradient text-purple-600">
           Student Attendance
         </h2>
-        <NavLink to={`/class/${cid}/take_attendance`} className="px-6 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-md shadow-lg">
+        <NavLink
+          to={`/class/${cid}/take_attendance`}
+          className="px-6 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-md shadow-lg"
+        >
           Take Attendance
         </NavLink>
       </div>
 
       <div className="flex space-x-4">
-        {mappedData?.map((item) => (
+        {mappedData.map((item) => (
           <AttendanceNavCard
             key={item.label}
             label={item.label}
             value={item.value}
             bgColor={item.bgColor}
-            textColor={item.textColor}
             icon={item.icon}
-            iconBackground={item.iconBackground}
-            onClick={() => handleFilterChange(item.label.toLowerCase())}
+            iconBackground={item.iconColor}
+            textColor={item.textColor}
           />
         ))}
       </div>

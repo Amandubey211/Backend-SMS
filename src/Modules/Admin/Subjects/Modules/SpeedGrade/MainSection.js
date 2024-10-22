@@ -1,4 +1,5 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import StudentList from "./Components/StudentList";
 import AssignmentDetails from "./Components/AssignmentDetails";
 import SubmissionDetails from "./Components/SubmissionDetails";
@@ -6,45 +7,47 @@ import Spinner from "../../../../../Components/Common/Spinner";
 import NoDataFound from "../../../../../Components/Common/NoDataFound";
 import { FaUserCircle } from "react-icons/fa";
 import { useParams } from "react-router-dom";
-import useGetStudentAssignment from "../../../../../Hooks/AuthHooks/Staff/Admin/SpeedGrade/Assignment/useGetStudentAssignment";
-import useGetStudentQuiz from "../../../../../Hooks/AuthHooks/Staff/Admin/SpeedGrade/Quiz/useGetStudentQuiz";
+import {
+  fetchAssignedAssignmentStudents,
+  fetchStudentAssignment,
+} from "../../../../../Store/Slices/Admin/Class/SpeedGrade/AssignmentSpeedGradeThunks";
+import {
+  fetchAssignedQuizStudents,
+  fetchStudentQuiz,
+} from "../../../../../Store/Slices/Admin/Class/SpeedGrade/QuizSpeedGradeThunks";
 
 const MainSection = () => {
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [totalGrade, setTotalGrade] = useState(0);
   const { sgid, type } = useParams();
+  const dispatch = useDispatch();
 
-  // Determine which hook to use based on the `type` parameter
-  const {
-    loading: assignmentLoading,
-    error: assignmentError,
-    assignmentDetails,
-    fetchStudentAssignment,
-  } = useGetStudentAssignment();
+  const { loading, error, assignmentDetails, quizDetails, students } =
+    useSelector((state) => state.admin.speedgrades);
 
-  const {
-    loading: quizLoading,
-    error: quizError,
-    quizDetails,
-    fetchStudentQuiz,
-  } = useGetStudentQuiz();
+  useEffect(() => {
+    if (type === "Assignment") {
+      dispatch(fetchAssignedAssignmentStudents(sgid));
+    } else {
+      dispatch(fetchAssignedQuizStudents(sgid));
+    }
+  }, [dispatch, sgid, type]);
 
-  const handleStudentSelection = useCallback(
-    (student) => {
-      setSelectedStudent(student);
-      if (student) {
-        if (type === "Assignment") {
-          fetchStudentAssignment(student._id, sgid);
-        } else if (type === "Quiz") {
-          fetchStudentQuiz(student._id, sgid);
-        }
+  const handleStudentSelection = (student) => {
+    setSelectedStudent(student);
+    if (student) {
+      if (type === "Assignment") {
+        dispatch(
+          fetchStudentAssignment({ studentId: student._id, assignmentId: sgid })
+        );
+      } else if (type === "Quiz") {
+        dispatch(fetchStudentQuiz({ studentId: student._id, quizId: sgid }));
       }
-    },
-    [fetchStudentAssignment, fetchStudentQuiz, sgid, type]
-  );
+    }
+  };
 
-  const loading = type === "Assignment" ? assignmentLoading : quizLoading;
-  const error = type === "Assignment" ? assignmentError : quizError;
+  const loadingStatus = type === "Assignment" ? loading : loading;
+  const errorStatus = type === "Assignment" ? error : error;
   const details = type === "Assignment" ? assignmentDetails : quizDetails;
 
   const handleTotalGradeUpdate = (grade) => {
@@ -55,7 +58,10 @@ const MainSection = () => {
     <div className="flex h-screen">
       {/* Student List Section */}
       <div className="w-1/4 p-4 border-r border-gray-200 flex flex-col">
-        <StudentList onSelectStudent={handleStudentSelection} />
+        <StudentList
+          onSelectStudent={handleStudentSelection}
+          students={students}
+        />
       </div>
 
       {/* Middle Section */}
@@ -69,9 +75,9 @@ const MainSection = () => {
       ) : (
         <>
           <div className="w-1/2 p-4 border-r border-gray-200 flex flex-col">
-            {loading ? (
+            {loadingStatus ? (
               <Spinner />
-            ) : error ? (
+            ) : errorStatus ? (
               <NoDataFound />
             ) : (
               <AssignmentDetails

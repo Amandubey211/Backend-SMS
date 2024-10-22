@@ -4,13 +4,17 @@ import { FaCalendarAlt } from "react-icons/fa";
 import { HiOutlineDotsVertical } from "react-icons/hi";
 import { BsPatchCheckFill } from "react-icons/bs";
 import { useNavigate, useParams } from "react-router-dom";
-import useDeletePage from "../../../../../../Hooks/AuthHooks/Staff/Admin/Page/useDeletePage";
-import useUpdatePage from "../../../../../../Hooks/AuthHooks/Staff/Admin/Page/useUpdatePage";
+import { useDispatch, useSelector } from "react-redux";
+
 import toast from "react-hot-toast";
 import Spinner from "../../../../../../Components/Common/Spinner";
 import NoDataFound from "../../../../../../Components/Common/NoDataFound";
 import DeleteModal from "../../../../../../Components/Common/DeleteModal";
 import { MdOutlineBlock } from "react-icons/md";
+import {
+  deletePage,
+  updatePage,
+} from "../../../../../../Store/Slices/Admin/Class/Page/pageThunk";
 
 const ViewPageHeader = ({ title, LastEdit, page, refetchPage }) => {
   const [showMenu, setShowMenu] = useState(false);
@@ -19,18 +23,13 @@ const ViewPageHeader = ({ title, LastEdit, page, refetchPage }) => {
   const menuRef = useRef(null); // Reference for the menu
   const navigate = useNavigate();
   const { cid, sid } = useParams();
+  const dispatch = useDispatch();
+
   const {
     loading: deleteLoading,
     error: deleteError,
     success: deleteSuccess,
-    deletePage,
-  } = useDeletePage();
-  const {
-    loading: updateLoading,
-    error: updateError,
-    success: updateSuccess,
-    updatePage,
-  } = useUpdatePage();
+  } = useSelector((state) => state.admin.pages);
 
   const handleEdit = () => {
     navigate(`/class/${cid}/${sid}/page/create_Page`, { state: { page } });
@@ -41,7 +40,13 @@ const ViewPageHeader = ({ title, LastEdit, page, refetchPage }) => {
   };
 
   const handleConfirmDelete = async () => {
-    await deletePage(page._id);
+    await dispatch(deletePage({ pid: page._id }));
+    if (!deleteError) {
+      toast.success("Page deleted successfully!");
+      navigate(`/class/${cid}/${sid}/page`);
+    } else {
+      toast.error("Failed to delete the page.");
+    }
   };
 
   const handlePublishToggle = async () => {
@@ -50,10 +55,14 @@ const ViewPageHeader = ({ title, LastEdit, page, refetchPage }) => {
       publish: !isPublished, // Toggle publish status
     };
 
-    const success = await updatePage(page._id, updatedData);
+    const success = await dispatch(
+      updatePage({ pageId: page._id, pageData: updatedData })
+    );
     if (success) {
       setIsPublished(!isPublished); // Update local state if successful
-      refetchPage(); // Refetch page data after update
+      // refetchPage(); // Refetch page data after update
+    } else {
+      toast.error("Failed to update the page.");
     }
   };
 
@@ -76,19 +85,6 @@ const ViewPageHeader = ({ title, LastEdit, page, refetchPage }) => {
     };
   }, [showMenu]);
 
-  useEffect(() => {
-    if (deleteSuccess) {
-      toast.success("Page deleted successfully!");
-      navigate(`/class/${cid}/${sid}/page`);
-    }
-    if (deleteError) {
-      toast.error("Failed to delete the page.");
-    }
-    if (updateError) {
-      toast.error("Failed to update the page.");
-    }
-  }, [deleteSuccess, deleteError, updateError, navigate, cid, sid]);
-
   return (
     <div className="flex justify-between items-end p-4 border-b">
       <div className="w-full">
@@ -108,7 +104,7 @@ const ViewPageHeader = ({ title, LastEdit, page, refetchPage }) => {
           className="flex items-center space-x-1 px-4 py-1 border rounded-md border-gray-300 text-gray-600 hover:bg-gray-100 transition"
           aria-label={isPublished ? "Unpublish Page" : "Publish Page"}
           onClick={handlePublishToggle}
-          disabled={updateLoading}
+          disabled={deleteLoading}
         >
           {isPublished ? (
             <>

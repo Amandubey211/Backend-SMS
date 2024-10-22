@@ -4,7 +4,9 @@ import PaySalary from "./PaySalary";
 import { fetchApi } from '../api/api';
 import { baseUrl } from "../../../../../config/Common";
 import axios from "axios";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchSalaries, updateSalary } from "../../../../../Store/Slices/Admin/Accounting/Expenses/expenses.action";
+import NoDataFound from "../../../../../Components/Common/NoDataFound";
 
 const DropdownMenu = ({ onEditClick }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -54,11 +56,22 @@ const DropdownMenu = ({ onEditClick }) => {
   );
 };
 
+const capitalizeFirstLetter = (str) => {
+  if (!str) return ''; // Handle cases with undefined or empty strings
+  const firstLetter = str.charAt(0);
+  // Check if the first letter is already uppercase
+  if (firstLetter === firstLetter.toUpperCase()) {
+    return str;
+  } else {
+    return firstLetter.toUpperCase() + str.slice(1);
+  }
+};
+
 // Memoized row component
 const SalaryRow = React.memo(({ staff, onPayClick, onEditClick }) => {
   return (
-    <tr className="bg-white">
-      <td className="px-5 py-3 border-b border-gray-200 flex items-center">
+    <tr className="bg-white border border-gray-200 ">
+      <td className="px-5 py-3 flex items-center">
         {staff.staffId?.profile ? (
           <img src={staff.staffId?.profile} alt="Profile" className="w-10 h-10 rounded-full mr-3" />
         ) : (
@@ -73,65 +86,53 @@ const SalaryRow = React.memo(({ staff, onPayClick, onEditClick }) => {
           <div className="text-sm text-gray-500">{staff.staffId?.position}</div>
         </div>
       </td>
-      <td className="px-5 py-2 border-b border-gray-200">{staff.staffId?.mobileNumber}</td>
-      <td className="px-5 py-2 border-b border-gray-200">{staff.month}</td>
-      <td className="px-5 py-2 border-b border-gray-200">{staff.salaryAmount} QR</td>
-      <td className="px-5 py-2 border-b border-gray-200">
+      <td className="px-5 py-2">{staff.staffId?.mobileNumber}</td>
+      <td className="px-5 py-2">{staff.month}</td>
+      <td className="px-5 py-2">{staff.salaryAmount} QR</td>
+      <td className="px-5 py-2">
         {staff.paidDate ? new Date(staff.paidDate).toLocaleDateString() : "---"}
       </td>
-      <td className="px-5 py-2 border-b border-gray-200">
-        <span className={`px-3 py-1 text-xs font-semibold ${staff.status === "paid" ? " text-green-800" : " text-red-800"}`}>
-          {staff.status}
+      <td className="px-5 py-2">
+        <span className={`px-3 py-1 text-m font-semibold ${staff.status === "paid" ? " text-green-800" : " text-red-600"}`}>
+          {capitalizeFirstLetter(staff.status)}
         </span>
       </td>
-      <td className="px-5 py-2 border-b border-gray-200 flex items-center justify-between space-x-2">
+      <td className="px-5 py-2 flex items-center justify-between space-x-2">
         {staff.status === "paid" ? (
-          <span className="inline-flex items-center border border-transparent text-xs font-medium shadow-sm bg-green-200 text-green-800 py-1 px-2 rounded-md">
+          <span className="inline-flex items-center border border-transparent text-xs font-medium shadow-sm bg-green-200 text-green-800 py-1.5 px-3 rounded-md">
             Completed
           </span>
         ) : (
           <button
-            className="inline-flex items-center border border-transparent text-xs font-medium shadow-sm bg-gradient-to-r from-pink-500 to-purple-500 text-white py-1 px-2 rounded-md hover:from-pink-600 hover:to-purple-600"
+            className="inline-flex items-center border border-transparent text-sm font-medium shadow-sm bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600"
             onClick={() => onPayClick(staff)}
           >
             Pay Now
           </button>
         )}
+
         <DropdownMenu onEditClick={() => onEditClick(staff)} />
       </td>
     </tr>
   );
 });
 
-const StaffSalary = ({ initialStaffData, selectedOption, selectedMonth }) => {
-  const [staffData, setStaffData] = useState(initialStaffData || []);
+const StaffSalary = ({ selectedOption, selectedMonth }) => {
+
+  const { staffSalaries, loading } = useSelector((store) => store?.admin?.expenses)
+
+  const dispatch = useDispatch();
+
+  //const [staffData, setStaffData] = useState(initialStaffData || []);
   const [selectedStaff, setSelectedStaff] = useState(null);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [isEditSidebarOpen, setEditSidebarOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const role = useSelector((store) => store.Auth.role);
-  const token = localStorage.getItem(`${role}:token`);
+  //const [loading, setLoading] = useState(false);
 
-  const fetchSalaries = useCallback(async (query, month) => {
-    try {
-      const year = new Date().getFullYear();
-      const response = await axios.get(`${baseUrl}/admin/staff/get_salary?salaryRole=all&status=${query}&month=${month}&year=${year}`,
-        {
-          headers: {
-            Authentication: token
-          }
-        }
-      );
-      setStaffData(response.data.salaryRecords);
-      console.log("staffData", response);
-    } catch (error) {
-      console.error('Error fetching salaries:', error);
-    }
-  }, [token]);
 
   useEffect(() => {
-    fetchSalaries(selectedOption, selectedMonth);
-  }, [selectedOption, selectedMonth, fetchSalaries]);
+    dispatch(fetchSalaries({ query: selectedOption, activeTab: "StaffSalary", month: selectedMonth }))
+  }, [selectedOption, selectedMonth, dispatch]);
 
   // Handle clicking the pay button
   const handlePayClick = (staff) => {
@@ -146,17 +147,10 @@ const StaffSalary = ({ initialStaffData, selectedOption, selectedMonth }) => {
   };
 
   const handleUpdateSalary = async (salaryDetails) => {
-    setLoading(true);
-    try {
-      await fetchApi(`${baseUrl}/admin/staff/update_salary`, "PUT", salaryDetails, token);
-
-      await fetchSalaries(selectedOption, selectedMonth);
+    dispatch(updateSalary({ salaryDetails })).then(() => {
+      dispatch(fetchSalaries({ query: selectedOption, activeTab: "StaffSalary", month: selectedMonth }))
       handleEditSidebarClose();
-    } catch (error) {
-      console.error("Failed to update salary:", error);
-    } finally {
-      setLoading(false);
-    }
+    })
   };
 
   const handleEditSidebarClose = () => {
@@ -171,31 +165,40 @@ const StaffSalary = ({ initialStaffData, selectedOption, selectedMonth }) => {
 
   return (
     <div>
-      <table className="min-w-full leading-normal mt-4 rounded-lg">
-        <thead>
-          <tr className="text-left text-gray-700 bg-gray-100">
-            <th className="px-5 py-3 border-b-2 border-gray-200">Staff Name</th>
-            <th className="px-5 py-3 border-b-2 border-gray-200">Contact Info</th>
-            <th className="px-5 py-3 border-b-2 border-gray-200">Salary Month</th>
-            <th className="px-5 py-3 border-b-2 border-gray-200">Salary Amount</th>
-            <th className="px-5 py-3 border-b-2 border-gray-200">Paid Date</th>
-            <th className="px-5 py-3 border-b-2 border-gray-200">Status</th>
-            <th className="px-5 py-3 border-b-2 border-gray-200">Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {staffData.map((staff, index) => (
-            <SalaryRow key={index} staff={staff} onPayClick={handlePayClick} onEditClick={handleEditClick} />
-          ))}
-        </tbody>
-      </table>
+     <table className="min-w-full leading-normal mt-4 rounded-lg">
+  <thead>
+    <tr className="text-left text-gray-700 bg-gray-100">
+      <th className="px-5 py-3 border-b-2 border-gray-200">Staff Name</th>
+      <th className="px-5 py-3 border-b-2 border-gray-200">Contact Info</th>
+      <th className="px-5 py-3 border-b-2 border-gray-200">Salary Month</th>
+      <th className="px-5 py-3 border-b-2 border-gray-200">Salary Amount</th>
+      <th className="px-5 py-3 border-b-2 border-gray-200">Paid Date</th>
+      <th className="px-5 py-3 border-b-2 border-gray-200">Status</th>
+      <th className="px-5 py-3 border-b-2 border-gray-200">Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {staffSalaries?.length === 0 ? (
+      <tr>
+        <td colSpan="7" className="text-center px-5 py-5">
+          <NoDataFound /> {/* Display NoDataFound when no data */}
+        </td>
+      </tr>
+    ) : (
+      staffSalaries?.map((staff, index) => (
+        <SalaryRow key={index} staff={staff} onPayClick={handlePayClick} onEditClick={handleEditClick} />
+      ))
+    )}
+  </tbody>
+</table>
+
 
       <Sidebar
         isOpen={isSidebarOpen}
         onClose={handleSidebarClose}
         title="Add Transaction"
       >
-        <PaySalary teacher={selectedStaff} onSave={handleUpdateSalary} />
+        <PaySalary teacher={selectedStaff} onSave={handleUpdateSalary} onClose={handleSidebarClose} />
       </Sidebar>
 
       <Sidebar

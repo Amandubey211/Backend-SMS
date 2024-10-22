@@ -8,7 +8,7 @@ const useAddStudent = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const role = useSelector((store) => store.Auth.role);
+  const role = useSelector((store) => store.common.auth.role);
 
   const addStudent = useCallback(
     async (studentData) => {

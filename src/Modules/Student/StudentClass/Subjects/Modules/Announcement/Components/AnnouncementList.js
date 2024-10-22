@@ -4,22 +4,32 @@ import { ImSpinner3 } from "react-icons/im";
 import { useParams } from "react-router-dom";
 import AnnouncementHeader from "./AnnouncementHeader";
 import AnnouncementCard from "./AnnouncementCard";
-import useGetAllAnnouncements from "../../../../../../../Hooks/AuthHooks/Staff/Admin/Announcement/useGetAllAnnouncements";
 import NoDataFound from "../../../../../../../Components/Common/NoDataFound";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchStudentAnnounce } from "../../../../../../../Store/Slices/Student/MyClass/Class/Subjects/Announcement/announcement.action";
+import OfflineModal from "../../../../../../../Components/Common/Offline";
+import { setShowError } from "../../../../../../../Store/Slices/Common/Alerts/alertsSlice";
 
 const AnnouncementList = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const { loading, error, fetchAnnouncements, announcementData } =
-    useGetAllAnnouncements();
+  const dispatch = useDispatch();
+  const { loading, error, announcementData } = useSelector((store) => store?.student?.studentAnnounce)
+  const { showError } = useSelector((store) => store?.common?.alertMsg);
+
   const { cid } = useParams();
 
   useEffect(() => {
-    fetchAnnouncements(cid);
-  }, [cid, fetchAnnouncements]);
+    dispatch(fetchStudentAnnounce(cid))
+  }, [cid, dispatch]);
 
   const filteredAnnouncements = announcementData.filter((card) =>
     card.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
+  console.log(filteredAnnouncements, "filteredAnnouncements");
+
+  const handleDismiss = () => {
+    dispatch(setShowError(false));
+  }
 
   return (
     <div className="w-full ps-3">
@@ -33,16 +43,8 @@ const AnnouncementList = () => {
         </div>
       )}
 
-      {/* Error State */}
-      {error && (
-        <div className="flex flex-col items-center justify-center h-full text-red-500">
-          <FaExclamationCircle className="w-12 h-12 mb-3" />
-          <p className="text-lg font-semibold">Error: {error}</p>
-        </div>
-      )}
-
       {/* No Announcements Found */}
-      {!loading && !error && filteredAnnouncements.length === 0 && (
+      {!loading  && filteredAnnouncements.length === 0 && (
         <NoDataFound title="announcements" />
       )}
 
@@ -59,6 +61,9 @@ const AnnouncementList = () => {
             />
           ))}
         </div>
+      )}
+      {!loading && showError && (
+        <OfflineModal error={error} onDismiss={handleDismiss} />
       )}
     </div>
   );

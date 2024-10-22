@@ -1,63 +1,94 @@
-import React, { useState, useCallback, memo } from "react";
-import { useSelector } from "react-redux";
+import React, { useState, useCallback, useEffect, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { LuUser } from "react-icons/lu";
 import { GiImperialCrown } from "react-icons/gi";
 import { TbDotsVertical } from "react-icons/tb";
 import { FaUsers } from "react-icons/fa";
-import useCreateGroup from "../../../../Hooks/AuthHooks/Staff/Admin/useCreateGroup";
-import useDeleteModal from "../../../../Hooks/CommonHooks/useDeleteModal";
+import { HiOutlineTrash, HiOutlinePencilAlt } from "react-icons/hi"; // Modern edit and delete icons
+import {
+  deleteGroup,
+  fetchGroupsByClass,
+  fetchUnassignedStudents,
+} from "../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
 import DeleteModal from "../../../../Components/Common/DeleteModal";
-import StudentMenuOptions from "../../Students/Components/StudentMenuOptions";
 import AddGroup from "./AddGroup";
+import { BsThreeDotsVertical } from "react-icons/bs";
+import Spinner from "../../../../Components/Common/Spinner";
+import { useParams } from "react-router-dom";
+import Sidebar from "../../../../Components/Common/Sidebar";
+import profileIcon from "../../../../Assets/DashboardAssets/profileIcon.png";
 
-const GroupList = ({ onSeeGradeClick, fetchGroups, fetchStudents }) => {
+const GroupList = ({ onSeeGradeClick }) => {
   const [expandedGroupIndex, setExpandedGroupIndex] = useState(null);
   const [activeMenu, setActiveMenu] = useState(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [editingGroup, setEditingGroup] = useState(null);
-  const [searchQuery, setSearchQuery] = useState(""); // State for search query
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [groupToDelete, setGroupToDelete] = useState(null);
+  const role = useSelector((store) => store.common.auth.role);
 
-  const groupList = useSelector((store) => store.Class.groupsList);
-  const { deleteGroup } = useCreateGroup();
-  const { isModalOpen, modalData, openModal, closeModal } = useDeleteModal();
+  const dispatch = useDispatch();
+  const { cid } = useParams();
+  const { groupsList, loading, error } = useSelector(
+    (store) => store.admin.group_section
+  );
 
-  const handleMenuToggle = useCallback((groupIndex) => {
+  const menuRefs = useRef([]); // Reference for each menu
+
+  const handleMenuToggle = (groupIndex) => {
     setActiveMenu((prevActiveMenu) =>
       prevActiveMenu === groupIndex ? null : groupIndex
     );
-  }, []);
+  };
 
-  const handleEdit = useCallback((group) => {
-    setEditingGroup(group);
-    setIsSidebarOpen(true);
-    setActiveMenu(null);
-  }, []);
+  const handleEdit = (group) => {
+    setEditingGroup(group); // Set the selected group to be edited
+    setIsSidebarOpen(true); // Open the sidebar for editing
+  };
 
-  const handleDelete = useCallback(
-    (group) => {
-      openModal(group);
-      setActiveMenu(null);
-    },
-    [openModal]
-  );
+  // Trigger modal for confirming group deletion
+  const handleDeleteClick = (group) => {
+    setGroupToDelete(group); // Set the group to be deleted
+    setIsDeleteModalOpen(true); // Open the delete modal
+  };
 
   const handleDeleteConfirm = async () => {
-    await deleteGroup(modalData._id);
-    closeModal();
-    fetchGroups();
-    fetchStudents();
+    dispatch(deleteGroup(groupToDelete?._id));
+    dispatch(fetchUnassignedStudents(cid));
+    dispatch(fetchGroupsByClass(cid)); // Refetch groups after deletion
+    setIsDeleteModalOpen(false);
+    setGroupToDelete(null);
   };
 
   const closeSidebar = useCallback(() => {
     setIsSidebarOpen(false);
     setEditingGroup(null);
-    fetchGroups();
-  }, [fetchGroups]);
+  }, [dispatch]);
 
   // Filter groups based on search query
-  const filteredGroups = groupList.filter((group) =>
+  const filteredGroups = groupsList.filter((group) =>
     group.groupName.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  // Close the menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRefs.current) {
+        const isClickedOutside = menuRefs.current.every(
+          (menuRef, idx) => menuRef && !menuRef.contains(event.target)
+        );
+        if (isClickedOutside) {
+          setActiveMenu(null); // Close the menu
+        }
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   return (
     <div className="w-full p-1 bg-white">
@@ -71,17 +102,22 @@ const GroupList = ({ onSeeGradeClick, fetchGroups, fetchStudents }) => {
             type="text"
             placeholder="Search by group name"
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)} // Update search query
+            onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full px-3 py-2 border rounded-md"
-            aria-label="Search by group name"
           />
         </div>
       </div>
-
-      {filteredGroups.length === 0 ? (
-        <div className="flex flex-col items-center justify-center h-64 text-center text-gray-500">
-          <FaUsers className="text-6xl mb-4" />
-          <p>No groups found.</p>
+      {loading || filteredGroups.length === 0 ? (
+        <div className="flex flex-col items-center justify-center h-96 text-center text-gray-500">
+          {loading ? (
+            <Spinner />
+          ) : (
+            <>
+              <FaUsers className="text-8xl mb-1 text-pink-400" />{" "}
+              {/* Colored Icon */}
+              <p>No groups found.</p>
+            </>
+          )}
         </div>
       ) : (
         filteredGroups.map((group, groupIndex) => (
@@ -94,21 +130,12 @@ const GroupList = ({ onSeeGradeClick, fetchGroups, fetchStudents }) => {
                     prevExpandedGroupIndex === groupIndex ? null : groupIndex
                   )
                 }
-                aria-expanded={expandedGroupIndex === groupIndex}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) =>
-                  e.key === "Enter" &&
-                  setExpandedGroupIndex((prevExpandedGroupIndex) =>
-                    prevExpandedGroupIndex === groupIndex ? null : groupIndex
-                  )
-                }
               >
                 {group?.groupName || "Group Name"}
               </h3>
               <div className="flex items-center space-x-2 relative">
                 <div className="flex items-center space-x-1 border p-1 rounded-full px-4">
-                  <LuUser />
+                  <LuUser className="text-green-500" /> {/* Colored Icon */}
                   <span className="text-gray-500">
                     Students{" "}
                     <span className="text-gradient">
@@ -117,42 +144,48 @@ const GroupList = ({ onSeeGradeClick, fetchGroups, fetchStudents }) => {
                     </span>
                   </span>
                 </div>
-                <div className="relative">
+                {role !== "teacher" && (
                   <div
-                    className="w-7 h-7 flex items-center justify-center rounded-full border cursor-pointer"
-                    onClick={() => handleMenuToggle(groupIndex)}
-                    aria-haspopup="true"
-                    aria-expanded={activeMenu === groupIndex}
+                    className="relative"
+                    ref={(el) => (menuRefs.current[groupIndex] = el)} // Attach reference to each group
                   >
-                    <TbDotsVertical className="w-6 h-6 text-gray-500" />
-                  </div>
-                  {activeMenu === groupIndex && (
-                    <div className="absolute right-0 mt-2 w-32 bg-white border rounded-md shadow-lg z-10">
-                      <div
-                        className="px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer"
-                        onClick={() => handleEdit(group)}
-                        role="menuitem"
-                        tabIndex={0}
-                        onKeyDown={(e) =>
-                          e.key === "Enter" && handleEdit(group)
-                        }
-                      >
-                        Edit
-                      </div>
-                      <div
-                        className="px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer"
-                        onClick={() => handleDelete(group)}
-                        role="menuitem"
-                        tabIndex={0}
-                        onKeyDown={(e) =>
-                          e.key === "Enter" && handleDelete(group)
-                        }
-                      >
-                        Delete
-                      </div>
+                    <div
+                      className={`w-7 h-7 flex items-center justify-center rounded-full border cursor-pointer ${
+                        activeMenu === groupIndex ? "bg-blue-100" : ""
+                      }`} // Add active state style here
+                      onClick={() => handleMenuToggle(groupIndex)}
+                    >
+                      <TbDotsVertical
+                        className={`w-6 h-6 ${
+                          activeMenu === groupIndex
+                            ? "text-blue-500" // Active state color
+                            : "text-gray-500"
+                        }`}
+                      />
                     </div>
-                  )}
-                </div>
+                    {activeMenu === groupIndex && (
+                      <div className="absolute right-0 mt-2 w-32 bg-white border rounded-md shadow-lg z-10">
+                        <div
+                          className="px-4 py-2 flex items-center text-gray-700 hover:bg-gray-100 cursor-pointer"
+                          onClick={() => handleEdit(group)}
+                        >
+                          <HiOutlinePencilAlt className="text-blue-500 mr-2" />{" "}
+                          {/* Colored Edit Icon */}
+                          Edit
+                        </div>
+                        <div
+                          className="px-4 py-2 flex items-center text-gray-700 hover:bg-gray-100 cursor-pointer"
+                          onClick={() => handleDeleteClick(group)}
+                        >
+                          <HiOutlineTrash className="text-red-500 mr-2" />{" "}
+                          {/* Colored Delete Icon */}
+                          Delete
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 <svg
                   className={`w-7 h-7 text-gray-500 transform p-1 border rounded-full transition-transform ${
                     expandedGroupIndex === groupIndex ? "rotate-180" : ""
@@ -165,26 +198,17 @@ const GroupList = ({ onSeeGradeClick, fetchGroups, fetchStudents }) => {
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                  aria-expanded={expandedGroupIndex === groupIndex}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={(e) =>
-                    e.key === "Enter" &&
-                    setExpandedGroupIndex((prevExpandedGroupIndex) =>
-                      prevExpandedGroupIndex === groupIndex ? null : groupIndex
-                    )
-                  }
                 >
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth="2"
                     d="M19 9l-7 7-7-7"
-                  ></path>
+                  />
                 </svg>
               </div>
             </div>
+
             {expandedGroupIndex === groupIndex && (
               <ul className="border-t border-gray-200">
                 {group.students.length === 0 ? (
@@ -199,7 +223,7 @@ const GroupList = ({ onSeeGradeClick, fetchGroups, fetchStudents }) => {
                     >
                       <div className="flex items-center flex-shrink-0 w-1/4">
                         <img
-                          src={student?.profile || ""}
+                          src={student?.profile || profileIcon }
                           alt={student?.firstName || "First"}
                           className="w-10 h-10 rounded-full mr-3"
                         />
@@ -239,21 +263,15 @@ const GroupList = ({ onSeeGradeClick, fetchGroups, fetchStudents }) => {
                         <button
                           onClick={() => onSeeGradeClick(student)}
                           className="px-3 py-1 text-green-500 font-semibold text-sm border border-green-500 rounded-md"
-                          aria-label={`See grade of ${student.firstName} ${student.lastName}`}
                         >
                           See Grade
                         </button>
                       </div>
-                      <div className="flex-shrink-0 w-1/8 relative">
-                        <StudentMenuOptions
-                          studentId={student._id}
-                          studentName={student.firstName}
-                          groupId={group._id}
-                          fetchGroups={fetchGroups}
-                          fetchStudents={fetchStudents}
-                          onSeeGradeClick={onSeeGradeClick}
-                        />
-                      </div>
+                      {role !== "teacher" && (
+                        <div className="flex-shrink-0 w-1/8 relative">
+                          <BsThreeDotsVertical />
+                        </div>
+                      )}
                     </li>
                   ))
                 )}
@@ -262,27 +280,28 @@ const GroupList = ({ onSeeGradeClick, fetchGroups, fetchStudents }) => {
           </div>
         ))
       )}
-      {isSidebarOpen && (
-        <div className="fixed inset-0 z-50 flex justify-end bg-black bg-opacity-50">
-          <div className="bg-white h-full w-full max-w-md shadow-lg p-4 overflow-y-auto">
-            <AddGroup
-              group={editingGroup}
-              isUpdate={!!editingGroup}
-              groupId={editingGroup?._id}
-              onClose={closeSidebar}
-              fetchGroups={fetchGroups}
-            />
-          </div>
-        </div>
-      )}
+
+      <Sidebar
+        isOpen={isSidebarOpen}
+        onClose={closeSidebar}
+        title="Update Group"
+      >
+        <AddGroup
+          group={editingGroup}
+          isUpdate={!!editingGroup}
+          groupId={editingGroup?._id}
+          onClose={closeSidebar}
+        />
+      </Sidebar>
+
       <DeleteModal
-        isOpen={isModalOpen}
-        onClose={closeModal}
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
         onConfirm={handleDeleteConfirm}
-        title={modalData?.groupName || ""}
+        title={groupToDelete?.groupName || ""}
       />
     </div>
   );
 };
 
-export default memo(GroupList);
+export default GroupList;

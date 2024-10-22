@@ -1,0 +1,30 @@
+import { createSlice } from "@reduxjs/toolkit";
+import { fetchAllNotices } from "./notice.action"; 
+
+// Notice slice
+const noticeSlice = createSlice({
+  name: "notice",
+  initialState: {
+    notices: [],
+    loading: false,
+    error: false,
+  },
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchAllNotices.pending, (state) => {
+        state.loading = true;
+        state.error = false;
+      })
+      .addCase(fetchAllNotices.fulfilled, (state, action) => {
+        state.loading = false;
+        state.notices = action.payload;
+      })
+      .addCase(fetchAllNotices.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+  },
+});
+
+export default noticeSlice.reducer;

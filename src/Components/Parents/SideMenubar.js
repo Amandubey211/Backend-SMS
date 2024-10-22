@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, NavLink, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next"; // Import useTranslation hook
 import StudentDiwanLogo from "../../Assets/HomeAssets/StudentDiwanLogo.png";
 import { MdOutlineKeyboardArrowUp, MdOutlineKeyboardArrowDown } from "react-icons/md";
 import sidebarData from "./DataFile/sidebarData.js";
@@ -29,21 +30,23 @@ const isActivePath = (path, locationPath) => {
 
 const SideMenubar = () => {
   const location = useLocation();
+  const { t } = useTranslation('prtSidebar'); // Translation hook, using the prtSidebar namespace
   const [openItems, setOpenItems] = useState([]);
   const dispatch = useDispatch();
   const { parentLogout } = useParentLogout();
   const { userDetail } = useGetUserDetail();
+  
   useEffect(() => {
     const getData = async () => {
       await userDetail();
     };
     getData();
   }, []);
+  
   const { isOpen, role, userDetails } = useSelector((state) => ({
-    isOpen: state.sidebar.isOpen,
-    role: state.Auth.role,
-    userDetails: state?.Auth?.userDetail,
-
+    isOpen: state.common.user.sidebar.isOpen,
+    role: state.common.auth.role,
+    userDetails: state?.common.user?.userDetails,
   }));
 
   const toggleDropdown = (title) => {
@@ -91,7 +94,8 @@ const SideMenubar = () => {
         </button>
       </NavLink>
       <div className="mt-4 p-2">
-        {isOpen && <h2 className="text-gray-500">MENU</h2>}
+        {isOpen && <h2 className="text-gray-500 mb-2 ml-4">{t("Menu")}</h2>} {/* Translated Menu Title */}
+        <hr/>
         <ul className="mt-1 space-y-2 flex-grow">
           {sidebarData.map((item, index) => (
             <React.Fragment key={index}>
@@ -107,7 +111,7 @@ const SideMenubar = () => {
                     <span className={`${!isOpen && "text-xl"}`}>{item.icon}</span>
                     {isOpen && (
                       <span role="presentation" className="ml-3 flex items-center">
-                        {item.title}
+                        {t(item.title)} {/* Translation applied for sidebar titles */}
                       </span>
                     )}
                   </div>
@@ -145,11 +149,10 @@ const SideMenubar = () => {
                   <span className={`${!isOpen && "text-xl"}`}>{item.icon}</span>
                   {isOpen && (
                     <span role="presentation" className="ml-3">
-                      {item.title}
+                      {t(item.title)} {/* Translation applied for individual items */}
                     </span>
                   )}
                 </NavLink>
-
               )}
               {openItems.includes(item.title) && item.items && (
                 <ul className="pl-2 space-y-2">
@@ -164,7 +167,7 @@ const SideMenubar = () => {
                       {subItem.icon}
                       {isOpen && (
                         <span role="presentation" className="ml-3">
-                          {subItem.title}
+                          {t(subItem.title)} {/* Translation for submenu items */}
                         </span>
                       )}
                     </NavLink>
@@ -185,16 +188,16 @@ const SideMenubar = () => {
         {isOpen && (
           <div className="flex-1 ml-3">
             <h2 className="font-semibold">
-              {userDetails?.fatherName?.slice(0, 8) || "User"}
+              {userDetails?.fatherName?.slice(0, 8) || t("User")} 
             </h2>
             <p className="text-gray-500 capitalize text-sm">{role}</p>
           </div>
         )}
         <button
-          title="logout"
+          title={t("Logout")} 
           onClick={handleLogout}
           className="ml-3"
-          aria-label="Logout"
+          aria-label={t("Logout")}
         >
           <FiLogOut className={`${isOpen ? "w-7 h-7" : "w-5 h-5"} text-gray-500`} />
         </button>

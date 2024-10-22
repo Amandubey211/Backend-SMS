@@ -1,80 +1,30 @@
 import React, { useEffect, useState } from "react";
-import { MdOutlineLocationOn } from "react-icons/md";
 import FinanceCard from "./FinanceCard";
 import FinanceTable from "./FinanceTable";
 import { PiMoneyBold } from "react-icons/pi";
 import { FaUserFriends } from "react-icons/fa";
 import { useParams } from "react-router-dom";
-import axios from "axios";
-import { baseUrl } from "../../../../../../config/Common";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchStudentFinance } from "../../../../../../Store/Slices/Admin/Users/Students/student.action";
+import { FiLoader } from "react-icons/fi";
+import Spinner from "../../../../../../Components/Common/Spinner";
 const StudentFinance = ({ student }) => {
   const {cid} = useParams();
-  const [filters, setFilters] = useState({
-    feesType: "",
-    status: "Everyone",
-  });
-  const [feesDetails, setFeesDetails] = useState([]);
   const [totalUnpaidFees, setTotalUnpaidFees] = useState("");
   const [totalPaidFees, setTotalPaidFees] = useState("");
-  const [loading, setLoading] = useState(true);
-  const role = useSelector((store) => store.Auth.role);
-  const fetchFeesDetails = async () => {
-    console.log("Fetching fees details...");
-    try {
-      const token = localStorage.getItem(`${role}:token`);
-  
-      if (!token) {
-        throw new Error('Authentication token not found');
-      }
-  
-      const response = await axios.get(
-        `${baseUrl}/student/fees/${cid}`,
-        {
-          headers: {
-            Authentication: token,
-          },
-        }
-      );
-  
-      console.log("Response received:", response);
-      const data = response.data;
-      console.log("Data parsed:", data);
-  
-      if (data) {
-        setFeesDetails(data.fees.reverse());
-        setTotalUnpaidFees(data.totalUnpaidFees);
-        setTotalPaidFees(data.totalPaidFees);
-      } else {
-        console.log("No fees data or unsuccessful response");
-      }
-    } catch (error) {
-      console.error("Failed to fetch fees details:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  const {feesDetails,loading} = useSelector((store) => store.admin.all_students);
+  const dispatch = useDispatch();
   useEffect(() => {
-    fetchFeesDetails();
-  }, []);
-
-  const handleFilterChange = (e) => {
-    const { name, value } = e.target;
-    setFilters((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const filteredFeesDetails = feesDetails.filter(
-    (item) =>
-      (filters.feesType === "" || item.feeType === filters.feesType) &&
-      (filters.status === "Everyone" || item.status === filters.status)
-  );
-
+    dispatch(fetchStudentFinance(cid)).then(()=>{
+      setTotalUnpaidFees(feesDetails?.totalUnpaidFees);
+        setTotalPaidFees(feesDetails?.totalPaidFees);
+    });
+  }, [dispatch])
   if (loading) {
-    return <div>Loading...</div>;
+    return <div className="flex w-full h-[90vh] flex-col items-center justify-center">
+    <Spinner/>
+    </div>;
   }
-  console.log("totalPaidFees", totalPaidFees)
-  console.log("TotalPaidFees", totalUnpaidFees)
   return (
       <>
       <div className="flex flex-col">
@@ -84,7 +34,7 @@ const StudentFinance = ({ student }) => {
            <FinanceCard
               icon={<PiMoneyBold className="text-red-300 text-[2.5rem] font-bold border border-red-300 p-2 rounded-full" />}
               label="Total Unpaid Fees"
-              value={totalUnpaidFees}
+              value={feesDetails?.totalUnpaidFees}
               buttonLabel={null}
               onButtonClick={() => console.log("Message clicked")}
             />
@@ -92,20 +42,20 @@ const StudentFinance = ({ student }) => {
             <FinanceCard
               icon={<FaUserFriends className="text-red-300 text-[2.5rem] font-bold border border-red-300 p-2 rounded-full" />}
               label="Parents Account Total Paid"
-              value={student?.finance?.parentsAccountTotalPaid || '0 QR'}
+              value={feesDetails?.totalPaidFeesByParent || '0 QR'}
               onButtonClick={() => console.log("Message clicked")}
               buttonLabel={null}
             />
             <FinanceCard
               icon={<PiMoneyBold className="text-green-300 text-[2.5rem] font-bold border border-green-300 p-2 rounded-full" />}
               label="Total Paid Fees"
-              value={totalPaidFees}
+              value={feesDetails?.totalPaidFees}
                 buttonLabel={null}
               onButtonClick={() => console.log("Message clicked")}
             />
           </div>
         </div>
-        <FinanceTable feesDetails={feesDetails} />
+        <FinanceTable />
       </div>
     </>
   );

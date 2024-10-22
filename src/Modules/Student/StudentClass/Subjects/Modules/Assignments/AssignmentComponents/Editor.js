@@ -1,42 +1,3 @@
-// import React, { useState } from "react";
-// import "react-quill/dist/quill.snow.css";
-// import ReactQuill from "react-quill";
-
-// const Editor = ({ editorContent, onEditorChange, onSubmit }) => {
-//   const handleSubmit = () => {
-//     console.log("Editor Content:", editorContent);
-//     onSubmit();
-//   };
-
-//   return (
-//     <div className="w-full flex flex-col   p-6 h-screen bg-white mb-3 shadow-md rounded-lg">
-//       <div>
-//         <ReactQuill
-//           value={editorContent}
-//           onChange={onEditorChange}
-//           className="bg-white"
-//           theme="snow"
-//           style={{ height: "300px" }} // Adjust the height as needed
-//         />
-//       </div>
-
-//       <div>
-//         <button
-//           onClick={handleSubmit}
-//           className="mt-[70px] px-4 py-2 text-white font-medium rounded-md shadow-sm bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2"
-//         >
-//           Submit
-//         </button>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default Editor;
-
-
-
-
 import React, { useState, useCallback, useRef } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
@@ -48,7 +9,7 @@ const Editor = ({
   editorContent,
   onEditorChange,
   onNext, // Include onNext to handle moving to the next tab
-  isCreateQuestion
+  isCreateQuestion,
 }) => {
   const quillRef = useRef(null);
   const [loading, setLoading] = useState(false);
@@ -108,9 +69,9 @@ const Editor = ({
         ["clean"],
         [{ align: [] }],
         [{ list: "bullet" }, { list: "ordered" }],
-        [{ color: [] }, { background: [] }],
-        ["link", "image", "video"],
-        ["blockquote", "code-block"],
+        // [{ color: [] }, { background: [] }],
+        // ["link", "image", "video"],
+        // ["blockquote", "code-block"],
       ],
       handlers: {
         image: handleImageUpload,
@@ -129,12 +90,12 @@ const Editor = ({
     "list",
     "bullet",
     "align",
-    "color",
-    "background",
-    "link",
-    "image",
-    "video",
-    "script",
+    // "color",
+    // "background",
+    // "link",
+    // "image",
+    // "video",
+    // "script",
   ];
 
   // Handle content changes in the editor
@@ -149,7 +110,7 @@ const Editor = ({
         ref={quillRef}
         value={editorContent}
         onChange={handleEditorChange}
-        className={`bg-white p-2 ${isCreateQuestion ? "h-60" : "h-96"}`}
+        className={`bg-white  ${isCreateQuestion ? "h-60" : "h-96"}`}
         theme="snow"
         modules={modules}
         formats={formats}
@@ -157,7 +118,7 @@ const Editor = ({
 
       <button
         onClick={onNext}
-        className="mt-12 px-4 py-2 text-white font-medium rounded-md shadow-sm bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-700 hover:to-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+        className="mt-12 px-4 py-2 text-white font-medium rounded-md shadow-sm bg-gradient-to-r from-pink-500 to-pink-700  hover:to-pink-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
       >
         Next
       </button>

@@ -1,18 +1,24 @@
 import React, { useState } from "react";
 import Logo from "../../../Components/Common/Logo";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { FaEye } from "react-icons/fa";
 import { PiEyeClosedFill } from "react-icons/pi";
 import { LuLoader } from "react-icons/lu";
 import toast from "react-hot-toast";
-import useStaffLogin from "../../../Hooks/AuthHooks/Staff/useStaffLogin";
+import { useDispatch, useSelector } from "react-redux";
+import { staffLogin } from "../../../Store/Slices/Common/Auth/Index"; // Ensure the path to the file is correct
+import { IoIosArrowRoundBack } from "react-icons/io";
 
 const StaffLoginForm = () => {
   const [staffCredentials, setStaffCredentials] = useState({
     email: "",
     password: "",
   });
-  const { loading, staffLogin } = useStaffLogin();
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { loading } = useSelector((state) => state.common.auth); // Get loading state from Redux store
+
   const [showPassword, setShowPassword] = useState(false);
 
   const handleInputChange = (e) => {
@@ -25,10 +31,26 @@ const StaffLoginForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    // Validation
     if (!staffCredentials.email || !staffCredentials.password) {
       return toast.error("Please add the required details");
     }
-    staffLogin(staffCredentials);
+
+    // Dispatch the staffLogin thunk with credentials
+    dispatch(staffLogin(staffCredentials))
+      .unwrap()
+      .then((result) => {
+        // Success logic, check if there's a redirect path
+        if (result.redirect) {
+          console.log(result.redirect, "Redirection url | Success");
+          navigate(result.redirect);
+        }
+      })
+      .catch((error) => {
+        // Handle error
+        toast.error(error);
+      });
   };
 
   return (
@@ -43,7 +65,7 @@ const StaffLoginForm = () => {
             className="text-sm text-gray-500 hover:text-gray-700 mb-4 items-center flex gap-2"
           >
             <div className="rounded-full border-2 text-xl w-6 h-6 flex justify-center items-center">
-              &larr;
+            <IoIosArrowRoundBack />
             </div>
             <span>LMS Home</span>
           </NavLink>

@@ -6,10 +6,13 @@ import EditStudent from "./EditStudent";
 import { HiOutlineDotsVertical } from "react-icons/hi";
 import { BsArrow90DegRight } from "react-icons/bs";
 import { MdOutlineModeEditOutline } from "react-icons/md";
-import { RiDeleteBin2Line } from "react-icons/ri";
+import { useSelector } from "react-redux";
+
 import { TfiStatsUp } from "react-icons/tfi";
+import { TfiStatsDown } from "react-icons/tfi";
 import DeleteModal from "../../../../Components/Common/DeleteModal";
 import useAssignStudentToGroup from "../../../../Hooks/AuthHooks/Staff/Admin/Students/useAssignStudentToGroup ";
+import DemoteClass from "./DemoteClass";
 
 const StudentMenuOptions = ({
   studentId,
@@ -17,6 +20,7 @@ const StudentMenuOptions = ({
   groupId,
   fetchGroups,
   fetchStudents,
+  student,
   onSeeGradeClick,
 }) => {
   const [showMenu, setShowMenu] = useState(null);
@@ -24,6 +28,8 @@ const StudentMenuOptions = ({
   const [sidebarContent, setSidebarContent] = useState(null);
   const [sidebarTitle, setSidebarTitle] = useState("");
   const [isModalOpen, setModalOpen] = useState(false);
+  const role = useSelector((store) => store.common.auth.role);
+
   const menuRef = useRef(null);
   const buttonRef = useRef(null);
 
@@ -60,13 +66,9 @@ const StudentMenuOptions = ({
         setModalOpen(true);
       } else {
         const sidebarComponents = {
-          "Promote Class": <PromoteClass studentId={studentId} />,
+          "Promote Class": <PromoteClass student={student} />,
           "Move to Section": (
-            <MoveToSection
-              studentId={studentId}
-              fetchGroups={fetchGroups}
-              onClose={handleSidebarClose}
-            />
+            <MoveToSection student={student} onClose={handleSidebarClose} />
           ),
           "Edit Student": (
             <EditStudent
@@ -75,6 +77,7 @@ const StudentMenuOptions = ({
               onClose={handleSidebarClose}
             />
           ),
+          "Demote Class": <DemoteClass student={student} />,
         };
 
         handleSidebarOpen(action, sidebarComponents[action]);
@@ -109,15 +112,18 @@ const StudentMenuOptions = ({
 
   return (
     <>
-      <button
-        ref={buttonRef}
-        onClick={() => toggleMenu(studentId)}
-        className="p-2"
-        aria-haspopup="true"
-        aria-expanded={showMenu === studentId}
-      >
-        <HiOutlineDotsVertical />
-      </button>
+      {role !== "teacher" && (
+        <button
+          ref={buttonRef}
+          onClick={() => toggleMenu(studentId)}
+          className="p-2"
+          aria-haspopup="true"
+          aria-expanded={showMenu === studentId}
+        >
+          <HiOutlineDotsVertical />
+        </button>
+      )}
+
       {showMenu === studentId && (
         <div
           ref={menuRef}
@@ -131,6 +137,11 @@ const StudentMenuOptions = ({
               onClick={() => handleMenuItemClick("Promote Class")}
             />
             <MenuItem
+              icon={<TfiStatsDown className="text-[#E33131]" />}
+              text="Demote Class"
+              onClick={() => handleMenuItemClick("Demote Class")}
+            />
+            <MenuItem
               icon={<BsArrow90DegRight />}
               text="Move to Section"
               onClick={() => handleMenuItemClick("Move to Section")}
@@ -140,11 +151,11 @@ const StudentMenuOptions = ({
               text="Edit Student"
               onClick={() => handleMenuItemClick("Edit Student")}
             />
-            <MenuItem
+            {/* <MenuItem
               icon={<RiDeleteBin2Line className="text-[#E33131]" />}
               text="Delete Student"
               onClick={() => handleMenuItemClick("Delete Student")}
-            />
+            /> */}
           </ul>
         </div>
       )}

@@ -5,18 +5,16 @@ import ButtonsGroup from "../../../Component/ButtonsGroup";
 import SpeedGradeButton from "../../../Component/SpeedGradeButton";
 import RubricButton from "../../Assignments/AssignmentComponents/RubricButton";
 import AddRubricModal from "../../Rubric/Components/AddRubricModal";
+import { useSelector } from "react-redux";
 
-const QuizzDetailCard = ({ quiz, onRefresh, isPublish }) => {
+const QuizzDetailCard = () => {
   const [isModalOpen, setModalOpen] = useState(false);
-  const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [criteriaList, setCriteriaList] = useState([]);
   const [existingRubricId, setExistingRubricId] = useState(null);
-  const [selectedQuizId, setSelectedQuizId] = useState("");
-  useEffect(() => {
-    if (quiz && quiz._id) {
-      setSelectedQuizId(quiz._id);
-    }
-  }, [quiz]);
+  const { quizzDetail: quiz, updateLoading } = useSelector(
+    (store) => store.admin.quizzes
+  );
+
   const quizDetails = [
     {
       label: "Quiz Point",
@@ -26,8 +24,10 @@ const QuizzDetailCard = ({ quiz, onRefresh, isPublish }) => {
     { label: "Quiz Type", value: quiz?.quizType || "N/A", type: "quizz" },
     { label: "Quiz Score", value: "0 out of 10", type: "quizz" },
     {
-      label: "Multiple Attempts",
-      value: quiz?.allowedAttempts ? "Yes" : "No",
+      label: "Allowed Attempts",
+      value: quiz?.allowNumberOfAttempts
+        ? quiz?.allowNumberOfAttempts
+        : "Unlimited",
       type: "quizz",
     },
     { label: "Submitting date", value: "20-5-2024", type: "quizz" },
@@ -48,23 +48,23 @@ const QuizzDetailCard = ({ quiz, onRefresh, isPublish }) => {
     },
     {
       label: "Student See The correct Answer",
-      value: new Date(
-        quiz?.showAnswerDate || "MM/DD/YYYY"
-      ).toLocaleDateString(),
+      value: quiz?.showAnswerDate
+        ? new Date(quiz?.showAnswerDate).toLocaleDateString()
+        : "DD/MM/YYYY",
       type: "quizz",
     },
     {
       label: "Available From",
       value: quiz?.availableFrom
         ? new Date(quiz?.availableFrom).toLocaleDateString()
-        : "N/A",
+        : "DD/MM/YYY",
       type: "date",
     },
     {
       label: "Due Date",
       value: quiz?.dueDate
         ? new Date(quiz?.dueDate).toLocaleDateString()
-        : "N/A",
+        : "DD/MM/YYY",
       type: "date",
     },
   ];
@@ -73,7 +73,7 @@ const QuizzDetailCard = ({ quiz, onRefresh, isPublish }) => {
   };
   return (
     <div className="p-3 bg-white" aria-label="Quiz Card">
-      <ButtonsGroup data={quiz} type="Quiz" onRefresh={onRefresh} />
+      <ButtonsGroup type="Quiz" data={quiz} loading={updateLoading} />
       <p className="text-center text-green-500 italic font-semibold pb-3 border-b">
         Submitted Students : 50/100{" "}
       </p>
@@ -81,7 +81,7 @@ const QuizzDetailCard = ({ quiz, onRefresh, isPublish }) => {
         type="Quiz"
         sgid={quiz?._id}
         name={quiz?.name}
-        isPublish={isPublish}
+        isPublish={quiz?.publish}
       />
 
       <div className="ps-3 ">
@@ -109,10 +109,9 @@ const QuizzDetailCard = ({ quiz, onRefresh, isPublish }) => {
       <RubricButton onClick={handleViewRubric} />
       <AddRubricModal
         type="quiz"
-        QuizId={selectedQuizId}
+        QuizId={quiz?._id}
         isOpen={isModalOpen}
         onClose={() => setModalOpen(false)}
-        // onAddCriteria={() => setSidebarOpen(true)}
         criteriaList={criteriaList}
         setCriteriaList={setCriteriaList}
         setExistingRubricId={setExistingRubricId}

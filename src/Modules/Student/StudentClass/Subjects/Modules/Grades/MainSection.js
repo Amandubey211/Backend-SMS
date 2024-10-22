@@ -6,48 +6,36 @@ import StudentGradeSummary from "./StudentGradeViewModal/Component/StudentGradeS
 import Spinner from "../../../../../../Components/Common/Spinner";
 import NoDataFound from "../../../../../../Components/Common/NoDataFound";
 import { useParams } from "react-router-dom";
+import { fetchStudentGrades } from "../../../../../../Store/Slices/Admin/Users/Students/student.action";
+import OfflineModal from "../../../../../../Components/Common/Offline";
+import { setShowError } from "../../../../../../Store/Slices/Common/Alerts/alertsSlice";
 
 const MainSection = () => {
-  const { selectedClass, studentId } = useSelector((state) => state.Common);
-  const [gradesData, setGradesData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-const {sid} = useParams();
+  const { sid, cid } = useParams();
+  const { grades, loading, error } = useSelector((store) => store.admin.all_students);
+  const { userDetails, classInfo } = useSelector((store) => store.common.user);
+  const dispatch = useDispatch();
+  const { showError } = useSelector((store) => store?.common?.alertMsg);
+
+  const handleDismiss = () => {
+    dispatch(setShowError(false));
+  }
+
+  const getStudentGrades = () => {
+    const params = {};
+    if (sid) {
+      params.subjectId = sid;
+      dispatch(fetchStudentGrades({
+        params, studentId: userDetails?.userId
+        , studentClassId: cid
+      }));
+    }
+  }
   useEffect(() => {
-    if (!studentId || !selectedClass) return;
+    getStudentGrades();
+    console.log(userDetails, classInfo);
 
-    const fetchGradesData = async () => {
-      try {
-        const token = localStorage.getItem("student:token");
-        if (!token) {
-          throw new Error("Authentication token not found");
-        }
-
-        const response = await fetch(
-          `http://localhost:8080/admin/grades/student/${studentId}/class/${selectedClass}/?subjectId=${sid}`,
-          {
-            headers: {
-              Authentication: token,
-            },
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error(`Failed to fetch grades, status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        setGradesData(data);
-      } catch (error) {
-        console.error("Error fetching grades data:", error);
-        setError(error.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchGradesData();
-  }, [studentId, selectedClass]);
+  }, [dispatch])
 
   let content;
   if (loading) {
@@ -56,34 +44,31 @@ const {sid} = useParams();
         <Spinner />
       </div>
     );
-  } else if (
-    error ||
-    !gradesData ||
-    !Array.isArray(gradesData.grades) ||
-    gradesData.grades.length === 0
-  ) {
+  } else if (!grades) {
     content = <NoDataFound title="Grades" />;
   } else {
     const studentData = {
-      avatar: gradesData.student.profile,
-      name: gradesData.student.fullName,
-      section: gradesData.student.presentSectionId,
-      assignment: gradesData.totalScoreOfAllAssignments,
-      groupAssignment: gradesData.submittedGroupAssignmentScore || "0",
-      quiz: gradesData.totalScoreOfAllQuizzes,
-      groupQuiz: gradesData.submittedGroupQuizScore || "0",
-      attendance: gradesData.attendance,
-      totalScore: gradesData.totalScoreOfSubmitAssignments,
-      totalGroupAssignmentScore: gradesData.totalGroupAssignmentScore,
-      totalGroupQuizScore: gradesData.totalGroupQuizScore,
-      totalQuizCompletedScore: gradesData.totalQuizCompletedScore,
-      total: gradesData.total,
+      avatar: grades?.student?.profile,
+      name: grades?.student?.fullName,
+      //need section name in userdetails
+      section: 'section',
+      assignment: grades?.totalScoreOfAllAssignments,
+      groupAssignment: grades?.totalGroupAssignmentScore,
+      quiz: grades?.totalScoreOfAllQuizzes,
+      groupQuiz: grades?.totalGroupQuizScore,
+      attendance: grades?.attendance,
+      totalGroupAssignmentScore: grades?.submittedGroupAssignmentScore,
+      totalAssignmentScore: grades?.totalScoreOfSubmitAssignments,
+      totalGroupQuizScore: grades?.submittedGroupQuizScore,
+      totalQuizCompletedScore: grades?.totalQuizCompletedScore,
+      total: grades?.total,
     };
 
     content = (
       <div className="flex flex-row w-full h-full">
         <div className="w-[70%] p-4 min-h-full">
-          <GradeAccordionItem grade={gradesData.grades} />
+          {/* Optional chaining added here to prevent accessing undefined length */}
+          <GradeAccordionItem grade={grades?.grades?.length > 0 ? grades?.grades : []} />
         </div>
         <div className="w-[30%] h-full border-l border-gray-200">
           <StudentGradeSummary studentGrade={studentData} />
@@ -91,11 +76,15 @@ const {sid} = useParams();
       </div>
     );
   }
-  console.log(gradesData,"sdfsdf");
   return (
     <div className="flex w-full h-full">
       <SubjectSideBar />
-      <div className="flex-grow p-4 border-l h-full">{content}</div>
+      <div className="flex-grow p-4 border-l h-full">
+        {content}
+      </div>
+      {!loading && showError && (
+        <OfflineModal error={error} onDismiss={handleDismiss} />
+      )}
     </div>
   );
 };

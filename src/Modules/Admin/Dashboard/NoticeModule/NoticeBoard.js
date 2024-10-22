@@ -1,8 +1,9 @@
-import React, { useEffect } from "react";
+import React, { useEffect, memo } from "react";
 import Notice from "./Notice";
-import useGetNotices from "../../../../Hooks/AuthHooks/Staff/Admin/Notices/useGetNotices";
 import Fallback from "../../../../Components/Common/Fallback";
 import { useNavigate } from "react-router-dom"; // Updated import
+import { useDispatch, useSelector } from "react-redux"; // Import Redux hooks
+import { fetchNotices } from "../../../../Store/Slices/Admin/Dashboard/adminDashboard.action"; // Import Redux action
 import icon1 from "../../../../Assets/DashboardAssets/Images/image1.png"; // Update with correct path
 import icon2 from "../../../../Assets/DashboardAssets/Images/image2.png"; // Update with correct path
 import { FaCalendarAlt } from "react-icons/fa"; // For "No data found" icon
@@ -21,13 +22,16 @@ const generateRandomColor = () => {
   return colors[Math.floor(Math.random() * colors.length)];
 };
 
-const NoticeBoard = () => {
-  const { loading, error, notices, fetchNotices } = useGetNotices();
-  const navigate = useNavigate(); // Use useNavigate
-  console.log("This is notices",fetchNotices)
+const NoticeBoard = (descriptionLength) => {
+  const dispatch = useDispatch(); // Use useDispatch to dispatch actions
+  const navigate = useNavigate(); // Use useNavigate for navigation
+
+  // Get notices data from Redux state
+  const { loading, error, notices } = useSelector((state) => state.admin.adminDashboard);
+
   useEffect(() => {
-    fetchNotices();
-  }, [fetchNotices]);
+    dispatch(fetchNotices()); // Dispatch the action to fetch notices when component mounts
+  }, [dispatch]);
 
   if (loading) {
     return <Fallback />;
@@ -36,15 +40,25 @@ const NoticeBoard = () => {
   if (error) {
     return <p>Error: {error}</p>;
   }
-  
-  const noticesSort = notices.sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
+
+  // Ensure notices is an array and create a copy before sorting
+  const noticesArray = Array.isArray(notices) ? [...notices] : [];
+  const noticesSort = noticesArray.sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
   const topNotices = noticesSort.slice(0, 5);
 
   return (
     <div className="p-2">
       <div className="flex justify-between p-4 items-center px-6">
         <h2 className="text-xl font-semibold text-gray-600">Notice Board</h2>
-        <button className="text-blue-500" onClick={() => navigate('/noticeboard/announcements')}>View All</button>
+        <button
+          className="text-black border border-gray-300 px-4 py-2 rounded-md hover:shadow-md transition duration-300 ease-in-out"
+          onClick={() => navigate('/noticeboard/notice')}
+        >
+          View All
+        </button>
+
+
+
       </div>
       {topNotices.length === 0 ? (
         <div className="flex flex-col items-center justify-center my-10">
@@ -61,6 +75,7 @@ const NoticeBoard = () => {
             priority={notice.priority}
             content={notice.description} // Changed 'content' to 'description' based on API response
             backgroundColor={generateRandomColor()}
+            descriptionLength={descriptionLength}
           />
         ))
       )}
@@ -68,4 +83,4 @@ const NoticeBoard = () => {
   );
 };
 
-export default NoticeBoard;
+export default memo(NoticeBoard);

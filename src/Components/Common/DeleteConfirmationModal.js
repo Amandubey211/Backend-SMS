@@ -4,7 +4,13 @@ import { createPortal } from "react-dom";
 import { RiCloseLine } from "react-icons/ri";
 import { FaSpinner } from "react-icons/fa";
 
-const DeleteConfirmatiomModal = ({ isOpen, onClose, onConfirm, loading,text }) => {
+const DeleteConfirmatiomModal = ({
+  isOpen,
+  onClose,
+  onConfirm,
+  loading,
+  text,
+}) => {
   const modalRef = useRef(null);
 
   useEffect(() => {
@@ -69,14 +75,16 @@ const DeleteConfirmatiomModal = ({ isOpen, onClose, onConfirm, loading,text }) =
       >
         <div className="flex justify-between items-center p-4 border-b">
           <h3 id="logout-modal-title" className="text-lg font-semibold">
-            Confirm {text?text:'Delete'}
+            Confirm {text ? text : "Delete"}
           </h3>
           <button onClick={onClose} aria-label="Close modal">
             <RiCloseLine className="text-gray-700 w-6 h-6" />
           </button>
         </div>
         <div className="p-4">
-          <p id="logout-modal-description">Are you sure you want to {text?text:'Delete'} it?</p>
+          <p id="logout-modal-description">
+            Are you sure you want to {text ? text : "Delete"} it?
+          </p>
           <div className="mt-4 flex justify-end space-x-2">
             <button
               id="cancel-button"
@@ -92,7 +100,13 @@ const DeleteConfirmatiomModal = ({ isOpen, onClose, onConfirm, loading,text }) =
               onClick={onConfirm}
               aria-label="Confirm Logout"
             >
-              {loading ? <FaSpinner className="animate-spin mr-2" /> :text?text:'Delete'}
+              {loading ? (
+                <FaSpinner className="animate-spin mr-2" />
+              ) : text ? (
+                text
+              ) : (
+                "Delete"
+              )}
             </button>
           </div>
         </div>
@@ -107,7 +121,7 @@ DeleteConfirmatiomModal.propTypes = {
   onClose: PropTypes.func.isRequired,
   onConfirm: PropTypes.func.isRequired,
   loading: PropTypes.bool,
-  text:PropTypes.string
+  text: PropTypes.string,
 };
 
 DeleteConfirmatiomModal.defaultProps = {

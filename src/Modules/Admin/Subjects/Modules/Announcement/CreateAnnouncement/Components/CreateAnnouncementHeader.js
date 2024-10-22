@@ -1,5 +1,4 @@
 import React from "react";
-import toast from "react-hot-toast";
 import { IoIosArrowBack } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 
@@ -26,9 +25,7 @@ const CreateAnnouncementHeader = ({ onSave, loading, isEditing }) => {
           <span>Cancel</span>
         </button>
         <button
-          onClick={() => {
-            onSave();
-          }}
+          onClick={onSave}
           className="flex-grow rounded-md py-2 px-6 text-center border bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200 transition"
           disabled={loading}
         >

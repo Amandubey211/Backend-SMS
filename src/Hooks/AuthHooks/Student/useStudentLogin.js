@@ -4,7 +4,7 @@ import { useDispatch } from "react-redux";
 import {
   setAuth,
   setRole,
-  setUerDetails,
+  setUserDetails,
 } from "../../../Redux/Slices/Auth/AuthSlice";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -52,9 +52,9 @@ const useStudentLogin = () => {
           profile: data?.profile,
           fullName: data?.fullName,
         };
-        dispatch(setUerDetails(user));
+        dispatch(setUserDetails(user));
         // dispatch(setUerDetails(data.user));
-        console.log("data",data);
+        console.log("data", data);
         if (data.isVerifiedSchoolId) {
           navigate("/student_dash");
         } else {

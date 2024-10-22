@@ -1,16 +1,18 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
-import axios from 'axios';
-import { baseUrl } from "../../../../../config/Common";
 import Sidebar from "../../../../../Components/Common/Sidebar";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { deleteExpenseById, fetchSalaries, updateExpense } from "../../../../../Store/Slices/Admin/Accounting/Expenses/expenses.action";
+import toast from "react-hot-toast";
+import NoDataFound from "../../../../../Components/Common/NoDataFound";
 
-const OtherExpenses = ({ expenseData, selectedMonth }) => {
-  const [data, setData] = useState([]);
+const OtherExpenses = ({ selectedOption, selectedMonth }) => {
+
+  const { otherExpenses, loading } = useSelector((store) => store?.admin?.expenses)
+  const dispatch = useDispatch();
+
   const [selectedItem, setSelectedItem] = useState(null);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
-  const role = useSelector((store) => store.Auth.role);
-  const token = localStorage.getItem(`${role}:token`);
-  const [loading, setLoading] = useState(false);
+
   const [isEditSidebarOpen, setEditSidebarOpen] = useState(false);
   const [editExpense, setEditExpense] = useState(null);
 
@@ -25,8 +27,8 @@ const OtherExpenses = ({ expenseData, selectedMonth }) => {
   };
 
   useEffect(() => {
-    setData(expenseData);
-  }, [expenseData]);
+    dispatch(fetchSalaries({ query: selectedOption, activeTab: "OtherExpenses", month: selectedMonth }))
+  }, [dispatch, selectedMonth, selectedOption]);
 
   const handleSidebarOpen = () => {
     if (selectedItem) setSidebarOpen(true);
@@ -49,107 +51,65 @@ const OtherExpenses = ({ expenseData, selectedMonth }) => {
 
   const handlePayNow = async () => {
     if (!selectedItem) return;
-
-    setLoading(true);
-
-    try {
-      const expenseId = selectedItem._id;
-      await axios.put(`${baseUrl}/api/admin/expenses/${expenseId}`, {
-        status: "paid"
-      }, {
-        headers: {
-          Authentication: token
-        }
-      });
-
-      setData((prevData) =>
-        prevData.map((item) =>
-          item._id === selectedItem._id ? { ...item, status: "paid" } : item
-        )
-      );
-      setSelectedItem(null);
+    const expenseId = selectedItem._id;
+    dispatch(updateExpense({ expenseId, editExpense: { status: "paid" } })).then(() => {
+      dispatch(fetchSalaries({ query: selectedOption, activeTab: "OtherExpenses", month: selectedMonth }))
       handleSidebarClose();
-    } catch (error) {
-      console.error('Error processing payment:', error);
-    } finally {
-      setLoading(false);
-    }
+    })
   };
 
   const handleDelete = async (expenseId) => {
-    setLoading(true);
-    try {
-      await axios.delete(`${baseUrl}/api/admin/expenses/${expenseId}`, {
-        headers: {
-          Authentication: token
-        }
-      });
-      setData(prevData => prevData.filter(item => item._id !== expenseId));
-    } catch (error) {
-      console.error('Error deleting expense:', error);
-    } finally {
-      setLoading(false);
-    }
+    dispatch(deleteExpenseById(expenseId)).then(() => {
+      dispatch(fetchSalaries({ query: selectedOption, activeTab: "OtherExpenses", month: selectedMonth }))
+    })
+    //setData(prevData => prevData.filter(item => item._id !== expenseId));
+
   };
 
   const handleEditSave = async () => {
     if (!editExpense) return;
-
-    setLoading(true);
-
-    try {
-      const expenseId = editExpense._id;
-      await axios.put(`${baseUrl}/api/admin/expenses/${expenseId}`, editExpense, {
-        headers: {
-          Authentication: token
-        }
-      });
-
-      setData((prevData) =>
-        prevData.map((item) =>
-          item._id === editExpense._id ? editExpense : item
-        )
-      );
+    const expenseId = editExpense._id;
+    dispatch(updateExpense({ expenseId, editExpense })).then(() => {
+      dispatch(fetchSalaries({ query: selectedOption, activeTab: "OtherExpenses", month: selectedMonth }))
       handleEditSidebarClose();
-    } catch (error) {
-      console.error('Error updating expense:', error);
-    } finally {
-      setLoading(false);
-    }
+    })
   };
-
-  const filteredData = useMemo(() => {
-    const filtered = selectedMonth === "All" || !selectedMonth
-      ? data
-      : data.filter((item) => item.month === selectedMonth);
-    return filtered;
-  }, [data, selectedMonth]);
 
   return (
     <div>
-      <table className="min-w-full leading-normal mt-4 rounded-lg ">
-        <thead>
-          <tr className="text-left text-gray-700 bg-gray-100">
-            <th className="px-5 py-3 border-b-2 border-gray-200">Expenses Reason</th>
-            <th className="px-5 py-3 border-b-2 border-gray-200">Amount</th>
-            <th className="px-5 py-3 border-b-2 border-gray-200">Expense Date</th>
-            <th className="px-5 py-3 border-b-2 border-gray-200">Status</th>
-            <th className="px-5 py-3 border-b-2 border-gray-200">Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredData.map((item, index) => (
-            <ExpenseRow
-              key={item._id}
-              item={item}
-              index={index}
-              handlePayClick={handlePayClick}
-              handleDelete={handleDelete}
-              handleEditSidebarOpen={handleEditSidebarOpen}
-            />
-          ))}
-        </tbody>
-      </table>
+    <table className="min-w-full leading-normal mt-4 rounded-lg overflow-hidden">
+  <thead>
+    <tr className="text-left text-gray-700 bg-gray-100">
+      <th className="px-5 py-1 border-b-2 border-gray-200">Serial No.</th>
+      <th className="px-5 py-3 border-b-2 border-gray-200">Expenses Reason</th>
+      <th className="px-5 py-3 border-b-2 border-gray-200">Amount</th>
+      <th className="px-5 py-3 border-b-2 border-gray-200">Expense Date</th>
+      <th className="px-5 py-3 border-b-2 border-gray-200">Status</th>
+      <th className="px-5 py-3 border-b-2 border-gray-200">Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {otherExpenses?.length === 0 ? (
+      <tr>
+        <td colSpan="6" className="text-center px-5 py-5">
+          <NoDataFound /> {/* Display NoDataFound when no data */}
+        </td>
+      </tr>
+    ) : (
+      otherExpenses?.map((item, index) => (
+        <ExpenseRow
+          key={item._id}
+          item={item}
+          index={index}
+          handlePayClick={handlePayClick}
+          handleDelete={handleDelete}
+          handleEditSidebarOpen={handleEditSidebarOpen}
+        />
+      ))
+    )}
+  </tbody>
+</table>
+
 
       <Sidebar
         isOpen={isSidebarOpen}
@@ -267,6 +227,18 @@ const OtherExpenses = ({ expenseData, selectedMonth }) => {
   );
 };
 
+const capitalizeFirstLetter = (str) => {
+  if (!str) return ''; // Handle cases with undefined or empty strings
+  const firstLetter = str.charAt(0);
+  // Check if the first letter is already uppercase
+  if (firstLetter === firstLetter.toUpperCase()) {
+    return str;
+  } else {
+    return firstLetter.toUpperCase() + str.slice(1);
+  }
+};
+
+
 const ExpenseRow = ({ item, index, handlePayClick, handleDelete, handleEditSidebarOpen }) => {
   const [openDropdown, setOpenDropdown] = useState(false);
   const dropdownRef = useRef(null);
@@ -298,30 +270,34 @@ const ExpenseRow = ({ item, index, handlePayClick, handleDelete, handleEditSideb
   }, [openDropdown]);
 
   return (
-    <tr key={item._id} className="bg-white">
-      <td className="px-5 py-2 border-b border-gray-200">{item.reason}</td>
-      <td className="px-5 py-2 border-b border-gray-200">{item.amount} QR</td>
-      <td className="px-5 py-2 border-b border-gray-200">{new Date(item.date).toLocaleDateString()}</td>
-      <td className="px-5 py-2 border-b border-gray-200">
+    <tr key={item._id} className="bg-white border border-gray-200">
+      {/* Dynamic serial number */}
+      <td className="px-5 py-2">{index + 1}</td> 
+
+      <td className="px-5 py-2">{item.reason}</td>
+      <td className="px-5 py-2">{item.amount} QR</td>
+      <td className="px-5 py-2">{new Date(item.date).toLocaleDateString()}</td>
+      <td className="px-5 py-2">
         <span
-          className={`px-3 py-1 text-xs font-semibold rounded-full ${item.status === "paid" ? "text-green-800" : "text-red-800"}`}
+          className={`px-3 py-1 text-m font-semibold rounded-full ${item.status === "paid" ? "text-green-800" : "text-red-600"}`}
         >
-          {item.status}
+          {capitalizeFirstLetter(item.status)}
         </span>
       </td>
-      <td className="px-5 py-2 border-b border-gray-200 flex items-center justify-between relative">
+      <td className="px-5 py-2 flex items-center justify-between relative">
         {item.status === "paid" ? (
-          <span className="inline-flex items-center border border-transparent text-xs font-medium shadow-sm bg-green-200 text-green-800 py-1 px-2 rounded-md">
+          <span className="inline-flex items-center border border-transparent text-sm font-medium shadow-sm bg-green-200 text-green-800 py-1.5 px-3 rounded-md">
             Completed
           </span>
         ) : (
           <button
-            className="inline-flex items-center border border-transparent text-xs font-medium shadow-sm bg-gradient-to-r from-pink-500 to-purple-500 text-white py-1 px-2 rounded-md hover:from-pink-600 hover:to-purple-600"
+            className="inline-flex items-center border border-transparent text-sm font-medium shadow-sm bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600"
             onClick={() => handlePayClick(item)}
           >
             Pay Now
           </button>
         )}
+
         <button
           onClick={handleDropdownToggle}
           className="text-gray-500 hover:text-gray-700 transition duration-300"
@@ -354,5 +330,6 @@ const ExpenseRow = ({ item, index, handlePayClick, handleDelete, handleEditSideb
     </tr>
   );
 };
+
 
 export default React.memo(OtherExpenses);

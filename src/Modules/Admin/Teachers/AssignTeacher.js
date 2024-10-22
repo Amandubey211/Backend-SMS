@@ -1,27 +1,34 @@
 import React, { useEffect, useState } from "react";
-import useGetAllTeachers from "../../../Hooks/AuthHooks/Staff/Admin/Teacher/useGetAllTeacher";
-import { useSelector } from "react-redux";
-// import useFetchSubjects from "../../../Hooks/AuthHooks/Staff/Admin/useFetchSubjects";
+import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-import useAssignTeacher from "../../../Hooks/AuthHooks/Staff/Admin/Teacher/useAssignTeacher";
+import {
+  assignTeacher,
+  fetchAllTeachers,
+} from "../../../Store/Slices/Admin/Class/Teachers/teacherThunks";
+import { fetchSubjects } from "../../../Store/Slices/Admin/Class/Subject/subjectThunks";
 
 const AssignTeacher = () => {
   const [teacherId, setTeacherId] = useState("");
   const [subjectId, setSubjectId] = useState("");
   const [sectionId, setSectionId] = useState("");
-  const { fetchTeachers } = useGetAllTeachers();
-  // const { fetchSubjects } = useFetchSubjects();
-  const { cid } = useParams();
-  const { assignTeacher, loading } = useAssignTeacher();
+  const dispatch = useDispatch();
+  const { cid } = useParams(); // Get class ID from params
 
+  // Extracting required data from Redux store
+  const allTeachers = useSelector((state) => state.admin.teacher.allTeachers);
+  console.log(allTeachers, "kkkkkkkkkkkk");
+  const allSubjects = useSelector((state) => state.admin.subject.subjects);
+  const allSections = useSelector(
+    (state) => state.admin.group_section.sectionsList
+  );
+  const loading = useSelector((state) => state.admin.teacher.loading);
+
+  // Fetch teachers, subjects, and sections on component mount
   useEffect(() => {
-    fetchTeachers();
-    // fetchSubjects(cid);
-  }, []);
+    dispatch(fetchAllTeachers());
 
-  const AllTeachers = useSelector((store) => store.Teachers.allTeachers);
-  const AllSubjects = useSelector((store) => store.Subject.subjects);
-  const AllSections = useSelector((store) => store.Class.sectionsList);
+    dispatch(fetchSubjects(cid));
+  }, [dispatch, cid]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -31,7 +38,7 @@ const AssignTeacher = () => {
       sectionId,
       subjectId,
     };
-    assignTeacher(assignData);
+    dispatch(assignTeacher(assignData)); // Dispatch the thunk to assign a teacher
   };
 
   return (
@@ -48,16 +55,17 @@ const AssignTeacher = () => {
             disabled={loading}
           >
             <option value="">Choose</option>
-            {AllTeachers?.map((teacher) => (
+            {allTeachers?.map((teacher) => (
               <option key={teacher._id} value={teacher._id}>
-                {teacher.fullName}
+                {teacher.firstName} {teacher.lastName}
               </option>
             ))}
           </select>
         </div>
+
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Teacher Category
+            Subject
           </label>
           <select
             value={subjectId}
@@ -66,13 +74,14 @@ const AssignTeacher = () => {
             disabled={loading}
           >
             <option value="">Choose</option>
-            {AllSubjects?.map((subject) => (
-              <option key={subject._id} value={subject._id}>
-                {subject.name}
+            {allSubjects?.map((subject) => (
+              <option key={subject?.subjectId} value={subject?.subjectId}>
+                {subject.subjectName}
               </option>
             ))}
           </select>
         </div>
+
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Section
@@ -84,7 +93,7 @@ const AssignTeacher = () => {
             disabled={loading}
           >
             <option value="">Choose</option>
-            {AllSections?.map((section) => (
+            {allSections?.map((section) => (
               <option key={section._id} value={section._id}>
                 {section.sectionName}
               </option>
@@ -92,6 +101,7 @@ const AssignTeacher = () => {
           </select>
         </div>
       </div>
+
       <div className="mt-auto mb-8">
         <button
           type="submit"

@@ -3,7 +3,7 @@ import React from "react";
 import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 
 const SelectedQuestionCard = ({ question, selectedOption }) => {
-  const correctOption = question.correctAnswer;
+  const correctOption = question?.correctAnswer;
   const isCorrect = selectedOption === correctOption;
 
   return (

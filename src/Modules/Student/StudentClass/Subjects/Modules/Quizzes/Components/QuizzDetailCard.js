@@ -13,48 +13,48 @@ const formatTimeLimit = (minutes) => {
 
 const QuizzDetailCard = ({ quiz }) => {
   const quizDetails = [
-    { label: "Due Date", value: quiz.dueDate, type: "date" },
-    { label: "Quiz Type", value: quiz.quizType, type: "quizz" },
+    { label: "Due Date", value: quiz?.dueDate, type: "date" },
+    { label: "Quiz Type", value: quiz?.quizType, type: "quizz" },
     {
       label: "Quiz Points",
-      value: quiz.totalPoints,
+      value: quiz?.totalPoints,
       type: "quizz",
       extra: "Point",
     },
     {
       label: "Allow Attempts",
-      value: quiz.allowNumberOfAttempts,
+      value: quiz?.allowNumberOfAttempts,
       type: "quizz",
       extra: "Time",
     },
     {
       label: "Questions",
-      value: quiz.questions?.length,
+      value: quiz?.questions?.length,
       type: "quizz",
       extra: "Question",
     },
     {
       label: "Time Limit",
-      value: formatTimeLimit(quiz.timeLimit),
+      value: formatTimeLimit(quiz?.timeLimit),
       type: "quizz",
     },
   ];
 
   return (
     <div className="px-4 ">
-      {quizDetails.map((detail, index) => {
+      {quizDetails?.map((detail, index) => {
         if (detail.type === "quizz") {
           return (
             <AssignmentDetail
               key={index}
-              label={detail.label}
-              extra={detail.extra}
-              value={detail.value}
+              label={detail?.label}
+              extra={detail?.extra}
+              value={detail?.value}
             />
           );
-        } else if (detail.type === "date") {
+        } else if (detail?.type === "date") {
           return (
-            <DateDetail key={index} label={detail.label} value={detail.value} />
+            <DateDetail key={index} label={detail?.label} value={detail?.value} />
           );
         }
       })}

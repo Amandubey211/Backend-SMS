@@ -1,9 +1,9 @@
 import React from "react";
 import { FaUsers } from "react-icons/fa";
 import StudentMenuOptions from "./StudentMenuOptions";
+import profileIcon from "../../../../Assets/DashboardAssets/profileIcon.png";
 
 const DetailedStudentList = ({ activeSection, onSeeGradeClick, students }) => {
-  
   const filteredStudents =
     activeSection === "Everyone"
       ? students
@@ -31,6 +31,7 @@ const DetailedStudentList = ({ activeSection, onSeeGradeClick, students }) => {
               <StudentMenuOptions
                 studentName={`${student?.firstName} ${student?.lastName}`}
                 studentId={student._id}
+                student={student}
                 onSeeGradeClick={onSeeGradeClick}
               />
             </li>
@@ -42,15 +43,11 @@ const DetailedStudentList = ({ activeSection, onSeeGradeClick, students }) => {
 };
 
 const StudentInfo = React.memo(({ student, index, onSeeGradeClick }) => (
-
   <>
     <div className="flex items-center w-1/4">
       <img
         src={
-          student.profile ||
-          `https://randomuser.me/api/portraits/med/${
-            index % 2 === 0 ? "women" : "men"
-          }/${index}.jpg`
+          student.profile || profileIcon
         }
         alt={student.name}
         className="w-10 h-10 rounded-full mr-3"
@@ -64,24 +61,25 @@ const StudentInfo = React.memo(({ student, index, onSeeGradeClick }) => (
         <div className="text-xs text-gray-500 truncate">
           {student?.admissionNumber || index}
         </div>
-
       </div>
     </div>
     <StudentDetails student={student} />
     <div className="flex items-center w-1/6">
-       <button
+      <button
         className="px-3 py-1 text-green-500 font-semibold text-sm border border-green-500 rounded-lg"
-        onClick={() => {onSeeGradeClick(student);console.log(student)}}
+        onClick={() => {
+          onSeeGradeClick(student);
+          console.log(student);
+        }}
         aria-label={`See Grade for ${student?.firstName} ${student?.lastName}`}
       >
         See Grade
-      </button> 
+      </button>
     </div>
   </>
 ));
 
 const StudentDetails = React.memo(({ student }) => (
- 
   <>
     <div className="flex flex-col gap-1 items-start justify-start w-1/5 ml-5 truncate">
       <div className="text-sm text-gray-500">Class</div>

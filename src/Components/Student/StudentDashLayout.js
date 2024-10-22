@@ -10,13 +10,16 @@ const StudentDashLayout = ({
   hideAvatarList,
   hideStudentView,
 }) => {
-  const isSidebarOpen = useSelector((state) => state.sidebar.isOpen);
+  const isSidebarOpen = useSelector(
+    (state) => state.common.user.sidebar.isOpen
+  );
   const sidebarWidth = isSidebarOpen ? "15%" : "7%"; // Adjust the width based on sidebar state
 
   return (
-    <div className="flex w-full h-full">
+    <div className="flex w-full h-auto border-l border-r border-t">
+      <Toaster/>
       <SideMenubar isOpen={isSidebarOpen} />
-
+         
       <div
         className={`ml-${sidebarWidth} transition-all duration-500 flex-1 h-full`}
         style={{
@@ -30,7 +33,7 @@ const StudentDashLayout = ({
           hideStudentView={hideStudentView}
         />
         {/* Main content area */}
-        <main className="w-full h-[90%] overflow-y-scroll no-scrollbar  ">
+        <main className="w-full h-[90vh] mt-[0.1vh] ">
           {children}
         </main>
       </div>

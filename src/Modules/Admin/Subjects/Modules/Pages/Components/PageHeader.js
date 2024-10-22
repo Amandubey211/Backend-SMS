@@ -3,10 +3,10 @@ import React from "react";
 import { NavLink, useParams } from "react-router-dom";
 
 const PageHeader = ({ searchQuery, handleSearchChange }) => {
-  const {cid,sid} = useParams()
+  const { cid, sid } = useParams();
   return (
     <div className="flex items-center justify-between w-full p-4 bg-white border-gray-300">
-      <h1 className="text-lg font-semibold text-gray-800">All Page</h1>
+      <h1 className="text-lg font-semibold text-gray-800">All Pages</h1>
       <div className="flex items-center space-x-4">
         <div className="relative flex items-center w-80">
           <input
@@ -21,8 +21,7 @@ const PageHeader = ({ searchQuery, handleSearchChange }) => {
           </button>
         </div>
         <NavLink
-        to={`/class/${cid}/${sid}/page/create_Page`}
-          // onClick={handleSidebarOpen}
+          to={`/class/${cid}/${sid}/page/create_Page`}
           className="flex items-center border border-gray-300 ps-5 rounded-full"
         >
           <span className="mr-2 font-normal">Add new Page</span>

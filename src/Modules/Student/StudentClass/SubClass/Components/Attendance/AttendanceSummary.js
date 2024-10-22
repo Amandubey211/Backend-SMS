@@ -1,7 +1,12 @@
 import React from 'react';
 import { FaCheckCircle, FaTimesCircle, FaDoorOpen } from 'react-icons/fa';
+import { useSelector } from 'react-redux';
 
-const AttendanceSummary = ({ present, absent, leave }) => {
+const AttendanceSummary = () => {
+  const { loading, error, summary, currentDate } = useSelector((store) => store?.student?.studentAttendance);
+  const present=summary?.presentCount;
+  const absent=summary?.absentCount;
+  const leave=summary?.leaveCount;
   return (
     <div className="flex justify-around px-4  space-x-4">
       <div className="flex items-center bg-green-100 p-4 pl-10 rounded-lg w-1/3">

@@ -1,159 +1,231 @@
-import React, { useEffect, useState, useCallback } from "react";
+// import React, { useEffect, useCallback, useState } from "react";
+// import { useParams } from "react-router-dom";
+// import { useSelector, useDispatch } from "react-redux";
+// import TeacherCard from "./TeacherCard";
+// import NavigationBar from "./NavigationBar";
+// import Spinner from "../../../Components/Common/Spinner";
+// import Sidebar from "../../../Components/Common/Sidebar";
+// import NoDataFound from "../../../Components/Common/NoDataFound";
+// import {
+//   assignTeacher,
+//   fetchTeachersByClass,
+// } from "../../../Store/Slices/Admin/Class/Teachers/teacherThunks";
+// import { fetchSectionsByClass } from "../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
+
+// const MainSection = () => {
+//   const { cid } = useParams();
+//   const dispatch = useDispatch();
+
+//   const { assignedTeachers, loading, error } = useSelector(
+//     (state) => state.admin.teacher
+//   );
+//   const role = useSelector((state) => state.common.auth.role);
+//   const sectionsList = useSelector(
+//     (state) => state.admin.group_section.sectionsList
+//   );
+
+//   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+//   const [selectedTeacher, setSelectedTeacher] = useState(null);
+//   const [subjectId, setSubjectId] = useState("");
+//   const [sectionId, setSectionId] = useState("");
+
+//   // Fetch teachers and sections when component is mounted
+//   useEffect(() => {
+//     let classId = cid;
+//     dispatch(fetchTeachersByClass(classId));
+//     dispatch(fetchSectionsByClass(cid));
+//   }, [cid, dispatch]);
+
+//   console.log(assignedTeachers, "lllllllll");
+
+//   const handleEditClick = useCallback((teacher) => {
+//     setSelectedTeacher(teacher);
+//     setSubjectId(teacher.subjectId || "");
+//     setSectionId(teacher.sectionId || "");
+//     setIsSidebarOpen(true);
+//   }, []);
+
+//   // Submit handler for updating teacher assignment
+//   const handleSidebarSubmit = useCallback(
+//     (e) => {
+//       e.preventDefault();
+//       if (!subjectId || !sectionId) {
+//         alert("Both Subject and Section are required.");
+//         return;
+//       }
+
+//       const assignData = {
+//         teacherId: selectedTeacher._id,
+//         classId: cid,
+//         subjectId,
+//         sectionId,
+//       };
+//       dispatch(assignTeacher(assignData));
+//       setIsSidebarOpen(false);
+//     },
+//     [dispatch, selectedTeacher, cid, subjectId, sectionId]
+//   );
+
+//   return (
+//     <>
+//       <NavigationBar />
+//       <div className="flex flex-wrap justify-start px-2 items-center">
+//         {loading ? (
+//           <div className="h-96 w-full flex justify-center items-center">
+//             <Spinner />
+//           </div>
+//         ) : error ? (
+//           <div className="h-96 w-full flex justify-center items-center">
+//             <NoDataFound />
+//           </div>
+//         ) : assignedTeachers.length < 1 ? (
+//           <div className="h-96 w-full flex justify-center items-center">
+//             <NoDataFound title="Teacher" />
+//           </div>
+//         ) : (
+//           assignedTeachers?.map((teacher) => (
+//             <TeacherCard
+//               key={teacher._id}
+//               teacher={teacher}
+//               role={role}
+//               onEditClick={handleEditClick}
+//             />
+//           ))
+//         )}
+//       </div>
+//       {/*
+//       <Sidebar
+//         isOpen={isSidebarOpen}
+//         title="Update Assigned Teacher"
+//         onClose={() => setIsSidebarOpen(false)}
+//         width="30%"
+//       >
+//         <form className="flex flex-col h-full" onSubmit={handleSidebarSubmit}>
+//           <div className="bg-white rounded-lg p-4 w-full max-w-md">
+//             <div className="mb-4">
+//               <label className="block text-sm font-medium text-gray-700 mb-1">
+//                 Subject
+//               </label>
+//               <select
+//                 value={subjectId}
+//                 onChange={(e) => setSubjectId(e.target.value)}
+//                 className="block w-full p-2 border border-gray-300 rounded-lg"
+//               >
+//                 <option value="">Choose</option>
+//                 {sectionsList?.map((subject) => (
+//                   <option key={subject._id} value={subject._id}>
+//                     {subject.name}
+//                   </option>
+//                 ))}
+//               </select>
+//             </div>
+//             <div className="mb-4">
+//               <label className="block text-sm font-medium text-gray-700 mb-1">
+//                 Section
+//               </label>
+//               <select
+//                 value={sectionId}
+//                 onChange={(e) => setSectionId(e.target.value)}
+//                 className="block w-full p-2 border border-gray-300 rounded-lg"
+//               >
+//                 <option value="">Choose</option>
+//                 {sectionsList?.map((section) => (
+//                   <option key={section._id} value={section._id}>
+//                     {section.sectionName}
+//                   </option>
+//                 ))}
+//               </select>
+//             </div>
+//           </div>
+
+//           <button
+//             type="submit"
+//             className="w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600"
+//           >
+//             Update Instructor
+//           </button>
+//         </form>
+//       </Sidebar> */}
+//     </>
+//   );
+// };
+
+// export default MainSection;
+
+import React, { useEffect, useCallback, useState } from "react";
 import { useParams } from "react-router-dom";
-import { useSelector } from "react-redux";
-import toast from "react-hot-toast";
+import { useSelector, useDispatch } from "react-redux";
 import TeacherCard from "./TeacherCard";
 import NavigationBar from "./NavigationBar";
 import Spinner from "../../../Components/Common/Spinner";
-import Sidebar from "../../../Components/Common/Sidebar";
 import NoDataFound from "../../../Components/Common/NoDataFound";
-import useFetchTeachersByClass from "../../../Hooks/AuthHooks/Staff/Admin/Teacher/useFetchTeachersByClass";
+import { fetchTeachersByClass } from "../../../Store/Slices/Admin/Class/Teachers/teacherThunks";
 
 const MainSection = () => {
-  const [selectedSection, setSelectedSection] = useState("Everyone");
   const { cid } = useParams();
-  const { loading, fetchTeachersByClass, error } = useFetchTeachersByClass();
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [selectedTeacher, setSelectedTeacher] = useState(null);
-  const [subjectId, setSubjectId] = useState("");
-  const [sectionId, setSectionId] = useState("");
+  const dispatch = useDispatch();
 
-  const { assignedTeachers, allSubjects, allSections, role } = useSelector(
-    (store) => ({
-      assignedTeachers: store.Class.assignedTeacher,
-      allSubjects: store.Subject.subjects,
-      allSections: store.Class.sectionsList,
-      role: store.Auth.role,
-    })
+  const { assignedTeachers, loading, error } = useSelector(
+    (state) => state.admin.teacher
+  );
+  const role = useSelector((state) => state.common.auth.role);
+  const selectedSection = useSelector(
+    (state) => state.admin.teacher.selectedSection
   );
 
-  useEffect(() => {
-    let isMounted = true;
-    fetchTeachersByClass(cid).finally(() => {
-      if (isMounted) setIsSidebarOpen(false);
-    });
-    return () => {
-      isMounted = false;
-    };
-  }, [cid, fetchTeachersByClass]);
+  console.log(assignedTeachers, "llllllll");
 
-  const handleSectionChange = useCallback((section) => {
-    setSelectedSection(section);
-  }, []);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [selectedTeacher, setSelectedTeacher] = useState(null);
+
+  // Fetch teachers when the component is mounted
+  useEffect(() => {
+    dispatch(fetchTeachersByClass(cid));
+  }, [cid, dispatch]);
+
+  // Filter assigned teachers by selected section
+  const filteredTeachers =
+    selectedSection === "Everyone"
+      ? assignedTeachers
+      : assignedTeachers.filter((teacher) =>
+          teacher.sectionId.some(
+            (section) => section.sectionName === selectedSection
+          )
+        );
 
   const handleEditClick = useCallback((teacher) => {
     setSelectedTeacher(teacher);
-    setSubjectId(teacher.subjectId || "");
-    setSectionId(teacher.sectionId || "");
     setIsSidebarOpen(true);
   }, []);
 
-  const handleSidebarSubmit = useCallback(
-    (e) => {
-      e.preventDefault();
-      if (selectedTeacher) {
-        toast.success("Teacher details updated successfully!");
-        setIsSidebarOpen(false);
-      }
-    },
-    [selectedTeacher]
-  );
-
   return (
     <>
-      <div>
-        <NavigationBar
-          role={role}
-          onSectionChange={handleSectionChange}
-          selectedSection={selectedSection}
-          totalTeachers={assignedTeachers?.length}
-        />
-      </div>
+      <NavigationBar />
+
       <div className="flex flex-wrap justify-start px-2 items-center">
-        {loading && (
-          <div className="flex h-full w-full justify-center items-center">
+        {loading ? (
+          <div className="h-96 w-full flex justify-center items-center">
             <Spinner />
           </div>
-        )}
-        {error && (
-          <div className="flex h-full w-full justify-center items-center">
+        ) : error ? (
+          <div className="h-96 w-full flex justify-center items-center">
             <NoDataFound />
           </div>
-        )}
-        {assignedTeachers.length < 1 && (
-          <div className="flex h-full w-full justify-center items-center">
+        ) : filteredTeachers.length < 1 ? (
+          <div className="h-96 w-full flex justify-center items-center">
             <NoDataFound title="Teacher" />
           </div>
+        ) : (
+          filteredTeachers?.map((teacher) => (
+            <TeacherCard
+              key={teacher._id}
+              teacher={teacher}
+              role={role}
+              onEditClick={handleEditClick}
+            />
+          ))
         )}
-        {assignedTeachers?.map((teacher) => (
-          <TeacherCard
-            role={role}
-            key={teacher._id}
-            teacher={teacher}
-            onEditClick={handleEditClick}
-          />
-        ))}
       </div>
-      {role === "admin" && (
-        <Sidebar
-          isOpen={isSidebarOpen}
-          title="Update Assigned Teacher"
-          onClose={() => setIsSidebarOpen(false)}
-          width="30%"
-        >
-          <form className="flex flex-col h-full" onSubmit={handleSidebarSubmit}>
-            <div className="bg-white rounded-lg p-4 w-full max-w-md">
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Subject
-                </label>
-                <select
-                  value={subjectId}
-                  onChange={(e) => setSubjectId(e.target.value)}
-                  className="block w-full p-2 border border-gray-300 rounded-lg"
-                  disabled={loading}
-                >
-                  <option value="">Choose</option>
-                  {allSubjects?.map((subject) => (
-                    <option key={subject._id} value={subject._id}>
-                      {subject.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Section
-                </label>
-                <select
-                  value={sectionId}
-                  onChange={(e) => setSectionId(e.target.value)}
-                  className="block w-full p-2 border border-gray-300 rounded-lg"
-                  disabled={loading}
-                >
-                  <option value="">Choose</option>
-                  {allSections?.map((section) => (
-                    <option key={section._id} value={section._id}>
-                      {section.sectionName}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-            <div className="mt-auto mb-8">
-              <button
-                type="submit"
-                className={`w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600 ${
-                  loading ? "opacity-50 cursor-not-allowed" : ""
-                }`}
-                disabled={loading}
-              >
-                {loading ? "Assigning..." : "Update Instructor"}
-              </button>
-            </div>
-          </form>
-        </Sidebar>
-      )}
     </>
   );
 };

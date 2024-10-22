@@ -1,6 +1,8 @@
+// RadioGroup.js
+
 import React from "react";
 
-const RadioGroup = ({ label, name, value, onChange, options, required }) => (
+const RadioGroup = ({ label, name, value, onChange, options, error }) => (
   <div className="mb-4">
     {label && (
       <label className="block text-lg font-semibold mb-2 mt-2 text-gray-700">
@@ -17,12 +19,12 @@ const RadioGroup = ({ label, name, value, onChange, options, required }) => (
             checked={value === option.value}
             onChange={onChange}
             className="h-4 w-4 border-gray-300 focus:ring-green-500"
-            required={required}
           />
           <span className="ml-2">{option.label}</span>
         </label>
       ))}
     </div>
+    {error && <span className="text-red-500 text-sm">{error}</span>}
   </div>
 );
 

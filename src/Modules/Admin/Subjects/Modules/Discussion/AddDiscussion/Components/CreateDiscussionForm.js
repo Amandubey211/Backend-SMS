@@ -15,7 +15,10 @@ const CreateDiscussionForm = ({
 }) => {
   return (
     <div>
+      {/* Radio options for threaded replies and post-before-seeing-replies */}
       <OptionRadios option={option} handleChange={handleChange} />
+
+      {/* Section or Group assignment */}
       <AssignToSection
         assignTo={assignTo}
         sectionId={sectionId}
@@ -24,6 +27,7 @@ const CreateDiscussionForm = ({
         isAssignToLabel={true}
       />
 
+      {/* Date Inputs for availability, due date, and until */}
       <DateInput
         label="Available from"
         name="availableFrom"

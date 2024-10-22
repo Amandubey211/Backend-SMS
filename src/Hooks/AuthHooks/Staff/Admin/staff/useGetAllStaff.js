@@ -7,7 +7,7 @@ import { baseUrl } from "../../../../../config/Common";
 const useGetAllStaff = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const role = useSelector((store) => store.Auth.role);
+  const role = useSelector((store) => store.common.auth.role);
   const dispatch = useDispatch();
   const fetchStaff = async () => {
     try {
