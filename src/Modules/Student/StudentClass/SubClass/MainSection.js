@@ -36,8 +36,9 @@ const MainSection = () => {
   const { classData, loading, error } = useSelector(
     (store) => store?.student?.studentClass
   );
-  const { showError } = useSelector((store) => store?.common?.alertMsg);
 
+  const { showError } = useSelector((store) => store?.common?.alertMsg);
+  console.log("cls=>>>>>>>>>>>>",classData)
   const dispatch = useDispatch();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [modalData, setModalData] = useState(null);
@@ -137,9 +138,8 @@ const MainSection = () => {
             <Spinner />
           </div>
         ) 
-        :   (!loading || !classData) || (!loading   &&
-          ( Object.keys(classData)?.length == 0 ||
-          classData?.subjects?.length == 0)) ? (
+        :   !loading && (classData=={} || !classData ||
+          classData?.subjects?.length == 0) ? (
           <div className="flex flex-col items-center justify-center py-20">
             <NoDataFound title="Subject" />
           </div>
