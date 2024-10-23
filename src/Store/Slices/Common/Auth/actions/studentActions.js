@@ -24,11 +24,11 @@ export const studentLogin = createAsyncThunk(
 
       if (data.success) {
         const tokenKey = process.env.REACT_APP_STUDENT_TOKEN_STORAGE_KEY;
-        localStorage.setItem(tokenKey, `Bearer ${data.token}`);
+        localStorage.setItem(`${data.role}:token`, `Bearer ${data.token}`);
         localStorage.setItem("classId", `${data.classId}`);
-
-        dispatch(setToken(data.token)); // Store token in state
-        dispatch(setRole(data.role)); // Set role
+       
+        dispatch(setToken(data?.token)); // Store token in state
+        dispatch(setRole(data?.role)); // Set role
         dispatch(
           setUserDetails({
             schoolId: data?.schoolId,
@@ -64,9 +64,8 @@ export const studentLogin = createAsyncThunk(
 export const studentLogout = createAsyncThunk(
   "auth/studentLogout",
   async (_, { dispatch }) => {
-    localStorage.removeItem(process.env.REACT_APP_STUDENT_TOKEN_STORAGE_KEY);
-
     dispatch(resetState()); // Reset auth state
+    localStorage.clear();
     toast.success("Logged out successfully", {
       position: "bottom-left",
     });
@@ -78,10 +77,14 @@ export const studentLogout = createAsyncThunk(
 export const qidVerification = createAsyncThunk(
   "auth/qidVerification",
   async (studentDetails, { rejectWithValue, dispatch }) => {
+    const token =localStorage.getItem("student:token");
+    if(!token){
+      return rejectWithValue("Authentication Failed!");
+    }
     try {
-      const token = localStorage.getItem(
-        process.env.REACT_APP_STUDENT_TOKEN_STORAGE_KEY
-      );
+      // const token = localStorage.getItem(
+      //   process.env.REACT_APP_STUDENT_TOKEN_STORAGE_KEY
+      // );
 
       const { data } = await axios.post(
         `${baseUrl}/student/verify_school_id`,
