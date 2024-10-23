@@ -1,23 +1,23 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import DataGrid from 'react-data-grid';
-import 'react-data-grid/lib/styles.css';
+import { DataGrid } from '@mui/x-data-grid';
+import { Button } from '@mui/material';
+import AddBoxOutlinedIcon from '@mui/icons-material/AddBoxOutlined';
+import PlayForWorkOutlinedIcon from '@mui/icons-material/PlayForWorkOutlined';
 import { createTimetable, updateTimetable } from '../../../../Store/Slices/Admin/TimeTable/timetable.action';
 import DashLayout from '../../../../Components/Admin/AdminDashLayout'; // Sidebar and navbar
 import Layout from '../../../../Components/Common/Layout';
-import AddBoxOutlinedIcon from '@mui/icons-material/AddBoxOutlined';
-import PlayForWorkOutlinedIcon from '@mui/icons-material/PlayForWorkOutlined';
 
 const CreateTimeTablePage = ({ timetable = {}, onClose }) => {
   const dispatch = useDispatch();
   const { classes } = useSelector((state) => state.admin.class);
 
   const [columns, setColumns] = useState([
-    { key: 'id', name: 'ID', width: 50, frozen: true },
-    { key: 'day', name: 'Day', editable: true },
-    { key: 'timeSlot', name: 'Time Slot', editable: true },
-    { key: 'subjectId', name: 'Subject ID', editable: true },
-    { key: 'teacherId', name: 'Teacher ID', editable: true },
+    { field: 'id', headerName: 'ID', width: 50, editable: false },
+    { field: 'day', headerName: 'Day', width: 100, editable: true },
+    { field: 'timeSlot', headerName: 'Time Slot', width: 150, editable: true },
+    { field: 'subjectId', headerName: 'Subject ID', width: 150, editable: true },
+    { field: 'teacherId', headerName: 'Teacher ID', width: 150, editable: true },
   ]);
 
   const [rows, setRows] = useState([]);
@@ -32,30 +32,21 @@ const CreateTimeTablePage = ({ timetable = {}, onClose }) => {
 
   // Add a new row
   const handleAddRow = () => {
-    const newRow = { id: rows.length + 1 };
-    columns.forEach((column) => {
-      if (column.key !== 'id') {
-        newRow[column.key] = '';
-      }
-    });
+    const newRow = { id: rows.length + 1, day: '', timeSlot: '', subjectId: '', teacherId: '' };
     setRows([...rows, newRow]);
   };
 
   // Add a new column
   const handleAddColumn = () => {
-    const newColumnKey = `column${columns.length + 1}`;
-    const newColumn = {
-      key: newColumnKey,
-      name: `Column ${columns.length + 1}`,
-      editable: true,
-    };
-    setColumns([...columns, newColumn]);
-    setRows(rows.map((row) => ({ ...row, [newColumnKey]: '' })));
+    const newColumnField = `column${columns.length + 1}`;
+    setColumns([...columns, { field: newColumnField, headerName: `Column ${columns.length + 1}`, width: 150, editable: true }]);
   };
 
   // Handle cell edits
-  const handleRowsChange = (updatedRows) => {
+  const processRowUpdate = (newRow) => {
+    const updatedRows = rows.map((row) => (row.id === newRow.id ? newRow : row));
     setRows(updatedRows);
+    return newRow;
   };
 
   // Submit the form
@@ -140,37 +131,23 @@ const CreateTimeTablePage = ({ timetable = {}, onClose }) => {
             <div className="w-full mb-4">
               {/* Action Buttons */}
               <div className="flex justify-between mb-2">
-                <button
-                  type="button"
-                  onClick={handleAddColumn}
-                  className="bg-blue-500 text-white px-2 py-2 rounded-md flex items-center"
-                >
-                  <AddBoxOutlinedIcon style={{ color: 'white', marginRight: '4px' }} />
+                <Button variant="contained" onClick={handleAddColumn} startIcon={<AddBoxOutlinedIcon />}>
                   Add Column
-                </button>
-                <button
-                  type="button"
-                  onClick={handleAddRow}
-                  className="bg-blue-500 text-white px-4 py-2 rounded flex items-center"
-                >
-                  <PlayForWorkOutlinedIcon style={{ color: 'white', marginRight: '4px' }} />
+                </Button>
+                <Button variant="contained" onClick={handleAddRow} startIcon={<PlayForWorkOutlinedIcon />}>
                   Add Row
-                </button>
+                </Button>
               </div>
 
               {/* Data Grid Component */}
-              <div style={{ height: '500px' }}>
+              <div style={{ height: '500px', width: '100%' }}>
                 <DataGrid
                   columns={columns}
                   rows={rows}
-                  onRowsChange={handleRowsChange}
-                  defaultColumnOptions={{
-                    resizable: true,
-                    sortable: true,
-                    editable: true,
-                  }}
-                  rowKeyGetter={(row) => row.id}
-                  className="rdg-light"
+                  processRowUpdate={processRowUpdate}
+                  pageSize={5}
+                  rowsPerPageOptions={[5]}
+                  experimentalFeatures={{ newEditingApi: true }}
                 />
               </div>
             </div>
