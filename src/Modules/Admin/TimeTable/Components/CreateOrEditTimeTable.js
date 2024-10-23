@@ -1,23 +1,22 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { DataGrid } from '@mui/x-data-grid';
-import { Button } from '@mui/material';
-import AddBoxOutlinedIcon from '@mui/icons-material/AddBoxOutlined';
-import PlayForWorkOutlinedIcon from '@mui/icons-material/PlayForWorkOutlined';
+import { DataGrid } from '@mui/x-data-grid'; 
 import { createTimetable, updateTimetable } from '../../../../Store/Slices/Admin/TimeTable/timetable.action';
 import DashLayout from '../../../../Components/Admin/AdminDashLayout'; // Sidebar and navbar
 import Layout from '../../../../Components/Common/Layout';
+import AddBoxOutlinedIcon from '@mui/icons-material/AddBoxOutlined';
+import PlayForWorkOutlinedIcon from '@mui/icons-material/PlayForWorkOutlined';
 
 const CreateTimeTablePage = ({ timetable = {}, onClose }) => {
   const dispatch = useDispatch();
   const { classes } = useSelector((state) => state.admin.class);
 
   const [columns, setColumns] = useState([
-    { field: 'id', headerName: 'ID', width: 50, editable: false },
-    { field: 'day', headerName: 'Day', width: 100, editable: true },
-    { field: 'timeSlot', headerName: 'Time Slot', width: 150, editable: true },
-    { field: 'subjectId', headerName: 'Subject ID', width: 150, editable: true },
-    { field: 'teacherId', headerName: 'Teacher ID', width: 150, editable: true },
+    { field: 'id', headerName: 'ID', width: 50, editable: false }, // ID column is not editable
+    { field: 'day', headerName: 'Day', editable: true },
+    { field: 'timeSlot', headerName: 'Time Slot', editable: true },
+    { field: 'subjectId', headerName: 'Subject ID', editable: true },
+    { field: 'teacherId', headerName: 'Teacher ID', editable: true },
   ]);
 
   const [rows, setRows] = useState([]);
@@ -38,15 +37,22 @@ const CreateTimeTablePage = ({ timetable = {}, onClose }) => {
 
   // Add a new column
   const handleAddColumn = () => {
-    const newColumnField = `column${columns.length + 1}`;
-    setColumns([...columns, { field: newColumnField, headerName: `Column ${columns.length + 1}`, width: 150, editable: true }]);
+    const newColumnKey = `column${columns.length + 1}`;
+    const newColumn = {
+      field: newColumnKey,
+      headerName: `Column ${columns.length + 1}`,
+      editable: true,
+    };
+    setColumns([...columns, newColumn]);
+    setRows(rows.map((row) => ({ ...row, [newColumnKey]: '' }))); // Ensure all existing rows have the new column key
   };
 
-  // Handle cell edits
-  const processRowUpdate = (newRow) => {
-    const updatedRows = rows.map((row) => (row.id === newRow.id ? newRow : row));
-    setRows(updatedRows);
-    return newRow;
+  // Handle cell edit commit
+  const handleCellEditCommit = (params) => {
+    const { id, field, value } = params;
+    setRows((prevRows) =>
+      prevRows.map((row) => (row.id === id ? { ...row, [field]: value } : row))
+    );
   };
 
   // Submit the form
@@ -128,26 +134,34 @@ const CreateTimeTablePage = ({ timetable = {}, onClose }) => {
             </div>
 
             {/* Data Grid */}
-            <div className="w-full mb-4">
+            <div className="w-full mb-4 grid-container">
               {/* Action Buttons */}
               <div className="flex justify-between mb-2">
-                <Button variant="contained" onClick={handleAddColumn} startIcon={<AddBoxOutlinedIcon />}>
+                <button
+                  type="button"
+                  onClick={handleAddColumn}
+                  className="bg-blue-500 text-white px-2 py-2 rounded-md flex items-center"
+                >
+                  <AddBoxOutlinedIcon style={{ color: 'white', marginRight: '4px' }} />
                   Add Column
-                </Button>
-                <Button variant="contained" onClick={handleAddRow} startIcon={<PlayForWorkOutlinedIcon />}>
+                </button>
+                <button
+                  type="button"
+                  onClick={handleAddRow}
+                  className="bg-blue-500 text-white px-4 py-2 rounded flex items-center"
+                >
+                  <PlayForWorkOutlinedIcon style={{ color: 'white', marginRight: '4px' }} />
                   Add Row
-                </Button>
+                </button>
               </div>
 
               {/* Data Grid Component */}
-              <div style={{ height: '500px', width: '100%' }}>
+              <div style={{ height: '500px' }}>
                 <DataGrid
                   columns={columns}
                   rows={rows}
-                  processRowUpdate={processRowUpdate}
-                  pageSize={5}
-                  rowsPerPageOptions={[5]}
-                  experimentalFeatures={{ newEditingApi: true }}
+                  editMode="cell" // Changed from "row" to "cell"
+                  onCellEditCommit={handleCellEditCommit} // Added this handler
                 />
               </div>
             </div>
@@ -169,3 +183,27 @@ const CreateTimeTablePage = ({ timetable = {}, onClose }) => {
 };
 
 export default CreateTimeTablePage;
+
+// Fix for ResizeObserver loop error
+if (process.env.NODE_ENV === 'development') {
+  const resizeObserverLoopErrSilenced = () => {
+    let resizeObserverErr = false;
+    const observerErrHandler = () => {
+      resizeObserverErr = true;
+    };
+    window.addEventListener('error', observerErrHandler);
+    const originalError = console.error;
+    console.error = (...args) => {
+      if (args[0] && args[0].startsWith('ResizeObserver loop limit exceeded')) {
+        if (!resizeObserverErr) {
+          return;
+        }
+        resizeObserverErr = false;
+        return;
+      }
+      originalError.call(console, ...args);
+    };
+  };
+
+  resizeObserverLoopErrSilenced();
+}
