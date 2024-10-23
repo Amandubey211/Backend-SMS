@@ -18,13 +18,16 @@ export const fetchTimetables = createAsyncThunk(
         headers: { Authentication: token },
         params: filters,
       });
-      return response.data; // Returning fetched timetables
+
+      // Ensure the response is always an array
+      return Array.isArray(response.data) ? response.data : [];
     } catch (error) {
       console.error("Error fetching timetables:", error);
       return rejectWithValue(error.message);
     }
   }
 );
+
 
 // Create Timetable
 export const createTimetable = createAsyncThunk(

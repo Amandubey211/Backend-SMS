@@ -2,12 +2,13 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import TimeTableList from "./Components/TimeTableList";
 import { fetchTimetables, deleteTimetable } from "../../../Store/Slices/Admin/TimeTable/timetable.action";
-import CreateOrEditTimeTable from "./Components/CreateOrEditTimeTable"; // For creating/editing
 import { fetchAllClasses } from "../../../Store/Slices/Admin/Class/actions/classThunk"; // Import fetchAllClasses thunk
 import TopNavigationWithFilters from "./Components/TopNavigationWithFilters"; // Import filter component
+import { useNavigate } from "react-router-dom"; // Import useNavigate hook
 
 const TimeTableMainSection = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate(); // Initialize the useNavigate hook
 
   const { timetables, loading, error } = useSelector((state) => state.admin.timetable);
   const { classes, loading: classLoading } = useSelector((state) => state.admin.class); // Select classes from state
@@ -20,8 +21,6 @@ const TimeTableMainSection = () => {
     status: "",
     academicYear: "", // Filter based on academic year
   });
-
-  const [isCreateModalOpen, setCreateModalOpen] = useState(false);
 
   // Function to fetch academic years from localStorage
   const fetchAcademicYearsFromStorage = () => {
@@ -50,8 +49,9 @@ const TimeTableMainSection = () => {
     setFilters(updatedFilters); // Update filters when changed
   };
 
+  // Handle create button click to navigate to a new route
   const handleCreateTimeTable = () => {
-    setCreateModalOpen(true); // Show the create modal
+    navigate("/noticeboard/timetable/create-new-timeTable"); // Navigate to create timetable page
   };
 
   const handleDelete = (id) => {
@@ -78,11 +78,6 @@ const TimeTableMainSection = () => {
 
       {/* Display list of timetables */}
       <TimeTableList />
-
-      {/* Modal for creating or editing timetable */}
-      {isCreateModalOpen && (
-        <CreateOrEditTimeTable onClose={() => setCreateModalOpen(false)} />
-      )}
     </div>
   );
 };
