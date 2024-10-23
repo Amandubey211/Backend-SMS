@@ -8,7 +8,7 @@ const priorityClasses = {
   "Low priority": "bg-gray-100 text-black",
 };
 
-const Notice = ({ title, startDate, endDate, priority, content, image, backgroundColor }) => {
+const Notice = ({ title, startDate, endDate, priority, content, image, backgroundColor,authorName }) => {
   // Format dates using date-fns
   const formattedStartDate = format(new Date(startDate), 'yyyy-MM-dd');
   const formattedEndDate = format(new Date(endDate), 'yyyy-MM-dd');
@@ -36,7 +36,7 @@ const Notice = ({ title, startDate, endDate, priority, content, image, backgroun
           {renderImageOrFallback(image)}
         </div>
         <div className="flex flex-col gap-1">
-          <h2 className="text-lg font-semibold text-gray-800">{title}</h2>
+          <h2 className="text-lg font-semibold text-gray-800">{title} <span className="ml-4 text-sm text-gray-500">(Posted by <span className="text-sm text-gray-700">{authorName || '-'}</span>)</span></h2>
           <div className="flex items-center gap-4 mb-2">
             <div className="flex gap-1 items-center">
               <IoCalendarOutline />

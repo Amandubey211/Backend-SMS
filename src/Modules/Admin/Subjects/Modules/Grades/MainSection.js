@@ -36,13 +36,11 @@ const MainSection = () => {
   }, [dispatch]);
 
   const handleSearchChange = (value) => {
-       setSearch(value); 
-   
-  
+    setSearch(value);
   };
 
   const handleFilterChange = (name, value) => {
-// Update filters state
+
   const updatedFilters = {
     ...filters,
     [name]: value,
@@ -52,22 +50,11 @@ const MainSection = () => {
   const params = {};
     if (filters.moduleId) params.moduleId = filters.moduleId;
   dispatch(fetchSubjectGrades({classId:cid,subjectId:sid,filters:params}))
+
+  
   };
 
-  const fuzzySearch = (query, text) => {
-    query = query.toLowerCase();
-    text = text.toLowerCase();
-    let queryIndex = 0;
-    for (let i = 0; i < text.length; i++) {
-      if (text[i] === query[queryIndex]) {
-        queryIndex++;
-      }
-      if (queryIndex === query.length) {
-        return true;
-      }
-    }
-    return false;
-  };
+
 
   const handleRowClick = (student) => {
     const params = {};
@@ -90,7 +77,9 @@ const MainSection = () => {
           {loading? <div className="flex items-center h-[80%] w-[100%] justify-center flex-col gap-2">
             <FiLoader className="animate-spin mr-2 w-[3rem] h-[3rem] " />
             <p className="text-gray-800 text-lg">Loading...</p>
-            </div>:<StudentTable students={subjectGrades} onRowClick={handleRowClick} />}
+            </div>:<StudentTable students={subjectGrades?.filter((i) =>
+      i?.studentName?.toLowerCase()?.includes(search?.toLowerCase())
+    )} onRowClick={handleRowClick} />}
         </div>
       </div>
       {subjectGrades && <StudentGradeModal  isOpen={isModalOpen} onClose={handleCloseModal} student={student} />} 

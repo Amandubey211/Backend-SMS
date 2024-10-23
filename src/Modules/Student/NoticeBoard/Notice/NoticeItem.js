@@ -40,11 +40,10 @@ const NoticeItem = ({
                             alt="Announcement Icon"
                         />
                     </div>
-
                     {/* Title and Date */}
                     <div className="flex-1 flex flex-col gap-2">
                         <h2 className="font-[500] text-[#4D4D4D] text-sm leading-5">
-                            {notice.title}
+                            {notice?.title}<span className="ml-4 text-sm text-gray-500">(Posted by <span className="text-sm text-gray-700">{notice?.authorName || '-'}</span>)</span>
                         </h2>
                         <div className="flex items-center text-xs">
                             <IoCalendarOutline

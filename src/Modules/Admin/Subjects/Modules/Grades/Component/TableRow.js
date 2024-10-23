@@ -17,12 +17,12 @@ const TableRow = ({ student, onRowClick }) => {
       <td className="p-3">{student.group || "No Group"}</td>
       <td className="p-3 text-center">
         <div className="border text-pink-600 py-1 rounded-md">
-           {student.completedAssignmentsScore}/ {student.totalAssignmentsPoints }
+           {student.completedAssignmentsScore} / {student.totalAssignmentsPoints }
         </div>
       </td>
       <td className="p-3 text-center">
         <div className="border text-green-600 py-1 rounded-md">
-          {student.completedQuizzes}/{student.totalQuizzes}
+          {student.completedQuizzes} / {student.totalQuizzes}
         </div>
       </td>
       <td className="p-3 text-center">
