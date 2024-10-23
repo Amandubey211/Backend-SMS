@@ -1,10 +1,10 @@
-import React, { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import DataGrid from 'react-data-grid';
-import 'react-data-grid/lib/styles.css'; // Import the styles for the grid
-import { createTimetable, updateTimetable } from "../../../../Store/Slices/Admin/TimeTable/timetable.action";
-import DashLayout from "../../../../Components/Admin/AdminDashLayout"; // Sidebar and navbar
-import Layout from "../../../../Components/Common/Layout";
+import 'react-data-grid/lib/styles.css';
+import { createTimetable, updateTimetable } from '../../../../Store/Slices/Admin/TimeTable/timetable.action';
+import DashLayout from '../../../../Components/Admin/AdminDashLayout'; // Sidebar and navbar
+import Layout from '../../../../Components/Common/Layout';
 import AddBoxOutlinedIcon from '@mui/icons-material/AddBoxOutlined';
 import PlayForWorkOutlinedIcon from '@mui/icons-material/PlayForWorkOutlined';
 
@@ -12,59 +12,50 @@ const CreateTimeTablePage = ({ timetable = {}, onClose }) => {
   const dispatch = useDispatch();
   const { classes } = useSelector((state) => state.admin.class);
 
-  // Initialize formData with appropriate defaults
+  const [columns, setColumns] = useState([
+    { key: 'id', name: 'ID', width: 50, frozen: true },
+    { key: 'day', name: 'Day', editable: true },
+    { key: 'timeSlot', name: 'Time Slot', editable: true },
+    { key: 'subjectId', name: 'Subject ID', editable: true },
+    { key: 'teacherId', name: 'Teacher ID', editable: true },
+  ]);
+
+  const [rows, setRows] = useState([]);
+
+  // Form state
   const [formData, setFormData] = useState({
     name: timetable.name || '',
     classId: timetable.classId || '',
     startDate: timetable.startDate || '',
     endDate: timetable.endDate || '',
-    rows: timetable.rows || [],
-    columns: timetable.columns || [
-      { key: 'id', name: 'ID', width: 50, resizable: true, frozen: true },
-      { key: 'day', name: 'Day', editable: true, resizable: true },
-      { key: 'timeSlot', name: 'Time Slot', editable: true, resizable: true },
-      { key: 'subjectId', name: 'Subject ID', editable: true, resizable: true },
-      { key: 'teacherId', name: 'Teacher ID', editable: true, resizable: true },
-    ],
   });
 
   // Add a new row
   const handleAddRow = () => {
-    const newRow = {
-      id: formData.rows.length + 1,
-      day: '',
-      timeSlot: '',
-      subjectId: '',
-      teacherId: ''
-    };
-    setFormData(prevData => ({
-      ...prevData,
-      rows: [...prevData.rows, newRow],
-    }));
+    const newRow = { id: rows.length + 1 };
+    columns.forEach((column) => {
+      if (column.key !== 'id') {
+        newRow[column.key] = '';
+      }
+    });
+    setRows([...rows, newRow]);
   };
 
   // Add a new column
   const handleAddColumn = () => {
-    const newColumnKey = `customField${formData.columns.length + 1}`;
+    const newColumnKey = `column${columns.length + 1}`;
     const newColumn = {
       key: newColumnKey,
-      name: `Column ${formData.columns.length + 1}`,
+      name: `Column ${columns.length + 1}`,
       editable: true,
-      resizable: true
     };
-    setFormData(prevData => ({
-      ...prevData,
-      columns: [...prevData.columns, newColumn],
-      rows: prevData.rows.map(row => ({ ...row, [newColumnKey]: '' })),
-    }));
+    setColumns([...columns, newColumn]);
+    setRows(rows.map((row) => ({ ...row, [newColumnKey]: '' })));
   };
 
   // Handle cell edits
   const handleRowsChange = (updatedRows) => {
-    setFormData(prevData => ({
-      ...prevData,
-      rows: updatedRows,
-    }));
+    setRows(updatedRows);
   };
 
   // Submit the form
@@ -77,15 +68,17 @@ const CreateTimeTablePage = ({ timetable = {}, onClose }) => {
       startDate: formData.startDate,
       endDate: formData.endDate,
       type: 'weekly',
-      days: formData.rows.map(row => ({
+      days: rows.map((row) => ({
         day: row.day,
-        slots: [{
-          startTime: row.timeSlot.split('-')[0],
-          endTime: row.timeSlot.split('-')[1],
-          subjectId: row.subjectId,
-          teacherId: row.teacherId
-        }]
-      }))
+        slots: [
+          {
+            startTime: row.timeSlot?.split('-')[0] || '',
+            endTime: row.timeSlot?.split('-')[1] || '',
+            subjectId: row.subjectId,
+            teacherId: row.teacherId,
+          },
+        ],
+      })),
     };
 
     if (timetable._id) {
@@ -101,7 +94,7 @@ const CreateTimeTablePage = ({ timetable = {}, onClose }) => {
     <Layout title="Create TimeTable | Student Diwan">
       <DashLayout>
         <div className="flex flex-col items-center justify-start w-full p-6">
-          <h2 className="text-xl font-semibold mb-4">{timetable._id ? "Edit" : "Create"} TimeTable</h2>
+          <h2 className="text-xl font-semibold mb-4">{timetable._id ? 'Edit' : 'Create'} TimeTable</h2>
 
           <form onSubmit={handleSubmit} className="w-full space-y-6">
             {/* Form Inputs */}
@@ -152,7 +145,7 @@ const CreateTimeTablePage = ({ timetable = {}, onClose }) => {
                   onClick={handleAddColumn}
                   className="bg-blue-500 text-white px-2 py-2 rounded-md flex items-center"
                 >
-                  <AddBoxOutlinedIcon style={{ color: "white", marginRight: "4px" }} />
+                  <AddBoxOutlinedIcon style={{ color: 'white', marginRight: '4px' }} />
                   Add Column
                 </button>
                 <button
@@ -160,7 +153,7 @@ const CreateTimeTablePage = ({ timetable = {}, onClose }) => {
                   onClick={handleAddRow}
                   className="bg-blue-500 text-white px-4 py-2 rounded flex items-center"
                 >
-                  <PlayForWorkOutlinedIcon style={{ color: "white", marginRight: "4px" }} />
+                  <PlayForWorkOutlinedIcon style={{ color: 'white', marginRight: '4px' }} />
                   Add Row
                 </button>
               </div>
@@ -168,12 +161,13 @@ const CreateTimeTablePage = ({ timetable = {}, onClose }) => {
               {/* Data Grid Component */}
               <div style={{ height: '500px' }}>
                 <DataGrid
-                  columns={formData.columns}
-                  rows={formData.rows}
+                  columns={columns}
+                  rows={rows}
                   onRowsChange={handleRowsChange}
                   defaultColumnOptions={{
                     resizable: true,
                     sortable: true,
+                    editable: true,
                   }}
                   rowKeyGetter={(row) => row.id}
                   className="rdg-light"
@@ -187,7 +181,7 @@ const CreateTimeTablePage = ({ timetable = {}, onClose }) => {
                 Cancel
               </button>
               <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">
-                {timetable._id ? "Update" : "Create"}
+                {timetable._id ? 'Update' : 'Create'}
               </button>
             </div>
           </form>
