@@ -125,6 +125,7 @@ const AdminNotice = () => {
                 <AdminNoticeItem
                   key={notice._id}
                   notice={notice}
+                 
                   index={index}
                   activeIndex={activeIndex}
                   toggleAccordion={toggleAccordion}

@@ -70,10 +70,11 @@ const NoticeBoard = (descriptionLength) => {
           <Notice
             key={index}
             image={icons[index % icons.length]} // Use cyclic icons
-            title={notice.title}
-            date={new Date(notice.startDate).toLocaleDateString()} // Formatting date
-            priority={notice.priority}
-            content={notice.description} // Changed 'content' to 'description' based on API response
+            title={notice?.title}
+            authorName={notice?.authorName}
+            date={new Date(notice?.startDate).toLocaleDateString()} // Formatting date
+            priority={notice?.priority}
+            content={notice?.description} // Changed 'content' to 'description' based on API response
             backgroundColor={generateRandomColor()}
             descriptionLength={descriptionLength}
           />

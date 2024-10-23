@@ -15,6 +15,7 @@ const AdminNoticeItem = ({
 }) => {
   const dispatch = useDispatch();
   const role = useSelector((store) => store.common.auth.role);
+  const {userDetails} = useSelector((store) => store.common.user);
 
   const handleDelete = () => {
     setDeleteModalOpen(true);
@@ -43,7 +44,8 @@ const AdminNoticeItem = ({
 
           {/* Title and Date */}
           <div className="flex-1 flex flex-col gap-2">
-            <h2 className="font-semibold text-lg">{notice.title}</h2>
+            <h2 className="font-semibold text-lg gap-2">{notice?.title}<span className="ml-4 text-sm text-gray-500">(Posted by <span className="text-sm text-gray-700">{notice?.authorName || '-'}</span>
+              )</span></h2>
             <div className="flex items-center text-xs">
               <IoCalendarOutline className="text-gray-400" />
               <span className="ml-2 text-sm text-gray-500">
@@ -53,6 +55,7 @@ const AdminNoticeItem = ({
                   day: "numeric",
                 })}
               </span>
+             
               <div
                 className={`ml-3 px-3 py-1 bg-gray-100 rounded-full ${notice.priority === "High priority"
                   ? "text-pink-500 bg-pink-100"
@@ -62,11 +65,12 @@ const AdminNoticeItem = ({
                 {notice.priority}
               </div>
             </div>
+            
           </div>
 
           {/* Action Icons */}
           <div className="flex items-center gap-4">
-            {(role === "admin" || role === "teacher" || role === "accountant") && (
+            {(notice?.authorId == userDetails?.userId) && (
               <div className="flex items-center gap-4">
                 <BsPencilSquare
                   className="text-blue-500 cursor-pointer"
@@ -97,7 +101,7 @@ const AdminNoticeItem = ({
         {/* Description */}
         {activeIndex === index && (
           <div className="p-4 text-sm text-gray-700">
-            <p>{notice.description}</p>
+            <p>{notice?.description}</p>
           </div>
         )}
       </div>
