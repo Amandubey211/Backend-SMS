@@ -24,6 +24,7 @@ const CreateTimeTablePage = ({ timetable = {}, onClose }) => {
   const [rows, setRows] = useState([]);
   const [selectionModel, setSelectionModel] = useState([]);
   const [deletedRowsStack, setDeletedRowsStack] = useState([]);
+  const [nextId, setNextId] = useState(1); // For sequential IDs starting from 1
 
   // Generate columns based on type
   const getColumnsByType = (type) => {
@@ -60,8 +61,9 @@ const CreateTimeTablePage = ({ timetable = {}, onClose }) => {
   useEffect(() => {
     const cols = getColumnsByType(formData.type);
     setColumns(cols);
-    // Reset rows when type changes
+    // Reset rows and nextId when type changes
     setRows([]);
+    setNextId(1);
   }, [formData.type]);
 
   // Handle cell edit commit
@@ -74,7 +76,8 @@ const CreateTimeTablePage = ({ timetable = {}, onClose }) => {
 
   // Add a new row
   const handleAddRow = () => {
-    const newRow = { id: Date.now() }; // Use timestamp as unique ID
+    const newRow = { id: nextId }; // Sequential ID starting from 1
+    setNextId(nextId + 1);
 
     if (formData.type === 'weekly') {
       newRow.day = '';
@@ -253,54 +256,69 @@ const CreateTimeTablePage = ({ timetable = {}, onClose }) => {
 
           <form onSubmit={handleSubmit} className="w-full space-y-6">
             {/* Form Inputs */}
-            <div className="flex flex-wrap space-x-4">
-              <input
-                type="text"
-                placeholder="Name"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="border p-2 rounded w-full md:w-1/5"
-                required
-              />
-              <input
-                type="date"
-                value={formData.startDate}
-                onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                className="border p-2 rounded w-full md:w-1/5"
-                required
-              />
-              <input
-                type="date"
-                value={formData.endDate}
-                onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                className="border p-2 rounded w-full md:w-1/5"
-                required={formData.type === 'exam' || formData.type === 'event'}
-                disabled={formData.type === 'weekly' || formData.type === 'others'}
-              />
-              <select
-                value={formData.classId}
-                onChange={(e) => setFormData({ ...formData, classId: e.target.value })}
-                className="border p-2 rounded w-full md:w-1/5"
-                required
-              >
-                <option value="">Select Class</option>
-                {classes.map((classItem) => (
-                  <option key={classItem._id} value={classItem._id}>
-                    {classItem.className}
-                  </option>
-                ))}
-              </select>
-              <select
-                value={formData.type}
-                onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                className="border p-2 rounded w-full md:w-1/5"
-                required
-              >
-                <option value="weekly">Weekly</option>
-                <option value="exam">Exam</option>
-                <option value="event">Event</option>
-                <option value="others">Others</option>
-              </select>
+            <div className="flex flex-wrap -mx-2">
+              <div className="w-full md:w-1/5 px-2 mb-4">
+                <label className="block mb-1">Name</label>
+                <input
+                  type="text"
+                  placeholder="Name"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  className="border p-2 rounded w-full"
+                  required
+                />
+              </div>
+              <div className="w-full md:w-1/5 px-2 mb-4">
+                <label className="block mb-1">Start Date</label>
+                <input
+                  type="date"
+                  value={formData.startDate}
+                  onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
+                  className="border p-2 rounded w-full"
+                  required
+                />
+              </div>
+              <div className="w-full md:w-1/5 px-2 mb-4">
+                <label className="block mb-1">End Date</label>
+                <input
+                  type="date"
+                  value={formData.endDate}
+                  onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+                  className="border p-2 rounded w-full"
+                  required={formData.type === 'exam' || formData.type === 'event'}
+                  disabled={!(formData.type === 'exam' || formData.type === 'event')}
+                />
+              </div>
+              <div className="w-full md:w-1/5 px-2 mb-4">
+                <label className="block mb-1">Select Class</label>
+                <select
+                  value={formData.classId}
+                  onChange={(e) => setFormData({ ...formData, classId: e.target.value })}
+                  className="border p-2 rounded w-full"
+                  required
+                >
+                  <option value="">Select Class</option>
+                  {classes.map((classItem) => (
+                    <option key={classItem._id} value={classItem._id}>
+                      {classItem.className}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="w-full md:w-1/5 px-2 mb-4">
+                <label className="block mb-1">Table Type</label>
+                <select
+                  value={formData.type}
+                  onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+                  className="border p-2 rounded w-full"
+                  required
+                >
+                  <option value="weekly">Weekly</option>
+                  <option value="exam">Exam</option>
+                  <option value="event">Event</option>
+                  <option value="others">Others</option>
+                </select>
+              </div>
             </div>
 
             {/* Data Grid */}
