@@ -12,7 +12,7 @@ import { TbDashboard } from "react-icons/tb";
 import { RiGraduationCapLine } from "react-icons/ri";
 import { LuUser } from "react-icons/lu";
 import { HiOutlineCalculator } from "react-icons/hi2";
-import { PiCertificateLight } from "react-icons/pi";
+import { ImTable2 } from "react-icons/im";
 import { RiUserAddLine } from "react-icons/ri";
 import { BsBook } from "react-icons/bs";
 import { TbNotebook } from "react-icons/tb";
@@ -115,6 +115,12 @@ const sidebarData = [
     icon: <TbNotebook />,
     roles: ["admin", "teacher", "librarian", "accountant"],
     items: [
+      {
+        title: "Time Table",
+        icon: <ImTable2 />,
+        path: "/noticeboard/timetable",
+        roles: ["admin", "teacher"],
+      },
       {
         title: "Announcements",
         icon: <FaClipboardList />,

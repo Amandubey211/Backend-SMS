@@ -29,6 +29,8 @@ import "../Utils/translator/i18n.js";
 import i18next from "i18next";
 import { useSelector } from "react-redux";
 import GraduationPage from "../Modules/Admin/Graduation/GraduationPage.js";
+import TimeTablePage from "../Modules/Admin/TimeTable/TimeTablePage.js";
+import CreateOrEditTimeTable from "../Modules/Admin/TimeTable/Components/CreateOrEditTimeTable.js";
 // lazy loaded routes
 
 const Academic = lazy(() =>
@@ -650,6 +652,27 @@ function App() {
     },
     { path: "library", element: <Libary />, errorElement: <Error /> },
     {
+      path: "/noticeboard/timetable",
+      element: (
+        <ProtectRoute
+          Component={TimeTablePage}
+          allowedRoles={["admin", "teacher"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+
+    {
+      path: "/noticeboard/timetable/create-new-timeTable",
+      element: (
+        <ProtectRoute
+          Component={CreateOrEditTimeTable}
+          allowedRoles={["admin", "teacher"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
       path: "/noticeboard/events",
       element: (
         <ProtectRoute
@@ -716,6 +739,7 @@ function App() {
       ),
       errorElement: <Error />,
     },
+    
     {
       path: "/users/parents",
       element: (
