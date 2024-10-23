@@ -56,6 +56,58 @@ const AttendanceGraph = () => {
     ],
   });
   useEffect(() => {
+    if(attendanceData){
+        const updatedData = { ...chartData };
+        updatedData.datasets[0].data[1] = attendanceData?.January?.presentCount;
+        updatedData.datasets[1].data[1] = attendanceData?.January?.absentCount;
+        updatedData.datasets[2].data[1] = attendanceData?.January?.leaveCount;
+        
+        updatedData.datasets[0].data[2] = attendanceData?.February?.presentCount;
+        updatedData.datasets[1].data[2] = attendanceData?.February?.absentCount;
+        updatedData.datasets[2].data[2] = attendanceData?.February?.leaveCount;
+        
+        updatedData.datasets[0].data[3] = attendanceData?.March?.presentCount;
+        updatedData.datasets[1].data[3] = attendanceData?.March?.absentCount;
+        updatedData.datasets[2].data[3] = attendanceData?.March?.leaveCount;
+        
+        updatedData.datasets[0].data[4] = attendanceData?.April?.presentCount;
+        updatedData.datasets[1].data[4] = attendanceData?.April?.absentCount;
+        updatedData.datasets[2].data[4] = attendanceData?.April?.leaveCount;
+        
+        updatedData.datasets[0].data[5] = attendanceData?.May?.presentCount;
+        updatedData.datasets[1].data[5] = attendanceData?.May?.absentCount;
+        updatedData.datasets[2].data[5] = attendanceData?.May?.leaveCount;
+        
+        updatedData.datasets[0].data[6] = attendanceData?.June?.presentCount;
+        updatedData.datasets[1].data[6] = attendanceData?.June?.absentCount;
+        updatedData.datasets[2].data[6] = attendanceData?.June?.leaveCount;
+        
+        updatedData.datasets[0].data[7] = attendanceData?.July?.presentCount;
+        updatedData.datasets[1].data[7] = attendanceData?.July?.absentCount;
+        updatedData.datasets[2].data[7] = attendanceData?.July?.leaveCount;
+        
+        updatedData.datasets[0].data[8] = attendanceData?.August?.presentCount;
+        updatedData.datasets[1].data[8] = attendanceData?.August?.absentCount;
+        updatedData.datasets[2].data[8] = attendanceData?.August?.leaveCount;
+        
+        updatedData.datasets[0].data[9] = attendanceData?.September?.presentCount;
+        updatedData.datasets[1].data[9] = attendanceData?.September?.absentCount;
+        updatedData.datasets[2].data[9] = attendanceData?.September?.leaveCount;
+        
+        updatedData.datasets[0].data[10] = attendanceData?.October?.presentCount;
+        updatedData.datasets[1].data[10] = attendanceData?.October?.absentCount;
+        updatedData.datasets[2].data[10] = attendanceData?.October?.leaveCount;
+        
+        updatedData.datasets[0].data[11] = attendanceData?.November?.presentCount;
+        updatedData.datasets[1].data[11] = attendanceData?.November?.absentCount;
+        updatedData.datasets[2].data[11] = attendanceData?.November?.leaveCount;
+        
+        updatedData.datasets[0].data[12] = attendanceData?.December?.presentCount;
+        updatedData.datasets[1].data[12] = attendanceData?.December?.absentCount;
+        updatedData.datasets[2].data[12] = attendanceData?.December?.leaveCount;
+              setChartData(updatedData);      
+      
+    }else{
     dispatch(fetchAttendanceData(cid)).then(()=>{
       const updatedData = { ...chartData };
       updatedData.datasets[0].data[1] = attendanceData?.January?.presentCount;
@@ -106,7 +158,7 @@ const AttendanceGraph = () => {
       updatedData.datasets[1].data[12] = attendanceData?.December?.absentCount;
       updatedData.datasets[2].data[12] = attendanceData?.December?.leaveCount;
             setChartData(updatedData);      
-    });
+    });}
   }, [dispatch])
   const options = {
     plugins: {

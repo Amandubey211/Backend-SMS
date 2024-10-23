@@ -70,7 +70,7 @@ const AdminNoticeItem = ({
 
           {/* Action Icons */}
           <div className="flex items-center gap-4">
-            {(notice?.authorId == userDetails?.userId) && (
+            {(notice?.authorId == userDetails?.userId || role == "admin") && (
               <div className="flex items-center gap-4">
                 <BsPencilSquare
                   className="text-blue-500 cursor-pointer"
