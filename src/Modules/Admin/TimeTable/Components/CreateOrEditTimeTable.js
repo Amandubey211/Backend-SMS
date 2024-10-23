@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { DataGrid } from '@mui/x-data-grid'; 
+import { TextField } from '@mui/material';
 import { createTimetable, updateTimetable } from '../../../../Store/Slices/Admin/TimeTable/timetable.action';
 import DashLayout from '../../../../Components/Admin/AdminDashLayout'; // Sidebar and navbar
 import Layout from '../../../../Components/Common/Layout';
@@ -20,6 +21,10 @@ const CreateTimeTablePage = ({ timetable = {}, onClose }) => {
   ]);
 
   const [rows, setRows] = useState([]);
+
+  // State to track which column header is being edited
+  const [editingHeaderField, setEditingHeaderField] = useState(null);
+  const [headerInputValue, setHeaderInputValue] = useState('');
 
   // Form state
   const [formData, setFormData] = useState({
@@ -42,6 +47,7 @@ const CreateTimeTablePage = ({ timetable = {}, onClose }) => {
       field: newColumnKey,
       headerName: `Column ${columns.length + 1}`,
       editable: true,
+      renderHeader: (params) => renderEditableHeader(params),
     };
     setColumns([...columns, newColumn]);
     setRows(rows.map((row) => ({ ...row, [newColumnKey]: '' }))); // Ensure all existing rows have the new column key
@@ -54,6 +60,56 @@ const CreateTimeTablePage = ({ timetable = {}, onClose }) => {
       prevRows.map((row) => (row.id === id ? { ...row, [field]: value } : row))
     );
   };
+
+  // Handle header edit start
+  const handleHeaderDoubleClick = (field, headerName) => {
+    setEditingHeaderField(field);
+    setHeaderInputValue(headerName);
+  };
+
+  // Handle header name change
+  const handleHeaderInputChange = (e) => {
+    setHeaderInputValue(e.target.value);
+  };
+
+  // Handle header edit end
+  const handleHeaderInputBlur = () => {
+    setColumns((prevColumns) =>
+      prevColumns.map((col) =>
+        col.field === editingHeaderField ? { ...col, headerName: headerInputValue } : col
+      )
+    );
+    setEditingHeaderField(null);
+    setHeaderInputValue('');
+  };
+
+  // Render editable header
+  const renderEditableHeader = (params) => {
+    const { field, colDef } = params;
+    if (field === editingHeaderField) {
+      return (
+        <TextField
+          value={headerInputValue}
+          onChange={handleHeaderInputChange}
+          onBlur={handleHeaderInputBlur}
+          autoFocus
+          size="small"
+          variant="standard"
+        />
+      );
+    }
+    return (
+      <span onDoubleClick={() => handleHeaderDoubleClick(field, colDef.headerName)}>
+        {colDef.headerName}
+      </span>
+    );
+  };
+
+  // Update columns to include renderHeader
+  const columnsWithRenderHeader = columns.map((col) => ({
+    ...col,
+    renderHeader: (params) => renderEditableHeader(params),
+  }));
 
   // Submit the form
   const handleSubmit = (e) => {
@@ -158,10 +214,10 @@ const CreateTimeTablePage = ({ timetable = {}, onClose }) => {
               {/* Data Grid Component */}
               <div style={{ height: '500px' }}>
                 <DataGrid
-                  columns={columns}
+                  columns={columnsWithRenderHeader}
                   rows={rows}
-                  editMode="cell" // Changed from "row" to "cell"
-                  onCellEditCommit={handleCellEditCommit} // Added this handler
+                  editMode="cell"
+                  onCellEditCommit={handleCellEditCommit}
                 />
               </div>
             </div>
