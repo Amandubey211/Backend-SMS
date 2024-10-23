@@ -1,11 +1,18 @@
-import React from "react";
+import React, { useEffect } from "react";
  import AttendanceGraph from "./AttendanceGraph";
  import StudentGradePieChart from "./StudentGradePieChart";
 import TaskChart from "./TaskChart";
 import AllSubjects from "../StudentCourseProgress/allSubjects/AllSubjects";
+import { fetchAttendanceData} from "../../../../../../Store/Slices/Admin/Users/Students/student.action";
+import { useDispatch } from "react-redux";
+import { useParams } from "react-router-dom";
 
 const StudentOverView = () => {
-
+  const {cid} = useParams()
+  const dispatch = useDispatch()
+  useEffect(() => {
+    dispatch(fetchAttendanceData(cid))
+  }, [dispatch])
   return (
     <>
        <div className="flex flex-col">
