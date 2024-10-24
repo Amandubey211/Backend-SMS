@@ -91,6 +91,7 @@ const AddBook = () => {
             value={bookData.bookName}
             onChange={handleInputChange}
             error={errors.bookName}
+            required
           />
           <FormInput
             id="authorName"
@@ -99,6 +100,7 @@ const AddBook = () => {
             value={bookData.authorName}
             onChange={handleInputChange}
             error={errors.authorName}
+            required
           />
           <FormSelect
             id="class"
@@ -110,6 +112,7 @@ const AddBook = () => {
             }))}
             value={bookData.class}
             onChange={handleInputChange}
+            required
           />
           <FormInput
             id="category"
@@ -118,6 +121,7 @@ const AddBook = () => {
             value={bookData.category}
             onChange={handleInputChange}
             error={errors.category}
+            required
           />
           <FormInput
             id="copies"
@@ -127,6 +131,7 @@ const AddBook = () => {
             value={bookData.copies}
             onChange={handleInputChange}
             error={errors.copies}
+            required
           />
         </div>
       </div>
