@@ -32,7 +32,7 @@ const TimeTableList = () => {
           {timetables.map((timetable) => (
             <div
               key={timetable._id}
-              className="p-6 bg-white shadow-xl rounded-3xl border border-gray-200 transition duration-500 hover:scale-105 hover:shadow-2xl cursor-pointer"
+              className="p-6 bg-white shadow-xl rounded-xl border border-gray-200 transition duration-500 hover:scale-105 hover:shadow-2xl cursor-pointer"
             >
               <h2 className="text-2xl font-bold text-gray-800 mb-4">
                 {timetable.name} <FaClipboardList className="inline-block ml-2 text-indigo-500" />
