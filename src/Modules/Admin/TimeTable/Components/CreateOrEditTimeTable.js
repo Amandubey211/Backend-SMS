@@ -8,6 +8,7 @@ import {
   TimePicker,
   Button,
   Popconfirm,
+  message,
 } from 'antd';
 import {
   PlusOutlined,
@@ -19,22 +20,26 @@ import {
   createTimetable,
   updateTimetable,
 } from '../../../../Store/Slices/Admin/TimeTable/timetable.action';
-import { fetchSubjects } from '../../../../Store/Slices/Admin/Class/Subject/subjectThunks'; // Import fetchSubjects
+import { fetchSubjects } from '../../../../Store/Slices/Admin/Class/Subject/subjectThunks';
 import DashLayout from '../../../../Components/Admin/AdminDashLayout';
 import Layout from '../../../../Components/Common/Layout';
 
 const { Option } = Select;
 
-const CreateTimeTablePage = ({ timetable = {}, onClose }) => {
+const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
   const dispatch = useDispatch();
   const { classes } = useSelector((state) => state.admin.class);
-  const { subjects } = useSelector((state) => state.admin.subject); // Get subjects from Redux
+  const { subjects } = useSelector((state) => state.admin.subject);
 
   const [formData, setFormData] = useState({
     name: timetable.name || '',
     classId: timetable.classId || '',
-    startDate: timetable.validity?.startDate ? timetable.validity.startDate.split('T')[0] : '',
-    endDate: timetable.validity?.endDate ? timetable.validity.endDate.split('T')[0] : '',
+    startDate: timetable.validity?.startDate
+      ? timetable.validity.startDate.split('T')[0]
+      : '',
+    endDate: timetable.validity?.endDate
+      ? timetable.validity.endDate.split('T')[0]
+      : '',
     type: timetable.type || 'weekly',
   });
 
@@ -127,17 +132,21 @@ const CreateTimeTablePage = ({ timetable = {}, onClose }) => {
     // Reset dataSource and nextId when type changes
     setDataSource([]);
     setNextId(1);
+    // Add a default row
+    handleAddRow();
   }, [formData.type]);
 
   // Handle cell value changes
   const handleCellChange = (value, record, dataIndex) => {
-    const newData = [...dataSource];
-    const index = newData.findIndex((item) => record.key === item.key);
-    if (index > -1) {
-      const item = newData[index];
-      item[dataIndex] = value;
-      setDataSource(newData);
-    }
+    setDataSource((prevData) => {
+      const newData = [...prevData];
+      const index = newData.findIndex((item) => record.key === item.key);
+      if (index > -1) {
+        newData[index] = { ...newData[index], [dataIndex]: value };
+        return newData;
+      }
+      return newData;
+    });
   };
 
   // Render Editable Cell
@@ -172,18 +181,25 @@ const CreateTimeTablePage = ({ timetable = {}, onClose }) => {
       value={text || undefined}
       onChange={(value) => handleCellChange(value, record, dataIndex)}
       style={{ width: '100%' }}
+      placeholder="Select Subject"
     >
-      {subjects.map((subject) => (
-        <Option key={subject._id} value={subject._id}>
-          {subject.name}
+      {subjects && subjects.length > 0 ? (
+        subjects.map((subject) => (
+          <Option key={subject._id} value={subject._id}>
+            {subject.name}
+          </Option>
+        ))
+      ) : (
+        <Option value="" disabled>
+          No subjects available
         </Option>
-      ))}
+      )}
     </Select>
   );
 
   // Add a new row
   const handleAddRow = () => {
-    const newRow = { key: nextId, id: nextId }; // Sequential ID starting from 1
+    const newRow = { key: nextId, id: nextId }; // Ensure key and id are assigned
     setNextId(nextId + 1);
 
     if (formData.type === 'weekly') {
@@ -352,6 +368,7 @@ const CreateTimeTablePage = ({ timetable = {}, onClose }) => {
       dispatch(createTimetable(timetableData));
     }
 
+    // Close the form or perform any cleanup
     onClose();
   };
 
@@ -410,14 +427,13 @@ const CreateTimeTablePage = ({ timetable = {}, onClose }) => {
               <div className="w-full md:w-1/5 px-2 mb-4">
                 <label className="block mb-1">Select Class</label>
                 <Select
-                  value={formData.classId || undefined}
+                  value={formData.classId || ''}
                   onChange={(value) => {
                     setFormData({ ...formData, classId: value });
-                    // Optionally reset subjects when class changes
-                    // dispatch(resetSubjects());
                   }}
                   style={{ width: '100%' }}
                   required
+                  placeholder="Select Class"
                 >
                   <Option value="">Select Class</Option>
                   {classes.map((classItem) => (
