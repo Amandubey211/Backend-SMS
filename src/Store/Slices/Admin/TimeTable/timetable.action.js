@@ -19,14 +19,15 @@ export const fetchTimetables = createAsyncThunk(
         params: filters,
       });
 
-      // Ensure the response is always an array
-      return Array.isArray(response.data) ? response.data : [];
+      // Ensure you're accessing the correct data property
+      return response.data.data; // Accessing the nested data property
     } catch (error) {
       console.error("Error fetching timetables:", error);
       return rejectWithValue(error.message);
     }
   }
 );
+
 
 
 // Create Timetable
