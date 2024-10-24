@@ -5,18 +5,22 @@ import AddressInfo from "./Components/AddressInfo";
 import AdmissionInfo from "./Components/AdmissionInfo";
 import ParentInfo from "./Components/ParentInfo";
 import DocumentUploadForm from "../../LoginPages/Student/SignUp/DocumentUploadForm";
-import useAddStudent from "../../../Hooks/AuthHooks/Staff/Admin/Students/useAddStudent";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import toast from "react-hot-toast";
 import validateStudentDetails from "../../../Validataions/Student/validateStudentDetails";
-import useSaveDetails from "../../../Hooks/AuthHooks/Student/useSaveDetails";
-import useSaveDocument from "../../../Hooks/AuthHooks/Student/useSaveDocuments";
+
 import StudentCard from "./Components/StudentCard";
+import {
+  registerStudentDetails,
+  uploadStudentDocuments,
+} from "../../../Store/Slices/Common/Auth/actions/studentActions";
 
 const StudentInfo = () => {
+  const dispatch = useDispatch();
   const schoolId = useSelector(
     (store) => store.common.user.userDetails.schoolId
   );
+  const { loading } = useSelector((store) => store.common.auth);
   const [studentInfo, setStudentInfo] = useState({
     firstName: "",
     lastName: "",
@@ -55,23 +59,13 @@ const StudentInfo = () => {
     Q_Id: "",
     applyingClass: "",
     enrollmentStatus: "",
-    //transportRequirement: "",
-    enrollmentStatus: "",
     schoolId: schoolId,
-    // fatherImage: null,
-    // motherImage: null,
   });
 
   const [imagePreview, setImagePreview] = useState(null);
-  const [fatherImagePreview, setFatherImagePreview] = useState(null);
-  const [motherImagePreview, setMotherImagePreview] = useState(null);
   const [sameAddress, setSameAddress] = useState(false);
   const [profile, setProfile] = useState(null);
   const fileInputRef = useRef(null);
-
-  const { loading, error, addStudent } = useAddStudent();
-  const { loading: saveLoading, saveDetails } = useSaveDetails();
-  const { loading: docLoading, saveDocument } = useSaveDocument();
 
   const [preview, setPreview] = useState([]);
   const [studentDocuments, setStudentDocuments] = useState({
@@ -125,33 +119,15 @@ const StudentInfo = () => {
         setImagePreview(reader.result);
       };
       reader.readAsDataURL(file);
+
+      // Update the studentInfo state with the profile image
       setProfile(file);
+      setStudentInfo((prevState) => ({
+        ...prevState,
+        profile: file, // Add profile to studentInfo state
+      }));
     }
   };
-
-  // const handleFatherImageChange = (e) => {
-  //   const file = e.target.files[0];
-  //   if (file) {
-  //     const reader = new FileReader();
-  //     reader.onloadend = () => {
-  //       setFatherImagePreview(reader.result);
-  //     };
-  //     reader.readAsDataURL(file);
-  //     setStudentInfo({ ...studentInfo, fatherImage: file });
-  //   }
-  // };
-
-  // const handleMotherImageChange = (e) => {
-  //   const file = e.target.files[0];
-  //   if (file) {
-  //     const reader = new FileReader();
-  //     reader.onloadend = () => {
-  //       setMotherImagePreview(reader.result);
-  //     };
-  //     reader.readAsDataURL(file);
-  //     setStudentInfo({ ...studentInfo, motherImage: file });
-  //   }
-  // };
 
   const handleSameAddressChange = (e) => {
     setSameAddress(e.target.checked);
@@ -205,7 +181,14 @@ const StudentInfo = () => {
       return;
     }
 
-    const validationErrors = validateStudentDetails(studentInfo, "Admin");
+    // Make sure the profile is included in the validation
+    const validationErrors = validateStudentDetails(
+      {
+        ...studentInfo,
+        profile: profile, // Include profile in the validation
+      },
+      "Admin"
+    );
 
     if (Object.keys(validationErrors).length > 0) {
       toast.error(Object.values(validationErrors)[0]);
@@ -236,33 +219,37 @@ const StudentInfo = () => {
         return;
       }
 
-      const response = await saveDetails(formData);
+      // Dispatch the thunk for saving student details
+      const resultAction = await dispatch(registerStudentDetails(formData));
 
-      if (response.success) {
+      if (registerStudentDetails.fulfilled.match(resultAction)) {
         toast.success("Details Saved Successfully");
 
         if (studentDocuments?.documents.length !== 0) {
-          const documentResponse = await saveDocument(
-            studentInfo.email,
-            studentInfo.schoolId,
-            studentDocuments
+          // Dispatch the thunk for saving documents
+          const documentResultAction = await dispatch(
+            uploadStudentDocuments({
+              email: studentInfo.email,
+              schoolId: studentInfo.schoolId,
+              studentDocuments,
+            })
           );
-          if (documentResponse?.success) {
+          if (uploadStudentDocuments.fulfilled.match(documentResultAction)) {
             toast.success("Documents uploaded successfully!");
-            // addStudent(studentInfo);
           } else {
-            toast.error("Failed to upload the document");
+            toast.error(
+              documentResultAction.payload || "Failed to upload the document"
+            );
           }
         }
       } else {
-        toast.error("Failed to save student details.");
+        toast.error(resultAction.payload || "Failed to save student details.");
       }
     } catch (error) {
       console.error("Error in submitting documents:", error);
       toast.error("An error occurred while submitting the documents.");
     }
   };
-
   return (
     <div className="flex gap-4 h-screen">
       <div className="p-8 max-w-4xl bg-white rounded-lg overflow-y-auto no-scrollbar">
@@ -301,19 +288,6 @@ const StudentInfo = () => {
           <ParentInfo
             studentInfo={studentInfo}
             handleInputChange={handleInputChange}
-            // dont remove  the below code --------------------
-            // fatherImagePreview={fatherImagePreview}
-            // motherImagePreview={motherImagePreview}
-            // handleFatherImageChange={handleFatherImageChange}
-            // handleMotherImageChange={handleMotherImageChange}
-            // handleRemoveFatherImage={() => {
-            //   setFatherImagePreview(null);
-            //   setStudentInfo({ ...studentInfo, fatherImage: null });
-            // }}
-            // handleRemoveMotherImage={() => {
-            //   setMotherImagePreview(null);
-            //   setStudentInfo({ ...studentInfo, motherImage: null });
-            // }}
           />
           <DocumentUploadForm
             type="Admin"
@@ -326,20 +300,15 @@ const StudentInfo = () => {
             setPreview={setPreview}
             setStudentDocuments={setStudentDocuments}
             fileInputRef={fileInputRef}
-            handleDocumentSubmit={handleDocumentSubmit}
-            docloading={docLoading}
           />
           <div className="mt-6">
             <button
               type="submit"
               className="w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600 text-center"
-              disabled={loading || saveLoading || docLoading}
+              disabled={loading}
             >
-              {loading || saveLoading || docLoading
-                ? "Registering..."
-                : "Add Student"}
+              {loading ? "Registering..." : "Add Student"}
             </button>
-            {error && <p className="text-red-500">{error}</p>}
           </div>
         </form>
       </div>
