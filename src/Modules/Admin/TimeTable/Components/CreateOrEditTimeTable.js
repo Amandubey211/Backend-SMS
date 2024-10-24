@@ -8,7 +8,6 @@ import {
   TimePicker,
   Button,
   Popconfirm,
-  message,
 } from 'antd';
 import {
   PlusOutlined,
@@ -169,8 +168,8 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
   // Render Date Picker Cell
   const renderDatePicker = (text, record, dataIndex) => (
     <DatePicker
-      value={text ? moment(text, 'DD/MM/YYYY') : null}
-      format="DD/MM/YYYY"
+      value={text ? moment(text, 'YYYY-MM-DD') : null}
+      format="YYYY-MM-DD"
       onChange={(date, dateString) => handleCellChange(dateString, record, dataIndex)}
     />
   );
@@ -182,6 +181,7 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
       onChange={(value) => handleCellChange(value, record, dataIndex)}
       style={{ width: '100%' }}
       placeholder="Select Subject"
+      disabled={!formData.classId || subjects.length === 0}
     >
       {subjects && subjects.length > 0 ? (
         subjects.map((subject) => (
@@ -342,8 +342,9 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
     } else if (formData.type === 'exam' || formData.type === 'event') {
       const dateMap = {};
       dataSource.forEach((row) => {
-        if (!dateMap[row.date]) {
-          dateMap[row.date] = [];
+        const formattedDate = moment(row.date, 'YYYY-MM-DD').format('YYYY-MM-DD');
+        if (!dateMap[formattedDate]) {
+          dateMap[formattedDate] = [];
         }
         const slotData = {
           startTime: row.startTime,
@@ -354,7 +355,7 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
         } else if (formData.type === 'event') {
           slotData.eventName = row.eventName;
         }
-        dateMap[row.date].push(slotData);
+        dateMap[formattedDate].push(slotData);
       });
       timetableData.days = Object.keys(dateMap).map((date) => ({
         date,
