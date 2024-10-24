@@ -54,7 +54,7 @@ const StudentLoginForm = () => {
             className="text-sm text-gray-500 hover:text-gray-700 mb-4 items-center flex gap-2"
           >
             <div className="rounded-full border text-xl w-6 h-6 flex justify-center items-center">
-            <IoIosArrowRoundBack/>
+              <IoIosArrowRoundBack />
             </div>
             <span>LMS Home</span>
           </NavLink>
@@ -153,14 +153,15 @@ const StudentLoginForm = () => {
             Information
           </h2>
           <p className="mb-6 capitalize">
-            If you have{" "}
-            <b>already applied, please wait for your login credentials. </b>
-            It may take 4-5 working days. For any queries, contact us at:
+            If you have <strong>already submitted your application</strong>,
+            please allow 4-5 business days to receive your login credentials.
+            For any inquiries, please contact your respective school.
           </p>
-          <div className="flex   mb-4">
+
+          {/* <div className="flex   mb-4">
             <AiOutlinePhone className="text-xl mr-2" />
             <span className="font-semibold">Phone: 123-456-7890</span>
-          </div>
+          </div> */}
           <div className="flex justify-end">
             <button
               onClick={closeModal}
