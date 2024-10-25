@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   Table,
@@ -50,8 +50,8 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [deletedRowsStack, setDeletedRowsStack] = useState([]);
   
-  // ID Counter to manage row IDs
-  const [idCounter, setIdCounter] = useState(1);
+  // ID Counter using useRef
+  const idCounterRef = useRef(1);
 
   // Debugging: Log subjects to verify data
   useEffect(() => {
@@ -210,14 +210,14 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
   // Reset dataSource and ID counter when formData.type changes
   useEffect(() => {
     setDataSource([]);
-    setIdCounter(1);
-    handleAddRow();
+    idCounterRef.current = 1; // Reset the ID counter
+    handleAddRow(); // Add the first row with ID = 1
   }, [formData.type]);
 
   // Add a new row
   const handleAddRow = () => {
     setDataSource((prevData) => {
-      const newId = idCounter;
+      const newId = idCounterRef.current;
       const newRow = { key: newId, id: newId };
 
       if (formData.type === 'weekly') {
@@ -238,7 +238,7 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
       }
 
       // Increment the ID counter
-      setIdCounter((prevId) => prevId + 1);
+      idCounterRef.current += 1;
 
       return [...prevData, newRow];
     });
