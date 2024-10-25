@@ -26,6 +26,17 @@ import Layout from '../../../../Components/Common/Layout';
 
 const { Option } = Select;
 
+// Days of the week for the dropdown
+const daysOfWeek = [
+  'Monday',
+  'Tuesday',
+  'Wednesday',
+  'Thursday',
+  'Friday',
+  'Saturday',
+  'Sunday',
+];
+
 const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
   const dispatch = useDispatch();
   
@@ -45,6 +56,7 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
     type: timetable.type || 'weekly',
   });
 
+  const [isActive, setIsActive] = useState(false); // Initialize isActive state
   const [columns, setColumns] = useState([]);
   const [dataSource, setDataSource] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -52,6 +64,23 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
   
   // ID Counter using useRef
   const idCounterRef = useRef(1);
+
+  // Fetch isActive from localStorage on component mount
+  useEffect(() => {
+    const authData = localStorage.getItem('persist:auth');
+    if (authData) {
+      try {
+        const parsedAuth = JSON.parse(authData);
+        const academicYear = parsedAuth.AcademicYear
+          ? JSON.parse(parsedAuth.AcademicYear)
+          : [];
+        setIsActive(academicYear[0]?.isActive || false); // Safely access isActive
+        console.log('Fetched isActive:', academicYear[0]?.isActive || false);
+      } catch (error) {
+        console.error('Error parsing auth data:', error);
+      }
+    }
+  }, []);
 
   // Debugging: Log subjects to verify data
   useEffect(() => {
@@ -82,6 +111,21 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
       value={text}
       onChange={(e) => handleCellChange(e.target.value, record, dataIndex)}
     />
+  );
+
+  const renderDayDropdown = (text, record, dataIndex) => (
+    <Select
+      value={text || undefined}
+      onChange={(value) => handleCellChange(value, record, dataIndex)}
+      style={{ width: '100%' }}
+      placeholder="Select Day"
+    >
+      {daysOfWeek.map((day) => (
+        <Option key={day} value={day}>
+          {day}
+        </Option>
+      ))}
+    </Select>
   );
 
   const renderTimePicker = (text, record, dataIndex) => (
@@ -125,6 +169,14 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
     );
   };
 
+  const renderDescription = (text, record, dataIndex) => (
+    <Input
+      value={text}
+      onChange={(e) => handleCellChange(e.target.value, record, dataIndex)}
+      placeholder="Enter Description"
+    />
+  );
+
   // Generate columns based on type
   const getColumnsByType = () => {
     const commonColumns = [
@@ -134,44 +186,101 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
         width: 70,
         fixed: 'left',
       },
-      {
-        title: 'Start Time',
-        dataIndex: 'startTime',
-        width: 150,
-        render: (text, record) => renderTimePicker(text, record, 'startTime'),
-      },
-      {
-        title: 'End Time',
-        dataIndex: 'endTime',
-        width: 150,
-        render: (text, record) => renderTimePicker(text, record, 'endTime'),
-      },
+      // The rest of the columns will be appended based on type
     ];
 
     if (formData.type === 'weekly') {
       return [
         ...commonColumns,
         {
-          title: 'Day',
-          dataIndex: 'day',
-          width: 150,
-          render: (text, record) => renderEditableCell(text, record, 'day'),
-        },
-        {
           title: 'Subject',
           dataIndex: 'subjectId',
           width: 200,
           render: (text, record) => renderSubjectDropdown(text, record, 'subjectId'),
+        },
+        {
+          title: 'Day',
+          dataIndex: 'day',
+          width: 150,
+          render: (text, record) => renderDayDropdown(text, record, 'day'), // Updated
+        },
+        {
+          title: 'Start Time',
+          dataIndex: 'startTime',
+          width: 150,
+          render: (text, record) => renderTimePicker(text, record, 'startTime'),
+        },
+        {
+          title: 'End Time',
+          dataIndex: 'endTime',
+          width: 150,
+          render: (text, record) => renderTimePicker(text, record, 'endTime'),
         },
       ];
     } else if (formData.type === 'exam') {
       return [
         ...commonColumns,
         {
+          title: 'Subject',
+          dataIndex: 'subjectId',
+          width: 200,
+          render: (text, record) => renderSubjectDropdown(text, record, 'subjectId'),
+        },
+        {
+          title: 'Start Time',
+          dataIndex: 'startTime',
+          width: 150,
+          render: (text, record) => renderTimePicker(text, record, 'startTime'),
+        },
+        {
+          title: 'End Time',
+          dataIndex: 'endTime',
+          width: 150,
+          render: (text, record) => renderTimePicker(text, record, 'endTime'),
+        },
+        {
           title: 'Date',
           dataIndex: 'date',
           width: 150,
           render: (text, record) => renderDatePicker(text, record, 'date'),
+        },
+      ];
+    } else if (formData.type === 'event') {
+      return [
+        ...commonColumns,
+        {
+          title: 'Event Name',
+          dataIndex: 'eventName',
+          width: 200,
+          render: (text, record) => renderEditableCell(text, record, 'eventName'),
+        },
+        {
+          title: 'Start Time',
+          dataIndex: 'startTime',
+          width: 150,
+          render: (text, record) => renderTimePicker(text, record, 'startTime'),
+        },
+        {
+          title: 'End Time',
+          dataIndex: 'endTime',
+          width: 150,
+          render: (text, record) => renderTimePicker(text, record, 'endTime'),
+        },
+        {
+          title: 'Date',
+          dataIndex: 'date',
+          width: 150,
+          render: (text, record) => renderDatePicker(text, record, 'date'),
+        },
+      ];
+    } else if (formData.type === 'others') {
+      return [
+        ...commonColumns,
+        {
+          title: 'Other Title',
+          dataIndex: 'otherTitle',
+          width: 200,
+          render: (text, record) => renderEditableCell(text, record, 'otherTitle'),
         },
         {
           title: 'Subject',
@@ -179,21 +288,23 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
           width: 200,
           render: (text, record) => renderSubjectDropdown(text, record, 'subjectId'),
         },
-      ];
-    } else if (formData.type === 'event') {
-      return [
-        ...commonColumns,
         {
-          title: 'Date',
-          dataIndex: 'date',
+          title: 'Start Time',
+          dataIndex: 'startTime',
           width: 150,
-          render: (text, record) => renderDatePicker(text, record, 'date'),
+          render: (text, record) => renderTimePicker(text, record, 'startTime'),
         },
         {
-          title: 'Event Name',
-          dataIndex: 'eventName',
-          width: 200,
-          render: (text, record) => renderEditableCell(text, record, 'eventName'),
+          title: 'End Time',
+          dataIndex: 'endTime',
+          width: 150,
+          render: (text, record) => renderTimePicker(text, record, 'endTime'),
+        },
+        {
+          title: 'Description',
+          dataIndex: 'description',
+          width: 250,
+          render: (text, record) => renderDescription(text, record, 'description'),
         },
       ];
     } else {
@@ -221,20 +332,26 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
       const newRow = { key: newId, id: newId };
 
       if (formData.type === 'weekly') {
+        newRow.subjectId = '';
         newRow.day = '';
         newRow.startTime = '';
         newRow.endTime = '';
-        newRow.subjectId = '';
       } else if (formData.type === 'exam') {
-        newRow.date = '';
-        newRow.startTime = '';
-        newRow.endTime = '';
         newRow.subjectId = '';
-      } else if (formData.type === 'event') {
-        newRow.date = '';
         newRow.startTime = '';
         newRow.endTime = '';
+        newRow.date = '';
+      } else if (formData.type === 'event') {
         newRow.eventName = '';
+        newRow.startTime = '';
+        newRow.endTime = '';
+        newRow.date = '';
+      } else if (formData.type === 'others') {
+        newRow.otherTitle = '';
+        newRow.subjectId = '';
+        newRow.startTime = '';
+        newRow.endTime = '';
+        newRow.description = '';
       }
 
       // Increment the ID counter
@@ -248,10 +365,26 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
   const handleDeleteRows = () => {
     if (selectedRowKeys.length === 0) return;
 
-    const rowsToDelete = dataSource.filter((row) => selectedRowKeys.includes(row.key));
-    setDeletedRowsStack((prevStack) => [...prevStack, rowsToDelete]);
+    setDataSource((prevData) => {
+      const newData = [...prevData];
+      const rowsToDelete = [];
+      const indicesToDelete = [];
 
-    setDataSource((prevData) => prevData.filter((row) => !selectedRowKeys.includes(row.key)));
+      selectedRowKeys.forEach((key) => {
+        const index = newData.findIndex((item) => item.key === key);
+        if (index > -1) {
+          rowsToDelete.push({ ...newData[index], originalIndex: index });
+          indicesToDelete.push(index);
+        }
+      });
+
+      // Store deleted rows with their original indices
+      setDeletedRowsStack((prevStack) => [...prevStack, ...rowsToDelete]);
+
+      // Remove the rows from dataSource
+      return newData.filter((item) => !selectedRowKeys.includes(item.key));
+    });
+
     setSelectedRowKeys([]);
   };
 
@@ -259,9 +392,22 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
   const handleUndoDelete = () => {
     if (deletedRowsStack.length === 0) return;
 
-    const lastDeletedRows = deletedRowsStack[deletedRowsStack.length - 1];
-    setDataSource((prevData) => [...prevData, ...lastDeletedRows]);
-    setDeletedRowsStack((prevStack) => prevStack.slice(0, -1));
+    setDataSource((prevData) => {
+      let newData = [...prevData];
+      const rowsToRestore = deletedRowsStack.slice(-1)[0]; // Get the last deleted row(s)
+
+      // If multiple rows were deleted at different times, adjust accordingly
+      // Here, assuming one batch of deletions at a time
+      rowsToRestore.forEach((row) => {
+        const { originalIndex } = row;
+        newData.splice(originalIndex, 0, row); // Insert at original index
+      });
+
+      // Remove the last set of deleted rows from the stack
+      setDeletedRowsStack((prevStack) => prevStack.slice(0, -1));
+
+      return newData;
+    });
   };
 
   // Handle Ctrl+Z for undo
@@ -305,25 +451,58 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
       errors.push('End date is required for exam or event.');
     }
 
+    if (formData.type === 'others' && !formData.description) {
+      errors.push('Description is required for others type.');
+    }
+
     if (dataSource.length === 0) {
       errors.push('At least one row must be added to the timetable.');
     }
 
     dataSource.forEach((row, index) => {
-      if (formData.type === 'weekly' && !row.day) {
-        errors.push(`Day is required for row ${index + 1}.`);
-      }
-      if ((formData.type === 'exam' || formData.type === 'event') && !row.date) {
-        errors.push(`Date is required for row ${index + 1}.`);
-      }
-      if (!row.startTime || !row.endTime) {
-        errors.push(`Start and end time are required for row ${index + 1}.`);
-      }
-      if (formData.type !== 'event' && !row.subjectId) {
-        errors.push(`Subject is required for row ${index + 1}.`);
-      }
-      if (formData.type === 'event' && !row.eventName) {
-        errors.push(`Event name is required for row ${index + 1}.`);
+      if (formData.type === 'weekly') {
+        if (!row.subjectId) {
+          errors.push(`Subject is required for row ${index + 1}.`);
+        }
+        if (!row.day) {
+          errors.push(`Day is required for row ${index + 1}.`);
+        }
+        if (!row.startTime || !row.endTime) {
+          errors.push(`Start and end time are required for row ${index + 1}.`);
+        }
+      } else if (formData.type === 'exam') {
+        if (!row.subjectId) {
+          errors.push(`Subject is required for row ${index + 1}.`);
+        }
+        if (!row.startTime || !row.endTime) {
+          errors.push(`Start and end time are required for row ${index + 1}.`);
+        }
+        if (!row.date) {
+          errors.push(`Date is required for row ${index + 1}.`);
+        }
+      } else if (formData.type === 'event') {
+        if (!row.eventName) {
+          errors.push(`Event name is required for row ${index + 1}.`);
+        }
+        if (!row.startTime || !row.endTime) {
+          errors.push(`Start and end time are required for row ${index + 1}.`);
+        }
+        if (!row.date) {
+          errors.push(`Date is required for row ${index + 1}.`);
+        }
+      } else if (formData.type === 'others') {
+        if (!row.otherTitle) {
+          errors.push(`Other Title is required for row ${index + 1}.`);
+        }
+        if (!row.subjectId) {
+          errors.push(`Subject is required for row ${index + 1}.`);
+        }
+        if (!row.startTime || !row.endTime) {
+          errors.push(`Start and end time are required for row ${index + 1}.`);
+        }
+        if (!row.description) {
+          errors.push(`Description is required for row ${index + 1}.`);
+        }
       }
     });
 
@@ -340,7 +519,7 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
         startDate: new Date(formData.startDate).toISOString(),
         endDate: formData.endDate ? new Date(formData.endDate).toISOString() : undefined,
       },
-      status: 'inactive',
+      status: isActive ? 'active' : 'inactive', // Use isActive from state
       days: [],
     };
 
@@ -352,9 +531,9 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
           dayMap[row.day] = [];
         }
         dayMap[row.day].push({
+          subjectId: row.subjectId,
           startTime: row.startTime,
           endTime: row.endTime,
-          subjectId: row.subjectId,
         });
       });
       timetableData.days = Object.keys(dayMap).map((day) => ({
@@ -382,6 +561,24 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
       timetableData.days = Object.keys(dateMap).map((date) => ({
         date,
         slots: dateMap[date],
+      }));
+    } else if (formData.type === 'others') {
+      const titleMap = {};
+      dataSource.forEach((row) => {
+        const formattedTitle = row.otherTitle;
+        if (!titleMap[formattedTitle]) {
+          titleMap[formattedTitle] = [];
+        }
+        titleMap[formattedTitle].push({
+          subjectId: row.subjectId,
+          startTime: row.startTime,
+          endTime: row.endTime,
+          description: row.description,
+        });
+      });
+      timetableData.days = Object.keys(titleMap).map((title) => ({
+        otherTitle: title,
+        slots: titleMap[title],
       }));
     }
 
@@ -493,6 +690,7 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
                   type="primary"
                   icon={<PlusOutlined />}
                   onClick={handleAddRow}
+                  disabled={!formData.classId} // Disable until class is selected
                 >
                   Add Row
                 </Button>
