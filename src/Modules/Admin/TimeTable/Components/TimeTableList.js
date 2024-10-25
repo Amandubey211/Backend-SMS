@@ -49,42 +49,89 @@ const TimeTableList = () => {
                 <FaChalkboardTeacher className="text-indigo-400 mr-2" />
                 <strong>Class:</strong> {timetable.classId}
               </p>
-              <p className="text-sm text-gray-600 flex items-center">
-                <FaCalendarAlt className="text-indigo-400 mr-2" />
-                <strong>Valid From:</strong>{" "}
-                {new Date(timetable.validity.startDate).toLocaleDateString()}
-              </p>
-              {timetable.validity.endDate && (
-                <p className="text-sm text-gray-600 flex items-center">
-                  <FaCalendarAlt className="text-indigo-400 mr-2" />
-                  <strong>Valid To:</strong>{" "}
-                  {new Date(timetable.validity.endDate).toLocaleDateString()}
-                </p>
+              {timetable.validity && (
+                <>
+                  <p className="text-sm text-gray-600 flex items-center">
+                    <FaCalendarAlt className="text-indigo-400 mr-2" />
+                    <strong>Valid From:</strong>{" "}
+                    {new Date(timetable.validity.startDate).toLocaleDateString()}
+                  </p>
+                  {timetable.validity.endDate && (
+                    <p className="text-sm text-gray-600 flex items-center">
+                      <FaCalendarAlt className="text-indigo-400 mr-2" />
+                      <strong>Valid To:</strong>{" "}
+                      {new Date(timetable.validity.endDate).toLocaleDateString()}
+                    </p>
+                  )}
+                </>
               )}
 
               {/* Display days and slots */}
               <div className="mt-6 bg-gray-100 p-4 rounded-lg border border-gray-200">
                 <h3 className="text-md font-semibold text-gray-700">Schedule:</h3>
-                {timetable.days.map((day) => (
-                  <div key={day._id} className="mt-3 border-t border-gray-300 pt-3">
-                    <p className="font-medium text-gray-600 flex items-center">
-                      <FaCalendarAlt className="text-indigo-400 mr-2" />
-                      Date: {new Date(day.date).toLocaleDateString()}
-                    </p>
-                    {day.slots.map((slot) => (
-                      <div key={slot._id} className="ml-4 mt-2 text-gray-600">
-                        <p className="flex items-center">
-                          <FaClipboardList className="text-indigo-400 mr-2" />
-                          <strong>Event:</strong> {slot.eventName}
+                {timetable.days && timetable.days.length > 0 ? (
+                  timetable.days.map((day, index) => (
+                    <div key={index} className="mt-3 border-t border-gray-300 pt-3">
+                      {/* Conditional Rendering Based on Timetable Type */}
+                      {timetable.type === "weekly" && day.day && (
+                        <p className="font-medium text-gray-600 flex items-center">
+                          <FaCalendarAlt className="text-indigo-400 mr-2" />
+                          Day: {day.day}
                         </p>
-                        <p className="flex items-center">
-                          <FaClock className="text-indigo-400 mr-2" />
-                          <strong>Time:</strong> {slot.startTime} - {slot.endTime}
+                      )}
+                      {(timetable.type === "exam" || timetable.type === "event") && day.date && (
+                        <p className="font-medium text-gray-600 flex items-center">
+                          <FaCalendarAlt className="text-indigo-400 mr-2" />
+                          Date: {new Date(day.date).toLocaleDateString()}
                         </p>
-                      </div>
-                    ))}
-                  </div>
-                ))}
+                      )}
+                      {timetable.type === "others" && day.otherTitle && (
+                        <p className="font-medium text-gray-600 flex items-center">
+                          <FaCalendarAlt className="text-indigo-400 mr-2" />
+                          Other Title: {day.otherTitle}
+                        </p>
+                      )}
+
+                      {/* Render Slots Based on Timetable Type */}
+                      {day.slots && day.slots.length > 0 ? (
+                        day.slots.map((slot, slotIndex) => (
+                          <div key={slotIndex} className="ml-4 mt-2 text-gray-600">
+                            {timetable.type === "event" ? (
+                              <p className="flex items-center">
+                                <FaClipboardList className="text-indigo-400 mr-2" />
+                                <strong>Event:</strong> {slot.eventName}
+                              </p>
+                            ) : timetable.type === "others" ? (
+                              <>
+                                <p className="flex items-center">
+                                  <FaClipboardList className="text-indigo-400 mr-2" />
+                                  <strong>Subject:</strong> {slot.subjectId}
+                                </p>
+                                <p className="flex items-center">
+                                  <FaClipboardList className="text-indigo-400 mr-2" />
+                                  <strong>Description:</strong> {slot.description}
+                                </p>
+                              </>
+                            ) : (
+                              <p className="flex items-center">
+                                <FaClipboardList className="text-indigo-400 mr-2" />
+                                <strong>Subject:</strong> {slot.subjectId}
+                              </p>
+                            )}
+                            <p className="flex items-center">
+                              <FaClock className="text-indigo-400 mr-2" />
+                              <strong>Time:</strong> {slot.startTime} - {slot.endTime}
+                            </p>
+                          </div>
+                        ))
+                      ) : (
+                        <p className="text-gray-500">No slots available.</p>
+                      )}
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-gray-500">No schedule available.</p>
+                )}
               </div>
 
               <button

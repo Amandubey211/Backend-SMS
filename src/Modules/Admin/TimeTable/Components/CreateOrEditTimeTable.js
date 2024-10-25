@@ -23,6 +23,7 @@ import {
 import { fetchSubjects } from '../../../../Store/Slices/Admin/Class/Subject/subjectThunks';
 import DashLayout from '../../../../Components/Admin/AdminDashLayout';
 import Layout from '../../../../Components/Common/Layout';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
 const { Option } = Select;
 
@@ -39,7 +40,8 @@ const daysOfWeek = [
 
 const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
   const dispatch = useDispatch();
-  
+  const navigate = useNavigate(); // Initialize navigate
+
   // Accessing classes and subjects from Redux store
   const classes = useSelector((state) => state.admin.class.classes);
   const subjects = useSelector((state) => state.admin.subject.subjects);
@@ -61,7 +63,7 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
   const [dataSource, setDataSource] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [deletedRowsStack, setDeletedRowsStack] = useState([]);
-  
+
   // ID Counter using useRef
   const idCounterRef = useRef(1);
 
@@ -379,7 +381,7 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
       });
 
       // Store deleted rows with their original indices
-      setDeletedRowsStack((prevStack) => [...prevStack, ...rowsToDelete]);
+      setDeletedRowsStack((prevStack) => [...prevStack, rowsToDelete]);
 
       // Remove the rows from dataSource
       return newData.filter((item) => !selectedRowKeys.includes(item.key));
@@ -394,10 +396,8 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
 
     setDataSource((prevData) => {
       let newData = [...prevData];
-      const rowsToRestore = deletedRowsStack.slice(-1)[0]; // Get the last deleted row(s)
+      const rowsToRestore = deletedRowsStack.slice(-1)[0]; // Get the last deleted rows
 
-      // If multiple rows were deleted at different times, adjust accordingly
-      // Here, assuming one batch of deletions at a time
       rowsToRestore.forEach((row) => {
         const { originalIndex } = row;
         newData.splice(originalIndex, 0, row); // Insert at original index
@@ -586,9 +586,19 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
     if (timetable._id) {
       dispatch(updateTimetable({ id: timetable._id, data: timetableData }));
       message.success('Timetable updated successfully!');
+
+      // Redirect after a short delay
+      setTimeout(() => {
+        navigate('/noticeboard/timetable');
+      }, 1500);
     } else {
       dispatch(createTimetable(timetableData));
       message.success('Timetable created successfully!');
+
+      // Redirect after a short delay
+      setTimeout(() => {
+        navigate('/noticeboard/timetable');
+      }, 1500);
     }
 
     // Close the form or perform any cleanup
