@@ -8,6 +8,7 @@ import {
   TimePicker,
   Button,
   Popconfirm,
+  message,
 } from 'antd';
 import {
   PlusOutlined,
@@ -27,8 +28,10 @@ const { Option } = Select;
 
 const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
   const dispatch = useDispatch();
-  const { classes } = useSelector((state) => state.admin.class);
-  const { subjects } = useSelector((state) => state.admin.subject);
+  
+  // Accessing classes and subjects from Redux store
+  const classes = useSelector((state) => state.admin.class.classes);
+  const subjects = useSelector((state) => state.admin.subject.subjects);
 
   const [formData, setFormData] = useState({
     name: timetable.name || '',
@@ -46,10 +49,84 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
   const [dataSource, setDataSource] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [deletedRowsStack, setDeletedRowsStack] = useState([]);
-  const [nextId, setNextId] = useState(1); // For sequential IDs starting from 1
+  
+  // ID Counter to manage row IDs
+  const [idCounter, setIdCounter] = useState(1);
+
+  // Debugging: Log subjects to verify data
+  useEffect(() => {
+    console.log('Fetched Subjects:', subjects);
+  }, [subjects]);
+
+  // Debugging: Log selected class
+  useEffect(() => {
+    console.log('Selected Class ID:', formData.classId);
+  }, [formData.classId]);
+
+  // Handle cell value changes
+  const handleCellChange = (value, record, dataIndex) => {
+    setDataSource((prevData) => {
+      const newData = [...prevData];
+      const index = newData.findIndex((item) => record.key === item.key);
+      if (index > -1) {
+        newData[index] = { ...newData[index], [dataIndex]: value };
+        return newData;
+      }
+      return newData;
+    });
+  };
+
+  // Render functions
+  const renderEditableCell = (text, record, dataIndex) => (
+    <Input
+      value={text}
+      onChange={(e) => handleCellChange(e.target.value, record, dataIndex)}
+    />
+  );
+
+  const renderTimePicker = (text, record, dataIndex) => (
+    <TimePicker
+      value={text ? moment(text, 'HH:mm') : null}
+      format="HH:mm"
+      onChange={(time, timeString) => handleCellChange(timeString, record, dataIndex)}
+    />
+  );
+
+  const renderDatePicker = (text, record, dataIndex) => (
+    <DatePicker
+      value={text ? moment(text, 'YYYY-MM-DD') : null}
+      format="YYYY-MM-DD"
+      onChange={(date, dateString) => handleCellChange(dateString, record, dataIndex)}
+    />
+  );
+
+  const renderSubjectDropdown = (text, record, dataIndex) => {
+    const isDisabled = !formData.classId || !(subjects && subjects.length > 0);
+    return (
+      <Select
+        value={text || undefined}
+        onChange={(value) => handleCellChange(value, record, dataIndex)}
+        style={{ width: '100%' }}
+        placeholder="Select Subject"
+        disabled={isDisabled}
+      >
+        {subjects && subjects.length > 0 ? (
+          subjects.map((subject) => (
+            <Option key={subject.subjectId} value={subject.subjectId}>
+              {subject.subjectName}
+            </Option>
+          ))
+        ) : (
+          <Option value="" disabled>
+            No subjects available
+          </Option>
+        )}
+      </Select>
+    );
+  };
 
   // Generate columns based on type
-  const getColumnsByType = (type) => {
+  const getColumnsByType = () => {
     const commonColumns = [
       {
         title: 'ID',
@@ -71,7 +148,7 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
       },
     ];
 
-    if (type === 'weekly') {
+    if (formData.type === 'weekly') {
       return [
         ...commonColumns,
         {
@@ -87,7 +164,7 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
           render: (text, record) => renderSubjectDropdown(text, record, 'subjectId'),
         },
       ];
-    } else if (type === 'exam') {
+    } else if (formData.type === 'exam') {
       return [
         ...commonColumns,
         {
@@ -103,7 +180,7 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
           render: (text, record) => renderSubjectDropdown(text, record, 'subjectId'),
         },
       ];
-    } else if (type === 'event') {
+    } else if (formData.type === 'event') {
       return [
         ...commonColumns,
         {
@@ -124,102 +201,47 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
     }
   };
 
-  // Update columns when formData.type changes
+  // Update columns when formData.type or subjects change
   useEffect(() => {
-    const cols = getColumnsByType(formData.type);
+    const cols = getColumnsByType();
     setColumns(cols);
-    // Reset dataSource and nextId when type changes
+  }, [formData.type, subjects]);
+
+  // Reset dataSource and ID counter when formData.type changes
+  useEffect(() => {
     setDataSource([]);
-    setNextId(1);
-    // Add a default row
+    setIdCounter(1);
     handleAddRow();
   }, [formData.type]);
 
-  // Handle cell value changes
-  const handleCellChange = (value, record, dataIndex) => {
-    setDataSource((prevData) => {
-      const newData = [...prevData];
-      const index = newData.findIndex((item) => record.key === item.key);
-      if (index > -1) {
-        newData[index] = { ...newData[index], [dataIndex]: value };
-        return newData;
-      }
-      return newData;
-    });
-  };
-
-  // Render Editable Cell
-  const renderEditableCell = (text, record, dataIndex) => (
-    <Input
-      value={text}
-      onChange={(e) => handleCellChange(e.target.value, record, dataIndex)}
-    />
-  );
-
-  // Render Time Picker Cell
-  const renderTimePicker = (text, record, dataIndex) => (
-    <TimePicker
-      value={text ? moment(text, 'HH:mm') : null}
-      format="HH:mm"
-      onChange={(time, timeString) => handleCellChange(timeString, record, dataIndex)}
-    />
-  );
-
-  // Render Date Picker Cell
-  const renderDatePicker = (text, record, dataIndex) => (
-    <DatePicker
-      value={text ? moment(text, 'YYYY-MM-DD') : null}
-      format="YYYY-MM-DD"
-      onChange={(date, dateString) => handleCellChange(dateString, record, dataIndex)}
-    />
-  );
-
-  // Render Subject Dropdown Cell
-  const renderSubjectDropdown = (text, record, dataIndex) => (
-    <Select
-      value={text || undefined}
-      onChange={(value) => handleCellChange(value, record, dataIndex)}
-      style={{ width: '100%' }}
-      placeholder="Select Subject"
-      disabled={!formData.classId || subjects.length === 0}
-    >
-      {subjects && subjects.length > 0 ? (
-        subjects.map((subject) => (
-          <Option key={subject._id} value={subject._id}>
-            {subject.name}
-          </Option>
-        ))
-      ) : (
-        <Option value="" disabled>
-          No subjects available
-        </Option>
-      )}
-    </Select>
-  );
-
   // Add a new row
   const handleAddRow = () => {
-    const newRow = { key: nextId, id: nextId }; // Ensure key and id are assigned
-    setNextId(nextId + 1);
+    setDataSource((prevData) => {
+      const newId = idCounter;
+      const newRow = { key: newId, id: newId };
 
-    if (formData.type === 'weekly') {
-      newRow.day = '';
-      newRow.startTime = '';
-      newRow.endTime = '';
-      newRow.subjectId = '';
-    } else if (formData.type === 'exam') {
-      newRow.date = '';
-      newRow.startTime = '';
-      newRow.endTime = '';
-      newRow.subjectId = '';
-    } else if (formData.type === 'event') {
-      newRow.date = '';
-      newRow.startTime = '';
-      newRow.endTime = '';
-      newRow.eventName = '';
-    }
+      if (formData.type === 'weekly') {
+        newRow.day = '';
+        newRow.startTime = '';
+        newRow.endTime = '';
+        newRow.subjectId = '';
+      } else if (formData.type === 'exam') {
+        newRow.date = '';
+        newRow.startTime = '';
+        newRow.endTime = '';
+        newRow.subjectId = '';
+      } else if (formData.type === 'event') {
+        newRow.date = '';
+        newRow.startTime = '';
+        newRow.endTime = '';
+        newRow.eventName = '';
+      }
 
-    setDataSource((prev) => [...prev, newRow]);
+      // Increment the ID counter
+      setIdCounter((prevId) => prevId + 1);
+
+      return [...prevData, newRow];
+    });
   };
 
   // Delete selected rows
@@ -306,7 +328,7 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
     });
 
     if (errors.length > 0) {
-      alert(errors.join('\n'));
+      message.error(errors.join('\n'));
       return;
     }
 
@@ -315,8 +337,8 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
       classId: formData.classId,
       type: formData.type,
       validity: {
-        startDate: formData.startDate,
-        endDate: formData.endDate,
+        startDate: new Date(formData.startDate).toISOString(),
+        endDate: formData.endDate ? new Date(formData.endDate).toISOString() : undefined,
       },
       status: 'inactive',
       days: [],
@@ -342,7 +364,7 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
     } else if (formData.type === 'exam' || formData.type === 'event') {
       const dateMap = {};
       dataSource.forEach((row) => {
-        const formattedDate = moment(row.date, 'YYYY-MM-DD').format('YYYY-MM-DD');
+        const formattedDate = moment(row.date, 'YYYY-MM-DD').toISOString();
         if (!dateMap[formattedDate]) {
           dateMap[formattedDate] = [];
         }
@@ -363,10 +385,13 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
       }));
     }
 
+    // Dispatch the action to create or update the timetable
     if (timetable._id) {
       dispatch(updateTimetable({ id: timetable._id, data: timetableData }));
+      message.success('Timetable updated successfully!');
     } else {
       dispatch(createTimetable(timetableData));
+      message.success('Timetable created successfully!');
     }
 
     // Close the form or perform any cleanup
