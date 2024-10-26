@@ -87,8 +87,6 @@ const AdminNotice = () => {
             {role === "staff" && "Staff Notice Board"}
             {role === "accountant" && "Accountant Notice Board"}
           </h1>
-
-
           {/* Search Bar */}
           <div className="flex p-2 justify-between">
             <div className="flex gap-4">
