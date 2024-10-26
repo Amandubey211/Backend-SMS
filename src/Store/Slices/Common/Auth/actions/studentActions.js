@@ -26,7 +26,7 @@ export const studentLogin = createAsyncThunk(
         const tokenKey = process.env.REACT_APP_STUDENT_TOKEN_STORAGE_KEY;
         localStorage.setItem(`${data.role}:token`, `Bearer ${data.token}`);
         localStorage.setItem("classId", `${data.classId}`);
-       
+
         dispatch(setToken(data?.token)); // Store token in state
         dispatch(setRole(data?.role)); // Set role
         dispatch(
@@ -40,7 +40,7 @@ export const studentLogin = createAsyncThunk(
             mobileNumber: data?.mobileNumber,
             dateOfBirth: data?.dateOfBirth,
             Q_Id: data?.Q_Id,
-            enrollment:data?.enrollment
+            enrollment: data?.enrollment,
           })
         );
 
@@ -77,8 +77,8 @@ export const studentLogout = createAsyncThunk(
 export const qidVerification = createAsyncThunk(
   "auth/qidVerification",
   async (studentDetails, { rejectWithValue, dispatch }) => {
-    const token =localStorage.getItem("student:token");
-    if(!token){
+    const token = localStorage.getItem("student:token");
+    if (!token) {
       return rejectWithValue("Authentication Failed!");
     }
     try {

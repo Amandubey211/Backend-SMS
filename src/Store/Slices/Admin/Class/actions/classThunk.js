@@ -67,8 +67,7 @@ export const createClass = createAsyncThunk(
         headers: { Authentication: `Bearer ${token}` }, // Using Authentication header
       });
 
-
-      toast.success("Class Created Sussessfully!")
+      toast.success("Class Created Sussessfully!");
       // After successful creation, refetch the class list
       dispatch(fetchAllClasses());
 
