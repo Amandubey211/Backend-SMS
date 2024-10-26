@@ -1,26 +1,28 @@
 import React, { useState, useRef } from "react";
-import ImageUpload from "./Components/ImageUpload";
+import { useSelector, useDispatch } from "react-redux";
+import toast from "react-hot-toast";
+import {
+  registerStudentDetails,
+  uploadStudentDocuments,
+} from "../../../Store/Slices/Common/Auth/actions/studentActions";
 import PersonalInfo from "./Components/PersonalInfo";
 import AddressInfo from "./Components/AddressInfo";
 import AdmissionInfo from "./Components/AdmissionInfo";
 import ParentInfo from "./Components/ParentInfo";
 import DocumentUploadForm from "../../LoginPages/Student/SignUp/DocumentUploadForm";
-import { useSelector, useDispatch } from "react-redux";
-import toast from "react-hot-toast";
-import validateStudentDetails from "../../../Validataions/Student/validateStudentDetails";
-
+import ImageUpload from "./Components/ImageUpload";
 import StudentCard from "./Components/StudentCard";
-import {
-  registerStudentDetails,
-  uploadStudentDocuments,
-} from "../../../Store/Slices/Common/Auth/actions/studentActions";
+import validateStudentDetails from "../../../Validataions/Student/validateStudentDetails";
 
 const StudentInfo = () => {
   const dispatch = useDispatch();
   const schoolId = useSelector(
-    (store) => store.common.user.userDetails.schoolId
+    (store) => store.common.user.userDetails?.schoolId || ""
   );
   const { loading } = useSelector((store) => store.common.auth);
+  const [errors, setErrors] = useState({});
+  const formRef = useRef(null);
+
   const [studentInfo, setStudentInfo] = useState({
     firstName: "",
     lastName: "",
@@ -53,8 +55,6 @@ const StudentInfo = () => {
       postalCode: "",
       country: "",
     },
-    placeOfBirth: "",
-    emergencyNumber: "",
     transportRequirement: false,
     Q_Id: "",
     applyingClass: "",
@@ -63,80 +63,78 @@ const StudentInfo = () => {
   });
 
   const [imagePreview, setImagePreview] = useState(null);
-  const [sameAddress, setSameAddress] = useState(false);
   const [profile, setProfile] = useState(null);
+  const [imageError, setImageError] = useState(""); // State for image validation error
   const fileInputRef = useRef(null);
 
-  const [preview, setPreview] = useState([]);
   const [studentDocuments, setStudentDocuments] = useState({
     documentLabels: [""],
     documents: [],
     schoolId: schoolId,
     email: studentInfo.email,
   });
+  const [preview, setPreview] = useState([]);
+
+  const inputRefs = {
+    firstName: useRef(null),
+    lastName: useRef(null),
+    email: useRef(null),
+    dateOfBirth: useRef(null),
+    placeOfBirth: useRef(null),
+    emergencyNumber: useRef(null),
+    gender: useRef(null),
+    contactNumber: useRef(null),
+    bloodGroup: useRef(null),
+    religion: useRef(null),
+    motherName: useRef(null),
+    fatherName: useRef(null),
+    guardianName: useRef(null),
+    guardianRelationToStudent: useRef(null),
+    guardianContactNumber: useRef(null),
+    guardianEmail: useRef(null),
+    applyingClass: useRef(null),
+    Q_Id: useRef(null),
+    enrollmentStatus: useRef(null),
+    transportRequirement: useRef(null),
+    permanentAddressStreet: useRef(null),
+    permanentAddressCity: useRef(null),
+    permanentAddressState: useRef(null),
+    permanentAddressPostalCode: useRef(null),
+    permanentAddressCountry: useRef(null),
+    residentialAddressStreet: useRef(null),
+    residentialAddressCity: useRef(null),
+    residentialAddressState: useRef(null),
+    residentialAddressPostalCode: useRef(null),
+    residentialAddressCountry: useRef(null),
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    setErrors((prevErrors) => ({ ...prevErrors, [name]: null }));
 
-    if (name === "dateOfBirth") {
-      const age = calculateAge(new Date(value));
-      setStudentInfo({
-        ...studentInfo,
-        [name]: value,
-        age: age,
-      });
-    } else {
-      setStudentInfo({
-        ...studentInfo,
-        [name]: value,
-      });
-    }
-  };
-
-  // Helper function to calculate age based on DOB
-  const calculateAge = (dob) => {
-    const diffMs = Date.now() - dob.getTime();
-    const ageDate = new Date(diffMs);
-    return Math.abs(ageDate.getUTCFullYear() - 1970);
-  };
-
-  const handleAddressChange = (e, type) => {
-    const { name, value } = e.target;
-    setStudentInfo({
-      ...studentInfo,
-      [type]: {
-        ...studentInfo[type],
-        [name]: value,
-      },
+    setStudentInfo((prevState) => {
+      const keys = name.split(".");
+      if (keys.length === 1) {
+        return { ...prevState, [name]: value };
+      }
+      const [parentKey, childKey] = keys;
+      return {
+        ...prevState,
+        [parentKey]: {
+          ...prevState[parentKey],
+          [childKey]: value,
+        },
+      };
     });
   };
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result);
-      };
-      reader.readAsDataURL(file);
-
-      // Update the studentInfo state with the profile image
-      setProfile(file);
-      setStudentInfo((prevState) => ({
-        ...prevState,
-        profile: file, // Add profile to studentInfo state
-      }));
-    }
-  };
-
-  const handleSameAddressChange = (e) => {
-    setSameAddress(e.target.checked);
-    if (e.target.checked) {
-      setStudentInfo((prev) => ({
-        ...prev,
-        residentialAddress: { ...prev.permanentAddress },
-      }));
-    }
+  const handleClearPhoto = () => {
+    setStudentDocuments((prevState) => ({
+      ...prevState,
+      documents: [],
+    }));
+    setPreview([]);
+    fileInputRef.current.value = "";
   };
 
   const handlePhotoChange = (e) => {
@@ -164,130 +162,130 @@ const StudentInfo = () => {
     });
   };
 
-  const handleClearPhoto = () => {
-    setStudentDocuments((prevState) => ({
-      ...prevState,
-      documents: [],
-    }));
-    setPreview([]);
-    fileInputRef.current.value = "";
+  const handleValidation = () => {
+    const validationErrors = validateStudentDetails(studentInfo);
+    setErrors(validationErrors);
+    console.log(validationErrors, "pppppp");
+    // Check if there is an image error
+    if (!profile) {
+      setImageError("Profile image is required");
+      validationErrors.profile = "Profile image is required";
+    } else {
+      setImageError("");
+    }
+
+    // Identify the first field with an error to scroll into view
+    for (const errorKey in validationErrors) {
+      const refKey = errorKey.includes(".")
+        ? errorKey.split(".").join("")
+        : errorKey;
+
+      const ref = inputRefs[refKey]?.current;
+
+      if (ref) {
+        ref.scrollIntoView({ behavior: "smooth", block: "center" });
+        ref.focus();
+        break;
+      }
+    }
+
+    if (Object.keys(validationErrors).length > 0) {
+      toast.error("Please correct the errors in the form.");
+    }
+
+    return Object.keys(validationErrors).length === 0 && profile;
   };
 
   const handleDocumentSubmit = async (e) => {
     e.preventDefault();
 
-    if (!studentInfo.email) {
-      toast.error("Email is required");
-      return;
-    }
+    if (!handleValidation()) return;
 
-    // Make sure the profile is included in the validation
-    const validationErrors = validateStudentDetails(
-      {
-        ...studentInfo,
-        profile: profile, // Include profile in the validation
-      },
-      "Admin"
-    );
-
-    if (Object.keys(validationErrors).length > 0) {
-      toast.error(Object.values(validationErrors)[0]);
-      return;
+    const formData = new FormData();
+    for (const [key, value] of Object.entries(studentInfo)) {
+      if (typeof value === "object" && value !== null) {
+        for (const [subKey, subValue] of Object.entries(value)) {
+          formData.append(`${key}[${subKey}]`, subValue);
+        }
+      } else {
+        formData.append(key, value);
+      }
     }
+    formData.append("profile", profile);
 
     try {
-      const formData = new FormData();
-      for (const key in studentInfo) {
-        if (studentInfo.hasOwnProperty(key)) {
-          if (key === "permanentAddress" || key === "residentialAddress") {
-            const address = studentInfo[key];
-            for (const field in address) {
-              if (address.hasOwnProperty(field)) {
-                formData.append(`${key}[${field}]`, address[field]);
-              }
-            }
-          } else {
-            formData.append(key, studentInfo[key]);
-          }
-        }
-      }
-
-      if (profile) {
-        formData.append("profile", profile);
-      } else {
-        toast.error("Profile image is required");
-        return;
-      }
-
-      // Dispatch the thunk for saving student details
       const resultAction = await dispatch(registerStudentDetails(formData));
-
       if (registerStudentDetails.fulfilled.match(resultAction)) {
-        toast.success("Details Saved Successfully");
-
-        if (studentDocuments?.documents.length !== 0) {
-          // Dispatch the thunk for saving documents
-          const documentResultAction = await dispatch(
+        // toast.success("Student registered successfully.");
+        if (studentDocuments.documents.length) {
+          await dispatch(
             uploadStudentDocuments({
               email: studentInfo.email,
-              schoolId: studentInfo.schoolId,
+              schoolId,
               studentDocuments,
             })
           );
-          if (uploadStudentDocuments.fulfilled.match(documentResultAction)) {
-            toast.success("Documents uploaded successfully!");
-          } else {
-            toast.error(
-              documentResultAction.payload || "Failed to upload the document"
-            );
-          }
+          // toast.success("Documents uploaded successfully.");
         }
       } else {
-        toast.error(resultAction.payload || "Failed to save student details.");
+        toast.error("Failed to register student.");
       }
     } catch (error) {
-      console.error("Error in submitting documents:", error);
-      toast.error("An error occurred while submitting the documents.");
+      toast.error("An error occurred during submission.");
     }
   };
+
   return (
     <div className="flex gap-4 h-screen">
       <div className="p-8 max-w-4xl bg-white rounded-lg overflow-y-auto no-scrollbar">
         <h2 className="text-2xl font-semibold mb-6">Student Information</h2>
-        <form onSubmit={handleDocumentSubmit}>
+        <form ref={formRef} onSubmit={handleDocumentSubmit}>
           <div className="grid grid-cols-12 gap-4">
             <div className="col-span-4">
               <ImageUpload
                 imagePreview={imagePreview}
-                handleBrowseClick={() => fileInputRef.current.click()}
-                handleImageChange={handleImageChange}
-                handleRemoveImage={() => {
-                  setImagePreview(null);
-                  setProfile(null);
+                handleImageChange={(e) => {
+                  setProfile(e.target.files[0]);
+                  setImageError(""); // Clear the error when image is selected
+                  const reader = new FileReader();
+                  reader.onload = () => setImagePreview(reader.result);
+                  reader.readAsDataURL(e.target.files[0]);
                 }}
+                handleRemoveImage={() => {
+                  setProfile(null);
+                  setImagePreview(null);
+                  setImageError("Profile image is required"); // Set error if image is removed
+                }}
+                error={imageError} // Pass error state to ImageUpload component
+                inputRef={fileInputRef}
               />
             </div>
             <div className="col-span-8">
               <PersonalInfo
                 studentInfo={studentInfo}
                 handleInputChange={handleInputChange}
+                errors={errors}
+                inputRefs={inputRefs}
               />
             </div>
           </div>
           <AddressInfo
             studentInfo={studentInfo}
             handleInputChange={handleInputChange}
-            handleAddressChange={handleAddressChange}
-            sameAddress={sameAddress}
-            handleSameAddressChange={handleSameAddressChange}
+            errors={errors}
+            inputRefs={inputRefs}
           />
           <AdmissionInfo
             studentInfo={studentInfo}
             handleInputChange={handleInputChange}
+            errors={errors}
+            inputRefs={inputRefs}
           />
           <ParentInfo
             studentInfo={studentInfo}
             handleInputChange={handleInputChange}
+            errors={errors}
+            inputRefs={inputRefs}
           />
           <DocumentUploadForm
             type="Admin"
