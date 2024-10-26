@@ -3,6 +3,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { baseUrl } from "../../../../../config/Common";
+import toast from "react-hot-toast";
 
 // Fetch events
 export const fetchEventsThunk = createAsyncThunk(
@@ -27,6 +28,8 @@ export const fetchEventsThunk = createAsyncThunk(
 export const createEventThunk = createAsyncThunk(
   "events/createEvent",
   async (eventData, { getState, rejectWithValue, dispatch }) => {
+    console.log(eventData);
+    
     try {
       const { common } = getState(); // Get state
       const token = common.auth.token; // Extract token
@@ -47,8 +50,10 @@ export const createEventThunk = createAsyncThunk(
         }
       );
       dispatch(fetchEventsThunk());
+      toast.success("Event created successfully!");
       return response.data;
     } catch (error) {
+      console.log(error);
       return rejectWithValue(
         error.response?.data?.msg || "Failed to create event"
       );
