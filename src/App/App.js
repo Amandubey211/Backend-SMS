@@ -36,6 +36,10 @@ import CreateOrEditTimeTable from "../Modules/Admin/TimeTable/Components/CreateO
 const Academic = lazy(() =>
   import("../Modules/Admin/AcademicYear/Academic.js")
 );
+
+const commonAcademic = lazy(() =>
+  import("../Components/Common/AcademicYear/Academic.js")
+);
 // const CreateAcademicYear = lazy(() =>
 //   import("../Components/Admin/CreateAcademicYear.js")
 // );
@@ -309,6 +313,11 @@ function App() {
   const AppRouter = createBrowserRouter([
     // common-------------------------------------------------------------------------------------
     { path: "/", element: <Home />, errorElement: <Error /> },
+    {
+      path: "/dashboard/select/academic",
+      element: <ProtectRoute Component={commonAcademic} allowedRoles={["admin","parent","student","teacher","accountant","librarain","staff"]} />,
+      errorElement: <Error />,
+    },
     {
       path: "/studentlogin",
       element: <StudentLogin />,
