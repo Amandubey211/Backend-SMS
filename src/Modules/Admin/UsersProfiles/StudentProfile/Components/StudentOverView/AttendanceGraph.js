@@ -4,9 +4,7 @@ import { Chart, registerables } from "chart.js";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { fetchAttendanceData } from "../../../../../../Store/Slices/Admin/Users/Students/student.action";
-
 Chart.register(...registerables);
-
 const AttendanceGraph = () => {
   const { cid } = useParams();
   const attendanceData = useSelector((store) => store.admin.all_students.attendanceData);

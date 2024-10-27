@@ -6,6 +6,7 @@ import { combineReducers } from "redux";
 import authReducer from "./Slices/Common/Auth/reducers/authSlice"; // Importing the auth slice reducer
 import userReducer from "./Slices/Common/User/reducers/userSlice"; // Importing the user slice reducer
 import alertReducer from "./Slices/Common/Alerts/alertsSlice";
+import academicYearReducer from "./Slices/Common/AcademicYear/academicYear.slice";
 
 // admin
 import adminDashboardReducer from "./Slices/Admin/Dashboard/adminDashboardSlice";
@@ -112,6 +113,7 @@ const commonReducer = combineReducers({
   auth: persistReducer(authPersistConfig, authReducer),
   user: persistReducer(userPersistConfig, userReducer),
   alertMsg: alertReducer,
+  academicYear:academicYearReducer,
 });
 
 

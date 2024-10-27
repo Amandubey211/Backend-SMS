@@ -87,9 +87,9 @@ const SettingDropdown = ({
         </NavLink>
 
         {/* Admin Section */}
-        {role === "admin" && (
+       
           <NavLink
-            to="/dashboard/academic"
+            to={role == "admin" ?"/dashboard/academic":"/dashboard/select/academic"}
             className={({ isActive }) =>
               `${listItemClass} ${
                 isActive ? "text-purple-600 bg-purple-100 " : ""
@@ -99,7 +99,7 @@ const SettingDropdown = ({
             <FaGraduationCap className="text-lg" />
             {t("Academic", gt.setting)}
           </NavLink>
-        )}
+       
 
         {/* Custom Language Switcher */}
         <div className="relative">
