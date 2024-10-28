@@ -99,36 +99,8 @@ const Chapter = ({ title, chapterNumber, imageUrl, assignments, quizzes, attachm
       {/* Chapter Content */}
       {chapterExpanded && (
         <div className="mt-2">
-          {/* Assignments and Quizzes */}
-          <div>
-            {assignments.length > 0 || quizzes.length > 0 ? (
-              <>
-                {assignments.map((assignment, index) => (
-                  <ChapterItem
-                    key={index}
-                    type="assignment"
-                    title={assignment.title}
-                    submitted={assignment.submitted}
-                  />
-                ))}
-                {quizzes.map((quiz, index) => (
-                  <ChapterItem
-                    key={index}
-                    type="quiz"
-                    title={quiz.title}
-                    submitted={quiz.submitted}
-                  />
-                ))}
-              </>
-            ) : (
-              <p className="py-2 bg-gray-50 italic text-gray-500 text-center">
-                No Assignment or Quiz
-              </p>
-            )}
-          </div>
-
-          {/* Attachments (PDF Preview) */}
-          {attachments.length > 0 && (
+            {/* Attachments (PDF Preview) */}
+            {attachments.length > 0 && (
             <div className="mt-4">
               <h3 className="text-sm font-semibold text-green-600 mb-2">Attachments ({attachments.length})</h3>
               {attachments.map((attachment, index) => (
@@ -170,6 +142,35 @@ const Chapter = ({ title, chapterNumber, imageUrl, assignments, quizzes, attachm
               ))}
             </div>
           )}
+          {/* Assignments and Quizzes */}
+          <div>
+            {assignments.length > 0 || quizzes.length > 0 ? (
+              <>
+                {assignments.map((assignment, index) => (
+                  <ChapterItem
+                    key={index}
+                    type="assignment"
+                    title={assignment.title}
+                    submitted={assignment.submitted}
+                  />
+                ))}
+                {quizzes.map((quiz, index) => (
+                  <ChapterItem
+                    key={index}
+                    type="quiz"
+                    title={quiz.title}
+                    submitted={quiz.submitted}
+                  />
+                ))}
+              </>
+            ) : (
+              <p className="py-2 bg-gray-50 italic text-gray-500 text-center">
+                No Assignment or Quiz
+              </p>
+            )}
+          </div>
+
+        
         </div>
       )}
 

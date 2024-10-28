@@ -42,7 +42,7 @@ const SingleStudent = () => {
        "Parents": <ParentsProfile student={student} />,
        "Grades": <StudentGradesAccordion student={student} />,
        "Attendance": <StudentAttendance  student={student} />,
-       "Book Issue": <BookIssue  />
+       "Book Issue": <BookIssue/>
     };
     return menuComponents[activeItem] || <div>Select a menu item</div>;
   };

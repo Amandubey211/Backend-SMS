@@ -28,10 +28,10 @@ export const staffLogin = createAsyncThunk(
       if (data.success) {
         // Store token in localStorage
         localStorage.setItem(`${data.role}:token`, `Bearer ${data.token}`);
-        localStorage.removeItem(process.env.REACT_APP_PARENT_TOKEN_STORAGE_KEY);
-        localStorage.removeItem(
-          process.env.REACT_APP_STUDENT_TOKEN_STORAGE_KEY
-        );
+        // localStorage.removeItem(process.env.REACT_APP_PARENT_TOKEN_STORAGE_KEY);
+        // localStorage.removeItem(
+        //   process.env.REACT_APP_STUDENT_TOKEN_STORAGE_KEY
+        // );
         console.log(data, "ddddddddddddd");
 
         // Dispatch user details to userSlice

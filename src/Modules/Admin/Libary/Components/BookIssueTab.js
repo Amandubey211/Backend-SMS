@@ -53,7 +53,7 @@ const BookIssueTab = ({ handleSidebarOpen, setEditIssueData }) => {
 
   return (
     <>
-      <div className="flex justify-between items-end mb-4">
+      <div className="flex justify-between items-end mb-4 ">
         <div className="flex space-x-4">
           <FormField
             id="classLevel"

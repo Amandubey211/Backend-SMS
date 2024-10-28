@@ -84,7 +84,7 @@ const AllNotice = () => {
         <ParentDashLayout hideAvatarList={true}>
           <div className="p-4">
             <h1 className="mb-2 bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent font-semibold bg-clip-text">
-              {t("Child Notice Board")}
+              {t("Child Notice Board")} 
             </h1>
             <div className="flex p-[10px] justify-between">
               <div className="flex gap-4">
@@ -128,7 +128,7 @@ const AllNotice = () => {
                         </div>
                         <div className="flex flex-col gap-3 mt-[-5px] flex-1">
                           <h2 className="font-[500] text-[#4D4D4D]" style={{ fontStyle: "inter" }}>
-                            {notice?.title || t("Untitled")}
+                            {notice?.title || t("Untitled")} <span className="ml-4 text-sm text-gray-500">(Posted by <span className="text-sm text-gray-700">{notice?.authorName || '-'}</span>)</span>
                           </h2>
                           <div className="flex flex-row gap-[50px] text-xs">
                             <div className="flex flex-wrap justify-center items-center">

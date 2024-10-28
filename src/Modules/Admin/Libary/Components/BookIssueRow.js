@@ -98,29 +98,16 @@ const BookIssueRow = ({ item, handleSidebarOpen, setEditIssueData, role }) => {
       </td>
       {/* Conditionally render the Action column for non-teacher roles */}
       {role !== "teacher" && (
-        <td className="px-5 py-2 border-b border-gray-200 relative">
-          {/* Dots Menu */}
-          <div className="border rounded-full p-1 h-8 hover:bg-gray-200 w-8 flex justify-center items-center">
-            <HiDotsVertical
-              className="cursor-pointer "
-              onClick={handleMenuToggle}
-            />
-          </div>
-
-          {showMenu && (
-            <div
-              ref={menuRef}
-              className="absolute top-full right-0 w-24 bg-white border rounded-lg shadow-lg z-10"
-            >
+        <td className="px-5 py-2 border-b border-gray-200 relative">  
+          
               <button
                 onClick={handleSidebarEditOpen}
-                className="flex items-center gap-2 p-2 hover:bg-gray-200 w-full text-left"
+                className="flex items-center gap-1 p-2 hover:bg-gray-200 w-auto text-left rounded-lg"
               >
                 <MdEdit className="text-gray-500" />
                 <span>Edit</span>
               </button>
-            </div>
-          )}
+        
 
           {/* Sidebar for Editing Book Issue */}
           <Sidebar

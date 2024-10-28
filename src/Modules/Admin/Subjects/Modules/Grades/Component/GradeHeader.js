@@ -12,7 +12,6 @@ const GradeHeader = ({ onSearch, onFilterChange }) => {
   const handleSearchChange = (e) => {
        setSearch(e.target.value);
     onSearch(e.target.value);
-   
   };
   const handleFilterChange = (name, value) => {
     onFilterChange(name, value);
@@ -30,7 +29,7 @@ const GradeHeader = ({ onSearch, onFilterChange }) => {
             <input
               type="text"
               placeholder="Search"
-              className="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-300 w-[13rem]"
+              className="text px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-300 w-[13rem]"
               value={search}
               onChange={handleSearchChange}
             />

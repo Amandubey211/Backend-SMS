@@ -43,6 +43,7 @@ export const createNoticeThunk = createAsyncThunk(
       dispatch(fetchNoticesThunk());
       return response.data;
     } catch (error) {
+      dispatch(fetchNoticesThunk());
       return rejectWithValue(
         error.response?.data?.message || "Failed to create notice"
       );
