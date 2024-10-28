@@ -21,10 +21,17 @@ import {
   updateTimetable,
 } from '../../../../Store/Slices/Admin/TimeTable/timetable.action';
 import { fetchSubjects } from '../../../../Store/Slices/Admin/Class/Subject/subjectThunks';
+// Correct Import from groupSectionSlice
 import {
   fetchSectionsByClass,
   fetchGroupsByClass,
 } from '../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks';
+
+import {
+  clearSectionsList,
+  clearGroupsList,
+} from '../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionSlice';
+
 import DashLayout from '../../../../Components/Admin/AdminDashLayout';
 import Layout from '../../../../Components/Common/Layout';
 import { useNavigate } from 'react-router-dom';
@@ -95,9 +102,23 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
   // Fetch subjects, sections, and groups when classId changes
   useEffect(() => {
     if (formData.classId) {
+      // Clear existing sections and groups
+      dispatch(clearSectionsList());
+      dispatch(clearGroupsList());
+
+      // Fetch new sections and groups
       dispatch(fetchSubjects(formData.classId));
       dispatch(fetchSectionsByClass(formData.classId));
       dispatch(fetchGroupsByClass(formData.classId));
+    } else {
+      // If classId is cleared, also clear sections and groups
+      dispatch(clearSectionsList());
+      dispatch(clearGroupsList());
+      setFormData((prev) => ({
+        ...prev,
+        sectionId: '',
+        groupId: '',
+      }));
     }
   }, [formData.classId, dispatch]);
 
@@ -114,16 +135,21 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
     console.log('Fetched Groups:', groupsList);
   }, [groupsList]);
 
-  // Handle cell value changes
-  const handleCellChange = (value, record, dataIndex) => {
+  // Monitor dataSource for debugging
+  useEffect(() => {
+    console.log('Current dataSource:', dataSource);
+  }, [dataSource]);
+
+  // Handle cell value changes using row index
+  const handleCellChange = (value, rowIndex, dataIndex) => {
     setDataSource((prevData) => {
       const newData = [...prevData];
-      const index = newData.findIndex((item) => record.key === item.key);
-      if (index > -1) {
-        newData[index] = { ...newData[index], [dataIndex]: value };
+      if (rowIndex > -1 && rowIndex < newData.length) {
+        newData[rowIndex] = { ...newData[rowIndex], [dataIndex]: value };
+        console.log(`Updated row ${rowIndex + 1}:`, newData[rowIndex]); // Debugging
         return newData;
       }
-      return newData;
+      return prevData;
     });
   };
 
@@ -131,15 +157,15 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
   const renderEditableCell = (text, record, dataIndex) => (
     <Input
       value={text}
-      onChange={(e) => handleCellChange(e.target.value, record, dataIndex)}
+      onChange={(e) => handleCellChange(e.target.value, record.index, dataIndex)}
       required
     />
   );
 
-  const renderDayDropdown = (text, record, dataIndex) => (
+  const renderDayDropdown = (text, record, dataIndex, rowIndex) => (
     <Select
       value={text || undefined}
-      onChange={(value) => handleCellChange(value, record, dataIndex)}
+      onChange={(value) => handleCellChange(value, rowIndex, dataIndex)}
       style={{ width: '100%' }}
       placeholder="Select Day"
     >
@@ -151,28 +177,28 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
     </Select>
   );
 
-  const renderTimePicker = (text, record, dataIndex) => (
+  const renderTimePicker = (text, record, dataIndex, rowIndex) => (
     <TimePicker
       value={text ? moment(text, 'HH:mm') : null}
       format="HH:mm"
-      onChange={(time, timeString) => handleCellChange(timeString, record, dataIndex)}
+      onChange={(time, timeString) => handleCellChange(timeString, rowIndex, dataIndex)}
     />
   );
 
-  const renderDatePicker = (text, record, dataIndex) => (
+  const renderDatePicker = (text, record, dataIndex, rowIndex) => (
     <DatePicker
       value={text ? moment(text, 'YYYY-MM-DD') : null}
       format="YYYY-MM-DD"
-      onChange={(date, dateString) => handleCellChange(dateString, record, dataIndex)}
+      onChange={(date, dateString) => handleCellChange(dateString, rowIndex, dataIndex)}
     />
   );
 
-  const renderSubjectDropdown = (text, record, dataIndex) => {
+  const renderSubjectDropdown = (text, record, dataIndex, rowIndex) => {
     const isDisabled = !formData.classId || !(subjects && subjects.length > 0);
     return (
       <Select
         value={text || undefined}
-        onChange={(value) => handleCellChange(value, record, dataIndex)}
+        onChange={(value) => handleCellChange(value, rowIndex, dataIndex)}
         style={{ width: '100%' }}
         placeholder="Select Subject"
         disabled={isDisabled}
@@ -192,10 +218,10 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
     );
   };
 
-  const renderDescription = (text, record, dataIndex) => (
+  const renderDescription = (text, record, dataIndex, rowIndex) => (
     <Input
       value={text}
-      onChange={(e) => handleCellChange(e.target.value, record, dataIndex)}
+      onChange={(e) => handleCellChange(e.target.value, rowIndex, dataIndex)}
       placeholder="Enter Description"
       required
     />
@@ -220,31 +246,31 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
           title: 'Subject',
           dataIndex: 'subjectId',
           width: 200,
-          render: (text, record) => renderSubjectDropdown(text, record, 'subjectId'),
+          render: (text, record, index) => renderSubjectDropdown(text, { ...record, index }, 'subjectId', index),
         },
         {
           title: 'Day',
           dataIndex: 'day',
           width: 150,
-          render: (text, record) => renderDayDropdown(text, record, 'day'),
+          render: (text, record, index) => renderDayDropdown(text, { ...record, index }, 'day', index),
         },
         {
           title: 'Start Time',
           dataIndex: 'startTime',
           width: 150,
-          render: (text, record) => renderTimePicker(text, record, 'startTime'),
+          render: (text, record, index) => renderTimePicker(text, { ...record, index }, 'startTime', index),
         },
         {
           title: 'End Time',
           dataIndex: 'endTime',
           width: 150,
-          render: (text, record) => renderTimePicker(text, record, 'endTime'),
+          render: (text, record, index) => renderTimePicker(text, { ...record, index }, 'endTime', index),
         },
         {
           title: 'Description',
           dataIndex: 'description',
           width: 250,
-          render: (text, record) => renderDescription(text, record, 'description'),
+          render: (text, record, index) => renderDescription(text, { ...record, index }, 'description', index),
         },
       ];
     } else if (formData.type === 'exam') {
@@ -254,31 +280,31 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
           title: 'Subject',
           dataIndex: 'subjectId',
           width: 200,
-          render: (text, record) => renderSubjectDropdown(text, record, 'subjectId'),
+          render: (text, record, index) => renderSubjectDropdown(text, { ...record, index }, 'subjectId', index),
         },
         {
           title: 'Start Time',
           dataIndex: 'startTime',
           width: 150,
-          render: (text, record) => renderTimePicker(text, record, 'startTime'),
+          render: (text, record, index) => renderTimePicker(text, { ...record, index }, 'startTime', index),
         },
         {
           title: 'End Time',
           dataIndex: 'endTime',
           width: 150,
-          render: (text, record) => renderTimePicker(text, record, 'endTime'),
+          render: (text, record, index) => renderTimePicker(text, { ...record, index }, 'endTime', index),
         },
         {
           title: 'Date',
           dataIndex: 'date',
           width: 150,
-          render: (text, record) => renderDatePicker(text, record, 'date'),
+          render: (text, record, index) => renderDatePicker(text, { ...record, index }, 'date', index),
         },
         {
           title: 'Description',
           dataIndex: 'description',
           width: 250,
-          render: (text, record) => renderDescription(text, record, 'description'),
+          render: (text, record, index) => renderDescription(text, { ...record, index }, 'description', index),
         },
       ];
     } else if (formData.type === 'event') {
@@ -288,31 +314,31 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
           title: 'Event Name',
           dataIndex: 'eventName',
           width: 200,
-          render: (text, record) => renderEditableCell(text, record, 'eventName'),
+          render: (text, record, index) => renderEditableCell(text, { ...record, index }, 'eventName'),
         },
         {
           title: 'Start Time',
           dataIndex: 'startTime',
           width: 150,
-          render: (text, record) => renderTimePicker(text, record, 'startTime'),
+          render: (text, record, index) => renderTimePicker(text, { ...record, index }, 'startTime', index),
         },
         {
           title: 'End Time',
           dataIndex: 'endTime',
           width: 150,
-          render: (text, record) => renderTimePicker(text, record, 'endTime'),
+          render: (text, record, index) => renderTimePicker(text, { ...record, index }, 'endTime', index),
         },
         {
           title: 'Date',
           dataIndex: 'date',
           width: 150,
-          render: (text, record) => renderDatePicker(text, record, 'date'),
+          render: (text, record, index) => renderDatePicker(text, { ...record, index }, 'date', index),
         },
         {
           title: 'Description',
           dataIndex: 'description',
           width: 250,
-          render: (text, record) => renderDescription(text, record, 'description'),
+          render: (text, record, index) => renderDescription(text, { ...record, index }, 'description', index),
         },
       ];
     } else if (formData.type === 'others') {
@@ -322,31 +348,31 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
           title: 'Other Title',
           dataIndex: 'otherTitle',
           width: 200,
-          render: (text, record) => renderEditableCell(text, record, 'otherTitle'),
+          render: (text, record, index) => renderEditableCell(text, { ...record, index }, 'otherTitle'),
         },
         {
           title: 'Subject',
           dataIndex: 'subjectId',
           width: 200,
-          render: (text, record) => renderSubjectDropdown(text, record, 'subjectId'),
+          render: (text, record, index) => renderSubjectDropdown(text, { ...record, index }, 'subjectId', index),
         },
         {
           title: 'Start Time',
           dataIndex: 'startTime',
           width: 150,
-          render: (text, record) => renderTimePicker(text, record, 'startTime'),
+          render: (text, record, index) => renderTimePicker(text, { ...record, index }, 'startTime', index),
         },
         {
           title: 'End Time',
           dataIndex: 'endTime',
           width: 150,
-          render: (text, record) => renderTimePicker(text, record, 'endTime'),
+          render: (text, record, index) => renderTimePicker(text, { ...record, index }, 'endTime', index),
         },
         {
           title: 'Description',
           dataIndex: 'description',
           width: 250,
-          render: (text, record) => renderDescription(text, record, 'description'),
+          render: (text, record, index) => renderDescription(text, { ...record, index }, 'description', index),
         },
       ];
     } else {
@@ -494,14 +520,6 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
     ) {
       errors.push('End date is required for exam or event.');
     }
-
-    // Description in formData is not used; descriptions are in each row
-    // Remove this check or update if necessary
-    /*
-    if (formData.type === 'others' && !formData.description) {
-      errors.push('Description is required for others type.');
-    }
-    */
 
     if (dataSource.length === 0) {
       errors.push('At least one row must be added to the timetable.');
@@ -879,3 +897,4 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
 };
 
 export default CreateTimeTablePage;
+
