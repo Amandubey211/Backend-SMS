@@ -21,9 +21,13 @@ import {
   updateTimetable,
 } from '../../../../Store/Slices/Admin/TimeTable/timetable.action';
 import { fetchSubjects } from '../../../../Store/Slices/Admin/Class/Subject/subjectThunks';
+import {
+  fetchSectionsByClass,
+  fetchGroupsByClass,
+} from '../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks';
 import DashLayout from '../../../../Components/Admin/AdminDashLayout';
 import Layout from '../../../../Components/Common/Layout';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useNavigate } from 'react-router-dom';
 
 const { Option } = Select;
 
@@ -42,18 +46,22 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate(); // Initialize navigate
 
-  // Accessing classes and subjects from Redux store
+  // Accessing classes, subjects, sections, and groups from Redux store
   const classes = useSelector((state) => state.admin.class.classes);
   const subjects = useSelector((state) => state.admin.subject.subjects);
+  const sectionsList = useSelector((state) => state.admin.group_section.sectionsList);
+  const groupsList = useSelector((state) => state.admin.group_section.groupsList);
 
   const [formData, setFormData] = useState({
     name: timetable.name || '',
     classId: timetable.classId || '',
+    sectionId: timetable.sectionId || '',
+    groupId: timetable.groupId || '',
     startDate: timetable.validity?.startDate
-      ? timetable.validity.startDate.split('T')[0]
+      ? moment(timetable.validity.startDate).format('YYYY-MM-DD')
       : '',
     endDate: timetable.validity?.endDate
-      ? timetable.validity.endDate.split('T')[0]
+      ? moment(timetable.validity.endDate).format('YYYY-MM-DD')
       : '',
     type: timetable.type || 'weekly',
   });
@@ -84,15 +92,27 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
     }
   }, []);
 
-  // Debugging: Log subjects to verify data
+  // Fetch subjects, sections, and groups when classId changes
+  useEffect(() => {
+    if (formData.classId) {
+      dispatch(fetchSubjects(formData.classId));
+      dispatch(fetchSectionsByClass(formData.classId));
+      dispatch(fetchGroupsByClass(formData.classId));
+    }
+  }, [formData.classId, dispatch]);
+
+  // Debugging: Log subjects, sections, and groups to verify data
   useEffect(() => {
     console.log('Fetched Subjects:', subjects);
   }, [subjects]);
 
-  // Debugging: Log selected class
   useEffect(() => {
-    console.log('Selected Class ID:', formData.classId);
-  }, [formData.classId]);
+    console.log('Fetched Sections:', sectionsList);
+  }, [sectionsList]);
+
+  useEffect(() => {
+    console.log('Fetched Groups:', groupsList);
+  }, [groupsList]);
 
   // Handle cell value changes
   const handleCellChange = (value, record, dataIndex) => {
@@ -112,6 +132,7 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
     <Input
       value={text}
       onChange={(e) => handleCellChange(e.target.value, record, dataIndex)}
+      required
     />
   );
 
@@ -158,7 +179,7 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
       >
         {subjects && subjects.length > 0 ? (
           subjects.map((subject) => (
-            <Option key={subject.subjectId} value={subject.subjectId}>
+            <Option key={subject._id} value={subject._id}>
               {subject.subjectName}
             </Option>
           ))
@@ -176,6 +197,7 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
       value={text}
       onChange={(e) => handleCellChange(e.target.value, record, dataIndex)}
       placeholder="Enter Description"
+      required
     />
   );
 
@@ -188,7 +210,7 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
         width: 70,
         fixed: 'left',
       },
-      // The rest of the columns will be appended based on type
+      // Additional columns will be appended based on type
     ];
 
     if (formData.type === 'weekly') {
@@ -204,7 +226,7 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
           title: 'Day',
           dataIndex: 'day',
           width: 150,
-          render: (text, record) => renderDayDropdown(text, record, 'day'), // Updated
+          render: (text, record) => renderDayDropdown(text, record, 'day'),
         },
         {
           title: 'Start Time',
@@ -217,6 +239,12 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
           dataIndex: 'endTime',
           width: 150,
           render: (text, record) => renderTimePicker(text, record, 'endTime'),
+        },
+        {
+          title: 'Description',
+          dataIndex: 'description',
+          width: 250,
+          render: (text, record) => renderDescription(text, record, 'description'),
         },
       ];
     } else if (formData.type === 'exam') {
@@ -246,6 +274,12 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
           width: 150,
           render: (text, record) => renderDatePicker(text, record, 'date'),
         },
+        {
+          title: 'Description',
+          dataIndex: 'description',
+          width: 250,
+          render: (text, record) => renderDescription(text, record, 'description'),
+        },
       ];
     } else if (formData.type === 'event') {
       return [
@@ -273,6 +307,12 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
           dataIndex: 'date',
           width: 150,
           render: (text, record) => renderDatePicker(text, record, 'date'),
+        },
+        {
+          title: 'Description',
+          dataIndex: 'description',
+          width: 250,
+          render: (text, record) => renderDescription(text, record, 'description'),
         },
       ];
     } else if (formData.type === 'others') {
@@ -338,16 +378,19 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
         newRow.day = '';
         newRow.startTime = '';
         newRow.endTime = '';
+        newRow.description = '';
       } else if (formData.type === 'exam') {
         newRow.subjectId = '';
         newRow.startTime = '';
         newRow.endTime = '';
         newRow.date = '';
+        newRow.description = '';
       } else if (formData.type === 'event') {
         newRow.eventName = '';
         newRow.startTime = '';
         newRow.endTime = '';
         newRow.date = '';
+        newRow.description = '';
       } else if (formData.type === 'others') {
         newRow.otherTitle = '';
         newRow.subjectId = '';
@@ -370,13 +413,11 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
     setDataSource((prevData) => {
       const newData = [...prevData];
       const rowsToDelete = [];
-      const indicesToDelete = [];
 
       selectedRowKeys.forEach((key) => {
         const index = newData.findIndex((item) => item.key === key);
         if (index > -1) {
           rowsToDelete.push({ ...newData[index], originalIndex: index });
-          indicesToDelete.push(index);
         }
       });
 
@@ -447,13 +488,20 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
       errors.push('Start date is required.');
     }
 
-    if ((formData.type === 'exam' || formData.type === 'event') && !formData.endDate) {
+    if (
+      (formData.type === 'exam' || formData.type === 'event') &&
+      !formData.endDate
+    ) {
       errors.push('End date is required for exam or event.');
     }
 
+    // Description in formData is not used; descriptions are in each row
+    // Remove this check or update if necessary
+    /*
     if (formData.type === 'others' && !formData.description) {
       errors.push('Description is required for others type.');
     }
+    */
 
     if (dataSource.length === 0) {
       errors.push('At least one row must be added to the timetable.');
@@ -470,6 +518,9 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
         if (!row.startTime || !row.endTime) {
           errors.push(`Start and end time are required for row ${index + 1}.`);
         }
+        if (!row.description) {
+          errors.push(`Description is required for row ${index + 1}.`);
+        }
       } else if (formData.type === 'exam') {
         if (!row.subjectId) {
           errors.push(`Subject is required for row ${index + 1}.`);
@@ -480,6 +531,9 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
         if (!row.date) {
           errors.push(`Date is required for row ${index + 1}.`);
         }
+        if (!row.description) {
+          errors.push(`Description is required for row ${index + 1}.`);
+        }
       } else if (formData.type === 'event') {
         if (!row.eventName) {
           errors.push(`Event name is required for row ${index + 1}.`);
@@ -489,6 +543,9 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
         }
         if (!row.date) {
           errors.push(`Date is required for row ${index + 1}.`);
+        }
+        if (!row.description) {
+          errors.push(`Description is required for row ${index + 1}.`);
         }
       } else if (formData.type === 'others') {
         if (!row.otherTitle) {
@@ -514,6 +571,8 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
     const timetableData = {
       name: formData.name,
       classId: formData.classId,
+      sectionId: formData.sectionId || null,
+      groupId: formData.groupId || null,
       type: formData.type,
       validity: {
         startDate: new Date(formData.startDate).toISOString(),
@@ -534,13 +593,14 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
           subjectId: row.subjectId,
           startTime: row.startTime,
           endTime: row.endTime,
+          description: row.description,
         });
       });
       timetableData.days = Object.keys(dayMap).map((day) => ({
         day,
         slots: dayMap[day],
       }));
-    } else if (formData.type === 'exam' || formData.type === 'event') {
+    } else if (formData.type === 'exam') {
       const dateMap = {};
       dataSource.forEach((row) => {
         const formattedDate = moment(row.date, 'YYYY-MM-DD').toISOString();
@@ -548,14 +608,30 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
           dateMap[formattedDate] = [];
         }
         const slotData = {
+          subjectId: row.subjectId,
           startTime: row.startTime,
           endTime: row.endTime,
+          description: row.description,
         };
-        if (formData.type === 'exam') {
-          slotData.subjectId = row.subjectId;
-        } else if (formData.type === 'event') {
-          slotData.eventName = row.eventName;
+        dateMap[formattedDate].push(slotData);
+      });
+      timetableData.days = Object.keys(dateMap).map((date) => ({
+        date,
+        slots: dateMap[date],
+      }));
+    } else if (formData.type === 'event') {
+      const dateMap = {};
+      dataSource.forEach((row) => {
+        const formattedDate = moment(row.date, 'YYYY-MM-DD').toISOString();
+        if (!dateMap[formattedDate]) {
+          dateMap[formattedDate] = [];
         }
+        const slotData = {
+          eventName: row.eventName,
+          startTime: row.startTime,
+          endTime: row.endTime,
+          description: row.description,
+        };
         dateMap[formattedDate].push(slotData);
       });
       timetableData.days = Object.keys(dateMap).map((date) => ({
@@ -605,13 +681,6 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
     onClose();
   };
 
-  // Fetch subjects when classId changes
-  useEffect(() => {
-    if (formData.classId) {
-      dispatch(fetchSubjects(formData.classId));
-    }
-  }, [formData.classId, dispatch]);
-
   // Row Selection
   const rowSelection = {
     selectedRowKeys,
@@ -629,6 +698,7 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
           <form onSubmit={handleSubmit} className="w-full space-y-6">
             {/* Form Inputs */}
             <div className="flex flex-wrap -mx-2">
+              {/* Name */}
               <div className="w-full md:w-1/5 px-2 mb-4">
                 <label className="block mb-1">Name</label>
                 <Input
@@ -638,6 +708,7 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
                   required
                 />
               </div>
+              {/* Start Date */}
               <div className="w-full md:w-1/5 px-2 mb-4">
                 <label className="block mb-1">Start Date</label>
                 <Input
@@ -647,6 +718,7 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
                   required
                 />
               </div>
+              {/* End Date */}
               <div className="w-full md:w-1/5 px-2 mb-4">
                 <label className="block mb-1">End Date</label>
                 <Input
@@ -657,12 +729,13 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
                   disabled={!(formData.type === 'exam' || formData.type === 'event')}
                 />
               </div>
+              {/* Select Class */}
               <div className="w-full md:w-1/5 px-2 mb-4">
                 <label className="block mb-1">Select Class</label>
                 <Select
                   value={formData.classId || ''}
                   onChange={(value) => {
-                    setFormData({ ...formData, classId: value });
+                    setFormData({ ...formData, classId: value, sectionId: '', groupId: '' });
                   }}
                   style={{ width: '100%' }}
                   required
@@ -676,6 +749,55 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
                   ))}
                 </Select>
               </div>
+              {/* Select Section */}
+              <div className="w-full md:w-1/5 px-2 mb-4">
+                <label className="block mb-1">Select Section</label>
+                <Select
+                  value={formData.sectionId || ''}
+                  onChange={(value) => setFormData({ ...formData, sectionId: value })}
+                  style={{ width: '100%' }}
+                  placeholder="Select Section"
+                  disabled={!formData.classId || sectionsList.length === 0}
+                >
+                  <Option value="">Select Section</Option>
+                  {sectionsList.length > 0 ? (
+                    sectionsList.map((section) => (
+                      <Option key={section._id} value={section._id}>
+                        {section.sectionName}
+                      </Option>
+                    ))
+                  ) : (
+                    <Option value="" disabled>
+                      No sections available
+                    </Option>
+                  )}
+                </Select>
+              </div>
+              {/* Select Group */}
+              <div className="w-full md:w-1/5 px-2 mb-4">
+                <label className="block mb-1">Select Group</label>
+                <Select
+                  value={formData.groupId || ''}
+                  onChange={(value) => setFormData({ ...formData, groupId: value })}
+                  style={{ width: '100%' }}
+                  placeholder="Select Group"
+                  disabled={!formData.classId || groupsList.length === 0}
+                >
+                  <Option value="">Select Group</Option>
+                  {groupsList.length > 0 ? (
+                    groupsList.map((group) => (
+                      <Option key={group._id} value={group._id}>
+                        {group.groupName}
+                      </Option>
+                    ))
+                  ) : (
+                    <Option value="" disabled>
+                      No groups available
+                    </Option>
+                  )}
+                </Select>
+              </div>
+              {/* Table Type */}
               <div className="w-full md:w-1/5 px-2 mb-4">
                 <label className="block mb-1">Table Type</label>
                 <Select
