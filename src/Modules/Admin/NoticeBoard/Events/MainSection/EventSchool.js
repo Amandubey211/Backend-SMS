@@ -13,7 +13,7 @@ import {
   setSidebarContent,
   resetSidebarContent,
 } from "../../../../../Store/Slices/Admin/NoticeBoard/Events/eventSlice";
-import { format, isValid, parse } from "date-fns";
+import { format, isValid, parse, parseISO } from "date-fns";
 import toast from "react-hot-toast";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
 import { IoCalendarOutline } from "react-icons/io5";
@@ -64,8 +64,8 @@ const EventScheduler = () => {
       
       handleSidebarClose();
   
-      // Fetch the updated list of events after saving
-      dispatch(fetchEventsThunk()); // Automatically refresh events after creating/updating
+      
+      dispatch(fetchEventsThunk()); 
   
     } catch (error) {
       toast.error("Failed to save event");
@@ -99,41 +99,34 @@ const EventScheduler = () => {
 
   // Custom date cell render for the calendar
   const handleDateCellRender = (value) => {
-    const formattedDate = format(value.toDate(), "yyyy-MM-dd");
-    const dayEvents = events.filter(
-      (event) => format(new Date(event?.date), "yyyy-MM-dd") === formattedDate
-    );
+    if (events?.length > 0) {
+        // Format the date for comparison
+        const formattedDate = format(value?.toDate(), "yyyy-MM-dd");
 
-    const bgColors = ["bg-pink-500", "bg-purple-500", "bg-blue-500", "bg-indigo-500"];
+        // Filter events to match the formatted date
+        const dayEvents = events?.filter((event) => {
+            const eventDate = event?.date ? parseISO(event.date) : null;
+            return isValid(eventDate) && format(eventDate, "yyyy-MM-dd") === formattedDate;
+        });
 
-    return (
-      <ul className="events space-y-1 max-h-20 overflow-y-auto">
-        {dayEvents.map((event, index) => {
-          let formattedTime = "No time"; // Default fallback for time
-          if (event?.time) {
-            try {
-              // Since all times in the DB are in "hh:mm a" format, directly parse it this way
-              const eventTime = parse(event?.time, "hh:mm a", new Date("1970-01-01"));
-              formattedTime = isValid(eventTime) ? format(eventTime, "hh:mm a") : "No time";
-            } catch (error) {
-              console.error("Error formatting time:", error);
-            }
-          }
+        const bgColors = ["bg-pink-500", "bg-purple-500", "bg-blue-500", "bg-indigo-500"];
 
-          return (
-            <li
-              key={event?._id}
-              className={`inline-block px-2 py-1 rounded text-white ${bgColors[index % bgColors.length]
-                } shadow-md cursor-pointer`}
-              onClick={() => handleEventClick(event)}
-            >
-              {event?.title} - {formattedTime}
-            </li>
-          );
-        })}
-      </ul>
-    );
-  };
+        return (
+            <ul className="events space-y-1 max-h-20 overflow-y-auto">
+                {dayEvents.map((event, index) => (
+                    <li
+                        key={event?._id}
+                        className={`inline-block px-2 py-1 rounded text-white ${bgColors[index % bgColors.length]} shadow-md cursor-pointer`}
+                        onClick={() => handleEventClick(event)}
+                    >
+                        {event?.title} - {event?.time || '-'}
+                    </li>
+                ))}
+            </ul>
+        );
+    }
+    return null;
+};
 
 
   const sidebarTitle =

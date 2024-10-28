@@ -29,10 +29,16 @@ import "../Utils/translator/i18n.js";
 import i18next from "i18next";
 import { useSelector } from "react-redux";
 import GraduationPage from "../Modules/Admin/Graduation/GraduationPage.js";
+import TimeTablePage from "../Modules/Admin/TimeTable/TimeTablePage.js";
+import CreateOrEditTimeTable from "../Modules/Admin/TimeTable/Components/CreateOrEditTimeTable.js";
 // lazy loaded routes
 
 const Academic = lazy(() =>
   import("../Modules/Admin/AcademicYear/Academic.js")
+);
+
+const commonAcademic = lazy(() =>
+  import("../Components/Common/AcademicYear/Academic.js")
 );
 // const CreateAcademicYear = lazy(() =>
 //   import("../Components/Admin/CreateAcademicYear.js")
@@ -307,6 +313,11 @@ function App() {
   const AppRouter = createBrowserRouter([
     // common-------------------------------------------------------------------------------------
     { path: "/", element: <Home />, errorElement: <Error /> },
+    {
+      path: "/dashboard/select/academic",
+      element: <ProtectRoute Component={commonAcademic} allowedRoles={["admin","parent","student","teacher","accountant","librarain","staff"]} />,
+      errorElement: <Error />,
+    },
     {
       path: "/studentlogin",
       element: <StudentLogin />,
@@ -650,6 +661,27 @@ function App() {
     },
     { path: "library", element: <Libary />, errorElement: <Error /> },
     {
+      path: "/noticeboard/timetable",
+      element: (
+        <ProtectRoute
+          Component={TimeTablePage}
+          allowedRoles={["admin", "teacher"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+
+    {
+      path: "/noticeboard/timetable/create-new-timeTable",
+      element: (
+        <ProtectRoute
+          Component={CreateOrEditTimeTable}
+          allowedRoles={["admin", "teacher"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
       path: "/noticeboard/events",
       element: (
         <ProtectRoute
@@ -716,6 +748,7 @@ function App() {
       ),
       errorElement: <Error />,
     },
+    
     {
       path: "/users/parents",
       element: (

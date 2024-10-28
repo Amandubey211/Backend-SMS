@@ -6,7 +6,7 @@ const priorityClasses = {
 };
 
 
-const Notice = ({ title, date, priority, content, image, backgroundColor, descriptionLength }) => {
+const Notice = ({ title, date, priority, content, image, backgroundColor, descriptionLength ,authorName}) => {
 
   const truncateText = (text, maxLength) => {
     return text.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
@@ -22,7 +22,7 @@ const Notice = ({ title, date, priority, content, image, backgroundColor, descri
         </div>
       </div>
       <div className="flex flex-col gap-1 flex-grow">
-        <h2 className="text-lg font-semibold text-gray-800">{title}</h2>
+        <h2 className="text-lg font-semibold text-gray-800">{title} <span className="ml-4 text-sm text-gray-500">(Posted by <span className="text-sm text-gray-700">{authorName || '-'}</span>)</span></h2>
         <div className="flex items-center gap-4 mb-2">
           <div className="flex gap-1 items-center">
             <IoCalendarOutline />

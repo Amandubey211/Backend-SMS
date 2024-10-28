@@ -6,6 +6,7 @@ import { combineReducers } from "redux";
 import authReducer from "./Slices/Common/Auth/reducers/authSlice"; // Importing the auth slice reducer
 import userReducer from "./Slices/Common/User/reducers/userSlice"; // Importing the user slice reducer
 import alertReducer from "./Slices/Common/Alerts/alertsSlice";
+import academicYearReducer from "./Slices/Common/AcademicYear/academicYear.slice";
 
 // admin
 import adminDashboardReducer from "./Slices/Admin/Dashboard/adminDashboardSlice";
@@ -41,6 +42,7 @@ import adminAnnouncementCommentsReducer from "./Slices/Admin/Class/Announcement/
 import adminAssignmentReducer from "./Slices/Admin/Class/Assignment/assignmentSlice";
 import adminQuizReducer from "./Slices/Admin/Class/Quiz/quizSlice";
 import adminSpeedGradeReducer from "./Slices/Admin/Class/SpeedGrade/speedGradeSlice";
+import timetableReducer from "./Slices/Admin/TimeTable/timtableSlice";
 
 // student
 import studentDashboardReducer from "./Slices/Student/Dashboard/studentDashboardSlices";
@@ -111,7 +113,10 @@ const commonReducer = combineReducers({
   auth: persistReducer(authPersistConfig, authReducer),
   user: persistReducer(userPersistConfig, userReducer),
   alertMsg: alertReducer,
+  academicYear:academicYearReducer,
 });
+
+
 const AdminReducer = combineReducers({
   adminDashboard: adminDashboardReducer,
   class: classReducer,
@@ -135,11 +140,9 @@ const AdminReducer = combineReducers({
   comments: adminCommentReducer,
   assignments: adminAssignmentReducer,
   quizzes: adminQuizReducer,
-
+  timetable: timetableReducer,
   speedgrades: adminSpeedGradeReducer,
-
   graduates: graduateReducer,
-
   all_students: allStudentReducer,
   all_parents: allParentReducer,
   all_staff: allstaffReducer,
@@ -150,6 +153,8 @@ const AdminReducer = combineReducers({
   subject_assignment: subjectAssignmentReducer,
   subject_quiz: subjectQuizReducer,
 });
+
+
 const studentReducer = combineReducers({
   studentDashboard: studentDashboardReducer,
   studentFinance: studentFinanceReducer,

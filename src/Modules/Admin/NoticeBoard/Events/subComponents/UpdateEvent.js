@@ -135,6 +135,7 @@ const UpdateEvent = () => {
             label="Location"
             value={eventData.location}
             onChange={handleInputChange}
+            required
           />
           <FormInput
             id="director"
@@ -142,6 +143,7 @@ const UpdateEvent = () => {
             label="Event Director"
             value={eventData.director}
             onChange={handleInputChange}
+            required
           />
           <FormInput
             id="type"
@@ -149,6 +151,7 @@ const UpdateEvent = () => {
             label="Event Type"
             value={eventData.type}
             onChange={handleInputChange}
+            required
           />
 
           <div>

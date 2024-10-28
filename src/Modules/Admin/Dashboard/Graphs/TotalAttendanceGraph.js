@@ -120,7 +120,7 @@ const TotalAttendanceGraph = () => {
   const yearLabel = year === currentYear ? "Current Year" : "Past Year";
 
   return (
-    <div className="bg-white p-4 h-[100%] border border-red">
+    <div className="bg-white p-4 h-[100%] ">
       <div className="flex justify-between items-center mb-4">
         <div>
           <h2 className="text-xl font-semibold">Today's Attendance</h2>

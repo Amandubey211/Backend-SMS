@@ -41,10 +41,8 @@ const DashboardNoticeBoard = (descriptionLength) => {
     return <p>Error: {error}</p>;
   }
 
-  // Ensure notices is an array and create a copy before sorting
-  const noticesArray = Array.isArray(notices) ? [...notices] : [];
-  const noticesSort = noticesArray.sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
-  const topNotices = noticesSort.slice(0, 3);
+  
+  const topNotices = notices.slice(0, 3);
 
   return (
     <div className="p-2">
@@ -70,10 +68,11 @@ const DashboardNoticeBoard = (descriptionLength) => {
           <Notice
             key={index}
             image={icons[index % icons.length]} // Use cyclic icons
-            title={notice.title}
+            title={notice?.title}
             date={new Date(notice.startDate).toLocaleDateString()} // Formatting date
-            priority={notice.priority}
-            content={notice.description} // Changed 'content' to 'description' based on API response
+            priority={notice?.priority}
+            authorName={notice?.authorName}
+            content={notice?.description} // Changed 'content' to 'description' based on API response
             backgroundColor={generateRandomColor()}
             descriptionLength={descriptionLength}
           />

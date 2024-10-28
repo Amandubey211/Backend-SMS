@@ -4,6 +4,7 @@ import toast from "react-hot-toast";
 import { createNoticeThunk, updateNoticeThunk } from "../../../../Store/Slices/Admin/NoticeBoard/Notice/noticeThunks";
 import { fetchAllClasses } from "../../../../Store/Slices/Admin/Class/actions/classThunk";
 import { FiLoader } from "react-icons/fi"; // Icon for the spinner
+import { fetchStudentsByClassAndSection } from "../../../../Store/Slices/Admin/Class/Students/studentThunks";
 
 const AddNotice = ({ isEditing, onClose }) => {
   const dispatch = useDispatch();
@@ -11,6 +12,7 @@ const AddNotice = ({ isEditing, onClose }) => {
   const { selectedNotice, loading } = useSelector((state) => state.admin.notice);
   const { classes } = useSelector((state) => state.admin.class); // Assuming classes are stored here
   const role = useSelector((store) => store.common.auth.role);
+  const {studentsList,loading:studentLoading} = useSelector((store) => store.admin.students);
 
   const [announcementData, setAnnouncementData] = useState({
     title: "",
@@ -18,7 +20,8 @@ const AddNotice = ({ isEditing, onClose }) => {
     endDate: "",
     description: "",
     priority: "High priority",
-    classId: "", // Add classId to the state
+    classId: "", 
+    noticeFor: "", 
   });
 
   // Fetch classes when the component mounts
@@ -44,13 +47,17 @@ const AddNotice = ({ isEditing, onClose }) => {
         endDate: "",
         description: "",
         priority: "High priority",
-        classId: "", // Reset classId
+        classId: "",
+        noticeFor: "",
       });
     }
   }, [isEditing, selectedNotice]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    if(name == 'classId'){
+      dispatch(fetchStudentsByClassAndSection(value))
+    }
     setAnnouncementData({ ...announcementData, [name]: value });
   };
 
@@ -60,7 +67,7 @@ const AddNotice = ({ isEditing, onClose }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!announcementData.title || !announcementData.startDate || !announcementData.endDate || !announcementData.classId) {
+    if (!announcementData.title || !announcementData.startDate || !announcementData.endDate) {
       toast.error("Please fill in all required fields.");
       return;
     }
@@ -138,9 +145,8 @@ const AddNotice = ({ isEditing, onClose }) => {
             value={announcementData.classId}
             onChange={handleInputChange}
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-            required
           >
-            <option value="">Select Class</option>
+            <option value="">All</option>
             {classes &&
               classes.map((classItem) => (
                 <option key={classItem._id} value={classItem._id}>
@@ -149,7 +155,27 @@ const AddNotice = ({ isEditing, onClose }) => {
               ))}
           </select>
         </div>
-
+        <div className="mb-4">
+          <label htmlFor="class" className="block text-sm font-medium text-gray-700" >
+            Notice for (student)
+          </label>
+          <select
+            id="noticeFor"
+            name="noticeFor"
+            value={announcementData.noticeFor}
+            onChange={handleInputChange}
+            disabled={studentLoading}
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+          >
+            <option value="">All</option>
+            {studentsList &&
+              studentsList.map((s) => (
+                <option key={s?._id} value={s?._id}>
+                  {s?.firstName} 
+                </option>
+              ))}
+          </select>
+        </div>
         {/* Description */}
         <div className="mb-4">
           <label htmlFor="description" className="block text-sm font-medium text-gray-700">

@@ -1,22 +1,28 @@
 import React, { useState, useRef } from "react";
-import ImageUpload from "./Components/ImageUpload";
+import { useSelector, useDispatch } from "react-redux";
+import toast from "react-hot-toast";
+import {
+  registerStudentDetails,
+  uploadStudentDocuments,
+} from "../../../Store/Slices/Common/Auth/actions/studentActions";
 import PersonalInfo from "./Components/PersonalInfo";
 import AddressInfo from "./Components/AddressInfo";
 import AdmissionInfo from "./Components/AdmissionInfo";
 import ParentInfo from "./Components/ParentInfo";
 import DocumentUploadForm from "../../LoginPages/Student/SignUp/DocumentUploadForm";
-import useAddStudent from "../../../Hooks/AuthHooks/Staff/Admin/Students/useAddStudent";
-import { useSelector } from "react-redux";
-import toast from "react-hot-toast";
-import validateStudentDetails from "../../../Validataions/Student/validateStudentDetails";
-import useSaveDetails from "../../../Hooks/AuthHooks/Student/useSaveDetails";
-import useSaveDocument from "../../../Hooks/AuthHooks/Student/useSaveDocuments";
+import ImageUpload from "./Components/ImageUpload";
 import StudentCard from "./Components/StudentCard";
+import validateStudentDetails from "../../../Validataions/Student/validateStudentDetails";
 
 const StudentInfo = () => {
+  const dispatch = useDispatch();
   const schoolId = useSelector(
-    (store) => store.common.user.userDetails.schoolId
+    (store) => store.common.user.userDetails?.schoolId || ""
   );
+  const { loading } = useSelector((store) => store.common.auth);
+  const [errors, setErrors] = useState({});
+  const formRef = useRef(null);
+
   const [studentInfo, setStudentInfo] = useState({
     firstName: "",
     lastName: "",
@@ -49,118 +55,86 @@ const StudentInfo = () => {
       postalCode: "",
       country: "",
     },
-    placeOfBirth: "",
-    emergencyNumber: "",
     transportRequirement: false,
     Q_Id: "",
     applyingClass: "",
     enrollmentStatus: "",
-    //transportRequirement: "",
-    enrollmentStatus: "",
     schoolId: schoolId,
-    // fatherImage: null,
-    // motherImage: null,
   });
 
   const [imagePreview, setImagePreview] = useState(null);
-  const [fatherImagePreview, setFatherImagePreview] = useState(null);
-  const [motherImagePreview, setMotherImagePreview] = useState(null);
-  const [sameAddress, setSameAddress] = useState(false);
   const [profile, setProfile] = useState(null);
+  const [imageError, setImageError] = useState(""); // State for image validation error
   const fileInputRef = useRef(null);
 
-  const { loading, error, addStudent } = useAddStudent();
-  const { loading: saveLoading, saveDetails } = useSaveDetails();
-  const { loading: docLoading, saveDocument } = useSaveDocument();
-
-  const [preview, setPreview] = useState([]);
   const [studentDocuments, setStudentDocuments] = useState({
     documentLabels: [""],
     documents: [],
     schoolId: schoolId,
     email: studentInfo.email,
   });
+  const [preview, setPreview] = useState([]);
+
+  const inputRefs = {
+    firstName: useRef(null),
+    lastName: useRef(null),
+    email: useRef(null),
+    dateOfBirth: useRef(null),
+    placeOfBirth: useRef(null),
+    emergencyNumber: useRef(null),
+    gender: useRef(null),
+    contactNumber: useRef(null),
+    bloodGroup: useRef(null),
+    religion: useRef(null),
+    motherName: useRef(null),
+    fatherName: useRef(null),
+    guardianName: useRef(null),
+    guardianRelationToStudent: useRef(null),
+    guardianContactNumber: useRef(null),
+    guardianEmail: useRef(null),
+    applyingClass: useRef(null),
+    Q_Id: useRef(null),
+    enrollmentStatus: useRef(null),
+    transportRequirement: useRef(null),
+    permanentAddressStreet: useRef(null),
+    permanentAddressCity: useRef(null),
+    permanentAddressState: useRef(null),
+    permanentAddressPostalCode: useRef(null),
+    permanentAddressCountry: useRef(null),
+    residentialAddressStreet: useRef(null),
+    residentialAddressCity: useRef(null),
+    residentialAddressState: useRef(null),
+    residentialAddressPostalCode: useRef(null),
+    residentialAddressCountry: useRef(null),
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    setErrors((prevErrors) => ({ ...prevErrors, [name]: null }));
 
-    if (name === "dateOfBirth") {
-      const age = calculateAge(new Date(value));
-      setStudentInfo({
-        ...studentInfo,
-        [name]: value,
-        age: age,
-      });
-    } else {
-      setStudentInfo({
-        ...studentInfo,
-        [name]: value,
-      });
-    }
-  };
-
-  // Helper function to calculate age based on DOB
-  const calculateAge = (dob) => {
-    const diffMs = Date.now() - dob.getTime();
-    const ageDate = new Date(diffMs);
-    return Math.abs(ageDate.getUTCFullYear() - 1970);
-  };
-
-  const handleAddressChange = (e, type) => {
-    const { name, value } = e.target;
-    setStudentInfo({
-      ...studentInfo,
-      [type]: {
-        ...studentInfo[type],
-        [name]: value,
-      },
+    setStudentInfo((prevState) => {
+      const keys = name.split(".");
+      if (keys.length === 1) {
+        return { ...prevState, [name]: value };
+      }
+      const [parentKey, childKey] = keys;
+      return {
+        ...prevState,
+        [parentKey]: {
+          ...prevState[parentKey],
+          [childKey]: value,
+        },
+      };
     });
   };
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result);
-      };
-      reader.readAsDataURL(file);
-      setProfile(file);
-    }
-  };
-
-  // const handleFatherImageChange = (e) => {
-  //   const file = e.target.files[0];
-  //   if (file) {
-  //     const reader = new FileReader();
-  //     reader.onloadend = () => {
-  //       setFatherImagePreview(reader.result);
-  //     };
-  //     reader.readAsDataURL(file);
-  //     setStudentInfo({ ...studentInfo, fatherImage: file });
-  //   }
-  // };
-
-  // const handleMotherImageChange = (e) => {
-  //   const file = e.target.files[0];
-  //   if (file) {
-  //     const reader = new FileReader();
-  //     reader.onloadend = () => {
-  //       setMotherImagePreview(reader.result);
-  //     };
-  //     reader.readAsDataURL(file);
-  //     setStudentInfo({ ...studentInfo, motherImage: file });
-  //   }
-  // };
-
-  const handleSameAddressChange = (e) => {
-    setSameAddress(e.target.checked);
-    if (e.target.checked) {
-      setStudentInfo((prev) => ({
-        ...prev,
-        residentialAddress: { ...prev.permanentAddress },
-      }));
-    }
+  const handleClearPhoto = () => {
+    setStudentDocuments((prevState) => ({
+      ...prevState,
+      documents: [],
+    }));
+    setPreview([]);
+    fileInputRef.current.value = "";
   };
 
   const handlePhotoChange = (e) => {
@@ -188,78 +162,76 @@ const StudentInfo = () => {
     });
   };
 
-  const handleClearPhoto = () => {
-    setStudentDocuments((prevState) => ({
-      ...prevState,
-      documents: [],
-    }));
-    setPreview([]);
-    fileInputRef.current.value = "";
+  const handleValidation = () => {
+    const validationErrors = validateStudentDetails(studentInfo);
+    setErrors(validationErrors);
+    console.log(validationErrors, "pppppp");
+    // Check if there is an image error
+    if (!profile) {
+      setImageError("Profile image is required");
+      validationErrors.profile = "Profile image is required";
+    } else {
+      setImageError("");
+    }
+
+    // Identify the first field with an error to scroll into view
+    for (const errorKey in validationErrors) {
+      const refKey = errorKey.includes(".")
+        ? errorKey.split(".").join("")
+        : errorKey;
+
+      const ref = inputRefs[refKey]?.current;
+
+      if (ref) {
+        ref.scrollIntoView({ behavior: "smooth", block: "center" });
+        ref.focus();
+        break;
+      }
+    }
+
+    if (Object.keys(validationErrors).length > 0) {
+      toast.error("Please correct the errors in the form.");
+    }
+
+    return Object.keys(validationErrors).length === 0 && profile;
   };
 
   const handleDocumentSubmit = async (e) => {
     e.preventDefault();
 
-    if (!studentInfo.email) {
-      toast.error("Email is required");
-      return;
-    }
+    if (!handleValidation()) return;
 
-    const validationErrors = validateStudentDetails(studentInfo, "Admin");
-
-    if (Object.keys(validationErrors).length > 0) {
-      toast.error(Object.values(validationErrors)[0]);
-      return;
+    const formData = new FormData();
+    for (const [key, value] of Object.entries(studentInfo)) {
+      if (typeof value === "object" && value !== null) {
+        for (const [subKey, subValue] of Object.entries(value)) {
+          formData.append(`${key}[${subKey}]`, subValue);
+        }
+      } else {
+        formData.append(key, value);
+      }
     }
+    formData.append("profile", profile);
 
     try {
-      const formData = new FormData();
-      for (const key in studentInfo) {
-        if (studentInfo.hasOwnProperty(key)) {
-          if (key === "permanentAddress" || key === "residentialAddress") {
-            const address = studentInfo[key];
-            for (const field in address) {
-              if (address.hasOwnProperty(field)) {
-                formData.append(`${key}[${field}]`, address[field]);
-              }
-            }
-          } else {
-            formData.append(key, studentInfo[key]);
-          }
-        }
-      }
-
-      if (profile) {
-        formData.append("profile", profile);
-      } else {
-        toast.error("Profile image is required");
-        return;
-      }
-
-      const response = await saveDetails(formData);
-
-      if (response.success) {
-        toast.success("Details Saved Successfully");
-
-        if (studentDocuments?.documents.length !== 0) {
-          const documentResponse = await saveDocument(
-            studentInfo.email,
-            studentInfo.schoolId,
-            studentDocuments
+      const resultAction = await dispatch(registerStudentDetails(formData));
+      if (registerStudentDetails.fulfilled.match(resultAction)) {
+        // toast.success("Student registered successfully.");
+        if (studentDocuments.documents.length) {
+          await dispatch(
+            uploadStudentDocuments({
+              email: studentInfo.email,
+              schoolId,
+              studentDocuments,
+            })
           );
-          if (documentResponse?.success) {
-            toast.success("Documents uploaded successfully!");
-            // addStudent(studentInfo);
-          } else {
-            toast.error("Failed to upload the document");
-          }
+          // toast.success("Documents uploaded successfully.");
         }
       } else {
-        toast.error("Failed to save student details.");
+        toast.error("Failed to register student.");
       }
     } catch (error) {
-      console.error("Error in submitting documents:", error);
-      toast.error("An error occurred while submitting the documents.");
+      toast.error("An error occurred during submission.");
     }
   };
 
@@ -267,53 +239,53 @@ const StudentInfo = () => {
     <div className="flex gap-4 h-screen">
       <div className="p-8 max-w-4xl bg-white rounded-lg overflow-y-auto no-scrollbar">
         <h2 className="text-2xl font-semibold mb-6">Student Information</h2>
-        <form onSubmit={handleDocumentSubmit}>
+        <form ref={formRef} onSubmit={handleDocumentSubmit}>
           <div className="grid grid-cols-12 gap-4">
             <div className="col-span-4">
               <ImageUpload
                 imagePreview={imagePreview}
-                handleBrowseClick={() => fileInputRef.current.click()}
-                handleImageChange={handleImageChange}
-                handleRemoveImage={() => {
-                  setImagePreview(null);
-                  setProfile(null);
+                handleImageChange={(e) => {
+                  setProfile(e.target.files[0]);
+                  setImageError(""); // Clear the error when image is selected
+                  const reader = new FileReader();
+                  reader.onload = () => setImagePreview(reader.result);
+                  reader.readAsDataURL(e.target.files[0]);
                 }}
+                handleRemoveImage={() => {
+                  setProfile(null);
+                  setImagePreview(null);
+                  setImageError("Profile image is required"); // Set error if image is removed
+                }}
+                error={imageError} // Pass error state to ImageUpload component
+                inputRef={fileInputRef}
               />
             </div>
             <div className="col-span-8">
               <PersonalInfo
                 studentInfo={studentInfo}
                 handleInputChange={handleInputChange}
+                errors={errors}
+                inputRefs={inputRefs}
               />
             </div>
           </div>
           <AddressInfo
             studentInfo={studentInfo}
             handleInputChange={handleInputChange}
-            handleAddressChange={handleAddressChange}
-            sameAddress={sameAddress}
-            handleSameAddressChange={handleSameAddressChange}
+            errors={errors}
+            inputRefs={inputRefs}
           />
           <AdmissionInfo
             studentInfo={studentInfo}
             handleInputChange={handleInputChange}
+            errors={errors}
+            inputRefs={inputRefs}
           />
           <ParentInfo
             studentInfo={studentInfo}
             handleInputChange={handleInputChange}
-            // dont remove  the below code --------------------
-            // fatherImagePreview={fatherImagePreview}
-            // motherImagePreview={motherImagePreview}
-            // handleFatherImageChange={handleFatherImageChange}
-            // handleMotherImageChange={handleMotherImageChange}
-            // handleRemoveFatherImage={() => {
-            //   setFatherImagePreview(null);
-            //   setStudentInfo({ ...studentInfo, fatherImage: null });
-            // }}
-            // handleRemoveMotherImage={() => {
-            //   setMotherImagePreview(null);
-            //   setStudentInfo({ ...studentInfo, motherImage: null });
-            // }}
+            errors={errors}
+            inputRefs={inputRefs}
           />
           <DocumentUploadForm
             type="Admin"
@@ -326,20 +298,15 @@ const StudentInfo = () => {
             setPreview={setPreview}
             setStudentDocuments={setStudentDocuments}
             fileInputRef={fileInputRef}
-            handleDocumentSubmit={handleDocumentSubmit}
-            docloading={docLoading}
           />
           <div className="mt-6">
             <button
               type="submit"
               className="w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600 text-center"
-              disabled={loading || saveLoading || docLoading}
+              disabled={loading}
             >
-              {loading || saveLoading || docLoading
-                ? "Registering..."
-                : "Add Student"}
+              {loading ? "Registering..." : "Add Student"}
             </button>
-            {error && <p className="text-red-500">{error}</p>}
           </div>
         </form>
       </div>

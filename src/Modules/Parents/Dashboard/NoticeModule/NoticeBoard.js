@@ -144,6 +144,7 @@ const NoticeBoard = ({ textTrimCount }) => {
           title={notice.title || t("Untitled")}
           startDate={notice.startDate || "N/A"}
           endDate={notice.endDate || "N/A"}
+          authorName = {notice?.authorName}
           priority={
             <span
               className={notice.priority === "High priority"

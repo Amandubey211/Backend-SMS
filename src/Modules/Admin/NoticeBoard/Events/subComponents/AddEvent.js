@@ -44,40 +44,36 @@ const AddEvent = () => {
     });
   };
 
-  // Helper function to convert 24-hour time to 12-hour format with AM/PM
   const formatTimeTo12Hour = (time) => {
+    // Check if the time is valid and in the correct format
+    if (!time || !/^\d{2}:\d{2}$/.test(time)) {
+      return ""; // Return an empty string or handle it as necessary
+    }
+  
     const [hour, minute] = time.split(":");
     let hours = parseInt(hour, 10);
     const suffix = hours >= 12 ? "PM" : "AM";
-    hours = hours % 12 || 12; // Convert 24-hour to 12-hour format
+    hours = hours % 12 || 12;
     return `${hours}:${minute} ${suffix}`;
   };
+  
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    if (
-      !eventData.title ||
-      !eventData.date ||
-      !eventData.time ||
-      !eventData.image
-    ) {
+    if (!eventData.title || !eventData.date) {
       toast.error("Please fill in all required fields.");
       return;
     }
-
-    // Convert the event time to 12-hour format before submission
-    const formattedTime = formatTimeTo12Hour(eventData.time);
-
-    // Dispatch with updated eventData (with formatted time)
-    await dispatch(createEventThunk({ ...eventData, time: formattedTime }));
-    toast.success("Event created successfully!");
+    const formattedTime = eventData.time ? formatTimeTo12Hour(eventData.time) : "";
+   dispatch(createEventThunk({ ...eventData, time: formattedTime }));
   };
+  
 
   return (
     <div className="flex flex-col h-full border-t max-w-xl mx-auto bg-white ">
       {/* Scrollable content area */}
       <div className="flex-grow overflow-auto p-4 no-scrollbar">
-        <form className="space-y-4 mb-8" onSubmit={handleSubmit}>
+        <form className="space-y-4 mb-8" >
           <ImageUpload
             imagePreview={eventData.imagePreview}
             handleImageChange={handleImageChange}
@@ -115,6 +111,7 @@ const AddEvent = () => {
             label="Location"
             value={eventData.location}
             onChange={handleInputChange}
+            required
           />
           <FormInput
             id="director"
@@ -122,6 +119,7 @@ const AddEvent = () => {
             label="Event Director"
             value={eventData.director}
             onChange={handleInputChange}
+            required
           />
           <FormInput
             id="type"
@@ -129,6 +127,7 @@ const AddEvent = () => {
             label="Event Type"
             value={eventData.type}
             onChange={handleInputChange}
+            required
           />
 
           {/* Replacing FormInput for description with textarea */}
