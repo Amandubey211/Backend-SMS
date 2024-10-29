@@ -3,8 +3,10 @@ import { useDispatch, useSelector } from "react-redux";
 import GraduateList from "./Components/GraduateList";
 import TopNavigationWithFilters from "./Components/TopNavigationWithFilters";
 import Sidebar from "./Components/Sidebar";
+import DeleteConfirmationModal from "../../../Components/Common/DeleteConfirmationModal";
 import { fetchGraduates, demoteStudents } from "../../../Store/Slices/Admin/Graduate/graduate.action";
 import { setSelectedGraduate, clearSelectedGraduate } from "../../../Store/Slices/Admin/Graduate/graduateSlice";
+import { toast } from "react-hot-toast"; // Ensure toast library is imported
 
 const GraduationMainSection = () => {
   const dispatch = useDispatch();
@@ -18,10 +20,13 @@ const GraduationMainSection = () => {
   const [filters, setFilters] = useState({}); // Stores applied filters
   const [isSidebarOpen, setSidebarOpen] = useState(false); // Sidebar visibility state
   const [selectedStudents, setSelectedStudents] = useState([]); // State to track selected students
+  const [isModalOpen, setModalOpen] = useState(false); // Manage modal visibility
+  const [modalLoading, setModalLoading] = useState(false); // Manage modal loading state
+  const [demoteFromSidebar, setDemoteFromSidebar] = useState(false); // Track if demotion is from Sidebar
 
   // Fetch graduate data on component mount
   useEffect(() => {
-    dispatch(fetchGraduates({ page: 1, limit: 10 })); // Initial fetch with pagination
+    dispatch(fetchGraduates({ page: 1, limit: 10 }));
   }, [dispatch]);
 
   // Update filtered students whenever the graduates data changes
@@ -64,20 +69,34 @@ const GraduationMainSection = () => {
     setSidebarOpen(false);
   };
 
-  // Handle demoting selected students in GraduateList
+  // Open modal for bulk demotion
   const handleDemoteStudents = () => {
-    dispatch(demoteStudents({ studentIds: selectedStudents })).then(() => {
-      dispatch(fetchGraduates({ ...filters, page: 1, limit: 10 }));
-      setSelectedStudents([]); // Reset selection after demotion
-    });
+    setDemoteFromSidebar(false); // Reset to false for bulk action
+    setModalOpen(true); // Open modal
   };
 
-  // Handle Sidebar demotion
-  const handleSidebarDemote = (studentId) => {
-    dispatch(demoteStudents({ studentIds: [studentId] })).then(() => {
-      closeSidebar(); // Close sidebar after demotion
-      dispatch(fetchGraduates({ ...filters, page: 1, limit: 10 })); // Refresh the list
-    });
+  // Open modal for sidebar demotion
+  const handleSidebarDemote = () => {
+    setDemoteFromSidebar(true); // Set to true for sidebar action
+    setModalOpen(true); // Open modal
+  };
+
+  // Confirm demotion action in modal
+  const confirmDemotion = () => {
+    setModalLoading(true);
+    const studentIds = demoteFromSidebar ? [selectedGraduate._id] : selectedStudents;
+
+    dispatch(demoteStudents({ studentIds }))
+      .then(() => {
+        toast.success(`${studentIds.length} student(s) have been demoted`);
+        if (demoteFromSidebar) closeSidebar();
+        else setSelectedStudents([]); // Clear selection after bulk demotion
+        dispatch(fetchGraduates({ ...filters, page: 1, limit: 10 })); // Refresh list
+      })
+      .finally(() => {
+        setModalLoading(false);
+        setModalOpen(false);
+      });
   };
 
   return (
@@ -94,7 +113,7 @@ const GraduationMainSection = () => {
         currentPage={currentPage}
         totalPages={totalPages}
         onPageChange={handlePageChange}
-        onDemoteStudents={handleDemoteStudents}
+        onDemoteStudents={handleDemoteStudents} // Trigger bulk demote modal
         loading={loading}
         error={error}
       />
@@ -104,9 +123,18 @@ const GraduationMainSection = () => {
         <Sidebar
           student={selectedGraduate}
           closeSidebar={closeSidebar}
-          onDemote={() => handleSidebarDemote(selectedGraduate._id)} // Pass demote function
+          onDemote={handleSidebarDemote} // Trigger sidebar demote modal
         />
       )}
+
+      {/* Confirmation Modal */}
+      <DeleteConfirmationModal
+        isOpen={isModalOpen}
+        onClose={() => setModalOpen(false)}
+        onConfirm={confirmDemotion}
+        loading={modalLoading}
+        text="Demote"
+      />
     </div>
   );
 };
