@@ -5,6 +5,7 @@ import Layout from "../../../Components/Common/Layout";
 import TimeTableMainSection from "./TimeTableMainSection";
 import TableView from "./Components/TableView"; // Import TableView component
 import useNavHeading from "../../../Hooks/CommonHooks/useNavHeading "; // To set navigation headings
+import UpdateTimeTable from "./Components/UpdateTimeTable";
 
 const TimeTablePage = () => {
   useNavHeading("Admin", "TimeTable"); // Set the heading for TimeTable section
@@ -15,6 +16,7 @@ const TimeTablePage = () => {
         <Routes>
           <Route path="/" element={<TimeTableMainSection />} /> {/* Main timetable section */}
           <Route path="viewtable/:tablename" element={<TableView />} /> {/* Detailed table view */}
+          <Route path="edit/:id" element={<UpdateTimeTable />}/> {/* Update time table */}
         </Routes>
       </DashLayout>
     </Layout>
