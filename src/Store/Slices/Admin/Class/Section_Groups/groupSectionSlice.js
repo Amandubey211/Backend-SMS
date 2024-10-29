@@ -38,6 +38,9 @@ const groupSectionSlice = createSlice({
     clearGroupsList(state) {
       state.groupsList = []; // Clear the groups list when switching classes
     },
+    clearSectionsList(state) { // Add this action
+      state.sectionsList = []; // Clear the sections list when switching classes
+    },
     clearError(state) {
       state.error = null;
     },
@@ -232,6 +235,7 @@ export const {
   setGroupsList,
   setUnassignedStudentsList,
   clearGroupsList, // Export the clearGroupsList action
+  clearSectionsList, // Export the clearSectionsList action
   clearError,
 } = groupSectionSlice.actions;
 
