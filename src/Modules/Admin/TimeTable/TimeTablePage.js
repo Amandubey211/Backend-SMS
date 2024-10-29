@@ -1,7 +1,9 @@
 import React from "react";
+import { Routes, Route } from "react-router-dom"; // Import Routes and Route
 import DashLayout from "../../../Components/Admin/AdminDashLayout"; // Admin layout with sidebar
 import Layout from "../../../Components/Common/Layout";
 import TimeTableMainSection from "./TimeTableMainSection";
+import TableView from "./Components/TableView"; // Import TableView component
 import useNavHeading from "../../../Hooks/CommonHooks/useNavHeading "; // To set navigation headings
 
 const TimeTablePage = () => {
@@ -10,7 +12,10 @@ const TimeTablePage = () => {
   return (
     <Layout title="TimeTable | Student Diwan">
       <DashLayout>
-        <TimeTableMainSection /> {/* TimeTable specific content */}
+        <Routes>
+          <Route path="/" element={<TimeTableMainSection />} /> {/* Main timetable section */}
+          <Route path="/view" element={<TableView />} /> {/* Detailed table view */}
+        </Routes>
       </DashLayout>
     </Layout>
   );

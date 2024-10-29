@@ -583,7 +583,7 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
         endDate: formData.endDate ? new Date(formData.endDate).toISOString() : undefined,
       },
       status: isActive ? 'active' : 'inactive',
-      days: [],
+      days: [], // We will populate this below
     };
 
     // Organize dataSource into days and slots
@@ -597,7 +597,7 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
           subjectId: row.subjectId,
           startTime: row.startTime,
           endTime: row.endTime,
-          description: row.description,
+          description: row.description, // Ensure this line is present
         });
       });
       timetableData.days = Object.keys(dayMap).map((day) => ({
@@ -615,7 +615,7 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
           subjectId: row.subjectId,
           startTime: row.startTime,
           endTime: row.endTime,
-          description: row.description,
+          description: row.description, // Ensure this line is present
         };
         dateMap[formattedDate].push(slotData);
       });
@@ -634,7 +634,7 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
           eventName: row.eventName,
           startTime: row.startTime,
           endTime: row.endTime,
-          description: row.description,
+          description: row.description, // Ensure this line is present
         };
         dateMap[formattedDate].push(slotData);
       });
@@ -653,7 +653,7 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
           subjectId: row.subjectId,
           startTime: row.startTime,
           endTime: row.endTime,
-          description: row.description,
+          description: row.description, // Ensure this line is present
         });
       });
       timetableData.days = Object.keys(titleMap).map((title) => ({
@@ -661,6 +661,9 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
         slots: titleMap[title],
       }));
     }
+
+    // Log the timetableData to inspect the payload
+    console.log('Timetable Data:', JSON.stringify(timetableData, null, 2));
 
     // Dispatch the action to create or update the timetable
     if (timetable._id) {
