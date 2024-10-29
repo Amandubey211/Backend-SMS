@@ -87,7 +87,7 @@ const TimeTableList = () => {
     day.slots.map((slot) => ({
       key: slot._id,
       eventName: slot.eventName || "N/A",
-      subject: slot.subjectId || "N/A",
+      subject: slot.subjectId?.name || "N/A",
       otherTitle: selectedTimetable?.name || "N/A",
       day: day.day || "N/A",
       date: formatDate(day.date || null),
@@ -129,7 +129,7 @@ const TimeTableList = () => {
               </p>
               <p className="text-sm text-gray-600 flex items-center">
                 <FaChalkboardTeacher className="text-indigo-400 mr-2" />
-                <strong>Class:</strong> {timetable.classId}
+                <strong>Class:</strong> {timetable.classId?.className || "N/A"}
               </p>
               {timetable.validity && (
                 <>
@@ -168,12 +168,12 @@ const TimeTableList = () => {
                             {timetable.type === "event" ? (
                               <p className="flex items-center">
                                 <FaClipboardList className="text-indigo-400 mr-2" />
-                                <strong>Event:</strong> {slot.eventName}
+                                <strong>Event:</strong> {slot.eventName || "N/A"}
                               </p>
                             ) : (
                               <p className="flex items-center">
                                 <FaClipboardList className="text-indigo-400 mr-2" />
-                                <strong>Subject:</strong> {slot.subjectId}
+                                <strong>Subject:</strong> {slot.subjectId?.name || "N/A"}
                               </p>
                             )}
                             <p className="flex items-center">
