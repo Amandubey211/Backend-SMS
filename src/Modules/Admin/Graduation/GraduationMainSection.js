@@ -3,29 +3,15 @@ import { useDispatch, useSelector } from "react-redux";
 import GraduateList from "./Components/GraduateList";
 import TopNavigationWithFilters from "./Components/TopNavigationWithFilters";
 import Sidebar from "./Components/Sidebar";
-import {
-  fetchGraduates,
-  demoteStudents,
-} from "../../../Store/Slices/Admin/Graduate/graduate.action"; // Ensure the correct path
-import {
-  setSelectedGraduate,
-  clearSelectedGraduate,
-} from "../../../Store/Slices/Admin/Graduate/graduateSlice"; // Ensure the correct path
+import { fetchGraduates, demoteStudents } from "../../../Store/Slices/Admin/Graduate/graduate.action";
+import { setSelectedGraduate, clearSelectedGraduate } from "../../../Store/Slices/Admin/Graduate/graduateSlice";
 
 const GraduationMainSection = () => {
   const dispatch = useDispatch();
 
   // Accessing Redux state
-  const {
-    graduates,
-    loading,
-    error,
-    selectedGraduate,
-    total,
-    currentPage,
-    totalPages,
-  } = useSelector(
-    (state) => state?.admin?.graduates // Access the correct slice
+  const { graduates, loading, error, selectedGraduate, total, currentPage, totalPages } = useSelector(
+    (state) => state?.admin?.graduates
   );
 
   const [filteredStudents, setFilteredStudents] = useState([]); // Filtered students data
@@ -33,14 +19,14 @@ const GraduationMainSection = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false); // Sidebar visibility state
   const [selectedStudents, setSelectedStudents] = useState([]); // State to track selected students
 
-  // Fetch graduate data on component mount (initial load without filters)
+  // Fetch graduate data on component mount
   useEffect(() => {
-    dispatch(fetchGraduates({ page: 1, limit: 10 })); // Fetch all graduates initially with default pagination
+    dispatch(fetchGraduates({ page: 1, limit: 10 })); // Initial fetch with pagination
   }, [dispatch]);
 
   // Update filtered students whenever the graduates data changes
   useEffect(() => {
-    setFilteredStudents(graduates); // Update filteredStudents when graduates change
+    setFilteredStudents(graduates);
   }, [graduates]);
 
   // Handle real-time search
@@ -57,8 +43,8 @@ const GraduationMainSection = () => {
 
   // Handle filter changes
   const handleFilterChange = (filters) => {
-    setFilters(filters); // Update local filters state
-    dispatch(fetchGraduates({ ...filters, page: 1, limit: 10 })); // Fetch graduates with filters applied
+    setFilters(filters);
+    dispatch(fetchGraduates({ ...filters, page: 1, limit: 10 }));
   };
 
   // Handle pagination
@@ -68,47 +54,49 @@ const GraduationMainSection = () => {
 
   // Handle "View Details" click to open the sidebar with the selected student's data
   const handleViewDetails = (student) => {
-    dispatch(setSelectedGraduate(student)); // Set selected student in Redux
+    dispatch(setSelectedGraduate(student));
     setSidebarOpen(true);
   };
 
   // Close the sidebar
   const closeSidebar = () => {
-    dispatch(clearSelectedGraduate()); // Clear selected student in Redux
+    dispatch(clearSelectedGraduate());
     setSidebarOpen(false);
   };
 
-  // Handle demoting students
+  // Handle demoting selected students in GraduateList
   const handleDemoteStudents = () => {
-    // Dispatch action with selected students' IDs
-    dispatch(demoteStudents({ studentIds: selectedStudents }));
+    dispatch(demoteStudents({ studentIds: selectedStudents })).then(() => {
+      dispatch(fetchGraduates({ ...filters, page: 1, limit: 10 }));
+      setSelectedStudents([]); // Reset selection after demotion
+    });
   };
 
   // Handle Sidebar demotion
   const handleSidebarDemote = (studentId) => {
-    dispatch(demoteStudents({ studentIds: [studentId] }));
+    dispatch(demoteStudents({ studentIds: [studentId] })).then(() => {
+      closeSidebar(); // Close sidebar after demotion
+      dispatch(fetchGraduates({ ...filters, page: 1, limit: 10 })); // Refresh the list
+    });
   };
 
   return (
     <div className="relative p-5">
       {/* Search and Filter Navigation */}
-      <TopNavigationWithFilters
-        onSearch={handleSearch}
-        onFilterChange={handleFilterChange}
-      />
+      <TopNavigationWithFilters onSearch={handleSearch} onFilterChange={handleFilterChange} />
 
       {/* Display the filtered students */}
       <GraduateList
         students={filteredStudents}
         selectedStudents={selectedStudents}
-        setSelectedStudents={setSelectedStudents} // Pass the setter function here
+        setSelectedStudents={setSelectedStudents}
         onViewDetails={handleViewDetails}
         currentPage={currentPage}
         totalPages={totalPages}
         onPageChange={handlePageChange}
-        onDemoteStudents={handleDemoteStudents} // Pass demote function here
-        loading={loading} // Pass loading state
-        error={error} // Pass error state
+        onDemoteStudents={handleDemoteStudents}
+        loading={loading}
+        error={error}
       />
 
       {/* Sidebar */}
