@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import { baseUrl } from "../../../../../config/Common";
 import { fetchAllTeachers } from "../../Class/Teachers/teacherThunks";
 import { setAllStaffs } from "./staffSlice";
+import { createStaffSalary } from "../../Accounting/Expenses/expenses.action";
 
 export const fetchAllStaff = createAsyncThunk(
   "user/allStaff",
@@ -49,11 +50,12 @@ export const addUser = createAsyncThunk(
         }else{
           dispatch(fetchAllStaff())
         }
+        dispatch(createStaffSalary({status:"unpaid",action:"pay now"}));
         return response.data;
       }else{
         toast.error(response.data.message );
       }
-  
+      
       return response.data;
     } catch (error) {
       toast.error(error.response?.data.message||"Something is wrong");
@@ -61,6 +63,8 @@ export const addUser = createAsyncThunk(
     }
   }
 );
+
+
 export const editUser = createAsyncThunk(
   "user/editUser",
   async ({userData, address,id}, { rejectWithValue, getState,dispatch }) => {
@@ -127,6 +131,8 @@ export const deactiveUser = createAsyncThunk(
     }
   }
 );
+
+
 export const activeUser = createAsyncThunk(
   "user/activeUser",
   async (userData, { rejectWithValue, getState,dispatch }) => {
