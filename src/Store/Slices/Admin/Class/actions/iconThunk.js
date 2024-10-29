@@ -13,7 +13,7 @@ export const fetchAllIcons = createAsyncThunk(
 
     try {
       const response = await axios.get(`${baseUrl}/icons/getAllIcons`, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authentication: `Bearer ${token}` },
       });
       return response.data.icons;
     } catch (error) {
@@ -37,7 +37,7 @@ export const createIcon = createAsyncThunk(
         formData,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authentication: `Bearer ${token}`,
             "Content-Type": "multipart/form-data",
           },
         }
@@ -64,7 +64,7 @@ export const updateIcon = createAsyncThunk(
         iconData,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authentication: `Bearer ${token}`,
             "Content-Type": "multipart/form-data",
           },
         }
@@ -88,7 +88,7 @@ export const deleteIcon = createAsyncThunk(
 
     try {
       await axios.delete(`${baseUrl}/icons/deleteIcon/${iconId}`, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authentication: `Bearer ${token}` },
       });
       toast.success("Icon Deleted Successfully!");
       return iconId;
