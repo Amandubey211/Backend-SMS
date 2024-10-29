@@ -30,7 +30,9 @@ import i18next from "i18next";
 import { useSelector } from "react-redux";
 import GraduationPage from "../Modules/Admin/Graduation/GraduationPage.js";
 import TimeTablePage from "../Modules/Admin/TimeTable/TimeTablePage.js";
-import CreateOrEditTimeTable from "../Modules/Admin/TimeTable/Components/CreateOrEditTimeTable.js";
+import CreateTimeTable from "../Modules/Admin/TimeTable/Components/CreateTimeTable.js";
+import TableView from "../Modules/Admin/TimeTable/Components/TableView.js";
+import { updateTimetable } from "../Store/Slices/Admin/TimeTable/timetable.action.js";
 // lazy loaded routes
 
 const Academic = lazy(() =>
@@ -669,13 +671,35 @@ function App() {
         />
       ),
       errorElement: <Error />,
+      children: [
+        {
+          path: "viewtable/:tablename", // Notice it’s a child path, not a full path
+          element: (
+            <ProtectRoute
+              Component={TableView}
+              allowedRoles={["admin", "teacher"]}
+            />
+          ),
+          errorElement: <Error />,
+        },
+        {
+          path: "edit/:id", // New child route
+          element: (
+            <ProtectRoute
+              Component={updateTimetable}
+              allowedRoles={["admin", "teacher"]}
+            />
+          ),
+          errorElement: <Error />,
+        },
+      ],
     },
 
     {
       path: "/noticeboard/timetable/create-new-timeTable",
       element: (
         <ProtectRoute
-          Component={CreateOrEditTimeTable}
+          Component={CreateTimeTable}
           allowedRoles={["admin", "teacher"]}
         />
       ),

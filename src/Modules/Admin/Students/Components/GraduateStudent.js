@@ -1,38 +1,38 @@
-// import React, { useEffect, useState } from "react";
+// import React, { useState } from "react";
 // import { useDispatch, useSelector } from "react-redux";
-// import { demoteStudents } from "../../../../Store/Slices/Admin/Class/Students/studentThunks"; // Import the demote thunk
-// import { motion } from "framer-motion"; // For animations
+// import { graduateStudents } from "../../../../Store/Slices/Admin/Class/Students/studentThunks";
+// import { motion } from "framer-motion";
 // import DeleteConfirmatiomModal from "../../../../Components/Common/DeleteConfirmationModal";
 // import profileIcon from "../../../../Assets/DashboardAssets/profileIcon.png";
+// import toast from "react-hot-toast";
 
-// const DemoteClass = ({ student }) => {
+// const GraduateStudent = ({ student }) => {
 //   const dispatch = useDispatch();
 
 //   const [isModalOpen, setIsModalOpen] = useState(false); // Modal state
 //   const [confirmLoading, setConfirmLoading] = useState(false); // Loading state for confirmation action
-
 //   const { loading } = useSelector((state) => state.admin.students);
 
-//   useEffect(() => {
-//     // Any required data fetching (if needed)
-//   }, [dispatch]);
-
-//   const handleDemotion = (e) => {
+//   const handleGraduation = (e) => {
 //     e.preventDefault();
-//     setIsModalOpen(true); // Show the confirmation modal before demotion
+//     setIsModalOpen(true); // Show the confirmation modal before graduation
 //   };
 
-//   const confirmDemotion = async () => {
+//   const confirmGraduation = async () => {
 //     setConfirmLoading(true);
 //     try {
-//       await dispatch(
-//         demoteStudents({
+//       console.log("Dispatching graduateStudents thunk...");
+//       const response = await dispatch(
+//         graduateStudents({
 //           studentIds: [student._id],
 //         })
-//       );
-//       setIsModalOpen(false); // Close the modal after successful demotion
+//       ).unwrap(); // unwrap to handle any errors within async thunks
+//       console.log("Response:", response);
+//       toast.success("Student graduated successfully");
+//       setIsModalOpen(false); // Close the modal after successful graduation
 //     } catch (error) {
-//       console.error("Demotion failed:", error);
+//       console.error("Graduation failed:", error);
+//       toast.error("Failed to graduate student");
 //     } finally {
 //       setConfirmLoading(false);
 //     }
@@ -41,8 +41,8 @@
 //   return (
 //     <>
 //       <motion.form
-//         className="flex flex-col justify-between min-h-screen p-4" // Flexbox ensures button is always at the bottom
-//         onSubmit={handleDemotion}
+//         className="flex flex-col justify-between min-h-screen p-4"
+//         onSubmit={handleGraduation}
 //         initial={{ opacity: 0, y: 20 }}
 //         animate={{ opacity: 1, y: 0 }}
 //         transition={{ duration: 0.5 }}
@@ -51,9 +51,7 @@
 //         <div className="bg-white p-4 w-full max-w-md mx-auto flex-grow">
 //           <div className="flex items-center space-x-4 mb-6">
 //             <img
-//               src={
-//                 student.profile || profileIcon
-//               }
+//               src={student.profile || profileIcon}
 //               alt={`${student.firstName} ${student.lastName}`}
 //               className="w-14 h-14 rounded-full"
 //               loading="lazy"
@@ -73,7 +71,7 @@
 //           </div>
 //         </div>
 
-//         {/* Submit Button */}
+//         {/* Graduate Button */}
 //         <motion.div
 //           className="mb-10 sticky bottom-0 w-full max-w-md mx-auto"
 //           whileHover={{ scale: 1.05 }}
@@ -81,12 +79,12 @@
 //         >
 //           <button
 //             type="submit"
-//             className={`w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-blue-600 hover:to-purple-600 transition-all ${
+//             className={`w-full bg-gradient-to-r from-green-500 to-teal-500 text-white py-2 px-4 rounded-md hover:from-green-600 hover:to-teal-600 transition-all ${
 //               loading ? "opacity-50 cursor-not-allowed" : ""
 //             }`}
 //             disabled={loading}
 //           >
-//             {loading ? "Demoting..." : "Demote Student"}
+//             {loading ? "Graduating..." : "Graduate Student"}
 //           </button>
 //         </motion.div>
 //       </motion.form>
@@ -95,40 +93,44 @@
 //       <DeleteConfirmatiomModal
 //         isOpen={isModalOpen}
 //         onClose={() => setIsModalOpen(false)}
-//         onConfirm={confirmDemotion}
+//         onConfirm={confirmGraduation}
 //         loading={confirmLoading}
-//         text="Demote"
+//         text="Graduate"
 //       />
 //     </>
 //   );
 // };
 
-// export default DemoteClass;
+// export default GraduateStudent;
 
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { demoteStudents } from "../../../../Store/Slices/Admin/Class/Students/studentThunks";
+import { graduateStudents } from "../../../../Store/Slices/Admin/Class/Students/studentThunks";
 import { motion } from "framer-motion";
 import profileIcon from "../../../../Assets/DashboardAssets/profileIcon.png";
+import toast from "react-hot-toast";
 
-const DemoteClass = ({ student }) => {
+const GraduateStudent = ({ student }) => {
   const dispatch = useDispatch();
 
-  const [confirmLoading, setConfirmLoading] = useState(false); // Loading state for demotion action
+  const [confirmLoading, setConfirmLoading] = useState(false); // Loading state for graduation action
   const { loading } = useSelector((state) => state.admin.students);
 
-  const handleDemotion = async (e) => {
+  const handleGraduation = async (e) => {
     e.preventDefault();
     setConfirmLoading(true);
     try {
-      await dispatch(
-        demoteStudents({
+      console.log("Dispatching graduateStudents thunk...");
+      const response = await dispatch(
+        graduateStudents({
           studentIds: [student._id],
         })
       ).unwrap(); // unwrap to handle any errors within async thunks
-      console.log("Student demoted successfully");
+      console.log("Response:", response);
+      toast.success("Student graduated successfully");
     } catch (error) {
-      console.error("Demotion failed:", error);
+      console.error("Graduation failed:", error);
+      toast.error("Failed to graduate student");
     } finally {
       setConfirmLoading(false);
     }
@@ -137,7 +139,7 @@ const DemoteClass = ({ student }) => {
   return (
     <motion.form
       className="flex flex-col justify-between min-h-screen p-4"
-      onSubmit={handleDemotion}
+      onSubmit={handleGraduation}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
@@ -166,7 +168,7 @@ const DemoteClass = ({ student }) => {
         </div>
       </div>
 
-      {/* Demote Button */}
+      {/* Graduate Button */}
       <motion.div
         className="mb-10 sticky bottom-0 w-full max-w-md mx-auto"
         whileHover={{ scale: 1.05 }}
@@ -174,16 +176,16 @@ const DemoteClass = ({ student }) => {
       >
         <button
           type="submit"
-          className={`w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-blue-600 hover:to-purple-600 transition-all ${
-            loading || confirmLoading ? "opacity-50 cursor-not-allowed" : ""
+          className={`w-full bg-gradient-to-r from-green-500 to-teal-500 text-white py-2 px-4 rounded-md hover:from-green-600 hover:to-teal-600 transition-all ${
+            loading ? "opacity-50 cursor-not-allowed" : ""
           }`}
           disabled={loading || confirmLoading}
         >
-          {loading || confirmLoading ? "Demoting..." : "Demote Student"}
+          {loading || confirmLoading ? "Graduating..." : "Graduate Student"}
         </button>
       </motion.div>
     </motion.form>
   );
 };
 
-export default DemoteClass;
+export default GraduateStudent;
