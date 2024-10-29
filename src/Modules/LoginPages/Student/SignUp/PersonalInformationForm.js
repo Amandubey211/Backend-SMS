@@ -6,6 +6,7 @@ import SelectInput from "./SelectInput";
 import TextInput from "./TextInput";
 import RadioGroup from "./RadioGroup";
 import { RiImageAddFill } from "react-icons/ri";
+import useGetAllClasses from "../../../../Hooks/Common/useGetAllClasses ";
 
 const PersonalInformationForm = ({
   studentDetails,
@@ -17,6 +18,7 @@ const PersonalInformationForm = ({
   inputRefs,
 }) => {
   const { fetchSchools, schoolList } = useGetAllSchools();
+  const { fetchClasses, classList, error } = useGetAllClasses();
 
   const religionOptions = [
     { value: "Islam", label: "Islam" },
@@ -31,6 +33,13 @@ const PersonalInformationForm = ({
   useEffect(() => {
     fetchSchools();
   }, []);
+  useEffect(() => {
+    // Only fetch classes when schoolId is defined
+    if (studentDetails.schoolId) {
+      console.log(studentDetails, "kkkk");
+      fetchClasses(studentDetails?.schoolId);
+    }
+  }, [studentDetails.schoolId]);
 
   return (
     <>
@@ -46,6 +55,20 @@ const PersonalInformationForm = ({
             label: school.nameOfSchool,
           }))}
           error={validationErrors.schoolId}
+        />
+
+        <SelectInput
+          ref={(el) => (inputRefs.current["applyingClass"] = el)}
+          label="Applying Class*"
+          name="applyingClass"
+          value={studentDetails.applyingClass}
+          onChange={handleChange}
+          options={classList.map((classItem) => ({
+            value: classItem._id,
+            label: classItem.className,
+          }))}
+          error={validationErrors.applyingClass}
+          disabled={!studentDetails.schoolId}
         />
         <div className="w-1/2 flex justify-center">
           <div className="relative group">

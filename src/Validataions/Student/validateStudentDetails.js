@@ -26,7 +26,7 @@ const validateStudentDetails = (details) => {
     errors.placeOfBirth = "Place of Birth is required";
   if (!details.gender) errors.gender = "Gender is required";
   if (!details.religion) errors.religion = "Religion is required";
-  if (!details.bloodGroup) errors.bloodGroup = "bloodGroup is required";
+  // if (!details.bloodGroup) errors.bloodGroup = "bloodGroup is required";
 
   if (!details.contactNumber.trim())
     errors.contactNumber = "Contact Number is required";
