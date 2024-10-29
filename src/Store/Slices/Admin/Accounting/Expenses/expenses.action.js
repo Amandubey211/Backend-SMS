@@ -151,3 +151,28 @@ export const createExpense = createAsyncThunk(
         }
     }
 )
+
+
+
+// create salary
+
+ export const createStaffSalary=createAsyncThunk(
+    'salary/createStaffSalary',
+    async({action,status},{rejectWithValue,getState,dispatch})=>{
+        const token = getToken(getState());
+        const body={action,status}
+        try {
+            const response = axios.post(`${baseUrl}/admin/staff/craete_salary`, body, {
+                headers: {
+                    Authentication: `${token}`,
+                },
+            })
+            const data = response?.data
+            // toast.success("Create Salary successfully")
+            // console.log("salary data---", data);
+            return data
+        } catch (error) {
+            return rejectWithValue(error?.response?.data?.message || error?.message || "Something Went Wrong!");
+        }
+    }
+ )

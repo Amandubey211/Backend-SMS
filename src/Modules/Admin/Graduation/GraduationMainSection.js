@@ -3,14 +3,28 @@ import { useDispatch, useSelector } from "react-redux";
 import GraduateList from "./Components/GraduateList";
 import TopNavigationWithFilters from "./Components/TopNavigationWithFilters";
 import Sidebar from "./Components/Sidebar";
-import { fetchGraduates, demoteStudents } from "../../../Store/Slices/Admin/Graduate/graduate.action"; // Ensure the correct path
-import { setSelectedGraduate, clearSelectedGraduate } from "../../../Store/Slices/Admin/Graduate/graduateSlice"; // Ensure the correct path
+import {
+  fetchGraduates,
+  demoteStudents,
+} from "../../../Store/Slices/Admin/Graduate/graduate.action"; // Ensure the correct path
+import {
+  setSelectedGraduate,
+  clearSelectedGraduate,
+} from "../../../Store/Slices/Admin/Graduate/graduateSlice"; // Ensure the correct path
 
 const GraduationMainSection = () => {
   const dispatch = useDispatch();
 
   // Accessing Redux state
-  const { graduates, loading, error, selectedGraduate, total, currentPage, totalPages } = useSelector(
+  const {
+    graduates,
+    loading,
+    error,
+    selectedGraduate,
+    total,
+    currentPage,
+    totalPages,
+  } = useSelector(
     (state) => state?.admin?.graduates // Access the correct slice
   );
 
@@ -78,7 +92,10 @@ const GraduationMainSection = () => {
   return (
     <div className="relative p-5">
       {/* Search and Filter Navigation */}
-      <TopNavigationWithFilters onSearch={handleSearch} onFilterChange={handleFilterChange} />
+      <TopNavigationWithFilters
+        onSearch={handleSearch}
+        onFilterChange={handleFilterChange}
+      />
 
       {/* Display the filtered students */}
       <GraduateList

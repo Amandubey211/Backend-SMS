@@ -115,12 +115,12 @@ const sidebarData = [
     icon: <TbNotebook />,
     roles: ["admin", "teacher", "librarian", "accountant"],
     items: [
-      // {
-      //   title: "Time Table",
-      //   icon: <ImTable2 />,
-      //   path: "/noticeboard/timetable",
-      //   roles: ["admin", "teacher"],
-      // },
+      {
+        title: "Time Table",
+        icon: <ImTable2 />,
+        path: "/noticeboard/timetable",
+        roles: ["admin", "teacher"],
+      },
       {
         title: "Announcements",
         icon: <FaClipboardList />,

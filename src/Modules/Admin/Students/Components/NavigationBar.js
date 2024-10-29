@@ -1,13 +1,18 @@
-import React, { useCallback } from "react";
-import { NavLink } from "react-router-dom";
-import { useSelector } from "react-redux";
+import React, { useCallback, useEffect } from "react";
+import { NavLink, useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchSectionsByClass } from "../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
 
 const NavigationBar = ({ setActiveSection, activeSection, totalStudents }) => {
   const Sections = useSelector(
     (store) => store.admin.group_section.sectionsList
   ); // Assuming this comes from another slice
   const role = useSelector((store) => store.common.auth.role);
-
+  const dispatch = useDispatch();
+  const { cid } = useParams();
+  useEffect(() => {
+    dispatch(fetchSectionsByClass(cid));
+  }, [dispatch, cid]);
   const getButtonClass = useCallback(
     (section) => {
       return activeSection === section
