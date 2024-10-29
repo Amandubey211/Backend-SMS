@@ -228,7 +228,7 @@ export const assignStudentToSection = createAsyncThunk(
           headers: { Authentication: `Bearer ${token}` },
         }
       );
-      toast.success("Student assigned to section successfully!");
+      toast.success("Student assigned successfully!");
       return response.data.data;
     } catch (error) {
       toast.error(

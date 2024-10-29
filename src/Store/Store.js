@@ -42,7 +42,7 @@ import adminAssignmentReducer from "./Slices/Admin/Class/Assignment/assignmentSl
 import adminQuizReducer from "./Slices/Admin/Class/Quiz/quizSlice";
 import adminSpeedGradeReducer from "./Slices/Admin/Class/SpeedGrade/speedGradeSlice";
 import timetableReducer from "./Slices/Admin/TimeTable/timtableSlice";
-
+import adminClassIconsReducer from "./Slices/Admin/Class/reducer/iconSlice";
 // student
 import studentDashboardReducer from "./Slices/Student/Dashboard/studentDashboardSlices";
 import studentFinanceReducer from "./Slices/Student/Finance/financeSlice";
@@ -114,7 +114,6 @@ const commonReducer = combineReducers({
   alertMsg: alertReducer,
 });
 
-
 const AdminReducer = combineReducers({
   adminDashboard: adminDashboardReducer,
   class: classReducer,
@@ -140,6 +139,8 @@ const AdminReducer = combineReducers({
   quizzes: adminQuizReducer,
   timetable: timetableReducer,
   speedgrades: adminSpeedGradeReducer,
+  classIcons: adminClassIconsReducer,
+
   graduates: graduateReducer,
   all_students: allStudentReducer,
   all_parents: allParentReducer,
@@ -151,7 +152,6 @@ const AdminReducer = combineReducers({
   subject_assignment: subjectAssignmentReducer,
   subject_quiz: subjectQuizReducer,
 });
-
 
 const studentReducer = combineReducers({
   studentDashboard: studentDashboardReducer,
