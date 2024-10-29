@@ -1,4 +1,4 @@
-// UpdateTimeTable.js
+// UpdateTimeTable.jsx
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -30,8 +30,6 @@ import {
   clearSectionsList,
   clearGroupsList,
 } from '../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionSlice';
-import DashLayout from '../../../../Components/Admin/AdminDashLayout';
-import Layout from '../../../../Components/Common/Layout';
 import { useNavigate, useParams } from 'react-router-dom';
 
 const { Option } = Select;
@@ -185,7 +183,7 @@ const UpdateTimeTable = () => {
     });
   };
 
-  // Render functions (same as in CreateTimeTablePage.jsx)
+  // Render functions
   const renderEditableCell = (text, record, dataIndex) => (
     <Input
       value={text}
@@ -759,216 +757,208 @@ const UpdateTimeTable = () => {
 
   if (!timetable) {
     return (
-      <Layout title="Update TimeTable | Student Diwan">
-        <DashLayout>
-          <div className="flex flex-col items-center justify-center w-full p-6">
-            <h2 className="text-xl font-semibold mb-4">Timetable Not Found</h2>
-            <p>The timetable you're trying to edit does not exist.</p>
-          </div>
-        </DashLayout>
-      </Layout>
+      <div className="flex flex-col items-center justify-center w-full p-6">
+        <h2 className="text-xl font-semibold mb-4">Timetable Not Found</h2>
+        <p>The timetable you're trying to edit does not exist.</p>
+      </div>
     );
   }
 
   return (
-    <Layout title="Update TimeTable | Student Diwan">
-      <DashLayout>
-        <div className="flex flex-col items-center justify-start w-full p-6">
-          <h2 className="text-xl font-semibold mb-4">Edit TimeTable</h2>
+    <div className="flex flex-col items-center justify-start w-full p-6">
+      <h2 className="text-xl font-semibold mb-4">Edit TimeTable</h2>
 
-          <form onSubmit={handleSubmit} className="w-full space-y-6">
-            {/* Form Inputs */}
-            <div className="flex flex-wrap -mx-2">
-              {/* Name */}
-              <div className="w-full md:w-1/5 px-2 mb-4">
-                <label className="block mb-1">Name</label>
-                <Input
-                  placeholder="Name"
-                  value={formData.name}
-                  onChange={(e) =>
-                    setFormData({ ...formData, name: e.target.value })
-                  }
-                  required
-                />
-              </div>
-              {/* Start Date */}
-              <div className="w-full md:w-1/5 px-2 mb-4">
-                <label className="block mb-1">Start Date</label>
-                <Input
-                  type="date"
-                  value={formData.startDate}
-                  onChange={(e) =>
-                    setFormData({ ...formData, startDate: e.target.value })
-                  }
-                  required
-                />
-              </div>
-              {/* End Date */}
-              <div className="w-full md:w-1/5 px-2 mb-4">
-                <label className="block mb-1">End Date</label>
-                <Input
-                  type="date"
-                  value={formData.endDate}
-                  onChange={(e) =>
-                    setFormData({ ...formData, endDate: e.target.value })
-                  }
-                  required={formData.type === 'exam' || formData.type === 'event'}
-                  disabled={
-                    !(formData.type === 'exam' || formData.type === 'event')
-                  }
-                />
-              </div>
-              {/* Select Class */}
-              <div className="w-full md:w-1/5 px-2 mb-4">
-                <label className="block mb-1">Select Class</label>
-                <Select
-                  value={formData.classId || ''}
-                  onChange={(value) => {
-                    setFormData({
-                      ...formData,
-                      classId: value,
-                      sectionId: '',
-                      groupId: '',
-                    });
-                  }}
-                  style={{ width: '100%' }}
-                  required
-                  placeholder="Select Class"
-                >
-                  <Option value="">Select Class</Option>
-                  {classes.map((classItem) => (
-                    <Option key={classItem._id} value={classItem._id}>
-                      {classItem.className}
-                    </Option>
-                  ))}
-                </Select>
-              </div>
-              {/* Select Section */}
-              <div className="w-full md:w-1/5 px-2 mb-4">
-                <label className="block mb-1">Select Section</label>
-                <Select
-                  value={formData.sectionId || ''}
-                  onChange={(value) =>
-                    setFormData({ ...formData, sectionId: value })
-                  }
-                  style={{ width: '100%' }}
-                  placeholder="Select Section"
-                  disabled={!formData.classId || sectionsList.length === 0}
-                >
-                  <Option value="">Select Section</Option>
-                  {sectionsList.length > 0 ? (
-                    sectionsList.map((section) => (
-                      <Option key={section._id} value={section._id}>
-                        {section.sectionName}
-                      </Option>
-                    ))
-                  ) : (
-                    <Option value="" disabled>
-                      No sections available
-                    </Option>
-                  )}
-                </Select>
-              </div>
-              {/* Select Group */}
-              <div className="w-full md:w-1/5 px-2 mb-4">
-                <label className="block mb-1">Select Group</label>
-                <Select
-                  value={formData.groupId || ''}
-                  onChange={(value) =>
-                    setFormData({ ...formData, groupId: value })
-                  }
-                  style={{ width: '100%' }}
-                  placeholder="Select Group"
-                  disabled={!formData.classId || groupsList.length === 0}
-                >
-                  <Option value="">Select Group</Option>
-                  {groupsList.length > 0 ? (
-                    groupsList.map((group) => (
-                      <Option key={group._id} value={group._id}>
-                        {group.groupName}
-                      </Option>
-                    ))
-                  ) : (
-                    <Option value="" disabled>
-                      No groups available
-                    </Option>
-                  )}
-                </Select>
-              </div>
-              {/* Table Type */}
-              <div className="w-full md:w-1/5 px-2 mb-4">
-                <label className="block mb-1">Table Type</label>
-                <Select
-                  value={formData.type}
-                  onChange={(value) => setFormData({ ...formData, type: value })}
-                  style={{ width: '100%' }}
-                  required
-                >
-                  <Option value="weekly">Weekly</Option>
-                  <Option value="exam">Exam</Option>
-                  <Option value="event">Event</Option>
-                  <Option value="others">Others</Option>
-                </Select>
-              </div>
-            </div>
-
-            {/* Table */}
-            <div className="w-full mb-4">
-              {/* Action Buttons */}
-              <div className="flex justify-between mb-2">
-                <Button
-                  type="primary"
-                  icon={<PlusOutlined />}
-                  onClick={handleAddRow}
-                  disabled={!formData.classId}
-                >
-                  Add Row
-                </Button>
-                <div className="flex space-x-2">
-                  {deletedRowsStack.length > 0 && (
-                    <Button icon={<UndoOutlined />} onClick={handleUndoDelete}>
-                      Undo Delete
-                    </Button>
-                  )}
-                  {selectedRowKeys.length > 0 && (
-                    <Popconfirm
-                      title="Are you sure you want to delete selected rows?"
-                      onConfirm={handleDeleteRows}
-                      okText="Yes"
-                      cancelText="No"
-                    >
-                      <Button danger icon={<DeleteOutlined />}>
-                        Delete Rows
-                      </Button>
-                    </Popconfirm>
-                  )}
-                </div>
-              </div>
-
-              {/* Table Component */}
-              <Table
-                columns={columns}
-                dataSource={dataSource}
-                rowSelection={rowSelection}
-                pagination={false}
-                scroll={{ x: 'max-content' }}
-                style={{ width: '100%' }}
-              />
-            </div>
-
-            {/* Form Actions */}
-            <div className="flex justify-end space-x-4">
-              <Button onClick={() => navigate('/noticeboard/timetable')}>
-                Cancel
-              </Button>
-              <Button type="primary" htmlType="submit">
-                Update
-              </Button>
-            </div>
-          </form>
+      <form onSubmit={handleSubmit} className="w-full space-y-6">
+        {/* Form Inputs */}
+        <div className="flex flex-wrap -mx-2">
+          {/* Name */}
+          <div className="w-full md:w-1/5 px-2 mb-4">
+            <label className="block mb-1">Name</label>
+            <Input
+              placeholder="Name"
+              value={formData.name}
+              onChange={(e) =>
+                setFormData({ ...formData, name: e.target.value })
+              }
+              required
+            />
+          </div>
+          {/* Start Date */}
+          <div className="w-full md:w-1/5 px-2 mb-4">
+            <label className="block mb-1">Start Date</label>
+            <Input
+              type="date"
+              value={formData.startDate}
+              onChange={(e) =>
+                setFormData({ ...formData, startDate: e.target.value })
+              }
+              required
+            />
+          </div>
+          {/* End Date */}
+          <div className="w-full md:w-1/5 px-2 mb-4">
+            <label className="block mb-1">End Date</label>
+            <Input
+              type="date"
+              value={formData.endDate}
+              onChange={(e) =>
+                setFormData({ ...formData, endDate: e.target.value })
+              }
+              required={formData.type === 'exam' || formData.type === 'event'}
+              disabled={
+                !(formData.type === 'exam' || formData.type === 'event')
+              }
+            />
+          </div>
+          {/* Select Class */}
+          <div className="w-full md:w-1/5 px-2 mb-4">
+            <label className="block mb-1">Select Class</label>
+            <Select
+              value={formData.classId || ''}
+              onChange={(value) => {
+                setFormData({
+                  ...formData,
+                  classId: value,
+                  sectionId: '',
+                  groupId: '',
+                });
+              }}
+              style={{ width: '100%' }}
+              required
+              placeholder="Select Class"
+            >
+              <Option value="">Select Class</Option>
+              {classes.map((classItem) => (
+                <Option key={classItem._id} value={classItem._id}>
+                  {classItem.className}
+                </Option>
+              ))}
+            </Select>
+          </div>
+          {/* Select Section */}
+          <div className="w-full md:w-1/5 px-2 mb-4">
+            <label className="block mb-1">Select Section</label>
+            <Select
+              value={formData.sectionId || ''}
+              onChange={(value) =>
+                setFormData({ ...formData, sectionId: value })
+              }
+              style={{ width: '100%' }}
+              placeholder="Select Section"
+              disabled={!formData.classId || sectionsList.length === 0}
+            >
+              <Option value="">Select Section</Option>
+              {sectionsList.length > 0 ? (
+                sectionsList.map((section) => (
+                  <Option key={section._id} value={section._id}>
+                    {section.sectionName}
+                  </Option>
+                ))
+              ) : (
+                <Option value="" disabled>
+                  No sections available
+                </Option>
+              )}
+            </Select>
+          </div>
+          {/* Select Group */}
+          <div className="w-full md:w-1/5 px-2 mb-4">
+            <label className="block mb-1">Select Group</label>
+            <Select
+              value={formData.groupId || ''}
+              onChange={(value) =>
+                setFormData({ ...formData, groupId: value })
+              }
+              style={{ width: '100%' }}
+              placeholder="Select Group"
+              disabled={!formData.classId || groupsList.length === 0}
+            >
+              <Option value="">Select Group</Option>
+              {groupsList.length > 0 ? (
+                groupsList.map((group) => (
+                  <Option key={group._id} value={group._id}>
+                    {group.groupName}
+                  </Option>
+                ))
+              ) : (
+                <Option value="" disabled>
+                  No groups available
+                </Option>
+              )}
+            </Select>
+          </div>
+          {/* Table Type */}
+          <div className="w-full md:w-1/5 px-2 mb-4">
+            <label className="block mb-1">Table Type</label>
+            <Select
+              value={formData.type}
+              onChange={(value) => setFormData({ ...formData, type: value })}
+              style={{ width: '100%' }}
+              required
+            >
+              <Option value="weekly">Weekly</Option>
+              <Option value="exam">Exam</Option>
+              <Option value="event">Event</Option>
+              <Option value="others">Others</Option>
+            </Select>
+          </div>
         </div>
-      </DashLayout>
-    </Layout>
+
+        {/* Table */}
+        <div className="w-full mb-4">
+          {/* Action Buttons */}
+          <div className="flex justify-between mb-2">
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={handleAddRow}
+              disabled={!formData.classId}
+            >
+              Add Row
+            </Button>
+            <div className="flex space-x-2">
+              {deletedRowsStack.length > 0 && (
+                <Button icon={<UndoOutlined />} onClick={handleUndoDelete}>
+                  Undo Delete
+                </Button>
+              )}
+              {selectedRowKeys.length > 0 && (
+                <Popconfirm
+                  title="Are you sure you want to delete selected rows?"
+                  onConfirm={handleDeleteRows}
+                  okText="Yes"
+                  cancelText="No"
+                >
+                  <Button danger icon={<DeleteOutlined />}>
+                    Delete Rows
+                  </Button>
+                </Popconfirm>
+              )}
+            </div>
+          </div>
+
+          {/* Table Component */}
+          <Table
+            columns={columns}
+            dataSource={dataSource}
+            rowSelection={rowSelection}
+            pagination={false}
+            scroll={{ x: 'max-content' }}
+            style={{ width: '100%' }}
+          />
+        </div>
+
+        {/* Form Actions */}
+        <div className="flex justify-end space-x-4">
+          <Button onClick={() => navigate('/noticeboard/timetable')}>
+            Cancel
+          </Button>
+          <Button type="primary" htmlType="submit">
+            Update
+          </Button>
+        </div>
+      </form>
+    </div>
   );
 };
 
