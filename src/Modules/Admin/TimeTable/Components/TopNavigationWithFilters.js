@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllClasses } from "../../../../Store/Slices/Admin/Class/actions/classThunk";
-import { Input, Select, Button, Row, Col } from "antd";
+import { Input, Select, Button, Row, Col, Space } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import toast from "react-hot-toast";
 
@@ -30,40 +30,55 @@ const TopNavigationWithFilters = ({ onFilterChange }) => {
 
   const handleFilterChange = (filterName, value) => {
     setFilters((prevFilters) => ({ ...prevFilters, [filterName]: value }));
+
+    // Make real-time request for classId and type filters
+    if (filterName === "classId" || filterName === "type") {
+      onFilterChange({ ...filters, [filterName]: value });
+    }
   };
 
   const applyFilters = () => {
     onFilterChange(filters);
   };
 
+  const clearFilters = () => {
+    setFilters({
+      name: "",
+      classId: "",
+      type: "",
+    });
+    onFilterChange({}); // Trigger API request to load data without filters
+  };
+
   return (
-    <div className="p-6 bg-white rounded-lg shadow-md">
-      <Row gutter={16} align="middle" justify="center">
+    <div className="p-4 bg-transparent mb-5">
+      <Row gutter={16} align="middle" justify="end">
         {/* Name Filter */}
-        <Col span={6}>
-          <label className="font-medium text-gray-700">Name</label>
+        <Col>
+          <label className="font-medium text-gray-700" style={{ paddingRight: "8px" }}>Name</label>
           <Input
             placeholder="Search by Name"
             prefix={<SearchOutlined />}
             value={filters.name}
             onChange={(e) => handleFilterChange("name", e.target.value)}
             allowClear
-            style={{ borderRadius: "6px", marginTop: "4px" }}
+            style={{ width: "200px" }}
           />
         </Col>
 
         {/* Class ID Filter */}
-        <Col span={6}>
-          <label className="font-medium text-gray-700">Class</label>
+        <Col>
+          <label className="font-medium text-gray-700" style={{ paddingRight: "8px" }}>Class</label>
           <Select
             placeholder="Select Class"
             loading={loading}
             value={filters.classId}
             onChange={(value) => handleFilterChange("classId", value)}
-            style={{ width: "100%", borderRadius: "6px", marginTop: "4px" }}
+            style={{ width: "180px" }}
             optionFilterProp="children"
             showSearch
           >
+            <Option value="">Select Class</Option>
             {classes.map((cls) => (
               <Option key={cls._id} value={cls._id}>
                 {cls.className}
@@ -73,13 +88,13 @@ const TopNavigationWithFilters = ({ onFilterChange }) => {
         </Col>
 
         {/* Type Filter */}
-        <Col span={6}>
-          <label className="font-medium text-gray-700">Type</label>
+        <Col>
+          <label className="font-medium text-gray-700" style={{ paddingRight: "8px" }}>Type</label>
           <Select
-            placeholder="Select Type"
+            placeholder="All Types"
             value={filters.type}
             onChange={(value) => handleFilterChange("type", value)}
-            style={{ width: "100%", borderRadius: "6px", marginTop: "4px" }}
+            style={{ width: "180px" }}
           >
             <Option value="">All Types</Option>
             <Option value="weekly">Weekly</Option>
@@ -89,15 +104,27 @@ const TopNavigationWithFilters = ({ onFilterChange }) => {
           </Select>
         </Col>
 
-        {/* Apply Filters Button */}
-        <Col span={4}>
-          <Button
-            type="primary"
-            onClick={applyFilters}
-            style={{ width: "100%", borderRadius: "6px", marginTop: "24px" }}
-          >
-            Apply Filters
-          </Button>
+        {/* Action Buttons */}
+        <Col>
+          <Space size="middle">
+            <Button
+              type="primary"
+              onClick={applyFilters}
+              style={{ borderRadius: "6px" }}
+            >
+              Apply Filters
+            </Button>
+            <Button
+              onClick={clearFilters}
+              style={{
+                borderRadius: "6px",
+                color: "#1890ff",
+                borderColor: "#1890ff",
+              }}
+            >
+              Clear Filters
+            </Button>
+          </Space>
         </Col>
       </Row>
     </div>
