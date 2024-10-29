@@ -88,7 +88,9 @@ export const deleteIcon = createAsyncThunk(
 
     try {
       await axios.delete(`${baseUrl}/icons/deleteIcon/${iconId}`, {
+
         headers: { Authentication: `Bearer ${token}` },
+
       });
       toast.success("Icon Deleted Successfully!");
       return iconId;
