@@ -54,6 +54,7 @@ const StudentSignUpForm = () => {
     profile: "", // Ensure this is present
     enrollmentStatus: "",
     transportRequirement: "",
+    applyingClass: "",
   });
 
   const [studentDocuments, setStudentDocuments] = useState({
@@ -183,7 +184,7 @@ const StudentSignUpForm = () => {
 
   const handleNext = async (e) => {
     e.preventDefault();
-
+    console.log("hdh");
     const errors = validateStudentDetails(studentDetails);
 
     if (Object.keys(errors).length > 0) {
@@ -193,7 +194,7 @@ const StudentSignUpForm = () => {
       // Construct validationErrors object with only the first error
       let firstError = {};
       setFirstError(firstError, errors, firstErrorField.split("_"));
-
+      console.log(firstErrorField, firstError, "lll");
       setValidationErrors(firstError);
 
       // Focus on the first invalid input
@@ -234,6 +235,7 @@ const StudentSignUpForm = () => {
           }
         }
       }
+      console.log(formData, "oooooooooooo");
 
       // Dispatch the registerStudentDetails Thunk
       const resultAction = await dispatch(registerStudentDetails(formData));
