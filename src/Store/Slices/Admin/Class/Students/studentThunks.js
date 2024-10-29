@@ -46,9 +46,10 @@ export const promoteStudents = createAsyncThunk(
   "students/promoteStudents",
   async (
     { studentIds, promotionClassId, academicYearId },
-    { getState, rejectWithValue }
+    { getState, rejectWithValue, dispatch }
   ) => {
     const token = getState().common.auth.token;
+    const classId = getState().common.user.classInfo.selectedClassId;
 
     try {
       const response = await axios.put(
@@ -56,6 +57,8 @@ export const promoteStudents = createAsyncThunk(
         { studentIds, promotionClassId, academicYearId },
         { headers: { Authentication: `Bearer ${token}` } }
       );
+      toast.success("Student Promoted");
+      dispatch(fetchStudentsByClassAndSection(classId));
       return response.data;
     } catch (error) {
       const errorMessage =
@@ -68,8 +71,12 @@ export const promoteStudents = createAsyncThunk(
 // Promote Students in Same Class
 export const promoteInSameClassStudents = createAsyncThunk(
   "students/promoteInSameClass",
-  async ({ studentIds, academicYearId }, { getState, rejectWithValue }) => {
+  async (
+    { studentIds, academicYearId },
+    { getState, rejectWithValue, dispatch }
+  ) => {
     const token = getState().common.auth.token;
+    const classId = getState().common.user.classInfo.selectedClassId;
 
     try {
       const response = await axios.put(
@@ -77,6 +84,7 @@ export const promoteInSameClassStudents = createAsyncThunk(
         { studentIds, academicYearId },
         { headers: { Authentication: `Bearer ${token}` } }
       );
+      dispatch(fetchStudentsByClassAndSection(classId));
       return response.data;
     } catch (error) {
       const errorMessage =
@@ -90,8 +98,9 @@ export const promoteInSameClassStudents = createAsyncThunk(
 // Graduate Students
 export const graduateStudents = createAsyncThunk(
   "students/graduateStudents",
-  async ({ studentIds }, { getState, rejectWithValue }) => {
+  async ({ studentIds }, { getState, rejectWithValue, dispatch }) => {
     const token = getState().common.auth.token;
+    const classId = getState().common.user.classInfo.selectedClassId;
 
     try {
       const response = await axios.put(
@@ -99,6 +108,8 @@ export const graduateStudents = createAsyncThunk(
         { studentIds },
         { headers: { Authentication: `Bearer ${token}` } }
       );
+      // toast.success("Student Graduated");
+      dispatch(fetchStudentsByClassAndSection(classId));
       return response.data;
     } catch (error) {
       const errorMessage =

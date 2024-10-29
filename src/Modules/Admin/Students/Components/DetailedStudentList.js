@@ -46,9 +46,7 @@ const StudentInfo = React.memo(({ student, index, onSeeGradeClick }) => (
   <>
     <div className="flex items-center w-1/4">
       <img
-        src={
-          student.profile || profileIcon
-        }
+        src={student.profile || profileIcon}
         alt={student.name}
         className="w-10 h-10 rounded-full mr-3"
         loading="lazy"
