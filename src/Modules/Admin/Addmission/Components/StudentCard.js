@@ -2,6 +2,7 @@ import React from "react";
 import { GiArmorUpgrade } from "react-icons/gi";
 import CardBanner from "../../../../Assets/AdmissionCard/CardBanner.jpg";
 import Logo from "../../../../Components/Common/Logo";
+import { useSelector } from "react-redux";
 
 const StudentCard = ({ studentInfo, imagePreview }) => {
   const {
@@ -9,13 +10,18 @@ const StudentCard = ({ studentInfo, imagePreview }) => {
     lastName,
     Q_Id,
     contactNumber,
-    applyingClass: studentClass,
+    applyingClass,
     section,
     bloodGroup,
     religion,
     email,
   } = studentInfo;
+  const classList = useSelector((store) => store.admin.class.classes);
+  const selectedClass = classList.find(
+    (classItem) => classItem._id === applyingClass
+  );
 
+  const className = selectedClass ? selectedClass.className : "";
   // Truncate email if it is longer than 20 characters
   const truncateEmail = (email) => {
     return email.length > 20 ? email.substring(0, 20) + "..." : email;
@@ -50,7 +56,7 @@ const StudentCard = ({ studentInfo, imagePreview }) => {
               <span className="font-semibold">QID</span>: {Q_Id}
             </p>
             <p>
-              <span className="font-semibold">Class</span>: {studentClass}
+              <span className="font-semibold">Class</span>: {className}
             </p>
 
             <p>

@@ -39,9 +39,7 @@ const ClassesMainSection = () => {
   return (
     <div className="min-h-screen p-4">
       {/* Conditionally show heading for teachers */}
-      {role === "teacher" && (
-        <h1 className="text-2xl font-semibold mb-4 "></h1>
-      )}
+      {role === "teacher" && <h1 className="text-2xl font-semibold mb-4 "></h1>}
 
       {/* For Admin: Add new class button */}
       {role === "admin" && (
@@ -58,7 +56,7 @@ const ClassesMainSection = () => {
 
       {loading ? (
         <Spinner />
-      )  : classes.length === 0 ? (
+      ) : classes.length === 0 ? (
         <NoDataFound title="Classes" />
       ) : (
         <div className="grid grid-cols-1 gap-4 mt-4 sm:grid-cols-2 lg:grid-cols-4">

@@ -73,8 +73,8 @@ const UnVerifiedStudentCard = ({ studentId }) => {
           )}
         </div>
         <div className="ml-3">
-          <p className="text-sm font-medium">QID: {student?.Q_Id}</p>
-          <p className="text-sm">SID: {student._id}</p>
+          <p className="text-sm font-medium">QID: {student?.Q_Id || "N/A"}</p>
+          {/* <p className="text-sm">SID: {student._id}</p> */}
         </div>
       </div>
     </div>

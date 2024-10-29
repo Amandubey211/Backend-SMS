@@ -7,12 +7,13 @@ import { HiOutlineDotsVertical } from "react-icons/hi";
 import { BsArrow90DegRight } from "react-icons/bs";
 import { MdOutlineModeEditOutline } from "react-icons/md";
 import { useSelector } from "react-redux";
-
+import { FaGraduationCap } from "react-icons/fa";
 import { TfiStatsUp } from "react-icons/tfi";
 import { TfiStatsDown } from "react-icons/tfi";
 import DeleteModal from "../../../../Components/Common/DeleteModal";
 import useAssignStudentToGroup from "../../../../Hooks/AuthHooks/Staff/Admin/Students/useAssignStudentToGroup ";
 import DemoteClass from "./DemoteClass";
+import GraduateStudent from "./GraduateStudent";
 
 const StudentMenuOptions = ({
   studentId,
@@ -78,6 +79,7 @@ const StudentMenuOptions = ({
             />
           ),
           "Demote Class": <DemoteClass student={student} />,
+          "Graduate Student": <GraduateStudent student={student} />,
         };
 
         handleSidebarOpen(action, sidebarComponents[action]);
@@ -151,11 +153,11 @@ const StudentMenuOptions = ({
               text="Edit Student"
               onClick={() => handleMenuItemClick("Edit Student")}
             />
-            {/* <MenuItem
-              icon={<RiDeleteBin2Line className="text-[#E33131]" />}
-              text="Delete Student"
-              onClick={() => handleMenuItemClick("Delete Student")}
-            /> */}
+            <MenuItem
+              icon={<FaGraduationCap className="text-yellow-400" />}
+              text="Graduate Student"
+              onClick={() => handleMenuItemClick("Graduate Student")}
+            />
           </ul>
         </div>
       )}

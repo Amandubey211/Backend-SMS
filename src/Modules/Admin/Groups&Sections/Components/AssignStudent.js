@@ -44,7 +44,6 @@ const AssignStudent = ({ name, imageUrl, section, studentId }) => {
 
       dispatch(fetchUnassignedStudents(cid)); // Refetch unassigned students
       dispatch(fetchGroupsByClass(cid)); // Refetch groups after assignment
-      toast.success("Student assigned successfully!");
     } catch (error) {
       toast.error(error.message || "Something went wrong");
     }
