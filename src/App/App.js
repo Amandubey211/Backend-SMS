@@ -30,7 +30,7 @@ import i18next from "i18next";
 import { useSelector } from "react-redux";
 import GraduationPage from "../Modules/Admin/Graduation/GraduationPage.js";
 import TimeTablePage from "../Modules/Admin/TimeTable/TimeTablePage.js";
-import CreateOrEditTimeTable from "../Modules/Admin/TimeTable/Components/CreateOrEditTimeTable.js";
+import CreateTimeTable from "../Modules/Admin/TimeTable/Components/CreateTimeTable.js";
 import TableView from "../Modules/Admin/TimeTable/Components/TableView.js";
 // lazy loaded routes
 
@@ -679,7 +679,7 @@ function App() {
       path: "/noticeboard/timetable/create-new-timeTable",
       element: (
         <ProtectRoute
-          Component={CreateOrEditTimeTable}
+          Component={CreateTimeTable}
           allowedRoles={["admin", "teacher"]}
         />
       ),

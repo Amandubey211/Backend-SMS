@@ -1,7 +1,9 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Table, Button, Input, message, Row, Col } from "antd";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useDispatch } from "react-redux";
 import { FaArrowLeft, FaEdit, FaTrashAlt } from "react-icons/fa";
+import { deleteTimetable } from "../../../../Store/Slices/Admin/TimeTable/timetable.action"; // Import the delete action
 
 const TableView = () => {
   const navigate = useNavigate();
@@ -14,6 +16,8 @@ const TableView = () => {
     current: 1,
     pageSize: 10,
   });
+
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (!timetable) {
@@ -141,6 +145,19 @@ const TableView = () => {
     setPagination(pagination);
   };
 
+  const handleDelete = () => {
+    if (timetable) {
+      dispatch(deleteTimetable(timetable._id))
+        .then(() => {
+          message.success(`${timetable.name} deleted successfully`);
+          navigate("/noticeboard/timetable");
+        })
+        .catch((err) => {
+          message.error(`Failed to delete ${timetable.name}: ${err.message}`);
+        });
+    }
+  };
+
   return (
     <div className="p-6">
       <Button onClick={() => navigate(-1)} icon={<FaArrowLeft />} className="mb-4">
@@ -160,7 +177,7 @@ const TableView = () => {
         <Button icon={<FaEdit />} type="primary" style={{ marginRight: 5 }}>
           Edit
         </Button>
-        <Button icon={<FaTrashAlt />} type="danger">
+        <Button icon={<FaTrashAlt />} type="danger" onClick={handleDelete}>
           Delete
         </Button>
       </Row>
