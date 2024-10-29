@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
-import { FaUser, FaBook, FaGraduationCap, FaPhone, FaEnvelope, FaMapMarkerAlt, FaBirthdayCake, FaUsers, FaCalendarAlt, FaBriefcaseMedical, FaBusAlt, FaCertificate, FaCheckCircle, FaShieldAlt, FaGlobe, FaCalendarCheck, FaClipboardCheck, FaUserShield } from 'react-icons/fa';
+import { FaUser, FaBook, FaGraduationCap, FaPhone, FaEnvelope, FaMapMarkerAlt, FaBirthdayCake, FaUsers, FaCalendarAlt, FaBriefcaseMedical, FaBusAlt, FaCertificate, FaCheckCircle, FaShieldAlt, FaGlobe, FaUserShield } from 'react-icons/fa';
 import { VscChromeClose } from "react-icons/vsc";
 
-const Sidebar = ({ student, closeSidebar }) => {
+const Sidebar = ({ student, closeSidebar, onDemote }) => {
   // Close sidebar when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -11,10 +11,7 @@ const Sidebar = ({ student, closeSidebar }) => {
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [closeSidebar]);
 
   if (!student) return null; // Ensure there's a student to display
@@ -22,7 +19,7 @@ const Sidebar = ({ student, closeSidebar }) => {
   return (
     <div className="sidebar-wrapper fixed inset-0 z-50 flex justify-end bg-black bg-opacity-50 transition-opacity ease-in-out">
       <div className="sidebar-content fixed top-0 right-0 w-1/3 h-full bg-white shadow-lg transform transition-transform duration-1000 ease-in-out p-5 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
-        <div className="relative h-full pb-20"> {/* Added padding-bottom for content spacing */}
+        <div className="relative h-full pb-20">
 
           {/* Close button */}
           <button
@@ -116,9 +113,14 @@ const Sidebar = ({ student, closeSidebar }) => {
           </div>
 
           {/* Bottom Buttons */}
-          <div className="flex gap-4 mt-8 justify-center pb-6"> {/* Moved buttons to the bottom with margin-top and centered */}
+          <div className="flex gap-4 mt-8 justify-center pb-6">
             <button className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-all">Edit</button>
-            <button className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-all">Demote Student</button>
+            <button
+              onClick={() => onDemote(student._id)} // Trigger the onDemote function with student ID
+              className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-all"
+            >
+              Demote Student
+            </button>
           </div>
         </div>
       </div>
