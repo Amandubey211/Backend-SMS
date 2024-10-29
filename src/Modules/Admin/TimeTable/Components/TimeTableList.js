@@ -5,14 +5,13 @@ import {
   deleteTimetable,
 } from "../../../../Store/Slices/Admin/TimeTable/timetable.action";
 import { useNavigate } from "react-router-dom";
-import { PiTableDuotone } from "react-icons/pi";
 import {
   FaCalendarAlt,
   FaClock,
   FaChalkboardTeacher,
   FaClipboardList,
   FaTrashAlt,
-  FaEdit, // Import the edit icon
+  FaEdit,
 } from "react-icons/fa";
 import Spinner from "../../../../Components/Common/Spinner";
 
@@ -31,7 +30,7 @@ const TimeTableList = React.memo(() => {
   // Cache the processed timetables for better performance
   const cachedTimetables = useMemo(() => timetables || [], [timetables]);
 
-  // Function to handle click and navigate to TableView with selected timetable data
+  // Function to handle card click and navigate to TableView
   const handleCardClick = (timetable) => {
     navigate(`/noticeboard/timetable/viewtable/${timetable.name}`, {
       state: { timetable },
@@ -40,8 +39,8 @@ const TimeTableList = React.memo(() => {
 
   // Function to handle edit button click
   const handleEditClick = (e, timetable) => {
-    e.stopPropagation(); // Prevent the card click event
-    navigate(`/noticeboard/timetable/edit/${timetable._id}`); // Navigate to the edit page
+    e.stopPropagation();
+    navigate(`/noticeboard/timetable/edit/${timetable._id}`);
   };
 
   return (
@@ -52,7 +51,7 @@ const TimeTableList = React.memo(() => {
         <p className="text-red-500">Failed to load timetables: {error}</p>
       ) : cachedTimetables.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-96">
-          <PiTableDuotone className="text-9xl text-gray-400" />
+          <FaClipboardList className="text-9xl text-gray-400" />
           <p className="text-xl text-gray-400 mt-4">No TimeTables Yet!</p>
         </div>
       ) : (
@@ -61,10 +60,11 @@ const TimeTableList = React.memo(() => {
             <div
               key={timetable._id}
               className="p-6 bg-white shadow-xl rounded-xl border border-gray-200 transition duration-500 hover:scale-105 hover:shadow-2xl cursor-pointer"
-              onClick={() => handleCardClick(timetable)} // Navigate to TableView on click
+              onClick={() => handleCardClick(timetable)}
             >
-              <h2 className="text-2xl font-bold text-gray-800 mb-4">
-                {timetable.name}{" "}
+              {/* Card Header */}
+              <h2 className="text-xl font-semibold text-gray-800 mb-3">
+                {timetable.name}
                 <FaClipboardList className="inline-block ml-2 text-indigo-500" />
               </h2>
               <p className="text-sm text-gray-600 flex items-center">
@@ -73,116 +73,71 @@ const TimeTableList = React.memo(() => {
               </p>
               <p className="text-sm text-gray-600 flex items-center">
                 <FaChalkboardTeacher className="text-indigo-400 mr-2" />
-                <strong>Status:</strong> {timetable.status}
+                <strong>Status:</strong>{" "}
+                <span className="text-green-600">{timetable.status}</span>
               </p>
-              <p className="text-sm text-gray-600 flex items-center">
+
+              {/* General Info */}
+              <p className="text-sm text-gray-600 flex items-center mt-2">
                 <FaChalkboardTeacher className="text-indigo-400 mr-2" />
                 <strong>Class:</strong>{" "}
-                {timetable.classId?.className ?? "N/A"}
+                {timetable.classId?.className ?? "N/A"}, {timetable.schoolId?.nameOfSchool ?? "N/A"}
               </p>
               <p className="text-sm text-gray-600 flex items-center">
-                <FaChalkboardTeacher className="text-indigo-400 mr-2" />
-                <strong>School:</strong>{" "}
-                {timetable.schoolId?.nameOfSchool ?? "N/A"}
+                <FaCalendarAlt className="text-indigo-400 mr-2" />
+                <strong>Academic Year:</strong> {timetable.academicYear?.year ?? "N/A"}
               </p>
-              <p className="text-sm text-gray-600 flex items-center">
-                <FaChalkboardTeacher className="text-indigo-400 mr-2" />
-                <strong>Academic Year:</strong>{" "}
-                {timetable.academicYear?.year ?? "N/A"}
-              </p>
-              {/* Validity */}
-              {timetable.validity && (
-                <>
-                  <p className="text-sm text-gray-600 flex items-center">
-                    <FaCalendarAlt className="text-indigo-400 mr-2" />
-                    <strong>Valid From:</strong>{" "}
-                    {new Date(timetable.validity.startDate).toLocaleDateString()}
-                  </p>
+              {timetable.validity?.startDate && (
+                <p className="text-sm text-gray-600 flex items-center">
+                  <FaCalendarAlt className="text-indigo-400 mr-2" />
+                  <strong>Valid From:</strong> {new Date(timetable.validity.startDate).toLocaleDateString()}
                   {timetable.validity?.endDate && (
-                    <p className="text-sm text-gray-600 flex items-center">
-                      <FaCalendarAlt className="text-indigo-400 mr-2" />
-                      <strong>Valid To:</strong>{" "}
-                      {new Date(
-                        timetable.validity.endDate
-                      ).toLocaleDateString()}
-                    </p>
+                    <> – {new Date(timetable.validity.endDate).toLocaleDateString()}</>
                   )}
-                </>
+                </p>
               )}
 
-              {/* Display days and slots */}
-              <div className="mt-6 bg-gray-100 p-4 rounded-lg border border-gray-200">
+              {/* Schedule Summary */}
+              <div className="mt-4 bg-gray-100 p-3 rounded-lg border border-gray-200">
                 <h3 className="text-md font-semibold text-gray-700">
                   Schedule:
                 </h3>
-                {timetable.days?.length > 0 ? (
-                  timetable.days.map((day, index) => (
-                    <div
-                      key={index}
-                      className="mt-3 border-t border-gray-300 pt-3"
-                    >
-                      {timetable.type === "weekly" && day.day && (
-                        <p className="font-medium text-gray-600 flex items-center">
-                          <FaCalendarAlt className="text-indigo-400 mr-2" />
-                          Day: {day.day}
-                        </p>
-                      )}
-                      {(timetable.type === "exam" ||
-                        timetable.type === "event") &&
-                        day.date && (
-                          <p className="font-medium text-gray-600 flex items-center">
-                            <FaCalendarAlt className="text-indigo-400 mr-2" />
-                            Date:{" "}
-                            {new Date(day.date).toLocaleDateString()}
+                {timetable.days?.[0] ? (
+                  <div className="mt-2">
+                    {timetable.type === "weekly" && (
+                      <p className="text-gray-600">
+                        <strong>Day:</strong> {timetable.days[0].day}
+                      </p>
+                    )}
+                    {["event", "exam"].includes(timetable.type) && timetable.days[0].date && (
+                      <p className="text-gray-600">
+                        <strong>Date:</strong>{" "}
+                        {new Date(timetable.days[0].date).toLocaleDateString()}
+                      </p>
+                    )}
+                    {timetable.days[0].slots?.[0] && (
+                      <>
+                        {timetable.type === "event" ? (
+                          <p className="text-gray-600">
+                            <strong>Event:</strong> {timetable.days[0].slots[0].eventName ?? "N/A"}
+                          </p>
+                        ) : (
+                          <p className="text-gray-600">
+                            <strong>Subject:</strong> {timetable.days[0].slots[0].subjectId?.name ?? "N/A"}
                           </p>
                         )}
-
-                      {day.slots?.length > 0 ? (
-                        day.slots.map((slot, slotIndex) => (
-                          <div
-                            key={slotIndex}
-                            className="ml-4 mt-2 text-gray-600"
-                          >
-                            {timetable.type === "event" ? (
-                              <p className="flex items-center">
-                                <FaClipboardList className="text-indigo-400 mr-2" />
-                                <strong>Event:</strong>{" "}
-                                {slot.eventName ?? "N/A"}
-                              </p>
-                            ) : (
-                              <>
-                                <p className="flex items-center">
-                                  <FaClipboardList className="text-indigo-400 mr-2" />
-                                  <strong>Subject:</strong>{" "}
-                                  {slot.subjectId?.name ?? "N/A"}
-                                </p>
-                                {slot.description && (
-                                  <p className="flex items-center">
-                                    <FaClipboardList className="text-indigo-400 mr-2" />
-                                    <strong>Description:</strong>{" "}
-                                    {slot.description}
-                                  </p>
-                                )}
-                              </>
-                            )}
-                            <p className="flex items-center">
-                              <FaClock className="text-indigo-400 mr-2" />
-                              <strong>Time:</strong> {slot.startTime} -{" "}
-                              {slot.endTime}
-                            </p>
-                          </div>
-                        ))
-                      ) : (
-                        <p className="text-gray-500">No slots available.</p>
-                      )}
-                    </div>
-                  ))
+                        <p className="text-gray-600">
+                          <strong>Time:</strong> {timetable.days[0].slots[0].startTime} – {timetable.days[0].slots[0].endTime}
+                        </p>
+                      </>
+                    )}
+                  </div>
                 ) : (
                   <p className="text-gray-500">No schedule available.</p>
                 )}
               </div>
 
-              {/* Edit and Delete Buttons */}
+              {/* Action Buttons */}
               <div className="flex justify-end space-x-2 mt-4">
                 <button
                   className="bg-blue-500 text-white px-4 py-2 rounded-full flex items-center hover:bg-blue-600 transition duration-300"
