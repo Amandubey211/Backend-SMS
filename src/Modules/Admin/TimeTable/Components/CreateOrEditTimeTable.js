@@ -1,3 +1,5 @@
+// CreateTimeTablePage.jsx
+
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -21,17 +23,14 @@ import {
   updateTimetable,
 } from '../../../../Store/Slices/Admin/TimeTable/timetable.action';
 import { fetchSubjects } from '../../../../Store/Slices/Admin/Class/Subject/subjectThunks';
-// Correct Import from groupSectionSlice
 import {
   fetchSectionsByClass,
   fetchGroupsByClass,
 } from '../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks';
-
 import {
   clearSectionsList,
   clearGroupsList,
 } from '../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionSlice';
-
 import DashLayout from '../../../../Components/Admin/AdminDashLayout';
 import Layout from '../../../../Components/Common/Layout';
 import { useNavigate } from 'react-router-dom';
@@ -51,7 +50,7 @@ const daysOfWeek = [
 
 const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
   const dispatch = useDispatch();
-  const navigate = useNavigate(); // Initialize navigate
+  const navigate = useNavigate();
 
   // Accessing classes, subjects, sections, and groups from Redux store
   const classes = useSelector((state) => state.admin.class.classes);
@@ -73,7 +72,7 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
     type: timetable.type || 'weekly',
   });
 
-  const [isActive, setIsActive] = useState(false); // Initialize isActive state
+  const [isActive, setIsActive] = useState(false);
   const [columns, setColumns] = useState([]);
   const [dataSource, setDataSource] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -91,8 +90,7 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
         const academicYear = parsedAuth.AcademicYear
           ? JSON.parse(parsedAuth.AcademicYear)
           : [];
-        setIsActive(academicYear[0]?.isActive || false); // Safely access isActive
-        console.log('Fetched isActive:', academicYear[0]?.isActive || false);
+        setIsActive(academicYear[0]?.isActive || false);
       } catch (error) {
         console.error('Error parsing auth data:', error);
       }
@@ -102,16 +100,13 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
   // Fetch subjects, sections, and groups when classId changes
   useEffect(() => {
     if (formData.classId) {
-      // Clear existing sections and groups
       dispatch(clearSectionsList());
       dispatch(clearGroupsList());
 
-      // Fetch new sections and groups
       dispatch(fetchSubjects(formData.classId));
       dispatch(fetchSectionsByClass(formData.classId));
       dispatch(fetchGroupsByClass(formData.classId));
     } else {
-      // If classId is cleared, also clear sections and groups
       dispatch(clearSectionsList());
       dispatch(clearGroupsList());
       setFormData((prev) => ({
@@ -122,31 +117,18 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
     }
   }, [formData.classId, dispatch]);
 
-  // Debugging: Log subjects, sections, and groups to verify data
+  // Log the subjects to inspect their structure
   useEffect(() => {
-    console.log('Fetched Subjects:', subjects);
+    console.log('Subjects:', subjects);
   }, [subjects]);
 
-  useEffect(() => {
-    console.log('Fetched Sections:', sectionsList);
-  }, [sectionsList]);
-
-  useEffect(() => {
-    console.log('Fetched Groups:', groupsList);
-  }, [groupsList]);
-
-  // Monitor dataSource for debugging
-  useEffect(() => {
-    console.log('Current dataSource:', dataSource);
-  }, [dataSource]);
-
-  // Handle cell value changes using row index
-  const handleCellChange = (value, rowIndex, dataIndex) => {
+  // Handle cell value changes using row key
+  const handleCellChange = (value, key, dataIndex) => {
     setDataSource((prevData) => {
       const newData = [...prevData];
-      if (rowIndex > -1 && rowIndex < newData.length) {
-        newData[rowIndex] = { ...newData[rowIndex], [dataIndex]: value };
-        console.log(`Updated row ${rowIndex + 1}:`, newData[rowIndex]); // Debugging
+      const index = newData.findIndex((item) => item.key === key);
+      if (index > -1) {
+        newData[index] = { ...newData[index], [dataIndex]: value };
         return newData;
       }
       return prevData;
@@ -157,15 +139,15 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
   const renderEditableCell = (text, record, dataIndex) => (
     <Input
       value={text}
-      onChange={(e) => handleCellChange(e.target.value, record.index, dataIndex)}
+      onChange={(e) => handleCellChange(e.target.value, record.key, dataIndex)}
       required
     />
   );
 
-  const renderDayDropdown = (text, record, dataIndex, rowIndex) => (
+  const renderDayDropdown = (text, record, dataIndex) => (
     <Select
       value={text || undefined}
-      onChange={(value) => handleCellChange(value, rowIndex, dataIndex)}
+      onChange={(value) => handleCellChange(value, record.key, dataIndex)}
       style={{ width: '100%' }}
       placeholder="Select Day"
     >
@@ -177,38 +159,46 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
     </Select>
   );
 
-  const renderTimePicker = (text, record, dataIndex, rowIndex) => (
+  const renderTimePicker = (text, record, dataIndex) => (
     <TimePicker
       value={text ? moment(text, 'HH:mm') : null}
       format="HH:mm"
-      onChange={(time, timeString) => handleCellChange(timeString, rowIndex, dataIndex)}
+      onChange={(time, timeString) => handleCellChange(timeString, record.key, dataIndex)}
     />
   );
 
-  const renderDatePicker = (text, record, dataIndex, rowIndex) => (
+  const renderDatePicker = (text, record, dataIndex) => (
     <DatePicker
       value={text ? moment(text, 'YYYY-MM-DD') : null}
       format="YYYY-MM-DD"
-      onChange={(date, dateString) => handleCellChange(dateString, rowIndex, dataIndex)}
+      onChange={(date, dateString) => handleCellChange(dateString, record.key, dataIndex)}
     />
   );
 
-  const renderSubjectDropdown = (text, record, dataIndex, rowIndex) => {
+  const renderSubjectDropdown = (text, record, dataIndex) => {
     const isDisabled = !formData.classId || !(subjects && subjects.length > 0);
+
     return (
       <Select
         value={text || undefined}
-        onChange={(value) => handleCellChange(value, rowIndex, dataIndex)}
+        onChange={(value) => handleCellChange(value, record.key, dataIndex)}
         style={{ width: '100%' }}
         placeholder="Select Subject"
         disabled={isDisabled}
       >
         {subjects && subjects.length > 0 ? (
-          subjects.map((subject) => (
-            <Option key={subject._id} value={subject._id}>
-              {subject.subjectName}
-            </Option>
-          ))
+          subjects.map((subject, index) => {
+            const subjectId = subject._id || subject.id || subject.subjectId;
+            if (!subjectId) {
+              console.warn(`Subject at index ${index} is missing an ID.`);
+              return null;
+            }
+            return (
+              <Option key={subjectId} value={subjectId}>
+                {subject.subjectName}
+              </Option>
+            );
+          })
         ) : (
           <Option value="" disabled>
             No subjects available
@@ -218,10 +208,10 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
     );
   };
 
-  const renderDescription = (text, record, dataIndex, rowIndex) => (
+  const renderDescription = (text, record, dataIndex) => (
     <Input
       value={text}
-      onChange={(e) => handleCellChange(e.target.value, rowIndex, dataIndex)}
+      onChange={(e) => handleCellChange(e.target.value, record.key, dataIndex)}
       placeholder="Enter Description"
       required
     />
@@ -236,7 +226,6 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
         width: 70,
         fixed: 'left',
       },
-      // Additional columns will be appended based on type
     ];
 
     if (formData.type === 'weekly') {
@@ -246,31 +235,31 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
           title: 'Subject',
           dataIndex: 'subjectId',
           width: 200,
-          render: (text, record, index) => renderSubjectDropdown(text, { ...record, index }, 'subjectId', index),
+          render: (text, record) => renderSubjectDropdown(text, record, 'subjectId'),
         },
         {
           title: 'Day',
           dataIndex: 'day',
           width: 150,
-          render: (text, record, index) => renderDayDropdown(text, { ...record, index }, 'day', index),
+          render: (text, record) => renderDayDropdown(text, record, 'day'),
         },
         {
           title: 'Start Time',
           dataIndex: 'startTime',
           width: 150,
-          render: (text, record, index) => renderTimePicker(text, { ...record, index }, 'startTime', index),
+          render: (text, record) => renderTimePicker(text, record, 'startTime'),
         },
         {
           title: 'End Time',
           dataIndex: 'endTime',
           width: 150,
-          render: (text, record, index) => renderTimePicker(text, { ...record, index }, 'endTime', index),
+          render: (text, record) => renderTimePicker(text, record, 'endTime'),
         },
         {
           title: 'Description',
           dataIndex: 'description',
           width: 250,
-          render: (text, record, index) => renderDescription(text, { ...record, index }, 'description', index),
+          render: (text, record) => renderDescription(text, record, 'description'),
         },
       ];
     } else if (formData.type === 'exam') {
@@ -280,31 +269,31 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
           title: 'Subject',
           dataIndex: 'subjectId',
           width: 200,
-          render: (text, record, index) => renderSubjectDropdown(text, { ...record, index }, 'subjectId', index),
+          render: (text, record) => renderSubjectDropdown(text, record, 'subjectId'),
         },
         {
           title: 'Start Time',
           dataIndex: 'startTime',
           width: 150,
-          render: (text, record, index) => renderTimePicker(text, { ...record, index }, 'startTime', index),
+          render: (text, record) => renderTimePicker(text, record, 'startTime'),
         },
         {
           title: 'End Time',
           dataIndex: 'endTime',
           width: 150,
-          render: (text, record, index) => renderTimePicker(text, { ...record, index }, 'endTime', index),
+          render: (text, record) => renderTimePicker(text, record, 'endTime'),
         },
         {
           title: 'Date',
           dataIndex: 'date',
           width: 150,
-          render: (text, record, index) => renderDatePicker(text, { ...record, index }, 'date', index),
+          render: (text, record) => renderDatePicker(text, record, 'date'),
         },
         {
           title: 'Description',
           dataIndex: 'description',
           width: 250,
-          render: (text, record, index) => renderDescription(text, { ...record, index }, 'description', index),
+          render: (text, record) => renderDescription(text, record, 'description'),
         },
       ];
     } else if (formData.type === 'event') {
@@ -314,31 +303,31 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
           title: 'Event Name',
           dataIndex: 'eventName',
           width: 200,
-          render: (text, record, index) => renderEditableCell(text, { ...record, index }, 'eventName'),
+          render: (text, record) => renderEditableCell(text, record, 'eventName'),
         },
         {
           title: 'Start Time',
           dataIndex: 'startTime',
           width: 150,
-          render: (text, record, index) => renderTimePicker(text, { ...record, index }, 'startTime', index),
+          render: (text, record) => renderTimePicker(text, record, 'startTime'),
         },
         {
           title: 'End Time',
           dataIndex: 'endTime',
           width: 150,
-          render: (text, record, index) => renderTimePicker(text, { ...record, index }, 'endTime', index),
+          render: (text, record) => renderTimePicker(text, record, 'endTime'),
         },
         {
           title: 'Date',
           dataIndex: 'date',
           width: 150,
-          render: (text, record, index) => renderDatePicker(text, { ...record, index }, 'date', index),
+          render: (text, record) => renderDatePicker(text, record, 'date'),
         },
         {
           title: 'Description',
           dataIndex: 'description',
           width: 250,
-          render: (text, record, index) => renderDescription(text, { ...record, index }, 'description', index),
+          render: (text, record) => renderDescription(text, record, 'description'),
         },
       ];
     } else if (formData.type === 'others') {
@@ -348,31 +337,31 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
           title: 'Other Title',
           dataIndex: 'otherTitle',
           width: 200,
-          render: (text, record, index) => renderEditableCell(text, { ...record, index }, 'otherTitle'),
+          render: (text, record) => renderEditableCell(text, record, 'otherTitle'),
         },
         {
           title: 'Subject',
           dataIndex: 'subjectId',
           width: 200,
-          render: (text, record, index) => renderSubjectDropdown(text, { ...record, index }, 'subjectId', index),
+          render: (text, record) => renderSubjectDropdown(text, record, 'subjectId'),
         },
         {
           title: 'Start Time',
           dataIndex: 'startTime',
           width: 150,
-          render: (text, record, index) => renderTimePicker(text, { ...record, index }, 'startTime', index),
+          render: (text, record) => renderTimePicker(text, record, 'startTime'),
         },
         {
           title: 'End Time',
           dataIndex: 'endTime',
           width: 150,
-          render: (text, record, index) => renderTimePicker(text, { ...record, index }, 'endTime', index),
+          render: (text, record) => renderTimePicker(text, record, 'endTime'),
         },
         {
           title: 'Description',
           dataIndex: 'description',
           width: 250,
-          render: (text, record, index) => renderDescription(text, { ...record, index }, 'description', index),
+          render: (text, record) => renderDescription(text, record, 'description'),
         },
       ];
     } else {
@@ -389,8 +378,8 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
   // Reset dataSource and ID counter when formData.type changes
   useEffect(() => {
     setDataSource([]);
-    idCounterRef.current = 1; // Reset the ID counter
-    handleAddRow(); // Add the first row with ID = 1
+    idCounterRef.current = 1;
+    handleAddRow();
   }, [formData.type]);
 
   // Add a new row
@@ -425,7 +414,6 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
         newRow.description = '';
       }
 
-      // Increment the ID counter
       idCounterRef.current += 1;
 
       return [...prevData, newRow];
@@ -447,11 +435,10 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
         }
       });
 
-      // Store deleted rows with their original indices
       setDeletedRowsStack((prevStack) => [...prevStack, rowsToDelete]);
 
-      // Remove the rows from dataSource
-      return newData.filter((item) => !selectedRowKeys.includes(item.key));
+      const updatedData = newData.filter((item) => !selectedRowKeys.includes(item.key));
+      return updatedData;
     });
 
     setSelectedRowKeys([]);
@@ -463,14 +450,13 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
 
     setDataSource((prevData) => {
       let newData = [...prevData];
-      const rowsToRestore = deletedRowsStack.slice(-1)[0]; // Get the last deleted rows
+      const rowsToRestore = deletedRowsStack.slice(-1)[0];
 
       rowsToRestore.forEach((row) => {
         const { originalIndex } = row;
-        newData.splice(originalIndex, 0, row); // Insert at original index
+        newData.splice(originalIndex, 0, row);
       });
 
-      // Remove the last set of deleted rows from the stack
       setDeletedRowsStack((prevStack) => prevStack.slice(0, -1));
 
       return newData;
@@ -527,55 +513,55 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
 
     dataSource.forEach((row, index) => {
       if (formData.type === 'weekly') {
-        if (!row.subjectId) {
+        if (!row.subjectId || row.subjectId.trim() === '') {
           errors.push(`Subject is required for row ${index + 1}.`);
         }
-        if (!row.day) {
+        if (!row.day || row.day.trim() === '') {
           errors.push(`Day is required for row ${index + 1}.`);
         }
         if (!row.startTime || !row.endTime) {
           errors.push(`Start and end time are required for row ${index + 1}.`);
         }
-        if (!row.description) {
+        if (!row.description || row.description.trim() === '') {
           errors.push(`Description is required for row ${index + 1}.`);
         }
       } else if (formData.type === 'exam') {
-        if (!row.subjectId) {
+        if (!row.subjectId || row.subjectId.trim() === '') {
           errors.push(`Subject is required for row ${index + 1}.`);
         }
         if (!row.startTime || !row.endTime) {
           errors.push(`Start and end time are required for row ${index + 1}.`);
         }
-        if (!row.date) {
+        if (!row.date || row.date.trim() === '') {
           errors.push(`Date is required for row ${index + 1}.`);
         }
-        if (!row.description) {
+        if (!row.description || row.description.trim() === '') {
           errors.push(`Description is required for row ${index + 1}.`);
         }
       } else if (formData.type === 'event') {
-        if (!row.eventName) {
+        if (!row.eventName || row.eventName.trim() === '') {
           errors.push(`Event name is required for row ${index + 1}.`);
         }
         if (!row.startTime || !row.endTime) {
           errors.push(`Start and end time are required for row ${index + 1}.`);
         }
-        if (!row.date) {
+        if (!row.date || row.date.trim() === '') {
           errors.push(`Date is required for row ${index + 1}.`);
         }
-        if (!row.description) {
+        if (!row.description || row.description.trim() === '') {
           errors.push(`Description is required for row ${index + 1}.`);
         }
       } else if (formData.type === 'others') {
-        if (!row.otherTitle) {
+        if (!row.otherTitle || row.otherTitle.trim() === '') {
           errors.push(`Other Title is required for row ${index + 1}.`);
         }
-        if (!row.subjectId) {
+        if (!row.subjectId || row.subjectId.trim() === '') {
           errors.push(`Subject is required for row ${index + 1}.`);
         }
         if (!row.startTime || !row.endTime) {
           errors.push(`Start and end time are required for row ${index + 1}.`);
         }
-        if (!row.description) {
+        if (!row.description || row.description.trim() === '') {
           errors.push(`Description is required for row ${index + 1}.`);
         }
       }
@@ -596,7 +582,7 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
         startDate: new Date(formData.startDate).toISOString(),
         endDate: formData.endDate ? new Date(formData.endDate).toISOString() : undefined,
       },
-      status: isActive ? 'active' : 'inactive', // Use isActive from state
+      status: isActive ? 'active' : 'inactive',
       days: [],
     };
 
@@ -695,7 +681,6 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
       }, 1500);
     }
 
-    // Close the form or perform any cleanup
     onClose();
   };
 
@@ -840,7 +825,7 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
                   type="primary"
                   icon={<PlusOutlined />}
                   onClick={handleAddRow}
-                  disabled={!formData.classId} // Disable until class is selected
+                  disabled={!formData.classId}
                 >
                   Add Row
                 </Button>
@@ -897,4 +882,3 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
 };
 
 export default CreateTimeTablePage;
-
