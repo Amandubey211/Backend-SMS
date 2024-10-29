@@ -1,109 +1,134 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchAllClasses } from "../../../../Store/Slices/Admin/Class/actions/classThunk";
+import { Input, Select, Button, Row, Col, Space } from "antd";
+import { SearchOutlined } from "@ant-design/icons";
+import toast from "react-hot-toast";
 
-const TopNavigationWithFilters = ({ onSearch, onFilterChange, academicYears }) => {
+const { Option } = Select;
+
+const TopNavigationWithFilters = ({ onFilterChange }) => {
+  const dispatch = useDispatch();
+
+  // Local filter state
   const [filters, setFilters] = useState({
     name: "",
     classId: "",
     type: "",
-    status: "",
-    academicYear: academicYears?.length ? academicYears[0]._id : "", // Default to first academic year
   });
 
-  useEffect(() => {
-    if (academicYears?.length) {
-      setFilters((prevFilters) => ({
-        ...prevFilters,
-        academicYear: academicYears[0]._id, // Default to the first academic year
-      }));
-    }
-  }, [academicYears]);
+  // Fetch classes from Redux store
+  const { classes, loading, error } = useSelector((state) => state.admin.class);
 
-  // Handle filter change for text input fields
+  useEffect(() => {
+    dispatch(fetchAllClasses());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (error) toast.error("Failed to load classes. Please try again.");
+  }, [error]);
+
   const handleFilterChange = (filterName, value) => {
     setFilters((prevFilters) => ({ ...prevFilters, [filterName]: value }));
+
+    // Make real-time request for classId and type filters
+    if (filterName === "classId" || filterName === "type") {
+      onFilterChange({ ...filters, [filterName]: value });
+    }
   };
 
-  // Handle apply filters
   const applyFilters = () => {
-    onFilterChange(filters); // Trigger the filter update in parent component
+    onFilterChange(filters);
+  };
+
+  const clearFilters = () => {
+    setFilters({
+      name: "",
+      classId: "",
+      type: "",
+    });
+    onFilterChange({}); // Trigger API request to load data without filters
   };
 
   return (
-    <div className="flex justify-between items-center mb-6">
-      {/* Name Filter */}
-      <div className="relative flex items-center max-w-xs w-full mr-4">
-        <input
-          type="text"
-          placeholder="Filter by Name"
-          value={filters.name}
-          onChange={(e) => handleFilterChange("name", e.target.value)}
-          className="px-4 py-2 border rounded-full focus:outline-none w-full transition-all duration-300"
-        />
-      </div>
+    <div className="p-4 bg-transparent mb-5">
+      <Row gutter={16} align="middle" justify="end">
+        {/* Name Filter */}
+        <Col>
+          <label className="font-medium text-gray-700" style={{ paddingRight: "8px" }}>Name</label>
+          <Input
+            placeholder="Search by Name"
+            prefix={<SearchOutlined />}
+            value={filters.name}
+            onChange={(e) => handleFilterChange("name", e.target.value)}
+            allowClear
+            style={{ width: "200px" }}
+          />
+        </Col>
 
-      {/* Class ID Filter */}
-      <div className="relative flex items-center max-w-xs w-full mr-4">
-        <input
-          type="text"
-          placeholder="Filter by Class ID"
-          value={filters.classId}
-          onChange={(e) => handleFilterChange("classId", e.target.value)}
-          className="px-4 py-2 border rounded-full focus:outline-none w-full transition-all duration-300"
-        />
-      </div>
+        {/* Class ID Filter */}
+        <Col>
+          <label className="font-medium text-gray-700" style={{ paddingRight: "8px" }}>Class</label>
+          <Select
+            placeholder="Select Class"
+            loading={loading}
+            value={filters.classId}
+            onChange={(value) => handleFilterChange("classId", value)}
+            style={{ width: "180px" }}
+            optionFilterProp="children"
+            showSearch
+          >
+            <Option value="">Select Class</Option>
+            {classes.map((cls) => (
+              <Option key={cls._id} value={cls._id}>
+                {cls.className}
+              </Option>
+            ))}
+          </Select>
+        </Col>
 
-      {/* Type Filter */}
-      <div className="relative max-w-xs w-full mr-4">
-        <select
-          value={filters.type}
-          onChange={(e) => handleFilterChange("type", e.target.value)}
-          className="px-4 py-2 border rounded-full focus:outline-none w-full transition-all duration-300"
-        >
-          <option value="">All Types</option>
-          <option value="weekly">Weekly</option>
-          <option value="exam">Exam</option>
-          <option value="event">Event</option>
-          <option value="others">Others</option>
-        </select>
-      </div>
+        {/* Type Filter */}
+        <Col>
+          <label className="font-medium text-gray-700" style={{ paddingRight: "8px" }}>Type</label>
+          <Select
+            placeholder="All Types"
+            value={filters.type}
+            onChange={(value) => handleFilterChange("type", value)}
+            style={{ width: "180px" }}
+          >
+            <Option value="">All Types</Option>
+            <Option value="weekly">Weekly</Option>
+            <Option value="exam">Exam</Option>
+            <Option value="event">Event</Option>
+            <Option value="others">Others</Option>
+          </Select>
+        </Col>
 
-      {/* Status Filter */}
-      <div className="relative max-w-xs w-full mr-4">
-        <select
-          value={filters.status}
-          onChange={(e) => handleFilterChange("status", e.target.value)}
-          className="px-4 py-2 border rounded-full focus:outline-none w-full transition-all duration-300"
-        >
-          <option value="">All Status</option>
-          <option value="active">Active</option>
-          <option value="inactive">Inactive</option>
-        </select>
-      </div>
-
-      {/* Academic Year Filter */}
-      <div className="relative max-w-xs w-full">
-        <select
-          value={filters.academicYear}
-          onChange={(e) => handleFilterChange("academicYear", e.target.value)}
-          className="px-4 py-2 border rounded-full focus:outline-none w-full transition-all duration-300"
-        >
-          {academicYears.map((year) => (
-            <option key={year._id} value={year._id}>
-              {year.year}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {/* Apply Filters Button */}
-      <button
-        onClick={applyFilters}
-        className="bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600 transition-all duration-300"
-      >
-        Apply Filters
-      </button>
+        {/* Action Buttons */}
+        <Col>
+          <Space size="middle">
+            <Button
+              type="primary"
+              onClick={applyFilters}
+              style={{ borderRadius: "6px" }}
+            >
+              Apply Filters
+            </Button>
+            <Button
+              onClick={clearFilters}
+              style={{
+                borderRadius: "6px",
+                color: "#1890ff",
+                borderColor: "#1890ff",
+              }}
+            >
+              Clear Filters
+            </Button>
+          </Space>
+        </Col>
+      </Row>
     </div>
   );
 };
 
-export default React.memo(TopNavigationWithFilters);
+export default TopNavigationWithFilters;

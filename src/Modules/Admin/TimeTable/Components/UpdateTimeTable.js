@@ -56,6 +56,8 @@ const UpdateTimeTable = () => {
   // Find the timetable to edit
   const timetable = timetables.find((tt) => tt._id === id);
 
+  console.log('Timetable fetched from Redux:', timetable); // Debugging
+
   // Accessing classes, subjects, sections, and groups from Redux store
   const classes = useSelector((state) => state.admin.class.classes);
   const subjects = useSelector((state) => state.admin.subject.subjects);
@@ -89,21 +91,34 @@ const UpdateTimeTable = () => {
   // ID Counter using useRef
   const idCounterRef = useRef(1);
 
-  // Fetch isActive from localStorage on component mount
+  // Fetch isActive and academicYear from localStorage or timetable data
+  const [academicYear, setAcademicYear] = useState(null);
+
   useEffect(() => {
     const authData = localStorage.getItem('persist:auth');
+    let academicYearData = null;
     if (authData) {
       try {
         const parsedAuth = JSON.parse(authData);
-        const academicYear = parsedAuth.AcademicYear
+        academicYearData = parsedAuth.AcademicYear
           ? JSON.parse(parsedAuth.AcademicYear)
-          : [];
-        setIsActive(academicYear[0]?.isActive || false);
+          : null;
+        setIsActive(academicYearData?.isActive || false);
+        console.log('Academic Year from localStorage:', academicYearData); // Debugging
       } catch (error) {
         console.error('Error parsing auth data:', error);
       }
     }
-  }, []);
+
+    if (academicYearData && academicYearData._id) {
+      setAcademicYear(academicYearData._id);
+    } else if (timetable && timetable.academicYear && timetable.academicYear._id) {
+      setAcademicYear(timetable.academicYear._id);
+      console.log('Academic Year from timetable:', timetable.academicYear); // Debugging
+    } else {
+      console.warn('Academic Year is not available.');
+    }
+  }, [timetable]);
 
   // Fetch subjects, sections, and groups when classId changes
   useEffect(() => {
@@ -130,10 +145,18 @@ const UpdateTimeTable = () => {
     if (timetable && timetable.days && timetable.days.length > 0) {
       const newDataSource = [];
       idCounterRef.current = 1;
-      timetable.days.forEach((day) => {
-        day.slots.forEach((slot) => {
+      timetable.days.forEach((day, dayIndex) => {
+        console.log(`Processing day ${dayIndex + 1}:`, day); // Debugging
+        day.slots.forEach((slot, slotIndex) => {
+          console.log(`Processing slot ${slotIndex + 1}:`, slot); // Debugging
           const newRow = { key: idCounterRef.current, id: idCounterRef.current };
-          if (timetable.type === 'weekly') {
+          if (timetable.type === 'others') {
+            newRow.heading = slot.name || ''; // Extract heading from slot.name
+            newRow.subjectId = slot.subjectId?._id || slot.subjectId || '';
+            newRow.startTime = slot.startTime || '';
+            newRow.endTime = slot.endTime || '';
+            newRow.description = slot.description || '';
+          } else if (timetable.type === 'weekly') {
             newRow.subjectId = slot.subjectId?._id || slot.subjectId || '';
             newRow.day = day.day || '';
             newRow.startTime = slot.startTime || '';
@@ -148,16 +171,10 @@ const UpdateTimeTable = () => {
             newRow.endTime = slot.endTime || '';
             newRow.description = slot.description || '';
           } else if (timetable.type === 'event') {
-            newRow.eventName = slot.eventName || '';
+            newRow.eventName = slot.name || ''; // Extract event name from slot.name
             newRow.date = day.date
               ? moment(day.date).format('YYYY-MM-DD')
               : '';
-            newRow.startTime = slot.startTime || '';
-            newRow.endTime = slot.endTime || '';
-            newRow.description = slot.description || '';
-          } else if (timetable.type === 'others') {
-            newRow.otherTitle = day.otherTitle || '';
-            newRow.subjectId = slot.subjectId?._id || slot.subjectId || '';
             newRow.startTime = slot.startTime || '';
             newRow.endTime = slot.endTime || '';
             newRow.description = slot.description || '';
@@ -166,7 +183,10 @@ const UpdateTimeTable = () => {
           idCounterRef.current += 1;
         });
       });
+      console.log('Pre-filled dataSource:', newDataSource); // Debugging
       setDataSource(newDataSource);
+    } else {
+      console.warn('Timetable data is incomplete or missing days.'); // Debugging
     }
   }, [timetable]);
 
@@ -399,11 +419,11 @@ const UpdateTimeTable = () => {
       return [
         ...commonColumns,
         {
-          title: 'Other Title',
-          dataIndex: 'otherTitle',
+          title: 'Heading',
+          dataIndex: 'heading',
           width: 200,
           render: (text, record) =>
-            renderEditableCell(text, record, 'otherTitle'),
+            renderEditableCell(text, record, 'heading'),
         },
         {
           title: 'Subject',
@@ -453,7 +473,7 @@ const UpdateTimeTable = () => {
       idCounterRef.current = 1;
       handleAddRow();
     }
-  }, [formData.type]);
+  }, [formData.type, timetable]);
 
   // Add a new row
   const handleAddRow = () => {
@@ -480,7 +500,7 @@ const UpdateTimeTable = () => {
         newRow.date = '';
         newRow.description = '';
       } else if (formData.type === 'others') {
-        newRow.otherTitle = '';
+        newRow.heading = '';
         newRow.subjectId = '';
         newRow.startTime = '';
         newRow.endTime = '';
@@ -627,8 +647,8 @@ const UpdateTimeTable = () => {
           errors.push(`Description is required for row ${index + 1}.`);
         }
       } else if (formData.type === 'others') {
-        if (!row.otherTitle || row.otherTitle.trim() === '') {
-          errors.push(`Other Title is required for row ${index + 1}.`);
+        if (!row.heading || row.heading.trim() === '') {
+          errors.push(`Heading is required for row ${index + 1}.`);
         }
         if (!row.subjectId || row.subjectId.trim() === '') {
           errors.push(`Subject is required for row ${index + 1}.`);
@@ -660,6 +680,7 @@ const UpdateTimeTable = () => {
           : undefined,
       },
       status: isActive ? 'active' : 'inactive',
+      academicYear: academicYear, // Include academicYear as ObjectId
       days: [], // We will populate this below
     };
 
@@ -708,7 +729,7 @@ const UpdateTimeTable = () => {
           dateMap[formattedDate] = [];
         }
         const slotData = {
-          eventName: row.eventName,
+          name: row.eventName, // Use 'name' for event name
           startTime: row.startTime,
           endTime: row.endTime,
           description: row.description,
@@ -720,33 +741,34 @@ const UpdateTimeTable = () => {
         slots: dateMap[date],
       }));
     } else if (formData.type === 'others') {
-      const titleMap = {};
-      dataSource.forEach((row) => {
-        const formattedTitle = row.otherTitle;
-        if (!titleMap[formattedTitle]) {
-          titleMap[formattedTitle] = [];
-        }
-        titleMap[formattedTitle].push({
+      // Since heading is in slots, we can group all slots under a single day
+      const day = {
+        slots: dataSource.map((row) => ({
+          name: row.heading, // Use 'name' for heading
           subjectId: row.subjectId,
           startTime: row.startTime,
           endTime: row.endTime,
           description: row.description,
-        });
-      });
-      timetableData.days = Object.keys(titleMap).map((title) => ({
-        otherTitle: title,
-        slots: titleMap[title],
-      }));
+        })),
+      };
+      timetableData.days.push(day);
     }
 
-    // Dispatch the action to update the timetable
-    dispatch(updateTimetable({ id: timetable._id, data: timetableData }));
-    message.success('Timetable updated successfully!');
+    console.log('Timetable data to be sent:', timetableData); // Debugging
 
-    // Redirect after a short delay
-    setTimeout(() => {
-      navigate('/noticeboard/timetable');
-    }, 1500);
+    // Dispatch the action to update the timetable
+    dispatch(updateTimetable({ id: timetable._id, data: timetableData }))
+      .unwrap()
+      .then(() => {
+        message.success('Timetable updated successfully!');
+        // Redirect after a short delay
+        setTimeout(() => {
+          navigate('/noticeboard/timetable');
+        }, 1500);
+      })
+      .catch((error) => {
+        message.error(error || 'Failed to update timetable.');
+      });
   };
 
   // Row Selection
