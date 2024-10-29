@@ -1,12 +1,14 @@
 import React, { useEffect, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchTimetables, deleteTimetable } from "../../../../Store/Slices/Admin/TimeTable/timetable.action";
+import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
 import { PiTableDuotone } from "react-icons/pi";
 import { FaCalendarAlt, FaClock, FaChalkboardTeacher, FaClipboardList, FaTrashAlt } from "react-icons/fa";
 import Spinner from "../../../../Components/Common/Spinner";
 
 const TimeTableList = React.memo(() => {
   const dispatch = useDispatch();
+  const navigate = useNavigate(); // Initialize navigate function
 
   useEffect(() => {
     dispatch(fetchTimetables());
@@ -16,6 +18,12 @@ const TimeTableList = React.memo(() => {
 
   // Cache the processed timetables for better performance
   const cachedTimetables = useMemo(() => timetables || [], [timetables]);
+
+  // Function to handle click and navigate to TableView with selected timetable data
+  const handleCardClick = (timetable) => {
+    navigate(`/noticeboard/timetable/viewtable/${timetable.name}`, { state: { timetable } });
+
+  };
 
   return (
     <>
@@ -34,6 +42,7 @@ const TimeTableList = React.memo(() => {
             <div
               key={timetable._id}
               className="p-6 bg-white shadow-xl rounded-xl border border-gray-200 transition duration-500 hover:scale-105 hover:shadow-2xl cursor-pointer"
+              onClick={() => handleCardClick(timetable)} // Navigate to TableView on click
             >
               <h2 className="text-2xl font-bold text-gray-800 mb-4">
                 {timetable.name} <FaClipboardList className="inline-block ml-2 text-indigo-500" />
@@ -133,7 +142,10 @@ const TimeTableList = React.memo(() => {
 
               <button
                 className="bg-red-500 text-white px-4 py-2 mt-6 rounded-full flex items-center hover:bg-red-600 transition duration-300"
-                onClick={() => dispatch(deleteTimetable(timetable._id))}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  dispatch(deleteTimetable(timetable._id));
+                }}
               >
                 <FaTrashAlt className="mr-2" /> Delete
               </button>

@@ -31,6 +31,7 @@ import { useSelector } from "react-redux";
 import GraduationPage from "../Modules/Admin/Graduation/GraduationPage.js";
 import TimeTablePage from "../Modules/Admin/TimeTable/TimeTablePage.js";
 import CreateOrEditTimeTable from "../Modules/Admin/TimeTable/Components/CreateOrEditTimeTable.js";
+import TableView from "../Modules/Admin/TimeTable/Components/TableView.js";
 // lazy loaded routes
 
 const Academic = lazy(() =>
@@ -660,6 +661,18 @@ function App() {
         />
       ),
       errorElement: <Error />,
+      children: [
+        {
+          path: "viewtable/:tablename", // Notice it’s a child path, not a full path
+          element: (
+            <ProtectRoute
+              Component={TableView}
+              allowedRoles={["admin", "teacher"]}
+            />
+          ),
+          errorElement: <Error />,
+        },
+      ],
     },
 
     {

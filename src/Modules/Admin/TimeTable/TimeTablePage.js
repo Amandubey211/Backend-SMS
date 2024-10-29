@@ -14,7 +14,7 @@ const TimeTablePage = () => {
       <DashLayout>
         <Routes>
           <Route path="/" element={<TimeTableMainSection />} /> {/* Main timetable section */}
-          <Route path="/view" element={<TableView />} /> {/* Detailed table view */}
+          <Route path="viewtable/:tablename" element={<TableView />} /> {/* Detailed table view */}
         </Routes>
       </DashLayout>
     </Layout>
