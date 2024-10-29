@@ -11,8 +11,10 @@ const IconGrid = ({ activeIconId, onEdit }) => {
   );
   const dispatch = useDispatch();
 
+  // Function to handle icon selection
   const handleIconClick = (id) => dispatch(selectIcon(id));
 
+  // Function to handle icon deletion
   const handleDeleteIcon = async (iconId) => {
     await dispatch(deleteIcon(iconId));
   };
@@ -22,14 +24,14 @@ const IconGrid = ({ activeIconId, onEdit }) => {
       {icons?.map((icon) => (
         <motion.div
           key={icon._id}
-          className={`relative rounded-lg  transition-transform duration-300 `}
+          className="relative rounded-lg transition-transform duration-300"
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
         >
           <button
             type="button"
             className={`h-16 w-16 rounded-lg overflow-hidden ${
-              activeIconId === icon._id || selectedIcon === icon._id
+              activeIconId === icon._id || selectedIcon?._id === icon._id
                 ? "border-2 border-purple-500 scale-125 mx-2"
                 : "border border-gray-300"
             }`}
@@ -44,7 +46,7 @@ const IconGrid = ({ activeIconId, onEdit }) => {
           </button>
 
           {/* Edit/Delete icons only visible on hover */}
-          <div className="absolute top-1 right-1 flex gap-1  rounded-full opacity-0 transition-opacity duration-200 hover:opacity-100">
+          <div className="absolute top-1 right-1 flex gap-1 rounded-full opacity-0 transition-opacity duration-200 hover:opacity-100">
             <motion.button
               onClick={() => onEdit(icon)}
               className="text-gray-700 hover:text-green-400"

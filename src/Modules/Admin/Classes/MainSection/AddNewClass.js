@@ -13,7 +13,7 @@ import { fetchAllIcons } from "../../../../Store/Slices/Admin/Class/actions/icon
 const AddNewClass = ({ classData, isUpdate, onClose }) => {
   const [newClassName, setNewClassName] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [showClassNameError, setShowClassNameError] = useState(false); // State for error visibility
+  const [showClassNameError, setShowClassNameError] = useState(false);
   const { icons, selectedIcon } = useSelector(
     (state) => state.admin.classIcons
   );
@@ -25,7 +25,7 @@ const AddNewClass = ({ classData, isUpdate, onClose }) => {
 
     if (isUpdate && classData) {
       setNewClassName(classData.className);
-      dispatch(selectIcon(classData.classIcons));
+      dispatch(selectIcon(classData?.classIcons || null)); // Set initial icon selection if updating
     } else {
       setNewClassName("");
       dispatch(selectIcon(null));
@@ -45,13 +45,11 @@ const AddNewClass = ({ classData, isUpdate, onClose }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Check if class name is empty
     if (!newClassName) {
-      setShowClassNameError(true); // Show error if class name is empty
+      setShowClassNameError(true);
       return;
     }
 
-    // Check if icon is selected
     if (!selectedIcon) {
       toast.error("Please select an icon.");
       return;
@@ -68,7 +66,7 @@ const AddNewClass = ({ classData, isUpdate, onClose }) => {
         await dispatch(createClass(classDetails));
         setNewClassName("");
         dispatch(selectIcon(null));
-        setShowClassNameError(false); // Reset error after successful submission
+        setShowClassNameError(false);
       }
     } catch (err) {
       toast.error(err.message || "Something went wrong");
@@ -87,7 +85,7 @@ const AddNewClass = ({ classData, isUpdate, onClose }) => {
             value={newClassName}
             onChange={(e) => {
               setNewClassName(e.target.value);
-              setShowClassNameError(false); // Hide error when user types
+              setShowClassNameError(false);
             }}
             className={`mt-1 block w-full px-3 py-3 border rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm ${
               showClassNameError ? "border-red-500" : "border-gray-300"
@@ -107,7 +105,10 @@ const AddNewClass = ({ classData, isUpdate, onClose }) => {
           <h3 className="font-semibold">Class Icons</h3>
           <IconGrid
             icons={icons}
-            activeIconId={selectedIcon}
+            activeIconId={
+              selectedIcon ||
+              (classData?.classIcons && classData?.classIcons._id)
+            }
             onEdit={openModal}
           />
         </div>
