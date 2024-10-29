@@ -1,109 +1,97 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchAllClasses } from "../../../../Store/Slices/Admin/Class/actions/classThunk";
+import { Input, Select, Button, Space } from "antd";
+import { SearchOutlined } from "@ant-design/icons";
+import toast from "react-hot-toast";
 
-const TopNavigationWithFilters = ({ onSearch, onFilterChange, academicYears }) => {
+const { Option } = Select;
+
+const TopNavigationWithFilters = ({ onFilterChange }) => {
+  const dispatch = useDispatch();
+
+  // Local filter state
   const [filters, setFilters] = useState({
     name: "",
     classId: "",
     type: "",
-    status: "",
-    academicYear: academicYears?.length ? academicYears[0]._id : "", // Default to first academic year
   });
 
-  useEffect(() => {
-    if (academicYears?.length) {
-      setFilters((prevFilters) => ({
-        ...prevFilters,
-        academicYear: academicYears[0]._id, // Default to the first academic year
-      }));
-    }
-  }, [academicYears]);
+  // Fetch classes from Redux store
+  const { classes, loading, error } = useSelector((state) => state.admin.class);
 
-  // Handle filter change for text input fields
+  useEffect(() => {
+    dispatch(fetchAllClasses());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (error) toast.error("Failed to load classes. Please try again.");
+  }, [error]);
+
   const handleFilterChange = (filterName, value) => {
     setFilters((prevFilters) => ({ ...prevFilters, [filterName]: value }));
   };
 
-  // Handle apply filters
   const applyFilters = () => {
-    onFilterChange(filters); // Trigger the filter update in parent component
+    onFilterChange(filters);
   };
 
   return (
-    <div className="flex justify-between items-center mb-6">
-      {/* Name Filter */}
-      <div className="relative flex items-center max-w-xs w-full mr-4">
-        <input
-          type="text"
-          placeholder="Filter by Name"
+    <div className="p-4 bg-white rounded-lg shadow-md">
+      <Space size="large" className="flex items-center justify-between w-full">
+        {/* Name Filter */}
+        <Input
+          placeholder="Search by Name"
+          prefix={<SearchOutlined />}
           value={filters.name}
           onChange={(e) => handleFilterChange("name", e.target.value)}
-          className="px-4 py-2 border rounded-full focus:outline-none w-full transition-all duration-300"
+          style={{ width: "30%", borderRadius: "8px" }}
+          allowClear
         />
-      </div>
 
-      {/* Class ID Filter */}
-      <div className="relative flex items-center max-w-xs w-full mr-4">
-        <input
-          type="text"
-          placeholder="Filter by Class ID"
+        {/* Class ID Filter */}
+        <Select
+          placeholder="Select Class"
+          loading={loading}
           value={filters.classId}
-          onChange={(e) => handleFilterChange("classId", e.target.value)}
-          className="px-4 py-2 border rounded-full focus:outline-none w-full transition-all duration-300"
-        />
-      </div>
-
-      {/* Type Filter */}
-      <div className="relative max-w-xs w-full mr-4">
-        <select
-          value={filters.type}
-          onChange={(e) => handleFilterChange("type", e.target.value)}
-          className="px-4 py-2 border rounded-full focus:outline-none w-full transition-all duration-300"
+          onChange={(value) => handleFilterChange("classId", value)}
+          style={{ width: "30%", borderRadius: "8px" }}
+          optionFilterProp="children"
+          showSearch
         >
-          <option value="">All Types</option>
-          <option value="weekly">Weekly</option>
-          <option value="exam">Exam</option>
-          <option value="event">Event</option>
-          <option value="others">Others</option>
-        </select>
-      </div>
-
-      {/* Status Filter */}
-      <div className="relative max-w-xs w-full mr-4">
-        <select
-          value={filters.status}
-          onChange={(e) => handleFilterChange("status", e.target.value)}
-          className="px-4 py-2 border rounded-full focus:outline-none w-full transition-all duration-300"
-        >
-          <option value="">All Status</option>
-          <option value="active">Active</option>
-          <option value="inactive">Inactive</option>
-        </select>
-      </div>
-
-      {/* Academic Year Filter */}
-      <div className="relative max-w-xs w-full">
-        <select
-          value={filters.academicYear}
-          onChange={(e) => handleFilterChange("academicYear", e.target.value)}
-          className="px-4 py-2 border rounded-full focus:outline-none w-full transition-all duration-300"
-        >
-          {academicYears.map((year) => (
-            <option key={year._id} value={year._id}>
-              {year.year}
-            </option>
+          {classes.map((cls) => (
+            <Option key={cls._id} value={cls._id}>
+              {cls.className}
+            </Option>
           ))}
-        </select>
-      </div>
+        </Select>
 
-      {/* Apply Filters Button */}
-      <button
-        onClick={applyFilters}
-        className="bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600 transition-all duration-300"
-      >
-        Apply Filters
-      </button>
+        {/* Type Filter */}
+        <Select
+          placeholder="Select Type"
+          value={filters.type}
+          onChange={(value) => handleFilterChange("type", value)}
+          style={{ width: "30%", borderRadius: "8px" }}
+        >
+          <Option value="">All Types</Option>
+          <Option value="weekly">Weekly</Option>
+          <Option value="exam">Exam</Option>
+          <Option value="event">Event</Option>
+          <Option value="others">Others</Option>
+        </Select>
+
+        {/* Apply Filters Button */}
+        <Button
+          type="primary"
+          onClick={applyFilters}
+          style={{ borderRadius: "8px", height: "40px" }}
+          className="flex items-center justify-center"
+        >
+          Apply Filters
+        </Button>
+      </Space>
     </div>
   );
 };
 
-export default React.memo(TopNavigationWithFilters);
+export default TopNavigationWithFilters;
