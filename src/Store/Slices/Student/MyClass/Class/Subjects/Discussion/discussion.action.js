@@ -3,9 +3,9 @@ import { baseUrl } from "../../../../../../../config/Common";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { ErrorMsg } from "../../../../../Common/Alerts/errorhandling.action";
-import { setShowError } from "../../../../../Common/Alerts/alertsSlice";
+import { setShowError,setErrorMsg } from "../../../../../Common/Alerts/alertsSlice";
 
-
+const say = localStorage.getItem("say");
 export const fetchStudentDiscussion = createAsyncThunk(
     'discussion/fetchStudentDiscussion',
     async (cid, { rejectWithValue, dispatch }) => {
@@ -13,13 +13,14 @@ export const fetchStudentDiscussion = createAsyncThunk(
 
         if (!token) {
             dispatch(setShowError(true));
+            dispatch(setErrorMsg("Authentication failed!"));
             return rejectWithValue("Authentication failed!");
         }
 
         try {
             dispatch(setShowError(false));
             const response = await axios.get(
-                `${baseUrl}/admin/getDiscussion/class/${cid}`,
+                `${baseUrl}/admin/getDiscussion/class/${cid}?say=${say}`,
                 {
                     headers: { Authentication: token },
                 }
@@ -29,9 +30,9 @@ export const fetchStudentDiscussion = createAsyncThunk(
             return data;
 
         } catch (error) {
-            console.log("Error in student discussion", error);
             const err = ErrorMsg(error);
             dispatch(setShowError(true));
+            dispatch(setErrorMsg(err.message));
             return rejectWithValue(err.message);
             //return rejectWithValue((error?.response?.data?.message || error?.message || "Something Went Wrong!"))
         }
@@ -40,14 +41,16 @@ export const fetchStudentDiscussion = createAsyncThunk(
 
 export const updateStudentPinStatus = createAsyncThunk(
     'discussion/updateStudentPinStatus',
-    async ({ discussionId, isPinned }, { rejectWithValue }) => {
+    async ({ discussionId, isPinned }, { rejectWithValue ,dispatch}) => {
         const token = localStorage.getItem("student:token");
         if (!token) {
+            dispatch(setShowError(true));
+            dispatch(setErrorMsg("Authentication failed!"));
             return rejectWithValue("Authentication failed!");
         }
         try {
             const response = await axios.put(
-                `${baseUrl}/admin/discussion/pinstatus/${discussionId}`,
+                `${baseUrl}/admin/discussion/pinstatus/${discussionId}?say=${say}`,
                 { isPinned },
                 {
                     headers: { Authentication: token },
@@ -67,14 +70,16 @@ export const updateStudentPinStatus = createAsyncThunk(
 
 export const markAsReadStudentDiscussion = createAsyncThunk(
     'discussion/markAsReadStudentDiscussion',
-    async (discussionId, { rejectWithValue }) => {
+    async (discussionId, { rejectWithValue,dispatch }) => {
         const token = localStorage.getItem("student:token");
         if (!token) {
+            dispatch(setShowError(true));
+            dispatch(setErrorMsg("Authentication failed!"));
             return rejectWithValue("Authentication failed!");
         }
         try {
             const response = await axios.put(
-                `${baseUrl}/admin/discussion/readstatus/${discussionId}`,
+                `${baseUrl}/admin/discussion/readstatus/${discussionId}?say=${say}`,
                 {},
                 {
                     headers: { Authentication: token },
@@ -86,23 +91,28 @@ export const markAsReadStudentDiscussion = createAsyncThunk(
             return data;
 
         } catch (error) {
-            return rejectWithValue((error?.response?.data?.message || error?.message || "Something Went Wrong!"))
+            const err = ErrorMsg(error);
+            dispatch(setShowError(true));
+            dispatch(setErrorMsg(err.message));
+            return rejectWithValue(err.message);
         }
     }
 )
 
 export const fetchStudentDiscussionById = createAsyncThunk(
     'discussion/fetchStudentDiscussionById',
-    async (did, { rejectWithValue }) => {
+    async (did, { rejectWithValue,dispatch }) => {
         const token = localStorage.getItem("student:token");
 
         if (!token) {
+            dispatch(setShowError(true));
+            dispatch(setErrorMsg("Authentication failed!"));
             return rejectWithValue("Authentication failed!");
         }
 
         try {
             const response = await axios.get(
-                `${baseUrl}/admin/getDiscussionById/${did}`,
+                `${baseUrl}/admin/getDiscussionById/${did}?say=${say}`,
                 {
                     headers: { Authentication: token },
                 }
@@ -112,23 +122,28 @@ export const fetchStudentDiscussionById = createAsyncThunk(
             return data;
 
         } catch (error) {
-            return rejectWithValue((error?.response?.data?.message || error?.message || "Something Went Wrong!"))
+            const err = ErrorMsg(error);
+            dispatch(setShowError(true));
+            dispatch(setErrorMsg(err.message));
+            return rejectWithValue(err.message);
         }
     }
 )
 
 export const fetchStudentCommentsByDiscussion = createAsyncThunk(
     'discussion/fetchStudentCommentsByDiscussion',
-    async ({ discussionId }, { rejectWithValue }) => {
+    async ({ discussionId }, { rejectWithValue,dispatch }) => {
         const token = localStorage.getItem("student:token");
 
         if (!token) {
+            dispatch(setShowError(true));
+            dispatch(setErrorMsg("Authentication failed!"));
             return rejectWithValue("Authentication failed!");
         }
 
         try {
             const response = await axios.get(
-                `${baseUrl}/admin/getDiscussionComment/${discussionId}`,
+                `${baseUrl}/admin/getDiscussionComment/${discussionId}?say=${say}`,
                 {
                     headers: { Authentication: token },
                 }
@@ -138,23 +153,28 @@ export const fetchStudentCommentsByDiscussion = createAsyncThunk(
             return data;
 
         } catch (error) {
-            return rejectWithValue((error?.response?.data?.message || error?.message || "Something Went Wrong!"))
+            const err = ErrorMsg(error);
+            dispatch(setShowError(true));
+            dispatch(setErrorMsg(err.message));
+            return rejectWithValue(err.message);
         }
     }
 )
 
 export const createStudentDiscussionComment = createAsyncThunk(
     'discussion/createStudentDiscussionComment',
-    async ({ discussionId, comment }, { rejectWithValue }) => {
+    async ({ discussionId, comment }, { rejectWithValue,dispatch }) => {
         const token = localStorage.getItem("student:token");
 
         if (!token) {
+            dispatch(setShowError(true));
+            dispatch(setErrorMsg("Authentication failed!"));
             return rejectWithValue("Authentication failed!");
         }
 
         try {
             const response = await axios.post(
-                `${baseUrl}/admin/createCommentDiscussion/${discussionId}/replies`, { content: comment, parentId: null },
+                `${baseUrl}/admin/createCommentDiscussion/${discussionId}/replies?say=${say}`, { content: comment, parentId: null },
                 {
                     headers: { Authentication: token },
                 }
@@ -164,24 +184,29 @@ export const createStudentDiscussionComment = createAsyncThunk(
             return data;
 
         } catch (error) {
-            return rejectWithValue((error?.response?.data?.message || error?.message || "Something Went Wrong!"))
+            const err = ErrorMsg(error);
+            dispatch(setShowError(true));
+            dispatch(setErrorMsg(err.message));
+            return rejectWithValue(err.message);
         }
     }
 )
 
 export const createStudentDiscussionReply = createAsyncThunk(
     'discussion/createStudentDiscussionReply',
-    async ({ discussionId, replyId, text }, { rejectWithValue }) => {
+    async ({ discussionId, replyId, text }, { rejectWithValue,dispatch }) => {
         const token = localStorage.getItem("student:token");
 
         if (!token) {
+            dispatch(setShowError(true));
+            dispatch(setErrorMsg("Authentication failed!"));
             return rejectWithValue("Authentication failed!");
         }
         console.log("discusdsion--",replyId);
 
         try {
             const response = await axios.post(
-                `${baseUrl}/admin/createCommentDiscussion/${discussionId}/replies`, { content: text, parentId: replyId },
+                `${baseUrl}/admin/createCommentDiscussion/${discussionId}/replies?say=${say}`, { content: text, parentId: replyId },
                 {
                     headers: { Authentication: token },
                 }
@@ -191,23 +216,28 @@ export const createStudentDiscussionReply = createAsyncThunk(
             return data;
 
         } catch (error) {
-            return rejectWithValue((error?.response?.data?.message || error?.message || "Something Went Wrong!"))
+            const err = ErrorMsg(error);
+            dispatch(setShowError(true));
+            dispatch(setErrorMsg(err.message));
+            return rejectWithValue(err.message);
         }
     }
 )
 
 export const deleteStudentDiscussionComment = createAsyncThunk(
     'discussion/deleteStudentDiscussionComment',
-    async ({ commentId }, { rejectWithValue }) => {
+    async ({ commentId }, { rejectWithValue,dispatch }) => {
         const token = localStorage.getItem("student:token");
 
         if (!token) {
+            dispatch(setShowError(true));
+            dispatch(setErrorMsg("Authentication failed!"));
             return rejectWithValue("Authentication failed!");
         }
 
         try {
             const response = await axios.delete(
-                `${baseUrl}/admin/deleteCommentDiscussion/${commentId}`,
+                `${baseUrl}/admin/deleteCommentDiscussion/${commentId}?say=${say}`,
                 {
                     headers: { Authentication: token },
                 }
@@ -217,23 +247,28 @@ export const deleteStudentDiscussionComment = createAsyncThunk(
             return data;
 
         } catch (error) {
-            return rejectWithValue((error?.response?.data?.message || error?.message || "Something Went Wrong!"))
+            const err = ErrorMsg(error);
+            dispatch(setShowError(true));
+            dispatch(setErrorMsg(err.message));
+            return rejectWithValue(err.message);
         }
     }
 )
 
 export const deleteStudentDiscussionReply = createAsyncThunk(
     'discussion/deleteStudentDiscussionReply',
-    async (replyId, { rejectWithValue }) => {
+    async (replyId, { rejectWithValue,dispatch }) => {
         const token = localStorage.getItem("student:token");
 
         if (!token) {
+            dispatch(setShowError(true));
+            dispatch(setErrorMsg("Authentication failed!"));
             return rejectWithValue("Authentication failed!");
         }
 
         try {
             const response = await axios.delete(
-                `${baseUrl}/admin/deleteCommentDiscussion/${replyId}`,
+                `${baseUrl}/admin/deleteCommentDiscussion/${replyId}?say=${say}`,
                 {
                     headers: { Authentication: token },
                 }
@@ -243,23 +278,28 @@ export const deleteStudentDiscussionReply = createAsyncThunk(
             return data;
 
         } catch (error) {
-            return rejectWithValue((error?.response?.data?.message || error?.message || "Something Went Wrong!"))
+            const err = ErrorMsg(error);
+            dispatch(setShowError(true));
+            dispatch(setErrorMsg(err.message));
+            return rejectWithValue(err.message);
         }
     }
 )
 
 export const editStudentDiscussionComment = createAsyncThunk(
     'discussion/editStudentDiscussionComment',
-    async ({ commentId, newText }, { rejectWithValue }) => {
+    async ({ commentId, newText }, { rejectWithValue,dispatch }) => {
         const token = localStorage.getItem("student:token");
 
         if (!token) {
+            dispatch(setShowError(true));
+            dispatch(setErrorMsg("Authentication failed!"));
             return rejectWithValue("Authentication failed!");
         }
 
         try {
             const response = await axios.put(
-                `${baseUrl}/admin/editCommentDiscussion/${commentId}`, { content: newText },
+                `${baseUrl}/admin/editCommentDiscussion/${commentId}?say=${say}`, { content: newText },
                 {
                     headers: { Authentication: token },
                 }
@@ -269,23 +309,28 @@ export const editStudentDiscussionComment = createAsyncThunk(
             return data;
 
         } catch (error) {
-            return rejectWithValue((error?.response?.data?.message || error?.message || "Something Went Wrong!"))
+            const err = ErrorMsg(error);
+            dispatch(setShowError(true));
+            dispatch(setErrorMsg(err.message));
+            return rejectWithValue(err.message);
         }
     }
 )
 
 export const editStudentDiscussionReply = createAsyncThunk(
     'discussion/editStudentDiscussionReply',
-    async ({ replyId, newText }, { rejectWithValue }) => {
+    async ({ replyId, newText }, { rejectWithValue,dispatch }) => {
         const token = localStorage.getItem("student:token");
 
         if (!token) {
+            dispatch(setShowError(true));
+            dispatch(setErrorMsg("Authentication failed!"));
             return rejectWithValue("Authentication failed!");
         }
 
         try {
             const response = await axios.put(
-                `${baseUrl}/admin/editCommentDiscussion/${replyId}`, { content: newText },
+                `${baseUrl}/admin/editCommentDiscussion/${replyId}?say=${say}`, { content: newText },
                 {
                     headers: { Authentication: token },
                 }
@@ -295,23 +340,28 @@ export const editStudentDiscussionReply = createAsyncThunk(
             return data;
 
         } catch (error) {
-            return rejectWithValue((error?.response?.data?.message || error?.message || "Something Went Wrong!"))
+            const err = ErrorMsg(error);
+            dispatch(setShowError(true));
+            dispatch(setErrorMsg(err.message));
+            return rejectWithValue(err.message);
         }
     }
 )
 
 export const toggleLikeStudentDiscussion = createAsyncThunk(
     'discussion/toggleLikeStudentDiscussion',
-    async ({ id }, { rejectWithValue }) => {
+    async ({ id }, { rejectWithValue,dispatch }) => {
         const token = localStorage.getItem("student:token");
         if (!token) {
+            dispatch(setShowError(true));
+            dispatch(setErrorMsg("Authentication failed!"));
             return rejectWithValue("Authentication failed!");
         }
         console.log("token---", token);
         console.log("messageID--", id);
 
         try {
-            const response = await axios.put(`${baseUrl}/admin/likeDiscussions/${id}`, {},
+            const response = await axios.put(`${baseUrl}/admin/likeDiscussions/${id}?say=${say}`, {},
                 {
                     headers: { Authentication: token },
                 }
@@ -321,7 +371,10 @@ export const toggleLikeStudentDiscussion = createAsyncThunk(
             return data;
 
         } catch (error) {
-            return rejectWithValue((error?.response?.data?.message || error?.message || "Something Went Wrong!"))
+            const err = ErrorMsg(error);
+            dispatch(setShowError(true));
+            dispatch(setErrorMsg(err.message));
+            return rejectWithValue(err.message);
         }
     }
 )

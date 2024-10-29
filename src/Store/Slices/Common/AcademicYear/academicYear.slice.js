@@ -1,8 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchAcademicYear } from "./academicYear.action";
+import { fetchAcademicYear, updateAcademicYear } from "./academicYear.action";
 
 const initialState = {
-    activeAcademicYear:{},
+    seletedAcademicYear:{},
     academicYears:[],
     loading:false,
     error:null
@@ -13,15 +13,15 @@ const academicYearSlice = createSlice({
     name: "academicYear",
     initialState,
     reducers: {
-        setActiveAcademicYear: (state, action) => {
-            state.activeAcademicYear = action.payload;
+        setSeletedAcademicYear: (state, action) => {
+            state.seletedAcademicYear = action.payload;
         },
   
     },
 
     extraReducers: (builder) => {
-        builder.
-            addCase(fetchAcademicYear.pending, (state) => {
+        builder
+            .addCase(fetchAcademicYear.pending, (state) => {
                 state.loading = true;
                 state.error = false;
             })
@@ -35,8 +35,22 @@ const academicYearSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload  || true;
             })
+
+            .addCase(updateAcademicYear.pending, (state) => {
+                state.loading = true;
+                state.error = false;
+            })
+            .addCase(updateAcademicYear.fulfilled, (state, action) => {
+                state.loading = false;
+                state.error = null;
+            
+            })
+            .addCase(updateAcademicYear.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload  || true;
+            })
     }
 })
 
-export const { setActiveAcademicYear } = academicYearSlice.actions;
+export const { setSeletedAcademicYear } = academicYearSlice.actions;
 export default academicYearSlice.reducer

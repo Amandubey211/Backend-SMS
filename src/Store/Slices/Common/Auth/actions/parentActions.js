@@ -4,12 +4,13 @@ import { resetState, setRole, setToken } from "../reducers/authSlice";
 import { baseUrl } from "../../../../../config/Common";
 import { setUserDetails } from "../../User/reducers/userSlice";
 import toast from "react-hot-toast";
+import { fetchAcademicYear } from "../../AcademicYear/academicYear.action";
 
 // **Parent login action**
 export const parentLogin = createAsyncThunk(
   "auth/parentLogin",
-  async ({parentDetails,navigate}, { rejectWithValue, dispatch }) => {
-   
+  async ({parentDetails,navigate}, { rejectWithValue, dispatch,getState }) => {
+    
     try {
       const { data } = await axios.post(
         `${baseUrl}/auth/parent/login`,
@@ -20,7 +21,10 @@ export const parentLogin = createAsyncThunk(
         const token = `Bearer ${data.token}`;
         localStorage.setItem("userData", JSON.stringify(data));
         localStorage.setItem(`${data.role}:token`, token);
-
+    
+         await dispatch(fetchAcademicYear());
+         const activeAcademicYear = getState().common?.academicYear?.academicYears?.find((i)=>i.isActive == true);
+         localStorage.setItem("say", activeAcademicYear?._id);
         dispatch(setToken(data.token)); // Store token in state
         dispatch(setRole(data.role)); // Set role
 
@@ -35,7 +39,7 @@ export const parentLogin = createAsyncThunk(
           })
         );
         console.log("Parent Dashhhh :",data.token);
-        navigate("/parent_dash")
+        navigate("/parent_dash");
         return data.token;
       } 
     } catch (error) {

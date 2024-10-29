@@ -4,11 +4,12 @@ import { resetState, setRole, setToken } from "../reducers/authSlice";
 import { setUserDetails } from "../../User/reducers/userSlice";
 import { baseUrl } from "../../../../../config/Common";
 import toast from "react-hot-toast";
+import { fetchAcademicYear } from "../../AcademicYear/academicYear.action";
 
 // Student login action
 export const studentLogin = createAsyncThunk(
   "auth/studentLogin",
-  async (studentDetails, { rejectWithValue, dispatch }) => {
+  async (studentDetails, { rejectWithValue, dispatch,getState }) => {
     try {
       const { email, password } = studentDetails;
 
@@ -45,6 +46,9 @@ export const studentLogin = createAsyncThunk(
         );
 
         if (data.isVerifiedSchoolId) {
+          await dispatch(fetchAcademicYear());
+          const activeAcademicYear = getState().common?.academicYear?.academicYears?.find((i)=>i.isActive == true);
+          localStorage.setItem("say", activeAcademicYear?._id);
           return { redirect: "/student_dash" };
         } else {
           return { redirect: "/verify_qid" };

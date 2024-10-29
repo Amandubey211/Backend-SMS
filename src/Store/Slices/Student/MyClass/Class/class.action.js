@@ -2,23 +2,22 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { baseUrl } from "../../../../../config/Common";
 import { ErrorMsg } from "../../../Common/Alerts/errorhandling.action";
-import { setShowError } from "../../../Common/Alerts/alertsSlice";
-
-
-
+import { setShowError,setErrorMsg } from "../../../Common/Alerts/alertsSlice";
+const say = localStorage.getItem("say");
 export const stdClass = createAsyncThunk(
     'class/studentClass',
     async (_, { rejectWithValue, dispatch }) => {
         const token = localStorage.getItem("student:token");
         if (!token) {
             dispatch(setShowError(true));
+            dispatch(setErrorMsg("Authentication failed!"));
 
             return rejectWithValue("Authentication failed!");
         }
         try {
             dispatch(setShowError(false));
 
-            const res = await axios.get(`${baseUrl}/student/my_class`, {
+            const res = await axios.get(`${baseUrl}/student/my_class?say=${say}`, {
                 headers: {
                     Authentication: token,
                 },
@@ -27,9 +26,9 @@ export const stdClass = createAsyncThunk(
             const data = res?.data?.data;
             return data;
         } catch (error) {
-            console.log("Error in student Class", error);
             const err = ErrorMsg(error);
             dispatch(setShowError(true));
+            dispatch(setErrorMsg(err.message));
             return rejectWithValue(err.message);
         }
     }

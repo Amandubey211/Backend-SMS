@@ -1,9 +1,9 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { baseUrl } from "../../../../../../../config/Common";
-import { setShowError } from "./assignmentSlice";
+import { setShowError,setErrorMsg } from "../../../../../Common/Alerts/alertsSlice";
 import { ErrorMsg } from "../../../../../Common/Alerts/errorhandling.action";
-
+const say = localStorage.getItem("say");
 // Fetch assignment details
 export const stdGetAssignment = createAsyncThunk(
   "assignment/stdGetAssignment",
@@ -11,13 +11,14 @@ export const stdGetAssignment = createAsyncThunk(
     const token = localStorage.getItem("student:token");
     if (!token) {
       dispatch(setShowError(true));
+      dispatch(setErrorMsg("Authentication failed!"));
       return rejectWithValue("Authentication failed!");
     }
 
     try {
       dispatch(setShowError(false));
       const res = await axios.get(
-        `${baseUrl}/student/studentAssignment/${aid}`,
+        `${baseUrl}/student/studentAssignment/${aid}?say=${say}`,
         {
           headers: { Authentication: token },
         }
@@ -27,7 +28,8 @@ export const stdGetAssignment = createAsyncThunk(
     } catch (error) {
       const err = ErrorMsg(error);
       dispatch(setShowError(true));
-      return rejectWithValue(err.message || "Failed to fetch assignment");
+      dispatch(setErrorMsg(err.message));
+      return rejectWithValue(err.message);
     }
   }
 );
@@ -42,6 +44,7 @@ export const stdDoAssignment = createAsyncThunk(
     const token = localStorage.getItem("student:token");
     if (!token) {
       dispatch(setShowError(true));
+            dispatch(setErrorMsg("Authentication failed!"));
       return rejectWithValue("Authentication failed!");
     }
 
@@ -55,7 +58,7 @@ export const stdDoAssignment = createAsyncThunk(
     try {
       dispatch(setShowError(false));
       const res = await axios.post(
-        `${baseUrl}/student/studentAssignment/submit/${assignmentId}`,
+        `${baseUrl}/student/studentAssignment/submit/${assignmentId}?say=${say}`,
         submissionData,
         { headers: { Authentication: token } }
       );
@@ -65,7 +68,8 @@ export const stdDoAssignment = createAsyncThunk(
     } catch (error) {
       const err = ErrorMsg(error);
       dispatch(setShowError(true));
-      return rejectWithValue(err.message || "Failed to submit assignment");
+      dispatch(setErrorMsg(err.message));
+      return rejectWithValue(err.message);
     }
   }
 );
@@ -80,6 +84,7 @@ export const stdReattemptAssignment = createAsyncThunk(
     const token = localStorage.getItem("student:token");
     if (!token) {
       dispatch(setShowError(true));
+            dispatch(setErrorMsg("Authentication failed!"));
       return rejectWithValue("Authentication failed!");
     }
 
@@ -93,7 +98,7 @@ export const stdReattemptAssignment = createAsyncThunk(
     try {
       dispatch(setShowError(false));
       const res = await axios.put(
-        `${baseUrl}/student/studentAssignment/reattempt/${aid}`,
+        `${baseUrl}/student/studentAssignment/reattempt/${aid}?say=${say}`,
         reattemptData,
         { headers: { Authentication: token } }
       );
@@ -102,7 +107,8 @@ export const stdReattemptAssignment = createAsyncThunk(
     } catch (error) {
       const err = ErrorMsg(error);
       dispatch(setShowError(true));
-      return rejectWithValue(err.message || "Failed to reattempt assignment");
+      dispatch(setErrorMsg(err.message));
+      return rejectWithValue(err.message);
     }
   }
 );
@@ -117,13 +123,14 @@ export const stdGetFilteredAssignment = createAsyncThunk(
     const token = localStorage.getItem("student:token");
     if (!token) {
       dispatch(setShowError(true));
+      dispatch(setErrorMsg("Authentication failed!"));
       return rejectWithValue("Authentication failed!");
     }
 
     try {
       dispatch(setShowError(false));
       const res = await axios.get(
-        `${baseUrl}/student/studentAssignment/class/${cid}`,
+        `${baseUrl}/student/studentAssignment/class/${cid}?say=${say}`,
         {
           headers: { Authentication: token },
           params: { subjectId, moduleId, chapterId },
@@ -134,9 +141,8 @@ export const stdGetFilteredAssignment = createAsyncThunk(
     } catch (error) {
       const err = ErrorMsg(error);
       dispatch(setShowError(true));
-      return rejectWithValue(
-        err.message || "Failed to fetch filtered assignments"
-      );
+      dispatch(setErrorMsg(err.message));
+      return rejectWithValue(err.message);
     }
   }
 );

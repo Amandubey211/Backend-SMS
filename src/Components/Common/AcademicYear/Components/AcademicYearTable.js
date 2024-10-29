@@ -5,6 +5,7 @@ const AcademicYearTable = ({
   academicYears,
   handleCheckboxChange,
 }) => {
+  const selectedYearId = localStorage.getItem('say')
   return (
     <div className="bg-white p-2 rounded-lg w-full">
       <h2 className="text-2xl font-semibold mb-4 text-gray-800">
@@ -25,19 +26,19 @@ const AcademicYearTable = ({
             <tr
               key={year?._id}
               className={`${
-                year?.isActive ? "bg-green-50 hover:bg-green-100" : " hover:bg-gray-50"
+                selectedYearId ==  year._id ? "bg-green-50 hover:bg-green-100" : " hover:bg-gray-50"
               }  border-b border-gray-200  transition duration-200`}
             >
               <td className="p-3 flex justify-center">
                 <button onClick={() => handleCheckboxChange(year)}>
-                  {year?.isActive ? (
+                  {selectedYearId ==  year._id ? (
                     <BsFillPatchCheckFill className="text-green-500 text-2xl" />
                   ) : (
                     <BsPatchCheck className="text-gray-400 text-2xl" />
                   )}
                 </button>
               </td>
-              <td className="p-3">{year?.academicYear}</td>
+              <td className="p-3">{year?.year}</td>
               <td className="p-3">{year?.startDate?.slice(0,10)}</td>
               <td className="p-3">{year?.endDate?.slice(0,10)}</td>
               <td className="p-3">

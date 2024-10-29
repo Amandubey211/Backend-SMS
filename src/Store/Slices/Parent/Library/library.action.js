@@ -1,19 +1,24 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { baseUrl } from "../../../../config/Common";
-
+import { setErrorMsg, setShowError } from "../../Common/Alerts/alertsSlice";
+import { ErrorMsg } from "../../Common/Alerts/errorhandling.action";
+const say = localStorage.getItem("say");
 // Fetch library books thunk
 export const fetchLibraryBooks = createAsyncThunk(
   'library/fetchLibraryBooks',
-  async (_, { rejectWithValue }) => {
+  async (_, { rejectWithValue, dispatch }) => {
     const token = localStorage.getItem('parent:token');
 
     if (!token) {
-      return rejectWithValue("No token found");
+      const errorMessage = "Authentication failed";
+      dispatch(setShowError(true));
+      dispatch(setErrorMsg(errorMessage));
+      return rejectWithValue(errorMessage);
     }
 
     try {
-      const response = await axios.get(`${baseUrl}/parent/all/bookIssue`, {
+      const response = await axios.get(`${baseUrl}/parent/all/bookIssue?say=${say}`, {
         headers: {
           Authentication: `${token}`,
         },
@@ -27,8 +32,11 @@ export const fetchLibraryBooks = createAsyncThunk(
         bookCategory: book.bookId.category,
       }));
     } catch (error) {
-      const errorMessage = error.response?.data?.message || error.message ||"Failed to fetch library data.";
-      return rejectWithValue(errorMessage);
+      const errorMessage = error.response?.data?.message || error.message || "Failed to fetch library data.";
+      const err = ErrorMsg(error);
+      dispatch(setShowError(true));
+      dispatch(setErrorMsg(err?.message));
+      return rejectWithValue(err?.message)
     }
   }
 );
