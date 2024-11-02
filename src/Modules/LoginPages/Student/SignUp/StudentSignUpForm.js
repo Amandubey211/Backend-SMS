@@ -187,13 +187,13 @@ const StudentSignUpForm = () => {
     console.log("hdh");
     const errors = validateStudentDetails(studentDetails);
 
-    if (Object.keys(errors).length > 0) {
+    if (Object.keys(errors)?.length > 0) {
       // Get the first error field, including nested fields
       const firstErrorField = getFirstErrorField(errors);
 
       // Construct validationErrors object with only the first error
       let firstError = {};
-      setFirstError(firstError, errors, firstErrorField.split("_"));
+      setFirstError(firstError, errors, firstErrorField[0]?.split("_"));
       console.log(firstErrorField, firstError, "lll");
       setValidationErrors(firstError);
 
