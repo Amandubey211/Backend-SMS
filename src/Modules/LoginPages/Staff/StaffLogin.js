@@ -1,5 +1,5 @@
 import React from "react";
-import TeacherLoginBanner from "../../../Assets/TeacherAssets/TeacherLoginBanner.png";
+import TeacherLoginBanner from "../../../Assets/TeacherAssets/TeacherLoginBanner.jpeg";
 import Layout from "../../../Components/Common/Layout";
 import StaffLoginForm from "./StaffLoginForm";
 const StaffLogin = () => {
