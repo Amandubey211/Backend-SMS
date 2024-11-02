@@ -3,7 +3,7 @@ const validateStudentDetails = (details) => {
   const errors = {};
 
   const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  const isValidPhoneNumber = (number) => /^\d{10}$/.test(number);
+  const isValidPhoneNumber = (number) => /^\d{8}$/.test(number);
   const isValidPostalCode = (postalCode) => /^\d{5,10}$/.test(postalCode);
   const isValidName = (name) => /^[a-zA-Z\s]+$/.test(name);
   const isValidQID = (qid) => /^\d{5,10}$/.test(qid);
@@ -31,13 +31,13 @@ const validateStudentDetails = (details) => {
   if (!details.contactNumber.trim())
     errors.contactNumber = "Contact Number is required";
   else if (!isValidPhoneNumber(details.contactNumber))
-    errors.contactNumber = "Invalid Contact Number (should be 10 digits)";
+    errors.contactNumber = "Invalid Contact Number (should be 8 digits)";
 
   if (!details.emergencyNumber.trim())
     errors.emergencyNumber = "Emergency Contact Number is required";
   else if (!isValidPhoneNumber(details.emergencyNumber))
     errors.emergencyNumber =
-      "Invalid Emergency Contact Number (should be 10 digits)";
+      "Invalid Emergency Contact Number (should be 8 digits)";
 
   if (!details.Q_Id.trim()) errors.Q_Id = "QID is required";
   else if (!isValidQID(details.Q_Id)) errors.Q_Id = "Invalid QID format";
@@ -69,7 +69,7 @@ const validateStudentDetails = (details) => {
     errors.guardianContactNumber = "Guardian's Contact Number is required";
   else if (!isValidPhoneNumber(details.guardianContactNumber))
     errors.guardianContactNumber =
-      "Invalid Guardian Contact Number (should be 10 digits)";
+      "Invalid Guardian Contact Number (should be 8 digits)";
 
   if (!details.enrollmentStatus)
     errors.enrollmentStatus = "Enrollment Status is required";
