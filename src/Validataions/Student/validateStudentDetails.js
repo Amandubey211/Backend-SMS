@@ -4,9 +4,9 @@ const validateStudentDetails = (details) => {
 
   const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   const isValidPhoneNumber = (number) => /^\d{8}$/.test(number);
-  const isValidPostalCode = (postalCode) => /^\d{5,10}$/.test(postalCode);
+  const isValidPostalCode = (postalCode) => /^\d{3,10}$/.test(postalCode);
   const isValidName = (name) => /^[a-zA-Z\s]+$/.test(name);
-  const isValidQID = (qid) => /^\d{5,10}$/.test(qid);
+  const isValidQID = (qid) => /^\d{5,11}$/.test(qid);
 
   // Personal Information
   if (!details.firstName.trim()) errors.firstName = "First Name is required";
