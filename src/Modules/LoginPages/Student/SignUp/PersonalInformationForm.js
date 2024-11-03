@@ -7,6 +7,7 @@ import TextInput from "./TextInput";
 import RadioGroup from "./RadioGroup";
 import { RiImageAddFill } from "react-icons/ri";
 import useGetAllClasses from "../../../../Hooks/Common/useGetAllClasses ";
+import ImageUpload from "../../../Admin/Addmission/Components/ImageUpload";
 
 const PersonalInformationForm = ({
   studentDetails,
@@ -19,7 +20,12 @@ const PersonalInformationForm = ({
 }) => {
   const { fetchSchools, schoolList } = useGetAllSchools();
   const { fetchClasses, classList, error } = useGetAllClasses();
-
+  const handleClearImage = () => {
+    setImagePreview(null);
+    handleChange({
+      target: { name: "profile", value: null },
+    }); // Clear profile in studentDetails
+  };
   const religionOptions = [
     { value: "Islam", label: "Islam" },
     { value: "Christianity", label: "Christianity" },
@@ -40,69 +46,49 @@ const PersonalInformationForm = ({
       fetchClasses(studentDetails?.schoolId);
     }
   }, [studentDetails.schoolId]);
+  console.log("Validation Errors:", validationErrors);
 
   return (
     <>
-      <div className="flex items-center space-x-6">
-        <SelectInput
-          ref={(el) => (inputRefs.current["schoolId"] = el)}
-          label="School*"
-          name="schoolId"
-          value={studentDetails.schoolId}
-          onChange={handleChange}
-          options={schoolList.map((school) => ({
-            value: school._id,
-            label: school.nameOfSchool,
-          }))}
-          error={validationErrors.schoolId}
-        />
-
-        <SelectInput
-          ref={(el) => (inputRefs.current["applyingClass"] = el)}
-          label="Applying Class*"
-          name="applyingClass"
-          value={studentDetails.applyingClass}
-          onChange={handleChange}
-          options={classList.map((classItem) => ({
-            value: classItem._id,
-            label: classItem.className,
-          }))}
-          error={validationErrors.applyingClass}
-          disabled={!studentDetails.schoolId}
-        />
-        <div className="w-1/2 flex justify-center">
-          <div className="relative group">
-            <input
-              type="file"
-              name="profile"
-              onChange={handleImageChange}
-              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-              accept="image/*"
-            />
-            <div
-              className={`h-36 w-36 rounded-full border ${
-                validationErrors.profile ? "border-red-500" : "border-pink-400"
-              } shadow-sm overflow-hidden cursor-pointer bg-pink-50 flex items-center justify-center`}
-            >
-              {imagePreview ? (
-                <img
-                  src={imagePreview}
-                  alt="Selected Profile"
-                  className="h-full w-full object-cover"
-                />
-              ) : (
-                <div className="flex flex-col items-center justify-center gap-2 ">
-                  <RiImageAddFill className="text-4xl text-pink-400" />
-                  <span className="text-pink-500">Upload Image</span>
-                </div>
-              )}
-            </div>
-            {validationErrors.profile && (
-              <span className="text-red-500 text-sm">
-                {validationErrors.profile}
-              </span>
-            )}
-          </div>
+      <div className="flex space-x-7">
+        {" "}
+        {/* Reduces spacing between inputs and image upload */}
+        <div className="flex flex-col w-full space-y-2 gap-5">
+          {" "}
+          {/* Full width for stacked SelectInputs */}
+          <SelectInput
+            ref={(el) => (inputRefs.current["schoolId"] = el)}
+            label="School*"
+            name="schoolId"
+            value={studentDetails.schoolId}
+            onChange={handleChange}
+            options={schoolList.map((school) => ({
+              value: school._id,
+              label: school.nameOfSchool,
+            }))}
+            error={validationErrors.schoolId}
+          />
+          <SelectInput
+            ref={(el) => (inputRefs.current["applyingClass"] = el)}
+            label="Applying Class*"
+            name="applyingClass"
+            value={studentDetails.applyingClass}
+            onChange={handleChange}
+            options={classList.map((classItem) => ({
+              value: classItem._id,
+              label: classItem.className,
+            }))}
+            error={validationErrors.applyingClass}
+            disabled={!studentDetails.schoolId}
+          />
+        </div>{" "}
+        <div className="w-1/2 flex  flex-col justify-center">
+          <ImageUpload
+            imagePreview={imagePreview}
+            handleImageChange={handleImageChange}
+            handleRemoveImage={handleClearImage}
+            error={validationErrors.profile}
+          />
         </div>
       </div>
 
@@ -224,6 +210,7 @@ const PersonalInformationForm = ({
         value={studentDetails.Q_Id}
         onChange={handleChange}
         placeholder="QID*"
+        type="number"
         error={validationErrors.Q_Id}
       />
       <h3 className="text-lg font-semibold my-2">Guardian Information</h3>
