@@ -163,7 +163,7 @@ const StudentInfo = () => {
   };
 
   const handleValidation = () => {
-    const validationErrors = validateStudentDetails(studentInfo);
+    const validationErrors = validateStudentDetails(studentInfo, "admin");
     setErrors(validationErrors);
     console.log(validationErrors, "pppppp");
     // Check if there is an image error
