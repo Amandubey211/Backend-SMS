@@ -4,9 +4,9 @@ const validateStudentDetails = (details) => {
 
   const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   const isValidPhoneNumber = (number) => /^\d{8}$/.test(number);
-  const isValidPostalCode = (postalCode) => /^\d{5,10}$/.test(postalCode);
+  const isValidPostalCode = (postalCode) => /^\d{3,10}$/.test(postalCode);
   const isValidName = (name) => /^[a-zA-Z\s]+$/.test(name);
-  const isValidQID = (qid) => /^\d{5,10}$/.test(qid);
+  const isValidQID = (qid) => /^\d{11}$/.test(qid);
 
   // Personal Information
   if (!details.firstName.trim()) errors.firstName = "First Name is required";
@@ -40,7 +40,7 @@ const validateStudentDetails = (details) => {
       "Invalid Emergency Contact Number (should be 8 digits)";
 
   if (!details.Q_Id.trim()) errors.Q_Id = "QID is required";
-  else if (!isValidQID(details.Q_Id)) errors.Q_Id = "Invalid QID format";
+  else if (!isValidQID(details.Q_Id)) errors.Q_Id = "Invalid QID format it must be 11 digit";
 
   if (!details.motherName.trim())
     errors.motherName = "Mother's Name is required";
