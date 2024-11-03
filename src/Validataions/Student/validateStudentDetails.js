@@ -1,5 +1,5 @@
 // validateStudentDetails.js
-const validateStudentDetails = (details) => {
+const validateStudentDetails = (details, type) => {
   const errors = {};
 
   const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -7,7 +7,12 @@ const validateStudentDetails = (details) => {
   const isValidPostalCode = (postalCode) => /^\d{3,10}$/.test(postalCode);
   const isValidName = (name) => /^[a-zA-Z\s]+$/.test(name);
   const isValidQID = (qid) => /^\d{11}$/.test(qid);
-
+  if (type === "admin" && !details.bloodGroup) {
+    errors.bloodGroup = "Blood Group is required for admin";
+  }
+  if (type === "student" && !details.profile) {
+    errors.profile = "Profile image is required for students";
+  }
   // Personal Information
   if (!details.firstName.trim()) errors.firstName = "First Name is required";
   else if (!isValidName(details.firstName))
@@ -40,7 +45,8 @@ const validateStudentDetails = (details) => {
       "Invalid Emergency Contact Number (should be 8 digits)";
 
   if (!details.Q_Id.trim()) errors.Q_Id = "QID is required";
-  else if (!isValidQID(details.Q_Id)) errors.Q_Id = "Invalid QID format it must be 11 digit";
+  else if (!isValidQID(details.Q_Id))
+    errors.Q_Id = "Invalid QID format it must be 11 digit";
 
   if (!details.motherName.trim())
     errors.motherName = "Mother's Name is required";

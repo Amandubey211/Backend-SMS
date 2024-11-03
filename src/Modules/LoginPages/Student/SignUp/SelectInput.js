@@ -9,7 +9,7 @@ const SelectInput = ({
   required,
   disabled = false,
 }) => (
-  <div className="w-1/2">
+  <div className="w-full">
     {label && (
       <label className="block text-lg font-semibold mb-2 mt-2 text-gray-700">
         {label}
