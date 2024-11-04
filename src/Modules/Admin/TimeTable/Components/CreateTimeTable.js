@@ -482,35 +482,39 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
   }, [handleKeyDown]);
 
   // Submit the form
+
+
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    // Validate required fields before submitting
+  
+    // Initialize an array to collect validation errors
     const errors = [];
-
+  
+    // Basic validation checks
     if (!formData.name) {
       errors.push('Name is required.');
     }
-
+  
     if (!formData.classId) {
       errors.push('Class is required.');
     }
-
+  
     if (!formData.startDate) {
       errors.push('Start date is required.');
     }
-
+  
     if (
       (formData.type === 'exam' || formData.type === 'event') &&
       !formData.endDate
     ) {
       errors.push('End date is required for exam or event.');
     }
-
+  
     if (dataSource.length === 0) {
       errors.push('At least one row must be added to the timetable.');
     }
-
+  
+    // Specific validation based on timetable type
     dataSource.forEach((row, index) => {
       if (formData.type === 'weekly') {
         if (!row.subjectId || row.subjectId.trim() === '') {
@@ -566,12 +570,17 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
         }
       }
     });
-
+  
+    // **Remove the restriction for 'others' type to allow multiple rows**
+    // Previously: Only one row allowed for 'others'
+    // No need to enforce single row now
+  
     if (errors.length > 0) {
       message.error(errors.join('\n'));
       return;
     }
-
+  
+    // Prepare the timetable data
     const timetableData = {
       name: formData.name,
       classId: formData.classId,
@@ -583,10 +592,10 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
         endDate: formData.endDate ? new Date(formData.endDate).toISOString() : undefined,
       },
       status: isActive ? 'active' : 'inactive',
-      days: [], // We will populate this below
+      days: [], // To be populated based on type
     };
-
-    // Organize dataSource into days and slots
+  
+    // Organize dataSource into days and slots based on type
     if (formData.type === 'weekly') {
       const dayMap = {};
       dataSource.forEach((row) => {
@@ -597,7 +606,7 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
           subjectId: row.subjectId,
           startTime: row.startTime,
           endTime: row.endTime,
-          description: row.description, // Ensure this line is present
+          description: row.description,
         });
       });
       timetableData.days = Object.keys(dayMap).map((day) => ({
@@ -615,7 +624,7 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
           subjectId: row.subjectId,
           startTime: row.startTime,
           endTime: row.endTime,
-          description: row.description, // Ensure this line is present
+          description: row.description,
         };
         dateMap[formattedDate].push(slotData);
       });
@@ -634,7 +643,7 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
           eventName: row.eventName,
           startTime: row.startTime,
           endTime: row.endTime,
-          description: row.description, // Ensure this line is present
+          description: row.description,
         };
         dateMap[formattedDate].push(slotData);
       });
@@ -643,33 +652,39 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
         slots: dateMap[date],
       }));
     } else if (formData.type === 'others') {
-      const titleMap = {};
-      dataSource.forEach((row) => {
-        const formattedTitle = row.otherTitle;
-        if (!titleMap[formattedTitle]) {
-          titleMap[formattedTitle] = [];
-        }
-        titleMap[formattedTitle].push({
-          subjectId: row.subjectId,
-          startTime: row.startTime,
-          endTime: row.endTime,
-          description: row.description, // Ensure this line is present
-        });
-      });
-      timetableData.days = Object.keys(titleMap).map((title) => ({
-        otherTitle: title,
-        slots: titleMap[title],
+      // **Modified Section for 'others' Type**
+  
+      // Extract all 'otherTitle's to assign to the top-level 'heading'
+      const allHeadings = dataSource.map(row => row.otherTitle.trim()).join(', ');
+      timetableData.heading = allHeadings || "Default Heading"; // Ensure it's not empty
+  
+      // Assign 'heading' within each slot to satisfy TimeSlotSchema
+      const slots = dataSource.map((row) => ({
+        subjectId: row.subjectId,
+        startTime: row.startTime,
+        endTime: row.endTime,
+        description: row.description,
+        heading: row.otherTitle.trim(), // Assign 'heading' in each slot
       }));
+  
+      // Assign slots to days (assuming a single day object)
+      timetableData.days = [
+        {
+          slots: slots,
+        },
+      ];
+  
+      // **End of Modified Section**
     }
-
+  
     // Log the timetableData to inspect the payload
     console.log('Timetable Data:', JSON.stringify(timetableData, null, 2));
-
+  
     // Dispatch the action to create or update the timetable
     if (timetable._id) {
       dispatch(updateTimetable({ id: timetable._id, data: timetableData }));
       message.success('Timetable updated successfully!');
-
+  
       // Redirect after a short delay
       setTimeout(() => {
         navigate('/noticeboard/timetable');
@@ -677,15 +692,19 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
     } else {
       dispatch(createTimetable(timetableData));
       message.success('Timetable created successfully!');
-
+  
       // Redirect after a short delay
       setTimeout(() => {
         navigate('/noticeboard/timetable');
       }, 1500);
     }
-
+  
     onClose();
   };
+  
+  
+
+
 
   // Row Selection
   const rowSelection = {
