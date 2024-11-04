@@ -8,6 +8,7 @@ import DeleteModal from "../../../Components/Common/DeleteModal";
 import { setAcademicYear } from "../../../Redux/Slices/Auth/AuthSlice";
 import AcademicYearTable from "./Components/AcademicYearTable";
 import CreateAcademicYearForm from "./Components/CreateAcademicYearForm";
+import { setSeletedAcademicYear } from "../../../Store/Slices/Common/AcademicYear/academicYear.slice";
 
 const formatDate = (dateString) => {
   const date = new Date(dateString);
@@ -62,49 +63,11 @@ const MainSection = () => {
     }
   };
 
-  // Handle the checkbox change to set only one academic year as active
   const handleCheckboxChange = async (selectedYear) => {
-
-    if(error){
-      return
-    }
-    // First, uncheck all other years
-  //   const updatedYears = academicYears?.map((year) => ({
-  //     ...year,
-  //     isActive: year._id === selectedYear._id, // Set only the selected year as active
-  //   }));
-  //  console.log("updatedYears",updatedYears)
-  //   setAcademicYears(updatedYears);
-  //   dispatch(setAcademicYear(updatedYears)); // Update the Redux store
-
-    // Call the update API to set the selected year as active
-    try {
-      const token = localStorage.getItem(`${role}:token`);
-      const { data } = await axios.put(
-        `${baseUrl}/admin/updateAcademicYear/${selectedYear._id}`,
-        { isActive: true },
-        {
-          headers: { Authentication: token },
-        }
-      );
-      if (data?.success) {
-        toast.success(
-          `Academic year ${selectedYear.academicYear} set as active.`
-        );
-            const updatedYears = academicYears?.map((year) => ({
-      ...year,
-      isActive: year._id === selectedYear._id, // Set only the selected year as active
-    }));
-   console.log("updatedYears",updatedYears)
-    setAcademicYears(updatedYears);
-    dispatch(setAcademicYear(updatedYears)); // Update the Redux store
-
-      } else {
-        toast.error(data.msg || "Failed to update academic year.");
-      }
-    } catch (error) {
-      toast.error("Something went wrong. Please try again.");
-    }
+    alert('After select the year need to reload the page');
+    localStorage.setItem('say', selectedYear._id);
+    dispatch(setSeletedAcademicYear(selectedYear));
+      window.location.reload();
   };
 
   // Handle academic year creation

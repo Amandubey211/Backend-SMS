@@ -1,33 +1,50 @@
-// src/Store/Slices/Admin/Verification/VerificationThunks.js
-
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { baseUrl } from "../../../../config/Common";
+import { ErrorMsg } from "../../Common/Alerts/errorhandling.action";
+import { setShowError, setErrorMsg } from "../../Common/Alerts/alertsSlice";
+
+const say = localStorage.getItem("say");
+
+// Helper function to get the token from the Redux state
+const getToken = (state, rejectWithValue, dispatch) => {
+  const token = state.common.auth?.token;
+  if (!token) {
+    dispatch(setShowError(true));
+    dispatch(setErrorMsg("Authentication Failed"));
+    return rejectWithValue("Authentication Failed");
+  }
+  return `Bearer ${token}`;
+};
+
+// Centralized error handling
+const handleError = (error, dispatch, rejectWithValue) => {
+  const err = ErrorMsg(error);
+  dispatch(setShowError(true));
+  dispatch(setErrorMsg(err.message));
+  return rejectWithValue(err.message);
+};
+
 // Fetch Unverified Students
 export const fetchUnverifiedStudents = createAsyncThunk(
   "verification/fetchUnverifiedStudents",
-  async (_, { rejectWithValue, getState }) => {
+  async (_, { rejectWithValue, getState, dispatch }) => {
     try {
-      const { common } = getState(); // Get state
-      const token = common.auth.token; // Extract token
-
+      const token = getToken(getState(), rejectWithValue, dispatch);
       const response = await axios.get(
-        `${baseUrl}/admin/get_unverified_student_details`,
+        `${baseUrl}/admin/get_unverified_student_details?say=${say}`,
         {
-          headers: { Authentication: `Bearer ${token}` }, // Use token in headers
+          headers: { Authentication: token },
         }
       );
 
       if (!response.data.students || response.data.students.length === 0) {
         return rejectWithValue("No unverified students found.");
       }
-
       return response.data.students;
     } catch (error) {
-      return rejectWithValue(
-        error.response?.data?.msg || "Failed to fetch unverified students"
-      );
+      return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
@@ -35,43 +52,38 @@ export const fetchUnverifiedStudents = createAsyncThunk(
 // Fetch Rejected Students
 export const fetchRejectedStudents = createAsyncThunk(
   "verification/fetchRejectedStudents",
-  async (_, { rejectWithValue, getState }) => {
+  async (_, { rejectWithValue, getState, dispatch }) => {
     try {
-      const { common } = getState(); // Get state
-      const token = common.auth.token; // Extract token
-
+      const token = getToken(getState(), rejectWithValue, dispatch);
       const response = await axios.get(
-        `${baseUrl}/admin/get_rejected_student_details`,
+        `${baseUrl}/admin/get_rejected_student_details?say=${say}`,
         {
-          headers: { Authentication: `Bearer ${token}` }, // Use token in headers
+          headers: { Authentication: token },
         }
       );
 
       if (!response.data.students || response.data.students.length === 0) {
         return rejectWithValue("No rejected students found.");
       }
-
       return response.data.students;
     } catch (error) {
-      return rejectWithValue(
-        error.response?.data?.msg || "Failed to fetch rejected students"
-      );
+      return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
+
 // Verify Student and Send Credentials
 export const verifyStudent = createAsyncThunk(
   "verification/verifyStudent",
   async (verificationDetails, { rejectWithValue, getState, dispatch }) => {
     try {
-      const { common } = getState(); // Get state
-      const token = common.auth.token; // Extract token
+      const token = getToken(getState(), rejectWithValue, dispatch);
 
       // Step 1: Verify Student
       const verifyResponse = await axios.put(
-        `${baseUrl}/admin/verify_student_info`,
+        `${baseUrl}/admin/verify_student_info?say=${say}`,
         verificationDetails,
-        { headers: { Authentication: `Bearer ${token}` } }
+        { headers: { Authentication: token } }
       );
 
       if (!verifyResponse.data.success) {
@@ -79,7 +91,6 @@ export const verifyStudent = createAsyncThunk(
           verifyResponse.data.msg || "Failed to verify student"
         );
       }
-
       toast.success(verifyResponse.data.msg || "Student verified successfully");
 
       // Step 2: Assign Class to Student (if verified)
@@ -90,9 +101,9 @@ export const verifyStudent = createAsyncThunk(
         };
 
         const assignResponse = await axios.put(
-          `${baseUrl}/admin/assign_class`,
+          `${baseUrl}/admin/assign_class?say=${say}`,
           assignClassDetails,
-          { headers: { Authentication: `Bearer ${token}` } }
+          { headers: { Authentication: token } }
         );
 
         if (!assignResponse.data.success) {
@@ -100,7 +111,6 @@ export const verifyStudent = createAsyncThunk(
             assignResponse.data.msg || "Failed to assign class"
           );
         }
-
         toast.success(assignResponse.data.msg || "Class assigned successfully");
         dispatch(fetchUnverifiedStudents());
       } else {
@@ -114,9 +124,9 @@ export const verifyStudent = createAsyncThunk(
       };
 
       const sendCredentialsResponse = await axios.post(
-        `${baseUrl}/admin/send_login_credential`,
+        `${baseUrl}/admin/send_login_credential?say=${say}`,
         mailConfiguration,
-        { headers: { Authentication: `Bearer ${token}` } }
+        { headers: { Authentication: token } }
       );
 
       if (!sendCredentialsResponse.data.success) {
@@ -128,13 +138,9 @@ export const verifyStudent = createAsyncThunk(
       toast.success(
         sendCredentialsResponse.data.msg || "Credentials sent successfully"
       );
-
       return verifyResponse.data.student;
     } catch (error) {
-      const errorMessage =
-      error.response?.data?.message || error.response?.data?.msg || "Something went wrong. Please try again.";
-      toast.error(errorMessage);
-      return rejectWithValue(errorMessage);
+      return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
@@ -142,16 +148,14 @@ export const verifyStudent = createAsyncThunk(
 // Assign Class to Student
 export const assignClassToStudent = createAsyncThunk(
   "verification/assignClassToStudent",
-  async (classDetails, { rejectWithValue, getState }) => {
+  async (classDetails, { rejectWithValue, getState, dispatch }) => {
     try {
-      const { common } = getState(); // Get state
-      const token = common.auth.token; // Extract token
-
+      const token = getToken(getState(), rejectWithValue, dispatch);
       const { data } = await axios.put(
-        `${baseUrl}/admin/assign_class`,
+        `${baseUrl}/admin/assign_class?say=${say}`,
         classDetails,
         {
-          headers: { Authentication: `Bearer ${token}` },
+          headers: { Authentication: token },
         }
       );
       if (data.success) {
@@ -159,9 +163,7 @@ export const assignClassToStudent = createAsyncThunk(
       }
       return rejectWithValue(data.msg || "Failed to assign class");
     } catch (error) {
-      return rejectWithValue(
-        error.response?.data?.message ||  error.response?.data?.msg || "Something went wrong."
-      );
+      return handleError(error, dispatch, rejectWithValue);
     }
   }
 );

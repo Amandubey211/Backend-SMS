@@ -1,22 +1,41 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { baseUrl } from '../../../../config/Common';
+import { ErrorMsg } from "../../Common/Alerts/errorhandling.action";
+import { setShowError, setErrorMsg } from "../../Common/Alerts/alertsSlice";
 
+const say = localStorage.getItem("say");
+
+// Helper function to get the token from Redux state
+const getToken = (state, rejectWithValue, dispatch) => {
+  const token = state.common.auth?.token;
+  if (!token) {
+    dispatch(setShowError(true));
+    dispatch(setErrorMsg("Authentication Failed"));
+    return rejectWithValue("Authentication Failed");
+  }
+  return `Bearer ${token}`;
+};
+
+// Centralized error handling
+const handleError = (error, dispatch, rejectWithValue) => {
+  const err = ErrorMsg(error);
+  dispatch(setShowError(true));
+  dispatch(setErrorMsg(err.message));
+  return rejectWithValue(err.message);
+};
+
+// Fetch Graduates
 export const fetchGraduates = createAsyncThunk(
   "graduates/fetchGraduates",
-  async ({ batchStart, batchEnd, email, Q_Id, admissionNumber, page, limit }, { rejectWithValue, getState }) => {
-    const { role } = getState().common.auth;
-    const token = localStorage.getItem(`${role}:token`);
-
-    if (!token) {
-      return rejectWithValue("Authentication failed!");
-    }
-
+  async (
+    { batchStart, batchEnd, email, Q_Id, admissionNumber, page, limit },
+    { rejectWithValue, getState, dispatch }
+  ) => {
     try {
-      const response = await axios.get(`${baseUrl}/admin/graduates/students`, {
-        headers: {
-          Authentication: token,
-        },
+      const token = getToken(getState(), rejectWithValue, dispatch);
+      const response = await axios.get(`${baseUrl}/admin/graduates/students?say=${say}`, {
+        headers: { Authentication: token },
         params: { batchStart, batchEnd, email, Q_Id, admissionNumber, page, limit },
       });
 
@@ -27,34 +46,28 @@ export const fetchGraduates = createAsyncThunk(
         totalPages: response.data.totalPages,
       };
     } catch (error) {
-      return rejectWithValue(error.message);
+      return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
 
-
-
-
+// Demote Students
 export const demoteStudents = createAsyncThunk(
   "students/demoteStudents",
-  async ({ studentIds }, { rejectWithValue, getState }) => {
-    const { role } = getState().common.auth;
-    const token = localStorage.getItem(`${role}:token`);
-
-    if (!token) {
-      return rejectWithValue("Authentication failed!");
-    }
-
+  async ({ studentIds }, { rejectWithValue, getState, dispatch }) => {
     try {
-      const response = await axios.put(`${baseUrl}/admin/demote/students`, { studentIds }, {
-        headers: {
-          Authentication: token,
-        },
-      });
+      const token = getToken(getState(), rejectWithValue, dispatch);
+      const response = await axios.put(
+        `${baseUrl}/admin/demote/students?say=${say}`,
+        { studentIds },
+        {
+          headers: { Authentication: token },
+        }
+      );
 
-      return response.data; // Assume success returns the modified students
+      return response.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || error.message);
+      return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
