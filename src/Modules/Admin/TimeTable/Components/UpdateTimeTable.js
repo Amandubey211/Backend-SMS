@@ -151,7 +151,7 @@ const UpdateTimeTable = () => {
           console.log(`Processing slot ${slotIndex + 1}:`, slot); // Debugging
           const newRow = { key: idCounterRef.current, id: idCounterRef.current };
           if (timetable.type === 'others') {
-            newRow.heading = slot.name || ''; // Extract heading from slot.name
+            newRow.heading = slot.heading || ''; // Extract heading from slot.name
             newRow.subjectId = slot.subjectId?._id || slot.subjectId || '';
             newRow.startTime = slot.startTime || '';
             newRow.endTime = slot.endTime || '';
@@ -171,7 +171,7 @@ const UpdateTimeTable = () => {
             newRow.endTime = slot.endTime || '';
             newRow.description = slot.description || '';
           } else if (timetable.type === 'event') {
-            newRow.eventName = slot.name || ''; // Extract event name from slot.name
+            newRow.eventName = slot.eventName || ''; // Extract event name from slot.name
             newRow.date = day.date
               ? moment(day.date).format('YYYY-MM-DD')
               : '';
@@ -729,7 +729,7 @@ const UpdateTimeTable = () => {
           dateMap[formattedDate] = [];
         }
         const slotData = {
-          name: row.eventName, // Use 'name' for event name
+          eventName: row.eventName, // Use 'name' for event name
           startTime: row.startTime,
           endTime: row.endTime,
           description: row.description,
@@ -744,7 +744,7 @@ const UpdateTimeTable = () => {
       // Since heading is in slots, we can group all slots under a single day
       const day = {
         slots: dataSource.map((row) => ({
-          name: row.heading, // Use 'name' for heading
+          heading: row.heading, // Use 'name' for heading
           subjectId: row.subjectId,
           startTime: row.startTime,
           endTime: row.endTime,
