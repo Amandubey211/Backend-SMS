@@ -27,11 +27,13 @@ import { ReactComponent as ParentIcon } from "../../../Assets/DashboardAssets/SV
 import { ReactComponent as StaffIcon } from "../../../Assets/DashboardAssets/SVG/staff.svg";
 import { RiDashboardFill } from "react-icons/ri";
 import Spinner from "../../../Components/Common/Spinner";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { createStaffSalary } from "../../../Store/Slices/Admin/Accounting/Expenses/expenses.action";
 
 const MainSection = () => {
   const { dashboardData, error, fetchAdminDashboardData, loading } =
     useGetAdminDashboardData();
+    const dispatch=useDispatch();
 
   const { role } = useSelector((state) => ({
     role: state.common.auth.role,
@@ -41,6 +43,10 @@ const MainSection = () => {
     fetchAdminDashboardData();
   }, [fetchAdminDashboardData]);
 
+
+  useEffect(()=>{
+   dispatch(createStaffSalary({status:"unpaid",action:"pay now"}))
+  },[dispatch,createStaffSalary])
 
   function capitalizeFirstLetter(string) {
     if (!string) return '';

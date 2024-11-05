@@ -24,7 +24,6 @@ export const studentLogin = createAsyncThunk(
       );
 
       if (data.success) {
-        const tokenKey = process.env.REACT_APP_STUDENT_TOKEN_STORAGE_KEY;
         localStorage.setItem(`${data.role}:token`, `Bearer ${data.token}`);
         localStorage.setItem("classId", `${data.classId}`);
 
@@ -94,7 +93,7 @@ export const qidVerification = createAsyncThunk(
         `${baseUrl}/student/verify_school_id`,
         studentDetails,
         {
-          headers: { Authorization: token },
+          headers: { Authentication: token },
         }
       );
 

@@ -64,6 +64,9 @@ export const promoteStudents = createAsyncThunk(
     { studentIds, promotionClassId, academicYearId },
     { getState, rejectWithValue, dispatch }
   ) => {
+    const token = getState().common.auth.token;
+    const classId = getState().common.user.classInfo.selectedClassId;
+
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
       const response = await axios.put(
@@ -71,6 +74,8 @@ export const promoteStudents = createAsyncThunk(
         { studentIds, promotionClassId, academicYearId },
         { headers: { Authentication: token } }
       );
+      toast.success("Student Promoted");
+      dispatch(fetchStudentsByClassAndSection(classId));
       return response.data;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -81,7 +86,17 @@ export const promoteStudents = createAsyncThunk(
 // Promote Students in Same Class
 export const promoteInSameClassStudents = createAsyncThunk(
   "students/promoteInSameClass",
+
   async ({ studentIds, academicYearId }, { getState, rejectWithValue, dispatch }) => {
+
+  async (
+    { studentIds, academicYearId },
+    { getState, rejectWithValue, dispatch }
+  ) => {
+    const token = getState().common.auth.token;
+    const classId = getState().common.user.classInfo.selectedClassId;
+
+
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
       const response = await axios.put(
@@ -89,6 +104,7 @@ export const promoteInSameClassStudents = createAsyncThunk(
         { studentIds, academicYearId },
         { headers: { Authentication: token } }
       );
+      dispatch(fetchStudentsByClassAndSection(classId));
       return response.data;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -100,6 +116,11 @@ export const promoteInSameClassStudents = createAsyncThunk(
 export const graduateStudents = createAsyncThunk(
   "students/graduateStudents",
   async ({ studentIds }, { getState, rejectWithValue, dispatch }) => {
+
+    const token = getState().common.auth.token;
+    const classId = getState().common.user.classInfo.selectedClassId;
+
+
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
       const response = await axios.put(
@@ -107,6 +128,8 @@ export const graduateStudents = createAsyncThunk(
         { studentIds },
         { headers: { Authentication: token } }
       );
+      // toast.success("Student Graduated");
+      dispatch(fetchStudentsByClassAndSection(classId));
       return response.data;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);

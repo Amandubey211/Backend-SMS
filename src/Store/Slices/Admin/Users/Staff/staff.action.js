@@ -4,6 +4,7 @@ import toast from "react-hot-toast";
 import { baseUrl } from "../../../../../config/Common";
 import { fetchAllTeachers } from "../../Class/Teachers/teacherThunks";
 import { setAllStaffs } from "./staffSlice";
+import { createStaffSalary } from "../../Accounting/Expenses/expenses.action";
 import { ErrorMsg } from "../../../Common/Alerts/errorhandling.action";
 import { setShowError, setErrorMsg } from "../../../Common/Alerts/alertsSlice";
 
@@ -27,6 +28,9 @@ const handleError = (error, dispatch, rejectWithValue) => {
   dispatch(setErrorMsg(err.message));
   return rejectWithValue(err.message);
 };
+
+
+
 
 // Fetch All Staff
 export const fetchAllStaff = createAsyncThunk(
@@ -61,9 +65,21 @@ export const addUser = createAsyncThunk(
 
       if (response.data.success) {
         toast.success("User added successfully");
+
         userData.role === 'teacher' ? dispatch(fetchAllTeachers()) : dispatch(fetchAllStaff());
       } else {
         toast.error(response.data.message);
+      }
+
+        if(userData.role == 'teacher'){
+          dispatch(fetchAllTeachers())
+        }else{
+          dispatch(fetchAllStaff())
+        }
+        dispatch(createStaffSalary({status:"unpaid",action:"pay now"}));
+        return response.data;
+      }else{
+        toast.error(response.data.message );
       }
 
       return response.data;
@@ -72,6 +88,7 @@ export const addUser = createAsyncThunk(
     }
   }
 );
+
 
 // Edit User
 export const editUser = createAsyncThunk(
@@ -125,7 +142,9 @@ export const deactiveUser = createAsyncThunk(
   }
 );
 
+
 // Activate User
+
 export const activeUser = createAsyncThunk(
   "user/activeUser",
   async (userData, { rejectWithValue, getState, dispatch }) => {

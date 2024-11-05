@@ -62,6 +62,27 @@ export const fetchGroupsByClassAndSection = createAsyncThunk(
   }
 );
 
+// Fetch Sections by Class
+export const fetchSectionsByClass = createAsyncThunk(
+  "group/fetchSectionsByClass",
+  async (classId, { getState, rejectWithValue }) => {
+    try {
+      const token = getState().common.auth.token;
+      const response = await axios.get(
+        `${baseUrl}/admin/getSectionByclass/${classId}`,
+        {
+          headers: { Authentication: `Bearer ${token}` },
+        }
+      );
+      return response.data.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch sections"
+      );
+    }
+  }
+);
+
 // Fetch Unassigned Students
 export const fetchUnassignedStudents = createAsyncThunk(
   "student/fetchUnassignedStudents",
@@ -115,6 +136,8 @@ export const updateGroup = createAsyncThunk(
   }
 );
 
+
+
 // Delete Group
 export const deleteGroup = createAsyncThunk(
   "group/deleteGroup",
@@ -131,6 +154,7 @@ export const deleteGroup = createAsyncThunk(
     }
   }
 );
+
 
 // Fetch Sections by Class
 export const fetchSectionsByClass = createAsyncThunk(
@@ -215,7 +239,7 @@ export const assignStudentToSection = createAsyncThunk(
         { studentId, sectionId },
         { headers: { Authentication: token } }
       );
-      toast.success("Student assigned to section successfully!");
+      toast.success("Student assigned successfully!");
       return response.data.data;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
