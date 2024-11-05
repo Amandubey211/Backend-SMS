@@ -116,12 +116,6 @@ const sidebarData = [
     roles: ["admin", "teacher", "librarian", "accountant"],
     items: [
       {
-        title: "Time Table",
-        icon: <ImTable2 />,
-        path: "/noticeboard/timetable",
-        roles: ["admin", "teacher"],
-      },
-      {
         title: "Announcements",
         icon: <FaClipboardList />,
         path: "/noticeboard/notice",
@@ -140,6 +134,12 @@ const sidebarData = [
     icon: <RiUserAddLine />,
     path: "/admissions",
     roles: ["admin"],
+  },
+  {
+    title: "Time Table",
+    icon: <ImTable2 />,
+    path: "/noticeboard/timetable",
+    roles: ["admin", "teacher"],
   },
   {
     title: "Library",

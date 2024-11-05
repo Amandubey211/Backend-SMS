@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Table, Button, Input, message, Row, Col } from "antd";
+import { Table, Button, Input, message, Row, Col, Popconfirm } from "antd";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { FaArrowLeft, FaEdit, FaTrashAlt } from "react-icons/fa";
@@ -97,7 +97,7 @@ const TableView = () => {
           },
           ...commonColumns,
         ];
-      default:
+      case "others":
         return [
           {
             title: "Other Title",
@@ -107,6 +107,8 @@ const TableView = () => {
           },
           ...commonColumns,
         ];
+      default:
+        return commonColumns;
     }
   };
 
@@ -122,6 +124,7 @@ const TableView = () => {
         startTime: slot.startTime || "N/A",
         endTime: slot.endTime || "N/A",
         description: slot.description || "N/A",
+        otherTitle: slot.heading || "N/A", // Map 'heading' to 'otherTitle' for 'others' type
       }))
     ) || [];
   }, [timetable]);
@@ -158,6 +161,11 @@ const TableView = () => {
     }
   };
 
+  // Handle Edit - Navigate to edit page with timetable data
+  const handleEdit = () => {
+    navigate("/noticeboard/timetable/edit", { state: { timetable } });
+  };
+
   return (
     <div className="p-6">
       <Button onClick={() => navigate(-1)} icon={<FaArrowLeft />} className="mb-4">
@@ -174,12 +182,19 @@ const TableView = () => {
           allowClear
           style={{ width: 200, marginRight: 10 }}
         />
-        <Button icon={<FaEdit />} type="primary" style={{ marginRight: 5 }}>
+        <Button icon={<FaEdit />} type="primary" style={{ marginRight: 5 }} onClick={handleEdit}>
           Edit
         </Button>
-        <Button icon={<FaTrashAlt />} type="danger" onClick={handleDelete}>
-          Delete
-        </Button>
+        <Popconfirm
+          title={`Are you sure you want to delete the timetable "${timetable?.name}"?`}
+          onConfirm={handleDelete}
+          okText="Yes"
+          cancelText="No"
+        >
+          <Button icon={<FaTrashAlt />} type="danger">
+            Delete
+          </Button>
+        </Popconfirm>
       </Row>
 
       <Table
