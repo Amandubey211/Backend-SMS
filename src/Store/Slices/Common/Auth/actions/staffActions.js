@@ -33,7 +33,6 @@ export const staffLogin = createAsyncThunk(
         // localStorage.removeItem(
         //   process.env.REACT_APP_STUDENT_TOKEN_STORAGE_KEY
         // );
-        console.log(data, "ddddddddddddd");
 
         // Dispatch user details to userSlice
         dispatch(
@@ -56,7 +55,6 @@ export const staffLogin = createAsyncThunk(
         // Dispatch token and role to authSlice
         dispatch(setToken(data?.token));
         dispatch(setRole(data?.role));
-        console.log("i ran");
 
         // Handle academic year
         if (data.role === "admin" && data.isAcademicYearActive === false) {
