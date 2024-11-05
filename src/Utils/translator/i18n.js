@@ -15,7 +15,7 @@ i18n
       }
     },
     fallbackLng: "en", // Fallback language if detection fails
-    ns: ['date','month','language','setting','stdFinance','stdLibrary','stdNoticeboard','stdEvents','stdSyllabus', 'prtFinance', 'prtChildrens', 'prtNotices', 'prtEvents', 'prtLibrary', 'prtProfile'], // Specify your namespace
+    ns: ['date','month','language','setting','stdFinance','stdLibrary','stdNoticeboard','stdEvents','stdSyllabus', 'prtFinance', 'prtChildrens', 'prtNotices', 'prtEvents', 'prtLibrary', 'prtProfile', 'dashboard', 'earning', 'studentFees'], // Specify your namespace
     defaultNS: 'language', // Set default namespace
     detection: {
       // Language detection options

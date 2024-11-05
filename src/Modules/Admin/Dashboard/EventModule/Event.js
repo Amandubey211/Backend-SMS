@@ -9,6 +9,7 @@ import EventItem from "./EventItem";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux"; // Import Redux hooks
 import { fetchFilteredEvents } from "../../../../Store/Slices/Admin/Dashboard/adminDashboard.action"; // Import the action
+import { useTranslation } from "react-i18next";
 
 const monthNames = [
   "JANUARY",
@@ -29,8 +30,12 @@ const Events = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+
   // Extract events, loading, nd error from the Redux store
   const { events, loadingEvents:loading, errorEvents:error } = useSelector((state) => state.admin.adminDashboard);
+
+  const { t } = useTranslation('dashboard');
+ 
 
   const currentMonth = new Date().getMonth() + 1; // Months are zero-indexed
   const currentYear = new Date().getFullYear();
@@ -90,7 +95,7 @@ const Events = () => {
   return (
     <div className="max-w-4xl mx-auto text-gray-600 bg-white p-4">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-medium">Event</h2>
+        <h2 className="text-xl font-medium">{t("Event")}</h2>
         <div className="flex items-center gap-3">
           <button
             className="p-1 border rounded-full"
@@ -110,13 +115,13 @@ const Events = () => {
           className="text-black border border-gray-300 px-4 py-2 rounded-md hover:shadow-md transition duration-300 ease-in-out"
           onClick={handleViewAll}
         >
-          View All
+          {t("View All")}
         </button>
       </div>
       <div className="grid grid-cols-3 gap-4 py-3 font-semibold text-left border-y border-gray-200">
-        <h1>Event Name</h1>
-        <h1>Event Type</h1>
-        <h1>Start Date</h1>
+        <h1>{t("Event Name")}</h1>
+        <h1>{t("Event Type")}</h1>
+        <h1>{t("Start Date")}</h1>
       </div>
       <div className="divide-y divide-gray-200">
         {loading ? (
@@ -131,7 +136,7 @@ const Events = () => {
         ) : top5Events?.length === 0 ? (
           <div className="flex flex-col items-center justify-center my-10">
             <FaCalendarAlt className="text-gray-400 text-6xl mb-4" />
-            <p className="text-gray-500 text-xl">No events found</p>
+            <p className="text-gray-500 text-xl">{t("No events found")}</p>
           </div>
         ) : (
           top5Events?.map((event) => (

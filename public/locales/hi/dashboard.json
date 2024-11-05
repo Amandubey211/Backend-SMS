@@ -1,0 +1,21 @@
+{
+    "Students": "छात्र",
+    "Teacher": "शिक्षक",
+    "Parents": "अभिभावक",
+    "Staff": "स्टाफ",
+    "Earnings": "कमाई",
+    "Event Name": "कार्यक्रम का नाम",
+    "Event Type": "कार्यक्रम का प्रकार",
+    "Start Date": "प्रारंभ तिथि",
+    "No Earnings/Expense Data Found": "कोई आय/व्यय डेटा नहीं मिला",
+    "This month": "इस महीने",
+    "Last month": "पिछले महीने",
+    "Total Collections": "कुल संग्रह",
+    "Total Expenses": "कुल खर्च",
+    "Total Students": "कुल छात्र",
+    "Female Students": "छात्राएँ",
+    "Male Students": "छात्र",
+    "Notice Board": "सूचना पटल",
+    "View All": "सभी देखें",
+    "Event": "इवेंट"
+}
