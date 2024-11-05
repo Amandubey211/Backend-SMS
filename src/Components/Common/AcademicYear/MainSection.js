@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
-import axios from "axios";
 import AcademicYearTable from "./Components/AcademicYearTable";
-import { setAcademicYear } from "../../../Store/Slices/Common/Auth/reducers/authSlice";
-import { baseUrl } from "../../../config/Common";
-import { fetchAcademicYear } from "../../../Store/Slices/Common/AcademicYear/academicYear.action";
+import { fetchAcademicYear, updateAcademicYear } from "../../../Store/Slices/Common/AcademicYear/academicYear.action";
+import Spinner from "../Spinner";
+import { setSeletedAcademicYear } from "../../../Store/Slices/Common/AcademicYear/academicYear.slice";
 
 
 const formatDate = (dateString) => {
@@ -18,22 +17,27 @@ const formatDate = (dateString) => {
 
 const MainSection = () => {
   const dispatch = useDispatch();
-  const {academicYears,loading,error} = useSelector((store)=>store.common.academicYear)
+  const {academicYears,loading,seletedAcademicYear} = useSelector((store)=>store.common.academicYear)
   const handleCheckboxChange = async (selectedYear) => {
+    //need custom popup
+    alert('After select the year need to reload the page');
+  localStorage.setItem('say', selectedYear._id);
+  dispatch(setSeletedAcademicYear(selectedYear));
+    window.location.reload();
   };
   useEffect(() => {
-    
     dispatch(fetchAcademicYear())
   }, [dispatch]);
 
   return (
     <div className=" min-h-screen flex w-full">
+      {loading ? <Spinner/>:
       <div className="w-full">
         <AcademicYearTable
           academicYears={academicYears}
           handleCheckboxChange={handleCheckboxChange}
         />
-      </div>
+      </div>}
     </div>
   );
 };

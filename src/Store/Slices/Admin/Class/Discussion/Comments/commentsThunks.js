@@ -2,154 +2,154 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 import { baseUrl } from "../../../../../../config/Common";
+import { setErrorMsg, setShowError } from "../../../../Common/Alerts/alertsSlice";
+import { ErrorMsg } from "../../../../Common/Alerts/errorhandling.action";
 
-// Fetch comments by discussion
+const say = localStorage.getItem("say");
+
+// Helper function to get the token from Redux state with centralized error handling
+const getToken = (state, rejectWithValue, dispatch) => {
+  const token = state.common.auth?.token;
+  if (!token) {
+    dispatch(setShowError(true));
+    dispatch(setErrorMsg("Authentication Failed"));
+    return rejectWithValue("Authentication Failed");
+  }
+  return `Bearer ${token}`;
+};
+
+// Centralized error handling
+const handleError = (error, dispatch, rejectWithValue) => {
+  const err = ErrorMsg(error);
+  dispatch(setShowError(true));
+  dispatch(setErrorMsg(err.message));
+  return rejectWithValue(err.message);
+};
+
+// Thunks
 export const fetchComments = createAsyncThunk(
   "discussionComments/fetchComments",
-  async (discussionId, { rejectWithValue, getState }) => {
+  async (discussionId, { rejectWithValue, getState, dispatch }) => {
     try {
-      const token = getState().common.auth.token; // Retrieve token from Redux state
+      const token = getToken(getState(), rejectWithValue, dispatch);
       const response = await axios.get(
-        `${baseUrl}/admin/getDiscussionComment/${discussionId}`,
-        {
-          headers: { Authentication: `Bearer ${token}` },
-        }
+        `${baseUrl}/admin/getDiscussionComment/${discussionId}?say=${say}`,
+        { headers: { Authentication: token } }
       );
       if (response.data.status) {
-        return response.data.data; // Returning comments data
+        return response.data.data;
       } else {
         throw new Error("Failed to fetch comments");
       }
     } catch (error) {
-      toast.error(error.message || "Error fetching comments");
-      return rejectWithValue(error.message || "Error fetching comments");
+      return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
 
-// Add a new comment
 export const addComment = createAsyncThunk(
   "discussionComments/addComment",
-  async ({ discussionId, text }, { rejectWithValue, getState }) => {
+  async ({ discussionId, text }, { rejectWithValue, getState, dispatch }) => {
     try {
-      const token = getState().common.auth.token; // Retrieve token from Redux state
+      const token = getToken(getState(), rejectWithValue, dispatch);
       const response = await axios.post(
-        `${baseUrl}/admin/createCommentDiscussion/${discussionId}/replies`,
+        `${baseUrl}/admin/createCommentDiscussion/${discussionId}/replies?say=${say}`,
         { content: text, parentId: null },
-        {
-          headers: { Authentication: `Bearer ${token}` },
-        }
+        { headers: { Authentication: token } }
       );
       if (response.data.status) {
         toast.success("Comment added successfully");
-        return response.data.data; // Return the added comment data
+        return response.data.data;
       } else {
         throw new Error("Failed to add comment");
       }
     } catch (error) {
-      toast.error(error.message || "Error adding comment");
-      return rejectWithValue(error.message || "Error adding comment");
+      return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
 
-// Add a reply to a comment
 export const addReply = createAsyncThunk(
   "discussionComments/addReply",
-  async ({ discussionId, parentId, text }, { rejectWithValue, getState }) => {
+  async ({ discussionId, parentId, text }, { rejectWithValue, getState, dispatch }) => {
     try {
-      const token = getState().common.auth.token; // Retrieve token from Redux state
+      const token = getToken(getState(), rejectWithValue, dispatch);
       const response = await axios.post(
-        `${baseUrl}/admin/createCommentDiscussion/${discussionId}/replies`,
+        `${baseUrl}/admin/createCommentDiscussion/${discussionId}/replies?say=${say}`,
         { content: text, parentId },
-        {
-          headers: { Authentication: `Bearer ${token}` },
-        }
+        { headers: { Authentication: token } }
       );
       if (response.data.status) {
         toast.success("Reply added successfully");
-        return { parentId, reply: response.data.data }; // Return parentId and added reply
+        return { parentId, reply: response.data.data };
       } else {
         throw new Error("Failed to add reply");
       }
     } catch (error) {
-      toast.error(error.message || "Error adding reply");
-      return rejectWithValue(error.message || "Error adding reply");
+      return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
 
-// Delete a comment
 export const deleteComment = createAsyncThunk(
   "discussionComments/deleteComment",
-  async (commentId, { rejectWithValue, getState }) => {
+  async (commentId, { rejectWithValue, getState, dispatch }) => {
     try {
-      const token = getState().common.auth.token; // Retrieve token from Redux state
+      const token = getToken(getState(), rejectWithValue, dispatch);
       const response = await axios.delete(
-        `${baseUrl}/admin/deleteCommentDiscussion/${commentId}`,
-        {
-          headers: { Authentication: `Bearer ${token}` },
-        }
+        `${baseUrl}/admin/deleteCommentDiscussion/${commentId}?say=${say}`,
+        { headers: { Authentication: token } }
       );
       if (response.data.status) {
         toast.success("Comment deleted successfully");
-        return commentId; // Return deleted commentId
+        return commentId;
       } else {
         throw new Error("Failed to delete comment");
       }
     } catch (error) {
-      toast.error(error.message || "Error deleting comment");
-      return rejectWithValue(error.message || "Error deleting comment");
+      return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
 
-// Delete a reply
 export const deleteReply = createAsyncThunk(
   "discussionComments/deleteReply",
-  async (replyId, { rejectWithValue, getState }) => {
+  async (replyId, { rejectWithValue, getState, dispatch }) => {
     try {
-      const token = getState().common.auth.token; // Retrieve token from Redux state
+      const token = getToken(getState(), rejectWithValue, dispatch);
       const response = await axios.delete(
-        `${baseUrl}/admin/deleteCommentDiscussion/${replyId}`,
-        {
-          headers: { Authentication: `Bearer ${token}` },
-        }
+        `${baseUrl}/admin/deleteCommentDiscussion/${replyId}?say=${say}`,
+        { headers: { Authentication: token } }
       );
       if (response.data.status) {
         toast.success("Reply deleted successfully");
-        return replyId; // Return deleted replyId
+        return replyId;
       } else {
         throw new Error("Failed to delete reply");
       }
     } catch (error) {
-      toast.error(error.message || "Error deleting reply");
-      return rejectWithValue(error.message || "Error deleting reply");
+      return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
 
-// Toggle like for a message
 export const toggleLikeMessage = createAsyncThunk(
   "discussionComments/toggleLike",
-  async (messageId, { rejectWithValue, getState }) => {
+  async (messageId, { rejectWithValue, getState, dispatch }) => {
     try {
-      const token = getState().common.auth.token; // Retrieve token from Redux state
+      const token = getToken(getState(), rejectWithValue, dispatch);
       const response = await axios.put(
-        `${baseUrl}/admin/likeDiscussions/${messageId}`,
+        `${baseUrl}/admin/likeDiscussions/${messageId}?say=${say}`,
         {},
-        {
-          headers: { Authentication: `Bearer ${token}` },
-        }
+        { headers: { Authentication: token } }
       );
       if (response.data.status) {
-        return messageId; // Return liked messageId
+        return messageId;
       } else {
         throw new Error("Failed to toggle like");
       }
     } catch (error) {
-      toast.error(error.message || "Error toggling like");
-      return rejectWithValue(error.message || "Error toggling like");
+      return handleError(error, dispatch, rejectWithValue);
     }
   }
 );

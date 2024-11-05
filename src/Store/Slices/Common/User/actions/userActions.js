@@ -2,6 +2,7 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { baseUrl } from "../../../../../config/Common";
 import toast from "react-hot-toast";
+import { setUserDetails } from "../reducers/userSlice";
 
 // Fetch user data
 export const fetchUserData = createAsyncThunk(
@@ -64,3 +65,24 @@ export const updatePasswordThunk = createAsyncThunk("User/updatePassword",
   }
 
 })
+
+export const updateAdminProfile = createAsyncThunk ("User/updateAdmin",
+  async({data},{rejectWithValue,getState,dispatch})=>{
+  const { common } = getState();
+  const token = common.auth.token;
+    try {
+      const response = await axios.put(`${baseUrl}/admin/update/admin_profile`,data, {
+        headers: { Authentication: `Bearer ${token}` },
+      });
+      toast.success('Profile update successfully');
+      if(response.data.success){
+        dispatch(setUserDetails(response.data.data))
+      } 
+      return response.data;
+    } catch (error) {
+      toast.error('Profile not updated')
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+  )
+

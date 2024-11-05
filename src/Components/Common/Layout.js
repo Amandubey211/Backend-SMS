@@ -2,13 +2,22 @@ import React from "react";
 import { Helmet } from "react-helmet";
 import { Toaster } from "react-hot-toast";
 import useNavHeading from "../../Hooks/CommonHooks/useNavHeading ";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { setErrorMsg, setShowError } from "../../Store/Slices/Common/Alerts/alertsSlice";
+import OfflineModal from "./Offline";
 const Layout = ({ children, title, description, keywords, author }) => {
-  // const role = useSelector((store) => store.common.auth.role);
-  // useNavHeading(role);
+  const dispatch = useDispatch()
+   const {showError,errorMsg}=useSelector((store)=>store?.common?.alertMsg);
+   const handleDismiss = () => {
+     dispatch(setShowError(false));
+     dispatch(setErrorMsg(''));
+   }
   return (
     <div>
-      <Helmet>
+       { showError && errorMsg && (
+            <OfflineModal error={errorMsg} onDismiss={handleDismiss} />
+          )}
+      <Helmet> 
         <meta charSet="utf-8" />
         <meta name="description" content={description} />
         <meta name="keywords" content={keywords} />

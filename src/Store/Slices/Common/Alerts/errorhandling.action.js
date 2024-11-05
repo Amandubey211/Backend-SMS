@@ -1,7 +1,7 @@
 export const ErrorMsg = (error) => {
   if (error.response) {
     const statusCode = error.response.status;
-    const msg = error.response.data?.message;
+    const msg = error.response.data?.message||error.response.data?.msg;
 
     switch (statusCode) {
       case 400:

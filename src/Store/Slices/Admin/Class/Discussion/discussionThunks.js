@@ -1,164 +1,161 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { baseUrl } from "../../../../../config/Common";
+import { setErrorMsg, setShowError } from "../../../Common/Alerts/alertsSlice";
+import { ErrorMsg } from "../../../Common/Alerts/errorhandling.action";
 
-// Fetch all discussions for a class
+const say = localStorage.getItem("say");
+
+// Helper function to get the token from Redux state with centralized error handling
+const getToken = (state, rejectWithValue, dispatch) => {
+  const token = state.common.auth?.token;
+  if (!token) {
+    dispatch(setShowError(true));
+    dispatch(setErrorMsg("Authentication Failed"));
+    return rejectWithValue("Authentication Failed");
+  }
+  return `Bearer ${token}`;
+};
+
+// Centralized error handling
+const handleError = (error, dispatch, rejectWithValue) => {
+  const err = ErrorMsg(error);
+  dispatch(setShowError(true));
+  dispatch(setErrorMsg(err.message));
+  return rejectWithValue(err.message);
+};
+
+// Thunks
 export const fetchClassDiscussions = createAsyncThunk(
   "discussions/fetchClassDiscussions",
-  async ({ cid }, { getState, rejectWithValue }) => {
+  async ({ cid }, { getState, rejectWithValue, dispatch }) => {
     try {
-      const token = getState().common.auth.token;
+      const token = getToken(getState(), rejectWithValue, dispatch);
       const response = await axios.get(
-        `${baseUrl}/admin/getDiscussion/class/${cid}`,
-        {
-          headers: { Authentication: `Bearer ${token}` },
-        }
+        `${baseUrl}/admin/getDiscussion/class/${cid}?say=${say}`,
+        { headers: { Authentication: token } }
       );
       return response.data.data;
     } catch (error) {
-      return rejectWithValue(
-        error.response?.data?.message || "Error fetching discussions"
-      );
+      return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
 
-// Fetch a single discussion by ID
 export const fetchDiscussionById = createAsyncThunk(
   "discussions/fetchDiscussionById",
-  async ({ did }, { getState, rejectWithValue }) => {
+  async ({ did }, { getState, rejectWithValue, dispatch }) => {
     try {
-      const token = getState().common.auth.token;
+      const token = getToken(getState(), rejectWithValue, dispatch);
       const response = await axios.get(
-        `${baseUrl}/admin/getDiscussionById/${did}`,
-        {
-          headers: { Authentication: `Bearer ${token}` },
-        }
+        `${baseUrl}/admin/getDiscussionById/${did}?say=${say}`,
+        { headers: { Authentication: token } }
       );
       return response.data.data;
     } catch (error) {
-      return rejectWithValue(
-        error.response?.data?.message || "Error fetching discussion"
-      );
+      return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
 
-// Create a new discussion
 export const createDiscussion = createAsyncThunk(
   "discussions/createDiscussion",
-  async ({ discussionData, cid }, { getState, rejectWithValue }) => {
+  async ({ discussionData, cid }, { getState, rejectWithValue, dispatch }) => {
     try {
-      const token = getState().common.auth.token;
+      const token = getToken(getState(), rejectWithValue, dispatch);
       const formData = new FormData();
       Object.keys(discussionData).forEach((key) => {
         formData.append(key, discussionData[key]);
       });
       const response = await axios.post(
-        `${baseUrl}/admin/createDiscussion/class/${cid}`,
+        `${baseUrl}/admin/createDiscussion/class/${cid}?say=${say}`,
         formData,
         {
           headers: {
-            Authentication: `Bearer ${token}`,
+            Authentication: token,
             "Content-Type": "multipart/form-data",
           },
         }
       );
       return response.data.data;
     } catch (error) {
-      return rejectWithValue(
-        error.response?.data?.message || "Error creating discussion"
-      );
+      return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
 
-// Update an existing discussion
 export const updateDiscussion = createAsyncThunk(
   "discussions/updateDiscussion",
-  async ({ discussionId, discussionData }, { getState, rejectWithValue }) => {
+  async ({ discussionId, discussionData }, { getState, rejectWithValue, dispatch }) => {
     try {
-      const token = getState().common.auth.token;
+      const token = getToken(getState(), rejectWithValue, dispatch);
       const formData = new FormData();
       Object.keys(discussionData).forEach((key) => {
         formData.append(key, discussionData[key]);
       });
       const response = await axios.put(
-        `${baseUrl}/admin/updateDiscussion/${discussionId}`,
+        `${baseUrl}/admin/updateDiscussion/${discussionId}?say=${say}`,
         formData,
         {
           headers: {
-            Authentication: `Bearer ${token}`,
+            Authentication: token,
             "Content-Type": "multipart/form-data",
           },
         }
       );
       return response.data.data;
     } catch (error) {
-      return rejectWithValue(
-        error.response?.data?.message || "Error updating discussion"
-      );
+      return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
 
-// Delete a discussion
 export const deleteDiscussion = createAsyncThunk(
   "discussions/deleteDiscussion",
-  async ({ discussionId }, { getState, rejectWithValue }) => {
+  async ({ discussionId }, { getState, rejectWithValue, dispatch }) => {
     try {
-      const token = getState().common.auth.token;
+      const token = getToken(getState(), rejectWithValue, dispatch);
       const response = await axios.delete(
-        `${baseUrl}/admin/deleteDiscussion/${discussionId}`,
-        {
-          headers: { Authentication: `Bearer ${token}` },
-        }
+        `${baseUrl}/admin/deleteDiscussion/${discussionId}?say=${say}`,
+        { headers: { Authentication: token } }
       );
-      return discussionId; // Return the deleted discussion's ID
+      return discussionId;
     } catch (error) {
-      return rejectWithValue(
-        error.response?.data?.message || "Error deleting discussion"
-      );
+      return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
 
-// Mark a discussion as read
 export const markAsReadDiscussion = createAsyncThunk(
   "discussions/markAsReadDiscussion",
-  async ({ discussionId }, { getState, rejectWithValue }) => {
+  async ({ discussionId }, { getState, rejectWithValue, dispatch }) => {
     try {
-      const token = getState().common.auth.token;
+      const token = getToken(getState(), rejectWithValue, dispatch);
       const response = await axios.put(
-        `${baseUrl}/admin/discussion/readstatus/${discussionId}`,
+        `${baseUrl}/admin/discussion/readstatus/${discussionId}?say=${say}`,
         {},
-        { headers: { Authentication: `Bearer ${token}` } }
+        { headers: { Authentication: token } }
       );
       return response.data.data;
     } catch (error) {
-      return rejectWithValue(
-        error.response?.data?.message || "Error marking discussion as read"
-      );
+      return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
 
-// Update the pin status of a discussion
 export const updatePinStatus = createAsyncThunk(
   "discussions/updatePinStatus",
-  async ({ discussionId, isPinned }, { getState, rejectWithValue }) => {
+  async ({ discussionId, isPinned }, { getState, rejectWithValue, dispatch }) => {
     try {
-      const token = getState().common.auth.token;
+      const token = getToken(getState(), rejectWithValue, dispatch);
       const response = await axios.put(
-        `${baseUrl}/admin/discussion/pinstatus/${discussionId}`,
+        `${baseUrl}/admin/discussion/pinstatus/${discussionId}?say=${say}`,
         { isPinned },
-        { headers: { Authentication: `Bearer ${token}` } }
+        { headers: { Authentication: token } }
       );
       return response.data.data;
     } catch (error) {
-      return rejectWithValue(
-        error.response?.data?.message || "Error updating pin status"
-      );
+      return handleError(error, dispatch, rejectWithValue);
     }
   }
 );

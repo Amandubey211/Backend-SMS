@@ -4,6 +4,29 @@ import toast from "react-hot-toast";
 import { baseUrl } from "../../../../../config/Common";
 import { fetchModules } from "./moduleThunk";
 import { setSelectedModule } from "./moduleSlice";
+import { setErrorMsg, setShowError } from "../../../Common/Alerts/alertsSlice";
+import { ErrorMsg } from "../../../Common/Alerts/errorhandling.action";
+
+const say = localStorage.getItem("say");
+
+// Helper function to get the token from Redux state with centralized error handling
+const getToken = (state, rejectWithValue, dispatch) => {
+  const token = state.common.auth?.token;
+  if (!token) {
+    dispatch(setShowError(true));
+    dispatch(setErrorMsg("Authentication Failed"));
+    return rejectWithValue("Authentication Failed");
+  }
+  return `Bearer ${token}`;
+};
+
+// Centralized error handling
+const handleError = (error, dispatch, rejectWithValue) => {
+  const err = ErrorMsg(error);
+  dispatch(setShowError(true));
+  dispatch(setErrorMsg(err.message));
+  return rejectWithValue(err.message);
+};
 
 // Add Chapter Thunk
 export const addChapter = createAsyncThunk(
@@ -13,25 +36,25 @@ export const addChapter = createAsyncThunk(
     { rejectWithValue, getState, dispatch }
   ) => {
     try {
-      const token = getState().common.auth.token; // Get token from state
+      const token = getToken(getState(), rejectWithValue, dispatch);
       const cid = getState().common.user.classInfo.selectedClassId;
-      const sid = getState().common.user.subjectInfo.selectedSubjectId;
+      const subjectId = getState().common.user.subjectInfo.selectedSubjectId;
 
       const formData = new FormData();
       formData.append("name", name);
       formData.append("moduleId", moduleId);
-      formData.append("subjectId", sid);
+      formData.append("subjectId", subjectId);
       if (thumbnail) {
         formData.append("thumbnail", thumbnail);
       }
 
       const response = await axios.post(
-        `${baseUrl}/admin/add_chapter`,
+        `${baseUrl}/admin/add_chapter?say=${say}`,
         formData,
         {
           headers: {
             "Content-Type": "multipart/form-data",
-            Authentication: `Bearer ${token}`,
+            Authentication: token,
           },
         }
       );
@@ -39,19 +62,14 @@ export const addChapter = createAsyncThunk(
       toast.success(response.data.msg);
 
       if (response.data.success) {
-        // Fetch updated modules after chapter is added
-        await dispatch(fetchModules({ cid, sid }));
+        await dispatch(fetchModules({ cid, sid: subjectId }));
 
-        // Retrieve updated modules from state
         const updatedModules = getState().admin.module.modules;
-
-        // Find the updated module by moduleId
         const updatedModule = updatedModules.find(
           (module) => module._id === moduleId
         );
 
         if (updatedModule) {
-          // Explicitly set the updated module as the selected one
           dispatch(
             setSelectedModule({
               moduleId: updatedModule._id,
@@ -62,11 +80,9 @@ export const addChapter = createAsyncThunk(
         }
       }
 
-      return response.data.data; // Return new chapter data
-    } catch (err) {
-      const message = err.response?.data?.msg || "Failed to add chapter.";
-      toast.error(message);
-      return rejectWithValue(message);
+      return response.data.data;
+    } catch (error) {
+      return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
@@ -79,9 +95,9 @@ export const editChapter = createAsyncThunk(
     { rejectWithValue, getState, dispatch }
   ) => {
     try {
-      const token = getState().common.auth.token; // Get token from state
+      const token = getToken(getState(), rejectWithValue, dispatch);
       const cid = getState().common.user.classInfo.selectedClassId;
-      const sid = getState().common.user.subjectInfo.selectedSubjectId;
+      const subjectId = getState().common.user.subjectInfo.selectedSubjectId;
 
       const formData = new FormData();
       formData.append("name", name);
@@ -90,30 +106,25 @@ export const editChapter = createAsyncThunk(
       }
 
       const response = await axios.put(
-        `${baseUrl}/admin/subjects/${sid}/modules/${moduleId}/chapters/${chapterId}`,
+        `${baseUrl}/admin/subjects/${subjectId}/modules/${moduleId}/chapters/${chapterId}?say=${say}`,
         formData,
         {
           headers: {
             "Content-Type": "multipart/form-data",
-            Authentication: `Bearer ${token}`,
+            Authentication: token,
           },
         }
       );
 
       if (response.data.success) {
-        // Fetch updated modules after chapter is edited
-        await dispatch(fetchModules({ cid, sid }));
+        await dispatch(fetchModules({ cid, sid: subjectId }));
 
-        // Retrieve updated modules from state
         const updatedModules = getState().admin.module.modules;
-
-        // Find the updated module by moduleId
         const updatedModule = updatedModules.find(
           (module) => module._id === moduleId
         );
 
         if (updatedModule) {
-          // Explicitly set the updated module as the selected one
           dispatch(
             setSelectedModule({
               moduleId: updatedModule._id,
@@ -125,11 +136,9 @@ export const editChapter = createAsyncThunk(
       }
 
       toast.success(response.data.msg);
-      return response.data.data; // Return updated chapter data
-    } catch (err) {
-      const message = err.response?.data?.msg || "Failed to edit chapter.";
-      toast.error(message);
-      return rejectWithValue(message);
+      return response.data.data;
+    } catch (error) {
+      return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
@@ -142,37 +151,28 @@ export const deleteChapter = createAsyncThunk(
     { rejectWithValue, getState, dispatch }
   ) => {
     try {
-      const token = getState().common.auth.token; // Get token from state
+      const token = getToken(getState(), rejectWithValue, dispatch);
       const cid = getState().common.user.classInfo.selectedClassId;
-      const sid = getState().common.user.subjectInfo.selectedSubjectId;
+      const subjectId = getState().common.user.subjectInfo.selectedSubjectId;
 
-      // API call to delete chapter
       const response = await axios.delete(
-        `${baseUrl}/admin/subjects/${sid}/modules/${moduleId}/chapters/${chapterId}`,
+        `${baseUrl}/admin/subjects/${subjectId}/modules/${moduleId}/chapters/${chapterId}?say=${say}`,
         {
-          headers: {
-            Authentication: `Bearer ${token}`,
-          },
+          headers: { Authentication: token },
         }
       );
 
-      // Show success message if the deletion is successful
       toast.success(response.data.msg);
 
       if (response.data.success) {
-        // Fetch updated modules after chapter is edited
-        await dispatch(fetchModules({ cid, sid }));
+        await dispatch(fetchModules({ cid, sid: subjectId }));
 
-        // Retrieve updated modules from state
         const updatedModules = getState().admin.module.modules;
-
-        // Find the updated module by moduleId
         const updatedModule = updatedModules.find(
           (module) => module._id === moduleId
         );
 
         if (updatedModule) {
-          // Explicitly set the updated module as the selected one
           dispatch(
             setSelectedModule({
               moduleId: updatedModule._id,
@@ -183,11 +183,9 @@ export const deleteChapter = createAsyncThunk(
         }
       }
 
-      return chapterId; // Return the deleted chapter ID
-    } catch (err) {
-      const message = err.response?.data?.msg || "Failed to delete chapter.";
-      toast.error(message);
-      return rejectWithValue(message);
+      return chapterId;
+    } catch (error) {
+      return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
