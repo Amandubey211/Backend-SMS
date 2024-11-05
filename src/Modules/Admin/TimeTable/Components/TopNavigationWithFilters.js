@@ -150,7 +150,7 @@ const TopNavigationWithFilters = ({ onBackendFilterChange, onFrontendFilterChang
           </Select>
         </Col>
 
-        {/* Academic Year Filter */}
+        {/* Academic Year Filter
         <Col>
           <label className="font-medium text-gray-700" style={{ paddingRight: "8px" }}>Academic Year</label>
           <Select
@@ -167,7 +167,7 @@ const TopNavigationWithFilters = ({ onBackendFilterChange, onFrontendFilterChang
               </Option>
             ))}
           </Select>
-        </Col>
+        </Col> */}
 
         {/* Action Buttons */}
         <Col>

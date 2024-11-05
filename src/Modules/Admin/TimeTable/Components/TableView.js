@@ -1,7 +1,9 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { Table, Button, Input, message, Row, Col, Popconfirm } from "antd";
+// TableView.jsx
+
+import React, { useEffect, useMemo, useState, useCallback } from "react";
+import { Table, Button, Input, message, Row, Popconfirm } from "antd";
 import { useNavigate, useLocation } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { FaArrowLeft, FaEdit, FaTrashAlt } from "react-icons/fa";
 import { deleteTimetable } from "../../../../Store/Slices/Admin/TimeTable/timetable.action"; // Import the delete action
 
@@ -161,9 +163,13 @@ const TableView = () => {
     }
   };
 
-  // Handle Edit - Navigate to edit page with timetable data
+  // **Updated Handle Edit Function**
   const handleEdit = () => {
-    navigate("/noticeboard/timetable/edit", { state: { timetable } });
+    if (timetable && timetable._id) {
+      navigate(`/noticeboard/timetable/edit/${timetable._id}`);
+    } else {
+      message.error("Timetable ID is missing.");
+    }
   };
 
   return (
