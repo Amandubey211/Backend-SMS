@@ -49,7 +49,7 @@ export const fetchClasses = createAsyncThunk(
     async (_, { rejectWithValue, getState, dispatch }) => {
         const token = getToken(getState(), rejectWithValue, dispatch);
         if (typeof token === 'object') return token;
-
+        const say = localStorage.getItem("say")
         try {
             const response = await axios.get(`${baseUrl}/admin/class?say=${say}`, {
                 headers: { Authentication: token },
@@ -68,7 +68,7 @@ export const deleteStudentFee = createAsyncThunk(
     async (feeId, { rejectWithValue, getState, dispatch }) => {
         const token = getToken(getState(), rejectWithValue, dispatch);
         if (typeof token === 'object') return token;
-
+        const say = localStorage.getItem("say")
         try {
             const response = await axios.delete(`${baseUrl}/admin/fee/delete/${feeId}?say=${say}`, {
                 headers: { Authentication: token },
@@ -87,7 +87,7 @@ export const createStudentFee = createAsyncThunk(
     async ({ submissionData }, { rejectWithValue, getState, dispatch }) => {
         const token = getToken(getState(), rejectWithValue, dispatch);
         if (typeof token === 'object') return token;
-
+        const say = localStorage.getItem("say")
         try {
             const response = await axios.post(`${baseUrl}/admin/student/create_fees?say=${say}`, submissionData, {
                 headers: { Authentication: token },
@@ -106,7 +106,7 @@ export const updateStudentFee = createAsyncThunk(
     async ({ feeId, submissionData }, { rejectWithValue, getState, dispatch }) => {
         const token = getToken(getState(), rejectWithValue, dispatch);
         if (typeof token === 'object') return token;
-
+        const say = localStorage.getItem("say")
         try {
             const response = await axios.put(`${baseUrl}/admin/student/update_fees/${feeId}?say=${say}`, submissionData, {
                 headers: { Authentication: token },

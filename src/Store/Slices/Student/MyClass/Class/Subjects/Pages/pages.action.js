@@ -10,6 +10,7 @@ export const stdPages = createAsyncThunk(
     async ({ classId }, { rejectWithValue , dispatch}) => {
         console.log("i am pages class",classId)
         const token = localStorage.getItem("student:token");
+        const say = localStorage.getItem("say")
         if (!token) {
             dispatch(setShowError(true));
             dispatch(setErrorMsg("Authentication failed!"));
@@ -40,6 +41,7 @@ export const fetchPageView = createAsyncThunk(
     'pages/pageView',
     async (pageId, { rejectWithValue,dispatch }) => {
         const token = localStorage.getItem("student:token");
+        const say = localStorage.getItem("say")
         if (!token) {
             dispatch(setShowError(true));
             dispatch(setErrorMsg("Authentication failed!"));

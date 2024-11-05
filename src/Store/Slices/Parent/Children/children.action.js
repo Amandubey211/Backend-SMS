@@ -39,6 +39,7 @@ export const fetchAttendance = createAsyncThunk(
   "children/fetchAttendance",
   async ({ studentId, month, year }, { rejectWithValue, dispatch }) => {
     const token = localStorage.getItem("parent:token");
+    const say = localStorage.getItem("say")
     if (!token) {
       dispatch(setShowError(true));
       dispatch(setErrorMsg("Authentication failed"));
@@ -66,6 +67,7 @@ export const fetchTeachers = createAsyncThunk(
   "children/fetchTeachers",
   async (studentId, { rejectWithValue, dispatch }) => {
     const token = localStorage.getItem("parent:token");
+    const say = localStorage.getItem("say")
     const userData = JSON.parse(localStorage.getItem("userData"));
 
     if (!userData || !userData.email) {
@@ -101,6 +103,7 @@ export const fetchGrades = createAsyncThunk(
   'children/fetchGrades',
   async ({ studentId }, { rejectWithValue, dispatch }) => {
     const token = localStorage.getItem('parent:token');
+    const say = localStorage.getItem("say")
     if (!token) {
       dispatch(setShowError(true));
       dispatch(setErrorMsg("Authentication failed"));
@@ -154,6 +157,7 @@ export const fetchSubjects = createAsyncThunk(
   "children/fetchSubjects",
   async (studentId, { rejectWithValue, dispatch }) => {
     const token = localStorage.getItem("parent:token");
+    const say = localStorage.getItem("say")
     if (!token) {
       dispatch(setShowError(true));
       dispatch(setErrorMsg("Authentication failed"));

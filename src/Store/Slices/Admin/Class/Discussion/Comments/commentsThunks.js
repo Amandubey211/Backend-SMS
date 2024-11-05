@@ -32,6 +32,7 @@ export const fetchComments = createAsyncThunk(
   async (discussionId, { rejectWithValue, getState, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const response = await axios.get(
         `${baseUrl}/admin/getDiscussionComment/${discussionId}?say=${say}`,
         { headers: { Authentication: token } }
@@ -52,6 +53,7 @@ export const addComment = createAsyncThunk(
   async ({ discussionId, text }, { rejectWithValue, getState, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const response = await axios.post(
         `${baseUrl}/admin/createCommentDiscussion/${discussionId}/replies?say=${say}`,
         { content: text, parentId: null },
@@ -74,6 +76,7 @@ export const addReply = createAsyncThunk(
   async ({ discussionId, parentId, text }, { rejectWithValue, getState, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const response = await axios.post(
         `${baseUrl}/admin/createCommentDiscussion/${discussionId}/replies?say=${say}`,
         { content: text, parentId },
@@ -96,6 +99,7 @@ export const deleteComment = createAsyncThunk(
   async (commentId, { rejectWithValue, getState, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const response = await axios.delete(
         `${baseUrl}/admin/deleteCommentDiscussion/${commentId}?say=${say}`,
         { headers: { Authentication: token } }
@@ -117,6 +121,7 @@ export const deleteReply = createAsyncThunk(
   async (replyId, { rejectWithValue, getState, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const response = await axios.delete(
         `${baseUrl}/admin/deleteCommentDiscussion/${replyId}?say=${say}`,
         { headers: { Authentication: token } }
@@ -138,6 +143,7 @@ export const toggleLikeMessage = createAsyncThunk(
   async (messageId, { rejectWithValue, getState, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const response = await axios.put(
         `${baseUrl}/admin/likeDiscussions/${messageId}?say=${say}`,
         {},

@@ -10,6 +10,7 @@ export const studentIssueBooks = createAsyncThunk(
     'books/studentIssueBooks',
     async (_, { rejectWithValue, dispatch }) => {
         const token = localStorage.getItem("student:token");
+        const say = localStorage.getItem("say")
         if (!token) {
             dispatch(setShowError(true));
             dispatch(setErrorMsg("Authentication Failed!"));

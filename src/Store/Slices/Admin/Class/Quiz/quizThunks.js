@@ -33,6 +33,7 @@ export const fetchFilteredQuizzesThunk = createAsyncThunk(
   async ({ moduleId, chapterId, publish }, { getState, rejectWithValue, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const params = {
         ...(moduleId && { moduleId }),
         ...(chapterId && { chapterId }),
@@ -63,6 +64,7 @@ export const fetchQuizByIdThunk = createAsyncThunk(
   async (quizId, { getState, rejectWithValue, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const response = await axios.get(`${baseUrl}/admin/quiz/${quizId}?say=${say}`, {
         headers: { Authentication: token },
       });
@@ -83,6 +85,7 @@ export const addQuestionThunk = createAsyncThunk(
   async ({ quizId, question }, { getState, rejectWithValue, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const response = await axios.put(
         `${baseUrl}/admin/add_question/quiz/${quizId}?say=${say}`,
         question,
@@ -107,6 +110,7 @@ export const updateQuestionThunk = createAsyncThunk(
   async ({ quizId, questionId, question }, { getState, rejectWithValue, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const response = await axios.put(
         `${baseUrl}/admin/quiz/${quizId}/question/${questionId}?say=${say}`,
         question,
@@ -131,6 +135,7 @@ export const deleteQuestionThunk = createAsyncThunk(
   async ({ quizId, questionId }, { getState, rejectWithValue, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const response = await axios.delete(
         `${baseUrl}/admin/quiz/${quizId}/question/${questionId}?say=${say}`,
         { headers: { Authentication: token } }
@@ -154,6 +159,7 @@ export const createQuizThunk = createAsyncThunk(
   async (quizData, { getState, rejectWithValue, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const response = await axios.post(`${baseUrl}/admin/create_quiz?say=${say}`, quizData, {
         headers: { Authentication: token },
       });
@@ -176,6 +182,7 @@ export const updateQuizThunk = createAsyncThunk(
   async ({ quizId, quizData }, { getState, rejectWithValue, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const response = await axios.put(`${baseUrl}/admin/update_quiz/${quizId}?say=${say}`, quizData, {
         headers: { Authentication: token },
       });
@@ -198,6 +205,7 @@ export const deleteQuizThunk = createAsyncThunk(
   async (quizId, { getState, rejectWithValue, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const response = await axios.delete(`${baseUrl}/admin/delete_quiz/${quizId}?say=${say}`, {
         headers: { Authentication: token },
       });

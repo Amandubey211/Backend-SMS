@@ -31,7 +31,7 @@ export const fetchAnnouncementComments = createAsyncThunk(
     async (announcementId, { rejectWithValue, getState, dispatch }) => {
         const token = getToken(getState(), rejectWithValue, dispatch);
         if (typeof token === "object") return token;
-
+        const say = localStorage.getItem("say")
         try {
             const response = await axios.get(
                 `${baseUrl}/admin/getAnnouncementComment/${announcementId}`,
@@ -54,7 +54,7 @@ export const addAnnouncementComment = createAsyncThunk(
     async ({ announcementId, text }, { rejectWithValue, getState, dispatch }) => {
         const token = getToken(getState(), rejectWithValue, dispatch);
         if (typeof token === "object") return token;
-
+        const say = localStorage.getItem("say")
         try {
             const response = await axios.post(
                 `${baseUrl}/admin/createCommentAnnouncement/${announcementId}/replies`,
@@ -79,7 +79,7 @@ export const addAnnouncementReply = createAsyncThunk(
     async ({ announcementId, parentId, text }, { rejectWithValue, getState, dispatch }) => {
         const token = getToken(getState(), rejectWithValue, dispatch);
         if (typeof token === "object") return token;
-
+        const say = localStorage.getItem("say")
         try {
             const response = await axios.post(
                 `${baseUrl}/admin/createCommentAnnouncement/${announcementId}/replies`,
@@ -104,7 +104,7 @@ export const deleteAnnouncementComment = createAsyncThunk(
     async (commentId, { rejectWithValue, getState, dispatch }) => {
         const token = getToken(getState(), rejectWithValue, dispatch);
         if (typeof token === "object") return token;
-
+        const say = localStorage.getItem("say")
         try {
             const response = await axios.delete(
                 `${baseUrl}/admin/deleteCommentAnnouncement/${commentId}`,
@@ -128,7 +128,7 @@ export const toggleLikeAnnouncementComment = createAsyncThunk(
     async (commentId, { rejectWithValue, getState, dispatch }) => {
         const token = getToken(getState(), rejectWithValue, dispatch);
         if (typeof token === "object") return token;
-
+        const say = localStorage.getItem("say")
         try {
             const response = await axios.put(
                 `${baseUrl}/admin/likeAnnouncementComment/${commentId}`,

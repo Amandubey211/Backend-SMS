@@ -31,6 +31,7 @@ export const fetchAssignedQuizStudents = createAsyncThunk(
   async (quizId, { getState, rejectWithValue, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const response = await axios.get(
         `${baseUrl}/admin/speed_grade/quiz/${quizId}?say=${say}`,
         {
@@ -50,6 +51,7 @@ export const fetchStudentQuiz = createAsyncThunk(
   async ({ studentId, quizId }, { getState, rejectWithValue, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const response = await axios.get(
         `${baseUrl}/admin/speed_grade/quiz?say=${say}`,
         {
@@ -73,6 +75,7 @@ export const assignQuizGrade = createAsyncThunk(
   ) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const response = await axios.put(
         `${baseUrl}/admin/speed_grade/quiz/grade?say=${say}`,
         { studentId, quizId, attemptDate, score, status },

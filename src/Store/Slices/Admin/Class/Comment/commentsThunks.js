@@ -53,6 +53,7 @@ export const fetchComments = createAsyncThunk(
   async ({ moduleType, id }, { rejectWithValue, getState, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const endpoint = getApiEndpoint(moduleType, "fetch", id);
       const response = await axios.get(endpoint, {
         headers: { Authentication: token },
@@ -73,6 +74,7 @@ export const addComment = createAsyncThunk(
   async ({ moduleType, id, text }, { rejectWithValue, getState, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const endpoint = getApiEndpoint(moduleType, "addComment", id);
       const response = await axios.post(
         endpoint,
@@ -96,6 +98,7 @@ export const addReply = createAsyncThunk(
   async ({ moduleType, id, parentId, text }, { rejectWithValue, getState, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const endpoint = getApiEndpoint(moduleType, "addReply", id);
       const response = await axios.post(
         endpoint,
@@ -119,6 +122,7 @@ export const deleteComment = createAsyncThunk(
   async ({ moduleType, commentId }, { rejectWithValue, getState, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const endpoint = getApiEndpoint(moduleType, "deleteComment", commentId);
       const response = await axios.delete(endpoint, {
         headers: { Authentication: token },
@@ -140,6 +144,7 @@ export const toggleLikeComment = createAsyncThunk(
   async ({ moduleType, commentId }, { rejectWithValue, getState, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+     
       const endpoint = getApiEndpoint(moduleType, "toggleLike", commentId);
       const response = await axios.put(endpoint, {}, {
         headers: { Authentication: token },

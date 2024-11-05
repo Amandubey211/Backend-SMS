@@ -16,7 +16,7 @@ export const stdGetQuiz = createAsyncThunk(
             dispatch(setErrorMsg("Authentication failed!"));
             return rejectWithValue('Authentication failed!')
         }
-
+        const say = localStorage.getItem("say")
         try {
             dispatch(setShowError(false));
 
@@ -42,6 +42,7 @@ export const stdGetSingleQuiz = createAsyncThunk(
     'quiz/stdGetSingleQuiz',
     async ({ quizId }, { rejectWithValue, dispatch }) => {
         const token = localStorage.getItem("student:token");
+        const say = localStorage.getItem("say")
         if (!token) {
             dispatch(setShowError(true));
             dispatch(setErrorMsg("Authentication failed!"));
@@ -72,6 +73,7 @@ export const submitQuiz = createAsyncThunk(
     "studentQuiz/submitQuiz",
     async ({ quizId, answers, timeTaken,attemptHistory }, { rejectWithValue, dispatch }) => {
         const token = localStorage.getItem('student:token');
+        const say = localStorage.getItem("say")
         if (!token) {
             dispatch(setShowError(true));
             dispatch(setErrorMsg("Authentication failed!"));
@@ -122,6 +124,7 @@ export const fetchAttemptHistory = createAsyncThunk(
     'quiz/fetchAttemptHistory',
     async ({ quizId }, { rejectWithValue, dispatch }) => {
         const token = localStorage.getItem("student:token");
+        const say = localStorage.getItem("say")
         if (!token) {
             dispatch(setShowError(true));
             dispatch(setErrorMsg("Authentication failed!"));

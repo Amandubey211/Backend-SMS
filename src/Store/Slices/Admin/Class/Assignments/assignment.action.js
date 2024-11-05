@@ -6,6 +6,7 @@ const say = localStorage.getItem("say");
  export const fetchAllAssignment = createAsyncThunk("subject/AllAssignment",async ({ subjectId,params} , { rejectWithValue, getState, }) => {
     const { common } = getState();
     const token = common.auth.token;
+    const say = localStorage.getItem("say")
     try {
 
         const response = await axios.get(

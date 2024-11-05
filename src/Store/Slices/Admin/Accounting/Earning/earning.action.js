@@ -21,7 +21,7 @@ export const fetchEarning = createAsyncThunk(
     async (_, { rejectWithValue, getState, dispatch }) => {
         const token = getToken(getState(), rejectWithValue, dispatch);
         if (typeof token === 'object') return token; // Return if token is not retrieved
-
+        const say = localStorage.getItem("say")
         try {
             const response = await axios.get(`${baseUrl}/admin/getearning?say=${say}`, {
                 headers: { Authentication: token },
@@ -45,7 +45,7 @@ export const fetchTotalAmounts = createAsyncThunk(
     async (_, { rejectWithValue, getState, dispatch }) => {
         const token = getToken(getState(), rejectWithValue, dispatch);
         if (typeof token === 'object') return token;
-
+        const say = localStorage.getItem("say")
         try {
             const response = await axios.get(`${baseUrl}/admin/total_amount?say=${say}`, {
                 headers: { Authentication: token },
@@ -67,7 +67,7 @@ export const updateEarning = createAsyncThunk(
     async ({ id, updatedEarning }, { rejectWithValue, getState, dispatch }) => {
         const token = getToken(getState(), rejectWithValue, dispatch);
         if (typeof token === 'object') return token;
-
+        const say = localStorage.getItem("say")
         try {
             const response = await axios.put(`${baseUrl}/admin/updateEarning/${id}?say=${say}`, updatedEarning, {
                 headers: { Authentication: token }
@@ -89,7 +89,7 @@ export const createEarning = createAsyncThunk(
     async ({ payload }, { rejectWithValue, getState, dispatch }) => {
         const token = getToken(getState(), rejectWithValue, dispatch);
         if (typeof token === 'object') return token;
-
+        const say = localStorage.getItem("say")
         try {
             const response = await axios.post(`${baseUrl}/admin/addEarning?say=${say}`, payload, {
                 headers: { Authentication: token }
@@ -112,7 +112,7 @@ export const deleteEarning = createAsyncThunk(
     async ({ id }, { rejectWithValue, getState, dispatch }) => {
         const token = getToken(getState(), rejectWithValue, dispatch);
         if (typeof token === 'object') return token;
-
+        const say = localStorage.getItem("say")
         try {
             const response = await axios.delete(`${baseUrl}/admin/deleteEarning/${id}?say=${say}`, {
                 headers: { Authentication: token }

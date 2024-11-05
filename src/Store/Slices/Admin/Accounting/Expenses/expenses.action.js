@@ -31,7 +31,7 @@ export const fetchSalaries = createAsyncThunk(
     async ({ query, activeTab, month }, { rejectWithValue, getState, dispatch }) => {
         const token = getToken(getState(), rejectWithValue, dispatch);
         if (typeof token === 'object') return token;
-
+        const say = localStorage.getItem("say")
         const year = new Date().getFullYear();
         let url = "";
 
@@ -58,7 +58,7 @@ export const fetchExpenseById = createAsyncThunk(
     async (id, { rejectWithValue, getState, dispatch }) => {
         const token = getToken(getState(), rejectWithValue, dispatch);
         if (typeof token === 'object') return token;
-
+        const say = localStorage.getItem("say")
         try {
             const response = await axios.get(`${baseUrl}/api/admin/expenses/${id}?say=${say}`, {
                 headers: { Authentication: token },
@@ -76,7 +76,7 @@ export const deleteExpenseById = createAsyncThunk(
     async (id, { rejectWithValue, getState, dispatch }) => {
         const token = getToken(getState(), rejectWithValue, dispatch);
         if (typeof token === 'object') return token;
-
+        const say = localStorage.getItem("say")
         try {
             const response = await axios.delete(`${baseUrl}/api/admin/expenses/${id}?say=${say}`, {
                 headers: { Authentication: token },
@@ -95,7 +95,7 @@ export const updateSalary = createAsyncThunk(
     async ({ salaryDetails }, { rejectWithValue, getState, dispatch }) => {
         const token = getToken(getState(), rejectWithValue, dispatch);
         if (typeof token === 'object') return token;
-
+        const say = localStorage.getItem("say")
         try {
             const response = await axios.put(`${baseUrl}/admin/staff/update_salary?say=${say}`, salaryDetails, {
                 headers: { Authentication: token },
@@ -114,7 +114,7 @@ export const updateExpense = createAsyncThunk(
     async ({ expenseId, editExpense }, { rejectWithValue, getState, dispatch }) => {
         const token = getToken(getState(), rejectWithValue, dispatch);
         if (typeof token === 'object') return token;
-
+        const say = localStorage.getItem("say")
         try {
             const response = await axios.put(`${baseUrl}/api/admin/expenses/${expenseId}?say=${say}`, editExpense, {
                 headers: { Authentication: token },
@@ -133,7 +133,7 @@ export const createExpense = createAsyncThunk(
     async ({ payload }, { rejectWithValue, getState, dispatch }) => {
         const token = getToken(getState(), rejectWithValue, dispatch);
         if (typeof token === 'object') return token;
-
+        const say = localStorage.getItem("say")
         try {
             const response = await axios.post(`${baseUrl}/api/admin/expenses/?say=${say}`, payload, {
                 headers: { Authentication: token },

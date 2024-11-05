@@ -11,7 +11,7 @@ export const fetchAllNotices = createAsyncThunk(
   "dashboard/fetchNotices",
   async (_, { rejectWithValue, dispatch }) => {
     const token = localStorage.getItem("parent:token");
-
+    const say = localStorage.getItem("say")
     if (!token) {
       const errorMessage = "No token found";
       dispatch(setShowError(true));

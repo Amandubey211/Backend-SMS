@@ -8,6 +8,7 @@ export const stdSubjectProgressPercentage = createAsyncThunk(
     'progress/stdSubjectProgressPercentage',
     async ({studentId}, { rejectWithValue, dispatch }) => {
         const token = localStorage.getItem("student:token");
+        const say = localStorage.getItem("say")
         if (!token) {
             dispatch(setShowError(true));
             dispatch(setErrorMsg("Authentication failed!"));

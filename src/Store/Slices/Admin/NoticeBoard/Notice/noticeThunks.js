@@ -31,6 +31,7 @@ export const fetchNoticesThunk = createAsyncThunk(
   async (_, { rejectWithValue, getState, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const response = await axios.get(`${baseUrl}/admin/all/notices?say=${say}`, {
         headers: { Authentication: token },
       });
@@ -47,6 +48,7 @@ export const createNoticeThunk = createAsyncThunk(
   async (noticeData, { rejectWithValue, getState, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const response = await axios.post(
         `${baseUrl}/admin/create_notice?say=${say}`,
         noticeData,
@@ -71,6 +73,7 @@ export const updateNoticeThunk = createAsyncThunk(
   async ({ noticeId, updatedData }, { rejectWithValue, getState, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const response = await axios.put(
         `${baseUrl}/admin/update/notice/${noticeId}?say=${say}`,
         updatedData,
@@ -92,6 +95,7 @@ export const deleteNoticeThunk = createAsyncThunk(
   async (noticeId, { rejectWithValue, getState, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       await axios.delete(`${baseUrl}/admin/delete/notice/${noticeId}?say=${say}`, {
         headers: { Authentication: token },
       });
