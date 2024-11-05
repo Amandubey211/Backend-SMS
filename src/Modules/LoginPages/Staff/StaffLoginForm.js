@@ -47,8 +47,8 @@ const StaffLoginForm = () => {
         }
       })
       .catch((error) => {
+        console.log(error);
         // Handle error
-        toast.error(error);
       });
   };
 

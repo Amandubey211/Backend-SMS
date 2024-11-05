@@ -23,7 +23,6 @@ const handleError = (error, dispatch, rejectWithValue) => {
   const err = ErrorMsg(error);
   dispatch(setShowError(true));
   dispatch(setErrorMsg(err.message));
-  toast.error(err.message);
   return rejectWithValue(err.message);
 };
 
@@ -35,10 +34,13 @@ export const fetchGroupsByClass = createAsyncThunk(
   async (classId, { getState, rejectWithValue, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
-      const say = localStorage.getItem("say")
-      const response = await axios.get(`${baseUrl}/admin/group/${classId}?say=${say}`, {
-        headers: { Authentication: token },
-      });
+      const say = localStorage.getItem("say");
+      const response = await axios.get(
+        `${baseUrl}/admin/group/${classId}?say=${say}`,
+        {
+          headers: { Authentication: token },
+        }
+      );
       return response.data.data;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -52,7 +54,7 @@ export const fetchGroupsByClassAndSection = createAsyncThunk(
   async ({ classId, sectionId }, { getState, rejectWithValue, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
-      const say = localStorage.getItem("say")
+      const say = localStorage.getItem("say");
       const response = await axios.get(
         `${baseUrl}/admin/group/class/${classId}/section/${sectionId}?say=${say}`,
         { headers: { Authentication: token } }
@@ -70,7 +72,7 @@ export const fetchSectionsByClass = createAsyncThunk(
   async (classId, { getState, rejectWithValue }) => {
     try {
       const token = getState().common.auth.token;
-      const say = localStorage.getItem("say")
+      const say = localStorage.getItem("say");
       const response = await axios.get(
         `${baseUrl}/admin/getSectionByclass/${classId}`,
         {
@@ -92,7 +94,7 @@ export const fetchUnassignedStudents = createAsyncThunk(
   async (classId, { getState, rejectWithValue, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
-      const say = localStorage.getItem("say")
+      const say = localStorage.getItem("say");
       const response = await axios.get(
         `${baseUrl}/admin/unassignedStudent/${classId}?say=${say}`,
         { headers: { Authentication: token } }
@@ -110,10 +112,14 @@ export const createGroup = createAsyncThunk(
   async (groupData, { getState, rejectWithValue, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
-      const say = localStorage.getItem("say")
-      const response = await axios.post(`${baseUrl}/admin/group?say=${say}`, groupData, {
-        headers: { Authentication: token },
-      });
+      const say = localStorage.getItem("say");
+      const response = await axios.post(
+        `${baseUrl}/admin/group?say=${say}`,
+        groupData,
+        {
+          headers: { Authentication: token },
+        }
+      );
       toast.success("Group added successfully!");
       return response.data.data;
     } catch (error) {
@@ -128,7 +134,7 @@ export const updateGroup = createAsyncThunk(
   async ({ groupId, formData }, { getState, rejectWithValue, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
-      const say = localStorage.getItem("say")
+      const say = localStorage.getItem("say");
       const response = await axios.put(
         `${baseUrl}/admin/group/${groupId}?say=${say}`,
         formData,
@@ -141,8 +147,6 @@ export const updateGroup = createAsyncThunk(
     }
   }
 );
-
-
 
 // Delete Group
 export const deleteGroup = createAsyncThunk(
@@ -160,7 +164,6 @@ export const deleteGroup = createAsyncThunk(
     }
   }
 );
-
 
 // // Fetch Sections by Class
 // export const fetchSectionsByClass = createAsyncThunk(
@@ -201,7 +204,10 @@ export const createSection = createAsyncThunk(
 // Update Section
 export const updateSection = createAsyncThunk(
   "section/updateSection",
-  async ({ sectionId, sectionData }, { getState, rejectWithValue, dispatch }) => {
+  async (
+    { sectionId, sectionData },
+    { getState, rejectWithValue, dispatch }
+  ) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
       const response = await axios.put(

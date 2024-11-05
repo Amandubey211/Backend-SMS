@@ -63,7 +63,6 @@ const sidebarData = [
         icon: <FaChalkboardTeacher />,
         path: "/users/teachers",
         roles: ["admin", "accountant", "librarian"],
-
       },
       {
         title: "Accountant",
@@ -129,12 +128,7 @@ const sidebarData = [
       },
     ],
   },
-  {
-    title: "Admissions",
-    icon: <RiUserAddLine />,
-    path: "/admissions",
-    roles: ["admin"],
-  },
+
   {
     title: "Time Table",
     icon: <ImTable2 />,
@@ -148,6 +142,12 @@ const sidebarData = [
     roles: ["admin"],
   },
   {
+    title: "Admissions",
+    icon: <RiUserAddLine />,
+    path: "/admissions",
+    roles: ["admin"],
+  },
+  {
     title: "Verification",
     icon: <BsCheckCircle />,
     path: "/verify_students",
@@ -157,8 +157,7 @@ const sidebarData = [
     title: "Graduate",
     icon: <FaUserGraduate />,
     roles: ["admin"],
-    path: `/graduates`
-
+    path: `/graduates`,
   },
 ];
 
