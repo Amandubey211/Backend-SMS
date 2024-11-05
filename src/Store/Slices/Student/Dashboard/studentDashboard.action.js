@@ -10,7 +10,7 @@ const say = localStorage.getItem('say');
 // Fetch Dashboard Details
 export const fetchDashboardDetails = createAsyncThunk(
   'studentDashboard/fetchDashboardDetails',
-  async (_, { rejectWithValue, dispatch }) => {
+  async (_, { rejectWithValue, dispatch,getState }) => {
     const token = localStorage.getItem('student:token');
     const say = localStorage.getItem("say")
     if (!token) {
@@ -26,9 +26,10 @@ export const fetchDashboardDetails = createAsyncThunk(
 
       const data = response?.data;
       const { attendanceSummary } = data.data;
-
+      const { student } = await getState(); 
+  const notices =   student.studentAnnouncement.noticeData.length || 0
       return {
-        cardData: formatDashboardData(data),
+        cardData: formatDashboardData(data,notices),
         paidFees: data?.data?.totalPaidFees,
         unpaidFees: data?.data?.dueFees,
         attendanceSummary,
@@ -142,7 +143,7 @@ export const fetchStudentGrades = createAsyncThunk(
 );
 
 // Helper function to format dashboard data
-const formatDashboardData = (dashboardData) => {
+const formatDashboardData = (dashboardData,notices) => {
   return [
     {
       label: 'Upcoming Exam',
@@ -170,7 +171,7 @@ const formatDashboardData = (dashboardData) => {
     },
     {
       label: 'Notice',
-      value: dashboardData?.data?.notices,
+      value: notices,
       bgColor: 'bg-yellow-100',
       textColor: 'text-black-500',
       icon: '🔔',

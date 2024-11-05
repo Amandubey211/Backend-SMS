@@ -89,7 +89,7 @@ const AccountingSection = () => {
 
   return (
     <Layout title={t("Finance")}>
-      <div className="p-4">
+      <div className="p-4 w-full">
         {/* Accounting Section Header */}
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg font-semibold text-gray-600 text-center">
@@ -148,7 +148,7 @@ const AccountingSection = () => {
             ) : (
               // Display paginated data in table
 
-              <table className="min-w-full table-fixed leading-normal">
+              <table className="w-full table-fixed leading-normal">
                 <thead>
                   <tr className="text-left text-gray-700 bg-[#F9FAFC]">
                     <th className="px-5 py-3 border-b-2 border-gray-200 font-normal w-1/5">{t("Fee Type")}</th>

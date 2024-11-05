@@ -43,12 +43,12 @@ const AdminSection = () => {
         <div className="w-full md:w-1/2 p-2">
           <NoticeBoard descriptionLength={58} /> 
         </div>
-        <div className="w-full md:w-1/2 p-2">
+        <div className="w-full md:w-1/2 ">
            <Events /> 
         </div>
      
       </div>
-      <div className="w-full md:w-full p-2">
+      <div className="w-full md:w-full">
            <Library /> 
         </div>
     </>
