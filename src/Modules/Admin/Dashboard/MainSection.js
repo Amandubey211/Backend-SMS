@@ -51,7 +51,9 @@ const MainSection = () => {
 
 
   useEffect(()=>{
+    if(role=="admin" || role == "accountant"){
    dispatch(createStaffSalary({status:"unpaid",action:"pay now"}))
+  }
   },[dispatch,createStaffSalary])
 
   function capitalizeFirstLetter(string) {
