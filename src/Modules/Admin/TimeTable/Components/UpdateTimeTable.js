@@ -679,7 +679,7 @@ const UpdateTimeTable = () => {
           ? new Date(formData.endDate).toISOString()
           : undefined,
       },
-      status: isActive ? 'active' : 'inactive',
+      status: timetable.status,
       academicYear: academicYear, // Include academicYear as ObjectId
       days: [], // We will populate this below
     };

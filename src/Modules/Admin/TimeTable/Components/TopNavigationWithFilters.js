@@ -110,10 +110,17 @@ const TopNavigationWithFilters = ({ onFilterChange }) => {
             <Button
               type="primary"
               onClick={applyFilters}
-              style={{ borderRadius: "6px" }}
+              style={{
+                borderRadius: "6px",
+                background: "linear-gradient(to right, #ec4899, #a855f7)",
+                color: "white",
+              }}
+              className="hover:bg-gradient-to-r hover:from-pink-600 hover:to-purple-700"
             >
               Apply Filters
             </Button>
+
+
             <Button
               onClick={clearFilters}
               style={{
