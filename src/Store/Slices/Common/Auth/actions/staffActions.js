@@ -84,6 +84,7 @@ export const staffLogin = createAsyncThunk(
           localStorage.setItem("say", activeAcademicYear?._id);
          dispatch(setToken(data.token)); 
          dispatch(setRole(data.role)); 
+         
           return { redirect: "/dashboard" }; // Return the redirect path
         }
       } else {

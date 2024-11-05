@@ -25,11 +25,6 @@ const MainSection = () => {
   const dispatch = useDispatch();
   const { cid } = useParams();
 
-  // Centralized state from the Redux store for sections, groups, and unassigned students
-  const { loading, error, unassignedStudentsList } = useSelector(
-    (store) => store.admin.group_section
-  );
-
   // Reset groups on class change
   useEffect(() => {
     if (cid) {
