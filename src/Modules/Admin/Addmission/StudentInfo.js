@@ -236,13 +236,19 @@ const StudentInfo = () => {
   };
 
   return (
-    <div className="flex gap-4 h-screen">
-      <div className="p-8 max-w-4xl bg-white rounded-lg overflow-y-auto no-scrollbar">
+    <div className="flex gap-4 h-screen ">
+      {/* Form Section - 77% Width */}
+      <div
+        style={{ width: "75%" }}
+        className="p-3 bg-white rounded-lg overflow-y-auto no-scrollbar"
+      >
         <h2 className="text-2xl font-semibold mb-6">Student Information</h2>
         <form ref={formRef} onSubmit={handleDocumentSubmit}>
           <div className="grid grid-cols-12 gap-4">
             <div className="col-span-4">
               <ImageUpload
+                width="w-56"
+                height="h-56"
                 imagePreview={imagePreview}
                 handleImageChange={(e) => {
                   setProfile(e.target.files[0]);
@@ -310,7 +316,9 @@ const StudentInfo = () => {
           </div>
         </form>
       </div>
-      <div className="sticky top-4">
+
+      {/* Student Card Section - 23% Width */}
+      <div style={{ width: "25%" }} className="sticky top-4 ">
         <StudentCard studentInfo={studentInfo} imagePreview={imagePreview} />
       </div>
     </div>

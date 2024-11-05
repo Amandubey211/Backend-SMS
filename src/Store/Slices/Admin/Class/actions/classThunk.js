@@ -1,82 +1,89 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { baseUrl } from "../../../../../config/Common";
-import { setClass } from "../reducer/classSlice";
-import { setSubjects } from "../Subject/subjectSlice";
-import toast from "react-hot-toast";
+import { setErrorMsg, setShowError } from "../../../Common/Alerts/alertsSlice";
+import { ErrorMsg } from "../../../Common/Alerts/errorhandling.action";
+
+const say = localStorage.getItem("say");
+
+// Helper function to retrieve token and handle errors if token is missing
+const getToken = (state, rejectWithValue, dispatch) => {
+  const token = state.common.auth?.token;
+  if (!token) {
+    dispatch(setShowError(true));
+    dispatch(setErrorMsg("Authentication Failed"));
+    return rejectWithValue("Authentication Failed");
+  }
+  return `Bearer ${token}`;
+};
+
+// Centralized error handling
+const handleError = (error, dispatch, rejectWithValue) => {
+  const err = ErrorMsg(error);
+  dispatch(setShowError(true));
+  dispatch(setErrorMsg(err.message));
+  return rejectWithValue(err.message);
+};
 
 // Fetch all classes
 export const fetchAllClasses = createAsyncThunk(
   "class/fetchAllClasses",
-  async (_, { getState, rejectWithValue }) => {
-    const { common } = getState();
-    const token = common.auth.token;
-
+  async (_, { getState, rejectWithValue, dispatch }) => {
+    const token = getToken(getState(), rejectWithValue, dispatch);
+    if (typeof token === "object") return token;
+    const say = localStorage.getItem("say");
     try {
-      const response = await axios.get(`${baseUrl}/admin/class`, {
-        headers: { Authentication: `Bearer ${token}` }, // Using Authentication header
+      const response = await axios.get(`${baseUrl}/admin/class?say=${say}`, {
+        headers: { Authentication: token },
       });
-
-      return response.data.data; // Assuming this is the structure of your API response
+      return response.data.data;
     } catch (error) {
-      const errorMessage =
-        error.response?.data?.message || "Failed to fetch classes";
-      console.error("Error fetching classes:", errorMessage);
-      return rejectWithValue(errorMessage);
+      return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
+
+// Fetch class details
 export const fetchClassDetails = createAsyncThunk(
   "class/fetchClassDetails",
-  async (classId, { rejectWithValue, getState, dispatch }) => {
-    const { common } = getState();
-    const token = common.auth.token;
-
+  async (classId, { getState, rejectWithValue, dispatch }) => {
+    const token = getToken(getState(), rejectWithValue, dispatch);
+    if (typeof token === "object") return token;
+    const say = localStorage.getItem("say");
     try {
       const response = await axios.get(
-        `${baseUrl}/admin/class/${classId}`,
-
+        `${baseUrl}/admin/class/${classId}?say=${say}`,
         {
-          headers: { Authentication: `Bearer ${token}` },
+          headers: { Authentication: token },
         }
       );
-
-      console.log(response.data);
-      // Dispatch the class and subjects to the Redux store
-      dispatch(setClass(response.data?.data));
-      dispatch(setSubjects(response.data?.data?.subjects));
-
-      return response.data?.data; // Return the class details
+      return response.data?.data;
     } catch (error) {
-      const errorMessage =
-        error.response?.data?.message || "Failed to fetch class details";
-      console.error("Error fetching class details:", errorMessage);
-      return rejectWithValue(errorMessage);
+      return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
+
 // Create a new class
 export const createClass = createAsyncThunk(
   "class/createClass",
-  async (classData, { rejectWithValue, getState, dispatch }) => {
-    const { common } = getState();
-    const token = common.auth.token;
-
+  async (classData, { getState, rejectWithValue, dispatch }) => {
+    const token = getToken(getState(), rejectWithValue, dispatch);
+    if (typeof token === "object") return token;
+    const say = localStorage.getItem("say");
     try {
-      const response = await axios.post(`${baseUrl}/admin/class`, classData, {
-        headers: { Authentication: `Bearer ${token}` }, // Using Authentication header
-      });
-
-      toast.success("Class Created Sussessfully!");
-      // After successful creation, refetch the class list
+      const response = await axios.post(
+        `${baseUrl}/admin/class?say=${say}`,
+        classData,
+        {
+          headers: { Authentication: token },
+        }
+      );
       dispatch(fetchAllClasses());
 
-      return response.data; // Return newly created class data
+      return response.data;
     } catch (error) {
-      const errorMessage =
-        error.response?.data?.msg || "Failed to create class";
-      console.error("Error creating class:", errorMessage);
-      return rejectWithValue(errorMessage);
+      return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
@@ -84,28 +91,23 @@ export const createClass = createAsyncThunk(
 // Update an existing class
 export const updateClass = createAsyncThunk(
   "class/updateClass",
-  async ({ classData, classId }, { rejectWithValue, getState, dispatch }) => {
-    const { common } = getState();
-    const token = common.auth.token;
-
+  async ({ classData, classId }, { getState, rejectWithValue, dispatch }) => {
+    const token = getToken(getState(), rejectWithValue, dispatch);
+    if (typeof token === "object") return token;
+    const say = localStorage.getItem("say");
     try {
       const response = await axios.put(
-        `${baseUrl}/admin/update_class/${classId}`,
+        `${baseUrl}/admin/update_class/${classId}?say=${say}`,
         classData,
         {
-          headers: { Authentication: `Bearer ${token}` },
+          headers: { Authentication: token },
         }
       );
-
-      // After the update, refetch all classes to get the latest data
       dispatch(fetchAllClasses());
 
-      return response.data; // Return success message
+      return response.data;
     } catch (error) {
-      const errorMessage =
-        error.response?.data?.msg || "Failed to update class";
-      console.error("Error updating class:", errorMessage);
-      return rejectWithValue(errorMessage);
+      return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
@@ -113,27 +115,22 @@ export const updateClass = createAsyncThunk(
 // Delete a class
 export const deleteClass = createAsyncThunk(
   "class/deleteClass",
-  async (classId, { rejectWithValue, getState, dispatch }) => {
-    const { common } = getState();
-    const token = common.auth.token;
-
+  async (classId, { getState, rejectWithValue, dispatch }) => {
+    const token = getToken(getState(), rejectWithValue, dispatch);
+    if (typeof token === "object") return token;
+    const say = localStorage.getItem("say");
     try {
-      const response = await axios.delete(
-        `${baseUrl}/admin/delete_class/${classId}`,
+      await axios.delete(
+        `${baseUrl}/admin/delete_class/${classId}?say=${say}`,
         {
-          headers: { Authentication: `Bearer ${token}` }, // Using Authentication header
+          headers: { Authentication: token },
         }
       );
-
-      // After successful deletion, refetch the class list
       dispatch(fetchAllClasses());
 
-      return classId; // Return deleted class ID
+      return classId;
     } catch (error) {
-      const errorMessage =
-        error.response?.data?.msg || "Failed to delete class";
-      console.error("Error deleting class:", errorMessage);
-      return rejectWithValue(errorMessage);
+      return handleError(error, dispatch, rejectWithValue);
     }
   }
 );

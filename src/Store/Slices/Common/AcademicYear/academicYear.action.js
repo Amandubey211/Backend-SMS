@@ -20,10 +20,6 @@ export const fetchAcademicYear = createAsyncThunk("user/AcademicYear",async(_,{ 
       const res = await axios.get(`${baseUrl}/admin/getAllAcademicYear`, {
         headers: { Authentication: `Bearer ${token}` },
       });
-     if(res?.data?.success){
-        const activeYear = res?.data?.data?.filter((y)=>y.isActive==true)
-        setActiveAcademicYear(activeYear)
-     }
       return res?.data?.data
     } catch (error) {
       console.log("Error in academic Year", error);
@@ -32,4 +28,30 @@ export const fetchAcademicYear = createAsyncThunk("user/AcademicYear",async(_,{ 
       return rejectWithValue(err.message);
     }
 
-})
+});
+
+export const updateAcademicYear = createAsyncThunk("user/updateAcademicYear",async({id,data},{ rejectWithValue, dispatch,getState })=>{
+   
+  const token = getState().common.auth.token;
+
+    if (!token) {
+      dispatch(setShowError(true));
+      return rejectWithValue(`Authentication failed!`);
+    }
+      
+    try {
+      dispatch(setShowError(false));
+
+      const res = await axios.put(`${baseUrl}/admin/updateAcademicYear/${id}`,data, {
+        headers: { Authentication: `Bearer ${token}` },
+      });
+      dispatch(fetchAcademicYear())
+      return res?.data?.data
+    } catch (error) {
+      console.log("Error in  update academic Year", error);
+      const err = ErrorMsg(error);
+      dispatch(setShowError(true));
+      return rejectWithValue(err.message);
+    }
+
+});

@@ -1,20 +1,38 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { baseUrl } from "../../../../config/Common"; // Replace with your actual base URL
+import { setErrorMsg, setShowError } from "../../Common/Alerts/alertsSlice";
+import { ErrorMsg } from "../../Common/Alerts/errorhandling.action";
 
 // Fetch Timetables
+const getToken = (state, rejectWithValue, dispatch) => {
+  const token = state.common.auth?.token;
+  if (!token) {
+    dispatch(setShowError(true));
+    dispatch(setErrorMsg("Authentication Failed"));
+    return rejectWithValue("Authentication Failed");
+  }
+  return `Bearer ${token}`;
+};
+
+// Centralized error handling
+const handleError = (error, dispatch, rejectWithValue) => {
+  const err = ErrorMsg(error);
+  dispatch(setShowError(true));
+  dispatch(setErrorMsg(err.message));
+  return rejectWithValue(err.message);
+};
+
 export const fetchTimetables = createAsyncThunk(
   "timetable/fetchTimetables",
-  async (filters = {}, { rejectWithValue, getState }) => {
+  async (filters = {}, { rejectWithValue, getState,dispatch }) => {
     const { role } = getState().common.auth;
-    const token = localStorage.getItem(`${role}:token`);
-
-    if (!token) {
-      return rejectWithValue("Authentication failed!");
-    }
+    const token = getToken(getState(), rejectWithValue, dispatch); // Fetch token from Redux state
+    if (typeof token === "object") return token;
+    const say = localStorage.getItem("say")
 
     try {
-      const response = await axios.get(`${baseUrl}/admin/timetable`, {
+      const response = await axios.get(`${baseUrl}/admin/timetable?say=${say}`, {
         headers: { Authentication: token },
         params: filters,
       });
@@ -22,8 +40,7 @@ export const fetchTimetables = createAsyncThunk(
       // Ensure you're accessing the correct data property
       return response.data.data; // Accessing the nested data property
     } catch (error) {
-      console.error("Error fetching timetables:", error);
-      return rejectWithValue(error.message);
+      return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
@@ -33,22 +50,19 @@ export const fetchTimetables = createAsyncThunk(
 // Create Timetable
 export const createTimetable = createAsyncThunk(
   "timetable/createTimetable",
-  async (data, { rejectWithValue, getState }) => {
+  async (data, { rejectWithValue, getState,dispatch }) => {
     const { role } = getState().common.auth;
-    const token = localStorage.getItem(`${role}:token`);
-
-    if (!token) {
-      return rejectWithValue("Authentication failed!");
-    }
+    const token = getToken(getState(), rejectWithValue, dispatch); // Fetch token from Redux state
+      if (typeof token === "object") return token;
+      const say = localStorage.getItem("say")
 
     try {
-      const response = await axios.post(`${baseUrl}/admin/create-timetable`, data, {
+      const response = await axios.post(`${baseUrl}/admin/create-timetable?say=${say}`, data, {
         headers: { Authentication: token },
       });
       return response.data; // Returning newly created timetable
     } catch (error) {
-      console.error("Error creating timetable:", error);
-      return rejectWithValue(error.message);
+      return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
@@ -56,22 +70,22 @@ export const createTimetable = createAsyncThunk(
 // Update Timetable
 export const updateTimetable = createAsyncThunk(
   "timetable/updateTimetable",
-  async ({ id, data }, { rejectWithValue, getState }) => {
+  async ({ id, data }, { rejectWithValue, getState,dispatch }) => {
     const { role } = getState().common.auth;
-    const token = localStorage.getItem(`${role}:token`);
-
+    const token = getToken(getState(), rejectWithValue, dispatch); // Fetch token from Redux state
+    if (typeof token === "object") return token;
+    const say = localStorage.getItem("say")
     if (!token) {
       return rejectWithValue("Authentication failed!");
     }
 
     try {
-      const response = await axios.put(`${baseUrl}/admin/update-timetable/${id}`, data, {
+      const response = await axios.put(`${baseUrl}/admin/update-timetable/${id}?say=${say}`, data, {
         headers: { Authentication: token },
       });
       return response.data; // Returning updated timetable
     } catch (error) {
-      console.error("Error updating timetable:", error);
-      return rejectWithValue(error.message);
+      return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
@@ -79,22 +93,18 @@ export const updateTimetable = createAsyncThunk(
 // Delete Timetable
 export const deleteTimetable = createAsyncThunk(
   "timetable/deleteTimetable",
-  async (id, { rejectWithValue, getState }) => {
-    const { role } = getState().common.auth;
-    const token = localStorage.getItem(`${role}:token`);
-
-    if (!token) {
-      return rejectWithValue("Authentication failed!");
-    }
-
+  async (id, { rejectWithValue, getState ,dispatch}) => {
+    const token = getToken(getState(), rejectWithValue, dispatch); // Fetch token from Redux state
+    if (typeof token === "object") return token;
+    const say = localStorage.getItem("say")
+  
     try {
-      const response = await axios.delete(`${baseUrl}/admin/delete-timetable/${id}`, {
+      const response = await axios.delete(`${baseUrl}/admin/delete-timetable/${id}?say=${say}`, {
         headers: { Authentication: token },
       });
       return { id }; // Returning ID of the deleted timetable
     } catch (error) {
-      console.error("Error deleting timetable:", error);
-      return rejectWithValue(error.message);
+      return handleError(error, dispatch, rejectWithValue);
     }
   }
 );

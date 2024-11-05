@@ -10,14 +10,11 @@ import { FaEye } from "react-icons/fa";
 import { FaEyeSlash } from "react-icons/fa";
 import { updatePasswordThunk } from "../../../../Store/Slices/Common/User/actions/userActions";
 import { ImSpinner3 } from "react-icons/im";
+import { setUserDetails } from "../../../../Redux/Slices/Auth/AuthSlice";
 const UserProfile = () => {
+  const dispatch = useDispatch();
   const {userDetails} = useSelector((store) => store.common.user);
   const [loading ,setLoading] = useState(false)
- 
-
-  // useEffect(() => {
-  //   setUserData(user);
-  // }, [user]);
 
   const [passwordData, setPasswordData] = useState({
     currentPassword: "",
@@ -35,7 +32,7 @@ const UserProfile = () => {
   };
 
 
-  const dispatch = useDispatch();
+  
   const updatePassword = () => {
     setLoading(true)
     if (passwordData.newPassword === passwordData.confirmPassword) {
@@ -70,18 +67,18 @@ const UserProfile = () => {
           <div className="flex flex-col  w-full p-4 gap-3 ">
             <div className="flex items-center px-6 py-4 gap-3 border rounded-md">
               <img
-                src={userDetails.profile ? userDetails?.profile : profileIcon}
+                src={userDetails?.profile ? userDetails?.profile : profileIcon}
                 alt="Cameron Williamson"
                 className="w-20 h-20 rounded-full shadow-lg border "
               />
               <div className="flex flex-row justify-between w-full">
-                <h2 className="text-xl font-semibold">{userDetails.fullName}</h2>
-                {/* <button
+                <h2 className="text-xl font-semibold">{userDetails?.fullName}</h2>
+                 <button
                   onClick={handleSidebarOpen}
                   className="px-4 inline-flex items-center border border-transparent text-sm font-medium shadow-sm bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-md hover:from-pink-600 hover:to-purple-600"
                 >
                   Edit
-                </button> */}
+                </button> 
               </div>
             </div>
             <h3 className="text-lg font-semibold mb-4">Personal Information</h3>
@@ -136,7 +133,7 @@ const UserProfile = () => {
                   className="border p-2 rounded w-[30%]"
                   placeholder="New Password"
                 />{" "}
-                <span className="text-2xl cursor-pointer">
+                <span className="text-2xl cursor-pointer ">
                   {!showPaasword ? (
                     <FaEye onClick={() => setShowPassword(true)} />
                   ) : (
@@ -156,13 +153,13 @@ const UserProfile = () => {
                 <button
                 disabled={loading}
                   onClick={updatePassword}
-                  className="px-4 w-[200px] h-12 inline-flex items-center border border-transparent text-sm font-medium shadow-sm bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-md hover:from-pink-600 hover:to-purple-600 justify-center"
+                  className="px-4 w-[150px] h-12 inline-flex items-center border border-transparent text-sm font-medium shadow-sm bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-md hover:from-pink-600 hover:to-purple-600 justify-center"
                 >
                    { loading ? <ImSpinner3 className="w-8 h-8 animate-spin mb-3 text-white" />: 'Update Password'}
                 </button>
                 <button
                   onClick={cancelUpdatePassword}
-                  className="px-4 w-[200px] h-12 inline-flex items-center justify-center border border-transparent text-lg font-medium shadow-sm bg-gray-300 text-black rounded-md hover:bg-gray-400"
+                  className="px-4 w-[150px] h-12 inline-flex items-center justify-center border border-transparent text-lg font-medium shadow-sm bg-gray-300 text-black rounded-md hover:bg-gray-400"
                 >
                   Cancel
                 </button>
@@ -175,7 +172,7 @@ const UserProfile = () => {
               title="Edit Profile"
               width="50%"
             >
-              {/* <EditAdmin data={userDetails} /> */}
+               <EditAdmin data={userDetails} /> 
             </SidebarSlide>
           </div>
         </DashLayout>

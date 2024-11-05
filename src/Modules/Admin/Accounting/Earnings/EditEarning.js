@@ -3,11 +3,12 @@ import FormInput from '../subClass/component/FormInput';
 import { useDispatch, useSelector } from 'react-redux';
 import { resetFormData, setFormData, setIsEditSidebarOpen } from '../../../../Store/Slices/Admin/Accounting/Earning/earningSlice';
 import { fetchEarning, fetchTotalAmounts, updateEarning } from '../../../../Store/Slices/Admin/Accounting/Earning/earning.action';
+import { useTranslation } from 'react-i18next';
 
 const EditEarning = () => {
     const { editEarning, formData } = useSelector((store) => store?.admin?.earning)
     const dispatch = useDispatch();
-
+    const { t } = useTranslation('earning')
     useEffect(() => {
         if (editEarning) {
             dispatch(setFormData({
@@ -34,7 +35,7 @@ const EditEarning = () => {
                 dispatch(fetchTotalAmounts());
                 dispatch(fetchEarning());
                 dispatch(setIsEditSidebarOpen(false));
-                dispatch(resetFormData()); 
+                dispatch(resetFormData());
             })
             .catch((err) => {
                 console.error("Error updating earning", err);
@@ -48,12 +49,12 @@ const EditEarning = () => {
 
     return (
         <form className="space-y-4 mt-2" onSubmit={handleSubmit}>
-            <FormInput id="paymentFrom" label="From" type="text" name="paymentFrom" value={formData.paymentFrom} onChange={handleChange} required />
-            <FormInput id="amount" label="Amount" type="text" name="amount" value={formData.amount} onChange={handleChange} required />
-            <FormInput id="paymentDate" label="Earning Date" type="date" name="paymentDate" value={formData.paymentDate} onChange={handleChange} required />
-            <FormInput id="description" label="Description" type="text" name="description" value={formData.description} onChange={handleChange} required />
+            <FormInput id="paymentFrom" label={t("From")} type="text" name="paymentFrom" value={formData.paymentFrom} onChange={handleChange} required />
+            <FormInput id="amount" label={t("Amount")} type="text" name="amount" value={formData.amount} onChange={handleChange} required />
+            <FormInput id="paymentDate" label={t("Earning Date")} type="date" name="paymentDate" value={formData.paymentDate} onChange={handleChange} required />
+            <FormInput id="description" label={t("Description")} type="text" name="description" value={formData.description} onChange={handleChange} required />
             <button type="submit" className="w-full flex justify-center border border-transparent shadow-sm text-sm font-medium bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600">
-                Update Earning
+                {t("Update Earning")}
             </button>
         </form>
     )

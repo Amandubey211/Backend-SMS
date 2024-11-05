@@ -43,13 +43,12 @@ const StaffLoginForm = () => {
       .then((result) => {
         // Success logic, check if there's a redirect path
         if (result.redirect) {
-          console.log(result.redirect, "Redirection url | Success");
           navigate(result.redirect);
         }
       })
       .catch((error) => {
+        console.log(error);
         // Handle error
-        toast.error(error);
       });
   };
 
@@ -65,7 +64,7 @@ const StaffLoginForm = () => {
             className="text-sm text-gray-500 hover:text-gray-700 mb-4 items-center flex gap-2"
           >
             <div className="rounded-full border-2 text-xl w-6 h-6 flex justify-center items-center">
-            <IoIosArrowRoundBack />
+              <IoIosArrowRoundBack />
             </div>
             <span>LMS Home</span>
           </NavLink>
@@ -123,7 +122,9 @@ const StaffLoginForm = () => {
             </div>
             <button
               type="submit"
-              className="w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600"
+              className={`w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600 ${
+                loading ? "cursor-not-allowed" : ""
+              }`}
               disabled={loading}
             >
               {loading ? (

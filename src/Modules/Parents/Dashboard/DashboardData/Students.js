@@ -17,6 +17,7 @@ const StudentCard = React.memo(({ student, index }) => {
   const group = student?.group || "N/A";
 
   return (
+    <>
     <div className=" p-4 pb-4 pt-6 text-center relative border-gray-300">
       <div className="absolute top-2 left-2 bg-gray-100 text-gray-800 py-1 px-2 rounded-l-sm rounded-r-sm text-sm">
         {t("Child")}: {index + 1}
@@ -33,6 +34,8 @@ const StudentCard = React.memo(({ student, index }) => {
       </div>
       <div className="text-green-600 text-sm">{t("Group")}: {group}</div>
     </div>
+    
+    </>
   );
 });
 
@@ -74,9 +77,9 @@ const StudentParentCard = () => {
 
   return (
     <div className="relative h-3/5">
-      <div className="flex justify-between p-4 pb-3 items-center px-6">
-        <h2 className="text-lg font-semibold text-gray-600">{t("My Children")}</h2>
-        {!loadingChildren && !errorChildren && students?.length > 3 && (
+      <div className="flex justify-between p-4 pb-3 items-center px-2">
+        <h2 className="text-lg font-semibold text-gray-600">{t("My Children")} {students?.length || 0}</h2>
+        {!loadingChildren && !errorChildren && students?.length > 0 && (
           <button
             className="text-transparent bg-clip-text bg-gradient-to-r from-[#C83B62] to-[#7F35CD] font-normal"
             onClick={handleNavigate}
@@ -104,7 +107,7 @@ const StudentParentCard = () => {
         {/* Render children if available */}
         {!loadingChildren && !errorChildren && students?.length > 0 && (
           <>
-            {students.slice(0, 3).map((student, index) => (
+            {students.slice(0, 1).map((student, index) => (
               <StudentCard key={student?.id || index} student={student} index={index} />
             ))}
           </>

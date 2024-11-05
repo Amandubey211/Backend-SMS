@@ -4,12 +4,15 @@ import { PiStudentBold } from "react-icons/pi"; // No data/error icon
 import Spinner from "../../../../Components/Common/Spinner"; // Import default spinner
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAdminDashboardData } from "../../../../Store/Slices/Admin/Dashboard/adminDashboard.action"; // Import the action
+import { useTranslation } from "react-i18next";
 
 const TotalStudentsGraphjs = () => {
   const dispatch = useDispatch();
-  
+
+  const { t } = useTranslation('dashboard');
+
   const role = useSelector((store) => store?.common?.auth?.role);
-  const { loading, error, dashboardData } = useSelector(
+  const { loadingDashboard:loading, errorDashboard:error, dashboardData } = useSelector(
     (state) => state?.admin?.adminDashboard
   );
 
@@ -18,11 +21,6 @@ const TotalStudentsGraphjs = () => {
     maleStudents: 0,
     femaleStudents: 0,
   });
-
-  useEffect(() => {
-    dispatch(fetchAdminDashboardData()); // Fetch dashboard data from Redux
-  }, [dispatch]);
-
   useEffect(() => {
     if (role === "teacher" && selectedClass) {
       const selectedClassData = dashboardData?.studentData?.find(
@@ -46,7 +44,7 @@ const TotalStudentsGraphjs = () => {
         femaleStudents: dashboardData?.studentData?.[0]?.femaleStudents || 0,
       });
     }
-  }, [selectedClass, dashboardData, role]);
+  }, [selectedClass]);
 
   const handleClassChange = (e) => {
     setSelectedClass(e.target.value);
@@ -54,7 +52,7 @@ const TotalStudentsGraphjs = () => {
 
   return (
     <div className="flex flex-col items-center justify-center h-full px-2 py-4">
-      <h2 className="text-2xl font-semibold mb-4 text-left w-full">Total Students</h2>
+      <h2 className="text-2xl font-semibold mb-4 text-left w-full">{t("Total Students")}</h2>
 
       {/* Conditionally render spinner, error, no data message, or the pie chart */}
       {loading ? (
@@ -69,7 +67,7 @@ const TotalStudentsGraphjs = () => {
       ) : !dashboardData || (classData.maleStudents === 0 && classData.femaleStudents === 0) ? (
         <div className="flex flex-col items-center justify-center text-gray-400">
           <PiStudentBold className="text-6xl mb-4" />
-          <p className="text-xl">No student data found</p>
+          <p className="text-xl">{t("No student data found")}</p>
         </div>
       ) : (
         <>
@@ -137,7 +135,7 @@ const TotalStudentsGraphjs = () => {
             {/* Centered total students count */}
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="text-center">
-                <span className="block text-sm font-medium">Total Students</span>
+                <span className="block text-sm font-medium">{t("Total Students")}</span>
                 <span className="block text-xl font-bold">
                   {classData.maleStudents + classData.femaleStudents}
                 </span>
@@ -149,7 +147,7 @@ const TotalStudentsGraphjs = () => {
             <div className="flex flex-col items-start">
               <div className="w-16 h-1 bg-[#8F77F3] rounded-full mb-1"></div>
               <div className="text-left">
-                <span className="text-gray-700">Female Students</span>
+                <span className="text-gray-700">{t("Female Students")}</span>
                 <div className="font-bold text-gray-700">
                   {classData.femaleStudents}
                 </div>
@@ -158,7 +156,7 @@ const TotalStudentsGraphjs = () => {
             <div className="flex flex-col items-start">
               <div className="w-16 h-1 bg-[#23C55E] rounded-full mb-1"></div>
               <div className="text-left">
-                <span className="text-gray-700">Male Students</span>
+                <span className="text-gray-700">{t("Male Students")}</span>
                 <div className="font-bold text-gray-700">
                   {classData.maleStudents}
                 </div>

@@ -5,6 +5,7 @@ import { FiCalendar } from "react-icons/fi";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchEarningsData } from "../../../../Store/Slices/Admin/Dashboard/adminDashboard.action"; // Make sure the path is correct
 import Spinner from "../../../../Components/Common/Spinner";
+import { useTranslation } from "react-i18next";
 
 ChartJS.register(...registerables);
 
@@ -13,8 +14,10 @@ const TotalEarningsGraph = () => {
   const [tooltipData, setTooltipData] = useState(null);
   const [selectedOption, setSelectedOption] = useState("currentMonth");
 
+  const { t } = useTranslation('dashboard');
+
   const dispatch = useDispatch();
-  const { loading, error, earningsData } = useSelector((state) => state?.admin?.adminDashboard);
+  const {  loadingEarnings:loading, errorEarnings:error, earningsData } = useSelector((state) => state?.admin?.adminDashboard);
 
   // Function to dispatch the fetchEarningsData action
   const fetchDashboardData = (option) => {
@@ -86,7 +89,7 @@ const TotalEarningsGraph = () => {
         </div>
         <div className="flex flex-col items-center justify-center text-center p-4">
           <FiCalendar size={40} className="mb-4 text-gray-400" />
-          <p className="text-gray-500">No Earnings/Expense Data Found</p>
+          <p className="text-gray-500">{t("No Earnings/Expense Data Found")}</p>
         </div>
         <div className="flex justify-around mt-4">
           <div className="flex flex-col items-start">
@@ -110,7 +113,7 @@ const TotalEarningsGraph = () => {
               style={{ backgroundColor: "#EA580C", alignSelf: "flex-start" }}
             ></div>
             <div className="flex items-center">
-              <div className="text-gray-700">Total Expenses</div>
+              <div className="text-gray-700">{t("Total Expenses")}</div>
               <div className="ml-2 font-bold mr-1">
                 {earningsData
                   ? earningsData.totalExpenses?.toLocaleString()
@@ -246,7 +249,7 @@ const TotalEarningsGraph = () => {
     <div className="p-4 bg-white">
       <div className="flex justify-between items-center mb-4">
         <div>
-          <h2 className="text-xl font-semibold">Earnings</h2>
+          <h2 className="text-xl font-semibold">{t('Earnings')}</h2>
         </div>
         <div>
           <select
@@ -254,8 +257,8 @@ const TotalEarningsGraph = () => {
             value={selectedOption}
             onChange={(e) => setSelectedOption(e.target.value)}
           >
-            <option value="currentMonth">This month</option>
-            <option value="lastMonth">Last month</option>
+            <option value="currentMonth">{t("This month")}</option>
+            <option value="lastMonth">{t("Last month")}</option>
           </select>
         </div>
       </div>
@@ -287,7 +290,7 @@ const TotalEarningsGraph = () => {
             style={{ backgroundColor: "#7C3AED", alignSelf: "flex-start" }}
           ></div>
           <div className="flex items-center">
-            <div className="text-gray-700">Total Collections</div>
+            <div className="text-gray-700">{t("Total Collections")}</div>
             <div className="ml-2 font-bold mr-1">
               {totalEarnings?.toLocaleString()}
             </div>
@@ -300,7 +303,7 @@ const TotalEarningsGraph = () => {
             style={{ backgroundColor: "#EA580C", alignSelf: "flex-start" }}
           ></div>
           <div className="flex items-center">
-            <div className="text-gray-700">Total Expenses</div>
+            <div className="text-gray-700">{t("Total Expenses")}</div>
             <div className="ml-2 font-bold mr-1">
               {totalExpenses?.toLocaleString()}
             </div>

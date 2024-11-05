@@ -27,25 +27,33 @@ import { ReactComponent as ParentIcon } from "../../../Assets/DashboardAssets/SV
 import { ReactComponent as StaffIcon } from "../../../Assets/DashboardAssets/SVG/staff.svg";
 import { RiDashboardFill } from "react-icons/ri";
 import Spinner from "../../../Components/Common/Spinner";
+import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
 import { createStaffSalary } from "../../../Store/Slices/Admin/Accounting/Expenses/expenses.action";
+import { fetchAdminDashboardData } from "../../../Store/Slices/Admin/Dashboard/adminDashboard.action";
+import { fetchAllClasses } from "../../../Store/Slices/Admin/Class/actions/classThunk";
 
 const MainSection = () => {
-  const { dashboardData, error, fetchAdminDashboardData, loading } =
-    useGetAdminDashboardData();
+  const { dashboardData, errorDashboard, loadingDashboard} = useSelector((store)=>store.admin.adminDashboard)
     const dispatch=useDispatch();
-
+    useEffect(() => {
+      dispatch(fetchAllClasses());
+    }, [dispatch]);
   const { role } = useSelector((state) => ({
     role: state.common.auth.role,
   }));
 
+  const { t } = useTranslation();
+
   useEffect(() => {
-    fetchAdminDashboardData();
-  }, [fetchAdminDashboardData]);
+    dispatch(fetchAdminDashboardData());
+  }, [dispatch]);
 
 
   useEffect(()=>{
+    if(role=="admin" || role == "accountant"){
    dispatch(createStaffSalary({status:"unpaid",action:"pay now"}))
+  }
   },[dispatch,createStaffSalary])
 
   function capitalizeFirstLetter(string) {
@@ -55,7 +63,7 @@ const MainSection = () => {
 
   const cardData = [
     {
-      label: "Students",
+      label: t("Students", { ns: 'dashboard' }),
       value:
         typeof dashboardData?.totalStudents === "number"
           ? dashboardData.totalStudents
@@ -67,7 +75,7 @@ const MainSection = () => {
       navigateTo: '/users/students',  // Add this line
     },
     {
-      label: "Teacher",
+      label: t("Teacher", { ns: 'dashboard' }),
       value:
         typeof dashboardData?.teachers === "number"
           ? dashboardData.teachers
@@ -79,7 +87,7 @@ const MainSection = () => {
       navigateTo: '/users/teachers',  // Add this line
     },
     {
-      label: "Parents",
+      label: t("Parents", { ns: 'dashboard' }),
       value:
         typeof dashboardData?.parents === "number"
           ? dashboardData.parents
@@ -91,7 +99,7 @@ const MainSection = () => {
       navigateTo: '/users/parents',  // Add this line
     },
     {
-      label: "Staff",
+      label: t("Staff", { ns: 'dashboard' }),
       value:
         typeof dashboardData?.staffs === "number"
           ? dashboardData.staffs
@@ -112,22 +120,22 @@ const MainSection = () => {
         ))}
       </div>
 
-      {loading && (
+      {loadingDashboard && (
         <div className="flex flex-col items-center justify-center w-full">
           <Spinner />
           <hr className="my-4 border-gray-300" />
         </div>
       )}
 
-      {error && (
+      {errorDashboard && (
         <div className="flex flex-col items-center justify-center w-full">
           <RiDashboardFill className="text-gray-400 text-9xl mb-4" />
-          <p className="text-gray-600 text-2xl">{error}: Unable to Fetch {capitalizeFirstLetter(role)} Dashboard</p>
+          <p className="text-gray-600 text-2xl">{errorDashboard}: Unable to Fetch {capitalizeFirstLetter(role)} Dashboard</p>
           <hr className="my-4 border-gray-300" />
         </div>
       )}
 
-      {!loading && !error && (
+      {!loadingDashboard && !errorDashboard && (
         <>
           {role === "admin" && <AdminSection />}
           {role === "teacher" && <TeacherSection />}

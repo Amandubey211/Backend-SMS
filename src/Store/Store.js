@@ -108,6 +108,7 @@ const stdClassPersistConfig = {
   storage,
 };
 
+
 // Combine the Auth and User reducers under a Common entity
 const commonReducer = combineReducers({
   auth: persistReducer(authPersistConfig, authReducer),

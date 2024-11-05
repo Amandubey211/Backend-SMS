@@ -11,11 +11,12 @@ import { baseUrl } from "../../../../../config/Common";
 import { requestPermissionAndGetToken } from "../../../../../Hooks/NotificationHooks/NotificationHooks";
 import toast from "react-hot-toast";
 import { formatAcademicYear } from "../utils/authUtils";
+import { fetchAcademicYear } from "../../AcademicYear/academicYear.action";
 
 // **Staff login action**
 export const staffLogin = createAsyncThunk(
   "auth/staffLogin",
-  async (staffDetails, { rejectWithValue, dispatch }) => {
+  async (staffDetails, { rejectWithValue, dispatch,getState }) => {
     try {
       const deviceToken = await requestPermissionAndGetToken(); // Get notification token
       const userDetail = { ...staffDetails, deviceToken }; // Include device token
@@ -32,7 +33,6 @@ export const staffLogin = createAsyncThunk(
         // localStorage.removeItem(
         //   process.env.REACT_APP_STUDENT_TOKEN_STORAGE_KEY
         // );
-        console.log(data, "ddddddddddddd");
 
         // Dispatch user details to userSlice
         dispatch(
@@ -55,7 +55,6 @@ export const staffLogin = createAsyncThunk(
         // Dispatch token and role to authSlice
         dispatch(setToken(data?.token));
         dispatch(setRole(data?.role));
-        console.log("i ran");
 
         // Handle academic year
         if (data.role === "admin" && data.isAcademicYearActive === false) {
@@ -80,6 +79,12 @@ export const staffLogin = createAsyncThunk(
               },
             ])
           );
+          await dispatch(fetchAcademicYear());
+          const activeAcademicYear = await  getState().common?.academicYear?.academicYears?.find((i)=>i.isActive == true);
+          localStorage.setItem("say", activeAcademicYear?._id);
+         dispatch(setToken(data.token)); 
+         dispatch(setRole(data.role)); 
+         
           return { redirect: "/dashboard" }; // Return the redirect path
         }
       } else {

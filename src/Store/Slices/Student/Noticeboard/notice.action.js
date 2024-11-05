@@ -2,21 +2,22 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import { baseUrl } from "../../../../config/Common";
 import axios from "axios";
 import { ErrorMsg } from "../../Common/Alerts/errorhandling.action";
-import { setShowError } from "../../Common/Alerts/alertsSlice";
-
+import { setErrorMsg, setShowError } from "../../Common/Alerts/alertsSlice";
+const say = localStorage.getItem("say");
 
 export const studentNotice = createAsyncThunk(
     'announcement/studentNotice',
     async (_, { rejectWithValue, dispatch }) => {
         const token = localStorage.getItem("student:token");
+        const say = localStorage.getItem("say")
         if (!token) {
             dispatch(setShowError(true));
+            dispatch(setErrorMsg(`Authentication failed!`));
             return rejectWithValue(`Authentication failed!`);
         }
         try {
             dispatch(setShowError(false));
-
-            const res = await axios.get(`${baseUrl}/admin/all/notices`, {
+            const res = await axios.get(`${baseUrl}/admin/all/notices?say=${say}`, {
                 headers: { Authentication: token }
             });
 
@@ -32,9 +33,9 @@ export const studentNotice = createAsyncThunk(
 
         }
         catch (error) {
-            console.log("Error in student notice", error);
             const err = ErrorMsg(error);
             dispatch(setShowError(true));
+            dispatch(setErrorMsg(err.message));
             return rejectWithValue(err.message);
         }
     }

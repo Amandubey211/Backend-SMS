@@ -23,8 +23,8 @@ const ChildProfile = ({ children }) => {
           /> 
         </div>
         <h2 className='font-medium' >{child?.name}</h2>
-        <div className='flex gap-2  ' >
-            <span className='text-gray-500'> Id: </span>
+        <div className='flex gap-2' >
+        <span className='text-gray-500'>Adm </span>
             <span className='font-medium text-gray-800' >{child?.admissionNumber}</span>
             <span className='text-gray-500'> Class </span>
             <span className='font-medium text-gray-800'>{child?.class}  </span>

@@ -2,6 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
     showError: false,
+    errorMsg:''
 }
 
 const alertsSlice = createSlice({
@@ -10,9 +11,12 @@ const alertsSlice = createSlice({
     reducers: {
         setShowError: (state, action) => {
            state.showError=action.payload;
-        }
+        },
+        setErrorMsg: (state, action) => {
+            state.errorMsg = action.payload;
+         }
     }
 });
 
-export const { setShowError } = alertsSlice.actions;
+export const { setShowError,setErrorMsg } = alertsSlice.actions;
 export default alertsSlice.reducer; 

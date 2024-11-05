@@ -63,7 +63,6 @@ const sidebarData = [
         icon: <FaChalkboardTeacher />,
         path: "/users/teachers",
         roles: ["admin", "accountant", "librarian"],
-
       },
       {
         title: "Accountant",
@@ -116,12 +115,6 @@ const sidebarData = [
     roles: ["admin", "teacher", "librarian", "accountant"],
     items: [
       {
-        title: "Time Table",
-        icon: <ImTable2 />,
-        path: "/noticeboard/timetable",
-        roles: ["admin", "teacher"],
-      },
-      {
         title: "Announcements",
         icon: <FaClipboardList />,
         path: "/noticeboard/notice",
@@ -135,16 +128,23 @@ const sidebarData = [
       },
     ],
   },
+
   {
-    title: "Admissions",
-    icon: <RiUserAddLine />,
-    path: "/admissions",
-    roles: ["admin"],
+    title: "Time Table",
+    icon: <ImTable2 />,
+    path: "/noticeboard/timetable",
+    roles: ["admin", "teacher"],
   },
   {
     title: "Library",
     icon: <BsBook />,
     path: "/library",
+    roles: ["admin"],
+  },
+  {
+    title: "Admissions",
+    icon: <RiUserAddLine />,
+    path: "/admissions",
     roles: ["admin"],
   },
   {
@@ -157,8 +157,7 @@ const sidebarData = [
     title: "Graduate",
     icon: <FaUserGraduate />,
     roles: ["admin"],
-    path: `/graduates`
-
+    path: `/graduates`,
   },
 ];
 

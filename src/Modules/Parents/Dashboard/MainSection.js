@@ -16,14 +16,15 @@ const ParentSection = () => {
           
         </div>
         <div className="flex flex-wrap justify-between items-start border-y">
-          <div className="w-2/5">
+          <div className="w-2/5 ">
             <StudentParentCard/>
           </div>
+        
           <div className="w-3/5 border-r">
             <NoticeBoard textTrimCount={74}/>
           </div>
         </div>
-        <div className="flex justify-between items-start border-y">
+        <div className="flex  border-y">
           <div className="w-full">
             <AccountingSection/>
           </div>
