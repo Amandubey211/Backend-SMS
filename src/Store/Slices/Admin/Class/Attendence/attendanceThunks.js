@@ -3,6 +3,7 @@ import axios from "axios";
 import { baseUrl } from "../../../../../config/Common";
 import { setErrorMsg, setShowError } from "../../../Common/Alerts/alertsSlice";
 import { ErrorMsg } from "../../../Common/Alerts/errorhandling.action";
+import toast from "react-hot-toast";
 
 const say = localStorage.getItem("say");
 
@@ -80,7 +81,7 @@ export const markAttendance = createAsyncThunk(
           headers: { Authentication: token }, // Use token in the request headers
         }
       );
-
+        toast.success ('Attendance mark successfully');
       dispatch(setShowError(false));
       return response.data; // Return the response data
     } catch (error) {

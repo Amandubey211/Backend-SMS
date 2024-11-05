@@ -99,7 +99,6 @@ const EditBook = ({ book, onClose }) => {
     }
 
     dispatch(updateBookThunk({ bookId: book._id, formData })).then(() => {
-      toast.success("Book updated successfully!");
       onClose();
     });
   };

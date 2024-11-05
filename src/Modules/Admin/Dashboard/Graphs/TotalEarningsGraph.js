@@ -14,7 +14,7 @@ const TotalEarningsGraph = () => {
   const [selectedOption, setSelectedOption] = useState("currentMonth");
 
   const dispatch = useDispatch();
-  const { loading, error, earningsData } = useSelector((state) => state?.admin?.adminDashboard);
+  const {  loadingEarnings:loading, errorEarnings:error, earningsData } = useSelector((state) => state?.admin?.adminDashboard);
 
   // Function to dispatch the fetchEarningsData action
   const fetchDashboardData = (option) => {

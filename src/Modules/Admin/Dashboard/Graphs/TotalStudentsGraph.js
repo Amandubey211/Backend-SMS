@@ -7,9 +7,8 @@ import { fetchAdminDashboardData } from "../../../../Store/Slices/Admin/Dashboar
 
 const TotalStudentsGraphjs = () => {
   const dispatch = useDispatch();
-  
   const role = useSelector((store) => store?.common?.auth?.role);
-  const { loading, error, dashboardData } = useSelector(
+  const { loadingDashboard:loading, errorDashboard:error, dashboardData } = useSelector(
     (state) => state?.admin?.adminDashboard
   );
 
@@ -18,11 +17,6 @@ const TotalStudentsGraphjs = () => {
     maleStudents: 0,
     femaleStudents: 0,
   });
-
-  useEffect(() => {
-    dispatch(fetchAdminDashboardData()); // Fetch dashboard data from Redux
-  }, [dispatch]);
-
   useEffect(() => {
     if (role === "teacher" && selectedClass) {
       const selectedClassData = dashboardData?.studentData?.find(
@@ -46,7 +40,7 @@ const TotalStudentsGraphjs = () => {
         femaleStudents: dashboardData?.studentData?.[0]?.femaleStudents || 0,
       });
     }
-  }, [selectedClass, dashboardData, role]);
+  }, [selectedClass]);
 
   const handleClassChange = (e) => {
     setSelectedClass(e.target.value);

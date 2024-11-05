@@ -29,8 +29,8 @@ const Events = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // Extract events, loading, and error from the Redux store
-  const { events, loading, error } = useSelector((state) => state.admin.adminDashboard);
+  // Extract events, loading, nd error from the Redux store
+  const { events, loadingEvents:loading, errorEvents:error } = useSelector((state) => state.admin.adminDashboard);
 
   const currentMonth = new Date().getMonth() + 1; // Months are zero-indexed
   const currentYear = new Date().getFullYear();
@@ -43,7 +43,7 @@ const Events = () => {
 
   useEffect(() => {
     fetchEvents();
-  }, [fetchEvents]);
+  }, []);
 
   const handleMonthChange = (e) => {
     setDate((prevDate) => ({
