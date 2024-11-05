@@ -106,7 +106,7 @@ const StudentParentProfile = () => {
                       Email
                     </th>
                     <th className="px-5 py-3 border-b-2 border-gray-200">
-                      Childs
+                      Children
                     </th>
                   </tr>
                 </thead>
@@ -146,7 +146,7 @@ const StudentParentProfile = () => {
                           className="flex items-center py-1 cursor-pointer"
                           onClick={() => handleStudentClick(parent?.children)}
                         >
-                          <div className="flex bg-pink-100 p-2 border rounded-full">
+                          <div className="flex bg-pink-100 p-2 border rounded-full w-[10rem] items-center">
                             {parent?.children?.map((child, idx) => (
                               <img
                                 key={idx}

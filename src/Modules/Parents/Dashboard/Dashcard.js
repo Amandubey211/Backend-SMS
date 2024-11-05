@@ -4,6 +4,8 @@ import { fetchDashboardCards } from '../../../Store/Slices/Parent/Dashboard/dash
 import { RiBookOpenLine, RiMoneyDollarBoxFill, RiCalendarCheckLine } from "react-icons/ri";
 import { CiMoneyBill } from "react-icons/ci";
 import { useTranslation } from 'react-i18next'; // Import i18next hook
+import { fetchNoticesThunk } from "../../../Store/Slices/Admin/NoticeBoard/Notice/noticeThunks.js";
+import { fetchAllNotices } from "../../../Store/Slices/Parent/NoticeBoard/notice.action.js";
 
 const DashCard = ({
   label,
@@ -12,7 +14,11 @@ const DashCard = ({
   textColor,
   icon,
 }) => {
+  const { notices} = useSelector((state) => state?.Parent?.notice || {});
   const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(fetchAllNotices());
+  }, [dispatch]);
   const { t } = useTranslation(); // Initialize translation function
 
   // Fetch cardsData from Redux if props are not passed
@@ -48,8 +54,8 @@ const DashCard = ({
       icon: <RiBookOpenLine />,
     },
     {
-      label: t("Result Published", { ns: "stdFinance" }),
-      value: cardsData?.publishedResultsCount?.toString() || "0",
+      label: t("Notices", { ns: "stdFinance" }),
+      value: notices?.length?.toString() || "0",
       bgColor: "bg-teal-100",
       textColor: "text-teal-700",
       icon: <RiCalendarCheckLine />,

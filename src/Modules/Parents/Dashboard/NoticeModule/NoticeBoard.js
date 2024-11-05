@@ -67,14 +67,14 @@ const NoticeBoard = ({ textTrimCount }) => {
   }, [notices]);
 
   // Get the number of notices to show based on the number of children
-  const numberOfNoticesToShow = 5
+  const numberOfNoticesToShow = 2
 
   // Memoize latest notices filtering and sorting
   const latestNotices = useMemo(() => {
     return formattedNotices
       .filter((notice) => notice.startDate !== "Invalid Date")
       .sort((a, b) => new Date(b.startDate) - new Date(a.startDate))
-      .slice(0, numberOfNoticesToShow);
+      .slice(0,2);
   }, [formattedNotices, numberOfNoticesToShow]);
 
   // Utility function to truncate text

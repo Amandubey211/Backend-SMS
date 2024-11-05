@@ -47,7 +47,7 @@ const NoticeBoard = (descriptionLength) => {
   // Ensure notices is an array and create a copy before sorting
   const noticesArray = Array.isArray(notices) ? [...notices] : [];
   const noticesSort = noticesArray.sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
-  const topNotices = noticesSort.slice(0, 5);
+  const topNotices = noticesSort.slice(0, 3);
 
   return (
     <div className="p-2">

@@ -100,8 +100,8 @@ const Navbar = () => {
 
         <div className="flex items-center space-x-2 relative justify-center  ">
           {role === "admin" || role === "teacher" || role === "accountant" ? (
-            <div className="border-r px-4 font-semibold text-gradient">
-              {activeAcademicYear && activeAcademicYear}
+            <div className="border-r px-4 font-semibold text-gradient" title='Academic Year'>
+             AY: {activeAcademicYear && activeAcademicYear}
             </div>
           ) : null}
 
