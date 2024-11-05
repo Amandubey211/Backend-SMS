@@ -33,12 +33,12 @@ const AddNotice = ({ isEditing, onClose }) => {
   useEffect(() => {
     if (isEditing && selectedNotice) {
       setAnnouncementData({
-        title: selectedNotice.title,
-        startDate: selectedNotice.startDate.split("T")[0],
-        endDate: selectedNotice.endDate.split("T")[0],
-        description: selectedNotice.description,
-        priority: selectedNotice.priority,
-        classId: selectedNotice.classId._id || "", // Preload classId for editing
+        title: selectedNotice?.title,
+        startDate: selectedNotice?.startDate?.split("T")[0],
+        endDate: selectedNotice?.endDate?.split("T")[0],
+        description: selectedNotice?.description,
+        priority: selectedNotice?.priority,
+        classId: selectedNotice?.classId?._id || "", // Preload classId for editing
       });
     } else {
       setAnnouncementData({
@@ -95,7 +95,7 @@ const AddNotice = ({ isEditing, onClose }) => {
             type="text"
             id="title"
             name="title"
-            value={announcementData.title}
+            value={announcementData?.title}
             onChange={handleInputChange}
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
             required
@@ -112,7 +112,7 @@ const AddNotice = ({ isEditing, onClose }) => {
               type="date"
               id="startDate"
               name="startDate"
-              value={announcementData.startDate}
+              value={announcementData?.startDate}
               onChange={handleInputChange}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
               required
@@ -126,7 +126,7 @@ const AddNotice = ({ isEditing, onClose }) => {
               type="date"
               id="endDate"
               name="endDate"
-              value={announcementData.endDate}
+              value={announcementData?.endDate}
               onChange={handleInputChange}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
               required
@@ -142,15 +142,15 @@ const AddNotice = ({ isEditing, onClose }) => {
           <select
             id="class"
             name="classId"
-            value={announcementData.classId}
+            value={announcementData?.classId}
             onChange={handleInputChange}
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
           >
             <option value="">All</option>
             {classes &&
               classes.map((classItem) => (
-                <option key={classItem._id} value={classItem._id}>
-                  {classItem.className}
+                <option key={classItem?._id} value={classItem?._id}>
+                  {classItem?.className}
                 </option>
               ))}
           </select>
@@ -162,7 +162,7 @@ const AddNotice = ({ isEditing, onClose }) => {
           <select
             id="noticeFor"
             name="noticeFor"
-            value={announcementData.noticeFor}
+            value={announcementData?.noticeFor}
             onChange={handleInputChange}
             disabled={studentLoading}
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
@@ -184,7 +184,7 @@ const AddNotice = ({ isEditing, onClose }) => {
           <textarea
             id="description"
             name="description"
-            value={announcementData.description}
+            value={announcementData?.description}
             onChange={handleInputChange}
             rows={4}
             placeholder="Type here"
@@ -202,7 +202,7 @@ const AddNotice = ({ isEditing, onClose }) => {
                 type="radio"
                 name="priority"
                 value="High priority"
-                checked={announcementData.priority === "High priority"}
+                checked={announcementData?.priority === "High priority"}
                 onChange={handlePriorityChange}
                 className="form-radio text-green-500"
               />
@@ -213,7 +213,7 @@ const AddNotice = ({ isEditing, onClose }) => {
                 type="radio"
                 name="priority"
                 value="Low priority"
-                checked={announcementData.priority === "Low priority"}
+                checked={announcementData?.priority === "Low priority"}
                 onChange={handlePriorityChange}
                 className="form-radio text-gray-500"
               />

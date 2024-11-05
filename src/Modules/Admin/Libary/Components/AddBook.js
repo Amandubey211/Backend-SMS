@@ -104,7 +104,7 @@ const AddBook = () => {
           />
           <FormSelect
             id="class"
-            label="Select Class"
+            label="Class"
             name="class"
             options={classList.map((cls) => ({
               value: cls._id,

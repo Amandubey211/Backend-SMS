@@ -30,8 +30,7 @@ const NoticeBoard = (descriptionLength) => {
   const { t } = useTranslation('dashboard');
 
   // Get notices data from Redux state
-  const { loading, error, notices } = useSelector((state) => state.admin.adminDashboard);
-const say = localStorage.getItem('say')
+  const { loadingNotices:loading, errorNotices:error, notices } = useSelector((state) => state.admin.adminDashboard);
   useEffect(() => {
   
     dispatch(fetchNotices());

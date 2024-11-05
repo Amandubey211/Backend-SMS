@@ -54,4 +54,4 @@ export const updateAcademicYear = createAsyncThunk("user/updateAcademicYear",asy
       return rejectWithValue(err.message);
     }
 
-})
+});

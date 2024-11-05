@@ -17,7 +17,7 @@ const TotalEarningsGraph = () => {
   const { t } = useTranslation('dashboard');
 
   const dispatch = useDispatch();
-  const { loading, error, earningsData } = useSelector((state) => state?.admin?.adminDashboard);
+  const {  loadingEarnings:loading, errorEarnings:error, earningsData } = useSelector((state) => state?.admin?.adminDashboard);
 
   // Function to dispatch the fetchEarningsData action
   const fetchDashboardData = (option) => {

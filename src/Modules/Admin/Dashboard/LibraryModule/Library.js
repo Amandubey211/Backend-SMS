@@ -13,12 +13,12 @@ const Library = () => {
   const role = useSelector((state) => state?.common?.auth?.role);
 
   // Extracting books, loading, and error from Redux state
-  const { books, loading, error } = useSelector((state) => state?.admin?.adminDashboard);
+  const { books, loadingBooks:loading, errorBooks:error } = useSelector((state) => state?.admin?.adminDashboard);
 
   // Fetch Books based on role
   useEffect(() => {
     dispatch(fetchFilteredIssueBooks());
-  }, [dispatch, role]);
+  }, [dispatch]);
 
   const handleViewAllClick = () => {
     navigate("/library");
@@ -44,7 +44,7 @@ const Library = () => {
   }
 
   // Ensure only the top 5 latest books are displayed
-  const latestBooks = books?.slice(0, 5) || []; // Slicing to get only the top 5 books
+  const latestBooks = books?.slice(0, 3) || []; // Slicing to get only the top 5 books
 
   return (
     <div className="p-4 bg-white">
@@ -80,4 +80,4 @@ const Library = () => {
   );
 };
 
-export default memo(Library);
+export default Library;

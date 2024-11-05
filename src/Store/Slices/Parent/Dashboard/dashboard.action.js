@@ -10,6 +10,7 @@ export const fetchDashboardCards = createAsyncThunk(
   "dashboard/fetchCards",
   async (_, { rejectWithValue, dispatch }) => {
     const token = localStorage.getItem("parent:token");
+    const say = localStorage.getItem("say")
     if (!token) {
       dispatch(setShowError(true));
       dispatch(setErrorMsg("Authentication failed"));

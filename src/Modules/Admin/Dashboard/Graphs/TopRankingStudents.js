@@ -12,22 +12,18 @@ const TopRankingStudents = () => {
   const { topStudents, loadingTopStudents, errorTopStudents } = useSelector(
     (state) => state.admin.adminDashboard
   );
-  const { classes } = useSelector((store) => store?.admin?.class);
+  const { classes,loading } = useSelector((store) => store?.admin?.class);
   const [selectedClass, setSelectedClass] = useState("");
 
-  useEffect(() => {
-    // Fetch classes first
-    dispatch(fetchAllClasses());
-  }, [dispatch]);
+ 
 
   useEffect(() => {
-    // Once classes are loaded and there's a valid class ID, fetch top students
-    if (classes.length > 0) {
+    if (classes?.length > 0) {
       const initialClassId = classes[0]?._id;
       setSelectedClass(initialClassId);
       dispatch(fetchTopStudents(initialClassId));
     }
-  }, [classes, dispatch]);
+  }, [dispatch, classes]);
 
   const handleChange = (e) => {
     const { value } = e.target;
@@ -55,11 +51,11 @@ const TopRankingStudents = () => {
         </div>
       </div>
 
-      {errorTopStudents ||topStudents?.length == 0   ? (
+      {errorTopStudents || topStudents?.length == 0   ? (
         <div className="flex items-center justify-center py-20">
           <NoDataFound title={"Student"} />
         </div>
-      ) : loadingTopStudents ? (
+      ) : loadingTopStudents || loading  ? (
         <div className="py-20">
           <Spinner />
         </div>
@@ -119,7 +115,7 @@ const TopRankingStudents = () => {
                     src={student?.studentProfile || profileIcon}
                     alt={student?.studentName}
                   />
-                  <span>{student?.studentName}</span>
+                  <span>{student?.studentName?.slice(0,15)}{student?.studentName?.length > 15 &&'...'}</span>
                 </div>
                 <div
                   className="rounded-sm"
@@ -138,9 +134,11 @@ const TopRankingStudents = () => {
                     Score: {student?.score} %
                   </span>
                 </div>
-                <span>
+               <div className="w-[25%]">
+               <span>
                   Adm: <span className="text-gray-600">{student?.admissionNumber}</span>
                 </span>
+               </div>
               </div>
             ))}
           </div>

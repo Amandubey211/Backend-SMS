@@ -30,7 +30,7 @@ export const fetchFees = createAsyncThunk(
     async (_, { rejectWithValue, getState, dispatch }) => {
         const token = getToken(getState(), rejectWithValue, dispatch);
         if (typeof token === 'object') return token;
-
+        const say = localStorage.getItem("say")
         try {
             const response = await axios.get(`${baseUrl}/admin/get_fees?say=${say}`, {
                 headers: { Authentication: token },

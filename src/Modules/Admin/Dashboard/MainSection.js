@@ -30,20 +30,15 @@ import Spinner from "../../../Components/Common/Spinner";
 import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
 import { createStaffSalary } from "../../../Store/Slices/Admin/Accounting/Expenses/expenses.action";
-import { fetchAcademicYear } from "../../../Store/Slices/Common/AcademicYear/academicYear.action";
+import { fetchAdminDashboardData } from "../../../Store/Slices/Admin/Dashboard/adminDashboard.action";
+import { fetchAllClasses } from "../../../Store/Slices/Admin/Class/actions/classThunk";
 
 const MainSection = () => {
-  // const {academicYears} = useSelector((store)=>store.common.academicYear)
-  // useEffect(()=>{
-  //   dispatch(fetchAcademicYear()).then(()=>{
-  //     const activeAcademicYear = academicYears?.find((i)=>i.isActive == true);
-  //     localStorage.setItem("say", activeAcademicYear?._id);
-  //   });
-  // },[])
-  const { dashboardData, error, fetchAdminDashboardData, loading } =
-    useGetAdminDashboardData();
+  const { dashboardData, errorDashboard, loadingDashboard} = useSelector((store)=>store.admin.adminDashboard)
     const dispatch=useDispatch();
-
+    useEffect(() => {
+      dispatch(fetchAllClasses());
+    }, [dispatch]);
   const { role } = useSelector((state) => ({
     role: state.common.auth.role,
   }));
@@ -51,9 +46,8 @@ const MainSection = () => {
   const { t } = useTranslation();
 
   useEffect(() => {
-    fetchAdminDashboardData();
-  }, [fetchAdminDashboardData]);
-
+    dispatch(fetchAdminDashboardData());
+  }, [dispatch]);
 
 
   useEffect(()=>{
@@ -124,22 +118,22 @@ const MainSection = () => {
         ))}
       </div>
 
-      {loading && (
+      {loadingDashboard && (
         <div className="flex flex-col items-center justify-center w-full">
           <Spinner />
           <hr className="my-4 border-gray-300" />
         </div>
       )}
 
-      {error && (
+      {errorDashboard && (
         <div className="flex flex-col items-center justify-center w-full">
           <RiDashboardFill className="text-gray-400 text-9xl mb-4" />
-          <p className="text-gray-600 text-2xl">{error}: Unable to Fetch {capitalizeFirstLetter(role)} Dashboard</p>
+          <p className="text-gray-600 text-2xl">{errorDashboard}: Unable to Fetch {capitalizeFirstLetter(role)} Dashboard</p>
           <hr className="my-4 border-gray-300" />
         </div>
       )}
 
-      {!loading && !error && (
+      {!loadingDashboard && !errorDashboard && (
         <>
           {role === "admin" && <AdminSection />}
           {role === "teacher" && <TeacherSection />}
