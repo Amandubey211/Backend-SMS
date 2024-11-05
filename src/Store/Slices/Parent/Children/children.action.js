@@ -1,198 +1,177 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { baseUrl } from "../../../../config/Common";
-import toast from "react-hot-toast";
+import { setErrorMsg, setShowError } from "../../Common/Alerts/alertsSlice";
+import {ErrorMsg} from "../../Common/Alerts/errorhandling.action";
 import axios from "axios";
 
+const say = localStorage.getItem('say');
 
 // Thunk to fetch children
 export const fetchChildren = createAsyncThunk(
   "dashboard/fetchChildren",
-  async (_, { rejectWithValue }) => {
+  async (_, { rejectWithValue, dispatch }) => {
     const token = localStorage.getItem("parent:token");
     const userData = JSON.parse(localStorage.getItem("userData"));
 
     if (!userData || !userData.email) {
-      // toast.error("No guardian email found");
+      dispatch(setShowError(true));
+      dispatch(setErrorMsg("No guardian email found"));
       return rejectWithValue("No guardian email found");
     }
 
     try {
-      const response = await axios.get(
-        `${baseUrl}/parent/api/children`,
-        {
-          headers: {
-            Authentication: token,
-          },
-        }
-      );
+      const response = await axios.get(`${baseUrl}/parent/api/children?say=${say}`, {
+        headers: { Authentication: token },
+      });
       return response.data.children;
     } catch (error) {
       const errorMessage = error.response?.data?.message || error.message || "Failed to fetch children data";
-      // toast.error(errorMessage);
-      return rejectWithValue(errorMessage);
+     const err = ErrorMsg(error);
+      dispatch(setShowError(true));
+      dispatch(setErrorMsg(err?.message));
+      return rejectWithValue(err?.message)
     }
   }
 );
-
-
 
 // Thunk to fetch attendance
 export const fetchAttendance = createAsyncThunk(
   "children/fetchAttendance",
-  async ({ studentId, month, year }, { rejectWithValue }) => {
+  async ({ studentId, month, year }, { rejectWithValue, dispatch }) => {
+    const token = localStorage.getItem("parent:token");
+    if (!token) {
+      dispatch(setShowError(true));
+      dispatch(setErrorMsg("Authentication failed"));
+      return rejectWithValue("Authentication failed");
+    }
+
     try {
-      const token = localStorage.getItem("parent:token");
-      if (!token) {
-        // toast.error("Authentication token not found");
-        return rejectWithValue("Authentication token not found");
-      }
-
       const response = await axios.get(
-        `${baseUrl}/api/studentDashboard/myAttendance?studentId=${studentId}&month=${month}&year=${year}`,
-        {
-          headers: { Authentication: token },
-        }
+        `${baseUrl}/api/studentDashboard/myAttendance?studentId=${studentId}&month=${month}&year=${year}&say=${say}`,
+        { headers: { Authentication: token } }
       );
-
       return response.data.report.report;
     } catch (error) {
-      const errorMessage =
-        error.response?.data?.msg || error.message || "Failed to fetch attendance";
-      // toast.error(errorMessage);
-      return rejectWithValue(errorMessage);
+      const errorMessage = error.response?.data?.msg || error.message || "Failed to fetch attendance";
+     const err = ErrorMsg(error);
+      dispatch(setShowError(true));
+      dispatch(setErrorMsg(err?.message));
+      return rejectWithValue(err?.message)
     }
   }
 );
-
-
-
-
 
 // Thunk to fetch teachers
 export const fetchTeachers = createAsyncThunk(
   "children/fetchTeachers",
-  async (studentId, { rejectWithValue }) => {
+  async (studentId, { rejectWithValue, dispatch }) => {
     const token = localStorage.getItem("parent:token");
     const userData = JSON.parse(localStorage.getItem("userData"));
 
     if (!userData || !userData.email) {
-      // toast.error("No guardian email found");
+      dispatch(setShowError(true));
+      dispatch(setErrorMsg("No guardian email found"));
       return rejectWithValue("No guardian email found");
     }
 
     if (!token) {
-      // toast.error("No token found");
-      return rejectWithValue("No token found");
+      dispatch(setShowError(true));
+      dispatch(setErrorMsg("Authentication failed"));
+      return rejectWithValue("Authentication failed");
     }
 
     try {
-      const response = await axios.get(`${baseUrl}/parent/api/instructors/${studentId}`, {
-        headers: {
-          Authentication: `${token}`,
-        },
-      });
-
-      if (!response.data || response.data.instructors.length === 0) {
-        return [];  // No instructors found
-      }
-
-      return response.data.instructors;
-    } catch (error) {
-
-
-      const errorMessage = error.response?.data?.message || error.message || "Failed to fetch instructors";
-      // // toast.error(errorMessage);
-
-
-      return rejectWithValue(errorMessage);
-    }
-  }
-);
-
-
-
-
-
-
-
-
-// Thunk to fetch grades for a specific student and subject
-export const fetchGrades = createAsyncThunk(
-  'children/fetchGrades',
-  async ({ studentId }, { rejectWithValue }) => {
-    const token = localStorage.getItem('parent:token');
-    if (!token) {
-      // toast.error("Authentication token not found");
-      return rejectWithValue("Authentication token not found");
-    }
-
-    try {
-      const response = await axios.get(`${baseUrl}/api/studentDashboard/subjects/${studentId}`, {
+      const response = await axios.get(`${baseUrl}/parent/api/instructors/${studentId}?say=${say}`, {
         headers: { Authentication: token },
       });
-      
-      return response.data.grades;  // Assuming the response has a grades field
+
+      return response.data.instructors || [];
     } catch (error) {
-      const errorMessage = error.response?.data?.message || error.message ||'Error fetching grades';
-      // toast.error(errorMessage);
-      return rejectWithValue(errorMessage);
+      const errorMessage = error.response?.data?.message || error.message || "Failed to fetch instructors";
+     const err = ErrorMsg(error);
+      dispatch(setShowError(true));
+      dispatch(setErrorMsg(err?.message));
+      return rejectWithValue(err?.message)
     }
   }
 );
 
+// Thunk to fetch grades
+export const fetchGrades = createAsyncThunk(
+  'children/fetchGrades',
+  async ({ studentId }, { rejectWithValue, dispatch }) => {
+    const token = localStorage.getItem('parent:token');
+    if (!token) {
+      dispatch(setShowError(true));
+      dispatch(setErrorMsg("Authentication failed"));
+      return rejectWithValue("Authentication failed");
+    }
 
+    try {
+      const response = await axios.get(`${baseUrl}/api/studentDashboard/subjects/${studentId}?say=${say}`, {
+        headers: { Authentication: token },
+      });
+      return response.data.grades;
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || error.message || "Error fetching grades";
+     const err = ErrorMsg(error);
+      dispatch(setShowError(true));
+      dispatch(setErrorMsg(err?.message));
+      return rejectWithValue(err?.message)
+    }
+  }
+);
 
-
-// Fetch modules for a specific subject
+// Thunk to fetch modules
 export const fetchModules = createAsyncThunk(
   "children/fetchModules",
-  async ({ studentId, subjectId, presentClassId }, { rejectWithValue }) => {
-    try {
-      const token = localStorage.getItem("parent:token");
-      if (!token) {
-        // toast.error("Authentication token not found");
-        return rejectWithValue("Authentication token not found");
-      }
+  async ({ studentId, subjectId, presentClassId }, { rejectWithValue, dispatch }) => {
+    const token = localStorage.getItem("parent:token");
+    if (!token) {
+      dispatch(setShowError(true));
+      dispatch(setErrorMsg("Authentication failed"));
+      return rejectWithValue("Authentication failed");
+    }
 
+    try {
       const response = await axios.get(
-        `${baseUrl}/admin/parent/classes/${presentClassId}/modules/${subjectId}/studentId/${studentId}`,
-        {
-          headers: { Authentication: token },
-        }
+        `${baseUrl}/admin/parent/classes/${presentClassId}/modules/${subjectId}/studentId/${studentId}?say=${say}`,
+        { headers: { Authentication: token } }
       );
       return response.data.data.modules;
     } catch (error) {
-      const errorMessage =
-        error.response?.data?.message || error.message || "Failed to fetch modules";
-      // toast.error(errorMessage);
-      return rejectWithValue(errorMessage);
+      const errorMessage = error.response?.data?.message || error.message || "Failed to fetch modules";
+     const err = ErrorMsg(error);
+      dispatch(setShowError(true));
+      dispatch(setErrorMsg(err?.message));
+      return rejectWithValue(err?.message)
     }
   }
 );
 
-// Fetch subjects for a student
+// Thunk to fetch subjects
 export const fetchSubjects = createAsyncThunk(
   "children/fetchSubjects",
-  async (studentId, { rejectWithValue }) => {
-    try {
-      const token = localStorage.getItem("parent:token");
-      if (!token) {
-        // toast.error("Authentication token not found");
-        return rejectWithValue("Authentication token not found");
-      }
+  async (studentId, { rejectWithValue, dispatch }) => {
+    const token = localStorage.getItem("parent:token");
+    if (!token) {
+      dispatch(setShowError(true));
+      dispatch(setErrorMsg("Authentication failed"));
+      return rejectWithValue("Authenticationfailed");
+    }
 
+    try {
       const response = await axios.get(
-        `${baseUrl}/admin/course/subjects/student/${studentId}`,
-        {
-          headers: { Authentication: token },
-        }
+        `${baseUrl}/admin/course/subjects/student/${studentId}?say=${say}`,
+        { headers: { Authentication: token } }
       );
       return response.data.subjects;
     } catch (error) {
-      const errorMessage =
-        error.response?.data?.message || error.message || "No Subject Found ";
-      // toast.error(errorMessage);
-      return rejectWithValue(errorMessage);
+      const errorMessage = error.response?.data?.message || error.message || "No Subject Found";
+     const err = ErrorMsg(error);
+      dispatch(setShowError(true));
+      dispatch(setErrorMsg(err?.message));
+      return rejectWithValue(err?.message)
     }
   }
 );

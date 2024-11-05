@@ -1,25 +1,43 @@
-// src/Store/Slices/Event/eventThunks.js
-
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { baseUrl } from "../../../../../config/Common";
 import toast from "react-hot-toast";
+import { ErrorMsg } from "../../../Common/Alerts/errorhandling.action";
+import { setShowError, setErrorMsg } from "../../../Common/Alerts/alertsSlice";
+
+const say = localStorage.getItem("say");
+
+// Helper function to get the token from Redux state
+const getToken = (state, rejectWithValue, dispatch) => {
+  const token = state.common.auth?.token;
+  if (!token) {
+    dispatch(setShowError(true));
+    dispatch(setErrorMsg("Authentication Failed"));
+    return rejectWithValue("Authentication Failed");
+  }
+  return `Bearer ${token}`;
+};
+
+// Centralized error handling
+const handleError = (error, dispatch, rejectWithValue) => {
+  const err = ErrorMsg(error);
+  dispatch(setShowError(true));
+  dispatch(setErrorMsg(err.message));
+  return rejectWithValue(err.message);
+};
 
 // Fetch events
 export const fetchEventsThunk = createAsyncThunk(
   "events/fetchEvents",
-  async (_, { getState, rejectWithValue }) => {
+  async (_, { getState, rejectWithValue, dispatch }) => {
     try {
-      const { common } = getState(); // Get state
-      const token = common.auth.token; // Extract token
-      const response = await axios.get(`${baseUrl}/admin/all/events`, {
-        headers: { Authentication: `Bearer ${token}` },
+      const token = getToken(getState(), rejectWithValue, dispatch);
+      const response = await axios.get(`${baseUrl}/admin/all/events?say=${say}`, {
+        headers: { Authentication: token },
       });
       return response.data.events;
     } catch (error) {
-      return rejectWithValue(
-        error.response?.data?.msg || "Failed to fetch events"
-      );
+      return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
@@ -28,11 +46,8 @@ export const fetchEventsThunk = createAsyncThunk(
 export const createEventThunk = createAsyncThunk(
   "events/createEvent",
   async (eventData, { getState, rejectWithValue, dispatch }) => {
-    console.log(eventData);
-    
     try {
-      const { common } = getState(); // Get state
-      const token = common.auth.token; // Extract token
+      const token = getToken(getState(), rejectWithValue, dispatch);
 
       const formData = new FormData();
       Object.keys(eventData).forEach((key) => {
@@ -40,23 +55,21 @@ export const createEventThunk = createAsyncThunk(
       });
 
       const response = await axios.post(
-        `${baseUrl}/admin/create_event`,
+        `${baseUrl}/admin/create_event?say=${say}`,
         formData,
         {
           headers: {
-            Authentication: `Bearer ${token}`,
+            Authentication: token,
             "Content-Type": "multipart/form-data",
           },
         }
       );
+
       dispatch(fetchEventsThunk());
       toast.success("Event created successfully!");
       return response.data;
     } catch (error) {
-      console.log(error);
-      return rejectWithValue(
-        error.response?.data?.msg || "Failed to create event"
-      );
+      return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
@@ -66,8 +79,7 @@ export const updateEventThunk = createAsyncThunk(
   "events/updateEvent",
   async ({ eventId, eventData }, { getState, rejectWithValue, dispatch }) => {
     try {
-      const { common } = getState(); // Get state
-      const token = common.auth.token; // Extract token
+      const token = getToken(getState(), rejectWithValue, dispatch);
 
       const formData = new FormData();
       Object.keys(eventData).forEach((key) => {
@@ -75,21 +87,20 @@ export const updateEventThunk = createAsyncThunk(
       });
 
       const response = await axios.put(
-        `${baseUrl}/admin/update/event/${eventId}`,
+        `${baseUrl}/admin/update/event/${eventId}?say=${say}`,
         formData,
         {
           headers: {
-            Authentication: `Bearer ${token}`,
+            Authentication: token,
             "Content-Type": "multipart/form-data",
           },
         }
       );
+
       dispatch(fetchEventsThunk());
       return response.data;
     } catch (error) {
-      return rejectWithValue(
-        error.response?.data?.msg || "Failed to update event"
-      );
+      return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
@@ -99,18 +110,17 @@ export const deleteEventThunk = createAsyncThunk(
   "events/deleteEvent",
   async (eventId, { getState, rejectWithValue, dispatch }) => {
     try {
-      const { common } = getState(); // Get state
-      const token = common.auth.token; // Extract token
+      const token = getToken(getState(), rejectWithValue, dispatch);
 
-      await axios.delete(`${baseUrl}/admin/delete/event/${eventId}`, {
-        headers: { Authentication: `Bearer ${token}` },
+      await axios.delete(`${baseUrl}/admin/delete/event/${eventId}?say=${say}`, {
+        headers: { Authentication: token },
       });
+
       dispatch(fetchEventsThunk());
+      toast.success("Event deleted successfully!");
       return eventId;
     } catch (error) {
-      return rejectWithValue(
-        error.response?.data?.msg || "Failed to delete event"
-      );
+      return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
