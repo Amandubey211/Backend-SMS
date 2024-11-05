@@ -28,9 +28,10 @@ const NoticeBoard = (descriptionLength) => {
 
   // Get notices data from Redux state
   const { loading, error, notices } = useSelector((state) => state.admin.adminDashboard);
-
+const say = localStorage.getItem('say')
   useEffect(() => {
-    dispatch(fetchNotices()); // Dispatch the action to fetch notices when component mounts
+  
+    dispatch(fetchNotices());
   }, [dispatch]);
 
   if (loading) {
