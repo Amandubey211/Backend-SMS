@@ -48,7 +48,7 @@ const daysOfWeek = [
   'Sunday',
 ];
 
-const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
+const CreateTimeTablePage = ({ timetable = {}, onClose = () => { } }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -697,8 +697,8 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
     onClose();
   };
 
-  
-  
+
+
 
 
 
@@ -844,17 +844,31 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => {} }) => {
                   icon={<PlusOutlined />}
                   onClick={handleAddRow}
                   disabled={!formData.classId}
+                  style={{
+                    borderRadius: "6px",
+                    background: "linear-gradient(to right, #ec4899, #a855f7)",
+                    color: "white",
+                  }}
+                  className="hover:bg-gradient-to-r hover:from-pink-600 hover:to-purple-700"
                 >
                   Add Row
                 </Button>
+
                 <div className="flex space-x-2">
                   {deletedRowsStack.length > 0 && (
-                    <Button
-                      icon={<UndoOutlined />}
-                      onClick={handleUndoDelete}
-                    >
-                      Undo Delete
-                    </Button>
+                   <Button
+                   icon={<UndoOutlined />}
+                   onClick={handleUndoDelete}
+                   style={{
+                     borderColor: "gray",
+                     color: "gray",
+                     transition: "border-color 0.3s ease, color 0.3s ease", // Smooth transition for hover effect
+                   }}
+                   className="hover:border-gray-800 hover:text-gray-800 cursor-pointer" // Darker gray on hover
+                 >
+                   Undo Delete
+                 </Button>
+                 
                   )}
                   {selectedRowKeys.length > 0 && (
                     <Popconfirm
