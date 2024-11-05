@@ -10,8 +10,7 @@ import {
 } from "react-icons/fa";
 import Spinner from "../../../../Components/Common/Spinner";
 import PropTypes from "prop-types";
-import DeleteConfirmatiomModal from "../../../../Components/Common/DeleteConfirmationModal"; // Adjust the import path as needed
-
+import DeleteConfirmatiomModal from "../../../../Components/Common/DeleteConfirmationModal";
 const TimeTableList = React.memo(({ timetables, loading, onDelete }) => {
   const navigate = useNavigate();
 

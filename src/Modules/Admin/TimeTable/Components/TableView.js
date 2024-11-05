@@ -1,11 +1,12 @@
 // TableView.jsx
 
-import React, { useEffect, useMemo, useState, useCallback } from "react";
-import { Table, Button, Input, message, Row, Popconfirm } from "antd";
+import React, { useEffect, useMemo, useState } from "react";
+import { Table, Button, Input, message, Row } from "antd";
 import { useNavigate, useLocation } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { FaArrowLeft, FaEdit, FaTrashAlt } from "react-icons/fa";
 import { deleteTimetable } from "../../../../Store/Slices/Admin/TimeTable/timetable.action"; // Import the delete action
+import DeleteConfirmatiomModal from "../../../../Components/Common/DeleteConfirmationModal"; // Correct import path
 
 const TableView = () => {
   const navigate = useNavigate();
@@ -20,6 +21,10 @@ const TableView = () => {
   });
 
   const dispatch = useDispatch();
+
+  // State for Delete Confirmation Modal
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   useEffect(() => {
     if (!timetable) {
@@ -150,26 +155,39 @@ const TableView = () => {
     setPagination(pagination);
   };
 
+  // **Handle Delete Function**
   const handleDelete = () => {
     if (timetable) {
+      setDeleteLoading(true);
       dispatch(deleteTimetable(timetable._id))
         .then(() => {
+          setDeleteLoading(false);
           message.success(`${timetable.name} deleted successfully`);
           navigate("/noticeboard/timetable");
         })
         .catch((err) => {
+          setDeleteLoading(false);
           message.error(`Failed to delete ${timetable.name}: ${err.message}`);
         });
     }
   };
 
-  // **Updated Handle Edit Function**
+  // **Handle Edit Function**
   const handleEdit = () => {
     if (timetable && timetable._id) {
       navigate(`/noticeboard/timetable/edit/${timetable._id}`);
     } else {
       message.error("Timetable ID is missing.");
     }
+  };
+
+  // **Modal Control Functions**
+  const openDeleteModal = () => {
+    setIsDeleteModalOpen(true);
+  };
+
+  const closeDeleteModal = () => {
+    setIsDeleteModalOpen(false);
   };
 
   return (
@@ -188,19 +206,22 @@ const TableView = () => {
           allowClear
           style={{ width: 200, marginRight: 10 }}
         />
-        <Button icon={<FaEdit />} type="primary" style={{ marginRight: 5 }} onClick={handleEdit}>
+        <Button
+          icon={<FaEdit />}
+          type="primary"
+          onClick={handleEdit}
+          style={{ marginRight: 5 }}
+        >
           Edit
         </Button>
-        <Popconfirm
-          title={`Are you sure you want to delete the timetable "${timetable?.name}"?`}
-          onConfirm={handleDelete}
-          okText="Yes"
-          cancelText="No"
+        <Button
+          icon={<FaTrashAlt />}
+          type="primary"
+          danger
+          onClick={openDeleteModal}
         >
-          <Button icon={<FaTrashAlt />} type="danger">
-            Delete
-          </Button>
-        </Popconfirm>
+          Delete
+        </Button>
       </Row>
 
       <Table
@@ -213,6 +234,15 @@ const TableView = () => {
         }}
         onChange={handleTableChange}
         bordered
+      />
+
+      {/* Delete Confirmation Modal */}
+      <DeleteConfirmatiomModal
+        isOpen={isDeleteModalOpen}
+        onClose={closeDeleteModal}
+        onConfirm={handleDelete}
+        loading={deleteLoading}
+        text="Delete this timetable"
       />
     </div>
   );
