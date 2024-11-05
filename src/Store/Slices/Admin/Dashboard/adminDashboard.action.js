@@ -29,6 +29,7 @@ const handleError = (error, dispatch, rejectWithValue) => {
 export const fetchAdminDashboardData = createAsyncThunk(
   'adminDashboard/fetchAdminDashboardData',
   async (_, { rejectWithValue, getState, dispatch }) => {
+    const say = localStorage.getItem("say")
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
       const response = await axios.get(`${baseUrl}/admin/dashboard?say=${say}`, {
@@ -46,6 +47,7 @@ export const fetchAttendanceData = createAsyncThunk(
   'adminDashboard/fetchAttendanceData',
   async ({ month, year }, { rejectWithValue, getState, dispatch }) => {
     try {
+      const say = localStorage.getItem("say")
       const token = getToken(getState(), rejectWithValue, dispatch);
       const response = await axios.get(`${baseUrl}/admin/dashboard/attendance?say=${say}`, {
         headers: { Authentication: token },
@@ -63,6 +65,7 @@ export const fetchEarningsData = createAsyncThunk(
   'adminDashboard/fetchEarningsData',
   async ({ month, year, includeUnpaidExpenses }, { rejectWithValue, getState, dispatch }) => {
     try {
+      const say = localStorage.getItem("say")
       const token = getToken(getState(), rejectWithValue, dispatch);
       const response = await axios.get(`${baseUrl}/admin/dashboard/earnings?say=${say}`, {
         headers: { Authentication: token },
@@ -80,6 +83,7 @@ export const fetchNotices = createAsyncThunk(
   'adminDashboard/fetchNotices',
   async (_, { rejectWithValue, getState, dispatch }) => {
     try {
+      const say = localStorage.getItem("say")
       const token = getToken(getState(), rejectWithValue, dispatch);
       const response = await axios.get(`${baseUrl}/admin/dashboard/notices?say=${say}`, {
         headers: { Authentication: token },
@@ -96,6 +100,7 @@ export const fetchTopStudents = createAsyncThunk(
   'adminDashboard/TopStudents',
   async (classId, { rejectWithValue, getState, dispatch }) => {
     try {
+      const say = localStorage.getItem("say")
       const token = getToken(getState(), rejectWithValue, dispatch);
       const response = await axios.get(`${baseUrl}/admin/top/students/class/${classId}?say=${say}`, {
         headers: { Authentication: token },
@@ -112,6 +117,7 @@ export const fetchFilteredEvents = createAsyncThunk(
   'adminDashboard/fetchFilteredEvents',
   async ({ month, year }, { rejectWithValue, getState, dispatch }) => {
     try {
+      const say = localStorage.getItem("say")
       const token = getToken(getState(), rejectWithValue, dispatch);
       const response = await axios.get(`${baseUrl}/admin/dashboard/events?say=${say}`, {
         headers: { Authentication: token },
@@ -129,6 +135,7 @@ export const fetchFilteredIssueBooks = createAsyncThunk(
   'adminDashboard/fetchFilteredIssueBooks',
   async (_, { rejectWithValue, getState, dispatch }) => {
     try {
+      const say = localStorage.getItem("say")
       const token = getToken(getState(), rejectWithValue, dispatch);
       const response = await axios.get(`${baseUrl}/admin/all/book?say=${say}`, {
         headers: { Authentication: token },

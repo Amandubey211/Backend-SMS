@@ -29,8 +29,16 @@ import { RiDashboardFill } from "react-icons/ri";
 import Spinner from "../../../Components/Common/Spinner";
 import { useDispatch, useSelector } from "react-redux";
 import { createStaffSalary } from "../../../Store/Slices/Admin/Accounting/Expenses/expenses.action";
+import { fetchAcademicYear } from "../../../Store/Slices/Common/AcademicYear/academicYear.action";
 
 const MainSection = () => {
+  // const {academicYears} = useSelector((store)=>store.common.academicYear)
+  // useEffect(()=>{
+  //   dispatch(fetchAcademicYear()).then(()=>{
+  //     const activeAcademicYear = academicYears?.find((i)=>i.isActive == true);
+  //     localStorage.setItem("say", activeAcademicYear?._id);
+  //   });
+  // },[])
   const { dashboardData, error, fetchAdminDashboardData, loading } =
     useGetAdminDashboardData();
     const dispatch=useDispatch();
@@ -42,6 +50,7 @@ const MainSection = () => {
   useEffect(() => {
     fetchAdminDashboardData();
   }, [fetchAdminDashboardData]);
+
 
 
   useEffect(()=>{

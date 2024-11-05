@@ -82,7 +82,7 @@ export const staffLogin = createAsyncThunk(
             ])
           );
           await dispatch(fetchAcademicYear());
-          const activeAcademicYear = getState().common?.academicYear?.academicYears?.find((i)=>i.isActive == true);
+          const activeAcademicYear = await  getState().common?.academicYear?.academicYears?.find((i)=>i.isActive == true);
           localStorage.setItem("say", activeAcademicYear?._id);
          dispatch(setToken(data.token)); 
          dispatch(setRole(data.role)); 

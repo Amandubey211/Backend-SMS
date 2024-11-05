@@ -31,7 +31,7 @@ export const fetchAllClasses = createAsyncThunk(
     async (_, { getState, rejectWithValue, dispatch }) => {
         const token = getToken(getState(), rejectWithValue, dispatch);
         if (typeof token === 'object') return token;
-
+        const say = localStorage.getItem("say")
         try {
             const response = await axios.get(`${baseUrl}/admin/class?say=${say}`, {
                 headers: { Authentication: token },
@@ -49,7 +49,7 @@ export const fetchClassDetails = createAsyncThunk(
     async (classId, { getState, rejectWithValue, dispatch }) => {
         const token = getToken(getState(), rejectWithValue, dispatch);
         if (typeof token === 'object') return token;
-
+        const say = localStorage.getItem("say")
         try {
             const response = await axios.get(`${baseUrl}/admin/class/${classId}?say=${say}`, {
                 headers: { Authentication: token },
