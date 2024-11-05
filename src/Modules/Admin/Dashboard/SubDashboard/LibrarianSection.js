@@ -7,17 +7,17 @@ const LibrarianSection = () => {
   return (
     <>
       <div className="flex flex-wrap justify-between items-start border-y h-auto">
-        <div className="w-full md:w-1/2 p-4 border-r border-gray-300">
-          <Library />
+        <div className="w-full md:w-1/2 p-4 ">
+        <NoticeBoard descriptionLength={140} />
         </div>
-        <div className="w-full md:w-1/2 p-4">
+        <div className="w-full md:w-1/2 p-4 border-l border-gray-300 h-full">
           <Events />
         </div>
       </div>
 
       <div className="flex flex-wrap items-start justify-between border-y h-auto">
         <div className="w-full p-4">
-          <NoticeBoard descriptionLength={140} />
+        <Library />
         </div>
       </div>
     </>
