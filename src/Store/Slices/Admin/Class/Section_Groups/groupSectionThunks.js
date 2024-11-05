@@ -156,22 +156,22 @@ export const deleteGroup = createAsyncThunk(
 );
 
 
-// Fetch Sections by Class
-export const fetchSectionsByClass = createAsyncThunk(
-  "group/fetchSectionsByClass",
-  async (classId, { getState, rejectWithValue, dispatch }) => {
-    try {
-      const token = getToken(getState(), rejectWithValue, dispatch);
-      const response = await axios.get(
-        `${baseUrl}/admin/getSectionByclass/${classId}?say=${say}`,
-        { headers: { Authentication: token } }
-      );
-      return response.data.data;
-    } catch (error) {
-      return handleError(error, dispatch, rejectWithValue);
-    }
-  }
-);
+// // Fetch Sections by Class
+// export const fetchSectionsByClass = createAsyncThunk(
+//   "group/fetchSectionsByClass",
+//   async (classId, { getState, rejectWithValue, dispatch }) => {
+//     try {
+//       const token = getToken(getState(), rejectWithValue, dispatch);
+//       const response = await axios.get(
+//         `${baseUrl}/admin/getSectionByclass/${classId}?say=${say}`,
+//         { headers: { Authentication: token } }
+//       );
+//       return response.data.data;
+//     } catch (error) {
+//       return handleError(error, dispatch, rejectWithValue);
+//     }
+//   }
+// );
 
 // Create Section
 export const createSection = createAsyncThunk(
