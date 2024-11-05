@@ -7,6 +7,7 @@ import { fetchNotices } from "../../../../Store/Slices/Admin/Dashboard/adminDash
 import icon1 from "../../../../Assets/DashboardAssets/Images/image1.png"; // Update with correct path
 import icon2 from "../../../../Assets/DashboardAssets/Images/image2.png"; // Update with correct path
 import { FaCalendarAlt } from "react-icons/fa"; // For "No data found" icon
+import { useTranslation } from "react-i18next";
 
 const icons = [icon1, icon2];
 
@@ -25,6 +26,8 @@ const generateRandomColor = () => {
 const NoticeBoard = (descriptionLength) => {
   const dispatch = useDispatch(); // Use useDispatch to dispatch actions
   const navigate = useNavigate(); // Use useNavigate for navigation
+
+  const { t } = useTranslation('dashboard');
 
   // Get notices data from Redux state
   const { loading, error, notices } = useSelector((state) => state.admin.adminDashboard);
@@ -50,12 +53,12 @@ const say = localStorage.getItem('say')
   return (
     <div className="p-2">
       <div className="flex justify-between p-4 items-center px-6">
-        <h2 className="text-xl font-semibold text-gray-600">Notice Board</h2>
+        <h2 className="text-xl font-semibold text-gray-600">{t("Notice Board")}</h2>
         <button
           className="text-black border border-gray-300 px-4 py-2 rounded-md hover:shadow-md transition duration-300 ease-in-out"
           onClick={() => navigate('/noticeboard/notice')}
         >
-          View All
+          {t("View All")}
         </button>
 
 
@@ -64,7 +67,7 @@ const say = localStorage.getItem('say')
       {topNotices.length === 0 ? (
         <div className="flex flex-col items-center justify-center my-10">
           <FaCalendarAlt className="text-gray-400 text-6xl mb-4" />
-          <p className="text-gray-500 text-xl">No noticeboard data found</p>
+          <p className="text-gray-500 text-xl">{t("No noticeboard data found")}</p>
         </div>
       ) : (
         topNotices.map((notice, index) => (
