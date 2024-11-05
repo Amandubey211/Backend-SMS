@@ -9,6 +9,7 @@ export const stdModule = createAsyncThunk(
     'module/stdModule',
     async ({ cid, sid }, { rejectWithValue, dispatch }) => {
         const token = localStorage.getItem("student:token");
+        const say = localStorage.getItem("say")
         if (!token) {
             dispatch(setShowError(true));
             dispatch(setErrorMsg("Authentication failed!"));

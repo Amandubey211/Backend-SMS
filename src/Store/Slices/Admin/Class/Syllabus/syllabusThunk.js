@@ -32,6 +32,7 @@ export const fetchSyllabus = createAsyncThunk(
   async ({ subjectId, classId }, { getState, rejectWithValue, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const response = await axios.get(
         `${baseUrl}/admin/syllabus/${subjectId}/class/${classId}?say=${say}`,
         {
@@ -51,6 +52,7 @@ export const deleteSyllabus = createAsyncThunk(
   async (syllabusId, { getState, rejectWithValue, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const response = await axios.delete(
         `${baseUrl}/admin/syllabus/${syllabusId}?say=${say}`,
         {
@@ -71,6 +73,7 @@ export const createSyllabus = createAsyncThunk(
   async ({ title, content, subjectId }, { getState, rejectWithValue, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const response = await axios.post(
         `${baseUrl}/admin/syllabus?say=${say}`,
         { title, content, subjectId },
@@ -92,6 +95,7 @@ export const editSyllabus = createAsyncThunk(
   async ({ syllabusId, data, cid }, { getState, rejectWithValue, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const formData = new FormData();
 
       for (const key in data) {

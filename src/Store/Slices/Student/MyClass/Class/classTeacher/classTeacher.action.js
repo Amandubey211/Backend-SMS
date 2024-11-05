@@ -10,6 +10,7 @@ export const stdClassTeacher = createAsyncThunk(
     'classTeacher/stdClassTeacher',
     async ({ classId }, { rejectWithValue, dispatch }) => {
         const token = localStorage.getItem("student:token");
+        const say = localStorage.getItem("say")
         if (!token) {
             dispatch(setShowError(true));
             dispatch(setErrorMsg("Authentication failed!"));

@@ -90,6 +90,7 @@ export const updateRubricThunk = (rubricId, rubricData) => async (dispatch, getS
 
   try {
     const token = getToken(getState(), dispatch);
+    const say = localStorage.getItem("say")
     const response = await axios.put(
       `${baseUrl}/admin/rubric/${rubricId}?say=${say}`,
       rubricData,
@@ -120,6 +121,7 @@ export const createAssignmentRubricThunk = (rubricData) => async (dispatch, getS
 
   try {
     const token = getToken(getState(), dispatch);
+    const say = localStorage.getItem("say")
     const response = await axios.post(
       `${baseUrl}/admin/create_rubric?say=${say}`,
       rubricData,
@@ -147,7 +149,7 @@ export const createAssignmentRubricThunk = (rubricData) => async (dispatch, getS
 export const createQuizRubricThunk = (rubricData) => async (dispatch, getState) => {
   dispatch(setLoading(true));
   dispatch(setError(null));
-
+  const say = localStorage.getItem("say")
   try {
     const token = getToken(getState(), dispatch);
     const response = await axios.post(
@@ -180,6 +182,7 @@ export const fetchFilteredAssignmentsThunk = (sid) => async (dispatch, getState)
 
   try {
     const token = getToken(getState(), dispatch);
+    const say = localStorage.getItem("say")
     const response = await axios.get(`${baseUrl}/admin/assignments/${sid}?say=${say}`, {
       headers: { Authentication: token },
     });
@@ -200,13 +203,13 @@ export const fetchFilteredAssignmentsThunk = (sid) => async (dispatch, getState)
 export const fetchFilteredQuizzesThunk = (sid) => async (dispatch, getState) => {
   dispatch(setLoading(true));
   dispatch(setError(null));
-
+  const say = localStorage.getItem("say")
   try {
     const token = getToken(getState(), dispatch);
     const response = await axios.get(`${baseUrl}/admin/quizzes/${sid}?say=${say}`, {
       headers: { Authentication: token },
     });
-
+    
     if (response.data.success) {
       dispatch(setQuizzes(response.data.quizzes));
     } else {
@@ -223,13 +226,13 @@ export const fetchFilteredQuizzesThunk = (sid) => async (dispatch, getState) => 
 export const getRubricByIdThunk = (id) => async (dispatch, getState) => {
   dispatch(setRubricLoading(true));
   dispatch(setError(null));
-
+  const say = localStorage.getItem("say")
   try {
     const token = getToken(getState(), dispatch);
     const response = await axios.get(`${baseUrl}/admin/rubric/${id}?say=${say}`, {
       headers: { Authentication: token },
     });
-
+   
     if (response.data.success) {
       dispatch(setRubricToEdit(response.data.rubric));
       dispatch(setCriteria(response.data.rubric.criteria));

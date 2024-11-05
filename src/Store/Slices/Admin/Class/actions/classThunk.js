@@ -67,7 +67,7 @@ export const createClass = createAsyncThunk(
     async (classData, { getState, rejectWithValue, dispatch }) => {
         const token = getToken(getState(), rejectWithValue, dispatch);
         if (typeof token === 'object') return token;
-
+        const say = localStorage.getItem("say")
         try {
             const response = await axios.post(`${baseUrl}/admin/class?say=${say}`, classData, {
                 headers: { Authentication: token },
@@ -85,7 +85,7 @@ export const updateClass = createAsyncThunk(
     async ({ classData, classId }, { getState, rejectWithValue, dispatch }) => {
         const token = getToken(getState(), rejectWithValue, dispatch);
         if (typeof token === 'object') return token;
-
+        const say = localStorage.getItem("say")
         try {
             const response = await axios.put(`${baseUrl}/admin/update_class/${classId}?say=${say}`, classData, {
                 headers: { Authentication: token },
@@ -103,7 +103,7 @@ export const deleteClass = createAsyncThunk(
     async (classId, { getState, rejectWithValue, dispatch }) => {
         const token = getToken(getState(), rejectWithValue, dispatch);
         if (typeof token === 'object') return token;
-
+        const say = localStorage.getItem("say")
         try {
             await axios.delete(`${baseUrl}/admin/delete_class/${classId}?say=${say}`, {
                 headers: { Authentication: token },

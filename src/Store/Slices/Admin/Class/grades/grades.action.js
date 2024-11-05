@@ -32,6 +32,7 @@ export const fetchSubjectGrades = createAsyncThunk(
   async ({ classId, subjectId, filters }, { rejectWithValue, getState, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const response = await axios.get(
         `${baseUrl}/admin/grades/class/${classId}/subject/${subjectId}?say=${say}`,
         {

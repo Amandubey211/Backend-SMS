@@ -32,6 +32,7 @@ export const fetchModules = createAsyncThunk(
   async ({ cid, sid }, { rejectWithValue, getState, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const response = await axios.get(
         `${baseUrl}/admin/student/classes/${cid}/modules/${sid}?say=${say}`,
         {
@@ -54,6 +55,7 @@ export const addModule = createAsyncThunk(
   ) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const cid = getState().common.user.classInfo.selectedClassId;
       const sid = getState().common.user.subjectInfo.selectedSubjectId;
 
@@ -93,6 +95,7 @@ export const editModule = createAsyncThunk(
   ) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const cid = getState().common.user.classInfo.selectedClassId;
       const sid = getState().common.user.subjectInfo.selectedSubjectId;
 
@@ -128,6 +131,7 @@ export const deleteModule = createAsyncThunk(
   async ({ sid, moduleId }, { rejectWithValue, getState, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       await axios.delete(
         `${baseUrl}/admin/subjects/${sid}/modules/${moduleId}?say=${say}`,
         {
@@ -149,6 +153,7 @@ export const moveModule = createAsyncThunk(
   async ({ moduleId, newIndex, sid }, { rejectWithValue, getState, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const response = await axios.put(
         `${baseUrl}/admin/subjects/${sid}/modules/reorder?say=${say}`,
         { moduleId, newIndex },

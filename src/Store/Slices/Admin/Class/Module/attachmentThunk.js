@@ -35,6 +35,7 @@ export const addAttachment = createAsyncThunk(
     { chapterId, subjectId, documents, documentLabels },
     { rejectWithValue, getState, dispatch }
   ) => {
+    const say = localStorage.getItem("say")
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
       const cid = getState().common.user.classInfo.selectedClassId;
@@ -91,6 +92,7 @@ export const deleteAttachmentThunk = createAsyncThunk(
   ) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const cid = getState().common.user.classInfo.selectedClassId;
       const sid = getState().common.user.subjectInfo.selectedSubjectId;
 

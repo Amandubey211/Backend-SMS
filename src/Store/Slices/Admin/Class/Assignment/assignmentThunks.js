@@ -32,6 +32,7 @@ export const createAssignmentThunk = createAsyncThunk(
   async (assignmentData, { rejectWithValue, getState, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const response = await axios.post(
         `${baseUrl}/admin/create_assignment?say=${say}`,
         assignmentData,
@@ -62,6 +63,7 @@ export const updateAssignmentThunk = createAsyncThunk(
   ) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const response = await axios.put(
         `${baseUrl}/admin/update_assignment/${assignmentId}?say=${say}`,
         {
@@ -93,6 +95,7 @@ export const deleteAssignmentThunk = createAsyncThunk(
   async (assignmentId, { rejectWithValue, getState, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const response = await axios.delete(
         `${baseUrl}/admin/delete_assignment/${assignmentId}?say=${say}`,
         {
@@ -119,6 +122,7 @@ export const fetchAssignmentsByClassThunk = createAsyncThunk(
   async (classId, { rejectWithValue, getState, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const response = await axios.get(
         `${baseUrl}/admin/class_assignments/${classId}?say=${say}`,
         {
@@ -147,6 +151,7 @@ export const fetchFilteredAssignments = createAsyncThunk(
     { sid, moduleId, chapterId, publish },
     { getState, rejectWithValue, dispatch }
   ) => {
+    const say = localStorage.getItem("say")
     try {
       const params = {};
       const token = getToken(getState(), rejectWithValue, dispatch);
@@ -173,6 +178,7 @@ export const fetchFilteredAssignments = createAsyncThunk(
 export const fetchAssignmentByIdThunk = createAsyncThunk(
   "assignment/fetchAssignmentById",
   async (assignmentId, { rejectWithValue, getState, dispatch }) => {
+    const say = localStorage.getItem("say")
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
       const response = await axios.get(

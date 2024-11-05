@@ -34,6 +34,7 @@ export const fetchGraduates = createAsyncThunk(
   ) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const response = await axios.get(`${baseUrl}/admin/graduates/students?say=${say}`, {
         headers: { Authentication: token },
         params: { batchStart, batchEnd, email, Q_Id, admissionNumber, page, limit },
@@ -57,6 +58,8 @@ export const demoteStudents = createAsyncThunk(
   async ({ studentIds }, { rejectWithValue, getState, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
+      
       const response = await axios.put(
         `${baseUrl}/admin/demote/students?say=${say}`,
         { studentIds },

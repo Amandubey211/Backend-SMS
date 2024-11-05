@@ -31,6 +31,7 @@ export const fetchAllPages = createAsyncThunk(
   async ({ cid }, { rejectWithValue, getState, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const response = await axios.get(
         `${baseUrl}/admin/api/pages/class/pages/${cid}?say=${say}`,
         {
@@ -55,6 +56,7 @@ export const fetchPageById = createAsyncThunk(
   async ({ pid }, { rejectWithValue, getState, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const response = await axios.get(
         `${baseUrl}/admin/api/pages/${pid}?say=${say}`,
         {
@@ -79,6 +81,7 @@ export const createPage = createAsyncThunk(
   async ({ pageData, cid }, { rejectWithValue, getState, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const response = await axios.post(
         `${baseUrl}/admin/api/pages/class/${cid}?say=${say}`,
         pageData,
@@ -107,6 +110,7 @@ export const updatePage = createAsyncThunk(
   async ({ pageId, pageData }, { rejectWithValue, getState, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const response = await axios.put(
         `${baseUrl}/admin/api/pages/${pageId}?say=${say}`,
         pageData,
@@ -135,6 +139,7 @@ export const deletePage = createAsyncThunk(
   async ({ pid }, { rejectWithValue, getState, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const response = await axios.delete(
         `${baseUrl}/admin/api/pages/${pid}?say=${say}`,
         {

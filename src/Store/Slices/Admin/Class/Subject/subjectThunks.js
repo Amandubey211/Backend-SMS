@@ -34,6 +34,7 @@ export const fetchSubjects = createAsyncThunk(
   async (classId, { rejectWithValue, getState, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const response = await axios.get(`${baseUrl}/admin/subject/${classId}?say=${say}`, {
         headers: { Authentication: token },
       });
@@ -52,6 +53,7 @@ export const createSubject = createAsyncThunk(
   async (subjectData, { rejectWithValue, getState, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const response = await axios.post(
         `${baseUrl}/admin/subject?say=${say}`,
         subjectData,
@@ -74,6 +76,7 @@ export const updateSubject = createAsyncThunk(
   async ({ subjectId, subjectData }, { rejectWithValue, getState, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const response = await axios.put(
         `${baseUrl}/admin/subject/${subjectId}?say=${say}`,
         subjectData,
@@ -96,6 +99,7 @@ export const deleteSubject = createAsyncThunk(
   async ({ subjectId, classId }, { rejectWithValue, getState, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       await axios.delete(`${baseUrl}/admin/subject/${subjectId}?say=${say}`, {
         headers: { Authentication: token },
       });

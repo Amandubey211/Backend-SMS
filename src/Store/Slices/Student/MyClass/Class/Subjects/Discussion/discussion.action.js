@@ -10,7 +10,7 @@ export const fetchStudentDiscussion = createAsyncThunk(
     'discussion/fetchStudentDiscussion',
     async (cid, { rejectWithValue, dispatch }) => {
         const token = localStorage.getItem("student:token");
-
+        const say = localStorage.getItem("say")
         if (!token) {
             dispatch(setShowError(true));
             dispatch(setErrorMsg("Authentication failed!"));
@@ -43,6 +43,7 @@ export const updateStudentPinStatus = createAsyncThunk(
     'discussion/updateStudentPinStatus',
     async ({ discussionId, isPinned }, { rejectWithValue ,dispatch}) => {
         const token = localStorage.getItem("student:token");
+        const say = localStorage.getItem("say")
         if (!token) {
             dispatch(setShowError(true));
             dispatch(setErrorMsg("Authentication failed!"));
@@ -72,6 +73,7 @@ export const markAsReadStudentDiscussion = createAsyncThunk(
     'discussion/markAsReadStudentDiscussion',
     async (discussionId, { rejectWithValue,dispatch }) => {
         const token = localStorage.getItem("student:token");
+        const say = localStorage.getItem("say")
         if (!token) {
             dispatch(setShowError(true));
             dispatch(setErrorMsg("Authentication failed!"));
@@ -103,7 +105,7 @@ export const fetchStudentDiscussionById = createAsyncThunk(
     'discussion/fetchStudentDiscussionById',
     async (did, { rejectWithValue,dispatch }) => {
         const token = localStorage.getItem("student:token");
-
+        const say = localStorage.getItem("say")
         if (!token) {
             dispatch(setShowError(true));
             dispatch(setErrorMsg("Authentication failed!"));
@@ -134,7 +136,7 @@ export const fetchStudentCommentsByDiscussion = createAsyncThunk(
     'discussion/fetchStudentCommentsByDiscussion',
     async ({ discussionId }, { rejectWithValue,dispatch }) => {
         const token = localStorage.getItem("student:token");
-
+        const say = localStorage.getItem("say")
         if (!token) {
             dispatch(setShowError(true));
             dispatch(setErrorMsg("Authentication failed!"));
@@ -165,7 +167,7 @@ export const createStudentDiscussionComment = createAsyncThunk(
     'discussion/createStudentDiscussionComment',
     async ({ discussionId, comment }, { rejectWithValue,dispatch }) => {
         const token = localStorage.getItem("student:token");
-
+        const say = localStorage.getItem("say")
         if (!token) {
             dispatch(setShowError(true));
             dispatch(setErrorMsg("Authentication failed!"));
@@ -196,7 +198,7 @@ export const createStudentDiscussionReply = createAsyncThunk(
     'discussion/createStudentDiscussionReply',
     async ({ discussionId, replyId, text }, { rejectWithValue,dispatch }) => {
         const token = localStorage.getItem("student:token");
-
+        const say = localStorage.getItem("say")
         if (!token) {
             dispatch(setShowError(true));
             dispatch(setErrorMsg("Authentication failed!"));
@@ -228,7 +230,7 @@ export const deleteStudentDiscussionComment = createAsyncThunk(
     'discussion/deleteStudentDiscussionComment',
     async ({ commentId }, { rejectWithValue,dispatch }) => {
         const token = localStorage.getItem("student:token");
-
+        const say = localStorage.getItem("say")
         if (!token) {
             dispatch(setShowError(true));
             dispatch(setErrorMsg("Authentication failed!"));
@@ -259,7 +261,7 @@ export const deleteStudentDiscussionReply = createAsyncThunk(
     'discussion/deleteStudentDiscussionReply',
     async (replyId, { rejectWithValue,dispatch }) => {
         const token = localStorage.getItem("student:token");
-
+        const say = localStorage.getItem("say")
         if (!token) {
             dispatch(setShowError(true));
             dispatch(setErrorMsg("Authentication failed!"));
@@ -290,7 +292,7 @@ export const editStudentDiscussionComment = createAsyncThunk(
     'discussion/editStudentDiscussionComment',
     async ({ commentId, newText }, { rejectWithValue,dispatch }) => {
         const token = localStorage.getItem("student:token");
-
+        const say = localStorage.getItem("say")
         if (!token) {
             dispatch(setShowError(true));
             dispatch(setErrorMsg("Authentication failed!"));
@@ -321,7 +323,7 @@ export const editStudentDiscussionReply = createAsyncThunk(
     'discussion/editStudentDiscussionReply',
     async ({ replyId, newText }, { rejectWithValue,dispatch }) => {
         const token = localStorage.getItem("student:token");
-
+        const say = localStorage.getItem("say")
         if (!token) {
             dispatch(setShowError(true));
             dispatch(setErrorMsg("Authentication failed!"));
@@ -352,6 +354,7 @@ export const toggleLikeStudentDiscussion = createAsyncThunk(
     'discussion/toggleLikeStudentDiscussion',
     async ({ id }, { rejectWithValue,dispatch }) => {
         const token = localStorage.getItem("student:token");
+        const say = localStorage.getItem("say")
         if (!token) {
             dispatch(setShowError(true));
             dispatch(setErrorMsg("Authentication failed!"));

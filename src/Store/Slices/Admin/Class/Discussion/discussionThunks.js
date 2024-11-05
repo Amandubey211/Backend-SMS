@@ -31,6 +31,7 @@ export const fetchClassDiscussions = createAsyncThunk(
   async ({ cid }, { getState, rejectWithValue, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const response = await axios.get(
         `${baseUrl}/admin/getDiscussion/class/${cid}?say=${say}`,
         { headers: { Authentication: token } }
@@ -47,6 +48,7 @@ export const fetchDiscussionById = createAsyncThunk(
   async ({ did }, { getState, rejectWithValue, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const response = await axios.get(
         `${baseUrl}/admin/getDiscussionById/${did}?say=${say}`,
         { headers: { Authentication: token } }
@@ -63,6 +65,7 @@ export const createDiscussion = createAsyncThunk(
   async ({ discussionData, cid }, { getState, rejectWithValue, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const formData = new FormData();
       Object.keys(discussionData).forEach((key) => {
         formData.append(key, discussionData[key]);
@@ -89,6 +92,7 @@ export const updateDiscussion = createAsyncThunk(
   async ({ discussionId, discussionData }, { getState, rejectWithValue, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const formData = new FormData();
       Object.keys(discussionData).forEach((key) => {
         formData.append(key, discussionData[key]);
@@ -115,6 +119,7 @@ export const deleteDiscussion = createAsyncThunk(
   async ({ discussionId }, { getState, rejectWithValue, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const response = await axios.delete(
         `${baseUrl}/admin/deleteDiscussion/${discussionId}?say=${say}`,
         { headers: { Authentication: token } }
@@ -131,6 +136,7 @@ export const markAsReadDiscussion = createAsyncThunk(
   async ({ discussionId }, { getState, rejectWithValue, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const response = await axios.put(
         `${baseUrl}/admin/discussion/readstatus/${discussionId}?say=${say}`,
         {},
@@ -148,6 +154,7 @@ export const updatePinStatus = createAsyncThunk(
   async ({ discussionId, isPinned }, { getState, rejectWithValue, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const response = await axios.put(
         `${baseUrl}/admin/discussion/pinstatus/${discussionId}?say=${say}`,
         { isPinned },

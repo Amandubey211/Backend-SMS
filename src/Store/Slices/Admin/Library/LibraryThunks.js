@@ -33,6 +33,7 @@ export const fetchBooksThunk = createAsyncThunk(
   async (_, { rejectWithValue, getState, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const response = await axios.get(`${baseUrl}/admin/all/book?say=${say}`, {
         headers: { Authentication: token },
       });
@@ -49,6 +50,7 @@ export const addBookThunk = createAsyncThunk(
   async (bookData, { rejectWithValue, getState, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const response = await axios.post(`${baseUrl}/admin/add_book?say=${say}`, bookData, {
         headers: { Authentication: token },
       });
@@ -68,6 +70,7 @@ export const deleteBookThunk = createAsyncThunk(
   async (bookId, { rejectWithValue, getState, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       await axios.delete(`${baseUrl}/admin/delete/book/${bookId}?say=${say}`, {
         headers: { Authentication: token },
       });
@@ -85,6 +88,7 @@ export const updateBookThunk = createAsyncThunk(
   async ({ bookId, formData }, { rejectWithValue, getState, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const response = await axios.put(
         `${baseUrl}/admin/update/book/${bookId}?say=${say}`,
         formData,
@@ -107,6 +111,7 @@ export const fetchBookIssuesThunk = createAsyncThunk(
   async (_, { rejectWithValue, getState, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const response = await axios.get(`${baseUrl}/admin/all/bookIssue?say=${say}`, {
         headers: { Authentication: token },
       });
@@ -123,6 +128,7 @@ export const issueBookThunk = createAsyncThunk(
   async (issueData, { rejectWithValue, getState, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const { id, ...bookIssueData } = issueData;
       const url = id
         ? `${baseUrl}/admin/update/bookIssue/${id}?say=${say}`

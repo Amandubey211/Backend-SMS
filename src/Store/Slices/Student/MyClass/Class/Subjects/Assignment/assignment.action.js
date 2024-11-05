@@ -14,7 +14,7 @@ export const stdGetAssignment = createAsyncThunk(
       dispatch(setErrorMsg("Authentication failed!"));
       return rejectWithValue("Authentication failed!");
     }
-
+    const say = localStorage.getItem("say")
     try {
       dispatch(setShowError(false));
       const res = await axios.get(
@@ -42,6 +42,7 @@ export const stdDoAssignment = createAsyncThunk(
     { rejectWithValue, dispatch }
   ) => {
     const token = localStorage.getItem("student:token");
+    const say = localStorage.getItem("say")
     if (!token) {
       dispatch(setShowError(true));
             dispatch(setErrorMsg("Authentication failed!"));
@@ -82,6 +83,7 @@ export const stdReattemptAssignment = createAsyncThunk(
     { rejectWithValue, dispatch }
   ) => {
     const token = localStorage.getItem("student:token");
+    const say = localStorage.getItem("say")
     if (!token) {
       dispatch(setShowError(true));
             dispatch(setErrorMsg("Authentication failed!"));
@@ -121,6 +123,7 @@ export const stdGetFilteredAssignment = createAsyncThunk(
     { rejectWithValue, dispatch }
   ) => {
     const token = localStorage.getItem("student:token");
+    const say = localStorage.getItem("say")
     if (!token) {
       dispatch(setShowError(true));
       dispatch(setErrorMsg("Authentication failed!"));

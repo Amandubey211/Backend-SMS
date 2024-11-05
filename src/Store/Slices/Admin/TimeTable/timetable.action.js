@@ -36,7 +36,7 @@ export const createTimetable = createAsyncThunk(
   async (data, { rejectWithValue, getState }) => {
     const { role } = getState().common.auth;
     const token = localStorage.getItem(`${role}:token`);
-
+    const say = localStorage.getItem("say")
     if (!token) {
       return rejectWithValue("Authentication failed!");
     }
@@ -59,7 +59,7 @@ export const updateTimetable = createAsyncThunk(
   async ({ id, data }, { rejectWithValue, getState }) => {
     const { role } = getState().common.auth;
     const token = localStorage.getItem(`${role}:token`);
-
+    const say = localStorage.getItem("say")
     if (!token) {
       return rejectWithValue("Authentication failed!");
     }
@@ -82,7 +82,7 @@ export const deleteTimetable = createAsyncThunk(
   async (id, { rejectWithValue, getState }) => {
     const { role } = getState().common.auth;
     const token = localStorage.getItem(`${role}:token`);
-
+    const say = localStorage.getItem("say")
     if (!token) {
       return rejectWithValue("Authentication failed!");
     }

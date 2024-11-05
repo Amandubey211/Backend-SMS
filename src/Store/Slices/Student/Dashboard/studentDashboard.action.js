@@ -12,6 +12,7 @@ export const fetchDashboardDetails = createAsyncThunk(
   'studentDashboard/fetchDashboardDetails',
   async (_, { rejectWithValue, dispatch }) => {
     const token = localStorage.getItem('student:token');
+    const say = localStorage.getItem("say")
     if (!token) {
       dispatch(setShowError(true));
       dispatch(setErrorMsg('Authentication failed!'));
@@ -47,6 +48,7 @@ export const fetchSubjects = createAsyncThunk(
   'studentDashboard/fetchSubjects',
   async (_, { rejectWithValue, dispatch }) => {
     const token = localStorage.getItem('student:token');
+    const say = localStorage.getItem("say")
     if (!token) {
       dispatch(setShowError(true));
       dispatch(setErrorMsg('Authentication failed!'));
@@ -89,7 +91,7 @@ export const fetchTasks = createAsyncThunk(
       dispatch(setErrorMsg('Authentication failed!'));
       return rejectWithValue('Authentication failed!');
     }
-
+    const say = localStorage.getItem("say")
     try {
       const response = await axios.get(`${baseUrl}/admin/task/student/${studentId}?say=${say}`, {
         headers: { Authentication: token },
@@ -116,7 +118,7 @@ export const fetchStudentGrades = createAsyncThunk(
     const persistUserObject = JSON.parse(persistUserString);
     const userDetails = JSON.parse(persistUserObject.userDetails);
     const studentId = userDetails.userId;
-
+    const say = localStorage.getItem("say")
     if (!studentId || !classId) {
       dispatch(setShowError(true));
       dispatch(setErrorMsg('Invalid student or class ID.'));

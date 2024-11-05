@@ -32,6 +32,7 @@ export const fetchEventsThunk = createAsyncThunk(
   async (_, { getState, rejectWithValue, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const response = await axios.get(`${baseUrl}/admin/all/events?say=${say}`, {
         headers: { Authentication: token },
       });
@@ -48,7 +49,7 @@ export const createEventThunk = createAsyncThunk(
   async (eventData, { getState, rejectWithValue, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
-
+      const say = localStorage.getItem("say")
       const formData = new FormData();
       Object.keys(eventData).forEach((key) => {
         if (eventData[key]) formData.append(key, eventData[key]);
@@ -80,7 +81,7 @@ export const updateEventThunk = createAsyncThunk(
   async ({ eventId, eventData }, { getState, rejectWithValue, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
-
+      const say = localStorage.getItem("say")
       const formData = new FormData();
       Object.keys(eventData).forEach((key) => {
         if (eventData[key]) formData.append(key, eventData[key]);
@@ -111,7 +112,7 @@ export const deleteEventThunk = createAsyncThunk(
   async (eventId, { getState, rejectWithValue, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
-
+      const say = localStorage.getItem("say")
       await axios.delete(`${baseUrl}/admin/delete/event/${eventId}?say=${say}`, {
         headers: { Authentication: token },
       });

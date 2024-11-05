@@ -8,7 +8,7 @@ export const fetchStudentAnnounce = createAsyncThunk(
     'announce/fetchStudentAnnounce',
     async (cid, { rejectWithValue, dispatch }) => {
         const token = localStorage.getItem("student:token");
-
+        const say = localStorage.getItem("say")
         if (!token) {
             dispatch(setShowError(true));
             dispatch(setErrorMsg("Authentication failed!"));
@@ -42,7 +42,7 @@ export const fetchStudentAnnounceById = createAsyncThunk(
     'announce/fetchStudentAnnounceById',
     async (aid, { rejectWithValue,dispatch }) => {
         const token = localStorage.getItem("student:token");
-
+        const say = localStorage.getItem("say")
         if (!token) {
             dispatch(setShowError(true));
             dispatch(setErrorMsg("Authentication failed!"));
@@ -75,7 +75,7 @@ export const markAsReadStudentAnnounce = createAsyncThunk(
     'announce/markAsReadStudentAnnounce',
     async (id, { rejectWithValue,dispatch }) => {
         const token = localStorage.getItem("student:token");
-
+        const say = localStorage.getItem("say")
         if (!token) {
             dispatch(setShowError(true));
             dispatch(setErrorMsg("Authentication failed!"));
@@ -107,7 +107,7 @@ export const fetchStudentAnnounceComments = createAsyncThunk(
     'announce/fetchStudentAnnounceComments',
     async ({ aid }, { rejectWithValue,dispatch }) => {
         const token = localStorage.getItem("student:token");
-
+        const say = localStorage.getItem("say")
         if (!token) {
             dispatch(setShowError(true));
             dispatch(setErrorMsg("Authentication failed!"));
@@ -138,7 +138,7 @@ export const createStudentAnnounceComment = createAsyncThunk(
     'announce/createStudentAnnounceComment',
     async ({ aid, text }, { rejectWithValue,dispatch }) => {
         const token = localStorage.getItem("student:token");
-
+        const say = localStorage.getItem("say")
         if (!token) {
             dispatch(setShowError(true));
             dispatch(setErrorMsg("Authentication failed!"));
@@ -169,7 +169,7 @@ export const createStudentAnnounceReply = createAsyncThunk(
     'announce/createStudentAnnounceReply',
     async ({ aid, replyId, text }, { rejectWithValue,dispatch }) => {
         const token = localStorage.getItem("student:token");
-
+        const say = localStorage.getItem("say")
         if (!token) {
             dispatch(setShowError(true));
             dispatch(setErrorMsg("Authentication failed!"));
@@ -200,7 +200,7 @@ export const deleteStudentAnnounceComment = createAsyncThunk(
     'announce/deleteStudentAnnounceComment',
     async ({ commentId }, { rejectWithValue,dispatch }) => {
         const token = localStorage.getItem("student:token");
-
+        const say = localStorage.getItem("say")
         if (!token) {
             dispatch(setShowError(true));
             dispatch(setErrorMsg("Authentication failed!"));
@@ -231,7 +231,7 @@ export const deleteStudentAnnounceReply = createAsyncThunk(
     'announce/deleteStudentAnnounceComment',
     async ({ replyId }, { rejectWithValue,dispatch }) => {
         const token = localStorage.getItem("student:token");
-
+        const say = localStorage.getItem("say")
         if (!token) {
             dispatch(setShowError(true));
             dispatch(setErrorMsg("Authentication failed!"));
@@ -262,7 +262,7 @@ export const editStudentAnnounceComment = createAsyncThunk(
     'announce/editStudentAnnounceComment',
     async ({ commentId, newText }, { rejectWithValue,dispatch }) => {
         const token = localStorage.getItem("student:token");
-
+        const say = localStorage.getItem("say")
         if (!token) {
             dispatch(setShowError(true));
             dispatch(setErrorMsg("Authentication failed!"));
@@ -293,7 +293,7 @@ export const editStudentAnnounceReply = createAsyncThunk(
     'announce/editStudentAnnounceReply',
     async ({ replyId, newText }, { rejectWithValue,dispatch }) => {
         const token = localStorage.getItem("student:token");
-
+        const say = localStorage.getItem("say")
         if (!token) {
             dispatch(setShowError(true));
             dispatch(setErrorMsg("Authentication failed!"));
@@ -324,7 +324,7 @@ export const toggleStudentAnnounceLike = createAsyncThunk(
     'announce/toggleStudentAnnounceLike',
     async ({ id }, { rejectWithValue,dispatch }) => {
         const token = localStorage.getItem("student:token");
-
+        const say = localStorage.getItem("say")
         if (!token) {
             dispatch(setShowError(true));
             dispatch(setErrorMsg("Authentication failed!"));

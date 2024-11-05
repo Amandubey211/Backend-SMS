@@ -16,7 +16,7 @@ export const StudentFinanceDetails = createAsyncThunk(
       dispatch(setErrorMsg("Authentication failed!"));
       return rejectWithValue("Authentication failed!");
     }
-    
+    const say = localStorage.getItem("say")
     try {
       dispatch(setShowError(false));
 

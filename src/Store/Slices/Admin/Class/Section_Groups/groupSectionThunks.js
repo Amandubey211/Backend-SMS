@@ -35,6 +35,7 @@ export const fetchGroupsByClass = createAsyncThunk(
   async (classId, { getState, rejectWithValue, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const response = await axios.get(`${baseUrl}/admin/group/${classId}?say=${say}`, {
         headers: { Authentication: token },
       });
@@ -51,6 +52,7 @@ export const fetchGroupsByClassAndSection = createAsyncThunk(
   async ({ classId, sectionId }, { getState, rejectWithValue, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const response = await axios.get(
         `${baseUrl}/admin/group/class/${classId}/section/${sectionId}?say=${say}`,
         { headers: { Authentication: token } }
@@ -68,6 +70,7 @@ export const fetchSectionsByClass = createAsyncThunk(
   async (classId, { getState, rejectWithValue }) => {
     try {
       const token = getState().common.auth.token;
+      const say = localStorage.getItem("say")
       const response = await axios.get(
         `${baseUrl}/admin/getSectionByclass/${classId}`,
         {
@@ -89,6 +92,7 @@ export const fetchUnassignedStudents = createAsyncThunk(
   async (classId, { getState, rejectWithValue, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const response = await axios.get(
         `${baseUrl}/admin/unassignedStudent/${classId}?say=${say}`,
         { headers: { Authentication: token } }
@@ -106,6 +110,7 @@ export const createGroup = createAsyncThunk(
   async (groupData, { getState, rejectWithValue, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const response = await axios.post(`${baseUrl}/admin/group?say=${say}`, groupData, {
         headers: { Authentication: token },
       });
@@ -123,6 +128,7 @@ export const updateGroup = createAsyncThunk(
   async ({ groupId, formData }, { getState, rejectWithValue, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const response = await axios.put(
         `${baseUrl}/admin/group/${groupId}?say=${say}`,
         formData,

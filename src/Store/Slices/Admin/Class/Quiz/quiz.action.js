@@ -31,7 +31,7 @@ export const fetchAllQuizzes = createAsyncThunk(
   async ({ subjectId, params }, { rejectWithValue, getState, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
-
+      const say = localStorage.getItem("say")
       const response = await axios.get(
         `${baseUrl}/admin/quizzes/${subjectId}?say=${say}`,
         {

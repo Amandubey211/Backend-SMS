@@ -45,6 +45,7 @@ export const fetchAttendanceByClassSectionGroupDate = createAsyncThunk(
     try {
       const token = getToken(getState(), rejectWithValue, dispatch); // Fetch token from Redux state
       if (typeof token === "object") return token;
+      const say = localStorage.getItem("say")
       const formattedDate = formatDate(date); // Format the date before sending
 
       const response = await axios.get(
@@ -69,6 +70,7 @@ export const markAttendance = createAsyncThunk(
     try {
       const token = getToken(getState(), rejectWithValue, dispatch); // Fetch token from Redux state
       if (typeof token === "object") return token;
+      const say = localStorage.getItem("say")
       const formattedDate = formatDate(attendanceData.date); // Format the date
 
       const response = await axios.post(
@@ -94,6 +96,7 @@ export const fetchAttendanceStats = createAsyncThunk(
     try {
       const token = getToken(getState(), rejectWithValue, dispatch); // Fetch token from Redux state
       if (typeof token === "object") return token;
+      const say = localStorage.getItem("say")
 
       const response = await axios.get(
         `${baseUrl}/api/teacher/attendance/getAttendanceStats/${classId}?say=${say}`,
@@ -119,7 +122,7 @@ export const fetchStudentsMonthAttendanceList = createAsyncThunk(
     try {
       const token = getToken(getState(), rejectWithValue, dispatch); // Fetch token from Redux state
       if (typeof token === "object") return token;
-
+      const say = localStorage.getItem("say")
       const response = await axios.get(
         `${baseUrl}/api/teacher/attendance/getStudentMonthList/${classId}?say=${say}`,
         {

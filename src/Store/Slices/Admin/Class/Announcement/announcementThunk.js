@@ -30,7 +30,7 @@ export const fetchAnnouncements = createAsyncThunk(
     async (cid, { getState, rejectWithValue, dispatch }) => {
         const token = getToken(getState(), rejectWithValue, dispatch);
         if (typeof token === "object") return token;
-
+        const say = localStorage.getItem("say")
         try {
             const response = await axios.get(
                 `${baseUrl}/admin/announcement/class/${cid}?say=${say}`,
@@ -51,7 +51,7 @@ export const markAsReadAnnouncement = createAsyncThunk(
     async (_id, { getState, rejectWithValue, dispatch }) => {
         const token = getToken(getState(), rejectWithValue, dispatch);
         if (typeof token === "object") return token;
-
+        const say = localStorage.getItem("say")
         try {
             await axios.post(
                 `${baseUrl}/admin/markAsRead/announcement/${_id}?say=${say}`,
@@ -73,7 +73,7 @@ export const fetchAnnouncementById = createAsyncThunk(
     async (id, { getState, rejectWithValue, dispatch }) => {
         const token = getToken(getState(), rejectWithValue, dispatch);
         if (typeof token === "object") return token;
-
+        const say = localStorage.getItem("say")
         try {
             const response = await axios.get(
                 `${baseUrl}/admin/announcement/${id}?say=${say}`,
@@ -94,7 +94,7 @@ export const deleteAnnouncement = createAsyncThunk(
     async (id, { getState, rejectWithValue, dispatch }) => {
         const token = getToken(getState(), rejectWithValue, dispatch);
         if (typeof token === "object") return token;
-
+        const say = localStorage.getItem("say")
         try {
             await axios.delete(
                 `${baseUrl}/admin/announcement/${id}?say=${say}`,
@@ -115,7 +115,7 @@ export const createAnnouncement = createAsyncThunk(
     async ({ data, files }, { getState, rejectWithValue, dispatch }) => {
         const token = getToken(getState(), rejectWithValue, dispatch);
         if (typeof token === "object") return token;
-
+        const say = localStorage.getItem("say")
         const formData = new FormData();
         Object.keys(data).forEach((key) => formData.append(key, data[key]));
 
@@ -147,7 +147,7 @@ export const editAnnouncement = createAsyncThunk(
     async ({ id, data, files }, { getState, rejectWithValue, dispatch }) => {
         const token = getToken(getState(), rejectWithValue, dispatch);
         if (typeof token === "object") return token;
-
+        const say = localStorage.getItem("say")
         const formData = new FormData();
         Object.keys(data).forEach((key) => formData.append(key, data[key]));
 

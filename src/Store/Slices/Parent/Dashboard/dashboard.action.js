@@ -45,7 +45,7 @@ export const fetchNotices = createAsyncThunk(
   "dashboard/fetchNotices",
   async (_, { rejectWithValue, dispatch }) => {
     const token = localStorage.getItem("parent:token");
-
+    const say = localStorage.getItem("say")
     if (!token) {
       dispatch(setShowError(true));
       dispatch(setErrorMsg("Authentication failed"));
@@ -78,7 +78,7 @@ export const fetchChildren = createAsyncThunk(
   async (_, { rejectWithValue, dispatch }) => {
     const userData = JSON.parse(localStorage.getItem("userData"));
     const token = localStorage.getItem("parent:token");
-
+    const say = localStorage.getItem("say")
     if (!userData || !userData.email) {
       const errorMessage = "No guardian email found";
       dispatch(setErrorMsg(errorMessage));
@@ -108,7 +108,7 @@ export const fetchAccountingData = createAsyncThunk(
   "dashboard/fetchAccountingData",
   async (_, { rejectWithValue, dispatch }) => {
     const token = localStorage.getItem("parent:token");
-
+    const say = localStorage.getItem("say")
     if (!token) {
       const errorMessage = "Authentication failed";
       dispatch(setShowError(true));

@@ -32,6 +32,7 @@ export const fetchAllTeachers = createAsyncThunk(
   async (_, { rejectWithValue, getState, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const response = await axios.get(`${baseUrl}/admin/teacher?say=${say}`, {
         headers: { Authentication: token },
       });
@@ -50,6 +51,7 @@ export const fetchTeachersByClass = createAsyncThunk(
   async (classId, { rejectWithValue, getState, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const { data } = await axios.get(`${baseUrl}/admin/teacherByClass?say=${say}`, {
         params: { id: classId },
         headers: { Authentication: token },
@@ -69,6 +71,7 @@ export const assignTeacher = createAsyncThunk(
   async (assignData, { rejectWithValue, getState, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const response = await axios.post(
         `${baseUrl}/admin/teacher?say=${say}`,
         assignData,
@@ -90,6 +93,7 @@ export const unassignTeacher = createAsyncThunk(
   async ({ teacherId, classId }, { rejectWithValue, getState, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       await axios.delete(
         `${baseUrl}/admin/teacher/${teacherId}/class/${classId}?say=${say}`,
         {
