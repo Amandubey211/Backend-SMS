@@ -147,8 +147,6 @@ export const createExpense = createAsyncThunk(
 
 );
 
-)
-
 
 
 // create salary

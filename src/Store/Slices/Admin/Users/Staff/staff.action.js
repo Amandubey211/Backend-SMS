@@ -78,11 +78,6 @@ export const addUser = createAsyncThunk(
         }
         dispatch(createStaffSalary({status:"unpaid",action:"pay now"}));
         return response.data;
-      }else{
-        toast.error(response.data.message );
-      }
-
-      return response.data;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }

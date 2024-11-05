@@ -3,6 +3,7 @@ import axios from "axios";
 import { baseUrl } from "../../../../../config/Common";
 import { ErrorMsg } from "../../../Common/Alerts/errorhandling.action";
 import { setShowError, setErrorMsg } from "../../../Common/Alerts/alertsSlice";
+import toast from "react-hot-toast";
 
 const say = localStorage.getItem("say");
 
@@ -87,8 +88,6 @@ export const promoteStudents = createAsyncThunk(
 export const promoteInSameClassStudents = createAsyncThunk(
   "students/promoteInSameClass",
 
-  async ({ studentIds, academicYearId }, { getState, rejectWithValue, dispatch }) => {
-
   async (
     { studentIds, academicYearId },
     { getState, rejectWithValue, dispatch }
@@ -110,17 +109,13 @@ export const promoteInSameClassStudents = createAsyncThunk(
       return handleError(error, dispatch, rejectWithValue);
     }
   }
-);
+  )
 
 // Graduate Students
 export const graduateStudents = createAsyncThunk(
   "students/graduateStudents",
   async ({ studentIds }, { getState, rejectWithValue, dispatch }) => {
-
-    const token = getState().common.auth.token;
     const classId = getState().common.user.classInfo.selectedClassId;
-
-
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
       const response = await axios.put(
