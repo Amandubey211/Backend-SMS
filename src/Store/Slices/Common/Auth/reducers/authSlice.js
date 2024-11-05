@@ -25,8 +25,6 @@ const initialState = {
   selectedLanguage: "en",
 };
 
-
-
 const AuthSlice = createSlice({
   name: "Auth",
   initialState,
@@ -73,7 +71,7 @@ const AuthSlice = createSlice({
         state.isLoggedIn = false;
         state.role = null;
         state.token = null;
-        localStorage.removeItem("token");
+        localStorage.removeItem("token"); // remove the hard code string and use the env here
       })
 
       // Student login/logout
@@ -84,7 +82,7 @@ const AuthSlice = createSlice({
       .addCase(studentLogin.fulfilled, (state, action) => {
         state.loading = false;
         state.isLoggedIn = true;
-        localStorage.setItem("token", action.payload.token);
+        localStorage.setItem("token", action.payload.token); // remove the hard code string and use the env here
       })
       .addCase(studentLogin.rejected, (state, action) => {
         state.loading = false;
@@ -94,7 +92,7 @@ const AuthSlice = createSlice({
         state.isLoggedIn = false;
         state.role = null;
         state.token = null;
-        localStorage.removeItem("token");
+        localStorage.removeItem("token"); // remove the hard code string and use the env here
       })
 
       // Student QID verification
@@ -128,7 +126,7 @@ const AuthSlice = createSlice({
         state.isLoggedIn = false;
         state.role = null;
         state.token = null;
-        localStorage.removeItem("token");
+        localStorage.removeItem("token"); // remove the hard code string and use the env here
       })
       .addCase(registerStudentDetails.pending, (state) => {
         state.loading = true;
