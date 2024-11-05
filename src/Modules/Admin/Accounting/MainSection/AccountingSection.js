@@ -26,6 +26,7 @@ import {
   fetchFees,
 } from "../../../../Store/Slices/Admin/Accounting/StudentFees/studentFees.action";
 import NoDataFound from "../../../../Components/Common/NoDataFound";
+import { useTranslation } from "react-i18next";
 const AccountingSection = () => {
   const {
     isSidebarOpen,
@@ -37,7 +38,7 @@ const AccountingSection = () => {
   } = useSelector((store) => store?.admin?.student_fees);
   const dispatch = useDispatch();
   const [showEditMenu, setShowEditMenu] = useState({ show: false, index: 0 });
-
+  const { t } = useTranslation('studentFees')
   useEffect(() => {
     dispatch(fetchFees());
     dispatch(fetchClasses());
@@ -125,14 +126,14 @@ const AccountingSection = () => {
               <div className="flex gap-3">
                 <FormField
                   id="class"
-                  label="Class"
+                  label={t("Class")}
                   value={filters.class}
                   onChange={handleFilterChange}
                   options={classes}
                 />
                 <FormField
                   id="feesType"
-                  label="Fees Type"
+                  label={t("Fees Type")}
                   value={filters.feesType}
                   onChange={handleFilterChange}
                   options={feesTypes}
@@ -143,7 +144,7 @@ const AccountingSection = () => {
                   onClick={handleSidebarOpen}
                   className="h-12 inline-flex items-center border border-transparent text-sm font-medium shadow-sm bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600"
                 >
-                  Add New Fees
+                  {t("Add New Fees")}
                   <span className="ml-2">+</span>
                 </button>
               </div>
@@ -166,24 +167,22 @@ const AccountingSection = () => {
                     className="hidden"
                   />
                   <div
-                    className={`h-5 w-5 rounded-full mr-2 flex items-center justify-center border-2 ${
-                      filters.status === status
+                    className={`h-5 w-5 rounded-full mr-2 flex items-center justify-center border-2 ${filters.status === status
                         ? "border-green-500 bg-green-500"
                         : "border-gray-300"
-                    }`}
+                      }`}
                   >
                     {filters.status === status && (
                       <div className="h-3 w-3 bg-white rounded-full"></div>
                     )}
                   </div>
                   <span
-                    className={`transition-colors duration-200 ${
-                      filters.status === status
+                    className={`transition-colors duration-200 ${filters.status === status
                         ? "text-red-700"
                         : "text-gray-700"
-                    }`}
+                      }`}
                   >
-                    {status}
+                    {t(status)}
                   </span>
                 </label>
               ))}
@@ -194,24 +193,24 @@ const AccountingSection = () => {
             <table className="min-w-full leading-normal">
               <thead>
                 <tr className="text-left text-gray-700 bg-gray-100">
-                  <th className="px-5 py-3 border-b-2 border-gray-200">Name</th>
+                  <th className="px-5 py-3 border-b-2 border-gray-200">{t("Name")}</th>
                   <th className="px-5 py-3 border-b-2 border-gray-200">
-                    Class
+                    {t("Class")}
                   </th>
                   <th className="px-5 py-3 border-b-2 border-gray-200">
-                    Fees Type
+                    {t("Fees Type")}
                   </th>
                   <th className="px-5 py-3 border-b-2 border-gray-200">
-                    Due Date
+                    {t("Due Date")}
                   </th>
                   <th className="px-5 py-3 border-b-2 border-gray-200">
-                    Amount
+                    {t("Amount")}
                   </th>
                   <th className="px-5 py-3 border-b-2 border-gray-200">
-                    Status
+                    {t("Status")}
                   </th>
                   <th className="px-5 py-3 border-b-2 border-gray-200">
-                    Action
+                    {t("Action")}
                   </th>
                 </tr>
               </thead>
@@ -249,11 +248,10 @@ const AccountingSection = () => {
                       <td className="px-5 py-2">{item?.amount}</td>
                       <td className="px-5 py-2">
                         <span
-                          className={`inline-block px-3 py-1 text-xs font-semibold rounded-full ${
-                            item.status === "paid"
+                          className={`inline-block px-3 py-1 text-xs font-semibold rounded-full ${item.status === "paid"
                               ? "bg-green-200 text-green-800"
                               : "bg-red-200 text-red-800"
-                          }`}
+                            }`}
                         >
                           {capitalizeFirstLetter(item?.status)}
                         </span>
@@ -289,7 +287,7 @@ const AccountingSection = () => {
                                 handleSidebarEditOpen();
                               }}
                             >
-                              Edit
+                              {t("Edit")}
                             </button>
                             <button
                               className="bottom-2 text-indigo-600 hover:text-indigo-900"
@@ -305,7 +303,7 @@ const AccountingSection = () => {
                                 openModal();
                               }}
                             >
-                              Delete
+                              {t("Delete")}
                             </button>
                           </div>
                         ) : null}

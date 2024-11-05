@@ -24,6 +24,7 @@ import {
   setOpenDropDown,
   setSidebarOpen,
 } from "../../../../Store/Slices/Admin/Accounting/Earning/earningSlice";
+import { useTranslation } from "react-i18next";
 
 const Earning = () => {
   const {
@@ -40,7 +41,7 @@ const Earning = () => {
     error,
   } = useSelector((store) => store?.admin?.earning);
   const dispatch = useDispatch();
-
+  const { t } = useTranslation('earning')
   const handleDropdownClose = () => {
     dispatch(setOpenDropDown(null));
   };
@@ -98,12 +99,12 @@ const Earning = () => {
               className="w-full h-20 p-4 border-b flex justify-between items-center"
               style={{ maxHeight: "90vh" }}
             >
-              <span>All Earnings</span>
+              <span>{t("All Earnings")}</span>
               <button
                 onClick={handleSidebarOpen}
                 className="flex items-center border border-gray-300 ps-5 py-0 rounded-full"
               >
-                <span className="mr-2">Add New Earning</span>
+                <span className="mr-2">{t("Add New Earning")}</span>
                 <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full w-10 h-10 flex items-center justify-center">
                   <span className="text-2xl -mt-2">+</span>
                 </div>
@@ -114,19 +115,19 @@ const Earning = () => {
                 <thead>
                   <tr className="text-left text-gray-700 bg-gray-100">
                     <th className="px-5 py-3 border-b-2 border-gray-200">
-                      Earning Reason
+                      {t("Earning Reason")}
                     </th>
                     <th className="px-5 py-3 border-b-2 border-gray-200">
-                      From
+                      {t("From")}
                     </th>
                     <th className="px-5 py-3 border-b-2 border-gray-200">
-                      Earning Date
+                      {t("Earning Date")}
                     </th>
                     <th className="px-5 py-3 border-b-2 border-gray-200">
-                      Amount
+                      {t("Amount")}
                     </th>
                     <th className="px-5 py-3 border-b-2 border-gray-200">
-                      Action
+                      {t("Action")}
                     </th>
                   </tr>
                 </thead>
@@ -178,7 +179,7 @@ const Earning = () => {
                                 }}
                                 className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 transition duration-300"
                               >
-                                Edit
+                                {t("Edit")}
                               </button>
                               <button
                                 onClick={() => {
@@ -187,7 +188,7 @@ const Earning = () => {
                                 }}
                                 className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 transition duration-300"
                               >
-                                Delete
+                                {t("Delete")}
                               </button>
                             </div>
                           )}
@@ -208,7 +209,7 @@ const Earning = () => {
                 </div>
               </div>
               <h2 className="text-lg font-semibold text-gray-800">
-                Remaining Balance
+                {t("Remaining Balance")}
               </h2>
               <p className="text-3xl font-bold text-gradient bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-pink-500">
                 {remainingBalance} QR
@@ -222,7 +223,7 @@ const Earning = () => {
                 </div>
               </div>
               <h2 className="text-lg font-semibold text-gray-800">
-                Total Earning
+                {t("Total Earning")}
               </h2>
               <p className="text-3xl font-bold text-gradient bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-pink-500">
                 {totalEarnings} QR
@@ -236,7 +237,7 @@ const Earning = () => {
                 </div>
               </div>
               <h2 className="text-lg font-semibold text-gray-800">
-                Total Student Fees
+                {t("Total Student Fees")}
               </h2>
               <p className="text-3xl mb-5 font-bold text-gradient bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-pink-500">
                 {totalFees} QR
@@ -245,7 +246,7 @@ const Earning = () => {
                 to="/accounting/studentfees"
                 className="mt-4 px-4 py-2 border border-blue-500 text-blue-500 rounded-full"
               >
-                View All Fees
+                {t("View All Fees")}
               </Link>
             </div>
 
@@ -256,7 +257,7 @@ const Earning = () => {
                 </div>
               </div>
               <h2 className="text-lg font-semibold text-gray-800">
-                Total Expenses
+                {t("Total Expenses")}
               </h2>
               <p className="text-3xl mb-5 font-bold text-gradient bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-pink-500">
                 {totalExpense} QR

@@ -28,6 +28,7 @@ import { ReactComponent as StaffIcon } from "../../../Assets/DashboardAssets/SVG
 import { RiDashboardFill } from "react-icons/ri";
 import Spinner from "../../../Components/Common/Spinner";
 import { useSelector } from "react-redux";
+import { useTranslation } from "react-i18next";
 
 const MainSection = () => {
   const { dashboardData, error, fetchAdminDashboardData, loading } =
@@ -36,6 +37,8 @@ const MainSection = () => {
   const { role } = useSelector((state) => ({
     role: state.common.auth.role,
   }));
+
+  const { t } = useTranslation();
 
   useEffect(() => {
     fetchAdminDashboardData();
@@ -49,7 +52,7 @@ const MainSection = () => {
 
   const cardData = [
     {
-      label: "Students",
+      label: t("Students", { ns: 'dashboard' }),
       value:
         typeof dashboardData?.totalStudents === "number"
           ? dashboardData.totalStudents
@@ -61,7 +64,7 @@ const MainSection = () => {
       navigateTo: '/users/students',  // Add this line
     },
     {
-      label: "Teacher",
+      label: t("Teacher", { ns: 'dashboard' }),
       value:
         typeof dashboardData?.teachers === "number"
           ? dashboardData.teachers
@@ -73,7 +76,7 @@ const MainSection = () => {
       navigateTo: '/users/teachers',  // Add this line
     },
     {
-      label: "Parents",
+      label: t("Parents", { ns: 'dashboard' }),
       value:
         typeof dashboardData?.parents === "number"
           ? dashboardData.parents
@@ -85,7 +88,7 @@ const MainSection = () => {
       navigateTo: '/users/parents',  // Add this line
     },
     {
-      label: "Staff",
+      label: t("Staff", { ns: 'dashboard' }),
       value:
         typeof dashboardData?.staffs === "number"
           ? dashboardData.staffs
