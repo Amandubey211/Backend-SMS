@@ -1,13 +1,15 @@
-import React, { useEffect, useState } from "react";
+// TopNavigationWithFilters.jsx
+import React, { useEffect, useState, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllClasses } from "../../../../Store/Slices/Admin/Class/actions/classThunk";
 import { Input, Select, Button, Row, Col, Space } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import toast from "react-hot-toast";
+import debounce from "lodash/debounce";
 
 const { Option } = Select;
 
-const TopNavigationWithFilters = ({ onFilterChange }) => {
+const TopNavigationWithFilters = ({ onBackendFilterChange, onFrontendFilterChange, academicYears }) => {
   const dispatch = useDispatch();
 
   // Local filter state
@@ -15,6 +17,8 @@ const TopNavigationWithFilters = ({ onFilterChange }) => {
     name: "",
     classId: "",
     type: "",
+    status: "",
+    academicYear: "",
   });
 
   // Fetch classes from Redux store
@@ -28,17 +32,38 @@ const TopNavigationWithFilters = ({ onFilterChange }) => {
     if (error) toast.error("Failed to load classes. Please try again.");
   }, [error]);
 
+  // Debounced function to handle name filtering
+  const debouncedHandleNameFilter = useMemo(
+    () =>
+      debounce((value) => {
+        onFrontendFilterChange(value);
+      }, 300),
+    [onFrontendFilterChange]
+  );
+
+  // Handle filter changes
   const handleFilterChange = (filterName, value) => {
     setFilters((prevFilters) => ({ ...prevFilters, [filterName]: value }));
 
-    // Make real-time request for classId and type filters
-    if (filterName === "classId" || filterName === "type") {
-      onFilterChange({ ...filters, [filterName]: value });
+    if (
+      filterName === "classId" ||
+      filterName === "type" ||
+      filterName === "status" ||
+      filterName === "academicYear"
+    ) {
+      // Trigger backend filter change
+      onBackendFilterChange({ ...filters, [filterName]: value });
+    }
+
+    if (filterName === "name") {
+      // Trigger frontend filter change with debounce
+      debouncedHandleNameFilter(value);
     }
   };
 
   const applyFilters = () => {
-    onFilterChange(filters);
+    onBackendFilterChange(filters);
+    onFrontendFilterChange(filters.name);
   };
 
   const clearFilters = () => {
@@ -46,8 +71,11 @@ const TopNavigationWithFilters = ({ onFilterChange }) => {
       name: "",
       classId: "",
       type: "",
+      status: "",
+      academicYear: "",
     });
-    onFilterChange({}); // Trigger API request to load data without filters
+    onBackendFilterChange({}); // Trigger API request to load data without filters
+    onFrontendFilterChange(""); // Reset frontend filter
   };
 
   return (
@@ -77,6 +105,7 @@ const TopNavigationWithFilters = ({ onFilterChange }) => {
             style={{ width: "180px" }}
             optionFilterProp="children"
             showSearch
+            allowClear
           >
             <Option value="">Select Class</Option>
             {classes.map((cls) => (
@@ -95,12 +124,48 @@ const TopNavigationWithFilters = ({ onFilterChange }) => {
             value={filters.type}
             onChange={(value) => handleFilterChange("type", value)}
             style={{ width: "180px" }}
+            allowClear
           >
             <Option value="">All Types</Option>
             <Option value="weekly">Weekly</Option>
             <Option value="exam">Exam</Option>
             <Option value="event">Event</Option>
             <Option value="others">Others</Option>
+          </Select>
+        </Col>
+
+        {/* Status Filter */}
+        <Col>
+          <label className="font-medium text-gray-700" style={{ paddingRight: "8px" }}>Status</label>
+          <Select
+            placeholder="All Statuses"
+            value={filters.status}
+            onChange={(value) => handleFilterChange("status", value)}
+            style={{ width: "180px" }}
+            allowClear
+          >
+            <Option value="">All Statuses</Option>
+            <Option value="active">Active</Option>
+            <Option value="inactive">Inactive</Option>
+          </Select>
+        </Col>
+
+        {/* Academic Year Filter */}
+        <Col>
+          <label className="font-medium text-gray-700" style={{ paddingRight: "8px" }}>Academic Year</label>
+          <Select
+            placeholder="Select Academic Year"
+            value={filters.academicYear}
+            onChange={(value) => handleFilterChange("academicYear", value)}
+            style={{ width: "180px" }}
+            allowClear
+          >
+            <Option value="">All Years</Option>
+            {academicYears.map((year) => (
+              <Option key={year} value={year}>
+                {year}
+              </Option>
+            ))}
           </Select>
         </Col>
 
@@ -119,7 +184,6 @@ const TopNavigationWithFilters = ({ onFilterChange }) => {
             >
               Apply Filters
             </Button>
-
 
             <Button
               onClick={clearFilters}
