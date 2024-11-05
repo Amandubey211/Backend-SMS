@@ -2,36 +2,54 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { baseUrl } from "../../../../../config/Common";
+import { setErrorMsg, setShowError } from "../../../Common/Alerts/alertsSlice";
+import { ErrorMsg } from "../../../Common/Alerts/errorhandling.action";
 
-// Helper function to get the token from state
-const getToken = (getState) => getState().common.auth.token;
+const say = localStorage.getItem("say");
+
+// Helper function to get the token from the Redux state
+const getToken = (state, rejectWithValue, dispatch) => {
+  const token = state.common.auth?.token;
+  if (!token) {
+    dispatch(setShowError(true));
+    dispatch(setErrorMsg("Authentication Failed"));
+    return rejectWithValue("Authentication Failed");
+  }
+  return `Bearer ${token}`;
+};
+
+// Centralized error handling
+const handleError = (error, dispatch, rejectWithValue) => {
+  const err = ErrorMsg(error);
+  dispatch(setShowError(true));
+  dispatch(setErrorMsg(err.message));
+  return rejectWithValue(err.message);
+};
 
 // Thunk for creating an assignment
 export const createAssignmentThunk = createAsyncThunk(
   "assignment/createAssignment",
-  async (assignmentData, { rejectWithValue, getState }) => {
+  async (assignmentData, { rejectWithValue, getState, dispatch }) => {
     try {
-      const token = getToken(getState); // Get token using helper
+      const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const response = await axios.post(
-        `${baseUrl}/admin/create_assignment`,
+        `${baseUrl}/admin/create_assignment?say=${say}`,
         assignmentData,
         {
           headers: {
-            Authentication: `Bearer ${token}`,
+            Authentication: token,
           },
         }
       );
       if (response.data.success) {
         toast.success("Assignment created successfully!");
-        return response.data.assignment; // Return the created assignment
+        return response.data.assignment;
       } else {
         throw new Error(response.data.message || "Failed to create assignment");
       }
     } catch (error) {
-      toast.error(error.response?.data?.message || error.message);
-      return rejectWithValue(
-        error.response?.data?.message || "Failed to create assignment"
-      );
+      return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
@@ -44,31 +62,29 @@ export const updateAssignmentThunk = createAsyncThunk(
     { rejectWithValue, getState, dispatch }
   ) => {
     try {
-      const token = getToken(getState); // Get token using helper
+      const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const response = await axios.put(
-        `${baseUrl}/admin/update_assignment/${assignmentId}`,
+        `${baseUrl}/admin/update_assignment/${assignmentId}?say=${say}`,
         {
           ...assignmentData,
           sectionId,
         },
         {
           headers: {
-            Authentication: `Bearer ${token}`,
+            Authentication: token,
           },
         }
       );
       if (response.data.success) {
         toast.success("Assignment updated successfully!");
         dispatch(fetchAssignmentByIdThunk(assignmentId));
-        return response.data.assignment; // Return the updated assignment
+        return response.data.assignment;
       } else {
         throw new Error(response.data.message || "Failed to update assignment");
       }
     } catch (error) {
-      toast.error(error.response?.data?.message || error.message);
-      return rejectWithValue(
-        error.response?.data?.message || "Failed to update assignment"
-      );
+      return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
@@ -76,28 +92,26 @@ export const updateAssignmentThunk = createAsyncThunk(
 // Thunk for deleting an assignment
 export const deleteAssignmentThunk = createAsyncThunk(
   "assignment/deleteAssignment",
-  async (assignmentId, { rejectWithValue, getState }) => {
+  async (assignmentId, { rejectWithValue, getState, dispatch }) => {
     try {
-      const token = getToken(getState); // Get token using helper
+      const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const response = await axios.delete(
-        `${baseUrl}/admin/delete_assignment/${assignmentId}`,
+        `${baseUrl}/admin/delete_assignment/${assignmentId}?say=${say}`,
         {
           headers: {
-            Authentication: `Bearer ${token}`,
+            Authentication: token,
           },
         }
       );
       if (response.data.success) {
         toast.success("Assignment deleted successfully!");
-        return assignmentId; // Return the deleted assignment ID to filter it out from state
+        return assignmentId;
       } else {
         throw new Error(response.data.message || "Failed to delete assignment");
       }
     } catch (error) {
-      toast.error(error.response?.data?.message || error.message);
-      return rejectWithValue(
-        error.response?.data?.message || "Failed to delete assignment"
-      );
+      return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
@@ -105,59 +119,57 @@ export const deleteAssignmentThunk = createAsyncThunk(
 // Thunk for fetching assignments by class
 export const fetchAssignmentsByClassThunk = createAsyncThunk(
   "assignment/fetchAssignmentsByClass",
-  async (classId, { rejectWithValue, getState }) => {
+  async (classId, { rejectWithValue, getState, dispatch }) => {
     try {
-      const token = getState().common.auth.token;
+      const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const response = await axios.get(
-        `${baseUrl}/admin/class_assignments/${classId}`,
+        `${baseUrl}/admin/class_assignments/${classId}?say=${say}`,
         {
           headers: {
-            Authentication: `Bearer ${token}`,
+            Authentication: token,
           },
         }
       );
       if (response.data.success) {
-        return response.data.assignments; // Return the assignments list
+        return response.data.assignments;
       } else {
         throw new Error(
           response.data.message || "Failed to fetch assignments by class"
         );
       }
     } catch (error) {
-      toast.error(error.response?.data?.message || error.message);
-      return rejectWithValue(
-        error.response?.data?.message || "Failed to fetch assignments by class"
-      );
+      return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
+
 // Thunk to fetch filtered assignments
 export const fetchFilteredAssignments = createAsyncThunk(
   "assignments/fetchFiltered",
   async (
     { sid, moduleId, chapterId, publish },
-    { getState, rejectWithValue }
+    { getState, rejectWithValue, dispatch }
   ) => {
+    const say = localStorage.getItem("say")
     try {
       const params = {};
-      const token = getState().common.auth.token;
+      const token = getToken(getState(), rejectWithValue, dispatch);
 
       if (moduleId) params.moduleId = moduleId;
       if (chapterId) params.chapterId = chapterId;
       if (publish !== null) params.publish = publish;
 
-      const response = await axios.get(`${baseUrl}/admin/assignments/${sid}`, {
+      const response = await axios.get(`${baseUrl}/admin/assignments/${sid}?say=${say}`, {
         params,
         headers: {
-          Authentication: `Bearer ${token}`,
+          Authentication: token,
         },
       });
 
       return response.data.assignments;
-    } catch (err) {
-      return rejectWithValue(
-        err.response?.data?.message || "Failed to fetch assignments."
-      );
+    } catch (error) {
+      return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
@@ -165,28 +177,25 @@ export const fetchFilteredAssignments = createAsyncThunk(
 // Thunk to fetch assignment by ID
 export const fetchAssignmentByIdThunk = createAsyncThunk(
   "assignment/fetchAssignmentById",
-  async (assignmentId, { rejectWithValue, getState }) => {
+  async (assignmentId, { rejectWithValue, getState, dispatch }) => {
+    const say = localStorage.getItem("say")
     try {
-      const token = getState().common.auth.token;
+      const token = getToken(getState(), rejectWithValue, dispatch);
       const response = await axios.get(
-        `${baseUrl}/admin/assignment/${assignmentId}`,
+        `${baseUrl}/admin/assignment/${assignmentId}?say=${say}`,
         {
           headers: {
-            Authentication: `Bearer ${token}`,
+            Authentication: token,
           },
         }
       );
-      console.log(response.data, "ddddddddddddd");
       if (response.data.success) {
-        return response.data.assignment; // Return the fetched assignment data
+        return response.data.assignment;
       } else {
         throw new Error(response.data.message || "Failed to fetch assignment");
       }
     } catch (error) {
-      toast.error(error.response?.data?.message || error.message);
-      return rejectWithValue(
-        error.response?.data?.message || "Failed to fetch assignment"
-      );
+      return handleError(error, dispatch, rejectWithValue);
     }
   }
 );

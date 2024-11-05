@@ -1,119 +1,120 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { baseUrl } from "../../../../../config/Common";
+import { setErrorMsg, setShowError } from "../../../Common/Alerts/alertsSlice";
+import { ErrorMsg } from "../../../Common/Alerts/errorhandling.action";
 
+const say = localStorage.getItem("say");
 
-
-
-const getToken = (state) => {
+const getToken = (state, rejectWithValue, dispatch) => {
     const token = state.common.auth?.token;
     if (!token) {
-        throw new Error("Authentication token is missing.");
+        dispatch(setShowError(true));
+        dispatch(setErrorMsg('Authentication Failed'));
+        return rejectWithValue('Authentication Failed');
     }
     return `Bearer ${token}`;
 };
 
+// Centralized error handling
+const handleError = (error, dispatch, rejectWithValue) => {
+    const err = ErrorMsg(error);
+    dispatch(setShowError(true));
+    dispatch(setErrorMsg(err.message));
+    return rejectWithValue(err.message);
+};
+
+// Fetch Student Fees
 export const fetchFees = createAsyncThunk(
     "accounting/studentFees",
-    async (_, { rejectWithValue, getState }) => {
-        const token = getToken(getState());
+    async (_, { rejectWithValue, getState, dispatch }) => {
+        const token = getToken(getState(), rejectWithValue, dispatch);
+        if (typeof token === 'object') return token;
+
         try {
-            const response = await axios.get(`${baseUrl}/admin/get_fees`, {
-                headers: {
-                    Authentication: `${token}`,
-                },
+            const response = await axios.get(`${baseUrl}/admin/get_fees?say=${say}`, {
+                headers: { Authentication: token },
             });
 
-            const data = response?.data?.data
-            console.log("data---", data);
-            return data
-
+            return response?.data?.data;
         } catch (error) {
-            return rejectWithValue(error?.response?.data?.message || error?.message || "Something Went Wrong!");
+            return handleError(error, dispatch, rejectWithValue);
         }
     }
-)
+);
 
+// Fetch Classes
 export const fetchClasses = createAsyncThunk(
     "accounting/fetchClasses",
-    async (_, { rejectWithValue, getState }) => {
-        const token = getToken(getState());
+    async (_, { rejectWithValue, getState, dispatch }) => {
+        const token = getToken(getState(), rejectWithValue, dispatch);
+        if (typeof token === 'object') return token;
+        const say = localStorage.getItem("say")
         try {
-            const response = await axios.get(`${baseUrl}/admin/class`, {
-                headers: {
-                    Authentication: `${token}`,
-                },
+            const response = await axios.get(`${baseUrl}/admin/class?say=${say}`, {
+                headers: { Authentication: token },
             });
 
-            const data = response?.data?.data
-            console.log("fetch classes data---", data);
-            return data
-
+            return response?.data?.data;
         } catch (error) {
-            return rejectWithValue(error?.response?.data?.message || error?.message || "Something Went Wrong!");
+            return handleError(error, dispatch, rejectWithValue);
         }
     }
-)
+);
 
+// Delete Student Fee
 export const deleteStudentFee = createAsyncThunk(
     "accounting/deleteStudentFee",
-    async (feeId, { rejectWithValue, getState }) => {
-        const token = getToken(getState());
+    async (feeId, { rejectWithValue, getState, dispatch }) => {
+        const token = getToken(getState(), rejectWithValue, dispatch);
+        if (typeof token === 'object') return token;
+        const say = localStorage.getItem("say")
         try {
-            const response = await axios.delete(`${baseUrl}/admin/fee/delete/${feeId}`, {
-                headers: {
-                    Authentication: `${token}`,
-                },
+            const response = await axios.delete(`${baseUrl}/admin/fee/delete/${feeId}?say=${say}`, {
+                headers: { Authentication: token },
             });
 
-            const data = response?.data
-            console.log("delete student fees---", data);
-            return data
-
+            return response?.data;
         } catch (error) {
-            return rejectWithValue(error?.response?.data?.message || error?.message || "Something Went Wrong!");
+            return handleError(error, dispatch, rejectWithValue);
         }
     }
-)
+);
 
+// Create Student Fee
 export const createStudentFee = createAsyncThunk(
     "accounting/createStudentFee",
-    async ({ submissionData }, { rejectWithValue, getState }) => {
-        const token = getToken(getState());
+    async ({ submissionData }, { rejectWithValue, getState, dispatch }) => {
+        const token = getToken(getState(), rejectWithValue, dispatch);
+        if (typeof token === 'object') return token;
+        const say = localStorage.getItem("say")
         try {
-            const response = await axios.post(`${baseUrl}/admin/student/create_fees`, submissionData, {
-                headers: {
-                    Authentication: `${token}`,
-                },
+            const response = await axios.post(`${baseUrl}/admin/student/create_fees?say=${say}`, submissionData, {
+                headers: { Authentication: token },
             });
 
-            const data = response?.data?.data
-            console.log("Fees for student created---", data);
-            return data
-
+            return response?.data?.data;
         } catch (error) {
-            return rejectWithValue(error?.response?.data?.message || error?.message || "Something Went Wrong!");
+            return handleError(error, dispatch, rejectWithValue);
         }
     }
-)
+);
 
+// Update Student Fee
 export const updateStudentFee = createAsyncThunk(
     "accounting/updateStudentFee",
-    async ({ feeId, submissionData }, { rejectWithValue, getState }) => {
-        const token = getToken(getState());
+    async ({ feeId, submissionData }, { rejectWithValue, getState, dispatch }) => {
+        const token = getToken(getState(), rejectWithValue, dispatch);
+        if (typeof token === 'object') return token;
+        const say = localStorage.getItem("say")
         try {
-            const response = await axios.put(`${baseUrl}/admin/student/update_fees/${feeId}`, submissionData, {
-                headers: {
-                    Authentication: `${token}`,
-                },
+            const response = await axios.put(`${baseUrl}/admin/student/update_fees/${feeId}?say=${say}`, submissionData, {
+                headers: { Authentication: token },
             });
 
-            const data = response?.data
-            console.log("Fees for student created---", data);
-            return data
-
+            return response?.data;
         } catch (error) {
-            return rejectWithValue(error?.response?.data?.message || error?.message || "Something Went Wrong!");
+            return handleError(error, dispatch, rejectWithValue);
         }
     }
-)
+);

@@ -1,32 +1,37 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { baseUrl } from "../../../../config/Common";
-import toast from "react-hot-toast";
+import { setErrorMsg, setShowError } from "../../Common/Alerts/alertsSlice";
+import { ErrorMsg } from "../../Common/Alerts/errorhandling.action";
+
+const say = localStorage.getItem("say");
 
 // Fetch finance data for parent
 export const fetchParentFinanceData = createAsyncThunk(
   "dashboard/fetchAccountingData",
-  async (_, { rejectWithValue }) => {
+  async (_, { rejectWithValue, dispatch }) => {
     const token = localStorage.getItem("parent:token");
-
+    const say = localStorage.getItem("say")
     if (!token) {
-      const errorMessage = "Token not found";
-      // toast.error(errorMessage);
-      return rejectWithValue(errorMessage); // Reject with custom message if no token is found
+      const errorMessage = "Authentication failed";
+      dispatch(setShowError(true));
+      dispatch(setErrorMsg(errorMessage));
+      return rejectWithValue(errorMessage);
     }
 
     try {
-      const response = await axios.get(`${baseUrl}/parent/api/fees`, {
+      const response = await axios.get(`${baseUrl}/parent/api/fees?say=${say}`, {
         headers: {
           Authentication: `${token}`,
         },
       });
       return response.data;
     } catch (error) {
-      const errorMessage = error.response?.data?.message || error.message ||"Failed to fetch accounting data";
-      // toast.error(errorMessage);
-      return rejectWithValue(errorMessage); // Reject with custom error message
+      const errorMessage = error.response?.data?.message || error.message || "Failed to fetch accounting data";
+      const err = ErrorMsg(error);
+      dispatch(setShowError(true));
+      dispatch(setErrorMsg(err?.message));
+      return rejectWithValue(err?.message);
     }
   }
 );
-

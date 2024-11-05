@@ -1,23 +1,43 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
-import { baseUrl } from "../../../../../config/Common"; // Ensure this base URL is set properly
+import { baseUrl } from "../../../../../config/Common";
+import { ErrorMsg } from "../../../Common/Alerts/errorhandling.action";
+import { setShowError, setErrorMsg } from "../../../Common/Alerts/alertsSlice";
+
+const say = localStorage.getItem("say");
+
+// Helper function to get the token from Redux state
+const getToken = (state, rejectWithValue, dispatch) => {
+  const token = state.common.auth?.token;
+  if (!token) {
+    dispatch(setShowError(true));
+    dispatch(setErrorMsg("Authentication Failed"));
+    return rejectWithValue("Authentication Failed");
+  }
+  return `Bearer ${token}`;
+};
+
+// Centralized error handling
+const handleError = (error, dispatch, rejectWithValue) => {
+  const err = ErrorMsg(error);
+  dispatch(setShowError(true));
+  dispatch(setErrorMsg(err.message));
+  return rejectWithValue(err.message);
+};
 
 // Fetch all notices
 export const fetchNoticesThunk = createAsyncThunk(
   "notice/fetchAll",
-  async (_, { rejectWithValue, getState }) => {
-    const { common } = getState();
-    const token = common.auth.token;
-
+  async (_, { rejectWithValue, getState, dispatch }) => {
     try {
-      const response = await axios.get(`${baseUrl}/admin/all/notices`, {
-        headers: { Authentication: `Bearer ${token}` },
+      const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
+      const response = await axios.get(`${baseUrl}/admin/all/notices?say=${say}`, {
+        headers: { Authentication: token },
       });
       return response.data.notices;
     } catch (error) {
-      return rejectWithValue(
-        error.response?.data?.message || "Failed to fetch notices"
-      );
+      return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
@@ -26,27 +46,23 @@ export const fetchNoticesThunk = createAsyncThunk(
 export const createNoticeThunk = createAsyncThunk(
   "notice/create",
   async (noticeData, { rejectWithValue, getState, dispatch }) => {
-    const { common } = getState();
-    const token = common.auth.token;
-
     try {
+      const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const response = await axios.post(
-        `${baseUrl}/admin/create_notice`,
+        `${baseUrl}/admin/create_notice?say=${say}`,
         noticeData,
         {
           headers: {
             "Content-Type": "application/json",
-            Authentication: `Bearer ${token}`,
+            Authentication: token,
           },
         }
       );
       dispatch(fetchNoticesThunk());
       return response.data;
     } catch (error) {
-      dispatch(fetchNoticesThunk());
-      return rejectWithValue(
-        error.response?.data?.message || "Failed to create notice"
-      );
+      return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
@@ -54,27 +70,21 @@ export const createNoticeThunk = createAsyncThunk(
 // Update notice
 export const updateNoticeThunk = createAsyncThunk(
   "notice/update",
-  async (
-    { noticeId, updatedData },
-    { rejectWithValue, getState, dispatch }
-  ) => {
-    const { common } = getState();
-    const token = common.auth.token;
-
+  async ({ noticeId, updatedData }, { rejectWithValue, getState, dispatch }) => {
     try {
+      const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const response = await axios.put(
-        `${baseUrl}/admin/update/notice/${noticeId}`,
+        `${baseUrl}/admin/update/notice/${noticeId}?say=${say}`,
         updatedData,
         {
-          headers: { Authentication: `Bearer ${token}` },
+          headers: { Authentication: token },
         }
       );
       dispatch(fetchNoticesThunk());
       return response.data;
     } catch (error) {
-      return rejectWithValue(
-        error.response?.data?.message || "Failed to update notice"
-      );
+      return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
@@ -83,19 +93,16 @@ export const updateNoticeThunk = createAsyncThunk(
 export const deleteNoticeThunk = createAsyncThunk(
   "notice/delete",
   async (noticeId, { rejectWithValue, getState, dispatch }) => {
-    const { common } = getState();
-    const token = common.auth.token;
-
     try {
-      await axios.delete(`${baseUrl}/admin/delete/notice/${noticeId}`, {
-        headers: { Authentication: `Bearer ${token}` },
+      const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
+      await axios.delete(`${baseUrl}/admin/delete/notice/${noticeId}?say=${say}`, {
+        headers: { Authentication: token },
       });
       dispatch(fetchNoticesThunk());
       return noticeId;
     } catch (error) {
-      return rejectWithValue(
-        error.response?.data?.message || "Failed to delete notice"
-      );
+      return handleError(error, dispatch, rejectWithValue);
     }
   }
 );

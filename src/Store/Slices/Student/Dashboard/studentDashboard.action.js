@@ -2,21 +2,26 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { baseUrl } from '../../../../config/Common';
 import { CiMoneyBill } from 'react-icons/ci';
+import { setErrorMsg, setShowError } from '../../Common/Alerts/alertsSlice';
+import {ErrorMsg } from '../../Common/Alerts/errorhandling.action';
+
+const say = localStorage.getItem('say');
 
 // Fetch Dashboard Details
 export const fetchDashboardDetails = createAsyncThunk(
   'studentDashboard/fetchDashboardDetails',
-  async (_, { rejectWithValue }) => {
+  async (_, { rejectWithValue, dispatch }) => {
     const token = localStorage.getItem('student:token');
+    const say = localStorage.getItem("say")
     if (!token) {
+      dispatch(setShowError(true));
+      dispatch(setErrorMsg('Authentication failed!'));
       return rejectWithValue('Authentication failed!');
     }
 
     try {
-      const response = await axios.get(`${baseUrl}/api/studentDashboard/dashboard/student`, {
-        headers: {
-          Authentication: token,
-        },
+      const response = await axios.get(`${baseUrl}/api/studentDashboard/dashboard/student?say=${say}`, {
+        headers: { Authentication: token },
       });
 
       const data = response?.data;
@@ -29,8 +34,11 @@ export const fetchDashboardDetails = createAsyncThunk(
         attendanceSummary,
       };
     } catch (error) {
-      console.error('Error in fetchDashboardDetails:', error);
-      return rejectWithValue(error.message);
+      const errorMessage = error.response?.data?.message || error.message || "Failed to fetch dashboard details.";
+      const err = ErrorMsg(error);
+      dispatch(setShowError(true));
+      dispatch(setErrorMsg(err?.message));
+      return rejectWithValue(err?.message);
     }
   }
 );
@@ -38,9 +46,12 @@ export const fetchDashboardDetails = createAsyncThunk(
 // Fetch Subjects
 export const fetchSubjects = createAsyncThunk(
   'studentDashboard/fetchSubjects',
-  async (_, { rejectWithValue }) => {
+  async (_, { rejectWithValue, dispatch }) => {
     const token = localStorage.getItem('student:token');
+    const say = localStorage.getItem("say")
     if (!token) {
+      dispatch(setShowError(true));
+      dispatch(setErrorMsg('Authentication failed!'));
       return rejectWithValue('Authentication failed!');
     }
 
@@ -50,16 +61,17 @@ export const fetchSubjects = createAsyncThunk(
       const userDetails = JSON.parse(persistUserObject.userDetails);
       const userId = userDetails.userId;
 
-      const response = await axios.get(`${baseUrl}/api/studentDashboard/subjects/${userId}`, {
-        headers: {
-          Authentication: token,
-        },
+      const response = await axios.get(`${baseUrl}/api/studentDashboard/subjects/${userId}?say=${say}`, {
+        headers: { Authentication: token },
       });
 
       return response?.data?.subjects;
     } catch (error) {
-      console.error('Error in fetchSubjects:', error);
-      return rejectWithValue(error.message);
+      const errorMessage = error.response?.data?.message || error.message || "Failed to fetch subjects.";
+      const err = ErrorMsg(error);
+      dispatch(setShowError(true));
+      dispatch(setErrorMsg(err?.message));
+      return rejectWithValue(err?.message)
     }
   }
 );
@@ -67,7 +79,7 @@ export const fetchSubjects = createAsyncThunk(
 // Fetch Tasks
 export const fetchTasks = createAsyncThunk(
   'studentDashboard/fetchTasks',
-  async (_, { rejectWithValue }) => {
+  async (_, { rejectWithValue, dispatch }) => {
     const token = localStorage.getItem('student:token');
     const persistUserString = localStorage.getItem('persist:user');
     const persistUserObject = JSON.parse(persistUserString);
@@ -75,20 +87,23 @@ export const fetchTasks = createAsyncThunk(
     const studentId = userDetails.userId;
 
     if (!token) {
+      dispatch(setShowError(true));
+      dispatch(setErrorMsg('Authentication failed!'));
       return rejectWithValue('Authentication failed!');
     }
-
+    const say = localStorage.getItem("say")
     try {
-      const response = await axios.get(`${baseUrl}/admin/task/student/${studentId}`, {
-        headers: {
-          Authentication: token,
-        },
+      const response = await axios.get(`${baseUrl}/admin/task/student/${studentId}?say=${say}`, {
+        headers: { Authentication: token },
       });
 
       return response?.data?.completedTask;
     } catch (error) {
-      console.error('Error in fetchTasks:', error);
-      return rejectWithValue(error.message);
+      const errorMessage = error.response?.data?.message || error.message || "Failed to fetch tasks.";
+      const err = ErrorMsg(error);
+      dispatch(setShowError(true));
+      dispatch(setErrorMsg(err?.message));
+      return rejectWithValue(err?.message)
     }
   }
 );
@@ -96,29 +111,32 @@ export const fetchTasks = createAsyncThunk(
 // Fetch Student Grades
 export const fetchStudentGrades = createAsyncThunk(
   'studentDashboard/fetchStudentGrades',
-  async (_, { rejectWithValue }) => {
+  async (_, { rejectWithValue, dispatch }) => {
     const token = localStorage.getItem('student:token');
     const classId = localStorage.getItem('classId');
     const persistUserString = localStorage.getItem('persist:user');
     const persistUserObject = JSON.parse(persistUserString);
     const userDetails = JSON.parse(persistUserObject.userDetails);
     const studentId = userDetails.userId;
-
+    const say = localStorage.getItem("say")
     if (!studentId || !classId) {
+      dispatch(setShowError(true));
+      dispatch(setErrorMsg('Invalid student or class ID.'));
       return rejectWithValue('Invalid student or class ID.');
     }
 
     try {
-      const response = await axios.get(`${baseUrl}/admin/grades/student/${studentId}/class/${classId}`, {
-        headers: {
-          Authentication: token,
-        },
+      const response = await axios.get(`${baseUrl}/admin/grades/student/${studentId}/class/${classId}?say=${say}`, {
+        headers: { Authentication: token },
       });
 
       return response?.data;
     } catch (error) {
-      console.error('Error in fetchStudentGrades:', error);
-      return rejectWithValue(error.message);
+      const errorMessage = error.response?.data?.message || error.message || "Failed to fetch student grades.";
+      const err = ErrorMsg(error);
+      dispatch(setShowError(true));
+      dispatch(setErrorMsg(err?.message));
+      return rejectWithValue(err?.message)
     }
   }
 );
@@ -140,7 +158,7 @@ const formatDashboardData = (dashboardData) => {
       bgColor: 'bg-red-100',
       textColor: 'text-black-500',
       icon: <CiMoneyBill />,
-         url:'/student_finance'
+      url:'/student_finance'
     },
     {
       label: 'Event',
@@ -148,7 +166,7 @@ const formatDashboardData = (dashboardData) => {
       bgColor: 'bg-blue-100',
       textColor: 'text-black-500',
       icon: '📅',
-         url:'/student/noticeboard/events'
+      url:'/student/noticeboard/events'
     },
     {
       label: 'Notice',
@@ -156,7 +174,7 @@ const formatDashboardData = (dashboardData) => {
       bgColor: 'bg-yellow-100',
       textColor: 'text-black-500',
       icon: '🔔',
-         url:'/student/noticeboard/announcements'
+      url:'/student/noticeboard/announcements'
     },
   ];
 };

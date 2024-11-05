@@ -28,6 +28,7 @@ const ClassCard = ({ role, classData, onEdit }) => {
     sectionsCount,
     groupsCount,
     _id: classId,
+    classIcons,
   } = classData;
 
   const handleDeleteClick = () => {
@@ -88,7 +89,11 @@ const ClassCard = ({ role, classData, onEdit }) => {
             {className}
           </h2>
           <p>{teachersCount} Teachers</p>
-          <img src={centerLogo} className="w-20" alt="center_logo" />
+          <img
+            src={classIcons?.imageLink || centerLogo}
+            className="w-20"
+            alt="center_logo"
+          />
         </NavLink>
         <div className="flex justify-between items-center px-3">
           <div className="flex flex-col items-center gap-1">

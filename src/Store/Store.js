@@ -43,7 +43,7 @@ import adminAssignmentReducer from "./Slices/Admin/Class/Assignment/assignmentSl
 import adminQuizReducer from "./Slices/Admin/Class/Quiz/quizSlice";
 import adminSpeedGradeReducer from "./Slices/Admin/Class/SpeedGrade/speedGradeSlice";
 import timetableReducer from "./Slices/Admin/TimeTable/timtableSlice";
-
+import adminClassIconsReducer from "./Slices/Admin/Class/reducer/iconSlice";
 // student
 import studentDashboardReducer from "./Slices/Student/Dashboard/studentDashboardSlices";
 import studentFinanceReducer from "./Slices/Student/Finance/financeSlice";
@@ -108,6 +108,7 @@ const stdClassPersistConfig = {
   storage,
 };
 
+
 // Combine the Auth and User reducers under a Common entity
 const commonReducer = combineReducers({
   auth: persistReducer(authPersistConfig, authReducer),
@@ -115,7 +116,6 @@ const commonReducer = combineReducers({
   alertMsg: alertReducer,
   academicYear:academicYearReducer,
 });
-
 
 const AdminReducer = combineReducers({
   adminDashboard: adminDashboardReducer,
@@ -142,6 +142,8 @@ const AdminReducer = combineReducers({
   quizzes: adminQuizReducer,
   timetable: timetableReducer,
   speedgrades: adminSpeedGradeReducer,
+  classIcons: adminClassIconsReducer,
+
   graduates: graduateReducer,
   all_students: allStudentReducer,
   all_parents: allParentReducer,
@@ -153,7 +155,6 @@ const AdminReducer = combineReducers({
   subject_assignment: subjectAssignmentReducer,
   subject_quiz: subjectQuizReducer,
 });
-
 
 const studentReducer = combineReducers({
   studentDashboard: studentDashboardReducer,

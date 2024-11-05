@@ -12,8 +12,8 @@ const ParentInformation = ({ parents }) => (
       guardianEmail
     } />
     <InformationItem icon={MdOutlineLocationOn} title="Address" value={`${parents?.permanentAddress?.
-      country}, ${parents?.permanentAddress?.city}, ${parents?.permanentAddress?.
-          street}`} />
+      country || '-'}, ${parents?.permanentAddress?.city || ''}, ${parents?.permanentAddress?.
+          street || ''}`} />
   </div>
 );
 

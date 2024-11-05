@@ -3,27 +3,46 @@ import axios from "axios";
 import { baseUrl } from "../../../../../config/Common";
 import { fetchClassDetails } from "../actions/classThunk";
 import { setSubjects } from "./subjectSlice";
+import { ErrorMsg } from "../../../Common/Alerts/errorhandling.action";
+import { setShowError, setErrorMsg } from "../../../Common/Alerts/alertsSlice";
 import toast from "react-hot-toast";
+
+const say = localStorage.getItem("say");
+
+// Helper function to get the token from Redux state
+const getToken = (state, rejectWithValue, dispatch) => {
+  const token = state.common.auth?.token;
+  if (!token) {
+    dispatch(setShowError(true));
+    dispatch(setErrorMsg("Authentication Failed"));
+    return rejectWithValue("Authentication Failed");
+  }
+  return `Bearer ${token}`;
+};
+
+// Centralized error handling
+const handleError = (error, dispatch, rejectWithValue) => {
+  const err = ErrorMsg(error);
+  dispatch(setShowError(true));
+  dispatch(setErrorMsg(err.message));
+  return rejectWithValue(err.message);
+};
 
 // Fetch subjects by classId
 export const fetchSubjects = createAsyncThunk(
   "subject/fetchSubjects",
   async (classId, { rejectWithValue, getState, dispatch }) => {
-    const { common } = getState(); // Accessing the auth token from the common slice
-    const token = common.auth.token;
-
     try {
-      const response = await axios.get(`${baseUrl}/admin/subject/${classId}`, {
-        headers: { Authentication: `Bearer ${token}` },
+      const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
+      const response = await axios.get(`${baseUrl}/admin/subject/${classId}?say=${say}`, {
+        headers: { Authentication: token },
       });
-
       const { data } = response.data;
       dispatch(setSubjects(data)); // Update the subjects state using the setSubjects action
       return data;
     } catch (err) {
-      const errorMessage =
-        err.response?.data?.message || "No Subject Found ";
-      return rejectWithValue(errorMessage);
+      return handleError(err, dispatch, rejectWithValue);
     }
   }
 );
@@ -32,27 +51,21 @@ export const fetchSubjects = createAsyncThunk(
 export const createSubject = createAsyncThunk(
   "subject/createSubject",
   async (subjectData, { rejectWithValue, getState, dispatch }) => {
-    const { common } = getState();
-    const token = common.auth.token;
-
     try {
+      const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const response = await axios.post(
-        `${baseUrl}/admin/subject`,
+        `${baseUrl}/admin/subject?say=${say}`,
         subjectData,
         {
-          headers: { Authentication: `Bearer ${token}` },
+          headers: { Authentication: token },
         }
       );
-      console.log(subjectData, "aaaaaaaa");
       toast.success("Subject created successfully");
-      const classId = subjectData.classId;
-      dispatch(fetchClassDetails(classId));
+      dispatch(fetchClassDetails(subjectData.classId));
       return response.data.data;
     } catch (error) {
-      console.log(error);
-      const errorMessage =
-        error.response?.data?.message || "Failed to create subject";
-      return rejectWithValue(errorMessage);
+      return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
@@ -60,30 +73,22 @@ export const createSubject = createAsyncThunk(
 // Update an existing subject
 export const updateSubject = createAsyncThunk(
   "subject/updateSubject",
-  async (
-    { subjectId, subjectData },
-    { rejectWithValue, getState, dispatch }
-  ) => {
-    const { common } = getState();
-    const token = common.auth.token;
-
+  async ({ subjectId, subjectData }, { rejectWithValue, getState, dispatch }) => {
     try {
+      const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const response = await axios.put(
-        `${baseUrl}/admin/subject/${subjectId}`,
+        `${baseUrl}/admin/subject/${subjectId}?say=${say}`,
         subjectData,
         {
-          headers: { Authentication: `Bearer ${token}` },
+          headers: { Authentication: token },
         }
       );
       toast.success("Subject updated successfully");
-
-      const classId = subjectData.classId;
-      dispatch(fetchClassDetails(classId));
+      dispatch(fetchClassDetails(subjectData.classId));
       return response.data.data;
     } catch (error) {
-      const errorMessage =
-        error.response?.data?.msg || "Failed to update subject";
-      return rejectWithValue(errorMessage);
+      return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
@@ -92,20 +97,17 @@ export const updateSubject = createAsyncThunk(
 export const deleteSubject = createAsyncThunk(
   "subject/deleteSubject",
   async ({ subjectId, classId }, { rejectWithValue, getState, dispatch }) => {
-    const { common } = getState();
-    const token = common.auth.token;
-
     try {
-      await axios.delete(`${baseUrl}/admin/subject/${subjectId}`, {
-        headers: { Authentication: `Bearer ${token}` },
+      const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
+      await axios.delete(`${baseUrl}/admin/subject/${subjectId}?say=${say}`, {
+        headers: { Authentication: token },
       });
-
       dispatch(fetchClassDetails(classId));
+      toast.success("Subject deleted successfully");
       return subjectId;
     } catch (error) {
-      const errorMessage =
-        error.response?.data?.msg || "Failed to delete subject";
-      return rejectWithValue(errorMessage);
+      return handleError(error, dispatch, rejectWithValue);
     }
   }
 );

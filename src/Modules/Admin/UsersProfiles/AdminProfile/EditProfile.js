@@ -4,24 +4,22 @@ import FormInput from "../../Accounting/subClass/component/FormInput";
 import FormSelect from "../../Accounting/subClass/component/FormSelect";
 import useEditAdmin from "../../../../Hooks/AuthHooks/Staff/Admin/staff/useEditAdmin";
 import useGetUserDetail from "../../../../Hooks/AuthHooks/Staff/useGetUserDetail";
+import { useDispatch } from "react-redux";
+import { fetchUserData, updateAdminProfile } from "../../../../Store/Slices/Common/User/actions/userActions";
 
 const EditAdmin = ({data}) => {
-  const [imagePreview, setImagePreview] = useState(null);
+  const [imagePreview, setImagePreview] = useState(data?.profile||null);
+  const dispatch = useDispatch()
   const [adminData, setAdminData] = useState({
-    adminName: data.adminName,
-    contactNumber: data.contactNumber,
-    email: data.email,
+    _id:data?._id,
+    adminName: data?.fullName,
+    contactNumber: data?.mobileNumber,
+    email: data?.email,
     profile: null,
   });
-  useEffect(() => {
-    if (data) {
-      setAdminData({
-        adminName: data.adminName || "",
-        contactNumber: data.contactNumber || "",
-        email: data.email || "",
-      });
-    }
-  }, [data]);
+  useEffect(()=>{
+    setImagePreview(data?.profile);
+  },[])
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setAdminData((prev) => ({
@@ -47,14 +45,12 @@ const EditAdmin = ({data}) => {
   const handleRemoveImage = () => {
     setImagePreview(null);
   };
-  const  {userDetail} = useGetUserDetail();
-const {EditAdmin} = useEditAdmin()
+  
   const handleSubmit = async(e) => {
     e.preventDefault();
-    console.log("admin data to submit:", adminData);
-  await  EditAdmin(adminData);
-  userDetail()
+    dispatch(updateAdminProfile({data:adminData}));
   };
+
   return (
     <>
       <div className="p-4 bg-gray-50 h-full border rounded-lg">
@@ -70,7 +66,7 @@ const {EditAdmin} = useEditAdmin()
             </div>
             <div className="flex flex-col gap-3">
               <FormInput id="adminName" label="Full Name" value={adminData.adminName} onChange={handleInputChange} />
-              <FormInput id="email"  label="Email" type="email" value={adminData.email} readOnly />
+              <FormInput id="email"  label="Email" type="email"   value={adminData.email} readOnly />
               <FormInput id="contactNumber" label="Contact" type="text" value={adminData.contactNumber} onChange={handleInputChange} />
             </div>
           </div>

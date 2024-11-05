@@ -1,13 +1,18 @@
 // validateStudentDetails.js
-const validateStudentDetails = (details) => {
+const validateStudentDetails = (details, type) => {
   const errors = {};
 
   const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  const isValidPhoneNumber = (number) => /^\d{10}$/.test(number);
-  const isValidPostalCode = (postalCode) => /^\d{5,10}$/.test(postalCode);
+  const isValidPhoneNumber = (number) => /^\d{8}$/.test(number);
+  const isValidPostalCode = (postalCode) => /^\d{3,10}$/.test(postalCode);
   const isValidName = (name) => /^[a-zA-Z\s]+$/.test(name);
-  const isValidQID = (qid) => /^\d{5,10}$/.test(qid);
-
+  const isValidQID = (qid) => /^\d{11}$/.test(qid);
+  if (type === "admin" && !details.bloodGroup) {
+    errors.bloodGroup = "Blood Group is required for admin";
+  }
+  if (type === "student" && !details.profile) {
+    errors.profile = "Profile image is required for students";
+  }
   // Personal Information
   if (!details.firstName.trim()) errors.firstName = "First Name is required";
   else if (!isValidName(details.firstName))
@@ -26,21 +31,22 @@ const validateStudentDetails = (details) => {
     errors.placeOfBirth = "Place of Birth is required";
   if (!details.gender) errors.gender = "Gender is required";
   if (!details.religion) errors.religion = "Religion is required";
-  if (!details.bloodGroup) errors.bloodGroup = "bloodGroup is required";
+  // if (!details.bloodGroup) errors.bloodGroup = "bloodGroup is required";
 
   if (!details.contactNumber.trim())
     errors.contactNumber = "Contact Number is required";
   else if (!isValidPhoneNumber(details.contactNumber))
-    errors.contactNumber = "Invalid Contact Number (should be 10 digits)";
+    errors.contactNumber = "Invalid Contact Number (should be 8 digits)";
 
   if (!details.emergencyNumber.trim())
     errors.emergencyNumber = "Emergency Contact Number is required";
   else if (!isValidPhoneNumber(details.emergencyNumber))
     errors.emergencyNumber =
-      "Invalid Emergency Contact Number (should be 10 digits)";
+      "Invalid Emergency Contact Number (should be 8 digits)";
 
   if (!details.Q_Id.trim()) errors.Q_Id = "QID is required";
-  else if (!isValidQID(details.Q_Id)) errors.Q_Id = "Invalid QID format";
+  else if (!isValidQID(details.Q_Id))
+    errors.Q_Id = "Invalid QID format it must be 11 digit";
 
   if (!details.motherName.trim())
     errors.motherName = "Mother's Name is required";
@@ -69,7 +75,7 @@ const validateStudentDetails = (details) => {
     errors.guardianContactNumber = "Guardian's Contact Number is required";
   else if (!isValidPhoneNumber(details.guardianContactNumber))
     errors.guardianContactNumber =
-      "Invalid Guardian Contact Number (should be 10 digits)";
+      "Invalid Guardian Contact Number (should be 8 digits)";
 
   if (!details.enrollmentStatus)
     errors.enrollmentStatus = "Enrollment Status is required";

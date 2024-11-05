@@ -4,6 +4,29 @@ import toast from "react-hot-toast";
 import { baseUrl } from "../../../../../config/Common";
 import { fetchModules } from "./moduleThunk";
 import { setSelectedModule } from "./moduleSlice";
+import { setErrorMsg, setShowError } from "../../../Common/Alerts/alertsSlice";
+import { ErrorMsg } from "../../../Common/Alerts/errorhandling.action";
+
+const say = localStorage.getItem("say");
+
+// Helper function to get the token from Redux state with centralized error handling
+const getToken = (state, rejectWithValue, dispatch) => {
+  const token = state.common.auth?.token;
+  if (!token) {
+    dispatch(setShowError(true));
+    dispatch(setErrorMsg("Authentication Failed"));
+    return rejectWithValue("Authentication Failed");
+  }
+  return `Bearer ${token}`;
+};
+
+// Centralized error handling
+const handleError = (error, dispatch, rejectWithValue) => {
+  const err = ErrorMsg(error);
+  dispatch(setShowError(true));
+  dispatch(setErrorMsg(err.message));
+  return rejectWithValue(err.message);
+};
 
 // Add Attachment Thunk
 export const addAttachment = createAsyncThunk(
@@ -12,8 +35,9 @@ export const addAttachment = createAsyncThunk(
     { chapterId, subjectId, documents, documentLabels },
     { rejectWithValue, getState, dispatch }
   ) => {
+    const say = localStorage.getItem("say")
     try {
-      const token = getState().common.auth.token;
+      const token = getToken(getState(), rejectWithValue, dispatch);
       const cid = getState().common.user.classInfo.selectedClassId;
       const sid = getState().common.user.subjectInfo.selectedSubjectId;
 
@@ -26,12 +50,12 @@ export const addAttachment = createAsyncThunk(
       });
 
       const response = await axios.put(
-        `${baseUrl}/admin/uploadChapterFiles`,
+        `${baseUrl}/admin/uploadChapterFiles?say=${say}`,
         formData,
         {
           headers: {
             "Content-Type": "multipart/form-data",
-            Authentication: `Bearer ${token}`,
+            Authentication: token,
           },
         }
       );
@@ -53,11 +77,8 @@ export const addAttachment = createAsyncThunk(
       }
 
       return response.data;
-    } catch (err) {
-      const message =
-        err.response?.data?.message || "Error uploading documents";
-      toast.error(message);
-      return rejectWithValue(message);
+    } catch (error) {
+      return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
@@ -70,16 +91,17 @@ export const deleteAttachmentThunk = createAsyncThunk(
     { rejectWithValue, getState, dispatch }
   ) => {
     try {
-      const token = getState().common.auth.token;
+      const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say")
       const cid = getState().common.user.classInfo.selectedClassId;
       const sid = getState().common.user.subjectInfo.selectedSubjectId;
 
       const response = await axios.put(
-        `${baseUrl}/admin/removeChapterFiles`,
+        `${baseUrl}/admin/removeChapterFiles?say=${say}`,
         { chapterId, subjectId, fileUrl },
         {
           headers: {
-            Authentication: `Bearer ${token}`,
+            Authentication: token,
           },
         }
       );
@@ -101,11 +123,8 @@ export const deleteAttachmentThunk = createAsyncThunk(
       }
 
       return response.data;
-    } catch (err) {
-      const message =
-        err.response?.data?.message || "Error deleting attachment";
-      toast.error(message);
-      return rejectWithValue(message);
+    } catch (error) {
+      return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
