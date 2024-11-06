@@ -168,15 +168,10 @@ const MainSection = () => {
   const { assignedTeachers, loading, error } = useSelector(
     (state) => state.admin.teacher
   );
-  const role = useSelector((state) => state.common.auth.role);
+
   const selectedSection = useSelector(
     (state) => state.admin.teacher.selectedSection
   );
-
-  console.log(assignedTeachers, "llllllll");
-
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [selectedTeacher, setSelectedTeacher] = useState(null);
 
   // Fetch teachers when the component is mounted
   useEffect(() => {
@@ -187,16 +182,13 @@ const MainSection = () => {
   const filteredTeachers =
     selectedSection === "Everyone"
       ? assignedTeachers
-      : assignedTeachers.filter((teacher) =>
-          teacher.sectionId.some(
-            (section) => section.sectionName === selectedSection
-          )
+      : assignedTeachers?.filter(
+          (teacher) =>
+            teacher?.sectionId &&
+            teacher.sectionId.some(
+              (section) => section?.sectionName === selectedSection
+            )
         );
-
-  const handleEditClick = useCallback((teacher) => {
-    setSelectedTeacher(teacher);
-    setIsSidebarOpen(true);
-  }, []);
 
   return (
     <>
@@ -220,8 +212,7 @@ const MainSection = () => {
             <TeacherCard
               key={teacher._id}
               teacher={teacher}
-              role={role}
-              onEditClick={handleEditClick}
+              // onEditClick={handleEditClick}
             />
           ))
         )}
