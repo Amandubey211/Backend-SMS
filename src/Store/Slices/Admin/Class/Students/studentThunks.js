@@ -129,6 +129,11 @@ export const graduateStudents = createAsyncThunk(
         { studentIds },
         { headers: { Authentication: token } }
       );
+      if(response.data.success){
+        toast.success("Student graduated successfully");
+      }else{
+        toast.success(response.data.message);
+      }
       // toast.success("Student Graduated");
       dispatch(fetchStudentsByClassAndSection(classId));
       return response.data;

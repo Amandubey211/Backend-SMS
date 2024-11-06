@@ -1,14 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import toast from "react-hot-toast";
-import axios from "axios";
-import { baseUrl } from "../../../config/Common";
 import EditAcademicYearModal from "./Components/EditAcademicYearModal";
 import DeleteModal from "../../../Components/Common/DeleteModal";
-import { setAcademicYear } from "../../../Redux/Slices/Auth/AuthSlice";
 import AcademicYearTable from "./Components/AcademicYearTable";
 import CreateAcademicYearForm from "./Components/CreateAcademicYearForm";
 import { setSeletedAcademicYear } from "../../../Store/Slices/Common/AcademicYear/academicYear.slice";
+import { addAcademicYear, deleteAcademicYear, fetchAcademicYear } from "../../../Store/Slices/Common/AcademicYear/academicYear.action";
 
 const formatDate = (dateString) => {
   const date = new Date(dateString);
@@ -20,7 +17,6 @@ const formatDate = (dateString) => {
 
 const MainSection = () => {
   const dispatch = useDispatch();
-  const [academicYears, setAcademicYears] = useState([]);
   const [newYear, setNewYear] = useState({
     year: "",
     startDate: "",
@@ -31,38 +27,7 @@ const MainSection = () => {
   const [deletingYear, setDeletingYear] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [loading, setLoading] = useState(false);
   const role = useSelector((store) => store.common.auth.role);
-  const [error,setError]=useState(false);
-
-  const fetchAcademicYears = async () => {
-    setLoading(true);
-    try {
-      const token = localStorage.getItem(`${role}:token`);
-      const { data } = await axios.get(`${baseUrl}/admin/getAllAcademicYear`, {
-        headers: { Authentication: token },
-      });
-      if (data?.success) {
-        const formattedYears = data?.data?.map((year) => ({
-          _id: year._id,
-          academicYear: year.year,
-          startDate: formatDate(year.startDate),
-          endDate: formatDate(year.endDate),
-          isActive: year.isActive,
-        }));
-        setAcademicYears(formattedYears);
-        dispatch(setAcademicYear(formattedYears));
-      } else {
-        toast.error(data.msg || "Failed to fetch academic years.");
-      }
-    } catch (error) {
-      setError(true)
-      toast.error("Something went wrong. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleCheckboxChange = async (selectedYear) => {
     alert('After select the year need to reload the page');
     localStorage.setItem('say', selectedYear._id);
@@ -70,45 +35,8 @@ const MainSection = () => {
       window.location.reload();
   };
 
-  // Handle academic year creation
   const handleCreate = async () => {
-    setLoading(true);
-    try {
-      const token = localStorage.getItem(`${role}:token`);
-      const { data } = await axios.post(
-        `${baseUrl}/admin/createAcademicYear`,
-        newYear,
-        {
-          headers: { Authentication: token },
-        }
-      );
-
-      if (data?.success) {
-        // Format the new year immediately after creation
-        const formattedNewYear = {
-          _id: data.data._id,
-          academicYear: data.data.year,
-          startDate: formatDate(data.data.startDate),
-          endDate: formatDate(data.data.endDate),
-          isActive: data.data.isActive,
-        };
-
-        // Update state with the newly created and formatted academic year
-        setAcademicYears([...academicYears, formattedNewYear]);
-        dispatch(setAcademicYear([...academicYears, formattedNewYear]));
-
-        // Clear the form fields
-        setNewYear({ year: "", startDate: "", endDate: "", isActive: false });
-
-        toast.success("Academic year created successfully.");
-      } else {
-        toast.error(data.msg || "Failed to create academic year.");
-      }
-    } catch (error) {
-      toast.error("Something went wrong. Please try again.");
-    } finally {
-      setLoading(false);
-    }
+      dispatch(addAcademicYear(newYear))
   };
 
   const handleEdit = (year) => {
@@ -122,39 +50,13 @@ const MainSection = () => {
   };
 
   const handleDeleteConfirm = async () => {
-    setLoading(true);
-    try {
-      const token = localStorage.getItem(`${role}:token`);
-      const { data } = await axios.delete(
-        `${baseUrl}/admin/deleteAcademicYear/${deletingYear._id}`,
-        {
-          headers: { Authentication: token },
-        }
-      );
-      if (data?.success) {
-        setAcademicYears(
-          academicYears.filter((year) => year._id !== deletingYear._id)
-        );
-        dispatch(
-          setAcademicYear(
-            academicYears.filter((year) => year._id !== deletingYear._id)
-          )
-        );
-        setShowDeleteModal(false);
-        toast.success("Academic year deleted successfully.");
-      } else {
-        toast.error(data.msg || "Failed to delete academic year.");
-      }
-    } catch (error) {
-      toast.error("Something went wrong. Please try again.");
-    } finally {
-      setLoading(false);
-    }
+    
+   dispatch(deleteAcademicYear(deletingYear._id))
   };
-
+  const {academicYears,loading} = useSelector((store)=>store.common.academicYear)
   useEffect(() => {
-    fetchAcademicYears();
-  }, []);
+    dispatch(fetchAcademicYear())
+  }, [dispatch]);
 
   return (
     <div className=" min-h-screen flex w-full">
@@ -181,7 +83,7 @@ const MainSection = () => {
           show={showEditModal}
           onClose={() => setShowEditModal(false)}
           year={editingYear}
-          refreshData={fetchAcademicYears}
+          refreshData={fetchAcademicYear}
         />
       )}
 
@@ -190,7 +92,7 @@ const MainSection = () => {
           isOpen={showDeleteModal}
           onClose={() => setShowDeleteModal(false)}
           onConfirm={handleDeleteConfirm}
-          title={deletingYear.academicYear}
+          title={deletingYear?.year}
         />
       )}
     </div>

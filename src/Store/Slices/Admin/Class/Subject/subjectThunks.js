@@ -34,10 +34,13 @@ export const fetchSubjects = createAsyncThunk(
   async (classId, { rejectWithValue, getState, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
-      const say = localStorage.getItem("say")
-      const response = await axios.get(`${baseUrl}/admin/subject/${classId}?say=${say}`, {
-        headers: { Authentication: token },
-      });
+      const say = localStorage.getItem("say");
+      const response = await axios.get(
+        `${baseUrl}/admin/subject/${classId}?say=${say}`,
+        {
+          headers: { Authentication: token },
+        }
+      );
       const { data } = response.data;
       dispatch(setSubjects(data)); // Update the subjects state using the setSubjects action
       return data;
@@ -53,7 +56,7 @@ export const createSubject = createAsyncThunk(
   async (subjectData, { rejectWithValue, getState, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
-      const say = localStorage.getItem("say")
+      const say = localStorage.getItem("say");
       const response = await axios.post(
         `${baseUrl}/admin/subject?say=${say}`,
         subjectData,
@@ -73,10 +76,13 @@ export const createSubject = createAsyncThunk(
 // Update an existing subject
 export const updateSubject = createAsyncThunk(
   "subject/updateSubject",
-  async ({ subjectId, subjectData }, { rejectWithValue, getState, dispatch }) => {
+  async (
+    { subjectId, subjectData },
+    { rejectWithValue, getState, dispatch }
+  ) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
-      const say = localStorage.getItem("say")
+      const say = localStorage.getItem("say");
       const response = await axios.put(
         `${baseUrl}/admin/subject/${subjectId}?say=${say}`,
         subjectData,
@@ -99,7 +105,7 @@ export const deleteSubject = createAsyncThunk(
   async ({ subjectId, classId }, { rejectWithValue, getState, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
-      const say = localStorage.getItem("say")
+      const say = localStorage.getItem("say");
       await axios.delete(`${baseUrl}/admin/subject/${subjectId}?say=${say}`, {
         headers: { Authentication: token },
       });

@@ -127,7 +127,7 @@ const GraduateStudent = ({ student }) => {
         })
       ).unwrap(); // unwrap to handle any errors within async thunks
       console.log("Response:", response);
-      toast.success("Student graduated successfully");
+      
     } catch (error) {
       console.error("Graduation failed:", error);
       toast.error("Failed to graduate student");

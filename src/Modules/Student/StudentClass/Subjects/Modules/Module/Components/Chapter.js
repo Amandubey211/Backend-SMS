@@ -5,7 +5,6 @@ import {
   FaFilePdf,
   FaFileWord,
   FaFilePowerpoint,
-  FaEllipsisV,
   FaEye,
 } from "react-icons/fa";
 import ChapterItem from "./ChapterItem";
@@ -20,7 +19,6 @@ const Chapter = ({
   isExpanded,
   onToggle,
 }) => {
-  const [attachmentsExpanded, setAttachmentsExpanded] = useState(false);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [previewType, setPreviewType] = useState(null);
 
@@ -35,13 +33,7 @@ const Chapter = ({
     })),
   ];
 
-  const toggleAttachments = () => {
-    setAttachmentsExpanded((prev) => !prev);
-  };
-
-  const openPreviewModal = (url, type, attachment) => {
-    console.log("Opening preview for:", attachment); // Console log the attachment
-    console.log("Opening preview for:", url); // Console log the attachment
+  const openPreviewModal = (url, type) => {
     setPreviewUrl(url);
     setPreviewType(type);
   };
@@ -77,74 +69,50 @@ const Chapter = ({
           />
           <div>
             <h2 className="font-semibold text-lg">{title}</h2>
-            <div className="flex items-center gap-1">
-              <p className="text-gray-500">Chapter {chapterNumber}</p>
-
-              {attachments.length > 0 && (
-                <div className="flex items-center justify-between">
-                  <button
-                    className="flex items-center space-x-1 px-3 text-sm font-semibold bg-gradient-to-r from-pink-100 to-purple-200 rounded-md py-1"
-                    onClick={toggleAttachments}
-                  >
-                    <span className="text-gradient">
-                      Attachments ({attachments.length})
-                    </span>
-                    <span>
-                      {attachmentsExpanded ? (
-                        <FaChevronUp className="ml-1 text-purple-700" />
-                      ) : (
-                        <FaChevronDown className="ml-1 text-purple-800" />
-                      )}
-                    </span>
-                  </button>
-                </div>
-              )}
-            </div>
+            <p className="text-gray-500">Chapter {chapterNumber}</p>
           </div>
         </div>
-        <div className="flex items-center space-x-2">
-          <button
-            className="border p-2 rounded-full hover:bg-gray-50"
-            onClick={onToggle}
-          >
-            {isExpanded ? <FaChevronUp /> : <FaChevronDown />}
-          </button>
-        </div>
+        <button
+          className="border p-2 rounded-full hover:bg-gray-50"
+          onClick={onToggle}
+        >
+          {isExpanded ? <FaChevronUp /> : <FaChevronDown />}
+        </button>
       </div>
 
-      {attachmentsExpanded && attachments.length > 0 && (
+      {isExpanded && (
         <div className="mt-2">
-          <div className="grid grid-cols-1 gap-2 mb-2">
-            {attachments?.map((attachment, index) => {
-              return (
-                <div
-                  key={index}
-                  className="flex flex-col p-2 border rounded-md transform transition duration-100 hover:shadow-md"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center">
-                      {getFileIcon(attachment?.type) || (
-                        <img
-                          src={attachment?.url}
-                          alt={attachment?.name}
-                          className="h-8 w-8 object-cover rounded-md"
-                        />
-                      )}
-                      <div className="flex flex-col ml-4">
-                        <p className="text-gray-700 text-sm truncate max-w-xs">
-                          {attachment?.name}
-                        </p>
-                        <p className="text-md">{attachment?.label}</p>
+          {/* Attachments Section */}
+          {attachments.length > 0 && (
+            <div className="mb-4">
+              <h3 className="text-sm font-semibold text-green-600">
+                <b>{attachments.length}</b> Attachments
+              </h3>
+              <div className="grid grid-cols-1 gap-2 mb-2">
+                {attachments.map((attachment, index) => (
+                  <div
+                    key={index}
+                    className="flex flex-col p-2 border rounded-md transform transition duration-100 hover:shadow-md"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        {getFileIcon(attachment?.type) || (
+                          <img
+                            src={attachment?.url}
+                            alt={attachment?.name}
+                            className="h-8 w-8 object-cover rounded-md"
+                          />
+                        )}
+                        <div className="flex flex-col ml-4">
+                          <p className="text-gray-700 text-sm truncate max-w-xs">
+                            {attachment?.name}
+                          </p>
+                          <p className="text-md">{attachment?.label}</p>
+                        </div>
                       </div>
-                    </div>
-                    <div className="flex items-center space-x-2">
                       <button
                         onClick={() =>
-                          openPreviewModal(
-                            attachment?.url,
-                            attachment?.type,
-                            attachment
-                          )
+                          openPreviewModal(attachment?.url, attachment?.type)
                         }
                         className="text-green-500 transition p-1 border rounded-full transform hover:scale-110 cursor-pointer"
                         aria-label="Preview"
@@ -153,33 +121,33 @@ const Chapter = ({
                       </button>
                     </div>
                   </div>
-                </div>
-              );
-            })}
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Assignments and Quizzes Section */}
+          <div>
+            {combinedItems.length > 0 ? (
+              combinedItems.map((item, index) => (
+                <ChapterItem
+                  key={index}
+                  type={item.type}
+                  title={item.name}
+                  id={item._id}
+                  isPublished={item.isPublished}
+                />
+              ))
+            ) : (
+              <p className="py-2 bg-gray-50 italic text-gray-500 text-center">
+                No Data found
+              </p>
+            )}
           </div>
         </div>
       )}
 
-      {isExpanded && (
-        <div className="ml-10 py-2">
-          {combinedItems?.length > 0 ? (
-            combinedItems?.map((item, index) => (
-              <ChapterItem
-                key={index}
-                type={item?.type}
-                title={item?.name}
-                id={item?._id}
-                isPublished={item?.isPublished}
-              />
-            ))
-          ) : (
-            <p className="py-2 bg-gray-50 italic text-gray-500 text-center">
-              No Data found
-            </p>
-          )}
-        </div>
-      )}
-
+      {/* Preview Modal */}
       {previewUrl && (
         <div
           className="fixed inset-0 flex items-center justify-center z-50"

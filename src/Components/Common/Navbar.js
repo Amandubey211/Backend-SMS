@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { TbBell } from "react-icons/tb";
 import { IoSettingsOutline } from "react-icons/io5";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import IconButton from "./IconButton";
 import LeftHeading from "./LeftHeading";
@@ -10,6 +10,7 @@ import useStaffLogout from "../../Hooks/AuthHooks/Staff/useStaffLogOut";
 import Sidebar from "./Sidebar";
 import NotificationBar from "./NotificationBar";
 import SettingDropdown from "./SettingDropdown";
+import { fetchAcademicYear } from "../../Store/Slices/Common/AcademicYear/academicYear.action";
 
 const Navbar = () => {
   const [isOpenNotification, setIsOpenNotification] = useState(false);
@@ -22,12 +23,14 @@ const Navbar = () => {
     (store) => store.common.user.navbar.leftHeading
   );
   const role = useSelector((store) => store.common.auth.role);
-  const activeAcademicYear = useSelector((store) => {
-    if (role === "admin" || role === "teacher" || role === "accountant") {
-      return store.common.auth?.AcademicYear?.find((year) => year?.isActive)
-        ?.academicYear;
-    }
-    return null; // Or provide a default value if necessary
+  const dispatch = useDispatch()
+  useEffect(() => {
+    dispatch(fetchAcademicYear())
+  }, []);
+  const selectAcademicYear = useSelector((store) => {
+    const say = localStorage.getItem('say')
+      return store.common.academicYear.academicYears?.find((year) => year?._id == say)
+    
   });
 
   const { staffLogout } = useStaffLogout();
@@ -101,7 +104,7 @@ const Navbar = () => {
         <div className="flex items-center space-x-2 relative justify-center  ">
           {role === "admin" || role === "teacher" || role === "accountant" ? (
             <div className="border-r px-4 font-semibold text-gradient" title='Academic Year'>
-             AY: {activeAcademicYear && activeAcademicYear}
+             AY: {selectAcademicYear && selectAcademicYear?.year}
             </div>
           ) : null}
 

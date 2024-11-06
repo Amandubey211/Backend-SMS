@@ -13,9 +13,10 @@ const StudentCourseProgress = ({student}) => {
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(fetchStudentSubjectProgress(cid)).then(()=>{
+      if(studentSubjectProgress.length > 0){
       dispatch(
         fetchCourseProgress({ studentId: cid, subjectId: studentSubjectProgress[0]?.subjectId })
-      )
+      )}
     });
   }, []);
   const fetchModules = (subjectId)=>{

@@ -69,21 +69,19 @@ export const fetchGroupsByClassAndSection = createAsyncThunk(
 // Fetch Sections by Class
 export const fetchSectionsByClass = createAsyncThunk(
   "group/fetchSectionsByClass",
-  async (classId, { getState, rejectWithValue }) => {
+  async (classId, { getState, rejectWithValue,dispatch }) => {
     try {
       const token = getState().common.auth.token;
       const say = localStorage.getItem("say");
       const response = await axios.get(
-        `${baseUrl}/admin/getSectionByclass/${classId}`,
+        `${baseUrl}/admin/getSectionByclass/${classId}?say=${say}`,
         {
           headers: { Authentication: `Bearer ${token}` },
         }
       );
       return response.data.data;
     } catch (error) {
-      return rejectWithValue(
-        error.response?.data?.message || "Failed to fetch sections"
-      );
+      return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
