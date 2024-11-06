@@ -64,7 +64,7 @@ const GraduateList = ({
       </div>
 
       <div className="overflow-hidden ">
-        <table className="min-w-full bg-white border border-gray-200">
+        <table className="min-w-full bg-white border border-gray-200 rounded-lg">
           <thead>
             <tr className="bg-gray-100 border-b">
               <th className="py-2 px-3 text-center align-middle w-10">
@@ -75,31 +75,31 @@ const GraduateList = ({
                   onChange={handleSelectAll}
                 />
               </th>
-              <th className="py-2 px-3 text-left text-xs font-semibold text-gray-600">
+              <th className="py-2 px-3 text-left text-sm font-semibold text-gray-600">
                 {t("Profile")}
               </th>
-              <th className="py-2 px-3 text-left text-xs font-semibold text-gray-600">
+              <th className="py-2 px-3 text-left text-sm font-semibold text-gray-600">
                 {t("Name")}
               </th>
-              <th className="py-2 px-3 text-left text-xs font-semibold text-gray-600">
+              <th className="py-2 px-3 text-left text-sm font-semibold text-gray-600">
                 {t("QID")}
               </th>
-              <th className="py-2 px-3 text-left text-xs font-semibold text-gray-600">
+              <th className="py-2 px-3 text-left text-sm font-semibold text-gray-600">
                 {t("Admission Number")}
               </th>
-              <th className="py-2 px-3 text-left text-xs font-semibold text-gray-600">
+              <th className="py-2 px-3 text-left text-sm font-semibold text-gray-600">
                 {t("Graduation Year")}
               </th>
-              <th className="py-2 px-3 text-left text-xs font-semibold text-gray-600">
+              <th className="py-2 px-3 text-left text-sm font-semibold text-gray-600">
                 {t("Email")}
               </th>
-              <th className="py-2 px-3 text-left text-xs font-semibold text-gray-600">
+              <th className="py-2 px-3 text-left text-sm font-semibold text-gray-600">
                 {t("Contact")}
               </th>
-              <th className="py-2 px-3 text-left text-xs font-semibold text-gray-600">
+              <th className="py-2 px-3 text-left text-sm font-semibold text-gray-600">
                 {t("Parent Contact")}
               </th>
-              <th className="py-2 px-3 text-xs"></th>
+              <th className="py-2 px-3 text-sm"></th>
             </tr>
           </thead>
           <tbody>
@@ -162,31 +162,31 @@ const GraduateList = ({
                       className="w-8 h-8 rounded-full border-2 border-gray-300"
                     />
                   </td>
-                  <td className="py-2 px-3 text-xs whitespace-nowrap">
+                  <td className="py-2 px-3 text-sm whitespace-nowrap">
                     {student.firstName  || 'N/A'} {student.lastName  || 'N/A'}
                   </td>
-                  <td className="py-2 px-3 text-xs whitespace-nowrap">
+                  <td className="py-2 px-3 text-sm whitespace-nowrap">
                     {student.Q_Id || 'N/A'}
                   </td>
-                  <td className="py-2 px-3 text-xs whitespace-nowrap">
+                  <td className="py-2 px-3 text-sm whitespace-nowrap">
                     {student.admissionNumber || 'N/A'}
                   </td>
-                  <td className="py-2 px-3 text-xs whitespace-nowrap">
+                  <td className="py-2 px-3 text-sm whitespace-nowrap">
                     {student.academicYear?.year  || 'N/A'}
                   </td>
-                  <td className="py-2 px-3 text-xs truncate max-w-xs">
+                  <td className="py-2 px-3 text-sm truncate max-w-xs">
                     {student.email || 'N/A'}
                   </td>
-                  <td className="py-2 px-3 text-xs whitespace-nowrap">
+                  <td className="py-2 px-3 text-sm whitespace-nowrap">
                     {student.contactNumber || 'N/A'}
                   </td>
-                  <td className="py-2 px-3 text-xs whitespace-nowrap">
+                  <td className="py-2 px-3 text-sm whitespace-nowrap">
                     {student.guardianContactNumber || 'N/A'}
                   </td>
                   <td className="py-2 px-3">
                     <button
                       onClick={() => onViewDetails(student)}
-                      className="px-2 py-1 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 hover:shadow-md transition-all duration-200 text-xs"
+                      className="px-2 py-1 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 hover:shadow-md transition-all duration-200 text-sm"
                     >
                       {t("View Details")}
                     </button>
