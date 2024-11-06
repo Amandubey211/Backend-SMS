@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import { CiSearch, CiFilter } from "react-icons/ci";
+import { useTranslation } from 'react-i18next';
 
 const TopNavigationWithFilters = ({ onSearch, onFilterChange }) => {
+  const { t } = useTranslation('admDashboard');
   const [searchQuery, setSearchQuery] = useState("");
   const [showFilter, setShowFilter] = useState(false);
   const [filters, setFilters] = useState({
@@ -50,7 +52,7 @@ const TopNavigationWithFilters = ({ onSearch, onFilterChange }) => {
       <div className="relative flex items-center max-w-xs w-full mr-4">
         <input
           type="text"
-          placeholder="Search by Name or Email"
+          placeholder={t("Search by Name or Email")}
           value={searchQuery}
           onChange={handleSearchChange} // Only update locally without triggering a query
           className="px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-purple-300 w-full transition-all duration-300"
@@ -67,75 +69,75 @@ const TopNavigationWithFilters = ({ onSearch, onFilterChange }) => {
           onClick={() => setShowFilter(!showFilter)}
         >
           <CiFilter className="w-5 h-5 text-gray-500 mr-2" />
-          <span className="text-gray-600">Filters</span>
+          <span className="text-gray-600">{t("Filters")}</span>
         </button>
 
         {/* Filter dropdown */}
         {showFilter && (
           <div className="absolute right-0 mt-2 w-72 bg-white shadow-md rounded-lg p-4 z-50">
-            <h3 className="font-semibold mb-4">Filter By</h3>
+            <h3 className="font-semibold mb-4">{t("Filter By")}</h3>
 
             {/* Batch Start Filter */}
             <div className="mb-4">
-              <label className="block mb-1 font-medium">Batch Start (Year)</label>
+              <label className="block mb-1 font-medium">{t("Batch Start (Year)")}</label>
               <input
                 type="number"
                 min="1900"
                 max={new Date().getFullYear()}
-                placeholder="Enter Start Year"
+                placeholder={t("Enter Start Year")}
                 className="w-full border px-3 py-2 rounded-lg"
                 onChange={(e) => handleFilterChange("batchStart", e.target.value)}
-                value={filters.batchStart}
+                value={filters.batchStart || ""}
               />
             </div>
 
             {/* Batch End Filter */}
             <div className="mb-4">
-              <label className="block mb-1 font-medium">Batch End (Year)</label>
+              <label className="block mb-1 font-medium">{t("Batch End (Year)")}</label>
               <input
                 type="number"
                 min="1900"
                 max={new Date().getFullYear()}
-                placeholder="Enter End Year"
+                placeholder={t("Enter End Year")}
                 className="w-full border px-3 py-2 rounded-lg"
                 onChange={(e) => handleFilterChange("batchEnd", e.target.value)}
-                value={filters.batchEnd}
+                value={filters.batchEnd || ""}
               />
             </div>
 
             {/* Email Filter */}
             <div className="mb-4">
-              <label className="block mb-1 font-medium">Email</label>
+              <label className="block mb-1 font-medium">{t("Email")}</label>
               <input
                 type="email"
-                placeholder="Enter Email"
+                placeholder={t("Enter Email")}
                 className="w-full border px-3 py-2 rounded-lg"
                 onChange={(e) => handleFilterChange("email", e.target.value)}
-                value={filters.email}
+                value={filters.email || ""}
               />
             </div>
 
             {/* Q_Id Filter */}
             <div className="mb-4">
-              <label className="block mb-1 font-medium">Q_Id</label>
+              <label className="block mb-1 font-medium">{t("Q_Id")}</label>
               <input
                 type="text"
-                placeholder="Enter Q_Id"
+                placeholder={t("Enter Q_Id")}
                 className="w-full border px-3 py-2 rounded-lg"
                 onChange={(e) => handleFilterChange("Q_Id", e.target.value)}
-                value={filters.Q_Id}
+                value={filters.Q_Id || ""}
               />
             </div>
 
             {/* Admission Number Filter */}
             <div className="mb-4">
-              <label className="block mb-1 font-medium">Admission Number</label>
+              <label className="block mb-1 font-medium">{t("Admission Number")}</label>
               <input
                 type="text"
-                placeholder="Enter Admission Number"
+                placeholder={t("Enter Admission Number")}
                 className="w-full border px-3 py-2 rounded-lg"
                 onChange={(e) => handleFilterChange("admissionNumber", e.target.value)}
-                value={filters.admissionNumber}
+                value={filters.admissionNumber || ""}
               />
             </div>
 
@@ -145,7 +147,7 @@ const TopNavigationWithFilters = ({ onSearch, onFilterChange }) => {
                 className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-all duration-300"
                 onClick={applyFilters} // Only trigger query when the button is clicked
               >
-                Apply Filters
+                {t("Apply Filters")}
               </button>
             </div>
           </div>
