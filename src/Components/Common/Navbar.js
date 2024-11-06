@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { TbBell } from "react-icons/tb";
 import { IoSettingsOutline } from "react-icons/io5";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import IconButton from "./IconButton";
 import LeftHeading from "./LeftHeading";
@@ -10,6 +10,7 @@ import useStaffLogout from "../../Hooks/AuthHooks/Staff/useStaffLogOut";
 import Sidebar from "./Sidebar";
 import NotificationBar from "./NotificationBar";
 import SettingDropdown from "./SettingDropdown";
+import { fetchAcademicYear } from "../../Store/Slices/Common/AcademicYear/academicYear.action";
 
 const Navbar = () => {
   const [isOpenNotification, setIsOpenNotification] = useState(false);
@@ -22,6 +23,10 @@ const Navbar = () => {
     (store) => store.common.user.navbar.leftHeading
   );
   const role = useSelector((store) => store.common.auth.role);
+  const dispatch = useDispatch()
+  useEffect(() => {
+    dispatch(fetchAcademicYear())
+  }, []);
   const selectAcademicYear = useSelector((store) => {
     const say = localStorage.getItem('say')
       return store.common.academicYear.academicYears?.find((year) => year?._id == say)

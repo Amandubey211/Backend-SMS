@@ -37,14 +37,16 @@ const MainSection = () => {
 
   // Handle section change
   useEffect(() => {
-    if (activeSection !== "Everyone" && activeSectionId) {
+    if (activeSection != "Everyone" && activeSectionId) {
+      
+      
       dispatch(
         fetchGroupsByClassAndSection({
           classId: cid,
           sectionId: activeSectionId,
         })
       );
-    } else if (activeSection === "Everyone") {
+    } else if (activeSection == "Everyone") {
       dispatch(fetchGroupsByClass(cid));
     }
   }, [activeSectionId, activeSection, cid, dispatch]);
@@ -53,7 +55,7 @@ const MainSection = () => {
   const handleSectionChange = useCallback((section, sectionId) => {
     setActiveSection(section);
     setActiveSectionId(sectionId);
-    dispatch(fetchGroupsByClassAndSection({ classId: cid, sectionId }));
+   // dispatch(fetchGroupsByClassAndSection({ classId: cid, sectionId }));
   }, []);
 
   const onSeeGradeClick = (student) => {

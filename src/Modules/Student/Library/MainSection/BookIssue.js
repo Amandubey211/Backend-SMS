@@ -114,7 +114,7 @@ const BookIssue = () => {
               )} */}
 
               {/* Display No Data Found */}
-              {!loading  && issueBooks?.length === 0 && (
+              {!loading  && issueBooks?.length == 0 && (
                 <tr>
                   <td colSpan="6" className="text-center py-20">
                     <NoDataFound />
@@ -122,7 +122,7 @@ const BookIssue = () => {
                 </tr>
               )}
 
-              {!loading && !error && !issueBooks?.length === 0 && (filteredBookIssueData()?.map((item) => (
+              {!loading && !error && issueBooks?.length > 0 && (filteredBookIssueData()?.map((item) => (
                 <BookIssueRow key={item.id} item={item} />
               )))}
             </tbody>
