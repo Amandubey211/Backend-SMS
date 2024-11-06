@@ -1,7 +1,11 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { baseUrl } from "../../../../../config/Common";
-import { setTeacherAssign, setTeachers, filterTeachersBySection } from "./teacherSlice";
+import {
+  setTeacherAssign,
+  setTeachers,
+  filterTeachersBySection,
+} from "./teacherSlice";
 import { ErrorMsg } from "../../../Common/Alerts/errorhandling.action";
 import { setShowError, setErrorMsg } from "../../../Common/Alerts/alertsSlice";
 
@@ -32,7 +36,7 @@ export const fetchAllTeachers = createAsyncThunk(
   async (_, { rejectWithValue, getState, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
-      const say = localStorage.getItem("say")
+      const say = localStorage.getItem("say");
       const response = await axios.get(`${baseUrl}/admin/teacher?say=${say}`, {
         headers: { Authentication: token },
       });
@@ -51,11 +55,14 @@ export const fetchTeachersByClass = createAsyncThunk(
   async (classId, { rejectWithValue, getState, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
-      const say = localStorage.getItem("say")
-      const { data } = await axios.get(`${baseUrl}/admin/teacherByClass?say=${say}`, {
-        params: { id: classId },
-        headers: { Authentication: token },
-      });
+      const say = localStorage.getItem("say");
+      const { data } = await axios.get(
+        `${baseUrl}/admin/teacherByClass?say=${say}`,
+        {
+          params: { id: classId },
+          headers: { Authentication: token },
+        }
+      );
       dispatch(setTeacherAssign(data.data));
       dispatch(filterTeachersBySection());
       return data.data;
@@ -71,7 +78,7 @@ export const assignTeacher = createAsyncThunk(
   async (assignData, { rejectWithValue, getState, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
-      const say = localStorage.getItem("say")
+      const say = localStorage.getItem("say");
       const response = await axios.post(
         `${baseUrl}/admin/teacher?say=${say}`,
         assignData,
@@ -93,7 +100,7 @@ export const unassignTeacher = createAsyncThunk(
   async ({ teacherId, classId }, { rejectWithValue, getState, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
-      const say = localStorage.getItem("say")
+      const say = localStorage.getItem("say");
       await axios.delete(
         `${baseUrl}/admin/teacher/${teacherId}/class/${classId}?say=${say}`,
         {

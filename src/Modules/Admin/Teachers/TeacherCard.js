@@ -34,10 +34,10 @@ const TeacherCard = ({ teacher }) => {
         </div>
       )}
       <div className="flex justify-center">
-        {teacher.image ? (
+        {teacher.profile ? (
           <img
             className="w-24 h-24 rounded-full"
-            src={teacher.image}
+            src={teacher.profile}
             alt={teacher.firstName}
           />
         ) : (
@@ -45,7 +45,7 @@ const TeacherCard = ({ teacher }) => {
         )}
       </div>
       <div className="text-center mt-4">
-        <div className="font-bold text-xl mb-1">
+        <div className="font-bold capitalize text-xl mb-1">
           {teacher.firstName} {teacher.lastName}
         </div>
         <p className="text-gray-700 text-sm ">Instructor</p>

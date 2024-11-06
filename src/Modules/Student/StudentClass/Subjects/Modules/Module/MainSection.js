@@ -7,20 +7,29 @@ import NoDataFound from "../../../../../../Components/Common/NoDataFound";
 import Spinner from "../../../../../../Components/Common/Spinner";
 import { stdModule } from "../../../../../../Store/Slices/Student/MyClass/Class/Subjects/Modules/module.action";
 import { useParams } from "react-router-dom";
-import { setExpandedChapters, setSelectedModule } from "../../../../../../Store/Slices/Student/MyClass/Class/Subjects/Modules/moduleSlice";
+import {
+  setExpandedChapters,
+  setSelectedModule,
+} from "../../../../../../Store/Slices/Student/MyClass/Class/Subjects/Modules/moduleSlice";
 import OfflineModal from "../../../../../../Components/Common/Offline";
 import { setShowError } from "../../../../../../Store/Slices/Common/Alerts/alertsSlice";
 
 const MainSection = () => {
-  const { loading, error, modulesData, selectedModule, subjectName, expandedChapters } = useSelector((store) => store?.student?.studentModule);
+  const {
+    loading,
+    error,
+    modulesData,
+    selectedModule,
+    subjectName,
+    expandedChapters,
+  } = useSelector((store) => store?.student?.studentModule);
   const dispatch = useDispatch();
   const { cid, sid } = useParams();
-  const {showError}=useSelector((store)=>store?.common?.alertMsg);
+  const { showError } = useSelector((store) => store?.common?.alertMsg);
 
   useEffect(() => {
     dispatch(stdModule({ cid, sid }));
   }, [dispatch]);
-
 
   // Select the first module when modules are fetched
   useEffect(() => {
@@ -35,20 +44,24 @@ const MainSection = () => {
       );
       dispatch(setExpandedChapters([]));
     } else {
-      dispatch(setSelectedModule({
-        moduleId: null,
-        name: null,
-        chapters: [],
-      }));
+      dispatch(
+        setSelectedModule({
+          moduleId: null,
+          name: null,
+          chapters: [],
+        })
+      );
     }
   }, [dispatch, modulesData]);
 
   const toggleChapter = (chapterId) => {
-    dispatch(setExpandedChapters(
-      expandedChapters?.includes(chapterId)
-        ? expandedChapters?.filter((id) => id !== chapterId)
-        : [...expandedChapters, chapterId]
-    ));
+    dispatch(
+      setExpandedChapters(
+        expandedChapters?.includes(chapterId)
+          ? expandedChapters?.filter((id) => id !== chapterId)
+          : [...expandedChapters, chapterId]
+      )
+    );
   };
 
   const selectModule = (module) => {
@@ -65,7 +78,7 @@ const MainSection = () => {
 
   const handleDismiss = () => {
     dispatch(setShowError(false));
-  }
+  };
 
   // Render chapters if available
   const renderChapters = () => {
@@ -81,7 +94,10 @@ const MainSection = () => {
         imageUrl={chapter?.thumbnail}
         assignments={chapter?.assignments}
         quizzes={chapter?.quizzes}
-        isExpanded={(Array.isArray(expandedChapters) && expandedChapters.includes(chapter?._id))}
+        isExpanded={
+          Array.isArray(expandedChapters) &&
+          expandedChapters.includes(chapter?._id)
+        }
         onToggle={() => toggleChapter(chapter?._id)}
         attachments={chapter?.attachments}
       />
@@ -99,9 +115,7 @@ const MainSection = () => {
         <div className="flex items-center  h-[10%]">
           <h1 className="text-xl font-semibold">All Modules</h1>
           <p className="bg-gradient-to-r from-pink-100 to-purple-200 font-semibold rounded-full p-1 px-2">
-            <span className="text-gradient">
-              {modulesData?.length || 0}
-            </span>
+            <span className="text-gradient">{modulesData?.length || 0}</span>
           </p>
         </div>
         <div className="grid grid-cols-1 overflow-y-auto w-full h-[90%]">
@@ -128,7 +142,9 @@ const MainSection = () => {
         <div className="bg-white p-2 rounded-lg">{renderChapters()}</div>
       </div>
       <div className="w-[35%] p-2 border h-[100%]">
-        <div className="bg-white  rounded-lg  h-[100%] w-[100%]">{renderModules()}</div>
+        <div className="bg-white  rounded-lg  h-[100%] w-[100%]">
+          {renderModules()}
+        </div>
       </div>
       {!loading && showError && (
         <OfflineModal error={error} onDismiss={handleDismiss} />
