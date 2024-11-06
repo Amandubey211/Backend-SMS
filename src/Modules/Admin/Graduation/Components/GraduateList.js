@@ -1,6 +1,7 @@
 import React from "react";
 import { FaExclamationTriangle, FaUserGraduate } from "react-icons/fa"; // Import icons
 import Spinner from "../../../../Components/Common/Spinner";
+import { useTranslation } from 'react-i18next';
 
 const GraduateList = ({
   students,
@@ -11,6 +12,8 @@ const GraduateList = ({
   loading,
   error,
 }) => {
+  const { t } = useTranslation('admDashboard'); // Initialize i18next hook
+
   // Function to handle individual row selection
   const handleSelect = (studentId) => {
     setSelectedStudents((prevSelected) => {
@@ -38,15 +41,15 @@ const GraduateList = ({
   // Determine error message based on status code
   const getErrorMessage = () => {
     if (error?.status === 404) {
-      return "No Graduates Yet!";
+      return t("No Graduates Yet");
     }
-    return "No Graduates Found";
+    return t("No Graduates Found");
   };
 
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-xl font-semibold">All Graduates</h1>
+        <h1 className="text-xl font-semibold">{t("All Graduates")}</h1>
 
         {selectedStudents.length > 0 && (
           <button
@@ -54,8 +57,8 @@ const GraduateList = ({
             onClick={() => onDemoteStudents(selectedStudents)}
           >
             {selectedStudents.length === 1
-              ? "Demote Student"
-              : "Demote All Students"}
+              ? t("Demote Student")
+              : t("Demote All Students")}
           </button>
         )}
       </div>
@@ -73,28 +76,28 @@ const GraduateList = ({
                 />
               </th>
               <th className="py-2 px-3 text-left text-xs font-semibold text-gray-600">
-                Profile
+                {t("Profile")}
               </th>
               <th className="py-2 px-3 text-left text-xs font-semibold text-gray-600">
-                Name
+                {t("Name")}
               </th>
               <th className="py-2 px-3 text-left text-xs font-semibold text-gray-600">
-                QID
+                {t("QID")}
               </th>
               <th className="py-2 px-3 text-left text-xs font-semibold text-gray-600">
-                Admission Number
+                {t("Admission Number")}
               </th>
               <th className="py-2 px-3 text-left text-xs font-semibold text-gray-600">
-                Graduation Year
+                {t("Graduation Year")}
               </th>
               <th className="py-2 px-3 text-left text-xs font-semibold text-gray-600">
-                Email
+                {t("Email")}
               </th>
               <th className="py-2 px-3 text-left text-xs font-semibold text-gray-600">
-                Contact
+                {t("Contact")}
               </th>
               <th className="py-2 px-3 text-left text-xs font-semibold text-gray-600">
-                Parent Contact
+                {t("Parent Contact")}
               </th>
               <th className="py-2 px-3 text-xs"></th>
             </tr>
@@ -130,7 +133,7 @@ const GraduateList = ({
                     className="text-gray-500 mx-auto mb-4"
                     size={40}
                   />
-                  <p className="text-gray-500">No Graduates Yet</p>
+                  <p className="text-gray-500">{t("No Graduates Yet")}</p>
                 </td>
               </tr>
             )}
@@ -160,32 +163,32 @@ const GraduateList = ({
                     />
                   </td>
                   <td className="py-2 px-3 text-xs whitespace-nowrap">
-                    {student.firstName} {student.lastName}
+                    {student.firstName  || 'N/A'} {student.lastName  || 'N/A'}
                   </td>
                   <td className="py-2 px-3 text-xs whitespace-nowrap">
-                    {student.Q_Id}
+                    {student.Q_Id || 'N/A'}
                   </td>
                   <td className="py-2 px-3 text-xs whitespace-nowrap">
-                    {student.admissionNumber}
+                    {student.admissionNumber || 'N/A'}
                   </td>
                   <td className="py-2 px-3 text-xs whitespace-nowrap">
-                    {student.academicYear?.year}
+                    {student.academicYear?.year  || 'N/A'}
                   </td>
                   <td className="py-2 px-3 text-xs truncate max-w-xs">
-                    {student.email}
+                    {student.email || 'N/A'}
                   </td>
                   <td className="py-2 px-3 text-xs whitespace-nowrap">
-                    {student.contactNumber}
+                    {student.contactNumber || 'N/A'}
                   </td>
                   <td className="py-2 px-3 text-xs whitespace-nowrap">
-                    {student.guardianContactNumber}
+                    {student.guardianContactNumber || 'N/A'}
                   </td>
                   <td className="py-2 px-3">
                     <button
                       onClick={() => onViewDetails(student)}
                       className="px-2 py-1 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 hover:shadow-md transition-all duration-200 text-xs"
                     >
-                      View Details
+                      {t("View Details")}
                     </button>
                   </td>
                 </tr>
