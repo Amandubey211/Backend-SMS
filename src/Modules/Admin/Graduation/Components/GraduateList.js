@@ -163,25 +163,25 @@ const GraduateList = ({
                     />
                   </td>
                   <td className="py-2 px-3 text-xs whitespace-nowrap">
-                    {student.firstName} {student.lastName}
+                    {student.firstName  || 'N/A'} {student.lastName  || 'N/A'}
                   </td>
                   <td className="py-2 px-3 text-xs whitespace-nowrap">
-                    {student.Q_Id}
+                    {student.Q_Id || 'N/A'}
                   </td>
                   <td className="py-2 px-3 text-xs whitespace-nowrap">
-                    {student.admissionNumber}
+                    {student.admissionNumber || 'N/A'}
                   </td>
                   <td className="py-2 px-3 text-xs whitespace-nowrap">
-                    {student.academicYear?.year}
+                    {student.academicYear?.year  || 'N/A'}
                   </td>
                   <td className="py-2 px-3 text-xs truncate max-w-xs">
-                    {student.email}
+                    {student.email || 'N/A'}
                   </td>
                   <td className="py-2 px-3 text-xs whitespace-nowrap">
-                    {student.contactNumber}
+                    {student.contactNumber || 'N/A'}
                   </td>
                   <td className="py-2 px-3 text-xs whitespace-nowrap">
-                    {student.guardianContactNumber}
+                    {student.guardianContactNumber || 'N/A'}
                   </td>
                   <td className="py-2 px-3">
                     <button
