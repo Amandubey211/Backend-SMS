@@ -43,9 +43,9 @@ const AcademicYearTable = ({
                   )}
                 </button>
               </td>
-              <td className="p-3">{year.academicYear}</td>
-              <td className="p-3">{year.startDate}</td>
-              <td className="p-3">{year.endDate}</td>
+              <td className="p-3">{year?.year}</td>
+              <td className="p-3">{year?.startDate?.slice(0,10)}</td>
+              <td className="p-3">{year?.endDate?.slice(0,10)}</td>
               <td className="p-3">
                 <span
                   className={`px-2 py-1 rounded-md text-base ${
