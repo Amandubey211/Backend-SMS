@@ -3,7 +3,7 @@ import { CiSearch, CiFilter } from "react-icons/ci";
 import { useTranslation } from 'react-i18next';
 
 const TopNavigationWithFilters = ({ onSearch, onFilterChange }) => {
-  const { t } = useTranslation('admDashboard');
+  const { t } = useTranslation('admDashboard'); // Initialize i18next hook
   const [searchQuery, setSearchQuery] = useState("");
   const [showFilter, setShowFilter] = useState(false);
   const [filters, setFilters] = useState({
@@ -16,9 +16,11 @@ const TopNavigationWithFilters = ({ onSearch, onFilterChange }) => {
 
   const filterRef = useRef(null);
 
-  // Handle search query input
+  // Real-time search query input handler
   const handleSearchChange = (e) => {
-    setSearchQuery(e.target.value); // Only update searchQuery locally
+    const query = e.target.value;
+    setSearchQuery(query);
+    onSearch(query); // Trigger the search function in real-time
   };
 
   // Apply filters and search when user clicks the filter button
@@ -26,6 +28,20 @@ const TopNavigationWithFilters = ({ onSearch, onFilterChange }) => {
     const updatedFilters = { ...filters, searchQuery }; // Include search query in the filters
     onFilterChange(updatedFilters); // Trigger the parent function to fetch the filtered list
     setShowFilter(false); // Close the filter dropdown after applying
+  };
+
+  // Clear all filters
+  const clearFilters = () => {
+    setSearchQuery("");
+    setFilters({
+      batchStart: "",
+      batchEnd: "",
+      email: "",
+      Q_Id: "",
+      admissionNumber: ""
+    });
+    onFilterChange({}); // Reset the parent filter function
+    onSearch(""); // Reset the search query
   };
 
   // Handle individual filter changes without triggering a query
@@ -54,10 +70,10 @@ const TopNavigationWithFilters = ({ onSearch, onFilterChange }) => {
           type="text"
           placeholder={t("Search by Name or Email")}
           value={searchQuery}
-          onChange={handleSearchChange} // Only update locally without triggering a query
+          onChange={handleSearchChange} // Update query in real-time
           className="px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-purple-300 w-full transition-all duration-300"
         />
-        <button className="absolute right-3">
+        <button className="absolute right-3" onClick={() => onSearch(searchQuery)}>
           <CiSearch className="w-5 h-5 text-gray-500" />
         </button>
       </div>
@@ -87,7 +103,7 @@ const TopNavigationWithFilters = ({ onSearch, onFilterChange }) => {
                 placeholder={t("Enter Start Year")}
                 className="w-full border px-3 py-2 rounded-lg"
                 onChange={(e) => handleFilterChange("batchStart", e.target.value)}
-                value={filters.batchStart || ""}
+                value={filters.batchStart}
               />
             </div>
 
@@ -101,7 +117,7 @@ const TopNavigationWithFilters = ({ onSearch, onFilterChange }) => {
                 placeholder={t("Enter End Year")}
                 className="w-full border px-3 py-2 rounded-lg"
                 onChange={(e) => handleFilterChange("batchEnd", e.target.value)}
-                value={filters.batchEnd || ""}
+                value={filters.batchEnd}
               />
             </div>
 
@@ -113,7 +129,7 @@ const TopNavigationWithFilters = ({ onSearch, onFilterChange }) => {
                 placeholder={t("Enter Email")}
                 className="w-full border px-3 py-2 rounded-lg"
                 onChange={(e) => handleFilterChange("email", e.target.value)}
-                value={filters.email || ""}
+                value={filters.email}
               />
             </div>
 
@@ -125,7 +141,7 @@ const TopNavigationWithFilters = ({ onSearch, onFilterChange }) => {
                 placeholder={t("Enter Q_Id")}
                 className="w-full border px-3 py-2 rounded-lg"
                 onChange={(e) => handleFilterChange("Q_Id", e.target.value)}
-                value={filters.Q_Id || ""}
+                value={filters.Q_Id}
               />
             </div>
 
@@ -137,12 +153,18 @@ const TopNavigationWithFilters = ({ onSearch, onFilterChange }) => {
                 placeholder={t("Enter Admission Number")}
                 className="w-full border px-3 py-2 rounded-lg"
                 onChange={(e) => handleFilterChange("admissionNumber", e.target.value)}
-                value={filters.admissionNumber || ""}
+                value={filters.admissionNumber}
               />
             </div>
 
-            {/* Apply Filters Button */}
-            <div className="flex justify-end">
+            {/* Apply and Clear Filters Buttons */}
+            <div className="flex justify-end gap-2">
+              <button
+                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-all duration-300"
+                onClick={clearFilters}
+              >
+                {t("Clear Filters")}
+              </button>
               <button
                 className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-all duration-300"
                 onClick={applyFilters} // Only trigger query when the button is clicked
