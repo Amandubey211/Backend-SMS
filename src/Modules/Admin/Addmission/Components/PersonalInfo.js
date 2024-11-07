@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import TextInput from "./TextInput";
+import { useTranslation } from 'react-i18next';
 
 const PersonalInfo = ({
   studentInfo,
@@ -7,6 +8,8 @@ const PersonalInfo = ({
   errors,
   inputRefs,
 }) => {
+  const { t } = useTranslation('admAdmission');
+
   const calculateAge = (dateOfBirth) => {
     const birthDate = new Date(dateOfBirth);
     const ageDiffMs = Date.now() - birthDate.getTime();
@@ -32,38 +35,38 @@ const PersonalInfo = ({
   return (
     <div className="grid grid-cols-2 gap-4">
       <TextInput
-        label="First Name"
+        label={t("First Name")}
         name="firstName"
         value={studentInfo.firstName || ""}
         onChange={handleInputChange}
-        placeholder="Enter First Name"
+        placeholder={t("Enter First Name")}
         error={errors.firstName}
         ref={inputRefs.firstName}
         aria-invalid={errors.firstName ? "true" : "false"}
       />
       <TextInput
-        label="Last Name"
+        label={t("Last Name")}
         name="lastName"
         value={studentInfo.lastName || ""}
         onChange={handleInputChange}
-        placeholder="Enter Last Name"
+        placeholder={t("Enter Last Name")}
         error={errors.lastName}
         ref={inputRefs.lastName}
         aria-invalid={errors.lastName ? "true" : "false"}
       />
       <TextInput
-        label="Date of Birth"
+        label={t("Date of Birth")}
         name="dateOfBirth"
         type="date"
         value={studentInfo.dateOfBirth || ""}
         onChange={handleInputChange}
-        placeholder="Enter Date of Birth"
+        placeholder={t("Enter Date of Birth")}
         error={errors.dateOfBirth}
         ref={inputRefs.dateOfBirth}
         aria-invalid={errors.dateOfBirth ? "true" : "false"}
       />
       <div>
-        <label className="block text-gray-700">Gender</label>
+        <label className="block text-gray-700">{t("Gender")}</label>
         <select
           ref={inputRefs.gender}
           name="gender"
@@ -74,17 +77,17 @@ const PersonalInfo = ({
           onChange={handleInputChange}
           aria-invalid={errors.gender ? "true" : "false"}
         >
-          <option value="">Choose Options</option>
-          <option value="male">Male</option>
-          <option value="female">Female</option>
-          <option value="other">Other</option>
+          <option value="">{t("Choose Options")}</option>
+          <option value="male">{t("Male")}</option>
+          <option value="female">{t("Female")}</option>
+          <option value="other">{t("Other")}</option>
         </select>
         {errors.gender && (
           <span className="text-red-500 text-sm mt-1">{errors.gender}</span>
         )}
       </div>
       <div>
-        <label className="block text-gray-700">Religion</label>
+        <label className="block text-gray-700">{t("Religion")}</label>
         <select
           ref={inputRefs.religion}
           name="religion"
@@ -95,11 +98,11 @@ const PersonalInfo = ({
           onChange={handleInputChange}
           aria-invalid={errors.religion ? "true" : "false"}
         >
-          <option value="">Choose Options</option>
-          <option>Islam</option>
-          <option>Christianity</option>
-          <option>Hinduism</option>
-          <option>Buddhism</option>
+          <option value="">{t("Choose Options")}</option>
+          <option>{t("Islam")}</option>
+          <option>{t("Christianity")}</option>
+          <option>{t("Hinduism")}</option>
+          <option>{t("Buddhism")}</option>
         </select>
         {errors.religion && (
           <span className="text-red-500 text-sm mt-1">{errors.religion}</span>
@@ -107,7 +110,7 @@ const PersonalInfo = ({
       </div>
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-gray-700">Blood Group</label>
+          <label className="block text-gray-700">{t("Blood Group")}</label>
           <select
             name="bloodGroup"
             ref={inputRefs.bloodGroup}
@@ -118,15 +121,15 @@ const PersonalInfo = ({
             onChange={handleInputChange}
             aria-invalid={errors.bloodGroup ? "true" : "false"}
           >
-            <option value="">Choose</option>
-            <option>O+</option>
-            <option>O-</option>
-            <option>A+</option>
-            <option>A-</option>
-            <option>B+</option>
-            <option>B-</option>
-            <option>AB+</option>
-            <option>AB-</option>
+            <option value="">{t("Choose")}</option>
+            <option>{t("O+")}</option>
+            <option>{t("O-")}</option>
+            <option>{t("A+")}</option>
+            <option>{t("A-")}</option>
+            <option>{t("B+")}</option>
+            <option>{t("B-")}</option>
+            <option>{t("AB+")}</option>
+            <option>{t("AB-")}</option>
           </select>
           {errors.bloodGroup && (
             <span className="text-red-500 text-sm mt-1">
@@ -135,7 +138,7 @@ const PersonalInfo = ({
           )}
         </div>
         <TextInput
-          label="Age"
+          label={t("Age")}
           name="age"
           value={studentInfo.age || ""}
           placeholder="00"

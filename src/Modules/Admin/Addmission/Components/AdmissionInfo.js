@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import TextInput from "./TextInput";
 import { fetchAllClasses } from "../../../../Store/Slices/Admin/Class/actions/classThunk";
+import { useTranslation } from 'react-i18next';
 
 const AdmissionInfo = ({
   studentInfo,
@@ -9,6 +10,7 @@ const AdmissionInfo = ({
   errors,
   inputRefs,
 }) => {
+  const { t } = useTranslation('admAdmission');
   const classList = useSelector((store) => store.admin.class.classes);
   const dispatch = useDispatch();
 
@@ -20,11 +22,11 @@ const AdmissionInfo = ({
 
   return (
     <div className="mt-6">
-      <h2 className="text-xl font-semibold mb-4">Admission to Class</h2>
+      <h2 className="text-xl font-semibold mb-4">{t("Admission to Class")}</h2>
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-gray-700">Applying For</label>
+          <label className="block text-gray-700">{t("Applying For")}</label>
           <select
             name="applyingClass"
             className={`mt-1 p-2 block w-full rounded-md border ${
@@ -35,7 +37,7 @@ const AdmissionInfo = ({
             aria-invalid={errors.applyingClass ? "true" : "false"}
             ref={inputRefs.applyingClass}
           >
-            <option value="">Choose Options</option>
+            <option value="">{t("Choose Options")}</option>
             {classList?.map((classItem, index) => (
               <option key={index} value={classItem?._id}>
                 {classItem.className}
@@ -50,7 +52,7 @@ const AdmissionInfo = ({
         </div>
 
         <div>
-          <label className="block text-gray-700">Transport Requirement</label>
+          <label className="block text-gray-700">{t("Transport Requirement")}</label>
           <select
             name="transportRequirement"
             className={`mt-1 p-2 block w-full rounded-md border ${
@@ -61,9 +63,9 @@ const AdmissionInfo = ({
             aria-invalid={errors.transportRequirement ? "true" : "false"}
             ref={inputRefs.transportRequirement}
           >
-            <option value="">Choose Options</option>
-            <option value={true}>YES</option>
-            <option value={false}>NO</option>
+            <option value="">{t("Choose Options")}</option>
+            <option value={true}>{t("YES")}</option>
+            <option value={false}>{t("NO")}</option>
           </select>
           {errors.transportRequirement && (
             <span className="text-red-500 text-sm mt-1">
@@ -73,7 +75,7 @@ const AdmissionInfo = ({
         </div>
 
         <div>
-          <label className="block text-gray-700">Enrollment Status</label>
+          <label className="block text-gray-700">{t("Enrollment Status")}</label>
           <select
             name="enrollmentStatus"
             value={studentInfo.enrollmentStatus || ""}
@@ -85,10 +87,10 @@ const AdmissionInfo = ({
             ref={inputRefs.enrollmentStatus}
           >
             <option value="" disabled>
-              Select
+              {t("Select")}
             </option>
-            <option value="Full Time">Full Time</option>
-            <option value="Part Time">Part Time</option>
+            <option value="Full Time">{t("Full Time")}</option>
+            <option value="Part Time">{t("Part Time")}</option>
           </select>
           {errors.enrollmentStatus && (
             <span className="text-red-500 text-sm mt-1">

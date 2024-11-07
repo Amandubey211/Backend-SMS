@@ -13,8 +13,10 @@ import DocumentUploadForm from "../../LoginPages/Student/SignUp/DocumentUploadFo
 import ImageUpload from "./Components/ImageUpload";
 import StudentCard from "./Components/StudentCard";
 import validateStudentDetails from "../../../Validataions/Student/validateStudentDetails";
+import { useTranslation } from 'react-i18next';
 
 const StudentInfo = () => {
+  const { t } = useTranslation('admAdmission');
   const dispatch = useDispatch();
   const schoolId = useSelector(
     (store) => store.common.user.userDetails?.schoolId || ""
@@ -140,7 +142,7 @@ const StudentInfo = () => {
   const handlePhotoChange = (e) => {
     const files = Array.from(e.target.files);
     if (files.length + studentDocuments.documents.length > 3) {
-      toast.error("You can upload a maximum of 3 documents.");
+      toast.error(t("You can upload a maximum of 3 documents."));
       return;
     }
 
@@ -165,11 +167,10 @@ const StudentInfo = () => {
   const handleValidation = () => {
     const validationErrors = validateStudentDetails(studentInfo, "admin");
     setErrors(validationErrors);
-    console.log(validationErrors, "pppppp");
     // Check if there is an image error
     if (!profile) {
-      setImageError("Profile image is required");
-      validationErrors.profile = "Profile image is required";
+      setImageError(t("Profile image is required"));
+      validationErrors.profile = t("Profile image is required");
     } else {
       setImageError("");
     }
@@ -190,7 +191,7 @@ const StudentInfo = () => {
     }
 
     if (Object.keys(validationErrors).length > 0) {
-      toast.error("Please correct the errors in the form.");
+      toast.error(t("Please correct the errors in the form."));
     }
 
     return Object.keys(validationErrors).length === 0 && profile;
@@ -216,7 +217,6 @@ const StudentInfo = () => {
     try {
       const resultAction = await dispatch(registerStudentDetails(formData));
       if (registerStudentDetails.fulfilled.match(resultAction)) {
-        // toast.success("Student registered successfully.");
         if (studentDocuments.documents.length) {
           await dispatch(
             uploadStudentDocuments({
@@ -225,13 +225,12 @@ const StudentInfo = () => {
               studentDocuments,
             })
           );
-          // toast.success("Documents uploaded successfully.");
         }
       } else {
-        toast.error("Failed to register student.");
+        toast.error(t("Failed to register student."));
       }
     } catch (error) {
-      toast.error("An error occurred during submission.");
+      toast.error(t("An error occurred during submission."));
     }
   };
 
@@ -242,7 +241,7 @@ const StudentInfo = () => {
         style={{ width: "75%" }}
         className="p-3 bg-white rounded-lg overflow-y-auto no-scrollbar"
       >
-        <h2 className="text-2xl font-semibold mb-6">Student Information</h2>
+        <h2 className="text-2xl font-semibold mb-6">{t("Student Information")}</h2>
         <form ref={formRef} onSubmit={handleDocumentSubmit}>
           <div className="grid grid-cols-12 gap-4">
             <div className="col-span-4">
@@ -260,7 +259,7 @@ const StudentInfo = () => {
                 handleRemoveImage={() => {
                   setProfile(null);
                   setImagePreview(null);
-                  setImageError("Profile image is required"); // Set error if image is removed
+                  setImageError(t("Profile image is required")); // Set error if image is removed
                 }}
                 error={imageError} // Pass error state to ImageUpload component
                 inputRef={fileInputRef}
@@ -311,7 +310,7 @@ const StudentInfo = () => {
               className="w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600 text-center"
               disabled={loading}
             >
-              {loading ? "Registering..." : "Add Student"}
+              {loading ? t("Registering...") : t("Add Student")}
             </button>
           </div>
         </form>
