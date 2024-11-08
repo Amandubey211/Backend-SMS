@@ -3,8 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchAllClasses } from "../../../../Store/Slices/Admin/Class/actions/classThunk";
 import { verifyStudent } from "../../../../Store/Slices/Admin/Verification/VerificationThunks";
+import { useTranslation } from 'react-i18next'; // Import useTranslation hook
 
 const VerificationForm = ({ email, studentId }) => {
+  const { t } = useTranslation('admVerification'); // Initialize useTranslation hook
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -46,7 +48,7 @@ const VerificationForm = ({ email, studentId }) => {
     >
       {/* Form Title */}
       <h3 className="text-xl font-semibold mb-4 text-gray-800">
-        Verify Student
+        {t('Verify Student')}
       </h3>
 
       {/* Verification Status Dropdown */}
@@ -55,7 +57,7 @@ const VerificationForm = ({ email, studentId }) => {
           htmlFor="verificationStatus"
           className="block text-xs font-medium text-gray-700 mb-1"
         >
-          Verification Status
+          {t('Verification Status')}
         </label>
         <select
           id="verificationStatus"
@@ -63,9 +65,9 @@ const VerificationForm = ({ email, studentId }) => {
           onChange={(e) => setVerificationStatus(e.target.value)}
           className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-purple-400 focus:outline-none transition-all duration-200 text-sm"
         >
-          <option value="">Select verification status</option>
-          <option value="verified">Verified</option>
-          <option value="rejected">Rejected</option>
+          <option value="">{t('Select verification status')}</option>
+          <option value="verified">{t('Verified')}</option>
+          <option value="rejected">{t('Rejected')}</option>
         </select>
       </div>
 
@@ -76,14 +78,14 @@ const VerificationForm = ({ email, studentId }) => {
             htmlFor="rejectionReason"
             className="block text-xs font-medium text-gray-700 mb-1"
           >
-            Reason for Rejection
+            {t('Reason for Rejection')}
           </label>
           <textarea
             id="rejectionReason"
             value={rejectionReason}
             onChange={(e) => setRejectionReason(e.target.value)}
             rows={3}
-            placeholder="Provide reason for rejection"
+            placeholder={t('Provide reason for rejection')}
             className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-red-400 focus:outline-none transition-all duration-200 text-sm"
           />
         </div>
@@ -96,14 +98,14 @@ const VerificationForm = ({ email, studentId }) => {
               htmlFor="admissionNumber"
               className="block text-xs font-medium text-gray-700 mb-1"
             >
-              Admission Number
+              {t('Admission Number')}
             </label>
             <input
               type="text"
               id="admissionNumber"
               value={admissionNumber}
               onChange={(e) => setAdmissionNumber(e.target.value)}
-              placeholder="Admission Number"
+              placeholder={t('Admission Number')}
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-400 focus:outline-none transition-all duration-200 text-sm"
             />
           </div>
@@ -113,7 +115,7 @@ const VerificationForm = ({ email, studentId }) => {
               htmlFor="presentClassId"
               className="block text-xs font-medium text-gray-700 mb-1"
             >
-              Assign Class
+              {t('Assign Class')}
             </label>
             <select
               id="presentClassId"
@@ -121,7 +123,7 @@ const VerificationForm = ({ email, studentId }) => {
               onChange={(e) => setPresentClassId(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-400 focus:outline-none transition-all duration-200 text-sm"
             >
-              <option value="">Select class</option>
+              <option value="">{t('Select class')}</option>
               {classList?.map((classItem, index) => (
                 <option key={index} value={classItem._id}>
                   {classItem.className}
@@ -141,8 +143,8 @@ const VerificationForm = ({ email, studentId }) => {
         disabled={!verificationStatus}
       >
         {verificationStatus === "rejected"
-          ? "Reject Student"
-          : "Verify Student"}
+          ? t('Reject Student')
+          : t('Verify Student')}
       </button>
     </form>
   );
