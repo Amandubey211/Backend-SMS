@@ -4,9 +4,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { deleteExpenseById, fetchSalaries, updateExpense } from "../../../../../Store/Slices/Admin/Accounting/Expenses/expenses.action";
 import toast from "react-hot-toast";
 import NoDataFound from "../../../../../Components/Common/NoDataFound";
+import { useTranslation } from 'react-i18next'; // Import useTranslation hook
 
 const OtherExpenses = ({ selectedOption, selectedMonth }) => {
-
+  const { t } = useTranslation('admExpense'); // Initialize useTranslation hook
   const { otherExpenses, loading } = useSelector((store) => store?.admin?.expenses)
   const dispatch = useDispatch();
 
@@ -62,8 +63,6 @@ const OtherExpenses = ({ selectedOption, selectedMonth }) => {
     dispatch(deleteExpenseById(expenseId)).then(() => {
       dispatch(fetchSalaries({ query: selectedOption, activeTab: "OtherExpenses", month: selectedMonth }))
     })
-    //setData(prevData => prevData.filter(item => item._id !== expenseId));
-
   };
 
   const handleEditSave = async () => {
@@ -77,49 +76,48 @@ const OtherExpenses = ({ selectedOption, selectedMonth }) => {
 
   return (
     <div>
-    <table className="min-w-full leading-normal mt-4 rounded-lg overflow-hidden">
-  <thead>
-    <tr className="text-left text-gray-700 bg-gray-100">
-      <th className="px-5 py-1 border-b-2 border-gray-200">Serial No.</th>
-      <th className="px-5 py-3 border-b-2 border-gray-200">Expenses Reason</th>
-      <th className="px-5 py-3 border-b-2 border-gray-200">Amount</th>
-      <th className="px-5 py-3 border-b-2 border-gray-200">Expense Date</th>
-      <th className="px-5 py-3 border-b-2 border-gray-200">Status</th>
-      <th className="px-5 py-3 border-b-2 border-gray-200">Action</th>
-    </tr>
-  </thead>
-  <tbody>
-    {otherExpenses?.length === 0 ? (
-      <tr>
-        <td colSpan="6" className="text-center px-5 py-5">
-          <NoDataFound /> {/* Display NoDataFound when no data */}
-        </td>
-      </tr>
-    ) : (
-      otherExpenses?.map((item, index) => (
-        <ExpenseRow
-          key={item._id}
-          item={item}
-          index={index}
-          handlePayClick={handlePayClick}
-          handleDelete={handleDelete}
-          handleEditSidebarOpen={handleEditSidebarOpen}
-        />
-      ))
-    )}
-  </tbody>
-</table>
-
+      <table className="min-w-full leading-normal mt-4 rounded-lg overflow-hidden">
+        <thead>
+          <tr className="text-left text-gray-700 bg-gray-100">
+            <th className="px-5 py-1 border-b-2 border-gray-200">{t('Serial No.')}</th>
+            <th className="px-5 py-3 border-b-2 border-gray-200">{t('Expenses Reason')}</th>
+            <th className="px-5 py-3 border-b-2 border-gray-200">{t('Amount')}</th>
+            <th className="px-5 py-3 border-b-2 border-gray-200">{t('Expense Date')}</th>
+            <th className="px-5 py-3 border-b-2 border-gray-200">{t('Status')}</th>
+            <th className="px-5 py-3 border-b-2 border-gray-200">{t('Action')}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {otherExpenses?.length === 0 ? (
+            <tr>
+              <td colSpan="6" className="text-center px-5 py-5">
+                <NoDataFound /> {/* Display NoDataFound when no data */}
+              </td>
+            </tr>
+          ) : (
+            otherExpenses?.map((item, index) => (
+              <ExpenseRow
+                key={item._id}
+                item={item}
+                index={index}
+                handlePayClick={handlePayClick}
+                handleDelete={handleDelete}
+                handleEditSidebarOpen={handleEditSidebarOpen}
+              />
+            ))
+          )}
+        </tbody>
+      </table>
 
       <Sidebar
         isOpen={isSidebarOpen}
-        title="Pay Expense"
+        title={t('Pay Expense')}
         onClose={handleSidebarClose}
         width="1/3"
       >
         <div className="bg-white p-4 rounded-lg shadow">
           <div className="flex justify-between items-center border-b pb-4 mb-4">
-            <h2 className="text-xl font-semibold">Pay Expense</h2>
+            <h2 className="text-xl font-semibold">{t('Pay Expense')}</h2>
           </div>
           <div className="flex flex-col items-center mb-4">
             {selectedItem?.profile ? (
@@ -139,7 +137,7 @@ const OtherExpenses = ({ selectedOption, selectedMonth }) => {
           </div>
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Amount
+              {t('Amount')}
             </label>
             <input
               type="number"
@@ -153,24 +151,24 @@ const OtherExpenses = ({ selectedOption, selectedMonth }) => {
             disabled={loading}
             className={`w-full flex justify-center border border-transparent shadow-sm text-sm font-medium bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600 ${loading ? 'bg-gray-400' : ''}`}
           >
-            {loading ? 'Processing...' : 'Pay Now'}
+            {loading ? t('Processing...') : t('Pay Now')}
           </button>
         </div>
       </Sidebar>
 
       <Sidebar
         isOpen={isEditSidebarOpen}
-        title="Edit Expense"
+        title={t('Edit Expense')}
         onClose={handleEditSidebarClose}
         width="1/3"
       >
         <div className="bg-white p-4 rounded-lg shadow">
           <div className="flex justify-between items-center border-b pb-4 mb-4">
-            <h2 className="text-xl font-semibold">Edit Expense</h2>
+            <h2 className="text-xl font-semibold">{t('Edit Expense')}</h2>
           </div>
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Reason
+              {t('Reason')}
             </label>
             <input
               type="text"
@@ -181,7 +179,7 @@ const OtherExpenses = ({ selectedOption, selectedMonth }) => {
           </div>
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Amount
+              {t('Amount')}
             </label>
             <input
               type="number"
@@ -192,7 +190,7 @@ const OtherExpenses = ({ selectedOption, selectedMonth }) => {
           </div>
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Date
+              {t('Date')}
             </label>
             <input
               type="date"
@@ -203,15 +201,15 @@ const OtherExpenses = ({ selectedOption, selectedMonth }) => {
           </div>
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Status
+              {t('Status')}
             </label>
             <select
               value={editExpense?.status || ''}
               onChange={(e) => setEditExpense({ ...editExpense, status: e.target.value })}
               className="mt-1 p-2 w-full border border-gray-300 rounded-md shadow-sm"
             >
-              <option value="unpaid">Unpaid</option>
-              <option value="paid">Paid</option>
+              <option value="unpaid">{t('Unpaid')}</option>
+              <option value="paid">{t('Paid')}</option>
             </select>
           </div>
           <button
@@ -219,7 +217,7 @@ const OtherExpenses = ({ selectedOption, selectedMonth }) => {
             disabled={loading}
             className={`w-full flex justify-center border border-transparent shadow-sm text-sm font-medium bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600 ${loading ? 'bg-gray-400' : ''}`}
           >
-            {loading ? 'Saving...' : 'Save'}
+            {loading ? t('Saving...') : t('Save')}
           </button>
         </div>
       </Sidebar>
@@ -240,6 +238,7 @@ const capitalizeFirstLetter = (str) => {
 
 
 const ExpenseRow = ({ item, index, handlePayClick, handleDelete, handleEditSidebarOpen }) => {
+  const { t } = useTranslation('admExpense'); // Initialize useTranslation hook
   const [openDropdown, setOpenDropdown] = useState(false);
   const dropdownRef = useRef(null);
 
@@ -275,26 +274,26 @@ const ExpenseRow = ({ item, index, handlePayClick, handleDelete, handleEditSideb
       <td className="px-5 py-2">{index + 1}</td> 
 
       <td className="px-5 py-2">{item.reason}</td>
-      <td className="px-5 py-2">{item.amount} QR</td>
+      <td className="px-5 py-2">{item.amount} {t('QR')}</td>
       <td className="px-5 py-2">{new Date(item.date).toLocaleDateString()}</td>
       <td className="px-5 py-2">
         <span
           className={`px-3 py-1 text-m font-semibold rounded-full ${item.status === "paid" ? "text-green-800" : "text-red-600"}`}
         >
-          {capitalizeFirstLetter(item.status)}
+          {capitalizeFirstLetter(t(item.status))}
         </span>
       </td>
       <td className="px-5 py-2 flex items-center justify-between relative">
         {item.status === "paid" ? (
           <span className="inline-flex items-center border border-transparent text-sm font-medium shadow-sm bg-green-200 text-green-800 py-1.5 px-3 rounded-md">
-            Completed
+            {t('Completed')}
           </span>
         ) : (
           <button
             className="inline-flex items-center border border-transparent text-sm font-medium shadow-sm bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600"
             onClick={() => handlePayClick(item)}
           >
-            Pay Now
+            {t('Pay Now')}
           </button>
         )}
 
@@ -313,7 +312,7 @@ const ExpenseRow = ({ item, index, handlePayClick, handleDelete, handleEditSideb
               }}
               className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 transition duration-300"
             >
-              Edit
+              {t('Edit')}
             </button>
             <button
               onClick={() => {
@@ -322,7 +321,7 @@ const ExpenseRow = ({ item, index, handlePayClick, handleDelete, handleEditSideb
               }}
               className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 transition duration-300"
             >
-              Delete
+              {t('Delete')}
             </button>
           </div>
         )}
@@ -330,6 +329,5 @@ const ExpenseRow = ({ item, index, handlePayClick, handleDelete, handleEditSideb
     </tr>
   );
 };
-
 
 export default React.memo(OtherExpenses);

@@ -7,8 +7,10 @@ import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchSalaries, updateSalary } from "../../../../../Store/Slices/Admin/Accounting/Expenses/expenses.action";
 import NoDataFound from "../../../../../Components/Common/NoDataFound";
+import { useTranslation } from 'react-i18next'; // Import useTranslation hook
 
 const DropdownMenu = ({ onEditClick }) => {
+  const { t } = useTranslation('admExpense'); // Initialize useTranslation hook
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null); // <-- Added useRef
 
@@ -47,7 +49,7 @@ const DropdownMenu = ({ onEditClick }) => {
               onClick={onEditClick}
               className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
             >
-              Edit
+              {t('Edit')}
             </button>
           </div>
         </div>
@@ -69,6 +71,7 @@ const capitalizeFirstLetter = (str) => {
 
 // Memoized row component
 const SalaryRow = React.memo(({ staff, onPayClick, onEditClick }) => {
+  const { t } = useTranslation('admExpense'); // Initialize useTranslation hook
   return (
     <tr className="bg-white border border-gray-200 ">
       <td className="px-5 py-3 flex items-center">
@@ -88,26 +91,26 @@ const SalaryRow = React.memo(({ staff, onPayClick, onEditClick }) => {
       </td>
       <td className="px-5 py-2">{staff.staffId?.mobileNumber}</td>
       <td className="px-5 py-2">{staff.month}</td>
-      <td className="px-5 py-2">{staff.salaryAmount} QR</td>
+      <td className="px-5 py-2">{staff.salaryAmount} {t('QR')}</td>
       <td className="px-5 py-2">
         {staff.paidDate ? new Date(staff.paidDate).toLocaleDateString() : "---"}
       </td>
       <td className="px-5 py-2">
         <span className={`px-3 py-1 text-m font-semibold ${staff.status === "paid" ? " text-green-800" : " text-red-600"}`}>
-          {capitalizeFirstLetter(staff.status)}
+          {capitalizeFirstLetter(t(staff.status))}
         </span>
       </td>
       <td className="px-5 py-2 flex items-center justify-between space-x-2">
         {staff.status === "paid" ? (
           <span className="inline-flex items-center border border-transparent text-xs font-medium shadow-sm bg-green-200 text-green-800 py-1.5 px-3 rounded-md">
-            Completed
+            {t('Completed')}
           </span>
         ) : (
           <button
             className="inline-flex items-center border border-transparent text-sm font-medium shadow-sm bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600"
             onClick={() => onPayClick(staff)}
           >
-            Pay Now
+            {t('Pay Now')}
           </button>
         )}
 
@@ -118,7 +121,7 @@ const SalaryRow = React.memo(({ staff, onPayClick, onEditClick }) => {
 });
 
 const StaffSalary = ({ selectedOption, selectedMonth }) => {
-
+  const { t } = useTranslation('admExpense'); // Initialize useTranslation hook
   const { staffSalaries, loading } = useSelector((store) => store?.admin?.expenses)
 
   const dispatch = useDispatch();
@@ -168,13 +171,13 @@ const StaffSalary = ({ selectedOption, selectedMonth }) => {
      <table className="min-w-full leading-normal mt-4 rounded-lg">
   <thead>
     <tr className="text-left text-gray-700 bg-gray-100">
-      <th className="px-5 py-3 border-b-2 border-gray-200">Staff Name</th>
-      <th className="px-5 py-3 border-b-2 border-gray-200">Contact Info</th>
-      <th className="px-5 py-3 border-b-2 border-gray-200">Salary Month</th>
-      <th className="px-5 py-3 border-b-2 border-gray-200">Salary Amount</th>
-      <th className="px-5 py-3 border-b-2 border-gray-200">Paid Date</th>
-      <th className="px-5 py-3 border-b-2 border-gray-200">Status</th>
-      <th className="px-5 py-3 border-b-2 border-gray-200">Action</th>
+      <th className="px-5 py-3 border-b-2 border-gray-200">{t('Staff Name')}</th>
+      <th className="px-5 py-3 border-b-2 border-gray-200">{t('Contact Info')}</th>
+      <th className="px-5 py-3 border-b-2 border-gray-200">{t('Salary Month')}</th>
+      <th className="px-5 py-3 border-b-2 border-gray-200">{t('Salary Amount')}</th>
+      <th className="px-5 py-3 border-b-2 border-gray-200">{t('Paid Date')}</th>
+      <th className="px-5 py-3 border-b-2 border-gray-200">{t('Status')}</th>
+      <th className="px-5 py-3 border-b-2 border-gray-200">{t('Action')}</th>
     </tr>
   </thead>
   <tbody>
@@ -196,7 +199,7 @@ const StaffSalary = ({ selectedOption, selectedMonth }) => {
       <Sidebar
         isOpen={isSidebarOpen}
         onClose={handleSidebarClose}
-        title="Add Transaction"
+        title={t('Add Transaction')}
       >
         <PaySalary teacher={selectedStaff} onSave={handleUpdateSalary} onClose={handleSidebarClose} />
       </Sidebar>
@@ -204,12 +207,12 @@ const StaffSalary = ({ selectedOption, selectedMonth }) => {
       <Sidebar
         isOpen={isEditSidebarOpen}
         onClose={handleEditSidebarClose}
-        title="Edit Salary Status"
+        title={t('Edit Salary Status')}
       >
         {selectedStaff && (
           <div className="bg-white p-4 rounded-lg shadow">
             <div className="flex justify-between items-center border-b pb-4 mb-4">
-              <h2 className="text-xl font-semibold">Edit Salary Status</h2>
+              <h2 className="text-xl font-semibold">{t('Edit Salary Status')}</h2>
             </div>
             <div className="flex flex-col items-center mb-4">
               {selectedStaff.staffId.profile ? (
@@ -229,7 +232,7 @@ const StaffSalary = ({ selectedOption, selectedMonth }) => {
             </div>
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Salary Amount
+                {t('Salary Amount')}
               </label>
               <input
                 type="number"
@@ -240,15 +243,15 @@ const StaffSalary = ({ selectedOption, selectedMonth }) => {
             </div>
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Status
+                {t('Status')}
               </label>
               <select
                 value={selectedStaff.status || ''}
                 onChange={(e) => setSelectedStaff({ ...selectedStaff, status: e.target.value })}
                 className="mt-1 p-2 w-full border border-gray-300 rounded-md shadow-sm"
               >
-                <option value="unpaid">Unpaid</option>
-                <option value="paid">Paid</option>
+                <option value="unpaid">{t('Unpaid')}</option>
+                <option value="paid">{t('Paid')}</option>
               </select>
             </div>
             <button
@@ -256,7 +259,7 @@ const StaffSalary = ({ selectedOption, selectedMonth }) => {
               disabled={loading}
               className={`w-full flex justify-center border border-transparent shadow-sm text-sm font-medium bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600 ${loading ? 'bg-gray-400' : ''}`}
             >
-              {loading ? 'Saving...' : 'Save'}
+              {loading ? t('Saving...') : t('Save')}
             </button>
           </div>
         )}
