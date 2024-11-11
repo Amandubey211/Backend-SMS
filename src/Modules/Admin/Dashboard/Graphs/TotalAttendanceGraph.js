@@ -16,6 +16,7 @@ const TotalAttendanceGraph = () => {
   const [gender, setGender] = useState("Both");
 
   const dispatch = useDispatch();
+
   const { attendanceData, loadingAttendance: loading, errorAttendance: error } = useSelector(
     (state) => state?.admin?.adminDashboard
   );

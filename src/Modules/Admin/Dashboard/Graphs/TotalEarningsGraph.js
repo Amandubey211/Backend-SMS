@@ -14,10 +14,14 @@ const TotalEarningsGraph = () => {
   const [tooltipData, setTooltipData] = useState(null);
   const [selectedOption, setSelectedOption] = useState("currentMonth");
 
-  const { t } = useTranslation('dashboard');
+  const { t } = useTranslation("dashboard");
 
   const dispatch = useDispatch();
-  const {  loadingEarnings:loading, errorEarnings:error, earningsData } = useSelector((state) => state?.admin?.adminDashboard);
+  const {
+    loadingEarnings: loading,
+    errorEarnings: error,
+    earningsData,
+  } = useSelector((state) => state?.admin?.adminDashboard);
 
   // Function to dispatch the fetchEarningsData action
   const fetchDashboardData = (option) => {
@@ -32,7 +36,6 @@ const TotalEarningsGraph = () => {
     } else if (option === "totalExpensesWithoutPay") {
       includeUnpaidExpenses = false;
     }
-
 
     // Dispatch fetchEarningsData with necessary parameters
     dispatch(fetchEarningsData({ month, year, includeUnpaidExpenses }));
@@ -133,7 +136,6 @@ const TotalEarningsGraph = () => {
     totalEarnings,
     totalExpenses,
   } = earningsData;
-
 
   // Function to get the ordinal suffix of a number
   const getOrdinalSuffix = (day) => {
@@ -249,7 +251,7 @@ const TotalEarningsGraph = () => {
     <div className="p-4 bg-white">
       <div className="flex justify-between items-center mb-4">
         <div>
-          <h2 className="text-xl font-semibold">{t('Earnings')}</h2>
+          <h2 className="text-xl font-semibold">{t("Earnings")}</h2>
         </div>
         <div>
           <select
