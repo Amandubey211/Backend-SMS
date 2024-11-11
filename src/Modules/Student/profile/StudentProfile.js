@@ -123,7 +123,7 @@ const StudentProfile = () => {
                 </span>
               </div>
               <div className="flex flex-col">
-                <span className="font-normal text-gray-500">Q Id</span>
+                <span className="font-normal text-gray-500">QID</span>
                 <span className="font-medium text-gray-800">
                   {userDetails?.Q_Id || "-"}
                 </span>
@@ -133,13 +133,13 @@ const StudentProfile = () => {
               <div className="flex flex-col">
                 <span className="font-normal text-gray-500">Section</span>
                 <span className="font-medium text-gray-800">
-                  {userDetails?.sectionName || "-"}
+                  {userDetails?.sectionName ||"-"}
                 </span>
               </div>
               <div className="flex flex-col">
-                <span className="font-normal text-gray-500">class</span>
+                <span className="font-normal text-gray-500">Class</span>
                 <span className="font-medium text-gray-800">
-                  {userDetails?.className || "-"}
+                  {userDetails?.className ||"-"}
                 </span>
               </div>
             </div>

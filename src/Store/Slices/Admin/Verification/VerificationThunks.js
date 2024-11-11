@@ -30,6 +30,7 @@ const handleError = (error, dispatch, rejectWithValue) => {
 export const fetchUnverifiedStudents = createAsyncThunk(
   "verification/fetchUnverifiedStudents",
   async (_, { rejectWithValue, getState, dispatch }) => {
+    const say = localStorage.getItem("say");
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
       const response = await axios.get(
@@ -53,6 +54,7 @@ export const fetchUnverifiedStudents = createAsyncThunk(
 export const fetchRejectedStudents = createAsyncThunk(
   "verification/fetchRejectedStudents",
   async (_, { rejectWithValue, getState, dispatch }) => {
+    const say = localStorage.getItem("say");
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
       const response = await axios.get(
@@ -76,6 +78,7 @@ export const fetchRejectedStudents = createAsyncThunk(
 export const verifyStudent = createAsyncThunk(
   "verification/verifyStudent",
   async (verificationDetails, { rejectWithValue, getState, dispatch }) => {
+    const say = localStorage.getItem("say");
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
 
@@ -149,6 +152,7 @@ export const verifyStudent = createAsyncThunk(
 export const assignClassToStudent = createAsyncThunk(
   "verification/assignClassToStudent",
   async (classDetails, { rejectWithValue, getState, dispatch }) => {
+    const say = localStorage.getItem("say");
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
       const { data } = await axios.put(
