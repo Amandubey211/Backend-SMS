@@ -46,7 +46,7 @@ const StudentProfile = ({student}) => {
     <div className="bg-white  h-full  px-7 py-2 ">
     <h2 className="text-base font-semibold text-gray-600 mb-3">Educational Documents</h2>
     {
-      studentDocument.length > 0 ?
+      studentDocument?.length > 0 ?
       <div className=" w-[30rem] p-2  rounded-lg mb-3 ">
       <h3 className="text-lg font-semibold mb-4 text-gray-800">
         Document Previews
@@ -59,7 +59,7 @@ const StudentProfile = ({student}) => {
               index
             )} p-4 border rounded-lg shadow-md transform transition-transform hover:scale-105`}
           >
-            {doc.documentType.startsWith("image/") ? (
+            {doc?.documentType?.startsWith("image/") ? (
               <img
                 src={doc?.documentUrl}
                 alt={`Document ${index + 1}`}
@@ -68,7 +68,7 @@ const StudentProfile = ({student}) => {
             ) : (
               <embed
                 src={doc?.documentUrl}
-                type={doc.documentType}
+                type={doc?.documentType}
                 className="w-full h-40 mb-2 rounded-md"
               />
             )}
@@ -81,7 +81,7 @@ const StudentProfile = ({student}) => {
                 title="Open Modal"
                 className="p-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-full shadow-lg hover:from-pink-600 hover:to-purple-600 transition-all duration-200"
                 onClick={() =>
-                  handlePreviewClick(doc?.documentUrl, doc.documentType)
+                  handlePreviewClick(doc?.documentUrl, doc?.documentType)
                 }
               >
                 <AiOutlineEye size={20} />
