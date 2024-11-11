@@ -12,6 +12,7 @@ const initialState = {
   unVerifiedStudents: [],
   rejectedStudents: [],
   loadingUnverified: false,
+  loadingVerificationStudent: false,
   loadingRejected: false,
   error: null,
   activeTab: "unverified",
@@ -68,30 +69,30 @@ const verificationSlice = createSlice({
       })
       // Verify Student
       .addCase(verifyStudent.pending, (state) => {
-        state.loadingUnverified = true;
+        state.loadingVerificationStudent = true;
         state.error = null;
       })
       .addCase(verifyStudent.fulfilled, (state, action) => {
-        state.loadingUnverified = false;
+        state.loadingVerificationStudent = false;
         // const updatedStudent = action.payload;
         // state.unVerifiedStudents = state.unVerifiedStudents.filter(
         //   (student) => student._id !== updatedStudent._id
         // );
       })
       .addCase(verifyStudent.rejected, (state, action) => {
-        state.loadingUnverified = false;
+        state.loadingVerificationStudent = false;
         state.error = action.payload;
       })
       // Assign Class to Student
       .addCase(assignClassToStudent.pending, (state) => {
-        state.loadingUnverified = true;
+        state.loadingVerificationStudent = true;
         state.error = null;
       })
       .addCase(assignClassToStudent.fulfilled, (state) => {
-        state.loadingUnverified = false;
+        state.loadingVerificationStudent = false;
       })
       .addCase(assignClassToStudent.rejected, (state, action) => {
-        state.loadingUnverified = false;
+        state.loadingVerificationStudent = false;
         state.error = action.payload;
       });
   },
