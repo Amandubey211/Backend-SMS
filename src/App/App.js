@@ -662,49 +662,49 @@ function App() {
       errorElement: <Error />,
     },
     { path: "library", element: <Libary />, errorElement: <Error /> },
-    {
-      path: "/noticeboard/timetable",
-      element: (
-        <ProtectRoute
-          Component={TimeTablePage}
-          allowedRoles={["admin", "teacher"]}
-        />
-      ),
-      errorElement: <Error />,
-      children: [
-        {
-          path: "viewtable/:tablename", // Notice it’s a child path, not a full path
-          element: (
-            <ProtectRoute
-              Component={TableView}
-              allowedRoles={["admin", "teacher"]}
-            />
-          ),
-          errorElement: <Error />,
-        },
-        {
-          path: "edit/:id", // New child route
-          element: (
-            <ProtectRoute
-              Component={updateTimetable}
-              allowedRoles={["admin", "teacher"]}
-            />
-          ),
-          errorElement: <Error />,
-        },
-      ],
-    },
+    // {
+    //   path: "/noticeboard/timetable",
+    //   element: (
+    //     <ProtectRoute
+    //       Component={TimeTablePage}
+    //       allowedRoles={["admin", "teacher"]}
+    //     />
+    //   ),
+    //   errorElement: <Error />,
+    //   children: [
+    //     {
+    //       path: "viewtable/:tablename", // Notice it’s a child path, not a full path
+    //       element: (
+    //         <ProtectRoute
+    //           Component={TableView}
+    //           allowedRoles={["admin", "teacher"]}
+    //         />
+    //       ),
+    //       errorElement: <Error />,
+    //     },
+    //     {
+    //       path: "edit/:id", // New child route
+    //       element: (
+    //         <ProtectRoute
+    //           Component={updateTimetable}
+    //           allowedRoles={["admin", "teacher"]}
+    //         />
+    //       ),
+    //       errorElement: <Error />,
+    //     },
+    //   ],
+    // },
 
-    {
-      path: "/noticeboard/timetable/create-new-timeTable",
-      element: (
-        <ProtectRoute
-          Component={CreateTimeTable}
-          allowedRoles={["admin", "teacher"]}
-        />
-      ),
-      errorElement: <Error />,
-    },
+    // {
+    //   path: "/noticeboard/timetable/create-new-timeTable",
+    //   element: (
+    //     <ProtectRoute
+    //       Component={CreateTimeTable}
+    //       allowedRoles={["admin", "teacher"]}
+    //     />
+    //   ),
+    //   errorElement: <Error />,
+    // },
     {
       path: "/noticeboard/events",
       element: (
