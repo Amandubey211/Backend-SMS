@@ -16,7 +16,7 @@ import { fetchAcademicYear } from "../../AcademicYear/academicYear.action";
 // **Staff login action**
 export const staffLogin = createAsyncThunk(
   "auth/staffLogin",
-  async (staffDetails, { rejectWithValue, dispatch,getState }) => {
+  async (staffDetails, { rejectWithValue, dispatch, getState }) => {
     try {
       const deviceToken = await requestPermissionAndGetToken(); // Get notification token
       const userDetail = { ...staffDetails, deviceToken }; // Include device token
@@ -80,11 +80,14 @@ export const staffLogin = createAsyncThunk(
             ])
           );
           await dispatch(fetchAcademicYear());
-          const activeAcademicYear = await  getState().common?.academicYear?.academicYears?.find((i)=>i.isActive == true);
+          const activeAcademicYear =
+            await getState().common?.academicYear?.academicYears?.find(
+              (i) => i.isActive == true
+            );
           localStorage.setItem("say", activeAcademicYear?._id);
-         dispatch(setToken(data.token)); 
-         dispatch(setRole(data.role)); 
-         
+          dispatch(setToken(data.token));
+          dispatch(setRole(data.role));
+
           return { redirect: "/dashboard" }; // Return the redirect path
         }
       } else {

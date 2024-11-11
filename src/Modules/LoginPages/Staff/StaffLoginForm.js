@@ -14,27 +14,56 @@ const StaffLoginForm = () => {
     email: "",
     password: "",
   });
+  const [errors, setErrors] = useState({ email: "", password: "" });
+  const [isShaking, setIsShaking] = useState(false); // Shake animation state
+  const [showPassword, setShowPassword] = useState(false);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { loading } = useSelector((state) => state.common.auth); // Get loading state from Redux store
-
-  const [showPassword, setShowPassword] = useState(false);
+  const { loading } = useSelector((state) => state.common.auth);
 
   const handleInputChange = (e) => {
     const { id, value } = e.target;
+
+    // Update credentials and clear error when typing
     setStaffCredentials((prevDetails) => ({
       ...prevDetails,
       [id]: value,
     }));
+
+    if (value.trim() !== "") {
+      setErrors((prevErrors) => ({ ...prevErrors, [id]: "" }));
+    }
+  };
+
+  const triggerShake = () => {
+    setIsShaking(true);
+    setTimeout(() => setIsShaking(false), 500); // Reset shake state after animation
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+    if (!staffCredentials.email.trim()) {
+      newErrors.email = "Email is required.";
+    }
+    if (!staffCredentials.password.trim()) {
+      newErrors.password = "Password is required.";
+    }
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length > 0) {
+      triggerShake();
+    }
+
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Validation
-    if (!staffCredentials.email || !staffCredentials.password) {
-      return toast.error("Please add the required details");
+    // Validate inputs
+    if (!validateForm()) {
+      return;
     }
 
     // Dispatch the staffLogin thunk with credentials
@@ -47,8 +76,13 @@ const StaffLoginForm = () => {
         }
       })
       .catch((error) => {
-        console.log(error);
-        // Handle error
+        console.error(error);
+        // Handle error, clear the password field
+        setStaffCredentials((prevDetails) => ({
+          ...prevDetails,
+          password: "",
+        }));
+        toast.error(error || "Login failed. Please try again.");
       });
   };
 
@@ -69,8 +103,10 @@ const StaffLoginForm = () => {
             <span>LMS Home</span>
           </NavLink>
           <h2 className="text-2xl font-semibold mb-6">Staff Account</h2>
-          <form onSubmit={handleSubmit}>
-            <h6>Login in using:</h6>
+          <form
+            onSubmit={handleSubmit}
+            className={isShaking ? "animate-shake" : ""} // Add Tailwind animation class
+          >
             <div className="mb-4">
               <label htmlFor="email" className="sr-only">
                 Email
@@ -81,10 +117,16 @@ const StaffLoginForm = () => {
                 value={staffCredentials.email}
                 onChange={handleInputChange}
                 placeholder="Type your email"
-                className="mt-1 block w-full px-3 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                required
+                className={`mt-1 block w-full px-3 py-3 border rounded-md shadow-sm sm:text-sm ${
+                  errors.email
+                    ? "border-red-500 focus:ring-red-500 focus:border-red-500"
+                    : "border-gray-300 focus:ring-indigo-500 focus:border-indigo-500"
+                }`}
                 aria-required="true"
               />
+              {errors.email && (
+                <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+              )}
             </div>
             <div className="mb-4">
               <div className="relative">
@@ -97,8 +139,11 @@ const StaffLoginForm = () => {
                   value={staffCredentials.password}
                   onChange={handleInputChange}
                   placeholder="Type your password"
-                  className="mt-1 block w-full px-3 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                  required
+                  className={`mt-1 block w-full px-3 py-3 border rounded-md shadow-sm sm:text-sm ${
+                    errors.password
+                      ? "border-red-500 focus:ring-red-500 focus:border-red-500"
+                      : "border-gray-300 focus:ring-indigo-500 focus:border-indigo-500"
+                  }`}
                   aria-required="true"
                 />
                 <button
@@ -110,6 +155,9 @@ const StaffLoginForm = () => {
                   {showPassword ? <FaEye /> : <PiEyeClosedFill />}
                 </button>
               </div>
+              {errors.password && (
+                <p className="text-red-500 text-sm mt-1">{errors.password}</p>
+              )}
             </div>
             <div className="mb-6 text-right">
               <NavLink

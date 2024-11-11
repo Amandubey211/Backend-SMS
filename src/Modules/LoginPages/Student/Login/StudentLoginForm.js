@@ -9,33 +9,75 @@ import { LuLoader } from "react-icons/lu";
 import { FcInfo } from "react-icons/fc";
 import { NavLink, useNavigate } from "react-router-dom";
 import Modal from "../../../../Components/Common/Modal";
-import { AiOutlinePhone } from "react-icons/ai";
 import StudentDiwanLogo from "../../../../Assets/HomeAssets/StudentDiwanLogo.png";
 import { IoIosArrowRoundBack } from "react-icons/io";
+
 const StudentLoginForm = () => {
   const [studentDetails, setStudentDetails] = useState({
     email: "",
     password: "",
   });
+  const [errors, setErrors] = useState({ email: "", password: "" });
+  const [isShaking, setIsShaking] = useState(false); // State for shake animation
   const [showPassword, setShowPassword] = useState(false);
   const { loading } = useSelector((state) => state.common.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [modalIsOpen, setModalIsOpen] = useState(false);
 
+  const handleInputChange = (e) => {
+    const { id, value } = e.target;
+
+    setStudentDetails((prev) => ({
+      ...prev,
+      [id]: value,
+    }));
+    if (value.trim() !== "") {
+      setErrors((prevErrors) => ({ ...prevErrors, [id]: "" }));
+    }
+  };
+
+  const triggerShake = () => {
+    setIsShaking(true);
+    setTimeout(() => setIsShaking(false), 500); // Reset shake state
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+    if (!studentDetails.email.trim()) {
+      newErrors.email = "Email is required.";
+    }
+    if (!studentDetails.password.trim()) {
+      newErrors.password = "Password is required.";
+    }
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length > 0) {
+      triggerShake();
+    }
+
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!studentDetails.email || !studentDetails.password) {
-      toast.error("Please add the required details");
+
+    if (!validateForm()) {
       return;
     }
+
     dispatch(studentLogin(studentDetails))
       .unwrap()
       .then(({ redirect }) => {
         navigate(redirect);
       })
       .catch((error) => {
-        toast.error(error);
+        // Clear password on error
+        setStudentDetails((prev) => ({
+          ...prev,
+          password: "",
+        }));
+        toast.error(error || "Login failed. Please try again.");
       });
   };
 
@@ -64,23 +106,26 @@ const StudentLoginForm = () => {
               <FcInfo className="text-2xl" />
             </button>
           </div>
-          <form onSubmit={handleSubmit}>
-            <h6>Login in using:</h6>
+          <form
+            onSubmit={handleSubmit}
+            className={isShaking ? "animate-shake" : ""} // Tailwind shake animation
+          >
             <div className="mb-4">
               <input
                 type="email"
                 id="email"
                 value={studentDetails.email}
-                onChange={(e) =>
-                  setStudentDetails((prev) => ({
-                    ...prev,
-                    email: e.target.value,
-                  }))
-                }
+                onChange={handleInputChange}
                 placeholder="Type your email"
-                className="mt-1 block w-full px-3 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                required
+                className={`mt-1 block w-full px-3 py-3 border rounded-md shadow-sm sm:text-sm ${
+                  errors.email
+                    ? "border-red-500 focus:ring-red-500 focus:border-red-500"
+                    : "border-gray-300 focus:ring-indigo-500 focus:border-indigo-500"
+                }`}
               />
+              {errors.email && (
+                <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+              )}
             </div>
             <div className="mb-4">
               <div className="relative">
@@ -88,15 +133,13 @@ const StudentLoginForm = () => {
                   type={showPassword ? "text" : "password"}
                   id="password"
                   value={studentDetails.password}
-                  onChange={(e) =>
-                    setStudentDetails((prev) => ({
-                      ...prev,
-                      password: e.target.value,
-                    }))
-                  }
+                  onChange={handleInputChange}
                   placeholder="Type your password"
-                  className="mt-1 block w-full px-3 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                  required
+                  className={`mt-1 block w-full px-3 py-3 border rounded-md shadow-sm sm:text-sm ${
+                    errors.password
+                      ? "border-red-500 focus:ring-red-500 focus:border-red-500"
+                      : "border-gray-300 focus:ring-indigo-500 focus:border-indigo-500"
+                  }`}
                 />
                 <button
                   type="button"
@@ -107,6 +150,9 @@ const StudentLoginForm = () => {
                   {showPassword ? <FaEye /> : <PiEyeClosedFill />}
                 </button>
               </div>
+              {errors.password && (
+                <p className="text-red-500 text-sm mt-1">{errors.password}</p>
+              )}
             </div>
             <div className="mb-6 text-right">
               <NavLink
@@ -120,6 +166,7 @@ const StudentLoginForm = () => {
             <button
               type="submit"
               className="w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600 text-center"
+              disabled={loading}
             >
               {loading ? (
                 <div className="flex justify-center">
@@ -143,13 +190,13 @@ const StudentLoginForm = () => {
       </div>
 
       <Modal isOpen={modalIsOpen} onClose={closeModal}>
-        <div className="">
+        <div className="text-center">
           <img
             src={StudentDiwanLogo}
             alt="logo"
             className="mx-auto mb-4 h-18 w-60 "
           />
-          <h2 className="text-2xl    font-semibold mb-4" id="modal-title">
+          <h2 className="text-2xl font-semibold mb-4" id="modal-title">
             Information
           </h2>
           <p className="mb-6 capitalize">
@@ -157,11 +204,6 @@ const StudentLoginForm = () => {
             please allow 4-5 business days to receive your login credentials.
             For any inquiries, please contact your respective school.
           </p>
-
-          {/* <div className="flex   mb-4">
-            <AiOutlinePhone className="text-xl mr-2" />
-            <span className="font-semibold">Phone: 123-456-7890</span>
-          </div> */}
           <div className="flex justify-end">
             <button
               onClick={closeModal}
