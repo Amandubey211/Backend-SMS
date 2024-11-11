@@ -3,6 +3,8 @@ import { FaSpinner } from "react-icons/fa";
 import toast from "react-hot-toast";
 import axios from "axios";
 import { baseUrl } from "../../../../config/Common";
+import { useDispatch } from "react-redux";
+import { updateAcademicYear } from "../../../../Store/Slices/Common/AcademicYear/academicYear.action";
 
 // Helper function to format the date to YYYY-MM-DD
 const formatDateForInput = (dateString) => {
@@ -69,38 +71,15 @@ const EditAcademicYearModal = ({ show, onClose, year, refreshData }) => {
     setErrors(formErrors);
     return Object.keys(formErrors).length === 0;
   };
-
+const dispatch = useDispatch()
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) {
       return;
     }
+    dispatch(updateAcademicYear({data:formData,id:year?._id}))
 
-    setLoading(true);
-
-    try {
-      const token = localStorage.getItem("admin:token");
-      const response = await axios.put(
-        `${baseUrl}/admin/updateAcademicYear/${year._id}`,
-        formData,
-        {
-          headers: { Authentication: token },
-        }
-      );
-
-      if (response.data.success) {
-        toast.success("Academic year updated successfully.");
-        refreshData(); // Refresh data on the main screen
-        onClose(); // Close the modal
-      } else {
-        toast.error(response.data.message || "Failed to update academic year.");
-      }
-    } catch (error) {
-      toast.error("Something went wrong. Please try again.");
-    } finally {
-      setLoading(false);
-    }
   };
 
   return (

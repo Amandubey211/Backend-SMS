@@ -36,7 +36,10 @@ const NoticeBoard = (descriptionLength) => {
     notices,
   } = useSelector((state) => state.admin.adminDashboard);
   useEffect(() => {
-    dispatch(fetchNotices());
+
+  
+    dispatch(fetchNotices())
+
   }, [dispatch]);
 
   if (loading) {

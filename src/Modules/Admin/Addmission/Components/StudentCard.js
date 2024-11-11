@@ -3,8 +3,10 @@ import { GiArmorUpgrade } from "react-icons/gi";
 import CardBanner from "../../../../Assets/AdmissionCard/CardBanner.jpg";
 import Logo from "../../../../Components/Common/Logo";
 import { useSelector } from "react-redux";
+import { useTranslation } from 'react-i18next';
 
 const StudentCard = ({ studentInfo, imagePreview }) => {
+  const { t } = useTranslation('admAdmission');
   const {
     firstName,
     lastName,
@@ -49,28 +51,27 @@ const StudentCard = ({ studentInfo, imagePreview }) => {
         </div>
         <div className="mt-4  px-4">
           <h2 className="text-lg text-center font-semibold">
-            {firstName + " " + lastName || "Student Name"}
+            {firstName + " " + lastName || t("Student Name")}
           </h2>
           <div className="text-sm text-gray-600 mt-2 space-y-1 ">
             <p>
-              <span className="font-semibold">QID</span>: {Q_Id}
+              <span className="font-semibold">{t("QID")}</span>: {Q_Id}
             </p>
             <p>
-              <span className="font-semibold">Class</span>: {className}
+              <span className="font-semibold">{t("Class")}</span>: {className}
             </p>
 
             <p>
-              <span className="font-semibold">Blood</span>: {bloodGroup}
+              <span className="font-semibold">{t("Blood")}</span>: {bloodGroup}
             </p>
             <p>
-              <span className="font-semibold">Religion</span>: {religion}
+              <span className="font-semibold">{t("Religion")}</span>: {religion}
             </p>
             <p title={email}>
-              <span className="font-semibold">Email</span>:{" "}
-              {truncateEmail(email)}
+              <span className="font-semibold">{t("Email")}</span>: {truncateEmail(email)}
             </p>
             <p>
-              <span className="font-semibold">Number</span>: {contactNumber}
+              <span className="font-semibold">{t("Number")}</span>: {contactNumber}
             </p>
           </div>
         </div>

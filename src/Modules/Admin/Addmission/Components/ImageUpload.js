@@ -1,5 +1,6 @@
 import React from "react";
 import { FaTimes } from "react-icons/fa"; // Importing the Font Awesome remove icon
+import { useTranslation } from 'react-i18next';
 
 const ImageUpload = ({
   imagePreview,
@@ -10,6 +11,7 @@ const ImageUpload = ({
   height,
   error,
 }) => {
+  const { t } = useTranslation('admAdmission');
   const fileInputRef = React.useRef(null);
 
   return (
@@ -25,13 +27,13 @@ const ImageUpload = ({
           <div className="relative w-full h-full">
             <img
               src={imagePreview}
-              alt="Student"
+              alt={t("Student")}
               className="object-cover rounded-lg w-full h-full"
             />
             <button
               type="button"
               onClick={handleRemoveImage}
-              className="absolute top-2 right-2  text-purple-500 bg-purple-300 transition transform hover:scale-110 hover:bg-purple-500 hover:text-purple-700"
+              className="absolute top-2 right-2 text-purple-500 bg-purple-300 transition transform hover:scale-110 hover:bg-purple-500 hover:text-purple-700"
               style={{
                 borderRadius: "50%",
                 padding: "0.25rem",
@@ -94,13 +96,13 @@ const ImageUpload = ({
                 </clipPath>
               </defs>
             </svg>
-            <p className="mt-2 text-sm text-gray-600">Drop Your Image here</p>
+            <p className="mt-2 text-sm text-gray-600">{t("Drop Your Image here")}</p>
             <button
               type="button"
               onClick={() => fileInputRef.current.click()}
               className="mt-2 text-purple-500 underline"
             >
-              Click to browse
+              {t("Click to browse")}
             </button>
             <input
               type="file"

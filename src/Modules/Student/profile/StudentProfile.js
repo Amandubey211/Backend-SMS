@@ -21,6 +21,10 @@ const StudentProfile = () => {
     dataSetter((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
+  useEffect(()=>{
+    console.log('ud',userDetails);
+    
+  },[])
   const updateProfile = () => {
     // Logic to update profile
     console.log("Profile updated:");
@@ -122,6 +126,20 @@ const StudentProfile = () => {
                 <span className="font-normal text-gray-500">Q Id</span>
                 <span className="font-medium text-gray-800">
                   {userDetails?.Q_Id || "-"}
+                </span>
+              </div>
+            </div>
+            <div className="flex flex-col gap-5">
+              <div className="flex flex-col">
+                <span className="font-normal text-gray-500">Section</span>
+                <span className="font-medium text-gray-800">
+                  {userDetails?.sectionName || "-"}
+                </span>
+              </div>
+              <div className="flex flex-col">
+                <span className="font-normal text-gray-500">class</span>
+                <span className="font-medium text-gray-800">
+                  {userDetails?.className || "-"}
                 </span>
               </div>
             </div>

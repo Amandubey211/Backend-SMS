@@ -1,8 +1,11 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, memo } from 'react';
 import { FaUser, FaBook, FaGraduationCap, FaPhone, FaEnvelope, FaMapMarkerAlt, FaBirthdayCake, FaUsers, FaCalendarAlt, FaBriefcaseMedical, FaBusAlt, FaCertificate, FaCheckCircle, FaShieldAlt, FaGlobe, FaUserShield } from 'react-icons/fa';
 import { VscChromeClose } from "react-icons/vsc";
+import { useTranslation } from 'react-i18next';
 
 const Sidebar = ({ student, closeSidebar, onDemote }) => {
+  const { t } = useTranslation('admDashboard'); // Initialize i18next hook
+
   // Close sidebar when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -15,6 +18,8 @@ const Sidebar = ({ student, closeSidebar, onDemote }) => {
   }, [closeSidebar]);
 
   if (!student) return null; // Ensure there's a student to display
+
+  const formatDate = (date) => date ? new Date(date).toLocaleDateString() : t("N/A"); // Default date format with "N/A"
 
   return (
     <div className="sidebar-wrapper fixed inset-0 z-50 flex justify-end bg-black bg-opacity-50 transition-opacity ease-in-out">
@@ -32,13 +37,13 @@ const Sidebar = ({ student, closeSidebar, onDemote }) => {
           {/* Profile Section */}
           <div className="flex items-center mb-6">
             <img
-              src={student.profile}
-              alt={`${student.firstName} ${student.lastName}`}
+              src={student?.profile || 'https://via.placeholder.com/150'}
+              alt={`${student?.firstName || t("N/A")} ${student?.lastName || t("N/A")}`}
               className="w-20 h-20 p-0.5 rounded-full border-2 border-gray-300 mr-4"
             />
             <div>
-              <h2 className="text-2xl font-semibold">{student.firstName} {student.lastName}</h2>
-              <p className="text-sm text-gray-500">Admission Number: <span className="font-medium text-gray-700">{student.admissionNumber}</span></p>
+              <h2 className="text-2xl font-semibold">{student?.firstName || t("N/A")} {student?.lastName || t("N/A")}</h2>
+              <p className="text-sm text-gray-500">{t("Admission Number")}: <span className="font-medium text-gray-700">{student?.admissionNumber || t("N/A")}</span></p>
             </div>
           </div>
 
@@ -47,14 +52,14 @@ const Sidebar = ({ student, closeSidebar, onDemote }) => {
           {/* Personal Info */}
           <div className="mb-6">
             <h3 className="text-lg font-semibold mb-2 flex items-center text-gray-800">
-              <FaUser className="mr-2 text-blue-600" /> Personal Information
+              <FaUser className="mr-2 text-blue-600" /> {t("Personal Information")}
             </h3>
-            <p className="text-gray-600"><FaEnvelope className="inline mr-2 text-gray-500" /> <span className="font-bold">Email:</span> {student.email}</p>
-            <p className="text-gray-600"><FaPhone className="inline mr-2 text-gray-500" /> <span className="font-bold">Phone:</span> {student.contactNumber}</p>
-            <p className="text-gray-600"><FaBirthdayCake className="inline mr-2 text-gray-500" /> <span className="font-bold">Date of Birth:</span> {new Date(student.dateOfBirth).toLocaleDateString()}</p>
-            <p className="text-gray-600"><FaUser className="inline mr-2 text-gray-500" /> <span className="font-bold">Gender:</span> {student.gender}</p>
-            <p className="text-gray-600"><FaBriefcaseMedical className="inline mr-2 text-gray-500" /> <span className="font-bold">Blood Group:</span> {student.bloodGroup}</p>
-            <p className="text-gray-600"><FaGlobe className="inline mr-2 text-gray-500" /> <span className="font-bold">Religion:</span> {student.religion}</p>
+            <p className="text-gray-600"><FaEnvelope className="inline mr-2 text-gray-500" /> <span className="font-bold">{t("Email")}:</span> {student?.email || t("N/A")}</p>
+            <p className="text-gray-600"><FaPhone className="inline mr-2 text-gray-500" /> <span className="font-bold">{t("Phone")}:</span> {student?.contactNumber || t("N/A")}</p>
+            <p className="text-gray-600"><FaBirthdayCake className="inline mr-2 text-gray-500" /> <span className="font-bold">{t("Date of Birth")}:</span> {formatDate(student?.dateOfBirth)}</p>
+            <p className="text-gray-600"><FaUser className="inline mr-2 text-gray-500" /> <span className="font-bold">{t("Gender")}:</span> {student?.gender || t("N/A")}</p>
+            <p className="text-gray-600"><FaBriefcaseMedical className="inline mr-2 text-gray-500" /> <span className="font-bold">{t("Blood Group")}:</span> {student?.bloodGroup || t("N/A")}</p>
+            <p className="text-gray-600"><FaGlobe className="inline mr-2 text-gray-500" /> <span className="font-bold">{t("Religion")}:</span> {student?.religion || t("N/A")}</p>
           </div>
 
           <hr className="my-4 border-gray-300" />
@@ -62,11 +67,11 @@ const Sidebar = ({ student, closeSidebar, onDemote }) => {
           {/* Guardian Info */}
           <div className="mb-6">
             <h3 className="text-lg font-semibold mb-2 flex items-center text-gray-800">
-              <FaUser className="mr-2 text-purple-600" /> Guardian Information
+              <FaUser className="mr-2 text-purple-600" /> {t("Guardian Information")}
             </h3>
-            <p className="text-gray-600"><FaUser className="inline mr-2 text-gray-500" /> <span className="font-bold">Name:</span> {student.guardianName} ({student.guardianRelationToStudent})</p>
-            <p className="text-gray-600"><FaPhone className="inline mr-2 text-gray-500" /> <span className="font-bold">Guardian Phone:</span> {student.guardianContactNumber}</p>
-            <p className="text-gray-600"><FaEnvelope className="inline mr-2 text-gray-500" /> <span className="font-bold">Guardian Email:</span> {student.guardianEmail}</p>
+            <p className="text-gray-600"><FaUser className="inline mr-2 text-gray-500" /> <span className="font-bold">{t("Name")}:</span> {student?.guardianName || t("N/A")} ({student?.guardianRelationToStudent || t("N/A")})</p>
+            <p className="text-gray-600"><FaPhone className="inline mr-2 text-gray-500" /> <span className="font-bold">{t("Guardian Phone")}:</span> {student?.guardianContactNumber || t("N/A")}</p>
+            <p className="text-gray-600"><FaEnvelope className="inline mr-2 text-gray-500" /> <span className="font-bold">{t("Guardian Email")}:</span> {student?.guardianEmail || t("N/A")}</p>
           </div>
 
           <hr className="my-4 border-gray-300" />
@@ -74,15 +79,15 @@ const Sidebar = ({ student, closeSidebar, onDemote }) => {
           {/* Address Information */}
           <div className="mb-6">
             <h3 className="text-lg font-semibold mb-2 flex items-center text-gray-800">
-              <FaMapMarkerAlt className="mr-2 text-green-600" /> Address Information
+              <FaMapMarkerAlt className="mr-2 text-green-600" /> {t("Address Information")}
             </h3>
             <div>
-              <h4 className="font-medium flex items-center"><FaMapMarkerAlt className="mr-2 text-gray-500" /> Permanent Address:</h4>
-              <p className="text-gray-600">{student.permanentAddress.street}, {student.permanentAddress.city}, {student.permanentAddress.state}, {student.permanentAddress.country}, {student.permanentAddress.postalCode}</p>
+              <h4 className="font-medium flex items-center"><FaMapMarkerAlt className="mr-2 text-gray-500" /> {t("Permanent Address")}:</h4>
+              <p className="text-gray-600">{student?.permanentAddress?.street || t("N/A")}, {student?.permanentAddress?.city || t("N/A")}, {student?.permanentAddress?.state || t("N/A")}, {student?.permanentAddress?.country || t("N/A")}, {student?.permanentAddress?.postalCode || t("N/A")}</p>
             </div>
             <div className="mt-3">
-              <h4 className="font-medium flex items-center"><FaMapMarkerAlt className="mr-2 text-gray-500" /> Residential Address:</h4>
-              <p className="text-gray-600">{student.residentialAddress.street}, {student.residentialAddress.city}, {student.residentialAddress.state}, {student.residentialAddress.country}, {student.residentialAddress.postalCode}</p>
+              <h4 className="font-medium flex items-center"><FaMapMarkerAlt className="mr-2 text-gray-500" /> {t("Residential Address")}:</h4>
+              <p className="text-gray-600">{student?.residentialAddress?.street || t("N/A")}, {student?.residentialAddress?.city || t("N/A")}, {student?.residentialAddress?.state || t("N/A")}, {student?.residentialAddress?.country || t("N/A")}, {student?.residentialAddress?.postalCode || t("N/A")}</p>
             </div>
           </div>
 
@@ -91,12 +96,12 @@ const Sidebar = ({ student, closeSidebar, onDemote }) => {
           {/* Academic Info */}
           <div className="mb-6">
             <h3 className="text-lg font-semibold mb-2 flex items-center text-gray-800">
-              <FaGraduationCap className="mr-2 text-yellow-600" /> Academic Information
+              <FaGraduationCap className="mr-2 text-yellow-600" /> {t("Academic Information")}
             </h3>
-            <p className="text-gray-600"><FaBook className="inline mr-2 text-gray-500" /> <span className="font-bold">Academic Year:</span> {student.academicYear.year}</p>
-            <p className="text-gray-600"><FaCertificate className="inline mr-2 text-gray-500" /> <span className="font-bold">Enrollment Status:</span> {student.enrollmentStatus}</p>
-            <p className="text-gray-600"><FaCalendarAlt className="inline mr-2 text-gray-500" /> <span className="font-bold">Batch End:</span> {new Date(student.batchEnd).toLocaleDateString()}</p>
-            <p className="text-gray-600"><FaUsers className="inline mr-2 text-gray-500" /> <span className="font-bold">Group IDs:</span> {student.presentGroupId.join(", ")}</p>
+            <p className="text-gray-600"><FaBook className="inline mr-2 text-gray-500" /> <span className="font-bold">{t("Academic Year")}:</span> {student?.academicYear?.year || t("N/A")}</p>
+            <p className="text-gray-600"><FaCertificate className="inline mr-2 text-gray-500" /> <span className="font-bold">{t("Enrollment Status")}:</span> {student?.enrollmentStatus || t("N/A")}</p>
+            <p className="text-gray-600"><FaCalendarAlt className="inline mr-2 text-gray-500" /> <span className="font-bold">{t("Batch End")}:</span> {formatDate(student?.batchEnd)}</p>
+            <p className="text-gray-600"><FaUsers className="inline mr-2 text-gray-500" /> <span className="font-bold">{t("Group IDs")}:</span> {student?.presentGroupId?.join(", ") || t("N/A")}</p>
           </div>
 
           <hr className="my-4 border-gray-300" />
@@ -104,22 +109,22 @@ const Sidebar = ({ student, closeSidebar, onDemote }) => {
           {/* Additional Info */}
           <div className="mb-6">
             <h3 className="text-lg font-semibold mb-2 flex items-center text-gray-800">
-              <FaShieldAlt className="mr-2 text-red-600" /> Additional Information
+              <FaShieldAlt className="mr-2 text-red-600" /> {t("Additional Information")}
             </h3>
-            <p className="text-gray-600"><FaUserShield className="inline mr-2 text-gray-500" /> <span className="font-bold">Verified Documents:</span> {student.isVerifiedDocuments}</p>
-            <p className="text-gray-600"><FaBusAlt className="inline mr-2 text-gray-500" /> <span className="font-bold">Transport Requirement:</span> {student.transportRequirement ? "Yes" : "No"}</p>
-            <p className="text-gray-600"><FaPhone className="inline mr-2 text-gray-500" /> <span className="font-bold">Emergency Contact:</span> {student.emergencyNumber}</p>
-            <p className="text-gray-600"><FaCheckCircle className="inline mr-2 text-gray-500" /> <span className="font-bold">Student Verified:</span> {student.isStudentVerified ? "Yes" : "No"}</p>
+            <p className="text-gray-600"><FaUserShield className="inline mr-2 text-gray-500" /> <span className="font-bold">{t("Verified Documents")}:</span> {student?.isVerifiedDocuments ? t("Yes") : t("No")}</p>
+            <p className="text-gray-600"><FaBusAlt className="inline mr-2 text-gray-500" /> <span className="font-bold">{t("Transport Requirement")}:</span> {student?.transportRequirement ? t("Yes") : t("No")}</p>
+            <p className="text-gray-600"><FaPhone className="inline mr-2 text-gray-500" /> <span className="font-bold">{t("Emergency Contact")}:</span> {student?.emergencyNumber || t("N/A")}</p>
+            <p className="text-gray-600"><FaCheckCircle className="inline mr-2 text-gray-500" /> <span className="font-bold">{t("Student Verified")}:</span> {student?.isStudentVerified ? t("Yes") : t("No")}</p>
           </div>
 
           {/* Bottom Buttons */}
           <div className="flex gap-4 mt-8 justify-center pb-6">
-            <button className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-all">Edit</button>
+            {/* <button className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-all">{t("Edit")}</button> */}
             <button
-              onClick={() => onDemote(student._id)} // Trigger the onDemote function with student ID
+              onClick={() => onDemote(student._id)}
               className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-all"
             >
-              Demote Student
+              {t("Demote Student")}
             </button>
           </div>
         </div>
@@ -128,4 +133,4 @@ const Sidebar = ({ student, closeSidebar, onDemote }) => {
   );
 };
 
-export default Sidebar;
+export default memo(Sidebar);
