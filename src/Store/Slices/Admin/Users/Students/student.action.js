@@ -19,6 +19,7 @@ const getToken = (state, rejectWithValue, dispatch) => {
 
 // Centralized error handling
 const handleError = (error, dispatch, rejectWithValue) => {
+  console.log('--er',error)
   const err = ErrorMsg(error);
   dispatch(setShowError(true));
   dispatch(setErrorMsg(err.message));
@@ -70,7 +71,7 @@ export const fetchStudentDocument = createAsyncThunk(
       const response = await axios.get(`${baseUrl}/admin/documents/student/${id}?say=${say}`, {
         headers: { Authentication: token },
       });
-      return response.data.documents.documents;
+      return response.data?.documents?.documents;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
