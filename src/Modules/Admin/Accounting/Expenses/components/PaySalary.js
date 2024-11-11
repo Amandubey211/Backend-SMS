@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
+import { useTranslation } from 'react-i18next'; // Import useTranslation hook
 
 const PaySalary = ({ teacher, onSave, onClose }) => {
+  const { t } = useTranslation('admExpense'); // Initialize useTranslation hook
   const [salaryAmount, setSalaryAmount] = useState(teacher ? teacher.salaryAmount : 0);
 
   useEffect(() => {
@@ -10,7 +12,7 @@ const PaySalary = ({ teacher, onSave, onClose }) => {
   }, [teacher]);
 
   if (!teacher) {
-    return <div>Loading...</div>;
+    return <div>{t('Loading...')}</div>;
   }
 
   const handlePayment = () => {
@@ -28,7 +30,7 @@ const PaySalary = ({ teacher, onSave, onClose }) => {
   return (
     <div className="bg-white p-4 rounded-lg shadow">
       <div className="flex justify-between items-center border-b pb-4 mb-4">
-        <h2 className="text-xl font-semibold">Pay Salary</h2>
+        <h2 className="text-xl font-semibold">{t('Pay Salary')}</h2>
       </div>
       <div className="flex flex-col items-center mb-4">
         {teacher.staffId.profile ? (
@@ -48,7 +50,7 @@ const PaySalary = ({ teacher, onSave, onClose }) => {
       </div>
       <div className="mb-4">
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          Salary Amount
+          {t('Salary Amount')}
         </label>
         <input
           type="number"
@@ -62,11 +64,10 @@ const PaySalary = ({ teacher, onSave, onClose }) => {
         onClick={handlePayment}
         className="w-full flex justify-center border border-transparent shadow-sm text-sm font-medium bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600"
       >
-        Pay Now
+        {t('Pay Now')}
       </button>
     </div>
   );
 };
-
 
 export default PaySalary;

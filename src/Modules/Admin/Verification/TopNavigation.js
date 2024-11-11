@@ -7,9 +7,11 @@ import {
   setActiveTab,
   setSearchQuery,
 } from "../../../Store/Slices/Admin/Verification/VerificationSlice";
+import { useTranslation } from 'react-i18next';
 
 const TopNavigation = () => {
   const dispatch = useDispatch();
+  const { t } = useTranslation('admVerification');
   const { unVerifiedStudents, rejectedStudents, activeTab, searchQuery } =
     useSelector((state) => state.admin.verification);
 
@@ -25,7 +27,7 @@ const TopNavigation = () => {
           }`}
           onClick={() => dispatch(setActiveTab("unverified"))}
         >
-          Unverified Students ({unVerifiedStudents.length})
+          {t("Unverified Students")} ({unVerifiedStudents.length})
         </h1>
 
         {/* Rejected Students Tab */}
@@ -37,7 +39,7 @@ const TopNavigation = () => {
           }`}
           onClick={() => dispatch(setActiveTab("rejected"))}
         >
-          Rejected Students ({rejectedStudents.length})
+          {t("Rejected Students")} ({rejectedStudents.length})
         </h1>
       </div>
 
@@ -45,7 +47,7 @@ const TopNavigation = () => {
       <div className="relative flex items-center max-w-xs w-full mr-4">
         <input
           type="text"
-          placeholder="Search By Email"
+          placeholder={t("Search By Email")}
           value={searchQuery}
           onChange={(e) => dispatch(setSearchQuery(e.target.value))}
           className="px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-purple-300 w-full transition-all duration-300"

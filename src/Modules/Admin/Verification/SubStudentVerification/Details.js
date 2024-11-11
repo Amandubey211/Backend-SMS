@@ -1,6 +1,7 @@
 import React from "react";
 import { CiUser } from "react-icons/ci";
 import VerificationForm from "./VerificationForm"; // Assuming this is the form you're referencing
+import { useTranslation } from 'react-i18next'; // Import useTranslation hook
 
 const formatDate = (dateString) => {
   if (!dateString) return "";
@@ -12,6 +13,8 @@ const formatDate = (dateString) => {
 };
 
 const Details = ({ student }) => {
+  const { t } = useTranslation('admVerification'); // Initialize useTranslation hook
+
   return (
     <div className="relative container mx-auto p-1 ">
       {/* Main container to hold details and form */}
@@ -41,59 +44,59 @@ const Details = ({ student }) => {
           {/* Personal Information */}
           <div className="border-t border-gray-200 pt-4">
             <h3 className="text-lg font-medium text-gray-800 mt-24">
-              Personal Information
+              {t('Personal Information')}
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
               <div className="bg-pink-100 rounded-md p-4">
-                <span className="font-medium text-gray-700">Email:</span>
+                <span className="font-medium text-gray-700">{t('Email')}:</span>
                 <p className="text-gray-600 truncate">{student?.email}</p>
               </div>
               <div className="bg-pink-100 rounded-md p-4">
                 <span className="font-medium text-gray-700">
-                  Contact Number:
+                  {t('Contact Number')}:
                 </span>
                 <p className="text-gray-600">{student?.contactNumber}</p>
               </div>
               <div className="bg-pink-100 rounded-md p-4">
-                <span className="font-medium text-gray-700">Age:</span>
+                <span className="font-medium text-gray-700">{t('Age')}:</span>
                 <p className="text-gray-600">{student?.age}</p>
               </div>
               <div className="bg-pink-100 rounded-md p-4">
                 <span className="font-medium text-gray-700">
-                  Date of Birth:
+                  {t('Date of Birth')}:
                 </span>
                 <p className="text-gray-600">
                   {formatDate(student?.dateOfBirth)}
                 </p>
               </div>
               <div className="bg-pink-100 rounded-md p-4">
-                <span className="font-medium text-gray-700">Birth Place:</span>
+                <span className="font-medium text-gray-700">{t('Birth Place')}:</span>
                 <p className="text-gray-600">{student?.placeOfBirth}</p>
               </div>
               <div className="bg-pink-100 rounded-md p-4">
-                <span className="font-medium text-gray-700">Gender:</span>
+                <span className="font-medium text-gray-700">{t('Gender')}:</span>
                 <p className="text-gray-600">{student?.gender}</p>
               </div>
             </div>
             <h3 className="text-lg font-medium text-gray-800 mb-4">
-              Parent Information
+              {t('Parent Information')}
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
               <div className="bg-pink-100 rounded-md p-4">
                 <span className="font-medium text-gray-700">
-                  Mother's Name:
+                  {t('Mother\'s Name')}:
                 </span>
                 <p className="text-gray-600">{student?.motherName}</p>
               </div>
               <div className="bg-pink-100 rounded-md p-4">
                 <span className="font-medium text-gray-700">
-                  Guardian's Name:
+                  {t('Guardian\'s Name')}:
                 </span>
                 <p className="text-gray-600">{student?.guardianName}</p>
               </div>
               <div className="bg-pink-100 rounded-md p-4">
                 <span className="font-medium text-gray-700">
-                  Guardian's Contact:
+                  {t('Guardian\'s Contact')}:
                 </span>
                 <p className="text-gray-600">
                   {student?.guardianContactNumber}
@@ -103,12 +106,12 @@ const Details = ({ student }) => {
 
             {/* Addresses */}
             <h3 className="text-lg font-medium text-gray-800 mb-4 border-t pt-4">
-              Addresses
+              {t('Addresses')}
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
               <div className="bg-pink-100 rounded-md p-4">
                 <span className="font-medium text-gray-700">
-                  Permanent Address:
+                  {t('Permanent Address')}:
                 </span>
                 <p className="text-gray-600">
                   {student?.permanentAddress?.street},{" "}
@@ -119,7 +122,7 @@ const Details = ({ student }) => {
               </div>
               <div className="bg-pink-100 rounded-md p-4">
                 <span className="font-medium text-gray-700">
-                  Residential Address:
+                  {t('Residential Address')}:
                 </span>
                 <p className="text-gray-600">
                   {student?.residentialAddress?.street},{" "}
@@ -132,16 +135,16 @@ const Details = ({ student }) => {
 
             {/* Other Details */}
             <h3 className="text-lg font-medium text-gray-800 mb-4 border-t pt-4">
-              Status
+              {t('Status')}
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="bg-pink-100 rounded-md p-4">
-                <span className="font-medium text-gray-700">QID:</span>
+                <span className="font-medium text-gray-700">{t('QID')}:</span>
                 <p className="text-gray-600">{student?.Q_Id}</p>
               </div>
               <div className="bg-pink-100 rounded-md p-4">
                 <span className="font-medium text-gray-700">
-                  Student Applied for Class:
+                  {t('Student Applied for Class')}:
                 </span>
                 <p className="text-gray-600">
                   {student?.applyingClass?.className}
@@ -149,18 +152,18 @@ const Details = ({ student }) => {
               </div>
               <div className="bg-pink-100 rounded-md p-4">
                 <span className="font-medium text-gray-700">
-                  Verified Documents:
+                  {t('Verified Documents')}:
                 </span>
                 <p className="text-gray-600">
-                  {student?.isVerifiedDocuments ? "Yes" : "No"}
+                  {student?.isVerifiedDocuments ? t('Yes') : t('No')}
                 </p>
               </div>
               <div className="bg-pink-100 rounded-md p-4">
                 <span className="font-medium text-gray-700">
-                  Verified School ID:
+                  {t('Verified School ID')}:
                 </span>
                 <p className="text-gray-600">
-                  {student?.isVerifiedSchoolId ? "Yes" : "No"}
+                  {student?.isVerifiedSchoolId ? t('Yes') : t('No')}
                 </p>
               </div>
             </div>

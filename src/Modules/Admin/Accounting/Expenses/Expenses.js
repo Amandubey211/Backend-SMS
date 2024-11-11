@@ -21,8 +21,10 @@ import { useDispatch, useSelector } from "react-redux";
 import TabButton from "../../Libary/Components/TabButton.js";
 import { setCurrentExpense, setIsSidebarOpen } from "../../../../Store/Slices/Admin/Accounting/Expenses/expensesSlice.js";
 import { fetchSalaries } from "../../../../Store/Slices/Admin/Accounting/Expenses/expenses.action.js";
+import { useTranslation } from 'react-i18next'; // Import useTranslation hook
 
 const Expenses = () => {
+  const { t } = useTranslation('admExpense'); // Initialize useTranslation hook
 
   const { isSidebarOpen, currentExpense } = useSelector((store) => store?.admin?.expenses)
   const dispatch = useDispatch()
@@ -32,30 +34,30 @@ const Expenses = () => {
   const [selectedOption, setSelectedOption] = useState("");
 
   const options = [{
-    label: 'All Expenses',
+    label: t('All Expenses'),
     value: ''
   }, {
-    label: 'Paid Expenses',
+    label: t('Paid Expenses'),
     value: 'paid'
   }, {
-    label: 'Due Expenses',
+    label: t('Due Expenses'),
     value: 'unpaid'
   }]
 
   const months = [
-    { value: '', label: 'All Month' },
-    { value: 'January', label: 'January' },
-    { value: 'February', label: 'February' },
-    { value: 'March', label: 'March' },
-    { value: 'April', label: 'April' },
-    { value: 'May', label: 'May' },
-    { value: 'June', label: 'June' },
-    { value: 'July', label: 'July' },
-    { value: 'August', label: 'August' },
-    { value: 'September', label: 'September' },
-    { value: 'October', label: 'October' },
-    { value: 'November', label: 'November' },
-    { value: 'December', label: 'December' }
+    { value: '', label: t('All Month') },
+    { value: 'January', label: t('January') },
+    { value: 'February', label: t('February') },
+    { value: 'March', label: t('March') },
+    { value: 'April', label: t('April') },
+    { value: 'May', label: t('May') },
+    { value: 'June', label: t('June') },
+    { value: 'July', label: t('July') },
+    { value: 'August', label: t('August') },
+    { value: 'September', label: t('September') },
+    { value: 'October', label: t('October') },
+    { value: 'November', label: t('November') },
+    { value: 'December', label: t('December') }
   ];
 
   const handleSidebarOpen = () => {
@@ -65,7 +67,6 @@ const Expenses = () => {
   const handleSidebarClose = () => {
     dispatch(setIsSidebarOpen(false))
     dispatch(setCurrentExpense(null));
-    
   };
 
   const handleCreateExpense = async () => {
@@ -90,7 +91,7 @@ const Expenses = () => {
   }, [activeTab]);
 
   return (
-    <Layout title="Expenses">
+    <Layout title={t('Expenses')}>
       <DashLayout>
         <div className="min-h-screen p-4 bg-gray-50 overflow-x-auto" style={{ maxHeight: "90vh" }}>
           <div className="flex flex-col gap-5 mb-6">
@@ -100,19 +101,19 @@ const Expenses = () => {
                   isActive={activeTab === "TeacherSalary"}
                   onClick={() => setActiveTab("TeacherSalary")}
                 >
-                  Teacher's Salary
+                  {t("Teacher's Salary")}
                 </TabButton>
                 <TabButton
                   isActive={activeTab === "StaffSalary"}
                   onClick={() => setActiveTab("StaffSalary")}
                 >
-                  Staff Salary
+                  {t("Staff Salary")}
                 </TabButton>
                 <TabButton
                   isActive={activeTab === "OtherExpenses"}
                   onClick={() => setActiveTab("OtherExpenses")}
                 >
-                  Other Expenses
+                  {t("Other Expenses")}
                 </TabButton>
               </div>
 
@@ -121,7 +122,7 @@ const Expenses = () => {
                   onClick={handleSidebarOpen}
                   className="flex items-center border border-gray-300 ps-5 py-0 rounded-full"
                 >
-                  <span className="mr-2">Other Expenses</span>
+                  <span className="mr-2">{t("Other Expenses")}</span>
                   <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full w-10 h-10 flex items-center justify-center">
                     <span className="text-2xl -mt-2">+</span>
                   </div>
@@ -155,7 +156,7 @@ const Expenses = () => {
                 ))}
               </div>
               <div>
-                <span className="text-gray-700 font-semibold">Month :</span>
+                <span className="text-gray-700 font-semibold">{t('Month')} :</span>
                 <select className="text-green-700 font-bold bg-inherit" value={selectedMonth} onChange={handleMonthChange}>
                   {months.map(month => (
                     <option key={month.value} value={month.value}>
@@ -169,41 +170,31 @@ const Expenses = () => {
 
           {activeTab === "TeacherSalary" && (
             <TeacherSalary
-              //initialTeacherData={salaryData}
               selectedMonth={selectedMonth}
               selectedOption={selectedOption}
-              //onEdit={fetchExpenseById}
-              //onDelete={handleDeleteExpense}
             />
           )}
 
           {activeTab === "StaffSalary" && (
             <StaffSalary
-              //staffData={salaryData}
               selectedMonth={selectedMonth}
               selectedOption={selectedOption}
-              //onEdit={fetchExpenseById}
-              //onDelete={handleDeleteExpense}
             />
           )}
 
           {activeTab === "OtherExpenses" && (
             <OtherExpenses
-              //expenseData={salaryData}
               selectedMonth={selectedMonth}
               selectedOption={selectedOption}
-              //onEdit={fetchExpenseById}
-              //onDelete={handleDeleteExpense}
             />
           )}
 
           <Sidebar
             isOpen={isSidebarOpen}
             onClose={handleSidebarClose}
-            title={<span className="font-normal text-gray-600">Add New Expenses</span>}
+            title={<span className="font-normal text-gray-600">{t('Add New Expenses')}</span>}
           >
             <AddExpense
-
               onCreate={handleCreateExpense}
             />
           </Sidebar>
@@ -214,9 +205,3 @@ const Expenses = () => {
 };
 
 export default Expenses;
-
-
-
-
-
-
