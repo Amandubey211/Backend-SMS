@@ -1,5 +1,5 @@
-import React, {memo} from "react";
-import { useNavigate } from 'react-router-dom';
+import React, { memo } from "react";
+import { useNavigate } from "react-router-dom";
 
 const DashCard = ({
   label,
@@ -8,7 +8,7 @@ const DashCard = ({
   textColor,
   icon,
   iconBackground,
-  navigateTo,  // New prop for navigation
+  navigateTo, // New prop for navigation
 }) => {
   const navigate = useNavigate();
 
@@ -18,9 +18,7 @@ const DashCard = ({
       className={`p-3 px-6 w-[24%] rounded-lg border ${bgColor} hover:shadow-lg transition-shadow duration-200 cursor-pointer`}
     >
       <div className="flex gap-4 items-center">
-        <div
-          className={`p-3 bg-white ${textColor} rounded-full text-2xl`}
-        >
+        <div className={`p-3 bg-white ${textColor} rounded-full text-2xl`}>
           {icon}
         </div>
         <div>

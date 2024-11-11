@@ -14,9 +14,11 @@ const TotalAttendanceGraph = () => {
   const [gender, setGender] = useState("Both"); // New state for gender filter
 
   const dispatch = useDispatch();
-  const { attendanceData, loadingAttendance:loading, errorAttendance:error } = useSelector(
-    (state) => state?.admin?.adminDashboard
-  );
+  const {
+    attendanceData,
+    loadingAttendance: loading,
+    errorAttendance: error,
+  } = useSelector((state) => state?.admin?.adminDashboard);
 
   useEffect(() => {
     console.log(`Fetching data for: month=${month}, year=${year}`);
