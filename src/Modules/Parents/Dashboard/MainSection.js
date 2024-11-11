@@ -3,27 +3,40 @@ import DashCard from "../Dashboard/Dashcard.js";
 import AccountingSection from "../Accounting/MainSection/ParentAccounts.js";
 import StudentParentCard from "../Dashboard/DashboardData/Students.js";
 import NoticeBoard from "../Dashboard/NoticeModule/NoticeBoard.js";
-import Spinner from "../../../Components/Common/Spinner";
 
 const ParentSection = () => {
   return (
     <div className="h-full w-full">
+      {/* Dashboard Cards */}
       <div className="w-full">
         <div className="flex flex-wrap justify-center gap-3 py-4 w-full">
           <DashCard />
         </div>
-        <div className="flex flex-wrap justify-between items-start border-y">
-          <div className="w-2/5 ">
-            <StudentParentCard />
+
+        {/* First Row: StudentParentCard and NoticeBoard */}
+        <div className="flex flex-wrap justify-between items-start border-y h-[400px] relative">
+          {/* Middle Vertical Divider */}
+          <div className="absolute left-2/5 transform translate-x-1/2 top-0 bottom-0 border-l border-gray-300"></div>
+
+          <div className="w-full md:w-2/5 h-full flex items-center justify-center p-4">
+            <div className="w-full h-full">
+              <StudentParentCard />
+            </div>
           </div>
 
-          <div className="w-3/5 border-r">
-            <NoticeBoard textTrimCount={74} />
+          <div className="w-full md:w-3/5 h-full flex items-center justify-center p-4">
+            <div className="w-full h-full">
+              <NoticeBoard textTrimCount={74} />
+            </div>
           </div>
         </div>
-        <div className="flex  border-y">
-          <div className="w-full">
-            <AccountingSection />
+
+        {/* Second Row: Accounting Section */}
+        <div className="flex border-y h-[400px]">
+          <div className="w-full h-full flex items-center justify-center p-4">
+            <div className="w-full h-full">
+              <AccountingSection />
+            </div>
           </div>
         </div>
       </div>

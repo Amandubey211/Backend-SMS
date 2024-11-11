@@ -31,6 +31,7 @@ export const fetchAllParent = createAsyncThunk(
   "user/allParent",
   async (_, { rejectWithValue, getState, dispatch }) => {
     try {
+      const say = localStorage.getItem("say");
       const token = getToken(getState(), rejectWithValue, dispatch); // Get token with error handling
       const response = await axios.get(`${baseUrl}/admin/all/Parents?say=${say}`, {
         headers: { Authentication: token },

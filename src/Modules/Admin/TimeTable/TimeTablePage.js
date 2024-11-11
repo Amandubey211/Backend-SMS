@@ -6,10 +6,12 @@ import TimeTableMainSection from "./TimeTableMainSection";
 import TableView from "./Components/TableView"; // Import TableView component
 import useNavHeading from "../../../Hooks/CommonHooks/useNavHeading "; // To set navigation headings
 import UpdateTimeTable from "./Components/UpdateTimeTable";
+import { useTranslation } from 'react-i18next';
 
 const TimeTablePage = () => {
-  useNavHeading("Admin", "TimeTable"); // Set the heading for TimeTable section
-
+  const { t } = useTranslation('admTimeTable'); // Initialize i18next hook
+  
+  useNavHeading(t("Admin"), t("TimeTable")); // Set the heading for TimeTable section
   return (
     <Layout title="TimeTable | Student Diwan">
       <DashLayout>

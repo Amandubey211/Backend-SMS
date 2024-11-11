@@ -81,7 +81,7 @@ const Sidebar = ({ isOpen, title, onClose, children, width = "35%" }) => {
       <div
         ref={sidebarRef}
         style={{ width }}
-        className={`absolute top-0 right-0 h-full py-3 px-4 bg-white shadow-lg transform ${
+        className={`absolute top-0 right-0 h-full overflow-y-auto py-3 px-4 bg-white shadow-lg transform ${
           isOpen ? "translate-x-0" : "translate-x-full"
         } transition-transform`}
       >

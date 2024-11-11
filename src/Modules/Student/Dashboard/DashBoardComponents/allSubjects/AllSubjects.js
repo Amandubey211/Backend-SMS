@@ -3,7 +3,13 @@ import { GoAlertFill } from "react-icons/go";
 
 const AllSubjects = ({ subjects }) => {
   // Colors to cycle through for the progress bars
-  const progressBarColors = ["#FF7AA5", "#5278FF", "#FBB778", "#33C4FE", "#FF7AA5"];
+  const progressBarColors = [
+    "#FF7AA5",
+    "#5278FF",
+    "#FBB778",
+    "#33C4FE",
+    "#FF7AA5",
+  ];
 
   return (
     <div className="px-1">
@@ -11,7 +17,8 @@ const AllSubjects = ({ subjects }) => {
         {subjects && subjects.length > 0 ? (
           <div className="mt-4">
             {subjects.slice(0, 2).map((subject, index) => {
-              const progressBarColor = progressBarColors[index % progressBarColors.length];
+              const progressBarColor =
+                progressBarColors[index % progressBarColors.length];
               return (
                 <div
                   key={subject._id}
@@ -22,22 +29,30 @@ const AllSubjects = ({ subjects }) => {
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.transform = "scale(1.05)";
-                    e.currentTarget.style.boxShadow = "0px 8px 15px rgba(0, 0, 0, 0.1)";
+                    e.currentTarget.style.boxShadow =
+                      "0px 8px 15px rgba(0, 0, 0, 0.1)";
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.transform = "scale(1)";
-                    e.currentTarget.style.boxShadow = "0px 4px 6px rgba(0, 0, 0, 0.1)";
+                    e.currentTarget.style.boxShadow =
+                      "0px 4px 6px rgba(0, 0, 0, 0.1)";
                   }}
                 >
                   <div className="flex items-center mb-2">
                     <img
-                      src={"https://foundr.com/wp-content/uploads/2023/04/How-to-create-an-online-course.jpg.webp"}
-                      alt={'subject'}
+                      src={
+                        "https://foundr.com/wp-content/uploads/2023/04/How-to-create-an-online-course.jpg.webp"
+                      }
+                      alt={"subject"}
                       className="w-16 h-16 rounded mr-4"
                     />
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-700">{subject?.subjectName}</h3>
-                      <p className="text-sm text-gray-500">Started: {subject?.started?.slice(0,10)}</p>
+                      <h3 className="text-lg font-semibold text-gray-700">
+                        {subject?.subjectName}
+                      </h3>
+                      <p className="text-sm text-gray-500">
+                        Started: {subject?.started?.slice(0, 10)}
+                      </p>
                     </div>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
@@ -60,7 +75,9 @@ const AllSubjects = ({ subjects }) => {
         ) : (
           <div className="flex w-full h-full text-gray-500 items-center justify-center flex-col text-2xl mt-4 mb-8">
             <GoAlertFill className="text-[4rem]" />
-            <span className="mt-2 text-xl font-semibold text-center">No Data Found</span>
+            <span className="mt-2 text-xl font-semibold text-center">
+              No Data Found
+            </span>
           </div>
         )}
       </div>

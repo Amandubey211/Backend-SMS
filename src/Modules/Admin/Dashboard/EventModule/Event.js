@@ -1,8 +1,5 @@
 import React, { useEffect, useState, useCallback, memo } from "react";
-import {
-  IoIosArrowForward,
-  IoIosArrowBack,
-} from "react-icons/io";
+import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
 import { FaCalendarAlt } from "react-icons/fa";
 import Spinner from "../../../../Components/Common/Spinner";
 import EventItem from "./EventItem";
@@ -30,12 +27,12 @@ const Events = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  // Extract events, loading, and error from the Redux store
+  const { events, loadingEvents: loading, errorEvents: error } = useSelector(
+    (state) => state.admin.adminDashboard
+  );
 
-  // Extract events, loading, nd error from the Redux store
-  const { events, loadingEvents:loading, errorEvents:error } = useSelector((state) => state.admin.adminDashboard);
-
-  const { t } = useTranslation('dashboard');
- 
+  const { t } = useTranslation("dashboard");
 
   const currentMonth = new Date().getMonth() + 1; // Months are zero-indexed
   const currentYear = new Date().getFullYear();
@@ -48,36 +45,27 @@ const Events = () => {
 
   useEffect(() => {
     fetchEvents();
-  }, []);
+  }, [fetchEvents]);
 
-  const handleMonthChange = (e) => {
-    setDate((prevDate) => ({
-      ...prevDate,
-      month: parseInt(e?.target?.value) || prevDate.month,
-    }));
-  };
-
-  const handleYearChange = (e) => {
-    setDate((prevDate) => ({
-      ...prevDate,
-      year: parseInt(e?.target?.value) || prevDate.year,
-    }));
+  const handleMonthChange = (newMonth, newYear) => {
+    setDate({ month: newMonth, year: newYear });
+    dispatch(fetchFilteredEvents({ month: newMonth, year: newYear })); // Dispatch API request immediately after date update
   };
 
   const handlePreviousMonth = () => {
     setDate((prevDate) => {
-      const newMonth = prevDate?.month === 1 ? 12 : prevDate?.month - 1;
-      const newYear =
-        prevDate?.month === 1 ? prevDate?.year - 1 : prevDate?.year;
+      const newMonth = prevDate.month === 1 ? 12 : prevDate.month - 1;
+      const newYear = prevDate.month === 1 ? prevDate.year - 1 : prevDate.year;
+      handleMonthChange(newMonth, newYear); // Update state and fetch events
       return { month: newMonth, year: newYear };
     });
   };
 
   const handleNextMonth = () => {
     setDate((prevDate) => {
-      const newMonth = prevDate?.month === 12 ? 1 : prevDate?.month + 1;
-      const newYear =
-        prevDate?.month === 12 ? prevDate?.year + 1 : prevDate?.year;
+      const newMonth = prevDate.month === 12 ? 1 : prevDate.month + 1;
+      const newYear = prevDate.month === 12 ? prevDate.year + 1 : prevDate.year;
+      handleMonthChange(newMonth, newYear); // Update state and fetch events
       return { month: newMonth, year: newYear };
     });
   };
@@ -87,7 +75,7 @@ const Events = () => {
   };
 
   const handleUpdateEvent = (updatedEvent) => {
-    // For now, this function can be a placeholder as events will be re-fetched when updating
+    // Placeholder: Events will be re-fetched on update
   };
 
   const top5Events = events?.slice?.(0, 5) || [];

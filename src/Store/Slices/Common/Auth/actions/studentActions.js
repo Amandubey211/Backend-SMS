@@ -41,6 +41,8 @@ export const studentLogin = createAsyncThunk(
             dateOfBirth: data?.dateOfBirth,
             Q_Id: data?.Q_Id,
             enrollment: data?.enrollment,
+            className:data?.className,
+            sectionName:data?.sectionName,
           })
         );
 

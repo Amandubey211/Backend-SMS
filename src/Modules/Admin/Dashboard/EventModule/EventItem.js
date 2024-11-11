@@ -41,7 +41,7 @@ const EventItem = ({ event, onUpdate }) => {
       <div className="flex items-center">
         <img
           className="w-10 h-10 rounded-full mr-4"
-          src={event.eventImage || "https://via.placeholder.com/50"}
+          src={event.eventImage || "https://img.freepik.com/premium-vector/social-events-icon-vector-image-can-be-used-elderly-care_120816-241693.jpg"|| "https://via.placeholder.com/50"}
           alt={event.eventName}
         />
         <p

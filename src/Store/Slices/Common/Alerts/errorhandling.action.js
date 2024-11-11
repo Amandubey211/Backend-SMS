@@ -1,4 +1,5 @@
 export const ErrorMsg = (error) => {
+  console.log('----msg',error)
   if (error.response) {
     const statusCode = error.response.status;
     const msg = error.response.data?.message||error.response.data?.msg;
@@ -21,7 +22,8 @@ export const ErrorMsg = (error) => {
     }
   } else if (error.request) {
     return { message: 'Network error: Unable to reach the server. Please check your connection.', statusCode: null };
-  } else {
+  } 
+   else {
     return { message: 'An error occurred while processing your request. Please try again.', statusCode: null };
   }
 };

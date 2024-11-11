@@ -1,20 +1,23 @@
 import React, { useEffect, useState, memo } from "react";
 import { Bar } from "react-chartjs-2";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchAttendanceData } from "../../../../Store/Slices/Admin/Dashboard/adminDashboard.action"; // Adjust path if needed
-import { FiCalendar, FiAlertCircle } from "react-icons/fi"; // Error and No data icons
+import { fetchAttendanceData } from "../../../../Store/Slices/Admin/Dashboard/adminDashboard.action";
+import { FiCalendar, FiAlertCircle } from "react-icons/fi";
 import Spinner from "../../../../Components/Common/Spinner";
+import { useTranslation } from 'react-i18next';
 
 const TotalAttendanceGraph = () => {
-  const currentMonth = new Date().getMonth() + 1; // Months are zero-indexed
+  const { t } = useTranslation('admDashboad');
+  const currentMonth = new Date().getMonth() + 1;
   const currentYear = new Date().getFullYear();
 
   const [month, setMonth] = useState(currentMonth);
   const [year, setYear] = useState(currentYear);
-  const [gender, setGender] = useState("Both"); // New state for gender filter
+  const [gender, setGender] = useState("Both");
 
   const dispatch = useDispatch();
-  const { attendanceData, loadingAttendance:loading, errorAttendance:error } = useSelector(
+
+  const { attendanceData, loadingAttendance: loading, errorAttendance: error } = useSelector(
     (state) => state?.admin?.adminDashboard
   );
 
@@ -60,7 +63,7 @@ const TotalAttendanceGraph = () => {
         datasets: [
           gender === "Female" || gender === "Both"
             ? {
-                label: "Female",
+                label: t("Female"),
                 data: femaleAttendance,
                 backgroundColor: "#8F77F3",
                 borderRadius: 10,
@@ -71,7 +74,7 @@ const TotalAttendanceGraph = () => {
             : null,
           gender === "Male" || gender === "Both"
             ? {
-                label: "Male",
+                label: t("Male"),
                 data: maleAttendance,
                 backgroundColor: "#23C55E",
                 borderRadius: 10,
@@ -112,18 +115,18 @@ const TotalAttendanceGraph = () => {
 
   // Generate array of years dynamically
   const availableYears = [
-    { label: "Current Year", value: "Current Year" },
-    { label: "Past Year", value: "Past Year" },
+    { label: t("Current Year"), value: "Current Year" },
+    { label: t("Past Year"), value: "Past Year" },
   ];
 
   // Determine the label for the current year state
-  const yearLabel = year === currentYear ? "Current Year" : "Past Year";
+  const yearLabel = year === currentYear ? t("Current Year") : t("Past Year");
 
   return (
     <div className="bg-white p-4 h-[100%] ">
       <div className="flex justify-between items-center mb-4">
         <div>
-          <h2 className="text-xl font-semibold">Today's Attendance</h2>
+          <h2 className="text-xl font-semibold">{t("Today's Attendance")}</h2>
           <div className="text-3xl font-bold">
             {attendanceData
               ? attendanceData.totalMaleAttendance +
@@ -159,9 +162,9 @@ const TotalAttendanceGraph = () => {
             onChange={handleGenderChange}
             value={gender}
           >
-            <option value="Both">Both</option>
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
+            <option value="Both">{t("Both")}</option>
+            <option value="Male">{t("Male")}</option>
+            <option value="Female">{t("Female")}</option>
           </select>
         </div>
       </div>
@@ -172,12 +175,12 @@ const TotalAttendanceGraph = () => {
       ) : error ? (
         <div className="flex flex-col items-center justify-center text-gray-400">
           <FiAlertCircle className="w-12 h-12 mb-2" />
-          <p>{`Error: ${error}`}</p>
+          <p>{`${t("Error")}: ${error}`}</p>
         </div>
       ) : !attendanceData || attendanceData?.attendanceData?.length === 0 ? (
         <div className="flex flex-col items-center justify-center text-gray-400 h-full">
           <FiCalendar className="w-12 h-12 mb-2" />
-          <p>No Attendance Data Found</p>
+          <p>{t("No Attendance Data Found")}</p>
         </div>
       ) : graphData ? (
         <>
@@ -240,7 +243,7 @@ const TotalAttendanceGraph = () => {
                 style={{ alignSelf: "flex-start" }}
               ></div>
               <div className="flex items-center">
-                <div className="text-gray-700">Total Female Att.</div>
+                <div className="text-gray-700">{t("Total Female Att.")}</div>
                 <div className="ml-2 font-bold">
                   {attendanceData ? attendanceData.totalFemaleAttendance : 0}
                 </div>
@@ -252,7 +255,7 @@ const TotalAttendanceGraph = () => {
                 style={{ alignSelf: "flex-start" }}
               ></div>
               <div className="flex items-center">
-                <div className="text-gray-700">Total Male Att.</div>
+                <div className="text-gray-700">{t("Total Male Att.")}</div>
                 <div className="ml-2 font-bold">
                   {attendanceData ? attendanceData.totalMaleAttendance : 0}
                 </div>
@@ -265,4 +268,4 @@ const TotalAttendanceGraph = () => {
   );
 };
 
-export default TotalAttendanceGraph;
+export default memo(TotalAttendanceGraph);

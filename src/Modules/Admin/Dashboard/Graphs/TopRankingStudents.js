@@ -6,16 +6,16 @@ import { fetchAllClasses } from "../../../../Store/Slices/Admin/Class/actions/cl
 import Spinner from "../../../../Components/Common/Spinner";
 import NoDataFound from "../../../../Components/Common/NoDataFound";
 import profileIcon from "../../../../Assets/DashboardAssets/profileIcon.png";
+import { useTranslation } from "react-i18next";
 
 const TopRankingStudents = () => {
+  const { t } = useTranslation("admTopRanking");
   const dispatch = useDispatch();
   const { topStudents, loadingTopStudents, errorTopStudents } = useSelector(
     (state) => state.admin.adminDashboard
   );
-  const { classes,loading } = useSelector((store) => store?.admin?.class);
+  const { classes, loading } = useSelector((store) => store?.admin?.class);
   const [selectedClass, setSelectedClass] = useState("");
-
- 
 
   useEffect(() => {
     if (classes?.length > 0) {
@@ -34,7 +34,7 @@ const TopRankingStudents = () => {
   return (
     <div className="bg-white p-4">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-semibold">Top Ranking Students</h2>
+        <h2 className="text-2xl font-semibold">{t("Top Ranking Students")}</h2>
         <div className="relative">
           <select
             name="classId"
@@ -44,18 +44,18 @@ const TopRankingStudents = () => {
           >
             {classes?.map((c) => (
               <option key={c?._id} value={c?._id}>
-                {c?.className}
+                {c?.className || t("N/A")}
               </option>
             ))}
           </select>
         </div>
       </div>
 
-      {errorTopStudents || topStudents?.length == 0   ? (
+      {errorTopStudents || topStudents?.length === 0 ? (
         <div className="flex items-center justify-center py-20">
           <NoDataFound title={"Student"} />
         </div>
-      ) : loadingTopStudents || loading  ? (
+      ) : loadingTopStudents || loading ? (
         <div className="py-20">
           <Spinner />
         </div>
@@ -63,9 +63,15 @@ const TopRankingStudents = () => {
         <>
           <div className="flex w-full h-auto py-2 gap-4">
             {topStudents?.slice(0, 3).map((student, index) => (
-              <div key={index} className="text-center p-4 border rounded-lg relative w-[35%]">
+              <div
+                key={index}
+                className="text-center p-4 border rounded-lg relative w-[35%]"
+              >
                 {index === 0 && (
-                  <div className="absolute left-1/2 transform -translate-x-1/2" style={{ top: "17px" }}>
+                  <div
+                    className="absolute left-1/2 transform -translate-x-1/2"
+                    style={{ top: "17px" }}
+                  >
                     <FaCrown className="w-20 h-8" />
                   </div>
                 )}
@@ -73,17 +79,20 @@ const TopRankingStudents = () => {
                   <img
                     className="w-14 h-14 rounded-full mx-auto"
                     src={student?.studentProfile || profileIcon}
-                    alt={student?.studentName}
+                    alt={student?.studentName || t("N/A")}
                   />
                   {index !== 0 && (
                     <h3 className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-full text-md mb-1 mt font-medium bg-white px-2">
-                      Top {index === 1 ? 2 : 3}
+                      {t("Top")} {index === 1 ? 2 : 3}
                     </h3>
                   )}
                 </div>
-                <p>{student.studentName}</p>
+                <p>{student?.studentName || t("N/A")}</p>
                 <p className="mb-2">
-                  Adm: <span className="text-gray-600">{student?.admissionNumber}</span>
+                  {t("Adm")}:{" "}
+                  <span className="text-gray-600">
+                    {student?.admissionNumber || t("N/A")}
+                  </span>
                 </p>
                 <span
                   style={{
@@ -98,7 +107,8 @@ const TopRankingStudents = () => {
                       WebkitTextFillColor: "transparent",
                     }}
                   >
-                    Score: {student?.score} %
+                    {t("Score")}:{" "}
+                    {student?.score ? `${student.score} %` : t("N/A")}
                   </span>
                 </span>
               </div>
@@ -106,41 +116,54 @@ const TopRankingStudents = () => {
           </div>
 
           <div className="flex flex-col gap-2">
-            {topStudents.slice(topStudents?.length > 3 ? 3 : 0).map((student, index) => (
-              <div key={index} className="flex items-center justify-between p-2 px-5 border rounded-md">
-                <div className="flex items-center">
-                  <span className="mr-3">{index + 1}</span>
-                  <img
-                    className="w-10 h-10 rounded-full mr-4"
-                    src={student?.studentProfile || profileIcon}
-                    alt={student?.studentName}
-                  />
-                  <span>{student?.studentName?.slice(0,15)}{student?.studentName?.length > 15 &&'...'}</span>
-                </div>
+            {topStudents
+              .slice(topStudents?.length > 3 ? 3 : 0)
+              .map((student, index) => (
                 <div
-                  className="rounded-sm"
-                  style={{
-                    background: "linear-gradient(to right, #fce7f3, #e9d5ff)",
-                  }}
+                  key={index}
+                  className="flex items-center justify-between p-2 px-5 border rounded-md"
                 >
-                  <span
+                  <div className="flex items-center">
+                    <span className="mr-3">{index + 1}</span>
+                    <img
+                      className="w-10 h-10 rounded-full mr-4"
+                      src={student?.studentProfile || profileIcon}
+                      alt={student?.studentName || t("N/A")}
+                    />
+                    <span>
+                      {student?.studentName?.slice(0, 15) || t("N/A")}
+                      {student?.studentName?.length > 15 && "..."}
+                    </span>
+                  </div>
+                  <div
+                    className="rounded-sm"
                     style={{
-                      background: "linear-gradient(to right, #f43f5e, #8b5cf6)",
-                      WebkitBackgroundClip: "text",
-                      WebkitTextFillColor: "transparent",
+                      background: "linear-gradient(to right, #fce7f3, #e9d5ff)",
                     }}
-                    className="px-3"
                   >
-                    Score: {student?.score} %
-                  </span>
+                    <span
+                      style={{
+                        background:
+                          "linear-gradient(to right, #f43f5e, #8b5cf6)",
+                        WebkitBackgroundClip: "text",
+                        WebkitTextFillColor: "transparent",
+                      }}
+                      className="px-3"
+                    >
+                      {t("Score")}:{" "}
+                      {student?.score ? `${student.score} %` : t("N/A")}
+                    </span>
+                  </div>
+                  <div className="w-[25%]">
+                    <span>
+                      {t("Adm")}:{" "}
+                      <span className="text-gray-600">
+                        {student?.admissionNumber || t("N/A")}
+                      </span>
+                    </span>
+                  </div>
                 </div>
-               <div className="w-[25%]">
-               <span>
-                  Adm: <span className="text-gray-600">{student?.admissionNumber}</span>
-                </span>
-               </div>
-              </div>
-            ))}
+              ))}
           </div>
         </>
       )}
@@ -148,4 +171,4 @@ const TopRankingStudents = () => {
   );
 };
 
-export default TopRankingStudents;
+export default memo(TopRankingStudents);
