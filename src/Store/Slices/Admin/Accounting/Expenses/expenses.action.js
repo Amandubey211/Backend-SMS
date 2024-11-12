@@ -154,10 +154,12 @@ export const createExpense = createAsyncThunk(
  export const createStaffSalary=createAsyncThunk(
     'salary/createStaffSalary',
     async({action,status},{rejectWithValue,getState,dispatch})=>{
-        const token = getToken(getState());
+        const token = getToken(getState(), rejectWithValue, dispatch);
+        if (typeof token === 'object') return token;
+        const say = localStorage.getItem("say")
         const body={action,status}
         try {
-            const response = axios.post(`${baseUrl}/admin/staff/craete_salary`, body, {
+            const response = axios.post(`${baseUrl}/admin/staff/craete_salary?say=${say}`, body, {
                 headers: {
                     Authentication: `${token}`,
                 },
@@ -167,7 +169,7 @@ export const createExpense = createAsyncThunk(
             // console.log("salary data---", data);
             return data
         } catch (error) {
-            return rejectWithValue(error?.response?.data?.message || error?.message || "Something Went Wrong!");
+            return handleError(error, dispatch, rejectWithValue);
         }
     }
  )

@@ -1,6 +1,7 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchGroupsByClass, fetchSectionsByClass } from '../../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks';
+import { fetchAllStudents } from '../../../../../Store/Slices/Admin/Users/Students/student.action';
 
 export default function StudentsFilter({ filters, onFilterChange }) {
   const dispatch = useDispatch();
@@ -9,7 +10,14 @@ export default function StudentsFilter({ filters, onFilterChange }) {
 
   const handleChange = (e) => {
     const { name, value } = e.target; // Ensure correct destructuring here
-    console.log(`Selected: ${name} = ${value}`);
+    console.log(`Selected: ${name} = ${value}`); 
+      if (name == 'classId' && value == '') {
+        dispatch(fetchAllStudents({ classId: '', sectionId: '', groupId: '' }));
+        onFilterChange('classId', '');
+        onFilterChange('sectionId', '');
+        onFilterChange('groupId', '');
+        return;
+      }
     
     if (name === 'classId') {
 
