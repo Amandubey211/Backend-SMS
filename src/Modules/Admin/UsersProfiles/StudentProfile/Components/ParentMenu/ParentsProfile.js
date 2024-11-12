@@ -15,7 +15,7 @@ const ParentsProfile = ({ student }) => {
       <ParentProfileBlock
         title="Father Details"
         imageSrc={student?.guardianProfile || profileIcon }
-        name={student?.guardianName}
+        name={student?.fatherName || student?.guardianName}
         details={[
           { type: 'phone', label: 'Phone', value: student?.guardianContactNumber },
           { type: 'email', label: 'Email', value: student?.guardianEmail},

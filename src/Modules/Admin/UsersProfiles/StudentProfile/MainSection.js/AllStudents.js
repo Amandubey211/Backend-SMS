@@ -13,11 +13,17 @@ import { HiMiniCheckBadge } from 'react-icons/hi2';
 import { fetchAllClasses } from '../../../../../Store/Slices/Admin/Class/actions/classThunk';
 import StudentsFilter from './StudentsFilter';
 import Spinner from '../../../../../Components/Common/Spinner';
+import { MdEdit } from 'react-icons/md';
+import Sidebar from '../../../../../Components/Common/Sidebar';
+import UpdateStudent from './UpdateStudent';
 
 const AllStudents = () => {
   const { allStudents, loading } = useSelector((store) => store.admin.all_students);
   const dispatch = useDispatch();
-  
+  const [isUpdateSidebarOpen, setIsUpdateSidebarOpen] = useState(false);
+  const [studentData, setStudentData] = useState(null);
+  const handleSidebarClose = () => setIsUpdateSidebarOpen(false);
+  const handleUpdateSidebarClose = () => setIsUpdateSidebarOpen(false);
   useEffect(() => {
     dispatch(fetchAllStudents());
     dispatch(fetchAllClasses());
@@ -81,8 +87,11 @@ const AllStudents = () => {
             {allStudents?.length > 0 ? (
               allStudents?.map((student) => (
                 <div key={student?._id} className={`${bgColor(student?._id)} p-6 rounded-lg shadow-md text-white relative`}>
-                  <div className="absolute top-4 right-4 bg-white rounded-full">
-                    <HiMiniCheckBadge className="text-green-500 text-2xl" />
+                  <div className="absolute top-1 left-2 bg-white rounded-full">
+                    <HiMiniCheckBadge className="text-green-500 text-xl" />
+                  </div>
+                  <div className="absolute top-4 right-4 bg-white rounded-full p-1 shadow-lg cursor-pointer" onClick={()=>{setStudentData(student);setIsUpdateSidebarOpen(true)}}>
+                  <MdEdit className="text-gray-500 text-lg" />
                   </div>
                   <NavLink to={`/users/students/${student?._id}`}>
                     <div className="mb-4">
@@ -116,6 +125,14 @@ const AllStudents = () => {
             )}
           </div>
         )}
+          <Sidebar
+                isOpen={isUpdateSidebarOpen}
+                onClose={handleSidebarClose}
+                title={'Edit Student'}
+                width='55%'
+              >
+                <UpdateStudent data={studentData} handleUpdateSidebarClose={handleUpdateSidebarClose} />
+              </Sidebar>
       </DashLayout>
     </Layout>
   );
