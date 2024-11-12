@@ -65,8 +65,15 @@ const TimeTableMainSection = () => {
 
   // Fetch timetables based on backend filters
   useEffect(() => {
-    dispatch(fetchTimetables(backendFilters));
+    // Create a new object with only non-empty filter parameters
+    const activeFilters = Object.fromEntries(
+      Object.entries(backendFilters).filter(([key, value]) => value)
+    );
+  
+    // Dispatch fetchTimetables with the activeFilters
+    dispatch(fetchTimetables(activeFilters));
   }, [backendFilters, dispatch]);
+  
 
   // Update filtered timetables when timetables or frontend filter changes
   useEffect(() => {

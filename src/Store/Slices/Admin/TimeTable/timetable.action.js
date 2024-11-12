@@ -32,7 +32,7 @@ export const fetchTimetables = createAsyncThunk(
     const say = localStorage.getItem("say")
 
     try {
-      const response = await axios.get(`${baseUrl}/admin/timetable?say=${say}`, {
+      const response = await axios.get(`${baseUrl}/admin/timetable`, {
         headers: { Authentication: token },
         params: filters,
       });
