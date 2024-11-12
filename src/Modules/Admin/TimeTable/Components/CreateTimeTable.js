@@ -682,7 +682,7 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => { } }) => {
 
       // Redirect after a short delay
       setTimeout(() => {
-        navigate('/noticeboard/timetable');
+        navigate('/timetable');
       }, 1500);
     } else {
       dispatch(createTimetable(timetableData));
@@ -690,7 +690,7 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => { } }) => {
 
       // Redirect after a short delay
       setTimeout(() => {
-        navigate('/noticeboard/timetable');
+        navigate('/timetable');
       }, 1500);
     }
 

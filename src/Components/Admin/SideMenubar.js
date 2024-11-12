@@ -62,7 +62,9 @@ const SideMenubar = () => {
       role === "teacher" ||
       role === "accountant" ||
       role === "librarian" ||
-      role === "staff"
+      role === "staff"||
+      role === "student"||
+      role === "parent"
     ) {
       navigate("/users/my/profile");
     } else {

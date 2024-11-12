@@ -663,11 +663,11 @@ function App() {
     },
     { path: "library", element: <Libary />, errorElement: <Error /> },
     {
-      path: "/noticeboard/timetable",
+      path: "/timetable",
       element: (
         <ProtectRoute
           Component={TimeTablePage}
-          allowedRoles={["admin", "teacher"]}
+          allowedRoles={["admin", "teacher", "student", "parent"]}
         />
       ),
       errorElement: <Error />,
@@ -677,7 +677,7 @@ function App() {
           element: (
             <ProtectRoute
               Component={TableView}
-              allowedRoles={["admin", "teacher"]}
+              allowedRoles={["admin", "teacher", "student", "parent"]}
             />
           ),
           errorElement: <Error />,
@@ -696,7 +696,7 @@ function App() {
     },
 
     {
-      path: "/noticeboard/timetable/create-new-timeTable",
+      path: "/timetable/create-new-timeTable",
       element: (
         <ProtectRoute
           Component={CreateTimeTable}
