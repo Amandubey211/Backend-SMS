@@ -145,8 +145,8 @@ const TopNavigationWithFilters = ({ onBackendFilterChange, onFrontendFilterChang
             allowClear
           >
             <Option value="">All Statuses</Option>
-            <Option value="active">Active</Option>
-            <Option value="inactive">Inactive</Option>
+            <Option value="active">Published</Option>
+            <Option value="inactive">Drafts</Option>
           </Select>
         </Col>
 
