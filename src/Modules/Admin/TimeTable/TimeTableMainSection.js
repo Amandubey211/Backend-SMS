@@ -15,6 +15,10 @@ const TimeTableMainSection = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+
+  const role = useSelector((store) => store.common.auth.role);
+
+
   // Correctly destructure timetables, loadingFetch, and errorFetch
   const { timetables, loadingFetch, errorFetch } = useSelector(
     (state) => state.admin.timetable
@@ -93,7 +97,7 @@ const TimeTableMainSection = () => {
 
   // Handle create button click to navigate to a new route
   const handleCreateTimeTable = () => {
-    navigate("/noticeboard/timetable/create-new-timeTable");
+    navigate("/timetable/create-new-timeTable");
   };
 
   // Handle delete action
@@ -125,14 +129,17 @@ const TimeTableMainSection = () => {
       />
 
       {/* Button to create a new timetable */}
-      <div className="flex justify-start mb-4 ml-5">
-        <button
-          onClick={handleCreateTimeTable}
-          className="px-4 py-2 rounded-md text-white bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700"
-        >
-          + Create TimeTable
-        </button>
-      </div>
+      {(role !== "parent" && role !== "student") && (
+        <div className="flex justify-start mb-4 ml-5">
+          <button
+            onClick={handleCreateTimeTable}
+            className="px-4 py-2 rounded-md text-white bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700"
+          >
+            + Create TimeTable
+          </button>
+        </div>
+      )}
+
 
       {/* Display list of timetables */}
       <TimeTableList

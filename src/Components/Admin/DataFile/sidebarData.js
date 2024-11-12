@@ -132,7 +132,7 @@ const sidebarData = [
   {
     title: "Time Table",
     icon: <ImTable2 />,
-    path: "/noticeboard/timetable",
+    path: "/timetable",
     roles: ["admin", "teacher"],
   },
   {

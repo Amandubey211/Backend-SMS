@@ -7,6 +7,7 @@ import { useDispatch } from "react-redux";
 import { FaArrowLeft, FaEdit, FaTrashAlt } from "react-icons/fa";
 import { deleteTimetable } from "../../../../Store/Slices/Admin/TimeTable/timetable.action"; // Import the delete action
 import DeleteConfirmatiomModal from "../../../../Components/Common/DeleteConfirmationModal"; // Correct import path
+import { useSelector } from "react-redux";
 
 const TableView = () => {
   const navigate = useNavigate();
@@ -22,6 +23,9 @@ const TableView = () => {
 
   const dispatch = useDispatch();
 
+  const role = useSelector((store) => store.common.auth.role);
+
+
   // State for Delete Confirmation Modal
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
@@ -29,7 +33,7 @@ const TableView = () => {
   useEffect(() => {
     if (!timetable) {
       message.error("No timetable data available.");
-      navigate("/noticeboard/timetable"); // Redirect if data is missing
+      navigate("/timetable"); // Redirect if data is missing
     }
   }, [timetable, navigate]);
 
@@ -163,7 +167,7 @@ const TableView = () => {
         .then(() => {
           setDeleteLoading(false);
           message.success(`${timetable.name} deleted successfully`);
-          navigate("/noticeboard/timetable");
+          navigate("/timetable");
         })
         .catch((err) => {
           setDeleteLoading(false);
@@ -175,7 +179,7 @@ const TableView = () => {
   // **Handle Edit Function**
   const handleEdit = () => {
     if (timetable && timetable._id) {
-      navigate(`/noticeboard/timetable/edit/${timetable._id}`);
+      navigate(`/timetable/edit/${timetable._id}`);
     } else {
       message.error("Timetable ID is missing.");
     }
@@ -196,7 +200,7 @@ const TableView = () => {
         Back to Timetables
       </Button>
       <h1 className="text-3xl font-bold mb-6">{timetable?.name || "Timetable Details"}</h1>
-      
+
       {/* Top Right Controls */}
       <Row justify="end" align="middle" className="mb-4">
         <Input.Search
@@ -206,22 +210,26 @@ const TableView = () => {
           allowClear
           style={{ width: 200, marginRight: 10 }}
         />
-        <Button
-          icon={<FaEdit />}
-          type="primary"
-          onClick={handleEdit}
-          style={{ marginRight: 5 }}
-        >
-          Edit
-        </Button>
-        <Button
-          icon={<FaTrashAlt />}
-          type="primary"
-          danger
-          onClick={openDeleteModal}
-        >
-          Delete
-        </Button>
+        {(role !== "parent" && role !== "student") && (
+          <>
+            <Button
+              icon={<FaEdit />}
+              type="primary"
+              onClick={handleEdit}
+              style={{ marginRight: 5 }}
+            >
+              Edit
+            </Button>
+            <Button
+              icon={<FaTrashAlt />}
+              type="primary"
+              danger
+              onClick={openDeleteModal}
+            >
+              Delete
+            </Button>
+          </>
+        )}
       </Row>
 
       <Table

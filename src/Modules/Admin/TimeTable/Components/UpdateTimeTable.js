@@ -763,7 +763,7 @@ const UpdateTimeTable = () => {
         message.success('Timetable updated successfully!');
         // Redirect after a short delay
         setTimeout(() => {
-          navigate('/noticeboard/timetable');
+          navigate('/timetable');
         }, 1500);
       })
       .catch((error) => {
@@ -972,7 +972,7 @@ const UpdateTimeTable = () => {
 
         {/* Form Actions */}
         <div className="flex justify-end space-x-4">
-          <Button onClick={() => navigate('/noticeboard/timetable')}>
+          <Button onClick={() => navigate('/timetable')}>
             Cancel
           </Button>
           <Button type="primary" htmlType="submit">
