@@ -228,7 +228,7 @@ const SideMenubar = () => {
         {isOpen && (
           <div className="flex-1 ml-3">
             <h2 className="font-semibold">
-              {userDetails?.fullName?.slice(0, 8) ||
+              {userDetails?.fullName?.slice(0, 5) ||
                 "User"}
             </h2>
             <p className="text-gray-500 capitalize text-sm">{role}</p>

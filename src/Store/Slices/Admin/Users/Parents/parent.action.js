@@ -42,3 +42,20 @@ export const fetchAllParent = createAsyncThunk(
     }
   }
 );
+export const updateParent = createAsyncThunk(
+  "user/updateParent",
+  async ({data}, { rejectWithValue, getState, dispatch }) => {
+    try {
+      const say = localStorage.getItem("say");
+      const token = getToken(getState(), rejectWithValue, dispatch); 
+      const response = await axios.put(`${baseUrl}/admin/parent/update?say=${say}`,data, {
+        headers: { Authentication: token },
+      });
+      toast.success('Parent update successfull');
+      dispatch(fetchAllParent())
+      return response.data;
+    } catch (error) {
+      return handleError(error, dispatch, rejectWithValue); 
+    }
+  }
+);
