@@ -226,7 +226,7 @@ const StudentParentProfile = () => {
                 onClose={handleUpdateSidebarClose}
                 title={'Edit Parent'}
               >
-                <UpdateParent data={selectedParentData} />
+                <UpdateParent data={selectedParentData} handleUpdateSidebarClose={handleUpdateSidebarClose} />
               </Sidebar>
             </div>}
         </DashLayout>
