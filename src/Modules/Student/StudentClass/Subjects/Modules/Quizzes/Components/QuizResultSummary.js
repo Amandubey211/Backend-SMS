@@ -1,23 +1,37 @@
-import React from "react";
+import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setSelectedAttempt } from "../../../../../../../Store/Slices/Student/MyClass/Class/Subjects/Quizes/quizesSlice";
+import {
+  FaChevronDown,
+  FaChevronUp,
+  FaClock,
+  FaCheckCircle,
+  FaTimesCircle,
+} from "react-icons/fa";
+import { motion, AnimatePresence } from "framer-motion";
 
 const QuizResultSummary = () => {
   const { attemptHistory } = useSelector(
     (store) => store?.student?.studentQuiz
   );
   const dispatch = useDispatch();
+  const [openIndex, setOpenIndex] = useState(0); // Keeps track of the currently opened accordion
 
   const formatTime = (totalSeconds) => {
+    if (!totalSeconds || totalSeconds <= 0) return "0s";
     const hours = Math.floor(totalSeconds / 3600);
     const minutes = Math.floor((totalSeconds % 3600) / 60);
-    const seconds = totalSeconds % 60;
+    const seconds = Math.floor(totalSeconds % 60);
 
     const hoursDisplay = hours > 0 ? `${hours}h ` : "";
     const minutesDisplay = minutes > 0 ? `${minutes}m ` : "";
-    const secondsDisplay = `${seconds}s`;
+    const secondsDisplay = seconds > 0 ? `${seconds}s` : "";
 
     return `${hoursDisplay}${minutesDisplay}${secondsDisplay}`.trim();
+  };
+
+  const handleToggle = (index) => {
+    setOpenIndex(index === openIndex ? -1 : index); // Toggle accordion
   };
 
   const handleAttemptClick = (attempt) => {
@@ -25,63 +39,117 @@ const QuizResultSummary = () => {
   };
 
   return (
-    <div className="mt-4 overflow-y-auto px-4" style={{ maxHeight: "80vh" }}>
-      <h3 className="text-lg font-semibold">
-        Attempt History ({attemptHistory.length})
-      </h3>
-      {Array.isArray(attemptHistory) && attemptHistory.length > 0 ? (
-        attemptHistory?.map((attempt, index) => (
+    <div className="p-4 space-y-4 h-full no-scrollbar overflow-y-scroll my-2 ">
+      {/* Component Heading */}
+      <h2 className="text-lg font-semibold mb-4">
+        My Attempt History ({attemptHistory?.length || 0})
+      </h2>
+      {Array.isArray(attemptHistory) && attemptHistory?.length > 0 ? (
+        attemptHistory.slice().map((attempt, index) => (
           <div
-            key={index}
-            className="p-4 border rounded-md mt-4 cursor-pointer hover:bg-gray-100"
-            onClick={() => handleAttemptClick(attempt)}
+            key={attempt?._id || index}
+            className="bg-white shadow-md rounded-lg overflow-hidden transition-shadow duration-300"
           >
-            <div className="flex justify-between items-center">
-              <h3 className="font-medium text-lg text-blue-600">
-                Attempt {attempt?.attempts}
-              </h3>
-              <span className="text-gray-500 text-sm">
-                {new Date(attempt?.date).toLocaleString()}
-              </span>
+            {/* Accordion Header */}
+            <div
+              className="flex justify-between items-center p-1 px-4 cursor-pointer bg-gray-50 hover:bg-gray-200"
+              onClick={() => handleToggle(index)}
+            >
+              <div>
+                <h3 className="text-lg font-semibold text-gradient">
+                  Attempt {attempt?.attempts + 1 || "N/A"}
+                </h3>
+                <p className="text-gray-500 text-sm">
+                  {attempt?.submittedAt
+                    ? new Date(attempt?.submittedAt).toLocaleString()
+                    : "In Progress"}
+                </p>
+              </div>
+              <div>
+                {openIndex === index ? (
+                  <FaChevronUp className="text-gray-600" size={20} />
+                ) : (
+                  <FaChevronDown className="text-gray-600" size={20} />
+                )}
+              </div>
             </div>
-            <ul className="list-none space-y-1 mt-2">
-              <li className="font-mono">
-                <strong>Time Taken:</strong>{" "}
-                <span className="text-gray-700 font-semibold">
-                  {formatTime(attempt?.timeTaken)}
-                </span>
-              </li>
-              <li>
-                <strong>Total Points:</strong>{" "}
-                <span className="text-gray-700 font-semibold">
-                  {attempt?.score}
-                </span>
-              </li>
-              <li>
-                <strong>Correct Answers:</strong>{" "}
-                <span className="text-green-500 font-semibold">
-                  {attempt?.rightAnswer}
-                </span>
-              </li>
-              <li>
-                <strong>Wrong Answers:</strong>{" "}
-                <span className="text-red-500 font-semibold">
-                  {attempt?.wrongAnswer}
-                </span>
-              </li>
-            </ul>
-            <div className="mt-2">
-              <button
-                className="bg-blue-500 text-white py-1 px-3 rounded-md hover:bg-blue-600"
-                onClick={() => handleAttemptClick(attempt)}
-              >
-                View Details
-              </button>
-            </div>
+
+            {/* Accordion Content with Framer Motion */}
+            <AnimatePresence>
+              {openIndex === index && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="p-4"
+                >
+                  {/* Stats Section */}
+                  <div className="grid grid-cols-3 text-center divide-x">
+                    <div>
+                      <p className="text-gray-500 text-sm">Correct</p>
+                      <p className="text-green-500 font-bold flex items-center justify-center">
+                        <FaCheckCircle className="inline mr-1" />
+                        <span>{attempt?.rightAnswer ?? "N/A"}</span>
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-gray-500 text-sm">Wrong</p>
+                      <p className="text-red-500 font-bold flex items-center justify-center">
+                        <FaTimesCircle className="inline mr-1" />
+                        <span>{attempt?.wrongAnswer ?? "N/A"}</span>
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-gray-500 text-sm">Time</p>
+                      <p className="text-blue-500 font-bold flex justify-center items-center">
+                        <FaClock className="inline mr-1" />
+                        <span>
+                          {attempt?.timeTaken
+                            ? formatTime(attempt?.timeTaken)
+                            : "N/A"}
+                        </span>
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Status Section */}
+                  <div className="text-center mt-4">
+                    <span
+                      className={`inline-block px-3 py-1 text-sm font-medium rounded-full ${
+                        attempt?.submissionStatus === "Submitted"
+                          ? "bg-green-100 text-green-600"
+                          : attempt?.submissionStatus === "inProgress"
+                          ? "bg-yellow-100 text-yellow-600"
+                          : "bg-gray-100 text-gray-600"
+                      }`}
+                    >
+                      {attempt?.submissionStatus || "Unknown"}
+                    </span>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         ))
       ) : (
-        <div className="mt-2 text-gray-600">No attempt history available.</div>
+        <div className="flex flex-col items-center justify-center mt-8 bg-gray-50 p-6 rounded-lg border border-gray-200 shadow-md">
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            className="text-blue-400"
+          >
+            <FaClock size={60} />
+          </motion.div>
+          <h3 className="text-lg font-semibold text-gray-700 mt-4">
+            No Attempt History Found
+          </h3>
+          <p className="text-gray-500 text-sm mt-2">
+            You haven’t completed any quizzes yet. Start one now to see your
+            progress here!
+          </p>
+        </div>
       )}
     </div>
   );

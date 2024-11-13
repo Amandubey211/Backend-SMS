@@ -134,10 +134,11 @@ const stdQuizSlice = createSlice({
       })
       .addCase(fetchAllAttemptHistory.fulfilled, (state, action) => {
         state.loading = false;
-        state.attemptHistory = action.payload;
+        state.attemptHistory = action.payload?.length ? action.payload : [];
       })
       .addCase(fetchAllAttemptHistory.rejected, (state, action) => {
         state.loading = false;
+        state.attemptHistory = [];
         state.error = action.payload || true;
       })
 

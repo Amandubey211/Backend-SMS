@@ -1,0 +1,20 @@
+{
+    "Library": "पुस्तकालय",
+    "Book Issue": "पुस्तक निर्गम",
+    "Issue Book": "पुस्तक जारी करें",
+    "Author": "लेखक",
+    "Category": "श्रेणी",
+    "Issue Date": "निर्गम तिथि",
+    "Return Date": "वापसी तिथि",
+    "Status": "स्थिति",
+    "All": "सभी",
+    "Pending": "लंबित",
+    "Return": "वापसी",
+    "Unknown Title": "अज्ञात शीर्षक",
+    "Unknown Author": "अज्ञात लेखक",
+    "Unknown Category": "अज्ञात श्रेणी",
+    "No Status": "कोई स्थिति नहीं",
+    "Class": "कक्षा",
+    "Copies": "प्रतियां",
+    "Available": "उपलब्ध"
+}

@@ -7,6 +7,8 @@ import QuizzDetailCard from "./Components/QuizzDetailCard";
 import QuestionDetailCard from "./Components/QuestionDetailCard";
 import QuizResultSummary from "./Components/QuizResultSummary";
 import { useDispatch, useSelector } from "react-redux";
+import { MdErrorOutline } from "react-icons/md"; // React Icon for Placeholder
+
 import {
   setAttemptHistory,
   setQuizResults,
@@ -19,6 +21,7 @@ import {
   fetchAllAttemptHistory,
 } from "../../../../../../Store/Slices/Student/MyClass/Class/Subjects/Quizes/quizes.action";
 import { useParams } from "react-router-dom";
+import QuizInstructions from "./Components/QuizInstructions";
 
 const MainSection = () => {
   const {
@@ -42,44 +45,46 @@ const MainSection = () => {
   const [violationCount, setViolationCount] = useState(0);
   const [errorModalVisible, setErrorModalVisible] = useState(false);
   const [violationModalVisible, setViolationModalVisible] = useState(false);
+  const [resizeModalVisible, setResizeModalVisible] = useState(false);
+  const [initialWindowWidth, setInitialWindowWidth] = useState(null);
+  const [initialWindowHeight, setInitialWindowHeight] = useState(null);
+  const [acknowledged, setAcknowledged] = useState(false);
 
   const timerRef = useRef(null);
 
-  // Enable fullscreen
+  // Enable fullscreen and wait for it to be activated
   const enableFullScreen = () => {
     const elem = document.documentElement;
-    if (elem.requestFullscreen) {
-      elem.requestFullscreen().catch((err) => {
+    const requestFullScreen =
+      elem.requestFullscreen ||
+      elem.mozRequestFullScreen ||
+      elem.webkitRequestFullscreen ||
+      elem.msRequestFullscreen;
+
+    if (requestFullScreen) {
+      requestFullScreen.call(elem).catch((err) => {
         console.error("Error attempting to enable fullscreen mode:", err);
       });
-    } else if (elem.mozRequestFullScreen) {
-      elem.mozRequestFullScreen();
-    } else if (elem.webkitRequestFullscreen) {
-      elem.webkitRequestFullscreen();
-    } else if (elem.msRequestFullscreen) {
-      elem.msRequestFullscreen();
     }
   };
 
   // Exit fullscreen
   const disableFullScreen = () => {
+    const exitFullScreen =
+      document.exitFullscreen ||
+      document.mozCancelFullScreen ||
+      document.webkitExitFullscreen ||
+      document.msExitFullscreen;
+
     if (
       document.fullscreenElement ||
       document.webkitFullscreenElement ||
       document.mozFullScreenElement ||
       document.msFullscreenElement
     ) {
-      if (document.exitFullscreen) {
-        document.exitFullscreen().catch((err) => {
-          console.error("Error attempting to exit fullscreen mode:", err);
-        });
-      } else if (document.mozCancelFullScreen) {
-        document.mozCancelFullScreen();
-      } else if (document.webkitExitFullscreen) {
-        document.webkitExitFullscreen();
-      } else if (document.msExitFullscreen) {
-        document.msExitFullscreen();
-      }
+      exitFullScreen.call(document).catch((err) => {
+        console.error("Error attempting to exit fullscreen mode:", err);
+      });
     }
   };
 
@@ -138,10 +143,102 @@ const MainSection = () => {
     attemptHistory,
   ]);
 
+  // Security event listeners
+  const addSecurityEventListeners = useCallback(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        setSuspiciousActivityDetected(true);
+      }
+    };
+
+    const handleFocusLoss = () => {
+      setSuspiciousActivityDetected(true);
+    };
+
+    const disableShortcuts = (e) => {
+      // List of restricted keys
+      const restrictedKeys = [
+        "F12",
+        "F11",
+        "Escape",
+        "PrintScreen",
+        "Alt",
+        "Tab",
+        "ContextMenu",
+      ];
+
+      if (
+        (e.ctrlKey && e.key === "c") || // Ctrl+C
+        (e.ctrlKey && e.key === "v") || // Ctrl+V
+        (e.ctrlKey && e.key === "x") || // Ctrl+X
+        (e.ctrlKey && e.key === "s") || // Ctrl+S
+        (e.altKey && e.key === "Tab") || // Alt+Tab
+        restrictedKeys.includes(e.key)
+      ) {
+        e.preventDefault();
+        setSuspiciousActivityDetected(true);
+      }
+    };
+
+    const disableRightClick = (e) => {
+      e.preventDefault();
+      setSuspiciousActivityDetected(true);
+    };
+
+    const handleResize = () => {
+      if (
+        window.innerWidth < initialWindowWidth ||
+        window.innerHeight < initialWindowHeight
+      ) {
+        setResizeModalVisible(true);
+      }
+    };
+
+    // Add event listeners
+    window.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("blur", handleFocusLoss);
+    window.addEventListener("keydown", disableShortcuts);
+    window.addEventListener("contextmenu", disableRightClick);
+    window.addEventListener("resize", handleResize);
+
+    // Cleanup function
+    const removeSecurityEventListeners = () => {
+      window.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("blur", handleFocusLoss);
+      window.removeEventListener("keydown", disableShortcuts);
+      window.removeEventListener("contextmenu", disableRightClick);
+      window.removeEventListener("resize", handleResize);
+    };
+
+    // Save the cleanup function to be called when the quiz ends
+    cleanupRef.current = removeSecurityEventListeners;
+  }, [initialWindowWidth, initialWindowHeight]);
+
+  const cleanupRef = useRef(null);
+
   // Start quiz logic
   const handleStartQuiz = useCallback(async () => {
     try {
+      // Listen for fullscreen change
+      const onFullScreenChange = () => {
+        if (document.fullscreenElement) {
+          // Now we're in fullscreen mode
+          // Set initial window size
+          setInitialWindowWidth(window.innerWidth);
+          setInitialWindowHeight(window.innerHeight);
+
+          // Remove the listener as it's no longer needed
+          document.removeEventListener("fullscreenchange", onFullScreenChange);
+
+          // Now, set up the security event listeners
+          addSecurityEventListeners();
+        }
+      };
+
+      document.addEventListener("fullscreenchange", onFullScreenChange);
+
       enableFullScreen(); // Enable fullscreen mode
+
       const response = await dispatch(startQuiz({ quizId })).unwrap();
 
       setQuizStarted(true);
@@ -168,78 +265,81 @@ const MainSection = () => {
       console.error("Failed to start quiz:", error);
       setErrorModalVisible(true);
     }
-  }, [dispatch, quizId, itemDetails.timeLimit, handleSubmit]);
+  }, [
+    dispatch,
+    quizId,
+    itemDetails.timeLimit,
+    handleSubmit,
+    addSecurityEventListeners,
+  ]);
 
   const hasRemainingAttempts = useCallback(() => {
     if (itemDetails?.allowNumberOfAttempts === null) return true; // Unlimited attempts
     return attemptHistory?.length < itemDetails?.allowNumberOfAttempts;
   }, [itemDetails?.allowNumberOfAttempts, attemptHistory]);
 
+  const handleAcknowledge = () => {
+    setAcknowledged((prev) => !prev);
+  };
+
   const handleOkClick = useCallback(() => {
+    const newViolationCount = violationCount + 1;
+    setViolationCount(newViolationCount);
     setViolationModalVisible(false);
-  }, []);
 
-  // Cleanup on component unmount
-  useEffect(() => {
-    return () => clearInterval(timerRef.current);
-  }, []);
+    if (newViolationCount >= 3) {
+      setErrorModalVisible(true);
+      handleSubmit();
+    }
+  }, [violationCount, handleSubmit]);
 
-  // Handle suspicious activity detection
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (document.hidden) {
-        setSuspiciousActivityDetected(true);
+  const handleResizeOkClick = useCallback(() => {
+    setResizeModalVisible(false);
+    handleSubmit();
+  }, [handleSubmit]);
+
+  const handleResizeCancelClick = useCallback(() => {
+    const newViolationCount = violationCount + 1;
+    setViolationCount(newViolationCount);
+    setResizeModalVisible(false);
+
+    // Re-enable fullscreen mode
+    enableFullScreen();
+
+    // Update initial window size to current size
+    // We need to wait for fullscreen to be re-enabled
+    const onFullScreenChange = () => {
+      if (document.fullscreenElement) {
+        setInitialWindowWidth(window.innerWidth);
+        setInitialWindowHeight(window.innerHeight);
+        document.removeEventListener("fullscreenchange", onFullScreenChange);
       }
     };
+    document.addEventListener("fullscreenchange", onFullScreenChange);
 
-    const handleFocusLoss = () => {
-      setSuspiciousActivityDetected(true);
-    };
+    if (newViolationCount >= 3) {
+      setErrorModalVisible(true);
+      handleSubmit();
+    }
+  }, [violationCount, enableFullScreen, handleSubmit]);
 
-    const disableShortcuts = (e) => {
-      if (
-        (e.ctrlKey && e.key === "c") || // Ctrl+C
-        (e.ctrlKey && e.key === "v") || // Ctrl+V
-        (e.altKey && e.key === "Tab") || // Alt+Tab
-        e.key === "F12" || // Developer Tools
-        e.key === "Escape" // Exit fullscreen
-      ) {
-        e.preventDefault();
-        setSuspiciousActivityDetected(true);
-      }
-    };
-
-    const disableRightClick = (e) => {
-      e.preventDefault();
-      setSuspiciousActivityDetected(true);
-    };
-
-    window.addEventListener("visibilitychange", handleVisibilityChange);
-    window.addEventListener("blur", handleFocusLoss);
-    window.addEventListener("keydown", disableShortcuts);
-    window.addEventListener("contextmenu", disableRightClick);
-
-    return () => {
-      window.removeEventListener("visibilitychange", handleVisibilityChange);
-      window.removeEventListener("blur", handleFocusLoss);
-      window.removeEventListener("keydown", disableShortcuts);
-      window.removeEventListener("contextmenu", disableRightClick);
-    };
-  }, []);
-
+  // Handle violation modal visibility
   useEffect(() => {
     if (suspiciousActivityDetected) {
-      setViolationCount((prev) => prev + 1);
       setViolationModalVisible(true);
-      setSuspiciousActivityDetected(false); // Reset to avoid repeated increments
-
-      if (violationCount + 1 >= 3) {
-        setViolationModalVisible(false);
-        setErrorModalVisible(true);
-        handleSubmit();
-      }
+      setSuspiciousActivityDetected(false); // Reset to avoid repeated triggers
     }
-  }, [suspiciousActivityDetected, violationCount, handleSubmit]);
+  }, [suspiciousActivityDetected]);
+
+  // Cleanup on component unmount or when quiz ends
+  useEffect(() => {
+    return () => {
+      clearInterval(timerRef.current);
+      if (cleanupRef.current) {
+        cleanupRef.current();
+      }
+    };
+  }, []);
 
   // Fetch attempt history
   useEffect(() => {
@@ -262,33 +362,11 @@ const MainSection = () => {
               {activeTab === "instructions" && <QuizInstructionSection />}
               {activeTab === "questions" && (
                 <div>
-                  {!quizStarted && showInstructions && (
-                    <div className="my-4 p-4 bg-gray-100 border border-gray-300 rounded">
-                      <p className="text-gray-600 mt-2">
-                        You are about to start the quiz. Once you click the{" "}
-                        <strong>"Start Quiz"</strong> button, the timer will
-                        begin, and you'll need to answer all the questions
-                        within the given time limit. If you close the quiz or
-                        run out of time, your answers will be automatically
-                        submitted. If you've already completed the quiz, you may
-                        have the chance to <strong>restart</strong> if more
-                        attempts are allowed.
-                      </p>
-                      <p className="mt-2 text-red-600 font-semibold">
-                        Make sure you're ready before starting!
-                      </p>
-                    </div>
-                  )}
-                  {!quizStarted && (
-                    <button
-                      onClick={handleStartQuiz}
-                      className="mt-4 px-4 py-2 text-white font-medium rounded-md shadow-sm bg-gradient-to-r from-pink-500 to-pink-700 hover:to-pink-900 focus:outline-none"
-                    >
-                      {quizSubmitted && hasRemainingAttempts()
-                        ? "Restart Quiz"
-                        : "Start Quiz"}
-                    </button>
-                  )}
+                  <QuizInstructions
+                    acknowledged={acknowledged}
+                    onAcknowledge={handleAcknowledge}
+                    handleStartQuiz={handleStartQuiz}
+                  />
                 </div>
               )}
             </div>
@@ -299,7 +377,8 @@ const MainSection = () => {
       {isModalOpen && (
         <div
           className={`fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 ${
-            violationModalVisible && "border-4 border-red-600"
+            (violationModalVisible || resizeModalVisible) &&
+            "border-4 border-red-600"
           }`}
         >
           <div className="bg-white w-full h-full flex">
@@ -307,7 +386,7 @@ const MainSection = () => {
               <QuizQuestions handleSubmit={handleSubmit} />
             </div>
             <div className="w-[25%] border-l p-4">
-              <QuestionDetailCard />
+              <QuestionDetailCard hideTime={true} />
             </div>
             {violationModalVisible && (
               <div
@@ -329,6 +408,32 @@ const MainSection = () => {
                   >
                     OK
                   </button>
+                </div>
+              </div>
+            )}
+            {resizeModalVisible && (
+              <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div className="bg-white p-6 rounded-lg shadow-lg">
+                  <h3 className="text-lg font-semibold text-red-600">
+                    Window Resized!
+                  </h3>
+                  <p className="mt-2 text-gray-700">
+                    You have resized the window. Do you want to submit the quiz?
+                  </p>
+                  <div className="mt-4 flex justify-end space-x-4">
+                    <button
+                      onClick={handleResizeCancelClick}
+                      className="bg-gray-500 text-white px-4 py-2 rounded-md shadow-md hover:bg-gray-600 focus:outline-none"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleResizeOkClick}
+                      className="bg-red-500 text-white px-4 py-2 rounded-md shadow-md hover:bg-red-600 focus:outline-none"
+                    >
+                      Submit Quiz
+                    </button>
+                  </div>
                 </div>
               </div>
             )}
@@ -360,12 +465,12 @@ const MainSection = () => {
         {activeTab === "instructions" && (
           <div>
             <QuizzDetailCard />
-            <QuizResultSummary />
+            {/* <QuizResultSummary /> */}
           </div>
         )}
         {activeTab === "questions" && !quizSubmitted && (
           <div>
-            <QuestionDetailCard />
+            {/* <QuestionDetailCard /> */}
             <QuizResultSummary />
           </div>
         )}
