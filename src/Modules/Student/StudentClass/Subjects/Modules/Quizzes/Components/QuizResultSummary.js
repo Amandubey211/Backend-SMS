@@ -39,119 +39,123 @@ const QuizResultSummary = () => {
   };
 
   return (
-    <div className="p-4 space-y-4 h-full no-scrollbar overflow-y-scroll my-2 ">
-      {/* Component Heading */}
-      <h2 className="text-lg font-semibold mb-4">
+    <>
+      <h2 className="text-lg font-semibold p-3">
         My Attempt History ({attemptHistory?.length || 0})
       </h2>
-      {Array.isArray(attemptHistory) && attemptHistory?.length > 0 ? (
-        attemptHistory.slice().map((attempt, index) => (
-          <div
-            key={attempt?._id || index}
-            className="bg-white shadow-md rounded-lg overflow-hidden transition-shadow duration-300"
-          >
-            {/* Accordion Header */}
+
+      <div className="p-4 space-y-2 h-80 no-scrollbar overflow-y-scroll  ">
+        {/* Component Heading */}
+
+        {Array.isArray(attemptHistory) && attemptHistory?.length > 0 ? (
+          attemptHistory.slice().map((attempt, index) => (
             <div
-              className="flex justify-between items-center p-1 px-4 cursor-pointer bg-gray-50 hover:bg-gray-200"
-              onClick={() => handleToggle(index)}
+              key={attempt?._id || index}
+              className="bg-white shadow-md rounded-lg overflow-hidden transition-shadow duration-300"
             >
-              <div>
-                <h3 className="text-lg font-semibold text-gradient">
-                  Attempt {attempt?.attempts + 1 || "N/A"}
-                </h3>
-                <p className="text-gray-500 text-sm">
-                  {attempt?.submittedAt
-                    ? new Date(attempt?.submittedAt).toLocaleString()
-                    : "In Progress"}
-                </p>
+              {/* Accordion Header */}
+              <div
+                className="flex justify-between items-center p-1 px-4 cursor-pointer bg-gray-50 hover:bg-gray-200"
+                onClick={() => handleToggle(index)}
+              >
+                <div>
+                  <h3 className="text-lg font-semibold text-gradient">
+                    Attempt {attempt?.attempts + 1 || "N/A"}
+                  </h3>
+                  <p className="text-gray-500 text-sm">
+                    {attempt?.submittedAt
+                      ? new Date(attempt?.submittedAt).toLocaleString()
+                      : "In Progress"}
+                  </p>
+                </div>
+                <div>
+                  {openIndex === index ? (
+                    <FaChevronUp className="text-gray-600" size={20} />
+                  ) : (
+                    <FaChevronDown className="text-gray-600" size={20} />
+                  )}
+                </div>
               </div>
-              <div>
-                {openIndex === index ? (
-                  <FaChevronUp className="text-gray-600" size={20} />
-                ) : (
-                  <FaChevronDown className="text-gray-600" size={20} />
+
+              {/* Accordion Content with Framer Motion */}
+              <AnimatePresence>
+                {openIndex === index && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="p-4"
+                  >
+                    {/* Stats Section */}
+                    <div className="grid grid-cols-3 text-center divide-x">
+                      <div>
+                        <p className="text-gray-500 text-sm">Correct</p>
+                        <p className="text-green-500 font-bold flex items-center justify-center">
+                          <FaCheckCircle className="inline mr-1" />
+                          <span>{attempt?.rightAnswer ?? "N/A"}</span>
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-gray-500 text-sm">Wrong</p>
+                        <p className="text-red-500 font-bold flex items-center justify-center">
+                          <FaTimesCircle className="inline mr-1" />
+                          <span>{attempt?.wrongAnswer ?? "N/A"}</span>
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-gray-500 text-sm">Time</p>
+                        <p className="text-blue-500 font-bold flex justify-center items-center">
+                          <FaClock className="inline mr-1" />
+                          <span>
+                            {attempt?.timeTaken
+                              ? formatTime(attempt?.timeTaken)
+                              : "N/A"}
+                          </span>
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Status Section */}
+                    <div className="text-center mt-4">
+                      <span
+                        className={`inline-block px-3 py-1 text-sm font-medium rounded-full ${
+                          attempt?.submissionStatus === "Submitted"
+                            ? "bg-green-100 text-green-600"
+                            : attempt?.submissionStatus === "inProgress"
+                            ? "bg-yellow-100 text-yellow-600"
+                            : "bg-gray-100 text-gray-600"
+                        }`}
+                      >
+                        {attempt?.submissionStatus || "Unknown"}
+                      </span>
+                    </div>
+                  </motion.div>
                 )}
-              </div>
+              </AnimatePresence>
             </div>
-
-            {/* Accordion Content with Framer Motion */}
-            <AnimatePresence>
-              {openIndex === index && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: "auto", opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.3 }}
-                  className="p-4"
-                >
-                  {/* Stats Section */}
-                  <div className="grid grid-cols-3 text-center divide-x">
-                    <div>
-                      <p className="text-gray-500 text-sm">Correct</p>
-                      <p className="text-green-500 font-bold flex items-center justify-center">
-                        <FaCheckCircle className="inline mr-1" />
-                        <span>{attempt?.rightAnswer ?? "N/A"}</span>
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-gray-500 text-sm">Wrong</p>
-                      <p className="text-red-500 font-bold flex items-center justify-center">
-                        <FaTimesCircle className="inline mr-1" />
-                        <span>{attempt?.wrongAnswer ?? "N/A"}</span>
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-gray-500 text-sm">Time</p>
-                      <p className="text-blue-500 font-bold flex justify-center items-center">
-                        <FaClock className="inline mr-1" />
-                        <span>
-                          {attempt?.timeTaken
-                            ? formatTime(attempt?.timeTaken)
-                            : "N/A"}
-                        </span>
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Status Section */}
-                  <div className="text-center mt-4">
-                    <span
-                      className={`inline-block px-3 py-1 text-sm font-medium rounded-full ${
-                        attempt?.submissionStatus === "Submitted"
-                          ? "bg-green-100 text-green-600"
-                          : attempt?.submissionStatus === "inProgress"
-                          ? "bg-yellow-100 text-yellow-600"
-                          : "bg-gray-100 text-gray-600"
-                      }`}
-                    >
-                      {attempt?.submissionStatus || "Unknown"}
-                    </span>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+          ))
+        ) : (
+          <div className="flex flex-col items-center justify-center mt-8 bg-gray-50 p-6 rounded-lg border border-gray-200 shadow-md">
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.5, ease: "easeOut" }}
+              className="text-blue-400"
+            >
+              <FaClock size={60} />
+            </motion.div>
+            <h3 className="text-lg font-semibold text-gray-700 mt-4">
+              No Attempt History Found
+            </h3>
+            <p className="text-gray-500 text-sm mt-2">
+              You haven’t completed any quizzes yet. Start one now to see your
+              progress here!
+            </p>
           </div>
-        ))
-      ) : (
-        <div className="flex flex-col items-center justify-center mt-8 bg-gray-50 p-6 rounded-lg border border-gray-200 shadow-md">
-          <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.5, ease: "easeOut" }}
-            className="text-blue-400"
-          >
-            <FaClock size={60} />
-          </motion.div>
-          <h3 className="text-lg font-semibold text-gray-700 mt-4">
-            No Attempt History Found
-          </h3>
-          <p className="text-gray-500 text-sm mt-2">
-            You haven’t completed any quizzes yet. Start one now to see your
-            progress here!
-          </p>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </>
   );
 };
 
