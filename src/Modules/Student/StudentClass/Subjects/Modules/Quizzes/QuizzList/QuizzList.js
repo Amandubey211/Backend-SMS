@@ -6,14 +6,16 @@ import useNavHeading from "../../../../../../../Hooks/CommonHooks/useNavHeading 
 import { useSelector } from "react-redux";
 
 const QuizzList = () => {
-  const { subjectName } = useSelector((store) => store?.student?.studentSubject?.subject);
+  const { subjectName } = useSelector(
+    (store) => store?.student?.studentSubject?.subject
+  );
   const { classData } = useSelector((store) => store?.student?.studentClass);
   const className = classData?.className;
 
   useNavHeading(className, subjectName);
 
   return (
-    <Layout>
+    <Layout title="Quizzes | Student Diwan">
       <StudentDashLayout children={<MainSection />} hideSearchbar={true} />
     </Layout>
   );

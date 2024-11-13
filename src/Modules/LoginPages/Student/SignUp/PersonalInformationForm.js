@@ -92,7 +92,7 @@ const PersonalInformationForm = ({
         </div>
       </div>
 
-      <h3 className="text-lg font-semibold mb-2">Personal Information</h3>
+      <h3 className="text-lg font-semibold mb-2">Personal Information*</h3>
       <div className="grid grid-cols-2 gap-4 mb-4">
         <TextInput
           ref={(el) => (inputRefs.current["firstName"] = el)}
@@ -203,7 +203,7 @@ const PersonalInformationForm = ({
           error={validationErrors.emergencyNumber}
         />
       </div>
-      <h3 className="text-lg font-semibold mb-2">Identity Information</h3>
+      <h3 className="text-lg font-semibold mb-2">QID Number*</h3>
       <TextInput
         ref={(el) => (inputRefs.current["Q_Id"] = el)}
         name="Q_Id"
@@ -213,7 +213,7 @@ const PersonalInformationForm = ({
         type="number"
         error={validationErrors.Q_Id}
       />
-      <h3 className="text-lg font-semibold my-2">Guardian Information</h3>
+      <h3 className="text-lg font-semibold my-2">Guardian Information*</h3>
       <div className="grid grid-cols-2 gap-4 mb-4">
         <TextInput
           ref={(el) => (inputRefs.current["motherName"] = el)}

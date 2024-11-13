@@ -6,20 +6,22 @@ import { stdGetSingleQuiz } from "../../../../../../../Store/Slices/Student/MyCl
 import { setActiveTab } from "../../../../../../../Store/Slices/Student/MyClass/Class/Subjects/Quizes/quizesSlice";
 
 const Tabs = ({
-  quiz,
   children,
-  // onTabChange, 
+  // onTabChange,
   createPage,
   quizSubmitted,
   hasAttempted,
   hasRemainingAttempts,
-  attemptHistory
-
+  attemptHistory,
 }) => {
-// console.log("attempt history is===>",attemptHistory.length)
-  const {qid}=useParams();
-  const { loading, activeTab } = useSelector((store) => store?.student?.studentQuiz);
-
+  // console.log("attempt history is===>",attemptHistory.length)
+  const { qid } = useParams();
+  const { loading, activeTab } = useSelector(
+    (store) => store?.student?.studentQuiz
+  );
+  const { itemDetails: quiz } = useSelector(
+    (store) => store?.student?.studentQuiz
+  );
   const dispatch = useDispatch();
   const handleTabClick = (tab) => {
     // if (tab === "questions" && !hasRemainingAttempts) {
@@ -37,9 +39,9 @@ const Tabs = ({
 
   const { name, quizType, availableFrom } = quiz;
 
-  useEffect(()=>{
-    dispatch(stdGetSingleQuiz({quizId:qid}))
- },[dispatch,stdGetSingleQuiz,qid]);
+  useEffect(() => {
+    dispatch(stdGetSingleQuiz({ quizId: qid }));
+  }, [dispatch, stdGetSingleQuiz, qid]);
 
   return (
     <>
@@ -90,7 +92,7 @@ const Tabs = ({
                 activeTab === "questions" ? "text-gradient" : "text-black"
               }`}
             >
-            {`Quiz Questions`}
+              {`Quiz Questions`}
             </span>
           </button>
         </div>
