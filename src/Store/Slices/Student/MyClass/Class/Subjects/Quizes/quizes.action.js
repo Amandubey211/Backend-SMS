@@ -158,7 +158,7 @@ export const fetchAllAttemptHistory = createAsyncThunk(
         }
       );
 
-      return res?.data?.submission;
+      return res?.data?.submission || [];
     } catch (error) {
       const err = ErrorMsg(error);
       dispatch(setShowError(true));
