@@ -470,8 +470,8 @@ const MainSection = () => {
         )}
         {activeTab === "questions" && !quizSubmitted && (
           <div>
-            {/* <QuestionDetailCard /> */}
             <QuizResultSummary />
+            <QuestionDetailCard />
           </div>
         )}
 
