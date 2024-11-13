@@ -50,18 +50,21 @@ const TimeTableMainSection = () => {
     }
   };
 
-  // Fetch classes and academic years on component mount
+  // Fetch academic years on component mount
   useEffect(() => {
     fetchAcademicYearsFromStorage();
-    dispatch(fetchAllClasses());
-  }, [dispatch]);
+    // Only fetch classes if role is not parent or student
+    if (role !== "parent" && role !== "student") {
+      dispatch(fetchAllClasses());
+    }
+  }, [dispatch, role]);
 
-  // Handle class fetching errors
+  // Handle class fetching errors, but skip for parent or student
   useEffect(() => {
-    if (classError) {
+    if (classError && role !== "parent" && role !== "student") {
       toast.error("Failed to load classes. Please try again.");
     }
-  }, [classError]);
+  }, [classError, role]);
 
   // Fetch timetables based on backend filters
   useEffect(() => {
@@ -69,11 +72,11 @@ const TimeTableMainSection = () => {
     const activeFilters = Object.fromEntries(
       Object.entries(backendFilters).filter(([key, value]) => value)
     );
-  
+
     // Dispatch fetchTimetables with the activeFilters
     dispatch(fetchTimetables(activeFilters));
   }, [backendFilters, dispatch]);
-  
+
 
   // Update filtered timetables when timetables or frontend filter changes
   useEffect(() => {
