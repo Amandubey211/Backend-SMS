@@ -14,7 +14,7 @@ import { useSelector } from "react-redux";
 const TimeTablePage = () => {
   const { t } = useTranslation("admTimeTable");
   
-  useNavHeading(t("Admin"), t("TimeTable"));
+  useNavHeading(t("TimeTable"));
 
   // Get role from Redux store
   const role = useSelector((store) => store.common.auth.role);

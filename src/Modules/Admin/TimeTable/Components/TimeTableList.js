@@ -95,15 +95,17 @@ const TimeTableList = React.memo(({ timetables, loading, onDelete }) => {
               onClick={() => handleCardClick(timetable)}
             >
               {/* Status Badge */}
-              <span
-                className={`absolute top-2 right-2 text-xs font-semibold px-2 py-1 rounded ${
-                  timetable.status === "active"
-                    ? "bg-green-500 text-white"
-                    : "bg-gray-500 text-white"
-                }`}
-              >
-                {timetable.status === "active" ? "Published" : "Draft"}
-              </span>
+              {role !== "parent" && role !== "student" && (
+                <span
+                  className={`absolute top-2 right-2 text-xs font-semibold px-2 py-1 rounded ${timetable.status === "active"
+                      ? "bg-green-500 text-white"
+                      : "bg-gray-500 text-white"
+                    }`}
+                >
+                  {timetable.status === "active" ? "Published" : "Draft"}
+                </span>
+              )}
+
 
               {/* Card Header */}
               <h2 className="text-xl font-semibold text-gray-800 mb-3 flex items-center">
