@@ -1,9 +1,10 @@
 // services/apiService.js
 import axios from 'axios';
+import { baseUrl } from '../config/Common';
 
 // Create an instance of axios with default configurations
 const apiService = axios.create({
-  baseURL: 'https://api.example.com', // Replace with your API base URL
+  baseURL: baseUrl, // Replace with your API base URL
   timeout: 10000, // Timeout after 10 seconds
   headers: {
     'Content-Type': 'application/json',
@@ -13,8 +14,12 @@ const apiService = axios.create({
 // Add a request interceptor (optional)
 apiService.interceptors.request.use(
   (config) => {
-    // You can add authorization headers here if needed
-    config.headers['Authorization'] = `Bearer ${token}`;
+    const token = localStorage.getItem("student:token"); // Retrieve token from localStorage
+    // console.log("Token Retrieved:", token); // Debugging the token
+
+    if (token) {
+      config.headers['Authentication'] = `${token}`; // Attach token to request headers with the correct header name
+    }
     return config;
   },
   (error) => {

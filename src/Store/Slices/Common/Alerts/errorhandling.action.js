@@ -1,3 +1,5 @@
+import { setErrorMsg, setShowError } from "./alertsSlice";
+
 export const ErrorMsg = (error) => {
   console.log('----msg',error)
   if (error.response) {
@@ -27,3 +29,13 @@ export const ErrorMsg = (error) => {
     return { message: 'An error occurred while processing your request. Please try again.', statusCode: null };
   }
 };
+
+
+
+
+export const handleError=(error,dispatch,rejectWithValue)=>{
+  const err = ErrorMsg(error);
+  dispatch(setShowError(true)); // Show the error message
+  dispatch(setErrorMsg(err.message)); // Set the error message
+  return rejectWithValue(err.message)
+}
