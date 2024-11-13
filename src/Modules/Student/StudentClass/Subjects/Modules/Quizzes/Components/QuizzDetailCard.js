@@ -1,6 +1,7 @@
 import React from "react";
 import DateDetail from "../../../Component/DateDetail";
 import AssignmentDetail from "../../../Component/AssignmentDetail";
+import { useSelector } from "react-redux";
 
 // Utility function to convert minutes to hours and minutes
 const formatTimeLimit = (minutes) => {
@@ -11,7 +12,10 @@ const formatTimeLimit = (minutes) => {
   }`.trim();
 };
 
-const QuizzDetailCard = ({ quiz }) => {
+const QuizzDetailCard = () => {
+  const { itemDetails: quiz } = useSelector(
+    (store) => store?.student?.studentQuiz
+  );
   const quizDetails = [
     { label: "Due Date", value: quiz?.dueDate, type: "date" },
     { label: "Quiz Type", value: quiz?.quizType, type: "quizz" },
@@ -41,7 +45,7 @@ const QuizzDetailCard = ({ quiz }) => {
   ];
 
   return (
-    <div className="px-4 ">
+    <div className="px-4   ">
       {quizDetails?.map((detail, index) => {
         if (detail.type === "quizz") {
           return (
@@ -54,7 +58,11 @@ const QuizzDetailCard = ({ quiz }) => {
           );
         } else if (detail?.type === "date") {
           return (
-            <DateDetail key={index} label={detail?.label} value={detail?.value} />
+            <DateDetail
+              key={index}
+              label={detail?.label}
+              value={detail?.value}
+            />
           );
         }
       })}

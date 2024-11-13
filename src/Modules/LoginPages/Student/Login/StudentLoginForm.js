@@ -77,7 +77,6 @@ const StudentLoginForm = () => {
           ...prev,
           password: "",
         }));
-        toast.error(error || "Login failed. Please try again.");
       });
   };
 

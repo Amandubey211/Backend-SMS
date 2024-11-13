@@ -1,18 +1,19 @@
-import React, { useState } from 'react';
-import Logo from '../../../../../Components/Common/Logo';
-import { useForgotPassword } from '../../../../../Hooks/AuthHooks/Student/useResetPassword';
-import { LuLoader } from 'react-icons/lu';
-import { NavLink, useNavigate } from 'react-router-dom';
-import Layout from '../../../../../Components/Common/Layout';
-import { useLocation } from 'react-router-dom';
+import React, { useState } from "react";
+import Logo from "../../../../../Components/Common/Logo";
+import { useForgotPassword } from "../../../../../Hooks/AuthHooks/Student/useResetPassword";
+import { LuLoader } from "react-icons/lu";
+import { NavLink, useNavigate } from "react-router-dom";
+import Layout from "../../../../../Components/Common/Layout";
+import { useLocation } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const ForgetPassword = () => {
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState("");
   const { loading, sendForgotPassword } = useForgotPassword();
   const navigate = useNavigate();
   const location = useLocation();
   const { role } = location.state;
-  
+
   const handleChange = (e) => {
     setEmail(e.target.value);
   };
@@ -23,8 +24,7 @@ const ForgetPassword = () => {
       await sendForgotPassword({ email, role });
       // navigate('/reset_password');
     } catch (error) {
-      console.error('Failed to reset password:', error);
-      alert(error.msg || 'Failed to reset password.');
+      // toast.error(error.msg || "Failed to reset password.");
     }
   };
 
@@ -35,7 +35,10 @@ const ForgetPassword = () => {
           <Logo />
         </div>
 
-        <form onSubmit={handleSubmit} className="flex justify-center w-full h-full">
+        <form
+          onSubmit={handleSubmit}
+          className="flex justify-center w-full h-full"
+        >
           <div className="bg-white p-8 rounded-lg w-full max-w-3xl">
             <NavLink
               to="/"
@@ -69,7 +72,7 @@ const ForgetPassword = () => {
                   <LuLoader className="animate-spin text-2xl" />
                 </div>
               ) : (
-                'Submit'
+                "Submit"
               )}
             </button>
           </div>
