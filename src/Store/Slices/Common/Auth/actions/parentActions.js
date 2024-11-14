@@ -5,6 +5,8 @@ import { baseUrl } from "../../../../../config/Common";
 import { setUserDetails } from "../../User/reducers/userSlice";
 import toast from "react-hot-toast";
 import { fetchAcademicYear } from "../../AcademicYear/academicYear.action";
+import { handleError } from "../../Alerts/errorhandling.action";
+import { postData } from "../../../../../services/apiEndpoints";
 
 // **Parent login action**
 export const parentLogin = createAsyncThunk(
@@ -14,15 +16,15 @@ export const parentLogin = createAsyncThunk(
     { rejectWithValue, dispatch, getState }
   ) => {
     try {
-      const { data } = await axios.post(
-        `${baseUrl}/auth/parent/login`,
+      const  data  = await postData(
+        `/auth/parent/login`,
         parentDetails
       );
 
       if (data.success) {
-        const token = `Bearer ${data.token}`;
+        const token = `${data.token}`;
         localStorage.setItem("userData", JSON.stringify(data));
-        localStorage.setItem(`${data.role}:token`, token);
+        localStorage.setItem(`userToken`, token);
 
         await dispatch(fetchAcademicYear());
         const activeAcademicYear =
@@ -47,10 +49,7 @@ export const parentLogin = createAsyncThunk(
         return data.token;
       }
     } catch (error) {
-      const errorMessage =
-        error.response?.data?.msg || "Something went wrong. Please try again.";
-      toast.error(errorMessage);
-      return rejectWithValue(errorMessage);
+      handleError(error,dispatch,rejectWithValue);
     }
   }
 );
