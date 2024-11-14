@@ -4,6 +4,7 @@ import { baseUrl } from "../../../../../config/Common";
 import { setShowError, setErrorMsg } from "../../../Common/Alerts/alertsSlice";
 import { ErrorMsg } from "../../../Common/Alerts/errorhandling.action";
 import toast from "react-hot-toast";
+import { fetchStudentsByClassAndSection } from "../../Class/Students/studentThunks";
 
 const say = localStorage.getItem("say");
 
@@ -55,6 +56,25 @@ export const updateStudents = createAsyncThunk(
         headers: { Authentication: token },
       });
       toast.success(response.data?.message);
+      dispatch(fetchAllStudents())
+      return response.data;
+    } catch (error) {
+      return handleError(error, dispatch, rejectWithValue);
+    }
+  }
+);
+export const editStudents = createAsyncThunk(
+  "user/editStudents",
+  async ({id,data}, { rejectWithValue, getState, dispatch }) => {
+    try {
+      const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = localStorage.getItem("say");
+      const response = await axios.put(`${baseUrl}/admin/editStudent/${id}?say=${say}`,data, {
+        headers: { Authentication: token },
+      });
+      if(response.data.success){
+        toast.success('Student Move successfully');
+      }
       dispatch(fetchAllStudents())
       return response.data;
     } catch (error) {

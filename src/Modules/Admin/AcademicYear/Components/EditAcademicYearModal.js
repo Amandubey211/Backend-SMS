@@ -30,7 +30,7 @@ const EditAcademicYearModal = ({ show, onClose, year, refreshData }) => {
     // Preload data when the modal is opened
     if (year && show) {
       setFormData({
-        year: year.academicYear,
+        year: year?.year,
         startDate: formatDateForInput(year.startDate), // Format start date for input
         endDate: formatDateForInput(year.endDate), // Format end date for input
         isActive: year.isActive,
