@@ -3,21 +3,19 @@ import { CiMoneyBill } from "react-icons/ci";
 import { setErrorMsg, setShowError } from "../../Common/Alerts/alertsSlice";
 import { handleError } from "../../Common/Alerts/errorhandling.action";
 import { getData } from "../../../../services/apiEndpoints";
-import {
-  stdCardDashbord,
-  stdGradeDashboard,
-  stdSubjectDashboard,
-  stdTaskDashboard,
-} from "../../../../Utils/EndpoinUrls/stdEndpointUrl";
-import { classId, userId } from "../../../../Utils/localStorage/stdLocalStorage";
+import { getAY } from "../../../../Utils/academivYear";
 
 // Fetch Card Details
 export const fetchDashboardDetails = createAsyncThunk(
   "studentDashboard/fetchDashboardDetails",
   async (_, { rejectWithValue, dispatch, getState }) => {
     try {
-      const data = await getData(stdCardDashbord);
-      const { attendanceSummary } = data.data;
+      const say = getAY();
+      dispatch(setShowError(false));
+      const data = await getData(
+        `/api/studentDashboard/dashboard/student?say=${say}`
+      );
+      const { attendanceSummary } = data?.data;
       const { student } = await getState();
       const notices = student.studentAnnouncement.noticeData.length || 0;
       return {
@@ -36,8 +34,17 @@ export const fetchDashboardDetails = createAsyncThunk(
 export const fetchSubjects = createAsyncThunk(
   "studentDashboard/fetchSubjects",
   async (_, { rejectWithValue, dispatch }) => {
+    const persistUserString = localStorage.getItem("persist:user");
+    const persistUserObject = JSON.parse(persistUserString);
+    const userDetails = JSON.parse(persistUserObject?.userDetails);
+    const userId = userDetails?.userId;
+
     try {
-      const data = await getData(stdSubjectDashboard);
+      const say = getAY();
+      dispatch(setShowError(false));
+      const data = await getData(
+        `/api/studentDashboard/subjects/${userId}?say=${say}`
+      );
       return data?.subjects;
     } catch (error) {
       handleError(error, dispatch, rejectWithValue);
@@ -49,8 +56,15 @@ export const fetchSubjects = createAsyncThunk(
 export const fetchTasks = createAsyncThunk(
   "studentDashboard/fetchTasks",
   async (_, { rejectWithValue, dispatch }) => {
+    const persistUserString = localStorage.getItem("persist:user");
+    const persistUserObject = JSON.parse(persistUserString);
+    const userDetails = JSON.parse(persistUserObject?.userDetails);
+    const userId = userDetails?.userId;
+
     try {
-      const data = await getData(stdTaskDashboard);
+      const say = getAY();
+      dispatch(setShowError(false));
+      const data = await getData(`/admin/task/student/${userId}?say=${say}`);
       return data?.completedTask;
     } catch (error) {
       handleError(error, dispatch, rejectWithValue);
@@ -62,13 +76,23 @@ export const fetchTasks = createAsyncThunk(
 export const fetchStudentGrades = createAsyncThunk(
   "studentDashboard/fetchStudentGrades",
   async (_, { rejectWithValue, dispatch }) => {
+    const persistUserString = localStorage.getItem("persist:user");
+    const persistUserObject = JSON.parse(persistUserString);
+    const userDetails = JSON.parse(persistUserObject?.userDetails);
+    const userId = userDetails?.userId;
+    const classId = localStorage.getItem("classId");
+    
     if (!userId || !classId) {
       dispatch(setShowError(true));
       dispatch(setErrorMsg("Invalid student or class ID."));
       return rejectWithValue("Invalid student or class ID.");
     }
     try {
-      const data = await getData(stdGradeDashboard);
+      const say = getAY();
+      dispatch(setShowError(false));
+      const data = await getData(
+        `/admin/grades/student/${userId}/class/${classId}?say=${say}`
+      );
       return data;
     } catch (error) {
       handleError(error, dispatch, rejectWithValue);

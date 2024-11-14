@@ -2,14 +2,15 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import { handleError } from "../../Common/Alerts/errorhandling.action";
 import { setShowError } from "../../Common/Alerts/alertsSlice";
 import { getData } from "../../../../services/apiEndpoints";
-import { stdBookIssued } from "../../../../Utils/EndpoinUrls/stdEndpointUrl";
+import { getAY } from "../../../../Utils/academivYear";
 
 export const studentIssueBooks = createAsyncThunk(
   "books/studentIssueBooks",
   async (_, { rejectWithValue, dispatch }) => {
     try {
+      const say=getAY();
       dispatch(setShowError(false));
-      const data = await getData(stdBookIssued);
+      const data = await getData(`/student/issue/books?say=${say}`);
       return data;
     } catch (error) {
       console.error("Error in studentIssueBooks:", error);

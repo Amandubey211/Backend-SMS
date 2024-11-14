@@ -20,6 +20,7 @@ apiService.interceptors.request.use(
     if (token) {
       config.headers['Authentication'] = `${token}`; // Attach token to request headers with the correct header name
     }
+    
     return config;
   },
   (error) => {

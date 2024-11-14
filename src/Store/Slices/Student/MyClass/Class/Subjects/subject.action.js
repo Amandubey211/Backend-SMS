@@ -1,32 +1,22 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
-import { baseUrl } from "../../../../../../config/Common";
-import { setErrorMsg, setShowError } from "../../../../Common/Alerts/alertsSlice";
-import { ErrorMsg } from "../../../../Common/Alerts/errorhandling.action";
-const say = localStorage.getItem("say");
+import {  setShowError } from "../../../../Common/Alerts/alertsSlice";
+import { handleError } from "../../../../Common/Alerts/errorhandling.action";
+import { getAY } from "../../../../../../Utils/academivYear";
+import { getData } from "../../../../../../services/apiEndpoints";
+
 export const stdSubjectProgressPercentage = createAsyncThunk(
     'progress/stdSubjectProgressPercentage',
     async ({studentId}, { rejectWithValue, dispatch }) => {
-        const token = localStorage.getItem("student:token");
-        const say = localStorage.getItem("say")
-        if (!token) {
-            dispatch(setShowError(true));
-            dispatch(setErrorMsg("Authentication failed!"));
-            return rejectWithValue('Authentication failed!');
-        }
+    
         try {
-            const res = await axios.get(`${baseUrl}/admin/course/subjects/student/${studentId}?say=${say}`, {
-                headers: { Authentication: token }
-            });
-            const data= res?.data?.data;
-           console.log('progress data ===>>',data)
+            const say=getAY();
+            dispatch(setShowError(false));
+            const res = await getData(`/admin/course/subjects/student/${studentId}?say=${say}`);
+            const data= res?.data;
             return data;
 
         } catch (error) {
-            const err = ErrorMsg(error);
-            dispatch(setShowError(true));
-            dispatch(setErrorMsg(err.message));
-            return rejectWithValue(err.message);
+            handleError(error,dispatch,rejectWithValue);
         }
     }
 )

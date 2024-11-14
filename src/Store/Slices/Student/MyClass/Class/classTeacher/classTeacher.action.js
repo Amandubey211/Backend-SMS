@@ -1,40 +1,32 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { baseUrl } from "../../../../../../config/Common";
-import { ErrorMsg } from "../../../../Common/Alerts/errorhandling.action";
-import { setErrorMsg, setShowError } from "../../../../Common/Alerts/alertsSlice";
+import {
+  ErrorMsg,
+  handleError,
+} from "../../../../Common/Alerts/errorhandling.action";
+import {
+  setErrorMsg,
+  setShowError,
+} from "../../../../Common/Alerts/alertsSlice";
+import { getAY } from "../../../../../../Utils/academivYear";
+import { getData } from "../../../../../../services/apiEndpoints";
 
 const say = localStorage.getItem("say");
 
 export const stdClassTeacher = createAsyncThunk(
-    'classTeacher/stdClassTeacher',
-    async ({ classId }, { rejectWithValue, dispatch }) => {
-        const token = localStorage.getItem("student:token");
-        const say = localStorage.getItem("say")
-        if (!token) {
-            dispatch(setShowError(true));
-            dispatch(setErrorMsg("Authentication failed!"));
-            return rejectWithValue("Authentication failed!");
-        }
-
-        try {
-            dispatch(setShowError(false));
-
-            const res = await axios.get(`${baseUrl}/student/my_teachers/${classId}?say=${say}`, {
-                headers: {
-                    Authentication: token
-                }
-            });
-
-            console.log("Class teacher data:", res.data.data);
-            const data = res?.data?.data;
-            return data;
-        } catch (error) {
-            console.error("Error in fetching class teacher:", error);
-            const err = ErrorMsg(error);
-            dispatch(setShowError(true));
-            dispatch(setErrorMsg(err.message));
-            return rejectWithValue(err.message);
-        }
+  "classTeacher/stdClassTeacher",
+  async ({ classId }, { rejectWithValue, dispatch }) => {
+    try {
+      const say = getAY();
+      dispatch(setShowError(false));
+      const res = await getData(`/student/my_teachers/${classId}?say=${say}`);
+      console.log("Class teacher data:", res?.data);
+      const data = res?.data;
+      return data;
+    } catch (error) {
+      console.error("Error in fetching class teacher:", error);
+      handleError(error, dispatch, rejectWithValue);
     }
+  }
 );
