@@ -12,7 +12,7 @@ import { setShowError } from "../../Alerts/alertsSlice";
 // Student login action
 export const studentLogin = createAsyncThunk(
   "auth/studentLogin",
-  async (studentDetails, { rejectWithValue, dispatch,getState }) => {
+  async (studentDetails, { rejectWithValue, dispatch, getState }) => {
     try {
       const { email, password } = studentDetails;
 
@@ -21,10 +21,7 @@ export const studentLogin = createAsyncThunk(
         return rejectWithValue("Validation failed.");
       }
 
-      const data  = await postData(
-        `/auth/student/login`,
-        studentDetails
-      );
+      const data = await postData(`/auth/student/login`, studentDetails);
 
       if (data.success) {
         localStorage.setItem(`userToken`, `${data.token}`);
@@ -44,14 +41,17 @@ export const studentLogin = createAsyncThunk(
             dateOfBirth: data?.dateOfBirth,
             Q_Id: data?.Q_Id,
             enrollment: data?.enrollment,
-            className:data?.className,
-            sectionName:data?.sectionName,
+            className: data?.className,
+            sectionName: data?.sectionName,
           })
         );
 
         if (data.isVerifiedSchoolId) {
           await dispatch(fetchAcademicYear());
-          const activeAcademicYear = getState().common?.academicYear?.academicYears?.find((i)=>i.isActive == true);
+          const activeAcademicYear =
+            getState().common?.academicYear?.academicYears?.find(
+              (i) => i.isActive == true
+            );
           localStorage.setItem("say", activeAcademicYear?._id);
           return { redirect: "/student_dash" };
         } else {
@@ -61,7 +61,10 @@ export const studentLogin = createAsyncThunk(
         return rejectWithValue(data.msg || "Login failed.");
       }
     } catch (error) {
-     handleError(error,dispatch,rejectWithValue);
+      const errorMessage =
+        error.response?.data?.msg || "Something went wrong. Please try again.";
+      toast.error(errorMessage);
+      return rejectWithValue(errorMessage);
     }
   }
 );
@@ -83,13 +86,9 @@ export const studentLogout = createAsyncThunk(
 export const qidVerification = createAsyncThunk(
   "auth/qidVerification",
   async (studentDetails, { rejectWithValue, dispatch }) => {
-
     try {
       dispatch(setShowError(false));
-      const data = await postData(
-        `/student/verify_school_id`,
-        studentDetails
-      );
+      const data = await postData(`/student/verify_school_id`, studentDetails);
 
       if (data.success) {
         dispatch(setRole("student"));
@@ -98,7 +97,7 @@ export const qidVerification = createAsyncThunk(
         return rejectWithValue(data.msg || "Verification failed.");
       }
     } catch (error) {
-       handleError(error,dispatch,rejectWithValue);
+      handleError(error, dispatch, rejectWithValue);
     }
   }
 );

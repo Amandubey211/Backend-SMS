@@ -16,10 +16,7 @@ export const parentLogin = createAsyncThunk(
     { rejectWithValue, dispatch, getState }
   ) => {
     try {
-      const  data  = await postData(
-        `/auth/parent/login`,
-        parentDetails
-      );
+      const data = await postData(`/auth/parent/login`, parentDetails);
 
       if (data.success) {
         const token = `${data.token}`;
@@ -49,7 +46,10 @@ export const parentLogin = createAsyncThunk(
         return data.token;
       }
     } catch (error) {
-      handleError(error,dispatch,rejectWithValue);
+      const errorMessage =
+        error.response?.data?.msg || "Something went wrong. Please try again.";
+      toast.error(errorMessage);
+      return rejectWithValue(errorMessage);
     }
   }
 );
