@@ -15,7 +15,11 @@ import { setShowError } from "../../../../../../Store/Slices/Common/Alerts/alert
 import SidebarSlide from '../../../../../../Components/Common/SidebarSlide'
 
 const StudentTeacher = () => {
+  const { classData } = useSelector((store) => store?.student?.studentClass);
 
+  const className = classData?.className;
+
+  useNavHeading(` ${className}`, "Class Teachers");
   const dispatch = useDispatch();
   const { teacherData, loading, error } = useSelector((store) => store?.student?.studentClassTeacher);
   const { classId } = useParams();
@@ -23,7 +27,7 @@ const StudentTeacher = () => {
   const {showError}=useSelector((store)=>store?.common?.alertMsg);
 
 
-  // useNavHeading(selectedClassName, "Teachers");
+
 
   useEffect(() => {
     dispatch(stdClassTeacher({ classId }))

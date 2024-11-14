@@ -13,7 +13,18 @@ import ClassmateModal from "./ClassmateModal";
 import { setShowError } from "../../../../../../Store/Slices/Common/Alerts/alertsSlice";
 import OfflineModal from "../../../../../../Components/Common/Offline";
 import SidebarSlide from '../../../../../../Components/Common/SidebarSlide'
+import useNavHeading from "../../../../../../Hooks/CommonHooks/useNavHeading ";
+
+
 const StudentClassMates = () => {
+
+  const { classData } = useSelector((store) => store?.student?.studentClass);
+
+  const className = classData?.className;
+
+  useNavHeading(` ${className}`, "Classmates");
+
+
   const { classmateData, loading, error } = useSelector(
     (store) => store?.student?.studentClassmate
   );

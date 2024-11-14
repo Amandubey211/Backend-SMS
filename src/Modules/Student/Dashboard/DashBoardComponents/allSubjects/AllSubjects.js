@@ -1,6 +1,6 @@
 import React from "react";
 import { GoAlertFill } from "react-icons/go";
-
+import subjectIcon from '../../../../../Assets/DashboardAssets/subject.webp'
 const AllSubjects = ({ subjects }) => {
   // Colors to cycle through for the progress bars
   const progressBarColors = [
@@ -40,7 +40,7 @@ const AllSubjects = ({ subjects }) => {
                 >
                   <div className="flex items-center mb-2">
                     <img
-                      src={
+                      src={subjectIcon||
                         "https://foundr.com/wp-content/uploads/2023/04/How-to-create-an-online-course.jpg.webp"
                       }
                       alt={"subject"}
