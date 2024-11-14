@@ -3,14 +3,15 @@ import { parseISO } from "date-fns";
 import { handleError } from "../../Common/Alerts/errorhandling.action";
 import { setShowError } from "../../Common/Alerts/alertsSlice";
 import { getData } from "../../../../services/apiEndpoints";
-import { stdEvents } from "../../../../Utils/EndpoinUrls/stdEndpointUrl";
+import { getAY } from "../../../../Utils/academivYear";
 
 export const stdEvent = createAsyncThunk(
   "event/studentEvents",
   async (_, { rejectWithValue, dispatch }) => {
     try {
+      const say=getAY();
       dispatch(setShowError(false));
-      const data = await getData(stdEvents);
+      const data = await getData(`/admin/all/events?say=${say}`);
 
       const formattedEvents = data?.events?.map((event, index) => ({
         ...event,

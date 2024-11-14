@@ -3,31 +3,21 @@ import axios from "axios";
 import { baseUrl } from "../../../../../../config/Common";
 import { ErrorMsg } from "../../../../Common/Alerts/errorhandling.action";
 import { setErrorMsg, setShowError } from "../../../../Common/Alerts/alertsSlice";
+import { getAY } from "../../../../../../Utils/academivYear";
+import { getData } from "../../../../../../services/apiEndpoints";
 
-const say = localStorage.getItem("say");
 
 export const stdAttendance = createAsyncThunk(
   'attendance/stdAttendance',
   async ({ month, year }, { rejectWithValue, dispatch }) => {
-    const token = localStorage.getItem("student:token");
-    const say = localStorage.getItem("say")
-    if (!token) {
-      dispatch(setShowError(true));
-      dispatch(setErrorMsg("Authentication failed!"));
-      return rejectWithValue("Authentication failed!");
-    }
 
     try {
+      const say=getAY();
       dispatch(setShowError(false));
 
-      const res = await axios.get(
-        `${baseUrl}/api/studentDashboard/myAttendance?say=${say}`,
-        {
-          params: { month, year },
-          headers: { Authentication: token },
-        }
-      );
-      const data = res?.data?.report;
+      const res = await getData(
+        `/api/studentDashboard/myAttendance?say=${say}`, { month, year } );
+      const data = res?.report;
       console.log("Attendance in action:", data);
 
       return data;

@@ -1,352 +1,212 @@
-import axios from "axios";
-import { baseUrl } from "../../../../../../../config/Common";
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { setShowError,setErrorMsg } from "../../../../../Common/Alerts/alertsSlice";
-import { ErrorMsg } from "../../../../../Common/Alerts/errorhandling.action";
-const say = localStorage.getItem("say");
+import { setShowError } from "../../../../../Common/Alerts/alertsSlice";
+import { handleError } from "../../../../../Common/Alerts/errorhandling.action";
+import { getAY } from "../../../../../../../Utils/academivYear";
+import {
+  deleteData,
+  getData,
+  postData,
+  putData,
+} from "../../../../../../../services/apiEndpoints";
+
 export const fetchStudentAnnounce = createAsyncThunk(
-    'announce/fetchStudentAnnounce',
-    async (cid, { rejectWithValue, dispatch }) => {
-        const token = localStorage.getItem("student:token");
-        const say = localStorage.getItem("say")
-        if (!token) {
-            dispatch(setShowError(true));
-            dispatch(setErrorMsg("Authentication failed!"));
-            return rejectWithValue("Authentication failed!");
-        }
-
-        try {
-            dispatch(setShowError(false));
-            const response = await axios.get(
-                `${baseUrl}/admin/announcement/class/${cid}?say=${say}`,
-                {
-                    headers: { Authentication: token },
-                }
-            );
-            const data = response?.data?.data;
-            console.log("response data---", data);
-            return data;
-
-        } catch (error) {
-            console.log("Error in student Announcement", error);
-            const err = ErrorMsg(error);
-            dispatch(setShowError(true));
-            dispatch(setErrorMsg(err.message));
-            return rejectWithValue(err.message);
-            //return rejectWithValue((error?.response?.data?.message || error?.message || "Something Went Wrong!"))
-        }
+  "announce/fetchStudentAnnounce",
+  async (cid, { rejectWithValue, dispatch }) => {
+    try {
+      const say = getAY();
+      dispatch(setShowError(false));
+      const response = await getData(
+        `/admin/announcement/class/${cid}?say=${say}`
+      );
+      const data = response?.data;
+      console.log("response data---", data);
+      return data;
+    } catch (error) {
+      handleError(error, dispatch, rejectWithValue);
     }
-)
+  }
+);
 
 export const fetchStudentAnnounceById = createAsyncThunk(
-    'announce/fetchStudentAnnounceById',
-    async (aid, { rejectWithValue,dispatch }) => {
-        const token = localStorage.getItem("student:token");
-        const say = localStorage.getItem("say")
-        if (!token) {
-            dispatch(setShowError(true));
-            dispatch(setErrorMsg("Authentication failed!"));
-            return rejectWithValue("Authentication failed!");
-           
-        }
-
-        try {
-            const response = await axios.get(
-                `${baseUrl}/admin/announcement/${aid}?say=${say}`,
-                {
-                    headers: { Authentication: token },
-                }
-            );
-            const data = response?.data?.data;
-            console.log("response data---", data);
-            return data;
-
-        } catch (error) {
-          
-            const err = ErrorMsg(error);
-            dispatch(setShowError(true));
-            dispatch(setErrorMsg(err.message));
-            return rejectWithValue(err.message);
-        }
+  "announce/fetchStudentAnnounceById",
+  async (aid, { rejectWithValue, dispatch }) => {
+    try {
+      const say = getAY();
+      dispatch(setShowError(false));
+      const response = await getData(`/admin/announcement/${aid}?say=${say}`);
+      const data = response?.data;
+      console.log("response data---", data);
+      return data;
+    } catch (error) {
+      handleError(error, dispatch, rejectWithValue);
     }
-)
+  }
+);
 
 export const markAsReadStudentAnnounce = createAsyncThunk(
-    'announce/markAsReadStudentAnnounce',
-    async (id, { rejectWithValue,dispatch }) => {
-        const token = localStorage.getItem("student:token");
-        const say = localStorage.getItem("say")
-        if (!token) {
-            dispatch(setShowError(true));
-            dispatch(setErrorMsg("Authentication failed!"));
-            return rejectWithValue("Authentication failed!");
-        }
-
-        try {
-            const response = await axios.put(
-                `${baseUrl}/admin/markAsRead/announcement/${id}?say=${say}`,
-                {
-                    headers: { Authentication: token },
-                }
-            );
-            const data = response?.data?.data;
-            console.log("response data---", data);
-            return data;
-
-        } catch (error) {
-            const err = ErrorMsg(error);
-            dispatch(setShowError(true));
-            dispatch(setErrorMsg(err.message));
-            return rejectWithValue(err.message);
-        }
+  "announce/markAsReadStudentAnnounce",
+  async (id, { rejectWithValue, dispatch }) => {
+    try {
+      const say = getAY();
+      dispatch(setShowError(false));
+      const response = await putData(
+        `/admin/markAsRead/announcement/${id}?say=${say}`
+      );
+      const data = response?.data;
+      console.log("response data---", data);
+      return data;
+    } catch (error) {
+      handleError(error, dispatch, rejectWithValue);
     }
-)
+  }
+);
 
 // comments api's
 export const fetchStudentAnnounceComments = createAsyncThunk(
-    'announce/fetchStudentAnnounceComments',
-    async ({ aid }, { rejectWithValue,dispatch }) => {
-        const token = localStorage.getItem("student:token");
-        const say = localStorage.getItem("say")
-        if (!token) {
-            dispatch(setShowError(true));
-            dispatch(setErrorMsg("Authentication failed!"));
-            return rejectWithValue("Authentication failed!");
-        }
-
-        try {
-            const response = await axios.get(
-                `${baseUrl}/admin/getAnnouncementComment/${aid}?say=${say}`,
-                {
-                    headers: { Authentication: token },
-                }
-            );
-            const data = response?.data?.data;
-            console.log("response data---", data);
-            return data;
-
-        } catch (error) {
-            const err = ErrorMsg(error);
-            dispatch(setShowError(true));
-            dispatch(setErrorMsg(err.message));
-            return rejectWithValue(err.message);
-        }
+  "announce/fetchStudentAnnounceComments",
+  async ({ aid }, { rejectWithValue, dispatch }) => {
+    try {
+      const say = getAY();
+      dispatch(setShowError(false));
+      const response = await getData(
+        `/admin/getAnnouncementComment/${aid}?say=${say}`
+      );
+      const data = response?.data;
+      console.log("response data---", data);
+      return data;
+    } catch (error) {
+      handleError(error, dispatch, rejectWithValue);
     }
-)
+  }
+);
 
 export const createStudentAnnounceComment = createAsyncThunk(
-    'announce/createStudentAnnounceComment',
-    async ({ aid, text }, { rejectWithValue,dispatch }) => {
-        const token = localStorage.getItem("student:token");
-        const say = localStorage.getItem("say")
-        if (!token) {
-            dispatch(setShowError(true));
-            dispatch(setErrorMsg("Authentication failed!"));
-            return rejectWithValue("Authentication failed!");
-        }
-
-        try {
-            const response = await axios.post(
-                `${baseUrl}/admin/createCommentAnnouncement/${aid}/replies?say=${say}`, { content: text, parentId: null },
-                {
-                    headers: { Authentication: token },
-                }
-            );
-            const data = response?.data?.data;
-            console.log("response data---", data);
-            return data;
-
-        } catch (error) {
-            const err = ErrorMsg(error);
-            dispatch(setShowError(true));
-            dispatch(setErrorMsg(err.message));
-            return rejectWithValue(err.message);
-        }
+  "announce/createStudentAnnounceComment",
+  async ({ aid, text }, { rejectWithValue, dispatch }) => {
+    try {
+      const say = getAY();
+      dispatch(setShowError(false));
+      const response = await postData(
+        `/admin/createCommentAnnouncement/${aid}/replies?say=${say}`,
+        { content: text, parentId: null }
+      );
+      const data = response?.data;
+      console.log("response data---", data);
+      return data;
+    } catch (error) {
+      handleError(error, dispatch, rejectWithValue);
     }
-)
+  }
+);
 
 export const createStudentAnnounceReply = createAsyncThunk(
-    'announce/createStudentAnnounceReply',
-    async ({ aid, replyId, text }, { rejectWithValue,dispatch }) => {
-        const token = localStorage.getItem("student:token");
-        const say = localStorage.getItem("say")
-        if (!token) {
-            dispatch(setShowError(true));
-            dispatch(setErrorMsg("Authentication failed!"));
-            return rejectWithValue("Authentication failed!");
-        }
-
-        try {
-            const response = await axios.post(
-                `${baseUrl}/admin/createCommentAnnouncement/${aid}/replies?say=${say}`, { content: text, parentId: replyId },
-                {
-                    headers: { Authentication: token },
-                }
-            );
-            const data = response?.data?.data;
-            console.log("response data---", data);
-            return data;
-
-        } catch (error) {
-            const err = ErrorMsg(error);
-            dispatch(setShowError(true));
-            dispatch(setErrorMsg(err.message));
-            return rejectWithValue(err.message);
-        }
+  "announce/createStudentAnnounceReply",
+  async ({ aid, replyId, text }, { rejectWithValue, dispatch }) => {
+    try {
+      const say = getAY();
+      dispatch(setShowError(false));
+      const response = await postData(
+        `/admin/createCommentAnnouncement/${aid}/replies?say=${say}`,
+        { content: text, parentId: replyId }
+      );
+      const data = response?.data;
+      console.log("response data---", data);
+      return data;
+    } catch (error) {
+      handleError(error, dispatch, rejectWithValue);
     }
-)
+  }
+);
 
 export const deleteStudentAnnounceComment = createAsyncThunk(
-    'announce/deleteStudentAnnounceComment',
-    async ({ commentId }, { rejectWithValue,dispatch }) => {
-        const token = localStorage.getItem("student:token");
-        const say = localStorage.getItem("say")
-        if (!token) {
-            dispatch(setShowError(true));
-            dispatch(setErrorMsg("Authentication failed!"));
-            return rejectWithValue("Authentication failed!");
-        }
-
-        try {
-            const response = await axios.delete(
-                `${baseUrl}/admin/deleteCommentannouncement/${commentId}?say=${say}`,
-                {
-                    headers: { Authentication: token },
-                }
-            );
-            const data = response?.data?.data;
-            console.log("response data---", data);
-            return data;
-
-        } catch (error) {
-            const err = ErrorMsg(error);
-            dispatch(setShowError(true));
-            dispatch(setErrorMsg(err.message));
-            return rejectWithValue(err.message);
-        }
+  "announce/deleteStudentAnnounceComment",
+  async ({ commentId }, { rejectWithValue, dispatch }) => {
+    try {
+      const say = getAY();
+      dispatch(setShowError(false));
+      const response = await deleteData(
+        `/admin/deleteCommentannouncement/${commentId}?say=${say}`
+      );
+      const data = response?.data;
+      console.log("response data---", data);
+      return data;
+    } catch (error) {
+      handleError(error, dispatch, rejectWithValue);
     }
-)
+  }
+);
 
 export const deleteStudentAnnounceReply = createAsyncThunk(
-    'announce/deleteStudentAnnounceComment',
-    async ({ replyId }, { rejectWithValue,dispatch }) => {
-        const token = localStorage.getItem("student:token");
-        const say = localStorage.getItem("say")
-        if (!token) {
-            dispatch(setShowError(true));
-            dispatch(setErrorMsg("Authentication failed!"));
-            return rejectWithValue("Authentication failed!");
-        }
-
-        try {
-            const response = await axios.delete(
-                `${baseUrl}/admin/deleteCommentannouncement/${replyId}?say=${say}`,
-                {
-                    headers: { Authentication: token },
-                }
-            );
-            const data = response?.data?.data;
-            console.log("response data---", data);
-            return data;
-
-        } catch (error) {
-            const err = ErrorMsg(error);
-            dispatch(setShowError(true));
-            dispatch(setErrorMsg(err.message));
-            return rejectWithValue(err.message);
-        }
+  "announce/deleteStudentAnnounceComment",
+  async ({ replyId }, { rejectWithValue, dispatch }) => {
+    try {
+      const say = getAY();
+      dispatch(setShowError(false));
+      const response = await deleteData(
+        `/admin/deleteCommentannouncement/${replyId}?say=${say}`
+      );
+      const data = response?.data;
+      console.log("response data---", data);
+      return data;
+    } catch (error) {
+      handleError(error, dispatch, rejectWithValue);
     }
-)
+  }
+);
 
 export const editStudentAnnounceComment = createAsyncThunk(
-    'announce/editStudentAnnounceComment',
-    async ({ commentId, newText }, { rejectWithValue,dispatch }) => {
-        const token = localStorage.getItem("student:token");
-        const say = localStorage.getItem("say")
-        if (!token) {
-            dispatch(setShowError(true));
-            dispatch(setErrorMsg("Authentication failed!"));
-            return rejectWithValue("Authentication failed!");
-        }
-
-        try {
-            const response = await axios.put(
-                `${baseUrl}/admin/editCommentAnnouncement/${commentId}?say=${say}`, { content: newText },
-                {
-                    headers: { Authentication: token },
-                }
-            );
-            const data = response?.data?.data;
-            console.log("response data---", data);
-            return data;
-
-        } catch (error) {
-            const err = ErrorMsg(error);
-            dispatch(setShowError(true));
-            dispatch(setErrorMsg(err.message));
-            return rejectWithValue(err.message);
-        }
+  "announce/editStudentAnnounceComment",
+  async ({ commentId, newText }, { rejectWithValue, dispatch }) => {
+    try {
+      const say = getAY();
+      dispatch(setShowError(false));
+      const response = await putData(
+        `/admin/editCommentAnnouncement/${commentId}?say=${say}`,
+        { content: newText }
+      );
+      const data = response?.data;
+      console.log("response data---", data);
+      return data;
+    } catch (error) {
+      handleError(error, dispatch, rejectWithValue);
     }
-)
+  }
+);
 
 export const editStudentAnnounceReply = createAsyncThunk(
-    'announce/editStudentAnnounceReply',
-    async ({ replyId, newText }, { rejectWithValue,dispatch }) => {
-        const token = localStorage.getItem("student:token");
-        const say = localStorage.getItem("say")
-        if (!token) {
-            dispatch(setShowError(true));
-            dispatch(setErrorMsg("Authentication failed!"));
-            return rejectWithValue("Authentication failed!");
-        }
-
-        try {
-            const response = await axios.put(
-                `${baseUrl}/admin/editCommentAnnouncement/${replyId}?say=${say}`, { content: newText },
-                {
-                    headers: { Authentication: token },
-                }
-            );
-            const data = response?.data?.data;
-            console.log("response data---", data);
-            return data;
-
-        } catch (error) {
-            const err = ErrorMsg(error);
-            dispatch(setShowError(true));
-            dispatch(setErrorMsg(err.message));
-            return rejectWithValue(err.message);
-        }
+  "announce/editStudentAnnounceReply",
+  async ({ replyId, newText }, { rejectWithValue, dispatch }) => {
+    try {
+      const say = getAY();
+      dispatch(setShowError(false));
+      const response = await putData(
+        `/admin/editCommentAnnouncement/${replyId}?say=${say}`,
+        { content: newText }
+      );
+      const data = response?.data;
+      console.log("response data---", data);
+      return data;
+    } catch (error) {
+      handleError(error, dispatch, rejectWithValue);
     }
-)
+  }
+);
 
 export const toggleStudentAnnounceLike = createAsyncThunk(
-    'announce/toggleStudentAnnounceLike',
-    async ({ id }, { rejectWithValue,dispatch }) => {
-        const token = localStorage.getItem("student:token");
-        const say = localStorage.getItem("say")
-        if (!token) {
-            dispatch(setShowError(true));
-            dispatch(setErrorMsg("Authentication failed!"));
-            return rejectWithValue("Authentication failed!");
-        }
-
-        try {
-            const response = await axios.put(
-                `${baseUrl}/admin/likeAnnouncementComment/${id}?say=${say}`, {},
-                {
-                    headers: { Authentication: token },
-                }
-            );
-            const data = response?.data?.data;
-            console.log("response data---", data);
-            return data;
-
-        } catch (error) {
-            const err = ErrorMsg(error);
-            dispatch(setShowError(true));
-            dispatch(setErrorMsg(err.message));
-            return rejectWithValue(err.message);
-        }
+  "announce/toggleStudentAnnounceLike",
+  async ({ id }, { rejectWithValue, dispatch }) => {
+    try {
+      const say = getAY();
+      dispatch(setShowError(false));
+      const response = await putData(
+        `/admin/likeAnnouncementComment/${id}?say=${say}`,
+        {}
+      );
+      const data = response?.data;
+      console.log("response data---", data);
+      return data;
+    } catch (error) {
+      handleError(error, dispatch, rejectWithValue);
     }
-)
+  }
+);
