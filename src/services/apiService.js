@@ -14,13 +14,12 @@ const apiService = axios.create({
 // Add a request interceptor (optional)
 apiService.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("student:token"); // Retrieve token from localStorage
+    const token = localStorage.getItem("userToken"); // Retrieve token from localStorage
     // console.log("Token Retrieved:", token); // Debugging the token
 
     if (token) {
-      config.headers['Authentication'] = `${token}`; // Attach token to request headers with the correct header name
+      config.headers['Authentication'] = `Bearer ${token}`; // Attach token to request headers with the correct header name
     }
-    
     return config;
   },
   (error) => {
@@ -28,14 +27,14 @@ apiService.interceptors.request.use(
   }
 );
 
-// Add a response interceptor (optional)
-apiService.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    // Handle errors globally
-    console.error('API error:', error);
-    return Promise.reject(error);
-  }
-);
+// // Add a response interceptor (optional)
+// apiService.interceptors.response.use(
+//   (response) => response,
+//   (error) => {
+//     // Handle errors globally
+//     console.error('API error:', error);
+//     return Promise.reject(error);
+//   }
+// );
 
 export default apiService;
