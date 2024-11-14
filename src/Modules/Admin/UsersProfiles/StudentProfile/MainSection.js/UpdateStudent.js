@@ -159,7 +159,7 @@ const UpdateStudent = ({ data, handleUpdateSidebarClose }) => {
               <FormInput id="city"  label="City" value={studentData.permanentAddress.city} name="city" onChange={(e) => handleAddressChange(e, "permanentAddress")} />
               <FormInput id="state"  label="State" value={studentData.permanentAddress.state} name="state" onChange={(e) => handleAddressChange(e, "permanentAddress")} />
               <FormInput id="postalCode"  label="Postal Code" value={studentData.permanentAddress.postalCode} name="postalCode" onChange={(e) => handleAddressChange(e, "permanentAddress")} />
-              <FormInput id="permanentCountry" label="Country" value={studentData.permanentAddress.country} name="country" onChange={(e) => handleAddressChange(e, "permanentAddress")} />
+              <FormInput id="country" label="Country" value={studentData.permanentAddress.country} name="country" onChange={(e) => handleAddressChange(e, "permanentAddress")} />
             </div>
           </div>
 
@@ -178,7 +178,7 @@ const UpdateStudent = ({ data, handleUpdateSidebarClose }) => {
 
         {/* Submit Button */}
         <div className="flex justify-center">
-          <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">
+          <button type="submit" className="bg-purple-400 text-white px-4 py-2 rounded">
             {loading ? "Updating..." : "Update"}
           </button>
         </div>

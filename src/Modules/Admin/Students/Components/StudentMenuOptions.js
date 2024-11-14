@@ -71,13 +71,13 @@ const StudentMenuOptions = ({
           "Move to Section": (
             <MoveToSection student={student} onClose={handleSidebarClose} />
           ),
-          "Edit Student": (
-            <EditStudent
-              studentId={studentId}
-              fetchGroups={fetchGroups}
-              onClose={handleSidebarClose}
-            />
-          ),
+          // "Class change": (
+          //   <EditStudent
+          //     studentId={studentId}
+          //     fetchGroups={fetchGroups}
+          //     onClose={handleSidebarClose}
+          //   />
+          // ),
           "Demote Class": <DemoteClass student={student} />,
           "Graduate Student": <GraduateStudent student={student} />,
         };
@@ -148,11 +148,11 @@ const StudentMenuOptions = ({
               text="Move to Section"
               onClick={() => handleMenuItemClick("Move to Section")}
             />
-            <MenuItem
+            {/* <MenuItem
               icon={<MdOutlineModeEditOutline className="text-[#0D9755]" />}
-              text="Edit Student"
-              onClick={() => handleMenuItemClick("Edit Student")}
-            />
+              text="Class change"
+              onClick={() => handleMenuItemClick("Class change")}
+            /> */}
             <MenuItem
               icon={<FaGraduationCap className="text-yellow-400" />}
               text="Graduate Student"
