@@ -1,45 +1,30 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
-import { baseUrl } from "../../../../config/Common";
-import { format, parseISO, isValid } from "date-fns";
-import { ErrorMsg } from "../../Common/Alerts/errorhandling.action";
-import { setErrorMsg, setShowError } from "../../Common/Alerts/alertsSlice";
-const say = localStorage.getItem("say");
+import { parseISO } from "date-fns";
+import { handleError } from "../../Common/Alerts/errorhandling.action";
+import { setShowError } from "../../Common/Alerts/alertsSlice";
+import { getData } from "../../../../services/apiEndpoints";
+import { stdEvents } from "../../../../Utils/EndpoinUrls/stdEndpointUrl";
+
 export const stdEvent = createAsyncThunk(
-    'event/studentEvents',
-    async (_, { rejectWithValue, dispatch }) => {
-        const token = localStorage.getItem("student:token");
-        const say = localStorage.getItem("say")
-        if (!token) {
-            dispatch(setShowError(true));
-            dispatch(setErrorMsg(`Authentication failed!`));
-            return rejectWithValue(`Authentication failed!`);
-        }
-        try {
-            dispatch(setShowError(false));
+  "event/studentEvents",
+  async (_, { rejectWithValue, dispatch }) => {
+    try {
+      dispatch(setShowError(false));
+      const data = await getData(stdEvents);
 
-            const res = await axios.get(`${baseUrl}/admin/all/events?say=${say}`, {
-                headers: { Authentication: token }
-            });
+      const formattedEvents = data?.events?.map((event, index) => ({
+        ...event,
+        id: index,
+        startDate: parseISO(event.date),
+        endDate: new Date(
+          new Date(event.date).setHours(new Date(event.date).getHours() + 2)
+        ),
+      }));
 
-            const data = res?.data;
-            const formattedEvents = data?.events?.map((event, index) => ({
-                ...event,
-                id: index,
-                startDate: parseISO(event.date),
-                endDate: new Date(
-                    new Date(event.date).setHours(new Date(event.date).getHours() + 2)
-                ),
-            }));
-
-            return formattedEvents;
-        }
-
-        catch (error) {
-            const err = ErrorMsg(error);
-            dispatch(setShowError(true));
-            dispatch(setErrorMsg(err.message));
-            return rejectWithValue(err.message);
-        }
+      return formattedEvents;
+    } catch (error) {
+      console.log("Error in std Event", error);
+      handleError(error, dispatch, rejectWithValue);
     }
-)
+  }
+);
