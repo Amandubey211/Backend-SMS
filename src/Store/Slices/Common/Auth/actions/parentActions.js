@@ -15,6 +15,7 @@ export const parentLogin = createAsyncThunk(
     { parentDetails, navigate },
     { rejectWithValue, dispatch, getState }
   ) => {
+    console.log("ddddd-========--------",getState())
     try {
       const data = await postData(`/auth/parent/login`, parentDetails);
 
@@ -24,11 +25,11 @@ export const parentLogin = createAsyncThunk(
         localStorage.setItem(`userToken`, token);
 
         await dispatch(fetchAcademicYear());
-        const activeAcademicYear =
-          getState().common?.academicYear?.academicYears?.find(
-            (i) => i.isActive == true
-          );
-        localStorage.setItem("say", activeAcademicYear?._id);
+          const activeAcademicYear =
+            await getState().common?.academicYear?.academicYears?.find(
+              (i) => i.isActive == true
+            );
+          localStorage.setItem("say", activeAcademicYear?._id);
         dispatch(setToken(data.token)); // Store token in state
         dispatch(setRole(data.role)); // Set role
 

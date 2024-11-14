@@ -3,7 +3,7 @@ import { setErrorMsg, setShowError } from "../../Common/Alerts/alertsSlice";
 import {  handleError } from "../../Common/Alerts/errorhandling.action";
 import { getAY } from "../../../../Utils/academivYear";
 import { getData } from "../../../../services/apiEndpoints";
-const say = localStorage.getItem("say");
+
 
 // Fetch dashboard cards
 export const fetchDashboardCards = createAsyncThunk(

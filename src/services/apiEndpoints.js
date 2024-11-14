@@ -8,8 +8,7 @@ export const getData = async (endpoint, params = {}) => {
     const response = await apiService.get(endpoint, { params });
     return response.data;
   } catch (error) {
-    console.error('Error fetching data:', error);
-    throw error;
+    console.log('Error fetching data:', error);
   }
 };
 
@@ -19,8 +18,7 @@ export const postData = async (endpoint, data) => {
     const response = await apiService.post(endpoint, data);
     return response.data;
   } catch (error) {
-    console.error('Error posting data:', error);
-    throw error;
+    console.log('Error posting data:', error);
   }
 };
 
@@ -30,8 +28,7 @@ export const putData = async (endpoint, data) => {
     const response = await apiService.put(endpoint, data);
     return response.data;
   } catch (error) {
-    console.error('Error updating data:', error);
-    throw error;
+    console.log('Error updating data:', error);
   }
 };
 
@@ -41,8 +38,8 @@ export const deleteData = async (endpoint) => {
     const response = await apiService.delete(endpoint);
     return response.data;
   } catch (error) {
-    console.error('Error deleting data:', error);
-    throw error;
+    console.log('Error deleting data:', error);
+
   }
 };
 
@@ -52,8 +49,7 @@ export const patchData = async (endpoint, data) => {
     const response = await apiService.patch(endpoint, data);
     return response.data;
   } catch (error) {
-    console.error('Error patching data:', error);
-    throw error;
+    console.log('Error patching data:', error);
   }
 };
 
@@ -67,7 +63,7 @@ export const customRequest = async (method, endpoint, data = null) => {
     });
     return response.data;
   } catch (error) {
-    console.error('Error with custom request:', error);
-    throw error;
+    console.log('Error with custom request:', error);
+   
   }
 };

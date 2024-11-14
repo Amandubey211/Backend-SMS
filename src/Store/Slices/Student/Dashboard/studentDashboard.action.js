@@ -17,7 +17,7 @@ export const fetchDashboardDetails = createAsyncThunk(
       );
       const { attendanceSummary } = data?.data;
       const { student } = await getState();
-      const notices = student.studentAnnouncement.noticeData.length || 0;
+      const notices = student?.studentAnnouncement?.noticeData?.length || 0;
       return {
         cardData: formatDashboardData(data, notices),
         paidFees: data?.data?.totalPaidFees,
@@ -38,13 +38,18 @@ export const fetchSubjects = createAsyncThunk(
     const persistUserObject = JSON.parse(persistUserString);
     const userDetails = JSON.parse(persistUserObject?.userDetails);
     const userId = userDetails?.userId;
-
+    if (!userId ) {
+      dispatch(setShowError(true));
+      dispatch(setErrorMsg("Invalid student or class ID."));
+      return rejectWithValue("Invalid student or class ID.");
+    }
+ 
     try {
+    
       const say = getAY();
       dispatch(setShowError(false));
-      const data = await getData(
-        `/api/studentDashboard/subjects/${userId}?say=${say}`
-      );
+      const data =  await getData(`/api/studentDashboard/subjects/${userId}?say=${say}`);
+      console.log("errorrrrrrr",data)
       return data?.subjects;
     } catch (error) {
       handleError(error, dispatch, rejectWithValue);
@@ -59,9 +64,15 @@ export const fetchTasks = createAsyncThunk(
     const persistUserString = localStorage.getItem("persist:user");
     const persistUserObject = JSON.parse(persistUserString);
     const userDetails = JSON.parse(persistUserObject?.userDetails);
-    const userId = userDetails?.userId;
-
+    const userId = await  userDetails?.userId;
+    if (!userId ) {
+      dispatch(setShowError(true));
+      dispatch(setErrorMsg("Invalid student or class ID."));
+      return rejectWithValue("Invalid student or class ID.");
+    }
+   
     try {
+    
       const say = getAY();
       dispatch(setShowError(false));
       const data = await getData(`/admin/task/student/${userId}?say=${say}`);

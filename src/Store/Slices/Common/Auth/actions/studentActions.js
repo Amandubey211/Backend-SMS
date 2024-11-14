@@ -49,7 +49,7 @@ export const studentLogin = createAsyncThunk(
         if (data.isVerifiedSchoolId) {
           await dispatch(fetchAcademicYear());
           const activeAcademicYear =
-            getState().common?.academicYear?.academicYears?.find(
+            await getState().common?.academicYear?.academicYears?.find(
               (i) => i.isActive == true
             );
           localStorage.setItem("say", activeAcademicYear?._id);

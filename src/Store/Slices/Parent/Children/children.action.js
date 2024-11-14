@@ -6,7 +6,6 @@ import axios from "axios";
 import { getAY } from "../../../../Utils/academivYear";
 import { getData } from "../../../../services/apiEndpoints";
 
-const say = localStorage.getItem("say");
 
 // Thunk to fetch children
 export const fetchChildren = createAsyncThunk(

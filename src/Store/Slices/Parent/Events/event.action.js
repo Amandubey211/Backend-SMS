@@ -15,7 +15,7 @@ export const fetchAllEvents = createAsyncThunk(
       const say = getAY();
       dispatch(setShowError(false));
       const data = await getData(`/admin/all/events?say=${say}`);
-      return data.events;
+      return data?.events;
     } catch (error) {
       handleError(error, dispatch, rejectWithValue);
     }
