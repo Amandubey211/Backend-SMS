@@ -9,7 +9,7 @@ import useNavHeading from "../../../Hooks/CommonHooks/useNavHeading .js";
 const ParentDash = () => {
   const { t } = useTranslation('prtChildrens'); // Initialize translation hook
 
-  useNavHeading(t("My Childs"));
+  useNavHeading(t("My Children"));
   return (
     <Layout title="Parents | Children">
       <DashLayout children={<MyChildren />} hideAvatarList={true} />

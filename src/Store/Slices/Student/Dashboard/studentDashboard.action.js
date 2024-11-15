@@ -5,6 +5,46 @@ import { handleError } from "../../Common/Alerts/errorhandling.action";
 import { getData } from "../../../../services/apiEndpoints";
 import { getAY } from "../../../../Utils/academivYear";
 
+
+// Helper function to format dashboard data
+const formatDashboardData = (dashboardData, notices) => {
+  return [
+    {
+      label: "Upcoming Exam",
+      value: dashboardData?.data?.upcomingExam,
+      bgColor: "bg-green-100",
+      textColor: "text-black-500",
+      icon: "📝",
+      url: "/student_dash",
+    },
+    {
+      label: "Due Fees",
+      value: dashboardData?.data?.dueFees,
+      bgColor: "bg-red-100",
+      textColor: "text-black-500",
+      icon: <CiMoneyBill />,
+      url: "/student_finance",
+    },
+    {
+      label: "Event",
+      value: dashboardData?.data?.events,
+      bgColor: "bg-blue-100",
+      textColor: "text-black-500",
+      icon: "📅",
+      url: "/student/noticeboard/events",
+    },
+    {
+      label: "Notice",
+      value: notices,
+      bgColor: "bg-yellow-100",
+      textColor: "text-black-500",
+      icon: "🔔",
+      url: "/student/noticeboard/announcements",
+    },
+  ];
+};
+
+
 // Fetch Card Details
 export const fetchDashboardDetails = createAsyncThunk(
   "studentDashboard/fetchDashboardDetails",
@@ -17,6 +57,7 @@ export const fetchDashboardDetails = createAsyncThunk(
       );
       const { attendanceSummary } = data?.data;
       const { student } = await getState();
+      console.log("std----?>>>>",student)
       const notices = student?.studentAnnouncement?.noticeData?.length || 0;
       return {
         cardData: formatDashboardData(data, notices),
@@ -111,40 +152,3 @@ export const fetchStudentGrades = createAsyncThunk(
   }
 );
 
-// Helper function to format dashboard data
-const formatDashboardData = (dashboardData, notices) => {
-  return [
-    {
-      label: "Upcoming Exam",
-      value: dashboardData?.data?.upcomingExam,
-      bgColor: "bg-green-100",
-      textColor: "text-black-500",
-      icon: "📝",
-      url: "/student_dash",
-    },
-    {
-      label: "Due Fees",
-      value: dashboardData?.data?.dueFees,
-      bgColor: "bg-red-100",
-      textColor: "text-black-500",
-      icon: <CiMoneyBill />,
-      url: "/student_finance",
-    },
-    {
-      label: "Event",
-      value: dashboardData?.data?.events,
-      bgColor: "bg-blue-100",
-      textColor: "text-black-500",
-      icon: "📅",
-      url: "/student/noticeboard/events",
-    },
-    {
-      label: "Notice",
-      value: notices,
-      bgColor: "bg-yellow-100",
-      textColor: "text-black-500",
-      icon: "🔔",
-      url: "/student/noticeboard/announcements",
-    },
-  ];
-};
