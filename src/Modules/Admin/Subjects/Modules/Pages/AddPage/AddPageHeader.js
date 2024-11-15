@@ -2,8 +2,14 @@ import React from "react";
 import { IoIosArrowBack } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 import { ImSpinner8 } from "react-icons/im";
+import PropTypes from "prop-types"; // For prop type validation (optional)
 
-const AddPageHeader = ({ onSave, isUpdating, loadingType }) => {
+const AddPageHeader = ({
+  onSave,
+  isUpdating,
+  loadingType,
+  isPublishDateSet,
+}) => {
   const navigate = useNavigate();
 
   return (
@@ -20,7 +26,11 @@ const AddPageHeader = ({ onSave, isUpdating, loadingType }) => {
       <div className="flex items-center space-x-2">
         <button
           onClick={() => onSave(false)} // Save without publishing
-          className="flex-grow rounded-md py-2 px-6 text-center bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200 transition"
+          className={`flex-grow rounded-md py-2 px-6 text-center bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200 transition ${
+            loadingType === "save" || loadingType === "publish"
+              ? "opacity-50 cursor-not-allowed"
+              : ""
+          }`}
           disabled={loadingType === "save" || loadingType === "publish"}
         >
           <span className="text-gradient flex items-center justify-center">
@@ -38,8 +48,23 @@ const AddPageHeader = ({ onSave, isUpdating, loadingType }) => {
         </button>
         <button
           onClick={() => onSave(true)} // Save and publish
-          className="flex-grow rounded-md py-2 px-6 text-center bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200 transition"
-          disabled={loadingType === "save" || loadingType === "publish"}
+          className={`flex-grow rounded-md py-2 px-6 text-center bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200 transition ${
+            loadingType === "save" ||
+            loadingType === "publish" ||
+            !isPublishDateSet
+              ? "opacity-50 cursor-not-allowed"
+              : ""
+          }`}
+          disabled={
+            loadingType === "save" ||
+            loadingType === "publish" ||
+            !isPublishDateSet
+          }
+          title={
+            !isPublishDateSet
+              ? "Publish date is required to publish the page."
+              : ""
+          }
         >
           <span className="text-gradient flex items-center justify-center">
             {loadingType === "publish" ? (
@@ -57,6 +82,14 @@ const AddPageHeader = ({ onSave, isUpdating, loadingType }) => {
       </div>
     </div>
   );
+};
+
+// Optional: Define prop types for better type checking
+AddPageHeader.propTypes = {
+  onSave: PropTypes.func.isRequired,
+  isUpdating: PropTypes.bool.isRequired,
+  loadingType: PropTypes.string.isRequired,
+  isPublishDateSet: PropTypes.bool.isRequired,
 };
 
 export default AddPageHeader;

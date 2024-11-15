@@ -82,6 +82,7 @@ export const createDiscussion = createAsyncThunk(
         }
       );
       if (response.data.status) {
+        alert("dd");
         toast.success("Discussion Created");
       }
       return response.data.data;

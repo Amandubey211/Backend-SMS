@@ -92,6 +92,9 @@ const AddPage = () => {
     ]
   );
 
+  // Compute if publish date is set
+  const isPublishDateSet = publishAt.trim() !== "";
+
   return (
     <Layout
       title={
@@ -108,6 +111,7 @@ const AddPage = () => {
             onSave={handleSave}
             isUpdating={isUpdating}
             loadingType={loadingType}
+            isPublishDateSet={isPublishDateSet} // Passing the prop
           />
           <div className="flex w-full">
             <div className="w-[70%]">
