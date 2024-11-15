@@ -182,7 +182,7 @@ export const createQuizThunk = createAsyncThunk(
       if (response.data.success) {
         toast.success("Quiz created successfully");
         dispatch(fetchQuizByIdThunk(response.data.quiz._id));
-        return response.data.quiz;
+        return response.data;
       } else {
         throw new Error(response.data.message || "Failed to create quiz");
       }

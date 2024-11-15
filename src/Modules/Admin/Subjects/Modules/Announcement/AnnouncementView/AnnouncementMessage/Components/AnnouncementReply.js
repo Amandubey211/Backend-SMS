@@ -39,7 +39,7 @@ const AnnouncementReply = ({
   };
 
   return (
-    <div className="ml-10 mt-2 p-4 bg-gray-100 rounded-md shadow-sm">
+    <div className="ml-10 mt-2 p-2 px-4 bg-gray-100 rounded-md shadow-sm">
       <div className="flex items-center mb-2">
         <img
           src={reply.profile}
@@ -53,10 +53,10 @@ const AnnouncementReply = ({
           </span>
         </div>
         <div className="ml-auto flex space-x-2">
-          <MdOutlineEdit
+          {/* <MdOutlineEdit
             className="text-gray-500 text-lg cursor-pointer"
             onClick={() => setIsEditing(true)}
-          />
+          /> */}
           <RxCross2
             className="text-red-500 text-lg cursor-pointer"
             onClick={() => {}}
@@ -72,7 +72,7 @@ const AnnouncementReply = ({
       ) : (
         <>
           <p className="text-gray-700 mb-2">{reply.content}</p>
-          <div className="flex items-center mb-2 pt-3 border-t border-gray-200">
+          <div className="flex items-center pt-3 border-t border-gray-200">
             {isLiked ? (
               <FcLike
                 className="text-gray-500 cursor-pointer"

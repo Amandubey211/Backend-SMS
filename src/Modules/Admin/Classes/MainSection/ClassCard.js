@@ -94,7 +94,7 @@ const ClassCard = ({ role, classData, onEdit }) => {
           <p>{teachersCount} Teachers</p>
           <img
             src={classIcons?.imageLink || centerLogo}
-            className="w-20"
+            className="w-20 h-20 object-contain"
             alt="center_logo"
           />
         </NavLink>

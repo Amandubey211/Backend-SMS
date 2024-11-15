@@ -81,12 +81,12 @@ const AnnouncementComment = ({
           </span>
         </div>
         <div className="ml-auto flex space-x-2">
-          <MdOutlineEdit
+          {/* <MdOutlineEdit
             className={`text-xl cursor-pointer ${
               isEditing ? "text-blue-500" : "text-gray-500"
             }`}
             onClick={() => setIsEditing((prev) => !prev)} // Toggle edit mode
-          />
+          /> */}
           <RxCross2
             className="text-red-500 cursor-pointer text-xl"
             onClick={handleDeleteComment} // Delete comment
