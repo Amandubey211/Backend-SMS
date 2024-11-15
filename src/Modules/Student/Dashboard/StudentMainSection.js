@@ -104,7 +104,7 @@ const StudentMainSection = () => {
         <div className="absolute left-1/3 transform -translate-x-1/2 top-0 bottom-0 border-l border-gray-300"></div>
         <div className="w-[32%] flex items-center justify-center p-4">
           <div className="w-full h-full">
-            <div className="pt-2 pl-5">
+            <div className="pt-2 pl-1">
               <div className="flex justify-between items-center mb-2">
                 <h2 className="text-xl font-semibold text-gray-600">
                   My Subject
@@ -160,7 +160,7 @@ const StudentMainSection = () => {
       {/* Notice Board and Task Section */}
       <div className="flex flex-row w-[100%] h-full border-t relative">
         <div className="absolute left-2/3 transform -translate-x-1/2 top-0 bottom-0 border-l border-gray-300"></div>
-        <div className="w-[70%] flex items-center justify-center pl-3">
+        <div className="w-[67%] flex items-center justify-center pl-1">
           <div className="w-full h-full">
             <DashboardNoticeBoard descriptionLength={58} />
           </div>
