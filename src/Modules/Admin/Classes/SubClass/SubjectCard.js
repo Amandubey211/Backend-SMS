@@ -13,6 +13,7 @@ import {
   setSelectedSubjectId,
   setSelectedSubjectName,
 } from "../../../../Store/Slices/Common/User/reducers/userSlice";
+import { useTranslation } from "react-i18next";
 
 const SubjectCard = ({
   data,
@@ -24,6 +25,7 @@ const SubjectCard = ({
 }) => {
   const dispatch = useDispatch();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { t } = useTranslation("admClass");
 
   const handleDelete = () => {
     dispatch(deleteSubject({ subjectId, classId: Class }));
@@ -43,12 +45,14 @@ const SubjectCard = ({
           <button
             onClick={() => onEdit(data)}
             className="bg-white p-1 rounded-full shadow hover:bg-gray-200"
+            aria-label={t("Edit")}
           >
             <MdOutlineModeEdit className="text-green-800 bg-green-50 p-1 text-3xl rounded-full cursor-pointer" />
           </button>
           <button
             className="bg-white p-1 rounded-full shadow hover:bg-gray-200"
             onClick={() => setIsModalOpen(true)}
+            aria-label={t("Delete")}
           >
             <RiDeleteBin6Line className="text-red-800 bg-red-50 p-1 text-3xl rounded-full cursor-pointer" />
           </button>
@@ -71,7 +75,7 @@ const SubjectCard = ({
               : "bg-pink-50 text-gray-600"
           }`}
         >
-          {data.isPublished ? "Published" : "Unpublished"}
+          {data.isPublished ? t("Published") : t("Unpublished")}
         </button>
       </div>
 
@@ -87,7 +91,7 @@ const SubjectCard = ({
           <span className="border-r-2 border-white h-5 mr-2"></span>
           <span className="flex items-center gap-1">
             <BsBook />
-            <span>{data.modules.length} Modules</span>
+            <span>{t("Modules", { count: data.modules.length })}</span>
           </span>
         </div>
       </NavLink>
@@ -96,7 +100,7 @@ const SubjectCard = ({
         {data.teacherId?.profile ? (
           <img
             src={data.teacherId?.profile}
-            alt="teacher"
+            alt={t("Teacher profile picture")}
             className="w-12 h-12 rounded-full transition-transform duration-300 transform hover:scale-110"
           />
         ) : (
@@ -104,18 +108,18 @@ const SubjectCard = ({
         )}
         <div className="ml-3 capitalize">
           <p className="text-white font-semibold">
-            {data?.teacherId?.firstName + data?.teacherId?.lastName ||
-              "No Instructor Assigned"}
+            {data?.teacherId?.firstName + " " + data?.teacherId?.lastName ||
+              t("No Instructor Assigned")}
           </p>
           <p className="text-white text-sm">
-            {data?.teacherId?.role || "Teacher"}
+            {data?.teacherId?.role || t("Teacher")}
           </p>
         </div>
       </div>
 
       <img
         src={SubjectIcon}
-        alt="icon"
+        alt={t("Subject icon")}
         className="absolute bottom-6 right-6 h-28 transition-transform duration-300 transform hover:scale-110"
       />
     </div>

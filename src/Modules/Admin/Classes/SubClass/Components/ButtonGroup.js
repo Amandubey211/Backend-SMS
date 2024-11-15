@@ -1,12 +1,10 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 
-const ButtonGroup = ({
-  onAddNewSubject,
-  selectedTab,
-  setSelectedTab,
-  role,
-}) => {
+const ButtonGroup = ({ onAddNewSubject, selectedTab, setSelectedTab, role }) => {
+  const { t } = useTranslation("admClass");
+
   return (
     <div className="flex justify-between items-center mb-8">
       <div className="flex space-x-4">
@@ -18,7 +16,7 @@ const ButtonGroup = ({
           }`}
           onClick={() => setSelectedTab("Published")}
         >
-          Published
+          {t("Published")}
         </button>
         <button
           className={`px-4 py-2 rounded-md ${
@@ -28,15 +26,15 @@ const ButtonGroup = ({
           }`}
           onClick={() => setSelectedTab("Draft")}
         >
-          Draft
+          {t("Draft")}
         </button>
       </div>
       {role === "admin" && (
         <button
           onClick={onAddNewSubject}
-          className="flex items-center border border-gray-300 ps-5  py-0 rounded-full"
+          className="flex items-center border border-gray-300 ps-5 py-0 rounded-full"
         >
-          <span className="mr-2">Add New Subject</span>
+          <span className="mr-2">{t("Add New Subject")}</span>
           <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full w-12 h-12 flex items-center justify-center">
             <span className="text-3xl -mt-2">+</span>
           </div>

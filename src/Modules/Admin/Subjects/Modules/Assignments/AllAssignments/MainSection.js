@@ -6,6 +6,7 @@ import SubjectSideBar from "../../../Component/SubjectSideBar";
 import FilterCard from "../Component/FilterCard";
 import List from "../Component/List";
 import { fetchFilteredAssignments } from "../../../../../../Store/Slices/Admin/Class/Assignment/assignmentThunks";
+import { useTranslation } from "react-i18next";
 
 const MainSection = () => {
   const { sid, cid } = useParams();
@@ -13,6 +14,7 @@ const MainSection = () => {
   const { assignments, loading, error } = useSelector(
     (state) => state.admin.assignments
   );
+  const { t } = useTranslation("admClass");
 
   const [filters, setFilters] = React.useState({
     moduleId: "",
@@ -37,8 +39,8 @@ const MainSection = () => {
       <SubjectSideBar />
       <div className="w-[65%] border-l">
         <List
-          type="Assignment"
-          title="All Assignments"
+          type={t("Assignment")}
+          title={t("All Assignments")}
           data={assignments}
           icon={<RiListCheck3 />}
           loading={loading}
@@ -48,7 +50,11 @@ const MainSection = () => {
       <div className="w-[30%] p-2">
         <FilterCard filters={filters} setFilters={setFilters} />
       </div>
-      <NavLink to={`/class/${cid}/${sid}/createassignment`} {...navLinkStyles}>
+      <NavLink
+        to={`/class/${cid}/${sid}/createassignment`}
+        aria-label={t("Create Assignment")}
+        {...navLinkStyles}
+      >
         <RiAddFill size={24} />
       </NavLink>
     </div>

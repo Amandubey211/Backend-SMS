@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { FaSpinner } from "react-icons/fa";
 import toast from "react-hot-toast"; // Import toast
+import { useTranslation } from "react-i18next";
 
 const CreateAcademicYearForm = ({
   newYear,
@@ -8,6 +9,7 @@ const CreateAcademicYearForm = ({
   handleCreate,
   loading,
 }) => {
+  const { t } = useTranslation("admAcademicYear"); // Use translation hook
   const [errors, setErrors] = useState({});
 
   const validateForm = () => {
@@ -16,20 +18,20 @@ const CreateAcademicYearForm = ({
     // Validate Academic Year format (YYYY-YYYY)
     const yearPattern = /^\d{4}-\d{4}$/;
     if (!newYear.year || !yearPattern.test(newYear.year)) {
-      formErrors.year = "Academic Year must be in format 'YYYY-YYYY'.";
-      toast.error("Invalid Academic Year format. Please enter 'YYYY-YYYY'.");
+      formErrors.year = t("Academic Year must be in format 'YYYY-YYYY'.");
+      toast.error(t("Invalid Academic Year format. Please enter 'YYYY-YYYY'."));
     }
 
     // Validate Start Date
     if (!newYear.startDate) {
-      formErrors.startDate = "Start Date is required.";
-      toast.error("Start Date is required.");
+      formErrors.startDate = t("Start Date is required.");
+      toast.error(t("Start Date is required."));
     }
 
     // Validate End Date
     if (!newYear.endDate) {
-      formErrors.endDate = "End Date is required.";
-      toast.error("End Date is required.");
+      formErrors.endDate = t("End Date is required.");
+      toast.error(t("End Date is required."));
     }
 
     // Ensure End Date is after Start Date
@@ -38,8 +40,8 @@ const CreateAcademicYearForm = ({
       newYear.endDate &&
       newYear.endDate < newYear.startDate
     ) {
-      formErrors.endDate = "End Date cannot be before Start Date.";
-      toast.error("End Date cannot be before Start Date.");
+      formErrors.endDate = t("End Date cannot be before Start Date.");
+      toast.error(t("End Date cannot be before Start Date."));
     }
 
     setErrors(formErrors);
@@ -56,14 +58,14 @@ const CreateAcademicYearForm = ({
   return (
     <div className="bg-white p-4 rounded-lg shadow-md w-full border sticky top-2">
       <h2 className="text-xl font-semibold text-gray-800 mb-3">
-        Create Academic Year
+        {t("Create Academic Year")}
       </h2>
 
       <form onSubmit={handleSubmit}>
         {/* Academic Year Input */}
         <div className="mb-2">
           <label className="block text-sm text-gray-700 font-medium mb-1">
-            Academic Year (YYYY-YYYY)
+            {t("Academic Year (YYYY-YYYY)")}
           </label>
           <input
             type="text"
@@ -72,7 +74,7 @@ const CreateAcademicYearForm = ({
             className={`w-full px-3 py-2 border ${
               errors.year ? "border-red-500" : "border-gray-300"
             } rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500`}
-            placeholder="e.g., 2024-2025"
+            placeholder={t("e.g., 2024-2025")}
             required
           />
           {errors.year && (
@@ -83,7 +85,7 @@ const CreateAcademicYearForm = ({
         {/* Start Date Input */}
         <div className="mb-2">
           <label className="block text-sm text-gray-700 font-medium mb-1">
-            Start Date
+            {t("Start Date")}
           </label>
           <input
             type="date"
@@ -104,7 +106,7 @@ const CreateAcademicYearForm = ({
         {/* End Date Input */}
         <div className="mb-2">
           <label className="block text-sm text-gray-700 font-medium mb-1">
-            End Date
+            {t("End Date")}
           </label>
           <input
             type="date"
@@ -132,7 +134,9 @@ const CreateAcademicYearForm = ({
             }
             className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-2 focus:ring-purple-500"
           />
-          <label className="text-sm text-gray-700">Set as Active Year</label>
+          <label className="text-sm text-gray-700">
+            {t("Set as Active Year")}
+          </label>
         </div>
 
         {/* Submit Button */}
@@ -145,10 +149,10 @@ const CreateAcademicYearForm = ({
         >
           {loading ? (
             <>
-              <FaSpinner className="animate-spin mr-2" /> Creating...
+              <FaSpinner className="animate-spin mr-2" /> {t("Creating...")}
             </>
           ) : (
-            "Create Academic Year"
+            t("Create Academic Year")
           )}
         </button>
       </form>

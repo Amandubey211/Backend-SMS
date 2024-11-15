@@ -1,25 +1,28 @@
 import React, { useEffect, useState } from "react";
-import Layout from '../../../../Components/Common/Layout';
-import DashLayout from '../../../../Components/Admin/AdminDashLayout';
-import SidebarSlide from '../../../../Components/Common/SidebarSlide';
+import Layout from "../../../../Components/Common/Layout";
+import DashLayout from "../../../../Components/Admin/AdminDashLayout";
+import SidebarSlide from "../../../../Components/Common/SidebarSlide";
 import ViewAccountant from "./ViewAccountant";
-import ProfileCard from '../SubComponents/ProfileCard'; // Import the generic ProfileCard
+import ProfileCard from "../SubComponents/ProfileCard";
 import { useDispatch, useSelector } from "react-redux";
 import AddUser from "../StaffProfile/AddUser";
-import { FiLoader } from "react-icons/fi";
 import { GoAlertFill } from "react-icons/go";
-import { fetchAllStaff } from "../../../../Store/Slices/Admin/Users/Staff/staff.action";
 import Spinner from "../../../../Components/Common/Spinner";
+import { useTranslation } from "react-i18next";
+import { fetchAllStaff } from "../../../../Store/Slices/Admin/Users/Staff/staff.action";
 
 const AllAccountants = () => {
+  const { t } = useTranslation("admAccounts");
+
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarContent, setSidebarContent] = useState(null);
   const [selectedAccountant, setSelectedAccountant] = useState(null);
   const [accountantData, setAccountantData] = useState(null);
-  const {accountant,loading} = useSelector((store) => store.admin.all_staff);
-const dispatch = useDispatch()
+  const { accountant, loading } = useSelector((store) => store.admin.all_staff);
+  const dispatch = useDispatch();
+
   useEffect(() => {
-    dispatch(fetchAllStaff())
+    dispatch(fetchAllStaff());
   }, [dispatch]);
 
   const handleSidebarOpen = () => setSidebarOpen(true);
@@ -49,165 +52,75 @@ const dispatch = useDispatch()
       case "viewAccountant":
         return <ViewAccountant accountant={selectedAccountant} />;
       case "addAccountant":
-        return <AddUser role={'accountant'} data={accountantData} />;
+        return <AddUser role={"accountant"} data={accountantData} />;
       case "editAccountant":
-        return <AddUser role={'accountant'} data={accountantData} />;
+        return <AddUser role={"accountant"} data={accountantData} />;
       default:
-        return <div>Select an action</div>;
+        return <div>{t("Select an action")}</div>;
     }
   };
 
   return (
-    <Layout title="All Accountants">
+    <Layout title={t("All Accountants")}>
       <DashLayout>
-      {loading?<div className="flex w-full h-[90vh] flex-col items-center justify-center">
-        <Spinner/>
-    </div>:
-        <div className="p-4">
-          <div className="flex justify-between items-center mb-4 border-b-2 h-20">
-            <h2 className="text-xl font-semibold">All Accountants <span className="bg-purple-400 px-2 text-sm py-1 rounded-full  ">{accountant?.length}</span></h2>
-            <button onClick={handleAddAccountantClick}
-              className="bg-purple-500 text-white px-4 py-2 rounded-md flex items-center space-x-2">
-              <span>Add New Accountant</span>
-            </button>
+        {loading ? (
+          <div className="flex w-full h-[90vh] flex-col items-center justify-center">
+            <Spinner />
           </div>
-          <div className="flex flex-wrap -mx-2">
-
-            {accountant.length >0 ?
-            accountant.map((accountant, index) => (
-              <ProfileCard
-                key={index}
-                profile={accountant}
-                onClick={handleAccountantClick}
-                editUser={editUser} // Pass the editUser function as a prop
-              />
-            )):  <div>
-            <div className="flex w-[80vw] text-gray-500 h-[90vh] items-center justify-center flex-col text-2xl">
-    <GoAlertFill className="text-[5rem]" />
-   No  Accountant Found
-  </div>
-        </div>}
+        ) : (
+          <div className="p-4">
+            <div className="flex justify-between items-center mb-4 border-b-2 h-20">
+              <h2 className="text-xl font-semibold">
+                {t("All Accountants")}{" "}
+                <span className="bg-purple-400 px-2 text-sm py-1 rounded-full">
+                  {accountant?.length}
+                </span>
+              </h2>
+              <button
+                onClick={handleAddAccountantClick}
+                className="bg-purple-500 text-white px-4 py-2 rounded-md flex items-center space-x-2"
+              >
+                <span>{t("Add New Accountant")}</span>
+              </button>
+            </div>
+            <div className="flex flex-wrap -mx-2">
+              {accountant.length > 0 ? (
+                accountant.map((accountant, index) => (
+                  <ProfileCard
+                    key={index}
+                    profile={accountant}
+                    onClick={handleAccountantClick}
+                    editUser={editUser} // Pass the editUser function as a prop
+                  />
+                ))
+              ) : (
+                <div className="flex w-[80vw] text-gray-500 h-[90vh] items-center justify-center flex-col text-2xl">
+                  <GoAlertFill className="text-[5rem]" />
+                  {t("No Accountant Found")}
+                </div>
+              )}
+            </div>
+            <SidebarSlide
+              key={sidebarContent} // Use the key to force re-render
+              isOpen={isSidebarOpen}
+              onClose={handleSidebarClose}
+              title={
+                <span className="bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent bg-clip-text">
+                  {sidebarContent === "viewAccountant"
+                    ? t("Quick View of Accountant")
+                    : t("Add/Edit Accountant")}
+                </span>
+              }
+              width={sidebarContent === "viewAccountant" ? "30%" : "60%"}
+              height="100%"
+            >
+              {renderSidebarContent()}
+            </SidebarSlide>
           </div>
-          <SidebarSlide
-            key={sidebarContent} // Use the key to force re-render
-            isOpen={isSidebarOpen}
-            onClose={handleSidebarClose}
-            title={<span className="bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent bg-clip-text">
-              {sidebarContent === "viewAccountant" ? "Quick View of Accountant" : "Add/Edit Accountant"}
-            </span>}
-            width={sidebarContent === "viewAccountant" ? "30%" : "60%"}
-            height="100%"
-          >
-            {renderSidebarContent()}
-          </SidebarSlide>
-        </div>}
+        )}
       </DashLayout>
     </Layout>
   );
 };
 
 export default AllAccountants;
-
-
-
-//---------Asli-----
-
-
-// import React, { useState } from "react";
-// import { dummyAccountants } from './dummyData/dummyData'; // Import accountant data
-// import { FiUserPlus } from 'react-icons/fi';
-// import { BiTrash } from 'react-icons/bi';
-// import Layout from '../../../../Components/Common/Layout';
-// import DashLayout from '../../../../Components/Admin/AdminDashLayout';
-// import SidebarSlide from '../../../../Components/Common/SidebarSlide';
-// import AddAccountant from "./AddAccountant";
-// import ViewAccountant from "./ViewAccountant";
-
-// const AllAccountants = () => {
-//   const [isSidebarOpen, setSidebarOpen] = useState(false);
-//   const [sidebarContent, setSidebarContent] = useState(null);
-//   const [selectedAccountant, setSelectedAccountant] = useState(null);
-
-//   const handleSidebarOpen = () => setSidebarOpen(true);
-//   const handleSidebarClose = () => setSidebarOpen(false);
-
-//   const handleAccountantClick = (accountant) => {
-//     setSelectedAccountant(accountant);
-//     setSidebarContent("viewAccountant");
-//     setSidebarOpen(true);
-//   };
-
-//   const handleAddAccountantClick = () => {
-//     setSidebarContent("addAccountant");
-//     setSidebarOpen(true);
-//   };
-
-//   const renderSidebarContent = () => {
-//     switch (sidebarContent) {
-//       case "viewAccountant":
-//         return <ViewAccountant accountant={selectedAccountant} />;
-//       case "addAccountant":
-//         return <AddAccountant />;
-//       default:
-//         return <div>Select an action</div>;
-//     }
-//   };
-
-//   return (
-//     <Layout title="All Accountants">
-//       <DashLayout>
-//         <div className="p-4">
-//           <div className="flex justify-between items-center mb-4">
-//             <h2 className="text-xl font-semibold">All Accountants</h2>
-//             <button onClick={handleAddAccountantClick}
-//               className="bg-purple-500 text-white px-4 py-2 rounded-md flex items-center space-x-2">
-//               <FiUserPlus />
-//               <span>Add New Accountant</span>
-//             </button>
-//           </div>
-//           <div className="flex flex-wrap -mx-2">
-//             {dummyAccountants.map((accountant, index) => (
-//               <div className="relative w-full sm:w-1/2 md:w-1/3 lg:w-1/4 px-2 mb-4 flex flex-col" key={index}>
-//                 <div onClick={() => handleAccountantClick(accountant)}
-//                   className="block p-6 bg-white rounded-lg shadow-lg hover:bg-gray-100 transition cursor-pointer"
-//                 >
-//                   {/* Accountant Card Content */}
-
-//                   <div className="absolute right-0 flex flex-col px-4 gap-2 justify-end">
-//                     <button className="bg-transparent p-2 rounded-full border">
-//                       <FiUserPlus className="text-sm text-green-500" />
-//                     </button>
-//                     <button className="bg-transparent p-2 rounded-full border">
-//                       <BiTrash className="text-sm text-red-500" />
-//                     </button>
-//                   </div>
-//                   <div className="flex flex-col h-[80%] justify-center items-center py-3">
-//                     <img className="object-cover rounded-full w-[100px] h-[100px]" src={accountant.imageUrl} alt={accountant.name} />
-//                     <h3 className="text-lg font-medium">{accountant.name}</h3>
-//                     <p className="text-gray-500">{accountant.subject}</p>
-//                   </div>
-//                   <div className="p-4 text-center justify-center items-center">
-//                     <p className="text-gray-600 ">Phone: </p>
-//                     <p className="text-gray-600 ">{accountant.phone}</p>
-//                   </div>
-//                 </div>
-//               </div>
-//             ))}
-//           </div>
-//           <SidebarSlide
-//             isOpen={isSidebarOpen}
-//             onClose={handleSidebarClose}
-//             title={<span className="bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent bg-clip-text">
-//               {sidebarContent === "viewAccountant" ? "Quick View of Accountant" : "Add New Accountant"}
-//             </span>}
-//             width="40%"
-//           >
-//             {renderSidebarContent()}
-//           </SidebarSlide>
-//         </div>
-//       </DashLayout>
-//     </Layout>
-//   );
-// };
-
-// export default AllAccountants;

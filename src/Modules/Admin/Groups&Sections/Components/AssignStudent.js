@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 import {
   assignStudentToSection,
   fetchGroupsByClass,
@@ -11,6 +12,7 @@ import {
 import profileIcon from "../../../../Assets/DashboardAssets/profileIcon.png";
 
 const AssignStudent = ({ name, imageUrl, section, studentId }) => {
+  const { t } = useTranslation("admClass");
   const [sectionId, setSectionId] = useState("");
   const AllSections = useSelector(
     (store) => store.admin.group_section.sectionsList
@@ -36,7 +38,7 @@ const AssignStudent = ({ name, imageUrl, section, studentId }) => {
     e.preventDefault();
 
     if (!sectionId) {
-      toast.error("Please select a section.");
+      toast.error(t("Please select a section."));
       return;
     }
     try {
@@ -45,7 +47,7 @@ const AssignStudent = ({ name, imageUrl, section, studentId }) => {
       dispatch(fetchUnassignedStudents(cid)); // Refetch unassigned students
       dispatch(fetchGroupsByClass(cid)); // Refetch groups after assignment
     } catch (error) {
-      toast.error(error.message || "Something went wrong");
+      toast.error(error.message || t("Something went wrong"));
     }
   };
 
@@ -61,21 +63,21 @@ const AssignStudent = ({ name, imageUrl, section, studentId }) => {
           <div>
             <div className="text-sm font-medium">{name}</div>
             <div className="text-xs text-gray-500">
-              {section || "No Section Assigned"}
+              {section || t("No Section Assigned")}
             </div>
           </div>
         </div>
       </div>
       <div className="mt-4">
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          Section
+          {t("Section")}
         </label>
         <select
           value={sectionId}
           onChange={(e) => setSectionId(e.target.value)}
           className="block w-full p-2 border border-gray-300 rounded-lg"
         >
-          <option value="">Select Section</option>
+          <option value="">{t("Select Section")}</option>
           {AllSections?.map((section) => (
             <option key={section._id} value={section._id}>
               {section.sectionName}
@@ -91,7 +93,7 @@ const AssignStudent = ({ name, imageUrl, section, studentId }) => {
           }`}
           disabled={!sectionId}
         >
-          Assign Student
+          {t("Assign Student")}
         </button>
       </div>
     </form>

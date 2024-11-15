@@ -1,5 +1,6 @@
 import React, { useState, useEffect, lazy, Suspense, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useTranslation } from "react-i18next";
 import { fetchSectionsByClass } from "../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
 import Sidebar from "../../../Components/Common/Sidebar";
 import { useParams } from "react-router-dom";
@@ -11,6 +12,7 @@ import {
 const AssignTeacher = lazy(() => import("./AssignTeacher"));
 
 const NavigationBar = () => {
+  const { t } = useTranslation("admClass");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const role = useSelector((store) => store.common.auth.role);
   const dispatch = useDispatch();
@@ -50,7 +52,7 @@ const NavigationBar = () => {
     <>
       <div className="flex justify-between items-center p-4">
         <div className="flex items-center space-x-2">
-          <h1 className="text-xl font-semibold">All Instructors</h1>
+          <h1 className="text-xl font-semibold">{t("All Instructors")}</h1>
           <span className="bg-purple-200 text-purple-700 rounded-full w-7 h-7 flex justify-center items-center text-sm">
             {totalTeachers}
           </span>
@@ -62,7 +64,7 @@ const NavigationBar = () => {
             onClick={handleSidebarOpen}
             className="flex items-center border border-gray-300 ps-5 py-0 rounded-full"
           >
-            <span className="mr-2">Assign Instructor</span>
+            <span className="mr-2">{t("Assign Instructor")}</span>
             <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full w-12 h-12 flex items-center justify-center">
               <span className="text-3xl -mt-2">+</span>
             </div>
@@ -73,9 +75,9 @@ const NavigationBar = () => {
       <Sidebar
         isOpen={isSidebarOpen}
         onClose={handleSidebarClose}
-        title="Assign new Instructor"
+        title={t("Assign new Instructor")}
       >
-        <Suspense fallback={<div>Loading...</div>}>
+        <Suspense fallback={<div>{t("Loading...")}</div>}>
           <AssignTeacher />
         </Suspense>
       </Sidebar>
@@ -85,7 +87,7 @@ const NavigationBar = () => {
           className={getButtonClass("Everyone")}
           onClick={() => handleSectionChange("Everyone")}
         >
-          Everyone {selectedSection === "Everyone"}
+          {t("Everyone")} {selectedSection === "Everyone"}
         </button>
         {sections?.map((item) => (
           <button
@@ -93,7 +95,7 @@ const NavigationBar = () => {
             className={getButtonClass(item.sectionName)}
             onClick={() => handleSectionChange(item.sectionName)}
           >
-            {item.sectionName}{" "}
+            {item.sectionName}
           </button>
         ))}
       </div>

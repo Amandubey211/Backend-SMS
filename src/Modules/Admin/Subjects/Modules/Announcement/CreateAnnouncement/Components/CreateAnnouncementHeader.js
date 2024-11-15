@@ -1,9 +1,11 @@
 import React from "react";
 import { IoIosArrowBack } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 const CreateAnnouncementHeader = ({ onSave, loading, isEditing }) => {
   const navigate = useNavigate();
+  const { t } = useTranslation("admClass");
 
   return (
     <div className="flex items-center justify-between p-2 pe-5 bg-white border-b border-gray-300 shadow-sm">
@@ -11,9 +13,10 @@ const CreateAnnouncementHeader = ({ onSave, loading, isEditing }) => {
         <IoIosArrowBack
           className="mr-2 text-gray-600 text-2xl cursor-pointer"
           onClick={() => navigate(-1)}
+          aria-label={t("Go Back")}
         />
         <h1 className="text-lg font-semibold text-gray-800">
-          {isEditing ? "Update Announcement" : "Create New Announcement"}
+          {isEditing ? t("Update Announcement") : t("Create New Announcement")}
         </h1>
       </div>
       <div className="flex items-center space-x-2">
@@ -22,7 +25,7 @@ const CreateAnnouncementHeader = ({ onSave, loading, isEditing }) => {
           className="flex-grow rounded-md py-2 px-6 text-center border"
           disabled={loading}
         >
-          <span>Cancel</span>
+          <span>{t("Cancel")}</span>
         </button>
         <button
           onClick={onSave}
@@ -31,10 +34,10 @@ const CreateAnnouncementHeader = ({ onSave, loading, isEditing }) => {
         >
           <span className="text-gradient">
             {loading
-              ? "Saving..."
+              ? t("Saving...")
               : isEditing
-              ? "Update Announcement"
-              : "Submit Announcement"}
+              ? t("Update Announcement")
+              : t("Submit Announcement")}
           </span>
         </button>
       </div>

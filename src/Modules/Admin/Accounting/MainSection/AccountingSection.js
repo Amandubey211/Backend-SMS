@@ -27,6 +27,7 @@ import {
 } from "../../../../Store/Slices/Admin/Accounting/StudentFees/studentFees.action";
 import NoDataFound from "../../../../Components/Common/NoDataFound";
 import { useTranslation } from "react-i18next";
+
 const AccountingSection = () => {
   const {
     isSidebarOpen,
@@ -38,7 +39,8 @@ const AccountingSection = () => {
   } = useSelector((store) => store?.admin?.student_fees);
   const dispatch = useDispatch();
   const [showEditMenu, setShowEditMenu] = useState({ show: false, index: 0 });
-  const { t } = useTranslation('studentFees')
+  const { t } = useTranslation("studentFees");
+
   useEffect(() => {
     dispatch(fetchFees());
     dispatch(fetchClasses());
@@ -118,7 +120,7 @@ const AccountingSection = () => {
   };
 
   return (
-    <Layout title="Accounting">
+    <Layout title={t("Accounting")}>
       <DashLayout>
         <div className="min-h-screen p-4 bg-gray-50">
           <div className="flex items-center mb-4">
@@ -193,7 +195,9 @@ const AccountingSection = () => {
             <table className="min-w-full leading-normal">
               <thead>
                 <tr className="text-left text-gray-700 bg-gray-100">
-                  <th className="px-5 py-3 border-b-2 border-gray-200">{t("Name")}</th>
+                  <th className="px-5 py-3 border-b-2 border-gray-200">
+                    {t("Name")}
+                  </th>
                   <th className="px-5 py-3 border-b-2 border-gray-200">
                     {t("Class")}
                   </th>
@@ -318,14 +322,14 @@ const AccountingSection = () => {
           <Sidebar
             isOpen={isSidebarEditOpen}
             onClose={handleSidebarClose}
-            title={"Edit Fees"}
+            title={t("Edit Fees")}
           >
             <EditFee />
           </Sidebar>
           <Sidebar
             isOpen={isSidebarOpen}
             onClose={handleSidebarClose}
-            title={"Add New Fees"}
+            title={t("Add New Fees")}
           >
             <AddFeesForm />
           </Sidebar>
