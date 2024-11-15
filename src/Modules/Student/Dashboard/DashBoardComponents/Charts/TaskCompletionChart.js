@@ -57,16 +57,16 @@ const TaskCompletionChart = () => {
       <div className="flex flex-col items-center justify-center h-[18rem] w-[18rem]">
         {/* Task Summary */}
         <div className="flex flex-row justify-between w-full mb-5 text-lg">
-          <p className="text-gray-500">
+          <p className="text-gray-500 text-left">
             Completed{" "}
             <span className="text-pink-600 font-bold text-lg">
-              {completedTask}%
+              {Number(completedTask).toFixed(2)}%
             </span>
           </p>
-          <p className="text-gray-500">
+          <p className="text-gray-500 text-right">
             Remaining{" "}
             <span className="text-gray-700 font-bold text-lg">
-              {inCompletedTask}%
+              {Number(inCompletedTask).toFixed(2)}%
             </span>
           </p>
         </div>
