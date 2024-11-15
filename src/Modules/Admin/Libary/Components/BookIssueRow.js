@@ -1,11 +1,12 @@
-// src/Modules/Admin/Libary/Components/BookIssueRow.js
 import React, { useState, useEffect, useRef } from "react";
 import { HiDotsVertical } from "react-icons/hi";
 import { MdEdit } from "react-icons/md";
 import Sidebar from "../../../../Components/Common/Sidebar";
 import AddIssue from "../Components/AddIssue"; // Now using AddIssue instead of EditBook
+import { useTranslation } from "react-i18next";
 
 const BookIssueRow = ({ item, handleSidebarOpen, setEditIssueData, role }) => {
+  const { t } = useTranslation("admLibrary");
   const [showMenu, setShowMenu] = useState(false);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const menuRef = useRef(null);
@@ -49,7 +50,7 @@ const BookIssueRow = ({ item, handleSidebarOpen, setEditIssueData, role }) => {
         <div className="flex items-center">
           <img
             src={item?.studentId?.profile}
-            alt="Profile"
+            alt={t("Profile")}
             className="h-8 w-8 rounded-full mr-2"
           />
           <span>{item.studentId?.firstName}</span>
@@ -65,7 +66,7 @@ const BookIssueRow = ({ item, handleSidebarOpen, setEditIssueData, role }) => {
         <div className="flex items-center bg-pink-50 rounded-lg p-1">
           <img
             src={item.bookId?.image}
-            alt="Book"
+            alt={t("Book")}
             className="h-10 w-10 mr-2 rounded-md"
           />
           <div className="flex flex-col">
@@ -80,8 +81,12 @@ const BookIssueRow = ({ item, handleSidebarOpen, setEditIssueData, role }) => {
         {item.author}
       </td>
       <td className="px-5 py-2 border-b border-gray-200">
-        <div>Issue: {new Date(item.issueDate).toLocaleDateString()}</div>
-        <div>Return: {new Date(item.returnDate).toLocaleDateString()}</div>
+        <div>
+          {t("Issue")}: {new Date(item.issueDate).toLocaleDateString()}
+        </div>
+        <div>
+          {t("Return")}: {new Date(item.returnDate).toLocaleDateString()}
+        </div>
       </td>
       <td className="px-5 py-2 border-b border-gray-200">
         <span
@@ -93,27 +98,25 @@ const BookIssueRow = ({ item, handleSidebarOpen, setEditIssueData, role }) => {
               : "bg-red-200 text-red-800"
           }`}
         >
-          {item.status}
+          {t(item.status)}
         </span>
       </td>
       {/* Conditionally render the Action column for non-teacher roles */}
       {role !== "teacher" && (
         <td className="px-5 py-2 border-b border-gray-200 relative">  
-          
-              <button
-                onClick={handleSidebarEditOpen}
-                className="flex items-center gap-1 p-2 hover:bg-gray-200 w-auto text-left rounded-lg"
-              >
-                <MdEdit className="text-gray-500" />
-                <span>Edit</span>
-              </button>
-        
+          <button
+            onClick={handleSidebarEditOpen}
+            className="flex items-center gap-1 p-2 hover:bg-gray-200 w-auto text-left rounded-lg"
+          >
+            <MdEdit className="text-gray-500" />
+            <span>{t("Edit")}</span>
+          </button>
 
           {/* Sidebar for Editing Book Issue */}
           <Sidebar
             isOpen={isSidebarOpen}
             onClose={handleSidebarClose}
-            title="Edit Book Issue"
+            title={t("Edit Book Issue")}
             width="40%"
           >
             {item && (

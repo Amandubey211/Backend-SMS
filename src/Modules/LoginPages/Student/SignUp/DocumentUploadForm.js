@@ -1,5 +1,3 @@
-// DocumentUploadForm.js
-
 import React, { useState } from "react";
 import { LuLoader } from "react-icons/lu";
 import { AiOutlineEye, AiOutlineEdit, AiOutlineFilePdf } from "react-icons/ai";
@@ -8,6 +6,7 @@ import { IoCloudUploadOutline } from "react-icons/io5";
 import { MdDoneOutline, MdOutlineDocumentScanner } from "react-icons/md";
 import { useDispatch } from "react-redux";
 import { setStep } from "../../../../Store/Slices/Common/User/reducers/userSlice";
+import { useTranslation } from 'react-i18next';
 
 const DocumentUploadForm = ({
   studentDocuments,
@@ -24,6 +23,7 @@ const DocumentUploadForm = ({
   validationErrors,
   type = "Student",
 }) => {
+  const { t } = useTranslation('admAdmission');
   const dispatch = useDispatch();
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedPreview, setSelectedPreview] = useState("");
@@ -87,7 +87,7 @@ const DocumentUploadForm = ({
       return (
         <img
           src={preview[index]}
-          alt="Preview"
+          alt={t("Preview")}
           className="h-8 w-8 object-cover rounded-md"
         />
       );
@@ -102,9 +102,9 @@ const DocumentUploadForm = ({
 
   return (
     <form onSubmit={handleDocumentSubmit}>
-      <h3 className="text-lg font-semibold mb-4">Document Upload</h3>
+      <h3 className="text-lg font-semibold mb-4">{t("Document Upload")}</h3>
       {validationErrors?.documents && (
-        <div className="text-red-500 mb-4">{validationErrors?.documents}</div>
+        <div className="text-red-500 mb-4">{t(validationErrors?.documents)}</div>
       )}
       <div className="grid grid-cols-1 gap-4">
         {studentDocuments.documents &&
@@ -124,11 +124,11 @@ const DocumentUploadForm = ({
                     disabled={editIndex !== index}
                   >
                     <option value="" disabled>
-                      Select Document Type
+                      {t("Select Document Type")}
                     </option>
-                    <option value="Passport">Passport</option>
-                    <option value="Birth Certificate">Birth Certificate</option>
-                    <option value="Other">Other</option>
+                    <option value="Passport">{t("Passport")}</option>
+                    <option value="Birth Certificate">{t("Birth Certificate")}</option>
+                    <option value="Other">{t("Other")}</option>
                   </select>
                   <div className="flex space-x-2 ml-4">
                     {editIndex === index ? (
@@ -185,8 +185,8 @@ const DocumentUploadForm = ({
               className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-gray-300 rounded-md cursor-pointer hover:border-indigo-500 hover:bg-gray-100 transition duration-500 ease-in-out"
             >
               <IoCloudUploadOutline size={50} className="text-gray-400 mb-2" />
-              <p className="text-gray-500">Browse Files</p>
-              <p className="text-gray-400">Drag and drop files here</p>
+              <p className="text-gray-500">{t("Browse Files")}</p>
+              <p className="text-gray-400">{t("Drag and drop files here")}</p>
               <input
                 type="file"
                 accept=".pdf, .doc, .jpg, .jpeg, .png"
@@ -209,9 +209,7 @@ const DocumentUploadForm = ({
               className="mr-2"
               required
             />
-            <label className="text-sm">
-              I acknowledge that the above information is correct.
-            </label>
+            <label className="text-sm">{t("I acknowledge that the above information is correct.")}</label>
           </div>
 
           {/* Add Back Button Here */}
@@ -221,7 +219,7 @@ const DocumentUploadForm = ({
               onClick={handleBack}
               className="w-1/4 bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-600 text-center transition duration-500 ease-in-out"
             >
-              Back
+              {t("Back")}
             </button>
             <button
               type="submit"
@@ -233,10 +231,10 @@ const DocumentUploadForm = ({
               {loading ? (
                 <div className="flex justify-center gap-1">
                   <LuLoader className="animate-spin text-2xl" />
-                  <span>Uploading...</span>
+                  <span>{t("Uploading...")}</span>
                 </div>
               ) : (
-                "Upload Document & Apply"
+                t("Upload Document & Apply")
               )}
             </button>
           </div>
@@ -257,7 +255,7 @@ const DocumentUploadForm = ({
                 (isImage(selectedPreview) ? (
                   <img
                     src={selectedPreview}
-                    alt="Preview"
+                    alt={t("Preview")}
                     className="max-h-[80vh] object-contain rounded-md"
                   />
                 ) : (

@@ -7,8 +7,10 @@ import EditBook from "./EditBook";
 import { deleteBookThunk } from "../../../../Store/Slices/Admin/Library/LibraryThunks";
 import Sidebar from "../../../../Components/Common/Sidebar";
 import DeleteModal from "../../../../Components/Common/DeleteModal";
+import { useTranslation } from "react-i18next";
 
 const BookCard = ({ book }) => {
+  const { t } = useTranslation('admLibrary');
   const { _id, name, author, category, classId, copies, image } = book;
   const dispatch = useDispatch();
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -35,10 +37,10 @@ const BookCard = ({ book }) => {
         />
         <div className="flex flex-col p-2 space-y-1">
           <span className="font-semibold text-[#7F7F7F] text-sm">
-            Class: {classId.className}
+            {t("Class")}: {classId.className}
           </span>
           <span className="text-sm font-semibold text-gray-700">
-            Copies: {copies}
+            {t("Copies")}: {copies}
           </span>
         </div>
       </div>
@@ -46,7 +48,7 @@ const BookCard = ({ book }) => {
         <h3 className="text-lg font-bold text-[#333333]">{name}</h3>
         <p className="text-base font-semibold">{category}</p>
         <div className="flex gap-2">
-          <p className="text-sm font-medium text-gray-500">Author: </p>
+          <p className="text-sm font-medium text-gray-500">{t("Author")}: </p>
           <p className="text-sm font-medium text-gray-600">{author}</p>
         </div>
 
@@ -55,14 +57,14 @@ const BookCard = ({ book }) => {
             <button
               onClick={handleSidebarOpen}
               className="text-indigo-600 hover:text-indigo-900"
-              aria-label="Edit"
+              aria-label={t("Edit")}
             >
               <FiEdit className="w-6 h-6" />
             </button>
             <button
               onClick={handleDeleteModalOpen}
               className="text-red-600 hover:text-red-900"
-              aria-label="Delete"
+              aria-label={t("Delete")}
             >
               <FiTrash2 className="w-6 h-6" />
             </button>
@@ -75,7 +77,7 @@ const BookCard = ({ book }) => {
       <Sidebar
         isOpen={isSidebarOpen}
         onClose={handleSidebarClose}
-        title="Edit Book"
+        title={t("Edit Book")}
       >
         <EditBook book={book} onClose={handleSidebarClose} />
       </Sidebar>

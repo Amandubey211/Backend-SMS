@@ -1,32 +1,35 @@
 import React from "react";
 import { FaTimes } from "react-icons/fa"; // Importing the Font Awesome remove icon
+import { useTranslation } from "react-i18next";
 
 const ImageUpload = ({
   imagePreview,
   handleImageChange,
   handleRemoveImage,
 }) => {
+  const { t } = useTranslation("admLibrary");
   const fileInputRef = React.useRef(null);
 
   return (
-    <div className="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 p-1 rounded-lg relative h-40  w-full">
+    <div className="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 p-1 rounded-lg relative h-40 w-full">
       {imagePreview ? (
         <div className="relative w-36 h-36">
           <img
             src={imagePreview}
-            alt="Preview"
+            alt={t("Image Preview")}
             className="w-full h-full object-cover rounded-lg"
             style={{ objectFit: "cover" }} // Ensures image covers the container without stretching
           />
           <button
             type="button"
             onClick={handleRemoveImage}
-            className="absolute top-2 right-2  text-purple-500 bg-purple-300 transition transform hover:scale-110 hover:bg-purple-500 hover:text-purple-700"
+            className="absolute top-2 right-2 text-purple-500 bg-purple-300 transition transform hover:scale-110 hover:bg-purple-500 hover:text-purple-700"
             style={{
               borderRadius: "50%",
               padding: "0.25rem",
               boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
             }}
+            aria-label={t("Remove Image")}
           >
             <FaTimes size={20} />
           </button>
@@ -84,13 +87,13 @@ const ImageUpload = ({
               </clipPath>
             </defs>
           </svg>
-          <p className="mt-2 text-sm text-gray-600">Drop Your Image here</p>
+          <p className="mt-2 text-sm text-gray-600">{t("Drop Your Image here")}</p>
           <button
             type="button"
             onClick={() => fileInputRef.current.click()}
             className="mt-2 text-purple-500 underline"
           >
-            Click to browse
+            {t("Click to browse")}
           </button>
           <input
             type="file"

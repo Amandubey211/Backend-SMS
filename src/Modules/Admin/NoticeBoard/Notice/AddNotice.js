@@ -5,14 +5,16 @@ import { createNoticeThunk, updateNoticeThunk } from "../../../../Store/Slices/A
 import { fetchAllClasses } from "../../../../Store/Slices/Admin/Class/actions/classThunk";
 import { FiLoader } from "react-icons/fi"; // Icon for the spinner
 import { fetchStudentsByClassAndSection } from "../../../../Store/Slices/Admin/Class/Students/studentThunks";
+import { useTranslation } from "react-i18next";
 
 const AddNotice = ({ isEditing, onClose }) => {
+  const { t } = useTranslation("admNotice");
   const dispatch = useDispatch();
 
   const { selectedNotice, loading } = useSelector((state) => state.admin.notice);
   const { classes } = useSelector((state) => state.admin.class); // Assuming classes are stored here
   const role = useSelector((store) => store.common.auth.role);
-  const {studentsList,loading:studentLoading} = useSelector((store) => store.admin.students);
+  const { studentsList, loading: studentLoading } = useSelector((store) => store.admin.students);
 
   const [announcementData, setAnnouncementData] = useState({
     title: "",
@@ -20,8 +22,8 @@ const AddNotice = ({ isEditing, onClose }) => {
     endDate: "",
     description: "",
     priority: "High priority",
-    classId: "", 
-    noticeFor: "", 
+    classId: "",
+    noticeFor: "",
   });
 
   // Fetch classes when the component mounts
@@ -38,7 +40,7 @@ const AddNotice = ({ isEditing, onClose }) => {
         endDate: selectedNotice?.endDate?.split("T")[0],
         description: selectedNotice?.description,
         priority: selectedNotice?.priority,
-        classId: selectedNotice?.classId?._id || "", // Preload classId for editing
+        classId: selectedNotice?.classId?._id || "",
       });
     } else {
       setAnnouncementData({
@@ -55,8 +57,8 @@ const AddNotice = ({ isEditing, onClose }) => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    if(name == 'classId'){
-      dispatch(fetchStudentsByClassAndSection(value))
+    if (name === 'classId') {
+      dispatch(fetchStudentsByClassAndSection(value));
     }
     setAnnouncementData({ ...announcementData, [name]: value });
   };
@@ -68,7 +70,7 @@ const AddNotice = ({ isEditing, onClose }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!announcementData.title || !announcementData.startDate || !announcementData.endDate) {
-      toast.error("Please fill in all required fields.");
+      toast.error(t("Please fill in all required fields."));
       return;
     }
 
@@ -89,7 +91,7 @@ const AddNotice = ({ isEditing, onClose }) => {
         {/* Title */}
         <div className="mb-4">
           <label htmlFor="title" className="block text-sm font-medium text-gray-700">
-            Title
+            {t("Title")}
           </label>
           <input
             type="text"
@@ -106,7 +108,7 @@ const AddNotice = ({ isEditing, onClose }) => {
         <div className="flex gap-4 mb-4">
           <div className="flex-1">
             <label htmlFor="startDate" className="block text-sm font-medium text-gray-700">
-              Available from
+              {t("Available from")}
             </label>
             <input
               type="date"
@@ -120,7 +122,7 @@ const AddNotice = ({ isEditing, onClose }) => {
           </div>
           <div className="flex-1">
             <label htmlFor="endDate" className="block text-sm font-medium text-gray-700">
-              Until
+              {t("Until")}
             </label>
             <input
               type="date"
@@ -137,7 +139,7 @@ const AddNotice = ({ isEditing, onClose }) => {
         {/* Class Dropdown */}
         <div className="mb-4">
           <label htmlFor="class" className="block text-sm font-medium text-gray-700">
-            Class
+            {t("Class")}
           </label>
           <select
             id="class"
@@ -146,7 +148,7 @@ const AddNotice = ({ isEditing, onClose }) => {
             onChange={handleInputChange}
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
           >
-            <option value="">All</option>
+            <option value="">{t("All")}</option>
             {classes &&
               classes.map((classItem) => (
                 <option key={classItem?._id} value={classItem?._id}>
@@ -155,9 +157,11 @@ const AddNotice = ({ isEditing, onClose }) => {
               ))}
           </select>
         </div>
+
+        {/* Notice for (student) */}
         <div className="mb-4">
-          <label htmlFor="class" className="block text-sm font-medium text-gray-700" >
-            Notice for (student)
+          <label htmlFor="noticeFor" className="block text-sm font-medium text-gray-700">
+            {t("Notice for (student)")}
           </label>
           <select
             id="noticeFor"
@@ -167,19 +171,20 @@ const AddNotice = ({ isEditing, onClose }) => {
             disabled={studentLoading}
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
           >
-            <option value="">All</option>
+            <option value="">{t("All")}</option>
             {studentsList &&
               studentsList.map((s) => (
                 <option key={s?._id} value={s?._id}>
-                  {s?.firstName} 
+                  {s?.firstName}
                 </option>
               ))}
           </select>
         </div>
+
         {/* Description */}
         <div className="mb-4">
           <label htmlFor="description" className="block text-sm font-medium text-gray-700">
-            Event Details
+            {t("Event Details")}
           </label>
           <textarea
             id="description"
@@ -187,7 +192,7 @@ const AddNotice = ({ isEditing, onClose }) => {
             value={announcementData?.description}
             onChange={handleInputChange}
             rows={4}
-            placeholder="Type here"
+            placeholder={t("Type here")}
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
             required
           />
@@ -195,7 +200,7 @@ const AddNotice = ({ isEditing, onClose }) => {
 
         {/* Priority */}
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">Priority</label>
+          <label className="block text-sm font-medium text-gray-700">{t("Priority")}</label>
           <div className="mt-2 space-x-4">
             <label className="inline-flex items-center">
               <input
@@ -206,7 +211,7 @@ const AddNotice = ({ isEditing, onClose }) => {
                 onChange={handlePriorityChange}
                 className="form-radio text-green-500"
               />
-              <span className="ml-2">High Priority</span>
+              <span className="ml-2">{t("High Priority")}</span>
             </label>
             <label className="inline-flex items-center">
               <input
@@ -217,7 +222,7 @@ const AddNotice = ({ isEditing, onClose }) => {
                 onChange={handlePriorityChange}
                 className="form-radio text-gray-500"
               />
-              <span className="ml-2">Low Priority</span>
+              <span className="ml-2">{t("Low Priority")}</span>
             </label>
           </div>
         </div>
@@ -230,9 +235,9 @@ const AddNotice = ({ isEditing, onClose }) => {
           {loading ? (
             <FiLoader className="animate-spin mr-2" />
           ) : isEditing ? (
-            "Update Notice"
+            t("Update Notice")
           ) : (
-            "Add Notice"
+            t("Add Notice")
           )}
         </button>
       </form>

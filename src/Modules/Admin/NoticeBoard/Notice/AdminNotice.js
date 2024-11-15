@@ -22,8 +22,10 @@ import {
   resetTitleToDelete,
 } from "../../../../Store/Slices/Admin/NoticeBoard/Notice/noticeSlice";
 import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
+import { useTranslation } from "react-i18next";
 
 const AdminNotice = () => {
+  const { t } = useTranslation("admNotice");
   const { loading, error, notices, editMode, titleToDelete } = useSelector(
     (store) => store.admin.notice
   );
@@ -75,17 +77,18 @@ const AdminNotice = () => {
     dispatch(setEditMode(true));
     setSidebarOpen(true); // Open sidebar with edit mode
   };
-  useNavHeading(role, "Notices");
+  useNavHeading(t("Noticeboard"), t("Notices"));
+
   return (
-    <Layout title=" Notice | Student diwan">
+    <Layout title={"Notice | Student diwan"}>
       <DashLayout>
         <div className="p-5">
           <h1 className="bg-gradient-to-r from-pink-500 to-purple-500 text-transparent bg-clip-text font-semibold">
-            {role === "admin" && "Admin Notice Board"}
-            {role === "librarian" && "Librarian Notice Board"}
-            {role === "teacher" && "Teacher Notice Board"}
-            {role === "staff" && "Staff Notice Board"}
-            {role === "accountant" && "Accountant Notice Board"}
+            {role === "admin" && t("Admin Notice Board")}
+            {role === "librarian" && t("Librarian Notice Board")}
+            {role === "teacher" && t("Teacher Notice Board")}
+            {role === "staff" && t("Staff Notice Board")}
+            {role === "accountant" && t("Accountant Notice Board")}
           </h1>
           {/* Search Bar */}
           <div className="flex p-2 justify-between">
@@ -94,20 +97,23 @@ const AdminNotice = () => {
                 <AiOutlineSearch className="absolute left-3 text-gray-400" />
                 <input
                   type="text"
-                  placeholder="Search by Notice"
+                  placeholder={t("Search by Notice")}
                   value={searchTerm} // Controlled search term input
                   onChange={handleSearchTerm}
                   className="p-2 pl-10 border rounded-md w-72 text-gray-600 focus:outline-none focus:ring-2 focus:ring-pink-200"
                 />
               </div>
             </div>
-            {(role === "admin" || role === "accountant" || role === "teacher" || role === "librarian") && (
+            {(role === "admin" ||
+              role === "accountant" ||
+              role === "teacher" ||
+              role === "librarian") && (
               <button
                 className="flex items-center justify-center border border-transparent bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold py-2 px-4 rounded-lg shadow-lg transition duration-300 transform hover:scale-105 hover:shadow-xl"
                 onClick={() => setSidebarOpen(true)} // Open sidebar
               >
                 <FiPlus className="mr-2" />
-                Add Notice
+                {t("Add Notice")}
               </button>
             )}
           </div>
@@ -117,13 +123,12 @@ const AdminNotice = () => {
             {loading ? (
               <Spinner />
             ) : error ? (
-              <NoDataFound title="Notices" />
+              <NoDataFound title={t("Notices")} />
             ) : filteredNotices.length > 0 ? (
               filteredNotices.map((notice, index) => (
                 <AdminNoticeItem
                   key={notice._id}
                   notice={notice}
-                 
                   index={index}
                   activeIndex={activeIndex}
                   toggleAccordion={toggleAccordion}
@@ -134,14 +139,14 @@ const AdminNotice = () => {
                 />
               ))
             ) : (
-              <NoDataFound title="Notices" />
+              <NoDataFound title={t("Notices")} />
             )}
           </div>
 
           <Sidebar
             isOpen={isSidebarOpen}
             onClose={handleSidebarClose}
-            title={editMode ? "Edit Notice" : "Add Notice"}
+            title={editMode ? t("Edit Notice") : t("Add Notice")}
           >
             <AddNotice
               isEditing={editMode}
@@ -154,7 +159,7 @@ const AdminNotice = () => {
             isOpen={isDeleteModalOpen}
             onClose={handleDeleteModalClose}
             onConfirm={confirmDelete}
-            title={`${titleToDelete}`} // Use title from Redux state
+            title={`${t(titleToDelete)}`} // Use title from Redux state
           />
         </div>
       </DashLayout>

@@ -25,7 +25,7 @@ import AddEvent from "../subComponents/AddEvent";
 import UpdateEvent from "../subComponents/UpdateEvent";
 import ViewEvent from "../subComponents/ViewEvent";
 import useNavHeading from "../../../../../Hooks/CommonHooks/useNavHeading ";
-
+import { useTranslation } from "react-i18next";
 
 const EventScheduler = () => {
   const [currentPage, setCurrentPage] = useState(0);
@@ -36,6 +36,7 @@ const EventScheduler = () => {
     (state) => state.admin.events
   );
   const role = useSelector((state) => state.common.auth.role);
+  const { t } = useTranslation("admEvent"); // Hook for translation
 
   useEffect(() => {
     dispatch(fetchEventsThunk());
@@ -50,38 +51,24 @@ const EventScheduler = () => {
     dispatch(resetSelectedEvent());
     dispatch(resetSidebarContent());
   };
-  useNavHeading(role, "Events");
+  useNavHeading(t("Noticeboard"), t("Events"));
 
   const handleSaveEvent = async (eventData) => {
     try {
       if (selectedEvent) {
         await dispatch(updateEventThunk(eventData));
-        toast.success("Event updated successfully!");
+        toast.success(t("Event updated successfully!"));
       } else {
         await dispatch(createEventThunk(eventData));
-        toast.success("Event created successfully!");
+        toast.success(t("Event created successfully!"));
       }
-      
+
       handleSidebarClose();
-  
-      
-      dispatch(fetchEventsThunk()); 
-  
+      dispatch(fetchEventsThunk());
     } catch (error) {
-      toast.error("Failed to save event");
+      toast.error(t("Failed to save event"));
     }
   };
-  
-
-  // const handleDeleteEvent = async () => {
-  //   try {
-  //     await dispatch(deleteEventThunk(selectedEvent._id));
-  //     toast.success("Event deleted successfully!");
-  //     handleSidebarClose();
-  //   } catch (error) {
-  //     toast.error("Failed to delete event");
-  //   }
-  // };
 
   const handleEventClick = (event) => {
     dispatch(setSelectedEvent(event));
@@ -100,58 +87,57 @@ const EventScheduler = () => {
   // Custom date cell render for the calendar
   const handleDateCellRender = (value) => {
     if (events?.length > 0) {
-        // Format the date for comparison
-        const formattedDate = format(value?.toDate(), "yyyy-MM-dd");
+      // Format the date for comparison
+      const formattedDate = format(value?.toDate(), "yyyy-MM-dd");
 
-        // Filter events to match the formatted date
-        const dayEvents = events?.filter((event) => {
-            const eventDate = event?.date ? parseISO(event.date) : null;
-            return isValid(eventDate) && format(eventDate, "yyyy-MM-dd") === formattedDate;
-        });
+      // Filter events to match the formatted date
+      const dayEvents = events?.filter((event) => {
+        const eventDate = event?.date ? parseISO(event.date) : null;
+        return isValid(eventDate) && format(eventDate, "yyyy-MM-dd") === formattedDate;
+      });
 
-        const bgColors = ["bg-pink-500", "bg-purple-500", "bg-blue-500", "bg-indigo-500"];
+      const bgColors = ["bg-pink-500", "bg-purple-500", "bg-blue-500", "bg-indigo-500"];
 
-        return (
-            <ul className="events space-y-1 max-h-20 overflow-y-auto">
-                {dayEvents.map((event, index) => (
-                    <li
-                        key={event?._id}
-                        className={`inline-block px-2 py-1 rounded text-white ${bgColors[index % bgColors.length]} shadow-md cursor-pointer`}
-                        onClick={() => handleEventClick(event)}
-                    >
-                        {event?.title} - {event?.time || '-'}
-                    </li>
-                ))}
-            </ul>
-        );
+      return (
+        <ul className="events space-y-1 max-h-20 overflow-y-auto">
+          {dayEvents.map((event, index) => (
+            <li
+              key={event?._id}
+              className={`inline-block px-2 py-1 rounded text-white ${bgColors[index % bgColors.length]} shadow-md cursor-pointer`}
+              onClick={() => handleEventClick(event)}
+            >
+              {event?.title} - {event?.time || "-"}
+            </li>
+          ))}
+        </ul>
+      );
     }
     return null;
-};
-
+  };
 
   const sidebarTitle =
     sidebarContent === "viewEvent" && selectedEvent
       ? selectedEvent.title
       : sidebarContent === "addEvent"
-        ? "Add New Event"
-        : sidebarContent === "updateEvent"
-          ? "Update Event"
-          : "Sidebar";
+      ? t("Add New Event")
+      : sidebarContent === "updateEvent"
+      ? t("Update Event")
+      : t("Sidebar");
 
   return (
-    <Layout title="Event | Student Diwan">
+    <Layout title={`${t("Event")} | ${t("Student Diwan")}`}>
       <DashLayout>
         <div className="min-h-screen p-4 bg-gray-50 max-w-screen">
           <div className="flex flex-row justify-between">
             <h1 className="mb-2 bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent font-semibold bg-clip-text">
-              Student Events
+              {t("Student Events")}
             </h1>
             {role === "admin" && (
               <button
                 className="h-10 inline-flex items-center border border-transparent text-sm font-medium shadow-sm bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600"
                 onClick={() => dispatch(setSidebarContent("addEvent"))}
               >
-                Add New Event
+                {t("Add New Event")}
               </button>
             )}
           </div>
@@ -169,7 +155,7 @@ const EventScheduler = () => {
             {filteredEvents.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full text-gray-500 w-full">
                 <IoCalendarOutline className="text-6xl" />
-                <span>No Events in this Month</span>
+                <span>{t("No Events in this Month")}</span>
               </div>
             ) : (
               filteredEvents.map((event) => (
@@ -192,7 +178,6 @@ const EventScheduler = () => {
 
           {/* Add HR and margin bottom */}
           <hr className="my-6 border-t-2 mt-12" />
-
 
           {/* Calendar Date Render */}
           <Calendar
@@ -250,28 +235,29 @@ const EventScheduler = () => {
                   </select>
                   <div className="flex space-x-2">
                     <button
-                      className={`border rounded px-2 py-1 ${type === "month"
+                      className={`border rounded px-2 py-1 ${
+                        type === "month"
                           ? "bg-gradient-to-r from-pink-500 to-purple-500 text-white"
                           : ""
-                        }`}
+                      }`}
                       onClick={() => onTypeChange("month")}
                     >
-                      Month
+                      {t("Month")}
                     </button>
                     <button
-                      className={`border rounded px-2 py-1 ${type === "year"
+                      className={`border rounded px-2 py-1 ${
+                        type === "year"
                           ? "bg-gradient-to-r from-pink-500 to-purple-500 text-white"
                           : ""
-                        }`}
+                      }`}
                       onClick={() => onTypeChange("year")}
                     >
-                      Year
+                      {t("Year")}
                     </button>
                   </div>
                 </div>
               );
             }}
-            // Customize week day display
             className="custom-calendar"
           />
 
@@ -284,7 +270,7 @@ const EventScheduler = () => {
             {sidebarContent === "viewEvent" && selectedEvent ? (
               <ViewEvent />
             ) : sidebarContent === "viewEvent" ? (
-              <p>No event selected</p>
+              <p>{t("No event selected")}</p>
             ) : null}
 
             {sidebarContent === "addEvent" && (
