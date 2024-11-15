@@ -23,7 +23,9 @@ const GradeHeader = ({ onSearch, onFilterChange }) => {
 
   const { modules: moduleList } = useSelector((state) => state.admin.module);
   const { assignments } = useSelector((store) => store.admin.subject_assignment);
-  const { quizzes } = useSelector((store) => store.admin.subject_quiz);
+  const {quizzes } = useSelector(
+    (state) => state.admin.quizzes
+  );
 
   return (
     <div className="p-2 bg-white">
