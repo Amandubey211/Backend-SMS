@@ -1,76 +1,34 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { GoAlertFill } from "react-icons/go";
 import Chapter from "./Components/Chapter";
 import ModuleCard from "./Components/ModuleCard";
-import { baseUrl } from '../../../config/Common';
 import Spinner from "../../../Components/Common/Spinner";
+import { fetchCourseProgress } from "../../../Store/Slices/Admin/Users/Students/student.action";
+import { useParams } from "react-router-dom";
 
-const MainSection = ({ selectedSubjectId }) => {
+const MainSection = () => {
+  const { studentId } = useParams();
   const [modules, setModules] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
   const [expandedChapters, setExpandedChapters] = useState(null);
-  const [selectedModule, setSelectedModule] = useState(null); // Track selected module
-
-  // Fetch childrenData and presentClassId from Redux
-  const childrenData = useSelector((state) => state.Parent.children.children);
-  const presentClassId = childrenData && childrenData[0]?.presentClassId;
-  const studentId = childrenData && childrenData[0]?.id; // Assuming 'id' is the field for student ID
-
-  console.log("Children Data:", childrenData);
-  console.log("Student ID:", studentId);
-
-  // Fetch modules and chapters
+  const [selectedModule, setSelectedModule] = useState(null);
+  const { courseProgress, loading, error } = useSelector(
+    (store) => store.admin.all_students
+  );
   useEffect(() => {
-    if (!selectedSubjectId) {
-      setModules([]);  // Clear previous modules
-      setSelectedModule(null); // Clear selected module
-      setError(null); // Clear any errors
-      console.log("Missing presentClassId or selectedSubjectId:", { selectedSubjectId });
-      return;
-    }
-  
-    const fetchModulesAndChapters = async () => {
-      setLoading(true);
-      try {
-        const token = localStorage.getItem("parent:token");
-        if (!token) throw new Error("Authentication token not found");
-  
-        const response = await axios.get(
-          `${baseUrl}/admin/course/progress/student/${studentId}/subject/${selectedSubjectId}`,
-          {
-            headers: { Authentication: token },
-          }
-        );
-  
-        if (response.data && response.data.data) {
-          setModules(response.data.data.module);
+    if (courseProgress && courseProgress?.module) {
+      const fetchedModules = courseProgress.module;
+      setModules(fetchedModules);
 
-          // Automatically select the first module and load its chapters
-          if (response.data.data.module.length > 0) {
-            setSelectedModule(response.data.data.module[0]);  // Auto-select the first module
-          }
-        } else {
-          setModules([]); // If no modules found, reset the data
-        }
-  
-        setLoading(false);
-      } catch (err) {
-        console.error("Error fetching modules:", err);
-        setError("Failed to fetch modules.");
-        setModules([]);  // Reset modules on error
-        setLoading(false);
+      // Update selectedModule only if it changes
+      if (!selectedModule || selectedModule.moduleId !== fetchedModules[0]?.moduleId) {
+        setSelectedModule(fetchedModules[0] || null);
       }
-    };
-  
-    fetchModulesAndChapters();
-  }, [presentClassId, selectedSubjectId, studentId]); // Dependencies ensure that it reloads when subject changes
-  
+    }
+  }, [courseProgress]);
 
   const selectModule = (module) => {
-    setSelectedModule(module); // Set the selected module when clicked
+    setSelectedModule(module);
     window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
   };
 
@@ -82,9 +40,8 @@ const MainSection = ({ selectedSubjectId }) => {
     <div className="flex min-h-screen my-2">
       <div className="w-[65%] bg-white p-2">
         <div className="bg-white p-2 rounded-lg">
-          {/* Show loading or error state for Chapters */}
           {loading ? (
-            <Spinner/>
+            <Spinner />
           ) : error ? (
             <div className="flex justify-center items-center my-20 h-full w-full">
               <p className="text-gray-500">Error loading data: {error}</p>
@@ -101,7 +58,7 @@ const MainSection = ({ selectedSubjectId }) => {
                 quizzes={chapter?.quizzes || []}
                 attachments={chapter?.attachments || []}
                 isExpanded={expandedChapters === chapter?.chapterId}
-                onToggle={() => handleToggle(chapter?.chapterId)}                
+                onToggle={() => handleToggle(chapter?.chapterId)}
               />
             ))
           ) : (
@@ -122,7 +79,7 @@ const MainSection = ({ selectedSubjectId }) => {
             <h2 className="text-lg font-semibold">All Modules</h2>
           </div>
           <div className="grid grid-cols-1 gap-2">
-            {loading ? ( // Show spinner while loading modules
+            {loading ? (
               <Spinner />
             ) : modules?.length > 0 ? (
               modules.map((module, index) => (

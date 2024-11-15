@@ -231,7 +231,7 @@ const SideMenubar = () => {
           <div className="flex-1 ml-3">
             <h2 className="font-semibold">
               {userDetails?.fullName?.slice(0, 5) ||
-                "User"}
+                "User"} {userDetails?.fullName?.length > 5 && '..'}
             </h2>
             <p className="text-gray-500 capitalize text-sm">{role}</p>
           </div>
