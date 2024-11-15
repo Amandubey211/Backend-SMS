@@ -24,14 +24,18 @@ const Navbar = () => {
   );
   const role = useSelector((store) => store.common.auth.role);
   const dispatch = useDispatch()
-  useEffect(() => {
-    dispatch(fetchAcademicYear())
-  }, []);
+ 
   const selectAcademicYear = useSelector((store) => {
     const say = localStorage.getItem('say')
       return store.common.academicYear.academicYears?.find((year) => year?._id == say)
     
   });
+  useEffect(() => {
+    if(!selectAcademicYear){
+         dispatch(fetchAcademicYear()) 
+    }
+
+  }, []);
 
   const { staffLogout } = useStaffLogout();
 
