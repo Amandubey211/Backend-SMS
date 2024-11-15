@@ -210,41 +210,24 @@ const StudentMainSection = () => {
         </div>
         <div className=" w-[35%] flex items-center justify-center p-4">
           <div className="w-full h-full">
-            {unpaidFees === 0 ? (
-              <div className="text-gray-500 flex flex-col items-center mt-4 mb-6">
-                <PiMoneyWavy size={80} />
-                <span className="mt-4 text-2lx font-semibold text-center">
-                  No unpaid fees at the moment
-                </span>
-              </div>
-            ) : (
-              <div className="flex flex-col border-b border-gray-200 p-5">
-                <StudentDashFeeCard
-                  title="Total Unpaid Fees"
-                  amount={unpaidFees}
-                  unpaidFees={unpaidFees}
-                  buttonText="Pay Now"
-                />
-              </div>
-            )}
+            <div className="flex flex-col border-b border-gray-200 p-5">
+              <StudentDashFeeCard
+                title="Total Unpaid Fees"
+                amount={unpaidFees || 0} 
+                unpaidFees={unpaidFees || 0}
+                buttonText="Pay Now"
+              />
+            </div>
             <hr />
-            {paidFees === 0 ? (
-              <div className="text-gray-500 flex flex-col items-center mt-7">
-                <PiMoneyWavyDuotone size={80} />
-                <span className="mt-4 text-lg font-semibold text-center mb-8">
-                  No paid fees available
-                </span>
-              </div>
-            ) : (
-              <div className="flex flex-col py-5">
-                <StudentDashFeeCard
-                  title="Total Paid Fees"
-                  amount={paidFees}
-                  unpaidFees={paidFees} // Should be `paidFees`
-                />
-              </div>
-            )}
+            <div className="flex flex-col py-5">
+              <StudentDashFeeCard
+                title="Total Paid Fees"
+                amount={paidFees || 0}
+                unpaidFees={paidFees || 0}
+              />
+            </div>
           </div>
+
         </div>
       </div>
     </div>
