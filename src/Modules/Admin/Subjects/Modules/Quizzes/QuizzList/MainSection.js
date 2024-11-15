@@ -7,9 +7,12 @@ import QuizFilterCard from "../Components/QuizFilterCard";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchFilteredQuizzesThunk } from "../../../../../../Store/Slices/Admin/Class/Quiz/quizThunks"; // Import the thunk
 import FilterCard from "../../Assignments/Component/FilterCard";
+import { useTranslation } from "react-i18next";
 
 const MainSection = () => {
   const { cid, sid } = useParams();
+  const { t } = useTranslation("admClass");
+
   const [filters, setFilters] = useState({
     moduleId: "",
     chapterId: "",
@@ -36,10 +39,10 @@ const MainSection = () => {
       <SubjectSideBar />
       <div className="w-[65%] border-l">
         <List
-          title="All Quizzes"
+          title={t("All Quizzes")}
           data={quizzes}
           icon={<RiFileUnknowLine />}
-          type="Quiz"
+          type={t("Quiz")}
           loading={loading}
           error={error}
           refetchData={refetchQuizzes} // Pass the correct prop
@@ -50,6 +53,7 @@ const MainSection = () => {
       </div>
       <NavLink
         to={`/class/${cid}/${sid}/create_quiz`}
+        aria-label={t("Create Quiz")}
         className="bg-gradient-to-r from-purple-400 to-pink-400 text-white p-4 fixed rounded-full shadow-md bottom-4 right-4"
       >
         <RiAddFill size={24} />

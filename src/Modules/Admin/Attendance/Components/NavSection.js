@@ -4,10 +4,12 @@ import { useParams, NavLink } from "react-router-dom";
 import { fetchAttendanceStats } from "../../../../Store/Slices/Admin/Class/Attendence/attendanceThunks";
 import AttendanceNavCard from "./AttendanceNavCard";
 import { navData } from "./Data/NavData";
+import { useTranslation } from "react-i18next";
 
 const NavSection = () => {
   const dispatch = useDispatch();
   const { cid } = useParams();
+  const { t } = useTranslation("admClass");
 
   const attendanceStat = useSelector(
     (state) => state.admin.attendance.stats || {}
@@ -25,6 +27,7 @@ const NavSection = () => {
   const mappedData = navData.map((item) => ({
     ...item,
     value: attendanceStat[dataMapping[item.label.trim()]] || 0, // Map values from the attendanceStat object
+    label: t(item.label.trim()), // Translate labels using i18n
   }));
 
   useEffect(() => {
@@ -37,13 +40,13 @@ const NavSection = () => {
     <div>
       <div className="flex items-center justify-between mb-3">
         <h2 className="text-xl font-semibold text-gradient text-purple-600">
-          Student Attendance
+          {t("Student Attendance")}
         </h2>
         <NavLink
           to={`/class/${cid}/take_attendance`}
           className="px-6 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-md shadow-lg"
         >
-          Take Attendance
+          {t("Take Attendance")}
         </NavLink>
       </div>
 

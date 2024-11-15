@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import IconGrid from "./IconGrid";
 import CreateEditIconModal from "./CreateEditIconModal";
+import { useTranslation } from "react-i18next";
 import {
   createClass,
   updateClass,
@@ -11,6 +12,8 @@ import { selectIcon } from "../../../../Store/Slices/Admin/Class/reducer/iconSli
 import { fetchAllIcons } from "../../../../Store/Slices/Admin/Class/actions/iconThunk";
 
 const AddNewClass = ({ classData, isUpdate, onClose }) => {
+  const { t } = useTranslation("admClass");
+
   const [newClassName, setNewClassName] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showClassNameError, setShowClassNameError] = useState(false);
@@ -51,7 +54,7 @@ const AddNewClass = ({ classData, isUpdate, onClose }) => {
     }
 
     if (!selectedIcon) {
-      toast.error("Please select an icon.");
+      toast.error(t("Please select an icon."));
       return;
     }
 
@@ -69,7 +72,7 @@ const AddNewClass = ({ classData, isUpdate, onClose }) => {
         setShowClassNameError(false);
       }
     } catch (err) {
-      toast.error(err.message || "Something went wrong");
+      toast.error(err.message || t("Something went wrong"));
     }
   };
 
@@ -78,7 +81,7 @@ const AddNewClass = ({ classData, isUpdate, onClose }) => {
       <form onSubmit={handleSubmit} className="flex flex-col h-full">
         <div className="flex flex-col justify-start gap-2 mt-5">
           <label htmlFor="className" className="font-semibold">
-            Class Name
+            {t("Class Name")}
           </label>
           <input
             id="className"
@@ -91,18 +94,18 @@ const AddNewClass = ({ classData, isUpdate, onClose }) => {
               showClassNameError ? "border-red-500" : "border-gray-300"
             }`}
             type="text"
-            placeholder="Type here"
-            aria-label="Class Name"
+            placeholder={t("Type here")}
+            aria-label={t("Class Name")}
           />
           {showClassNameError && (
             <span className="text-red-500 text-sm mt-1">
-              Class name is required.
+              {t("Class name is required.")}
             </span>
           )}
         </div>
 
         <div className="flex flex-col gap-2 mt-6 flex-grow">
-          <h3 className="font-semibold">Class Icons</h3>
+          <h3 className="font-semibold">{t("Class Icons")}</h3>
           <IconGrid
             icons={icons}
             activeIconId={
@@ -121,10 +124,10 @@ const AddNewClass = ({ classData, isUpdate, onClose }) => {
             aria-busy={loading ? "true" : "false"}
           >
             {loading
-              ? "Processing..."
+              ? t("Processing...")
               : isUpdate
-              ? "Update Class"
-              : "Add New Class"}
+              ? t("Update Class")
+              : t("Add New Class")}
           </button>
         </div>
       </form>

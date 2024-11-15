@@ -2,17 +2,21 @@ import React, { useCallback, useEffect } from "react";
 import { NavLink, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchSectionsByClass } from "../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
+import { useTranslation } from "react-i18next";
 
 const NavigationBar = ({ setActiveSection, activeSection, totalStudents }) => {
+  const { t } = useTranslation("admClass");
   const Sections = useSelector(
     (store) => store.admin.group_section.sectionsList
-  ); // Assuming this comes from another slice
+  );
   const role = useSelector((store) => store.common.auth.role);
   const dispatch = useDispatch();
   const { cid } = useParams();
+
   useEffect(() => {
     dispatch(fetchSectionsByClass(cid));
   }, [dispatch, cid]);
+
   const getButtonClass = useCallback(
     (section) => {
       return activeSection === section
@@ -33,7 +37,7 @@ const NavigationBar = ({ setActiveSection, activeSection, totalStudents }) => {
     <>
       <div className="flex justify-between items-center p-4">
         <div className="flex items-center space-x-4">
-          <h1 className="text-xl font-semibold">All Students</h1>
+          <h1 className="text-xl font-semibold">{t("All Students")}</h1>
           <span className="bg-purple-200 text-purple-700 rounded-full px-2 py-1 text-sm">
             {totalStudents}
           </span>
@@ -43,7 +47,7 @@ const NavigationBar = ({ setActiveSection, activeSection, totalStudents }) => {
             to="/admissions"
             className="flex items-center border border-gray-300 ps-5 py-0 rounded-full"
           >
-            <span className="mr-2">Add New Students</span>
+            <span className="mr-2">{t("Add New Students")}</span>
             <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full w-12 h-12 flex items-center justify-center">
               <span className="text-3xl -mt-2">+</span>
             </div>
@@ -56,7 +60,7 @@ const NavigationBar = ({ setActiveSection, activeSection, totalStudents }) => {
           onClick={() => handleSectionChange("Everyone")}
           aria-pressed={activeSection === "Everyone"}
         >
-          Everyone
+          {t("Everyone")}
         </button>
         {Sections?.map((item) => (
           <button

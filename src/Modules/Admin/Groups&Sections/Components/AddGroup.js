@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import toast from "react-hot-toast";
 import { GiImperialCrown } from "react-icons/gi";
-import { FaChevronDown, FaTimes } from "react-icons/fa";
+import { FaChevronDown, FaTimes, FaUserSlash } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import {
   createGroup,
@@ -11,10 +11,11 @@ import {
   fetchSectionsByClass,
 } from "../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
 import { useParams } from "react-router-dom";
-import { FaUserSlash } from "react-icons/fa";
 import { fetchStudentsByClassAndSection } from "../../../../Store/Slices/Admin/Class/Students/studentThunks";
+import { useTranslation } from "react-i18next";
 
 const AddGroup = ({ group, isUpdate, groupId, onClose }) => {
+  const { t } = useTranslation("admClass");
   const [groupName, setGroupName] = useState("");
   const [seatLimit, setSeatLimit] = useState(5);
   const [selectedStudents, setSelectedStudents] = useState([]);
@@ -85,7 +86,7 @@ const AddGroup = ({ group, isUpdate, groupId, onClose }) => {
 
     // Validate seat limit
     if (seatLimit <= 0) {
-      setSeatLimitError("Seat limit must be a positive number");
+      setSeatLimitError(t("Seat limit must be a positive number"));
       return;
     } else {
       setSeatLimitError("");
@@ -114,18 +115,17 @@ const AddGroup = ({ group, isUpdate, groupId, onClose }) => {
       dispatch(fetchGroupsByClass(cid));
       dispatch(fetchUnassignedStudents(cid));
     } catch (err) {
-      toast.error(err.message || "Something went wrong");
+      toast.error(err.message || t("Something went wrong"));
     }
   };
 
   return (
     <form className="flex flex-col h-full" onSubmit={handleSubmit}>
       <div className="bg-white h-[80%] overflow-y-auto rounded-lg p-4 w-full max-w-md">
-        <div className="flex justify-between items-center mb-4"></div>
         <div className="flex flex-col space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700">
-              Group Name
+              {t("Group Name")}
             </label>
             <input
               type="text"
@@ -137,7 +137,7 @@ const AddGroup = ({ group, isUpdate, groupId, onClose }) => {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700">
-              Max. Number Of Students
+              {t("Max. Number Of Students")}
             </label>
             <input
               type="number"
@@ -152,7 +152,7 @@ const AddGroup = ({ group, isUpdate, groupId, onClose }) => {
           </div>
           <div className="relative">
             <label className="block text-sm font-medium text-gray-700">
-              Select Students
+              {t("Select Students")}
             </label>
             <div className="border border-gray-300 rounded-md p-3 flex flex-wrap">
               {selectedStudents.map((student) => (
@@ -185,7 +185,7 @@ const AddGroup = ({ group, isUpdate, groupId, onClose }) => {
                   <div className="text-center p-4">
                     <FaUserSlash className="text-2xl text-gray-400 mx-auto" />
                     <p className="text-sm text-gray-500">
-                      No students available in this class.
+                      {t("No students available in this class.")}
                     </p>
                   </div>
                 ) : (
@@ -205,7 +205,7 @@ const AddGroup = ({ group, isUpdate, groupId, onClose }) => {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700">
-              Name Of Team Leader (Optional)
+              {t("Name Of Team Leader (Optional)")}
             </label>
             {leader && (
               <div className="flex items-center space-x-2 bg-gradient-to-r rounded-lg text-white from-pink-500 to-purple-500">
@@ -242,7 +242,11 @@ const AddGroup = ({ group, isUpdate, groupId, onClose }) => {
           className="w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md"
           disabled={loading}
         >
-          {loading ? "Please Wait..." : isUpdate ? "Update Group" : "Add Group"}
+          {loading
+            ? t("Please Wait...")
+            : isUpdate
+            ? t("Update Group")
+            : t("Add Group")}
         </button>
       </div>
     </form>

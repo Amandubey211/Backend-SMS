@@ -1,11 +1,13 @@
 import React, { useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import Sidebar from "../../../../Components/Common/Sidebar";
-import { PiPlusLight } from "react-icons/pi";
+import { PiPlusLight, PiStudentThin } from "react-icons/pi";
 import AssignStudent from "./AssignStudent";
-import { PiStudentThin } from "react-icons/pi";
 import profileIcon from "../../../../Assets/DashboardAssets/profileIcon.png";
+import { useTranslation } from "react-i18next";
+
 const UnAssignedStudentList = () => {
+  const { t } = useTranslation("admClass");
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -36,19 +38,19 @@ const UnAssignedStudentList = () => {
     const section = sectionsList.find((sec) => sec._id === sectionId);
     return section
       ? { name: section.sectionName, color: "text-gray-500" }
-      : { name: "No Section Assigned", color: "text-red-500" };
+      : { name: t("No Section Assigned"), color: "text-red-500" };
   };
 
   return (
     <div className="w-80 p-4 bg-white">
       <div className="mb-4">
         <h2 className="text-md font-semibold">
-          Unassigned Students{" "}
+          {t("Unassigned Students")}{" "}
           <span className="text-gray-500">({filteredStudents.length})</span>
         </h2>
         <input
           type="text"
-          placeholder="Search Student"
+          placeholder={t("Search Student")}
           value={searchQuery}
           onChange={handleSearch}
           className="mt-2 w-full px-3 py-2 border rounded-full"
@@ -59,8 +61,7 @@ const UnAssignedStudentList = () => {
       {filteredStudents.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-64 text-center text-gray-500">
           <PiStudentThin className="text-5xl mb-2" />
-
-          <p>No students found.</p>
+          <p>{t("No students found.")}</p>
         </div>
       ) : (
         <ul>
@@ -101,7 +102,7 @@ const UnAssignedStudentList = () => {
         <Sidebar
           isOpen={isSidebarOpen}
           onClose={handleSidebarClose}
-          title="Assign Section"
+          title={t("Assign Section")}
         >
           <AssignStudent
             name={selectedStudent.firstName}
