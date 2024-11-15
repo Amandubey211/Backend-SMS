@@ -4,8 +4,10 @@ import BookCard from "../Components/BookCard";
 import FormField from "../Components/FormField";
 import NoDataFound from "../../../../Components/Common/NoDataFound";
 import { setFilters } from "../../../../Store/Slices/Admin/Library/LibrarySlice";
+import { useTranslation } from "react-i18next";
 
 const LibraryTab = ({ handleSidebarOpen }) => {
+  const { t } = useTranslation("admLibrary");
   const dispatch = useDispatch();
   const { books, filters } = useSelector((state) => state.admin.library);
   const role = useSelector((store) => store.common.auth.role);
@@ -49,7 +51,7 @@ const LibraryTab = ({ handleSidebarOpen }) => {
           <FormField
             id="class"
             name="class"
-            label="Class"
+            label={t("Class")}
             value={filters.class}
             onChange={handleFilterChange}
             options={classLevels}
@@ -57,7 +59,7 @@ const LibraryTab = ({ handleSidebarOpen }) => {
           <FormField
             id="category"
             name="category"
-            label="Category"
+            label={t("Category")}
             value={filters.category}
             onChange={handleFilterChange}
             options={categories}
@@ -66,10 +68,10 @@ const LibraryTab = ({ handleSidebarOpen }) => {
         {role !== "teacher" && (
           <button
             onClick={handleSidebarOpen}
-            className="bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600">Add Book
+            className="bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600">
+            {t("Add Book")}
           </button>
         )}
-
       </div>
 
       <div className="flex justify-center items-center w-full min-h-[70vh]">
@@ -81,7 +83,7 @@ const LibraryTab = ({ handleSidebarOpen }) => {
           </div>
         ) : (
           <div className="flex justify-center items-center min-h-[50vh]">
-            <NoDataFound message="No Books Found" />
+            <NoDataFound message={t("No Books Found")} />
           </div>
         )}
       </div>
