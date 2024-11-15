@@ -21,7 +21,7 @@ export const fetchDashboardCards = createAsyncThunk(
   }
 );
 
-// Fetch notices
+// Fetch notices // -- looking not in use and duplicate api
 export const fetchNotices = createAsyncThunk(
   "dashboard/fetchNotices",
   async (_, { rejectWithValue, dispatch }) => {
