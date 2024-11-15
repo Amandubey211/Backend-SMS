@@ -86,6 +86,10 @@ const AddDiscussion = () => {
         toast.error("please assign the discussion");
         return;
       }
+      if (!discussionData.title) {
+        toast.error("please give title to the discussion");
+        return;
+      }
       if (isEditing) {
         dispatch(
           updateDiscussion({

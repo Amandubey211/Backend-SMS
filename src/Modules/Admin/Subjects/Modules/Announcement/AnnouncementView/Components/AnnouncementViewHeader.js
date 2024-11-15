@@ -10,6 +10,7 @@ import DeleteModal from "../../../../../../../Components/Common/DeleteModal";
 import AnnouncementCommentSection from "../AnnouncementMessage/AnnouncementCommentSection";
 import { deleteAnnouncement } from "../../../../../../../Store/Slices/Admin/Class/Announcement/announcementThunk";
 import CommentModule from "../../../Comment/CommentModule";
+import { FaUserCircle } from "react-icons/fa";
 
 const AnnouncementViewHeader = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -75,11 +76,19 @@ const AnnouncementViewHeader = () => {
   return (
     <div className="flex items-center justify-between p-2 px-4 border-b">
       <div className="flex items-center">
-        <img
-          src=""
-          alt="Profile"
-          className="w-12 h-12 rounded-full"
-        />
+        {announcement?.authorUrl ? (
+          <img
+            src={announcement.authorUrl}
+            alt={`${announcement.authorName || "Author"}'s Profile`}
+            className="w-12 h-12 rounded-full object-cover"
+          />
+        ) : (
+          <FaUserCircle
+            className="w-12 h-12 text-gray-400"
+            aria-label="Default Profile Icon"
+          />
+        )}
+
         <div className="ml-3">
           <h1 className="text-lg font-semibold">
             {announcement?.title || "Announcement Title"}

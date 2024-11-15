@@ -45,8 +45,11 @@ const AnnouncementHeader = ({ onSearch }) => {
             <CiSearch className="w-5 h-5 text-gray-500" />
           </button>
         </div>
+
+  
         <div className="flex items-center gap-4">
           <span className="text-gray-500">{t("Status")}: </span>
+
           <label className="inline-flex items-center">
             <input
               type="radio"
@@ -69,7 +72,7 @@ const AnnouncementHeader = ({ onSearch }) => {
             />
             <span className="ml-2">{t("Unread")}</span>
           </label>
-        </div>
+        </div> */}
       </div>
     </div>
   );

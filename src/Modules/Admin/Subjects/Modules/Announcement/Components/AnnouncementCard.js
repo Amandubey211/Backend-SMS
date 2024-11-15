@@ -14,6 +14,7 @@ const AnnouncementCard = ({
   color,
   isRead,
   createdAt,
+  delayPosting,
 }) => {
   const { sid, cid } = useParams();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -62,14 +63,23 @@ const AnnouncementCard = ({
           <p className="text-base text-green-600">{section}</p>
           <div className="flex justify-center items-center gap-1 mt-5 text-gray-500">
             <IoCalendarOutline />
-            <p className="text-md">Posted on:</p>
+            <p className="text-md">Created on:</p>
             <p className="text-md">
               {new Date(createdAt).toLocaleDateString()}
             </p>
           </div>
+          {delayPosting && (
+            <div className="flex justify-center items-center gap-1 mt-5 text-gray-500">
+              <IoCalendarOutline />
+              <p className="text-md">Posting on:</p>
+              <p className="text-md">
+                {new Date(delayPosting).toLocaleDateString()}
+              </p>
+            </div>
+          )}
         </NavLink>
         <div className="flex flex-col gap-2 text-xl relative">
-          <button
+          {/* <button
             className="p-1 border rounded-full transition-all duration-300 ease-in-out hover:bg-gray-200"
             onClick={toggleMenu}
           >
@@ -88,7 +98,7 @@ const AnnouncementCard = ({
                 <span>Mark as Read</span>
               </button>
             </div>
-          )}
+          )} */}
         </div>
       </div>
     </div>

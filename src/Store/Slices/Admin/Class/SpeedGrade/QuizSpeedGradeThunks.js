@@ -3,6 +3,7 @@ import axios from "axios";
 import { baseUrl } from "../../../../../config/Common"; // Importing baseUrl
 import { setShowError, setErrorMsg } from "../../../Common/Alerts/alertsSlice";
 import { ErrorMsg } from "../../../Common/Alerts/errorhandling.action";
+import toast from "react-hot-toast";
 
 const say = localStorage.getItem("say");
 
@@ -31,7 +32,7 @@ export const fetchAssignedQuizStudents = createAsyncThunk(
   async (quizId, { getState, rejectWithValue, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
-      const say = localStorage.getItem("say")
+      const say = localStorage.getItem("say");
       const response = await axios.get(
         `${baseUrl}/admin/speed_grade/quiz/${quizId}?say=${say}`,
         {
@@ -51,7 +52,7 @@ export const fetchStudentQuiz = createAsyncThunk(
   async ({ studentId, quizId }, { getState, rejectWithValue, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
-      const say = localStorage.getItem("say")
+      const say = localStorage.getItem("say");
       const response = await axios.get(
         `${baseUrl}/admin/speed_grade/quiz?say=${say}`,
         {
@@ -75,7 +76,7 @@ export const assignQuizGrade = createAsyncThunk(
   ) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
-      const say = localStorage.getItem("say")
+      const say = localStorage.getItem("say");
       const response = await axios.put(
         `${baseUrl}/admin/speed_grade/quiz/grade?say=${say}`,
         { studentId, quizId, attemptDate, score, status },
@@ -83,6 +84,8 @@ export const assignQuizGrade = createAsyncThunk(
           headers: { Authentication: token },
         }
       );
+      toast.success("Grade Assigned");
+      dispatch(fetchStudentQuiz({ studentId, quizId }));
       return response.data.data;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
