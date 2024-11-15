@@ -5,11 +5,14 @@ import { setUserDetails } from "../../User/reducers/userSlice";
 import { baseUrl } from "../../../../../config/Common";
 import toast from "react-hot-toast";
 import { fetchAcademicYear } from "../../AcademicYear/academicYear.action";
+import { postData } from "../../../../../services/apiEndpoints";
+import { handleError } from "../../Alerts/errorhandling.action";
+import { setShowError } from "../../Alerts/alertsSlice";
 
 // Student login action
 export const studentLogin = createAsyncThunk(
   "auth/studentLogin",
-  async (studentDetails, { rejectWithValue, dispatch,getState }) => {
+  async (studentDetails, { rejectWithValue, dispatch, getState }) => {
     try {
       const { email, password } = studentDetails;
 
@@ -18,13 +21,10 @@ export const studentLogin = createAsyncThunk(
         return rejectWithValue("Validation failed.");
       }
 
-      const { data } = await axios.post(
-        `${baseUrl}/auth/student/login`,
-        studentDetails
-      );
+      const data = await postData(`/auth/student/login`, studentDetails);
 
       if (data.success) {
-        localStorage.setItem(`${data.role}:token`, `Bearer ${data.token}`);
+        localStorage.setItem(`userToken`, `${data.token}`);
         localStorage.setItem("classId", `${data.classId}`);
 
         dispatch(setToken(data?.token)); // Store token in state
@@ -41,14 +41,17 @@ export const studentLogin = createAsyncThunk(
             dateOfBirth: data?.dateOfBirth,
             Q_Id: data?.Q_Id,
             enrollment: data?.enrollment,
-            className:data?.className,
-            sectionName:data?.sectionName,
+            className: data?.className,
+            sectionName: data?.sectionName,
           })
         );
 
         if (data.isVerifiedSchoolId) {
           await dispatch(fetchAcademicYear());
-          const activeAcademicYear = getState().common?.academicYear?.academicYears?.find((i)=>i.isActive == true);
+          const activeAcademicYear =
+            await getState().common?.academicYear?.academicYears?.find(
+              (i) => i.isActive == true
+            );
           localStorage.setItem("say", activeAcademicYear?._id);
           return { redirect: "/student_dash" };
         } else {
@@ -60,6 +63,7 @@ export const studentLogin = createAsyncThunk(
     } catch (error) {
       const errorMessage =
         error.response?.data?.msg || "Something went wrong. Please try again.";
+      toast.error(errorMessage);
       return rejectWithValue(errorMessage);
     }
   }
@@ -82,22 +86,9 @@ export const studentLogout = createAsyncThunk(
 export const qidVerification = createAsyncThunk(
   "auth/qidVerification",
   async (studentDetails, { rejectWithValue, dispatch }) => {
-    const token = localStorage.getItem("student:token");
-    if (!token) {
-      return rejectWithValue("Authentication Failed!");
-    }
     try {
-      // const token = localStorage.getItem(
-      //   process.env.REACT_APP_STUDENT_TOKEN_STORAGE_KEY
-      // );
-
-      const { data } = await axios.post(
-        `${baseUrl}/student/verify_school_id`,
-        studentDetails,
-        {
-          headers: { Authentication: token },
-        }
-      );
+      dispatch(setShowError(false));
+      const data = await postData(`/student/verify_school_id`, studentDetails);
 
       if (data.success) {
         dispatch(setRole("student"));
@@ -106,9 +97,7 @@ export const qidVerification = createAsyncThunk(
         return rejectWithValue(data.msg || "Verification failed.");
       }
     } catch (error) {
-      const errorMessage =
-        error.response?.data?.msg || "Something went wrong. Please try again.";
-      return rejectWithValue(errorMessage);
+      handleError(error, dispatch, rejectWithValue);
     }
   }
 );

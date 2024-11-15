@@ -121,9 +121,9 @@ const TopRankingStudents = () => {
               .map((student, index) => (
                 <div
                   key={index}
-                  className="flex items-center justify-between p-2 px-5 border rounded-md"
+                  className="flex items-center justify-between p-2 px-5 border rounded-md w-full gap-2"
                 >
-                  <div className="flex items-center">
+                  <div className="flex items-center w-[40%]">
                     <span className="mr-3">{index + 1}</span>
                     <img
                       className="w-10 h-10 rounded-full mr-4"
@@ -136,7 +136,7 @@ const TopRankingStudents = () => {
                     </span>
                   </div>
                   <div
-                    className="rounded-sm"
+                    className="rounded-sm w-[30%]"
                     style={{
                       background: "linear-gradient(to right, #fce7f3, #e9d5ff)",
                     }}
@@ -154,7 +154,7 @@ const TopRankingStudents = () => {
                       {student?.score ? `${student.score} %` : t("N/A")}
                     </span>
                   </div>
-                  <div className="w-[25%]">
+                  <div className="w-[30%]">
                     <span>
                       {t("Adm")}:{" "}
                       <span className="text-gray-600">

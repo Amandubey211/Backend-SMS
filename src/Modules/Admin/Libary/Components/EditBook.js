@@ -5,8 +5,10 @@ import FormInput from "../../Accounting/subClass/component/FormInput";
 import FormSelect from "../../Accounting/subClass/component/FormSelect";
 import ImageUpload from "./ImageUpload";
 import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 
 const EditBook = ({ book, onClose }) => {
+  const { t } = useTranslation("admLibrary");
   const dispatch = useDispatch();
   const classList = useSelector((state) => state.admin.class.classes);
 
@@ -72,11 +74,11 @@ const EditBook = ({ book, onClose }) => {
 
   const validateForm = () => {
     const newErrors = {};
-    if (!bookData.bookName) newErrors.bookName = "Book name is required.";
-    if (!bookData.authorName) newErrors.authorName = "Author name is required.";
-    if (!bookData.class) newErrors.class = "Class selection is required.";
-    if (!bookData.category) newErrors.category = "Category is required.";
-    if (bookData.copies < 1) newErrors.copies = "Copies must be at least 1.";
+    if (!bookData.bookName) newErrors.bookName = t("Book name is required.");
+    if (!bookData.authorName) newErrors.authorName = t("Author name is required.");
+    if (!bookData.class) newErrors.class = t("Class selection is required.");
+    if (!bookData.category) newErrors.category = t("Category is required.");
+    if (bookData.copies < 1) newErrors.copies = t("Copies must be at least 1.");
     return newErrors;
   };
 
@@ -118,7 +120,7 @@ const EditBook = ({ book, onClose }) => {
         <div className="px-5">
           <FormInput
             id="bookName"
-            label="Book Name"
+            label={t("Book Name")}
             name="bookName"
             value={bookData.bookName}
             onChange={handleInputChange}
@@ -126,7 +128,7 @@ const EditBook = ({ book, onClose }) => {
           />
           <FormInput
             id="authorName"
-            label="Author Name"
+            label={t("Author Name")}
             name="authorName"
             value={bookData.authorName}
             onChange={handleInputChange}
@@ -134,7 +136,7 @@ const EditBook = ({ book, onClose }) => {
           />
           <FormSelect
             id="class"
-            label="Select Class"
+            label={t("Select Class")}
             name="class"
             options={classList.map((cls) => ({
               value: cls._id,
@@ -146,7 +148,7 @@ const EditBook = ({ book, onClose }) => {
           />
           <FormInput
             id="category"
-            label="Category"
+            label={t("Category")}
             name="category"
             value={bookData.category}
             onChange={handleInputChange}
@@ -154,7 +156,7 @@ const EditBook = ({ book, onClose }) => {
           />
           <FormInput
             id="copies"
-            label="Copies"
+            label={t("Copies")}
             name="copies"
             type="number"
             value={bookData.copies}
@@ -168,7 +170,7 @@ const EditBook = ({ book, onClose }) => {
           type="submit"
           className="w-full p-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-md"
         >
-          Edit Book
+          {t("Edit Book")}
         </button>
       </div>
     </form>

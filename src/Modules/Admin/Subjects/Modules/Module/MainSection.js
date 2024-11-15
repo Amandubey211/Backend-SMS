@@ -14,6 +14,7 @@ import { fetchModules } from "../../../../../Store/Slices/Admin/Class/Module/mod
 import { setSelectedModule } from "../../../../../Store/Slices/Admin/Class/Module/moduleSlice";
 import { useParams } from "react-router-dom";
 import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 
 const MainSection = () => {
   const [expandedChapters, setExpandedChapters] = useState([]);
@@ -21,6 +22,8 @@ const MainSection = () => {
   const [sidebarContent, setSidebarContent] = useState(null);
   const { sid, cid } = useParams();
   const dispatch = useDispatch();
+  const { t } = useTranslation("admClass");
+
   const {
     selectedModule,
     modules: modulesData,
@@ -98,7 +101,7 @@ const MainSection = () => {
 
   const handleMoveModule = (module) => {
     if (!selectedModule || !selectedModule.moduleId) {
-      toast.error("No module selected to move.");
+      toast.error(t("No module selected to move."));
       return;
     }
 
@@ -135,14 +138,14 @@ const MainSection = () => {
         <div className="bg-white p-2 rounded-lg">
           <div className="flex justify-between px-4 mb-3 items-center">
             <h1 className="text-lg font-semibold">
-              {selectedModule?.name ? selectedModule.name : "Select a Module"}
+              {selectedModule?.name ? selectedModule.name : t("Select a Module")}
             </h1>
             {selectedModule?.name && (
               <button
                 onClick={openAddChapter}
                 className="px-4 py-2 rounded-md bg-gradient-to-r from-pink-100 to-purple-200"
               >
-                <span className="text-gradient">+ Add Chapter</span>
+                <span className="text-gradient">{t("+ Add Chapter")}</span>
               </button>
             )}
           </div>
@@ -163,14 +166,14 @@ const MainSection = () => {
               />
             ))
           ) : (
-            <NoDataFound title="Chapter" />
+            <NoDataFound title={t("Chapter")} />
           )}
         </div>
       </div>
       <div className="w-[35%] p-2 border">
         <div className="bg-white p-4 rounded-lg">
           <div className="flex items-center gap-1 mb-2">
-            <h1 className="text-xl font-semibold">All Modules</h1>
+            <h1 className="text-xl font-semibold">{t("All Modules")}</h1>
             <p className="bg-gradient-to-r from-pink-100 flex justify-center items-center to-purple-200 font-semibold rounded-full w-6 h-6">
               <span className="text-gradient">{modulesData?.length}</span>
             </p>
@@ -190,12 +193,12 @@ const MainSection = () => {
           <button
             onClick={openAddModule}
             className="bg-gradient-to-r from-purple-400 to-pink-400 text-white p-4 fixed rounded-full shadow-md bottom-4 right-4 transform transition-transform duration-300 hover:scale-110"
-            aria-label="Add Module"
+            aria-label={t("Add Module")}
           >
             <RiAddFill size={24} />
           </button>
           <span className="absolute bottom-14 right-1/2 transform translate-x-1/2 bg-black text-white text-sm p-2 rounded opacity-0 transition-opacity duration-300 hover:opacity-100 pointer-events-none">
-            Add Module
+            {t("Add Module")}
           </span>
         </div>
 
@@ -205,10 +208,10 @@ const MainSection = () => {
             onClose={handleSidebarClose}
             title={
               sidebarContent === "chapter"
-                ? "Add New Chapter"
+                ? t("Add New Chapter")
                 : sidebarContent === "module"
-                ? "Add New Module"
-                : "Edit Module"
+                ? t("Add New Module")
+                : t("Edit Module")
             }
           >
             {sidebarContent === "chapter" ? (

@@ -1,49 +1,30 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { ErrorMsg } from "../../../../../Common/Alerts/errorhandling.action";
-import {
-  setShowError,
-  setErrorMsg,
-} from "../../../../../Common/Alerts/alertsSlice";
-import axios from "axios";
-import { baseUrl } from "../../../../../../../config/Common";
-import { setActiveTab, setAttemptHistory, setQuizResults } from "./quizesSlice";
+import { handleError } from "../../../../../Common/Alerts/errorhandling.action";
+import { setShowError } from "../../../../../Common/Alerts/alertsSlice";
+import { setQuizResults } from "./quizesSlice";
 import { toast } from "react-hot-toast";
-const say = localStorage.getItem("say");
-
-// Helper Function: Get Token
-const getToken = (dispatch) => {
-  const token = localStorage.getItem("student:token");
-  if (!token) {
-    dispatch(setShowError(true));
-    dispatch(setErrorMsg("Authentication failed!"));
-    throw new Error("Authentication failed!");
-  }
-  return token;
-};
-
-// Thunks
+import { getAY } from "../../../../../../../Utils/academivYear";
+import {
+  getData,
+  postData,
+  putData,
+} from "../../../../../../../services/apiEndpoints";
 
 export const stdGetQuiz = createAsyncThunk(
   "quiz/stdGetQuiz",
   async ({ cid, sid, moduleId, chapterId }, { rejectWithValue, dispatch }) => {
     try {
-      const token = getToken(dispatch);
-
-      const res = await axios.get(
-        `${baseUrl}/student/studentquiz/class/${cid}?say=${say}`,
-        {
-          headers: { Authentication: token },
-          params: { subjectId: sid, moduleId, chapterId },
-        }
+      const say = getAY();
+      dispatch(setShowError(false));
+      const res = await getData(
+        `/student/studentquiz/class/${cid}?say=${say}`,
+        { subjectId: sid, moduleId, chapterId }
       );
 
-      const data = res?.data?.quizzes?.reverse();
+      const data = res?.quizzes?.reverse();
       return data;
     } catch (error) {
-      const err = ErrorMsg(error);
-      dispatch(setShowError(true));
-      dispatch(setErrorMsg(err.message));
-      return rejectWithValue(err.message);
+      handleError(error, dispatch, rejectWithValue);
     }
   }
 );
@@ -52,21 +33,13 @@ export const stdGetSingleQuiz = createAsyncThunk(
   "quiz/stdGetSingleQuiz",
   async ({ quizId }, { rejectWithValue, dispatch }) => {
     try {
-      const token = getToken(dispatch);
+      const say = getAY();
+      dispatch(setShowError(false));
+      const res = await getData(`/student/quiz/${quizId}?say=${say}`);
 
-      const res = await axios.get(
-        `${baseUrl}/student/quiz/${quizId}?say=${say}`,
-        {
-          headers: { Authentication: token },
-        }
-      );
-
-      return res?.data?.quiz;
+      return res?.quiz;
     } catch (error) {
-      const err = ErrorMsg(error);
-      dispatch(setShowError(true));
-      dispatch(setErrorMsg(err.message));
-      return rejectWithValue(err.message);
+      handleError(error, dispatch, rejectWithValue);
     }
   }
 );
@@ -78,21 +51,16 @@ export const submitQuiz = createAsyncThunk(
     { rejectWithValue, dispatch }
   ) => {
     try {
-      const token = getToken(dispatch);
+      const say = getAY();
+      dispatch(setShowError(false));
 
       const body = { studentAnswers: answers, timeTaken, isReattempt };
 
-      const res = await axios.post(
-        `${baseUrl}/student/studentquiz/submit/${quizId}?say=${say}`,
-        body,
-        {
-          headers: {
-            Authentication: token,
-          },
-        }
+      const data = await postData(
+        `/student/studentquiz/submit/${quizId}?say=${say}`,
+        body
       );
 
-      const data = res?.data;
       dispatch(
         setQuizResults({
           totalPoints: data.score,
@@ -114,10 +82,7 @@ export const submitQuiz = createAsyncThunk(
       toast.success("Quiz Submitted Successfully ");
       return newAttempt;
     } catch (error) {
-      const err = ErrorMsg(error);
-      dispatch(setShowError(true));
-      dispatch(setErrorMsg(err.message));
-      return rejectWithValue(err.message);
+      handleError(error, dispatch, rejectWithValue);
     }
   }
 );
@@ -126,21 +91,16 @@ export const fetchAttemptHistory = createAsyncThunk(
   "quiz/fetchAttemptHistory",
   async ({ quizId }, { rejectWithValue, dispatch }) => {
     try {
-      const token = getToken(dispatch);
+      const say = getAY();
+      dispatch(setShowError(false));
 
-      const res = await axios.get(
-        `${baseUrl}/student/studentquiz/${quizId}/attempt?say=${say}`,
-        {
-          headers: { Authentication: token },
-        }
+      const res = await getData(
+        `/student/studentquiz/${quizId}/attempt?say=${say}`
       );
 
-      return res?.data?.submission;
+      return res?.submission;
     } catch (error) {
-      const err = ErrorMsg(error);
-      dispatch(setShowError(true));
-      dispatch(setErrorMsg(err.message));
-      return rejectWithValue(err.message);
+      handleError(error, dispatch, rejectWithValue);
     }
   }
 );
@@ -149,21 +109,16 @@ export const fetchAllAttemptHistory = createAsyncThunk(
   "quiz/fetchAllAttemptHistory",
   async ({ quizId }, { rejectWithValue, dispatch }) => {
     try {
-      const token = getToken(dispatch);
+      const say = getAY();
+      dispatch(setShowError(false));
 
-      const res = await axios.get(
-        `${baseUrl}/student/studentquiz/${quizId}/attempt?say=${say}`,
-        {
-          headers: { Authentication: token },
-        }
+      const res = await getData(
+        `/student/studentquiz/${quizId}/attempt?say=${say}`
       );
 
-      return res?.data?.submission || [];
+      return res?.submission || [];
     } catch (error) {
-      const err = ErrorMsg(error);
-      dispatch(setShowError(true));
-      dispatch(setErrorMsg(err.message));
-      return rejectWithValue(err.message);
+      handleError(error, dispatch, rejectWithValue);
     }
   }
 );
@@ -172,22 +127,17 @@ export const startQuiz = createAsyncThunk(
   "quiz/startQuiz",
   async ({ quizId }, { rejectWithValue, dispatch }) => {
     try {
-      const token = getToken(dispatch);
+      const say = getAY();
+      dispatch(setShowError(false));
 
-      const res = await axios.post(
-        `${baseUrl}/student/studentquiz/startQuiz/${quizId}?say=${say}`,
-        {},
-        {
-          headers: { Authentication: token },
-        }
+      const data = await postData(
+        `/student/studentquiz/startQuiz/${quizId}?say=${say}`,
+        {}
       );
 
-      return res?.data;
+      return data;
     } catch (error) {
-      const err = ErrorMsg(error);
-      dispatch(setShowError(true));
-      dispatch(setErrorMsg(err.message));
-      return rejectWithValue(err.message);
+      handleError(error, dispatch, rejectWithValue);
     }
   }
 );
@@ -196,24 +146,19 @@ export const updateRemainingTime = createAsyncThunk(
   "quiz/updateRemainingTime",
   async ({ quizId, remainingTime }, { rejectWithValue, dispatch }) => {
     try {
-      const token = getToken(dispatch);
+      const say = getAY();
+      dispatch(setShowError(false));
 
       const body = { quizId, remainingTime };
 
-      const res = await axios.put(
-        `${baseUrl}/student/studentquiz/updateQuizTime/${quizId}?say=${say}`,
-        body,
-        {
-          headers: { Authentication: token },
-        }
+      const data = await putData(
+        `/student/studentquiz/updateQuizTime/${quizId}?say=${say}`,
+        body
       );
 
-      return res?.data;
+      return data;
     } catch (error) {
-      const err = ErrorMsg(error);
-      dispatch(setShowError(true));
-      dispatch(setErrorMsg(err.message));
-      return rejectWithValue(err.message);
+      handleError(error, dispatch, rejectWithValue);
     }
   }
 );

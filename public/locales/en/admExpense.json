@@ -47,5 +47,27 @@
   "Edit Expense": "Edit Expense",
   "QR": "QR",
   "Edit": "Edit",
-  "Delete": "Delete"
+  "Delete": "Delete",
+  "Add New Fees": "Add New Fees",
+  "Fees Type": "Fees Type",
+  "Single Fee": "Single Fee",
+  "Mass Fee": "Mass Fee",
+  "Class": "Class",
+  "Section": "Section",
+  "Due Date": "Due Date",
+  "Amount": "Amount",
+  "Fee record Added": "Fee record Added",
+  "Error adding Fees": "Error adding Fees",
+  "Student ID": "Student ID",
+  "Edit Fees": "Edit Fees",
+  "Fee updated successfully": "Fee updated successfully",
+  "Error updating Fee": "Error updating Fee",
+  "Everyone": "Everyone",
+  "Expense Reason": "Expense Reason",
+  "Add New Expense": "Add New Expense",
+  "From": "From",
+  "Earning Date": "Earning Date",
+  "Description": "Description",
+  "Add New Earning": "Add New Earning"
+    
 }

@@ -5,8 +5,11 @@ import FormInput from "../../../Accounting/subClass/component/FormInput";
 import ImageUpload from "../../../Addmission/Components/ImageUpload";
 import { createEventThunk } from "../../../../../Store/Slices/Admin/NoticeBoard/Events/eventThunks";
 import { FiLoader } from "react-icons/fi";
+import { useTranslation } from "react-i18next";
 
 const AddEvent = () => {
+  const { t } = useTranslation("admEvent"); // Use translation hook with "events" namespace
+
   const dispatch = useDispatch();
   const [eventData, setEventData] = useState({
     title: "",
@@ -45,44 +48,40 @@ const AddEvent = () => {
   };
 
   const formatTimeTo12Hour = (time) => {
-    // Check if the time is valid and in the correct format
     if (!time || !/^\d{2}:\d{2}$/.test(time)) {
-      return ""; // Return an empty string or handle it as necessary
+      return ""; // Return empty string if time is invalid
     }
-  
     const [hour, minute] = time.split(":");
     let hours = parseInt(hour, 10);
     const suffix = hours >= 12 ? "PM" : "AM";
     hours = hours % 12 || 12;
     return `${hours}:${minute} ${suffix}`;
   };
-  
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!eventData.title || !eventData.date) {
-      toast.error("Please fill in all required fields.");
+      toast.error(t("Please fill in all required fields."));
       return;
     }
     const formattedTime = eventData.time ? formatTimeTo12Hour(eventData.time) : "";
-   dispatch(createEventThunk({ ...eventData, time: formattedTime }));
+    dispatch(createEventThunk({ ...eventData, time: formattedTime }));
   };
-  
 
   return (
-    <div className="flex flex-col h-full border-t max-w-xl mx-auto bg-white ">
+    <div className="flex flex-col h-full border-t max-w-xl mx-auto bg-white">
       {/* Scrollable content area */}
       <div className="flex-grow overflow-auto p-4 no-scrollbar">
-        <form className="space-y-4 mb-8" >
+        <form className="space-y-4 mb-8">
           <ImageUpload
             imagePreview={eventData.imagePreview}
             handleImageChange={handleImageChange}
-            handleRemoveImage={handleRemoveImage} // Pass handleRemoveImage to ImageUpload component
+            handleRemoveImage={handleRemoveImage}
           />
           <FormInput
             id="title"
             name="title"
-            label="Event Name"
+            label={t("Event Name")}
             value={eventData.title}
             onChange={handleInputChange}
             required
@@ -90,7 +89,7 @@ const AddEvent = () => {
           <FormInput
             id="date"
             name="date"
-            label="Date"
+            label={t("Date")}
             type="date"
             value={eventData.date}
             onChange={handleInputChange}
@@ -99,7 +98,7 @@ const AddEvent = () => {
           <FormInput
             id="time"
             name="time"
-            label="Event Time"
+            label={t("Event Time")}
             type="time"
             value={eventData.time}
             onChange={handleInputChange}
@@ -108,7 +107,7 @@ const AddEvent = () => {
           <FormInput
             id="location"
             name="location"
-            label="Location"
+            label={t("Location")}
             value={eventData.location}
             onChange={handleInputChange}
             required
@@ -116,7 +115,7 @@ const AddEvent = () => {
           <FormInput
             id="director"
             name="director"
-            label="Event Director"
+            label={t("Event Director")}
             value={eventData.director}
             onChange={handleInputChange}
             required
@@ -124,7 +123,7 @@ const AddEvent = () => {
           <FormInput
             id="type"
             name="type"
-            label="Event Type"
+            label={t("Event Type")}
             value={eventData.type}
             onChange={handleInputChange}
             required
@@ -136,16 +135,16 @@ const AddEvent = () => {
               htmlFor="description"
               className="block text-sm font-medium text-gray-700"
             >
-              Description
+              {t("Description")}
             </label>
             <textarea
               id="description"
               name="description"
               value={eventData.description}
               onChange={handleInputChange}
-              rows={5} // Adjust row count as needed
+              rows={5}
               className="mt-1 block w-full rounded-md border p-2 border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-              placeholder="Enter event description"
+              placeholder={t("Enter event description")}
             />
           </div>
         </form>
@@ -158,7 +157,7 @@ const AddEvent = () => {
           className="w-full flex justify-center items-center bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md"
           onClick={handleSubmit}
         >
-          {Loading ? <FiLoader className="animate-spin mr-2" /> : "Add Event"}
+          {Loading ? <FiLoader className="animate-spin mr-2" /> : t("Add Event")}
         </button>
       </div>
     </div>

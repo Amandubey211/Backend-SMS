@@ -4,8 +4,10 @@ import { fetchSectionsByClass } from "../../../../Store/Slices/Admin/Class/Secti
 import FormField from "../Components/FormField";
 import NoDataFound from "../../../../Components/Common/NoDataFound";
 import BookIssueRow from "../Components/BookIssueRow";
+import { useTranslation } from "react-i18next";
 
 const BookIssueTab = ({ handleSidebarOpen, setEditIssueData }) => {
+  const { t } = useTranslation("admLibrary");
   const dispatch = useDispatch();
   const { bookIssues, books } = useSelector((state) => state.admin.library);
   const classList = useSelector((store) => store.admin.class.classes);
@@ -58,7 +60,7 @@ const BookIssueTab = ({ handleSidebarOpen, setEditIssueData }) => {
           <FormField
             id="classLevel"
             name="classLevel"
-            label="Class"
+            label={t("Class")}
             value={localFilters.classLevel}
             onChange={handleIssueFilterChange}
             options={classList?.map((cls) => ({
@@ -69,7 +71,7 @@ const BookIssueTab = ({ handleSidebarOpen, setEditIssueData }) => {
           <FormField
             id="section"
             name="section"
-            label="Section"
+            label={t("Section")}
             value={localFilters.section}
             onChange={handleIssueFilterChange}
             options={sectionList?.map((section) => ({
@@ -81,7 +83,7 @@ const BookIssueTab = ({ handleSidebarOpen, setEditIssueData }) => {
           <FormField
             id="book"
             name="book"
-            label="Book"
+            label={t("Book")}
             value={localFilters.book}
             onChange={handleIssueFilterChange}
             options={books?.map((book) => ({
@@ -92,12 +94,12 @@ const BookIssueTab = ({ handleSidebarOpen, setEditIssueData }) => {
           <FormField
             id="status"
             name="status"
-            label="Status"
+            label={t("Status")}
             value={localFilters.status}
             onChange={handleIssueFilterChange}
             options={[
-              { value: "Pending", label: "Pending" },
-              { value: "Returned", label: "Returned" },
+              { value: "Pending", label: t("Pending") },
+              { value: "Returned", label: t("Returned") },
             ]}
           />
         </div>
@@ -106,24 +108,23 @@ const BookIssueTab = ({ handleSidebarOpen, setEditIssueData }) => {
             onClick={handleSidebarOpen}
             className="bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600"
           >
-            Add Book Issue
+            {t("Add Book Issue")}
           </button>
         )}
-
       </div>
 
       <div className="overflow-x-auto bg-white shadow rounded-lg">
         <table className="min-w-full">
           <thead>
             <tr className="text-left text-gray-700 bg-gray-200">
-              <th className="px-6 py-3">Student</th>
-              <th className="px-6 py-3">Class & Section</th>
-              <th className="px-6 py-3">Book</th>
-              <th className="px-6 py-3">Author</th>
-              <th className="px-6 py-3">Issue Date</th>
-              <th className="px-6 py-3">Status</th>
+              <th className="px-6 py-3">{t("Student")}</th>
+              <th className="px-6 py-3">{t("Class & Section")}</th>
+              <th className="px-6 py-3">{t("Book")}</th>
+              <th className="px-6 py-3">{t("Author")}</th>
+              <th className="px-6 py-3">{t("Issue Date")}</th>
+              <th className="px-6 py-3">{t("Status")}</th>
               {/* Conditionally render the Action column */}
-              {role !== "teacher" && <th className="px-6 py-3">Action</th>}
+              {role !== "teacher" && <th className="px-6 py-3">{t("Action")}</th>}
             </tr>
           </thead>
           <tbody>
@@ -140,13 +141,12 @@ const BookIssueTab = ({ handleSidebarOpen, setEditIssueData }) => {
             ) : (
               <tr>
                 <td colSpan="7" className="h-80">
-                  <NoDataFound message="No Book Issues Found" />
+                  <NoDataFound message={t("No Book Issues Found")} />
                 </td>
               </tr>
             )}
           </tbody>
         </table>
-
       </div>
     </>
   );

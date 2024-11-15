@@ -13,7 +13,7 @@ const ProgressChild = () => {
   const [isLoading, setIsLoading] = useState(true); // Loading state
 
   useEffect(() => {
-    // Simulating data fetching process
+   
     const fetchData = async () => {
       setIsLoading(true);
       // Simulate an API call with a timeout

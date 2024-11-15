@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import useGetUserDetail from "../../Hooks/AuthHooks/Staff/useGetUserDetail";
+// import useGetUserDetail from "../../Hooks/AuthHooks/Staff/useGetUserDetail";
 import FormInput from "../../Modules/Admin/Accounting/subClass/component/FormInput";
 import ImageUpload from "../../Modules/Admin/Addmission/Components/ImageUpload";
 
@@ -51,7 +51,7 @@ const EditParentProfile = ({ data }) => {
     setImagePreview(null);
   };
 
-  const { userDetail } = useGetUserDetail();
+  // const { userDetail } = useGetUserDetail();
  // const { editParentProfile } = useEditParentProfile();
 
   const handleSubmit = async (e) => {

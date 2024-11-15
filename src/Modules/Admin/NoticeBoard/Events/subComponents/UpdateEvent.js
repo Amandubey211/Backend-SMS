@@ -5,6 +5,7 @@ import { format } from "date-fns";
 import FormInput from "../../../Accounting/subClass/component/FormInput";
 import ImageUpload from "../../../Addmission/Components/ImageUpload";
 import { updateEventThunk } from "../../../../../Store/Slices/Admin/NoticeBoard/Events/eventThunks";
+import { useTranslation } from "react-i18next";
 
 // Helper function to convert 12-hour time to 24-hour format
 const convertTo24HourFormat = (time12h) => {
@@ -20,10 +21,9 @@ const convertTo24HourFormat = (time12h) => {
 };
 
 const UpdateEvent = () => {
+  const { t } = useTranslation("admEvent");
   const dispatch = useDispatch();
-  const selectedEvent = useSelector(
-    (state) => state.admin.events.selectedEvent
-  );
+  const selectedEvent = useSelector((state) => state.admin.events.selectedEvent);
   const loading = useSelector((state) => state.admin.events.loading);
 
   const [eventData, setEventData] = useState({
@@ -78,19 +78,14 @@ const UpdateEvent = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (
-      !eventData.title ||
-      !eventData.date ||
-      !eventData.time ||
-      !eventData.image
-    ) {
-      toast.error("Please fill in all required fields.");
+    if (!eventData.title || !eventData.date || !eventData.time || !eventData.image) {
+      toast.error(t("Please fill in all required fields."));
       return;
     }
 
     // Dispatch the update event thunk
     await dispatch(updateEventThunk({ eventId: selectedEvent._id, eventData }));
-    toast.success("Event updated successfully!");
+    toast.success(t("Event updated successfully!"));
   };
 
   return (
@@ -106,7 +101,7 @@ const UpdateEvent = () => {
           <FormInput
             id="title"
             name="title"
-            label="Event Name"
+            label={t("Event Name")}
             value={eventData.title}
             onChange={handleInputChange}
             required
@@ -114,7 +109,7 @@ const UpdateEvent = () => {
           <FormInput
             id="date"
             name="date"
-            label="Date"
+            label={t("Date")}
             type="date"
             value={eventData.date}
             onChange={handleInputChange}
@@ -123,7 +118,7 @@ const UpdateEvent = () => {
           <FormInput
             id="time"
             name="time"
-            label="Event Time"
+            label={t("Event Time")}
             type="time"
             value={eventData.time}
             onChange={handleInputChange}
@@ -132,7 +127,7 @@ const UpdateEvent = () => {
           <FormInput
             id="location"
             name="location"
-            label="Location"
+            label={t("Location")}
             value={eventData.location}
             onChange={handleInputChange}
             required
@@ -140,7 +135,7 @@ const UpdateEvent = () => {
           <FormInput
             id="director"
             name="director"
-            label="Event Director"
+            label={t("Event Director")}
             value={eventData.director}
             onChange={handleInputChange}
             required
@@ -148,7 +143,7 @@ const UpdateEvent = () => {
           <FormInput
             id="type"
             name="type"
-            label="Event Type"
+            label={t("Event Type")}
             value={eventData.type}
             onChange={handleInputChange}
             required
@@ -159,7 +154,7 @@ const UpdateEvent = () => {
               htmlFor="description"
               className="block text-sm font-medium text-gray-700"
             >
-              Description
+              {t("Description")}
             </label>
             <textarea
               id="description"
@@ -168,7 +163,7 @@ const UpdateEvent = () => {
               onChange={handleInputChange}
               rows={5}
               className="mt-1 block w-full rounded-md border border-gray-700  p-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-              placeholder="Enter event description"
+              placeholder={t("Enter event description")}
             />
           </div>
         </form>
@@ -181,7 +176,7 @@ const UpdateEvent = () => {
           className="w-full flex justify-center items-center bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md"
           onClick={handleSubmit}
         >
-          {loading ? "Updating..." : "Update Event"}
+          {loading ? t("Updating...") : t("Update Event")}
         </button>
       </div>
     </div>

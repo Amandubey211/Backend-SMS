@@ -16,8 +16,10 @@ import BookIssueTab from "../Components/BookIssueTab";
 import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 import { fetchAllClasses } from "../../../../Store/Slices/Admin/Class/actions/classThunk";
 import { fetchAllStudents } from "../../../../Store/Slices/Admin/Class/Students/studentThunks";
+import { useTranslation } from "react-i18next";
 
 const LibraryAndBookIssue = () => {
+  const { t } = useTranslation("admLibrary");
   const dispatch = useDispatch();
   const { books, bookIssues, loading, addBookSuccess, addIssueSuccess } =
     useSelector((state) => state.admin.library);
@@ -52,11 +54,11 @@ const LibraryAndBookIssue = () => {
     setSidebarOpen(false);
     setEditIssueData(null);
   };
-  const currentPath = activeTab === "Library" ? "Library" : "Book Issue";
-  useNavHeading("Admin", currentPath);
+  const currentPath = activeTab === "Library" ? t("Library") : t("Book Issue");
+  useNavHeading(t("Admin"), currentPath);
 
   return (
-    <Layout title="Library & Book Issues | Admin Panel">
+    <Layout title={`${"Library & Book Issues"} | ${"Admin Panel"}`}>
       <DashLayout>
         {loading ? (
           <Spinner />
@@ -68,13 +70,13 @@ const LibraryAndBookIssue = () => {
                 isActive={activeTab === "Library"}
                 onClick={() => setActiveTab("Library")}
               >
-                Library
+                {t("Library")}
               </TabButton>
               <TabButton
                 isActive={activeTab === "BookIssue"}
                 onClick={() => setActiveTab("BookIssue")}
               >
-                Book Issue
+                {t("Book Issue")}
               </TabButton>
             </div>
 
@@ -96,10 +98,10 @@ const LibraryAndBookIssue = () => {
               onClose={handleSidebarClose}
               title={
                 activeTab === "Library"
-                  ? "Add New Book"
+                  ? t("Add New Book")
                   : editIssueData
-                  ? "Edit Book Issue"
-                  : "Add Book Issue"
+                  ? t("Edit Book Issue")
+                  : t("Add Book Issue")
               }
             >
               {activeTab === "Library" ? (

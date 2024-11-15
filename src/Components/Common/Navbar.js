@@ -24,14 +24,18 @@ const Navbar = () => {
   );
   const role = useSelector((store) => store.common.auth.role);
   const dispatch = useDispatch()
-  useEffect(() => {
-    dispatch(fetchAcademicYear())
-  }, []);
+ 
   const selectAcademicYear = useSelector((store) => {
     const say = localStorage.getItem('say')
       return store.common.academicYear.academicYears?.find((year) => year?._id == say)
     
   });
+  useEffect(() => {
+    if(!selectAcademicYear){
+         dispatch(fetchAcademicYear()) 
+    }
+
+  }, []);
 
   const { staffLogout } = useStaffLogout();
 
@@ -102,11 +106,11 @@ const Navbar = () => {
         <LeftHeading leftHeading={leftHeading} navigate={navigate} />
 
         <div className="flex items-center space-x-2 relative justify-center  ">
-          {role === "admin" || role === "teacher" || role === "accountant" ? (
+         
             <div className="border-r px-4 font-semibold text-gradient" title='Academic Year'>
              AY: {selectAcademicYear && selectAcademicYear?.year}
             </div>
-          ) : null}
+          
 
           {/* Notification Icon with Count */}
 

@@ -69,7 +69,7 @@ const ParentProfile = () => {
                 className="w-20 h-20 rounded-full shadow-lg border"
               />
               <div className="flex flex-row justify-between w-full">
-                <h2 className="text-xl font-semibold">{userDetails?.fatherName || userDetails?.motherName }</h2>
+                <h2 className="text-xl font-semibold">{userDetails?.fatherName || userDetails?.guardianName }</h2>
               </div>
             </div>
             <h3 className="text-lg font-semibold mb-4">{t('Personal Information')}</h3>

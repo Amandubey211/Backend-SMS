@@ -6,7 +6,7 @@ import Layout from '../../../../../Components/Common/Layout';
 import DashLayout from '../../../../../Components/Admin/AdminDashLayout';
 import { useDispatch, useSelector } from 'react-redux';
 import { GoAlertFill } from 'react-icons/go';
-
+import { CgArrowsExchange } from "react-icons/cg";
 import { fetchAllStudents } from '../../../../../Store/Slices/Admin/Users/Students/student.action';
 import { CiUser } from 'react-icons/ci';
 import { HiMiniCheckBadge } from 'react-icons/hi2';
@@ -16,14 +16,18 @@ import Spinner from '../../../../../Components/Common/Spinner';
 import { MdEdit } from 'react-icons/md';
 import Sidebar from '../../../../../Components/Common/Sidebar';
 import UpdateStudent from './UpdateStudent';
+import EditStudent from '../../../Students/Components/EditStudent';
+import { BsArrow90DegRight } from 'react-icons/bs';
 
 const AllStudents = () => {
   const { allStudents, loading } = useSelector((store) => store.admin.all_students);
   const dispatch = useDispatch();
   const [isUpdateSidebarOpen, setIsUpdateSidebarOpen] = useState(false);
+  const [isEditSidebarOpen, setIsEditSidebarOpen] = useState(false);
   const [studentData, setStudentData] = useState(null);
   const handleSidebarClose = () => setIsUpdateSidebarOpen(false);
   const handleUpdateSidebarClose = () => setIsUpdateSidebarOpen(false);
+  const handleEditSidebarClose = () => setIsEditSidebarOpen(false);
   useEffect(() => {
     dispatch(fetchAllStudents());
     dispatch(fetchAllClasses());
@@ -90,8 +94,11 @@ const AllStudents = () => {
                   <div className="absolute top-1 left-2 bg-white rounded-full">
                     <HiMiniCheckBadge className="text-green-500 text-xl" />
                   </div>
-                  <div className="absolute top-4 right-4 bg-white rounded-full p-1 shadow-lg cursor-pointer" onClick={()=>{setStudentData(student);setIsUpdateSidebarOpen(true)}}>
+                  <div  title='Update Info' className="absolute top-4 right-4 bg-white rounded-full p-1 shadow-lg cursor-pointer" onClick={()=>{setStudentData(student);setIsUpdateSidebarOpen(true)}}>
                   <MdEdit className="text-gray-500 text-lg" />
+                  </div>
+                  <div title='Change Class' className="absolute top-12 right-4 bg-white rounded-full p-1 shadow-lg cursor-pointer" onClick={()=>{setStudentData(student);setIsEditSidebarOpen(true)}}>
+                  <CgArrowsExchange className="text-gray-500 text-bold text-lg" />
                   </div>
                   <NavLink to={`/users/students/${student?._id}`}>
                     <div className="mb-4">
@@ -132,6 +139,14 @@ const AllStudents = () => {
                 width='55%'
               >
                 <UpdateStudent data={studentData} handleUpdateSidebarClose={handleUpdateSidebarClose} />
+              </Sidebar>
+              <Sidebar
+                isOpen={isEditSidebarOpen}
+                onClose={handleEditSidebarClose}
+                title={'Change Student Class'}
+                width='30%'
+              >
+                <EditStudent studentId={studentData?._id} handleUpdateSidebarClose={handleEditSidebarClose} />
               </Sidebar>
       </DashLayout>
     </Layout>
