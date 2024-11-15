@@ -112,13 +112,13 @@ const MainSection = () => {
 
     return (
       <div className="h-[100%] w-full">
-        <div className="flex items-center  h-[10%]">
-          <h1 className="text-xl font-semibold">All Modules</h1>
-          <p className="bg-gradient-to-r from-pink-100 to-purple-200 font-semibold rounded-full p-1 px-2">
-            <span className="text-gradient">{modulesData?.length || 0}</span>
+        <div className="flex items-center h-[10%]">
+          <h1 className="text-xl font-semibold mr-2">All Modules</h1>
+          <p className="bg-gradient-to-r from-pink-100 to-purple-200 font-semibold rounded-full h-9 w-9 flex items-center justify-center">
+            <span className="text-gradient text-lg">{modulesData?.length || 0}</span>
           </p>
         </div>
-        <div className="grid grid-cols-1 overflow-y-auto w-full h-[90%]">
+        <div className="grid grid-cols-1 overflow-y-auto w-full h-[70%]">
           {modulesData?.map((module, index) => (
             <ModuleCard
               key={index}
