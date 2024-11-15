@@ -29,7 +29,7 @@ const BookIssue = () => {
     if (filters.status === "All") {
       return bookIssue;
     }
-    return bookIssue.filter(item => item.status === filters.status);
+    return bookIssue?.filter(item => item.status === filters.status);
   }, [bookIssue, filters.status]);
 
   return (
@@ -86,8 +86,8 @@ const BookIssue = () => {
               <th className="px-5 py-3 border-b border-gray-200">Status</th>
             </tr>
           </thead>
-          {filteredBookIssueData.length > 0 ?  <tbody>
-            {filteredBookIssueData?.reverse().map((item) => (
+          {filteredBookIssueData?.length > 0 ?  <tbody>
+            {filteredBookIssueData?.reverse()?.map((item) => (
               <BookIssueRow key={item.id} item={item} />
 
             ))}
