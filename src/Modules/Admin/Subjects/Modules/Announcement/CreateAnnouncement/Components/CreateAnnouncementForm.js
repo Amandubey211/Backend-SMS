@@ -14,7 +14,7 @@ const CreateAnnouncementForm = ({
 }) => {
   return (
     <div>
-      <OptionRadios option={option} handleChange={handleChange} />
+      {/* <OptionRadios option={option} handleChange={handleChange} /> */}
       <AssignToSection
         groupId={groupId}
         assignTitle="Post To"
