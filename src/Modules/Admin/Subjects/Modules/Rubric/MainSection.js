@@ -1,5 +1,3 @@
-// src/components/MainSection.js
-
 import React, { useState, lazy, Suspense, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
@@ -133,10 +131,7 @@ const MainSection = () => {
             {rubrics.map((rubric) => (
               <RubricCard
                 key={rubric._id}
-                rubricId={rubric._id}
-                title={rubric.name}
-                criteria={rubric.criteria.length}
-                points={rubric?.totalScore}
+                rubric={rubric}
                 onDelete={() => handleDeleteRubric(rubric._id)}
                 onEdit={() => handleEditRubric(rubric._id)}
               />

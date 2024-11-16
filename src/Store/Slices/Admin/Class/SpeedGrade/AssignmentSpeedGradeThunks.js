@@ -3,6 +3,7 @@ import axios from "axios";
 import { baseUrl } from "../../../../../config/Common"; // Importing baseUrl
 import { setShowError, setErrorMsg } from "../../../Common/Alerts/alertsSlice";
 import { ErrorMsg } from "../../../Common/Alerts/errorhandling.action";
+import toast from "react-hot-toast";
 
 const say = localStorage.getItem("say");
 
@@ -31,7 +32,7 @@ export const fetchAssignedAssignmentStudents = createAsyncThunk(
   async (assignmentId, { getState, rejectWithValue, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
-      const say = localStorage.getItem("say")
+      const say = localStorage.getItem("say");
       const response = await axios.get(
         `${baseUrl}/admin/speed_grade/students/${assignmentId}?say=${say}`,
         {
@@ -48,10 +49,13 @@ export const fetchAssignedAssignmentStudents = createAsyncThunk(
 // Fetch Student Assignment
 export const fetchStudentAssignment = createAsyncThunk(
   "speedGrade/fetchStudentAssignment",
-  async ({ studentId, assignmentId }, { getState, rejectWithValue, dispatch }) => {
+  async (
+    { studentId, assignmentId },
+    { getState, rejectWithValue, dispatch }
+  ) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
-      const say = localStorage.getItem("say")
+      const say = localStorage.getItem("say");
       const response = await axios.get(
         `${baseUrl}/admin/speed_grade/assignment?say=${say}`,
         {
@@ -75,7 +79,7 @@ export const assignAssignmentGrade = createAsyncThunk(
   ) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
-      const say = localStorage.getItem("say")
+      const say = localStorage.getItem("say");
       const response = await axios.put(
         `${baseUrl}/admin/speed_grade/grade?say=${say}`,
         { studentId, assignmentId, grade, attemptDate, status },
@@ -83,6 +87,8 @@ export const assignAssignmentGrade = createAsyncThunk(
           headers: { Authentication: token },
         }
       );
+      toast.success("Grade Assigned");
+      dispatch(fetchStudentAssignment({ studentId, assignmentId }));
       return response.data.data;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);

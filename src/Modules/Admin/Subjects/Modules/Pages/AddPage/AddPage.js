@@ -18,7 +18,7 @@ const AddPage = () => {
   const dispatch = useDispatch();
   const [title, setTitle] = useState("");
   const [editorContent, setEditorContent] = useState("");
-  const [editPermission, setEditPermission] = useState("Only Instructor");
+  // const [editPermission, setEditPermission] = useState("Only Instructor");
   const [publishAt, setPublishDate] = useState("");
   const [isUpdating, setIsUpdating] = useState(false);
   const [loadingType, setLoadingType] = useState(""); // Separate loading state for each button
@@ -34,7 +34,7 @@ const AddPage = () => {
     if (state?.page) {
       setTitle(state.page.title || "");
       setEditorContent(state.page.content || "");
-      setEditPermission(state.page.editPermission || "Only Instructor");
+      // setEditPermission(state.page.editPermission || "Only Instructor");
       if (state.page.publishAt) {
         setPublishDate(
           new Date(state.page.publishAt).toISOString().substring(0, 10)
@@ -49,10 +49,10 @@ const AddPage = () => {
     (content) => setEditorContent(content),
     []
   );
-  const handleEditPermissionChange = useCallback(
-    (e) => setEditPermission(e.target.value),
-    []
-  );
+  // const handleEditPermissionChange = useCallback(
+  //   (e) => setEditPermission(e.target.value),
+  //   []
+  // );
   const handlePublishDateChange = useCallback(
     (e) => setPublishDate(e.target.value),
     []
@@ -63,7 +63,7 @@ const AddPage = () => {
       const pageData = {
         title,
         content: editorContent,
-        editPermission,
+        // editPermission,
         publishAt,
         publish: shouldPublish,
       };
@@ -85,13 +85,16 @@ const AddPage = () => {
     [
       title,
       editorContent,
-      editPermission,
+      // editPermission,
       publishAt,
       isUpdating,
       state,
       dispatch,
     ]
   );
+
+  // Compute if publish date is set
+  const isPublishDateSet = publishAt.trim() !== "";
 
   return (
     <Layout
@@ -111,6 +114,7 @@ const AddPage = () => {
             onSave={handleSave}
             isUpdating={isUpdating}
             loadingType={loadingType}
+            isPublishDateSet={isPublishDateSet} // Passing the prop
           />
           <div className="flex w-full">
             <div className="w-[70%]">
@@ -123,8 +127,11 @@ const AddPage = () => {
               />
             </div>
             <div className="w-[30%] border-l min-h-screen px-4 py-2">
+
+
               <h2 className="text-lg font-semibold mb-4">{t("Option")}</h2>
-              <div className="mb-4">
+              {/* <div className="mb-4">
+
                 <label className="block text-gray-700" htmlFor="editPermission">
                   {t("Users allowed to edit this page")}
                 </label>
@@ -138,7 +145,7 @@ const AddPage = () => {
                   <option>{t("All Students")}</option>
                   <option>{t("Instructor and TA")}</option>
                 </select>
-              </div>
+              </div> */}
               <DateInput
                 label={t("Publish at")}
                 name="publishAt"

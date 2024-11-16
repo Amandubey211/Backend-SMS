@@ -89,7 +89,7 @@ const DiscussionCard = ({ discussion, fetchClassDiscussions }) => {
           <BsPatchCheckFill className="text-green-600 w-6 h-6 transition-transform transform hover:scale-110" />
         )} */}
 
-        {!discussion.pulish ? (
+        {!discussion.publish ? (
           <>
             <BsPatchCheckFill
               aria-hidden="true"

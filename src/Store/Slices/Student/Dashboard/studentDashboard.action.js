@@ -7,7 +7,7 @@ import { getAY } from "../../../../Utils/academivYear";
 
 
 // Helper function to format dashboard data
-const formatDashboardData = (dashboardData, notices) => {
+const formatDashboardData = (dashboardData) => {
   return [
     {
       label: "Upcoming Exam",
@@ -35,7 +35,7 @@ const formatDashboardData = (dashboardData, notices) => {
     },
     {
       label: "Notice",
-      value: notices,
+      value: dashboardData?.notices,
       bgColor: "bg-yellow-100",
       textColor: "text-black-500",
       icon: "🔔",
@@ -55,12 +55,14 @@ export const fetchDashboardDetails = createAsyncThunk(
       const data = await getData(
         `/api/studentDashboard/dashboard/student?say=${say}`
       );
+
+      console.log("dadaUJSHAIDSLKS----------------------->>>",data)
       const { attendanceSummary } = data?.data;
-      const { student } = await getState();
-      console.log("std----?>>>>",student)
-      const notices = student?.studentAnnouncement?.noticeData?.length || 0;
+      // const { student } = await getState();
+      // console.log("std----?>>>>",student)
+      // const notices = student?.studentAnnouncement?.noticeData?.length || 0;
       return {
-        cardData: formatDashboardData(data, notices),
+        cardData: formatDashboardData(data?.data),
         paidFees: data?.data?.totalPaidFees,
         unpaidFees: data?.data?.dueFees,
         attendanceSummary,
@@ -90,7 +92,7 @@ export const fetchSubjects = createAsyncThunk(
       const say = getAY();
       dispatch(setShowError(false));
       const data =  await getData(`/api/studentDashboard/subjects/${userId}?say=${say}`);
-      console.log("errorrrrrrr",data)
+      console.log("escsasa->",data)
       return data?.subjects;
     } catch (error) {
       handleError(error, dispatch, rejectWithValue);

@@ -66,10 +66,7 @@ const Comment = ({
     <div className="bg-white p-4 mb-4 rounded-md shadow-sm">
       <div className="flex items-center mb-2">
         <img
-          src={
-            comment.profile ||
-            ""
-          }
+          src={comment.profile || ""}
           alt="avatar"
           className="w-10 h-10 rounded-full mr-3"
         />
@@ -78,10 +75,10 @@ const Comment = ({
           <span className="text-sm text-gray-500">{comment.time}</span>
         </div>
         <div className="ml-auto flex space-x-2">
-          <MdOutlineEdit
+          {/* <MdOutlineEdit
             className="text-gray-500 text-xl cursor-pointer"
             onClick={handleEditClick}
-          />
+          /> */}
           <RxCross2
             className="text-red-500 cursor-pointer text-xl"
             onClick={handleDeleteComment}

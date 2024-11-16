@@ -16,7 +16,7 @@ const SubjectCard = ({ data, backgroundColor, classId, onSubjectClick, currentPr
   const dispatch = useDispatch();
 
   console.log("Subjects is : ", data);
-  const percentage = 75;
+  const percentage = currentProgress?.percentageValue;
   console.log("subject progress", currentProgress)
 
   console.log("subject detail ::==>", data.subjectId)
@@ -45,17 +45,16 @@ const SubjectCard = ({ data, backgroundColor, classId, onSubjectClick, currentPr
         </button>
         {
           currentProgress && (
-            <div style={{ width: 50, height: 50 }}>
+            <div style={{ width: 60, height: 60 }}>
               <CircularProgressbar
-                value={currentProgress?.
-                  percentageValue
+                value={percentage
                 }
-                text={`${currentProgress?.percentageValue
+                text={`${percentage
                   }%`}
                 styles={buildStyles({
-                  rotation: 0.47,
+                  rotation: 0,
                   strokeLinecap: 'round',
-                  textSize: '30px',
+                  textSize: '20px',
                   pathTransitionDuration: 0.5,
                   pathColor:
                     percentage < 33

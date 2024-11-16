@@ -13,6 +13,7 @@ import { fetchStudentGrades } from "../../../../../Store/Slices/Admin/Users/Stud
 import { fetchAllAssignment } from "../../../../../Store/Slices/Admin/Class/Assignments/assignment.action";
 import { fetchAllQuizzes } from "../../../../../Store/Slices/Admin/Class/Quiz/quiz.action";
 import { fetchModules } from "../../../../../Store/Slices/Admin/Class/Module/moduleThunk";
+import { fetchFilteredQuizzesThunk } from "../../../../../Store/Slices/Admin/Class/Quiz/quizThunks";
 const MainSection = () => {
   const { cid, sid } = useParams();
   const [search, setSearch] = useState("");
@@ -32,7 +33,7 @@ const MainSection = () => {
     dispatch(fetchSubjectGrades({classId:cid,subjectId:sid,filters}))
     dispatch(fetchModules({ cid, sid }));
     dispatch(fetchAllAssignment({subjectId:sid}))
-    dispatch(fetchAllQuizzes({subjectId:sid}))
+    dispatch(fetchFilteredQuizzesThunk({subjectId:sid}))
   }, [dispatch]);
 
   const handleSearchChange = (value) => {

@@ -14,9 +14,9 @@ const CommentsHeader = ({ handleSearch, handleRefresh }) => {
         />
         <FaSearch className="absolute right-3 text-gray-500" />
       </div>
-      <button className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-sm hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
+      {/* <button className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-sm hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
         Unread
-      </button>
+      </button> */}
       <button
         onClick={handleRefresh}
         className="absolute top-2 right-2 text-gray-600 rounded-full p-2 focus:outline-none transform transition-transform duration-300 hover:rotate-180"

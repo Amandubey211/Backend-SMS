@@ -43,6 +43,7 @@ export const studentLogin = createAsyncThunk(
             enrollment: data?.enrollment,
             className: data?.className,
             sectionName: data?.sectionName,
+            schoolName: data?.schoolName,
           })
         );
 
