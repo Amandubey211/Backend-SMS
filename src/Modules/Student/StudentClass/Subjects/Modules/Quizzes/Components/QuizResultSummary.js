@@ -48,47 +48,50 @@ const QuizResultSummary = () => {
         {/* Component Heading */}
 
         {Array.isArray(attemptHistory) && attemptHistory?.length > 0 ? (
-          attemptHistory.slice().map((attempt, index) => (
-            <div
-              key={attempt?._id || index}
-              className="bg-white shadow-md rounded-lg overflow-hidden transition-shadow duration-300"
-            >
-              {/* Accordion Header */}
+          attemptHistory
+            .slice()
+            .reverse()
+            .map((attempt, index) => (
               <div
-                className="flex justify-between items-center p-1 px-4 cursor-pointer bg-gray-50 hover:bg-gray-200"
-                onClick={() => handleToggle(index)}
+                key={attempt?._id || index}
+                className="bg-white shadow-md rounded-lg overflow-hidden transition-shadow duration-300"
               >
-                <div>
-                  <h3 className="text-lg font-semibold text-gradient">
-                    Attempt {attempt?.attempts + 1 || "N/A"}
-                  </h3>
-                  <p className="text-gray-500 text-sm">
-                    {attempt?.submittedAt
-                      ? new Date(attempt?.submittedAt).toLocaleString()
-                      : "In Progress"}
-                  </p>
+                {/* Accordion Header */}
+                <div
+                  className="flex justify-between items-center p-1 px-4 cursor-pointer bg-gray-50 hover:bg-gray-200"
+                  onClick={() => handleToggle(index)}
+                >
+                  <div>
+                    <h3 className="text-lg font-semibold text-gradient">
+                      Attempt {index + 1}
+                    </h3>
+                    <p className="text-gray-500 text-sm">
+                      {attempt?.submittedAt
+                        ? new Date(attempt?.submittedAt).toLocaleString()
+                        : "In Progress"}
+                    </p>
+                  </div>
+                  <div>
+                    {openIndex === index ? (
+                      <FaChevronUp className="text-gray-600" size={20} />
+                    ) : (
+                      <FaChevronDown className="text-gray-600" size={20} />
+                    )}
+                  </div>
                 </div>
-                <div>
-                  {openIndex === index ? (
-                    <FaChevronUp className="text-gray-600" size={20} />
-                  ) : (
-                    <FaChevronDown className="text-gray-600" size={20} />
-                  )}
-                </div>
-              </div>
 
-              {/* Accordion Content with Framer Motion */}
-              <AnimatePresence>
-                {openIndex === index && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: "auto", opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="p-4"
-                  >
-                    {/* Stats Section */}
-                    <div className="grid grid-cols-3 text-center divide-x">
+                {/* Accordion Content with Framer Motion */}
+                <AnimatePresence>
+                  {openIndex === index && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="p-4"
+                    >
+                      {/* Stats Section */}
+                      {/* <div className="grid grid-cols-3 text-center divide-x">
                       <div>
                         <p className="text-gray-500 text-sm">Correct</p>
                         <p className="text-green-500 font-bold flex items-center justify-center">
@@ -114,27 +117,27 @@ const QuizResultSummary = () => {
                           </span>
                         </p>
                       </div>
-                    </div>
+                    </div> */}
 
-                    {/* Status Section */}
-                    <div className="text-center mt-4">
-                      <span
-                        className={`inline-block px-3 py-1 text-sm font-medium rounded-full ${
-                          attempt?.submissionStatus === "Submitted"
-                            ? "bg-green-100 text-green-600"
-                            : attempt?.submissionStatus === "inProgress"
-                            ? "bg-yellow-100 text-yellow-600"
-                            : "bg-gray-100 text-gray-600"
-                        }`}
-                      >
-                        {attempt?.submissionStatus || "Unknown"}
-                      </span>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          ))
+                      {/* Status Section */}
+                      <div className="text-center mt-4">
+                        <span
+                          className={`inline-block px-3 py-1 text-sm font-medium rounded-full ${
+                            attempt?.submissionStatus === "Submitted"
+                              ? "bg-green-100 text-green-600"
+                              : attempt?.submissionStatus === "inProgress"
+                              ? "bg-yellow-100 text-yellow-600"
+                              : "bg-gray-100 text-gray-600"
+                          }`}
+                        >
+                          {attempt?.submissionStatus || "Unknown"}
+                        </span>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            ))
         ) : (
           <div className="flex flex-col items-center justify-center mt-8 bg-gray-50 p-6 rounded-lg border border-gray-200 shadow-md">
             <motion.div

@@ -155,11 +155,12 @@ const QuizInstructions = ({ onAcknowledge, acknowledged, handleStartQuiz }) => {
           >
             <button
               onClick={handleStartQuiz}
-              disabled={!acknowledged} // Disable button until acknowledged
-              className={`px-6 py-3 font-semibold text-lg rounded-md shadow-md focus:outline-none ${
+              disabled={!acknowledged}
+              aria-disabled={!acknowledged}
+              className={` p-4 rounded-md shadow-sm transition-all duration-300 ${
                 acknowledged
-                  ? "bg-blue-600 hover:bg-blue-700 text-white"
-                  : "bg-gray-300 cursor-not-allowed text-gray-600"
+                  ? "bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 cursor-pointer text-white"
+                  : "bg-gray-300 cursor-not-allowed text-black"
               }`}
             >
               Start Quiz
