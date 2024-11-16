@@ -129,21 +129,12 @@ const sidebarData = [
     ],
   },
 
-<<<<<<< HEAD
-  // {
-  //   title: "Time Table",
-  //   icon: <ImTable2 />,
-  //   path: "/noticeboard/timetable",
-  //   roles: ["admin", "teacher"],
-  // },
-=======
   {
     title: "Time Table",
     icon: <ImTable2 />,
     path: "/timetable",
     roles: ["admin", "teacher"],
   },
->>>>>>> ef3b378fb976aa208207f32d59b896c85d3fd602
   {
     title: "Library",
     icon: <BsBook />,
