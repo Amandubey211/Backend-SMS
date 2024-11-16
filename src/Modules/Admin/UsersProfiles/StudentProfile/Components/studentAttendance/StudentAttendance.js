@@ -5,13 +5,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import { FaCheckCircle, FaDoorOpen, FaTimesCircle } from 'react-icons/fa';
 import { fetchStudentAttendance } from '../../../../../../Store/Slices/Admin/Users/Students/student.action';
 import Spinner from '../../../../../../Components/Common/Spinner';
+import { useTranslation } from 'react-i18next';
 
 const StudentAttendance = ({ student }) => {
+    const { t } = useTranslation('admAccounts');
     const [currentDate, setCurrentDate] = useState(moment());
     const { StudentAttendance, StudentAttendanceSummary, loading } = useSelector((store) => store.admin.all_students);
     const dispatch = useDispatch();
 
-    
     const onPanelChange = (value) => {
         setCurrentDate(value); 
     };
@@ -41,7 +42,7 @@ const StudentAttendance = ({ student }) => {
                         </div>
                         <div className="flex flex-col items-start ml-4">
                             <span className="text-3xl text-gray-700">{StudentAttendanceSummary?.presentCount || 0}</span>
-                            <span className="mt-1 text-green-600">Total Present</span>
+                            <span className="mt-1 text-green-600">{t('Total Present')}</span>
                         </div>
                     </div>
                     <div className="flex items-center bg-red-100 p-4 rounded-lg w-1/3">
@@ -50,7 +51,7 @@ const StudentAttendance = ({ student }) => {
                         </div>
                         <div className="flex flex-col items-start ml-4">
                             <span className="text-3xl text-gray-700">{StudentAttendanceSummary?.absentCount || 0}</span>
-                            <span className="mt-1 text-red-600">Total Absent</span>
+                            <span className="mt-1 text-red-600">{t('Total Absent')}</span>
                         </div>
                     </div>
                     <div className="flex items-center bg-purple-100 p-4 rounded-lg w-1/3">
@@ -59,7 +60,7 @@ const StudentAttendance = ({ student }) => {
                         </div>
                         <div className="flex flex-col items-start ml-4">
                             <span className="text-3xl text-gray-700">{StudentAttendanceSummary?.leaveCount || 0}</span>
-                            <span className="mt-1 text-purple-600">Total Leave</span>
+                            <span className="mt-1 text-purple-600">{t('Total Leave')}</span>
                         </div>
                     </div>
                 </div>

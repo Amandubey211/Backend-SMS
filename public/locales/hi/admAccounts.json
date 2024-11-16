@@ -121,6 +121,23 @@
   "Create New Assignment": "नया असाइनमेंट बनाएं",
   "Add Rubric": "रूब्रिक जोड़ें",
   "Saved and Published": "सहेजा और प्रकाशित किया गया",
-  "Add New Criteria": "नई मानदंड जोड़ें"
+  "Add New Criteria": "नई मानदंड जोड़ें",
+   "Student Grade": "छात्र ग्रेड",
+  "Task": "कार्य",
+  "Modules": "मॉड्यूल्स",
+  "Module": "मॉड्यूल",
+  "Profile": "प्रोफाइल",
+  "Grade Summary": "ग्रेड सारांश",
+  "Assignment": "असाइनमेंट",
+  "Group Assignment": "समूह असाइनमेंट",
+  "Quiz": "प्रश्नोत्तरी",
+  "Group Quiz": "समूह प्रश्नोत्तरी",
+  "DAY": "दिन",
+  "Total Score": "कुल अंक",
+  "Father Details": "पिता का विवरण",
+  "Mother Details": "मां का विवरण",
+  "Total Present": "कुल उपस्थिति",
+  "Total Absent": "कुल अनुपस्थिति",
+  "Total Leave": "कुल अवकाश"
   
 }
