@@ -50,6 +50,7 @@ export const staffLogin = createAsyncThunk(
             monthlySalary: data?.monthlySalary,
             active: data?.active,
             dateOfBirth: data?.dateOfBirth,
+            schoolName: data?.schoolName,
           })
         );
 

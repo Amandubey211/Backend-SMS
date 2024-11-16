@@ -8,6 +8,7 @@ import DashLayout from "../Admin/AdminDashLayout";
 import Spinner from "../../Components/Common/Spinner";
 import { updatePasswordThunk } from "../../Store/Slices/Common/User/actions/userActions";
 import { ImSpinner3 } from "react-icons/im";
+import { LuSchool } from "react-icons/lu";
 
 const StaffMyProfile = () => {
   const {userDetails} = useSelector((store) => store.common.user); 
@@ -64,7 +65,12 @@ const StaffMyProfile = () => {
                 className="w-20 h-20 rounded-full shadow-lg border"
               />
               <div className="flex flex-row justify-between w-full">
-                <h2 className="text-xl font-semibold">{`${userDetails?.firstName || ''} ${userDetails?.lastName || ''}`}</h2>
+              <div className="flex flex-row justify-between w-full">
+                <div className="flex flex-col">
+                <h2 className="text-xl font-semibold">{userDetails?.fullName}</h2>
+                <h2 className="text-lg text-gray-600 flex flex-row items-center gap-2"> <span><LuSchool/></span>{userDetails?.schoolName}</h2>
+                </div>
+                </div>
                 <button
                   className="px-4 inline-flex items-center border border-transparent text-sm font-medium shadow-sm bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-md hover:from-pink-600 hover:to-purple-600"
                 >

@@ -41,6 +41,7 @@ export const parentLogin = createAsyncThunk(
             email: data?.email,
             motherName: data?.motherName,
             guardianName: data?.guardianName,
+            schoolName: data?.schoolName,
           })
         );
         navigate("/parent_dash");

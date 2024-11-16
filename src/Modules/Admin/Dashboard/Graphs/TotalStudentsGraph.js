@@ -57,7 +57,22 @@ const TotalStudentsGraphjs = () => {
       <h2 className="text-2xl font-semibold mb-4 text-left w-full">
         {t("Total Students")}
       </h2>
-
+      {role == "teacher" && (
+              <div className="">
+                <select
+                  id="classSelection"
+                  value={selectedClass}
+                  onChange={handleClassChange}
+                  className="p-2 border rounded-md"
+                >
+                  {dashboardData?.studentData?.map((classItem) => (
+                    <option key={classItem.classId} value={classItem.classId}>
+                      {classItem.className}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
       {/* Conditionally render spinner, error, no data message, or the pie chart */}
       <div
         className="relative w-[300px] h-[300px] flex items-center justify-center"
@@ -78,22 +93,7 @@ const TotalStudentsGraphjs = () => {
           </div>
         ) : (
           <>
-            {role === "teacher" && (
-              <div className="mb-4">
-                <select
-                  id="classSelection"
-                  value={selectedClass}
-                  onChange={handleClassChange}
-                  className="p-2 border rounded-md"
-                >
-                  {dashboardData?.studentData?.map((classItem) => (
-                    <option key={classItem.classId} value={classItem.classId}>
-                      {classItem.className}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
+         
 
             {/* Pie chart */}
             <div
