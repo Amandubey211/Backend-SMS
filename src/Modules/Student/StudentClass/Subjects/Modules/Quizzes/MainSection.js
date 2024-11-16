@@ -49,6 +49,8 @@ const MainSection = () => {
   const [initialWindowWidth, setInitialWindowWidth] = useState(null);
   const [initialWindowHeight, setInitialWindowHeight] = useState(null);
   const [acknowledged, setAcknowledged] = useState(false);
+  const [submissionModalVisible, setSubmissionModalVisible] = useState(false);
+  const [timeTaken, setTimeTaken] = useState(0);
 
   const timerRef = useRef(null);
 
@@ -89,6 +91,61 @@ const MainSection = () => {
   };
 
   // Submit quiz logic
+  // const handleSubmit = useCallback(async () => {
+  //   try {
+  //     clearInterval(timerRef.current);
+  //     setQuizStarted(false);
+  //     disableFullScreen(); // Exit fullscreen after submission
+
+  //     const questionsWithSelectedOptions = itemDetails?.questions?.map(
+  //       (question, index) => {
+  //         const selectedOption = selectedOptions[index];
+  //         const isCorrect =
+  //           selectedOption && selectedOption === question.correctAnswer;
+
+  //         return {
+  //           questionId: question._id,
+  //           selectedOption,
+  //           isCorrect,
+  //         };
+  //       }
+  //     );
+
+  //     const timeTakenInMinutes = (totalTime - timeLeft) / 60; // Convert time taken to minutes
+  //     const response = await dispatch(
+  //       submitQuiz({
+  //         quizId,
+  //         answers: questionsWithSelectedOptions,
+  //         timeTaken: timeTakenInMinutes,
+  //         attemptHistory,
+  //       })
+  //     ).unwrap();
+
+  //     dispatch(setAttemptHistory([...attemptHistory, response.newAttempt]));
+  //     dispatch(
+  //       setQuizResults({
+  //         totalPoints: response.totalPoints,
+  //         correctAnswers: response.correctAnswers,
+  //         wrongAnswers: response.wrongAnswers,
+  //       })
+  //     );
+  //     setQuizSubmitted(true);
+  //     setIsModalOpen(false);
+  //     window.location.reload();
+  //   } catch (error) {
+  //     console.error("Failed to submit quiz:", error);
+  //     setErrorModalVisible(true);
+  //   }
+  // }, [
+  //   dispatch,
+  //   itemDetails?.questions,
+  //   selectedOptions,
+  //   totalTime,
+  //   timeLeft,
+  //   quizId,
+  //   attemptHistory,
+  // ]);
+
   const handleSubmit = useCallback(async () => {
     try {
       clearInterval(timerRef.current);
@@ -129,6 +186,10 @@ const MainSection = () => {
       );
       setQuizSubmitted(true);
       setIsModalOpen(false);
+
+      // Update time taken and show the submission modal
+      setTimeTaken(timeTakenInMinutes);
+      setSubmissionModalVisible(true);
     } catch (error) {
       console.error("Failed to submit quiz:", error);
       setErrorModalVisible(true);
@@ -411,6 +472,7 @@ const MainSection = () => {
                 </div>
               </div>
             )}
+
             {resizeModalVisible && (
               <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                 <div className="bg-white p-6 rounded-lg shadow-lg">
@@ -440,6 +502,77 @@ const MainSection = () => {
           </div>
         </div>
       )}
+      {submissionModalVisible && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-md w-full relative">
+            {/* Close Button */}
+            <button
+              onClick={() => {
+                setSubmissionModalVisible(false);
+                window.location.reload();
+              }}
+              className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+              aria-label="Close Modal"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+
+            {/* Modal Content */}
+            <div className="text-center">
+              <svg
+                className="mx-auto h-12 w-12 text-green-500"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
+              <h3 className="mt-4 text-lg leading-6 font-medium text-gray-900 dark:text-white">
+                Quiz Submitted Successfully!
+              </h3>
+              <div className="mt-2">
+                <p className="text-sm text-gray-500 dark:text-gray-300">
+                  You have completed the quiz.
+                </p>
+                <p className="mt-4 text-sm text-gray-700 dark:text-gray-400">
+                  <strong>Time Taken:</strong> {Math.floor(timeTaken)} minutes{" "}
+                  {Math.round((timeTaken % 1) * 60)} seconds
+                </p>
+              </div>
+              <div className="mt-6">
+                <button
+                  onClick={() => {
+                    setSubmissionModalVisible(false);
+                    window.location.reload();
+                  }}
+                  className="px-4 py-2 bg-green-600 text-white rounded-md shadow hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Error Modal */}
       {errorModalVisible && (
@@ -465,7 +598,7 @@ const MainSection = () => {
         {activeTab === "instructions" && (
           <div>
             <QuizzDetailCard />
-            {/* <QuizResultSummary /> */}
+            <QuizResultSummary />
           </div>
         )}
         {activeTab === "questions" && !quizSubmitted && (

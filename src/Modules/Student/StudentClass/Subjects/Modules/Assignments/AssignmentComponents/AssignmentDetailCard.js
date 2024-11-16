@@ -59,7 +59,11 @@ const AssignmentDetailCard = ({ isSubmitted }) => {
       <AssignmentDetail label="Assignment Points" value={points.toString()} />
       <AssignmentDetail
         label="Remaining Attempts"
-        value={allowNumberOfAttempts - (currentAttempt ?? 0)}
+        value={
+          isNaN(allowNumberOfAttempts)
+            ? "Unlimited "
+            : allowNumberOfAttempts - (currentAttempt ?? 0)
+        }
         extra="Times"
       />
       <AssignmentDetail
