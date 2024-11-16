@@ -17,6 +17,7 @@ const CreateQuizHeader = ({
   setCriteriaList,
   existingRubricId,
   setExistingRubricId, // Make sure to receive this prop
+  activeTab,
 }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -97,53 +98,56 @@ const CreateQuizHeader = ({
           {isEditing ? "Update Quiz" : "Create New Quiz"}
         </h1>
       </div>
-      <div className="flex items-center space-x-2">
-        {/* <button
-          onClick={() => setModalOpen(true)}
-          className="flex items-center px-4 py-2 border border-gray-300 rounded-md text-pink-500 hover:bg-gray-100 transition"
-        >
-          {!isEditing && <span className="mr-1">+</span>}
-          <span>{isEditing ? "Edit Rubric" : "Add Rubric"}</span>
-        </button> */}
-        <button
-          onClick={() => onSave(true)}
-          className="flex-grow rounded-md py-2 px-4 text-center bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200 transition"
-        >
-          <span className="bg-clip-text text-transparent bg-gradient-to-r from-rose-500 to-indigo-500">
-            {isEditing ? "Update & Publish" : "Save & Publish"}
-          </span>
-        </button>
-        <button
-          onClick={() => onSave(false)}
-          className="px-4 py-2 text-white font-semibold rounded-md bg-gradient-to-r from-purple-500 to-red-500 hover:from-purple-600 hover:to-red-600 transition"
-        >
-          Save
-        </button>
-        {/* <AddRubricModal
-          type="quiz"
-          isOpen={isModalOpen}
-          onClose={() => setModalOpen(false)}
-          onSubmit={handleSubmit}
-          editMode={editMode}
-          onAddCriteria={handleAddCriteria}
-          onEditCriteria={handleEditCriteria}
-          setExistingRubricId={setExistingRubricId}
-          criteriaList={criteriaList} // Pass criteriaList state
-          setCriteriaList={setCriteriaList} // Pass setCriteriaList function
-          QuizId={quizId} // Pass the QuizId prop
-        /> */}
-        <Sidebar
-          isOpen={isSidebarOpen}
-          onClose={() => setSidebarOpen(false)} // Pass down function to close sidebar
-          title="Add New Criteria"
-        >
-          <AddNewCriteriaForm
-            onSave={handleAddNewCriteria}
-            initialData={criteriaToEdit}
-            editMode={editMode}
-          />
-        </Sidebar>
-      </div>
+
+      {activeTab === "instructions" && (
+        <div className="flex items-center space-x-2">
+          {/* <button
+  onClick={() => setModalOpen(true)}
+  className="flex items-center px-4 py-2 border border-gray-300 rounded-md text-pink-500 hover:bg-gray-100 transition"
+>
+  {!isEditing && <span className="mr-1">+</span>}
+  <span>{isEditing ? "Edit Rubric" : "Add Rubric"}</span>
+</button> */}
+          <button
+            onClick={() => onSave(true)}
+            className="flex-grow rounded-md py-2 px-4 text-center bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200 transition"
+          >
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-rose-500 to-indigo-500">
+              {isEditing ? "Update & Publish" : "Save & Publish"}
+            </span>
+          </button>
+          <button
+            onClick={() => onSave(false)}
+            className="px-4 py-2 text-white font-semibold rounded-md bg-gradient-to-r from-purple-500 to-red-500 hover:from-purple-600 hover:to-red-600 transition"
+          >
+            Save
+          </button>
+          {/* <AddRubricModal
+  type="quiz"
+  isOpen={isModalOpen}
+  onClose={() => setModalOpen(false)}
+  onSubmit={handleSubmit}
+  editMode={editMode}
+  onAddCriteria={handleAddCriteria}
+  onEditCriteria={handleEditCriteria}
+  setExistingRubricId={setExistingRubricId}
+  criteriaList={criteriaList} // Pass criteriaList state
+  setCriteriaList={setCriteriaList} // Pass setCriteriaList function
+  QuizId={quizId} // Pass the QuizId prop
+/> */}
+          <Sidebar
+            isOpen={isSidebarOpen}
+            onClose={() => setSidebarOpen(false)} // Pass down function to close sidebar
+            title="Add New Criteria"
+          >
+            <AddNewCriteriaForm
+              onSave={handleAddNewCriteria}
+              initialData={criteriaToEdit}
+              editMode={editMode}
+            />
+          </Sidebar>
+        </div>
+      )}
     </div>
   );
 };

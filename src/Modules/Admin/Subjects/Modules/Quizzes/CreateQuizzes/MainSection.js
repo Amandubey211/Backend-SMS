@@ -1,11 +1,10 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { useParams, useLocation } from "react-router-dom";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import CreateQuizHeader from "./Components/CreateQuizHeader";
 import Tabs from "../Components/Tabs";
 import QuizInstructions from "./Components/QuizInstructions";
 import Sidebar from "../../../../../../Components/Common/Sidebar";
-import toast from "react-hot-toast";
 import CreateQuizForm from "./Components/CreateQuizForm";
 import QuestionForm from "./Components/QuestionForm";
 import QuestionListView from "./Components/QuestionListView";
@@ -69,12 +68,16 @@ const MainSection = ({ setIsEditing, isEditing }) => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [editingQuestionId, setEditingQuestionId] = useState(null);
   // const [isEditing, setLocalIsEditing] = useState(false);
-
+  const navigate = useNavigate();
+  const quizIdFromRedux = useSelector(
+    (state) => state.admin.quizzes.quizzDetail?._id || ""
+  );
   // Fetch quiz by ID if it exists
   useEffect(() => {
     const quizIdFromState = location.state?.quizId;
+
     if (quizIdFromState) {
-      setQuizId(quizIdFromState);
+      setQuizId(quizIdFromState || quizIdFromRedux);
       setIsEditing(true);
 
       dispatch(fetchQuizByIdThunk(quizIdFromState));
@@ -97,7 +100,7 @@ const MainSection = ({ setIsEditing, isEditing }) => {
     if (isEditing && quiz) {
       setAssignmentName(quiz.name || "");
       setInstruction(quiz.content || "");
-      setQuizId(quiz._id || "");
+      setQuizId(quiz?._id || "");
 
       setFormState((prevState) => ({
         ...prevState,
@@ -132,6 +135,12 @@ const MainSection = ({ setIsEditing, isEditing }) => {
       setWrongAnswerComment(quiz.wrongAnswerComment || "");
     }
   }, [isEditing, quiz]);
+  useEffect(() => {
+    if (quizIdFromRedux) {
+      setQuizId(quizIdFromRedux);
+      setIsEditing(true);
+    }
+  }, [quizIdFromRedux]);
 
   const handleFormChange = useCallback((e) => {
     const { name, value, type, checked } = e.target;
@@ -289,26 +298,17 @@ const MainSection = ({ setIsEditing, isEditing }) => {
       // Include the allowedAttempts and allowNumberOfAttempts in the quizData
       quizData.allowedAttempts = allowedAttempts;
       quizData.allowNumberOfAttempts = allowNumberOfAttempts;
-
-      if (isEditing) {
-        // Update existing quiz
-        dispatch(updateQuizThunk({ quizId, quizData }));
+      console.log("Saving quiz with ID:", quizId);
+      if (quizId) {
+        console.log("Updating existing quiz...");
+        dispatch(updateQuizThunk({ quizId, quizData, navigate }));
       } else {
-        // Create new quiz
-        console.log("quizData", quizData); // Debugging line
-        const result = await dispatch(createQuizThunk(quizData));
+        console.log("Creating new quiz...");
+        dispatch(createQuizThunk(quizData));
+        setActiveTab("questions");
       }
     },
-    [
-      dispatch,
-      formState,
-      assignmentName,
-      instruction,
-      cid,
-      sid,
-      quizId,
-      isEditing,
-    ]
+    [dispatch, formState, assignmentName, instruction, cid, sid, quizId]
   );
 
   const handleInstructionChange = useCallback((content) => {
@@ -318,6 +318,7 @@ const MainSection = ({ setIsEditing, isEditing }) => {
   return (
     <div className="flex flex-col w-full">
       <CreateQuizHeader
+        activeTab={activeTab}
         onSave={handleSaveQuiz}
         isEditing={!!quizId}
         quizId={quizId}
