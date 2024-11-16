@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchFilteredQuizzesThunk } from "../../../../../../Store/Slices/Admin/Class/Quiz/quizThunks"; // Import the thunk
 import FilterCard from "../../Assignments/Component/FilterCard";
 import { useTranslation } from "react-i18next";
+import { clearQuizDetail } from "../../../../../../Store/Slices/Admin/Class/Quiz/quizSlice";
 
 const MainSection = () => {
   const { cid, sid } = useParams();
@@ -23,6 +24,11 @@ const MainSection = () => {
   const { quizzes, loading, error } = useSelector(
     (state) => state.admin.quizzes
   ); // Access state from slice
+
+  // Optimized handleClear function
+  const HandleClear = useCallback(() => {
+    dispatch(clearQuizDetail());
+  }, [dispatch]);
 
   // Function to refetch quizzes based on filters
   const refetchQuizzes = useCallback(() => {
@@ -52,6 +58,7 @@ const MainSection = () => {
         <FilterCard filters={filters} setFilters={setFilters} />
       </div>
       <NavLink
+        onClick={HandleClear}
         to={`/class/${cid}/${sid}/create_quiz`}
         aria-label={t("Create Quiz")}
         className="bg-gradient-to-r from-purple-400 to-pink-400 text-white p-4 fixed rounded-full shadow-md bottom-4 right-4"

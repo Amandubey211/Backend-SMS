@@ -7,7 +7,7 @@ const QuestionList = ({
   editQuestion,
   allowShuffleAnswers,
 }) => {
-  const totalPoints = questions.reduce((sum, question) => {
+  const totalPoints = questions?.reduce((sum, question) => {
     return sum + parseFloat(question.questionPoint);
   }, 0);
 
@@ -18,7 +18,7 @@ const QuestionList = ({
         <h3>Total Points: {totalPoints}</h3>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {questions.map((q) => (
+        {questions?.map((q) => (
           <QuestionCard
             key={q._id}
             question={q}

@@ -92,22 +92,35 @@ export const addQuestionThunk = createAsyncThunk(
   "quiz/addQuestion",
   async ({ quizId, question }, { getState, rejectWithValue, dispatch }) => {
     try {
+      // Get the token for authentication
       const token = getToken(getState(), rejectWithValue, dispatch);
+
+      // Dynamically fetch the quiz ID either from params or Redux
+      const resolvedQuizId = quizId || getState().admin.quizzes.quizzDetail._id;
+
+      // Fetch "say" value from local storage
       const say = localStorage.getItem("say");
+
+      // Perform the API call
       const response = await axios.put(
-        `${baseUrl}/admin/add_question/quiz/${quizId}?say=${say}`,
+        `${baseUrl}/admin/add_question/quiz/${resolvedQuizId}?say=${say}`,
         question,
         { headers: { Authentication: token } }
       );
 
       if (response.data.success) {
         toast.success("Question added successfully");
+
+        // Dispatch an action to refresh the quiz details
         dispatch(fetchQuizByIdThunk(response.data.quiz._id));
+
+        // Return the updated quiz data
         return response.data.quiz;
       } else {
         throw new Error(response.data.message || "Failed to add question");
       }
     } catch (error) {
+      // Handle the error using the provided error handling logic
       return handleError(error, dispatch, rejectWithValue);
     }
   }
@@ -182,7 +195,7 @@ export const createQuizThunk = createAsyncThunk(
       if (response.data.success) {
         toast.success("Quiz created successfully");
         dispatch(fetchQuizByIdThunk(response.data.quiz._id));
-        return response.data;
+        return response.data.quiz;
       } else {
         throw new Error(response.data.message || "Failed to create quiz");
       }
@@ -194,7 +207,10 @@ export const createQuizThunk = createAsyncThunk(
 
 export const updateQuizThunk = createAsyncThunk(
   "quiz/updateQuiz",
-  async ({ quizId, quizData }, { getState, rejectWithValue, dispatch }) => {
+  async (
+    { quizId, quizData, navigate },
+    { getState, rejectWithValue, dispatch }
+  ) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
       const say = localStorage.getItem("say");
@@ -209,6 +225,12 @@ export const updateQuizThunk = createAsyncThunk(
       if (response.data.success) {
         toast.success("Quiz updated successfully");
         dispatch(fetchQuizByIdThunk(quizId));
+
+        // Navigate back to the previous page
+        if (navigate) {
+          navigate(-1);
+        }
+
         return response.data.quiz;
       } else {
         throw new Error(response.data.message || "Failed to update quiz");
