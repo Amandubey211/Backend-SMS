@@ -3,17 +3,15 @@ import { useLocation, NavLink, useNavigate } from "react-router-dom";
 import StudentDiwanLogo from "../../Assets/HomeAssets/StudentDiwanLogo.png";
 import smallLogo from "../../Assets/SideBarAsset/smallLogo.png";
 import sidebarData from "./DataFile/sidebarData.js";
-import {
-  MdOutlineKeyboardArrowUp,
-  MdOutlineKeyboardArrowDown,
-} from "react-icons/md";
+import { MdOutlineKeyboardArrowUp, MdOutlineKeyboardArrowDown } from "react-icons/md";
 import { FiLogOut } from "react-icons/fi";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { useDispatch, useSelector } from "react-redux";
-import { staffLogout } from "../../Store/Slices/Common/Auth/actions/staffActions"; // Import staffLogout action
+import { staffLogout } from "../../Store/Slices/Common/Auth/actions/staffActions";
 import LogoutConfirmationModal from "../Common/LogoutConfirmationModal.js";
 import profileIcon from "../../Assets/DashboardAssets/profileIcon.png";
 import { toggleSidebar } from "../../Store/Slices/Common/User/reducers/userSlice.js";
+import { useTranslation } from "react-i18next";
 
 const isActivePath = (path, locationPath) => locationPath.startsWith(path);
 
@@ -21,11 +19,12 @@ const SideMenubar = () => {
   const dispatch = useDispatch();
   const location = useLocation();
   const navigate = useNavigate();
+  const { t } = useTranslation('admSidebar');
 
   const { isOpen, role, userDetails } = useSelector((state) => ({
     isOpen: state.common.user.sidebar.isOpen,
     role: state.common.auth.role,
-    userDetails: state.common.user.userDetails, // Updated to fetch from User slice
+    userDetails: state.common.user.userDetails,
   }));
 
   const [openItems, setOpenItems] = useState([]);
@@ -47,9 +46,9 @@ const SideMenubar = () => {
   const confirmLogout = async () => {
     setIsLoggingOut(true);
     try {
-      await dispatch(staffLogout()).unwrap(); // Dispatch the staffLogout action
+      await dispatch(staffLogout()).unwrap();
       setIsLogoutModalOpen(false);
-      navigate("/stafflogin"); // Redirect to login after logout
+      navigate("/stafflogin");
     } finally {
       setIsLoggingOut(false);
     }
@@ -62,21 +61,17 @@ const SideMenubar = () => {
       role === "teacher" ||
       role === "accountant" ||
       role === "librarian" ||
-      role === "staff"||
-      role === "student"||
+      role === "staff" ||
+      role === "student" ||
       role === "parent"
     ) {
       navigate("/users/my/profile");
     } else {
-      console.warn(
-        "Role not recognized. Navigation not defined for this role."
-      );
+      console.warn("Role not recognized. Navigation not defined for this role.");
     }
   };
 
-  const filteredSidebarData = sidebarData.filter((item) =>
-    item.roles.includes(role)
-  );
+  const filteredSidebarData = sidebarData.filter((item) => item.roles.includes(role));
 
   return (
     <nav
@@ -90,9 +85,7 @@ const SideMenubar = () => {
           <img
             src={isOpen ? StudentDiwanLogo : smallLogo}
             alt="Logo"
-            className={`transition-width duration-300 ${
-              isOpen ? "w-36 pt-1" : "h-12"
-            }`}
+            className={`transition-width duration-300 ${isOpen ? "w-36 pt-1" : "h-12"}`}
           />
         </NavLink>
         <button
@@ -110,7 +103,7 @@ const SideMenubar = () => {
       </div>
 
       <div className="flex-grow overflow-y-auto no-scrollbar">
-        {isOpen && <h2 className="text-gray-500 my-1">MENU</h2>}
+        {isOpen && <h2 className="text-gray-500 my-1">{t("MENU")}</h2>}
         <ul className={`space-y-1 ${!isOpen && "mt-3"}`}>
           {filteredSidebarData.map((item, index) => (
             <React.Fragment key={index}>
@@ -119,9 +112,7 @@ const SideMenubar = () => {
                   className={`flex items-center w-full p-2 rounded-lg cursor-pointer ${
                     isActivePath(item.path, location.pathname) ||
                     (item.items &&
-                      item.items.some((subItem) =>
-                        isActivePath(subItem.path, location.pathname)
-                      ))
+                      item.items.some((subItem) => isActivePath(subItem.path, location.pathname)))
                       ? "bg-purple-100 text-purple-500"
                       : "text-gray-700 hover:bg-gray-100"
                   } ${isOpen ? "justify-between" : "justify-center "}`}
@@ -132,15 +123,10 @@ const SideMenubar = () => {
                   tabIndex="0"
                 >
                   <div className="flex justify-center items-center">
-                    <span className={`${!isOpen && "text-xl"}`}>
-                      {item.icon}
-                    </span>
+                    <span className={`${!isOpen && "text-xl"}`}>{item.icon}</span>
                     {isOpen && (
-                      <span
-                        role="presentation"
-                        className="ml-3 flex items-center"
-                      >
-                        {item.title}
+                      <span role="presentation" className="ml-3 flex items-center">
+                        {t(item.title)}
                       </span>
                     )}
                   </div>
@@ -169,21 +155,19 @@ const SideMenubar = () => {
                         : "text-gray-700 hover:bg-gray-100"
                     } ${isOpen ? "" : "justify-center"}`
                   }
-                  aria-label={item.title}
+                  aria-label={t(item.title)}
                 >
                   <span className={`${!isOpen && "text-xl"}`}>{item.icon}</span>
                   {isOpen && (
                     <span role="presentation" className="ml-3">
-                      {item.title}
+                      {t(item.title)}
                     </span>
                   )}
                 </NavLink>
               )}
               {(openItems.includes(item.title) ||
                 (item.items &&
-                  item.items.some((subItem) =>
-                    isActivePath(subItem.path, location.pathname)
-                  ))) &&
+                  item.items.some((subItem) => isActivePath(subItem.path, location.pathname)))) &&
                 item.items && (
                   <ul id={`submenu-${index}`} className="pl-2 space-y-2">
                     {item.items
@@ -194,18 +178,17 @@ const SideMenubar = () => {
                           to={subItem.path}
                           className={({ isActive }) =>
                             `flex items-center p-2 rounded-lg ${
-                              isActive ||
-                              isActivePath(subItem.path, location.pathname)
+                              isActive || isActivePath(subItem.path, location.pathname)
                                 ? "text-purple-500 bg-purple-100"
                                 : "text-gray-700 hover:bg-gray-100"
                             } ${isOpen ? "" : "justify-center"}`
                           }
-                          aria-label={subItem.title}
+                          aria-label={t(subItem.title)}
                         >
                           {subItem.icon}
                           {isOpen && (
                             <span role="presentation" className="ml-3">
-                              {subItem.title}
+                              {t(subItem.title)}
                             </span>
                           )}
                         </NavLink>
@@ -221,29 +204,27 @@ const SideMenubar = () => {
         <img
           src={userDetails?.profile || profileIcon}
           alt="Profile"
-          className={`${
-            isOpen ? "w-10 h-10" : "w-8 h-8"
-          } cursor-pointer rounded-full`}
+          className={`${isOpen ? "w-10 h-10" : "w-8 h-8"} cursor-pointer rounded-full`}
           onClick={HandleNavigate}
         />
 
         {isOpen && (
           <div className="flex-1 ml-3">
             <h2 className="font-semibold">
-            {userDetails?.fullName?.charAt(0).toUpperCase() + userDetails?.fullName?.slice(1,5).toLowerCase()}{userDetails?.fullName?.length > 5 && '..'}
+              {userDetails?.fullName?.charAt(0).toUpperCase() +
+                userDetails?.fullName?.slice(1, 5).toLowerCase()}
+              {userDetails?.fullName?.length > 5 && ".."}
             </h2>
             <p className="text-gray-500 capitalize text-sm">{role}</p>
           </div>
         )}
         <button
-          title="logout"
+          title={t("Logout")}
           onClick={handleLogout}
           className="ml-3"
-          aria-label="Logout"
+          aria-label={t("Logout")}
         >
-          <FiLogOut
-            className={`${isOpen ? "w-7 h-7" : "w-5 h-5"} text-gray-500`}
-          />
+          <FiLogOut className={`${isOpen ? "w-7 h-7" : "w-5 h-5"} text-gray-500`} />
         </button>
       </div>
       <LogoutConfirmationModal

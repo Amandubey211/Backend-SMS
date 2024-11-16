@@ -14,17 +14,14 @@ const ParentSection = () => {
         </div>
 
         {/* First Row: StudentParentCard and NoticeBoard */}
-        <div className="flex flex-wrap justify-between items-start border-y h-[400px] relative">
-          {/* Middle Vertical Divider */}
-          <div className="absolute left-2/5 transform translate-x-1/2 top-0 bottom-0 border-l border-gray-300"></div>
-
+        <div className="flex flex-wrap justify-between items-start border-y h-[400px]">
           <div className="w-full md:w-2/5 h-full flex items-center justify-center p-4">
             <div className="w-full h-full">
               <StudentParentCard />
             </div>
           </div>
 
-          <div className="w-full md:w-3/5 h-full flex items-center justify-center p-4">
+          <div className="w-full md:w-3/5 h-full flex items-center justify-center p-4 border-l border-gray-300">
             <div className="w-full h-full">
               <NoticeBoard textTrimCount={74} />
             </div>

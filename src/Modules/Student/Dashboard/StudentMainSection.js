@@ -176,12 +176,12 @@ const StudentMainSection = () => {
       </div>
 
       {/* Exam Results and Fees Section */}
-      <div className="flex border border-y h-full relative">
-        <div className="absolute left-2/3 transform -translate-x-1/2 top-0 bottom-0 border-l border-gray-300"></div>
-        <div className="w-[65%] flex items-center justify-center p-4 ">
+      <div className="flex border border-y h-full relative border-l">
+        <div className="absolute left-2/3 transform -translate-x-1/2 top-0 bottom-0 border-l-0 border-gray-300"></div>
+        <div className="w-[65%] flex items-center justify-center p-4">
           <div className="w-full h-full">
             <div className="flex justify-between items-center">
-              <h4 className="text-xl font-semibold text-gray-600 pl-6">
+              <h4 className="text-xl font-semibold text-gray-600 pl-2">
                 Recent Exam Results
               </h4>
               <button
@@ -198,7 +198,6 @@ const StudentMainSection = () => {
               >
                 View All
               </button>
-
             </div>
             <div className="text-gray-500 flex flex-col items-center mt-36">
               <IoNewspaperOutline size={70} />
@@ -208,12 +207,14 @@ const StudentMainSection = () => {
             </div>
           </div>
         </div>
-        <div className=" w-[35%] flex items-center justify-center p-4">
+        <div
+          className="w-[35%] flex items-center justify-center p-4 border-l border-gray-300"
+        >
           <div className="w-full h-full">
             <div className="flex flex-col border-b border-gray-200 p-5">
               <StudentDashFeeCard
                 title="Total Unpaid Fees"
-                amount={unpaidFees || 0} 
+                amount={unpaidFees || 0}
                 unpaidFees={unpaidFees || 0}
                 buttonText="Pay Now"
               />
@@ -227,8 +228,8 @@ const StudentMainSection = () => {
               />
             </div>
           </div>
-
         </div>
+
       </div>
     </div>
   );
