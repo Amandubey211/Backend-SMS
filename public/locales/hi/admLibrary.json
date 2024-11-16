@@ -30,7 +30,7 @@
   "Status": "स्थिति",
   "Pending": "अपूर्ण",
   "Returned": "वापसी",
-  "Add Book Issue": "पुस्तक समस्या जोड़ें",
+  "Add Book Issue": "पुस्तक निर्गम जोड़ें",
   "Student": "छात्र",
   "Class & Section": "कक्षा और अनुभाग",
   "Author": "लेखक",
@@ -48,7 +48,7 @@
   "Admin": "प्रशासन",
   "Book Issue": "पुस्तक निर्गम",
   "Add New Book": "नई पुस्तक जोड़ें",
-  "Library & Book Issues": "पुस्तकालय और पुस्तक समस्याएं",
+  "Library & Book Issues": "पुस्तकालय और पुस्तक निर्गम",
   "Admin Panel": "प्रशासन पैनल",
   "Add Book": "किताब जोड़ें",
   "No Books Found": "कोई किताबें नहीं मिलीं"
