@@ -1,0 +1,19 @@
+{
+    "myProfile": "ملفي الشخصي",
+    "userAvatar": "صورة المستخدم",
+    "edit": "تعديل",
+    "personalInformation": "معلومات شخصية",
+    "firstName": "الاسم الأول",
+    "lastName": "اسم العائلة",
+    "email": "البريد الإلكتروني",
+    "phone": "الهاتف",
+    "resetYourPassword": "إعادة تعيين كلمة المرور",
+    "currentPassword": "كلمة المرور الحالية",
+    "newPassword": "كلمة المرور الجديدة",
+    "reEnterPassword": "أعد إدخال كلمة المرور",
+    "updatePassword": "تحديث كلمة المرور",
+    "cancel": "إلغاء",
+    "editProfile": "تعديل الملف الشخصي",
+    "confirmPasswordError": "يجب أن تكون كلمة المرور المؤكدة متطابقة"
+  }
+  

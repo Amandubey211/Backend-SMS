@@ -1,0 +1,19 @@
+{
+    "myProfile": "मेरा प्रोफ़ाइल",
+    "userAvatar": "उपयोगकर्ता अवतार",
+    "edit": "संपादित करें",
+    "personalInformation": "व्यक्तिगत जानकारी",
+    "firstName": "पहला नाम",
+    "lastName": "अंतिम नाम",
+    "email": "ईमेल",
+    "phone": "फोन",
+    "resetYourPassword": "अपना पासवर्ड रीसेट करें",
+    "currentPassword": "वर्तमान पासवर्ड",
+    "newPassword": "नया पासवर्ड",
+    "reEnterPassword": "पासवर्ड फिर से दर्ज करें",
+    "updatePassword": "पासवर्ड अपडेट करें",
+    "cancel": "रद्द करें",
+    "editProfile": "प्रोफ़ाइल संपादित करें",
+    "confirmPasswordError": "पासवर्ड की पुष्टि समान होनी चाहिए"
+  }
+  
