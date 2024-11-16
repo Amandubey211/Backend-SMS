@@ -12,6 +12,7 @@ import { FcGraduationCap, FcCalendar } from "react-icons/fc";
 import NoDataFound from "../../../../Components/Common/NoDataFound";
 import Spinner from "../../../../Components/Common/Spinner";
 import { fetchClassDetails } from "../../../../Store/Slices/Admin/Class/actions/classThunk";
+import { useTranslation } from "react-i18next";
 
 const colors = [
   "bg-yellow-300",
@@ -27,22 +28,22 @@ const getColor = (index) => {
 };
 
 const MainSection = () => {
+  const { t } = useTranslation("admClass");
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [selectedTab, setSelectedTab] = useState("Published");
-  const [editSubject, setEditSubject] = useState(null); // New state for editing
-  const classDetails = useSelector((store) => store.admin.class.classDetails); // Use classDetails from Redux
+  const [selectedTab, setSelectedTab] = useState(t("Published"));
+  const [editSubject, setEditSubject] = useState(null);
+  const classDetails = useSelector((store) => store.admin.class.classDetails);
   const role = useSelector((store) => store.common.auth.role);
   const loading = useSelector((store) => store.admin.class.loading);
 
   const dispatch = useDispatch();
   const { cid } = useParams();
 
-  // Fetch class details using the thunk
   useEffect(() => {
     dispatch(fetchClassDetails(cid));
   }, [dispatch, cid]);
 
-  // Static icon data
   const staticIconData = [
     {
       icon: <SlEyeglass className="text-purple-600" />,
@@ -57,31 +58,31 @@ const MainSection = () => {
     { icon: <FcGraduationCap />, text: "", url: `/class/${cid}/students` },
     {
       icon: <FcCalendar />,
-      text: "Attendance",
+      text: t("Attendance"),
       url: `/class/${cid}/attendance`,
     },
   ];
 
-  // Update static icon data with dynamic details if classDetails is available
   if (classDetails) {
-    staticIconData[0].text = `${
-      classDetails?.teachersIds?.length || 0
-    } Instructor Assigned`;
-    staticIconData[1].text = `${
-      classDetails?.sections?.length || 0
-    } Section | ${classDetails?.groups?.length || 0} Groups`;
-    staticIconData[2].text = `${
-      classDetails?.studentsIds?.length || 0
-    } Students`;
+    staticIconData[0].text = t("Instructor Assigned", {
+      count: classDetails?.teachersIds?.length || 0,
+    });
+    staticIconData[1].text = t("Sections and Groups", {
+      sections: classDetails?.sections?.length || 0,
+      groups: classDetails?.groups?.length || 0,
+    });
+    staticIconData[2].text = t("Students", {
+      count: classDetails?.studentsIds?.length || 0,
+    });
   }
 
   const handleAddNewSubject = () => {
-    setEditSubject(null); // Reset edit state when adding a new subject
+    setEditSubject(null);
     setIsSidebarOpen(true);
   };
 
   const handleEditSubject = (subject) => {
-    setEditSubject(subject); // Set the subject to be edited
+    setEditSubject(subject);
     setIsSidebarOpen(true);
   };
 
@@ -92,7 +93,7 @@ const MainSection = () => {
   const filteredSubjects =
     classDetails && classDetails.subjects
       ? classDetails.subjects.filter((subject) =>
-          selectedTab === "Published"
+          selectedTab === t("Published")
             ? subject.isPublished
             : !subject.isPublished
         )
@@ -102,7 +103,7 @@ const MainSection = () => {
     <>
       {loading ? (
         <div className="flex justify-center items-center h-screen">
-          <Spinner /> {/* Display Spinner while loading */}
+          <Spinner />
         </div>
       ) : (
         <>
@@ -133,9 +134,9 @@ const MainSection = () => {
                       ...subject,
                       teacherName: subject.teacherId
                         ? subject.teacherId.fullName
-                        : "No Instructor Assigned",
+                        : t("No Instructor Assigned"),
                       teacherImage: subject.teacherId?.profile,
-                      teacherRole: subject.teacherId?.role || "Teacher",
+                      teacherRole: subject.teacherId?.role || t("Teacher"),
                     }}
                     Class={cid}
                     subjectId={subject._id}
@@ -145,7 +146,7 @@ const MainSection = () => {
                 ))
               ) : (
                 <p className="col-span-3 text-center text-gray-500">
-                  <NoDataFound title="Subject" />
+                  <NoDataFound title={t("Subject")} />
                 </p>
               )}
             </div>
@@ -153,7 +154,7 @@ const MainSection = () => {
         </>
       )}
       <Sidebar
-        title={editSubject ? "Edit Subject" : "Add New Subject"}
+        title={editSubject ? t("Edit Subject") : t("Add New Subject")}
         isOpen={isSidebarOpen}
         onClose={handleCloseSidebar}
       >

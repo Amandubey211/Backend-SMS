@@ -2,7 +2,9 @@ import React from "react";
 import { IoIosArrowBack } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 import { ImSpinner8 } from "react-icons/im";
+import { useTranslation } from "react-i18next";
 import PropTypes from "prop-types"; // For prop type validation (optional)
+
 
 const AddPageHeader = ({
   onSave,
@@ -11,6 +13,7 @@ const AddPageHeader = ({
   isPublishDateSet,
 }) => {
   const navigate = useNavigate();
+  const { t } = useTranslation('admAccounts');
 
   return (
     <div className="flex items-center justify-between p-2 pe-5 bg-white border-b border-gray-300 shadow-sm">
@@ -20,7 +23,7 @@ const AddPageHeader = ({
           onClick={() => navigate(-1)} // Navigate to the previous page
         />
         <h1 className="text-lg font-semibold text-gray-800">
-          {isUpdating ? "Update Page" : "Create New Page"}
+          {isUpdating ? t("Update Page") : t("Create New Page")}
         </h1>
       </div>
       <div className="flex items-center space-x-2">
@@ -37,12 +40,12 @@ const AddPageHeader = ({
             {loadingType === "save" ? (
               <>
                 <ImSpinner8 className="animate-spin mr-2" />
-                {isUpdating ? "Updating..." : "Saving..."}
+                {isUpdating ? t("Updating...") : t("Saving...")}
               </>
             ) : isUpdating ? (
-              "Update"
+              t("Update")
             ) : (
-              "Save"
+              t("Save")
             )}
           </span>
         </button>
@@ -70,12 +73,12 @@ const AddPageHeader = ({
             {loadingType === "publish" ? (
               <>
                 <ImSpinner8 className="animate-spin mr-2" />
-                {isUpdating ? "Updating..." : "Publishing..."}
+                {isUpdating ? t("Updating...") : t("Publishing...")}
               </>
             ) : isUpdating ? (
-              "Update & Publish"
+              t("Update & Publish")
             ) : (
-              "Save & Publish"
+              t("Save & Publish")
             )}
           </span>
         </button>

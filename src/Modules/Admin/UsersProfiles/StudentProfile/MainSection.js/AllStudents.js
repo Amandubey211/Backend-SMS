@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import profileIcon from '../../../../../Assets/DashboardAssets/profileIcon.png';
-import SingleStudent from './SingleStudent';
 import Layout from '../../../../../Components/Common/Layout';
 import DashLayout from '../../../../../Components/Admin/AdminDashLayout';
 import { useDispatch, useSelector } from 'react-redux';
@@ -17,9 +16,10 @@ import { MdEdit } from 'react-icons/md';
 import Sidebar from '../../../../../Components/Common/Sidebar';
 import UpdateStudent from './UpdateStudent';
 import EditStudent from '../../../Students/Components/EditStudent';
-import { BsArrow90DegRight } from 'react-icons/bs';
+import { useTranslation } from 'react-i18next';
 
 const AllStudents = () => {
+  const { t } = useTranslation('admAccounts');
   const { allStudents, loading } = useSelector((store) => store.admin.all_students);
   const dispatch = useDispatch();
   const [isUpdateSidebarOpen, setIsUpdateSidebarOpen] = useState(false);
@@ -28,6 +28,7 @@ const AllStudents = () => {
   const handleSidebarClose = () => setIsUpdateSidebarOpen(false);
   const handleUpdateSidebarClose = () => setIsUpdateSidebarOpen(false);
   const handleEditSidebarClose = () => setIsEditSidebarOpen(false);
+  
   useEffect(() => {
     dispatch(fetchAllStudents());
     dispatch(fetchAllClasses());
@@ -77,7 +78,7 @@ const AllStudents = () => {
   };
 
   return (
-    <Layout title="All students">
+    <Layout title={t("All students")}>
       <DashLayout>
         <div className="w-[80vw] px-6">
           <StudentsFilter onFilterChange={handleFilterChange} filters={filters} />
@@ -94,18 +95,18 @@ const AllStudents = () => {
                   <div className="absolute top-1 left-2 bg-white rounded-full">
                     <HiMiniCheckBadge className="text-green-500 text-xl" />
                   </div>
-                  <div  title='Update Info' className="absolute top-4 right-4 bg-white rounded-full p-1 shadow-lg cursor-pointer" onClick={()=>{setStudentData(student);setIsUpdateSidebarOpen(true)}}>
-                  <MdEdit className="text-gray-500 text-lg" />
+                  <div title={t('Update Info')} className="absolute top-4 right-4 bg-white rounded-full p-1 shadow-lg cursor-pointer" onClick={() => {setStudentData(student); setIsUpdateSidebarOpen(true)}}>
+                    <MdEdit className="text-gray-500 text-lg" />
                   </div>
-                  <div title='Change Class' className="absolute top-12 right-4 bg-white rounded-full p-1 shadow-lg cursor-pointer" onClick={()=>{setStudentData(student);setIsEditSidebarOpen(true)}}>
-                  <CgArrowsExchange className="text-gray-500 text-bold text-lg" />
+                  <div title={t('Change Class')} className="absolute top-12 right-4 bg-white rounded-full p-1 shadow-lg cursor-pointer" onClick={() => {setStudentData(student); setIsEditSidebarOpen(true)}}>
+                    <CgArrowsExchange className="text-gray-500 text-bold text-lg" />
                   </div>
                   <NavLink to={`/users/students/${student?._id}`}>
                     <div className="mb-4">
                       <h2 className="text-lg font-semibold">{student?.firstName}</h2>
                       <p className="text-sm">{student?.email}</p>
                       <div className="flex items-center mt-2 text-sm">
-                        <p>Contact: {student?.contactNumber}</p>
+                        <p>{t('Contact')}: {student?.contactNumber}</p>
                       </div>
                     </div>
                     <div className="flex items-center mt-4">
@@ -118,7 +119,7 @@ const AllStudents = () => {
                       </div>
                       <div className="ml-3">
                         <p className="text-sm font-medium">ID: {student?.admissionNumber}</p>
-                        <p className="text-sm">Parent: {student?.fatherName || student?.motherName}</p>
+                        <p className="text-sm">{t('Parent')}: {student?.fatherName || student?.motherName}</p>
                       </div>
                     </div>
                   </NavLink>
@@ -127,7 +128,7 @@ const AllStudents = () => {
             ) : (
               <div className="flex w-[80vw] text-gray-500 h-[90vh] items-center justify-center flex-col text-2xl">
                 <GoAlertFill className="text-[5rem]" />
-                No Student Found
+                {t("No Student Found")}
               </div>
             )}
           </div>
@@ -135,7 +136,7 @@ const AllStudents = () => {
           <Sidebar
                 isOpen={isUpdateSidebarOpen}
                 onClose={handleSidebarClose}
-                title={'Edit Student'}
+                title={t('Edit Student')}
                 width='55%'
               >
                 <UpdateStudent data={studentData} handleUpdateSidebarClose={handleUpdateSidebarClose} />
@@ -143,7 +144,7 @@ const AllStudents = () => {
               <Sidebar
                 isOpen={isEditSidebarOpen}
                 onClose={handleEditSidebarClose}
-                title={'Change Student Class'}
+                title={t('Change Student Class')}
                 width='30%'
               >
                 <EditStudent studentId={studentData?._id} handleUpdateSidebarClose={handleEditSidebarClose} />

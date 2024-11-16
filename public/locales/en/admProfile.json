@@ -1,0 +1,19 @@
+{
+    "myProfile": "MY Profile",
+    "userAvatar": "User Avatar",
+    "edit": "Edit",
+    "personalInformation": "Personal Information",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "email": "Email",
+    "phone": "Phone",
+    "resetYourPassword": "Reset Your Password",
+    "currentPassword": "Current Password",
+    "newPassword": "New Password",
+    "reEnterPassword": "Re-enter Password",
+    "updatePassword": "Update Password",
+    "cancel": "Cancel",
+    "editProfile": "Edit Profile",
+    "confirmPasswordError": "Confirm Password must be same"
+  }
+  

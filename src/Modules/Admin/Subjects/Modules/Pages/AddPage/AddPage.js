@@ -5,7 +5,7 @@ import AddPageHeader from "./AddPageHeader";
 import EditorComponent from "../../../Component/AdminEditor";
 import DateInput from "../../../Component/DateInput";
 import { useDispatch, useSelector } from "react-redux";
-
+import { useTranslation } from "react-i18next";
 import { useLocation, useParams } from "react-router-dom";
 import {
   createPage,
@@ -13,6 +13,7 @@ import {
 } from "../../../../../../Store/Slices/Admin/Class/Page/pageThunk";
 
 const AddPage = () => {
+  const { t } = useTranslation('admAccounts');
   const { state } = useLocation();
   const dispatch = useDispatch();
   const [title, setTitle] = useState("");
@@ -98,7 +99,9 @@ const AddPage = () => {
   return (
     <Layout
       title={
-        isUpdating ? "Update Page | Student Diwan" : "Add Page | Student Diwan"
+        isUpdating
+          ? t("Update Page | Student Diwan")
+          : t("Add Page | Student Diwan")
       }
     >
       <div className="flex w-full min-h-screen">
@@ -117,17 +120,20 @@ const AddPage = () => {
             <div className="w-[70%]">
               <EditorComponent
                 assignmentName={title}
-                assignmentLabel="Page Title"
+                assignmentLabel={t("Page Title")}
                 editorContent={editorContent}
                 onNameChange={handleNameChange}
                 onEditorChange={handleEditorChange}
               />
             </div>
             <div className="w-[30%] border-l min-h-screen px-4 py-2">
-              <h2 className="text-lg font-semibold mb-4">Option</h2>
+
+
+              <h2 className="text-lg font-semibold mb-4">{t("Option")}</h2>
               {/* <div className="mb-4">
+
                 <label className="block text-gray-700" htmlFor="editPermission">
-                  Users allowed to edit this page
+                  {t("Users allowed to edit this page")}
                 </label>
                 <select
                   id="editPermission"
@@ -135,13 +141,13 @@ const AddPage = () => {
                   onChange={handleEditPermissionChange}
                   className="mt-1 block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
                 >
-                  <option>Only Instructor</option>
-                  <option>All Students</option>
-                  <option>Instructor and TA</option>
+                  <option>{t("Only Instructor")}</option>
+                  <option>{t("All Students")}</option>
+                  <option>{t("Instructor and TA")}</option>
                 </select>
               </div> */}
               <DateInput
-                label="Publish at"
+                label={t("Publish at")}
                 name="publishAt"
                 value={publishAt}
                 handleChange={handlePublishDateChange}
@@ -149,11 +155,11 @@ const AddPage = () => {
             </div>
           </div>
           {loading && (
-            <p className="text-center my-4 text-indigo-600">Saving...</p>
+            <p className="text-center my-4 text-indigo-600">{t("Saving...")}</p>
           )}
           {error && (
             <p role="alert" className="text-red-400 text-current my-4">
-              {error}
+              {t("Error: ")}{error}
             </p>
           )}
         </div>
