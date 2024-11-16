@@ -8,6 +8,7 @@ import Layout from "../Common/ParentLayout";
 import { useTranslation } from 'react-i18next'; // Import i18next hook
 import { updatePasswordThunk } from "../../Store/Slices/Common/User/actions/userActions";
 import { ImSpinner3 } from "react-icons/im";
+import { LuSchool } from "react-icons/lu";
 
 const ParentProfile = () => {
   const { t } = useTranslation('prtProfile'); // Initialize i18next hook
@@ -68,8 +69,9 @@ const ParentProfile = () => {
                 alt={t("Profile")}
                 className="w-20 h-20 rounded-full shadow-lg border"
               />
-              <div className="flex flex-row justify-between w-full">
+              <div className="flex flex-col justify-between w-full">
                 <h2 className="text-xl font-semibold">{userDetails?.fatherName || userDetails?.guardianName }</h2>
+                <h2 className="text-lg text-gray-600 flex flex-row items-center gap-2"> <span><LuSchool/></span>{userDetails?.schoolName}</h2>
               </div>
             </div>
             <h3 className="text-lg font-semibold mb-4">{t('Personal Information')}</h3>

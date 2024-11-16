@@ -112,22 +112,23 @@ const Navbar = () => {
             </div>
           
 
-          {/* Notification Icon with Count */}
+          {/* Notification Icon with Count 
 
-          <div className="relative ">
+           <div className="relative ">
             <IconButton
               icon={TbBell}
               label="Notifications"
               onClick={() => setIsOpenNotification(true)}
               className="hover:bg-gray-200 rounded-full transition-all duration-200"
             />
-            {/* Notification Count */}
+           
             {notificationCount > 0 && (
               <div className="absolute -top-1 -right-1 bg-purple-200 rounded-full  w-[20px] h-[20px] flex justify-center items-center text-sm">
                 <span className="text-gradient">{notificationCount || 0}</span>
               </div>
             )}
           </div>
+          */}
 
           {/* Settings Icon */}
          <div>
