@@ -16,7 +16,7 @@ const CreateDiscussionForm = ({
   return (
     <div>
       {/* Radio options for threaded replies and post-before-seeing-replies */}
-      <OptionRadios option={option} handleChange={handleChange} />
+      {/* <OptionRadios option={option} handleChange={handleChange} /> */}
 
       {/* Section or Group assignment */}
       <AssignToSection

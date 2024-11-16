@@ -32,7 +32,7 @@ const Events = () => {
     (state) => state.admin.adminDashboard
   );
 
-  const { t } = useTranslation("dashboard");
+  const { t } = useTranslation("admEvent");
 
   const currentMonth = new Date().getMonth() + 1; // Months are zero-indexed
   const currentYear = new Date().getFullYear();

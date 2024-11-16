@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { useTranslation } from "react-i18next";
 import ClassCard from "./ClassCard";
 import Sidebar from "../../../../Components/Common/Sidebar";
 import AddNewClass from "./AddNewClass";
@@ -8,11 +9,13 @@ import NoDataFound from "../../../../Components/Common/NoDataFound";
 import { fetchAllClasses } from "../../../../Store/Slices/Admin/Class/actions/classThunk";
 
 const ClassesMainSection = () => {
+  const { t } = useTranslation("admClass");
+
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [editingClass, setEditingClass] = useState(null); // For handling update
 
   const dispatch = useDispatch();
-  const { classes, loading, error } = useSelector((store) => store.admin.class);
+  const { classes, loading } = useSelector((store) => store.admin.class);
   const role = useSelector((store) => store.common.auth.role);
 
   // Handle the sidebar open for adding a new class (clear the form)
@@ -39,7 +42,9 @@ const ClassesMainSection = () => {
   return (
     <div className="min-h-screen p-4">
       {/* Conditionally show heading for teachers */}
-      {role === "teacher" && <h1 className="text-2xl font-semibold mb-4 "></h1>}
+      {role === "teacher" && (
+        <h1 className="text-2xl font-semibold mb-4">{t("Classes")}</h1>
+      )}
 
       {/* For Admin: Add new class button */}
       {role === "admin" && (
@@ -47,9 +52,9 @@ const ClassesMainSection = () => {
           <button
             onClick={handleAddNewClass} // Open for adding new class
             className="px-4 py-2 rounded-md bg-gradient-to-r from-pink-100 to-purple-200"
-            aria-label="Add New Class"
+            aria-label={t("Add New Class")}
           >
-            <span className="text-gradient"> + Add New Class</span>
+            <span className="text-gradient"> + {t("Add New Class")}</span>
           </button>
         </div>
       )}
@@ -57,7 +62,7 @@ const ClassesMainSection = () => {
       {loading ? (
         <Spinner />
       ) : classes.length === 0 ? (
-        <NoDataFound title="Classes" />
+        <NoDataFound title={t("Classes")} />
       ) : (
         <div className="grid grid-cols-1 gap-4 mt-4 sm:grid-cols-2 lg:grid-cols-4">
           {classes?.map((cls) => (
@@ -76,7 +81,7 @@ const ClassesMainSection = () => {
         <Sidebar
           isOpen={isSidebarOpen}
           onClose={handleSidebarClose}
-          title={editingClass ? "Update Class" : "Add New Class"}
+          title={editingClass ? t("Update Class") : t("Add New Class")}
         >
           <AddNewClass
             onClose={handleSidebarClose}

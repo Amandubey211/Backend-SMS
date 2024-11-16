@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import FormInput from '../subClass/component/FormInput';
 import { useDispatch, useSelector } from 'react-redux';
 import FormSelect from '../subClass/component/FormSelect';
@@ -6,8 +7,9 @@ import { fetchFees, updateStudentFee } from '../../../../Store/Slices/Admin/Acco
 import { setEditFormData } from '../../../../Store/Slices/Admin/Accounting/StudentFees/studentFeesSlice';
 
 const EditFee = () => {
+  const { t } = useTranslation("admExpense"); // Use translation hook
   const dispatch = useDispatch();
-  const { editFormData } = useSelector((store) => store?.admin?.student_fees)
+  const { editFormData } = useSelector((store) => store?.admin?.student_fees);
 
   const [formData, setFormData] = useState({
     feeId: editFormData.feeId,
@@ -36,24 +38,60 @@ const EditFee = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("fomData- feeeId", formData);
     dispatch(updateStudentFee({ feeId: formData.feeId, submissionData: formData }))
       .then(() => {
-        dispatch(fetchFees())
+        dispatch(fetchFees());
+        console.log('Fee updated successfully');
       })
+      .catch(() => {
+        console.error('Error updating Fee');
+      });
   };
+
   const statusData = [
-    { label: 'Paid', value: 'paid' },
-    { label: 'Unpaid', value: 'unpaid' },
-  ]
+    { label: t('Paid'), value: 'paid' },
+    { label: t('Unpaid'), value: 'unpaid' },
+  ];
+
   return (
     <form className="space-y-4" onSubmit={handleSubmit}>
-      <FormInput id="feeType" label="Fees Type" type='text' value={formData.feeType} onChange={handleChange} required />
-      <FormInput id="dueDate" label="Due Date" type="date" value={formData.dueDate} onChange={handleChange} required />
-      <FormInput id="amount" label="Amount" type="text" value={formData.amount} onChange={handleChange} required />
-      <FormSelect id="status" label="Status" options={statusData} value={formData.status} onChange={handleChange} required />
-      <button type="submit" className="w-full flex justify-center border border-transparent shadow-sm text-sm font-medium bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600">
-        Edit Fees
+      <FormInput
+        id="feeType"
+        label={t('Fees Type')}
+        type='text'
+        value={formData.feeType}
+        onChange={handleChange}
+        required
+      />
+      <FormInput
+        id="dueDate"
+        label={t('Due Date')}
+        type="date"
+        value={formData.dueDate}
+        onChange={handleChange}
+        required
+      />
+      <FormInput
+        id="amount"
+        label={t('Amount')}
+        type="text"
+        value={formData.amount}
+        onChange={handleChange}
+        required
+      />
+      <FormSelect
+        id="status"
+        label={t('Status')}
+        options={statusData}
+        value={formData.status}
+        onChange={handleChange}
+        required
+      />
+      <button
+        type="submit"
+        className="w-full flex justify-center border border-transparent shadow-sm text-sm font-medium bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600"
+      >
+        {t('Edit Fees')}
       </button>
     </form>
   );

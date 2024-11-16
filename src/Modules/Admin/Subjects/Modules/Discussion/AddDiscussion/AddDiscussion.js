@@ -14,6 +14,7 @@ import {
   createDiscussion,
   updateDiscussion,
 } from "../../../../../../Store/Slices/Admin/Class/Discussion/discussionThunks";
+import toast from "react-hot-toast";
 
 const AddDiscussion = () => {
   const { state } = useLocation();
@@ -30,7 +31,7 @@ const AddDiscussion = () => {
   );
   const [file, setFile] = useState(null);
   const [formState, setFormState] = useState({
-    assignTo: state?.discussion?.assignTo || "",
+    assignTo: state?.discussion?.assignTo,
     dueDate: state?.discussion?.dueDate || "",
     sectionId: state?.discussion?.sectionId || "",
     groupId: state?.discussion?.groupId || "",
@@ -81,7 +82,14 @@ const AddDiscussion = () => {
         classId: cid,
         publish,
       };
-
+      if (!discussionData.assignTo) {
+        toast.error("please assign the discussion");
+        return;
+      }
+      if (!discussionData.title) {
+        toast.error("please give title to the discussion");
+        return;
+      }
       if (isEditing) {
         dispatch(
           updateDiscussion({

@@ -1,59 +1,43 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { useSelector } from "react-redux";
-import { GoAlertFill } from 'react-icons/go';
-import SubjectCard from '../../Admin/UsersProfiles/StudentProfile/Components/StudentCourseProgress/allSubjects/SubjectCard';
-import { baseUrl } from '../../../config/Common';
-import MainSection from './MainSection.js';
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { GoAlertFill } from "react-icons/go";
+import SubjectCard from "../../Admin/UsersProfiles/StudentProfile/Components/StudentCourseProgress/allSubjects/SubjectCard";
+import MainSection from "./MainSection.js";
 import Spinner from "../../../Components/Common/Spinner";
+import { fetchCourseProgress, fetchStudentSubjectProgress } from "../../../Store/Slices/Admin/Users/Students/student.action.js";
+import { useParams } from "react-router-dom";
 
-const AllSubject = ({ studentId }) => {
-  const role = useSelector((store) => store.common.auth.role);
-  const students = JSON.parse(localStorage.getItem('childrenData')) || [];
-  const student = students?.find((i) => i.id == studentId);
-  console.log('Student ID:', studentId);
-  const [studentSubjects, setStudentSubjects] = useState([]); // Initialize with an empty array
+const AllSubject = () => {
+  const { studentId } = useParams();
   const [selectedSubjectId, setSelectedSubjectId] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const { studentSubjectProgress } = useSelector(
+    (store) => store.admin.all_students
+  );
+  const { courseProgress, loading, error } = useSelector(
+    (store) => store.admin.all_students
+  );
 
+  const dispatch = useDispatch();
   useEffect(() => {
-    const fetchSubjects = async () => {
-      setLoading(true);
-      setError(null); // Reset error state before fetching
-      try {
-        const token = localStorage.getItem('parent:token');
-        if (!token) {
-          throw new Error('Authentication token not found');
-        }
+    dispatch(fetchStudentSubjectProgress(studentId))
+  }, [ studentId]);
 
-        // Fetch subjects from the API
-        const response = await axios.get(`${baseUrl}/admin/course/subjects/student/${studentId}`, {
-          headers: { Authentication: token }
-        });
-
-        if (response.data && response.data.data && response.data.data.length > 0) {
-          setStudentSubjects(response.data.data); // Set subjects from the response
-          setSelectedSubjectId(response.data.data[0]?.subjectId || null); // Set the first subjectId
-        } else {
-          setStudentSubjects([]); // Set empty if no subjects found
-        }
-
-        setLoading(false);
-      } catch (err) {
-        console.error('Error fetching subjects:', err);
-        setError('No Subject Found ');
-        setLoading(false);
-      }
-    };
-
-    fetchSubjects();
-  }, [studentId]);
+ 
+  useEffect(() => {
+    dispatch(fetchCourseProgress({ studentId, subjectId:studentSubjectProgress[0]?.subjectId }))
+    if (studentSubjectProgress?.length > 0) {
+      setSelectedSubjectId(studentSubjectProgress[0]?.subjectId || null);
+    }
+  }, [studentSubjectProgress]);
+  const fetchModule = async(id)=>{
+    setSelectedSubjectId(id)
+    dispatch(fetchCourseProgress({ studentId, subjectId:id }));
+  }
 
   return (
     <>
       {loading ? (
-        <div className='w-full h-[50vh] flex items-center justify-center'>
+        <div className="w-full h-[50vh] flex items-center justify-center">
           <Spinner />
         </div>
       ) : error ? (
@@ -62,30 +46,23 @@ const AllSubject = ({ studentId }) => {
           {error}
         </div>
       ) : (
-        <div className='py-2 w-full'>
-          <div className='pb-2 flex w-full flex-row'>
-            <div className='flex flex-col gap-2 p-4 w-[25%] border-gray-300 border-r'>
+        <div className="py-2 w-full">
+          <div className="pb-2 flex w-full flex-row">
+            <div className="flex flex-col gap-2 p-4 w-[25%] border-gray-300 border-r">
               {/* Safeguard against null/undefined and map subjects */}
-              {studentSubjects && studentSubjects.length > 0 ? (
-                studentSubjects.map((subject, index) => (
+              {studentSubjectProgress?.length > 0 ? (
+                studentSubjectProgress.map((subject, index) => (
                   <div
                     key={index}
-                    className={`w-[270px] transition-all duration-300 transform 
-    ${subject.subjectId === selectedSubjectId ? 'bg-gray-100 shadow-lg scale-105' : 'bg-white shadow-md rounded-lg'}`}
-                    onClick={() => {
-                      setSelectedSubjectId(null); // Reset first to clear existing data
-                      setTimeout(() => {
-                        setSelectedSubjectId(subject.subjectId);  // Set new subjectId after resetting
-                        console.log('Selected Subject ID:', subject.subjectId);
-                      }, 0); // Using setTimeout ensures state updates properly
-                    }}
+                    className={`w-[260px] transition-all duration-300 transform ${
+                      subject.subjectId === selectedSubjectId
+                        ? "scale-105"
+                        : "bg-white shadow-md rounded-lg"
+                    }`}
+                    onClick={() => fetchModule(subject.subjectId)}
                   >
                     <SubjectCard subject={subject} i={index} />
                   </div>
-
-
-
-
                 ))
               ) : (
                 <div className="flex w-full h-full text-gray-500 items-center justify-center flex-col text-xl">
@@ -94,10 +71,11 @@ const AllSubject = ({ studentId }) => {
                 </div>
               )}
             </div>
-            <div className='border-t-2 w-[75%]'>
-              {console.log("This is studentID: ", studentId, "This is select Subject id: ", selectedSubjectId)}
-              <MainSection selectedSubjectId={selectedSubjectId} />
-
+            <div className="border-t-2 w-[75%]">
+              <MainSection
+                selectedSubjectId={selectedSubjectId}
+                studentId={studentId}
+              />
             </div>
           </div>
         </div>

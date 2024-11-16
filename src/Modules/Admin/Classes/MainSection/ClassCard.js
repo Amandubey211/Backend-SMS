@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { useDispatch, useSelector } from "react-redux";
 import { NavLink } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { TbEdit } from "react-icons/tb";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { deleteClass } from "../../../../Store/Slices/Admin/Class/actions/classThunk"; // Import the delete thunk
@@ -17,6 +18,8 @@ import centerLogo from "../../../../Assets/ClassesAssets/ClassCardCenterLogo.png
 import DeleteModal from "../../../../Components/Common/DeleteModal";
 
 const ClassCard = ({ role, classData, onEdit }) => {
+  const { t } = useTranslation("admClass");
+
   const dispatch = useDispatch();
   const [isModalOpen, setModalOpen] = useState(false);
   const loading = useSelector((state) => state.admin.class.loading); // Access loading state directly
@@ -65,7 +68,7 @@ const ClassCard = ({ role, classData, onEdit }) => {
               onClick={() => onEdit(classData)}
               className="bg-white p-1 rounded-full shadow hover:bg-gray-200"
             >
-              <TbEdit className="w-5 h-5  text-green-500" />
+              <TbEdit className="w-5 h-5 text-green-500" />
             </button>
             <button
               disabled={loading}
@@ -90,22 +93,22 @@ const ClassCard = ({ role, classData, onEdit }) => {
           </h2>
           <p>{teachersCount} Teachers</p>
           <img
-            src={classIcons?.imageLink || centerLogo}
-            className="w-20"
+            src={classIcons || centerLogo}
+            className="w-20 h-20 object-contain"
             alt="center_logo"
           />
         </NavLink>
         <div className="flex justify-between items-center px-3">
           <div className="flex flex-col items-center gap-1">
-            <p className="opacity-50">Students</p>
+            <p className="opacity-50">{t("Students")}</p>
             <span className="font-bold">{studentsCount}</span>
           </div>
           <div className="flex border-x px-4 border-opacity-45 border-black flex-col items-center gap-1">
-            <p className="opacity-50">Section</p>
+            <p className="opacity-50">{t("Section")}</p>
             <span className="font-bold">{sectionsCount}</span>
           </div>
           <div className="flex items-center flex-col gap-1">
-            <p className="opacity-50">Group</p>
+            <p className="opacity-50">{t("Group")}</p>
             <span className="font-bold">{groupsCount}</span>
           </div>
         </div>

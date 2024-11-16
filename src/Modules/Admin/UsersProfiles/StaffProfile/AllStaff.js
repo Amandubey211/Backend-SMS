@@ -10,8 +10,11 @@ import { FiLoader } from "react-icons/fi";
 import { GoAlertFill } from "react-icons/go";
 import { fetchAllStaff } from "../../../../Store/Slices/Admin/Users/Staff/staff.action";
 import Spinner from "../../../../Components/Common/Spinner";
+import { useTranslation } from 'react-i18next';
 
 const AllStaff = () => {
+  const { t } = useTranslation("admAccounts");
+
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarContent, setSidebarContent] = useState(null);
   const [selectedStaff, setSelectedStaff] = useState(null);
@@ -58,12 +61,12 @@ const AllStaff = () => {
       case "editStaff":
         return <AddUser role="staff" data={staffData} />;
       default:
-        return <div>Select an action</div>;
+        return <div>{t("Select an action")}</div>;
     }
   };
 
   return (
-    <Layout title="All Staff">
+    <Layout title={t("All Staff")}>
       <DashLayout>
         {loading ? (
           <div className="flex w-full h-[90vh] flex-col items-center justify-center">
@@ -73,7 +76,7 @@ const AllStaff = () => {
           <div className="p-4">
             <div className="flex justify-between items-center mb-4 border-b-2 h-20">
               <h2 className="text-xl font-semibold">
-                All Staff{" "}
+                {t("All Staff")}{" "}
                 <span className="bg-purple-400 px-2 text-sm py-1 rounded-full">
                   {staff?.length}
                 </span>
@@ -85,7 +88,7 @@ const AllStaff = () => {
                   onClick={handleAddStaffClick}
                   className="bg-purple-500 text-white px-4 py-2 rounded-md flex items-center space-x-2"
                 >
-                  <span>Add New Staff</span>
+                  <span>{t("Add New Staff")}</span>
                 </button>
               )}
             </div>
@@ -104,7 +107,7 @@ const AllStaff = () => {
                 <div>
                   <div className="flex w-[80vw] text-gray-500 h-[90vh] items-center justify-center flex-col text-2xl">
                     <GoAlertFill className="text-[5rem]" />
-                    No Staff data Found
+                    {t("No Staff data Found")}
                   </div>
                 </div>
               )}
@@ -117,8 +120,8 @@ const AllStaff = () => {
               title={
                 <span className="bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent bg-clip-text">
                   {sidebarContent === "viewStaff"
-                    ? "Quick View of Staff"
-                    : "Add/Edit Staff"}
+                    ? t("Quick View of Staff")
+                    : t("Add/Edit Staff")}
                 </span>
               }
               width={sidebarContent === "viewStaff" ? "30%" : "60%"}

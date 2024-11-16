@@ -87,5 +87,16 @@
   "Guardian Phone": "رقم هاتف الوصي",
   "Student": "طالب",
   "Drop Your Image here": "أسقط صورتك هنا",
-  "Click to browse": "اضغط للتصفح"
+  "Click to browse": "اضغط للتصفح",
+  "Document Upload": "تحميل المستند",
+  "Preview": "معاينة",
+  "Select Document Type": "اختر نوع المستند",
+  "Passport": "جواز السفر",
+  "Birth Certificate": "شهادة الميلاد",
+  "Browse Files": "تصفح الملفات",
+  "Drag and drop files here": "اسحب الملفات وأفلتها هنا",
+  "I acknowledge that the above information is correct.": "أقر بأن المعلومات أعلاه صحيحة.",
+  "Back": "عودة",
+  "Uploading...": "جاري التحميل...",
+  "Upload Document & Apply": "تحميل المستند والتقديم"
 }

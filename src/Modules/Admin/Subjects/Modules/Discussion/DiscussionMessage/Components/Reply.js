@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FaRegHeart, FaRegComment } from "react-icons/fa";
+import { FaRegHeart, FaRegComment, FaUserCircle } from "react-icons/fa";
 import { FcLike } from "react-icons/fc";
 import { MdOutlineEdit } from "react-icons/md";
 import { RxCross2 } from "react-icons/rx";
@@ -61,25 +61,26 @@ const Reply = ({
   };
 
   return (
-    <div className="ml-10 mt-2 p-4 bg-gray-100 rounded-md shadow-sm">
+    <div className="ml-10 mt-2 p-2 px-4 bg-gray-50 rounded-md shadow-sm">
       <div className="flex items-center mb-2">
-        <img
-          src={
-            reply?.avatarUrl ||
-            ""
-          }
-          alt="avatar"
-          className="w-8 h-8 rounded-full mr-3"
-        />
+        {reply?.avatarUrl ? (
+          <img
+            src={reply.avatarUrl}
+            alt="avatar"
+            className="w-8 h-8 rounded-full mr-3"
+          />
+        ) : (
+          <FaUserCircle className="w-8 h-8 text-gray-500 mr-3" />
+        )}
         <div>
           <h4 className="text-md font-semibold">{reply.createdBy}</h4>
           <span className="text-sm text-gray-500">{reply.time}</span>
         </div>
         <div className="ml-auto flex space-x-2">
-          <MdOutlineEdit
+          {/* <MdOutlineEdit
             className="text-gray-500 text-lg cursor-pointer"
             onClick={handleEditClick}
-          />
+          /> */}
           <RxCross2
             className="text-red-500 text-lg cursor-pointer"
             onClick={handleDeleteReply}
@@ -95,7 +96,7 @@ const Reply = ({
           initialText={editedContent}
         />
       )}
-      <div className="flex items-center mb-2 pt-3 border-t border-gray-200">
+      <div className="flex items-center  pt-3 border-t border-gray-200">
         {isLiked ? (
           <FcLike
             className="text-gray-500 cursor-pointer"
@@ -108,20 +109,20 @@ const Reply = ({
           />
         )}
         <span className="ml-1 text-gray-500">{likesCount}</span>
-        <FaRegComment
+        {/* <FaRegComment
           className="ml-4 text-gray-500 cursor-pointer"
           onClick={handleReplyClick}
         />
-        <span className="ml-1 text-gray-500">Reply</span>
+        <span className="ml-1 text-gray-500">Reply</span> */}
       </div>
-      {activeReplyId === reply._id && (
+      {/* {activeReplyId === reply._id && (
         <div className="mt-4">
           <InputComment
             addComment={(text) => addNestedReply(reply._id, text)}
             placeholder="Write a reply..."
           />
         </div>
-      )}
+      )} */}
     </div>
   );
 };

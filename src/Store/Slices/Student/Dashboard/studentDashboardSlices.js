@@ -1,10 +1,10 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice } from "@reduxjs/toolkit";
 import {
   fetchDashboardDetails,
   fetchSubjects,
   fetchTasks,
   fetchStudentGrades,
-} from './studentDashboard.action';
+} from "./studentDashboard.action";
 
 const initialState = {
   cardData: [],
@@ -23,7 +23,7 @@ const initialState = {
 };
 
 const studentDashboardSlice = createSlice({
-  name: 'studentDashboard',
+  name: "studentDashboard",
   initialState,
   reducers: {
     setCache: (state, action) => {

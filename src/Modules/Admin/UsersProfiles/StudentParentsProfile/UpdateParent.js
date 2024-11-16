@@ -1,15 +1,18 @@
 import React, { useEffect, useState } from "react";
 import ImageUpload from "../../Addmission/Components/ImageUpload";
 import FormInput from "../../Accounting/subClass/component/FormInput";
+import { useDispatch } from "react-redux";
+import { updateParent } from "../../../../Store/Slices/Admin/Users/Parents/parent.action";
 
-const UpdateParent = ({data}) => {
+const UpdateParent = ({data,handleUpdateSidebarClose}) => {
     
   const [imagePreview, setImagePreview] = useState(null);
-
+const [loading,setLoading] =useState(false)
   const [parentData, setParentData] = useState({
-    fatherName:data?.email,
+    id:'',
+    fatherName:'',
     motherName:"",
-    guardianContactNumber: data?.phone,
+    guardianContactNumber:'',
     guardianEmail: "",
     profile:null,
     guardianRelationToStudent:'',
@@ -17,13 +20,16 @@ const UpdateParent = ({data}) => {
     active:true
   });
   useEffect(()=>{
+    console.log(data);
+    
 setParentData({
+    id:data?._id,
     fatherName:data?.fatherName,
     motherName:data?.motherName,
     guardianContactNumber: data?.phone,
     guardianEmail:data?.email,
     profile:data?.fatherImageUrl,
-    guardianRelationToStudent:data?.guardianRelationToStuden,
+    guardianRelationToStudent:data?.guardianRelationToStudent,
     guardianName:data?.guardianName,
     active:true})
   },[data]);
@@ -54,12 +60,16 @@ setParentData({
   const handleRemoveImage = () => {
     setImagePreview(null);
   };
-
+const dispatch = useDispatch();
   const handleSubmit = async(e) => {
     e.preventDefault();
-   console.log(parentData);
-   
-
+    setLoading(true)
+    const formData = new FormData();
+    Object.keys(parentData).forEach((key) => formData.append(key, parentData[key]));
+  
+    await dispatch(updateParent({ data: formData }));
+    setLoading(false)
+    handleUpdateSidebarClose();
   };
 
   return (
@@ -90,26 +100,30 @@ setParentData({
                 label="Mobile Number"
                 value={parentData.guardianContactNumber}
                 onChange={handleInputChange}
+                required
               />
               <FormInput
                 id="guardianEmail"
                 label="Email"
                 value={parentData.guardianEmail}
                 onChange={handleInputChange}
+                required
               />
             </div>
             <div className=" flex  gap-5  ">
               <FormInput
                 id="fatherName"
                 label="Father Name"
-                value={parentData.fisrtName}
+                value={parentData.fatherName}
                 onChange={handleInputChange}
+                required
               />
                 <FormInput
                 id="motherName"
                 label="Mother Name"
                 value={parentData.motherName}
                 onChange={handleInputChange}
+                required
               />
             </div>
             <div className="flex  gap-5  ">
@@ -119,6 +133,7 @@ setParentData({
                 name="guardianRelationToStudent"
                 value={parentData.guardianRelationToStudent}
                 onChange={handleInputChange}
+                required
               />
               <FormInput
                 id="guardianName"
@@ -126,16 +141,18 @@ setParentData({
                 name="guardianName"
                 value={parentData.guardianName}
                 onChange={handleInputChange}
+                required
               />
             </div>
           </div>
         </div>
 
         <button
+        disabled={loading}
           type="submit"
           className="bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-10 rounded-md hover:from-pink-600 hover:to-purple-600"
         >
-          Update
+          {loading?'Loading...':'Update'}
         </button>
       </form>
     </div>

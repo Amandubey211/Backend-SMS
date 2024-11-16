@@ -11,8 +11,12 @@ import {
 import Spinner from "../../../../Components/Common/Spinner";
 import PropTypes from "prop-types";
 import DeleteConfirmatiomModal from "../../../../Components/Common/DeleteConfirmationModal";
+import { useSelector } from "react-redux";
+
 const TimeTableList = React.memo(({ timetables, loading, onDelete }) => {
   const navigate = useNavigate();
+
+  const role = useSelector((store) => store.common.auth.role);
 
   // State to manage the deletion modal
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -20,7 +24,7 @@ const TimeTableList = React.memo(({ timetables, loading, onDelete }) => {
 
   // Function to handle card click and navigate to TableView
   const handleCardClick = (timetable) => {
-    navigate(`/noticeboard/timetable/viewtable/${timetable.name}`, {
+    navigate(`/timetable/viewtable/${timetable.name}`, {
       state: { timetable },
     });
   };
@@ -28,7 +32,7 @@ const TimeTableList = React.memo(({ timetables, loading, onDelete }) => {
   // Function to handle edit button click
   const handleEditClick = (e, timetable) => {
     e.stopPropagation(); // Prevent triggering card click
-    navigate(`/noticeboard/timetable/edit/${timetable._id}`);
+    navigate(`/timetable/edit/${timetable._id}`);
   };
 
   // Function to open the deletion modal
@@ -87,9 +91,22 @@ const TimeTableList = React.memo(({ timetables, loading, onDelete }) => {
           {sortedTimetables.map((timetable) => (
             <div
               key={timetable._id}
-              className="p-6 bg-white shadow-xl rounded-xl border border-gray-200 transition duration-500 hover:scale-105 hover:shadow-2xl cursor-pointer"
+              className="relative p-6 bg-white shadow-xl rounded-xl border border-gray-200 transition duration-500 hover:scale-105 hover:shadow-2xl cursor-pointer"
               onClick={() => handleCardClick(timetable)}
             >
+              {/* Status Badge */}
+              {role !== "parent" && role !== "student" && (
+                <span
+                  className={`absolute top-2 right-2 text-xs font-semibold px-2 py-1 rounded ${timetable.status === "active"
+                      ? "bg-green-500 text-white"
+                      : "bg-gray-500 text-white"
+                    }`}
+                >
+                  {timetable.status === "active" ? "Published" : "Draft"}
+                </span>
+              )}
+
+
               {/* Card Header */}
               <h2 className="text-xl font-semibold text-gray-800 mb-3 flex items-center">
                 {timetable.name}
@@ -166,18 +183,29 @@ const TimeTableList = React.memo(({ timetables, loading, onDelete }) => {
 
               {/* Action Buttons */}
               <div className="flex justify-end space-x-2 mt-4">
-                <button
-                  className="bg-blue-500 text-white px-4 py-2 rounded-full flex items-center hover:bg-blue-600 transition duration-300"
-                  onClick={(e) => handleEditClick(e, timetable)}
-                >
-                  <FaEdit className="mr-2" /> Edit
-                </button>
-                <button
-                  className="bg-red-500 text-white px-4 py-2 rounded-full flex items-center hover:bg-red-600 transition duration-300"
-                  onClick={(e) => handleDeleteClick(e, timetable)}
-                >
-                  <FaTrashAlt className="mr-2" /> Delete
-                </button>
+                {(role !== "parent" && role !== "student") ? (
+                  <>
+                    <button
+                      className="bg-blue-500 text-white px-4 py-2 rounded-full flex items-center hover:bg-blue-600 transition duration-300"
+                      onClick={(e) => handleEditClick(e, timetable)}
+                    >
+                      <FaEdit className="mr-2" /> Edit
+                    </button>
+                    <button
+                      className="bg-red-500 text-white px-4 py-2 rounded-full flex items-center hover:bg-red-600 transition duration-300"
+                      onClick={(e) => handleDeleteClick(e, timetable)}
+                    >
+                      <FaTrashAlt className="mr-2" /> Delete
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    className="px-4 py-2 rounded-md text-white bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700"
+                    onClick={() => handleCardClick(timetable)}
+                  >
+                    View Timetable
+                  </button>
+                )}
               </div>
             </div>
           ))}

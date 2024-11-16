@@ -5,6 +5,7 @@ import axios from "axios";
 import { baseUrl } from "../../../../config/Common";
 import { useDispatch } from "react-redux";
 import { updateAcademicYear } from "../../../../Store/Slices/Common/AcademicYear/academicYear.action";
+import { useTranslation } from "react-i18next"; // Import translation hook
 
 // Helper function to format the date to YYYY-MM-DD
 const formatDateForInput = (dateString) => {
@@ -16,6 +17,7 @@ const formatDateForInput = (dateString) => {
 };
 
 const EditAcademicYearModal = ({ show, onClose, year, refreshData }) => {
+  const { t } = useTranslation("admAcademicYear"); // Use translation hook
   const [formData, setFormData] = useState({
     year: "",
     startDate: "",
@@ -30,7 +32,7 @@ const EditAcademicYearModal = ({ show, onClose, year, refreshData }) => {
     // Preload data when the modal is opened
     if (year && show) {
       setFormData({
-        year: year.academicYear,
+        year: year?.year,
         startDate: formatDateForInput(year.startDate), // Format start date for input
         endDate: formatDateForInput(year.endDate), // Format end date for input
         isActive: year.isActive,
@@ -59,27 +61,28 @@ const EditAcademicYearModal = ({ show, onClose, year, refreshData }) => {
     let formErrors = {};
 
     if (!formData.year) {
-      formErrors.year = "Academic Year is required.";
+      formErrors.year = t("Academic Year is required.");
     }
     if (!formData.startDate) {
-      formErrors.startDate = "Start Date is required.";
+      formErrors.startDate = t("Start Date is required.");
     }
     if (!formData.endDate) {
-      formErrors.endDate = "End Date is required.";
+      formErrors.endDate = t("End Date is required.");
     }
 
     setErrors(formErrors);
     return Object.keys(formErrors).length === 0;
   };
-const dispatch = useDispatch()
+
+  const dispatch = useDispatch();
+
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) {
       return;
     }
-    dispatch(updateAcademicYear({data:formData,id:year?._id}))
-
+    dispatch(updateAcademicYear({ data: formData, id: year?._id }));
   };
 
   return (
@@ -98,7 +101,7 @@ const dispatch = useDispatch()
       >
         <div className="bg-gray-100 px-6 py-4 rounded-t-lg">
           <h2 className="text-lg font-semibold text-gray-900">
-            Edit Academic Year
+            {t("Edit Academic Year")}
           </h2>
         </div>
         <div className="bg-white p-5">
@@ -106,7 +109,7 @@ const dispatch = useDispatch()
             {/* Academic Year */}
             <div className="mb-3">
               <label className="block text-sm font-semibold text-gray-700">
-                Academic Year (YYYY-YYYY)
+                {t("Academic Year (YYYY-YYYY)")}
               </label>
               <input
                 type="text"
@@ -117,7 +120,7 @@ const dispatch = useDispatch()
                 className={`w-full px-3 py-2 border ${
                   errors.year ? "border-red-500" : "border-gray-300"
                 } rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 transition`}
-                placeholder="e.g., 2024-2025"
+                placeholder={t("e.g., 2024-2025")}
                 required
               />
               {errors.year && (
@@ -128,7 +131,7 @@ const dispatch = useDispatch()
             {/* Start Date */}
             <div className="mb-3">
               <label className="block text-sm font-semibold text-gray-700">
-                Start Date
+                {t("Start Date")}
               </label>
               <input
                 type="date"
@@ -142,14 +145,16 @@ const dispatch = useDispatch()
                 required
               />
               {errors.startDate && (
-                <p className="text-red-500 text-xs mt-1">{errors.startDate}</p>
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.startDate}
+                </p>
               )}
             </div>
 
             {/* End Date */}
             <div className="mb-3">
               <label className="block text-sm font-semibold text-gray-700">
-                End Date
+                {t("End Date")}
               </label>
               <input
                 type="date"
@@ -177,7 +182,9 @@ const dispatch = useDispatch()
                 }
                 className="mr-2 ms-1 w-4 h-4"
               />
-              <label className="text-gray-700">Set as Active Year</label>
+              <label className="text-gray-700">
+                {t("Set as Active Year")}
+              </label>
             </div>
 
             {/* Submit Button */}
@@ -187,7 +194,7 @@ const dispatch = useDispatch()
                 onClick={onClose}
                 className="mr-3 bg-gray-200 px-4 py-2 rounded-md text-gray-700 hover:bg-gray-300"
               >
-                Cancel
+                {t("Cancel")}
               </button>
               <button
                 type="submit"
@@ -198,10 +205,10 @@ const dispatch = useDispatch()
               >
                 {loading ? (
                   <>
-                    <FaSpinner className="animate-spin mr-2" /> Updating...
+                    <FaSpinner className="animate-spin mr-2" /> {t("Updating...")}
                   </>
                 ) : (
-                  "Update Academic Year"
+                  t("Update Academic Year")
                 )}
               </button>
             </div>

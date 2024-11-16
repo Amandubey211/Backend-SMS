@@ -2,6 +2,7 @@ import React from "react";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import { FaRegEdit } from "react-icons/fa";
 import { BsFillPatchCheckFill, BsPatchCheck } from "react-icons/bs"; // Importing the icons
+import { useTranslation } from "react-i18next";
 
 const AcademicYearTable = ({
   academicYears,
@@ -9,30 +10,32 @@ const AcademicYearTable = ({
   handleEdit,
   handleDelete,
 }) => {
-  const say = localStorage.getItem('say')
+  const { t } = useTranslation("admAcademicYear"); // Use the translation hook
+  const say = localStorage.getItem('say');
+
   return (
     <div className="bg-white p-2 rounded-lg w-full">
       <h2 className="text-2xl font-semibold mb-4 text-gray-800">
-        All Academic Years
+        {t("All Academic Years")}
       </h2>
       <table className="min-w-full table-auto border-collapse">
         <thead>
           <tr className="text-left text-gray-500 text-base leading-normal bg-gray-100">
-            <th className="p-3">Select</th>
-            <th className="p-3">Year</th>
-            <th className="p-3">Start Date</th>
-            <th className="p-3">End Date</th>
-            <th className="p-3">Active</th>
-            <th className="p-3">Actions</th>
+            <th className="p-3">{t("Select")}</th>
+            <th className="p-3">{t("Year")}</th>
+            <th className="p-3">{t("Start Date")}</th>
+            <th className="p-3">{t("End Date")}</th>
+            <th className="p-3">{t("Active")}</th>
+            <th className="p-3">{t("Actions")}</th>
           </tr>
         </thead>
-        <tbody className="text-base  text-gray-700">
+        <tbody className="text-base text-gray-700">
           {academicYears?.map((year) => (
             <tr
               key={year._id}
               className={`${
-                say == year._id ? "bg-green-50 hover:bg-green-100" : " hover:bg-gray-50"
-              }  border-b border-gray-200  transition duration-200`}
+                say == year._id ? "bg-green-50 hover:bg-green-100" : "hover:bg-gray-50"
+              } border-b border-gray-200 transition duration-200`}
             >
               <td className="p-3 flex justify-center">
                 <button onClick={() => handleCheckboxChange(year)}>
@@ -44,8 +47,8 @@ const AcademicYearTable = ({
                 </button>
               </td>
               <td className="p-3">{year?.year}</td>
-              <td className="p-3">{year?.startDate?.slice(0,10)}</td>
-              <td className="p-3">{year?.endDate?.slice(0,10)}</td>
+              <td className="p-3">{year?.startDate?.slice(0, 10)}</td>
+              <td className="p-3">{year?.endDate?.slice(0, 10)}</td>
               <td className="p-3">
                 <span
                   className={`px-2 py-1 rounded-md text-base ${
@@ -54,7 +57,7 @@ const AcademicYearTable = ({
                       : "bg-gray-100 text-gray-800"
                   }`}
                 >
-                  {year.isActive ? "Yes" : "No"}
+                  {year.isActive ? t("Yes") : t("No")}
                 </span>
               </td>
               <td className="p-3 flex items-center space-x-3 text-2xl">

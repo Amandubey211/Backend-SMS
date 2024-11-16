@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchAllNotices } from "./notice.action"; 
+import { fetchAllNotices } from "./notice.action";
 
 // Notice slice
 const noticeSlice = createSlice({

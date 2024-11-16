@@ -6,6 +6,8 @@ import { MdLocalLibrary, MdOutlineNotificationsActive } from "react-icons/md";
 import { FaClipboardList, FaBook } from "react-icons/fa";
 import { LiaClipboardListSolid } from "react-icons/lia";
 import { FcAdvertising } from "react-icons/fc";
+import { ImTable2 } from "react-icons/im";
+
 
 const sidebarData = [
   {
@@ -27,6 +29,11 @@ const sidebarData = [
     title: "Library",
     icon: <MdLocalLibrary />,
     path: "/student_library",
+  },
+  {
+    title: "Time Table",
+    icon: <ImTable2 />,
+    path: "/timetable",
   },
   {
     title: "Notice Board",

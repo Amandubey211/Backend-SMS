@@ -46,7 +46,7 @@ const DashboardNoticeBoard = (descriptionLength) => {
 
   return (
     <div className="p-2">
-      <div className="flex justify-between p-4 items-center px-6">
+      <div className="flex justify-between p-4 items-center px-6 pr-14 pl-2">
         <h2 className="text-xl font-semibold text-gray-600">Notice Board</h2>
         <button
           className="text-black border border-gray-300 px-4 py-2 rounded-md hover:shadow-md transition duration-300 ease-in-out"

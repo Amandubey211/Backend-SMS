@@ -1,8 +1,15 @@
 import React from 'react';
 import { FaCheckCircle, FaTimesCircle, FaDoorOpen } from 'react-icons/fa';
 import { useSelector } from 'react-redux';
+import useNavHeading from "../../../../../../Hooks/CommonHooks/useNavHeading ";
+
 
 const AttendanceSummary = () => {
+  const { classData } = useSelector((store) => store?.student?.studentClass);
+
+  const className = classData?.className;
+
+  useNavHeading(` ${className}`, "Attendance");
   const { loading, error, summary, currentDate } = useSelector((store) => store?.student?.studentAttendance);
   const present=summary?.presentCount;
   const absent=summary?.absentCount;

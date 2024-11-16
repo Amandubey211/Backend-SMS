@@ -5,10 +5,12 @@ import { format } from "date-fns";
 const DateDetail = ({ label, value, labelAbove = false }) => {
   // Check if value is a valid date
   const isValidDate = value && !isNaN(new Date(value).getTime());
-  const formattedDate = isValidDate ? format(new Date(value), "dd/MM/yyyy") : "N/A";
+  const formattedDate = isValidDate
+    ? format(new Date(value), "dd/MM/yyyy")
+    : "N/A";
 
   return (
-    <div className="mt-2">
+    <div className="mt-2 w-full">
       {labelAbove ? (
         <>
           <p className="text-sm text-gray-600 ">{label}</p>
@@ -20,9 +22,9 @@ const DateDetail = ({ label, value, labelAbove = false }) => {
       ) : (
         <div className="flex items-center p-3 text-green-500 text-sm font-medium">
           <FaRegCalendarAlt className="mr-2" aria-hidden="true" />
-          <div>
-          <p>{label} :</p>
-          <p className="ml-2 font-semibold">{formattedDate}</p>
+          <div className="flex items-center gap-2">
+            <p>{label} :</p>
+            <p className="ml-2 font-semibold">{formattedDate}</p>
           </div>
         </div>
       )}

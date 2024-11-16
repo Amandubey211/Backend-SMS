@@ -70,9 +70,10 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => { } }) => {
       ? moment(timetable.validity.endDate).format('YYYY-MM-DD')
       : '',
     type: timetable.type || 'weekly',
+    status: timetable.status === 'active' ? 'Publish' : 'Draft', // New field
   });
 
-  const [isActive, setIsActive] = useState(false);
+
   const [columns, setColumns] = useState([]);
   const [dataSource, setDataSource] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -81,21 +82,7 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => { } }) => {
   // ID Counter using useRef
   const idCounterRef = useRef(1);
 
-  // Fetch isActive from localStorage on component mount
-  useEffect(() => {
-    const authData = localStorage.getItem('persist:auth');
-    if (authData) {
-      try {
-        const parsedAuth = JSON.parse(authData);
-        const academicYear = parsedAuth.AcademicYear
-          ? JSON.parse(parsedAuth.AcademicYear)
-          : [];
-        setIsActive(academicYear[0]?.isActive || false);
-      } catch (error) {
-        console.error('Error parsing auth data:', error);
-      }
-    }
-  }, []);
+
 
   // Fetch subjects, sections, and groups when classId changes
   useEffect(() => {
@@ -586,7 +573,7 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => { } }) => {
         startDate: new Date(formData.startDate).toISOString(),
         endDate: formData.endDate ? new Date(formData.endDate).toISOString() : undefined,
       },
-      status: isActive ? 'active' : 'inactive',
+      status: formData.status === 'Publish' ? 'active' : 'inactive', // Updated status mapping
       days: [], // To be populated based on type
     };
 
@@ -677,25 +664,36 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => { } }) => {
 
     // Dispatch the action to create or update the timetable
     if (timetable._id) {
-      dispatch(updateTimetable({ id: timetable._id, data: timetableData }));
-      message.success('Timetable updated successfully!');
-
-      // Redirect after a short delay
-      setTimeout(() => {
-        navigate('/noticeboard/timetable');
-      }, 1500);
+      dispatch(updateTimetable({ id: timetable._id, data: timetableData }))
+        .unwrap()
+        .then(() => {
+          message.success('Timetable updated successfully!');
+          // Redirect after a short delay
+          setTimeout(() => {
+            navigate('/timetable');
+          }, 1500);
+        })
+        .catch((error) => {
+          message.error(error || 'Failed to update timetable.');
+        });
     } else {
-      dispatch(createTimetable(timetableData));
-      message.success('Timetable created successfully!');
-
-      // Redirect after a short delay
-      setTimeout(() => {
-        navigate('/noticeboard/timetable');
-      }, 1500);
+      dispatch(createTimetable(timetableData))
+        .unwrap()
+        .then(() => {
+          message.success('Timetable created successfully!');
+          // Redirect after a short delay
+          setTimeout(() => {
+            navigate('/timetable');
+          }, 1500);
+        })
+        .catch((error) => {
+          message.error(error || 'Failed to create timetable.');
+        });
     }
 
     onClose();
   };
+
 
 
 
@@ -833,6 +831,21 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => { } }) => {
                   <Option value="others">Others</Option>
                 </Select>
               </div>
+              {/* Status Dropdown */}
+              <div className="w-full md:w-1/5 px-2 mb-4">
+                <label className="block mb-1">Status</label>
+                <Select
+                  value={formData.status}
+                  onChange={(value) => setFormData({ ...formData, status: value })}
+                  style={{ width: '100%' }}
+                  required
+                  placeholder="Select Status"
+                >
+                  <Option value="Publish">Publish</Option>
+                  <Option value="Draft">Draft</Option>
+                </Select>
+              </div>
+
             </div>
 
             {/* Table */}
@@ -856,19 +869,19 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => { } }) => {
 
                 <div className="flex space-x-2">
                   {deletedRowsStack.length > 0 && (
-                   <Button
-                   icon={<UndoOutlined />}
-                   onClick={handleUndoDelete}
-                   style={{
-                     borderColor: "gray",
-                     color: "gray",
-                     transition: "border-color 0.3s ease, color 0.3s ease", // Smooth transition for hover effect
-                   }}
-                   className="hover:border-gray-800 hover:text-gray-800 cursor-pointer" // Darker gray on hover
-                 >
-                   Undo Delete
-                 </Button>
-                 
+                    <Button
+                      icon={<UndoOutlined />}
+                      onClick={handleUndoDelete}
+                      style={{
+                        borderColor: "gray",
+                        color: "gray",
+                        transition: "border-color 0.3s ease, color 0.3s ease", // Smooth transition for hover effect
+                      }}
+                      className="hover:border-gray-800 hover:text-gray-800 cursor-pointer" // Darker gray on hover
+                    >
+                      Undo Delete
+                    </Button>
+
                   )}
                   {selectedRowKeys.length > 0 && (
                     <Popconfirm

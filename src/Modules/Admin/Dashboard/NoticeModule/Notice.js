@@ -12,7 +12,7 @@ const Notice = ({ title, date, priority, content, image, backgroundColor, descri
     return text.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
   };
   return (
-    <div className="p-4 border-t bg-white flex">
+    <div className="w-[97%] p-4 border-t bg-white flex">
       <div className="mr-4 flex-shrink-0">
         <div
           className="h-16 w-16 rounded-md flex items-center justify-center"

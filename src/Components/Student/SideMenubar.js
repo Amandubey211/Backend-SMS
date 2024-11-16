@@ -209,7 +209,7 @@ const SideMenubar = () => {
           {isOpen && (
             <div className="ml-4">
               <h2 className="text-sm font-semibold">
-                {userDetails?.fullName?.slice(0, 8) || "User Name"}
+                {userDetails?.fullName?.charAt(0).toUpperCase() + userDetails?.fullName?.slice(1,5).toLowerCase() || "User"}{userDetails?.fullName?.length > 5 && '..'}
               </h2>
               <p className="text-gray-500 capitalize">{role}</p>
             </div>

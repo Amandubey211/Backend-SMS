@@ -4,8 +4,10 @@ import { issueBookThunk } from "../../../../Store/Slices/Admin/Library/LibraryTh
 import { fetchSectionsByClass } from "../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
 import { fetchStudentsByClassAndSection } from "../../../../Store/Slices/Admin/Class/Students/studentThunks";
 import FormInput from "../../Accounting/subClass/component/FormInput";
+import { useTranslation } from "react-i18next";
 
 const AddIssue = ({ onClose, editIssueData }) => {
+  const { t } = useTranslation("admLibrary");
   const dispatch = useDispatch();
   const { books } = useSelector((state) => state.admin.library);
   const sectionList = useSelector(
@@ -105,7 +107,6 @@ const AddIssue = ({ onClose, editIssueData }) => {
   };
 
   return (
-
     <form className="flex flex-col h-full space-y-6" onSubmit={handleSubmit}>
       <div className="flex-1 overflow-auto no-scrollbar px-5 space-y-4">
         <div>
@@ -113,7 +114,7 @@ const AddIssue = ({ onClose, editIssueData }) => {
             htmlFor="class"
             className="block text-sm font-medium text-gray-700"
           >
-            Class
+            {t("Class")}
           </label>
           <select
             id="class"
@@ -123,7 +124,7 @@ const AddIssue = ({ onClose, editIssueData }) => {
             required
             className="block w-full p-2 mt-1 border rounded focus:ring-indigo-500 focus:border-indigo-500"
           >
-            <option value="">Select Class</option>
+            <option value="">{t("Select Class")}</option>
             {classList.map((cls) => (
               <option key={cls._id} value={cls._id}>
                 {cls.className}
@@ -136,7 +137,7 @@ const AddIssue = ({ onClose, editIssueData }) => {
             htmlFor="section"
             className="block text-sm font-medium text-gray-700"
           >
-            Section
+            {t("Section")}
           </label>
           <select
             id="section"
@@ -145,7 +146,7 @@ const AddIssue = ({ onClose, editIssueData }) => {
             onChange={handleInputChange}
             className="block w-full p-2 mt-1 border rounded focus:ring-indigo-500 focus:border-indigo-500"
           >
-            <option value="">Select Section</option>
+            <option value="">{t("Select Section")}</option>
             {sectionList.map((section) => (
               <option key={section._id} value={section._id}>
                 {section.sectionName}
@@ -159,7 +160,7 @@ const AddIssue = ({ onClose, editIssueData }) => {
             htmlFor="student"
             className="block text-sm font-medium text-gray-700"
           >
-            Student
+            {t("Student")}
           </label>
           <select
             id="student"
@@ -169,7 +170,7 @@ const AddIssue = ({ onClose, editIssueData }) => {
             required
             className="block w-full p-2 mt-1 border rounded focus:ring-indigo-500 focus:border-indigo-500"
           >
-            <option value="">Select Student</option>
+            <option value="">{t("Select Student")}</option>
             {studentList.map((student) => (
               <option key={student._id} value={student._id}>
                 {student.firstName} {student.lastName}
@@ -183,7 +184,7 @@ const AddIssue = ({ onClose, editIssueData }) => {
             htmlFor="book"
             className="block text-sm font-medium text-gray-700"
           >
-            Book
+            {t("Book")}
           </label>
           <select
             id="book"
@@ -192,7 +193,7 @@ const AddIssue = ({ onClose, editIssueData }) => {
             onChange={handleInputChange}
             className="block w-full p-2 mt-1 border rounded focus:ring-indigo-500 focus:border-indigo-500"
           >
-            <option value="">Select Book</option>
+            <option value="">{t("Select Book")}</option>
             {books.map((book) => (
               <option key={book._id} value={book._id}>
                 {book.name}
@@ -204,14 +205,14 @@ const AddIssue = ({ onClose, editIssueData }) => {
         <FormInput
           id="authorName"
           name="authorName"
-          label="Author Name"
+          label={t("Author Name")}
           value={issueData.authorName}
           onChange={handleInputChange}
         />
         <FormInput
           id="issueDate"
           name="issueDate"
-          label="Issue Date"
+          label={t("Issue Date")}
           type="date"
           value={issueData.issueDate}
           onChange={handleInputChange}
@@ -220,7 +221,7 @@ const AddIssue = ({ onClose, editIssueData }) => {
         <FormInput
           id="returnDate"
           name="returnDate"
-          label="Return Date"
+          label={t("Return Date")}
           type="date"
           value={issueData.returnDate}
           onChange={handleInputChange}
@@ -232,7 +233,7 @@ const AddIssue = ({ onClose, editIssueData }) => {
             htmlFor="status"
             className="block text-sm font-medium text-gray-700"
           >
-            Status
+            {t("Status")}
           </label>
           <select
             id="status"
@@ -241,8 +242,8 @@ const AddIssue = ({ onClose, editIssueData }) => {
             onChange={handleInputChange}
             className="block w-full p-2 mt-1 border rounded focus:ring-indigo-500 focus:border-indigo-500"
           >
-            <option value="Pending">Pending</option>
-            <option value="Returned">Returned</option>
+            <option value="Pending">{t("Pending")}</option>
+            <option value="Returned">{t("Returned")}</option>
           </select>
         </div>
       </div>
@@ -251,7 +252,7 @@ const AddIssue = ({ onClose, editIssueData }) => {
           type="submit"
           className="w-full p-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-md hover:from-pink-600 hover:to-purple-600"
         >
-          {editIssueData ? "Edit Book Issue" : "Add Book Issue"}
+          {editIssueData ? t("Edit Book Issue") : t("Add Book Issue")}
         </button>
       </div>
     </form>

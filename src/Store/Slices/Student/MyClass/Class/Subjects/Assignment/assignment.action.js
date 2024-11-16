@@ -1,35 +1,25 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
-import { baseUrl } from "../../../../../../../config/Common";
-import { setShowError,setErrorMsg } from "../../../../../Common/Alerts/alertsSlice";
-import { ErrorMsg } from "../../../../../Common/Alerts/errorhandling.action";
-const say = localStorage.getItem("say");
+import {
+  setShowError,
+} from "../../../../../Common/Alerts/alertsSlice";
+import {
+  handleError,
+} from "../../../../../Common/Alerts/errorhandling.action";
+import { getAY } from "../../../../../../../Utils/academivYear";
+import { getData, postData, putData } from "../../../../../../../services/apiEndpoints";
+
 // Fetch assignment details
 export const stdGetAssignment = createAsyncThunk(
   "assignment/stdGetAssignment",
   async (aid, { rejectWithValue, dispatch }) => {
-    const token = localStorage.getItem("student:token");
-    if (!token) {
-      dispatch(setShowError(true));
-      dispatch(setErrorMsg("Authentication failed!"));
-      return rejectWithValue("Authentication failed!");
-    }
-    const say = localStorage.getItem("say")
     try {
+      const say = getAY();
       dispatch(setShowError(false));
-      const res = await axios.get(
-        `${baseUrl}/student/studentAssignment/${aid}?say=${say}`,
-        {
-          headers: { Authentication: token },
-        }
-      );
-      const data = res?.data?.data;
+      const res = await getData(`/student/studentAssignment/${aid}?say=${say}`);
+      const data = res?.data;
       return data;
     } catch (error) {
-      const err = ErrorMsg(error);
-      dispatch(setShowError(true));
-      dispatch(setErrorMsg(err.message));
-      return rejectWithValue(err.message);
+      handleError(error, dispatch, rejectWithValue);
     }
   }
 );
@@ -41,14 +31,6 @@ export const stdDoAssignment = createAsyncThunk(
     { assignmentId, editorContent, fileUrls },
     { rejectWithValue, dispatch }
   ) => {
-    const token = localStorage.getItem("student:token");
-    const say = localStorage.getItem("say")
-    if (!token) {
-      dispatch(setShowError(true));
-            dispatch(setErrorMsg("Authentication failed!"));
-      return rejectWithValue("Authentication failed!");
-    }
-
     const submissionData = {
       content: editorContent,
       media: fileUrls,
@@ -57,20 +39,17 @@ export const stdDoAssignment = createAsyncThunk(
     };
 
     try {
+      const say = getAY();
       dispatch(setShowError(false));
-      const res = await axios.post(
-        `${baseUrl}/student/studentAssignment/submit/${assignmentId}?say=${say}`,
-        submissionData,
-        { headers: { Authentication: token } }
+      const data = await postData(
+        `/student/studentAssignment/submit/${assignmentId}?say=${say}`,
+        submissionData
       );
-      const data = res?.data;
+
       dispatch(stdGetAssignment(assignmentId));
       return data;
     } catch (error) {
-      const err = ErrorMsg(error);
-      dispatch(setShowError(true));
-      dispatch(setErrorMsg(err.message));
-      return rejectWithValue(err.message);
+      handleError(error, dispatch, rejectWithValue);
     }
   }
 );
@@ -82,14 +61,6 @@ export const stdReattemptAssignment = createAsyncThunk(
     { aid, submissionContent, submissionType, submissionComment, fileUrls },
     { rejectWithValue, dispatch }
   ) => {
-    const token = localStorage.getItem("student:token");
-    const say = localStorage.getItem("say")
-    if (!token) {
-      dispatch(setShowError(true));
-            dispatch(setErrorMsg("Authentication failed!"));
-      return rejectWithValue("Authentication failed!");
-    }
-
     const reattemptData = {
       content: submissionContent,
       type: submissionType,
@@ -98,19 +69,16 @@ export const stdReattemptAssignment = createAsyncThunk(
     };
 
     try {
+      const say = getAY();
       dispatch(setShowError(false));
-      const res = await axios.put(
-        `${baseUrl}/student/studentAssignment/reattempt/${aid}?say=${say}`,
-        reattemptData,
-        { headers: { Authentication: token } }
+      const res = await putData(
+        `/student/studentAssignment/reattempt/${aid}?say=${say}`,
+        reattemptData
       );
-      const data = res?.data?.data;
+      const data = res?.data;
       return data;
     } catch (error) {
-      const err = ErrorMsg(error);
-      dispatch(setShowError(true));
-      dispatch(setErrorMsg(err.message));
-      return rejectWithValue(err.message);
+      handleError(error, dispatch, rejectWithValue);
     }
   }
 );
@@ -122,30 +90,17 @@ export const stdGetFilteredAssignment = createAsyncThunk(
     { cid, subjectId, moduleId, chapterId },
     { rejectWithValue, dispatch }
   ) => {
-    const token = localStorage.getItem("student:token");
-    const say = localStorage.getItem("say")
-    if (!token) {
-      dispatch(setShowError(true));
-      dispatch(setErrorMsg("Authentication failed!"));
-      return rejectWithValue("Authentication failed!");
-    }
 
     try {
+      const say=getAY();
       dispatch(setShowError(false));
-      const res = await axios.get(
-        `${baseUrl}/student/studentAssignment/class/${cid}?say=${say}`,
-        {
-          headers: { Authentication: token },
-          params: { subjectId, moduleId, chapterId },
-        }
+      const res = await getData(
+        `/student/studentAssignment/class/${cid}?say=${say}`,{ subjectId, moduleId, chapterId }  
       );
-      const data = res?.data?.data;
+      const data = res?.data;
       return data;
     } catch (error) {
-      const err = ErrorMsg(error);
-      dispatch(setShowError(true));
-      dispatch(setErrorMsg(err.message));
-      return rejectWithValue(err.message);
+      handleError(error,dispatch,rejectWithValue);
     }
   }
 );

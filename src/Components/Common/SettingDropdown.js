@@ -70,11 +70,11 @@ const SettingDropdown = ({
         {/* Profile Button with active state */}
         <NavLink
           to={
-            role === "admin"
+            role == "admin"
               ? `/users/admin`
-              : role === "student"
+              : role == "student"
               ? "/users/student/profile"
-              : ""
+              : role == "parent"? '/users/parent/profile':'/users/my/profile'
           }
           className={({ isActive }) =>
             `${listItemClass} ${

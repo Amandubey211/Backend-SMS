@@ -8,6 +8,7 @@ import {
   createSubject,
   updateSubject,
 } from "../../../../Store/Slices/Admin/Class/Subject/subjectThunks";
+import { useTranslation } from "react-i18next";
 
 const dummyColors = [
   "#34D399",
@@ -23,6 +24,7 @@ const dummyColors = [
 ];
 
 const AddNewSubject = ({ onClose, subject }) => {
+  const { t } = useTranslation("admClass"); // Use translation hook
   const [activeTab, setActiveTab] = useState("icon");
   const [selectedColor, setSelectedColor] = useState("");
   const [activeIconId, setActiveIconId] = useState(null);
@@ -50,11 +52,11 @@ const AddNewSubject = ({ onClose, subject }) => {
 
   const validateInputs = useCallback(() => {
     if (!subjectTitle.trim()) {
-      toast.error("Subject name is required.");
+      toast.error(t("Subject name is required."));
       return false;
     }
     return true;
-  }, [subjectTitle]);
+  }, [subjectTitle, t]);
 
   const hasChanges = () => {
     if (!subject) return false;
@@ -79,7 +81,7 @@ const AddNewSubject = ({ onClose, subject }) => {
     if (subject) {
       // Dispatch update only if there are changes
       if (!hasChanges()) {
-        toast("No changes detected.");
+        toast(t("No changes detected."));
         return;
       }
       dispatch(updateSubject({ subjectId: subject._id, subjectData }));
@@ -101,16 +103,16 @@ const AddNewSubject = ({ onClose, subject }) => {
               : "bg-transparent border-gray-300"
           }`}
           aria-pressed={activeIconId === data.id}
-          aria-label={`Select ${data.icon} icon`}
+          aria-label={t("Select icon", { icon: data.id })}
         >
           <img
             src={data.icon}
-            alt={`Icon ${data.id}`}
+            alt={t("Icon ID", { id: data.id })}
             className="w-full h-full"
           />
         </button>
       )),
-    [activeIconId]
+    [activeIconId, t]
   );
 
   const colorGrid = useMemo(
@@ -124,10 +126,10 @@ const AddNewSubject = ({ onClose, subject }) => {
             selectedColor === color ? "border-indigo-500" : "border-transparent"
           }`}
           aria-pressed={selectedColor === color}
-          aria-label={`Select color ${color}`}
+          aria-label={t("Select color", { color })}
         />
       )),
-    [selectedColor]
+    [selectedColor, t]
   );
 
   return (
@@ -137,7 +139,7 @@ const AddNewSubject = ({ onClose, subject }) => {
           htmlFor="subject-title"
           className="block text-sm font-medium text-gray-700"
         >
-          Subject Title
+          {t("Subject Title")}
         </label>
         <input
           type="text"
@@ -145,7 +147,7 @@ const AddNewSubject = ({ onClose, subject }) => {
           value={subjectTitle}
           onChange={(e) => setSubjectTitle(e.target.value)}
           className="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-          placeholder="Type here"
+          placeholder={t("Type here")}
         />
       </div>
 
@@ -159,7 +161,7 @@ const AddNewSubject = ({ onClose, subject }) => {
           onClick={() => setActiveTab("icon")}
           aria-controls="icon-tab"
         >
-          Subject Icon
+          {t("Subject Icon")}
         </button>
         <button
           className={`flex-1 py-2 ${
@@ -170,7 +172,7 @@ const AddNewSubject = ({ onClose, subject }) => {
           onClick={() => setActiveTab("color")}
           aria-controls="color-tab"
         >
-          Frame Color
+          {t("Frame Color")}
         </button>
       </div>
 
@@ -198,7 +200,7 @@ const AddNewSubject = ({ onClose, subject }) => {
           {loading ? (
             <ImSpinner3 className="animate-spin mx-auto" />
           ) : (
-            "Save & Publish"
+            t("Save & Publish")
           )}
         </button>
         <button
@@ -206,7 +208,11 @@ const AddNewSubject = ({ onClose, subject }) => {
           className="w-full py-2 rounded-md bg-gradient-to-r from-purple-500 to-red-500 text-white"
           disabled={loading}
         >
-          {loading ? <ImSpinner3 className="animate-spin mx-auto" /> : "Save"}
+          {loading ? (
+            <ImSpinner3 className="animate-spin mx-auto" />
+          ) : (
+            t("Save")
+          )}
         </button>
       </div>
     </div>

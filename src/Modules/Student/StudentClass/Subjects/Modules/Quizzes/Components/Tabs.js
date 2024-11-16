@@ -5,41 +5,24 @@ import { useParams } from "react-router-dom";
 import { stdGetSingleQuiz } from "../../../../../../../Store/Slices/Student/MyClass/Class/Subjects/Quizes/quizes.action";
 import { setActiveTab } from "../../../../../../../Store/Slices/Student/MyClass/Class/Subjects/Quizes/quizesSlice";
 
-const Tabs = ({
-  quiz,
-  children,
-  // onTabChange, 
-  createPage,
-  quizSubmitted,
-  hasAttempted,
-  hasRemainingAttempts,
-  attemptHistory
-
-}) => {
-// console.log("attempt history is===>",attemptHistory.length)
-  const {qid}=useParams();
-  const { loading, activeTab } = useSelector((store) => store?.student?.studentQuiz);
-
+const Tabs = ({ children, createPage }) => {
+  const { qid } = useParams();
+  const { loading, activeTab } = useSelector(
+    (store) => store?.student?.studentQuiz
+  );
+  const { itemDetails: quiz } = useSelector(
+    (store) => store?.student?.studentQuiz
+  );
   const dispatch = useDispatch();
   const handleTabClick = (tab) => {
-    // if (tab === "questions" && !hasRemainingAttempts) {
-    //   alert("No more attempts allowed.");
-    //   return;
-    // }
-
     dispatch(setActiveTab(tab));
-
-    // Call onTabChange only if it exists
-    // if (onTabChange && typeof onTabChange === "function") {
-    //   onTabChange(tab);
-    // }
   };
 
   const { name, quizType, availableFrom } = quiz;
 
-  useEffect(()=>{
-    dispatch(stdGetSingleQuiz({quizId:qid}))
- },[dispatch,stdGetSingleQuiz,qid]);
+  useEffect(() => {
+    dispatch(stdGetSingleQuiz({ quizId: qid }));
+  }, [dispatch, stdGetSingleQuiz, qid]);
 
   return (
     <>
@@ -90,7 +73,7 @@ const Tabs = ({
                 activeTab === "questions" ? "text-gradient" : "text-black"
               }`}
             >
-            {`Quiz Questions`}
+              {`Take Quiz`}
             </span>
           </button>
         </div>

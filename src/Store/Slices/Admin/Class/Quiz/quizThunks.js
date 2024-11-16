@@ -30,10 +30,13 @@ const handleError = (error, dispatch, rejectWithValue) => {
 
 export const fetchFilteredQuizzesThunk = createAsyncThunk(
   "quiz/fetchFilteredQuizzes",
-  async ({ moduleId, chapterId, publish }, { getState, rejectWithValue, dispatch }) => {
+  async (
+    { moduleId, chapterId, publish },
+    { getState, rejectWithValue, dispatch }
+  ) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
-      const say = localStorage.getItem("say")
+      const say = localStorage.getItem("say");
       const params = {
         ...(moduleId && { moduleId }),
         ...(chapterId && { chapterId }),
@@ -41,7 +44,9 @@ export const fetchFilteredQuizzesThunk = createAsyncThunk(
       };
 
       const response = await axios.get(
-        `${baseUrl}/admin/quizzes/${getState().common.user.subjectInfo.selectedSubjectId}?say=${say}`,
+        `${baseUrl}/admin/quizzes/${
+          getState().common.user.subjectInfo.selectedSubjectId
+        }?say=${say}`,
         {
           headers: { Authentication: token },
           params,
@@ -64,10 +69,13 @@ export const fetchQuizByIdThunk = createAsyncThunk(
   async (quizId, { getState, rejectWithValue, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
-      const say = localStorage.getItem("say")
-      const response = await axios.get(`${baseUrl}/admin/quiz/${quizId}?say=${say}`, {
-        headers: { Authentication: token },
-      });
+      const say = localStorage.getItem("say");
+      const response = await axios.get(
+        `${baseUrl}/admin/quiz/${quizId}?say=${say}`,
+        {
+          headers: { Authentication: token },
+        }
+      );
 
       if (response.data.success) {
         return response.data.quiz;
@@ -84,22 +92,35 @@ export const addQuestionThunk = createAsyncThunk(
   "quiz/addQuestion",
   async ({ quizId, question }, { getState, rejectWithValue, dispatch }) => {
     try {
+      // Get the token for authentication
       const token = getToken(getState(), rejectWithValue, dispatch);
-      const say = localStorage.getItem("say")
+
+      // Dynamically fetch the quiz ID either from params or Redux
+      const resolvedQuizId = quizId || getState().admin.quizzes.quizzDetail._id;
+
+      // Fetch "say" value from local storage
+      const say = localStorage.getItem("say");
+
+      // Perform the API call
       const response = await axios.put(
-        `${baseUrl}/admin/add_question/quiz/${quizId}?say=${say}`,
+        `${baseUrl}/admin/add_question/quiz/${resolvedQuizId}?say=${say}`,
         question,
         { headers: { Authentication: token } }
       );
 
       if (response.data.success) {
         toast.success("Question added successfully");
+
+        // Dispatch an action to refresh the quiz details
         dispatch(fetchQuizByIdThunk(response.data.quiz._id));
+
+        // Return the updated quiz data
         return response.data.quiz;
       } else {
         throw new Error(response.data.message || "Failed to add question");
       }
     } catch (error) {
+      // Handle the error using the provided error handling logic
       return handleError(error, dispatch, rejectWithValue);
     }
   }
@@ -107,10 +128,13 @@ export const addQuestionThunk = createAsyncThunk(
 
 export const updateQuestionThunk = createAsyncThunk(
   "quiz/updateQuestion",
-  async ({ quizId, questionId, question }, { getState, rejectWithValue, dispatch }) => {
+  async (
+    { quizId, questionId, question },
+    { getState, rejectWithValue, dispatch }
+  ) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
-      const say = localStorage.getItem("say")
+      const say = localStorage.getItem("say");
       const response = await axios.put(
         `${baseUrl}/admin/quiz/${quizId}/question/${questionId}?say=${say}`,
         question,
@@ -135,7 +159,7 @@ export const deleteQuestionThunk = createAsyncThunk(
   async ({ quizId, questionId }, { getState, rejectWithValue, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
-      const say = localStorage.getItem("say")
+      const say = localStorage.getItem("say");
       const response = await axios.delete(
         `${baseUrl}/admin/quiz/${quizId}/question/${questionId}?say=${say}`,
         { headers: { Authentication: token } }
@@ -159,10 +183,14 @@ export const createQuizThunk = createAsyncThunk(
   async (quizData, { getState, rejectWithValue, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
-      const say = localStorage.getItem("say")
-      const response = await axios.post(`${baseUrl}/admin/create_quiz?say=${say}`, quizData, {
-        headers: { Authentication: token },
-      });
+      const say = localStorage.getItem("say");
+      const response = await axios.post(
+        `${baseUrl}/admin/create_quiz?say=${say}`,
+        quizData,
+        {
+          headers: { Authentication: token },
+        }
+      );
 
       if (response.data.success) {
         toast.success("Quiz created successfully");
@@ -179,17 +207,30 @@ export const createQuizThunk = createAsyncThunk(
 
 export const updateQuizThunk = createAsyncThunk(
   "quiz/updateQuiz",
-  async ({ quizId, quizData }, { getState, rejectWithValue, dispatch }) => {
+  async (
+    { quizId, quizData, navigate },
+    { getState, rejectWithValue, dispatch }
+  ) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
-      const say = localStorage.getItem("say")
-      const response = await axios.put(`${baseUrl}/admin/update_quiz/${quizId}?say=${say}`, quizData, {
-        headers: { Authentication: token },
-      });
+      const say = localStorage.getItem("say");
+      const response = await axios.put(
+        `${baseUrl}/admin/update_quiz/${quizId}?say=${say}`,
+        quizData,
+        {
+          headers: { Authentication: token },
+        }
+      );
 
       if (response.data.success) {
         toast.success("Quiz updated successfully");
         dispatch(fetchQuizByIdThunk(quizId));
+
+        // Navigate back to the previous page
+        if (navigate) {
+          navigate(-1);
+        }
+
         return response.data.quiz;
       } else {
         throw new Error(response.data.message || "Failed to update quiz");
@@ -205,10 +246,13 @@ export const deleteQuizThunk = createAsyncThunk(
   async (quizId, { getState, rejectWithValue, dispatch }) => {
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
-      const say = localStorage.getItem("say")
-      const response = await axios.delete(`${baseUrl}/admin/delete_quiz/${quizId}?say=${say}`, {
-        headers: { Authentication: token },
-      });
+      const say = localStorage.getItem("say");
+      const response = await axios.delete(
+        `${baseUrl}/admin/delete_quiz/${quizId}?say=${say}`,
+        {
+          headers: { Authentication: token },
+        }
+      );
 
       if (response.data.success) {
         toast.success("Quiz deleted successfully");

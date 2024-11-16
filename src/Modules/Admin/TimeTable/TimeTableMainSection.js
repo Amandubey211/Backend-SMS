@@ -15,6 +15,10 @@ const TimeTableMainSection = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+
+  const role = useSelector((store) => store.common.auth.role);
+
+
   // Correctly destructure timetables, loadingFetch, and errorFetch
   const { timetables, loadingFetch, errorFetch } = useSelector(
     (state) => state.admin.timetable
@@ -46,23 +50,33 @@ const TimeTableMainSection = () => {
     }
   };
 
-  // Fetch classes and academic years on component mount
+  // Fetch academic years on component mount
   useEffect(() => {
     fetchAcademicYearsFromStorage();
-    dispatch(fetchAllClasses());
-  }, [dispatch]);
+    // Only fetch classes if role is not parent or student
+    if (role !== "parent" && role !== "student") {
+      dispatch(fetchAllClasses());
+    }
+  }, [dispatch, role]);
 
-  // Handle class fetching errors
+  // Handle class fetching errors, but skip for parent or student
   useEffect(() => {
-    if (classError) {
+    if (classError && role !== "parent" && role !== "student") {
       toast.error("Failed to load classes. Please try again.");
     }
-  }, [classError]);
+  }, [classError, role]);
 
   // Fetch timetables based on backend filters
   useEffect(() => {
-    dispatch(fetchTimetables(backendFilters));
+    // Create a new object with only non-empty filter parameters
+    const activeFilters = Object.fromEntries(
+      Object.entries(backendFilters).filter(([key, value]) => value)
+    );
+
+    // Dispatch fetchTimetables with the activeFilters
+    dispatch(fetchTimetables(activeFilters));
   }, [backendFilters, dispatch]);
+
 
   // Update filtered timetables when timetables or frontend filter changes
   useEffect(() => {
@@ -93,7 +107,7 @@ const TimeTableMainSection = () => {
 
   // Handle create button click to navigate to a new route
   const handleCreateTimeTable = () => {
-    navigate("/noticeboard/timetable/create-new-timeTable");
+    navigate("/timetable/create-new-timeTable");
   };
 
   // Handle delete action
@@ -125,14 +139,17 @@ const TimeTableMainSection = () => {
       />
 
       {/* Button to create a new timetable */}
-      <div className="flex justify-start mb-4 ml-5">
-        <button
-          onClick={handleCreateTimeTable}
-          className="px-4 py-2 rounded-md text-white bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700"
-        >
-          + Create TimeTable
-        </button>
-      </div>
+      {(role !== "parent" && role !== "student") && (
+        <div className="flex justify-start mb-4 ml-5">
+          <button
+            onClick={handleCreateTimeTable}
+            className="px-4 py-2 rounded-md text-white bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700"
+          >
+            + Create TimeTable
+          </button>
+        </div>
+      )}
+
 
       {/* Display list of timetables */}
       <TimeTableList

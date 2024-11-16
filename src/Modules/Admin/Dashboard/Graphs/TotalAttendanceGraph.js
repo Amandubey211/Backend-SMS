@@ -63,25 +63,25 @@ const TotalAttendanceGraph = () => {
         datasets: [
           gender === "Female" || gender === "Both"
             ? {
-                label: t("Female"),
-                data: femaleAttendance,
-                backgroundColor: "#8F77F3",
-                borderRadius: 10,
-                borderWidth: 1,
-                stack: "combined",
-                barThickness: 30,
-              }
+              label: t("Female"),
+              data: femaleAttendance,
+              backgroundColor: "#8F77F3",
+              borderRadius: 10,
+              borderWidth: 1,
+              stack: "combined",
+              barThickness: 30,
+            }
             : null,
           gender === "Male" || gender === "Both"
             ? {
-                label: t("Male"),
-                data: maleAttendance,
-                backgroundColor: "#23C55E",
-                borderRadius: 10,
-                borderWidth: 1,
-                stack: "combined",
-                barThickness: 30,
-              }
+              label: t("Male"),
+              data: maleAttendance,
+              backgroundColor: "#23C55E",
+              borderRadius: 10,
+              borderWidth: 1,
+              stack: "combined",
+              barThickness: 30,
+            }
             : null,
         ].filter(Boolean),
       };
@@ -130,7 +130,7 @@ const TotalAttendanceGraph = () => {
           <div className="text-3xl font-bold">
             {attendanceData
               ? attendanceData.totalMaleAttendance +
-                attendanceData.totalFemaleAttendance
+              attendanceData.totalFemaleAttendance
               : 0}
           </div>
         </div>
@@ -142,10 +142,11 @@ const TotalAttendanceGraph = () => {
           >
             {[...Array(12).keys()].map((i) => (
               <option key={i} value={i + 1}>
-                {new Date(0, i).toLocaleString("default", { month: "long" })}
+                {t(new Date(0, i).toLocaleString("default", { month: "long" }))}
               </option>
             ))}
           </select>
+
           <select
             className="border rounded p-2"
             onChange={handleYearChange}

@@ -80,9 +80,12 @@ const UpdateTimeTable = () => {
       ? moment(timetable.validity.endDate).format('YYYY-MM-DD')
       : '',
     type: timetable?.type || 'weekly',
+    status: timetable?.status === 'active' ? 'Publish' : 'Draft',
   });
 
-  const [isActive, setIsActive] = useState(false);
+  // Remove isActive state as per previous instructions
+  // const [isActive, setIsActive] = useState(false);
+
   const [columns, setColumns] = useState([]);
   const [dataSource, setDataSource] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -91,32 +94,15 @@ const UpdateTimeTable = () => {
   // ID Counter using useRef
   const idCounterRef = useRef(1);
 
-  // Fetch isActive and academicYear from localStorage or timetable data
+  // Set academicYear from timetable
   const [academicYear, setAcademicYear] = useState(null);
 
   useEffect(() => {
-    const authData = localStorage.getItem('persist:auth');
-    let academicYearData = null;
-    if (authData) {
-      try {
-        const parsedAuth = JSON.parse(authData);
-        academicYearData = parsedAuth.AcademicYear
-          ? JSON.parse(parsedAuth.AcademicYear)
-          : null;
-        setIsActive(academicYearData?.isActive || false);
-        console.log('Academic Year from localStorage:', academicYearData); // Debugging
-      } catch (error) {
-        console.error('Error parsing auth data:', error);
-      }
-    }
-
-    if (academicYearData && academicYearData._id) {
-      setAcademicYear(academicYearData._id);
-    } else if (timetable && timetable.academicYear && timetable.academicYear._id) {
+    if (timetable && timetable.academicYear && timetable.academicYear._id) {
       setAcademicYear(timetable.academicYear._id);
-      console.log('Academic Year from timetable:', timetable.academicYear); // Debugging
     } else {
-      console.warn('Academic Year is not available.');
+      console.warn('Academic Year is not available in the timetable.');
+      // Optionally, fetch it from another source or handle accordingly
     }
   }, [timetable]);
 
@@ -151,7 +137,7 @@ const UpdateTimeTable = () => {
           console.log(`Processing slot ${slotIndex + 1}:`, slot); // Debugging
           const newRow = { key: idCounterRef.current, id: idCounterRef.current };
           if (timetable.type === 'others') {
-            newRow.heading = slot.heading || ''; // Extract heading from slot.name
+            newRow.heading = slot.heading || ''; // Extract heading from slot.heading
             newRow.subjectId = slot.subjectId?._id || slot.subjectId || '';
             newRow.startTime = slot.startTime || '';
             newRow.endTime = slot.endTime || '';
@@ -171,7 +157,7 @@ const UpdateTimeTable = () => {
             newRow.endTime = slot.endTime || '';
             newRow.description = slot.description || '';
           } else if (timetable.type === 'event') {
-            newRow.eventName = slot.eventName || ''; // Extract event name from slot.name
+            newRow.eventName = slot.eventName || ''; // Extract event name from slot.eventName
             newRow.date = day.date
               ? moment(day.date).format('YYYY-MM-DD')
               : '';
@@ -580,9 +566,10 @@ const UpdateTimeTable = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Validate required fields before submitting
+    // Initialize an array to collect validation errors
     const errors = [];
 
+    // Basic validation checks
     if (!formData.name) {
       errors.push('Name is required.');
     }
@@ -606,6 +593,7 @@ const UpdateTimeTable = () => {
       errors.push('At least one row must be added to the timetable.');
     }
 
+    // Specific validation based on timetable type
     dataSource.forEach((row, index) => {
       if (formData.type === 'weekly') {
         if (!row.subjectId || row.subjectId.trim() === '') {
@@ -667,6 +655,7 @@ const UpdateTimeTable = () => {
       return;
     }
 
+    // Prepare the timetable data
     const timetableData = {
       name: formData.name,
       classId: formData.classId,
@@ -675,16 +664,14 @@ const UpdateTimeTable = () => {
       type: formData.type,
       validity: {
         startDate: new Date(formData.startDate).toISOString(),
-        endDate: formData.endDate
-          ? new Date(formData.endDate).toISOString()
-          : undefined,
+        endDate: formData.endDate ? new Date(formData.endDate).toISOString() : undefined,
       },
-      status: timetable.status,
+      status: formData.status === 'Publish' ? 'active' : 'inactive', // Updated status mapping
       academicYear: academicYear, // Include academicYear as ObjectId
-      days: [], // We will populate this below
+      days: [], // To be populated based on type
     };
 
-    // Organize dataSource into days and slots
+    // Organize dataSource into days and slots based on type
     if (formData.type === 'weekly') {
       const dayMap = {};
       dataSource.forEach((row) => {
@@ -729,7 +716,7 @@ const UpdateTimeTable = () => {
           dateMap[formattedDate] = [];
         }
         const slotData = {
-          eventName: row.eventName, // Use 'name' for event name
+          eventName: row.eventName,
           startTime: row.startTime,
           endTime: row.endTime,
           description: row.description,
@@ -744,7 +731,7 @@ const UpdateTimeTable = () => {
       // Since heading is in slots, we can group all slots under a single day
       const day = {
         slots: dataSource.map((row) => ({
-          heading: row.heading, // Use 'name' for heading
+          heading: row.heading, // Use 'heading' for heading
           subjectId: row.subjectId,
           startTime: row.startTime,
           endTime: row.endTime,
@@ -763,13 +750,14 @@ const UpdateTimeTable = () => {
         message.success('Timetable updated successfully!');
         // Redirect after a short delay
         setTimeout(() => {
-          navigate('/noticeboard/timetable');
+          navigate('/timetable');
         }, 1500);
       })
       .catch((error) => {
         message.error(error || 'Failed to update timetable.');
       });
   };
+
 
   // Row Selection
   const rowSelection = {
@@ -924,6 +912,20 @@ const UpdateTimeTable = () => {
               <Option value="others">Others</Option>
             </Select>
           </div>
+          {/* Status Dropdown */}
+          <div className="w-full md:w-1/5 px-2 mb-4">
+            <label className="block mb-1">Status</label>
+            <Select
+              value={formData.status}
+              onChange={(value) => setFormData({ ...formData, status: value })}
+              style={{ width: '100%' }}
+              required
+              placeholder="Select Status"
+            >
+              <Option value="Publish">Publish</Option>
+              <Option value="Draft">Draft</Option>
+            </Select>
+          </div>
         </div>
 
         {/* Table */}
@@ -972,7 +974,7 @@ const UpdateTimeTable = () => {
 
         {/* Form Actions */}
         <div className="flex justify-end space-x-4">
-          <Button onClick={() => navigate('/noticeboard/timetable')}>
+          <Button onClick={() => navigate('/timetable')}>
             Cancel
           </Button>
           <Button type="primary" htmlType="submit">

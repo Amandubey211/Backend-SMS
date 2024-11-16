@@ -3,6 +3,7 @@ import {
   fetchFilteredQuizzesThunk,
   fetchQuizByIdThunk,
   updateQuizThunk,
+  createQuizThunk,
 } from "./quizThunks"; // Import thunks
 
 const initialState = {
@@ -24,9 +25,25 @@ const quizSlice = createSlice({
     clearSuccess(state) {
       state.success = false;
     },
+    clearQuizDetail(state) {
+      state.quizzDetail = null;
+    },
   },
   extraReducers: (builder) => {
     builder
+
+      .addCase(createQuizThunk.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(createQuizThunk.fulfilled, (state, action) => {
+        state.loading = false;
+        state.quizzDetail = action.payload;
+      })
+      .addCase(createQuizThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
       // Fetch Filtered Quizzes
       .addCase(fetchFilteredQuizzesThunk.pending, (state) => {
         state.loading = true;
@@ -68,6 +85,6 @@ const quizSlice = createSlice({
   },
 });
 
-export const { clearError, clearSuccess } = quizSlice.actions;
+export const { clearError, clearSuccess, clearQuizDetail } = quizSlice.actions;
 
 export default quizSlice.reducer;

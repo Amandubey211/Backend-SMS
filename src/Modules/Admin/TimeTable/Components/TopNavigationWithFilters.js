@@ -1,4 +1,3 @@
-// TopNavigationWithFilters.jsx
 import React, { useEffect, useState, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllClasses } from "../../../../Store/Slices/Admin/Class/actions/classThunk";
@@ -11,6 +10,9 @@ const { Option } = Select;
 
 const TopNavigationWithFilters = ({ onBackendFilterChange, onFrontendFilterChange, academicYears }) => {
   const dispatch = useDispatch();
+
+  // Get role from Redux store
+  const role = useSelector((store) => store.common.auth.role);
 
   // Local filter state
   const [filters, setFilters] = useState({
@@ -25,12 +27,16 @@ const TopNavigationWithFilters = ({ onBackendFilterChange, onFrontendFilterChang
   const { classes, loading, error } = useSelector((state) => state.admin.class);
 
   useEffect(() => {
-    dispatch(fetchAllClasses());
-  }, [dispatch]);
+    if (role !== "parent" && role !== "student") {
+      dispatch(fetchAllClasses());
+    }
+  }, [dispatch, role]);
 
   useEffect(() => {
-    if (error) toast.error("Failed to load classes. Please try again.");
-  }, [error]);
+    if (error && role !== "parent" && role !== "student") {
+      toast.error("Failed to load classes. Please try again.");
+    }
+  }, [error, role]);
 
   // Debounced function to handle name filtering
   const debouncedHandleNameFilter = useMemo(
@@ -94,27 +100,29 @@ const TopNavigationWithFilters = ({ onBackendFilterChange, onFrontendFilterChang
           />
         </Col>
 
-        {/* Class ID Filter */}
-        <Col>
-          <label className="font-medium text-gray-700" style={{ paddingRight: "8px" }}>Class</label>
-          <Select
-            placeholder="Select Class"
-            loading={loading}
-            value={filters.classId}
-            onChange={(value) => handleFilterChange("classId", value)}
-            style={{ width: "180px" }}
-            optionFilterProp="children"
-            showSearch
-            allowClear
-          >
-            <Option value="">Select Class</Option>
-            {classes.map((cls) => (
-              <Option key={cls._id} value={cls._id}>
-                {cls.className}
-              </Option>
-            ))}
-          </Select>
-        </Col>
+        {/* Class ID Filter - Exclude for Parent/Student */}
+        {role !== "parent" && role !== "student" && (
+          <Col>
+            <label className="font-medium text-gray-700" style={{ paddingRight: "8px" }}>Class</label>
+            <Select
+              placeholder="Select Class"
+              loading={loading}
+              value={filters.classId}
+              onChange={(value) => handleFilterChange("classId", value)}
+              style={{ width: "180px" }}
+              optionFilterProp="children"
+              showSearch
+              allowClear
+            >
+              <Option value="">Select Class</Option>
+              {classes.map((cls) => (
+                <Option key={cls._id} value={cls._id}>
+                  {cls.className}
+                </Option>
+              ))}
+            </Select>
+          </Col>
+        )}
 
         {/* Type Filter */}
         <Col>
@@ -134,24 +142,26 @@ const TopNavigationWithFilters = ({ onBackendFilterChange, onFrontendFilterChang
           </Select>
         </Col>
 
-        {/* Status Filter */}
-        <Col>
-          <label className="font-medium text-gray-700" style={{ paddingRight: "8px" }}>Status</label>
-          <Select
-            placeholder="All Statuses"
-            value={filters.status}
-            onChange={(value) => handleFilterChange("status", value)}
-            style={{ width: "180px" }}
-            allowClear
-          >
-            <Option value="">All Statuses</Option>
-            <Option value="active">Active</Option>
-            <Option value="inactive">Inactive</Option>
-          </Select>
-        </Col>
+        {/* Status Filter - Exclude for Parent/Student */}
+        {role !== "parent" && role !== "student" && (
+          <Col>
+            <label className="font-medium text-gray-700" style={{ paddingRight: "8px" }}>Status</label>
+            <Select
+              placeholder="All Statuses"
+              value={filters.status}
+              onChange={(value) => handleFilterChange("status", value)}
+              style={{ width: "180px" }}
+              allowClear
+            >
+              <Option value="">All Statuses</Option>
+              <Option value="active">Published</Option>
+              <Option value="inactive">Drafts</Option>
+            </Select>
+          </Col>
+        )}
 
-        {/* Academic Year Filter
-        <Col>
+        {/* Academic Year Filter */}
+        {/* <Col>
           <label className="font-medium text-gray-700" style={{ paddingRight: "8px" }}>Academic Year</label>
           <Select
             placeholder="Select Academic Year"

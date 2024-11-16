@@ -662,6 +662,7 @@ function App() {
       errorElement: <Error />,
     },
     { path: "library", element: <Libary />, errorElement: <Error /> },
+<<<<<<< HEAD
     // {
     //   path: "/noticeboard/timetable",
     //   element: (
@@ -705,6 +706,51 @@ function App() {
     //   ),
     //   errorElement: <Error />,
     // },
+=======
+    {
+      path: "/timetable",
+      element: (
+        <ProtectRoute
+          Component={TimeTablePage}
+          allowedRoles={["admin", "teacher", "student", "parent"]}
+        />
+      ),
+      errorElement: <Error />,
+      children: [
+        {
+          path: "viewtable/:tablename", // Notice it’s a child path, not a full path
+          element: (
+            <ProtectRoute
+              Component={TableView}
+              allowedRoles={["admin", "teacher", "student", "parent"]}
+            />
+          ),
+          errorElement: <Error />,
+        },
+        {
+          path: "edit/:id", // New child route
+          element: (
+            <ProtectRoute
+              Component={updateTimetable}
+              allowedRoles={["admin", "teacher"]}
+            />
+          ),
+          errorElement: <Error />,
+        },
+      ],
+    },
+
+    {
+      path: "/timetable/create-new-timeTable",
+      element: (
+        <ProtectRoute
+          Component={CreateTimeTable}
+          allowedRoles={["admin", "teacher"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+>>>>>>> ef3b378fb976aa208207f32d59b896c85d3fd602
     {
       path: "/noticeboard/events",
       element: (

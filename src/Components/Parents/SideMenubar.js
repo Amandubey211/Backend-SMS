@@ -12,7 +12,7 @@ import { toggleSidebar } from "../../Redux/Slices/Common/SidebarSlice.js";
 import useParentLogout from '../../Hooks/AuthHooks/Parent/useParentLogout.js';
 import LogoutConfirmationModal from "../Common/LogoutConfirmationModal.js";
 import profileIcon from "../../Assets/DashboardAssets/profileIcon.png";
-import useGetUserDetail from "../../Hooks/AuthHooks/Staff/useGetUserDetail.js";
+// import useGetUserDetail from "../../Hooks/AuthHooks/Staff/useGetUserDetail.js";
 
 // Updated function to handle more paths
 const isActivePath = (path, locationPath) => {
@@ -34,14 +34,14 @@ const SideMenubar = () => {
   const [openItems, setOpenItems] = useState([]);
   const dispatch = useDispatch();
   const { parentLogout } = useParentLogout();
-  const { userDetail } = useGetUserDetail();
+  // const { userDetail } = useGetUserDetail();
   
-  useEffect(() => {
-    const getData = async () => {
-      await userDetail();
-    };
-    getData();
-  }, []);
+  // useEffect(() => {
+  //   const getData = async () => {
+  //     await userDetail();
+  //   };
+  //   getData();
+  // }, []);
   
   const { isOpen, role, userDetails } = useSelector((state) => ({
     isOpen: state.common.user.sidebar.isOpen,
@@ -188,7 +188,8 @@ const SideMenubar = () => {
         {isOpen && (
           <div className="flex-1 ml-3">
             <h2 className="font-semibold">
-              {userDetails?.fatherName?.slice(0, 8) || t("User")} 
+              {userDetails?.fatherName?.charAt(0).toUpperCase() + userDetails?.fatherName?.slice(1,5).toLowerCase() ||userDetails?.guardianName?.charAt(0).toUpperCase() + userDetails?.guardianName?.slice(1,5).toLowerCase() || "User"}
+              {userDetails?.fatherName?.length > 5 && '..'}
             </h2>
             <p className="text-gray-500 capitalize text-sm">{role}</p>
           </div>

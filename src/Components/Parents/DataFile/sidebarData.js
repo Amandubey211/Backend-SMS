@@ -8,6 +8,8 @@ import financeIcon from '../../../Assets/ParentAssets/svg/finance.svg';
 import libraryIcon from '../../../Assets/ParentAssets/svg/library.svg';
 import mychildsIcon from '../../../Assets/ParentAssets/svg/mychilds.svg';
 import noticeboardIcon from '../../../Assets/ParentAssets/svg/noticeboard.svg';
+import { ImTable2 } from "react-icons/im";
+
 
 const sidebarData = [
   {
@@ -29,6 +31,11 @@ const sidebarData = [
     title: "Library",
     icon: <img src={libraryIcon} alt="Library Icon" style={{ width: '24px', height: '24px' }} />,
     path:'/parentlibrary'
+  },
+  {
+    title: "Time Table",
+    icon: <ImTable2/>,
+    path: "/timetable",
   },
   {
     title: "Notice Board",

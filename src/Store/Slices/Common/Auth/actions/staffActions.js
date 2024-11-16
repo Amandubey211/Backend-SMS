@@ -12,6 +12,7 @@ import { requestPermissionAndGetToken } from "../../../../../Hooks/NotificationH
 import toast from "react-hot-toast";
 import { formatAcademicYear } from "../utils/authUtils";
 import { fetchAcademicYear } from "../../AcademicYear/academicYear.action";
+import { setSeletedAcademicYear } from "../../AcademicYear/academicYear.slice";
 
 // **Staff login action**
 export const staffLogin = createAsyncThunk(
@@ -49,6 +50,7 @@ export const staffLogin = createAsyncThunk(
             monthlySalary: data?.monthlySalary,
             active: data?.active,
             dateOfBirth: data?.dateOfBirth,
+            schoolName: data?.schoolName,
           })
         );
 
@@ -145,7 +147,8 @@ export const createAcademicYear = createAsyncThunk(
 
         // Dispatch the newly created academic year to the Redux store
         if (yearData.isActive) {
-          dispatch(setAcademicYear([yearData]));
+          dispatch(setSeletedAcademicYear(data.data));
+          localStorage.setItem('say',data?.data?._id);
         }
 
         return true;

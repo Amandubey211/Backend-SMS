@@ -560,7 +560,7 @@ const SubmissionDetails = ({ details, student, initialGrade }) => {
           : await dispatch(assignQuizGrade(gradeData)).unwrap();
 
       if (result) {
-        toast.success("Grade submitted successfully");
+        // toast.success("Grade submitted successfully");
       }
     } catch (error) {
       toast.error("Failed to submit grade");

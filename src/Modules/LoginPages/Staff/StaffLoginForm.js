@@ -82,7 +82,6 @@ const StaffLoginForm = () => {
           ...prevDetails,
           password: "",
         }));
-        toast.error(error || "Login failed. Please try again.");
       });
   };
 

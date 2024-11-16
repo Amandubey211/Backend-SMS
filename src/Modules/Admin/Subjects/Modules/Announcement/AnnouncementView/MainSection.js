@@ -23,7 +23,7 @@ const MainSection = () => {
       <SubjectSideBar />
       <div className="border-l w-full">
         <AnnouncementViewHeader />
-        <div className="p-4 bg-white border">
+        <div className="p-4 bg-white ">
           {loading && <Spinner />}
           {error && <NoDataFound title="Announcement" />}
           {announcement && (
