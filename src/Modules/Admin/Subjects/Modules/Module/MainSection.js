@@ -37,11 +37,14 @@ const MainSection = () => {
     if (cid && sid) {
       dispatch(fetchModules({ cid, sid }));
     }
+   
   }, [dispatch, cid, sid]);
 
-  // Auto-select the first module if no module is selected
-  useEffect(() => {
-    if (!selectedModule && modulesData?.length > 0) {
+// Auto-select the first module if no module is selected, or handle when no modules are available
+useEffect(() => {
+  if (modulesData?.length > 0) {
+    if (!selectedModule) {
+      // Auto-select the first module when none is selected
       dispatch(
         setSelectedModule({
           moduleId: modulesData[0]._id,
@@ -50,7 +53,14 @@ const MainSection = () => {
         })
       );
     }
-  }, [dispatch, selectedModule, modulesData]);
+  } else {
+    // If modulesData is empty, clear the selected module
+    if (selectedModule) {
+      dispatch(setSelectedModule(null));
+    }
+  }
+}, [dispatch, modulesData, selectedModule]);
+
 
   const handleToggle = (chapterNumber) => {
     setExpandedChapters((prev) =>
