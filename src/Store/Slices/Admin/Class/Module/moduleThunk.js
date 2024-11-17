@@ -4,6 +4,7 @@ import toast from "react-hot-toast";
 import { baseUrl } from "../../../../../config/Common";
 import { setErrorMsg, setShowError } from "../../../Common/Alerts/alertsSlice";
 import { ErrorMsg } from "../../../Common/Alerts/errorhandling.action";
+import { setSelectedModule } from "./moduleSlice";
 
 const say = localStorage.getItem("say");
 
