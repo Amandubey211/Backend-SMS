@@ -34,33 +34,56 @@ const MainSection = () => {
   } = useSelector((state) => state.admin.module);
 
   useEffect(() => {
-    if (cid && sid) {
-      dispatch(fetchModules({ cid, sid }));
-    }
-   
+    const fetchAndSetModules = async () => {
+      if (cid && sid) {
+        const resultAction = await dispatch(fetchModules({ cid, sid }));
+
+        // Ensure that the modules are fetched successfully before proceeding
+        if (fetchModules.fulfilled.match(resultAction)) {
+          const modules = resultAction.payload;
+
+          if (modules?.length > 0) {
+            dispatch(
+              setSelectedModule({
+                moduleId: modules[0]._id,
+                name: modules[0].moduleName,
+                chapters: modules[0].chapters,
+              })
+            );
+          } else {
+            // If no modules are found, clear selected module
+            dispatch(setSelectedModule(null));
+          }
+        } else {
+          console.error("Failed to fetch modules:", resultAction.payload);
+        }
+      }
+    };
+
+    fetchAndSetModules();
   }, [dispatch, cid, sid]);
 
-// Auto-select the first module if no module is selected, or handle when no modules are available
-useEffect(() => {
-  if (modulesData?.length > 0) {
-    if (!selectedModule) {
-      // Auto-select the first module when none is selected
-      dispatch(
-        setSelectedModule({
-          moduleId: modulesData[0]._id,
-          name: modulesData[0].moduleName,
-          chapters: modulesData[0].chapters,
-        })
-      );
-    }
-  } else {
-    // If modulesData is empty, clear the selected module
-    if (selectedModule) {
-      dispatch(setSelectedModule(null));
-    }
-  }
-}, [dispatch, modulesData, selectedModule]);
-
+  // Auto-select the first module if no module is selected, or handle when no modules are available
+  // useEffect(() => {
+  //   if (modulesData?.length > 0) {
+  //     // if (!selectedModule) {
+  //     // Auto-select the first module when none is selected
+  //     dispatch(
+  //       setSelectedModule({
+  //         moduleId: modulesData[0]._id,
+  //         name: modulesData[0].moduleName,
+  //         chapters: modulesData[0].chapters,
+  //       })
+  //     );
+  //     // }
+  //   } else {
+  //     // If modulesData is empty, clear the selected module
+  //     if (selectedModule) {
+  //       dispatch(setSelectedModule(null));
+  //     }
+  //   }
+  //   // }, [dispatch, modulesData, selectedModule]);
+  // }, []);
 
   const handleToggle = (chapterNumber) => {
     setExpandedChapters((prev) =>
@@ -161,7 +184,7 @@ useEffect(() => {
               </button>
             )}
           </div>
-          {chapterLoading ? (
+          {chapterLoading || moduleLoading ? (
             <Spinner />
           ) : error || modulesData?.length === 0 ? (
             <NoDataFound />

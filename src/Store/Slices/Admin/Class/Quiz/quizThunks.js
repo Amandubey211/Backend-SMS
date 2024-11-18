@@ -31,7 +31,7 @@ const handleError = (error, dispatch, rejectWithValue) => {
 export const fetchFilteredQuizzesThunk = createAsyncThunk(
   "quiz/fetchFilteredQuizzes",
   async (
-    { moduleId, chapterId, publish },
+    { sid, moduleId, chapterId, publish },
     { getState, rejectWithValue, dispatch }
   ) => {
     try {
@@ -44,9 +44,7 @@ export const fetchFilteredQuizzesThunk = createAsyncThunk(
       };
 
       const response = await axios.get(
-        `${baseUrl}/admin/quizzes/${
-          getState().common.user.subjectInfo.selectedSubjectId
-        }?say=${say}`,
+        `${baseUrl}/admin/quizzes/${sid}?say=${say}`,
         {
           headers: { Authentication: token },
           params,
@@ -109,7 +107,7 @@ export const addQuestionThunk = createAsyncThunk(
       );
 
       if (response.data.success) {
-        toast.success("Question added successfully");
+        toast.success("Question added");
 
         // Dispatch an action to refresh the quiz details
         dispatch(fetchQuizByIdThunk(response.data.quiz._id));

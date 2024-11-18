@@ -18,12 +18,14 @@ const AssignToSection = ({
         isAssignToLabel={isAssignToLabel}
         title={assignTitle}
       />
-      {/* <SectionSelect
+
+      {/* // critical */}
+      <SectionSelect
         assignTo={assignTo}
         sectionId={sectionId}
         groupId={groupId}
         handleChange={handleChange}
-      /> */}
+      />
     </div>
   );
 };

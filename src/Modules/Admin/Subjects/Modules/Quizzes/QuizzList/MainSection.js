@@ -32,8 +32,13 @@ const MainSection = () => {
 
   // Function to refetch quizzes based on filters
   const refetchQuizzes = useCallback(() => {
-    dispatch(fetchFilteredQuizzesThunk(filters));
-  }, [dispatch, filters]);
+    dispatch(
+      fetchFilteredQuizzesThunk({
+        sid, // Include sid in the payload
+        ...filters, // Spread the existing filters
+      })
+    );
+  }, [dispatch, sid, filters]); // Add sid to the dependency array
 
   // Fetch quizzes when the component mounts or filters change
   useEffect(() => {
