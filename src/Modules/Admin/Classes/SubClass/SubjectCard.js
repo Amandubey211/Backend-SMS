@@ -108,9 +108,11 @@ const SubjectCard = ({
         )}
         <div className="ml-3 capitalize">
           <p className="text-white font-semibold">
-            {data?.teacherId?.firstName + " " + data?.teacherId?.lastName ||
-              t("No Instructor Assigned")}
+            {data?.teacherId?.firstName && data?.teacherId?.lastName
+              ? `${data.teacherId.firstName} ${data.teacherId.lastName}`
+              : t("No Instructor Assigned")}
           </p>
+
           <p className="text-white text-sm">
             {data?.teacherId?.role || t("Teacher")}
           </p>

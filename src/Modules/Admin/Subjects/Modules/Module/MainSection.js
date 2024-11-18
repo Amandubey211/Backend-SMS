@@ -138,7 +138,9 @@ const MainSection = () => {
         <div className="bg-white p-2 rounded-lg">
           <div className="flex justify-between px-4 mb-3 items-center">
             <h1 className="text-lg font-semibold">
-              {selectedModule?.name ? selectedModule.name : t("Select a Module")}
+              {selectedModule?.name
+                ? selectedModule.name
+                : t("Select a Module")}
             </h1>
             {selectedModule?.name && (
               <button
@@ -151,7 +153,7 @@ const MainSection = () => {
           </div>
           {chapterLoading ? (
             <Spinner />
-          ) : error ? (
+          ) : error || modulesData.length === 0 ? (
             <NoDataFound />
           ) : selectedModule?.chapters &&
             selectedModule?.chapters.length > 0 ? (
