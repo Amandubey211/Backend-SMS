@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { AiOutlineBook } from "react-icons/ai";
 import { IoNewspaperOutline } from "react-icons/io5";
-import { PiMoneyWavyDuotone, PiMoneyWavy } from "react-icons/pi";
 import { CiMoneyBill } from "react-icons/ci";
 import DashCard from "./Dashcard.js";
 import AllSubjects from "./DashBoardComponents/allSubjects/AllSubjects.js";
@@ -33,8 +32,6 @@ const StudentMainSection = () => {
     subjects,
     subjectError,
     loading,
-    gradeData,
-    error,
     tasks,
   } = useSelector((state) => state.student.studentDashboard);
   const { selectedClass, selectedSection } = useSelector(
@@ -100,7 +97,7 @@ const StudentMainSection = () => {
       </div>
 
       {/* Subjects and Attendance Section */}
-      <div className="flex flex-1 w-full h-full relative ">
+      <div className="flex flex-1 w-full h-full relative">
         <div className="absolute left-1/3 transform -translate-x-1/2 top-0 bottom-0 border-l border-gray-300"></div>
         <div className="w-[32%] flex items-center justify-center p-4">
           <div className="w-full h-full">
@@ -109,7 +106,6 @@ const StudentMainSection = () => {
                 <h2 className="text-xl font-semibold text-gray-600">
                   My Subject
                 </h2>
-
 
                 <button
                   className="text-black border border-gray-300 px-4 py-2 rounded-md hover:shadow-md transition duration-300 ease-in-out"
@@ -147,7 +143,7 @@ const StudentMainSection = () => {
             </div>
           </div>
         </div>
-        <div className="w-[68%] flex items-center justify-center  p-4">
+        <div className="w-[68%] flex items-center justify-center p-4">
           <div className="w-full h-full">
             <AttendanceDashboard
               attendanceSummary={dashboardAttendance}
@@ -157,79 +153,80 @@ const StudentMainSection = () => {
         </div>
       </div>
 
-      {/* Notice Board and Task Section */}
-      <div className="flex flex-row w-[100%] h-full border-t relative">
-        <div className="absolute left-2/3 transform -translate-x-1/2 top-0 bottom-0 border-l border-gray-300"></div>
-        <div className="w-[67%] flex items-center justify-center pl-1">
-          <div className="w-full h-full">
-            <DashboardNoticeBoard descriptionLength={58} />
+      {/* Parent Wrapper for Left and Right Sections */}
+      <div className="flex flex-row w-full h-full border-t border-gray-300">
+        {/* Left Column: Notice Board and Recent Exam Results */}
+        <div className="w-[100%] flex flex-col border-r border-gray-300">
+          {/* Notice Board */}
+          <div className="flex items-center justify-center p-4">
+            <div className="w-full h-full">
+              <DashboardNoticeBoard descriptionLength={58} />
+            </div>
           </div>
-        </div>
-        <div className="flex flex-col my-4   w-[30%] items-center justify-center p-4">
-          <div className="w-full">
-            <h1 className="text-xl font-semibold text-gray-600 mb-2 justify-start">Task</h1>
-          </div>
-          <div className="flex-1 w-full h-full">
-            <TaskCompletionChart />
-          </div>
-        </div>
-      </div>
 
-      {/* Exam Results and Fees Section */}
-      <div className="flex border border-y h-full relative border-l">
-        <div className="absolute left-2/3 transform -translate-x-1/2 top-0 bottom-0 border-l-0 border-gray-300"></div>
-        <div className="w-[65%] flex items-center justify-center p-4">
-          <div className="w-full h-full">
-            <div className="flex justify-between items-center">
-              <h4 className="text-xl font-semibold text-gray-600 pl-2">
-                Recent Exam Results
-              </h4>
-              <button
-                className="text-black border border-gray-300 px-4 py-2 rounded-md hover:shadow-md transition duration-300 ease-in-out"
-                onClick={() => {
-                  if (selectedClass && selectedSection) {
-                    navigate(`/student_class/${selectedClass}/${selectedSection}/grades`);
-                  } else {
-                    console.error(
-                      "Unable to navigate to grades. Class or Section is missing."
-                    );
-                  }
-                }}
-              >
-                View All
-              </button>
-            </div>
-            <div className="text-gray-500 flex flex-col items-center mt-36">
-              <IoNewspaperOutline size={70} />
-              <span className="mt-4 text-lg font-semibold text-center">
-                No Exam Results for Now
-              </span>
-            </div>
-          </div>
-        </div>
-        <div
-          className="w-[35%] flex items-center justify-center p-4 border-l border-gray-300"
-        >
-          <div className="w-full h-full">
-            <div className="flex flex-col border-b border-gray-200 p-5">
-              <StudentDashFeeCard
-                title="Total Unpaid Fees"
-                amount={unpaidFees || 0}
-                unpaidFees={unpaidFees || 0}
-                buttonText="Pay Now"
-              />
-            </div>
-            <hr />
-            <div className="flex flex-col py-5">
-              <StudentDashFeeCard
-                title="Total Paid Fees"
-                amount={paidFees || 0}
-                unpaidFees={paidFees || 0}
-              />
+          {/* Recent Exam Results */}
+          <div className="flex items-center justify-center p-4 border-t border-gray-300">
+            <div className="w-full h-full">
+              <div className="flex justify-between items-center">
+                <h4 className="text-xl font-semibold text-gray-600">
+                  Recent Exam Results
+                </h4>
+                <button
+                  className="text-black border border-gray-300 px-4 py-2 rounded-md hover:shadow-md transition duration-300 ease-in-out"
+                  onClick={() => {
+                    if (selectedClass && selectedSection) {
+                      navigate(`/student_class/${selectedClass}/${selectedSection}/grades`);
+                    } else {
+                      console.error(
+                        "Unable to navigate to grades. Class or Section is missing."
+                      );
+                    }
+                  }}
+                >
+                  View All
+                </button>
+              </div>
+              <div className="text-gray-500 flex flex-col items-center mt-36">
+                <IoNewspaperOutline size={70} />
+                <span className="mt-4 text-lg font-semibold text-center">
+                  No Exam Results for Now
+                </span>
+              </div>
             </div>
           </div>
         </div>
 
+        {/* Right Column: Task Completion and Fees Section */}
+        <div className="w-[40%] flex flex-col">
+          {/* Task Completion */}
+          <div className="flex items-center justify-center p-4 mb-[20.6%]">
+            <div className="w-full h-full">
+              <h1 className="text-xl font-semibold text-gray-600 mb-2">Task</h1>
+              <TaskCompletionChart />
+            </div>
+          </div>
+
+          {/* Fees Section */}
+          <div className="flex items-center justify-center p-4 border-t border-gray-300">
+            <div className="w-full h-full">
+              <div className="flex flex-col border-b border-gray-200 p-5">
+                <StudentDashFeeCard
+                  title="Total Unpaid Fees"
+                  amount={unpaidFees || 0}
+                  unpaidFees={unpaidFees || 0}
+                  buttonText="Pay Now"
+                />
+              </div>
+              <div className="flex flex-col py-5">
+                <StudentDashFeeCard
+                  title="Total Paid Fees"
+                  amount={paidFees || 0}
+                  unpaidFees={paidFees || 0}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
