@@ -314,7 +314,7 @@ const Chapter = ({ onEdit, chapterNumber, chapter }) => {
 
             {/* Assignments and Quizzes */}
             <div>
-              {assignments.length > 0 || quizzes.length > 0 ? (
+              {/* {assignments.length > 0 || quizzes.length > 0 ? (
                 <>
                   {assignments.map((assignment, index) => (
                     <ChapterItem
@@ -339,7 +339,30 @@ const Chapter = ({ onEdit, chapterNumber, chapter }) => {
                 <p className="py-2 bg-gray-50 italic text-gray-500 text-center">
                   No Assignment or Quizz
                 </p>
-              )}
+              )} */}
+              {assignments.length > 0 ||
+                (quizzes.length > 0 && (
+                  <>
+                    {assignments.map((assignment, index) => (
+                      <ChapterItem
+                        key={index}
+                        type="assignment"
+                        title={assignment.name}
+                        id={assignment._id}
+                        isPublished={assignment.isPublished}
+                      />
+                    ))}
+                    {quizzes.map((quiz, index) => (
+                      <ChapterItem
+                        key={index}
+                        type="quiz"
+                        title={quiz.name}
+                        id={quiz._id}
+                        isPublished={quiz.isPublished}
+                      />
+                    ))}
+                  </>
+                ))}
             </div>
           </div>
         </div>

@@ -34,33 +34,56 @@ const MainSection = () => {
   } = useSelector((state) => state.admin.module);
 
   useEffect(() => {
-    if (cid && sid) {
-      dispatch(fetchModules({ cid, sid }));
-    }
-   
+    const fetchAndSetModules = async () => {
+      if (cid && sid) {
+        const resultAction = await dispatch(fetchModules({ cid, sid }));
+
+        // Ensure that the modules are fetched successfully before proceeding
+        if (fetchModules.fulfilled.match(resultAction)) {
+          const modules = resultAction.payload;
+
+          if (modules?.length > 0) {
+            dispatch(
+              setSelectedModule({
+                moduleId: modules[0]._id,
+                name: modules[0].moduleName,
+                chapters: modules[0].chapters,
+              })
+            );
+          } else {
+            // If no modules are found, clear selected module
+            dispatch(setSelectedModule(null));
+          }
+        } else {
+          console.error("Failed to fetch modules:", resultAction.payload);
+        }
+      }
+    };
+
+    fetchAndSetModules();
   }, [dispatch, cid, sid]);
 
-// Auto-select the first module if no module is selected, or handle when no modules are available
-useEffect(() => {
-  if (modulesData?.length > 0) {
-    if (!selectedModule) {
-      // Auto-select the first module when none is selected
-      dispatch(
-        setSelectedModule({
-          moduleId: modulesData[0]._id,
-          name: modulesData[0].moduleName,
-          chapters: modulesData[0].chapters,
-        })
-      );
-    }
-  } else {
-    // If modulesData is empty, clear the selected module
-    if (selectedModule) {
-      dispatch(setSelectedModule(null));
-    }
-  }
-}, [dispatch, modulesData, selectedModule]);
-
+  // Auto-select the first module if no module is selected, or handle when no modules are available
+  // useEffect(() => {
+  //   if (modulesData?.length > 0) {
+  //     // if (!selectedModule) {
+  //     // Auto-select the first module when none is selected
+  //     dispatch(
+  //       setSelectedModule({
+  //         moduleId: modulesData[0]._id,
+  //         name: modulesData[0].moduleName,
+  //         chapters: modulesData[0].chapters,
+  //       })
+  //     );
+  //     // }
+  //   } else {
+  //     // If modulesData is empty, clear the selected module
+  //     if (selectedModule) {
+  //       dispatch(setSelectedModule(null));
+  //     }
+  //   }
+  //   // }, [dispatch, modulesData, selectedModule]);
+  // }, []);
 
   const handleToggle = (chapterNumber) => {
     setExpandedChapters((prev) =>
@@ -110,13 +133,13 @@ useEffect(() => {
   };
 
   const handleMoveModule = (module) => {
-    if (!selectedModule || !selectedModule.moduleId) {
+    if (!selectedModule || !selectedModule?.moduleId) {
       toast.error(t("No module selected to move."));
       return;
     }
 
     const currentIndex = modulesData?.findIndex(
-      (mod) => mod._id === module._id
+      (mod) => mod._id === module?._id
     );
 
     setSidebarContent(
@@ -148,7 +171,9 @@ useEffect(() => {
         <div className="bg-white p-2 rounded-lg">
           <div className="flex justify-between px-4 mb-3 items-center">
             <h1 className="text-lg font-semibold">
-              {selectedModule?.name ? selectedModule.name : t("Select a Module")}
+              {selectedModule?.name
+                ? selectedModule.name
+                : t("Select a Module")}
             </h1>
             {selectedModule?.name && (
               <button
@@ -159,9 +184,9 @@ useEffect(() => {
               </button>
             )}
           </div>
-          {chapterLoading ? (
+          {chapterLoading || moduleLoading ? (
             <Spinner />
-          ) : error ? (
+          ) : error || modulesData?.length === 0 ? (
             <NoDataFound />
           ) : selectedModule?.chapters &&
             selectedModule?.chapters.length > 0 ? (

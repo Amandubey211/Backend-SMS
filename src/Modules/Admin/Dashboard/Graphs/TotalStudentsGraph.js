@@ -161,7 +161,7 @@ const TotalStudentsGraphjs = () => {
         )}
       </div>
 
-      <div className="flex justify-around mt-4 text-lg w-[20rem] gap-2">
+      <div className="flex justify-around mt-16 text-lg w-[22rem] gap-2">
         <div className="flex flex-col items-start">
           <div className="w-16 h-1 bg-[#8F77F3] rounded-full mb-1"></div>
           <div className="text-left">

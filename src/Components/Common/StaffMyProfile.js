@@ -72,7 +72,7 @@ const StaffMyProfile = () => {
                 </div>
                 </div>
                 <button
-                  className="px-4 inline-flex items-center border border-transparent text-sm font-medium shadow-sm bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-md hover:from-pink-600 hover:to-purple-600"
+                  className="px-4 inline-flex items-center border border-transparent text-sm font-medium shadow-sm bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-md hover:from-pink-600 hover:to-purple-600 h-[2rem]"
                 >
                   {userDetails?.active ? 'Active' : 'Deactive'}
                 </button>

@@ -85,7 +85,7 @@ const NoticeBoard = ({ textTrimCount }) => {
   // Loading state with spinner displayed at the center
   if (loadingNotices) {
     return (
-      <div className="p-4 border-l border-gray-300">
+      <div className="p-4">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg font-semibold text-gray-600">{t("Noticeboard")}</h2>
         </div>
@@ -127,8 +127,8 @@ const NoticeBoard = ({ textTrimCount }) => {
   }
 
   return (
-    <div className="p-2  border-gray-300">
-      <div className="flex justify-between p-4 items-center px-6">
+    <div className="p-2 ">
+      <div className="flex justify-between p-4 items-center px-6 pt-0">
         <h2 className="text-lg font-semibold text-gray-600">{t("Noticeboard")}</h2>
         <button
           className="text-transparent bg-clip-text bg-gradient-to-r from-[#C83B62] to-[#7F35CD]"
