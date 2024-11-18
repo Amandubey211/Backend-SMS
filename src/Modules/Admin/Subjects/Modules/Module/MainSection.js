@@ -110,13 +110,13 @@ useEffect(() => {
   };
 
   const handleMoveModule = (module) => {
-    if (!selectedModule || !selectedModule.moduleId) {
+    if (!selectedModule || !selectedModule?.moduleId) {
       toast.error(t("No module selected to move."));
       return;
     }
 
     const currentIndex = modulesData?.findIndex(
-      (mod) => mod._id === module._id
+      (mod) => mod._id === module?._id
     );
 
     setSidebarContent(
@@ -163,7 +163,7 @@ useEffect(() => {
           </div>
           {chapterLoading ? (
             <Spinner />
-          ) : error || modulesData.length === 0 ? (
+          ) : error || modulesData?.length === 0 ? (
             <NoDataFound />
           ) : selectedModule?.chapters &&
             selectedModule?.chapters.length > 0 ? (
