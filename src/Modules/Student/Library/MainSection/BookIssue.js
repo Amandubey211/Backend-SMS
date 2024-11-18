@@ -41,7 +41,7 @@ const BookIssue = () => {
     <div className="">
       {/* Radio buttons for filtering */}
       <div className="flex gap-4 mb-4 ps-5">
-        {["All", "Pending", "Return"].map((status) => (
+        {["All", "Pending", "Returned"].map((status) => (
           <label key={status} className="flex items-center cursor-pointer">
             <input
               type="radio"
