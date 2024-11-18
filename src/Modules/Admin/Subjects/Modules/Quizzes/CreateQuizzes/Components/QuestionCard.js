@@ -46,7 +46,7 @@ const QuestionCard = ({
   };
 
   return (
-    <div className="bg-white shadow min-h-60 min-w-96 rounded-lg mb-4 border">
+    <div className="bg-white shadow min-h-60 min-w-80 rounded-lg mb-4 border">
       <div className="flex justify-between items-center mb-2 bg-gray-100 p-3">
         <div className="text-sm font-semibold">
           Question Point :{" "}
