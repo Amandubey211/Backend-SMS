@@ -8,11 +8,13 @@ import LabeledInput from "./LabeledInput";
 import { useParams } from "react-router-dom";
 import { fetchModules } from "../../../../../../../Store/Slices/Admin/Class/Module/moduleThunk";
 import { format } from "date-fns"; // Import date-fns for formatting
+import { useTranslation } from "react-i18next";
 
 const AllowedAttemptsSelect = ({ allowedAttempts, handleChange }) => {
+  const { t } = useTranslation('quiz');
   return (
     <div className="mb-4">
-      <label className="block text-gray-700">Allowed Attempts</label>
+      <label className="block text-gray-700">{t("Allowed Attempts")}</label>
       <select
         name="allowedAttempts"
         value={allowedAttempts ? "true" : "false"} // Handle boolean as string
@@ -26,13 +28,14 @@ const AllowedAttemptsSelect = ({ allowedAttempts, handleChange }) => {
         }
         className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
       >
-        <option value="">Select</option>
-        <option value="true">Limited</option>
-        <option value="false">Unlimited</option>
+        <option value="">{t("Select")}</option>
+        <option value="true">{t("Limited")}</option>
+        <option value="false">{t("Unlimited")}</option>
       </select>
     </div>
   );
 };
+
 const CreateQuizForm = ({
   quizType,
   allowShuffleAnswers,
@@ -56,6 +59,7 @@ const CreateQuizForm = ({
   const [chapters, setChapters] = useState([]);
   const { modules } = useSelector((state) => state.admin.module);
   const { cid, sid } = useParams();
+  const { t } = useTranslation('admModule');
 
   useEffect(() => {
     // Fetch modules if not already present
@@ -81,23 +85,23 @@ const CreateQuizForm = ({
 
   return (
     <div className="max-w-md mx-auto p-4 bg-white space-y-2">
-      <h2 className="text-xl font-semibold">Options</h2>
+      <h2 className="text-xl font-semibold">{t("Options")}</h2>
       <div className="space-y-4">
         <LabeledSelect
-          label="Quiz type"
+          label={t("Quiz Type")}
           name="quizType"
           value={quizType}
           onChange={handleChange}
           options={[
-            { value: "", label: "Select" },
-            { value: "Practice", label: "Practice Quiz" },
-            { value: "Graded", label: "Graded Quiz" },
+            { value: "", label: t("Select") },
+            { value: "Practice", label: t("Practice Quiz") },
+            { value: "Graded", label: t("Graded Quiz") },
           ]}
         />
 
         {/* Shuffle Answers Input */}
         <div className="p-2">
-          <h3 className="text-gray-700">Shuffle Answers</h3>
+          <h3 className="text-gray-700">{t("Shuffle Answers")}</h3>
           <div className="flex items-center">
             <input
               type="radio"
@@ -116,7 +120,7 @@ const CreateQuizForm = ({
               className="mr-2"
             />
             <label htmlFor="shuffleYes" className="mr-4">
-              Yes
+              {t("Yes")}
             </label>
             <input
               type="radio"
@@ -134,42 +138,17 @@ const CreateQuizForm = ({
               }
               className="mr-2"
             />
-            <label htmlFor="shuffleNo">No</label>
+            <label htmlFor="shuffleNo">{t("No")}</label>
           </div>
         </div>
 
         {/* Time Limit Input */}
         <LabeledInput
-          label="Time limit in Minutes"
+          label={t("Time Limit in Minutes")}
           name="timeLimit"
           value={timeLimit}
           onChange={handleChange}
         />
-
-        {/* Allowed Attempts
-        <div className="flex items-center">
-          <input
-            type="checkbox"
-            id="allowedAttempts"
-            name="allowedAttempts"
-            checked={allowedAttempts}
-            onChange={handleChange}
-            className="mr-2 p-3"
-          />
-          <label htmlFor="allowedAttempts" className="text-gray-700">
-            Allow Multiple Attempts
-          </label>
-        </div>
-
-        {!allowedAttempts && (
-          <LabeledInput
-            label="Allowed Attempts"
-            name="allowNumberOfAttempts"
-            type="number"
-            value={allowNumberOfAttempts}
-            onChange={handleChange}
-          />
-        )} */}
 
         {/* Allowed Attempts using Select Box */}
         <AllowedAttemptsSelect
@@ -180,7 +159,7 @@ const CreateQuizForm = ({
         {/* Conditionally show Number of Attempts input when allowedAttempts is false (i.e., Limited) */}
         {allowedAttempts && (
           <LabeledInput
-            label="Number of Attempts"
+            label={t("Number of Attempts")}
             name="allowNumberOfAttempts"
             type="number"
             value={allowNumberOfAttempts || ""} // Reset to empty if null
@@ -190,14 +169,12 @@ const CreateQuizForm = ({
 
         {/* Quiz Restrictions */}
         <h2 className="text-xl font-semibold mt-6 pt-4 border-t">
-          Quiz Restrictions
+          {t("Quiz Restrictions")}
         </h2>
 
         {/* See Answer Option */}
         <div className="p-2">
-          <h3 className="text-gray-700 mb-1">
-            Students See the Correct Answer
-          </h3>
+          <h3 className="text-gray-700 mb-1">{t("Students See the Correct Answer")}</h3>
           <div className="flex items-center mb-2">
             <input
               type="radio"
@@ -209,7 +186,7 @@ const CreateQuizForm = ({
               className="mr-2"
             />
             <label htmlFor="seeAnswerYes" className="mr-4">
-              Yes
+              {t("Yes")}
             </label>
             <input
               type="radio"
@@ -222,11 +199,11 @@ const CreateQuizForm = ({
               onChange={handleChange}
               className="mr-2"
             />
-            <label htmlFor="seeAnswerNo">No</label>
+            <label htmlFor="seeAnswerNo">{t("No")}</label>
           </div>
           {(studentSeeAnswer === "true" || studentSeeAnswer === true) && (
             <DateInput
-              label="Select Date"
+              label={t("Select Date")}
               name="showAnswerDate"
               value={formatDate(showAnswerDate)} // Use formatted date here
               handleChange={handleChange}
@@ -236,13 +213,13 @@ const CreateQuizForm = ({
 
         {/* Show One Question at a Time */}
         <LabeledSelect
-          label="Show one question at a time"
+          label={t("Show One Question at a Time")}
           name="showOneQuestionOnly"
           value={showOneQuestionOnly}
           onChange={handleChange}
           options={[
-            { value: "true", label: "Yes" },
-            { value: "false", label: "No" },
+            { value: "true", label: t("Yes") },
+            { value: "false", label: t("No") },
           ]}
         />
 
@@ -257,7 +234,7 @@ const CreateQuizForm = ({
             className="mr-2 p-3"
           />
           <label htmlFor="lockQuestionAfterAnswering" className="text-gray-700">
-            Lock questions after answering
+            {t("Lock Questions After Answering")}
           </label>
         </div>
 
@@ -279,7 +256,7 @@ const CreateQuizForm = ({
         {/* Module and Chapter Select */}
         <div className="mb-4">
           <label className="block text-gray-700" htmlFor="module-select">
-            Module
+            {t("Module")}
           </label>
           <select
             id="module-select"
@@ -288,7 +265,7 @@ const CreateQuizForm = ({
             name="moduleId"
             onChange={handleChange}
           >
-            <option value="">Select</option>
+            <option value="">{t("Select")}</option>
             {modules.map((module) => (
               <option key={module._id} value={module._id}>
                 {module.moduleName}
@@ -299,7 +276,7 @@ const CreateQuizForm = ({
 
         <div className="mb-4">
           <label className="block text-gray-700" htmlFor="chapter-select">
-            Chapter
+            {t("Chapter")}
           </label>
           <select
             id="chapter-select"
@@ -311,7 +288,7 @@ const CreateQuizForm = ({
           >
             {moduleId ? (
               <>
-                <option value="">Select</option>
+                <option value="">{t("Select")}</option>
                 {chapters.map((chapter) => (
                   <option key={chapter._id} value={chapter._id}>
                     {chapter.name}
@@ -319,20 +296,20 @@ const CreateQuizForm = ({
                 ))}
               </>
             ) : (
-              <option value="">Select module first</option>
+              <option value="">{t("Select Module First")}</option>
             )}
           </select>
         </div>
 
         {/* Date Inputs */}
         <DateInput
-          label="Available from"
+          label={t("Available From")}
           name="availableFrom"
           value={formatDate(availableFrom)} // Format date for input
           handleChange={handleChange}
         />
         <DateInput
-          label="Due"
+          label={t("Due")}
           name="dueDate"
           value={formatDate(dueDate)} // Format date for input
           handleChange={handleChange}

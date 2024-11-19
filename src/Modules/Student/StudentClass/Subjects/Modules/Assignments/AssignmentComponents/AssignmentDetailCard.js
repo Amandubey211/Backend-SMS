@@ -2,21 +2,24 @@ import React, { useState } from "react";
 import AssignmentDetail from "../../../Component/AssignmentDetail";
 import { FiCalendar } from "react-icons/fi";
 import { useSelector } from "react-redux";
+import { useTranslation } from "react-i18next";
 
 const AssignmentDetailCard = ({ isSubmitted }) => {
+  const { t } = useTranslation('admModule');
+
   const { assignmentData, submissionData } = useSelector(
     (store) => store?.student?.studentAssignment
   );
 
-  const points = assignmentData?.points || "N/A";
+  const points = assignmentData?.points || t("N/A");
   const allowNumberOfAttempts =
     assignmentData?.allowedAttempts && assignmentData?.allowNumberOfAttempts
       ? assignmentData.allowNumberOfAttempts
-      : "Unlimited";
+      : t("Unlimited");
 
   const dueDate =
-    new Date(assignmentData?.dueDate).toLocaleDateString() || "N/A";
-  const submittingBy = assignmentData?.submittingBy || "Everyone";
+    new Date(assignmentData?.dueDate).toLocaleDateString() || t("N/A");
+  const submittingBy = assignmentData?.submittingBy || t("Everyone");
 
   const submittedAt = submissionData?.submittedAt
     ? new Date(submissionData.submittedAt)
@@ -34,19 +37,19 @@ const AssignmentDetailCard = ({ isSubmitted }) => {
           hour12: true,
         }
       )})`
-    : "N/A";
+    : t("N/A");
 
   return (
-    <div className="max-w-sm p-6 bg-white " aria-label="Assignment Card">
+    <div className="max-w-sm p-6 bg-white " aria-label={t("Assignment Card")}>
       <h3 className="mb-4 text-lg font-semibold text-gray-700">
-        {isSubmitted ? "Submission Details" : "Assignment Details"}
+        {isSubmitted ? t("Submission Details") : t("Assignment Details")}
       </h3>
 
       {isSubmitted && (
         <div className="border p-4 mb-4 rounded-md">
           <p className="flex items-center text-sm mb-2">
             <span className="font-medium text-gray-600">
-              Submitted Assignment
+              {t("Submitted Assignment")}
             </span>
           </p>
           <p className="flex items-center text-sm text-gray-900">
@@ -56,23 +59,23 @@ const AssignmentDetailCard = ({ isSubmitted }) => {
         </div>
       )}
 
-      <AssignmentDetail label="Assignment Points" value={points.toString()} />
+      <AssignmentDetail label={t("Assignment Points")} value={points.toString()} />
       <AssignmentDetail
-        label="Remaining Attempts"
+        label={t("Remaining Attempts")}
         value={
           isNaN(allowNumberOfAttempts)
-            ? "Unlimited "
+            ? `${t("Unlimited")} `
             : allowNumberOfAttempts - (currentAttempt ?? 0)
         }
-        extra="Times"
+        extra={t("Times")}
       />
       <AssignmentDetail
-        label="Allowed Attempts"
+        label={t("Allowed Attempts")}
         value={allowNumberOfAttempts.toString().padStart(2, "0")}
-        extra="Times"
+        extra={t("Times")}
       />
-      <AssignmentDetail label="Due Date" value={dueDate} />
-      <AssignmentDetail label="Submitted By" value={submittingBy} />
+      <AssignmentDetail label={t("Due Date")} value={dueDate} />
+      <AssignmentDetail label={t("Submitted By")} value={submittingBy} />
     </div>
   );
 };

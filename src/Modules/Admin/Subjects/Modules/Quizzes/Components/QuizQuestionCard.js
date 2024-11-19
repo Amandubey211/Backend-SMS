@@ -1,5 +1,6 @@
 import React from "react";
 import { FaCheckCircle, FaTimesCircle, FaRegCircle } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 
 const QuizQuestionCard = ({
   question,
@@ -7,12 +8,13 @@ const QuizQuestionCard = ({
   selectedOption,
   handleOptionChange,
 }) => {
+  const { t } = useTranslation('admModule');
   const correctAnswer = question.correctAnswer;
 
   return (
     <div className="p-4 bg-white shadow rounded-lg mb-4 border flex flex-col h-full">
       <div className="text-sm font-semibold text-gray-500 mb-2">
-        Question Point :{" "}
+        {t("Question Point")} :{" "}
         <span className="text-black">{question.questionPoint}</span>
       </div>
       <h2 className="text-lg font-semibold mb-3">
@@ -25,7 +27,7 @@ const QuizQuestionCard = ({
         <textarea
           rows="4"
           className="w-full p-2 border rounded flex-grow bg-gray-50"
-          placeholder="Type your answer here..."
+          placeholder={t("Type your answer here")}
         />
       ) : (
         <div className="space-y-2">
@@ -80,11 +82,11 @@ const QuizQuestionCard = ({
         >
           {selectedOption === correctAnswer ? (
             <div className="flex items-center text-sm">
-              <FaCheckCircle className="mr-2" /> Right Answer
+              <FaCheckCircle className="mr-2" /> {t("Right Answer")}
             </div>
           ) : (
             <div className="flex items-center text-sm">
-              <FaTimesCircle className="mr-2" /> Wrong Answer
+              <FaTimesCircle className="mr-2" /> {t("Wrong Answer")}
             </div>
           )}
         </div>

@@ -8,6 +8,7 @@ import { MdDelete } from "react-icons/md";
 import Sidebar from "../../../../../../../Components/Common/Sidebar";
 import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import { useTranslation } from "react-i18next";
 
 import DeleteModal from "../../../../../../../Components/Common/DeleteModal";
 import {
@@ -20,6 +21,7 @@ const DiscussionMessage = React.lazy(() =>
 );
 
 const Header = ({ discussion, refetchDiscussion }) => {
+  const { t } = useTranslation('admModule');
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [isMenuOpen, setMenuOpen] = useState(false);
   const [isModalOpen, setModalOpen] = useState(false);
@@ -86,23 +88,23 @@ const Header = ({ discussion, refetchDiscussion }) => {
       <div className="flex items-center">
         <img
           src=""
-          alt="Profile"
+          alt={t("Profile")}
           className="w-10 h-10 rounded-full"
         />
         <div className="ml-3">
           <h1 className="text-lg font-semibold">{discussion.createdBy}</h1>
-          <p className="text-sm text-green-600">Discussion</p>
+          <p className="text-sm text-green-600">{t("Discussion")}</p>
         </div>
       </div>
       <div className="flex flex-col gap-1 items-end justify-center relative">
         <span className="text-sm text-gray-500">
-          Due: {new Date(discussion.dueDate).toLocaleDateString()}
+          {t("Due")}: {new Date(discussion.dueDate).toLocaleDateString()}
         </span>
         <div className="flex items-center space-x-4">
           <button
             className="flex items-center space-x-1 px-4 py-1 border rounded-md border-gray-300 text-gray-600 hover:bg-gray-100 transition"
             aria-label={
-              isPublished ? "Unpublish Discussion" : "Publish Discussion"
+              isPublished ? t("Unpublish Discussion") : t("Publish Discussion")
             }
             onClick={handlePublishToggle}
           >
@@ -112,18 +114,18 @@ const Header = ({ discussion, refetchDiscussion }) => {
                   aria-hidden="true"
                   className="text-green-600"
                 />
-                <span>Publish</span>
+                <span>{t("Publish")}</span>
               </>
             ) : (
               <>
                 <MdOutlineBlock aria-hidden="true" />
-                <span>Unpublish</span>
+                <span>{t("Unpublish")}</span>
               </>
             )}
           </button>
           <button
             className="flex items-center space-x-1 px-4 py-1 border rounded-md border-gray-300 text-green-600 hover:bg-gray-100 transition"
-            aria-label="Edit Discussion"
+            aria-label={t("Edit Discussion")}
             onClick={() =>
               navigate(`/class/${cid}/${sid}/create_discussion`, {
                 state: { discussion },
@@ -131,11 +133,11 @@ const Header = ({ discussion, refetchDiscussion }) => {
             }
           >
             <AiOutlineEdit aria-hidden="true" />
-            <span>Edit</span>
+            <span>{t("Edit")}</span>
           </button>
           <button
             className="flex items-center space-x-1 border rounded-full w-8 h-8 justify-center border-gray-300 text-gray-600 hover:bg-gray-100 transition"
-            aria-label="More Options"
+            aria-label={t("More Options")}
             onClick={() => setMenuOpen((prev) => !prev)}
           >
             <HiOutlineDotsVertical aria-hidden="true" />
@@ -151,10 +153,10 @@ const Header = ({ discussion, refetchDiscussion }) => {
                 disabled={deleteLoading}
               >
                 <MdDelete aria-hidden="true" />
-                <span>Delete</span>
+                <span>{t("Delete")}</span>
               </button>
               {deleteError && (
-                <p className="text-red-500 text-sm px-4">{deleteError}</p>
+                <p className="text-red-500 text-sm px-4">{t(deleteError)}</p>
               )}
             </div>
           )}
@@ -162,16 +164,16 @@ const Header = ({ discussion, refetchDiscussion }) => {
             onClick={handleSidebarOpen}
             className="px-4 py-1 bg-gradient-to-r from-pink-500 to-purple-500 text-white items-center rounded-md flex gap-2"
           >
-            <BsChat /> <span>Discussion</span>
+            <BsChat /> <span>{t("Discussion")}</span>
           </button>
 
           <Sidebar
             width="70%"
-            title="Discussion"
+            title={t("Discussion")}
             isOpen={isSidebarOpen}
             onClose={handleSidebarClose}
           >
-            <Suspense fallback={<div>Loading...</div>}>
+            <Suspense fallback={<div>{t("Loading...")}</div>}>
               <DiscussionMessage />
             </Suspense>
           </Sidebar>
@@ -182,7 +184,7 @@ const Header = ({ discussion, refetchDiscussion }) => {
         isOpen={isModalOpen}
         onClose={() => setModalOpen(false)}
         onConfirm={confirmDelete}
-        title={discussion.title || "discussion"}
+        title={discussion.title || t("discussion")}
       />
     </div>
   );

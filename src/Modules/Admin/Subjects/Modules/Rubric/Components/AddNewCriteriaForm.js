@@ -1,6 +1,7 @@
 // src/components/Components/AddNewCriteriaForm.js
 
 import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 
 const AddNewCriteriaForm = ({ onSave, initialData, editMode }) => {
   const [criteriaData, setCriteriaData] = useState({
@@ -8,6 +9,8 @@ const AddNewCriteriaForm = ({ onSave, initialData, editMode }) => {
     description: "",
     ratings: [],
   });
+
+  const { t } = useTranslation("admModule"); // Adding the translation function with namespace 'addNewCriteriaForm'
 
   useEffect(() => {
     if (initialData) {
@@ -24,7 +27,7 @@ const AddNewCriteriaForm = ({ onSave, initialData, editMode }) => {
     <div className="flex flex-col h-full p-4">
       <div className="mb-4">
         <label className="block text-gray-700 text-sm font-bold mb-2">
-          Criteria Title
+          {t("Criteria Title")}
         </label>
         <input
           type="text"
@@ -33,12 +36,12 @@ const AddNewCriteriaForm = ({ onSave, initialData, editMode }) => {
             setCriteriaData({ ...criteriaData, title: e.target.value })
           }
           className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          placeholder="Type here"
+          placeholder={t("Type here")}
         />
       </div>
       <div className="mb-4">
         <label className="block text-gray-700 text-sm font-bold mb-2">
-          Description
+          {t("Description")}
         </label>
         <textarea
           value={criteriaData.description}
@@ -46,7 +49,7 @@ const AddNewCriteriaForm = ({ onSave, initialData, editMode }) => {
             setCriteriaData({ ...criteriaData, description: e.target.value })
           }
           className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          placeholder="Type here"
+          placeholder={t("Type here")}
         />
       </div>
 
@@ -56,7 +59,7 @@ const AddNewCriteriaForm = ({ onSave, initialData, editMode }) => {
           type="submit"
           className="w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600"
         >
-          {editMode ? "Update Criteria" : "Add Criteria"}
+          {editMode ? t("Update Criteria") : t("Add Criteria")}
         </button>
       </div>
     </div>

@@ -5,10 +5,12 @@ import { Input, Select, Button, Row, Col, Space } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import toast from "react-hot-toast";
 import debounce from "lodash/debounce";
+import { useTranslation } from "react-i18next";
 
 const { Option } = Select;
 
 const TopNavigationWithFilters = ({ onBackendFilterChange, onFrontendFilterChange, academicYears }) => {
+  const { t } = useTranslation("admTimeTable");
   const dispatch = useDispatch();
 
   // Get role from Redux store
@@ -34,7 +36,7 @@ const TopNavigationWithFilters = ({ onBackendFilterChange, onFrontendFilterChang
 
   useEffect(() => {
     if (error && role !== "parent" && role !== "student") {
-      toast.error("Failed to load classes. Please try again.");
+      toast.error(t("Failed to load classes. Please try again."));
     }
   }, [error, role]);
 
@@ -89,9 +91,9 @@ const TopNavigationWithFilters = ({ onBackendFilterChange, onFrontendFilterChang
       <Row gutter={16} align="middle" justify="end">
         {/* Name Filter */}
         <Col>
-          <label className="font-medium text-gray-700" style={{ paddingRight: "8px" }}>Name</label>
+          <label className="font-medium text-gray-700" style={{ paddingRight: "8px" }}>{t("Name")}</label>
           <Input
-            placeholder="Search by Name"
+            placeholder={t("Search by Name")}
             prefix={<SearchOutlined />}
             value={filters.name}
             onChange={(e) => handleFilterChange("name", e.target.value)}
@@ -103,9 +105,9 @@ const TopNavigationWithFilters = ({ onBackendFilterChange, onFrontendFilterChang
         {/* Class ID Filter - Exclude for Parent/Student */}
         {role !== "parent" && role !== "student" && (
           <Col>
-            <label className="font-medium text-gray-700" style={{ paddingRight: "8px" }}>Class</label>
+            <label className="font-medium text-gray-700" style={{ paddingRight: "8px" }}>{t("Class")}</label>
             <Select
-              placeholder="Select Class"
+              placeholder={t("Select Class")}
               loading={loading}
               value={filters.classId}
               onChange={(value) => handleFilterChange("classId", value)}
@@ -114,7 +116,7 @@ const TopNavigationWithFilters = ({ onBackendFilterChange, onFrontendFilterChang
               showSearch
               allowClear
             >
-              <Option value="">Select Class</Option>
+              <Option value="">{t("Select Class")}</Option>
               {classes.map((cls) => (
                 <Option key={cls._id} value={cls._id}>
                   {cls.className}
@@ -126,58 +128,39 @@ const TopNavigationWithFilters = ({ onBackendFilterChange, onFrontendFilterChang
 
         {/* Type Filter */}
         <Col>
-          <label className="font-medium text-gray-700" style={{ paddingRight: "8px" }}>Type</label>
+          <label className="font-medium text-gray-700" style={{ paddingRight: "8px" }}>{t("Type")}</label>
           <Select
-            placeholder="All Types"
+            placeholder={t("All Types")}
             value={filters.type}
             onChange={(value) => handleFilterChange("type", value)}
             style={{ width: "180px" }}
             allowClear
           >
-            <Option value="">All Types</Option>
-            <Option value="weekly">Weekly</Option>
-            <Option value="exam">Exam</Option>
-            <Option value="event">Event</Option>
-            <Option value="others">Others</Option>
+            <Option value="">{t("All Types")}</Option>
+            <Option value="weekly">{t("Weekly")}</Option>
+            <Option value="exam">{t("Exam")}</Option>
+            <Option value="event">{t("Event")}</Option>
+            <Option value="others">{t("Others")}</Option>
           </Select>
         </Col>
 
         {/* Status Filter - Exclude for Parent/Student */}
         {role !== "parent" && role !== "student" && (
           <Col>
-            <label className="font-medium text-gray-700" style={{ paddingRight: "8px" }}>Status</label>
+            <label className="font-medium text-gray-700" style={{ paddingRight: "8px" }}>{t("Status")}</label>
             <Select
-              placeholder="All Statuses"
+              placeholder={t("All Statuses")}
               value={filters.status}
               onChange={(value) => handleFilterChange("status", value)}
               style={{ width: "180px" }}
               allowClear
             >
-              <Option value="">All Statuses</Option>
-              <Option value="active">Published</Option>
-              <Option value="inactive">Drafts</Option>
+              <Option value="">{t("All Statuses")}</Option>
+              <Option value="active">{t("Published")}</Option>
+              <Option value="inactive">{t("Drafts")}</Option>
             </Select>
           </Col>
         )}
-
-        {/* Academic Year Filter */}
-        {/* <Col>
-          <label className="font-medium text-gray-700" style={{ paddingRight: "8px" }}>Academic Year</label>
-          <Select
-            placeholder="Select Academic Year"
-            value={filters.academicYear}
-            onChange={(value) => handleFilterChange("academicYear", value)}
-            style={{ width: "180px" }}
-            allowClear
-          >
-            <Option value="">All Years</Option>
-            {academicYears.map((year) => (
-              <Option key={year} value={year}>
-                {year}
-              </Option>
-            ))}
-          </Select>
-        </Col> */}
 
         {/* Action Buttons */}
         <Col>
@@ -192,7 +175,7 @@ const TopNavigationWithFilters = ({ onBackendFilterChange, onFrontendFilterChang
               }}
               className="hover:bg-gradient-to-r hover:from-pink-600 hover:to-purple-700"
             >
-              Apply Filters
+              {t("Apply Filters")}
             </Button>
 
             <Button
@@ -203,7 +186,7 @@ const TopNavigationWithFilters = ({ onBackendFilterChange, onFrontendFilterChang
                 borderColor: "#1890ff",
               }}
             >
-              Clear Filters
+              {t("Clear Filters")}
             </Button>
           </Space>
         </Col>

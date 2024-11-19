@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import Spinner from "../../../../../../Components/Common/Spinner";
 import Comment from "./Components/Comment";
+import { useTranslation } from "react-i18next";
 
 const CommentSection = ({
   comments,
@@ -12,6 +13,7 @@ const CommentSection = ({
   loading,
   error,
 }) => {
+  const { t } = useTranslation('admModule');
   const commentsEndRef = useRef(null);
 
   useEffect(() => {
@@ -27,7 +29,7 @@ const CommentSection = ({
   if (error) {
     return (
       <div className="flex justify-center items-center h-full text-red-500">
-        Error: {error}
+        {t("Error")}: {error}
       </div>
     );
   }
@@ -48,7 +50,7 @@ const CommentSection = ({
         ))
       ) : (
         <div className="text-center w-full mt-40">
-          <p>No comments found</p>
+          <p>{t("No comments found")}</p>
         </div>
       )}
       <div ref={commentsEndRef} />
