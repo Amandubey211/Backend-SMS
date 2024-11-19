@@ -70,7 +70,6 @@ const useEditQuestion = () => {
         const { quiz } = response.data;
 
         setLoading(false);
-        toast.success("Question updated successfully");
         return { success: true, quiz };
       } catch (err) {
         const errorMessage =

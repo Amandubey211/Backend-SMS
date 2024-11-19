@@ -199,7 +199,20 @@ const MainSection = ({ setIsEditing, isEditing }) => {
       inCorrectAnswerComment: wrongAnswerComment,
     };
 
-    dispatch(addQuestionThunk({ quizId, question: newQuestion }));
+    try {
+      const result = await dispatch(
+        addQuestionThunk({ quizId, question: newQuestion })
+      );
+
+      if (addQuestionThunk.fulfilled.match(result)) {
+        setSidebarOpen(false); // Close the sidebar on success
+      } else {
+        // Optionally handle the error case
+        console.error("Failed to add question:", result.payload);
+      }
+    } catch (error) {
+      console.error("An error occurred while adding the question:", error);
+    }
   }, [
     dispatch,
     quizId,
@@ -223,13 +236,24 @@ const MainSection = ({ setIsEditing, isEditing }) => {
       inCorrectAnswerComment: wrongAnswerComment,
     };
 
-    const result = await dispatch(
-      updateQuestionThunk({
-        quizId,
-        questionId: editingQuestionId,
-        question: updatedQuestion,
-      })
-    );
+    try {
+      const result = await dispatch(
+        updateQuestionThunk({
+          quizId,
+          questionId: editingQuestionId,
+          question: updatedQuestion,
+        })
+      );
+
+      if (updateQuestionThunk.fulfilled.match(result)) {
+        setSidebarOpen(false); // Close the sidebar on success
+      } else {
+        // Optionally handle the error case
+        console.error("Failed to update question:", result.payload);
+      }
+    } catch (error) {
+      console.error("An error occurred while updating the question:", error);
+    }
   }, [
     dispatch,
     quizId,

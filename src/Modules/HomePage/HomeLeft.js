@@ -36,8 +36,28 @@ const HomeLeft = () => {
           ))}
 
           <p className="text-gray-600 text-sm mt-4">
-            By signing in, you agree to our Privacy Policy, Terms of Use and
-            Cookie Policy.
+            By signing in, you agree to our{" "}
+            <NavLink
+              to="/privacy-policy"
+              className="text-blue-600 underline hover:text-blue-800 transition-colors duration-200"
+            >
+              Privacy Policy
+            </NavLink>
+            ,{" "}
+            <NavLink
+              to="/terms-and-conditions"
+              className="text-blue-600 underline hover:text-blue-800 transition-colors duration-200"
+            >
+              Terms of Use
+            </NavLink>{" "}
+            and{" "}
+            <NavLink
+              to="/cookie-policy"
+              className="text-blue-600 underline hover:text-blue-800 transition-colors duration-200"
+            >
+              Cookie Policy
+            </NavLink>
+            .
           </p>
           <p className="text-gray-600 text-sm">
             ©The Student Diwan. All Rights Reserved.
