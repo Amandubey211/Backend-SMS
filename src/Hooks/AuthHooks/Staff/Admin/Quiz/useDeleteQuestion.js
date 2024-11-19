@@ -20,7 +20,6 @@ const useDeleteQuestion = () => {
       setError(null);
 
       try {
-        
         const token = localStorage.getItem(`${role}:token`);
 
         const response = await axios.delete(
@@ -33,7 +32,6 @@ const useDeleteQuestion = () => {
         const { quiz } = response.data;
 
         setLoading(false);
-        toast.success("Question deleted successfully");
         return { success: true, quiz };
       } catch (err) {
         const errorMessage =

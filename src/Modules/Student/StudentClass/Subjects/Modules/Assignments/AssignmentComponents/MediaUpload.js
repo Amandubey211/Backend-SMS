@@ -142,16 +142,19 @@ const MediaUpload = ({ onSubmit, onAssignmentSubmit }) => {
         Upload Media
       </label>
       {!files.length && (
-        <div className="flex items-center mb-4">
+        <div className="flex items-start  mb-4 ">
           <input
             type="checkbox"
             id="skipFiles"
             checked={skipFiles}
             onChange={() => setSkipFiles(!skipFiles)}
-            className="mr-2"
+            className="mr-2 mt-1"
           />
           <label htmlFor="skipFiles" className="text-sm text-gray-600">
-            I don't want to upload any files
+            I confirm that this assignment is my original work and has been
+            completed independently. I understand that submitting plagiarized or
+            incomplete work may result in a reduced grade or other consequences
+            as outlined by my teacher
           </label>
         </div>
       )}

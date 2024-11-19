@@ -72,7 +72,6 @@ const useAddQuestion = () => {
         const { quiz } = response.data;
 
         setLoading(false);
-        toast.success("Question added successfully");
         return { success: true, quiz };
       } catch (err) {
         const errorMessage =

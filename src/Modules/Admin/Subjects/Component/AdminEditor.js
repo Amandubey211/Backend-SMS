@@ -14,7 +14,6 @@ const EditorComponent = ({
   isCreateQuestion,
 }) => {
   const editor = useRef(null);
-  // const [loading, setLoading] = useState(false);
   const [scrollPosition, setScrollPosition] = useState(0);
 
   // Function to create and show a custom progress bar below the toolbar
@@ -59,7 +58,7 @@ const EditorComponent = ({
     }
   };
 
-  // Handle image upload and display
+  // Handle image upload with progress bar
   const handleImageUpload = useCallback(
     async (file) => {
       if (!file) return;
@@ -77,12 +76,14 @@ const EditorComponent = ({
       const formData = new FormData();
       formData.append("file", file);
       formData.append("upload_preset", process.env.REACT_APP_CLOUDINARY_PRESET);
+      formData.append("folder", "assignments"); // Specify folder name
 
       try {
         const response = await axios.post(
           process.env.REACT_APP_CLOUDINARY_URL,
           formData,
           {
+            headers: { "Content-Type": "multipart/form-data" },
             onUploadProgress: (progressEvent) => {
               const percentage = Math.round(
                 (progressEvent.loaded * 100) / progressEvent.total
@@ -94,16 +95,9 @@ const EditorComponent = ({
 
         if (response.data.secure_url) {
           const imageUrl = response.data.secure_url;
-
-          // Insert the image using insertHTML
-          if (editorInstance) {
-            const imgHTML = `<img src="${imageUrl}" alt="Image" />`;
-            editorInstance.selection.insertHTML(imgHTML); // Insert HTML
-            toast.success("Image Uploaded Successfully");
-          } else {
-            toast.error("Failed to insert image into the editor.");
-            console.error("Editor instance is not defined.");
-          }
+          const imgHTML = `<img src="${imageUrl}" alt="Uploaded Image" />`;
+          editorInstance.selection.insertHTML(imgHTML);
+          toast.success("Image Uploaded Successfully");
         } else {
           toast.error("Image upload failed. No secure URL returned.");
         }
@@ -114,15 +108,86 @@ const EditorComponent = ({
         if (editorInstance) {
           removeProgressBar(editorInstance, progressBar); // Remove progress bar
         }
-        // setLoading(false);
-        // Restore the scroll position
-        window.scrollTo(0, scrollPosition);
+        window.scrollTo(0, scrollPosition); // Restore the scroll position
       }
     },
     [scrollPosition]
   );
 
-  // File input creation and handling
+  // Handle PDF file upload with progress bar and styled link
+  const handleFileUpload = useCallback(
+    async (file) => {
+      if (!file) return;
+
+      const editorInstance = editor.current;
+      let progressBar;
+
+      // Save the current scroll position
+      setScrollPosition(window.scrollY);
+
+      if (editorInstance) {
+        progressBar = showProgressBar(editorInstance); // Show custom progress bar below toolbar
+      }
+
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("upload_preset", process.env.REACT_APP_CLOUDINARY_PRESET);
+      formData.append("folder", "assignments"); // Specify folder name
+
+      try {
+        const response = await axios.post(
+          process.env.REACT_APP_CLOUDINARY_URL,
+          formData,
+          {
+            headers: { "Content-Type": "multipart/form-data" },
+            onUploadProgress: (progressEvent) => {
+              const percentage = Math.round(
+                (progressEvent.loaded * 100) / progressEvent.total
+              );
+              updateProgressBar(progressBar, percentage); // Update progress bar
+            },
+          }
+        );
+
+        if (response.data.secure_url) {
+          const fileUrl = response.data.secure_url;
+
+          // Enhanced styled PDF link
+          const pdfLink = `
+            <a href="${fileUrl}" target="_blank" rel="noopener noreferrer" style="
+              display: inline-flex;
+              align-items: center;
+              padding: 8px 16px;
+              background-color: #C71585;
+              color: #fff;
+              border-radius: 4px;
+              text-decoration: none;
+              font-weight: bold;
+              margin: 10px 0;
+            ">
+              📄 View PDF
+            </a>
+          `;
+
+          editorInstance.selection.insertHTML(pdfLink);
+          toast.success("PDF Uploaded Successfully");
+        } else {
+          toast.error("File upload failed. No secure URL returned.");
+        }
+      } catch (error) {
+        console.error("Error uploading PDF to Cloudinary", error);
+        toast.error("Error uploading file. Please try again.");
+      } finally {
+        if (editorInstance) {
+          removeProgressBar(editorInstance, progressBar); // Remove progress bar
+        }
+        window.scrollTo(0, scrollPosition); // Restore the scroll position
+      }
+    },
+    [scrollPosition]
+  );
+
+  // Trigger image upload
   const triggerImageUpload = useCallback(() => {
     const input = document.createElement("input");
     input.type = "file";
@@ -136,45 +201,42 @@ const EditorComponent = ({
     input.click();
   }, [handleImageUpload]);
 
-  // Print the content of the editor
-  // const handlePrint = useCallback(() => {
-  //   if (editor.current) {
-  //     const printWindow = window.open("", "PRINT", "height=600,width=800");
-  //     printWindow.document.write(`
-  //       <html>
-  //       <head><title>Print</title></head>
-  //       <body>${editor.current.value}</body>
-  //       </html>
-  //     `);
-  //     printWindow.document.close(); // Necessary for some browsers
-  //     printWindow.focus(); // Necessary for some browsers
-  //     printWindow.print();
-  //     printWindow.close();
-  //   }
-  // }, []);
+  // Trigger PDF upload
+  const triggerFileUpload = useCallback(() => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "application/pdf";
+    input.onchange = (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        handleFileUpload(file);
+      }
+    };
+    input.click();
+  }, [handleFileUpload]);
 
   // Jodit Editor Configuration
   const config = useMemo(
     () => ({
       readonly: false,
       height: isCreateQuestion ? 300 : 400,
-      spellcheck: true, // Enable browser's native spellcheck in the editor
+      spellcheck: true,
       toolbarSticky: true,
       toolbarAdaptive: false,
-      showCharsCounter: true, // Show character counter
-      showWordsCounter: true, // Show word counter
+      showCharsCounter: true,
+      showWordsCounter: true,
       showXPathInStatusbar: false,
       askBeforePasteHTML: false,
       askBeforePasteFromWord: false,
-      removeButtons: ["powered-by-jodit"], // Remove "Powered by Jodit"
+      removeButtons: ["powered-by-jodit"],
       buttons: [
-        "font", // Font family selector
-        "fontsize", // Font size selector
+        "font",
+        "fontsize",
         "bold",
         "italic",
         "underline",
         "strikethrough",
-        "hr", // Add Horizontal Rule
+        "hr",
         "superscript",
         "subscript",
         "align",
@@ -183,31 +245,26 @@ const EditorComponent = ({
         "outdent",
         "indent",
         "symbols",
-        "brush", // Font color/brush tool
-
-        "undo", // Add Undo button
-        "redo", // Add Redo button
+        "brush",
+        "undo",
+        "redo",
         "spellcheck",
-
-        "table", // Include Table
-
+        "table",
         {
           name: "image",
           tooltip: "Upload Image",
-          exec: triggerImageUpload,
+          exec: triggerImageUpload, // Image upload logic
         },
-
+        {
+          name: "file",
+          tooltip: "Upload File (PDF)",
+          exec: triggerFileUpload, // PDF upload logic
+        },
         "video",
-        "file",
         "link",
-        "preview", // Include Preview
-        "fullsize", // Include Fullscreen
+        "preview",
+        "fullsize",
         "print",
-        // {
-        //   name: "print",
-        //   tooltip: "Print Content",
-        //   exec: handlePrint,
-        // },
       ],
       events: {
         change: (newContent) => {
@@ -218,7 +275,7 @@ const EditorComponent = ({
         },
       },
     }),
-    [isCreateQuestion, onEditorChange, triggerImageUpload]
+    [isCreateQuestion, onEditorChange, triggerImageUpload, triggerFileUpload]
   );
 
   return (
@@ -236,7 +293,7 @@ const EditorComponent = ({
               value={assignmentName}
               onChange={(e) => onNameChange(e.target.value)}
               className="w-full p-2 border border-gray-300 rounded-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              spellCheck="true" // Enable spell check in input field
+              spellCheck="true"
             />
           </div>
         </div>
@@ -246,7 +303,7 @@ const EditorComponent = ({
         ref={editor}
         value={editorContent}
         config={config}
-        tabIndex={1} // tabIndex of textarea
+        tabIndex={1}
       />
     </div>
   );

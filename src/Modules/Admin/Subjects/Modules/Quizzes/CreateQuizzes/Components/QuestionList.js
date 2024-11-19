@@ -1,3 +1,4 @@
+// QuestionList.jsx
 import React from "react";
 import QuestionCard from "./QuestionCard";
 
@@ -12,17 +13,20 @@ const QuestionList = ({
   }, 0);
 
   return (
-    <div className="">
-      <div className="flex justify-between px-4 items-center">
-        <h3 className="text-xl font-semibold mb-2">All Questions:</h3>
-        <h3>Total Points: {totalPoints}</h3>
+    <div className="w-full px-4 py-6">
+      {/* Header Section */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+        <h3 className="text-2xl font-semibold mb-2 md:mb-0">All Questions:</h3>
+        <h3 className="text-xl font-medium">Total Points: {totalPoints}</h3>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+
+      {/* Grid Container */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {questions?.map((q) => (
           <QuestionCard
             key={q._id}
             question={q}
-            allowShuffleAnswers={allowShuffleAnswers} // Pass the prop here
+            allowShuffleAnswers={allowShuffleAnswers}
             deleteQuestion={() => deleteQuestion(q._id)}
             editQuestion={() => editQuestion(q._id)}
           />

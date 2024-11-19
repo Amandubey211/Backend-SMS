@@ -1,3 +1,4 @@
+// QuestionCard.jsx
 import React, { useState, useEffect } from "react";
 import { FaCheckCircle, FaTimesCircle, FaRegCircle } from "react-icons/fa";
 import { FiEdit2, FiTrash2 } from "react-icons/fi";
@@ -46,24 +47,29 @@ const QuestionCard = ({
   };
 
   return (
-    <div className="bg-white shadow min-h-60 min-w-80 rounded-lg mb-4 border">
-      <div className="flex justify-between items-center mb-2 bg-gray-100 p-3">
+    <div className="bg-white shadow-md rounded-lg  flex flex-col h-full border">
+      {/* Question Header */}
+      <div className="flex justify-between items-center mb-2 bg-pink-100 p-3 rounded">
         <div className="text-sm font-semibold">
-          Question Point :{" "}
+          Question Point:{" "}
           <span className="text-black">{question.questionPoint}</span>
         </div>
         <div className="flex space-x-2">
           <FiEdit2
             className="text-green-600 cursor-pointer text-xl"
             onClick={editQuestion}
+            title="Edit Question"
           />
           <FiTrash2
             className="text-red-600 cursor-pointer text-xl"
             onClick={deleteQuestion}
+            title="Delete Question"
           />
         </div>
       </div>
-      <div className="px-4 py-2">
+
+      {/* Question Content */}
+      <div className="px-4 py-2 flex-grow">
         <h2 className="text-lg font-semibold mb-3">
           <span
             dangerouslySetInnerHTML={{ __html: question.questionText }}
@@ -73,7 +79,7 @@ const QuestionCard = ({
           // Render a text area if the question type is "text"
           <textarea
             rows="4"
-            className="w-full p-2 border rounded bg-gray-50"
+            className="w-full p-2 border rounded bg-gray-50 resize-y"
             placeholder="Type your answer here..."
           />
         ) : (
