@@ -1,22 +1,24 @@
 import React from "react";
 import { IoIosArrowBack } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 const CreateSyllabusHeader = ({ onSave, loading, isEditing }) => {
+  const { t } = useTranslation('admModule');
   const navigate = useNavigate();
 
   return (
     <div className="flex items-center justify-between p-2 pe-8 bg-white border-b border-gray-300 shadow-sm">
       <div className="flex items-center">
         <button
-          aria-label="Go back"
+          aria-label={t("Go back")}
           onClick={() => navigate(-1)}
           className="mr-2 text-gray-600 text-2xl cursor-pointer"
         >
           <IoIosArrowBack aria-hidden="true" />
         </button>
         <h1 className="text-lg font-semibold text-gray-800">
-          {isEditing ? "Update Syllabus" : "Create New Syllabus"}
+          {isEditing ? t("Update Syllabus") : t("Create New Syllabus")}
         </h1>
       </div>
       <div className="flex items-center space-x-2">
@@ -24,7 +26,7 @@ const CreateSyllabusHeader = ({ onSave, loading, isEditing }) => {
           onClick={() => navigate(-1)}
           className="px-4 py-2 border font-semibold rounded-md transition"
         >
-          Cancel
+          {t("Cancel")}
         </button>
         <button
           type="button"
@@ -34,11 +36,11 @@ const CreateSyllabusHeader = ({ onSave, loading, isEditing }) => {
         >
           {loading ? (
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-rose-500 to-indigo-500">
-              {isEditing ? "Updating..." : "Saving...."}
+              {isEditing ? t("Updating...") : t("Saving....")}
             </span>
           ) : (
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-rose-500 to-indigo-500">
-              {isEditing ? "Update Syllabus" : "Submit Syllabus"}
+              {isEditing ? t("Update Syllabus") : t("Submit Syllabus")}
             </span>
           )}
         </button>

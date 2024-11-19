@@ -3,10 +3,12 @@ import { IoSearchOutline } from "react-icons/io5";
 import { VscSettings } from "react-icons/vsc";
 import Spinner from "../../../../../../Components/Common/Spinner";
 import NoDataFound from "../../../../../../Components/Common/NoDataFound";
+import { useTranslation } from "react-i18next";
 
 function StudentList({ onSelectStudent, students }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeIndex, setActiveIndex] = useState(null);
+  const { t } = useTranslation("admModule"); // Adding the translation function with namespace 'studentList'
 
   const filteredStudents = students.filter((student) =>
     student.fullName.toLowerCase().includes(searchTerm.toLowerCase())
@@ -26,7 +28,7 @@ function StudentList({ onSelectStudent, students }) {
         <div className="relative">
           <input
             type="text"
-            placeholder="Search Student"
+            placeholder={t("Search Student")} // Translated placeholder text
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-500"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -36,12 +38,12 @@ function StudentList({ onSelectStudent, students }) {
         </div>
       </div>
       <div className="flex gap-4 items-center mb-4">
-        <h2 className="text-md font-semibold">All Students</h2>
+        <h2 className="text-md font-semibold">{t("All Students")}</h2> {/* Translated heading */}
         <span className="text-sm bg-purple-100 text-purple-600 rounded-full px-2 py-1">
           {students.length}
         </span>
       </div>
-      {!filteredStudents.length && <NoDataFound title="Students" />}
+      {!filteredStudents.length && <NoDataFound title={t("Students")} />} {/* Translated title */}
       <div className="flex-grow overflow-y-auto space-y-2 ">
         {filteredStudents.map((student, index) => (
           <div
@@ -72,7 +74,7 @@ function StudentList({ onSelectStudent, students }) {
                 {student.fullName}
               </h3>
               <p className="text-sm text-green-500">
-                {student?.presentSectionId?.sectionName || "N/A"}
+                {student?.presentSectionId?.sectionName || t("N/A")} {/* Translated "N/A" */}
               </p>
             </div>
           </div>

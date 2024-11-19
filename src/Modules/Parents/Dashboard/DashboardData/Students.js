@@ -18,22 +18,37 @@ const StudentCard = React.memo(({ student, index }) => {
 
   return (
     <>
-    <div className=" p-4 pb-4 pt-6 text-center relative border-gray-300">
-      <div className="absolute top-2 left-2 bg-gray-100 text-gray-800 py-1 px-2 rounded-l-sm rounded-r-sm text-sm">
-        {t("Child")}: {index + 1}
-      </div>
+    <div className="p-4 pb-4 pt-6 text-center relative border-gray-300">
+  {/* Child Label */}
+  <div className="absolute top-2 left-2 bg-gray-100 text-gray-800 py-1 px-2 rounded-l-sm rounded-r-sm text-sm">
+    {t("Child")}: {index + 1}
+  </div>
+
+  {/* Student Image with Frame Effect */}
+  <div className="w-24 h-24 mx-auto mb-2 border-gray-300 border-2 rounded-full p-0.5">
+    <div className="w-full h-full rounded-full overflow-hidden border-white border-2">
       <img
-        src={profileImage?.length != 0 ? profileImage : profileIcon}
-        alt={student?.name || 'Unknown'}
-        className="w-20 h-20 rounded-full mx-auto mb-2 border"
-      
+        src={profileImage?.length !== 0 ? profileImage : profileIcon}
+        alt={student?.name || "Unknown"}
+        className="w-full h-full object-cover"
       />
-      <h2 className="text-lg font-semibold mb-1">{student?.name || "N/A"}</h2>
-      <div className="text-gray-600 text-sm mb-1">
-        {t("Class")}: {studentClass} | {t("Id")}: {admissionNumber} | {t("Section")}: {section}
-      </div>
-      <div className="text-green-600 text-sm">{t("Group")}: {group}</div>
     </div>
+  </div>
+
+  {/* Student Name */}
+  <h2 className="text-lg font-semibold mb-1">{student?.name || "N/A"}</h2>
+
+  {/* Class, ID, and Section */}
+  <div className="text-gray-600 text-sm mb-1">
+    {t("Class")}: {studentClass} | {t("Id")}: {admissionNumber} | {t("Section")}: {section}
+  </div>
+
+  {/* Group */}
+  <div className="text-green-600 text-sm">
+    {t("Group")}: {group}
+  </div>
+</div>
+
     
     </>
   );
@@ -77,7 +92,7 @@ const StudentParentCard = () => {
 
   return (
     <div className="relative h-3/5">
-      <div className="flex justify-between p-4 pb-3 items-center px-2">
+      <div className="flex justify-between p-4 pb-3 items-center px-2 pt-2">
         <h2 className="text-lg font-semibold text-gray-600">{t("My Children")} {students?.length || 0}</h2>
         {!loadingChildren && !errorChildren && students?.length > 0 && (
           <button

@@ -4,6 +4,7 @@ import { FiLoader } from "react-icons/fi"; // For loader icon
 import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import { useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   addModule,
   editModule,
@@ -11,6 +12,7 @@ import {
 import { setSelectedModule } from "../../../../../../Store/Slices/Admin/Class/Module/moduleSlice";
 
 const AddModule = ({ data, onClose }) => {
+  const { t } = useTranslation("admModule");
   const dispatch = useDispatch();
   const { sid } = useParams(); // Assuming the subjectId is present in the URL
 
@@ -54,12 +56,12 @@ const AddModule = ({ data, onClose }) => {
 
   const handleSubmit = async () => {
     if (!moduleTitle) {
-      toast.error("Module title is required");
+      toast.error(t("Module title is required"));
       return;
     }
 
     if (!selectedFile && !preview) {
-      toast.error("Module image is required");
+      toast.error(t("Module image is required"));
       return;
     }
 
@@ -102,14 +104,14 @@ const AddModule = ({ data, onClose }) => {
             className="block text-gray-700 text-sm font-semibold opacity-60 mb-2"
             htmlFor="moduleImage"
           >
-            Module Image
+            {t("Module Image")}
           </label>
           <div className="relative border border-dashed rounded-lg w-full h-48 flex items-center justify-center">
             {preview ? (
               <>
                 <img
                   src={preview}
-                  alt="Preview"
+                  alt={t("Preview")}
                   className="w-full h-full object-cover rounded-lg"
                 />
                 <button
@@ -188,12 +190,12 @@ const AddModule = ({ data, onClose }) => {
             className="block text-gray-700 text-sm font-semibold opacity-60 mb-2"
             htmlFor="moduleTitle"
           >
-            Module Title
+            {t("Module Title")}
           </label>
           <input
             type="text"
             id="moduleTitle"
-            placeholder="Type here"
+            placeholder={t("Type here")}
             value={moduleTitle}
             onChange={(e) => setModuleTitle(e.target.value)}
             className="w-full px-3 py-2 border rounded-lg text-gray-700 focus:outline-none focus:shadow-outline"
@@ -210,11 +212,11 @@ const AddModule = ({ data, onClose }) => {
           {moduleLoading && <FiLoader className="animate-spin mr-2" />}
           {moduleLoading
             ? data
-              ? "Updating Module..."
-              : "Adding Module..."
+              ? t("Updating Module...")
+              : t("Adding Module...")
             : data
-            ? "Update Module"
-            : "Add New Module"}
+            ? t("Update Module")
+            : t("Add New Module")}
         </button>
       </div>
     </div>

@@ -14,22 +14,27 @@ const ParentSection = () => {
         </div>
 
         {/* First Row: StudentParentCard and NoticeBoard */}
-        <div className="flex flex-wrap justify-between items-start border-y h-[400px]">
-          <div className="w-full md:w-2/5 h-full flex items-center justify-center p-4">
-            <div className="w-full h-full">
+        <div className="flex w-full border-y h-auto relative">
+          {/* StudentParentCard Section */}
+          <div className="w-2/5 p-4">
+            <div className="w-full">
               <StudentParentCard />
             </div>
           </div>
 
-          <div className="w-full md:w-3/5 h-full flex items-center justify-center p-4 border-l border-gray-300">
-            <div className="w-full h-full">
+          {/* Vertical Divider */}
+          <div className="absolute h-full top-0 bottom-0 left-[40%] w-[1px] bg-gray-300"></div>
+
+          {/* NoticeBoard Section */}
+          <div className="w-3/5 p-4">
+            <div className="w-full">
               <NoticeBoard textTrimCount={74} />
             </div>
           </div>
         </div>
 
         {/* Second Row: Accounting Section */}
-        <div className="flex border-y h-[400px]">
+        <div className="flex border-y h-[auto]">
           <div className="w-full h-full flex items-center justify-center p-4">
             <div className="w-full h-full">
               <AccountingSection />

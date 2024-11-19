@@ -1,38 +1,12 @@
-// import React from "react";
-
-// const AllowedAttemptsSelect = ({ allowedAttempts, handleChange }) => (
-//   <>
-//     <label className="block mb-2 text-sm font-medium text-gray-700">
-//       Allowed Attempts
-//     </label>
-//     <select
-//       name="allowedAttempts"
-//       value={allowedAttempts}
-//       onChange={(e) =>
-//         handleChange({
-//           target: {
-//             name: "allowedAttempts",
-//             value: e.target.value === "true", // Ensure boolean is set
-//           },
-//         })
-//       }
-//       className="mb-4 w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-//     >
-//       <option value="">Select</option>
-//       <option value="true">Limited</option>
-//       <option value="false">Unlimited</option>
-//     </select>
-//   </>
-// );
-
-// export default AllowedAttemptsSelect;
-
 import React from "react";
+import { useTranslation } from 'react-i18next';
 
 const AllowedAttemptsSelect = ({ allowedAttempts, handleChange }) => {
+  const { t } = useTranslation('admModule');
+
   return (
     <div className="mb-4">
-      <label className="block text-gray-700">Allowed Attempts</label>
+      <label className="block text-gray-700">{t("Allowed Attempts")}</label>
       <select
         name="allowedAttempts"
         value={allowedAttempts ? "true" : "false"} // Handle boolean as string
@@ -46,9 +20,9 @@ const AllowedAttemptsSelect = ({ allowedAttempts, handleChange }) => {
         }
         className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
       >
-        <option value="">Select</option>
-        <option value="true">Limited</option>
-        <option value="false">Unlimited</option>
+        <option value="">{t("Select")}</option>
+        <option value="true">{t("Limited")}</option>
+        <option value="false">{t("Unlimited")}</option>
       </select>
     </div>
   );

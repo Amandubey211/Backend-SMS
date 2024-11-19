@@ -15,7 +15,8 @@ const AddIssue = ({ onClose, editIssueData }) => {
   );
   const studentList = useSelector((state) => state.admin.students.studentsList);
   const classList = useSelector((state) => state.admin.class.classes);
-
+  const {loading} = useSelector((state) => state.admin.students);
+  
   const [issueData, setIssueData] = useState({
     class: "",
     section: "",
@@ -69,10 +70,11 @@ const AddIssue = ({ onClose, editIssueData }) => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     if (name === "class") {
-      dispatch(fetchSectionsByClass(value)); // Fetch sections when class changes
+      dispatch(fetchSectionsByClass(value));
+      dispatch(fetchStudentsByClassAndSection(value));
     }
     if (name === "section") {
-      dispatch(fetchStudentsByClassAndSection(value)); // Fetch students when section changes
+      dispatch(fetchStudentsByClassAndSection(value));
     }
     setIssueData((prev) => ({
       ...prev,
@@ -142,6 +144,7 @@ const AddIssue = ({ onClose, editIssueData }) => {
           <select
             id="section"
             name="section"
+            disabled={loading}
             value={issueData.section}
             onChange={handleInputChange}
             className="block w-full p-2 mt-1 border rounded focus:ring-indigo-500 focus:border-indigo-500"
@@ -165,6 +168,7 @@ const AddIssue = ({ onClose, editIssueData }) => {
           <select
             id="student"
             name="student"
+            disabled={loading}
             value={issueData.student}
             onChange={handleInputChange}
             required
