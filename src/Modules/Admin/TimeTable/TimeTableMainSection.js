@@ -10,10 +10,12 @@ import { fetchAllClasses } from "../../../Store/Slices/Admin/Class/actions/class
 import TopNavigationWithFilters from "./Components/TopNavigationWithFilters";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 
 const TimeTableMainSection = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { t } = useTranslation("admTimeTable");
 
 
   const role = useSelector((store) => store.common.auth.role);
@@ -62,7 +64,7 @@ const TimeTableMainSection = () => {
   // Handle class fetching errors, but skip for parent or student
   useEffect(() => {
     if (classError && role !== "parent" && role !== "student") {
-      toast.error("Failed to load classes. Please try again.");
+      toast.error(t("Failed to load classes. Please try again."));
     }
   }, [classError, role]);
 
@@ -115,17 +117,17 @@ const TimeTableMainSection = () => {
     dispatch(deleteTimetable(id))
       .unwrap()
       .then(() => {
-        toast.success("Timetable deleted successfully.");
+        toast.success(t("Timetable deleted successfully."));
       })
       .catch((err) => {
-        toast.error("Failed to delete timetable.");
+        toast.error(t("Failed to delete timetable."));
       });
   };
 
   // Handle fetching errors
   useEffect(() => {
     if (errorFetch) {
-      toast.error(`Failed to load timetables: ${errorFetch}`);
+      toast.error(`${t("Failed to load timetables")}: ${errorFetch}`);
     }
   }, [errorFetch]);
 
@@ -145,7 +147,7 @@ const TimeTableMainSection = () => {
             onClick={handleCreateTimeTable}
             className="px-4 py-2 rounded-md text-white bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700"
           >
-            + Create TimeTable
+            {t("+ Create TimeTable")}
           </button>
         </div>
       )}

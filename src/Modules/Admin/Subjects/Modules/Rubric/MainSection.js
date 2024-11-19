@@ -15,10 +15,12 @@ import AddNewCriteriaForm from "./Components/AddNewCriteriaForm";
 import SubjectSideBar from "../../Component/SubjectSideBar";
 import Spinner from "../../../../../Components/Common/Spinner";
 import NoDataFound from "../../../../../Components/Common/NoDataFound";
+import { useTranslation } from "react-i18next";
 
 const AddRubricModal = lazy(() => import("./Components/AddRubricModal"));
 
 const MainSection = () => {
+  const { t } = useTranslation('admModule');
   const dispatch = useDispatch();
   const { sid } = useParams();
   const [isModalOpen, setModalOpen] = useState(false);
@@ -138,7 +140,7 @@ const MainSection = () => {
             ))}
           </div>
         ) : (
-          <NoDataFound title="Rubrics" />
+          <NoDataFound title={t("Rubrics")} />
         )}
         <Suspense fallback={<Spinner />}>
           {isModalOpen && (
@@ -165,7 +167,7 @@ const MainSection = () => {
             setEditMode(false);
             setCriteriaToEdit(null);
           }}
-          title={editMode ? "Update Criteria" : "Add New Criteria"}
+          title={t(editMode ? "Update Criteria" : "Add New Criteria")}
         >
           <AddNewCriteriaForm
             onSave={handleAddNewCriteria}

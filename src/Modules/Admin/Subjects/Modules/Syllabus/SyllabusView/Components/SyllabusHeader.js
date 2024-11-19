@@ -3,8 +3,10 @@ import { AiOutlineEdit } from "react-icons/ai";
 import { HiOutlineDotsVertical } from "react-icons/hi";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import DeleteModal from "../../../../../../../Components/Common/DeleteModal";
+import { useTranslation } from "react-i18next";
 
 const SyllabusHeader = ({ onEditClick, onDeleteClick, syllabus }) => {
+  const { t } = useTranslation('admModule');
   const [menuOpen, setMenuOpen] = useState(false);
   const [isModalOpen, setModalOpen] = useState(false);
   const menuRef = useRef(null);
@@ -33,20 +35,20 @@ const SyllabusHeader = ({ onEditClick, onDeleteClick, syllabus }) => {
 
   return (
     <div className="flex items-center justify-between ps-4 border-b">
-      <h1 className="text-lg font-semibold">Subject Syllabus</h1>
+      <h1 className="text-lg font-semibold">{t("Subject Syllabus")}</h1>
       <div className="flex gap-1 items-end justify-center relative">
         <div className="flex justify-center gap-2 items-center w-full p-2 text-gray-700">
           <button
             className="flex items-center space-x-1 px-4 py-1 border rounded-md border-gray-300 text-green-600 hover:bg-gray-100 transition"
-            aria-label="Edit Assignment"
+            aria-label={t("Edit Assignment")}
             onClick={onEditClick}
           >
             <AiOutlineEdit aria-hidden="true" />
-            <span>Edit</span>
+            <span>{t("Edit")}</span>
           </button>
           <button
             className="flex items-center space-x-1 border rounded-full w-8 h-8 justify-center border-gray-300 text-gray-600 hover:bg-gray-100 transition"
-            aria-label="More Options"
+            aria-label={t("More Options")}
             onClick={() => setMenuOpen(!menuOpen)}
           >
             <HiOutlineDotsVertical aria-hidden="true" />
@@ -61,7 +63,7 @@ const SyllabusHeader = ({ onEditClick, onDeleteClick, syllabus }) => {
                 onClick={handleDeleteClick}
               >
                 <RiDeleteBin5Line className="mr-2 text-red-700" />
-                <span>Delete</span>
+                <span>{t("Delete")}</span>
               </button>
             </div>
           )}
@@ -75,7 +77,7 @@ const SyllabusHeader = ({ onEditClick, onDeleteClick, syllabus }) => {
           onDeleteClick(syllabus._id);
           setModalOpen(false);
         }}
-        title={syllabus?.title || "this syllabus"}
+        title={syllabus?.title || t("this syllabus")}
       />
     </div>
   );

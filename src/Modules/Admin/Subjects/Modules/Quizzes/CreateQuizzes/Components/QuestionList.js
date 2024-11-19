@@ -1,5 +1,6 @@
 import React from "react";
 import QuestionCard from "./QuestionCard";
+import { useTranslation } from "react-i18next";
 
 const QuestionList = ({
   questions,
@@ -7,6 +8,8 @@ const QuestionList = ({
   editQuestion,
   allowShuffleAnswers,
 }) => {
+  const { t } = useTranslation('admModule');
+
   const totalPoints = questions?.reduce((sum, question) => {
     return sum + parseFloat(question.questionPoint);
   }, 0);
@@ -14,8 +17,8 @@ const QuestionList = ({
   return (
     <div className="">
       <div className="flex justify-between px-4 items-center">
-        <h3 className="text-xl font-semibold mb-2">All Questions:</h3>
-        <h3>Total Points: {totalPoints}</h3>
+        <h3 className="text-xl font-semibold mb-2">{t("All Questions:")}</h3>
+        <h3>{t("Total Points:")} {totalPoints}</h3>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {questions?.map((q) => (

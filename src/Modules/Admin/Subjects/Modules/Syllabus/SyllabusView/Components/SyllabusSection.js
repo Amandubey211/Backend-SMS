@@ -1,6 +1,9 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 const SyllabusSection = ({ title, content }) => {
+  const { t } = useTranslation('admModule');
+
   return (
     <div className="p-3 bg-white mb-6">
       {title && content ? (
@@ -12,7 +15,7 @@ const SyllabusSection = ({ title, content }) => {
           />
         </>
       ) : (
-        <p className="text-gray-500 mt-4">No syllabus data available.</p>
+        <p className="text-gray-500 mt-4">{t("No syllabus data available.")}</p>
       )}
     </div>
   );

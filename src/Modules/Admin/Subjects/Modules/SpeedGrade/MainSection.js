@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useTranslation } from "react-i18next";
 import StudentList from "./Components/StudentList";
 import AssignmentDetails from "./Components/AssignmentDetails";
 import SubmissionDetails from "./Components/SubmissionDetails";
@@ -20,6 +21,7 @@ const MainSection = () => {
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [totalGrade, setTotalGrade] = useState(0);
   const { sgid, type } = useParams();
+  const { t } = useTranslation("admModule"); // Adding the translation function with namespace 'speedgrade'
   const dispatch = useDispatch();
 
   const { loading, error, assignmentDetails, quizDetails, students } =
@@ -68,9 +70,7 @@ const MainSection = () => {
       {!selectedStudent ? (
         <div className="flex flex-col items-center justify-center text-gray-400 h-full w-full">
           <FaUserCircle className="text-9xl mb-4" /> {/* Large user icon */}
-          <p className="text-xl font-semibold">
-            Select a student to view details
-          </p>
+          <p className="text-xl font-semibold">{t("Select a student to view details")}</p>
         </div>
       ) : (
         <>
@@ -100,7 +100,7 @@ const MainSection = () => {
             ) : (
               <div className="flex-grow flex flex-col items-center justify-center text-gray-400">
                 <FaUserCircle className="text-9xl mb-4" /> {/* Big icon */}
-                <p className="text-lg font-semibold">No submission found</p>
+                <p className="text-lg font-semibold">{t("No submission found")}</p>
               </div>
             )}
           </div>

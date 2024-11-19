@@ -1,7 +1,6 @@
 import React, { useState } from "react";
-import { MdEdit, MdCheckCircle, MdCancel } from "react-icons/md";
-import { AiOutlineSave } from "react-icons/ai";
-import { MdDoneOutline } from "react-icons/md";
+import { MdEdit, MdCheckCircle, MdCancel, MdDoneOutline } from "react-icons/md";
+import { useTranslation } from "react-i18next";
 
 const SpeedGradeQuizAnswerCard = ({
   question,
@@ -11,6 +10,7 @@ const SpeedGradeQuizAnswerCard = ({
 }) => {
   const [textGrade, setTextGrade] = useState("");
   const [isEditing, setIsEditing] = useState(true); // Start in edit mode
+  const { t } = useTranslation("admModule"); // Adding the translation function with namespace 'speedGradeQuizAnswerCard'
 
   const correctAnswer = question.correctAnswer;
   const isCorrect = selectedOption === correctAnswer;
@@ -46,11 +46,11 @@ const SpeedGradeQuizAnswerCard = ({
         <div className="absolute top-1 right-0">
           {isCorrect ? (
             <span className="px-2 py-2 text-xs shadow-sm font-semibold text-green-800 bg-green-200 rounded-l-full">
-              Correct Answer
+              {t("Correct Answer")}
             </span>
           ) : (
             <span className="px-2 py-2 text-xs font-semibold shadow-sm text-red-800 bg-red-200 rounded-l-full">
-              Wrong Answer
+              {t("Wrong Answer")}
             </span>
           )}
         </div>
@@ -85,7 +85,7 @@ const SpeedGradeQuizAnswerCard = ({
       )}
 
       <div className="text-sm font-semibold py-2 ps-2 bg-gray-100 text-gray-500 mb-2">
-        Question Point:{" "}
+        {t("Question Point")}:{" "}
         <span className="text-black">{question.questionPoint}</span>
       </div>
 
@@ -101,7 +101,7 @@ const SpeedGradeQuizAnswerCard = ({
             <textarea
               rows="4"
               className="w-full p-2 border rounded flex-grow bg-gray-50"
-              value={selectedOption || "No answer provided"}
+              value={selectedOption || t("No answer provided")}
               readOnly
             />
           ) : (

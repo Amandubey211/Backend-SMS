@@ -4,6 +4,7 @@ import { useParams, NavLink } from "react-router-dom";
 import { MdKeyboardArrowDown } from "react-icons/md";
 import { GoDiscussionClosed } from "react-icons/go";
 import { RiAddFill } from "react-icons/ri";
+import { useTranslation } from "react-i18next";
 import DiscussionCard from "./Components/DiscussionCard";
 import PinnedDiscussions from "./Components/PinnedDiscussions";
 import DiscussionHeader from "./Components/DiscussionHeader";
@@ -13,6 +14,7 @@ import SubjectSideBar from "../../Component/SubjectSideBar";
 import { fetchClassDiscussions } from "../../../../../Store/Slices/Admin/Class/Discussion/discussionThunks";
 
 const MainSection = () => {
+  const { t } = useTranslation('admModule');
   const dispatch = useDispatch();
   const [searchQuery, setSearchQuery] = useState("");
   const [filter, setFilter] = useState("all");
@@ -62,7 +64,7 @@ const MainSection = () => {
         ) : error ? (
           <div className="flex justify-center">
             <p role="alert" className="text-red-400 my-4">
-              {error}
+              {t(error)}
             </p>
           </div>
         ) : (
@@ -76,7 +78,7 @@ const MainSection = () => {
             <div className="p-3">
               <div className="flex items-center gap-2 ml-3 mb-2">
                 <GoDiscussionClosed className="text-xl text-green-600" />
-                <h2 className="text-xl">All Discussions</h2>
+                <h2 className="text-xl">{t("All Discussions")}</h2>
                 <MdKeyboardArrowDown className="text-gray-500 h-8 w-8" />
               </div>
               {filteredDiscussions.length > 0 ? (
@@ -92,7 +94,7 @@ const MainSection = () => {
                   ))}
                 </div>
               ) : (
-                <NoDataFound title="Discussions" />
+                <NoDataFound title={t("Discussions")} />
               )}
             </div>
           </>

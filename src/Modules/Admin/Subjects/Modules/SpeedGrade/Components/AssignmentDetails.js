@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import SpeedGradeQuizAnswerCard from "./SpeedGradeQuizAnswerCard";
+import { useTranslation } from "react-i18next";
 
 const AssignmentDetails = ({ student, details, type, onTotalGradeUpdate }) => {
   const [totalTextGrade, setTotalTextGrade] = useState(0);
+  const { t } = useTranslation("admModule"); // Adding the translation function with namespace 'assignmentDetails'
 
   useEffect(() => {
     if (!student || !details) return;
@@ -47,7 +49,7 @@ const AssignmentDetails = ({ student, details, type, onTotalGradeUpdate }) => {
       <div className="flex justify-between items-center mb-4 border-b pb-2">
         <div>
           <h2 className="text-xl font-medium mb-1 capitalize flex items-center">
-            {name || "Untitled"}
+            {name || t("Untitled")}
             {quizType && (
               <span
                 className={`ml-2 px-2 py-1 rounded-lg text-xs font-semibold ${
@@ -56,17 +58,19 @@ const AssignmentDetails = ({ student, details, type, onTotalGradeUpdate }) => {
                     : "bg-green-100 text-green-800"
                 }`}
               >
-                {quizType === "Practice" ? "Practice Type" : "Graded Type"}
+                {quizType === "Practice"
+                  ? t("Practice Type")
+                  : t("Graded Type")}
               </span>
             )}
           </h2>
           <p className="text-gray-500">
-            Submission Date:{" "}
-            {dueDate ? new Date(dueDate).toLocaleDateString() : "N/A"}
+            {t("Submission Date")}:{" "}
+            {dueDate ? new Date(dueDate).toLocaleDateString() : t("N/A")}
           </p>
         </div>
         <div className="text-right">
-          <p className="text-gray-500 mb-1">Points</p>
+          <p className="text-gray-500 mb-1">{t("Points")}</p>
           <p className="text-green-500 font-bold text-md">
             {type === "Quiz" ? score || 0 : grade || 0}/
             {type === "Quiz" ? totalPoints : points}
@@ -96,7 +100,7 @@ const AssignmentDetails = ({ student, details, type, onTotalGradeUpdate }) => {
               );
             })
           ) : (
-            <p className="text-gray-500">No questions available.</p>
+            <p className="text-gray-500">{t("No questions available")}</p>
           )}
         </div>
       )}
