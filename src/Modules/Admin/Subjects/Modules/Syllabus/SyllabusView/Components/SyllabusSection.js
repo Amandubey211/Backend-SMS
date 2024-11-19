@@ -5,12 +5,12 @@ const SyllabusSection = ({ title, content }) => {
   const { t } = useTranslation('admModule');
 
   return (
-    <div className="p-3 bg-white mb-6">
+    <div className="p-5 mb-6 mt-5 border border-gray-300 rounded-lg">
       {title && content ? (
         <>
-          <h2 className="text-xl font-bold mb-4">{title}</h2>
+          <h2 className="text-2xl font-semibold text-gray-800 mb-4">{title}</h2>
           <div
-            className="text-gray-700 mb-6"
+            className="text-gray-700 leading-8 text-justify"
             dangerouslySetInnerHTML={{ __html: content }}
           />
         </>
