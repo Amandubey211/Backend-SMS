@@ -179,7 +179,7 @@ const SideMenubar = () => {
         </ul>
       </div>
       <div
-        className={`fixed bottom-1 h-[3rem] flex flex-row items-center justify-center border-t border-gray-300 ${isOpen ? "w-[14.7%]" : "w-[7%]"
+        className={`fixed bottom-1 h-[3rem] flex flex-row items-center justify-center  border-gray-300 ${isOpen ? "w-[14.7%]" : "w-[7%]"
           }`}
         style={{
           transition: "width 0.3s ease",
@@ -198,12 +198,7 @@ const SideMenubar = () => {
         {isOpen && (
           <div className="flex-1 ml-3">
             <h2 className="font-semibold">
-              {userDetails?.fatherName?.charAt(0).toUpperCase() +
-                userDetails?.fatherName?.slice(1, 5).toLowerCase() ||
-                userDetails?.guardianName?.charAt(0).toUpperCase() +
-                userDetails?.guardianName?.slice(1, 5).toLowerCase() ||
-                "User"}
-              {userDetails?.fatherName?.length > 5 && ".."}
+            {userDetails?.fatherName?.charAt(0)?.toUpperCase() + userDetails?.fatherName?.split(' ')[1]?.charAt(0)?.toUpperCase() || "User"}
             </h2>
             <p className="text-gray-500 capitalize text-sm">{role}</p>
           </div>
