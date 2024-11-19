@@ -29,7 +29,7 @@ const AddRubricModal = ({
   setExistingRubricId,
   readonly = false,
 }) => {
-  const { t } = useTranslation('admModule');
+  const { t } = useTranslation("admModule");
   const [rubricName, setRubricName] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [dropdownOpen2, setDropdownOpen2] = useState(false);
@@ -267,7 +267,9 @@ const AddRubricModal = ({
           {/* Show only one select box based on selection */}
           {selectedQuizId === "" && (
             <div className="p-2 flex-1 relative" ref={dropdownRef}>
-              <label className="block text-gray-700 mb-1">{t("Assignment")}</label>
+              <label className="block text-gray-700 mb-1">
+                {t("Assignment")}
+              </label>
               <div
                 className="block w-full pl-3 pr-10 py-2 text-base border rounded-md cursor-pointer focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                 onClick={() => !readonly && setDropdownOpen(!dropdownOpen)}
@@ -279,7 +281,8 @@ const AddRubricModal = ({
                 <ul className="absolute left-0 right-0 mt-2 max-h-72 overflow-auto bg-white border rounded-md shadow-lg z-10 py-2">
                   {assignments.length === 0 ? (
                     <li className="flex items-center justify-center py-2 text-gray-500">
-                      <CiBoxList className="mr-2" /> {t("No assignments available")}
+                      <CiBoxList className="mr-2" />{" "}
+                      {t("No assignments available")}
                     </li>
                   ) : (
                     <>
