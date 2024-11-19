@@ -43,8 +43,10 @@ export const fetchFilteredQuizzesThunk = createAsyncThunk(
         ...(publish !== undefined && { publish }),
       };
 
+      const subjectId =
+        sid || getState().common.user.subjectInfo.selectedSubjectId;
       const response = await axios.get(
-        `${baseUrl}/admin/quizzes/${sid}?say=${say}`,
+        `${baseUrl}/admin/quizzes/${subjectId}?say=${say}`,
         {
           headers: { Authentication: token },
           params,
@@ -248,7 +250,11 @@ export const deleteQuizThunk = createAsyncThunk(
 
       if (response.data.success) {
         toast.success("Quiz deleted successfully");
-        dispatch(fetchFilteredQuizzesThunk({}));
+        dispatch(
+          fetchFilteredQuizzesThunk({
+            sid: getState().common.user.subjectInfo.selectedSubjectId,
+          })
+        );
         return quizId;
       } else {
         throw new Error(response.data.message || "Failed to delete quiz");
