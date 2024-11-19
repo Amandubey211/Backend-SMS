@@ -52,7 +52,7 @@ export const updateStudents = createAsyncThunk(
     try {
       const token = getToken(getState(), rejectWithValue, dispatch);
       const say = localStorage.getItem("say");
-      const response = await axios.put(`${baseUrl}/admin/update/StudentInfo`,data, {
+      const response = await axios.put(`${baseUrl}/admin/update/StudentInfo?say=${say}`,data, {
         headers: { Authentication: token },
       });
       toast.success(response.data?.message);
