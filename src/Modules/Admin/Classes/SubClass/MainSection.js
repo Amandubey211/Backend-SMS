@@ -71,9 +71,8 @@ const MainSection = () => {
       sections: classDetails?.sections?.length || 0,
       groups: classDetails?.groups?.length || 0,
     });
-    staticIconData[2].text = t("Students", {
-      count: classDetails?.studentsIds?.length || 0,
-    });
+    staticIconData[2].text = `${classDetails?.studentsIds?.length || 0} ${t("Students")}`;
+
   }
 
   const handleAddNewSubject = () => {
