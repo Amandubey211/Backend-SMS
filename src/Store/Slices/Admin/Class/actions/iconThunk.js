@@ -7,12 +7,12 @@ import toast from "react-hot-toast";
 // Fetch all icons
 export const fetchAllIcons = createAsyncThunk(
   "icons/fetchAllIcons",
-  async (_, { getState, rejectWithValue }) => {
+  async ({type}, { getState, rejectWithValue }) => {
     const { common } = getState();
     const token = common.auth.token;
 
     try {
-      const response = await axios.get(`${baseUrl}/icons/getAllIcons`, {
+      const response = await axios.get(`${baseUrl}/icons/getAllIcons?type=${type}`, {
         headers: { Authentication: `Bearer ${token}` },
       });
       return response.data.icons;

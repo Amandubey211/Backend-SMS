@@ -11,7 +11,7 @@ import {
   resetIconSelection,
 } from "../../../../Store/Slices/Admin/Class/reducer/iconSlice";
 
-const CreateEditIconModal = ({ onClose }) => {
+const CreateEditIconModal = ({ onClose,type }) => {
   const dispatch = useDispatch();
   const { selectedIcon, loading } = useSelector(
     (state) => state.admin.classIcons
@@ -57,7 +57,7 @@ const CreateEditIconModal = ({ onClose }) => {
 
     const formData = new FormData();
     formData.append("name", iconName);
-    formData.append("type", "Class");
+    formData.append("type", type?type:"Class");
     if (iconImage) formData.append("image", iconImage);
 
     try {

@@ -139,7 +139,7 @@ const MainSection = () => {
                     }}
                     Class={cid}
                     subjectId={subject._id}
-                    backgroundColor={getColor(index)}
+                    backgroundColor={subject.subjectColor ?subject.subjectColor:getColor(index)}
                     onEdit={handleEditSubject}
                   />
                 ))
