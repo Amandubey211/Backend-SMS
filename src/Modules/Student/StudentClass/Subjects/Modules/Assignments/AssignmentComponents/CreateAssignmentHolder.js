@@ -1,3 +1,4 @@
+// CreateAssignmentHolder.jsx
 import React, { useState, useEffect } from "react";
 import EditorComponent from "./Editor";
 import MediaUpload from "./MediaUpload"; // Assuming you have this component
@@ -5,6 +6,7 @@ import TabButton from "./TabButton"; // Assuming you have this component
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux"; // If you're using Redux
 import DOMPurify from "dompurify";
+
 const CreateAssignmentHolder = ({ onSubmit }) => {
   // Fetch assignment data from Redux store or props
   const { assignmentData } = useSelector(
@@ -66,12 +68,14 @@ const CreateAssignmentHolder = ({ onSubmit }) => {
 
       // Wrap non-blank text in non-editable spans
       if (sanitizedPart.trim() !== "") {
-        processed += `<span class="non-editable">${sanitizedPart}</span>`;
+        processed += `<span class="non-editable" aria-hidden="true">${sanitizedPart}</span>`;
       }
 
       // After each part except the last, add an editable blank
       if (index < parts.length - 1) {
-        processed += `<span class="editable-blank" data-blank="true" data-id="blank-${counter}">____</span>`;
+        processed += `<span class="editable-blank" data-blank="true" data-id="blank-${counter}">
+                        <input type="text" class="blank-input" placeholder="Fill in..." aria-label="Fill in the blank" />
+                      </span>`;
         counter += 1;
       }
     });
@@ -83,11 +87,11 @@ const CreateAssignmentHolder = ({ onSubmit }) => {
   const extractAnswers = (content) => {
     const parser = new DOMParser();
     const doc = parser.parseFromString(content, "text/html");
-    const blanks = doc.querySelectorAll(".editable-blank");
+    const inputs = doc.querySelectorAll(".blank-input");
     const answers = [];
 
-    blanks.forEach((blank) => {
-      answers.push(blank.textContent.trim());
+    inputs.forEach((input) => {
+      answers.push(input.value.trim());
     });
 
     return answers;
@@ -97,13 +101,10 @@ const CreateAssignmentHolder = ({ onSubmit }) => {
   const getFilledBlanks = (content) => {
     const parser = new DOMParser();
     const doc = parser.parseFromString(content, "text/html");
-    const blanks = doc.querySelectorAll(".editable-blank");
+    const inputs = doc.querySelectorAll(".blank-input");
 
-    for (let blank of blanks) {
-      if (
-        blank.textContent.trim() === "____" ||
-        blank.textContent.trim() === ""
-      ) {
+    for (let input of inputs) {
+      if (input.value.trim() === "") {
         return false;
       }
     }
@@ -112,9 +113,9 @@ const CreateAssignmentHolder = ({ onSubmit }) => {
   };
 
   return (
-    <div className="w-full  h-screen overflow-y-auto">
+    <div className="w-full h-screen overflow-y-auto">
       {/* Tabs for switching between Editor and Media Upload */}
-      <div className="flex gap-4 mb-2 " role="tablist">
+      <div className="flex gap-4 mb-2" role="tablist">
         <TabButton
           isActive={activeTab === "Editor"}
           onClick={() => setActiveTab("Editor")}

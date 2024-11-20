@@ -1,9 +1,19 @@
-import React, { useRef, memo, useEffect, useState, useMemo } from "react";
+// EditorComponent.jsx
+import React, {
+  useRef,
+  memo,
+  useEffect,
+  useState,
+  useMemo,
+  useCallback,
+} from "react";
 import JoditEditor from "jodit-react";
 import DOMPurify from "dompurify";
 import toast, { Toaster } from "react-hot-toast";
 import axios from "axios";
 import { ImSpinner3 } from "react-icons/im";
+import useThrottle from "../../../../../../../Utils/Hooks/useThrottle";
+
 const EditorComponent = ({
   editorContent,
   onEditorChange,
@@ -14,6 +24,15 @@ const EditorComponent = ({
   const editor = useRef(null);
   const [loading, setLoading] = useState(false);
   const [scrollPosition, setScrollPosition] = useState(0);
+
+  // Custom Throttled Toast Functions
+  const showDeleteError = useThrottle(() => {
+    toast.error("Cannot delete read-only content.");
+  }, 2000); // Throttle to once every 2 seconds
+
+  const showEditError = useThrottle(() => {
+    toast.error("Cannot edit read-only content.");
+  }, 2000); // Throttle to once every 2 seconds
 
   // Function to create and show a custom progress bar below the toolbar
   const showProgressBar = (editorInstance) => {
@@ -182,36 +201,6 @@ const EditorComponent = ({
     }
   };
 
-  // Trigger image upload
-  const triggerImageUpload = () => {
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = "image/*";
-    input.onchange = (e) => {
-      const file = e.target.files[0];
-      if (file) {
-        setLoading(true);
-        handleImageUpload(file);
-      }
-    };
-    input.click();
-  };
-
-  // Trigger PDF upload
-  const triggerFileUpload = () => {
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = "application/pdf";
-    input.onchange = (e) => {
-      const file = e.target.files[0];
-      if (file) {
-        setLoading(true);
-        handleFileUpload(file);
-      }
-    };
-    input.click();
-  };
-
   // Jodit Editor Configuration
   const config = useMemo(
     () => ({
@@ -265,26 +254,54 @@ const EditorComponent = ({
           editor.current = editorInstance;
 
           if (submissionType === "Online-textEntry") {
-            // Protect non-editable spans
-            const protectSpans =
-              editorInstance.container.querySelectorAll("span.non-editable");
+            const protectNonEditable = () => {
+              const nonEditableSpans =
+                editorInstance.container.querySelectorAll("span.non-editable");
+              nonEditableSpans.forEach((span) => {
+                span.setAttribute("contenteditable", "false");
+                span.style.userSelect = "none";
+                span.style.pointerEvents = "none";
+              });
+            };
 
-            protectSpans.forEach((span) => {
-              span.setAttribute("contenteditable", "false");
-              span.style.userSelect = "none";
-              span.style.pointerEvents = "none";
+            protectNonEditable();
+
+            // Re-apply protection after any content changes
+            editorInstance.events.on("afterChange", () => {
+              protectNonEditable();
             });
 
             // Prevent deletion of non-editable spans
             editorInstance.events.on("beforeDelete", (event) => {
               const selection = editorInstance.selection.current;
               if (selection) {
-                const selectedNode = selection.focusNode.parentNode;
+                const selectedNode = selection.range.startContainer.parentNode;
                 if (selectedNode.classList.contains("non-editable")) {
                   event.preventDefault();
-                  toast.error("Cannot delete read-only content.");
+                  showDeleteError(); // Use throttled toast
                 }
               }
+            });
+
+            // Prevent typing inside non-editable spans
+            editorInstance.events.on("keydown", (event) => {
+              const selection = editorInstance.selection;
+              if (selection && selection.range) {
+                const selectedNode = selection.range.startContainer.parentNode;
+                if (selectedNode.classList.contains("non-editable")) {
+                  event.preventDefault();
+                  showEditError(); // Use throttled toast
+                }
+              }
+            });
+
+            // Ensure input fields are focusable
+            const inputFields =
+              editorInstance.container.querySelectorAll(".blank-input");
+            inputFields.forEach((input) => {
+              input.addEventListener("keydown", (e) => {
+                e.stopPropagation(); // Prevent Jodit from handling input key events
+              });
             });
           }
         },
@@ -297,10 +314,16 @@ const EditorComponent = ({
           url: "https://api.cloudinary.com/v1_1/YOUR_CLOUD_NAME/image/upload",
         },
       },
-      // Protect custom <protected> tags when submissionType is "Online-textEntry"
-      protectedTags: submissionType === "Online-textEntry" ? ["protected"] : [],
+      protectedTags:
+        submissionType === "Online-textEntry" ? ["non-editable"] : [],
     }),
-    [isCreateQuestion, onEditorChange, submissionType]
+    [
+      isCreateQuestion,
+      onEditorChange,
+      submissionType,
+      showDeleteError,
+      showEditError,
+    ]
   );
 
   return (
@@ -336,36 +359,23 @@ const EditorComponent = ({
         </button>
       )}
 
-      {/* Optional: Buttons for image and PDF upload */}
-      {/* {submissionType === "Online-textEntry" && (
-        <div className="mt-4 flex gap-2">
-          <button
-            onClick={triggerImageUpload}
-            className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500"
-          >
-            Upload Image
-          </button>
-          <button
-            onClick={triggerFileUpload}
-            className="px-4 py-2 bg-purple-500 text-white rounded-md hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-500"
-          >
-            Upload PDF
-          </button>
-        </div>
-      )} */}
-
       <style jsx>{`
         .editable-blank {
-          border-bottom: 2px solid #c71585;
           display: inline-block;
-          min-width: 50px;
-          text-align: center;
-          padding: 2px 4px;
           margin: 0 2px;
         }
 
-        .editable-blank:focus {
+        .blank-input {
+          border: none;
+          border-bottom: 2px solid #c71585;
           outline: none;
+          background-color: transparent;
+          text-align: center;
+          min-width: 50px;
+          transition: border-color 0.3s, background-color 0.3s;
+        }
+
+        .blank-input:focus {
           border-color: #a50b5e;
           background-color: #fff0f5; /* Light pink background on focus */
         }
