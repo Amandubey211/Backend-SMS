@@ -283,7 +283,7 @@ const ExpenseRow = ({ item, index, handlePayClick, handleDelete, handleEditSideb
           {capitalizeFirstLetter(t(item.status))}
         </span>
       </td>
-      <td className="px-5 py-2 flex items-center justify-between relative">
+      <td className="px-5 py-2 flex items-center justify-between ">
         {item.status === "paid" ? (
           <span className="inline-flex items-center border border-transparent text-sm font-medium shadow-sm bg-green-200 text-green-800 py-1.5 px-3 rounded-md">
             {t('Completed')}
@@ -304,7 +304,7 @@ const ExpenseRow = ({ item, index, handlePayClick, handleDelete, handleEditSideb
           &#x22EE;
         </button>
         {openDropdown && (
-          <div ref={dropdownRef} className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+          <div ref={dropdownRef} className="absolute right-4 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
             <button
               onClick={() => {
                 handleEditSidebarOpen(item);
