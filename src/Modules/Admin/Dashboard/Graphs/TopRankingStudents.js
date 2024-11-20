@@ -136,7 +136,7 @@ const TopRankingStudents = () => {
                     </span>
                   </div>
                   <div
-                    className="rounded-sm w-[20%]"
+                    className="rounded-sm w-auto"
                     style={{
                       background: "linear-gradient(to right, #fce7f3, #e9d5ff)",
                     }}
