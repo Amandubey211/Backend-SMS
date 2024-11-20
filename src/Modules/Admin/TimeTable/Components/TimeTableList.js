@@ -122,11 +122,6 @@ const TimeTableList = React.memo(({ timetables, loading, onDelete }) => {
                 <FaChalkboardTeacher className="text-indigo-400 mr-2" />
                 <strong>{t("Type")}:</strong> {timetable.type}
               </p>
-              {/* <p className="text-sm text-gray-600 flex items-center">
-                <FaChalkboardTeacher className="text-indigo-400 mr-2" />
-                <strong>{t("Status")}:</strong>{" "}
-                <span className="text-green-600">{timetable.status}</span>
-              </p> */}
 
               {/* General Info */}
               <p className="text-sm text-gray-600 flex items-center mt-1">
