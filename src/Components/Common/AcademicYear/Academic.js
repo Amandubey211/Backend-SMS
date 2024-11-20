@@ -5,6 +5,7 @@ import useNavHeading from "../../../Hooks/CommonHooks/useNavHeading .js";
 import { useSelector } from "react-redux";
 import ParentDashLayout from "../../Parents/ParentDashLayout.js";
 import StudentDashLayout from "../../Student/StudentDashLayout.js";
+import DashLayout from "../../Admin/AdminDashLayout.js";
 
 const Academic = () => {
   const role = useSelector((store) => store.common.auth.role);
@@ -16,7 +17,9 @@ const Academic = () => {
         <MainSection />
       </ParentDashLayout>:role == "student"?<StudentDashLayout >
         <MainSection />
-      </StudentDashLayout>:null
+      </StudentDashLayout>:<DashLayout >
+        <MainSection />
+      </DashLayout>
       }
    
     </Layout>

@@ -55,7 +55,7 @@ const DashCard = ({
     },
     {
       label: t("Notices", { ns: "stdFinance" }),
-      value: notices?.length?.toString() || "0",
+      value: cardsData?.notices || "0",
       bgColor: "bg-teal-100",
       textColor: "text-teal-700",
       icon: <RiCalendarCheckLine />,
@@ -71,7 +71,7 @@ const DashCard = ({
 
   return (
     <div className="flex justify-around py-4 gap-1  w-full px-2"> {/* Adjusted padding */}
-      {cardData.map((item, index) => (
+      {cardData?.map((item, index) => (
         <div 
           key={index} 
           className={`p-4 px-6  flex-none w-[24%]  rounded-lg border ${item.bgColor} hover:shadow-lg transition-shadow duration-200`} // Adjusted padding, margin, and width

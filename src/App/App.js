@@ -329,7 +329,7 @@ function App() {
             "student",
             "teacher",
             "accountant",
-            "librarain",
+            "librarian",
             "staff",
           ]}
         />
@@ -381,7 +381,7 @@ function App() {
 
     {
       path: "/dashboard/academic",
-      element: <ProtectRoute Component={Academic} allowedRoles={["admin"]} />,
+      element: <ProtectRoute Component={Academic} allowedRoles={["admin", "teacher", "librarian", "accountant","staff"]} />,
       errorElement: <Error />,
     },
 
@@ -391,7 +391,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={Dash}
-          allowedRoles={["admin", "teacher", "librarian", "accountant"]}
+          allowedRoles={["admin", "teacher", "librarian", "accountant","staff"]}
         />
       ),
       errorElement: <Error />,
@@ -741,7 +741,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={EventSchool}
-          allowedRoles={["admin", "teacher", "librarian", "peon", "accountant"]}
+          allowedRoles={["admin", "teacher", "librarian", "peon", "accountant","staff"]}
         />
       ),
       errorElement: <Error />,
@@ -751,7 +751,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={AdminNotice}
-          allowedRoles={["admin", "teacher", "librarian", "peon", "accountant"]}
+          allowedRoles={["admin", "teacher", "librarian", "peon", "accountant","staff"]}
         />
       ),
       errorElement: <Error />,
@@ -809,7 +809,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={StudentParentProfile}
-          allowedRoles={["admin", "teacher", "accountant", "librarian"]}
+          allowedRoles={["admin", "teacher", "accountant", "librarian","staff"]}
         />
       ),
       errorElement: <Error />,

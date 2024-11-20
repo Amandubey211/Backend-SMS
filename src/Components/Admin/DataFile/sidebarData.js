@@ -26,7 +26,7 @@ const sidebarData = [
     title: "Dashboard",
     icon: <TbDashboard />,
     path: `/dashboard`,
-    roles: ["admin", "teacher", "librarian", "accountant", "peon"],
+    roles: ["admin", "teacher", "librarian", "accountant", "staff"],
   },
   {
     title: "Classes",
@@ -43,26 +43,26 @@ const sidebarData = [
   {
     title: "Users",
     icon: <LuUser />,
-    roles: ["admin", "teacher", "accountant", "librarian"],
+    roles: ["admin", "teacher", "accountant", "librarian","staff"],
     items: [
       {
         title: "Student",
         icon: <FaUserGraduate />,
         path: "/users/students",
-        roles: ["admin", "teacher", "accountant", "librarian"],
+        roles: ["admin", "teacher", "accountant", "librarian","staff"],
       },
       {
         title: "Parent",
         icon: <RiParentFill />,
         path: "/users/parents",
-        roles: ["admin", "teacher", "accountant", "librarian"],
+        roles: ["admin", "teacher", "accountant", "librarian","staff"],
       },
       // Other user roles for admin only
       {
         title: "Teacher",
         icon: <FaChalkboardTeacher />,
         path: "/users/teachers",
-        roles: ["admin", "accountant", "librarian"],
+        roles: ["admin", "accountant", "librarian","staff"],
       },
       {
         title: "Accountant",
@@ -80,7 +80,7 @@ const sidebarData = [
         title: "Staff",
         icon: <GrUserWorker />,
         path: "/users/staffs",
-        roles: ["admin", "teacher", "accountant", "librarian"],
+        roles: ["admin", "teacher", "accountant", "librarian","staff"],
       },
     ],
   },
@@ -112,19 +112,19 @@ const sidebarData = [
   {
     title: "NoticeBoard",
     icon: <TbNotebook />,
-    roles: ["admin", "teacher", "librarian", "accountant"],
+    roles: ["admin", "teacher", "librarian", "accountant","staff"],
     items: [
       {
         title: "Announcements",
         icon: <FaClipboardList />,
         path: "/noticeboard/notice",
-        roles: ["admin", "teacher", "librarian", "accountant"],
+        roles: ["admin", "teacher", "librarian", "accountant","staff"],
       },
       {
         title: "Events",
         icon: <FaBook />,
         path: "/noticeboard/events",
-        roles: ["admin", "teacher", "librarian", "accountant"],
+        roles: ["admin", "teacher", "librarian", "accountant","staff"],
       },
     ],
   },

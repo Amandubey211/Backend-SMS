@@ -8,10 +8,10 @@ import { FiLogOut } from "react-icons/fi";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { useDispatch, useSelector } from "react-redux";
 import smallLogo from "../../Assets/SideBarAsset/smallLogo.png";
-import { toggleSidebar } from "../../Redux/Slices/Common/SidebarSlice.js";
 import useParentLogout from '../../Hooks/AuthHooks/Parent/useParentLogout.js';
 import LogoutConfirmationModal from "../Common/LogoutConfirmationModal.js";
 import profileIcon from "../../Assets/DashboardAssets/profileIcon.png";
+import { toggleSidebar } from "../../Store/Slices/Common/User/reducers/userSlice.js";
 // import useGetUserDetail from "../../Hooks/AuthHooks/Staff/useGetUserDetail.js";
 
 // Updated function to handle more paths
@@ -208,7 +208,7 @@ const SideMenubar = () => {
         <button
           title={t("Logout")}
           onClick={handleLogout}
-          className="ml-3"
+          className="mr-3"
           aria-label={t("Logout")}
         >
           <FiLogOut

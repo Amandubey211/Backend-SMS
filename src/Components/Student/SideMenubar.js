@@ -217,7 +217,7 @@ const SideMenubar = () => {
           <button
             title="logout"
             onClick={handleLogout}
-            className="ml-3"
+            className="ml-10"
             aria-label="Logout"
           >
             <FiLogOut
