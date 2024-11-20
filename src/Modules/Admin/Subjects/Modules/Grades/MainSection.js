@@ -33,7 +33,7 @@ const MainSection = () => {
     dispatch(fetchSubjectGrades({classId:cid,subjectId:sid,filters}))
     dispatch(fetchModules({ cid, sid }));
     dispatch(fetchAllAssignment({subjectId:sid}))
-    dispatch(fetchFilteredQuizzesThunk({subjectId:sid}))
+    dispatch(fetchFilteredQuizzesThunk({sid}))
   }, [dispatch]);
 
   const handleSearchChange = (value) => {

@@ -23,8 +23,8 @@ const TimeTablePage = () => {
   const DashLayout = 
     role === "admin" ? AdminDashLayout :
     role === "student" ? StudentDashLayout :
-    ParentDashLayout; // Default to ParentDashLayout if role doesn't match
-
+    role === "teacher" ?  AdminDashLayout: null;
+    
   return (
     <Layout title="TimeTable | Student Diwan">
       <DashLayout>

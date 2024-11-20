@@ -13,6 +13,7 @@ import {
   getRubricByIdThunk,
 } from "../../../../../../Store/Slices/Admin/Class/Rubric/rubricThunks";
 import { useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 const AddRubricModal = ({
   isOpen,
@@ -28,6 +29,7 @@ const AddRubricModal = ({
   setExistingRubricId,
   readonly = false,
 }) => {
+  const { t } = useTranslation("admModule");
   const [rubricName, setRubricName] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [dropdownOpen2, setDropdownOpen2] = useState(false);
@@ -190,13 +192,13 @@ const AddRubricModal = ({
 
   const handleSubmit = async () => {
     if (!rubricName) {
-      toast.error("Rubric name is required."); // Show toast if rubric name is empty
+      toast.error(t("Rubric name is required.")); // Show toast if rubric name is empty
       return;
     }
 
     const targetId = selectedAssignmentId || selectedQuizId;
     if (!targetId) {
-      toast.error("Please select either an assignment or a quiz.");
+      toast.error(t("Please select either an assignment or a quiz."));
       return;
     }
 
@@ -237,7 +239,7 @@ const AddRubricModal = ({
       >
         <div className="flex justify-between items-center p-1">
           <h2 className="text-lg font-semibold">
-            {editMode ? "Update" : readonly ? "View" : "Add"} Rubric
+            {editMode ? t("Update") : readonly ? t("View") : t("Add")} Rubric
           </h2>
           <button
             onClick={onClose}
@@ -250,14 +252,14 @@ const AddRubricModal = ({
         <div className="flex items-center px-2">
           <div className="p-2 flex-1">
             <label className="block mb-2 text-sm text-gray-700">
-              Rubric Name
+              {t("Rubric Name")}
             </label>
             <input
               type="text"
               value={rubricName}
               onChange={(e) => setRubricName(e.target.value)}
               className="block w-full p-2 border rounded-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              placeholder="Type here"
+              placeholder={t("Type here")}
               disabled={readonly}
             />
           </div>
@@ -265,19 +267,22 @@ const AddRubricModal = ({
           {/* Show only one select box based on selection */}
           {selectedQuizId === "" && (
             <div className="p-2 flex-1 relative" ref={dropdownRef}>
-              <label className="block text-gray-700 mb-1">Assignment</label>
+              <label className="block text-gray-700 mb-1">
+                {t("Assignment")}
+              </label>
               <div
                 className="block w-full pl-3 pr-10 py-2 text-base border rounded-md cursor-pointer focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                 onClick={() => !readonly && setDropdownOpen(!dropdownOpen)}
               >
                 {assignments.find((a) => a._id === selectedAssignmentId)
-                  ?.name || "Select"}
+                  ?.name || t("Select")}
               </div>
               {dropdownOpen && (
                 <ul className="absolute left-0 right-0 mt-2 max-h-72 overflow-auto bg-white border rounded-md shadow-lg z-10 py-2">
                   {assignments.length === 0 ? (
                     <li className="flex items-center justify-center py-2 text-gray-500">
-                      <CiBoxList className="mr-2" /> No assignments available
+                      <CiBoxList className="mr-2" />{" "}
+                      {t("No assignments available")}
                     </li>
                   ) : (
                     <>
@@ -285,7 +290,7 @@ const AddRubricModal = ({
                         onClick={() => handleSelectAssignmentChange("reset")}
                         className="px-4 py-2 hover:bg-gray-100 transition duration-300 transform cursor-pointer hover:translate-x-[-8px] ps-6 text-red-600"
                       >
-                        Reset
+                        {t("Reset")}
                       </li>
                       {assignments.map((assignment) => (
                         <li
@@ -307,19 +312,19 @@ const AddRubricModal = ({
 
           {selectedAssignmentId === "" && (
             <div className="p-2 flex-1 relative" ref={dropdownRef2}>
-              <label className="block text-gray-700 mb-1">Quizzes</label>
+              <label className="block text-gray-700 mb-1">{t("Quizzes")}</label>
               <div
                 className="block w-full pl-3 pr-10 py-2 text-base border rounded-md cursor-pointer focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                 onClick={() => !readonly && setDropdownOpen2(!dropdownOpen2)}
               >
                 {quizzes.find((q) => q._id === selectedQuizId)?.name ||
-                  "Select"}
+                  t("Select")}
               </div>
               {dropdownOpen2 && (
                 <ul className="absolute left-0 right-0 mt-2 max-h-72 overflow-auto bg-white border rounded-md shadow-lg z-10 py-2">
                   {quizzes.length === 0 ? (
                     <li className="flex items-center justify-center py-4 text-gray-500">
-                      <CiBoxList className="mr-2" /> No quizzes available
+                      <CiBoxList className="mr-2" /> {t("No quizzes available")}
                     </li>
                   ) : (
                     <>
@@ -327,7 +332,7 @@ const AddRubricModal = ({
                         onClick={() => handleSelectQuizChange("reset")}
                         className="px-4 py-2 hover:bg-gray-100 transition duration-300 transform cursor-pointer hover:translate-x-[-8px] ps-6 text-red-600"
                       >
-                        Reset
+                        {t("Reset")}
                       </li>
                       {quizzes.map((quiz) => (
                         <li
@@ -357,7 +362,7 @@ const AddRubricModal = ({
                 key={idx}
                 className="w-2/8 bg-gradient-to-r from-red-500 to-purple-500 bg-clip-text text-transparent"
               >
-                {heading}
+                {t(heading)}
               </div>
             ))}
           </div>
@@ -369,7 +374,7 @@ const AddRubricModal = ({
             <div className="flex flex-col items-center justify-center h-full text-center">
               <CiBoxList className="text-6xl text-gray-300" />
               <p className="mt-4 text-sm text-gray-600">
-                No criteria added yet
+                {t("No criteria added yet")}
               </p>
             </div>
           ) : (
@@ -399,14 +404,14 @@ const AddRubricModal = ({
             >
               <HiOutlinePlus className="text-red-600 text-2xl" />
               <span className="bg-gradient-to-r from-red-500 to-purple-500 bg-clip-text text-transparent">
-                Add New Criteria
+                {t("Add New Criteria")}
               </span>
             </button>
           )}
           <div className="text-transparent text-xl font-bold bg-clip-text bg-gradient-to-r from-pink-500 to-purple-500">
             {selectedAssignmentId
-              ? `Total Assignment Points: ${totalPoints}`
-              : `Total Quiz Points: ${totalPoints}`}
+              ? t("Total Assignment Points: ") + totalPoints
+              : t("Total Quiz Points: ") + totalPoints}
           </div>
         </div>
 
@@ -416,13 +421,13 @@ const AddRubricModal = ({
               onClick={onClose}
               className="text-gray-600 bg-gray-100 hover:bg-gray-200 p-2 px-4 rounded-md"
             >
-              Cancel
+              {t("Cancel")}
             </button>
             <button
               onClick={handleSubmit}
               className="flex items-center gap-2 font-semibold p-2 px-4 rounded-md bg-gradient-to-r from-pink-100 to-purple-100 hover:shadow-md transition-shadow duration-300"
             >
-              Save Rubric
+              {t("Save Rubric")}
             </button>
           </div>
         )}

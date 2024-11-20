@@ -8,13 +8,14 @@ import { fetchStudentsByClassAndSection } from "../../../../Store/Slices/Admin/C
 import DeleteConfirmatiomModal from "../../../../Components/Common/DeleteConfirmationModal";
 import toast from "react-hot-toast";
 
-const EditStudent = ({ studentId,  handleUpdateSidebarClose}) => {
+const EditStudent = ({ studentId,  handleUpdateSidebarClose,onFilterChange}) => {
+  
   const { classes } = useSelector((store) => store?.admin?.class);
   const { cid } = useParams();
   const { sectionsList, loading } = useSelector((store) => store?.admin?.group_section);
-  const [selectClass, setSelectClass] = useState();
+  const [selectClass, setSelectClass] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectSection, setSelectSection] = useState();
+  const [selectSection, setSelectSection] = useState(null);
 
   const dispatch = useDispatch();
 
@@ -33,14 +34,21 @@ const EditStudent = ({ studentId,  handleUpdateSidebarClose}) => {
     if(selectClass){
     await dispatch(editStudents({ id: studentId, data: { classId: selectClass, sectionId: selectSection } }));
     handleUpdateSidebarClose();
+    onFilterChange('classId', '');
     setIsModalOpen(false);}else{
       toast.error('Please select a class')
     }
   };
 
-  useEffect(() => {
+  useEffect(() => { 
+    setSelectClass(null);
+    setSelectSection(null);
+    setSelectClass(null);
+    setSelectSection(null);
     dispatch(fetchAllClasses());
-  }, [dispatch]);
+ 
+  }, [dispatch,studentId]);
+
 
   return (
     <div>
@@ -59,7 +67,7 @@ const EditStudent = ({ studentId,  handleUpdateSidebarClose}) => {
           <select
             id="class"
             required
-            value={selectClass}
+            value={selectClass || ''}
             onChange={handleClassChange}
             className="mt-1 block w-full pl-3 pr-10 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
           >
@@ -81,7 +89,7 @@ const EditStudent = ({ studentId,  handleUpdateSidebarClose}) => {
           <select
             id="section"
             disabled={loading}
-            value={selectSection}
+            value={selectSection || ''}
             onChange={handleSectionChange}
             className="mt-1 block w-full pl-3 pr-10 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
           >

@@ -3,6 +3,7 @@ import { useNavigate, useParams, NavLink } from "react-router-dom";
 import { AiOutlineFileAdd } from "react-icons/ai";
 import { RiAddFill } from "react-icons/ri";
 import { useDispatch, useSelector } from "react-redux";
+import { useTranslation } from "react-i18next";
 import SubjectSideBar from "../../../Component/SubjectSideBar";
 import SyllabusHeader from "./Components/SyllabusHeader";
 import SyllabusSection from "./Components/SyllabusSection";
@@ -15,6 +16,7 @@ import NoDataFound from "../../../../../../Components/Common/NoDataFound";
 
 const MainSection = () => {
   const dispatch = useDispatch();
+  const { t } = useTranslation('admModule');
   const { cid, sid } = useParams();
   const navigate = useNavigate();
 
@@ -43,7 +45,7 @@ const MainSection = () => {
     }
 
     if (error) {
-      return <NoDataFound title="Syllabus" />;
+      return <NoDataFound title={t("Syllabus")} />;
     }
 
     if (syllabi && syllabi.length > 0) {
@@ -65,7 +67,7 @@ const MainSection = () => {
     return (
       <div className="flex flex-col items-center justify-center h-full">
         <AiOutlineFileAdd size={64} className="text-gray-500" />
-        <p className="text-gray-500 mt-4">No syllabus has been created yet.</p>
+        <p className="text-gray-500 mt-4">{t("No syllabus has been created yet.")}</p>
       </div>
     );
   };

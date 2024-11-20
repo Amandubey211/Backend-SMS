@@ -3,9 +3,12 @@ import toast from 'react-hot-toast';
 import { IoIosArrowBack } from 'react-icons/io';
 import { useNavigate } from 'react-router-dom';
 import AddRubricModal from '../Modules/Rubric/Components/AddRubricModal';
-
+import Sidebar from '../Components/Sidebar';
+import AddNewCriteriaForm from '../Components/AddNewCriteriaForm';
+import { useTranslation } from 'react-i18next';
 
 const CreateModalHeader = ({ onSave }) => {
+  const { t } = useTranslation('admModule');
   const navigate = useNavigate();
   const [isModalOpen, setModalOpen] = useState(false);
   const [isSidebarOpen, setSidebarOpen] = useState(false); // Manage sidebar state
@@ -16,27 +19,31 @@ const CreateModalHeader = ({ onSave }) => {
         <IoIosArrowBack
           className="mr-2 text-gray-600 text-2xl cursor-pointer"
           onClick={() => navigate(-1)} // Navigate to the previous page
+          aria-label={t("Back")}
         />
-        <h1 className="text-lg font-semibold text-gray-800">Create New Assignment</h1>
+        <h1 className="text-lg font-semibold text-gray-800">{t("Create New Assignment")}</h1>
       </div>
       <div className="flex items-center space-x-2">
-        <button onClick={() => setModalOpen(true)} className="flex items-center px-4 py-2 border border-gray-300 rounded-md text-pink-500 hover:bg-gray-100 transition">
+        <button
+          onClick={() => setModalOpen(true)}
+          className="flex items-center px-4 py-2 border border-gray-300 rounded-md text-pink-500 hover:bg-gray-100 transition"
+        >
           <span className="mr-1">+</span>
-          <span>Add Rubric</span>
+          <span>{t("Add Rubric")}</span>
         </button>
         <button
           onClick={() => {
             onSave();
-            toast.success("Saved and Published", { position: "bottom-left" });
+            toast.success(t("Saved and Published"), { position: "bottom-left" });
           }}
           className="flex-grow rounded-md py-2 px-4 text-center bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200 transition"
         >
           <span className="bg-clip-text text-transparent bg-gradient-to-r from-rose-500 to-indigo-500">
-            Save & Publish
+            {t("Save & Publish")}
           </span>
         </button>
         <button className="px-4 py-2 text-white font-semibold rounded-md bg-gradient-to-r from-purple-500 to-red-500 hover:from-purple-600 hover:to-red-600 transition">
-          Save
+          {t("Save")}
         </button>
         <AddRubricModal
           isOpen={isModalOpen}
@@ -46,7 +53,7 @@ const CreateModalHeader = ({ onSave }) => {
         <Sidebar
           isOpen={isSidebarOpen}
           onClose={() => setSidebarOpen(false)} // Pass down function to close sidebar
-          title="Add New Criteria"
+          title={t("Add New Criteria")}
         >
           <AddNewCriteriaForm />
         </Sidebar>

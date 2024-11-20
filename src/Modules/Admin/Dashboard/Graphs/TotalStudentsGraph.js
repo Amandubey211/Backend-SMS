@@ -54,10 +54,14 @@ const TotalStudentsGraphjs = () => {
 
   return (
     <div className="flex flex-col items-center justify-center h-full px-2 py-4">
-      <h2 className="text-2xl font-semibold mb-4 text-left w-full">
+      <div className="flex flex-row items-center w-full justify-between">
+        <div>
+        <h2 className="text-2xl font-semibold mb-4 text-left w-full">
         {t("Total Students")}
       </h2>
-      {role == "teacher" && (
+        </div>
+        <div>
+        {role == "teacher" && (
               <div className="">
                 <select
                   id="classSelection"
@@ -73,6 +77,10 @@ const TotalStudentsGraphjs = () => {
                 </select>
               </div>
             )}
+        </div>
+      </div>
+   
+    
       {/* Conditionally render spinner, error, no data message, or the pie chart */}
       <div
         className="relative w-[300px] h-[300px] flex items-center justify-center"

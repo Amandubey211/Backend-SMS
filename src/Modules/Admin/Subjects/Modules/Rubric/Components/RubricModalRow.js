@@ -8,6 +8,7 @@ import RatingCard from "./RatingCard";
 import AddNewRatingForm from "./AddNewRatingForm";
 import EditRatingForm from "./EditRatingForm";
 import Sidebar from "../../../../../../Components/Common/Sidebar";
+import { useTranslation } from "react-i18next";
 
 const RubricModalRow = ({
   data,
@@ -17,6 +18,7 @@ const RubricModalRow = ({
   onEditCriteria,
   readonly,
 }) => {
+  const { t } = useTranslation('admModule');
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [isEditSidebarOpen, setEditSidebarOpen] = useState(false);
   const [ratings, setRatings] = useState(data?.ratings);
@@ -67,8 +69,8 @@ const RubricModalRow = ({
     <div className="flex flex-col border-t border-gray-200">
       <div className="flex justify-between flex-row">
         <div className="flex flex-col w-48 justify-around px-4 py-2">
-          <p className="font-medium text-gray-900">{data.title}</p>
-          <p className="text-sm text-gray-600">{data.description}</p>
+          <p className="font-medium text-gray-900">{t(data.title)}</p>
+          <p className="text-sm text-gray-600">{t(data.description)}</p>
           <div className="flex justify-between items-center mt-1">
             <div className="flex items-center gap-1">
               <input
@@ -77,7 +79,7 @@ const RubricModalRow = ({
                 checked={data.range}
                 readOnly
               />
-              <p className="text-sm text-gray-500">Range</p>
+              <p className="text-sm text-gray-500">{t("Range")}</p>
             </div>
             {!readonly && (
               <div className="flex gap-2">
@@ -113,12 +115,12 @@ const RubricModalRow = ({
               onClick={() => setSidebarOpen(true)}
             >
               <HiOutlinePlus />
-              <span className="text-gray-500 text-sm">Add Rating</span>
+              <span className="text-gray-500 text-sm">{t("Add Rating")}</span>
             </button>
           )}
         </div>
         <div className="flex flex-col justify-center items-center px-4 py-2">
-          <p className="font-medium text-gray-900">Total Points</p>
+          <p className="font-medium text-gray-900">{t("Total Points")}</p>
           <input
             type="number"
             value={totalPoints}
@@ -129,7 +131,7 @@ const RubricModalRow = ({
         {!readonly && (
           <>
             <Sidebar
-              title="Add New Rating"
+              title={t("Add New Rating")}
               isOpen={isSidebarOpen}
               onClose={() => setSidebarOpen(false)}
             >
@@ -137,7 +139,7 @@ const RubricModalRow = ({
             </Sidebar>
             {currentEditRating && (
               <Sidebar
-                title="Edit Rating"
+                title={t("Edit Rating")}
                 isOpen={isEditSidebarOpen}
                 onClose={() => setEditSidebarOpen(false)}
               >

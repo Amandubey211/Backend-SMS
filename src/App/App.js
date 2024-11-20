@@ -33,6 +33,9 @@ import TimeTablePage from "../Modules/Admin/TimeTable/TimeTablePage.js";
 import CreateTimeTable from "../Modules/Admin/TimeTable/Components/CreateTimeTable.js";
 import TableView from "../Modules/Admin/TimeTable/Components/TableView.js";
 import { updateTimetable } from "../Store/Slices/Admin/TimeTable/timetable.action.js";
+import PrivacyPolicy from "../Modules/LoginPages/Policys/PrivacyPolicy.jsx";
+import TermsAndConditions from "../Modules/LoginPages/Policys/TermsAndConditions.jsx";
+import CookiePolicy from "../Modules/LoginPages/Policys/CookiePolicy.jsx";
 // lazy loaded routes
 
 const Academic = lazy(() =>
@@ -317,7 +320,20 @@ function App() {
     { path: "/", element: <Home />, errorElement: <Error /> },
     {
       path: "/dashboard/select/academic",
-      element: <ProtectRoute Component={commonAcademic} allowedRoles={["admin","parent","student","teacher","accountant","librarain","staff"]} />,
+      element: (
+        <ProtectRoute
+          Component={commonAcademic}
+          allowedRoles={[
+            "admin",
+            "parent",
+            "student",
+            "teacher",
+            "accountant",
+            "librarian",
+            "staff",
+          ]}
+        />
+      ),
       errorElement: <Error />,
     },
     {
@@ -328,7 +344,22 @@ function App() {
     { path: "/parentlogin", element: <ParentLogin />, errorElement: <Error /> },
     { path: "/stafflogin", element: <StaffLogin />, errorElement: <Error /> },
     { path: "/signup", element: <StudentSignUp />, errorElement: <Error /> },
-    { path: "/verify_qid", element: <QIDLogin />, errorElement: <Error /> },
+    { path: "/signup", element: <StudentSignUp />, errorElement: <Error /> },
+    {
+      path: "/privacy-policy",
+      element: <PrivacyPolicy />,
+      errorElement: <Error />,
+    },
+    {
+      path: "/terms-and-conditions",
+      element: <TermsAndConditions />,
+      errorElement: <Error />,
+    },
+    {
+      path: "/cookie-policy",
+      element: <CookiePolicy />,
+      errorElement: <Error />,
+    },
 
     {
       path: "/reset_password/:token",
@@ -350,7 +381,7 @@ function App() {
 
     {
       path: "/dashboard/academic",
-      element: <ProtectRoute Component={Academic} allowedRoles={["admin"]} />,
+      element: <ProtectRoute Component={Academic} allowedRoles={["admin", "teacher", "librarian", "accountant","staff"]} />,
       errorElement: <Error />,
     },
 
@@ -360,7 +391,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={Dash}
-          allowedRoles={["admin", "teacher", "librarian", "accountant"]}
+          allowedRoles={["admin", "teacher", "librarian", "accountant","staff"]}
         />
       ),
       errorElement: <Error />,
@@ -710,7 +741,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={EventSchool}
-          allowedRoles={["admin", "teacher", "librarian", "peon", "accountant"]}
+          allowedRoles={["admin", "teacher", "librarian", "peon", "accountant","staff"]}
         />
       ),
       errorElement: <Error />,
@@ -720,7 +751,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={AdminNotice}
-          allowedRoles={["admin", "teacher", "librarian", "peon", "accountant"]}
+          allowedRoles={["admin", "teacher", "librarian", "peon", "accountant","staff"]}
         />
       ),
       errorElement: <Error />,
@@ -772,13 +803,13 @@ function App() {
       ),
       errorElement: <Error />,
     },
-    
+
     {
       path: "/users/parents",
       element: (
         <ProtectRoute
           Component={StudentParentProfile}
-          allowedRoles={["admin", "teacher", "accountant", "librarian"]}
+          allowedRoles={["admin", "teacher", "accountant", "librarian","staff"]}
         />
       ),
       errorElement: <Error />,

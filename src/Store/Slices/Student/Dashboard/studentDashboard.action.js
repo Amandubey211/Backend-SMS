@@ -11,7 +11,7 @@ const formatDashboardData = (dashboardData) => {
   return [
     {
       label: "Upcoming Exam",
-      value: dashboardData?.data?.upcomingExam,
+      value: dashboardData?.upcomingExam,
       bgColor: "bg-green-100",
       textColor: "text-black-500",
       icon: "📝",
@@ -19,7 +19,7 @@ const formatDashboardData = (dashboardData) => {
     },
     {
       label: "Due Fees",
-      value: dashboardData?.data?.dueFees,
+      value: dashboardData?.dueFees,
       bgColor: "bg-red-100",
       textColor: "text-black-500",
       icon: <CiMoneyBill />,
@@ -27,7 +27,7 @@ const formatDashboardData = (dashboardData) => {
     },
     {
       label: "Event",
-      value: dashboardData?.data?.events,
+      value: dashboardData?.events,
       bgColor: "bg-blue-100",
       textColor: "text-black-500",
       icon: "📅",

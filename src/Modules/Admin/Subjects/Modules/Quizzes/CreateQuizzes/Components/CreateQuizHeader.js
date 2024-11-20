@@ -50,42 +50,6 @@ const CreateQuizHeader = ({
     setSidebarOpen(true);
   };
 
-  // const handleSubmit = async (rubricData) => {
-  //   try {
-  //     if (existingRubricId) {
-  //       // Update rubric via thunk
-  //       const result = await dispatch(
-  //         updateQuizRubricThunk({ rubricId: existingRubricId, rubricData })
-  //       ).unwrap();
-
-  //       if (result.success) {
-  //         dispatch(fetchRubricsBySubjectId(sid));
-  //         setModalOpen(false);
-  //         setEditMode(false);
-  //         toast.success("Rubric updated successfully.");
-  //       } else {
-  //         toast.error(result.error || "Failed to update rubric.");
-  //       }
-  //     } else {
-  //       // Create rubric via thunk
-  //       const result = await dispatch(
-  //         createQuizRubricThunk(rubricData)
-  //       ).unwrap();
-
-  //       if (result.success) {
-  //         dispatch(fetchRubricsBySubjectId(sid));
-  //         toast.success("Rubric created successfully.");
-  //         setModalOpen(false);
-  //         setCriteriaList([]); // Clear criteria after creation
-  //         setExistingRubricId(result.data._id); // Ensure this is called
-  //       } else {
-  //         toast.error(result.error || "Failed to create rubric.");
-  //       }
-  //     }
-  //   } catch (error) {
-  //     toast.error("An error occurred while processing the rubric.");
-  //   }
-  // };
 
   return (
     <div className="flex items-center justify-between p-2 bg-white border-b border-gray-300 shadow-sm">
@@ -101,13 +65,7 @@ const CreateQuizHeader = ({
 
       {activeTab === "instructions" && (
         <div className="flex items-center space-x-2">
-          {/* <button
-  onClick={() => setModalOpen(true)}
-  className="flex items-center px-4 py-2 border border-gray-300 rounded-md text-pink-500 hover:bg-gray-100 transition"
->
-  {!isEditing && <span className="mr-1">+</span>}
-  <span>{isEditing ? "Edit Rubric" : "Add Rubric"}</span>
-</button> */}
+         
           <button
             onClick={() => onSave(true)}
             className="flex-grow rounded-md py-2 px-4 text-center bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200 transition"
@@ -122,19 +80,7 @@ const CreateQuizHeader = ({
           >
             Save
           </button>
-          {/* <AddRubricModal
-  type="quiz"
-  isOpen={isModalOpen}
-  onClose={() => setModalOpen(false)}
-  onSubmit={handleSubmit}
-  editMode={editMode}
-  onAddCriteria={handleAddCriteria}
-  onEditCriteria={handleEditCriteria}
-  setExistingRubricId={setExistingRubricId}
-  criteriaList={criteriaList} // Pass criteriaList state
-  setCriteriaList={setCriteriaList} // Pass setCriteriaList function
-  QuizId={quizId} // Pass the QuizId prop
-/> */}
+         
           <Sidebar
             isOpen={isSidebarOpen}
             onClose={() => setSidebarOpen(false)} // Pass down function to close sidebar

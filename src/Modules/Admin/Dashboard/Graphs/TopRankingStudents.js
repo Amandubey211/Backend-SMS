@@ -136,7 +136,7 @@ const TopRankingStudents = () => {
                     </span>
                   </div>
                   <div
-                    className="rounded-sm w-[30%]"
+                    className="rounded-sm w-auto"
                     style={{
                       background: "linear-gradient(to right, #fce7f3, #e9d5ff)",
                     }}
@@ -151,7 +151,7 @@ const TopRankingStudents = () => {
                       className="px-3"
                     >
                       {t("Score")}:{" "}
-                      {student?.score ? `${student.score} %` : t("N/A")}
+                      {student?.score ? `${student.score} %` : t("0")}
                     </span>
                   </div>
                   <div className="w-[30%]">

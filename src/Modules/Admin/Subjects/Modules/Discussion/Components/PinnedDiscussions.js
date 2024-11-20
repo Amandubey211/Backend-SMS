@@ -2,8 +2,10 @@ import React, { useState } from "react";
 import DiscussionCard from "./DiscussionCard";
 import { MdKeyboardArrowDown, MdKeyboardArrowUp } from "react-icons/md";
 import { TbPin } from "react-icons/tb";
+import { useTranslation } from "react-i18next";
 
 const PinnedDiscussions = ({ discussions, fetchClassDiscussions }) => {
+  const { t } = useTranslation('admModule');
   const [isVisible, setIsVisible] = useState(true);
 
   const toggleVisibility = () => {
@@ -18,7 +20,7 @@ const PinnedDiscussions = ({ discussions, fetchClassDiscussions }) => {
           onClick={toggleVisibility}
         >
           <TbPin className="text-green-500 text-xl" />
-          <span>Pinned Discussions</span>
+          <span>{t("Pinned Discussions")}</span>
           <button onClick={toggleVisibility}>
             {isVisible ? (
               <MdKeyboardArrowUp className="text-gray-500 h-8 w-8" />

@@ -43,8 +43,10 @@ export const fetchFilteredQuizzesThunk = createAsyncThunk(
         ...(publish !== undefined && { publish }),
       };
 
+      const subjectId =
+        sid || getState().common.user.subjectInfo.selectedSubjectId;
       const response = await axios.get(
-        `${baseUrl}/admin/quizzes/${sid}?say=${say}`,
+        `${baseUrl}/admin/quizzes/${subjectId}?say=${say}`,
         {
           headers: { Authentication: token },
           params,
@@ -90,16 +92,10 @@ export const addQuestionThunk = createAsyncThunk(
   "quiz/addQuestion",
   async ({ quizId, question }, { getState, rejectWithValue, dispatch }) => {
     try {
-      // Get the token for authentication
       const token = getToken(getState(), rejectWithValue, dispatch);
-
-      // Dynamically fetch the quiz ID either from params or Redux
       const resolvedQuizId = quizId || getState().admin.quizzes.quizzDetail._id;
-
-      // Fetch "say" value from local storage
       const say = localStorage.getItem("say");
 
-      // Perform the API call
       const response = await axios.put(
         `${baseUrl}/admin/add_question/quiz/${resolvedQuizId}?say=${say}`,
         question,
@@ -107,18 +103,18 @@ export const addQuestionThunk = createAsyncThunk(
       );
 
       if (response.data.success) {
-        toast.success("Question added");
+        console.log("Toast Triggered"); // Log here to confirm it’s called once
+        toast.success("Question added", {
+          id: "unique-toast-id",
+          position: "bottom-left",
+        });
 
-        // Dispatch an action to refresh the quiz details
         dispatch(fetchQuizByIdThunk(response.data.quiz._id));
-
-        // Return the updated quiz data
         return response.data.quiz;
       } else {
         throw new Error(response.data.message || "Failed to add question");
       }
     } catch (error) {
-      // Handle the error using the provided error handling logic
       return handleError(error, dispatch, rejectWithValue);
     }
   }
@@ -254,7 +250,11 @@ export const deleteQuizThunk = createAsyncThunk(
 
       if (response.data.success) {
         toast.success("Quiz deleted successfully");
-        dispatch(fetchFilteredQuizzesThunk({}));
+        dispatch(
+          fetchFilteredQuizzesThunk({
+            sid: getState().common.user.subjectInfo.selectedSubjectId,
+          })
+        );
         return quizId;
       } else {
         throw new Error(response.data.message || "Failed to delete quiz");

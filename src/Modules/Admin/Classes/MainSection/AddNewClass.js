@@ -24,7 +24,7 @@ const AddNewClass = ({ classData, isUpdate, onClose }) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(fetchAllIcons());
+    dispatch(fetchAllIcons({type:'Class'}));
 
     if (isUpdate && classData) {
       setNewClassName(classData.className);

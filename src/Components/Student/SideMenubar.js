@@ -57,7 +57,7 @@ const SideMenubar = () => {
 
   return (
     <nav
-      className={`fixed top-0 left-0 bottom-0 transition-all duration-300 p-1 px-3 z-30 border-r flex flex-col bg-white ${
+      className={`fixed top-0 left-0 bottom-0 transition-all duration-300 p-1 px-3 z-30 border-r  border-b flex flex-col bg-white ${
         isOpen ? "w-[15%]" : "w-[7%]"
       }`}
       aria-label="Sidebar"
@@ -193,7 +193,7 @@ const SideMenubar = () => {
       </div>
 
       <div
-        className={`fixed bottom-1  h-[3rem]  flex flex- row items-center justify-center border-t w-auto ${
+        className={`fixed bottom-1  h-[3rem]  flex flex- row items-center justify-center  w-auto ${
           isOpen ? "w-[14%]" : "w-[7%]"
         }  `}
       >
@@ -209,7 +209,7 @@ const SideMenubar = () => {
           {isOpen && (
             <div className="ml-4">
               <h2 className="text-sm font-semibold">
-                {userDetails?.fullName?.charAt(0).toUpperCase() + userDetails?.fullName?.slice(1,5).toLowerCase() || "User"}{userDetails?.fullName?.length > 5 && '..'}
+                {userDetails?.fullName?.charAt(0)?.toUpperCase() + userDetails?.fullName?.split(' ')[1]?.charAt(0)?.toUpperCase() || "User"}
               </h2>
               <p className="text-gray-500 capitalize">{role}</p>
             </div>
@@ -217,7 +217,7 @@ const SideMenubar = () => {
           <button
             title="logout"
             onClick={handleLogout}
-            className="ml-3"
+            className="ml-10"
             aria-label="Logout"
           >
             <FiLogOut

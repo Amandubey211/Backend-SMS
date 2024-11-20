@@ -1,7 +1,9 @@
 import React from "react";
 import { NavLink, useLocation, useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 const SubjectSideBar = () => {
+  const { t } = useTranslation('admModule');
   const location = useLocation();
   const { cid, sid } = useParams();
 
@@ -40,7 +42,7 @@ const SubjectSideBar = () => {
                 : "text-gray-800 px-4 py-1"
             }
           >
-            {item.name}
+            {t(item.name)}
           </NavLink>
         );
       })}

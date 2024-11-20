@@ -65,15 +65,14 @@ const MainSection = () => {
 
   if (classDetails) {
     staticIconData[0].text = t("Instructor Assigned", {
-      count: classDetails?.teachersIds?.length || 0,
+      count: classDetails?.teachers?.length || 0,
     });
     staticIconData[1].text = t("Sections and Groups", {
       sections: classDetails?.sections?.length || 0,
       groups: classDetails?.groups?.length || 0,
     });
-    staticIconData[2].text = t("Students", {
-      count: classDetails?.studentsIds?.length || 0,
-    });
+    staticIconData[2].text = `${classDetails?.students?.length || 0} ${t("Students")}`;
+
   }
 
   const handleAddNewSubject = () => {
@@ -140,7 +139,7 @@ const MainSection = () => {
                     }}
                     Class={cid}
                     subjectId={subject._id}
-                    backgroundColor={getColor(index)}
+                    backgroundColor={subject.subjectColor ?subject.subjectColor:getColor(index)}
                     onEdit={handleEditSubject}
                   />
                 ))

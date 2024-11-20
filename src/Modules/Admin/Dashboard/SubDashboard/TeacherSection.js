@@ -26,9 +26,9 @@ const TeacherSection = () => {
       </div>
 
       {/* Second Row */}
-      <div className="flex flex-wrap justify-between items-start border-y h-[500px] relative max-w-screen">
+      <div className="flex flex-wrap justify-between items-start border-y h-[33.4375rem] relative max-w-screen">
         {/* Middle Vertical Divider */}
-        <div className="absolute left-2/5 transform translate-x-1/2 top-0 bottom-0 border-l border-gray-300"></div>
+        <div className="absolute left-2/5 transform translate-x-1/2 top-0 bottom-0 "></div>
         <div className=" w-[35%]  p-2 h-auto flex items-center justify-center">
           <div className="w-auto h-full">
             <TotalStudentsGraphjs />

@@ -25,16 +25,26 @@ const handleError = (error, dispatch, rejectWithValue) => {
 
 export const fetchTimetables = createAsyncThunk(
   "timetable/fetchTimetables",
-  async (filters = {}, { rejectWithValue, getState,dispatch }) => {
+  async (filters = {}, { rejectWithValue, getState, dispatch }) => {
     const { role } = getState().common.auth;
     const token = getToken(getState(), rejectWithValue, dispatch); // Fetch token from Redux state
     if (typeof token === "object") return token;
-    const say = localStorage.getItem("say")
+
+    const say = localStorage.getItem("say");
+    let updatedFilters = { ...filters };
+
+    // If role is student, include classId from localStorage
+    if (role === "student" || role === "teacher") {
+      const classId = localStorage.getItem("classId");
+      if (classId) {
+        updatedFilters = { ...updatedFilters, classId };
+      }
+    }
 
     try {
       const response = await axios.get(`${baseUrl}/admin/timetable?say=${say}`, {
         headers: { Authentication: token },
-        params: filters,
+        params: updatedFilters,
       });
 
       // Ensure you're accessing the correct data property
@@ -50,11 +60,11 @@ export const fetchTimetables = createAsyncThunk(
 // Create Timetable
 export const createTimetable = createAsyncThunk(
   "timetable/createTimetable",
-  async (data, { rejectWithValue, getState,dispatch }) => {
+  async (data, { rejectWithValue, getState, dispatch }) => {
     const { role } = getState().common.auth;
     const token = getToken(getState(), rejectWithValue, dispatch); // Fetch token from Redux state
-      if (typeof token === "object") return token;
-      const say = localStorage.getItem("say")
+    if (typeof token === "object") return token;
+    const say = localStorage.getItem("say")
 
     try {
       const response = await axios.post(`${baseUrl}/admin/create-timetable?say=${say}`, data, {
@@ -70,7 +80,7 @@ export const createTimetable = createAsyncThunk(
 // Update Timetable
 export const updateTimetable = createAsyncThunk(
   "timetable/updateTimetable",
-  async ({ id, data }, { rejectWithValue, getState,dispatch }) => {
+  async ({ id, data }, { rejectWithValue, getState, dispatch }) => {
     const { role } = getState().common.auth;
     const token = getToken(getState(), rejectWithValue, dispatch); // Fetch token from Redux state
     if (typeof token === "object") return token;
@@ -93,11 +103,11 @@ export const updateTimetable = createAsyncThunk(
 // Delete Timetable
 export const deleteTimetable = createAsyncThunk(
   "timetable/deleteTimetable",
-  async (id, { rejectWithValue, getState ,dispatch}) => {
+  async (id, { rejectWithValue, getState, dispatch }) => {
     const token = getToken(getState(), rejectWithValue, dispatch); // Fetch token from Redux state
     if (typeof token === "object") return token;
     const say = localStorage.getItem("say")
-  
+
     try {
       const response = await axios.delete(`${baseUrl}/admin/delete-timetable/${id}?say=${say}`, {
         headers: { Authentication: token },

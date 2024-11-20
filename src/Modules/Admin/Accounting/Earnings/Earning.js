@@ -131,7 +131,7 @@ const Earning = () => {
                     </th>
                   </tr>
                 </thead>
-                <tbody className="h-[300px]">
+                <tbody className="h-auto">
                   {" "}
                   {/* Setting a fixed height for the table body */}
                   {loading || error || earningData?.length === 0 ? (

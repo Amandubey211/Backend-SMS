@@ -3,8 +3,10 @@ import { FiRefreshCw, FiAlertCircle } from "react-icons/fi"; // Import the alert
 import { fetchModules } from "../../../../../../Store/Slices/Admin/Class/Module/moduleThunk";
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 const FilterCard = ({ filters, setFilters }) => {
+  const { t } = useTranslation("admModule");
   const [publishStatus, setPublishStatus] = useState(filters.publish || null);
   const [selectedModule, setSelectedModule] = useState(filters.moduleId || "");
   const [selectedChapter, setSelectedChapter] = useState(
@@ -78,16 +80,16 @@ const FilterCard = ({ filters, setFilters }) => {
       <button
         onClick={handleResetFilters}
         className="absolute top-2 right-2 text-gray-600 rounded-full p-2 focus:outline-none transform transition-transform duration-300 hover:rotate-180"
-        aria-label="Reset filters"
+        aria-label={t("Reset filters")}
       >
         <FiRefreshCw size={24} />
       </button>
 
-      <h2 className="text-lg font-semibold mb-4">Filter</h2>
+      <h2 className="text-lg font-semibold mb-4">{t("Filter")}</h2>
 
       <div className="mb-4">
         <fieldset>
-          <legend className="sr-only">Publish Status</legend>
+          <legend className="sr-only">{t("Publish Status")}</legend>
           <div className="flex items-center">
             <label className="inline-flex items-center">
               <input
@@ -98,9 +100,9 @@ const FilterCard = ({ filters, setFilters }) => {
                 onChange={() => togglePublishStatus("true")}
                 style={radioStyles(publishStatus === "true", "#10b981")} // Green color for publish
                 aria-checked={publishStatus === "true"}
-                aria-label="Publish"
+                aria-label={t("Publish")}
               />
-              <span className="ml-2 text-green-600">Publish</span>
+              <span className="ml-2 text-green-600">{t("Publish")}</span>
             </label>
             <label className="inline-flex items-center ml-6">
               <input
@@ -111,9 +113,9 @@ const FilterCard = ({ filters, setFilters }) => {
                 onChange={() => togglePublishStatus("false")}
                 style={radioStyles(publishStatus === "false", "#ef4444")} // Red color for unpublish
                 aria-checked={publishStatus === "false"}
-                aria-label="Unpublish"
+                aria-label={t("Unpublish")}
               />
-              <span className="ml-2 text-red-600">Unpublish</span>
+              <span className="ml-2 text-red-600">{t("Unpublish")}</span>
             </label>
           </div>
         </fieldset>
@@ -121,7 +123,7 @@ const FilterCard = ({ filters, setFilters }) => {
 
       <div className="mb-4">
         <label className="block text-gray-700" htmlFor="module-select">
-          Module
+          {t("Module")}
         </label>
         <select
           id="module-select"
@@ -129,7 +131,7 @@ const FilterCard = ({ filters, setFilters }) => {
           value={selectedModule}
           onChange={handleModuleChange}
         >
-          <option value="">Select</option>
+          <option value="">{t("Select")}</option>
           {moduleList.map((module) => (
             <option key={module._id} value={module._id}>
               {module.moduleName}
@@ -140,7 +142,7 @@ const FilterCard = ({ filters, setFilters }) => {
 
       <div className="mb-4">
         <label className="block text-gray-700" htmlFor="chapter-select">
-          Chapter
+          {t("Chapter")}
         </label>
         <select
           id="chapter-select"
@@ -152,11 +154,11 @@ const FilterCard = ({ filters, setFilters }) => {
           {!selectedModule ? (
             <option value="">
               <FiAlertCircle className="inline mr-1" />
-              Please select the module
+              {t("Please select the module")}
             </option>
           ) : (
             <>
-              <option value="">Select</option>
+              <option value="">{t("Select")}</option>
               {chapters.map((chapter) => (
                 <option key={chapter._id} value={chapter._id}>
                   {chapter.name}
@@ -170,9 +172,9 @@ const FilterCard = ({ filters, setFilters }) => {
       <button
         onClick={handleApplyFilters}
         className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-2 rounded-full focus:outline-none transform transition-transform duration-300 hover:scale-105"
-        aria-label="Apply filters"
+        aria-label={t("Apply filters")}
       >
-        Apply
+        {t("Apply")}
       </button>
     </div>
   );

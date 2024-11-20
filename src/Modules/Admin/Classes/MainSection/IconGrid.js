@@ -12,7 +12,9 @@ const IconGrid = ({ activeIconId, onEdit }) => {
   const dispatch = useDispatch();
 
   // Function to handle icon selection
-  const handleIconClick = (id) => dispatch(selectIcon(id));
+  const handleIconClick = (icon) => {
+   dispatch(selectIcon(icon))
+  };
 
   // Function to handle icon deletion
   const handleDeleteIcon = async (iconId) => {
@@ -27,15 +29,16 @@ const IconGrid = ({ activeIconId, onEdit }) => {
           className="relative rounded-lg transition-transform duration-300"
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
+          onClick={() => handleIconClick(icon)}
         >
           <button
             type="button"
             className={`h-16 w-16 rounded-lg overflow-hidden ${
-              activeIconId === icon._id || selectedIcon?._id === icon._id
+              activeIconId == icon._id || selectedIcon?._id == icon._id
                 ? "border-2 border-purple-500 scale-125 mx-2"
                 : "border border-gray-300"
             }`}
-            onClick={() => handleIconClick(icon._id)}
+            
             aria-label={`Select icon ${icon.name}`}
           >
             <img

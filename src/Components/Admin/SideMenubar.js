@@ -200,7 +200,7 @@ const SideMenubar = () => {
         </ul>
       </div>
 
-      <div className="p-2 border-t flex items-center justify-between">
+      <div className="p-2  flex items-center justify-between">
         <img
           src={userDetails?.profile || profileIcon}
           alt="Profile"
@@ -211,9 +211,7 @@ const SideMenubar = () => {
         {isOpen && (
           <div className="flex-1 ml-3">
             <h2 className="font-semibold">
-              {userDetails?.fullName?.charAt(0).toUpperCase() +
-                userDetails?.fullName?.slice(1, 5).toLowerCase()}
-              {userDetails?.fullName?.length > 5 && ".."}
+            {userDetails?.fullName?.charAt(0)?.toUpperCase() + userDetails?.fullName?.split(' ')[1]?.charAt(0)?.toUpperCase() || "User"}
             </h2>
             <p className="text-gray-500 capitalize text-sm">{role}</p>
           </div>
