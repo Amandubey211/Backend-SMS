@@ -28,7 +28,7 @@ const handleError = (error, dispatch, rejectWithValue) => {
   return rejectWithValue(err.message);
 };
 
-// Fetch All Students
+
 export const fetchAllStudents = createAsyncThunk(
   "user/allStudents",
   async (filter, { rejectWithValue, getState, dispatch }) => {
@@ -75,7 +75,6 @@ export const editStudents = createAsyncThunk(
       if(response.data.success){
         toast.success('Student Move successfully');
       }
-      dispatch(fetchAllStudents())
       return response.data;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
