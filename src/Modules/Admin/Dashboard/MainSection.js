@@ -38,10 +38,12 @@ const MainSection = () => {
   useEffect(() => {
     dispatch(fetchAllClasses());
   }, [dispatch]);
+
    var { role } = useSelector((state) => ({
     role: state.common.auth.role,
    }));
  
+
   const { t } = useTranslation();
 
   useEffect(() => {
