@@ -95,7 +95,6 @@ const SubjectCard = ({
           </span>
         </div>
       </NavLink>
-
       <div className="flex items-center mt-12">
         {data.teacherId?.profile ? (
           <img
@@ -112,7 +111,6 @@ const SubjectCard = ({
               ? `${data.teacherId.firstName} ${data.teacherId.lastName}`
               : t("No Instructor Assigned")}
           </p>
-
           <p className="text-white text-sm">
             {data?.teacherId?.role || t("Teacher")}
           </p>
@@ -120,7 +118,7 @@ const SubjectCard = ({
       </div>
 
       <img
-        src={SubjectIcon}
+        src={data?.subjectIcon ? data?.subjectIcon: SubjectIcon}
         alt={t("Subject icon")}
         className="absolute bottom-6 right-6 h-28 transition-transform duration-300 transform hover:scale-110"
       />

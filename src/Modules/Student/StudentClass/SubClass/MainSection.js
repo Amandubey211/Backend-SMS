@@ -154,7 +154,7 @@ const MainSection = () => {
                     data={subject}
                     classId={classData?.classId}
                     // onSubjectClick={handleSubjectClick}
-                    backgroundColor={getColor(index)}
+                    backgroundColor={subject?.subjectColor?subject?.subjectColor:getColor(index)}
                     currentProgress={subjectProgress?.find(
                       (el) => el?.subjectId === subject?.subjectId
                     )}

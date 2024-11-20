@@ -180,7 +180,7 @@ const SubjectCard = ({
             <p className="text-white text-sm">Teacher</p>
           </div>
         </div>
-        <img src={ClassCardBookImg} alt="icon" className="h-28" />
+        <img src={data.subjectIcon ? data.subjectIcon:ClassCardBookImg} alt="icon" className="h-28" />
       </div>
     </div>
   );

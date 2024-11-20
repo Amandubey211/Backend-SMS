@@ -1,44 +1,63 @@
 import React, { useEffect, useState, useMemo, useCallback } from "react";
-import classIcons from "../../Dashboard/DashboardData/ClassIconData";
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { ImSpinner3 } from "react-icons/im";
 import {
   createSubject,
-  updateSubject,
+ updateSubject,
 } from "../../../../Store/Slices/Admin/Class/Subject/subjectThunks";
 import { useTranslation } from "react-i18next";
+import { fetchAllIcons } from "../../../../Store/Slices/Admin/Class/actions/iconThunk";
+import IconGrid from "../MainSection/IconGrid";
+import CreateEditIconModal from "../MainSection/CreateEditIconModal";
+import { selectIcon } from "../../../../Store/Slices/Admin/Class/reducer/iconSlice";
 
 const dummyColors = [
-  "#34D399",
-  "#F472B6",
-  "#A78BFA",
-  "#60A5FA",
-  "#3B82F6",
-  "#EC4899",
-  "#EF4444",
-  "#10B981",
-  "#F59E0B",
-  "#6366F1",
+  "bg-yellow-300",
+  "bg-blue-300",
+  "bg-green-300",
+  "bg-red-300",
+  "bg-purple-300",
+  "bg-pink-300",
+  "bg-indigo-300",
+  "bg-orange-300",
+  "bg-teal-300",
+  "bg-cyan-300",
+  "bg-lime-300",
+  "bg-amber-300",
+  "bg-emerald-300",
+  "bg-fuchsia-300",
+  "bg-rose-300",
+  "bg-violet-300",
+  "bg-sky-300",
+  "bg-gray-300",
 ];
+
+
 
 const AddNewSubject = ({ onClose, subject }) => {
   const { t } = useTranslation("admClass"); // Use translation hook
   const [activeTab, setActiveTab] = useState("icon");
   const [selectedColor, setSelectedColor] = useState("");
-  const [activeIconId, setActiveIconId] = useState(null);
+  const [activeIcon, setActiveIcon] = useState(null);
   const [subjectTitle, setSubjectTitle] = useState("");
 
   const dispatch = useDispatch();
   const { cid } = useParams();
-  const loading = useSelector((state) => state.admin.subject.loading);
+  const {loading} = useSelector((state) => state.admin.subject);
+  const { icons, selectedIcon } = useSelector(
+    (state) => state.admin.classIcons
+  );
+  useEffect(()=>{
+    dispatch(fetchAllIcons({type:"Subject"}))
+  },[dispatch])
 
   useEffect(() => {
     if (subject) {
-      setSelectedColor(subject.color || "");
-      setActiveIconId(subject.icon || null);
-      setSubjectTitle(subject.name || "");
+      setSelectedColor(subject?.color || "");
+      setActiveIcon(subject?.icon || null);
+      setSubjectTitle(subject?.name || "");
     } else {
       resetForm();
     }
@@ -46,7 +65,7 @@ const AddNewSubject = ({ onClose, subject }) => {
 
   const resetForm = useCallback(() => {
     setSelectedColor("");
-    setActiveIconId(null);
+    setActiveIcon(null);
     setSubjectTitle("");
   }, []);
 
@@ -63,19 +82,18 @@ const AddNewSubject = ({ onClose, subject }) => {
     return (
       subjectTitle !== subject.name ||
       selectedColor !== subject.color ||
-      activeIconId !== subject.icon
+      activeIcon !== subject.icon
     );
   };
 
   const handleSave = async (publish = false) => {
     if (!validateInputs()) return;
-
     const subjectData = {
       name: subjectTitle,
       classId: cid,
       isPublished: publish,
-      icon: activeIconId,
-      color: selectedColor,
+      subjectIcon: selectedIcon?.imageLink,
+      subjectColor: selectedColor,
     };
 
     if (subject) {
@@ -86,33 +104,32 @@ const AddNewSubject = ({ onClose, subject }) => {
       }
       dispatch(updateSubject({ subjectId: subject._id, subjectData }));
     } else {
-      dispatch(createSubject(subjectData));
+      
+    dispatch(createSubject(subjectData));
     }
     onClose();
   };
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const openModal = (icon = null) => {
+    dispatch(selectIcon(icon));
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setActiveIcon(null);
+  }
+
   const iconGrid = useMemo(
     () =>
-      classIcons.map((data) => (
-        <button
-          key={data.id}
-          onClick={() => setActiveIconId(data.id)}
-          className={`h-16 w-16 p-1 rounded-lg border focus:outline-none transition duration-300 ease-in-out ${
-            activeIconId === data.id
-              ? "bg-gradient-to-r from-pink-600 to-purple-600 border-pink-500"
-              : "bg-transparent border-gray-300"
-          }`}
-          aria-pressed={activeIconId === data.id}
-          aria-label={t("Select icon", { icon: data.id })}
-        >
-          <img
-            src={data.icon}
-            alt={t("Icon ID", { id: data.id })}
-            className="w-full h-full"
-          />
-        </button>
-      )),
-    [activeIconId, t]
+      <div className="flex flex-col gap-2  flex-grow w-full ">
+      <IconGrid
+    icons={icons}
+    activeIcon={selectIcon?._id}
+    onEdit={openModal}
+  /></div>,
+    [selectedIcon, t]
   );
 
   const colorGrid = useMemo(
@@ -120,10 +137,9 @@ const AddNewSubject = ({ onClose, subject }) => {
       dummyColors.map((color, index) => (
         <button
           key={index}
-          style={{ backgroundColor: color }}
-          onClick={() => setSelectedColor(color)}
-          className={`w-12 h-12 rounded-full border-4 focus:outline-none transition duration-300 ease-in-out ${
-            selectedColor === color ? "border-indigo-500" : "border-transparent"
+          onClick={() => {console.log (color);setSelectedColor(color)}}
+          className={`w-12 h-12 rounded-full border-2 ${color} focus:outline-none transition duration-300 ease-in-out ${
+            selectedColor === color ? "border-black" : "border-transparent"
           }`}
           aria-pressed={selectedColor === color}
           aria-label={t("Select color", { color })}
@@ -177,7 +193,7 @@ const AddNewSubject = ({ onClose, subject }) => {
       </div>
 
       <div
-        className={`grid grid-cols-5 gap-4 ${
+        className={`flex flex-row p-2 w-full ${
           activeTab === "icon" ? "block" : "hidden"
         }`}
       >
@@ -215,6 +231,7 @@ const AddNewSubject = ({ onClose, subject }) => {
           )}
         </button>
       </div>
+      {isModalOpen && <CreateEditIconModal onClose={closeModal} type={'Subject'} />}
     </div>
   );
 };
