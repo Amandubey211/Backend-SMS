@@ -28,7 +28,7 @@ const AllStudents = () => {
   const [studentData, setStudentData] = useState(null);
   const handleSidebarClose = () => setIsUpdateSidebarOpen(false);
   const handleUpdateSidebarClose = () => setIsUpdateSidebarOpen(false);
-  const handleEditSidebarClose = () => setIsEditSidebarOpen(false);
+  
   
   useEffect(() => {
     dispatch(fetchAllStudents());
@@ -41,7 +41,7 @@ const AllStudents = () => {
     groupId:''
   });
 
-  // Fetch students whenever filters change
+  const handleEditSidebarClose = () => setIsEditSidebarOpen(false);
   useEffect(() => {
     dispatch(fetchAllStudents(filters));
   }, [filters, dispatch]);
@@ -150,7 +150,7 @@ const AllStudents = () => {
                 title={t('Change Student Class')}
                 width='30%'
               >
-                <EditStudent studentId={studentData?._id} handleUpdateSidebarClose={handleEditSidebarClose} />
+                <EditStudent studentId={studentData?._id} onFilterChange={handleFilterChange}   handleUpdateSidebarClose={handleEditSidebarClose}  />
               </Sidebar>
       </DashLayout>
     </Layout>
