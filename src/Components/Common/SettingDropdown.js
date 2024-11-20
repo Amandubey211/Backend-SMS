@@ -89,7 +89,7 @@ const SettingDropdown = ({
         {/* Admin Section */}
        
           <NavLink
-            to={role == "admin" ?"/dashboard/academic":"/dashboard/select/academic"}
+            to={role == "admin" ?"/dashboard/academic" :"/dashboard/select/academic"}
             className={({ isActive }) =>
               `${listItemClass} ${
                 isActive ? "text-purple-600 bg-purple-100 " : ""

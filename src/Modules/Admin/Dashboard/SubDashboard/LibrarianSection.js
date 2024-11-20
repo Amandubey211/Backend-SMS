@@ -28,7 +28,7 @@ const LibrarianSection = () => {
 
 
       {/* Second Row */}
-      <div className="flex flex-wrap items-start justify-center border-y h-[400px]">
+      <div className="flex flex-wrap items-start justify-center border-y h-[400px] mb-20">
         {/* Library Section */}
         <div className="w-full p-4 h-full flex items-center justify-center">
           <div className="w-full h-full">
