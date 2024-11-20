@@ -1,6 +1,19 @@
 // SidebarSlide.js
 import React, { useEffect, useRef, useCallback } from "react";
 import { RxCross2 } from "react-icons/rx";
+import { motion, AnimatePresence } from "framer-motion";
+
+const sidebarVariants = {
+  hidden: { x: "100%" },
+  visible: { x: "0%" },
+  exit: { x: "100%" },
+};
+
+const overlayVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 0.5 },
+  exit: { opacity: 0 },
+};
 
 const SidebarSlide = ({
   isOpen,
@@ -48,85 +61,83 @@ const SidebarSlide = ({
   );
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
-        onClose();
-      }
-    };
-
     if (isOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
       document.addEventListener("keydown", trapFocus);
+      // Optionally, prevent background scrolling when sidebar is open
+      document.body.style.overflow = "hidden";
     } else {
-      document.removeEventListener("mousedown", handleClickOutside);
       document.removeEventListener("keydown", trapFocus);
+      document.body.style.overflow = "auto";
     }
 
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
       document.removeEventListener("keydown", trapFocus);
+      document.body.style.overflow = "auto";
     };
-  }, [isOpen, onClose, trapFocus]);
+  }, [isOpen, trapFocus]);
 
   return (
-    <div
-      className={`fixed inset-0 z-30 transition-opacity duration-300 ${
-        isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
-      }`}
-      style={{ overflowY: "auto" }}
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="sidebar-title"
-    >
-      <div
-        className="fixed inset-0 bg-black bg-opacity-50"
-        aria-hidden="true"
-      ></div>
-      <div
-        ref={sidebarRef}
-        style={{
-          width: width || "33%",
-          height: height || "100%",
-          overflowY: "auto",
-          padding: "20px",
-          borderRadius: "8px",
-          scrollbarWidth: "thin",
-          scrollbarColor: "#888 #f1f1f1",
-        }}
-        className={`fixed top-0 right-0 bg-white shadow-lg transform ${
-          isOpen ? "translate-x-0" : "translate-x-full"
-        } transition-transform duration-300`}
-      >
-        <div
-          className="flex justify-between items-center px-2"
-          id="sidebar-title"
-        >
-          <h1 className="font-semibold">{title || "Please give title"}</h1>
-          <button
-            onClick={onClose}
-            className="p-1 m-1 opacity-70"
-            aria-label="Close sidebar"
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          {/* Overlay */}
+          <motion.div
+            className="fixed inset-0 bg-black z-40"
+            variants={overlayVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            aria-hidden="true"
+          />
+
+          {/* Sidebar */}
+          <motion.div
+            ref={sidebarRef}
+            className="fixed top-0 right-0 h-full bg-white z-50 shadow-lg"
+            style={{ width: width || "33%", height: height || "100%" }}
+            variants={sidebarVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            transition={{ type: "tween", duration: 0.3 }}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="sidebar-title"
           >
-            <RxCross2 className="text-xl" />
-          </button>
-        </div>
-        <div className="mt-4">{children}</div>
-        {footer && <div className="mt-4">{footer}</div>}
-      </div>
-      <style jsx>{`
-        ::-webkit-scrollbar {
-          width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-          background: #f1f1f1;
-        }
-        ::-webkit-scrollbar-thumb {
-          background-color: #888;
-          border-radius: 10px;
-          border: 3px solid #f1f1f1;
-        }
-      `}</style>
-    </div>
+            <div
+              className="flex justify-between items-center px-4 py-2 border-b"
+              id="sidebar-title"
+            >
+              <h1 className="font-semibold text-xl ps-4 text-gradient">
+                {title || "Please provide a title"}
+              </h1>
+              <button
+                onClick={onClose}
+                className="p-1 m-1 opacity-70 hover:opacity-100 transition-opacity"
+                aria-label="Close sidebar"
+              >
+                <RxCross2 className="text-2xl" />
+              </button>
+            </div>
+            <div className="p-4 overflow-y-auto">{children}</div>
+            {footer && <div className="p-4 border-t">{footer}</div>}
+          </motion.div>
+          <style jsx>{`
+            ::-webkit-scrollbar {
+              width: 8px;
+            }
+            ::-webkit-scrollbar-track {
+              background: #f1f1f1;
+            }
+            ::-webkit-scrollbar-thumb {
+              background-color: #888;
+              border-radius: 10px;
+              border: 3px solid #f1f1f1;
+            }
+          `}</style>
+        </>
+      )}
+    </AnimatePresence>
   );
 };
 

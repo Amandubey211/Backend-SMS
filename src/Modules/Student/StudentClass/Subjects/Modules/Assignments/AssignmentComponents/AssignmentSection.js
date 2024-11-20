@@ -1,3 +1,5 @@
+// src/components/Student/Assignment/AssignmentSection.js
+
 import React, { useState } from "react";
 import SidebarSlide from "../../../../../../../Components/Common/SidebarSlide";
 import CreateAssignmentHolder from "./CreateAssignmentHolder";
@@ -28,11 +30,7 @@ const AssignmentSection = ({ isSubmitted, onResubmit }) => {
     }
   };
 
-  const handleFormSubmit = async (
-    submissionContent,
-    submissionType,
-    submissionComment
-  ) => {
+  const handleFormSubmit = async (submissionContent, submissionType) => {
     try {
       setIsSubmitting(true); // Disable submit button while submitting
       const currentAttempts = submissionData?.attempt || 0;
@@ -57,7 +55,9 @@ const AssignmentSection = ({ isSubmitted, onResubmit }) => {
 
       setIsSubmitting(false);
       setSidebarOpen(false);
-      // onResubmit?.(submissionContent, submissionType, submissionComment); // Ensure callback is called if provided
+      toast.success("Assignment submitted successfully");
+      // Optionally, you can trigger a callback here
+      // onResubmit?.(submissionContent, submissionType, submissionComment);
     } catch (error) {
       setIsSubmitting(false);
       toast.error(error?.message || "Error submitting assignment");
@@ -67,10 +67,10 @@ const AssignmentSection = ({ isSubmitted, onResubmit }) => {
   const { name = "Assignment", content = "" } = assignmentData || {};
 
   return (
-    <div className="max-w-3xl mx-auto p-6 bg-white">
-      <div className="flex items-center justify-between mb-2">
+    <div className="max-w-3xl mx-auto  bg-white">
+      <div className="flex items-center justify-between mb-2 border-b p-3">
         <div>
-          <h2 className="text-2xl font-semibold">{name}</h2>
+          <h2 className="text-xl capitalize font-semibold">{name}</h2>
           <p className="text-sm text-green-600 mt-1 font-semibold">
             Assignment
           </p>
@@ -85,7 +85,7 @@ const AssignmentSection = ({ isSubmitted, onResubmit }) => {
       </div>
 
       <div
-        className="text-gray-700 mb-6"
+        className="text-gray-700 mb-6 p-3"
         dangerouslySetInnerHTML={{ __html: content }}
       />
 
@@ -95,10 +95,7 @@ const AssignmentSection = ({ isSubmitted, onResubmit }) => {
         title="Start Assignment"
         width="80%"
       >
-        <CreateAssignmentHolder
-          onSubmit={handleFormSubmit}
-          isReattempt={isSubmitted}
-        />
+        <CreateAssignmentHolder onSubmit={handleFormSubmit} />
       </SidebarSlide>
     </div>
   );

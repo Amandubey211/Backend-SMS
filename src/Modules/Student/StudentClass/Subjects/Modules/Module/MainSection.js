@@ -112,13 +112,15 @@ const MainSection = () => {
 
     return (
       <div className="h-[100%] w-full">
-        <div className="flex items-center h-[10%]">
+        <div className="flex items-center pb-2 ">
           <h1 className="text-xl font-semibold mr-2">All Modules</h1>
-          <p className="bg-gradient-to-r from-pink-100 to-purple-200 font-semibold rounded-full h-9 w-9 flex items-center justify-center">
-            <span className="text-gradient text-lg">{modulesData?.length || 0}</span>
+          <p className="bg-gradient-to-r from-pink-100 to-purple-200 font-semibold rounded-full h-6 w-6 flex items-center justify-center">
+            <span className="text-gradient text-lg">
+              {modulesData?.length || 0}
+            </span>
           </p>
         </div>
-        <div className="grid grid-cols-1 overflow-y-auto w-full h-[70%]">
+        <div className="grid grid-cols-1 overflow-y-auto w-full h-full">
           {modulesData?.map((module, index) => (
             <ModuleCard
               key={index}
@@ -138,10 +140,10 @@ const MainSection = () => {
   return (
     <div className="flex h-[100%]">
       <SubjectSideBar />
-      <div className="w-[65%] bg-white p-2 border-l h-[100%]">
+      <div className="w-[65%] bg-white p-2 border-x h-[100%]">
         <div className="bg-white p-2 rounded-lg">{renderChapters()}</div>
       </div>
-      <div className="w-[35%] p-2 border h-[100%]">
+      <div className="w-[35%] p-2  h-[100%]">
         <div className="bg-white  rounded-lg  h-[100%] w-[100%]">
           {renderModules()}
         </div>
