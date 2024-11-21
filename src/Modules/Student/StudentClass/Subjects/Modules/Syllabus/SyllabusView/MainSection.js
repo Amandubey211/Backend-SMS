@@ -6,7 +6,6 @@ import SyllabusSection from "./Components/SyllabusSection";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { AiOutlineFileAdd } from "react-icons/ai";
-import useFetchSyllabus from "../../../../../../../Hooks/AuthHooks/Staff/Admin/Syllabus/useFetchSyllabus";
 import Spinner from "../../../../../../../Components/Common/Spinner";
 import { stdSyllabus } from "../../../../../../../Store/Slices/Student/MyClass/Class/Subjects/Syllabus/syllabus.action";
 import { GoAlertFill } from "react-icons/go";

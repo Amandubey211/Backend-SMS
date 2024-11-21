@@ -198,11 +198,9 @@ export const fetchFilteredAssignmentsThunk =
       );
 
       if (response.data.success) {
-        dispatch(setAssignments(response.data.assignments));
-      } else {
-        throw new Error(
-          response.data.message || "Failed to fetch assignments."
-        );
+     return   dispatch(setAssignments(response.data.assignments));
+      }else{
+        return  dispatch(setAssignments([]));
       }
     } catch (err) {
       dispatch(setError(handleError(err, dispatch)));
@@ -227,9 +225,9 @@ export const fetchFilteredQuizzesThunk =
       );
 
       if (response.data.success) {
-        dispatch(setQuizzes(response.data.quizzes));
+       return dispatch(setQuizzes(response.data.quizzes));
       } else {
-        throw new Error(response.data.message || "Failed to fetch quizzes.");
+        return dispatch(setQuizzes([]));
       }
     } catch (err) {
       dispatch(setError(handleError(err, dispatch)));

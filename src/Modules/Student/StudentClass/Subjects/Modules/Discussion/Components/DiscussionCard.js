@@ -5,8 +5,6 @@ import { TbBookmark, TbBookmarkFilled } from "react-icons/tb";
 import { GoDiscussionClosed } from "react-icons/go";
 import { MdMarkEmailRead } from "react-icons/md";
 import { NavLink, useParams } from "react-router-dom";
-import useMarkAsRead from "../../../../../../../Hooks/AuthHooks/Student/Discussion/useMarkAsRead";
-import useUpdatePinStatus from "../../../../../../../Hooks/AuthHooks/Staff/Admin/Disscussion/useUpdatePinStatus";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchStudentDiscussion, markAsReadStudentDiscussion, updateStudentPinStatus } from "../../../../../../../Store/Slices/Student/MyClass/Class/Subjects/Discussion/discussion.action";
 import { setIsMenuOpen } from "../../../../../../../Store/Slices/Student/MyClass/Class/Subjects/Discussion/discussionSlice";

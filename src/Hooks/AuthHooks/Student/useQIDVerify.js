@@ -2,9 +2,9 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { setRole } from "../../../Redux/Slices/Auth/AuthSlice";
 import { useDispatch } from "react-redux";
 import { baseUrl } from "../../../config/Common";
+import { setRole } from "../../../Store/Slices/Common/Auth/reducers/authSlice";
 const TOKEN_STORAGE_KEY = process.env.REACT_APP_STUDENT_TOKEN_STORAGE_KEY;
 const useQidVerification = () => {
   const dispatch = useDispatch();

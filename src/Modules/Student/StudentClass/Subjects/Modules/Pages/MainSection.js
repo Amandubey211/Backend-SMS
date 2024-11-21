@@ -4,7 +4,6 @@ import PageHeader from "./Components/PageHeader";
 import { MdKeyboardArrowDown } from "react-icons/md";
 import { GoDiscussionClosed } from "react-icons/go";
 import SubjectSideBar from "../../Component/SubjectSideBar";
-import useFetchAllPages from "../../../../../../Hooks/AuthHooks/Student/Page/useFetchAllPages";
 import Spinner from "../../../../../../Components/Common/Spinner";
 import NoDataFound from "../../../../../../Components/Common/NoDataFound";
 import { useDispatch, useSelector } from "react-redux";

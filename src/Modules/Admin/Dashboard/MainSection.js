@@ -8,7 +8,6 @@ import Events from "./EventModule/Event";
 import BestPerformersChart from "./Graphs/BestPerformancGraph";
 import performanceData from "./DashboardData/PerformanceData";
 import NoticeBoard from "./NoticeModule/NoticeBoard";
-import useGetAdminDashboardData from "../../../Hooks/AuthHooks/Staff/Admin/Dashboard/useGetAdminDashboardData";
 import DashCard from "./Dashcard";
 
 // Import role-specific sections

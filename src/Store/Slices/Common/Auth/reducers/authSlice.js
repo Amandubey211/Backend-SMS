@@ -61,7 +61,7 @@ const AuthSlice = createSlice({
         // state.role = action.payload.role;
         // state.token = action.payload.token;
         // state.AcademicYear = action.payload.academicYear;
-        localStorage.setItem("token", action.payload.token);
+        // localStorage.setItem("token", action.payload.token);
       })
       .addCase(staffLogin.rejected, (state, action) => {
         state.loading = false;
@@ -82,7 +82,7 @@ const AuthSlice = createSlice({
       .addCase(studentLogin.fulfilled, (state, action) => {
         state.loading = false;
         state.isLoggedIn = true;
-        localStorage.setItem("token", action.payload.token); // remove the hard code string and use the env here
+        // localStorage.setItem("token", action.payload.token); // remove the hard code string and use the env here
       })
       .addCase(studentLogin.rejected, (state, action) => {
         state.loading = false;
