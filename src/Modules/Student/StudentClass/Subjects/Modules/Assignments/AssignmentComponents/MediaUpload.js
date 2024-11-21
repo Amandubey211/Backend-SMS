@@ -1,17 +1,12 @@
 import React, { useState, useRef } from "react";
-import {
-  FaSpinner,
-  FaTimes,
-  FaPlusCircle,
-  FaCheckCircle,
-} from "react-icons/fa";
+import { FaSpinner, FaTimes } from "react-icons/fa";
 import { IoCloudUploadOutline } from "react-icons/io5";
-import { RiEyeFill, RiDeleteBin5Line, RiFileUploadLine } from "react-icons/ri";
+import { RiEyeFill, RiFileUploadLine } from "react-icons/ri";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { AiOutlineFilePdf } from "react-icons/ai"; // Correct import for AiOutlineFilePdf
 import { MdOutlineDocumentScanner } from "react-icons/md";
-const MediaUpload = ({ onSubmit, onAssignmentSubmit }) => {
+const MediaUpload = ({ onSubmit }) => {
   const [files, setFiles] = useState([]);
   const [previews, setPreviews] = useState([]);
   const [selectedPreview, setSelectedPreview] = useState(null);
@@ -105,16 +100,6 @@ const MediaUpload = ({ onSubmit, onAssignmentSubmit }) => {
     }
   };
 
-  const handleSubmitAssignment = () => {
-    if (!uploadComplete && files.length === 0 && !skipFiles) {
-      toast.error(
-        "Please either upload files or check the 'Skip Upload' option."
-      );
-      return;
-    }
-    onAssignmentSubmit(); // Call the parent function to submit the assignment
-  };
-
   const isImage = (file) => {
     return file && file.type.startsWith("image/");
   };
@@ -137,7 +122,7 @@ const MediaUpload = ({ onSubmit, onAssignmentSubmit }) => {
   };
 
   return (
-    <div className="w-full p-6 bg-white border  ">
+    <div className="w-full p-6 bg-white   ">
       <label className="block mb-2 text-sm font-medium text-gray-700">
         Upload Media
       </label>
@@ -151,10 +136,7 @@ const MediaUpload = ({ onSubmit, onAssignmentSubmit }) => {
             className="mr-2 mt-1"
           />
           <label htmlFor="skipFiles" className="text-sm text-gray-600">
-            I confirm that this assignment is my original work and has been
-            completed independently. I understand that submitting plagiarized or
-            incomplete work may result in a reduced grade or other consequences
-            as outlined by my teacher
+            Skip file submission
           </label>
         </div>
       )}
@@ -183,8 +165,8 @@ const MediaUpload = ({ onSubmit, onAssignmentSubmit }) => {
           </div>
 
           {files.length > 0 && (
-            <div className="flex-grow overflow-y-auto mt-4 px-3 no-scrollbar">
-              <div className="grid grid-cols-1 gap-2">
+            <div className="flex-grow  overflow-y-auto mt-4 px-3 no-scrollbar">
+              <div className="grid grid-cols-2 gap-2">
                 {files.map((file, index) => (
                   <div
                     key={index}
