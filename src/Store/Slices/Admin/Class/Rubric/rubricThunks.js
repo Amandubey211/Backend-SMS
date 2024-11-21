@@ -34,7 +34,7 @@ const handleError = (error, dispatch) => {
   const err = ErrorMsg(error);
   dispatch(setShowError(true));
   dispatch(setErrorMsg(err.message));
-  toast.error(err.message);
+  // toast.error(err.message);
   return err.message;
 };
 

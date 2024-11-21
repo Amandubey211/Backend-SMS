@@ -105,7 +105,7 @@ const SidebarSlide = ({
             aria-labelledby="sidebar-title"
           >
             <div
-              className="flex justify-between items-center px-4 py-2 border-b"
+              className="flex justify-between items-center px-4 py-1 border-b"
               id="sidebar-title"
             >
               <h1 className="font-semibold text-xl ps-4 text-gradient">
@@ -119,8 +119,8 @@ const SidebarSlide = ({
                 <RxCross2 className="text-2xl" />
               </button>
             </div>
-            <div className="p-4 overflow-y-auto">{children}</div>
-            {footer && <div className="p-4 border-t">{footer}</div>}
+            <div className="p-1 overflow-y-auto h-full">{children}</div>
+            {footer && <div className="p-1 border-t">{footer}</div>}
           </motion.div>
           <style jsx>{`
             ::-webkit-scrollbar {
