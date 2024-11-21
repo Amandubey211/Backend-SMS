@@ -3,7 +3,6 @@ import SubjectSideBar from "../../../Component/SubjectSideBar";
 import FilterCard from "../../../Component/FilterCard";
 import { RiFileUnknowLine } from "react-icons/ri";
 import { useDispatch, useSelector } from "react-redux";
-import useFetchQuizzes from "../../../../../../../Hooks/AuthHooks/Student/Quiz/useFetchQuizzes";
 import List from "../../../Component/List";
 import { useParams } from "react-router-dom";
 import { stdGetQuiz } from "../../../../../../../Store/Slices/Student/MyClass/Class/Subjects/Quizes/quizes.action";

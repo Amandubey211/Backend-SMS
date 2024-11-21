@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-// import useGetUserDetail from "../../Hooks/AuthHooks/Staff/useGetUserDetail";
 import FormInput from "../../Modules/Admin/Accounting/subClass/component/FormInput";
 import ImageUpload from "../../Modules/Admin/Addmission/Components/ImageUpload";
 

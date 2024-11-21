@@ -1,16 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { FaChevronDown, FaTimes } from 'react-icons/fa';
 import { useSelector } from 'react-redux';
-import useGetAllTeachers from '../../../../../Hooks/AuthHooks/Staff/Admin/Teacher/useGetAllTeacher';
+
 
 const EditorSelector = ({ selectedUsers, setSelectedUsers, subject }) => {
   const [isDropdownOpen, setDropdownOpen] = useState(false);
-  const { fetchTeachers } = useGetAllTeachers();
-
-  useEffect(() => {
-  
-      fetchTeachers();
-  }, [ fetchTeachers]);
+ 
 
   const AllTeachers = useSelector((store) => store.Teachers.allTeachers);
 

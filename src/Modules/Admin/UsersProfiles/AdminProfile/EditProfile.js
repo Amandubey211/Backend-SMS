@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import ImageUpload from "../../Addmission/Components/ImageUpload";
 import FormInput from "../../Accounting/subClass/component/FormInput";
 import FormSelect from "../../Accounting/subClass/component/FormSelect";
-import useEditAdmin from "../../../../Hooks/AuthHooks/Staff/Admin/staff/useEditAdmin";
 // import useGetUserDetail from "../../../../Hooks/AuthHooks/Staff/useGetUserDetail";
 import { useDispatch } from "react-redux";
 import { fetchUserData, updateAdminProfile } from "../../../../Store/Slices/Common/User/actions/userActions";

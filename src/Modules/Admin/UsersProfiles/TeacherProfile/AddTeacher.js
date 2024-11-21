@@ -4,8 +4,6 @@ import FormInput from "../../Accounting/subClass/component/FormInput";
 import FormSelect from "../../Accounting/subClass/component/FormSelect";
 import Layout from "../../../../Components/Common/Layout";
 import DashLayout from "../../../../Components/Admin/AdminDashLayout";
-import useAddUser from "../../../../Hooks/AuthHooks/Staff/Admin/staff/useAddUser";
-import useGetAllTeachers from "../../../../Hooks/AuthHooks/Staff/Admin/Teacher/useGetAllTeacher";
 
 const AddTeacher = ({role}) => {
   const [imagePreview, setImagePreview] = useState(null);
@@ -107,17 +105,14 @@ const AddTeacher = ({role}) => {
   const handleRemoveImage = () => {
     setImagePreview(null);
   };
-  const { fetchTeachers } = useGetAllTeachers();
 const {addUser,error,loading} = useAddUser()
   const handleSubmit = async(e) => {
     e.preventDefault();
    teacherData.address=address;
    teacherData.role = role
     console.log("Teacher data to submit:", teacherData);
-   await addUser(teacherData);
-   if(!error){
-    fetchTeachers()
-   }
+  //  await addUser(teacherData);
+  
 
   };
 
