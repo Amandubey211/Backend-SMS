@@ -27,6 +27,7 @@ const AssignmentDetailCard = ({ isSubmitted }) => {
     : t("N/A");
 
   const submittingBy = assignmentData?.submittingBy || t("Everyone");
+  const SubmissionType = assignmentData?.submissionType || "N/A";
 
   const submittedAt = submissionData?.submittedAt
     ? new Date(submissionData.submittedAt)
@@ -71,6 +72,12 @@ const AssignmentDetailCard = ({ isSubmitted }) => {
         label={t("Assignment Points")}
         value={points.toString()}
       />
+
+      <AssignmentDetail
+        label="Submission Type"
+        value={SubmissionType?.toString()}
+      />
+
       <AssignmentDetail
         label={t("Remaining Attempts")}
         value={
