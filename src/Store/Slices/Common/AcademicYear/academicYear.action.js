@@ -6,6 +6,7 @@ import {
   handleError,
 } from "../../Common/Alerts/errorhandling.action";
 import { setShowError } from "../../Common/Alerts/alertsSlice";
+
 import {
   setActiveAcademicYear,
   setSeletedAcademicYear,
@@ -22,6 +23,7 @@ export const fetchAcademicYear = createAsyncThunk(
   async (_, { rejectWithValue, dispatch, getState }) => {
     const token = getState().common.auth.token;
 
+
     try {
       dispatch(setShowError(false));
       const say = localStorage.getItem("say");
@@ -36,6 +38,7 @@ export const fetchAcademicYear = createAsyncThunk(
     }
   }
 );
+
 
 export const updateAcademicYear = createAsyncThunk(
   "user/updateAcademicYear",
@@ -67,6 +70,7 @@ export const addAcademicYear = createAsyncThunk(
   }
 );
 
+
 export const deleteAcademicYear = createAsyncThunk(
   "user/deleteAcademicYear",
   async (id, { rejectWithValue, dispatch }) => {
@@ -80,4 +84,5 @@ export const deleteAcademicYear = createAsyncThunk(
       return handleError(error, dispatch, rejectWithValue);
     }
   }
-);
+
+});

@@ -1,6 +1,8 @@
 // services/apiService.js
-import axios from "axios";
-import { baseUrl } from "../config/Common";
+import axios from 'axios';
+import { baseUrl } from '../config/Common';
+import Cookies from 'js-cookie';
+
 
 // Create an instance of axios with default configurations
 const apiService = axios.create({
@@ -14,11 +16,13 @@ const apiService = axios.create({
 // Add a request interceptor (optional)
 apiService.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("userToken"); // Retrieve token from localStorage
+    //const token = localStorage.getItem("userToken"); // Retrieve token from localStorage
+    const token = Cookies.get("userToken");
+    console.log('Request made with token:', token);
     // console.log("Token Retrieved:", token); // Debugging the token
 
     if (token) {
-      config.headers["Authentication"] = `Bearer ${token}`; // Attach token to request headers with the correct header name
+      config.headers['Authentication'] = `${token}`; // Attach token to request headers with the correct header name
     }
     return config;
   },
