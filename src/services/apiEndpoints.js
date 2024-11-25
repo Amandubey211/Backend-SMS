@@ -52,12 +52,14 @@ export const patchData = async (endpoint, data) => {
 };
 
 // Example for custom API requests if needed
+
 export const customRequest = async (
   method,
   endpoint,
   data = null,
   config = {}
 ) => {
+
   try {
     const response = await apiService({
       method,
@@ -69,5 +71,6 @@ export const customRequest = async (
   } catch (error) {
     console.log("Error with custom request:", error);
     throw error; // Re-throw the error for the thunk to handle
+
   }
 };

@@ -41,7 +41,7 @@ const AddUser = ({ role ,data}) => {
       religion:  data?.religion ,
       gender:  data?.gender,
       position:  data?.position ,
-      monthlySalary:  data?.monthlySalary ,
+      monthlySalary:  data?.monthlySalary,
       bloodGroup:  data?.bloodGroup ,
       mobileNumber: data?.mobileNumber ,
       email: data?.email ,

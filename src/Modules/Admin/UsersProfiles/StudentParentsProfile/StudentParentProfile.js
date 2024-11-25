@@ -17,7 +17,7 @@ import { useTranslation } from "react-i18next";
 const uniqueFilterOptions = (data, key) => {
   return [
     ...new Set(
-      data.flatMap((item) => item.children.map((child) => child[key]))
+      data?.flatMap((item) => item.children.map((child) => child[key]))
     ),
   ].sort();
 };
@@ -60,8 +60,8 @@ const StudentParentProfile = () => {
     setSidebarOpen(true);
   };
 
-  const filteredParents = allParents.filter((parent) =>
-    parent.children.some(
+  const filteredParents = allParents?.filter((parent) =>
+    parent?.children?.some(
       (child) =>
         (filters.class === "" || child.class === filters.class) &&
         (filters.section === "" || child.section === filters.section)
