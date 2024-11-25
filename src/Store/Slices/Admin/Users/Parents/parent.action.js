@@ -5,6 +5,7 @@ import { baseUrl } from "../../../../../config/Common";
 import { ErrorMsg, handleError } from "../../../Common/Alerts/errorhandling.action";
 import { setShowError, setErrorMsg } from "../../../Common/Alerts/alertsSlice";
 import { getData, postData } from "../../../../../services/apiEndpoints";
+import { getAY } from "../../../../../Utils/academivYear";
 
 
 // Fetch all parents
@@ -12,7 +13,7 @@ export const fetchAllParent = createAsyncThunk(
   "user/allParent",
   async (_, { rejectWithValue, getState, dispatch }) => {
     try {
-      const say = localStorage.getItem("say");
+      const say = getAY();
        dispatch(setShowError(false));
       const response = await getData(`/admin/all/Parents?say=${say}`);
       return response;
@@ -25,7 +26,7 @@ export const updateParent = createAsyncThunk(
   "user/updateParent",
   async ({data}, { rejectWithValue, getState, dispatch }) => {
     try {
-      const say = localStorage.getItem("say");
+      const say = getAY();
       dispatch(setShowError(false));
       const response = await postData(`/admin/parent/update?say=${say}`,data);
       toast.success('Parent update successfull');
