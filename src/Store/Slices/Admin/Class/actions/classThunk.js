@@ -19,7 +19,7 @@ export const fetchAllClasses = createAsyncThunk(
     try {
       const endpoint = `/admin/class`;
       const params = { say };
-      const response = await getData(endpoint, { params });
+      const response = await getData(endpoint, params);
       console.log(response, "lk");
       if (response && response.status) {
         return response.data; // Assuming 'data' contains the list of classes
@@ -42,7 +42,7 @@ export const fetchClassDetails = createAsyncThunk(
     try {
       const endpoint = `/admin/class/${classId}`;
       const params = { say };
-      const response = await getData(endpoint, { params });
+      const response = await getData(endpoint, params);
 
       if (response && response.status) {
         return response.data; // Assuming 'data' contains class details
@@ -64,7 +64,7 @@ export const createClass = createAsyncThunk(
     try {
       const endpoint = `/admin/class`;
       const params = { say };
-      const response = await postData(endpoint, classData, { params });
+      const response = await postData(endpoint, classData, params);
 
       if (response && response.success) {
         toast.success("Class created successfully!");
