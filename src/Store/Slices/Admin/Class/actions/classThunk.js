@@ -20,13 +20,14 @@ export const fetchAllClasses = createAsyncThunk(
       const endpoint = `/admin/class`;
       const params = { say };
       const response = await getData(endpoint, { params });
-
-      if (response && response.success) {
+      console.log(response, "lk");
+      if (response && response.status) {
         return response.data; // Assuming 'data' contains the list of classes
       } else {
         throw new Error("Failed to fetch all classes");
       }
     } catch (error) {
+      console.log(error);
       return handleError(error, dispatch, rejectWithValue);
     }
   }
@@ -43,7 +44,7 @@ export const fetchClassDetails = createAsyncThunk(
       const params = { say };
       const response = await getData(endpoint, { params });
 
-      if (response && response.success) {
+      if (response && response.status) {
         return response.data; // Assuming 'data' contains class details
       } else {
         throw new Error("Failed to fetch class details");
