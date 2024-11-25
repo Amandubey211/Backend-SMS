@@ -8,6 +8,7 @@ import {
 import { setShowError } from "../../../Common/Alerts/alertsSlice";
 import toast from "react-hot-toast";
 import getAY from "../../../../../Utils/academicYear"; // Adjust the path as necessary
+import { handleError } from "../../../Common/Alerts/errorhandling.action";
 
 export const fetchAllClasses = createAsyncThunk(
   "class/fetchAllClasses",
