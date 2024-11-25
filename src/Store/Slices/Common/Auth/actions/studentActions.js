@@ -5,7 +5,7 @@ import { setUserDetails } from "../../User/reducers/userSlice";
 import { baseUrl } from "../../../../../config/Common";
 import toast from "react-hot-toast";
 import { fetchAcademicYear } from "../../AcademicYear/academicYear.action";
-import { postData } from "../../../../../services/apiEndpoints";
+import { customRequest, postData } from "../../../../../services/apiEndpoints";
 import { handleError } from "../../Alerts/errorhandling.action";
 import { setShowError } from "../../Alerts/alertsSlice";
 
@@ -106,38 +106,28 @@ export const qidVerification = createAsyncThunk(
 // / Thunk for registering student details
 export const registerStudentDetails = createAsyncThunk(
   "auth/registerStudentDetails",
-  async (formData, { rejectWithValue }) => {
+  async (formData, { rejectWithValue,dispatch }) => {
     try {
-      const response = await axios.post(
-        `${baseUrl}/student/student_register`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-      if (response.data.success) {
+      const response = await customRequest('post',
+        `/student/student_register`,
+        formData);
+      if (response.success) {
         toast.success("Registered Successfully");
-        return response.data;
+        return response;
       } else {
         return rejectWithValue(
-          response.data.msg || "Failed to save student details."
+          response.msg || "Failed to save student details."
         );
       }
     } catch (error) {
-      const errorMessage =
-        error.response?.data?.msg ||
-        "An error occurred while submitting the details.";
-      return rejectWithValue(errorMessage);
-    }
-  }
+     return handleError(error, dispatch, rejectWithValue);
+  }}
 );
 
 // Thunk for uploading student documents
 export const uploadStudentDocuments = createAsyncThunk(
   "auth/uploadStudentDocuments",
-  async ({ email, schoolId, studentDocuments }, { rejectWithValue }) => {
+  async ({ email, schoolId, studentDocuments }, { rejectWithValue,dispatch }) => {
     try {
       if (!email) {
         return rejectWithValue("Email is required");
@@ -153,29 +143,19 @@ export const uploadStudentDocuments = createAsyncThunk(
         formData.append(`documents`, file);
         formData.append(`documentLabels`, label);
       });
-
-      const response = await axios.post(
-        `${baseUrl}/student/upload_documents`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
+      const response = await customRequest('post',
+        `/student/upload_documents`,
+        formData    
       );
-
-      if (response.data.success) {
-        return response.data;
+      if (response.success) {
+        return response;
       } else {
         return rejectWithValue(
           response.data.msg || "Failed to upload the document"
         );
       }
     } catch (error) {
-      const errorMessage =
-        error.response?.data?.msg ||
-        "An error occurred while uploading the documents.";
-      return rejectWithValue(errorMessage);
+     return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
