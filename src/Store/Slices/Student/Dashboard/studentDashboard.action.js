@@ -55,8 +55,6 @@ export const fetchDashboardDetails = createAsyncThunk(
       const data = await getData(
         `/api/studentDashboard/dashboard/student?say=${say}`
       );
-
-      console.log("dadaUJSHAIDSLKS----------------------->>>",data)
       const { attendanceSummary } = data?.data;
       // const { student } = await getState();
       // console.log("std----?>>>>",student)
@@ -154,3 +152,34 @@ export const fetchStudentGrades = createAsyncThunk(
   }
 );
 
+export const fetchExamResults = createAsyncThunk(
+  "studentDashboard/fetchExamResults",
+  async (_, { rejectWithValue, dispatch }) => {
+    try {
+      // Retrieve required parameters from localStorage or other sources
+      const persistUserString = localStorage.getItem("persist:user");
+      const persistUserObject = JSON.parse(persistUserString);
+      const userDetails = JSON.parse(persistUserObject?.userDetails);
+
+      const studentId = userDetails?.userId;
+      const schoolId = userDetails?.schoolId;
+      const say = getAY(); // Selected Academic Year
+
+      if (!studentId || !schoolId || !say) {
+        dispatch(setShowError(true));
+        dispatch(setErrorMsg("Missing required parameters for fetching exam results."));
+        return rejectWithValue("Invalid studentId, schoolId, or academic year.");
+      }
+
+      // Construct the API endpoint with query parameters
+      const apiEndpoint = `/api/studentDashboard/getQuizResult?say=${say}&studentId=${studentId}&schoolId=${schoolId}`;
+      
+      // Fetch data from the API
+      const data = await getData(apiEndpoint);
+      return data?.data; // Assuming the response contains a "data" field
+    } catch (error) {
+      console.error("Error fetching exam results:", error);
+      handleError(error, dispatch, rejectWithValue);
+    }
+  }
+);
