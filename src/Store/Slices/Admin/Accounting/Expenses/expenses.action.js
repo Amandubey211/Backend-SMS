@@ -1,21 +1,9 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
-import { baseUrl } from "../../../../../config/Common";
 import toast from "react-hot-toast";
 import { setErrorMsg, setShowError } from "../../../Common/Alerts/alertsSlice";
 import { ErrorMsg } from "../../../Common/Alerts/errorhandling.action";
-
-const say = localStorage.getItem("say");
-
-const getToken = (state, rejectWithValue, dispatch) => {
-    const token = state.common.auth?.token;
-    if (!token) {
-        dispatch(setShowError(true));
-        dispatch(setErrorMsg('Authentication Failed'));
-        return rejectWithValue('Authentication Failed');
-    }
-    return `Bearer ${token}`;
-};
+import { deleteData, getData, postData, putData } from "../../../../../services/apiEndpoints";
+import { getAY } from "../../../../../Utils/academivYear";
 
 // Helper function for handling errors
 const handleError = (error, dispatch, rejectWithValue) => {
@@ -28,24 +16,24 @@ const handleError = (error, dispatch, rejectWithValue) => {
 // Fetch Salaries with `say` and enhanced error handling
 export const fetchSalaries = createAsyncThunk(
     "accounting/fetchSalaries",
-    async ({ query, activeTab, month }, { rejectWithValue, getState, dispatch }) => {
-        const token = getToken(getState(), rejectWithValue, dispatch);
-        if (typeof token === 'object') return token;
-        const say = localStorage.getItem("say")
+    async ({ query, activeTab, month }, { rejectWithValue, dispatch }) => {
+        const say = getAY();
+        dispatch(setShowError(false));
         const year = new Date().getFullYear();
         let url = "";
 
         if (activeTab === "TeacherSalary") {
-            url = `${baseUrl}/admin/staff/get_salary?salaryRole=teacher&status=${query}&month=${month}&year=${year}&say=${say}`;
+            url = `/admin/staff/get_salary?salaryRole=teacher&status=${query}&month=${month}&year=${year}&say=${say}`;
         } else if (activeTab === "StaffSalary") {
-            url = `${baseUrl}/admin/staff/get_salary?salaryRole=all&status=${query}&month=${month}&year=${year}&say=${say}`;
+            url = `/admin/staff/get_salary?salaryRole=all&status=${query}&month=${month}&year=${year}&say=${say}`;
         } else if (activeTab === "OtherExpenses") {
-            url = `${baseUrl}/api/admin/expenses?status=${query}&month=${month}&year=${year}&say=${say}`;
+            url = `/api/admin/expenses?status=${query}&month=${month}&year=${year}&say=${say}`;
         }
 
         try {
-            const response = await axios.get(url, { headers: { Authentication: token } });
-            return { activeTab, data: activeTab.includes('Salary') ? response.data.salaryRecords : response.data.data };
+            const response = await getData(url);
+
+            return { activeTab, data: activeTab.includes('Salary') ? response?.salaryRecords : response?.data };
         } catch (error) {
             return handleError(error, dispatch, rejectWithValue);
         }
@@ -55,15 +43,13 @@ export const fetchSalaries = createAsyncThunk(
 // Fetch Expense by ID
 export const fetchExpenseById = createAsyncThunk(
     "accounting/fetchExpensesById",
-    async (id, { rejectWithValue, getState, dispatch }) => {
-        const token = getToken(getState(), rejectWithValue, dispatch);
-        if (typeof token === 'object') return token;
-        const say = localStorage.getItem("say")
+    async (id, { rejectWithValue, dispatch }) => {
+
         try {
-            const response = await axios.get(`${baseUrl}/api/admin/expenses/${id}?say=${say}`, {
-                headers: { Authentication: token },
-            });
-            return response.data;
+            const say = getAY();
+            dispatch(setShowError(false));
+            const response = await getData(`/api/admin/expenses/${id}?say=${say}`);
+            return response;
         } catch (error) {
             return handleError(error, dispatch, rejectWithValue);
         }
@@ -74,13 +60,11 @@ export const fetchExpenseById = createAsyncThunk(
 export const deleteExpenseById = createAsyncThunk(
     "accounting/deleteExpenseById",
     async (id, { rejectWithValue, getState, dispatch }) => {
-        const token = getToken(getState(), rejectWithValue, dispatch);
-        if (typeof token === 'object') return token;
-        const say = localStorage.getItem("say")
+
         try {
-            const response = await axios.delete(`${baseUrl}/api/admin/expenses/${id}?say=${say}`, {
-                headers: { Authentication: token },
-            });
+            const say = getAY();
+            dispatch(setShowError(false));
+            const response = await deleteData(`/api/admin/expenses/${id}?say=${say}`);
             toast.success("Expense deleted successfully");
             return response.data;
         } catch (error) {
@@ -92,14 +76,11 @@ export const deleteExpenseById = createAsyncThunk(
 // Update Salary
 export const updateSalary = createAsyncThunk(
     "accounting/updateSalary",
-    async ({ salaryDetails }, { rejectWithValue, getState, dispatch }) => {
-        const token = getToken(getState(), rejectWithValue, dispatch);
-        if (typeof token === 'object') return token;
-        const say = localStorage.getItem("say")
+    async ({ salaryDetails }, { rejectWithValue, dispatch }) => {
         try {
-            const response = await axios.put(`${baseUrl}/admin/staff/update_salary?say=${say}`, salaryDetails, {
-                headers: { Authentication: token },
-            });
+            const say = getAY();
+            dispatch(setShowError(false));
+            const response = await putData(`/admin/staff/update_salary?say=${say}`, salaryDetails);
             toast.success("Salary updated successfully");
             return response.data;
         } catch (error) {
@@ -111,14 +92,12 @@ export const updateSalary = createAsyncThunk(
 // Update Expense
 export const updateExpense = createAsyncThunk(
     "accounting/updateExpense",
-    async ({ expenseId, editExpense }, { rejectWithValue, getState, dispatch }) => {
-        const token = getToken(getState(), rejectWithValue, dispatch);
-        if (typeof token === 'object') return token;
-        const say = localStorage.getItem("say")
+    async ({ expenseId, editExpense }, { rejectWithValue, dispatch }) => {
+
         try {
-            const response = await axios.put(`${baseUrl}/api/admin/expenses/${expenseId}?say=${say}`, editExpense, {
-                headers: { Authentication: token },
-            });
+            const say = getAY();
+            dispatch(setShowError(false));
+            const response = await putData(`/api/admin/expenses/${expenseId}?say=${say}`, editExpense);
             toast.success("Expense updated successfully");
             return response.data;
         } catch (error) {
@@ -130,14 +109,11 @@ export const updateExpense = createAsyncThunk(
 // Create Expense
 export const createExpense = createAsyncThunk(
     "accounting/createExpense",
-    async ({ payload }, { rejectWithValue, getState, dispatch }) => {
-        const token = getToken(getState(), rejectWithValue, dispatch);
-        if (typeof token === 'object') return token;
-        const say = localStorage.getItem("say")
+    async ({ payload }, { rejectWithValue, dispatch }) => {
         try {
-            const response = await axios.post(`${baseUrl}/api/admin/expenses/?say=${say}`, payload, {
-                headers: { Authentication: token },
-            });
+            const say = getAY();
+            dispatch(setShowError(false));
+            const response = await postData(`/api/admin/expenses/?say=${say}`, payload);
             toast.success("Expense added successfully");
             return response.data;
         } catch (error) {
@@ -151,19 +127,14 @@ export const createExpense = createAsyncThunk(
 
 // create salary
 
- export const createStaffSalary=createAsyncThunk(
+export const createStaffSalary = createAsyncThunk(
     'salary/createStaffSalary',
-    async({action,status},{rejectWithValue,getState,dispatch})=>{
-        const token = getToken(getState(), rejectWithValue, dispatch);
-        if (typeof token === 'object') return token;
-        const say = localStorage.getItem("say")
-        const body={action,status}
+    async ({ action, status }, { rejectWithValue, dispatch }) => {
         try {
-            const response = axios.post(`${baseUrl}/admin/staff/craete_salary?say=${say}`, body, {
-                headers: {
-                    Authentication: `${token}`,
-                },
-            })
+            const say = getAY();
+            const body = { action, status }
+            dispatch(setShowError(false));
+            const response = postData(`/admin/staff/craete_salary?say=${say}`, body)
             const data = response?.data
             // toast.success("Create Salary successfully")
             // console.log("salary data---", data);
@@ -172,5 +143,5 @@ export const createExpense = createAsyncThunk(
             return handleError(error, dispatch, rejectWithValue);
         }
     }
- )
+)
 
