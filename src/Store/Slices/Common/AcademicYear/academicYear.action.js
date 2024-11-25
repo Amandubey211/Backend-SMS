@@ -2,18 +2,12 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import { baseUrl } from "../../../../config/Common";
 import { ErrorMsg, handleError } from "../../Common/Alerts/errorhandling.action";
 import { setShowError } from "../../Common/Alerts/alertsSlice";
-import {
-  setActiveAcademicYear,
-  setSeletedAcademicYear,
-} from "./academicYear.slice";
+import { setActiveAcademicYear, setSeletedAcademicYear } from "./academicYear.slice";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { deleteData, getData, postData, putData } from "../../../../services/apiEndpoints";
 
-export const fetchAcademicYear = createAsyncThunk(
-  "user/AcademicYear",
-  async (_, { rejectWithValue, dispatch, getState }) => {
-    const token = getState().common.auth.token;
+export const fetchAcademicYear = createAsyncThunk("user/AcademicYear", async (_, { rejectWithValue, dispatch, getState }) => {
 
 
 
@@ -58,18 +52,7 @@ export const addAcademicYear = createAsyncThunk("user/addAcademicYear", async (d
   } catch (error) {
 
     return handleError(error, dispatch, rejectWithValue);
-
   }
-);
-export const addAcademicYear = createAsyncThunk(
-  "user/addAcademicYear",
-  async (data, { rejectWithValue, dispatch, getState }) => {
-    const token = getState().common.auth.token;
-
-    if (!token) {
-      dispatch(setShowError(true));
-      return rejectWithValue(`Authentication failed!`);
-    }
 
 });
 export const deleteAcademicYear = createAsyncThunk("user/deleteAcademicYear", async (id, { rejectWithValue, dispatch, getState }) => {
@@ -83,4 +66,5 @@ export const deleteAcademicYear = createAsyncThunk("user/deleteAcademicYear", as
   } catch (error) {
     return handleError(error, dispatch, rejectWithValue);
   }
-);
+
+});
