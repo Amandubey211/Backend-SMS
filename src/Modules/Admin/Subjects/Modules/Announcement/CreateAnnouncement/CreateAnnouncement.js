@@ -12,6 +12,7 @@ import {
   createAnnouncement,
   editAnnouncement,
 } from "../../../../../../Store/Slices/Admin/Class/Announcement/announcementThunk";
+import toast from "react-hot-toast";
 
 const CreateAnnouncement = () => {
   const location = useLocation();
@@ -85,6 +86,11 @@ const CreateAnnouncement = () => {
     const files = {
       attachment: file,
     };
+
+    if (!formState.author || !assignmentName) {
+      toast.error("Please fill the required Details ");
+      return;
+    }
 
     if (announcement?._id) {
       // Edit announcement

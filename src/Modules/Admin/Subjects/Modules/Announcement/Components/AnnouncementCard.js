@@ -1,5 +1,10 @@
 import React, { useState, useRef, useEffect } from "react";
-import { IoCalendarOutline } from "react-icons/io5";
+import {
+  IoCalendarOutline,
+  IoCheckmarkCircleOutline,
+  IoTimeOutline,
+  IoWarningOutline,
+} from "react-icons/io5";
 import { NavLink, useParams } from "react-router-dom";
 import { BiDotsVerticalRounded } from "react-icons/bi";
 import { AiOutlineCheck } from "react-icons/ai";
@@ -22,7 +27,6 @@ const AnnouncementCard = ({
   const dispatch = useDispatch();
 
   // Toggle dropdown menu
-  const toggleMenu = () => setMenuOpen(!menuOpen);
 
   // Close dropdown when clicking outside
   const handleClickOutside = (event) => {
@@ -50,55 +54,87 @@ const AnnouncementCard = ({
   return (
     <div
       style={{ backgroundColor: color }}
-      className={`ps-1 rounded-md h-36 transition-all duration-300 ease-in-out hover:shadow-lg ${
+      className={`ps-1 rounded-md h-36 hover:scale-105 transition-all duration-200 ease-in-out hover:shadow-lg ${
         isRead ? "opacity-50" : ""
       }`}
     >
-      <div className="border rounded-md shadow-sm relative flex bg-white justify-between p-4 h-36">
+      <div
+        className={`border rounded-md shadow-sm relative flex bg-white hover:bg-[${color}]-50  justify-between p-4 h-36`}
+      >
+        {/* Badge for Posted, Scheduled, or Not Scheduled */}
+        <div className="absolute top-2 right-2">
+          {delayPosting ? (
+            new Date() > new Date(delayPosting) ? (
+              <span className="flex items-center gap-1 px-2 py-1 bg-green-100 text-green-600 text-xs font-medium rounded-full">
+                <IoCheckmarkCircleOutline className="text-base" />
+                Posted
+              </span>
+            ) : (
+              <span className="flex items-center gap-1 px-2 py-1 bg-yellow-100 text-yellow-600 text-xs font-medium rounded-full">
+                <IoTimeOutline className="text-base" />
+                Scheduled
+              </span>
+            )
+          ) : (
+            <span className="flex items-center gap-1 px-2 py-1 bg-red-100 text-red-600 text-xs font-medium rounded-full">
+              <IoWarningOutline className="text-base" />
+              Not Scheduled
+            </span>
+          )}
+        </div>
+
         <NavLink
           to={`/class/${cid}/${sid}/announcements/${_id}/view`}
-          className="flex flex-col items-start justify-start transition-transform duration-300 ease-in-out hover:scale-105"
+          className="flex flex-col p-4 transition-transform duration-300 ease-in-out "
         >
-          <h2 className="text-base font-semibold">{title}</h2>
-          <p className="text-base text-green-600">{section}</p>
-          <div className="flex justify-center items-center gap-1 mt-5 text-gray-500">
-            <IoCalendarOutline />
-            <p className="text-md">Created on:</p>
-            <p className="text-md">
-              {new Date(createdAt).toLocaleDateString()}
-            </p>
+          {/* Header Section */}
+          <div className="flex justify-between items-center mb-3">
+            <h2 className="text-lg font-semibold text-gray-800">{title}</h2>
           </div>
-          {delayPosting && (
-            <div className="flex justify-center items-center gap-1 mt-5 text-gray-500">
-              <IoCalendarOutline />
-              <p className="text-md">Posting on:</p>
-              <p className="text-md">
-                {new Date(delayPosting).toLocaleDateString()}
-              </p>
+
+          {/* Section Name */}
+          <p className="text-sm text-green-600 mb-3">{section}</p>
+
+          {/* Dates Section */}
+          <div className="flex flex-col gap-2 text-sm text-gray-500">
+            <div className="flex items-center gap-2">
+              <IoCalendarOutline className="text-lg" />
+              <span>Created on:</span>
+              <span>{new Date(createdAt).toLocaleDateString()}</span>
             </div>
-          )}
+            {delayPosting && (
+              <div className="flex items-center gap-2">
+                <IoCalendarOutline className="text-lg" />
+                <span>Posting on:</span>
+                <span>{new Date(delayPosting).toLocaleDateString()}</span>
+              </div>
+            )}
+          </div>
         </NavLink>
+
+        {/* Action Buttons Section */}
         <div className="flex flex-col gap-2 text-xl relative">
+          {/* Keep the commented part */}
           {/* <button
-            className="p-1 border rounded-full transition-all duration-300 ease-in-out hover:bg-gray-200"
-            onClick={toggleMenu}
+          className="p-1 border rounded-full transition-all duration-300 ease-in-out hover:bg-gray-200"
+          onClick={toggleMenu}
+        >
+          <BiDotsVerticalRounded />
+        </button>
+        {menuOpen && (
+          <div
+            ref={menuRef}
+            className="absolute right-0 top-10 w-48 bg-white border rounded shadow-md transition-all duration-300 ease-in-out"
           >
-            <BiDotsVerticalRounded />
-          </button>
-          {menuOpen && (
-            <div
-              ref={menuRef}
-              className="absolute right-0 top-10 w-48 bg-white border rounded shadow-md transition-all duration-300 ease-in-out"
+            <button
+              className="w-full flex items-center justify-between px-4 py-2 text-gray-700 hover:bg-gray-100 transition"
+              onClick={handleMarkAsRead}
             >
-              <button
-                className="w-full flex items-center justify-between px-4 py-2 text-gray-700 hover:bg-gray-100 transition"
-                onClick={handleMarkAsRead}
-              >
-                <AiOutlineCheck className="text-green-600" />
-                <span>Mark as Read</span>
-              </button>
-            </div>
-          )} */}
+              <AiOutlineCheck className="text-green-600" />
+              <span>Mark as Read</span>
+            </button>
+          </div>
+        )} */}
         </div>
       </div>
     </div>

@@ -1,32 +1,14 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import {
+  getData,
+  postData,
+  putData,
+  deleteData,
+} from "../../../../../services/apiEndpoints"; // Adjust the path as necessary
+import { setShowError } from "../../../Common/Alerts/alertsSlice";
+import { handleError } from "../../../Common/Alerts/errorhandling.action";
 import toast from "react-hot-toast";
-import { baseUrl } from "../../../../../config/Common";
-import { setErrorMsg, setShowError } from "../../../Common/Alerts/alertsSlice";
-import { ErrorMsg } from "../../../Common/Alerts/errorhandling.action";
-
-const say = localStorage.getItem("say");
-
-// Helper function to get the token from Redux state with centralized error handling
-const getToken = (state, rejectWithValue, dispatch) => {
-  const token = state.common.auth?.token;
-  if (!token) {
-    dispatch(setShowError(true));
-    dispatch(setErrorMsg("Authentication Failed"));
-    return rejectWithValue("Authentication Failed");
-  }
-  return `Bearer ${token}`;
-};
-
-// Centralized error handling
-const handleError = (error, dispatch, rejectWithValue) => {
-  const err = ErrorMsg(error);
-  dispatch(setShowError(true));
-  dispatch(setErrorMsg(err.message));
-  return rejectWithValue(err.message);
-};
-
-// Thunks with integrated error handling, token management, and `say` parameter
+import { getAY } from "../../../../../Utils/academivYear";
 
 export const fetchFilteredQuizzesThunk = createAsyncThunk(
   "quiz/fetchFilteredQuizzes",
@@ -35,8 +17,9 @@ export const fetchFilteredQuizzesThunk = createAsyncThunk(
     { getState, rejectWithValue, dispatch }
   ) => {
     try {
-      const token = getToken(getState(), rejectWithValue, dispatch);
-      const say = localStorage.getItem("say");
+      const say = getAY();
+      dispatch(setShowError(false));
+
       const params = {
         ...(moduleId && { moduleId }),
         ...(chapterId && { chapterId }),
@@ -45,18 +28,14 @@ export const fetchFilteredQuizzesThunk = createAsyncThunk(
 
       const subjectId =
         sid || getState().common.user.subjectInfo.selectedSubjectId;
-      const response = await axios.get(
-        `${baseUrl}/admin/quizzes/${subjectId}?say=${say}`,
-        {
-          headers: { Authentication: token },
-          params,
-        }
-      );
 
-      if (response.data.success) {
-        return response.data.quizzes;
+      const endpoint = `/admin/quizzes/${subjectId}`;
+      const response = await getData(endpoint, { params });
+
+      if (response.success) {
+        return response.quizzes;
       } else {
-        throw new Error(response.data.message || "Failed to fetch quizzes");
+        throw new Error(response.message || "Failed to fetch quizzes");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -66,21 +45,19 @@ export const fetchFilteredQuizzesThunk = createAsyncThunk(
 
 export const fetchQuizByIdThunk = createAsyncThunk(
   "quiz/fetchQuizById",
-  async (quizId, { getState, rejectWithValue, dispatch }) => {
+  async (quizId, { rejectWithValue, dispatch }) => {
     try {
-      const token = getToken(getState(), rejectWithValue, dispatch);
-      const say = localStorage.getItem("say");
-      const response = await axios.get(
-        `${baseUrl}/admin/quiz/${quizId}?say=${say}`,
-        {
-          headers: { Authentication: token },
-        }
-      );
+      const say = getAY();
+      dispatch(setShowError(false));
 
-      if (response.data.success) {
-        return response.data.quiz;
+      const endpoint = `/admin/quiz/${quizId}`;
+      const params = { say };
+      const response = await getData(endpoint, { params });
+
+      if (response.success) {
+        return response.quiz;
       } else {
-        throw new Error(response.data.message || "Quiz not found");
+        throw new Error(response.message || "Quiz not found");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -90,29 +67,25 @@ export const fetchQuizByIdThunk = createAsyncThunk(
 
 export const addQuestionThunk = createAsyncThunk(
   "quiz/addQuestion",
-  async ({ quizId, question }, { getState, rejectWithValue, dispatch }) => {
+  async ({ quizId, question }, { rejectWithValue, dispatch }) => {
     try {
-      const token = getToken(getState(), rejectWithValue, dispatch);
-      const resolvedQuizId = quizId || getState().admin.quizzes.quizzDetail._id;
-      const say = localStorage.getItem("say");
+      const say = getAY();
+      dispatch(setShowError(false));
 
-      const response = await axios.put(
-        `${baseUrl}/admin/add_question/quiz/${resolvedQuizId}?say=${say}`,
-        question,
-        { headers: { Authentication: token } }
-      );
+      const endpoint = `/admin/add_question/quiz/${quizId}?say=${say}`;
+      const response = await putData(endpoint, question);
 
-      if (response.data.success) {
+      if (response.success) {
         console.log("Toast Triggered"); // Log here to confirm it’s called once
         toast.success("Question added", {
           id: "unique-toast-id",
           position: "bottom-left",
         });
 
-        dispatch(fetchQuizByIdThunk(response.data.quiz._id));
-        return response.data.quiz;
+        dispatch(fetchQuizByIdThunk(response.quiz._id));
+        return response.quiz;
       } else {
-        throw new Error(response.data.message || "Failed to add question");
+        throw new Error(response.message || "Failed to add question");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -122,25 +95,20 @@ export const addQuestionThunk = createAsyncThunk(
 
 export const updateQuestionThunk = createAsyncThunk(
   "quiz/updateQuestion",
-  async (
-    { quizId, questionId, question },
-    { getState, rejectWithValue, dispatch }
-  ) => {
+  async ({ quizId, questionId, question }, { rejectWithValue, dispatch }) => {
     try {
-      const token = getToken(getState(), rejectWithValue, dispatch);
-      const say = localStorage.getItem("say");
-      const response = await axios.put(
-        `${baseUrl}/admin/quiz/${quizId}/question/${questionId}?say=${say}`,
-        question,
-        { headers: { Authentication: token } }
-      );
+      const say = getAY();
+      dispatch(setShowError(false));
 
-      if (response.data.success) {
+      const endpoint = `/admin/quiz/${quizId}/question/${questionId}?say=${say}`;
+      const response = await putData(endpoint, question);
+
+      if (response.success) {
         toast.success("Question updated successfully");
         dispatch(fetchQuizByIdThunk(quizId));
-        return response.data.quiz;
+        return response.quiz;
       } else {
-        throw new Error(response.data.message || "Failed to update question");
+        throw new Error(response.message || "Failed to update question");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -150,21 +118,20 @@ export const updateQuestionThunk = createAsyncThunk(
 
 export const deleteQuestionThunk = createAsyncThunk(
   "quiz/deleteQuestion",
-  async ({ quizId, questionId }, { getState, rejectWithValue, dispatch }) => {
+  async ({ quizId, questionId }, { rejectWithValue, dispatch }) => {
     try {
-      const token = getToken(getState(), rejectWithValue, dispatch);
-      const say = localStorage.getItem("say");
-      const response = await axios.delete(
-        `${baseUrl}/admin/quiz/${quizId}/question/${questionId}?say=${say}`,
-        { headers: { Authentication: token } }
-      );
+      const say = getAY();
+      dispatch(setShowError(false));
 
-      if (response.data.success) {
+      const endpoint = `/admin/quiz/${quizId}/question/${questionId}?say=${say}`;
+      const response = await deleteData(endpoint);
+
+      if (response.success) {
         toast.success("Question deleted successfully");
         dispatch(fetchQuizByIdThunk(quizId));
         return questionId;
       } else {
-        throw new Error(response.data.message || "Failed to delete question");
+        throw new Error(response.message || "Failed to delete question");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -174,24 +141,20 @@ export const deleteQuestionThunk = createAsyncThunk(
 
 export const createQuizThunk = createAsyncThunk(
   "quiz/createQuiz",
-  async (quizData, { getState, rejectWithValue, dispatch }) => {
+  async (quizData, { rejectWithValue, dispatch }) => {
     try {
-      const token = getToken(getState(), rejectWithValue, dispatch);
-      const say = localStorage.getItem("say");
-      const response = await axios.post(
-        `${baseUrl}/admin/create_quiz?say=${say}`,
-        quizData,
-        {
-          headers: { Authentication: token },
-        }
-      );
+      const say = getAY();
+      dispatch(setShowError(false));
 
-      if (response.data.success) {
+      const endpoint = `/admin/create_quiz?say=${say}`;
+      const response = await postData(endpoint, quizData);
+
+      if (response.success) {
         toast.success("Quiz created successfully");
-        dispatch(fetchQuizByIdThunk(response.data.quiz._id));
-        return response.data.quiz;
+        dispatch(fetchQuizByIdThunk(response.quiz._id));
+        return response.quiz;
       } else {
-        throw new Error(response.data.message || "Failed to create quiz");
+        throw new Error(response.message || "Failed to create quiz");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -201,22 +164,15 @@ export const createQuizThunk = createAsyncThunk(
 
 export const updateQuizThunk = createAsyncThunk(
   "quiz/updateQuiz",
-  async (
-    { quizId, quizData, navigate },
-    { getState, rejectWithValue, dispatch }
-  ) => {
+  async ({ quizId, quizData, navigate }, { rejectWithValue, dispatch }) => {
     try {
-      const token = getToken(getState(), rejectWithValue, dispatch);
-      const say = localStorage.getItem("say");
-      const response = await axios.put(
-        `${baseUrl}/admin/update_quiz/${quizId}?say=${say}`,
-        quizData,
-        {
-          headers: { Authentication: token },
-        }
-      );
+      const say = getAY();
+      dispatch(setShowError(false));
 
-      if (response.data.success) {
+      const endpoint = `/admin/update_quiz/${quizId}?say=${say}`;
+      const response = await putData(endpoint, quizData);
+
+      if (response.success) {
         toast.success("Quiz updated successfully");
         dispatch(fetchQuizByIdThunk(quizId));
 
@@ -225,9 +181,9 @@ export const updateQuizThunk = createAsyncThunk(
           navigate(-1);
         }
 
-        return response.data.quiz;
+        return response.quiz;
       } else {
-        throw new Error(response.data.message || "Failed to update quiz");
+        throw new Error(response.message || "Failed to update quiz");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -239,16 +195,13 @@ export const deleteQuizThunk = createAsyncThunk(
   "quiz/deleteQuiz",
   async (quizId, { getState, rejectWithValue, dispatch }) => {
     try {
-      const token = getToken(getState(), rejectWithValue, dispatch);
-      const say = localStorage.getItem("say");
-      const response = await axios.delete(
-        `${baseUrl}/admin/delete_quiz/${quizId}?say=${say}`,
-        {
-          headers: { Authentication: token },
-        }
-      );
+      const say = getAY();
+      dispatch(setShowError(false));
 
-      if (response.data.success) {
+      const endpoint = `/admin/delete_quiz/${quizId}?say=${say}`;
+      const response = await deleteData(endpoint);
+
+      if (response.success) {
         toast.success("Quiz deleted successfully");
         dispatch(
           fetchFilteredQuizzesThunk({
@@ -257,7 +210,7 @@ export const deleteQuizThunk = createAsyncThunk(
         );
         return quizId;
       } else {
-        throw new Error(response.data.message || "Failed to delete quiz");
+        throw new Error(response.message || "Failed to delete quiz");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);

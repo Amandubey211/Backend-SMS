@@ -1,52 +1,31 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
 import toast from "react-hot-toast";
-import { baseUrl } from "../../../../../config/Common";
-import { setErrorMsg, setShowError } from "../../../Common/Alerts/alertsSlice";
-import { ErrorMsg } from "../../../Common/Alerts/errorhandling.action";
+import { setShowError } from "../../../Common/Alerts/alertsSlice";
+import { handleError } from "../../../Common/Alerts/errorhandling.action";
+import { getAY } from "../../../../../Utils/academivYear";
+import {
+  postData,
+  deleteData,
+  putData,
+  getData,
+} from "../../../../../services/apiEndpoints";
 
-const say = localStorage.getItem("say");
-
-// Helper function to get the token from the Redux state
-const getToken = (state, rejectWithValue, dispatch) => {
-  const token = state.common.auth?.token;
-  if (!token) {
-    dispatch(setShowError(true));
-    dispatch(setErrorMsg("Authentication Failed"));
-    return rejectWithValue("Authentication Failed");
-  }
-  return `Bearer ${token}`;
-};
-
-// Centralized error handling
-const handleError = (error, dispatch, rejectWithValue) => {
-  const err = ErrorMsg(error);
-  dispatch(setShowError(true));
-  dispatch(setErrorMsg(err.message));
-  return rejectWithValue(err.message);
-};
-
-// Thunk for creating an assignment
 export const createAssignmentThunk = createAsyncThunk(
   "assignment/createAssignment",
-  async (assignmentData, { rejectWithValue, getState, dispatch }) => {
+  async (assignmentData, { rejectWithValue, dispatch }) => {
+    const say = getAY();
+    dispatch(setShowError(false));
+
     try {
-      const token = getToken(getState(), rejectWithValue, dispatch);
-      const say = localStorage.getItem("say")
-      const response = await axios.post(
-        `${baseUrl}/admin/create_assignment?say=${say}`,
-        assignmentData,
-        {
-          headers: {
-            Authentication: token,
-          },
-        }
-      );
-      if (response.data.success) {
+      const endpoint = `/admin/create_assignment`;
+      const params = { say };
+      const response = await postData(endpoint, assignmentData, { params });
+
+      if (response.success) {
         toast.success("Assignment created successfully!");
-        return response.data.assignment;
+        return response.assignment;
       } else {
-        throw new Error(response.data.message || "Failed to create assignment");
+        throw new Error(response.message || "Failed to create assignment");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -54,34 +33,32 @@ export const createAssignmentThunk = createAsyncThunk(
   }
 );
 
-// Thunk for updating an assignment
 export const updateAssignmentThunk = createAsyncThunk(
   "assignment/updateAssignment",
   async (
     { assignmentId, assignmentData, sectionId },
-    { rejectWithValue, getState, dispatch }
+    { rejectWithValue, dispatch }
   ) => {
+    const say = getAY();
+    dispatch(setShowError(false));
+
     try {
-      const token = getToken(getState(), rejectWithValue, dispatch);
-      const say = localStorage.getItem("say")
-      const response = await axios.put(
-        `${baseUrl}/admin/update_assignment/${assignmentId}?say=${say}`,
-        {
-          ...assignmentData,
-          sectionId,
-        },
-        {
-          headers: {
-            Authentication: token,
-          },
-        }
-      );
-      if (response.data.success) {
+      const endpoint = `/admin/update_assignment/${assignmentId}`;
+      const params = { say };
+      const payload = {
+        ...assignmentData,
+        sectionId,
+      };
+
+      const response = await putData(endpoint, payload, { params });
+
+      if (response.success) {
         toast.success("Assignment updated successfully!");
+        // Optionally, you can dispatch another thunk to fetch the updated assignment
         dispatch(fetchAssignmentByIdThunk(assignmentId));
-        return response.data.assignment;
+        return response.assignment;
       } else {
-        throw new Error(response.data.message || "Failed to update assignment");
+        throw new Error(response.message || "Failed to update assignment");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -89,26 +66,22 @@ export const updateAssignmentThunk = createAsyncThunk(
   }
 );
 
-// Thunk for deleting an assignment
 export const deleteAssignmentThunk = createAsyncThunk(
   "assignment/deleteAssignment",
-  async (assignmentId, { rejectWithValue, getState, dispatch }) => {
+  async (assignmentId, { rejectWithValue, dispatch }) => {
+    const say = getAY();
+    dispatch(setShowError(false));
+
     try {
-      const token = getToken(getState(), rejectWithValue, dispatch);
-      const say = localStorage.getItem("say")
-      const response = await axios.delete(
-        `${baseUrl}/admin/delete_assignment/${assignmentId}?say=${say}`,
-        {
-          headers: {
-            Authentication: token,
-          },
-        }
-      );
-      if (response.data.success) {
+      const endpoint = `/admin/delete_assignment/${assignmentId}`;
+      const params = { say };
+      const response = await deleteData(endpoint, { params });
+
+      if (response.success) {
         toast.success("Assignment deleted successfully!");
         return assignmentId;
       } else {
-        throw new Error(response.data.message || "Failed to delete assignment");
+        throw new Error(response.message || "Failed to delete assignment");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -116,26 +89,22 @@ export const deleteAssignmentThunk = createAsyncThunk(
   }
 );
 
-// Thunk for fetching assignments by class
 export const fetchAssignmentsByClassThunk = createAsyncThunk(
   "assignment/fetchAssignmentsByClass",
-  async (classId, { rejectWithValue, getState, dispatch }) => {
+  async (classId, { rejectWithValue, dispatch }) => {
+    const say = getAY();
+    dispatch(setShowError(false));
+
     try {
-      const token = getToken(getState(), rejectWithValue, dispatch);
-      const say = localStorage.getItem("say")
-      const response = await axios.get(
-        `${baseUrl}/admin/class_assignments/${classId}?say=${say}`,
-        {
-          headers: {
-            Authentication: token,
-          },
-        }
-      );
-      if (response.data.success) {
-        return response.data.assignments;
+      const endpoint = `/admin/class_assignments/${classId}`;
+      const params = { say };
+      const response = await getData(endpoint, { params });
+
+      if (response.success) {
+        return response.assignments;
       } else {
         throw new Error(
-          response.data.message || "Failed to fetch assignments by class"
+          response.message || "Failed to fetch assignments by class"
         );
       }
     } catch (error) {
@@ -144,55 +113,50 @@ export const fetchAssignmentsByClassThunk = createAsyncThunk(
   }
 );
 
-// Thunk to fetch filtered assignments
 export const fetchFilteredAssignments = createAsyncThunk(
   "assignments/fetchFiltered",
   async (
     { sid, moduleId, chapterId, publish },
-    { getState, rejectWithValue, dispatch }
+    { rejectWithValue, dispatch }
   ) => {
-    const say = localStorage.getItem("say")
     try {
-      const params = {};
-      const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = getAY();
+      dispatch(setShowError(false));
+      const endpoint = `/admin/assignments/${sid}`;
+      const params = { say };
 
       if (moduleId) params.moduleId = moduleId;
       if (chapterId) params.chapterId = chapterId;
-      if (publish !== null) params.publish = publish;
+      if (publish !== null && publish !== undefined) params.publish = publish;
 
-      const response = await axios.get(`${baseUrl}/admin/assignments/${sid}?say=${say}`, {
-        params,
-        headers: {
-          Authentication: token,
-        },
-      });
+      const response = await getData(endpoint, params);
 
-      return response.data.assignments;
+      if (response.success) {
+        return response.assignments;
+      } else {
+        throw new Error("Failed to fetch filtered assignments");
+      }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
 
-// Thunk to fetch assignment by ID
 export const fetchAssignmentByIdThunk = createAsyncThunk(
   "assignment/fetchAssignmentById",
-  async (assignmentId, { rejectWithValue, getState, dispatch }) => {
-    const say = localStorage.getItem("say")
+  async (assignmentId, { rejectWithValue, dispatch }) => {
+    const say = getAY();
+    dispatch(setShowError(false));
+
     try {
-      const token = getToken(getState(), rejectWithValue, dispatch);
-      const response = await axios.get(
-        `${baseUrl}/admin/assignment/${assignmentId}?say=${say}`,
-        {
-          headers: {
-            Authentication: token,
-          },
-        }
-      );
-      if (response.data.success) {
-        return response.data.assignment;
+      const endpoint = `/admin/assignment/${assignmentId}`;
+      const params = { say };
+      const response = await getData(endpoint, { params });
+
+      if (response.success) {
+        return response.assignment;
       } else {
-        throw new Error(response.data.message || "Failed to fetch assignment");
+        throw new Error(response.message || "Failed to fetch assignment");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);

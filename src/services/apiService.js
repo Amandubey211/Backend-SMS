@@ -1,13 +1,13 @@
 // services/apiService.js
-import axios from 'axios';
-import { baseUrl } from '../config/Common';
+import axios from "axios";
+import { baseUrl } from "../config/Common";
 
 // Create an instance of axios with default configurations
 const apiService = axios.create({
   baseURL: baseUrl, // Replace with your API base URL
   timeout: 10000, // Timeout after 10 seconds
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
 });
 
@@ -18,7 +18,7 @@ apiService.interceptors.request.use(
     // console.log("Token Retrieved:", token); // Debugging the token
 
     if (token) {
-      config.headers['Authentication'] = `Bearer ${token}`; // Attach token to request headers with the correct header name
+      config.headers["Authentication"] = `Bearer ${token}`; // Attach token to request headers with the correct header name
     }
     return config;
   },
