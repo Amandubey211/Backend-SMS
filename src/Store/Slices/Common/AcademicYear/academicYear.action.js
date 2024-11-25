@@ -46,6 +46,7 @@ export const updateAcademicYear = createAsyncThunk("user/updateAcademicYear", as
   }
 
 });
+
 export const addAcademicYear = createAsyncThunk("user/addAcademicYear", async (data, { rejectWithValue, dispatch, getState }) => {
   try {
     dispatch(setShowError(false));
