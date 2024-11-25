@@ -1,126 +1,115 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
 import toast from "react-hot-toast";
-import { baseUrl } from "../../../../../config/Common";
-import { ErrorMsg } from "../../../Common/Alerts/errorhandling.action";
-import { setShowError, setErrorMsg } from "../../../Common/Alerts/alertsSlice";
+import { handleError } from "../../../Common/Alerts/errorhandling.action";
+import { setShowError } from "../../../Common/Alerts/alertsSlice";
+import { getAY } from "../../../../../Utils/academivYear";
+import {
+  postData,
+  customRequest,
+  deleteData,
+  getData,
+} from "../../../../../services/apiEndpoints";
 
-const say = localStorage.getItem("say");
-
-// Helper function to get the token from Redux state
-const getToken = (state, rejectWithValue, dispatch) => {
-  const token = state.common.auth?.token;
-  if (!token) {
-    dispatch(setShowError(true));
-    dispatch(setErrorMsg("Authentication Failed"));
-    return rejectWithValue("Authentication Failed");
-  }
-  return `Bearer ${token}`;
-};
-
-// Centralized error handling
-const handleError = (error, dispatch, rejectWithValue) => {
-  const err = ErrorMsg(error);
-  dispatch(setShowError(true));
-  dispatch(setErrorMsg(err.message));
-  return rejectWithValue(err.message);
-};
-
-// Fetch Syllabus Thunk
 export const fetchSyllabus = createAsyncThunk(
   "syllabus/fetchSyllabus",
-  async ({ subjectId, classId }, { getState, rejectWithValue, dispatch }) => {
+  async ({ subjectId, classId }, { rejectWithValue, dispatch }) => {
+    const say = getAY();
+    dispatch(setShowError(false));
+
     try {
-      const token = getToken(getState(), rejectWithValue, dispatch);
-      const say = localStorage.getItem("say")
-      const response = await axios.get(
-        `${baseUrl}/admin/syllabus/${subjectId}/class/${classId}?say=${say}`,
+      const response = await getData(
+        `/admin/syllabus/${subjectId}/class/${classId}`,
         {
-          headers: { Authentication: token },
+          params: { say },
         }
       );
-      return response.data.data;
-    } catch (err) {
-      return handleError(err, dispatch, rejectWithValue);
+
+      if (response && response.status) {
+        return response.data;
+      } else {
+        throw new Error(response?.message || "Failed to fetch syllabus.");
+      }
+    } catch (error) {
+      return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
 
-// Delete Syllabus Thunk
 export const deleteSyllabus = createAsyncThunk(
   "syllabus/deleteSyllabus",
-  async (syllabusId, { getState, rejectWithValue, dispatch }) => {
+  async (syllabusId, { rejectWithValue, dispatch }) => {
+    const say = getAY();
+    dispatch(setShowError(false));
+
     try {
-      const token = getToken(getState(), rejectWithValue, dispatch);
-      const say = localStorage.getItem("say")
-      const response = await axios.delete(
-        `${baseUrl}/admin/syllabus/${syllabusId}?say=${say}`,
-        {
-          headers: { Authentication: token },
-        }
-      );
-      toast.success("Syllabus deleted successfully!");
-      return syllabusId;
-    } catch (err) {
-      return handleError(err, dispatch, rejectWithValue);
+      const response = await deleteData(`/admin/syllabus/${syllabusId}`, {
+        params: { say },
+      });
+
+      if (response && response.status) {
+        toast.success("Syllabus deleted successfully!");
+        return syllabusId;
+      } else {
+        toast.error(response?.message || "Failed to delete syllabus.");
+      }
+    } catch (error) {
+      return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
 
-// Create Syllabus Thunk
 export const createSyllabus = createAsyncThunk(
   "syllabus/createSyllabus",
-  async ({ title, content, subjectId }, { getState, rejectWithValue, dispatch }) => {
+  async ({ title, content, subjectId }, { rejectWithValue, dispatch }) => {
+    const say = getAY();
+    dispatch(setShowError(false));
+
     try {
-      const token = getToken(getState(), rejectWithValue, dispatch);
-      const say = localStorage.getItem("say")
-      const response = await axios.post(
-        `${baseUrl}/admin/syllabus?say=${say}`,
-        { title, content, subjectId },
-        {
-          headers: { Authentication: token },
-        }
-      );
-      toast.success("Syllabus created successfully!");
-      return response.data.data;
-    } catch (err) {
-      return handleError(err, dispatch, rejectWithValue);
+      const payload = { title, content, subjectId };
+      const response = await postData("/admin/syllabus", payload, {
+        params: { say },
+      });
+
+      if (response && response.status) {
+        toast.success("Syllabus created successfully!");
+        return response.data;
+      } else {
+        toast.error(response?.message || "Failed to create syllabus.");
+      }
+    } catch (error) {
+      return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
 
-// Edit Syllabus Thunk
 export const editSyllabus = createAsyncThunk(
   "syllabus/editSyllabus",
-  async ({ syllabusId, data, cid }, { getState, rejectWithValue, dispatch }) => {
-    try {
-      const token = getToken(getState(), rejectWithValue, dispatch);
-      const say = localStorage.getItem("say")
-      const formData = new FormData();
+  async ({ syllabusId, data, cid }, { rejectWithValue, dispatch }) => {
+    const say = getAY();
+    dispatch(setShowError(false));
 
+    try {
+      const formData = new FormData();
       for (const key in data) {
         formData.append(key, data[key]);
       }
 
-      const response = await axios.put(
-        `${baseUrl}/admin/syllabus/${syllabusId}/class/${cid}?say=${say}`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authentication: token,
-          },
-        }
-      );
+      const endpoint = `/admin/syllabus/${syllabusId}/class/${cid}`;
+      const response = await customRequest("put", endpoint, formData, {
+        params: { say },
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
-      if (response.data.status) {
+      if (response && response.status) {
         toast.success("Syllabus updated successfully!");
-        return response.data.data;
+        return response.data;
       } else {
-        throw new Error("Failed to update syllabus");
+        toast.error("Failed to update syllabus.");
       }
-    } catch (err) {
-      return handleError(err, dispatch, rejectWithValue);
+    } catch (error) {
+      return handleError(error, dispatch, rejectWithValue);
     }
   }
 );

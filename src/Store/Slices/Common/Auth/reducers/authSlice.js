@@ -13,7 +13,6 @@ import {
   registerStudentDetails,
   uploadStudentDocuments,
 } from "../actions/studentActions";
-import { redirect } from "react-router-dom";
 
 const initialState = {
   isLoggedIn: false,

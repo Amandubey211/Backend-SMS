@@ -14,7 +14,7 @@ import teacherReducer from "./Slices/Admin/Class/Teachers/teacherSlice";
 import classReducer from "./Slices/Admin/Class/reducer/classSlice"; // Importing the combined admin reducer
 import subjectReducer from "./Slices/Admin/Class/Subject/subjectSlice";
 import subjectGradesReducer from "./Slices/Admin/Class/grades/gradesSlice";
-import subjectAssignmentReducer from "./Slices/Admin/Class/Assignments/assignmentSlice";
+// import subjectAssignmentReducer from "./Slices/Admin/Class/Assignments/assignmentSlice";
 import subjectQuizReducer from "./Slices/Admin/Class/Quiz/quizSlice";
 import sectionReducer from "./Slices/Admin/Class/Section_Groups/groupSectionSlice";
 import graduateReducer from "./Slices/Admin/Graduate/graduateSlice";
@@ -37,7 +37,6 @@ import studentFeesReducer from "./Slices/Admin/Accounting/StudentFees/studentFee
 import expensesReducer from "./Slices/Admin/Accounting/Expenses/expensesSlice";
 import adminRubricReducer from "./Slices/Admin/Class/Rubric/rubricSlice";
 import adminDiscussionCommentsReducer from "./Slices/Admin/Class/Discussion/Comments/discussionCommentsSlice";
-import adminCommentReducer from "./Slices/Admin/Class/Comment/commentsSlice";
 import adminAnnouncementCommentsReducer from "./Slices/Admin/Class/Announcement/Comment/announcementCommentsSlice";
 import adminAssignmentReducer from "./Slices/Admin/Class/Assignment/assignmentSlice";
 import adminQuizReducer from "./Slices/Admin/Class/Quiz/quizSlice";
@@ -108,13 +107,12 @@ const stdClassPersistConfig = {
   storage,
 };
 
-
 // Combine the Auth and User reducers under a Common entity
 const commonReducer = combineReducers({
   auth: persistReducer(authPersistConfig, authReducer),
   user: persistReducer(userPersistConfig, userReducer),
   alertMsg: alertReducer,
-  academicYear:academicYearReducer,
+  academicYear: academicYearReducer,
 });
 
 const AdminReducer = combineReducers({
@@ -137,7 +135,6 @@ const AdminReducer = combineReducers({
   rubrics: adminRubricReducer,
   discussionComments: adminDiscussionCommentsReducer,
   announcementComments: adminAnnouncementCommentsReducer,
-  comments: adminCommentReducer,
   assignments: adminAssignmentReducer,
   quizzes: adminQuizReducer,
   timetable: timetableReducer,
@@ -152,7 +149,7 @@ const AdminReducer = combineReducers({
   student_fees: studentFeesReducer,
   expenses: expensesReducer,
   subject_grades: subjectGradesReducer,
-  subject_assignment: subjectAssignmentReducer,
+  // subject_assignment: subjectAssignmentReducer,
   subject_quiz: subjectQuizReducer,
 });
 

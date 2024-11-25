@@ -21,7 +21,7 @@ const iconSlice = createSlice({
       state.icons = [];
     },
     selectIcon(state, action) {
-      state.selectedIcon = action.payload;   
+      state.selectedIcon = action.payload;
     },
     resetIconSelection(state) {
       state.selectedIcon = null;

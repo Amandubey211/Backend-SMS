@@ -13,7 +13,7 @@ const IconGrid = ({ activeIconId, onEdit }) => {
 
   // Function to handle icon selection
   const handleIconClick = (icon) => {
-   dispatch(selectIcon(icon))
+    dispatch(selectIcon(icon));
   };
 
   // Function to handle icon deletion
@@ -38,7 +38,6 @@ const IconGrid = ({ activeIconId, onEdit }) => {
                 ? "border-2 border-purple-500 scale-125 mx-2"
                 : "border border-gray-300"
             }`}
-            
             aria-label={`Select icon ${icon.name}`}
           >
             <img
