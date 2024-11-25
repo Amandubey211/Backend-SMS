@@ -54,16 +54,17 @@ export const patchData = async (endpoint, data) => {
 };
 
 // Example for custom API requests if needed
-export const customRequest = async (method, endpoint, data = null) => {
+export const customRequest = async (method, endpoint, data = null, headers) => {
   try {
     const response = await apiService({
       method,
       url: endpoint,
       data,
+      headers
     });
     return response.data;
   } catch (error) {
     console.log('Error with custom request:', error);
-   
+
   }
 };
