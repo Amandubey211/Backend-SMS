@@ -1,16 +1,9 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import toast from "react-hot-toast";
-import { baseUrl } from "../../../../config/Common";
-import {
-  ErrorMsg,
-  handleError,
-} from "../../Common/Alerts/errorhandling.action";
+import { handleError } from "../../Common/Alerts/errorhandling.action";
 import { setShowError } from "../../Common/Alerts/alertsSlice";
 
-import {
-  setActiveAcademicYear,
-  setSeletedAcademicYear,
-} from "./academicYear.slice";
+import { setSeletedAcademicYear } from "./academicYear.slice";
 import {
   deleteData,
   getData,
@@ -22,7 +15,6 @@ export const fetchAcademicYear = createAsyncThunk(
   "user/fetchAcademicYear",
   async (_, { rejectWithValue, dispatch, getState }) => {
     const token = getState().common.auth.token;
-
 
     try {
       dispatch(setShowError(false));
@@ -38,7 +30,6 @@ export const fetchAcademicYear = createAsyncThunk(
     }
   }
 );
-
 
 export const updateAcademicYear = createAsyncThunk(
   "user/updateAcademicYear",
@@ -70,7 +61,6 @@ export const addAcademicYear = createAsyncThunk(
   }
 );
 
-
 export const deleteAcademicYear = createAsyncThunk(
   "user/deleteAcademicYear",
   async (id, { rejectWithValue, dispatch }) => {
@@ -84,5 +74,4 @@ export const deleteAcademicYear = createAsyncThunk(
       return handleError(error, dispatch, rejectWithValue);
     }
   }
-
-});
+); // Removed extra parenthesis here
