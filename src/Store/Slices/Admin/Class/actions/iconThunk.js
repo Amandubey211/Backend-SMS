@@ -8,7 +8,7 @@ import {
 import { setShowError } from "../../../Common/Alerts/alertsSlice";
 import { handleError } from "../../../Common/Alerts/errorhandling.action";
 import toast from "react-hot-toast";
-import getAY from "../../../../../Utils/academicYear"; // Adjust the path as necessary
+import { getAY } from "../../../../../Utils/academivYear";
 
 export const fetchAllIcons = createAsyncThunk(
   "icons/fetchAllIcons",
