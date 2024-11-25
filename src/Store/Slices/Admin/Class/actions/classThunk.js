@@ -7,8 +7,8 @@ import {
 } from "../../../../../services/apiEndpoints"; // Adjust the path as necessary
 import { setShowError } from "../../../Common/Alerts/alertsSlice";
 import toast from "react-hot-toast";
-import getAY from "../../../../../Utils/academicYear"; // Adjust the path as necessary
 import { handleError } from "../../../Common/Alerts/errorhandling.action";
+import { getAY } from "../../../../../Utils/academivYear";
 
 export const fetchAllClasses = createAsyncThunk(
   "class/fetchAllClasses",
