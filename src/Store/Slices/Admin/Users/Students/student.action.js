@@ -7,7 +7,7 @@ import toast from "react-hot-toast";
 import { fetchStudentsByClassAndSection } from "../../Class/Students/studentThunks";
 import { getData, putData } from "../../../../../services/apiEndpoints";
 
-const say = localStorage.getItem("say");
+const say = getAY();
 
 
 
@@ -15,7 +15,7 @@ export const fetchAllStudents = createAsyncThunk(
   "user/allStudents",
   async (filter, { rejectWithValue, dispatch }) => {
     try {
-      const say = localStorage.getItem("say");
+      const say = getAY();
       dispatch(setShowError(false));
       const response = await getData(`${baseUrl}/admin/all/students?say=${say}`,filter);
       return response.data;
@@ -29,7 +29,7 @@ export const updateStudents = createAsyncThunk(
   "user/updateStudents",
   async ({data}, { rejectWithValue, dispatch }) => {
     try {
-      const say = localStorage.getItem("say");
+      const say = getAY();
       dispatch(setShowError(false));
       const response = await putData(`/admin/update/StudentInfo?say=${say}`,data);
       toast.success(response?.message);
@@ -44,7 +44,7 @@ export const editStudents = createAsyncThunk(
   "user/editStudents",
   async ({id,data}, { rejectWithValue, dispatch }) => {
     try {
-      const say = localStorage.getItem("say");
+      const say = getAY();
       dispatch(setShowError(false));
       const response = await putData(`/admin/editStudent/${id}?say=${say}`,data);
       if(response.success){
@@ -63,7 +63,7 @@ export const studentIssueBooks = createAsyncThunk(
   async (id, { rejectWithValue, dispatch }) => {
     try {
       dispatch(setShowError(false));
-      const say = localStorage.getItem("say");
+      const say = getAY();
       const response = await getData(`/admin/all/bookIssue/?studentId=${id}&say=${say}`);
       return response;
     } catch (error) {
@@ -78,7 +78,7 @@ export const fetchStudentDocument = createAsyncThunk(
   async (id, { rejectWithValue,  dispatch }) => {
     try {
       dispatch(setShowError(false));
-      const say = localStorage.getItem("say");
+      const say = getAY();
       const response = await getData(`/admin/documents/student/${id}?say=${say}`);
       return response.documents?.documents;
     } catch (error) {
@@ -93,7 +93,7 @@ export const fetchStudentAttendance = createAsyncThunk(
   async ({ month, year, studentId }, { rejectWithValue, dispatch }) => {
     try {
       dispatch(setShowError(false));
-      const say = localStorage.getItem("say");
+      const say = getAY();
       const response = await getData(`/api/studentDashboard/myAttendance?say=${say}`,{ month, year, studentId },
       );
       const { report, summary } = response.report;
@@ -114,7 +114,7 @@ export const fetchStudentGrades = createAsyncThunk(
   async ({ params, studentId, studentClassId }, { rejectWithValue, getState, dispatch }) => {
     try {
       dispatch(setShowError(false));
-      const say = localStorage.getItem("say");
+      const say = getAY();
       const response = await getData(`/admin/grades/student/${studentId}/class/${studentClassId}?say=${say}`,params);
       return response;
     } catch (error) {
@@ -129,7 +129,7 @@ export const fetchStudentSubjects = createAsyncThunk(
   async (id, { rejectWithValue, getState, dispatch }) => {
     try {
       dispatch(setShowError(false));
-      const say = localStorage.getItem("say");
+      const say = getAY();
       const response = await getData(`/api/studentDashboard/subjects/${id}?say=${say}`);
       return response.subjects;
     } catch (error) {
@@ -144,7 +144,7 @@ export const fetchStudentFinance = createAsyncThunk(
   async (id, { rejectWithValue, getState, dispatch }) => {
     try {
       dispatch(setShowError(false));
-      const say = localStorage.getItem("say");
+      const say = getAY();
       const response = await getData(`/student/fees/${id}?say=${say}`);
       return response;
     } catch (error) {
@@ -159,7 +159,7 @@ export const fetchStudentSubjectProgress = createAsyncThunk(
   async (id, { rejectWithValue, getState, dispatch }) => {
     try {
       dispatch(setShowError(false));
-      const say = localStorage.getItem("say");
+      const say = getAY();
       const response = await getData(`/admin/course/subjects/student/${id}?say=${say}`);
       return response.data;
     } catch (error) {
@@ -174,7 +174,7 @@ export const fetchAttendanceData = createAsyncThunk(
   async (id, { rejectWithValue, getState, dispatch }) => {
     try {
       dispatch(setShowError(false));
-      const say = localStorage.getItem("say");
+      const say = getAY();
       const response = await getData(`/api/teacher/attendance/getYearlyAttendance/${id}?say=${say}`);
       return response.data;
     } catch (error) {
@@ -189,7 +189,7 @@ export const fetchCourseProgress = createAsyncThunk(
   async (ids, { rejectWithValue, getState, dispatch }) => {
     try {
       dispatch(setShowError(false));
-      const say = localStorage.getItem("say");
+      const say = getAY();
       const response = await getData(`${baseUrl}/admin/course/progress/student/${ids.studentId}/subject/${ids.subjectId}?say=${say}`);
       return response.data;
     } catch (error) {
@@ -204,7 +204,7 @@ export const fetchStudentTask = createAsyncThunk(
   async ({ id }, { rejectWithValue, getState, dispatch }) => {
     try {
       dispatch(setShowError(false));
-      const say = localStorage.getItem("say");
+      const say = getAY();
       const response = await getData(`/admin/task/student/${id}?say=${say}`);
       return response.completedTask;
     } catch (error) {

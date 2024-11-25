@@ -8,6 +8,7 @@ import { createStaffSalary } from "../../Accounting/Expenses/expenses.action";
 import { ErrorMsg, handleError } from "../../../Common/Alerts/errorhandling.action";
 import { setShowError, setErrorMsg } from "../../../Common/Alerts/alertsSlice";
 import { deleteData, getData, postData, putData } from "../../../../../services/apiEndpoints";
+import { getAY } from "../../../../../Utils/academivYear";
 
 
 // Fetch All Staff
@@ -15,7 +16,7 @@ export const fetchAllStaff = createAsyncThunk(
   "user/allStaff",
   async (_, { rejectWithValue, getState, dispatch }) => {
     try {
-      const say = localStorage.getItem("say");
+      const say = getAY();
       dispatch(setShowError(false));
       const response = await getData(`/admin/get_staffs?say=${say}`);
       dispatch(setAllStaffs(response));
@@ -31,7 +32,7 @@ export const addUser = createAsyncThunk(
   "user/addUser",
   async ({ userData, address }, { rejectWithValue, getState, dispatch }) => {
     try {
-      const say = localStorage.getItem("say");
+      const say = getAY();
       dispatch(setShowError(false));
       const formData = new FormData();
       Object.keys(userData).forEach((key) => formData.append(key, userData[key]));
@@ -66,7 +67,7 @@ export const editUser = createAsyncThunk(
   "user/editUser",
   async ({ userData, address, id }, { rejectWithValue, getState, dispatch }) => {
     try {
-      const say = localStorage.getItem("say");
+      const say = getAY();
       dispatch(setShowError(false));
       const formData = new FormData();
       Object.keys(userData).forEach((key) => formData.append(key, userData[key]));
@@ -94,7 +95,7 @@ export const deactiveUser = createAsyncThunk(
   async (userData, { rejectWithValue, getState, dispatch }) => {
     try {
       dispatch(setShowError(false));
-      const say = localStorage.getItem("say");
+      const say = getAY();
       const response = await deleteData(`${baseUrl}/admin/delete_staff/${userData.id}?say=${say}`);
 
       if (response.success) {
@@ -119,7 +120,7 @@ export const activeUser = createAsyncThunk(
   async (userData, { rejectWithValue, getState, dispatch }) => {
     try {
       dispatch(setShowError(false));
-      const say = localStorage.getItem("say");
+      const say = getAY();
       const response = await putData(`${baseUrl}/admin/update_active_status?say=${say}`, userData);
 
       if (response.success) {
