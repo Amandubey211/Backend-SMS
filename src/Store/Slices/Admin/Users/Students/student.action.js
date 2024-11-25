@@ -5,7 +5,7 @@ import { setShowError, setErrorMsg } from "../../../Common/Alerts/alertsSlice";
 import { ErrorMsg, handleError } from "../../../Common/Alerts/errorhandling.action";
 import toast from "react-hot-toast";
 import { fetchStudentsByClassAndSection } from "../../Class/Students/studentThunks";
-import { getData, putData } from "../../../../../services/apiEndpoints";
+import { customRequest, getData, putData } from "../../../../../services/apiEndpoints";
 import { getAY } from "../../../../../Utils/academivYear";
 
 
@@ -30,7 +30,10 @@ export const updateStudents = createAsyncThunk(
     try {
       const say = getAY();
       dispatch(setShowError(false));
-      const response = await putData(`/admin/update/StudentInfo?say=${say}`,data);
+      const response = await customRequest('put',`/admin/update/StudentInfo?say=${say}`,data,   {
+        "Content-Type": "multipart/form-data",
+      }
+);
       toast.success(response?.message);
       dispatch(fetchAllStudents())
       return response;

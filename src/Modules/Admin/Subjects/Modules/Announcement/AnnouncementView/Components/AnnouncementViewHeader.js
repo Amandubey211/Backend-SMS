@@ -9,7 +9,6 @@ import Sidebar from "../../../../../../../Components/Common/Sidebar";
 import DeleteModal from "../../../../../../../Components/Common/DeleteModal";
 import AnnouncementCommentSection from "../AnnouncementMessage/AnnouncementCommentSection";
 import { deleteAnnouncement } from "../../../../../../../Store/Slices/Admin/Class/Announcement/announcementThunk";
-import CommentModule from "../../../Comment/CommentModule";
 import { FaUserCircle } from "react-icons/fa";
 
 const AnnouncementViewHeader = () => {

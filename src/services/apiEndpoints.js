@@ -1,14 +1,13 @@
 // services/apiEndpoints.js
 import apiService from "./apiService";
 
-
 // GET request
 export const getData = async (endpoint, params = {}) => {
   try {
     const response = await apiService.get(endpoint, { params, withCredentials: true });
     return response.data;
   } catch (error) {
-    console.log('Error fetching data:', error);
+    console.log("Error fetching data:", error);
   }
 };
 
@@ -18,7 +17,7 @@ export const postData = async (endpoint, data) => {
     const response = await apiService.post(endpoint, data);
     return response.data;
   } catch (error) {
-    console.log('Error posting data:', error);
+    console.log("Error posting data:", error);
   }
 };
 
@@ -28,7 +27,7 @@ export const putData = async (endpoint, data) => {
     const response = await apiService.put(endpoint, data);
     return response.data;
   } catch (error) {
-    console.log('Error updating data:', error);
+    console.log("Error updating data:", error);
   }
 };
 
@@ -38,8 +37,7 @@ export const deleteData = async (endpoint) => {
     const response = await apiService.delete(endpoint);
     return response.data;
   } catch (error) {
-    console.log('Error deleting data:', error);
-
+    console.log("Error deleting data:", error);
   }
 };
 
@@ -49,22 +47,30 @@ export const patchData = async (endpoint, data) => {
     const response = await apiService.patch(endpoint, data);
     return response.data;
   } catch (error) {
-    console.log('Error patching data:', error);
+    console.log("Error patching data:", error);
   }
 };
 
 // Example for custom API requests if needed
-export const customRequest = async (method, endpoint, data = null, headers) => {
+
+export const customRequest = async (
+  method,
+  endpoint,
+  data = null,
+  config = {}
+) => {
+
   try {
     const response = await apiService({
       method,
       url: endpoint,
       data,
-      headers
+      ...config, // Spread additional configurations like params and headers
     });
     return response.data;
   } catch (error) {
-    console.log('Error with custom request:', error);
+    console.log("Error with custom request:", error);
+    throw error; // Re-throw the error for the thunk to handle
 
   }
 };

@@ -3,12 +3,13 @@ import axios from 'axios';
 import { baseUrl } from '../config/Common';
 import Cookies from 'js-cookie';
 
+
 // Create an instance of axios with default configurations
 const apiService = axios.create({
   baseURL: baseUrl, // Replace with your API base URL
   timeout: 10000, // Timeout after 10 seconds
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
 });
 

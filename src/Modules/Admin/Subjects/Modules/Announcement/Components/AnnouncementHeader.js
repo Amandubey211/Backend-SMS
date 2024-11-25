@@ -41,12 +41,14 @@ const AnnouncementHeader = ({ onSearch }) => {
             onChange={handleSearchChange}
             aria-label={t("Search")}
           />
-          <button className="absolute right-3 hover:text-gray-700 transition-all duration-200 ease-in-out" aria-label={t("Search")}>
+          <button
+            className="absolute right-3 hover:text-gray-700 transition-all duration-200 ease-in-out"
+            aria-label={t("Search")}
+          >
             <CiSearch className="w-5 h-5 text-gray-500" />
           </button>
         </div>
 
-  
         <div className="flex items-center gap-4">
           <span className="text-gray-500">{t("Status")}: </span>
 
@@ -72,7 +74,7 @@ const AnnouncementHeader = ({ onSearch }) => {
             />
             <span className="ml-2">{t("Unread")}</span>
           </label>
-        </div> */}
+        </div>
       </div>
     </div>
   );

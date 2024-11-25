@@ -1,92 +1,81 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
-import { baseUrl } from "../../../../../config/Common"; // Importing baseUrl
-import { setShowError, setErrorMsg } from "../../../Common/Alerts/alertsSlice";
-import { ErrorMsg } from "../../../Common/Alerts/errorhandling.action";
+import { getData, putData } from "../../../../../services/apiEndpoints"; // Adjust the path as necessary
+import { setErrorMsg, setShowError } from "../../../Common/Alerts/alertsSlice";
+import {
+  ErrorMsg,
+  handleError,
+} from "../../../Common/Alerts/errorhandling.action";
 import toast from "react-hot-toast";
+import { getAY } from "../../../../../Utils/academivYear";
 
-const say = localStorage.getItem("say");
-
-// Helper function to get the token from Redux state
-const getToken = (state, rejectWithValue, dispatch) => {
-  const token = state.common.auth?.token;
-  if (!token) {
-    dispatch(setShowError(true));
-    dispatch(setErrorMsg("Authentication Failed"));
-    return rejectWithValue("Authentication Failed");
-  }
-  return `Bearer ${token}`;
-};
-
-// Centralized error handling
-const handleError = (error, dispatch, rejectWithValue) => {
-  const err = ErrorMsg(error);
-  dispatch(setShowError(true));
-  dispatch(setErrorMsg(err.message));
-  return rejectWithValue(err.message);
-};
-
-// Fetch Assigned Quiz Students
 export const fetchAssignedQuizStudents = createAsyncThunk(
   "speedGrade/fetchAssignedQuizStudents",
-  async (quizId, { getState, rejectWithValue, dispatch }) => {
+  async (quizId, { rejectWithValue, dispatch }) => {
+    const say = getAY();
+    dispatch(setShowError(false));
+
     try {
-      const token = getToken(getState(), rejectWithValue, dispatch);
-      const say = localStorage.getItem("say");
-      const response = await axios.get(
-        `${baseUrl}/admin/speed_grade/quiz/${quizId}?say=${say}`,
-        {
-          headers: { Authentication: token },
-        }
-      );
-      return response.data.data;
+      const endpoint = `/admin/speed_grade/quiz/${quizId}`;
+      const params = { say };
+      const response = await getData(endpoint, { params });
+
+      if (response && response.success) {
+        return response.data; // Assuming 'data' contains the list of assigned students
+      } else {
+        throw new Error(
+          response.message || "Failed to fetch assigned quiz students"
+        );
+      }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
 
-// Fetch Student Quiz
 export const fetchStudentQuiz = createAsyncThunk(
   "speedGrade/fetchStudentQuiz",
-  async ({ studentId, quizId }, { getState, rejectWithValue, dispatch }) => {
+  async ({ studentId, quizId }, { rejectWithValue, dispatch }) => {
+    const say = getAY();
+    dispatch(setShowError(false));
+
     try {
-      const token = getToken(getState(), rejectWithValue, dispatch);
-      const say = localStorage.getItem("say");
-      const response = await axios.get(
-        `${baseUrl}/admin/speed_grade/quiz?say=${say}`,
-        {
-          headers: { Authentication: token },
-          params: { studentId, quizId },
-        }
-      );
-      return response.data.data;
+      const endpoint = `/admin/speed_grade/quiz`;
+      const params = { say, studentId, quizId };
+      const response = await getData(endpoint, params);
+
+      if (response && response.success) {
+        return response.data; // Assuming 'data' contains the student's quiz details
+      } else {
+        throw new Error(response.message || "Failed to fetch student quiz");
+      }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
 
-// Assign Quiz Grade
 export const assignQuizGrade = createAsyncThunk(
   "speedGrade/assignQuizGrade",
   async (
     { studentId, quizId, attemptDate, score, status },
-    { getState, rejectWithValue, dispatch }
+    { rejectWithValue, dispatch }
   ) => {
+    const say = getAY();
+    dispatch(setShowError(false));
+
     try {
-      const token = getToken(getState(), rejectWithValue, dispatch);
-      const say = localStorage.getItem("say");
-      const response = await axios.put(
-        `${baseUrl}/admin/speed_grade/quiz/grade?say=${say}`,
-        { studentId, quizId, attemptDate, score, status },
-        {
-          headers: { Authentication: token },
-        }
-      );
-      toast.success("Grade Assigned");
-      dispatch(fetchStudentQuiz({ studentId, quizId }));
-      return response.data.data;
+      const endpoint = `/admin/speed_grade/quiz/grade`;
+      const params = { say };
+      const requestBody = { studentId, quizId, attemptDate, score, status };
+      const response = await putData(endpoint, requestBody, { params });
+
+      if (response && response.success) {
+        toast.success("Grade Assigned");
+        dispatch(fetchStudentQuiz({ studentId, quizId }));
+        return response.data; // Assuming 'data' contains the updated quiz data
+      } else {
+        throw new Error(response.message || "Failed to assign quiz grade");
+      }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }

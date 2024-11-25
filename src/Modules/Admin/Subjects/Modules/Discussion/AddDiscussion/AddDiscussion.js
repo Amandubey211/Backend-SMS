@@ -1,7 +1,6 @@
 import React, { useState, useCallback } from "react";
-import { useLocation, useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-
 import Layout from "../../../../../../Components/Common/Layout";
 import SideMenubar from "../../../../../../Components/Admin/SideMenubar";
 import AddDiscussionHeader from "./Components/AddDiscussionHeader";
@@ -17,46 +16,55 @@ import {
 import toast from "react-hot-toast";
 
 const AddDiscussion = () => {
-  const { state } = useLocation();
-
   const { cid, sid } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const [assignmentName, setAssignmentName] = useState(
-    state?.discussion?.title || ""
+  // Fetch discussion from Redux state
+  const currentDiscussion = useSelector(
+    (state) => state.admin.discussions.discussion
   );
-  const [editorContent, setEditorContent] = useState(
-    state?.discussion?.content || ""
-  );
-  const [file, setFile] = useState(null);
-  const [formState, setFormState] = useState({
-    assignTo: state?.discussion?.assignTo,
-    dueDate: state?.discussion?.dueDate || "",
-    sectionId: state?.discussion?.sectionId || "",
-    groupId: state?.discussion?.groupId || "",
-    option: state?.discussion?.allowThreadedReplies
-      ? "threadedReplies"
-      : state?.discussion?.mustPostBeforeSeeingReplies
-      ? "postBeforeReplies"
-      : "",
-    availableFrom: state?.discussion?.availableFrom || "",
-    availableUntil: state?.discussion?.availableUntil || "",
-  });
-
-  const isEditing = Boolean(state?.admin?.discussion?._id);
   const isLoading = useSelector((state) => state.admin.discussions.loading);
   const error = useSelector((state) => state.admin.discussions.error);
 
+  // Determine if editing or creating
+  const isEditing = Boolean(currentDiscussion?._id);
+
+  // Component State
+  const [assignmentName, setAssignmentName] = useState(
+    currentDiscussion?.title || ""
+  );
+  const [editorContent, setEditorContent] = useState(
+    currentDiscussion?.content || ""
+  );
+  const [file, setFile] = useState(null);
+  const [formState, setFormState] = useState({
+    assignTo: currentDiscussion?.assignTo,
+    dueDate: currentDiscussion?.dueDate || "",
+    sectionId: currentDiscussion?.sectionId || "",
+    groupId: currentDiscussion?.groupId || "",
+    option: currentDiscussion?.allowThreadedReplies
+      ? "threadedReplies"
+      : currentDiscussion?.mustPostBeforeSeeingReplies
+      ? "postBeforeReplies"
+      : "",
+    availableFrom: currentDiscussion?.availableFrom || "",
+    availableUntil: currentDiscussion?.availableUntil || "",
+  });
+
+  // Event Handlers
   const handleNameChange = useCallback(
     (e) => setAssignmentName(e.target.value),
     []
   );
+
   const handleEditorChange = useCallback(
     (content) => setEditorContent(content),
     []
   );
+
   const handleFileChange = useCallback((e) => setFile(e.target.files[0]), []);
+
   const handleFormChange = useCallback((e) => {
     const { name, value } = e.target;
     setFormState((prev) => ({ ...prev, [name]: value }));
@@ -82,27 +90,32 @@ const AddDiscussion = () => {
         classId: cid,
         publish,
       };
+
       if (!discussionData.assignTo) {
-        toast.error("please assign the discussion");
+        toast.error("Please assign the discussion");
         return;
       }
+
       if (!discussionData.title) {
-        toast.error("please give title to the discussion");
+        toast.error("Please provide a title for the discussion");
         return;
       }
+
       if (isEditing) {
         dispatch(
           updateDiscussion({
-            discussionId: state.discussion._id,
+            discussionId: currentDiscussion._id,
             discussionData,
           })
         )
           .unwrap()
-          .then(() => navigate(`/class/${cid}/${sid}/discussions`));
+          .then(() => navigate(`/class/${cid}/${sid}/discussions`))
+          .catch((err) => toast.error(`Error updating discussion: ${err}`));
       } else {
         dispatch(createDiscussion({ discussionData, cid }))
           .unwrap()
-          .then(() => navigate(`/class/${cid}/${sid}/discussions`));
+          .then(() => navigate(`/class/${cid}/${sid}/discussions`))
+          .catch((err) => toast.error(`Error creating discussion: ${err}`));
       }
     },
     [
@@ -112,18 +125,20 @@ const AddDiscussion = () => {
       file,
       isEditing,
       dispatch,
-      state,
+      currentDiscussion,
       cid,
       sid,
       navigate,
     ]
   );
 
+  // Sidebar logic
   const isSidebarOpen = useSelector(
     (state) => state.common.user.sidebar.isOpen
   );
   const sidebarWidth = isSidebarOpen ? "15%" : "7%";
 
+  // JSX
   return (
     <Layout
       title={

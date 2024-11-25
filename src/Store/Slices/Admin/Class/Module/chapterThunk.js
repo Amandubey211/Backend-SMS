@@ -5,39 +5,30 @@ import { baseUrl } from "../../../../../config/Common";
 import { fetchModules } from "./moduleThunk";
 import { setSelectedModule } from "./moduleSlice";
 import { setErrorMsg, setShowError } from "../../../Common/Alerts/alertsSlice";
-import { ErrorMsg } from "../../../Common/Alerts/errorhandling.action";
+import {
+  ErrorMsg,
+  handleError,
+} from "../../../Common/Alerts/errorhandling.action";
+import { getAY } from "../../../../../Utils/academivYear";
+import {
+  postData,
+  customRequest,
+  putData,
+  deleteData,
+} from "../../../../../services/apiEndpoints";
 
-const say = localStorage.getItem("say");
+// thunks/chapterThunks.js
 
-// Helper function to get the token from Redux state with centralized error handling
-const getToken = (state, rejectWithValue, dispatch) => {
-  const token = state.common.auth?.token;
-  if (!token) {
-    dispatch(setShowError(true));
-    dispatch(setErrorMsg("Authentication Failed"));
-    return rejectWithValue("Authentication Failed");
-  }
-  return `Bearer ${token}`;
-};
-
-// Centralized error handling
-const handleError = (error, dispatch, rejectWithValue) => {
-  const err = ErrorMsg(error);
-  dispatch(setShowError(true));
-  dispatch(setErrorMsg(err.message));
-  return rejectWithValue(err.message);
-};
-
-// Add Chapter Thunk
 export const addChapter = createAsyncThunk(
   "chapter/addChapter",
   async (
     { name, thumbnail, moduleId, sid },
     { rejectWithValue, getState, dispatch }
   ) => {
+    const say = getAY();
+    dispatch(setShowError(false));
+
     try {
-      const token = getToken(getState(), rejectWithValue, dispatch);
-      const say = localStorage.getItem("say")
       const cid = getState().common.user.classInfo.selectedClassId;
       const subjectId = getState().common.user.subjectInfo.selectedSubjectId;
 
@@ -49,20 +40,20 @@ export const addChapter = createAsyncThunk(
         formData.append("thumbnail", thumbnail);
       }
 
-      const response = await axios.post(
-        `${baseUrl}/admin/add_chapter?say=${say}`,
+      const response = await customRequest(
+        "post",
+        "/admin/add_chapter",
         formData,
         {
+          params: { say },
           headers: {
             "Content-Type": "multipart/form-data",
-            Authentication: token,
           },
         }
       );
 
-      toast.success(response.data.msg);
-
-      if (response.data.success) {
+      if (response && response.success) {
+        toast.success(response.msg);
         await dispatch(fetchModules({ cid, sid: subjectId }));
 
         const updatedModules = getState().admin.module.modules;
@@ -79,26 +70,27 @@ export const addChapter = createAsyncThunk(
             })
           );
         }
-      }
 
-      return response.data.data;
+        return response.data;
+      } else {
+        throw new Error(response?.message || "Failed to add chapter.");
+      }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
 
-// Edit Chapter Thunk
 export const editChapter = createAsyncThunk(
   "chapter/editChapter",
   async (
     { name, thumbnail, moduleId, chapterId, sid },
     { rejectWithValue, getState, dispatch }
   ) => {
+    const say = getAY();
+    dispatch(setShowError(false));
 
     try {
-      const token = getToken(getState(), rejectWithValue, dispatch);
-      const say = localStorage.getItem("say")
       const cid = getState().common.user.classInfo.selectedClassId;
       const subjectId = getState().common.user.subjectInfo.selectedSubjectId;
 
@@ -108,18 +100,16 @@ export const editChapter = createAsyncThunk(
         formData.append("thumbnail", thumbnail);
       }
 
-      const response = await axios.put(
-        `${baseUrl}/admin/subjects/${subjectId}/modules/${moduleId}/chapters/${chapterId}?say=${say}`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authentication: token,
-          },
-        }
-      );
+      const endpoint = `/admin/subjects/${subjectId}/modules/${moduleId}/chapters/${chapterId}`;
 
-      if (response.data.success) {
+      const response = await customRequest("put", endpoint, formData, {
+        params: { say },
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      if (response && response.success) {
         await dispatch(fetchModules({ cid, sid: subjectId }));
 
         const updatedModules = getState().admin.module.modules;
@@ -138,43 +128,39 @@ export const editChapter = createAsyncThunk(
         }
       }
 
-      toast.success(response.data.msg);
-      return response.data.data;
+      toast.success(response.msg);
+      return response.data;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
 
-// Delete Chapter Thunk
 export const deleteChapter = createAsyncThunk(
   "chapter/deleteChapter",
   async (
     { moduleId, chapterId, sid },
     { rejectWithValue, getState, dispatch }
   ) => {
+    const say = getAY();
+    dispatch(setShowError(false));
+
     try {
-      const token = getToken(getState(), rejectWithValue, dispatch);
-      const say = localStorage.getItem("say")
       const cid = getState().common.user.classInfo.selectedClassId;
       const subjectId = getState().common.user.subjectInfo.selectedSubjectId;
 
-      const response = await axios.delete(
-        `${baseUrl}/admin/subjects/${subjectId}/modules/${moduleId}/chapters/${chapterId}?say=${say}`,
-        {
-          headers: { Authentication: token },
-        }
-      );
+      const endpoint = `/admin/subjects/${subjectId}/modules/${moduleId}/chapters/${chapterId}`;
 
-      toast.success(response.data.msg);
+      const response = await deleteData(endpoint, {
+        params: { say },
+      });
 
-      if (response.data.success) {
+      if (response && response.success) {
+        toast.success(response.msg);
         await dispatch(fetchModules({ cid, sid: subjectId }));
 
-        const updatedModules = getState().admin.module.modules;
-        const updatedModule = updatedModules.find(
-          (module) => module._id === moduleId
-        );
+        const modules = getState().admin.module.modules;
+        const updatedModule = modules.find((module) => module._id === moduleId);
 
         if (updatedModule) {
           dispatch(
@@ -185,9 +171,11 @@ export const deleteChapter = createAsyncThunk(
             })
           );
         }
-      }
 
-      return chapterId;
+        return chapterId;
+      } else {
+        throw new Error(response?.message || "Failed to delete chapter.");
+      }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }

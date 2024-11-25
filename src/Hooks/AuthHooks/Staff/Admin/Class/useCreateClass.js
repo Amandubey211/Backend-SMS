@@ -34,14 +34,17 @@ const useCreateClass = () => {
   };
 
   const updateClass = async (classData, classId) => {
-
     setLoading(true);
     setError(null);
     try {
       const token = localStorage.getItem(`${role}:token`);
-      const response = await axios.put(`${baseUrl}/admin/update_class/${classId}`, classData, {
-        headers: { Authentication: token },
-      });
+      const response = await axios.put(
+        `${baseUrl}/admin/update_class/${classId}`,
+        classData,
+        {
+          headers: { Authentication: token },
+        }
+      );
       toast.success("Class updated successfully!");
       setLoading(false);
       console.log("update class--", response.data);
@@ -57,14 +60,16 @@ const useCreateClass = () => {
   };
 
   const deleteClass = async (classId) => {
-
     setLoading(true);
     setError(null);
     try {
       const token = localStorage.getItem(`${role}:token`);
-      const response = await axios.delete(`${baseUrl}/admin/delete_class/${classId}`, {
-        headers: { Authentication: token },
-      });
+      const response = await axios.delete(
+        `${baseUrl}/admin/delete_class/${classId}`,
+        {
+          headers: { Authentication: token },
+        }
+      );
       toast.success("Class deleted successfully!");
       setLoading(false);
       console.log("delete class--", response.data);
@@ -79,7 +84,7 @@ const useCreateClass = () => {
     }
   };
 
-  return { createClass, updateClass,deleteClass, loading, error };
+  return { createClass, updateClass, deleteClass, loading, error };
 };
 
 export default useCreateClass;

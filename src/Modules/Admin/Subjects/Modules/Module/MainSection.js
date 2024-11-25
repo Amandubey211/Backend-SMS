@@ -216,6 +216,7 @@ const MainSection = () => {
           <div className="grid grid-cols-1 gap-2">
             {modulesData?.map((module) => (
               <ModuleCard
+                key={module._id}
                 module={module}
                 onSelect={() => handleModuleSelect(module)}
                 onEdit={() => handleEditModule(module)}
