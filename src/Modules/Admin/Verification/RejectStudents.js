@@ -25,7 +25,7 @@ const RejectStudents = () => {
     const isDataStale =
       !lastFetchedRejected || now - lastFetchedRejected > CACHE_DURATION;
 
-    if (rejectedStudents.length === 0 || isDataStale) {
+    if (rejectedStudents.length == 0 || isDataStale) {
       dispatch(fetchRejectedStudents());
     }
   }, [dispatch, rejectedStudents.length, lastFetchedRejected]);
