@@ -6,8 +6,7 @@ import { ErrorMsg, handleError } from "../../../Common/Alerts/errorhandling.acti
 import toast from "react-hot-toast";
 import { fetchStudentsByClassAndSection } from "../../Class/Students/studentThunks";
 import { getData, putData } from "../../../../../services/apiEndpoints";
-
-const say = getAY();
+import { getAY } from "../../../../../Utils/academivYear";
 
 
 
