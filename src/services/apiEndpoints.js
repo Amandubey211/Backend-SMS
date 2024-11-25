@@ -5,7 +5,7 @@ import apiService from "./apiService";
 // GET request
 export const getData = async (endpoint, params = {}) => {
   try {
-    const response = await apiService.get(endpoint, { params });
+    const response = await apiService.get(endpoint, { params, withCredentials: true });
     return response.data;
   } catch (error) {
     console.log('Error fetching data:', error);

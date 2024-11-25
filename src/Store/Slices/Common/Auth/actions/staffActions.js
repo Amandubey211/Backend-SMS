@@ -13,6 +13,7 @@ import toast from "react-hot-toast";
 import { formatAcademicYear } from "../utils/authUtils";
 import { fetchAcademicYear } from "../../AcademicYear/academicYear.action";
 import { setSeletedAcademicYear } from "../../AcademicYear/academicYear.slice";
+import Cookies from 'js-cookie';
 
 // **Staff login action**
 export const staffLogin = createAsyncThunk(
@@ -29,7 +30,15 @@ export const staffLogin = createAsyncThunk(
 
       if (data.success) {
         // Store token in localStorage
-        localStorage.setItem(`${data.role}:token`, `Bearer ${data.token}`);
+        //localStorage.setItem(`${data.role}:token`, `Bearer ${data.token}`);
+        Cookies.set(`userToken`, `${data.token}`, {
+          httpOnly: true,
+          expires: 1, // Token will expire in 1 hour
+          secure: false,
+          //secure: process.env.NODE_ENV === 'production', // Only send cookie over HTTPS in production
+          sameSite: 'Strict', // Prevent CSRF attacks
+          path: '/', // Make cookie accessible across the entire app
+        });
         // localStorage.removeItem(process.env.REACT_APP_PARENT_TOKEN_STORAGE_KEY);
         // localStorage.removeItem(
         //   process.env.REACT_APP_STUDENT_TOKEN_STORAGE_KEY
@@ -148,7 +157,7 @@ export const createAcademicYear = createAsyncThunk(
         // Dispatch the newly created academic year to the Redux store
         if (yearData.isActive) {
           dispatch(setSeletedAcademicYear(data.data));
-          localStorage.setItem('say',data?.data?._id);
+          localStorage.setItem('say', data?.data?._id);
         }
 
         return true;
