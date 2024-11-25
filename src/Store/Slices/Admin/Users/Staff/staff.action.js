@@ -7,7 +7,7 @@ import { setAllStaffs } from "./staffSlice";
 import { createStaffSalary } from "../../Accounting/Expenses/expenses.action";
 import { ErrorMsg, handleError } from "../../../Common/Alerts/errorhandling.action";
 import { setShowError, setErrorMsg } from "../../../Common/Alerts/alertsSlice";
-import { deleteData, getData, postData, putData } from "../../../../../services/apiEndpoints";
+import { customRequest, deleteData, getData, postData, putData } from "../../../../../services/apiEndpoints";
 import { getAY } from "../../../../../Utils/academivYear";
 
 
@@ -38,7 +38,10 @@ export const addUser = createAsyncThunk(
       Object.keys(userData).forEach((key) => formData.append(key, userData[key]));
       formData.append("address", JSON.stringify(address));
 
-      const response = await postData(`/admin/staff_register?say=${say}`, formData);
+      const response = await customRequest('post',`/admin/staff_register?say=${say}`, formData,   {
+        "Content-Type": "multipart/form-data",
+      }
+);
 
       if (response.success) {
         toast.success("User added successfully");
@@ -73,7 +76,10 @@ export const editUser = createAsyncThunk(
       Object.keys(userData).forEach((key) => formData.append(key, userData[key]));
       formData.append("address", JSON.stringify(address));
 
-      const response = await putData(`${baseUrl}/admin/update_staff/${id}?say=${say}`, formData);
+      const response = await customRequest('put',`/admin/update_staff/${id}?say=${say}`, formData,   {
+        "Content-Type": "multipart/form-data",
+      }
+);
 
       if (response.success) {
         toast.success("User updated successfully");

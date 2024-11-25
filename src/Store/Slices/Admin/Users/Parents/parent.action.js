@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 import { baseUrl } from "../../../../../config/Common";
 import { ErrorMsg, handleError } from "../../../Common/Alerts/errorhandling.action";
 import { setShowError, setErrorMsg } from "../../../Common/Alerts/alertsSlice";
-import { getData, postData } from "../../../../../services/apiEndpoints";
+import { customRequest, getData, postData } from "../../../../../services/apiEndpoints";
 import { getAY } from "../../../../../Utils/academivYear";
 
 
@@ -28,7 +28,10 @@ export const updateParent = createAsyncThunk(
     try {
       const say = getAY();
       dispatch(setShowError(false));
-      const response = await postData(`/admin/parent/update?say=${say}`,data);
+      const response = await customRequest('put',`/admin/parent/update?say=${say}`,data,   {
+        "Content-Type": "multipart/form-data",
+      }
+);
       toast.success('Parent update successfull');
       dispatch(fetchAllParent())
       return response;

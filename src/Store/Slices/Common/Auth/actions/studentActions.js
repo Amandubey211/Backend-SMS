@@ -110,7 +110,10 @@ export const registerStudentDetails = createAsyncThunk(
     try {
       const response = await customRequest('post',
         `/student/student_register`,
-        formData);
+        formData,   {
+          "Content-Type": "multipart/form-data",
+        }
+);
       if (response.success) {
         toast.success("Registered Successfully");
         return response;
@@ -145,7 +148,10 @@ export const uploadStudentDocuments = createAsyncThunk(
       });
       const response = await customRequest('post',
         `/student/upload_documents`,
-        formData    
+        formData,   {
+          "Content-Type": "multipart/form-data",
+        }
+    
       );
       if (response.success) {
         return response;
