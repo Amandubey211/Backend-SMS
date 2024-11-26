@@ -5,7 +5,7 @@ import { setErrorMsg, setShowError } from "../../Common/Alerts/alertsSlice";
 import { ErrorMsg, handleError } from "../../Common/Alerts/errorhandling.action";
 import { getData } from "../../../../services/apiEndpoints";
 import { getAY } from "../../../../Utils/academivYear";
-const say = localStorage.getItem('say');
+
 
 // Fetch all events
 export const fetchAllEvents = createAsyncThunk(

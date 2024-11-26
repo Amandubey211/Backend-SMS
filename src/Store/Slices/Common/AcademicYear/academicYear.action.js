@@ -3,9 +3,9 @@ import { baseUrl } from "../../../../config/Common";
 import { ErrorMsg, handleError } from "../../Common/Alerts/errorhandling.action";
 import { setShowError } from "../../Common/Alerts/alertsSlice";
 import { setActiveAcademicYear, setSeletedAcademicYear } from "./academicYear.slice";
-import axios from "axios";
 import toast from "react-hot-toast";
 import { deleteData, getData, postData, putData } from "../../../../services/apiEndpoints";
+import { getAY } from "../../../../Utils/academivYear";
 
 export const fetchAcademicYear = createAsyncThunk("user/AcademicYear", async (_, { rejectWithValue, dispatch, getState }) => {
 
@@ -13,7 +13,7 @@ export const fetchAcademicYear = createAsyncThunk("user/AcademicYear", async (_,
 
   try {
     dispatch(setShowError(false));
-    const say = localStorage.getItem('say')
+    const say = getAY()
     const res = await getData(`/admin/getAllAcademicYear`);
     if (res.success) {
       const Ay = res?.data.find((i) => i._id == say);

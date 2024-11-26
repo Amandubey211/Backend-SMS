@@ -56,6 +56,7 @@ export const deleteBookThunk = createAsyncThunk(
   "library/deleteBook",
   async (bookId, { rejectWithValue, dispatch }) => {
     try {
+      dispatch(setShowError(false))
       const say = getAY(); // Replace localStorage.getItem("say") with getAY()
       await deleteData(`/admin/delete/book/${bookId}?say=${say}`); // Use deleteData
       toast.success("Book deleted successfully!");

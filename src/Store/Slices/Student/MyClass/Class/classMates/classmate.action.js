@@ -4,7 +4,7 @@ import { setShowError } from "../../../../Common/Alerts/alertsSlice";
 import { getAY } from "../../../../../../Utils/academivYear";
 import { getData } from "../../../../../../services/apiEndpoints";
 
-const say = localStorage.getItem("say");
+
 
 export const stdClassmate = createAsyncThunk(
   "classmate/studentClassmate",

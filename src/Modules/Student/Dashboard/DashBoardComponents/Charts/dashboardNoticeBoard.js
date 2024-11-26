@@ -42,7 +42,7 @@ const DashboardNoticeBoard = (descriptionLength) => {
   }
 
   
-  const topNotices = notices.slice(0, 3);
+  const topNotices = notices?.slice(0, 3);
 
   return (
     <div className="p-2">
@@ -58,16 +58,16 @@ const DashboardNoticeBoard = (descriptionLength) => {
 
 
       </div>
-      {topNotices.length === 0 ? (
+      {topNotices?.length == 0 ? (
         <div className="flex flex-col items-center justify-center my-10">
           <FaCalendarAlt className="text-gray-400 text-6xl mb-4" />
           <p className="text-gray-500 text-xl">No noticeboard data found</p>
         </div>
       ) : (
-        topNotices.map((notice, index) => (
+        topNotices?.map((notice, index) => (
           <Notice
             key={index}
-            image={icons[index % icons.length]} // Use cyclic icons
+            image={icons[index % icons?.length]} // Use cyclic icons
             title={notice?.title}
             date={new Date(notice.startDate).toLocaleDateString()} // Formatting date
             priority={notice?.priority}

@@ -16,14 +16,7 @@ const apiService = axios.create({
 // Add a request interceptor (optional)
 apiService.interceptors.request.use(
   (config) => {
-    //const token = localStorage.getItem("userToken"); // Retrieve token from localStorage
-    const token = Cookies.get("userToken");
-    console.log('Request made with token:', token);
-    // console.log("Token Retrieved:", token); // Debugging the token
-
-    if (token) {
-      config.headers['Authentication'] = `${token}`; // Attach token to request headers with the correct header name
-    }
+    config.withCredentials = true
     return config;
   },
   (error) => {

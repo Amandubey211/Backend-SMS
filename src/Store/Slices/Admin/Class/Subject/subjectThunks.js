@@ -163,9 +163,7 @@ export const fetchSubjects = createAsyncThunk(
       if (response && response.success) {
         dispatch(setSubjects(response.data)); // Update the subjects state using the setSubjects action
         return response.data; // Assuming 'data' contains the list of subjects
-      } else {
-        throw new Error(response.message || "Failed to fetch subjects");
-      }
+      } 
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }

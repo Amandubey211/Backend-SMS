@@ -6,7 +6,7 @@ import AcademicYearTable from "./Components/AcademicYearTable";
 import CreateAcademicYearForm from "./Components/CreateAcademicYearForm";
 import { setSeletedAcademicYear } from "../../../Store/Slices/Common/AcademicYear/academicYear.slice";
 import { addAcademicYear, deleteAcademicYear, fetchAcademicYear } from "../../../Store/Slices/Common/AcademicYear/academicYear.action";
-
+import Cookies from 'js-cookie'
 const formatDate = (dateString) => {
   const date = new Date(dateString);
   const day = String(date.getDate()).padStart(2, "0");
@@ -30,7 +30,7 @@ const MainSection = () => {
   const role = useSelector((store) => store.common.auth.role);
   const handleCheckboxChange = async (selectedYear) => {
     alert('After select the year need to reload the page');
-    localStorage.setItem('say', selectedYear._id);
+    Cookies.set('say', selectedYear._id);
     dispatch(setSeletedAcademicYear(selectedYear));
       window.location.reload();
   };

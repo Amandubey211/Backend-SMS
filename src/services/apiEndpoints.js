@@ -4,7 +4,7 @@ import apiService from "./apiService";
 // GET request
 export const getData = async (endpoint, params = {}) => {
   try {
-    const response = await apiService.get(endpoint, { params, withCredentials: true });
+    const response = await apiService.get(endpoint, { params });
     return response.data;
   } catch (error) {
     console.log("Error fetching data:", error);
@@ -57,7 +57,7 @@ export const customRequest = async (
   method,
   endpoint,
   data = null,
-  config = {}
+  headers 
 ) => {
 
   try {
@@ -65,7 +65,7 @@ export const customRequest = async (
       method,
       url: endpoint,
       data,
-      ...config, // Spread additional configurations like params and headers
+      headers,
     });
     return response.data;
   } catch (error) {

@@ -5,7 +5,7 @@ import AcademicYearTable from "./Components/AcademicYearTable";
 import { fetchAcademicYear, updateAcademicYear } from "../../../Store/Slices/Common/AcademicYear/academicYear.action";
 import Spinner from "../Spinner";
 import { setSeletedAcademicYear } from "../../../Store/Slices/Common/AcademicYear/academicYear.slice";
-
+import Cookies from 'js-cookie'
 
 const formatDate = (dateString) => {
   const date = new Date(dateString);
@@ -21,7 +21,7 @@ const MainSection = () => {
   const handleCheckboxChange = async (selectedYear) => {
     //need custom popup
     alert('After select the year need to reload the page');
-  localStorage.setItem('say', selectedYear._id);
+  Cookies.set('say', selectedYear._id);
   dispatch(setSeletedAcademicYear(selectedYear));
     window.location.reload();
   };

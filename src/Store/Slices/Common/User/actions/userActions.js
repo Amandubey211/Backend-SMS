@@ -1,20 +1,22 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
-import { baseUrl } from "../../../../../config/Common";
 import toast from "react-hot-toast";
 import { setUserDetails } from "../reducers/userSlice";
+import { customRequest, getData, putData } from "../../../../../services/apiEndpoints";
+import { handleError } from "../../Alerts/errorhandling.action";
+import { setShowError } from "../../Alerts/alertsSlice";
+
 
 // Fetch user data
 export const fetchUserData = createAsyncThunk(
   "User/fetchUserData",
-  async (userId, { rejectWithValue }) => {
+  async (userId, { rejectWithValue,dispatch }) => {
     try {
-      const response = await axios.get(`${baseUrl}/user/${userId}`);
-      return response.data;
+    
+      dispatch(setShowError(false));
+      const response = await getData(`/user/${userId}`);
+      return response;
     } catch (error) {
-      return rejectWithValue(
-        error.response?.data?.message || "Failed to fetch user data"
-      );
+      return handleError(error,dispatch,rejectWithValue)
     }
   }
 );
@@ -22,14 +24,13 @@ export const fetchUserData = createAsyncThunk(
 // Fetch class data
 export const fetchClassData = createAsyncThunk(
   "User/fetchClassData",
-  async (classId, { rejectWithValue }) => {
+  async (classId, { rejectWithValue,dispatch }) => {
     try {
-      const response = await axios.get(`${baseUrl}/class/${classId}`);
-      return response.data;
+      dispatch(setShowError(false));
+      const response = await getData(`/class/${classId}`);
+      return response;
     } catch (error) {
-      return rejectWithValue(
-        error.response?.data?.message || "Failed to fetch class data"
-      );
+      return handleError(error,dispatch,rejectWithValue)
     }
   }
 );
@@ -37,51 +38,45 @@ export const fetchClassData = createAsyncThunk(
 // Fetch subject data
 export const fetchSubjectData = createAsyncThunk(
   "User/fetchSubjectData",
-  async (subjectId, { rejectWithValue }) => {
+  async (subjectId, { rejectWithValue,dispatch }) => {
     try {
-      const response = await axios.get(`${baseUrl}/subject/${subjectId}`);
-      return response.data;
+      dispatch(setShowError(false));
+      const response = await getData(`/subject/${subjectId}`);
+      return response;
     } catch (error) {
-      return rejectWithValue(
-        error.response?.data?.message || "Failed to fetch subject data"
-      );
+      return handleError(error,dispatch,rejectWithValue)
     }
   }
 );
 
 export const updatePasswordThunk = createAsyncThunk("User/updatePassword",
-  async(data,{rejectWithValue,getState})=>{
-  const { common } = getState();
-  const token = common.auth.token;
+  async(data,{rejectWithValue,dispatch})=>{
   try {
-    const response = await axios.put(`${baseUrl}/api/password/change-password`,data, {
-      headers: { Authentication: `Bearer ${token}` },
-    });
+    dispatch(setShowError(false));
+    const response = await putData(`/api/password/change-password`,data);
     toast.success('Password update successfully')
-    return response.data;
+    return response;
   } catch (error) {
-    toast.error('current password is wrong')
-    return rejectWithValue(error.response?.data || error.message);
+    return handleError(error,dispatch,rejectWithValue)
   }
 
 })
 
 export const updateAdminProfile = createAsyncThunk ("User/updateAdmin",
-  async({data},{rejectWithValue,getState,dispatch})=>{
-  const { common } = getState();
-  const token = common.auth.token;
+  async({data},{rejectWithValue,dispatch})=>{
     try {
-      const response = await axios.put(`${baseUrl}/admin/update/admin_profile`,data, {
-        headers: { Authentication: `Bearer ${token}` },
-      });
+      dispatch(setShowError(false));
+      const response = await customRequest('put',`/admin/update/admin_profile`,data, 
+        {"Content-Type": "multipart/form-data"}
+      );
       toast.success('Profile update successfully');
-      if(response.data.success){
-        dispatch(setUserDetails(response.data.data))
+      if(response.success){
+        dispatch(setUserDetails(response.data))
       } 
-      return response.data;
+      return response;
     } catch (error) {
       toast.error('Profile not updated')
-      return rejectWithValue(error.response?.data || error.message);
+      return handleError(error,dispatch,rejectWithValue)
     }
   }
   )

@@ -7,7 +7,8 @@ import {
 } from "../../../../../services/apiEndpoints"; // Adjust the path as necessary
 import { setShowError } from "../../../Common/Alerts/alertsSlice";
 import toast from "react-hot-toast";
-import getAY from "../../../../../Utils/academicYear"; // Adjust the path as necessary
+import { handleError } from "../../../Common/Alerts/errorhandling.action";
+import { getAY } from "../../../../../Utils/academivYear";
 
 export const fetchAllClasses = createAsyncThunk(
   "class/fetchAllClasses",
@@ -18,14 +19,15 @@ export const fetchAllClasses = createAsyncThunk(
     try {
       const endpoint = `/admin/class`;
       const params = { say };
-      const response = await getData(endpoint, { params });
-
-      if (response && response.success) {
+      const response = await getData(endpoint, params);
+      console.log(response, "lk");
+      if (response && response.status) {
         return response.data; // Assuming 'data' contains the list of classes
       } else {
         throw new Error("Failed to fetch all classes");
       }
     } catch (error) {
+      console.log(error);
       return handleError(error, dispatch, rejectWithValue);
     }
   }
@@ -40,9 +42,9 @@ export const fetchClassDetails = createAsyncThunk(
     try {
       const endpoint = `/admin/class/${classId}`;
       const params = { say };
-      const response = await getData(endpoint, { params });
+      const response = await getData(endpoint, params);
 
-      if (response && response.success) {
+      if (response && response.status) {
         return response.data; // Assuming 'data' contains class details
       } else {
         throw new Error("Failed to fetch class details");
@@ -62,7 +64,7 @@ export const createClass = createAsyncThunk(
     try {
       const endpoint = `/admin/class`;
       const params = { say };
-      const response = await postData(endpoint, classData, { params });
+      const response = await postData(endpoint, classData, params);
 
       if (response && response.success) {
         toast.success("Class created successfully!");

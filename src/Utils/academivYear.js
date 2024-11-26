@@ -1,4 +1,6 @@
 // function for get academic year
+import Cookies from 'js-cookie';
+
 export const getAY = () => {
-  return localStorage.getItem("say");
+  return Cookies.get("say");
 };

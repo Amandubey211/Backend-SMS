@@ -3,6 +3,7 @@ import { RiDeleteBin5Line } from "react-icons/ri";
 import { FaRegEdit } from "react-icons/fa";
 import { BsFillPatchCheckFill, BsPatchCheck } from "react-icons/bs"; // Importing the icons
 import { useTranslation } from "react-i18next";
+import { getAY } from "../../../../Utils/academivYear";
 
 const AcademicYearTable = ({
   academicYears,
@@ -11,7 +12,7 @@ const AcademicYearTable = ({
   handleDelete,
 }) => {
   const { t } = useTranslation("admAcademicYear"); // Use the translation hook
-  const say = localStorage.getItem('say');
+  const say = getAY()
 
   return (
     <div className="bg-white p-2 rounded-lg w-full">

@@ -12,7 +12,6 @@ import {
 import { getAY } from "../../../../../../Utils/academivYear";
 import { getData } from "../../../../../../services/apiEndpoints";
 
-const say = localStorage.getItem("say");
 
 export const stdClassTeacher = createAsyncThunk(
   "classTeacher/stdClassTeacher",

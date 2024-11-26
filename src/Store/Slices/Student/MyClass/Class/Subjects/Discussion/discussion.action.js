@@ -14,7 +14,6 @@ import {
   putData,
 } from "../../../../../../../services/apiEndpoints";
 
-const say = localStorage.getItem("say");
 export const fetchStudentDiscussion = createAsyncThunk(
   "discussion/fetchStudentDiscussion",
   async (cid, { rejectWithValue, dispatch }) => {
