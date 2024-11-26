@@ -24,8 +24,7 @@ export const studentLogin = createAsyncThunk(
       const data = await postData(`/auth/student/login`, studentDetails);
 
       if (data.success) {
-        localStorage.setItem("classId", `${data.classId}`);
-
+      //  localStorage.setItem("classId", `${data.classId}`);
      //   dispatch(setToken(data?.token)); // Store token in state
         dispatch(setRole(data?.role)); // Set role
         dispatch(
@@ -41,6 +40,7 @@ export const studentLogin = createAsyncThunk(
             Q_Id: data?.Q_Id,
             enrollment: data?.enrollment,
             className: data?.className,
+            classId: data?.classId,
             sectionName: data?.sectionName,
             schoolName: data?.schoolName,
           })

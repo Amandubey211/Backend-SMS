@@ -61,7 +61,7 @@ const TimeTableList = React.memo(({ timetables, loading, onDelete }) => {
 
   // Memoized sorted timetables
   const sortedTimetables = useMemo(() => {
-    return [...timetables].sort((a, b) => {
+    return [...timetables]?.sort((a, b) => {
       const dateA = a.validity?.startDate ? new Date(a.validity.startDate) : new Date(0);
       const dateB = b.validity?.startDate ? new Date(b.validity.startDate) : new Date(0);
       return dateB - dateA; // Latest first

@@ -41,10 +41,10 @@ const studentDashboardSlice = createSlice({
       })
       .addCase(fetchDashboardDetails.fulfilled, (state, action) => {
         state.loading = false;
-        state.cardData = action.payload.cardData;
-        state.paidFees = action.payload.paidFees;
-        state.unpaidFees = action.payload.unpaidFees;
-        state.dashboardAttendance = action.payload.attendanceSummary;
+        state.cardData = action.payload?.cardData;
+        state.paidFees = action.payload?.paidFees;
+        state.unpaidFees = action.payload?.unpaidFees;
+        state.dashboardAttendance = action.payload?.attendanceSummary;
       })
       .addCase(fetchDashboardDetails.rejected, (state, action) => {
         state.loading = false;

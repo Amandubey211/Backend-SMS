@@ -20,7 +20,7 @@ export const parentLogin = createAsyncThunk(
       const data = await postData(`/auth/parent/login`, parentDetails);
 
       if (data.success) {
-        localStorage.setItem("userData", JSON.stringify(data));
+       // localStorage.setItem("userData", JSON.stringify(data));
         await dispatch(fetchAcademicYear());
           const activeAcademicYear =
             await getState().common?.academicYear?.academicYears?.find(
