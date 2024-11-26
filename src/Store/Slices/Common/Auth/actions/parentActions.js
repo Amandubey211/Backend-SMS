@@ -8,6 +8,7 @@ import { fetchAcademicYear } from "../../AcademicYear/academicYear.action";
 import { handleError } from "../../Alerts/errorhandling.action";
 import { postData } from "../../../../../services/apiEndpoints";
 import Cookies from 'js-cookie'
+import { setLocalCookies } from "../../../../../Utils/academivYear";
 // **Parent login action**
 export const parentLogin = createAsyncThunk(
   "auth/parentLogin",
@@ -26,7 +27,7 @@ export const parentLogin = createAsyncThunk(
             await getState().common?.academicYear?.academicYears?.find(
               (i) => i.isActive == true
             );
-          Cookies.set("say", activeAcademicYear?._id);
+          setLocalCookies("say", activeAcademicYear?._id);
      //   dispatch(setToken(data.token)); // Store token in state
         dispatch(setRole(data.role)); // Set role
 

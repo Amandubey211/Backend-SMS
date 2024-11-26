@@ -9,6 +9,7 @@ import { customRequest, postData } from "../../../../../services/apiEndpoints";
 import { handleError } from "../../Alerts/errorhandling.action";
 import { setShowError } from "../../Alerts/alertsSlice";
 import Cookies from 'js-cookie'
+import { setLocalCookies } from "../../../../../Utils/academivYear";
 // Student login action
 export const studentLogin = createAsyncThunk(
   "auth/studentLogin",
@@ -52,7 +53,7 @@ export const studentLogin = createAsyncThunk(
             await getState().common?.academicYear?.academicYears?.find(
               (i) => i.isActive == true
             );
-          Cookies.set("say", activeAcademicYear?._id);
+          setLocalCookies("say", activeAcademicYear?._id);
           return { redirect: "/student_dash" };
         } else {
           return { redirect: "/verify_qid" };

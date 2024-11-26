@@ -2,11 +2,12 @@ import React from "react";
 import { useSelector } from "react-redux";
 import { Navigate, useLocation } from "react-router-dom";
 import Cookies from 'js-cookie'
+import { getIsAYA } from "../../Utils/academivYear";
 const ProtectRoute = ({ Component, allowedRoles }) => {
   const isSignedIn = useSelector((store) => store.common.auth.isLoggedIn);
   const userRole = useSelector((store) => store.common.auth.role);
   console.log(isSignedIn, userRole,"-------");
-  const isAcademicYearActive =  Cookies.get("isAcademicYearActive")
+  const isAcademicYearActive = getIsAYA()
 
   const location = useLocation();
 

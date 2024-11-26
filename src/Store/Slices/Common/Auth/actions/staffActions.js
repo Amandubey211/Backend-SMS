@@ -19,6 +19,7 @@ import Cookies from 'js-cookie';
 import { setErrorMsg, setShowError } from "../../Alerts/alertsSlice";
 import { ErrorMsg } from "../../Alerts/errorhandling.action";
 import { postData } from "../../../../../services/apiEndpoints";
+import { setLocalCookies } from "../../../../../Utils/academivYear";
 
 
 // **Staff Login Action**
@@ -63,7 +64,7 @@ export const staffLogin = createAsyncThunk(
         // Handle academic year
         if (data.role === "admin" && !data.isAcademicYearActive) {
           toast.success("Please create an academic year");
-          Cookies.set(
+          setLocalCookies(
             "isAcademicYearActive",
             data.isAcademicYearActive
           );
@@ -89,7 +90,7 @@ export const staffLogin = createAsyncThunk(
               (i) => i.isActive === true
             );
           if (activeAcademicYear) {
-            Cookies.set("say", activeAcademicYear._id);
+            setLocalCookies("say", activeAcademicYear._id);
           }
 
           // Token and role already set above, no need to set again
@@ -155,12 +156,12 @@ export const createAcademicYear = createAsyncThunk(
       if (data && data.success) {
         toast.success("Academic Year created successfully");
 
-        Cookies.set("isAcademicYearActive", true); // Set Academic Year active in local storage
+        setLocalCookies("isAcademicYearActive", true); // Set Academic Year active in local storage
 
         // Dispatch the newly created academic year to the Redux store
         if (yearData.isActive) {
           dispatch(setSeletedAcademicYear(data.data));
-          Cookies.set('say', data?.data?._id);
+          setLocalCookies('say', data?.data?._id);
         }
 
         return true;
