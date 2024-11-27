@@ -38,8 +38,8 @@ export const addChapter = createAsyncThunk(
       const response = await customRequest(
         "post",
         "/admin/add_chapter",
-        {},
         formData,
+        {},
         {
           params: { say },
           headers: {

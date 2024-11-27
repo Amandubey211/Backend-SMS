@@ -66,6 +66,7 @@ export const createDiscussion = createAsyncThunk(
         "post",
         `/admin/createDiscussion/class/${cid}`,
         formData,
+        {},
         {
           params: { say },
           headers: {

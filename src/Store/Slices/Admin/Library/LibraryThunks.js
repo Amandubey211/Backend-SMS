@@ -1,10 +1,19 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import toast from "react-hot-toast";
 import { toggleSidebar } from "./LibrarySlice";
-import { ErrorMsg, handleError } from "../../Common/Alerts/errorhandling.action";
+import {
+  ErrorMsg,
+  handleError,
+} from "../../Common/Alerts/errorhandling.action";
 import { setShowError } from "../../Common/Alerts/alertsSlice";
 import { getAY } from "../../../../Utils/academivYear";
-import { getData, postData, putData, deleteData, customRequest } from "../../../../services/apiEndpoints";
+import {
+  getData,
+  postData,
+  putData,
+  deleteData,
+  customRequest,
+} from "../../../../services/apiEndpoints";
 
 // Fetch Books Thunk
 export const fetchBooksThunk = createAsyncThunk(
@@ -29,14 +38,15 @@ export const addBookThunk = createAsyncThunk(
       const say = getAY(); // Dynamically fetch the 'say' parameter
       dispatch(setShowError(false));
       // Use postData to send FormData
-      const response = await customRequest('post', `/admin/add_book?say=${say}`, formData,
+      const response = await customRequest(
+        "post",
+        `/admin/add_book?say=${say}`,
+        formData,
         // Additional headers for the request
 
         {
           "Content-Type": "multipart/form-data",
         }
-
-
       );
 
       // Handle successful response
@@ -56,7 +66,7 @@ export const deleteBookThunk = createAsyncThunk(
   "library/deleteBook",
   async (bookId, { rejectWithValue, dispatch }) => {
     try {
-      dispatch(setShowError(false))
+      dispatch(setShowError(false));
       const say = getAY(); // Replace localStorage.getItem("say") with getAY()
       await deleteData(`/admin/delete/book/${bookId}?say=${say}`); // Use deleteData
       toast.success("Book deleted successfully!");
@@ -76,7 +86,8 @@ export const updateBookThunk = createAsyncThunk(
       dispatch(setShowError(false));
       const response = await putData(
         `/admin/update/book/${bookId}?say=${say}`,
-        formData, {
+        formData,
+        {
           "Content-Type": "multipart/form-data",
         }
       );
