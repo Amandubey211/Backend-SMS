@@ -11,8 +11,10 @@ import { BsPatchCheckFill } from "react-icons/bs";
 import { MdOutlineBlock } from "react-icons/md";
 import { NavLink, useParams } from "react-router-dom";
 import DeleteModal from "../../../../../../Components/Common/DeleteModal";
-import useDeleteQuiz from "../../../../../../Hooks/AuthHooks/Staff/Admin/Quiz/useDeleteQuiz";
-import useDeleteAssignment from "../../../../../../Hooks/AuthHooks/Staff/Admin/Assignment/useDeleteAssignment";
+import { useDispatch, useSelector } from "react-redux";
+import {  deleteQuizThunk } from "../../../../../../Store/Slices/Admin/Class/Quiz/quizThunks";
+import { deleteAssignmentThunk } from "../../../../../../Store/Slices/Admin/Class/Assignment/assignmentThunks";
+
 
 const getIcon = (type) => {
   switch (type) {
@@ -37,10 +39,8 @@ const ChapterItem = ({ type, title, id, isPublished, fetchModules }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const optionsRef = useRef(null);
 
-  const { deleteAssignment, loading: deleteAssignmentLoading } =
-    useDeleteAssignment();
-  const { deleteQuiz, loading: deleteQuizLoading } = useDeleteQuiz();
-
+ const { loading: deleteAssignmentLoading } = useSelector((store)=>store.admin?.assignments);
+ const { loading: deleteQuizLoading } = useSelector((store)=>store.admin?.quizzes);
   const toggleMenu = (event) => {
     event.preventDefault();
     setMenuOpen((prev) => !prev);
@@ -63,13 +63,13 @@ const ChapterItem = ({ type, title, id, isPublished, fetchModules }) => {
       document.removeEventListener("mousedown", closeMenu);
     };
   }, [menuOpen]);
-
+const dispatch = useDispatch()
   const handleDelete = async () => {
     try {
       if (type === "assignment") {
-        await deleteAssignment(id);
+        await dispatch(deleteAssignmentThunk(id));
       } else if (type === "quiz") {
-        await deleteQuiz(id);
+        await dispatch(deleteQuizThunk(id));
       }
       fetchModules();
       setMenuOpen(false);

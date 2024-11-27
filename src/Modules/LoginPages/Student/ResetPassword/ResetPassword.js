@@ -3,9 +3,9 @@ import { useLocation, NavLink } from "react-router-dom";
 import Logo from "../../../../Components/Common/Logo";
 import { FaEye } from "react-icons/fa";
 import { PiEyeClosedFill } from "react-icons/pi";
-import { useResetPassword } from "../../../../Hooks/AuthHooks/Student/useResetPassword";
 import { LuLoader } from "react-icons/lu";
 import Layout from "../../../../Components/Common/Layout";
+import { useForgotPassword, useResetPassword } from "../../../../Hooks/CommonHooks/useResetPassword";
 
 const ResetPassword = () => {
   const [resetDetails, setResetDetails] = useState({
@@ -16,7 +16,8 @@ const ResetPassword = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const { loading, resetPassword } = useResetPassword();
+  const { loading,  } = useForgotPassword();
+  const {  resetPassword } = useResetPassword();
   const location = useLocation();
 
   useEffect(() => {
