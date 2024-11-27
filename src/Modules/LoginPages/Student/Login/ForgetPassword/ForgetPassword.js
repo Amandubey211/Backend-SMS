@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import Logo from "../../../../../Components/Common/Logo";
-import { useForgotPassword } from "../../../../../Hooks/AuthHooks/Student/useResetPassword";
 import { LuLoader } from "react-icons/lu";
 import { NavLink, useNavigate } from "react-router-dom";
 import Layout from "../../../../../Components/Common/Layout";
 import { useLocation } from "react-router-dom";
 import toast from "react-hot-toast";
+import { useForgotPassword } from "../../../../../Hooks/CommonHooks/useResetPassword";
 
 const ForgetPassword = () => {
   const [email, setEmail] = useState("");
