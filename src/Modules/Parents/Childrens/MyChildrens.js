@@ -1,23 +1,31 @@
-import React, { useEffect, useCallback, useMemo } from "react";
+import React, { useEffect, useCallback, useMemo, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import ChildCard from "../../../Components/Parents/Children/ChildCard";
 import Spinner from "../../../Components/Common/Spinner";
 import { FaChild } from 'react-icons/fa';
 import { fetchChildren } from "../../../Store/Slices/Parent/Children/children.action";
 import { RiSignalWifiErrorFill } from "react-icons/ri";
-import { useTranslation } from "react-i18next"; // Import useTranslation from i18next
+import { useTranslation } from "react-i18next";
 
-// Memoization for performance optimization
 const MyChildren = () => {
   const dispatch = useDispatch();
-  const { children, loading, error } = useSelector((state) => state?.Parent?.children || {});
-  
-  const { t } = useTranslation('prtChildrens'); // Correctly set the translation namespace
 
-  // Fetching children data using Redux thunk
+  // Select necessary state slices
+  const { children = [], loading, error } = useSelector((state) => state?.Parent?.children || {});
+  const userId = useSelector((state) => state?.Auth?.user?.id);
+
+  const { t } = useTranslation('prtChildrens');
+
+  // useRef to track if fetchChildren has been dispatched
+  const hasFetched = useRef(false);
+
   useEffect(() => {
-    dispatch(fetchChildren());
-  }, [dispatch]);
+    // Only dispatch if userId is available and fetchChildren hasn't been called yet
+    if (userId && !hasFetched.current) {
+      dispatch(fetchChildren(userId));
+      hasFetched.current = true; // Set the flag to true to prevent future dispatches
+    }
+  }, [dispatch, userId]);
 
   // Memoize children data to prevent unnecessary renders
   const memoizedChildren = useMemo(() => children, [children]);
@@ -25,7 +33,7 @@ const MyChildren = () => {
   // Error message rendering for children
   const renderErrorMessage = () => {
     const isNetworkError = error?.toLowerCase().includes("network error");
-  
+
     return (
       <div className="flex flex-col items-center justify-center h-full text-center py-10">
         {isNetworkError ? (
@@ -34,7 +42,8 @@ const MyChildren = () => {
           <FaChild className="text-gray-400 text-8xl mb-6" />
         )}
         <p className="text-gray-600 text-lg text-center mt-2">
-          {error}: {t("Unable to fetch children data!")}
+          {error ? `${error}: ` : ""}
+          {t("Unable to fetch children data!")}
         </p>
       </div>
     );

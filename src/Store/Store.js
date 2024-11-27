@@ -14,7 +14,6 @@ import teacherReducer from "./Slices/Admin/Class/Teachers/teacherSlice";
 import classReducer from "./Slices/Admin/Class/reducer/classSlice"; // Importing the combined admin reducer
 import subjectReducer from "./Slices/Admin/Class/Subject/subjectSlice";
 import subjectGradesReducer from "./Slices/Admin/Class/grades/gradesSlice";
-// import subjectAssignmentReducer from "./Slices/Admin/Class/Assignments/assignmentSlice";
 import subjectQuizReducer from "./Slices/Admin/Class/Quiz/quizSlice";
 import sectionReducer from "./Slices/Admin/Class/Section_Groups/groupSectionSlice";
 import graduateReducer from "./Slices/Admin/Graduate/graduateSlice";
@@ -43,6 +42,8 @@ import adminQuizReducer from "./Slices/Admin/Class/Quiz/quizSlice";
 import adminSpeedGradeReducer from "./Slices/Admin/Class/SpeedGrade/speedGradeSlice";
 import timetableReducer from "./Slices/Admin/TimeTable/timtableSlice";
 import adminClassIconsReducer from "./Slices/Admin/Class/reducer/iconSlice";
+
+
 // student
 import studentDashboardReducer from "./Slices/Student/Dashboard/studentDashboardSlices";
 import studentFinanceReducer from "./Slices/Student/Finance/financeSlice";
@@ -62,6 +63,8 @@ import studentSyllabusReducer from "../Store/Slices/Student/MyClass/Class/Subjec
 import studentPagesReducer from "../Store/Slices/Student/MyClass/Class/Subjects/Pages/pagesSlice";
 import studentDiscussionReducer from "../Store/Slices/Student/MyClass/Class/Subjects/Discussion/discussionSlice";
 import studentAnnounceReducer from "../Store/Slices/Student/MyClass/Class/Subjects/Announcement/announcementSlice";
+import studentTimeTableReducer from "../Store/Slices/Student/TimeTable/studentTimeTableSlice";
+
 // parent
 import dashboardReducer from "../Store/Slices/Parent/Dashboard/dashboardSlice";
 import financeReducer from "../Store/Slices/Parent/Finance/financeSlice";
@@ -69,6 +72,7 @@ import noticeReducer from "../Store/Slices/Parent/NoticeBoard/noticeSlice";
 import childrenReducer from "../Store/Slices/Parent/Children/childrenSlice";
 import libraryReducer from "../Store/Slices/Parent/Library/librarySlices";
 import eventReducer from "../Store/Slices/Parent/Events/eventSlice";
+import parentTimeTableReducer from "../Store/Slices/Parent/TimeTable/parentTimeTableSlice";
 
 // Persist configuration for the Auth slice
 
@@ -176,6 +180,7 @@ const studentReducer = combineReducers({
   studentDiscussion: studentDiscussionReducer,
   studentAnnounce: studentAnnounceReducer,
   studentAssignment: studentAssignmentReducer,
+  studentTimetable: studentTimeTableReducer
 });
 
 const ParentReducer = combineReducers({
@@ -185,6 +190,7 @@ const ParentReducer = combineReducers({
   notice: noticeReducer,
   library: libraryReducer,
   events: eventReducer,
+  parentTimetable: parentTimeTableReducer
 });
 
 // Create the store

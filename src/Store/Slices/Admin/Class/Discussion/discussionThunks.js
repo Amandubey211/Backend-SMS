@@ -106,6 +106,7 @@ export const updateDiscussion = createAsyncThunk(
         "put",
         `/admin/updateDiscussion/${discussionId}`,
         formData,
+        {},
         {
           params: { say },
           headers: {

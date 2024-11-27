@@ -43,6 +43,7 @@ export const addChapter = createAsyncThunk(
       const response = await customRequest(
         "post",
         "/admin/add_chapter",
+        {},
         formData,
         {
           params: { say },
@@ -102,12 +103,18 @@ export const editChapter = createAsyncThunk(
 
       const endpoint = `/admin/subjects/${subjectId}/modules/${moduleId}/chapters/${chapterId}`;
 
-      const response = await customRequest("put", endpoint, formData, {
-        params: { say },
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      const response = await customRequest(
+        "put",
+        endpoint,
+        formData,
+        {},
+        {
+          params: { say },
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
 
       if (response && response.success) {
         await dispatch(fetchModules({ cid, sid: subjectId }));

@@ -8,10 +8,10 @@ const priorityClasses = {
   "Low priority": "bg-gray-100 text-black",
 };
 
-const Notice = ({ title, startDate, endDate, priority, content, image, backgroundColor,authorName }) => {
-  // Format dates using date-fns
-  const formattedStartDate = format(new Date(startDate), 'yyyy-MM-dd');
-  const formattedEndDate = format(new Date(endDate), 'yyyy-MM-dd');
+const Notice = ({ title, startDate, endDate, priority, content, image, backgroundColor, authorName }) => {
+  // Format dates using date-fns with optional chaining
+  const formattedStartDate = startDate ? format(new Date(startDate), 'yyyy-MM-dd') : "N/A";
+  const formattedEndDate = endDate ? format(new Date(endDate), 'yyyy-MM-dd') : "N/A";
 
   // Function to render either an image or a fallback image inside a styled div
   const renderImageOrFallback = (image) => {
@@ -45,7 +45,7 @@ const Notice = ({ title, startDate, endDate, priority, content, image, backgroun
               </span>
             </div>
             <span
-              className={`px-2 py-1 text-xs font-medium rounded ${priorityClasses[priority]}`}
+              className={`px-2 py-1 text-xs font-medium rounded ${priorityClasses[priority] || "bg-gray-100 text-black"}`}
             >
               {priority}
             </span>

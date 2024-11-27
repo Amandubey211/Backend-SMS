@@ -20,10 +20,15 @@ const TimeTablePage = () => {
   const role = useSelector((store) => store.common.auth.role);
 
   // Determine the layout component based on the role
-  const DashLayout = 
-    role === "admin" ? AdminDashLayout :
-    role === "student" ? StudentDashLayout :
-    role === "teacher" ?  AdminDashLayout: null;
+  const DashLayout =
+  role === "admin"
+    ? AdminDashLayout
+    : role === "student"
+    ? StudentDashLayout
+    : role === "teacher"
+    ? AdminDashLayout
+    : AdminDashLayout
+
     
   return (
     <Layout title="TimeTable | Student Diwan">

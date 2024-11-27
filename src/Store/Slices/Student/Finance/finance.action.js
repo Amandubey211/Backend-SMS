@@ -9,7 +9,7 @@ export const StudentFinanceDetails = createAsyncThunk(
   `fees/StudentFinanceDetails`,
   async (_, { rejectWithValue, dispatch }) => {
     try {
-      const say=getAY();
+      const say = getAY();
       dispatch(setShowError(false));
       const data = await getData(`/student/my_fees?say=${say}`);
       return data;
