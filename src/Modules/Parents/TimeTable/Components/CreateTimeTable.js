@@ -1,0 +1,929 @@
+// CreateTimeTablePage.jsx
+
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  Table,
+  Input,
+  Select,
+  DatePicker,
+  TimePicker,
+  Button,
+  Popconfirm,
+  message,
+} from 'antd';
+import {
+  PlusOutlined,
+  DeleteOutlined,
+  UndoOutlined,
+} from '@ant-design/icons';
+import moment from 'moment';
+import {
+  createTimetable,
+  updateTimetable,
+} from '../../../../Store/Slices/Admin/TimeTable/timetable.action';
+import { fetchSubjects } from '../../../../Store/Slices/Admin/Class/Subject/subjectThunks';
+import {
+  fetchSectionsByClass,
+  fetchGroupsByClass,
+} from '../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks';
+import {
+  clearSectionsList,
+  clearGroupsList,
+} from '../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionSlice';
+import DashLayout from '../../../../Components/Admin/AdminDashLayout';
+import Layout from '../../../../Components/Common/Layout';
+import { useNavigate } from 'react-router-dom';
+
+const { Option } = Select;
+
+// Days of the week for the dropdown
+const daysOfWeek = [
+  'Monday',
+  'Tuesday',
+  'Wednesday',
+  'Thursday',
+  'Friday',
+  'Saturday',
+  'Sunday',
+];
+
+const CreateTimeTablePage = ({ timetable = {}, onClose = () => { } }) => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  // Accessing classes, subjects, sections, and groups from Redux store
+  const classes = useSelector((state) => state.admin.class.classes);
+  const subjects = useSelector((state) => state.admin.subject.subjects);
+  const sectionsList = useSelector((state) => state.admin.group_section.sectionsList);
+  const groupsList = useSelector((state) => state.admin.group_section.groupsList);
+
+  const [formData, setFormData] = useState({
+    name: timetable.name || '',
+    classId: timetable.classId || '',
+    sectionId: timetable.sectionId || '',
+    groupId: timetable.groupId || '',
+    startDate: timetable.validity?.startDate
+      ? moment(timetable.validity.startDate).format('YYYY-MM-DD')
+      : '',
+    endDate: timetable.validity?.endDate
+      ? moment(timetable.validity.endDate).format('YYYY-MM-DD')
+      : '',
+    type: timetable.type || 'weekly',
+    status: timetable.status === 'active' ? 'Publish' : 'Draft', // New field
+  });
+
+
+  const [columns, setColumns] = useState([]);
+  const [dataSource, setDataSource] = useState([]);
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const [deletedRowsStack, setDeletedRowsStack] = useState([]);
+
+  // ID Counter using useRef
+  const idCounterRef = useRef(1);
+
+
+
+  // Fetch subjects, sections, and groups when classId changes
+  useEffect(() => {
+    if (formData.classId) {
+      dispatch(clearSectionsList());
+      dispatch(clearGroupsList());
+
+      dispatch(fetchSubjects(formData.classId));
+      dispatch(fetchSectionsByClass(formData.classId));
+      dispatch(fetchGroupsByClass(formData.classId));
+    } else {
+      dispatch(clearSectionsList());
+      dispatch(clearGroupsList());
+      setFormData((prev) => ({
+        ...prev,
+        sectionId: '',
+        groupId: '',
+      }));
+    }
+  }, [formData.classId, dispatch]);
+
+  // Log the subjects to inspect their structure
+  useEffect(() => {
+    console.log('Subjects:', subjects);
+  }, [subjects]);
+
+  // Handle cell value changes using row key
+  const handleCellChange = (value, key, dataIndex) => {
+    setDataSource((prevData) => {
+      const newData = [...prevData];
+      const index = newData.findIndex((item) => item.key === key);
+      if (index > -1) {
+        newData[index] = { ...newData[index], [dataIndex]: value };
+        return newData;
+      }
+      return prevData;
+    });
+  };
+
+  // Render functions
+  const renderEditableCell = (text, record, dataIndex) => (
+    <Input
+      value={text}
+      onChange={(e) => handleCellChange(e.target.value, record.key, dataIndex)}
+      required
+    />
+  );
+
+  const renderDayDropdown = (text, record, dataIndex) => (
+    <Select
+      value={text || undefined}
+      onChange={(value) => handleCellChange(value, record.key, dataIndex)}
+      style={{ width: '100%' }}
+      placeholder="Select Day"
+    >
+      {daysOfWeek.map((day) => (
+        <Option key={day} value={day}>
+          {day}
+        </Option>
+      ))}
+    </Select>
+  );
+
+  const renderTimePicker = (text, record, dataIndex) => (
+    <TimePicker
+      value={text ? moment(text, 'HH:mm') : null}
+      format="HH:mm"
+      onChange={(time, timeString) => handleCellChange(timeString, record.key, dataIndex)}
+    />
+  );
+
+  const renderDatePicker = (text, record, dataIndex) => (
+    <DatePicker
+      value={text ? moment(text, 'YYYY-MM-DD') : null}
+      format="YYYY-MM-DD"
+      onChange={(date, dateString) => handleCellChange(dateString, record.key, dataIndex)}
+    />
+  );
+
+  const renderSubjectDropdown = (text, record, dataIndex) => {
+    const isDisabled = !formData.classId || !(subjects && subjects.length > 0);
+
+    return (
+      <Select
+        value={text || undefined}
+        onChange={(value) => handleCellChange(value, record.key, dataIndex)}
+        style={{ width: '100%' }}
+        placeholder="Select Subject"
+        disabled={isDisabled}
+      >
+        {subjects && subjects.length > 0 ? (
+          subjects.map((subject, index) => {
+            const subjectId = subject._id || subject.id || subject.subjectId;
+            if (!subjectId) {
+              console.warn(`Subject at index ${index} is missing an ID.`);
+              return null;
+            }
+            return (
+              <Option key={subjectId} value={subjectId}>
+                {subject.subjectName}
+              </Option>
+            );
+          })
+        ) : (
+          <Option value="" disabled>
+            No subjects available
+          </Option>
+        )}
+      </Select>
+    );
+  };
+
+  const renderDescription = (text, record, dataIndex) => (
+    <Input
+      value={text}
+      onChange={(e) => handleCellChange(e.target.value, record.key, dataIndex)}
+      placeholder="Enter Description"
+      required
+    />
+  );
+
+  // Generate columns based on type
+  const getColumnsByType = () => {
+    const commonColumns = [
+      {
+        title: 'ID',
+        dataIndex: 'id',
+        width: 70,
+        fixed: 'left',
+      },
+    ];
+
+    if (formData.type === 'weekly') {
+      return [
+        ...commonColumns,
+        {
+          title: 'Subject',
+          dataIndex: 'subjectId',
+          width: 200,
+          render: (text, record) => renderSubjectDropdown(text, record, 'subjectId'),
+        },
+        {
+          title: 'Day',
+          dataIndex: 'day',
+          width: 150,
+          render: (text, record) => renderDayDropdown(text, record, 'day'),
+        },
+        {
+          title: 'Start Time',
+          dataIndex: 'startTime',
+          width: 150,
+          render: (text, record) => renderTimePicker(text, record, 'startTime'),
+        },
+        {
+          title: 'End Time',
+          dataIndex: 'endTime',
+          width: 150,
+          render: (text, record) => renderTimePicker(text, record, 'endTime'),
+        },
+        {
+          title: 'Description',
+          dataIndex: 'description',
+          width: 250,
+          render: (text, record) => renderDescription(text, record, 'description'),
+        },
+      ];
+    } else if (formData.type === 'exam') {
+      return [
+        ...commonColumns,
+        {
+          title: 'Subject',
+          dataIndex: 'subjectId',
+          width: 200,
+          render: (text, record) => renderSubjectDropdown(text, record, 'subjectId'),
+        },
+        {
+          title: 'Start Time',
+          dataIndex: 'startTime',
+          width: 150,
+          render: (text, record) => renderTimePicker(text, record, 'startTime'),
+        },
+        {
+          title: 'End Time',
+          dataIndex: 'endTime',
+          width: 150,
+          render: (text, record) => renderTimePicker(text, record, 'endTime'),
+        },
+        {
+          title: 'Date',
+          dataIndex: 'date',
+          width: 150,
+          render: (text, record) => renderDatePicker(text, record, 'date'),
+        },
+        {
+          title: 'Description',
+          dataIndex: 'description',
+          width: 250,
+          render: (text, record) => renderDescription(text, record, 'description'),
+        },
+      ];
+    } else if (formData.type === 'event') {
+      return [
+        ...commonColumns,
+        {
+          title: 'Event Name',
+          dataIndex: 'eventName',
+          width: 200,
+          render: (text, record) => renderEditableCell(text, record, 'eventName'),
+        },
+        {
+          title: 'Start Time',
+          dataIndex: 'startTime',
+          width: 150,
+          render: (text, record) => renderTimePicker(text, record, 'startTime'),
+        },
+        {
+          title: 'End Time',
+          dataIndex: 'endTime',
+          width: 150,
+          render: (text, record) => renderTimePicker(text, record, 'endTime'),
+        },
+        {
+          title: 'Date',
+          dataIndex: 'date',
+          width: 150,
+          render: (text, record) => renderDatePicker(text, record, 'date'),
+        },
+        {
+          title: 'Description',
+          dataIndex: 'description',
+          width: 250,
+          render: (text, record) => renderDescription(text, record, 'description'),
+        },
+      ];
+    } else if (formData.type === 'others') {
+      return [
+        ...commonColumns,
+        {
+          title: 'Other Title',
+          dataIndex: 'otherTitle',
+          width: 200,
+          render: (text, record) => renderEditableCell(text, record, 'otherTitle'),
+        },
+        {
+          title: 'Subject',
+          dataIndex: 'subjectId',
+          width: 200,
+          render: (text, record) => renderSubjectDropdown(text, record, 'subjectId'),
+        },
+        {
+          title: 'Start Time',
+          dataIndex: 'startTime',
+          width: 150,
+          render: (text, record) => renderTimePicker(text, record, 'startTime'),
+        },
+        {
+          title: 'End Time',
+          dataIndex: 'endTime',
+          width: 150,
+          render: (text, record) => renderTimePicker(text, record, 'endTime'),
+        },
+        {
+          title: 'Description',
+          dataIndex: 'description',
+          width: 250,
+          render: (text, record) => renderDescription(text, record, 'description'),
+        },
+      ];
+    } else {
+      return commonColumns;
+    }
+  };
+
+  // Update columns when formData.type or subjects change
+  useEffect(() => {
+    const cols = getColumnsByType();
+    setColumns(cols);
+  }, [formData.type, subjects]);
+
+  // Reset dataSource and ID counter when formData.type changes
+  useEffect(() => {
+    setDataSource([]);
+    idCounterRef.current = 1;
+    handleAddRow();
+  }, [formData.type]);
+
+  // Add a new row
+  const handleAddRow = () => {
+    setDataSource((prevData) => {
+      const newId = idCounterRef.current;
+      const newRow = { key: newId, id: newId };
+
+      if (formData.type === 'weekly') {
+        newRow.subjectId = '';
+        newRow.day = '';
+        newRow.startTime = '';
+        newRow.endTime = '';
+        newRow.description = '';
+      } else if (formData.type === 'exam') {
+        newRow.subjectId = '';
+        newRow.startTime = '';
+        newRow.endTime = '';
+        newRow.date = '';
+        newRow.description = '';
+      } else if (formData.type === 'event') {
+        newRow.eventName = '';
+        newRow.startTime = '';
+        newRow.endTime = '';
+        newRow.date = '';
+        newRow.description = '';
+      } else if (formData.type === 'others') {
+        newRow.otherTitle = '';
+        newRow.subjectId = '';
+        newRow.startTime = '';
+        newRow.endTime = '';
+        newRow.description = '';
+      }
+
+      idCounterRef.current += 1;
+
+      return [...prevData, newRow];
+    });
+  };
+
+  // Delete selected rows
+  const handleDeleteRows = () => {
+    if (selectedRowKeys.length === 0) return;
+
+    setDataSource((prevData) => {
+      const newData = [...prevData];
+      const rowsToDelete = [];
+
+      selectedRowKeys.forEach((key) => {
+        const index = newData.findIndex((item) => item.key === key);
+        if (index > -1) {
+          rowsToDelete.push({ ...newData[index], originalIndex: index });
+        }
+      });
+
+      setDeletedRowsStack((prevStack) => [...prevStack, rowsToDelete]);
+
+      const updatedData = newData.filter((item) => !selectedRowKeys.includes(item.key));
+      return updatedData;
+    });
+
+    setSelectedRowKeys([]);
+  };
+
+  // Undo delete rows
+  const handleUndoDelete = () => {
+    if (deletedRowsStack.length === 0) return;
+
+    setDataSource((prevData) => {
+      let newData = [...prevData];
+      const rowsToRestore = deletedRowsStack.slice(-1)[0];
+
+      rowsToRestore.forEach((row) => {
+        const { originalIndex } = row;
+        newData.splice(originalIndex, 0, row);
+      });
+
+      setDeletedRowsStack((prevStack) => prevStack.slice(0, -1));
+
+      return newData;
+    });
+  };
+
+  // Handle Ctrl+Z for undo
+  const handleKeyDown = useCallback(
+    (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+        e.preventDefault();
+        handleUndoDelete();
+      }
+    },
+    [handleUndoDelete]
+  );
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [handleKeyDown]);
+
+  // Submit the form
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    // Initialize an array to collect validation errors
+    const errors = [];
+
+    // Basic validation checks
+    if (!formData.name) {
+      errors.push('Name is required.');
+    }
+
+    if (!formData.classId) {
+      errors.push('Class is required.');
+    }
+
+    if (!formData.startDate) {
+      errors.push('Start date is required.');
+    }
+
+    if (
+      (formData.type === 'exam' || formData.type === 'event') &&
+      !formData.endDate
+    ) {
+      errors.push('End date is required for exam or event.');
+    }
+
+    if (dataSource.length === 0) {
+      errors.push('At least one row must be added to the timetable.');
+    }
+
+    // Specific validation based on timetable type
+    dataSource.forEach((row, index) => {
+      if (formData.type === 'weekly') {
+        if (!row.subjectId || row.subjectId.trim() === '') {
+          errors.push(`Subject is required for row ${index + 1}.`);
+        }
+        if (!row.day || row.day.trim() === '') {
+          errors.push(`Day is required for row ${index + 1}.`);
+        }
+        if (!row.startTime || !row.endTime) {
+          errors.push(`Start and end time are required for row ${index + 1}.`);
+        }
+        if (!row.description || row.description.trim() === '') {
+          errors.push(`Description is required for row ${index + 1}.`);
+        }
+      } else if (formData.type === 'exam') {
+        if (!row.subjectId || row.subjectId.trim() === '') {
+          errors.push(`Subject is required for row ${index + 1}.`);
+        }
+        if (!row.startTime || !row.endTime) {
+          errors.push(`Start and end time are required for row ${index + 1}.`);
+        }
+        if (!row.date || row.date.trim() === '') {
+          errors.push(`Date is required for row ${index + 1}.`);
+        }
+        if (!row.description || row.description.trim() === '') {
+          errors.push(`Description is required for row ${index + 1}.`);
+        }
+      } else if (formData.type === 'event') {
+        if (!row.eventName || row.eventName.trim() === '') {
+          errors.push(`Event name is required for row ${index + 1}.`);
+        }
+        if (!row.startTime || !row.endTime) {
+          errors.push(`Start and end time are required for row ${index + 1}.`);
+        }
+        if (!row.date || row.date.trim() === '') {
+          errors.push(`Date is required for row ${index + 1}.`);
+        }
+        if (!row.description || row.description.trim() === '') {
+          errors.push(`Description is required for row ${index + 1}.`);
+        }
+      } else if (formData.type === 'others') {
+        if (!row.otherTitle || row.otherTitle.trim() === '') {
+          errors.push(`Other Title is required for row ${index + 1}.`);
+        }
+        if (!row.subjectId || row.subjectId.trim() === '') {
+          errors.push(`Subject is required for row ${index + 1}.`);
+        }
+        if (!row.startTime || !row.endTime) {
+          errors.push(`Start and end time are required for row ${index + 1}.`);
+        }
+        if (!row.description || row.description.trim() === '') {
+          errors.push(`Description is required for row ${index + 1}.`);
+        }
+      }
+    });
+
+    if (errors.length > 0) {
+      message.error(errors.join('\n'));
+      return;
+    }
+
+    // Prepare the timetable data
+    const timetableData = {
+      name: formData.name,
+      classId: formData.classId,
+      sectionId: formData.sectionId || null,
+      groupId: formData.groupId || null,
+      type: formData.type,
+      validity: {
+        startDate: new Date(formData.startDate).toISOString(),
+        endDate: formData.endDate ? new Date(formData.endDate).toISOString() : undefined,
+      },
+      status: formData.status === 'Publish' ? 'active' : 'inactive', // Updated status mapping
+      days: [], // To be populated based on type
+    };
+
+    // Organize dataSource into days and slots based on type
+    if (formData.type === 'weekly') {
+      const dayMap = {};
+      dataSource.forEach((row) => {
+        if (!dayMap[row.day]) {
+          dayMap[row.day] = [];
+        }
+        dayMap[row.day].push({
+          subjectId: row.subjectId,
+          startTime: row.startTime,
+          endTime: row.endTime,
+          description: row.description,
+        });
+      });
+      timetableData.days = Object.keys(dayMap).map((day) => ({
+        day,
+        slots: dayMap[day],
+      }));
+    } else if (formData.type === 'exam') {
+      const dateMap = {};
+      dataSource.forEach((row) => {
+        const formattedDate = moment(row.date, 'YYYY-MM-DD').toISOString();
+        if (!dateMap[formattedDate]) {
+          dateMap[formattedDate] = [];
+        }
+        const slotData = {
+          subjectId: row.subjectId,
+          startTime: row.startTime,
+          endTime: row.endTime,
+          description: row.description,
+        };
+        dateMap[formattedDate].push(slotData);
+      });
+      timetableData.days = Object.keys(dateMap).map((date) => ({
+        date,
+        slots: dateMap[date],
+      }));
+    } else if (formData.type === 'event') {
+      const dateMap = {};
+      dataSource.forEach((row) => {
+        const formattedDate = moment(row.date, 'YYYY-MM-DD').toISOString();
+        if (!dateMap[formattedDate]) {
+          dateMap[formattedDate] = [];
+        }
+        const slotData = {
+          eventName: row.eventName,
+          startTime: row.startTime,
+          endTime: row.endTime,
+          description: row.description,
+        };
+        dateMap[formattedDate].push(slotData);
+      });
+      timetableData.days = Object.keys(dateMap).map((date) => ({
+        date,
+        slots: dateMap[date],
+      }));
+    } else if (formData.type === 'others') {
+      // **Modified Section for 'others' Type**
+
+      // Assign 'heading' within each slot based on 'otherTitle'
+      const slots = dataSource.map((row) => ({
+        subjectId: row.subjectId,
+        startTime: row.startTime,
+        endTime: row.endTime,
+        description: row.description,
+        heading: row.otherTitle.trim(), // Assign 'heading' in each slot
+      }));
+
+      // Since the backend controller assigns 'heading' at top level but the schema does not have it,
+      // we can assign it as an empty string to satisfy the controller without affecting the schema
+      timetableData.heading = ""; // Assign empty string
+
+      // Assign slots to days (assuming a single day object since 'others' type may not require days)
+      timetableData.days = [
+        {
+          slots: slots,
+        },
+      ];
+
+      // **End of Modified Section**
+    }
+
+    // Log the timetableData to inspect the payload
+    console.log('Timetable Data:', JSON.stringify(timetableData, null, 2));
+
+    // Dispatch the action to create or update the timetable
+    if (timetable._id) {
+      dispatch(updateTimetable({ id: timetable._id, data: timetableData }))
+        .unwrap()
+        .then(() => {
+          message.success('Timetable updated successfully!');
+          // Redirect after a short delay
+          setTimeout(() => {
+            navigate('/timetable');
+          }, 1500);
+        })
+        .catch((error) => {
+          message.error(error || 'Failed to update timetable.');
+        });
+    } else {
+      dispatch(createTimetable(timetableData))
+        .unwrap()
+        .then(() => {
+          message.success('Timetable created successfully!');
+          // Redirect after a short delay
+          setTimeout(() => {
+            navigate('/timetable');
+          }, 1500);
+        })
+        .catch((error) => {
+          message.error(error || 'Failed to create timetable.');
+        });
+    }
+
+    onClose();
+  };
+
+
+
+
+
+
+
+  // Row Selection
+  const rowSelection = {
+    selectedRowKeys,
+    onChange: (selectedKeys) => setSelectedRowKeys(selectedKeys),
+  };
+
+  return (
+    <Layout title="Create TimeTable | Student Diwan">
+      <DashLayout>
+        <div className="flex flex-col items-center justify-start w-full p-6">
+          <h2 className="text-xl font-semibold mb-4">
+            {timetable._id ? 'Edit' : 'Create'} TimeTable
+          </h2>
+
+          <form onSubmit={handleSubmit} className="w-full space-y-6">
+            {/* Form Inputs */}
+            <div className="flex flex-wrap -mx-2">
+              {/* Name */}
+              <div className="w-full md:w-1/5 px-2 mb-4">
+                <label className="block mb-1">Name</label>
+                <Input
+                  placeholder="Name"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  required
+                />
+              </div>
+              {/* Start Date */}
+              <div className="w-full md:w-1/5 px-2 mb-4">
+                <label className="block mb-1">Start Date</label>
+                <Input
+                  type="date"
+                  value={formData.startDate}
+                  onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
+                  required
+                />
+              </div>
+              {/* End Date */}
+              <div className="w-full md:w-1/5 px-2 mb-4">
+                <label className="block mb-1">End Date</label>
+                <Input
+                  type="date"
+                  value={formData.endDate}
+                  onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+                  required={formData.type === 'exam' || formData.type === 'event'}
+                  disabled={!(formData.type === 'exam' || formData.type === 'event')}
+                />
+              </div>
+              {/* Select Class */}
+              <div className="w-full md:w-1/5 px-2 mb-4">
+                <label className="block mb-1">Select Class</label>
+                <Select
+                  value={formData.classId || ''}
+                  onChange={(value) => {
+                    setFormData({ ...formData, classId: value, sectionId: '', groupId: '' });
+                  }}
+                  style={{ width: '100%' }}
+                  required
+                  placeholder="Select Class"
+                >
+                  <Option value="">Select Class</Option>
+                  {classes.map((classItem) => (
+                    <Option key={classItem._id} value={classItem._id}>
+                      {classItem.className}
+                    </Option>
+                  ))}
+                </Select>
+              </div>
+              {/* Select Section */}
+              <div className="w-full md:w-1/5 px-2 mb-4">
+                <label className="block mb-1">Select Section</label>
+                <Select
+                  value={formData.sectionId || ''}
+                  onChange={(value) => setFormData({ ...formData, sectionId: value })}
+                  style={{ width: '100%' }}
+                  placeholder="Select Section"
+                  disabled={!formData.classId || sectionsList.length === 0}
+                >
+                  <Option value="">Select Section</Option>
+                  {sectionsList.length > 0 ? (
+                    sectionsList.map((section) => (
+                      <Option key={section._id} value={section._id}>
+                        {section.sectionName}
+                      </Option>
+                    ))
+                  ) : (
+                    <Option value="" disabled>
+                      No sections available
+                    </Option>
+                  )}
+                </Select>
+              </div>
+              {/* Select Group */}
+              <div className="w-full md:w-1/5 px-2 mb-4">
+                <label className="block mb-1">Select Group</label>
+                <Select
+                  value={formData.groupId || ''}
+                  onChange={(value) => setFormData({ ...formData, groupId: value })}
+                  style={{ width: '100%' }}
+                  placeholder="Select Group"
+                  disabled={!formData.classId || groupsList.length === 0}
+                >
+                  <Option value="">Select Group</Option>
+                  {groupsList.length > 0 ? (
+                    groupsList.map((group) => (
+                      <Option key={group._id} value={group._id}>
+                        {group.groupName}
+                      </Option>
+                    ))
+                  ) : (
+                    <Option value="" disabled>
+                      No groups available
+                    </Option>
+                  )}
+                </Select>
+              </div>
+              {/* Table Type */}
+              <div className="w-full md:w-1/5 px-2 mb-4">
+                <label className="block mb-1">Table Type</label>
+                <Select
+                  value={formData.type}
+                  onChange={(value) => setFormData({ ...formData, type: value })}
+                  style={{ width: '100%' }}
+                  required
+                >
+                  <Option value="weekly">Weekly</Option>
+                  <Option value="exam">Exam</Option>
+                  <Option value="event">Event</Option>
+                  <Option value="others">Others</Option>
+                </Select>
+              </div>
+              {/* Status Dropdown */}
+              <div className="w-full md:w-1/5 px-2 mb-4">
+                <label className="block mb-1">Status</label>
+                <Select
+                  value={formData.status}
+                  onChange={(value) => setFormData({ ...formData, status: value })}
+                  style={{ width: '100%' }}
+                  required
+                  placeholder="Select Status"
+                >
+                  <Option value="Publish">Publish</Option>
+                  <Option value="Draft">Draft</Option>
+                </Select>
+              </div>
+
+            </div>
+
+            {/* Table */}
+            <div className="w-full mb-4">
+              {/* Action Buttons */}
+              <div className="flex justify-between mb-2">
+                <Button
+                  type="primary"
+                  icon={<PlusOutlined />}
+                  onClick={handleAddRow}
+                  disabled={!formData.classId}
+                  style={{
+                    borderRadius: "6px",
+                    background: "linear-gradient(to right, #ec4899, #a855f7)",
+                    color: "white",
+                  }}
+                  className="hover:bg-gradient-to-r hover:from-pink-600 hover:to-purple-700"
+                >
+                  Add Row
+                </Button>
+
+                <div className="flex space-x-2">
+                  {deletedRowsStack.length > 0 && (
+                    <Button
+                      icon={<UndoOutlined />}
+                      onClick={handleUndoDelete}
+                      style={{
+                        borderColor: "gray",
+                        color: "gray",
+                        transition: "border-color 0.3s ease, color 0.3s ease", // Smooth transition for hover effect
+                      }}
+                      className="hover:border-gray-800 hover:text-gray-800 cursor-pointer" // Darker gray on hover
+                    >
+                      Undo Delete
+                    </Button>
+
+                  )}
+                  {selectedRowKeys.length > 0 && (
+                    <Popconfirm
+                      title="Are you sure you want to delete selected rows?"
+                      onConfirm={handleDeleteRows}
+                      okText="Yes"
+                      cancelText="No"
+                    >
+                      <Button
+                        danger
+                        icon={<DeleteOutlined />}
+                      >
+                        Delete Rows
+                      </Button>
+                    </Popconfirm>
+                  )}
+                </div>
+              </div>
+
+              {/* Table Component */}
+              <Table
+                columns={columns}
+                dataSource={dataSource}
+                rowSelection={rowSelection}
+                pagination={false}
+                scroll={{ x: 'max-content' }}
+                style={{ width: '100%' }}
+              />
+            </div>
+
+            {/* Form Actions */}
+            <div className="flex justify-end space-x-4">
+              <Button onClick={onClose}>Cancel</Button>
+              <Button type="primary" htmlType="submit">
+                {timetable._id ? 'Update' : 'Create'}
+              </Button>
+            </div>
+          </form>
+        </div>
+      </DashLayout>
+    </Layout>
+  );
+};
+
+export default CreateTimeTablePage;
