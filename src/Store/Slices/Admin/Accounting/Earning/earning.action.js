@@ -47,7 +47,7 @@ export const updateEarning = createAsyncThunk(
             const say = getAY();
             dispatch(setShowError(false));
             const response = await putData(`/admin/updateEarning/${id}?say=${say}`, updatedEarning);
-
+          dispatch(fetchEarning())
             return response?.data;
 
         } catch (error) {
