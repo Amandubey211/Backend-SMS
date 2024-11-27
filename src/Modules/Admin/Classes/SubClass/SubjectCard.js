@@ -86,12 +86,12 @@ const SubjectCard = ({
         <div className="flex items-center mt-2 text-white">
           <span className="flex items-center mr-2 gap-1">
             <LuUser />
-            <span>{data.studentsIds ? data.studentsIds.length : 0}</span>
+            <span>{data.studentsIds ? data.studentsIds?.length : 0}</span>
           </span>
           <span className="border-r-2 border-white h-5 mr-2"></span>
           <span className="flex items-center gap-1">
             <BsBook />
-            <span>{t("Modules", { count: data.modules.length })}</span>
+            <span>{t("Modules", { count: data.modules?.length })}</span>
           </span>
         </div>
       </NavLink>
@@ -109,7 +109,7 @@ const SubjectCard = ({
           <p className="text-white font-semibold">
             {data?.teacherId?.firstName && data?.teacherId?.lastName
               ? `${data.teacherId.firstName} ${data.teacherId.lastName}`
-                  .length > 15
+                  ?.length > 15
                 ? `${data.teacherId.firstName} ${data.teacherId.lastName}`.substring(
                     0,
                     15

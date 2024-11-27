@@ -49,8 +49,8 @@ const FilterAttendanceBar = () => {
             onClick={() => setIsSectionDropdownOpen(!isSectionDropdownOpen)}
           >
             <div className="block w-full p-2 border border-gray-300 rounded-lg cursor-pointer">
-              {sections.length > 0 ? (
-                sections.find((section) => section._id === sectionId)
+              {sections?.length > 0 ? (
+                sections?.find((section) => section._id === sectionId)
                   ?.sectionName || "All Sections"
               ) : (
                 <span className="text-gray-500">No sections found</span>
@@ -72,8 +72,8 @@ const FilterAttendanceBar = () => {
                 >
                   All Sections
                 </div>
-                {sections.length > 0 ? (
-                  sections.map((section) => (
+                {sections?.length > 0 ? (
+                  sections?.map((section) => (
                     <div
                       key={section._id}
                       className="p-2 cursor-pointer hover:bg-gray-100"
@@ -99,8 +99,8 @@ const FilterAttendanceBar = () => {
             onClick={() => setIsGroupDropdownOpen(!isGroupDropdownOpen)}
           >
             <div className="block w-full p-2 border border-gray-300 rounded-lg cursor-pointer">
-              {groups.length > 0 ? (
-                groups.find((group) => group._id === groupId)?.groupName ||
+              {groups?.length > 0 ? (
+                groups?.find((group) => group._id === groupId)?.groupName ||
                 "All Groups"
               ) : (
                 <span className="text-gray-500">No groups found</span>
@@ -122,14 +122,14 @@ const FilterAttendanceBar = () => {
                 >
                   All Groups
                 </div>
-                {groups.length > 0 ? (
-                  groups.map((group) => (
+                {groups?.length > 0 ? (
+                  groups?.map((group) => (
                     <div
-                      key={group._id}
+                      key={group?._id}
                       className="p-2 cursor-pointer hover:bg-gray-100"
                       onClick={() => handleFilterChange("groupId", group._id)}
                     >
-                      {group.groupName}
+                      {group?.groupName}
                     </div>
                   ))
                 ) : (

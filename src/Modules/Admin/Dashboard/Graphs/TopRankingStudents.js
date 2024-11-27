@@ -117,8 +117,8 @@ const TopRankingStudents = () => {
 
           <div className="flex flex-col gap-2">
             {topStudents
-              .slice(topStudents?.length > 3 ? 3 : 0)
-              .map((student, index) => (
+              ?.slice(topStudents?.length > 3 ? 3 : 0)
+              ?.map((student, index) => (
                 <div
                   key={index}
                   className="flex items-center justify-between p-2 px-5 border rounded-md w-full gap-2"

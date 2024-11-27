@@ -34,13 +34,13 @@ const SidebarSlide = ({
           'a, button, input, textarea, select, [tabindex]:not([tabindex="-1"])'
         );
 
-        if (focusableElements.length === 0) {
+        if (focusableElements?.length === 0) {
           event.preventDefault();
           return;
         }
 
         const firstElement = focusableElements[0];
-        const lastElement = focusableElements[focusableElements.length - 1];
+        const lastElement = focusableElements[focusableElements?.length - 1];
 
         if (event.shiftKey) {
           // Shift + Tab

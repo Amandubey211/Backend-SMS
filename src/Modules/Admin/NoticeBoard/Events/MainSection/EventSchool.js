@@ -42,7 +42,7 @@ const EventScheduler = () => {
     dispatch(fetchEventsThunk());
   }, [dispatch]);
 
-  const filteredEvents = events.slice(
+  const filteredEvents = events?.slice(
     currentPage * itemsPerPage,
     (currentPage + 1) * itemsPerPage
   );

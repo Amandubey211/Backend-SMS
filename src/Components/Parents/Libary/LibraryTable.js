@@ -91,7 +91,7 @@ const LibraryTable = () => {
   const renderErrorMessage = () => {
     return (
       <tr>
-        <td colSpan={columns.length} style={{ width: '88rem' }}>
+        <td colSpan={columns?.length} style={{ width: '88rem' }}>
           <div className="w-full flex flex-col items-center justify-center py-4" style={{"marginTop": '5rem', marginBottom: '10rem'}}>
             <RiSignalWifiErrorFill className="text-gray-400 text-8xl mb-6" />
             <p className="text-gray-600 text-lg text-center mt-2">{t('Error')}: {error} - {t('Unable to fetch Library data')}</p> {/* Translated error message */}
@@ -105,7 +105,7 @@ const LibraryTable = () => {
   const renderNoDataMessage = () => {
     return (
       <tr>
-        <td colSpan={columns.length} style={{ width: '88rem' }}>
+        <td colSpan={columns?.length} style={{ width: '88rem' }}>
           <div className="w-full flex flex-col items-center justify-center py-4" style={{"marginTop": '5rem', marginBottom: '10rem'}}>
             <FaBookOpen className="text-gray-400 text-8xl mb-6" />
             <p className="text-gray-600 text-lg text-center mt-2">{t('No data available')}</p> {/* Translated no data message */}
@@ -119,7 +119,7 @@ const LibraryTable = () => {
   const renderLoading = () => {
     return (
       <tr>
-        <td colSpan={columns.length} style={{ width: '88rem' }}>
+        <td colSpan={columns?.length} style={{ width: '88rem' }}>
           <div className="w-full flex justify-center py-4" style={{"marginTop": '5rem', marginBottom: '10rem'}}>
             <Spinner />
           </div>

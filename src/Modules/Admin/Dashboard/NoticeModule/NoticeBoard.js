@@ -55,7 +55,7 @@ const NoticeBoard = (descriptionLength) => {
   const noticesSort = noticesArray.sort(
     (a, b) => new Date(b.startDate) - new Date(a.startDate)
   );
-  const topNotices = noticesSort.slice(0, 3);
+  const topNotices = noticesSort?.slice(0, 3);
 
   return (
     <div className="p-2">

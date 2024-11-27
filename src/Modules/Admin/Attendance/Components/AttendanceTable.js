@@ -63,7 +63,7 @@ const AttendanceTable = () => {
 
   return (
     <div className="overflow-x-auto">
-      {filteredStudents.length > 0 ? (
+      {filteredStudents?.length > 0 ? (
         <table className="min-w-full bg-white table-fixed">
           <thead>
             <tr>

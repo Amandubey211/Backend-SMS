@@ -229,10 +229,10 @@ const capitalizeFirstLetter = (str) => {
   if (!str) return ''; // Handle cases with undefined or empty strings
   const firstLetter = str.charAt(0);
   // Check if the first letter is already uppercase
-  if (firstLetter === firstLetter.toUpperCase()) {
+  if (firstLetter === firstLetter?.toUpperCase()) {
     return str;
   } else {
-    return firstLetter.toUpperCase() + str.slice(1);
+    return firstLetter?.toUpperCase() + str?.slice(1);
   }
 };
 

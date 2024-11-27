@@ -124,8 +124,8 @@ const MainSection = () => {
               setSelectedTab={setSelectedTab}
             />
             <div className="grid grid-cols-3 gap-4 mb-10">
-              {filteredSubjects.length > 0 ? (
-                filteredSubjects.map((subject, index) => (
+              {filteredSubjects?.length > 0 ? (
+                filteredSubjects?.map((subject, index) => (
                   <SubjectCard
                     role={role}
                     key={index}
