@@ -23,9 +23,7 @@ export const fetchAllIcons = createAsyncThunk(
 
       if (response && response.success) {
         return response.icons; // Assuming 'icons' contains the list of icons
-      } else {
-        throw new Error(response.message || "Failed to fetch icons");
-      }
+      } 
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
@@ -47,9 +45,7 @@ export const createIcon = createAsyncThunk(
         toast.success("Icon created successfully!");
         dispatch(fetchAllIcons({ type: formData.get("type") })); // Refresh the icons list based on type
         return response.data; // Assuming 'data' contains the created icon
-      } else {
-        throw new Error(response.message || "Failed to create icon");
-      }
+      } 
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
@@ -71,8 +67,6 @@ export const updateIcon = createAsyncThunk(
         toast.success("Icon updated successfully!");
         dispatch(fetchAllIcons({ type: iconData.get("type") })); // Refresh the icons list based on type
         return response.icon; // Assuming 'icon' contains the updated icon
-      } else {
-        throw new Error(response.message || "Failed to update icon");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -95,9 +89,7 @@ export const deleteIcon = createAsyncThunk(
         toast.success("Icon deleted successfully!");
         dispatch(fetchAllIcons({ type })); // Refresh the icons list based on type
         return iconId;
-      } else {
-        throw new Error(response.message || "Failed to delete icon");
-      }
+      } 
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }

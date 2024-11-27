@@ -1,4 +1,4 @@
-import axios from "axios";
+
 import {
   setRubrics,
   setAssignments,
@@ -12,258 +12,171 @@ import {
   setRubricLoading,
 } from "./rubricSlice";
 import toast from "react-hot-toast";
-import { baseUrl } from "../../../../../config/Common";
-import { ErrorMsg } from "../../../Common/Alerts/errorhandling.action";
+import { ErrorMsg, handleError } from "../../../Common/Alerts/errorhandling.action";
 import { setErrorMsg, setShowError } from "../../../Common/Alerts/alertsSlice";
+import { deleteData, getData, postData, putData } from "../../../../../services/apiEndpoints";
+import { getAY } from "../../../../../Utils/academivYear";
 
-const say = localStorage.getItem("say");
-
-// Helper function to get the token from Redux state with centralized error handling
-const getToken = (state, dispatch) => {
-  const token = state.common.auth?.token;
-  if (!token) {
-    dispatch(setShowError(true));
-    dispatch(setErrorMsg("Authentication Failed"));
-    throw new Error("Authentication Failed");
-  }
-  return `Bearer ${token}`;
-};
-
-// Centralized error handling
-const handleError = (error, dispatch) => {
-  const err = ErrorMsg(error);
-  dispatch(setShowError(true));
-  dispatch(setErrorMsg(err.message));
-  // toast.error(err.message);
-  return err.message;
-};
 
 // Fetch Rubrics by Subject ID Thunk
-export const fetchRubricsBySubjectId = (sid) => async (dispatch, getState) => {
+export const fetchRubricsBySubjectId = (sid) => async (dispatch, rejectWithValue) => {
   dispatch(setLoading(true));
-  dispatch(setError(null));
-
   try {
-    const token = getToken(getState(), dispatch);
-    const response = await axios.get(
-      `${baseUrl}/admin/rubric/subject/${sid}?say=${say}`,
-      {
-        headers: { Authentication: token },
-      }
+    dispatch(setShowError(false));
+    const say = getAY()
+    const response = await getData(
+      `/admin/rubric/subject/${sid}?say=${say}`
     );
-
-    if (response.data.success) {
-      dispatch(setRubrics(response.data.rubrics));
-    } else {
-      throw new Error(response.data.message || "Failed to fetch rubrics.");
-    }
-  } catch (err) {
-    dispatch(setError(handleError(err, dispatch)));
-  } finally {
+    
+   return   dispatch(setRubrics(response.rubrics));
+  } catch (error) {
     dispatch(setLoading(false));
-  }
+    return handleError(error, dispatch, rejectWithValue);
+  } 
 };
 
 // Delete Rubric Thunk
-export const deleteRubricThunk = (rubricId) => async (dispatch, getState) => {
+export const deleteRubricThunk = (rubricId) => async (dispatch, rejectWithValue) => {
   dispatch(setLoading(true));
-  dispatch(setError(null));
-
+ 
   try {
-    const token = getToken(getState(), dispatch);
-    await axios.delete(`${baseUrl}/admin/rubric/${rubricId}?say=${say}`, {
-      headers: { Authentication: token },
-    });
+    dispatch(setShowError(false));
+      const say = getAY()
+    await deleteData(`/admin/rubric/${rubricId}?say=${say}`);
 
     toast.success("Rubric deleted successfully");
-    return { success: true };
-  } catch (err) {
-    const errorMessage = handleError(err, dispatch);
-    dispatch(setError(errorMessage));
-    return { success: false, error: errorMessage };
-  } finally {
     dispatch(setLoading(false));
-  }
+    return { success: true };
+  } catch (error) {
+    dispatch(setLoading(false));
+    return handleError(error, dispatch, rejectWithValue);
+  } 
 };
 
 // Update Rubric Thunk
 export const updateRubricThunk =
-  (rubricId, rubricData) => async (dispatch, getState) => {
-    dispatch(setLoading(true));
-    dispatch(setError(null));
-
+  (rubricId, rubricData) => async (dispatch, rejectWithValue) => {
     try {
-      const token = getToken(getState(), dispatch);
-      const say = localStorage.getItem("say");
-      const response = await axios.put(
-        `${baseUrl}/admin/rubric/${rubricId}?say=${say}`,
-        rubricData,
-        {
-          headers: { Authentication: token },
-        }
+      dispatch(setShowError(false));
+      const say = getAY()
+      const response = await putData(
+        `/admin/rubric/${rubricId}?say=${say}`,
+        rubricData
       );
 
-      if (response.data.success) {
+      if (response.success) {
         toast.success("Rubric updated successfully");
         return { success: true };
-      } else {
-        throw new Error(response.data.message || "Failed to update rubric");
       }
-    } catch (err) {
-      const errorMessage = handleError(err, dispatch);
-      dispatch(setError(errorMessage));
-      return { success: false, error: errorMessage };
-    } finally {
-      dispatch(setLoading(false));
-    }
+    } catch (error) {
+      return handleError(error, dispatch, rejectWithValue);
+    } 
   };
 
 // Create Assignment Rubric Thunk
 export const createAssignmentRubricThunk =
-  (rubricData) => async (dispatch, getState) => {
-    dispatch(setLoading(true));
-    dispatch(setError(null));
+  (rubricData) => async (dispatch, rejectWithValue) => {
+  
 
     try {
-      const token = getToken(getState(), dispatch);
-      const say = localStorage.getItem("say");
-      const response = await axios.post(
-        `${baseUrl}/admin/create_rubric?say=${say}`,
-        rubricData,
-        {
-          headers: { Authentication: token },
-        }
+      dispatch(setShowError(false));
+      const say = getAY()
+      const response = await postData(
+        `/admin/create_rubric?say=${say}`,
+        rubricData
       );
 
-      if (response.data.success) {
+      if (response.success) {
         toast.success("Rubric created successfully");
-        return { success: true, data: response.data };
-      } else {
-        throw new Error(response.data.message || "Failed to create rubric");
-      }
-    } catch (err) {
-      const errorMessage = handleError(err, dispatch);
-      dispatch(setError(errorMessage));
-      return { success: false, error: errorMessage };
-    } finally {
-      dispatch(setLoading(false));
+        return { success: true, data: response };
+      } 
+    } catch (error) {
+      return handleError(error, dispatch, rejectWithValue);
     }
   };
 
 // Create Quiz Rubric Thunk
 export const createQuizRubricThunk =
-  (rubricData) => async (dispatch, getState) => {
-    dispatch(setLoading(true));
-    dispatch(setError(null));
-    const say = localStorage.getItem("say");
+  (rubricData) => async (dispatch, rejectWithValue) => {
     try {
-      const token = getToken(getState(), dispatch);
-      const response = await axios.post(
-        `${baseUrl}/admin/quiz/create_rubric?say=${say}`,
-        rubricData,
-        {
-          headers: { Authentication: token },
-        }
+      dispatch(setShowError(false));
+      const say = getAY()
+      const response = await postData(
+        `/admin/quiz/create_rubric?say=${say}`,
+        rubricData
       );
 
-      if (response.data.success) {
+      if (response.success) {
         toast.success("Rubric created successfully");
-        return { success: true, data: response.data };
-      } else {
-        throw new Error(response.data.message || "Failed to create rubric");
-      }
-    } catch (err) {
-      const errorMessage = handleError(err, dispatch);
-      dispatch(setError(errorMessage));
-      return { success: false, error: errorMessage };
-    } finally {
-      dispatch(setLoading(false));
+        return { success: true, data: response};
+      } 
+    } catch (error) {
+      return handleError(error, dispatch, rejectWithValue);
     }
   };
 
 // Fetch Filtered Assignments Thunk
 export const fetchFilteredAssignmentsThunk =
-  (sid) => async (dispatch, getState) => {
-    dispatch(setLoading(true));
-    dispatch(setError(null));
+  (sid) => async (dispatch, rejectWithValue) => {
+    
 
     try {
-      const token = getToken(getState(), dispatch);
-      const say = localStorage.getItem("say");
-      const response = await axios.get(
-        `${baseUrl}/admin/assignments/${sid}?say=${say}`,
-        {
-          headers: { Authentication: token },
-        }
+      dispatch(setShowError(false));
+      const say = getAY()
+      const response = await getData(
+        `/admin/assignments/${sid}?say=${say}`
       );
 
-      if (response.data.success) {
-     return   dispatch(setAssignments(response.data.assignments));
-      }else{
-        return  dispatch(setAssignments([]));
+      if (response.success) {
+        return dispatch(setAssignments(response.assignments));
+      } else {
+        return dispatch(setAssignments([]));
       }
-    } catch (err) {
-      dispatch(setError(handleError(err, dispatch)));
-    } finally {
-      dispatch(setLoading(false));
+    } catch (error) {
+      return handleError(error, dispatch, rejectWithValue);
     }
   };
 
 // Fetch Filtered Quizzes Thunk
 export const fetchFilteredQuizzesThunk =
-  (sid) => async (dispatch, getState) => {
-    dispatch(setLoading(true));
-    dispatch(setError(null));
-    const say = localStorage.getItem("say");
+  (sid) => async (dispatch, rejectWithValue) => {
+    
     try {
-      const token = getToken(getState(), dispatch);
-      const response = await axios.get(
-        `${baseUrl}/admin/quizzes/${sid}?say=${say}`,
-        {
-          headers: { Authentication: token },
-        }
+      dispatch(setShowError(false));
+      const say = getAY()
+      const response = await getData(
+        `/admin/quizzes/${sid}?say=${say}`,
+        
       );
 
-      if (response.data.success) {
-       return dispatch(setQuizzes(response.data.quizzes));
+      if (response.success) {
+        return dispatch(setQuizzes(response.quizzes));
       } else {
         return dispatch(setQuizzes([]));
       }
-    } catch (err) {
-      dispatch(setError(handleError(err, dispatch)));
-    } finally {
-      dispatch(setLoading(false));
-    }
+    } catch (error) {
+      return handleError(error, dispatch, rejectWithValue);
+    } 
   };
 
 // Get Rubric by ID Thunk
-export const getRubricByIdThunk = (id) => async (dispatch, getState) => {
-  dispatch(setRubricLoading(true));
-  dispatch(setError(null));
-  const say = localStorage.getItem("say");
+export const getRubricByIdThunk = (id) => async (dispatch, rejectWithValue) => {
+ 
   try {
-    const token = getToken(getState(), dispatch);
-    const response = await axios.get(
-      `${baseUrl}/admin/rubric/${id}?say=${say}`,
-      {
-        headers: { Authentication: token },
-      }
+    dispatch(setShowError(false));
+    const say = getAY()
+    const response = await getData(
+      `/admin/rubric/${id}?say=${say}`
     );
 
-    if (response.data.success) {
-      dispatch(setRubricToEdit(response.data.rubric));
-      dispatch(setCriteria(response.data.rubric.criteria));
-      dispatch(setRubricName(response.data.rubric.name));
-      dispatch(setExistingRubricId(response.data.rubric._id));
-      return { success: true, rubric: response.data.rubric };
-    } else {
-      throw new Error(response.data.message || "Failed to fetch rubric.");
-    }
-  } catch (err) {
-    const errorMessage = handleError(err, dispatch);
-    dispatch(setError(errorMessage));
-    return { success: false, error: errorMessage };
-  } finally {
-    dispatch(setRubricLoading(false));
-  }
+    if (response.success) {
+      dispatch(setRubricToEdit(response.rubric));
+      dispatch(setCriteria(response.rubric.criteria));
+      dispatch(setRubricName(response.rubric.name));
+      dispatch(setExistingRubricId(response.rubric._id));
+      return { success: true, rubric: response.rubric };
+    } 
+  } catch (error) {
+    return handleError(error, dispatch, rejectWithValue);
+  } 
 };

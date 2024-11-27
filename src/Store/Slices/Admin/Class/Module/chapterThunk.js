@@ -1,19 +1,18 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+
 import toast from "react-hot-toast";
-import { baseUrl } from "../../../../../config/Common";
+
 import { fetchModules } from "./moduleThunk";
 import { setSelectedModule } from "./moduleSlice";
-import { setErrorMsg, setShowError } from "../../../Common/Alerts/alertsSlice";
+import {  setShowError } from "../../../Common/Alerts/alertsSlice";
 import {
-  ErrorMsg,
   handleError,
 } from "../../../Common/Alerts/errorhandling.action";
 import { getAY } from "../../../../../Utils/academivYear";
 import {
-  postData,
+
   customRequest,
-  putData,
+
   deleteData,
 } from "../../../../../services/apiEndpoints";
 
