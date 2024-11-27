@@ -6,25 +6,45 @@ import {
   fetchTimetables,
   deleteTimetable,
 } from "../../../Store/Slices/Admin/TimeTable/timetable.action";
+import { fetchStudentTimetable } from "../../../Store/Slices/Student/TimeTable/studentTimeTable.action";
+import { fetchParentTimetable, } from "../../../Store/Slices/Parent/TimeTable/parentTimeTable.action";
 import { fetchAllClasses } from "../../../Store/Slices/Admin/Class/actions/classThunk";
 import TopNavigationWithFilters from "./Components/TopNavigationWithFilters";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
-
 const TimeTableMainSection = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { t } = useTranslation("admTimeTable");
 
-
+  // Role-based state selection
   const role = useSelector((store) => store.common.auth.role);
 
+  const { timetables, loadingFetch, errorFetch } = useSelector((state) => {
+    if (role === "student") {
+      return {
+        timetables: state.student?.studentTimetable?.timetables || [],
+        loadingFetch: state.student?.studentTimetable?.loading || false,
+        errorFetch: state.student?.studentTimetable?.error || null,
+      };
+    } else if (role === "parent") {
+      return {
+        timetables: state.Parent?.parentTimetable?.timetables || [],
+        loadingFetch: state.Parent?.parentTimetable?.loading || false,
+        errorFetch: state.Parent?.parentTimetable?.error || null,
+      };
+    } else {
+      return {
+        timetables: state.admin?.timetable?.timetables || [],
+        loadingFetch: state.admin?.timetable?.loadingFetch || false,
+        errorFetch: state.admin?.timetable?.errorFetch || null,
+      };
+    }
+  });
+  
+  
 
-  // Correctly destructure timetables, loadingFetch, and errorFetch
-  const { timetables, loadingFetch, errorFetch } = useSelector(
-    (state) => state.admin.timetable
-  );
   const { classes, loading: classLoading, error: classError } = useSelector(
     (state) => state.admin.class
   );
@@ -37,7 +57,6 @@ const TimeTableMainSection = () => {
     academicYear: "",
   });
   const [frontendFilter, setFrontendFilter] = useState("");
-
   const [filteredTimetables, setFilteredTimetables] = useState([]);
 
   // Function to fetch academic years from localStorage
@@ -52,33 +71,35 @@ const TimeTableMainSection = () => {
     }
   };
 
-  // Fetch academic years on component mount
+  // Fetch timetables or classes based on role
   useEffect(() => {
     fetchAcademicYearsFromStorage();
-    // Only fetch classes if role is not parent or student
-    if (role !== "parent" && role !== "student") {
+    if (role === "student") {
+      dispatch(fetchStudentTimetable());
+    } else if (role === "parent") {
+      dispatch(fetchParentTimetable());
+    } else if (role !== "parent" && role !== "student") {
       dispatch(fetchAllClasses());
+      dispatch(fetchTimetables({})); // Fetch all timetables
     }
   }, [dispatch, role]);
 
   // Handle class fetching errors, but skip for parent or student
   useEffect(() => {
     if (classError && role !== "parent" && role !== "student") {
-      toast.error(t("Failed to load classes. Please try again."));
+      console.error("Failed to load classes:", classError); // Log the error
     }
   }, [classError, role]);
 
   // Fetch timetables based on backend filters
   useEffect(() => {
-    // Create a new object with only non-empty filter parameters
-    const activeFilters = Object.fromEntries(
-      Object.entries(backendFilters).filter(([key, value]) => value)
-    );
-
-    // Dispatch fetchTimetables with the activeFilters
-    dispatch(fetchTimetables(activeFilters));
-  }, [backendFilters, dispatch]);
-
+    if (role !== "parent" && role !== "student") {
+      const activeFilters = Object.fromEntries(
+        Object.entries(backendFilters).filter(([key, value]) => value)
+      );
+      dispatch(fetchTimetables(activeFilters));
+    }
+  }, [backendFilters, dispatch, role]);
 
   // Update filtered timetables when timetables or frontend filter changes
   useEffect(() => {
@@ -130,6 +151,7 @@ const TimeTableMainSection = () => {
       toast.error(`${t("Failed to load timetables")}: ${errorFetch}`);
     }
   }, [errorFetch]);
+
 
   return (
     <div className="relative p-5">

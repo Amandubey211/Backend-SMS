@@ -27,18 +27,19 @@ const TopNavigationWithFilters = ({ onBackendFilterChange, onFrontendFilterChang
 
   // Fetch classes from Redux store
   const { classes, loading, error } = useSelector((state) => state.admin.class);
-
   useEffect(() => {
     if (role !== "parent" && role !== "student") {
       dispatch(fetchAllClasses());
     }
   }, [dispatch, role]);
-
+  
   useEffect(() => {
     if (error && role !== "parent" && role !== "student") {
-      toast.error(t("Failed to load classes. Please try again."));
+      // Handle the error silently or log it, as toast is removed
+      console.error("Failed to load classes:", error);
     }
   }, [error, role]);
+  
 
   // Debounced function to handle name filtering
   const debouncedHandleNameFilter = useMemo(
