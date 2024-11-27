@@ -105,12 +105,19 @@ const SubjectCard = ({
         ) : (
           <CiUser className="w-10 h-10 bg-transparent text-white " />
         )}
-        <div className="ml-3 capitalize">
+        <div className="ml-3 capitalize z-10">
           <p className="text-white font-semibold">
             {data?.teacherId?.firstName && data?.teacherId?.lastName
               ? `${data.teacherId.firstName} ${data.teacherId.lastName}`
+                  .length > 15
+                ? `${data.teacherId.firstName} ${data.teacherId.lastName}`.substring(
+                    0,
+                    15
+                  ) + "..."
+                : `${data.teacherId.firstName} ${data.teacherId.lastName}`
               : t("No Instructor Assigned")}
           </p>
+
           <p className="text-white text-sm">
             {data?.teacherId?.role || t("Teacher")}
           </p>
@@ -120,7 +127,7 @@ const SubjectCard = ({
       <img
         src={data?.subjectIcon ? data?.subjectIcon : SubjectIcon}
         alt={t("Subject icon")}
-        className="absolute bottom-6 right-6 h-20 w-auto transition-transform duration-300 transform hover:scale-110 object-contain"
+        className="absolute  bottom-6 right-6 h-20 w-20 transition-transform duration-300  transform hover:scale-110 object-contain"
       />
     </div>
   );
