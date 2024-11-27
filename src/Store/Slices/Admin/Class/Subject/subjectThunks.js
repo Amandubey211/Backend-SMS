@@ -23,7 +23,7 @@ export const fetchSubjects = createAsyncThunk(
       const params = { say };
       const response = await getData(endpoint, params);
 
-      if (response && response.success) {
+      if (response && response.status) {
         dispatch(setSubjects(response.data)); // Update the subjects state using the setSubjects action
         return response.data; // Assuming 'data' contains the list of subjects
       }
@@ -44,7 +44,7 @@ export const createSubject = createAsyncThunk(
       const params = { say };
       const response = await postData(endpoint, subjectData, { params });
 
-      if (response && response.success) {
+      if (response && response.status) {
         toast.success("Subject created successfully");
         dispatch(fetchClassDetails(subjectData.classId)); // Refresh class details
         return response.data; // Assuming 'data' contains the created subject
@@ -66,7 +66,7 @@ export const updateSubject = createAsyncThunk(
       const params = { say };
       const response = await putData(endpoint, subjectData, { params });
 
-      if (response && response.success) {
+      if (response && response.status) {
         toast.success("Subject updated successfully");
         dispatch(fetchClassDetails(subjectData.classId)); // Refresh class details
         return response.data; // Assuming 'data' contains the updated subject
