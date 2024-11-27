@@ -29,7 +29,7 @@ const SingleFee = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    if (classes && classes.length > 0) {
+    if (classes && classes?.length > 0) {
       const formattedClassData = classes.map((item) => ({
         value: item.className,
         label: item.className,

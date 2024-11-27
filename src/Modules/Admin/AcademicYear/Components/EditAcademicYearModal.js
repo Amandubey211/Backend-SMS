@@ -71,7 +71,7 @@ const EditAcademicYearModal = ({ show, onClose, year, refreshData }) => {
     }
 
     setErrors(formErrors);
-    return Object.keys(formErrors).length === 0;
+    return Object.keys(formErrors)?.length === 0;
   };
 
   const dispatch = useDispatch();

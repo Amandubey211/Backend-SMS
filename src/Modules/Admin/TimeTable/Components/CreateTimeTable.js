@@ -437,14 +437,14 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => { } }) => {
 
     setDataSource((prevData) => {
       let newData = [...prevData];
-      const rowsToRestore = deletedRowsStack.slice(-1)[0];
+      const rowsToRestore = deletedRowsStack?.slice(-1)[0];
 
       rowsToRestore.forEach((row) => {
         const { originalIndex } = row;
         newData.splice(originalIndex, 0, row);
       });
 
-      setDeletedRowsStack((prevStack) => prevStack.slice(0, -1));
+      setDeletedRowsStack((prevStack) => prevStack?.slice(0, -1));
 
       return newData;
     });

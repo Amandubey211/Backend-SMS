@@ -81,8 +81,8 @@ const StudentModalGradeList = ({ data, filters }) => {
               </td>
               <td className={`px-6 py-4 whitespace-nowrap text-sm text-gray-500 ${getBoldClass(item)}`}>{item.dueDate?.slice(0,10)}</td>
               <td className={`px-6 py-4 whitespace-nowrap text-sm text-gray-500 ${getBoldClass(item)}`}>{item.submittedDate?item.submittedDate?.slice(0,10):item.createAt?.slice(0,10)}</td>
-              <td className={`px-6 py-4 whitespace-nowrap text-sm ${getBoldClass(item)} ${getStatusClass(item.status)}`}>{item.status}</td>
-              <td className={`px-6 py-4 whitespace-nowrap text-sm text-gray-500 ${getBoldClass(item)}`}>{item.score}</td>
+              <td className={`px-6 py-4 whitespace-nowrap text-sm ${getBoldClass(item)} ${getStatusClass(item?.status)}`}>{item.status}</td>
+              <td className={`px-6 py-4 whitespace-nowrap text-sm text-gray-500 ${getBoldClass(item)}`}>{item?.score}</td>
             </tr>
           ))}
         </tbody>

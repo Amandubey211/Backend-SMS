@@ -45,7 +45,7 @@ const CreateAcademicYearForm = ({
     }
 
     setErrors(formErrors);
-    return Object.keys(formErrors).length === 0;
+    return Object.keys(formErrors)?.length === 0;
   };
 
   const handleSubmit = (e) => {

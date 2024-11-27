@@ -33,7 +33,7 @@ const SubjectCard = ({ subject, i }) => {
         <FaBook className="text-[2.2rem] text-pink-400" />
         <div className="flex flex-col">
           <span>{subjectName}</span>
-          <span className="text-[12px] text-gray-600">Started: {started !== "N/A" ? started.slice(0, 10) : "N/A"}</span>
+          <span className="text-[12px] text-gray-600">Started: {started !== "N/A" ? started?.slice(0, 10) : "N/A"}</span>
         </div>
       </div>
 

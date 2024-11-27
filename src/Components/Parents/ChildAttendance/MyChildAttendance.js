@@ -61,8 +61,8 @@ const MyChildAttendance = () => {
               return null;
           }
           return (
-            <li key={item.date}>
-              {icon} {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
+            <li key={item?.date}>
+              {icon} {item?.status?.charAt(0)?.toUpperCase() + item?.status?.slice(1)}
             </li>
           );
         })}

@@ -29,7 +29,7 @@ const CustomCalendar = ({ selectedDate, setSelectedDate }) => {
         className="w-full"
         next2Label={null}
         prev2Label={null}
-        formatShortWeekday={(locale, date) => date.toString().slice(0, 2)}
+        formatShortWeekday={(locale, date) => date?.toString()?.slice(0, 2)}
       />
     </div>
   );

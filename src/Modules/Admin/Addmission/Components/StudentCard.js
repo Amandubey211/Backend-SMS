@@ -26,7 +26,7 @@ const StudentCard = ({ studentInfo, imagePreview }) => {
   const className = selectedClass ? selectedClass.className : "";
   // Truncate email if it is longer than 20 characters
   const truncateEmail = (email) => {
-    return email.length > 20 ? email.substring(0, 20) + "..." : email;
+    return email?.length > 20 ? email.substring(0, 20) + "..." : email;
   };
 
   return (

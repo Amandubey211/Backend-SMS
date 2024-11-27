@@ -9,7 +9,7 @@ const Dash = () => {
   const { role } = useSelector((store) => store.common.auth);
 
   const formattedRole =
-    role?.charAt(0).toUpperCase() + role.slice(1).toLowerCase();
+    role?.charAt(0)?.toUpperCase() + role?.slice(1)?.toLowerCase();
   useNavHeading(formattedRole);
 
   return (

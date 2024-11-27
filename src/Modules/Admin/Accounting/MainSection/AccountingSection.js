@@ -106,7 +106,7 @@ const AccountingSection = () => {
     if (firstLetter === firstLetter.toUpperCase()) {
       return str;
     } else {
-      return firstLetter.toUpperCase() + str.slice(1);
+      return firstLetter?.toUpperCase() + str?.slice(1);
     }
   };
 
