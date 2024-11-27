@@ -49,7 +49,7 @@ const MainSection = () => {
           <div className="h-96 w-full flex justify-center items-center">
             <NoDataFound />
           </div>
-        ) : filteredTeachers.length < 1 ? (
+        ) : filteredTeachers?.length < 1 ? (
           <div className="h-96 w-full flex justify-center items-center">
             <NoDataFound title="Teacher" />
           </div>

@@ -30,11 +30,11 @@ const teacherSlice = createSlice({
       state.selectedSection = action.payload; // Set the selected section
     },
     filterTeachersBySection(state) {
-      if (state.selectedSection === "Everyone") {
+      if (state.selectedSection == "Everyone") {
         state.filteredTeachers = state.assignedTeachers; // Reset to the original list when "Everyone" is selected
       } else {
         // Filter teachers by selected section
-        state.filteredTeachers = state.assignedTeachers.filter((teacher) =>
+        state.filteredTeachers = state.assignedTeachers?.filter((teacher) =>
           teacher.sectionId.some(
             (section) => section.sectionName === state.selectedSection
           )

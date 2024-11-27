@@ -16,7 +16,8 @@ export const fetchTimetables = createAsyncThunk(
 
     // If role is student, include classId from localStorage
     if (role === "student" || role === "teacher") {
-      const classId = localStorage.getItem("classId");
+      const {userDetails} = getState((store) => store.common.user);
+      const classId = userDetails?.classId
       if (classId) {
         updatedFilters = { ...updatedFilters, classId };
       }

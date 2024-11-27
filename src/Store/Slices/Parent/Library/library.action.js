@@ -8,7 +8,7 @@ import {
 } from "../../Common/Alerts/errorhandling.action";
 import { getAY } from "../../../../Utils/academivYear";
 import { getData } from "../../../../services/apiEndpoints";
-const say = localStorage.getItem("say");
+
 // Fetch library books thunk
 export const fetchLibraryBooks = createAsyncThunk(
   "library/fetchLibraryBooks",

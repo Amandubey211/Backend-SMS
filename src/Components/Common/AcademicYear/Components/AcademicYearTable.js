@@ -1,11 +1,12 @@
 import React from "react";
 import { BsFillPatchCheckFill, BsPatchCheck } from "react-icons/bs"; // Importing the icons
+import { getAY } from "../../../../Utils/academivYear";
 
 const AcademicYearTable = ({
   academicYears,
   handleCheckboxChange,
 }) => {
-  const selectedYearId = localStorage.getItem('say')
+  const selectedYearId = getAY()
   return (
     <div className="bg-white p-2 rounded-lg w-full">
       <h2 className="text-2xl font-semibold mb-4 text-gray-800">

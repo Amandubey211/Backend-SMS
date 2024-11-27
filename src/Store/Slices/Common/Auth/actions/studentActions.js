@@ -1,5 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+
 import { resetState, setRole, setToken } from "../reducers/authSlice";
 import { setUserDetails } from "../../User/reducers/userSlice";
 import { baseUrl } from "../../../../../config/Common";
@@ -8,7 +8,8 @@ import { fetchAcademicYear } from "../../AcademicYear/academicYear.action";
 import { customRequest, postData } from "../../../../../services/apiEndpoints";
 import { handleError } from "../../Alerts/errorhandling.action";
 import { setShowError } from "../../Alerts/alertsSlice";
-
+import Cookies from 'js-cookie'
+import { setLocalCookies } from "../../../../../Utils/academivYear";
 // Student login action
 export const studentLogin = createAsyncThunk(
   "auth/studentLogin",
@@ -24,10 +25,8 @@ export const studentLogin = createAsyncThunk(
       const data = await postData(`/auth/student/login`, studentDetails);
 
       if (data.success) {
-        localStorage.setItem(`userToken`, `${data.token}`);
-        localStorage.setItem("classId", `${data.classId}`);
-
-        dispatch(setToken(data?.token)); // Store token in state
+      //  localStorage.setItem("classId", `${data.classId}`);
+     //   dispatch(setToken(data?.token)); // Store token in state
         dispatch(setRole(data?.role)); // Set role
         dispatch(
           setUserDetails({
@@ -42,6 +41,7 @@ export const studentLogin = createAsyncThunk(
             Q_Id: data?.Q_Id,
             enrollment: data?.enrollment,
             className: data?.className,
+            classId: data?.classId,
             sectionName: data?.sectionName,
             schoolName: data?.schoolName,
           })
@@ -53,7 +53,7 @@ export const studentLogin = createAsyncThunk(
             await getState().common?.academicYear?.academicYears?.find(
               (i) => i.isActive == true
             );
-          localStorage.setItem("say", activeAcademicYear?._id);
+          setLocalCookies("say", activeAcademicYear?._id);
           return { redirect: "/student_dash" };
         } else {
           return { redirect: "/verify_qid" };
@@ -76,6 +76,9 @@ export const studentLogout = createAsyncThunk(
   async (_, { dispatch }) => {
     dispatch(resetState()); // Reset auth state
     localStorage.clear();
+    Cookies.remove('userToken');
+    Cookies.remove('say');
+    Cookies.remove('isAcademicYearActive');
     toast.success("Logged out successfully", {
       position: "bottom-left",
     });

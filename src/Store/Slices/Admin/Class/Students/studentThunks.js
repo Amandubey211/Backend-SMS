@@ -1,42 +1,23 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
-import { baseUrl } from "../../../../../config/Common";
-import { ErrorMsg } from "../../../Common/Alerts/errorhandling.action";
+
+import { ErrorMsg, handleError } from "../../../Common/Alerts/errorhandling.action";
 import { setShowError, setErrorMsg } from "../../../Common/Alerts/alertsSlice";
 import toast from "react-hot-toast";
+import { getAY } from "../../../../../Utils/academivYear";
+import { getData, putData } from "../../../../../services/apiEndpoints";
 
-const say = localStorage.getItem("say");
 
-// Helper function to get the token from Redux state
-const getToken = (state, rejectWithValue, dispatch) => {
-  const token = state.common.auth?.token;
-  if (!token) {
-    dispatch(setShowError(true));
-    dispatch(setErrorMsg("Authentication Failed"));
-    return rejectWithValue("Authentication Failed");
-  }
-  return `Bearer ${token}`;
-};
-
-// Centralized error handling
-const handleError = (error, dispatch, rejectWithValue) => {
-  const err = ErrorMsg(error);
-  dispatch(setShowError(true));
-  dispatch(setErrorMsg(err.message));
-  return rejectWithValue(err.message);
-};
 
 // Fetch students by class and section
 export const fetchStudentsByClassAndSection = createAsyncThunk(
   "students/fetchByClassAndSection",
-  async (classId, { getState, rejectWithValue, dispatch }) => {
-    const say = localStorage.getItem("say");
+  async (classId, {  rejectWithValue, dispatch }) => {
+ 
     try {
-      const token = getToken(getState(), rejectWithValue, dispatch);
-      const response = await axios.get(`${baseUrl}/admin/student/${classId}?say=${say}`, {
-        headers: { Authentication: token },
-      });
-      return response.data.data;
+      dispatch(setShowError(false));
+      const say = getAY()
+      const response = await getData(`/admin/student/${classId}?say=${say}`);
+      return response.data;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
@@ -46,14 +27,12 @@ export const fetchStudentsByClassAndSection = createAsyncThunk(
 // Fetch all students
 export const fetchAllStudents = createAsyncThunk(
   "students/fetchAll",
-  async (_, { getState, rejectWithValue, dispatch }) => {
+  async (_, {  rejectWithValue, dispatch }) => {
     try {
-      const token = getToken(getState(), rejectWithValue, dispatch);
-      const say = localStorage.getItem("say");
-      const response = await axios.get(`${baseUrl}/admin/all/students?say=${say}`, {
-        headers: { Authentication: token },
-      });
-      return response.data.data;
+      dispatch(setShowError(false));
+      const say = getAY()
+      const response = await getData(`/admin/all/students?say=${say}`);
+      return response.data;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
@@ -67,20 +46,19 @@ export const promoteStudents = createAsyncThunk(
     { studentIds, promotionClassId, academicYearId },
     { getState, rejectWithValue, dispatch }
   ) => {
-    const token = getState().common.auth.token;
-    const say = localStorage.getItem("say");
+   
     const classId = getState().common.user.classInfo.selectedClassId;
 
     try {
-      const token = getToken(getState(), rejectWithValue, dispatch);
-      const response = await axios.put(
-        `${baseUrl}/admin/promote/students?say=${say}`,
+      dispatch(setShowError(false));
+      const say = getAY()
+      const response = await putData(
+        `/admin/promote/students?say=${say}`,
         { studentIds, promotionClassId, academicYearId },
-        { headers: { Authentication: token } }
       );
       toast.success("Student Promoted");
       dispatch(fetchStudentsByClassAndSection(classId));
-      return response.data;
+      return response;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
@@ -93,22 +71,20 @@ export const promoteInSameClassStudents = createAsyncThunk(
 
   async (
     { studentIds, academicYearId },
-    { getState, rejectWithValue, dispatch }
+    {  rejectWithValue, dispatch,getState }
   ) => {
-    const token = getState().common.auth.token;
+   
     const classId = getState().common.user.classInfo.selectedClassId;
-    const say = localStorage.getItem("say");
-
     try {
-      const token = getToken(getState(), rejectWithValue, dispatch);
-      const say = localStorage.getItem("say")
-      const response = await axios.put(
-        `${baseUrl}/admin/promote/inSameClass/students?say=${say}`,
+      dispatch(setShowError(false));
+      const say = getAY()
+      const response = await putData(
+        `/admin/promote/inSameClass/students?say=${say}`,
         { studentIds, academicYearId },
-        { headers: { Authentication: token } }
+     
       );
       dispatch(fetchStudentsByClassAndSection(classId));
-      return response.data;
+      return response;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
@@ -121,22 +97,20 @@ export const graduateStudents = createAsyncThunk(
   async ({ studentIds }, { getState, rejectWithValue, dispatch }) => {
     const classId = getState().common.user.classInfo.selectedClassId;
     try {
-      const token = getToken(getState(), rejectWithValue, dispatch);
-      
-      const say = localStorage.getItem("say")
-      const response = await axios.put(
-        `${baseUrl}/admin/graduate/students?say=${say}`,
+      dispatch(setShowError(false));
+      const say = getAY()
+      const response = await putData(
+        `/admin/graduate/students?say=${say}`,
         { studentIds },
-        { headers: { Authentication: token } }
       );
-      if(response.data.success){
+      if(response.success){
         toast.success("Student graduated successfully");
       }else{
-        toast.success(response.data.message);
+        toast.success(response.message);
       }
       // toast.success("Student Graduated");
       dispatch(fetchStudentsByClassAndSection(classId));
-      return response.data;
+      return response;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
@@ -148,14 +122,14 @@ export const demoteStudents = createAsyncThunk(
   "students/demoteStudents",
   async ({ studentIds }, { getState, rejectWithValue, dispatch }) => {
     try {
-      const token = getToken(getState(), rejectWithValue, dispatch);
-      const say = localStorage.getItem("say")
-      const response = await axios.put(
-        `${baseUrl}/admin/demote/students?say=${say}`,
+      dispatch(setShowError(false));
+      const say = getAY()
+      const response = await putData(
+        `/admin/demote/students?say=${say}`,
         { studentIds },
-        { headers: { Authentication: token } }
+     
       );
-      return response.data;
+      return response;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
@@ -165,15 +139,14 @@ export const demoteStudents = createAsyncThunk(
 // Fetch Graduates
 export const fetchGraduates = createAsyncThunk(
   "students/fetchGraduates",
-  async (queryParams, { getState, rejectWithValue, dispatch }) => {
+  async (queryParams, {  rejectWithValue, dispatch }) => {
     try {
-      const token = getToken(getState(), rejectWithValue, dispatch);
-      const say = localStorage.getItem("say")
-      const response = await axios.get(`${baseUrl}/admin/graduates/students?say=${say}`, {
-        headers: { Authentication: token },
-        params: queryParams,
+      dispatch(setShowError(false));
+      const say = getAY()
+      const response = await getData(`/admin/graduates/students?say=${say}`, {
+        queryParams,
       });
-      return response.data;
+      return response;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }

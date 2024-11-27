@@ -30,16 +30,16 @@ const LibraryAndBookIssue = () => {
   const [editIssueData, setEditIssueData] = useState(null);
 
   useEffect(() => {
-    if (!books.length) dispatch(fetchBooksThunk());
-    if (!bookIssues.length) dispatch(fetchBookIssuesThunk());
-    if (!classList.length) dispatch(fetchAllClasses());
-    if (!StudentList.length) dispatch(fetchAllStudents());
+    if (!books?.length) dispatch(fetchBooksThunk());
+    if (!bookIssues?.length) dispatch(fetchBookIssuesThunk());
+    if (!classList?.length) dispatch(fetchAllClasses());
+    if (!StudentList?.length) dispatch(fetchAllStudents());
   }, [
     dispatch,
-    books.length,
-    bookIssues.length,
-    classList.length,
-    StudentList.length,
+    books?.length,
+    bookIssues?.length,
+    classList?.length,
+    StudentList?.length,
   ]);
 
   useEffect(() => {

@@ -1,11 +1,11 @@
 import { useState, useCallback } from "react";
 import axios from "axios";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import { baseUrl } from "../../../../../config/Common";
 import useGetAllStaff from "./useGetAllStaff";
 import useCreateSalary from "../../../../CommonHooks/useCreateSalary";
-import useGetAllTeachers from "../Teacher/useGetAllTeacher";
+import { fetchAllTeachers } from "../../../../../Store/Slices/Admin/Class/Teachers/teacherThunks";
 
 const useAddUser = () => {
   const [loading, setLoading] = useState(false);
@@ -13,8 +13,7 @@ const useAddUser = () => {
   const adminRole = useSelector((store) => store.common.auth.role);
   const { fetchStaff } = useGetAllStaff();
   const { createSalary } = useCreateSalary();
-  const { fetchTeachers } = useGetAllTeachers();
-
+  const dispatch = useDispatch()
   const addUser = useCallback(
     async (userData, address) => {
       const {
@@ -75,7 +74,7 @@ const useAddUser = () => {
         toast.success("User added successfully");
 
         if (role == "teacher") {
-          fetchTeachers();
+          dispatch(fetchAllTeachers())
         } else {
           fetchStaff();
         }

@@ -127,12 +127,14 @@ export const fetchTasks = createAsyncThunk(
 // Fetch Student Grades 
 export const fetchStudentGrades = createAsyncThunk(
   "studentDashboard/fetchStudentGrades",
-  async (_, { rejectWithValue, dispatch }) => {
-    const persistUserString = localStorage.getItem("persist:user");
-    const persistUserObject = JSON.parse(persistUserString);
-    const userDetails = JSON.parse(persistUserObject?.userDetails);
-    const userId = userDetails?.userId;
-    const classId = localStorage.getItem("classId");
+  async (_, { rejectWithValue, dispatch ,getState}) => {
+    // const persistUserString = localStorage.getItem("persist:user");
+    // const persistUserObject = JSON.parse(persistUserString);
+    // const userDetails = JSON.parse(persistUserObject?.userDetails);
+    // const userId = userDetails?.userId;
+    const {userDetails} = getState((store) => store.common.user);
+      const classId = userDetails?.classId;
+      const userId = userDetails?.userId;
     
     if (!userId || !classId) {
       dispatch(setShowError(true));
