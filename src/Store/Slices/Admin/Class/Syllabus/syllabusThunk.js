@@ -95,12 +95,18 @@ export const editSyllabus = createAsyncThunk(
       }
 
       const endpoint = `/admin/syllabus/${syllabusId}/class/${cid}`;
-      const response = await customRequest("put", endpoint, formData, {
-        params: { say },
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      const response = await customRequest(
+        "put",
+        endpoint,
+        formData,
+        {},
+        {
+          params: { say },
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
 
       if (response && response.status) {
         toast.success("Syllabus updated successfully!");

@@ -41,7 +41,7 @@ export const createIcon = createAsyncThunk(
     try {
       const endpoint = `/icons/createIcon`;
       const params = { say };
-      const response = await postData(endpoint, formData, { params });
+      const response = await postData(endpoint, formData, params);
 
       if (response && response.success) {
         toast.success("Icon created successfully!");
