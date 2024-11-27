@@ -30,8 +30,10 @@ import i18next from "i18next";
 import { useSelector } from "react-redux";
 import GraduationPage from "../Modules/Admin/Graduation/GraduationPage.js";
 import TimeTablePage from "../Modules/Admin/TimeTable/TimeTablePage.js";
+// import StudentTimeTablePage from "../Modules/Student/TimeTable/TimeTablePage.js";
 import CreateTimeTable from "../Modules/Admin/TimeTable/Components/CreateTimeTable.js";
 import TableView from "../Modules/Admin/TimeTable/Components/TableView.js";
+// import StudentTableView from "../Modules/Student/TimeTable/Components/TableView.js";
 import { updateTimetable } from "../Store/Slices/Admin/TimeTable/timetable.action.js";
 import PrivacyPolicy from "../Modules/LoginPages/Policys/PrivacyPolicy.jsx";
 import TermsAndConditions from "../Modules/LoginPages/Policys/TermsAndConditions.jsx";
@@ -694,7 +696,7 @@ function App() {
     },
     { path: "library", element: <Libary />, errorElement: <Error /> },
     {
-      path: "/timetable",
+      path: "/timetable/*",
       element: (
         <ProtectRoute
           Component={TimeTablePage}
@@ -928,6 +930,30 @@ function App() {
       ),
       errorElement: <Error />,
     },
+
+    // {
+    //   path: "/student_timetable",
+    //   element: (
+    //     <ProtectRoute
+    //       Component={StudentTimeTablePage}
+    //       allowedRoles={["student"]}
+    //     />
+    //   ),
+    //   errorElement: <Error />,
+    //   children: [
+    //     {
+    //       path: "viewtable/:tablename", // Notice it’s a child path, not a full path
+    //       element: (
+    //         <ProtectRoute
+    //           Component={StudentTableView}
+    //           allowedRoles={["student"]}
+    //         />
+    //       ),
+    //       errorElement: <Error />,
+    //     },
+        
+    //   ],
+    // },
     //{ path: "/student_class/:sid/createassignment", element: <ProtectRoute Component={StudentCreateAssignment} allowedRoles={["student"]} />, errorElement: <Error /> },
     {
       path: "/student_class/:cid/:sid/quizzes",

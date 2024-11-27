@@ -33,7 +33,7 @@ const sidebarData = [
   {
     title: "Time Table",
     icon: <ImTable2 />,
-    path: "/timetable",
+    path: "/student_timetable",
   },
   {
     title: "Notice Board",

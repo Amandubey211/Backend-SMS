@@ -74,6 +74,12 @@ import libraryReducer from "../Store/Slices/Parent/Library/librarySlices";
 import eventReducer from "../Store/Slices/Parent/Events/eventSlice";
 import parentTimeTableReducer from "../Store/Slices/Parent/TimeTable/parentTimeTableSlice";
 
+// teacher
+import teacherTimeTableReducer from "../Store/Slices/Teacher/teacherTimeTableSlice";
+
+
+
+
 // Persist configuration for the Auth slice
 
 const authPersistConfig = {
@@ -125,6 +131,7 @@ const AdminReducer = combineReducers({
   subject: subjectReducer,
   group_section: sectionReducer,
   teacher: teacherReducer,
+  teacherTimetable: teacherTimeTableReducer,
   students: classStudentReducer,
   attendance: attendanceReducer,
   verification: verificationReducer,
@@ -179,9 +186,11 @@ const studentReducer = combineReducers({
   studentPages: studentPagesReducer,
   studentDiscussion: studentDiscussionReducer,
   studentAnnounce: studentAnnounceReducer,
-  studentAssignment: studentAssignmentReducer,
   studentTimetable: studentTimeTableReducer
 });
+
+
+
 
 const ParentReducer = combineReducers({
   dashboard: dashboardReducer,
