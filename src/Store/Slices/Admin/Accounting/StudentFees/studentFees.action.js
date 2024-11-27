@@ -1,17 +1,10 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { setErrorMsg, setShowError } from "../../../Common/Alerts/alertsSlice";
-import { ErrorMsg } from "../../../Common/Alerts/errorhandling.action";
+import { setShowError } from "../../../Common/Alerts/alertsSlice";
+import { handleError } from "../../../Common/Alerts/errorhandling.action";
 import { getAY } from "../../../../../Utils/academivYear";
 import { deleteData, getData, postData, putData } from "../../../../../services/apiEndpoints";
 
 
-// Centralized error handling
-const handleError = (error, dispatch, rejectWithValue) => {
-    const err = ErrorMsg(error);
-    dispatch(setShowError(true));
-    dispatch(setErrorMsg(err.message));
-    return rejectWithValue(err.message);
-};
 
 // Fetch Student Fees
 export const fetchFees = createAsyncThunk(
