@@ -45,8 +45,6 @@ export const fetchStudentQuiz = createAsyncThunk(
 
       if (response && response.success) {
         return response.data; // Assuming 'data' contains the student's quiz details
-      } else {
-        throw new Error(response.message || "Failed to fetch student quiz");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -73,8 +71,6 @@ export const assignQuizGrade = createAsyncThunk(
         toast.success("Grade Assigned");
         dispatch(fetchStudentQuiz({ studentId, quizId }));
         return response.data; // Assuming 'data' contains the updated quiz data
-      } else {
-        throw new Error(response.message || "Failed to assign quiz grade");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);

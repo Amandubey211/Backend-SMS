@@ -1,19 +1,11 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-
 import toast from "react-hot-toast";
-
 import { fetchModules } from "./moduleThunk";
 import { setSelectedModule } from "./moduleSlice";
-import { setErrorMsg, setShowError } from "../../../Common/Alerts/alertsSlice";
-import { ErrorMsg, handleError } from "../../../Common/Alerts/errorhandling.action";
+import { setShowError } from "../../../Common/Alerts/alertsSlice";
+import { handleError } from "../../../Common/Alerts/errorhandling.action";
 import { getAY } from "../../../../../Utils/academivYear";
-import {
-  postData,
-  customRequest,
-  putData,
-  deleteData,
-} from "../../../../../services/apiEndpoints";
-
+import { customRequest, putData } from "../../../../../services/apiEndpoints";
 
 export const addAttachment = createAsyncThunk(
   "attachment/addAttachment",
@@ -64,15 +56,12 @@ export const addAttachment = createAsyncThunk(
         }
 
         return response.data;
-      } else {
-        throw new Error(response?.message || "Failed to upload documents.");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
-
 
 export const deleteAttachmentThunk = createAsyncThunk(
   "attachment/deleteAttachment",
@@ -107,8 +96,6 @@ export const deleteAttachmentThunk = createAsyncThunk(
         }
 
         return response.data;
-      } else {
-        throw new Error(response?.message || "Failed to delete attachment.");
       }
     } catch (error) {
       console.error("Delete Attachment Error:", error);

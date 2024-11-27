@@ -4,15 +4,11 @@ import toast from "react-hot-toast";
 
 import { fetchModules } from "./moduleThunk";
 import { setSelectedModule } from "./moduleSlice";
-import {  setShowError } from "../../../Common/Alerts/alertsSlice";
-import {
-  handleError,
-} from "../../../Common/Alerts/errorhandling.action";
+import { setShowError } from "../../../Common/Alerts/alertsSlice";
+import { handleError } from "../../../Common/Alerts/errorhandling.action";
 import { getAY } from "../../../../../Utils/academivYear";
 import {
-
   customRequest,
-
   deleteData,
 } from "../../../../../services/apiEndpoints";
 
@@ -72,8 +68,6 @@ export const addChapter = createAsyncThunk(
         }
 
         return response.data;
-      } else {
-        throw new Error(response?.message || "Failed to add chapter.");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -179,8 +173,6 @@ export const deleteChapter = createAsyncThunk(
         }
 
         return chapterId;
-      } else {
-        throw new Error(response?.message || "Failed to delete chapter.");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);

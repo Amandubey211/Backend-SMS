@@ -19,8 +19,6 @@ export const fetchSubjectGrades = createAsyncThunk(
 
       if (response && response.gradesResult) {
         return response.gradesResult;
-      } else {
-        throw new Error("Failed to fetch subject grades");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);

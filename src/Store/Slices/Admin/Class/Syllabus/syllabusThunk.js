@@ -26,8 +26,6 @@ export const fetchSyllabus = createAsyncThunk(
 
       if (response && response.status) {
         return response.data;
-      } else {
-        throw new Error(response?.message || "Failed to fetch syllabus.");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -49,8 +47,6 @@ export const deleteSyllabus = createAsyncThunk(
       if (response && response.status) {
         toast.success("Syllabus deleted successfully!");
         return syllabusId;
-      } else {
-        toast.error(response?.message || "Failed to delete syllabus.");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -73,8 +69,6 @@ export const createSyllabus = createAsyncThunk(
       if (response && response.status) {
         toast.success("Syllabus created successfully!");
         return response.data;
-      } else {
-        toast.error(response?.message || "Failed to create syllabus.");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -111,8 +105,6 @@ export const editSyllabus = createAsyncThunk(
       if (response && response.status) {
         toast.success("Syllabus updated successfully!");
         return response.data;
-      } else {
-        toast.error("Failed to update syllabus.");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);

@@ -18,10 +18,6 @@ export const fetchAssignedAssignmentStudents = createAsyncThunk(
 
       if (response && response.success) {
         return response.data; // Assuming 'data' contains the list of assigned students
-      } else {
-        throw new Error(
-          response.message || "Failed to fetch assigned assignment students"
-        );
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -42,10 +38,6 @@ export const fetchStudentAssignment = createAsyncThunk(
 
       if (response && response.success) {
         return response.data; // Assuming 'data' contains the student's assignment details
-      } else {
-        throw new Error(
-          response.message || "Failed to fetch student assignment"
-        );
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -78,10 +70,6 @@ export const assignAssignmentGrade = createAsyncThunk(
         toast.success("Grade Assigned");
         dispatch(fetchStudentAssignment({ studentId, assignmentId }));
         return response.data; // Assuming 'data' contains the updated assignment data
-      } else {
-        throw new Error(
-          response.message || "Failed to assign assignment grade"
-        );
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);

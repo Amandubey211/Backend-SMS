@@ -24,8 +24,6 @@ export const fetchAnnouncements = createAsyncThunk(
 
       if (response && response.status) {
         return response.data;
-      } else {
-        throw new Error("Failed to fetch announcements");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -68,8 +66,6 @@ export const fetchAnnouncementById = createAsyncThunk(
 
       if (response && response.status) {
         return response.data;
-      } else {
-        throw new Error("Failed to fetch announcement");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -91,8 +87,6 @@ export const deleteAnnouncement = createAsyncThunk(
       if (response && response.status) {
         toast.success("Announcement deleted successfully!");
         return id;
-      } else {
-        throw new Error("Failed to delete announcement");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -130,8 +124,6 @@ export const createAnnouncement = createAsyncThunk(
       if (response && response.status) {
         toast.success("Announcement created");
         return response.data;
-      } else {
-        throw new Error("Failed to create announcement");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -169,8 +161,6 @@ export const editAnnouncement = createAsyncThunk(
       if (response && response.status) {
         toast.success("Announcement updated successfully!");
         return response.data;
-      } else {
-        throw new Error("Failed to update announcement");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);

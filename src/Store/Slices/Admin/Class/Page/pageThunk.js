@@ -23,8 +23,6 @@ export const fetchAllPages = createAsyncThunk(
 
       if (response && response.success) {
         return response.data;
-      } else {
-        throw new Error("Failed to fetch pages");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -45,8 +43,6 @@ export const fetchPageById = createAsyncThunk(
 
       if (response && response.success) {
         return response.data;
-      } else {
-        throw new Error("Failed to fetch page");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -75,8 +71,6 @@ export const createPage = createAsyncThunk(
       if (response && response.success) {
         toast.success("Page Created");
         return response.data;
-      } else {
-        throw new Error("Failed to create page");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -101,8 +95,6 @@ export const updatePage = createAsyncThunk(
       if (response && response.success) {
         toast.success("Page Updated Successfully");
         return response.data;
-      } else {
-        throw new Error("Failed to update page");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -124,8 +116,6 @@ export const deletePage = createAsyncThunk(
       if (response && response.success) {
         toast.success("Page Deleted Successfully");
         return pid;
-      } else {
-        throw new Error("Failed to delete page");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);

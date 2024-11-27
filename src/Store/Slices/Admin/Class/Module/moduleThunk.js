@@ -28,9 +28,6 @@ export const fetchModules = createAsyncThunk(
       if (response && response.success) {
         // Assuming 'modules' are nested within 'data.data'
         return response.data.modules;
-      } else {
-        // If response is undefined or success is false, throw an error to be caught
-        throw new Error(response?.message || "Failed to fetch modules.");
       }
     } catch (error) {
       // Handle Errors
@@ -64,7 +61,6 @@ export const addModule = createAsyncThunk(
       // Define the endpoint for the API call
       const endpoint = "/admin/add_module";
 
-      // Perform the API call using the updated `customRequest`
       const response = await customRequest(
         "post",
         endpoint,
@@ -78,27 +74,16 @@ export const addModule = createAsyncThunk(
         }
       );
 
-      // Handle success response
       if (response && response.success) {
         toast.success("Module added successfully");
-
-        // Dispatch action to refresh the modules list
         dispatch(fetchModules({ cid, sid }));
-
-        // Return the response data (e.g., the added module details)
         return response.data;
-      } else {
-        // If the response is invalid or indicates failure, throw an error
-        throw new Error(response?.message || "Failed to add module.");
       }
     } catch (error) {
-      // Handle errors gracefully and return rejected value
-      console.error("Error adding module:", error);
       return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
-
 
 export const editModule = createAsyncThunk(
   "module/editModule",
@@ -134,17 +119,12 @@ export const editModule = createAsyncThunk(
         }
       );
 
-      // Check if response is valid and indicates success
       if (response && response.success) {
         toast.success("Module updated successfully");
-        // Refresh the modules list
         dispatch(fetchModules({ cid, sid }));
         return response.data;
-      } else {
-        throw new Error(response?.message || "Failed to edit module.");
       }
     } catch (error) {
-      // Handle Errors
       console.error(error);
       return handleError(error, dispatch, rejectWithValue);
     }
@@ -154,24 +134,18 @@ export const editModule = createAsyncThunk(
 export const deleteModule = createAsyncThunk(
   "module/deleteModule",
   async ({ sid, moduleId }, { rejectWithValue, dispatch }) => {
-    // Mandatory Lines
     const say = getAY();
     dispatch(setShowError(false));
 
     try {
-      // API Call using service function with query parameter
       const endpoint = `/admin/subjects/${sid}/modules/${moduleId}`;
       const response = await deleteData(endpoint, { say });
 
-      // Check if response is valid and indicates success
       if (response && response.success) {
         toast.success("Module deleted successfully");
         return moduleId;
-      } else {
-        throw new Error(response?.message || "Failed to delete module.");
       }
     } catch (error) {
-      // Handle Errors
       console.error(error);
       return handleError(error, dispatch, rejectWithValue);
     }
@@ -181,25 +155,19 @@ export const deleteModule = createAsyncThunk(
 export const moveModule = createAsyncThunk(
   "module/moveModule",
   async ({ moduleId, newIndex, sid }, { rejectWithValue, dispatch }) => {
-    // Mandatory Lines
     const say = getAY();
     dispatch(setShowError(false));
 
     try {
-      // API Call using service function with query parameter
       const endpoint = `/admin/subjects/${sid}/modules/reorder`;
       const data = { moduleId, newIndex };
       const response = await putData(endpoint, data, { say });
 
-      // Check if response is valid and indicates success
       if (response && response.success) {
         toast.success("Module moved successfully");
         return response.data; // not getting from the backend
-      } else {
-        throw new Error(response?.message || "Failed to move module.");
       }
     } catch (error) {
-      // Handle Errors
       console.error(error);
       return handleError(error, dispatch, rejectWithValue);
     }
