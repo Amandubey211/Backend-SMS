@@ -80,7 +80,7 @@ const EditAdmin = ({data}) => {
             </div>
             <div className="flex flex-col gap-3">
               <FormInput id="adminName" label="Full Name" value={adminData.adminName} onChange={handleInputChange} />
-              <FormInput id="email"  label="Email" type="email"   value={adminData.email} readOnly />
+              <FormInput id="email"  label="Email" type="email"   value={adminData.email} readOnly={true} />
               <FormInput id="contactNumber" label="Contact" type="text" value={adminData.contactNumber} onChange={handleInputChange} />
             </div>
           </div>
