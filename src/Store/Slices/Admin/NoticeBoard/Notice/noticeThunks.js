@@ -15,7 +15,7 @@ export const fetchNoticesThunk = createAsyncThunk(
       const say = getAY();
       dispatch(setShowError(false));
       const response = await getData(`/admin/all/notices?say=${say}`);
-      return response.data.notices;
+      return response?.notices;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
@@ -33,7 +33,7 @@ export const createNoticeThunk = createAsyncThunk(
         `/admin/create_notice?say=${say}`,
         noticeData);
       dispatch(fetchNoticesThunk());
-      return response.data;
+      return response;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
@@ -51,7 +51,7 @@ export const updateNoticeThunk = createAsyncThunk(
         `/admin/update/notice/${noticeId}?say=${say}`,
         updatedData);
       dispatch(fetchNoticesThunk());
-      return response.data;
+      return response;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
