@@ -20,10 +20,9 @@ export const addChapter = createAsyncThunk(
     { name, thumbnail, moduleId, sid },
     { rejectWithValue, getState, dispatch }
   ) => {
-    const say = getAY();
-    dispatch(setShowError(false));
-
     try {
+      const say = getAY();
+      dispatch(setShowError(false));
       const cid = getState().common.user.classInfo.selectedClassId;
       const subjectId = getState().common.user.subjectInfo.selectedSubjectId;
 
@@ -37,14 +36,10 @@ export const addChapter = createAsyncThunk(
 
       const response = await customRequest(
         "post",
-        "/admin/add_chapter",
+        `/admin/add_chapter?say=${say}`,
         formData,
-        {},
         {
-          params: { say },
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
+          "Content-Type": "multipart/form-data",
         }
       );
 
@@ -81,10 +76,9 @@ export const editChapter = createAsyncThunk(
     { name, thumbnail, moduleId, chapterId, sid },
     { rejectWithValue, getState, dispatch }
   ) => {
-    const say = getAY();
-    dispatch(setShowError(false));
-
     try {
+      const say = getAY();
+      dispatch(setShowError(false));
       const cid = getState().common.user.classInfo.selectedClassId;
       const subjectId = getState().common.user.subjectInfo.selectedSubjectId;
 
@@ -94,20 +88,11 @@ export const editChapter = createAsyncThunk(
         formData.append("thumbnail", thumbnail);
       }
 
-      const endpoint = `/admin/subjects/${subjectId}/modules/${moduleId}/chapters/${chapterId}`;
+      const endpoint = `/admin/subjects/${subjectId}/modules/${moduleId}/chapters/${chapterId}?say=${say}`;
 
-      const response = await customRequest(
-        "put",
-        endpoint,
-        formData,
-        {},
-        {
-          params: { say },
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+      const response = await customRequest("put", endpoint, formData, {
+        "Content-Type": "multipart/form-data",
+      });
 
       if (response && response.success) {
         await dispatch(fetchModules({ cid, sid: subjectId }));

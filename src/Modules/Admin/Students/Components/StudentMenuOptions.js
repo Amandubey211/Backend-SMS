@@ -11,9 +11,9 @@ import { FaGraduationCap } from "react-icons/fa";
 import { TfiStatsUp } from "react-icons/tfi";
 import { TfiStatsDown } from "react-icons/tfi";
 import DeleteModal from "../../../../Components/Common/DeleteModal";
-import useAssignStudentToGroup from "../../../../Hooks/AuthHooks/Staff/Admin/Students/useAssignStudentToGroup ";
 import DemoteClass from "./DemoteClass";
 import GraduateStudent from "./GraduateStudent";
+import { removeStudentFromGroup } from "../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
 
 const StudentMenuOptions = ({
   studentId,
@@ -34,7 +34,7 @@ const StudentMenuOptions = ({
   const menuRef = useRef(null);
   const buttonRef = useRef(null);
 
-  const { removeStudentFromGroup } = useAssignStudentToGroup();
+ 
 
   const toggleMenu = useCallback(
     (index) => {

@@ -1,17 +1,13 @@
 // src/Hooks/AuthHooks/Staff/Admin/useGetAllSchools.js
 
 import { useState, useEffect } from "react";
-import axios from "axios";
-import { baseUrl } from "../../../../config/Common";
-
+import { getData } from "../../services/apiEndpoints";
 const useGetAllSchools = () => {
   const [schoolList, setSchoolList] = useState([]);
-
   const fetchSchools = async () => {
     try {
-      const response = await axios.get(`${baseUrl}/student_diwan/get_schools`);
-      console.log(response.data)
-      setSchoolList(response.data.schools);
+      const response = await getData(`/student_diwan/get_schools`);
+     return setSchoolList(response.schools);
     } catch (error) {
       console.error("Error fetching schools:", error);
     }

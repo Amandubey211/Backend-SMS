@@ -1,13 +1,13 @@
 // PersonalInformationForm.js
-
 import React, { useEffect } from "react";
-import useGetAllSchools from "../../../../Hooks/AuthHooks/Staff/Admin/useGetAllSchool";
 import SelectInput from "./SelectInput";
 import TextInput from "./TextInput";
 import RadioGroup from "./RadioGroup";
-import { RiImageAddFill } from "react-icons/ri";
-import useGetAllClasses from "../../../../Hooks/Common/useGetAllClasses ";
 import ImageUpload from "../../../Admin/Addmission/Components/ImageUpload";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchAllClasses } from "../../../../Store/Slices/Admin/Class/actions/classThunk";
+import useGetAllSchools from "../../../../Hooks/CommonHooks/useGetAllSchool";
+
 
 const PersonalInformationForm = ({
   studentDetails,
@@ -19,7 +19,7 @@ const PersonalInformationForm = ({
   inputRefs,
 }) => {
   const { fetchSchools, schoolList } = useGetAllSchools();
-  const { fetchClasses, classList, error } = useGetAllClasses();
+  const {  classes:classList, error } = useSelector((store)=>store.admin.class);
   const handleClearImage = () => {
     setImagePreview(null);
     handleChange({
@@ -35,15 +35,14 @@ const PersonalInformationForm = ({
     { value: "Sikhism", label: "Sikhism" },
     { value: "Other", label: "Other" },
   ];
-
+  const dispatch = useDispatch()
   useEffect(() => {
     fetchSchools();
   }, []);
   useEffect(() => {
     // Only fetch classes when schoolId is defined
     if (studentDetails.schoolId) {
-      console.log(studentDetails, "kkkk");
-      fetchClasses(studentDetails?.schoolId);
+     dispatch(fetchAllClasses())
     }
   }, [studentDetails.schoolId]);
   console.log("Validation Errors:", validationErrors);
