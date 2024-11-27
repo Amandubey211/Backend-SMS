@@ -1,8 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { getData, putData } from "../../../../../services/apiEndpoints"; // Adjust the path as necessary
-import { setErrorMsg, setShowError } from "../../../Common/Alerts/alertsSlice";
+import {  setShowError } from "../../../Common/Alerts/alertsSlice";
 import {
-  ErrorMsg,
   handleError,
 } from "../../../Common/Alerts/errorhandling.action";
 import toast from "react-hot-toast";
@@ -21,11 +20,7 @@ export const fetchAssignedQuizStudents = createAsyncThunk(
 
       if (response && response.success) {
         return response.data; // Assuming 'data' contains the list of assigned students
-      } else {
-        throw new Error(
-          response.message || "Failed to fetch assigned quiz students"
-        );
-      }
+      } 
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
