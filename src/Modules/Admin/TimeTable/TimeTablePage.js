@@ -26,7 +26,9 @@ const TimeTablePage = () => {
     : role === "student"
     ? StudentDashLayout
     : role === "teacher"
-    ? AdminDashLayout
+    ? StudentDashLayout
+    : role === "parent"
+    ? ParentDashLayout
     : AdminDashLayout
 
     

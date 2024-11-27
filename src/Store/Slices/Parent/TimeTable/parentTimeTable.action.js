@@ -11,7 +11,7 @@ export const fetchParentTimetable = createAsyncThunk(
 
     try {
       const response = await getData(
-        `/parent/timetable`,
+        `/parent/api/timetable`,
         {
           params: {
             userId,

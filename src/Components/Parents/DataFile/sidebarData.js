@@ -32,11 +32,11 @@ const sidebarData = [
     icon: <img src={libraryIcon} alt="Library Icon" style={{ width: '24px', height: '24px' }} />,
     path:'/parentlibrary'
   },
-  // {
-  //   title: "Time Table",
-  //   icon: <ImTable2/>,
-  //   path: "/timetable",
-  // },
+  {
+    title: "Time Table",
+    icon: <ImTable2 style={{ width: '20px', height: '20px', color: 'gray' }}/>,
+    path: "/timetable",
+  },
   {
     title: "Notice Board",
     icon: <img src={noticeboardIcon} alt="Notice Board Icon" style={{ width: '24px', height: '24px' }} />,
