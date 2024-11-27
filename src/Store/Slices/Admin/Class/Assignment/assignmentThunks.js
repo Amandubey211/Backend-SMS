@@ -24,8 +24,6 @@ export const createAssignmentThunk = createAsyncThunk(
       if (response.success) {
         toast.success("Assignment created successfully!");
         return response.assignment;
-      } else {
-        throw new Error(response.message || "Failed to create assignment");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -57,8 +55,6 @@ export const updateAssignmentThunk = createAsyncThunk(
         // Optionally, you can dispatch another thunk to fetch the updated assignment
         dispatch(fetchAssignmentByIdThunk(assignmentId));
         return response.assignment;
-      } else {
-        throw new Error(response.message || "Failed to update assignment");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -80,8 +76,6 @@ export const deleteAssignmentThunk = createAsyncThunk(
       if (response.success) {
         toast.success("Assignment deleted successfully!");
         return assignmentId;
-      } else {
-        throw new Error(response.message || "Failed to delete assignment");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -102,10 +96,6 @@ export const fetchAssignmentsByClassThunk = createAsyncThunk(
 
       if (response.success) {
         return response.assignments;
-      } else {
-        throw new Error(
-          response.message || "Failed to fetch assignments by class"
-        );
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -133,8 +123,6 @@ export const fetchFilteredAssignments = createAsyncThunk(
 
       if (response.success) {
         return response.assignments;
-      } else {
-        throw new Error("Failed to fetch filtered assignments");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -155,8 +143,6 @@ export const fetchAssignmentByIdThunk = createAsyncThunk(
 
       if (response.success) {
         return response.assignment;
-      } else {
-        throw new Error(response.message || "Failed to fetch assignment");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);

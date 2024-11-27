@@ -1,4 +1,3 @@
-
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import {
   getData,
@@ -13,7 +12,6 @@ import { fetchClassDetails } from "../actions/classThunk"; // Adjust the path as
 import toast from "react-hot-toast";
 import { getAY } from "../../../../../Utils/academivYear";
 
-
 export const fetchSubjects = createAsyncThunk(
   "subject/fetchSubjects",
   async (classId, { rejectWithValue, dispatch }) => {
@@ -23,18 +21,17 @@ export const fetchSubjects = createAsyncThunk(
     try {
       const endpoint = `/admin/subject/${classId}`;
       const params = { say };
-      const response = await getData(endpoint,  params );
+      const response = await getData(endpoint, params);
 
       if (response && response.success) {
         dispatch(setSubjects(response.data)); // Update the subjects state using the setSubjects action
         return response.data; // Assuming 'data' contains the list of subjects
-      } 
+      }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
-
 
 export const createSubject = createAsyncThunk(
   "subject/createSubject",
@@ -50,16 +47,13 @@ export const createSubject = createAsyncThunk(
       if (response && response.success) {
         toast.success("Subject created successfully");
         dispatch(fetchClassDetails(subjectData.classId)); // Refresh class details
-        return response.data.data; // Assuming 'data' contains the created subject
-      } else {
-        throw new Error(response.message || "Failed to create subject");
+        return response.data; // Assuming 'data' contains the created subject
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
-
 
 export const updateSubject = createAsyncThunk(
   "subject/updateSubject",
@@ -75,16 +69,13 @@ export const updateSubject = createAsyncThunk(
       if (response && response.success) {
         toast.success("Subject updated successfully");
         dispatch(fetchClassDetails(subjectData.classId)); // Refresh class details
-        return response.data.data; // Assuming 'data' contains the updated subject
-      } else {
-        throw new Error(response.message || "Failed to update subject");
+        return response.data; // Assuming 'data' contains the updated subject
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
-
 
 export const deleteSubject = createAsyncThunk(
   "subject/deleteSubject",
@@ -101,8 +92,6 @@ export const deleteSubject = createAsyncThunk(
         toast.success("Subject deleted successfully");
         dispatch(fetchClassDetails(classId)); // Refresh class details
         return subjectId;
-      } else {
-        throw new Error(response.message || "Failed to delete subject");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);

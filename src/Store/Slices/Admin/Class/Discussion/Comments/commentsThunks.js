@@ -26,8 +26,6 @@ export const fetchComments = createAsyncThunk(
 
       if (response && response.status) {
         return response.data;
-      } else {
-        throw new Error("Failed to fetch comments");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -51,8 +49,6 @@ export const addComment = createAsyncThunk(
       if (response && response.status) {
         toast.success("Comment added successfully");
         return response.data;
-      } else {
-        throw new Error("Failed to add comment");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -76,8 +72,6 @@ export const addReply = createAsyncThunk(
       if (response && response.status) {
         toast.success("Reply added successfully");
         return { parentId, reply: response.data };
-      } else {
-        throw new Error("Failed to add reply");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -99,8 +93,6 @@ export const deleteComment = createAsyncThunk(
       if (response && response.status) {
         toast.success("Comment deleted successfully");
         return commentId;
-      } else {
-        throw new Error("Failed to delete comment");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -122,8 +114,6 @@ export const deleteReply = createAsyncThunk(
       if (response && response.status) {
         toast.success("Reply deleted successfully");
         return replyId;
-      } else {
-        throw new Error("Failed to delete reply");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -145,8 +135,6 @@ export const toggleLikeMessage = createAsyncThunk(
 
       if (response && response.status) {
         return messageId;
-      } else {
-        throw new Error("Failed to toggle like");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);

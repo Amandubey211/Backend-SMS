@@ -23,8 +23,6 @@ export const fetchClassDiscussions = createAsyncThunk(
 
       if (response && response.status) {
         return response.data;
-      } else {
-        throw new Error("Failed to fetch discussions");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -45,8 +43,6 @@ export const fetchDiscussionById = createAsyncThunk(
 
       if (response && response.status) {
         return response.data;
-      } else {
-        throw new Error("Failed to fetch discussion");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -81,8 +77,6 @@ export const createDiscussion = createAsyncThunk(
       if (response && response.status) {
         toast.success("Discussion Created");
         return response.data;
-      } else {
-        throw new Error("Failed to create discussion");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -118,8 +112,6 @@ export const updateDiscussion = createAsyncThunk(
       if (response && response.status) {
         toast.success("Discussion Updated Successfully");
         return response.data;
-      } else {
-        throw new Error("Failed to update discussion");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -170,8 +162,6 @@ export const markAsReadDiscussion = createAsyncThunk(
 
       if (response && response.success) {
         return response.data;
-      } else {
-        throw new Error("Failed to mark discussion as read");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -196,8 +186,6 @@ export const updatePinStatus = createAsyncThunk(
 
       if (response && response.success) {
         return response.data;
-      } else {
-        throw new Error("Failed to update pin status");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);

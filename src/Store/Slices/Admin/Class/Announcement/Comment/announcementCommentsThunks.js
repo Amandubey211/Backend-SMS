@@ -25,8 +25,6 @@ export const fetchAnnouncementComments = createAsyncThunk(
 
       if (response && response.status) {
         return response.data;
-      } else {
-        throw new Error("Failed to fetch comments");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -53,8 +51,6 @@ export const addAnnouncementComment = createAsyncThunk(
       if (response && response.status) {
         toast.success("Comment added successfully");
         return response.data;
-      } else {
-        throw new Error("Failed to add comment");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -81,8 +77,6 @@ export const addAnnouncementReply = createAsyncThunk(
       if (response && response.status) {
         toast.success("Reply added successfully");
         return { parentId, reply: response.data };
-      } else {
-        throw new Error("Failed to add reply");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -107,8 +101,6 @@ export const deleteAnnouncementComment = createAsyncThunk(
       if (response && response.status) {
         toast.success("Comment deleted successfully");
         return commentId;
-      } else {
-        throw new Error("Failed to delete comment");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -133,8 +125,6 @@ export const toggleLikeAnnouncementComment = createAsyncThunk(
 
       if (response && response.status) {
         return commentId;
-      } else {
-        throw new Error("Failed to toggle like");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);

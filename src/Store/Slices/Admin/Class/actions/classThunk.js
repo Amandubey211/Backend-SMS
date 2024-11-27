@@ -46,8 +46,6 @@ export const fetchClassDetails = createAsyncThunk(
 
       if (response && response.status) {
         return response.data; // Assuming 'data' contains class details
-      } else {
-        throw new Error("Failed to fetch class details");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -70,8 +68,6 @@ export const createClass = createAsyncThunk(
         toast.success("Class created successfully!");
         dispatch(fetchAllClasses()); // Refresh the classes list
         return response.data; // Assuming 'data' contains the created class
-      } else {
-        throw new Error(response.message || "Failed to create class");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -93,8 +89,6 @@ export const updateClass = createAsyncThunk(
         toast.success("Class updated successfully!");
         dispatch(fetchAllClasses()); // Refresh the classes list
         return response.data; // Assuming 'data' contains the updated class
-      } else {
-        throw new Error(response.message || "Failed to update class");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -116,8 +110,6 @@ export const deleteClass = createAsyncThunk(
         toast.success("Class deleted successfully!");
         dispatch(fetchAllClasses()); // Refresh the classes list
         return classId;
-      } else {
-        throw new Error(response.message || "Failed to delete class");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);

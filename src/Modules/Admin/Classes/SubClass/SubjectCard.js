@@ -118,9 +118,9 @@ const SubjectCard = ({
       </div>
 
       <img
-        src={data?.subjectIcon ? data?.subjectIcon: SubjectIcon}
+        src={data?.subjectIcon ? data?.subjectIcon : SubjectIcon}
         alt={t("Subject icon")}
-        className="absolute bottom-6 right-6 h-28 transition-transform duration-300 transform hover:scale-110"
+        className="absolute bottom-6 right-6 h-20 w-auto transition-transform duration-300 transform hover:scale-110 object-contain"
       />
     </div>
   );

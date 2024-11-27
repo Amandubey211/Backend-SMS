@@ -34,8 +34,6 @@ export const fetchFilteredQuizzesThunk = createAsyncThunk(
 
       if (response.success) {
         return response.quizzes;
-      } else {
-        throw new Error(response.message || "Failed to fetch quizzes");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -56,8 +54,6 @@ export const fetchQuizByIdThunk = createAsyncThunk(
 
       if (response.success) {
         return response.quiz;
-      } else {
-        throw new Error(response.message || "Quiz not found");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -84,8 +80,6 @@ export const addQuestionThunk = createAsyncThunk(
 
         dispatch(fetchQuizByIdThunk(response.quiz._id));
         return response.quiz;
-      } else {
-        throw new Error(response.message || "Failed to add question");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -107,8 +101,6 @@ export const updateQuestionThunk = createAsyncThunk(
         toast.success("Question updated successfully");
         dispatch(fetchQuizByIdThunk(quizId));
         return response.quiz;
-      } else {
-        throw new Error(response.message || "Failed to update question");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -130,8 +122,6 @@ export const deleteQuestionThunk = createAsyncThunk(
         toast.success("Question deleted successfully");
         dispatch(fetchQuizByIdThunk(quizId));
         return questionId;
-      } else {
-        throw new Error(response.message || "Failed to delete question");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -153,8 +143,6 @@ export const createQuizThunk = createAsyncThunk(
         toast.success("Quiz created successfully");
         dispatch(fetchQuizByIdThunk(response.quiz._id));
         return response.quiz;
-      } else {
-        throw new Error(response.message || "Failed to create quiz");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -182,8 +170,6 @@ export const updateQuizThunk = createAsyncThunk(
         }
 
         return response.quiz;
-      } else {
-        throw new Error(response.message || "Failed to update quiz");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -209,8 +195,6 @@ export const deleteQuizThunk = createAsyncThunk(
           })
         );
         return quizId;
-      } else {
-        throw new Error(response.message || "Failed to delete quiz");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
