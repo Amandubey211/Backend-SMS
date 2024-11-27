@@ -32,8 +32,8 @@ export const addAttachment = createAsyncThunk(
       const response = await customRequest(
         "put",
         "/admin/uploadChapterFiles",
-        {},
         formData,
+        {},
         {
           params: { say },
           headers: {

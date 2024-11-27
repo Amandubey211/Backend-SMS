@@ -20,11 +20,9 @@ export const addChapter = createAsyncThunk(
     { name, thumbnail, moduleId, sid },
     { rejectWithValue, getState, dispatch }
   ) => {
-    
-
     try {
       const say = getAY();
-    dispatch(setShowError(false));
+      dispatch(setShowError(false));
       const cid = getState().common.user.classInfo.selectedClassId;
       const subjectId = getState().common.user.subjectInfo.selectedSubjectId;
 
@@ -41,9 +39,8 @@ export const addChapter = createAsyncThunk(
         `/admin/add_chapter?say=${say}`,
         formData,
         {
-            "Content-Type": "multipart/form-data",
-          },
-        
+          "Content-Type": "multipart/form-data",
+        }
       );
 
       if (response && response.success) {
@@ -79,8 +76,6 @@ export const editChapter = createAsyncThunk(
     { name, thumbnail, moduleId, chapterId, sid },
     { rejectWithValue, getState, dispatch }
   ) => {
- 
-
     try {
       const say = getAY();
       dispatch(setShowError(false));
@@ -95,14 +90,9 @@ export const editChapter = createAsyncThunk(
 
       const endpoint = `/admin/subjects/${subjectId}/modules/${moduleId}/chapters/${chapterId}?say=${say}`;
 
-      const response = await customRequest(
-        "put",
-        endpoint,
-        formData,
-       {
-            "Content-Type": "multipart/form-data",
-          },
-      );
+      const response = await customRequest("put", endpoint, formData, {
+        "Content-Type": "multipart/form-data",
+      });
 
       if (response && response.success) {
         await dispatch(fetchModules({ cid, sid: subjectId }));
