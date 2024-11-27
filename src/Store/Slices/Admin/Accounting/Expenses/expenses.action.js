@@ -1,17 +1,10 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import toast from "react-hot-toast";
-import { setErrorMsg, setShowError } from "../../../Common/Alerts/alertsSlice";
-import { ErrorMsg } from "../../../Common/Alerts/errorhandling.action";
+import {  setShowError } from "../../../Common/Alerts/alertsSlice";
+import {  handleError } from "../../../Common/Alerts/errorhandling.action";
 import { deleteData, getData, postData, putData } from "../../../../../services/apiEndpoints";
 import { getAY } from "../../../../../Utils/academivYear";
 
-// Helper function for handling errors
-const handleError = (error, dispatch, rejectWithValue) => {
-    const err = ErrorMsg(error);
-    dispatch(setShowError(true));
-    dispatch(setErrorMsg(err.message));
-    return rejectWithValue(err.message);
-};
 
 // Fetch Salaries with `say` and enhanced error handling
 export const fetchSalaries = createAsyncThunk(
