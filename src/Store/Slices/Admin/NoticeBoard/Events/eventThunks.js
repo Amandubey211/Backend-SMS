@@ -17,7 +17,9 @@ export const fetchEventsThunk = createAsyncThunk(
       const say = getAY();
       dispatch(setShowError(false));
       const response = await getData(`/admin/all/events?say=${say}`);
-      return response.data.events;
+      console.log("response events--",response);
+
+      return response?.events;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
@@ -42,7 +44,7 @@ export const createEventThunk = createAsyncThunk(
 
       dispatch(fetchEventsThunk());
       toast.success("Event created successfully!");
-      return response.data;
+      return response;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
@@ -63,10 +65,10 @@ export const updateEventThunk = createAsyncThunk(
 
       const response = await customRequest("put",
         `/admin/update/event/${eventId}?say=${say}`,
-        formData,{"Content-Type": "multipart/form-data"});
+        formData, { "Content-Type": "multipart/form-data" });
 
       dispatch(fetchEventsThunk());
-      return response.data;
+      return response;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
