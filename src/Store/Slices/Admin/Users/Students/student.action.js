@@ -16,7 +16,7 @@ export const fetchAllStudents = createAsyncThunk(
       const say = getAY();
       dispatch(setShowError(false));
       const response = await getData(`${baseUrl}/admin/all/students?say=${say}`,filter);
-      return response.data;
+      return response?.data;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }

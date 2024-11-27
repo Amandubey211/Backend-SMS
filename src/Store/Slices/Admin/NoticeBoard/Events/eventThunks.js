@@ -1,13 +1,9 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
-import { baseUrl } from "../../../../../config/Common";
 import toast from "react-hot-toast";
 import { handleError } from "../../../Common/Alerts/errorhandling.action";
 import { setShowError } from "../../../Common/Alerts/alertsSlice";
 import { getAY } from "../../../../../Utils/academivYear";
-import { customRequest, deleteData, getData, postData, putData } from "../../../../../services/apiEndpoints";
-
-
+import { customRequest, deleteData, getData,} from "../../../../../services/apiEndpoints";
 
 // Fetch events
 export const fetchEventsThunk = createAsyncThunk(

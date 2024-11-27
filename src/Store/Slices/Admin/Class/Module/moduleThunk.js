@@ -99,44 +99,6 @@ export const addModule = createAsyncThunk(
   }
 );
 
-// export const addModule = createAsyncThunk(
-//   "module/addModule",
-//   async (
-//     { name, thumbnail, subjectId },
-//     { rejectWithValue, getState, dispatch }
-//   ) => {
-//     try {
-//       const token = getToken(getState(), rejectWithValue, dispatch);
-//       const say = localStorage.getItem("say");
-//       const cid = getState().common.user.classInfo.selectedClassId;
-//       const sid = getState().common.user.subjectInfo.selectedSubjectId;
-
-//       const formData = new FormData();
-//       formData.append("name", name);
-//       formData.append("subjectId", subjectId);
-//       if (thumbnail) formData.append("thumbnail", thumbnail);
-
-//       const response = await axios.post(
-//         `${baseUrl}/admin/add_module?say=${say}`,
-//         formData,
-//         {
-//           headers: {
-//             "Content-Type": "multipart/form-data",
-//             Authentication: token,
-//           },
-//         }
-//       );
-
-//       toast.success("Module added successfully");
-//       if (response.data.success) {
-//         dispatch(fetchModules({ cid, sid }));
-//       }
-//       return response.data.data;
-//     } catch (error) {
-//       return handleError(error, dispatch, rejectWithValue);
-//     }
-//   }
-// );
 
 export const editModule = createAsyncThunk(
   "module/editModule",

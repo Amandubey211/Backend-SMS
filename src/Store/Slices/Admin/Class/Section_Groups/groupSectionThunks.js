@@ -1,5 +1,4 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-
 import toast from "react-hot-toast";
 import { setShowError, setErrorMsg } from "../../../Common/Alerts/alertsSlice";
 import { ErrorMsg, handleError } from "../../../Common/Alerts/errorhandling.action";
@@ -132,24 +131,6 @@ export const deleteGroup = createAsyncThunk(
   }
 );
 
-// // Fetch Sections by Class
-// export const fetchSectionsByClass = createAsyncThunk(
-//   "group/fetchSectionsByClass",
-//   async (classId, { getState, rejectWithValue, dispatch }) => {
-//     try {
-//       const token = getToken(getState(), rejectWithValue, dispatch);
-//       const response = await axios.get(
-//         `${baseUrl}/admin/getSectionByclass/${classId}?say=${say}`,
-//         { headers: { Authentication: token } }
-//       );
-//       return response.data.data;
-//     } catch (error) {
-//       return handleError(error, dispatch, rejectWithValue);
-//     }
-//   }
-// );
-
-// Create Section
 export const createSection = createAsyncThunk(
   "section/createSection",
   async (sectionData, {  rejectWithValue, dispatch }) => {
