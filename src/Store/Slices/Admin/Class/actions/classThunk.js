@@ -23,8 +23,6 @@ export const fetchAllClasses = createAsyncThunk(
       console.log(response, "lk");
       if (response && response.status) {
         return response.data; // Assuming 'data' contains the list of classes
-      } else {
-        throw new Error("Failed to fetch all classes");
       }
     } catch (error) {
       console.log(error);

@@ -136,8 +136,6 @@ export const deleteDiscussion = createAsyncThunk(
       if (response && response.success) {
         toast.success("Discussion Deleted Successfully");
         return discussionId;
-      } else {
-        throw new Error("Failed to delete discussion");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
