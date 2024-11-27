@@ -118,6 +118,7 @@ export const createAnnouncement = createAsyncThunk(
         "post",
         "/admin/announcement",
         formData,
+        {},
         {
           params: { say },
           headers: {
@@ -156,6 +157,7 @@ export const editAnnouncement = createAsyncThunk(
         "put",
         `/admin/announcement/${id}`,
         formData,
+        {},
         {
           params: { say },
           headers: {
