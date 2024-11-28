@@ -9,6 +9,7 @@ import { useTranslation } from "react-i18next";
 import i18next from "i18next";
 import { gt } from "../../Utils/translator/translation";
 import { setSelectedLanguage } from "../../Store/Slices/Common/Auth/reducers/authSlice";
+import { BiSolidSchool } from "react-icons/bi";
 
 const SettingDropdown = ({
   showSetting,
@@ -99,6 +100,20 @@ const SettingDropdown = ({
             <FaGraduationCap className="text-lg" />
             {t("Academic", gt.setting)}
           </NavLink>
+          { role == "admin" && 
+          <NavLink
+          to={"/dashboard/all/branch"}
+          className={({ isActive }) =>
+            `${listItemClass} ${
+              isActive ? "text-purple-600 bg-purple-100 " : ""
+            }`
+          }
+        >
+          <BiSolidSchool className="text-lg" />
+          {t("Branchs", gt.setting)}
+        </NavLink>
+          }
+          
        
 
         {/* Custom Language Switcher */}
