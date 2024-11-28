@@ -1,30 +1,48 @@
 // src/components/Components/AddNewCriteriaForm.js
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { setRubricField } from "../../../../../../Store/Slices/Admin/Class/Rubric/rubricSlice";
 import { useTranslation } from "react-i18next";
 
-const AddNewCriteriaForm = ({ onSave, initialData, editMode }) => {
+const AddNewCriteriaForm = ({ editMode }) => {
+  const dispatch = useDispatch();
+  const { t } = useTranslation("admModule");
+
+  const { criteria, criteriaToEdit } = useSelector(
+    (state) => state.admin.rubrics
+  );
   const [criteriaData, setCriteriaData] = useState({
     title: "",
     description: "",
     ratings: [],
   });
 
-  const { t } = useTranslation("admModule"); // Adding the translation function with namespace 'addNewCriteriaForm'
+  const formRef = useRef(null);
 
   useEffect(() => {
-    if (initialData) {
-      setCriteriaData(initialData);
+    if (criteriaToEdit) {
+      setCriteriaData(criteriaToEdit);
     }
-  }, [initialData]);
+  }, [criteriaToEdit]);
 
   const handleAddCriteria = () => {
-    onSave(criteriaData);
+    const newCriteria = { ...criteriaData };
+
+    const updatedCriteria = editMode
+      ? criteria.map((crit, index) =>
+          index === criteriaToEdit.index ? newCriteria : crit
+        )
+      : [...criteria, newCriteria];
+    dispatch(setRubricField({ field: "criteria", value: updatedCriteria }));
+    dispatch(setRubricField({ field: "isSidebarOpen", value: false }));
+    dispatch(setRubricField({ field: "editMode", value: false }));
+    dispatch(setRubricField({ field: "criteriaToEdit", value: null }));
     setCriteriaData({ title: "", description: "", ratings: [] });
   };
 
   return (
-    <div className="flex flex-col h-full p-4">
+    <div className="flex flex-col z-50 h-full p-4" ref={formRef}>
       <div className="mb-4">
         <label className="block text-gray-700 text-sm font-bold mb-2">
           {t("Criteria Title")}

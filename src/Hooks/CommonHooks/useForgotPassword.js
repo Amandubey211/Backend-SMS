@@ -1,6 +1,8 @@
+
 import axios from 'axios';
 import { postData } from '../../services/apiEndpoints';
 import { baseUrl } from '../../config/Common';
+
 
 
 export const forgotPassword = async (email, role) => {
@@ -9,21 +11,28 @@ export const forgotPassword = async (email, role) => {
     return console.log(res);
     
   } catch (error) {
-    console.error('Error in forgot password:', error);
-    return console.log(error);
+
+    console.error("Error in forgot password:", error);
+    throw error.response.data;
+
   }
 };
 
-export const resetPassword = async ({ email, newPassword, confirmPassword, token }) => {
+export const resetPassword = async ({
+  email,
+  newPassword,
+  confirmPassword,
+  token,
+}) => {
   try {
     return await postData(`/api/password/reset-password`, {
       email,
       newPassword,
       confirmPassword,
-      token
+      token,
     });
   } catch (error) {
-    console.error('Error in resetPassword:', error);
+    console.error("Error in resetPassword:", error);
     throw error.response.data;
   }
 };

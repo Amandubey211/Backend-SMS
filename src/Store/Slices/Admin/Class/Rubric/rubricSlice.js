@@ -1,3 +1,5 @@
+// src/store/slices/rubricSlice.js
+
 import { createSlice } from "@reduxjs/toolkit";
 import {
   fetchRubricsBySubjectId,
@@ -5,15 +7,11 @@ import {
   updateRubricThunk,
   createAssignmentRubricThunk,
   createQuizRubricThunk,
-  fetchFilteredAssignmentsThunk,
-  fetchFilteredQuizzesThunk,
   getRubricByIdThunk,
 } from "./rubricThunks";
 
 const initialState = {
   rubrics: [],
-  assignments: [],
-  quizzes: [],
   loading: false,
   error: null,
   rubricToEdit: null,
@@ -21,16 +19,38 @@ const initialState = {
   existingRubricId: null,
   rubricName: "",
   rubricLoading: false,
+  isModalOpen: false,
+  isSidebarOpen: false,
+  editMode: false,
+  criteriaToEdit: null,
+  selectedAssignmentId: "",
+  selectedQuizId: "",
+  totalPoints: 0,
+  ratings: [],
 };
 
 const rubricSlice = createSlice({
   name: "rubric",
   initialState,
   reducers: {
-    // Define synchronous reducers if needed
+    setRubricField: (state, action) => {
+      state[action.payload.field] = action.payload.value;
+    },
+    resetRubricState: (state) => {
+      state.criteria = [];
+      state.editMode = false;
+      state.criteriaToEdit = null;
+      state.rubricToEdit = null;
+      state.selectedAssignmentId = "";
+      state.selectedQuizId = "";
+      state.existingRubricId = null;
+      state.rubricName = "";
+      state.totalPoints = 0;
+      state.ratings = [];
+    },
   },
   extraReducers: (builder) => {
-    // Fetch Rubrics by Subject ID
+    // Handle fetchRubricsBySubjectId
     builder
       .addCase(fetchRubricsBySubjectId.pending, (state) => {
         state.loading = true;
@@ -42,10 +62,10 @@ const rubricSlice = createSlice({
       })
       .addCase(fetchRubricsBySubjectId.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload || "Failed to fetch rubrics";
+        state.error = action.payload;
       });
 
-    // Delete Rubric
+    // Handle deleteRubricThunk
     builder
       .addCase(deleteRubricThunk.pending, (state) => {
         state.loading = true;
@@ -59,10 +79,10 @@ const rubricSlice = createSlice({
       })
       .addCase(deleteRubricThunk.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload || "Failed to delete rubric";
+        state.error = action.payload;
       });
 
-    // Update Rubric
+    // Handle updateRubricThunk
     builder
       .addCase(updateRubricThunk.pending, (state) => {
         state.loading = true;
@@ -70,19 +90,19 @@ const rubricSlice = createSlice({
       })
       .addCase(updateRubricThunk.fulfilled, (state, action) => {
         state.loading = false;
-        const index = state.rubrics.findIndex(
-          (rubric) => rubric._id === action.payload._id
-        );
-        if (index !== -1) {
-          state.rubrics[index] = action.payload;
-        }
+        // const index = state.rubrics.findIndex(
+        //   (rubric) => rubric._id === action.payload._id
+        // );
+        // if (index !== -1) {
+        //   state.rubrics[index] = action.payload;
+        // }
       })
       .addCase(updateRubricThunk.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload || "Failed to update rubric";
+        state.error = action.payload;
       });
 
-    // Create Assignment Rubric
+    // Handle createAssignmentRubricThunk
     builder
       .addCase(createAssignmentRubricThunk.pending, (state) => {
         state.loading = true;
@@ -90,14 +110,13 @@ const rubricSlice = createSlice({
       })
       .addCase(createAssignmentRubricThunk.fulfilled, (state, action) => {
         state.loading = false;
-        state.rubrics.push(action.payload);
       })
       .addCase(createAssignmentRubricThunk.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload || "Failed to create assignment rubric";
+        state.error = action.payload;
       });
 
-    // Create Quiz Rubric
+    // Handle createQuizRubricThunk
     builder
       .addCase(createQuizRubricThunk.pending, (state) => {
         state.loading = true;
@@ -105,44 +124,13 @@ const rubricSlice = createSlice({
       })
       .addCase(createQuizRubricThunk.fulfilled, (state, action) => {
         state.loading = false;
-        state.rubrics.push(action.payload);
       })
       .addCase(createQuizRubricThunk.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload || "Failed to create quiz rubric";
+        state.error = action.payload;
       });
 
-    // Fetch Filtered Assignments
-    builder
-      .addCase(fetchFilteredAssignmentsThunk.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(fetchFilteredAssignmentsThunk.fulfilled, (state, action) => {
-        state.loading = false;
-        state.assignments = action.payload;
-      })
-      .addCase(fetchFilteredAssignmentsThunk.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload || "Failed to fetch assignments";
-      });
-
-    // Fetch Filtered Quizzes
-    builder
-      .addCase(fetchFilteredQuizzesThunk.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(fetchFilteredQuizzesThunk.fulfilled, (state, action) => {
-        state.loading = false;
-        state.quizzes = action.payload;
-      })
-      .addCase(fetchFilteredQuizzesThunk.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload || "Failed to fetch quizzes";
-      });
-
-    // Get Rubric by ID
+    // Handle getRubricByIdThunk
     builder
       .addCase(getRubricByIdThunk.pending, (state) => {
         state.rubricLoading = true;
@@ -150,105 +138,37 @@ const rubricSlice = createSlice({
       })
       .addCase(getRubricByIdThunk.fulfilled, (state, action) => {
         state.rubricLoading = false;
-        state.rubricToEdit = action.payload;
-        state.criteria = action.payload.criteria;
-        state.rubricName = action.payload.name;
-        state.existingRubricId = action.payload._id;
+        state.criteria = action.payload.criteria || [];
+        state.rubricName = action.payload.rubricName || "";
+        state.existingRubricId = action.payload.existingRubricId || null;
+        state.selectedAssignmentId = action.payload.assignmentId || "";
+        state.selectedQuizId = action.payload.quizId || "";
+        state.totalPoints = action.payload.totalPoints || 0;
       })
       .addCase(getRubricByIdThunk.rejected, (state, action) => {
         state.rubricLoading = false;
-        state.error = action.payload || "Failed to get rubric by ID";
+        state.error = action.payload || "Failed to load rubric";
       });
+
+    // General pending and rejected matchers
+    builder
+      .addMatcher(
+        (action) => action.type.endsWith("/pending"),
+        (state) => {
+          state.error = null;
+          // state.loading = true; // Commented out because we handle loading per thunk
+        }
+      )
+      .addMatcher(
+        (action) => action.type.endsWith("/rejected"),
+        (state, action) => {
+          state.error = action.payload || "An error occurred";
+          // state.loading = false; // Commented out because we handle loading per thunk
+        }
+      );
   },
 });
 
+export const { setRubricField, resetRubricState } = rubricSlice.actions;
+
 export default rubricSlice.reducer;
-
-// // src/redux/slices/rubricSlice.js
-
-// import { createSlice } from "@reduxjs/toolkit";
-
-// const initialState = {
-//   rubrics: [],
-//   assignments: [],
-//   quizzes: [],
-//   loading: false,
-//   error: null,
-//   rubricToEdit: null,
-//   criteria: [],
-//   existingRubricId: null,
-//   rubricName: "",
-//   rubricLoading: false,
-// };
-
-// const rubricSlice = createSlice({
-//   name: "rubric",
-//   initialState,
-//   reducers: {
-//     setRubrics: (state, action) => {
-//       state.rubrics = action.payload;
-//       state.loading = false;
-//       state.error = null;
-//     },
-//     setAssignments: (state, action) => {
-//       state.assignments = action.payload;
-//       state.loading = false;
-//       state.error = null;
-//     },
-//     setQuizzes: (state, action) => {
-//       state.quizzes = action.payload;
-//       state.loading = false;
-//       state.error = null;
-//     },
-//     setLoading: (state, action) => {
-//       state.loading = action.payload;
-//       state.loading = false;
-//       state.error = null;
-//     },
-//     setRubricLoading: (state, action) => {
-//       state.rubricLoading = action.payload;
-//       state.loading = false;
-//       state.error = null;
-//     },
-//     setError: (state, action) => {
-//       state.error = action.payload;
-//       state.loading = false;
-//       state.error = null;
-//     },
-//     setRubricToEdit: (state, action) => {
-//       state.rubricToEdit = action.payload;
-//       state.loading = false;
-//       state.error = null;
-//     },
-//     setCriteria: (state, action) => {
-//       state.criteria = action.payload;
-//       state.loading = false;
-//       state.error = null;
-//     },
-//     setExistingRubricId: (state, action) => {
-//       state.existingRubricId = action.payload;
-//       state.loading = false;
-//       state.error = null;
-//     },
-//     setRubricName: (state, action) => {
-//       state.rubricName = action.payload;
-//       state.loading = false;
-//       state.error = null;
-//     },
-//   },
-// });
-
-// export const {
-//   setRubrics,
-//   setAssignments,
-//   setQuizzes,
-//   setLoading,
-//   setError,
-//   setRubricToEdit,
-//   setCriteria,
-//   setExistingRubricId,
-//   setRubricName,
-//   setRubricLoading,
-// } = rubricSlice.actions;
-
-// export default rubricSlice.reducer;

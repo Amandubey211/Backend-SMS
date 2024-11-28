@@ -8,27 +8,24 @@ import RatingCard from "./RatingCard";
 import AddNewRatingForm from "./AddNewRatingForm";
 import EditRatingForm from "./EditRatingForm";
 import Sidebar from "../../../../../../Components/Common/Sidebar";
+import { useDispatch, useSelector } from "react-redux";
+import { setRubricField } from "../../../../../../Store/Slices/Admin/Class/Rubric/rubricSlice";
 import { useTranslation } from "react-i18next";
 
-const RubricModalRow = ({
-  data,
-  criteriaIndex,
-  onDeleteCriteria,
-  onAddRating,
-  onEditCriteria,
-  readonly,
-}) => {
-  const { t } = useTranslation('admModule');
+const RubricModalRow = ({ data, criteriaIndex, readonly }) => {
+  const { t } = useTranslation("admModule");
+  const dispatch = useDispatch();
+  const { criteria } = useSelector((state) => state.admin.rubrics);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [isEditSidebarOpen, setEditSidebarOpen] = useState(false);
-  const [ratings, setRatings] = useState(data?.ratings);
+  const [ratings, setRatings] = useState(data?.ratings || []);
   const [totalPoints, setTotalPoints] = useState(0);
   const [currentEditRating, setCurrentEditRating] = useState(null);
   const [currentEditIndex, setCurrentEditIndex] = useState(null);
 
   useEffect(() => {
     const calculateTotalPoints = () => {
-      const total = ratings.reduce(
+      const total = ratings?.reduce(
         (acc, rating) => acc + Number(rating.ratingScore),
         0
       );
@@ -41,7 +38,7 @@ const RubricModalRow = ({
   const handleAddNewRating = (ratingData) => {
     const updatedRatings = [...ratings, ratingData];
     setRatings(updatedRatings);
-    onAddRating(criteriaIndex, updatedRatings);
+    updateCriteriaRatings(updatedRatings);
   };
 
   const handleEditRating = (index) => {
@@ -55,14 +52,39 @@ const RubricModalRow = ({
       index === currentEditIndex ? updatedRating : rating
     );
     setRatings(updatedRatings);
-    onAddRating(criteriaIndex, updatedRatings);
+    updateCriteriaRatings(updatedRatings);
     setEditSidebarOpen(false);
   };
 
   const handleDeleteRating = (ratingIndex) => {
     const updatedRatings = ratings.filter((_, index) => index !== ratingIndex);
     setRatings(updatedRatings);
-    onAddRating(criteriaIndex, updatedRatings);
+    updateCriteriaRatings(updatedRatings);
+  };
+
+  const updateCriteriaRatings = (updatedRatings) => {
+    const updatedCriteria = criteria.map((crit, index) =>
+      index === criteriaIndex ? { ...crit, ratings: updatedRatings } : crit
+    );
+    dispatch(setRubricField({ field: "criteria", value: updatedCriteria }));
+  };
+
+  const handleDeleteCriteria = () => {
+    const updatedCriteria = criteria.filter(
+      (_, index) => index !== criteriaIndex
+    );
+    dispatch(setRubricField({ field: "criteria", value: updatedCriteria }));
+  };
+
+  const handleEditCriteria = () => {
+    dispatch(
+      setRubricField({
+        field: "criteriaToEdit",
+        value: { ...data, index: criteriaIndex },
+      })
+    );
+    dispatch(setRubricField({ field: "editMode", value: true }));
+    dispatch(setRubricField({ field: "isSidebarOpen", value: true }));
   };
 
   return (
@@ -83,16 +105,10 @@ const RubricModalRow = ({
             </div>
             {!readonly && (
               <div className="flex gap-2">
-                <button
-                  className="text-red-600"
-                  onClick={() => onDeleteCriteria(criteriaIndex)}
-                >
+                <button className="text-red-600" onClick={handleDeleteCriteria}>
                   <RiDeleteBin5Line />
                 </button>
-                <button
-                  className="text-green-600"
-                  onClick={() => onEditCriteria(criteriaIndex)}
-                >
+                <button className="text-green-600" onClick={handleEditCriteria}>
                   <TbEdit />
                 </button>
               </div>
@@ -100,7 +116,7 @@ const RubricModalRow = ({
           </div>
         </div>
         <div className="flex justify-start flex-wrap w-[70%] gap-1 px-4 py-2">
-          {ratings.map((rating, index) => (
+          {ratings?.map((rating, index) => (
             <RatingCard
               key={index}
               rating={rating}
