@@ -43,6 +43,9 @@ import CookiePolicy from "../Modules/LoginPages/Policys/CookiePolicy.jsx";
 const Academic = lazy(() =>
   import("../Modules/Admin/AcademicYear/Academic.js")
 );
+const Branch = lazy(() =>
+  import("../Modules/Admin/Branchs/Branch.js")
+);
 
 const commonAcademic = lazy(() =>
   import("../Components/Common/AcademicYear/Academic.js")
@@ -53,6 +56,7 @@ const commonAcademic = lazy(() =>
 const CreateAcademicYear = lazy(() =>
   import("../Components/Admin/CreateAcademicYear.js")
 );
+
 
 const StudentProfile = lazy(() =>
   import("../Modules/Student/profile/StudentProfile.js")
@@ -384,6 +388,11 @@ function App() {
     {
       path: "/dashboard/academic",
       element: <ProtectRoute Component={Academic} allowedRoles={["admin", "teacher", "librarian", "accountant","staff"]} />,
+      errorElement: <Error />,
+    },
+    {
+      path: "/dashboard/all/branch",
+      element: <ProtectRoute Component={Branch} allowedRoles={["admin"]} />,
       errorElement: <Error />,
     },
 
