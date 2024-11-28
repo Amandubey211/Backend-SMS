@@ -16,8 +16,6 @@ const AssignmentDetailCard = () => {
     error,
   } = useSelector((store) => store.admin.assignments);
   const [isModalOpen, setModalOpen] = useState(false);
-  const [criteriaList, setCriteriaList] = useState([]);
-  const [existingRubricId, setExistingRubricId] = useState(null);
 
   const handleViewRubric = () => {
     setModalOpen(true);
@@ -101,18 +99,9 @@ const AssignmentDetailCard = () => {
         })}
       </div>
 
-      <RubricButton onClick={handleViewRubric} />
+      {/* <RubricButton onClick={handleViewRubric} /> */}
 
-      <AddRubricModal
-        type="assignment"
-        AssignmentId={assignment?._id}
-        isOpen={isModalOpen}
-        onClose={() => setModalOpen(false)}
-        criteriaList={criteriaList}
-        setCriteriaList={setCriteriaList}
-        setExistingRubricId={setExistingRubricId}
-        readonly={true}
-      />
+      {/* {isModalOpen && <AddRubricModal readonly={true} />} */}
     </div>
   );
 };

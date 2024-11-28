@@ -1,124 +1,50 @@
-import React, { useState, lazy, Suspense, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import {
   fetchRubricsBySubjectId,
   deleteRubricThunk,
-  updateRubricThunk,
-  createAssignmentRubricThunk,
-  createQuizRubricThunk,
+  getRubricByIdThunk,
 } from "../../../../../Store/Slices/Admin/Class/Rubric/rubricThunks";
+import {
+  setRubricField,
+  resetRubricState,
+} from "../../../../../Store/Slices/Admin/Class/Rubric/rubricSlice";
 import RubricHeader from "./Components/RubricHeader";
 import RubricCard from "./Components/RubricCard";
-import Sidebar from "../../../../../Components/Common/Sidebar";
-import AddNewCriteriaForm from "./Components/AddNewCriteriaForm";
 import SubjectSideBar from "../../Component/SubjectSideBar";
 import Spinner from "../../../../../Components/Common/Spinner";
 import NoDataFound from "../../../../../Components/Common/NoDataFound";
+import AddRubricModal from "./Components/AddRubricModal";
 import { useTranslation } from "react-i18next";
 
-const AddRubricModal = lazy(() => import("./Components/AddRubricModal"));
-
 const MainSection = () => {
-  const { t } = useTranslation('admModule');
+  const { t } = useTranslation("admModule");
   const dispatch = useDispatch();
   const { sid } = useParams();
-  const [isModalOpen, setModalOpen] = useState(false);
-  const [isSidebarOpen, setSidebarOpen] = useState(false);
-  const [criteria, setCriteria] = useState([]);
-  const [editMode, setEditMode] = useState(false);
-  const [criteriaToEdit, setCriteriaToEdit] = useState(null);
-  const [rubricToEdit, setRubricToEdit] = useState(null);
-  const [selectedAssignmentId, setSelectedAssignmentId] = useState("");
-  const [selectedQuizId, setSelectedQuizId] = useState("");
-  const [existingRubricId, setExistingRubricId] = useState(null);
 
-  // Accessing the Redux state
-  const { rubrics, loading, error } = useSelector(
+  const { rubrics, loading, isModalOpen } = useSelector(
     (state) => state.admin.rubrics
   );
 
-  // Fetching rubrics when component mounts or subject ID changes
   useEffect(() => {
     dispatch(fetchRubricsBySubjectId(sid));
   }, [sid, dispatch]);
 
-  const handleAddNewCriteria = (newCriteria) => {
-    if (editMode) {
-      setCriteria(
-        criteria.map((crit, index) =>
-          index === criteriaToEdit.index ? newCriteria : crit
-        )
-      );
-    } else {
-      setCriteria([...criteria, newCriteria]);
-    }
-    setSidebarOpen(false);
-    setEditMode(false);
-    setCriteriaToEdit(null);
+  const handleDeleteRubric = (id) => {
+    dispatch(deleteRubricThunk(id));
   };
 
-  const handleEditCriteria = (index) => {
-    setCriteriaToEdit({ ...criteria[index], index });
-    setSidebarOpen(true);
-    setEditMode(true);
-  };
-
-  const handleDeleteCriteria = (criteriaIndex) => {
-    setCriteria(criteria.filter((_, index) => index !== criteriaIndex));
-  };
-
-  const handleDeleteRubric = async (rubricId) => {
-    const result = await dispatch(deleteRubricThunk(rubricId));
-    if (result.success) {
-      dispatch(fetchRubricsBySubjectId(sid)); // Refetch rubrics after deletion
-    }
-  };
-
-  const handleEditRubric = (rubricId) => {
-    const rubric = rubrics.find((rubric) => rubric._id === rubricId);
-    setRubricToEdit(rubric);
-    setCriteria(rubric.criteria);
-    setSelectedAssignmentId(rubric.assignmentId?._id || "");
-    setSelectedQuizId(rubric.quizId?._id || "");
-    setExistingRubricId(rubric._id);
-    setModalOpen(true);
-    setEditMode(true);
-  };
-
-  const handleSubmit = async (rubricData, type) => {
-    if (existingRubricId) {
-      const result = await dispatch(
-        updateRubricThunk(existingRubricId, rubricData)
-      );
-      if (result.success) {
-        dispatch(fetchRubricsBySubjectId(sid));
-        setModalOpen(false);
-        setRubricToEdit(null);
-        setEditMode(false);
-      }
-    } else {
-      let result;
-      if (type === "createQuizRubric") {
-        result = await dispatch(createQuizRubricThunk(rubricData));
-      } else {
-        result = await dispatch(createAssignmentRubricThunk(rubricData));
-      }
-      if (result.success) {
-        dispatch(fetchRubricsBySubjectId(sid));
-        setModalOpen(false);
-      }
-    }
+  const handleEditRubric = (id) => {
+    dispatch(resetRubricState());
+    dispatch(setRubricField({ field: "editMode", value: true }));
+    dispatch(setRubricField({ field: "isModalOpen", value: true }));
+    dispatch(getRubricByIdThunk(id));
   };
 
   const handleAddRubric = () => {
-    setModalOpen(true);
-    setEditMode(false);
-    setCriteria([]); // Clear criteria for new rubric
-    setRubricToEdit(null);
-    setSelectedAssignmentId("");
-    setSelectedQuizId("");
-    setExistingRubricId(null);
+    dispatch(resetRubricState());
+    dispatch(setRubricField({ field: "isModalOpen", value: true }));
   };
 
   return (
@@ -134,47 +60,15 @@ const MainSection = () => {
               <RubricCard
                 key={rubric._id}
                 rubric={rubric}
-                onDelete={() => handleDeleteRubric(rubric._id)}
-                onEdit={() => handleEditRubric(rubric._id)}
+                onDelete={handleDeleteRubric}
+                onEdit={handleEditRubric}
               />
             ))}
           </div>
         ) : (
           <NoDataFound title={t("Rubrics")} />
         )}
-        <Suspense fallback={<Spinner />}>
-          {isModalOpen && (
-            <AddRubricModal
-              isOpen={isModalOpen}
-              onClose={() => setModalOpen(false)}
-              criteriaList={criteria}
-              setCriteriaList={setCriteria}
-              onAddCriteria={() => setSidebarOpen(true)}
-              onDeleteCriteria={handleDeleteCriteria}
-              onEditCriteria={handleEditCriteria}
-              onSubmit={handleSubmit}
-              editMode={editMode}
-              AssignmentId={selectedAssignmentId}
-              QuizId={selectedQuizId}
-              setExistingRubricId={setExistingRubricId}
-            />
-          )}
-        </Suspense>
-        <Sidebar
-          isOpen={isSidebarOpen}
-          onClose={() => {
-            setSidebarOpen(false);
-            setEditMode(false);
-            setCriteriaToEdit(null);
-          }}
-          title={t(editMode ? "Update Criteria" : "Add New Criteria")}
-        >
-          <AddNewCriteriaForm
-            onSave={handleAddNewCriteria}
-            initialData={criteriaToEdit}
-            editMode={editMode}
-          />
-        </Sidebar>
+        {isModalOpen && <AddRubricModal />}
       </div>
     </div>
   );

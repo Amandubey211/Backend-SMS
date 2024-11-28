@@ -1,5 +1,3 @@
-
-
 // ----------------------------------------// Api Services Integrated // ------------------
 
 import { createAsyncThunk } from "@reduxjs/toolkit";
@@ -15,12 +13,11 @@ import toast from "react-hot-toast";
 import { formatAcademicYear } from "../utils/authUtils";
 import { fetchAcademicYear } from "../../AcademicYear/academicYear.action";
 import { setSeletedAcademicYear } from "../../AcademicYear/academicYear.slice";
-import Cookies from 'js-cookie';
+import Cookies from "js-cookie";
 import { setErrorMsg, setShowError } from "../../Alerts/alertsSlice";
 import { ErrorMsg } from "../../Alerts/errorhandling.action";
 import { postData } from "../../../../../services/apiEndpoints";
 import { setLocalCookies } from "../../../../../Utils/academivYear";
-
 
 // **Staff Login Action**
 export const staffLogin = createAsyncThunk(
@@ -37,7 +34,6 @@ export const staffLogin = createAsyncThunk(
       console.log(data);
 
       if (data && data.success) {
-      
         // Dispatch user details to userSlice
         dispatch(
           setUserDetails({
@@ -58,16 +54,13 @@ export const staffLogin = createAsyncThunk(
         );
 
         // Dispatch token and role to authSlice
-        //dispatch(setToken(data.token));
+        dispatch(setToken(data.token));
         dispatch(setRole(data.role));
 
         // Handle academic year
         if (data.role === "admin" && !data.isAcademicYearActive) {
           toast.success("Please create an academic year");
-          setLocalCookies(
-            "isAcademicYearActive",
-            data.isAcademicYearActive
-          );
+          setLocalCookies("isAcademicYearActive", data.isAcademicYearActive);
           return { redirect: "/create_academicYear" }; // Return the redirect path
         } else {
           // Format and set the academic year in the state
@@ -119,9 +112,9 @@ export const staffLogout = createAsyncThunk(
   "auth/staffLogout",
   async (_, { dispatch }) => {
     try {
-      Cookies.remove('userToken');
-      Cookies.remove('say');
-      Cookies.remove('isAcademicYearActive');
+      Cookies.remove("userToken");
+      Cookies.remove("say");
+      Cookies.remove("isAcademicYearActive");
       // Mandatory lines
       dispatch(setShowError(false));
 
@@ -161,7 +154,7 @@ export const createAcademicYear = createAsyncThunk(
         // Dispatch the newly created academic year to the Redux store
         if (yearData.isActive) {
           dispatch(setSeletedAcademicYear(data.data));
-          setLocalCookies('say', data?.data?._id);
+          setLocalCookies("say", data?.data?._id);
         }
 
         return true;
