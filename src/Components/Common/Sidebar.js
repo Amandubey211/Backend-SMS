@@ -63,7 +63,7 @@ const Sidebar = ({ isOpen, title, onClose, children, width = "35%" }) => {
       document.removeEventListener("mousedown", handleClickOutside);
       document.removeEventListener("keydown", trapFocus);
     };
-  }, [isOpen, onClose,]);
+  }, [isOpen, onClose]);
 
   return (
     <div
