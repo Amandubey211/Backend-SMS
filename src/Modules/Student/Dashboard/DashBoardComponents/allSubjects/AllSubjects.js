@@ -14,11 +14,11 @@ const AllSubjects = ({ subjects }) => {
   return (
     <div className="px-1">
       <div className="mt-1">
-        {subjects && subjects.length > 0 ? (
+        {subjects && subjects?.length > 0 ? (
           <div className="mt-4">
-            {subjects.slice(0, 2)?.map((subject, index) => {
+            {subjects?.slice(0, 2)?.map((subject, index) => {
               const progressBarColor =
-                progressBarColors[index % progressBarColors.length];
+                progressBarColors[index % progressBarColors?.length];
               return (
                 <div
                   key={subject._id}

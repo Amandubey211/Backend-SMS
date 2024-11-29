@@ -131,7 +131,7 @@ const CreateAssignmentHolder = ({ isSubmitted, onClose }) => {
         processed += `<span class="non-editable" contenteditable="false" aria-hidden="true">${sanitizedPart}</span>`;
       }
 
-      if (index < parts.length - 1) {
+      if (index < parts?.length - 1) {
         processed += `<span class="editable-blank" data-blank="true" data-id="blank-${counter}">
                         <input type="text" class="blank-input" placeholder="Fill in..." aria-label="Fill in the blank" />
                       </span>`;

@@ -163,7 +163,7 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => { } }) => {
   );
 
   const renderSubjectDropdown = (text, record, dataIndex) => {
-    const isDisabled = !formData.classId || !(subjects && subjects.length > 0);
+    const isDisabled = !formData.classId || !(subjects && subjects?.length > 0);
 
     return (
       <Select
@@ -173,7 +173,7 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => { } }) => {
         placeholder="Select Subject"
         disabled={isDisabled}
       >
-        {subjects && subjects.length > 0 ? (
+        {subjects && subjects?.length > 0 ? (
           subjects?.map((subject, index) => {
             const subjectId = subject._id || subject.id || subject.subjectId;
             if (!subjectId) {
@@ -409,7 +409,7 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => { } }) => {
 
   // Delete selected rows
   const handleDeleteRows = () => {
-    if (selectedRowKeys.length === 0) return;
+    if (selectedRowKeys?.length === 0) return;
 
     setDataSource((prevData) => {
       const newData = [...prevData];
@@ -433,18 +433,18 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => { } }) => {
 
   // Undo delete rows
   const handleUndoDelete = () => {
-    if (deletedRowsStack.length === 0) return;
+    if (deletedRowsStack?.length === 0) return;
 
     setDataSource((prevData) => {
       let newData = [...prevData];
-      const rowsToRestore = deletedRowsStack.slice(-1)[0];
+      const rowsToRestore = deletedRowsStack?.slice(-1)[0];
 
       rowsToRestore.forEach((row) => {
         const { originalIndex } = row;
         newData.splice(originalIndex, 0, row);
       });
 
-      setDeletedRowsStack((prevStack) => prevStack.slice(0, -1));
+      setDeletedRowsStack((prevStack) => prevStack?.slice(0, -1));
 
       return newData;
     });
@@ -496,7 +496,7 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => { } }) => {
       errors.push('End date is required for exam or event.');
     }
 
-    if (dataSource.length === 0) {
+    if (dataSource?.length === 0) {
       errors.push('At least one row must be added to the timetable.');
     }
 
@@ -557,7 +557,7 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => { } }) => {
       }
     });
 
-    if (errors.length > 0) {
+    if (errors?.length > 0) {
       message.error(errors.join('\n'));
       return;
     }
@@ -776,10 +776,10 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => { } }) => {
                   onChange={(value) => setFormData({ ...formData, sectionId: value })}
                   style={{ width: '100%' }}
                   placeholder="Select Section"
-                  disabled={!formData.classId || sectionsList.length === 0}
+                  disabled={!formData.classId || sectionsList?.length === 0}
                 >
                   <Option value="">Select Section</Option>
-                  {sectionsList.length > 0 ? (
+                  {sectionsList?.length > 0 ? (
                     sectionsList?.map((section) => (
                       <Option key={section._id} value={section._id}>
                         {section.sectionName}
@@ -800,10 +800,10 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => { } }) => {
                   onChange={(value) => setFormData({ ...formData, groupId: value })}
                   style={{ width: '100%' }}
                   placeholder="Select Group"
-                  disabled={!formData.classId || groupsList.length === 0}
+                  disabled={!formData.classId || groupsList?.length === 0}
                 >
                   <Option value="">Select Group</Option>
-                  {groupsList.length > 0 ? (
+                  {groupsList?.length > 0 ? (
                     groupsList?.map((group) => (
                       <Option key={group._id} value={group._id}>
                         {group.groupName}
@@ -868,7 +868,7 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => { } }) => {
                 </Button>
 
                 <div className="flex space-x-2">
-                  {deletedRowsStack.length > 0 && (
+                  {deletedRowsStack?.length > 0 && (
                     <Button
                       icon={<UndoOutlined />}
                       onClick={handleUndoDelete}
@@ -883,7 +883,7 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => { } }) => {
                     </Button>
 
                   )}
-                  {selectedRowKeys.length > 0 && (
+                  {selectedRowKeys?.length > 0 && (
                     <Popconfirm
                       title="Are you sure you want to delete selected rows?"
                       onConfirm={handleDeleteRows}

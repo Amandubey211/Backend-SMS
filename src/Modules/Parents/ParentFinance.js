@@ -152,7 +152,7 @@ const ParentFinanceTable = () => {
                   </tr>
                 ) : error ? (
                   renderErrorMessage() // Display error message in table row
-                ) : filteredFeesDetails.length > 0 ? (
+                ) : filteredFeesDetails?.length > 0 ? (
                   filteredFeesDetails?.map((item, index) => (
                     <tr key={index} className="text-left text-gray-700 bg-white shadow-sm">
                       <td className="px-5 py-4 border-b border-gray-200">{item?.feeType || t("No Fee Type")}</td>

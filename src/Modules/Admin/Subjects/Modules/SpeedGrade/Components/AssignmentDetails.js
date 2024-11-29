@@ -12,7 +12,7 @@ const AssignmentDetails = ({ student, details, type, onTotalGradeUpdate }) => {
     const { questions } = details.assignmentId || details.quizId || {};
     let initialGrade = 0;
 
-    if (questions && questions.length > 0) {
+    if (questions && questions?.length > 0) {
       initialGrade = questions.reduce((total, question) => {
         const answer = details.answers.find(
           (ans) => ans.questionId === question._id

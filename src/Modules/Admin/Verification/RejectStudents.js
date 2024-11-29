@@ -25,10 +25,10 @@ const RejectStudents = () => {
     const isDataStale =
       !lastFetchedRejected || now - lastFetchedRejected > CACHE_DURATION;
 
-    if (rejectedStudents.length == 0 || isDataStale) {
+    if (rejectedStudents?.length == 0 || isDataStale) {
       dispatch(fetchRejectedStudents());
     }
-  }, [dispatch, rejectedStudents.length, lastFetchedRejected]);
+  }, [dispatch, rejectedStudents?.length, lastFetchedRejected]);
 
   // Filter rejected students based on search query
   const filteredStudents = useMemo(() => {
@@ -49,7 +49,7 @@ const RejectStudents = () => {
     );
   }
 
-  if (filteredStudents.length === 0) {
+  if (filteredStudents?.length === 0) {
     return (
       <div className="flex flex-col justify-center items-center h-64">
         <FaUserSlash className="text-6xl text-gray-400 mb-4" /> {/* Big Icon */}

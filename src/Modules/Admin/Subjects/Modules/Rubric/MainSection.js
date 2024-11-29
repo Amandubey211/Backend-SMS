@@ -54,7 +54,7 @@ const MainSection = () => {
         <RubricHeader onAddRubric={handleAddRubric} />
         {loading ? (
           <Spinner />
-        ) : rubrics.length > 0 ? (
+        ) : rubrics?.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
             {rubrics?.map((rubric) => (
               <RubricCard

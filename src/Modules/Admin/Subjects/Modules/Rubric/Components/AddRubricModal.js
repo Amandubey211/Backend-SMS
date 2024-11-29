@@ -147,7 +147,7 @@ const AddRubricModal = ({ readonly = false }) => {
       return;
     }
 
-    if (criteria.length === 0) {
+    if (criteria?.length === 0) {
       toast.error(t("Please add at least one criteria."));
       return;
     }

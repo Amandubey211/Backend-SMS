@@ -120,7 +120,7 @@ const AllNotice = () => {
                       onClick={() => toggleAccordion(index)}
                     >
                       <div className="flex gap-6 px-3 py-2">
-                        <div className={`border ${backgroundColors[index % backgroundColors.length]} rounded-[10%] flex items-center justify-center`} style={{ height: '70px', width: '70px' }}>
+                        <div className={`border ${backgroundColors[index % backgroundColors?.length]} rounded-[10%] flex items-center justify-center`} style={{ height: '70px', width: '70px' }}>
                           <img
                             className="h-[80%] w-[80%] rounded-[10%]"
                             src={announcementIcon}

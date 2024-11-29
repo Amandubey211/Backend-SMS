@@ -103,7 +103,7 @@ const EventScheduler = () => {
           {dayEvents?.map((event, index) => (
             <li
               key={event?._id}
-              className={`inline-block px-2 py-1 rounded text-white ${bgColors[index % bgColors.length]} shadow-md cursor-pointer`}
+              className={`inline-block px-2 py-1 rounded text-white ${bgColors[index % bgColors?.length]} shadow-md cursor-pointer`}
               onClick={() => handleEventClick(event)}
             >
               {event?.title} - {event?.time || "-"}
@@ -152,7 +152,7 @@ const EventScheduler = () => {
                 <IoIosArrowBack />
               </div>
             )}
-            {filteredEvents.length === 0 ? (
+            {filteredEvents?.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full text-gray-500 w-full">
                 <IoCalendarOutline className="text-6xl" />
                 <span>{t("No Events in this Month")}</span>
@@ -166,7 +166,7 @@ const EventScheduler = () => {
                 />
               ))
             )}
-            {(currentPage + 1) * itemsPerPage < events.length && (
+            {(currentPage + 1) * itemsPerPage < events?.length && (
               <div
                 className="p-1 rounded-full text-purple-500 bg-white border-2 cursor-pointer absolute right-0 top-1/2 transform -translate-y-1/2"
                 onClick={() => setCurrentPage((prev) => prev + 1)}

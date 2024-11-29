@@ -63,7 +63,7 @@ const CreateQuizForm = ({
 
   useEffect(() => {
     // Fetch modules if not already present
-    if (!modules || modules.length === 0) {
+    if (!modules || modules?.length === 0) {
       dispatch(fetchModules({ cid, sid }));
     }
   }, [dispatch, modules]);

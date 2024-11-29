@@ -45,7 +45,7 @@ const UpdateStudent = ({ data, handleUpdateSidebarClose }) => {
         contactNumber: data.contactNumber || '',
         email: data.email || '',
         profile: data.profile || null,
-        dateOfBirth: data.dateOfBirth ? data.dateOfBirth.slice(0, 10) : '',
+        dateOfBirth: data.dateOfBirth ? data.dateOfBirth?.slice(0, 10) : '',
         admissionNumber: data.admissionNumber || '',
         Q_Id: data.Q_Id || '',
         transportRequirement: data.transportRequirement || '',

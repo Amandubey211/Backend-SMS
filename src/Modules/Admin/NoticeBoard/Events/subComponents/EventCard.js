@@ -9,8 +9,8 @@ const colors = ["bg-yellow-300", "bg-blue-300", "bg-green-300"];
 // Hash function to generate a numeric index for a string (e.g., studentId)
 const hashCode = (str) => {
   let hash = 0;
-  if (str.length === 0) return hash;
-  for (let i = 0; i < str.length; i++) {
+  if (str?.length === 0) return hash;
+  for (let i = 0; i < str?.length; i++) {
     const char = str.charCodeAt(i);
     hash = (hash << 5) - hash + char;
     hash = hash & hash; // Convert to 32-bit integer
@@ -20,7 +20,7 @@ const hashCode = (str) => {
 
 // Function to truncate text safely
 const truncateText = (text, maxLength) => {
-  return text && text.length > maxLength ? `${text.substring(0, maxLength)}...` : text ?? ('No Description');
+  return text && text?.length > maxLength ? `${text.substring(0, maxLength)}...` : text ?? ('No Description');
 };
 
 const EventCard = ({ event }) => {

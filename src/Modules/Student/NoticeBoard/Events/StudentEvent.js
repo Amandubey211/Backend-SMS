@@ -117,7 +117,7 @@ const StudentEvent = () => {
             <li
               key={event?.id}
               className={`inline-block px-2 py-1 rounded text-white ${
-                bgColors[index % bgColors.length]
+                bgColors[index % bgColors?.length]
               } shadow-md cursor-pointer`}
               onClick={() => handleStickerClick(event)}
             >

@@ -95,7 +95,7 @@ const GroupList = ({ onSeeGradeClick }) => {
       <div className="flex items-center justify-between mb-4 p-2">
         <h2 className="text-lg font-semibold ps-4">
           Groups{" "}
-          <span className="text-gray-500">({filteredGroups.length})</span>
+          <span className="text-gray-500">({filteredGroups?.length})</span>
         </h2>
         <div className="relative">
           <input
@@ -107,7 +107,7 @@ const GroupList = ({ onSeeGradeClick }) => {
           />
         </div>
       </div>
-      {loading || filteredGroups.length === 0 ? (
+      {loading || filteredGroups?.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-96 text-center text-gray-500">
           {loading ? (
             <Spinner />
@@ -211,7 +211,7 @@ const GroupList = ({ onSeeGradeClick }) => {
 
             {expandedGroupIndex === groupIndex && (
               <ul className="border-t border-gray-200">
-                {group.students.length === 0 ? (
+                {group.students?.length === 0 ? (
                   <li className="p-4 text-center text-gray-500 italic">
                     No members found in this group.
                   </li>

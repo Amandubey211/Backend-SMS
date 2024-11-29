@@ -81,7 +81,7 @@ const MainSection = () => {
                 <MdKeyboardArrowDown className="text-gray-500 h-8 w-8" />
               </div>
               <div className="flex-grow flex justify-center items-center">
-                {filteredDiscussions.length > 0 ? (
+                {filteredDiscussions?.length > 0 ? (
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
                     {filteredDiscussions?.map((discussion) => (
                       <DiscussionCard

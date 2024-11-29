@@ -21,11 +21,11 @@ const StudentGradePieChart = () => {
       {
         data: dataValues,
         backgroundColor: allZero 
-          ? Array(dataValues.length).fill("gray") // Set all slices to gray if all data is 0
-          : dataValues?.map(value => value === 0 ? "gray" : colors[dataValues.indexOf(value) % colors.length]), 
+          ? Array(dataValues?.length).fill("gray") // Set all slices to gray if all data is 0
+          : dataValues?.map(value => value === 0 ? "gray" : colors[dataValues.indexOf(value) % colors?.length]), 
         hoverBackgroundColor: allZero 
-          ? Array(dataValues.length).fill("gray") 
-          : dataValues?.map(value => value === 0 ? "gray" : colors[dataValues.indexOf(value) % colors.length]),
+          ? Array(dataValues?.length).fill("gray") 
+          : dataValues?.map(value => value === 0 ? "gray" : colors[dataValues.indexOf(value) % colors?.length]),
         borderWidth: 5,
         borderRadius: 10,
         borderColor: "#ffffff",

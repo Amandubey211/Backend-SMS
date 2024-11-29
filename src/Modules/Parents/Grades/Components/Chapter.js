@@ -21,16 +21,16 @@ const Chapter = ({ title, chapterNumber, imageUrl, assignments, quizzes, attachm
 
   // Handle the attachment icon click
   const handleAttachmentClick = () => {
-    if (attachments.length === 1) {
+    if (attachments?.length === 1) {
       openPreview(attachments[0].url); // Open the PDF if there's only one attachment
-    } else if (attachments.length > 1) {
+    } else if (attachments?.length > 1) {
       setChapterExpanded(true); // Expand the chapter if more than one attachment
     }
   };
 
   // Function to truncate lengthy filenames
   const truncateFileName = (name, length = 30) => {
-    if (name.length > length) {
+    if (name?.length > length) {
       return `${name.substring(0, length)}...`;
     }
     return name;
@@ -64,7 +64,7 @@ const Chapter = ({ title, chapterNumber, imageUrl, assignments, quizzes, attachm
             </div>
           </div>
           <div className="flex items-center space-x-2 relative">
-            {attachments.length > 0 && (
+            {attachments?.length > 0 && (
               <div className="relative">
                 <button
                   className="border p-2 rounded-full hover:bg-gray-100 text-red-600"
@@ -77,7 +77,7 @@ const Chapter = ({ title, chapterNumber, imageUrl, assignments, quizzes, attachm
                   <GrAttachment />
                 </button>
                 <span className="absolute -top-1 -right-1 bg-red-100 text-red-900 text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                  {attachments.length}
+                  {attachments?.length}
                 </span>
               </div>
             )}
@@ -100,9 +100,9 @@ const Chapter = ({ title, chapterNumber, imageUrl, assignments, quizzes, attachm
       {chapterExpanded && (
         <div className="mt-2">
             {/* Attachments (PDF Preview) */}
-            {attachments.length > 0 && (
+            {attachments?.length > 0 && (
             <div className="mt-4">
-              <h3 className="text-sm font-semibold text-green-600 mb-2">Attachments ({attachments.length})</h3>
+              <h3 className="text-sm font-semibold text-green-600 mb-2">Attachments ({attachments?.length})</h3>
               {attachments?.map((attachment, index) => (
                 <div
                   key={index}
@@ -144,7 +144,7 @@ const Chapter = ({ title, chapterNumber, imageUrl, assignments, quizzes, attachm
           )}
           {/* Assignments and Quizzes */}
           <div>
-            {assignments.length > 0 || quizzes.length > 0 ? (
+            {assignments?.length > 0 || quizzes?.length > 0 ? (
               <>
                 {assignments?.map((assignment, index) => (
                   <ChapterItem

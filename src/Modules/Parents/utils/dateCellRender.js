@@ -27,7 +27,7 @@ export const dateCellRender = (value, attendanceData) => {
         }
         return (
           <li key={item.date}>
-            {icon} {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
+            {icon} {item.status.charAt(0).toUpperCase() + item.status?.slice(1)}
           </li>
         );
       })}

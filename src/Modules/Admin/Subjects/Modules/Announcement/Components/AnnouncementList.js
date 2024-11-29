@@ -23,7 +23,7 @@ const colors = [
 
 // Utility function to get a random color
 const getRandomColor = () => {
-  const randomIndex = Math.floor(Math.random() * colors.length);
+  const randomIndex = Math.floor(Math.random() * colors?.length);
   return colors[randomIndex];
 };
 
@@ -58,7 +58,7 @@ const AnnouncementList = () => {
         <Spinner />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-2">
-          {filteredAnnouncements.length > 0 ? (
+          {filteredAnnouncements?.length > 0 ? (
             filteredAnnouncements?.map((announcement) => (
               <AnnouncementCard key={announcement._id} {...announcement} />
             ))

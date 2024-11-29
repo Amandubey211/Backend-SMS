@@ -179,7 +179,7 @@ const DocumentUploadForm = ({
             </div>
           ))}
         {studentDocuments.documents &&
-          studentDocuments.documents.length < 3 && (
+          studentDocuments.documents?.length < 3 && (
             <div
               onClick={handleFileUploadIconClick}
               className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-gray-300 rounded-md cursor-pointer hover:border-indigo-500 hover:bg-gray-100 transition duration-500 ease-in-out"

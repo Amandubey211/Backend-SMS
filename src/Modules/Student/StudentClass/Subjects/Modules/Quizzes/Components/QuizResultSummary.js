@@ -49,7 +49,7 @@ const QuizResultSummary = () => {
 
         {Array.isArray(attemptHistory) && attemptHistory?.length > 0 ? (
           attemptHistory
-            .slice()
+            ?.slice()
             .reverse()
             ?.map((attempt, index) => (
               <div

@@ -119,11 +119,11 @@ const StudentEditor = forwardRef(
             if (shiftPressed) {
               nextIndex = index - 1;
               if (nextIndex < 0) {
-                nextIndex = inputs.length - 1;
+                nextIndex = inputs?.length - 1;
               }
             } else {
               nextIndex = index + 1;
-              if (nextIndex >= inputs.length) {
+              if (nextIndex >= inputs?.length) {
                 nextIndex = 0;
               }
             }
@@ -153,7 +153,7 @@ const StudentEditor = forwardRef(
         if (editorInstance && submissionType === "Online-textEntry") {
           const inputs =
             editorInstance.container.querySelectorAll(".blank-input");
-          return inputs.length;
+          return inputs?.length;
         }
         return 0;
       },

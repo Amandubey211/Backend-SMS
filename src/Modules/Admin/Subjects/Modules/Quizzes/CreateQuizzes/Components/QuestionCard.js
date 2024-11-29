@@ -5,7 +5,7 @@ import { FiEdit2, FiTrash2 } from "react-icons/fi";
 
 // Utility function to shuffle an array
 function shuffleArray(array) {
-  let currentIndex = array.length;
+  let currentIndex = array?.length;
   let randomIndex;
 
   // While there remain elements to shuffle...

@@ -82,7 +82,7 @@ const TimeTableMainSection = () => {
 
   // Filter timetables based on both frontend (name) and backend (type) filters
   useEffect(() => {
-    if (timetables && timetables.length > 0) {
+    if (timetables && timetables?.length > 0) {
       const filtered = timetables.filter((timetable) => {
         const matchesName = timetable.name.toLowerCase().includes(filters.name.toLowerCase());
         const matchesType = filters.type === "" || timetable.type === filters.type;

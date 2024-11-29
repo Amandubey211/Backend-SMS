@@ -60,7 +60,7 @@ const Chapter = ({
       {/* Expanded Content */}
       {isExpanded === id && (
         <div className="ml-10 py-2">
-          {combinedItems.length > 0 ? (
+          {combinedItems?.length > 0 ? (
             combinedItems?.map((item, index) => (
               <ChapterItem
                 key={index}

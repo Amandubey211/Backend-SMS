@@ -27,7 +27,7 @@ const TopNavigation = () => {
           }`}
           onClick={() => dispatch(setActiveTab("unverified"))}
         >
-          {t("Unverified Students")} ({unVerifiedStudents.length})
+          {t("Unverified Students")} ({unVerifiedStudents?.length})
         </h1>
 
         {/* Rejected Students Tab */}
@@ -39,7 +39,7 @@ const TopNavigation = () => {
           }`}
           onClick={() => dispatch(setActiveTab("rejected"))}
         >
-          {t("Rejected Students")} ({rejectedStudents.length})
+          {t("Rejected Students")} ({rejectedStudents?.length})
         </h1>
       </div>
 

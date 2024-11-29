@@ -9,7 +9,7 @@ const priorityClasses = {
 const Notice = ({ title, date, priority, content, image, backgroundColor, descriptionLength ,authorName}) => {
 
   const truncateText = (text, maxLength) => {
-    return text.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
+    return text?.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
   };
   return (
     <div className="w-[97%] p-4 border-t bg-white flex">

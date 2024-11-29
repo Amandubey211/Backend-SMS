@@ -216,7 +216,7 @@ const TableView = () => {
         dataSource={filteredData}
         pagination={{
           ...pagination,
-          total: filteredData.length,
+          total: filteredData?.length,
           showSizeChanger: true,
         }}
         onChange={handleTableChange}

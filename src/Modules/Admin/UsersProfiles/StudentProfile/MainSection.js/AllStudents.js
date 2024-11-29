@@ -74,7 +74,7 @@ const AllStudents = () => {
   };
 
   const bgColor = (studentId) => {
-    const colorIndex = hashCode(studentId) % colors.length;
+    const colorIndex = hashCode(studentId) % colors?.length;
     return colors[colorIndex];
   };
 

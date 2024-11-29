@@ -17,7 +17,7 @@ const QuizQuestions = () => {
     });
   };
 
-  if (!questions || questions.length === 0) {
+  if (!questions || questions?.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-full">
         <FaQuestionCircle className="text-6xl text-gray-400" />

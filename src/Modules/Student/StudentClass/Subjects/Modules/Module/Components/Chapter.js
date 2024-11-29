@@ -83,10 +83,10 @@ const Chapter = ({
       {isExpanded && (
         <div className="mt-2">
           {/* Attachments Section */}
-          {attachments.length > 0 && (
+          {attachments?.length > 0 && (
             <div className="mb-4">
               <h3 className="text-sm font-semibold text-green-600">
-                <b>{attachments.length}</b> Attachments
+                <b>{attachments?.length}</b> Attachments
               </h3>
               <div className="grid grid-cols-1 gap-2 mb-2">
                 {attachments?.map((attachment, index) => (
@@ -128,7 +128,7 @@ const Chapter = ({
 
           {/* Assignments and Quizzes Section */}
           <div>
-            {combinedItems.length > 0 ? (
+            {combinedItems?.length > 0 ? (
               combinedItems?.map((item, index) => (
                 <ChapterItem
                   key={index}

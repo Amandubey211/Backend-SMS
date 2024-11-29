@@ -7,7 +7,7 @@ const ChildProfile = ({ children }) => {
   const navigate = useNavigate();
   const { t } = useTranslation('admAccounts');
 
-  if (!children || children.length === 0) {
+  if (!children || children?.length === 0) {
     return <div>{t('No children data available')}</div>;
   }
 

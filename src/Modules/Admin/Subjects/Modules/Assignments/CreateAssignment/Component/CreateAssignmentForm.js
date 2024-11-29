@@ -35,7 +35,7 @@
 //   const [selectedChapter, setSelectedChapter] = useState(chapterId || "");
 
 //   useEffect(() => {
-//     // if (!moduleList || moduleList.length === 0) {
+//     // if (!moduleList || moduleList?.length === 0) {
 //     fetchModules();
 //     // }
 //   }, [fetchModules]);
@@ -204,7 +204,7 @@ const CreateAssignmentForm = ({
   const [chapters, setChapters] = useState([]);
 
   useEffect(() => {
-    if (moduleList.length === 0) {
+    if (moduleList?.length === 0) {
       dispatch(fetchModules({ cid, sid }));
     }
   }, [moduleList, dispatch, cid, sid]);

@@ -85,7 +85,7 @@ const EditBook = ({ book, onClose }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     const validationErrors = validateForm();
-    if (Object.keys(validationErrors).length > 0) {
+    if (Object.keys(validationErrors)?.length > 0) {
       setErrors(validationErrors);
       return;
     }

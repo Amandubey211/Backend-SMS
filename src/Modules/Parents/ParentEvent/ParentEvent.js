@@ -93,7 +93,7 @@ const handleDateCellRender = (value) => {
           <li
             key={event?.id}
             className={`inline-block px-2 py-1 rounded text-white ${
-              bgColors[index % bgColors.length]
+              bgColors[index % bgColors?.length]
             } shadow-md cursor-pointer`}
             onClick={() => handleStickerClick(event)}
           >
@@ -139,7 +139,7 @@ const handleDateCellRender = (value) => {
     }
   };
 
-  const paginatedEvents = filteredEvents.slice(
+  const paginatedEvents = filteredEvents?.slice(
     currentPage * itemsPerPage,
     (currentPage + 1) * itemsPerPage
   );
@@ -166,7 +166,7 @@ const handleDateCellRender = (value) => {
                 <RiSignalWifiErrorFill className="text-gray-400 text-8xl mb-6" />
                 <p className="text-gray-600 font-semibold">{error}: {t("Unable to fetch events")}</p>
               </div>
-            ) : paginatedEvents.length === 0 ? (
+            ) : paginatedEvents?.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-4">
                 <IoCalendarOutline className="text-6xl" />
                 <span>No Events in this Month</span>
@@ -195,12 +195,12 @@ const handleDateCellRender = (value) => {
                     <EventCard
                       key={event?.id}
                       event={event}
-                      color={bgColors[index % bgColors.length]}
+                      color={bgColors[index % bgColors?.length]}
                       onClick={handleStickerClick}
                       className="transform transition-transform duration-200 hover:scale-105 hover:shadow-xl"
                     />
                   ))}
-                  {(currentPage + 1) * itemsPerPage < filteredEvents.length && (
+                  {(currentPage + 1) * itemsPerPage < filteredEvents?.length && (
                     <div
                       className="p-1 rounded-full text-purple-500 bg-white border-2 cursor-pointer absolute right-0 top-1/2 transform -translate-y-1/2"
                       onClick={() => setCurrentPage((prev) => prev + 1)}

@@ -181,9 +181,9 @@ const Chapter = ({ onEdit, chapterNumber, chapter }) => {
             >
               <GrAttachment />
             </button>
-            {attachments.length > 0 && (
+            {attachments?.length > 0 && (
               <span className="absolute -top-1 -right-1 bg-red-100 opacity-90 text-red-900 text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                {attachments.length}
+                {attachments?.length}
               </span>
             )}
           </div>
@@ -252,7 +252,7 @@ const Chapter = ({ onEdit, chapterNumber, chapter }) => {
             {attachments?.length > 0 && (
               <div>
                 <h3 className="text-sm font-semibold text-green-600">
-                  Attachments ({attachments.length})
+                  Attachments ({attachments?.length})
                 </h3>
                 <div className="grid grid-cols-1 gap-2 mb-2">
                   {attachments?.map((attachment, index) => (
@@ -314,7 +314,7 @@ const Chapter = ({ onEdit, chapterNumber, chapter }) => {
 
             {/* Assignments and Quizzes */}
             <div>
-              {/* {assignments.length > 0 || quizzes.length > 0 ? (
+              {/* {assignments?.length > 0 || quizzes?.length > 0 ? (
                 <>
                   {assignments?.map((assignment, index) => (
                     <ChapterItem

@@ -29,7 +29,7 @@ const Reply = ({
   const [editText, setEditText] = useState(reply.text);
 
   // Console logs to debug
-  const [likesCount, setLikesCount] = useState(reply.likes.length);
+  const [likesCount, setLikesCount] = useState(reply.likes?.length);
   const [isLiked, setIsLiked] = useState(
     reply.likes.some((like) => like.userId === userId)
   );

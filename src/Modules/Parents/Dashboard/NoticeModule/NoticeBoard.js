@@ -79,7 +79,7 @@ const NoticeBoard = ({ textTrimCount }) => {
 
   // Utility function to truncate text
   const truncateText = useCallback((text, maxLength) => {
-    return text && text.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
+    return text && text?.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
   }, []);
 
   // Loading state with spinner displayed at the center
@@ -155,7 +155,7 @@ const NoticeBoard = ({ textTrimCount }) => {
             </span>
           }
           content={truncateText(notice?.description || "", textTrimCount)}
-          backgroundColor={gradientBackgrounds[index % gradientBackgrounds.length]}
+          backgroundColor={gradientBackgrounds[index % gradientBackgrounds?.length]}
         />
       ))}
     </div>

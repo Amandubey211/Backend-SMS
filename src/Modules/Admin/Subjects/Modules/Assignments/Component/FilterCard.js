@@ -19,10 +19,10 @@ const FilterCard = ({ filters, setFilters }) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (!moduleList.length) {
+    if (!moduleList?.length) {
       dispatch(fetchModules({ cid, sid }));
     }
-  }, [moduleList.length, dispatch, cid, sid]);
+  }, [moduleList?.length, dispatch, cid, sid]);
 
   useEffect(() => {
     if (selectedModule) {

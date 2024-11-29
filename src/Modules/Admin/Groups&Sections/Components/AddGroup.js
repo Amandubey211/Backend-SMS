@@ -181,7 +181,7 @@ const AddGroup = ({ group, isUpdate, groupId, onClose }) => {
             </div>
             {isDropdownOpen && (
               <div className="absolute mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg z-10">
-                {studentsList.length === 0 ? (
+                {studentsList?.length === 0 ? (
                   <div className="text-center p-4">
                     <FaUserSlash className="text-2xl text-gray-400 mx-auto" />
                     <p className="text-sm text-gray-500">

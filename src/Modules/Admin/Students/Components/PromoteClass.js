@@ -22,10 +22,10 @@
 
 //   useEffect(() => {
 //     // Fetch classes and academic years if necessary
-//     if (classes.length === 0) {
+//     if (classes?.length === 0) {
 //       // Dispatch thunk to fetch classes
 //     }
-//     if (academicYears.length === 0) {
+//     if (academicYears?.length === 0) {
 //       // Dispatch thunk to fetch academic years
 //     }
 //   }, [dispatch, classes, academicYears]);
@@ -186,10 +186,10 @@ const PromoteClass = ({ student }) => {
 
   useEffect(() => {
     // Fetch classes and academic years if necessary
-    if (classes.length === 0) {
+    if (classes?.length === 0) {
       // Dispatch thunk to fetch classes
     }
-    if (academicYears.length === 0) {
+    if (academicYears?.length === 0) {
       // Dispatch thunk to fetch academic years
     }
   }, [dispatch, classes, academicYears]);

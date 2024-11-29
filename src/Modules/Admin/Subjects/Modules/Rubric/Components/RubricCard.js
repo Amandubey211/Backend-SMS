@@ -63,7 +63,7 @@ const RubricCard = ({ rubric, onDelete, onEdit }) => {
             <div className="flex items-center">
               <p className="text-sm mr-1">Criteria :</p>
               <p className="text-base font-bold">
-                {rubric.criteria.length.toString().padStart(2, "0")}
+                {rubric.criteria?.length.toString().padStart(2, "0")}
               </p>
             </div>
             <div className="flex items-center">

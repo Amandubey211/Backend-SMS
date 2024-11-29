@@ -11,7 +11,7 @@ const EventCard = ({ event, onClick }) => {
   ];
 
   const eventId = event.id ?? 0;
-  const bgColor = bgColors[eventId % bgColors.length];
+  const bgColor = bgColors[eventId % bgColors?.length];
 
   // Function to format date
   const formatDate = (dateString) => {

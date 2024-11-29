@@ -5,7 +5,7 @@ import { AiOutlinePlus } from "react-icons/ai"; // Import an icon to indicate ad
 const ProfileCard = ({ profile, onClick }) => {
   const groups = profile?.group?.split(",")?.map(group => group.trim()) || [];
   const firstGroup = groups[0]; // First group
-  const hasMoreGroups = groups.length > 1;  // Count of additional groups
+  const hasMoreGroups = groups?.length > 1;  // Count of additional groups
 
   return (
     <div className="relative w-full sm:w-1/2 md:w-1/3 lg:w-1/4 px-2 mb-4">

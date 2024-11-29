@@ -46,7 +46,7 @@ const MainSection = () => {
           <div className="flex justify-between items-center mb-5">
             {/* Add Chapter Button (if needed) */}
           </div>
-          {chapters.length > 0 ? (
+          {chapters?.length > 0 ? (
             chapters?.map((chapter, index) => (
               <Chapter
                 key={index}

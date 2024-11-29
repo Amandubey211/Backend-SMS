@@ -19,8 +19,8 @@ import {
 const DiscussionCard = ({ discussion, fetchClassDiscussions }) => {
   const { sid, cid } = useParams();
   const lastReply =
-    discussion.replies.length > 0
-      ? discussion.replies[discussion.replies.length - 1]
+    discussion.replies?.length > 0
+      ? discussion.replies[discussion.replies?.length - 1]
       : null;
 
   const dispatch = useDispatch();
@@ -154,7 +154,7 @@ const DiscussionCard = ({ discussion, fetchClassDiscussions }) => {
         <div className="flex justify-center space-x-4">
           <div className="flex items-center space-x-1 border rounded-full px-4 py-1">
             <span className="font-semibold text-lg">
-              {discussion.replies.length}
+              {discussion.replies?.length}
             </span>
             <span className="text-sm text-gray-500">Replies</span>
           </div>

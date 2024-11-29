@@ -40,10 +40,10 @@ function StudentList({ onSelectStudent, students }) {
       <div className="flex gap-4 items-center mb-4">
         <h2 className="text-md font-semibold">{t("All Students")}</h2> {/* Translated heading */}
         <span className="text-sm bg-purple-100 text-purple-600 rounded-full px-2 py-1">
-          {students.length}
+          {students?.length}
         </span>
       </div>
-      {!filteredStudents.length && <NoDataFound title={t("Students")} />} {/* Translated title */}
+      {!filteredStudents?.length && <NoDataFound title={t("Students")} />} {/* Translated title */}
       <div className="flex-grow overflow-y-auto space-y-2 ">
         {filteredStudents?.map((student, index) => (
           <div

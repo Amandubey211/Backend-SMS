@@ -189,7 +189,7 @@ const MainSection = () => {
           ) : error || modulesData?.length === 0 ? (
             <NoDataFound />
           ) : selectedModule?.chapters &&
-            selectedModule?.chapters.length > 0 ? (
+            selectedModule?.chapters?.length > 0 ? (
             selectedModule?.chapters?.map((chapter, index) => (
               <Chapter
                 key={index}

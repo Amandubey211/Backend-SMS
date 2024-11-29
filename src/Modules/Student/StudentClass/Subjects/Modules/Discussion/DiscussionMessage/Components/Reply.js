@@ -30,7 +30,7 @@ const Reply = ({
   const [likes, setLikes] = useState(reply.likes);
 
   // Console logs to debug
-  const [likesCount, setLikesCount] = useState(reply.likes.length);
+  const [likesCount, setLikesCount] = useState(reply.likes?.length);
   const [isLiked, setIsLiked] = useState(
     reply.likes.some((like) => like.userId === userId)
   );

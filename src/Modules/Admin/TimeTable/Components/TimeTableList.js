@@ -78,14 +78,14 @@ const TimeTableList = React.memo(({ timetables, loading, onDelete }) => {
             {t("Time Tables")}:
           </span>
           <div className="flex items-center justify-center w-8 h-8 rounded-full text-white bg-gradient-to-r from-pink-500 to-purple-600">
-            {sortedTimetables.length}
+            {sortedTimetables?.length}
           </div>
         </div>
       </div>
 
       {loading ? (
         <Spinner />
-      ) : sortedTimetables.length === 0 ? (
+      ) : sortedTimetables?.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-96">
           <FaClipboardList className="text-9xl text-gray-400" />
           <p className="text-xl text-gray-400 mt-4">

@@ -92,7 +92,7 @@ const AnswerSection = ({
         aria-label={t("Add answer")}
       >
         <AiOutlinePlus className="mr-2" />
-        {t(answers.length === 0 ? "Add Answer" : "Add Another Answer")}
+        {t(answers?.length === 0 ? "Add Answer" : "Add Another Answer")}
       </button>
 
       <div className="grid grid-cols-2 gap-4 mt-6">

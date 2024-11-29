@@ -31,7 +31,7 @@ const Comment = ({
   const [editText, setEditText] = useState(comment.content);
 
   // Console logs to debug
-  const [likesCount, setLikesCount] = useState(comment.likes.length);
+  const [likesCount, setLikesCount] = useState(comment.likes?.length);
   const [isLiked, setIsLiked] = useState(
     comment.likes.some((like) => like.userId === userId)
   );

@@ -59,7 +59,7 @@ const MyChildren = () => {
       return renderErrorMessage(); // Render error message when there's an error
     }
 
-    if (memoizedChildren.length === 0) {
+    if (memoizedChildren?.length === 0) {
       return (
         <div className="flex flex-col items-center justify-center h-full text-center py-10">
           <FaChild className="text-gray-400 text-8xl mb-6" />
@@ -89,7 +89,7 @@ const MyChildren = () => {
               }}
               className="text-sm font-semibold"
             >
-              {memoizedChildren.length.toString().padStart(2, '0')}
+              {memoizedChildren?.length.toString().padStart(2, '0')}
             </span>
           </div>
         </div>

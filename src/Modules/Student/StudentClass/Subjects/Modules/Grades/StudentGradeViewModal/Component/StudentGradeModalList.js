@@ -40,7 +40,7 @@ const StudentModalGradeList = ({ data, filters }) => {
 
   const sortedData = sortData(filteredData, filters.arrangeBy);
 
-  if (sortedData.length === 0) {
+  if (sortedData?.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-10 text-gray-500">
         <FaExclamationTriangle className="w-12 h-12 mb-3" />
