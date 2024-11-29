@@ -13,7 +13,7 @@ export const setLocalCookies = (name, id) => {
 
   return Cookies.set(name, id, {
     // Set cookie options dynamically based on environment
-    httpOnly: false, // Note: 'js-cookie' does not support httpOnly as it's a server-side option
+    httpOnly: true, // Note: 'js-cookie' does not support httpOnly as it's a server-side option
     secure: isProduction, // Secure in production
     sameSite: isProduction ? 'Strict' : 'Lax', // Relaxed for localhost
     expires: 7, // 7 days, equivalent to maxAge in days
