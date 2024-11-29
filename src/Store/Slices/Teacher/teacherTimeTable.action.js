@@ -7,15 +7,15 @@ import { setShowError } from "../Common/Alerts/alertsSlice";
 // Fetch Teacher Timetable
 export const fetchTeacherTimetable = createAsyncThunk(
   "teacherTimetable/fetchTeacherTimetable",
-  async (filters = {}, { rejectWithValue, dispatch }) => {
+  async (_, { rejectWithValue, dispatch }) => {
 
     try {
       const say = getAY(); // Get academic year
       dispatch(setShowError(false));
       // Build API query
-      const response = await getData(`/api/teacher/timetable?say=${say}`, ...filters);
+      const response = await getData(`/api/teacher/timetable?say=${say}`);
 
-      return response?.data; // Return timetable data
+      return response; // Return timetable data
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue); // Handle errors
     }

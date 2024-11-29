@@ -3,8 +3,8 @@ import { Table, Button, Input, message, Row } from "antd";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { FaArrowLeft, FaEdit, FaTrashAlt } from "react-icons/fa";
-import { deleteTimetable } from "../../../../Store/Slices/Admin/TimeTable/timetable.action"; 
-import DeleteConfirmatiomModal from "../../../../Components/Common/DeleteConfirmationModal"; 
+import { deleteTimetable } from "../../../../../Store/Slices/Admin/TimeTable/timetable.action"; 
+import DeleteConfirmatiomModal from "../../../../../Components/Common/DeleteConfirmationModal"; 
 import { useTranslation } from "react-i18next";
 
 const TableView = () => {
@@ -208,26 +208,7 @@ const TableView = () => {
           allowClear
           style={{ width: 200, marginRight: 10 }}
         />
-        {(role !== "parent" && role !== "student") && (
-          <>
-            <Button
-              icon={<FaEdit />}
-              type="primary"
-              onClick={handleEdit}
-              style={{ marginRight: 5 }}
-            >
-              {t("Edit")}
-            </Button>
-            <Button
-              icon={<FaTrashAlt />}
-              type="primary"
-              danger
-              onClick={openDeleteModal}
-            >
-              {t("Delete")}
-            </Button>
-          </>
-        )}
+        
       </Row>
 
       <Table

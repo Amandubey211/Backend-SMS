@@ -44,6 +44,11 @@ import { updateTimetable } from "../Store/Slices/Admin/TimeTable/timetable.actio
 import StudentTimeTablePage from "../Modules/Student/TimeTable/TimeTablePage.js";
 import StudentTableView from "../Modules/Student/TimeTable/Components/TableView.js";
 
+
+// Teacher
+import TeacherTimeTablePage from "../Components/Staff/Teacher/TimeTable/TimeTablePage.js";
+import TeacherTableView from "../Components/Staff/Teacher/TimeTable/Components/TableView.js";
+
 // Parent
 import ParentTimeTablePage from "../Modules/Parents/TimeTable/TimeTablePage.js";
 import ParentTableView from "../Modules/Parents/TimeTable/Components/TableView.js";
@@ -1097,6 +1102,34 @@ function App() {
       ),
       errorElement: <Error />,
     },
+
+    // teacher----------------------------------------------------------------
+
+    {
+      path: "/teacher_timetable",
+      element: (
+        <ProtectRoute
+          Component={TeacherTimeTablePage}
+          allowedRoles={["teacher"]}
+        />
+      ),
+      errorElement: <Error />,
+      children: [
+        {
+          path: "viewtable/:tablename", // Notice it’s a child path, not a full path
+          element: (
+            <ProtectRoute
+              Component={TeacherTableView}
+              allowedRoles={["teacher"]}
+            />
+          ),
+          errorElement: <Error />,
+        },
+        
+      ],
+    },
+
+
 
     // parent----------------------------------------------------------------
     {
