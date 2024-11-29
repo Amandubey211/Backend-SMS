@@ -22,7 +22,7 @@ const PaySalary = ({ teacher, onSave, onClose }) => {
       year: teacher.year,
       status: 'paid'
     };
-    console.log("salaryDetails", salaryDetails);
+    // console.log("salaryDetails", salaryDetails);
     onSave(salaryDetails);
     onClose();
   };

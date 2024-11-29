@@ -57,7 +57,7 @@ export const fetchDashboardDetails = createAsyncThunk(
       );
       const { attendanceSummary } = data?.data;
       // const { student } = await getState();
-      // console.log("std----?>>>>",student)
+      // // console.log("std----?>>>>",student)
       // const notices = student?.studentAnnouncement?.noticeData?.length || 0;
       return {
         cardData: formatDashboardData(data?.data),
@@ -90,7 +90,7 @@ export const fetchSubjects = createAsyncThunk(
       const say = getAY();
       dispatch(setShowError(false));
       const data =  await getData(`/api/studentDashboard/subjects/${userId}?say=${say}`);
-      console.log("escsasa->",data)
+      // console.log("escsasa->",data)
       return data?.subjects;
     } catch (error) {
       handleError(error, dispatch, rejectWithValue);

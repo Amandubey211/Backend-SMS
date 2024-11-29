@@ -13,7 +13,7 @@ export const stdPages = createAsyncThunk(
       const res = await getData(
         `/admin/api/pages/class/pages/${classId}?say=${say}`
       );
-      console.log(res)
+      // console.log(res)
       const data = res?.data;
       return data;
     } catch (error) {

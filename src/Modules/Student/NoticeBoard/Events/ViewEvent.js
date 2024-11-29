@@ -7,7 +7,7 @@ import { gt } from "../../../../Utils/translator/translation";
 import { useTranslation } from "react-i18next";
 
 const ViewEvent = ({ event }) => {
-  console.log("event is ", event);
+  // console.log("event is ", event);
   const {t}=useTranslation();
   const formatDateTime = (date) => {
     const options = { year: "numeric", month: "long", day: "numeric" };

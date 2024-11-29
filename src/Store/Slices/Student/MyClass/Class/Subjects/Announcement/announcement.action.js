@@ -19,7 +19,7 @@ export const fetchStudentAnnounce = createAsyncThunk(
         `/admin/announcement/class/${cid}?say=${say}`
       );
       const data = response?.data;
-      console.log("response data---", data);
+      // console.log("response data---", data);
       return data;
     } catch (error) {
       handleError(error, dispatch, rejectWithValue);
@@ -35,7 +35,7 @@ export const fetchStudentAnnounceById = createAsyncThunk(
       dispatch(setShowError(false));
       const response = await getData(`/admin/announcement/${aid}?say=${say}`);
       const data = response?.data;
-      console.log("response data---", data);
+      // console.log("response data---", data);
       return data;
     } catch (error) {
       handleError(error, dispatch, rejectWithValue);
@@ -53,7 +53,7 @@ export const markAsReadStudentAnnounce = createAsyncThunk(
         `/admin/markAsRead/announcement/${id}?say=${say}`
       );
       const data = response?.data;
-      console.log("response data---", data);
+      // console.log("response data---", data);
       return data;
     } catch (error) {
       handleError(error, dispatch, rejectWithValue);
@@ -72,7 +72,7 @@ export const fetchStudentAnnounceComments = createAsyncThunk(
         `/admin/getAnnouncementComment/${aid}?say=${say}`
       );
       const data = response?.data;
-      console.log("response data---", data);
+      // console.log("response data---", data);
       return data;
     } catch (error) {
       handleError(error, dispatch, rejectWithValue);
@@ -91,7 +91,7 @@ export const createStudentAnnounceComment = createAsyncThunk(
         { content: text, parentId: null }
       );
       const data = response?.data;
-      console.log("response data---", data);
+      // console.log("response data---", data);
       return data;
     } catch (error) {
       handleError(error, dispatch, rejectWithValue);
@@ -110,7 +110,7 @@ export const createStudentAnnounceReply = createAsyncThunk(
         { content: text, parentId: replyId }
       );
       const data = response?.data;
-      console.log("response data---", data);
+      // console.log("response data---", data);
       return data;
     } catch (error) {
       handleError(error, dispatch, rejectWithValue);
@@ -128,7 +128,7 @@ export const deleteStudentAnnounceComment = createAsyncThunk(
         `/admin/deleteCommentannouncement/${commentId}?say=${say}`
       );
       const data = response?.data;
-      console.log("response data---", data);
+      // console.log("response data---", data);
       return data;
     } catch (error) {
       handleError(error, dispatch, rejectWithValue);
@@ -146,7 +146,7 @@ export const deleteStudentAnnounceReply = createAsyncThunk(
         `/admin/deleteCommentannouncement/${replyId}?say=${say}`
       );
       const data = response?.data;
-      console.log("response data---", data);
+      // console.log("response data---", data);
       return data;
     } catch (error) {
       handleError(error, dispatch, rejectWithValue);
@@ -165,7 +165,7 @@ export const editStudentAnnounceComment = createAsyncThunk(
         { content: newText }
       );
       const data = response?.data;
-      console.log("response data---", data);
+      // console.log("response data---", data);
       return data;
     } catch (error) {
       handleError(error, dispatch, rejectWithValue);
@@ -184,7 +184,7 @@ export const editStudentAnnounceReply = createAsyncThunk(
         { content: newText }
       );
       const data = response?.data;
-      console.log("response data---", data);
+      // console.log("response data---", data);
       return data;
     } catch (error) {
       handleError(error, dispatch, rejectWithValue);
@@ -203,7 +203,7 @@ export const toggleStudentAnnounceLike = createAsyncThunk(
         {}
       );
       const data = response?.data;
-      console.log("response data---", data);
+      // console.log("response data---", data);
       return data;
     } catch (error) {
       handleError(error, dispatch, rejectWithValue);

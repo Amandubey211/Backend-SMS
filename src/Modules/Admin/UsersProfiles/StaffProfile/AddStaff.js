@@ -50,7 +50,7 @@ const AddStaff = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Staff data to submit:", staffData);
+    // console.log("Staff data to submit:", staffData);
     // Implement submission logic here
   };
 

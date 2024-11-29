@@ -38,7 +38,7 @@ const StudentTeacher = () => {
     setSelectedTeacher(teacher); 
     setIsSidebarOpen(true)
   };
-  console.log("selected teacher is", selectedTeacher)
+  // console.log("selected teacher is", selectedTeacher)
 
  
 

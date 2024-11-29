@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 
 const Filter = ({ onFilterChange, onClose }) => {
   const classDetails = useSelector((store) => store.admin.class);
-  console.log(classDetails);
+  // console.log(classDetails);
 
   return (
     <div className="flex flex-col h-full p-2">

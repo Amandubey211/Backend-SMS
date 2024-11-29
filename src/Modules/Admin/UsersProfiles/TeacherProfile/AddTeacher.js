@@ -70,7 +70,7 @@ const AddTeacher = ({role}) => {
   };
   const handleAddressInputChange = (e) => {
     const { name, value } = e.target;
-    console.log(name,value);
+    // console.log(name,value);
     setAddress((prev) => ({
       ...prev,
       [name]: value,
@@ -110,7 +110,7 @@ const {addUser,error,loading} = useAddUser()
     e.preventDefault();
    teacherData.address=address;
    teacherData.role = role
-    console.log("Teacher data to submit:", teacherData);
+    // console.log("Teacher data to submit:", teacherData);
   //  await addUser(teacherData);
   
 

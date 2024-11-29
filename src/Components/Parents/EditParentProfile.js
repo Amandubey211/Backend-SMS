@@ -55,7 +55,7 @@ const EditParentProfile = ({ data }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Parent data to submit:", parentData);
+    // console.log("Parent data to submit:", parentData);
     // await editParentProfile(parentData);
     // userDetail(); // Refresh user details after updating profile
   };

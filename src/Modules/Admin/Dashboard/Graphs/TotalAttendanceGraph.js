@@ -22,7 +22,7 @@ const TotalAttendanceGraph = () => {
   );
 
   useEffect(() => {
-    console.log(`Fetching data for: month=${month}, year=${year}`);
+    // console.log(`Fetching data for: month=${month}, year=${year}`);
     dispatch(fetchAttendanceData({ month, year }));
   }, [month, year, dispatch]);
 
@@ -94,17 +94,17 @@ const TotalAttendanceGraph = () => {
 
   const handleMonthChange = (e) => {
     const newMonth = parseInt(e.target.value);
-    console.log(`Month changed to: ${newMonth}`);
+    // console.log(`Month changed to: ${newMonth}`);
     setMonth(newMonth);
   };
 
   const handleYearChange = (e) => {
     const selectedValue = e.target.value;
     if (selectedValue === "Current Year") {
-      console.log("Year changed to current year");
+      // console.log("Year changed to current year");
       setYear(currentYear);
     } else if (selectedValue === "Past Year") {
-      console.log("Year changed to past year");
+      // console.log("Year changed to past year");
       setYear(currentYear - 1);
     }
   };

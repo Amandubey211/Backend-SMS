@@ -72,7 +72,7 @@ export const addQuestionThunk = createAsyncThunk(
       const response = await putData(endpoint, question);
 
       if (response.success) {
-        console.log("Toast Triggered"); // Log here to confirm it’s called once
+        // console.log("Toast Triggered"); // Log here to confirm it’s called once
         toast.success("Question added", {
           id: "unique-toast-id",
           position: "bottom-left",

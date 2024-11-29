@@ -38,8 +38,8 @@ const Reply = ({
   const normalizedCurrentUserId = String(currentUserId).trim().toString();
   const normalizedReplyAuthorId = String(reply.creatorID).trim().toString();
 
-  console.log("reply Result:", reply);
-  console.log("activeReplyId", activeReplyId);
+  // console.log("reply Result:", reply);
+  // console.log("activeReplyId", activeReplyId);
 
 
   const handleEditReply = () => {

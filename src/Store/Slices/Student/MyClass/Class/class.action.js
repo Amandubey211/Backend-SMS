@@ -12,7 +12,7 @@ export const stdClass = createAsyncThunk(
       const say = getAY();
       dispatch(setShowError(false));
       const res = await getData(`/student/my_class?say=${say}`);
-      console.log("data in action class :", res?.data);
+      // console.log("data in action class :", res?.data);
       const data = res?.data;
       dispatch(setSelectedClassName(data?.className));
       return data;

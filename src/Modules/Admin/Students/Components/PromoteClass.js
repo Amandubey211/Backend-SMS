@@ -210,7 +210,7 @@ const PromoteClass = ({ student }) => {
           academicYearId: selectedAcademicYear,
         })
       ).unwrap(); // Ensure the thunk handles errors directly
-      console.log("Student promoted successfully");
+      // console.log("Student promoted successfully");
     } catch (error) {
       console.error("Promotion failed:", error);
     } finally {

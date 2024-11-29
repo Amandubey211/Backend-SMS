@@ -37,7 +37,7 @@ const SettingDropdown = ({
   };
   // Language change handler
   const handleLanguageChange = (lang) => {
-    console.log("lang is", lang);
+    // console.log("lang is", lang);
     // Change the language using i18next
     i18next
       .changeLanguage(lang)

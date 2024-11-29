@@ -12,7 +12,7 @@ export default function StudentsFilter({ filters, onFilterChange }) {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    console.log(`Selected: ${name} = ${value}`); 
+    // console.log(`Selected: ${name} = ${value}`); 
 
     if (name === 'classId' && value === '') {
       dispatch(fetchAllStudents({ classId: '', sectionId: '', groupId: '' }));

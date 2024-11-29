@@ -19,7 +19,7 @@ const classSlice = createSlice({
       .addCase(stdClass.fulfilled, (state, action) => {
         state.loading = false;
         state.classData = action.payload;
-        console.log(action.payload);
+        // console.log(action.payload);
       })
       .addCase(stdClass.rejected, (state, action) => {
         state.loading = false;

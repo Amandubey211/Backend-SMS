@@ -58,7 +58,7 @@ const AddLibrarian = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Librian data to submit:", teacherData);
+    // console.log("Librian data to submit:", teacherData);
     // Implement submission logic here
   };
 

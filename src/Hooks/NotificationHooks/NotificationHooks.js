@@ -20,16 +20,16 @@ export const requestPermissionAndGetToken = async () => {
   try {
     const permission = await Notification.requestPermission();
     if (permission === "granted") {
-      console.log("Notification permission granted.");
+      // console.log("Notification permission granted.");
 
       const token = await getToken(messaging, {
         vapidKey:
           "BE2aOEIZNs60qnKRqlazM2rjZ-DYlbYhsBSjVTNZiSX3rLiB_7ISUO5yp0CK_6ApDNlX9cCltzI9SlnPcd7KRv0",
       });
-      console.log("Device token:", token);
+      // console.log("Device token:", token);
       return token;
     } else {
-      console.log("Notification permission denied.");
+      // console.log("Notification permission denied.");
     }
   } catch (error) {
     console.error(
@@ -56,7 +56,7 @@ export const useFirebaseMessaging = () => {
         );
 
         if (response.ok) {
-          console.log("Token successfully sent to the server.");
+          // console.log("Token successfully sent to the server.");
         } else {
           console.error("Failed to send token to server:", response.statusText);
         }
@@ -70,12 +70,12 @@ export const useFirebaseMessaging = () => {
 
     const onMessageListener = () => {
       onMessage(messaging, (payload) => {
-        console.log("Message received. Payload:", payload);
+        // console.log("Message received. Payload:", payload);
         const notifications =
           JSON.parse(localStorage.getItem("notifications")) || [];
         notifications.push(payload);
         localStorage.setItem("notifications", JSON.stringify(notifications));
-        console.log("Notification saved to local storage:", payload);
+        // console.log("Notification saved to local storage:", payload);
       });
     };
 

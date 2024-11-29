@@ -36,7 +36,7 @@
 // const ModuleDetails = ({ isExpanded, classId, studentId }) => {
 //   const [moduleDetails, setModuleDetails] = useState(Dummy);
 //   const [loading, setLoading] = useState(true);
-//   console.log("classId is", classId)
+//   // console.log("classId is", classId)
 //   const selectedClass = useSelector(state => state.Common.selectedClass);
 //   const selectedSubject = useSelector(state => state.Common.selectedSubject);
 //   useEffect(() => {
@@ -59,7 +59,7 @@
 //           }
 
 //           const data = await response.json();
-//           console.log("moduledetails data", data)
+//           // console.log("moduledetails data", data)
 //           setModuleDetails(data.modules.modules || []);
 //         } catch (error) {
 //           console.error("Failed to fetch module details:", error);

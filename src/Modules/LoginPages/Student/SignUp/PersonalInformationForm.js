@@ -45,7 +45,7 @@ const PersonalInformationForm = ({
      dispatch(fetchAllClasses())
     }
   }, [studentDetails.schoolId]);
-  console.log("Validation Errors:", validationErrors);
+  // console.log("Validation Errors:", validationErrors);
 
   return (
     <>

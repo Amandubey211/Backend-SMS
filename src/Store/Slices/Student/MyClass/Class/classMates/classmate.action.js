@@ -13,7 +13,7 @@ export const stdClassmate = createAsyncThunk(
       const say = getAY();
       dispatch(setShowError(false));
       const res = await getData(`/student/my_classmates/${classId}?say=${say}`);
-      console.log("Classmate data in action:", res?.data);
+      // console.log("Classmate data in action:", res?.data);
       const data = res?.data;
       return data;
     } catch (error) {

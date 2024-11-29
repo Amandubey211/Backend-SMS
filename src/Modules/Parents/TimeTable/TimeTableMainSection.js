@@ -78,7 +78,7 @@ const TimeTableMainSection = () => {
     dispatch(fetchParentTimetable(activeFilters));
   }, [backendFilters, dispatch]);
 
-  console.log("raw timetable", timetables)
+  // console.log("raw timetable", timetables)
 
   // Update filtered timetables when timetables or frontend filter changes
   useEffect(() => {
@@ -130,7 +130,7 @@ const TimeTableMainSection = () => {
       toast.error(`${t("Failed to load timetables")}: ${errorFetch}`);
     }
   }, [errorFetch]);
-  console.log("Filter Timetables: ", filteredTimetables)
+  // console.log("Filter Timetables: ", filteredTimetables)
   return (
     <div className="relative p-5">
       {/* Filter Navigation */}

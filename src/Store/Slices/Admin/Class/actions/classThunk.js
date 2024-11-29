@@ -20,12 +20,12 @@ export const fetchAllClasses = createAsyncThunk(
       const endpoint = `/admin/class`;
       const params = { say };
       const response = await getData(endpoint, params);
-      console.log(response, "lk");
+      // console.log(response, "lk");
       if (response && response.status) {
         return response.data; // Assuming 'data' contains the list of classes
       }
     } catch (error) {
-      console.log(error);
+      // console.log(error);
       return handleError(error, dispatch, rejectWithValue);
     }
   }

@@ -20,7 +20,7 @@ const MainSection = () => {
   const { cid, sid } = useParams();
   const {showError}=useSelector((store)=>store?.common?.alertMsg);
 
-  console.log("use param in syllabus:===>",cid,sid)
+  // console.log("use param in syllabus:===>",cid,sid)
   useEffect(() => {
     dispatch(stdSyllabus({ classId: cid, subjectId: sid }));
   }, [dispatch,cid,sid]);

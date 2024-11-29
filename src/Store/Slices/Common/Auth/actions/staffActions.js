@@ -31,7 +31,7 @@ export const staffLogin = createAsyncThunk(
       const userDetail = { ...staffDetails, deviceToken }; // Include device token
 
       const data = await postData("/auth/staff/login", userDetail);
-      console.log(data);
+      // console.log(data);
 
       if (data && data.success) {
         // Dispatch user details to userSlice

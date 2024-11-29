@@ -25,7 +25,7 @@ const AnnouncementList = () => {
   const filteredAnnouncements = announcementData.filter((card) =>
     card.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
-  console.log(filteredAnnouncements, "filteredAnnouncements");
+  // console.log(filteredAnnouncements, "filteredAnnouncements");
 
   const handleDismiss = () => {
     dispatch(setShowError(false));

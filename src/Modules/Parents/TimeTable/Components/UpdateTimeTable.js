@@ -56,7 +56,7 @@ const UpdateTimeTable = () => {
   // Find the timetable to edit
   const timetable = timetables.find((tt) => tt._id === id);
 
-  console.log('Timetable fetched from Redux:', timetable); // Debugging
+  // console.log('Timetable fetched from Redux:', timetable); // Debugging
 
   // Accessing classes, subjects, sections, and groups from Redux store
   const classes = useSelector((state) => state.admin.class.classes);
@@ -132,9 +132,9 @@ const UpdateTimeTable = () => {
       const newDataSource = [];
       idCounterRef.current = 1;
       timetable.days.forEach((day, dayIndex) => {
-        console.log(`Processing day ${dayIndex + 1}:`, day); // Debugging
+        // console.log(`Processing day ${dayIndex + 1}:`, day); // Debugging
         day.slots.forEach((slot, slotIndex) => {
-          console.log(`Processing slot ${slotIndex + 1}:`, slot); // Debugging
+          // console.log(`Processing slot ${slotIndex + 1}:`, slot); // Debugging
           const newRow = { key: idCounterRef.current, id: idCounterRef.current };
           if (timetable.type === 'others') {
             newRow.heading = slot.heading || ''; // Extract heading from slot.heading
@@ -169,7 +169,7 @@ const UpdateTimeTable = () => {
           idCounterRef.current += 1;
         });
       });
-      console.log('Pre-filled dataSource:', newDataSource); // Debugging
+      // console.log('Pre-filled dataSource:', newDataSource); // Debugging
       setDataSource(newDataSource);
     } else {
       console.warn('Timetable data is incomplete or missing days.'); // Debugging
@@ -741,7 +741,7 @@ const UpdateTimeTable = () => {
       timetableData.days.push(day);
     }
 
-    console.log('Timetable data to be sent:', timetableData); // Debugging
+    // console.log('Timetable data to be sent:', timetableData); // Debugging
 
     // Dispatch the action to update the timetable
     dispatch(updateTimetable({ id: timetable._id, data: timetableData }))

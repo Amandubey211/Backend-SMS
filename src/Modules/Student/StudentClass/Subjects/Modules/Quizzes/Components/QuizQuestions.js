@@ -9,23 +9,23 @@
 
 //   const handleNextQuestion = () => {
 //     if (currentQuestionIndex < questions?.length - 1) {
-//       console.log("cqisss111ss==>", currentQuestionIndex);
+//       // console.log("cqisss111ss==>", currentQuestionIndex);
 //       setCurrentQuestionIndex(currentQuestionIndex + 1);
 //     }
 //   };
 
 //   const handlePreviousQuestion = () => {
 //     if (currentQuestionIndex > 0) {
-//       console.log("cqisssss==>", currentQuestionIndex);
+//       // console.log("cqisssss==>", currentQuestionIndex);
 //       setCurrentQuestionIndex(currentQuestionIndex - 1);
 //     }
 //   };
 
-//   // console.log("cqi 2", currentQuestionIndex)
+//   // // console.log("cqi 2", currentQuestionIndex)
 //   if (showOneQuestionOnly) {
 //     // Show one question at a time
 //     const question = questions[currentQuestionIndex];
-//     // console.log("cqi", currentQuestionIndex)
+//     // // console.log("cqi", currentQuestionIndex)
 //     return (
 //       <div className="w-full p-1">
 //         <QuizQuestionCard

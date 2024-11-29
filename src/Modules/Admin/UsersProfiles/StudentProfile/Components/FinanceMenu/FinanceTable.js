@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 const FinanceTable = () => {
   const { t } = useTranslation('admAccounts');
   const { feesDetails } = useSelector((store) => store.admin.all_students);
-  console.log("--", feesDetails.fees);
+  // console.log("--", feesDetails.fees);
 
   return (
     <table className="min-w-full leading-normal">

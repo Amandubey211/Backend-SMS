@@ -23,12 +23,12 @@ const StudentProfile = () => {
   };
 
   useEffect(()=>{
-    console.log('ud',userDetails);
+    // console.log('ud',userDetails);
     
   },[])
   const updateProfile = () => {
     // Logic to update profile
-    console.log("Profile updated:");
+    // console.log("Profile updated:");
   };
 
   const dispatch = useDispatch();
