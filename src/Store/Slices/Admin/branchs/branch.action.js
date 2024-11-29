@@ -1,11 +1,11 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import toast from "react-hot-toast";
-import { getData, postData, putData } from "../../../../services/apiEndpoints";
+import { getData, postData } from "../../../../services/apiEndpoints";
 import { handleError } from "../../Common/Alerts/errorhandling.action";
 import { setShowError } from "../../Common/Alerts/alertsSlice";
-import Cookies from "js-cookie";
-import { fetchAcademicYear } from "../../Common/AcademicYear/academicYear.action";
-import { redirect } from "react-router-dom";
+
+import Cookies from 'js-cookie'
+
 import { setLocalCookies } from "../../../../Utils/academivYear";
 export const fetchBranch = createAsyncThunk(
   "user/Branch",

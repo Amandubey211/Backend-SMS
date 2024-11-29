@@ -1,10 +1,10 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
-import StudentDashLayout from "../../../Components/Student/StudentDashLayout";
-import Layout from "../../../Components/Common/Layout";
+import AdminDashLayout from "../../../../Components/Admin/AdminDashLayout";
+import Layout from "../../../../Components/Common/Layout";
 import TimeTableMainSection from "./TimeTableMainSection";
 import TableView from "./Components/TableView";
-import useNavHeading from "../../../Hooks/CommonHooks/useNavHeading ";
+import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 
@@ -17,7 +17,7 @@ const TimeTablePage = () => {
   const role = useSelector((store) => store.common.auth.role);
 
   // Determine the layout component based on the role
-  const DashLayout = StudentDashLayout;
+  const DashLayout = AdminDashLayout;
 
 
   
@@ -27,7 +27,7 @@ const TimeTablePage = () => {
         <Routes>
           <Route index element={<TimeTableMainSection />} />
           <Route path="viewtable/:tablename" element={<TableView />} />
-          {/* <Route path="edit/:id" element={<UpdateTimeTable />} /> */}
+          
         </Routes>
       </DashLayout>
     </Layout>

@@ -30,12 +30,12 @@ const TimeTableMainSection = () => {
         loadingFetch: state.student?.studentTimetable?.loading || false,
         errorFetch: state.student?.studentTimetable?.error || null,
       };
-    } else if (role === "parent") {
-      return {
-        timetables: state.Parent?.parentTimetable?.timetables || [],
-        loadingFetch: state.Parent?.parentTimetable?.loading || false,
-        errorFetch: state.Parent?.parentTimetable?.error || null,
-      };
+    // } else if (role === "parent") {
+    //   return {
+    //     timetables: state.Parent?.parentTimetable?.timetables || [],
+    //     loadingFetch: state.Parent?.parentTimetable?.loading || false,
+    //     errorFetch: state.Parent?.parentTimetable?.error || null,
+    //   };
     } else if (role === "teacher") {
       return {
         timetables: state.admin?.teacherTimetable?.timetables || [],
@@ -83,9 +83,11 @@ const TimeTableMainSection = () => {
     fetchAcademicYearsFromStorage();
     if (role === "student") {
       dispatch(fetchStudentTimetable());
-    } else if (role === "parent") {
-      dispatch(fetchParentTimetable());
-    } else if (role === "teacher") {
+     } 
+    //else if (role === "parent") {
+    //   dispatch(fetchParentTimetable());
+    // } 
+    else if (role === "teacher") {
       dispatch(fetchTeacherTimetable());
     } else if (role === "admin") {
       dispatch(fetchAllClasses());

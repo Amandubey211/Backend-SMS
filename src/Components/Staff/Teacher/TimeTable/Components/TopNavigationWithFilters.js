@@ -1,6 +1,5 @@
-import React, { useEffect, useState, useMemo } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchAllClasses } from "../../../../Store/Slices/Admin/Class/actions/classThunk";
+import React, { useState, useMemo } from "react";
+import { useDispatch } from "react-redux";
 import { Input, Select, Button, Row, Col, Space } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import toast from "react-hot-toast";

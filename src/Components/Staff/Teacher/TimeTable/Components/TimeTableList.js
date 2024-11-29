@@ -4,9 +4,9 @@ import {
   FaCalendarAlt,
   FaChalkboardTeacher,
   FaClipboardList,
-  FaEdit
+  
 } from "react-icons/fa";
-import Spinner from "../../../../Components/Common/Spinner";
+import Spinner from "../../../../../Components/Common/Spinner";
 import PropTypes from "prop-types";
 import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
@@ -62,19 +62,7 @@ const TimeTableList = React.memo(({ timetables, loading }) => {
               className="relative p-6 bg-white shadow-xl rounded-xl border border-gray-200 transition duration-500 hover:scale-105 hover:shadow-2xl cursor-pointer"
               onClick={() => handleCardClick(timetable)}
             >
-              {/* Status Badge */}
-              {role !== "parent" && role !== "student" && (
-                <span
-                  className={`absolute top-2 right-2 text-xs font-semibold px-2 py-1 rounded ${
-                    timetable.status === "active"
-                      ? "bg-green-500 text-white"
-                      : "bg-gray-500 text-white"
-                  }`}
-                >
-                  {timetable.status === "active" ? t("Published") : t("Draft")}
-                </span>
-              )}
-
+              
               {/* Card Header */}
               <h2 className="text-xl font-semibold text-gray-800 mb-3 flex items-center">
                 {timetable.name}

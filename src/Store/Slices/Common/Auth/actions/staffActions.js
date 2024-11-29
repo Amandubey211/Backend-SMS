@@ -117,6 +117,8 @@ export const staffLogout = createAsyncThunk(
       Cookies.remove("userToken");
       Cookies.remove("say");
       Cookies.remove("isAcademicYearActive");
+      Cookies.remove('schoolId');
+      Cookies.remove('SelectedschoolId');
       // Mandatory lines
       dispatch(setShowError(false));
 

@@ -133,7 +133,13 @@ const sidebarData = [
     title: "Time Table",
     icon: <ImTable2 />,
     path: "/timetable",
-    roles: ["admin", "teacher"],
+    roles: ["admin"],
+  },
+  {
+    title: "Time Table",
+    icon: <ImTable2 />,
+    path: "/teacher_timetable",
+    roles: ["teacher"],
   },
   {
     title: "Library",
