@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import TimeTableList from "./Components/TimeTableList";
-import { fetchStudentTimetable } from "../../../Store/Slices/Student/TimeTable/studentTimeTable.action";
-import { fetchAllClasses } from "../../../Store/Slices/Admin/Class/actions/classThunk";
+import { fetchTeacherTimetable } from "../../../../Store/Slices/Teacher/teacherTimeTable.action";
+import { fetchAllClasses } from "../../../../Store/Slices/Admin/Class/actions/classThunk";
 import TopNavigationWithFilters from "./Components/TopNavigationWithFilters";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -17,7 +17,7 @@ const TimeTableMainSection = () => {
   const role = useSelector((store) => store.common.auth.role);
 
   const { timetables, loadingFetch, errorFetch } = useSelector(
-    (state) => state.student.studentTimetable
+    (state) => state.admin.teacherTimetable
   );
   const { classes, loading: classLoading, error: classError } = useSelector(
     (state) => state.admin.class
@@ -70,15 +70,9 @@ const TimeTableMainSection = () => {
 
   // Fetch timetables based on backend filters (e.g., type, status)
   useEffect(() => {
-    const activeFilters = Object.fromEntries(
-      Object.entries(filters).filter(([key, value]) => value)
-    );
+    dispatch(fetchTeacherTimetable());
 
-    // Only trigger fetch if there are any active filters
-   
-      dispatch(fetchStudentTimetable(activeFilters));
-    
-  }, [filters, dispatch]);
+  }, [dispatch]);
 
   useEffect(() => {
     if (errorFetch) {
@@ -127,17 +121,7 @@ const TimeTableMainSection = () => {
         academicYears={academicYears}
       />
 
-      {/* Button to create a new timetable */}
-      {(role !== "parent" && role !== "student") && (
-        <div className="flex justify-start mb-4 ml-5">
-          <button
-            onClick={handleCreateTimeTable}
-            className="px-4 py-2 rounded-md text-white bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700"
-          >
-            {t("+ Create TimeTable")}
-          </button>
-        </div>
-      )}
+      
 
       {/* Display filtered list of timetables */}
       <TimeTableList

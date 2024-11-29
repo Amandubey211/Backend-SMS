@@ -35,7 +35,7 @@ const sidebarData = [
   {
     title: "Time Table",
     icon: <ImTable2 style={{ width: '20px', height: '20px', color: 'gray' }}/>,
-    path: "/timetable",
+    path: "/parent_timetable",
   },
   {
     title: "Notice Board",
