@@ -2,19 +2,18 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import { handleError } from "../Common/Alerts/errorhandling.action";
 import { getAY } from "../../../Utils/academivYear";
 import { getData } from "../../../services/apiEndpoints";
+import { setShowError } from "../Common/Alerts/alertsSlice";
 
 // Fetch Teacher Timetable
 export const fetchTeacherTimetable = createAsyncThunk(
   "teacherTimetable/fetchTeacherTimetable",
-  async (filters = {}, { rejectWithValue, getState, dispatch }) => {
-    try {
-      const { userSchoolId } = getState().common.auth; // Fetch schoolId
-      const say = getAY(); // Get academic year
+  async (filters = {}, { rejectWithValue, dispatch }) => {
 
+    try {
+      const say = getAY(); // Get academic year
+      dispatch(setShowError(false));
       // Build API query
-      const response = await getData(`/api/teacher/timetable?say=${say}`, {
-        params: { userSchoolId, ...filters },
-      });
+      const response = await getData(`/api/teacher/timetable?say=${say}`, ...filters);
 
       return response?.data; // Return timetable data
     } catch (error) {

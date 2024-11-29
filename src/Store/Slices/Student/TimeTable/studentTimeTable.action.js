@@ -2,13 +2,16 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import { handleError } from "../../Common/Alerts/errorhandling.action";
 import { getData } from "../../../../services/apiEndpoints";
 import { getAY } from "../../../../Utils/academivYear";
+import { setShowError } from "../../Common/Alerts/alertsSlice";
 
 // Fetch Student Timetable
 export const fetchStudentTimetable = createAsyncThunk(
   "studentTimetable/fetchStudentTimetable",
   async (_, { rejectWithValue, dispatch }) => {
-    const say = getAY()
+
     try {
+      const say = getAY()
+      dispatch(setShowError(false));
       const response = await getData(
         `/student/timetable?say=${say}`
       );
