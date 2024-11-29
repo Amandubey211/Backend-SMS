@@ -62,6 +62,8 @@ export const parentLogout = createAsyncThunk(
     Cookies.remove('userToken');
     Cookies.remove('say');
     Cookies.remove('isAcademicYearActive');
+    Cookies.remove('schoolId');
+    Cookies.remove('SelectedschoolId');
     dispatch(resetState());
     return true;
   }

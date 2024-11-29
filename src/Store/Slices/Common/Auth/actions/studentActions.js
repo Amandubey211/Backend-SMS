@@ -79,6 +79,8 @@ export const studentLogout = createAsyncThunk(
     Cookies.remove('userToken');
     Cookies.remove('say');
     Cookies.remove('isAcademicYearActive');
+    Cookies.remove('schoolId');
+    Cookies.remove('SelectedschoolId');
     toast.success("Logged out successfully", {
       position: "bottom-left",
     });
