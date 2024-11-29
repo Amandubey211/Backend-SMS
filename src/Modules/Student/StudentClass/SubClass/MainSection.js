@@ -34,7 +34,7 @@ const MainSection = () => {
   );
 
   const { showError } = useSelector((store) => store?.common?.alertMsg);
-  console.log("cls=>>>>>>>>>>>>",classData)
+  // console.log("cls=>>>>>>>>>>>>",classData)
   const dispatch = useDispatch();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [modalData, setModalData] = useState(null);
@@ -88,7 +88,7 @@ const MainSection = () => {
   };
 
   // const handleSubjectClick = ({ subjectId, subjectName }) => {
-  //   console.log("Subject Clicked!")
+  //   // console.log("Subject Clicked!")
   //   dispatch(setSelectedSubject(subjectId));
   //   dispatch(setSelectedSubjectName(subjectName));
   // };
@@ -104,7 +104,7 @@ const MainSection = () => {
    
   }, [dispatch]);
 
-  console.log("std class data : ", classData);
+  // console.log("std class data : ", classData);
   return (
     <>
    

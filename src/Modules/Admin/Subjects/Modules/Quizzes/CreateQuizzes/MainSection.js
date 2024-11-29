@@ -322,12 +322,12 @@ const MainSection = ({ setIsEditing, isEditing }) => {
       // Include the allowedAttempts and allowNumberOfAttempts in the quizData
       quizData.allowedAttempts = allowedAttempts;
       quizData.allowNumberOfAttempts = allowNumberOfAttempts;
-      console.log("Saving quiz with ID:", quizId);
+      // console.log("Saving quiz with ID:", quizId);
       if (quizId) {
-        console.log("Updating existing quiz...");
+        // console.log("Updating existing quiz...");
         dispatch(updateQuizThunk({ quizId, quizData, navigate }));
       } else {
-        console.log("Creating new quiz...");
+        // console.log("Creating new quiz...");
         dispatch(createQuizThunk(quizData));
         setActiveTab("questions");
       }

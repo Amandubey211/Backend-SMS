@@ -16,7 +16,7 @@ export const fetchStudentTimetable = createAsyncThunk(
         `/student/timetable?say=${say}`
       );
 
-      console.log('API Response:', response);  // Log the response to verify structure
+      // console.log('API Response:', response);  // Log the response to verify structure
       return response; // Ensure response is in the expected format
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);

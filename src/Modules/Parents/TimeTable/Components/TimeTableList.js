@@ -13,7 +13,7 @@ import { useTranslation } from "react-i18next";
 
 const TimeTableList = React.memo(({ timetables, loading }) => {
   const { t } = useTranslation('admTimeTable');
-  console.log('timetable received', timetables);
+  // console.log('timetable received', timetables);
   const navigate = useNavigate();
 
   const role = useSelector((store) => store.common.auth.role);

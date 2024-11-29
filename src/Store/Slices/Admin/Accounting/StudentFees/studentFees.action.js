@@ -15,7 +15,7 @@ export const fetchFees = createAsyncThunk(
             const say = getAY();
             dispatch(setShowError(false));
             const response = await getData(`/admin/get_fees?say=${say}`);
-            console.log("response", response);
+            // console.log("response", response);
 
             return response?.data;
         } catch (error) {

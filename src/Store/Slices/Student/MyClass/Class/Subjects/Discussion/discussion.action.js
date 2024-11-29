@@ -24,7 +24,7 @@ export const fetchStudentDiscussion = createAsyncThunk(
         `/admin/getDiscussion/class/${cid}?say=${say}`
       );
       const data = response?.data;
-      console.log("response data---", data);
+      // console.log("response data---", data);
       return data;
     } catch (error) {
       handleError(error, dispatch, rejectWithValue);
@@ -80,7 +80,7 @@ export const fetchStudentDiscussionById = createAsyncThunk(
         `/admin/getDiscussionById/${did}?say=${say}`
       );
       const data = response?.data;
-      console.log("response data---", data);
+      // console.log("response data---", data);
       return data;
     } catch (error) {
       handleError(error, dispatch, rejectWithValue);
@@ -134,7 +134,7 @@ export const createStudentDiscussionReply = createAsyncThunk(
         { content: text, parentId: replyId }
       );
       const data = response?.data;
-      console.log("response data---", data);
+      // console.log("response data---", data);
       return data;
     } catch (error) {
       handleError(error, dispatch, rejectWithValue);
@@ -152,7 +152,7 @@ export const deleteStudentDiscussionComment = createAsyncThunk(
         `/admin/deleteCommentDiscussion/${commentId}?say=${say}`
       );
       const data = response?.data;
-      console.log("response data---", data);
+      // console.log("response data---", data);
       return data;
     } catch (error) {
       handleError(error, dispatch, rejectWithValue);
@@ -170,7 +170,7 @@ export const deleteStudentDiscussionReply = createAsyncThunk(
         `/admin/deleteCommentDiscussion/${replyId}?say=${say}`
       );
       const data = response?.data;
-      console.log("response data---", data);
+      // console.log("response data---", data);
       return data;
     } catch (error) {
       handleError(error, dispatch, rejectWithValue);
@@ -189,7 +189,7 @@ export const editStudentDiscussionComment = createAsyncThunk(
         { content: newText }
       );
       const data = response?.data;
-      console.log("response data---", data);
+      // console.log("response data---", data);
       return data;
     } catch (error) {
       handleError(error, dispatch, rejectWithValue);
@@ -208,7 +208,7 @@ export const editStudentDiscussionReply = createAsyncThunk(
         { content: newText }
       );
       const data = response?.data;
-      console.log("response data---", data);
+      // console.log("response data---", data);
       return data;
     } catch (error) {
       handleError(error, dispatch, rejectWithValue);
@@ -227,7 +227,7 @@ export const toggleLikeStudentDiscussion = createAsyncThunk(
         {}
       );
       const data = response?.data;
-      console.log("response data---", data);
+      // console.log("response data---", data);
       return data;
     } catch (error) {
       handleError(error, dispatch, rejectWithValue);

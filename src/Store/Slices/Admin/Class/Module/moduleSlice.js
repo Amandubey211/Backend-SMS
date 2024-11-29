@@ -35,7 +35,7 @@ const moduleSlice = createSlice({
       })
       .addCase(fetchModules.fulfilled, (state, action) => {
         state.moduleLoading = false;
-        console.log("I am checking subject------>", action.payload);
+        // console.log("I am checking subject------>", action.payload);
         state.modules = action.payload || [];
       })
       .addCase(fetchModules.rejected, (state, action) => {

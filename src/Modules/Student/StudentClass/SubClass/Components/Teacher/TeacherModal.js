@@ -4,7 +4,7 @@ import profileImage from "../../../../../../Assets/DashboardAssets/profileIcon.p
 import { MdOutlineCall} from "react-icons/md";
 import { GiBlackBook } from "react-icons/gi";
 const TeacherModal = ({ teacher }) => {
-  console.log('---',teacher);
+  // console.log('---',teacher);
   return (
     <div className="flex flex-col">
     <div className="flex flex-col justify-center items-center py-3">

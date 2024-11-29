@@ -12,7 +12,7 @@ export const fetchEarning = createAsyncThunk(
             dispatch(setShowError(false));
             const response = await getData(`/admin/getearning?say=${say}`);
             const data = response?.earnings;
-            console.log("data---", data);
+            // console.log("data---", data);
             return data;
 
         } catch (error) {
@@ -29,7 +29,7 @@ export const fetchTotalAmounts = createAsyncThunk(
             const say = getAY();
             dispatch(setShowError(false));
             const response = await getData(`/admin/total_amount?say=${say}`);
-            console.log("response", response);
+            // console.log("response", response);
 
             return response;
 
@@ -64,7 +64,7 @@ export const createEarning = createAsyncThunk(
             dispatch(setShowError(false));
             const response = await postData(`/admin/addEarning?say=${say}`, payload);
 
-            console.log("response of create", response);
+            // console.log("response of create", response);
             return response?.data;
 
         } catch (error) {
@@ -82,7 +82,7 @@ export const deleteEarning = createAsyncThunk(
             dispatch(setShowError(false));
             const response = await deleteData(`/admin/deleteEarning/${id}?say=${say}`);
 
-            //console.log("response of delete", response);
+            //// console.log("response of delete", response);
             return response?.data;
 
         } catch (error) {

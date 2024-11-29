@@ -45,7 +45,7 @@ const StudentFinance = ({ student }) => {
                 label={t("Total Unpaid Fees")}
                 value={feesDetails?.totalUnpaidFees}
                 buttonLabel={null}
-                onButtonClick={() => console.log("Message clicked")}
+                
               />
             </div>
             <FinanceCard
@@ -54,7 +54,7 @@ const StudentFinance = ({ student }) => {
               }
               label={t("Parents Account Total Paid")}
               value={feesDetails?.totalPaidFeesByParent || "0 QR"}
-              onButtonClick={() => console.log("Message clicked")}
+             
               buttonLabel={null}
             />
             <FinanceCard
@@ -64,7 +64,7 @@ const StudentFinance = ({ student }) => {
               label={t("Total Paid Fees")}
               value={feesDetails?.totalPaidFees}
               buttonLabel={null}
-              onButtonClick={() => console.log("Message clicked")}
+              
             />
           </div>
         </div>

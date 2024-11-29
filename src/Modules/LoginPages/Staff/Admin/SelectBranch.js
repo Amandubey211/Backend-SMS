@@ -34,7 +34,7 @@ const SelectBranch = () => {
     return Math.abs(hash);
   };
   const HandleBranch = () => {
-    console.log(selectedBranch);
+    // console.log(selectedBranch);
     const data = { schoolId: selectedBranch._id };
     dispatch(updateBranch({ navigate, data })).then(() => {
       setLocalCookies("SelectedschoolId", selectedBranch._id);

@@ -101,7 +101,7 @@ export const fetchModules = createAsyncThunk(
       const say = getAY();
       dispatch(setShowError(false));
       const data = await getData(`/admin/parent/classes/${presentClassId}/modules/${subjectId}/studentId/${studentId}?say=${say}`);
-     console.log("mmm------->>>",data)
+     // console.log("mmm------->>>",data)
       return data?.data?.modules;
     } catch (error) {
       handleError(error, dispatch, rejectWithValue);

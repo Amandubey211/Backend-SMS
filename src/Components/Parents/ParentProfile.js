@@ -26,7 +26,7 @@ const ParentProfile = () => {
 
   const updateProfile = () => {
     // Logic to update profile
-    console.log("Profile updated:");
+    // console.log("Profile updated:");
   };
 
 

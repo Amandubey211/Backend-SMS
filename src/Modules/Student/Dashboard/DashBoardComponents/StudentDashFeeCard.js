@@ -2,12 +2,7 @@ import React from "react";
 import { MdAccessTime } from "react-icons/md";
 
 const StudentDashFeeCard = ({ title, amount, unpaidFees, buttonText }) => {
-  console.log("Rendering StudentDashFeeCard with props:", {
-    title,
-    amount,
-    unpaidFees,
-    buttonText,
-  });
+  
 
   return (
     <div className="py-4 flex flex-1 flex-col justify-around items-center gap-5">

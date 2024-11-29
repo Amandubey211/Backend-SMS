@@ -49,7 +49,7 @@ const AddAccountant = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Accountant data to submit:", accountantData);
+    // console.log("Accountant data to submit:", accountantData);
     // Implement submission logic here
   };
 

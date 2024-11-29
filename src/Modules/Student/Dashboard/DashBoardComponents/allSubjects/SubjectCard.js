@@ -47,7 +47,7 @@ const SubjectCard = ({ subject,i}) => {
   const { name, startDate, modules,    completedModules, progress } = subject;
   const [bgColor,setBgColor] =useState('')
   useEffect(() => {
-    console.log(i);
+    // console.log(i);
   
     // Map of colors for each value from 1 to 6
     const colorMap = {

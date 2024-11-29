@@ -4,7 +4,7 @@ import ReactQuill from "react-quill";
 
 const Editor = ({ editorContent, onEditorChange, onSubmit }) => {
   const handleSubmit = () => {
-    console.log("Editor Content:", editorContent);
+    // console.log("Editor Content:", editorContent);
     onSubmit();
   };
 

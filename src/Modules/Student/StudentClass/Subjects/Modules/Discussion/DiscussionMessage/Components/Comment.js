@@ -99,7 +99,7 @@ const Comment = ({
   };
 
   const formattedDate = formatDate(comment?.createdAt);
-  console.log("comments-------", comment);
+  // console.log("comments-------", comment);
 
   return (
     <div className="bg-white p-2 mb-4 border rounded-lg shadow-md">

@@ -34,7 +34,7 @@ const AddGroup = ({ group, isUpdate, groupId, onClose }) => {
   }));
 
   const { studentsList } = useSelector((store) => store.admin.students);
-  console.log(studentsList, "allStudentsList");
+  // console.log(studentsList, "allStudentsList");
 
   // Preload data when editing a group
   useEffect(() => {

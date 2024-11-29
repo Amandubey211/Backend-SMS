@@ -30,7 +30,7 @@ const UserProfile = () => {
   };
 
   const updateProfile = () => {
-    console.log("Profile updated:");
+    // console.log("Profile updated:");
   };
 
   const updatePassword = () => {

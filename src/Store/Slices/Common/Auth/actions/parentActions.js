@@ -16,7 +16,7 @@ export const parentLogin = createAsyncThunk(
     { parentDetails, navigate },
     { rejectWithValue, dispatch, getState }
   ) => {
-    console.log("ddddd-========--------",getState())
+    // console.log("ddddd-========--------",getState())
     try {
       const data = await postData(`/auth/parent/login`, parentDetails);
 

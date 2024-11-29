@@ -13,7 +13,7 @@ export const fetchDashboardCards = createAsyncThunk(
       const say = getAY();
       dispatch(setShowError(false));
       const data = await getData(`/parent/api/dashboard/sections?say=${say}`);
-      console.log("API Response for Dashboard Cards:", data);
+      // console.log("API Response for Dashboard Cards:", data);
       return data;
     } catch (error) {
       handleError(error, dispatch, rejectWithValue);
@@ -30,7 +30,7 @@ export const fetchNotices = createAsyncThunk(
       dispatch(setShowError(false));
       const data = await getData(`/admin/all/notices?say=${say}`);
 
-      console.log("API Response for Notices:", data?.notices);
+      // console.log("API Response for Notices:", data?.notices);
       return data?.notices;
     } catch (error) {
       handleError(error, dispatch, rejectWithValue);

@@ -15,7 +15,7 @@ export const fetchAcademicYear = createAsyncThunk("user/AcademicYear", async (_,
     dispatch(setShowError(false));
     const say = getAY()
     const res = await getData(`/admin/getAllAcademicYear`);
-    console.log('resss',res);
+    // console.log('resss',res);
     if (res?.success) {
       const Ay = res?.data.find((i) => i._id == say);
       setSeletedAcademicYear(Ay)

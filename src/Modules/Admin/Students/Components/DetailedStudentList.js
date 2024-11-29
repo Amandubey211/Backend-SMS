@@ -67,7 +67,7 @@ const StudentInfo = React.memo(({ student, index, onSeeGradeClick }) => (
         className="px-3 py-1 text-green-500 font-semibold text-sm border border-green-500 rounded-lg"
         onClick={() => {
           onSeeGradeClick(student);
-          console.log(student);
+          // console.log(student);
         }}
         aria-label={`See Grade for ${student?.firstName} ${student?.lastName}`}
       >

@@ -31,9 +31,9 @@ export default function NotificationBar() {
     }
     getNotificationsFromIndexedDB()
       .then((notifications) => {
-        console.log("Retrieved notifications from IndexedDB:", notifications);
+        // console.log("Retrieved notifications from IndexedDB:", notifications);
         setNotiarray(notifications);
-        console.log("11", notifications);
+        // console.log("11", notifications);
         localStorage.setItem("NotificationCount", notifications?.length);
         // Display notifications in your UI
       })
@@ -76,7 +76,7 @@ export default function NotificationBar() {
         setNotiarray((prevNotiarray) =>
           prevNotiarray.filter((noti) => noti.id !== id)
         );
-        console.log(`Notification with id ${id} deleted`);
+        // console.log(`Notification with id ${id} deleted`);
         localStorage.setItem("NotificationCount", notiarray?.length);
       })
       .catch((error) => {

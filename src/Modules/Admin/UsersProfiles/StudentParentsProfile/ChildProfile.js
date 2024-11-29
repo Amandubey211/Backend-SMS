@@ -11,7 +11,7 @@ const ChildProfile = ({ children }) => {
     return <div>{t('No children data available')}</div>;
   }
 
-  console.log('Children data:', children);
+  // console.log('Children data:', children);
 
   return (
     <>

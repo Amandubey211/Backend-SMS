@@ -17,7 +17,7 @@ const {cid,sid} = useParams()
   const handleChange = (e) => {
     const { name, value } = e.target;
     if(name=='module'){
-      console.log(moduleList,value);
+      // console.log(moduleList,value);
       const module = moduleList?.filter((i)=>i?._id==value);      
       setChapters(module[0]?.chapters||[])
     }

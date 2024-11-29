@@ -13,7 +13,7 @@ export const fetchEventsThunk = createAsyncThunk(
       const say = getAY();
       dispatch(setShowError(false));
       const response = await getData(`/admin/all/events?say=${say}`);
-      console.log("response events--",response);
+      // console.log("response events--",response);
 
       return response?.events;
     } catch (error) {

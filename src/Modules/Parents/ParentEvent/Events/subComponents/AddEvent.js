@@ -48,7 +48,7 @@ const AddEvent = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Event data to submit:", eventData);
+    // console.log("Event data to submit:", eventData);
     // Implement submission logic here
   };
 

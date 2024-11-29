@@ -87,7 +87,7 @@ const AddChapter = ({ chapterData, isEditing, onClose }) => {
       onClose();
       // dispatch(fetchModules({ cid, sid }));
     } catch (error) {
-      console.log(error, "////////");
+      // console.log(error, "////////");
       toast.error(error);
     }
   };

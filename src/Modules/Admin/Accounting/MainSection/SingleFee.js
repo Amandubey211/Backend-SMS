@@ -48,7 +48,7 @@ const SingleFee = () => {
         dispatch(fetchSectionsByClass(findClass._id));
         dispatch(fetchStudentsByClassAndSection(findClass._id));
       } else {
-        console.log('Class not found');
+        // console.log('Class not found');
       }
     }
 

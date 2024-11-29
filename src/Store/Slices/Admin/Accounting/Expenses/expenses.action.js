@@ -130,7 +130,7 @@ export const createStaffSalary = createAsyncThunk(
             const response = postData(`/admin/staff/craete_salary?say=${say}`, body)
             const data = response?.data
             // toast.success("Create Salary successfully")
-            // console.log("salary data---", data);
+            // // console.log("salary data---", data);
             return data
         } catch (error) {
             return handleError(error, dispatch, rejectWithValue);

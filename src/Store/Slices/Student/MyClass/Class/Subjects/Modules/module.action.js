@@ -18,7 +18,7 @@ export const stdModule = createAsyncThunk(
         `/admin/student/classes/${cid}/modules/${sid}?say=${say}`
       );
       const data = res?.data;
-      console.log("std module action--->", data);
+      // console.log("std module action--->", data);
       return data;
     } catch (error) {
       handleError(error, dispatch, rejectWithValue);

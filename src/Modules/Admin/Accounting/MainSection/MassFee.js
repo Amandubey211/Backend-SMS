@@ -65,10 +65,10 @@ const MassFee = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Submitting Mass Fee:', formData);
+    // console.log('Submitting Mass Fee:', formData);
 
     const selectedStudents = studentsList?.map((item) => item._id);
-    console.log('selectedStudents', selectedStudents);
+    // console.log('selectedStudents', selectedStudents);
 
     const submissionData = {
       studentIds: selectedStudents,

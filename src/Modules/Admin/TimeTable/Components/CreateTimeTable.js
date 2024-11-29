@@ -106,7 +106,7 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => { } }) => {
 
   // Log the subjects to inspect their structure
   useEffect(() => {
-    console.log('Subjects:', subjects);
+    // console.log('Subjects:', subjects);
   }, [subjects]);
 
   // Handle cell value changes using row key
@@ -660,7 +660,7 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => { } }) => {
     }
 
     // Log the timetableData to inspect the payload
-    console.log('Timetable Data:', JSON.stringify(timetableData, null, 2));
+    // console.log('Timetable Data:', JSON.stringify(timetableData, null, 2));
 
     // Dispatch the action to create or update the timetable
     if (timetable._id) {

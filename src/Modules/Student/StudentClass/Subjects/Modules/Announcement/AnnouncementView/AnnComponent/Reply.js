@@ -58,7 +58,7 @@ const Reply = ({
     dispatch(fetchStudentAnnounceComments({ aid: announcement._id }))
     //deleteReply(commentId, reply.id);
   };
-  console.log("activeReplyId", activeReplyId);
+  // console.log("activeReplyId", activeReplyId);
 
 
   const handleReplyClick = () => {

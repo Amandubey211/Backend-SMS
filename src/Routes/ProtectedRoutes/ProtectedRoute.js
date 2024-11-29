@@ -6,7 +6,7 @@ import { getIsAYA } from "../../Utils/academivYear";
 const ProtectRoute = ({ Component, allowedRoles }) => {
   const isSignedIn = useSelector((store) => store.common.auth.isLoggedIn);
   const userRole = useSelector((store) => store.common.auth.role);
-  console.log(isSignedIn, userRole, "-------");
+  // console.log(isSignedIn, userRole, "-------");
   const isAcademicYearActive = getIsAYA();
 
   const location = useLocation();

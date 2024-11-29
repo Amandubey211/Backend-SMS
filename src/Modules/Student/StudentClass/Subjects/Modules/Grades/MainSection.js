@@ -33,7 +33,7 @@ const MainSection = () => {
   }
   useEffect(() => {
     getStudentGrades();
-    console.log(userDetails, classInfo);
+    // console.log(userDetails, classInfo);
 
   }, [dispatch])
 

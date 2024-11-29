@@ -1,7 +1,7 @@
 import { setErrorMsg, setShowError } from "./alertsSlice";
 
 export const ErrorMsg = (error) => {
-  console.log("----msg", error);
+  // console.log("----msg", error);
   if (error.response) {
     const statusCode = error.response.status;
     const msg = error.response.data?.message || error.response.data?.msg;

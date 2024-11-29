@@ -13,7 +13,7 @@ const Header = () => {
   const { discussion, isSidebarOpen } = useSelector((store) => store?.student?.studentDiscussion)
 
   //const [isSidebarOpen, setSidebarOpen] = useState(false);
-  console.log("disccussion", discussion)
+  // console.log("disccussion", discussion)
   const handleSidebarOpen = () => {
     //setSidebarOpen(true)
     dispatch(setSidebarOpen(true))
