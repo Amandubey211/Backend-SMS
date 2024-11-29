@@ -5,10 +5,6 @@ import { SlEyeglass } from "react-icons/sl";
 import { FcGraduationCap, FcCalendar } from "react-icons/fc";
 import { useDispatch, useSelector } from "react-redux";
 import { GoAlertFill } from "react-icons/go";
-import {
-  setSelectedSubject,
-  setSelectedSubjectName,
-} from "../../../../Redux/Slices/Common/CommonSlice";
 import Spinner from "../../../../Components/Common/Spinner";
 import NoDataFound from "../../../../Components/Common/NoDataFound";
 import { stdClass } from "../../../../Store/Slices/Student/MyClass/Class/class.action";
@@ -30,7 +26,7 @@ const colors = [
   "bg-pink-300",
 ];
 
-const getColor = (index) => colors[index % colors.length];
+const getColor = (index) => colors[index % colors?.length];
 
 const MainSection = () => {
   const { classData, loading, error } = useSelector(
@@ -38,7 +34,7 @@ const MainSection = () => {
   );
 
   const { showError } = useSelector((store) => store?.common?.alertMsg);
-  console.log("cls=>>>>>>>>>>>>",classData)
+  // console.log("cls=>>>>>>>>>>>>",classData)
   const dispatch = useDispatch();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [modalData, setModalData] = useState(null);
@@ -92,7 +88,7 @@ const MainSection = () => {
   };
 
   // const handleSubjectClick = ({ subjectId, subjectName }) => {
-  //   console.log("Subject Clicked!")
+  //   // console.log("Subject Clicked!")
   //   dispatch(setSelectedSubject(subjectId));
   //   dispatch(setSelectedSubjectName(subjectName));
   // };
@@ -108,7 +104,7 @@ const MainSection = () => {
    
   }, [dispatch]);
 
-  console.log("std class data : ", classData);
+  // console.log("std class data : ", classData);
   return (
     <>
    

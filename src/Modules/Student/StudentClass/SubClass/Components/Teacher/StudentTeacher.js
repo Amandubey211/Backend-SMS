@@ -38,7 +38,7 @@ const StudentTeacher = () => {
     setSelectedTeacher(teacher); 
     setIsSidebarOpen(true)
   };
-  console.log("selected teacher is", selectedTeacher)
+  // console.log("selected teacher is", selectedTeacher)
 
  
 
@@ -76,7 +76,7 @@ const StudentTeacher = () => {
             //   </div>
             // ) 
             : teacherData?.length > 0 ? (
-              teacherData.map((teacher, index) => (
+              teacherData?.map((teacher, index) => (
                 <ProfileCard key={index} profile={teacher} onClick={() => handleProfileClick(teacher)} />
               ))
             ) :(!loading && teacherData?.length === 0 ) && (

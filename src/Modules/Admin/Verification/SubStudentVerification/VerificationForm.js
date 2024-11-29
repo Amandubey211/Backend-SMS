@@ -20,10 +20,10 @@ const VerificationForm = ({ email, studentId }) => {
   );
 
   useEffect(() => {
-    if (!classList.length) {
+    if (!classList?.length) {
       dispatch(fetchAllClasses());
     }
-  }, [classList.length, dispatch]);
+  }, [classList?.length, dispatch]);
 
   const handleVerifyStudent = async (e) => {
     e.preventDefault();

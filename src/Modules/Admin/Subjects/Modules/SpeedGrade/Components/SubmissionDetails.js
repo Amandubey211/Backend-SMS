@@ -34,7 +34,7 @@ const SubmissionDetails = ({ details, student, initialGrade }) => {
   const { content, media } = details;
   const maxPoints = type === "Quiz" ? totalPoints : points;
 
-  const wordCount = content ? content.split(/\s+/).length : 0;
+  const wordCount = content ? content.split(/\s+/)?.length : 0;
   const today = new Date();
   const due = new Date(dueDate);
   const daysDifference = Math.ceil((due - today) / (1000 * 60 * 60 * 24));
@@ -46,7 +46,7 @@ const SubmissionDetails = ({ details, student, initialGrade }) => {
     ? "text-green-500 bg-green-100"
     : "text-red-500 bg-red-100";
 
-  const commentCount = comments ? comments.length : 0;
+  const commentCount = comments ? comments?.length : 0;
 
   useEffect(() => {
     setGrade(initialGrade);
@@ -124,7 +124,7 @@ const SubmissionDetails = ({ details, student, initialGrade }) => {
   };
 
   const renderFiles = () => {
-    if (!media || media.length === 0) {
+    if (!media || media?.length === 0) {
       return (
         <div className="flex flex-col items-center justify-center text-gray-500 mt-7">
           <FaFileAlt className="text-xl" aria-hidden="true" />
@@ -139,7 +139,7 @@ const SubmissionDetails = ({ details, student, initialGrade }) => {
           </h1>
 
           <ul className="space-y-2 text-sm">
-            {media.map((file, index) => (
+            {media?.map((file, index) => (
               <li
                 key={index}
                 className="flex items-center justify-between bg-white p-2 border rounded-md shadow-sm hover:shadow-md transition-shadow"

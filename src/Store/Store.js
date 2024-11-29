@@ -7,6 +7,7 @@ import authReducer from "./Slices/Common/Auth/reducers/authSlice"; // Importing 
 import userReducer from "./Slices/Common/User/reducers/userSlice"; // Importing the user slice reducer
 import alertReducer from "./Slices/Common/Alerts/alertsSlice";
 import academicYearReducer from "./Slices/Common/AcademicYear/academicYear.slice";
+import branchReducer from "./Slices/Admin/branchs/branch.slice";
 
 // admin
 import adminDashboardReducer from "./Slices/Admin/Dashboard/adminDashboardSlice";
@@ -14,7 +15,6 @@ import teacherReducer from "./Slices/Admin/Class/Teachers/teacherSlice";
 import classReducer from "./Slices/Admin/Class/reducer/classSlice"; // Importing the combined admin reducer
 import subjectReducer from "./Slices/Admin/Class/Subject/subjectSlice";
 import subjectGradesReducer from "./Slices/Admin/Class/grades/gradesSlice";
-import subjectAssignmentReducer from "./Slices/Admin/Class/Assignments/assignmentSlice";
 import subjectQuizReducer from "./Slices/Admin/Class/Quiz/quizSlice";
 import sectionReducer from "./Slices/Admin/Class/Section_Groups/groupSectionSlice";
 import graduateReducer from "./Slices/Admin/Graduate/graduateSlice";
@@ -37,13 +37,14 @@ import studentFeesReducer from "./Slices/Admin/Accounting/StudentFees/studentFee
 import expensesReducer from "./Slices/Admin/Accounting/Expenses/expensesSlice";
 import adminRubricReducer from "./Slices/Admin/Class/Rubric/rubricSlice";
 import adminDiscussionCommentsReducer from "./Slices/Admin/Class/Discussion/Comments/discussionCommentsSlice";
-import adminCommentReducer from "./Slices/Admin/Class/Comment/commentsSlice";
 import adminAnnouncementCommentsReducer from "./Slices/Admin/Class/Announcement/Comment/announcementCommentsSlice";
 import adminAssignmentReducer from "./Slices/Admin/Class/Assignment/assignmentSlice";
 import adminQuizReducer from "./Slices/Admin/Class/Quiz/quizSlice";
 import adminSpeedGradeReducer from "./Slices/Admin/Class/SpeedGrade/speedGradeSlice";
 import timetableReducer from "./Slices/Admin/TimeTable/timtableSlice";
 import adminClassIconsReducer from "./Slices/Admin/Class/reducer/iconSlice";
+
+
 // student
 import studentDashboardReducer from "./Slices/Student/Dashboard/studentDashboardSlices";
 import studentFinanceReducer from "./Slices/Student/Finance/financeSlice";
@@ -63,6 +64,8 @@ import studentSyllabusReducer from "../Store/Slices/Student/MyClass/Class/Subjec
 import studentPagesReducer from "../Store/Slices/Student/MyClass/Class/Subjects/Pages/pagesSlice";
 import studentDiscussionReducer from "../Store/Slices/Student/MyClass/Class/Subjects/Discussion/discussionSlice";
 import studentAnnounceReducer from "../Store/Slices/Student/MyClass/Class/Subjects/Announcement/announcementSlice";
+import studentTimeTableReducer from "../Store/Slices/Student/TimeTable/studentTimeTableSlice";
+
 // parent
 import dashboardReducer from "../Store/Slices/Parent/Dashboard/dashboardSlice";
 import financeReducer from "../Store/Slices/Parent/Finance/financeSlice";
@@ -70,6 +73,13 @@ import noticeReducer from "../Store/Slices/Parent/NoticeBoard/noticeSlice";
 import childrenReducer from "../Store/Slices/Parent/Children/childrenSlice";
 import libraryReducer from "../Store/Slices/Parent/Library/librarySlices";
 import eventReducer from "../Store/Slices/Parent/Events/eventSlice";
+import parentTimeTableReducer from "../Store/Slices/Parent/TimeTable/parentTimeTableSlice";
+
+// teacher
+import teacherTimeTableReducer from "../Store/Slices/Teacher/teacherTimeTableSlice";
+
+
+
 
 // Persist configuration for the Auth slice
 
@@ -108,13 +118,13 @@ const stdClassPersistConfig = {
   storage,
 };
 
-
 // Combine the Auth and User reducers under a Common entity
 const commonReducer = combineReducers({
   auth: persistReducer(authPersistConfig, authReducer),
   user: persistReducer(userPersistConfig, userReducer),
   alertMsg: alertReducer,
-  academicYear:academicYearReducer,
+  academicYear: academicYearReducer,
+  branchs: branchReducer,
 });
 
 const AdminReducer = combineReducers({
@@ -123,6 +133,7 @@ const AdminReducer = combineReducers({
   subject: subjectReducer,
   group_section: sectionReducer,
   teacher: teacherReducer,
+  teacherTimetable: teacherTimeTableReducer,
   students: classStudentReducer,
   attendance: attendanceReducer,
   verification: verificationReducer,
@@ -137,7 +148,6 @@ const AdminReducer = combineReducers({
   rubrics: adminRubricReducer,
   discussionComments: adminDiscussionCommentsReducer,
   announcementComments: adminAnnouncementCommentsReducer,
-  comments: adminCommentReducer,
   assignments: adminAssignmentReducer,
   quizzes: adminQuizReducer,
   timetable: timetableReducer,
@@ -152,7 +162,7 @@ const AdminReducer = combineReducers({
   student_fees: studentFeesReducer,
   expenses: expensesReducer,
   subject_grades: subjectGradesReducer,
-  subject_assignment: subjectAssignmentReducer,
+  // subject_assignment: subjectAssignmentReducer,
   subject_quiz: subjectQuizReducer,
 });
 
@@ -178,8 +188,11 @@ const studentReducer = combineReducers({
   studentPages: studentPagesReducer,
   studentDiscussion: studentDiscussionReducer,
   studentAnnounce: studentAnnounceReducer,
-  studentAssignment: studentAssignmentReducer,
+  studentTimetable: studentTimeTableReducer
 });
+
+
+
 
 const ParentReducer = combineReducers({
   dashboard: dashboardReducer,
@@ -188,6 +201,7 @@ const ParentReducer = combineReducers({
   notice: noticeReducer,
   library: libraryReducer,
   events: eventReducer,
+  parentTimetable: parentTimeTableReducer
 });
 
 // Create the store

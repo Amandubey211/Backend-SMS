@@ -20,7 +20,7 @@ const [loading,setLoading] =useState(false)
     active:true
   });
   useEffect(()=>{
-    console.log(data);
+    // console.log(data);
     
 setParentData({
     id:data?._id,

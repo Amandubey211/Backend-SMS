@@ -2,7 +2,7 @@ import React from "react";
 import profileImage from "../../../../../../Assets/DashboardAssets/profileIcon.png";
 
 const ClassmateModal = ({ classmate }) => {
-  const groups = classmate?.group?.split(",").map((group) => group.trim()) || [];
+  const groups = classmate?.group?.split(",")?.map((group) => group.trim()) || [];
 
   return (
   
@@ -29,8 +29,8 @@ const ClassmateModal = ({ classmate }) => {
           <div className="text-gray-600">
             <p className="font-semibold">Group(s):</p>
             <ul className="list-disc list-inside text-gray-700 flex items-start flex-col px-20">
-              {groups.length > 0 ? (
-                groups.map((group, index) => (
+              {groups?.length > 0 ? (
+                groups?.map((group, index) => (
                   <li key={index} className="font-medium">{group || "N/A"}</li>
                 ))
               ) : (

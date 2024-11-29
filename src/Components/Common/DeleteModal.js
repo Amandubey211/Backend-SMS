@@ -29,10 +29,10 @@ const DeleteModal = ({ isOpen, onClose, onConfirm, title }) => {
       focusableSelectors.join(", ")
     );
 
-    if (focusableElements.length === 0) return;
+    if (focusableElements?.length === 0) return;
 
     const firstElement = focusableElements[0];
-    const lastElement = focusableElements[focusableElements.length - 1];
+    const lastElement = focusableElements[focusableElements?.length - 1];
 
     const handleKeyDown = (e) => {
       if (e.key === "Tab") {

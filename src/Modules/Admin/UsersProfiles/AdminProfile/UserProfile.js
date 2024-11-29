@@ -10,7 +10,6 @@ import { FaEye } from "react-icons/fa";
 import { FaEyeSlash } from "react-icons/fa";
 import { updatePasswordThunk } from "../../../../Store/Slices/Common/User/actions/userActions";
 import { ImSpinner3 } from "react-icons/im";
-import { setUserDetails } from "../../../../Redux/Slices/Auth/AuthSlice";
 import { useTranslation } from "react-i18next";
 import { LuSchool } from "react-icons/lu";
 
@@ -31,7 +30,7 @@ const UserProfile = () => {
   };
 
   const updateProfile = () => {
-    console.log("Profile updated:");
+    // console.log("Profile updated:");
   };
 
   const updatePassword = () => {

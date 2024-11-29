@@ -1,134 +1,114 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
-import { baseUrl } from "../../../../../config/Common";
-import { setErrorMsg, setShowError } from "../../../Common/Alerts/alertsSlice";
-import { ErrorMsg } from "../../../Common/Alerts/errorhandling.action";
+import {
+  getData,
+  postData,
+  putData,
+  deleteData,
+} from "../../../../../services/apiEndpoints"; // Adjust the path as necessary
+import { setShowError } from "../../../Common/Alerts/alertsSlice";
+import toast from "react-hot-toast";
+import { handleError } from "../../../Common/Alerts/errorhandling.action";
+import { getAY } from "../../../../../Utils/academivYear";
 
-const say = localStorage.getItem("say");
-
-// Helper function to retrieve token and handle errors if token is missing
-const getToken = (state, rejectWithValue, dispatch) => {
-  const token = state.common.auth?.token;
-  if (!token) {
-    dispatch(setShowError(true));
-    dispatch(setErrorMsg("Authentication Failed"));
-    return rejectWithValue("Authentication Failed");
-  }
-  return `Bearer ${token}`;
-};
-
-// Centralized error handling
-const handleError = (error, dispatch, rejectWithValue) => {
-  const err = ErrorMsg(error);
-  dispatch(setShowError(true));
-  dispatch(setErrorMsg(err.message));
-  return rejectWithValue(err.message);
-};
-
-// Fetch all classes
 export const fetchAllClasses = createAsyncThunk(
   "class/fetchAllClasses",
-  async (_, { getState, rejectWithValue, dispatch }) => {
-    const token = getToken(getState(), rejectWithValue, dispatch);
-    if (typeof token === "object") return token;
-    const say = localStorage.getItem("say");
+  async (_, { rejectWithValue, dispatch }) => {
+    const say = getAY();
+    dispatch(setShowError(false));
+
     try {
-      const response = await axios.get(`${baseUrl}/admin/class?say=${say}`, {
-        headers: { Authentication: token },
-      });
-      return response.data.data;
+      const endpoint = `/admin/class`;
+      const params = { say };
+      const response = await getData(endpoint, params);
+      // console.log(response, "lk");
+      if (response && response.status) {
+        return response.data; // Assuming 'data' contains the list of classes
+      }
     } catch (error) {
+      // console.log(error);
       return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
 
-// Fetch class details
 export const fetchClassDetails = createAsyncThunk(
   "class/fetchClassDetails",
-  async (classId, { getState, rejectWithValue, dispatch }) => {
-    const token = getToken(getState(), rejectWithValue, dispatch);
-    if (typeof token === "object") return token;
-    const say = localStorage.getItem("say");
+  async (classId, { rejectWithValue, dispatch }) => {
+    const say = getAY();
+    dispatch(setShowError(false));
+
     try {
-      const response = await axios.get(
-        `${baseUrl}/admin/class/${classId}?say=${say}`,
-        {
-          headers: { Authentication: token },
-        }
-      );
-      return response.data?.data;
+      const endpoint = `/admin/class/${classId}`;
+      const params = { say };
+      const response = await getData(endpoint, params);
+
+      if (response && response.status) {
+        return response.data; // Assuming 'data' contains class details
+      }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
 
-// Create a new class
 export const createClass = createAsyncThunk(
   "class/createClass",
-  async (classData, { getState, rejectWithValue, dispatch }) => {
-    const token = getToken(getState(), rejectWithValue, dispatch);
-    if (typeof token === "object") return token;
-    const say = localStorage.getItem("say");
-    try {
-      const response = await axios.post(
-        `${baseUrl}/admin/class?say=${say}`,
-        classData,
-        {
-          headers: { Authentication: token },
-        }
-      );
-      dispatch(fetchAllClasses());
+  async (classData, { rejectWithValue, dispatch }) => {
+    const say = getAY();
+    dispatch(setShowError(false));
 
-      return response.data;
+    try {
+      const endpoint = `/admin/class`;
+      const params = { say };
+      const response = await postData(endpoint, classData, params);
+
+      if (response && response.success) {
+        toast.success("Class created successfully!");
+        dispatch(fetchAllClasses()); // Refresh the classes list
+        return response.data; // Assuming 'data' contains the created class
+      }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
 
-// Update an existing class
 export const updateClass = createAsyncThunk(
   "class/updateClass",
-  async ({ classData, classId }, { getState, rejectWithValue, dispatch }) => {
-    const token = getToken(getState(), rejectWithValue, dispatch);
-    if (typeof token === "object") return token;
-    const say = localStorage.getItem("say");
-    try {
-      const response = await axios.put(
-        `${baseUrl}/admin/update_class/${classId}?say=${say}`,
-        classData,
-        {
-          headers: { Authentication: token },
-        }
-      );
-      dispatch(fetchAllClasses());
+  async ({ classData, classId }, { rejectWithValue, dispatch }) => {
+    const say = getAY();
+    dispatch(setShowError(false));
 
-      return response.data;
+    try {
+      const endpoint = `/admin/update_class/${classId}?say=${say}`;
+      const response = await putData(endpoint, classData);
+
+      if (response && response.success) {
+        toast.success("Class updated successfully!");
+        dispatch(fetchAllClasses()); // Refresh the classes list
+        return response.data; // Assuming 'data' contains the updated class
+      }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
 
-// Delete a class
 export const deleteClass = createAsyncThunk(
   "class/deleteClass",
-  async (classId, { getState, rejectWithValue, dispatch }) => {
-    const token = getToken(getState(), rejectWithValue, dispatch);
-    if (typeof token === "object") return token;
-    const say = localStorage.getItem("say");
-    try {
-      await axios.delete(
-        `${baseUrl}/admin/delete_class/${classId}?say=${say}`,
-        {
-          headers: { Authentication: token },
-        }
-      );
-      dispatch(fetchAllClasses());
+  async (classId, { rejectWithValue, dispatch }) => {
+    const say = getAY();
+    dispatch(setShowError(false));
 
-      return classId;
+    try {
+      const endpoint = `/admin/delete_class/${classId}?say=${say}`;
+      const response = await deleteData(endpoint);
+
+      if (response && response.success) {
+        toast.success("Class deleted successfully!");
+        dispatch(fetchAllClasses()); // Refresh the classes list
+        return classId;
+      }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }

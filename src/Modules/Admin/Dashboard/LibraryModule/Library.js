@@ -59,13 +59,13 @@ const Library = () => {
           {t("View All")}
         </button>
       </div>
-      {latestBooks.length === 0 ? (
+      {latestBooks?.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-[200px]">
           <FaBook className="text-gray-400 text-6xl mb-4" />
           <p className="text-gray-500 text-xl">{t("No library data found")}</p>
         </div>
       ) : (
-        latestBooks.map((book) => (
+        latestBooks?.map((book) => (
           <BookItem
             key={book?._id}
             image={book?.image || "https://via.placeholder.com/50"}

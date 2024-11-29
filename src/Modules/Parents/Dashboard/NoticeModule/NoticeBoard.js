@@ -23,12 +23,12 @@ const NoticeBoard = ({ textTrimCount }) => {
   const { t } = useTranslation('prtNotices'); // Use i18n translation hook with namespace 'prtNotices'
 
   // Get the notices, loading, and error states from Redux
-  const { notices, loadingNotices, errorNotices } = useSelector((state) => state.Parent.dashboard);
+  const { notices, loadingNotices, errorNotices } = useSelector((state) => state?.Parent?.dashboard);
 
- 
+
   useEffect(() => {
-    if (!notices.length) {
-      dispatch(fetchNotices()); 
+    if (!notices?.length) {
+      dispatch(fetchNotices());
     }
   }, [dispatch]);
 
@@ -39,22 +39,22 @@ const NoticeBoard = ({ textTrimCount }) => {
 
   // Memoize the formatted notices to avoid recalculations on each render
   const formattedNotices = useMemo(() => {
-    return notices.map((notice) => {
+    return notices?.map((notice) => {
       let startDate = "Invalid Date", endDate = "Invalid Date";
 
-      if (notice.startDate) {
+      if (notice?.startDate) {
         try {
           startDate = format(new Date(notice.startDate), 'yyyy-MM-dd');
         } catch (e) {
-          console.error(`Invalid start date value for notice "${notice.title}":`, notice.startDate);
+          console.error(`Invalid start date value for notice "${notice?.title}":`, notice?.startDate);
         }
       }
 
-      if (notice.endDate) {
+      if (notice?.endDate) {
         try {
           endDate = format(new Date(notice.endDate), 'yyyy-MM-dd');
         } catch (e) {
-          console.error(`Invalid end date value for notice "${notice.title}":`, notice.endDate);
+          console.error(`Invalid end date value for notice "${notice?.title}":`, notice?.endDate);
         }
       }
 
@@ -72,14 +72,14 @@ const NoticeBoard = ({ textTrimCount }) => {
   // Memoize latest notices filtering and sorting
   const latestNotices = useMemo(() => {
     return formattedNotices
-      .filter((notice) => notice.startDate !== "Invalid Date")
-      .sort((a, b) => new Date(b.startDate) - new Date(a.startDate))
-      .slice(0,2);
+      ?.filter((notice) => notice?.startDate !== "Invalid Date")
+      ?.sort((a, b) => new Date(b?.startDate) - new Date(a?.startDate))
+      ?.slice(0, 2);
   }, [formattedNotices, numberOfNoticesToShow]);
 
   // Utility function to truncate text
   const truncateText = useCallback((text, maxLength) => {
-    return text && text.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
+    return text && text?.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
   }, []);
 
   // Loading state with spinner displayed at the center
@@ -140,22 +140,22 @@ const NoticeBoard = ({ textTrimCount }) => {
       {latestNotices?.map((notice, index) => (
         <Notice
           key={index}
-          image={notice.image || ""}
-          title={notice.title || t("Untitled")}
-          startDate={notice.startDate || "N/A"}
-          endDate={notice.endDate || "N/A"}
-          authorName = {notice?.authorName}
+          image={notice?.image || ""}
+          title={notice?.title || t("Untitled")}
+          startDate={notice?.startDate || "N/A"}
+          endDate={notice?.endDate || "N/A"}
+          authorName={notice?.authorName}
           priority={
             <span
-              className={notice.priority === "High priority"
+              className={notice?.priority === "High priority"
                 ? "bg-pink-200 text-pink-600 font-semibold px-2 py-1 rounded-md"
                 : "bg-gray-200 text-gray-600 font-semibold px-2 py-1 rounded-md"}
             >
-              {t(notice.priority === "High priority" ? "High Priority" : "Low Priority")}
+              {t(notice?.priority === "High priority" ? "High Priority" : "Low Priority")}
             </span>
           }
-          content={truncateText(notice.description || "", textTrimCount)}
-          backgroundColor={gradientBackgrounds[index % gradientBackgrounds.length]}
+          content={truncateText(notice?.description || "", textTrimCount)}
+          backgroundColor={gradientBackgrounds[index % gradientBackgrounds?.length]}
         />
       ))}
     </div>

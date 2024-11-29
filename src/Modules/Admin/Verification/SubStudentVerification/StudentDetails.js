@@ -14,7 +14,7 @@ const colors = [
   "bg-pink-300",
 ];
 
-const getColor = (index) => colors[index % colors.length];
+const getColor = (index) => colors[index % colors?.length];
 
 const StudentDetail = () => {
   const { t } = useTranslation('admVerification'); // Initialize useTranslation hook

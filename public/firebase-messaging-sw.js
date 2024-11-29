@@ -30,7 +30,7 @@ const openDB = () => {
 
   request.onsuccess = (event) => {
     db = event.target.result;
-    console.log('IndexedDB initialized successfully');
+    // console.log('IndexedDB initialized successfully');
   };
 
   request.onerror = (event) => {
@@ -45,7 +45,7 @@ const saveNotificationToIndexedDB = (notification) => {
     objectStore.add({ ...notification, timestamp: new Date().toISOString() });
 
     transaction.oncomplete = () => {
-      console.log('Notification saved to IndexedDB');
+      // console.log('Notification saved to IndexedDB');
     };
 
     transaction.onerror = (event) => {
@@ -60,7 +60,7 @@ openDB();
 messaging.onBackgroundMessage((payload) => {
  
   
-  console.log('[firebase-messaging-sw.js] Received background message', payload);
+  // console.log('[firebase-messaging-sw.js] Received background message', payload);
   // Customize notification here
   const notificationTitle = payload.notification.title || 'Background Message Title';
   const notificationOptions = {

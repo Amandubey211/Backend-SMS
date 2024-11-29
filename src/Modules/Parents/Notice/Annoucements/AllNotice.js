@@ -14,13 +14,13 @@ import { useTranslation } from "react-i18next"; // Import useTranslation
 const AllNotice = () => {
   const { t } = useTranslation('prtNotices'); // Initialize translation hook
   const dispatch = useDispatch();
-  
+
   // Accessing the notices, loading, and error from Redux state
   const { notices, loading, error } = useSelector((state) => state?.Parent?.notice || {});
-  
+
   const [searchTerm, setSearchTerm] = useState("");
   const [activeIndex, setActiveIndex] = useState(null);
-  
+
   // Custom hook for setting navigation heading
   useNavHeading(t("Child Notice Board"));
 
@@ -31,16 +31,16 @@ const AllNotice = () => {
 
   // Memoized array for background colors
   const backgroundColors = useMemo(() => [
-    'bg-blue-300', 
-    'bg-green-300', 
-    'bg-yellow-300', 
-    'bg-pink-300', 
+    'bg-blue-300',
+    'bg-green-300',
+    'bg-yellow-300',
+    'bg-pink-300',
     'bg-purple-300'
   ], []);
 
   // Memoized filtered notices based on search term
   const filteredNotices = useMemo(() => {
-    return notices.filter((notice) =>
+    return notices?.filter((notice) =>
       notice?.title?.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [notices, searchTerm]);
@@ -52,6 +52,7 @@ const AllNotice = () => {
 
   // Date formatting helper
   const formatDate = (isoDate) => {
+    if (!isoDate) return t("No Date");
     const date = new Date(isoDate);
     return date.toLocaleDateString('en-US', {
       year: 'numeric',
@@ -63,7 +64,7 @@ const AllNotice = () => {
   // Error message rendering for notices
   const renderErrorMessage = () => {
     const isNetworkError = error?.toLowerCase().includes("network error");
-  
+
     return (
       <div className="flex flex-col items-center justify-center mt-6">
         {isNetworkError ? (
@@ -84,7 +85,7 @@ const AllNotice = () => {
         <ParentDashLayout hideAvatarList={true}>
           <div className="p-4">
             <h1 className="mb-2 bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent font-semibold bg-clip-text">
-              {t("Child Notice Board")} 
+              {t("Child Notice Board")}
             </h1>
             <div className="flex p-[10px] justify-between">
               <div className="flex gap-4">
@@ -111,15 +112,15 @@ const AllNotice = () => {
                 </div>
               ) : error ? (
                 renderErrorMessage() // Error message with icon below search bar
-              ) : filteredNotices.length > 0 ? (
-                filteredNotices.map((notice, index) => (
-                  <div key={notice.id || index} className="border mb-4">
+              ) : filteredNotices?.length > 0 ? (
+                filteredNotices?.map((notice, index) => (
+                  <div key={notice?.id || index} className="border mb-4">
                     <div
                       className={`cursor-pointer p-2 flex flex-col bg-white`}
                       onClick={() => toggleAccordion(index)}
                     >
                       <div className="flex gap-6 px-3 py-2">
-                        <div className={`border ${backgroundColors[index % backgroundColors.length]} rounded-[10%] flex items-center justify-center`} style={{ height: '70px', width: '70px' }}>
+                        <div className={`border ${backgroundColors[index % backgroundColors?.length]} rounded-[10%] flex items-center justify-center`} style={{ height: '70px', width: '70px' }}>
                           <img
                             className="h-[80%] w-[80%] rounded-[10%]"
                             src={announcementIcon}
@@ -134,7 +135,7 @@ const AllNotice = () => {
                             <div className="flex flex-wrap justify-center items-center">
                               <img src={CalendarIcon} alt="calendar" style={{ width: '25px', height: '25px', marginRight: '5px' }} />
                               <span className="text-sm p-1 font-[400] text-[#7F7F7F]">
-                                {formatDate(notice?.startDate) || t("No Date")}
+                                {formatDate(notice?.startDate)}
                               </span>
                             </div>
                             <div

@@ -4,20 +4,23 @@ import { NavLink } from "react-router-dom";
 import { FaEye } from "react-icons/fa";
 import { PiEyeClosedFill } from "react-icons/pi";
 import toast from "react-hot-toast";
-import useQidVerification from "../../../../Hooks/AuthHooks/Student/useQIDVerify";
 import { LuLoader } from "react-icons/lu";
+import { qidVerification } from "../../../../Store/Slices/Common/Auth/actions/studentActions";
+import { useDispatch, useSelector } from "react-redux";
 
 const QIDLogin = () => {
   const [StudentID, setStudentID] = useState({
     Q_Id: "",
     addmissionNumber: "",
   });
-  const { loading, verify } = useQidVerification();
+  //const { loading, verify } = useQidVerification();
+  const  {loading} = useSelector((store)=>store.common.auth)
   const [showPassword, setShowPassword] = useState(false);
+  const dispatch = useDispatch()
   const HandleSubmit = (e) => {
     e.preventDefault();
     if (!StudentID) return toast.error("please add the required details");
-    verify(StudentID);
+    dispatch(qidVerification(StudentID));
   };
   return (
     <div className="relative h-screen bg-gray-100 w-full">

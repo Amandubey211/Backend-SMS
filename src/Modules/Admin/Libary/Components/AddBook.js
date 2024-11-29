@@ -54,7 +54,7 @@ const AddBook = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     const validationErrors = validateForm();
-    if (Object.keys(validationErrors).length > 0) {
+    if (Object.keys(validationErrors)?.length > 0) {
       setErrors(validationErrors);
       return;
     }
@@ -106,7 +106,7 @@ const AddBook = () => {
             id="class"
             label="Class"
             name="class"
-            options={classList.map((cls) => ({
+            options={classList?.map((cls) => ({
               value: cls._id,
               label: cls.className,
             }))}

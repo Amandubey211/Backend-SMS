@@ -127,7 +127,7 @@ const AddIssue = ({ onClose, editIssueData }) => {
             className="block w-full p-2 mt-1 border rounded focus:ring-indigo-500 focus:border-indigo-500"
           >
             <option value="">{t("Select Class")}</option>
-            {classList.map((cls) => (
+            {classList?.map((cls) => (
               <option key={cls._id} value={cls._id}>
                 {cls.className}
               </option>
@@ -150,7 +150,7 @@ const AddIssue = ({ onClose, editIssueData }) => {
             className="block w-full p-2 mt-1 border rounded focus:ring-indigo-500 focus:border-indigo-500"
           >
             <option value="">{t("Select Section")}</option>
-            {sectionList.map((section) => (
+            {sectionList?.map((section) => (
               <option key={section._id} value={section._id}>
                 {section.sectionName}
               </option>
@@ -175,7 +175,7 @@ const AddIssue = ({ onClose, editIssueData }) => {
             className="block w-full p-2 mt-1 border rounded focus:ring-indigo-500 focus:border-indigo-500"
           >
             <option value="">{t("Select Student")}</option>
-            {studentList.map((student) => (
+            {studentList?.map((student) => (
               <option key={student._id} value={student._id}>
                 {student.firstName} {student.lastName}
               </option>
@@ -198,7 +198,7 @@ const AddIssue = ({ onClose, editIssueData }) => {
             className="block w-full p-2 mt-1 border rounded focus:ring-indigo-500 focus:border-indigo-500"
           >
             <option value="">{t("Select Book")}</option>
-            {books.map((book) => (
+            {books?.map((book) => (
               <option key={book._id} value={book._id}>
                 {book.name}
               </option>

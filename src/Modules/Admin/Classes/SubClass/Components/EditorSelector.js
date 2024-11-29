@@ -1,16 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { FaChevronDown, FaTimes } from 'react-icons/fa';
 import { useSelector } from 'react-redux';
-import useGetAllTeachers from '../../../../../Hooks/AuthHooks/Staff/Admin/Teacher/useGetAllTeacher';
+
 
 const EditorSelector = ({ selectedUsers, setSelectedUsers, subject }) => {
   const [isDropdownOpen, setDropdownOpen] = useState(false);
-  const { fetchTeachers } = useGetAllTeachers();
-
-  useEffect(() => {
-  
-      fetchTeachers();
-  }, [ fetchTeachers]);
+ 
 
   const AllTeachers = useSelector((store) => store.Teachers.allTeachers);
 
@@ -42,7 +37,7 @@ const EditorSelector = ({ selectedUsers, setSelectedUsers, subject }) => {
         Who Can Edit
       </label>
       <div className="border border-gray-300 rounded-md p-2 flex flex-wrap">
-        {selectedUsers.map((user) => (
+        {selectedUsers?.map((user) => (
           <div
             key={user._id}
             className="bg-purple-100 text-purple-700 rounded-md px-2 py-1 m-1 flex items-center space-x-1 truncate"
@@ -64,7 +59,7 @@ const EditorSelector = ({ selectedUsers, setSelectedUsers, subject }) => {
       </div>
       {isDropdownOpen && (
         <div className="absolute mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg z-10">
-          {AllTeachers.map((teacher) => (
+          {AllTeachers?.map((teacher) => (
             <button
               key={teacher._id}
               onClick={() => handleUserSelect(teacher)}

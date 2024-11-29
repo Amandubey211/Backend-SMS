@@ -8,7 +8,6 @@ import Events from "./EventModule/Event";
 import BestPerformersChart from "./Graphs/BestPerformancGraph";
 import performanceData from "./DashboardData/PerformanceData";
 import NoticeBoard from "./NoticeModule/NoticeBoard";
-import useGetAdminDashboardData from "../../../Hooks/AuthHooks/Staff/Admin/Dashboard/useGetAdminDashboardData";
 import DashCard from "./Dashcard";
 
 // Import role-specific sections
@@ -58,7 +57,7 @@ const MainSection = () => {
 
   function capitalizeFirstLetter(string) {
     if (!string) return "";
-    return string.charAt(0).toUpperCase() + string.slice(1);
+    return string.charAt(0).toUpperCase() + string?.slice(1);
   }
 
   const cardData = [
@@ -111,7 +110,7 @@ const MainSection = () => {
   return (
     <div className="w-full overflow-x-hidden">
       <div className="flex flex-wrap justify-center gap-3 py-4">
-        {cardData.map((item, index) => (
+        {cardData?.map((item, index) => (
           <DashCard key={index} {...item} />
         ))}
       </div>

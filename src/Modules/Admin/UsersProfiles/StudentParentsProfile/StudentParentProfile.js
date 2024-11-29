@@ -17,7 +17,7 @@ import { useTranslation } from "react-i18next";
 const uniqueFilterOptions = (data, key) => {
   return [
     ...new Set(
-      data.flatMap((item) => item.children.map((child) => child[key]))
+      data?.flatMap((item) => item.children?.map((child) => child[key]))
     ),
   ].sort();
 };
@@ -60,8 +60,8 @@ const StudentParentProfile = () => {
     setSidebarOpen(true);
   };
 
-  const filteredParents = allParents.filter((parent) =>
-    parent.children.some(
+  const filteredParents = allParents?.filter((parent) =>
+    parent?.children?.some(
       (child) =>
         (filters.class === "" || child.class === filters.class) &&
         (filters.section === "" || child.section === filters.section)
@@ -130,7 +130,7 @@ const StudentParentProfile = () => {
                   </thead>
                   <tbody>
                     {filteredParents?.length > 0 ? (
-                      filteredParents.map((parent, index) => (
+                      filteredParents?.map((parent, index) => (
                         <tr key={index} className="text-left text-gray-700">
                           <td className="px-5 py-5 border-b border-gray-200 align-middle">
                             <div className="flex items-center">
@@ -165,7 +165,7 @@ const StudentParentProfile = () => {
                             >
                               <div className="flex bg-pink-100 p-2 border rounded-full w-[10rem] items-center overflow-hidden">
                                 <div className="flex -space-x-2">
-                                  {parent?.children?.slice(0, 1).map((child, idx) => (
+                                  {parent?.children?.slice(0, 1)?.map((child, idx) => (
                                     <img
                                       key={idx}
                                       src={child?.imageUrl || profileIcon}

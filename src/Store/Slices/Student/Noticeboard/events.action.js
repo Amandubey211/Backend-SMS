@@ -24,7 +24,7 @@ export const stdEvent = createAsyncThunk(
 
       return formattedEvents;
     } catch (error) {
-      console.log("Error in std Event", error);
+      // console.log("Error in std Event", error);
       handleError(error, dispatch, rejectWithValue);
     }
   }

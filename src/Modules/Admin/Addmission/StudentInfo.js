@@ -116,7 +116,7 @@ const StudentInfo = () => {
 
     setStudentInfo((prevState) => {
       const keys = name.split(".");
-      if (keys.length === 1) {
+      if (keys?.length === 1) {
         return { ...prevState, [name]: value };
       }
       const [parentKey, childKey] = keys;
@@ -141,7 +141,7 @@ const StudentInfo = () => {
 
   const handlePhotoChange = (e) => {
     const files = Array.from(e.target.files);
-    if (files.length + studentDocuments.documents.length > 3) {
+    if (files?.length + studentDocuments?.documents?.length > 3) {
       toast.error(t("You can upload a maximum of 3 documents."));
       return;
     }
@@ -190,11 +190,11 @@ const StudentInfo = () => {
       }
     }
 
-    if (Object.keys(validationErrors).length > 0) {
+    if (Object.keys(validationErrors)?.length > 0) {
       toast.error(t("Please correct the errors in the form."));
     }
 
-    return Object.keys(validationErrors).length === 0 && profile;
+    return Object.keys(validationErrors)?.length === 0 && profile;
   };
 
   const handleDocumentSubmit = async (e) => {
@@ -217,7 +217,7 @@ const StudentInfo = () => {
     try {
       const resultAction = await dispatch(registerStudentDetails(formData));
       if (registerStudentDetails.fulfilled.match(resultAction)) {
-        if (studentDocuments.documents.length) {
+        if (studentDocuments.documents?.length) {
           await dispatch(
             uploadStudentDocuments({
               email: studentInfo.email,

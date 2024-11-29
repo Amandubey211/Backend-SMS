@@ -23,7 +23,7 @@ const Statistics = () => {
   };
 
   // Map the stats data from Redux and combine it with the navData structure
-  const mappedData = navData.map((item) => {
+  const mappedData = navData?.map((item) => {
     const key = Object.keys(dataMapping).find(
       (key) => dataMapping[key] === item.label
     );
@@ -63,7 +63,7 @@ const Statistics = () => {
     <div className="grid grid-cols-1 gap-2 w-full">
       {" "}
       {/* Ensure the cards are displayed in a stable layout */}
-      {mappedData.map((item) => (
+      {mappedData?.map((item) => (
         <AttendanceNavCard
           key={item.label}
           label={item.label}

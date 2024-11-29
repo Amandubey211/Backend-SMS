@@ -5,7 +5,7 @@ import { HiOutlinePlus } from "react-icons/hi2";
 import { useTranslation } from "react-i18next";
 
 const RubricHeader = ({ onAddRubric }) => {
-  const { t } = useTranslation('admModule');
+  const { t } = useTranslation("admModule");
 
   return (
     <div className="flex justify-between items-center mb-4">

@@ -48,7 +48,7 @@ const FilterContainer = () => {
       <div className="flex flex-col w-2/3">
         <label className="text-gray-500 text-sm font-medium mb-2">{t(`Status`, gt.stdFinance)}</label>
         <div className="flex gap-5">
-          {["Everyone", "Paid", "Unpaid"].map((status) => (
+          {["Everyone", "Paid", "Unpaid"]?.map((status) => (
             <label key={status} className="flex items-center cursor-pointer">
               <input
                 type="radio"

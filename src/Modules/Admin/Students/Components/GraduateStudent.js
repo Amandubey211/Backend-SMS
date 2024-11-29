@@ -21,13 +21,13 @@
 //   const confirmGraduation = async () => {
 //     setConfirmLoading(true);
 //     try {
-//       console.log("Dispatching graduateStudents thunk...");
+//       // console.log("Dispatching graduateStudents thunk...");
 //       const response = await dispatch(
 //         graduateStudents({
 //           studentIds: [student._id],
 //         })
 //       ).unwrap(); // unwrap to handle any errors within async thunks
-//       console.log("Response:", response);
+//       // console.log("Response:", response);
 //       toast.success("Student graduated successfully");
 //       setIsModalOpen(false); // Close the modal after successful graduation
 //     } catch (error) {
@@ -120,13 +120,13 @@ const GraduateStudent = ({ student }) => {
     e.preventDefault();
     setConfirmLoading(true);
     try {
-      console.log("Dispatching graduateStudents thunk...");
+      // console.log("Dispatching graduateStudents thunk...");
       const response = await dispatch(
         graduateStudents({
           studentIds: [student._id],
         })
       ).unwrap(); // unwrap to handle any errors within async thunks
-      console.log("Response:", response);
+      // console.log("Response:", response);
       
     } catch (error) {
       console.error("Graduation failed:", error);

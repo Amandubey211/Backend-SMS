@@ -38,7 +38,7 @@ const BookIssue = () => {
 
       </div>
       <div className="flex gap-3 mb-5">
-        {["All", "Pending", "Return"].map((status) => (
+        {["All", "Pending", "Returned"]?.map((status) => (
           <div key={status} className="">
             <label className="flex items-center cursor-pointer">
               <input
@@ -87,7 +87,7 @@ const BookIssue = () => {
             </tr>
           </thead>
           {filteredBookIssueData?.length > 0 ?  <tbody>
-            {filteredBookIssueData?.reverse()?.map((item) => (
+            {[...filteredBookIssueData]?.reverse()?.map((item) => (
               <BookIssueRow key={item.id} item={item} />
 
             ))}

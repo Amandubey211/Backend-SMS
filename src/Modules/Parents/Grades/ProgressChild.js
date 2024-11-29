@@ -58,7 +58,7 @@ const ProgressChild = () => {
           <div className="flex justify-between items-center mb-5">
             <h1 className="text-md font-semibold">Business Entrepreneurship</h1>
           </div>
-          {dummyData.map((chapter, index) => (
+          {dummyData?.map((chapter, index) => (
             <Chapter
               key={index}
               title={chapter.title}
@@ -80,7 +80,7 @@ const ProgressChild = () => {
             </p>
           </div>
           <div className="grid grid-cols-1 gap-2">
-            {dummyModules.map((module, index) => (
+            {dummyModules?.map((module, index) => (
               <ModuleCard
                 key={index}
                 title={module.title}

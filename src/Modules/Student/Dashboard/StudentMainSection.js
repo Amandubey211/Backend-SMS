@@ -16,8 +16,10 @@ import {
   fetchSubjects,
   fetchTasks,
   fetchStudentGrades,
+  fetchExamResults
 } from "../../../Store/Slices/Student/Dashboard/studentDashboard.action.js";
 import { fetchStudentSubjectProgress } from "../../../Store/Slices/Admin/Users/Students/student.action.js";
+import ExamResults from "./DashboardData/ExamResults.js";
 
 const StudentMainSection = () => {
   const navigate = useNavigate();
@@ -33,6 +35,7 @@ const StudentMainSection = () => {
     subjectError,
     loading,
     tasks,
+    examResults: results
   } = useSelector((state) => state.student.studentDashboard);
   const { selectedClass, selectedSection } = useSelector(
     (state) => state?.common?.user?.classInfo
@@ -49,6 +52,7 @@ const StudentMainSection = () => {
     dispatch(fetchTasks());
     dispatch(fetchStudentGrades());
     dispatch(fetchTasks());
+    dispatch(fetchExamResults());
   }, [dispatch]);
 
   return (
@@ -91,7 +95,7 @@ const StudentMainSection = () => {
               url: "/",
             },
           ]
-        ).map((item, index) => (
+        )?.map((item, index) => (
           <DashCard key={index} {...item} />
         ))}
       </div>
@@ -128,7 +132,7 @@ const StudentMainSection = () => {
               ) : subjects?.length > 0 ? (
                 <div>
                   <p className="text-sm text-gray-500">
-                    A total of {subjects.length} Courses are in Progress
+                    A total of {subjects?.length} Courses are in Progress
                   </p>
                   <AllSubjects subjects={studentSubjectProgress} />
                 </div>
@@ -165,36 +169,44 @@ const StudentMainSection = () => {
           </div>
 
           {/* Recent Exam Results */}
-          <div className="flex items-center justify-center p-4 border-t border-gray-300">
-            <div className="w-full h-full">
-              <div className="flex justify-between items-center">
-                <h4 className="text-xl font-semibold text-gray-600">
-                  Recent Exam Results
-                </h4>
-                <button
-                  className="text-black border border-gray-300 px-4 py-2 rounded-md hover:shadow-md transition duration-300 ease-in-out"
-                  onClick={() => {
-                    if (selectedClass && selectedSection) {
-                      navigate(`/student_class/${selectedClass}/${selectedSection}/grades`);
-                    } else {
-                      console.error(
-                        "Unable to navigate to grades. Class or Section is missing."
-                      );
-                    }
-                  }}
-                >
-                  View All
-                </button>
-              </div>
-              <div className="text-gray-500 flex flex-col items-center mt-36">
-                <IoNewspaperOutline size={70} />
-                <span className="mt-4 text-lg font-semibold text-center">
-                  No Exam Results for Now
-                </span>
+       
+              
+              <div className="flex items-center justify-center p-4 border-t border-gray-300">
+                <div className="w-full h-full">
+                  <div className="flex justify-between items-center">
+                    <h4 className="text-xl font-semibold text-gray-600">
+                      Recent Exam Results
+                    </h4>
+                    <button
+                      className="text-black border border-gray-300 px-4 py-2 rounded-md hover:shadow-md transition duration-300 ease-in-out"
+                      onClick={() => {
+                        if (selectedClass && selectedSection) {
+                          navigate(`/student_class/${selectedClass}/${selectedSection}/grades`);
+                        } else {
+                          console.error(
+                            "Unable to navigate to grades. Class or Section is missing."
+                          );
+                        }
+                      }}
+                    >
+                      View All
+                    </button>
+                  </div>
+                  {/* Conditionally Render ExamResults or Placeholder */}
+                  {results?.length > 0 ? (
+                    <ExamResults/>
+                  ) : (
+                    <div className="text-gray-500 flex flex-col items-center mt-36">
+                      <IoNewspaperOutline size={70} />
+                      <span className="mt-4 text-lg font-semibold text-center">
+                        No Exam Results for Now
+                      </span>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-        </div>
+     
 
         {/* Right Column: Task Completion and Fees Section */}
         <div className="w-[40%] flex flex-col">

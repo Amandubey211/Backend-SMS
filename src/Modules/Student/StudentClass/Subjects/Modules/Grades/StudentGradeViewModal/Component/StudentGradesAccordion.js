@@ -6,7 +6,7 @@ const StudentGradesAccordion = ({ student }) => {
 
   return (
     <div>
-      {student.grades.map((grade, index) => (
+      {student.grades?.map((grade, index) => (
         <GradeAccordionItem key={index} grade={grade} />
       ))}
     </div>

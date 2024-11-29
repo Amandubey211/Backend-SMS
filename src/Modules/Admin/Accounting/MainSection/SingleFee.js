@@ -29,8 +29,8 @@ const SingleFee = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    if (classes && classes.length > 0) {
-      const formattedClassData = classes.map((item) => ({
+    if (classes && classes?.length > 0) {
+      const formattedClassData = classes?.map((item) => ({
         value: item.className,
         label: item.className,
       }));
@@ -48,7 +48,7 @@ const SingleFee = () => {
         dispatch(fetchSectionsByClass(findClass._id));
         dispatch(fetchStudentsByClassAndSection(findClass._id));
       } else {
-        console.log('Class not found');
+        // console.log('Class not found');
       }
     }
 
@@ -111,7 +111,7 @@ const SingleFee = () => {
   useEffect(() => {
     if (sectionsList) {
       setSectionData(
-        sectionsList.map((section) => ({
+        sectionsList?.map((section) => ({
           value: section.sectionName,
           label: section.sectionName,
           id: section._id,
@@ -121,7 +121,7 @@ const SingleFee = () => {
 
     if (studentsList) {
       setStudentData(
-        studentsList.map((student) => ({
+        studentsList?.map((student) => ({
           value: student._id,
           label: `${student.firstName} ${student.lastName} (ID: ${student.admissionNumber})`,
         }))

@@ -86,12 +86,12 @@ const SubjectCard = ({
         <div className="flex items-center mt-2 text-white">
           <span className="flex items-center mr-2 gap-1">
             <LuUser />
-            <span>{data.studentsIds ? data.studentsIds.length : 0}</span>
+            <span>{data.studentsIds ? data.studentsIds?.length : 0}</span>
           </span>
           <span className="border-r-2 border-white h-5 mr-2"></span>
           <span className="flex items-center gap-1">
             <BsBook />
-            <span>{t("Modules", { count: data.modules.length })}</span>
+            <span>{t("Modules", { count: data.modules?.length })}</span>
           </span>
         </div>
       </NavLink>
@@ -105,12 +105,19 @@ const SubjectCard = ({
         ) : (
           <CiUser className="w-10 h-10 bg-transparent text-white " />
         )}
-        <div className="ml-3 capitalize">
+        <div className="ml-3 capitalize z-10">
           <p className="text-white font-semibold">
             {data?.teacherId?.firstName && data?.teacherId?.lastName
               ? `${data.teacherId.firstName} ${data.teacherId.lastName}`
+                  ?.length > 15
+                ? `${data.teacherId.firstName} ${data.teacherId.lastName}`.substring(
+                    0,
+                    15
+                  ) + "..."
+                : `${data.teacherId.firstName} ${data.teacherId.lastName}`
               : t("No Instructor Assigned")}
           </p>
+
           <p className="text-white text-sm">
             {data?.teacherId?.role || t("Teacher")}
           </p>
@@ -118,9 +125,9 @@ const SubjectCard = ({
       </div>
 
       <img
-        src={data?.subjectIcon ? data?.subjectIcon: SubjectIcon}
+        src={data?.subjectIcon ? data?.subjectIcon : SubjectIcon}
         alt={t("Subject icon")}
-        className="absolute bottom-6 right-6 h-28 transition-transform duration-300 transform hover:scale-110"
+        className="absolute  bottom-6 right-6 h-20 w-20 transition-transform duration-300  transform hover:scale-110 object-contain"
       />
     </div>
   );

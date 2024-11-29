@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-// import useGetUserDetail from "../../Hooks/AuthHooks/Staff/useGetUserDetail";
 import FormInput from "../../Modules/Admin/Accounting/subClass/component/FormInput";
 import ImageUpload from "../../Modules/Admin/Addmission/Components/ImageUpload";
 
@@ -56,7 +55,7 @@ const EditParentProfile = ({ data }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Parent data to submit:", parentData);
+    // console.log("Parent data to submit:", parentData);
     // await editParentProfile(parentData);
     // userDetail(); // Refresh user details after updating profile
   };

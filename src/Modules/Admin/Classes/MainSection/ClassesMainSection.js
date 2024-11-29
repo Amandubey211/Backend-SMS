@@ -7,6 +7,7 @@ import AddNewClass from "./AddNewClass";
 import Spinner from "../../../../Components/Common/Spinner";
 import NoDataFound from "../../../../Components/Common/NoDataFound";
 import { fetchAllClasses } from "../../../../Store/Slices/Admin/Class/actions/classThunk";
+// import { FaSchool } from "react-icons/fa";
 
 const ClassesMainSection = () => {
   const { t } = useTranslation("admClass");
@@ -16,7 +17,8 @@ const ClassesMainSection = () => {
 
   const dispatch = useDispatch();
   const { classes, loading } = useSelector((store) => store.admin.class);
-  const role = useSelector((store) => store.common.auth.role);
+  const { role } = useSelector((store) => store.common.auth);
+  const { schoolName } = useSelector((store) => store.common.user.userDetails);
 
   // Handle the sidebar open for adding a new class (clear the form)
   const handleAddNewClass = () => {
@@ -48,10 +50,19 @@ const ClassesMainSection = () => {
 
       {/* For Admin: Add new class button */}
       {role === "admin" && (
-        <div className="flex justify-end">
+        <div className="flex justify-end items-center">
+          {/* <div className="flex items-center gap-4 p-1">
+            <div className="bg-gradient-to-r from-purple-300 to-pink-300 p-3 rounded-full">
+              <FaSchool className="text-white text-3xl" aria-hidden="true" />
+            </div>
+            <h1 className="text-gradient font-bold text-xl tracking-wide">
+              {schoolName}
+            </h1>
+          </div> */}
+
           <button
             onClick={handleAddNewClass} // Open for adding new class
-            className="px-4 py-2 rounded-md bg-gradient-to-r from-pink-100 to-purple-200"
+            className="px-4 py-2 rounded-md bg-gradient-to-r from-pink-100 to-purple-200 flex items-center gap-2"
             aria-label={t("Add New Class")}
           >
             <span className="text-gradient"> + {t("Add New Class")}</span>
@@ -61,7 +72,7 @@ const ClassesMainSection = () => {
 
       {loading ? (
         <Spinner />
-      ) : classes.length === 0 ? (
+      ) : classes?.length === 0 ? (
         <NoDataFound title={t("Classes")} />
       ) : (
         <div className="grid grid-cols-1 gap-4 mt-4 sm:grid-cols-2 lg:grid-cols-4">

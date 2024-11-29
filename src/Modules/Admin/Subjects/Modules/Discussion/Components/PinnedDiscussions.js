@@ -38,7 +38,7 @@ const PinnedDiscussions = ({ discussions, fetchClassDiscussions }) => {
         }`}
       >
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {discussions.map((discussion, index) => (
+          {discussions?.map((discussion, index) => (
             <DiscussionCard
               key={index}
               discussion={discussion}

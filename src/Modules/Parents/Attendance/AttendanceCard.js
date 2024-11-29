@@ -11,9 +11,9 @@ const AttendanceCard = ({ attendanceData }) => {
 
   useEffect(() => {
     if (attendanceData) {
-      const presentCount = attendanceData.filter(item => item.status === 'present').length;
-      const absentCount = attendanceData.filter(item => item.status === 'absent').length;
-      const leaveCount = attendanceData.filter(item => item.status === 'leave').length;
+      const presentCount = attendanceData.filter(item => item.status === 'present')?.length;
+      const absentCount = attendanceData.filter(item => item.status === 'absent')?.length;
+      const leaveCount = attendanceData.filter(item => item.status === 'leave')?.length;
 
       setSummary({ presentCount, absentCount, leaveCount });
     }
@@ -32,7 +32,7 @@ const AttendanceCard = ({ attendanceData }) => {
   return (
     <div className="flex flex-col items-center">
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 mt-10 justify-between">
-        {summaryData.map((item, index) => (
+        {summaryData?.map((item, index) => (
           <CardComponent key={index} data={item} />
         ))}
       </div>

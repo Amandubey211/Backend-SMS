@@ -45,7 +45,7 @@ const StudentProfile = ({ student }) => {
     "bg-pink-300",
   ];
 
-  const getColor = (index) => colors[index % colors.length];
+  const getColor = (index) => colors[index % colors?.length];
 
   return (
     <div className="bg-white h-full px-7 py-2">

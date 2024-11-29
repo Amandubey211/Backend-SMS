@@ -18,7 +18,7 @@ const AnnouncementReply = ({
   const [isLiked, setIsLiked] = useState(
     reply.likes.some((like) => like.userId === reply.createdBy)
   );
-  const [likesCount, setLikesCount] = useState(reply.likes.length);
+  const [likesCount, setLikesCount] = useState(reply.likes?.length);
   const [isEditing, setIsEditing] = useState(false);
   const [editedContent, setEditedContent] = useState(reply.content);
 

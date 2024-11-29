@@ -126,7 +126,7 @@ const DemoteClass = ({ student }) => {
           studentIds: [student._id],
         })
       ).unwrap(); // unwrap to handle any errors within async thunks
-      console.log("Student demoted successfully");
+      // console.log("Student demoted successfully");
     } catch (error) {
       console.error("Demotion failed:", error);
     } finally {

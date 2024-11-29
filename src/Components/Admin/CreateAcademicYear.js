@@ -5,6 +5,7 @@ import { LuLoader } from "react-icons/lu";
 import { useDispatch, useSelector } from "react-redux";
 import { createAcademicYear } from "../../Store/Slices/Common/Auth/actions/staffActions"; // Ensure correct path
 import Logo from "../Common/Logo";
+import { IoIosArrowRoundBack } from "react-icons/io";
 
 const CreateAcademicYear = () => {
   const [yearData, setYearData] = useState({
@@ -18,6 +19,9 @@ const CreateAcademicYear = () => {
   const navigate = useNavigate();
   const { loading } = useSelector((state) => state.common.auth); // Get loading state from Redux store
 
+  const handleBack = () => {
+    navigate(-1); // Navigate one step back in history
+  };
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!yearData.year || !yearData.startDate || !yearData.endDate) {
@@ -45,7 +49,17 @@ const CreateAcademicYear = () => {
       </div>
       <div className="flex justify-center items-center w-full h-full">
         <div className="bg-white border p-8 rounded-lg w-full max-w-md">
-          <h2 className="text-2xl font-semibold mb-6">Create Academic Year</h2>
+          <div className="flex items-center gap-2 mb-6">
+            <button
+              onClick={handleBack}
+              className="text-sm text-gray-500 hover:text-gray-700  items-center flex gap-2 focus:outline-none"
+            >
+              <div className="rounded-full border-2 text-xl w-6 h-6 flex justify-center items-center">
+                <IoIosArrowRoundBack />
+              </div>
+            </button>
+            <h2 className="text-2xl font-semibold">Create Academic Year</h2>
+          </div>
           <form onSubmit={handleSubmit}>
             <div className="mb-4">
               <label

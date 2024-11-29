@@ -2,48 +2,28 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { baseUrl } from "../../../../config/Common";
-import { ErrorMsg } from "../../Common/Alerts/errorhandling.action";
+import { ErrorMsg, handleError } from "../../Common/Alerts/errorhandling.action";
 import { setShowError, setErrorMsg } from "../../Common/Alerts/alertsSlice";
+import { getAY } from "../../../../Utils/academivYear"
+import { getData, postData, putData } from "../../../../services/apiEndpoints";
 
-const say = localStorage.getItem("say");
-
-// Helper function to get the token from the Redux state
-const getToken = (state, rejectWithValue, dispatch) => {
-  const token = state.common.auth?.token;
-  if (!token) {
-    dispatch(setShowError(true));
-    dispatch(setErrorMsg("Authentication Failed"));
-    return rejectWithValue("Authentication Failed");
-  }
-  return `Bearer ${token}`;
-};
-
-// Centralized error handling
-const handleError = (error, dispatch, rejectWithValue) => {
-  const err = ErrorMsg(error);
-  dispatch(setShowError(true));
-  dispatch(setErrorMsg(err.message));
-  return rejectWithValue(err.message);
-};
 
 // Fetch Unverified Students
 export const fetchUnverifiedStudents = createAsyncThunk(
   "verification/fetchUnverifiedStudents",
-  async (_, { rejectWithValue, getState, dispatch }) => {
-    const say = localStorage.getItem("say");
+  async (_, { rejectWithValue, dispatch }) => {
+
     try {
-      const token = getToken(getState(), rejectWithValue, dispatch);
-      const response = await axios.get(
-        `${baseUrl}/admin/get_unverified_student_details?say=${say}`,
-        {
-          headers: { Authentication: token },
-        }
+      const say = getAY();
+      dispatch(setShowError(false));
+      const response = await  getData(
+        `/admin/get_unverified_student_details?say=${say}`
       );
 
-      if (!response.data.students || response.data.students.length === 0) {
+      if (!response.students || response.students?.length === 0) {
         return rejectWithValue("No unverified students found.");
       }
-      return response.data.students;
+      return response.students;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
@@ -54,20 +34,17 @@ export const fetchUnverifiedStudents = createAsyncThunk(
 export const fetchRejectedStudents = createAsyncThunk(
   "verification/fetchRejectedStudents",
   async (_, { rejectWithValue, getState, dispatch }) => {
-    const say = localStorage.getItem("say");
+ 
     try {
-      const token = getToken(getState(), rejectWithValue, dispatch);
-      const response = await axios.get(
-        `${baseUrl}/admin/get_rejected_student_details?say=${say}`,
-        {
-          headers: { Authentication: token },
-        }
-      );
+      const say = getAY();
+      dispatch(setShowError(false));
+      const response = await getData(
+        `/admin/get_rejected_student_details?say=${say}`);
 
-      if (!response.data.students || response.data.students.length === 0) {
+      if (!response.students || response.students?.length === 0) {
         return rejectWithValue("No rejected students found.");
       }
-      return response.data.students;
+      return response.students;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
@@ -77,44 +54,42 @@ export const fetchRejectedStudents = createAsyncThunk(
 // Verify Student and Send Credentials
 export const verifyStudent = createAsyncThunk(
   "verification/verifyStudent",
-  async (verificationDetails, { rejectWithValue, getState, dispatch }) => {
-    const say = localStorage.getItem("say");
+  async (verificationDetails, { rejectWithValue,  dispatch }) => {
     try {
-      const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = getAY();
+      dispatch(setShowError(false));
 
       // Step 1: Verify Student
-      const verifyResponse = await axios.put(
-        `${baseUrl}/admin/verify_student_info?say=${say}`,
-        verificationDetails,
-        { headers: { Authentication: token } }
+      const verifyResponse = await putData(
+        `/admin/verify_student_info?say=${say}`,
+        verificationDetails
       );
 
-      if (!verifyResponse.data.success) {
+      if (!verifyResponse.success) {
         return rejectWithValue(
           verifyResponse.data.msg || "Failed to verify student"
         );
       }
-      toast.success(verifyResponse.data.msg || "Student verified successfully");
+      toast.success(verifyResponse.msg || "Student verified successfully");
 
       // Step 2: Assign Class to Student (if verified)
-      if (verificationDetails.isVerifiedDocuments === "verified") {
+      if (verificationDetails.isVerifiedDocuments == "verified") {
         const assignClassDetails = {
           studentId: verificationDetails.studentId,
           presentClassId: verificationDetails.presentClassId,
         };
 
-        const assignResponse = await axios.put(
-          `${baseUrl}/admin/assign_class?say=${say}`,
-          assignClassDetails,
-          { headers: { Authentication: token } }
+        const assignResponse = await putData(
+          `/admin/assign_class?say=${say}`,
+          assignClassDetails
         );
 
-        if (!assignResponse.data.success) {
+        if (!assignResponse.success) {
           return rejectWithValue(
             assignResponse.data.msg || "Failed to assign class"
           );
         }
-        toast.success(assignResponse.data.msg || "Class assigned successfully");
+        toast.success(assignResponse.msg || "Class assigned successfully");
         dispatch(fetchUnverifiedStudents());
       } else {
         dispatch(fetchRejectedStudents());
@@ -126,22 +101,21 @@ export const verifyStudent = createAsyncThunk(
         descriptionOnReject: verificationDetails?.rejectionReason,
       };
 
-      const sendCredentialsResponse = await axios.post(
-        `${baseUrl}/admin/send_login_credential?say=${say}`,
-        mailConfiguration,
-        { headers: { Authentication: token } }
+      const sendCredentialsResponse = await postData(
+        `/admin/send_login_credential?say=${say}`,
+        mailConfiguration
       );
 
-      if (!sendCredentialsResponse.data.success) {
+      if (!sendCredentialsResponse.success) {
         return rejectWithValue(
-          sendCredentialsResponse.data.msg || "Failed to send credentials"
+          sendCredentialsResponse.msg || "Failed to send credentials"
         );
       }
 
       toast.success(
-        sendCredentialsResponse.data.msg || "Credentials sent successfully"
+        sendCredentialsResponse.msg || "Credentials sent successfully"
       );
-      return verifyResponse.data.student;
+      return verifyResponse.student;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
@@ -152,15 +126,13 @@ export const verifyStudent = createAsyncThunk(
 export const assignClassToStudent = createAsyncThunk(
   "verification/assignClassToStudent",
   async (classDetails, { rejectWithValue, getState, dispatch }) => {
-    const say = localStorage.getItem("say");
+  
     try {
-      const token = getToken(getState(), rejectWithValue, dispatch);
-      const { data } = await axios.put(
-        `${baseUrl}/admin/assign_class?say=${say}`,
-        classDetails,
-        {
-          headers: { Authentication: token },
-        }
+      const say = getAY();
+      dispatch(setShowError(false));
+      const  data  = await putData(
+        `/admin/assign_class?say=${say}`,
+        classDetails
       );
       if (data.success) {
         return data;

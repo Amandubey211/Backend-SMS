@@ -38,8 +38,8 @@ const AttendanceTable = () => {
             </tr>
           </thead>
           <tbody>
-            {attendanceData.length > 0 ? (
-              attendanceData.map((student, index) => (
+            {attendanceData?.length > 0 ? (
+              attendanceData?.map((student, index) => (
                 <tr
                   key={student.studentId}
                   className="text-center border-b h-12"

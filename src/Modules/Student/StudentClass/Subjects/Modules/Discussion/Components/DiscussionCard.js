@@ -5,8 +5,6 @@ import { TbBookmark, TbBookmarkFilled } from "react-icons/tb";
 import { GoDiscussionClosed } from "react-icons/go";
 import { MdMarkEmailRead } from "react-icons/md";
 import { NavLink, useParams } from "react-router-dom";
-import useMarkAsRead from "../../../../../../../Hooks/AuthHooks/Student/Discussion/useMarkAsRead";
-import useUpdatePinStatus from "../../../../../../../Hooks/AuthHooks/Staff/Admin/Disscussion/useUpdatePinStatus";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchStudentDiscussion, markAsReadStudentDiscussion, updateStudentPinStatus } from "../../../../../../../Store/Slices/Student/MyClass/Class/Subjects/Discussion/discussion.action";
 import { setIsMenuOpen } from "../../../../../../../Store/Slices/Student/MyClass/Class/Subjects/Discussion/discussionSlice";
@@ -20,8 +18,8 @@ const DiscussionCard = ({ discussion }) => {
   const { sid, cid } = useParams();
 
   const lastReply =
-    discussion.replies.length > 0
-      ? discussion.replies[discussion.replies.length - 1]
+    discussion.replies?.length > 0
+      ? discussion.replies[discussion.replies?.length - 1]
       : null;
 
   const [isPinned, setIsPinned] = useState(discussion.isPinned);
@@ -140,7 +138,7 @@ const DiscussionCard = ({ discussion }) => {
         <div className="flex justify-center space-x-4">
           <div className="flex items-center space-x-1 border rounded-full px-4 py-1">
             <span className="font-semibold text-lg">
-              {discussion.replies.length}
+              {discussion.replies?.length}
             </span>
             <span className="text-sm text-gray-500">Replies</span>
           </div>

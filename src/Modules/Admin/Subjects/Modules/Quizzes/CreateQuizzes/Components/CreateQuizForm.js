@@ -63,7 +63,7 @@ const CreateQuizForm = ({
 
   useEffect(() => {
     // Fetch modules if not already present
-    if (!modules || modules.length === 0) {
+    if (!modules || modules?.length === 0) {
       dispatch(fetchModules({ cid, sid }));
     }
   }, [dispatch, modules]);
@@ -266,7 +266,7 @@ const CreateQuizForm = ({
             onChange={handleChange}
           >
             <option value="">{t("Select")}</option>
-            {modules.map((module) => (
+            {modules?.map((module) => (
               <option key={module._id} value={module._id}>
                 {module.moduleName}
               </option>
@@ -289,7 +289,7 @@ const CreateQuizForm = ({
             {moduleId ? (
               <>
                 <option value="">{t("Select")}</option>
-                {chapters.map((chapter) => (
+                {chapters?.map((chapter) => (
                   <option key={chapter._id} value={chapter._id}>
                     {chapter.name}
                   </option>

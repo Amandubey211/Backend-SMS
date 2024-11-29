@@ -36,8 +36,8 @@ const CommentSection = ({
 
   return (
     <div className="w-full h-full flex flex-col">
-      {comments.length > 0 ? (
-        comments.map((comment) => (
+      {comments?.length > 0 ? (
+        comments?.map((comment) => (
           <Comment
             key={comment._id}
             comment={comment}

@@ -8,7 +8,7 @@ import { useSelector } from "react-redux";
 const StudentClass = () => {
   const { classData } = useSelector((store) => store?.student?.studentClass);
 
-  const className = classData?.className;
+  const className = classData?.className || "Class";
   useNavHeading(` ${className}`);
 
   return (

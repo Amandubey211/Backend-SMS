@@ -9,6 +9,7 @@ import { useTranslation } from "react-i18next";
 import i18next from "i18next";
 import { gt } from "../../Utils/translator/translation";
 import { setSelectedLanguage } from "../../Store/Slices/Common/Auth/reducers/authSlice";
+import { BiSolidSchool } from "react-icons/bi";
 
 const SettingDropdown = ({
   showSetting,
@@ -36,7 +37,7 @@ const SettingDropdown = ({
   };
   // Language change handler
   const handleLanguageChange = (lang) => {
-    console.log("lang is", lang);
+    // console.log("lang is", lang);
     // Change the language using i18next
     i18next
       .changeLanguage(lang)
@@ -99,6 +100,20 @@ const SettingDropdown = ({
             <FaGraduationCap className="text-lg" />
             {t("Academic", gt.setting)}
           </NavLink>
+          { role == "admin" && 
+          <NavLink
+          to={"/dashboard/all/branch"}
+          className={({ isActive }) =>
+            `${listItemClass} ${
+              isActive ? "text-purple-600 bg-purple-100 " : ""
+            }`
+          }
+        >
+          <BiSolidSchool className="text-lg" />
+          {t("Branchs", gt.setting)}
+        </NavLink>
+          }
+          
        
 
         {/* Custom Language Switcher */}
@@ -120,7 +135,7 @@ const SettingDropdown = ({
                 { lang: "ar", label: "Arabic", flag: "🇶🇦" },
                 { lang: "en", label: "English", flag: "🇬🇧" },
                 { lang: "hi", label: "Hindi", flag: "🇮🇳" },
-              ].map(({ lang, label, flag }) => (
+              ]?.map(({ lang, label, flag }) => (
                 <div
                   key={lang}
                   className="flex items-center gap-2 px-3 py-2 hover:bg-gray-200 cursor-pointer"

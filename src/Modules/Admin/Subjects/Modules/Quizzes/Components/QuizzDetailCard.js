@@ -85,7 +85,7 @@ const QuizzDetailCard = () => {
       />
 
       <div className="ps-3 ">
-        {quizDetails.map((detail, index) => {
+        {quizDetails?.map((detail, index) => {
           if (detail.type === "quizz") {
             return (
               <AssignmentDetail

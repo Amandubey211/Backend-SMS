@@ -134,7 +134,7 @@ const AddNewSubject = ({ onClose, subject }) => {
 
   const colorGrid = useMemo(
     () =>
-      dummyColors.map((color, index) => (
+      dummyColors?.map((color, index) => (
         <button
           key={index}
           onClick={() => {console.log (color);setSelectedColor(color)}}

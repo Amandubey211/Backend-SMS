@@ -7,8 +7,8 @@ const StudentGradePieChart = () => {
   const { studentSubjectProgress } = useSelector((store) => store.admin.all_students);
 
   // Extract subject names and percentage values
-  const labels = studentSubjectProgress.map(subject => subject.subjectName);
-  const dataValues = studentSubjectProgress.map(subject => subject.percentageValue);
+  const labels = studentSubjectProgress?.map(subject => subject.subjectName);
+  const dataValues = studentSubjectProgress?.map(subject => subject.percentageValue);
 
   const colors = ["#FF6384", "#36A2EB", "#FFCE56", "#FF9F40", "#4BC0C0", "#9966FF"];
 
@@ -21,11 +21,11 @@ const StudentGradePieChart = () => {
       {
         data: dataValues,
         backgroundColor: allZero 
-          ? Array(dataValues.length).fill("gray") // Set all slices to gray if all data is 0
-          : dataValues.map(value => value === 0 ? "gray" : colors[dataValues.indexOf(value) % colors.length]), 
+          ? Array(dataValues?.length).fill("gray") // Set all slices to gray if all data is 0
+          : dataValues?.map(value => value === 0 ? "gray" : colors[dataValues.indexOf(value) % colors?.length]), 
         hoverBackgroundColor: allZero 
-          ? Array(dataValues.length).fill("gray") 
-          : dataValues.map(value => value === 0 ? "gray" : colors[dataValues.indexOf(value) % colors.length]),
+          ? Array(dataValues?.length).fill("gray") 
+          : dataValues?.map(value => value === 0 ? "gray" : colors[dataValues.indexOf(value) % colors?.length]),
         borderWidth: 5,
         borderRadius: 10,
         borderColor: "#ffffff",

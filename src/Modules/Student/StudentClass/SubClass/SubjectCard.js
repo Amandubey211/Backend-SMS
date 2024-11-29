@@ -21,11 +21,11 @@ const SubjectCard = ({
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  console.log("Subjects is : ", data);
+  // console.log("Subjects is : ", data);
   const percentage = currentProgress?.percentageValue;
-  console.log("subject progress", currentProgress);
+  // console.log("subject progress", currentProgress);
 
-  console.log("subject detail ::==>", data.subjectId);
+  // console.log("subject detail ::==>", data.subjectId);
 
   const handleSubjectClicked = () => {
     dispatch(

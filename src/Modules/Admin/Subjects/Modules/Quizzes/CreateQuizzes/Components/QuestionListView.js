@@ -27,7 +27,7 @@ const QuestionListView = ({
       />
 
       {/* Show a message and button if no questions exist */}
-      {questionState.length === 0 && (
+      {questionState?.length === 0 && (
         <div className="w-full h-80 flex justify-center items-center">
           <div>
             <button

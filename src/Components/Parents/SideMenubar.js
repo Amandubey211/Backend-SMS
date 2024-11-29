@@ -8,10 +8,10 @@ import { FiLogOut } from "react-icons/fi";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { useDispatch, useSelector } from "react-redux";
 import smallLogo from "../../Assets/SideBarAsset/smallLogo.png";
-import useParentLogout from '../../Hooks/AuthHooks/Parent/useParentLogout.js';
 import LogoutConfirmationModal from "../Common/LogoutConfirmationModal.js";
 import profileIcon from "../../Assets/DashboardAssets/profileIcon.png";
 import { toggleSidebar } from "../../Store/Slices/Common/User/reducers/userSlice.js";
+import { parentLogout } from "../../Store/Slices/Common/Auth/actions/parentActions.js";
 // import useGetUserDetail from "../../Hooks/AuthHooks/Staff/useGetUserDetail.js";
 
 // Updated function to handle more paths
@@ -33,7 +33,7 @@ const SideMenubar = () => {
   const { t } = useTranslation('prtSidebar'); // Translation hook, using the prtSidebar namespace
   const [openItems, setOpenItems] = useState([]);
   const dispatch = useDispatch();
-  const { parentLogout } = useParentLogout();
+
   // const { userDetail } = useGetUserDetail();
 
   // useEffect(() => {
@@ -66,7 +66,7 @@ const SideMenubar = () => {
   const confirmLogout = async () => {
     setIsLoggingOut(true);
     try {
-      await parentLogout();
+      await dispatch(parentLogout());
       setIsLogoutModalOpen(false);
     } finally {
       setIsLoggingOut(false);
@@ -97,7 +97,7 @@ const SideMenubar = () => {
         {isOpen && <h2 className="text-gray-500 mb-2 ml-4">{t("Menu")}</h2>} {/* Translated Menu Title */}
         <hr />
         <ul className="mt-1 space-y-2 flex-grow">
-          {sidebarData.map((item, index) => (
+          {sidebarData?.map((item, index) => (
             <React.Fragment key={index}>
               {item.items ? (
                 <div
@@ -156,7 +156,7 @@ const SideMenubar = () => {
               )}
               {openItems.includes(item.title) && item.items && (
                 <ul className="pl-2 space-y-2">
-                  {item.items.map((subItem, subIndex) => (
+                  {item?.items?.map((subItem, subIndex) => (
                     <NavLink
                       key={subIndex}
                       to={subItem.path}

@@ -1,102 +1,97 @@
-// iconThunk.js
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
-import { baseUrl } from "../../../../../config/Common";
+import {
+  getData,
+  postData,
+  putData,
+  deleteData,
+} from "../../../../../services/apiEndpoints"; // Adjust the path as necessary
+import { setShowError } from "../../../Common/Alerts/alertsSlice";
+import { handleError } from "../../../Common/Alerts/errorhandling.action";
 import toast from "react-hot-toast";
+import { getAY } from "../../../../../Utils/academivYear";
 
-// Fetch all icons
 export const fetchAllIcons = createAsyncThunk(
   "icons/fetchAllIcons",
-  async ({type}, { getState, rejectWithValue }) => {
-    const { common } = getState();
-    const token = common.auth.token;
+  async ({ type }, { rejectWithValue, dispatch }) => {
+    const say = getAY();
+    dispatch(setShowError(false));
 
     try {
-      const response = await axios.get(`${baseUrl}/icons/getAllIcons?type=${type}`, {
-        headers: { Authentication: `Bearer ${token}` },
-      });
-      return response.data.icons;
+      const endpoint = `/icons/getAllIcons`;
+      const params = { say, type };
+      const response = await getData(endpoint, { params });
+
+      if (response && response.success) {
+        return response.icons; // Assuming 'icons' contains the list of icons
+      } 
     } catch (error) {
-      const errorMessage =
-        error.response?.data?.message || "Failed to fetch icons";
-      console.error("Error fetching icons:", errorMessage);
-      return rejectWithValue(errorMessage);
+      return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
 
 export const createIcon = createAsyncThunk(
   "icons/createIcon",
-  async (formData, { getState, rejectWithValue }) => {
-    const { common } = getState();
-    const token = common.auth.token;
+  async (formData, { rejectWithValue, dispatch }) => {
+    const say = getAY();
+    dispatch(setShowError(false));
 
     try {
-      const response = await axios.post(
-        `${baseUrl}/icons/createIcon`,
-        formData,
-        {
-          headers: {
-            Authentication: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-      return response.data.data;
+      const endpoint = `/icons/createIcon`;
+      const params = { say };
+      const response = await postData(endpoint, formData, params);
+
+      if (response && response.success) {
+        toast.success("Icon created successfully!");
+        dispatch(fetchAllIcons({ type: formData.get("type") })); // Refresh the icons list based on type
+        return response.data; // Assuming 'data' contains the created icon
+      } 
     } catch (error) {
-      const errorMessage =
-        error.response?.data?.message || "Failed to create icon";
-      console.error("Error creating icon:", errorMessage);
-      return rejectWithValue(errorMessage);
+      return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
 
 export const updateIcon = createAsyncThunk(
   "icons/updateIcon",
-  async ({ iconData, iconId }, { getState, rejectWithValue }) => {
-    const { common } = getState();
-    const token = common.auth.token;
+  async ({ iconData, iconId }, { rejectWithValue, dispatch }) => {
+    const say = getAY();
+    dispatch(setShowError(false));
 
     try {
-      const response = await axios.put(
-        `${baseUrl}/icons/updateIcon/${iconId}`,
-        iconData,
-        {
-          headers: {
-            Authentication: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-      return response.data.icon;
+      const endpoint = `/icons/updateIcon/${iconId}`;
+      const params = { say };
+      const response = await putData(endpoint, iconData, { params });
+
+      if (response && response.success) {
+        toast.success("Icon updated successfully!");
+        dispatch(fetchAllIcons({ type: iconData.get("type") })); // Refresh the icons list based on type
+        return response.icon; // Assuming 'icon' contains the updated icon
+      }
     } catch (error) {
-      const errorMessage =
-        error.response?.data?.message || "Failed to update icon";
-      console.error("Error updating icon:", errorMessage);
-      return rejectWithValue(errorMessage);
+      return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
 
-// Delete an icon
 export const deleteIcon = createAsyncThunk(
   "icons/deleteIcon",
-  async (iconId, { getState, rejectWithValue }) => {
-    const { common } = getState();
-    const token = common.auth.token;
+  async ({ iconId, type }, { rejectWithValue, dispatch }) => {
+    const say = getAY();
+    dispatch(setShowError(false));
 
     try {
-      await axios.delete(`${baseUrl}/icons/deleteIcon/${iconId}`, {
-        headers: { Authentication: `Bearer ${token}` },
-      });
-      toast.success("Icon Deleted Successfully!");
-      return iconId;
+      const endpoint = `/icons/deleteIcon/${iconId}`;
+      const params = { say };
+      const response = await deleteData(endpoint, { params });
+
+      if (response && response.success) {
+        toast.success("Icon deleted successfully!");
+        dispatch(fetchAllIcons({ type })); // Refresh the icons list based on type
+        return iconId;
+      } 
     } catch (error) {
-      const errorMessage =
-        error.response?.data?.message || "Failed to delete icon";
-      console.error("Error deleting icon:", errorMessage);
-      return rejectWithValue(errorMessage);
+      return handleError(error, dispatch, rejectWithValue);
     }
   }
 );

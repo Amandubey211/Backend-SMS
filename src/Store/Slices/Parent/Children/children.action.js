@@ -11,13 +11,13 @@ import { getData } from "../../../../services/apiEndpoints";
 export const fetchChildren = createAsyncThunk(
   "dashboard/fetchChildren",
   async (_, { rejectWithValue, dispatch }) => {
-    const userData = JSON.parse(localStorage.getItem("userData"));
+    // const userData = JSON.parse(localStorage.getItem("userData"));
 
-    if (!userData || !userData.email) {
-      dispatch(setShowError(true));
-      dispatch(setErrorMsg("No guardian email found"));
-      return rejectWithValue("No guardian email found");
-    }
+    // if (!userData || !userData.email) {
+    //   dispatch(setShowError(true));
+    //   dispatch(setErrorMsg("No guardian email found"));
+    //   return rejectWithValue("No guardian email found");
+    // }
 
     try {
       const say = getAY();
@@ -51,13 +51,13 @@ export const fetchAttendance = createAsyncThunk(
 export const fetchTeachers = createAsyncThunk(
   "children/fetchTeachers",
   async (studentId, { rejectWithValue, dispatch }) => {
-    const userData = JSON.parse(localStorage.getItem("userData"));
+    // const userData = JSON.parse(localStorage.getItem("userData"));
 
-    if (!userData || !userData.email) {
-      dispatch(setShowError(true));
-      dispatch(setErrorMsg("No guardian email found"));
-      return rejectWithValue("No guardian email found");
-    }
+    // if (!userData || !userData.email) {
+    //   dispatch(setShowError(true));
+    //   dispatch(setErrorMsg("No guardian email found"));
+    //   return rejectWithValue("No guardian email found");
+    // }
 
     try {
       const say = getAY();
@@ -101,7 +101,7 @@ export const fetchModules = createAsyncThunk(
       const say = getAY();
       dispatch(setShowError(false));
       const data = await getData(`/admin/parent/classes/${presentClassId}/modules/${subjectId}/studentId/${studentId}?say=${say}`);
-     console.log("mmm------->>>",data)
+     // console.log("mmm------->>>",data)
       return data?.data?.modules;
     } catch (error) {
       handleError(error, dispatch, rejectWithValue);

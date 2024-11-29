@@ -5,7 +5,7 @@ import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 
 const EditRatingForm = ({ currentRating, onUpdateRating }) => {
-  const { t } = useTranslation('admModule');
+  const { t } = useTranslation("admModule");
   const [markType, setMarkType] = useState("");
   const [points, setPoints] = useState("");
   const [description, setDescription] = useState("");

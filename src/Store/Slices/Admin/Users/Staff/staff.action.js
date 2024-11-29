@@ -5,31 +5,10 @@ import { baseUrl } from "../../../../../config/Common";
 import { fetchAllTeachers } from "../../Class/Teachers/teacherThunks";
 import { setAllStaffs } from "./staffSlice";
 import { createStaffSalary } from "../../Accounting/Expenses/expenses.action";
-import { ErrorMsg } from "../../../Common/Alerts/errorhandling.action";
+import { ErrorMsg, handleError } from "../../../Common/Alerts/errorhandling.action";
 import { setShowError, setErrorMsg } from "../../../Common/Alerts/alertsSlice";
-
-const say = localStorage.getItem("say");
-
-// Helper function to get the token from the Redux state
-const getToken = (state, rejectWithValue, dispatch) => {
-  const token = state.common.auth?.token;
-  if (!token) {
-    dispatch(setShowError(true));
-    dispatch(setErrorMsg("Authentication Failed"));
-    return rejectWithValue("Authentication Failed");
-  }
-  return `Bearer ${token}`;
-};
-
-// Centralized error handling
-const handleError = (error, dispatch, rejectWithValue) => {
-  const err = ErrorMsg(error);
-  dispatch(setShowError(true));
-  dispatch(setErrorMsg(err.message));
-  return rejectWithValue(err.message);
-};
-
-
+import { customRequest, deleteData, getData, postData, putData } from "../../../../../services/apiEndpoints";
+import { getAY } from "../../../../../Utils/academivYear";
 
 
 // Fetch All Staff
@@ -37,12 +16,11 @@ export const fetchAllStaff = createAsyncThunk(
   "user/allStaff",
   async (_, { rejectWithValue, getState, dispatch }) => {
     try {
-      const token = getToken(getState(), rejectWithValue, dispatch);
-      const response = await axios.get(`${baseUrl}/admin/get_staffs?say=${say}`, {
-        headers: { Authentication: token },
-      });
-      dispatch(setAllStaffs(response.data));
-      return response.data;
+      const say = getAY();
+      dispatch(setShowError(false));
+      const response = await getData(`/admin/get_staffs?say=${say}`);
+      dispatch(setAllStaffs(response));
+      return response;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
@@ -54,21 +32,23 @@ export const addUser = createAsyncThunk(
   "user/addUser",
   async ({ userData, address }, { rejectWithValue, getState, dispatch }) => {
     try {
-      const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = getAY();
+      dispatch(setShowError(false));
       const formData = new FormData();
       Object.keys(userData).forEach((key) => formData.append(key, userData[key]));
       formData.append("address", JSON.stringify(address));
 
-      const response = await axios.post(`${baseUrl}/admin/staff_register?say=${say}`, formData, {
-        headers: { Authentication: token },
-      });
+      const response = await customRequest('post',`/admin/staff_register?say=${say}`, formData,   {
+        "Content-Type": "multipart/form-data",
+      }
+);
 
-      if (response.data.success) {
+      if (response.success) {
         toast.success("User added successfully");
 
         userData.role === 'teacher' ? dispatch(fetchAllTeachers()) : dispatch(fetchAllStaff());
       } else {
-        toast.error(response.data.message);
+        toast.error(response.message);
       }
 
         if(userData.role == 'teacher'){
@@ -77,7 +57,7 @@ export const addUser = createAsyncThunk(
           dispatch(fetchAllStaff())
         }
         dispatch(createStaffSalary({status:"unpaid",action:"pay now"}));
-        return response.data;
+        return response;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
@@ -90,23 +70,25 @@ export const editUser = createAsyncThunk(
   "user/editUser",
   async ({ userData, address, id }, { rejectWithValue, getState, dispatch }) => {
     try {
-      const token = getToken(getState(), rejectWithValue, dispatch);
+      const say = getAY();
+      dispatch(setShowError(false));
       const formData = new FormData();
       Object.keys(userData).forEach((key) => formData.append(key, userData[key]));
       formData.append("address", JSON.stringify(address));
 
-      const response = await axios.put(`${baseUrl}/admin/update_staff/${id}?say=${say}`, formData, {
-        headers: { Authentication: token },
-      });
+      const response = await customRequest('put',`/admin/update_staff/${id}?say=${say}`, formData,   {
+        "Content-Type": "multipart/form-data",
+      }
+);
 
-      if (response.data.success) {
+      if (response.success) {
         toast.success("User updated successfully");
         userData.role === 'teacher' ? dispatch(fetchAllTeachers()) : dispatch(fetchAllStaff());
       } else {
-        toast.error(response.data.message);
+        toast.error(response.message);
       }
 
-      return response.data;
+      return response;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
@@ -118,19 +100,18 @@ export const deactiveUser = createAsyncThunk(
   "user/deactiveUser",
   async (userData, { rejectWithValue, getState, dispatch }) => {
     try {
-      const token = getToken(getState(), rejectWithValue, dispatch);
-      const response = await axios.delete(`${baseUrl}/admin/delete_staff/${userData.id}?say=${say}`, {
-        headers: { Authentication: token },
-      });
+      dispatch(setShowError(false));
+      const say = getAY();
+      const response = await deleteData(`${baseUrl}/admin/delete_staff/${userData.id}?say=${say}`);
 
-      if (response.data.success) {
+      if (response.success) {
         toast.success("User deactivated successfully");
         userData.role === 'teacher' ? dispatch(fetchAllTeachers()) : dispatch(fetchAllStaff());
       } else {
-        toast.error(response.data.message || "User deactivation failed");
+        toast.error(response.message || "User deactivation failed");
       }
 
-      return response.data;
+      return response;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
@@ -144,19 +125,18 @@ export const activeUser = createAsyncThunk(
   "user/activeUser",
   async (userData, { rejectWithValue, getState, dispatch }) => {
     try {
-      const token = getToken(getState(), rejectWithValue, dispatch);
-      const response = await axios.put(`${baseUrl}/admin/update_active_status?say=${say}`, userData, {
-        headers: { Authentication: token },
-      });
+      dispatch(setShowError(false));
+      const say = getAY();
+      const response = await putData(`${baseUrl}/admin/update_active_status?say=${say}`, userData);
 
-      if (response.data.success) {
+      if (response.success) {
         toast.success("User activated successfully");
         userData.role === 'teacher' ? dispatch(fetchAllTeachers()) : dispatch(fetchAllStaff());
       } else {
-        toast.error(response.data.message || "User activation failed");
+        toast.error(response.message || "User activation failed");
       }
 
-      return response.data;
+      return response;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }

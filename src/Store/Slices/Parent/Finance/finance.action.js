@@ -6,7 +6,7 @@ import { ErrorMsg, handleError } from "../../Common/Alerts/errorhandling.action"
 import { getAY } from "../../../../Utils/academivYear";
 import { getData } from "../../../../services/apiEndpoints";
 
-const say = localStorage.getItem("say");
+
 
 // Fetch finance data for parent
 export const fetchParentFinanceData = createAsyncThunk(

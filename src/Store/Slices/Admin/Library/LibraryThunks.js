@@ -1,45 +1,31 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
-import { baseUrl } from "../../../../config/Common";
 import toast from "react-hot-toast";
 import { toggleSidebar } from "./LibrarySlice";
-import { ErrorMsg } from "../../Common/Alerts/errorhandling.action";
-import { setShowError, setErrorMsg } from "../../Common/Alerts/alertsSlice";
-
-const say = localStorage.getItem("say");
-
-// Helper function to get the token from Redux state
-const getToken = (state, rejectWithValue, dispatch) => {
-  const token = state.common.auth?.token;
-  if (!token) {
-    dispatch(setShowError(true));
-    dispatch(setErrorMsg("Authentication Failed"));
-    return rejectWithValue("Authentication Failed");
-  }
-  return `Bearer ${token}`;
-};
-
-// Centralized error handling
-const handleError = (error, dispatch, rejectWithValue) => {
-  const err = ErrorMsg(error);
-  dispatch(setShowError(true));
-  dispatch(setErrorMsg(err.message));
-  return rejectWithValue(err.message);
-};
+import {
+  ErrorMsg,
+  handleError,
+} from "../../Common/Alerts/errorhandling.action";
+import { setShowError } from "../../Common/Alerts/alertsSlice";
+import { getAY } from "../../../../Utils/academivYear";
+import {
+  getData,
+  postData,
+  putData,
+  deleteData,
+  customRequest,
+} from "../../../../services/apiEndpoints";
 
 // Fetch Books Thunk
 export const fetchBooksThunk = createAsyncThunk(
   "library/fetchBooks",
-  async (_, { rejectWithValue, getState, dispatch }) => {
+  async (_, { rejectWithValue, dispatch }) => {
     try {
-      const token = getToken(getState(), rejectWithValue, dispatch);
-      const say = localStorage.getItem("say")
-      const response = await axios.get(`${baseUrl}/admin/all/book?say=${say}`, {
-        headers: { Authentication: token },
-      });
-      return response.data.books;
+      const say = getAY(); // Replace localStorage.getItem("say") with getAY()
+      dispatch(setShowError(false)); // Reset error visibility
+      const response = await getData(`/admin/all/book?say=${say}`); // Use getData for API calls
+      return response?.books; // Safely access books using optional chaining
     } catch (error) {
-      return handleError(error, dispatch, rejectWithValue);
+      return handleError(error, dispatch, rejectWithValue); // Centralized error handling
     }
   }
 );
@@ -47,18 +33,29 @@ export const fetchBooksThunk = createAsyncThunk(
 // Add Book Thunk
 export const addBookThunk = createAsyncThunk(
   "library/addBook",
-  async (bookData, { rejectWithValue, getState, dispatch }) => {
+  async (formData, { rejectWithValue, dispatch }) => {
     try {
-      const token = getToken(getState(), rejectWithValue, dispatch);
-      const say = localStorage.getItem("say")
-      const response = await axios.post(`${baseUrl}/admin/add_book?say=${say}`, bookData, {
-        headers: { Authentication: token },
-      });
+      const say = getAY(); // Dynamically fetch the 'say' parameter
+      dispatch(setShowError(false));
+      // Use postData to send FormData
+      const response = await customRequest(
+        "post",
+        `/admin/add_book?say=${say}`,
+        formData,
+        // Additional headers for the request
+
+        {
+          "Content-Type": "multipart/form-data",
+        }
+      );
+
+      // Handle successful response
       toast.success("Book added successfully!");
       dispatch(toggleSidebar());
-      dispatch(fetchBooksThunk());
-      return response.data.book;
+      dispatch(fetchBooksThunk()); // Refresh the list of books
+      return response?.book; // Return the added book data safely
     } catch (error) {
+      // Centralized error handling
       return handleError(error, dispatch, rejectWithValue);
     }
   }
@@ -67,15 +64,13 @@ export const addBookThunk = createAsyncThunk(
 // Delete Book Thunk
 export const deleteBookThunk = createAsyncThunk(
   "library/deleteBook",
-  async (bookId, { rejectWithValue, getState, dispatch }) => {
+  async (bookId, { rejectWithValue, dispatch }) => {
     try {
-      const token = getToken(getState(), rejectWithValue, dispatch);
-      const say = localStorage.getItem("say")
-      await axios.delete(`${baseUrl}/admin/delete/book/${bookId}?say=${say}`, {
-        headers: { Authentication: token },
-      });
+      dispatch(setShowError(false));
+      const say = getAY(); // Replace localStorage.getItem("say") with getAY()
+      await deleteData(`/admin/delete/book/${bookId}?say=${say}`); // Use deleteData
       toast.success("Book deleted successfully!");
-      return bookId;
+      return bookId; // Return the deleted book ID
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
@@ -85,20 +80,20 @@ export const deleteBookThunk = createAsyncThunk(
 // Update Book Thunk
 export const updateBookThunk = createAsyncThunk(
   "library/updateBook",
-  async ({ bookId, formData }, { rejectWithValue, getState, dispatch }) => {
+  async ({ bookId, formData }, { rejectWithValue, dispatch }) => {
     try {
-      const token = getToken(getState(), rejectWithValue, dispatch);
-      const say = localStorage.getItem("say")
-      const response = await axios.put(
-        `${baseUrl}/admin/update/book/${bookId}?say=${say}`,
+      const say = getAY(); // Replace localStorage.getItem("say") with getAY()
+      dispatch(setShowError(false));
+      const response = await putData(
+        `/admin/update/book/${bookId}?say=${say}`,
         formData,
         {
-          headers: { Authentication: token },
+          "Content-Type": "multipart/form-data",
         }
       );
       toast.success("Book updated successfully!");
       dispatch(fetchBooksThunk());
-      return response.data.book;
+      return response?.book; // Safely access book using optional chaining
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
@@ -108,14 +103,12 @@ export const updateBookThunk = createAsyncThunk(
 // Fetch Book Issues Thunk
 export const fetchBookIssuesThunk = createAsyncThunk(
   "library/fetchBookIssues",
-  async (_, { rejectWithValue, getState, dispatch }) => {
+  async (_, { rejectWithValue, dispatch }) => {
     try {
-      const token = getToken(getState(), rejectWithValue, dispatch);
-      const say = localStorage.getItem("say")
-      const response = await axios.get(`${baseUrl}/admin/all/bookIssue?say=${say}`, {
-        headers: { Authentication: token },
-      });
-      return response.data.books;
+      const say = getAY(); // Replace localStorage.getItem("say") with getAY()
+      dispatch(setShowError(false)); // Reset error visibility
+      const response = await getData(`/admin/all/bookIssue?say=${say}`); // Use getData
+      return response?.books; // Safely access books using optional chaining
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
@@ -125,25 +118,16 @@ export const fetchBookIssuesThunk = createAsyncThunk(
 // Issue Book Thunk
 export const issueBookThunk = createAsyncThunk(
   "library/issueBook",
-  async (issueData, { rejectWithValue, getState, dispatch }) => {
+  async (issueData, { rejectWithValue, dispatch }) => {
     try {
-      const token = getToken(getState(), rejectWithValue, dispatch);
-      const say = localStorage.getItem("say")
+      const say = getAY(); // Replace localStorage.getItem("say") with getAY()
       const { id, ...bookIssueData } = issueData;
       const url = id
-        ? `${baseUrl}/admin/update/bookIssue/${id}?say=${say}`
-        : `${baseUrl}/admin/issue_book?say=${say}`;
+        ? `/admin/update/bookIssue/${id}?say=${say}`
+        : `/admin/issue_book?say=${say}`;
       const method = id ? "put" : "post";
 
-      const response = await axios({
-        url,
-        method,
-        data: bookIssueData,
-        headers: {
-          "Content-Type": "application/json",
-          Authentication: token,
-        },
-      });
+      const response = await customRequest(method, url, bookIssueData); // Use customRequest for dynamic methods
 
       dispatch(fetchBookIssuesThunk());
 
@@ -153,7 +137,7 @@ export const issueBookThunk = createAsyncThunk(
           : "Book issue created successfully!"
       );
 
-      return response.data.book;
+      return response?.book; // Safely access book using optional chaining
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }

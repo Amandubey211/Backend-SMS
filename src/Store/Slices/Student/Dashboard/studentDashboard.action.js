@@ -55,11 +55,9 @@ export const fetchDashboardDetails = createAsyncThunk(
       const data = await getData(
         `/api/studentDashboard/dashboard/student?say=${say}`
       );
-
-      console.log("dadaUJSHAIDSLKS----------------------->>>",data)
       const { attendanceSummary } = data?.data;
       // const { student } = await getState();
-      // console.log("std----?>>>>",student)
+      // // console.log("std----?>>>>",student)
       // const notices = student?.studentAnnouncement?.noticeData?.length || 0;
       return {
         cardData: formatDashboardData(data?.data),
@@ -92,7 +90,7 @@ export const fetchSubjects = createAsyncThunk(
       const say = getAY();
       dispatch(setShowError(false));
       const data =  await getData(`/api/studentDashboard/subjects/${userId}?say=${say}`);
-      console.log("escsasa->",data)
+      // console.log("escsasa->",data)
       return data?.subjects;
     } catch (error) {
       handleError(error, dispatch, rejectWithValue);
@@ -129,12 +127,14 @@ export const fetchTasks = createAsyncThunk(
 // Fetch Student Grades 
 export const fetchStudentGrades = createAsyncThunk(
   "studentDashboard/fetchStudentGrades",
-  async (_, { rejectWithValue, dispatch }) => {
-    const persistUserString = localStorage.getItem("persist:user");
-    const persistUserObject = JSON.parse(persistUserString);
-    const userDetails = JSON.parse(persistUserObject?.userDetails);
-    const userId = userDetails?.userId;
-    const classId = localStorage.getItem("classId");
+  async (_, { rejectWithValue, dispatch ,getState}) => {
+    // const persistUserString = localStorage.getItem("persist:user");
+    // const persistUserObject = JSON.parse(persistUserString);
+    // const userDetails = JSON.parse(persistUserObject?.userDetails);
+    // const userId = userDetails?.userId;
+    const {userDetails} = getState((store) => store.common.user);
+      const classId = userDetails?.classId;
+      const userId = userDetails?.userId;
     
     if (!userId || !classId) {
       dispatch(setShowError(true));
@@ -154,3 +154,34 @@ export const fetchStudentGrades = createAsyncThunk(
   }
 );
 
+export const fetchExamResults = createAsyncThunk(
+  "studentDashboard/fetchExamResults",
+  async (_, { rejectWithValue, dispatch }) => {
+    try {
+      // Retrieve required parameters from localStorage or other sources
+      const persistUserString = localStorage.getItem("persist:user");
+      const persistUserObject = JSON.parse(persistUserString);
+      const userDetails = JSON.parse(persistUserObject?.userDetails);
+
+      const studentId = userDetails?.userId;
+      const schoolId = userDetails?.schoolId;
+      const say = getAY(); // Selected Academic Year
+
+      if (!studentId || !schoolId || !say) {
+        dispatch(setShowError(true));
+        dispatch(setErrorMsg("Missing required parameters for fetching exam results."));
+        return rejectWithValue("Invalid studentId, schoolId, or academic year.");
+      }
+
+      // Construct the API endpoint with query parameters
+      const apiEndpoint = `/api/studentDashboard/getQuizResult?say=${say}&studentId=${studentId}&schoolId=${schoolId}`;
+      
+      // Fetch data from the API
+      const data = await getData(apiEndpoint);
+      return data?.data; // Assuming the response contains a "data" field
+    } catch (error) {
+      console.error("Error fetching exam results:", error);
+      handleError(error, dispatch, rejectWithValue);
+    }
+  }
+);

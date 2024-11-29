@@ -3,7 +3,10 @@ import { useLocation, NavLink, useNavigate } from "react-router-dom";
 import StudentDiwanLogo from "../../Assets/HomeAssets/StudentDiwanLogo.png";
 import smallLogo from "../../Assets/SideBarAsset/smallLogo.png";
 import sidebarData from "./DataFile/sidebarData.js";
-import { MdOutlineKeyboardArrowUp, MdOutlineKeyboardArrowDown } from "react-icons/md";
+import {
+  MdOutlineKeyboardArrowUp,
+  MdOutlineKeyboardArrowDown,
+} from "react-icons/md";
 import { FiLogOut } from "react-icons/fi";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { useDispatch, useSelector } from "react-redux";
@@ -19,13 +22,11 @@ const SideMenubar = () => {
   const dispatch = useDispatch();
   const location = useLocation();
   const navigate = useNavigate();
-  const { t } = useTranslation('admSidebar');
+  const { t } = useTranslation("admSidebar");
 
-  const { isOpen, role, userDetails } = useSelector((state) => ({
-    isOpen: state.common.user.sidebar.isOpen,
-    role: state.common.auth.role,
-    userDetails: state.common.user.userDetails,
-  }));
+  const isOpen = useSelector((state) => state.common.user.sidebar.isOpen);
+  const role = useSelector((state) => state.common.auth.role);
+  const userDetails = useSelector((state) => state.common.user.userDetails);
 
   const [openItems, setOpenItems] = useState([]);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -67,11 +68,15 @@ const SideMenubar = () => {
     ) {
       navigate("/users/my/profile");
     } else {
-      console.warn("Role not recognized. Navigation not defined for this role.");
+      console.warn(
+        "Role not recognized. Navigation not defined for this role."
+      );
     }
   };
 
-  const filteredSidebarData = sidebarData.filter((item) => item.roles.includes(role));
+  const filteredSidebarData = sidebarData.filter((item) =>
+    item.roles.includes(role)
+  );
 
   return (
     <nav
@@ -85,7 +90,9 @@ const SideMenubar = () => {
           <img
             src={isOpen ? StudentDiwanLogo : smallLogo}
             alt="Logo"
-            className={`transition-width duration-300 ${isOpen ? "w-36 pt-1" : "h-12"}`}
+            className={`transition-width duration-300 ${
+              isOpen ? "w-36 pt-1" : "h-12"
+            }`}
           />
         </NavLink>
         <button
@@ -105,14 +112,16 @@ const SideMenubar = () => {
       <div className="flex-grow overflow-y-auto no-scrollbar">
         {isOpen && <h2 className="text-gray-500 my-1">{t("MENU")}</h2>}
         <ul className={`space-y-1 ${!isOpen && "mt-3"}`}>
-          {filteredSidebarData.map((item, index) => (
+          {filteredSidebarData?.map((item, index) => (
             <React.Fragment key={index}>
               {item.items ? (
                 <div
                   className={`flex items-center w-full p-2 rounded-lg cursor-pointer ${
                     isActivePath(item.path, location.pathname) ||
                     (item.items &&
-                      item.items.some((subItem) => isActivePath(subItem.path, location.pathname)))
+                      item.items.some((subItem) =>
+                        isActivePath(subItem.path, location.pathname)
+                      ))
                       ? "bg-purple-100 text-purple-500"
                       : "text-gray-700 hover:bg-gray-100"
                   } ${isOpen ? "justify-between" : "justify-center "}`}
@@ -123,9 +132,14 @@ const SideMenubar = () => {
                   tabIndex="0"
                 >
                   <div className="flex justify-center items-center">
-                    <span className={`${!isOpen && "text-xl"}`}>{item.icon}</span>
+                    <span className={`${!isOpen && "text-xl"}`}>
+                      {item.icon}
+                    </span>
                     {isOpen && (
-                      <span role="presentation" className="ml-3 flex items-center">
+                      <span
+                        role="presentation"
+                        className="ml-3 flex items-center"
+                      >
                         {t(item.title)}
                       </span>
                     )}
@@ -167,18 +181,21 @@ const SideMenubar = () => {
               )}
               {(openItems.includes(item.title) ||
                 (item.items &&
-                  item.items.some((subItem) => isActivePath(subItem.path, location.pathname)))) &&
+                  item.items.some((subItem) =>
+                    isActivePath(subItem.path, location.pathname)
+                  ))) &&
                 item.items && (
                   <ul id={`submenu-${index}`} className="pl-2 space-y-2">
                     {item.items
                       .filter((subItem) => subItem.roles.includes(role))
-                      .map((subItem, subIndex) => (
+                      ?.map((subItem, subIndex) => (
                         <NavLink
                           key={subIndex}
                           to={subItem.path}
                           className={({ isActive }) =>
                             `flex items-center p-2 rounded-lg ${
-                              isActive || isActivePath(subItem.path, location.pathname)
+                              isActive ||
+                              isActivePath(subItem.path, location.pathname)
                                 ? "text-purple-500 bg-purple-100"
                                 : "text-gray-700 hover:bg-gray-100"
                             } ${isOpen ? "" : "justify-center"}`
@@ -204,14 +221,20 @@ const SideMenubar = () => {
         <img
           src={userDetails?.profile || profileIcon}
           alt="Profile"
-          className={`${isOpen ? "w-10 h-10" : "w-8 h-8"} cursor-pointer rounded-full`}
+          className={`${
+            isOpen ? "w-10 h-10" : "w-8 h-8"
+          } cursor-pointer rounded-full`}
           onClick={HandleNavigate}
         />
 
         {isOpen && (
           <div className="flex-1 ml-3">
             <h2 className="font-semibold">
-            {userDetails?.fullName?.charAt(0)?.toUpperCase() + userDetails?.fullName?.split(' ')[1]?.charAt(0)?.toUpperCase() || "User"}
+              {userDetails?.fullName?.charAt(0)?.toUpperCase() +
+                userDetails?.fullName
+                  ?.split(" ")[1]
+                  ?.charAt(0)
+                  ?.toUpperCase() || "User"}
             </h2>
             <p className="text-gray-500 capitalize text-sm">{role}</p>
           </div>
@@ -222,7 +245,9 @@ const SideMenubar = () => {
           className="ml-3"
           aria-label={t("Logout")}
         >
-          <FiLogOut className={`${isOpen ? "w-7 h-7" : "w-5 h-5"} text-gray-500`} />
+          <FiLogOut
+            className={`${isOpen ? "w-7 h-7" : "w-5 h-5"} text-gray-500`}
+          />
         </button>
       </div>
       <LogoutConfirmationModal
@@ -235,4 +260,4 @@ const SideMenubar = () => {
   );
 };
 
-export default SideMenubar;
+export default React.memo(SideMenubar);

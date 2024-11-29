@@ -4,7 +4,6 @@ import PageHeader from "./Components/PageHeader";
 import { MdKeyboardArrowDown } from "react-icons/md";
 import { GoDiscussionClosed } from "react-icons/go";
 import SubjectSideBar from "../../Component/SubjectSideBar";
-import useFetchAllPages from "../../../../../../Hooks/AuthHooks/Student/Page/useFetchAllPages";
 import Spinner from "../../../../../../Components/Common/Spinner";
 import NoDataFound from "../../../../../../Components/Common/NoDataFound";
 import { useDispatch, useSelector } from "react-redux";
@@ -54,10 +53,10 @@ const MainSection = () => {
           </div>
           <div className="flex-grow flex justify-center items-start my-10">
             {loading && <Spinner />}
-            {!loading && filteredPages.length === 0 && (
+            {!loading && filteredPages?.length === 0 && (
               <NoDataFound title="Pages" />
             )}
-            {!loading && !error && filteredPages.length > 0 && (
+            {!loading && !error && filteredPages?.length > 0 && (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full ">
                 {filteredPages?.map((page) => (
                   <PageCard

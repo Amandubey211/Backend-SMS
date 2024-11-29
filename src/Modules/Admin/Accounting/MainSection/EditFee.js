@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import FormSelect from '../subClass/component/FormSelect';
 import { fetchFees, updateStudentFee } from '../../../../Store/Slices/Admin/Accounting/StudentFees/studentFees.action';
 import { setEditFormData } from '../../../../Store/Slices/Admin/Accounting/StudentFees/studentFeesSlice';
+import toast from 'react-hot-toast';
 
 const EditFee = () => {
   const { t } = useTranslation("admExpense"); // Use translation hook
@@ -41,7 +42,7 @@ const EditFee = () => {
     dispatch(updateStudentFee({ feeId: formData.feeId, submissionData: formData }))
       .then(() => {
         dispatch(fetchFees());
-        console.log('Fee updated successfully');
+        toast.success('Fee updated successfully');
       })
       .catch(() => {
         console.error('Error updating Fee');

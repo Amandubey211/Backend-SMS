@@ -6,11 +6,12 @@ import { useNavigate } from "react-router-dom";
 import IconButton from "./IconButton";
 import LeftHeading from "./LeftHeading";
 import LogoutConfirmationModal from "./LogoutConfirmationModal";
-import useStaffLogout from "../../Hooks/AuthHooks/Staff/useStaffLogOut";
 import Sidebar from "./Sidebar";
 import NotificationBar from "./NotificationBar";
 import SettingDropdown from "./SettingDropdown";
 import { fetchAcademicYear } from "../../Store/Slices/Common/AcademicYear/academicYear.action";
+import { staffLogout } from "../../Store/Slices/Common/Auth/actions/staffActions";
+import { getAY } from "../../Utils/academivYear";
 
 const Navbar = () => {
   const [isOpenNotification, setIsOpenNotification] = useState(false);
@@ -26,7 +27,7 @@ const Navbar = () => {
   const dispatch = useDispatch()
  
   const selectAcademicYear = useSelector((store) => {
-    const say = localStorage.getItem('say')
+    const say = getAY()
       return store.common.academicYear.academicYears?.find((year) => year?._id == say)
     
   });
@@ -37,7 +38,7 @@ const Navbar = () => {
 
   }, []);
 
-  const { staffLogout } = useStaffLogout();
+
 
   // Fetch notifications from IndexedDB
   const getNotificationsFromIndexedDB = () => {
@@ -95,7 +96,7 @@ const Navbar = () => {
   };
 
   const logout = async () => {
-    await staffLogout();
+    await dispatch(staffLogout())
     setIsModalOpen(false);
   };
 

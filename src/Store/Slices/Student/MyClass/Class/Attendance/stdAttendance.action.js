@@ -18,7 +18,7 @@ export const stdAttendance = createAsyncThunk(
       const res = await getData(
         `/api/studentDashboard/myAttendance?say=${say}`, { month, year } );
       const data = res?.report;
-      console.log("Attendance in action:", data);
+      // console.log("Attendance in action:", data);
 
       return data;
     } catch (error) {

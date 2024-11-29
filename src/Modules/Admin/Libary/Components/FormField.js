@@ -24,7 +24,7 @@ const FormField = ({
         disabled={disabled} // Conditionally disable the select field
       >
         <option value="">Choose</option>
-        {options.map((option, index) =>
+        {options?.map((option, index) =>
           typeof option === "string" ? (
             <option key={index} value={option.toLowerCase()}>
               {option}

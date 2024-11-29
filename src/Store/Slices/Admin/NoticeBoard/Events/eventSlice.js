@@ -22,14 +22,14 @@ const eventSlice = createSlice({
   initialState,
   reducers: {
     setSelectedEvent: (state, action) => {
-      console.log("Selected Event: ", action.payload); //
+      // console.log("Selected Event: ", action.payload); //
       state.selectedEvent = action.payload;
     },
     resetSelectedEvent: (state) => {
       state.selectedEvent = null;
     },
     setSidebarContent(state, action) {
-      console.log("Selected content: ", action.payload); //
+      // console.log("Selected content: ", action.payload); //
 
       state.sidebarContent = action.payload;
     },

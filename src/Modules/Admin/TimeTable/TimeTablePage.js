@@ -1,6 +1,7 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 import AdminDashLayout from "../../../Components/Admin/AdminDashLayout";
+import TeacherDashLayout from "../../../Components/Admin/AdminDashLayout";
 import StudentDashLayout from "../../../Components/Student/StudentDashLayout";
 import ParentDashLayout from "../../../Components/Parents/ParentDashLayout";
 import Layout from "../../../Components/Common/Layout";
@@ -13,25 +14,32 @@ import { useSelector } from "react-redux";
 
 const TimeTablePage = () => {
   const { t } = useTranslation("admTimeTable");
-  
+
   useNavHeading(t("TimeTable"));
 
   // Get role from Redux store
   const role = useSelector((store) => store.common.auth.role);
 
   // Determine the layout component based on the role
-  const DashLayout = 
-    role === "admin" ? AdminDashLayout :
-    role === "student" ? StudentDashLayout :
-    role === "teacher" ?  AdminDashLayout: null;
-    
+  const DashLayout =
+    role === "admin"
+      ? AdminDashLayout
+      : role === "student"
+        ? StudentDashLayout
+        : role === "teacher"
+          ? TeacherDashLayout
+          : role === "parent"
+            ? ParentDashLayout
+            : AdminDashLayout;
+
+
   return (
     <Layout title="TimeTable | Student Diwan">
       <DashLayout>
         <Routes>
-          <Route path="/" element={<TimeTableMainSection />} /> {/* Main timetable section */}
-          <Route path="viewtable/:tablename" element={<TableView />} /> {/* Detailed table view */}
-          <Route path="edit/:id" element={<UpdateTimeTable />} /> {/* Update timetable */}
+          <Route index element={<TimeTableMainSection />} />
+          <Route path="viewtable/:tablename" element={<TableView />} />
+          <Route path="edit/:id" element={<UpdateTimeTable />} />
         </Routes>
       </DashLayout>
     </Layout>

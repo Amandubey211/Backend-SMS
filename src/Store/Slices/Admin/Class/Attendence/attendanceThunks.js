@@ -1,11 +1,11 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
 import { baseUrl } from "../../../../../config/Common";
 import { setErrorMsg, setShowError } from "../../../Common/Alerts/alertsSlice";
-import { ErrorMsg } from "../../../Common/Alerts/errorhandling.action";
+import { ErrorMsg, handleError } from "../../../Common/Alerts/errorhandling.action";
 import toast from "react-hot-toast";
+import { getAY } from "../../../../../Utils/academivYear";
+import { getData, postData } from "../../../../../services/apiEndpoints";
 
-const say = localStorage.getItem("say");
 
 // Utility to format date for handling API errors and consistency
 const formatDate = (date) => {
@@ -17,47 +17,28 @@ const formatDate = (date) => {
   return parsedDate.toISOString().split("T")[0]; // Format valid date to YYYY-MM-DD
 };
 
-// Helper function to get the token from the Redux state
-const getToken = (state, rejectWithValue, dispatch) => {
-  const token = state.common.auth?.token;
-  if (!token) {
-    dispatch(setShowError(true));
-    dispatch(setErrorMsg("Authentication Failed"));
-    return rejectWithValue("Authentication Failed");
-  }
-  return `Bearer ${token}`;
-};
 
-// Centralized error handling
-const handleError = (error, dispatch, rejectWithValue) => {
-  const err = ErrorMsg(error);
-  dispatch(setShowError(true));
-  dispatch(setErrorMsg(err.message));
-  return rejectWithValue(err.message);
-};
 
 // Fetch attendance data by class, section, group, and date
 export const fetchAttendanceByClassSectionGroupDate = createAsyncThunk(
   "attendance/fetchAttendance",
   async (
     { classId, sectionId, groupId, date },
-    { rejectWithValue, getState, dispatch }
+    { rejectWithValue,  dispatch }
   ) => {
     try {
-      const token = getToken(getState(), rejectWithValue, dispatch); // Fetch token from Redux state
-      if (typeof token === "object") return token;
-      const say = localStorage.getItem("say")
+      dispatch(setShowError(false));
+      const say = getAY()
       const formattedDate = formatDate(date); // Format the date before sending
 
-      const response = await axios.get(
-        `${baseUrl}/api/teacher/attendance/getStudentList/${classId}?say=${say}`,
-        {
-          headers: { Authentication: token }, // Use token in the request headers
-          params: { sectionId, groupId, date: formattedDate }, // Send the formatted date and filters
-        }
+      const response = await getData(
+        `/api/teacher/attendance/getStudentList/${classId}?say=${say}`,
+        
+          { sectionId, groupId, date: formattedDate }, // Send the formatted date and filters
+        
       );
 
-      return response.data; // Return the response data
+      return response; // Return the response data
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue); // Centralized error handling
     }
@@ -67,23 +48,20 @@ export const fetchAttendanceByClassSectionGroupDate = createAsyncThunk(
 // Mark attendance
 export const markAttendance = createAsyncThunk(
   "attendance/markAttendance",
-  async (attendanceData, { rejectWithValue, getState, dispatch }) => {
+  async (attendanceData, { rejectWithValue,  dispatch }) => {
     try {
-      const token = getToken(getState(), rejectWithValue, dispatch); // Fetch token from Redux state
-      if (typeof token === "object") return token;
-      const say = localStorage.getItem("say")
+      dispatch(setShowError(false));
+      const say = getAY()
       const formattedDate = formatDate(attendanceData.date); // Format the date
 
-      const response = await axios.post(
+      const response = await postData(
         `${baseUrl}/api/teacher/attendance/mark?say=${say}`,
-        { ...attendanceData, date: formattedDate }, // Ensure the date is in the correct format
-        {
-          headers: { Authentication: token }, // Use token in the request headers
-        }
+        { ...attendanceData, date: formattedDate }, 
+       
       );
         toast.success ('Attendance mark successfully');
       dispatch(setShowError(false));
-      return response.data; // Return the response data
+      return response; // Return the response data
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue); // Centralized error handling
     }
@@ -93,22 +71,19 @@ export const markAttendance = createAsyncThunk(
 // Fetch attendance stats
 export const fetchAttendanceStats = createAsyncThunk(
   "attendance/fetchAttendanceStats",
-  async (classId, { rejectWithValue, getState, dispatch }) => {
+  async (classId, { rejectWithValue,  dispatch }) => {
     try {
-      const token = getToken(getState(), rejectWithValue, dispatch); // Fetch token from Redux state
-      if (typeof token === "object") return token;
-      const say = localStorage.getItem("say")
+      dispatch(setShowError(false));
+      const say = getAY()
 
-      const response = await axios.get(
-        `${baseUrl}/api/teacher/attendance/getAttendanceStats/${classId}?say=${say}`,
-        {
-          headers: { Authentication: token }, // Use token in the request headers
-        }
+      const response = await getData(
+        `/api/teacher/attendance/getAttendanceStats/${classId}?say=${say}`,
+        
       );
 
-      return response.data; // Return the response data
+      return response; // Return the response data
     } catch (error) {
-      return handleError(error, dispatch, rejectWithValue); // Centralized error handling
+      return handleError(error, dispatch, rejectWithValue); 
     }
   }
 );
@@ -117,24 +92,21 @@ export const fetchAttendanceStats = createAsyncThunk(
 export const fetchStudentsMonthAttendanceList = createAsyncThunk(
   "attendance/fetchStudentsMonthAttendanceList",
   async (
-    { classId, sectionId, groupId, year, month }, // Expecting classId, sectionId, groupId, year, and month
-    { rejectWithValue, getState, dispatch }
+    { classId, sectionId, groupId, year, month }, 
+    { rejectWithValue,  dispatch }
   ) => {
     try {
-      const token = getToken(getState(), rejectWithValue, dispatch); // Fetch token from Redux state
-      if (typeof token === "object") return token;
-      const say = localStorage.getItem("say")
-      const response = await axios.get(
-        `${baseUrl}/api/teacher/attendance/getStudentMonthList/${classId}?say=${say}`,
-        {
-          headers: { Authentication: token }, // Use token in the request headers
-          params: { sectionId, groupId, year, month }, // Pass sectionId, groupId, year, and month as query params
-        }
+      dispatch(setShowError(false));
+      const say = getAY()
+      const response = await getData(
+        `/api/teacher/attendance/getStudentMonthList/${classId}?say=${say}`,
+       
+         { sectionId, groupId, year, month }, 
+        
       );
-
-      return response.data; // Return the response data (attendanceList)
+      return response
     } catch (error) {
-      return handleError(error, dispatch, rejectWithValue); // Centralized error handling
+      return handleError(error, dispatch, rejectWithValue);
     }
   }
 );

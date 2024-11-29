@@ -2,17 +2,14 @@ import React, { useState, useEffect, useMemo } from "react";
 import Sidebar from "../../../../Components/Common/Sidebar";
 import Layout from "../../../../Components/Common/Layout";
 import DashLayout from "../../../../Components/Admin/AdminDashLayout";
-import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 import AddFeesForm from "../subClass/component/AddFeesForm";
 import FormField from "../subClass/component/FormField";
-import { baseUrl } from "../../../../config/Common";
 import { useDispatch, useSelector } from "react-redux";
 import { MdCancel } from "react-icons/md";
 import EditFee from "./EditFee";
 import DeleteConfirmatiomModal from "../../../../Components/Common/DeleteConfirmationModal";
 import toast from "react-hot-toast";
-import axios from "axios";
-import useGetAllClasses from "../../../../Hooks/AuthHooks/Staff/Admin/Class/useGetAllClasses";
+
 import {
   setEditFormData,
   setFilters,
@@ -47,13 +44,13 @@ const AccountingSection = () => {
   }, [dispatch]);
 
   const uniqueFilterOptions = (data, key) => {
-    return [...new Set(data.map((item) => item?.[key]))].sort();
+    return [...new Set(data?.map((item) => item?.[key]))].sort();
   };
 
   const classes = useMemo(
     () =>
       uniqueFilterOptions(
-        feesData.map((fd) => fd.studentId?.presentClassId),
+        feesData?.map((fd) => fd.studentId?.presentClassId),
         "className"
       ),
     [feesData]
@@ -109,7 +106,7 @@ const AccountingSection = () => {
     if (firstLetter === firstLetter.toUpperCase()) {
       return str;
     } else {
-      return firstLetter.toUpperCase() + str.slice(1);
+      return firstLetter?.toUpperCase() + str?.slice(1);
     }
   };
 
@@ -155,7 +152,7 @@ const AccountingSection = () => {
 
           <div className="p-4">
             <div className="flex items-center space-x-4">
-              {["Everyone", "Paid", "Unpaid"].map((status) => (
+              {["Everyone", "Paid", "Unpaid"]?.map((status) => (
                 <label
                   key={status}
                   className="flex items-center cursor-pointer"

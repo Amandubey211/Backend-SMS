@@ -36,7 +36,7 @@ const Comment = ({
 
 
   // Console logs to debug
-  const [likesCount, setLikesCount] = useState(comment.likes.length);
+  const [likesCount, setLikesCount] = useState(comment.likes?.length);
   const [isLiked, setIsLiked] = useState(
     comment.likes.some((like) => like.userId === userId)
   );
@@ -220,12 +220,12 @@ const Comment = ({
                 </div>
               </>
             ) : (
-              comment.replies.length > 0 && (
+              comment.replies?.length > 0 && (
                 <div
                   className="text-blue-500 cursor-pointer mt-2"
                   onClick={() => setShowReplies(true)}
                 >
-                  View {comment.replies.length} more replies
+                  View {comment.replies?.length} more replies
                 </div>
               )
             )}

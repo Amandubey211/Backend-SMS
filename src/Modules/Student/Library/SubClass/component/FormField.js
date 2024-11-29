@@ -12,7 +12,7 @@ const FormField = ({ id, name, label, value, onChange, options }) => {
         className="border rounded px-3 py-2"
       >
         <option value="">All</option>
-        {options.map((option, index) => (
+        {options?.map((option, index) => (
           <option key={index} value={option}>
             {option}
           </option>

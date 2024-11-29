@@ -10,7 +10,7 @@ const RadioGroup = ({ label, name, value, onChange, options, error }) => (
       </label>
     )}
     <div className="mt-1 flex items-center">
-      {options.map((option, index) => (
+      {options?.map((option, index) => (
         <label key={index} className="inline-flex items-center mr-4">
           <input
             type="radio"

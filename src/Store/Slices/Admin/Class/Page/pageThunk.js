@@ -1,49 +1,28 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
-import { baseUrl } from "../../../../../config/Common";
-import { setErrorMsg, setShowError } from "../../../Common/Alerts/alertsSlice";
-import { ErrorMsg } from "../../../Common/Alerts/errorhandling.action";
+import { setShowError } from "../../../Common/Alerts/alertsSlice";
+import { handleError } from "../../../Common/Alerts/errorhandling.action";
 import toast from "react-hot-toast";
+import { getAY } from "../../../../../Utils/academivYear";
+import {
+  postData,
+  deleteData,
+  getData,
+  putData,
+} from "../../../../../services/apiEndpoints";
 
-const say = localStorage.getItem("say");
-
-// Helper function to get the token from Redux state with centralized error handling
-const getToken = (state, rejectWithValue, dispatch) => {
-  const token = state.common.auth?.token;
-  if (!token) {
-    dispatch(setShowError(true));
-    dispatch(setErrorMsg("Authentication Failed"));
-    return rejectWithValue("Authentication Failed");
-  }
-  return `Bearer ${token}`;
-};
-
-// Centralized error handling
-const handleError = (error, dispatch, rejectWithValue) => {
-  const err = ErrorMsg(error);
-  dispatch(setShowError(true));
-  dispatch(setErrorMsg(err.message));
-  return rejectWithValue(err.message);
-};
-
-// Fetch All Pages Thunk
 export const fetchAllPages = createAsyncThunk(
   "pages/fetchAllPages",
-  async ({ cid }, { rejectWithValue, getState, dispatch }) => {
-    try {
-      const token = getToken(getState(), rejectWithValue, dispatch);
-      const say = localStorage.getItem("say");
-      const response = await axios.get(
-        `${baseUrl}/admin/api/pages/class/pages/${cid}?say=${say}`,
-        {
-          headers: { Authentication: token },
-        }
-      );
+  async ({ cid }, { rejectWithValue, dispatch }) => {
+    const say = getAY();
+    dispatch(setShowError(false));
 
-      if (response.data && response.data.success) {
-        return response.data.data;
-      } else {
-        throw new Error("Failed to fetch pages");
+    try {
+      const response = await getData(`/admin/api/pages/class/pages/${cid}`, {
+        params: { say },
+      });
+
+      if (response && response.success) {
+        return response.data;
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -51,24 +30,19 @@ export const fetchAllPages = createAsyncThunk(
   }
 );
 
-// Fetch Page by ID Thunk
 export const fetchPageById = createAsyncThunk(
   "pages/fetchPageById",
-  async ({ pid }, { rejectWithValue, getState, dispatch }) => {
-    try {
-      const token = getToken(getState(), rejectWithValue, dispatch);
-      const say = localStorage.getItem("say");
-      const response = await axios.get(
-        `${baseUrl}/admin/api/pages/${pid}?say=${say}`,
-        {
-          headers: { Authentication: token },
-        }
-      );
+  async ({ pid }, { rejectWithValue, dispatch }) => {
+    const say = getAY();
+    dispatch(setShowError(false));
 
-      if (response.data && response.data.success) {
-        return response.data.data;
-      } else {
-        throw new Error("Failed to fetch page");
+    try {
+      const response = await getData(`/admin/api/pages/${pid}`, {
+        params: { say },
+      });
+
+      if (response && response.success) {
+        return response.data;
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -76,30 +50,27 @@ export const fetchPageById = createAsyncThunk(
   }
 );
 
-// Create Page Thunk
 export const createPage = createAsyncThunk(
   "pages/createPage",
-  async ({ pageData, cid }, { rejectWithValue, getState, dispatch }) => {
+  async ({ pageData, cid }, { rejectWithValue, dispatch }) => {
+    const say = getAY();
+    dispatch(setShowError(false));
+
     try {
-      const token = getToken(getState(), rejectWithValue, dispatch);
-      const say = localStorage.getItem("say");
-      const response = await axios.post(
-        `${baseUrl}/admin/api/pages/class/${cid}?say=${say}`,
+      const response = await postData(
+        `/admin/api/pages/class/${cid}`,
         pageData,
         {
+          params: { say },
           headers: {
-            Authentication: token,
             "Content-Type": "application/json",
           },
         }
       );
 
-      if (response.data.success) {
+      if (response && response.success) {
         toast.success("Page Created");
-
-        return response.data.data;
-      } else {
-        throw new Error("Failed to create page");
+        return response.data;
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -107,28 +78,23 @@ export const createPage = createAsyncThunk(
   }
 );
 
-// Update Page Thunk
 export const updatePage = createAsyncThunk(
   "pages/updatePage",
-  async ({ pageId, pageData }, { rejectWithValue, getState, dispatch }) => {
-    try {
-      const token = getToken(getState(), rejectWithValue, dispatch);
-      const say = localStorage.getItem("say");
-      const response = await axios.put(
-        `${baseUrl}/admin/api/pages/${pageId}?say=${say}`,
-        pageData,
-        {
-          headers: {
-            Authentication: token,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+  async ({ pageId, pageData }, { rejectWithValue, dispatch }) => {
+    const say = getAY();
+    dispatch(setShowError(false));
 
-      if (response.data.success) {
-        return response.data.data;
-      } else {
-        throw new Error("Failed to update page");
+    try {
+      const response = await putData(`/admin/api/pages/${pageId}`, pageData, {
+        params: { say },
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response && response.success) {
+        toast.success("Page Updated Successfully");
+        return response.data;
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -136,24 +102,20 @@ export const updatePage = createAsyncThunk(
   }
 );
 
-// Delete Page Thunk
 export const deletePage = createAsyncThunk(
   "pages/deletePage",
-  async ({ pid }, { rejectWithValue, getState, dispatch }) => {
-    try {
-      const token = getToken(getState(), rejectWithValue, dispatch);
-      const say = localStorage.getItem("say");
-      const response = await axios.delete(
-        `${baseUrl}/admin/api/pages/${pid}?say=${say}`,
-        {
-          headers: { Authentication: token },
-        }
-      );
+  async ({ pid }, { rejectWithValue, dispatch }) => {
+    const say = getAY();
+    dispatch(setShowError(false));
 
-      if (response.data.success) {
+    try {
+      const response = await deleteData(`/admin/api/pages/${pid}`, {
+        params: { say },
+      });
+
+      if (response && response.success) {
+        toast.success("Page Deleted Successfully");
         return pid;
-      } else {
-        throw new Error("Failed to delete page");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);

@@ -19,7 +19,7 @@ const DeleteConfirmatiomModal = ({
         'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
       );
       const firstElement = focusableElements[0];
-      const lastElement = focusableElements[focusableElements.length - 1];
+      const lastElement = focusableElements[focusableElements?.length - 1];
 
       const trapFocus = (e) => {
         if (e.key === "Tab") {

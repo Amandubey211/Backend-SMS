@@ -51,11 +51,11 @@ const StaffLoginForm = () => {
     }
     setErrors(newErrors);
 
-    if (Object.keys(newErrors).length > 0) {
+    if (Object.keys(newErrors)?.length > 0) {
       triggerShake();
     }
 
-    return Object.keys(newErrors).length === 0;
+    return Object.keys(newErrors)?.length === 0;
   };
 
   const handleSubmit = (e) => {

@@ -18,7 +18,16 @@ const Tabs = ({ children, createPage }) => {
     dispatch(setActiveTab(tab));
   };
 
-  const { name, quizType, availableFrom } = quiz;
+  const { name, quizType, availableFrom, dueDate } = quiz || {};
+
+  // Get the current date (without time) to compare with dueDate
+  const currentDate = new Date();
+
+  // Check if dueDate is valid and not passed
+  const isDueDateValid = dueDate && new Date(dueDate) > currentDate;
+
+  // Only allow quiz interaction if dueDate is valid or the quiz is not expired
+  const showTakeQuizTab = isDueDateValid;
 
   useEffect(() => {
     dispatch(stdGetSingleQuiz({ quizId: qid }));
@@ -60,22 +69,25 @@ const Tabs = ({ children, createPage }) => {
             </span>
           </button>
 
-          <button
-            onClick={() => handleTabClick("questions")}
-            className={`flex-grow ${
-              activeTab === "questions"
-                ? "bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200"
-                : "border border-gray-300 text-gray-800"
-            } rounded-md py-2 px-4 text-center transition`}
-          >
-            <span
-              className={`${
-                activeTab === "questions" ? "text-gradient" : "text-black"
-              }`}
+          {/* Conditionally render the Take Quiz tab based on dueDate */}
+          {showTakeQuizTab && (
+            <button
+              onClick={() => handleTabClick("questions")}
+              className={`flex-grow ${
+                activeTab === "questions"
+                  ? "bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200"
+                  : "border border-gray-300 text-gray-800"
+              } rounded-md py-2 px-4 text-center transition`}
             >
-              {`Take Quiz`}
-            </span>
-          </button>
+              <span
+                className={`${
+                  activeTab === "questions" ? "text-gradient" : "text-black"
+                }`}
+              >
+                Take Quiz
+              </span>
+            </button>
+          )}
         </div>
       </div>
       <div className="p-4">{!loading && children(activeTab)}</div>

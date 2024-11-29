@@ -46,9 +46,9 @@ const StudentEvent = () => {
     month: currentDate.getMonth(),
     year: currentDate.getFullYear(),
   });
-  console.log("I am in inside1 :", eventData);
+  // console.log("I am in inside1 :", eventData);
 
-  console.log("I am in inside :", filteredEvents);
+  // console.log("I am in inside :", filteredEvents);
   // card colour
   const bgColors = [
     "bg-pink-500",
@@ -75,7 +75,7 @@ const StudentEvent = () => {
   const filterAndSortEvents = (eventData, selectedMonthYear) => {
     const filtered = eventData.filter((event) => {
       const eventDate = new Date(event.startDate);
-      console.log("event date is: ", eventDate);
+      // console.log("event date is: ", eventDate);
       return (
         eventDate.getMonth() === selectedMonthYear?.month &&
         eventDate?.getFullYear() === selectedMonthYear.year
@@ -83,7 +83,7 @@ const StudentEvent = () => {
     });
 
     const sorted = filtered.sort((a, b) => a.startDate - b.startDate);
-    console.log("sorted event :", sorted);
+    // console.log("sorted event :", sorted);
     dispatch(setFilteredEvents(sorted));
     dispatch(setCurrentPage(0));
   };
@@ -99,7 +99,7 @@ const StudentEvent = () => {
   
     return (
       <ul className="events space-y-1 max-h-20 overflow-y-auto">
-        {dayEvents.map((event, index) => {
+        {dayEvents?.map((event, index) => {
           // Parse time from event, support both 24-hour and 12-hour formats
           let eventTime = event?.time
             ? parse(event?.time, 'hh:mm a', new Date()) // Try parsing as 12-hour format first
@@ -117,7 +117,7 @@ const StudentEvent = () => {
             <li
               key={event?.id}
               className={`inline-block px-2 py-1 rounded text-white ${
-                bgColors[index % bgColors.length]
+                bgColors[index % bgColors?.length]
               } shadow-md cursor-pointer`}
               onClick={() => handleStickerClick(event)}
             >
@@ -156,7 +156,7 @@ const StudentEvent = () => {
     currentPage * itemsPerPage,
     (currentPage + 1) * itemsPerPage
   );
-  console.log("pagination event is :", paginatedEvents);
+  // console.log("pagination event is :", paginatedEvents);
   const handlePagination = () => {
     dispatch(setCurrentPage((prev) => Math.max(prev - 1, 0)));
   };
@@ -166,7 +166,7 @@ const StudentEvent = () => {
   };
 
   // selected Month and Year
-console.log("dsdfasasasa",paginatedEvents)
+// console.log("dsdfasasasa",paginatedEvents)
   return (
     <>
       <Layout title="Event">

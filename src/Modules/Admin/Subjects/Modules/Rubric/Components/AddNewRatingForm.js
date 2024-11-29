@@ -9,7 +9,7 @@ const AddNewRatingForm = ({ onAddNewRating }) => {
   const [points, setPoints] = useState("");
   const [description, setDescription] = useState("");
 
-  const { t } = useTranslation("admModule"); // Adding the translation function with namespace 'addNewRatingForm'
+  const { t } = useTranslation("admModule");
 
   const handleSubmit = () => {
     const newRating = {

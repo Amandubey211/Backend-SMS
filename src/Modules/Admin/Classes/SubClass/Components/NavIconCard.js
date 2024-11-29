@@ -2,7 +2,7 @@ import React from "react";
 import { NavLink } from "react-router-dom";
 
 const NavIconCard = ({ icon, text, url }) => {
-  console.log({text});
+  // console.log({text});
   
   return (
     <NavLink

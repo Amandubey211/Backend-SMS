@@ -44,7 +44,7 @@ const ChapterItem = ({ type, title, id, isPublished }) => {
       <div className="flex flex-col gap-1 justify-center flex-grow">
         <p className="font-semibold">{title}</p>
         <p className="text-green-500 text-sm">
-          {type.charAt(0).toUpperCase() + type.slice(1)}
+          {type.charAt(0).toUpperCase() + type?.slice(1)}
         </p>
       </div>
       <div className="flex items-center gap-3">

@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import ImageUpload from "../../Addmission/Components/ImageUpload";
 import FormInput from "../../Accounting/subClass/component/FormInput";
 import FormSelect from "../../Accounting/subClass/component/FormSelect";
-import useEditUser from "../../../../Hooks/AuthHooks/Staff/Admin/staff/useEditUser";
 import { FiLoader } from "react-icons/fi";
 import { useDispatch, useSelector } from "react-redux";
 import { addUser ,editUser} from "../../../../Store/Slices/Admin/Users/Staff/staff.action";
@@ -42,7 +41,7 @@ const AddUser = ({ role ,data}) => {
       religion:  data?.religion ,
       gender:  data?.gender,
       position:  data?.position ,
-      monthlySalary:  data?.monthlySalary ,
+      monthlySalary:  data?.monthlySalary,
       bloodGroup:  data?.bloodGroup ,
       mobileNumber: data?.mobileNumber ,
       email: data?.email ,

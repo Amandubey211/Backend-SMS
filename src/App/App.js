@@ -29,19 +29,49 @@ import "../Utils/translator/i18n.js";
 import i18next from "i18next";
 import { useSelector } from "react-redux";
 import GraduationPage from "../Modules/Admin/Graduation/GraduationPage.js";
-import TimeTablePage from "../Modules/Admin/TimeTable/TimeTablePage.js";
-import CreateTimeTable from "../Modules/Admin/TimeTable/Components/CreateTimeTable.js";
-import TableView from "../Modules/Admin/TimeTable/Components/TableView.js";
-import { updateTimetable } from "../Store/Slices/Admin/TimeTable/timetable.action.js";
 import PrivacyPolicy from "../Modules/LoginPages/Policys/PrivacyPolicy.jsx";
 import TermsAndConditions from "../Modules/LoginPages/Policys/TermsAndConditions.jsx";
 import CookiePolicy from "../Modules/LoginPages/Policys/CookiePolicy.jsx";
+
+
+// Timetable
+// Admin
+import TimeTablePage from "../Modules/Admin/TimeTable/TimeTablePage.js";
+import TableView from "../Modules/Admin/TimeTable/Components/TableView.js";
+import CreateTimeTable from "../Modules/Admin/TimeTable/Components/CreateTimeTable.js";
+import { updateTimetable } from "../Store/Slices/Admin/TimeTable/timetable.action.js";
+
+// Student
+import StudentTimeTablePage from "../Modules/Student/TimeTable/TimeTablePage.js";
+import StudentTableView from "../Modules/Student/TimeTable/Components/TableView.js";
+
+
+// Teacher
+import TeacherTimeTablePage from "../Components/Staff/Teacher/TimeTable/TimeTablePage.js";
+import TeacherTableView from "../Components/Staff/Teacher/TimeTable/Components/TableView.js";
+
+// Parent
+import ParentTimeTablePage from "../Modules/Parents/TimeTable/TimeTablePage.js";
+import ParentTableView from "../Modules/Parents/TimeTable/Components/TableView.js";
+
+
+
+
+
+
+
 // lazy loaded routes
 
+
+// lazy loaded routes
 const Academic = lazy(() =>
   import("../Modules/Admin/AcademicYear/Academic.js")
 );
 
+const SelectBranch = lazy(() =>
+  import("../Modules/LoginPages/Staff/Admin/SelectBranch.js")
+);
+const Branch = lazy(() => import("../Modules/Admin/Branchs/Branch.js"));
 const commonAcademic = lazy(() =>
   import("../Components/Common/AcademicYear/Academic.js")
 );
@@ -378,10 +408,33 @@ function App() {
       ),
       errorElement: <Error />,
     },
+    {
+      path: "/select_branch",
+      element: (
+        <ProtectRoute Component={SelectBranch} allowedRoles={["admin"]} />
+      ),
+      errorElement: <Error />,
+    },
 
     {
       path: "/dashboard/academic",
-      element: <ProtectRoute Component={Academic} allowedRoles={["admin", "teacher", "librarian", "accountant","staff"]} />,
+      element: (
+        <ProtectRoute
+          Component={Academic}
+          allowedRoles={[
+            "admin",
+            "teacher",
+            "librarian",
+            "accountant",
+            "staff",
+          ]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/dashboard/all/branch",
+      element: <ProtectRoute Component={Branch} allowedRoles={["admin"]} />,
       errorElement: <Error />,
     },
 
@@ -391,7 +444,13 @@ function App() {
       element: (
         <ProtectRoute
           Component={Dash}
-          allowedRoles={["admin", "teacher", "librarian", "accountant","staff"]}
+          allowedRoles={[
+            "admin",
+            "teacher",
+            "librarian",
+            "accountant",
+            "staff",
+          ]}
         />
       ),
       errorElement: <Error />,
@@ -694,7 +753,7 @@ function App() {
     },
     { path: "library", element: <Libary />, errorElement: <Error /> },
     {
-      path: "/timetable",
+      path: "/timetable/*",
       element: (
         <ProtectRoute
           Component={TimeTablePage}
@@ -741,7 +800,14 @@ function App() {
       element: (
         <ProtectRoute
           Component={EventSchool}
-          allowedRoles={["admin", "teacher", "librarian", "peon", "accountant","staff"]}
+          allowedRoles={[
+            "admin",
+            "teacher",
+            "librarian",
+            "peon",
+            "accountant",
+            "staff",
+          ]}
         />
       ),
       errorElement: <Error />,
@@ -751,7 +817,14 @@ function App() {
       element: (
         <ProtectRoute
           Component={AdminNotice}
-          allowedRoles={["admin", "teacher", "librarian", "peon", "accountant","staff"]}
+          allowedRoles={[
+            "admin",
+            "teacher",
+            "librarian",
+            "peon",
+            "accountant",
+            "staff",
+          ]}
         />
       ),
       errorElement: <Error />,
@@ -809,7 +882,13 @@ function App() {
       element: (
         <ProtectRoute
           Component={StudentParentProfile}
-          allowedRoles={["admin", "teacher", "accountant", "librarian","staff"]}
+          allowedRoles={[
+            "admin",
+            "teacher",
+            "accountant",
+            "librarian",
+            "staff",
+          ]}
         />
       ),
       errorElement: <Error />,
@@ -928,6 +1007,32 @@ function App() {
       ),
       errorElement: <Error />,
     },
+
+
+    {
+      path: "/student_timetable",
+      element: (
+        <ProtectRoute
+          Component={StudentTimeTablePage}
+          allowedRoles={["student"]}
+        />
+      ),
+      errorElement: <Error />,
+      children: [
+        {
+          path: "viewtable/:tablename", // Notice it’s a child path, not a full path
+          element: (
+            <ProtectRoute
+              Component={StudentTableView}
+              allowedRoles={["student"]}
+            />
+          ),
+          errorElement: <Error />,
+        },
+        
+      ],
+    },
+
     //{ path: "/student_class/:sid/createassignment", element: <ProtectRoute Component={StudentCreateAssignment} allowedRoles={["student"]} />, errorElement: <Error /> },
     {
       path: "/student_class/:cid/:sid/quizzes",
@@ -1056,6 +1161,34 @@ function App() {
       errorElement: <Error />,
     },
 
+    // teacher----------------------------------------------------------------
+
+    {
+      path: "/teacher_timetable",
+      element: (
+        <ProtectRoute
+          Component={TeacherTimeTablePage}
+          allowedRoles={["teacher"]}
+        />
+      ),
+      errorElement: <Error />,
+      children: [
+        {
+          path: "viewtable/:tablename", // Notice it’s a child path, not a full path
+          element: (
+            <ProtectRoute
+              Component={TeacherTableView}
+              allowedRoles={["teacher"]}
+            />
+          ),
+          errorElement: <Error />,
+        },
+        
+      ],
+    },
+
+
+
     // parent----------------------------------------------------------------
     {
       path: "/parent_dash",
@@ -1080,6 +1213,28 @@ function App() {
       path: "/attendance",
       element: <ProtectRoute Component={Calendar} allowedRoles={["parent"]} />,
       errorElement: <Error />,
+    },
+    {
+      path: "/parent_timetable",
+      element: (
+        <ProtectRoute
+          Component={ParentTimeTablePage}
+          allowedRoles={["parent"]}
+        />
+      ),
+      errorElement: <Error />,
+      children: [
+        {
+          path: "viewtable/:tablename", // Notice it’s a child path, not a full path
+          element: (
+            <ProtectRoute
+              Component={ParentTableView}
+              allowedRoles={["parent"]}
+            />
+          ),
+          errorElement: <Error />,
+        },
+      ],
     },
     {
       path: "/parentchildnotice",

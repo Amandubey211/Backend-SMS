@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 const FinanceTable = () => {
   const { t } = useTranslation('admAccounts');
   const { feesDetails } = useSelector((store) => store.admin.all_students);
-  console.log("--", feesDetails.fees);
+  // console.log("--", feesDetails.fees);
 
   return (
     <table className="min-w-full leading-normal">
@@ -22,7 +22,7 @@ const FinanceTable = () => {
       </thead>
       {feesDetails?.fees?.length > 0 ? (
         <tbody>
-          {[...feesDetails?.fees].reverse().map((item, index) => (
+          {[...feesDetails?.fees].reverse()?.map((item, index) => (
             <tr key={index} className="text-left text-gray-700">
               <td className="px-5 py-2 border-b border-gray-200">{item.feeType}</td>
               <td className="px-5 py-2 border-b border-gray-200">{item.paidBy || "-"}</td>

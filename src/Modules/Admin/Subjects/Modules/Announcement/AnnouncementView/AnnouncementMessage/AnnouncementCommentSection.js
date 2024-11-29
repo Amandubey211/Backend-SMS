@@ -90,13 +90,13 @@ const AnnouncementCommentSection = () => {
       <div className="h-[70%] overflow-y-scroll no-scrollbar px-6">
         {loading && <Spinner />}
         {error && <p className="text-red-500">Error: {error}</p>}
-        {!loading && !error && filteredComments.length === 0 && (
+        {!loading && !error && filteredComments?.length === 0 && (
           <div className="text-center w-full mt-40">
             <FaRegCommentDots size={64} className="mx-auto text-gray-500" />
             <p className="mt-4 text-lg text-gray-500">No comments found</p>
           </div>
         )}
-        {filteredComments.map((comment) => (
+        {filteredComments?.map((comment) => (
           <AnnouncementComment
             key={comment._id}
             comment={comment}

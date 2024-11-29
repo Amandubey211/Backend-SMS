@@ -139,12 +139,12 @@ const TableOfContents = ({ sections }) => {
               aria-label="Search Table of Contents"
             />
             <Scrollspy
-              items={filteredSections.map((section) => section.id)}
+              items={filteredSections?.map((section) => section.id)}
               currentClassName="text-blue-800 font-bold"
               className="list-disc list-inside space-y-2 md:space-y-4"
               offset={-100}
             >
-              {filteredSections.map((section, index) => (
+              {filteredSections?.map((section, index) => (
                 <motion.li
                   key={section.id}
                   initial={{ opacity: 0, x: -20 }}
@@ -180,12 +180,12 @@ const TableOfContents = ({ sections }) => {
             aria-label="Search Table of Contents"
           />
           <Scrollspy
-            items={filteredSections.map((section) => section.id)}
+            items={filteredSections?.map((section) => section.id)}
             currentClassName="text-blue-800 font-bold"
             className="list-disc list-inside space-y-4"
             offset={-100}
           >
-            {filteredSections.map((section, index) => (
+            {filteredSections?.map((section, index) => (
               <motion.li
                 key={section.id}
                 initial={{ opacity: 0, x: -20 }}

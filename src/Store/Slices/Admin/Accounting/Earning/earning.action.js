@@ -1,131 +1,92 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
-import { baseUrl } from "../../../../../config/Common";
 import { setErrorMsg, setShowError } from "../../../Common/Alerts/alertsSlice";
-import { ErrorMsg } from "../../../Common/Alerts/errorhandling.action";
-
-const say = localStorage.getItem("say");
-
-const getToken = (state, rejectWithValue, dispatch) => {
-    const token = state.common.auth?.token;
-    if (!token) {
-        dispatch(setShowError(true));
-        dispatch(setErrorMsg('Authentication Failed'));
-        return rejectWithValue('Authentication Failed');
-    }
-    return `Bearer ${token}`;
-};
+import { ErrorMsg, handleError } from "../../../Common/Alerts/errorhandling.action";
+import { deleteData, getData, postData, putData } from "../../../../../services/apiEndpoints";
+import { getAY } from "../../../../../Utils/academivYear";
 
 export const fetchEarning = createAsyncThunk(
     "accounting/earning",
-    async (_, { rejectWithValue, getState, dispatch }) => {
-        const token = getToken(getState(), rejectWithValue, dispatch);
-        if (typeof token === 'object') return token; // Return if token is not retrieved
-        const say = localStorage.getItem("say")
+    async (_, { rejectWithValue, dispatch }) => {
         try {
-            const response = await axios.get(`${baseUrl}/admin/getearning?say=${say}`, {
-                headers: { Authentication: token },
-            });
-
-            const data = response?.data?.earnings;
-            console.log("data---", data);
+            const say = getAY();
+            dispatch(setShowError(false));
+            const response = await getData(`/admin/getearning?say=${say}`);
+            const data = response?.earnings;
+            // console.log("data---", data);
             return data;
 
         } catch (error) {
-            const err = ErrorMsg(error);
-            dispatch(setShowError(true));
-            dispatch(setErrorMsg(err.message));
-            return rejectWithValue(err.message);
+            handleError(error, dispatch, rejectWithValue)
         }
     }
 );
 
 export const fetchTotalAmounts = createAsyncThunk(
     "accounting/fetchtotalamounts",
-    async (_, { rejectWithValue, getState, dispatch }) => {
-        const token = getToken(getState(), rejectWithValue, dispatch);
-        if (typeof token === 'object') return token;
-        const say = localStorage.getItem("say")
-        try {
-            const response = await axios.get(`${baseUrl}/admin/total_amount?say=${say}`, {
-                headers: { Authentication: token },
-            });
+    async (_, { rejectWithValue, dispatch }) => {
 
-            return response?.data;
+        try {
+            const say = getAY();
+            dispatch(setShowError(false));
+            const response = await getData(`/admin/total_amount?say=${say}`);
+            // console.log("response", response);
+
+            return response;
 
         } catch (error) {
-            const errMsg = ErrorMsg(error);
-            dispatch(setShowError(true));
-            dispatch(setErrorMsg(errMsg.message));
-            return rejectWithValue(errMsg.message);
+            handleError(error, dispatch, rejectWithValue)
         }
     }
 );
 
 export const updateEarning = createAsyncThunk(
     "accounting/updateEarning",
-    async ({ id, updatedEarning }, { rejectWithValue, getState, dispatch }) => {
-        const token = getToken(getState(), rejectWithValue, dispatch);
-        if (typeof token === 'object') return token;
-        const say = localStorage.getItem("say")
-        try {
-            const response = await axios.put(`${baseUrl}/admin/updateEarning/${id}?say=${say}`, updatedEarning, {
-                headers: { Authentication: token }
-            });
+    async ({ id, updatedEarning }, { rejectWithValue, dispatch }) => {
 
+        try {
+            const say = getAY();
+            dispatch(setShowError(false));
+            const response = await putData(`/admin/updateEarning/${id}?say=${say}`, updatedEarning);
+          dispatch(fetchEarning())
             return response?.data;
 
         } catch (error) {
-            const errMsg = ErrorMsg(error);
-            dispatch(setShowError(true));
-            dispatch(setErrorMsg(errMsg.message));
-            return rejectWithValue(errMsg.message);
+            handleError(error, dispatch, rejectWithValue)
         }
     }
 );
 
 export const createEarning = createAsyncThunk(
     "accounting/createEarning",
-    async ({ payload }, { rejectWithValue, getState, dispatch }) => {
-        const token = getToken(getState(), rejectWithValue, dispatch);
-        if (typeof token === 'object') return token;
-        const say = localStorage.getItem("say")
+    async ({ payload }, { rejectWithValue, dispatch }) => {
         try {
-            const response = await axios.post(`${baseUrl}/admin/addEarning?say=${say}`, payload, {
-                headers: { Authentication: token }
-            });
+            const say = getAY();
+            dispatch(setShowError(false));
+            const response = await postData(`/admin/addEarning?say=${say}`, payload);
 
-            console.log("response of create", response);
+            // console.log("response of create", response);
             return response?.data;
 
         } catch (error) {
-            const errMsg = ErrorMsg(error);
-            dispatch(setShowError(true));
-            dispatch(setErrorMsg(errMsg.message));
-            return rejectWithValue(errMsg.message);
+            handleError(error, dispatch, rejectWithValue)
         }
     }
 );
 
 export const deleteEarning = createAsyncThunk(
     "accounting/deleteEarning",
-    async ({ id }, { rejectWithValue, getState, dispatch }) => {
-        const token = getToken(getState(), rejectWithValue, dispatch);
-        if (typeof token === 'object') return token;
-        const say = localStorage.getItem("say")
-        try {
-            const response = await axios.delete(`${baseUrl}/admin/deleteEarning/${id}?say=${say}`, {
-                headers: { Authentication: token }
-            });
+    async ({ id }, { rejectWithValue, dispatch }) => {
 
-            console.log("response of delete", response);
+        try {
+            const say = getAY();
+            dispatch(setShowError(false));
+            const response = await deleteData(`/admin/deleteEarning/${id}?say=${say}`);
+
+            //// console.log("response of delete", response);
             return response?.data;
 
         } catch (error) {
-            const errMsg = ErrorMsg(error);
-            dispatch(setShowError(true));
-            dispatch(setErrorMsg(errMsg.message));
-            return rejectWithValue(errMsg.message);
+            handleError(error, dispatch, rejectWithValue)
         }
     }
 );

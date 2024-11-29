@@ -14,7 +14,7 @@ const HomeLeft = () => {
           <h1 className="text-3xl font-bold ">Welcome to the LMS!</h1>
           <p className="text-gray-600">Choose an account type to proceed:</p>
 
-          {HomeData.map(({ path, imgSrc, altText, title, description }) => (
+          {HomeData?.map(({ path, imgSrc, altText, title, description }) => (
             <NavLink
               key={path}
               to={path}

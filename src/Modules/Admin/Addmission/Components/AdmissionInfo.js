@@ -15,10 +15,10 @@ const AdmissionInfo = ({
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (classList.length === 0) {
+    if (classList?.length === 0) {
       dispatch(fetchAllClasses());
     }
-  }, [dispatch, classList.length]);
+  }, [dispatch, classList?.length]);
 
   return (
     <div className="mt-6">

@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import ImageUpload from "../../Addmission/Components/ImageUpload";
 import FormInput from "../../Accounting/subClass/component/FormInput";
 import FormSelect from "../../Accounting/subClass/component/FormSelect";
-import useEditAdmin from "../../../../Hooks/AuthHooks/Staff/Admin/staff/useEditAdmin";
 // import useGetUserDetail from "../../../../Hooks/AuthHooks/Staff/useGetUserDetail";
 import { useDispatch } from "react-redux";
 import { fetchUserData, updateAdminProfile } from "../../../../Store/Slices/Common/User/actions/userActions";
@@ -81,7 +80,7 @@ const EditAdmin = ({data}) => {
             </div>
             <div className="flex flex-col gap-3">
               <FormInput id="adminName" label="Full Name" value={adminData.adminName} onChange={handleInputChange} />
-              <FormInput id="email"  label="Email" type="email"   value={adminData.email} readOnly />
+              <FormInput id="email"  label="Email" type="email"   value={adminData.email} readOnly={true} />
               <FormInput id="contactNumber" label="Contact" type="text" value={adminData.contactNumber} onChange={handleInputChange} />
             </div>
           </div>

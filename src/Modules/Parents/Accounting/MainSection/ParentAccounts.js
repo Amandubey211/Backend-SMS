@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo, useCallback } from "react";
+import React, { useEffect, useState, useMemo, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAccountingData } from '../../../../Store/Slices/Parent/Dashboard/dashboard.action'; // Redux action to fetch accounting data
@@ -32,20 +32,30 @@ const AccountingSection = () => {
 
   // Redux state for accounting data
   const {
-    accountingData,
+    accountingData = {
+      fees: [],
+      totalUnpaidFees: 0,
+      totalPaidFees: 0
+    },
     loadingAccounting: loading, // Alias loading state for simplicity
     errorAccounting: error // Alias error state for simplicity
-  } = useSelector((state) => state?.Parent?.dashboard || {});
+  } = useSelector((state) => state?.Parent?.dashboard || {}); // Optional chaining to safely access Parent and dashboard
+
+  // useRef to track if fetchAccountingData has been dispatched
+  const hasFetched = useRef(false);
 
   // Dispatch action to fetch accounting data on component mount
   useEffect(() => {
-    dispatch(fetchAccountingData());
+    if (!hasFetched.current) {
+      dispatch(fetchAccountingData());
+      hasFetched.current = true;
+    }
   }, [dispatch]);
 
-  // Check if accountingData exists and has fees data
-  const fees = accountingData?.fees ?? [];
-  const totalUnpaidFees = accountingData?.totalUnpaidFees ?? "";
-  const totalPaidFees = accountingData?.totalPaidFees ?? "";
+  // Extracting data with safe defaults
+  const fees = useMemo(() => accountingData?.fees ?? [], [accountingData]);
+  const totalUnpaidFees = accountingData?.totalUnpaidFees ?? 0;
+  const totalPaidFees = accountingData?.totalPaidFees ?? 0;
 
   // Memoize the filter options inside the component itself
   const classes = useMemo(() => uniqueFilterOptions(fees, "class"), [fees]);
@@ -55,23 +65,23 @@ const AccountingSection = () => {
   // Apply filters to the fees data, useMemo to optimize the filtered data calculation
   const filteredData = useMemo(() => {
     return fees?.filter((item) => {
-      const classCondition = filters?.class === "" || !item?.class || item?.class === filters?.class;
-      const sectionCondition = filters?.section === "" || !item?.section || item?.section === filters?.section;
-      const feeTypeCondition = !filters?.feeType || item?.feeType === filters?.feeType;
+      const classCondition = filters?.class === "" || item?.class === filters?.class;
+      const sectionCondition = filters?.section === "" || item?.section === filters?.section;
+      const feeTypeCondition = filters?.feesType === "" || item?.feeType === filters?.feesType;
       const statusCondition = filters?.status === "Everyone" || item?.status === filters?.status;
       return classCondition && sectionCondition && feeTypeCondition && statusCondition;
     });
   }, [fees, filters]);
 
   // Calculate total pages for pagination
-  const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+  const totalPages = useMemo(() => Math.ceil(filteredData?.length / rowsPerPage), [filteredData?.length, rowsPerPage]);
 
   // Determine which data to show on the current page
   const paginatedData = useMemo(() => {
     const startIndex = (currentPage - 1) * rowsPerPage;
     const endIndex = startIndex + rowsPerPage;
-    return filteredData.slice(startIndex, endIndex);
-  }, [currentPage, filteredData]);
+    return filteredData?.slice(startIndex, endIndex); // Safe slicing
+  }, [currentPage, filteredData, rowsPerPage]);
 
   // Handle page change with left and right arrows
   const handleNextPage = useCallback(() => {
@@ -87,6 +97,13 @@ const AccountingSection = () => {
     navigate("/parentfinance");
   }, [navigate]);
 
+  // Reset currentPage if filters change and currentPage exceeds totalPages
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(1);
+    }
+  }, [currentPage, totalPages]);
+
   return (
     <Layout title={t("Finance")}>
       <div className="p-4 w-full">
@@ -95,7 +112,7 @@ const AccountingSection = () => {
           <h2 className="text-lg font-semibold text-gray-600 text-center">
             {t("Finance")}
           </h2>
-          {!error && paginatedData.length > 0 && (
+          {!error && paginatedData?.length > 0 && (
             <div className="flex items-center space-x-4">
               <button
                 className="text-gray-500"
@@ -126,20 +143,23 @@ const AccountingSection = () => {
 
         <div className="p-4 flex items-center justify-center w-full ">
           {/* Adjusting the table layout to show rows based on pagination */}
-          <div className=" rounded-lg">
+          <div className="rounded-lg w-full overflow-x-auto">
             {loading ? (
               // Show spinner when loading
-              <>
+              <div className="flex flex-col items-center justify-center p-10">
                 <Spinner />
                 <p className="text-gray-600">{t("Loading...")}</p>
-              </>
+              </div>
             ) : error ? (
               // Show error message when error occurs
-              <>
+              <div className="flex flex-col items-center p-10">
                 <FaExclamationCircle className="text-gray-400 text-4xl mb-4" />
-                <p className="text-gray-600 text-lg"> {error}: {t("Unable to fetch Fees")}</p>
-              </>
-            ) : paginatedData.length === 0 ? (
+                <p className="text-gray-600 text-lg"> 
+                  {error ? `${error}: ` : ""}
+                  {t("Unable to fetch Fees")}
+                </p>
+              </div>
+            ) : paginatedData?.length === 0 ? (
               // No data available, show icon and message
               <div className="flex flex-col items-center p-10">
                 <FaMoneyBillWave className="text-gray-400 text-6xl mb-4" />
@@ -147,7 +167,6 @@ const AccountingSection = () => {
               </div>
             ) : (
               // Display paginated data in table
-
               <table className="w-full table-fixed leading-normal">
                 <thead>
                   <tr className="text-left text-gray-700 bg-[#F9FAFC]">
@@ -160,8 +179,8 @@ const AccountingSection = () => {
                   </tr>
                 </thead>
                 <tbody className="space-y-2">
-                  {paginatedData.map((item, index) => (
-                    <tr key={index} className="text-left text-gray-700 bg-white shadow-sm">
+                  {paginatedData?.map((item) => (
+                    <tr key={item.id} className="text-left text-gray-700 bg-white shadow-sm">
                       <td className="px-5 py-4 border-b border-gray-200 truncate">{item?.feeType ?? t("No Fee Type")}</td>
                       <td className="px-5 py-4 border-b border-gray-200">{item?.paidBy ?? "N/A"}</td>
                       <td className="px-5 py-4 border-b border-gray-200">{item?.dueDate ?? "N/A"}</td>
@@ -186,7 +205,6 @@ const AccountingSection = () => {
                   ))}
                 </tbody>
               </table>
-
             )}
           </div>
         </div>

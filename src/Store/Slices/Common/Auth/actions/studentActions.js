@@ -1,14 +1,15 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+
 import { resetState, setRole, setToken } from "../reducers/authSlice";
 import { setUserDetails } from "../../User/reducers/userSlice";
 import { baseUrl } from "../../../../../config/Common";
 import toast from "react-hot-toast";
 import { fetchAcademicYear } from "../../AcademicYear/academicYear.action";
-import { postData } from "../../../../../services/apiEndpoints";
+import { customRequest, postData } from "../../../../../services/apiEndpoints";
 import { handleError } from "../../Alerts/errorhandling.action";
 import { setShowError } from "../../Alerts/alertsSlice";
-
+import Cookies from 'js-cookie'
+import { setLocalCookies } from "../../../../../Utils/academivYear";
 // Student login action
 export const studentLogin = createAsyncThunk(
   "auth/studentLogin",
@@ -24,10 +25,8 @@ export const studentLogin = createAsyncThunk(
       const data = await postData(`/auth/student/login`, studentDetails);
 
       if (data.success) {
-        localStorage.setItem(`userToken`, `${data.token}`);
-        localStorage.setItem("classId", `${data.classId}`);
-
-        dispatch(setToken(data?.token)); // Store token in state
+      //  localStorage.setItem("classId", `${data.classId}`);
+     //   dispatch(setToken(data?.token)); // Store token in state
         dispatch(setRole(data?.role)); // Set role
         dispatch(
           setUserDetails({
@@ -42,6 +41,7 @@ export const studentLogin = createAsyncThunk(
             Q_Id: data?.Q_Id,
             enrollment: data?.enrollment,
             className: data?.className,
+            classId: data?.classId,
             sectionName: data?.sectionName,
             schoolName: data?.schoolName,
           })
@@ -53,7 +53,7 @@ export const studentLogin = createAsyncThunk(
             await getState().common?.academicYear?.academicYears?.find(
               (i) => i.isActive == true
             );
-          localStorage.setItem("say", activeAcademicYear?._id);
+          setLocalCookies("say", activeAcademicYear?._id);
           return { redirect: "/student_dash" };
         } else {
           return { redirect: "/verify_qid" };
@@ -76,6 +76,11 @@ export const studentLogout = createAsyncThunk(
   async (_, { dispatch }) => {
     dispatch(resetState()); // Reset auth state
     localStorage.clear();
+    Cookies.remove('userToken');
+    Cookies.remove('say');
+    Cookies.remove('isAcademicYearActive');
+    Cookies.remove('schoolId');
+    Cookies.remove('SelectedschoolId');
     toast.success("Logged out successfully", {
       position: "bottom-left",
     });
@@ -106,38 +111,31 @@ export const qidVerification = createAsyncThunk(
 // / Thunk for registering student details
 export const registerStudentDetails = createAsyncThunk(
   "auth/registerStudentDetails",
-  async (formData, { rejectWithValue }) => {
+  async (formData, { rejectWithValue,dispatch }) => {
     try {
-      const response = await axios.post(
-        `${baseUrl}/student/student_register`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
+      const response = await customRequest('post',
+        `/student/student_register`,
+        formData,   {
+          "Content-Type": "multipart/form-data",
         }
-      );
-      if (response.data.success) {
+);
+      if (response.success) {
         toast.success("Registered Successfully");
-        return response.data;
+        return response;
       } else {
         return rejectWithValue(
-          response.data.msg || "Failed to save student details."
+          response.msg || "Failed to save student details."
         );
       }
     } catch (error) {
-      const errorMessage =
-        error.response?.data?.msg ||
-        "An error occurred while submitting the details.";
-      return rejectWithValue(errorMessage);
-    }
-  }
+     return handleError(error, dispatch, rejectWithValue);
+  }}
 );
 
 // Thunk for uploading student documents
 export const uploadStudentDocuments = createAsyncThunk(
   "auth/uploadStudentDocuments",
-  async ({ email, schoolId, studentDocuments }, { rejectWithValue }) => {
+  async ({ email, schoolId, studentDocuments }, { rejectWithValue,dispatch }) => {
     try {
       if (!email) {
         return rejectWithValue("Email is required");
@@ -153,29 +151,22 @@ export const uploadStudentDocuments = createAsyncThunk(
         formData.append(`documents`, file);
         formData.append(`documentLabels`, label);
       });
-
-      const response = await axios.post(
-        `${baseUrl}/student/upload_documents`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
+      const response = await customRequest('post',
+        `/student/upload_documents`,
+        formData,   {
+          "Content-Type": "multipart/form-data",
         }
+    
       );
-
-      if (response.data.success) {
-        return response.data;
+      if (response.success) {
+        return response;
       } else {
         return rejectWithValue(
           response.data.msg || "Failed to upload the document"
         );
       }
     } catch (error) {
-      const errorMessage =
-        error.response?.data?.msg ||
-        "An error occurred while uploading the documents.";
-      return rejectWithValue(errorMessage);
+     return handleError(error, dispatch, rejectWithValue);
     }
   }
 );

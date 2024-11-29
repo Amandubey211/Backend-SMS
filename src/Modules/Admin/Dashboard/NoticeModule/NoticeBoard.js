@@ -20,7 +20,7 @@ const generateRandomColor = () => {
     "#FBB778",
     "#F9B279",
   ];
-  return colors[Math.floor(Math.random() * colors.length)];
+  return colors[Math.floor(Math.random() * colors?.length)];
 };
 
 const NoticeBoard = (descriptionLength) => {
@@ -55,7 +55,7 @@ const NoticeBoard = (descriptionLength) => {
   const noticesSort = noticesArray.sort(
     (a, b) => new Date(b.startDate) - new Date(a.startDate)
   );
-  const topNotices = noticesSort.slice(0, 3);
+  const topNotices = noticesSort?.slice(0, 3);
 
   return (
     <div className="p-2">
@@ -70,7 +70,7 @@ const NoticeBoard = (descriptionLength) => {
           {t("View All")}
         </button>
       </div>
-      {topNotices.length === 0 ? (
+      {topNotices?.length === 0 ? (
         <div className="flex flex-col items-center justify-center my-10">
           <FaCalendarAlt className="text-gray-400 text-6xl mb-4" />
           <p className="text-gray-500 text-xl">
@@ -78,10 +78,10 @@ const NoticeBoard = (descriptionLength) => {
           </p>
         </div>
       ) : (
-        topNotices.map((notice, index) => (
+        topNotices?.map((notice, index) => (
           <Notice
             key={index}
-            image={icons[index % icons.length]} // Use cyclic icons
+            image={icons[index % icons?.length]} // Use cyclic icons
             title={notice?.title}
             authorName={notice?.authorName}
             date={new Date(notice?.startDate).toLocaleDateString()} // Formatting date

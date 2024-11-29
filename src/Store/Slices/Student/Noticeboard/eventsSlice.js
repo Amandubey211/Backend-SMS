@@ -27,7 +27,7 @@ const stdEventsSlice = createSlice({
       state.sidebarContent = action.payload;
     },
     setFilteredEvents: (state, action) => {
-      console.log("filter event slice: ", action.payload);
+      // console.log("filter event slice: ", action.payload);
       state.filteredEvents = action.payload;
     },
     setCurrentPage: (state, action) => {
@@ -45,7 +45,7 @@ const stdEventsSlice = createSlice({
       })
       .addCase(stdEvent.fulfilled, (state, action) => {
         state.loading = false;
-        // console.log("hi i am std event:", action.payload)
+        // // console.log("hi i am std event:", action.payload)
         state.eventData = action.payload;
       })
       .addCase(stdEvent.rejected, (state, action) => {

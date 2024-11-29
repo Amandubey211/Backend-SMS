@@ -26,10 +26,10 @@ const UnverifiedStudents = () => {
     const isDataStale =
       !lastFetchedUnverified || now - lastFetchedUnverified > CACHE_DURATION;
 
-    if (unVerifiedStudents.length === 0 || isDataStale) {
+    if (unVerifiedStudents?.length === 0 || isDataStale) {
       dispatch(fetchUnverifiedStudents());
     }
-  }, [dispatch, unVerifiedStudents.length, lastFetchedUnverified]);
+  }, [dispatch, unVerifiedStudents?.length, lastFetchedUnverified]);
 
   // Memoized filtered students based on search query
   const filteredStudents = useMemo(() => {
@@ -50,7 +50,7 @@ const UnverifiedStudents = () => {
     );
   }
 
-  if (filteredStudents.length === 0) {
+  if (filteredStudents?.length === 0) {
     return (
       <div className="flex flex-col justify-center items-center h-64">
         <FaUserSlash className="text-6xl text-gray-400 mb-4" /> {/* Big Icon */}
@@ -65,7 +65,7 @@ const UnverifiedStudents = () => {
   return (
     <div className="animate-fadeIn">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredStudents.map((student) => (
+        {filteredStudents?.map((student) => (
           <UnVerifiedStudentCard key={student._id} studentId={student._id} />
         ))}
       </div>

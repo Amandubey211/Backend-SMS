@@ -1,47 +1,23 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
-import { baseUrl } from "../../../../../config/Common";
 import toast from "react-hot-toast";
 import { setShowError, setErrorMsg } from "../../../Common/Alerts/alertsSlice";
-import { ErrorMsg } from "../../../Common/Alerts/errorhandling.action";
+import { ErrorMsg, handleError } from "../../../Common/Alerts/errorhandling.action";
+import { getAY } from "../../../../../Utils/academivYear";
+import { deleteData, getData, postData, putData } from "../../../../../services/apiEndpoints";
 
-const say = localStorage.getItem("say");
-
-// Helper function to get the token from Redux state with centralized error handling
-const getToken = (state, rejectWithValue, dispatch) => {
-  const token = state.common.auth?.token;
-  if (!token) {
-    dispatch(setShowError(true));
-    dispatch(setErrorMsg("Authentication Failed"));
-    return rejectWithValue("Authentication Failed");
-  }
-  return `Bearer ${token}`;
-};
-
-// Centralized error handling
-const handleError = (error, dispatch, rejectWithValue) => {
-  const err = ErrorMsg(error);
-  dispatch(setShowError(true));
-  dispatch(setErrorMsg(err.message));
-  return rejectWithValue(err.message);
-};
-
-// Thunks with error handling, token management, and `say` parameter
 
 // Fetch Groups by Class
 export const fetchGroupsByClass = createAsyncThunk(
   "group/fetchGroupsByClass",
-  async (classId, { getState, rejectWithValue, dispatch }) => {
+  async (classId, {  rejectWithValue, dispatch }) => {
     try {
-      const token = getToken(getState(), rejectWithValue, dispatch);
-      const say = localStorage.getItem("say");
-      const response = await axios.get(
-        `${baseUrl}/admin/group/${classId}?say=${say}`,
-        {
-          headers: { Authentication: token },
-        }
+      dispatch(setShowError(false));
+      const say = getAY()
+      const response = await getData(
+        `/admin/group/${classId}?say=${say}`
+        
       );
-      return response.data.data;
+      return response.data;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
@@ -53,13 +29,12 @@ export const fetchGroupsByClassAndSection = createAsyncThunk(
   "group/fetchGroupsByClassAndSection",
   async ({ classId, sectionId }, { getState, rejectWithValue, dispatch }) => {
     try {
-      const token = getToken(getState(), rejectWithValue, dispatch);
-      const say = localStorage.getItem("say");
-      const response = await axios.get(
-        `${baseUrl}/admin/group/class/${classId}/section/${sectionId}?say=${say}`,
-        { headers: { Authentication: token } }
+      dispatch(setShowError(false));
+      const say = getAY()
+      const response = await getData(
+        `/admin/group/class/${classId}/section/${sectionId}?say=${say}`
       );
-      return response.data.data;
+      return response.data;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
@@ -69,17 +44,15 @@ export const fetchGroupsByClassAndSection = createAsyncThunk(
 // Fetch Sections by Class
 export const fetchSectionsByClass = createAsyncThunk(
   "group/fetchSectionsByClass",
-  async (classId, { getState, rejectWithValue,dispatch }) => {
+  async (classId, {  rejectWithValue,dispatch }) => {
     try {
-      const token = getState().common.auth.token;
-      const say = localStorage.getItem("say");
-      const response = await axios.get(
-        `${baseUrl}/admin/getSectionByclass/${classId}?say=${say}`,
-        {
-          headers: { Authentication: `Bearer ${token}` },
-        }
+      dispatch(setShowError(false));
+      const say = getAY()
+      const response = await getData(
+        `/admin/getSectionByclass/${classId}?say=${say}`,
+       
       );
-      return response.data.data;
+      return response.data;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
@@ -89,15 +62,14 @@ export const fetchSectionsByClass = createAsyncThunk(
 // Fetch Unassigned Students
 export const fetchUnassignedStudents = createAsyncThunk(
   "student/fetchUnassignedStudents",
-  async (classId, { getState, rejectWithValue, dispatch }) => {
+  async (classId, {  rejectWithValue, dispatch }) => {
     try {
-      const token = getToken(getState(), rejectWithValue, dispatch);
-      const say = localStorage.getItem("say");
-      const response = await axios.get(
-        `${baseUrl}/admin/unassignedStudent/${classId}?say=${say}`,
-        { headers: { Authentication: token } }
+      dispatch(setShowError(false));
+      const say = getAY()
+      const response = await getData(
+        `/admin/unassignedStudent/${classId}?say=${say}`
       );
-      return response.data.data;
+      return response.data;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
@@ -107,19 +79,16 @@ export const fetchUnassignedStudents = createAsyncThunk(
 // Create Group
 export const createGroup = createAsyncThunk(
   "group/createGroup",
-  async (groupData, { getState, rejectWithValue, dispatch }) => {
+  async (groupData, {  rejectWithValue, dispatch }) => {
     try {
-      const token = getToken(getState(), rejectWithValue, dispatch);
-      const say = localStorage.getItem("say");
-      const response = await axios.post(
-        `${baseUrl}/admin/group?say=${say}`,
-        groupData,
-        {
-          headers: { Authentication: token },
-        }
+      dispatch(setShowError(false));
+      const say = getAY()
+      const response = await postData(
+        `/admin/group?say=${say}`,
+        groupData
       );
       toast.success("Group added successfully!");
-      return response.data.data;
+      return response.data;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
@@ -129,17 +98,17 @@ export const createGroup = createAsyncThunk(
 // Update Group
 export const updateGroup = createAsyncThunk(
   "group/updateGroup",
-  async ({ groupId, formData }, { getState, rejectWithValue, dispatch }) => {
+  async ({ groupId, formData }, {  rejectWithValue, dispatch }) => {
     try {
-      const token = getToken(getState(), rejectWithValue, dispatch);
-      const say = localStorage.getItem("say");
-      const response = await axios.put(
-        `${baseUrl}/admin/group/${groupId}?say=${say}`,
+      dispatch(setShowError(false));
+      const say = getAY()
+      const response = await putData(
+        `/admin/group/${groupId}?say=${say}`,
         formData,
-        { headers: { Authentication: token } }
+      
       );
       toast.success("Group updated successfully!");
-      return response.data.data;
+      return response.data;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
@@ -149,12 +118,11 @@ export const updateGroup = createAsyncThunk(
 // Delete Group
 export const deleteGroup = createAsyncThunk(
   "group/deleteGroup",
-  async (groupId, { getState, rejectWithValue, dispatch }) => {
+  async (groupId, {  rejectWithValue, dispatch }) => {
     try {
-      const token = getToken(getState(), rejectWithValue, dispatch);
-      await axios.delete(`${baseUrl}/admin/group/${groupId}?say=${say}`, {
-        headers: { Authentication: token },
-      });
+      dispatch(setShowError(false));
+      const say = getAY()
+      await deleteData(`admin/group/${groupId}?say=${say}`);
       toast.success("Group deleted successfully!");
       return groupId;
     } catch (error) {
@@ -163,36 +131,19 @@ export const deleteGroup = createAsyncThunk(
   }
 );
 
-// // Fetch Sections by Class
-// export const fetchSectionsByClass = createAsyncThunk(
-//   "group/fetchSectionsByClass",
-//   async (classId, { getState, rejectWithValue, dispatch }) => {
-//     try {
-//       const token = getToken(getState(), rejectWithValue, dispatch);
-//       const response = await axios.get(
-//         `${baseUrl}/admin/getSectionByclass/${classId}?say=${say}`,
-//         { headers: { Authentication: token } }
-//       );
-//       return response.data.data;
-//     } catch (error) {
-//       return handleError(error, dispatch, rejectWithValue);
-//     }
-//   }
-// );
-
-// Create Section
 export const createSection = createAsyncThunk(
   "section/createSection",
-  async (sectionData, { getState, rejectWithValue, dispatch }) => {
+  async (sectionData, {  rejectWithValue, dispatch }) => {
     try {
-      const token = getToken(getState(), rejectWithValue, dispatch);
-      const response = await axios.post(
-        `${baseUrl}/admin/section?say=${say}`,
+      dispatch(setShowError(false));
+      const say = getAY()
+      const response = await postData(
+        `/admin/section?say=${say}`,
         sectionData,
-        { headers: { Authentication: token } }
+  
       );
       toast.success("Section created successfully!");
-      return response.data.data;
+      return response.data;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
@@ -204,17 +155,18 @@ export const updateSection = createAsyncThunk(
   "section/updateSection",
   async (
     { sectionId, sectionData },
-    { getState, rejectWithValue, dispatch }
+    {  rejectWithValue, dispatch }
   ) => {
     try {
-      const token = getToken(getState(), rejectWithValue, dispatch);
-      const response = await axios.put(
-        `${baseUrl}/admin/editSection/${sectionId}?say=${say}`,
+      dispatch(setShowError(false));
+      const say = getAY()
+      const response = await putData(
+        `/admin/editSection/${sectionId}?say=${say}`,
         sectionData,
-        { headers: { Authentication: token } }
+     
       );
       toast.success("Section updated successfully!");
-      return response.data.section;
+      return response.section;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
@@ -224,12 +176,11 @@ export const updateSection = createAsyncThunk(
 // Delete Section
 export const deleteSection = createAsyncThunk(
   "section/deleteSection",
-  async (sectionId, { getState, rejectWithValue, dispatch }) => {
+  async (sectionId, {  rejectWithValue, dispatch }) => {
     try {
-      const token = getToken(getState(), rejectWithValue, dispatch);
-      await axios.delete(`${baseUrl}/admin/section/${sectionId}?say=${say}`, {
-        headers: { Authentication: token },
-      });
+      dispatch(setShowError(false));
+      const say = getAY()
+      await deleteData(`/admin/section/${sectionId}?say=${say}`);
       toast.success("Section deleted successfully!");
       return sectionId;
     } catch (error) {
@@ -241,16 +192,17 @@ export const deleteSection = createAsyncThunk(
 // Assign Student to Section
 export const assignStudentToSection = createAsyncThunk(
   "student/assignStudentToSection",
-  async ({ studentId, sectionId }, { getState, rejectWithValue, dispatch }) => {
+  async ({ studentId, sectionId }, {  rejectWithValue, dispatch }) => {
     try {
-      const token = getToken(getState(), rejectWithValue, dispatch);
-      const response = await axios.post(
-        `${baseUrl}/admin/assignStudentToSection?say=${say}`,
+      dispatch(setShowError(false));
+      const say = getAY()
+      const response = await postData(
+        `/admin/assignStudentToSection?say=${say}`,
         { studentId, sectionId },
-        { headers: { Authentication: token } }
+       
       );
       toast.success("Student assigned successfully!");
-      return response.data.data;
+      return response.data;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
@@ -260,16 +212,16 @@ export const assignStudentToSection = createAsyncThunk(
 // Remove Student from Group
 export const removeStudentFromGroup = createAsyncThunk(
   "student/removeStudentFromGroup",
-  async ({ studentId, groupId }, { getState, rejectWithValue, dispatch }) => {
+  async ({ studentId, groupId }, {  rejectWithValue, dispatch }) => {
     try {
-      const token = getToken(getState(), rejectWithValue, dispatch);
-      const response = await axios.put(
-        `${baseUrl}/admin/delStudentFrmGroup?say=${say}`,
+      dispatch(setShowError(false));
+      const say = getAY()
+      const response = await putData(
+        `/admin/delStudentFrmGroup?say=${say}`,
         { studentId, groupId },
-        { headers: { Authentication: token } }
       );
       toast.success("Student removed from group successfully!");
-      return response.data.data;
+      return response.data;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
