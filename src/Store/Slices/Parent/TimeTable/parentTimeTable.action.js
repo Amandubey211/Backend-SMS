@@ -20,8 +20,8 @@ export const fetchParentTimetable = createAsyncThunk(
           },
         }
       );
-
-      return response?.data?.timetables; // Return the timetables from the response
+      console.log('API Response:', response);  // Log the response to verify structure
+      return response; // Ensure response is in the expected format
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }

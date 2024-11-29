@@ -2,8 +2,9 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Table, Button, Input, message, Row } from "antd";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { FaArrowLeft } from "react-icons/fa";
+import { FaArrowLeft, FaEdit, FaTrashAlt } from "react-icons/fa";
 import { deleteTimetable } from "../../../../Store/Slices/Admin/TimeTable/timetable.action"; 
+import DeleteConfirmatiomModal from "../../../../Components/Common/DeleteConfirmationModal"; 
 import { useTranslation } from "react-i18next";
 
 const TableView = () => {
@@ -171,7 +172,23 @@ const TableView = () => {
     }
   };
 
+  // Handle Edit Function
+  const handleEdit = () => {
+    if (timetable && timetable._id) {
+      navigate(`/timetable/edit/${timetable._id}`);
+    } else {
+      message.error(t("Timetable ID is missing."));
+    }
+  };
 
+  // Modal Control Functions
+  const openDeleteModal = () => {
+    setIsDeleteModalOpen(true);
+  };
+
+  const closeDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+  };
 
   return (
     <div className="p-6">
@@ -191,7 +208,26 @@ const TableView = () => {
           allowClear
           style={{ width: 200, marginRight: 10 }}
         />
-        
+        {(role !== "parent" && role !== "student") && (
+          <>
+            <Button
+              icon={<FaEdit />}
+              type="primary"
+              onClick={handleEdit}
+              style={{ marginRight: 5 }}
+            >
+              {t("Edit")}
+            </Button>
+            <Button
+              icon={<FaTrashAlt />}
+              type="primary"
+              danger
+              onClick={openDeleteModal}
+            >
+              {t("Delete")}
+            </Button>
+          </>
+        )}
       </Row>
 
       <Table
@@ -206,7 +242,14 @@ const TableView = () => {
         bordered
       />
 
-     
+      {/* Delete Confirmation Modal */}
+      <DeleteConfirmatiomModal
+        isOpen={isDeleteModalOpen}
+        onClose={closeDeleteModal}
+        onConfirm={handleDelete}
+        loading={deleteLoading}
+        text={t("Delete this timetable")}
+      />
     </div>
   );
 };
