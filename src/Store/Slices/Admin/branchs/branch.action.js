@@ -4,8 +4,6 @@ import { getData, postData, putData } from "../../../../services/apiEndpoints";
 import { handleError } from "../../Common/Alerts/errorhandling.action";
 import { setShowError } from "../../Common/Alerts/alertsSlice";
 import Cookies from 'js-cookie'
-import { fetchAcademicYear } from "../../Common/AcademicYear/academicYear.action";
-import { redirect } from "react-router-dom";
 import { setLocalCookies } from "../../../../Utils/academivYear";
 export const fetchBranch = createAsyncThunk("user/Branch", async (_, { rejectWithValue, dispatch,getState, }) => {
   try {

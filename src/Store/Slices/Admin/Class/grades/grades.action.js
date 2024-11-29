@@ -12,7 +12,7 @@ export const fetchSubjectGrades = createAsyncThunk(
     dispatch(setShowError(false));
 
     try {
-      const endpoint = `/admin/grades/class/${classId}/subject/${subjectId}`;
+      const endpoint = `/admin/grades/class/${classId}/subject/${subjectId}?say=${say}`;
       const params = { say, ...filters };
 
       const response = await getData(endpoint, { params });
