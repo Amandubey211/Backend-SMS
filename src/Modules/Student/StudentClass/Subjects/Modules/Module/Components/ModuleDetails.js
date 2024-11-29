@@ -83,13 +83,13 @@
 
 //   return (
 //     <div>
-//       {moduleDetails.map((module, index) => (
+//       {moduleDetails?.map((module, index) => (
 //         <div key={index}>
 //           {/* <h2 className="font-semibold text-lg">{module.moduleName}</h2> */}
-//           {module.chapters.map((chapter, chapterIndex) => (
+//           {module.chapters?.map((chapter, chapterIndex) => (
 //             <div key={chapterIndex} className="ml-10 py-2">
 //               {/* <h3 className="font-semibold text-md">{chapter.name}</h3> */}
-//               {chapter.assignments.map((assignment, assignmentIndex) => (
+//               {chapter.assignments?.map((assignment, assignmentIndex) => (
 //                 <ChapterItem
 //                   key={assignmentIndex}
 //                   type="assignment"
@@ -98,7 +98,7 @@
 //                   isPublished={assignment.isPublished}
 //                 />
 //               ))}
-//               {chapter.quizzes.map((quiz, quizIndex) => (
+//               {chapter.quizzes?.map((quiz, quizIndex) => (
 //                 <ChapterItem
 //                   key={quizIndex}
 //                   type="quiz"

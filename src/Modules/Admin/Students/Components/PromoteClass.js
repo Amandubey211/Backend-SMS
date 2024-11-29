@@ -22,10 +22,10 @@
 
 //   useEffect(() => {
 //     // Fetch classes and academic years if necessary
-//     if (classes.length === 0) {
+//     if (classes?.length === 0) {
 //       // Dispatch thunk to fetch classes
 //     }
-//     if (academicYears.length === 0) {
+//     if (academicYears?.length === 0) {
 //       // Dispatch thunk to fetch academic years
 //     }
 //   }, [dispatch, classes, academicYears]);
@@ -105,7 +105,7 @@
 //               disabled={loading}
 //             >
 //               <option value="">Select Class</option>
-//               {classes.map((cls) => (
+//               {classes?.map((cls) => (
 //                 <option key={cls._id} value={cls._id}>
 //                   {cls.className}
 //                 </option>
@@ -125,7 +125,7 @@
 //               disabled={loading}
 //             >
 //               <option value="">Select Year</option>
-//               {academicYears.map((year) => (
+//               {academicYears?.map((year) => (
 //                 <option key={year._id} value={year._id}>
 //                   {year.academicYear}
 //                 </option>
@@ -186,10 +186,10 @@ const PromoteClass = ({ student }) => {
 
   useEffect(() => {
     // Fetch classes and academic years if necessary
-    if (classes.length === 0) {
+    if (classes?.length === 0) {
       // Dispatch thunk to fetch classes
     }
-    if (academicYears.length === 0) {
+    if (academicYears?.length === 0) {
       // Dispatch thunk to fetch academic years
     }
   }, [dispatch, classes, academicYears]);
@@ -261,7 +261,7 @@ const PromoteClass = ({ student }) => {
             disabled={loading || confirmLoading}
           >
             <option value="">Select Class</option>
-            {classes.map((cls) => (
+            {classes?.map((cls) => (
               <option key={cls._id} value={cls._id}>
                 {cls.className}
               </option>
@@ -281,7 +281,7 @@ const PromoteClass = ({ student }) => {
             disabled={loading || confirmLoading}
           >
             <option value="">Select Year</option>
-            {academicYears.map((year) => (
+            {academicYears?.map((year) => (
               <option key={year._id} value={year._id}>
                 {year.academicYear}
               </option>

@@ -32,8 +32,8 @@ const UnVerifiedStudentCard = ({ studentId }) => {
   // Hash function to generate a unique number from the studentId
   const hashCode = (str) => {
     let hash = 0;
-    if (str.length === 0) return hash;
-    for (let i = 0; i < str.length; i++) {
+    if (str?.length === 0) return hash;
+    for (let i = 0; i < str?.length; i++) {
       const char = str.charCodeAt(i);
       hash = (hash << 5) - hash + char;
       hash = hash & hash; // Convert to 32-bit integer
@@ -42,7 +42,7 @@ const UnVerifiedStudentCard = ({ studentId }) => {
   };
 
   // Calculate color index using the hash of studentId
-  const colorIndex = hashCode(studentId) % colors.length;
+  const colorIndex = hashCode(studentId) % colors?.length;
   const color = colors[colorIndex];
 
   return (

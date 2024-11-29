@@ -126,7 +126,7 @@ const StudentSignUpForm = () => {
         if (newErrors[type]) {
           const addressErrors = { ...newErrors[type] };
           delete addressErrors[name];
-          if (Object.keys(addressErrors).length === 0) {
+          if (Object.keys(addressErrors)?.length === 0) {
             delete newErrors[type];
           } else {
             newErrors[type] = addressErrors;
@@ -194,11 +194,11 @@ const StudentSignUpForm = () => {
     // Check if the key exists in errors to avoid undefined access
     if (!errors || !errors[key]) return;
 
-    if (pathArray.length === 1) {
+    if (pathArray?.length === 1) {
       obj[key] = errors[key];
     } else {
       obj[key] = obj[key] || {};
-      setFirstError(obj[key], errors[key], pathArray.slice(1));
+      setFirstError(obj[key], errors[key], pathArray?.slice(1));
     }
   }
 
@@ -207,7 +207,7 @@ const StudentSignUpForm = () => {
 
     const errors = validateStudentDetails(studentDetails, "student");
 
-    if (Object.keys(errors).length > 0) {
+    if (Object.keys(errors)?.length > 0) {
       // Set the entire errors object to validationErrors state
       setValidationErrors(errors);
 
@@ -256,7 +256,7 @@ const StudentSignUpForm = () => {
 
   //     if (registerStudentDetails.fulfilled.match(resultAction)) {
   //       // If there are no documents, stop here
-  //       if (studentDocuments.documents.length === 0) {
+  //       if (studentDocuments.documents?.length === 0) {
   //         toast.success(
   //           "Registration Successful! Please wait for verification."
   //         );
@@ -335,7 +335,7 @@ const StudentSignUpForm = () => {
   
       if (registerStudentDetails.fulfilled.match(resultAction)) {
         // If there are no documents, skip document upload
-        if (studentDocuments.documents.length === 0) {
+        if (studentDocuments.documents?.length === 0) {
           toast.success(
             "Registration Successful! Please wait for verification."
           );
@@ -385,7 +385,7 @@ const StudentSignUpForm = () => {
 
   const handlePhotoChange = (e) => {
     const files = Array.from(e.target.files);
-    if (files.length + studentDocuments.documents.length > 3) {
+    if (files?.length + studentDocuments.documents?.length > 3) {
       setValidationErrors({
         documents: "You can upload a maximum of 3 documents.",
       });

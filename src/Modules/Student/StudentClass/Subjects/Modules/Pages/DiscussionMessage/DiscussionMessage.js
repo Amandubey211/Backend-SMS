@@ -11,7 +11,7 @@ const DiscussionMessage = () => {
 
   const addComment = (text) => {
     const newComment = {
-      id: comments.length + 1,
+      id: comments?.length + 1,
       author: 'New User',
       role: null,
       time: 'Just now',
@@ -38,13 +38,13 @@ const DiscussionMessage = () => {
     };
 
     const addReplyRecursively = (comments) => {
-      return comments.map(comment => {
+      return comments?.map(comment => {
         if (comment.id === id && !isReplyToReply) {
           return {
             ...comment,
             replies: [newReply, ...comment.replies]
           };
-        } else if (comment.replies.length > 0) {
+        } else if (comment.replies?.length > 0) {
           return {
             ...comment,
             replies: addReplyRecursively(comment.replies)
@@ -70,13 +70,13 @@ const DiscussionMessage = () => {
 
   const deleteReply = (commentId, replyId) => {
     const deleteReplyRecursively = (comments) => {
-      return comments.map(comment => {
+      return comments?.map(comment => {
         if (comment.id === commentId) {
           return {
             ...comment,
             replies: comment.replies.filter(reply => reply.id !== replyId)
           };
-        } else if (comment.replies.length > 0) {
+        } else if (comment.replies?.length > 0) {
           return {
             ...comment,
             replies: deleteReplyRecursively(comment.replies)

@@ -23,7 +23,7 @@ const AssignStudent = ({ name, imageUrl, section, studentId }) => {
 
   // Preload the sectionId if the student already has a section
   useEffect(() => {
-    if (AllSections.length === 0) dispatch(fetchSectionsByClass(cid));
+    if (AllSections?.length === 0) dispatch(fetchSectionsByClass(cid));
 
     // If the student already has a section assigned, preload it in the dropdown
     const sectionToPreload = AllSections.find(

@@ -94,8 +94,8 @@ const AllStaff = () => {
             </div>
 
             <div className="flex flex-wrap -mx-2">
-              {staff.length > 0 ? (
-                staff.map((profile, index) => (
+              {staff?.length > 0 ? (
+                staff?.map((profile, index) => (
                   <ProfileCard
                     key={index}
                     profile={profile}

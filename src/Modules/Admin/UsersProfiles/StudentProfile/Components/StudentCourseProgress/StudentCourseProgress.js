@@ -13,7 +13,7 @@ const StudentCourseProgress = ({student}) => {
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(fetchStudentSubjectProgress(cid)).then(()=>{
-      if(studentSubjectProgress.length > 0){
+      if(studentSubjectProgress?.length > 0){
       dispatch(
         fetchCourseProgress({ studentId: cid, subjectId: studentSubjectProgress[0]?.subjectId })
       )}
@@ -32,7 +32,7 @@ const StudentCourseProgress = ({student}) => {
     <div className='py-2 max-w-[68vw]'>
     <div className='pb-2'>
       <div className='flex flex-row gap-2 p-4  overflow-x-auto max-w-full '>
-        {studentSubjectProgress.length > 0?
+        {studentSubjectProgress?.length > 0?
         studentSubjectProgress?.map((subject, index) => (
           <div key={index} className='min-w-max' onClick={()=>fetchModules(subject.subjectId)}>
             <SubjectCard subject={subject} i={index} />

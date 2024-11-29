@@ -11,14 +11,14 @@ const DetailedStudentList = ({ activeSection, onSeeGradeClick, students }) => {
 
   return (
     <div className="w-full p-4 bg-white">
-      {filteredStudents.length === 0 ? (
+      {filteredStudents?.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-64 text-center text-gray-500">
           <FaUsers className="text-6xl mb-4" />
           <p>No students found in this section.</p>
         </div>
       ) : (
         <ul>
-          {filteredStudents.map((student, index) => (
+          {filteredStudents?.map((student, index) => (
             <li
               key={student._id}
               className="relative flex items-center justify-between py-4 border-b"

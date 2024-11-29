@@ -20,7 +20,7 @@ export const fetchUnverifiedStudents = createAsyncThunk(
         `/admin/get_unverified_student_details?say=${say}`
       );
 
-      if (!response.students || response.students.length === 0) {
+      if (!response.students || response.students?.length === 0) {
         return rejectWithValue("No unverified students found.");
       }
       return response.students;
@@ -41,7 +41,7 @@ export const fetchRejectedStudents = createAsyncThunk(
       const response = await getData(
         `/admin/get_rejected_student_details?say=${say}`);
 
-      if (!response.students || response.students.length === 0) {
+      if (!response.students || response.students?.length === 0) {
         return rejectWithValue("No rejected students found.");
       }
       return response.students;

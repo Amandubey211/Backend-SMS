@@ -138,7 +138,7 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => { } }) => {
       style={{ width: '100%' }}
       placeholder="Select Day"
     >
-      {daysOfWeek.map((day) => (
+      {daysOfWeek?.map((day) => (
         <Option key={day} value={day}>
           {day}
         </Option>
@@ -163,7 +163,7 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => { } }) => {
   );
 
   const renderSubjectDropdown = (text, record, dataIndex) => {
-    const isDisabled = !formData.classId || !(subjects && subjects.length > 0);
+    const isDisabled = !formData.classId || !(subjects && subjects?.length > 0);
 
     return (
       <Select
@@ -173,8 +173,8 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => { } }) => {
         placeholder="Select Subject"
         disabled={isDisabled}
       >
-        {subjects && subjects.length > 0 ? (
-          subjects.map((subject, index) => {
+        {subjects && subjects?.length > 0 ? (
+          subjects?.map((subject, index) => {
             const subjectId = subject._id || subject.id || subject.subjectId;
             if (!subjectId) {
               console.warn(`Subject at index ${index} is missing an ID.`);
@@ -409,7 +409,7 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => { } }) => {
 
   // Delete selected rows
   const handleDeleteRows = () => {
-    if (selectedRowKeys.length === 0) return;
+    if (selectedRowKeys?.length === 0) return;
 
     setDataSource((prevData) => {
       const newData = [...prevData];
@@ -433,7 +433,7 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => { } }) => {
 
   // Undo delete rows
   const handleUndoDelete = () => {
-    if (deletedRowsStack.length === 0) return;
+    if (deletedRowsStack?.length === 0) return;
 
     setDataSource((prevData) => {
       let newData = [...prevData];
@@ -496,7 +496,7 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => { } }) => {
       errors.push('End date is required for exam or event.');
     }
 
-    if (dataSource.length === 0) {
+    if (dataSource?.length === 0) {
       errors.push('At least one row must be added to the timetable.');
     }
 
@@ -557,7 +557,7 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => { } }) => {
       }
     });
 
-    if (errors.length > 0) {
+    if (errors?.length > 0) {
       message.error(errors.join('\n'));
       return;
     }
@@ -610,7 +610,7 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => { } }) => {
         };
         dateMap[formattedDate].push(slotData);
       });
-      timetableData.days = Object.keys(dateMap).map((date) => ({
+      timetableData.days = Object.keys(dateMap)?.map((date) => ({
         date,
         slots: dateMap[date],
       }));
@@ -637,7 +637,7 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => { } }) => {
       // **Modified Section for 'others' Type**
 
       // Assign 'heading' within each slot based on 'otherTitle'
-      const slots = dataSource.map((row) => ({
+      const slots = dataSource?.map((row) => ({
         subjectId: row.subjectId,
         startTime: row.startTime,
         endTime: row.endTime,
@@ -761,7 +761,7 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => { } }) => {
                   placeholder="Select Class"
                 >
                   <Option value="">Select Class</Option>
-                  {classes.map((classItem) => (
+                  {classes?.map((classItem) => (
                     <Option key={classItem._id} value={classItem._id}>
                       {classItem.className}
                     </Option>
@@ -776,11 +776,11 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => { } }) => {
                   onChange={(value) => setFormData({ ...formData, sectionId: value })}
                   style={{ width: '100%' }}
                   placeholder="Select Section"
-                  disabled={!formData.classId || sectionsList.length === 0}
+                  disabled={!formData.classId || sectionsList?.length === 0}
                 >
                   <Option value="">Select Section</Option>
-                  {sectionsList.length > 0 ? (
-                    sectionsList.map((section) => (
+                  {sectionsList?.length > 0 ? (
+                    sectionsList?.map((section) => (
                       <Option key={section._id} value={section._id}>
                         {section.sectionName}
                       </Option>
@@ -800,11 +800,11 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => { } }) => {
                   onChange={(value) => setFormData({ ...formData, groupId: value })}
                   style={{ width: '100%' }}
                   placeholder="Select Group"
-                  disabled={!formData.classId || groupsList.length === 0}
+                  disabled={!formData.classId || groupsList?.length === 0}
                 >
                   <Option value="">Select Group</Option>
-                  {groupsList.length > 0 ? (
-                    groupsList.map((group) => (
+                  {groupsList?.length > 0 ? (
+                    groupsList?.map((group) => (
                       <Option key={group._id} value={group._id}>
                         {group.groupName}
                       </Option>
@@ -868,7 +868,7 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => { } }) => {
                 </Button>
 
                 <div className="flex space-x-2">
-                  {deletedRowsStack.length > 0 && (
+                  {deletedRowsStack?.length > 0 && (
                     <Button
                       icon={<UndoOutlined />}
                       onClick={handleUndoDelete}
@@ -883,7 +883,7 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => { } }) => {
                     </Button>
 
                   )}
-                  {selectedRowKeys.length > 0 && (
+                  {selectedRowKeys?.length > 0 && (
                     <Popconfirm
                       title="Are you sure you want to delete selected rows?"
                       onConfirm={handleDeleteRows}

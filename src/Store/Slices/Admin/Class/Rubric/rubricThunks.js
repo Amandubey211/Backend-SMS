@@ -122,7 +122,7 @@ export const getRubricByIdThunk = createAsyncThunk(
 
       const { success, rubric } = response;
 
-      if (success && rubric && rubric.length !== 0) {
+      if (success && rubric && rubric?.length !== 0) {
         // Rubric exists
         const existingRubric = rubric; // Assuming rubric is an object
 

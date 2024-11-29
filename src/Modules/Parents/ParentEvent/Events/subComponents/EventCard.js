@@ -14,7 +14,7 @@ const EventCard = ({ event, onClick }) => {
   ], []);
 
   const eventId = event?.id ?? 0;
-  const bgColor = bgColors[eventId % bgColors.length];
+  const bgColor = bgColors[eventId % bgColors?.length];
 
   // Function to format date with locale, handling null or invalid dates
   const formatDate = (dateString) => {
@@ -35,7 +35,7 @@ const EventCard = ({ event, onClick }) => {
 
   // Function to truncate text safely
   const truncateText = (text, maxLength) => {
-    return text && text.length > maxLength ? `${text.substring(0, maxLength)}...` : text ?? t('No Description');
+    return text && text?.length > maxLength ? `${text.substring(0, maxLength)}...` : text ?? t('No Description');
   };
 
   // Memoized values for optimization

@@ -44,8 +44,8 @@
 //             className="block w-full mb-4 p-2 border border-gray-300 rounded-lg"
 //           >
 //             <option value="">Choose Section</option>
-//             {AllSections.length > 0 ? (
-//               AllSections.map((section) => (
+//             {AllSections?.length > 0 ? (
+//               AllSections?.map((section) => (
 //                 <option key={section._id} value={section._id}>
 //                   {section.sectionName}
 //                 </option>
@@ -70,8 +70,8 @@
 //               disabled={loading || groupLoading}
 //             >
 //               <option value="">Choose Group</option>
-//               {groupsList.length > 0 ? (
-//                 groupsList.map((group) => (
+//               {groupsList?.length > 0 ? (
+//                 groupsList?.map((group) => (
 //                   <option key={group._id} value={group._id}>
 //                     {group.groupName}
 //                   </option>

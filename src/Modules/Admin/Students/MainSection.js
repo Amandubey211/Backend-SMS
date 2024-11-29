@@ -59,7 +59,7 @@ const MainSection = () => {
       <NavigationBar
         setActiveSection={setActiveSection}
         activeSection={activeSection}
-        totalStudents={students.length}
+        totalStudents={students?.length}
       />
       {loading ? (
         <div className="flex justify-center items-center h-64">

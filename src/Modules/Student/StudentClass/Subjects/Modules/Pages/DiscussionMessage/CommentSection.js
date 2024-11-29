@@ -4,7 +4,7 @@ import Comment from './Components/Comment';
 const CommentSection = ({ comments, deleteComment, deleteReply, addNestedReply, activeReplyId, setActiveReplyId }) => {
   return (
     <div className="w-full h-full">
-      {comments.map((comment) => (
+      {comments?.map((comment) => (
         <Comment
           key={comment.id}
           comment={comment}

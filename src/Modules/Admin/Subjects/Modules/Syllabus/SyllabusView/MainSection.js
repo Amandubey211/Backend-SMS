@@ -48,7 +48,7 @@ const MainSection = () => {
       return <NoDataFound title={t("Syllabus")} />;
     }
 
-    if (syllabi && syllabi.length > 0) {
+    if (syllabi && syllabi?.length > 0) {
       return (
         <>
           <SyllabusHeader
@@ -77,7 +77,7 @@ const MainSection = () => {
       <SubjectSideBar />
       <div className="border-l w-full p-4 relative">
         {renderContent()}
-        {syllabi && syllabi.length === 0 && (
+        {syllabi && syllabi?.length === 0 && (
           <NavLink
             to={`/class/${cid}/${sid}/syllabus/create_syllabus`}
             className="bg-gradient-to-r from-purple-400 to-pink-400 text-white p-4 fixed rounded-full shadow-md bottom-4 right-4"

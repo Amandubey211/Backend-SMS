@@ -59,7 +59,7 @@ const MyChildren = () => {
       return renderErrorMessage(); // Render error message when there's an error
     }
 
-    if (memoizedChildren.length === 0) {
+    if (memoizedChildren?.length === 0) {
       return (
         <div className="flex flex-col items-center justify-center h-full text-center py-10">
           <FaChild className="text-gray-400 text-8xl mb-6" />
@@ -89,14 +89,14 @@ const MyChildren = () => {
               }}
               className="text-sm font-semibold"
             >
-              {memoizedChildren.length.toString().padStart(2, '0')}
+              {memoizedChildren?.length.toString().padStart(2, '0')}
             </span>
           </div>
         </div>
 
         {/* Children grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {memoizedChildren.map((student) => (
+          {memoizedChildren?.map((student) => (
             <ChildCard key={student.id} student={student} />
           ))}
         </div>

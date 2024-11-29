@@ -25,8 +25,8 @@ const SelectBranch = () => {
   // Hash function to generate a unique number from the branchId
   const hashCode = (str) => {
     let hash = 0;
-    if (str.length === 0) return hash;
-    for (let i = 0; i < str.length; i++) {
+    if (str?.length === 0) return hash;
+    for (let i = 0; i < str?.length; i++) {
       const char = str.charCodeAt(i);
       hash = (hash << 5) - hash + char;
       hash = hash & hash; // Convert to 32-bit integer
@@ -94,8 +94,8 @@ const SelectBranch = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 justify-center mb-10">
               {loading ? (
                 <div className="w-full h-24 bg-gray-200 animate-pulse"></div>
-              ) : filteredBranches && filteredBranches.length > 0 ? (
-                [...filteredBranches].map((branch) => {
+              ) : filteredBranches && filteredBranches?.length > 0 ? (
+                [...filteredBranches]?.map((branch) => {
                   const colorIndex = hashCode(branch._id) % 6;
                   const color = [
                     "bg-yellow-300",

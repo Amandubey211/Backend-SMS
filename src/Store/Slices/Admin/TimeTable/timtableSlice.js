@@ -61,7 +61,7 @@ const timetableSlice = createSlice({
       })
       .addCase(updateTimetable.fulfilled, (state, action) => {
         state.loadingUpdate = false;
-        state.timetables = state.timetables.map((timetable) =>
+        state.timetables = state.timetables?.map((timetable) =>
           timetable._id === action.payload._id ? action.payload : timetable
         );
       })

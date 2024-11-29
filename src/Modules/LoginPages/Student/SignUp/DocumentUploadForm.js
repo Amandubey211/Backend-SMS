@@ -108,7 +108,7 @@ const DocumentUploadForm = ({
       )}
       <div className="grid grid-cols-1 gap-4">
         {studentDocuments.documents &&
-          studentDocuments.documents.map((doc, index) => (
+          studentDocuments.documents?.map((doc, index) => (
             <div
               key={index}
               className="border p-4 rounded-lg bg-white shadow-sm hover:shadow-lg transition duration-500 ease-in-out flex items-center"
@@ -179,7 +179,7 @@ const DocumentUploadForm = ({
             </div>
           ))}
         {studentDocuments.documents &&
-          studentDocuments.documents.length < 3 && (
+          studentDocuments.documents?.length < 3 && (
             <div
               onClick={handleFileUploadIconClick}
               className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-gray-300 rounded-md cursor-pointer hover:border-indigo-500 hover:bg-gray-100 transition duration-500 ease-in-out"

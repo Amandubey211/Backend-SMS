@@ -84,8 +84,8 @@ const AllAccountants = () => {
               </button>
             </div>
             <div className="flex flex-wrap -mx-2">
-              {accountant.length > 0 ? (
-                accountant.map((accountant, index) => (
+              {accountant?.length > 0 ? (
+                accountant?.map((accountant, index) => (
                   <ProfileCard
                     key={index}
                     profile={accountant}

@@ -61,7 +61,7 @@ const InputComment = ({
             className="absolute right-10 bottom-full mb-2 flex space-x-2 bg-white p-2 rounded shadow-md"
             ref={emojiListRef}
           >
-            {emojis.map((emoji, index) => (
+            {emojis?.map((emoji, index) => (
               <span
                 key={index}
                 onClick={() => handleEmojiClick(emoji)}

@@ -40,7 +40,7 @@ const StudentModalGradeList = ({ data, filters }) => {
 
   const sortedData = sortData(filteredData, filters.arrangeBy);
 
-  if (sortedData.length === 0) {
+  if (sortedData?.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-10 text-gray-500">
         <FaExclamationTriangle className="w-12 h-12 mb-3" />
@@ -72,7 +72,7 @@ const StudentModalGradeList = ({ data, filters }) => {
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
-          {sortedData.map((item, index) => (
+          {sortedData?.map((item, index) => (
             <tr key={index}>
               <td className={`px-6 py-4 whitespace-nowrap ${getBoldClass(item)}`}>
                 <div className="text-sm text-gray-900">{item.name}</div>

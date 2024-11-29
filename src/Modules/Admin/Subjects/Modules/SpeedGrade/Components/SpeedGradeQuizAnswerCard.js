@@ -105,7 +105,7 @@ const SpeedGradeQuizAnswerCard = ({
               readOnly
             />
           ) : (
-            question.options.map((option, optionIndex) => (
+            question?.options?.map((option, optionIndex) => (
               <label
                 key={optionIndex}
                 className={`flex items-center space-x-3 mb-1 cursor-pointer p-1 rounded-md ${

@@ -48,7 +48,7 @@ const RubricModalRow = ({ data, criteriaIndex, readonly }) => {
   };
 
   const handleUpdateRating = (updatedRating) => {
-    const updatedRatings = ratings.map((rating, index) =>
+    const updatedRatings = ratings((rating, index) =>
       index === currentEditIndex ? updatedRating : rating
     );
     setRatings(updatedRatings);
@@ -63,7 +63,7 @@ const RubricModalRow = ({ data, criteriaIndex, readonly }) => {
   };
 
   const updateCriteriaRatings = (updatedRatings) => {
-    const updatedCriteria = criteria.map((crit, index) =>
+    const updatedCriteria = criteria?.map((crit, index) =>
       index === criteriaIndex ? { ...crit, ratings: updatedRatings } : crit
     );
     dispatch(setRubricField({ field: "criteria", value: updatedCriteria }));

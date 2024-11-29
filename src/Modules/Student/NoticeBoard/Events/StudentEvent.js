@@ -99,7 +99,7 @@ const StudentEvent = () => {
   
     return (
       <ul className="events space-y-1 max-h-20 overflow-y-auto">
-        {dayEvents.map((event, index) => {
+        {dayEvents?.map((event, index) => {
           // Parse time from event, support both 24-hour and 12-hour formats
           let eventTime = event?.time
             ? parse(event?.time, 'hh:mm a', new Date()) // Try parsing as 12-hour format first
@@ -117,7 +117,7 @@ const StudentEvent = () => {
             <li
               key={event?.id}
               className={`inline-block px-2 py-1 rounded text-white ${
-                bgColors[index % bgColors.length]
+                bgColors[index % bgColors?.length]
               } shadow-md cursor-pointer`}
               onClick={() => handleStickerClick(event)}
             >

@@ -26,7 +26,7 @@ const StudentRecentGradeTable = () => {
           </tr>
         </thead>
         <tbody>
-          {RecentStudentDummyGrade.assessments.map((evalItem, idx) => (
+          {RecentStudentDummyGrade.assessments?.map((evalItem, idx) => (
             <tr key={idx} className="bg-white">
               <td className="px-5 py-2 flex flex-col ">
                 <span>{evalItem.name}</span>

@@ -45,7 +45,7 @@ const CalendarHeader = ({ attendanceData, onPanelChange, currentDate }) => {
     const currentMonth = value.month();
 
 
-    const monthOptions = moment.monthsShort().map((month, index) => (
+    const monthOptions = moment.monthsShort()?.map((month, index) => (
       <option key={index} value={index}>
         {t(month.toLowerCase(), gt.month)} {/* Translate the short month */}
       </option>

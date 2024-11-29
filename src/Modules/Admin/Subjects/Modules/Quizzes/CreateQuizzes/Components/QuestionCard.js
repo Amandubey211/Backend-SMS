@@ -5,7 +5,7 @@ import { FiEdit2, FiTrash2 } from "react-icons/fi";
 
 // Utility function to shuffle an array
 function shuffleArray(array) {
-  let currentIndex = array.length;
+  let currentIndex = array?.length;
   let randomIndex;
 
   // While there remain elements to shuffle...
@@ -84,7 +84,7 @@ const QuestionCard = ({
           />
         ) : (
           <div className="space-y-2 ms-4">
-            {shuffledOptions.map((option, index) => (
+            {shuffledOptions?.map((option, index) => (
               <label
                 key={index}
                 className="flex items-center space-x-3 cursor-pointer"

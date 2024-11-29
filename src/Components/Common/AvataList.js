@@ -5,7 +5,7 @@ const AvatarsList = () => {
   return (
     <div className="flex items-center justify-center ">
       <div className="flex items-center bg-white  rounded-full px-4 py-1 border">
-        {users.map((user, index) => (
+        {users?.map((user, index) => (
           <div
             key={user.id}
             className={`w-7 h-7 rounded-full overflow-hidden border-2 border-white ${

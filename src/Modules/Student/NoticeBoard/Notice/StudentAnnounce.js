@@ -104,7 +104,7 @@ const StudentAnnounce = () => {
           //   </div>
            
           // ) 
-          : filteredNotices().length > 0 ? (
+          : filteredNotices()?.length > 0 ? (
             filteredNotices()?.map((notice, index) => (
               <NoticeItem
                 key={notice.id}
@@ -113,7 +113,7 @@ const StudentAnnounce = () => {
                 formatDate={formatDate}
               />
             ))
-          ) : (!loading && filteredNotices().length === 0) && (
+          ) : (!loading && filteredNotices()?.length === 0) && (
             <div className="flex flex-col justify-center items-center text-center min-h-[300px]">
             <NoDataFound title="Notices" /> 
             </div>

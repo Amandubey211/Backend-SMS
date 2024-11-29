@@ -22,8 +22,8 @@ const ExamResults = () => {
     return (
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-            {results.length > 0 ? (
-                results.map((result) => (
+            {results?.length > 0 ? (
+                results?.map((result) => (
                     <div
                         key={result.quizName}
                         className="bg-white p-4 shadow-md rounded-md hover:shadow-lg transition duration-300"

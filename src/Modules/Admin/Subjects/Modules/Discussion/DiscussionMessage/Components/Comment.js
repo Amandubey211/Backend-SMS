@@ -24,7 +24,7 @@ const Comment = ({
   const [isLiked, setIsLiked] = useState(
     comment.likes.some((like) => like.userId === "currentUserId")
   );
-  const [likesCount, setLikesCount] = useState(comment.likes.length);
+  const [likesCount, setLikesCount] = useState(comment.likes?.length);
 
   const handleDeleteComment = async () => {
     await deleteComment(comment._id);
@@ -117,9 +117,9 @@ const Comment = ({
           <span className="ml-1 text-gray-500">Reply</span>
         </div>
       </div>
-      {showReplies && comment.replies.length > 0 && (
+      {showReplies && comment.replies?.length > 0 && (
         <div className="ml-10">
-          {comment.replies.map((reply) => (
+          {comment?.replies?.map((reply) => (
             <Reply
               key={reply._id}
               reply={reply}
@@ -138,12 +138,12 @@ const Comment = ({
           </div>
         </div>
       )}
-      {!showReplies && comment.replies.length > 0 && (
+      {!showReplies && comment.replies?.length > 0 && (
         <div
           className="text-blue-500 cursor-pointer"
           onClick={() => setShowReplies(true)}
         >
-          View {comment.replies.length} more replies
+          View {comment.replies?.length} more replies
         </div>
       )}
       {activeReplyId === comment._id && (

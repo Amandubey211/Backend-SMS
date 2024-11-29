@@ -74,13 +74,13 @@ const AccountingSection = () => {
   }, [fees, filters]);
 
   // Calculate total pages for pagination
-  const totalPages = useMemo(() => Math.ceil(filteredData.length / rowsPerPage), [filteredData.length, rowsPerPage]);
+  const totalPages = useMemo(() => Math.ceil(filteredData?.length / rowsPerPage), [filteredData?.length, rowsPerPage]);
 
   // Determine which data to show on the current page
   const paginatedData = useMemo(() => {
     const startIndex = (currentPage - 1) * rowsPerPage;
     const endIndex = startIndex + rowsPerPage;
-    return filteredData.slice(startIndex, endIndex); // Safe slicing
+    return filteredData?.slice(startIndex, endIndex); // Safe slicing
   }, [currentPage, filteredData, rowsPerPage]);
 
   // Handle page change with left and right arrows
@@ -112,7 +112,7 @@ const AccountingSection = () => {
           <h2 className="text-lg font-semibold text-gray-600 text-center">
             {t("Finance")}
           </h2>
-          {!error && paginatedData.length > 0 && (
+          {!error && paginatedData?.length > 0 && (
             <div className="flex items-center space-x-4">
               <button
                 className="text-gray-500"
@@ -159,7 +159,7 @@ const AccountingSection = () => {
                   {t("Unable to fetch Fees")}
                 </p>
               </div>
-            ) : paginatedData.length === 0 ? (
+            ) : paginatedData?.length === 0 ? (
               // No data available, show icon and message
               <div className="flex flex-col items-center p-10">
                 <FaMoneyBillWave className="text-gray-400 text-6xl mb-4" />
@@ -179,7 +179,7 @@ const AccountingSection = () => {
                   </tr>
                 </thead>
                 <tbody className="space-y-2">
-                  {paginatedData.map((item) => (
+                  {paginatedData?.map((item) => (
                     <tr key={item.id} className="text-left text-gray-700 bg-white shadow-sm">
                       <td className="px-5 py-4 border-b border-gray-200 truncate">{item?.feeType ?? t("No Fee Type")}</td>
                       <td className="px-5 py-4 border-b border-gray-200">{item?.paidBy ?? "N/A"}</td>

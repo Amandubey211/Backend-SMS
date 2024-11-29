@@ -68,7 +68,7 @@ const List = ({ data, icon, title, type, loading, error }) => {
         <h2 className="text-xl font-semibold text-gradient">
           {title}
           <span className="border rounded-full text-sm p-1 px-2 ml-1 text-gray-500">
-            {filteredData.length}
+            {filteredData?.length}
           </span>
         </h2>
         <div className="relative flex items-center max-w-xs w-full mr-4">
@@ -92,8 +92,8 @@ const List = ({ data, icon, title, type, loading, error }) => {
           </div>
         ) : error ? (
           <NoDataFound />
-        ) : filteredData.length > 0 ? (
-          filteredData.reverse().map((item) => (
+        ) : filteredData?.length > 0 ? (
+          filteredData?.reverse()?.map((item) => (
             <div key={item._id} className="relative mb-3">
               <div className="flex items-center gap-3 p-1 rounded-lg">
                 <NavLink

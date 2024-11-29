@@ -23,7 +23,7 @@ const AnnouncementComment = ({
   const [isLiked, setIsLiked] = useState(
     comment.likes.some((like) => like.userId === role)
   );
-  const [likesCount, setLikesCount] = useState(comment.likes.length);
+  const [likesCount, setLikesCount] = useState(comment.likes?.length);
   const [isEditing, setIsEditing] = useState(false);
   const [editedContent, setEditedContent] = useState(comment.content);
   const [showReplies, setShowReplies] = useState(false);
@@ -124,9 +124,9 @@ const AnnouncementComment = ({
       </div>
 
       {/* Replies Section */}
-      {showReplies && comment.replies.length > 0 && (
+      {showReplies && comment.replies?.length > 0 && (
         <div className="">
-          {comment.replies.map((reply) => (
+          {comment?.replies?.map((reply) => (
             <AnnouncementReply
               key={reply._id}
               reply={reply}
@@ -143,12 +143,12 @@ const AnnouncementComment = ({
           </div>
         </div>
       )}
-      {!showReplies && comment.replies.length > 0 && (
+      {!showReplies && comment.replies?.length > 0 && (
         <div
           className="text-blue-500 cursor-pointer"
           onClick={() => setShowReplies(true)}
         >
-          View {comment.replies.length} more replies
+          View {comment.replies?.length} more replies
         </div>
       )}
 

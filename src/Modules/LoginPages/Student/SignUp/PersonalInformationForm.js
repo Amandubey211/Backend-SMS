@@ -61,7 +61,7 @@ const PersonalInformationForm = ({
             name="schoolId"
             value={studentDetails.schoolId}
             onChange={handleChange}
-            options={schoolList.map((school) => ({
+            options={schoolList?.map((school) => ({
               value: school._id,
               label: school.nameOfSchool,
             }))}
@@ -73,7 +73,7 @@ const PersonalInformationForm = ({
             name="applyingClass"
             value={studentDetails.applyingClass}
             onChange={handleChange}
-            options={classList.map((classItem) => ({
+            options={classList?.map((classItem) => ({
               value: classItem._id,
               label: classItem.className,
             }))}

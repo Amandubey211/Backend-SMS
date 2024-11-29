@@ -77,7 +77,7 @@ const InputComment = ({ addComment, placeholder = "Write Something..." }) => {
             onMouseLeave={handleEmojiListMouseLeave}
             ref={emojiListRef}
           >
-            {emojis.map((emoji, index) => (
+            {emojis?.map((emoji, index) => (
               <span
                 key={index}
                 onClick={() => handleEmojiClick(emoji)}

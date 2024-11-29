@@ -15,7 +15,7 @@ const AttendanceChart = ({ data }) => {
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
   // Calculate the number of days in each month for the current year
-  const daysInMonths = months.map((_, index) => getDaysInMonth(index, currentYear));
+  const daysInMonths = months?.map((_, index) => getDaysInMonth(index, currentYear));
 
   // Find the maximum attendance value from the API data to dynamically adjust y-axis
   const maxAttendance = Math.max(
@@ -31,7 +31,7 @@ const AttendanceChart = ({ data }) => {
     datasets: [
       {
         label: 'Present',
-        data: data.map((month) => month.present || 0), // Get the 'present' value for each month, default to 0 if not available
+        data: data?.map((month) => month.present || 0), // Get the 'present' value for each month, default to 0 if not available
         backgroundColor: 'rgba(75, 192, 75, 0.6)', // Green color for the 'Present' line (symbolizing success or good status)
         borderColor: 'rgba(75, 192, 75, 1)',
         borderWidth: 2,
@@ -39,7 +39,7 @@ const AttendanceChart = ({ data }) => {
       },
       {
         label: 'Absent',
-        data: data.map((month) => month.absent || 0), // Get the 'absent' value for each month, default to 0 if not available
+        data: data?.map((month) => month.absent || 0), // Get the 'absent' value for each month, default to 0 if not available
         backgroundColor: 'rgba(255, 99, 132, 0.6)', // Red color for the 'Absent' line (commonly used for errors or warnings)
         borderColor: 'rgba(255, 99, 132, 1)',
         borderWidth: 2,
@@ -47,7 +47,7 @@ const AttendanceChart = ({ data }) => {
       },
       {
         label: 'Leave',
-        data: data.map((month) => month.leave || 0), // Get the 'leave' value for each month, default to 0 if not available
+        data: data?.map((month) => month.leave || 0), // Get the 'leave' value for each month, default to 0 if not available
         backgroundColor: 'rgba(255, 159, 64, 0.6)', // Orange color for the 'Leave' line (representing a neutral status)
         borderColor: 'rgba(255, 159, 64, 1)',
         borderWidth: 2,

@@ -22,7 +22,7 @@ const ResetPassword = () => {
 
   useEffect(() => {
     const urlParts = location.pathname.split('/');
-    const token = urlParts[urlParts.length - 1];
+    const token = urlParts[urlParts?.length - 1];
     setResetDetails(prev => ({ ...prev, token }));
   }, [location]);
 

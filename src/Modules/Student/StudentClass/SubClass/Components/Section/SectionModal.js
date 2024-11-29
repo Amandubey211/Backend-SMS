@@ -13,10 +13,10 @@ const SectionGroupModal = ({ modalData}) => {
                 <div className="mb-4">
                     <h4 className="text-lg font-semibold text-purple-500">{`Group('s) Name`}</h4>
                     {/* Group Details */}
-                    {modalData?.groups && modalData?.groups.length > 0 ? (
+                    {modalData?.groups && modalData?.groups?.length > 0 ? (
                         <div className="group-section">
                             <ul className="mt-4 grid grid-cols-2 gap-4">
-                                {modalData?.groups.map((group, index) => (
+                                {modalData?.groups?.map((group, index) => (
                                     <li
                                         key={index}
                                         className="flex items-center gap-2 bg-pink-200 p-2 rounded-lg shadow hover:bg-green-200"

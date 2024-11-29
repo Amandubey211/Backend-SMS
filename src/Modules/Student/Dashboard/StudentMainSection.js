@@ -95,7 +95,7 @@ const StudentMainSection = () => {
               url: "/",
             },
           ]
-        ).map((item, index) => (
+        )?.map((item, index) => (
           <DashCard key={index} {...item} />
         ))}
       </div>
@@ -132,7 +132,7 @@ const StudentMainSection = () => {
               ) : subjects?.length > 0 ? (
                 <div>
                   <p className="text-sm text-gray-500">
-                    A total of {subjects.length} Courses are in Progress
+                    A total of {subjects?.length} Courses are in Progress
                   </p>
                   <AllSubjects subjects={studentSubjectProgress} />
                 </div>

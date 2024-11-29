@@ -27,16 +27,16 @@ const GraduateList = ({
 
   // Function to handle "Select All" checkbox
   const handleSelectAll = () => {
-    if (selectedStudents.length === students.length) {
+    if (selectedStudents?.length === students?.length) {
       setSelectedStudents([]); // Deselect all if all are already selected
     } else {
-      const allStudentIds = students.map((student) => student._id);
+      const allStudentIds = students?.map((student) => student._id);
       setSelectedStudents(allStudentIds); // Select all
     }
   };
 
   // Check if all students are selected
-  const isAllSelected = selectedStudents.length === students.length;
+  const isAllSelected = selectedStudents?.length === students?.length;
 
   // Determine error message based on status code
   const getErrorMessage = () => {
@@ -51,12 +51,12 @@ const GraduateList = ({
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-xl font-semibold">{t("All Graduates")}</h1>
 
-        {selectedStudents.length > 0 && (
+        {selectedStudents?.length > 0 && (
           <button
             className="px-4 py-2 bg-red-500 text-white rounded-md"
             onClick={() => onDemoteStudents(selectedStudents)}
           >
-            {selectedStudents.length === 1
+            {selectedStudents?.length === 1
               ? t("Demote Student")
               : t("Demote All Students")}
           </button>
@@ -126,7 +126,7 @@ const GraduateList = ({
             )}
 
             {/* No Data State */}
-            {!loading && !error && students.length === 0 && (
+            {!loading && !error && students?.length === 0 && (
               <tr>
                 <td colSpan="10" className="text-center py-8">
                   <FaUserGraduate
@@ -141,8 +141,8 @@ const GraduateList = ({
             {/* Data Rows */}
             {!loading &&
               !error &&
-              students.length > 0 &&
-              students.map((student) => (
+              students?.length > 0 &&
+              students?.map((student) => (
                 <tr
                   key={student._id} // Use _id as the key since that's the ID from backend
                   className="hover:bg-gray-50 transition-all duration-200 border-b"

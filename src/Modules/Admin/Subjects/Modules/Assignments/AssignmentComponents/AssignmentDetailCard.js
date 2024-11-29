@@ -77,7 +77,7 @@ const AssignmentDetailCard = () => {
       />
 
       <div className="ps-3 ">
-        {assignmentDetails.map((detail, index) => {
+        {assignmentDetails?.map((detail, index) => {
           if (detail.type === "assignment") {
             return (
               <AssignmentDetail

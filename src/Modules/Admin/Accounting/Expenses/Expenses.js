@@ -158,7 +158,7 @@ const Expenses = () => {
               <div>
                 <span className="text-gray-700 font-semibold">{t('Month')} :</span>
                 <select className="text-green-700 font-bold bg-inherit" value={selectedMonth} onChange={handleMonthChange}>
-                  {months.map(month => (
+                  {months?.map(month => (
                     <option key={month.value} value={month.value}>
                       {month.label}
                     </option>

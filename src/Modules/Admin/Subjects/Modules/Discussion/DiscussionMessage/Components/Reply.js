@@ -22,7 +22,7 @@ const Reply = ({
   const [isLiked, setIsLiked] = useState(
     reply.likes.some((like) => like.userId === "currentUserId")
   );
-  const [likesCount, setLikesCount] = useState(reply.likes.length);
+  const [likesCount, setLikesCount] = useState(reply.likes?.length);
 
   const handleDeleteReply = () => {
     deleteReply(reply._id);

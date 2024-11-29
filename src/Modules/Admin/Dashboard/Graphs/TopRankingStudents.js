@@ -62,7 +62,7 @@ const TopRankingStudents = () => {
       ) : (
         <>
           <div className="flex w-full h-auto py-2 gap-4">
-            {topStudents?.slice(0, 3).map((student, index) => (
+            {topStudents?.slice(0, 3)?.map((student, index) => (
               <div
                 key={index}
                 className="text-center p-4 border rounded-lg relative w-[35%]"

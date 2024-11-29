@@ -133,13 +133,13 @@
 //           <p className="text-gray-500">Unable to Fetch Assignment</p>
 //         </div>
 //       )}
-//       {!loading && !error && subjects.length === 0 && (
+//       {!loading && !error && subjects?.length === 0 && (
 //         <div className="flex flex-col items-center justify-center h-full text-center">
 //           <FaExclamationTriangle className="text-6xl text-gray-400 mb-4" />
 //           <p className="text-gray-500">No Data Yet</p>
 //         </div>
 //       )}
-//       {!loading && !error && subjects.length > 0 && (
+//       {!loading && !error && subjects?.length > 0 && (
 //         <Collapse
 //           accordion
 //           bordered={false}
@@ -149,7 +149,7 @@
 //           className="bg-transparent"
 //           onChange={(key) => handlePanelClick(key)}
 //         >
-//           {subjects.map(subject => (
+//           {subjects?.map(subject => (
 //             <Panel
 //               header={
 //                 <div className="flex items-center text-white">

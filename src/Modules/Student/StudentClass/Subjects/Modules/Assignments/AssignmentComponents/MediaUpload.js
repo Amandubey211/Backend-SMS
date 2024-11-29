@@ -28,16 +28,16 @@ const MediaUpload = ({ onSubmit }) => {
       (file) => file.size > FILE_SIZE_LIMIT
     );
 
-    if (validFiles.length > 0) {
+    if (validFiles?.length > 0) {
       setFiles((prevFiles) => [...prevFiles, ...validFiles]);
       setPreviews((prevPreviews) => [
         ...prevPreviews,
-        ...validFiles.map((file) => URL.createObjectURL(file)),
+        ...validFiles?.map((file) => URL.createObjectURL(file)),
       ]);
       setSkipFiles(false); // Hide the checkbox when files are added
     }
 
-    if (invalidFiles.length > 0) {
+    if (invalidFiles?.length > 0) {
       toast.error("Some files exceed the 10MB limit and were not added.");
     }
   };
@@ -61,7 +61,7 @@ const MediaUpload = ({ onSubmit }) => {
   };
 
   const handleUploadFiles = async () => {
-    if (files.length === 0) {
+    if (files?.length === 0) {
       toast.error("Please select at least one file.");
       return;
     }
@@ -77,14 +77,14 @@ const MediaUpload = ({ onSubmit }) => {
     setLoading(true);
     try {
       const responses = await Promise.all(
-        files.map((file) => {
+        files?.map((file) => {
           const formData = new FormData();
           formData.append("file", file);
           formData.append("upload_preset", cloudinaryPreset);
           return axios.post(cloudinaryUrl, formData);
         })
       );
-      const mediaData = responses.map((res, index) => ({
+      const mediaData = responses?.map((res, index) => ({
         url: res.data.secure_url,
         name: files[index].name,
         type: files[index].type,
@@ -126,7 +126,7 @@ const MediaUpload = ({ onSubmit }) => {
       <label className="block mb-2 text-sm font-medium text-gray-700">
         Upload Media
       </label>
-      {!files.length && (
+      {!files?.length && (
         <div className="flex items-start  mb-4 ">
           <input
             type="checkbox"
@@ -164,10 +164,10 @@ const MediaUpload = ({ onSubmit }) => {
             />
           </div>
 
-          {files.length > 0 && (
+          {files?.length > 0 && (
             <div className="flex-grow  overflow-y-auto mt-4 px-3 no-scrollbar">
               <div className="grid grid-cols-2 gap-2">
-                {files.map((file, index) => (
+                {files?.map((file, index) => (
                   <div
                     key={index}
                     className={`flex flex-col p-2 border rounded-md transform transition duration-100 hover:shadow-md ${
@@ -225,7 +225,7 @@ const MediaUpload = ({ onSubmit }) => {
         </div>
       ) : (
         <>
-          {!skipFiles && files.length > 0 && (
+          {!skipFiles && files?.length > 0 && (
             <button
               onClick={handleUploadFiles}
               className="flex items-center justify-center w-full mt-4 px-4 py-2 bg-gradient-to-r from-green-400 to-teal-400 text-white rounded-md shadow-sm hover:from-green-500 hover:to-teal-500 transition duration-500 ease-in-out"

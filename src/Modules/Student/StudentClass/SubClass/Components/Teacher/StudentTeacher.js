@@ -76,7 +76,7 @@ const StudentTeacher = () => {
             //   </div>
             // ) 
             : teacherData?.length > 0 ? (
-              teacherData.map((teacher, index) => (
+              teacherData?.map((teacher, index) => (
                 <ProfileCard key={index} profile={teacher} onClick={() => handleProfileClick(teacher)} />
               ))
             ) :(!loading && teacherData?.length === 0 ) && (

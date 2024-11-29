@@ -24,7 +24,7 @@ const colors = [
 ];
 
 const getColor = (index) => {
-  return colors[index % colors.length];
+  return colors[index % colors?.length];
 };
 
 const MainSection = () => {

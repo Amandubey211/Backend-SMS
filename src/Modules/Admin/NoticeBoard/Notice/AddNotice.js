@@ -150,7 +150,7 @@ const AddNotice = ({ isEditing, onClose }) => {
           >
             <option value="">{t("All")}</option>
             {classes &&
-              classes.map((classItem) => (
+              classes?.map((classItem) => (
                 <option key={classItem?._id} value={classItem?._id}>
                   {classItem?.className}
                 </option>
@@ -173,7 +173,7 @@ const AddNotice = ({ isEditing, onClose }) => {
           >
             <option value="">{t("All")}</option>
             {studentsList &&
-              studentsList.map((s) => (
+              studentsList?.map((s) => (
                 <option key={s?._id} value={s?._id}>
                   {s?.firstName}
                 </option>

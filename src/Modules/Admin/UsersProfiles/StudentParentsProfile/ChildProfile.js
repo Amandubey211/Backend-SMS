@@ -7,7 +7,7 @@ const ChildProfile = ({ children }) => {
   const navigate = useNavigate();
   const { t } = useTranslation('admAccounts');
 
-  if (!children || children.length === 0) {
+  if (!children || children?.length === 0) {
     return <div>{t('No children data available')}</div>;
   }
 
@@ -16,7 +16,7 @@ const ChildProfile = ({ children }) => {
   return (
     <>
       <div className="flex flex-col gap-4 mt-2">
-        {children.map((child, index) => (
+        {children?.map((child, index) => (
           <div key={index} className='flex flex-col text-center border border-gray-300 rounded-md items-center justify-around mx-5 py-5 gap-3'>
             <div>
               <img

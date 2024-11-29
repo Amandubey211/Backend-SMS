@@ -34,7 +34,7 @@ export default function NotificationBar() {
         console.log("Retrieved notifications from IndexedDB:", notifications);
         setNotiarray(notifications);
         console.log("11", notifications);
-        localStorage.setItem("NotificationCount", notifications.length);
+        localStorage.setItem("NotificationCount", notifications?.length);
         // Display notifications in your UI
       })
       .catch((error) => {
@@ -57,7 +57,7 @@ export default function NotificationBar() {
         request.onsuccess = function () {
           resolve();
           getNotifications();
-          localStorage.setItem("NotificationCount", notiarray.length);
+          localStorage.setItem("NotificationCount", notiarray?.length);
         };
 
         request.onerror = function (event) {
@@ -77,7 +77,7 @@ export default function NotificationBar() {
           prevNotiarray.filter((noti) => noti.id !== id)
         );
         console.log(`Notification with id ${id} deleted`);
-        localStorage.setItem("NotificationCount", notiarray.length);
+        localStorage.setItem("NotificationCount", notiarray?.length);
       })
       .catch((error) => {
         console.error("Failed to delete notification from IndexedDB:", error);

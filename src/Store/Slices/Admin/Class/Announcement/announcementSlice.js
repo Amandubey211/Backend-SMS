@@ -37,7 +37,7 @@ const announcementSlice = createSlice({
 
     // Mark announcement as read
     builder.addCase(markAsReadAnnouncement.fulfilled, (state, action) => {
-      state.announcements = state.announcements.map((announcement) =>
+      state.announcements = state.announcements?.map((announcement) =>
         announcement._id === action.payload
           ? { ...announcement, isRead: true }
           : announcement
@@ -98,7 +98,7 @@ const announcementSlice = createSlice({
       })
       .addCase(editAnnouncement.fulfilled, (state, action) => {
         state.loading = false;
-        state.announcements = state.announcements.map((announcement) =>
+        state.announcements = state.announcements?.map((announcement) =>
           announcement._id === action.payload._id
             ? action.payload
             : announcement

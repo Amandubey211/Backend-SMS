@@ -39,7 +39,7 @@ const AnnouncementMessage = () => {
       const author = comment?.author ? comment.author.toLowerCase() : "";
       const isAuthorMatch = author?.includes(query.toLowerCase());
       const isReplyMatch = comment.replies?.some(
-        (reply) => filterCommentsRecursively([reply], query).length > 0
+        (reply) => filterCommentsRecursively([reply], query)?.length > 0
       );
       return isAuthorMatch || isReplyMatch;
     });

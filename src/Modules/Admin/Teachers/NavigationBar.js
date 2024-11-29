@@ -24,7 +24,7 @@ const NavigationBar = () => {
     (state) => state.admin.teacher.selectedSection
   );
   const totalTeachers = useSelector(
-    (state) => state.admin.teacher.assignedTeachers.length
+    (state) => state.admin.teacher.assignedTeachers?.length
   );
 
   const getButtonClass = useCallback(

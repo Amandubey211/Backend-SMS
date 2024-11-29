@@ -49,12 +49,12 @@ const TotalAttendanceGraph = () => {
         }
       });
 
-      const labels = sortedAttendance.map((item) => item.className);
+      const labels = sortedAttendance?.map((item) => item.className);
 
-      const femaleAttendance = sortedAttendance.map(
+      const femaleAttendance = sortedAttendance?.map(
         (item) => item.femaleAttendance
       );
-      const maleAttendance = sortedAttendance.map(
+      const maleAttendance = sortedAttendance?.map(
         (item) => item.maleAttendance
       );
 
@@ -140,7 +140,7 @@ const TotalAttendanceGraph = () => {
             onChange={handleMonthChange}
             value={month}
           >
-            {[...Array(12).keys()].map((i) => (
+            {[...Array(12).keys()]?.map((i) => (
               <option key={i} value={i + 1}>
                 {t(new Date(0, i).toLocaleString("default", { month: "long" }))}
               </option>
@@ -152,7 +152,7 @@ const TotalAttendanceGraph = () => {
             onChange={handleYearChange}
             value={yearLabel}
           >
-            {availableYears.map(({ label, value }) => (
+            {availableYears?.map(({ label, value }) => (
               <option key={value} value={value}>
                 {label}
               </option>

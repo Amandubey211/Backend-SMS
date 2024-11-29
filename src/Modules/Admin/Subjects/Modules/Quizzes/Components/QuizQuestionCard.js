@@ -31,7 +31,7 @@ const QuizQuestionCard = ({
         />
       ) : (
         <div className="space-y-2">
-          {question.options.map((option, optionIndex) => (
+          {question?.options?.map((option, optionIndex) => (
             <label
               key={optionIndex}
               className="flex items-center space-x-3 cursor-pointer"

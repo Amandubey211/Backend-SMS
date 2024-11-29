@@ -44,13 +44,13 @@ const AccountingSection = () => {
   }, [dispatch]);
 
   const uniqueFilterOptions = (data, key) => {
-    return [...new Set(data.map((item) => item?.[key]))].sort();
+    return [...new Set(data?.map((item) => item?.[key]))].sort();
   };
 
   const classes = useMemo(
     () =>
       uniqueFilterOptions(
-        feesData.map((fd) => fd.studentId?.presentClassId),
+        feesData?.map((fd) => fd.studentId?.presentClassId),
         "className"
       ),
     [feesData]
@@ -152,7 +152,7 @@ const AccountingSection = () => {
 
           <div className="p-4">
             <div className="flex items-center space-x-4">
-              {["Everyone", "Paid", "Unpaid"].map((status) => (
+              {["Everyone", "Paid", "Unpaid"]?.map((status) => (
                 <label
                   key={status}
                   className="flex items-center cursor-pointer"

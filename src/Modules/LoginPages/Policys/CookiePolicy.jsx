@@ -64,7 +64,7 @@ const CookiePolicy = () => {
               Table of Contents
             </h3>
             <ul className="list-disc list-inside space-y-2">
-              {sections.map((section) => (
+              {sections?.map((section) => (
                 <li key={section.id}>
                   <Link
                     to={section.id}
@@ -84,7 +84,7 @@ const CookiePolicy = () => {
           </motion.nav>
 
           {/* Policy Sections */}
-          {sections.map((section) => (
+          {sections?.map((section) => (
             <Element key={section.id} name={section.id} className="mb-8">
               <motion.section
                 initial={{ opacity: 0, y: 20 }}

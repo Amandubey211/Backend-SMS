@@ -65,7 +65,7 @@ const dummyPinnedData = [
         }`}
       >
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {dummyPinnedData.map((discussion, index) => (
+          {dummyPinnedData?.map((discussion, index) => (
             <DiscussionCard key={index} discussion={discussion} />
           ))}
         </div>

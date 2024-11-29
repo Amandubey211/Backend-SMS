@@ -68,7 +68,7 @@
 //   }
 
 //   // Show "No Data Found" if there is no grades data
-//   if (!gradesData || gradesData.length === 0) {
+//   if (!gradesData || gradesData?.length === 0) {
 //     return (
 //       <div className="flex text-gray-500 items-center justify-center">
 //         <GoAlertFill className="text-[5rem]" />
@@ -79,7 +79,7 @@
 
 //   const sortedGrades = gradesData
 //     ?.sort((a, b) => new Date(b.submittedDate) - new Date(a.submittedDate))
-//     .slice(0, 5); // Sort and limit to the 5 most recent grades
+//     ?.slice(0, 5); // Sort and limit to the 5 most recent grades
 
 //   return (
 //     <div className="py-3">

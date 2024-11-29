@@ -19,7 +19,7 @@ const AddFeesForm = () => {
       </label>
       <div className="flex items-center mb-4">
         <div className="flex items-center">
-          {['single', 'mass'].map((status) => (
+          {['single', 'mass']?.map((status) => (
             <label key={status} className="flex items-center cursor-pointer">
               <input
                 type="radio"

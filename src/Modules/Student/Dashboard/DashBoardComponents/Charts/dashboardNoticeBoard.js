@@ -19,7 +19,7 @@ const generateRandomColor = () => {
     "#FBB778",
     "#F9B279",
   ];
-  return colors[Math.floor(Math.random() * colors.length)];
+  return colors[Math.floor(Math.random() * colors?.length)];
 };
 
 const DashboardNoticeBoard = (descriptionLength) => {

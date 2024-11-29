@@ -70,7 +70,7 @@ export const submitQuiz = createAsyncThunk(
       );
 
       const newAttempt = {
-        attempts: attemptHistory.length + 1,
+        attempts: attemptHistory?.length + 1,
         score: data.score,
         rightAnswer: data.rightAnswer,
         wrongAnswer: data.wrongAnswer,

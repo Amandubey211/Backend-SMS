@@ -57,7 +57,7 @@ const MainSection = () => {
 
   function capitalizeFirstLetter(string) {
     if (!string) return "";
-    return string.charAt(0).toUpperCase() + string.slice(1);
+    return string.charAt(0).toUpperCase() + string?.slice(1);
   }
 
   const cardData = [
@@ -110,7 +110,7 @@ const MainSection = () => {
   return (
     <div className="w-full overflow-x-hidden">
       <div className="flex flex-wrap justify-center gap-3 py-4">
-        {cardData.map((item, index) => (
+        {cardData?.map((item, index) => (
           <DashCard key={index} {...item} />
         ))}
       </div>

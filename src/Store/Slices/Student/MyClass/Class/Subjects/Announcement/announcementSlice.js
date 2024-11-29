@@ -120,7 +120,7 @@ const findCommentOrReply = (comments, parentId) => {
     if (comment._id === parentId) {
       return comment;
     }
-    if (comment.replies && comment.replies.length > 0) {
+    if (comment.replies && comment.replies?.length > 0) {
       const foundReply = findCommentOrReply(comment.replies, parentId);
       if (foundReply) return foundReply;
     }

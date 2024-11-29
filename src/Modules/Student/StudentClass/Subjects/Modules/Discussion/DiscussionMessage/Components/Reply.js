@@ -30,7 +30,7 @@ const Reply = ({
   const [likes, setLikes] = useState(reply.likes);
 
   // Console logs to debug
-  const [likesCount, setLikesCount] = useState(reply.likes.length);
+  const [likesCount, setLikesCount] = useState(reply.likes?.length);
   const [isLiked, setIsLiked] = useState(
     reply.likes.some((like) => like.userId === userId)
   );
@@ -191,7 +191,7 @@ const Reply = ({
 
           <div className="mt-4 ml-4">
             {reply.replies &&
-              reply.replies.map((nestedReply) => (
+              reply.replies?.map((nestedReply) => (
                 <Reply
                   key={nestedReply._id}
                   reply={nestedReply}
