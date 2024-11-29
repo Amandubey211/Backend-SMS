@@ -57,11 +57,13 @@ export const staffLogin = createAsyncThunk(
         dispatch(setToken(data.token));
         dispatch(setRole(data.role));
 
-        // Handle academic year
-        if (data.role === "admin" && !data.isAcademicYearActive) {
-          toast.success("Please create an academic year");
-          setLocalCookies("isAcademicYearActive", data.isAcademicYearActive);
-          return { redirect: "/create_academicYear" }; // Return the redirect path
+        // if (data.role === "admin" && !data.isAcademicYearActive) {
+        //   toast.success("Please create an academic year");
+        //   setLocalCookies("isAcademicYearActive", data.isAcademicYearActive);
+        //   return { redirect: "/create_academicYear" }; // Return the redirect path
+        // }
+        if (data.role === "admin") {
+          return { redirect: "/select_branch" };
         } else {
           // Format and set the academic year in the state
           const formattedAcademicYear = formatAcademicYear(

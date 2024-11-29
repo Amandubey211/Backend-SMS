@@ -38,15 +38,16 @@ import { updateTimetable } from "../Store/Slices/Admin/TimeTable/timetable.actio
 import PrivacyPolicy from "../Modules/LoginPages/Policys/PrivacyPolicy.jsx";
 import TermsAndConditions from "../Modules/LoginPages/Policys/TermsAndConditions.jsx";
 import CookiePolicy from "../Modules/LoginPages/Policys/CookiePolicy.jsx";
-// lazy loaded routes
 
+// lazy loaded routes
 const Academic = lazy(() =>
   import("../Modules/Admin/AcademicYear/Academic.js")
 );
-const Branch = lazy(() =>
-  import("../Modules/Admin/Branchs/Branch.js")
-);
 
+const SelectBranch = lazy(() =>
+  import("../Modules/LoginPages/Staff/Admin/SelectBranch.js")
+);
+const Branch = lazy(() => import("../Modules/Admin/Branchs/Branch.js"));
 const commonAcademic = lazy(() =>
   import("../Components/Common/AcademicYear/Academic.js")
 );
@@ -56,7 +57,6 @@ const commonAcademic = lazy(() =>
 const CreateAcademicYear = lazy(() =>
   import("../Components/Admin/CreateAcademicYear.js")
 );
-
 
 const StudentProfile = lazy(() =>
   import("../Modules/Student/profile/StudentProfile.js")
@@ -384,10 +384,28 @@ function App() {
       ),
       errorElement: <Error />,
     },
+    {
+      path: "/select_branch",
+      element: (
+        <ProtectRoute Component={SelectBranch} allowedRoles={["admin"]} />
+      ),
+      errorElement: <Error />,
+    },
 
     {
       path: "/dashboard/academic",
-      element: <ProtectRoute Component={Academic} allowedRoles={["admin", "teacher", "librarian", "accountant","staff"]} />,
+      element: (
+        <ProtectRoute
+          Component={Academic}
+          allowedRoles={[
+            "admin",
+            "teacher",
+            "librarian",
+            "accountant",
+            "staff",
+          ]}
+        />
+      ),
       errorElement: <Error />,
     },
     {
@@ -402,7 +420,13 @@ function App() {
       element: (
         <ProtectRoute
           Component={Dash}
-          allowedRoles={["admin", "teacher", "librarian", "accountant","staff"]}
+          allowedRoles={[
+            "admin",
+            "teacher",
+            "librarian",
+            "accountant",
+            "staff",
+          ]}
         />
       ),
       errorElement: <Error />,
@@ -752,7 +776,14 @@ function App() {
       element: (
         <ProtectRoute
           Component={EventSchool}
-          allowedRoles={["admin", "teacher", "librarian", "peon", "accountant","staff"]}
+          allowedRoles={[
+            "admin",
+            "teacher",
+            "librarian",
+            "peon",
+            "accountant",
+            "staff",
+          ]}
         />
       ),
       errorElement: <Error />,
@@ -762,7 +793,14 @@ function App() {
       element: (
         <ProtectRoute
           Component={AdminNotice}
-          allowedRoles={["admin", "teacher", "librarian", "peon", "accountant","staff"]}
+          allowedRoles={[
+            "admin",
+            "teacher",
+            "librarian",
+            "peon",
+            "accountant",
+            "staff",
+          ]}
         />
       ),
       errorElement: <Error />,
@@ -820,7 +858,13 @@ function App() {
       element: (
         <ProtectRoute
           Component={StudentParentProfile}
-          allowedRoles={["admin", "teacher", "accountant", "librarian","staff"]}
+          allowedRoles={[
+            "admin",
+            "teacher",
+            "accountant",
+            "librarian",
+            "staff",
+          ]}
         />
       ),
       errorElement: <Error />,
@@ -960,7 +1004,7 @@ function App() {
     //       ),
     //       errorElement: <Error />,
     //     },
-        
+
     //   ],
     // },
     //{ path: "/student_class/:sid/createassignment", element: <ProtectRoute Component={StudentCreateAssignment} allowedRoles={["student"]} />, errorElement: <Error /> },
