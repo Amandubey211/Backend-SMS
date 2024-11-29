@@ -1,5 +1,3 @@
-// AssignmentSection.js
-
 import React, { useState } from "react";
 import SidebarSlide from "../../../../../../../Components/Common/SidebarSlide";
 import CreateAssignmentHolder from "./CreateAssignmentHolder";
@@ -27,7 +25,16 @@ const AssignmentSection = ({ isSubmitted, onResubmit }) => {
     }
   };
 
-  const { name = "Assignment", content = "" } = assignmentData || {};
+  const { name = "Assignment", content = "", dueDate } = assignmentData || {};
+
+  // Get the current date (without time) to compare with dueDate
+  const currentDate = new Date();
+
+  // Check if dueDate is valid and not passed
+  const isDueDateValid = dueDate && new Date(dueDate) > currentDate;
+
+  // Only show the button if the assignment is within the available window and not expired
+  const showAssignmentButton = isDueDateValid || isSubmitted;
 
   return (
     <div className="max-w-3xl mx-auto bg-white">
@@ -38,13 +45,17 @@ const AssignmentSection = ({ isSubmitted, onResubmit }) => {
             Assignment
           </p>
         </div>
-        <button
-          onClick={handleAssignment}
-          className="h-12 inline-flex items-center border border-transparent text-sm font-medium shadow-sm bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600"
-          disabled={attemptsExceeded}
-        >
-          {isSubmitted ? "Re-submit Assignment" : "Start Assignment"}
-        </button>
+
+        {/* Conditionally render the button based on dueDate validity */}
+        {showAssignmentButton && (
+          <button
+            onClick={handleAssignment}
+            className="h-12 inline-flex items-center border border-transparent text-sm font-medium shadow-sm bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600"
+            disabled={attemptsExceeded}
+          >
+            {isSubmitted ? "Re-submit Assignment" : "Start Assignment"}
+          </button>
+        )}
       </div>
 
       <div
@@ -52,6 +63,7 @@ const AssignmentSection = ({ isSubmitted, onResubmit }) => {
         dangerouslySetInnerHTML={{ __html: content }}
       />
 
+      {/* Sidebar for assignment creation */}
       <SidebarSlide
         isOpen={isSidebarOpen}
         onClose={() => setSidebarOpen(false)}
