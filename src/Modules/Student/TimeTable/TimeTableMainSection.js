@@ -75,9 +75,9 @@ const TimeTableMainSection = () => {
     );
 
     // Only trigger fetch if there are any active filters
-    if (Object.keys(activeFilters).length > 0) {
+   
       dispatch(fetchStudentTimetable(activeFilters));
-    }
+    
   }, [filters, dispatch]);
 
   useEffect(() => {

@@ -1,24 +1,16 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { handleError } from "../../Common/Alerts/errorhandling.action";
 import { getData } from "../../../../services/apiEndpoints";
+import { getAY } from "../../../../Utils/academivYear";
 
 // Fetch Student Timetable
 export const fetchStudentTimetable = createAsyncThunk(
   "studentTimetable/fetchStudentTimetable",
-  async (_, { rejectWithValue, getState, dispatch }) => {
-    const { userId, userSchoolId } = getState().common.auth;
-    const academicYear = getState().common.academicYear.selected || "";
-
+  async (_, { rejectWithValue, dispatch }) => {
+    const say = getAY()
     try {
       const response = await getData(
-        `/student/timetable`,
-        {
-          params: {
-            userId,
-            userSchoolId,
-            say: academicYear,
-          },
-        }
+        `/student/timetable?say=${say}`
       );
 
       console.log('API Response:', response);  // Log the response to verify structure

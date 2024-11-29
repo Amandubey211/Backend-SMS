@@ -19,18 +19,18 @@ const TopNavigationWithFilters = ({ onBackendFilterChange, onFrontendFilterChang
     type: "",
   });
 
-  // Fetch classes from Redux store (this might not be needed since we're removing role-based conditions)
-  const { classes, loading, error } = useSelector((state) => state.admin.class);
-  useEffect(() => {
-    dispatch(fetchAllClasses());
-  }, [dispatch]);
+  // // Fetch classes from Redux store (this might not be needed since we're removing role-based conditions)
+  // const { classes, loading, error } = useSelector((state) => state.admin.class);
+  // useEffect(() => {
+  //   dispatch(fetchAllClasses());
+  // }, [dispatch]);
 
-  useEffect(() => {
-    if (error) {
-      // Handle the error silently or log it
-      console.error("Failed to load classes:", error);
-    }
-  }, [error]);
+  // useEffect(() => {
+  //   if (error) {
+  //     // Handle the error silently or log it
+  //     console.error("Failed to load classes:", error);
+  //   }
+  // }, [error]);
 
   // Debounced function to handle name filtering
   const debouncedHandleNameFilter = useMemo(
