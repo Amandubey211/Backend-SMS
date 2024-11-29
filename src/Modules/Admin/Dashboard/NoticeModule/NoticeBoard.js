@@ -78,7 +78,7 @@ const NoticeBoard = (descriptionLength) => {
           </p>
         </div>
       ) : (
-        topNotices.map((notice, index) => (
+        topNotices?.map((notice, index) => (
           <Notice
             key={index}
             image={icons[index % icons.length]} // Use cyclic icons

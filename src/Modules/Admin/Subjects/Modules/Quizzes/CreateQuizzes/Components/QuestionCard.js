@@ -84,7 +84,7 @@ const QuestionCard = ({
           />
         ) : (
           <div className="space-y-2 ms-4">
-            {shuffledOptions.map((option, index) => (
+            {shuffledOptions?.map((option, index) => (
               <label
                 key={index}
                 className="flex items-center space-x-3 cursor-pointer"

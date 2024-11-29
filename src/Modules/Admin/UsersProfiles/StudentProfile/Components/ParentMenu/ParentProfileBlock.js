@@ -16,7 +16,7 @@ const ParentProfileBlock = ({ title, imageSrc, name, details }) => {
         <span className="font-semibold">{name}</span>
       </div>
       <div className="flex flex-col h-full p-3">
-        {details.map((detail) => (
+        {details?.map((detail) => (
           <ParentProfileDetail key={detail.type} type={detail.type} label={detail.label} value={detail.value} />
         ))}
       </div>

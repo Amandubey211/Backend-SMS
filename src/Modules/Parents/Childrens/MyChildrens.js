@@ -96,7 +96,7 @@ const MyChildren = () => {
 
         {/* Children grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {memoizedChildren.map((student) => (
+          {memoizedChildren?.map((student) => (
             <ChildCard key={student.id} student={student} />
           ))}
         </div>

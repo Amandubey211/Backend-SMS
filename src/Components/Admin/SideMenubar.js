@@ -112,7 +112,7 @@ const SideMenubar = () => {
       <div className="flex-grow overflow-y-auto no-scrollbar">
         {isOpen && <h2 className="text-gray-500 my-1">{t("MENU")}</h2>}
         <ul className={`space-y-1 ${!isOpen && "mt-3"}`}>
-          {filteredSidebarData.map((item, index) => (
+          {filteredSidebarData?.map((item, index) => (
             <React.Fragment key={index}>
               {item.items ? (
                 <div
@@ -188,7 +188,7 @@ const SideMenubar = () => {
                   <ul id={`submenu-${index}`} className="pl-2 space-y-2">
                     {item.items
                       .filter((subItem) => subItem.roles.includes(role))
-                      .map((subItem, subIndex) => (
+                      ?.map((subItem, subIndex) => (
                         <NavLink
                           key={subIndex}
                           to={subItem.path}

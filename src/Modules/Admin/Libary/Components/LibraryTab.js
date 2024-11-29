@@ -13,9 +13,9 @@ const LibraryTab = ({ handleSidebarOpen }) => {
   const role = useSelector((store) => store.common.auth.role);
 
   const classLevels = [
-    ...new Set(books.map((book) => book.classId?.className)),
+    ...new Set(books?.map((book) => book.classId?.className)),
   ].filter(Boolean);
-  const categories = [...new Set(books.map((book) => book.category))].filter(
+  const categories = [...new Set(books?.map((book) => book.category))].filter(
     Boolean
   );
 
@@ -77,7 +77,7 @@ const LibraryTab = ({ handleSidebarOpen }) => {
       <div className="flex justify-center items-center w-full min-h-[70vh]">
         {filteredBooks.length > 0 ? (
           <div className="grid grid-cols-3 gap-4 w-full p-4">
-            {filteredBooks.map((book) => (
+            {filteredBooks?.map((book) => (
               <BookCard key={book._id} book={book} />
             ))}
           </div>

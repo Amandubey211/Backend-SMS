@@ -103,7 +103,7 @@ const Chapter = ({ title, chapterNumber, imageUrl, assignments, quizzes, attachm
             {attachments.length > 0 && (
             <div className="mt-4">
               <h3 className="text-sm font-semibold text-green-600 mb-2">Attachments ({attachments.length})</h3>
-              {attachments.map((attachment, index) => (
+              {attachments?.map((attachment, index) => (
                 <div
                   key={index}
                   className="flex justify-between items-center mb-3 p-3 bg-gray-50 border border-gray-300 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300 ease-in-out"
@@ -146,7 +146,7 @@ const Chapter = ({ title, chapterNumber, imageUrl, assignments, quizzes, attachm
           <div>
             {assignments.length > 0 || quizzes.length > 0 ? (
               <>
-                {assignments.map((assignment, index) => (
+                {assignments?.map((assignment, index) => (
                   <ChapterItem
                     key={index}
                     type="assignment"
@@ -154,7 +154,7 @@ const Chapter = ({ title, chapterNumber, imageUrl, assignments, quizzes, attachm
                     submitted={assignment.submitted}
                   />
                 ))}
-                {quizzes.map((quiz, index) => (
+                {quizzes?.map((quiz, index) => (
                   <ChapterItem
                     key={index}
                     type="quiz"

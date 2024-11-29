@@ -97,7 +97,7 @@ const SideMenubar = () => {
         {isOpen && <h2 className="text-gray-500 mb-2 ml-4">{t("Menu")}</h2>} {/* Translated Menu Title */}
         <hr />
         <ul className="mt-1 space-y-2 flex-grow">
-          {sidebarData.map((item, index) => (
+          {sidebarData?.map((item, index) => (
             <React.Fragment key={index}>
               {item.items ? (
                 <div
@@ -156,7 +156,7 @@ const SideMenubar = () => {
               )}
               {openItems.includes(item.title) && item.items && (
                 <ul className="pl-2 space-y-2">
-                  {item.items.map((subItem, subIndex) => (
+                  {item?.items?.map((subItem, subIndex) => (
                     <NavLink
                       key={subIndex}
                       to={subItem.path}

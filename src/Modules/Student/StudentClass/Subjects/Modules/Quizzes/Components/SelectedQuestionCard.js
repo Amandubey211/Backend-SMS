@@ -39,7 +39,7 @@ const SelectedQuestionCard = ({ question, selectedOption }) => {
         </div>
       ) : (
         <div className="space-y-3">
-          {question.options.map((option, optionIndex) => (
+          {question.options?.map((option, optionIndex) => (
             <label key={optionIndex} className="flex items-center space-x-4">
               <div className="relative">
                 <input

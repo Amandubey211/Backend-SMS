@@ -132,7 +132,7 @@ const FilterCard = ({ filters, setFilters }) => {
           onChange={handleModuleChange}
         >
           <option value="">{t("Select")}</option>
-          {moduleList.map((module) => (
+          {moduleList?.map((module) => (
             <option key={module._id} value={module._id}>
               {module.moduleName}
             </option>
@@ -159,7 +159,7 @@ const FilterCard = ({ filters, setFilters }) => {
           ) : (
             <>
               <option value="">{t("Select")}</option>
-              {chapters.map((chapter) => (
+              {chapters?.map((chapter) => (
                 <option key={chapter._id} value={chapter._id}>
                   {chapter.name}
                 </option>

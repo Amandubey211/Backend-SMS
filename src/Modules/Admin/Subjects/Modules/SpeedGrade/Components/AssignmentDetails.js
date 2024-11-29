@@ -84,8 +84,8 @@ const AssignmentDetails = ({ student, details, type, onTotalGradeUpdate }) => {
         </div>
       ) : (
         <div className="space-y-4">
-          {questions && questions.length > 0 ? (
-            questions.map((question, index) => {
+          {questions && questions?.length > 0 ? (
+            questions?.map((question, index) => {
               const answer = details.answers.find(
                 (ans) => ans.questionId === question._id
               );

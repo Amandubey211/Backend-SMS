@@ -47,7 +47,7 @@ dispatch(fetchStudentSubjects(cid))
 
   return (
     <>
-      {studentSubjects.map((i, index) => (
+      {studentSubjects?.map((i, index) => (
         <div key={i._id} className="border-b p-3" onClick={() => { if (isOpen !== index) getData(i._id) }}>
           <div
             className="cursor-pointer py-3 px-5 flex items-center justify-between"
@@ -94,7 +94,7 @@ dispatch(fetchStudentSubjects(cid))
                 ) : (
                   <tbody className="w-full">
                     {grades?.grades?.length > 0 ? (
-                      grades?.grades.map((i, idx) => (
+                      grades?.grades?.map((i, idx) => (
                         <tr key={idx} className="bg-white">
                           <td className="px-5 py-2 flex items-center w-[10rem]">
                             <span>{i?.Name}</span>

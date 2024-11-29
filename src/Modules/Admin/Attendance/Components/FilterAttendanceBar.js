@@ -162,7 +162,7 @@ const FilterAttendanceBar = () => {
         </div>
         {isMonthDropdownOpen && (
           <div className="absolute z-10  w-full bg-white border border-gray-300 rounded-lg mt-1">
-            {months.map((monthObj) => (
+            {months?.map((monthObj) => (
               <div
                 key={monthObj.name}
                 className={`p-1 ps-4 hover:bg-gray-100 cursor-pointer ${

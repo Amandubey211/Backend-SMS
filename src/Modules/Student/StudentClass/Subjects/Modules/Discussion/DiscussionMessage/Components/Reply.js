@@ -191,7 +191,7 @@ const Reply = ({
 
           <div className="mt-4 ml-4">
             {reply.replies &&
-              reply.replies.map((nestedReply) => (
+              reply.replies?.map((nestedReply) => (
                 <Reply
                   key={nestedReply._id}
                   reply={nestedReply}

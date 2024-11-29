@@ -29,7 +29,7 @@ const CommentSection = () => {
     <div className="mt-6">
       <hr className="border-gray-200 mb-4"/>
       <h3 className="mb-4 text-lg font-semibold text-gray-700">Comments</h3>
-      {comments.map((comment) => (
+      {comments?.map((comment) => (
         <div key={comment.id} className="mb-4">
           <div className="flex items-center mb-2">
             <img src={comment.avatar} alt={comment.name} className="w-10 h-10 rounded-full mr-2" />

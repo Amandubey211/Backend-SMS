@@ -38,7 +38,7 @@ const BookIssue = () => {
 
       </div>
       <div className="flex gap-3 mb-5">
-        {["All", "Pending", "Returned"].map((status) => (
+        {["All", "Pending", "Returned"]?.map((status) => (
           <div key={status} className="">
             <label className="flex items-center cursor-pointer">
               <input

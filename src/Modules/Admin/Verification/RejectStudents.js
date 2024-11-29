@@ -63,7 +63,7 @@ const RejectStudents = () => {
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      {filteredStudents.map((student) => (
+      {filteredStudents?.map((student) => (
         <UnVerifiedStudentCard key={student._id} studentId={student._id} />
       ))}
     </div>

@@ -17,7 +17,7 @@ const BookIssue = ({ student }) => {
       <div>
         <label>BookIssue</label>
         <div className="flex items-center space-x-4">
-          {["All Book", "Return", "Pending"].map((status) => (
+          {["All Book", "Return", "Pending"]?.map((status) => (
             <label key={status} className="flex items-center cursor-pointer">
               <input
                 type="radio"
@@ -67,7 +67,7 @@ const BookIssue = ({ student }) => {
             </tr>
           </thead>
           <tbody>
-            {/* {filteredData.map((item, index) => ( */}
+            {/* {filteredData?.map((item, index) => ( */}
             <tr className="bg-white">
               <td className="px-5 py-3 border-b border-gray-200">
                 <div className="flex items-center">

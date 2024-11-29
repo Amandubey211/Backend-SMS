@@ -65,7 +65,7 @@ const UnAssignedStudentList = () => {
         </div>
       ) : (
         <ul>
-          {filteredStudents.map((student, index) => (
+          {filteredStudents?.map((student, index) => (
             <li
               key={index}
               className="flex items-center justify-between border-b py-2"

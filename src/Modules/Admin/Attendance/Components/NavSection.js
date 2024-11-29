@@ -24,7 +24,7 @@ const NavSection = () => {
   };
 
   // Directly map `navData` and use `attendanceStat` values.
-  const mappedData = navData.map((item) => ({
+  const mappedData = navData?.map((item) => ({
     ...item,
     value: attendanceStat[dataMapping[item.label.trim()]] || 0, // Map values from the attendanceStat object
     label: t(item.label.trim()), // Translate labels using i18n
@@ -51,7 +51,7 @@ const NavSection = () => {
       </div>
 
       <div className="flex space-x-4">
-        {mappedData.map((item) => (
+        {mappedData?.map((item) => (
           <AttendanceNavCard
             key={item.label}
             label={item.label}

@@ -100,7 +100,7 @@ const EventScheduler = () => {
 
       return (
         <ul className="events space-y-1 max-h-20 overflow-y-auto">
-          {dayEvents.map((event, index) => (
+          {dayEvents?.map((event, index) => (
             <li
               key={event?._id}
               className={`inline-block px-2 py-1 rounded text-white ${bgColors[index % bgColors.length]} shadow-md cursor-pointer`}
@@ -158,7 +158,7 @@ const EventScheduler = () => {
                 <span>{t("No Events in this Month")}</span>
               </div>
             ) : (
-              filteredEvents.map((event) => (
+              filteredEvents?.map((event) => (
                 <EventCard
                   key={event._id}
                   event={event}

@@ -47,7 +47,7 @@ const MainSection = () => {
             {/* Add Chapter Button (if needed) */}
           </div>
           {chapters.length > 0 ? (
-            chapters.map((chapter, index) => (
+            chapters?.map((chapter, index) => (
               <Chapter
                 key={index}
                 id={chapter.chapterId}

@@ -110,7 +110,7 @@ const MainSection = () => {
   return (
     <div className="w-full overflow-x-hidden">
       <div className="flex flex-wrap justify-center gap-3 py-4">
-        {cardData.map((item, index) => (
+        {cardData?.map((item, index) => (
           <DashCard key={index} {...item} />
         ))}
       </div>

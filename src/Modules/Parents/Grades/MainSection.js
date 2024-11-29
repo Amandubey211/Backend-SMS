@@ -47,7 +47,7 @@ const MainSection = () => {
               <p className="text-gray-500">Error loading data: {error}</p>
             </div>
           ) : selectedModule ? (
-            selectedModule.chapters.map((chapter, index) => (
+            selectedModule.chapters?.map((chapter, index) => (
               <Chapter
                 key={index}
                 id={chapter?.chapterId}
@@ -82,7 +82,7 @@ const MainSection = () => {
             {loading ? (
               <Spinner />
             ) : modules?.length > 0 ? (
-              modules.map((module, index) => (
+              modules?.map((module, index) => (
                 <div
                   key={index}
                   onClick={() => selectModule(module)}

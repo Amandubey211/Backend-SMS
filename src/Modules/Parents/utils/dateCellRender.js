@@ -10,7 +10,7 @@ export const dateCellRender = (value, attendanceData) => {
 
   return (
     <ul className="events">
-      {listData.map((item) => {
+      {listData?.map((item) => {
         let icon;
         switch (item.status) {
           case 'present':

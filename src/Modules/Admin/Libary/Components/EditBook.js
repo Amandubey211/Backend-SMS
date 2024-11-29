@@ -138,7 +138,7 @@ const EditBook = ({ book, onClose }) => {
             id="class"
             label={t("Select Class")}
             name="class"
-            options={classList.map((cls) => ({
+            options={classList?.map((cls) => ({
               value: cls._id,
               label: cls.className,
             }))}

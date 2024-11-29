@@ -51,7 +51,7 @@ const QuizResultSummary = () => {
           attemptHistory
             .slice()
             .reverse()
-            .map((attempt, index) => (
+            ?.map((attempt, index) => (
               <div
                 key={attempt?._id || index}
                 className="bg-white shadow-md rounded-lg overflow-hidden transition-shadow duration-300"

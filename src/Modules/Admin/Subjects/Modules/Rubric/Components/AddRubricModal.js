@@ -332,7 +332,7 @@ const AddRubricModal = ({ readonly = false }) => {
           }`}
         >
           <div className="flex px-4 font-semibold justify-between items-center p-2 w-full bg-gradient-to-r from-pink-100 to-purple-100">
-            {["Criteria", "Ratings", "Point"].map((heading, idx) => (
+            {["Criteria", "Ratings", "Point"]?.map((heading, idx) => (
               <div
                 key={idx}
                 className="w-2/8 bg-gradient-to-r from-red-500 to-purple-500 bg-clip-text text-transparent"

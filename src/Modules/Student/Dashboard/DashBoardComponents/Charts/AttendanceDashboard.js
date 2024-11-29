@@ -53,7 +53,7 @@ const AttendanceDashboard = ({ attendanceSummary, error }) => {
               "October",
               "November",
               "December",
-            ].map((month, index) => ({
+            ]?.map((month, index) => ({
               month,
               present: attendanceSummary?.present?.[index] || 0,
               absent: attendanceSummary?.absent?.[index] || 0,

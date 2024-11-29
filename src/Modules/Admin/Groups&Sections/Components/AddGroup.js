@@ -96,7 +96,7 @@ const AddGroup = ({ group, isUpdate, groupId, onClose }) => {
       classId: cid,
       groupName,
       seatLimit,
-      students: selectedStudents.map((student) => student._id),
+      students: selectedStudents?.map((student) => student._id),
       leader: leader ? leader._id : null,
     };
 
@@ -155,7 +155,7 @@ const AddGroup = ({ group, isUpdate, groupId, onClose }) => {
               {t("Select Students")}
             </label>
             <div className="border border-gray-300 rounded-md p-3 flex flex-wrap">
-              {selectedStudents.map((student) => (
+              {selectedStudents?.map((student) => (
                 <div
                   key={student._id}
                   className="bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-md px-2 py-1 m-1 flex items-center space-x-1 truncate"
@@ -189,7 +189,7 @@ const AddGroup = ({ group, isUpdate, groupId, onClose }) => {
                     </p>
                   </div>
                 ) : (
-                  studentsList.map((student) => (
+                  studentsList?.map((student) => (
                     <button
                       key={student._id}
                       type="button"
@@ -219,7 +219,7 @@ const AddGroup = ({ group, isUpdate, groupId, onClose }) => {
               </div>
             )}
             <div className="flex flex-wrap mt-2">
-              {selectedStudents.map((student) => (
+              {selectedStudents?.map((student) => (
                 <div
                   key={student._id}
                   className={`px-2 py-1 rounded-lg cursor-pointer ${

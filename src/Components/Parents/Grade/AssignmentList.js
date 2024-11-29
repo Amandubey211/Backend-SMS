@@ -149,7 +149,7 @@
 //           className="bg-transparent"
 //           onChange={(key) => handlePanelClick(key)}
 //         >
-//           {subjects.map(subject => (
+//           {subjects?.map(subject => (
 //             <Panel
 //               header={
 //                 <div className="flex items-center text-white">

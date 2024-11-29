@@ -72,7 +72,7 @@ const StudentModalGradeList = ({ data, filters }) => {
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
-          {sortedData.map((item, index) => (
+          {sortedData?.map((item, index) => (
             <tr key={index}>
               <td className={`px-6 py-4 whitespace-nowrap ${getBoldClass(item)}`}>
                 <div className="text-sm text-gray-900">{item.name}</div>

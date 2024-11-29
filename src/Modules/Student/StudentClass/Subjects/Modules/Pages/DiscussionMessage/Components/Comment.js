@@ -52,7 +52,7 @@ const Comment = ({ comment, deleteComment, deleteReply, addNestedReply, activeRe
       </div>
       {showReplies && comment.replies.length > 0 && (
         <div>
-          {comment.replies.map((reply) => (
+          {comment.replies?.map((reply) => (
             <Reply
               key={reply.id}
               reply={reply}

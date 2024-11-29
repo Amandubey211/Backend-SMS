@@ -51,7 +51,7 @@ const AllSubject = () => {
             <div className="flex flex-col gap-2 p-4 w-[25%] border-gray-300 border-r">
               {/* Safeguard against null/undefined and map subjects */}
               {studentSubjectProgress?.length > 0 ? (
-                studentSubjectProgress.map((subject, index) => (
+                studentSubjectProgress?.map((subject, index) => (
                   <div
                     key={index}
                     className={`w-[260px] transition-all duration-300 transform ${

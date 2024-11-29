@@ -16,7 +16,7 @@ const AllSubjects = ({ subjects }) => {
       <div className="mt-1">
         {subjects && subjects.length > 0 ? (
           <div className="mt-4">
-            {subjects.slice(0, 2).map((subject, index) => {
+            {subjects.slice(0, 2)?.map((subject, index) => {
               const progressBarColor =
                 progressBarColors[index % progressBarColors.length];
               return (

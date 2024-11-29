@@ -120,7 +120,7 @@ const GroupList = ({ onSeeGradeClick }) => {
           )}
         </div>
       ) : (
-        filteredGroups.map((group, groupIndex) => (
+        filteredGroups?.map((group, groupIndex) => (
           <div key={groupIndex} className="mb-2">
             <div className="flex items-center justify-between py-3 bg-gray-50">
               <h3
@@ -216,7 +216,7 @@ const GroupList = ({ onSeeGradeClick }) => {
                     No members found in this group.
                   </li>
                 ) : (
-                  group.students.map((student, memberIndex) => (
+                  group?.students?.map((student, memberIndex) => (
                     <li
                       key={memberIndex}
                       className="flex items-center justify-between p-4 border-b border-gray-200 gap-4"

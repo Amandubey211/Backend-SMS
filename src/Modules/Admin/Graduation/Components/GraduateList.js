@@ -30,7 +30,7 @@ const GraduateList = ({
     if (selectedStudents.length === students.length) {
       setSelectedStudents([]); // Deselect all if all are already selected
     } else {
-      const allStudentIds = students.map((student) => student._id);
+      const allStudentIds = students?.map((student) => student._id);
       setSelectedStudents(allStudentIds); // Select all
     }
   };
@@ -142,7 +142,7 @@ const GraduateList = ({
             {!loading &&
               !error &&
               students.length > 0 &&
-              students.map((student) => (
+              students?.map((student) => (
                 <tr
                   key={student._id} // Use _id as the key since that's the ID from backend
                   className="hover:bg-gray-50 transition-all duration-200 border-b"

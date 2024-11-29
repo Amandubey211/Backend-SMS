@@ -129,7 +129,7 @@ const BookIssueTab = ({ handleSidebarOpen, setEditIssueData }) => {
           </thead>
           <tbody>
             {filteredBookIssues.length > 0 ? (
-              filteredBookIssues.map((issue) => (
+              filteredBookIssues?.map((issue) => (
                 <BookIssueRow
                   key={issue._id}
                   item={issue}

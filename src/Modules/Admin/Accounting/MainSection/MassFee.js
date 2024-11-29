@@ -28,7 +28,7 @@ const MassFee = () => {
 
   useEffect(() => {
     if (classes && classes?.length > 0) {
-      const formattedClassData = classes.map((item) => ({
+      const formattedClassData = classes?.map((item) => ({
         value: item.className,
         label: item.className,
       }));
@@ -67,7 +67,7 @@ const MassFee = () => {
     e.preventDefault();
     console.log('Submitting Mass Fee:', formData);
 
-    const selectedStudents = studentsList.map((item) => item._id);
+    const selectedStudents = studentsList?.map((item) => item._id);
     console.log('selectedStudents', selectedStudents);
 
     const submissionData = {
@@ -93,7 +93,7 @@ const MassFee = () => {
   useEffect(() => {
     if (sectionsList) {
       setSectionData(
-        sectionsList.map((section) => ({
+        sectionsList?.map((section) => ({
           value: section?.sectionName,
           label: section?.sectionName,
           id: section?._id,

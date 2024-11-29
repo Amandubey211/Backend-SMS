@@ -3,7 +3,7 @@ import profileImage from "../../../../../../Assets/DashboardAssets/profileIcon.p
 import { AiOutlinePlus } from "react-icons/ai"; // Import an icon to indicate additional groups
 
 const ProfileCard = ({ profile, onClick }) => {
-  const groups = profile?.group?.split(",").map(group => group.trim()) || [];
+  const groups = profile?.group?.split(",")?.map(group => group.trim()) || [];
   const firstGroup = groups[0]; // First group
   const hasMoreGroups = groups.length > 1;  // Count of additional groups
 

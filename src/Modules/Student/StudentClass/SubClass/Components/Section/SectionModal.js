@@ -16,7 +16,7 @@ const SectionGroupModal = ({ modalData}) => {
                     {modalData?.groups && modalData?.groups.length > 0 ? (
                         <div className="group-section">
                             <ul className="mt-4 grid grid-cols-2 gap-4">
-                                {modalData?.groups.map((group, index) => (
+                                {modalData?.groups?.map((group, index) => (
                                     <li
                                         key={index}
                                         className="flex items-center gap-2 bg-pink-200 p-2 rounded-lg shadow hover:bg-green-200"

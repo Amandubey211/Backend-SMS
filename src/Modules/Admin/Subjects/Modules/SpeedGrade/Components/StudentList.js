@@ -45,7 +45,7 @@ function StudentList({ onSelectStudent, students }) {
       </div>
       {!filteredStudents.length && <NoDataFound title={t("Students")} />} {/* Translated title */}
       <div className="flex-grow overflow-y-auto space-y-2 ">
-        {filteredStudents.map((student, index) => (
+        {filteredStudents?.map((student, index) => (
           <div
             key={student._id}
             className={`flex items-center p-2 cursor-pointer rounded-full ${

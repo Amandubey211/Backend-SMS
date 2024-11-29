@@ -119,7 +119,7 @@ const Comment = ({
       </div>
       {showReplies && comment.replies.length > 0 && (
         <div className="ml-10">
-          {comment.replies.map((reply) => (
+          {comment?.replies?.map((reply) => (
             <Reply
               key={reply._id}
               reply={reply}

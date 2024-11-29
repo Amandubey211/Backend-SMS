@@ -91,7 +91,7 @@ const AllLibrarian = () => {
 
             <div className="flex flex-wrap -mx-2">
               {librarian.length > 0 ? (
-                librarian.map((librarian, index) => (
+                librarian?.map((librarian, index) => (
                   <ProfileCard
                     key={index}
                     profile={librarian}

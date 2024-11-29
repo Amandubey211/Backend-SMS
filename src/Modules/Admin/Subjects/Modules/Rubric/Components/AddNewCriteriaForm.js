@@ -30,7 +30,7 @@ const AddNewCriteriaForm = ({ editMode }) => {
     const newCriteria = { ...criteriaData };
 
     const updatedCriteria = editMode
-      ? criteria.map((crit, index) =>
+      ? criteria?.map((crit, index) =>
           index === criteriaToEdit.index ? newCriteria : crit
         )
       : [...criteria, newCriteria];

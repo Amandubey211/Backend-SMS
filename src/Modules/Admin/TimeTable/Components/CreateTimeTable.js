@@ -138,7 +138,7 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => { } }) => {
       style={{ width: '100%' }}
       placeholder="Select Day"
     >
-      {daysOfWeek.map((day) => (
+      {daysOfWeek?.map((day) => (
         <Option key={day} value={day}>
           {day}
         </Option>
@@ -174,7 +174,7 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => { } }) => {
         disabled={isDisabled}
       >
         {subjects && subjects.length > 0 ? (
-          subjects.map((subject, index) => {
+          subjects?.map((subject, index) => {
             const subjectId = subject._id || subject.id || subject.subjectId;
             if (!subjectId) {
               console.warn(`Subject at index ${index} is missing an ID.`);
@@ -610,7 +610,7 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => { } }) => {
         };
         dateMap[formattedDate].push(slotData);
       });
-      timetableData.days = Object.keys(dateMap).map((date) => ({
+      timetableData.days = Object.keys(dateMap)?.map((date) => ({
         date,
         slots: dateMap[date],
       }));
@@ -637,7 +637,7 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => { } }) => {
       // **Modified Section for 'others' Type**
 
       // Assign 'heading' within each slot based on 'otherTitle'
-      const slots = dataSource.map((row) => ({
+      const slots = dataSource?.map((row) => ({
         subjectId: row.subjectId,
         startTime: row.startTime,
         endTime: row.endTime,
@@ -761,7 +761,7 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => { } }) => {
                   placeholder="Select Class"
                 >
                   <Option value="">Select Class</Option>
-                  {classes.map((classItem) => (
+                  {classes?.map((classItem) => (
                     <Option key={classItem._id} value={classItem._id}>
                       {classItem.className}
                     </Option>
@@ -779,8 +779,8 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => { } }) => {
                   disabled={!formData.classId || sectionsList.length === 0}
                 >
                   <Option value="">Select Section</Option>
-                  {sectionsList.length > 0 ? (
-                    sectionsList.map((section) => (
+                  {sectionsList?.length > 0 ? (
+                    sectionsList?.map((section) => (
                       <Option key={section._id} value={section._id}>
                         {section.sectionName}
                       </Option>
@@ -803,8 +803,8 @@ const CreateTimeTablePage = ({ timetable = {}, onClose = () => { } }) => {
                   disabled={!formData.classId || groupsList.length === 0}
                 >
                   <Option value="">Select Group</Option>
-                  {groupsList.length > 0 ? (
-                    groupsList.map((group) => (
+                  {groupsList?.length > 0 ? (
+                    groupsList?.map((group) => (
                       <Option key={group._id} value={group._id}>
                         {group.groupName}
                       </Option>

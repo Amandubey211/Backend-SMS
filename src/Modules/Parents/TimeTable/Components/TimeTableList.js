@@ -56,7 +56,7 @@ const TimeTableList = React.memo(({ timetables, loading }) => {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-4 py-6">
-          {timetableData.map((timetable) => (
+          {timetableData?.map((timetable) => (
             <div
               key={timetable._id}
               className="relative p-6 bg-white shadow-xl rounded-xl border border-gray-200 transition duration-500 hover:scale-105 hover:shadow-2xl cursor-pointer"

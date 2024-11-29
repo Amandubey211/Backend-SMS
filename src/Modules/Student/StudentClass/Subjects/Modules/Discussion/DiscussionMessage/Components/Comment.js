@@ -195,7 +195,7 @@ const Comment = ({
           <div className="mt-4">
             {showReplies ? (
               <>
-                {comment.replies.map((reply) => (
+                {comment.replies?.map((reply) => (
                   <Reply
                     key={reply._id}
                     reply={reply}

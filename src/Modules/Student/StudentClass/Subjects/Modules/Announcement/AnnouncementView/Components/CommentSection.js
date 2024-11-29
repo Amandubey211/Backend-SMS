@@ -17,7 +17,7 @@ const CommentSection = ({
 }) => {
   return (
     <div className="w-full h-full">
-      {comments.map((comment) => (
+      {comments?.map((comment) => (
         <Comment
           key={comment._id}
           comment={comment}

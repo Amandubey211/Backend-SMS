@@ -7,7 +7,7 @@ const NavigationMenu = ({ activeItem, setActiveItem, items }) => {
 
   return (
     <div className="flex flex-col py-8 h-auto space-y-4 text-start items-center">
-      {items.map((item, index) => (
+      {items?.map((item, index) => (
         <button
           key={index}
           onClick={() => setActiveItem(item)}

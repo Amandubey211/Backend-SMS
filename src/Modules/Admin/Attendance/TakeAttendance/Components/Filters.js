@@ -47,7 +47,7 @@ const Filters = ({ isSectionInvalid }) => {
             onChange={(e) => handleFilterChange("sectionId", e.target.value)}
           >
             <option value="">Choose Section</option>
-            {sections.map((section) => (
+            {sections?.map((section) => (
               <option key={section._id} value={section._id}>
                 {section.sectionName}
               </option>
@@ -62,7 +62,7 @@ const Filters = ({ isSectionInvalid }) => {
             onChange={(e) => handleFilterChange("groupId", e.target.value)}
           >
             <option value="">Choose Group</option>
-            {groups.map((group) => (
+            {groups((group) => (
               <option key={group._id} value={group._id}>
                 {group.groupName}
               </option>

@@ -72,7 +72,7 @@ const discussionSlice = createSlice({
       })
       .addCase(updateDiscussion.fulfilled, (state, action) => {
         state.loading = false;
-        state.discussions = state.discussions.map((discussion) =>
+        state.discussions = state.discussions?.map((discussion) =>
           discussion._id === action.payload._id ? action.payload : discussion
         );
       })
@@ -98,7 +98,7 @@ const discussionSlice = createSlice({
       // Mark as read
       .addCase(markAsReadDiscussion.fulfilled, (state, action) => {
         const updatedDiscussion = action.payload;
-        // state.discussions = state.discussions.map((discussion) =>
+        // state.discussions = state.discussions?.map((discussion) =>
         //   discussion._id === updatedDiscussion._id
         //     ? updatedDiscussion
         //     : discussion
@@ -107,7 +107,7 @@ const discussionSlice = createSlice({
       // Update pin status
       .addCase(updatePinStatus.fulfilled, (state, action) => {
         const updatedDiscussion = action.payload;
-        state.discussions = state.discussions.map((discussion) =>
+        state.discussions = state.discussions?.map((discussion) =>
           discussion._id === updatedDiscussion._id
             ? updatedDiscussion
             : discussion

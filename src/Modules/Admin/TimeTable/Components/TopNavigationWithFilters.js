@@ -118,7 +118,7 @@ const TopNavigationWithFilters = ({ onBackendFilterChange, onFrontendFilterChang
               allowClear
             >
               <Option value="">{t("Select Class")}</Option>
-              {classes.map((cls) => (
+              {classes?.map((cls) => (
                 <Option key={cls._id} value={cls._id}>
                   {cls.className}
                 </Option>

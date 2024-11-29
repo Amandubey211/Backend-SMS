@@ -123,7 +123,7 @@ const TableView = () => {
   const tableData = useMemo(() => {
     if (!timetable) return [];
     return timetable.days?.flatMap((day) =>
-      day.slots.map((slot) => ({
+      day?.slots?.map((slot) => ({
         key: slot._id,
         day: day.day || t("N/A"),
         date: day.date ? new Date(day.date).toLocaleDateString() : t("N/A"),
@@ -208,7 +208,7 @@ const TableView = () => {
           allowClear
           style={{ width: 200, marginRight: 10 }}
         />
-        {(role !== "parent" && role !== "student") && (
+        {(role === 'admin') && (
           <>
             <Button
               icon={<FaEdit />}

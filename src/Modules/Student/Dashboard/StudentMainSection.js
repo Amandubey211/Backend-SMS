@@ -95,7 +95,7 @@ const StudentMainSection = () => {
               url: "/",
             },
           ]
-        ).map((item, index) => (
+        )?.map((item, index) => (
           <DashCard key={index} {...item} />
         ))}
       </div>

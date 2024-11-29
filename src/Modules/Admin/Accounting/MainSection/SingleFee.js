@@ -30,7 +30,7 @@ const SingleFee = () => {
 
   useEffect(() => {
     if (classes && classes?.length > 0) {
-      const formattedClassData = classes.map((item) => ({
+      const formattedClassData = classes?.map((item) => ({
         value: item.className,
         label: item.className,
       }));
@@ -111,7 +111,7 @@ const SingleFee = () => {
   useEffect(() => {
     if (sectionsList) {
       setSectionData(
-        sectionsList.map((section) => ({
+        sectionsList?.map((section) => ({
           value: section.sectionName,
           label: section.sectionName,
           id: section._id,
@@ -121,7 +121,7 @@ const SingleFee = () => {
 
     if (studentsList) {
       setStudentData(
-        studentsList.map((student) => ({
+        studentsList?.map((student) => ({
           value: student._id,
           label: `${student.firstName} ${student.lastName} (ID: ${student.admissionNumber})`,
         }))

@@ -95,7 +95,7 @@ const SelectBranch = () => {
               {loading ? (
                 <div className="w-full h-24 bg-gray-200 animate-pulse"></div>
               ) : filteredBranches && filteredBranches.length > 0 ? (
-                [...filteredBranches].map((branch) => {
+                [...filteredBranches]?.map((branch) => {
                   const colorIndex = hashCode(branch._id) % 6;
                   const color = [
                     "bg-yellow-300",

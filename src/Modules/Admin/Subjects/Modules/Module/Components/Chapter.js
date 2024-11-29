@@ -249,13 +249,13 @@ const Chapter = ({ onEdit, chapterNumber, chapter }) => {
         >
           <div className="flex flex-col space-y-4">
             {/* Attachments */}
-            {attachments.length > 0 && (
+            {attachments?.length > 0 && (
               <div>
                 <h3 className="text-sm font-semibold text-green-600">
                   Attachments ({attachments.length})
                 </h3>
                 <div className="grid grid-cols-1 gap-2 mb-2">
-                  {attachments.map((attachment, index) => (
+                  {attachments?.map((attachment, index) => (
                     <div
                       key={index}
                       className="flex flex-col p-2 border rounded-md transform transition duration-100 hover:shadow-md"
@@ -316,7 +316,7 @@ const Chapter = ({ onEdit, chapterNumber, chapter }) => {
             <div>
               {/* {assignments.length > 0 || quizzes.length > 0 ? (
                 <>
-                  {assignments.map((assignment, index) => (
+                  {assignments?.map((assignment, index) => (
                     <ChapterItem
                       key={index}
                       type="assignment"
@@ -325,7 +325,7 @@ const Chapter = ({ onEdit, chapterNumber, chapter }) => {
                       isPublished={assignment.isPublished}
                     />
                   ))}
-                  {quizzes.map((quiz, index) => (
+                  {quizzes?.map((quiz, index) => (
                     <ChapterItem
                       key={index}
                       type="quiz"
@@ -340,10 +340,10 @@ const Chapter = ({ onEdit, chapterNumber, chapter }) => {
                   No Assignment or Quizz
                 </p>
               )} */}
-              {assignments.length > 0 ||
-                (quizzes.length > 0 && (
+              {assignments?.length > 0 ||
+                (quizzes?.length > 0 && (
                   <>
-                    {assignments.map((assignment, index) => (
+                    {assignments?.map((assignment, index) => (
                       <ChapterItem
                         key={index}
                         type="assignment"
@@ -352,7 +352,7 @@ const Chapter = ({ onEdit, chapterNumber, chapter }) => {
                         isPublished={assignment.isPublished}
                       />
                     ))}
-                    {quizzes.map((quiz, index) => (
+                    {quizzes?.map((quiz, index) => (
                       <ChapterItem
                         key={index}
                         type="quiz"

@@ -37,7 +37,7 @@ const QuestionDetailCard = () => {
         <AssignmentDetail label="Question Type" value="Multiple Choice" />
       </div>
       <div className="mb-4 h-52 overflow-y-scroll">
-        {commentsData.map((comment, index) => (
+        {commentsData?.map((comment, index) => (
           <CommentCard
             key={index}
             avatar={comment.avatar}

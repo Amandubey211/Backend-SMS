@@ -34,9 +34,9 @@ const AddAttachment = ({ chapterData, onClose }) => {
       setFiles((prevFiles) => [...prevFiles, ...validFiles]);
       setPreviews((prevPreviews) => [
         ...prevPreviews,
-        ...validFiles.map((file) => URL.createObjectURL(file)),
+        ...validFiles?.map((file) => URL.createObjectURL(file)),
       ]);
-      setLabels((prevLabels) => [...prevLabels, ...validFiles.map(() => "")]);
+      setLabels((prevLabels) => [...prevLabels, ...validFiles?.map(() => "")]);
     }
 
     if (invalidFiles.length > 0) {
@@ -59,9 +59,9 @@ const AddAttachment = ({ chapterData, onClose }) => {
       setFiles((prevFiles) => [...prevFiles, ...validFiles]);
       setPreviews((prevPreviews) => [
         ...prevPreviews,
-        ...validFiles.map((file) => URL.createObjectURL(file)),
+        ...validFiles?.map((file) => URL.createObjectURL(file)),
       ]);
-      setLabels((prevLabels) => [...prevLabels, ...validFiles.map(() => "")]);
+      setLabels((prevLabels) => [...prevLabels, ...validFiles?.map(() => "")]);
     }
   };
 
@@ -163,7 +163,7 @@ const AddAttachment = ({ chapterData, onClose }) => {
         {files.length > 0 && (
           <div className="flex-grow overflow-y-auto mt-4 px-3 no-scrollbar">
             <div className="grid grid-cols-1 gap-2">
-              {files.map((file, index) => (
+              {files?.map((file, index) => (
                 <div
                   key={index}
                   className={`flex flex-col p-2 border rounded-md transform transition duration-100 hover:shadow-md ${

@@ -108,7 +108,7 @@ const DocumentUploadForm = ({
       )}
       <div className="grid grid-cols-1 gap-4">
         {studentDocuments.documents &&
-          studentDocuments.documents.map((doc, index) => (
+          studentDocuments.documents?.map((doc, index) => (
             <div
               key={index}
               className="border p-4 rounded-lg bg-white shadow-sm hover:shadow-lg transition duration-500 ease-in-out flex items-center"

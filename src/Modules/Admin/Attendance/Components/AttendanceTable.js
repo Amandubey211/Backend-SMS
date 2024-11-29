@@ -70,7 +70,7 @@ const AttendanceTable = () => {
               <th className="w-1/4 px-2 py-3 bg-gray-50 text-left font-semibold text-sm leading-4 text-gray-600 uppercase tracking-wider">
                 Student ID / Name
               </th>
-              {[...Array(getDaysInMonth(month)).keys()].map((day) => (
+              {[...Array(getDaysInMonth(month)).keys()]?.map((day) => (
                 <th
                   key={day}
                   className="w-1/31 py-3 bg-gray-50 font-normal text-center text-sm leading-4 text-gray-600 uppercase tracking-wider"

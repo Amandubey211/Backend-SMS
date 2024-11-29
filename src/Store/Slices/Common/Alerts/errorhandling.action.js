@@ -31,6 +31,11 @@ export const ErrorMsg = (error) => {
           message: msg || "Sorry! We couldn’t find what you’re looking for.",
           statusCode,
         };
+        case 429:
+        return {
+          message:"Too many request try again after 15min.",
+          statusCode,
+        };
       case 500:
         return {
           message:

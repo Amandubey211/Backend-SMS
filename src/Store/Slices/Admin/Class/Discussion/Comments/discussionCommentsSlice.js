@@ -64,7 +64,7 @@ const discussionCommentsSlice = createSlice({
 
     // Delete a reply
     builder.addCase(deleteReply.fulfilled, (state, action) => {
-      state.comments = state.comments.map((comment) => ({
+      state.comments = state.comments?.map((comment) => ({
         ...comment,
         replies: comment.replies.filter(
           (reply) => reply._id !== action.payload
@@ -75,7 +75,7 @@ const discussionCommentsSlice = createSlice({
     // Toggle like
     builder.addCase(toggleLikeMessage.fulfilled, (state, action) => {
       const messageId = action.payload;
-      state.comments = state.comments.map((comment) => {
+      state.comments = state.comments?.map((comment) => {
         if (comment._id === messageId) {
           const isLiked = comment.likes.some(
             (like) => like.userId === "currentUserId"

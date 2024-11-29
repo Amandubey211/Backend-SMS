@@ -15,15 +15,15 @@ const Chapter = ({
 }) => {
   // Combine assignments and quizzes into one array with their types
   const combinedItems = [
-    ...assignments.map((assignment) => ({
+    ...assignments?.map((assignment) => ({
       ...assignment,
       type: "assignment",
     })),
-    ...quizzes.map((quiz) => ({
+    ...quizzes?.map((quiz) => ({
       ...quiz,
       type: "quiz",
     })),
-    ...attachments.map((a) => ({
+    ...attachments?.map((a) => ({
       ...a,
       type:a?.type,
     })),
@@ -61,7 +61,7 @@ const Chapter = ({
       {isExpanded === id && (
         <div className="ml-10 py-2">
           {combinedItems.length > 0 ? (
-            combinedItems.map((item, index) => (
+            combinedItems?.map((item, index) => (
               <ChapterItem
                 key={index}
                 type={item?.type}

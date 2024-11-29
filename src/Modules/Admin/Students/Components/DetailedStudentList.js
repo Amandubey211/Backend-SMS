@@ -18,7 +18,7 @@ const DetailedStudentList = ({ activeSection, onSeeGradeClick, students }) => {
         </div>
       ) : (
         <ul>
-          {filteredStudents.map((student, index) => (
+          {filteredStudents?.map((student, index) => (
             <li
               key={student._id}
               className="relative flex items-center justify-between py-4 border-b"

@@ -81,7 +81,7 @@ const StudentGradePieChart = ({ gradesData }) => {
       </div>
       {/* Custom Legend with Separate Div for Circles */}
       <div className="flex flex-wrap justify-between w-full max-w-[400px]">
-        {labels.map((label, index) => (
+        {labels?.map((label, index) => (
           <div key={index} className="flex items-center mb-4 w-[calc(33%-10px)] min-w-[120px]">
             <div
               className="flex-shrink-0 mr-3"

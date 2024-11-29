@@ -32,7 +32,7 @@ const MediaUpload = ({ onSubmit }) => {
       setFiles((prevFiles) => [...prevFiles, ...validFiles]);
       setPreviews((prevPreviews) => [
         ...prevPreviews,
-        ...validFiles.map((file) => URL.createObjectURL(file)),
+        ...validFiles?.map((file) => URL.createObjectURL(file)),
       ]);
       setSkipFiles(false); // Hide the checkbox when files are added
     }
@@ -77,14 +77,14 @@ const MediaUpload = ({ onSubmit }) => {
     setLoading(true);
     try {
       const responses = await Promise.all(
-        files.map((file) => {
+        files?.map((file) => {
           const formData = new FormData();
           formData.append("file", file);
           formData.append("upload_preset", cloudinaryPreset);
           return axios.post(cloudinaryUrl, formData);
         })
       );
-      const mediaData = responses.map((res, index) => ({
+      const mediaData = responses?.map((res, index) => ({
         url: res.data.secure_url,
         name: files[index].name,
         type: files[index].type,
@@ -167,7 +167,7 @@ const MediaUpload = ({ onSubmit }) => {
           {files.length > 0 && (
             <div className="flex-grow  overflow-y-auto mt-4 px-3 no-scrollbar">
               <div className="grid grid-cols-2 gap-2">
-                {files.map((file, index) => (
+                {files?.map((file, index) => (
                   <div
                     key={index}
                     className={`flex flex-col p-2 border rounded-md transform transition duration-100 hover:shadow-md ${

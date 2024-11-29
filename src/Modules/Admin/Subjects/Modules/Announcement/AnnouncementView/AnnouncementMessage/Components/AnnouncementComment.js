@@ -126,7 +126,7 @@ const AnnouncementComment = ({
       {/* Replies Section */}
       {showReplies && comment.replies.length > 0 && (
         <div className="">
-          {comment.replies.map((reply) => (
+          {comment?.replies?.map((reply) => (
             <AnnouncementReply
               key={reply._id}
               reply={reply}

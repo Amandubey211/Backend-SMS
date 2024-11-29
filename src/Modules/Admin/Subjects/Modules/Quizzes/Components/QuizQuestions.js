@@ -34,7 +34,7 @@ const QuizQuestions = () => {
         {t("All Question Preview")}
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {questions.map((question, questionIndex) => (
+        {questions?.map((question, questionIndex) => (
           <QuizQuestionCard
             key={questionIndex}
             question={question}

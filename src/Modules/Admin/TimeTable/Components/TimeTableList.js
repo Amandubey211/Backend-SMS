@@ -94,16 +94,16 @@ const TimeTableList = React.memo(({ timetables, loading, onDelete }) => {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-4 py-6">
-          {sortedTimetables.map((timetable) => (
+          {sortedTimetables?.map((timetable) => (
             <div
               key={timetable._id}
               className="relative p-6 bg-white shadow-xl rounded-xl border border-gray-200 transition duration-500 hover:scale-105 hover:shadow-2xl cursor-pointer"
               onClick={() => handleCardClick(timetable)}
             >
               {/* Status Badge */}
-              {role !== "parent" && role !== "student" && (
+              {role === 'admin' && (
                 <span
-                  className={`absolute top-2 right-2 text-xs font-semibold px-2 py-1 rounded ${
+                  className={`absolute top-1 right-2 text-xs font-semibold px-2 py-1 mb-2 rounded ${
                     timetable.status === "active"
                       ? "bg-green-500 text-white"
                       : "bg-gray-500 text-white"
@@ -120,13 +120,13 @@ const TimeTableList = React.memo(({ timetables, loading, onDelete }) => {
               </h2>
               <p className="text-sm text-gray-600 flex items-center">
                 <FaChalkboardTeacher className="text-indigo-400 mr-2" />
-                <strong>{t("Type")}:</strong> {timetable.type}
+                <strong>{t("Type")}: </strong> {timetable.type}
               </p>
 
               {/* General Info */}
               <p className="text-sm text-gray-600 flex items-center mt-1">
                 <FaChalkboardTeacher className="text-indigo-400 mr-2" />
-                <strong>{t("Class")}:</strong>{" "}
+                <strong>{t("Class")}: </strong>{" "}
                 {timetable.classId?.className ?? t("N/A")}, {timetable.schoolId?.nameOfSchool ?? t("N/A")}
               </p>
               <p className="text-sm text-gray-600 flex items-center mt-1">

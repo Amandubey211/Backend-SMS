@@ -179,7 +179,7 @@ const AccountingSection = () => {
                   </tr>
                 </thead>
                 <tbody className="space-y-2">
-                  {paginatedData.map((item) => (
+                  {paginatedData?.map((item) => (
                     <tr key={item.id} className="text-left text-gray-700 bg-white shadow-sm">
                       <td className="px-5 py-4 border-b border-gray-200 truncate">{item?.feeType ?? t("No Fee Type")}</td>
                       <td className="px-5 py-4 border-b border-gray-200">{item?.paidBy ?? "N/A"}</td>

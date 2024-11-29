@@ -85,7 +85,7 @@ const AllTeachers = () => {
             </div>
             <div className="flex flex-wrap -mx-2">
               {allTeachers.length > 0 ? (
-                allTeachers.map((teacher, index) => (
+                allTeachers?.map((teacher, index) => (
                   <ProfileCard
                     key={index}
                     profile={teacher}

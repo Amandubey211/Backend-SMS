@@ -37,7 +37,7 @@ const EditorSelector = ({ selectedUsers, setSelectedUsers, subject }) => {
         Who Can Edit
       </label>
       <div className="border border-gray-300 rounded-md p-2 flex flex-wrap">
-        {selectedUsers.map((user) => (
+        {selectedUsers?.map((user) => (
           <div
             key={user._id}
             className="bg-purple-100 text-purple-700 rounded-md px-2 py-1 m-1 flex items-center space-x-1 truncate"
@@ -59,7 +59,7 @@ const EditorSelector = ({ selectedUsers, setSelectedUsers, subject }) => {
       </div>
       {isDropdownOpen && (
         <div className="absolute mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg z-10">
-          {AllTeachers.map((teacher) => (
+          {AllTeachers?.map((teacher) => (
             <button
               key={teacher._id}
               onClick={() => handleUserSelect(teacher)}

@@ -205,7 +205,7 @@ const UpdateTimeTable = () => {
       style={{ width: '100%' }}
       placeholder="Select Day"
     >
-      {daysOfWeek.map((day) => (
+      {daysOfWeek?.map((day) => (
         <Option key={day} value={day}>
           {day}
         </Option>
@@ -245,7 +245,7 @@ const UpdateTimeTable = () => {
         disabled={isDisabled}
       >
         {subjects && subjects.length > 0 ? (
-          subjects.map((subject, index) => {
+          subjects?.map((subject, index) => {
             const subjectId =
               subject._id || subject.id || subject.subjectId;
             if (!subjectId) {
@@ -685,7 +685,7 @@ const UpdateTimeTable = () => {
           description: row.description,
         });
       });
-      timetableData.days = Object.keys(dayMap).map((day) => ({
+      timetableData.days = Object.keys(dayMap)?.map((day) => ({
         day,
         slots: dayMap[day],
       }));
@@ -704,7 +704,7 @@ const UpdateTimeTable = () => {
         };
         dateMap[formattedDate].push(slotData);
       });
-      timetableData.days = Object.keys(dateMap).map((date) => ({
+      timetableData.days = Object.keys(dateMap)?.map((date) => ({
         date,
         slots: dateMap[date],
       }));
@@ -723,14 +723,14 @@ const UpdateTimeTable = () => {
         };
         dateMap[formattedDate].push(slotData);
       });
-      timetableData.days = Object.keys(dateMap).map((date) => ({
+      timetableData.days = Object.keys(dateMap)?.map((date) => ({
         date,
         slots: dateMap[date],
       }));
     } else if (formData.type === 'others') {
       // Since heading is in slots, we can group all slots under a single day
       const day = {
-        slots: dataSource.map((row) => ({
+        slots: dataSource?.map((row) => ({
           heading: row.heading, // Use 'heading' for heading
           subjectId: row.subjectId,
           startTime: row.startTime,
@@ -838,7 +838,7 @@ const UpdateTimeTable = () => {
               placeholder="Select Class"
             >
               <Option value="">Select Class</Option>
-              {classes.map((classItem) => (
+              {classes?.map((classItem) => (
                 <Option key={classItem._id} value={classItem._id}>
                   {classItem.className}
                 </Option>
@@ -859,7 +859,7 @@ const UpdateTimeTable = () => {
             >
               <Option value="">Select Section</Option>
               {sectionsList.length > 0 ? (
-                sectionsList.map((section) => (
+                sectionsList?.map((section) => (
                   <Option key={section._id} value={section._id}>
                     {section.sectionName}
                   </Option>
@@ -885,7 +885,7 @@ const UpdateTimeTable = () => {
             >
               <Option value="">Select Group</Option>
               {groupsList.length > 0 ? (
-                groupsList.map((group) => (
+                groupsList?.map((group) => (
                   <Option key={group._id} value={group._id}>
                     {group.groupName}
                   </Option>

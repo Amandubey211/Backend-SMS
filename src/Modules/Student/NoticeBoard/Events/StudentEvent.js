@@ -99,7 +99,7 @@ const StudentEvent = () => {
   
     return (
       <ul className="events space-y-1 max-h-20 overflow-y-auto">
-        {dayEvents.map((event, index) => {
+        {dayEvents?.map((event, index) => {
           // Parse time from event, support both 24-hour and 12-hour formats
           let eventTime = event?.time
             ? parse(event?.time, 'hh:mm a', new Date()) // Try parsing as 12-hour format first

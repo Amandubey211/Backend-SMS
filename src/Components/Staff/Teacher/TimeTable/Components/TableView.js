@@ -123,7 +123,7 @@ const TableView = () => {
   const tableData = useMemo(() => {
     if (!timetable) return [];
     return timetable.days?.flatMap((day) =>
-      day.slots.map((slot) => ({
+      day?.slots?.map((slot) => ({
         key: slot._id,
         day: day.day || t("N/A"),
         date: day.date ? new Date(day.date).toLocaleDateString() : t("N/A"),
@@ -224,13 +224,13 @@ const TableView = () => {
       />
 
       {/* Delete Confirmation Modal */}
-      <DeleteConfirmatiomModal
+      {/* <DeleteConfirmatiomModal
         isOpen={isDeleteModalOpen}
         onClose={closeDeleteModal}
         onConfirm={handleDelete}
         loading={deleteLoading}
         text={t("Delete this timetable")}
-      />
+      /> */}
     </div>
   );
 };

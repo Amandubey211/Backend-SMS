@@ -85,7 +85,7 @@
 //           onChange={handleModuleChange}
 //         >
 //           <option value="">Select</option>
-//           {moduleList.map((module) => (
+//           {moduleList?.map((module) => (
 //             <option key={module._id} value={module._id}>
 //               {module.moduleName}
 //             </option>
@@ -107,7 +107,7 @@
 //           {selectedModule ? (
 //             <>
 //               <option value="">Select</option>
-//               {chapters.map((chapter) => (
+//               {chapters?.map((chapter) => (
 //                 <option key={chapter._id} value={chapter._id}>
 //                   {chapter.name}
 //                 </option>
@@ -249,7 +249,7 @@ const CreateAssignmentForm = ({
           onChange={handleModuleChange}
         >
           <option value="">Select</option>
-          {moduleList.map((module) => (
+          {moduleList?.map((module) => (
             <option key={module._id} value={module._id}>
               {module.moduleName}
             </option>
@@ -269,7 +269,7 @@ const CreateAssignmentForm = ({
           disabled={!moduleId} // Disable if no module is selected
         >
           <option value="">Select</option>
-          {chapters.map((chapter) => (
+          {chapters?.map((chapter) => (
             <option key={chapter._id} value={chapter._id}>
               {chapter.name}
             </option>

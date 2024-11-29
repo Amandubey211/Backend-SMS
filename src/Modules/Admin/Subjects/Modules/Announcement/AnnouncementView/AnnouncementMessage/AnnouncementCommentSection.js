@@ -96,7 +96,7 @@ const AnnouncementCommentSection = () => {
             <p className="mt-4 text-lg text-gray-500">No comments found</p>
           </div>
         )}
-        {filteredComments.map((comment) => (
+        {filteredComments?.map((comment) => (
           <AnnouncementComment
             key={comment._id}
             comment={comment}

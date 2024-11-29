@@ -65,7 +65,7 @@ const Library = () => {
           <p className="text-gray-500 text-xl">{t("No library data found")}</p>
         </div>
       ) : (
-        latestBooks.map((book) => (
+        latestBooks?.map((book) => (
           <BookItem
             key={book?._id}
             image={book?.image || "https://via.placeholder.com/50"}

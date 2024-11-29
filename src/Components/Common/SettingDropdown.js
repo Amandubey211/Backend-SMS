@@ -135,7 +135,7 @@ const SettingDropdown = ({
                 { lang: "ar", label: "Arabic", flag: "🇶🇦" },
                 { lang: "en", label: "English", flag: "🇬🇧" },
                 { lang: "hi", label: "Hindi", flag: "🇮🇳" },
-              ].map(({ lang, label, flag }) => (
+              ]?.map(({ lang, label, flag }) => (
                 <div
                   key={lang}
                   className="flex items-center gap-2 px-3 py-2 hover:bg-gray-200 cursor-pointer"

@@ -81,9 +81,9 @@ const MainSection = () => {
                 <h2 className="text-xl">{t("All Discussions")}</h2>
                 <MdKeyboardArrowDown className="text-gray-500 h-8 w-8" />
               </div>
-              {filteredDiscussions.length > 0 ? (
+              {filteredDiscussions?.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {filteredDiscussions.map((discussion, index) => (
+                  {filteredDiscussions?.map((discussion, index) => (
                     <DiscussionCard
                       key={index}
                       discussion={discussion}

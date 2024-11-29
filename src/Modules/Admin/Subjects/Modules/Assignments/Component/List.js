@@ -93,7 +93,7 @@ const List = ({ data, icon, title, type, loading, error }) => {
         ) : error ? (
           <NoDataFound />
         ) : filteredData.length > 0 ? (
-          filteredData.reverse().map((item) => (
+          filteredData?.reverse()?.map((item) => (
             <div key={item._id} className="relative mb-3">
               <div className="flex items-center gap-3 p-1 rounded-lg">
                 <NavLink

@@ -139,7 +139,7 @@ const SubmissionDetails = ({ details, student, initialGrade }) => {
           </h1>
 
           <ul className="space-y-2 text-sm">
-            {media.map((file, index) => (
+            {media?.map((file, index) => (
               <li
                 key={index}
                 className="flex items-center justify-between bg-white p-2 border rounded-md shadow-sm hover:shadow-md transition-shadow"

@@ -42,7 +42,7 @@ const ParentEvent = () => {
   // Ensure all event dates are properly parsed and formatted
   useEffect(() => {
     if (events?.length > 0) {
-      const formattedEvents = events.map((event) => ({
+      const formattedEvents = events?.map((event) => ({
         ...event,
         startDate: parseISO(event?.date), // Parse the ISO string from API
         endDate: new Date(
@@ -75,7 +75,7 @@ const handleDateCellRender = (value) => {
 
   return (
     <ul className="events space-y-1 max-h-20 overflow-y-auto">
-      {dayEvents.map((event, index) => {
+      {dayEvents?.map((event, index) => {
         // Parse time from event, support both 24-hour and 12-hour formats
         let eventTime = event?.time
           ? parse(event?.time, 'hh:mm a', new Date()) // Try parsing as 12-hour format first
@@ -191,7 +191,7 @@ const handleDateCellRender = (value) => {
                       <IoIosArrowBack />
                     </div>
                   )}
-                  {paginatedEvents.map((event, index) => (
+                  {paginatedEvents?.map((event, index) => (
                     <EventCard
                       key={event?.id}
                       event={event}

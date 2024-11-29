@@ -23,11 +23,11 @@ const Chapter = ({
   const [previewType, setPreviewType] = useState(null);
 
   const combinedItems = [
-    ...assignments.map((assignment) => ({
+    ...assignments?.map((assignment) => ({
       ...assignment,
       type: "assignment",
     })),
-    ...quizzes.map((quiz) => ({
+    ...quizzes?.map((quiz) => ({
       ...quiz,
       type: "quiz",
     })),
@@ -89,7 +89,7 @@ const Chapter = ({
                 <b>{attachments.length}</b> Attachments
               </h3>
               <div className="grid grid-cols-1 gap-2 mb-2">
-                {attachments.map((attachment, index) => (
+                {attachments?.map((attachment, index) => (
                   <div
                     key={index}
                     className="flex flex-col p-2 border rounded-md transform transition duration-100 hover:shadow-md"
@@ -129,7 +129,7 @@ const Chapter = ({
           {/* Assignments and Quizzes Section */}
           <div>
             {combinedItems.length > 0 ? (
-              combinedItems.map((item, index) => (
+              combinedItems?.map((item, index) => (
                 <ChapterItem
                   key={index}
                   type={item.type}

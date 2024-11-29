@@ -41,7 +41,7 @@ const AnnouncementList = () => {
   }, [dispatch, cid]);
 
   // Add random colors to each announcement
-  const coloredAnnouncements = announcements.map((announcement) => ({
+  const coloredAnnouncements = announcements?.map((announcement) => ({
     ...announcement,
     color: getRandomColor(),
   }));
@@ -59,7 +59,7 @@ const AnnouncementList = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-2">
           {filteredAnnouncements.length > 0 ? (
-            filteredAnnouncements.map((announcement) => (
+            filteredAnnouncements?.map((announcement) => (
               <AnnouncementCard key={announcement._id} {...announcement} />
             ))
           ) : (

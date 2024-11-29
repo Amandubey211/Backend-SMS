@@ -125,7 +125,7 @@ const AdminNotice = () => {
             ) : error ? (
               <NoDataFound title={t("Notices")} />
             ) : filteredNotices.length > 0 ? (
-              filteredNotices.map((notice, index) => (
+              filteredNotices?.map((notice, index) => (
                 <AdminNoticeItem
                   key={notice._id}
                   notice={notice}

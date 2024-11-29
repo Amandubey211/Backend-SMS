@@ -38,7 +38,7 @@ const DiscussionMessage = () => {
     };
 
     const addReplyRecursively = (comments) => {
-      return comments.map(comment => {
+      return comments?.map(comment => {
         if (comment.id === id && !isReplyToReply) {
           return {
             ...comment,
@@ -70,7 +70,7 @@ const DiscussionMessage = () => {
 
   const deleteReply = (commentId, replyId) => {
     const deleteReplyRecursively = (comments) => {
-      return comments.map(comment => {
+      return comments?.map(comment => {
         if (comment.id === commentId) {
           return {
             ...comment,
