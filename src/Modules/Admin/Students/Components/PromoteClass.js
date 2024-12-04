@@ -3,13 +3,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { promoteStudents } from "../../../../Store/Slices/Admin/Class/Students/studentThunks";
 import { motion } from "framer-motion";
 import profileIcon from "../../../../Assets/DashboardAssets/profileIcon.png";
+import { fetchAllClasses } from "../../../../Store/Slices/Admin/Class/actions/classThunk";
 
 const PromoteClass = ({ student }) => {
   const dispatch = useDispatch();
 
   // Fetch class and academic year data from Redux store
   const classes = useSelector((state) => state.admin.class.classes);
-  const academicYears = useSelector((state) => state.common.auth.AcademicYear);
+  const { academicYears } = useSelector((state) => state.common.academicYear);
   const { loading } = useSelector((state) => state.admin.students);
 
   const [selectedClass, setSelectedClass] = useState("");
@@ -18,13 +19,14 @@ const PromoteClass = ({ student }) => {
 
   useEffect(() => {
     // Fetch classes and academic years if necessary
-    if (classes?.length === 0) {
-      // Dispatch thunk to fetch classes
-    }
+    // if (classes?.length === 0) {
+    //   // Dispatch thunk to fetch classes
+    // }
+    dispatch(fetchAllClasses());
     if (academicYears?.length === 0) {
       // Dispatch thunk to fetch academic years
     }
-  }, [dispatch, classes, academicYears]);
+  }, [dispatch, academicYears]);
 
   const handlePromotion = async (e) => {
     e.preventDefault();
@@ -37,7 +39,7 @@ const PromoteClass = ({ student }) => {
     try {
       await dispatch(
         promoteStudents({
-          studentIds: [student._id],
+          StudentIds: [student._id],
           promotionClassId: selectedClass,
           academicYearId: selectedAcademicYear,
         })
@@ -73,10 +75,14 @@ const PromoteClass = ({ student }) => {
               Admission Number: {student.admissionNumber || "N/A"}
             </div>
             <div className="text-sm text-gray-500">
-              Class: {student.className || "N/A"}
+              Class:{" "}
+              {student?.className || student.presentClassId.className || "N/A"}
             </div>
             <div className="text-sm text-gray-500">
-              Section: {student.sectionName || "N/A"}
+              Section:{" "}
+              {student?.sectionName ||
+                student?.presentSectionId?.sectionName ||
+                "N/A"}
             </div>
           </div>
         </div>
@@ -115,7 +121,7 @@ const PromoteClass = ({ student }) => {
             <option value="">Select Year</option>
             {academicYears?.map((year) => (
               <option key={year._id} value={year._id}>
-                {year.academicYear}
+                {year.year}
               </option>
             ))}
           </select>
