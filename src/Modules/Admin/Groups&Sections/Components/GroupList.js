@@ -17,6 +17,7 @@ import Spinner from "../../../../Components/Common/Spinner";
 import { useParams } from "react-router-dom";
 import Sidebar from "../../../../Components/Common/Sidebar";
 import profileIcon from "../../../../Assets/DashboardAssets/profileIcon.png";
+import StudentMenuOptions from "../../Students/Components/StudentMenuOptions";
 
 const GroupList = ({ onSeeGradeClick }) => {
   const [expandedGroupIndex, setExpandedGroupIndex] = useState(null);
@@ -223,7 +224,7 @@ const GroupList = ({ onSeeGradeClick }) => {
                     >
                       <div className="flex items-center flex-shrink-0 w-1/4">
                         <img
-                          src={student?.profile || profileIcon }
+                          src={student?.profile || profileIcon}
                           alt={student?.firstName || "First"}
                           className="w-10 h-10 rounded-full mr-3"
                         />
@@ -267,11 +268,19 @@ const GroupList = ({ onSeeGradeClick }) => {
                           See Grade
                         </button>
                       </div>
-                      {role !== "teacher" && (
+                      {/* {role === "admin" && (
                         <div className="flex-shrink-0 w-1/8 relative">
                           <BsThreeDotsVertical />
                         </div>
-                      )}
+                      )} */}
+                      <div className="flex-shrink-0 w-1/8 relative">
+                        <StudentMenuOptions
+                          groupId={group._id}
+                          studentName={`${student?.firstName} ${student?.lastName}`}
+                          studentId={student._id}
+                          student={student}
+                        />
+                      </div>
                     </li>
                   ))
                 )}

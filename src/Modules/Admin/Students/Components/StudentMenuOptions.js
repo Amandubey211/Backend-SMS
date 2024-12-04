@@ -14,15 +14,15 @@ import DeleteModal from "../../../../Components/Common/DeleteModal";
 import DemoteClass from "./DemoteClass";
 import GraduateStudent from "./GraduateStudent";
 import { removeStudentFromGroup } from "../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
+// import { RiDeleteBin2Line } from "react-icons/ri";
 
 const StudentMenuOptions = ({
-  studentId,
   studentName,
-  groupId,
-  fetchGroups,
-  fetchStudents,
+  studentId,
   student,
-  onSeeGradeClick,
+  groupId,
+  // fetchGroups,
+  // fetchStudents,
 }) => {
   const [showMenu, setShowMenu] = useState(null);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -33,8 +33,6 @@ const StudentMenuOptions = ({
 
   const menuRef = useRef(null);
   const buttonRef = useRef(null);
-
- 
 
   const toggleMenu = useCallback(
     (index) => {
@@ -80,12 +78,23 @@ const StudentMenuOptions = ({
           // ),
           "Demote Class": <DemoteClass student={student} />,
           "Graduate Student": <GraduateStudent student={student} />,
+
+          // "Edit Student": (
+          //   <EditStudent
+          //     studentId={studentId}
+          //     fetchGroups={fetchGroups}
+          //     onClose={handleSidebarClose}
+          //   />
+          // ),
+          // "Delete Student": (
+          //   <DeleteStudent studentId={studentId} groupId={groupId} />
+          // ),
         };
 
         handleSidebarOpen(action, sidebarComponents[action]);
       }
     },
-    [studentId, fetchGroups]
+    [studentId]
   );
 
   const handleSidebarOpen = (title, content) => {
@@ -103,8 +112,8 @@ const StudentMenuOptions = ({
   const handleDeleteConfirm = async () => {
     try {
       await removeStudentFromGroup(studentId, groupId);
-      fetchGroups();
-      fetchStudents();
+      // fetchGroups();
+      // fetchStudents();
       setModalOpen(false);
       handleSidebarClose();
     } catch (error) {
@@ -158,6 +167,16 @@ const StudentMenuOptions = ({
               text="Graduate Student"
               onClick={() => handleMenuItemClick("Graduate Student")}
             />
+            {/* <MenuItem
+              icon={<MdOutlineModeEditOutline className="text-[#0D9755]" />}
+              text="Edit Student"
+              onClick={() => handleMenuItemClick("Edit Student")}
+            /> */}
+            {/* <MenuItem
+              icon={<RiDeleteBin2Line className="text-[#E33131]" />}
+              text="Delete Student"
+              onClick={() => handleMenuItemClick("Delete Student")}
+            /> */}
           </ul>
         </div>
       )}
