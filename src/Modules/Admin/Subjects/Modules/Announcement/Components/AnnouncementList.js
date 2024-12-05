@@ -33,11 +33,11 @@ const AnnouncementList = () => {
   const { loading, announcements } = useSelector(
     (store) => store.admin.announcements
   );
-  const { cid } = useParams();
+  const { cid, sid } = useParams();
 
   // Fetch announcements on component mount
   useEffect(() => {
-    dispatch(fetchAnnouncements(cid));
+    dispatch(fetchAnnouncements({ cid, sid }));
   }, [dispatch, cid]);
 
   // Add random colors to each announcement

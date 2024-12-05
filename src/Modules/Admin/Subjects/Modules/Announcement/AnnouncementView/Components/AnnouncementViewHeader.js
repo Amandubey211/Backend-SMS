@@ -75,7 +75,7 @@ const AnnouncementViewHeader = () => {
   return (
     <div className="flex items-center justify-between p-2 px-4 border-b">
       <div className="flex items-center">
-        {announcement?.authorUrl ? (
+        {/* {announcement?.authorUrl ? (
           <img
             src={announcement.authorUrl}
             alt={`${announcement.authorName || "Author"}'s Profile`}
@@ -86,7 +86,7 @@ const AnnouncementViewHeader = () => {
             className="w-12 h-12 text-gray-400"
             aria-label="Default Profile Icon"
           />
-        )}
+        )} */}
 
         <div className="ml-3">
           <h1 className="text-lg font-semibold">

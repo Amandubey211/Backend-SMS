@@ -30,7 +30,7 @@ const CreateAnnouncement = () => {
     groupId: "",
   });
 
-  const { cid } = useParams();
+  const { cid, sid } = useParams();
   const isSidebarOpen = useSelector(
     (state) => state.common.user.sidebar.isOpen
   );
@@ -80,6 +80,7 @@ const CreateAnnouncement = () => {
       sectionId: formState.sectionId,
       delayPosting: formState.availableFrom,
       classId: cid,
+      subjectId: sid,
       ...formState,
     };
 
