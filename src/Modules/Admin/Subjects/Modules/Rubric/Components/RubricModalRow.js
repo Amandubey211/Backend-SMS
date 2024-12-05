@@ -48,7 +48,7 @@ const RubricModalRow = ({ data, criteriaIndex, readonly }) => {
   };
 
   const handleUpdateRating = (updatedRating) => {
-    const updatedRatings = ratings((rating, index) =>
+    const updatedRatings = ratings?.map((rating, index) =>
       index === currentEditIndex ? updatedRating : rating
     );
     setRatings(updatedRatings);
@@ -57,7 +57,7 @@ const RubricModalRow = ({ data, criteriaIndex, readonly }) => {
   };
 
   const handleDeleteRating = (ratingIndex) => {
-    const updatedRatings = ratings.filter((_, index) => index !== ratingIndex);
+    const updatedRatings = ratings?.filter((_, index) => index !== ratingIndex);
     setRatings(updatedRatings);
     updateCriteriaRatings(updatedRatings);
   };

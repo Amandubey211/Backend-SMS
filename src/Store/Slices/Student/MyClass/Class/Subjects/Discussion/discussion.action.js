@@ -16,12 +16,12 @@ import {
 
 export const fetchStudentDiscussion = createAsyncThunk(
   "discussion/fetchStudentDiscussion",
-  async (cid, { rejectWithValue, dispatch }) => {
+  async ({cid,sid}, { rejectWithValue, dispatch }) => {
     try {
       const say = getAY();
       dispatch(setShowError(false));
       const response = await getData(
-        `/admin/getDiscussion/class/${cid}?say=${say}`
+        `/admin/getDiscussion/class/${cid}/subject/${sid}?say=${say}`
       );
       const data = response?.data;
       // console.log("response data---", data);

@@ -18,10 +18,8 @@ export const fetchSyllabus = createAsyncThunk(
 
     try {
       const response = await getData(
-        `/admin/syllabus/${subjectId}/class/${classId}`,
-        {
-          params: { say },
-        }
+        `/admin/syllabus/${subjectId}/class/${classId}?say=${say}`,
+    
       );
 
       if (response && response.status) {
@@ -40,9 +38,7 @@ export const deleteSyllabus = createAsyncThunk(
     dispatch(setShowError(false));
 
     try {
-      const response = await deleteData(`/admin/syllabus/${syllabusId}`, {
-        params: { say },
-      });
+      const response = await deleteData(`/admin/syllabus/${syllabusId}?say=${say}`);
 
       if (response && response.status) {
         toast.success("Syllabus deleted successfully!");
@@ -62,9 +58,7 @@ export const createSyllabus = createAsyncThunk(
 
     try {
       const payload = { title, content, subjectId };
-      const response = await postData("/admin/syllabus", payload, {
-        params: { say },
-      });
+      const response = await postData(`/admin/syllabus?say=${say}`, payload);
 
       if (response && response.status) {
         toast.success("Syllabus created successfully!");

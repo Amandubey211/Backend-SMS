@@ -21,10 +21,15 @@ const StudentGradeModal = ({ isOpen, onClose,student }) => {
       ...prevFilters,
       [name]: value,
     }));
-    
-    console.log('--',filters)
-    getStudentGrades()
+    const params = {};
+    if (sid) params.subjectId = sid;
+    if (name == 'subject') params.subjectId   = value;
+    if (name =='module') params.moduleId   = value;
+    if (name =='chapter') params.chapterId = value;
+    if (name =='arrangeBy') params.arrangeBy = value;
+    getStudentGrades(params)
   };
+
 
   useEffect(() => {
     if (isOpen) {
@@ -38,14 +43,13 @@ const StudentGradeModal = ({ isOpen, onClose,student }) => {
   }, [isOpen]);
    const {grades,loading} = useSelector((store) => store.admin.all_students);
    const dispatch = useDispatch();
-  const getStudentGrades = async()=>{
-    
-    const params = {};
-         if (sid) params.subjectId = sid;
-         if (filters.subject) params.subjectId   = filters.subject;
-         if (filters.module) params.moduleId   = filters.module;
-         if (filters.chapter) params.chapterId = filters.chapter;
-         if (filters.arrangeBy) params.arrangeBy = filters.arrangeBy;
+  const getStudentGrades = async(params)=>{
+    // const params = {};
+    //      if (sid) params.subjectId = sid;
+    //      if (filters.subject) params.subjectId   = filters.subject;
+    //      if (filters.module) params.moduleId   = filters.module;
+    //      if (filters.chapter) params.chapterId = filters.chapter;
+    //      if (filters.arrangeBy) params.arrangeBy = filters.arrangeBy;
          dispatch(fetchStudentGrades({params,studentId:student?.studentId || student?._id,studentClassId:cid}));
      }
 
@@ -91,7 +95,7 @@ const StudentGradeModal = ({ isOpen, onClose,student }) => {
                   onFilterChange={handleFilterChange}
                 /> 
                 <div className="h-96 overflow-y-scroll no-scrollbar">
-                  <StudentModalGradeList data={grades.grades} filters={filters} />
+                  <StudentModalGradeList data={grades?.grades} filters={filters} />
                 </div>
               </div>
               <StudentGradeSummary grades={grades} studentData={grades.student} />

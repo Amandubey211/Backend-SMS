@@ -17,9 +17,7 @@ export const fetchAllPages = createAsyncThunk(
     dispatch(setShowError(false));
 
     try {
-      const response = await getData(`/admin/api/pages/class/pages/${cid}`, {
-        params: { say },
-      });
+      const response = await getData(`/admin/api/pages/class/pages/${cid}?say=${say}`);
 
       if (response && response.success) {
         return response.data;

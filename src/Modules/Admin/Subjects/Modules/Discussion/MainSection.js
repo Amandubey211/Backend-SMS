@@ -12,6 +12,7 @@ import Spinner from "../../../../../Components/Common/Spinner";
 import NoDataFound from "../../../../../Components/Common/NoDataFound";
 import SubjectSideBar from "../../Component/SubjectSideBar";
 import { fetchClassDiscussions } from "../../../../../Store/Slices/Admin/Class/Discussion/discussionThunks";
+import { resetDiscussion } from "../../../../../Store/Slices/Admin/Class/Discussion/discussionSlice";
 
 const MainSection = () => {
   const { t } = useTranslation('admModule');
@@ -25,7 +26,7 @@ const MainSection = () => {
   );
 
   useEffect(() => {
-    dispatch(fetchClassDiscussions({ cid }));
+    dispatch(fetchClassDiscussions({ cid,sid }));
   }, [dispatch, cid]);
 
   const handleSearch = (query) => {
@@ -36,7 +37,7 @@ const MainSection = () => {
     setFilter(filter);
   };
 
-  const filteredDiscussions = discussions.filter((discussion) => {
+  const filteredDiscussions = discussions?.filter((discussion) => {
     const matchesSearch = discussion.title
       .toLowerCase()
       .includes(searchQuery.toLowerCase());
@@ -47,7 +48,7 @@ const MainSection = () => {
     return matchesSearch && matchesFilter;
   });
 
-  const pinnedDiscussions = discussions.filter(
+  const pinnedDiscussions = discussions?.filter(
     (discussion) => discussion.isPinned
   );
 
@@ -72,7 +73,7 @@ const MainSection = () => {
             <PinnedDiscussions
               discussions={pinnedDiscussions}
               fetchClassDiscussions={() =>
-                dispatch(fetchClassDiscussions({ cid }))
+                dispatch(fetchClassDiscussions({ cid,sid }))
               }
             />
             <div className="p-3">
@@ -88,7 +89,7 @@ const MainSection = () => {
                       key={index}
                       discussion={discussion}
                       fetchClassDiscussions={() =>
-                        dispatch(fetchClassDiscussions({ cid }))
+                        dispatch(fetchClassDiscussions({ cid,sid }))
                       }
                     />
                   ))}
@@ -101,6 +102,7 @@ const MainSection = () => {
         )}
         <NavLink
           to={`/class/${cid}/${sid}/create_discussion`}
+          onClick={() => dispatch(resetDiscussion())}
           className="bg-gradient-to-r from-purple-400 to-pink-400 text-white p-4 fixed rounded-full shadow-md bottom-4 right-4"
         >
           <RiAddFill size={24} />
