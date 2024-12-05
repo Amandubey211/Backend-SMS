@@ -35,12 +35,12 @@ const MainSection = () => {
 
     setIsSectionInvalid(false); // Reset invalid state if section is valid
 
-    const attendanceToMark = attendanceData
-      ?.filter((student) => student.attendanceStatus !== "not marked")
-      ((student) => ({
-        studentId: student.studentId,
-        status: student.attendanceStatus,
-      }));
+    const attendanceToMark = attendanceData?.filter(
+      (student) => student.attendanceStatus !== "not marked"
+    )((student) => ({
+      studentId: student.studentId,
+      status: student.attendanceStatus,
+    }));
 
     dispatch(
       markAttendance({
