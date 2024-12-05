@@ -65,12 +65,10 @@ export const addModule = createAsyncThunk(
         "post",
         endpoint,
         formData,
-        {},
-        {
-          headers: {
+       {
             "Content-Type": "multipart/form-data", // Specify the content type
           },
-        }
+        
       );
 
       if (response && response.success) {
@@ -109,12 +107,10 @@ export const editModule = createAsyncThunk(
         "put",
         endpoint,
         formData,
-        {},
-        {
-          headers: {
+       {
             "Content-Type": "multipart/form-data",
           },
-        }
+        
       );
 
       if (response && response.success) {
@@ -136,8 +132,8 @@ export const deleteModule = createAsyncThunk(
     dispatch(setShowError(false));
 
     try {
-      const endpoint = `/admin/subjects/${sid}/modules/${moduleId}`;
-      const response = await deleteData(endpoint, { say });
+      const endpoint = `/admin/subjects/${sid}/modules/${moduleId}?say=${say}`;
+      const response = await deleteData(endpoint);
 
       if (response && response.success) {
         toast.success("Module deleted successfully");
@@ -157,9 +153,9 @@ export const moveModule = createAsyncThunk(
     dispatch(setShowError(false));
 
     try {
-      const endpoint = `/admin/subjects/${sid}/modules/reorder`;
+      const endpoint = `/admin/subjects/${sid}/modules/reorder?say=${say}`;
       const data = { moduleId, newIndex };
-      const response = await putData(endpoint, data, { say });
+      const response = await putData(endpoint, data);
 
       if (response && response.success) {
         toast.success("Module moved successfully");
