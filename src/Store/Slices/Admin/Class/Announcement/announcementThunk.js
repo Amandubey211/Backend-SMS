@@ -13,14 +13,14 @@ import {
 
 export const fetchAnnouncements = createAsyncThunk(
   "announcement/fetchAnnouncements",
-  async (cid, { rejectWithValue, dispatch }) => {
+  async ({ cid, sid }, { rejectWithValue, dispatch }) => {
     const say = getAY();
     dispatch(setShowError(false));
 
     try {
-      const response = await getData(`/admin/announcement/class/${cid}`, {
-        params: { say },
-      });
+      const response = await getData(
+        `/admin/announcement/class/${cid}/subject/${sid}?say=${say}`
+      );
 
       if (response && response.status) {
         return response.data;
@@ -39,8 +39,8 @@ export const markAsReadAnnouncement = createAsyncThunk(
 
     try {
       await postData(
-        `/admin/markAsRead/announcement/${_id}`,
-        {},
+        `/admin/markAsRead/announcement/${_id}?say=${say}`,
+
         {
           params: { say },
         }
@@ -60,9 +60,7 @@ export const fetchAnnouncementById = createAsyncThunk(
     dispatch(setShowError(false));
 
     try {
-      const response = await getData(`/admin/announcement/${id}`, {
-        params: { say },
-      });
+      const response = await getData(`/admin/announcement/${id}?say=${say}`);
 
       if (response && response.status) {
         return response.data;
@@ -80,9 +78,7 @@ export const deleteAnnouncement = createAsyncThunk(
     dispatch(setShowError(false));
 
     try {
-      const response = await deleteData(`/admin/announcement/${id}`, {
-        params: { say },
-      });
+      const response = await deleteData(`/admin/announcement/${id}?say=${say}`);
 
       if (response && response.status) {
         toast.success("Announcement deleted successfully!");
@@ -110,14 +106,11 @@ export const createAnnouncement = createAsyncThunk(
     try {
       const response = await customRequest(
         "post",
-        "/admin/announcement",
+        `/admin/announcement?say=${say}`,
         formData,
-        {},
+
         {
-          params: { say },
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
+          "Content-Type": "multipart/form-data",
         }
       );
 
@@ -147,14 +140,10 @@ export const editAnnouncement = createAsyncThunk(
     try {
       const response = await customRequest(
         "put",
-        `/admin/announcement/${id}`,
+        `/admin/announcement/${id}?say=${say}`,
         formData,
-        {},
         {
-          params: { say },
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
+          "Content-Type": "multipart/form-data",
         }
       );
 
