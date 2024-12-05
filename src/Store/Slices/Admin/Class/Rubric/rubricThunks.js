@@ -21,7 +21,7 @@ export const fetchRubricsBySubjectId = createAsyncThunk(
     dispatch(setShowError(false));
 
     try {
-      const response = await getData(`/admin/rubric/subject/${sid}`, { say });
+      const response = await getData(`/admin/rubric/subject/${sid}?say=${say}`);
       return response.rubrics;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -37,7 +37,7 @@ export const deleteRubricThunk = createAsyncThunk(
     dispatch(setShowError(false));
 
     try {
-      await deleteData(`/admin/rubric/${rubricId}`, { say });
+      await deleteData(`/admin/rubric/${rubricId}?say=${say}`);
 
       toast.success("Rubric deleted successfully");
       return rubricId;
@@ -55,9 +55,7 @@ export const updateRubricThunk = createAsyncThunk(
     dispatch(setShowError(false));
 
     try {
-      const response = await putData(`/admin/rubric/${rubricId}`, rubricData, {
-        say,
-      });
+      const response = await putData(`/admin/rubric/${rubricId}?say=${say}`, rubricData);
 
       toast.success("Rubric updated successfully");
       return response.rubric;
@@ -75,9 +73,7 @@ export const createAssignmentRubricThunk = createAsyncThunk(
     dispatch(setShowError(false));
 
     try {
-      const response = await postData("/admin/create_rubric", rubricData, {
-        say,
-      });
+      const response = await postData(`/admin/create_rubric?say=${say}`, rubricData);
 
       toast.success("Assignment Rubric created successfully");
       // dispatch(fetchRubricsBySubjectId({sid}))
@@ -96,9 +92,7 @@ export const createQuizRubricThunk = createAsyncThunk(
     dispatch(setShowError(false));
 
     try {
-      const response = await postData("/admin/quiz/create_rubric", rubricData, {
-        say,
-      });
+      const response = await postData(`/admin/quiz/create_rubric?say=${say}`, rubricData);
 
       toast.success("Quiz Rubric created successfully");
       // dispatch(fetchRubricsBySubjectId({sid}))
@@ -118,7 +112,7 @@ export const getRubricByIdThunk = createAsyncThunk(
 
     try {
       // Fetch the rubric by ID (assignmentId or quizId)
-      const response = await getData(`/admin/rubric/${id}`, { say });
+      const response = await getData(`/admin/rubric/${id}?say=${say}`);
 
       const { success, rubric } = response;
 

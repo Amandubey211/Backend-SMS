@@ -18,10 +18,8 @@ export const fetchComments = createAsyncThunk(
 
     try {
       const response = await getData(
-        `/admin/getDiscussionComment/${discussionId}`,
-        {
-          params: { say },
-        }
+        `/admin/getDiscussionComment/${discussionId}?say=${say}`,
+       
       );
 
       if (response && response.status) {
