@@ -26,6 +26,8 @@ const MainSection = () => {
   const [isSectionInvalid, setIsSectionInvalid] = useState(false);
 
   const handleMarkAttendance = async () => {
+    console.log('--',attendanceData);
+    
     // Validate sectionId before dispatching the markAttendance action
     if (!filters.sectionId) {
       toast.error("Please select a section first.");

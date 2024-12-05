@@ -11,9 +11,9 @@ const AttendanceCard = ({ attendanceData }) => {
 
   useEffect(() => {
     if (attendanceData) {
-      const presentCount = attendanceData.filter(item => item.status === 'present')?.length;
-      const absentCount = attendanceData.filter(item => item.status === 'absent')?.length;
-      const leaveCount = attendanceData.filter(item => item.status === 'leave')?.length;
+      const presentCount = attendanceData?.filter(item => item.status === 'present')?.length;
+      const absentCount = attendanceData?.filter(item => item.status === 'absent')?.length;
+      const leaveCount = attendanceData?.filter(item => item.status === 'leave')?.length;
 
       setSummary({ presentCount, absentCount, leaveCount });
     }
