@@ -53,6 +53,7 @@ import TeacherTableView from "../Components/Staff/Teacher/TimeTable/Components/T
 // Parent
 import ParentTimeTablePage from "../Modules/Parents/TimeTable/TimeTablePage.js";
 import ParentTableView from "../Modules/Parents/TimeTable/Components/TableView.js";
+import ManageRolePage from "../Components/Common/RBAC/ManageRolePage.js";
 
 
 
@@ -852,6 +853,13 @@ function App() {
     {
       path: "/users/students",
       element: <AllStudents />,
+      errorElement: <Error />,
+    },
+    {
+      path: "/manage-roles",
+      element: (
+        <ProtectRoute Component={ManageRolePage} allowedRoles={["admin", "teacher", "staff"]} />
+      ),
       errorElement: <Error />,
     },
     {
