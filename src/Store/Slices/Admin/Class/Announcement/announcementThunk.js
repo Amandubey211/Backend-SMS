@@ -38,13 +38,7 @@ export const markAsReadAnnouncement = createAsyncThunk(
     dispatch(setShowError(false));
 
     try {
-      await postData(
-        `/admin/markAsRead/announcement/${_id}?say=${say}`,
-
-        {
-          params: { say },
-        }
-      );
+      await postData(`/admin/markAsRead/announcement/${_id}?say=${say}`);
 
       return _id;
     } catch (error) {
