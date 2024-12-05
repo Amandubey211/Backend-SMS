@@ -18,6 +18,7 @@ import { setErrorMsg, setShowError } from "../../Alerts/alertsSlice";
 import { ErrorMsg } from "../../Alerts/errorhandling.action";
 import { postData } from "../../../../../services/apiEndpoints";
 import { setLocalCookies } from "../../../../../Utils/academivYear";
+import { decryptData, encryptData } from "../../../../cryptoF";
 
 // **Staff Login Action**
 export const staffLogin = createAsyncThunk(
@@ -52,7 +53,9 @@ export const staffLogin = createAsyncThunk(
             schoolName: data.schoolName,
           })
         );
-
+        decryptData(data.encryptedEmail).then((a)=>console.log(a))
+        //encryptData("ABD");
+        //decryptData()
         // Dispatch token and role to authSlice
         dispatch(setToken(data.token));
         dispatch(setRole(data.role));

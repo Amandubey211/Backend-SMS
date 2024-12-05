@@ -19,9 +19,8 @@ export const fetchSubjects = createAsyncThunk(
     dispatch(setShowError(false));
 
     try {
-      const endpoint = `/admin/subject/${classId}`;
-      const params = { say };
-      const response = await getData(endpoint, params);
+      const endpoint = `/admin/subject/${classId}?say=${say}`;
+      const response = await getData(endpoint);
 
       if (response && response.status) {
         dispatch(setSubjects(response.data)); // Update the subjects state using the setSubjects action
@@ -40,9 +39,8 @@ export const createSubject = createAsyncThunk(
     dispatch(setShowError(false));
 
     try {
-      const endpoint = `/admin/subject`;
-      const params = { say };
-      const response = await postData(endpoint, subjectData, { params });
+      const endpoint = `/admin/subject?say=${say}`;
+      const response = await postData(endpoint, subjectData);
 
       if (response && response.status) {
         toast.success("Subject created successfully");
@@ -62,9 +60,9 @@ export const updateSubject = createAsyncThunk(
     dispatch(setShowError(false));
 
     try {
-      const endpoint = `/admin/subject/${subjectId}`;
-      const params = { say };
-      const response = await putData(endpoint, subjectData, { params });
+      const endpoint = `/admin/subject/${subjectId}?say=${say}`;
+
+      const response = await putData(endpoint, subjectData);
 
       if (response && response.status) {
         toast.success("Subject updated successfully");
@@ -84,9 +82,9 @@ export const deleteSubject = createAsyncThunk(
     dispatch(setShowError(false));
 
     try {
-      const endpoint = `/admin/subject/${subjectId}`;
-      const params = { say };
-      const response = await deleteData(endpoint, { params });
+      const endpoint = `/admin/subject/${subjectId}?say=${say}`;
+   
+      const response = await deleteData(endpoint);
 
       if (response && response.success) {
         toast.success("Subject deleted successfully");

@@ -57,8 +57,10 @@ const SelectBranch = () => {
 
   // Filter branches based on the search query
   const filteredBranches = branchs?.filter((branch) => {
-    const branchName = branch?.nameOfSchool?.toLowerCase();
-    const branchCity = branch?.city?.toLowerCase();
+
+    const branchName = branch.nameOfSchool?.toLowerCase();
+    const branchCity = branch.city?.toLowerCase();
+
     const query = searchQuery?.toLowerCase();
 
     return branchName?.includes(query) || branchCity?.includes(query);

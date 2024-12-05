@@ -29,8 +29,8 @@ export const fetchFilteredQuizzesThunk = createAsyncThunk(
       const subjectId =
         sid || getState().common.user.subjectInfo.selectedSubjectId;
 
-      const endpoint = `/admin/quizzes/${subjectId}`;
-      const response = await getData(endpoint, { params });
+      const endpoint = `/admin/quizzes/${subjectId}?say=${say}`;
+      const response = await getData(endpoint,  params );
 
       if (response.success) {
         return response.quizzes;
@@ -48,9 +48,9 @@ export const fetchQuizByIdThunk = createAsyncThunk(
       const say = getAY();
       dispatch(setShowError(false));
 
-      const endpoint = `/admin/quiz/${quizId}`;
-      const params = { say };
-      const response = await getData(endpoint, { params });
+      const endpoint = `/admin/quiz/${quizId}?say=${say}`;
+      
+      const response = await getData(endpoint);
 
       if (response.success) {
         return response.quiz;
