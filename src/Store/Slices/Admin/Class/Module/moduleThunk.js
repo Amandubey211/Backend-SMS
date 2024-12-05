@@ -20,8 +20,8 @@ export const fetchModules = createAsyncThunk(
     try {
       // API Call using service function with query parameter
       const response = await getData(
-        `/admin/student/classes/${cid}/modules/${sid}`,
-        { say }
+        `/admin/student/classes/${cid}/modules/${sid}?say=${say}`,
+     
       );
 
       // Check if response is valid and indicates success

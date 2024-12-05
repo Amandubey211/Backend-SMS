@@ -18,8 +18,8 @@ export const fetchAllIcons = createAsyncThunk(
 
     try {
       const endpoint = `/icons/getAllIcons`;
-      const params = { say, type };
-      const response = await getData(endpoint, { params });
+      const params = {  type };
+      const response = await getData(endpoint,  params );
 
       if (response && response.success) {
         return response.icons; // Assuming 'icons' contains the list of icons
@@ -37,9 +37,9 @@ export const createIcon = createAsyncThunk(
     dispatch(setShowError(false));
 
     try {
-      const endpoint = `/icons/createIcon`;
-      const params = { say };
-      const response = await postData(endpoint, formData, params);
+      const endpoint = `/icons/createIcon?say=${say}`;
+    
+      const response = await postData(endpoint, formData);
 
       if (response && response.success) {
         toast.success("Icon created successfully!");
@@ -59,9 +59,9 @@ export const updateIcon = createAsyncThunk(
     dispatch(setShowError(false));
 
     try {
-      const endpoint = `/icons/updateIcon/${iconId}`;
-      const params = { say };
-      const response = await putData(endpoint, iconData, { params });
+      const endpoint = `/icons/updateIcon/${iconId}?say=${say}`;
+     
+      const response = await putData(endpoint, iconData);
 
       if (response && response.success) {
         toast.success("Icon updated successfully!");
@@ -81,9 +81,9 @@ export const deleteIcon = createAsyncThunk(
     dispatch(setShowError(false));
 
     try {
-      const endpoint = `/icons/deleteIcon/${iconId}`;
-      const params = { say };
-      const response = await deleteData(endpoint, { params });
+      const endpoint = `/icons/deleteIcon/${iconId}?say=${say}`;
+      
+      const response = await deleteData(endpoint);
 
       if (response && response.success) {
         toast.success("Icon deleted successfully!");

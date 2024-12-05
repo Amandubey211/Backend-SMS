@@ -21,6 +21,8 @@ const StudentGradeModal = ({ isOpen, onClose,student }) => {
       ...prevFilters,
       [name]: value,
     }));
+    
+    console.log('--',filters)
     getStudentGrades()
   };
 
@@ -37,6 +39,7 @@ const StudentGradeModal = ({ isOpen, onClose,student }) => {
    const {grades,loading} = useSelector((store) => store.admin.all_students);
    const dispatch = useDispatch();
   const getStudentGrades = async()=>{
+    
     const params = {};
          if (sid) params.subjectId = sid;
          if (filters.subject) params.subjectId   = filters.subject;

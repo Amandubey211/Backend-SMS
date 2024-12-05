@@ -17,9 +17,9 @@ export const createAssignmentThunk = createAsyncThunk(
     dispatch(setShowError(false));
 
     try {
-      const endpoint = `/admin/create_assignment`;
-      const params = { say };
-      const response = await postData(endpoint, assignmentData, { params });
+      const endpoint = `/admin/create_assignment?say=${say}`;
+
+      const response = await postData(endpoint, assignmentData);
 
       if (response.success) {
         toast.success("Assignment created successfully!");
@@ -41,14 +41,14 @@ export const updateAssignmentThunk = createAsyncThunk(
     dispatch(setShowError(false));
 
     try {
-      const endpoint = `/admin/update_assignment/${assignmentId}`;
-      const params = { say };
+      const endpoint = `/admin/update_assignment/${assignmentId}?say=${say}`;
+  
       const payload = {
         ...assignmentData,
         sectionId,
       };
 
-      const response = await putData(endpoint, payload, { params });
+      const response = await putData(endpoint, payload);
 
       if (response.success) {
         toast.success("Assignment updated successfully!");
@@ -69,9 +69,9 @@ export const deleteAssignmentThunk = createAsyncThunk(
     dispatch(setShowError(false));
 
     try {
-      const endpoint = `/admin/delete_assignment/${assignmentId}`;
-      const params = { say };
-      const response = await deleteData(endpoint, { params });
+      const endpoint = `/admin/delete_assignment/${assignmentId}?say=${say}`;
+     
+      const response = await deleteData(endpoint);
 
       if (response.success) {
         toast.success("Assignment deleted successfully!");
@@ -90,9 +90,9 @@ export const fetchAssignmentsByClassThunk = createAsyncThunk(
     dispatch(setShowError(false));
 
     try {
-      const endpoint = `/admin/class_assignments/${classId}`;
-      const params = { say };
-      const response = await getData(endpoint, { params });
+      const endpoint = `/admin/class_assignments/${classId}?say=${say}`;
+ 
+      const response = await getData(endpoint);
 
       if (response.success) {
         return response.assignments;
@@ -112,14 +112,14 @@ export const fetchFilteredAssignments = createAsyncThunk(
     try {
       const say = getAY();
       dispatch(setShowError(false));
-      const endpoint = `/admin/assignments/${sid}`;
-      const params = { say };
+      const endpoint = `/admin/assignments/${sid}?say=${say}`;
 
+     let params = { };
       if (moduleId) params.moduleId = moduleId;
       if (chapterId) params.chapterId = chapterId;
       if (publish !== null && publish !== undefined) params.publish = publish;
 
-      const response = await getData(endpoint, params);
+      const response = await getData(endpoint,params);
 
       if (response.success) {
         return response.assignments;
@@ -137,9 +137,9 @@ export const fetchAssignmentByIdThunk = createAsyncThunk(
     dispatch(setShowError(false));
 
     try {
-      const endpoint = `/admin/assignment/${assignmentId}`;
-      const params = { say };
-      const response = await getData(endpoint, { params });
+      const endpoint = `/admin/assignment/${assignmentId}?say=${say}`;
+    
+      const response = await getData(endpoint);
 
       if (response.success) {
         return response.assignment;

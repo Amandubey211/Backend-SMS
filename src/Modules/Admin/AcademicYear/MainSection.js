@@ -8,6 +8,7 @@ import { setSeletedAcademicYear } from "../../../Store/Slices/Common/AcademicYea
 import { addAcademicYear, deleteAcademicYear, fetchAcademicYear } from "../../../Store/Slices/Common/AcademicYear/academicYear.action";
 import Cookies from 'js-cookie'
 import { setLocalCookies } from "../../../Utils/academivYear";
+import { useNavigate } from "react-router-dom";
 const formatDate = (dateString) => {
   const date = new Date(dateString);
   const day = String(date.getDate()).padStart(2, "0");
@@ -29,11 +30,11 @@ const MainSection = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const role = useSelector((store) => store.common.auth.role);
+  const navigate = useNavigate()
   const handleCheckboxChange = async (selectedYear) => {
-    alert('After select the year need to reload the page');
     setLocalCookies('say', selectedYear._id);
     dispatch(setSeletedAcademicYear(selectedYear));
-      window.location.reload();
+    navigate('/dashboard')
   };
 
   const handleCreate = async () => {

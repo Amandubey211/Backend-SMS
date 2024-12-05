@@ -13,9 +13,9 @@ export const fetchSubjectGrades = createAsyncThunk(
 
     try {
       const endpoint = `/admin/grades/class/${classId}/subject/${subjectId}?say=${say}`;
-      const params = { say, ...filters };
+      
 
-      const response = await getData(endpoint, { params });
+      const response = await getData(endpoint, filters );
 
       if (response && response.gradesResult) {
         return response.gradesResult;
