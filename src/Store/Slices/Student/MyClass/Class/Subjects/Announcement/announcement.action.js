@@ -11,15 +11,14 @@ import {
 
 export const fetchStudentAnnounce = createAsyncThunk(
   "announce/fetchStudentAnnounce",
-  async (cid, { rejectWithValue, dispatch }) => {
+  async ({ cid, sid }, { rejectWithValue, dispatch }) => {
     try {
       const say = getAY();
       dispatch(setShowError(false));
       const response = await getData(
-        `/admin/announcement/class/${cid}?say=${say}`
+        `/admin/announcement/class/${cid}/subject/${sid}?say=${say}`
       );
       const data = response?.data;
-      // console.log("response data---", data);
       return data;
     } catch (error) {
       handleError(error, dispatch, rejectWithValue);
