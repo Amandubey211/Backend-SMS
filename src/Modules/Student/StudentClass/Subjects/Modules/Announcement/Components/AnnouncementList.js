@@ -13,23 +13,25 @@ import { setShowError } from "../../../../../../../Store/Slices/Common/Alerts/al
 const AnnouncementList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const dispatch = useDispatch();
-  const { loading, error, announcementData } = useSelector((store) => store?.student?.studentAnnounce)
+  const { loading, error, announcementData } = useSelector(
+    (store) => store?.student?.studentAnnounce
+  );
   const { showError } = useSelector((store) => store?.common?.alertMsg);
 
-  const { cid } = useParams();
+  const { cid, sid } = useParams();
 
   useEffect(() => {
-    dispatch(fetchStudentAnnounce(cid))
-  }, [cid, dispatch]);
+    dispatch(fetchStudentAnnounce({ cid, sid }));
+  }, [cid, dispatch, sid]);
 
-  const filteredAnnouncements = announcementData.filter((card) =>
-    card.title.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredAnnouncements = announcementData?.filter((card) =>
+    card.title.toLowerCase()?.includes(searchTerm.toLowerCase())
   );
   // console.log(filteredAnnouncements, "filteredAnnouncements");
 
   const handleDismiss = () => {
     dispatch(setShowError(false));
-  }
+  };
 
   return (
     <div className="w-full ps-3">
@@ -44,7 +46,7 @@ const AnnouncementList = () => {
       )}
 
       {/* No Announcements Found */}
-      {!loading  && filteredAnnouncements?.length === 0 && (
+      {!loading && filteredAnnouncements?.length === 0 && (
         <NoDataFound title="announcements" />
       )}
 
