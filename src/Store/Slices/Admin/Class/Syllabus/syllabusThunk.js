@@ -87,12 +87,9 @@ export const editSyllabus = createAsyncThunk(
         "put",
         endpoint,
         formData,
-        {},
         {
-
-          headers: {
             "Content-Type": "multipart/form-data",
-          },
+         
         }
       );
 

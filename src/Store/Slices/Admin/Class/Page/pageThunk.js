@@ -56,11 +56,7 @@ export const createPage = createAsyncThunk(
       const response = await postData(
         `/admin/api/pages/class/${cid}?say=${say}`,
         pageData,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
+     
       );
 
       if (response && response.success) {
@@ -80,11 +76,7 @@ export const updatePage = createAsyncThunk(
     dispatch(setShowError(false));
 
     try {
-      const response = await putData(`/admin/api/pages/${pageId}?say=${say}`, pageData, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await putData(`/admin/api/pages/${pageId}?say=${say}`, pageData);
 
       if (response && response.success) {
         toast.success("Page Updated Successfully");

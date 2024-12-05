@@ -65,12 +65,10 @@ export const addModule = createAsyncThunk(
         "post",
         endpoint,
         formData,
-        {},
-        {
-          headers: {
+       {
             "Content-Type": "multipart/form-data", // Specify the content type
           },
-        }
+        
       );
 
       if (response && response.success) {
@@ -109,12 +107,10 @@ export const editModule = createAsyncThunk(
         "put",
         endpoint,
         formData,
-        {},
-        {
-          headers: {
+       {
             "Content-Type": "multipart/form-data",
           },
-        }
+        
       );
 
       if (response && response.success) {

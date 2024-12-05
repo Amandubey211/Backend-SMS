@@ -61,13 +61,10 @@ export const createDiscussion = createAsyncThunk(
       const response = await customRequest(
         "post",
         `/admin/createDiscussion/class/${cid}?say=${say}`,
-        formData,
-        {},
-        {
-          headers: {
+        formData, {
             "Content-Type": "multipart/form-data",
           },
-        }
+
       );
 
       if (response && response.status) {
@@ -95,14 +92,10 @@ export const updateDiscussion = createAsyncThunk(
       const response = await customRequest(
         "put",
         `/admin/updateDiscussion/${discussionId}?say=${say}`,
-        formData,
-        {},
-        {
-        
-          headers: {
+        formData,{
             "Content-Type": "multipart/form-data",
           },
-        }
+        
       );
 
       if (response && response.status) {

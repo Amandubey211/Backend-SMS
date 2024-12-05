@@ -33,12 +33,10 @@ export const addAttachment = createAsyncThunk(
         "put",
         `/admin/uploadChapterFiles?say=${say}`,
         formData,
-        {},
         {
-          headers: {
             "Content-Type": "multipart/form-data",
           },
-        }
+        
       );
 
       if (response && response.uploadedFiles?.length) {
