@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { BsFillPatchCheckFill, BsPatchCheck } from "react-icons/bs"; // Importing the icons
 import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
@@ -11,10 +11,15 @@ import Spinner from "../../../Components/Common/Spinner";
 import { useNavigate } from "react-router-dom";
 import { LuSchool } from "react-icons/lu";
 import { setLocalCookies } from "../../../Utils/academivYear";
+import { FaRegEdit } from "react-icons/fa";
+import { edit } from "@cloudinary/url-gen/actions/animated";
+import EditBranch from "./EditBranch";
 
 const BranchTable = () => {
   const dispatch = useDispatch();
   const selectBranch = Cookies.get("SelectedschoolId");
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editData, setEditData] = useState(null);
   const { userDetails } = useSelector((store) => store.common.user);
   const { t } = useTranslation("admAcademicYear");
   const navigate = useNavigate();
@@ -51,7 +56,8 @@ const BranchTable = () => {
             <tr className="text-left text-gray-500 text-base leading-normal bg-gray-100">
               <th className="p-3">{t("Select Branch")}</th>
               <th className="p-3">{t("Branch Name")}</th>
-              <th className="p-3">{t("Branch City")}</th>
+              <th className="p-3">{t("Branch City & Address")}</th>
+              <th className="p-3">{t("Actions")}</th>
             </tr>
           </thead>
           <tbody className="text-base text-gray-700">
@@ -74,11 +80,29 @@ const BranchTable = () => {
                   </button>
                 </td>
                 <td className="p-3">{b?.branchName}</td>
-                <td className="p-3">{b?.city}</td>
+                <td className="p-3 ">{b?.city} <br/>
+                  <span className="text-gray-600 text-sm">
+                    {b?.address}
+                  </span>
+                  </td>
+                <td className="p-3 flex items-center text-2xl ">
+                <button
+                  onClick={() => { setEditData(b);setShowEditModal(true)}}
+                >
+                   <FaRegEdit />
+                </button>
+              </td>
               </tr>
             ))}
           </tbody>
         </table>
+      )}
+      {showEditModal && (
+        <EditBranch
+          show={showEditModal}
+          onClose={() => setShowEditModal(false)}
+          data={editData}
+        />
       )}
     </div>
   );

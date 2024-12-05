@@ -8,7 +8,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchAllClasses } from "../../../../Store/Slices/Admin/Class/actions/classThunk";
 import useGetAllSchools from "../../../../Hooks/CommonHooks/useGetAllSchool";
 
-
 const PersonalInformationForm = ({
   studentDetails,
   handleChange,
@@ -19,7 +18,9 @@ const PersonalInformationForm = ({
   inputRefs,
 }) => {
   const { fetchSchools, schoolList } = useGetAllSchools();
-  const {  classes:classList, error } = useSelector((store)=>store.admin.class);
+  const { classes: classList, error } = useSelector(
+    (store) => store.admin.class
+  );
   const handleClearImage = () => {
     setImagePreview(null);
     handleChange({
@@ -35,14 +36,14 @@ const PersonalInformationForm = ({
     { value: "Sikhism", label: "Sikhism" },
     { value: "Other", label: "Other" },
   ];
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
   useEffect(() => {
     fetchSchools();
   }, []);
   useEffect(() => {
     // Only fetch classes when schoolId is defined
     if (studentDetails.schoolId) {
-     dispatch(fetchAllClasses())
+      dispatch(fetchAllClasses());
     }
   }, [studentDetails.schoolId]);
   // console.log("Validation Errors:", validationErrors);
@@ -63,7 +64,9 @@ const PersonalInformationForm = ({
             onChange={handleChange}
             options={schoolList?.map((school) => ({
               value: school._id,
-              label: school.nameOfSchool,
+              label: `${school?.nameOfSchool || "Unknown School"}${
+                school?.branchName ? `, Branch: ${school.branchName}` : ""
+              }${school?.city ? `, City: ${school.city}` : ""}`,
             }))}
             error={validationErrors.schoolId}
           />

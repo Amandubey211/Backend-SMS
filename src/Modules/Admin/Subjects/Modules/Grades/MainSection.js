@@ -40,6 +40,7 @@ const MainSection = () => {
   };
 
   const handleFilterChange = (name, value) => {
+
     const updatedFilters = {
       ...filters,
       [name]: value,
@@ -47,7 +48,9 @@ const MainSection = () => {
     setFilters(updatedFilters);
 
     const params = {};
-    if (filters.moduleId) params.moduleId = filters.moduleId;
+    if (updatedFilters.moduleId) params.moduleId = updatedFilters.moduleId;
+    if (updatedFilters.quizId) params.quizId = updatedFilters.quizId;
+    if (updatedFilters.assignmentId) params.assignmentId = updatedFilters.assignmentId;
     dispatch(
       fetchSubjectGrades({ classId: cid, subjectId: sid, filters: params })
     );

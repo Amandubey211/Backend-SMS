@@ -134,11 +134,9 @@ export const deleteChapter = createAsyncThunk(
       const cid = getState().common.user.classInfo.selectedClassId;
       const subjectId = getState().common.user.subjectInfo.selectedSubjectId;
 
-      const endpoint = `/admin/subjects/${subjectId}/modules/${moduleId}/chapters/${chapterId}`;
+      const endpoint = `/admin/subjects/${subjectId}/modules/${moduleId}/chapters/${chapterId}?say=${say}`;
 
-      const response = await deleteData(endpoint, {
-        params: { say },
-      });
+      const response = await deleteData(endpoint);
 
       if (response && response.success) {
         toast.success(response.msg);

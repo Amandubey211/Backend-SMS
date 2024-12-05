@@ -36,17 +36,16 @@ const AnnouncementCard = ({ title, date, section, id }) => {
           <p className="text-base text-green-600">{section}</p>
           <div className="flex justify-center items-center gap-1 mt-5 text-gray-500">
             <div className="flex gap-1 items-center">
-            <IoCalendarOutline /> <p className="text-md">Post On :</p>
-            <p className="text-sm">{date}</p>
-
+              <IoCalendarOutline /> <p className="text-md">Post On :</p>
+              <p className="text-sm">{date}</p>
             </div>
           </div>
         </NavLink>
-        <div className="flex flex-col gap-2 text-xl">
+        {/* <div className="flex flex-col gap-2 text-xl">
           <button className="p-1 border rounded-full">
             <BiDotsVerticalRounded />
           </button>
-        </div>
+        </div> */}
       </div>
     </div>
   );

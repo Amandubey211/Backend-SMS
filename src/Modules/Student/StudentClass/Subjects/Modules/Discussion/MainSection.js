@@ -21,10 +21,10 @@ const MainSection = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filter, setFilter] = useState("all");
 
-  const { cid } = useParams();
+  const { cid,sid } = useParams();
 
   useEffect(() => {
-    dispatch(fetchStudentDiscussion(cid))
+    dispatch(fetchStudentDiscussion({cid,sid}))
   }, [dispatch]);
 
   const handleSearch = (query) => {
@@ -39,7 +39,7 @@ const MainSection = () => {
     dispatch(setShowError(false));
   }
 
-  const filteredDiscussions = discussionData.filter((discussion) => {
+  const filteredDiscussions = discussionData?.filter((discussion) => {
     const matchesSearch = discussion.title
       .toLowerCase()
       .includes(searchQuery.toLowerCase());
@@ -50,7 +50,7 @@ const MainSection = () => {
     return matchesSearch && matchesFilter;
   });
 
-  const pinnedDiscussions = discussionData.filter(
+  const pinnedDiscussions = discussionData?.filter(
     (discussion) => discussion.isPinned
   );
 

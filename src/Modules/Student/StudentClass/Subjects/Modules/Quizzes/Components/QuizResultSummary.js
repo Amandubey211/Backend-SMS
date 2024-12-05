@@ -63,7 +63,7 @@ const QuizResultSummary = () => {
                 >
                   <div>
                     <h3 className="text-lg font-semibold text-gradient">
-                      Attempt {index + 1}
+                      Attempt {attemptHistory?.length - index}
                     </h3>
                     <p className="text-gray-500 text-sm">
                       {attempt?.submittedAt

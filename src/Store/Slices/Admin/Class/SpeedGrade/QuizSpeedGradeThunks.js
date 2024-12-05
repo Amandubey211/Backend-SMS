@@ -14,9 +14,9 @@ export const fetchAssignedQuizStudents = createAsyncThunk(
     dispatch(setShowError(false));
 
     try {
-      const endpoint = `/admin/speed_grade/quiz/${quizId}`;
-      const params = { say };
-      const response = await getData(endpoint, { params });
+      const endpoint = `/admin/speed_grade/quiz/${quizId}?say=${say}`;
+
+      const response = await getData(endpoint);
 
       if (response && response.success) {
         return response.data; // Assuming 'data' contains the list of assigned students
@@ -34,9 +34,9 @@ export const fetchStudentQuiz = createAsyncThunk(
     dispatch(setShowError(false));
 
     try {
-      const endpoint = `/admin/speed_grade/quiz`;
-      const params = { say, studentId, quizId };
-      const response = await getData(endpoint, params);
+      const endpoint = `/admin/speed_grade/quiz?say=${say}&studentId=${studentId}&quizId=${quizId}`;
+
+      const response = await getData(endpoint);
 
       if (response && response.success) {
         return response.data; // Assuming 'data' contains the student's quiz details
@@ -57,10 +57,10 @@ export const assignQuizGrade = createAsyncThunk(
     dispatch(setShowError(false));
 
     try {
-      const endpoint = `/admin/speed_grade/quiz/grade`;
-      const params = { say };
+      const endpoint = `/admin/speed_grade/quiz/grade?say=${say}`;
+      
       const requestBody = { studentId, quizId, attemptDate, score, status };
-      const response = await putData(endpoint, requestBody, { params });
+      const response = await putData(endpoint, requestBody);
 
       if (response && response.success) {
         toast.success("Grade Assigned");

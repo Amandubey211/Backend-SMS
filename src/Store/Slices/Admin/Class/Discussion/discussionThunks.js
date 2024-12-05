@@ -12,14 +12,12 @@ import {
 
 export const fetchClassDiscussions = createAsyncThunk(
   "discussions/fetchClassDiscussions",
-  async ({ cid }, { rejectWithValue, dispatch }) => {
+  async ({ cid,sid }, { rejectWithValue, dispatch }) => {
     const say = getAY();
     dispatch(setShowError(false));
 
     try {
-      const response = await getData(`/admin/getDiscussion/class/${cid}`, {
-        params: { say },
-      });
+      const response = await getData(`/admin/getDiscussion/class/${cid}/subject/${sid}?say=${say}`);
 
       if (response && response.status) {
         return response.data;
@@ -37,9 +35,7 @@ export const fetchDiscussionById = createAsyncThunk(
     dispatch(setShowError(false));
 
     try {
-      const response = await getData(`/admin/getDiscussionById/${did}`, {
-        params: { say },
-      });
+      const response = await getData(`/admin/getDiscussionById/${did}?say=${say}`);
 
       if (response && response.status) {
         return response.data;
@@ -64,15 +60,11 @@ export const createDiscussion = createAsyncThunk(
     try {
       const response = await customRequest(
         "post",
-        `/admin/createDiscussion/class/${cid}`,
-        formData,
-        {},
-        {
-          params: { say },
-          headers: {
+        `/admin/createDiscussion/class/${cid}?say=${say}`,
+        formData, {
             "Content-Type": "multipart/form-data",
           },
-        }
+
       );
 
       if (response && response.status) {
@@ -99,15 +91,11 @@ export const updateDiscussion = createAsyncThunk(
     try {
       const response = await customRequest(
         "put",
-        `/admin/updateDiscussion/${discussionId}`,
-        formData,
-        {},
-        {
-          params: { say },
-          headers: {
+        `/admin/updateDiscussion/${discussionId}?say=${say}`,
+        formData,{
             "Content-Type": "multipart/form-data",
           },
-        }
+        
       );
 
       if (response && response.status) {
@@ -128,11 +116,7 @@ export const deleteDiscussion = createAsyncThunk(
 
     try {
       const response = await deleteData(
-        `/admin/deleteDiscussion/${discussionId}`,
-        {
-          params: { say },
-        }
-      );
+        `/admin/deleteDiscussion/${discussionId}?say=${say}`);
 
       if (response && response.success) {
         toast.success("Discussion Deleted Successfully");
@@ -152,11 +136,8 @@ export const markAsReadDiscussion = createAsyncThunk(
 
     try {
       const response = await putData(
-        `/admin/discussion/readstatus/${discussionId}`,
+        `/admin/discussion/readstatus/${discussionId}?say=${say}`,
         {},
-        {
-          params: { say },
-        }
       );
 
       if (response && response.success) {
@@ -176,11 +157,9 @@ export const updatePinStatus = createAsyncThunk(
 
     try {
       const response = await putData(
-        `/admin/discussion/pinstatus/${discussionId}`,
+        `/admin/discussion/pinstatus/${discussionId}?say=${say}`,
         { isPinned },
-        {
-          params: { say },
-        }
+        
       );
 
       if (response && response.success) {

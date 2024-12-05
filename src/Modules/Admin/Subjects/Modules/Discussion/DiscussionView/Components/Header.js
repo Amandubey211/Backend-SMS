@@ -86,11 +86,11 @@ const Header = ({ discussion, refetchDiscussion }) => {
   return (
     <div className="flex items-end justify-between p-2 px-4 border-b">
       <div className="flex items-center">
-        <img
+        {/* <img
           src=""
           alt={t("Profile")}
           className="w-10 h-10 rounded-full"
-        />
+        /> */}
         <div className="ml-3">
           <h1 className="text-lg font-semibold">{discussion.createdBy}</h1>
           <p className="text-sm text-green-600">{t("Discussion")}</p>

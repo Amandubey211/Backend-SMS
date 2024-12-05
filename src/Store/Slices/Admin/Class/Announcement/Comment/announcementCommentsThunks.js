@@ -17,10 +17,7 @@ export const fetchAnnouncementComments = createAsyncThunk(
       const say = getAY();
       dispatch(setShowError(false));
       const response = await getData(
-        `/admin/getAnnouncementComment/${announcementId}`,
-        {
-          params: { say },
-        }
+        `/admin/getAnnouncementComment/${announcementId}?say=${say}`
       );
 
       if (response && response.status) {
@@ -41,11 +38,8 @@ export const addAnnouncementComment = createAsyncThunk(
     try {
       const payload = { content: text, parentId: null };
       const response = await postData(
-        `/admin/createCommentAnnouncement/${announcementId}/replies`,
-        payload,
-        {
-          params: { say },
-        }
+        `/admin/createCommentAnnouncement/${announcementId}/replies?say=${say}`,
+        payload
       );
 
       if (response && response.status) {
@@ -67,11 +61,8 @@ export const addAnnouncementReply = createAsyncThunk(
     try {
       const payload = { content: text, parentId };
       const response = await postData(
-        `/admin/createCommentAnnouncement/${announcementId}/replies`,
-        payload,
-        {
-          params: { say },
-        }
+        `/admin/createCommentAnnouncement/${announcementId}/replies?say=${say}`,
+        payload
       );
 
       if (response && response.status) {
@@ -92,10 +83,7 @@ export const deleteAnnouncementComment = createAsyncThunk(
 
     try {
       const response = await deleteData(
-        `/admin/deleteCommentAnnouncement/${commentId}`,
-        {
-          params: { say },
-        }
+        `/admin/deleteCommentAnnouncement/${commentId}?say=${say}`
       );
 
       if (response && response.status) {
@@ -116,11 +104,7 @@ export const toggleLikeAnnouncementComment = createAsyncThunk(
 
     try {
       const response = await putData(
-        `/admin/likeAnnouncementComment/${commentId}`,
-        {},
-        {
-          params: { say },
-        }
+        `/admin/likeAnnouncementComment/${commentId}?say=${say}`
       );
 
       if (response && response.status) {

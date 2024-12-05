@@ -17,9 +17,7 @@ export const fetchAllPages = createAsyncThunk(
     dispatch(setShowError(false));
 
     try {
-      const response = await getData(`/admin/api/pages/class/pages/${cid}`, {
-        params: { say },
-      });
+      const response = await getData(`/admin/api/pages/class/pages/${cid}?say=${say}`);
 
       if (response && response.success) {
         return response.data;
@@ -37,9 +35,7 @@ export const fetchPageById = createAsyncThunk(
     dispatch(setShowError(false));
 
     try {
-      const response = await getData(`/admin/api/pages/${pid}`, {
-        params: { say },
-      });
+      const response = await getData(`/admin/api/pages/${pid}?say=${say}`);
 
       if (response && response.success) {
         return response.data;
@@ -58,14 +54,9 @@ export const createPage = createAsyncThunk(
 
     try {
       const response = await postData(
-        `/admin/api/pages/class/${cid}`,
+        `/admin/api/pages/class/${cid}?say=${say}`,
         pageData,
-        {
-          params: { say },
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
+     
       );
 
       if (response && response.success) {
@@ -85,12 +76,7 @@ export const updatePage = createAsyncThunk(
     dispatch(setShowError(false));
 
     try {
-      const response = await putData(`/admin/api/pages/${pageId}`, pageData, {
-        params: { say },
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await putData(`/admin/api/pages/${pageId}?say=${say}`, pageData);
 
       if (response && response.success) {
         toast.success("Page Updated Successfully");
@@ -109,9 +95,7 @@ export const deletePage = createAsyncThunk(
     dispatch(setShowError(false));
 
     try {
-      const response = await deleteData(`/admin/api/pages/${pid}`, {
-        params: { say },
-      });
+      const response = await deleteData(`/admin/api/pages/${pid}?say=${say}`);
 
       if (response && response.success) {
         toast.success("Page Deleted Successfully");

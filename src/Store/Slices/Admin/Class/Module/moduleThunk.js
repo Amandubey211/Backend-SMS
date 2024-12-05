@@ -20,8 +20,8 @@ export const fetchModules = createAsyncThunk(
     try {
       // API Call using service function with query parameter
       const response = await getData(
-        `/admin/student/classes/${cid}/modules/${sid}`,
-        { say }
+        `/admin/student/classes/${cid}/modules/${sid}?say=${say}`,
+     
       );
 
       // Check if response is valid and indicates success
@@ -59,19 +59,16 @@ export const addModule = createAsyncThunk(
       if (thumbnail) formData.append("thumbnail", thumbnail);
 
       // Define the endpoint for the API call
-      const endpoint = "/admin/add_module";
+      const endpoint = `/admin/add_module?say=${say}`;
 
       const response = await customRequest(
         "post",
         endpoint,
         formData,
-        {},
-        {
-          params: { say }, // Include query parameters
-          headers: {
+       {
             "Content-Type": "multipart/form-data", // Specify the content type
           },
-        }
+        
       );
 
       if (response && response.success) {
@@ -105,18 +102,15 @@ export const editModule = createAsyncThunk(
       if (thumbnail) formData.append("thumbnail", thumbnail);
 
       // API Call using customRequest for multipart/form-data with query parameter
-      const endpoint = `/admin/subjects/${subjectId}/modules/${moduleId}`;
+      const endpoint = `/admin/subjects/${subjectId}/modules/${moduleId}?say=${say}`;
       const response = await customRequest(
         "put",
         endpoint,
         formData,
-        {},
-        {
-          params: { say },
-          headers: {
+       {
             "Content-Type": "multipart/form-data",
           },
-        }
+        
       );
 
       if (response && response.success) {
@@ -138,8 +132,8 @@ export const deleteModule = createAsyncThunk(
     dispatch(setShowError(false));
 
     try {
-      const endpoint = `/admin/subjects/${sid}/modules/${moduleId}`;
-      const response = await deleteData(endpoint, { say });
+      const endpoint = `/admin/subjects/${sid}/modules/${moduleId}?say=${say}`;
+      const response = await deleteData(endpoint);
 
       if (response && response.success) {
         toast.success("Module deleted successfully");
@@ -159,9 +153,9 @@ export const moveModule = createAsyncThunk(
     dispatch(setShowError(false));
 
     try {
-      const endpoint = `/admin/subjects/${sid}/modules/reorder`;
+      const endpoint = `/admin/subjects/${sid}/modules/reorder?say=${say}`;
       const data = { moduleId, newIndex };
-      const response = await putData(endpoint, data, { say });
+      const response = await putData(endpoint, data);
 
       if (response && response.success) {
         toast.success("Module moved successfully");
