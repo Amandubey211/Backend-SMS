@@ -17,7 +17,13 @@ const MoveToSection = ({ student, onClose }) => {
   const dispatch = useDispatch();
 
   // Extracting data from the student prop
-  const { _id: studentId, firstName, profile, sectionName } = student;
+  const {
+    _id: studentId,
+    firstName,
+    profile,
+    sectionName,
+    presentSectionId,
+  } = student;
 
   // Preload the sectionId if the student already has a section
   useEffect(() => {
@@ -25,7 +31,7 @@ const MoveToSection = ({ student, onClose }) => {
 
     // If the student already has a section assigned, preload it in the dropdown
     const sectionToPreload = AllSections.find(
-      (sec) => sec.sectionName === sectionName
+      (sec) => sec.sectionName === sectionName || presentSectionId?.sectionName
     );
     if (sectionToPreload) {
       setSelectedSection(sectionToPreload._id);
@@ -63,7 +69,10 @@ const MoveToSection = ({ student, onClose }) => {
           <div>
             <div className="text-sm font-medium">{firstName}</div>
             <div className="text-xs text-gray-500">
-              {sectionName || "No Section Assigned"}
+              Section:{" "}
+              {student?.sectionName ||
+                student?.presentSectionId?.sectionName ||
+                "No Section Assigned"}
             </div>
           </div>
         </div>

@@ -18,6 +18,7 @@ const SelectBranch = () => {
   const [selectedBranch, setSelectedBranch] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
+
   useEffect(() => {
     dispatch(fetchBranch());
   }, [dispatch]);
@@ -33,13 +34,14 @@ const SelectBranch = () => {
     }
     return Math.abs(hash);
   };
+
   const HandleBranch = () => {
-    // console.log(selectedBranch);
-    const data = { schoolId: selectedBranch._id };
+    const data = { schoolId: selectedBranch?._id };
     dispatch(updateBranch({ navigate, data })).then(() => {
-      setLocalCookies("SelectedschoolId", selectedBranch._id);
+      setLocalCookies("SelectedschoolId", selectedBranch?._id);
     });
   };
+
   // Handle branch selection
   const handleBranchSelect = (branch) => {
     setSelectedBranch(branch);
@@ -48,18 +50,20 @@ const SelectBranch = () => {
   // Fallback image URL (until images are added)
   const getBranchImage = (branch) => {
     return (
-      branch.image ||
+      branch?.image ||
       "https://i.ibb.co/WGN5285/Screenshot-2024-11-29-121940.png"
     );
   };
 
   // Filter branches based on the search query
   const filteredBranches = branchs?.filter((branch) => {
+
     const branchName = branch.nameOfSchool?.toLowerCase();
     const branchCity = branch.city?.toLowerCase();
+
     const query = searchQuery?.toLowerCase();
 
-    return branchName.includes(query) || branchCity.includes(query);
+    return branchName?.includes(query) || branchCity?.includes(query);
   });
 
   return (
@@ -68,13 +72,13 @@ const SelectBranch = () => {
         {/* Left Section */}
         <div className="md:col-span-7 flex flex-col p-4 bg-transparent relative">
           {/* Header section - Logo, Title, and Search */}
-          <div className="sticky top-0 z-10 bg-white p-6 flex justify-end items-center ">
+          <div className="sticky top-0 z-10 bg-white p-6 flex justify-end items-center">
             <Logo />
           </div>
 
           {/* Search Input */}
           <div className="flex justify-between items-center w-full my-6">
-            <h2 className="text-xl  ps-3">Choose Branch</h2>
+            <h2 className="text-xl ps-3">Choose Branch</h2>
             <div className="relative flex items-center max-w-xs w-full mr-4">
               <input
                 type="text"
@@ -90,13 +94,13 @@ const SelectBranch = () => {
           </div>
 
           {/* Scrollable Branch Cards */}
-          <div className="overflow-y-scroll  p-2 max-h-[calc(100vh-220px)]">
+          <div className="overflow-y-scroll p-2 max-h-[calc(100vh-220px)]">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 justify-center mb-10">
               {loading ? (
                 <div className="w-full h-24 bg-gray-200 animate-pulse"></div>
-              ) : filteredBranches && filteredBranches?.length > 0 ? (
-                [...filteredBranches]?.map((branch) => {
-                  const colorIndex = hashCode(branch._id) % 6;
+              ) : filteredBranches?.length > 0 ? (
+                filteredBranches?.map((branch) => {
+                  const colorIndex = hashCode(branch?._id) % 6;
                   const color = [
                     "bg-yellow-300",
                     "bg-blue-300",
@@ -106,13 +110,12 @@ const SelectBranch = () => {
                     "bg-pink-300",
                   ][colorIndex];
 
-                  const isActive =
-                    selectedBranch && selectedBranch._id === branch._id;
+                  const isActive = selectedBranch?.id === branch?._id;
 
                   return (
                     <motion.div
-                      key={branch._id}
-                      className={` ${color} ${
+                      key={branch?._id}
+                      className={`${color} ${
                         isActive ? "active-branch" : ""
                       } p-3 rounded-lg shadow-lg text-white h-40 relative cursor-pointer transform transition duration-300 hover:scale-105`}
                       onClick={() => handleBranchSelect(branch)}
@@ -123,15 +126,15 @@ const SelectBranch = () => {
                     >
                       <div className="mb-4">
                         <h3 className="text-xl font-semibold">
-                          {branch.nameOfSchool}
+                          {branch?.nameOfSchool}
                         </h3>
-                        <p className="text-sm">{branch.city}</p>
+                        <p className="text-sm">{branch?.city}</p>
                       </div>
                       <div className="flex items-center justify-center">
                         <div className="w-16 h-16 mb-1 rounded-full overflow-hidden border-2 border-white flex justify-center items-center bg-white text-gray-800">
                           <img
                             src={getBranchImage(branch)}
-                            alt={branch.nameOfSchool}
+                            alt={branch?.nameOfSchool}
                             className="w-full h-full object-cover"
                           />
                         </div>
@@ -157,16 +160,16 @@ const SelectBranch = () => {
             >
               <div>
                 <h3 className="text-2xl font-semibold">
-                  {selectedBranch.nameOfSchool}
+                  {selectedBranch?.nameOfSchool}
                 </h3>
-                <p className="text-lg text-gray-700">{selectedBranch.city}</p>
+                <p className="text-lg text-gray-700">{selectedBranch?.city}</p>
 
                 {/* Branch Details */}
                 <div className="mt-4">
                   <div className="flex items-center justify-center mb-4">
                     <img
                       src={getBranchImage(selectedBranch)}
-                      alt={selectedBranch.nameOfSchool}
+                      alt={selectedBranch?.nameOfSchool}
                       className="w-32 h-32 object-contain rounded-full border-4 border-white"
                     />
                   </div>
@@ -175,7 +178,7 @@ const SelectBranch = () => {
 
               {/* Next Button */}
               <motion.div
-                className="mt-6 flex justify-center w-full "
+                className="mt-6 flex justify-center w-full"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.5 }}
