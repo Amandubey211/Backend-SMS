@@ -82,14 +82,14 @@ export const editSyllabus = createAsyncThunk(
         formData.append(key, data[key]);
       }
 
-      const endpoint = `/admin/syllabus/${syllabusId}/class/${cid}`;
+      const endpoint = `/admin/syllabus/${syllabusId}/class/${cid}?say=${say}`;
       const response = await customRequest(
         "put",
         endpoint,
         formData,
         {},
         {
-          params: { say },
+
           headers: {
             "Content-Type": "multipart/form-data",
           },

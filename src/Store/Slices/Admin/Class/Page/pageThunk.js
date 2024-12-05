@@ -35,9 +35,7 @@ export const fetchPageById = createAsyncThunk(
     dispatch(setShowError(false));
 
     try {
-      const response = await getData(`/admin/api/pages/${pid}`, {
-        params: { say },
-      });
+      const response = await getData(`/admin/api/pages/${pid}?say=${say}`);
 
       if (response && response.success) {
         return response.data;
@@ -56,10 +54,9 @@ export const createPage = createAsyncThunk(
 
     try {
       const response = await postData(
-        `/admin/api/pages/class/${cid}`,
+        `/admin/api/pages/class/${cid}?say=${say}`,
         pageData,
         {
-          params: { say },
           headers: {
             "Content-Type": "application/json",
           },
@@ -83,8 +80,7 @@ export const updatePage = createAsyncThunk(
     dispatch(setShowError(false));
 
     try {
-      const response = await putData(`/admin/api/pages/${pageId}`, pageData, {
-        params: { say },
+      const response = await putData(`/admin/api/pages/${pageId}?say=${say}`, pageData, {
         headers: {
           "Content-Type": "application/json",
         },
@@ -107,9 +103,7 @@ export const deletePage = createAsyncThunk(
     dispatch(setShowError(false));
 
     try {
-      const response = await deleteData(`/admin/api/pages/${pid}`, {
-        params: { say },
-      });
+      const response = await deleteData(`/admin/api/pages/${pid}?say=${say}`);
 
       if (response && response.success) {
         toast.success("Page Deleted Successfully");

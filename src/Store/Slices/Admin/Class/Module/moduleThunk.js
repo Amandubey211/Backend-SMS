@@ -59,7 +59,7 @@ export const addModule = createAsyncThunk(
       if (thumbnail) formData.append("thumbnail", thumbnail);
 
       // Define the endpoint for the API call
-      const endpoint = "/admin/add_module";
+      const endpoint = `/admin/add_module?say=${say}`;
 
       const response = await customRequest(
         "post",
@@ -67,7 +67,6 @@ export const addModule = createAsyncThunk(
         formData,
         {},
         {
-          params: { say }, // Include query parameters
           headers: {
             "Content-Type": "multipart/form-data", // Specify the content type
           },
@@ -105,14 +104,13 @@ export const editModule = createAsyncThunk(
       if (thumbnail) formData.append("thumbnail", thumbnail);
 
       // API Call using customRequest for multipart/form-data with query parameter
-      const endpoint = `/admin/subjects/${subjectId}/modules/${moduleId}`;
+      const endpoint = `/admin/subjects/${subjectId}/modules/${moduleId}?say=${say}`;
       const response = await customRequest(
         "put",
         endpoint,
         formData,
         {},
         {
-          params: { say },
           headers: {
             "Content-Type": "multipart/form-data",
           },

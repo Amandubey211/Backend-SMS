@@ -31,11 +31,10 @@ export const addAttachment = createAsyncThunk(
 
       const response = await customRequest(
         "put",
-        "/admin/uploadChapterFiles",
+        `/admin/uploadChapterFiles?say=${say}`,
         formData,
         {},
         {
-          params: { say },
           headers: {
             "Content-Type": "multipart/form-data",
           },
@@ -79,9 +78,7 @@ export const deleteAttachmentThunk = createAsyncThunk(
 
       const payload = { chapterId, subjectId, fileUrl };
 
-      const response = await putData("/admin/removeChapterFiles", payload, {
-        params: { say },
-      });
+      const response = await putData(`/admin/removeChapterFiles?say=${say}`, payload);
 
       if (response && response.message == "File deleted successfully") {
         await dispatch(fetchModules({ cid, sid }));
