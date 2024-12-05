@@ -28,14 +28,14 @@ const DiscussionCard = ({ discussion }) => {
   const handlePinClick = () => {
     dispatch(updateStudentPinStatus({ discussionId: discussion._id, isPinned: !isPinned }))
       .then(() => {
-        dispatch(fetchStudentDiscussion(cid))
+        dispatch(fetchStudentDiscussion({cid,sid}))
       })
   };
 
   const handleMarkAsReadClick = () => {
     dispatch(markAsReadStudentDiscussion(discussion._id)).then(() => {
       setIsMenuOpen(false);
-      dispatch(fetchStudentDiscussion(cid))
+      dispatch(fetchStudentDiscussion({cid,sid}))
     })
   };
 

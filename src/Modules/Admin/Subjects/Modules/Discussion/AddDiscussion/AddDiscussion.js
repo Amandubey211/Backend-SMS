@@ -88,6 +88,7 @@ const AddDiscussion = () => {
         availableUntil: formState.availableUntil,
         attachment: file,
         classId: cid,
+        subjectId:sid,
         publish,
       };
 

@@ -72,9 +72,9 @@ const discussionSlice = createSlice({
       })
       .addCase(updateDiscussion.fulfilled, (state, action) => {
         state.loading = false;
-        state.discussions = state.discussions?.map((discussion) =>
-          discussion._id === action.payload._id ? action.payload : discussion
-        );
+        // state.discussions = state.discussions?.map((discussion) =>
+        //   discussion?._id === action.payload._id ? action.payload : discussion
+        // );
       })
       .addCase(updateDiscussion.rejected, (state, action) => {
         state.loading = false;
@@ -107,11 +107,11 @@ const discussionSlice = createSlice({
       // Update pin status
       .addCase(updatePinStatus.fulfilled, (state, action) => {
         const updatedDiscussion = action.payload;
-        state.discussions = state.discussions?.map((discussion) =>
-          discussion._id === updatedDiscussion._id
-            ? updatedDiscussion
-            : discussion
-        );
+        // state.discussions = state.discussions?.map((discussion) =>
+        //   discussion._id === updatedDiscussion._id
+        //     ? updatedDiscussion
+        //     : discussion
+        // );
       });
   },
 });
