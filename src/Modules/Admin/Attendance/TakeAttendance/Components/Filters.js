@@ -62,7 +62,7 @@ const Filters = ({ isSectionInvalid }) => {
             onChange={(e) => handleFilterChange("groupId", e.target.value)}
           >
             <option value="">Choose Group</option>
-            {groups((group) => (
+            {groups?.map((group) => (
               <option key={group._id} value={group._id}>
                 {group.groupName}
               </option>

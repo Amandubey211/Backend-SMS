@@ -26,22 +26,25 @@ const MainSection = () => {
   const [isSectionInvalid, setIsSectionInvalid] = useState(false);
 
   const handleMarkAttendance = async () => {
+    console.log('--', attendanceData);
+  
     // Validate sectionId before dispatching the markAttendance action
     if (!filters.sectionId) {
       toast.error("Please select a section first.");
       setIsSectionInvalid(true);
       return;
     }
-
+  
     setIsSectionInvalid(false); // Reset invalid state if section is valid
-
+  
+    // Filter and map attendance data
     const attendanceToMark = attendanceData
-      ?.filter((student) => student.attendanceStatus !== "not marked")
-      ((student) => ({
+      ?.filter((student) => student?.attendanceStatus !== "not marked")
+      .map((student) => ({
         studentId: student.studentId,
         status: student.attendanceStatus,
       }));
-
+  
     dispatch(
       markAttendance({
         classId: cid,
@@ -51,6 +54,7 @@ const MainSection = () => {
       })
     );
   };
+  
 
   useEffect(() => {
     if (cid) {
