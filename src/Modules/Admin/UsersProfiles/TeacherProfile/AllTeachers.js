@@ -12,6 +12,7 @@ import ViewTeacher from "./SingleTeacher";
 import { fetchAllTeachers } from "../../../../Store/Slices/Admin/Class/Teachers/teacherThunks";
 import Spinner from "../../../../Components/Common/Spinner";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 
 const AllTeachers = () => {
   const { t } = useTranslation("admAccounts");
@@ -27,7 +28,7 @@ const AllTeachers = () => {
   const { loading } = useSelector((store) => store.admin.all_staff);
   const dispatch = useDispatch();
   const role = useSelector((store) => store.common.auth.role);
-
+  const navigate = useNavigate();
   useEffect(() => {
     dispatch(fetchAllTeachers());
   }, [dispatch]);
@@ -108,7 +109,8 @@ const AllTeachers = () => {
                     style={{
                       borderWidth: "2px",
                       borderImageSlice: 1,
-                      borderImageSource: "linear-gradient(to right, #C83B62, #7F35CD)",
+                      borderImageSource:
+                        "linear-gradient(to right, #C83B62, #7F35CD)",
                     }}
                   >
                     <span className="font-medium">Sort</span>
@@ -143,7 +145,7 @@ const AllTeachers = () => {
               {/* Right Section */}
               <div className="flex items-center gap-4">
                 <button
-                  onClick={() => (window.location.href = "/manage-roles")}
+                  onClick={() => navigate("/manage-roles")}
                   className="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-md flex items-center gap-2 hover:opacity-90 transition duration-200"
                 >
                   Manage Roles

@@ -869,7 +869,7 @@ function App() {
     {
       path: "/manage-roles",
       element: (
-        <ProtectRoute Component={ManageRolePage} allowedRoles={["admin", "teacher", "staff"]} />
+        <ProtectRoute Component={ManageRolePage} allowedRoles={["admin"]} />
       ),
       errorElement: <Error />,
     },
