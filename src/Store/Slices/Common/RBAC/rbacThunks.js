@@ -12,7 +12,7 @@ import { handleError } from "../Alerts/errorhandling.action";
 export const createRoleThunk = createAsyncThunk(
   "rbac/createRole",
   async (
-    { name, description, department, permission = [] },
+    { name, description, permission = [] },
     { rejectWithValue, dispatch }
   ) => {
     try {
@@ -22,7 +22,6 @@ export const createRoleThunk = createAsyncThunk(
       const response = await postData(`/admin/role/create?say=${say}`, {
         name,
         description,
-        department,
         permission,
       });
       return response;
@@ -105,7 +104,6 @@ export const getPermissionsThunk = createAsyncThunk(
       const say = getAY();
       dispatch(setShowError(false));
       const response = await getData(`/admin/permission?say=${say}`);
-      console.log(response, "dddddd");
       return response;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);

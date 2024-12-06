@@ -20,6 +20,7 @@ import { BsCheckCircle } from "react-icons/bs";
 import { GrUserWorker } from "react-icons/gr";
 import { MdLocalLibrary, MdManageAccounts } from "react-icons/md";
 import { RiParentFill, RiAdminFill } from "react-icons/ri";
+import { MdOutlineManageAccounts } from "react-icons/md";
 
 const sidebarData = [
   {
@@ -43,26 +44,32 @@ const sidebarData = [
   {
     title: "Users",
     icon: <LuUser />,
-    roles: ["admin", "teacher", "accountant", "librarian","staff"],
+    roles: ["admin", "teacher", "accountant", "librarian", "staff"],
     items: [
+      {
+        title: "Manage Role",
+        icon: <MdOutlineManageAccounts />,
+        path: "/users/manage-roles",
+        roles: ["admin"],
+      },
       {
         title: "Student",
         icon: <FaUserGraduate />,
         path: "/users/students",
-        roles: ["admin", "teacher", "accountant", "librarian","staff"],
+        roles: ["admin", "teacher", "accountant", "librarian", "staff"],
       },
       {
         title: "Parent",
         icon: <RiParentFill />,
         path: "/users/parents",
-        roles: ["admin", "teacher", "accountant", "librarian","staff"],
+        roles: ["admin", "teacher", "accountant", "librarian", "staff"],
       },
       // Other user roles for admin only
       {
         title: "Teacher",
         icon: <FaChalkboardTeacher />,
         path: "/users/teachers",
-        roles: ["admin", "accountant", "librarian","staff"],
+        roles: ["admin", "accountant", "librarian", "staff"],
       },
       {
         title: "Accountant",
@@ -80,7 +87,7 @@ const sidebarData = [
         title: "Staff",
         icon: <GrUserWorker />,
         path: "/users/staffs",
-        roles: ["admin", "teacher", "accountant", "librarian","staff"],
+        roles: ["admin", "teacher", "accountant", "librarian", "staff"],
       },
     ],
   },
@@ -112,19 +119,19 @@ const sidebarData = [
   {
     title: "NoticeBoard",
     icon: <TbNotebook />,
-    roles: ["admin", "teacher", "librarian", "accountant","staff"],
+    roles: ["admin", "teacher", "librarian", "accountant", "staff"],
     items: [
       {
         title: "Announcements",
         icon: <FaClipboardList />,
         path: "/noticeboard/notice",
-        roles: ["admin", "teacher", "librarian", "accountant","staff"],
+        roles: ["admin", "teacher", "librarian", "accountant", "staff"],
       },
       {
         title: "Events",
         icon: <FaBook />,
         path: "/noticeboard/events",
-        roles: ["admin", "teacher", "librarian", "accountant","staff"],
+        roles: ["admin", "teacher", "librarian", "accountant", "staff"],
       },
     ],
   },
