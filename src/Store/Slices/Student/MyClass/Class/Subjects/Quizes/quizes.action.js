@@ -87,23 +87,23 @@ export const submitQuiz = createAsyncThunk(
   }
 );
 
-export const fetchAttemptHistory = createAsyncThunk(
-  "quiz/fetchAttemptHistory",
-  async ({ quizId }, { rejectWithValue, dispatch }) => {
-    try {
-      const say = getAY();
-      dispatch(setShowError(false));
+// export const fetchAttemptHistory = createAsyncThunk(
+//   "quiz/fetchAttemptHistory",
+//   async ({ quizId }, { rejectWithValue, dispatch }) => {
+//     try {
+//       const say = getAY();
+//       dispatch(setShowError(false));
 
-      const res = await getData(
-        `/student/studentquiz/${quizId}/attempt?say=${say}`
-      );
+//       const res = await getData(
+//         `/student/studentquiz/${quizId}/attempt?say=${say}`
+//       );
 
-      return res?.submission;
-    } catch (error) {
-      handleError(error, dispatch, rejectWithValue);
-    }
-  }
-);
+//       return res?.submission;
+//     } catch (error) {
+//       handleError(error, dispatch, rejectWithValue);
+//     }
+//   }
+// );
 
 export const fetchAllAttemptHistory = createAsyncThunk(
   "quiz/fetchAllAttemptHistory",
