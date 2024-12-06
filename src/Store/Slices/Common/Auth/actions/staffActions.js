@@ -53,7 +53,7 @@ export const staffLogin = createAsyncThunk(
             schoolName: data.schoolName,
           })
         );
-        decryptData(data.encryptedEmail).then((a)=>console.log(a))
+        decryptData(data.encryptedEmail).then((a) => console.log(a));
         //encryptData("ABD");
         //decryptData()
         // Dispatch token and role to authSlice
@@ -120,8 +120,8 @@ export const staffLogout = createAsyncThunk(
       Cookies.remove("userToken");
       Cookies.remove("say");
       Cookies.remove("isAcademicYearActive");
-      Cookies.remove('schoolId');
-      Cookies.remove('SelectedschoolId');
+      Cookies.remove("schoolId");
+      Cookies.remove("SelectedschoolId");
       // Mandatory lines
       dispatch(setShowError(false));
 

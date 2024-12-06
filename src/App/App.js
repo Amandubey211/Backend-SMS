@@ -33,7 +33,6 @@ import PrivacyPolicy from "../Modules/LoginPages/Policys/PrivacyPolicy.jsx";
 import TermsAndConditions from "../Modules/LoginPages/Policys/TermsAndConditions.jsx";
 import CookiePolicy from "../Modules/LoginPages/Policys/CookiePolicy.jsx";
 
-
 // Timetable
 // Admin
 import TimeTablePage from "../Modules/Admin/TimeTable/TimeTablePage.js";
@@ -45,7 +44,6 @@ import { updateTimetable } from "../Store/Slices/Admin/TimeTable/timetable.actio
 import StudentTimeTablePage from "../Modules/Student/TimeTable/TimeTablePage.js";
 import StudentTableView from "../Modules/Student/TimeTable/Components/TableView.js";
 
-
 // Teacher
 import TeacherTimeTablePage from "../Components/Staff/Teacher/TimeTable/TimeTablePage.js";
 import TeacherTableView from "../Components/Staff/Teacher/TimeTable/Components/TableView.js";
@@ -55,16 +53,10 @@ import ParentTimeTablePage from "../Modules/Parents/TimeTable/TimeTablePage.js";
 import ParentTableView from "../Modules/Parents/TimeTable/Components/TableView.js";
 import ManageRolePage from "../Components/Common/RBAC/ManageRolePage.js";
 
-
-
-
-
-
-
 // lazy loaded routes
-
-
-// lazy loaded routes
+const RoleSelector = lazy(() =>
+  import("../Components/Common/RBAC/RoleSelector.js")
+);
 const Academic = lazy(() =>
   import("../Modules/Admin/AcademicYear/Academic.js")
 );
@@ -409,10 +401,29 @@ function App() {
       ),
       errorElement: <Error />,
     },
+
     {
       path: "/select_branch",
       element: (
         <ProtectRoute Component={SelectBranch} allowedRoles={["admin"]} />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/select_role",
+      element: (
+        <ProtectRoute
+          Component={RoleSelector}
+          allowedRoles={[
+            "admin",
+            "parent",
+            "student",
+            "teacher",
+            "accountant",
+            "librarian",
+            "staff",
+          ]}
+        />
       ),
       errorElement: <Error />,
     },
@@ -1016,7 +1027,6 @@ function App() {
       errorElement: <Error />,
     },
 
-
     {
       path: "/student_timetable",
       element: (
@@ -1037,7 +1047,6 @@ function App() {
           ),
           errorElement: <Error />,
         },
-        
       ],
     },
 
@@ -1191,11 +1200,8 @@ function App() {
           ),
           errorElement: <Error />,
         },
-        
       ],
     },
-
-
 
     // parent----------------------------------------------------------------
     {

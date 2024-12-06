@@ -4,7 +4,7 @@ import {
   stdGetQuiz,
   stdGetSingleQuiz,
   submitQuiz,
-  fetchAttemptHistory,
+  // fetchAttemptHistory,
   fetchAllAttemptHistory,
   startQuiz,
   updateRemainingTime,
@@ -113,19 +113,19 @@ const stdQuizSlice = createSlice({
         state.error = action.payload || true;
       })
 
-      // Handle fetchAttemptHistory
-      .addCase(fetchAttemptHistory.pending, (state) => {
-        state.loading = true;
-        state.error = false;
-      })
-      .addCase(fetchAttemptHistory.fulfilled, (state, action) => {
-        state.loading = false;
-        state.attemptHistory = action.payload;
-      })
-      .addCase(fetchAttemptHistory.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload || true;
-      })
+      // // Handle fetchAttemptHistory
+      // .addCase(fetchAttemptHistory.pending, (state) => {
+      //   state.loading = true;
+      //   state.error = false;
+      // })
+      // .addCase(fetchAttemptHistory.fulfilled, (state, action) => {
+      //   state.loading = false;
+      //   state.attemptHistory = action.payload;
+      // })
+      // .addCase(fetchAttemptHistory.rejected, (state, action) => {
+      //   state.loading = false;
+      //   state.error = action.payload || true;
+      // })
 
       // Handle fetchAllAttemptHistory
       .addCase(fetchAllAttemptHistory.pending, (state) => {
