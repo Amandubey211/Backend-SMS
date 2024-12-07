@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { FiEdit2, FiTrash2 } from "react-icons/fi";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import Layout from "../../../Components/Common/Layout";
 import DashLayout from "../../../Components/Admin/AdminDashLayout";
 import { useDispatch, useSelector } from "react-redux";
@@ -23,20 +23,42 @@ const ManageRolePage = () => {
     (state) => state.admin.rbac
   );
 
-  console.log(permissions, roles, "dddddddd");
+  // Flatten roles and include department information
+  const availableRoles = useMemo(() => {
+    if (!roles || !Array.isArray(roles)) return [];
+    return roles.flatMap((deptObj) =>
+      deptObj.roles.map((role) => ({
+        ...role,
+        department: deptObj.department ? deptObj.department.toLowerCase() : "",
+      }))
+    );
+  }, [roles]);
+
+  // Extract department names from permissions, ensuring consistent casing
+  const permissionDepartments = useMemo(() => {
+    if (!permissions || !Array.isArray(permissions)) return [];
+    return permissions.map((dept) => ({
+      ...dept,
+      department: dept.department.toLowerCase(),
+    }));
+  }, [permissions]);
+
+  const departmentNames = permissionDepartments.map((d) => d.department);
 
   // Pre-fill from location.state if available
   const initialDepartment = location.state?.department || "";
   const initialRole = location.state?.role || "";
   const initialEditMode = location.state?.editMode || false;
 
-  const [department, setDepartment] = useState(initialDepartment);
+  const [department, setDepartment] = useState(
+    initialDepartment ? initialDepartment.toLowerCase() : ""
+  );
   const [role, setRole] = useState(initialRole);
   const [selectedPermissions, setSelectedPermissions] = useState([]);
   const [originalPermissions, setOriginalPermissions] = useState([]);
   const [description, setDescription] = useState("");
   const [isEditMode, setIsEditMode] = useState(initialEditMode);
-  const [isAlertEnabled, setAlertEnabled] = useState(false);
+  const [isAlertEnabled, setIsAlertEnabled] = useState(false); // Corrected setter
 
   // Delete confirmation modal
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -52,54 +74,45 @@ const ManageRolePage = () => {
     dispatch(getPermissionsThunk());
   }, [dispatch]);
 
-  const availableRoles = roles || [];
-  const permissionDepartments = permissions || [];
-  const departmentNames = permissionDepartments.map((d) => d.department);
-
   // Filter roles based on selected department
-  const filteredRoles = department
-    ? availableRoles.filter((r) =>
-        r?.routes?.some((route) =>
-          permissionDepartments
-            .find((d) => d.department === department)
-            ?.groups?.some((group) =>
-              group.routes?.some((grpRoute) => grpRoute._id === route._id)
-            )
-        )
-      )
-    : availableRoles;
+  const filteredRoles = useMemo(() => {
+    if (!department) return availableRoles;
+    return availableRoles.filter((role) => role.department === department);
+  }, [availableRoles, department]);
 
-  // Filter departments based on selection
-  const displayedDepartments = department
-    ? permissionDepartments.filter(
-        (deptObj) => deptObj.department === department
-      )
-    : permissionDepartments;
+  // Find the selected role object
+  const selectedRoleObj = useMemo(() => {
+    return filteredRoles.find((r) => r.name === role);
+  }, [filteredRoles, role]);
 
-  const selectedRoleObj = filteredRoles.find((r) => r.name === role);
-
+  // Update selected permissions and description when role changes
   useEffect(() => {
     if (selectedRoleObj) {
-      const assignedRouteIds = selectedRoleObj.routes.map((route) => route._id);
-      setSelectedPermissions(assignedRouteIds);
-      setOriginalPermissions(assignedRouteIds);
+      setSelectedPermissions(selectedRoleObj.permission || []);
+      setOriginalPermissions(selectedRoleObj.permission || []);
       setDescription(selectedRoleObj.description || "");
+      setIsAlertEnabled(false); // Reset alert toggle on role change
     } else {
       setSelectedPermissions([]);
       setOriginalPermissions([]);
       setDescription("");
+      setIsAlertEnabled(false);
     }
   }, [selectedRoleObj]);
 
   const handleAlertToggle = () => {
     if (!isEditMode) return;
-    setAlertEnabled(!isAlertEnabled);
+    setIsAlertEnabled((prev) => !prev);
   };
 
   // Compute all route IDs from the displayed departments for select-all logic
-  const allDisplayedRouteIds = displayedDepartments.flatMap((deptObj) =>
-    deptObj.groups.flatMap((groupObj) => groupObj.routes.map((r) => r._id))
-  );
+  const allDisplayedRouteIds = useMemo(() => {
+    return permissionDepartments
+      .filter((deptObj) => !department || deptObj.department === department)
+      .flatMap((deptObj) =>
+        deptObj.groups.flatMap((groupObj) => groupObj.routes.map((r) => r._id))
+      );
+  }, [permissionDepartments, department]);
 
   useEffect(() => {
     const selectAllCheckbox = document.querySelector("#select-all-checkbox");
@@ -172,7 +185,7 @@ const ManageRolePage = () => {
       };
 
       await dispatch(
-        editRoleThunk({ roleId: selectedRoleObj.roleId, updates })
+        editRoleThunk({ roleId: selectedRoleObj.id, updates })
       ).unwrap();
       toast.success("Permissions successfully updated!");
       setOriginalPermissions(selectedPermissions); // Now current permissions are saved
@@ -196,8 +209,8 @@ const ManageRolePage = () => {
     if (!selectedRoleObj) return;
     setIsDeletingRole(true);
     try {
-      await dispatch(deleteRoleThunk(selectedRoleObj.roleId)).unwrap();
-      if (role === selectedRoleObj?.name) setRole("");
+      await dispatch(deleteRoleThunk(selectedRoleObj.id)).unwrap();
+      if (role === selectedRoleObj.name) setRole("");
       toast.success("Role deleted successfully");
     } catch (err) {
       console.error("Error deleting role:", err);
@@ -226,6 +239,7 @@ const ManageRolePage = () => {
           // Discard changes
           setSelectedPermissions(originalPermissions);
           setDescription(selectedRoleObj?.description || "");
+          setIsAlertEnabled(false);
         }
       }
       setIsEditMode(false);
@@ -235,11 +249,12 @@ const ManageRolePage = () => {
   };
 
   const handleDepartmentChange = (selectedDepartment) => {
-    setDepartment(selectedDepartment);
+    setDepartment(selectedDepartment.toLowerCase());
     setRole(""); // Reset role when department changes
     setSelectedPermissions([]);
     setOriginalPermissions([]);
     setDescription("");
+    setIsAlertEnabled(false);
   };
 
   // Determine if operations should be disabled
@@ -304,7 +319,7 @@ const ManageRolePage = () => {
                   <option value="">All Departments</option>
                   {departmentNames.map((dept) => (
                     <option key={dept} value={dept}>
-                      {dept}
+                      {dept.charAt(0).toUpperCase() + dept.slice(1)}
                     </option>
                   ))}
                 </select>
@@ -329,7 +344,7 @@ const ManageRolePage = () => {
                   {error && <option disabled>{error}</option>}
                   {!error &&
                     filteredRoles.map((r) => (
-                      <option key={r.roleId} value={r.name}>
+                      <option key={r.id} value={r.name}>
                         {r.name}
                       </option>
                     ))}
@@ -380,9 +395,7 @@ const ManageRolePage = () => {
                     Set alerts to user
                   </span>
                   <div
-                    onClick={() => {
-                      if (isEditMode) handleAlertToggle();
-                    }}
+                    onClick={handleAlertToggle}
                     className={`w-10 h-6 flex items-center bg-gray-300 rounded-full p-1 ${
                       isAlertEnabled
                         ? "bg-gradient-to-r from-pink-500 to-purple-500"
@@ -418,90 +431,96 @@ const ManageRolePage = () => {
                       transition={{ duration: 0.2 }}
                       className="space-y-4"
                     >
-                      {displayedDepartments.length === 0 && department && (
+                      {permissionDepartments.length === 0 && department && (
                         <div className="text-sm text-gray-500">
                           No Permission Or Department Found.
                         </div>
                       )}
 
-                      {displayedDepartments.map((deptObj) => (
-                        <div key={deptObj.department}>
-                          <h4 className="text-md font-semibold mb-2">
-                            {deptObj.department}
-                          </h4>
-                          {deptObj.groups.map((groupObj) => {
-                            const allGroupSelected = groupObj.routes.every(
-                              (r) => selectedPermissions.includes(r._id)
-                            );
-                            const someSelected =
-                              !allGroupSelected &&
-                              groupObj.routes?.some((r) =>
-                                selectedPermissions.includes(r._id)
+                      {permissionDepartments
+                        .filter(
+                          (deptObj) =>
+                            !department || deptObj.department === department
+                        )
+                        .map((deptObj) => (
+                          <div key={deptObj.department}>
+                            <h4 className="text-md font-semibold mb-2">
+                              {deptObj.department.charAt(0).toUpperCase() +
+                                deptObj.department.slice(1)}
+                            </h4>
+                            {deptObj.groups.map((groupObj) => {
+                              const allGroupSelected = groupObj.routes.every(
+                                (r) => selectedPermissions.includes(r._id)
                               );
+                              const someSelected =
+                                !allGroupSelected &&
+                                groupObj.routes.some((r) =>
+                                  selectedPermissions.includes(r._id)
+                                );
 
-                            return (
-                              <motion.div
-                                key={groupObj.groupName}
-                                className="border border-gray-200 rounded-lg p-4 mb-4"
-                                initial={{ opacity: 0, scale: 0.95 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                transition={{ duration: 0.2 }}
-                              >
-                                <div className="flex items-center gap-2 mb-2">
-                                  <input
-                                    type="checkbox"
-                                    className="form-checkbox text-purple-500"
-                                    onChange={(e) =>
-                                      handleGroupChange(
-                                        groupObj.routes,
-                                        e.target.checked
-                                      )
-                                    }
-                                    checked={allGroupSelected}
-                                    disabled={!isEditMode}
-                                    aria-label={`Select all routes in ${groupObj.groupName}`}
-                                    ref={(el) => {
-                                      if (el) {
-                                        el.indeterminate = someSelected;
+                              return (
+                                <motion.div
+                                  key={groupObj.groupName}
+                                  className="border border-gray-200 rounded-lg p-4 mb-4"
+                                  initial={{ opacity: 0, scale: 0.95 }}
+                                  animate={{ opacity: 1, scale: 1 }}
+                                  transition={{ duration: 0.2 }}
+                                >
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <input
+                                      type="checkbox"
+                                      className="form-checkbox text-purple-500"
+                                      onChange={(e) =>
+                                        handleGroupChange(
+                                          groupObj.routes,
+                                          e.target.checked
+                                        )
                                       }
-                                    }}
-                                  />
-                                  <span className="text-sm font-bold">
-                                    {groupObj.groupName}
-                                  </span>
-                                </div>
-                                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                                  {groupObj.routes.map((route) => (
-                                    <label
-                                      key={route._id}
-                                      className={`inline-flex items-center space-x-2`}
-                                      aria-label={`Permission: ${route.name}`}
-                                    >
-                                      <input
-                                        type="checkbox"
-                                        className="form-checkbox text-purple-500"
-                                        checked={selectedPermissions.includes(
-                                          route._id
-                                        )}
-                                        onChange={(e) =>
-                                          handleRouteChange(
-                                            route._id,
-                                            e.target.checked
-                                          )
+                                      checked={allGroupSelected}
+                                      disabled={!isEditMode}
+                                      aria-label={`Select all routes in ${groupObj.groupName}`}
+                                      ref={(el) => {
+                                        if (el) {
+                                          el.indeterminate = someSelected;
                                         }
-                                        disabled={!isEditMode}
-                                      />
-                                      <span className="text-sm">
-                                        {route.name}
-                                      </span>
-                                    </label>
-                                  ))}
-                                </div>
-                              </motion.div>
-                            );
-                          })}
-                        </div>
-                      ))}
+                                      }}
+                                    />
+                                    <span className="text-sm font-bold">
+                                      {groupObj.groupName}
+                                    </span>
+                                  </div>
+                                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                                    {groupObj.routes.map((route) => (
+                                      <label
+                                        key={route._id}
+                                        className={`inline-flex items-center space-x-2`}
+                                        aria-label={`Permission: ${route.name}`}
+                                      >
+                                        <input
+                                          type="checkbox"
+                                          className="form-checkbox text-purple-500"
+                                          checked={selectedPermissions.includes(
+                                            route._id
+                                          )}
+                                          onChange={(e) =>
+                                            handleRouteChange(
+                                              route._id,
+                                              e.target.checked
+                                            )
+                                          }
+                                          disabled={!isEditMode}
+                                        />
+                                        <span className="text-sm">
+                                          {route.name}
+                                        </span>
+                                      </label>
+                                    ))}
+                                  </div>
+                                </motion.div>
+                              );
+                            })}
+                          </div>
+                        ))}
                     </motion.div>
                   </AnimatePresence>
                 </div>
