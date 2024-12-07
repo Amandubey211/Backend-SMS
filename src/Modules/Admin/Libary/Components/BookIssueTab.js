@@ -36,7 +36,7 @@ const BookIssueTab = ({ handleSidebarOpen, setEditIssueData }) => {
   };
 
   // Filter book issues based on class, section, book, and status
-  const filteredBookIssues = bookIssues.filter((issue) => {
+  const filteredBookIssues = bookIssues?.filter((issue) => {
     const matchesClass =
       !localFilters.classLevel ||
       (issue.classId && issue.classId._id === localFilters.classLevel);
@@ -124,7 +124,9 @@ const BookIssueTab = ({ handleSidebarOpen, setEditIssueData }) => {
               <th className="px-6 py-3">{t("Issue Date")}</th>
               <th className="px-6 py-3">{t("Status")}</th>
               {/* Conditionally render the Action column */}
-              {role !== "teacher" && <th className="px-6 py-3">{t("Action")}</th>}
+              {role !== "teacher" && (
+                <th className="px-6 py-3">{t("Action")}</th>
+              )}
             </tr>
           </thead>
           <tbody>

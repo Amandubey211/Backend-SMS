@@ -43,7 +43,7 @@ import adminQuizReducer from "./Slices/Admin/Class/Quiz/quizSlice";
 import adminSpeedGradeReducer from "./Slices/Admin/Class/SpeedGrade/speedGradeSlice";
 import timetableReducer from "./Slices/Admin/TimeTable/timtableSlice";
 import adminClassIconsReducer from "./Slices/Admin/Class/reducer/iconSlice";
-
+import rbacReducer from "./Slices/Common/RBAC/rbacSlice";
 
 // student
 import studentDashboardReducer from "./Slices/Student/Dashboard/studentDashboardSlices";
@@ -77,9 +77,6 @@ import parentTimeTableReducer from "../Store/Slices/Parent/TimeTable/parentTimeT
 
 // teacher
 import teacherTimeTableReducer from "../Store/Slices/Teacher/teacherTimeTableSlice";
-
-
-
 
 // Persist configuration for the Auth slice
 
@@ -164,6 +161,7 @@ const AdminReducer = combineReducers({
   subject_grades: subjectGradesReducer,
   // subject_assignment: subjectAssignmentReducer,
   subject_quiz: subjectQuizReducer,
+  rbac: rbacReducer,
 });
 
 const studentReducer = combineReducers({
@@ -188,11 +186,8 @@ const studentReducer = combineReducers({
   studentPages: studentPagesReducer,
   studentDiscussion: studentDiscussionReducer,
   studentAnnounce: studentAnnounceReducer,
-  studentTimetable: studentTimeTableReducer
+  studentTimetable: studentTimeTableReducer,
 });
-
-
-
 
 const ParentReducer = combineReducers({
   dashboard: dashboardReducer,
@@ -201,7 +196,7 @@ const ParentReducer = combineReducers({
   notice: noticeReducer,
   library: libraryReducer,
   events: eventReducer,
-  parentTimetable: parentTimeTableReducer
+  parentTimetable: parentTimeTableReducer,
 });
 
 // Create the store
