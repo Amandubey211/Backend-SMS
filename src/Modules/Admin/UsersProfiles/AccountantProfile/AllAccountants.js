@@ -1,31 +1,38 @@
+// AllAccountants.js
 import React, { useEffect, useState, useRef } from "react";
+import { FiLock, FiUserPlus } from "react-icons/fi";
+import { GoAlertFill, GoPlus } from "react-icons/go";
+import { useDispatch, useSelector } from "react-redux";
+import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
+
 import Layout from "../../../../Components/Common/Layout";
 import DashLayout from "../../../../Components/Admin/AdminDashLayout";
 import SidebarSlide from "../../../../Components/Common/SidebarSlide";
-import ViewAccountant from "./ViewAccountant";
-import ProfileCard from "../SubComponents/ProfileCard";
-import { useDispatch, useSelector } from "react-redux";
-import AddUser from "../StaffProfile/AddUser";
-import { GoAlertFill, GoPlus } from "react-icons/go";
-import Spinner from "../../../../Components/Common/Spinner";
-import { useTranslation } from "react-i18next";
-import { fetchAllStaff } from "../../../../Store/Slices/Admin/Users/Staff/staff.action";
 import CreateRole from "../../../../Components/Common/RBAC/CreateRole";
+import AddUser from "../StaffProfile/AddUser";
+import ProfileCard from "../SubComponents/ProfileCard";
+import ViewAccountant from "./ViewAccountant";
+import Spinner from "../../../../Components/Common/Spinner";
+
+import { fetchAllStaff } from "../../../../Store/Slices/Admin/Users/Staff/staff.action";
 
 const AllAccountants = () => {
   const { t } = useTranslation("admAccounts");
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarContent, setSidebarContent] = useState(null);
   const [selectedAccountant, setSelectedAccountant] = useState(null);
   const [accountantData, setAccountantData] = useState(null);
-  const [isCreateRoleOpen, setCreateRoleOpen] = useState(false);
   const [sortDropdown, setSortDropdown] = useState(false);
   const dropdownRef = useRef(null);
 
-  const { accountant, loading } = useSelector((store) => store.admin.all_staff);
-  const role = useSelector((store) => store.common.auth.role);
-  const dispatch = useDispatch();
+  const { accountant, loading: accountantLoading } = useSelector(
+    (store) => store.admin.all_staff
+  );
+  const { role } = useSelector((store) => store.common.auth);
 
   useEffect(() => {
     dispatch(fetchAllStaff());
@@ -44,26 +51,22 @@ const AllAccountants = () => {
     };
   }, []);
 
-  const handleSidebarOpen = () => setSidebarOpen(true);
+  const handleSidebarOpen = (content, data = null) => {
+    setSidebarContent(content);
+    setSelectedAccountant(data);
+    setAccountantData(data);
+    setSidebarOpen(true);
+  };
+
   const handleSidebarClose = () => setSidebarOpen(false);
-
-  const handleAccountantClick = (accountant) => {
-    setSelectedAccountant(accountant);
-    setSidebarContent("viewAccountant");
-    setSidebarOpen(true);
-  };
-
-  const handleAddAccountantClick = () => {
-    setSidebarContent("addAccountant");
-    setSidebarOpen(true);
-    setAccountantData(null);
-  };
 
   const editUser = (event, accountant) => {
     event.stopPropagation();
-    setSidebarContent("editAccountant");
-    setSidebarOpen(true);
-    setAccountantData(accountant);
+    handleSidebarOpen("editAccountant", accountant);
+  };
+
+  const handleAccountantClick = (accountant) => {
+    handleSidebarOpen("viewAccountant", accountant);
   };
 
   const renderSidebarContent = () => {
@@ -71,9 +74,13 @@ const AllAccountants = () => {
       case "viewAccountant":
         return <ViewAccountant accountant={selectedAccountant} />;
       case "addAccountant":
-        return <AddUser role={"accountant"} data={accountantData} />;
+        return <AddUser role="accountant" />;
       case "editAccountant":
-        return <AddUser role={"accountant"} data={accountantData} />;
+        return <AddUser role="accountant" data={accountantData} />;
+      case "createRole":
+        return (
+          <CreateRole onClose={handleSidebarClose} department="Accountant" />
+        );
       default:
         return <div>{t("Select an action")}</div>;
     }
@@ -82,7 +89,7 @@ const AllAccountants = () => {
   return (
     <Layout title={t("All Accountants")}>
       <DashLayout>
-        {loading ? (
+        {accountantLoading ? (
           <div className="flex w-full h-[90vh] flex-col items-center justify-center">
             <Spinner />
           </div>
@@ -92,47 +99,51 @@ const AllAccountants = () => {
             <div className="flex justify-between items-center mb-4 border-b-2 h-20">
               {/* Left Section */}
               <div className="flex items-center gap-4">
-                <h2 className="text-xl font-semibold flex items-center gap-2">
+                <h2 className="text-xl font-semibold text-gray-800 flex items-center gap-2">
                   {t("All Accountants")}
-                  <span className="bg-purple-400 px-2 text-sm py-1 rounded-full">
-                    {accountant?.length}
+                  {/* Gradient Circle Badge */}
+                  <span className="inline-flex items-center justify-center">
+                    <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 p-[2px]">
+                      <span className="flex items-center justify-center w-full h-full bg-pink-50 rounded-full text-sm font-medium text-pink-600">
+                        {accountant?.length}
+                      </span>
+                    </span>
                   </span>
                 </h2>
 
-                {/* Sort Button */}
+                {/* Sort Button with Gradient Border */}
                 <div className="relative" ref={dropdownRef}>
-                  <button
-                    onClick={() => setSortDropdown(!sortDropdown)}
-                    className="bg-white text-black px-4 py-2 flex items-center gap-2 shadow hover:shadow-lg transition-all rounded-lg"
-                    style={{
-                      borderWidth: "2px",
-                      borderImageSlice: 1,
-                      borderImageSource: "linear-gradient(to right, #C83B62, #7F35CD)",
-                    }}
-                  >
-                    <span className="font-medium">Sort</span>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5 text-black"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
+                  <div className="bg-gradient-to-r from-pink-500 to-purple-500 p-[2px] rounded-md">
+                    <button
+                      onClick={() => setSortDropdown(!sortDropdown)}
+                      className="inline-flex items-center gap-2 px-4 py-1 bg-white rounded-md text-gray-800 font-medium"
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M4 6h16M4 12h8m-8 6h16"
-                      />
-                    </svg>
-                  </button>
+                      <span>{t("Sort")}</span>
+                      {/* Sort Icon */}
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5 text-gray-800"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M4 6h16M4 12h8m-8 6h16"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+
                   {sortDropdown && (
                     <div className="absolute mt-2 w-40 bg-white border border-gray-300 rounded-lg shadow-lg z-50">
                       <button className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100">
-                        By Date
+                        {t("By Date")}
                       </button>
                       <button className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100">
-                        By Roles
+                        {t("By Roles")}
                       </button>
                     </div>
                   )}
@@ -142,16 +153,23 @@ const AllAccountants = () => {
               {/* Right Section */}
               <div className="flex items-center gap-4">
                 <button
-                  onClick={() => (window.location.href = "/manage-roles")}
-                  className="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-md flex items-center gap-2 hover:opacity-90 transition duration-200"
+                  onClick={() => navigate("/users/manage-roles")}
+                  className="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-md inline-flex items-center gap-2 hover:opacity-90 transition duration-200"
                 >
-                  Manage Roles
+                  <FiLock className="text-white" />
+                  {t("Manage Roles")}
                 </button>
+
                 <button
-                  onClick={() => setCreateRoleOpen(true)}
-                  className="px-6 py-2 border-2 border-transparent bg-gradient-to-r from-pink-500 to-purple-500 text-white font-medium rounded-full flex items-center gap-2 hover:shadow-lg transition duration-200"
+                  onClick={() => handleSidebarOpen("createRole")}
+                  className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
                 >
-                  <span>Create Role</span>
+                  <span className="text-gray-800 font-medium">
+                    {t("Create Role")}
+                  </span>
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center text-white">
+                    <FiUserPlus size={16} />
+                  </div>
                 </button>
               </div>
             </div>
@@ -159,12 +177,14 @@ const AllAccountants = () => {
             {/* Accountant List */}
             <div className="flex flex-wrap -mx-2">
               {accountant?.length > 0 ? (
-                accountant?.map((accountant, index) => (
+                accountant.map((acc, index) => (
                   <ProfileCard
                     key={index}
-                    profile={accountant}
-                    onClick={handleAccountantClick}
-                    editUser={role === "admin" ? editUser : null}
+                    profile={acc}
+                    onClick={() => handleAccountantClick(acc)}
+                    editUser={
+                      role === "admin" ? (event) => editUser(event, acc) : null
+                    }
                   />
                 ))
               ) : (
@@ -178,7 +198,7 @@ const AllAccountants = () => {
             {/* Floating Action Button */}
             {role === "admin" && (
               <button
-                onClick={handleAddAccountantClick}
+                onClick={() => handleSidebarOpen("addAccountant")}
                 className="fixed bottom-8 right-8 bg-gradient-to-r from-pink-500 to-purple-500 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:opacity-90 transition duration-200"
               >
                 <GoPlus className="text-2xl" />
@@ -196,22 +216,22 @@ const AllAccountants = () => {
             <span className="bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent bg-clip-text">
               {sidebarContent === "viewAccountant"
                 ? t("Quick View of Accountant")
+                : sidebarContent === "createRole"
+                ? t("Create New Role")
                 : t("Add/Edit Accountant")}
             </span>
           }
-          width={sidebarContent === "viewAccountant" ? "30%" : "60%"}
+          width={
+            sidebarContent === "viewAccountant"
+              ? "30%"
+              : sidebarContent === "createRole"
+              ? "60%"
+              : "75%"
+          }
           height="100%"
         >
           {renderSidebarContent()}
         </SidebarSlide>
-
-        {/* Create Role Modal */}
-        {isCreateRoleOpen && (
-          <CreateRole
-            isOpen={isCreateRoleOpen}
-            onClose={() => setCreateRoleOpen(false)}
-          />
-        )}
       </DashLayout>
     </Layout>
   );

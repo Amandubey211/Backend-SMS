@@ -1,3 +1,4 @@
+// rbacSlice.js
 import { createSlice } from "@reduxjs/toolkit";
 import {
   createRoleThunk,
@@ -31,8 +32,8 @@ const rbacSlice = createSlice({
       .addCase(createRoleThunk.fulfilled, (state, action) => {
         state.loading = false;
         state.error = null;
-        if (action.payload?.data) {
-          state.roles.push(action.payload.data);
+        if (action.payload?.updatedRole) {
+          state.roles.push(action.payload.updatedRole);
         }
       })
       .addCase(createRoleThunk.rejected, (state, action) => {
@@ -48,13 +49,10 @@ const rbacSlice = createSlice({
       .addCase(editRoleThunk.fulfilled, (state, action) => {
         state.loading = false;
         state.error = null;
-        // If successful, update the existing role in state
-        const { roleId } = action.payload;
-        const updatedRole = state.roles.find((role) => role._id === roleId);
-        if (updatedRole && action.payload?.data) {
-          const updatedData = action.payload.data;
-          // Merge updates into the role
-          Object.assign(updatedRole, updatedData);
+        const { roleId, updatedRole } = action.payload;
+        const index = state.roles.findIndex((role) => role._id === roleId);
+        if (index !== -1) {
+          state.roles[index] = updatedRole;
         }
       })
       .addCase(editRoleThunk.rejected, (state, action) => {
@@ -70,8 +68,8 @@ const rbacSlice = createSlice({
       .addCase(getAllRolesThunk.fulfilled, (state, action) => {
         state.loading = false;
         state.error = null;
-        if (action.payload?.data) {
-          state.roles = action.payload.data;
+        if (action.payload?.roles) {
+          state.roles = action.payload.roles;
         }
       })
       .addCase(getAllRolesThunk.rejected, (state, action) => {
@@ -87,7 +85,7 @@ const rbacSlice = createSlice({
       .addCase(assignRoleThunk.fulfilled, (state) => {
         state.loading = false;
         state.error = null;
-        // This might not change local state of roles unless needed
+        // Update roles if necessary
       })
       .addCase(assignRoleThunk.rejected, (state, action) => {
         state.loading = false;
@@ -118,9 +116,8 @@ const rbacSlice = createSlice({
       .addCase(getPermissionsThunk.fulfilled, (state, action) => {
         state.loading = false;
         state.error = null;
-        console.log(action.payload.data, "kkkkkkk");
-        if (action.payload?.data) {
-          state.permissions = action.payload.data;
+        if (action.payload?.permissions) {
+          state.permissions = action.payload.permissions;
         }
       })
       .addCase(getPermissionsThunk.rejected, (state, action) => {

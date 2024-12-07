@@ -35,15 +35,25 @@ export const editRoleThunk = createAsyncThunk(
   "rbac/editRole",
   async ({ roleId, updates }, { rejectWithValue, dispatch }) => {
     try {
+      // Generate the 'say' parameter for the request
       const say = getAY();
       dispatch(setShowError(false));
+
+      // Send PUT request to the backend
       const response = await putData(
         `/admin/role/edit/${roleId}?say=${say}`,
         updates
       );
-      return { roleId, ...response };
+
+      // Validate and return the updated role data
+      return {
+        roleId,
+        updatedRole: response.data,
+        message: response.message || "Role updated successfully",
+      };
     } catch (error) {
-      return handleError(error, dispatch, rejectWithValue);
+      // Handle any errors encountered during the request
+      return rejectWithValue(handleError(error, dispatch, rejectWithValue));
     }
   }
 );

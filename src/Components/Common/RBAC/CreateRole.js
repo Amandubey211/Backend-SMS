@@ -185,16 +185,15 @@ const CreateRole = ({ onClose, department }) => {
 
       {/* Scrollable middle section (permissions) */}
       <div className="border border-gray-200 rounded-lg p-4  flex flex-col  overflow-hidden">
-        <div className="flex justify-end items-center">
+        <div className="flex justify-between items-center">
+          <h3 className="text-sm font-bold text-gradient">Give Permission</h3>
+
           <div className="flex items-center gap-2">
-            {/* <h3 className="text-sm font-bold">Give Permission</h3> */}
             <label
               className="inline-flex items-center gap-2 cursor-pointer"
               aria-label="Select all permissions"
             >
-              <span className="text-sm font-medium text-gradient">
-                Select All
-              </span>
+              <span className="text-sm font-medium ">Select All</span>
               <input
                 type="checkbox"
                 id="select-all-checkbox"

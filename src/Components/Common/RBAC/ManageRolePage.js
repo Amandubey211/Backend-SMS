@@ -7,8 +7,8 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   getAllRolesThunk,
   getPermissionsThunk,
-  assignRoleThunk,
   deleteRoleThunk,
+  editRoleThunk,
 } from "../../../Store/Slices/Common/RBAC/rbacThunks";
 import DeleteModal from "../DeleteModal";
 import { toast } from "react-hot-toast";
@@ -17,12 +17,12 @@ import Spinner from "../Spinner";
 import useNavHeading from "../../../Hooks/CommonHooks/useNavHeading ";
 
 const ManageRolePage = () => {
-  const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
   const { roles, permissions, loading, error } = useSelector(
     (state) => state.admin.rbac
   );
+
   console.log(permissions, roles, "dddddddd");
 
   // Pre-fill from location.state if available
@@ -30,14 +30,13 @@ const ManageRolePage = () => {
   const initialRole = location.state?.role || "";
   const initialEditMode = location.state?.editMode || false;
 
-  const [permissionsExpanded, setPermissionsExpanded] = useState(false);
-  const [isAlertEnabled, setAlertEnabled] = useState(false);
   const [department, setDepartment] = useState(initialDepartment);
   const [role, setRole] = useState(initialRole);
   const [selectedPermissions, setSelectedPermissions] = useState([]);
   const [originalPermissions, setOriginalPermissions] = useState([]);
-
+  const [description, setDescription] = useState("");
   const [isEditMode, setIsEditMode] = useState(initialEditMode);
+  const [isAlertEnabled, setAlertEnabled] = useState(false);
 
   // Delete confirmation modal
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -57,6 +56,19 @@ const ManageRolePage = () => {
   const permissionDepartments = permissions || [];
   const departmentNames = permissionDepartments.map((d) => d.department);
 
+  // Filter roles based on selected department
+  const filteredRoles = department
+    ? availableRoles.filter((r) =>
+        r?.routes?.some((route) =>
+          permissionDepartments
+            .find((d) => d.department === department)
+            ?.groups?.some((group) =>
+              group.routes?.some((grpRoute) => grpRoute._id === route._id)
+            )
+        )
+      )
+    : availableRoles;
+
   // Filter departments based on selection
   const displayedDepartments = department
     ? permissionDepartments.filter(
@@ -64,22 +76,20 @@ const ManageRolePage = () => {
       )
     : permissionDepartments;
 
-  const selectedRoleObj = availableRoles.find((r) => r.name === role);
+  const selectedRoleObj = filteredRoles.find((r) => r.name === role);
 
   useEffect(() => {
-    if (selectedRoleObj && Array.isArray(selectedRoleObj.routes)) {
+    if (selectedRoleObj) {
       const assignedRouteIds = selectedRoleObj.routes.map((route) => route._id);
       setSelectedPermissions(assignedRouteIds);
       setOriginalPermissions(assignedRouteIds);
+      setDescription(selectedRoleObj.description || "");
     } else {
       setSelectedPermissions([]);
       setOriginalPermissions([]);
+      setDescription("");
     }
   }, [selectedRoleObj]);
-
-  const togglePermissions = () => {
-    setPermissionsExpanded(!permissionsExpanded);
-  };
 
   const handleAlertToggle = () => {
     if (!isEditMode) return;
@@ -155,11 +165,14 @@ const ManageRolePage = () => {
     }
     setIsSettingPermissions(true);
     try {
+      const updates = {
+        name: role,
+        permission: selectedPermissions,
+        description: description,
+      };
+
       await dispatch(
-        assignRoleThunk({
-          roleId: selectedRoleObj.roleId,
-          permission: selectedPermissions,
-        })
+        editRoleThunk({ roleId: selectedRoleObj.roleId, updates })
       ).unwrap();
       toast.success("Permissions successfully updated!");
       setOriginalPermissions(selectedPermissions); // Now current permissions are saved
@@ -200,7 +213,8 @@ const ManageRolePage = () => {
       // Check for unsaved changes
       const changesUnsaved =
         JSON.stringify(selectedPermissions.sort()) !==
-        JSON.stringify(originalPermissions.sort());
+          JSON.stringify(originalPermissions.sort()) ||
+        description !== (selectedRoleObj?.description || "");
 
       if (changesUnsaved) {
         const confirmLeave = window.confirm(
@@ -211,6 +225,7 @@ const ManageRolePage = () => {
         } else {
           // Discard changes
           setSelectedPermissions(originalPermissions);
+          setDescription(selectedRoleObj?.description || "");
         }
       }
       setIsEditMode(false);
@@ -219,6 +234,15 @@ const ManageRolePage = () => {
     }
   };
 
+  const handleDepartmentChange = (selectedDepartment) => {
+    setDepartment(selectedDepartment);
+    setRole(""); // Reset role when department changes
+    setSelectedPermissions([]);
+    setOriginalPermissions([]);
+    setDescription("");
+  };
+
+  // Determine if operations should be disabled
   const isOperationDisabled = loading || (!isEditMode && selectedRoleObj);
 
   return (
@@ -226,16 +250,16 @@ const ManageRolePage = () => {
       <DashLayout>
         <div className="p-4">
           <motion.div
-            className="bg-white rounded-lg w-full "
+            className="bg-white rounded-lg w-full"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
           >
-            <div className="flex justify-between items-center mb-4 bg-pink-400 text-white px-4 py-3 rounded-t-lg">
+            <div className="flex justify-between bg-gray-50 items-center mb-4 px-4 py-3 rounded-t-lg">
               <h2 className="text-lg font-bold">Manage Role Permissions</h2>
               <div className="flex items-center gap-4">
                 <button
-                  className={`text-white hover:text-gray-200 relative`}
+                  className={`hover:text-gray-500 relative`}
                   onClick={handleEditClick}
                   aria-label="Toggle edit mode"
                 >
@@ -251,7 +275,7 @@ const ManageRolePage = () => {
                   )}
                 </button>
                 <button
-                  className="text-white hover:text-gray-200"
+                  className="hover:text-gray-500"
                   onClick={handleDeleteClick}
                   aria-label="Delete role"
                   disabled={!selectedRoleObj || loading || isDeletingRole}
@@ -273,9 +297,8 @@ const ManageRolePage = () => {
                 <select
                   id="department-select"
                   value={department}
-                  onChange={(e) => setDepartment(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none disabled:cursor-not-allowed"
-                  disabled={!isEditMode}
+                  onChange={(e) => handleDepartmentChange(e.target.value)}
+                  className="w-full px-3 py-2 border capitalize border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
                   aria-label="Select Department"
                 >
                   <option value="">All Departments</option>
@@ -298,14 +321,14 @@ const ManageRolePage = () => {
                   id="role-select"
                   value={role}
                   onChange={(e) => setRole(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none disabled:cursor-not-allowed"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
                   disabled={!isEditMode}
                   aria-label="Select Role"
                 >
                   <option value="">Select a role</option>
                   {error && <option disabled>{error}</option>}
                   {!error &&
-                    availableRoles.map((r) => (
+                    filteredRoles.map((r) => (
                       <option key={r.roleId} value={r.name}>
                         {r.name}
                       </option>
@@ -324,8 +347,10 @@ const ManageRolePage = () => {
                   id="description-input"
                   type="text"
                   placeholder="Write here"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none disabled:cursor-not-allowed"
-                  disabled={!isEditMode}
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                  disabled={!isEditMode || !selectedRoleObj}
                   aria-label="Role description"
                 />
               </div>
@@ -343,7 +368,7 @@ const ManageRolePage = () => {
                     <input
                       type="checkbox"
                       id="select-all-checkbox"
-                      className="form-checkbox text-purple-500 disabled:cursor-not-allowed"
+                      className="form-checkbox text-purple-500"
                       disabled={!isEditMode}
                       onChange={(e) => handleGlobalChange(e.target.checked)}
                     />
@@ -355,7 +380,9 @@ const ManageRolePage = () => {
                     Set alerts to user
                   </span>
                   <div
-                    onClick={handleAlertToggle}
+                    onClick={() => {
+                      if (isEditMode) handleAlertToggle();
+                    }}
                     className={`w-10 h-6 flex items-center bg-gray-300 rounded-full p-1 ${
                       isAlertEnabled
                         ? "bg-gradient-to-r from-pink-500 to-purple-500"
@@ -408,7 +435,7 @@ const ManageRolePage = () => {
                             );
                             const someSelected =
                               !allGroupSelected &&
-                              groupObj.routes.some((r) =>
+                              groupObj.routes?.some((r) =>
                                 selectedPermissions.includes(r._id)
                               );
 
@@ -423,7 +450,7 @@ const ManageRolePage = () => {
                                 <div className="flex items-center gap-2 mb-2">
                                   <input
                                     type="checkbox"
-                                    className="form-checkbox text-purple-500 disabled:cursor-not-allowed"
+                                    className="form-checkbox text-purple-500"
                                     onChange={(e) =>
                                       handleGroupChange(
                                         groupObj.routes,
@@ -452,7 +479,7 @@ const ManageRolePage = () => {
                                     >
                                       <input
                                         type="checkbox"
-                                        className="form-checkbox text-purple-500 disabled:cursor-not-allowed"
+                                        className="form-checkbox text-purple-500"
                                         checked={selectedPermissions.includes(
                                           route._id
                                         )}
