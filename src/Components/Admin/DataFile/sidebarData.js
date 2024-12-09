@@ -52,19 +52,7 @@ const sidebarData = [
         path: "/users/manage-roles",
         roles: ["admin"],
       },
-      {
-        title: "Student",
-        icon: <FaUserGraduate />,
-        path: "/users/students",
-        roles: ["admin", "teacher", "accountant", "librarian", "staff"],
-      },
-      {
-        title: "Parent",
-        icon: <RiParentFill />,
-        path: "/users/parents",
-        roles: ["admin", "teacher", "accountant", "librarian", "staff"],
-      },
-      // Other user roles for admin only
+
       {
         title: "Teacher",
         icon: <FaChalkboardTeacher />,
@@ -89,6 +77,19 @@ const sidebarData = [
         path: "/users/staffs",
         roles: ["admin", "teacher", "accountant", "librarian", "staff"],
       },
+      {
+        title: "Student",
+        icon: <FaUserGraduate />,
+        path: "/users/students",
+        roles: ["admin", "teacher", "accountant", "librarian", "staff"],
+      },
+      {
+        title: "Parent",
+        icon: <RiParentFill />,
+        path: "/users/parents",
+        roles: ["admin", "teacher", "accountant", "librarian", "staff"],
+      },
+      // Other user roles for admin only
     ],
   },
   {

@@ -68,8 +68,8 @@ const rbacSlice = createSlice({
       .addCase(getAllRolesThunk.fulfilled, (state, action) => {
         state.loading = false;
         state.error = null;
-        if (action.payload?.roles) {
-          state.roles = action.payload.roles;
+        if (action.payload?.data) {
+          state.roles = action.payload.data;
         }
       })
       .addCase(getAllRolesThunk.rejected, (state, action) => {
@@ -116,8 +116,8 @@ const rbacSlice = createSlice({
       .addCase(getPermissionsThunk.fulfilled, (state, action) => {
         state.loading = false;
         state.error = null;
-        if (action.payload?.permissions) {
-          state.permissions = action.payload.permissions;
+        if (action.payload?.data) {
+          state.permissions = action.payload.data;
         }
       })
       .addCase(getPermissionsThunk.rejected, (state, action) => {

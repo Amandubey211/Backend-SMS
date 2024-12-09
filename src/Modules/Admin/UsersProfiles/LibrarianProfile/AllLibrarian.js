@@ -16,6 +16,7 @@ import ViewLibrarian from "./ViewLibrarian";
 import Spinner from "../../../../Components/Common/Spinner";
 
 import { fetchAllStaff } from "../../../../Store/Slices/Admin/Users/Staff/staff.action";
+import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 
 const AllLibrarian = () => {
   const { t } = useTranslation("admAccounts");
@@ -85,7 +86,7 @@ const AllLibrarian = () => {
         return <div>{t("Select an action")}</div>;
     }
   };
-
+  useNavHeading("User", "Librarian");
   return (
     <Layout title={t("All Librarians")}>
       <DashLayout>
