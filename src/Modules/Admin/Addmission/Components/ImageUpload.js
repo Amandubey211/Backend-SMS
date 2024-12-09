@@ -1,6 +1,6 @@
 import React from "react";
 import { FaTimes } from "react-icons/fa"; // Importing the Font Awesome remove icon
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
 
 const ImageUpload = ({
   imagePreview,
@@ -11,7 +11,7 @@ const ImageUpload = ({
   height,
   error,
 }) => {
-  const { t } = useTranslation('admAdmission');
+  const { t } = useTranslation("admAdmission");
   const fileInputRef = React.useRef(null);
 
   return (
@@ -96,7 +96,9 @@ const ImageUpload = ({
                 </clipPath>
               </defs>
             </svg>
-            <p className="mt-2 text-sm text-gray-600">{t("Drop Your Image here")}</p>
+            <p className="mt-2 text-sm text-gray-600">
+              {t("Drop Your Image here")}
+            </p>
             <button
               type="button"
               onClick={() => fileInputRef.current.click()}

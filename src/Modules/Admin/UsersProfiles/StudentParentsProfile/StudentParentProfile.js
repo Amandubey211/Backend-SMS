@@ -13,6 +13,7 @@ import UpdateParent from "./UpdateParent";
 import { fetchAllParent } from "../../../../Store/Slices/Admin/Users/Parents/parent.action";
 import { fetchAllStudents } from "../../../../Store/Slices/Admin/Users/Students/student.action";
 import { useTranslation } from "react-i18next";
+import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 
 const uniqueFilterOptions = (data, key) => {
   return [
@@ -25,7 +26,9 @@ const uniqueFilterOptions = (data, key) => {
 const StudentParentProfile = () => {
   const { t } = useTranslation("admAccounts");
 
-  const { allParents, loading } = useSelector((store) => store.admin.all_parents);
+  const { allParents, loading } = useSelector(
+    (store) => store.admin.all_parents
+  );
   const { role } = useSelector((state) => ({
     role: state.common.auth.role,
   }));
@@ -68,6 +71,7 @@ const StudentParentProfile = () => {
     )
   );
 
+  useNavHeading("User", "Parents");
   return (
     <>
       <Layout title={t("Parents")}>
@@ -161,19 +165,23 @@ const StudentParentProfile = () => {
                           <td className="px-5 py-5 border-b border-gray-200 align-middle">
                             <div
                               className="flex items-center py-1 cursor-pointer"
-                              onClick={() => handleStudentClick(parent?.children)}
+                              onClick={() =>
+                                handleStudentClick(parent?.children)
+                              }
                             >
                               <div className="flex bg-pink-100 p-2 border rounded-full w-[10rem] items-center overflow-hidden">
                                 <div className="flex -space-x-2">
-                                  {parent?.children?.slice(0, 1)?.map((child, idx) => (
-                                    <img
-                                      key={idx}
-                                      src={child?.imageUrl || profileIcon}
-                                      alt={child?.name}
-                                      className="h-8 w-8 rounded-full border-2 border-white"
-                                      title={child?.name}
-                                    />
-                                  ))}
+                                  {parent?.children
+                                    ?.slice(0, 1)
+                                    ?.map((child, idx) => (
+                                      <img
+                                        key={idx}
+                                        src={child?.imageUrl || profileIcon}
+                                        alt={child?.name}
+                                        className="h-8 w-8 rounded-full border-2 border-white"
+                                        title={child?.name}
+                                      />
+                                    ))}
                                   {parent?.children?.length > 1 && (
                                     <div
                                       className="h-8 w-8 rounded-full bg-gray-300 flex items-center justify-center border-2 border-white text-sm"

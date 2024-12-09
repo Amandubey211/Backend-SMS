@@ -16,6 +16,7 @@ import ViewAccountant from "./ViewAccountant";
 import Spinner from "../../../../Components/Common/Spinner";
 
 import { fetchAllStaff } from "../../../../Store/Slices/Admin/Users/Staff/staff.action";
+import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 
 const AllAccountants = () => {
   const { t } = useTranslation("admAccounts");
@@ -85,6 +86,7 @@ const AllAccountants = () => {
         return <div>{t("Select an action")}</div>;
     }
   };
+  useNavHeading("User", "Accountants");
 
   return (
     <Layout title={t("All Accountants")}>

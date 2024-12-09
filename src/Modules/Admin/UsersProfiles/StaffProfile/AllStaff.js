@@ -12,6 +12,7 @@ import { fetchAllStaff } from "../../../../Store/Slices/Admin/Users/Staff/staff.
 import Spinner from "../../../../Components/Common/Spinner";
 import { useTranslation } from "react-i18next";
 import CreateRole from "../../../../Components/Common/RBAC/CreateRole";
+import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 
 const AllStaff = () => {
   const { t } = useTranslation("admAccounts");
@@ -23,7 +24,7 @@ const AllStaff = () => {
   const [isCreateRoleOpen, setCreateRoleOpen] = useState(false);
   const [sortDropdown, setSortDropdown] = useState(false);
   const dropdownRef = useRef(null); // Ref for dropdown
-
+  useNavHeading("User", "Staff");
   const role = useSelector((store) => store.common.auth.role);
   const { staff, loading } = useSelector((store) => store.admin.all_staff);
   const dispatch = useDispatch();
@@ -81,7 +82,7 @@ const AllStaff = () => {
   };
 
   return (
-    <Layout title={t("All Staff")}>
+    <Layout title="Staff | Student Diwan">
       <DashLayout>
         {loading ? (
           <div className="flex w-full h-[90vh] flex-col items-center justify-center">
@@ -108,7 +109,8 @@ const AllStaff = () => {
                     style={{
                       borderWidth: "2px",
                       borderImageSlice: 1,
-                      borderImageSource: "linear-gradient(to right, #C83B62, #7F35CD)",
+                      borderImageSource:
+                        "linear-gradient(to right, #C83B62, #7F35CD)",
                     }}
                   >
                     <span className="font-medium">Sort</span>

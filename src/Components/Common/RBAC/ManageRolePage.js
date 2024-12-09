@@ -67,7 +67,7 @@ const ManageRolePage = () => {
   const [isSettingPermissions, setIsSettingPermissions] = useState(false);
   const [isDeletingRole, setIsDeletingRole] = useState(false);
 
-  useNavHeading("Admin", "Manage Role");
+  useNavHeading("User", "Manage Role");
 
   useEffect(() => {
     dispatch(getAllRolesThunk());
@@ -223,10 +223,14 @@ const ManageRolePage = () => {
 
   const handleEditClick = () => {
     if (isEditMode) {
+      // Create sorted copies to avoid mutating the original arrays
+      const sortedSelectedPermissions = [...selectedPermissions].sort();
+      const sortedOriginalPermissions = [...originalPermissions].sort();
+
       // Check for unsaved changes
       const changesUnsaved =
-        JSON.stringify(selectedPermissions.sort()) !==
-          JSON.stringify(originalPermissions.sort()) ||
+        JSON.stringify(sortedSelectedPermissions) !==
+          JSON.stringify(sortedOriginalPermissions) ||
         description !== (selectedRoleObj?.description || "");
 
       if (changesUnsaved) {

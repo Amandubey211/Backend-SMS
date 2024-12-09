@@ -15,6 +15,7 @@ import Spinner from "../../../../Components/Common/Spinner";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { FiLock, FiUserPlus } from "react-icons/fi";
+import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 const AllTeachers = () => {
   const { t } = useTranslation("admAccounts");
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -79,6 +80,7 @@ const AllTeachers = () => {
         return <div>{t("Select an action")}</div>;
     }
   };
+  useNavHeading("User", "Teachers");
 
   return (
     <Layout title={t("All Teachers")}>
