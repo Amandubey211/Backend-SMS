@@ -13,6 +13,7 @@ import Spinner from "../../../../Components/Common/Spinner";
 import { useTranslation } from "react-i18next";
 import CreateRole from "../../../../Components/Common/RBAC/CreateRole";
 import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
+import NoDataFound from "../../../../Components/Common/NoDataFound";
 
 const AllStaff = () => {
   const { t } = useTranslation("admAccounts");
@@ -143,20 +144,22 @@ const AllStaff = () => {
               </div>
 
               {/* Right Section */}
-              <div className="flex items-center gap-4">
-                <button
-                  onClick={() => (window.location.href = "/manage-roles")}
-                  className="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-md flex items-center gap-2 hover:opacity-90 transition duration-200"
-                >
-                  Manage Roles
-                </button>
-                <button
-                  onClick={() => setCreateRoleOpen(true)}
-                  className="px-6 py-2 border-2 border-transparent bg-gradient-to-r from-pink-500 to-purple-500 text-white font-medium rounded-full flex items-center gap-2 hover:shadow-lg transition duration-200"
-                >
-                  <span>Create Role</span>
-                </button>
-              </div>
+              {role === "admin" && (
+                <div className="flex items-center gap-4">
+                  <button
+                    onClick={() => (window.location.href = "/manage-roles")}
+                    className="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-md flex items-center gap-2 hover:opacity-90 transition duration-200"
+                  >
+                    Manage Roles
+                  </button>
+                  <button
+                    onClick={() => setCreateRoleOpen(true)}
+                    className="px-6 py-2 border-2 border-transparent bg-gradient-to-r from-pink-500 to-purple-500 text-white font-medium rounded-full flex items-center gap-2 hover:shadow-lg transition duration-200"
+                  >
+                    <span>Create Role</span>
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Staff List */}
@@ -172,10 +175,7 @@ const AllStaff = () => {
                 ))
               ) : (
                 <div>
-                  <div className="flex w-[80vw] text-gray-500 h-[90vh] items-center justify-center flex-col text-2xl">
-                    <GoAlertFill className="text-[5rem]" />
-                    {t("No Staff data Found")}
-                  </div>
+                  <NoDataFound />
                 </div>
               )}
             </div>

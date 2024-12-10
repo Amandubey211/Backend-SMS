@@ -1,3 +1,4 @@
+// Components/StaffLoginForm.js
 import React, { useState } from "react";
 import Logo from "../../../Components/Common/Logo";
 import { NavLink, useNavigate } from "react-router-dom";
@@ -72,7 +73,7 @@ const StaffLoginForm = () => {
       .then((result) => {
         // Success logic, check if there's a redirect path
         if (result.redirect) {
-          navigate(result.redirect);
+          navigate(result.redirect, { replace: true });
         }
       })
       .catch((error) => {

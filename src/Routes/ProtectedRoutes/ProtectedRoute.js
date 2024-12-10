@@ -1,38 +1,67 @@
+// Components/ProtectedRoute.js
 import React from "react";
 import { useSelector } from "react-redux";
 import { Navigate, useLocation } from "react-router-dom";
-import Cookies from "js-cookie";
 import { getIsAYA } from "../../Utils/academivYear";
+import { toast } from "react-hot-toast";
+
 const ProtectRoute = ({ Component, allowedRoles }) => {
   const isSignedIn = useSelector((store) => store.common.auth.isLoggedIn);
   const userRole = useSelector((store) => store.common.auth.role);
-  // console.log(isSignedIn, userRole, "-------");
+  const groupedRoles = useSelector((store) => store.common.auth.userRoles); // Access grouped roles from Redux
   const isAcademicYearActive = getIsAYA();
 
   const location = useLocation();
 
-  // If user is not signed in or role is not allowed, redirect to login page
-  if (!isSignedIn || (allowedRoles && !allowedRoles.includes(userRole))) {
+  // If user is not signed in, redirect to login page
+  if (!isSignedIn) {
     return <Navigate to="/" replace />;
   }
 
-  // If the user is admin and trying to access the academic year creation page
-  // but the academic year is already active, redirect to dashboard
-  if (
-    userRole === "admin" &&
-    isAcademicYearActive === true &&
-    location.pathname === "/create_academicYear"
-  ) {
-    return <Navigate to="/dashboard" replace />;
+  // If role is not allowed, redirect to login page
+  if (allowedRoles && userRole && !allowedRoles.includes(userRole)) {
+    toast.error("You do not have permission to access this page.");
+    return <Navigate to="/" replace />;
   }
 
-  // If academic year is not active and user is trying to access other pages, redirect to create academic year
+  // Admin-specific redirections
+  if (userRole === "admin") {
+    if (
+      isAcademicYearActive === true &&
+      location.pathname === "/create_academicYear"
+    ) {
+      return <Navigate to="/dashboard" replace />;
+    }
+
+    if (
+      isAcademicYearActive === false &&
+      location.pathname !== "/create_academicYear"
+    ) {
+      return <Navigate to="/create_academicYear" replace />;
+    }
+  }
+
+  // If accessing /select_role
+  if (location.pathname === "/select_role") {
+    if (userRole === "admin") {
+      toast.error("Admins do not need to select roles.");
+      return <Navigate to="/dashboard" replace />;
+    }
+    if (!groupedRoles || groupedRoles.length === 0) {
+      toast.error("No roles available to select.");
+      return <Navigate to="/dashboard" replace />;
+    }
+  }
+
+  // For users with multiple roles and no selected role, redirect to /select_role
   if (
-    userRole === "admin" &&
-    isAcademicYearActive === false &&
-    location.pathname !== "/create_academicYear"
+    groupedRoles &&
+    groupedRoles.length > 1 &&
+    !userRole &&
+    location.pathname !== "/select_role"
   ) {
-    return <Navigate to="/create_academicYear" replace />;
+    toast.error("Please select a role to continue.");
+    return <Navigate to="/select_role" replace />;
   }
 
   // Otherwise, render the protected component
