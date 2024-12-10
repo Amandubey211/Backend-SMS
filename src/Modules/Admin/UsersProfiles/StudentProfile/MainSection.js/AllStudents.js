@@ -18,6 +18,7 @@ import UpdateStudent from "./UpdateStudent";
 import EditStudent from "../../../Students/Components/EditStudent";
 import { useTranslation } from "react-i18next";
 import useNavHeading from "../../../../../Hooks/CommonHooks/useNavHeading ";
+import NoDataFound from "../../../../../Components/Common/NoDataFound";
 
 const AllStudents = () => {
   const { t } = useTranslation("admAccounts");
@@ -171,8 +172,7 @@ const AllStudents = () => {
               ))
             ) : (
               <div className="flex w-[80vw] text-gray-500 h-[90vh] items-center justify-center flex-col text-2xl">
-                <GoAlertFill className="text-[5rem]" />
-                {t("No Student Found")}
+                <NoDataFound />
               </div>
             )}
           </div>

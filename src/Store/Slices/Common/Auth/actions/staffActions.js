@@ -47,7 +47,7 @@ export const staffLogin = createAsyncThunk(
             mobileNumber: data.mobileNumber,
             position: data.position,
             employeeID: data.employeeID,
-            role: data.role,
+            role: data.role, // Primary role, can be used as fallback
             monthlySalary: data.monthlySalary,
             active: data.active,
             dateOfBirth: data.dateOfBirth,
@@ -55,8 +55,8 @@ export const staffLogin = createAsyncThunk(
           })
         );
 
-        // Dispatch role to authSlice
-        dispatch(setRole(data.role));
+        // Reset any existing role
+        dispatch(setRole(null));
 
         // Store grouped roles in the state
         if (data.groupedRoles && data.groupedRoles.length > 0) {
@@ -73,34 +73,42 @@ export const staffLogin = createAsyncThunk(
           return { redirect: "/select_branch" };
         }
 
-        // Handle staff roles with grouped roles
-        if (data.groupedRoles && data.groupedRoles.length > 0) {
+        // Handle staff roles with multiple grouped roles
+        if (data.groupedRoles && data.groupedRoles.length > 1) {
           return { redirect: "/select_role" };
         }
 
-        // For non-admin users without grouped roles, set academic year and redirect to dashboard
-        const formattedAcademicYear = formatAcademicYear(
-          data.academicYear.year,
-          data.academicYear.startDate,
-          data.academicYear.endDate
-        );
-        dispatch(
-          setAcademicYear([
-            {
-              ...formattedAcademicYear,
-              isActive: data.isAcademicYearActive,
-            },
-          ])
-        );
+        // If the user has exactly one grouped role, set it directly
+        if (data.groupedRoles && data.groupedRoles.length === 1) {
+          dispatch(setRole(data.groupedRoles[0].department));
+          return { redirect: "/dashboard" };
+        }
 
-        // Fetch academic year details
-        await dispatch(fetchAcademicYear());
-        const activeAcademicYear =
-          getState().common?.academicYear?.academicYears?.find(
-            (i) => i.isActive === true
+        // For non-admin users without grouped roles, set academic year and redirect to dashboard
+        if (data.academicYear) {
+          const formattedAcademicYear = formatAcademicYear(
+            data.academicYear.year,
+            data.academicYear.startDate,
+            data.academicYear.endDate
           );
-        if (activeAcademicYear) {
-          setLocalCookies("say", activeAcademicYear._id);
+          dispatch(
+            setAcademicYear([
+              {
+                ...formattedAcademicYear,
+                isActive: data.isAcademicYearActive,
+              },
+            ])
+          );
+
+          // Fetch academic year details
+          await dispatch(fetchAcademicYear());
+          const activeAcademicYear =
+            getState().common?.academicYear?.academicYears?.find(
+              (i) => i.isActive === true
+            );
+          if (activeAcademicYear) {
+            setLocalCookies("say", activeAcademicYear._id);
+          }
         }
 
         return { redirect: "/dashboard" };
@@ -117,6 +125,7 @@ export const staffLogin = createAsyncThunk(
     }
   }
 );
+
 // Staff Logout
 export const staffLogout = createAsyncThunk(
   "auth/staffLogout",

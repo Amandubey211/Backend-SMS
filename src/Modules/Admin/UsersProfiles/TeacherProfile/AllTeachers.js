@@ -16,6 +16,7 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { FiLock, FiUserPlus } from "react-icons/fi";
 import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
+import NoDataFound from "../../../../Components/Common/NoDataFound";
 const AllTeachers = () => {
   const { t } = useTranslation("admAccounts");
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -183,8 +184,7 @@ const AllTeachers = () => {
                 ))
               ) : (
                 <div className="flex w-[80vw] text-gray-500 h-[90vh] items-center justify-center flex-col text-2xl">
-                  <GoAlertFill className="text-[5rem]" />
-                  {t("No Teacher Found")}
+                  <NoDataFound />
                 </div>
               )}
             </div>

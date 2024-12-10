@@ -174,7 +174,7 @@ const AllStaff = () => {
                   />
                 ))
               ) : (
-                <div>
+                <div className="flex w-[80vw] text-gray-500 h-[90vh] items-center justify-center flex-col text-2xl">
                   <NoDataFound />
                 </div>
               )}

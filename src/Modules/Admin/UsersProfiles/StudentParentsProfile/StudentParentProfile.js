@@ -14,6 +14,7 @@ import { fetchAllParent } from "../../../../Store/Slices/Admin/Users/Parents/par
 import { fetchAllStudents } from "../../../../Store/Slices/Admin/Users/Students/student.action";
 import { useTranslation } from "react-i18next";
 import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
+import NoDataFound from "../../../../Components/Common/NoDataFound";
 
 const uniqueFilterOptions = (data, key) => {
   return [
@@ -226,9 +227,8 @@ const StudentParentProfile = () => {
                           className="text-center text-2xl py-10 text-gray-400"
                           colSpan={6}
                         >
-                          <div className="flex items-center justify-center flex-col text-2xl">
-                            <GoAlertFill className="text-[5rem]" />
-                            {t("No Parent Data Found")}
+                          <div className="flex w-[80vw] text-gray-500 h-[90vh] items-center justify-center flex-col text-2xl">
+                            <NoDataFound />
                           </div>
                         </td>
                       </tr>

@@ -17,6 +17,7 @@ import Spinner from "../../../../Components/Common/Spinner";
 
 import { fetchAllStaff } from "../../../../Store/Slices/Admin/Users/Staff/staff.action";
 import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
+import NoDataFound from "../../../../Components/Common/NoDataFound";
 
 const AllAccountants = () => {
   const { t } = useTranslation("admAccounts");
@@ -193,8 +194,7 @@ const AllAccountants = () => {
                 ))
               ) : (
                 <div className="flex w-[80vw] text-gray-500 h-[90vh] items-center justify-center flex-col text-2xl">
-                  <GoAlertFill className="text-[5rem]" />
-                  {t("No Accountant Found")}
+                  <NoDataFound />
                 </div>
               )}
             </div>
