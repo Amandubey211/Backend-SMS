@@ -17,6 +17,7 @@ import Spinner from "../../../../Components/Common/Spinner";
 
 import { fetchAllStaff } from "../../../../Store/Slices/Admin/Users/Staff/staff.action";
 import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
+import NoDataFound from "../../../../Components/Common/NoDataFound";
 
 const AllLibrarian = () => {
   const { t } = useTranslation("admAccounts");
@@ -191,8 +192,7 @@ const AllLibrarian = () => {
                 ))
               ) : (
                 <div className="flex w-[80vw] text-gray-500 h-[90vh] items-center justify-center flex-col text-2xl">
-                  <GoAlertFill className="text-[5rem]" />
-                  {t("No Librarian Found")}
+                  <NoDataFound />
                 </div>
               )}
             </div>
