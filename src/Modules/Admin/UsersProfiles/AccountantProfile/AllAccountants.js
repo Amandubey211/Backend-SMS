@@ -1,58 +1,88 @@
 // AllAccountants.js
-import React, { useEffect, useState, useRef } from "react";
-import { FiLock, FiUserPlus } from "react-icons/fi";
-import { GoAlertFill, GoPlus } from "react-icons/go";
+import React, { useEffect, useState } from "react";
+import { FiUserPlus } from "react-icons/fi";
+import { GoPlus } from "react-icons/go";
 import { useDispatch, useSelector } from "react-redux";
-import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 import Layout from "../../../../Components/Common/Layout";
 import DashLayout from "../../../../Components/Admin/AdminDashLayout";
 import SidebarSlide from "../../../../Components/Common/SidebarSlide";
-import CreateRole from "../../../../Components/Common/RBAC/CreateRole";
-import AddUser from "../StaffProfile/AddUser";
-import ProfileCard from "../SubComponents/ProfileCard";
 import ViewAccountant from "./ViewAccountant";
+import ProfileCard from "../SubComponents/ProfileCard";
+import AddUser from "../StaffProfile/AddUser";
 import Spinner from "../../../../Components/Common/Spinner";
+import CreateRole from "../../../../Components/Common/RBAC/CreateRole";
+import NoDataFound from "../../../../Components/Common/NoDataFound";
 
 import { fetchAllStaff } from "../../../../Store/Slices/Admin/Users/Staff/staff.action";
 import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
-import NoDataFound from "../../../../Components/Common/NoDataFound";
+import Header from "../Component/Header";
 
 const AllAccountants = () => {
   const { t } = useTranslation("admAccounts");
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  // State Variables
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarContent, setSidebarContent] = useState(null);
   const [selectedAccountant, setSelectedAccountant] = useState(null);
   const [accountantData, setAccountantData] = useState(null);
-  const [sortDropdown, setSortDropdown] = useState(false);
-  const dropdownRef = useRef(null);
+  const [sortOption, setSortOption] = useState(null); // "by_date" or "by_roles"
+  const [filterOptions, setFilterOptions] = useState([]); // Array of filter criteria
+  const [sortedAccountants, setSortedAccountants] = useState([]);
 
+  // Redux Selectors
   const { accountant, loading: accountantLoading } = useSelector(
     (store) => store.admin.all_staff
   );
-  const { role } = useSelector((store) => store.common.auth);
+  const role = useSelector((store) => store.common.auth.role);
+  const { roles: AllRoles } = useSelector((state) => state.admin.rbac); // Assuming RBAC is set up similarly
 
+  // Fetch Accountants and Roles on Mount
   useEffect(() => {
     dispatch(fetchAllStaff());
+    // If roles are needed for filtering, ensure they are fetched here
   }, [dispatch]);
 
-  // Handle dropdown close when clicking outside
+  // Initialize sortedAccountants with accountant data
   useEffect(() => {
-    const handleOutsideClick = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setSortDropdown(false);
-      }
-    };
-    document.addEventListener("mousedown", handleOutsideClick);
-    return () => {
-      document.removeEventListener("mousedown", handleOutsideClick);
-    };
-  }, []);
+    setSortedAccountants(accountant);
+  }, [accountant]);
 
+  // Apply Sorting and Filtering
+  useEffect(() => {
+    let filtered = [...accountant];
+
+    // Apply Role Filtering
+    if (filterOptions.length > 0) {
+      filtered = filtered.filter((member) =>
+        member.position.some((pos) => filterOptions.includes(pos))
+      );
+    }
+
+    // Apply Sorting
+    if (sortOption) {
+      switch (sortOption) {
+        case "by_date":
+          filtered.sort(
+            (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+          );
+          break;
+        case "by_roles":
+          filtered.sort((a, b) => a.position.length - b.position.length);
+          break;
+        default:
+          break;
+      }
+    }
+
+    setSortedAccountants(filtered);
+  }, [sortOption, filterOptions, accountant]);
+
+  // Handlers
   const handleSidebarOpen = (content, data = null) => {
     setSidebarContent(content);
     setSelectedAccountant(data);
@@ -62,21 +92,62 @@ const AllAccountants = () => {
 
   const handleSidebarClose = () => setSidebarOpen(false);
 
-  const editUser = (event, accountant) => {
+  const editUser = (event, data) => {
     event.stopPropagation();
-    handleSidebarOpen("editAccountant", accountant);
+    handleSidebarOpen("editAccountant", data);
   };
 
-  const handleAccountantClick = (accountant) => {
-    handleSidebarOpen("viewAccountant", accountant);
+  const handleAccountantClick = (accountantMember) => {
+    handleSidebarOpen("viewAccountant", accountantMember);
   };
 
+  const handleAddAccountantClick = () => {
+    handleSidebarOpen("addAccountant");
+    setAccountantData(null);
+  };
+
+  // Extract Accountant Roles from AllRoles
+  const accountantRoles =
+    AllRoles?.filter(
+      (dept) => dept.department.toLowerCase() === "accountant"
+    )?.flatMap((dept) => dept.roles) || [];
+
+  // Define Sort and Filter Options
+  const sortOptions = [
+    { label: "By Date", value: "by_date" },
+    { label: "By Roles", value: "by_roles" },
+  ];
+
+  const filterOptionsList = accountantRoles.map((roleItem) => ({
+    label: roleItem.name,
+    value: roleItem.name,
+  }));
+
+  // Handler for applying sort and filter
+  const handleSortFilterApply = ({ sortOption, filterOptions }) => {
+    setSortOption(sortOption);
+    setFilterOptions(filterOptions);
+  };
+
+  // Handler for navigating to manage roles
+  const navigateToManageRoles = () => {
+    navigate("/users/manage-roles");
+  };
+
+  // Handler for creating a new role
+  const handleCreateRole = () => {
+    handleSidebarOpen("createRole");
+  };
+
+  useNavHeading("User", "Accountants"); // Ensure correct import and usage
+
+  // Define the renderSidebarContent function
   const renderSidebarContent = () => {
     switch (sidebarContent) {
       case "viewAccountant":
         return <ViewAccountant accountant={selectedAccountant} />;
       case "addAccountant":
-        return <AddUser role="accountant" />;
+        return <AddUser role="accountant" data={accountantData} />;
       case "editAccountant":
         return <AddUser role="accountant" data={accountantData} />;
       case "createRole":
@@ -87,7 +158,6 @@ const AllAccountants = () => {
         return <div>{t("Select an action")}</div>;
     }
   };
-  useNavHeading("User", "Accountants");
 
   return (
     <Layout title={t("All Accountants")}>
@@ -98,93 +168,25 @@ const AllAccountants = () => {
           </div>
         ) : (
           <div className="p-4 relative">
-            {/* Header Section */}
-            <div className="flex justify-between items-center mb-4 border-b-2 h-20">
-              {/* Left Section */}
-              <div className="flex items-center gap-4">
-                <h2 className="text-xl font-semibold text-gray-800 flex items-center gap-2">
-                  {t("All Accountants")}
-                  {/* Gradient Circle Badge */}
-                  <span className="inline-flex items-center justify-center">
-                    <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 p-[2px]">
-                      <span className="flex items-center justify-center w-full h-full bg-pink-50 rounded-full text-sm font-medium text-pink-600">
-                        {accountant?.length}
-                      </span>
-                    </span>
-                  </span>
-                </h2>
-
-                {/* Sort Button with Gradient Border */}
-                <div className="relative" ref={dropdownRef}>
-                  <div className="bg-gradient-to-r from-pink-500 to-purple-500 p-[2px] rounded-md">
-                    <button
-                      onClick={() => setSortDropdown(!sortDropdown)}
-                      className="inline-flex items-center gap-2 px-4 py-1 bg-white rounded-md text-gray-800 font-medium"
-                    >
-                      <span>{t("Sort")}</span>
-                      {/* Sort Icon */}
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5 text-gray-800"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M4 6h16M4 12h8m-8 6h16"
-                        />
-                      </svg>
-                    </button>
-                  </div>
-
-                  {sortDropdown && (
-                    <div className="absolute mt-2 w-40 bg-white border border-gray-300 rounded-lg shadow-lg z-50">
-                      <button className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100">
-                        {t("By Date")}
-                      </button>
-                      <button className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100">
-                        {t("By Roles")}
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Right Section */}
-              {role === "admin" && (
-                <div className="flex items-center gap-4">
-                  <button
-                    onClick={() => navigate("/users/manage-roles")}
-                    className="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-md inline-flex items-center gap-2 hover:opacity-90 transition duration-200"
-                  >
-                    <FiLock className="text-white" />
-                    {t("Manage Roles")}
-                  </button>
-
-                  <button
-                    onClick={() => handleSidebarOpen("createRole")}
-                    className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
-                  >
-                    <span className="text-gray-800 font-medium">
-                      {t("Create Role")}
-                    </span>
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center text-white">
-                      <FiUserPlus size={16} />
-                    </div>
-                  </button>
-                </div>
-              )}
-            </div>
+            {/* Reusable Header Component */}
+            <Header
+              title={t("All Accountants")}
+              count={accountant?.length || 0}
+              sortOptions={sortOptions}
+              filterOptions={filterOptionsList}
+              department="Accountants"
+              onSortFilterApply={handleSortFilterApply}
+              navigateToManageRoles={navigateToManageRoles}
+              handleCreateRole={handleCreateRole}
+              isAdmin={role === "admin"}
+            />
 
             {/* Accountant List */}
             <div className="flex flex-wrap -mx-2">
-              {accountant?.length > 0 ? (
-                accountant.map((acc, index) => (
+              {sortedAccountants?.length > 0 ? (
+                sortedAccountants.map((acc) => (
                   <ProfileCard
-                    key={index}
+                    key={acc._id} // Use a unique identifier
                     profile={acc}
                     onClick={() => handleAccountantClick(acc)}
                     editUser={
@@ -193,7 +195,7 @@ const AllAccountants = () => {
                   />
                 ))
               ) : (
-                <div className="flex w-[80vw] text-gray-500 h-[90vh] items-center justify-center flex-col text-2xl">
+                <div className="flex w-full text-gray-500 h-[90vh] items-center justify-center flex-col text-2xl">
                   <NoDataFound />
                 </div>
               )}
@@ -202,41 +204,42 @@ const AllAccountants = () => {
             {/* Floating Action Button */}
             {role === "admin" && (
               <button
-                onClick={() => handleSidebarOpen("addAccountant")}
+                onClick={handleAddAccountantClick}
                 className="fixed bottom-8 right-8 bg-gradient-to-r from-pink-500 to-purple-500 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:opacity-90 transition duration-200"
+                aria-label="Add New Accountant"
               >
                 <GoPlus className="text-2xl" />
               </button>
             )}
           </div>
         )}
-
-        {/* Sidebar */}
-        <SidebarSlide
-          key={sidebarContent}
-          isOpen={isSidebarOpen}
-          onClose={handleSidebarClose}
-          title={
-            <span className="bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent bg-clip-text">
-              {sidebarContent === "viewAccountant"
-                ? t("Quick View of Accountant")
-                : sidebarContent === "createRole"
-                ? t("Create New Role")
-                : t("Add/Edit Accountant")}
-            </span>
-          }
-          width={
-            sidebarContent === "viewAccountant"
-              ? "30%"
-              : sidebarContent === "createRole"
-              ? "60%"
-              : "75%"
-          }
-          height="100%"
-        >
-          {renderSidebarContent()}
-        </SidebarSlide>
       </DashLayout>
+
+      {/* Sidebar */}
+      <SidebarSlide
+        key={sidebarContent} // Use the key to force re-render
+        isOpen={isSidebarOpen}
+        onClose={handleSidebarClose}
+        title={
+          <span className="bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent bg-clip-text">
+            {sidebarContent === "viewAccountant"
+              ? t("Quick View of Accountant")
+              : sidebarContent === "createRole"
+              ? t("Create New Role")
+              : t("Add/Edit Accountant")}
+          </span>
+        }
+        width={
+          sidebarContent === "viewAccountant"
+            ? "30%"
+            : sidebarContent === "createRole"
+            ? "60%"
+            : "75%"
+        }
+        height="100%"
+      >
+        {renderSidebarContent()}
+      </SidebarSlide>
     </Layout>
   );
 };

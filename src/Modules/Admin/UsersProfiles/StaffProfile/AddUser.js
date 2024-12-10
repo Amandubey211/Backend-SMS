@@ -438,7 +438,6 @@ const AddUser = ({ role, data }) => {
                 value={teacherData.bloodGroup}
                 onChange={handleInputChange}
                 className="block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
-                required
               >
                 <option value="">Select Blood Group</option>
                 {bloodGroupOptions.map((option) => (
