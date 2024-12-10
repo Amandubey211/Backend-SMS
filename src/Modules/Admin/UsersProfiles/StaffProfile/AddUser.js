@@ -1,3 +1,5 @@
+// Components/Admin/Users/Staff/AddUser.js
+
 import React, { useEffect, useState } from "react";
 import ImageUpload from "../../Addmission/Components/ImageUpload";
 import FormInput from "../../Accounting/subClass/component/FormInput";
@@ -16,6 +18,7 @@ import { motion } from "framer-motion";
 import { toast } from "react-hot-toast";
 
 const AddUser = ({ role, data }) => {
+  console.log(data, "jjjjjjjj");
   const dispatch = useDispatch();
   const { roles } = useSelector((store) => store.admin.rbac);
   const { loading, error } = useSelector((store) => store.admin.all_staff);
@@ -55,6 +58,7 @@ const AddUser = ({ role, data }) => {
 
   useEffect(() => {
     if (data) {
+      // Populate teacher data
       setTeacherData({
         firstName: data.firstName || "",
         lastName: data.lastName || "",
@@ -72,6 +76,7 @@ const AddUser = ({ role, data }) => {
         active: data.active ?? true,
       });
 
+      // Populate address data
       setAddress({
         street: data.address?.street || "",
         city: data.address?.city || "",
@@ -80,13 +85,14 @@ const AddUser = ({ role, data }) => {
         country: data.address?.country || "",
       });
 
-      // Set imagePreview from data.profile
+      // Set image preview from data.profile
       setImagePreview(data.profile || null);
 
-      const existingRoleNames = Array.isArray(data.role)
-        ? data.role
-        : data.role
-        ? [data.role]
+      // Map data.position (array of role names) to role objects from the store
+      const existingRoleNames = Array.isArray(data.position)
+        ? data.position
+        : data.position
+        ? [data.position]
         : [];
 
       const initialSelectedRoles =
@@ -101,10 +107,8 @@ const AddUser = ({ role, data }) => {
 
       setSelectedRoles(initialSelectedRoles);
 
-      const permissions = initialSelectedRoles.flatMap(
-        (roleItem) => roleItem.permission
-      );
-
+      // Set selectedRolePermissions based on data.permission array
+      const permissions = data.permission || [];
       setSelectedRolePermissions([...new Set(permissions)]);
     } else {
       resetForm();
@@ -355,7 +359,7 @@ const AddUser = ({ role, data }) => {
           </div>
 
           {/* Personal Details */}
-          <div className="col-span-1  space-y-6">
+          <div className="col-span-1 space-y-6">
             <FormInput
               id="firstName"
               label="First Name"
@@ -600,7 +604,11 @@ const AddUser = ({ role, data }) => {
                           key={roleItem.id}
                           type="button"
                           onClick={() => handleRoleSelect(roleItem)}
-                          className="block w-full text-left px-4 py-3 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none text-base"
+                          className={`block w-full text-left px-4 py-3 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none text-base ${
+                            selectedRoles.some((r) => r.id === roleItem.id)
+                              ? "bg-gray-200"
+                              : ""
+                          }`}
                           role="option"
                           aria-selected={selectedRoles.some(
                             (r) => r.id === roleItem.id
