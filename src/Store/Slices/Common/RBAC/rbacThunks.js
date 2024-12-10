@@ -125,3 +125,24 @@ export const getPermissionsThunk = createAsyncThunk(
     }
   }
 );
+
+export const getMyRolePermissionsThunk = createAsyncThunk(
+  "rbac/getMyRolePermissions",
+  async (_, { rejectWithValue, dispatch }) => {
+    try {
+      const say = getAY(); // Retrieve the 'say' parameter
+      dispatch(setShowError(false)); // Reset any previous error states
+
+      // Make a GET request to fetch the user's role permissions
+      const response = await getData(`/admin/role/mypermission?say=${say}`);
+
+      // Optional: You can process the response here if needed before returning
+      // For example, you might want to normalize the data or handle specific cases
+
+      return response; // Return the successful response data
+    } catch (error) {
+      // Handle any errors that occur during the request
+      return handleError(error, dispatch, rejectWithValue);
+    }
+  }
+);

@@ -4,7 +4,6 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import {
   setAcademicYear,
   resetState as resetAuthState,
-  setToken,
   setRole,
   setUserRoles,
 } from "../reducers/authSlice"; // Updated to handle token
@@ -57,6 +56,36 @@ export const staffLogin = createAsyncThunk(
 
         // Reset any existing role
         dispatch(setRole(null));
+        if (data.academicYear) {
+          const formattedAcademicYear = formatAcademicYear(
+            data.academicYear.year,
+            data.academicYear.startDate,
+            data.academicYear.endDate
+          );
+          dispatch(
+            setAcademicYear([
+              {
+                ...formattedAcademicYear,
+                isActive: data.isAcademicYearActive,
+              },
+            ])
+          );
+          await dispatch(fetchAcademicYear());
+          const activeAcademicYear =
+            getState().common?.academicYear?.academicYears?.find(
+              (i) => i.isActive === true
+            );
+          if (activeAcademicYear) {
+            console.log(
+              "activeAcademicYear",
+              activeAcademicYear,
+              activeAcademicYear._id
+            );
+            setLocalCookies("say", activeAcademicYear._id);
+          }
+
+          // Fetch academic year details
+        }
 
         // Store grouped roles in the state
         if (data.groupedRoles && data.groupedRoles.length > 0) {
@@ -70,6 +99,7 @@ export const staffLogin = createAsyncThunk(
             setLocalCookies("isAcademicYearActive", data.isAcademicYearActive);
             return { redirect: "/create_academicYear" };
           }
+          dispatch(setRole(data.role));
           return { redirect: "/select_branch" };
         }
 
@@ -85,31 +115,6 @@ export const staffLogin = createAsyncThunk(
         }
 
         // For non-admin users without grouped roles, set academic year and redirect to dashboard
-        if (data.academicYear) {
-          const formattedAcademicYear = formatAcademicYear(
-            data.academicYear.year,
-            data.academicYear.startDate,
-            data.academicYear.endDate
-          );
-          dispatch(
-            setAcademicYear([
-              {
-                ...formattedAcademicYear,
-                isActive: data.isAcademicYearActive,
-              },
-            ])
-          );
-
-          // Fetch academic year details
-          await dispatch(fetchAcademicYear());
-          const activeAcademicYear =
-            getState().common?.academicYear?.academicYears?.find(
-              (i) => i.isActive === true
-            );
-          if (activeAcademicYear) {
-            setLocalCookies("say", activeAcademicYear._id);
-          }
-        }
 
         return { redirect: "/dashboard" };
       } else {

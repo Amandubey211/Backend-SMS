@@ -21,12 +21,12 @@ const RoleSelector = () => {
   const navigate = useNavigate();
   const groupedRoles = useSelector((store) => store.common.auth.userRoles);
 
-  useEffect(() => {
-    if (!groupedRoles || groupedRoles.length === 0) {
-      toast.error("No roles available to select.");
-      navigate("/dashboard"); // Redirect if no grouped roles are available
-    }
-  }, [groupedRoles, navigate]);
+  // useEffect(() => {
+  //   if (!groupedRoles || groupedRoles.length === 0) {
+  //     toast.error("No roles available to select.");
+  //     navigate("/dashboard"); // Redirect if no grouped roles are available
+  //   }
+  // }, [groupedRoles, navigate]);
 
   const handleLogout = () => {
     dispatch(staffLogout());
