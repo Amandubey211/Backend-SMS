@@ -1,23 +1,69 @@
-import React, { useState } from "react";
+// Components/RoleSelector.js
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { useDispatch } from "react-redux";
-import { staffLogout } from "../../../Store/Slices/Common/Auth/Index";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { staffLogout } from "../../../Store/Slices/Common/Auth/actions/staffActions"; // Ensure correct import
+
 import Layout from "../Layout";
+import toast from "react-hot-toast"; // Import toast for notifications
 
 // SVG assets
 import library from "../../../Assets/RBAC/library.svg";
 import Staff from "../../../Assets/RBAC/Staff.svg";
 import finance from "../../../Assets/RBAC/finance.svg";
 import teacher from "../../../Assets/RBAC/teacher.svg";
+import { setRole } from "../../../Store/Slices/Common/Auth/reducers/authSlice";
 
 const RoleSelector = () => {
   const [selectedRole, setSelectedRole] = useState(null); // Track the selected role
   const dispatch = useDispatch(); // Redux dispatch for actions
+  const navigate = useNavigate();
+  const groupedRoles = useSelector((store) => store.common.auth.userRoles);
 
-  // Handle logout functionality
+  useEffect(() => {
+    if (!groupedRoles || groupedRoles.length === 0) {
+      toast.error("No roles available to select.");
+      navigate("/dashboard"); // Redirect if no grouped roles are available
+    }
+  }, [groupedRoles, navigate]);
+
   const handleLogout = () => {
-    dispatch(staffLogout()); // Dispatch the logout thunk
+    dispatch(staffLogout());
+    navigate("/"); // Redirect to login after logout
   };
+
+  const handleConfirm = () => {
+    if (selectedRole) {
+      // Dispatch the selected role to Redux
+      dispatch(setRole(selectedRole));
+      navigate("/dashboard", { replace: true });
+    } else {
+      toast.error("Please select a role before proceeding.");
+    }
+  };
+
+  const rolesWithIcons = groupedRoles.map((group) => {
+    // Assign icons based on department
+    let icon;
+    switch (group.department.toLowerCase()) {
+      case "librarian":
+        icon = library;
+        break;
+      case "teacher":
+        icon = teacher;
+        break;
+      case "finance":
+        icon = finance;
+        break;
+      case "staff":
+        icon = Staff;
+        break;
+      default:
+        icon = Staff; // default icon
+    }
+    return { ...group, icon };
+  });
 
   return (
     <Layout title="Select Role | Student Diwan">
@@ -29,7 +75,7 @@ const RoleSelector = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
         >
-          Choose your Department and Roles.
+          Choose your Department and Role
         </motion.h1>
 
         {/* Roles Grid */}
@@ -41,23 +87,23 @@ const RoleSelector = () => {
           role="list"
           aria-label="Available Roles"
         >
-          {roles.map((role) => (
+          {rolesWithIcons.map((role) => (
             <motion.div
-              key={role.id}
-              onClick={() => setSelectedRole(role.id)} // Set active role on click
+              key={role.department}
+              onClick={() => setSelectedRole(role.department)} // Set active role on click
               whileHover={{
                 boxShadow: "0px 8px 20px rgba(0, 0, 0, 0.1)", // Keep shadow on hover
               }}
               className={`flex flex-col items-center justify-center p-4 rounded-lg transition duration-300 cursor-pointer focus:outline-none focus:ring-4 focus:ring-purple-300 ${
-                selectedRole === role.id ? "bg-pink-50" : "bg-white" // Add active background if selected
+                selectedRole === role.department ? "bg-pink-50" : "bg-white"
               }`}
               tabIndex={0}
               role="listitem"
-              aria-label={`Select ${role.label} role`}
+              aria-label={`Select ${role.department} role`}
               style={{
                 border: "2px solid transparent", // Consistent border for all cards
                 background:
-                  selectedRole === role.id
+                  selectedRole === role.department
                     ? "linear-gradient(white, #FFC0CB) padding-box, linear-gradient(to right, #ff007f, #ff0080) border-box" // Dark pink and white gradient for active
                     : "linear-gradient(white, white) padding-box, linear-gradient(to right, #ff0080, #7928ca) border-box", // Default gradient for inactive
               }}
@@ -65,13 +111,18 @@ const RoleSelector = () => {
               <div className="w-16 h-16 mb-4" aria-hidden="true">
                 <img
                   src={role.icon}
-                  alt={`${role.label} icon`}
+                  alt={`${role.department} icon`}
                   className="w-full h-full object-contain"
                 />
               </div>
               <span className="text-lg font-medium text-gray-700">
-                {role.label}
+                {role.department}
               </span>
+              <ul className="text-sm text-gray-500">
+                {role.role.map((r, idx) => (
+                  <li key={idx}>{r}</li>
+                ))}
+              </ul>
             </motion.div>
           ))}
         </motion.div>
@@ -87,7 +138,7 @@ const RoleSelector = () => {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className="w-40 px-6 py-2 text-purple-700 border border-purple-500 rounded-md hover:bg-purple-50 shadow transition focus:outline-none focus:ring-4 focus:ring-purple-300"
-            onClick={handleLogout} // Dispatch the logout thunk
+            onClick={handleLogout}
             aria-label="Log out"
           >
             Log Out
@@ -96,7 +147,7 @@ const RoleSelector = () => {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className="w-40 px-6 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-md shadow hover:opacity-90 transition focus:outline-none focus:ring-4 focus:ring-purple-300"
-            onClick={() => alert("Done clicked")}
+            onClick={handleConfirm}
             aria-label="Confirm role selection"
           >
             Done
@@ -106,13 +157,5 @@ const RoleSelector = () => {
     </Layout>
   );
 };
-
-// Roles array with icons and labels
-const roles = [
-  { id: 1, label: "Teacher", icon: teacher },
-  { id: 2, label: "Finance", icon: finance },
-  { id: 3, label: "Librarian", icon: library },
-  { id: 4, label: "Staff", icon: Staff },
-];
 
 export default RoleSelector;

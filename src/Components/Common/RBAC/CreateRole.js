@@ -89,6 +89,7 @@ const CreateRole = ({ onClose, department }) => {
         createRoleThunk({
           name: trimmedName,
           description: trimmedDesc,
+          department: department.toLowerCase().toString(),
           permission: selectedPermissions,
         })
       ).unwrap();
