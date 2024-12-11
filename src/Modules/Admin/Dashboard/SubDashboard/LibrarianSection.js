@@ -3,6 +3,7 @@ import Library from "../LibraryModule/Library";
 import NoticeBoard from "../NoticeModule/NoticeBoard";
 import Events from "../EventModule/Event";
 import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../config/permission";
 
 const LibrarianSection = () => {
   return (
@@ -14,7 +15,7 @@ const LibrarianSection = () => {
 
         {/* Notice Board Section */}
         <div className="w-full md:w-1/2 p-4 flex items-center justify-center h-full">
-          <ProtectedSection requiredPermission="addBodok">
+          <ProtectedSection requiredPermission={PERMISSIONS.ADD_BOOK}>
             <div className="w-full h-full">
               <NoticeBoard descriptionLength={140} />
             </div>
@@ -23,7 +24,7 @@ const LibrarianSection = () => {
 
         {/* Events Section */}
         <div className="w-full md:w-1/2 p-4 flex items-center justify-center h-full">
-          <ProtectedSection requiredPermission="addBodok">
+          <ProtectedSection requiredPermission={PERMISSIONS.ADD_BOOK}>
             <div className="w-full h-full">
               <Events />
             </div>
@@ -35,7 +36,7 @@ const LibrarianSection = () => {
       <div className="flex flex-wrap items-start justify-center border-y h-[35rem]">
         {/* Library Section */}
         <div className="w-full p-4 h-full flex items-center justify-center">
-          <ProtectedSection requiredPermission="manageLibrary">
+          <ProtectedSection requiredPermission={PERMISSIONS.MANAGE_LIBRARY}>
             <div className="w-full h-full">
               <Library />
             </div>
