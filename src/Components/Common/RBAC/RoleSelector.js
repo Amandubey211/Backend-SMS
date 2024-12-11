@@ -1,4 +1,4 @@
-// Components/RoleSelector.js
+// src/components/RoleSelector.js
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
@@ -14,6 +14,7 @@ import Staff from "../../../Assets/RBAC/Staff.svg";
 import finance from "../../../Assets/RBAC/finance.svg";
 import teacher from "../../../Assets/RBAC/teacher.svg";
 import { setRole } from "../../../Store/Slices/Common/Auth/reducers/authSlice";
+import { getMyRolePermissionsThunk } from "../../../Store/Slices/Common/RBAC/rbacThunks"; // Import permissions thunk
 
 const RoleSelector = () => {
   const [selectedRole, setSelectedRole] = useState(null); // Track the selected role
@@ -21,22 +22,26 @@ const RoleSelector = () => {
   const navigate = useNavigate();
   const groupedRoles = useSelector((store) => store.common.auth.userRoles);
 
-  // useEffect(() => {
-  //   if (!groupedRoles || groupedRoles.length === 0) {
-  //     toast.error("No roles available to select.");
-  //     navigate("/dashboard"); // Redirect if no grouped roles are available
-  //   }
-  // }, [groupedRoles, navigate]);
+  useEffect(() => {
+    if (!groupedRoles || groupedRoles.length === 0) {
+      toast.error("No roles available to select.");
+      navigate("/dashboard"); // Redirect if no grouped roles are available
+    }
+  }, [groupedRoles, navigate]);
 
   const handleLogout = () => {
     dispatch(staffLogout());
     navigate("/"); // Redirect to login after logout
   };
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     if (selectedRole) {
       // Dispatch the selected role to Redux
       dispatch(setRole(selectedRole));
+
+      // Fetch permissions for the selected role
+      await dispatch(getMyRolePermissionsThunk());
+
       navigate("/dashboard", { replace: true });
     } else {
       toast.error("Please select a role before proceeding.");
@@ -115,10 +120,10 @@ const RoleSelector = () => {
                   className="w-full h-full object-contain"
                 />
               </div>
-              <span className="text-lg font-medium text-gray-700">
+              <span className="text-lg font-medium capitalize text-gray-700">
                 {role.department}
               </span>
-              <ul className="text-sm text-gray-500">
+              <ul className="text-sm text-gray-500 capitalize">
                 {role.role.map((r, idx) => (
                   <li key={idx}>{r}</li>
                 ))}

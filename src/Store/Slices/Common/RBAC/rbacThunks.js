@@ -5,9 +5,10 @@ import {
   getData,
   putData,
 } from "../../../../services/apiEndpoints";
-import { setShowError } from "../Alerts/alertsSlice";
+import { setErrorMsg, setShowError } from "../Alerts/alertsSlice";
 import { getAY } from "../../../../Utils/academivYear";
 import { handleError } from "../Alerts/errorhandling.action";
+import { setPermissions } from "../Auth/reducers/authSlice";
 
 export const createRoleThunk = createAsyncThunk(
   "rbac/createRole",
@@ -126,22 +127,62 @@ export const getPermissionsThunk = createAsyncThunk(
   }
 );
 
+// Thunk to fetch and normalize permissions
 export const getMyRolePermissionsThunk = createAsyncThunk(
   "rbac/getMyRolePermissions",
-  async (_, { rejectWithValue, dispatch }) => {
+  async (_, { rejectWithValue, dispatch, getState }) => {
     try {
       const say = getAY(); // Retrieve the 'say' parameter
       dispatch(setShowError(false)); // Reset any previous error states
 
       // Make a GET request to fetch the user's role permissions
-      const response = await getData(`/admin/role/mypermission?say=${say}`);
+      const response = await getData(`/admin/mypermission?say=${say}`);
 
-      // Optional: You can process the response here if needed before returning
-      // For example, you might want to normalize the data or handle specific cases
+      if (!response || !response.success) {
+        const errorMessage =
+          response?.message || "Failed to fetch permissions.";
+        dispatch(setErrorMsg(errorMessage));
+        return rejectWithValue(errorMessage);
+      }
 
-      return response; // Return the successful response data
+      const data = response.data;
+      const role = getState().common.auth.role;
+
+      if (!role) {
+        const errorMessage = "User role is not defined.";
+        dispatch(setErrorMsg(errorMessage));
+        return rejectWithValue(errorMessage);
+      }
+
+      // Find the permissions for the user's department
+      const departmentPermission = data.find(
+        (dept) => dept.department.toLowerCase() === role.toLowerCase()
+      );
+
+      if (!departmentPermission) {
+        const errorMessage = "No permissions found for your department.";
+        dispatch(setErrorMsg(errorMessage));
+        return rejectWithValue(errorMessage);
+      }
+
+      // Extract route names into a Set for uniqueness
+      const permissionsSet = new Set();
+      departmentPermission.groups.forEach((group) => {
+        group.routes.forEach((route) => {
+          permissionsSet.add(route.name);
+        });
+      });
+
+      const permissions = Array.from(permissionsSet);
+
+      // Dispatch the normalized permissions to the AuthSlice
+      dispatch(setPermissions(permissions));
+
+      console.log("Permissions fetched and set:", permissions);
+
+      return permissions;
     } catch (error) {
-      // Handle any errors that occur during the request
+      console.error("Error in getMyRolePermissionsThunk:", error);
       return handleError(error, dispatch, rejectWithValue);
     }
   }
