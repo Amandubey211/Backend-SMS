@@ -8,6 +8,7 @@ import EditTotalRevenueSidebar from "./Components/EditTotalRevenueSidebar";
 import ExportModal from "./Components/ExportModal";
 import FilterRevenueModal from "./Components/FilterRevenueModal";
 import SortRevenueModal from "./Components/SortRevenueModal";
+import BulkEntriesModal from "./Components/BulkEntriesModal";
 
 const TotalRevenueList = () => {
     const [searchText, setSearchText] = useState("");
@@ -16,6 +17,7 @@ const TotalRevenueList = () => {
     const [isExportModalVisible, setIsExportModalVisible] = useState(false);
     const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
     const [isSortModalVisible, setIsSortModalVisible] = useState(false);
+    const [isBulkEntriesModalVisible, setIsBulkEntriesModalVisible] = useState(false); // Bulk Modal State
 
     const navigate = useNavigate();
 
@@ -87,7 +89,10 @@ const TotalRevenueList = () => {
         <AdminLayout>
             <div className="p-6 space-y-4">
                 <div className="flex justify-between items-center">
-                    <div className="cursor-pointer text-purple-600 hover:underline" onClick={() => navigate(-1)}>
+                    <div
+                        className="cursor-pointer text-purple-600 hover:underline"
+                        onClick={() => navigate(-1)}
+                    >
                         ← Total Revenue List
                     </div>
                     <div className="flex items-center gap-4">
@@ -128,6 +133,12 @@ const TotalRevenueList = () => {
                         >
                             Export
                         </Button>
+                        <Button
+                            className="px-4 py-2 bg-gradient-to-r from-[#C83B62] to-[#8E44AD] text-white font-bold rounded-lg hover:opacity-90 transition"
+                            onClick={() => setIsBulkEntriesModalVisible(true)} // Open Bulk Modal
+                        >
+                            Bulk Entries
+                        </Button>
                     </div>
                 </div>
                 <Table
@@ -141,6 +152,10 @@ const TotalRevenueList = () => {
                 <ExportModal visible={isExportModalVisible} onClose={() => setIsExportModalVisible(false)} />
                 <FilterRevenueModal visible={isFilterModalVisible} onClose={() => setIsFilterModalVisible(false)} />
                 <SortRevenueModal visible={isSortModalVisible} onClose={() => setIsSortModalVisible(false)} onSortChange={(sort) => console.log(sort)} />
+                <BulkEntriesModal
+                    visible={isBulkEntriesModalVisible}
+                    onClose={() => setIsBulkEntriesModalVisible(false)} // Close Modal
+                />
             </div>
         </AdminLayout>
     );

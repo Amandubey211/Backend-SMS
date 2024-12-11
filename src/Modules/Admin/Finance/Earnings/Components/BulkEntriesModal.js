@@ -1,25 +1,34 @@
-import React from "react";
-import { Upload } from "antd";
-import { InboxOutlined, UploadOutlined } from "@ant-design/icons";
+import React, { useState } from "react";
+import { Upload, message, Progress } from "antd";
+import { InboxOutlined, DownloadOutlined } from "@ant-design/icons";
 
 const BulkEntriesModal = ({ visible, onClose }) => {
   const { Dragger } = Upload;
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploading, setUploading] = useState(false);
 
   const uploadProps = {
     name: "file",
     multiple: false,
-    action: "/upload.do", // Placeholder URL
+    action: "/upload.do", // Replace with your server upload endpoint
     onChange(info) {
       const { status } = info.file;
-      if (status !== "uploading") {
-        console.log(info.file, info.fileList);
+      if (status === "uploading") {
+        setUploading(true);
       }
       if (status === "done") {
-        console.log(`${info.file.name} file uploaded successfully.`);
+        message.success(`${info.file.name} uploaded successfully.`);
+        setUploading(false);
+        setUploadProgress(100); // Set to 100% on success
       } else if (status === "error") {
-        console.log(`${info.file.name} file upload failed.`);
+        message.error(`${info.file.name} upload failed.`);
+        setUploading(false);
       }
     },
+    onProgress(event) {
+      setUploadProgress(Math.round((event.percent || 0) * 100) / 100);
+    },
+    showUploadList: true, // Enable file list preview
   };
 
   return (
@@ -46,7 +55,7 @@ const BulkEntriesModal = ({ visible, onClose }) => {
             <button
               className="px-4 py-2 bg-[#007BFF] text-white font-bold rounded-lg hover:bg-blue-600 transition flex items-center"
             >
-              Export <UploadOutlined className="ml-2 text-lg" />
+              Download <DownloadOutlined className="ml-2 text-lg" />
             </button>
           </div>
 
@@ -54,21 +63,40 @@ const BulkEntriesModal = ({ visible, onClose }) => {
           <Dragger
             {...uploadProps}
             className="border-2 border-dashed border-[#C83B62] bg-white rounded-lg p-0 flex flex-col items-center justify-center"
-            style={{ minHeight: "220px", minWidth: "100%", display: "flex", alignItems: "center", justifyContent: "center" }} // Ensure proper centering
+            style={{
+              minHeight: "220px",
+              minWidth: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
           >
-            <div className="flex flex-col items-center justify-center"> {/* Wrapping all children in a flex container */}
-              <p className="text-[#C83B62] text-4xl mb-4"> {/* Icon with margin-bottom */}
+            <div className="flex flex-col items-center justify-center">
+              {/* Wrapping all children in a flex container */}
+              <p className="text-[#C83B62] text-4xl mb-4">
+                {/* Icon with margin-bottom */}
                 <InboxOutlined />
               </p>
-              <p className="font-bold text-gray-800 text-lg mb-2"> {/* Header text */}
+              <p className="font-bold text-gray-800 text-lg mb-2">
+                {/* Header text */}
                 Upload CSV file
               </p>
-              <p className="text-base text-gray-500"> {/* Description text */}
+              <p className="text-base text-gray-500">
+                {/* Description text */}
                 Drag and drop your CSV file here or click to browse
               </p>
             </div>
           </Dragger>
 
+          {/* Progress Bar */}
+          {uploading && (
+            <div className="mt-4">
+              <Progress
+                percent={uploadProgress}
+                status={uploadProgress === 100 ? "success" : "active"}
+              />
+            </div>
+          )}
 
           {/* Buttons Section */}
           <div className="flex justify-between items-center mt-4">
