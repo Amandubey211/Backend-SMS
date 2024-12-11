@@ -1,29 +1,28 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import PropTypes from "prop-types";
-import { Input, Button, DatePicker } from "antd";
+import { Input, DatePicker } from "antd";
 
 const AddNewEarningSidebar = ({ visible, onClose }) => {
-  // Close sidebar when clicking outside
   useEffect(() => {
     const handleOutsideClick = (event) => {
-      if (visible && !event.target.closest(".sidebar-content")) {
+      const sidebarContent = document.querySelector(".sidebar-content");
+      if (visible && sidebarContent && !sidebarContent.contains(event.target)) {
         onClose();
       }
     };
+
     document.addEventListener("mousedown", handleOutsideClick);
     return () => document.removeEventListener("mousedown", handleOutsideClick);
   }, [visible, onClose]);
 
   return (
     <div
-      className={`fixed inset-0 bg-black bg-opacity-50 transition-opacity ${
-        visible ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
-      } z-50`}
+      className={`fixed -top-6 bottom-0 left-0 right-0 bg-black bg-opacity-50 transition-opacity ${visible ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+        } z-50`}
     >
       <div
-        className={`fixed right-0 top-0 h-full w-[400px] bg-white shadow-lg p-6 transition-transform transform ${
-          visible ? "translate-x-0" : "translate-x-full"
-        } sidebar-content`}
+        className={`fixed right-0 top-0 h-full w-[400px] bg-white shadow-lg p-6 transition-transform transform ${visible ? "translate-x-0" : "translate-x-full"
+          } sidebar-content`}
       >
         {/* Close Button */}
         <div className="flex justify-between items-center mb-6">
@@ -43,7 +42,10 @@ const AddNewEarningSidebar = ({ visible, onClose }) => {
             <label className="block text-sm font-medium text-gray-700">
               Category
             </label>
-            <Input placeholder="Type name" />
+            <Input
+              placeholder="Type name"
+              className="hover:border-purple-300 focus:border-purple-300 focus:ring-purple-300"
+            />
           </div>
 
           {/* Amount */}
@@ -51,7 +53,10 @@ const AddNewEarningSidebar = ({ visible, onClose }) => {
             <label className="block text-sm font-medium text-gray-700">
               Amount
             </label>
-            <Input placeholder="3,215 QR" />
+            <Input
+              placeholder="3,215 QR"
+              className="hover:border-purple-300 focus:border-purple-300 focus:ring-purple-300"
+            />
           </div>
 
           {/* Earning Date */}
@@ -62,6 +67,11 @@ const AddNewEarningSidebar = ({ visible, onClose }) => {
             <DatePicker
               style={{ width: "100%" }}
               placeholder="Select Date"
+              className="hover:border-purple-300 focus:border-purple-300 focus:ring-purple-300"
+              onOpenChange={(open) => {
+                // Prevent sidebar from closing when date picker is clicked
+                if (!open) onClose();
+              }}
             />
           </div>
 
@@ -74,19 +84,20 @@ const AddNewEarningSidebar = ({ visible, onClose }) => {
               placeholder="Donation For school.."
               maxLength={100}
               rows={4}
+              className="hover:border-purple-300 focus:border-purple-300 focus:ring-purple-300"
             />
             <p className="text-xs text-gray-500">You can write 100 characters</p>
           </div>
         </div>
 
         {/* Submit Button */}
-        <Button
-          type="primary"
-          className="mt-6 w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 border-none text-white"
+        <button
+          className="absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-pink-500 hover:to-purple-500 text-white font-medium py-2 rounded-lg transition-all duration-300 max-w-[300px] w-full"
           onClick={() => console.log("Earning Added")}
         >
           Add New Earning
-        </Button>
+        </button>
+
       </div>
     </div>
   );

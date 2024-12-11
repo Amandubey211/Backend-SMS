@@ -12,7 +12,7 @@ const Card = ({ title, value, comparison, percentage, icon, trend }) => {
 
   return (
     <div
-      className="p-4 w-[300px] h-[150px] rounded-lg border hover:shadow-lg hover:scale-105 transition-transform duration-300"
+      className="p-6 w-[350px] h-[180px] rounded-lg border hover:shadow-lg hover:scale-105 transition-transform duration-300"
       style={{
         background: "linear-gradient(to bottom, #FFFFFF, #F8F2FF)",
         borderColor: "#DABDFF",
@@ -20,7 +20,7 @@ const Card = ({ title, value, comparison, percentage, icon, trend }) => {
     >
       {/* Title and Icon */}
       <div className="flex items-center gap-2 mb-4">
-        <div className="p-2 rounded-md bg-gradient-to-r from-purple-500 to-pink-500 text-white text-lg">
+        <div className="p-3 rounded-md bg-gradient-to-r from-purple-500 to-pink-500 text-white text-lg">
           {icon}
         </div>
         <h3 className="text-sm font-medium text-gray-800">{title}</h3>

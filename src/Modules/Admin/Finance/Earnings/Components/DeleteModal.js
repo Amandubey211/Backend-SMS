@@ -5,7 +5,7 @@ const DeleteModal = ({ visible, onClose }) => {
     if (!visible) return null;
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed -top-6 bottom-0 left-0 right-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white p-6 rounded-lg shadow-md text-center space-y-4">
                 <h2 className="text-lg font-medium">
                     Are you sure you want to delete this earning?

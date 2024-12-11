@@ -18,7 +18,7 @@ const EarningMainSection = () => {
 
   const handleSidebarOpen = () => setIsSidebarVisible(true);
   const handleSidebarClose = () => setIsSidebarVisible(false);
-
+  const limit = 3; // cards to show in single row
   return (
     <div className="p-6 space-y-6">
       {/* Buttons Section */}
@@ -44,12 +44,16 @@ const EarningMainSection = () => {
 
       </div>
 
+
       {/* Cards Section */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {earningData.map((item, index) => (
-          <Card key={index} {...item} />
-        ))}
+      <div className="flex justify-center">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-16">
+          {earningData.slice(0, limit).map((item, index) => (
+            <Card key={index} {...item} />
+          ))}
+        </div>
       </div>
+
 
       {/* Graph Section */}
       <TotalEarningGraph />
