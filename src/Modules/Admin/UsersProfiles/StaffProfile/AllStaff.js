@@ -1,180 +1,203 @@
-import React, { useEffect, useState, useRef } from "react";
+// AllStaff.js
+import React, { useEffect, useState } from "react";
+import { GoPlus } from "react-icons/go";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+
 import Layout from "../../../../Components/Common/Layout";
 import DashLayout from "../../../../Components/Admin/AdminDashLayout";
 import SidebarSlide from "../../../../Components/Common/SidebarSlide";
 import ViewStaff from "./ViewStaff";
 import ProfileCard from "../SubComponents/ProfileCard";
-import { useDispatch, useSelector } from "react-redux";
 import AddUser from "./AddUser";
-import { FiLoader } from "react-icons/fi";
-import { GoAlertFill, GoPlus } from "react-icons/go";
-import { fetchAllStaff } from "../../../../Store/Slices/Admin/Users/Staff/staff.action";
 import Spinner from "../../../../Components/Common/Spinner";
-import { useTranslation } from "react-i18next";
 import CreateRole from "../../../../Components/Common/RBAC/CreateRole";
-import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 import NoDataFound from "../../../../Components/Common/NoDataFound";
+
+import { fetchAllStaff } from "../../../../Store/Slices/Admin/Users/Staff/staff.action";
+import Header from "../Component/Header";
+import { getAllRolesThunk } from "../../../../Store/Slices/Common/RBAC/rbacThunks";
+import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 
 const AllStaff = () => {
   const { t } = useTranslation("admAccounts");
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
+  // State Variables
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarContent, setSidebarContent] = useState(null);
   const [selectedStaff, setSelectedStaff] = useState(null);
   const [staffData, setStaffData] = useState(null);
-  const [isCreateRoleOpen, setCreateRoleOpen] = useState(false);
-  const [sortDropdown, setSortDropdown] = useState(false);
-  const dropdownRef = useRef(null); // Ref for dropdown
-  useNavHeading("User", "Staff");
-  const role = useSelector((store) => store.common.auth.role);
-  const { staff, loading } = useSelector((store) => store.admin.all_staff);
-  const dispatch = useDispatch();
+  const [sortOption, setSortOption] = useState(null); // "by_date" or "by_roles"
+  const [filterRoles, setFilterRoles] = useState([]); // Array of role names
+  const [sortedStaff, setSortedStaff] = useState([]);
 
+  // Redux Selectors
+  const { staff, loading: staffLoading } = useSelector(
+    (store) => store.admin.all_staff
+  );
+  const role = useSelector((store) => store.common.auth.role);
+  const { roles: AllRoles } = useSelector((state) => state.admin.rbac); // Ensure RBAC is set up correctly
+
+  // Fetch Staff and Roles on Mount
   useEffect(() => {
     dispatch(fetchAllStaff());
+    dispatch(getAllRolesThunk()); // Fetch roles for filtering
   }, [dispatch]);
 
-  // Handle dropdown close when clicking outside
+  // Initialize sortedStaff with allStaff
   useEffect(() => {
-    const handleOutsideClick = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setSortDropdown(false);
+    setSortedStaff(staff);
+  }, [staff]);
+
+  // Apply Sorting and Filtering
+  useEffect(() => {
+    let filtered = [...staff];
+
+    // Apply Role Filtering
+    if (filterRoles.length > 0) {
+      filtered = filtered.filter((member) =>
+        member.position.some((pos) => filterRoles.includes(pos))
+      );
+    }
+
+    // Apply Sorting
+    if (sortOption) {
+      switch (sortOption) {
+        case "by_date":
+          filtered.sort(
+            (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+          );
+          break;
+        case "by_roles":
+          filtered.sort((a, b) => a.position.length - b.position.length);
+          break;
+        default:
+          break;
       }
-    };
-    document.addEventListener("mousedown", handleOutsideClick);
-    return () => {
-      document.removeEventListener("mousedown", handleOutsideClick);
-    };
-  }, []);
+    }
 
-  const handleSidebarOpen = () => setSidebarOpen(true);
+    setSortedStaff(filtered);
+  }, [sortOption, filterRoles, staff]);
+
+  // Handlers
+  const handleSidebarOpen = (content, data = null) => {
+    setSidebarContent(content);
+    setSelectedStaff(data);
+    setStaffData(data);
+    setSidebarOpen(true);
+  };
+
   const handleSidebarClose = () => setSidebarOpen(false);
-
-  const handleStaffClick = (staff) => {
-    setSelectedStaff(staff);
-    setSidebarContent("viewStaff");
-    setSidebarOpen(true);
-  };
-
-  const handleAddStaffClick = () => {
-    setSidebarContent("addStaff");
-    setSidebarOpen(true);
-    setStaffData(null);
-  };
 
   const editUser = (event, data) => {
     event.stopPropagation();
-    setSidebarContent("editStaff");
-    setSidebarOpen(true);
-    setStaffData(data);
+    handleSidebarOpen("editStaff", data);
   };
 
+  const handleStaffClick = (staffMember) => {
+    handleSidebarOpen("viewStaff", staffMember);
+  };
+
+  const handleAddStaffClick = () => {
+    handleSidebarOpen("addStaff");
+    setStaffData(null);
+  };
+
+  // Extract Staff Roles from AllRoles
+  const staffRoles =
+    AllRoles?.filter(
+      (dept) => dept.department.toLowerCase() === "staff"
+    )?.flatMap((dept) => dept.roles) || [];
+
+  // Define Sort and Filter Options
+  const sortOptions = [
+    { label: "By Date", value: "by_date" },
+    { label: "By Roles", value: "by_roles" },
+  ];
+
+  const filterOptionsList = staffRoles.map((roleItem) => ({
+    label: roleItem.name,
+    value: roleItem.name,
+  }));
+
+  // Handler for applying sort and filter
+  const handleSortFilterApply = ({ sortOption, filterOptions }) => {
+    setSortOption(sortOption);
+    setFilterRoles(filterOptions);
+  };
+
+  // Handler for navigating to manage roles
+  const navigateToManageRoles = () => {
+    navigate("/users/manage-roles");
+  };
+
+  // Handler for creating a new role
+  const handleCreateRole = () => {
+    handleSidebarOpen("createRole");
+  };
+
+  useNavHeading("User", "Staff"); // Ensure correct import and usage
+
+  // Define the renderSidebarContent function
   const renderSidebarContent = () => {
     switch (sidebarContent) {
       case "viewStaff":
         return <ViewStaff staff={selectedStaff} />;
       case "addStaff":
-        return <AddUser role="staff" data={staffData} />;
+        return <AddUser role="staff" />;
       case "editStaff":
         return <AddUser role="staff" data={staffData} />;
+      case "createRole":
+        return <CreateRole onClose={handleSidebarClose} department="Staff" />;
       default:
         return <div>{t("Select an action")}</div>;
     }
   };
 
   return (
-    <Layout title="Staff | Student Diwan">
+    <Layout title={t("Staff | Student Diwan")}>
       <DashLayout>
-        {loading ? (
+        {staffLoading ? (
           <div className="flex w-full h-[90vh] flex-col items-center justify-center">
             <Spinner />
           </div>
         ) : (
           <div className="p-4 relative">
-            {/* Header Section */}
-            <div className="flex justify-between items-center mb-4 border-b-2 h-20">
-              {/* Left Section */}
-              <div className="flex items-center gap-4">
-                <h2 className="text-xl font-semibold flex items-center gap-2">
-                  {t("All Staff")}
-                  <span className="bg-purple-400 px-2 text-sm py-1 rounded-full">
-                    {staff?.length}
-                  </span>
-                </h2>
-
-                {/* Sort Button */}
-                <div className="relative" ref={dropdownRef}>
-                  <button
-                    onClick={() => setSortDropdown(!sortDropdown)}
-                    className="bg-white text-black px-4 py-2 flex items-center gap-2 shadow hover:shadow-lg transition-all rounded-lg"
-                    style={{
-                      borderWidth: "2px",
-                      borderImageSlice: 1,
-                      borderImageSource:
-                        "linear-gradient(to right, #C83B62, #7F35CD)",
-                    }}
-                  >
-                    <span className="font-medium">Sort</span>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5 text-black"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M4 6h16M4 12h8m-8 6h16"
-                      />
-                    </svg>
-                  </button>
-                  {sortDropdown && (
-                    <div className="absolute mt-2 w-40 bg-white border border-gray-300 rounded-lg shadow-lg z-50">
-                      <button className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100">
-                        By Date
-                      </button>
-                      <button className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100">
-                        By Roles
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Right Section */}
-              {role === "admin" && (
-                <div className="flex items-center gap-4">
-                  <button
-                    onClick={() => (window.location.href = "/manage-roles")}
-                    className="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-md flex items-center gap-2 hover:opacity-90 transition duration-200"
-                  >
-                    Manage Roles
-                  </button>
-                  <button
-                    onClick={() => setCreateRoleOpen(true)}
-                    className="px-6 py-2 border-2 border-transparent bg-gradient-to-r from-pink-500 to-purple-500 text-white font-medium rounded-full flex items-center gap-2 hover:shadow-lg transition duration-200"
-                  >
-                    <span>Create Role</span>
-                  </button>
-                </div>
-              )}
-            </div>
+            {/* Reusable Header Component with currentSort and currentFilters */}
+            <Header
+              title={t("All Staff")}
+              count={staff?.length || 0}
+              sortOptions={sortOptions}
+              filterOptions={filterOptionsList}
+              department="Staff"
+              onSortFilterApply={handleSortFilterApply}
+              navigateToManageRoles={navigateToManageRoles}
+              handleCreateRole={handleCreateRole}
+              isAdmin={role === "admin"}
+              currentSort={sortOption} // Pass current sort
+              currentFilters={filterRoles} // Pass current filters
+            />
 
             {/* Staff List */}
             <div className="flex flex-wrap -mx-2">
-              {staff?.length > 0 ? (
-                staff?.map((profile, index) => (
+              {sortedStaff?.length > 0 ? (
+                sortedStaff.map((member) => (
                   <ProfileCard
-                    key={index}
-                    profile={profile}
-                    onClick={handleStaffClick}
-                    editUser={role === "admin" ? editUser : null}
+                    key={member._id} // Use a unique identifier
+                    profile={member}
+                    onClick={() => handleStaffClick(member)}
+                    editUser={
+                      role === "admin"
+                        ? (event) => editUser(event, member)
+                        : null
+                    }
                   />
                 ))
               ) : (
-                <div className="flex w-[80vw] text-gray-500 h-[90vh] items-center justify-center flex-col text-2xl">
+                <div className="flex w-full text-gray-500 h-[90vh] items-center justify-center flex-col text-2xl">
                   <NoDataFound />
                 </div>
               )}
@@ -185,39 +208,40 @@ const AllStaff = () => {
               <button
                 onClick={handleAddStaffClick}
                 className="fixed bottom-8 right-8 bg-gradient-to-r from-pink-500 to-purple-500 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:opacity-90 transition duration-200"
+                aria-label="Add New Staff"
               >
                 <GoPlus className="text-2xl" />
               </button>
             )}
           </div>
         )}
-
-        {/* Sidebar */}
-        <SidebarSlide
-          key={sidebarContent} // Use the key to force re-render
-          isOpen={isSidebarOpen}
-          onClose={handleSidebarClose}
-          title={
-            <span className="bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent bg-clip-text">
-              {sidebarContent === "viewStaff"
-                ? t("Quick View of Staff")
-                : t("Add/Edit Staff")}
-            </span>
-          }
-          width={sidebarContent === "viewStaff" ? "30%" : "60%"}
-          height="100%"
-        >
-          {renderSidebarContent()}
-        </SidebarSlide>
-
-        {/* Create Role Modal */}
-        {isCreateRoleOpen && (
-          <CreateRole
-            isOpen={isCreateRoleOpen}
-            onClose={() => setCreateRoleOpen(false)}
-          />
-        )}
       </DashLayout>
+
+      {/* Sidebar */}
+      <SidebarSlide
+        key={sidebarContent} // Use the key to force re-render
+        isOpen={isSidebarOpen}
+        onClose={handleSidebarClose}
+        title={
+          <span className="bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent bg-clip-text">
+            {sidebarContent === "viewStaff"
+              ? t("Quick View of Staff")
+              : sidebarContent === "createRole"
+              ? t("Create New Role")
+              : t("Add/Edit Staff")}
+          </span>
+        }
+        width={
+          sidebarContent === "viewStaff"
+            ? "30%"
+            : sidebarContent === "createRole"
+            ? "60%"
+            : "75%"
+        }
+        height="100%"
+      >
+        {renderSidebarContent()}
+      </SidebarSlide>
     </Layout>
   );
 };
