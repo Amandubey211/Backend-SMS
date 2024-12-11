@@ -175,6 +175,8 @@ const AllTeachers = () => {
               navigateToManageRoles={navigateToManageRoles}
               handleCreateRole={handleCreateRole}
               isAdmin={role === "admin"}
+              currentSort={sortOption} // Pass current sort
+              currentFilters={filterRoles} // Pass current filters
             />
 
             {/* Teachers List */}

@@ -1,5 +1,5 @@
 // AllStaff.js
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { GoPlus } from "react-icons/go";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -16,8 +16,10 @@ import CreateRole from "../../../../Components/Common/RBAC/CreateRole";
 import NoDataFound from "../../../../Components/Common/NoDataFound";
 
 import { fetchAllStaff } from "../../../../Store/Slices/Admin/Users/Staff/staff.action";
-import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 import Header from "../Component/Header";
+import { getAllRolesThunk } from "../../../../Store/Slices/Common/RBAC/rbacThunks";
+import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
+
 const AllStaff = () => {
   const { t } = useTranslation("admAccounts");
   const dispatch = useDispatch();
@@ -29,18 +31,20 @@ const AllStaff = () => {
   const [selectedStaff, setSelectedStaff] = useState(null);
   const [staffData, setStaffData] = useState(null);
   const [sortOption, setSortOption] = useState(null); // "by_date" or "by_roles"
-  const [filterOptions, setFilterOptions] = useState([]); // Array of filter criteria
+  const [filterRoles, setFilterRoles] = useState([]); // Array of role names
   const [sortedStaff, setSortedStaff] = useState([]);
 
   // Redux Selectors
-  const { staff, loading } = useSelector((store) => store.admin.all_staff);
+  const { staff, loading: staffLoading } = useSelector(
+    (store) => store.admin.all_staff
+  );
   const role = useSelector((store) => store.common.auth.role);
-  const { roles: AllRoles } = useSelector((state) => state.admin.rbac); // Assuming RBAC is set up similarly
+  const { roles: AllRoles } = useSelector((state) => state.admin.rbac); // Ensure RBAC is set up correctly
 
   // Fetch Staff and Roles on Mount
   useEffect(() => {
     dispatch(fetchAllStaff());
-    // If roles are needed for filtering, ensure they are fetched here
+    dispatch(getAllRolesThunk()); // Fetch roles for filtering
   }, [dispatch]);
 
   // Initialize sortedStaff with allStaff
@@ -53,9 +57,9 @@ const AllStaff = () => {
     let filtered = [...staff];
 
     // Apply Role Filtering
-    if (filterOptions.length > 0) {
+    if (filterRoles.length > 0) {
       filtered = filtered.filter((member) =>
-        member.position.some((pos) => filterOptions.includes(pos))
+        member.position.some((pos) => filterRoles.includes(pos))
       );
     }
 
@@ -76,7 +80,7 @@ const AllStaff = () => {
     }
 
     setSortedStaff(filtered);
-  }, [sortOption, filterOptions, staff]);
+  }, [sortOption, filterRoles, staff]);
 
   // Handlers
   const handleSidebarOpen = (content, data = null) => {
@@ -122,7 +126,7 @@ const AllStaff = () => {
   // Handler for applying sort and filter
   const handleSortFilterApply = ({ sortOption, filterOptions }) => {
     setSortOption(sortOption);
-    setFilterOptions(filterOptions);
+    setFilterRoles(filterOptions);
   };
 
   // Handler for navigating to manage roles
@@ -143,7 +147,7 @@ const AllStaff = () => {
       case "viewStaff":
         return <ViewStaff staff={selectedStaff} />;
       case "addStaff":
-        return <AddUser role="staff" data={staffData} />;
+        return <AddUser role="staff" />;
       case "editStaff":
         return <AddUser role="staff" data={staffData} />;
       case "createRole":
@@ -156,13 +160,13 @@ const AllStaff = () => {
   return (
     <Layout title={t("Staff | Student Diwan")}>
       <DashLayout>
-        {loading ? (
+        {staffLoading ? (
           <div className="flex w-full h-[90vh] flex-col items-center justify-center">
             <Spinner />
           </div>
         ) : (
           <div className="p-4 relative">
-            {/* Reusable Header Component */}
+            {/* Reusable Header Component with currentSort and currentFilters */}
             <Header
               title={t("All Staff")}
               count={staff?.length || 0}
@@ -173,6 +177,8 @@ const AllStaff = () => {
               navigateToManageRoles={navigateToManageRoles}
               handleCreateRole={handleCreateRole}
               isAdmin={role === "admin"}
+              currentSort={sortOption} // Pass current sort
+              currentFilters={filterRoles} // Pass current filters
             />
 
             {/* Staff List */}
@@ -225,7 +231,13 @@ const AllStaff = () => {
               : t("Add/Edit Staff")}
           </span>
         }
-        width={sidebarContent === "viewStaff" ? "30%" : "60%"}
+        width={
+          sidebarContent === "viewStaff"
+            ? "30%"
+            : sidebarContent === "createRole"
+            ? "60%"
+            : "75%"
+        }
         height="100%"
       >
         {renderSidebarContent()}

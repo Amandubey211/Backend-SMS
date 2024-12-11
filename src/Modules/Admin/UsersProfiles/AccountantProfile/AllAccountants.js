@@ -1,6 +1,5 @@
 // AllAccountants.js
 import React, { useEffect, useState } from "react";
-import { FiUserPlus } from "react-icons/fi";
 import { GoPlus } from "react-icons/go";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -17,8 +16,9 @@ import CreateRole from "../../../../Components/Common/RBAC/CreateRole";
 import NoDataFound from "../../../../Components/Common/NoDataFound";
 
 import { fetchAllStaff } from "../../../../Store/Slices/Admin/Users/Staff/staff.action";
-import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
+import { getAllRolesThunk } from "../../../../Store/Slices/Common/RBAC/rbacThunks"; // Ensure this path is correct
 import Header from "../Component/Header";
+import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 
 const AllAccountants = () => {
   const { t } = useTranslation("admAccounts");
@@ -31,7 +31,7 @@ const AllAccountants = () => {
   const [selectedAccountant, setSelectedAccountant] = useState(null);
   const [accountantData, setAccountantData] = useState(null);
   const [sortOption, setSortOption] = useState(null); // "by_date" or "by_roles"
-  const [filterOptions, setFilterOptions] = useState([]); // Array of filter criteria
+  const [filterRoles, setFilterRoles] = useState([]); // Array of role names
   const [sortedAccountants, setSortedAccountants] = useState([]);
 
   // Redux Selectors
@@ -39,12 +39,12 @@ const AllAccountants = () => {
     (store) => store.admin.all_staff
   );
   const role = useSelector((store) => store.common.auth.role);
-  const { roles: AllRoles } = useSelector((state) => state.admin.rbac); // Assuming RBAC is set up similarly
+  const { roles: AllRoles } = useSelector((state) => state.admin.rbac); // Ensure RBAC is set up correctly
 
   // Fetch Accountants and Roles on Mount
   useEffect(() => {
     dispatch(fetchAllStaff());
-    // If roles are needed for filtering, ensure they are fetched here
+    dispatch(getAllRolesThunk()); // Fetch roles for filtering
   }, [dispatch]);
 
   // Initialize sortedAccountants with accountant data
@@ -57,9 +57,9 @@ const AllAccountants = () => {
     let filtered = [...accountant];
 
     // Apply Role Filtering
-    if (filterOptions.length > 0) {
+    if (filterRoles.length > 0) {
       filtered = filtered.filter((member) =>
-        member.position.some((pos) => filterOptions.includes(pos))
+        member.position.some((pos) => filterRoles.includes(pos))
       );
     }
 
@@ -80,7 +80,7 @@ const AllAccountants = () => {
     }
 
     setSortedAccountants(filtered);
-  }, [sortOption, filterOptions, accountant]);
+  }, [sortOption, filterRoles, accountant]);
 
   // Handlers
   const handleSidebarOpen = (content, data = null) => {
@@ -126,7 +126,7 @@ const AllAccountants = () => {
   // Handler for applying sort and filter
   const handleSortFilterApply = ({ sortOption, filterOptions }) => {
     setSortOption(sortOption);
-    setFilterOptions(filterOptions);
+    setFilterRoles(filterOptions);
   };
 
   // Handler for navigating to manage roles
@@ -147,7 +147,7 @@ const AllAccountants = () => {
       case "viewAccountant":
         return <ViewAccountant accountant={selectedAccountant} />;
       case "addAccountant":
-        return <AddUser role="accountant" data={accountantData} />;
+        return <AddUser role="accountant" />;
       case "editAccountant":
         return <AddUser role="accountant" data={accountantData} />;
       case "createRole":
@@ -168,7 +168,7 @@ const AllAccountants = () => {
           </div>
         ) : (
           <div className="p-4 relative">
-            {/* Reusable Header Component */}
+            {/* Reusable Header Component with currentSort and currentFilters */}
             <Header
               title={t("All Accountants")}
               count={accountant?.length || 0}
@@ -179,6 +179,8 @@ const AllAccountants = () => {
               navigateToManageRoles={navigateToManageRoles}
               handleCreateRole={handleCreateRole}
               isAdmin={role === "admin"}
+              currentSort={sortOption} // Pass current sort
+              currentFilters={filterRoles} // Pass current filters
             />
 
             {/* Accountant List */}

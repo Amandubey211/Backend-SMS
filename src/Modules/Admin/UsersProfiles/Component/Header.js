@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next";
 import SortFilterModal from "./SortFilterModal"; // Ensure the path is correct based on your project structure
 import { useSelector } from "react-redux";
 import { CiFilter } from "react-icons/ci";
+import { MdOutlineSort } from "react-icons/md";
 const Header = ({
   title,
   count,
@@ -17,6 +18,8 @@ const Header = ({
   navigateToManageRoles,
   handleCreateRole,
   isAdmin,
+  currentSort, // New prop
+  currentFilters, // New prop
 }) => {
   const { t } = useTranslation("admAccounts");
   const [isSortModalOpen, setSortModalOpen] = useState(false);
@@ -43,11 +46,11 @@ const Header = ({
             <div className="flex items-center justify-end">
               <button
                 onClick={() => setSortModalOpen(true)}
-                className="inline-flex items-center gap-2 px-4 py-1 bg-white  border-2 rounded-md text-gray-800 font-medium"
+                className="flex items-center gap-2 px-4 py-2 text-gray-800 bg-white border-2 border-purple-500 rounded-full font-medium hover:shadow-lg hover:bg-purple-50 transition duration-200"
                 aria-label="Open Sort and Filter Modal"
               >
-                <span>Sort & Filter</span>
-                <CiFilter />
+                <span>Sort</span>
+                <MdOutlineSort className="text-purple-500 text-xl" />
               </button>
             </div>
           )}
@@ -60,6 +63,8 @@ const Header = ({
               sortOptions={sortOptions}
               filterOptions={filterOptions}
               department={department} // Optional: Customize modal title
+              initialSort={currentSort} // Pass current sort
+              initialFilters={currentFilters} // Pass current filters
             />
           )}
         </div>
@@ -93,6 +98,27 @@ const Header = ({
       {/* Sort & Filter Modal Trigger */}
     </>
   );
+};
+
+// Update PropTypes to include new props
+Header.propTypes = {
+  title: PropTypes.string.isRequired,
+  count: PropTypes.number.isRequired,
+  sortOptions: PropTypes.array.isRequired,
+  filterOptions: PropTypes.array.isRequired,
+  department: PropTypes.string,
+  onSortFilterApply: PropTypes.func.isRequired,
+  navigateToManageRoles: PropTypes.func.isRequired,
+  handleCreateRole: PropTypes.func.isRequired,
+  isAdmin: PropTypes.bool.isRequired,
+  currentSort: PropTypes.string, // New PropType
+  currentFilters: PropTypes.array, // New PropType
+};
+
+Header.defaultProps = {
+  department: "",
+  currentSort: null,
+  currentFilters: [],
 };
 
 export default Header;

@@ -1,7 +1,7 @@
-// SortFilterModal.js
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import PropTypes from "prop-types";
+import { FiRefreshCw } from "react-icons/fi";
 
 const SortFilterModal = ({
   isOpen,
@@ -10,19 +10,20 @@ const SortFilterModal = ({
   sortOptions,
   filterOptions,
   department, // Optional: To display department-specific information
+  initialSort,
+  initialFilters,
 }) => {
-  const [selectedSort, setSelectedSort] = useState(null);
-  const [selectedFilters, setSelectedFilters] = useState([]);
+  const [selectedSort, setSelectedSort] = useState(initialSort || null);
+  const [selectedFilters, setSelectedFilters] = useState(initialFilters || []);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
-  // Reset selections when the modal opens
   useEffect(() => {
     if (isOpen) {
-      setSelectedSort(null);
-      setSelectedFilters([]);
+      setSelectedSort(initialSort);
+      setSelectedFilters(initialFilters);
     }
-  }, [isOpen]);
+  }, [isOpen, initialSort, initialFilters]);
 
-  // Handler for filter checkbox changes
   const handleFilterChange = (filterName) => {
     setSelectedFilters((prev) =>
       prev.includes(filterName)
@@ -31,7 +32,6 @@ const SortFilterModal = ({
     );
   };
 
-  // Handler for applying sort and filter
   const handleApply = () => {
     onApply({
       sortOption: selectedSort,
@@ -40,15 +40,18 @@ const SortFilterModal = ({
     onClose();
   };
 
-  // Handler for refreshing (resetting) sort and filter
   const handleRefresh = () => {
-    setSelectedSort(null);
-    setSelectedFilters([]);
-    onApply({
-      sortOption: null,
-      filterOptions: [],
-    });
-    onClose();
+    setIsRefreshing(true);
+    setTimeout(() => {
+      setIsRefreshing(false);
+      setSelectedSort(null);
+      setSelectedFilters([]);
+      onApply({
+        sortOption: null,
+        filterOptions: [],
+      });
+      onClose();
+    }, 300); // Simulate a short delay for effect
   };
 
   return (
@@ -61,22 +64,39 @@ const SortFilterModal = ({
           exit={{ opacity: 0 }}
         >
           <motion.div
-            className="bg-white rounded-lg shadow-lg w-80 p-6 max-h-[80vh] overflow-y-auto"
+            className="bg-white rounded-lg shadow-lg w-80 p-6 max-h-[80vh] overflow-y-auto relative"
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.8, opacity: 0 }}
             transition={{ duration: 0.3 }}
           >
+            {/* Refresh Button */}
+            <button
+              onClick={handleRefresh}
+              className="absolute top-2 right-2 text-gray-600 rounded-full p-2 focus:outline-none transform transition-transform duration-300 hover:rotate-180"
+              aria-label="Reset filters"
+            >
+              <FiRefreshCw
+                size={24}
+                className={isRefreshing ? "animate-spin" : ""}
+              />
+            </button>
+
+            {/* Modal Title */}
             {department && (
-              <h3 className="text-lg font-semibold mb-4">
+              <h3 className="text-lg font-semibold mb-4 text-gray-800">
                 {`Sort & Filter ${
                   department.charAt(0).toUpperCase() + department.slice(1)
                 }`}
               </h3>
             )}
             {!department && (
-              <h3 className="text-lg font-semibold mb-4">Sort & Filter</h3>
+              <h3 className="text-lg font-semibold mb-4 text-gray-800">
+                Sort & Filter
+              </h3>
             )}
+
+            {/* Sort & Filter Sections */}
             <div className="space-y-6">
               {/* Sort Section */}
               {sortOptions && sortOptions.length > 0 && (
@@ -86,7 +106,7 @@ const SortFilterModal = ({
                     {sortOptions.map((option) => (
                       <label
                         key={option.value}
-                        className="inline-flex items-center"
+                        className="inline-flex items-center ms-2" 
                       >
                         <input
                           type="radio"
@@ -96,7 +116,7 @@ const SortFilterModal = ({
                           onChange={() => setSelectedSort(option.value)}
                           className="form-radio h-4 w-4 text-purple-600"
                         />
-                        <span className="ml-2 text-gray-700">
+                        <span className="ml-1 text-gray-700">
                           {option.label}
                         </span>
                       </label>
@@ -141,12 +161,6 @@ const SortFilterModal = ({
                 Cancel
               </button>
               <button
-                onClick={handleRefresh}
-                className="px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition"
-              >
-                Refresh
-              </button>
-              <button
                 onClick={handleApply}
                 className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition"
               >
@@ -160,7 +174,7 @@ const SortFilterModal = ({
   );
 };
 
-// PropTypes for type checking
+// PropTypes
 SortFilterModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
@@ -178,12 +192,16 @@ SortFilterModal.propTypes = {
     })
   ),
   department: PropTypes.string, // Optional
+  initialSort: PropTypes.string,
+  initialFilters: PropTypes.array,
 };
 
 SortFilterModal.defaultProps = {
   sortOptions: [],
   filterOptions: [],
   department: "",
+  initialSort: null,
+  initialFilters: [],
 };
 
 export default SortFilterModal;

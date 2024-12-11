@@ -15,10 +15,10 @@ import AddUser from "../StaffProfile/AddUser";
 import Spinner from "../../../../Components/Common/Spinner";
 import CreateRole from "../../../../Components/Common/RBAC/CreateRole";
 import NoDataFound from "../../../../Components/Common/NoDataFound";
-
 import { fetchAllStaff } from "../../../../Store/Slices/Admin/Users/Staff/staff.action";
 import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 import Header from "../Component/Header";
+import { getAllRolesThunk } from "../../../../Store/Slices/Common/RBAC/rbacThunks";
 
 const AllLibrarian = () => {
   const { t } = useTranslation("admAccounts");
@@ -31,7 +31,7 @@ const AllLibrarian = () => {
   const [selectedLibrarian, setSelectedLibrarian] = useState(null);
   const [librarianData, setLibrarianData] = useState(null);
   const [sortOption, setSortOption] = useState(null); // "by_date" or "by_roles"
-  const [filterOptions, setFilterOptions] = useState([]); // Array of filter criteria
+  const [filterRoles, setFilterRoles] = useState([]); // Array of role names
   const [sortedLibrarians, setSortedLibrarians] = useState([]);
 
   // Redux Selectors
@@ -44,7 +44,7 @@ const AllLibrarian = () => {
   // Fetch Librarians and Roles on Mount
   useEffect(() => {
     dispatch(fetchAllStaff());
-    // If roles are needed for filtering, ensure they are fetched here
+    dispatch(getAllRolesThunk()); // Ensure roles are fetched if needed for filtering
   }, [dispatch]);
 
   // Initialize sortedLibrarians with librarian data
@@ -57,9 +57,9 @@ const AllLibrarian = () => {
     let filtered = [...librarian];
 
     // Apply Role Filtering
-    if (filterOptions.length > 0) {
+    if (filterRoles.length > 0) {
       filtered = filtered.filter((member) =>
-        member.position.some((pos) => filterOptions.includes(pos))
+        member.position.some((pos) => filterRoles.includes(pos))
       );
     }
 
@@ -80,7 +80,7 @@ const AllLibrarian = () => {
     }
 
     setSortedLibrarians(filtered);
-  }, [sortOption, filterOptions, librarian]);
+  }, [sortOption, filterRoles, librarian]);
 
   // Handlers
   const handleSidebarOpen = (content, data = null) => {
@@ -126,7 +126,7 @@ const AllLibrarian = () => {
   // Handler for applying sort and filter
   const handleSortFilterApply = ({ sortOption, filterOptions }) => {
     setSortOption(sortOption);
-    setFilterOptions(filterOptions);
+    setFilterRoles(filterOptions);
   };
 
   // Handler for navigating to manage roles
@@ -139,7 +139,7 @@ const AllLibrarian = () => {
     handleSidebarOpen("createRole");
   };
 
-  useNavHeading("User", "Librarian"); // Ensure correct import and usage
+  useNavHeading("User", "Librarians"); // Ensure correct import and usage
 
   // Define the renderSidebarContent function
   const renderSidebarContent = () => {
@@ -147,7 +147,7 @@ const AllLibrarian = () => {
       case "viewLibrarian":
         return <ViewLibrarian librarian={selectedLibrarian} />;
       case "addLibrarian":
-        return <AddUser role="librarian" data={librarianData} />;
+        return <AddUser role="librarian" />;
       case "editLibrarian":
         return <AddUser role="librarian" data={librarianData} />;
       case "createRole":
@@ -168,7 +168,7 @@ const AllLibrarian = () => {
           </div>
         ) : (
           <div className="p-4 relative">
-            {/* Reusable Header Component */}
+            {/* Reusable Header Component with currentSort and currentFilters */}
             <Header
               title={t("All Librarians")}
               count={librarian?.length || 0}
@@ -179,6 +179,8 @@ const AllLibrarian = () => {
               navigateToManageRoles={navigateToManageRoles}
               handleCreateRole={handleCreateRole}
               isAdmin={role === "admin"}
+              currentSort={sortOption} // Pass current sort
+              currentFilters={filterRoles} // Pass current filters
             />
 
             {/* Librarian List */}
