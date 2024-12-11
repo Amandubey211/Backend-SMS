@@ -17,6 +17,8 @@ import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 import { fetchAllClasses } from "../../../../Store/Slices/Admin/Class/actions/classThunk";
 import { fetchAllStudents } from "../../../../Store/Slices/Admin/Class/Students/studentThunks";
 import { useTranslation } from "react-i18next";
+import { PERMISSIONS } from "../../../../config/permission";
+import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
 
 const LibraryAndBookIssue = () => {
   const { t } = useTranslation("admLibrary");
@@ -83,12 +85,18 @@ const LibraryAndBookIssue = () => {
             {/* Tab Content */}
             <div className="flex-1">
               {activeTab === "Library" ? (
-                <LibraryTab handleSidebarOpen={handleSidebarOpen} />
+                <ProtectedSection
+                  requiredPermission={PERMISSIONS.MANAGE_LIBRARY}
+                >
+                  <LibraryTab handleSidebarOpen={handleSidebarOpen} />
+                </ProtectedSection>
               ) : (
-                <BookIssueTab
-                  handleSidebarOpen={handleSidebarOpen}
-                  setEditIssueData={setEditIssueData}
-                />
+                <ProtectedSection requiredPermission={PERMISSIONS.ISSUE_BOOK}>
+                  <BookIssueTab
+                    handleSidebarOpen={handleSidebarOpen}
+                    setEditIssueData={setEditIssueData}
+                  />
+                </ProtectedSection>
               )}
             </div>
 

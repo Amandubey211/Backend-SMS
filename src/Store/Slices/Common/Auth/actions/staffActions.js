@@ -73,18 +73,18 @@ export const staffLogin = createAsyncThunk(
               },
             ])
           );
-          await dispatch(fetchAcademicYear());
-          const activeAcademicYear =
-            getState().common?.academicYear?.academicYears?.find(
-              (i) => i.isActive === true
-            );
-          if (activeAcademicYear) {
-            console.log(
-              "activeAcademicYear",
-              activeAcademicYear,
-              activeAcademicYear._id
-            );
-            setLocalCookies("say", activeAcademicYear._id);
+          // await dispatch(fetchAcademicYear());
+          // const activeAcademicYear =
+          //   getState().common?.academicYear?.academicYears?.find(
+          //     (i) => i.isActive === true
+          //   );
+          if (data.isAcademicYearActive) {
+            // console.log(
+            //   "activeAcademicYear",
+            //   activeAcademicYear,
+            //   activeAcademicYear._id
+            // );
+            setLocalCookies("say", data.academicYear._id);
           }
         }
 

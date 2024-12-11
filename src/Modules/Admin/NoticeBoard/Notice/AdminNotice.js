@@ -23,6 +23,8 @@ import {
 } from "../../../../Store/Slices/Admin/NoticeBoard/Notice/noticeSlice";
 import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 import { useTranslation } from "react-i18next";
+import { PERMISSIONS } from "../../../../config/permission";
+import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
 
 const AdminNotice = () => {
   const { t } = useTranslation("admNotice");
@@ -118,30 +120,32 @@ const AdminNotice = () => {
             )}
           </div>
 
+          <ProtectedSection requiredPermission={PERMISSIONS.GET_NOTICE}>
+            <div className="mt-5">
+              {loading ? (
+                <Spinner />
+              ) : error ? (
+                <NoDataFound title={t("Notices")} />
+              ) : filteredNotices?.length > 0 ? (
+                filteredNotices?.map((notice, index) => (
+                  <AdminNoticeItem
+                    key={notice._id}
+                    notice={notice}
+                    index={index}
+                    activeIndex={activeIndex}
+                    toggleAccordion={toggleAccordion}
+                    handleEditNotice={handleEditNotice}
+                    setDeleteModalOpen={setDeleteModalOpen}
+                    setNoticeToDelete={setNoticeToDelete}
+                    dispatch={dispatch} // Pass dispatch to set title for delete
+                  />
+                ))
+              ) : (
+                <NoDataFound title={t("Notices")} />
+              )}
+            </div>
+          </ProtectedSection>
           {/* Notices List */}
-          <div className="mt-5">
-            {loading ? (
-              <Spinner />
-            ) : error ? (
-              <NoDataFound title={t("Notices")} />
-            ) : filteredNotices?.length > 0 ? (
-              filteredNotices?.map((notice, index) => (
-                <AdminNoticeItem
-                  key={notice._id}
-                  notice={notice}
-                  index={index}
-                  activeIndex={activeIndex}
-                  toggleAccordion={toggleAccordion}
-                  handleEditNotice={handleEditNotice}
-                  setDeleteModalOpen={setDeleteModalOpen}
-                  setNoticeToDelete={setNoticeToDelete}
-                  dispatch={dispatch} // Pass dispatch to set title for delete
-                />
-              ))
-            ) : (
-              <NoDataFound title={t("Notices")} />
-            )}
-          </div>
 
           <Sidebar
             isOpen={isSidebarOpen}
