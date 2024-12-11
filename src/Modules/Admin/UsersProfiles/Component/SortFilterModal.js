@@ -106,7 +106,7 @@ const SortFilterModal = ({
                     {sortOptions.map((option) => (
                       <label
                         key={option.value}
-                        className="inline-flex items-center ms-2" 
+                        className="inline-flex items-center ms-2"
                       >
                         <input
                           type="radio"

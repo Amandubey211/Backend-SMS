@@ -28,6 +28,7 @@ const sidebarData = [
     icon: <TbDashboard />,
     path: `/dashboard`,
     roles: ["admin", "teacher", "librarian", "accountant", "staff"],
+    // requiredPermission: "viewDashboard", // Example permission
   },
   {
     title: "Classes",

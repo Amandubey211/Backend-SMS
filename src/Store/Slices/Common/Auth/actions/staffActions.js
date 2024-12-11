@@ -18,8 +18,10 @@ import { setErrorMsg, setShowError } from "../../Alerts/alertsSlice";
 import { ErrorMsg } from "../../Alerts/errorhandling.action";
 import { postData } from "../../../../../services/apiEndpoints";
 import { setLocalCookies } from "../../../../../Utils/academivYear";
+import { getMyRolePermissionsThunk } from "../../RBAC/rbacThunks";
 
 // **Staff Login Action**
+
 export const staffLogin = createAsyncThunk(
   "auth/staffLogin",
   async (staffDetails, { rejectWithValue, dispatch, getState }) => {
@@ -46,7 +48,7 @@ export const staffLogin = createAsyncThunk(
             mobileNumber: data.mobileNumber,
             position: data.position,
             employeeID: data.employeeID,
-            role: data.role, // Primary role, can be used as fallback
+            role: data.role, // Primary role
             monthlySalary: data.monthlySalary,
             active: data.active,
             dateOfBirth: data.dateOfBirth,
@@ -56,6 +58,7 @@ export const staffLogin = createAsyncThunk(
 
         // Reset any existing role
         dispatch(setRole(null));
+
         if (data.academicYear) {
           const formattedAcademicYear = formatAcademicYear(
             data.academicYear.year,
@@ -83,8 +86,6 @@ export const staffLogin = createAsyncThunk(
             );
             setLocalCookies("say", activeAcademicYear._id);
           }
-
-          // Fetch academic year details
         }
 
         // Store grouped roles in the state
@@ -100,6 +101,10 @@ export const staffLogin = createAsyncThunk(
             return { redirect: "/create_academicYear" };
           }
           dispatch(setRole(data.role));
+
+          // Fetch permissions after setting role
+          // await dispatch(getMyRolePermissionsThunk());
+
           return { redirect: "/select_branch" };
         }
 
@@ -110,11 +115,19 @@ export const staffLogin = createAsyncThunk(
 
         // If the user has exactly one grouped role, set it directly
         if (data.groupedRoles && data.groupedRoles.length === 1) {
-          dispatch(setRole(data.groupedRoles[0].department));
+          const userRole = data.groupedRoles[0].department;
+          dispatch(setRole(userRole));
+
+          // Fetch permissions after setting role
+          await dispatch(getMyRolePermissionsThunk());
+
           return { redirect: "/dashboard" };
         }
 
         // For non-admin users without grouped roles, set academic year and redirect to dashboard
+        if (data.role) {
+          await dispatch(getMyRolePermissionsThunk());
+        }
 
         return { redirect: "/dashboard" };
       } else {
@@ -130,6 +143,117 @@ export const staffLogin = createAsyncThunk(
     }
   }
 );
+
+// export const staffLogin = createAsyncThunk(
+//   "auth/staffLogin",
+//   async (staffDetails, { rejectWithValue, dispatch, getState }) => {
+//     try {
+//       // Hide any previous errors
+//       dispatch(setShowError(false));
+
+//       // Get device token for notifications
+//       const deviceToken = await requestPermissionAndGetToken();
+//       const userDetail = { ...staffDetails, deviceToken };
+
+//       // Send login request
+//       const data = await postData("/auth/staff/login", userDetail);
+
+//       if (data && data.success) {
+//         // Dispatch user details to userSlice
+//         dispatch(
+//           setUserDetails({
+//             schoolId: data.schoolId,
+//             userId: data.userId,
+//             profile: data.profile,
+//             fullName: data.fullName,
+//             email: data.email,
+//             mobileNumber: data.mobileNumber,
+//             position: data.position,
+//             employeeID: data.employeeID,
+//             role: data.role, // Primary role, can be used as fallback
+//             monthlySalary: data.monthlySalary,
+//             active: data.active,
+//             dateOfBirth: data.dateOfBirth,
+//             schoolName: data.schoolName,
+//           })
+//         );
+
+//         // Reset any existing role
+//         dispatch(setRole(null));
+//         if (data.academicYear) {
+//           const formattedAcademicYear = formatAcademicYear(
+//             data.academicYear.year,
+//             data.academicYear.startDate,
+//             data.academicYear.endDate
+//           );
+//           dispatch(
+//             setAcademicYear([
+//               {
+//                 ...formattedAcademicYear,
+//                 isActive: data.isAcademicYearActive,
+//               },
+//             ])
+//           );
+//           // await dispatch(fetchAcademicYear());
+//           // const activeAcademicYear =
+//           //   getState().common?.academicYear?.academicYears?.find(
+//           //     (i) => i.isActive === true
+//           //   );
+//           if (data?.isAcademicYearActive) {
+//             // console.log(
+//             //   "activeAcademicYear",
+//             //   activeAcademicYear,
+//             //   activeAcademicYear._id
+//             // );
+//             setLocalCookies("say", data?.academicYear?._id);
+//           }
+
+//           // Fetch academic year details
+//         }
+
+//         // Store grouped roles in the state
+//         if (data.groupedRoles && data.groupedRoles.length > 0) {
+//           dispatch(setUserRoles(data.groupedRoles));
+//         }
+
+//         // Handle admin role redirection
+//         if (data.role === "admin") {
+//           if (!data.isAcademicYearActive) {
+//             toast.success("Please create an academic year");
+//             setLocalCookies("isAcademicYearActive", data.isAcademicYearActive);
+//             return { redirect: "/create_academicYear" };
+//           }
+//           dispatch(setRole(data.role));
+//           return { redirect: "/select_branch" };
+//         }
+
+//         // Handle staff roles with multiple grouped roles
+//         if (data.groupedRoles && data.groupedRoles.length > 1) {
+//           return { redirect: "/select_role" };
+//         }
+
+//         // If the user has exactly one grouped role, set it directly
+//         if (data.groupedRoles && data.groupedRoles.length === 1) {
+//           dispatch(setRole(data.groupedRoles[0].department));
+//           return { redirect: "/dashboard" };
+//         }
+
+//         // For non-admin users without grouped roles, set academic year and redirect to dashboard
+
+//         return { redirect: "/dashboard" };
+//       } else {
+//         const errorMessage = data?.msg || "Incorrect email or password.";
+//         toast.error(errorMessage);
+//         return rejectWithValue(errorMessage);
+//       }
+//     } catch (error) {
+//       console.error("Error in staff login:", error);
+//       const err = ErrorMsg(error);
+//       toast.error(err.message || "Login failed.");
+//       return rejectWithValue(err.message || "Login failed.");
+//     }
+//   }
+// );
 
 // Staff Logout
 export const staffLogout = createAsyncThunk(

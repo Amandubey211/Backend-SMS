@@ -5,6 +5,7 @@ import TopRankingStudents from "../Graphs/TopRankingStudents";
 import Library from "../LibraryModule/Library";
 import NoticeBoard from "../NoticeModule/NoticeBoard";
 import Events from "../EventModule/Event";
+import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
 
 const TeacherSection = () => {
   return (
@@ -15,7 +16,9 @@ const TeacherSection = () => {
         <div className="absolute left-1/2 transform -translate-x-1/2 top-0 bottom-0 border-l border-gray-300 "></div>
         <div className="w-full md:w-1/2 p-2 h-full flex items-center justify-center ">
           <div className="w-full h-full">
-            <TotalAttendanceGraph />
+            <ProtectedSection requiredPermission="addBook">
+              <TotalAttendanceGraph />
+            </ProtectedSection>
           </div>
         </div>
         <div className="w-full md:w-1/2 p-2 h-full flex items-center justify-center">
