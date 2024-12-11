@@ -31,9 +31,14 @@ const BulkEntriesModal = ({ visible, onClose }) => {
     showUploadList: true, // Enable file list preview
   };
 
+  if (!visible) return null; // Don't render if modal is not visible
+
   return (
     <div
-      className="fixed -top-6 left-0 right-0 bottom-0 flex items-center justify-center bg-black bg-opacity-70 z-[1000]"
+      className="fixed -top-6 right-0 left-0 bottom-0 flex items-center justify-center bg-black bg-opacity-70 z-[1000]"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose(); // Close when clicking outside modal content
+      }}
     >
       <div className="bg-white rounded-lg w-[500px] shadow-lg overflow-hidden">
         {/* Top Red Strip */}
