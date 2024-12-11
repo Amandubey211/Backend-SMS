@@ -1,0 +1,47 @@
+// src/Modules/Admin/Finance/Earnings/EarningMainSection.js
+import React from "react";
+import Card from "./Cards";
+import { earningCardsData as earningData } from "../Datafiles/earning";
+import { FiUserPlus } from "react-icons/fi";
+import TotalEarningGraph from "./TotalEarningGraph";
+import SummaryTotalRevenue from "./SummaryTotalRevenue";
+
+const EarningMainSection = () => {
+  return (
+    <div className="p-6 space-y-6">
+      {/* Cards Section */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {earningData.map((item, index) => (
+          <Card key={index} {...item} />
+        ))}
+      </div>
+
+      {/* Buttons Section */}
+      <div className="flex justify-end items-center gap-4">
+        {/* Bulk Entries Button */}
+        <button className="px-6 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-medium rounded-md hover:shadow-lg transition duration-200">
+          Bulk entries
+        </button>
+
+        {/* Add New Earning Button */}
+        <button
+          onClick={() => console.log("Add New Earning clicked")}
+          className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
+        >
+          <span className="text-gray-800 font-medium">Add New Earning</span>
+          <div className="w-12 h-12 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center text-white">
+            <FiUserPlus size={16} />
+          </div>
+        </button>
+      </div>
+
+      {/* Graph Section */}
+      <TotalEarningGraph />
+
+       {/* Summary Table Section */}
+       <SummaryTotalRevenue />
+    </div>
+  );
+};
+
+export default EarningMainSection;

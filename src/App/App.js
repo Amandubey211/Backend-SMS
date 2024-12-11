@@ -52,6 +52,8 @@ import TeacherTableView from "../Components/Staff/Teacher/TimeTable/Components/T
 import ParentTimeTablePage from "../Modules/Parents/TimeTable/TimeTablePage.js";
 import ParentTableView from "../Modules/Parents/TimeTable/Components/TableView.js";
 import ManageRolePage from "../Components/Common/RBAC/ManageRolePage.js";
+import EarningDash from "../Modules/Admin/Finance/Earnings/EarningDash.js";
+import TotalRevenueList from "../Modules/Admin/Finance/Earnings/TotalRevenueList.js";
 
 // lazy loaded routes
 const RoleSelector = lazy(() =>
@@ -841,21 +843,52 @@ function App() {
       ),
       errorElement: <Error />,
     },
+    // {
+    //   path: "/accounting/earning",
+    //   element: (
+    //     <ProtectRoute
+    //       Component={Earning}
+    //       allowedRoles={["admin", "accountant"]}
+    //     />
+    //   ),
+    //   errorElement: <Error />,
+    // },
+    // {
+    //   path: "/accounting/expenses",
+    //   element: (
+    //     <ProtectRoute
+    //       Component={Expenses}
+    //       allowedRoles={["admin", "accountant"]}
+    //     />
+    //   ),
+    //   errorElement: <Error />,
+    // },
+
     {
-      path: "/accounting/earning",
+      path: "/finance/earning",
       element: (
         <ProtectRoute
-          Component={Earning}
+          Component={EarningDash}
           allowedRoles={["admin", "accountant"]}
         />
       ),
       errorElement: <Error />,
     },
     {
-      path: "/accounting/expenses",
+      path: "/finance/expenses",
       element: (
         <ProtectRoute
           Component={Expenses}
+          allowedRoles={["admin", "accountant"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/finance/total-revenue-list",
+      element: (
+        <ProtectRoute
+          Component={TotalRevenueList}
           allowedRoles={["admin", "accountant"]}
         />
       ),
