@@ -54,6 +54,7 @@ import ParentTableView from "../Modules/Parents/TimeTable/Components/TableView.j
 import ManageRolePage from "../Components/Common/RBAC/ManageRolePage.js";
 import EarningDash from "../Modules/Admin/Finance/Earnings/EarningDash.js";
 import TotalRevenueList from "../Modules/Admin/Finance/Earnings/TotalRevenueList.js";
+import StudentFeesDash from "../Modules/Admin/Finance/StudentFees/StudentFeesDash.js";
 
 // lazy loaded routes
 const RoleSelector = lazy(() =>
@@ -889,6 +890,16 @@ function App() {
       element: (
         <ProtectRoute
           Component={TotalRevenueList}
+          allowedRoles={["admin", "accountant"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/finance/studentfees",
+      element: (
+        <ProtectRoute
+          Component={StudentFeesDash}
           allowedRoles={["admin", "accountant"]}
         />
       ),

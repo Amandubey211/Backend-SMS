@@ -1,6 +1,6 @@
 import React from "react";
 import Card from "./Cards";
-import { earningCardsData as earningData } from "../../Datafiles/earning";
+import { earningCardsData as earningData } from "../Datafiles/earning";
 
 const CardSection = () => {
   return (
