@@ -6,10 +6,9 @@ const StudentFeesGraph = () => {
   const [graphData, setGraphData] = useState(null);
   const [selectedOption, setSelectedOption] = useState("By Month");
 
-  // Fetch graph data with caching logic
+  // Fetch graph data
   useEffect(() => {
     const fetchGraphData = async () => {
-
       const fetchedData = {
         labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul"],
         datasets: [
@@ -31,7 +30,6 @@ const StudentFeesGraph = () => {
       };
 
       setGraphData(fetchedData);
-
     };
 
     fetchGraphData();
@@ -75,17 +73,15 @@ const StudentFeesGraph = () => {
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow w-full relative">
+    <div className="bg-white p-6 rounded-lg border-2 border-gray-300 w-full relative">
       {/* Dropdown at the top-right */}
       <div className="absolute top-4 right-4">
         <select
           value={selectedOption}
           onChange={handleOptionChange}
-          className="bg-white text-gray-700 py-2 px-4 rounded-lg outline-none"
+          className="bg-white text-gray-700 py-2 px-4 rounded-lg outline-none border-2 border-transparent"
           style={{
-            border: "2px solid",
-            borderImageSource: "linear-gradient(90deg, #C83B62, #46138A)",
-            borderImageSlice: 1,
+            borderImage: "linear-gradient(90deg, #C83B62, #46138A) 1",
           }}
         >
           <option value="By Month">By Month</option>
