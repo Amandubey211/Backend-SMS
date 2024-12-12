@@ -89,6 +89,7 @@ const authPersistConfig = {
     "AcademicYear",
     "token",
     "selectedLanguage",
+    "userRoles",
   ], // Fields to persist
 };
 

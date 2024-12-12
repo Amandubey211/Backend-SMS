@@ -47,8 +47,17 @@ const ProtectRoute = ({ Component, allowedRoles }) => {
       toast.error("Admins do not need to select roles.");
       return <Navigate to="/dashboard" replace />;
     }
-    if (!groupedRoles || groupedRoles.length === 0) {
-      toast.error("No roles available to select.");
+    if (groupedRoles && groupedRoles.length > 1 && !userRole) {
+      return <Component />;
+    }
+
+    // if (!groupedRoles || groupedRoles.length === 0) {
+    //   toast.error("No roles available to select.");
+    //   return <Navigate to="/dashboard" replace />;
+    // }
+    // Redirect users with no groupedRoles or a selected role
+    if (!groupedRoles || groupedRoles.length === 0 || userRole) {
+      toast.error("Invalid access to select role page.");
       return <Navigate to="/dashboard" replace />;
     }
   }
