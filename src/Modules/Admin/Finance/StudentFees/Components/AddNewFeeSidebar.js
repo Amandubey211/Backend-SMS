@@ -35,7 +35,7 @@ const AddNewFeeSidebar = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-gray-700 bg-opacity-50 flex justify-end">
+    <div className="fixed -top-6 bottom-0 left-0 right-0 bg-gray-700 bg-opacity-50 flex justify-end z-50">
       <div className="bg-white w-96 p-6 overflow-y-auto shadow-xl">
         <button
           onClick={onClose}
@@ -45,24 +45,30 @@ const AddNewFeeSidebar = ({ isOpen, onClose }) => {
         </button>
         <h2 className="text-xl font-semibold mb-4">Add New Fees</h2>
 
-        {/* Fee Type Toggle */}
+        {/* Fee Type Radio Buttons */}
         <div className="flex space-x-4 mb-4">
-          <button
-            className={`px-4 py-2 rounded-md text-white ${
-              formData.type === 'single' ? 'bg-purple-600' : 'bg-gray-300'
-            }`}
-            onClick={() => setFormData({ ...formData, type: 'single' })}
-          >
-            Single Fees
-          </button>
-          <button
-            className={`px-4 py-2 rounded-md text-white ${
-              formData.type === 'mass' ? 'bg-purple-600' : 'bg-gray-300'
-            }`}
-            onClick={() => setFormData({ ...formData, type: 'mass' })}
-          >
-            Mass Fees
-          </button>
+          <label className="flex items-center space-x-2 cursor-pointer">
+            <input
+              type="radio"
+              name="type"
+              value="single"
+              checked={formData.type === 'single'}
+              onChange={() => setFormData({ ...formData, type: 'single' })}
+              className="appearance-none rounded-full h-4 w-4 border-2 border-green-600 checked:bg-green-600"
+            />
+            <span>Single Fees</span>
+          </label>
+          <label className="flex items-center space-x-2 cursor-pointer">
+            <input
+              type="radio"
+              name="type"
+              value="mass"
+              checked={formData.type === 'mass'}
+              onChange={() => setFormData({ ...formData, type: 'mass' })}
+              className="appearance-none rounded-full h-4 w-4 border-2 border-green-600 checked:bg-green-600"
+            />
+            <span>Mass Fees</span>
+          </label>
         </div>
 
         {/* Form */}
@@ -168,27 +174,27 @@ const AddNewFeeSidebar = ({ isOpen, onClose }) => {
               className="w-full p-2 border rounded-md"
             />
           </div>
-
           {/* Notification Toggle */}
-          <div className="flex items-center">
-            <label className="block text-gray-600 mr-2">
-              Send Notification to Student
-            </label>
+          <div
+            className="flex justify-between items-center p-4 rounded-lg"
+            style={{ background: "linear-gradient(90deg, #FFECF1 0%, #EFDFFF 100%)" }}
+          >
+            <label className="block text-gray-600">Send Notification to Student</label>
             <div
               onClick={handleToggle}
-              className={`w-12 h-6 rounded-full p-1 cursor-pointer ${
-                formData.sendNotification
-                  ? 'bg-gradient-to-r from-pink-500 to-purple-600'
-                  : 'bg-gray-300'
-              }`}
+              className={`relative w-12 h-6 rounded-full cursor-pointer ${formData.sendNotification
+                  ? "bg-gradient-to-r from-[#C83B62] to-[#46138A]"
+                  : "bg-gray-300"
+                }`}
             >
               <div
-                className={`h-4 w-4 bg-white rounded-full transform ${
-                  formData.sendNotification ? 'translate-x-6' : ''
-                }`}
+                className={`absolute top-[2px] left-[2px] w-5 h-5 bg-white rounded-full transform transition-transform ${formData.sendNotification ? "translate-x-6" : ""
+                  }`}
               />
             </div>
           </div>
+
+
 
           {/* Submit Button */}
           <button

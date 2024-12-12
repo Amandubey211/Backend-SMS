@@ -1,4 +1,3 @@
-// src/Modules/Admin/Finance/StudentFees/StudentFeesMain.js
 import React, { useState } from "react";
 import StudentCardSection from "./Components/StudentCardSection"; // Reused Cards Section for Students
 import StudentFeesGraph from "./Components/StudentFeesGraph";
@@ -93,14 +92,18 @@ const StudentFeesMain = () => {
         <StudentCardSection />
 
         {/* Graph Section */}
-        <StudentFeesGraph />
+        <div className="mt-6">
+          <StudentFeesGraph />
+        </div>
 
-        {/* Summary Table Section */}
-        <StudentFeesSummaryTable />
+        {/* Space between Graph and Summary */}
+        <div className="mt-8">
+          <StudentFeesSummaryTable />
+        </div>
       </motion.div>
 
       {/* Sidebar */}
-      <AddNewFeeSidebar visible={isSidebarVisible} onClose={handleSidebarClose} />
+      <AddNewFeeSidebar isOpen={isSidebarVisible} onClose={handleSidebarClose} />
     </div>
   );
 };
