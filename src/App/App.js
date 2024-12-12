@@ -58,6 +58,9 @@ import StudentFeesDash from "../Modules/Admin/Finance/StudentFees/StudentFeesDas
 import SummaryRevenueList from "../Modules/Admin/Finance/StudentFees/SummaryRevenueList.js";
 
 // lazy loaded routes
+const AddEarnings = lazy(() =>
+  import("../Modules/Admin/Finance/Earnings/AddEarnings/AddEarnings.js")
+);
 const RoleSelector = lazy(() =>
   import("../Components/Common/RBAC/RoleSelector.js")
 );
@@ -901,6 +904,16 @@ function App() {
       element: (
         <ProtectRoute
           Component={StudentFeesDash}
+          allowedRoles={["admin", "accountant"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/finance/earning/add",
+      element: (
+        <ProtectRoute
+          Component={AddEarnings}
           allowedRoles={["admin", "accountant"]}
         />
       ),

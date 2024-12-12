@@ -5,6 +5,7 @@ import StudentFeesSummaryTable from "./Components/StudentFeesSummaryTable";
 import AddNewFeeSidebar from "./Components/AddNewFeeSidebar";
 import { FiUserPlus } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 const StudentFeesMain = () => {
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
@@ -13,7 +14,7 @@ const StudentFeesMain = () => {
   // Handlers for Sidebar
   const handleSidebarOpen = () => setIsSidebarVisible(true);
   const handleSidebarClose = () => setIsSidebarVisible(false);
-
+  const navigate = useNavigate();
   // Dropdown toggle
   const toggleDropdown = () => setIsDropdownOpen((prev) => !prev);
 
@@ -85,7 +86,7 @@ const StudentFeesMain = () => {
           </div>
         </div>
         <button
-          onClick={handleSidebarOpen}
+          onClick={() => navigate("/finance/earning/add")}
           className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
         >
           <span className="text-gray-800 font-medium">Add New Fees</span>
@@ -115,7 +116,10 @@ const StudentFeesMain = () => {
       </motion.div>
 
       {/* Sidebar */}
-      <AddNewFeeSidebar isOpen={isSidebarVisible} onClose={handleSidebarClose} />
+      <AddNewFeeSidebar
+        isOpen={isSidebarVisible}
+        onClose={handleSidebarClose}
+      />
     </div>
   );
 };
