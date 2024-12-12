@@ -14,7 +14,7 @@ const Card = ({ title, value, comparison, percentage, icon, trend }) => {
     <div
       className="p-6 w-[350px] h-[180px] rounded-lg border hover:shadow-lg hover:scale-105 transition-transform duration-300"
       style={{
-        background: "linear-gradient(to bottom, #FFFFFF, #F8F2FF)",
+        background: "radial-gradient(100.5% 129.64% at 50.05% 35.24%, #FBF7FF 0%, #FFCEDB 100%)",
         borderColor: "#DABDFF",
       }}
     >
