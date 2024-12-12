@@ -35,8 +35,14 @@ const AddNewFeeSidebar = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed -top-6 bottom-0 left-0 right-0 bg-gray-700 bg-opacity-50 flex justify-end z-50">
-      <div className="bg-white w-96 p-6 overflow-y-auto shadow-xl">
+    <div
+      className="fixed -top-6 bottom-0 left-0 right-0 bg-gray-700 bg-opacity-50 flex justify-end z-50"
+      onClick={onClose} // Close sidebar on overlay click
+    >
+      <div
+        className="bg-white w-96 p-6 overflow-y-auto shadow-xl relative scroll-smooth"
+        onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside
+      >
         <button
           onClick={onClose}
           className="text-gray-500 hover:text-gray-800 absolute top-4 right-4"
@@ -174,6 +180,7 @@ const AddNewFeeSidebar = ({ isOpen, onClose }) => {
               className="w-full p-2 border rounded-md"
             />
           </div>
+
           {/* Notification Toggle */}
           <div
             className="flex justify-between items-center p-4 rounded-lg"
@@ -182,19 +189,19 @@ const AddNewFeeSidebar = ({ isOpen, onClose }) => {
             <label className="block text-gray-600">Send Notification to Student</label>
             <div
               onClick={handleToggle}
-              className={`relative w-12 h-6 rounded-full cursor-pointer ${formData.sendNotification
+              className={`relative w-12 h-6 rounded-full cursor-pointer ${
+                formData.sendNotification
                   ? "bg-gradient-to-r from-[#C83B62] to-[#46138A]"
                   : "bg-gray-300"
-                }`}
+              }`}
             >
               <div
-                className={`absolute top-[2px] left-[2px] w-5 h-5 bg-white rounded-full transform transition-transform ${formData.sendNotification ? "translate-x-6" : ""
-                  }`}
+                className={`absolute top-[2px] left-[2px] w-5 h-5 bg-white rounded-full transform transition-transform ${
+                  formData.sendNotification ? "translate-x-6" : ""
+                }`}
               />
             </div>
           </div>
-
-
 
           {/* Submit Button */}
           <button

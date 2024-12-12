@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import StudentCardSection from "./Components/StudentCardSection"; // Reused Cards Section for Students
 import StudentFeesGraph from "./Components/StudentFeesGraph";
 import StudentFeesSummaryTable from "./Components/StudentFeesSummaryTable";
@@ -17,8 +17,20 @@ const StudentFeesMain = () => {
   // Dropdown toggle
   const toggleDropdown = () => setIsDropdownOpen((prev) => !prev);
 
+  // Effect to toggle scrollbar visibility
+  useEffect(() => {
+    if (isSidebarVisible) {
+      document.body.style.overflow = "hidden"; // Disable scrolling
+    } else {
+      document.body.style.overflow = ""; // Restore scrolling
+    }
+    return () => {
+      document.body.style.overflow = ""; // Ensure cleanup on unmount
+    };
+  }, [isSidebarVisible]);
+
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-6 space-y-6 scroll-smooth overflow-y-auto h-full">
       {/* Header Section */}
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-4">
