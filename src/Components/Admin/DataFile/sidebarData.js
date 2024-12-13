@@ -21,7 +21,7 @@ import { MdLocalLibrary, MdManageAccounts } from "react-icons/md";
 import { RiParentFill, RiAdminFill } from "react-icons/ri";
 import { MdOutlineManageAccounts } from "react-icons/md";
 import { ROLES, PERMISSIONS } from "../../../config/permission";
-
+import { BsCashCoin } from "react-icons/bs";
 const sidebarData = [
   {
     title: "Dashboard",
@@ -138,6 +138,7 @@ const sidebarData = [
     items: [
       {
         title: "Earning",
+        icon: <BsCashCoin />,
         path: "/finance/earning",
         roles: [ROLES.ADMIN, ROLES.ACCOUNTANT],
         //requiredPermission: PERMISSIONS.VIEW_EARNINGS, // Added permission reference

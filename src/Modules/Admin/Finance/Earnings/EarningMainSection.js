@@ -6,19 +6,21 @@ import TotalEarningGraph from "./TotalEarningGraph";
 import SummaryTotalRevenue from "./SummaryTotalRevenue";
 import BulkEntriesModal from "./Components/BulkEntriesModal";
 import AddNewEarningSidebar from "./Components/AddNewEarningSidebar";
+import { useNavigate } from "react-router-dom";
+import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 
 const EarningMainSection = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
-
+  const navigate = useNavigate();
   const handleModalOpen = () => setIsModalVisible(true);
   const handleModalClose = () => setIsModalVisible(false);
-
 
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
 
   const handleSidebarOpen = () => setIsSidebarVisible(true);
   const handleSidebarClose = () => setIsSidebarVisible(false);
   const limit = 3; // cards to show in single row
+  useNavHeading("Earnings");
   return (
     <div className="p-6 space-y-6">
       {/* Buttons Section */}
@@ -33,7 +35,7 @@ const EarningMainSection = () => {
 
         {/* Add New Earning Button */}
         <button
-          onClick={handleSidebarOpen}
+          onClick={() => navigate("/finance/earning/add")}
           className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
         >
           <span className="text-gray-800 font-medium">Add New Earning</span>
@@ -41,9 +43,7 @@ const EarningMainSection = () => {
             <FiUserPlus size={16} />
           </div>
         </button>
-
       </div>
-
 
       {/* Cards Section */}
       <div className="flex justify-center">
@@ -53,7 +53,6 @@ const EarningMainSection = () => {
           ))}
         </div>
       </div>
-
 
       {/* Graph Section */}
       <TotalEarningGraph />
@@ -65,8 +64,10 @@ const EarningMainSection = () => {
       <BulkEntriesModal visible={isModalVisible} onClose={handleModalClose} />
 
       {/* Sidebar */}
-      <AddNewEarningSidebar visible={isSidebarVisible} onClose={handleSidebarClose} />
-
+      <AddNewEarningSidebar
+        visible={isSidebarVisible}
+        onClose={handleSidebarClose}
+      />
     </div>
   );
 };

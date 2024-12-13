@@ -199,7 +199,7 @@ const SideMenubar = () => {
                           key={subIndex}
                           to={subItem.path}
                           className={({ isActive }) =>
-                            `flex items-center p-2 rounded-lg ms-3 ${
+                            `flex items-center p-2 rounded-lg  ${
                               isActive ||
                               isActivePath(subItem.path, location.pathname)
                                 ? "text-purple-500 bg-purple-100"
