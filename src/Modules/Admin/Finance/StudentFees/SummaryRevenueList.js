@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { Table } from "antd";
 import { useNavigate } from "react-router-dom";
 import AdminLayout from "../../../../Components/Admin/AdminDashLayout";
+import SortPopModal from "./Components/SortPopModal";
+import StudentFeesPaidModal from "./Components/StudentFeesPaidModal";
 
 
 
@@ -31,7 +33,31 @@ const SummaryRevenueList = () => {
     },
   ]);
 
+  const [isStudentDetailsModalVisible, setStudentDetailsModalVisible] = useState(false);
+  const [selectedStudentDetails, setSelectedStudentDetails] = useState({});
+  const [isSortModalVisible, setSortModalVisible] = useState(false);
+  const [selectedOption, setSelectedOption] = useState("newest");
   const navigate = useNavigate();
+
+
+
+  // Function to handle row click and show modal
+  const handleRowClick = (record) => {
+    setSelectedStudentDetails({
+      name: record?.name || "N/A",
+      class: record?.class || "N/A",
+      section: record?.section || "N/A",
+      fees_type: record?.feesType || "N/A",
+      due_date: record?.dueDate || "N/A",
+      total_amount: record?.amount || "N/A",
+      penalty: record?.penalty || "N/A",
+      paid_status: record?.status || "N/A",
+      paid_by: "Card",
+      transaction_id: "12345",
+      payment_method: "Stripe",
+    });
+    setStudentDetailsModalVisible(true);
+  };
 
   const columns = [
     {
@@ -70,11 +96,10 @@ const SummaryRevenueList = () => {
       key: "status",
       render: (text) => (
         <span
-          className={`px-2 py-1 rounded-lg text-sm font-medium ${
-            text === "Paid"
-              ? "bg-green-100 text-green-600"
-              : "bg-red-100 text-red-600"
-          }`}
+          className={`px-2 py-1 rounded-lg text-sm font-medium ${text === "Paid"
+            ? "bg-green-100 text-green-600"
+            : "bg-red-100 text-red-600"
+            }`}
         >
           {text}
         </span>
@@ -90,24 +115,24 @@ const SummaryRevenueList = () => {
       key: "invoice",
       render: () => (
         <svg
-    xmlns="http://www.w3.org/2000/svg"
-    className="h-5 w-5 text-purple-500"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth={2}
-  >
-    <path
-      d="M8 2h8a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-    <path
-      d="M9 8h6M9 12h6M9 16h6"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-5 w-5 text-purple-500"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={2}
+        >
+          <path
+            d="M8 2h8a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <path
+            d="M9 8h6M9 12h6M9 16h6"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
       ),
     },
     {
@@ -131,7 +156,7 @@ const SummaryRevenueList = () => {
       ),
     },
   ];
-  
+
 
   return (
     <AdminLayout>
@@ -186,7 +211,7 @@ const SummaryRevenueList = () => {
                 style={{
                   borderImageSource: "linear-gradient(to right, #FF007C, #8A2BE2)",
                   borderImageSlice: 1,
-                }}
+                }} onClick={() => setSortModalVisible(true)}
               >
                 Sort
                 <span className="ml-2">
@@ -243,6 +268,45 @@ const SummaryRevenueList = () => {
           pagination={{ pageSize: 5 }}
           rowKey="key"
           className="rounded-lg overflow-hidden"
+          onRow={(record) => ({
+            onClick: () => handleRowClick(record),
+          })}
+        />
+
+
+
+
+        {/* SortPopModal */}
+        <SortPopModal
+          visible={isSortModalVisible}
+          onClose={() => setSortModalVisible(false)} 
+          onApply={() => {
+            console.log("Sort Applied with option:", selectedOption);
+            setSortModalVisible(false); 
+          }}
+          selectedOption={selectedOption} 
+          setSelectedOption={setSelectedOption} 
+        />
+
+
+        {/* StudentDetailsModal */}
+
+        <StudentFeesPaidModal
+          visible={isStudentDetailsModalVisible}
+          onClose={() => setStudentDetailsModalVisible(false)} // Close modal
+          onDownload={() => console.log("Downloading PDF...")} // Handle download
+          onSendInvoice={() => console.log("Sending Invoice...")} // Handle send invoice
+          studentDetails={selectedStudentDetails} // Pass selected row details
+          paymentDetails={[
+            {
+              date: "12/02/2024",
+              time: "08:34:56 AM",
+              amount: "1214.4 QAR",
+              penalty: "N/A",
+              status: "Successful",
+              payment_method: "Stripe",
+            },
+          ]}
         />
       </div>
     </AdminLayout>
