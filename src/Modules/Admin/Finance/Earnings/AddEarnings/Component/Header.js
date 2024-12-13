@@ -81,13 +81,13 @@ const Header = ({ onReset, onSave, onCategoryChange, onSubCategoryChange }) => {
         <div className="flex gap-4">
           <button
             onClick={onReset}
-            className="bg-gray-100 text-gray-700 text-sm font-medium px-6 py-2 rounded-lg border border-gray-300 hover:bg-gray-200 transition"
+            className="bg-gray-100 text-gray-700 text-sm font-medium px-6 py-2 rounded-md border border-gray-300 hover:bg-gray-200 transition"
           >
             Reset
           </button>
           <button
             onClick={onSave}
-            className="bg-gradient-to-r from-pink-500 to-purple-500 text-white text-sm font-medium px-6 py-2 rounded-lg shadow-md hover:from-pink-600 hover:to-purple-600 transition"
+            className="bg-gradient-to-r from-pink-500 to-purple-500 text-white text-sm font-medium px-6 py-2 rounded-md shadow-md hover:from-pink-600 hover:to-purple-600 transition"
           >
             Save earnings
           </button>
@@ -131,7 +131,9 @@ const Header = ({ onReset, onSave, onCategoryChange, onSubCategoryChange }) => {
             placeholder="Write a short description"
           ></textarea>
           <div className="flex justify-end items-center my-3">
-            <span className="text-xs text-gray-500 italic">You can write 100 characters</span>
+            <span className="text-xs text-gray-500 italic">
+              You can write 100 characters
+            </span>
           </div>
         </div>
       </div>
