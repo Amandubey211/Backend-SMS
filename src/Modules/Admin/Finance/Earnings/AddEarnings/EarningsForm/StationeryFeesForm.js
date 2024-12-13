@@ -4,6 +4,8 @@ import * as Yup from "yup";
 import TextInput from "../Component/TextInput";
 import SelectInput from "../Component/SelectInput";
 import FileInput from "../Component/FileInput";
+import PaymentDetails from "../Component/PaymentDetails";
+import PaymentStatus from "../Component/PaymentStatus";
 
 const validationSchema = Yup.object({
   itemName: Yup.string().required("Item Name is required"),
@@ -85,94 +87,10 @@ const StationeryFeesForm = () => {
           </div>
 
           {/* Payment Details Section */}
-          <div className="mb-6">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">
-              Payment Details
-            </h2>
-            <div className="grid grid-cols-3 gap-6">
-              <TextInput
-                label="Date & Time"
-                name="dateTime"
-                type="datetime-local"
-              />
-              <TextInput
-                label="Tax (Inc/Exc)"
-                name="tax"
-                placeholder="Enter tax percentage"
-              />
-              <TextInput
-                label="Discount"
-                name="discount"
-                placeholder="Enter discount percentage"
-              />
-              <TextInput
-                label="Penalty"
-                name="penalty"
-                placeholder="Enter penalty amount"
-              />
-              <TextInput
-                label="Total Amount"
-                name="totalAmount"
-                placeholder="Enter total amount"
-              />
-              <TextInput
-                label="Final amount (After tax/discount/penalty)"
-                name="finalAmount"
-                placeholder="Enter final amount"
-              />
-            </div>
-          </div>
+          <PaymentDetails />
 
           {/* Payment Status Section */}
-          <div className="mb-6">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">
-              Payment Status
-            </h2>
-            <div className="grid grid-cols-3 gap-6">
-              <SelectInput
-                label="Payment Status"
-                name="paymentStatus"
-                options={["Paid", "Unpaid", "Partial", "Advance"]}
-              />
-              <TextInput
-                label="Paid Amount"
-                name="paidAmount"
-                placeholder="Enter paid amount"
-              />
-              <SelectInput
-                label="Payment Type"
-                name="paymentType"
-                options={["Cash", "Card", "Online", "Cheque", "Others"]}
-              />
-              <TextInput
-                label="Advance Amount"
-                name="advanceAmount"
-                placeholder="Enter advance amount"
-              />
-              <TextInput
-                label="Remaining Amount"
-                name="remainingAmount"
-                placeholder="Enter remaining amount"
-              />
-              <TextInput
-                label="Cheque Number"
-                name="chequeNumber"
-                placeholder="Enter cheque number"
-              />
-              <TextInput
-                label="Transaction ID"
-                name="transactionId"
-                placeholder="Enter transaction ID"
-              />
-              <FileInput
-                label="Add receipt/document"
-                name="receipt"
-                onChange={(event) =>
-                  setFieldValue("receipt", event.target.files[0])
-                }
-              />
-            </div>
-          </div>
+          <PaymentStatus setFieldValue={setFieldValue} />
 
           <div className="flex justify-end mt-6">
             <button

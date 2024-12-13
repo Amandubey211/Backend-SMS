@@ -40,10 +40,17 @@ const DropdownCard = ({
       <div
         className="bg-white rounded-lg px-4 py-3 flex justify-between items-center cursor-pointer shadow-lg"
         onClick={onToggle}
+        onMouseEnter={() => {
+          if (!isOpen) onToggle();
+        }}
       >
         <span className="text-gray-800 font-medium">{value}</span>
         <span className="border flex justify-center items-center rounded-full w-6 h-6">
-          <IoIosArrowForward className="text-purple-500 text-lg" />
+          <IoIosArrowForward
+            className={`text-lg transition-transform ${
+              isOpen ? "rotate-90" : ""
+            } text-purple-500`}
+          />
         </span>
       </div>
       {isOpen && (
@@ -56,7 +63,9 @@ const DropdownCard = ({
           {options.map((item, index) => (
             <li
               key={index}
-              className="px-3 py-1 hover:bg-pink-100 cursor-pointer text-gray-800 text-sm"
+              className={`px-3 py-2 hover:bg-pink-100 cursor-pointer text-sm ${
+                item === value ? "bg-pink-200 font-bold text-gray-900" : ""
+              }`}
               onClick={() => onSelect(item)}
             >
               {item}

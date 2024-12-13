@@ -130,8 +130,8 @@ const Header = ({ onReset, onSave, onCategoryChange, onSubCategoryChange }) => {
             className="bg-gray-50 rounded-lg p-2 text-sm text-gray-800 w-full focus:outline-none focus:ring-2 focus:ring-purple-300 shadow-sm"
             placeholder="Write a short description"
           ></textarea>
-          <div className="flex justify-end items-center my-1">
-            <span className="text-xs italic">You can write 100 characters</span>
+          <div className="flex justify-end items-center my-3">
+            <span className="text-xs text-gray-500 italic">You can write 100 characters</span>
           </div>
         </div>
       </div>
