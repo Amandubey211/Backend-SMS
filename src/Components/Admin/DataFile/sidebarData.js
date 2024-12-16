@@ -22,10 +22,20 @@ import { RiParentFill, RiAdminFill } from "react-icons/ri";
 import { MdOutlineManageAccounts } from "react-icons/md";
 import { ROLES, PERMISSIONS } from "../../../config/permission";
 import { BsCashCoin } from "react-icons/bs";
+import { IoReceiptOutline } from "react-icons/io5";
+import { TbFileInvoice } from "react-icons/tb";
+import { MdPayment } from "react-icons/md";
+import { HiOutlineReceiptTax } from "react-icons/hi";
+import { TbReport } from "react-icons/tb";
+import { RiHandCoinLine } from "react-icons/ri";
+import { TfiReceipt } from "react-icons/tfi";
+import { FaWpforms } from "react-icons/fa6";
+
+
 const sidebarData = [
   {
     title: "Dashboard",
-    icon: <TbDashboard />,
+    icon: <TbDashboard style={{ fontSize: '1.1rem' }}/>,
     path: `/dashboard`,
     roles: [
       ROLES.ADMIN,
@@ -38,7 +48,7 @@ const sidebarData = [
   },
   {
     title: "Classes",
-    icon: <RiGraduationCapLine />,
+    icon: <RiGraduationCapLine style={{ fontSize: '1.1rem' }}/>,
     path: `/class`,
     roles: [ROLES.ADMIN, ROLES.TEACHER],
     //requiredPermission: PERMISSIONS.VIEW_CLASSES, // Added permission reference
@@ -52,7 +62,7 @@ const sidebarData = [
   },
   {
     title: "Users",
-    icon: <LuUser />,
+    icon: <LuUser style={{ fontSize: '1.2rem' }}/>,
     roles: [
       ROLES.ADMIN,
       ROLES.TEACHER,
@@ -133,7 +143,7 @@ const sidebarData = [
   },
   {
     title: "Finance",
-    icon: <HiOutlineCalculator />,
+    icon: <HiOutlineCalculator style={{ fontSize: '1.1rem' }}/>,
     roles: [ROLES.ADMIN, ROLES.ACCOUNTANT],
     items: [
       {
@@ -146,56 +156,65 @@ const sidebarData = [
       {
         title: "Student Fees",
         path: "/finance/studentfees",
+        icon: <IoReceiptOutline style={{ fontSize: '1.1rem' }} />,
         roles: [ROLES.ADMIN, ROLES.ACCOUNTANT],
-        //requiredPermission: PERMISSIONS.VIEW_FEES, // Added permission reference
+        //requiredPermission: PERMISSIONS.VIEW_FEES,
       },
       {
         title: "Expense",
         path: "/finance/expenses",
+        icon: <RiHandCoinLine style={{ fontSize: '1.1rem' }} />,
         roles: [ROLES.ADMIN, ROLES.ACCOUNTANT],
-        //requiredPermission: PERMISSIONS.VIEW_EXPENSES, // Added permission reference
+        //requiredPermission: PERMISSIONS.VIEW_EXPENSES,
       },
       {
         title: "Invoices",
         path: "/finance/invoices",
+        icon: <TbFileInvoice style={{ fontSize: '1.1rem' }} />,
         roles: [ROLES.ADMIN, ROLES.ACCOUNTANT],
-        //requiredPermission: PERMISSIONS.VIEW_INVOICES, // Added permission reference
+        //requiredPermission: PERMISSIONS.VIEW_INVOICES,
       },
       {
         title: "Receipts",
         path: "/finance/receipts",
+        icon: <TfiReceipt style={{ fontSize: '1.1rem' }} />,
         roles: [ROLES.ADMIN, ROLES.ACCOUNTANT],
-        //requiredPermission: PERMISSIONS.VIEW_RECEIPTS, // Added permission reference
+        //requiredPermission: PERMISSIONS.VIEW_RECEIPTS,
       },
       {
         title: "Quotations",
         path: "/finance/quotations",
+        icon: <FaWpforms style={{ fontSize: '1.1rem' }} />,
         roles: [ROLES.ADMIN, ROLES.ACCOUNTANT],
-        //requiredPermission: PERMISSIONS.VIEW_QUOTATIONS, // Added permission reference
+        //requiredPermission: PERMISSIONS.VIEW_QUOTATIONS,
       },
       {
         title: "Payments",
         path: "/finance/payments",
+        icon: <MdPayment style={{ fontSize: '1.1rem' }} />,
         roles: [ROLES.ADMIN, ROLES.ACCOUNTANT],
-        //requiredPermission: PERMISSIONS.VIEW_PAYMENTS, // Added permission reference
+        //requiredPermission: PERMISSIONS.VIEW_PAYMENTS,
       },
       {
         title: "Reports",
         path: "/finance/reports",
+        icon: <TbReport style={{ fontSize: '1.1rem' }} />,
         roles: [ROLES.ADMIN, ROLES.ACCOUNTANT],
-        //requiredPermission: PERMISSIONS.VIEW_REPORTS, // Added permission reference
+        //requiredPermission: PERMISSIONS.VIEW_REPORTS,
       },
       {
         title: "Penalties & Adjustments",
         path: "/finance/penalties_adjustments",
+        icon: <HiOutlineReceiptTax style={{ fontSize: '1.1rem' }} />,
         roles: [ROLES.ADMIN, ROLES.ACCOUNTANT],
-        //requiredPermission: PERMISSIONS.VIEW_PENALTIES, // Added permission reference
+        //requiredPermission: PERMISSIONS.VIEW_PENALTIES,
       },
+
     ],
   },
   {
     title: "NoticeBoard",
-    icon: <TbNotebook />,
+    icon: <TbNotebook style={{ fontSize: '1.1rem' }}/>,
     roles: [
       ROLES.ADMIN,
       ROLES.TEACHER,

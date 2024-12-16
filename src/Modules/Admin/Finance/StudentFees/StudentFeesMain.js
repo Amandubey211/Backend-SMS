@@ -1,3 +1,4 @@
+// src/Modules/Admin/Finance/StudentFees/StudentFeesMain.js
 import React, { useState, useEffect } from "react";
 import StudentCardSection from "./Components/StudentCardSection"; // Reused Cards Section for Students
 import StudentFeesGraph from "./Components/StudentFeesGraph";
@@ -15,6 +16,7 @@ const StudentFeesMain = () => {
   const handleSidebarOpen = () => setIsSidebarVisible(true);
   const handleSidebarClose = () => setIsSidebarVisible(false);
   const navigate = useNavigate();
+
   // Dropdown toggle
   const toggleDropdown = () => setIsDropdownOpen((prev) => !prev);
 
@@ -31,15 +33,15 @@ const StudentFeesMain = () => {
   }, [isSidebarVisible]);
 
   return (
-    <div className="p-6 space-y-6 scroll-smooth overflow-y-auto h-full">
+    <div className="p-4 md:p-6 space-y-6 scroll-smooth overflow-y-auto h-full w-full mx-auto">
       {/* Header Section */}
-      <div className="flex justify-between items-center">
-        <div className="flex items-center gap-4">
-          <h2 className="text-2xl font-bold text-gray-800">Student Fees</h2>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-800">Student Fees</h2>
           <div className="relative">
             <button
               onClick={toggleDropdown}
-              className="px-4 py-2 bg-white text-gray-800 font-medium rounded-lg border border-gray-300 shadow-sm flex items-center gap-2"
+              className="px-3 sm:px-4 py-2 bg-white text-gray-800 font-medium rounded-lg border border-gray-300 shadow-sm flex items-center gap-2 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-indigo-500"
               style={{
                 borderImage: "linear-gradient(90deg, #C83B62, #46138A) 1",
                 borderRadius: "8px",
@@ -66,7 +68,7 @@ const StudentFeesMain = () => {
             <AnimatePresence>
               {isDropdownOpen && (
                 <motion.ul
-                  className="absolute right-0 mt-2 bg-white border border-gray-300 rounded-lg shadow-lg w-40"
+                  className="absolute right-0 mt-2 bg-white border border-gray-300 rounded-lg shadow-lg w-36 sm:w-40 z-10"
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
@@ -75,7 +77,11 @@ const StudentFeesMain = () => {
                   {["By Week", "By Month", "By Year"].map((option) => (
                     <li
                       key={option}
-                      className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                      className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm sm:text-base"
+                      onClick={() => {
+                        // Handle option selection (e.g., filter data)
+                        setIsDropdownOpen(false);
+                      }}
                     >
                       {option}
                     </li>
@@ -100,26 +106,24 @@ const StudentFeesMain = () => {
       <motion.div
         animate={{ y: isDropdownOpen ? 120 : 0 }}
         transition={{ duration: 0.3 }}
+        className="flex-1 flex flex-col space-y-6"
       >
         {/* Cards Section */}
         <StudentCardSection />
 
         {/* Graph Section */}
-        <div className="mt-6">
+        <div className="w-full">
           <StudentFeesGraph />
         </div>
 
-        {/* Space between Graph and Summary */}
-        <div className="mt-8">
+        {/* Summary Table */}
+        <div className="w-full">
           <StudentFeesSummaryTable />
         </div>
       </motion.div>
 
       {/* Sidebar */}
-      <AddNewFeeSidebar
-        isOpen={isSidebarVisible}
-        onClose={handleSidebarClose}
-      />
+      <AddNewFeeSidebar isOpen={isSidebarVisible} onClose={handleSidebarClose} />
     </div>
   );
 };
