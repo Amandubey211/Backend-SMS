@@ -1,60 +1,50 @@
 import React from "react";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
-import TextInput from "../Component/TextInput";
+import FormSection from "../Component/FormSection";
 import PaymentDetails from "../Component/PaymentDetails";
 import PaymentStatus from "../Component/PaymentStatus";
+import Button from "../Component/Button";
 
+// Configuration for Fundraising Details Fields
+const fundraisingDetailsFields = [
+  {
+    name: "fundName",
+    label: "Fund Name",
+    type: "text",
+    placeholder: "Enter fund name",
+  },
+];
+
+// Validation Schema
 const validationSchema = Yup.object({
   fundName: Yup.string().required("Fund Name is required"),
-  ...PaymentDetails.validationSchema, // Reusing PaymentDetails validation schema
-  ...PaymentStatus.validationSchema, // Reusing PaymentStatus validation schema
 });
 
-const FundraisingForm = () => {
+const FundraisingForm = ({ formData, onFormChange }) => {
   return (
     <Formik
-      initialValues={{
-        fundName: "",
-        ...PaymentDetails.initialValues, // Reusing PaymentDetails initial values
-        ...PaymentStatus.initialValues, // Reusing PaymentStatus initial values
-      }}
+      initialValues={formData}
       validationSchema={validationSchema}
       onSubmit={(values) => {
-        console.log(values);
+        console.log("Submitted Values:", values);
+        onFormChange(values); // Pass updated values to parent
       }}
     >
-      {({ isSubmitting, setFieldValue }) => (
+      {({ setFieldValue }) => (
         <Form className="bg-white p-6 rounded-lg shadow-md">
           {/* Fundraising Details Section */}
-          <div className="mb-6">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">
-              Fundraising Details
-            </h2>
-            <div className="grid grid-cols-3 gap-6">
-              <TextInput
-                label="Fund Name"
-                name="fundName"
-                placeholder="Enter fund name"
-              />
-            </div>
-          </div>
+          <FormSection
+            title="Fundraising Details"
+            fields={fundraisingDetailsFields}
+            setFieldValue={setFieldValue}
+          />
 
           {/* Payment Details Section */}
-          <PaymentDetails />
+          <PaymentDetails onFormChange={onFormChange} />
 
           {/* Payment Status Section */}
-          <PaymentStatus setFieldValue={setFieldValue} />
-
-          <div className="flex justify-end mt-6">
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="bg-gradient-to-r from-pink-500 to-purple-500 text-white text-sm font-medium px-6 py-2 rounded-lg shadow-md hover:from-pink-600 hover:to-purple-600 transition"
-            >
-              Submit
-            </button>
-          </div>
+          <PaymentStatus onFormChange={onFormChange} />
         </Form>
       )}
     </Formik>

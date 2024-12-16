@@ -1,10 +1,39 @@
 import React from "react";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
-import TextInput from "../Component/TextInput";
+import FormSection from "../Component/FormSection";
 import PaymentDetails from "../Component/PaymentDetails";
 import PaymentStatus from "../Component/PaymentStatus";
 
+// Configuration for Exam Center Details Fields
+const examCenterDetailsFields = [
+  {
+    name: "examName",
+    label: "Exam Name",
+    type: "text",
+    placeholder: "Enter exam name",
+  },
+  {
+    name: "userOrganisationName",
+    label: "User/Organisation Name",
+    type: "text",
+    placeholder: "Enter name",
+  },
+  {
+    name: "phoneNumber",
+    label: "Phone Number",
+    type: "text",
+    placeholder: "Enter phone number",
+  },
+  {
+    name: "timePeriod",
+    label: "Time Period",
+    type: "text",
+    placeholder: "Enter time period",
+  },
+];
+
+// Validation Schema
 const validationSchema = Yup.object({
   examName: Yup.string().required("Exam Name is required"),
   userOrganisationName: Yup.string().required(
@@ -14,72 +43,32 @@ const validationSchema = Yup.object({
     .required("Phone Number is required")
     .matches(/^[0-9]{10}$/, "Phone Number must be 10 digits"),
   timePeriod: Yup.string().required("Time Period is required"),
-  ...PaymentDetails.validationSchema,
-  ...PaymentStatus.validationSchema,
 });
 
-const ExamCenterFeesForm = () => {
+const ExamCenterFeesForm = ({ formData, onFormChange }) => {
   return (
     <Formik
-      initialValues={{
-        examName: "",
-        userOrganisationName: "",
-        phoneNumber: "",
-        timePeriod: "",
-        ...PaymentDetails.initialValues,
-        ...PaymentStatus.initialValues,
-      }}
+      initialValues={formData}
       validationSchema={validationSchema}
       onSubmit={(values) => {
-        console.log(values);
+        console.log("Submitted Values:", values);
+        onFormChange(values);
       }}
     >
-      {({ isSubmitting, setFieldValue }) => (
+      {({ setFieldValue }) => (
         <Form className="bg-white p-6 rounded-lg shadow-md">
           {/* Exam Center Details Section */}
-          <div className="mb-6">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">
-              Exam Center Details
-            </h2>
-            <div className="grid grid-cols-3 gap-6">
-              <TextInput
-                label="Exam Name"
-                name="examName"
-                placeholder="Enter exam name"
-              />
-              <TextInput
-                label="User/Organisation Name"
-                name="userOrganisationName"
-                placeholder="Enter name"
-              />
-              <TextInput
-                label="Phone Number"
-                name="phoneNumber"
-                placeholder="Enter phone number"
-              />
-              <TextInput
-                label="Time Period"
-                name="timePeriod"
-                placeholder="Enter time period"
-              />
-            </div>
-          </div>
+          <FormSection
+            title="Exam Center Details"
+            fields={examCenterDetailsFields}
+            setFieldValue={setFieldValue}
+          />
 
-          {/* Payment Details Section */}
-          <PaymentDetails />
+          {/* Static Payment Details Component */}
+          <PaymentDetails onFormChange={onFormChange} />
 
-          {/* Payment Status Section */}
+          {/* Static Payment Status Component */}
           <PaymentStatus setFieldValue={setFieldValue} />
-
-          <div className="flex justify-end mt-6">
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="bg-gradient-to-r from-pink-500 to-purple-500 text-white text-sm font-medium px-6 py-2 rounded-lg shadow-md hover:from-pink-600 hover:to-purple-600 transition"
-            >
-              Submit
-            </button>
-          </div>
         </Form>
       )}
     </Formik>

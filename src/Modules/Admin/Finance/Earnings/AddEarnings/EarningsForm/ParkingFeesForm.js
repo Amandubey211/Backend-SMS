@@ -1,11 +1,39 @@
 import React from "react";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
-import TextInput from "../Component/TextInput";
-import SelectInput from "../Component/SelectInput";
+import FormSection from "../Component/FormSection";
 import PaymentDetails from "../Component/PaymentDetails";
 import PaymentStatus from "../Component/PaymentStatus";
 
+// Configuration for Parking Details Fields
+const parkingDetailsFields = [
+  {
+    name: "vehicleType",
+    label: "Vehicle Type",
+    type: "text",
+    placeholder: "Enter vehicle type",
+  },
+  {
+    name: "nameOfPerson",
+    label: "Name Of Person",
+    type: "text",
+    placeholder: "Enter name",
+  },
+  {
+    name: "phoneNumber",
+    label: "Phone Number",
+    type: "text",
+    placeholder: "Enter phone number",
+  },
+  {
+    name: "userType",
+    label: "User Type",
+    type: "select",
+    options: ["Employee", "Visitor", "Other"],
+  },
+];
+
+// Validation Schema
 const validationSchema = Yup.object({
   vehicleType: Yup.string().required("Vehicle Type is required"),
   nameOfPerson: Yup.string().required("Name of Person is required"),
@@ -13,72 +41,32 @@ const validationSchema = Yup.object({
     .required("Phone Number is required")
     .matches(/^[0-9]{10}$/, "Phone Number must be 10 digits"),
   userType: Yup.string().required("User Type is required"),
-  ...PaymentDetails.validationSchema,
-  ...PaymentStatus.validationSchema,
 });
 
-const ParkingFeesForm = () => {
+const ParkingFeesForm = ({ formData, onFormChange }) => {
   return (
     <Formik
-      initialValues={{
-        vehicleType: "",
-        nameOfPerson: "",
-        phoneNumber: "",
-        userType: "",
-        ...PaymentDetails.initialValues,
-        ...PaymentStatus.initialValues,
-      }}
+      initialValues={formData}
       validationSchema={validationSchema}
       onSubmit={(values) => {
-        console.log(values);
+        console.log("Submitted Values:", values);
+        onFormChange(values); // Pass form values to parent
       }}
     >
-      {({ isSubmitting, setFieldValue }) => (
+      {({ setFieldValue }) => (
         <Form className="bg-white p-6 rounded-lg shadow-md">
           {/* Parking Details Section */}
-          <div className="mb-6">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">
-              Parking Details
-            </h2>
-            <div className="grid grid-cols-3 gap-6">
-              <TextInput
-                label="Vehicle Type"
-                name="vehicleType"
-                placeholder="Enter vehicle type"
-              />
-              <TextInput
-                label="Name Of Person"
-                name="nameOfPerson"
-                placeholder="Enter name"
-              />
-              <TextInput
-                label="Phone Number"
-                name="phoneNumber"
-                placeholder="Enter phone number"
-              />
-              <SelectInput
-                label="User Type"
-                name="userType"
-                options={["Employee", "Visitor", "Other"]}
-              />
-            </div>
-          </div>
+          <FormSection
+            title="Parking Details"
+            fields={parkingDetailsFields}
+            setFieldValue={setFieldValue}
+          />
 
-          {/* Payment Details Section */}
-          <PaymentDetails />
+          {/* Static Payment Details Section */}
+          <PaymentDetails onFormChange={onFormChange} />
 
-          {/* Payment Status Section */}
+          {/* Static Payment Status Section */}
           <PaymentStatus setFieldValue={setFieldValue} />
-
-          <div className="flex justify-end mt-6">
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="bg-gradient-to-r from-pink-500 to-purple-500 text-white text-sm font-medium px-6 py-2 rounded-lg shadow-md hover:from-pink-600 hover:to-purple-600 transition"
-            >
-              Submit
-            </button>
-          </div>
         </Form>
       )}
     </Formik>

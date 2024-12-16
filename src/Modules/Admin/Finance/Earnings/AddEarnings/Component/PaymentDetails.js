@@ -1,9 +1,13 @@
 import React from "react";
 import { useFormikContext } from "formik";
 import TextInput from "./TextInput";
-import * as Yup from "yup";
-const PaymentDetails = () => {
+import SelectInput from "./SelectInput";
+
+const PaymentDetails = ({ onFormChange }) => {
   const { values } = useFormikContext();
+
+  // Optionally pass form values back to the parent component if needed
+  onFormChange(values);
 
   return (
     <div className="mb-6">
@@ -11,18 +15,30 @@ const PaymentDetails = () => {
         Payment Details
       </h2>
       <div className="grid grid-cols-3 gap-6">
+        <SelectInput
+          label="Frequency of payment"
+          name="frequencyOfPayment"
+          options={[
+            "Monthly",
+            "Quarterly",
+            "Half yearly",
+            "Yearly",
+            "Custom Date",
+          ]}
+          value={values.paymentType}
+        />
         <TextInput
           label="Date & Time"
           name="dateTime"
           type="datetime-local"
           value={values.dateTime}
         />
-        <TextInput
+        {/* <TextInput
           label="Tax (Inc/Exc)"
           name="tax"
           placeholder="Enter tax percentage"
           value={values.tax}
-        />
+        /> */}
         <TextInput
           label="Discount"
           name="discount"
@@ -50,27 +66,6 @@ const PaymentDetails = () => {
       </div>
     </div>
   );
-};
-
-// Define initialValues and validationSchema for reuse
-PaymentDetails.initialValues = {
-  dateTime: "",
-  tax: "",
-  discount: "",
-  penalty: "",
-  totalAmount: "",
-  finalAmount: "",
-};
-
-PaymentDetails.validationSchema = {
-  dateTime: Yup.date().required("Date & Time is required"),
-  tax: Yup.number()
-    .required("Tax is required")
-    .min(0, "Invalid tax percentage"),
-  discount: Yup.number().min(0, "Invalid discount percentage"),
-  penalty: Yup.number().min(0, "Invalid penalty amount"),
-  totalAmount: Yup.number().required("Total amount is required").min(0),
-  finalAmount: Yup.number().required("Final amount is required").min(0),
 };
 
 export default PaymentDetails;
