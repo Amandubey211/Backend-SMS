@@ -1,74 +1,79 @@
 import React from "react";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
-import TextInput from "../Component/TextInput";
 import PaymentDetails from "../Component/PaymentDetails";
 import PaymentStatus from "../Component/PaymentStatus";
+import FormSection from "../Component/FormSection"; // Reusable FormSection
 
+// Configuration for Workshop/Training Details Fields
+const workshopDetailsFields = [
+  {
+    name: "sessionName",
+    label: "Session Name",
+    type: "text",
+    placeholder: "Enter session here",
+  },
+  {
+    name: "hostName",
+    label: "Host Name",
+    type: "text",
+    placeholder: "Enter host name",
+  },
+  {
+    name: "startDateTime",
+    label: "Start Date & Time",
+    type: "datetime-local",
+    placeholder: "Select start date and time",
+  },
+  {
+    name: "endDateTime",
+    label: "End Date & Time",
+    type: "datetime-local",
+    placeholder: "Select end date and time",
+  },
+];
+
+// Validation Schema
 const validationSchema = Yup.object({
   sessionName: Yup.string().required("Session Name is required"),
   hostName: Yup.string().required("Host Name is required"),
-  timePeriod: Yup.string().required("Time Period is required"),
-  ...PaymentDetails.validationSchema, // Reusing PaymentDetails validation schema
-  ...PaymentStatus.validationSchema, // Reusing PaymentStatus validation schema
+  startDateTime: Yup.date().required("Start Date & Time is required"),
+  endDateTime: Yup.date()
+    .required("End Date & Time is required")
+    .test(
+      "is-after-start",
+      "End Date & Time must be after Start Date & Time",
+      function (value) {
+        const { startDateTime } = this.parent;
+        return new Date(value) > new Date(startDateTime);
+      }
+    ),
 });
 
-const WorkshopTrainingFeesForm = () => {
+const WorkshopTrainingFeesForm = ({ formData, onFormChange }) => {
   return (
     <Formik
-      initialValues={{
-        sessionName: "",
-        hostName: "",
-        timePeriod: "",
-        ...PaymentDetails.initialValues, // Reusing PaymentDetails initial values
-        ...PaymentStatus.initialValues, // Reusing PaymentStatus initial values
-      }}
+      initialValues={formData}
       validationSchema={validationSchema}
       onSubmit={(values) => {
-        console.log(values);
+        console.log("Submitted Values:", values);
+        onFormChange(values); // Send updated data back to parent
       }}
     >
-      {({ isSubmitting, setFieldValue }) => (
+      {({ setFieldValue }) => (
         <Form className="bg-white p-6 rounded-lg shadow-md">
           {/* Workshop/Training Details Section */}
-          <div className="mb-6">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">
-              Workshop/Training Details
-            </h2>
-            <div className="grid grid-cols-3 gap-6">
-              <TextInput
-                label="Session Name"
-                name="sessionName"
-                placeholder="Enter session here"
-              />
-              <TextInput
-                label="Host Name"
-                name="hostName"
-                placeholder="Enter host name"
-              />
-              <TextInput
-                label="Time Period"
-                name="timePeriod"
-                placeholder="Enter duration"
-              />
-            </div>
-          </div>
+          <FormSection
+            title="Workshop/Training Details"
+            fields={workshopDetailsFields}
+            setFieldValue={setFieldValue}
+          />
 
-          {/* Payment Details Section */}
-          <PaymentDetails />
+          {/* Static PaymentDetails Component */}
+          <PaymentDetails onFormChange={onFormChange} />
 
-          {/* Payment Status Section */}
+          {/* Static PaymentStatus Component */}
           <PaymentStatus setFieldValue={setFieldValue} />
-
-          <div className="flex justify-end mt-6">
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="bg-gradient-to-r from-pink-500 to-purple-500 text-white text-sm font-medium px-6 py-2 rounded-lg shadow-md hover:from-pink-600 hover:to-purple-600 transition"
-            >
-              Submit
-            </button>
-          </div>
         </Form>
       )}
     </Formik>

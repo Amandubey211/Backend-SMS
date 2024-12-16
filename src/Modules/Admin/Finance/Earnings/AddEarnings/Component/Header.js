@@ -1,10 +1,17 @@
+// Header.jsx
 import React, { useState } from "react";
 import DropdownCard from "./DropdownCard";
 
-const Header = ({ onReset, onSave, onCategoryChange, onSubCategoryChange }) => {
+const Header = ({
+  onReset,
+  onSave,
+  onCategoryChange,
+  onSubCategoryChange,
+  description,
+  setDescription,
+}) => {
   const [category, setCategory] = useState("Student Based Revenue");
   const [subCategory, setSubCategory] = useState("Tuition fees");
-  const [description, setDescription] = useState("");
 
   const categories = [
     "Student Based Revenue",

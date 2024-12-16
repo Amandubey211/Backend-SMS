@@ -15,7 +15,8 @@ const FormSection = ({ title, fields, setFieldValue }) => {
             type === "text" ||
             type === "number" ||
             type === "date" ||
-            type === "datetime-local"
+            type === "datetime-local" ||
+            type === "time"
           ) {
             return (
               <TextInput

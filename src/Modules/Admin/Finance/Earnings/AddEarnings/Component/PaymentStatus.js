@@ -1,13 +1,12 @@
 import React from "react";
-import { useFormikContext } from "formik";
+import { useFormikContext } from "formik"; // Importing useFormikContext
 import { motion, AnimatePresence } from "framer-motion";
 import TextInput from "./TextInput";
 import SelectInput from "./SelectInput";
 import FileInput from "./FileInput";
-import * as Yup from "yup";
 
-const PaymentStatus = ({ setFieldValue }) => {
-  const { values } = useFormikContext();
+const PaymentStatus = () => {
+  const { values, setFieldValue } = useFormikContext(); // Using Formik's useFormikContext hook
 
   const fieldVariants = {
     hidden: { opacity: 0, y: -10 },
@@ -32,6 +31,12 @@ const PaymentStatus = ({ setFieldValue }) => {
           name="paidAmount"
           placeholder="Enter paid amount"
           value={values.paidAmount}
+        />
+        <SelectInput
+          label="Paid By"
+          name="paidBy"
+          options={["Manual", "Auto"]}
+          value={values.paymentType}
         />
         <SelectInput
           label="Payment Type"
@@ -96,37 +101,6 @@ const PaymentStatus = ({ setFieldValue }) => {
       </div>
     </div>
   );
-};
-
-// Define initialValues and validationSchema for reuse
-PaymentStatus.initialValues = {
-  paymentStatus: "",
-  paidAmount: "",
-  paymentType: "",
-  advanceAmount: "",
-  remainingAmount: "",
-  chequeNumber: "",
-  transactionId: "",
-  receipt: null,
-};
-
-PaymentStatus.validationSchema = {
-  paymentStatus: Yup.string().required("Payment Status is required"),
-  paidAmount: Yup.number().min(0, "Invalid paid amount"),
-  paymentType: Yup.string().required("Payment Type is required"),
-  advanceAmount: Yup.number().min(0, "Invalid advance amount"),
-  remainingAmount: Yup.number().min(0, "Invalid remaining amount"),
-  chequeNumber: Yup.string().when("paymentType", {
-    is: "Cheque",
-    then: Yup.string().required("Cheque Number is required"),
-    otherwise: Yup.string().notRequired(),
-  }),
-  transactionId: Yup.string().when("paymentType", {
-    is: "Online",
-    then: Yup.string().required("Transaction ID is required"),
-    otherwise: Yup.string().notRequired(),
-  }),
-  receipt: Yup.mixed().required("Receipt/document is required"),
 };
 
 export default PaymentStatus;

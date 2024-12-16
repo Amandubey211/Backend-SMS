@@ -1,10 +1,40 @@
 import React from "react";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
-import TextInput from "../Component/TextInput";
+import FormSection from "../Component/FormSection";
 import PaymentDetails from "../Component/PaymentDetails";
 import PaymentStatus from "../Component/PaymentStatus";
+import Button from "../Component/Button";
 
+// Configuration for Investment Details Fields
+const investmentDetailsFields = [
+  {
+    name: "investmentName",
+    label: "Investment Name",
+    type: "text",
+    placeholder: "Enter investment name",
+  },
+  {
+    name: "returnAmount",
+    label: "Return Amount",
+    type: "number",
+    placeholder: "Enter return amount",
+  },
+  {
+    name: "timePeriod",
+    label: "Time Period",
+    type: "text",
+    placeholder: "Enter time period",
+  },
+  {
+    name: "profitLoss",
+    label: "Profit/Loss",
+    type: "number",
+    placeholder: "Enter Profit/Loss",
+  },
+];
+
+// Validation Schema
 const validationSchema = Yup.object({
   investmentName: Yup.string().required("Investment Name is required"),
   returnAmount: Yup.number()
@@ -12,72 +42,32 @@ const validationSchema = Yup.object({
     .min(0, "Invalid amount"),
   timePeriod: Yup.string().required("Time Period is required"),
   profitLoss: Yup.number().required("Profit/Loss is required"),
-  ...PaymentDetails.validationSchema, // Reusing PaymentDetails validation schema
-  ...PaymentStatus.validationSchema, // Reusing PaymentStatus validation schema
 });
 
-const InvestmentForm = () => {
+const InvestmentForm = ({ formData, onFormChange }) => {
   return (
     <Formik
-      initialValues={{
-        investmentName: "",
-        returnAmount: "",
-        timePeriod: "",
-        profitLoss: "",
-        ...PaymentDetails.initialValues, // Reusing PaymentDetails initial values
-        ...PaymentStatus.initialValues, // Reusing PaymentStatus initial values
-      }}
+      initialValues={formData}
       validationSchema={validationSchema}
       onSubmit={(values) => {
-        console.log(values);
+        console.log("Submitted Values:", values);
+        onFormChange(values); // Pass updated values to parent
       }}
     >
-      {({ isSubmitting, setFieldValue }) => (
+      {({ setFieldValue }) => (
         <Form className="bg-white p-6 rounded-lg shadow-md">
           {/* Investment Details Section */}
-          <div className="mb-6">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">
-              Investment Details
-            </h2>
-            <div className="grid grid-cols-3 gap-6">
-              <TextInput
-                label="Investment Name"
-                name="investmentName"
-                placeholder="Enter investment name"
-              />
-              <TextInput
-                label="Return Amount"
-                name="returnAmount"
-                placeholder="Enter return amount"
-              />
-              <TextInput
-                label="Time Period"
-                name="timePeriod"
-                placeholder="Enter time period"
-              />
-              <TextInput
-                label="Profit/Loss"
-                name="profitLoss"
-                placeholder="Enter Profit/Loss"
-              />
-            </div>
-          </div>
+          <FormSection
+            title="Investment Details"
+            fields={investmentDetailsFields}
+            setFieldValue={setFieldValue}
+          />
 
           {/* Payment Details Section */}
-          <PaymentDetails />
+          <PaymentDetails onFormChange={onFormChange} />
 
           {/* Payment Status Section */}
-          <PaymentStatus setFieldValue={setFieldValue} />
-
-          <div className="flex justify-end mt-6">
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="bg-gradient-to-r from-pink-500 to-purple-500 text-white text-sm font-medium px-6 py-2 rounded-lg shadow-md hover:from-pink-600 hover:to-purple-600 transition"
-            >
-              Submit
-            </button>
-          </div>
+          <PaymentStatus onFormChange={onFormChange} />
         </Form>
       )}
     </Formik>

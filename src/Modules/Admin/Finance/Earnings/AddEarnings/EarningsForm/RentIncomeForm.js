@@ -1,74 +1,64 @@
 import React from "react";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
-import TextInput from "../Component/TextInput";
+import FormSection from "../Component/FormSection";
 import PaymentDetails from "../Component/PaymentDetails";
 import PaymentStatus from "../Component/PaymentStatus";
+import Button from "../Component/Button";
 
+// Configuration for Rent Details Fields
+const rentDetailsFields = [
+  {
+    name: "rentName",
+    label: "Rent Name",
+    type: "text",
+    placeholder: "Enter rent name",
+  },
+  {
+    name: "organisationName",
+    label: "User/Organisation Name",
+    type: "text",
+    placeholder: "Enter name",
+  },
+  {
+    name: "timePeriod",
+    label: "Time Period",
+    type: "text",
+    placeholder: "Enter time period",
+  },
+];
+
+// Validation Schema
 const validationSchema = Yup.object({
   rentName: Yup.string().required("Rent Name is required"),
   organisationName: Yup.string().required("User/Organisation Name is required"),
   timePeriod: Yup.string().required("Time Period is required"),
-  ...PaymentDetails.validationSchema, // Reusing PaymentDetails validation schema
-  ...PaymentStatus.validationSchema, // Reusing PaymentStatus validation schema
 });
 
-const RentIncomeForm = () => {
+const RentIncomeForm = ({ formData, onFormChange }) => {
   return (
     <Formik
-      initialValues={{
-        rentName: "",
-        organisationName: "",
-        timePeriod: "",
-        ...PaymentDetails.initialValues, // Reusing PaymentDetails initial values
-        ...PaymentStatus.initialValues, // Reusing PaymentStatus initial values
-      }}
+      initialValues={formData}
       validationSchema={validationSchema}
       onSubmit={(values) => {
-        console.log(values);
+        console.log("Submitted Values:", values);
+        onFormChange(values); // Pass updated values to parent
       }}
     >
-      {({ isSubmitting, setFieldValue }) => (
+      {({ setFieldValue }) => (
         <Form className="bg-white p-6 rounded-lg shadow-md">
           {/* Rent Details Section */}
-          <div className="mb-6">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">
-              Rent Details
-            </h2>
-            <div className="grid grid-cols-3 gap-6">
-              <TextInput
-                label="Rent Name"
-                name="rentName"
-                placeholder="Enter rent name"
-              />
-              <TextInput
-                label="User/Organisation Name"
-                name="organisationName"
-                placeholder="Enter name"
-              />
-              <TextInput
-                label="Time Period"
-                name="timePeriod"
-                placeholder="Enter time period"
-              />
-            </div>
-          </div>
+          <FormSection
+            title="Rent Details"
+            fields={rentDetailsFields}
+            setFieldValue={setFieldValue}
+          />
 
           {/* Payment Details Section */}
-          <PaymentDetails />
+          <PaymentDetails onFormChange={onFormChange} />
 
           {/* Payment Status Section */}
-          <PaymentStatus setFieldValue={setFieldValue} />
-
-          <div className="flex justify-end mt-6">
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="bg-gradient-to-r from-pink-500 to-purple-500 text-white text-sm font-medium px-6 py-2 rounded-lg shadow-md hover:from-pink-600 hover:to-purple-600 transition"
-            >
-              Submit
-            </button>
-          </div>
+          <PaymentStatus onFormChange={onFormChange} />
         </Form>
       )}
     </Formik>

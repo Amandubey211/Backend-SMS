@@ -1,78 +1,69 @@
 import React from "react";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
-import TextInput from "../Component/TextInput";
-import SelectInput from "../Component/SelectInput";
+import FormSection from "../Component/FormSection";
 import PaymentDetails from "../Component/PaymentDetails";
 import PaymentStatus from "../Component/PaymentStatus";
 
+// Configuration for Membership Details Fields
+const membershipDetailsFields = [
+  {
+    name: "memberName",
+    label: "Member Name",
+    type: "text",
+    placeholder: "Enter member name",
+  },
+  {
+    name: "subscriptionPlan",
+    label: "Subscription Plan",
+    type: "select",
+    options: ["Basic", "Premium", "VIP"],
+  },
+  {
+    name: "membershipId",
+    label: "Membership ID",
+    type: "text",
+    placeholder: "Enter membership ID",
+  },
+  {
+    name: "renewalDate",
+    label: "Renewal Date",
+    type: "date",
+  },
+];
+
+// Validation Schema
 const validationSchema = Yup.object({
   memberName: Yup.string().required("Member Name is required"),
   subscriptionPlan: Yup.string().required("Subscription Plan is required"),
   membershipId: Yup.string().required("Membership ID is required"),
   renewalDate: Yup.date().required("Renewal Date is required"),
-  ...PaymentDetails.validationSchema,
-  ...PaymentStatus.validationSchema,
 });
 
-const MembershipFeesForm = () => {
+const MembershipFeesForm = ({ formData, onFormChange }) => {
   return (
     <Formik
-      initialValues={{
-        memberName: "",
-        subscriptionPlan: "",
-        membershipId: "",
-        renewalDate: "",
-        ...PaymentDetails.initialValues,
-        ...PaymentStatus.initialValues,
-      }}
+      initialValues={formData}
       validationSchema={validationSchema}
       onSubmit={(values) => {
-        console.log(values);
+        console.log("Submitted Values:", values);
+        onFormChange(values); // Pass values back to parent
       }}
     >
-      {({ isSubmitting, setFieldValue }) => (
+      {({ setFieldValue }) => (
         <Form className="bg-white p-6 rounded-lg shadow-md">
           {/* Membership Details Section */}
-          <div className="mb-6">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">
-              Membership Details
-            </h2>
-            <div className="grid grid-cols-3 gap-6">
-              <TextInput
-                label="Member Name"
-                name="memberName"
-                placeholder="Enter member name"
-              />
-              <SelectInput
-                label="Subscription Plan"
-                name="subscriptionPlan"
-                options={["Basic", "Premium", "VIP"]}
-              />
-              <TextInput
-                label="Membership ID"
-                name="membershipId"
-                placeholder="Enter membership ID"
-              />
-              <TextInput label="Renewal Date" name="renewalDate" type="date" />
-            </div>
-          </div>
+          <FormSection
+            title="Membership Details"
+            fields={membershipDetailsFields}
+            setFieldValue={setFieldValue}
+          />
 
-          {/* Payment Details Section */}
-          <PaymentDetails />
+          {/* Static Payment Details Component */}
+          <PaymentDetails onFormChange={onFormChange} />
 
-          {/* Payment Status Section */}
+          {/* Static Payment Status Component */}
           <PaymentStatus setFieldValue={setFieldValue} />
-
-          <div className="flex justify-end mt-6">
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="bg-gradient-to-r from-pink-500 to-purple-500 text-white text-sm font-medium px-6 py-2 rounded-lg shadow-md hover:from-pink-600 hover:to-purple-600 transition"
-            >
-              Submit
-            </button>
-          </div>
         </Form>
       )}
     </Formik>
