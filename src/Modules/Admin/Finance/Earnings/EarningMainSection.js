@@ -16,19 +16,20 @@ const EarningMainSection = () => {
   const handleModalClose = () => setIsModalVisible(false);
 
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
-
   const handleSidebarOpen = () => setIsSidebarVisible(true);
   const handleSidebarClose = () => setIsSidebarVisible(false);
+
   const limit = 3; // cards to show in single row
   useNavHeading("Earnings");
+
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-4 md:p-6 space-y-6 w-full max-w-screen-xl mx-auto">
       {/* Buttons Section */}
-      <div className="flex justify-end items-center gap-4">
+      <div className="flex flex-wrap justify-end items-center gap-4">
         {/* Bulk Entries Button */}
         <button
           onClick={handleModalOpen}
-          className="px-6 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-medium rounded-md hover:shadow-lg transition duration-200"
+          className="px-4 py-2 md:px-6 md:py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-medium rounded-md hover:shadow-lg transition duration-200 text-sm md:text-base"
         >
           Bulk entries
         </button>
@@ -46,19 +47,21 @@ const EarningMainSection = () => {
       </div>
 
       {/* Cards Section */}
-      <div className="flex justify-center">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-16">
-          {earningData.slice(0, limit).map((item, index) => (
-            <Card key={index} {...item} />
-          ))}
-        </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-8">
+        {earningData.slice(0, limit).map((item, index) => (
+          <Card key={index} {...item} />
+        ))}
       </div>
 
       {/* Graph Section */}
-      <TotalEarningGraph />
+      <div className="w-full h-[250px] sm:h-[350px] md:h-[400px] bg-white rounded-lg p-2 md:p-4">
+        <TotalEarningGraph />
+      </div>
 
       {/* Summary Table Section */}
-      <SummaryTotalRevenue />
+      <div className="w-full bg-white rounded-lg  p-2 md:p-4 overflow-x-auto">
+        <SummaryTotalRevenue />
+      </div>
 
       {/* Modal */}
       <BulkEntriesModal visible={isModalVisible} onClose={handleModalClose} />

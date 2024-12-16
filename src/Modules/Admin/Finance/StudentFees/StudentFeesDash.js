@@ -8,7 +8,9 @@ const StudentFeesDashboard = () => {
   return (
     <Layout title="Admin | Student Fees">
       <AdminDashLayout>
-        <StudentFeesMain />
+        <div className="w-full overflow-x-hidden">
+          <StudentFeesMain />
+        </div>
       </AdminDashLayout>
     </Layout>
   );
