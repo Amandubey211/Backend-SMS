@@ -59,6 +59,9 @@ import SummaryRevenueList from "../Modules/Admin/Finance/StudentFees/SummaryReve
 import AddNewFees from "../Modules/Admin/Finance/StudentFees/AddNewFees/AddNewFees.js";
 
 // lazy loaded routes
+const AddExpense = lazy(() =>
+  import("../Modules/Admin/Finance/Expense/AddExpense/AddExpense.js")
+);
 const AddEarnings = lazy(() =>
   import("../Modules/Admin/Finance/Earnings/AddEarnings/AddEarnings.js")
 );
@@ -915,6 +918,16 @@ function App() {
       element: (
         <ProtectRoute
           Component={AddEarnings}
+          allowedRoles={["admin", "accountant"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/finance/expense/add",
+      element: (
+        <ProtectRoute
+          Component={AddExpense}
           allowedRoles={["admin", "accountant"]}
         />
       ),

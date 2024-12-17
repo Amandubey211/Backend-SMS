@@ -6,7 +6,7 @@ import StudentFeesMain from "./StudentFeesMain";
 
 const StudentFeesDashboard = () => {
   return (
-    <Layout title="Admin | Student Fees">
+    <Layout title="Finance | Student Fees">
       <AdminDashLayout>
         <div className="w-full max-w-screen-xl mx-auto overflow-x-hidden p-4 md:p-6">
           <StudentFeesMain />

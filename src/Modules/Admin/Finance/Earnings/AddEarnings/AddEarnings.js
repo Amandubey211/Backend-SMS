@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import Layout from "../../../../../Components/Common/Layout";
 import DashLayout from "../../../../../Components/Admin/AdminDashLayout";
@@ -48,23 +47,119 @@ const AddEarnings = () => {
   };
 
   const formMapping = {
-    "Tuition fees": <StudentFeesForm description={description} formData={formData} onFormChange={handleFormChange} />,
-    "Exam fees": <ExamFeesForm description={description} formData={formData} onFormChange={handleFormChange} />,
-    "Stationery fees": <StationeryFeesForm description={description} formData={formData} onFormChange={handleFormChange} />,
-    "Donation": <DonationForm description={description} formData={formData} onFormChange={handleFormChange} />,
-    "Fund raising": <FundraisingForm description={description} formData={formData} onFormChange={handleFormChange} />,
-    "Investments": <InvestmentForm description={description} formData={formData} onFormChange={handleFormChange} />,
-    "Rent Income": <RentIncomeForm description={description} formData={formData} onFormChange={handleFormChange} />,
-    "Other facility fees": <OtherFacilityForm description={description} formData={formData} onFormChange={handleFormChange} />,
-    "Workshop/Training fees": <WorkshopTrainingFeesForm description={description} formData={formData} onFormChange={handleFormChange} />,
-    "Canteen profit": <CanteenProfitForm description={description} formData={formData} onFormChange={handleFormChange} />,
-    "Subscription fees": <SubscriptionFeesForm description={description} formData={formData} onFormChange={handleFormChange} />,
-    "Exam center fees": <ExamCenterFeesForm description={description} formData={formData} onFormChange={handleFormChange} />,
-    "Parking fees": <ParkingFeesForm description={description} formData={formData} onFormChange={handleFormChange} />,
-    "Membership fees": <MembershipFeesForm description={description} formData={formData} onFormChange={handleFormChange} />,
-    "Borrow books": <BorrowBooksForm description={description} formData={formData} onFormChange={handleFormChange} />,
-    "Book sales": <BookSalesForm description={description} formData={formData} onFormChange={handleFormChange} />,
-    "Others": <div>Other Form Placeholder</div>, // For dynamic "Others"
+    "Tuition fees": (
+      <StudentFeesForm
+        description={description}
+        formData={formData}
+        onFormChange={handleFormChange}
+      />
+    ),
+    "Exam fees": (
+      <ExamFeesForm
+        description={description}
+        formData={formData}
+        onFormChange={handleFormChange}
+      />
+    ),
+    "Stationery fees": (
+      <StationeryFeesForm
+        description={description}
+        formData={formData}
+        onFormChange={handleFormChange}
+      />
+    ),
+    Donation: (
+      <DonationForm
+        description={description}
+        formData={formData}
+        onFormChange={handleFormChange}
+      />
+    ),
+    "Fund raising": (
+      <FundraisingForm
+        description={description}
+        formData={formData}
+        onFormChange={handleFormChange}
+      />
+    ),
+    Investments: (
+      <InvestmentForm
+        description={description}
+        formData={formData}
+        onFormChange={handleFormChange}
+      />
+    ),
+    "Rent Income": (
+      <RentIncomeForm
+        description={description}
+        formData={formData}
+        onFormChange={handleFormChange}
+      />
+    ),
+    "Other facility fees": (
+      <OtherFacilityForm
+        description={description}
+        formData={formData}
+        onFormChange={handleFormChange}
+      />
+    ),
+    "Workshop/Training fees": (
+      <WorkshopTrainingFeesForm
+        description={description}
+        formData={formData}
+        onFormChange={handleFormChange}
+      />
+    ),
+    "Canteen profit": (
+      <CanteenProfitForm
+        description={description}
+        formData={formData}
+        onFormChange={handleFormChange}
+      />
+    ),
+    "Subscription fees": (
+      <SubscriptionFeesForm
+        description={description}
+        formData={formData}
+        onFormChange={handleFormChange}
+      />
+    ),
+    "Exam center fees": (
+      <ExamCenterFeesForm
+        description={description}
+        formData={formData}
+        onFormChange={handleFormChange}
+      />
+    ),
+    "Parking fees": (
+      <ParkingFeesForm
+        description={description}
+        formData={formData}
+        onFormChange={handleFormChange}
+      />
+    ),
+    "Membership fees": (
+      <MembershipFeesForm
+        description={description}
+        formData={formData}
+        onFormChange={handleFormChange}
+      />
+    ),
+    "Borrow books": (
+      <BorrowBooksForm
+        description={description}
+        formData={formData}
+        onFormChange={handleFormChange}
+      />
+    ),
+    "Book sales": (
+      <BookSalesForm
+        description={description}
+        formData={formData}
+        onFormChange={handleFormChange}
+      />
+    ),
+    Others: <div>Other Form Placeholder</div>, // For dynamic "Others"
   };
 
   return (

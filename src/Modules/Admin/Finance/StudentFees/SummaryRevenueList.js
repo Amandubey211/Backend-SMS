@@ -1,63 +1,55 @@
-import React, { useState } from "react";
-import { Table } from "antd";
+// src/Modules/Admin/Finance/StudentFees/SummaryRevenueList.js
+
+import React, { useState, useEffect } from "react";
+import { Table, Modal, Button, Spin, Alert } from "antd";
 import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+
 import AdminLayout from "../../../../Components/Admin/AdminDashLayout";
-import SortPopModal from "./Components/SortPopModal";
+import SortPopModal from "./Components/SortPopModal"; // Corrected import
 import StudentFeesPaidModal from "./Components/StudentFeesPaidModal";
 import StudentFeesUnpaidModal from "./Components/StudentFeesUnpaidModal";
 import { FiUserPlus } from "react-icons/fi";
-
+import {
+  deleteStudentFees,
+  fetchAllStudentFees,
+} from "../../../../Store/Slices/Finance/StudentFees/studentFeesThunks";
+import moment from "moment"; // Replaced dayjs with moment
 
 const SummaryRevenueList = () => {
-  const [dataSource] = useState([
-    {
-      key: "1",
-      name: "Leslie Alexander",
-      class: "10",
-      section: "B",
-      feesType: "Exam",
-      dueDate: "12/02/24",
-      amount: "100 QR",
-      status: "Paid",
-      penalty: "25 QR",
-      tax: "12%",
-      discount: "0%",
-      total_amount: "100 QR",
-    },
-    {
-      key: "2",
-      name: "Leslie Alexander",
-      class: "10",
-      section: "B",
-      feesType: "Exam",
-      dueDate: "12/02/24",
-      amount: "100 QR",
-      status: "Unpaid",
-      penalty: "12QR",
-      tax: "2.5%",
-      discount: "15%",
-      total_amount: "100 QR",
-    },
-  ]);
-
-
-  const [isStudentDetailsModalVisible, setStudentDetailsModalVisible] = useState(false);
-  const [isStudentUnpaidModalVisible, setStudentUnpaidModalVisible] = useState(false); // New state
-  const [selectedStudentDetails, setSelectedStudentDetails] = useState({});
-  const [isSortModalVisible, setSortModalVisible] = useState(false);
-  const [selectedOption, setSelectedOption] = useState("newest");
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  const { records, loading, error } = useSelector(
+    (state) => state.admin.studentFees
+  ); // Adjust the path based on your store
 
+  const [selectedStudentDetails, setSelectedStudentDetails] = useState({});
+  const [isSortModalVisible, setSortModalVisible] = useState(false);
+  const [isStudentDetailsModalVisible, setStudentDetailsModalVisible] =
+    useState(false);
+  const [isStudentUnpaidModalVisible, setStudentUnpaidModalVisible] =
+    useState(false);
+  const [selectedOption, setSelectedOption] = useState("newest");
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+
+  useEffect(() => {
+    // Fetch all student fee records when the component mounts
+    dispatch(fetchAllStudentFees({ page: 1, limit: 20 })); // Adjust params as needed
+  }, [dispatch]);
 
   const handleRowClick = (record) => {
     // Clean base amount by removing "QR" and converting to a number
-    const baseAmount = parseFloat(record?.amount?.replace("QR", "").trim() || 0);
+    const baseAmount = parseFloat(
+      record?.amount?.replace("QR", "").trim() || 0
+    );
 
     // Clean penalty, tax, and discount fields
     const penalty = parseFloat(record?.penalty?.replace("QR", "").trim() || 0);
     const taxPercentage = parseFloat(record?.tax?.replace("%", "").trim() || 0);
-    const discountPercentage = parseFloat(record?.discount?.replace("%", "").trim() || 0);
+    const discountPercentage = parseFloat(
+      record?.discount?.replace("%", "").trim() || 0
+    );
 
     // Calculate tax and discount amounts
     const taxAmount = (baseAmount * taxPercentage) / 100;
@@ -77,63 +69,123 @@ const SummaryRevenueList = () => {
       paid_status: record?.status || "N/A",
       tax: record?.tax || "N/A", // Keep the original tax string
       discount: record?.discount || "N/A", // Keep the original discount string
-      paid_by: "Card", // Example data
-      transaction_id: "12345", // Example data
-      payment_method: "Stripe", // Example data
+      paid_by: "Card", // Example data, adjust as needed
+      transaction_id: "12345", // Example data, adjust as needed
+      payment_method: "Stripe", // Example data, adjust as needed
     };
 
     setSelectedStudentDetails(studentDetails);
 
-    if (record.status === "Paid") {
+    if (record?.status === "Paid") {
       setStudentDetailsModalVisible(true); // Open Paid Modal
-    } else if (record.status === "Unpaid") {
+    } else if (record?.status === "Unpaid") {
       setStudentUnpaidModalVisible(true); // Open Unpaid Modal
     }
   };
 
+  const handleDelete = () => {
+    if (selectedRowKeys.length === 0) {
+      Modal.warning({
+        title: "No Selection",
+        content: "Please select at least one fee record to delete.",
+      });
+      return;
+    }
 
+    Modal.confirm({
+      title: "Are you sure you want to delete the selected fee records?",
+      onOk: () => {
+        dispatch(deleteStudentFees(selectedRowKeys))
+          .unwrap()
+          .then(() => {
+            // Refresh the data after deletion
+            dispatch(fetchAllStudentFees({ page: 1, limit: 20 }));
+            setSelectedRowKeys([]);
+          })
+          .catch((err) => {
+            // Error handling is managed by the slice
+            console.error("Delete failed:", err);
+          });
+      },
+    });
+  };
+
+  // Function to handle single record deletion
+  const handleDeleteSingleRecord = (feeId) => {
+    Modal.confirm({
+      title: "Are you sure you want to delete this fee record?",
+      onOk: () => {
+        dispatch(deleteStudentFees([feeId]))
+          .unwrap()
+          .then(() => {
+            // Refresh the data after deletion
+            dispatch(fetchAllStudentFees({ page: 1, limit: 20 }));
+            setSelectedRowKeys((prevKeys) =>
+              prevKeys.filter((key) => key !== feeId)
+            );
+          })
+          .catch((err) => {
+            console.error("Delete failed:", err);
+          });
+      },
+    });
+  };
 
   const columns = [
     {
       title: "Name",
       dataIndex: "name",
       key: "name",
+      sorter: (a, b) => a.name.localeCompare(b.name),
+      render: (text) => <span>{text}</span>,
     },
     {
       title: "Class",
       dataIndex: "class",
       key: "class",
+      sorter: (a, b) => a.class.localeCompare(b.class),
+      render: (text) => <span>{text}</span>,
     },
     {
       title: "Section",
       dataIndex: "section",
       key: "section",
+      sorter: (a, b) => a.section.localeCompare(b.section),
+      render: (text) => <span>{text}</span>,
     },
     {
       title: "Fees Type",
       dataIndex: "feesType",
       key: "feesType",
+      sorter: (a, b) => a.feesType.localeCompare(b.feesType),
+      render: (text) => <span>{text}</span>,
     },
     {
       title: "Due Date",
       dataIndex: "dueDate",
       key: "dueDate",
+      sorter: (a, b) => new Date(a.dueDate) - new Date(b.dueDate),
+      render: (date) => (date ? moment(date).format("YYYY-MM-DD") : "N/A"),
     },
     {
       title: "Amount",
       dataIndex: "amount",
       key: "amount",
+      sorter: (a, b) => parseFloat(a.amount) - parseFloat(b.amount),
+      render: (value) => (typeof value === "string" ? `${value}` : "N/A"),
     },
     {
       title: "Status",
       dataIndex: "status",
       key: "status",
+      sorter: (a, b) => a.status.localeCompare(b.status),
       render: (text) => (
         <span
-          className={`px-2 py-1 rounded-lg text-sm font-medium ${text === "Paid"
-            ? "bg-green-100 text-green-600"
-            : "bg-red-100 text-red-600"
-            }`}
+          className={`px-2 py-1 rounded-lg text-sm font-medium ${
+            text === "Paid"
+              ? "bg-green-100 text-green-600"
+              : "bg-red-100 text-red-600"
+          }`}
         >
           {text}
         </span>
@@ -143,54 +195,61 @@ const SummaryRevenueList = () => {
       title: "Penalty",
       dataIndex: "penalty",
       key: "penalty",
+      sorter: (a, b) => parseFloat(a.penalty) - parseFloat(b.penalty),
+      render: (value) => (typeof value === "string" ? `${value}` : "N/A"),
     },
     {
-      title: "Invoice",
-      key: "invoice",
-      render: () => (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-5 w-5 text-purple-500"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={2}
-        >
-          <path
-            d="M8 2h8a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          <path
-            d="M9 8h6M9 12h6M9 16h6"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      ),
+      title: "Tax",
+      dataIndex: "tax",
+      key: "tax",
+      sorter: (a, b) => parseFloat(a.tax) - parseFloat(b.tax),
+      render: (value) => (typeof value === "string" ? `${value}` : "N/A"),
+    },
+    {
+      title: "Discount",
+      dataIndex: "discount",
+      key: "discount",
+      sorter: (a, b) => parseFloat(a.discount) - parseFloat(b.discount),
+      render: (value) => (typeof value === "string" ? `${value}` : "N/A"),
+    },
+    {
+      title: "Total Amount",
+      dataIndex: "total_amount",
+      key: "total_amount",
+      sorter: (a, b) => parseFloat(a.total_amount) - parseFloat(b.total_amount),
+      render: (value) => (typeof value === "string" ? `${value}` : "N/A"),
     },
     {
       title: "Action",
       key: "action",
       render: (_, record) => (
-        <div className="flex">
-          <button
-            className="w-1/2 py-2 text-center text-black bg-purple-100 hover:bg-purple-200"
-            onClick={() => console.log("Edit", record)}
+        <div className="flex space-x-2">
+          <Button
+            type="link"
+            onClick={() => navigate(`/finance/studentfees/edit/${record._id}`)}
+            className="text-blue-500"
           >
             Edit
-          </button>
-          <button
-            className="w-1/2 py-2 text-center text-red-600 bg-red-100 hover:bg-red-200"
-            onClick={() => console.log("Delete", record)}
+          </Button>
+          <Button
+            type="link"
+            danger
+            onClick={() => handleDeleteSingleRecord(record._id)}
+            className="text-red-500"
           >
             Delete
-          </button>
+          </Button>
         </div>
       ),
     },
   ];
 
+  const rowSelection = {
+    selectedRowKeys,
+    onChange: (selectedKeys) => {
+      setSelectedRowKeys(selectedKeys);
+    },
+  };
 
   return (
     <AdminLayout>
@@ -206,6 +265,7 @@ const SummaryRevenueList = () => {
                 <label className="text-gray-500 text-sm mb-1">Class</label>
                 <select className="border border-gray-300 rounded-lg px-4 py-2 text-gray-700 w-28">
                   <option value="Ten">Ten</option>
+                  {/* Add more options as needed */}
                 </select>
               </div>
 
@@ -214,6 +274,7 @@ const SummaryRevenueList = () => {
                 <label className="text-gray-500 text-sm mb-1">Section</label>
                 <select className="border border-gray-300 rounded-lg px-4 py-2 text-gray-700 w-28">
                   <option value="A">A</option>
+                  {/* Add more options as needed */}
                 </select>
               </div>
 
@@ -222,6 +283,7 @@ const SummaryRevenueList = () => {
                 <label className="text-gray-500 text-sm mb-1">Fees Type</label>
                 <select className="border border-gray-300 rounded-lg px-4 py-2 text-gray-700 w-36">
                   <option value="Exam fees">Exam fees</option>
+                  {/* Add more options as needed */}
                 </select>
               </div>
             </div>
@@ -262,7 +324,8 @@ const SummaryRevenueList = () => {
             <button
               className="flex items-center px-4 py-2 border rounded-lg text-gray-700 font-medium hover:shadow-md"
               style={{
-                borderColor: "linear-gradient(to right, #FF007C, #8A2BE2)",
+                borderImage: "linear-gradient(to right, #FF007C, #8A2BE2) 1",
+                borderRadius: "8px",
               }}
               onClick={() => setSortModalVisible(true)}
             >
@@ -286,7 +349,10 @@ const SummaryRevenueList = () => {
             </button>
 
             {/* Export Button */}
-            <button className="flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-medium rounded-lg hover:opacity-90">
+            <button
+              className="flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-medium rounded-lg hover:opacity-90"
+              onClick={() => console.log("Exporting data...")} // Implement export functionality
+            >
               Export
               <span className="ml-2">
                 <svg
@@ -306,9 +372,11 @@ const SummaryRevenueList = () => {
               </span>
             </button>
 
-            {/* Add New Earning Button */}
+            {/* Add New Fee Button */}
             <button
-              onClick={() => navigate('/finance/studentfees/total-revenue/addFees')}
+              onClick={() =>
+                navigate("/finance/studentfees/total-revenue/addFees")
+              }
               className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
             >
               <span className="text-gray-800 font-medium">Add New Fee</span>
@@ -320,16 +388,34 @@ const SummaryRevenueList = () => {
         </div>
 
         {/* Table Section */}
-        <Table
-          dataSource={dataSource}
-          columns={columns}
-          pagination={{ pageSize: 5 }}
-          rowKey="key"
-          className="rounded-lg overflow-hidden mt-6"
-          onRow={(record) => ({
-            onClick: () => handleRowClick(record),
-          })}
-        />
+        <div className="mt-6">
+          {loading ? (
+            <div className="flex justify-center my-4">
+              <Spin tip="Loading..." />
+            </div>
+          ) : error ? (
+            <Alert
+              message="Error"
+              description={error}
+              type="error"
+              showIcon
+              closable
+              className="my-4"
+            />
+          ) : (
+            <Table
+              dataSource={records}
+              columns={columns}
+              pagination={{ pageSize: 10 }}
+              rowKey="_id"
+              className="rounded-lg overflow-hidden"
+              rowSelection={rowSelection}
+              onRow={(record) => ({
+                onClick: () => handleRowClick(record),
+              })}
+            />
+          )}
+        </div>
 
         {/* SortPopModal */}
         <SortPopModal
@@ -338,12 +424,13 @@ const SummaryRevenueList = () => {
           onApply={() => {
             console.log("Sort Applied with option:", selectedOption);
             setSortModalVisible(false);
+            // Implement sorting logic here based on selectedOption
           }}
           selectedOption={selectedOption}
           setSelectedOption={setSelectedOption}
         />
 
-        {/* StudentDetailsModal */}
+        {/* StudentFeesPaidModal */}
         <StudentFeesPaidModal
           visible={isStudentDetailsModalVisible}
           onClose={() => setStudentDetailsModalVisible(false)}
@@ -352,7 +439,7 @@ const SummaryRevenueList = () => {
           studentDetails={selectedStudentDetails}
           paymentDetails={[
             {
-              date: "12/02/2024",
+              date: "2024-12-01",
               time: "08:34:56 AM",
               amount: "1214.4 QR",
               penalty: "N/A",
