@@ -5,9 +5,8 @@ import EarningMainSection from "./EarningMainSection";
 
 const EarningDash = () => {
   return (
-    <Layout title="Admin | Earnings">
+    <Layout title="Finance | Earnings">
       <DashLayout>
-        {/* Wrapper to fix overflow issues */}
         <div className="w-full overflow-x-hidden">
           <EarningMainSection />
         </div>

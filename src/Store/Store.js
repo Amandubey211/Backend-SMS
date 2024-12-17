@@ -32,8 +32,9 @@ import adminAnnouncementReducer from "./Slices/Admin/Class/Announcement/announce
 import allStudentReducer from "./Slices/Admin/Users/Students/studentSlice";
 import allParentReducer from "./Slices/Admin/Users/Parents/parentSilce";
 import allstaffReducer from "./Slices/Admin/Users/Staff/staffSlice";
-import earningReducer from "./Slices/Admin/Accounting/Earning/earningSlice";
-import studentFeesReducer from "./Slices/Admin/Accounting/StudentFees/studentFeesSlice";
+// import earningReducer from "./Slices/Admin/Accounting/Earning/earningSlice";
+import studentFeesReducer from "./Slices/Finance/StudentFees/studentFeesSlice";
+
 import expensesReducer from "./Slices/Admin/Accounting/Expenses/expensesSlice";
 import adminRubricReducer from "./Slices/Admin/Class/Rubric/rubricSlice";
 import adminDiscussionCommentsReducer from "./Slices/Admin/Class/Discussion/Comments/discussionCommentsSlice";
@@ -45,6 +46,7 @@ import timetableReducer from "./Slices/Admin/TimeTable/timtableSlice";
 import adminClassIconsReducer from "./Slices/Admin/Class/reducer/iconSlice";
 import rbacReducer from "./Slices/Common/RBAC/rbacSlice";
 
+import earnignsReducer from "./Slices/Finance/Earnings/earningsSlice";
 // student
 import studentDashboardReducer from "./Slices/Student/Dashboard/studentDashboardSlices";
 import studentFinanceReducer from "./Slices/Student/Finance/financeSlice";
@@ -156,13 +158,18 @@ const AdminReducer = combineReducers({
   all_students: allStudentReducer,
   all_parents: allParentReducer,
   all_staff: allstaffReducer,
-  earning: earningReducer,
-  student_fees: studentFeesReducer,
+  // student_fees: studentFeesReducer,
   expenses: expensesReducer,
   subject_grades: subjectGradesReducer,
   // subject_assignment: subjectAssignmentReducer,
   subject_quiz: subjectQuizReducer,
+
+  //RBAC
   rbac: rbacReducer,
+
+  // Finance
+  earnings: earnignsReducer,
+  studentFees: studentFeesReducer,
 });
 
 const studentReducer = combineReducers({

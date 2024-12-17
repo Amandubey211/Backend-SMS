@@ -6,16 +6,19 @@ import StudentFeesSummaryTable from "./Components/StudentFeesSummaryTable";
 import AddNewFeeSidebar from "./Components/AddNewFeeSidebar";
 import { FiUserPlus } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
+
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
 const StudentFeesMain = () => {
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const navigate = useNavigate();
+  const { loading, error } = useSelector((state) => state.admin.studentFees);
 
   // Handlers for Sidebar
   const handleSidebarOpen = () => setIsSidebarVisible(true);
   const handleSidebarClose = () => setIsSidebarVisible(false);
-  const navigate = useNavigate();
 
   // Dropdown toggle
   const toggleDropdown = () => setIsDropdownOpen((prev) => !prev);
@@ -32,18 +35,31 @@ const StudentFeesMain = () => {
     };
   }, [isSidebarVisible]);
 
+  // Handler to submit new fee data
+  const handleAddNewFee = async (feeData) => {
+    try {
+      // await dispatch(createStudentFee(feeData)).unwrap();
+      handleSidebarClose();
+      // Optionally show success message
+    } catch (err) {
+      // Error is handled by the slice and ErrorBoundary
+    }
+  };
+
   return (
     <div className="p-4 md:p-6 space-y-6 scroll-smooth overflow-y-auto h-full w-full mx-auto">
       {/* Header Section */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 md:gap-0">
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-800">Student Fees</h2>
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-800">
+            Student Fees
+          </h2>
           <div className="relative">
             <button
               onClick={toggleDropdown}
               className="px-3 sm:px-4 py-2 bg-white text-gray-800 font-medium rounded-lg border border-gray-300 shadow-sm flex items-center gap-2 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-indigo-500"
               style={{
-                borderImage: "linear-gradient(90deg, #C83B62, #46138A) 1",
+                borderImage: "linear-gradient(to right, #C83B62, #46138A) 1",
                 borderRadius: "8px",
               }}
             >
@@ -60,7 +76,7 @@ const StudentFeesMain = () => {
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  strokeWidth="2"
+                  strokeWidth={2}
                   d="M19 9l-7 7-7-7"
                 />
               </svg>
@@ -81,6 +97,7 @@ const StudentFeesMain = () => {
                       onClick={() => {
                         // Handle option selection (e.g., filter data)
                         setIsDropdownOpen(false);
+                        // Implement filtering logic here
                       }}
                     >
                       {option}
@@ -95,7 +112,7 @@ const StudentFeesMain = () => {
           onClick={() => navigate("/finance/earning/add")}
           className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
         >
-          <span className="text-gray-800 font-medium">Add New Fees</span>
+          <span className="text-gray-800 font-medium">Add New Fee</span>
           <div className="w-12 h-12 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center text-white">
             <FiUserPlus size={16} />
           </div>
@@ -122,8 +139,14 @@ const StudentFeesMain = () => {
         </div>
       </motion.div>
 
-      {/* Sidebar */}
-      <AddNewFeeSidebar isOpen={isSidebarVisible} onClose={handleSidebarClose} />
+      {/* Sidebar for Adding New Fee */}
+      <AddNewFeeSidebar
+        isOpen={isSidebarVisible}
+        onClose={handleSidebarClose}
+        onSubmit={handleAddNewFee}
+        loading={loading}
+        error={error}
+      />
     </div>
   );
 };
