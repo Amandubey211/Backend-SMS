@@ -4,6 +4,8 @@ import { Menu, Dropdown } from "antd";
 import { MoreOutlined } from "@ant-design/icons";
 import { FiUserPlus } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
+import Invoice from "./Components/Invoice";
+import { useRef, useEffect } from "react";
 
 // Sample Data
 const data = [
@@ -15,6 +17,9 @@ const data = [
 const RecentInvoiceList = () => {
     const [hoveredRow, setHoveredRow] = useState(null);
     const [isSortModalVisible, setSortModalVisible] = useState(false);
+    const [isInvoiceVisible, setInvoiceVisible] = useState(false); // Control popup visibility
+    const popupRef = useRef(null); // Reference for the Invoice popup
+
     const navigate = useNavigate();
 
     // Dropdown Menu for Action
@@ -65,6 +70,24 @@ const RecentInvoiceList = () => {
             </button>
         );
     };
+
+
+
+    const openInvoice = () => {
+        setInvoiceVisible(true); // Show Invoice popup
+    };
+
+    const closeInvoice = (e) => {
+        if (popupRef.current && !popupRef.current.contains(e.target)) {
+            setInvoiceVisible(false); // Close popup when clicking outside
+        }
+    };
+
+    // Attach click outside listener
+    useEffect(() => {
+        document.addEventListener("mousedown", closeInvoice);
+        return () => document.removeEventListener("mousedown", closeInvoice);
+    }, []);
 
     return (
         <AdminLayout>
@@ -237,6 +260,7 @@ const RecentInvoiceList = () => {
                             {data.map((item, index) => (
                                 <tr
                                     key={index}
+                                    onClick={() => openInvoice()}
                                     onMouseEnter={() => setHoveredRow(index)}
                                     onMouseLeave={() => setHoveredRow(null)}
                                     className="border-b hover:bg-gray-50 cursor-pointer"
@@ -265,6 +289,28 @@ const RecentInvoiceList = () => {
                         </tbody>
                     </table>
                 </div>
+                {isInvoiceVisible && (
+                    <div
+                        className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+                        style={{ backdropFilter: "blur(5px)" }} // Dim and blur background
+                    >
+                        <div
+                            ref={popupRef}
+                            className="relative bg-white rounded-lg p-6 w-[700px] shadow-xl"
+                        >
+                            {/* Invoice Component */}
+                            <Invoice />
+
+                            {/* Close Button */}
+                            <button
+                                onClick={() => setInvoiceVisible(false)}
+                                className="absolute top-2 right-2 bg-gray-200 hover:bg-gray-300 rounded-full w-8 h-8 flex items-center justify-center"
+                            >
+                                ✕
+                            </button>
+                        </div>
+                    </div>
+                )}
 
                 {/* Footer */}
                 <div className="flex justify-between items-center mt-4 text-gray-600 text-sm">
