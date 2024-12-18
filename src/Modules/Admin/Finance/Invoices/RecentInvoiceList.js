@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import AdminLayout from "../../../../Components/Admin/AdminDashLayout";
 import { Menu, Dropdown } from "antd";
 import { MoreOutlined } from "@ant-design/icons";
+import { FiUserPlus } from "react-icons/fi";
+import { useNavigate } from "react-router-dom";
 
 // Sample Data
 const data = [
@@ -12,6 +14,8 @@ const data = [
 
 const RecentInvoiceList = () => {
     const [hoveredRow, setHoveredRow] = useState(null);
+    const [isSortModalVisible, setSortModalVisible] = useState(false);
+    const navigate = useNavigate();
 
     // Dropdown Menu for Action
     const actionMenu = (
@@ -48,7 +52,6 @@ const RecentInvoiceList = () => {
                 >
                     Send Reminder
                 </button>
-
             );
         }
         return (
@@ -68,6 +71,149 @@ const RecentInvoiceList = () => {
             <div className="p-4 bg-white rounded-lg shadow-lg">
                 {/* Header */}
                 <h2 className="text-xl font-semibold mb-4">Recent Invoice List</h2>
+
+                <div className="p-6 bg-white shadow-lg rounded-lg">
+                    {/* Filters and Buttons Section */}
+                    <div className="flex justify-between items-start">
+                        {/* Left Side: Filters and Radio Buttons */}
+                        <div className="flex flex-col space-y-4">
+                            {/* Filters Row */}
+                            <div className="flex items-center space-x-4">
+                                {/* Class Filter */}
+                                <div className="flex flex-col">
+                                    <label className="text-gray-500 text-sm mb-1">Class</label>
+                                    <select className="border border-gray-300 rounded-lg px-4 py-2 text-gray-700 w-28">
+                                        <option value="Ten">Ten</option>
+                                        {/* Add more options as needed */}
+                                    </select>
+                                </div>
+
+                                {/* Section Filter */}
+                                <div className="flex flex-col">
+                                    <label className="text-gray-500 text-sm mb-1">Section</label>
+                                    <select className="border border-gray-300 rounded-lg px-4 py-2 text-gray-700 w-28">
+                                        <option value="A">A</option>
+                                        {/* Add more options as needed */}
+                                    </select>
+                                </div>
+
+                                {/* Fees Type Filter */}
+                                <div className="flex flex-col">
+                                    <label className="text-gray-500 text-sm mb-1">Fees Type</label>
+                                    <select className="border border-gray-300 rounded-lg px-4 py-2 text-gray-700 w-36">
+                                        <option value="Exam fees">Exam fees</option>
+                                        {/* Add more options as needed */}
+                                    </select>
+                                </div>
+                            </div>
+
+                            {/* Radio Buttons Row */}
+                            <div className="flex space-x-6">
+                                <label className="flex items-center text-sm space-x-2">
+                                    <input
+                                        type="radio"
+                                        name="studentFilter"
+                                        className="form-radio text-green-600"
+                                        defaultChecked
+                                    />
+                                    <span className="text-green-600 font-medium">Everyone</span>
+                                </label>
+                                <label className="flex items-center text-sm space-x-2">
+                                    <input
+                                        type="radio"
+                                        name="studentFilter"
+                                        className="form-radio text-gray-500"
+                                    />
+                                    <span className="text-gray-700">Paid Student</span>
+                                </label>
+                                <label className="flex items-center text-sm space-x-2">
+                                    <input
+                                        type="radio"
+                                        name="studentFilter"
+                                        className="form-radio text-gray-500"
+                                    />
+                                    <span className="text-gray-700">Unpaid Student</span>
+                                </label>
+                                <label className="flex items-center text-sm space-x-2">
+                                    <input
+                                        type="radio"
+                                        name="studentFilter"
+                                        className="form-radio text-gray-500"
+                                    />
+                                    <span className="text-gray-700">Overdue Student</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        {/* Right Side: Buttons */}
+                        <div className="flex items-center space-x-4">
+                            {/* Sort Button */}
+                            <button
+                                className="flex items-center px-4 py-2 border rounded-lg text-gray-700 font-medium hover:shadow-md"
+                                style={{
+                                    borderImage: "linear-gradient(to right, #FF007C, #8A2BE2) 1",
+                                    borderRadius: "8px",
+                                }}
+                                onClick={() => setSortModalVisible(true)}
+                            >
+                                Sort
+                                <span className="ml-2">
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        className="h-5 w-5"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth={2}
+                                            d="M16 17l-4 4m0 0l-4-4m4 4V3"
+                                        />
+                                    </svg>
+                                </span>
+                            </button>
+
+                            {/* Export Button */}
+                            <button
+                                className="flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-medium rounded-lg hover:opacity-90"
+                                onClick={() => console.log("Exporting data...")} // Implement export functionality
+                            >
+                                Export
+                                <span className="ml-2">
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        className="h-5 w-5"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth={2}
+                                            d="M5 10l7-7m0 0l7 7m-7-7v18"
+                                        />
+                                    </svg>
+                                </span>
+                            </button>
+
+                            {/* Add New Fee Button */}
+                            <button
+                                onClick={() =>
+                                    navigate("/finance/studentfees/total-revenue/addFees")
+                                }
+                                className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
+                            >
+                                <span className="text-gray-800 font-medium">Add New Invoice</span>
+                                <div className="w-12 h-12 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center text-white">
+                                    <FiUserPlus size={16} />
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
 
                 {/* Custom Table */}
                 <div className="overflow-x-auto">
