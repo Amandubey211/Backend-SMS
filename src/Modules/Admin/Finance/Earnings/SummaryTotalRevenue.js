@@ -54,27 +54,28 @@ const SummaryTotalRevenue = () => {
       sorter: (a, b) => a.subCategory.localeCompare(b.subCategory),
       render: (text) => <span>{text}</span>,
     },
-    {
-      title: "Description",
-      dataIndex: "description",
-      key: "description",
-      sorter: (a, b) => a.description.localeCompare(b.description),
-      render: (text) => <span>{text}</span>,
-    },
-    {
-      title: "From",
-      dataIndex: "from",
-      key: "from",
-      sorter: (a, b) => a.from.localeCompare(b.from),
-      render: (text) => <span>{text}</span>,
-    },
-    {
-      title: "Academic Year",
-      dataIndex: "academicYear",
-      key: "academicYear",
-      sorter: (a, b) => a.academicYear.localeCompare(b.academicYear),
-      render: (text) => <span>{text}</span>,
-    },
+    // Uncomment and adjust these columns if needed
+    // {
+    //   title: "Description",
+    //   dataIndex: "description",
+    //   key: "description",
+    //   sorter: (a, b) => a.description.localeCompare(b.description),
+    //   render: (text) => <span>{text}</span>,
+    // },
+    // {
+    //   title: "From",
+    //   dataIndex: "from",
+    //   key: "from",
+    //   sorter: (a, b) => a.from.localeCompare(b.from),
+    //   render: (text) => <span>{text}</span>,
+    // },
+    // {
+    //   title: "Academic Year",
+    //   dataIndex: "academicYear",
+    //   key: "academicYear",
+    //   sorter: (a, b) => a.academicYear.localeCompare(b.academicYear),
+    //   render: (text) => <span>{text}</span>,
+    // },
     {
       title: "Payment Type",
       dataIndex: "paymentType",
@@ -100,13 +101,6 @@ const SummaryTotalRevenue = () => {
       render: (text) => <span>{text}</span>,
     },
     {
-      title: "Tax (%)",
-      dataIndex: "tax",
-      key: "tax",
-      sorter: (a, b) => a.tax - b.tax,
-      render: (value) => <span>{value || "0"}%</span>,
-    },
-    {
       title: "Discount",
       dataIndex: "discount",
       key: "discount",
@@ -115,20 +109,6 @@ const SummaryTotalRevenue = () => {
         record.discountType === "percentage"
           ? `${value || 0}%`
           : `${value || 0} QR`,
-    },
-    {
-      title: "Penalty (QR)",
-      dataIndex: "penalty",
-      key: "penalty",
-      sorter: (a, b) => a.penalty - b.penalty,
-      render: (value) => <span>{value || "0"} QR</span>,
-    },
-    {
-      title: "Total Amount (QR)",
-      dataIndex: "total_amount",
-      key: "total_amount",
-      sorter: (a, b) => a.total_amount - b.total_amount,
-      render: (value) => <span>{value || "0"} QR</span>,
     },
     {
       title: "Final Amount (QR)",
@@ -151,13 +131,14 @@ const SummaryTotalRevenue = () => {
       sorter: (a, b) => a.remaining_amount - b.remaining_amount,
       render: (value) => <span>{value || "0"} QR</span>,
     },
-    {
-      title: "Earned Date",
-      dataIndex: "earnedDate",
-      key: "earnedDate",
-      sorter: (a, b) => new Date(a.earnedDate) - new Date(b.earnedDate),
-      render: (date) => (date ? new Date(date).toLocaleDateString() : "N/A"),
-    },
+    // Uncomment and adjust if Earned Date is needed
+    // {
+    //   title: "Earned Date",
+    //   dataIndex: "earnedDate",
+    //   key: "earnedDate",
+    //   sorter: (a, b) => new Date(a.earnedDate) - new Date(b.earnedDate),
+    //   render: (date) => (date ? new Date(date).toLocaleDateString() : "N/A"),
+    // },
     {
       title: "Action",
       key: "action",
@@ -226,6 +207,17 @@ const SummaryTotalRevenue = () => {
     earnedDate: income.paidDate || income.generateDate || "N/A",
   }));
 
+  // Row click handler to navigate to AddEarnings.jsx with incomeData
+  const onRowClick = (record) => {
+    return {
+      onClick: () => {
+        navigate("/finance/earning/add", {
+          state: { incomeData: record },
+        });
+      },
+    };
+  };
+
   return (
     <div className="bg-white p-4 rounded-lg shadow space-y-4">
       {/* Header */}
@@ -285,6 +277,7 @@ const SummaryTotalRevenue = () => {
           className="rounded-lg"
           bordered
           scroll={{ x: "max-content" }}
+          onRow={onRowClick} // Attach the row click handler here
         />
       )}
     </div>

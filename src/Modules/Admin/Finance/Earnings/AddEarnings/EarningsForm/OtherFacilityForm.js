@@ -1,59 +1,44 @@
 import React from "react";
-import { Formik, Form } from "formik";
-import * as Yup from "yup";
-import PaymentDetails from "../Component/PaymentDetails";
-import PaymentStatus from "../Component/PaymentStatus";
+import { useFormikContext } from "formik";
 import FormSection from "../Component/FormSection"; // Reusable FormSection
+import PaymentDetails from "../Component/PaymentDetails"; // Static Component
+import PaymentStatus from "../Component/PaymentStatus"; // Static Component
 
-// Configuration for Other Facility Details Fields
-const otherFacilityFields = [
-  {
-    name: "earningsFrom",
-    label: "Earnings From",
-    type: "text",
-    placeholder: "Write here",
-  },
-  {
-    name: "duration",
-    label: "Duration",
-    type: "text",
-    placeholder: "Enter duration",
-  },
-];
+const OtherFacilityForm = () => {
+  const { setFieldValue, values } = useFormikContext();
 
-// Validation Schema
-const validationSchema = Yup.object({
-  earningsFrom: Yup.string().required("Earnings From is required"),
-  duration: Yup.string().required("Duration is required"),
-});
+  // Configuration for Other Facility Details Fields
+  const otherFacilityFields = [
+    {
+      name: "earningsFrom",
+      label: "Earnings From",
+      type: "text",
+      placeholder: "Write here",
+    },
+    {
+      name: "duration",
+      label: "Duration",
+      type: "text",
+      placeholder: "Enter duration",
+    },
+  ];
 
-const OtherFacilityForm = ({ formData, onFormChange }) => {
   return (
-    <Formik
-      initialValues={formData}
-      validationSchema={validationSchema}
-      onSubmit={(values) => {
-        console.log("Submitted Values:", values);
-        onFormChange(values);
-      }}
-    >
-      {({ setFieldValue }) => (
-        <Form className="bg-white p-6 rounded-lg shadow-md">
-          {/* Other Facility Details Section */}
-          <FormSection
-            title="Other Facility Details"
-            fields={otherFacilityFields}
-            setFieldValue={setFieldValue}
-          />
+    <>
+      {/* Other Facility Details Section */}
+      <FormSection
+        title="Other Facility Details"
+        fields={otherFacilityFields}
+        setFieldValue={setFieldValue}
+        values={values}
+      />
 
-          {/* Static PaymentDetails Component */}
-          <PaymentDetails onFormChange={onFormChange} />
+      {/* Static PaymentDetails Component */}
+      <PaymentDetails />
 
-          {/* Static PaymentStatus Component */}
-          <PaymentStatus setFieldValue={setFieldValue} />
-        </Form>
-      )}
-    </Formik>
+      {/* Static PaymentStatus Component */}
+      <PaymentStatus />
+    </>
   );
 };
 

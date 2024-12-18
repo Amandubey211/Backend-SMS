@@ -1,6 +1,7 @@
 // Header.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import DropdownCard from "./DropdownCard";
+import { categories, subCategories } from "../constants/categories"; // Adjust the path as necessary
 
 const Header = ({
   onReset,
@@ -9,74 +10,35 @@ const Header = ({
   onSubCategoryChange,
   description,
   setDescription,
+  initialCategory = "Student-Based Revenue",
+  initialSubCategory = "Tuition Fees",
+  isUpdate = false, // New prop to indicate update mode
 }) => {
-  const [category, setCategory] = useState("Student Based Revenue");
-  const [subCategory, setSubCategory] = useState("Tuition fees");
-
-  const categories = [
-    "Student Based Revenue",
-    "Service Based Revenue",
-    "Community & External Revenue",
-    "Financial Investment",
-    "Facility Based Revenue",
-    "Library Based Revenue",
-    "Others",
-  ];
-
-  const subCategories = {
-    "Student Based Revenue": [
-      "Tuition fees",
-      "Transport fees",
-      "Hostel fees",
-      "Exam fees",
-      "Event fees",
-      "Certificate / ID card",
-      "Meal plan fees",
-      "Application fees",
-      "Others",
-    ],
-    "Service Based Revenue": [
-      "Stationery fees",
-      "Other facility fees",
-      "Subscription fees",
-      "Workshop/Training fees",
-      "Canteen profit",
-      "Others",
-    ],
-    "Community & External Revenue": ["Donation", "Fund raising", "Others"],
-    "Financial Investment": ["Investments", "Others"],
-    "Facility Based Revenue": [
-      "Rent Income",
-      "Exam center fees",
-      "Parking fees",
-      "Others",
-    ],
-    "Library Based Revenue": ["Borrow books", "Book sales", "Membership fees"],
-    Others: ["Others"],
-  };
-
+  const [category, setCategory] = useState(initialCategory);
+  const [subCategory, setSubCategory] = useState(initialSubCategory);
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const [isSubCategoryOpen, setIsSubCategoryOpen] = useState(false);
 
+  useEffect(() => {
+    // Sync initial state
+    setCategory(initialCategory);
+    setSubCategory(initialSubCategory);
+  }, [initialCategory, initialSubCategory]);
+
   const handleCategorySelect = (selectedCategory) => {
     setCategory(selectedCategory);
-    if (typeof onCategoryChange === "function") {
-      onCategoryChange(selectedCategory);
-    }
+    onCategoryChange(selectedCategory);
     setIsCategoryOpen(false);
 
+    // Automatically select the first subcategory
     const firstSubCategory = subCategories[selectedCategory][0];
     setSubCategory(firstSubCategory);
-    if (typeof onSubCategoryChange === "function") {
-      onSubCategoryChange(firstSubCategory);
-    }
+    onSubCategoryChange(firstSubCategory);
   };
 
   const handleSubCategorySelect = (selectedSubCategory) => {
     setSubCategory(selectedSubCategory);
-    if (typeof onSubCategoryChange === "function") {
-      onSubCategoryChange(selectedSubCategory);
-    }
+    onSubCategoryChange(selectedSubCategory);
     setIsSubCategoryOpen(false);
   };
 
@@ -84,7 +46,9 @@ const Header = ({
     <div className="bg-white py-3 px-5">
       {/* Header Title and Buttons */}
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">Add new earnings</h1>
+        <h1 className="text-2xl font-bold text-gray-800">
+          {isUpdate ? "Update Earnings" : "Add New Earnings"}
+        </h1>
         <div className="flex gap-4">
           <button
             onClick={onReset}
@@ -96,13 +60,13 @@ const Header = ({
             onClick={onSave}
             className="bg-gradient-to-r from-pink-500 to-purple-500 text-white text-sm font-medium px-6 py-2 rounded-md shadow-md hover:from-pink-600 hover:to-purple-600 transition"
           >
-            Save earnings
+            {isUpdate ? "Update Earnings" : "Save Earnings"}
           </button>
         </div>
       </div>
 
       {/* Dropdown Section */}
-      <div className="flex gap-6">
+      <div className="flex flex-col md:flex-row gap-6">
         <DropdownCard
           label="Category"
           value={category}
@@ -128,7 +92,7 @@ const Header = ({
         {/* Description Box */}
         <div className="relative w-full bg-gray-100 border border-gray-300 rounded-lg p-4 h-28">
           <label className="text-sm text-gray-900 block mb-2">
-            Add description
+            Add Description
           </label>
           <textarea
             value={description}
@@ -139,7 +103,7 @@ const Header = ({
           ></textarea>
           <div className="flex justify-end items-center my-3">
             <span className="text-xs text-gray-500 italic">
-              You can write 100 characters
+              You can write up to 100 characters
             </span>
           </div>
         </div>

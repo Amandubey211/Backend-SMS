@@ -10,11 +10,9 @@ import SortPopModal from "./Components/SortPopModal"; // Corrected import
 import StudentFeesPaidModal from "./Components/StudentFeesPaidModal";
 import StudentFeesUnpaidModal from "./Components/StudentFeesUnpaidModal";
 import { FiUserPlus } from "react-icons/fi";
-import {
-  deleteStudentFees,
-  fetchAllStudentFees,
-} from "../../../../Store/Slices/Finance/StudentFees/studentFeesThunks";
+import { deleteStudentFees } from "../../../../Store/Slices/Finance/StudentFees/studentFeesThunks";
 import moment from "moment"; // Replaced dayjs with moment
+import { fetchAllIncomes } from "../../../../Store/Slices/Finance/Earnings/earningsThunks";
 
 const SummaryRevenueList = () => {
   const dispatch = useDispatch();
@@ -35,7 +33,7 @@ const SummaryRevenueList = () => {
 
   useEffect(() => {
     // Fetch all student fee records when the component mounts
-    dispatch(fetchAllStudentFees({ page: 1, limit: 20 })); // Adjust params as needed
+    dispatch(fetchAllIncomes({ page: 1, limit: 20 })); // Adjust params as needed
   }, [dispatch]);
 
   const handleRowClick = (record) => {
@@ -99,7 +97,7 @@ const SummaryRevenueList = () => {
           .unwrap()
           .then(() => {
             // Refresh the data after deletion
-            dispatch(fetchAllStudentFees({ page: 1, limit: 20 }));
+            dispatch(fetchAllIncomes({ page: 1, limit: 20 }));
             setSelectedRowKeys([]);
           })
           .catch((err) => {
@@ -119,7 +117,7 @@ const SummaryRevenueList = () => {
           .unwrap()
           .then(() => {
             // Refresh the data after deletion
-            dispatch(fetchAllStudentFees({ page: 1, limit: 20 }));
+            dispatch(fetchAllIncomes({ page: 1, limit: 20 }));
             setSelectedRowKeys((prevKeys) =>
               prevKeys.filter((key) => key !== feeId)
             );

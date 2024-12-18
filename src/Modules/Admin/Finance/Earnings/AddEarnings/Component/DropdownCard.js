@@ -1,3 +1,4 @@
+// DropdownCard.jsx
 import React, { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { IoIosArrowForward } from "react-icons/io";
@@ -60,7 +61,7 @@ const DropdownCard = ({
           exit={{ opacity: 0, y: -10 }}
           className="absolute left-0 top-full mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg z-10"
         >
-          {options.map((item, index) => (
+          {options?.map((item, index) => (
             <li
               key={index}
               className={`px-3 py-2 hover:bg-pink-100 cursor-pointer text-sm ${
