@@ -10,7 +10,13 @@ import {
   Tooltip,
 } from "chart.js";
 
-ChartJS.register(LineElement, PointElement, LinearScale, CategoryScale, Tooltip);
+ChartJS.register(
+  LineElement,
+  PointElement,
+  LinearScale,
+  CategoryScale,
+  Tooltip
+);
 
 const TotalEarningGraph = () => {
   const [selectedMonth, setSelectedMonth] = useState("By Month");
@@ -23,11 +29,27 @@ const TotalEarningGraph = () => {
 
   // Data for the chart
   const data = {
-    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+    labels: [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ],
     datasets: [
       {
         label: "Total Revenue",
-        data: [5000, 10000, 15000, 20000, 15000, 10000, 5000, 10000, 15000, 20000, 15000, 10000],
+        data: [
+          5000, 10000, 15000, 20000, 15000, 10000, 5000, 10000, 15000, 20000,
+          15000, 10000,
+        ],
         fill: true,
         backgroundColor: "rgba(72, 191, 145, 0.2)", // Gradient background color
         borderColor: "rgba(72, 191, 145, 1)", // Green border color
@@ -82,10 +104,7 @@ const TotalEarningGraph = () => {
         {/* Custom Legend and Dropdown */}
         <div className="flex items-end gap-6">
           <div className="flex items-center gap-2">
-            <div
-              className="w-4 h-4 rounded-sm"
-              
-            ></div>
+            <div className="w-4 h-4 rounded-sm"></div>
             <span className="text-gray-700 text-sm font-medium"></span>
           </div>
         </div>
@@ -103,13 +122,24 @@ const TotalEarningGraph = () => {
           }}
         >
           <option value="By Month">By Month</option>
-          {["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"].map(
-            (month) => (
-              <option key={month} value={month}>
-                {month}
-              </option>
-            )
-          )}
+          {[
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "May",
+            "Jun",
+            "Jul",
+            "Aug",
+            "Sep",
+            "Oct",
+            "Nov",
+            "Dec",
+          ].map((month) => (
+            <option key={month} value={month}>
+              {month}
+            </option>
+          ))}
         </select>
       </div>
 
@@ -122,4 +152,3 @@ const TotalEarningGraph = () => {
 };
 
 export default TotalEarningGraph;
- 

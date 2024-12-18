@@ -1,6 +1,5 @@
-// src/components/TotalRevenueList.jsx
-
-import React, { useEffect, useState, useCallback } from "react";
+// TotalRevenueList.jsx
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { Table, Input, Button, Spin, Alert, Dropdown, Menu } from "antd";
 import {
   SearchOutlined,
@@ -24,10 +23,6 @@ import debounce from "lodash.debounce";
 import { setCurrentPage } from "../../../../Store/Slices/Finance/Earnings/earningsSlice";
 import { fetchAllIncomes } from "../../../../Store/Slices/Finance/Earnings/earningsThunks";
 
-/**
- * CustomHeaderCell Component
- * Applies a light pink background and reduced padding to the table header cells.
- */
 const CustomHeaderCell = (props) => (
   <th {...props} className="bg-pink-100 py-2 px-3 text-sm" />
 );
@@ -41,16 +36,15 @@ const TotalRevenueList = () => {
   const [isSortModalVisible, setIsSortModalVisible] = useState(false);
   const [isBulkEntriesModalVisible, setIsBulkEntriesModalVisible] =
     useState(false);
-  const [selectedIncome, setSelectedIncome] = useState(null); // For Edit/Delete actions
+  const [selectedIncome, setSelectedIncome] = useState(null);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  // Selectors - Adjust the state path based on your store configuration
-  const { incomes, loading, error, totalRecords, totalPages, currentPage } =
-    useSelector((state) => state.admin.earnings); // Ensure 'admin.earnings' is correct
+  const { incomes, loading, error, totalRecords, currentPage } = useSelector(
+    (state) => state.admin.earnings
+  );
 
-  // Debounced search to optimize API calls
   const debouncedFetch = useCallback(
     debounce((params) => {
       dispatch(fetchAllIncomes(params));
@@ -58,35 +52,32 @@ const TotalRevenueList = () => {
     [dispatch]
   );
 
-  // Fetch incomes on component mount and when dependencies change
   useEffect(() => {
     const params = {
-      search: searchText, // This should target "Subcategory"
+      search: searchText,
       page: currentPage,
-      limit: 20, // Adjust as needed
-      sortBy: "earnedDate", // Default sort field
-      sortOrder: "desc", // Default sort order
-      // Add more query params as needed
+      limit: 20,
+      sortBy: "earnedDate",
+      sortOrder: "desc",
     };
     debouncedFetch(params);
   }, [debouncedFetch, searchText, currentPage]);
 
-  // Handler for search input
   const handleSearch = (e) => {
     setSearchText(e.target.value);
-    dispatch(setCurrentPage(1)); // Reset to first page on new search
+    dispatch(setCurrentPage(1));
   };
 
-  // Menu for Action Dropdown
   const actionMenu = (record) => (
     <Menu>
       <Menu.Item
         key="edit"
         icon={<EditOutlined />}
-        onClick={() => {
-          setSelectedIncome(record);
-          setIsSidebarVisible(true);
-        }}
+        onClick={() =>
+          navigate("/finance/earning/add", {
+            state: { incomeData: record },
+          })
+        }
       >
         Edit
       </Menu.Item>
@@ -103,158 +94,158 @@ const TotalRevenueList = () => {
     </Menu>
   );
 
-  // Table columns with filters and sorting
-  const columns = [
-    {
-      title: "Category",
-      dataIndex: "category",
-      key: "category",
-      sorter: (a, b) => a.category.localeCompare(b.category),
-      render: (text) => <span className="text-sm">{text}</span>,
-      width: 120,
-    },
-    {
-      title: "Subcategory",
-      dataIndex: "subCategory",
-      key: "subCategory",
-      sorter: (a, b) => a.subCategory.localeCompare(b.subCategory),
-      render: (text) => <span className="text-sm">{text}</span>,
-      width: 150,
-    },
-    {
-      title: "Total Amount (QR)",
-      dataIndex: "final_amount",
-      key: "final_amount",
-      sorter: (a, b) => a.final_amount - b.final_amount,
-      render: (value) => (
-        <span className="text-sm">
-          {value !== undefined && value !== null ? `${value} QR` : "N/A"}
-        </span>
-      ),
-      width: 150,
-    },
-    {
-      title: "Paid Amount (QR)",
-      dataIndex: "paid_amount",
-      key: "paid_amount",
-      sorter: (a, b) => a.paid_amount - b.paid_amount,
-      render: (value) => (
-        <span className="text-sm">
-          {value !== undefined && value !== null ? `${value} QR` : "N/A"}
-        </span>
-      ),
-      width: 150,
-    },
-    {
-      title: "Discount",
-      dataIndex: "discount",
-      key: "discount",
-      sorter: (a, b) => a.discount - b.discount,
-      render: (value) =>
-        value !== undefined && value !== null ? (
-          <span className="text-green-600 text-sm">{`${value}%`}</span>
-        ) : (
-          "N/A"
+  // Memoize columns to prevent re-creation on every render
+  const columns = useMemo(
+    () => [
+      {
+        title: "Category",
+        dataIndex: "category",
+        key: "category",
+        sorter: (a, b) => a.category.localeCompare(b.category),
+        render: (text) => <span className="text-sm">{text}</span>,
+        width: 120,
+      },
+      {
+        title: "Subcategory",
+        dataIndex: "subCategory",
+        key: "subCategory",
+        sorter: (a, b) => a.subCategory.localeCompare(b.subCategory),
+        render: (text) => <span className="text-sm">{text}</span>,
+        width: 150,
+      },
+      {
+        title: "Total Amount (QR)",
+        dataIndex: "final_amount",
+        key: "final_amount",
+        sorter: (a, b) => a.final_amount - b.final_amount,
+        render: (value) => (
+          <span className="text-sm">
+            {value !== undefined && value !== null ? `${value} QR` : "N/A"}
+          </span>
         ),
-      width: 100,
-    },
-    {
-      title: "Penalty",
-      dataIndex: "penalty",
-      key: "penalty",
-      sorter: (a, b) => a.penalty - b.penalty,
-      render: (value) =>
-        value !== undefined && value !== null ? (
-          <span className="text-red-600 text-sm">{`${value} QR`}</span>
-        ) : (
-          "N/A"
+        width: 150,
+      },
+      {
+        title: "Paid Amount (QR)",
+        dataIndex: "paid_amount",
+        key: "paid_amount",
+        sorter: (a, b) => a.paid_amount - b.paid_amount,
+        render: (value) => (
+          <span className="text-sm">
+            {value !== undefined && value !== null ? `${value} QR` : "N/A"}
+          </span>
         ),
-      width: 100,
-    },
-    {
-      title: "Earned Date",
-      dataIndex: "earnedDate",
-      key: "earnedDate",
-      sorter: (a, b) => new Date(a.earnedDate) - new Date(b.earnedDate),
-      render: (date) =>
-        date ? (
-          <span className="text-sm">{new Date(date).toLocaleDateString()}</span>
-        ) : (
-          "N/A"
+        width: 150,
+      },
+      {
+        title: "Discount",
+        dataIndex: "discount",
+        key: "discount",
+        sorter: (a, b) => a.discount - b.discount,
+        render: (value) =>
+          value !== undefined && value !== null ? (
+            <span className="text-green-600 text-sm">{`${value}%`}</span>
+          ) : (
+            "N/A"
+          ),
+        width: 100,
+      },
+      {
+        title: "Penalty",
+        dataIndex: "penalty",
+        key: "penalty",
+        sorter: (a, b) => a.penalty - b.penalty,
+        render: (value) =>
+          value !== undefined && value !== null ? (
+            <span className="text-red-600 text-sm">{`${value} QR`}</span>
+          ) : (
+            "N/A"
+          ),
+        width: 100,
+      },
+      {
+        title: "Earned Date",
+        dataIndex: "earnedDate",
+        key: "earnedDate",
+        sorter: (a, b) => new Date(a.earnedDate) - new Date(b.earnedDate),
+        render: (date) =>
+          date ? (
+            <span className="text-sm">
+              {new Date(date).toLocaleDateString()}
+            </span>
+          ) : (
+            "N/A"
+          ),
+        width: 150,
+      },
+      {
+        title: "Action",
+        key: "action",
+        render: (_, record) => (
+          <Dropdown overlay={actionMenu(record)} trigger={["click"]}>
+            <Button type="link" icon={<EllipsisOutlined />} className="p-0" />
+          </Dropdown>
         ),
-      width: 150,
-    },
-    {
-      title: "Action",
-      key: "action",
-      render: (_, record) => (
-        <Dropdown overlay={actionMenu(record)} trigger={["click"]}>
-          <Button type="link" icon={<EllipsisOutlined />} className="p-0" />
-        </Dropdown>
-      ),
-      fixed: "right",
-      width: 80,
-    },
-  ];
+        fixed: "right",
+        width: 80,
+      },
+    ],
+    [navigate]
+  );
 
-  // Handle table pagination and sorting change
   const handleTableChange = (pagination, filters, sorter) => {
     const newPage = pagination.current;
     const newSortBy = sorter.field || "earnedDate";
     const newSortOrder = sorter.order === "descend" ? "desc" : "asc";
 
     const params = {
-      search: searchText, // Ensure this targets "Subcategory"
+      search: searchText,
       page: newPage,
-      limit: 20, // Adjust as needed
+      limit: 20,
       sortBy: newSortBy,
       sortOrder: newSortOrder,
-      // Include any additional filters here
       ...filters,
     };
 
     dispatch(fetchAllIncomes(params));
   };
 
-  // Map incomes data to table dataSource
-  const dataSource = incomes.map((income) => ({
-    key: income._id,
-    category: income.category?.[0]?.categoryName || "N/A",
-    subCategory: income.subCategory || "N/A",
-    final_amount:
-      income.final_amount !== undefined && income.final_amount !== null
-        ? income.final_amount
-        : "N/A",
-    paid_amount:
-      income.paid_amount !== undefined && income.paid_amount !== null
-        ? income.paid_amount
-        : "N/A",
-    discount:
-      income.discount !== undefined && income.discount !== null
-        ? income.discount
-        : "N/A",
-    penalty:
-      income.penalty !== undefined && income.penalty !== null
-        ? income.penalty
-        : "N/A",
-    remaining_amount:
-      income.remaining_amount !== undefined && income.remaining_amount !== null
-        ? income.remaining_amount
-        : "N/A",
-    earnedDate: income.paidDate || income.generateDate || "N/A",
-  }));
+  const dataSource = useMemo(
+    () =>
+      incomes.map((income) => ({
+        key: income._id,
+        category: income.category?.[0]?.categoryName || "N/A",
+        subCategory: income.subCategory || "N/A",
+        final_amount: income.final_amount || "N/A",
+        paid_amount: income.paid_amount || "N/A",
+        discount: income.discount || "N/A",
+        penalty: income.penalty || "N/A",
+        remaining_amount: income.remaining_amount || "N/A",
+        earnedDate: income.paidDate || income.generateDate || "N/A",
+      })),
+    [incomes]
+  );
 
-  // Define custom components for the Table to style the header
   const components = {
     header: {
       cell: CustomHeaderCell,
     },
   };
 
+  // Row click handler
+  const onRowClick = (record) => {
+    return {
+      onClick: () => {
+        navigate("/finance/earning/add", {
+          state: { incomeData: record },
+        });
+      },
+    };
+  };
+
   return (
     <AdminLayout>
       <div className="p-4 space-y-4">
-        {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-center md:items-start gap-4 md:gap-0">
           <div
             className="cursor-pointer text-lg font-semibold"
@@ -283,7 +274,7 @@ const TotalRevenueList = () => {
               value={searchText}
               onChange={handleSearch}
               allowClear
-              style={{ borderRadius: "0.375rem" }} // Tailwind's rounded-md equivalent
+              style={{ borderRadius: "0.375rem" }}
             />
             <Button
               type="primary"
@@ -305,14 +296,12 @@ const TotalRevenueList = () => {
           </div>
         </div>
 
-        {/* Loading Indicator */}
         {loading && (
           <div className="flex justify-center my-4">
             <Spin tip="Loading..." size="small" />
           </div>
         )}
 
-        {/* Error Message */}
         {error && (
           <Alert
             message="Error"
@@ -324,7 +313,6 @@ const TotalRevenueList = () => {
           />
         )}
 
-        {/* Table */}
         {!loading && !error && (
           <div className="overflow-x-auto">
             <Table
@@ -333,7 +321,7 @@ const TotalRevenueList = () => {
               pagination={{
                 current: currentPage,
                 total: totalRecords,
-                pageSize: 20, // Adjust as needed
+                pageSize: 20,
                 showSizeChanger: false,
                 size: "small",
               }}
@@ -342,25 +330,18 @@ const TotalRevenueList = () => {
               bordered
               size="small"
               scroll={{ x: "max-content" }}
-              components={components} // Apply custom header styling
-              rowClassName="hover:bg-gray-50"
+              components={components}
+              rowClassName="hover:bg-gray-50 cursor-pointer"
+              onRow={onRowClick}
             />
           </div>
         )}
 
-        {/* Action Modals */}
+        {/* Modals */}
         <DeleteModal
           visible={isDeleteModalVisible}
           onClose={() => {
             setIsDeleteModalVisible(false);
-            setSelectedIncome(null);
-          }}
-          income={selectedIncome}
-        />
-        <EditTotalRevenueSidebar
-          visible={isSidebarVisible}
-          onClose={() => {
-            setIsSidebarVisible(false);
             setSelectedIncome(null);
           }}
           income={selectedIncome}
