@@ -58,6 +58,7 @@ import StudentFeesDash from "../Modules/Admin/Finance/StudentFees/StudentFeesDas
 import SummaryRevenueList from "../Modules/Admin/Finance/StudentFees/SummaryRevenueList.js";
 import AddNewFees from "../Modules/Admin/Finance/StudentFees/AddNewFees/AddNewFees.js";
 import InvoicesMain from "../Modules/Admin/Finance/Invoices/InvoicesMain.js";
+import RecentInvoiceList from "../Modules/Admin/Finance/Invoices/RecentInvoiceList.js";
 
 // lazy loaded routes
 const AddExpense = lazy(() =>
@@ -959,6 +960,26 @@ function App() {
       element: (
         <ProtectRoute
           Component={InvoicesMain}
+          allowedRoles={["admin", "accountant"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/finance/invoices/dashboard/recent-invoices",
+      element: (
+        <ProtectRoute
+          Component={RecentInvoiceList}
+          allowedRoles={["admin", "accountant"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/finance/invoices/dashboard/return-invoices",
+      element: (
+        <ProtectRoute
+          Component={RecentInvoiceList}
           allowedRoles={["admin", "accountant"]}
         />
       ),

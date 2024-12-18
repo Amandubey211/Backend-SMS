@@ -253,7 +253,7 @@ const SummaryRevenueList = () => {
 
   return (
     <AdminLayout>
-      <div className="p-6 bg-white shadow-lg rounded-lg">
+       <div className="p-6 bg-white shadow-lg rounded-lg">
         {/* Filters and Buttons Section */}
         <div className="flex justify-between items-start">
           {/* Left Side: Filters and Radio Buttons */}
@@ -271,7 +271,7 @@ const SummaryRevenueList = () => {
 
               {/* Section Filter */}
               <div className="flex flex-col">
-                <label className="text-gray-500 text-sm mb-1">Section</label>
+               <label className="text-gray-500 text-sm mb-1">Section</label>
                 <select className="border border-gray-300 rounded-lg px-4 py-2 text-gray-700 w-28">
                   <option value="A">A</option>
                   {/* Add more options as needed */}
