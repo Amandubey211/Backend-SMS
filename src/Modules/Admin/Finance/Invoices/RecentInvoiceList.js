@@ -294,41 +294,42 @@ const RecentInvoiceList = () => {
                         className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50"
                         style={{ backdropFilter: "blur(8px)" }} // Enhanced blur
                     >
-                        {/* Cross and Buttons Wrapper */}
-                        <div className="absolute top-4 right-4 flex flex-col items-center space-y-3 z-50">
-                            {/* Close Button */}
-                            <button
-                                onClick={() => setInvoiceVisible(false)}
-                                className="bg-gray-200 hover:bg-gray-300 rounded-full w-8 h-8 flex items-center justify-center text-lg font-semibold"
-                            >
-                                ✕
-                            </button>
-
-                            {/* Action Buttons */}
-                            <button
-                                className="w-40 py-2 text-white font-semibold rounded-md"
-                                style={{ background: "linear-gradient(90deg, #C83B62 0%, #7F35CD 100%)" }}
-                            >
-                                Download PDF
-                            </button>
-                            <button
-                                className="w-40 py-2 text-white font-semibold rounded-md"
-                                style={{ background: "linear-gradient(90deg, #C83B62 0%, #7F35CD 100%)" }}
-                            >
-                                Send Invoice
-                            </button>
-                        </div>
-
-                        {/* Invoice Modal */}
+                        {/* Invoice Modal Container */}
                         <div
                             ref={popupRef}
-                            className="p-6 w-full max-w-[700px] max-h-[90vh] overflow-hidden"
+                            className="relative p-6 w-full max-w-[700px] max-h-[90vh] "
                         >
+                            {/* Top-Right Buttons (Inside Invoice Container) */}
+                            <div className="absolute top-4 right-0 left-[43rem] mt-4 mr-4 flex flex-col items-start space-y-2">
+                                {/* Close Button */}
+                                <button
+                                    onClick={() => setInvoiceVisible(false)}
+                                    className="bg-gray-200 hover:bg-gray-300 rounded-full w-8 h-8 flex items-center justify-center text-lg font-semibold"
+                                >
+                                    ✕
+                                </button>
+
+                                {/* Action Buttons */}
+                                <button
+                                    className="w-40 py-2 text-white font-semibold rounded-md"
+                                    style={{ background: "linear-gradient(90deg, #C83B62 0%, #7F35CD 100%)" }}
+                                >
+                                    Download PDF
+                                </button>
+                                <button
+                                    className="w-40 py-2 text-white font-semibold rounded-md"
+                                    style={{ background: "linear-gradient(90deg, #C83B62 0%, #7F35CD 100%)" }}
+                                >
+                                    Send Invoice
+                                </button>
+                            </div>
+
                             {/* Invoice Component */}
                             <Invoice />
                         </div>
                     </div>
                 )}
+
 
 
 
