@@ -169,7 +169,7 @@ const sidebarData = [
       },
       {
         title: "Invoices",
-        path: "/finance/invoices",
+        path: "/finance/invoices/dashboard",
         icon: <TbFileInvoice style={{ fontSize: '1.1rem' }} />,
         roles: [ROLES.ADMIN, ROLES.ACCOUNTANT],
         //requiredPermission: PERMISSIONS.VIEW_INVOICES,
