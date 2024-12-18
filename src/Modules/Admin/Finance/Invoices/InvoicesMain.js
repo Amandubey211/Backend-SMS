@@ -4,8 +4,8 @@ import CardsSection from "./CardsSection";
 import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 import { FiUserPlus } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
-import RecentInvoice from "./RecentInvoice.table";
-import ReturnInvoice from "./ReturnInvoice.table";
+import RecentInvoice from "./Components/RecentInvoice.table";
+import ReturnInvoice from "./Components/ReturnInvoice.table";
 
 const InvoicesMain = () => {
     useNavHeading("Finance", "Invoices");
