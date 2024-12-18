@@ -25,7 +25,6 @@ import { categories, subCategories } from "./constants/categories"; // Adjust th
 import { initialValuesMap } from "./constants/formInitialValues"; // Import initialValuesMap
 import { Formik, Form } from "formik"; // Ensure only one Formik import
 import { keysToCamel } from "../../../../../Utils/camelCase";
-import useNavHeading from "../../../../../Hooks/CommonHooks/useNavHeading ";
 
 const AddEarnings = () => {
   const location = useLocation();
@@ -38,12 +37,6 @@ const AddEarnings = () => {
   const [selectedSubCategory, setSelectedSubCategory] =
     useState("Tuition Fees");
   const [description, setDescription] = useState("");
-
-  // Determine if it's an update based on the presence of incomeData
-  const isUpdate = useMemo(
-    () => location.state && location.state.incomeData,
-    [location.state]
-  );
 
   // Define form mapping
   const formMapping = useMemo(
@@ -71,7 +64,7 @@ const AddEarnings = () => {
 
   // Function to get initial values based on subcategory
   const getInitialValues = () => {
-    if (isUpdate) {
+    if (location.state && location.state.incomeData) {
       const incomeData = keysToCamel(location.state.incomeData);
       const subCategory = incomeData.subCategory;
       return { ...initialValuesMap[subCategory], ...incomeData };
@@ -85,14 +78,14 @@ const AddEarnings = () => {
   const handleReset = (resetForm) => {
     resetForm();
     setDescription("");
-    if (isUpdate) {
+    if (location.state && location.state.incomeData) {
       navigate(-1); // Go back to the list page
     }
   };
 
   // Function to handle form submission
   const handleSaveOrUpdate = (values, actions) => {
-    if (isUpdate) {
+    if (location.state && location.state.incomeData) {
       console.log("Updating earnings data:", values);
       // dispatch(updateEarnings(values));
     } else {
@@ -105,19 +98,19 @@ const AddEarnings = () => {
 
   // Effect to preload form data if editing
   useEffect(() => {
-    if (isUpdate) {
+    if (location.state && location.state.incomeData) {
       const incomeData = keysToCamel(location.state.incomeData);
       console.log(incomeData);
       setSelectedCategory(incomeData.category);
       setSelectedSubCategory(incomeData.subCategory);
       setDescription(incomeData.description || "");
     }
-  }, [isUpdate, location.state]);
-  useNavHeading("Finance", "Earnings");
+  }, [location.state]);
+
   return (
     <Layout
       title={
-        isUpdate
+        location.state && location.state.incomeData
           ? "Update Earnings | Student Diwan"
           : "Add Earnings | Student Diwan"
       }
@@ -165,15 +158,12 @@ const AddEarnings = () => {
                 setDescription={setDescription}
                 initialCategory={selectedCategory}
                 initialSubCategory={selectedSubCategory}
-                isUpdate={isUpdate} // Pass the isUpdate prop
               />
 
-              <div className="px-7">
-                {/* Render the appropriate form based on the selected subcategory */}
-                {formMapping[selectedSubCategory] || (
-                  <div>Select a sub-category to proceed.</div>
-                )}
-              </div>
+              {/* Render the appropriate form based on the selected subcategory */}
+              {formMapping[selectedSubCategory] || (
+                <div>Select a sub-category to proceed.</div>
+              )}
             </Form>
           )}
         </Formik>

@@ -20,7 +20,7 @@ const EarningMainSection = () => {
   const handleSidebarClose = () => setIsSidebarVisible(false);
 
   const limit = 3; // cards to show in single row
-  useNavHeading("Finance","Earnings");
+  useNavHeading("Finance", "Earnings");
 
   return (
     <div className="p-4 md:p-6 space-y-6 w-full max-w-screen-xl mx-auto">
