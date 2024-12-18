@@ -291,43 +291,29 @@ const RecentInvoiceList = () => {
                 </div>
                 {isInvoiceVisible && (
                     <div
-                        className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
-                        style={{ backdropFilter: "blur(5px)" }} // Dim and blur background
+                        className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50"
+                        style={{ backdropFilter: "blur(8px)" }} // Enhanced blur
                     >
-                        {/* Cross Button */}
-                        <div className="absolute top-6 right-8 flex flex-col items-end space-y-4 z-50">
+                        {/* Cross and Buttons Wrapper */}
+                        <div className="absolute top-4 right-4 flex flex-col items-center space-y-3 z-50">
+                            {/* Close Button */}
                             <button
                                 onClick={() => setInvoiceVisible(false)}
-                                className="
-          bg-gray-200 
-          hover:bg-gray-300 
-          rounded-full 
-          w-8 
-          h-8 
-          flex 
-          items-center 
-          justify-center 
-          text-lg 
-          font-semibold
-        "
+                                className="bg-gray-200 hover:bg-gray-300 rounded-full w-8 h-8 flex items-center justify-center text-lg font-semibold"
                             >
                                 ✕
                             </button>
 
                             {/* Action Buttons */}
                             <button
-                                className="w-48 py-2 text-white font-semibold rounded-md"
-                                style={{
-                                    background: "linear-gradient(90deg, #C83B62 0%, #7F35CD 100%)",
-                                }}
+                                className="w-40 py-2 text-white font-semibold rounded-md"
+                                style={{ background: "linear-gradient(90deg, #C83B62 0%, #7F35CD 100%)" }}
                             >
                                 Download PDF
                             </button>
                             <button
-                                className="w-48 py-2 text-white font-semibold rounded-md"
-                                style={{
-                                    background: "linear-gradient(90deg, #C83B62 0%, #7F35CD 100%)",
-                                }}
+                                className="w-40 py-2 text-white font-semibold rounded-md"
+                                style={{ background: "linear-gradient(90deg, #C83B62 0%, #7F35CD 100%)" }}
                             >
                                 Send Invoice
                             </button>
@@ -336,23 +322,14 @@ const RecentInvoiceList = () => {
                         {/* Invoice Modal */}
                         <div
                             ref={popupRef}
-                            className="
-                            
-                            
-                            p-6 
-                            w-full 
-                            max-w-[700px] 
-                            max-h-[90vh] 
-                            
-                            overflow-hidden 
-                            flex 
-                            flex-col"
+                            className="p-6 w-full max-w-[700px] max-h-[90vh] overflow-hidden"
                         >
                             {/* Invoice Component */}
                             <Invoice />
                         </div>
                     </div>
                 )}
+
 
 
 
