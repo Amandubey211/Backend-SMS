@@ -63,6 +63,8 @@ import ReturnInvoiceList from "../Modules/Admin/Finance/Invoices/ReturnInvoiceLi
 import EarningMainSection from "../Modules/Admin/Finance/Earnings/EarningMainSection.js";
 import ReceiptsMain from "../Modules/Admin/Finance/Reciepts/ReceiptsMain.js";
 import RecentReceiptsList from "../Modules/Admin/Finance/Reciepts/RecentReceiptsList.js";
+import QuotationMain from "../Modules/Admin/Finance/Quotations/QuotationMain.js";
+import RecentQuotationList from "../Modules/Admin/Finance/Quotations/RecentQuotationList.js";
 
 // lazy loaded routes
 const AddExpense = lazy(() =>
@@ -1004,6 +1006,26 @@ function App() {
       element: (
         <ProtectRoute
           Component={RecentReceiptsList}
+          allowedRoles={["admin", "accountant"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/finance/quotations",
+      element: (
+        <ProtectRoute
+          Component={QuotationMain}
+          allowedRoles={["admin", "accountant"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/finance/quotations/quotations-list",
+      element: (
+        <ProtectRoute
+          Component={RecentQuotationList}
           allowedRoles={["admin", "accountant"]}
         />
       ),
