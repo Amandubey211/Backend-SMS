@@ -22,10 +22,16 @@ const InvestmentForm = () => {
       placeholder: "Enter return amount",
     },
     {
-      name: "timePeriod",
-      label: "Time Period",
-      type: "text",
-      placeholder: "Enter time period",
+      name: "startDate",
+      label: "Start Date",
+      type: "date",
+      placeholder: "Select start date",
+    },
+    {
+      name: "endDate",
+      label: "End Date",
+      type: "date",
+      placeholder: "Select end date",
     },
     {
       name: "profitLoss",

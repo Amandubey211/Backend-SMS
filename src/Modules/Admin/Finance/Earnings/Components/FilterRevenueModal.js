@@ -5,7 +5,7 @@ import {
   categories,
   subCategories,
   academicYears,
-} from "../AddEarnings/constants/categories"; // Ensure academicYears is imported
+} from "../AddEarnings/constants/categories";
 
 const { RangePicker } = DatePicker;
 const { Option } = Select;
@@ -21,20 +21,42 @@ const FilterRevenueModal = ({ visible, onClose, onFilterApply }) => {
   useEffect(() => {
     if (selectedCategory) {
       setFilteredSubCategories(subCategories[selectedCategory] || []);
-      setSelectedSubCategories([]); // Reset subcategories when category changes
+      setSelectedSubCategories([]);
+    } else {
+      setFilteredSubCategories([]);
     }
   }, [selectedCategory]);
 
   if (!visible) return null;
 
   const handleApply = () => {
-    onFilterApply({
-      category: selectedCategory,
-      subCategories: selectedSubCategories,
-      dateRange: selectedDateRange,
-      paymentType,
-      academicYear: selectedAcademicYear,
-    });
+    const filtersToApply = {};
+
+    // Sub-categories
+    if (selectedSubCategories.length > 0) {
+      filtersToApply.subCategory = selectedSubCategories.join(",");
+    }
+
+    // Payment type
+    if (paymentType) {
+      filtersToApply.paymentType = paymentType;
+    }
+
+    // Academic Year
+    if (selectedAcademicYear) {
+      filtersToApply.academicYear = selectedAcademicYear;
+    }
+
+    // Date range
+    if (selectedDateRange.length === 2) {
+      filtersToApply.startDate = selectedDateRange[0].format("YYYY-MM-DD");
+      filtersToApply.endDate = selectedDateRange[1].format("YYYY-MM-DD");
+    }
+
+    // We are not passing category directly because backend expects categoryId, not categoryName.
+    // If you have a way to map category to categoryId, you could do it here.
+
+    onFilterApply(filtersToApply);
     onClose();
   };
 
@@ -56,7 +78,6 @@ const FilterRevenueModal = ({ visible, onClose, onFilterApply }) => {
       }}
     >
       <div className="bg-white rounded-lg w-full max-w-2xl shadow-lg overflow-y-auto max-h-screen p-4">
-        {/* Header */}
         <div className="bg-[#C83B62] h-14 flex items-center justify-between px-5">
           <h3 className="text-white font-semibold flex items-center gap-2">
             <FilterOutlined /> Filter
@@ -69,7 +90,6 @@ const FilterRevenueModal = ({ visible, onClose, onFilterApply }) => {
           </button>
         </div>
 
-        {/* Content */}
         <div className="p-6 space-y-6">
           {/* Category Section */}
           <div>
@@ -126,7 +146,6 @@ const FilterRevenueModal = ({ visible, onClose, onFilterApply }) => {
             </div>
           )}
 
-          {/* Payment Type and Academic Year Side by Side */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Payment Type Section */}
             <div>
@@ -176,7 +195,6 @@ const FilterRevenueModal = ({ visible, onClose, onFilterApply }) => {
             />
           </div>
 
-          {/* Buttons */}
           <div className="flex justify-between items-center pt-2">
             <Button
               onClick={handleClear}

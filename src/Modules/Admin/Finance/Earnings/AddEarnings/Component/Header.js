@@ -1,18 +1,18 @@
-// Header.jsx
+// src/Components/Admin/Finance/Earnings/Component/Header.jsx
+
 import React, { useState, useEffect } from "react";
 import DropdownCard from "./DropdownCard";
-import { categories, subCategories } from "../constants/categories"; // Adjust the path as necessary
+import { categories, subCategories } from "../constants/categories";
 
 const Header = ({
   onReset,
-  onSave,
   onCategoryChange,
   onSubCategoryChange,
   description,
   setDescription,
   initialCategory = "Student-Based Revenue",
   initialSubCategory = "Tuition Fees",
-  isUpdate = false, // New prop to indicate update mode
+  isUpdate = false,
 }) => {
   const [category, setCategory] = useState(initialCategory);
   const [subCategory, setSubCategory] = useState(initialSubCategory);
@@ -20,7 +20,7 @@ const Header = ({
   const [isSubCategoryOpen, setIsSubCategoryOpen] = useState(false);
 
   useEffect(() => {
-    // Sync initial state
+    // Sync initial state if props change
     setCategory(initialCategory);
     setSubCategory(initialSubCategory);
   }, [initialCategory, initialSubCategory]);
@@ -56,8 +56,9 @@ const Header = ({
           >
             Reset
           </button>
+          {/* Use type="submit" to rely on Formik's onSubmit */}
           <button
-            onClick={onSave}
+            type="submit"
             className="bg-gradient-to-r from-pink-500 to-purple-500 text-white text-sm font-medium px-6 py-2 rounded-md shadow-md hover:from-pink-600 hover:to-purple-600 transition"
           >
             {isUpdate ? "Update Earnings" : "Save Earnings"}

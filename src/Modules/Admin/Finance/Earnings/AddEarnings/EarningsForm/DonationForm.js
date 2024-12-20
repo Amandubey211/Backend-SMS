@@ -1,4 +1,4 @@
-import React from "react";
+import React from "react"; 
 import { useFormikContext } from "formik";
 import FormSection from "../Component/FormSection"; // Reusable FormSection
 import PaymentDetails from "../Component/PaymentDetails"; // Static Component
@@ -8,30 +8,31 @@ const DonationForm = () => {
   const { setFieldValue, values } = useFormikContext();
 
   // Configuration for Donation Details section
+  // For Donations: name is required, phoneNumber & address optional
   const donationDetailsFields = [
     {
       name: "name",
-      label: "Name",
+      label: "Donor Name",
       type: "text",
-      placeholder: "Enter name",
+      placeholder: "Enter donor's name",
     },
     {
       name: "phoneNumber",
       label: "Phone Number",
       type: "text",
-      placeholder: "Enter phone number",
+      placeholder: "Enter phone number (optional)",
     },
     {
       name: "address",
       label: "Address",
       type: "text",
-      placeholder: "Enter address",
+      placeholder: "Enter address (optional)",
     },
   ];
 
   return (
     <>
-      {/* Donation Details Section - Dynamic Fields */}
+      {/* Donation Details Section */}
       <FormSection
         title="Donation Details"
         fields={donationDetailsFields}
