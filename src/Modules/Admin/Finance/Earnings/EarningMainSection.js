@@ -13,7 +13,7 @@ const EarningMainSection = () => {
 
     return (
         <AdminDashLayout>
-            <div className="w-[100%] border-2 border-black">
+            <div className="w-[100%] p-8">
                 {/* Header Section */}
                 <div className="flex justify-between items-center">
                     <div className="flex gap-4 justify-start items-center">
