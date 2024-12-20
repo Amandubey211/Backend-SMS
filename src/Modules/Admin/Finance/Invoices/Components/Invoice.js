@@ -113,28 +113,13 @@ const Invoice = () => {
       </table>
 
       {/* Payment Instructions */}
-      <div className="text-sm text-gray-700 mb-4">
+      <div className="text-sm text-gray-700 mb-4" style={{ fontFamily: 'Inter, sans-serif' }}>
         <p className="font-bold mb-2">Payment Instructions</p>
-        <p><strong>1. Online Payment:</strong> Log in to the Parent Portal.</p>
-        <p><strong>2. Bank Transfer:</strong> Bank Account Number: IBAN.</p>
-        <p><strong>3. Cash Payment:</strong> Visit the school office.</p>
+        <p>1. <span className="font-semibold">Online Payment:</span> Log in to the Parent Portal and use the "Pay Now" option.</p>
+        <p>2. <span className="font-semibold">Bank Transfer:</span> Bank Account Name: Account Number: IBAN Number: SWIFT Code:</p>
+        <p>3. <span className="font-semibold">Cash Payment:</span> Visit the school office during working hours. Payment is due 15 days after the invoice date. Please ensure that payment is made by the due date to avoid any late penalties.</p>
       </div>
 
-      {/* Buttons */}
-      <div className="flex justify-end gap-4">
-        <button
-          className="px-6 py-2 rounded text-white font-bold"
-          style={{ background: "linear-gradient(90deg, #C83B62 0%, #7F35CD 100%)" }}
-        >
-          Download PDF
-        </button>
-        <button
-          className="px-6 py-2 rounded text-white font-bold"
-          style={{ background: "linear-gradient(90deg, #C83B62 0%, #7F35CD 100%)" }}
-        >
-          Send Invoice
-        </button>
-      </div>
     </div>
   );
 };

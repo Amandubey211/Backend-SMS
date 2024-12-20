@@ -1,8 +1,8 @@
 // src/components/SummaryTotalRevenue.jsx
 
 import React, { useEffect, useState, useCallback } from "react";
-import { Table, Input, Spin, Alert } from "antd";
-import { SearchOutlined } from "@ant-design/icons";
+import { Table, Input, Spin, Alert, Button } from "antd";
+import { SearchOutlined, FilterOutlined, ExportOutlined, UploadOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllIncomes } from "../../../../Store/Slices/Finance/Earnings/earningsThunks";
@@ -12,6 +12,11 @@ const SummaryTotalRevenue = () => {
   const [searchText, setSearchText] = useState("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  // Modal visibility states
+  const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
+  const [isExportModalVisible, setIsExportModalVisible] = useState(false);
+  const [isBulkEntriesModalVisible, setIsBulkEntriesModalVisible] = useState(false);
 
   // Selectors
   const { incomes, loading, error, totalRecords, totalPages, currentPage } =
@@ -30,7 +35,7 @@ const SummaryTotalRevenue = () => {
     const params = {
       search: searchText,
       page: currentPage,
-      limit: 5, // Adjust as needed
+      limit: 20, // Updated to match pagination in the table
       sortBy: "earnedDate", // Default sort field
       sortOrder: "desc", // Default sort order
       // Add more query params as needed
@@ -54,28 +59,6 @@ const SummaryTotalRevenue = () => {
       sorter: (a, b) => a.subCategory.localeCompare(b.subCategory),
       render: (text) => <span>{text}</span>,
     },
-    // Uncomment and adjust these columns if needed
-    // {
-    //   title: "Description",
-    //   dataIndex: "description",
-    //   key: "description",
-    //   sorter: (a, b) => a.description.localeCompare(b.description),
-    //   render: (text) => <span>{text}</span>,
-    // },
-    // {
-    //   title: "From",
-    //   dataIndex: "from",
-    //   key: "from",
-    //   sorter: (a, b) => a.from.localeCompare(b.from),
-    //   render: (text) => <span>{text}</span>,
-    // },
-    // {
-    //   title: "Academic Year",
-    //   dataIndex: "academicYear",
-    //   key: "academicYear",
-    //   sorter: (a, b) => a.academicYear.localeCompare(b.academicYear),
-    //   render: (text) => <span>{text}</span>,
-    // },
     {
       title: "Payment Type",
       dataIndex: "paymentType",
@@ -131,14 +114,6 @@ const SummaryTotalRevenue = () => {
       sorter: (a, b) => a.remaining_amount - b.remaining_amount,
       render: (value) => <span>{value || "0"} QR</span>,
     },
-    // Uncomment and adjust if Earned Date is needed
-    // {
-    //   title: "Earned Date",
-    //   dataIndex: "earnedDate",
-    //   key: "earnedDate",
-    //   sorter: (a, b) => new Date(a.earnedDate) - new Date(b.earnedDate),
-    //   render: (date) => (date ? new Date(date).toLocaleDateString() : "N/A"),
-    // },
     {
       title: "Action",
       key: "action",
@@ -171,7 +146,7 @@ const SummaryTotalRevenue = () => {
     const params = {
       search: searchText,
       page: newPage,
-      limit: 5, // Adjust as needed
+      limit: 20, // Updated to match pagination in the table
       sortBy: newSortBy,
       sortOrder: newSortOrder,
       // Include any additional filters here
@@ -219,35 +194,65 @@ const SummaryTotalRevenue = () => {
   };
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow space-y-4">
+    <div className="bg-white p-4 rounded-lg shadow space-y-4 w-full">
       {/* Header */}
-      <div className="flex justify-between items-center">
-        <h2 className="text-lg font-medium text-gray-700">
-          Summary of Total Revenue
-        </h2>
-        <div className="flex items-center gap-4">
+      <div className="flex flex-col md:flex-row justify-between items-center md:items-start gap-4 md:gap-0">
+        {/* Back Navigation */}
+        <div
+          className="cursor-pointer text-lg font-semibold"
+          onClick={() => navigate(-1)}
+        >
+          Total Revenue List
+        </div>
+
+        {/* Action Buttons and Search */}
+        <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
+          <Button
+            className="flex items-center px-3 py-1 border-2 rounded-md hover:shadow-lg text-xs"
+            style={{
+              background: "white",
+              borderImageSource:
+                "linear-gradient(to right, #C83B62, #46138A)",
+              borderImageSlice: 1,
+            }}
+            icon={<FilterOutlined />}
+            onClick={() => setIsFilterModalVisible(true)}
+          >
+            Filter
+          </Button>
           <Input
-            placeholder="Search"
+            placeholder="Search by Subcategory"
             prefix={<SearchOutlined />}
-            className="w-64"
+            className="w-full md:w-64 text-sm"
             value={searchText}
             onChange={handleSearch}
             allowClear
+            style={{ borderRadius: "0.375rem" }}
           />
-          {/* View More Button */}
-          <button
-            onClick={handleViewMore}
-            className="px-4 py-2 bg-white border border-gray-300 rounded-md shadow hover:shadow-md transition cursor-pointer"
+          <Button
+            type="primary"
+            icon={<ExportOutlined />}
+            onClick={() => setIsExportModalVisible(true)}
+            className="flex items-center bg-gradient-to-r from-purple-500 to-pink-500 border-none hover:bg-gradient-to-r hover:from-purple-600 hover:to-pink-600 transition duration-200 text-xs"
+            size="small"
           >
-            View More
-          </button>
+            Export
+          </Button>
+          <Button
+            className="flex items-center px-3 py-1 bg-gradient-to-r from-[#C83B62] to-[#8E44AD] text-white font-bold rounded-lg hover:opacity-90 transition text-xs"
+            icon={<UploadOutlined />}
+            onClick={() => setIsBulkEntriesModalVisible(true)}
+            size="small"
+          >
+            Bulk Entries
+          </Button>
         </div>
       </div>
 
       {/* Loading Indicator */}
       {loading && (
-        <div className="flex justify-center">
-          <Spin tip="Loading..." />
+        <div className="flex justify-center my-4">
+          <Spin tip="Loading..." size="small" />
         </div>
       )}
 
@@ -259,26 +264,32 @@ const SummaryTotalRevenue = () => {
           type="error"
           showIcon
           closable
+          className="my-4 text-xs"
         />
       )}
 
-      {/* Table */}
+      {/* Table Section */}
       {!loading && !error && (
-        <Table
-          dataSource={dataSource}
-          columns={columns}
-          pagination={{
-            current: currentPage,
-            total: totalRecords,
-            pageSize: 5, // Adjust as needed
-            showSizeChanger: false,
-          }}
-          onChange={handleTableChange}
-          className="rounded-lg"
-          bordered
-          scroll={{ x: "max-content" }}
-          onRow={onRowClick} // Attach the row click handler here
-        />
+        <div className="overflow-x-auto w-full">
+          <Table
+            dataSource={dataSource}
+            columns={columns}
+            pagination={{
+              current: currentPage,
+              total: totalRecords,
+              pageSize: 20, // Updated to match fetch limit
+              showSizeChanger: false,
+              size: "small",
+            }}
+            onChange={handleTableChange}
+            className="rounded-lg shadow text-sm w-full" // Added w-full for full-width
+            bordered
+            size="small"
+            scroll={{ x: "max-content" }}
+            rowClassName="hover:bg-gray-50 cursor-pointer"
+            onRow={onRowClick}
+          />
+        </div>
       )}
     </div>
   );
