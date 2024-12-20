@@ -52,14 +52,14 @@ const RecentReceiptsList = () => {
         <AdminLayout>
             <div className="p-4 bg-white rounded-lg shadow-lg">
                 {/* Header */}
-                <h2 className="text-xl font-semibold mb-4">Recent Receipts List</h2>
+                <h2 className="text-xl font-semibold mb-2">Recent Receipts List</h2>
 
-                <div className="p-6 bg-white shadow-lg rounded-lg">
+                <div className="p-1 ">
                     {/* Filters and Buttons Section */}
-                    <div className="flex justify-between items-start">
+                    <div className="flex justify-between items-start -mt-8">
                         {/* Filters */}
                         <div className="flex flex-col space-y-4">
-                            <div className="flex items-center space-x-4">
+                            <div className="mt-8 flex items-center space-x-4">
                                 {/* Class Filter */}
                                 <div className="flex flex-col">
                                     <label className="text-gray-500 text-sm mb-1">Class</label>
@@ -103,7 +103,7 @@ const RecentReceiptsList = () => {
                         </div>
 
                         {/* Buttons */}
-                        <div className="flex items-center space-x-4">
+                        <div className="flex items-center space-x-4 mt-12">
                             <button className="flex items-center px-4 py-2 border rounded-lg text-gray-700 font-medium hover:shadow-md" onClick={() => setSortModalVisible(true)}>
                                 Sort
                             </button>

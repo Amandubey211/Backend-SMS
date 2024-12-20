@@ -35,7 +35,7 @@ const RecentReceipts = () => {
   );
 
   return (
-    <div className="overflow-x-auto bg-white rounded-lg shadow-lg p-4">
+    <div className="border-2 rounded-lg p-4" style={{ borderColor: "#FFCEDB" }}>
       {/* Header Section */}
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-semibold">Recent Receipts List</h2>
@@ -52,7 +52,7 @@ const RecentReceipts = () => {
           </div>
           <button
             onClick={() => navigate("/finance/receipts/receipt-list")}
-            className="text-purple-500 px-4 py-2 rounded-md border border-gray-400 shadow-md hover:shadow-xl hover:shadow-gray-300 transition duration-200"
+            className="px-4 py-2 rounded-md border border-gray-400 shadow-md hover:shadow-xl hover:shadow-gray-300 transition duration-200 text-transparent bg-gradient-text bg-clip-text"
           >
             View More
           </button>
