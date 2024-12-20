@@ -1,34 +1,40 @@
-// RentIncomeForm.jsx
+// src/Components/Admin/Finance/Earnings/EarningsForm/RentIncomeForm.jsx
+
 import React from "react";
 import { useFormikContext } from "formik";
-import FormSection from "../Component/FormSection"; // Reusable FormSection
-import PaymentDetails from "../Component/PaymentDetails"; // Static Component
-import PaymentStatus from "../Component/PaymentStatus"; // Static Component
+import FormSection from "../Component/FormSection";
+import PaymentDetails from "../Component/PaymentDetails";
+import PaymentStatus from "../Component/PaymentStatus";
 
 const RentIncomeForm = () => {
   const { setFieldValue, values } = useFormikContext();
 
-  // Configuration for Rent Details Fields
+  // Fields required by the backend for Rent Income
   const rentDetailsFields = [
     {
-      name: "rentName",
-      label: "Rent Name",
+      name: "name",
+      label: "Facility/Item Name",
       type: "text",
-      placeholder: "Enter rent name",
+      placeholder: "Enter the name of the rented facility/item",
     },
     {
-      name: "organisationName",
-      label: "User/Organisation Name",
+      name: "nameOfRenter",
+      label: "Name of Renter",
       type: "text",
-      placeholder: "Enter name",
+      placeholder: "Enter the name of the renter",
     },
     {
-      name: "timePeriod",
-      label: "Time Period",
-      type: "text",
-      placeholder: "Enter time period",
+      name: "startDate",
+      label: "Start Date",
+      type: "date",
+      placeholder: "Select start date",
     },
-    // Add other fields specific to Rent Income if needed
+    {
+      name: "endDate",
+      label: "End Date",
+      type: "date",
+      placeholder: "Select end date",
+    },
   ];
 
   return (
@@ -41,10 +47,10 @@ const RentIncomeForm = () => {
         values={values}
       />
 
-      {/* Static Payment Details Section */}
+      {/* Payment Details Section */}
       <PaymentDetails />
 
-      {/* Static Payment Status Section */}
+      {/* Payment Status Section */}
       <PaymentStatus />
     </>
   );

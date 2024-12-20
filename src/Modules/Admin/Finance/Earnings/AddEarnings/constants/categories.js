@@ -1,13 +1,12 @@
-// src/constants/categories.js
 export const categories = [
   "Student-Based Revenue",
   "Facility-Based Revenue",
   "Service-Based Revenue",
   "Community and External Revenue",
   "Financial Investments",
-  "Library Based Revenue",
-  "Penalties",
-  "Other",
+  // "Library-Based Revenue",
+  // "Penalties",
+  // "Other",
 ];
 
 export const subCategories = {
@@ -23,6 +22,12 @@ export const subCategories = {
     "Other",
   ],
   "Facility-Based Revenue": [
+    "Rent Income",
+    "Exam Center Fees",
+    "Parking Fees",
+    "Other",
+  ],
+  "Service-Based Revenue": [
     "Stationery Fees",
     "Other Facility Fees",
     "Subscription Fees",
@@ -30,26 +35,11 @@ export const subCategories = {
     "Canteen Profit",
     "Other",
   ],
-  "Service-Based Revenue": [
-    "Rent Income",
-    "Exam Center Fees",
-    "Parking Fees",
-    "Other",
-  ],
-  "Community and External Revenue": [
-    "Donations",
-    "Fundraising/Sponsorships",
-    "Other",
-  ],
+  "Community and External Revenue": ["Donations", "Fundraising", "Other"],
   "Financial Investments": ["Investments", "Other"],
-  "Library Based Revenue": [
-    "Borrow books",
-    "Book sales",
-    "Membership fees",
-    "Other",
-  ],
-  Penalties: ["Late Fees", "Fines", "Other"],
-  Other: ["Other"],
+  // "Library-Based Revenue": ["Library Fees", "Membership Fees", "Other"],
+  // Penalties: ["Late Fees", "Fines", "Other"],
+  // Other: ["Other"],
 };
 
 export const academicYears = [

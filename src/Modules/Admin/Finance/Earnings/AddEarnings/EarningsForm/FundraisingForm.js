@@ -8,12 +8,26 @@ const FundraisingForm = () => {
   const { setFieldValue, values } = useFormikContext();
 
   // Configuration for Fundraising Details Fields
+  // For Fundraising/Sponsorships: companyName is required
+  // phoneNumber and address optional
   const fundraisingDetailsFields = [
     {
-      name: "fundName",
-      label: "Fund Name",
+      name: "companyName",
+      label: "Company/Sponsor Name",
       type: "text",
-      placeholder: "Enter fund name",
+      placeholder: "Enter company/sponsor name",
+    },
+    {
+      name: "phoneNumber",
+      label: "Phone Number",
+      type: "text",
+      placeholder: "Enter phone number (optional)",
+    },
+    {
+      name: "address",
+      label: "Address",
+      type: "text",
+      placeholder: "Enter address (optional)",
     },
   ];
 
@@ -21,7 +35,7 @@ const FundraisingForm = () => {
     <>
       {/* Fundraising Details Section */}
       <FormSection
-        title="Fundraising Details"
+        title="Fundraising/Sponsorship Details"
         fields={fundraisingDetailsFields}
         setFieldValue={setFieldValue}
         values={values}

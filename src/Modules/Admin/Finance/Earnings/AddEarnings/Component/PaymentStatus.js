@@ -1,129 +1,8 @@
-// // PaymentStatus.jsx
-// import React from "react";
-// import { useFormikContext } from "formik";
-// import { motion, AnimatePresence } from "framer-motion";
-// import TextInput from "./TextInput";
-// import SelectInput from "./SelectInput";
-// import FileInput from "./FileInput";
+// src/Components/Admin/Finance/Earnings/EarningsForm/PaymentStatus.jsx
 
-// const PaymentStatus = () => {
-//   const { values, setFieldValue } = useFormikContext();
-
-//   const fieldVariants = {
-//     hidden: { opacity: 0, y: -10 },
-//     visible: { opacity: 1, y: 0 },
-//     exit: { opacity: 0, y: 10 },
-//   };
-
-//   return (
-//     <div className="mb-6">
-//       <h2 className="text-lg font-semibold text-gray-800 mb-4">
-//         Payment Status
-//       </h2>
-//       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-//         <SelectInput
-//           label="Payment Status"
-//           name="paymentStatus"
-//           options={["Paid", "Unpaid", "Partial", "Advance"]}
-//           value={values?.paymentStatus}
-//           onChange={(value) => setFieldValue("paymentStatus", value)}
-//         />
-//         <TextInput
-//           label="Paid Amount (QR)"
-//           name="paidAmount"
-//           placeholder="Enter paid amount"
-//           type="number"
-//           value={values?.paidAmount}
-//           onChange={(e) => setFieldValue("paidAmount", e.target.value)}
-//         />
-//         <SelectInput
-//           label="Paid By"
-//           name="paidBy"
-//           options={["Manual", "Auto"]}
-//           value={values?.paidBy}
-//           onChange={(value) => setFieldValue("paidBy", value)}
-//         />
-//         <SelectInput
-//           label="Payment Type"
-//           name="paymentType"
-//           options={["Cash", "Card", "Online", "Cheque", "Others"]}
-//           value={values?.paymentType}
-//           onChange={(value) => setFieldValue("paymentType", value)}
-//         />
-
-//         {/* Animate conditional fields */}
-//         <AnimatePresence>
-//           {values?.paymentType === "Cheque" && (
-//             <motion.div
-//               variants={fieldVariants}
-//               initial="hidden"
-//               animate="visible"
-//               exit="exit"
-//               transition={{ duration: 0.3 }}
-//             >
-//               <TextInput
-//                 label="Cheque Number"
-//                 name="chequeNumber"
-//                 placeholder="Enter cheque number"
-//                 type="text"
-//                 value={values?.chequeNumber}
-//                 onChange={(e) => setFieldValue("chequeNumber", e.target.value)}
-//               />
-//             </motion.div>
-//           )}
-//           {values?.paymentType === "Online" && (
-//             <motion.div
-//               variants={fieldVariants}
-//               initial="hidden"
-//               animate="visible"
-//               exit="exit"
-//               transition={{ duration: 0.3 }}
-//             >
-//               <TextInput
-//                 label="Transaction ID"
-//                 name="transactionId"
-//                 placeholder="Enter transaction ID"
-//                 type="text"
-//                 value={values?.transactionId}
-//                 onChange={(e) => setFieldValue("transactionId", e.target.value)}
-//               />
-//             </motion.div>
-//           )}
-//         </AnimatePresence>
-
-//         <TextInput
-//           label="Advance Amount (QR)"
-//           name="advanceAmount"
-//           placeholder="Enter advance amount"
-//           type="number"
-//           value={values?.advanceAmount}
-//           onChange={(e) => setFieldValue("advanceAmount", e.target.value)}
-//         />
-//         <TextInput
-//           label="Remaining Amount (QR)"
-//           name="remainingAmount"
-//           placeholder="Enter remaining amount"
-//           type="number"
-//           value={values?.remainingAmount}
-//           onChange={(e) => setFieldValue("remainingAmount", e.target.value)}
-//         />
-//         <FileInput
-//           label="Add Receipt/Document"
-//           name="receipt"
-//           onChange={(event) =>
-//             setFieldValue("receipt", event?.target?.files?.[0] || null)
-//           }
-//         />
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default PaymentStatus;
-// PaymentStatus.jsx// PaymentStatus.jsx
 import React from "react";
 import { useFormikContext } from "formik";
-import FormSection from "../Component/FormSection"; // Adjust the path as necessary
+import FormSection from "./FormSection"; // Adjust the path as necessary
 
 const PaymentStatus = () => {
   const { setFieldValue, values } = useFormikContext();
@@ -134,7 +13,7 @@ const PaymentStatus = () => {
       name: "paymentStatus",
       label: "Payment Status",
       type: "select",
-      options: ["Paid", "Unpaid", "Partial", "Advance"],
+      options: ["paid", "unpaid", "partial", "advance"],
     },
     {
       name: "paidAmount",
@@ -153,7 +32,7 @@ const PaymentStatus = () => {
       name: "paymentType",
       label: "Payment Type",
       type: "select",
-      options: ["Cash", "Card", "Online", "Cheque", "Others"],
+      options: ["cash", "card", "online", "cheque", "other"],
     },
     {
       name: "advanceAmount",

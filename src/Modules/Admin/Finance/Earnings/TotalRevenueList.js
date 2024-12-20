@@ -1,7 +1,7 @@
 // src/Components/Admin/Finance/Earnings/TotalRevenueList.jsx
 
 import React, { useEffect, useState, useCallback, useMemo } from "react";
-import { Table, Input, Button, Spin, Alert, Tooltip } from "antd";
+import { Table, Input, Button, Spin, Alert, Tooltip, Card } from "antd";
 import {
   SearchOutlined,
   ExportOutlined,
@@ -9,6 +9,10 @@ import {
   UploadOutlined,
   EditOutlined,
   DeleteOutlined,
+  DollarCircleOutlined,
+  PieChartOutlined,
+  ExclamationCircleOutlined,
+  CheckCircleOutlined,
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -22,9 +26,9 @@ import { fetchAllIncomes } from "../../../../Store/Slices/Finance/Earnings/earni
 import {
   setCurrentPage,
   setFilters,
+  setReadOnly,
 } from "../../../../Store/Slices/Finance/Earnings/earningsSlice";
 
-// Custom Header Cell with Light Pink Background
 const CustomHeaderCell = (props) => (
   <th {...props} className="bg-pink-100 py-1 px-2 text-xs" />
 );
@@ -46,12 +50,12 @@ const TotalRevenueList = () => {
     loading,
     error,
     totalRecords,
+    totalPages,
     currentPage,
     pageSize,
     filters,
   } = useSelector((state) => state.admin.earnings);
 
-  // Debounced fetch to prevent excessive API calls
   const debouncedFetch = useCallback(
     debounce((params) => {
       dispatch(fetchAllIncomes(params));
@@ -63,9 +67,9 @@ const TotalRevenueList = () => {
     const params = {
       search: searchText,
       page: currentPage,
-      limit: pageSize,
-      sortBy: "earnedDate",
-      sortOrder: "desc",
+      limit: 10,
+      // sortBy: "earnedDate",
+      // sortOrder: "desc",
       ...filters,
     };
     debouncedFetch(params);
@@ -73,25 +77,23 @@ const TotalRevenueList = () => {
 
   const handleSearch = (e) => {
     setSearchText(e.target.value);
-    dispatch(setCurrentPage(1)); // Reset to first page on search
+    dispatch(setCurrentPage(1));
   };
 
-  const handleFilterApply = (filters) => {
-    dispatch(setFilters(filters));
+  const handleFilterApply = (appliedFilters) => {
+    dispatch(setFilters(appliedFilters));
   };
 
-  // Action Icons: Edit and Delete with Tooltips
   const renderActionIcons = (record) => (
-    <div className="flex space-x-1">
+    <div className="flex space-x-1" onClick={(e) => e.stopPropagation()}>
       <Tooltip title="Edit">
         <Button
           type="link"
           icon={<EditOutlined />}
-          onClick={() =>
-            navigate("/finance/earning/add", {
-              state: { incomeData: record },
-            })
-          }
+          onClick={() => {
+            dispatch(setReadOnly(false));
+            navigate("/finance/earning/add", { state: { incomeData: record } });
+          }}
           className="text-blue-600 hover:text-blue-800 p-0"
           aria-label="Edit"
         />
@@ -111,21 +113,17 @@ const TotalRevenueList = () => {
     </div>
   );
 
-  // Helper function to format currency
   const formatCurrency = (value) =>
     value !== undefined && value !== null
       ? `${value.toLocaleString()} QR`
       : "N/A";
 
-  // Helper function to format percentage
   const formatPercentage = (value) =>
     value !== undefined && value !== null ? `${value}%` : "N/A";
 
-  // Helper function to format date
   const formatDate = (date) =>
     date ? new Date(date).toLocaleDateString() : "N/A";
 
-  // Memoize columns to prevent re-creation on every render
   const columns = useMemo(
     () => [
       {
@@ -179,13 +177,7 @@ const TotalRevenueList = () => {
         dataIndex: "remaining_amount",
         key: "remaining_amount",
         render: (value) => (
-          <span
-            className={`text-xs ${
-              value < 0 ? "text-red-600" : "text-green-600"
-            }`}
-          >
-            {formatCurrency(value)}
-          </span>
+          <span className="text-xs text-red-600">{formatCurrency(value)}</span>
         ),
         width: 160,
       },
@@ -209,48 +201,6 @@ const TotalRevenueList = () => {
         ),
         width: 100,
       },
-      // {
-      //   title: "Payment Status",
-      //   dataIndex: "paymentStatus",
-      //   key: "paymentStatus",
-      //   render: (status) => (
-      //     <Tag
-      //       color={
-      //         status === "paid"
-      //           ? "green"
-      //           : status === "pending"
-      //           ? "orange"
-      //           : "red"
-      //       }
-      //       className="text-xxs"
-      //     >
-      //       {status.toUpperCase()}
-      //     </Tag>
-      //   ),
-      //   width: 140,
-      // },
-      // {
-      //   title: "Documents",
-      //   dataIndex: "document",
-      //   key: "document",
-      //   render: (docs) =>
-      //     docs && docs.length > 0 ? (
-      //       docs.map((doc, index) => (
-      //         <a
-      //           href={`/documents/${doc}`} // Adjust the path as necessary
-      //           target="_blank"
-      //           rel="noopener noreferrer"
-      //           key={index}
-      //           className="text-blue-600 hover:underline text-xs mr-1"
-      //         >
-      //           {doc}
-      //         </a>
-      //       ))
-      //     ) : (
-      //       "N/A"
-      //     ),
-      //   width: 180,
-      // },
       {
         title: "Action",
         key: "action",
@@ -259,10 +209,9 @@ const TotalRevenueList = () => {
         width: 80,
       },
     ],
-    [navigate]
+    [navigate, dispatch]
   );
 
-  // Memoize data source to prevent re-creation on every render
   const dataSource = useMemo(
     () =>
       incomes?.map((income) => ({
@@ -276,20 +225,16 @@ const TotalRevenueList = () => {
         penalty: income.penalty || 0,
         earnedDate: income.paidDate || income.generateDate || null,
         total_amount: income.total_amount || 0,
-        // paymentStatus: income.paymentStatus || "N/A",
-        // document: income.document || [],
       })),
     [incomes]
   );
 
-  // Define table components for custom header styling
   const components = {
     header: {
       cell: CustomHeaderCell,
     },
   };
 
-  // Summary row for totals
   const summary = (pageData) => {
     let totalFinalAmount = 0;
     let totalPaidAmount = 0;
@@ -322,9 +267,7 @@ const TotalRevenueList = () => {
         <Table.Summary.Cell index={4}>
           <strong>{formatCurrency(totalRemainingAmount)}</strong>
         </Table.Summary.Cell>
-        <Table.Summary.Cell index={5}>
-          {/* <strong>{formatPercentage(totalDiscount)}</strong> */}
-        </Table.Summary.Cell>
+        <Table.Summary.Cell index={5} />
         <Table.Summary.Cell index={6}>
           <strong>{formatCurrency(totalPenalty)}</strong>
         </Table.Summary.Cell>
@@ -333,9 +276,69 @@ const TotalRevenueList = () => {
     );
   };
 
+  // Compute pageSize from totalRecords and totalPages to reflect backend pagination
+  // This ensures pagination UI shows correct number of pages as per backend
+  const computedPageSize =
+    totalPages > 0 ? Math.ceil(totalRecords / totalPages) : pageSize;
+
+  const cardData = [
+    {
+      title: "Total Revenue",
+      icon: <DollarCircleOutlined />,
+      color: "purple",
+      amount: "50,000 QR",
+    },
+    {
+      title: "Remaining Partial Paid",
+      icon: <PieChartOutlined />,
+      color: "yellow",
+      amount: "10,000 QR",
+    },
+    {
+      title: "Unpaid Amount",
+      icon: <ExclamationCircleOutlined />,
+      color: "red",
+      amount: "5,000 QR",
+    },
+    {
+      title: "Paid Amount",
+      icon: <CheckCircleOutlined />,
+      color: "green",
+      amount: "40,000 QR",
+    },
+  ];
+
   return (
     <AdminLayout>
       <div className="p-4 space-y-4">
+        {/* Top Cards Row */}
+        <div className="w-full h-full flex flex-wrap justify-center items-stretch gap-4 p-4">
+          {cardData.map((card, index) => (
+            <Card
+              key={index}
+              title={
+                <div
+                  className={`flex items-center gap-2 text-${card.color}-800 font-bold`}
+                >
+                  {card.icon}
+                  {card.title}
+                </div>
+              }
+              className={`shadow-sm bg-gradient-to-br from-${card.color}-100 to-${card.color}-50 border-none flex-grow`}
+              headStyle={{ borderBottom: "none" }}
+              style={{
+                flex: "1 1 200px",
+                maxWidth: "400px",
+                textAlign: "center",
+              }}
+            >
+              <p className={`text-xl font-bold text-${card.color}-800`}>
+                {card.amount}
+              </p>
+            </Card>
+          ))}
+        </div>
+
         {/* Header Section */}
         <div className="flex flex-col md:flex-row justify-between items-center md:items-start gap-4">
           <div
@@ -387,7 +390,6 @@ const TotalRevenueList = () => {
           </div>
         </div>
 
-        {/* Error Alert */}
         {error && (
           <Alert
             message="Error"
@@ -399,26 +401,25 @@ const TotalRevenueList = () => {
           />
         )}
 
-        {/* No Data Placeholder */}
         {!loading && incomes.length === 0 && !error && (
           <div className="text-center text-gray-500 text-xs py-4">
             No records found.
           </div>
         )}
 
-        {/* Table Section */}
         <div className="overflow-x-auto">
           <Table
             dataSource={dataSource}
             columns={columns}
+            // Use computedPageSize to show correct number of pages as per backend
             pagination={{
               current: currentPage,
               total: totalRecords,
-              pageSize: pageSize,
+              pageSize: computedPageSize,
               showSizeChanger: false,
               size: "small",
-              showTotal: (total, range) =>
-                `${range[0]}-${range[1]} of ${total} items`,
+              showTotal: () =>
+                `Page ${currentPage} of ${totalPages} | Total ${totalRecords} records`,
             }}
             onChange={(pagination) => {
               const newPage = pagination.current;
@@ -436,10 +437,17 @@ const TotalRevenueList = () => {
               tip: "Loading...",
             }}
             summary={summary}
+            onRow={(record) => ({
+              onClick: () => {
+                dispatch(setReadOnly(true));
+                navigate("/finance/earning/add", {
+                  state: { incomeData: record },
+                });
+              },
+            })}
           />
         </div>
 
-        {/* Modals */}
         <DeleteModal
           visible={isDeleteModalVisible}
           onClose={() => {

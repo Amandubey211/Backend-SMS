@@ -1,4 +1,5 @@
-// StudentFeesForm.jsx
+// src/Components/Admin/Finance/Earnings/EarningsForm/StudentFeesForm.jsx
+
 import React from "react";
 import { useFormikContext } from "formik";
 import FormSection from "../Component/FormSection";
@@ -7,17 +8,18 @@ import PaymentStatus from "../Component/PaymentStatus";
 
 const studentDetailsFields = [
   {
-    name: "studentName",
-    label: "Student Name",
-    type: "text",
-    placeholder: "Enter Name",
-  },
-  {
     name: "class",
     label: "Class",
     type: "text",
     placeholder: "Enter Class",
   },
+  {
+    name: "studentName",
+    label: "Student Name",
+    type: "text",
+    placeholder: "Enter Name",
+  },
+
   {
     name: "section",
     label: "Section",
