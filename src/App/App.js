@@ -60,6 +60,11 @@ import AddNewFees from "../Modules/Admin/Finance/StudentFees/AddNewFees/AddNewFe
 import InvoicesMain from "../Modules/Admin/Finance/Invoices/InvoicesMain.js";
 import RecentInvoiceList from "../Modules/Admin/Finance/Invoices/RecentInvoiceList.js";
 import ReturnInvoiceList from "../Modules/Admin/Finance/Invoices/ReturnInvoiceList.js";
+import EarningMainSection from "../Modules/Admin/Finance/Earnings/EarningMainSection.js";
+import ReceiptsMain from "../Modules/Admin/Finance/Reciepts/ReceiptsMain.js";
+import RecentReceiptsList from "../Modules/Admin/Finance/Reciepts/RecentReceiptsList.js";
+import QuotationMain from "../Modules/Admin/Finance/Quotations/QuotationMain.js";
+import RecentQuotationList from "../Modules/Admin/Finance/Quotations/RecentQuotationList.js";
 
 // lazy loaded routes
 const AddExpense = lazy(() =>
@@ -880,7 +885,7 @@ function App() {
       path: "/finance/earning",
       element: (
         <ProtectRoute
-          Component={EarningDash}
+          Component={EarningMainSection}
           allowedRoles={["admin", "accountant"]}
         />
       ),
@@ -981,6 +986,46 @@ function App() {
       element: (
         <ProtectRoute
           Component={ReturnInvoiceList}
+          allowedRoles={["admin", "accountant"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/finance/receipts",
+      element: (
+        <ProtectRoute
+          Component={ReceiptsMain}
+          allowedRoles={["admin", "accountant"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/finance/receipts/receipt-list",
+      element: (
+        <ProtectRoute
+          Component={RecentReceiptsList}
+          allowedRoles={["admin", "accountant"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/finance/quotations",
+      element: (
+        <ProtectRoute
+          Component={QuotationMain}
+          allowedRoles={["admin", "accountant"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/finance/quotations/quotations-list",
+      element: (
+        <ProtectRoute
+          Component={RecentQuotationList}
           allowedRoles={["admin", "accountant"]}
         />
       ),

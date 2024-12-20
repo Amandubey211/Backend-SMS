@@ -1,15 +1,17 @@
-import React, { useState } from "react";
-import Card from "./Components/Cards";
-import { earningCardsData as earningData } from "../Datafiles/earning";
-import { FiUserPlus } from "react-icons/fi";
+import React from "react";
+import AdminDashLayout from "../../../../Components/Admin/AdminDashLayout";
+import CardsSection from "./Components/CardSection";
 import TotalEarningGraph from "./TotalEarningGraph";
 import SummaryTotalRevenue from "./SummaryTotalRevenue";
-import BulkEntriesModal from "./Components/BulkEntriesModal";
-import AddNewEarningSidebar from "./Components/AddNewEarningSidebar";
-import { useNavigate } from "react-router-dom";
 import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
+import { FiUserPlus } from "react-icons/fi";
+import { useNavigate } from "react-router-dom";
 
 const EarningMainSection = () => {
+
+    useNavHeading("Finance", "Earnings");
+    const navigate = useNavigate();
+
   const [isModalVisible, setIsModalVisible] = useState(false);
   const navigate = useNavigate();
   const handleModalOpen = () => setIsModalVisible(true);
@@ -34,45 +36,76 @@ const EarningMainSection = () => {
           Bulk entries
         </button>
 
-        {/* Add New Earning Button */}
-        <button
-          onClick={() => navigate("/finance/earning/add")}
-          className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
-        >
-          <span className="text-gray-800 font-medium">Add New Earning</span>
-          <div className="w-12 h-12 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center text-white">
-            <FiUserPlus size={16} />
-          </div>
-        </button>
-      </div>
 
-      {/* Cards Section */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-8">
-        {earningData.slice(0, limit).map((item, index) => (
-          <Card key={index} {...item} />
-        ))}
-      </div>
+    return (
+        <AdminDashLayout>
+            <div className="w-[100%] p-8">
+                {/* Header Section */}
+                <div className="flex justify-between items-center">
+                    <div className="flex gap-4 justify-start items-center">
+                        {/* By Month Dropdown */}
+                        <div className="relative rounded-[0.625rem] p-[2px] bg-gradient-to-r from-[#C83B62] to-[#46138A]">
+                            <select
+                                className="px-4 py-2 w-full bg-white text-gray-600 shadow-sm hover:shadow-md transition-all duration-200 focus:outline-none"
+                                style={{
+                                    margin: "0.01px 0.2px 0.01px 0.1px",
+                                    borderRadius: "7px",
+                                }}
+                            >
+                                <option>By Month</option>
+                                <option>January</option>
+                                <option>February</option>
+                                <option>March</option>
+                            </select>
+                        </div>
 
-      {/* Graph Section */}
-      <div className="w-full h-[250px] sm:h-[350px] md:h-[400px] bg-white rounded-lg p-2 md:p-4">
-        <TotalEarningGraph />
-      </div>
+                        {/* Earnings Type Dropdown */}
+                        <div className="relative rounded-[0.625rem] p-[2px] bg-gradient-to-r from-[#C83B62] to-[#46138A]">
+                            <select
+                                className="px-4 py-2 w-full bg-white text-gray-600 shadow-sm hover:shadow-md transition-all duration-200 focus:outline-none"
+                                style={{
+                                    margin: "0.01px 0.2px 0.01px 0.1px",
+                                    borderRadius: "7px",
+                                }}
+                            >
+                                <option>Earnings Type</option>
+                                <option>Full Payment</option>
+                                <option>Partial Payment</option>
+                                <option>Overdue</option>
+                            </select>
+                        </div>
+                    </div>
 
-      {/* Summary Table Section */}
-      <div className="w-full bg-white rounded-lg  p-2 md:p-4 overflow-x-auto">
-        <SummaryTotalRevenue />
-      </div>
+                    {/* Add New Earning Button */}
+                    <button
+                        onClick={() => navigate("/finance/earning/add")}
+                        className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
+                    >
+                        <span className="text-gray-800 font-medium">Add New Earning</span>
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center text-white">
+                            <FiUserPlus size={16} />
+                        </div>
+                    </button>
+                </div>
 
-      {/* Modal */}
-      <BulkEntriesModal visible={isModalVisible} onClose={handleModalClose} />
+                {/* Cards Section */}
+                <CardsSection />
 
-      {/* Sidebar */}
-      <AddNewEarningSidebar
-        visible={isSidebarVisible}
-        onClose={handleSidebarClose}
-      />
-    </div>
-  );
+                {/* Graph Section */}
+                {/* <div className="w-full bg-white rounded-lg shadow p-4 border-2 border-red-700"> */}
+                   
+                        <TotalEarningGraph />
+                  
+                {/* </div> */}
+
+                {/* Summary Table Section */}
+                {/* <div className="w-full bg-white rounded-lg shadow p-4 overflow-x-auto">
+                    
+                </div> */}
+                <SummaryTotalRevenue />
+            </div>
+        </AdminDashLayout>
+    );
 };
 
 export default EarningMainSection;
