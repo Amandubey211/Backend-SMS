@@ -1,4 +1,3 @@
-// src/Modules/Admin/Finance/Earnings/TotalEarningGraph.js
 import React, { useState } from "react";
 import { Line } from "react-chartjs-2";
 import {
@@ -98,7 +97,7 @@ const TotalEarningGraph = () => {
   };
 
   return (
-    <div className="w-full bg-white p-4 rounded-lg shadow space-y-4">
+    <div className="w-[100%] bg-white p-4 rounded-lg shadow space-y-4">
       {/* Header */}
       <div className="flex justify-between items-center">
         {/* Custom Legend and Dropdown */}
@@ -143,8 +142,15 @@ const TotalEarningGraph = () => {
         </select>
       </div>
 
-      {/* Graph */}
-      <div className="h-[300px]">
+      {/* Graph with Fixed Dimensions */}
+      <div
+        className="h-[300px] w-full"
+        style={{
+          maxWidth: "100%",
+          height: "300px",
+          overflow: "hidden", // Ensure the graph doesn't overflow
+        }}
+      >
         <Line data={data} options={options} />
       </div>
     </div>

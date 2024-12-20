@@ -35,7 +35,11 @@ export const subCategories = {
     "Canteen Profit",
     "Other",
   ],
-  "Community and External Revenue": ["Donations", "Fundraising", "Other"],
+  "Community and External Revenue": [
+    "Donations",
+    "Fundraising/Sponsorships",
+    "Other",
+  ],
   "Financial Investments": ["Investments", "Other"],
   // "Library-Based Revenue": ["Library Fees", "Membership Fees", "Other"],
   // Penalties: ["Late Fees", "Fines", "Other"],

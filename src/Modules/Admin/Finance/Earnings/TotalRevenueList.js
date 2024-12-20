@@ -67,7 +67,7 @@ const TotalRevenueList = () => {
     const params = {
       search: searchText,
       page: currentPage,
-      limit: 10,
+      limit: 13,
       // sortBy: "earnedDate",
       // sortOrder: "desc",
       ...filters,
