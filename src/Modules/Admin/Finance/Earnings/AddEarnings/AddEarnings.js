@@ -58,7 +58,7 @@ const AddEarnings = () => {
       "Exam Fees": <ExamFeesForm />,
       "Stationery Fees": <StationeryFeesForm />,
       Donations: <DonationForm />,
-      Fundraising: <FundraisingForm />,
+      "Fundraising/Sponsorships": <FundraisingForm />,
       Investments: <InvestmentForm />,
       "Rent Income": <RentIncomeForm />,
       "Other Facility Fees": <OtherFacilityForm />,
@@ -181,39 +181,41 @@ const AddEarnings = () => {
                 </div>
               )}
 
-              <Header
-                onCategoryChange={(category) => {
-                  if (readOnly) return;
-                  setSelectedCategory(category);
-                  const firstSubCategory = subCategories[category][0];
-                  setSelectedSubCategory(firstSubCategory);
-                  resetForm({
-                    values: {
-                      ...initialValuesMap[firstSubCategory],
-                      category,
-                      subCategory: firstSubCategory,
-                    },
-                  });
-                  setDescription("");
-                }}
-                onSubCategoryChange={(subCategory) => {
-                  if (readOnly) return;
-                  setSelectedSubCategory(subCategory);
-                  resetForm({
-                    values: {
-                      ...initialValuesMap[subCategory],
-                      subCategory,
-                    },
-                  });
-                  setDescription("");
-                }}
-                onReset={() => handleReset(resetForm)}
-                description={description}
-                setDescription={readOnly ? () => {} : setDescription}
-                initialCategory={selectedCategory}
-                initialSubCategory={selectedSubCategory}
-                isUpdate={!!location.state?.incomeData}
-              />
+              {!readOnly && (
+                <Header
+                  onCategoryChange={(category) => {
+                    if (readOnly) return;
+                    setSelectedCategory(category);
+                    const firstSubCategory = subCategories[category][0];
+                    setSelectedSubCategory(firstSubCategory);
+                    resetForm({
+                      values: {
+                        ...initialValuesMap[firstSubCategory],
+                        category,
+                        subCategory: firstSubCategory,
+                      },
+                    });
+                    setDescription("");
+                  }}
+                  onSubCategoryChange={(subCategory) => {
+                    if (readOnly) return;
+                    setSelectedSubCategory(subCategory);
+                    resetForm({
+                      values: {
+                        ...initialValuesMap[subCategory],
+                        subCategory,
+                      },
+                    });
+                    setDescription("");
+                  }}
+                  onReset={() => handleReset(resetForm)}
+                  description={description}
+                  setDescription={readOnly ? () => {} : setDescription}
+                  initialCategory={selectedCategory}
+                  initialSubCategory={selectedSubCategory}
+                  isUpdate={!!location.state?.incomeData}
+                />
+              )}
 
               {formMapping[selectedSubCategory] || (
                 <div>Select a sub-category to proceed.</div>
