@@ -23,10 +23,11 @@ const SummaryTotalRevenue = () => {
   const dispatch = useDispatch();
 
   // Extracting necessary state from Redux store
-  const { incomes, loading, error, totalRecords, currentPage, pageSize } =
-    useSelector((state) => state.admin.earnings);
+  const { incomes, loading, error, totalRecords } = useSelector(
+    (state) => state.admin.earnings
+  );
 
-  // Debounced function to fetch incomes
+  // Debounced function to fetch incomes with a fixed limit of 5
   const debouncedFetch = useCallback(
     debounce((params) => {
       dispatch(fetchAllIncomes(params));
@@ -34,46 +35,39 @@ const SummaryTotalRevenue = () => {
     [dispatch]
   );
 
-  // Fetch data when dependencies change
+  // Fetch data on component mount with limit set to 5
   useEffect(() => {
     const params = {
-      page: currentPage,
-      limit: pageSize,
+      page: 1, // Always fetch the first page
+      limit: 5, // Limit to 5 records
       sortBy: "earnedDate",
       sortOrder: "desc",
     };
     debouncedFetch(params);
-  }, [debouncedFetch, currentPage, pageSize]);
+  }, [debouncedFetch]);
 
   // Handle "View More" button click
   const handleViewMore = () => {
     navigate("/finance/total-revenue-list");
   };
 
-  // Handle table changes such as pagination
-  const handleTableChange = (pagination) => {
-    const newPage = pagination.current;
-    dispatch(setCurrentPage(newPage));
-
-    debouncedFetch({
-      page: newPage,
-      limit: pageSize,
-    });
-  };
-
-  // Define table columns without sorting and filtering
+  // Define table columns with fixed widths and ellipsis
   const columns = [
     {
       title: "Category",
       dataIndex: "category",
       key: "category",
       render: (text) => <span className="text-xs">{text}</span>,
+      width: 120,
+      ellipsis: true,
     },
     {
       title: "Subcategory",
       dataIndex: "subCategory",
       key: "subCategory",
       render: (text) => <span className="text-xs">{text}</span>,
+      width: 150,
+      ellipsis: true,
     },
     {
       title: "Payment Type",
@@ -91,6 +85,8 @@ const SummaryTotalRevenue = () => {
           </span>
         </Tooltip>
       ),
+      width: 130,
+      ellipsis: true,
     },
     {
       title: "Discount",
@@ -106,37 +102,41 @@ const SummaryTotalRevenue = () => {
             {value || 0} QR
           </Tag>
         ),
+      width: 100,
+      ellipsis: true,
     },
     {
       title: "Final Amount (QR)",
       dataIndex: "final_amount",
       key: "final_amount",
       render: (value) => <span className="text-xs">{value || "0"} QR</span>,
+      width: 120,
+      ellipsis: true,
     },
     {
       title: "Paid Amount (QR)",
       dataIndex: "paid_amount",
       key: "paid_amount",
-      render: (value) => <span className="text-xs">{value || "0"} QR</span>,
+      render: (value) => (
+        <span className="text-xs text-green-600">{value || "0"} QR</span>
+      ),
+      width: 120,
+      ellipsis: true,
     },
     {
       title: "Remaining Amount (QR)",
       dataIndex: "remaining_amount",
       key: "remaining_amount",
       render: (value) => (
-        <span
-          className={`text-xs font-semibold ${
-            value < 0 ? "text-red-600" : "text-green-600"
-          }`}
-        >
-          {value || "0"} QR
-        </span>
+        <span className="text-xs text-red-600">{value || "0"} QR</span>
       ),
+      width: 140,
+      ellipsis: true,
     },
   ];
 
-  // Transform incomes data to table dataSource
-  const dataSource = incomes?.map((income) => ({
+  // Transform incomes data to table dataSource and limit to 5 records
+  const dataSource = incomes?.slice(0, 5).map((income) => ({
     key: income._id,
     category: income.category?.[0]?.categoryName || "N/A",
     subCategory: income.subCategory || "N/A",
@@ -153,14 +153,14 @@ const SummaryTotalRevenue = () => {
       {/* Header */}
       <div className="flex justify-between items-center">
         <h2 className="text-lg font-medium text-gray-700">
-          Summary of Total Revenue
+          Summary of Total Revenue ({dataSource?.length || 5}/{totalRecords})
         </h2>
         <Button
           onClick={handleViewMore}
           className="px-4 py-2 bg-gradient-to-r from-[#C83B62] to-[#8E44AD] text-white rounded-md shadow hover:from-[#a3324e] hover:to-[#6e2384] transition text-xs"
           size="small"
         >
-          View More
+          View More ({totalRecords})
         </Button>
       </div>
 
@@ -170,7 +170,6 @@ const SummaryTotalRevenue = () => {
           <Spin tip="Loading..." />
         </div>
       )}
-
       {/* Error Message */}
       {error && (
         <Alert
@@ -181,33 +180,22 @@ const SummaryTotalRevenue = () => {
           closable
         />
       )}
-
       {/* No Data Placeholder */}
       {!loading && incomes.length === 0 && !error && (
         <div className="text-center text-gray-500 text-xs py-4">
           No records found.
         </div>
       )}
-
       {/* Table */}
-      {!loading && !error && (
+      {!loading && !error && incomes.length > 0 && (
         <Table
           dataSource={dataSource}
           columns={columns}
-          pagination={{
-            current: currentPage,
-            total: totalRecords,
-            pageSize: pageSize,
-            showSizeChanger: false,
-            size: "small",
-            showTotal: (total, range) =>
-              `${range[0]}-${range[1]} of ${total} items`,
-          }}
-          onChange={handleTableChange}
+          pagination={false} // Removed pagination controls
           className="rounded-lg shadow text-xs"
           bordered
           size="small"
-          scroll={{ x: "max-content" }}
+          tableLayout="fixed" // Fixed table layout
         />
       )}
     </div>

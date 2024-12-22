@@ -1,9 +1,17 @@
+// src/Components/Admin/Finance/Earnings/Component/TextInput.jsx
+
 import React from "react";
 import { Field, ErrorMessage } from "formik";
 import { motion } from "framer-motion";
 import { useSelector } from "react-redux";
 
-const TextInput = ({ label, name, type = "text", placeholder }) => {
+const TextInput = ({
+  label,
+  name,
+  type = "text",
+  placeholder,
+  autoComplete = "off",
+}) => {
   const readOnly = useSelector((state) => state.admin.earnings.readOnly);
 
   const variants = {
@@ -28,6 +36,7 @@ const TextInput = ({ label, name, type = "text", placeholder }) => {
         name={name}
         type={type}
         placeholder={placeholder}
+        autoComplete={autoComplete}
         disabled={readOnly}
         readOnly={readOnly}
         className={`bg-white border border-gray-300 rounded-sm px-4 py-3 text-sm text-gray-800 w-full focus:outline-none focus:ring-2 focus:ring-purple-300 ${

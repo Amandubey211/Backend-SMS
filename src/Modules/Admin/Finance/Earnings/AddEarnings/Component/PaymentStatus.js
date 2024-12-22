@@ -1,93 +1,87 @@
 // src/Components/Admin/Finance/Earnings/EarningsForm/PaymentStatus.jsx
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useFormikContext } from "formik";
-import FormSection from "./FormSection"; // Adjust the path as necessary
+import FormSection from "../Component/FormSection";
+
+const paymentStatusFields = [
+  {
+    name: "paymentStatus",
+    label: "Payment Status",
+    type: "select",
+    options: ["paid", "unpaid", "partial", "advance"],
+  },
+  {
+    name: "paidAmount",
+    label: "Paid Amount (QR)",
+    type: "number",
+    placeholder: "Enter paid amount",
+    min: 0,
+  },
+  {
+    name: "paidBy",
+    label: "Paid By",
+    type: "select",
+    options: ["Manual", "Auto"],
+  },
+  {
+    name: "paymentType",
+    label: "Payment Type",
+    type: "select",
+    options: ["cash", "card", "online", "cheque", "other"],
+  },
+  {
+    name: "advance_amount",
+    label: "Advance Amount (QR)",
+    type: "number",
+    placeholder: "Enter advance amount",
+    min: 0,
+  },
+  {
+    name: "remaining_amount",
+    label: "Remaining Amount (QR)",
+    type: "number",
+    placeholder: "Enter remaining amount",
+    min: 0,
+  },
+  {
+    name: "receipt",
+    label: "Add Receipt/Document",
+    type: "file",
+  },
+];
 
 const PaymentStatus = () => {
   const { setFieldValue, values } = useFormikContext();
+  const [conditionalFields, setConditionalFields] = useState([]);
 
-  // Define static fields
-  const paymentStatusFields = [
-    {
-      name: "paymentStatus",
-      label: "Payment Status",
-      type: "select",
-      options: ["paid", "unpaid", "partial", "advance"],
-    },
-    {
-      name: "paidAmount",
-      label: "Paid Amount (QR)",
-      type: "number",
-      placeholder: "Enter paid amount",
-      min: 0,
-    },
-    {
-      name: "paidBy",
-      label: "Paid By",
-      type: "select",
-      options: ["Manual", "Auto"],
-    },
-    {
-      name: "paymentType",
-      label: "Payment Type",
-      type: "select",
-      options: ["cash", "card", "online", "cheque", "other"],
-    },
-    {
-      name: "advanceAmount",
-      label: "Advance Amount (QR)",
-      type: "number",
-      placeholder: "Enter advance amount",
-      min: 0,
-    },
-    {
-      name: "remainingAmount",
-      label: "Remaining Amount (QR)",
-      type: "number",
-      placeholder: "Enter remaining amount",
-      min: 0,
-    },
-    {
-      name: "receipt",
-      label: "Add Receipt/Document",
-      type: "file",
-    },
-  ];
+  // Determine conditional fields based on paymentType
+  useEffect(() => {
+    const newFields = [];
 
-  // Define conditional fields based on paymentType
-  const conditionalFields = [];
+    if (values.paymentType === "cheque") {
+      newFields.push({
+        name: "chequeNumber",
+        label: "Cheque Number",
+        type: "text",
+        placeholder: "Enter cheque number",
+      });
+    }
 
-  if (values?.paymentType === "Cheque") {
-    conditionalFields.push({
-      name: "chequeNumber",
-      label: "Cheque Number",
-      type: "text",
-      placeholder: "Enter cheque number",
-    });
-  }
+    if (values.paymentType === "online") {
+      newFields.push({
+        name: "transactionId",
+        label: "Transaction ID",
+        type: "text",
+        placeholder: "Enter transaction ID",
+      });
+    }
 
-  if (values?.paymentType === "Online") {
-    conditionalFields.push({
-      name: "transactionId",
-      label: "Transaction ID",
-      type: "text",
-      placeholder: "Enter transaction ID",
-    });
-  }
+    setConditionalFields(newFields);
+  }, [values.paymentType]);
 
-  // Combine static and conditional fields, ensuring conditional fields are after paymentType
-  const combinedFields = [...paymentStatusFields];
-
-  // Find the index of paymentType field
-  const paymentTypeIndex = combinedFields.findIndex(
-    (field) => field.name === "paymentType"
-  );
-
-  // Insert conditional fields right after paymentType
-  if (paymentTypeIndex !== -1 && conditionalFields.length > 0) {
-    combinedFields.splice(paymentTypeIndex + 1, 0, ...conditionalFields);
-  }
+  // Combine static and conditional fields
+  const combinedFields = [...paymentStatusFields, ...conditionalFields];
 
   return (
     <div className="mb-6">
@@ -95,9 +89,8 @@ const PaymentStatus = () => {
         Payment Status
       </h2>
 
-      {/* Render combined fields in a single FormSection */}
       <FormSection
-        title="" // No title as it's already provided above
+        title=""
         fields={combinedFields}
         setFieldValue={setFieldValue}
         values={values}

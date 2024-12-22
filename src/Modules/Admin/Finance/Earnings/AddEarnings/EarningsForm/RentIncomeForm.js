@@ -6,36 +6,35 @@ import FormSection from "../Component/FormSection";
 import PaymentDetails from "../Component/PaymentDetails";
 import PaymentStatus from "../Component/PaymentStatus";
 
+const rentDetailsFields = [
+  {
+    name: "name",
+    label: "Property Name",
+    type: "text",
+    placeholder: "Enter property name",
+  },
+  {
+    name: "nameOfRenter",
+    label: "Name of Renter",
+    type: "text",
+    placeholder: "Enter renter's name",
+  },
+  {
+    name: "startDate",
+    label: "Start Date",
+    type: "date",
+    placeholder: "Select start date",
+  },
+  {
+    name: "endDate",
+    label: "End Date",
+    type: "date",
+    placeholder: "Select end date",
+  },
+];
+
 const RentIncomeForm = () => {
   const { setFieldValue, values } = useFormikContext();
-
-  // Fields required by the backend for Rent Income
-  const rentDetailsFields = [
-    {
-      name: "name",
-      label: "Facility/Item Name",
-      type: "text",
-      placeholder: "Enter the name of the rented facility/item",
-    },
-    {
-      name: "nameOfRenter",
-      label: "Name of Renter",
-      type: "text",
-      placeholder: "Enter the name of the renter",
-    },
-    {
-      name: "startDate",
-      label: "Start Date",
-      type: "date",
-      placeholder: "Select start date",
-    },
-    {
-      name: "endDate",
-      label: "End Date",
-      type: "date",
-      placeholder: "Select end date",
-    },
-  ];
 
   return (
     <>

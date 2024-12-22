@@ -32,7 +32,9 @@ const FileInput = ({ label, name, onChange }) => {
 
   return (
     <div className="relative w-full mb-4">
-      <label className="text-sm text-gray-500 block mb-1">{label}</label>
+      <label htmlFor={name} className="text-sm text-gray-500 block mb-1">
+        {label}
+      </label>
       <div
         className={`relative bg-purple-50 border border-gray-300 rounded-md px-4 py-3 flex items-center justify-between cursor-pointer shadow-sm ${
           readOnly ? "cursor-not-allowed" : ""
@@ -46,6 +48,7 @@ const FileInput = ({ label, name, onChange }) => {
           onChange={handleFileChange}
           disabled={readOnly}
           className="absolute inset-0 w-full h-full opacity-0 "
+          aria-describedby={`${name}-description`}
         />
         <div className="flex items-center gap-2">
           <IoIosCloudUpload className="text-purple-500 text-xl" />

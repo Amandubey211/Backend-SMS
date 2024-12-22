@@ -13,6 +13,11 @@ const initialState = {
   loading: false,
   error: null,
   readOnly: false,
+  // New statistics fields
+  totalRevenue: 0,
+  remainingPartialPaidRevenue: 0,
+  totalPaidAmount: 0,
+  unpaidRevenue: 0,
 };
 
 const earningsSlice = createSlice({
@@ -27,6 +32,11 @@ const earningsSlice = createSlice({
       state.loading = false;
       state.error = null;
       state.filters = {};
+      // Reset statistics
+      state.totalRevenue = 0;
+      state.remainingPartialPaidRevenue = 0;
+      state.totalPaidAmount = 0;
+      state.unpaidRevenue = 0;
     },
     setCurrentPage: (state, action) => {
       state.currentPage = action.payload;
@@ -38,6 +48,7 @@ const earningsSlice = createSlice({
     clearFilters: (state) => {
       state.filters = {};
       state.currentPage = 1;
+      // Optionally reset other state related to filters if needed
     },
     setReadOnly: (state, action) => {
       state.readOnly = action.payload;
@@ -56,6 +67,12 @@ const earningsSlice = createSlice({
         state.totalRecords = action.payload.totalRecords || 0;
         state.totalPages = action.payload.totalPages || 0;
         state.currentPage = action.payload.currentPage || 1;
+        // Set the new statistics
+        state.totalRevenue = action.payload.totalRevenue || 0;
+        state.remainingPartialPaidRevenue =
+          action.payload.remainingPartialPaidRevenue || 0;
+        state.totalPaidAmount = action.payload.totalPaidAmount || 0;
+        state.unpaidRevenue = action.payload.unpaidRevenue || 0;
       })
       .addCase(fetchAllIncomes.rejected, (state, action) => {
         state.loading = false;
@@ -63,6 +80,11 @@ const earningsSlice = createSlice({
         state.incomes = [];
         state.totalRecords = 0;
         state.totalPages = 0;
+        // Reset statistics on error
+        state.totalRevenue = 0;
+        state.remainingPartialPaidRevenue = 0;
+        state.totalPaidAmount = 0;
+        state.unpaidRevenue = 0;
       })
 
       // Add Earnings

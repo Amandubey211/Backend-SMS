@@ -1,3 +1,5 @@
+// src/Components/Admin/Finance/Earnings/EarningsForm/SubscriptionFeesForm.jsx
+
 import React from "react";
 import { useFormikContext } from "formik";
 import FormSection from "../Component/FormSection"; // Reusable FormSection
@@ -7,7 +9,6 @@ import PaymentStatus from "../Component/PaymentStatus"; // Static Component
 const SubscriptionFeesForm = () => {
   const { setFieldValue, values } = useFormikContext();
 
-  // Configuration for Subscription Details Fields
   const subscriptionDetailsFields = [
     {
       name: "subscriptionName",
@@ -17,7 +18,7 @@ const SubscriptionFeesForm = () => {
     },
     {
       name: "description",
-      label: "Any Description",
+      label: "Description",
       type: "text",
       placeholder: "Enter description",
     },
@@ -33,10 +34,8 @@ const SubscriptionFeesForm = () => {
         values={values}
       />
 
-      {/* Static PaymentDetails Component */}
+      {/* Static PaymentDetails and PaymentStatus Sections */}
       <PaymentDetails />
-
-      {/* Static PaymentStatus Component */}
       <PaymentStatus />
     </>
   );

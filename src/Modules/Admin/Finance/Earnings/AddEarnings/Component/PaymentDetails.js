@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useFormikContext } from "formik";
-import FormSection from "./FormSection"; // Adjust the path as necessary
+import FormSection from "../Component/FormSection";
 
 const paymentDetailsFields = [
   {
@@ -17,14 +17,6 @@ const paymentDetailsFields = [
     type: "datetime-local",
     placeholder: "Select Date & Time",
   },
-  // Uncomment and update if needed
-  // {
-  //   name: "tax",
-  //   label: "Tax (Inc/Exc)",
-  //   type: "number",
-  //   placeholder: "Enter tax percentage",
-  //   min: 0,
-  // },
   {
     name: "discount",
     label: "Discount (%)",
@@ -40,14 +32,14 @@ const paymentDetailsFields = [
     min: 0,
   },
   {
-    name: "totalAmount",
+    name: "total_amount",
     label: "Total Amount (QR)",
     type: "number",
     placeholder: "Enter total amount",
     min: 0,
   },
   {
-    name: "finalAmount",
+    name: "final_amount",
     label: "Final Amount (After Tax/Discount/Penalty) (QR)",
     type: "number",
     placeholder: "Enter final amount",
