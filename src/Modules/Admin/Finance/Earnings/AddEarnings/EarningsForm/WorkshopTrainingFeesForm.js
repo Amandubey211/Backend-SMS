@@ -1,3 +1,5 @@
+// src/Components/Admin/Finance/Earnings/EarningsForm/WorkshopTrainingFeesForm.jsx
+
 import React from "react";
 import { useFormikContext } from "formik";
 import FormSection from "../Component/FormSection"; // Reusable FormSection
@@ -7,13 +9,12 @@ import PaymentStatus from "../Component/PaymentStatus"; // Static Component
 const WorkshopTrainingFeesForm = () => {
   const { setFieldValue, values } = useFormikContext();
 
-  // Configuration for Workshop/Training Details Fields
   const workshopDetailsFields = [
     {
-      name: "sessionName",
-      label: "Session Name",
+      name: "sessionTitle",
+      label: "Session Title",
       type: "text",
-      placeholder: "Enter session here",
+      placeholder: "Enter session title",
     },
     {
       name: "hostName",
@@ -22,16 +23,10 @@ const WorkshopTrainingFeesForm = () => {
       placeholder: "Enter host name",
     },
     {
-      name: "startDateTime",
-      label: "Start Date & Time",
-      type: "datetime-local",
-      placeholder: "Select start date and time",
-    },
-    {
-      name: "endDateTime",
-      label: "End Date & Time",
-      type: "datetime-local",
-      placeholder: "Select end date and time",
+      name: "timePeriod",
+      label: "Time Period",
+      type: "text",
+      placeholder: "Enter time period",
     },
   ];
 
@@ -45,10 +40,8 @@ const WorkshopTrainingFeesForm = () => {
         values={values}
       />
 
-      {/* Static PaymentDetails Component */}
+      {/* Static PaymentDetails and PaymentStatus Sections */}
       <PaymentDetails />
-
-      {/* Static PaymentStatus Component */}
       <PaymentStatus />
     </>
   );

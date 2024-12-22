@@ -1,7 +1,7 @@
 // src/Components/Admin/Finance/Earnings/TotalRevenueList.jsx
 
 import React, { useEffect, useState, useCallback, useMemo } from "react";
-import { Table, Input, Button, Spin, Alert, Tooltip, Card } from "antd";
+import { Table, Input, Button, Spin, Alert, Tooltip, Card, Tag } from "antd"; // Imported Tag
 import {
   SearchOutlined,
   ExportOutlined,
@@ -13,7 +13,10 @@ import {
   PieChartOutlined,
   ExclamationCircleOutlined,
   CheckCircleOutlined,
-} from "@ant-design/icons";
+  DollarOutlined, // Ensure all necessary icons are imported
+  CloudOutlined,
+  CreditCardOutlined,
+} from "@ant-design/icons"; // Imported missing icons
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import AdminLayout from "../../../../Components/Admin/AdminDashLayout";
@@ -27,8 +30,37 @@ import {
   setCurrentPage,
   setFilters,
   setReadOnly,
+  clearFilters, // Imported clearFilters
 } from "../../../../Store/Slices/Finance/Earnings/earningsSlice";
 
+// Mapping payment types to corresponding icons
+const paymentTypeIcons = {
+  cash: <DollarOutlined />,
+  online: <CloudOutlined />,
+  credit: <CreditCardOutlined />,
+};
+
+// Predefined color classes to handle dynamic Tailwind CSS classes
+const colorClasses = {
+  purple: {
+    text: "text-purple-800",
+    bg: "bg-purple-100",
+  },
+  yellow: {
+    text: "text-yellow-600",
+    bg: "bg-yellow-100",
+  },
+  red: {
+    text: "text-red-600",
+    bg: "bg-red-100",
+  },
+  green: {
+    text: "text-green-600",
+    bg: "bg-green-100",
+  },
+};
+
+// Custom header cell for table
 const CustomHeaderCell = (props) => (
   <th {...props} className="bg-pink-100 py-1 px-2 text-xs" />
 );
@@ -54,12 +86,17 @@ const TotalRevenueList = () => {
     currentPage,
     pageSize,
     filters,
+    // New statistics
+    totalRevenue,
+    remainingPartialPaidRevenue,
+    totalPaidAmount,
+    unpaidRevenue,
   } = useSelector((state) => state.admin.earnings);
 
   const debouncedFetch = useCallback(
     debounce((params) => {
       dispatch(fetchAllIncomes(params));
-    }, 300),
+    }, 500),
     [dispatch]
   );
 
@@ -67,7 +104,7 @@ const TotalRevenueList = () => {
     const params = {
       search: searchText,
       page: currentPage,
-      limit: 13,
+      limit: 10,
       // sortBy: "earnedDate",
       // sortOrder: "desc",
       ...filters,
@@ -81,7 +118,11 @@ const TotalRevenueList = () => {
   };
 
   const handleFilterApply = (appliedFilters) => {
-    dispatch(setFilters(appliedFilters));
+    if (Object.keys(appliedFilters).length === 0) {
+      dispatch(clearFilters());
+    } else {
+      dispatch(setFilters(appliedFilters));
+    }
   };
 
   const renderActionIcons = (record) => (
@@ -131,66 +172,80 @@ const TotalRevenueList = () => {
         dataIndex: "category",
         key: "category",
         render: (text) => <span className="text-xs">{text}</span>,
-        width: 150,
+        width: 120,
+        ellipsis: true,
       },
       {
         title: "Subcategory",
         dataIndex: "subCategory",
         key: "subCategory",
         render: (text) => <span className="text-xs">{text}</span>,
-        width: 160,
+        width: 150,
+        ellipsis: true,
+      },
+      {
+        title: "Payment Type",
+        dataIndex: "paymentType",
+        key: "paymentType",
+        render: (text) => (
+          <Tooltip
+            title={`Payment Type: ${
+              text.charAt(0).toUpperCase() + text.slice(1)
+            }`}
+          >
+            <span className="text-xs flex items-center gap-1">
+              {paymentTypeIcons[text.toLowerCase()] || <CreditCardOutlined />}
+              {text.charAt(0).toUpperCase() + text.slice(1)}
+            </span>
+          </Tooltip>
+        ),
+        width: 130,
+        ellipsis: true,
+      },
+      {
+        title: "Discount",
+        dataIndex: "discount",
+        key: "discount",
+        render: (value, record) =>
+          record.discountType === "percentage" ? (
+            <Tag color="purple" className="text-xs">
+              {value || 0}%
+            </Tag>
+          ) : (
+            <Tag color="orange" className="text-xs">
+              {value || 0} QR
+            </Tag>
+          ),
+        width: 100,
+        ellipsis: true,
       },
       {
         title: "Final Amount (QR)",
         dataIndex: "final_amount",
         key: "final_amount",
-        render: (value, record) => (
-          <Tooltip
-            title={`Final Amount = Total Amount (${formatCurrency(
-              record.total_amount
-            )}) + Penalty (${formatCurrency(
-              record.penalty
-            )}) - Discount (${formatPercentage(record.discount)})`}
-          >
-            <span className="text-xs">{formatCurrency(value)}</span>
-          </Tooltip>
-        ),
-        width: 140,
+        render: (value) => <span className="text-xs">{value || "0"} QR</span>,
+        width: 120,
+        ellipsis: true,
       },
       {
-        title: "Paid Amount & Date",
+        title: "Paid Amount (QR)",
         dataIndex: "paid_amount",
         key: "paid_amount",
-        render: (value, record) => (
-          <div>
-            <span className="text-xs font-medium">{formatCurrency(value)}</span>
-            <br />
-            <span className="text-xxs text-gray-500">
-              {formatDate(record.earnedDate)}
-            </span>
-          </div>
+        render: (value) => (
+          <span className="text-xs text-green-600">{value || "0"} QR</span>
         ),
-        width: 180,
+        width: 120,
+        ellipsis: true,
       },
       {
         title: "Remaining Amount (QR)",
         dataIndex: "remaining_amount",
         key: "remaining_amount",
         render: (value) => (
-          <span className="text-xs text-red-600">{formatCurrency(value)}</span>
+          <span className="text-xs text-red-600">{value || "0"} QR</span>
         ),
-        width: 160,
-      },
-      {
-        title: "Discount",
-        dataIndex: "discount",
-        key: "discount",
-        render: (value) => (
-          <span className="text-xs text-green-600">
-            {formatPercentage(value)}
-          </span>
-        ),
-        width: 100,
+        width: 140,
+        ellipsis: true,
       },
       {
         title: "Penalty",
@@ -200,6 +255,7 @@ const TotalRevenueList = () => {
           <span className="text-xs text-red-600">{formatCurrency(value)}</span>
         ),
         width: 100,
+        ellipsis: true,
       },
       {
         title: "Action",
@@ -218,10 +274,12 @@ const TotalRevenueList = () => {
         key: income._id,
         category: income.category?.[0]?.categoryName || "N/A",
         subCategory: income.subCategory || "N/A",
+        paymentType: income.paymentType || "N/A",
+        discount: income.discount || 0,
+        discountType: income.discountType || "percentage",
         final_amount: income.final_amount || 0,
         paid_amount: income.paid_amount || 0,
         remaining_amount: income.remaining_amount || 0,
-        discount: income.discount || 0,
         penalty: income.penalty || 0,
         earnedDate: income.paidDate || income.generateDate || null,
         total_amount: income.total_amount || 0,
@@ -281,62 +339,70 @@ const TotalRevenueList = () => {
   const computedPageSize =
     totalPages > 0 ? Math.ceil(totalRecords / totalPages) : pageSize;
 
-  const cardData = [
-    {
-      title: "Total Revenue",
-      icon: <DollarCircleOutlined />,
-      color: "purple",
-      amount: "50,000 QR",
-    },
-    {
-      title: "Remaining Partial Paid",
-      icon: <PieChartOutlined />,
-      color: "yellow",
-      amount: "10,000 QR",
-    },
-    {
-      title: "Unpaid Amount",
-      icon: <ExclamationCircleOutlined />,
-      color: "red",
-      amount: "5,000 QR",
-    },
-    {
-      title: "Paid Amount",
-      icon: <CheckCircleOutlined />,
-      color: "green",
-      amount: "40,000 QR",
-    },
-  ];
+  // Retrieve statistics from Redux store and map to color classes
+  const cardData = useMemo(
+    () => [
+      {
+        title: "Total Revenue",
+        icon: <DollarCircleOutlined />,
+        color: "purple",
+        amount: formatCurrency(totalRevenue),
+      },
+      {
+        title: "Remaining Partial Paid",
+        icon: <PieChartOutlined />,
+        color: "yellow",
+        amount: formatCurrency(remainingPartialPaidRevenue),
+      },
+      {
+        title: "Unpaid Amount",
+        icon: <ExclamationCircleOutlined />,
+        color: "red",
+        amount: formatCurrency(unpaidRevenue),
+      },
+      {
+        title: "Paid Amount",
+        icon: <CheckCircleOutlined />,
+        color: "green",
+        amount: formatCurrency(totalPaidAmount),
+      },
+    ],
+    [totalRevenue, remainingPartialPaidRevenue, unpaidRevenue, totalPaidAmount]
+  );
 
   return (
     <AdminLayout>
       <div className="p-4 space-y-4">
         {/* Top Cards Row */}
         <div className="w-full h-full flex flex-wrap justify-center items-stretch gap-4 p-4">
-          {cardData.map((card, index) => (
-            <Card
-              key={index}
-              title={
-                <div
-                  className={`flex items-center gap-2 text-${card.color}-800 font-bold`}
-                >
-                  {card.icon}
-                  {card.title}
-                </div>
-              }
-              className={`shadow-sm bg-gradient-to-br from-${card.color}-100 to-${card.color}-50 border-none flex-grow`}
-              headStyle={{ borderBottom: "none" }}
-              style={{
-                flex: "1 1 200px",
-                maxWidth: "400px",
-                textAlign: "center",
-              }}
-            >
-              <p className={`text-xl font-bold text-${card.color}-800`}>
-                {card.amount}
-              </p>
-            </Card>
-          ))}
+          {cardData.map((card, index) => {
+            const currentColor =
+              colorClasses[card.color] || colorClasses["purple"];
+            return (
+              <Card
+                key={index}
+                title={
+                  <div
+                    className={`flex items-center gap-2 ${currentColor.text} font-bold`}
+                  >
+                    {card.icon}
+                    {card.title}
+                  </div>
+                }
+                className={`${currentColor.bg} shadow-sm border-none flex-grow`}
+                headStyle={{ borderBottom: "none" }}
+                style={{
+                  flex: "1 1 200px",
+                  maxWidth: "400px",
+                  textAlign: "center",
+                }}
+              >
+                <p className={`${currentColor.text} text-xl font-bold`}>
+                  {card.amount}
+                </p>
+              </Card>
+            );
+          })}
         </div>
 
         {/* Header Section */}
@@ -390,6 +456,7 @@ const TotalRevenueList = () => {
           </div>
         </div>
 
+        {/* Error Message
         {error && (
           <Alert
             message="Error"
@@ -399,14 +466,16 @@ const TotalRevenueList = () => {
             closable
             className="my-4 text-xs"
           />
-        )}
+        )} */}
 
+        {/* No Data Placeholder */}
         {!loading && incomes.length === 0 && !error && (
           <div className="text-center text-gray-500 text-xs py-4">
             No records found.
           </div>
         )}
 
+        {/* Table */}
         <div className="overflow-x-auto">
           <Table
             dataSource={dataSource}
@@ -428,7 +497,7 @@ const TotalRevenueList = () => {
             className="rounded-lg shadow text-xs"
             bordered
             size="small"
-            scroll={{ x: "max-content" }}
+            tableLayout="fixed" // Fixed table layout for compactness
             components={components}
             rowClassName="hover:bg-gray-50 cursor-pointer"
             loading={{
@@ -448,6 +517,7 @@ const TotalRevenueList = () => {
           />
         </div>
 
+        {/* Modals */}
         <DeleteModal
           visible={isDeleteModalVisible}
           onClose={() => {

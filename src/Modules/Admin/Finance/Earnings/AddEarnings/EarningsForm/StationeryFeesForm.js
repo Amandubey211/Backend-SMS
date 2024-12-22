@@ -1,59 +1,49 @@
+// src/Components/Admin/Finance/Earnings/EarningsForm/StationeryFeesForm.jsx
+
 import React from "react";
 import { useFormikContext } from "formik";
 import FormSection from "../Component/FormSection"; // Reusable FormSection
 import PaymentDetails from "../Component/PaymentDetails"; // Static Component
 import PaymentStatus from "../Component/PaymentStatus"; // Static Component
 
-const StudentFeesForm = () => {
+const StationeryFeesForm = () => {
   const { setFieldValue, values } = useFormikContext();
 
-  // Configuration for Student Details section
-  const studentDetailsFields = [
+  const stationeryDetailsFields = [
     {
-      name: "studentName",
-      label: "Student Name",
-      type: "text",
-      placeholder: "Enter Name",
-    },
-    { name: "class", label: "Class", type: "text", placeholder: "Enter Class" },
-    {
-      name: "section",
-      label: "Section",
-      type: "text",
-      placeholder: "Enter Section",
-    },
-  ];
-
-  // Configuration for Due Details section
-  const dueDetailsFields = [
-    {
-      name: "dueDate",
-      label: "Due Date",
-      type: "date",
-      placeholder: "Enter Due Date",
-    },
-    {
-      name: "dueTime",
-      label: "Due Time",
-      type: "time",
-      placeholder: "Enter Due Time",
+      name: "stationeryItems",
+      label: "Stationery Items",
+      type: "array",
+      emptyItem: { itemName: "", quantity: 0, unitCost: 0 },
+      subFields: [
+        {
+          name: "itemName",
+          label: "Item Name",
+          type: "text",
+          placeholder: "Enter item name",
+        },
+        {
+          name: "quantity",
+          label: "Quantity",
+          type: "number",
+          placeholder: "Enter quantity",
+        },
+        {
+          name: "unitCost",
+          label: "Unit Cost",
+          type: "number",
+          placeholder: "Enter unit cost",
+        },
+      ],
     },
   ];
 
   return (
     <>
-      {/* Student Details Section - Dynamic Fields */}
+      {/* Stationery Items Section */}
       <FormSection
-        title="Student Details"
-        fields={studentDetailsFields}
-        setFieldValue={setFieldValue}
-        values={values}
-      />
-
-      {/* Due Details Section - Dynamic Fields */}
-      <FormSection
-        title="Due Details"
-        fields={dueDetailsFields}
+        title="Stationery Items"
+        fields={stationeryDetailsFields}
         setFieldValue={setFieldValue}
         values={values}
       />
@@ -65,4 +55,4 @@ const StudentFeesForm = () => {
   );
 };
 
-export default StudentFeesForm;
+export default StationeryFeesForm;

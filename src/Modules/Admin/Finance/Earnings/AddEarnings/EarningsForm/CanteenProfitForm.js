@@ -1,45 +1,50 @@
+// src/Components/Admin/Finance/Earnings/EarningsForm/WorkshopTrainingFeesForm.jsx
+
 import React from "react";
 import { useFormikContext } from "formik";
 import FormSection from "../Component/FormSection"; // Reusable FormSection
 import PaymentDetails from "../Component/PaymentDetails"; // Static Component
 import PaymentStatus from "../Component/PaymentStatus"; // Static Component
 
-const CanteenProfitForm = () => {
+const WorkshopTrainingFeesForm = () => {
   const { setFieldValue, values } = useFormikContext();
 
-  // Configuration for Canteen Profit Details Fields
-  const canteenProfitFields = [
+  const workshopDetailsFields = [
     {
-      name: "periodOfEarnings",
-      label: "Period Of Earnings",
-      type: "select",
-      options: ["Monthly", "Quarterly", "Half-yearly", "Yearly"],
+      name: "sessionTitle",
+      label: "Session Title",
+      type: "text",
+      placeholder: "Enter session title",
     },
     {
-      name: "description",
-      label: "Any Description",
+      name: "hostName",
+      label: "Host Name",
       type: "text",
-      placeholder: "Enter description",
+      placeholder: "Enter host name",
+    },
+    {
+      name: "timePeriod",
+      label: "Time Period",
+      type: "text",
+      placeholder: "Enter time period",
     },
   ];
 
   return (
     <>
-      {/* Canteen Profit Details Section */}
+      {/* Workshop/Training Details Section */}
       <FormSection
-        title="Canteen Profit Details"
-        fields={canteenProfitFields}
+        title="Workshop/Training Details"
+        fields={workshopDetailsFields}
         setFieldValue={setFieldValue}
         values={values}
       />
 
-      {/* Static PaymentDetails Component */}
+      {/* Static PaymentDetails and PaymentStatus Sections */}
       <PaymentDetails />
-
-      {/* Static PaymentStatus Component */}
       <PaymentStatus />
     </>
   );
 };
 
-export default CanteenProfitForm;
+export default WorkshopTrainingFeesForm;

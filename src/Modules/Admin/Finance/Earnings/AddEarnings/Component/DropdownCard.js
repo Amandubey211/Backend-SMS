@@ -1,10 +1,13 @@
-// DropdownCard.jsx
+// src/Components/Admin/Finance/Earnings/Component/DropdownCard.jsx
+
 import React, { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { IoIosArrowForward } from "react-icons/io";
 
 const DropdownCard = ({
   label,
+  name,
+  id, // Added id prop
   value,
   options,
   isOpen,
@@ -12,6 +15,7 @@ const DropdownCard = ({
   onSelect,
   bgColor,
   borderColor,
+  disabled = false, // Added default value for disabled
 }) => {
   const dropdownRef = useRef(null);
 
@@ -37,15 +41,31 @@ const DropdownCard = ({
       className={`relative w-full ${bgColor} border ${borderColor} rounded-lg px-4 pt-2`}
       ref={dropdownRef}
     >
-      <label className="text-sm text-gray-800 block mb-2">{label}</label>
+      {/* Label with id for ARIA */}
+      <label id={`label-${id}`} className="text-sm text-gray-800 block mb-2">
+        {label}
+      </label>
+
+      {/* Custom Dropdown */}
       <div
-        className="bg-white rounded-lg px-4 py-3 flex justify-between items-center cursor-pointer shadow-lg"
-        onClick={onToggle}
-        onMouseEnter={() => {
-          if (!isOpen) onToggle();
+        className={`relative bg-white rounded-lg px-4 py-3 flex justify-between items-center cursor-pointer shadow-lg ${
+          disabled ? "cursor-not-allowed opacity-50" : ""
+        }`}
+        onClick={() => {
+          if (!disabled) onToggle();
         }}
+        onMouseEnter={() => {
+          if (!disabled && !isOpen) onToggle();
+        }}
+        aria-haspopup="listbox"
+        aria-expanded={isOpen}
+        aria-labelledby={`label-${id}`}
+        role="combobox"
+        tabIndex={disabled ? -1 : 0} // Make focusable if not disabled
       >
-        <span className="text-gray-800 font-medium">{value}</span>
+        <span className="text-gray-800 font-medium">
+          {value || `Select ${label}`}
+        </span>
         <span className="border flex justify-center items-center rounded-full w-6 h-6">
           <IoIosArrowForward
             className={`text-lg transition-transform ${
@@ -54,12 +74,16 @@ const DropdownCard = ({
           />
         </span>
       </div>
+
+      {/* Dropdown Options */}
       {isOpen && (
         <motion.ul
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -10 }}
           className="absolute left-0 top-full mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg z-10"
+          role="listbox"
+          aria-labelledby={`label-${id}`}
         >
           {options?.map((item, index) => (
             <li
@@ -68,6 +92,14 @@ const DropdownCard = ({
                 item === value ? "bg-pink-200 font-bold text-gray-900" : ""
               }`}
               onClick={() => onSelect(item)}
+              role="option"
+              aria-selected={item === value}
+              tabIndex={0} // Make focusable
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  onSelect(item);
+                }
+              }}
             >
               {item}
             </li>

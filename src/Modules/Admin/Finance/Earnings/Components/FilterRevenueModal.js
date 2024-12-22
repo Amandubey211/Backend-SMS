@@ -1,3 +1,5 @@
+// src/Components/Admin/Finance/Earnings/FilterRevenueModal.jsx
+
 import React, { useState, useEffect } from "react";
 import { FilterOutlined } from "@ant-design/icons";
 import { Button, Tag, DatePicker, Select } from "antd";
@@ -53,8 +55,10 @@ const FilterRevenueModal = ({ visible, onClose, onFilterApply }) => {
       filtersToApply.endDate = selectedDateRange[1].format("YYYY-MM-DD");
     }
 
-    // We are not passing category directly because backend expects categoryId, not categoryName.
-    // If you have a way to map category to categoryId, you could do it here.
+    // Category
+    if (selectedCategory) {
+      filtersToApply.category = selectedCategory; // Assuming backend accepts category name
+    }
 
     onFilterApply(filtersToApply);
     onClose();
@@ -66,7 +70,7 @@ const FilterRevenueModal = ({ visible, onClose, onFilterApply }) => {
     setSelectedDateRange([]);
     setPaymentType("");
     setSelectedAcademicYear("");
-    onFilterApply({});
+    onFilterApply({}); // This will trigger clearFilters in TotalRevenueList.jsx
     onClose();
   };
 

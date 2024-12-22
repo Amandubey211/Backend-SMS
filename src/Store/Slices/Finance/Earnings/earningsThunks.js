@@ -4,6 +4,7 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import { setShowError } from "../../Common/Alerts/alertsSlice";
 import { handleError } from "../../Common/Alerts/errorhandling.action";
 import { getData, postData, putData } from "../../../../services/apiEndpoints";
+import toast from "react-hot-toast";
 
 /**
  * Helper function to determine the correct API endpoints based on category.
@@ -55,9 +56,11 @@ export const addEarnings = createAsyncThunk(
       const response = await postData(endpoint, values);
 
       if (response?.success) {
+        toast.success("Earnings added successfully!");
         return response.data;
       } else {
         dispatch(setShowError(true));
+        toast.error(response?.message || "Failed to add earnings.");
         return rejectWithValue(response?.message || "Failed to add earnings.");
       }
     } catch (error) {
@@ -74,9 +77,11 @@ export const updateEarnings = createAsyncThunk(
       const response = await putData(endpoint, values);
 
       if (response?.success) {
+        toast.success("Earnings updated successfully!");
         return response.data;
       } else {
         dispatch(setShowError(true));
+        toast.error(response?.message || "Failed to update earnings.");
         return rejectWithValue(
           response?.message || "Failed to update earnings."
         );
@@ -97,6 +102,7 @@ export const fetchAllIncomes = createAsyncThunk(
       if (response?.success) {
         return response;
       } else {
+        toast.error(response?.message || "Failed to fetch incomes.");
         return rejectWithValue(response?.message || "Failed to fetch incomes.");
       }
     } catch (error) {

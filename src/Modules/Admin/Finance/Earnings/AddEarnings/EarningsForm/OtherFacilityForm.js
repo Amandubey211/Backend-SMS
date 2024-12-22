@@ -1,3 +1,5 @@
+// src/Components/Admin/Finance/Earnings/EarningsForm/OtherFacilityForm.jsx
+
 import React from "react";
 import { useFormikContext } from "formik";
 import FormSection from "../Component/FormSection"; // Reusable FormSection
@@ -7,19 +9,18 @@ import PaymentStatus from "../Component/PaymentStatus"; // Static Component
 const OtherFacilityForm = () => {
   const { setFieldValue, values } = useFormikContext();
 
-  // Configuration for Other Facility Details Fields
   const otherFacilityFields = [
     {
-      name: "earningsFrom",
-      label: "Earnings From",
+      name: "facilityName",
+      label: "Facility Name",
       type: "text",
-      placeholder: "Write here",
+      placeholder: "Enter facility name",
     },
     {
-      name: "duration",
-      label: "Duration",
+      name: "accessDuration",
+      label: "Access Duration",
       type: "text",
-      placeholder: "Enter duration",
+      placeholder: "Enter access duration",
     },
   ];
 
@@ -33,10 +34,8 @@ const OtherFacilityForm = () => {
         values={values}
       />
 
-      {/* Static PaymentDetails Component */}
+      {/* Static PaymentDetails and PaymentStatus Sections */}
       <PaymentDetails />
-
-      {/* Static PaymentStatus Component */}
       <PaymentStatus />
     </>
   );

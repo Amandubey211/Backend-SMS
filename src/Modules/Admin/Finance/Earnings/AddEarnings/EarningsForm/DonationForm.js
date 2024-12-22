@@ -1,4 +1,6 @@
-import React from "react"; 
+// src/Components/Admin/Finance/Earnings/EarningsForm/DonationForm.jsx
+
+import React from "react";
 import { useFormikContext } from "formik";
 import FormSection from "../Component/FormSection"; // Reusable FormSection
 import PaymentDetails from "../Component/PaymentDetails"; // Static Component

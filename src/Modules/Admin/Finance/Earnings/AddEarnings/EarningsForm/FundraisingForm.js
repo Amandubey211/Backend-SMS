@@ -1,8 +1,10 @@
+// src/Components/Admin/Finance/Earnings/EarningsForm/FundraisingForm.jsx
+
 import React from "react";
 import { useFormikContext } from "formik";
-import FormSection from "../Component/FormSection";
-import PaymentDetails from "../Component/PaymentDetails";
-import PaymentStatus from "../Component/PaymentStatus";
+import FormSection from "../Component/FormSection"; // Reusable FormSection
+import PaymentDetails from "../Component/PaymentDetails"; // Static Component
+import PaymentStatus from "../Component/PaymentStatus"; // Static Component
 
 const FundraisingForm = () => {
   const { setFieldValue, values } = useFormikContext();
