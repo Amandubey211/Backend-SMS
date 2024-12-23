@@ -13,6 +13,7 @@ const initialState = {
   loading: false,
   error: null,
   readOnly: false,
+  selectedIncome: null,
   // New statistics fields
   totalRevenue: 0,
   remainingPartialPaidRevenue: 0,
@@ -37,6 +38,12 @@ const earningsSlice = createSlice({
       state.remainingPartialPaidRevenue = 0;
       state.totalPaidAmount = 0;
       state.unpaidRevenue = 0;
+    },
+    setSelectedIncome(state, action) {
+      state.selectedIncome = action.payload;
+    },
+    clearSelectedIncome(state) {
+      state.selectedIncome = null;
     },
     setCurrentPage: (state, action) => {
       state.currentPage = action.payload;
@@ -118,6 +125,8 @@ const earningsSlice = createSlice({
 });
 
 export const {
+  setSelectedIncome,
+  clearSelectedIncome,
   clearIncomes,
   setCurrentPage,
   setFilters,

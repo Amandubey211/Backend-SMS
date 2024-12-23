@@ -12,20 +12,20 @@ const paymentStatusFields = [
     options: ["paid", "unpaid", "partial", "advance"],
   },
   {
-    name: "paidAmount",
+    name: "paid_amount", // Changed to snake_case
     label: "Paid Amount (QR)",
     type: "number",
     placeholder: "Enter paid amount",
     min: 0,
   },
   {
-    name: "paidBy",
+    name: "paid_by", // Changed to snake_case
     label: "Paid By",
     type: "select",
     options: ["Manual", "Auto"],
   },
   {
-    name: "paymentType",
+    name: "payment_type", // Changed to snake_case
     label: "Payment Type",
     type: "select",
     options: ["cash", "card", "online", "cheque", "other"],

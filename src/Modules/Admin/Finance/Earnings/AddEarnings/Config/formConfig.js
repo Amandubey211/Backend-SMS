@@ -20,16 +20,16 @@ export const initialValuesMap = {
     startDate: "",
     endDate: "",
     nameOfRenter: "",
-    paymentType: "cash",
-    paymentStatus: "paid",
+    payment_type: "cash",
+    payment_status: "paid",
     paid_amount: 0,
-    paidBy: "Auto",
+    paid_by: "Auto",
     advance_amount: 0,
     remaining_amount: 0,
     tax: 0,
-    discountType: "percentage",
+    discount_type: "percentage",
     discount: 0,
-    penalty: 0,
+    penalty: 10,
     frequencyOfPayment: "Monthly",
     dateTime: "",
     total_amount: 0,
@@ -264,27 +264,27 @@ export const initialValuesMap = {
 // Form components mapping
 export const formComponentsMap = {
   "Facility-Based Revenue": {
-    "Rent Income": <RentIncomeForm />,
-    "Exam Center Fees": <ExamCenterFeesForm />,
-    "Parking Fees": <ParkingFeesForm />,
-    Other: <OtherFacilityForm />, // Adjust based on specific "Other" forms if needed
+    "Rent Income": RentIncomeForm,
+    "Exam Center Fees": ExamCenterFeesForm,
+    "Parking Fees": ParkingFeesForm,
+    // Add other subCategories as needed
   },
   "Service-Based Revenue": {
-    "Stationery Fees": <StationeryFeesForm />,
-    "Other Facility Fees": <OtherFacilityForm />,
-    "Subscription Fees": <SubscriptionFeesForm />,
-    "Workshop/Training Fees": <WorkshopTrainingFeesForm />,
-    "Canteen Profit": <CanteenProfitForm />,
-    Other: <OtherFacilityForm />, // Adjust based on specific "Other" forms if needed
+    "Stationery Fees": StationeryFeesForm,
+    "Other Facility Fees": OtherFacilityForm,
+    "Subscription Fees": SubscriptionFeesForm,
+    "Workshop/Training Fees": WorkshopTrainingFeesForm,
+    "Canteen Profit": CanteenProfitForm,
+    // Add other subCategories as needed
   },
   "Community and External Revenue": {
-    Donations: <DonationForm />,
-    "Fundraising/Sponsorships": <FundraisingForm />,
-    Other: <OtherFacilityForm />, // Adjust based on specific "Other" forms if needed
+    Donations: DonationForm,
+    "Fundraising/Sponsorships": FundraisingForm,
+    // Add other subCategories as needed
   },
   "Financial Investments": {
-    Investments: <InvestmentForm />,
-    Other: <OtherFacilityForm />, // Adjust based on specific "Other" forms if needed
+    Investments: InvestmentForm,
+    // Add other subCategories as needed
   },
   // Add other main categories and their subCategories as necessary
 };

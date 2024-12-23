@@ -4,29 +4,32 @@ import React, { useEffect, useState, useMemo } from "react";
 import { Formik, Form } from "formik";
 import Layout from "../../../../../Components/Common/Layout";
 import DashLayout from "../../../../../Components/Admin/AdminDashLayout";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import * as Yup from "yup";
 import Header from "./Component/Header";
 import { categories, subCategories } from "./constants/categories";
-import { keysToCamel } from "../../../../../Utils/camelCase";
-import { setReadOnly } from "../../../../../Store/Slices/Finance/Earnings/earningsSlice";
+import {
+  setReadOnly,
+  clearSelectedIncome,
+  setSelectedIncome, // Ensure this action exists
+} from "../../../../../Store/Slices/Finance/Earnings/earningsSlice";
 import {
   addEarnings,
   updateEarnings,
 } from "../../../../../Store/Slices/Finance/Earnings/earningsThunks";
 import { Button } from "antd";
-import { EditOutlined } from "@ant-design/icons"; // Ant Design's edit icon
+import { EditOutlined } from "@ant-design/icons";
 import { formComponentsMap, initialValuesMap } from "./Config/formConfig";
 import { validationSchemas } from "./Config/validationSchemas";
 import toast from "react-hot-toast";
 
 const AddEarnings = () => {
-  const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const { readOnly, loading, error } = useSelector(
+  // Retrieve readOnly, loading, error, and selectedIncome from Redux
+  const { readOnly, loading, error, selectedIncome } = useSelector(
     (state) => state.admin.earnings
   );
 
@@ -37,41 +40,79 @@ const AddEarnings = () => {
   const [description, setDescription] = useState("");
   const [showError, setShowErrorLocal] = useState(false); // Local state for error visibility
 
-  // Memoize form mapping based on the selected category
-  const formMapping = useMemo(
-    () => formComponentsMap[selectedCategory] || {},
-    [selectedCategory]
-  );
+  // Memoize form component based on the selected category and subcategory
+  const formComponent = useMemo(() => {
+    const SubCategoryComponent =
+      formComponentsMap[selectedCategory]?.[selectedSubCategory];
+    return SubCategoryComponent ? (
+      <SubCategoryComponent readOnly={readOnly} />
+    ) : null;
+  }, [selectedCategory, selectedSubCategory, formComponentsMap, readOnly]);
 
-  // Handle the transition from read-only to editable mode
-  const handleEdit = () => {
-    dispatch(setReadOnly(false));
-  };
-
-  // Function to get initial form values based on the current state
+  // Function to get initial form values based on the selectedIncome
   const getInitialValues = () => {
-    if (location.state && location.state.incomeData) {
-      const incomeData = keysToCamel(location.state.incomeData);
-      const subCategory = incomeData.subCategory;
-      const revenueType = categories.find((type) =>
-        subCategories[type].includes(subCategory)
-      );
+    if (selectedIncome) {
+      const incomeData = selectedIncome;
+      console.log("Prefilled Income Data:", incomeData); // Debugging line
+      const subCategory = incomeData.sub_category;
+      const categoryName =
+        incomeData.category?.[0]?.categoryName || "Facility-Based Revenue";
 
-      return {
-        categoryName: incomeData.categoryName || selectedCategory,
-        subCategory: incomeData.subCategory || selectedSubCategory,
-        ...initialValuesMap[subCategory],
+      // Merge top-level fields with subcategory-specific fields
+      const initialValues = {
+        _id: incomeData._id || "",
+        categoryName: categoryName,
+        sub_category: subCategory || selectedSubCategory,
+        paymentType: incomeData.paymentType || "cash",
+        paymentStatus: incomeData.paymentStatus || "paid",
+        paid_amount: incomeData.paid_amount || 0,
+        paidBy: incomeData.paidBy || "Auto",
+        advance_amount: incomeData.advance_amount || 0,
+        remaining_amount: incomeData.remaining_amount || 0,
+        tax: incomeData.tax || 0,
+        discountType: incomeData.discountType || "percentage",
+        discount: incomeData.discount || 0,
+        penalty: incomeData.penalty || 0,
+        frequencyOfPayment: incomeData.frequencyOfPayment || "Monthly",
+        dateTime: incomeData.dateTime || "",
+        total_amount: incomeData.total_amount || 0,
+        final_amount: incomeData.final_amount || 0,
+        receipt: incomeData.receipt || null,
         description: incomeData.description || "",
+        // Spread specific fields based on subCategory
+        ...(initialValuesMap[subCategory] || {}),
       };
+
+      console.log("Initial Form Values:", initialValues); // Debugging line
+
+      return initialValues;
     }
 
     // Initialize fields based on the selectedSubCategory
     const initialValues = {
+      _id: "",
       categoryName: selectedCategory,
-      subCategory: selectedSubCategory,
-      ...initialValuesMap[selectedSubCategory],
+      sub_category: selectedSubCategory,
+      paymentType: "cash",
+      paymentStatus: "paid",
+      paid_amount: 0,
+      paidBy: "Auto",
+      advance_amount: 0,
+      remaining_amount: 0,
+      tax: 0,
+      discountType: "percentage",
+      discount: 0,
+      penalty: 0,
+      frequencyOfPayment: "Monthly",
+      dateTime: "",
+      total_amount: 0,
+      final_amount: 0,
+      receipt: null,
       description: "",
+      ...initialValuesMap[selectedSubCategory],
     };
+
+    console.log("Default Initial Form Values:", initialValues); // Debugging line
 
     return initialValues;
   };
@@ -80,8 +121,9 @@ const AddEarnings = () => {
   const handleReset = (resetForm) => {
     resetForm();
     setDescription("");
-    if (location.state && location.state.incomeData) {
-      navigate(-1);
+    if (selectedIncome) {
+      dispatch(clearSelectedIncome()); // Clear selected income from Redux
+      navigate("/finance/total-revenue-list"); // Navigate back to revenue list
     } else {
       // Reset to default category and subCategory
       setSelectedCategory("Facility-Based Revenue");
@@ -93,7 +135,7 @@ const AddEarnings = () => {
   const handleSaveOrUpdate = async (values, actions) => {
     try {
       // Destructure fields
-      const { categoryName, subCategory, description, receipt, ...rest } =
+      const { _id, categoryName, subCategory, description, receipt, ...rest } =
         values;
 
       let specificFields = {};
@@ -109,23 +151,19 @@ const AddEarnings = () => {
           break;
         case "Exam Center Fees":
           specificFields = {
-            // examCentreFees: {
             examName: values.examName,
             startDate: values.startDate,
             endDate: values.endDate,
             mobileNumber: values.mobileNumber,
-            // },
           };
           break;
         case "Parking Fees":
           specificFields = {
-            // parkingFees: {
             vehicleType: values.vehicleType,
             name: values.name,
             userType: values.userType,
             otherVehicleDetails: values.otherVehicleDetails,
             otherUserDetails: values.otherUserDetails,
-            // },
           };
           break;
         case "Stationery Fees":
@@ -142,7 +180,7 @@ const AddEarnings = () => {
         case "Subscription Fees":
           specificFields = {
             subscriptionName: values.subscriptionName,
-            description: values.description, // Assuming description is part of Subscription Fees
+            description: values.description,
           };
           break;
         case "Workshop/Training Fees":
@@ -188,11 +226,11 @@ const AddEarnings = () => {
       }
 
       // Construct the nested payload
-      const payload = {
-        categoryName, // Top-level field
-        subCategory, // Top-level field
-        description, // Top-level field
-        receipt, // Top-level field
+      const payloadCamelCase = {
+        categoryName: categoryName, // Top-level field
+        sub_category: subCategory, // Top-level field
+        description: description, // Top-level field
+        receipt: receipt, // Top-level field
         paymentType: values.paymentType,
         paymentStatus: values.paymentStatus,
         paid_amount: values.paid_amount,
@@ -220,37 +258,42 @@ const AddEarnings = () => {
         "penalty",
         "total_amount",
         "final_amount",
-        "investmentAmount",
-        "returnAmount",
+        "investment_amount",
+        "return_amount",
         // Add other numeric fields as necessary
       ];
 
       numericFields.forEach((field) => {
-        if (payload[field] === "" || payload[field] === null) {
-          payload[field] = 0;
+        if (
+          payloadCamelCase[field] === "" ||
+          payloadCamelCase[field] === null
+        ) {
+          payloadCamelCase[field] = 0;
         } else {
-          payload[field] = Number(payload[field]);
+          payloadCamelCase[field] = Number(payloadCamelCase[field]);
         }
       });
 
       const category = selectedCategory;
 
-      if (location.state && location.state.incomeData && !readOnly) {
+      if (selectedIncome && !readOnly) {
         // Update existing record
-        const id = values._id;
+        const id = payloadCamelCase._id;
         await dispatch(
-          updateEarnings({ values: payload, category, id })
+          updateEarnings({ values: payloadCamelCase, category, id })
         ).unwrap();
         toast.success("Earnings updated successfully!");
+        dispatch(clearSelectedIncome()); // Clear the selected income after update
         navigate("/finance/total-revenue-list");
-      } else if (!location.state?.incomeData) {
+      } else if (!selectedIncome) {
         // Add new record
-        await dispatch(addEarnings({ values: payload, category })).unwrap();
+        await dispatch(
+          addEarnings({ values: payloadCamelCase, category })
+        ).unwrap();
         toast.success("Earnings added successfully!");
         navigate("/finance/total-revenue-list");
       }
     } catch (err) {
-      // dispatch(setShowError(true));
       toast.error(err || "An unexpected error occurred while saving the data.");
       console.error("Error while saving data:", err);
       setShowErrorLocal(true); // Show the error message
@@ -259,41 +302,48 @@ const AddEarnings = () => {
     }
   };
 
-  // Initialize component state based on location state
+  // Initialize component state based on selectedIncome
   useEffect(() => {
-    if (location.state && location.state.incomeData) {
-      const incomeData = keysToCamel(location.state.incomeData);
-      console.log(incomeData, "Income Data Loaded");
-      setSelectedCategory(incomeData.categoryName || "Facility-Based Revenue");
-      setSelectedSubCategory(incomeData.subCategory || "Rent Income");
+    if (selectedIncome) {
+      const incomeData = selectedIncome;
+      console.log("Income Data Loaded:", incomeData); // Debugging line
+      const categoryName =
+        incomeData.category?.[0]?.categoryName || "Facility-Based Revenue";
+      setSelectedCategory(categoryName);
+      setSelectedSubCategory(incomeData.sub_category || "Rent Income");
       setDescription(incomeData.description || "");
     } else {
       dispatch(setReadOnly(false));
     }
-  }, [location.state, dispatch]);
+
+    // Optional: Clear selectedIncome when component unmounts
+    return () => {
+      dispatch(clearSelectedIncome());
+    };
+  }, [selectedIncome, dispatch]);
 
   // Get the appropriate validation schema based on the selected sub-category
   const getValidationSchema = () => {
     return validationSchemas[selectedSubCategory] || Yup.object({});
   };
 
-  // Auto-hide the error message after 5 seconds
+  // Auto-hide the error message after 3 seconds
   useEffect(() => {
     let timer;
     if (error) {
       setShowErrorLocal(true);
       timer = setTimeout(() => {
         setShowErrorLocal(false);
-        // dispatch(setShowError(false)); // Reset the error in Redux store
-      }, 3000); // 5 seconds
+        // Optionally, reset the error in Redux store if implemented
+      }, 3000); // 3 seconds
     }
     return () => clearTimeout(timer);
-  }, [error, dispatch]);
+  }, [error]);
 
   return (
     <Layout
       title={
-        location.state && location.state.incomeData
+        selectedIncome
           ? readOnly
             ? "View Earnings | Student Diwan"
             : "Update Earnings | Student Diwan"
@@ -304,10 +354,10 @@ const AddEarnings = () => {
         <Formik
           enableReinitialize
           initialValues={getInitialValues()}
-          // validationSchema={getValidationSchema()}
+          validationSchema={getValidationSchema()}
           onSubmit={handleSaveOrUpdate}
         >
-          {({ resetForm, isSubmitting, values }) => (
+          {({ resetForm, isSubmitting, values, setFieldValue }) => (
             <Form className="p-3">
               {/* Read-Only Mode Notification */}
               {readOnly && (
@@ -334,7 +384,7 @@ const AddEarnings = () => {
                     onMouseLeave={(e) =>
                       (e.currentTarget.style.transform = "scale(1)")
                     }
-                    onClick={handleEdit}
+                    onClick={() => dispatch(setReadOnly(false))}
                   >
                     Edit
                   </Button>
@@ -342,13 +392,15 @@ const AddEarnings = () => {
               )}
 
               {/* Error Message */}
-              {/* {error && showError && (
+              {error && showError && (
                 <div className="bg-red-100 text-red-700 p-2 rounded-md text-sm">
-                  {error?.map((err, idx) => (
-                    <div key={idx}>{err.msg}</div>
-                  ))}
+                  {Array.isArray(error)
+                    ? error.map((err, idx) => (
+                        <div key={idx}>{err.msg || err}</div>
+                      ))
+                    : error}
                 </div>
-              )} */}
+              )}
 
               {/* Header with Dropdowns and Description */}
               <Header
@@ -359,75 +411,26 @@ const AddEarnings = () => {
                   setSelectedSubCategory(firstSubCategory);
                   resetForm({
                     values: {
-                      categoryName: category,
-                      subCategory: firstSubCategory,
-                      ...initialValuesMap[firstSubCategory],
+                      _id: "", // Reset _id for new entries
+                      categoryName: category, // Changed to snake_case
+                      sub_category: firstSubCategory, // Changed to snake_case
+                      paymentType: "cash", // Changed to snake_case
+                      paymentStatus: "paid", // Changed to snake_case
+                      paid_amount: 0,
+                      paidBy: "Auto", // Changed to snake_case
+                      advance_amount: 0,
+                      remaining_amount: 0,
+                      tax: 0,
+                      discountType: "percentage", // Changed to snake_case
+                      discount: 0,
+                      penalty: 0,
+                      frequencyOfPayment: "Monthly",
+                      dateTime: "",
+                      total_amount: 0,
+                      final_amount: 0,
+                      receipt: null,
                       description: "",
-                      // Initialize nested fields based on subCategory
-                      ...(firstSubCategory === "Exam Center Fees" && {
-                        examName: "",
-                        startDate: "",
-                        endDate: "",
-                        mobileNumber: "",
-                      }),
-                      ...(firstSubCategory === "Rent Income" && {
-                        name: "",
-                        startDate: "",
-                        endDate: "",
-                        nameOfRenter: "",
-                      }),
-                      ...(firstSubCategory === "Parking Fees" && {
-                        vehicleType: "",
-                        name: "",
-                        userType: "",
-                        otherVehicleDetails: "",
-                        otherUserDetails: "",
-                      }),
-                      ...(firstSubCategory === "Stationery Fees" && {
-                        stationeryItems: [
-                          {
-                            itemName: "",
-                            quantity: "",
-                            unitCost: "",
-                          },
-                        ],
-                      }),
-                      ...(firstSubCategory === "Other Facility Fees" && {
-                        facilityName: "",
-                        accessDuration: "",
-                      }),
-                      ...(firstSubCategory === "Subscription Fees" && {
-                        subscriptionName: "",
-                        description: "",
-                      }),
-                      ...(firstSubCategory === "Workshop/Training Fees" && {
-                        sessionTitle: "",
-                        hostName: "",
-                        timePeriod: "",
-                      }),
-                      ...(firstSubCategory === "Canteen Profit" && {
-                        periodOfEarnings: "",
-                        description: "",
-                      }),
-                      ...(firstSubCategory === "Donations" && {
-                        name: "",
-                        phoneNumber: "",
-                        address: "",
-                      }),
-                      ...(firstSubCategory === "Fundraising/Sponsorships" && {
-                        companyName: "",
-                        phoneNumber: "",
-                        address: "",
-                      }),
-                      ...(firstSubCategory === "Investments" && {
-                        name: "",
-                        profitOrLoss: "",
-                        fromDate: "",
-                        toDate: "",
-                        investmentAmount: "",
-                        returnAmount: "",
-                      }),
-                      // Add other subCategories as needed
+                      ...initialValuesMap[firstSubCategory],
                     },
                   });
                   setDescription("");
@@ -437,75 +440,26 @@ const AddEarnings = () => {
                   setSelectedSubCategory(subCategory);
                   resetForm({
                     values: {
-                      categoryName: selectedCategory,
-                      subCategory: subCategory,
-                      ...initialValuesMap[subCategory],
+                      _id: "", // Reset _id for new entries
+                      categoryName: selectedCategory, // Changed to snake_case
+                      subCategory: subCategory, // Changed to snake_case
+                      paymentType: "cash",
+                      paymentStatus: "paid",
+                      paid_amount: 0,
+                      paidBy: "Auto", // Changed to snake_case
+                      advance_amount: 0,
+                      remaining_amount: 0,
+                      tax: 0,
+                      discountType: "percentage", // Changed to snake_case
+                      discount: 0,
+                      penalty: 0,
+                      frequencyOfPayment: "Monthly",
+                      dateTime: "",
+                      total_amount: 0,
+                      final_amount: 0,
+                      receipt: null,
                       description: "",
-                      // Initialize nested fields based on subCategory
-                      ...(subCategory === "Exam Center Fees" && {
-                        examName: "",
-                        startDate: "",
-                        endDate: "",
-                        mobileNumber: "",
-                      }),
-                      ...(subCategory === "Rent Income" && {
-                        name: "",
-                        startDate: "",
-                        endDate: "",
-                        nameOfRenter: "",
-                      }),
-                      ...(subCategory === "Parking Fees" && {
-                        vehicleType: "",
-                        name: "",
-                        userType: "",
-                        otherVehicleDetails: "",
-                        otherUserDetails: "",
-                      }),
-                      ...(subCategory === "Stationery Fees" && {
-                        stationeryItems: [
-                          {
-                            itemName: "",
-                            quantity: "",
-                            unitCost: "",
-                          },
-                        ],
-                      }),
-                      ...(subCategory === "Other Facility Fees" && {
-                        facilityName: "",
-                        accessDuration: "",
-                      }),
-                      ...(subCategory === "Subscription Fees" && {
-                        subscriptionName: "",
-                        description: "",
-                      }),
-                      ...(subCategory === "Workshop/Training Fees" && {
-                        sessionTitle: "",
-                        hostName: "",
-                        timePeriod: "",
-                      }),
-                      ...(subCategory === "Canteen Profit" && {
-                        periodOfEarnings: "",
-                        description: "",
-                      }),
-                      ...(subCategory === "Donations" && {
-                        name: "",
-                        phoneNumber: "",
-                        address: "",
-                      }),
-                      ...(subCategory === "Fundraising/Sponsorships" && {
-                        companyName: "",
-                        phoneNumber: "",
-                        address: "",
-                      }),
-                      ...(subCategory === "Investments" && {
-                        name: "",
-                        profitOrLoss: "",
-                        fromDate: "",
-                        toDate: "",
-                        investmentAmount: "",
-                        returnAmount: "",
-                      }),
-                      // Add other subCategories as needed
+                      ...initialValuesMap[subCategory],
                     },
                   });
                   setDescription("");
@@ -515,13 +469,17 @@ const AddEarnings = () => {
                 setDescription={readOnly ? () => {} : setDescription}
                 initialCategory={selectedCategory}
                 initialSubCategory={selectedSubCategory}
-                isUpdate={!!location.state?.incomeData}
+                isUpdate={!!selectedIncome}
               />
 
               {/* Render the selected form component */}
-              {formMapping[selectedSubCategory] || (
-                <div>Select a sub-category to proceed.</div>
+              {formComponent || (
+                <div className="text-center text-gray-500 text-xs py-4">
+                  Select a sub-category to proceed.
+                </div>
               )}
+
+              {/* Submit Button is handled within Header.jsx */}
             </Form>
           )}
         </Formik>
