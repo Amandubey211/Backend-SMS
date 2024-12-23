@@ -1,7 +1,7 @@
 // src/Components/Admin/Finance/Earnings/TotalRevenueList.jsx
 
 import React, { useEffect, useState, useCallback, useMemo } from "react";
-import { Table, Input, Button, Spin, Alert, Tooltip, Card, Tag } from "antd"; // Imported Tag
+import { Table, Input, Button, Spin, Alert, Tooltip, Card, Tag } from "antd";
 import {
   SearchOutlined,
   ExportOutlined,
@@ -13,10 +13,10 @@ import {
   PieChartOutlined,
   ExclamationCircleOutlined,
   CheckCircleOutlined,
-  DollarOutlined, // Ensure all necessary icons are imported
+  DollarOutlined,
   CloudOutlined,
   CreditCardOutlined,
-} from "@ant-design/icons"; // Imported missing icons
+} from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import AdminLayout from "../../../../Components/Admin/AdminDashLayout";
@@ -30,8 +30,10 @@ import {
   setCurrentPage,
   setFilters,
   setReadOnly,
-  clearFilters, // Imported clearFilters
+  clearFilters,
+  setSelectedIncome, // Import the action to set selected income
 } from "../../../../Store/Slices/Finance/Earnings/earningsSlice";
+import toast from "react-hot-toast";
 
 // Mapping payment types to corresponding icons
 const paymentTypeIcons = {
@@ -66,17 +68,21 @@ const CustomHeaderCell = (props) => (
 );
 
 const TotalRevenueList = () => {
+  // State variables
   const [searchText, setSearchText] = useState("");
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const [isExportModalVisible, setIsExportModalVisible] = useState(false);
   const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
   const [isBulkEntriesModalVisible, setIsBulkEntriesModalVisible] =
     useState(false);
-  const [selectedIncome, setSelectedIncome] = useState(null);
+  const [selectedIncomeForDeletion, setSelectedIncomeForDeletion] =
+    useState(null);
 
+  // Navigation and dispatch
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+  // Redux state
   const {
     incomes,
     loading,
@@ -93,6 +99,16 @@ const TotalRevenueList = () => {
     unpaidRevenue,
   } = useSelector((state) => state.admin.earnings);
 
+  // Memoize a mapping from _id to income object for faster lookup
+  const incomeIdMap = useMemo(() => {
+    const map = {};
+    incomes.forEach((income) => {
+      map[income._id] = income;
+    });
+    return map;
+  }, [incomes]);
+
+  // Debounced fetch function to reduce API calls
   const debouncedFetch = useCallback(
     debounce((params) => {
       dispatch(fetchAllIncomes(params));
@@ -100,6 +116,7 @@ const TotalRevenueList = () => {
     [dispatch]
   );
 
+  // Fetch incomes on component mount and when dependencies change
   useEffect(() => {
     const params = {
       search: searchText,
@@ -112,11 +129,13 @@ const TotalRevenueList = () => {
     debouncedFetch(params);
   }, [debouncedFetch, searchText, currentPage, pageSize, filters]);
 
+  // Handle search input changes
   const handleSearch = (e) => {
     setSearchText(e.target.value);
     dispatch(setCurrentPage(1));
   };
 
+  // Handle filter application
   const handleFilterApply = (appliedFilters) => {
     if (Object.keys(appliedFilters).length === 0) {
       dispatch(clearFilters());
@@ -125,6 +144,7 @@ const TotalRevenueList = () => {
     }
   };
 
+  // Render action buttons (Edit and Delete) for each row
   const renderActionIcons = (record) => (
     <div className="flex space-x-1" onClick={(e) => e.stopPropagation()}>
       <Tooltip title="Edit">
@@ -132,8 +152,14 @@ const TotalRevenueList = () => {
           type="link"
           icon={<EditOutlined />}
           onClick={() => {
-            dispatch(setReadOnly(false));
-            navigate("/finance/earning/add", { state: { incomeData: record } });
+            const incomeToEdit = incomeIdMap[record.key];
+            if (incomeToEdit) {
+              dispatch(setReadOnly(true)); // Set readOnly to true for viewing
+              dispatch(setSelectedIncome(incomeToEdit)); // Dispatch the selected income to Redux
+              navigate("/finance/earning/add"); // Navigate without passing state
+            } else {
+              toast.error("Selected income not found.");
+            }
           }}
           className="text-blue-600 hover:text-blue-800 p-0"
           aria-label="Edit"
@@ -144,8 +170,13 @@ const TotalRevenueList = () => {
           type="link"
           icon={<DeleteOutlined />}
           onClick={() => {
-            setSelectedIncome(record);
-            setIsDeleteModalVisible(true);
+            const incomeToDelete = incomeIdMap[record.key];
+            if (incomeToDelete) {
+              setSelectedIncomeForDeletion(incomeToDelete); // Set income for deletion
+              setIsDeleteModalVisible(true);
+            } else {
+              toast.error("Selected income not found.");
+            }
           }}
           className="text-red-600 hover:text-red-800 p-0"
           aria-label="Delete"
@@ -154,6 +185,7 @@ const TotalRevenueList = () => {
     </div>
   );
 
+  // Formatting functions
   const formatCurrency = (value) =>
     value !== undefined && value !== null
       ? `${value.toLocaleString()} QR`
@@ -165,14 +197,15 @@ const TotalRevenueList = () => {
   const formatDate = (date) =>
     date ? new Date(date).toLocaleDateString() : "N/A";
 
+  // Define table columns
   const columns = useMemo(
     () => [
       {
         title: "Category",
-        dataIndex: "category",
-        key: "category",
+        dataIndex: "categoryName",
+        key: "categoryName",
         render: (text) => <span className="text-xs">{text}</span>,
-        width: 120,
+        width: 150,
         ellipsis: true,
       },
       {
@@ -183,25 +216,28 @@ const TotalRevenueList = () => {
         width: 150,
         ellipsis: true,
       },
-      {
-        title: "Payment Type",
-        dataIndex: "paymentType",
-        key: "paymentType",
-        render: (text) => (
-          <Tooltip
-            title={`Payment Type: ${
-              text.charAt(0).toUpperCase() + text.slice(1)
-            }`}
-          >
-            <span className="text-xs flex items-center gap-1">
-              {paymentTypeIcons[text.toLowerCase()] || <CreditCardOutlined />}
-              {text.charAt(0).toUpperCase() + text.slice(1)}
-            </span>
-          </Tooltip>
-        ),
-        width: 130,
-        ellipsis: true,
-      },
+      // Uncomment the following block if you wish to display Payment Type
+
+      // {
+      //   title: "Payment Type",
+      //   dataIndex: "paymentType",
+      //   key: "paymentType",
+      //   render: (text) => (
+      //     <Tooltip
+      //       title={`Payment Type: ${
+      //         text.charAt(0).toUpperCase() + text.slice(1)
+      //       }`}
+      //     >
+      //       <span className="text-xs flex items-center gap-1">
+      //         {paymentTypeIcons[text.toLowerCase()] || <CreditCardOutlined />}
+      //         {text.charAt(0).toUpperCase() + text.slice(1)}
+      //       </span>
+      //     </Tooltip>
+      //   ),
+      //   width: 150,
+      //   ellipsis: true,
+      // },
+      // Uncomment the following block if you wish to display Discount
       {
         title: "Discount",
         dataIndex: "discount",
@@ -216,35 +252,35 @@ const TotalRevenueList = () => {
               {value || 0} QR
             </Tag>
           ),
-        width: 100,
+        width: 70,
         ellipsis: true,
       },
       {
         title: "Final Amount (QR)",
-        dataIndex: "final_amount",
-        key: "final_amount",
+        dataIndex: "finalAmount",
+        key: "finalAmount",
         render: (value) => <span className="text-xs">{value || "0"} QR</span>,
-        width: 120,
+        width: 150,
         ellipsis: true,
       },
       {
         title: "Paid Amount (QR)",
-        dataIndex: "paid_amount",
-        key: "paid_amount",
+        dataIndex: "paidAmount",
+        key: "paidAmount",
         render: (value) => (
           <span className="text-xs text-green-600">{value || "0"} QR</span>
         ),
-        width: 120,
+        width: 150,
         ellipsis: true,
       },
       {
         title: "Remaining Amount (QR)",
-        dataIndex: "remaining_amount",
-        key: "remaining_amount",
+        dataIndex: "remainingAmount",
+        key: "remainingAmount",
         render: (value) => (
           <span className="text-xs text-red-600">{value || "0"} QR</span>
         ),
-        width: 140,
+        width: 160,
         ellipsis: true,
       },
       {
@@ -265,47 +301,48 @@ const TotalRevenueList = () => {
         width: 80,
       },
     ],
-    [navigate, dispatch]
+    [navigate, dispatch, incomeIdMap]
   );
 
+  // Map incomes to data source with camelCase fields, including subcategory-specific ones
   const dataSource = useMemo(
     () =>
       incomes?.map((income) => ({
         key: income._id,
-        category: income.category?.[0]?.categoryName || "N/A",
+        categoryName: income.category?.[0]?.categoryName || "N/A",
         subCategory: income.subCategory || "N/A",
         paymentType: income.paymentType || "N/A",
         discount: income.discount || 0,
         discountType: income.discountType || "percentage",
-        final_amount: income.final_amount || 0,
-        paid_amount: income.paid_amount || 0,
-        remaining_amount: income.remaining_amount || 0,
+        finalAmount: income.final_amount || 0,
+        paidAmount: income.paid_amount || 0,
+        remainingAmount: income.remaining_amount || 0,
         penalty: income.penalty || 0,
         earnedDate: income.paidDate || income.generateDate || null,
-        total_amount: income.total_amount || 0,
+        totalAmount: income.total_amount || 0,
       })),
     [incomes]
   );
 
+  // Custom components for table headers
   const components = {
     header: {
       cell: CustomHeaderCell,
     },
   };
 
+  // Table summary (totals row)
   const summary = (pageData) => {
     let totalFinalAmount = 0;
     let totalPaidAmount = 0;
     let totalRemainingAmount = 0;
-    let totalDiscount = 0;
     let totalPenalty = 0;
 
     pageData.forEach(
-      ({ final_amount, paid_amount, remaining_amount, discount, penalty }) => {
-        totalFinalAmount += final_amount;
-        totalPaidAmount += paid_amount;
-        totalRemainingAmount += remaining_amount;
-        totalDiscount += discount;
+      ({ finalAmount, paidAmount, remainingAmount, penalty }) => {
+        totalFinalAmount += finalAmount;
+        totalPaidAmount += paidAmount;
+        totalRemainingAmount += remainingAmount;
         totalPenalty += penalty;
       }
     );
@@ -316,6 +353,10 @@ const TotalRevenueList = () => {
           <strong>Totals:</strong>
         </Table.Summary.Cell>
         <Table.Summary.Cell index={1} />
+        {/* Uncomment the following blocks if Payment Type and Discount are displayed */}
+        {/* <Table.Summary.Cell index={2} />
+        <Table.Summary.Cell index={3} />
+        */}
         <Table.Summary.Cell index={2}>
           <strong>{formatCurrency(totalFinalAmount)}</strong>
         </Table.Summary.Cell>
@@ -335,7 +376,6 @@ const TotalRevenueList = () => {
   };
 
   // Compute pageSize from totalRecords and totalPages to reflect backend pagination
-  // This ensures pagination UI shows correct number of pages as per backend
   const computedPageSize =
     totalPages > 0 ? Math.ceil(totalRecords / totalPages) : pageSize;
 
@@ -456,7 +496,7 @@ const TotalRevenueList = () => {
           </div>
         </div>
 
-        {/* Error Message
+        {/* Error Message */}
         {error && (
           <Alert
             message="Error"
@@ -466,7 +506,7 @@ const TotalRevenueList = () => {
             closable
             className="my-4 text-xs"
           />
-        )} */}
+        )}
 
         {/* No Data Placeholder */}
         {!loading && incomes.length === 0 && !error && (
@@ -508,10 +548,15 @@ const TotalRevenueList = () => {
             summary={summary}
             onRow={(record) => ({
               onClick: () => {
-                dispatch(setReadOnly(true));
-                navigate("/finance/earning/add", {
-                  state: { incomeData: record },
-                });
+                console.log("Row clicked:", record); // Debugging line
+                const incomeToView = incomeIdMap[record.key];
+                if (incomeToView) {
+                  dispatch(setReadOnly(true));
+                  dispatch(setSelectedIncome(incomeToView)); // Dispatch selected income to Redux
+                  navigate("/finance/earning/add"); // Navigate to AddEarnings without state
+                } else {
+                  toast.error("Selected income not found.");
+                }
               },
             })}
           />
@@ -522,9 +567,9 @@ const TotalRevenueList = () => {
           visible={isDeleteModalVisible}
           onClose={() => {
             setIsDeleteModalVisible(false);
-            setSelectedIncome(null);
+            setSelectedIncomeForDeletion(null);
           }}
-          income={selectedIncome}
+          income={selectedIncomeForDeletion}
         />
         <ExportModal
           visible={isExportModalVisible}

@@ -55,15 +55,9 @@ const Header = ({
         </h1>
         {!readOnly && ( // Hide buttons if readOnly is true
           <div className="flex gap-4">
-            {/* <button
-              onClick={onReset}
-              className="bg-gray-100 text-gray-700 text-sm font-medium px-6 py-2 rounded-md border border-gray-300 hover:bg-gray-200 transition"
-            >
-              Reset
-            </button> */}
-            {/* Use type="submit" to rely on Formik's onSubmit */}
+            {/* Submit Button (Save or Update) */}
             <button
-              type="submit"
+              type="submit" // Formik will handle the submit
               className="bg-gradient-to-r from-pink-500 to-purple-500 text-white text-sm font-medium px-6 py-2 rounded-md shadow-md hover:from-pink-600 hover:to-purple-600 transition"
             >
               {isUpdate ? "Update Earnings" : "Save Earnings"}

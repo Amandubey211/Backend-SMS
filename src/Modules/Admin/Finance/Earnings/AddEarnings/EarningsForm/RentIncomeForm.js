@@ -20,13 +20,13 @@ const rentDetailsFields = [
     placeholder: "Enter renter's name",
   },
   {
-    name: "startDate",
+    name: "start_date", // Ensure snake_case
     label: "Start Date",
     type: "date",
     placeholder: "Select start date",
   },
   {
-    name: "endDate",
+    name: "end_date", // Ensure snake_case
     label: "End Date",
     type: "date",
     placeholder: "Select end date",
