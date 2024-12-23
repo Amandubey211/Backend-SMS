@@ -54,15 +54,108 @@ const AddEarnings = () => {
     if (selectedIncome) {
       const incomeData = selectedIncome;
       console.log("Prefilled Income Data:", incomeData); // Debugging line
-      const subCategory = incomeData.sub_category;
+
+      // **1. Extract 'subCategory' correctly from 'selectedIncome'**
+      const subCategory = incomeData.subCategory || incomeData.sub_category;
+
       const categoryName =
         incomeData.category?.[0]?.categoryName || "Facility-Based Revenue";
 
-      // Merge top-level fields with subcategory-specific fields
+      // **2. Extract subcategory-specific fields from 'selectedIncome'**
+      // Assuming subcategory-specific data is directly present in 'selectedIncome'
+      // If they are nested, adjust accordingly (e.g., incomeData.rentIncome.name)
+      let specificFields = {};
+
+      switch (subCategory) {
+        case "Rent Income":
+          specificFields = {
+            name: incomeData.name || "",
+            startDate: incomeData.startDate || "",
+            endDate: incomeData.endDate || "",
+            nameOfRenter: incomeData.nameOfRenter || "",
+          };
+          break;
+        case "Exam Center Fees":
+          specificFields = {
+            examName: incomeData.examName || "",
+            startDate: incomeData.startDate || "",
+            endDate: incomeData.endDate || "",
+            mobileNumber: incomeData.mobileNumber || "",
+          };
+          break;
+        case "Parking Fees":
+          specificFields = {
+            vehicleType: incomeData.vehicleType || "",
+            name: incomeData.name || "",
+            userType: incomeData.userType || "",
+            otherVehicleDetails: incomeData.otherVehicleDetails || "",
+            otherUserDetails: incomeData.otherUserDetails || "",
+          };
+          break;
+        case "Stationery Fees":
+          specificFields = {
+            stationeryItems: incomeData.stationeryItems || "",
+          };
+          break;
+        case "Other Facility Fees":
+          specificFields = {
+            facilityName: incomeData.facilityName || "",
+            accessDuration: incomeData.accessDuration || "",
+          };
+          break;
+        case "Subscription Fees":
+          specificFields = {
+            subscriptionName: incomeData.subscriptionName || "",
+            description: incomeData.description || "",
+          };
+          break;
+        case "Workshop/Training Fees":
+          specificFields = {
+            sessionTitle: incomeData.sessionTitle || "",
+            hostName: incomeData.hostName || "",
+            timePeriod: incomeData.timePeriod || "",
+          };
+          break;
+        case "Canteen Profit":
+          specificFields = {
+            periodOfEarnings: incomeData.periodOfEarnings || "",
+            description: incomeData.description || "",
+          };
+          break;
+        case "Donations":
+          specificFields = {
+            name: incomeData.name || "",
+            phoneNumber: incomeData.phoneNumber || "",
+            address: incomeData.address || "",
+          };
+          break;
+        case "Fundraising/Sponsorships":
+          specificFields = {
+            companyName: incomeData.companyName || "",
+            phoneNumber: incomeData.phoneNumber || "",
+            address: incomeData.address || "",
+          };
+          break;
+        case "Investments":
+          specificFields = {
+            name: incomeData.name || "",
+            profitOrLoss: incomeData.profitOrLoss || "",
+            fromDate: incomeData.fromDate || "",
+            toDate: incomeData.toDate || "",
+            investmentAmount: incomeData.investmentAmount || 0,
+            returnAmount: incomeData.returnAmount || 0,
+          };
+          break;
+        // Add other subCategories as needed
+        default:
+          break;
+      }
+
+      // **3. Construct 'initialValues' without spreading 'initialValuesMap'**
       const initialValues = {
         _id: incomeData._id || "",
         categoryName: categoryName,
-        sub_category: subCategory || selectedSubCategory,
+        sub_category: subCategory || selectedSubCategory, // Assign to 'sub_category'
         paymentType: incomeData.paymentType || "cash",
         paymentStatus: incomeData.paymentStatus || "paid",
         paid_amount: incomeData.paid_amount || 0,
@@ -79,8 +172,8 @@ const AddEarnings = () => {
         final_amount: incomeData.final_amount || 0,
         receipt: incomeData.receipt || null,
         description: incomeData.description || "",
-        // Spread specific fields based on subCategory
-        ...(initialValuesMap[subCategory] || {}),
+        // **4. Spread subcategory-specific fields from 'specificFields'**
+        ...specificFields,
       };
 
       console.log("Initial Form Values:", initialValues); // Debugging line
@@ -88,7 +181,7 @@ const AddEarnings = () => {
       return initialValues;
     }
 
-    // Initialize fields based on the selectedSubCategory
+    // **5. When not editing, initialize with default values and spread 'initialValuesMap'**
     const initialValues = {
       _id: "",
       categoryName: selectedCategory,
@@ -134,13 +227,15 @@ const AddEarnings = () => {
   // Handle form submission for adding or updating earnings
   const handleSaveOrUpdate = async (values, actions) => {
     try {
-      // Destructure fields
-      const { _id, categoryName, subCategory, description, receipt, ...rest } =
+      // **1. Destructure 'sub_category' instead of 'subCategory'**
+      const { _id, categoryName, sub_category, description, receipt, ...rest } =
         values;
 
       let specificFields = {};
 
-      switch (subCategory) {
+      switch (
+        sub_category // Use 'sub_category'
+      ) {
         case "Rent Income":
           specificFields = {
             name: values.name,
@@ -225,10 +320,10 @@ const AddEarnings = () => {
           break;
       }
 
-      // Construct the nested payload
+      // **2. Map 'sub_category' back to 'subCategory' in the payload**
       const payloadCamelCase = {
         categoryName: categoryName, // Top-level field
-        sub_category: subCategory, // Top-level field
+        subCategory: sub_category, // Map 'sub_category' to 'subCategory'
         description: description, // Top-level field
         receipt: receipt, // Top-level field
         paymentType: values.paymentType,
@@ -248,7 +343,7 @@ const AddEarnings = () => {
         ...specificFields,
       };
 
-      // Convert all numeric fields to numbers to prevent NaN
+      // **3. Convert all numeric fields to numbers to prevent NaN**
       const numericFields = [
         "paid_amount",
         "advance_amount",
@@ -278,7 +373,7 @@ const AddEarnings = () => {
 
       if (selectedIncome && !readOnly) {
         // Update existing record
-        const id = payloadCamelCase._id;
+        const id = selectedIncome?._id;
         await dispatch(
           updateEarnings({ values: payloadCamelCase, category, id })
         ).unwrap();
@@ -302,7 +397,7 @@ const AddEarnings = () => {
     }
   };
 
-  // Initialize component state based on selectedIncome
+  // **4. Update the useEffect Hook to correctly set 'selectedSubCategory'**
   useEffect(() => {
     if (selectedIncome) {
       const incomeData = selectedIncome;
@@ -310,7 +405,7 @@ const AddEarnings = () => {
       const categoryName =
         incomeData.category?.[0]?.categoryName || "Facility-Based Revenue";
       setSelectedCategory(categoryName);
-      setSelectedSubCategory(incomeData.sub_category || "Rent Income");
+      setSelectedSubCategory(incomeData.subCategory || "Rent Income"); // Use 'subCategory'
       setDescription(incomeData.description || "");
     } else {
       dispatch(setReadOnly(false));
@@ -354,7 +449,7 @@ const AddEarnings = () => {
         <Formik
           enableReinitialize
           initialValues={getInitialValues()}
-          validationSchema={getValidationSchema()}
+          // validationSchema={getValidationSchema()}
           onSubmit={handleSaveOrUpdate}
         >
           {({ resetForm, isSubmitting, values, setFieldValue }) => (
@@ -412,16 +507,16 @@ const AddEarnings = () => {
                   resetForm({
                     values: {
                       _id: "", // Reset _id for new entries
-                      categoryName: category, // Changed to snake_case
-                      sub_category: firstSubCategory, // Changed to snake_case
-                      paymentType: "cash", // Changed to snake_case
-                      paymentStatus: "paid", // Changed to snake_case
+                      categoryName: category,
+                      sub_category: firstSubCategory, // Use 'sub_category'
+                      paymentType: "cash",
+                      paymentStatus: "paid",
                       paid_amount: 0,
-                      paidBy: "Auto", // Changed to snake_case
+                      paidBy: "Auto",
                       advance_amount: 0,
                       remaining_amount: 0,
                       tax: 0,
-                      discountType: "percentage", // Changed to snake_case
+                      discountType: "percentage",
                       discount: 0,
                       penalty: 0,
                       frequencyOfPayment: "Monthly",
@@ -430,6 +525,7 @@ const AddEarnings = () => {
                       final_amount: 0,
                       receipt: null,
                       description: "",
+                      // **6. Spread 'initialValuesMap' only for the new subcategory**
                       ...initialValuesMap[firstSubCategory],
                     },
                   });
@@ -441,16 +537,16 @@ const AddEarnings = () => {
                   resetForm({
                     values: {
                       _id: "", // Reset _id for new entries
-                      categoryName: selectedCategory, // Changed to snake_case
-                      subCategory: subCategory, // Changed to snake_case
+                      categoryName: selectedCategory,
+                      sub_category: subCategory, // Use 'sub_category'
                       paymentType: "cash",
                       paymentStatus: "paid",
                       paid_amount: 0,
-                      paidBy: "Auto", // Changed to snake_case
+                      paidBy: "Auto",
                       advance_amount: 0,
                       remaining_amount: 0,
                       tax: 0,
-                      discountType: "percentage", // Changed to snake_case
+                      discountType: "percentage",
                       discount: 0,
                       penalty: 0,
                       frequencyOfPayment: "Monthly",
@@ -459,6 +555,7 @@ const AddEarnings = () => {
                       final_amount: 0,
                       receipt: null,
                       description: "",
+                      // **7. Spread 'initialValuesMap' only for the new subcategory**
                       ...initialValuesMap[subCategory],
                     },
                   });

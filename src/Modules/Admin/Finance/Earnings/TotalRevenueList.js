@@ -217,29 +217,27 @@ const TotalRevenueList = () => {
         ellipsis: true,
       },
       // Uncomment the following block if you wish to display Payment Type
-      /*
-      {
-        title: "Payment Type",
-        dataIndex: "paymentType",
-        key: "paymentType",
-        render: (text) => (
-          <Tooltip
-            title={`Payment Type: ${
-              text.charAt(0).toUpperCase() + text.slice(1)
-            }`}
-          >
-            <span className="text-xs flex items-center gap-1">
-              {paymentTypeIcons[text.toLowerCase()] || <CreditCardOutlined />}
-              {text.charAt(0).toUpperCase() + text.slice(1)}
-            </span>
-          </Tooltip>
-        ),
-        width: 150,
-        ellipsis: true,
-      },
-      */
+
+      // {
+      //   title: "Payment Type",
+      //   dataIndex: "paymentType",
+      //   key: "paymentType",
+      //   render: (text) => (
+      //     <Tooltip
+      //       title={`Payment Type: ${
+      //         text.charAt(0).toUpperCase() + text.slice(1)
+      //       }`}
+      //     >
+      //       <span className="text-xs flex items-center gap-1">
+      //         {paymentTypeIcons[text.toLowerCase()] || <CreditCardOutlined />}
+      //         {text.charAt(0).toUpperCase() + text.slice(1)}
+      //       </span>
+      //     </Tooltip>
+      //   ),
+      //   width: 150,
+      //   ellipsis: true,
+      // },
       // Uncomment the following block if you wish to display Discount
-      /*
       {
         title: "Discount",
         dataIndex: "discount",
@@ -254,10 +252,9 @@ const TotalRevenueList = () => {
               {value || 0} QR
             </Tag>
           ),
-        width: 100,
+        width: 70,
         ellipsis: true,
       },
-      */
       {
         title: "Final Amount (QR)",
         dataIndex: "finalAmount",
