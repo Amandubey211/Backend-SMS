@@ -67,6 +67,9 @@ import QuotationMain from "../Modules/Admin/Finance/Quotations/QuotationMain.js"
 import RecentQuotationList from "../Modules/Admin/Finance/Quotations/RecentQuotationList.js";
 
 // lazy loaded routes
+const ExpenseMain = lazy(() =>
+  import("../Modules/Admin/Finance/Expense/ExpenseMain.js")
+);
 const AddExpense = lazy(() =>
   import("../Modules/Admin/Finance/Expense/AddExpense/AddExpense.js")
 );
@@ -895,7 +898,7 @@ function App() {
       path: "/finance/expenses",
       element: (
         <ProtectRoute
-          Component={Expenses}
+          Component={ExpenseMain}
           allowedRoles={["admin", "accountant"]}
         />
       ),
