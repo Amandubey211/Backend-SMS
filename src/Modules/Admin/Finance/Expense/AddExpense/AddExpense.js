@@ -14,19 +14,20 @@ import {
   clearSelectedExpense,
 } from "../../../../../Store/Slices/Finance/Expenses/expensesSlice";
 import {
-  addExpenses,
-  updateExpenses,
+  addExpense,
+  updateExpense,
 } from "../../../../../Store/Slices/Finance/Expenses/expensesThunks";
 import { Button } from "antd";
 import { EditOutlined } from "@ant-design/icons";
 import { formComponentsMap, initialValuesMap } from "../Config/formConfig";
 import { validationSchemas } from "../Config/validationSchemas";
 import toast from "react-hot-toast";
+import useNavHeading from "../../../../../Hooks/CommonHooks/useNavHeading ";
 
 const AddExpenses = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
+  useNavHeading("Expenses", "Add");
   // Redux state
   const { readOnly, error, selectedExpense } = useSelector(
     (state) => state.admin.expenses
@@ -141,17 +142,19 @@ const AddExpenses = () => {
           payload[field] = Number(payload[field]);
         }
       });
-
+      let category = selectedCategory;
       if (selectedExpense) {
         // Update existing record
         const id = selectedExpense._id;
-        await dispatch(updateExpenses({ id, values: payload })).unwrap();
+        await dispatch(
+          updateExpense({ values: payload, category, id })
+        ).unwrap();
         toast.success("Expense updated successfully!");
         dispatch(clearSelectedExpense());
         navigate("/finance/total-expense-list");
       } else {
         // Add new record
-        await dispatch(addExpenses({ values: payload })).unwrap();
+        await dispatch(addExpense({ values: payload, category })).unwrap();
         toast.success("Expense added successfully!");
         navigate("/finance/total-expense-list");
       }

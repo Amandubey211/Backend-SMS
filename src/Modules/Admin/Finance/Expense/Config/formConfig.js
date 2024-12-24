@@ -29,33 +29,34 @@ import CanteenEquipmentMaintenanceForm from "../AddExpense/ExpenseForms/CanteenE
 // Initial values for each subCategory with flat fields
 export const initialValuesMap = {
   "Teaching Staffs": {
-    employeeName: "",
-    staffID: "",
-    salaryAmount: "",
-    paymentDate: "",
-    jobTitle: "",
-    department: "",
-    phoneNumber: "",
-    email: "",
-    address: "",
-    accountNumber: "",
-    accountHolderName: "",
-    ifsc: "",
-    bankName: "",
-    branchName: "",
-    baseSalary: 0,
-    tax: 0,
-    deduction: 0,
-    penalty: 0,
-    bonus: 0,
-    netSalary: 0,
-    paymentStatus: "",
-    paymentType: "",
-    paidAmount: 0,
-    advanceAmount: 0,
-    remainingAmount: 0,
-    receipt: null,
+    employeeName: "Jane Doe", // Full name of the employee
+    staffId: "TS2024-001", // Unique staff identifier
+    salaryAmount: "7500", // Gross salary amount (as a string if needed)
+    paymentDate: "2024-12-25", // Date of payment (YYYY-MM-DD format)
+    jobTitle: "Senior Mathematics Teacher", // Job title of the employee
+    department: "Mathematics", // Department the employee belongs to
+    phoneNumber: "555-1234-567", // Contact phone number
+    email: "jane.doe@example.com", // Contact email address
+    address: "123 Elm Street, Springfield", // Residential address
+    accountNumber: "9876543210", // Bank account number for salary deposit
+    accountHolderName: "Jane Doe", // Name of the account holder
+    ifsc: "IFSC0001234", // IFSC code of the bank branch
+    bankName: "Springfield Bank", // Name of the bank
+    branchName: "Downtown Branch", // Specific branch name
+    baseSalary: 7500, // Base salary amount (number)
+    tax: 750, // Tax deducted (number)
+    deduction: 150, // Other deductions (number)
+    penalty: 0, // Penalties, if any (number)
+    bonus: 500, // Bonus amount, if any (number)
+    netSalary: 7500 - 750 - 150 + 500, // Calculated net salary (number)
+    paymentStatus: "Paid", // Status of the payment (e.g., Paid, Pending)
+    paymentType: "Direct Deposit", // Method of payment (e.g., Direct Deposit, Cheque)
+    paidAmount: 5100, // Amount actually paid (number)
+    advanceAmount: 0, // Any advance amount given (number)
+    remainingAmount: 0, // Any remaining amount to be paid (number)
+    receipt: "receipts/jane_doe_2024-12-25.pdf", // Path or URL to the payment receipt
   },
+
   "Non-Teaching Staffs": {
     employeeName: "",
     staffID: "",
@@ -116,6 +117,20 @@ export const initialValuesMap = {
   "Furniture Maintenance": {
     buildingName: "",
     furnitureType: "",
+    expenseType: "",
+    vendorName: "",
+    billingPeriod: "",
+    dateTime: "",
+    totalAmount: 0,
+    tax: 0,
+    discount: 0,
+    penalty: 0,
+    finalAmount: 0,
+    receipt: null,
+  },
+  "IT Equipment Maintenance": {
+    // Added new subcategory
+    equipmentType: "",
     expenseType: "",
     vendorName: "",
     billingPeriod: "",
@@ -434,18 +449,20 @@ export const formComponentsMap = {
     "Teaching Staffs": TeachingStaffForm,
     "Non-Teaching Staffs": NonTeachingStaffForm,
   },
-  "Utilities & Maintenance": {
+  "Utilities and Maintenance": {
+    // Updated main category name
     Utilities: UtilitiesForm,
     "Building Maintenance": BuildingMaintenanceForm,
     "Furniture Maintenance": FurnitureMaintenanceForm,
-    "IT Equipment Maintenance": ITSoftwareForm,
-    "Transport Maintenance": FuelCostsForm,
+    "IT Equipment Maintenance": ITSoftwareForm, // Ensures consistency with initialValuesMap
+    "Fuel Costs": FuelCostsForm, // Changed from "Transport Maintenance" to "Fuel Costs" for consistency
   },
   Supplies: {
-    "Stationery Supplies": ClassroomOfficePurposeForm,
+    "Classroom & Office Purpose": ClassroomOfficePurposeForm, // Updated subcategory name for clarity
     "Canteen Supplies": CanteenSuppliesForm,
   },
-  "Event & Activity Expenses": {
+  "Event and Activity Costs": {
+    // Updated main category name
     Decorations: DecorationsForm,
     "Equipment Rentals": EquipmentRentalsForm,
     "Prizes and Gifts": PrizesAndGiftsForm,
@@ -456,7 +473,7 @@ export const formComponentsMap = {
   },
   "Examination and Affiliation": {
     "Printing Exam Papers": PrintingExamPapersForm,
-    "Invigilation Fees": ExaminationInvigilatorForm,
+    "Examination Invigilator Payments": ExaminationInvigilatorForm, // Updated subcategory name for consistency
     "Affiliation Fees": AffiliationFeesForm,
   },
   "IT and Software": {
