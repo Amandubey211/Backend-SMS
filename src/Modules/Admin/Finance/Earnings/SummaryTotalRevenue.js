@@ -1,23 +1,33 @@
-// src/components/SummaryTotalRevenue.jsx
-
-import React, { useEffect, useState, useCallback } from "react";
-import { Table, Input, Spin, Alert } from "antd";
-import { SearchOutlined } from "@ant-design/icons";
+import React, { useEffect, useCallback } from "react";
+import { Table, Spin, Alert, Button, Tag, Tooltip } from "antd";
+import {
+  DollarOutlined,
+  CloudOutlined,
+  CreditCardOutlined,
+} from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllIncomes } from "../../../../Store/Slices/Finance/Earnings/earningsThunks";
 import debounce from "lodash.debounce";
+import { setCurrentPage } from "../../../../Store/Slices/Finance/Earnings/earningsSlice";
+
+// Mapping payment types to corresponding icons
+const paymentTypeIcons = {
+  cash: <DollarOutlined />,
+  online: <CloudOutlined />,
+  credit: <CreditCardOutlined />,
+};
 
 const SummaryTotalRevenue = () => {
-  const [searchText, setSearchText] = useState("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  // Selectors
-  const { incomes, loading, error, totalRecords, totalPages, currentPage } =
-    useSelector((state) => state.admin.earnings);
+  // Extracting necessary state from Redux store
+  const { incomes, loading, error, totalRecords } = useSelector(
+    (state) => state.admin.earnings
+  );
 
-  // Debounced search to optimize API calls
+  // Debounced function to fetch incomes with a fixed limit of 5
   const debouncedFetch = useCallback(
     debounce((params) => {
       dispatch(fetchAllIncomes(params));
@@ -25,205 +35,117 @@ const SummaryTotalRevenue = () => {
     [dispatch]
   );
 
-  // Fetch incomes on component mount and when dependencies change
+  // Fetch data on component mount with limit set to 5
   useEffect(() => {
     const params = {
-      search: searchText,
-      page: currentPage,
-      limit: 5, // Adjust as needed
-      sortBy: "earnedDate", // Default sort field
-      sortOrder: "desc", // Default sort order
-      // Add more query params as needed
+      page: 1, // Always fetch the first page
+      limit: 5, // Limit to 5 records
+      sortBy: "earnedDate",
+      sortOrder: "desc",
     };
     debouncedFetch(params);
-  }, [debouncedFetch, searchText, currentPage]);
+  }, [debouncedFetch]);
 
-  // Table columns with filters and sorting
+  // Handle "View More" button click
+  const handleViewMore = () => {
+    navigate("/finance/total-revenue-list");
+  };
+
+  // Define table columns with fixed widths and ellipsis
   const columns = [
     {
       title: "Category",
       dataIndex: "category",
       key: "category",
-      sorter: (a, b) => a.category.localeCompare(b.category),
-      render: (text) => <span>{text}</span>,
+      render: (text) => <span className="text-xs">{text}</span>,
+      width: 120,
+      ellipsis: true,
     },
     {
       title: "Subcategory",
       dataIndex: "subCategory",
       key: "subCategory",
-      sorter: (a, b) => a.subCategory.localeCompare(b.subCategory),
-      render: (text) => <span>{text}</span>,
-    },
-    {
-      title: "Description",
-      dataIndex: "description",
-      key: "description",
-      sorter: (a, b) => a.description.localeCompare(b.description),
-      render: (text) => <span>{text}</span>,
-    },
-    {
-      title: "From",
-      dataIndex: "from",
-      key: "from",
-      sorter: (a, b) => a.from.localeCompare(b.from),
-      render: (text) => <span>{text}</span>,
-    },
-    {
-      title: "Academic Year",
-      dataIndex: "academicYear",
-      key: "academicYear",
-      sorter: (a, b) => a.academicYear.localeCompare(b.academicYear),
-      render: (text) => <span>{text}</span>,
+      render: (text) => <span className="text-xs">{text}</span>,
+      width: 150,
+      ellipsis: true,
     },
     {
       title: "Payment Type",
       dataIndex: "paymentType",
       key: "paymentType",
-      sorter: (a, b) => a.paymentType.localeCompare(b.paymentType),
-      filters: [
-        { text: "Cash", value: "cash" },
-        { text: "Online", value: "online" },
-      ],
-      onFilter: (value, record) => record.paymentType === value,
-      render: (text) => <span>{text}</span>,
-    },
-    {
-      title: "Payment Status",
-      dataIndex: "paymentStatus",
-      key: "paymentStatus",
-      sorter: (a, b) => a.paymentStatus.localeCompare(b.paymentStatus),
-      filters: [
-        { text: "Paid", value: "paid" },
-        { text: "Unpaid", value: "unpaid" },
-      ],
-      onFilter: (value, record) => record.paymentStatus === value,
-      render: (text) => <span>{text}</span>,
-    },
-    {
-      title: "Tax (%)",
-      dataIndex: "tax",
-      key: "tax",
-      sorter: (a, b) => a.tax - b.tax,
-      render: (value) => <span>{value || "0"}%</span>,
+      render: (text) => (
+        <Tooltip
+          title={`Payment Type: ${
+            text.charAt(0).toUpperCase() + text.slice(1)
+          }`}
+        >
+          <span className="text-xs flex items-center gap-1">
+            {paymentTypeIcons[text.toLowerCase()] || <CreditCardOutlined />}
+            {text.charAt(0).toUpperCase() + text.slice(1)}
+          </span>
+        </Tooltip>
+      ),
+      width: 130,
+      ellipsis: true,
     },
     {
       title: "Discount",
       dataIndex: "discount",
       key: "discount",
-      sorter: (a, b) => a.discount - b.discount,
       render: (value, record) =>
-        record.discountType === "percentage"
-          ? `${value || 0}%`
-          : `${value || 0} QR`,
-    },
-    {
-      title: "Penalty (QR)",
-      dataIndex: "penalty",
-      key: "penalty",
-      sorter: (a, b) => a.penalty - b.penalty,
-      render: (value) => <span>{value || "0"} QR</span>,
-    },
-    {
-      title: "Total Amount (QR)",
-      dataIndex: "total_amount",
-      key: "total_amount",
-      sorter: (a, b) => a.total_amount - b.total_amount,
-      render: (value) => <span>{value || "0"} QR</span>,
+        record.discountType === "percentage" ? (
+          <Tag color="purple" className="text-xs">
+            {value || 0}%
+          </Tag>
+        ) : (
+          <Tag color="orange" className="text-xs">
+            {value || 0} QR
+          </Tag>
+        ),
+      width: 100,
+      ellipsis: true,
     },
     {
       title: "Final Amount (QR)",
       dataIndex: "final_amount",
       key: "final_amount",
-      sorter: (a, b) => a.final_amount - b.final_amount,
-      render: (value) => <span>{value || "0"} QR</span>,
+      render: (value) => <span className="text-xs">{value || "0"} QR</span>,
+      width: 120,
+      ellipsis: true,
     },
     {
       title: "Paid Amount (QR)",
       dataIndex: "paid_amount",
       key: "paid_amount",
-      sorter: (a, b) => a.paid_amount - b.paid_amount,
-      render: (value) => <span>{value || "0"} QR</span>,
+      render: (value) => (
+        <span className="text-xs text-green-600">{value || "0"} QR</span>
+      ),
+      width: 120,
+      ellipsis: true,
     },
     {
       title: "Remaining Amount (QR)",
       dataIndex: "remaining_amount",
       key: "remaining_amount",
-      sorter: (a, b) => a.remaining_amount - b.remaining_amount,
-      render: (value) => <span>{value || "0"} QR</span>,
-    },
-    {
-      title: "Earned Date",
-      dataIndex: "earnedDate",
-      key: "earnedDate",
-      sorter: (a, b) => new Date(a.earnedDate) - new Date(b.earnedDate),
-      render: (date) => (date ? new Date(date).toLocaleDateString() : "N/A"),
-    },
-    {
-      title: "Action",
-      key: "action",
-      render: () => (
-        <span className="cursor-pointer text-gray-500 hover:text-gray-700">
-          ...
-        </span>
+      render: (value) => (
+        <span className="text-xs text-red-600">{value || "0"} QR</span>
       ),
+      width: 140,
+      ellipsis: true,
     },
   ];
 
-  // Search input change handler
-  const handleSearch = (e) => {
-    setSearchText(e.target.value);
-    // Optionally, reset to first page on new search
-    // dispatch(setCurrentPage(1)); if you have such an action
-  };
-
-  // Handle "View More" navigation
-  const handleViewMore = () => {
-    navigate("/finance/total-revenue-list");
-  };
-
-  // Handle table pagination and sorting change
-  const handleTableChange = (pagination, filters, sorter) => {
-    const newPage = pagination.current;
-    const newSortBy = sorter.field || "earnedDate";
-    const newSortOrder = sorter.order === "descend" ? "desc" : "asc";
-
-    const params = {
-      search: searchText,
-      page: newPage,
-      limit: 5, // Adjust as needed
-      sortBy: newSortBy,
-      sortOrder: newSortOrder,
-      // Include any additional filters here
-      ...filters,
-    };
-
-    dispatch(fetchAllIncomes(params));
-  };
-
-  // Map incomes data to table dataSource
-  const dataSource = incomes.map((income) => ({
+  // Transform incomes data to table dataSource and limit to 5 records
+  const dataSource = incomes?.slice(0, 5).map((income) => ({
     key: income._id,
     category: income.category?.[0]?.categoryName || "N/A",
     subCategory: income.subCategory || "N/A",
-    description: income.description || "N/A",
-    from:
-      income.collectBy ||
-      `${income.studentDetails?.firstName || ""} ${
-        income.studentDetails?.lastName || ""
-      }`.trim() ||
-      "N/A",
-    academicYear: income.academicYearDetails?.[0]?.year || "N/A",
     paymentType: income.paymentType || "N/A",
-    paymentStatus: income.paymentStatus || "N/A",
-    tax: income.tax,
-    discount: income.discount,
-    discountType: income.discountType,
-    penalty: income.penalty,
-    total_amount: income.total_amount,
-    final_amount: income.final_amount,
-    paid_amount: income.paid_amount,
-    remaining_amount: income.remaining_amount,
-    earnedDate: income.paidDate || income.generateDate || "N/A",
+    discount: income.discount || 0,
+    discountType: income.discountType || "percentage",
+    final_amount: income.final_amount || 0,
+    paid_amount: income.paid_amount || 0,
+    remaining_amount: income.remaining_amount || 0,
   }));
 
   return (
@@ -231,25 +153,15 @@ const SummaryTotalRevenue = () => {
       {/* Header */}
       <div className="flex justify-between items-center">
         <h2 className="text-lg font-medium text-gray-700">
-          Summary of Total Revenue
+          Summary of Total Revenue ({dataSource?.length || 5}/{totalRecords})
         </h2>
-        <div className="flex items-center gap-4">
-          <Input
-            placeholder="Search"
-            prefix={<SearchOutlined />}
-            className="w-64"
-            value={searchText}
-            onChange={handleSearch}
-            allowClear
-          />
-          {/* View More Button */}
-          <button
-            onClick={handleViewMore}
-            className="px-4 py-2 bg-white border border-gray-300 rounded-md shadow hover:shadow-md transition cursor-pointer"
-          >
-            View More
-          </button>
-        </div>
+        <Button
+          onClick={handleViewMore}
+          className="px-4 py-2 bg-gradient-to-r from-[#C83B62] to-[#8E44AD] text-white rounded-md shadow hover:from-[#a3324e] hover:to-[#6e2384] transition text-xs"
+          size="small"
+        >
+          View More ({totalRecords})
+        </Button>
       </div>
 
       {/* Loading Indicator */}
@@ -258,7 +170,6 @@ const SummaryTotalRevenue = () => {
           <Spin tip="Loading..." />
         </div>
       )}
-
       {/* Error Message */}
       {error && (
         <Alert
@@ -269,22 +180,22 @@ const SummaryTotalRevenue = () => {
           closable
         />
       )}
-
+      {/* No Data Placeholder */}
+      {!loading && incomes.length === 0 && !error && (
+        <div className="text-center text-gray-500 text-xs py-4">
+          No records found.
+        </div>
+      )}
       {/* Table */}
-      {!loading && !error && (
+      {!loading && !error && incomes.length > 0 && (
         <Table
           dataSource={dataSource}
           columns={columns}
-          pagination={{
-            current: currentPage,
-            total: totalRecords,
-            pageSize: 5, // Adjust as needed
-            showSizeChanger: false,
-          }}
-          onChange={handleTableChange}
-          className="rounded-lg"
+          pagination={false} // Removed pagination controls
+          className="rounded-lg shadow text-xs"
           bordered
-          scroll={{ x: "max-content" }}
+          size="small"
+          tableLayout="fixed" // Fixed table layout
         />
       )}
     </div>

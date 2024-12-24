@@ -1,77 +1,57 @@
-import React from "react";
-import { Formik, Form } from "formik";
-import * as Yup from "yup";
-import FormSection from "../Component/FormSection";
-import PaymentDetails from "../Component/PaymentDetails";
-import PaymentStatus from "../Component/PaymentStatus";
+// src/Components/Admin/Finance/Earnings/EarningsForm/ExamCenterFeesForm.jsx
 
-// Configuration for Exam Center Details Fields
-const examCenterDetailsFields = [
+import React from "react";
+import { useFormikContext } from "formik";
+import FormSection from "../Component/FormSection"; // Reusable FormSection
+import PaymentDetails from "../Component/PaymentDetails"; // Static Component
+import PaymentStatus from "../Component/PaymentStatus"; // Static Component
+
+const examFeesFields = [
   {
     name: "examName",
     label: "Exam Name",
     type: "text",
-    placeholder: "Enter exam name",
+    placeholder: "Enter the name of the exam",
   },
   {
-    name: "userOrganisationName",
-    label: "User/Organisation Name",
-    type: "text",
-    placeholder: "Enter name",
+    name: "startDate",
+    label: "Start Date",
+    type: "date",
+    placeholder: "Select start date",
   },
   {
-    name: "phoneNumber",
-    label: "Phone Number",
-    type: "text",
-    placeholder: "Enter phone number",
+    name: "endDate",
+    label: "End Date",
+    type: "date",
+    placeholder: "Select end date",
   },
   {
-    name: "timePeriod",
-    label: "Time Period",
+    name: "mobileNumber",
+    label: "Mobile Number",
     type: "text",
-    placeholder: "Enter time period",
+    placeholder: "Enter mobile number",
   },
 ];
 
-// Validation Schema
-const validationSchema = Yup.object({
-  examName: Yup.string().required("Exam Name is required"),
-  userOrganisationName: Yup.string().required(
-    "User/Organisation Name is required"
-  ),
-  phoneNumber: Yup.string()
-    .required("Phone Number is required")
-    .matches(/^[0-9]{10}$/, "Phone Number must be 10 digits"),
-  timePeriod: Yup.string().required("Time Period is required"),
-});
+const ExamCenterFeesForm = () => {
+  const { setFieldValue, values } = useFormikContext();
 
-const ExamCenterFeesForm = ({ formData, onFormChange }) => {
   return (
-    <Formik
-      initialValues={formData}
-      validationSchema={validationSchema}
-      onSubmit={(values) => {
-        console.log("Submitted Values:", values);
-        onFormChange(values);
-      }}
-    >
-      {({ setFieldValue }) => (
-        <Form className="bg-white p-6 rounded-lg shadow-md">
-          {/* Exam Center Details Section */}
-          <FormSection
-            title="Exam Center Details"
-            fields={examCenterDetailsFields}
-            setFieldValue={setFieldValue}
-          />
+    <>
+      {/* Exam Center Details Section */}
+      <FormSection
+        title="Exam Center Details"
+        fields={examFeesFields}
+        setFieldValue={setFieldValue}
+        values={values}
+      />
 
-          {/* Static Payment Details Component */}
-          <PaymentDetails onFormChange={onFormChange} />
+      {/* Static PaymentDetails Component */}
+      <PaymentDetails />
 
-          {/* Static Payment Status Component */}
-          <PaymentStatus setFieldValue={setFieldValue} />
-        </Form>
-      )}
-    </Formik>
+      {/* Static PaymentStatus Component */}
+      <PaymentStatus />
+    </>
   );
 };
 

@@ -1,8 +1,14 @@
+// src/Components/Admin/Finance/Earnings/Component/SelectInput.jsx
+
 import React from "react";
 import { Field, ErrorMessage } from "formik";
 import { motion } from "framer-motion";
+import { useSelector } from "react-redux";
 
-const SelectInput = ({ label, name, options }) => {
+const SelectInput = ({ label, name, options, autoComplete = "off" }) => {
+  // Subscribe to Redux state
+  const readOnly = useSelector((state) => state.admin.earnings.readOnly);
+
   // Animation variants for the container
   const containerVariants = {
     hidden: { opacity: 0, x: -10 },
@@ -35,9 +41,13 @@ const SelectInput = ({ label, name, options }) => {
         as="select"
         id={name}
         name={name}
-        className="bg-white border border-gray-300 rounded-md px-4 py-3 text-sm text-gray-800 w-full focus:outline-none focus:ring-2 focus:ring-purple-300"
+        disabled={readOnly} // Disable select if readOnly
+        autoComplete={autoComplete}
+        className={`bg-white border border-gray-300 rounded-md px-4 py-3 text-sm text-gray-800 w-full focus:outline-none focus:ring-2 focus:ring-purple-300 ${
+          readOnly ? "cursor-not-allowed" : ""
+        }`}
       >
-        <option value="">Select</option>
+        <option value="" label={`Select ${label}`} />
         {options.map((option, index) => (
           <motion.option
             key={index}

@@ -59,6 +59,13 @@ import addStudentFeesForm from "../Modules/Admin/Finance/StudentFees/AddStudentF
 import SummaryRevenueList from "../Modules/Admin/Finance/StudentFees/SummaryRevenueList.js";
 import AddNewFees from "../Modules/Admin/Finance/StudentFees/AddNewFees/AddNewFees.js";
 import InvoicesMain from "../Modules/Admin/Finance/Invoices/InvoicesMain.js";
+import RecentInvoiceList from "../Modules/Admin/Finance/Invoices/RecentInvoiceList.js";
+import ReturnInvoiceList from "../Modules/Admin/Finance/Invoices/ReturnInvoiceList.js";
+import EarningMainSection from "../Modules/Admin/Finance/Earnings/EarningMainSection.js";
+import ReceiptsMain from "../Modules/Admin/Finance/Reciepts/ReceiptsMain.js";
+import RecentReceiptsList from "../Modules/Admin/Finance/Reciepts/RecentReceiptsList.js";
+import QuotationMain from "../Modules/Admin/Finance/Quotations/QuotationMain.js";
+import RecentQuotationList from "../Modules/Admin/Finance/Quotations/RecentQuotationList.js";
 
 // lazy loaded routes
 const AddExpense = lazy(() =>
@@ -879,7 +886,7 @@ function App() {
       path: "/finance/earning",
       element: (
         <ProtectRoute
-          Component={EarningDash}
+          Component={EarningMainSection}
           allowedRoles={["admin", "accountant"]}
         />
       ),
@@ -936,7 +943,7 @@ function App() {
       errorElement: <Error />,
     },
     {
-      path: "/finance/expense/add",
+      path: "/finance/expenses/add",
       element: (
         <ProtectRoute
           Component={AddExpense}
@@ -970,6 +977,66 @@ function App() {
       element: (
         <ProtectRoute
           Component={InvoicesMain}
+          allowedRoles={["admin", "accountant"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/finance/invoices/dashboard/recent-invoices",
+      element: (
+        <ProtectRoute
+          Component={RecentInvoiceList}
+          allowedRoles={["admin", "accountant"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/finance/invoices/dashboard/return-invoices",
+      element: (
+        <ProtectRoute
+          Component={ReturnInvoiceList}
+          allowedRoles={["admin", "accountant"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/finance/receipts",
+      element: (
+        <ProtectRoute
+          Component={ReceiptsMain}
+          allowedRoles={["admin", "accountant"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/finance/receipts/receipt-list",
+      element: (
+        <ProtectRoute
+          Component={RecentReceiptsList}
+          allowedRoles={["admin", "accountant"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/finance/quotations",
+      element: (
+        <ProtectRoute
+          Component={QuotationMain}
+          allowedRoles={["admin", "accountant"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/finance/quotations/quotations-list",
+      element: (
+        <ProtectRoute
+          Component={RecentQuotationList}
           allowedRoles={["admin", "accountant"]}
         />
       ),

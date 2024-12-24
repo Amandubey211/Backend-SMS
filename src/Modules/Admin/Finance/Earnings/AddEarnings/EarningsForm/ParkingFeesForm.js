@@ -1,75 +1,65 @@
-import React from "react";
-import { Formik, Form } from "formik";
-import * as Yup from "yup";
-import FormSection from "../Component/FormSection";
-import PaymentDetails from "../Component/PaymentDetails";
-import PaymentStatus from "../Component/PaymentStatus";
+// src/Components/Admin/Finance/Earnings/EarningsForm/ParkingFeesForm.jsx
 
-// Configuration for Parking Details Fields
+import React from "react";
+import { useFormikContext } from "formik";
+import FormSection from "../Component/FormSection"; // Reusable FormSection
+import PaymentDetails from "../Component/PaymentDetails"; // Static Component
+import PaymentStatus from "../Component/PaymentStatus"; // Static Component
+
 const parkingDetailsFields = [
   {
     name: "vehicleType",
     label: "Vehicle Type",
-    type: "text",
-    placeholder: "Enter vehicle type",
+    type: "select",
+    options: ["car", "bike", "bicycle", "bus", "van", "other"],
+    placeholder: "Select vehicle type",
   },
   {
-    name: "nameOfPerson",
-    label: "Name Of Person",
+    name: "name",
+    label: "Name",
     type: "text",
     placeholder: "Enter name",
-  },
-  {
-    name: "phoneNumber",
-    label: "Phone Number",
-    type: "text",
-    placeholder: "Enter phone number",
   },
   {
     name: "userType",
     label: "User Type",
     type: "select",
-    options: ["Employee", "Visitor", "Other"],
+    options: ["staff", "student", "other"],
+    placeholder: "Select user type",
+  },
+  {
+    name: "otherVehicleDetails",
+    label: "Other Vehicle Details",
+    type: "text",
+    placeholder: "Provide details if vehicle type is 'other'",
+  },
+  {
+    name: "otherUserDetails",
+    label: "Other User Details",
+    type: "text",
+    placeholder: "Provide details if user type is 'other'",
   },
 ];
 
-// Validation Schema
-const validationSchema = Yup.object({
-  vehicleType: Yup.string().required("Vehicle Type is required"),
-  nameOfPerson: Yup.string().required("Name of Person is required"),
-  phoneNumber: Yup.string()
-    .required("Phone Number is required")
-    .matches(/^[0-9]{10}$/, "Phone Number must be 10 digits"),
-  userType: Yup.string().required("User Type is required"),
-});
+const ParkingFeesForm = () => {
+  const { setFieldValue, values } = useFormikContext();
 
-const ParkingFeesForm = ({ formData, onFormChange }) => {
   return (
-    <Formik
-      initialValues={formData}
-      validationSchema={validationSchema}
-      onSubmit={(values) => {
-        console.log("Submitted Values:", values);
-        onFormChange(values); // Pass form values to parent
-      }}
-    >
-      {({ setFieldValue }) => (
-        <Form className="bg-white p-6 rounded-lg shadow-md">
-          {/* Parking Details Section */}
-          <FormSection
-            title="Parking Details"
-            fields={parkingDetailsFields}
-            setFieldValue={setFieldValue}
-          />
+    <>
+      {/* Parking Details Section */}
+      <FormSection
+        title="Parking Details"
+        fields={parkingDetailsFields}
+        setFieldValue={setFieldValue}
+        values={values}
+      />
 
-          {/* Static Payment Details Section */}
-          <PaymentDetails onFormChange={onFormChange} />
+      {/* Static PaymentDetails Component */}
+      <PaymentDetails />
 
-          {/* Static Payment Status Section */}
-          <PaymentStatus setFieldValue={setFieldValue} />
-        </Form>
-      )}
-    </Formik>
+      {/* Static PaymentStatus Component */}
+      <PaymentStatus />
+    </>
   );
 };
 

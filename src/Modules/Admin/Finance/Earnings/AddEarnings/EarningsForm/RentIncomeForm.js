@@ -1,67 +1,57 @@
+// src/Components/Admin/Finance/Earnings/EarningsForm/RentIncomeForm.jsx
+
 import React from "react";
-import { Formik, Form } from "formik";
-import * as Yup from "yup";
+import { useFormikContext } from "formik";
 import FormSection from "../Component/FormSection";
 import PaymentDetails from "../Component/PaymentDetails";
 import PaymentStatus from "../Component/PaymentStatus";
-import Button from "../Component/Button";
 
-// Configuration for Rent Details Fields
 const rentDetailsFields = [
   {
-    name: "rentName",
-    label: "Rent Name",
+    name: "name",
+    label: "Property Name",
     type: "text",
-    placeholder: "Enter rent name",
+    placeholder: "Enter property name",
   },
   {
-    name: "organisationName",
-    label: "User/Organisation Name",
+    name: "nameOfRenter",
+    label: "Name of Renter",
     type: "text",
-    placeholder: "Enter name",
+    placeholder: "Enter renter's name",
   },
   {
-    name: "timePeriod",
-    label: "Time Period",
-    type: "text",
-    placeholder: "Enter time period",
+    name: "start_date", // Ensure snake_case
+    label: "Start Date",
+    type: "date",
+    placeholder: "Select start date",
+  },
+  {
+    name: "end_date", // Ensure snake_case
+    label: "End Date",
+    type: "date",
+    placeholder: "Select end date",
   },
 ];
 
-// Validation Schema
-const validationSchema = Yup.object({
-  rentName: Yup.string().required("Rent Name is required"),
-  organisationName: Yup.string().required("User/Organisation Name is required"),
-  timePeriod: Yup.string().required("Time Period is required"),
-});
+const RentIncomeForm = () => {
+  const { setFieldValue, values } = useFormikContext();
 
-const RentIncomeForm = ({ formData, onFormChange }) => {
   return (
-    <Formik
-      initialValues={formData}
-      validationSchema={validationSchema}
-      onSubmit={(values) => {
-        console.log("Submitted Values:", values);
-        onFormChange(values); // Pass updated values to parent
-      }}
-    >
-      {({ setFieldValue }) => (
-        <Form className="bg-white p-6 rounded-lg shadow-md">
-          {/* Rent Details Section */}
-          <FormSection
-            title="Rent Details"
-            fields={rentDetailsFields}
-            setFieldValue={setFieldValue}
-          />
+    <>
+      {/* Rent Details Section */}
+      <FormSection
+        title="Rent Details"
+        fields={rentDetailsFields}
+        setFieldValue={setFieldValue}
+        values={values}
+      />
 
-          {/* Payment Details Section */}
-          <PaymentDetails onFormChange={onFormChange} />
+      {/* Payment Details Section */}
+      <PaymentDetails />
 
-          {/* Payment Status Section */}
-          <PaymentStatus onFormChange={onFormChange} />
-        </Form>
-      )}
-    </Formik>
+      {/* Payment Status Section */}
+      <PaymentStatus />
+    </>
   );
 };
 

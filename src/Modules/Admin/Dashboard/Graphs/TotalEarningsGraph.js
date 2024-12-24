@@ -38,7 +38,7 @@ const TotalEarningsGraph = () => {
     }
 
     // Dispatch fetchEarningsData with necessary parameters
-    dispatch(fetchEarningsData({ month, year, includeUnpaidExpenses }));
+    // dispatch(fetchEarningsData({ month, year, includeUnpaidExpenses }));
   };
 
   // Fetch data whenever selectedOption changes

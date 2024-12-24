@@ -1,60 +1,50 @@
+// src/Components/Admin/Finance/Earnings/EarningsForm/WorkshopTrainingFeesForm.jsx
+
 import React from "react";
-import { Formik, Form } from "formik";
-import * as Yup from "yup";
-import FormSection from "../Component/FormSection";
-import PaymentDetails from "../Component/PaymentDetails";
-import PaymentStatus from "../Component/PaymentStatus";
+import { useFormikContext } from "formik";
+import FormSection from "../Component/FormSection"; // Reusable FormSection
+import PaymentDetails from "../Component/PaymentDetails"; // Static Component
+import PaymentStatus from "../Component/PaymentStatus"; // Static Component
 
-// Configuration for Canteen Profit Details Fields
-const canteenProfitFields = [
-  {
-    name: "periodOfEarnings",
-    label: "Period Of Earnings",
-    type: "select",
-    options: ["Monthly", "Quarterly", "Half-yearly", "Yearly"],
-  },
-  {
-    name: "description",
-    label: "Any Description",
-    type: "text",
-    placeholder: "Enter description",
-  },
-];
+const WorkshopTrainingFeesForm = () => {
+  const { setFieldValue, values } = useFormikContext();
 
-// Validation Schema
-const validationSchema = Yup.object({
-  periodOfEarnings: Yup.string().required("Period Of Earnings is required"),
-  description: Yup.string(),
-});
+  const workshopDetailsFields = [
+    {
+      name: "sessionTitle",
+      label: "Session Title",
+      type: "text",
+      placeholder: "Enter session title",
+    },
+    {
+      name: "hostName",
+      label: "Host Name",
+      type: "text",
+      placeholder: "Enter host name",
+    },
+    {
+      name: "timePeriod",
+      label: "Time Period",
+      type: "text",
+      placeholder: "Enter time period",
+    },
+  ];
 
-const CanteenProfitForm = ({ formData, onFormChange }) => {
   return (
-    <Formik
-      initialValues={formData}
-      validationSchema={validationSchema}
-      onSubmit={(values) => {
-        console.log("Submitted Values:", values);
-        onFormChange(values); // Pass values back to parent
-      }}
-    >
-      {({ setFieldValue }) => (
-        <Form className="bg-white p-6 rounded-lg shadow-md">
-          {/* Canteen Profit Details Section */}
-          <FormSection
-            title="Canteen Profit"
-            fields={canteenProfitFields}
-            setFieldValue={setFieldValue}
-          />
+    <>
+      {/* Workshop/Training Details Section */}
+      <FormSection
+        title="Workshop/Training Details"
+        fields={workshopDetailsFields}
+        setFieldValue={setFieldValue}
+        values={values}
+      />
 
-          {/* Static Payment Details Component */}
-          <PaymentDetails onFormChange={onFormChange} />
-
-          {/* Static Payment Status Component */}
-          <PaymentStatus setFieldValue={setFieldValue} />
-        </Form>
-      )}
-    </Formik>
+      {/* Static PaymentDetails and PaymentStatus Sections */}
+      <PaymentDetails />
+      <PaymentStatus />
+    </>
   );
 };
 
-export default CanteenProfitForm;
+export default WorkshopTrainingFeesForm;

@@ -1,104 +1,119 @@
-import React from "react";
-import { useFormikContext } from "formik"; // Importing useFormikContext
-import { motion, AnimatePresence } from "framer-motion";
-import TextInput from "./TextInput";
-import SelectInput from "./SelectInput";
-import FileInput from "./FileInput";
+// src/Components/Admin/Finance/Earnings/EarningsForm/PaymentStatus.jsx
+
+import React, { useEffect, useState } from "react";
+import { useFormikContext } from "formik";
+import FormSection from "../Component/FormSection";
+
+const paymentStatusFields = [
+  {
+    name: "paymentStatus",
+    label: "Payment Status",
+    type: "select",
+    options: ["paid", "unpaid", "partial", "advance"],
+  },
+  {
+    name: "paid_amount", // Changed to snake_case
+    label: "Paid Amount (QR)",
+    type: "number",
+    placeholder: "Enter paid amount",
+    min: 0,
+  },
+  {
+    name: "paid_by", // Changed to snake_case
+    label: "Paid By",
+    type: "select",
+    options: ["Manual", "Auto"],
+  },
+  {
+    name: "payment_type", // Changed to snake_case
+    label: "Payment Type",
+    type: "select",
+    options: ["cash", "card", "online", "cheque", "other"],
+  },
+  {
+    name: "advance_amount",
+    label: "Advance Amount (QR)",
+    type: "number",
+    placeholder: "Enter advance amount",
+    min: 0,
+  },
+  {
+    name: "remaining_amount",
+    label: "Remaining Amount (QR)",
+    type: "number",
+    placeholder: "Enter remaining amount",
+    min: 0,
+    readOnly: true, // Make it read-only as it's calculated
+  },
+  {
+    name: "receipt",
+    label: "Add Receipt/Document",
+    type: "file",
+  },
+];
 
 const PaymentStatus = () => {
-  const { values, setFieldValue } = useFormikContext(); // Using Formik's useFormikContext hook
+  const { setFieldValue, values } = useFormikContext();
+  const [conditionalFields, setConditionalFields] = useState([]);
 
-  const fieldVariants = {
-    hidden: { opacity: 0, y: -10 },
-    visible: { opacity: 1, y: 0 },
-    exit: { opacity: 0, y: 10 },
-  };
+  // Determine conditional fields based on paymentType
+  useEffect(() => {
+    const newFields = [];
+
+    if (values.payment_type === "cheque") {
+      newFields.push({
+        name: "chequeNumber",
+        label: "Cheque Number",
+        type: "text",
+        placeholder: "Enter cheque number",
+      });
+    }
+
+    if (values.payment_type === "online") {
+      newFields.push({
+        name: "transactionId",
+        label: "Transaction ID",
+        type: "text",
+        placeholder: "Enter transaction ID",
+      });
+    }
+
+    setConditionalFields(newFields);
+  }, [values.payment_type]);
+
+  // Combine static and conditional fields
+  const combinedFields = [...paymentStatusFields, ...conditionalFields];
+
+  // Calculate remaining_amount whenever final_amount or paid_amount changes
+  useEffect(() => {
+    const finalAmount = Number(values.final_amount) || 0;
+    const paidAmount = Number(values.paid_amount) || 0;
+
+    const calculatedRemainingAmount = finalAmount - paidAmount;
+
+    // Avoid setting the field if the value hasn't changed
+    if (values.remaining_amount !== calculatedRemainingAmount) {
+      setFieldValue("remaining_amount", calculatedRemainingAmount);
+    }
+  }, [
+    values.final_amount,
+    values.paid_amount,
+    setFieldValue,
+    values.remaining_amount,
+  ]);
 
   return (
     <div className="mb-6">
       <h2 className="text-lg font-semibold text-gray-800 mb-4">
         Payment Status
       </h2>
-      <div className="grid grid-cols-3 gap-6">
-        <SelectInput
-          label="Payment Status"
-          name="paymentStatus"
-          options={["Paid", "Unpaid", "Partial", "Advance"]}
-          value={values.paymentStatus}
-        />
-        <TextInput
-          label="Paid Amount"
-          name="paidAmount"
-          placeholder="Enter paid amount"
-          value={values.paidAmount}
-        />
-        <SelectInput
-          label="Paid By"
-          name="paidBy"
-          options={["Manual", "Auto"]}
-          value={values.paymentType}
-        />
-        <SelectInput
-          label="Payment Type"
-          name="paymentType"
-          options={["Cash", "Card", "Online", "Cheque", "Others"]}
-          value={values.paymentType}
-        />
 
-        {/* Animate conditional fields */}
-        <AnimatePresence>
-          {values.paymentType === "Cheque" && (
-            <motion.div
-              variants={fieldVariants}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-              transition={{ duration: 0.3 }}
-            >
-              <TextInput
-                label="Cheque Number"
-                name="chequeNumber"
-                placeholder="Enter cheque number"
-                value={values.chequeNumber}
-              />
-            </motion.div>
-          )}
-          {values.paymentType === "Online" && (
-            <motion.div
-              variants={fieldVariants}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-              transition={{ duration: 0.3 }}
-            >
-              <TextInput
-                label="Transaction ID"
-                name="transactionId"
-                placeholder="Enter transaction ID"
-                value={values.transactionId}
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        <TextInput
-          label="Advance Amount"
-          name="advanceAmount"
-          placeholder="Enter advance amount"
-          value={values.advanceAmount}
-        />
-        <TextInput
-          label="Remaining Amount"
-          name="remainingAmount"
-          placeholder="Enter remaining amount"
-          value={values.remainingAmount}
-        />
-        <FileInput
-          label="Add receipt/document"
-          name="receipt"
-          onChange={(event) => setFieldValue("receipt", event.target.files[0])}
-        />
-      </div>
+      <FormSection
+        title=""
+        fields={combinedFields}
+        setFieldValue={setFieldValue}
+        values={values}
+      />
     </div>
   );
 };

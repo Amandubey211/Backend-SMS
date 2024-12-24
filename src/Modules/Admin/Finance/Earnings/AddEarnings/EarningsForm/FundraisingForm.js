@@ -1,53 +1,52 @@
+// src/Components/Admin/Finance/Earnings/EarningsForm/FundraisingForm.jsx
+
 import React from "react";
-import { Formik, Form } from "formik";
-import * as Yup from "yup";
-import FormSection from "../Component/FormSection";
-import PaymentDetails from "../Component/PaymentDetails";
-import PaymentStatus from "../Component/PaymentStatus";
-import Button from "../Component/Button";
+import { useFormikContext } from "formik";
+import FormSection from "../Component/FormSection"; // Reusable FormSection
+import PaymentDetails from "../Component/PaymentDetails"; // Static Component
+import PaymentStatus from "../Component/PaymentStatus"; // Static Component
 
-// Configuration for Fundraising Details Fields
-const fundraisingDetailsFields = [
-  {
-    name: "fundName",
-    label: "Fund Name",
-    type: "text",
-    placeholder: "Enter fund name",
-  },
-];
+const FundraisingForm = () => {
+  const { setFieldValue, values } = useFormikContext();
 
-// Validation Schema
-const validationSchema = Yup.object({
-  fundName: Yup.string().required("Fund Name is required"),
-});
+  // Configuration for Fundraising Details Fields
+  // For Fundraising/Sponsorships: companyName is required
+  // phoneNumber and address optional
+  const fundraisingDetailsFields = [
+    {
+      name: "companyName",
+      label: "Company/Sponsor Name",
+      type: "text",
+      placeholder: "Enter company/sponsor name",
+    },
+    {
+      name: "phoneNumber",
+      label: "Phone Number",
+      type: "text",
+      placeholder: "Enter phone number (optional)",
+    },
+    {
+      name: "address",
+      label: "Address",
+      type: "text",
+      placeholder: "Enter address (optional)",
+    },
+  ];
 
-const FundraisingForm = ({ formData, onFormChange }) => {
   return (
-    <Formik
-      initialValues={formData}
-      validationSchema={validationSchema}
-      onSubmit={(values) => {
-        console.log("Submitted Values:", values);
-        onFormChange(values); // Pass updated values to parent
-      }}
-    >
-      {({ setFieldValue }) => (
-        <Form className="bg-white p-6 rounded-lg shadow-md">
-          {/* Fundraising Details Section */}
-          <FormSection
-            title="Fundraising Details"
-            fields={fundraisingDetailsFields}
-            setFieldValue={setFieldValue}
-          />
+    <>
+      {/* Fundraising Details Section */}
+      <FormSection
+        title="Fundraising/Sponsorship Details"
+        fields={fundraisingDetailsFields}
+        setFieldValue={setFieldValue}
+        values={values}
+      />
 
-          {/* Payment Details Section */}
-          <PaymentDetails onFormChange={onFormChange} />
-
-          {/* Payment Status Section */}
-          <PaymentStatus onFormChange={onFormChange} />
-        </Form>
-      )}
-    </Formik>
+      {/* Static Payment Details and Payment Status Sections */}
+      <PaymentDetails />
+      <PaymentStatus />
+    </>
   );
 };
 
