@@ -86,7 +86,7 @@ const CreateReceipt = () => {
                 background: "linear-gradient(to right, #ec4899, #a855f7)", // from-pink-500 to-purple-500
               }}
             >
-              Save Invoice
+              Save Receipts
             </button>
           </div>
         </div>
