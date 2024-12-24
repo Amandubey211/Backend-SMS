@@ -1,6 +1,6 @@
 // src/Components/Admin/Finance/Earnings/EarningsForm/PaymentDetails.jsx
 
-import React from "react";
+import React, { useEffect } from "react";
 import { useFormikContext } from "formik";
 import FormSection from "../Component/FormSection";
 
@@ -44,11 +44,31 @@ const paymentDetailsFields = [
     type: "number",
     placeholder: "Enter final amount",
     min: 0,
+    readOnly: true, // Make it read-only as it's calculated
   },
 ];
 
 const PaymentDetails = () => {
   const { setFieldValue, values } = useFormikContext();
+
+  useEffect(() => {
+    const totalAmount = Number(values.total_amount) || 0;
+    const penalty = Number(values.penalty) || 0;
+    const discount = Number(values.discount) || 0;
+
+    const calculatedFinalAmount = totalAmount + penalty - discount;
+
+    // Avoid setting the field if the value hasn't changed to prevent infinite loops
+    if (values.final_amount !== calculatedFinalAmount) {
+      setFieldValue("final_amount", calculatedFinalAmount);
+    }
+  }, [
+    values.total_amount,
+    values.penalty,
+    values.discount,
+    setFieldValue,
+    values.final_amount,
+  ]);
 
   return (
     <FormSection

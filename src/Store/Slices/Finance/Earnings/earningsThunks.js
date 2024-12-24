@@ -75,7 +75,7 @@ export const updateEarnings = createAsyncThunk(
     try {
       const endpoint = getEndpointForCategory(category, "update", id);
       const response = await putData(endpoint, values);
-console.log(id)
+
       if (response?.success) {
         toast.success("Earnings updated successfully!");
         return response.data;

@@ -354,9 +354,9 @@ const TotalRevenueList = () => {
         </Table.Summary.Cell>
         <Table.Summary.Cell index={1} />
         {/* Uncomment the following blocks if Payment Type and Discount are displayed */}
-        {/* <Table.Summary.Cell index={2} />
-        <Table.Summary.Cell index={3} />
-        */}
+        <Table.Summary.Cell index={2} />
+        {/* <Table.Summary.Cell index={3} /> */}
+
         <Table.Summary.Cell index={2}>
           <strong>{formatCurrency(totalFinalAmount)}</strong>
         </Table.Summary.Cell>
@@ -366,11 +366,11 @@ const TotalRevenueList = () => {
         <Table.Summary.Cell index={4}>
           <strong>{formatCurrency(totalRemainingAmount)}</strong>
         </Table.Summary.Cell>
-        <Table.Summary.Cell index={5} />
-        <Table.Summary.Cell index={6}>
+        {/* <Table.Summary.Cell index={5} /> */}
+        <Table.Summary.Cell index={5}>
           <strong>{formatCurrency(totalPenalty)}</strong>
         </Table.Summary.Cell>
-        <Table.Summary.Cell index={7} />
+        <Table.Summary.Cell index={6} />
       </Table.Summary.Row>
     );
   };

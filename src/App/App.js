@@ -932,7 +932,7 @@ function App() {
       errorElement: <Error />,
     },
     {
-      path: "/finance/expense/add",
+      path: "/finance/expenses/add",
       element: (
         <ProtectRoute
           Component={AddExpense}
