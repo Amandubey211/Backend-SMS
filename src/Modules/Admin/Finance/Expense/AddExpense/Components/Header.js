@@ -1,67 +1,48 @@
-import React, { useState } from "react";
+// src/Components/Admin/Finance/Expenses/Components/Header.jsx
+
+import React, { useState, useEffect } from "react";
 import DropdownCard from "./DropdownCard";
+import { useSelector } from "react-redux";
+import { subCategories, categories } from "../../Config/categories";
 
 const Header = ({
   onReset,
-  onSave,
   onCategoryChange,
   onSubCategoryChange,
   description,
   setDescription,
+  initialCategory = "Salaries and Wages",
+  initialSubCategory = "Teaching Staffs",
+  isUpdate = false,
 }) => {
-  const [category, setCategory] = useState("Maintenance");
-  const [subCategory, setSubCategory] = useState("Salaries and Wages");
-
-  const categories = [
-    "Maintenance",
-    "Utility Expenses",
-    "Event Expenses",
-    "Library Expenses",
-    "Canteen",
-    "Others",
-  ];
-
-  const subCategories = {
-    Maintenance: [
-      "Building Repairs",
-      "Furniture Maintenance",
-      "IT Equipment Maintenance",
-      "Others",
-    ],
-    "Utility Expenses": ["Electricity", "Water", "Internet", "Others"],
-    "Event Expenses": [
-      "Event Planning",
-      "Decoration",
-      "Refreshments",
-      "Others",
-    ],
-    "Library Expenses": ["Stationery", "Book Repairs", "Others"],
-    Canteen: ["Classroom & Office purpose", "Others"],
-    Others: ["Others"],
-  };
-
+  const [category, setCategory] = useState(initialCategory);
+  const [subCategory, setSubCategory] = useState(initialSubCategory);
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const [isSubCategoryOpen, setIsSubCategoryOpen] = useState(false);
+  const readOnly = useSelector((state) => state.admin.expenses.readOnly);
+
+  useEffect(() => {
+    // Sync initial state if props change
+    setCategory(initialCategory);
+    setSubCategory(initialSubCategory);
+  }, [initialCategory, initialSubCategory]);
 
   const handleCategorySelect = (selectedCategory) => {
+    if (readOnly) return;
     setCategory(selectedCategory);
-    if (typeof onCategoryChange === "function") {
-      onCategoryChange(selectedCategory);
-    }
+    onCategoryChange(selectedCategory);
     setIsCategoryOpen(false);
 
+    // Automatically select the first subcategory
     const firstSubCategory = subCategories[selectedCategory][0];
     setSubCategory(firstSubCategory);
-    if (typeof onSubCategoryChange === "function") {
-      onSubCategoryChange(firstSubCategory);
-    }
+    onSubCategoryChange(firstSubCategory);
   };
 
   const handleSubCategorySelect = (selectedSubCategory) => {
+    if (readOnly) return;
     setSubCategory(selectedSubCategory);
-    if (typeof onSubCategoryChange === "function") {
-      onSubCategoryChange(selectedSubCategory);
-    }
+    onSubCategoryChange(selectedSubCategory);
     setIsSubCategoryOpen(false);
   };
 
@@ -69,27 +50,29 @@ const Header = ({
     <div className="bg-white py-3 px-5">
       {/* Header Title and Buttons */}
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">Add new expense</h1>
-        <div className="flex gap-4">
-          <button
-            onClick={onReset}
-            className="bg-gray-100 text-gray-700 text-sm font-medium px-6 py-2 rounded-md border border-gray-300 hover:bg-gray-200 transition"
-          >
-            Reset
-          </button>
-          <button
-            onClick={onSave}
-            className="bg-gradient-to-r from-pink-500 to-purple-500 text-white text-sm font-medium px-6 py-2 rounded-md shadow-md hover:from-pink-600 hover:to-purple-600 transition"
-          >
-            Save expense
-          </button>
-        </div>
+        <h1 className="text-2xl font-bold text-gray-800">
+          {isUpdate ? "Update Expense" : "Add New Expense"}
+        </h1>
+        {!readOnly && (
+          <div className="flex gap-4">
+            {/* Submit Button (Save or Update) */}
+            <button
+              type="submit" // Formik will handle the submit
+              className="bg-gradient-to-r from-pink-500 to-purple-500 text-white text-sm font-medium px-6 py-2 rounded-md shadow-md hover:from-pink-600 hover:to-purple-600 transition"
+            >
+              {isUpdate ? "Update Expense" : "Save Expense"}
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Dropdown Section */}
-      <div className="flex gap-6">
+      <div className="flex flex-col md:flex-row gap-6">
+        {/* Category Selector */}
         <DropdownCard
           label="Category"
+          name="category"
+          id="category-dropdown" // Unique ID
           value={category}
           options={categories}
           isOpen={isCategoryOpen}
@@ -97,10 +80,14 @@ const Header = ({
           onSelect={handleCategorySelect}
           bgColor="bg-red-50"
           borderColor="border-red-300"
+          disabled={readOnly} // Disable dropdown if readOnly
         />
 
+        {/* SubCategory Selector */}
         <DropdownCard
           label="Sub-category"
+          name="subCategory"
+          id="subcategory-dropdown" // Unique ID
           value={subCategory}
           options={subCategories[category]}
           isOpen={isSubCategoryOpen}
@@ -108,23 +95,30 @@ const Header = ({
           onSelect={handleSubCategorySelect}
           bgColor="bg-purple-50"
           borderColor="border-purple-300"
+          disabled={readOnly} // Disable dropdown if readOnly
         />
 
         {/* Description Box */}
         <div className="relative w-full bg-gray-100 border border-gray-300 rounded-lg p-4 h-28">
-          <label className="text-sm text-gray-900 block mb-2">
-            Add description
+          <label
+            htmlFor="description"
+            className="text-sm text-gray-900 block mb-2"
+          >
+            Add Description
           </label>
           <textarea
+            id="description"
+            name="description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             maxLength={100}
             className="bg-gray-50 rounded-lg p-2 text-sm text-gray-800 w-full focus:outline-none focus:ring-2 focus:ring-purple-300 shadow-sm"
             placeholder="Write a short description"
+            readOnly={readOnly} // Make textarea read-only if readOnly is true
           ></textarea>
           <div className="flex justify-end items-center my-3">
             <span className="text-xs text-gray-500 italic">
-              You can write 100 characters
+              You can write up to 100 characters
             </span>
           </div>
         </div>

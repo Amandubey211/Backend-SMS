@@ -43,6 +43,7 @@ const paymentStatusFields = [
     type: "number",
     placeholder: "Enter remaining amount",
     min: 0,
+    readOnly: true, // Make it read-only as it's calculated
   },
   {
     name: "receipt",
@@ -59,7 +60,7 @@ const PaymentStatus = () => {
   useEffect(() => {
     const newFields = [];
 
-    if (values.paymentType === "cheque") {
+    if (values.payment_type === "cheque") {
       newFields.push({
         name: "chequeNumber",
         label: "Cheque Number",
@@ -68,7 +69,7 @@ const PaymentStatus = () => {
       });
     }
 
-    if (values.paymentType === "online") {
+    if (values.payment_type === "online") {
       newFields.push({
         name: "transactionId",
         label: "Transaction ID",
@@ -78,10 +79,28 @@ const PaymentStatus = () => {
     }
 
     setConditionalFields(newFields);
-  }, [values.paymentType]);
+  }, [values.payment_type]);
 
   // Combine static and conditional fields
   const combinedFields = [...paymentStatusFields, ...conditionalFields];
+
+  // Calculate remaining_amount whenever final_amount or paid_amount changes
+  useEffect(() => {
+    const finalAmount = Number(values.final_amount) || 0;
+    const paidAmount = Number(values.paid_amount) || 0;
+
+    const calculatedRemainingAmount = finalAmount - paidAmount;
+
+    // Avoid setting the field if the value hasn't changed
+    if (values.remaining_amount !== calculatedRemainingAmount) {
+      setFieldValue("remaining_amount", calculatedRemainingAmount);
+    }
+  }, [
+    values.final_amount,
+    values.paid_amount,
+    setFieldValue,
+    values.remaining_amount,
+  ]);
 
   return (
     <div className="mb-6">
