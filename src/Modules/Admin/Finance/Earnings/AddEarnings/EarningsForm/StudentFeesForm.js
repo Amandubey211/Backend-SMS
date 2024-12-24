@@ -9,7 +9,7 @@ import FileInput from "../Component/FileInput";
 import SelectInput from "../Component/SelectInput";
 import TextInput from "../Component/TextInput";
 
-const StudentFeesForm = ({ selectCategories, allData, setStudentDetail,setFormData,fromData }) => {
+const StudentFeesForm = ({ selectCategories, allData, setStudentDetail,setFormData,fromData,studentDetail }) => {
   const formikRef = useRef(null);
 
   const handleCustomSubmit = () => {
@@ -18,31 +18,53 @@ const StudentFeesForm = ({ selectCategories, allData, setStudentDetail,setFormDa
       validateForm().then((errors) => {
         if (Object.keys(errors).length === 0) {
           console.log("Submitted values:", values);
-          Object.keys(values).map((e)=>{
-            let feild = e.split('_')[0]
-            let subCategory = e.split('_')[1]
+  
+          Object.keys(values).forEach((key) => {
+            let field = key.split('_')[0];
+            let subCategory = key.split('_')[1];
+  
             setFormData((prev) => {
-              const existingIndex = prev.findIndex((item) => item.subCategory == subCategory);
-                // Update the existing object if found
-                const updated = [...prev];
-                updated[existingIndex] = { ...updated[existingIndex], [feild]: values[e] }; // 
-                // logUpdate as needed
-                console.log(values[e],updated);
+ 
+              const existingIndex = prev.findIndex(
+                (item) => item.subCategory === subCategory
+              );
                 
+              if (existingIndex !== -1) {
+               
+                const updated = [...prev];
+                updated[existingIndex] = {
+                  ...updated[existingIndex],
+                  [field]: values[key], 
+                  studentId: studentDetail.studentId,
+                  classId: studentDetail.classId,
+                  sectionId: studentDetail.sectionId,
+                  
+                };
+                console.log(`Updated specific category ${subCategory}:`, updated);
                 return updated;
+              } else {
+                // Add the field to every object in the array
+                const updated = prev.map((item) => ({
+                  ...item,
+                  [key]: values[key],
+                }));
+                console.log(
+                  `Added new field '${field}' to all categories:`,
+                  updated
+                );
+                return updated;
+              }
+             
             });
-            
-          })
-         console.log('f',fromData);
-         
+          });
+  
+          console.log("Final formData after updates:", fromData);
         } else {
           console.error("Validation errors:", errors);
         }
       });
     }
   };
-
-
   return (
     <Formik
       innerRef={formikRef}
@@ -60,28 +82,21 @@ const StudentFeesForm = ({ selectCategories, allData, setStudentDetail,setFormDa
                 <VscDebugBreakpointLog /> {sc} Details
               </h1>
 
-              <PaymentDetails category={sc} />
+              <PaymentDetails category={sc}  />
               <OnePaymentDetail category={sc} />
-              <div className="grid grid-cols-3 gap-6">
-                <TextInput
-                  label={`Due Date & Time (${sc})`}
-                  name={`dateTime_${sc}`}
-                  type="datetime-local"
-                />
-
-                <SelectInput
-                  label={`Payment Status (${sc})`}
-                  name={`paymentStatus_${sc}`}
-                  options={["Paid", "Unpaid", "Partial", "Advance"]}
-                />
-              </div>
+             
             </div>
           ))}
           <div className="grid grid-cols-3 gap-6">
+          <TextInput
+          label="Entry Date  & Time"
+          name="dateTime"
+          type="datetime-local"
+        />
             <SelectInput
               label="Paid By"
               name="paidBy"
-              options={["Manual", "Auto"]}
+              options={["Self", "Parent","Relative","other"]}
             />
             <SelectInput
               label="Payment Type"

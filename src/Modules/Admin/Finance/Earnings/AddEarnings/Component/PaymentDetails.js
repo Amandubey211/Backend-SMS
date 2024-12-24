@@ -3,32 +3,58 @@ import { useFormikContext } from "formik";
 import TextInput from "./TextInput";
 import SelectInput from "./SelectInput";
 
+const PaymentDetails = ({ category }) => {
+  const { values, setFieldValue } = useFormikContext();
 
-const PaymentDetails = ({category }) => {
-    
   return (
     <div className="mb-6">
       <div className="grid grid-cols-3 gap-6">
-      {category == "Exam Fees"?<TextInput
-          label="Exam Type"
-          name={`examType_${category}`}
-          placeholder="Enter Exam Type"
-        />:<SelectInput
-        label="Frequency of payment"
-        name={`frequencyOfPayment_${category}`}
-        options={[
-          "Monthly",
-          "Quarterly",
-          "Half yearly",
-          "Yearly",
-          "Custom Date",
-        ]}
-      />}
+        {category === "Exam Fees" ? (
+          <TextInput
+            label="Exam Type"
+            name={`examType_${category}`}
+            placeholder="Enter Exam Type"
+          />
+        ) : (<>
+          <SelectInput
+            label="Frequency of payment"
+            name={`frequencyOfPayment_${category}`}
+            options={[
+              "Monthly",
+              "Quarterly",
+              "Half yearly",
+              "Yearly",
+              "Custom Date",
+            ]}
+          />
+          <TextInput
+            label="Start Date"
+            name={`startDate_${category}`}
+            type="date"
+          />
+
+          {/* Conditionally render End Date */}
+          {values[`frequencyOfPayment_${category}`] === "Custom Date" && (
+            <TextInput
+              label="End Date"
+              name={`endDate_${category}`}
+              type="date"
+            />
+          )}</>
+        )}
+
         <TextInput
-          label="Date & Time"
-          name={`dateTime_${category}`}
+          label={`Due Date & Time (${category})`}
+          name={`dueDateTime_${category}`}
           type="datetime-local"
         />
+
+        <SelectInput
+          label={`Payment Status (${category})`}
+          name={`paymentStatus_${category}`}
+          options={["Paid", "Unpaid", "Partial", "Advance"]}
+        />
+
         <TextInput
           label="Discount"
           name={`discount_${category}`}
@@ -41,19 +67,8 @@ const PaymentDetails = ({category }) => {
           placeholder="Enter penalty amount"
           type="Number"
         />
-        <TextInput
-          label="Total Amount"
-          name={`totalAmount_${category}`}
-          placeholder="Enter total amount"
-          type="Number"
-        />
-        <TextInput
-          label="Final amount (After tax/discount/penalty)"
-          name={`finalAmount_${category}`}
-          placeholder={0}
-          disabled={true}
-        />
-        
+
+
       </div>
     </div>
   );

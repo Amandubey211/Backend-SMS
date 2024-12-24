@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Field, ErrorMessage } from "formik";
 import { motion } from "framer-motion";
 import { useFormikContext } from "formik";
@@ -64,11 +64,48 @@ export const SelectDynamicInput = ({ label, name, options, onChange, forWhom, di
     </motion.div>
   );
 };
-export const OnePaymentDetail = ({ category}) => {
+export const OnePaymentDetail = ({ category }) => {
+  const { values, setFieldValue } = useFormikContext();
+
+  useEffect(() => {
+    const totalAmount = parseFloat(values[`totalAmount_${category}`]) || 0;
+    const paidAmount = parseFloat(values[`paidAmount_${category}`]) || 0;
+    const discount = parseFloat(values[`discount_${category}`]) || 0;
+    const penalty = parseFloat(values[`penalty_${category}`]) || 0;
+    
+    const finalAmount = totalAmount - (totalAmount * discount) / 100 + penalty;
+    // Calculate advanceAmount
+    const advanceAmount = paidAmount > totalAmount ? paidAmount - finalAmount : 0;
+
+    // Calculate remainingAmount
+    const remainingAmount =
+      totalAmount > paidAmount ? totalAmount - paidAmount : 0;
+
+    // Calculate finalAmount
+  
+
+    // Set calculated values
+    setFieldValue(`advanceAmount_${category}`, advanceAmount.toFixed(2));
+    setFieldValue(`remainingAmount_${category}`, remainingAmount.toFixed(2));
+    setFieldValue(`finalAmount_${category}`, finalAmount.toFixed(2));
+  }, [
+    values[`totalAmount_${category}`],
+    values[`paidAmount_${category}`],
+    values[`discount_${category}`],
+    values[`penalty_${category}`],
+    setFieldValue,
+    category,
+  ]);
 
   return (
     <div className="mb-6">
       <div className="grid grid-cols-3 gap-6">
+        <TextInput
+          label="Total Amount"
+          name={`totalAmount_${category}`}
+          placeholder="Enter total amount"
+          type="Number"
+        />
         <TextInput
           label={`Paid Amount (${category})`}
           name={`paidAmount_${category}`}
@@ -79,13 +116,19 @@ export const OnePaymentDetail = ({ category}) => {
         <TextInput
           label={`Advance Amount (${category})`}
           name={`advanceAmount_${category}`}
-          placeholder={ 0}
+          placeholder={0}
           disabled={true}
         />
         <TextInput
           label={`Remaining Amount (${category})`}
           name={`remainingAmount_${category}`}
-          placeholder={ 0}
+          placeholder={0}
+          disabled={true}
+        />
+        <TextInput
+          label="Final amount (After tax/discount/penalty)"
+          name={`finalAmount_${category}`}
+          placeholder={0}
           disabled={true}
         />
       </div>
