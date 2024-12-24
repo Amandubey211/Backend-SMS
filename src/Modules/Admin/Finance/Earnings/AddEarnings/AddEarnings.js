@@ -1,8 +1,6 @@
 import React, { useState } from "react";
 import Layout from "../../../../../Components/Common/Layout";
 import DashLayout from "../../../../../Components/Admin/AdminDashLayout";
-import StudentFeesForm from "./EarningsForm/StudentFeesForm";
-import ExamFeesForm from "./EarningsForm/ExamFeesForm";
 // import ExamFeesForm from "./EarningsForm/ExamFeesForm";
 import StationeryFeesForm from "./EarningsForm/StationeryFeesForm";
 import DonationForm from "./EarningsForm/DonationForm";
@@ -47,20 +45,6 @@ const AddEarnings = () => {
   };
 
   const formMapping = {
-    "Tuition fees": (
-      <StudentFeesForm
-        description={description}
-        formData={formData}
-        onFormChange={handleFormChange}
-      />
-    ),
-    "Exam fees": (
-      <ExamFeesForm
-        description={description}
-        formData={formData}
-        onFormChange={handleFormChange}
-      />
-    ),
     "Stationery fees": (
       <StationeryFeesForm
         description={description}

@@ -10,11 +10,11 @@ const Header = ({
   description,
   setDescription,
 }) => {
-  const [category, setCategory] = useState("Student Based Revenue");
-  const [subCategory, setSubCategory] = useState("Tuition fees");
+  const [category, setCategory] = useState("Service Based Revenue");
+  const [subCategory, setSubCategory] = useState("Stationery fees");
 
   const categories = [
-    "Student Based Revenue",
+    //"Student Based Revenue",
     "Service Based Revenue",
     "Community & External Revenue",
     "Financial Investment",
@@ -24,17 +24,17 @@ const Header = ({
   ];
 
   const subCategories = {
-    "Student Based Revenue": [
-      "Tuition fees",
-      "Transport fees",
-      "Hostel fees",
-      "Exam fees",
-      "Event fees",
-      "Certificate / ID card",
-      "Meal plan fees",
-      "Application fees",
-      "Others",
-    ],
+    // "Student Based Revenue": [
+    //   "Tuition fees",
+    //   "Transport fees",
+    //   "Hostel fees",
+    //   "Exam fees",
+    //   "Event fees",
+    //   "Certificate / ID card",
+    //   "Meal plan fees",
+    //   "Application fees",
+    //   "Others",
+    // ],
     "Service Based Revenue": [
       "Stationery fees",
       "Other facility fees",

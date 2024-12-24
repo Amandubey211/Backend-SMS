@@ -6,7 +6,7 @@ import Sidebar from "../../../../Components/Common/Sidebar";
 import AddNewClass from "./AddNewClass";
 import Spinner from "../../../../Components/Common/Spinner";
 import NoDataFound from "../../../../Components/Common/NoDataFound";
-import { fetchAllClasses } from "../../../../Store/Slices/Admin/Class/actions/classThunk";
+import { fetchAllClasses, fetchAllClassesDetails } from "../../../../Store/Slices/Admin/Class/actions/classThunk";
 // import { FaSchool } from "react-icons/fa";
 
 const ClassesMainSection = () => {
@@ -38,7 +38,7 @@ const ClassesMainSection = () => {
   };
 
   useEffect(() => {
-    dispatch(fetchAllClasses());
+    dispatch(fetchAllClassesDetails());
   }, [dispatch]);
 
   return (

@@ -7,6 +7,7 @@ import {
   graduateStudents,
   demoteStudents,
   fetchGraduates,
+  fetchStudentsByClassAndSectionNames,
 } from "./studentThunks";
 
 const initialState = {
@@ -36,15 +37,15 @@ const studentSlice = createSlice({
   extraReducers: (builder) => {
     builder
       // Fetch Students by Class and Section
-      .addCase(fetchStudentsByClassAndSection.pending, (state) => {
+      .addCase(fetchStudentsByClassAndSectionNames.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchStudentsByClassAndSection.fulfilled, (state, action) => {
+      .addCase(fetchStudentsByClassAndSectionNames.fulfilled, (state, action) => {
         state.loading = false;
         state.studentsList = action.payload;
       })
-      .addCase(fetchStudentsByClassAndSection.rejected, (state, action) => {
+      .addCase(fetchStudentsByClassAndSectionNames.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })

@@ -7,6 +7,7 @@ import {
   deleteBookThunk,
   issueBookThunk,
   updateBookThunk,
+  fetchBooksDetailsThunk,
 } from "./LibraryThunks";
 
 const initialState = {
@@ -57,6 +58,18 @@ const librarySlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
+      .addCase(fetchBooksDetailsThunk.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchBooksDetailsThunk.fulfilled, (state, action) => {
+        state.loading = false;
+        state.books = action.payload;
+      })
+      .addCase(fetchBooksDetailsThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
       .addCase(addBookThunk.pending, (state) => {
         state.addbookloading = true;
       })

@@ -5,14 +5,20 @@ import FormField from "../Components/FormField";
 import NoDataFound from "../../../../Components/Common/NoDataFound";
 import BookIssueRow from "../Components/BookIssueRow";
 import { useTranslation } from "react-i18next";
+import { fetchBooksThunk } from "../../../../Store/Slices/Admin/Library/LibraryThunks";
 
 const BookIssueTab = ({ handleSidebarOpen, setEditIssueData }) => {
   const { t } = useTranslation("admLibrary");
   const dispatch = useDispatch();
+  //useEffect(()=>{dispatch(fetchBooksThunk())},[])
   const { bookIssues, books } = useSelector((state) => state.admin.library);
   const classList = useSelector((store) => store.admin.class.classes);
   const role = useSelector((store) => store.common.auth.role);
+useEffect(()=>{
 
+  //  dispatch(fetchBooksThunk())
+  
+},[])
   const sectionList = useSelector(
     (store) => store.admin.group_section.sectionsList
   );

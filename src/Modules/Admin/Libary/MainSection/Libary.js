@@ -8,6 +8,7 @@ import TabButton from "../Components/TabButton";
 import {
   fetchBooksThunk,
   fetchBookIssuesThunk,
+  fetchBooksDetailsThunk,
 } from "../../../../Store/Slices/Admin/Library/LibraryThunks";
 import LibraryTab from "../Components/LibraryTab";
 import AddIssue from "../Components/AddIssue";
@@ -32,7 +33,7 @@ const LibraryAndBookIssue = () => {
   const [editIssueData, setEditIssueData] = useState(null);
 
   useEffect(() => {
-    if (!books?.length) dispatch(fetchBooksThunk());
+    if (!books?.length) dispatch(fetchBooksDetailsThunk());
     if (!bookIssues?.length) dispatch(fetchBookIssuesThunk());
     if (!classList?.length) dispatch(fetchAllClasses());
     if (!StudentList?.length) dispatch(fetchAllStudents());

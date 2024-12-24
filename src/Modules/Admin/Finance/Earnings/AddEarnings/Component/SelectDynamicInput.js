@@ -1,8 +1,11 @@
 import React from "react";
 import { Field, ErrorMessage } from "formik";
 import { motion } from "framer-motion";
+import { useFormikContext } from "formik";
+import SelectInput from "./SelectInput";
+import TextInput from "./TextInput";
 
-const SelectInput = ({ label, name, options }) => {
+export const SelectDynamicInput = ({ label, name, options, onChange, forWhom, disabled }) => {
   // Animation variants for the container
   const containerVariants = {
     hidden: { opacity: 0, x: -10 },
@@ -36,16 +39,18 @@ const SelectInput = ({ label, name, options }) => {
         id={name}
         name={name}
         className="bg-white border border-gray-300 rounded-md px-4 py-3 text-sm text-gray-800 w-full focus:outline-none focus:ring-2 focus:ring-purple-300"
+        onChange={onChange}
+        disabled={disabled}
       >
         <option value="">Select</option>
         {options.map((option, index) => (
           <motion.option
             key={index}
-            value={option}
+            value={option?._id}
             variants={fieldVariants}
             transition={{ delay: 0.2 }}
           >
-            {option}
+            {forWhom == 'class' ? option?.className : forWhom == 'section' ? option?.sectionName : forWhom == 'student' ? option?.firstName + ' ' + option?.lastName : ''}
           </motion.option>
         ))}
       </Field>
@@ -59,6 +64,34 @@ const SelectInput = ({ label, name, options }) => {
     </motion.div>
   );
 };
+export const OnePaymentDetail = ({ category}) => {
+
+  return (
+    <div className="mb-6">
+      <div className="grid grid-cols-3 gap-6">
+        <TextInput
+          label={`Paid Amount (${category})`}
+          name={`paidAmount_${category}`}
+          placeholder="Enter paid amount"
+          type="Number"
+          required={true}
+        />
+        <TextInput
+          label={`Advance Amount (${category})`}
+          name={`advanceAmount_${category}`}
+          placeholder={ 0}
+          disabled={true}
+        />
+        <TextInput
+          label={`Remaining Amount (${category})`}
+          name={`remainingAmount_${category}`}
+          placeholder={ 0}
+          disabled={true}
+        />
+      </div>
+    </div>
+  );
+};
 
 
-export default SelectInput;
+

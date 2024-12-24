@@ -1,82 +1,107 @@
-import React from "react";
+import React, { useRef } from "react";
 import { Formik, Form } from "formik";
-import * as Yup from "yup";
-import FormSection from "../Component/FormSection";
+
 import PaymentDetails from "../Component/PaymentDetails";
-import PaymentStatus from "../Component/PaymentStatus";
+import StudentDetails from "../Component/StudentDetails";
+import { VscDebugBreakpointLog } from "react-icons/vsc";
+import { OnePaymentDetail } from "../Component/SelectDynamicInput";
+import FileInput from "../Component/FileInput";
+import SelectInput from "../Component/SelectInput";
+import TextInput from "../Component/TextInput";
 
-const validationSchema = Yup.object({
-  studentName: Yup.string().required("Student Name is required"),
-  class: Yup.string().required("Class is required"),
-  section: Yup.string().required("Section is required"),
-  dueDate: Yup.date().required("Due Date is required"),
-  dueTime: Yup.string().required("Due Time is required"),
-  // Add other validation rules...
-});
+const StudentFeesForm = ({ selectCategories, allData, setStudentDetail,setFormData,fromData }) => {
+  const formikRef = useRef(null);
 
-const StudentFeesForm = ({ description, formData, onFormChange }) => {
-  // Define form fields for each section
-  const studentDetailsFields = [
-    {
-      name: "studentName",
-      label: "Student Name",
-      type: "text",
-      placeholder: "Enter Name",
-    },
-    { name: "class", label: "Class", type: "text", placeholder: "Enter Class" },
-    {
-      name: "section",
-      label: "Section",
-      type: "text",
-      placeholder: "Enter Section",
-    },
-  ];
+  const handleCustomSubmit = () => {
+    if (formikRef.current) {
+      const { values, validateForm } = formikRef.current;
+      validateForm().then((errors) => {
+        if (Object.keys(errors).length === 0) {
+          console.log("Submitted values:", values);
+          Object.keys(values).map((e)=>{
+            let feild = e.split('_')[0]
+            let subCategory = e.split('_')[1]
+            setFormData((prev) => {
+              const existingIndex = prev.findIndex((item) => item.subCategory == subCategory);
+                // Update the existing object if found
+                const updated = [...prev];
+                updated[existingIndex] = { ...updated[existingIndex], [feild]: values[e] }; // 
+                // logUpdate as needed
+                console.log(values[e],updated);
+                
+                return updated;
+            });
+            
+          })
+         console.log('f',fromData);
+         
+        } else {
+          console.error("Validation errors:", errors);
+        }
+      });
+    }
+  };
 
-  const dueDetailsFields = [
-    {
-      name: "dueDate",
-      label: "Due Date",
-      type: "date",
-      placeholder: "Enter Due Date",
-    },
-    {
-      name: "dueTime",
-      label: "Due Time",
-      type: "time",
-      placeholder: "Enter Due Time",
-    }, // Ensure this is correct
-  ];
 
   return (
     <Formik
-      initialValues={formData} // Pass the formData as initial values
-      validationSchema={validationSchema}
+      innerRef={formikRef}
+      initialValues={allData}
       onSubmit={(values) => {
-        console.log(values); // This will log the data when the form is submitted
-        onFormChange(values); // Send the updated values back to the parent
+       
       }}
     >
-      {({ isSubmitting, setFieldValue }) => (
-        <Form className="bg-white px-5 py-2 ">
-          {/* Student Details Section */}
-          <FormSection
-            title="Student Details"
-            fields={studentDetailsFields}
-            setFieldValue={setFieldValue}
-          />
+      {({ setFieldValue }) => (
+        <Form className="bg-white px-5 py-2">
+          <StudentDetails setStudentDetail={setStudentDetail} />
+          {selectCategories.map((sc) => (
+            <div key={sc}>
+              <h1 className="font-bold flex flex-row items-center gap-1 mb-4 text-xl">
+                <VscDebugBreakpointLog /> {sc} Details
+              </h1>
 
-          {/* Due Details Section */}
-          <FormSection
-            title="Due Details"
-            fields={dueDetailsFields}
-            setFieldValue={setFieldValue}
-          />
+              <PaymentDetails category={sc} />
+              <OnePaymentDetail category={sc} />
+              <div className="grid grid-cols-3 gap-6">
+                <TextInput
+                  label={`Due Date & Time (${sc})`}
+                  name={`dateTime_${sc}`}
+                  type="datetime-local"
+                />
 
-          {/* Payment Details Section */}
-          <PaymentDetails onFormChange={onFormChange} />
+                <SelectInput
+                  label={`Payment Status (${sc})`}
+                  name={`paymentStatus_${sc}`}
+                  options={["Paid", "Unpaid", "Partial", "Advance"]}
+                />
+              </div>
+            </div>
+          ))}
+          <div className="grid grid-cols-3 gap-6">
+            <SelectInput
+              label="Paid By"
+              name="paidBy"
+              options={["Manual", "Auto"]}
+            />
+            <SelectInput
+              label="Payment Type"
+              name="paymentType"
+              options={["Cash", "Card", "Online", "Cheque", "Others"]}
+            />
+            <FileInput
+              label="Add receipt/document"
+              name="receipt"
+              onChange={(event) => setFieldValue("receipt", event.target.files[0])}
+            />
 
-          {/* Payment Status Section */}
-          <PaymentStatus onFormChange={onFormChange} />
+          </div>
+          {/* Custom Submit Button */}
+          <button
+            onClick={handleCustomSubmit}
+            className="bg-gradient-to-r from-pink-500 to-purple-500 text-white text-sm font-medium px-6 py-2 rounded-md shadow-md hover:from-pink-600 hover:to-purple-600 transition"
+          >
+            Add Fee
+          </button>
         </Form>
       )}
     </Formik>

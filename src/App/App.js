@@ -55,6 +55,7 @@ import ManageRolePage from "../Components/Common/RBAC/ManageRolePage.js";
 import EarningDash from "../Modules/Admin/Finance/Earnings/EarningDash.js";
 import TotalRevenueList from "../Modules/Admin/Finance/Earnings/TotalRevenueList.js";
 import StudentFeesDash from "../Modules/Admin/Finance/StudentFees/StudentFeesDash.js";
+import addStudentFeesForm from "../Modules/Admin/Finance/StudentFees/AddStudentFeesForm.js";
 import SummaryRevenueList from "../Modules/Admin/Finance/StudentFees/SummaryRevenueList.js";
 import AddNewFees from "../Modules/Admin/Finance/StudentFees/AddNewFees/AddNewFees.js";
 import InvoicesMain from "../Modules/Admin/Finance/Invoices/InvoicesMain.js";
@@ -899,6 +900,16 @@ function App() {
       element: (
         <ProtectRoute
           Component={TotalRevenueList}
+          allowedRoles={["admin", "accountant"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/finance/studentfees/add/form",
+      element: (
+        <ProtectRoute
+          Component={addStudentFeesForm}
           allowedRoles={["admin", "accountant"]}
         />
       ),

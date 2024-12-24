@@ -109,7 +109,7 @@ const StudentFeesMain = () => {
           </div>
         </div>
         <button
-          onClick={() => navigate("/finance/earning/add")}
+          onClick={() => navigate("/finance/studentfees/add/form")}
           className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
         >
           <span className="text-gray-800 font-medium">Add New Fee</span>

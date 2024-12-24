@@ -3,66 +3,57 @@ import { useFormikContext } from "formik";
 import TextInput from "./TextInput";
 import SelectInput from "./SelectInput";
 
-const PaymentDetails = ({ onFormChange }) => {
-  const { values } = useFormikContext();
 
-  // Optionally pass form values back to the parent component if needed
-  onFormChange(values);
-
+const PaymentDetails = ({category }) => {
+    
   return (
     <div className="mb-6">
-      <h2 className="text-lg font-semibold text-gray-800 mb-4">
-        Payment Details
-      </h2>
       <div className="grid grid-cols-3 gap-6">
-        <SelectInput
-          label="Frequency of payment"
-          name="frequencyOfPayment"
-          options={[
-            "Monthly",
-            "Quarterly",
-            "Half yearly",
-            "Yearly",
-            "Custom Date",
-          ]}
-          value={values.paymentType}
-        />
+      {category == "Exam Fees"?<TextInput
+          label="Exam Type"
+          name={`examType_${category}`}
+          placeholder="Enter Exam Type"
+        />:<SelectInput
+        label="Frequency of payment"
+        name={`frequencyOfPayment_${category}`}
+        options={[
+          "Monthly",
+          "Quarterly",
+          "Half yearly",
+          "Yearly",
+          "Custom Date",
+        ]}
+      />}
         <TextInput
           label="Date & Time"
-          name="dateTime"
+          name={`dateTime_${category}`}
           type="datetime-local"
-          value={values.dateTime}
         />
-        {/* <TextInput
-          label="Tax (Inc/Exc)"
-          name="tax"
-          placeholder="Enter tax percentage"
-          value={values.tax}
-        /> */}
         <TextInput
           label="Discount"
-          name="discount"
+          name={`discount_${category}`}
           placeholder="Enter discount percentage"
-          value={values.discount}
+          type="Number"
         />
         <TextInput
           label="Penalty"
-          name="penalty"
+          name={`penalty_${category}`}
           placeholder="Enter penalty amount"
-          value={values.penalty}
+          type="Number"
         />
         <TextInput
           label="Total Amount"
-          name="totalAmount"
+          name={`totalAmount_${category}`}
           placeholder="Enter total amount"
-          value={values.totalAmount}
+          type="Number"
         />
         <TextInput
           label="Final amount (After tax/discount/penalty)"
-          name="finalAmount"
-          placeholder="Enter final amount"
-          value={values.finalAmount}
+          name={`finalAmount_${category}`}
+          placeholder={0}
+          disabled={true}
         />
+        
       </div>
     </div>
   );

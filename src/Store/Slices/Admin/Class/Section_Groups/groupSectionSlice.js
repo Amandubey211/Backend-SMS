@@ -12,6 +12,7 @@ import {
   assignStudentToSection,
   removeStudentFromGroup,
   fetchGroupsByClassAndSection,
+  fetchSectionsNamesByClass,
 } from "./groupSectionThunks";
 
 const initialState = {
@@ -57,6 +58,18 @@ const groupSectionSlice = createSlice({
         state.sectionsList = action.payload;
       })
       .addCase(fetchSectionsByClass.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(fetchSectionsNamesByClass.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchSectionsNamesByClass.fulfilled, (state, action) => {
+        state.loading = false;
+        state.sectionsList = action.payload;
+      })
+      .addCase(fetchSectionsNamesByClass.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
