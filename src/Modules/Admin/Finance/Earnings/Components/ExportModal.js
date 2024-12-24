@@ -1,7 +1,30 @@
-import React from "react";
+import React, { useState } from "react";
+import { ExportExcel, ExportPDF } from "../../../../../Utils/xl";
+import toast from "react-hot-toast";
+import { useSelector } from "react-redux";
 
-const ExportModal = ({ visible, onClose }) => {
+const ExportModal = ({ visible, onClose, dataToExport, title, sheet }) => {
+  const [fileType, setFileType] = useState("");
+  const {schoolName}=useSelector((store)=>store.common.user.userDetails);
   if (!visible) return null;
+
+  const handleExport = (
+    dataToExport=[{"name":"Akash"}],
+    title = "ExportedData",
+    sheet = "sheet1"
+  ) => {
+    if (!dataToExport.length) {
+      return alert("No data available to export");
+    }
+
+    if (fileType === "excel") {
+      ExportExcel(dataToExport, `${title}.xlsx`, sheet);
+    } else if (fileType === "pdf") {
+      ExportPDF(dataToExport, `${title}.pdf`, schoolName);
+    } else {
+      alert("Please select a file type to export.");
+    }
+  };
 
   return (
     <div
@@ -36,6 +59,7 @@ const ExportModal = ({ visible, onClose }) => {
                 name="fileType"
                 value="pdf"
                 className="text-purple-600"
+                onChange={(e) => setFileType(e.target.value)}
               />
               PDF
             </label>
@@ -45,6 +69,7 @@ const ExportModal = ({ visible, onClose }) => {
                 name="fileType"
                 value="excel"
                 className="text-purple-600"
+                onChange={(e) => setFileType(e.target.value)}
               />
               Excel
             </label>
@@ -52,7 +77,7 @@ const ExportModal = ({ visible, onClose }) => {
 
           {/* Export Button */}
           <button
-            onClick={onClose}
+            onClick={() => handleExport(dataToExport, title, sheet)}
             className="px-4 py-2 bg-gradient-to-r from-[#C83B62] to-[#8E44AD] text-white font-bold rounded-md w-full hover:opacity-90 transition"
           >
             Export now
