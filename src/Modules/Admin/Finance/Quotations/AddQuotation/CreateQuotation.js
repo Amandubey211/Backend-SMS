@@ -82,7 +82,7 @@ const CreateQuotation = () => {
                 background: "linear-gradient(to right, #ec4899, #a855f7)", // from-pink-500 to-purple-500
               }}
             >
-              Save Receipts
+              Save Quotation
             </button>
           </div>
         </div>
