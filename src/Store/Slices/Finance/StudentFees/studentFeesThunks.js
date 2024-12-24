@@ -7,6 +7,7 @@ import {
   postData,
   putData,
   deleteData,
+  customRequest,
 } from "../../../../services/apiEndpoints";
 
 /**
@@ -56,10 +57,12 @@ export const createStudentFee = createAsyncThunk(
   "studentFees/createStudentFee",
   async (feeData, { rejectWithValue, dispatch }) => {
     try {
+      console.log('t',feeData);
+      
       dispatch(setShowError(false));
       const response = await postData(
         "/finance/revenue/add/student/fee",
-        feeData
+        {allData:feeData}
       );
       return response;
     } catch (error) {

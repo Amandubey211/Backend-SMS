@@ -52,7 +52,7 @@ const PaymentDetails = ({ category }) => {
         <SelectInput
           label={`Payment Status (${category})`}
           name={`paymentStatus_${category}`}
-          options={["Paid", "Unpaid", "Partial", "Advance"]}
+          options={["paid", "unpaid", "partial", "advance"]}
         />
 
         <TextInput

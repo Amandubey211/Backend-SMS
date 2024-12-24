@@ -8,10 +8,12 @@ import { OnePaymentDetail } from "../Component/SelectDynamicInput";
 import FileInput from "../Component/FileInput";
 import SelectInput from "../Component/SelectInput";
 import TextInput from "../Component/TextInput";
+import { useDispatch } from "react-redux";
+import { createStudentFee } from "../../../../../../Store/Slices/Finance/StudentFees/studentFeesThunks";
 
-const StudentFeesForm = ({ selectCategories, allData, setStudentDetail,setFormData,fromData,studentDetail }) => {
+const StudentFeesForm = ({ selectCategories, allData, setStudentDetail,setFormData,formData,studentDetail }) => {
   const formikRef = useRef(null);
-
+const dispatch = useDispatch()
   const handleCustomSubmit = () => {
     if (formikRef.current) {
       const { values, validateForm } = formikRef.current;
@@ -58,7 +60,8 @@ const StudentFeesForm = ({ selectCategories, allData, setStudentDetail,setFormDa
             });
           });
   
-          console.log("Final formData after updates:", fromData);
+          console.log("Final formData after updates:", formData);
+          dispatch(createStudentFee(formData))
         } else {
           console.error("Validation errors:", errors);
         }
@@ -101,7 +104,7 @@ const StudentFeesForm = ({ selectCategories, allData, setStudentDetail,setFormDa
             <SelectInput
               label="Payment Type"
               name="paymentType"
-              options={["Cash", "Card", "Online", "Cheque", "Others"]}
+              options={["cash", "card", "online", "cheque", "other"]}
             />
             <FileInput
               label="Add receipt/document"

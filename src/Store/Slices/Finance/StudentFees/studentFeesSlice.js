@@ -60,7 +60,7 @@ const studentFeesSlice = createSlice({
       })
       .addCase(createStudentFee.fulfilled, (state, action) => {
         state.loading = false;
-        state.fees.push(action.payload.data);
+        //state.fees.push(action.payload.data);
       })
       .addCase(createStudentFee.rejected, (state, action) => {
         state.loading = false;
