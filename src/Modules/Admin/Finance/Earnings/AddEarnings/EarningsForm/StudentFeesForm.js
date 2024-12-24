@@ -1,7 +1,6 @@
 import React, { useRef } from "react";
 import { Formik, Form } from "formik";
 
-import PaymentDetails from "../Component/PaymentDetails";
 import StudentDetails from "../Component/StudentDetails";
 import { VscDebugBreakpointLog } from "react-icons/vsc";
 import { OnePaymentDetail } from "../Component/SelectDynamicInput";
@@ -10,6 +9,7 @@ import SelectInput from "../Component/SelectInput";
 import TextInput from "../Component/TextInput";
 import { useDispatch } from "react-redux";
 import { createStudentFee } from "../../../../../../Store/Slices/Finance/StudentFees/studentFeesThunks";
+import StudentPaymentDetails from "../Component/StudentPaymentDetails";
 
 const StudentFeesForm = ({ selectCategories, allData, setStudentDetail,setFormData,formData,studentDetail }) => {
   const formikRef = useRef(null);
@@ -85,7 +85,7 @@ const dispatch = useDispatch()
                 <VscDebugBreakpointLog /> {sc} Details
               </h1>
 
-              <PaymentDetails category={sc}  />
+              <StudentPaymentDetails category={sc}  />
               <OnePaymentDetail category={sc} />
              
             </div>

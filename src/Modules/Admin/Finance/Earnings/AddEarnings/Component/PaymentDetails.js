@@ -1,76 +1,82 @@
-import React from "react";
-import { useFormikContext } from "formik";
-import TextInput from "./TextInput";
-import SelectInput from "./SelectInput";
+// src/Components/Admin/Finance/Earnings/EarningsForm/PaymentDetails.jsx
 
-const PaymentDetails = ({ category }) => {
-  const { values, setFieldValue } = useFormikContext();
+import React, { useEffect } from "react";
+import { useFormikContext } from "formik";
+import FormSection from "../Component/FormSection";
+
+const paymentDetailsFields = [
+  {
+    name: "frequencyOfPayment",
+    label: "Frequency of Payment",
+    type: "select",
+    options: ["Monthly", "Quarterly", "Half Yearly", "Yearly", "Custom Date"],
+  },
+  {
+    name: "dateTime",
+    label: "Date & Time",
+    type: "datetime-local",
+    placeholder: "Select Date & Time",
+  },
+  {
+    name: "discount",
+    label: "Discount (%)",
+    type: "number",
+    placeholder: "Enter discount percentage",
+    min: 0,
+  },
+  {
+    name: "penalty",
+    label: "Penalty (QR)",
+    type: "number",
+    placeholder: "Enter penalty amount",
+    min: 0,
+  },
+  {
+    name: "total_amount",
+    label: "Total Amount (QR)",
+    type: "number",
+    placeholder: "Enter total amount",
+    min: 0,
+  },
+  {
+    name: "final_amount",
+    label: "Final Amount (After Tax/Discount/Penalty) (QR)",
+    type: "number",
+    placeholder: "Enter final amount",
+    min: 0,
+    readOnly: true, // Make it read-only as it's calculated
+  },
+];
+
+const PaymentDetails = () => {
+  const { setFieldValue, values } = useFormikContext();
+
+  useEffect(() => {
+    const totalAmount = Number(values.total_amount) || 0;
+    const penalty = Number(values.penalty) || 0;
+    const discount = Number(values.discount) || 0;
+
+    const calculatedFinalAmount = totalAmount + penalty - discount;
+
+    // Avoid setting the field if the value hasn't changed to prevent infinite loops
+    if (values.final_amount !== calculatedFinalAmount) {
+      setFieldValue("final_amount", calculatedFinalAmount);
+    }
+  }, [
+    values.total_amount,
+    values.penalty,
+    values.discount,
+    setFieldValue,
+    values.final_amount,
+  ]);
 
   return (
-    <div className="mb-6">
-      <div className="grid grid-cols-3 gap-6">
-        {category === "Exam Fees" ? (
-          <TextInput
-            label="Exam Type"
-            name={`examType_${category}`}
-            placeholder="Enter Exam Type"
-          />
-        ) : (<>
-          <SelectInput
-            label="Frequency of payment"
-            name={`frequencyOfPayment_${category}`}
-            options={[
-              "Monthly",
-              "Quarterly",
-              "Half yearly",
-              "Yearly",
-              "Custom Date",
-            ]}
-          />
-          <TextInput
-            label="Start Date"
-            name={`startDate_${category}`}
-            type="date"
-          />
-
-          {/* Conditionally render End Date */}
-          {values[`frequencyOfPayment_${category}`] === "Custom Date" && (
-            <TextInput
-              label="End Date"
-              name={`endDate_${category}`}
-              type="date"
-            />
-          )}</>
-        )}
-
-        <TextInput
-          label={`Due Date & Time (${category})`}
-          name={`dueDateTime_${category}`}
-          type="datetime-local"
-        />
-
-        <SelectInput
-          label={`Payment Status (${category})`}
-          name={`paymentStatus_${category}`}
-          options={["paid", "unpaid", "partial", "advance"]}
-        />
-
-        <TextInput
-          label="Discount"
-          name={`discount_${category}`}
-          placeholder="Enter discount percentage"
-          type="Number"
-        />
-        <TextInput
-          label="Penalty"
-          name={`penalty_${category}`}
-          placeholder="Enter penalty amount"
-          type="Number"
-        />
-
-
-      </div>
-    </div>
+    <FormSection
+      title="Payment Details"
+      fields={paymentDetailsFields}
+      setFieldValue={setFieldValue}
+      values={values}
+    />
   );
 };
 
