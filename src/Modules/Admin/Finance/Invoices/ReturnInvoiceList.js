@@ -110,7 +110,7 @@ const ReturnInvoiceList = () => {
                             {/* Add New Fee Button */}
                             <button
                                 onClick={() =>
-                                    navigate("/finance/studentfees/total-revenue/addFees")
+                                    navigate("/finance/invoices/add-return-invoice")
                                 }
                                 className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
                             >

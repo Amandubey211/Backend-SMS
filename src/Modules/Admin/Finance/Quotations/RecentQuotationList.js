@@ -5,6 +5,8 @@ import { MoreOutlined } from "@ant-design/icons";
 import { FiUserPlus } from "react-icons/fi";
 import { ShareAltOutlined } from "@ant-design/icons";
 import EmailModal from "../../../../Components/Common/EmailModal";
+import { useNavigate } from 'react-router-dom';
+
 // Sample Data
 const data = [
     { id: "0098356", recipient: "Kameswaran S", class: "10", section: "B", paidDate: "16/12/24", amount: "1214 QAR", status: "Accepted" },
@@ -20,6 +22,10 @@ const RecentReceiptsList = () => {
     const handleShareClick = () => {
         setEmailModalOpen(true);
     };
+
+    const navigate = useNavigate();
+
+
 
     const closeEmailModal = () => {
         setEmailModalOpen(false);
@@ -59,7 +65,7 @@ const RecentReceiptsList = () => {
                     <div className="flex justify-between items-start">
                         {/* Filters */}
                         <div className="pt-3 flex flex-col space-y-4">
-                            
+
 
                             {/* Radio Buttons Row */}
                             <div className="flex space-x-6">
@@ -91,7 +97,10 @@ const RecentReceiptsList = () => {
                             <button className="flex items-center px-4 py-2 border rounded-lg text-gray-700 font-medium hover:shadow-md" onClick={() => setSortModalVisible(true)}>
                                 Sort
                             </button>
-                            <button className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2">
+                            <button
+                                onClick={() => navigate("/finance/quotations/add-new-quotations")}
+                                className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
+                            >
                                 <span className="text-gray-800 font-medium">Add New Quotation</span>
                                 <div className="w-12 h-12 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center text-white">
                                     <FiUserPlus size={16} />

@@ -66,6 +66,12 @@ import ReceiptsMain from "../Modules/Admin/Finance/Reciepts/ReceiptsMain.js";
 import RecentReceiptsList from "../Modules/Admin/Finance/Reciepts/RecentReceiptsList.js";
 import QuotationMain from "../Modules/Admin/Finance/Quotations/QuotationMain.js";
 import RecentQuotationList from "../Modules/Admin/Finance/Quotations/RecentQuotationList.js";
+import AddInvoice from "../Modules/Admin/Finance/Invoices/AddInvoice/AddReturnInvoice.js";
+import AddReturnInvoice from "../Modules/Admin/Finance/Invoices/AddInvoice/AddReturnInvoice.js";
+import CreateNewInvoice from "../Modules/Admin/Finance/Invoices/AddInvoice/CreateNewInvoice.js";
+import CreateReceipt from "../Modules/Admin/Finance/Reciepts/AddReceipt/CreateReceipt.js";
+import CreateQuotation from "../Modules/Admin/Finance/Quotations/AddQuotation/CreateQuotation.js";
+import CreatePenaltyAdjustment from "../Modules/Admin/Finance/PenaltiesandAdjustments/AddPenaltyAdjustment/CreatePenaltyAdjustment.js";
 
 // lazy loaded routes
 const AddExpense = lazy(() =>
@@ -983,6 +989,26 @@ function App() {
       errorElement: <Error />,
     },
     {
+      path: "/finance/invoices/add-new-invoice",
+      element: (
+        <ProtectRoute
+          Component={CreateNewInvoice}
+          allowedRoles={["admin", "accountant"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/finance/invoices/add-return-invoice",
+      element: (
+        <ProtectRoute
+          Component={AddReturnInvoice}
+          allowedRoles={["admin", "accountant"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
       path: "/finance/invoices/dashboard/recent-invoices",
       element: (
         <ProtectRoute
@@ -1023,6 +1049,16 @@ function App() {
       errorElement: <Error />,
     },
     {
+      path: "/finance/receipts/add-new-receipt",
+      element: (
+        <ProtectRoute
+          Component={CreateReceipt}
+          allowedRoles={["admin", "accountant"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
       path: "/finance/quotations",
       element: (
         <ProtectRoute
@@ -1033,10 +1069,30 @@ function App() {
       errorElement: <Error />,
     },
     {
+      path: "/finance/quotations/add-new-quotations",
+      element: (
+        <ProtectRoute
+          Component={CreateQuotation}
+          allowedRoles={["admin", "accountant"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
       path: "/finance/quotations/quotations-list",
       element: (
         <ProtectRoute
           Component={RecentQuotationList}
+          allowedRoles={["admin", "accountant"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/finance/penaltyAdjustment/add-new-penalty-adjustment",
+      element: (
+        <ProtectRoute
+          Component={CreatePenaltyAdjustment}
           allowedRoles={["admin", "accountant"]}
         />
       ),
