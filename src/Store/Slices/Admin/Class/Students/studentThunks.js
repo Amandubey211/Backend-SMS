@@ -23,6 +23,19 @@ export const fetchStudentsByClassAndSection = createAsyncThunk(
     }
   }
 );
+export const fetchStudentsByClassAndSectionNames = createAsyncThunk(
+  "students/fetchByClassAndSectionNames",
+  async (classId, { rejectWithValue, dispatch }) => {
+    try {
+      dispatch(setShowError(false));
+      const say = getAY();
+      const response = await getData(`/admin/all/student/${classId}?say=${say}`);
+      return response.data;
+    } catch (error) {
+      return handleError(error, dispatch, rejectWithValue);
+    }
+  }
+);
 
 // Fetch all students
 export const fetchAllStudents = createAsyncThunk(

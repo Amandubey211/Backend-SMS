@@ -58,6 +58,22 @@ export const fetchSectionsByClass = createAsyncThunk(
     }
   }
 );
+export const fetchSectionsNamesByClass = createAsyncThunk(
+  "group/fetchSectionsNamesByClass",
+  async (classId, {  rejectWithValue,dispatch }) => {
+    try {
+      dispatch(setShowError(false));
+      const say = getAY()
+      const response = await getData(
+        `/admin/all/getSectionByclass/${classId}?say=${say}`,
+       
+      );
+      return response.data;
+    } catch (error) {
+      return handleError(error, dispatch, rejectWithValue);
+    }
+  }
+);
 
 // Fetch Unassigned Students
 export const fetchUnassignedStudents = createAsyncThunk(

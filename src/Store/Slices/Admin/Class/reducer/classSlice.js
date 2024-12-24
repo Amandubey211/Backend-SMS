@@ -5,6 +5,7 @@ import {
   updateClass,
   deleteClass,
   fetchClassDetails,
+  fetchAllClassesDetails,
 } from "../actions/classThunk";
 
 const initialState = {
@@ -39,6 +40,21 @@ const classSlice = createSlice({
         state.classes = action.payload;
       })
       .addCase(fetchAllClasses.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+
+      
+      builder
+      .addCase(fetchAllClassesDetails.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchAllClassesDetails.fulfilled, (state, action) => {
+        state.loading = false;
+        state.classes = action.payload;
+      })
+      .addCase(fetchAllClassesDetails.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
