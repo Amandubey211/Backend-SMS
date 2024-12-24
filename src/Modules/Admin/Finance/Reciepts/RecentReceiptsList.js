@@ -5,6 +5,8 @@ import { MoreOutlined } from "@ant-design/icons";
 import { FiUserPlus } from "react-icons/fi";
 import { ShareAltOutlined } from "@ant-design/icons";
 import EmailModal from "../../../../Components/Common/EmailModal";
+import { useNavigate } from 'react-router-dom';
+
 // Sample Data
 const data = [
     { id: "0098356", recipient: "Kameswaran S", class: "10", section: "B", paidDate: "16/12/24", amount: "1214 QAR", status: "Paid" },
@@ -16,6 +18,14 @@ const data = [
 const RecentReceiptsList = () => {
     const [isSortModalVisible, setSortModalVisible] = useState(false);
     const [isEmailModalOpen, setEmailModalOpen] = useState(false);
+
+
+    const navigate = useNavigate();
+
+    const handleNavigate = () => {
+        navigate('/finance/receipts/add-new-receipt');
+    };
+
 
     const handleShareClick = () => {
         setEmailModalOpen(true);
@@ -110,7 +120,7 @@ const RecentReceiptsList = () => {
                             <button className="flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-medium rounded-lg hover:opacity-90">
                                 Export
                             </button>
-                            <button className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2">
+                            <button className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2" onClick={handleNavigate}>
                                 <span className="text-gray-800 font-medium">Add New Receipt</span>
                                 <div className="w-12 h-12 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center text-white">
                                     <FiUserPlus size={16} />
