@@ -2,16 +2,11 @@ import { createSlice } from "@reduxjs/toolkit";
 import { fetchAllReceipts, createReceipt, cancelReceipt } from "./receiptsThunks";
 
 const initialState = {
-  receipts: [],
-  totalRecords: 0,
-  totalPages: 0,
-  currentPage: 1,
-  pageSize: 5,
-  filters: {},
-  loading: false,
-  error: null,
-  selectedReceipt: null,
-  successMessage: null,
+  receipts: [], // Holds all receipts fetched from the API
+  loading: false, // Tracks loading state for async actions
+  error: null, // Stores error messages
+  selectedReceipt: null, // Stores a specific selected receipt
+  successMessage: null, // Stores success messages for actions
 };
 
 const receiptsSlice = createSlice({
@@ -20,29 +15,16 @@ const receiptsSlice = createSlice({
   reducers: {
     clearReceipts: (state) => {
       state.receipts = [];
-      state.totalRecords = 0;
-      state.totalPages = 0;
-      state.currentPage = 1;
       state.loading = false;
       state.error = null;
-      state.filters = {};
+      state.selectedReceipt = null;
+      state.successMessage = null;
     },
     setSelectedReceipt(state, action) {
       state.selectedReceipt = action.payload;
     },
     clearSelectedReceipt(state) {
       state.selectedReceipt = null;
-    },
-    setCurrentPage(state, action) {
-      state.currentPage = action.payload;
-    },
-    setFilters(state, action) {
-      state.filters = { ...state.filters, ...action.payload };
-      state.currentPage = 1;
-    },
-    clearFilters(state) {
-      state.filters = {};
-      state.currentPage = 1;
     },
   },
   extraReducers: (builder) => {
@@ -54,10 +36,7 @@ const receiptsSlice = createSlice({
       })
       .addCase(fetchAllReceipts.fulfilled, (state, action) => {
         state.loading = false;
-        state.receipts = action.payload.data || [];
-        state.totalRecords = action.payload.totalRecords || 0;
-        state.totalPages = action.payload.totalPages || 0;
-        state.currentPage = action.payload.currentPage || 1;
+        state.receipts = action.payload.receipts || [];
       })
       .addCase(fetchAllReceipts.rejected, (state, action) => {
         state.loading = false;
@@ -98,9 +77,6 @@ export const {
   clearReceipts,
   setSelectedReceipt,
   clearSelectedReceipt,
-  setCurrentPage,
-  setFilters,
-  clearFilters,
 } = receiptsSlice.actions;
 
 export default receiptsSlice.reducer;
