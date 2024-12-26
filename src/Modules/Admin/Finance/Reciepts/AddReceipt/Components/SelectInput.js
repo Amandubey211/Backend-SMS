@@ -3,7 +3,14 @@ import React from "react";
 import { Field, ErrorMessage } from "formik";
 import { motion } from "framer-motion";
 
-const SelectInput = ({ label, name, options, disabled, autoComplete = "off" }) => {
+const SelectInput = ({
+  label,
+  name,
+  options,
+  disabled,
+  autoComplete = "off",
+  onChange, // Accept onChange as a prop
+}) => {
   // Animation variants for the container
   const containerVariants = {
     hidden: { opacity: 0, x: -10 },
@@ -38,6 +45,7 @@ const SelectInput = ({ label, name, options, disabled, autoComplete = "off" }) =
         name={name}
         disabled={disabled || false}
         autoComplete={autoComplete}
+        onChange={onChange} // Pass onChange to Field
         className={`bg-white border border-gray-300 rounded-md px-4 py-3 text-sm text-gray-800 w-full focus:outline-none focus:ring-2 focus:ring-purple-300 ${
           disabled ? "cursor-not-allowed" : ""
         }`}

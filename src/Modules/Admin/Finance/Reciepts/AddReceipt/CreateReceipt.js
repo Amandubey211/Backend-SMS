@@ -31,34 +31,9 @@ const CreateReceipt = () => {
     dispatch(fetchAllClasses());
   }, [dispatch]);
 
-  // Fetch sections when a class is selected
-  // Fetch sections when a class is selected
-  useEffect(() => {
-    if (selectedClass) {
-      dispatch(fetchSectionsByClass(selectedClass))
-        .unwrap()
-        .catch((error) => {
-          console.error("Failed to fetch sections:", error);
-        });
-      setSelectedSection(""); // Reset section when class changes
-    }
-  }, [dispatch, selectedClass]);
 
-  // Fetch students when a section is selected
-  useEffect(() => {
-    if (selectedClass && selectedSection) {
-      dispatch(
-        fetchStudentsByClassAndSection({
-          classId: selectedClass,
-          sectionId: selectedSection,
-        })
-      )
-        .unwrap()
-        .catch((error) => {
-          console.error("Failed to fetch students:", error);
-        });
-    }
-  }, [dispatch, selectedClass, selectedSection]);
+ 
+
 
 
 
@@ -244,29 +219,58 @@ const CreateReceipt = () => {
                 <SelectInput
                   name="class"
                   label="Class"
-                  options={classes.map((cls) => ({ label: cls.className, value: cls._id }))} // Mapping class names from the API response
+                  options={classes.map((cls) => ({ label: cls.className, value: cls._id }))}
                   onChange={(e) => {
                     const classId = e.target.value;
+                    console.log("Class selected:", classId); // Debugging
                     setFieldValue("class", classId);
                     setSelectedClass(classId);
                     setFieldValue("section", ""); // Reset section and student when class changes
                     setFieldValue("studentName", "");
-                    dispatch(fetchSectionsByClass(classId)); // Fetch sections for the selected class
+                    // Dispatch action to fetch sections for the selected class
+                    dispatch(fetchSectionsByClass(classId))
+                      .unwrap()
+                      .then(() => {
+                        console.log("Sections fetched successfully for class:", classId); // Debugging
+                      })
+                      .catch((error) => {
+                        console.error("Failed to fetch sections:", error);
+                      });
                   }}
                 />
-
 
                 {/* Section Selection */}
                 <SelectInput
                   name="section"
                   label="Section"
-                  options={selectedClass && sectionsList[selectedClass] ? sectionsList[selectedClass].map((sec) => ({ label: sec.sectionName, value: sec._id })) : []} // Mapping section names dynamically
+                  options={
+                    selectedClass && sectionsList[selectedClass]
+                      ? sectionsList[selectedClass].map((sec) => ({
+                        label: sec.sectionName,
+                        value: sec._id,
+                      }))
+                      : []
+                  }
                   onChange={(e) => {
                     const sectionId = e.target.value;
+                    console.log("Section selected:", sectionId); // Debugging
                     setFieldValue("section", sectionId);
                     setSelectedSection(sectionId);
                     setFieldValue("studentName", ""); // Reset student when section changes
-                    dispatch(fetchStudentsByClassAndSection({ classId: selectedClass, sectionId })); // Fetch students for the selected class and section
+                    // Dispatch action to fetch students for the selected class and section
+                    dispatch(
+                      fetchStudentsByClassAndSection({
+                        classId: selectedClass,
+                        sectionId,
+                      })
+                    )
+                      .unwrap()
+                      .then(() => {
+                        console.log("Students fetched successfully for class:", selectedClass, "and section:", sectionId); // Debugging
+                      })
+                      .catch((error) => {
+                        console.error("Failed to fetch students:", error);
+                      });
                   }}
                   disabled={!selectedClass}
                 />
@@ -283,7 +287,7 @@ const CreateReceipt = () => {
                       studentsList[selectedClass][selectedSection]
                       ? studentsList[selectedClass][selectedSection].map((student) => ({
                         label: student.name,
-                        value: student.name, // Storing only the student name as a string
+                        value: student.name, // Adjust this if you need to store a different value
                       }))
                       : []
                   }
