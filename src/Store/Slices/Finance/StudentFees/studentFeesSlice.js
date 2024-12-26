@@ -22,22 +22,6 @@ const studentFeesSlice = createSlice({
     // Add any synchronous reducers if needed
   },
   extraReducers: (builder) => {
-    // Fetch all student fees
-    builder
-      .addCase(fetchAllStudentFees.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(fetchAllStudentFees.fulfilled, (state, action) => {
-        state.loading = false;
-        state.fees = action.payload.data || [];
-      })
-      .addCase(fetchAllStudentFees.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload || action.error.message;
-      });
-
-    // Fetch one student fee
     builder
       .addCase(fetchOneStudentFee.pending, (state) => {
         state.loading = true;

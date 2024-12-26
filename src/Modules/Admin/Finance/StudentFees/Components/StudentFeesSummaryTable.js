@@ -1,80 +1,98 @@
-// src/Modules/Admin/Finance/StudentFees/Components/StudentFeesSummaryTable.js
-
 import React, { useEffect, useState, useMemo } from "react";
 import { Table, Spin, Alert, Input, Button } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import moment from "moment"; // Replaced dayjs with moment
-import { fetchAllStudentFees } from "../../../../../Store/Slices/Finance/StudentFees/studentFeesThunks";
+import moment from "moment";
+import { fetchAllIncomes } from "../../../../../Store/Slices/Finance/Earnings/earningsThunks";
+import Spinner from "../../../../../Components/Common/Spinner";
+import NoDataFound from "../../../../../Components/Common/NoDataFound";
 
 const StudentFeesSummaryTable = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // Adjust the selector path based on your Redux store structure
-  const { fees, loading, error } = useSelector(
-    (state) => state.admin.studentFees
+  const { incomes, loading, error, totalRecords } = useSelector(
+    (state) => state.admin.earnings
   );
 
   const [searchText, setSearchText] = useState("");
+  const [currentPage, setCurrentPage] = useState(1); // State for current page
 
   useEffect(() => {
-    dispatch(fetchAllStudentFees({ page: 1, limit: 20 })); // Adjust params as needed
-  }, [dispatch]);
-
-  // Handle search filtering using useMemo for performance optimization
-  const filteredData = useMemo(() => {
-    if (!fees) return [];
-    return fees.filter((item) =>
-      Object.values(item)
-        .join(" ")
-        .toLowerCase()
-        .includes(searchText.toLowerCase())
+    dispatch(
+      fetchAllIncomes({
+        page: currentPage,
+        limit: 10,
+        categoryName: "Student-Based Revenue",
+        includeDetails:true
+      })
     );
-  }, [fees, searchText]);
+  }, [dispatch, currentPage]);
+
+  // Handle search filtering
+  const filteredData = useMemo(() => {
+    if (!incomes) return [];
+    return incomes.filter((item) => {
+      const searchableString = [
+        item?.category?.[0]?.categoryName,
+        item?.subCategory,
+        item?.description,
+        item?.paymentStatus,
+        item?.paymentType,
+        item?.final_amount,
+      ]
+        .join(" ")
+        .toLowerCase();
+      return searchableString.includes(searchText.toLowerCase());
+    });
+  }, [incomes, searchText]);
 
   // Table columns definition
   const columns = [
     {
-      title: "Category",
-      dataIndex: "category",
-      key: "category",
-      sorter: (a, b) => (a.category || "").localeCompare(b.category || ""),
-      render: (text) => <span>{text || "N/A"}</span>,
+      title: "Student",
+      dataIndex: "studentDetails",
+      key: "studentDetails",
+      render:(studentDetails) => studentDetails?.firstName?.slice(0,10)+'..' || "N/A",
+    },
+    {
+      title: "Class ",
+      dataIndex: "classDetails",
+      key: "classDetails",
+      render: (classDetails) => classDetails?.className ||"N/A",
+    },
+    {
+      title: "Sub-Category",
+      dataIndex: "subCategory",
+      key: "subCategory",
+      render: (subCategory) => subCategory || "N/A",
     },
     {
       title: "Amount",
       dataIndex: "final_amount",
       key: "final_amount",
       sorter: (a, b) => (a.final_amount || 0) - (b.final_amount || 0),
-      render: (value) => (
-        <span>{typeof value === "number" ? `${value} QR` : "N/A"}</span>
-      ),
+      render: (value) => (value ? `${value} QR` : "N/A"),
+    },
+    {
+      title: "Payment Status",
+      dataIndex: "paymentStatus",
+      key: "paymentStatus",
+      render: (status) => status || "N/A",
+    },
+    {
+      title: "Payment Type",
+      dataIndex: "paymentType",
+      key: "paymentType",
+      render: (type) => type || "N/A",
     },
     {
       title: "Date",
       dataIndex: "paidDate",
       key: "paidDate",
       sorter: (a, b) => new Date(a.paidDate) - new Date(b.paidDate),
-      render: (date) => (date ? moment(date).format("YYYY-MM-DD") : "N/A"), // Updated to use moment
-    },
-    {
-      title: "Action",
-      key: "action",
-      render: (_, record) => (
-        <div className="flex space-x-2">
-          <Button
-            type="link"
-            onClick={() =>
-              navigate(`/finance/studentfees/record/${record._id}`)
-            } // Ensure this route exists
-            className="text-blue-500"
-          >
-            View Details
-          </Button>
-        </div>
-      ),
+      render: (date) => (date ? moment(date).format("YYYY-MM-DD") : "N/A"),
     },
   ];
 
@@ -85,7 +103,6 @@ const StudentFeesSummaryTable = () => {
         <h3 className="text-lg font-medium text-gray-700">
           Summary of Student Fees
         </h3>
-
         <div className="flex items-center space-x-4">
           {/* Search Box */}
           <Input
@@ -96,39 +113,20 @@ const StudentFeesSummaryTable = () => {
             className="w-64"
             allowClear
           />
-
           {/* View More Button */}
           <Button
             type="primary"
             onClick={() => navigate("/finance/studentfees/total-revenue")}
-            style={{
-              borderImage: "linear-gradient(90deg, #C83B62, #46138A) 1",
-              borderRadius: "8px",
-            }}
           >
-            View More
+            View More {totalRecords}
           </Button>
         </div>
       </div>
 
       {/* Loading Indicator */}
-      {loading && (
-        <div className="flex justify-center my-4">
-          <Spin tip="Loading..." />
-        </div>
-      )}
-
-      {/* Error Message */}
-      {error && (
-        <Alert
-          message="Error"
-          description={error}
-          type="error"
-          showIcon
-          closable
-          className="my-4"
-        />
-      )}
+    {loading && <Spinner/>}
+    
+    {error && <NoDataFound/>}
 
       {/* Table */}
       {!loading && !error && (
@@ -136,7 +134,12 @@ const StudentFeesSummaryTable = () => {
           <Table
             dataSource={filteredData}
             columns={columns}
-            pagination={{ pageSize: 5 }}
+            pagination={{
+              current: currentPage,
+              pageSize: 10,
+              total: totalRecords,
+              onChange: (page) => setCurrentPage(page),
+            }}
             rowKey="_id" // Ensure each record has a unique _id
             bordered
           />

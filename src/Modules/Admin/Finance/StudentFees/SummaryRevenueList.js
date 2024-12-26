@@ -1,380 +1,302 @@
-// src/Modules/Admin/Finance/StudentFees/SummaryRevenueList.js
-
 import React, { useState, useEffect } from "react";
-import { Table, Modal, Button, Spin, Alert } from "antd";
+import { Table, Modal, Button, Spin, Alert, Tooltip } from "antd";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-
+import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import AdminLayout from "../../../../Components/Admin/AdminDashLayout";
-import SortPopModal from "./Components/SortPopModal"; // Corrected import
-import StudentFeesPaidModal from "./Components/StudentFeesPaidModal";
-import StudentFeesUnpaidModal from "./Components/StudentFeesUnpaidModal";
 import { FiUserPlus } from "react-icons/fi";
 import { deleteStudentFees } from "../../../../Store/Slices/Finance/StudentFees/studentFeesThunks";
 import moment from "moment"; // Replaced dayjs with moment
 import { fetchAllIncomes } from "../../../../Store/Slices/Finance/Earnings/earningsThunks";
+import { fetchSectionsNamesByClass } from "../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
+import { fetchAllClasses } from "../../../../Store/Slices/Admin/Class/actions/classThunk";
+import Spinner from "../../../../Components/Common/Spinner";
+import NoDataFound from "../../../../Components/Common/NoDataFound";
 
 const SummaryRevenueList = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [currentPage, setCurrentPage] = useState(1);
 
-  const { records, loading, error } = useSelector(
-    (state) => state.admin.studentFees
-  ); // Adjust the path based on your store
+  const { incomes, loading, error, totalRecords } = useSelector(
+    (state) => state.admin.earnings
+  );
 
-  const [selectedStudentDetails, setSelectedStudentDetails] = useState({});
-  const [isSortModalVisible, setSortModalVisible] = useState(false);
-  const [isStudentDetailsModalVisible, setStudentDetailsModalVisible] =
-    useState(false);
-  const [isStudentUnpaidModalVisible, setStudentUnpaidModalVisible] =
-    useState(false);
-  const [selectedOption, setSelectedOption] = useState("newest");
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  let sectionList = useSelector(
+    (state) => state.admin.group_section.sectionsList
+  );
+  const classList = useSelector((state) => state.admin.class.classes);
+
+  const [params, setParams] = useState({
+    limit: 10,
+    categoryName: "Student-Based Revenue",
+    includeDetails:true,
+    classId: "",
+    sectionId: "",
+    subCategory: "",
+    status: "",
+  });
 
   useEffect(() => {
-    // Fetch all student fee records when the component mounts
-    dispatch(fetchAllIncomes({ page: 1, limit: 20 })); // Adjust params as needed
-  }, [dispatch]);
+    dispatch(fetchAllClasses());
+    dispatch(fetchAllIncomes(params)); // Fetch initial data
+  }, [dispatch, params]);
 
-  const handleRowClick = (record) => {
-    // Clean base amount by removing "QR" and converting to a number
-    const baseAmount = parseFloat(
-      record?.amount?.replace("QR", "").trim() || 0
-    );
+  const filterOnchange = (e) => {
+    const { name, value } = e.target;
+   
 
-    // Clean penalty, tax, and discount fields
-    const penalty = parseFloat(record?.penalty?.replace("QR", "").trim() || 0);
-    const taxPercentage = parseFloat(record?.tax?.replace("%", "").trim() || 0);
-    const discountPercentage = parseFloat(
-      record?.discount?.replace("%", "").trim() || 0
-    );
-
-    // Calculate tax and discount amounts
-    const taxAmount = (baseAmount * taxPercentage) / 100;
-    const discountAmount = (baseAmount * discountPercentage) / 100;
-
-    // Calculate total amount
-    const totalAmount = baseAmount + taxAmount - discountAmount + penalty;
-
-    const studentDetails = {
-      name: record?.name || "N/A",
-      class: record?.class || "N/A",
-      section: record?.section || "N/A",
-      fees_type: record?.feesType || "N/A",
-      due_date: record?.dueDate || "N/A",
-      total_amount: totalAmount ? `${totalAmount.toFixed(2)} QR` : "N/A",
-      penalty: record?.penalty || "N/A",
-      paid_status: record?.status || "N/A",
-      tax: record?.tax || "N/A", // Keep the original tax string
-      discount: record?.discount || "N/A", // Keep the original discount string
-      paid_by: "Card", // Example data, adjust as needed
-      transaction_id: "12345", // Example data, adjust as needed
-      payment_method: "Stripe", // Example data, adjust as needed
-    };
-
-    setSelectedStudentDetails(studentDetails);
-
-    if (record?.status === "Paid") {
-      setStudentDetailsModalVisible(true); // Open Paid Modal
-    } else if (record?.status === "Unpaid") {
-      setStudentUnpaidModalVisible(true); // Open Unpaid Modal
+    // Fetch filtered incomes immediately
+    if (name === "classId") {
+      if(!value){
+        setParams((prev) => ({
+          ...prev,
+          sectionId:'', 
+        }));
+        dispatch(fetchSectionsNamesByClass("675bc4e3e7901c873905fd2f")); 
+      }else{
+        dispatch(fetchSectionsNamesByClass(value)); 
+      }
+      
     }
-  };
-
-  const handleDelete = () => {
-    if (selectedRowKeys.length === 0) {
-      Modal.warning({
-        title: "No Selection",
-        content: "Please select at least one fee record to delete.",
-      });
-      return;
-    }
-
-    Modal.confirm({
-      title: "Are you sure you want to delete the selected fee records?",
-      onOk: () => {
-        dispatch(deleteStudentFees(selectedRowKeys))
-          .unwrap()
-          .then(() => {
-            // Refresh the data after deletion
-            dispatch(fetchAllIncomes({ page: 1, limit: 20 }));
-            setSelectedRowKeys([]);
-          })
-          .catch((err) => {
-            // Error handling is managed by the slice
-            console.error("Delete failed:", err);
-          });
-      },
-    });
-  };
-
-  // Function to handle single record deletion
-  const handleDeleteSingleRecord = (feeId) => {
-    Modal.confirm({
-      title: "Are you sure you want to delete this fee record?",
-      onOk: () => {
-        dispatch(deleteStudentFees([feeId]))
-          .unwrap()
-          .then(() => {
-            // Refresh the data after deletion
-            dispatch(fetchAllIncomes({ page: 1, limit: 20 }));
-            setSelectedRowKeys((prevKeys) =>
-              prevKeys.filter((key) => key !== feeId)
-            );
-          })
-          .catch((err) => {
-            console.error("Delete failed:", err);
-          });
-      },
-    });
+    setParams((prev) => ({
+      ...prev,
+      [name]: value, 
+    }));
   };
 
   const columns = [
     {
-      title: "Name",
-      dataIndex: "name",
-      key: "name",
-      sorter: (a, b) => a.name.localeCompare(b.name),
-      render: (text) => <span>{text}</span>,
+      title: "Student",
+      dataIndex: "studentDetails",
+      key: "studentDetails",
+      render: (studentDetails) =>
+        studentDetails?.firstName?.slice(0,10)+'..' || "N/A",
     },
     {
       title: "Class",
-      dataIndex: "class",
-      key: "class",
-      sorter: (a, b) => a.class.localeCompare(b.class),
-      render: (text) => <span>{text}</span>,
+      dataIndex: "classDetails",
+      key: "classDetails",
+      render: (classDetails) => classDetails?.className || "N/A",
     },
     {
-      title: "Section",
-      dataIndex: "section",
-      key: "section",
-      sorter: (a, b) => a.section.localeCompare(b.section),
-      render: (text) => <span>{text}</span>,
+      title: "Sub-Category",
+      dataIndex: "subCategory",
+      key: "subCategory",
+      render: (text) => <span>{text || "N/A"}</span>,
     },
     {
-      title: "Fees Type",
-      dataIndex: "feesType",
-      key: "feesType",
-      sorter: (a, b) => a.feesType.localeCompare(b.feesType),
-      render: (text) => <span>{text}</span>,
-    },
-    {
-      title: "Due Date",
-      dataIndex: "dueDate",
-      key: "dueDate",
-      sorter: (a, b) => new Date(a.dueDate) - new Date(b.dueDate),
-      render: (date) => (date ? moment(date).format("YYYY-MM-DD") : "N/A"),
-    },
-    {
-      title: "Amount",
-      dataIndex: "amount",
-      key: "amount",
-      sorter: (a, b) => parseFloat(a.amount) - parseFloat(b.amount),
-      render: (value) => (typeof value === "string" ? `${value}` : "N/A"),
-    },
-    {
-      title: "Status",
-      dataIndex: "status",
-      key: "status",
-      sorter: (a, b) => a.status.localeCompare(b.status),
-      render: (text) => (
+      title: "Payment Status",
+      dataIndex: "paymentStatus",
+      key: "paymentStatus",
+      render: (status) => (
         <span
           className={`px-2 py-1 rounded-lg text-sm font-medium ${
-            text === "Paid"
+            status === "paid"
               ? "bg-green-100 text-green-600"
               : "bg-red-100 text-red-600"
           }`}
         >
-          {text}
+          {status}
         </span>
       ),
     },
+ 
     {
-      title: "Penalty",
-      dataIndex: "penalty",
-      key: "penalty",
-      sorter: (a, b) => parseFloat(a.penalty) - parseFloat(b.penalty),
-      render: (value) => (typeof value === "string" ? `${value}` : "N/A"),
+      title: "Final Amount",
+      dataIndex: "final_amount",
+      key: "final_amount",
+      sorter: (a, b) => (a.final_amount || 0) - (b.final_amount || 0),
+      render: (amount) => <span>{`${amount.toFixed(2)} QR`}</span>,
     },
     {
-      title: "Tax",
-      dataIndex: "tax",
-      key: "tax",
-      sorter: (a, b) => parseFloat(a.tax) - parseFloat(b.tax),
-      render: (value) => (typeof value === "string" ? `${value}` : "N/A"),
+      title: "Paid Amount",
+      dataIndex: "paid_amount",
+      key: "paid_amount",
+      sorter: (a, b) => a.paid_amount - b.paid_amount,
+      render: (amount) => <span>{`${amount.toFixed(2)} QR`}</span>,
+    },
+    {
+      title: "Date",
+      dataIndex: "paidDate",
+      key: "paidDate",
+      sorter: (a, b) => new Date(a.paidDate) - new Date(b.paidDate),
+      render: (date) => (date ? moment(date).format("YYYY-MM-DD") : "N/A"),
     },
     {
       title: "Discount",
       dataIndex: "discount",
       key: "discount",
-      sorter: (a, b) => parseFloat(a.discount) - parseFloat(b.discount),
-      render: (value) => (typeof value === "string" ? `${value}` : "N/A"),
-    },
-    {
-      title: "Total Amount",
-      dataIndex: "total_amount",
-      key: "total_amount",
-      sorter: (a, b) => parseFloat(a.total_amount) - parseFloat(b.total_amount),
-      render: (value) => (typeof value === "string" ? `${value}` : "N/A"),
+      render: (discount, record) => (
+        <span>
+          {discount
+            ? record.discountType === "percentage"
+              ? `${discount}%`
+              : `${discount} QR`
+            : "N/A"}
+        </span>
+      ),
     },
     {
       title: "Action",
       key: "action",
       render: (_, record) => (
-        <div className="flex space-x-2">
-          <Button
-            type="link"
-            onClick={() => navigate(`/finance/studentfees/edit/${record._id}`)}
-            className="text-blue-500"
-          >
-            Edit
-          </Button>
-          <Button
-            type="link"
-            danger
-            onClick={() => handleDeleteSingleRecord(record._id)}
-            className="text-red-500"
-          >
-            Delete
-          </Button>
-        </div>
+          <div className="flex space-x-1" onClick={(e) => e.stopPropagation()}>
+            <Tooltip title="Edit">
+              <Button
+                type="link"
+                icon={<EditOutlined />}
+                // onClick={() => {
+                //   const incomeToEdit = incomeIdMap[record.key];
+                //   if (incomeToEdit) {
+                //     dispatch(setReadOnly(true)); // Set readOnly to true for viewing
+                //     dispatch(setSelectedIncome(incomeToEdit)); // Dispatch the selected income to Redux
+                //     navigate("/finance/earning/add"); // Navigate without passing state
+                //   } else {
+                //     toast.error("Selected income not found.");
+                //   }
+                // }}
+                className="text-blue-600 hover:text-blue-800 p-0"
+                aria-label="Edit"
+              />
+            </Tooltip>
+            <Tooltip title="Delete">
+              <Button
+                type="link"
+                icon={<DeleteOutlined />}
+                // onClick={() => {
+                //   const incomeToDelete = incomeIdMap[record.key];
+                //   if (incomeToDelete) {
+                //     setSelectedIncomeForDeletion(incomeToDelete); // Set income for deletion
+                //     setIsDeleteModalVisible(true);
+                //   } else {
+                //     toast.error("Selected income not found.");
+                //   }
+                // }}
+                className="text-red-600 hover:text-red-800 p-0"
+                aria-label="Delete"
+              />
+            </Tooltip>
+          </div>
       ),
     },
   ];
 
-  const rowSelection = {
-    selectedRowKeys,
-    onChange: (selectedKeys) => {
-      setSelectedRowKeys(selectedKeys);
-    },
-  };
+  const subCategoryList = [
+    "Tuition Fees",
+    "Hotel Fees",
+    "Application Fees",
+    "Certificate Fees",
+    "Meal Fees",
+    "Event Fees",
+    "Exam Fees",
+    "Transport Fees",
+    "Other",
+  ];
 
   return (
     <AdminLayout>
-       <div className="p-6 bg-white shadow-lg rounded-lg">
+      <div className="p-6 bg-white shadow-lg rounded-lg">
         {/* Filters and Buttons Section */}
         <div className="flex justify-between items-start">
-          {/* Left Side: Filters and Radio Buttons */}
           <div className="flex flex-col space-y-4">
-            {/* Filters Row */}
             <div className="flex items-center space-x-4">
               {/* Class Filter */}
               <div className="flex flex-col">
                 <label className="text-gray-500 text-sm mb-1">Class</label>
-                <select className="border border-gray-300 rounded-lg px-4 py-2 text-gray-700 w-28">
-                  <option value="Ten">Ten</option>
-                  {/* Add more options as needed */}
+                <select
+                  className="border border-gray-300 rounded-lg px-4 py-2 text-gray-700 w-28"
+                  onChange={filterOnchange}
+                  name="classId"
+                >
+                  <option value="">All</option>
+                  {classList?.map((i) => (
+                    <option value={i._id} key={i._id}>
+                      {i.className}
+                    </option>
+                  ))}
                 </select>
               </div>
 
               {/* Section Filter */}
               <div className="flex flex-col">
-               <label className="text-gray-500 text-sm mb-1">Section</label>
-                <select className="border border-gray-300 rounded-lg px-4 py-2 text-gray-700 w-28">
-                  <option value="A">A</option>
-                  {/* Add more options as needed */}
+                <label className="text-gray-500 text-sm mb-1">Section</label>
+                <select
+                  className="border border-gray-300 rounded-lg px-4 py-2 text-gray-700 w-28"
+                  name="sectionId"
+                  onChange={filterOnchange}
+                >
+                  <option value="">ALL</option>
+                  {sectionList?.map((i) => (
+                    <option value={i?._id} key={i?._id}>
+                      {i?.sectionName}
+                    </option>
+                  ))}
                 </select>
               </div>
 
               {/* Fees Type Filter */}
               <div className="flex flex-col">
                 <label className="text-gray-500 text-sm mb-1">Fees Type</label>
-                <select className="border border-gray-300 rounded-lg px-4 py-2 text-gray-700 w-36">
-                  <option value="Exam fees">Exam fees</option>
-                  {/* Add more options as needed */}
+                <select
+                  className="border border-gray-300 rounded-lg px-4 py-2 text-gray-700 w-36"
+                  name="subCategory"
+                  onChange={filterOnchange}
+                >
+                  <option value="">All</option>
+                  {subCategoryList.map((i, idx) => (
+                    <option value={i} key={idx}>
+                      {i}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>
 
-            {/* Radio Buttons Row */}
             <div className="flex space-x-6">
               <label className="flex items-center text-sm space-x-2">
                 <input
                   type="radio"
-                  name="studentFilter"
+                  name="status"
                   className="form-radio text-green-600"
+                  value=""
                   defaultChecked
+                  onChange={filterOnchange}
                 />
                 <span className="text-green-600 font-medium">Everyone</span>
               </label>
               <label className="flex items-center text-sm space-x-2">
                 <input
                   type="radio"
-                  name="studentFilter"
+                  name="status"
                   className="form-radio text-gray-500"
+                  value="paid"
+                  onChange={filterOnchange}
                 />
                 <span className="text-gray-700">Paid Student</span>
               </label>
               <label className="flex items-center text-sm space-x-2">
                 <input
                   type="radio"
-                  name="studentFilter"
+                  name="status"
                   className="form-radio text-gray-500"
+                  value="unpaid"
+                  onChange={filterOnchange}
                 />
                 <span className="text-gray-700">Unpaid Student</span>
               </label>
             </div>
           </div>
 
-          {/* Right Side: Buttons */}
           <div className="flex items-center space-x-4">
-            {/* Sort Button */}
-            <button
-              className="flex items-center px-4 py-2 border rounded-lg text-gray-700 font-medium hover:shadow-md"
-              style={{
-                borderImage: "linear-gradient(to right, #FF007C, #8A2BE2) 1",
-                borderRadius: "8px",
-              }}
-              onClick={() => setSortModalVisible(true)}
-            >
-              Sort
-              <span className="ml-2">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M16 17l-4 4m0 0l-4-4m4 4V3"
-                  />
-                </svg>
-              </span>
-            </button>
-
-            {/* Export Button */}
             <button
               className="flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-medium rounded-lg hover:opacity-90"
-              onClick={() => console.log("Exporting data...")} // Implement export functionality
+              onClick={() => console.log("Exporting data...")}
             >
               Export
-              <span className="ml-2">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M5 10l7-7m0 0l7 7m-7-7v18"
-                  />
-                </svg>
-              </span>
             </button>
-
-            {/* Add New Fee Button */}
             <button
-              onClick={() =>
-                navigate("/finance/studentfees/total-revenue/addFees")
-              }
+              onClick={() => navigate("/finance/studentfees/add/form")}
               className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
             >
               <span className="text-gray-800 font-medium">Add New Fee</span>
@@ -385,75 +307,28 @@ const SummaryRevenueList = () => {
           </div>
         </div>
 
-        {/* Table Section */}
         <div className="mt-6">
           {loading ? (
-            <div className="flex justify-center my-4">
-              <Spin tip="Loading..." />
-            </div>
+            <Spinner/>
           ) : error ? (
-            <Alert
-              message="Error"
-              description={error}
-              type="error"
-              showIcon
-              closable
-              className="my-4"
-            />
+           <NoDataFound/>
           ) : (
             <Table
-              dataSource={records}
+              dataSource={incomes}
               columns={columns}
-              pagination={{ pageSize: 10 }}
+              pagination={{
+                current: currentPage,
+                pageSize: 10,
+                total: totalRecords,
+                onChange: (page) => {
+                  setCurrentPage(page);
+                  dispatch(fetchAllIncomes({ ...params, page }));
+                },
+              }}
               rowKey="_id"
-              className="rounded-lg overflow-hidden"
-              rowSelection={rowSelection}
-              onRow={(record) => ({
-                onClick: () => handleRowClick(record),
-              })}
             />
           )}
         </div>
-
-        {/* SortPopModal */}
-        <SortPopModal
-          visible={isSortModalVisible}
-          onClose={() => setSortModalVisible(false)}
-          onApply={() => {
-            console.log("Sort Applied with option:", selectedOption);
-            setSortModalVisible(false);
-            // Implement sorting logic here based on selectedOption
-          }}
-          selectedOption={selectedOption}
-          setSelectedOption={setSelectedOption}
-        />
-
-        {/* StudentFeesPaidModal */}
-        <StudentFeesPaidModal
-          visible={isStudentDetailsModalVisible}
-          onClose={() => setStudentDetailsModalVisible(false)}
-          onDownload={() => console.log("Downloading PDF...")}
-          onSendInvoice={() => console.log("Sending Invoice...")}
-          studentDetails={selectedStudentDetails}
-          paymentDetails={[
-            {
-              date: "2024-12-01",
-              time: "08:34:56 AM",
-              amount: "1214.4 QR",
-              penalty: "N/A",
-              status: "Successful",
-              payment_method: "Stripe",
-            },
-          ]}
-        />
-
-        {/* StudentFeesUnpaidModal */}
-        <StudentFeesUnpaidModal
-          visible={isStudentUnpaidModalVisible}
-          onClose={() => setStudentUnpaidModalVisible(false)}
-          onSendReminder={() => console.log("Sending Reminder...")}
-          studentDetails={selectedStudentDetails}
-        />
       </div>
     </AdminLayout>
   );

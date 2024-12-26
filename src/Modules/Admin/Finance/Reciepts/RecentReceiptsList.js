@@ -1,44 +1,63 @@
-import React, { useState } from "react";
+// RecentReceiptsList.js
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import AdminLayout from "../../../../Components/Admin/AdminDashLayout";
 import { Menu, Dropdown } from "antd";
-import { MoreOutlined } from "@ant-design/icons";
+import { MoreOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
 import { FiUserPlus } from "react-icons/fi";
 import { ShareAltOutlined } from "@ant-design/icons";
 import EmailModal from "../../../../Components/Common/EmailModal";
 import { useNavigate } from 'react-router-dom';
-
-// Sample Data
-const data = [
-    { id: "0098356", recipient: "Kameswaran S", class: "10", section: "B", paidDate: "16/12/24", amount: "1214 QAR", status: "Paid" },
-    { id: "0098357", recipient: "Kameswaran S", class: "10", section: "B", paidDate: "16/12/24", amount: "1214 QAR", status: "Unpaid" },
-    { id: "0098358", recipient: "Kameswaran S", class: "10", section: "B", paidDate: "16/12/24", amount: "1214 QAR", status: "Partial" },
-    { id: "0098359", recipient: "Kameswaran S", class: "10", section: "B", paidDate: "16/12/24", amount: "1214 QAR", status: "Overdue" },
-];
+import { fetchAllReceipts } from "../../../../Store/Slices/Finance/Receipts/receiptsThunks";
+import Spinner from "../../../../Components/Common/Spinner"; // Ensure the path is correct
 
 const RecentReceiptsList = () => {
     const [isSortModalVisible, setSortModalVisible] = useState(false);
     const [isEmailModalOpen, setEmailModalOpen] = useState(false);
-
+    const [searchQuery, setSearchQuery] = useState(""); // Added searchQuery state
 
     const navigate = useNavigate();
+    const dispatch = useDispatch();
 
+    // Access receipts data from Redux state
+    const { receipts = [], loading, error } = useSelector((state) => state.admin.receipts || {});
+
+    // Pagination States
+    const [currentPage, setCurrentPage] = useState(1);
+    const receiptsPerPage = 30;
+
+    // Calculate total pages
+    const totalReceipts = receipts.length;
+    const totalPages = Math.ceil(totalReceipts / receiptsPerPage);
+
+    // Fetch receipts on component mount if not already fetched
+    useEffect(() => {
+        if (totalReceipts === 0) { // Fetch only if no receipts are present
+            dispatch(fetchAllReceipts());
+        }
+    }, [dispatch, totalReceipts]);
+
+    // Handle Navigate to Add New Receipt
     const handleNavigate = () => {
         navigate('/finance/receipts/add-new-receipt');
     };
 
-
+    // Handle Share Click
     const handleShareClick = () => {
         setEmailModalOpen(true);
     };
 
+    // Close Email Modal
     const closeEmailModal = () => {
         setEmailModalOpen(false);
     };
 
     // Dropdown Menu for Action
-    const actionMenu = (
+    const actionMenu = (receiptId) => (
         <Menu>
-            <Menu.Item key="1">View Details</Menu.Item>
+            <Menu.Item key="1" onClick={() => navigate(`/finance/receipts/details/${receiptId}`)}>
+                View Details
+            </Menu.Item>
             <Menu.Item key="2">Send Reminder</Menu.Item>
         </Menu>
     );
@@ -50,13 +69,55 @@ const RecentReceiptsList = () => {
             Unpaid: { backgroundColor: "#FFE6E5", color: "#E70F00" },
             Partial: { backgroundColor: "#FFF0E3", color: "#FF6E0D" },
             Overdue: { backgroundColor: "#FFE6E5", color: "#E53935" },
+            Cancelled: { backgroundColor: "#FFE6E5", color: "#E70F00" }, // Added Cancelled status
         };
         return (
-            <span className="px-3 py-2 rounded-lg text-sm font-semibold" style={styles[status] || { backgroundColor: "#E0E0E0", color: "#808080" }}>
+            <span
+                className="px-3 py-2 rounded-lg text-sm font-semibold"
+                style={styles[status] || { backgroundColor: "#E0E0E0", color: "#808080" }}
+            >
                 {status}
             </span>
         );
     };
+
+    // Filter data based on search query
+    const filteredData = receipts.filter(
+        (item) =>
+            item.receiptNumber?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            (item.reciever?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                item.receiver?.name?.toLowerCase().includes(searchQuery.toLowerCase())) || // Handle both 'reciever' and 'receiver'
+            item.totalPaidAmount?.toString().includes(searchQuery.toLowerCase()) ||
+            (item.date && new Date(item.date).toLocaleDateString().includes(searchQuery.toLowerCase()))
+    );
+
+    // Get current receipts for pagination
+    const indexOfLastReceipt = currentPage * receiptsPerPage;
+    const indexOfFirstReceipt = indexOfLastReceipt - receiptsPerPage;
+    const currentReceipts = filteredData.slice(indexOfFirstReceipt, indexOfLastReceipt);
+
+    // Handle page change
+    const handlePageChange = (pageNumber) => {
+        setCurrentPage(pageNumber);
+    };
+
+    // Generate page numbers
+    const pageNumbers = [];
+    for (let i = 1; i <= totalPages; i++) {
+        pageNumbers.push(i);
+    }
+
+    // Map Redux receipts to table data
+    const mappedReceipts = currentReceipts.map(receipt => ({
+        id: receipt.receiptNumber || receipt._id || "N/A",
+        recipient: receipt.reciever?.name || receipt.receiver?.name || "N/A",
+        class: receipt.className || "N/A",
+        section: "N/A", // Assuming 'section' is not available in API data
+        paidDate: receipt.date ? new Date(receipt.date).toLocaleDateString() : "N/A",
+        amount: receipt.totalPaidAmount ? `${receipt.totalPaidAmount} QAR` : "N/A",
+        status: receipt.isCancel ? "Cancelled" : "Paid", // Adjust based on available data
+        _id: receipt._id, // Ensure _id is available for key and actions
+    }));
 
     return (
         <AdminLayout>
@@ -75,6 +136,7 @@ const RecentReceiptsList = () => {
                                     <label className="text-gray-500 text-sm mb-1">Class</label>
                                     <select className="border border-gray-300 rounded-lg px-4 py-2 text-gray-700 w-28">
                                         <option value="10">Ten</option>
+                                        {/* Add more options as needed */}
                                     </select>
                                 </div>
 
@@ -83,6 +145,7 @@ const RecentReceiptsList = () => {
                                     <label className="text-gray-500 text-sm mb-1">Section</label>
                                     <select className="border border-gray-300 rounded-lg px-4 py-2 text-gray-700 w-28">
                                         <option value="A">A</option>
+                                        {/* Add more options as needed */}
                                     </select>
                                 </div>
 
@@ -91,6 +154,7 @@ const RecentReceiptsList = () => {
                                     <label className="text-gray-500 text-sm mb-1">Fees Type</label>
                                     <select className="border border-gray-300 rounded-lg px-4 py-2 text-gray-700 w-36">
                                         <option value="Exam Fees">Exam Fees</option>
+                                        {/* Add more options as needed */}
                                     </select>
                                 </div>
                             </div>
@@ -114,13 +178,21 @@ const RecentReceiptsList = () => {
 
                         {/* Buttons */}
                         <div className="flex items-center space-x-4 mt-12">
-                            <button className="flex items-center px-4 py-2 border rounded-lg text-gray-700 font-medium hover:shadow-md" onClick={() => setSortModalVisible(true)}>
+                            <button
+                                className="flex items-center px-4 py-2 border rounded-lg text-gray-700 font-medium hover:shadow-md"
+                                onClick={() => setSortModalVisible(true)}
+                            >
                                 Sort
                             </button>
-                            <button className="flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-medium rounded-lg hover:opacity-90">
+                            <button
+                                className="flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-medium rounded-lg hover:opacity-90"
+                            >
                                 Export
                             </button>
-                            <button className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2" onClick={handleNavigate}>
+                            <button
+                                className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
+                                onClick={handleNavigate}
+                            >
                                 <span className="text-gray-800 font-medium">Add New Receipt</span>
                                 <div className="w-12 h-12 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center text-white">
                                     <FiUserPlus size={16} />
@@ -141,63 +213,127 @@ const RecentReceiptsList = () => {
                                 <th className="py-3 px-4 font-medium">Section</th>
                                 <th className="py-3 px-4 font-medium">Paid Date</th>
                                 <th className="py-3 px-4 font-medium">Paid Amount</th>
-                                <th className="py-3 px-4 font-medium">Status</th>
+                                {/* <th className="py-3 px-4 font-medium">Status</th> */}
                                 <th className="py-3 px-4 font-medium">Action</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {data.map((item, index) => (
-                                <tr key={index} className="border-b hover:bg-gray-50">
-                                    <td className="py-4 px-4">{item.id}</td>
-                                    <td className="py-4 px-4">{item.recipient}</td>
-                                    <td className="py-4 px-4">{item.class}</td>
-                                    <td className="py-4 px-4">{item.section}</td>
-                                    <td className="py-4 px-4">{item.paidDate}</td>
-                                    <td className="py-4 px-4">{item.amount}</td>
-                                    <td className="py-4 px-4">
-                                        <StatusBadge status={item.status} />
+                            {loading ? (
+                                <tr>
+                                    <td colSpan="8" className="py-4 px-4">
+                                        <div className="flex justify-center items-center">
+                                            <Spinner />
+                                        </div>
                                     </td>
-                                    <td className="py-4 px-4 flex items-center gap-4">
-                                        <Dropdown overlay={actionMenu} trigger={["click"]}>
-                                            <button className="w-8 h-8 flex items-center justify-center rounded-full border border-gray-300 hover:bg-gray-100">
-                                                <MoreOutlined style={{ fontSize: "16px", color: "#808080" }} />
-                                            </button>
-                                        </Dropdown>
-                                        <button onClick={handleShareClick} className="w-8 h-8 flex items-center justify-center rounded-full border border-gray-300 hover:bg-gray-100">
-                                            <ShareAltOutlined style={{ fontSize: "16px", color: "purple" }} />
-                                        </button>
-                                    </td>
-
                                 </tr>
-                            ))}
+                            ) : error ? (
+                                <tr>
+                                    <td colSpan="8" className="py-4 px-4">
+                                        <div className="flex justify-center items-center">
+                                            <ExclamationCircleOutlined style={{ fontSize: '24px', color: '#FF4D4F' }} />
+                                            <span className="ml-2 text-red-500">Error: {error}</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ) : mappedReceipts.length === 0 ? (
+                                <tr>
+                                    <td colSpan="8" className="py-4 px-4">
+                                        <div className="flex flex-col items-center">
+                                            <ExclamationCircleOutlined style={{ fontSize: '48px', color: '#d9d9d9' }} />
+                                            <span className="mt-4 text-gray-500 text-lg">No Receipts Available</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ) : (
+                                mappedReceipts.map((item) => (
+                                    <tr key={item.id} className="border-b hover:bg-gray-50">
+                                        <td className="py-4 px-4">{item.id}</td>
+                                        <td className="py-4 px-4">{item.recipient}</td>
+                                        <td className="py-4 px-4">{item.class}</td>
+                                        <td className="py-4 px-4">{item.section}</td>
+                                        <td className="py-4 px-4">{item.paidDate}</td>
+                                        <td className="py-4 px-4">{item.amount}</td>
+                                        {/* <td className="py-4 px-4">
+                                            <StatusBadge status={item.status} />
+                                        </td> */}
+                                        <td className="py-4 px-4 flex items-center gap-4">
+                                            <Dropdown overlay={() => actionMenu(item._id)} trigger={["click"]}>
+                                                <button
+                                                    className="w-8 h-8 flex items-center justify-center rounded-full border border-gray-300 hover:bg-gray-100"
+                                                    aria-label="Actions"
+                                                >
+                                                    <MoreOutlined style={{ fontSize: "16px", color: "#808080" }} />
+                                                </button>
+                                            </Dropdown>
+                                            <button onClick={handleShareClick} className="w-8 h-8 flex items-center justify-center rounded-full border border-gray-300 hover:bg-gray-100" aria-label="Share">
+                                                <ShareAltOutlined style={{ fontSize: "16px", color: "purple" }} />
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
                         </tbody>
                     </table>
                 </div>
 
-                {/* Pagination */}
-                <div className="flex justify-between items-center mt-4 text-gray-600 text-sm">
-                    <span>Showing 10 Receipts of 4373</span>
-                    <div className="flex gap-2">
-                        <button className="text-gray-500">« Back</button>
-                        <button className="bg-purple-500 text-white px-2 rounded">1</button>
-                        <button className="text-gray-500">2</button>
-                        <button className="text-gray-500">Next »</button>
+                {/* Pagination and Showing Info */}
+                {!loading && !error && (
+                    <div className="flex justify-between items-center mt-4 text-gray-600 text-sm">
+                        <span>
+                            Showing {currentReceipts.length} receipts out of {totalReceipts} receipts
+                        </span>
+                        {totalPages > 1 && (
+                            <div className="flex gap-2">
+                                <button
+                                    className={`px-3 py-1 rounded ${currentPage === 1 ? "bg-gray-200 cursor-not-allowed" : "bg-white hover:bg-gray-100"}`}
+                                    onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)}
+                                    disabled={currentPage === 1}
+                                >
+                                    « Back
+                                </button>
+                                {pageNumbers.map(number => (
+                                    <button
+                                        key={number}
+                                        className={`px-3 py-1 rounded ${currentPage === number ? "bg-purple-500 text-white" : "bg-white hover:bg-gray-100"}`}
+                                        onClick={() => handlePageChange(number)}
+                                    >
+                                        {number}
+                                    </button>
+                                ))}
+                                <button
+                                    className={`px-3 py-1 rounded ${currentPage === totalPages ? "bg-gray-200 cursor-not-allowed" : "bg-white hover:bg-gray-100"}`}
+                                    onClick={() => currentPage < totalPages && handlePageChange(currentPage + 1)}
+                                    disabled={currentPage === totalPages}
+                                >
+                                    Next »
+                                </button>
+                            </div>
+                        )}
                     </div>
-                </div>
+                )}
+
+                {/* Modals */}
+                <EmailModal
+                    isOpen={isEmailModalOpen}
+                    onClose={closeEmailModal}
+                    sendButtonText="Send Receipt"
+                    onSubmit={() => {
+                        console.log("Send Receipt Clicked");
+                        closeEmailModal();
+                    }}
+                />
+
+                {/* Sort Modal (Assuming it's implemented elsewhere) */}
+                {isSortModalVisible && (
+                    // Your Sort Modal component here
+                    <div>
+                        {/* Sort Modal Content */}
+                    </div>
+                )}
             </div>
-
-            <EmailModal
-                isOpen={isEmailModalOpen}
-                onClose={closeEmailModal}
-                sendButtonText="Send Receipt"
-                onSubmit={() => {
-                    console.log("Send Receipt Clicked");
-                    closeEmailModal();
-                }}
-            />
-
         </AdminLayout>
     );
+
 };
 
 export default RecentReceiptsList;

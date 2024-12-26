@@ -486,6 +486,26 @@ const TotalRevenueList = () => {
     [totalRevenue, remainingPartialPaidRevenue, unpaidRevenue, totalPaidAmount]
   );
 
+
+  const transformIncomeData = (incomes) =>
+    incomes?.map(({ _id, category, ...income }, index) => ({
+      sNo: index + 1,
+      category: category?.[0]?.categoryName || "N/A",
+      ...income, 
+      subCategory: income.subCategory || "N/A",
+      paymentType: income.paymentType || "N/A",
+      discount: income.discount || 0, 
+      discountType: income.discountType || "percentage",
+      finalAmount: income.final_amount || 0,
+      paidAmount: income.paid_amount || 0,
+      remainingAmount: income.remaining_amount || 0,
+      penalty: income.penalty || 0, 
+      // earnedDate: income.paidDate || income.generateDate || "N/A",
+      totalAmount: income.total_amount || 0,
+      academicYearDetails: income.academicYearDetails?.[0]?.year || "N/A",
+    })) || [];
+
+
   return (
     <Layout title="Earning List | Student Diwan">
       <AdminLayout>
@@ -683,8 +703,39 @@ const TotalRevenueList = () => {
             onClose={() => setIsBulkEntriesModalVisible(false)}
           />
         </div>
+<<<<<<< HEAD
       </AdminLayout>
     </Layout>
+=======
+
+        {/* Modals */}
+        <DeleteModal
+          visible={isDeleteModalVisible}
+          onClose={() => {
+            setIsDeleteModalVisible(false);
+            setSelectedIncomeForDeletion(null);
+          }}
+          income={selectedIncomeForDeletion}
+        />
+        <ExportModal
+          visible={isExportModalVisible}
+          onClose={() => setIsExportModalVisible(false)}
+          dataToExport={transformIncomeData(incomes)}
+          title="EarningsData"
+          sheet="earnings_report"
+        />
+        <FilterRevenueModal
+          visible={isFilterModalVisible}
+          onClose={() => setIsFilterModalVisible(false)}
+          onFilterApply={handleFilterApply}
+        />
+        <BulkEntriesModal
+          visible={isBulkEntriesModalVisible}
+          onClose={() => setIsBulkEntriesModalVisible(false)}
+        />
+      </div>
+    </AdminLayout>
+>>>>>>> 6ca9ee063ee467aca6dec9faf85d307a76a8098f
   );
 };
 
