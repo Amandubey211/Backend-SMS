@@ -20,7 +20,7 @@ const StudentFeesMain = () => {
     (state) => state.admin.earnings
   );
 useEffect(() => {
-  dispatch(fetchAllIncomes({ page: 1, limit: 20,categoryId:"675bc4e3e7901c873905fd2f",includeDetails:true})); 
+  dispatch(fetchAllIncomes({ page: 1, limit: 20,categoryName:"Student-Based Revenue",includeDetails:true})); 
 }, [dispatch]);
 
   // Handlers for Sidebar

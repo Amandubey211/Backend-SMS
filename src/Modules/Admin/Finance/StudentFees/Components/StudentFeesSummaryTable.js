@@ -5,6 +5,8 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import moment from "moment";
 import { fetchAllIncomes } from "../../../../../Store/Slices/Finance/Earnings/earningsThunks";
+import Spinner from "../../../../../Components/Common/Spinner";
+import NoDataFound from "../../../../../Components/Common/NoDataFound";
 
 const StudentFeesSummaryTable = () => {
   const dispatch = useDispatch();
@@ -22,7 +24,7 @@ const StudentFeesSummaryTable = () => {
       fetchAllIncomes({
         page: currentPage,
         limit: 10,
-        categoryId: "675bc4e3e7901c873905fd2f",
+        categoryName: "Student-Based Revenue",
         includeDetails:true
       })
     );
@@ -52,7 +54,7 @@ const StudentFeesSummaryTable = () => {
       title: "Student",
       dataIndex: "studentDetails",
       key: "studentDetails",
-      render: (studentDetails) => studentDetails?.firstName + ' ' + studentDetails?.lastName ||"N/A",
+      render:(studentDetails) => studentDetails?.firstName?.slice(0,10)+'..' || "N/A",
     },
     {
       title: "Class ",
@@ -122,23 +124,9 @@ const StudentFeesSummaryTable = () => {
       </div>
 
       {/* Loading Indicator */}
-      {loading && (
-        <div className="flex justify-center my-4">
-          <Spin tip="Loading..." />
-        </div>
-      )}
-
-      {/* Error Message */}
-      {error && (
-        <Alert
-          message="Error"
-          description={error}
-          type="error"
-          showIcon
-          closable
-          className="my-4"
-        />
-      )}
+    {loading && <Spinner/>}
+    
+    {error && <NoDataFound/>}
 
       {/* Table */}
       {!loading && !error && (

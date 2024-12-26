@@ -29,7 +29,7 @@ const SummaryRevenueList = () => {
 
   const [params, setParams] = useState({
     limit: 10,
-    categoryId: "675bc4e3e7901c873905fd2f",
+    categoryName: "Student-Based Revenue",
     includeDetails:true,
     classId: "",
     sectionId: "",
@@ -71,7 +71,7 @@ const SummaryRevenueList = () => {
       dataIndex: "studentDetails",
       key: "studentDetails",
       render: (studentDetails) =>
-        studentDetails?.firstName + " " + studentDetails?.lastName || "N/A",
+        studentDetails?.firstName?.slice(0,10)+'..' || "N/A",
     },
     {
       title: "Class",
@@ -101,12 +101,7 @@ const SummaryRevenueList = () => {
         </span>
       ),
     },
-    {
-      title: "Payment Type",
-      dataIndex: "paymentType",
-      key: "paymentType",
-      render: (text) => <span>{text || "N/A"}</span>,
-    },
+ 
     {
       title: "Final Amount",
       dataIndex: "final_amount",

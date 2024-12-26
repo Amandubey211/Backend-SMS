@@ -1,14 +1,16 @@
-import React from "react";
+import React, { useState } from "react";
 import { Formik, Form, FieldArray } from "formik";
 import * as Yup from "yup";
-import DashLayout from "../../../../../Components/Admin/AdminDashLayout";
+import AdminDashLayout from "../../../../../Components/Admin/AdminDashLayout";
 import TextInput from "./Components/TextInput";
 import SelectInput from "./Components/SelectInput";
 import { useDispatch } from "react-redux";
 import { addInvoice } from "../../../../../Store/Slices/Finance/Invoice/invoice.thunk";
 import toast from "react-hot-toast";
+import Layout from "../../../../../Components/Common/Layout";
 
 const CreateNewInvoice = () => {
+  const [loading,setLoading] = useState(false)
   const initialValues = {
     dueDate: "",
 
@@ -52,11 +54,13 @@ const CreateNewInvoice = () => {
   });
   const dispatch = useDispatch()
   const handleSubmit = async (values) => {
-    dispatch(addInvoice(values))
+    setLoading(true)
+    dispatch(addInvoice(values)).then(()=>setLoading(false))
   };
 
   return (
-    <DashLayout>
+    <Layout title="Finance | Invoice">
+    <AdminDashLayout>
       <div className="p-6 min-h-screen">
 
         <Formik
@@ -81,13 +85,14 @@ const CreateNewInvoice = () => {
                   </button>
                   <button
                     type="submit"
+                    disabled={loading}
                     className="px-4 py-2 mx-2 rounded-md text-white"
                     onClick={() => handleSubmit(values)}
                     style={{
                       background: "linear-gradient(to right, #ec4899, #a855f7)", // from-pink-500 to-purple-500
                     }}
                   >
-                    Save Invoice
+                    {loading?'Loading..':'Save Invoice'}
                   </button></div>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
@@ -98,7 +103,7 @@ const CreateNewInvoice = () => {
                 <TextInput name="receiver.email" label="Email" placeholder="Enter Email" />
                 <TextInput name="description" label="Note" placeholder="Enter Short Description" />
               </div>
-              <div className="p-6 rounded-md flex items-center flex-col justify-center" style={{ backgroundColor: "#ECECEC" }}>
+              <div className="p-6 rounded-md flex items-center flex-col justify-center mx-20" style={{ backgroundColor: "#ECECEC" }}>
                 <h2 className="text-lg font-semibold mb-4">Items</h2>
                 <FieldArray name="lineItems">
                   {({ remove, push }) => (
@@ -108,7 +113,7 @@ const CreateNewInvoice = () => {
                           key={index}
                           className="grid grid-cols-12 gap-4 items-center mb-4"
                         >
-                          <div className="col-span-3">
+                          <div className="col-span-4">
                             <SelectInput
                               name={`lineItems.${index}.revenueType`}
                               label="Revenue Type"
@@ -122,7 +127,7 @@ const CreateNewInvoice = () => {
                             />
                           </div>
 
-                          <div className="col-span-2">
+                          <div className="col-span-3">
                             <TextInput
                               name={`lineItems.${index}.quantity`}
                               label="Quantity"
@@ -130,7 +135,7 @@ const CreateNewInvoice = () => {
                               placeholder="Enter Quantity"
                             />
                           </div>
-                          <div className="col-span-2">
+                          <div className="col-span-3">
                             <TextInput
                               name={`lineItems.${index}.amount`}
                               label="Amount"
@@ -195,7 +200,8 @@ const CreateNewInvoice = () => {
           )}
         </Formik>
       </div>
-    </DashLayout>
+    </AdminDashLayout>
+    </Layout>
   );
 };
 
