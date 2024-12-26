@@ -10,7 +10,7 @@ const ReturnItems = ({ values, setFieldValue }) => (
             name="items"
             render={(arrayHelpers) => (
                 <>
-                    {values.items.map((item, index) => (
+                    {values?.map((item, index) => (
                         <div
                             key={index}
                             className="grid grid-cols-12 gap-4 items-center mb-4"
