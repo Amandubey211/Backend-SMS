@@ -1,127 +1,86 @@
-// src/Modules/Admin/Finance/StudentFees/SummaryRevenueList.js
-
 import React, { useState, useEffect } from "react";
-import { Table, Modal, Button, Spin, Alert } from "antd";
+import { Table, Modal, Button, Spin, Alert, Tooltip } from "antd";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import {  Tooltip} from "antd";
-import {EditOutlined,DeleteOutlined,} from "@ant-design/icons";
+import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import AdminLayout from "../../../../Components/Admin/AdminDashLayout";
-import SortPopModal from "./Components/SortPopModal"; // Corrected import
-import StudentFeesPaidModal from "./Components/StudentFeesPaidModal";
-import StudentFeesUnpaidModal from "./Components/StudentFeesUnpaidModal";
 import { FiUserPlus } from "react-icons/fi";
 import { deleteStudentFees } from "../../../../Store/Slices/Finance/StudentFees/studentFeesThunks";
 import moment from "moment"; // Replaced dayjs with moment
 import { fetchAllIncomes } from "../../../../Store/Slices/Finance/Earnings/earningsThunks";
+import { fetchSectionsNamesByClass } from "../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
+import { fetchAllClasses } from "../../../../Store/Slices/Admin/Class/actions/classThunk";
+import Spinner from "../../../../Components/Common/Spinner";
+import NoDataFound from "../../../../Components/Common/NoDataFound";
 
 const SummaryRevenueList = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [currentPage,setCurrentPage] = useState(1)
-  useEffect(() => {
-     dispatch(fetchAllIncomes({ page: 1, limit: 20,categoryId:"675bc4e3e7901c873905fd2f"})); 
-  }, [dispatch]);
-  const { incomes, loading, error, totalRecords,totalPages
-  } = useSelector(
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const { incomes, loading, error, totalRecords } = useSelector(
     (state) => state.admin.earnings
   );
 
-  const [selectedStudentDetails, setSelectedStudentDetails] = useState({});
-  const [isSortModalVisible, setSortModalVisible] = useState(false);
-  const [isStudentDetailsModalVisible, setStudentDetailsModalVisible] =
-    useState(false);
-  const [isStudentUnpaidModalVisible, setStudentUnpaidModalVisible] =
-    useState(false);
-  const [selectedOption, setSelectedOption] = useState("newest");
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  let sectionList = useSelector(
+    (state) => state.admin.group_section.sectionsList
+  );
+  const classList = useSelector((state) => state.admin.class.classes);
 
+  const [params, setParams] = useState({
+    limit: 10,
+    categoryName: "Student-Based Revenue",
+    includeDetails:true,
+    classId: "",
+    sectionId: "",
+    subCategory: "",
+    status: "",
+  });
+
+  useEffect(() => {
+    dispatch(fetchAllClasses());
+    dispatch(fetchAllIncomes(params)); // Fetch initial data
+  }, [dispatch, params]);
+
+  const filterOnchange = (e) => {
+    const { name, value } = e.target;
    
 
-  const handleRowClick = (record) => {
-    const penalty = parseFloat(record?.penalty || 0);
-    const taxAmount = (parseFloat(record?.final_amount || 0) * parseFloat(record?.tax || 0)) / 100;
-    const discountAmount =
-      record.discountType === "percentage"
-        ? (parseFloat(record?.final_amount || 0) * parseFloat(record?.discount || 0)) / 100
-        : parseFloat(record?.discount || 0);
-  
-    const totalAmount = parseFloat(record?.final_amount || 0) + penalty - discountAmount + taxAmount;
-  
-    const studentDetails = {
-      category: record?.category.map((cat) => cat.categoryName).join(", ") || "N/A",
-      subCategory: record?.subCategory || "N/A",
-      paymentStatus: record?.paymentStatus || "N/A",
-      paymentType: record?.paymentType || "N/A",
-      finalAmount: `${totalAmount.toFixed(2)} QR`,
-      paidAmount: `${record?.paid_amount?.toFixed(2) || 0} QR`,
-      penalty: `${penalty} QR`,
-      tax: `${record?.tax || 0}%`,
-      discount: record?.discount || "N/A",
-    };
-  
-    setSelectedStudentDetails(studentDetails);
-  
-    if (record?.paymentStatus === "paid") {
-      setStudentDetailsModalVisible(true);
-    } else {
-      setStudentUnpaidModalVisible(true);
+    // Fetch filtered incomes immediately
+    if (name === "classId") {
+      if(!value){
+        setParams((prev) => ({
+          ...prev,
+          sectionId:'', 
+        }));
+        dispatch(fetchSectionsNamesByClass("675bc4e3e7901c873905fd2f")); 
+      }else{
+        dispatch(fetchSectionsNamesByClass(value)); 
+      }
+      
     }
-  };
-  
-
-  const handleDelete = () => {
-    if (selectedRowKeys.length === 0) {
-      Modal.warning({
-        title: "No Selection",
-        content: "Please select at least one fee record to delete.",
-      });
-      return;
-    }
-
-    Modal.confirm({
-      title: "Are you sure you want to delete the selected fee records?",
-      onOk: () => {
-        dispatch(deleteStudentFees(selectedRowKeys))
-          .unwrap()
-          .then(() => {
-            // Refresh the data after deletion
-            dispatch(fetchAllIncomes({ page: 1, limit: 20 }));
-            setSelectedRowKeys([]);
-          })
-          .catch((err) => {
-            // Error handling is managed by the slice
-            console.error("Delete failed:", err);
-          });
-      },
-    });
-  };
-
-  // Function to handle single record deletion
-  const handleDeleteSingleRecord = (feeId) => {
-    Modal.confirm({
-      title: "Are you sure you want to delete this fee record?",
-      onOk: () => {
-        dispatch(deleteStudentFees([feeId]))
-          .unwrap()
-          .then(() => {
-            // Refresh the data after deletion
-            dispatch(fetchAllIncomes({ page: 1, limit: 20 }));
-            setSelectedRowKeys((prevKeys) =>
-              prevKeys.filter((key) => key !== feeId)
-            );
-          })
-          .catch((err) => {
-            console.error("Delete failed:", err);
-          });
-      },
-    });
+    setParams((prev) => ({
+      ...prev,
+      [name]: value, 
+    }));
   };
 
   const columns = [
- 
     {
-      title: "Subcategory",
+      title: "Student",
+      dataIndex: "studentDetails",
+      key: "studentDetails",
+      render: (studentDetails) =>
+        studentDetails?.firstName?.slice(0,10)+'..' || "N/A",
+    },
+    {
+      title: "Class",
+      dataIndex: "classDetails",
+      key: "classDetails",
+      render: (classDetails) => classDetails?.className || "N/A",
+    },
+    {
+      title: "Sub-Category",
       dataIndex: "subCategory",
       key: "subCategory",
       render: (text) => <span>{text || "N/A"}</span>,
@@ -142,12 +101,7 @@ const SummaryRevenueList = () => {
         </span>
       ),
     },
-    {
-      title: "Payment Type",
-      dataIndex: "paymentType",
-      key: "paymentType",
-      render: (text) => <span>{text || "N/A"}</span>,
-    },
+ 
     {
       title: "Final Amount",
       dataIndex: "final_amount",
@@ -159,10 +113,10 @@ const SummaryRevenueList = () => {
       title: "Paid Amount",
       dataIndex: "paid_amount",
       key: "paid_amount",
-      sorter: (a, b) => new Date(a.paid_amount) - new Date(b.paid_amount),
+      sorter: (a, b) => a.paid_amount - b.paid_amount,
       render: (amount) => <span>{`${amount.toFixed(2)} QR`}</span>,
     },
-  {
+    {
       title: "Date",
       dataIndex: "paidDate",
       key: "paidDate",
@@ -227,113 +181,122 @@ const SummaryRevenueList = () => {
       ),
     },
   ];
-  
 
-  const rowSelection = {
-    selectedRowKeys,
-    onChange: (selectedKeys) => {
-      setSelectedRowKeys(selectedKeys);
-    },
-  };
+  const subCategoryList = [
+    "Tuition Fees",
+    "Hotel Fees",
+    "Application Fees",
+    "Certificate Fees",
+    "Meal Fees",
+    "Event Fees",
+    "Exam Fees",
+    "Transport Fees",
+    "Other",
+  ];
 
   return (
     <AdminLayout>
-       <div className="p-6 bg-white shadow-lg rounded-lg">
+      <div className="p-6 bg-white shadow-lg rounded-lg">
         {/* Filters and Buttons Section */}
-        <div className="flex justify-between items-start ">
-          {/* Left Side: Filters and Radio Buttons */}
+        <div className="flex justify-between items-start">
           <div className="flex flex-col space-y-4">
-            {/* Filters Row */}
             <div className="flex items-center space-x-4">
               {/* Class Filter */}
               <div className="flex flex-col">
                 <label className="text-gray-500 text-sm mb-1">Class</label>
-                <select className="border border-gray-300 rounded-lg px-4 py-2 text-gray-700 w-28">
-                  <option value="Ten">Ten</option>
-                  {/* Add more options as needed */}
+                <select
+                  className="border border-gray-300 rounded-lg px-4 py-2 text-gray-700 w-28"
+                  onChange={filterOnchange}
+                  name="classId"
+                >
+                  <option value="">All</option>
+                  {classList?.map((i) => (
+                    <option value={i._id} key={i._id}>
+                      {i.className}
+                    </option>
+                  ))}
                 </select>
               </div>
 
               {/* Section Filter */}
               <div className="flex flex-col">
-               <label className="text-gray-500 text-sm mb-1">Section</label>
-                <select className="border border-gray-300 rounded-lg px-4 py-2 text-gray-700 w-28">
-                  <option value="A">A</option>
-                  {/* Add more options as needed */}
+                <label className="text-gray-500 text-sm mb-1">Section</label>
+                <select
+                  className="border border-gray-300 rounded-lg px-4 py-2 text-gray-700 w-28"
+                  name="sectionId"
+                  onChange={filterOnchange}
+                >
+                  <option value="">ALL</option>
+                  {sectionList?.map((i) => (
+                    <option value={i?._id} key={i?._id}>
+                      {i?.sectionName}
+                    </option>
+                  ))}
                 </select>
               </div>
 
               {/* Fees Type Filter */}
               <div className="flex flex-col">
                 <label className="text-gray-500 text-sm mb-1">Fees Type</label>
-                <select className="border border-gray-300 rounded-lg px-4 py-2 text-gray-700 w-36">
-                  <option value="Exam fees">Exam fees</option>
-                  {/* Add more options as needed */}
+                <select
+                  className="border border-gray-300 rounded-lg px-4 py-2 text-gray-700 w-36"
+                  name="subCategory"
+                  onChange={filterOnchange}
+                >
+                  <option value="">All</option>
+                  {subCategoryList.map((i, idx) => (
+                    <option value={i} key={idx}>
+                      {i}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>
 
-            {/* Radio Buttons Row */}
             <div className="flex space-x-6">
               <label className="flex items-center text-sm space-x-2">
                 <input
                   type="radio"
-                  name="studentFilter"
+                  name="status"
                   className="form-radio text-green-600"
+                  value=""
                   defaultChecked
+                  onChange={filterOnchange}
                 />
                 <span className="text-green-600 font-medium">Everyone</span>
               </label>
               <label className="flex items-center text-sm space-x-2">
                 <input
                   type="radio"
-                  name="studentFilter"
+                  name="status"
                   className="form-radio text-gray-500"
+                  value="paid"
+                  onChange={filterOnchange}
                 />
                 <span className="text-gray-700">Paid Student</span>
               </label>
               <label className="flex items-center text-sm space-x-2">
                 <input
                   type="radio"
-                  name="studentFilter"
+                  name="status"
                   className="form-radio text-gray-500"
+                  value="unpaid"
+                  onChange={filterOnchange}
                 />
                 <span className="text-gray-700">Unpaid Student</span>
               </label>
             </div>
           </div>
 
-          {/* Right Side: Buttons */}
-          <div className="flex items-center space-x-4 justify-center">
-            {/* Export Button */}
+          <div className="flex items-center space-x-4">
             <button
               className="flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-medium rounded-lg hover:opacity-90"
-              onClick={() => console.log("Exporting data...")} // Implement export functionality
+              onClick={() => console.log("Exporting data...")}
             >
               Export
-              <span className="ml-2">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M5 10l7-7m0 0l7 7m-7-7v18"
-                  />
-                </svg>
-              </span>
             </button>
-
-            {/* Add New Fee Button */}
             <button
-              onClick={() =>
-                navigate("/finance/studentfees/add/form")
-              }
+              onClick={() => navigate("/finance/studentfees/add/form")}
               className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
             >
               <span className="text-gray-800 font-medium">Add New Fee</span>
@@ -344,82 +307,28 @@ const SummaryRevenueList = () => {
           </div>
         </div>
 
-        {/* Table Section */}
         <div className="mt-6">
           {loading ? (
-            <div className="flex justify-center my-4">
-              <Spin tip="Loading..." />
-            </div>
+            <Spinner/>
           ) : error ? (
-            <Alert
-              message="Error"
-              description={error}
-              type="error"
-              showIcon
-              closable
-              className="my-4"
-            />
+           <NoDataFound/>
           ) : (
             <Table
-            dataSource={incomes}
-            columns={columns}
-            pagination={{
-              current: currentPage,
-              pageSize: 20,
-              total: totalRecords,
-              onChange: (page) => {
-                setCurrentPage(page)
-                dispatch(fetchAllIncomes({ page, limit: 20,categoryId:"675bc4e3e7901c873905fd2f"}));
-              },
-            }}
-            rowKey="_id"
-            onRow={(record) => ({
-              onClick: () => handleRowClick(record),
-            })}
-          />
-          
+              dataSource={incomes}
+              columns={columns}
+              pagination={{
+                current: currentPage,
+                pageSize: 10,
+                total: totalRecords,
+                onChange: (page) => {
+                  setCurrentPage(page);
+                  dispatch(fetchAllIncomes({ ...params, page }));
+                },
+              }}
+              rowKey="_id"
+            />
           )}
         </div>
-
-        {/* SortPopModal */}
-        <SortPopModal
-          visible={isSortModalVisible}
-          onClose={() => setSortModalVisible(false)}
-          onApply={() => {
-            console.log("Sort Applied with option:", selectedOption);
-            setSortModalVisible(false);
-            // Implement sorting logic here based on selectedOption
-          }}
-          selectedOption={selectedOption}
-          setSelectedOption={setSelectedOption}
-        />
-
-        {/* StudentFeesPaidModal */}
-        <StudentFeesPaidModal
-          visible={isStudentDetailsModalVisible}
-          onClose={() => setStudentDetailsModalVisible(false)}
-          onDownload={() => console.log("Downloading PDF...")}
-          onSendInvoice={() => console.log("Sending Invoice...")}
-          studentDetails={selectedStudentDetails}
-          paymentDetails={[
-            {
-              date: "2024-12-01",
-              time: "08:34:56 AM",
-              amount: "1214.4 QR",
-              penalty: "N/A",
-              status: "Successful",
-              payment_method: "Stripe",
-            },
-          ]}
-        />
-
-        {/* StudentFeesUnpaidModal */}
-        <StudentFeesUnpaidModal
-          visible={isStudentUnpaidModalVisible}
-          onClose={() => setStudentUnpaidModalVisible(false)}
-          onSendReminder={() => console.log("Sending Reminder...")}
-          studentDetails={selectedStudentDetails}
-        />
       </div>
     </AdminLayout>
   );
