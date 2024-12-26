@@ -424,7 +424,7 @@ const TotalRevenueList = () => {
       paidAmount: income.paid_amount || 0,
       remainingAmount: income.remaining_amount || 0,
       penalty: income.penalty || 0, 
-      earnedDate: income.paidDate || income.generateDate || "N/A",
+      // earnedDate: income.paidDate || income.generateDate || "N/A",
       totalAmount: income.total_amount || 0,
       academicYearDetails: income.academicYearDetails?.[0]?.year || "N/A",
     })) || [];
