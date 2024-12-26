@@ -1,7 +1,6 @@
 import React from "react";
 import { FieldArray } from "formik";
 import TextInput from "./TextInput";
-import SelectInput from "./SelectInput";
 
 const ReturnItems = ({ values, setFieldValue }) => (
   <div className="mb-6 p-6 rounded-md" style={{ backgroundColor: "#ECECEC" }}>
@@ -11,10 +10,9 @@ const ReturnItems = ({ values, setFieldValue }) => (
         <>
           {/* Headings */}
           <div className="grid grid-cols-12 gap-4 mb-4">
-            <div className="col-span-3 text-center font-normal">Category</div>
-            <div className="col-span-2 text-center font-normal">Quantity</div>
-            <div className="col-span-3 text-center font-normal">Rate</div>
-            <div className="col-span-3 text-center font-normal">Total Amount</div>
+            <div className="col-span-4 text-center font-normal">Category</div>
+            <div className="col-span-3 text-center font-normal">Quantity</div>
+            <div className="col-span-4 text-center font-normal">Total Amount</div>
             <div className="col-span-1"></div>
           </div>
 
@@ -24,42 +22,29 @@ const ReturnItems = ({ values, setFieldValue }) => (
               className="grid grid-cols-12 gap-4 items-center mb-4"
             >
               {/* Category */}
-              <div className="col-span-3">
-                <SelectInput
+              <div className="col-span-4">
+                <TextInput
                   name={`items.${index}.category`}
                   label=""
-                  options={["Category 1", "Category 2", "Category 3"]}
-                  placeholder="Select"
+                  placeholder="Enter category"
                 />
               </div>
 
               {/* Quantity */}
-              <div className="col-span-2">
-                <SelectInput
-                  name={`items.${index}.quantity`}
-                  label=""
-                  options={[1, 2, 3, 4, 5]} // Example quantity options
-                  placeholder="Select"
-                />
-              </div>
-
-              {/* Rate */}
               <div className="col-span-3">
                 <TextInput
-                  name={`items.${index}.rate`}
-                  label=""
+                  name={`items.${index}.quantity`}
                   type="number"
-                  placeholder="Enter rate"
+                  placeholder="Enter quantity"
                 />
               </div>
 
               {/* Total Amount */}
-              <div className="col-span-3">
+              <div className="col-span-4">
                 <TextInput
                   name={`items.${index}.totalAmount`}
                   label=""
                   type="number"
-                  readOnly
                   placeholder="Enter total amount"
                 />
               </div>
@@ -85,8 +70,7 @@ const ReturnItems = ({ values, setFieldValue }) => (
                 arrayHelpers.push({
                   category: "",
                   quantity: "",
-                  rate: 0,
-                  totalAmount: 0,
+                  totalAmount: "",
                 })
               }
               className="rounded-full w-12 h-12 flex items-center justify-center"
