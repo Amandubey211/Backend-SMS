@@ -46,11 +46,11 @@ const SelectInput = ({ label, name, options, disabled, autoComplete = "off" }) =
         {options.map((option, index) => (
           <motion.option
             key={index}
-            value={option.value} // Use option.value
+            value={option.value}
             variants={fieldVariants}
             transition={{ delay: 0.2 }}
           >
-            {option.label} {/* Use option.label */}
+            {option.label}
           </motion.option>
         ))}
       </Field>

@@ -17,7 +17,7 @@ import { createReceipt } from "../../../../../Store/Slices/Finance/Receipts/rece
 const CreateReceipt = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  
+
   const [selectedClass, setSelectedClass] = useState("");
   const [selectedSection, setSelectedSection] = useState("");
 
@@ -213,7 +213,7 @@ const CreateReceipt = () => {
                 <SelectInput
                   name="class"
                   label="Class"
-                  options={classes.map(cls => ({ label: cls.name, value: cls._id }))}
+                  options={classes.map((cls) => ({ label: cls.className, value: cls._id }))} // Updated mapping to use `className` from the API response
                   onChange={(e) => {
                     const classId = e.target.value;
                     setFieldValue("class", classId);
@@ -223,11 +223,12 @@ const CreateReceipt = () => {
                   }}
                 />
 
+
                 {/* Section Selection */}
                 <SelectInput
                   name="section"
                   label="Section"
-                  options={selectedClass && sectionsList[selectedClass] ? sectionsList[selectedClass].map(sec => ({ label: sec.name, value: sec._id })) : []}
+                  options={selectedClass && sectionsList[selectedClass] ? sectionsList[selectedClass].map((sec) => ({ label: sec.sectionName, value: sec._id })) : []} // Assuming `sectionName` is the key in your API response
                   onChange={(e) => {
                     const sectionId = e.target.value;
                     setFieldValue("section", sectionId);
@@ -241,7 +242,17 @@ const CreateReceipt = () => {
                 <SelectInput
                   name="studentName"
                   label="Student Name"
-                  options={selectedClass && selectedSection && studentsList[selectedClass] && studentsList[selectedClass][selectedSection] ? studentsList[selectedClass][selectedSection].map(student => ({ label: student.name, value: student.name })) : []}
+                  options={
+                    selectedClass &&
+                      selectedSection &&
+                      studentsList[selectedClass] &&
+                      studentsList[selectedClass][selectedSection]
+                      ? studentsList[selectedClass][selectedSection].map((student) => ({
+                        label: student.name,
+                        value: student.name, // Adjust based on your student API response
+                      }))
+                      : []
+                  }
                   onChange={(e) => setFieldValue("studentName", e.target.value)}
                   disabled={!selectedClass || !selectedSection}
                 />
