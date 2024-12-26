@@ -7,8 +7,8 @@ export const fetchAllQuotations = createAsyncThunk(
   "quotations/fetchAllQuotations",
   async (params, { rejectWithValue }) => {
     try {
-      const response = await getData("/finance/quotations/all", params);
-      if (response?.success) {
+      const response = await getData("/finance/revenue/all/quotation", params);
+      if (response) {
         return response;
       } else {
         toast.error(response?.message || "Failed to fetch quotations.");

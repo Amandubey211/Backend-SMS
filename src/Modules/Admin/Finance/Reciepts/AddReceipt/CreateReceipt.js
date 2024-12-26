@@ -18,18 +18,17 @@ const CreateReceipt = () => {
   const navigate = useNavigate();
 
   const [selectedClass, setSelectedClass] = useState("");
-  const [selectedSection, setSelectedSection] = useState("");
 
   // Accessing Redux State with Default Values to Prevent Destructuring Errors
   const { classes = [] } = useSelector((store) => store?.admin?.class || {});
-  const { sectionsList = {} } = useSelector((store) => store?.admin?.group_section || {});
-  const { studentsList = {} } = useSelector((store) => store?.admin?.students || {});
+  const { studentsList = [] } = useSelector((store) => store?.admin?.students || {});
 
   // Fetch classes on component mount
   useEffect(() => {
     dispatch(fetchAllClasses());
   }, [dispatch]);
 
+  // Revised Initial Values: No pre-filled or zero values
   const initialValues = {
     notes: "",
     class: "",
@@ -40,45 +39,69 @@ const CreateReceipt = () => {
     address: "",
     contactNumber: "",
     mailId: "",
-    academicYear: "", // You can set a default value if needed
-    items: [{ category: "", quantity: 1, rate: 0, totalAmount: 0 }],
+    items: [{ category: "", quantity: "", rate: "", totalAmount: "" }], // Empty strings instead of zeros
     billingPeriod: "",
     dueDate: "",
-    subAmount: 0,
-    tax: 0,
-    discount: 0,
-    penalty: 0,
-    finalAmount: 0,
+    subAmount: "",
+    tax: "",
+    discount: "",
+    penalty: "",
+    finalAmount: "",
     governmentRefNumber: "",
     document: null,
     paymentMode: "",
     paymentStatus: "",
-    remainingAmount: 0,
+    remainingAmount: "",
     remarks: "",
   };
 
+  // Revised Validation Schema: Only backend-required fields are required
   const validationSchema = Yup.object().shape({
-    studentName: Yup.string().required("Student Name is required"),
-    class: Yup.string().required("Class is required"),
-    section: Yup.string().required("Section is required"),
-    admissionNumber: Yup.string().required("Admission Number is required"),
-    parentName: Yup.string().required("Parent Name is required"),
+    tax: Yup.number()
+      .typeError("Tax must be a number")
+      .min(0, "Tax must be positive")
+      .required("Tax is required"),
+    discount: Yup.number()
+      .typeError("Discount must be a number")
+      .min(0, "Discount must be positive")
+      .required("Discount is required"),
+    penalty: Yup.number()
+      .typeError("Penalty must be a number")
+      .min(0, "Penalty must be positive")
+      .required("Penalty is required"),
+    finalAmount: Yup.number()
+      .typeError("Final amount must be a number")
+      .min(0, "Final amount must be positive")
+      .required("Final amount is required"),
     contactNumber: Yup.string().required("Contact Number is required"),
-    mailId: Yup.string().email("Invalid email").required("Mail ID is required"),
-    academicYear: Yup.string().required("Academic Year is required"),
-    items: Yup.array().of(
-      Yup.object().shape({
-        category: Yup.string().required("Category is required"),
-        quantity: Yup.number().min(1, "Quantity must be at least 1"),
-        rate: Yup.number().min(0, "Rate must be positive"),
-      })
-    ),
+    mailId: Yup.string()
+      .email("Invalid email")
+      .required("Mail ID is required"),
+    address: Yup.string().required("Address is required"),
+    studentName: Yup.string().required("Student Name is required"),
+    // Line Items Validation
+    items: Yup.array()
+      .of(
+        Yup.object().shape({
+          category: Yup.string().required("Category is required"),
+          quantity: Yup.number()
+            .typeError("Quantity must be a number")
+            .min(1, "Quantity must be at least 1")
+            .required("Quantity is required"),
+          rate: Yup.number()
+            .typeError("Rate must be a number")
+            .min(0, "Rate must be positive")
+            .required("Rate is required"),
+          // totalAmount is calculated, so it can be optional
+        })
+      )
+      .min(1, "At least one item is required"),
     dueDate: Yup.string().required("Due Date is required"),
-    finalAmount: Yup.number().min(0, "Final amount must be positive"),
-    remainingAmount: Yup.number().min(0, "Remaining amount must be positive"),
+    // Optional fields can have their own validations or be left out
   });
 
   const handleSubmit = (values, { setSubmitting, resetForm }) => {
+    console.log("Form Submitted with values:", values);
     // Prepare form data to match backend requirements
     const formData = new FormData();
 
@@ -86,39 +109,38 @@ const CreateReceipt = () => {
     const schoolId = localStorage.getItem('schoolId');
 
     // Append basic fields
-    formData.append('receiptNumber', values.receiptNumber || ""); // If auto-generated, can omit
-    formData.append('tax', values.tax);
-    formData.append('discount', values.discount);
-    formData.append('penalty', values.penalty);
-    formData.append('totalPaidAmount', values.finalAmount); // Assuming finalAmount is the total paid
+    // Note: receiptNumber and schoolName are handled by the backend
+    formData.append('tax', values.tax || "0");
+    formData.append('discount', values.discount || "0");
+    formData.append('penalty', values.penalty || "0");
+    formData.append('totalPaidAmount', values.finalAmount || "0"); // Assuming finalAmount is the total paid
     formData.append('receiver', JSON.stringify({
       name: values.studentName,
       email: values.mailId,
       phone: values.contactNumber,
       address: values.address,
     }));
-    formData.append('govtRefNumber', values.governmentRefNumber);
-    formData.append('remark', values.remarks);
-    formData.append('schoolName', ""); // This will be handled in the backend based on schoolId
+    formData.append('govtRefNumber', values.governmentRefNumber || "");
+    formData.append('remark', values.remarks || "");
+    // schoolName is handled in the backend based on schoolId
     formData.append('schoolId', schoolId);
-    formData.append('academicYear', values.academicYear);
 
     // Append line items
     formData.append('lineItems', JSON.stringify(values.items.map(item => ({
       revenueType: item.category,
       quantity: item.quantity,
-      total: item.totalAmount,
+      total: item.totalAmount || 0, // Default to 0 if not provided
       // record_id: item.record_id, // If applicable
     }))));
 
-    // Append billing details
-    formData.append('billingPeriod', values.billingPeriod);
+    // Append other billing details if needed
+    formData.append('billingPeriod', values.billingPeriod || "");
     formData.append('dueDate', values.dueDate);
-    formData.append('subAmount', values.subAmount);
-    formData.append('finalAmount', values.finalAmount);
-    formData.append('remainingAmount', values.remainingAmount);
-    formData.append('paymentMode', values.paymentMode);
-    formData.append('paymentStatus', values.paymentStatus);
+    formData.append('subAmount', values.subAmount || "0");
+    formData.append('finalAmount', values.finalAmount || "0");
+    formData.append('remainingAmount', values.remainingAmount || "0");
+    formData.append('paymentMode', values.paymentMode || "");
+    formData.append('paymentStatus', values.paymentStatus || "");
 
     // Append document if exists
     if (values.document) {
@@ -129,11 +151,13 @@ const CreateReceipt = () => {
     dispatch(createReceipt(formData))
       .unwrap()
       .then((response) => {
-        // Assuming thunks handle toast notifications
-        resetForm();
+        console.log("Receipt created successfully:", response);
+        resetForm(); // Reset the form to initial empty values
         // Optionally navigate or show success message
+        // navigate('/receipts'); // Example navigation
       })
       .catch((err) => {
+        console.error("Error creating receipt:", err);
         // Errors are handled in thunks
       })
       .finally(() => {
@@ -144,45 +168,44 @@ const CreateReceipt = () => {
   return (
     <DashLayout>
       <div className="p-6 min-h-screen">
-        {/* Header Section */}
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-semibold">Create Receipts</h1>
-          <div className="flex gap-4">
-            <button
-              type="reset"
-              className="border border-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-100"
-            >
-              Reset
-            </button>
-            <button
-              type="button"
-              className="border border-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-100"
-            >
-              Preview
-            </button>
-            <button
-              type="submit"
-              form="create-receipt-form"
-              className="px-4 py-2 rounded-md text-white"
-              style={{
-                background: "linear-gradient(to right, #ec4899, #a855f7)", // from-pink-500 to-purple-500
-              }}
-              disabled={false} // Optionally, disable during submission
-            >
-              Create Receipts
-            </button>
-          </div>
-        </div>
-
-        {/* Form Section */}
+        {/* Formik wraps the entire form including the header for proper access to Formik's methods */}
         <Formik
           initialValues={initialValues}
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
         >
-          {({ values, setFieldValue, isSubmitting }) => (
+          {({ values, setFieldValue, isSubmitting, resetForm }) => (
             <Form id="create-receipt-form">
-              
+              {/* Header Section */}
+              <div className="flex justify-between items-center mb-6">
+                <h1 className="text-2xl font-semibold">Create Receipts</h1>
+                <div className="flex gap-4">
+                  {/* Reset Button using Formik's resetForm */}
+                  <button
+                    type="button"
+                    onClick={() => resetForm()}
+                    className="border border-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-100"
+                  >
+                    Reset
+                  </button>
+                  <button
+                    type="button"
+                    className="border border-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-100"
+                  >
+                    Preview
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 rounded-md text-white"
+                    style={{
+                      background: "linear-gradient(to right, #ec4899, #a855f7)",
+                    }}
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? "Creating..." : "Create Receipts"}
+                  </button>
+                </div>
+              </div>
 
               {/* Bill To Section */}
               <h2 className="text-lg font-semibold mb-4">Bill To</h2>
@@ -190,27 +213,20 @@ const CreateReceipt = () => {
                 <SelectInput
                   name="class"
                   label="Class"
-                  options={classes.map((cls) => ({ label: cls.className, value: cls._id }))} // Map classes to dropdown options
+                  options={classes.map((cls) => ({ label: cls.className, value: cls._id }))}
                   onChange={(e) => {
                     const classId = e.target.value;
-                    console.log("Class selected:", classId); // Debugging
-                    setFieldValue("class", classId);
                     setSelectedClass(classId);
                     setFieldValue("studentName", ""); // Reset student name when class changes
 
-                    // Debug payload
-                    const payload = { classId: String(classId), sectionId: "" };
-                    console.log("Dispatching fetchStudentsByClassAndSection with payload:", payload);
-
-                    // Dispatch the action
-                    dispatch(fetchStudentsByClassAndSection(payload.classId))
+                    // Dispatch the action to fetch students based on class
+                    dispatch(fetchStudentsByClassAndSection(classId))
                       .unwrap()
                       .then((response) => {
-                        console.log("Response received:", response); // Debug the API response
-                        console.log("Students fetched successfully for class:", classId); // Success Debugging
+                        // Handle successful fetch if needed
                       })
                       .catch((error) => {
-                        console.error("Failed to fetch students:", error); // Error Debugging
+                        console.error("Failed to fetch students:", error);
                       });
                   }}
                 />
@@ -220,28 +236,21 @@ const CreateReceipt = () => {
                   name="studentName"
                   label="Student Name"
                   options={
-                    Array.isArray(studentsList) // Ensure studentsList is an array
-                      ? studentsList.map((student) => {
-                        console.log("Mapping student:", student); // Debugging individual student object
-                        return {
-                          label: `${student.firstName} ${student.lastName}`, // Combine first name and last name
-                          value: student._id, // Use student ID as the value
-                        };
-                      })
+                    Array.isArray(studentsList)
+                      ? studentsList.map((student) => ({
+                        label: `${student.firstName} ${student.lastName}`,
+                        value: student._id,
+                      }))
                       : []
                   }
                   onChange={(e) => {
                     const studentId = e.target.value;
-                    console.log("Student selected:", studentId); // Debugging
                     setFieldValue("studentName", studentId);
                   }}
                   disabled={
                     !selectedClass || !Array.isArray(studentsList) || studentsList.length === 0
                   }
                 />
-
-
-
 
                 {/* Address */}
                 <TextInput
@@ -263,8 +272,6 @@ const CreateReceipt = () => {
                   label="Mail ID"
                   placeholder="Enter mail ID"
                 />
-
-
               </div>
 
               {/* Return Items */}
@@ -291,7 +298,7 @@ const CreateReceipt = () => {
                 />
                 <TextInput
                   name="tax"
-                  label="Tax (Inc/Exc)"
+                  label="Tax"
                   placeholder="Enter tax percentage"
                 />
                 <TextInput
@@ -306,7 +313,7 @@ const CreateReceipt = () => {
                 />
                 <TextInput
                   name="finalAmount"
-                  label="Final Amount (After tax/discount/penalty)"
+                  label="Final Amount"
                   placeholder="Enter final amount"
                   readOnly
                 />
@@ -319,7 +326,9 @@ const CreateReceipt = () => {
                   name="document"
                   label="Add Document (if any)"
                   placeholder="Upload file"
-                  setFieldValue={setFieldValue}
+                  onChange={(e) => {
+                    setFieldValue("document", e.currentTarget.files[0]);
+                  }}
                 />
               </div>
 

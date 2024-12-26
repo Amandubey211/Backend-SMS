@@ -9,10 +9,10 @@ import { useNavigate } from 'react-router-dom';
 
 // Sample Data
 const data = [
-    { id: "0098356", recipient: "Kameswaran S", class: "10", section: "B", paidDate: "16/12/24", amount: "1214 QAR", status: "Accepted" },
-    { id: "0098357", recipient: "Kameswaran S", class: "10", section: "B", paidDate: "16/12/24", amount: "1214 QAR", status: "Rejected" },
-    { id: "0098358", recipient: "Kameswaran S", class: "10", section: "B", paidDate: "16/12/24", amount: "1214 QAR", status: "Pending" },
-    { id: "0098359", recipient: "Kameswaran S", class: "10", section: "B", paidDate: "16/12/24", amount: "1214 QAR", status: "Expired" },
+    { id: "0098356", recipient: "Kameswaran S", class: "10", section: "B", paidDate: "16/12/24", amount: "1214 QAR"},
+    { id: "0098357", recipient: "Kameswaran S", class: "10", section: "B", paidDate: "16/12/24", amount: "1214 QAR"},
+    { id: "0098358", recipient: "Kameswaran S", class: "10", section: "B", paidDate: "16/12/24", amount: "1214 QAR"},
+    { id: "0098359", recipient: "Kameswaran S", class: "10", section: "B", paidDate: "16/12/24", amount: "1214 QAR"},
 ];
 
 const RecentReceiptsList = () => {
@@ -120,7 +120,6 @@ const RecentReceiptsList = () => {
                                 <th className="py-3 px-4 font-medium">Purpose</th>
                                 <th className="py-3 px-4 font-medium">Issue Date</th>
                                 <th className="py-3 px-4 font-medium">Total Amount</th>
-                                <th className="py-3 px-4 font-medium">Status</th>
                                 <th className="py-3 px-4 font-medium">Action</th>
                             </tr>
                         </thead>
@@ -132,9 +131,7 @@ const RecentReceiptsList = () => {
                                     <td className="py-4 px-4">{item.class}</td>
                                     <td className="py-4 px-4">{item.section}</td>
                                     <td className="py-4 px-4">{item.amount}</td>
-                                    <td className="py-4 px-4">
-                                        <StatusBadge status={item.status} />
-                                    </td>
+
                                     <td className="py-4 px-4 flex items-center gap-4">
                                         <Dropdown overlay={actionMenu} trigger={["click"]}>
                                             <button className="w-8 h-8 flex items-center justify-center rounded-full border border-gray-300 hover:bg-gray-100">
