@@ -32,20 +32,51 @@ const CreateReceipt = () => {
   }, [dispatch]);
 
   // Fetch sections when a class is selected
+  // Fetch sections when a class is selected
   useEffect(() => {
     if (selectedClass) {
-      dispatch(fetchSectionsByClass(selectedClass));
-      setSelectedSection(""); // Reset selected section when class changes
+      dispatch(fetchSectionsByClass(selectedClass))
+        .unwrap()
+        .catch((error) => {
+          console.error("Failed to fetch sections:", error);
+        });
+      setSelectedSection(""); // Reset section when class changes
     }
   }, [dispatch, selectedClass]);
 
   // Fetch students when a section is selected
   useEffect(() => {
     if (selectedClass && selectedSection) {
-      dispatch(fetchStudentsByClassAndSection({ classId: selectedClass, sectionId: selectedSection }));
+      dispatch(
+        fetchStudentsByClassAndSection({
+          classId: selectedClass,
+          sectionId: selectedSection,
+        })
+      )
+        .unwrap()
+        .catch((error) => {
+          console.error("Failed to fetch students:", error);
+        });
     }
   }, [dispatch, selectedClass, selectedSection]);
 
+
+
+  // Fetch students when a section is selected
+  useEffect(() => {
+    if (selectedClass && selectedSection) {
+      dispatch(
+        fetchStudentsByClassAndSection({
+          classId: selectedClass,
+          sectionId: selectedSection,
+        })
+      )
+        .unwrap()
+        .catch((error) => {
+          console.error("Failed to fetch students:", error);
+        });
+    }
+  }, [dispatch, selectedClass, selectedSection]);
   const initialValues = {
     notes: "",
     class: "",
@@ -213,13 +244,14 @@ const CreateReceipt = () => {
                 <SelectInput
                   name="class"
                   label="Class"
-                  options={classes.map((cls) => ({ label: cls.className, value: cls._id }))} // Updated mapping to use `className` from the API response
+                  options={classes.map((cls) => ({ label: cls.className, value: cls._id }))} // Mapping class names from the API response
                   onChange={(e) => {
                     const classId = e.target.value;
                     setFieldValue("class", classId);
                     setSelectedClass(classId);
-                    setFieldValue("section", "");
+                    setFieldValue("section", ""); // Reset section and student when class changes
                     setFieldValue("studentName", "");
+                    dispatch(fetchSectionsByClass(classId)); // Fetch sections for the selected class
                   }}
                 />
 
@@ -228,15 +260,17 @@ const CreateReceipt = () => {
                 <SelectInput
                   name="section"
                   label="Section"
-                  options={selectedClass && sectionsList[selectedClass] ? sectionsList[selectedClass].map((sec) => ({ label: sec.sectionName, value: sec._id })) : []} // Assuming `sectionName` is the key in your API response
+                  options={selectedClass && sectionsList[selectedClass] ? sectionsList[selectedClass].map((sec) => ({ label: sec.sectionName, value: sec._id })) : []} // Mapping section names dynamically
                   onChange={(e) => {
                     const sectionId = e.target.value;
                     setFieldValue("section", sectionId);
                     setSelectedSection(sectionId);
-                    setFieldValue("studentName", "");
+                    setFieldValue("studentName", ""); // Reset student when section changes
+                    dispatch(fetchStudentsByClassAndSection({ classId: selectedClass, sectionId })); // Fetch students for the selected class and section
                   }}
                   disabled={!selectedClass}
                 />
+
 
                 {/* Student Name Selection */}
                 <SelectInput
@@ -249,7 +283,7 @@ const CreateReceipt = () => {
                       studentsList[selectedClass][selectedSection]
                       ? studentsList[selectedClass][selectedSection].map((student) => ({
                         label: student.name,
-                        value: student.name, // Adjust based on your student API response
+                        value: student.name, // Storing only the student name as a string
                       }))
                       : []
                   }
