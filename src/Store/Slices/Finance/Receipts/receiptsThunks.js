@@ -1,6 +1,8 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { getData, postData, putData } from "../../../../services/apiEndpoints";
 import toast from "react-hot-toast";
+import { getAY } from "../../../../Utils/academivYear";
+
 // Fetch all receipts
 export const fetchAllReceipts = createAsyncThunk(
   "receipts/fetchAllReceipts",
@@ -27,11 +29,39 @@ export const fetchAllReceipts = createAsyncThunk(
 
 
 // Create a receipt
+
 export const createReceipt = createAsyncThunk(
   "receipts/createReceipt",
-  async (data, { rejectWithValue }) => {
+  async (formValues, { rejectWithValue }) => {
     try {
-      const response = await postData("/finance/receipts/create", data);
+      const schoolId = localStorage.getItem('schoolId'); // Fetch schoolId from localStorage
+      const academicYearId = getAY(); // Fetch academicYear using getAY()
+
+      // Prepare the payload
+      const payload = {
+        ...formValues,
+        schoolId,
+        academicYear: academicYearId,
+      };
+
+      // Create FormData for file upload
+      const formData = new FormData();
+      for (const key in payload) {
+        if (key === 'items') {
+          formData.append('lineItems', JSON.stringify(payload[key]));
+        } else if (key === 'document' && payload[key]) {
+          formData.append('document', payload[key]);
+        } else {
+          formData.append(key, payload[key]);
+        }
+      }
+
+      const response = await postData("/finance/revenue/create/receipt", formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
       if (response?.success) {
         toast.success("Receipt created successfully!");
         return response.data;
@@ -40,6 +70,7 @@ export const createReceipt = createAsyncThunk(
         return rejectWithValue(response?.message || "Failed to create receipt.");
       }
     } catch (error) {
+      toast.error(error.message || "Error creating receipt.");
       return rejectWithValue(error.message || "Error creating receipt.");
     }
   }

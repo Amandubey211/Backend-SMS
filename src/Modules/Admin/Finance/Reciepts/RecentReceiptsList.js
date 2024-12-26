@@ -213,7 +213,7 @@ const RecentReceiptsList = () => {
                                 <th className="py-3 px-4 font-medium">Section</th>
                                 <th className="py-3 px-4 font-medium">Paid Date</th>
                                 <th className="py-3 px-4 font-medium">Paid Amount</th>
-                                <th className="py-3 px-4 font-medium">Status</th>
+                                {/* <th className="py-3 px-4 font-medium">Status</th> */}
                                 <th className="py-3 px-4 font-medium">Action</th>
                             </tr>
                         </thead>
@@ -253,9 +253,9 @@ const RecentReceiptsList = () => {
                                         <td className="py-4 px-4">{item.section}</td>
                                         <td className="py-4 px-4">{item.paidDate}</td>
                                         <td className="py-4 px-4">{item.amount}</td>
-                                        <td className="py-4 px-4">
+                                        {/* <td className="py-4 px-4">
                                             <StatusBadge status={item.status} />
-                                        </td>
+                                        </td> */}
                                         <td className="py-4 px-4 flex items-center gap-4">
                                             <Dropdown overlay={() => actionMenu(item._id)} trigger={["click"]}>
                                                 <button

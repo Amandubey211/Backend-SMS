@@ -1,3 +1,4 @@
+// SelectInput.js
 import React from "react";
 import { Field, ErrorMessage } from "formik";
 import { motion } from "framer-motion";
@@ -45,11 +46,11 @@ const SelectInput = ({ label, name, options, disabled, autoComplete = "off" }) =
         {options.map((option, index) => (
           <motion.option
             key={index}
-            value={option}
+            value={option.value} // Use option.value
             variants={fieldVariants}
             transition={{ delay: 0.2 }}
           >
-            {option}
+            {option.label} {/* Use option.label */}
           </motion.option>
         ))}
       </Field>

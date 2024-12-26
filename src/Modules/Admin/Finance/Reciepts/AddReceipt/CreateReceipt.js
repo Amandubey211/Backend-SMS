@@ -1,13 +1,51 @@
-import React from "react";
+// CreateReceipt.js
+import React, { useEffect, useState } from "react";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from 'react-router-dom';
 import DashLayout from "../../../../../Components/Admin/AdminDashLayout";
 import TextInput from "./Components/TextInput";
 import SelectInput from "./Components/SelectInput";
 import ReturnItems from "./Components/ReturnItems";
 import FileInput from "./Components/FileInput";
+import { fetchAllClasses } from "../../../../../Store/Slices/Admin/Class/actions/classThunk";
+import { fetchSectionsByClass } from "../../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
+import { fetchStudentsByClassAndSection } from "../../../../../Store/Slices/Admin/Class/Students/studentThunks";
+import { createReceipt } from "../../../../../Store/Slices/Finance/Receipts/receiptsThunks";
 
 const CreateReceipt = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  
+  const [selectedClass, setSelectedClass] = useState("");
+  const [selectedSection, setSelectedSection] = useState("");
+
+  // Accessing Redux State with Default Values to Prevent Destructuring Errors
+  const { classes = [] } = useSelector((store) => store?.admin?.class || {});
+  const { sectionsList = {} } = useSelector((store) => store?.admin?.group_section || {});
+  const { studentsList = {} } = useSelector((store) => store?.admin?.students || {});
+
+  // Fetch classes on component mount
+  useEffect(() => {
+    dispatch(fetchAllClasses());
+  }, [dispatch]);
+
+  // Fetch sections when a class is selected
+  useEffect(() => {
+    if (selectedClass) {
+      dispatch(fetchSectionsByClass(selectedClass));
+      setSelectedSection(""); // Reset selected section when class changes
+    }
+  }, [dispatch, selectedClass]);
+
+  // Fetch students when a section is selected
+  useEffect(() => {
+    if (selectedClass && selectedSection) {
+      dispatch(fetchStudentsByClassAndSection({ classId: selectedClass, sectionId: selectedSection }));
+    }
+  }, [dispatch, selectedClass, selectedSection]);
+
   const initialValues = {
     notes: "",
     class: "",
@@ -18,7 +56,7 @@ const CreateReceipt = () => {
     address: "",
     contactNumber: "",
     mailId: "",
-    academicYear: "",
+    academicYear: "", // You can set a default value if needed
     items: [{ category: "", quantity: 1, rate: 0, totalAmount: 0 }],
     billingPeriod: "",
     dueDate: "",
@@ -56,8 +94,66 @@ const CreateReceipt = () => {
     remainingAmount: Yup.number().min(0, "Remaining amount must be positive"),
   });
 
-  const handleSubmit = (values) => {
-    console.log("Form Submitted", values);
+  const handleSubmit = (values, { setSubmitting, resetForm }) => {
+    // Prepare form data to match backend requirements
+    const formData = new FormData();
+
+    // Get schoolId from localStorage
+    const schoolId = localStorage.getItem('schoolId');
+
+    // Append basic fields
+    formData.append('receiptNumber', values.receiptNumber || ""); // If auto-generated, can omit
+    formData.append('tax', values.tax);
+    formData.append('discount', values.discount);
+    formData.append('penalty', values.penalty);
+    formData.append('totalPaidAmount', values.finalAmount); // Assuming finalAmount is the total paid
+    formData.append('receiver', JSON.stringify({
+      name: values.studentName,
+      email: values.mailId,
+      phone: values.contactNumber,
+      address: values.address,
+    }));
+    formData.append('govtRefNumber', values.governmentRefNumber);
+    formData.append('remark', values.remarks);
+    formData.append('schoolName', ""); // This will be handled in the backend based on schoolId
+    formData.append('schoolId', schoolId);
+    formData.append('academicYear', values.academicYear);
+
+    // Append line items
+    formData.append('lineItems', JSON.stringify(values.items.map(item => ({
+      revenueType: item.category,
+      quantity: item.quantity,
+      total: item.totalAmount,
+      // record_id: item.record_id, // If applicable
+    }))));
+
+    // Append billing details
+    formData.append('billingPeriod', values.billingPeriod);
+    formData.append('dueDate', values.dueDate);
+    formData.append('subAmount', values.subAmount);
+    formData.append('finalAmount', values.finalAmount);
+    formData.append('remainingAmount', values.remainingAmount);
+    formData.append('paymentMode', values.paymentMode);
+    formData.append('paymentStatus', values.paymentStatus);
+
+    // Append document if exists
+    if (values.document) {
+      formData.append('document', values.document);
+    }
+
+    // Dispatch createReceipt thunk
+    dispatch(createReceipt(formData))
+      .unwrap()
+      .then((response) => {
+        // Assuming thunks handle toast notifications
+        resetForm();
+      })
+      .catch((err) => {
+        // Errors are handled in thunks
+      })
+      .finally(() => {
+        setSubmitting(false);
+      });
   };
 
   return (
@@ -81,10 +177,12 @@ const CreateReceipt = () => {
             </button>
             <button
               type="submit"
+              form="create-receipt-form"
               className="px-4 py-2 rounded-md text-white"
               style={{
                 background: "linear-gradient(to right, #ec4899, #a855f7)", // from-pink-500 to-purple-500
               }}
+              disabled={false} // Optionally, disable during submission
             >
               Save Receipts
             </button>
@@ -97,8 +195,8 @@ const CreateReceipt = () => {
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
         >
-          {({ values, setFieldValue }) => (
-            <Form>
+          {({ values, setFieldValue, isSubmitting }) => (
+            <Form id="create-receipt-form">
               {/* Notes Section */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                 <TextInput
@@ -111,50 +209,84 @@ const CreateReceipt = () => {
               {/* Bill To Section */}
               <h2 className="text-lg font-semibold mb-4">Bill To</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                {/* Class Selection */}
                 <SelectInput
                   name="class"
                   label="Class"
-                  options={["Class 1", "Class 2"]}
+                  options={classes.map(cls => ({ label: cls.name, value: cls._id }))}
+                  onChange={(e) => {
+                    const classId = e.target.value;
+                    setFieldValue("class", classId);
+                    setSelectedClass(classId);
+                    setFieldValue("section", "");
+                    setFieldValue("studentName", "");
+                  }}
                 />
+
+                {/* Section Selection */}
                 <SelectInput
                   name="section"
                   label="Section"
-                  options={["Section A", "Section B"]}
+                  options={selectedClass && sectionsList[selectedClass] ? sectionsList[selectedClass].map(sec => ({ label: sec.name, value: sec._id })) : []}
+                  onChange={(e) => {
+                    const sectionId = e.target.value;
+                    setFieldValue("section", sectionId);
+                    setSelectedSection(sectionId);
+                    setFieldValue("studentName", "");
+                  }}
+                  disabled={!selectedClass}
                 />
+
+                {/* Student Name Selection */}
                 <SelectInput
                   name="studentName"
                   label="Student Name"
-                  options={["Student 1", "Student 2"]}
+                  options={selectedClass && selectedSection && studentsList[selectedClass] && studentsList[selectedClass][selectedSection] ? studentsList[selectedClass][selectedSection].map(student => ({ label: student.name, value: student.name })) : []}
+                  onChange={(e) => setFieldValue("studentName", e.target.value)}
+                  disabled={!selectedClass || !selectedSection}
                 />
+
+                {/* Admission Number */}
                 <TextInput
                   name="admissionNumber"
                   label="Admission Number"
                   placeholder="Enter admission number"
                 />
+
+                {/* Parent Name */}
                 <TextInput
                   name="parentName"
                   label="Parent Name"
                   placeholder="Enter parent name"
                 />
+
+                {/* Address */}
                 <TextInput
                   name="address"
                   label="Address"
                   placeholder="Enter address"
                 />
+
+                {/* Contact Number */}
                 <TextInput
                   name="contactNumber"
                   label="Contact Number"
                   placeholder="Enter contact number"
                 />
+
+                {/* Mail ID */}
                 <TextInput
                   name="mailId"
                   label="Mail ID"
                   placeholder="Enter mail ID"
                 />
-                <SelectInput
+
+                {/* Academic Year */}
+                <TextInput
                   name="academicYear"
                   label="Academic Year"
-                  options={["2023", "2024"]}
+                  placeholder="Enter academic year"
+                  readOnly
                 />
               </div>
 
@@ -167,12 +299,13 @@ const CreateReceipt = () => {
                 <SelectInput
                   name="billingPeriod"
                   label="Billing Period"
-                  options={["Monthly", "Quarterly", "Yearly"]}
+                  options={["Monthly", "Quarterly", "Yearly"].map(option => ({ label: option, value: option }))}
                 />
                 <TextInput
                   name="dueDate"
                   label="Due Date"
-                  placeholder="Enter date and time"
+                  type="date"
+                  placeholder="Enter date"
                 />
                 <TextInput
                   name="subAmount"
@@ -209,6 +342,7 @@ const CreateReceipt = () => {
                   name="document"
                   label="Add Document (if any)"
                   placeholder="Upload file"
+                  setFieldValue={setFieldValue}
                 />
               </div>
 
@@ -218,17 +352,12 @@ const CreateReceipt = () => {
                 <SelectInput
                   name="paymentMode"
                   label="Payment Mode"
-                  options={["Cash", "Card", "Bank Transfer"]}
+                  options={["Cash", "Card", "Bank Transfer"].map(option => ({ label: option, value: option }))}
                 />
                 <SelectInput
                   name="paymentStatus"
                   label="Payment Status"
-                  options={["Paid", "Unpaid", "Partial"]}
-                />
-                <TextInput
-                  name="remainingAmount"
-                  label="Remaining Amount"
-                  placeholder="Enter remaining amount"
+                  options={["Paid", "Unpaid", "Partial"].map(option => ({ label: option, value: option }))}
                 />
                 <TextInput
                   name="remarks"

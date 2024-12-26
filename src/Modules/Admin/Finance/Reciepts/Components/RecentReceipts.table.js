@@ -84,7 +84,7 @@ const RecentReceipts = () => {
             <th className="py-3 px-4 font-medium">Section</th>
             <th className="py-3 px-4 font-medium">Paid Date</th>
             <th className="py-3 px-4 font-medium">Paid Amount</th>
-            <th className="py-3 px-4 font-medium">Status</th>
+            {/* <th className="py-3 px-4 font-medium">Status</th> */}
             <th className="py-3 px-4 font-medium">Action</th>
           </tr>
         </thead>
@@ -124,9 +124,9 @@ const RecentReceipts = () => {
                 <td className="py-4 px-4">{item.section || "N/A"}</td> {/* Assuming 'section' is not available */}
                 <td className="py-4 px-4">{item.date ? new Date(item.date).toLocaleDateString() : "N/A"}</td>
                 <td className="py-4 px-4">{item.totalPaidAmount ? `${item.totalPaidAmount} QAR` : "N/A"}</td>
-                <td className="py-4 px-4">
+                {/* <td className="py-4 px-4">
                   <StatusBadge status={item.isCancel ? "Cancelled" : "Paid"} />
-                </td>
+                </td> */}
                 <td className="py-4 px-4">
                   <Dropdown overlay={() => actionMenu(item._id)} trigger={["click"]}>
                     <button
