@@ -5,19 +5,28 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import moment from "moment";
 import { fetchAllIncomes } from "../../../../../Store/Slices/Finance/Earnings/earningsThunks";
+
 const StudentFeesSummaryTable = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { incomes, loading, error,totalRecords } = useSelector(
+  const { incomes, loading, error, totalRecords } = useSelector(
     (state) => state.admin.earnings
   );
 
   const [searchText, setSearchText] = useState("");
+  const [currentPage, setCurrentPage] = useState(1); // State for current page
 
   useEffect(() => {
-     dispatch(fetchAllIncomes({ page: 1, limit: 20,categoryId:"675bc4e3e7901c873905fd2f"})); 
-  }, [dispatch]);
+    dispatch(
+      fetchAllIncomes({
+        page: currentPage,
+        limit: 10,
+        categoryId: "675bc4e3e7901c873905fd2f",
+        includeDetails:true
+      })
+    );
+  }, [dispatch, currentPage]);
 
   // Handle search filtering
   const filteredData = useMemo(() => {
@@ -40,10 +49,16 @@ const StudentFeesSummaryTable = () => {
   // Table columns definition
   const columns = [
     {
-      title: "Category",
-      dataIndex: "category",
-      key: "category",
-      render: (category) => category?.[0]?.categoryName || "N/A",
+      title: "Student",
+      dataIndex: "studentDetails",
+      key: "studentDetails",
+      render: (studentDetails) => studentDetails?.firstName + ' ' + studentDetails?.lastName ||"N/A",
+    },
+    {
+      title: "Class ",
+      dataIndex: "classDetails",
+      key: "classDetails",
+      render: (classDetails) => classDetails?.className ||"N/A",
     },
     {
       title: "Sub-Category",
@@ -131,7 +146,12 @@ const StudentFeesSummaryTable = () => {
           <Table
             dataSource={filteredData}
             columns={columns}
-            pagination={{ pageSize: 5 }}
+            pagination={{
+              current: currentPage,
+              pageSize: 10,
+              total: totalRecords,
+              onChange: (page) => setCurrentPage(page),
+            }}
             rowKey="_id" // Ensure each record has a unique _id
             bordered
           />
