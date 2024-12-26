@@ -184,11 +184,12 @@ const TotalExpenseList = () => {
   const cardData = useMemo(
     () => [
       {
-        title: "Total Expense",
-        icon: <DollarCircleOutlined />,
-        color: "purple",
-        amount: formatCurrency(totalExpense),
+        title: "Paid Amount",
+        icon: <CheckCircleOutlined />,
+        color: "green",
+        amount: formatCurrency(totalPaidAmount),
       },
+
       {
         title: "Remaining Partial Paid",
         icon: <PieChartOutlined />,
@@ -201,11 +202,12 @@ const TotalExpenseList = () => {
         color: "red",
         amount: formatCurrency(unpaidExpense),
       },
+
       {
-        title: "Paid Amount",
-        icon: <CheckCircleOutlined />,
-        color: "green",
-        amount: formatCurrency(totalPaidAmount),
+        title: "Total Expense",
+        icon: <DollarCircleOutlined />,
+        color: "purple",
+        amount: formatCurrency(totalExpense),
       },
     ],
     [totalExpense, remainingPartialPaidExpense, unpaidExpense, totalPaidAmount]

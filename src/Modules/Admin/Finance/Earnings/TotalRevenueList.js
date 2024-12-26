@@ -459,11 +459,12 @@ const TotalRevenueList = () => {
   const cardData = useMemo(
     () => [
       {
-        title: "Total Revenue",
-        icon: <DollarCircleOutlined />,
-        color: "purple",
-        amount: formatCurrency(totalRevenue),
+        title: "Paid Amount",
+        icon: <CheckCircleOutlined />,
+        color: "green",
+        amount: formatCurrency(totalPaidAmount),
       },
+
       {
         title: "Remaining Partial Paid",
         icon: <PieChartOutlined />,
@@ -476,35 +477,34 @@ const TotalRevenueList = () => {
         color: "red",
         amount: formatCurrency(unpaidRevenue),
       },
+
       {
-        title: "Paid Amount",
-        icon: <CheckCircleOutlined />,
-        color: "green",
-        amount: formatCurrency(totalPaidAmount),
+        title: "Total Revenue",
+        icon: <DollarCircleOutlined />,
+        color: "purple",
+        amount: formatCurrency(totalRevenue),
       },
     ],
     [totalRevenue, remainingPartialPaidRevenue, unpaidRevenue, totalPaidAmount]
   );
 
-
   const transformIncomeData = (incomes) =>
     incomes?.map(({ _id, category, ...income }, index) => ({
       sNo: index + 1,
       category: category?.[0]?.categoryName || "N/A",
-      ...income, 
+      ...income,
       subCategory: income.subCategory || "N/A",
       paymentType: income.paymentType || "N/A",
-      discount: income.discount || 0, 
+      discount: income.discount || 0,
       discountType: income.discountType || "percentage",
       finalAmount: income.final_amount || 0,
       paidAmount: income.paid_amount || 0,
       remainingAmount: income.remaining_amount || 0,
-      penalty: income.penalty || 0, 
+      penalty: income.penalty || 0,
       // earnedDate: income.paidDate || income.generateDate || "N/A",
       totalAmount: income.total_amount || 0,
       academicYearDetails: income.academicYearDetails?.[0]?.year || "N/A",
     })) || [];
-
 
   return (
     <Layout title="Earning List | Student Diwan">
@@ -512,7 +512,7 @@ const TotalRevenueList = () => {
         <div className="p-4 space-y-3">
           {/* Top Cards Row */}
           <div className="w-full h-full flex flex-wrap justify-center items-stretch gap-4 p-2">
-            {cardData.map((card, index) => {
+            {cardData?.map((card, index) => {
               const currentColor =
                 colorClasses[card.color] || colorClasses["purple"];
               return (
@@ -606,29 +606,16 @@ const TotalRevenueList = () => {
               >
                 Export
               </Button>
-              {/* Uncomment for Bulk Entries */}
               {/* <Button
-      className="flex items-center px-3 py-1 bg-gradient-to-r from-pink-500 to-pink-400 text-white font-bold rounded-md hover:opacity-90 transition text-xs shadow-md"
-      icon={<UploadOutlined />}
-      onClick={() => setIsBulkEntriesModalVisible(true)}
-      size="small"
-    >
-      Bulk Entries
-    </Button> */}
+                className="flex items-center px-3 py-1 bg-gradient-to-r from-pink-500 to-pink-400 text-white font-bold rounded-md hover:opacity-90 transition text-xs shadow-md"
+                icon={<UploadOutlined />}
+                onClick={() => setIsBulkEntriesModalVisible(true)}
+                size="small"
+              >
+                Bulk Entries
+              </Button> */}
             </div>
           </div>
-
-          {/* Error Message */}
-          {error && (
-            <Alert
-              message="Error"
-              description={error}
-              type="error"
-              showIcon
-              closable
-              className="my-4 text-xs"
-            />
-          )}
 
           {/* No Data Placeholder */}
           {!loading && incomes.length === 0 && !error && (
@@ -703,10 +690,6 @@ const TotalRevenueList = () => {
             onClose={() => setIsBulkEntriesModalVisible(false)}
           />
         </div>
-<<<<<<< HEAD
-      </AdminLayout>
-    </Layout>
-=======
 
         {/* Modals */}
         <DeleteModal
@@ -733,9 +716,8 @@ const TotalRevenueList = () => {
           visible={isBulkEntriesModalVisible}
           onClose={() => setIsBulkEntriesModalVisible(false)}
         />
-      </div>
-    </AdminLayout>
->>>>>>> 6ca9ee063ee467aca6dec9faf85d307a76a8098f
+      </AdminLayout>
+    </Layout>
   );
 };
 
