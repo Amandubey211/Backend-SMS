@@ -169,7 +169,7 @@ const CreateReceipt = () => {
               }}
               disabled={false} // Optionally, disable during submission
             >
-              Save Receipts
+              Create Receipts
             </button>
           </div>
         </div>
