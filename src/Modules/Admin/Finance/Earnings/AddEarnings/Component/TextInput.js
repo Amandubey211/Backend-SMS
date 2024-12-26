@@ -1,6 +1,6 @@
 // src/Components/Admin/Finance/Earnings/Component/TextInput.jsx
 
-import React from "react";
+import React, { useSelector } from "react-redux";
 import { Field, ErrorMessage } from "formik";
 import { motion } from "framer-motion";
 
