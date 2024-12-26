@@ -1,35 +1,50 @@
-import React, { useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Menu, Dropdown } from "antd";
 import { SearchOutlined, MoreOutlined } from "@ant-design/icons";
-import StatusBadge from "./StatusBadge";
+import { RiErrorWarningFill } from "react-icons/ri";
+import { FcDeleteDatabase } from "react-icons/fc";
+import { fetchAllQuotations } from "../../../../../Store/Slices/Finance/Quotations/quotationThunks";
+import Spinner from "../../../../../Components/Common/Spinner";
 
 const RecentQuotation = () => {
-  const [searchQuery, setSearchQuery] = useState("");
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const data = [
-    { id: "0098356", recipient: "Kameswaran S", class: "10", section: "B", totalAmount: "1214 QAR", status: "Paid" },
-    { id: "0098357", recipient: "Kameswaran S", class: "10", section: "B", totalAmount: "1214 QAR", status: "Unpaid" },
-    { id: "0098358", recipient: "Kameswaran S", class: "10", section: "B", totalAmount: "1214 QAR", status: "Partial" },
-  ];
+  // Fetching state from Redux store
+  const { quotations, loading, error } = useSelector((state) => state.admin.quotations);
+  console.log("this is ",quotations)
+  // Fetch quotations on component mount
+  useEffect(() => {
+    dispatch(fetchAllQuotations());
+  }, [dispatch]);
 
   // Filter data based on search query
-  const filteredData = data.filter(
-    (item) =>
-      item.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.recipient.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.class.toString().includes(searchQuery) ||
-      item.section.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.totalAmount.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.amount.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.status.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredData = useMemo(() => {
+    if (!quotations) return [];
+    return quotations.filter((item) =>
+      [
+        item.quotationNumber,
+        item.reciever?.name,
+        item.final_amount,
+        item.remark,
+        item.status,
+        item.lineItems.map((li) => li.revenueType).join(", "), // Join line items for filtering
+        item.SelectedItems?.map((si) => si.name).join(", "), // Join selected items for filtering
+      ]
+        .filter(Boolean) // Ensure no null/undefined
+        .some((field) => field.toLowerCase().includes(searchQuery.toLowerCase()))
+    );
+  }, [quotations, searchQuery]);
 
   // Dropdown menu for actions
   const actionMenu = (
     <Menu>
-      <Menu.Item key="1">View Details</Menu.Item>
+      <Menu.Item key="1" onClick={() => navigate(`/finance/quotations/details`)}>
+        View Details
+      </Menu.Item>
       <Menu.Item key="2">Send Reminder</Menu.Item>
     </Menu>
   );
@@ -52,11 +67,10 @@ const RecentQuotation = () => {
           </div>
           <button
             onClick={() => navigate("/finance/quotations/quotations-list")}
-            className="px-4 py-2 rounded-md border border-gray-400 shadow-md hover:shadow-xl hover:shadow-gray-300 transition duration-200 text-transparent bg-gradient-text bg-clip-text"
+            className="px-4 py-2 rounded-md border border-gray-400 shadow-md hover:shadow-xl hover:shadow-gray-300 transition duration-200 text-transparent bg-gradient-to-r from-pink-500 via-purple-500 to-pink-500 bg-clip-text"
           >
             View More
           </button>
-
         </div>
       </div>
 
@@ -69,32 +83,64 @@ const RecentQuotation = () => {
             <th className="py-3 px-4 font-medium">Purpose</th>
             <th className="py-3 px-4 font-medium">Issue Date</th>
             <th className="py-3 px-4 font-medium">Total Amount</th>
-            <th className="py-3 px-4 font-medium">Status</th>
             <th className="py-3 px-4 font-medium">Action</th>
           </tr>
         </thead>
         <tbody>
-          {filteredData.map((item, index) => (
-            <tr key={index} className="border-b hover:bg-gray-50">
-              <td className="py-4 px-4">{item.id}</td>
-              <td className="py-4 px-4">{item.recipient}</td>
-              <td className="py-4 px-4">{item.class}</td>
-              <td className="py-4 px-4">{item.section}</td>
-              <td className="py-4 px-4">{item.totalAmount}</td>
-              <td className="py-4 px-4">
-                <StatusBadge status={item.status} />
-              </td>
-              <td className="py-4 px-4">
-                <Dropdown overlay={actionMenu} trigger={["click"]}>
-                  <button
-                    className="w-8 h-8 flex items-center justify-center rounded-full border border-gray-300 hover:bg-gray-100"
-                  >
-                    <MoreOutlined style={{ fontSize: "16px", color: "#808080" }} />
-                  </button>
-                </Dropdown>
+          {/* Loading State */}
+          {loading && (
+            <tr>
+              <td colSpan="6" className="py-4 px-4 text-center">
+                <Spinner />
               </td>
             </tr>
-          ))}
+          )}
+
+          {/* Error State */}
+          {error && (
+            <tr>
+              <td colSpan="6" className="py-4 px-4 text-center">
+                <div className="flex flex-col justify-center items-center">
+                  <RiErrorWarningFill className="text-red-500 text-4xl" />
+                  <span className="text-red-500 mt-2">Unable to Fetch Quotations: {error}</span>
+                </div>
+              </td>
+            </tr>
+          )}
+
+          {/* No Data State */}
+          {!loading && !error && filteredData.length === 0 && (
+            <tr>
+              <td colSpan="6" className="py-4 px-4 text-center">
+                <div className="flex flex-col justify-center items-center">
+                  <FcDeleteDatabase className="text-4xl" />
+                  <span className="text-gray-600 mt-2">No Quotation Yet!</span>
+                </div>
+              </td>
+            </tr>
+          )}
+
+          {/* Data Rows */}
+          {!loading &&
+            !error &&
+            filteredData.map((item) => (
+              <tr key={item._id} className="border-b hover:bg-gray-50">
+                <td className="py-4 px-4">{item.quotationNumber}</td>
+                <td className="py-4 px-4">{item.reciever?.name || "N/A"}</td>
+                <td className="py-4 px-4">{item.remark || "N/A"}</td>
+                <td className="py-4 px-4">{new Date(item.date).toLocaleDateString()}</td>
+                <td className="py-4 px-4">{item.final_amount || "N/A"}</td>
+                <td className="py-4 px-4">
+                  <Dropdown overlay={actionMenu} trigger={["click"]}>
+                    <button
+                      className="w-8 h-8 flex items-center justify-center rounded-full border border-gray-300 hover:bg-gray-100"
+                    >
+                      <MoreOutlined style={{ fontSize: "16px", color: "#808080" }} />
+                    </button>
+                  </Dropdown>
+                </td>
+              </tr>
+            ))}
         </tbody>
       </table>
     </div>

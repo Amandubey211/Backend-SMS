@@ -158,6 +158,7 @@ const AdminReducer = combineReducers({
   speedgrades: adminSpeedGradeReducer,
   classIcons: adminClassIconsReducer,
   quotations: quotationReducer,
+  receipts: receiptsReducer,
   graduates: graduateReducer,
   all_students: allStudentReducer,
   all_parents: allParentReducer,

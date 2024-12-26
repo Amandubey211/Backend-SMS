@@ -41,10 +41,12 @@ const studentSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchStudentsByClassAndSectionNames.fulfilled, (state, action) => {
+      .addCase(fetchStudentsByClassAndSection.fulfilled, (state, action) => {
+        console.log("Thunk fulfilled, payload received:", action.payload); // Debugging
         state.loading = false;
         state.studentsList = action.payload;
       })
+      
       .addCase(fetchStudentsByClassAndSectionNames.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;

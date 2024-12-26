@@ -53,6 +53,7 @@ const quotationSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchAllQuotations.fulfilled, (state, action) => {
+        console.log("Fulfilled payload:", action.payload);
         state.loading = false;
         state.quotations = action.payload.data || [];
         state.totalRecords = action.payload.totalRecords || 0;
