@@ -1,7 +1,17 @@
 // src/Components/Admin/Finance/Earnings/TotalRevenueList.jsx
 
 import React, { useEffect, useState, useCallback, useMemo } from "react";
-import { Table, Input, Button, Spin, Alert, Tooltip, Card, Tag } from "antd";
+import {
+  Table,
+  Input,
+  Button,
+  Spin,
+  Alert,
+  Tooltip,
+  Card,
+  Tag,
+  Checkbox,
+} from "antd";
 import {
   SearchOutlined,
   ExportOutlined,
@@ -9,13 +19,15 @@ import {
   UploadOutlined,
   EditOutlined,
   DeleteOutlined,
+  EyeOutlined,
   DollarCircleOutlined,
   PieChartOutlined,
   ExclamationCircleOutlined,
-  CheckCircleOutlined,
   DollarOutlined,
   CloudOutlined,
   CreditCardOutlined,
+  CheckCircleOutlined,
+  BlockOutlined,
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -31,7 +43,7 @@ import {
   setFilters,
   setReadOnly,
   clearFilters,
-  setSelectedIncome, // Import the action to set selected income
+  setSelectedIncome,
 } from "../../../../Store/Slices/Finance/Earnings/earningsSlice";
 import toast from "react-hot-toast";
 
@@ -78,6 +90,9 @@ const TotalRevenueList = () => {
   const [selectedIncomeForDeletion, setSelectedIncomeForDeletion] =
     useState(null);
 
+  // State for selected row key (single selection)
+  const [selectedRowKey, setSelectedRowKey] = useState(null);
+
   // Navigation and dispatch
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -122,8 +137,7 @@ const TotalRevenueList = () => {
       search: searchText,
       page: currentPage,
       limit: 10,
-      // sortBy: "earnedDate",
-      // sortOrder: "desc",
+      includeDetails: true,
       ...filters,
     };
     debouncedFetch(params);
@@ -144,9 +158,27 @@ const TotalRevenueList = () => {
     }
   };
 
-  // Render action buttons (Edit and Delete) for each row
+  // Render action buttons (View, Edit, Delete) for each row
   const renderActionIcons = (record) => (
     <div className="flex space-x-1" onClick={(e) => e.stopPropagation()}>
+      <Tooltip title="View">
+        <Button
+          type="link"
+          icon={<EyeOutlined />}
+          onClick={() => {
+            const incomeToView = incomeIdMap[record.key];
+            if (incomeToView) {
+              dispatch(setReadOnly(true)); // Set readOnly to true for viewing
+              dispatch(setSelectedIncome(incomeToView)); // Dispatch the selected income to Redux
+              navigate("/finance/earning/add"); // Navigate to view page
+            } else {
+              toast.error("Selected income not found.");
+            }
+          }}
+          className="text-gray-600 hover:text-gray-800 p-0"
+          aria-label="View"
+        />
+      </Tooltip>
       <Tooltip title="Edit">
         <Button
           type="link"
@@ -154,9 +186,9 @@ const TotalRevenueList = () => {
           onClick={() => {
             const incomeToEdit = incomeIdMap[record.key];
             if (incomeToEdit) {
-              dispatch(setReadOnly(true)); // Set readOnly to true for viewing
+              dispatch(setReadOnly(false)); // Set readOnly to false for editing
               dispatch(setSelectedIncome(incomeToEdit)); // Dispatch the selected income to Redux
-              navigate("/finance/earning/add"); // Navigate without passing state
+              navigate("/finance/earning/add"); // Navigate to edit page
             } else {
               toast.error("Selected income not found.");
             }
@@ -197,9 +229,43 @@ const TotalRevenueList = () => {
   const formatDate = (date) =>
     date ? new Date(date).toLocaleDateString() : "N/A";
 
-  // Define table columns
+  // Define table columns with a separate selection column using Checkboxes
   const columns = useMemo(
     () => [
+      // Selection Column
+      {
+        title: "",
+        key: "selection",
+        width: 60,
+        render: (_, record) => {
+          const isSelected = selectedRowKey === record.key;
+          if (record.paymentStatus === "unpaid") {
+            return (
+              <Checkbox
+                checked={isSelected}
+                onChange={(e) => {
+                  e.stopPropagation();
+                  if (e.target.checked) {
+                    setSelectedRowKey(record.key);
+                  } else {
+                    setSelectedRowKey(null);
+                  }
+                }}
+                aria-label={isSelected ? "Unselect" : "Select"}
+              />
+            );
+          } else {
+            return (
+              <div className="flex items-center justify-center">
+                <Tooltip title="Not selectable">
+                  <Checkbox disabled />
+                </Tooltip>
+                <BlockOutlined className="ml-1 text-red-500" />
+              </div>
+            );
+          }
+        },
+      },
       {
         title: "Category",
         dataIndex: "categoryName",
@@ -216,28 +282,7 @@ const TotalRevenueList = () => {
         width: 150,
         ellipsis: true,
       },
-      // Uncomment the following block if you wish to display Payment Type
-
-      // {
-      //   title: "Payment Type",
-      //   dataIndex: "paymentType",
-      //   key: "paymentType",
-      //   render: (text) => (
-      //     <Tooltip
-      //       title={`Payment Type: ${
-      //         text.charAt(0).toUpperCase() + text.slice(1)
-      //       }`}
-      //     >
-      //       <span className="text-xs flex items-center gap-1">
-      //         {paymentTypeIcons[text.toLowerCase()] || <CreditCardOutlined />}
-      //         {text.charAt(0).toUpperCase() + text.slice(1)}
-      //       </span>
-      //     </Tooltip>
-      //   ),
-      //   width: 150,
-      //   ellipsis: true,
-      // },
-      // Uncomment the following block if you wish to display Discount
+      // Discount Column
       {
         title: "Discount",
         dataIndex: "discount",
@@ -252,7 +297,47 @@ const TotalRevenueList = () => {
               {value || 0} QR
             </Tag>
           ),
-        width: 70,
+        width: 100,
+        ellipsis: true,
+      },
+      // Penalty Column
+      {
+        title: "Penalty",
+        dataIndex: "penalty",
+        key: "penalty",
+        render: (value) => (
+          <span className="text-xs text-red-600">{formatCurrency(value)}</span>
+        ),
+        width: 100,
+        ellipsis: true,
+      },
+      // Status Column
+      {
+        title: "Status",
+        dataIndex: "paymentStatus",
+        key: "paymentStatus",
+        render: (status) => {
+          let color = "default";
+          switch (status) {
+            case "paid":
+              color = "green";
+              break;
+            case "partial":
+              color = "yellow";
+              break;
+            case "unpaid":
+              color = "red";
+              break;
+            default:
+              color = "default";
+          }
+          return (
+            <Tag color={color} className="text-xs capitalize">
+              {status || "N/A"}
+            </Tag>
+          );
+        },
+        width: 80,
         ellipsis: true,
       },
       {
@@ -270,7 +355,7 @@ const TotalRevenueList = () => {
         render: (value) => (
           <span className="text-xs text-green-600">{value || "0"} QR</span>
         ),
-        width: 150,
+        width: 120,
         ellipsis: true,
       },
       {
@@ -280,17 +365,7 @@ const TotalRevenueList = () => {
         render: (value) => (
           <span className="text-xs text-red-600">{value || "0"} QR</span>
         ),
-        width: 160,
-        ellipsis: true,
-      },
-      {
-        title: "Penalty",
-        dataIndex: "penalty",
-        key: "penalty",
-        render: (value) => (
-          <span className="text-xs text-red-600">{formatCurrency(value)}</span>
-        ),
-        width: 100,
+        width: 120,
         ellipsis: true,
       },
       {
@@ -298,10 +373,10 @@ const TotalRevenueList = () => {
         key: "action",
         render: (_, record) => renderActionIcons(record),
         fixed: "right",
-        width: 80,
+        width: 120,
       },
     ],
-    [navigate, dispatch, incomeIdMap]
+    [selectedRowKey, incomeIdMap]
   );
 
   // Map incomes to data source with camelCase fields, including subcategory-specific ones
@@ -309,7 +384,7 @@ const TotalRevenueList = () => {
     () =>
       incomes?.map((income) => ({
         key: income._id,
-        categoryName: income.category?.[0]?.categoryName || "N/A",
+        categoryName: income.category?.categoryName || "N/A",
         subCategory: income.subCategory || "N/A",
         paymentType: income.paymentType || "N/A",
         discount: income.discount || 0,
@@ -318,6 +393,7 @@ const TotalRevenueList = () => {
         paidAmount: income.paid_amount || 0,
         remainingAmount: income.remaining_amount || 0,
         penalty: income.penalty || 0,
+        paymentStatus: income.paymentStatus || "N/A",
         earnedDate: income.paidDate || income.generateDate || null,
         totalAmount: income.total_amount || 0,
       })),
@@ -349,28 +425,23 @@ const TotalRevenueList = () => {
 
     return (
       <Table.Summary.Row>
-        <Table.Summary.Cell index={0}>
+        <Table.Summary.Cell index={0} colSpan={4}>
           <strong>Totals:</strong>
         </Table.Summary.Cell>
-        <Table.Summary.Cell index={1} />
-        {/* Uncomment the following blocks if Payment Type and Discount are displayed */}
-        <Table.Summary.Cell index={2} />
-        {/* <Table.Summary.Cell index={3} /> */}
-
-        <Table.Summary.Cell index={2}>
-          <strong>{formatCurrency(totalFinalAmount)}</strong>
-        </Table.Summary.Cell>
-        <Table.Summary.Cell index={3}>
-          <strong>{formatCurrency(totalPaidAmount)}</strong>
-        </Table.Summary.Cell>
         <Table.Summary.Cell index={4}>
-          <strong>{formatCurrency(totalRemainingAmount)}</strong>
-        </Table.Summary.Cell>
-        {/* <Table.Summary.Cell index={5} /> */}
-        <Table.Summary.Cell index={5}>
           <strong>{formatCurrency(totalPenalty)}</strong>
         </Table.Summary.Cell>
-        <Table.Summary.Cell index={6} />
+        <Table.Summary.Cell index={5} />
+        <Table.Summary.Cell index={6}>
+          <strong>{formatCurrency(totalFinalAmount)}</strong>
+        </Table.Summary.Cell>
+        <Table.Summary.Cell index={7}>
+          <strong>{formatCurrency(totalPaidAmount)}</strong>
+        </Table.Summary.Cell>
+        <Table.Summary.Cell index={8}>
+          <strong>{formatCurrency(totalRemainingAmount)}</strong>
+        </Table.Summary.Cell>
+        <Table.Summary.Cell index={9} />
       </Table.Summary.Row>
     );
   };
@@ -412,9 +483,9 @@ const TotalRevenueList = () => {
 
   return (
     <AdminLayout>
-      <div className="p-4 space-y-4">
+      <div className="p-4 space-y-3">
         {/* Top Cards Row */}
-        <div className="w-full h-full flex flex-wrap justify-center items-stretch gap-4 p-4">
+        <div className="w-full h-full flex flex-wrap justify-center items-stretch gap-4 p-2">
           {cardData.map((card, index) => {
             const currentColor =
               colorClasses[card.color] || colorClasses["purple"];
@@ -435,9 +506,10 @@ const TotalRevenueList = () => {
                   flex: "1 1 200px",
                   maxWidth: "400px",
                   textAlign: "center",
+                  padding: "0.2rem", // Reduced padding for compactness
                 }}
               >
-                <p className={`${currentColor.text} text-xl font-bold`}>
+                <p className={`${currentColor.text} text-lg font-bold`}>
                   {card.amount}
                 </p>
               </Card>
@@ -447,26 +519,38 @@ const TotalRevenueList = () => {
 
         {/* Header Section */}
         <div className="flex flex-col md:flex-row justify-between items-center md:items-start gap-4">
-          <div
-            className="cursor-pointer text-xl font-semibold"
-            onClick={() => navigate(-1)}
-          >
-            Total Revenue List
+          <div className="flex items-center gap-4">
+            <div
+              className="cursor-pointer text-xl font-semibold"
+              onClick={() => navigate(-1)}
+            >
+              Total Revenue List
+            </div>
+            {selectedRowKey && (
+              <Tooltip title="Create an invoice for the selected unpaid record">
+                <Button
+                  type="primary"
+                  icon={<DollarCircleOutlined />}
+                  onClick={() => {
+                    const selectedIncome = incomeIdMap[selectedRowKey];
+                    if (selectedIncome) {
+                      // Navigate to the invoice creation page with selectedRow data
+                      navigate("/finance/invoices/add-new-invoice", {
+                        state: { income: selectedIncome },
+                      });
+                    } else {
+                      toast.error("Selected income not found.");
+                    }
+                  }}
+                  className="flex items-center bg-gradient-to-r from-green-500 to-blue-500 border-none hover:bg-gradient-to-r hover:from-green-600 hover:to-blue-600 transition duration-200 text-xs px-4 py-2" // Increased padding
+                  size="small"
+                >
+                  Create Invoice
+                </Button>
+              </Tooltip>
+            )}
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <Button
-              className="flex items-center px-3 py-1 border-2 rounded-lg hover:shadow-lg text-xs"
-              style={{
-                background: "white",
-                borderImageSource:
-                  "linear-gradient(to right, #C83B62, #46138A)",
-                borderImageSlice: 1,
-              }}
-              icon={<FilterOutlined />}
-              onClick={() => setIsFilterModalVisible(true)}
-            >
-              Filter
-            </Button>
             <Input
               placeholder="Search by Subcategory"
               prefix={<SearchOutlined />}
@@ -474,25 +558,37 @@ const TotalRevenueList = () => {
               value={searchText}
               onChange={handleSearch}
               allowClear
-              style={{ borderRadius: "0.375rem" }}
+              style={{ borderRadius: "0.375rem", height: "40px" }} // Increased height
             />
+            <Button
+              className="flex items-center px-4 py-2 rounded-lg text-xs"
+              style={{
+                background: "linear-gradient(to right, #3b82f6, #06b6d4)", // Modern gradient
+                border: "none",
+                boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)", // Subtle shadow
+              }}
+              icon={<FilterOutlined />}
+              onClick={() => setIsFilterModalVisible(true)}
+            >
+              Filter
+            </Button>
             <Button
               type="primary"
               icon={<ExportOutlined />}
               onClick={() => setIsExportModalVisible(true)}
-              className="flex items-center bg-gradient-to-r from-purple-500 to-pink-500 border-none hover:bg-gradient-to-r hover:from-purple-600 hover:to-pink-600 transition duration-200 text-xs px-3 py-1"
+              className="flex items-center bg-gradient-to-r from-purple-600 to-pink-600 border-none hover:bg-gradient-to-r hover:from-purple-700 hover:to-pink-700 transition duration-200 text-xs px-4 py-2"
               size="small"
             >
               Export
             </Button>
-            <Button
+            {/* <Button
               className="flex items-center px-3 py-1 bg-gradient-to-r from-[#C83B62] to-[#8E44AD] text-white font-bold rounded-lg hover:opacity-90 transition text-xs"
               icon={<UploadOutlined />}
               onClick={() => setIsBulkEntriesModalVisible(true)}
               size="small"
             >
               Bulk Entries
-            </Button>
+            </Button> */}
           </div>
         </div>
 
@@ -539,24 +635,20 @@ const TotalRevenueList = () => {
             size="small"
             tableLayout="fixed" // Fixed table layout for compactness
             components={components}
-            rowClassName="hover:bg-gray-50 cursor-pointer"
             loading={{
               spinning: loading,
               indicator: <Spin size="large" />,
               tip: "Loading...",
             }}
             summary={summary}
+            // Removed rowSelection and rowClassName
             onRow={(record) => ({
               onClick: () => {
-                console.log("Row clicked:", record); // Debugging line
-                const incomeToView = incomeIdMap[record.key];
-                if (incomeToView) {
-                  dispatch(setReadOnly(true));
-                  dispatch(setSelectedIncome(incomeToView)); // Dispatch selected income to Redux
-                  navigate("/finance/earning/add"); // Navigate to AddEarnings without state
-                } else {
-                  toast.error("Selected income not found.");
+                if (record.paymentStatus !== "unpaid") {
+                  toast.error("Only unpaid records can be selected.");
+                  return;
                 }
+                setSelectedRowKey(record.key);
               },
             })}
           />

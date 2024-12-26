@@ -22,35 +22,6 @@ const ExpenseMain = () => {
               <h2 className="text-xl sm:text-2xl font-bold text-gray-800">
                 Expense Dashboard
               </h2>
-              <div className="relative">
-                <button
-                  //onClick={toggleDropdown}
-                  className="px-3 sm:px-4 py-2 bg-white text-gray-800 font-medium rounded-lg border border-gray-300 shadow-sm flex items-center gap-2 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  style={{
-                    borderImage:
-                      "linear-gradient(to right, #C83B62, #46138A) 1",
-                    borderRadius: "8px",
-                  }}
-                >
-                  By Month
-                  <svg
-                    className={`w-4 h-4 transform transition-transform ${
-                      true ? "rotate-180" : "rotate-0"
-                    }`}
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M19 9l-7 7-7-7"
-                    />
-                  </svg>
-                </button>
-              </div>
             </div>
 
             <button

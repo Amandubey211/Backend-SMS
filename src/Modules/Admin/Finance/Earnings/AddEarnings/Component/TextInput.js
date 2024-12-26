@@ -11,11 +11,9 @@ const TextInput = ({
   type = "text",
   placeholder,
   autoComplete = "off",
+  disabled = false, // Added disabled prop with default value
 }) => {
   const readOnly = useSelector((state) => state.admin.earnings.readOnly);
-
-
-const TextInput = ({ label, name, type = "text", placeholder,disabled }) => {
 
   const variants = {
     hidden: { opacity: 0, y: -10 },
@@ -39,11 +37,9 @@ const TextInput = ({ label, name, type = "text", placeholder,disabled }) => {
         name={name}
         type={type}
         placeholder={placeholder}
-        disabled={disabled || false}
+        disabled={disabled || readOnly}
         className="bg-white border border-gray-300 rounded-sm px-4 py-3 text-sm text-gray-800 w-full focus:outline-none focus:ring-2 focus:ring-purple-300"
         autoComplete={autoComplete}
-   
-      
       />
       <ErrorMessage
         name={name}
@@ -52,6 +48,6 @@ const TextInput = ({ label, name, type = "text", placeholder,disabled }) => {
       />
     </motion.div>
   );
-}};
+}; // Removed the extra closing brace
 
 export default TextInput;
