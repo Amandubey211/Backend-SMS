@@ -182,14 +182,7 @@ const CreateReceipt = () => {
         >
           {({ values, setFieldValue, isSubmitting }) => (
             <Form id="create-receipt-form">
-              {/* Notes Section */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                <TextInput
-                  name="notes"
-                  label="Notes"
-                  placeholder="Write notes here"
-                />
-              </div>
+              
 
               {/* Bill To Section */}
               <h2 className="text-lg font-semibold mb-4">Bill To</h2>
@@ -347,6 +340,14 @@ const CreateReceipt = () => {
                   name="remarks"
                   label="Remarks (If Any)"
                   placeholder="Enter remarks here"
+                />
+              </div>
+              {/* Notes Section */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <TextInput
+                  name="notes"
+                  label="Notes"
+                  placeholder="Write notes here"
                 />
               </div>
             </Form>
