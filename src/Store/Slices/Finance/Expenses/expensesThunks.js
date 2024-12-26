@@ -41,6 +41,30 @@ const getEndpointForCategory = (category, action, id) => {
 };
 
 /**
+ * Thunk to fetch all expenses with optional filters and pagination.
+ */
+export const fetchAllExpenses = createAsyncThunk(
+  "expenses/fetchAllExpenses",
+  async (params, { dispatch, rejectWithValue }) => {
+    try {
+      dispatch(setShowError(false));
+      const response = await getData("/finance/expense/getAll", params);
+
+      if (response?.success) {
+        return response;
+      } else {
+        toast.error(response?.message || "Failed to fetch expenses.");
+        return rejectWithValue(
+          response?.message || "Failed to fetch expenses."
+        );
+      }
+    } catch (error) {
+      return handleError(error, dispatch, rejectWithValue);
+    }
+  }
+);
+
+/**
  * Thunk to add a new expense.
  */
 export const addExpense = createAsyncThunk(
@@ -81,30 +105,6 @@ export const updateExpense = createAsyncThunk(
         toast.error(response?.message || "Failed to update expense.");
         return rejectWithValue(
           response?.message || "Failed to update expense."
-        );
-      }
-    } catch (error) {
-      return handleError(error, dispatch, rejectWithValue);
-    }
-  }
-);
-
-/**
- * Thunk to fetch all expenses with optional filters and pagination.
- */
-export const fetchAllExpenses = createAsyncThunk(
-  "expenses/fetchAllExpenses",
-  async (params, { dispatch, rejectWithValue }) => {
-    try {
-      dispatch(setShowError(false));
-      const response = await getData("/finance/expenses/all", params);
-
-      if (response?.success) {
-        return response;
-      } else {
-        toast.error(response?.message || "Failed to fetch expenses.");
-        return rejectWithValue(
-          response?.message || "Failed to fetch expenses."
         );
       }
     } catch (error) {

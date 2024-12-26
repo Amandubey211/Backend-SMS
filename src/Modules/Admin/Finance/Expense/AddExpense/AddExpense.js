@@ -27,7 +27,7 @@ import useNavHeading from "../../../../../Hooks/CommonHooks/useNavHeading ";
 const AddExpenses = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  useNavHeading("Expenses", "Add");
+  useNavHeading("Expenses", "Manage");
   // Redux state
   const { readOnly, error, selectedExpense } = useSelector(
     (state) => state.admin.expenses

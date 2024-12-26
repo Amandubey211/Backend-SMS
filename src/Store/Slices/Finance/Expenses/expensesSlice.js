@@ -19,9 +19,10 @@ const initialState = {
   error: null,
   readOnly: false,
   selectedExpense: null,
-  // Optional: Add any statistics fields if needed
-  totalExpenseAmount: 0,
-  // Add more statistics as required
+  totalExpenseAmount: 0, // Optional statistics
+  remainingPartialPaidExpense: 0,
+  totalPaidAmount: 0,
+  unpaidExpense: 0,
 };
 
 const expensesSlice = createSlice({
@@ -37,9 +38,10 @@ const expensesSlice = createSlice({
       state.error = null;
       state.filters = {};
       state.selectedExpense = null;
-      // Reset statistics
       state.totalExpenseAmount = 0;
-      // Reset other statistics as needed
+      state.remainingPartialPaidExpense = 0;
+      state.totalPaidAmount = 0;
+      state.unpaidExpense = 0;
     },
     setSelectedExpense(state, action) {
       state.selectedExpense = action.payload;
@@ -52,12 +54,11 @@ const expensesSlice = createSlice({
     },
     setFilters(state, action) {
       state.filters = { ...state.filters, ...action.payload };
-      state.currentPage = 1;
+      state.currentPage = 1; // Reset to the first page on filter change
     },
     clearFilters(state) {
       state.filters = {};
       state.currentPage = 1;
-      // Optionally reset other state related to filters if needed
     },
     setReadOnly(state, action) {
       state.readOnly = action.payload;
@@ -65,7 +66,6 @@ const expensesSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // Fetch All Expenses
       .addCase(fetchAllExpenses.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -73,23 +73,19 @@ const expensesSlice = createSlice({
       .addCase(fetchAllExpenses.fulfilled, (state, action) => {
         state.loading = false;
         state.expenses = action.payload.data || [];
-        state.totalRecords = action.payload.totalRecords || 0;
-        state.totalPages = action.payload.totalPages || 0;
-        state.currentPage = action.payload.currentPage || 1;
-        // Update statistics if provided
-        state.totalExpenseAmount =
-          action.payload.totalExpenseAmount || state.totalExpenseAmount;
-        // Update other statistics as needed
+        state.totalRecords = action.payload.totalRecords;
+        state.totalPages = action.payload.totalPages;
+        state.currentPage = action.payload.currentPage;
+        state.totalExpense = action.payload.totalExpense;
+        state.remainingPartialPaidExpense =
+          action.payload.remainingPartialPaidExpense;
+        state.totalPaidAmount = action.payload.totalPaidAmount;
+        state.unpaidExpense = action.payload.unpaidExpense;
       })
       .addCase(fetchAllExpenses.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload || "Failed to fetch expenses.";
-        state.expenses = [];
-        state.totalRecords = 0;
-        state.totalPages = 0;
-        // Reset statistics on error
-        state.totalExpenseAmount = 0;
-        // Reset other statistics as needed
+        state.error =
+          action.payload || "An error occurred while fetching expenses.";
       })
 
       // Add Expense
@@ -99,9 +95,9 @@ const expensesSlice = createSlice({
       })
       .addCase(addExpense.fulfilled, (state, action) => {
         state.loading = false;
-        // Optionally, append the new expense
-        state.expenses.unshift(action.payload);
-        state.totalRecords += 1;
+        // state.expenses.unshift(action.payload); // Add new expense to the start
+        // state.totalRecords += 1;
+
         // Update statistics
         state.totalExpenseAmount += action.payload.finalAmount || 0;
       })
@@ -117,16 +113,17 @@ const expensesSlice = createSlice({
       })
       .addCase(updateExpense.fulfilled, (state, action) => {
         state.loading = false;
-        const index = state.expenses.findIndex(
-          (expense) => expense._id === action.payload._id
-        );
-        if (index !== -1) {
-          // Update the expense in the list
-          state.expenses[index] = action.payload;
-          // Optionally, update statistics
-          // Example:
-          // state.totalExpenseAmount = recalculateTotalExpenseAmount(state.expenses);
-        }
+        // const index = state.expenses.findIndex(
+        //   (expense) => expense._id === action.payload._id
+        // );
+        // if (index !== -1) {
+        //   state.expenses[index] = action.payload; // Update the expense
+
+        //   // Optionally, update statistics
+        //   const updatedAmount = action.payload.finalAmount || 0;
+        //   const previousAmount = state.expenses[index]?.finalAmount || 0;
+        //   state.totalExpenseAmount += updatedAmount - previousAmount;
+        // }
       })
       .addCase(updateExpense.rejected, (state, action) => {
         state.loading = false;
