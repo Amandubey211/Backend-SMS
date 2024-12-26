@@ -32,6 +32,10 @@ import adminAnnouncementReducer from "./Slices/Admin/Class/Announcement/announce
 import allStudentReducer from "./Slices/Admin/Users/Students/studentSlice";
 import allParentReducer from "./Slices/Admin/Users/Parents/parentSilce";
 import allstaffReducer from "./Slices/Admin/Users/Staff/staffSlice";
+
+import receiptsReducer from "./Slices/Finance/Receipts/receiptsSlice";
+import quotationReducer from "./Slices/Finance/Quotations/quotationSlice";
+
 // import earningReducer from "./Slices/Admin/Accounting/Earning/earningSlice";
 import studentFeesReducer from "./Slices/Finance/StudentFees/studentFeesSlice";
 
@@ -153,7 +157,7 @@ const AdminReducer = combineReducers({
   timetable: timetableReducer,
   speedgrades: adminSpeedGradeReducer,
   classIcons: adminClassIconsReducer,
-
+  quotations: quotationReducer,
   graduates: graduateReducer,
   all_students: allStudentReducer,
   all_parents: allParentReducer,

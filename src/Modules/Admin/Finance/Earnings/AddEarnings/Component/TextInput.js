@@ -3,7 +3,7 @@
 import React from "react";
 import { Field, ErrorMessage } from "formik";
 import { motion } from "framer-motion";
-import { useSelector } from "react-redux";
+
 
 const TextInput = ({
   label,
@@ -14,6 +14,7 @@ const TextInput = ({
   disabled = false, // Added disabled prop with default value
 }) => {
   const readOnly = useSelector((state) => state.admin.earnings.readOnly);
+
 
   const variants = {
     hidden: { opacity: 0, y: -10 },
@@ -40,6 +41,7 @@ const TextInput = ({
         disabled={disabled || readOnly}
         className="bg-white border border-gray-300 rounded-sm px-4 py-3 text-sm text-gray-800 w-full focus:outline-none focus:ring-2 focus:ring-purple-300"
         autoComplete={autoComplete}
+
       />
       <ErrorMessage
         name={name}
@@ -48,6 +50,7 @@ const TextInput = ({
       />
     </motion.div>
   );
-}; // Removed the extra closing brace
+};
+
 
 export default TextInput;
