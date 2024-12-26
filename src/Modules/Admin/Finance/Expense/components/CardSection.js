@@ -25,10 +25,17 @@ const CardSection = () => {
       percentage: -3.5,
       trend: "down",
     },
+    {
+      title: "Total Expenses",
+      value: "2,67,634 QAR",
+      comparison: "Compared to (2,34,567 QAR last month)",
+      percentage: 3.5,
+      trend: "up",
+    },
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-6 auto-rows-fr">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 p-6 auto-rows-fr">
       {cardData.map((item, index) => (
         <Card key={index} {...item} />
       ))}
