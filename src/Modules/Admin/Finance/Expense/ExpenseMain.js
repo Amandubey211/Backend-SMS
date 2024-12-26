@@ -13,7 +13,7 @@ const ExpenseMain = () => {
   const navigate = useNavigate();
   useNavHeading("Finance", "Expenses");
   return (
-    <Layout title="Expense | Student Diwan">
+    <Layout title="Expense Dashboard | Student Diwan">
       <DashLayout>
         <div className="p-4 md:p-6 space-y-6 scroll-smooth overflow-y-auto h-full w-full mx-auto">
           {/* Header Section */}
