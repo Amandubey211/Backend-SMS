@@ -4,7 +4,8 @@ import React, { useState, useEffect } from "react";
 import { Table, Modal, Button, Spin, Alert } from "antd";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-
+import {  Tooltip} from "antd";
+import {EditOutlined,DeleteOutlined,} from "@ant-design/icons";
 import AdminLayout from "../../../../Components/Admin/AdminDashLayout";
 import SortPopModal from "./Components/SortPopModal"; // Corrected import
 import StudentFeesPaidModal from "./Components/StudentFeesPaidModal";
@@ -17,10 +18,14 @@ import { fetchAllIncomes } from "../../../../Store/Slices/Finance/Earnings/earni
 const SummaryRevenueList = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
-  const { records, loading, error } = useSelector(
-    (state) => state.admin.studentFees
-  ); // Adjust the path based on your store
+  const [currentPage,setCurrentPage] = useState(1)
+  useEffect(() => {
+     dispatch(fetchAllIncomes({ page: 1, limit: 20,categoryId:"675bc4e3e7901c873905fd2f"})); 
+  }, [dispatch]);
+  const { incomes, loading, error, totalRecords,totalPages
+  } = useSelector(
+    (state) => state.admin.earnings
+  );
 
   const [selectedStudentDetails, setSelectedStudentDetails] = useState({});
   const [isSortModalVisible, setSortModalVisible] = useState(false);
@@ -31,55 +36,39 @@ const SummaryRevenueList = () => {
   const [selectedOption, setSelectedOption] = useState("newest");
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
 
-  useEffect(() => {
-    // Fetch all student fee records when the component mounts
-    dispatch(fetchAllIncomes({ page: 1, limit: 20 })); // Adjust params as needed
-  }, [dispatch]);
+   
 
   const handleRowClick = (record) => {
-    // Clean base amount by removing "QR" and converting to a number
-    const baseAmount = parseFloat(
-      record?.amount?.replace("QR", "").trim() || 0
-    );
-
-    // Clean penalty, tax, and discount fields
-    const penalty = parseFloat(record?.penalty?.replace("QR", "").trim() || 0);
-    const taxPercentage = parseFloat(record?.tax?.replace("%", "").trim() || 0);
-    const discountPercentage = parseFloat(
-      record?.discount?.replace("%", "").trim() || 0
-    );
-
-    // Calculate tax and discount amounts
-    const taxAmount = (baseAmount * taxPercentage) / 100;
-    const discountAmount = (baseAmount * discountPercentage) / 100;
-
-    // Calculate total amount
-    const totalAmount = baseAmount + taxAmount - discountAmount + penalty;
-
+    const penalty = parseFloat(record?.penalty || 0);
+    const taxAmount = (parseFloat(record?.final_amount || 0) * parseFloat(record?.tax || 0)) / 100;
+    const discountAmount =
+      record.discountType === "percentage"
+        ? (parseFloat(record?.final_amount || 0) * parseFloat(record?.discount || 0)) / 100
+        : parseFloat(record?.discount || 0);
+  
+    const totalAmount = parseFloat(record?.final_amount || 0) + penalty - discountAmount + taxAmount;
+  
     const studentDetails = {
-      name: record?.name || "N/A",
-      class: record?.class || "N/A",
-      section: record?.section || "N/A",
-      fees_type: record?.feesType || "N/A",
-      due_date: record?.dueDate || "N/A",
-      total_amount: totalAmount ? `${totalAmount.toFixed(2)} QR` : "N/A",
-      penalty: record?.penalty || "N/A",
-      paid_status: record?.status || "N/A",
-      tax: record?.tax || "N/A", // Keep the original tax string
-      discount: record?.discount || "N/A", // Keep the original discount string
-      paid_by: "Card", // Example data, adjust as needed
-      transaction_id: "12345", // Example data, adjust as needed
-      payment_method: "Stripe", // Example data, adjust as needed
+      category: record?.category.map((cat) => cat.categoryName).join(", ") || "N/A",
+      subCategory: record?.subCategory || "N/A",
+      paymentStatus: record?.paymentStatus || "N/A",
+      paymentType: record?.paymentType || "N/A",
+      finalAmount: `${totalAmount.toFixed(2)} QR`,
+      paidAmount: `${record?.paid_amount?.toFixed(2) || 0} QR`,
+      penalty: `${penalty} QR`,
+      tax: `${record?.tax || 0}%`,
+      discount: record?.discount || "N/A",
     };
-
+  
     setSelectedStudentDetails(studentDetails);
-
-    if (record?.status === "Paid") {
-      setStudentDetailsModalVisible(true); // Open Paid Modal
-    } else if (record?.status === "Unpaid") {
-      setStudentUnpaidModalVisible(true); // Open Unpaid Modal
+  
+    if (record?.paymentStatus === "paid") {
+      setStudentDetailsModalVisible(true);
+    } else {
+      setStudentUnpaidModalVisible(true);
     }
   };
+  
 
   const handleDelete = () => {
     if (selectedRowKeys.length === 0) {
@@ -130,117 +119,115 @@ const SummaryRevenueList = () => {
   };
 
   const columns = [
+ 
     {
-      title: "Name",
-      dataIndex: "name",
-      key: "name",
-      sorter: (a, b) => a.name.localeCompare(b.name),
-      render: (text) => <span>{text}</span>,
+      title: "Subcategory",
+      dataIndex: "subCategory",
+      key: "subCategory",
+      render: (text) => <span>{text || "N/A"}</span>,
     },
     {
-      title: "Class",
-      dataIndex: "class",
-      key: "class",
-      sorter: (a, b) => a.class.localeCompare(b.class),
-      render: (text) => <span>{text}</span>,
-    },
-    {
-      title: "Section",
-      dataIndex: "section",
-      key: "section",
-      sorter: (a, b) => a.section.localeCompare(b.section),
-      render: (text) => <span>{text}</span>,
-    },
-    {
-      title: "Fees Type",
-      dataIndex: "feesType",
-      key: "feesType",
-      sorter: (a, b) => a.feesType.localeCompare(b.feesType),
-      render: (text) => <span>{text}</span>,
-    },
-    {
-      title: "Due Date",
-      dataIndex: "dueDate",
-      key: "dueDate",
-      sorter: (a, b) => new Date(a.dueDate) - new Date(b.dueDate),
-      render: (date) => (date ? moment(date).format("YYYY-MM-DD") : "N/A"),
-    },
-    {
-      title: "Amount",
-      dataIndex: "amount",
-      key: "amount",
-      sorter: (a, b) => parseFloat(a.amount) - parseFloat(b.amount),
-      render: (value) => (typeof value === "string" ? `${value}` : "N/A"),
-    },
-    {
-      title: "Status",
-      dataIndex: "status",
-      key: "status",
-      sorter: (a, b) => a.status.localeCompare(b.status),
-      render: (text) => (
+      title: "Payment Status",
+      dataIndex: "paymentStatus",
+      key: "paymentStatus",
+      render: (status) => (
         <span
           className={`px-2 py-1 rounded-lg text-sm font-medium ${
-            text === "Paid"
+            status === "paid"
               ? "bg-green-100 text-green-600"
               : "bg-red-100 text-red-600"
           }`}
         >
-          {text}
+          {status}
         </span>
       ),
     },
     {
-      title: "Penalty",
-      dataIndex: "penalty",
-      key: "penalty",
-      sorter: (a, b) => parseFloat(a.penalty) - parseFloat(b.penalty),
-      render: (value) => (typeof value === "string" ? `${value}` : "N/A"),
+      title: "Payment Type",
+      dataIndex: "paymentType",
+      key: "paymentType",
+      render: (text) => <span>{text || "N/A"}</span>,
     },
     {
-      title: "Tax",
-      dataIndex: "tax",
-      key: "tax",
-      sorter: (a, b) => parseFloat(a.tax) - parseFloat(b.tax),
-      render: (value) => (typeof value === "string" ? `${value}` : "N/A"),
+      title: "Final Amount",
+      dataIndex: "final_amount",
+      key: "final_amount",
+      sorter: (a, b) => (a.final_amount || 0) - (b.final_amount || 0),
+      render: (amount) => <span>{`${amount.toFixed(2)} QR`}</span>,
+    },
+    {
+      title: "Paid Amount",
+      dataIndex: "paid_amount",
+      key: "paid_amount",
+      sorter: (a, b) => new Date(a.paid_amount) - new Date(b.paid_amount),
+      render: (amount) => <span>{`${amount.toFixed(2)} QR`}</span>,
+    },
+  {
+      title: "Date",
+      dataIndex: "paidDate",
+      key: "paidDate",
+      sorter: (a, b) => new Date(a.paidDate) - new Date(b.paidDate),
+      render: (date) => (date ? moment(date).format("YYYY-MM-DD") : "N/A"),
     },
     {
       title: "Discount",
       dataIndex: "discount",
       key: "discount",
-      sorter: (a, b) => parseFloat(a.discount) - parseFloat(b.discount),
-      render: (value) => (typeof value === "string" ? `${value}` : "N/A"),
-    },
-    {
-      title: "Total Amount",
-      dataIndex: "total_amount",
-      key: "total_amount",
-      sorter: (a, b) => parseFloat(a.total_amount) - parseFloat(b.total_amount),
-      render: (value) => (typeof value === "string" ? `${value}` : "N/A"),
+      render: (discount, record) => (
+        <span>
+          {discount
+            ? record.discountType === "percentage"
+              ? `${discount}%`
+              : `${discount} QR`
+            : "N/A"}
+        </span>
+      ),
     },
     {
       title: "Action",
       key: "action",
       render: (_, record) => (
-        <div className="flex space-x-2">
-          <Button
-            type="link"
-            onClick={() => navigate(`/finance/studentfees/edit/${record._id}`)}
-            className="text-blue-500"
-          >
-            Edit
-          </Button>
-          <Button
-            type="link"
-            danger
-            onClick={() => handleDeleteSingleRecord(record._id)}
-            className="text-red-500"
-          >
-            Delete
-          </Button>
-        </div>
+          <div className="flex space-x-1" onClick={(e) => e.stopPropagation()}>
+            <Tooltip title="Edit">
+              <Button
+                type="link"
+                icon={<EditOutlined />}
+                // onClick={() => {
+                //   const incomeToEdit = incomeIdMap[record.key];
+                //   if (incomeToEdit) {
+                //     dispatch(setReadOnly(true)); // Set readOnly to true for viewing
+                //     dispatch(setSelectedIncome(incomeToEdit)); // Dispatch the selected income to Redux
+                //     navigate("/finance/earning/add"); // Navigate without passing state
+                //   } else {
+                //     toast.error("Selected income not found.");
+                //   }
+                // }}
+                className="text-blue-600 hover:text-blue-800 p-0"
+                aria-label="Edit"
+              />
+            </Tooltip>
+            <Tooltip title="Delete">
+              <Button
+                type="link"
+                icon={<DeleteOutlined />}
+                // onClick={() => {
+                //   const incomeToDelete = incomeIdMap[record.key];
+                //   if (incomeToDelete) {
+                //     setSelectedIncomeForDeletion(incomeToDelete); // Set income for deletion
+                //     setIsDeleteModalVisible(true);
+                //   } else {
+                //     toast.error("Selected income not found.");
+                //   }
+                // }}
+                className="text-red-600 hover:text-red-800 p-0"
+                aria-label="Delete"
+              />
+            </Tooltip>
+          </div>
       ),
     },
   ];
+  
 
   const rowSelection = {
     selectedRowKeys,
@@ -253,7 +240,7 @@ const SummaryRevenueList = () => {
     <AdminLayout>
        <div className="p-6 bg-white shadow-lg rounded-lg">
         {/* Filters and Buttons Section */}
-        <div className="flex justify-between items-start">
+        <div className="flex justify-between items-start ">
           {/* Left Side: Filters and Radio Buttons */}
           <div className="flex flex-col space-y-4">
             {/* Filters Row */}
@@ -317,35 +304,7 @@ const SummaryRevenueList = () => {
           </div>
 
           {/* Right Side: Buttons */}
-          <div className="flex items-center space-x-4">
-            {/* Sort Button */}
-            <button
-              className="flex items-center px-4 py-2 border rounded-lg text-gray-700 font-medium hover:shadow-md"
-              style={{
-                borderImage: "linear-gradient(to right, #FF007C, #8A2BE2) 1",
-                borderRadius: "8px",
-              }}
-              onClick={() => setSortModalVisible(true)}
-            >
-              Sort
-              <span className="ml-2">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M16 17l-4 4m0 0l-4-4m4 4V3"
-                  />
-                </svg>
-              </span>
-            </button>
-
+          <div className="flex items-center space-x-4 justify-center">
             {/* Export Button */}
             <button
               className="flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-medium rounded-lg hover:opacity-90"
@@ -373,7 +332,7 @@ const SummaryRevenueList = () => {
             {/* Add New Fee Button */}
             <button
               onClick={() =>
-                navigate("/finance/studentfees/total-revenue/addFees")
+                navigate("/finance/studentfees/add/form")
               }
               className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
             >
@@ -402,16 +361,23 @@ const SummaryRevenueList = () => {
             />
           ) : (
             <Table
-              dataSource={records}
-              columns={columns}
-              pagination={{ pageSize: 10 }}
-              rowKey="_id"
-              className="rounded-lg overflow-hidden"
-              rowSelection={rowSelection}
-              onRow={(record) => ({
-                onClick: () => handleRowClick(record),
-              })}
-            />
+            dataSource={incomes}
+            columns={columns}
+            pagination={{
+              current: currentPage,
+              pageSize: 20,
+              total: totalRecords,
+              onChange: (page) => {
+                setCurrentPage(page)
+                dispatch(fetchAllIncomes({ page, limit: 20,categoryId:"675bc4e3e7901c873905fd2f"}));
+              },
+            }}
+            rowKey="_id"
+            onRow={(record) => ({
+              onClick: () => handleRowClick(record),
+            })}
+          />
+          
           )}
         </div>
 

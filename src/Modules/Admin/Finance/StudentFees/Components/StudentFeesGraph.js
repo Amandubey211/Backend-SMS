@@ -1,13 +1,12 @@
-// src/Modules/Admin/Finance/StudentFees/Components/StudentFeesGraph.js
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Line } from "react-chartjs-2";
 
 const StudentFeesGraph = () => {
   const [graphData, setGraphData] = useState(null);
-  const [selectedOption, setSelectedOption] = useState("By Month");
+  const chartRef = useRef(null);
 
-  // Fetch graph data
   useEffect(() => {
+    // Simulate API call for graph data
     const fetchGraphData = async () => {
       const fetchedData = {
         labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul"],
@@ -15,14 +14,14 @@ const StudentFeesGraph = () => {
           {
             label: "Total Fees Collected",
             data: [5000, 10000, 15000, 12000, 17000, 20000, 25000],
-            borderColor: "#06A72E", // Green line
+            borderColor: "#06A72E",
             backgroundColor: "rgba(6, 167, 46, 0.2)",
             tension: 0.4,
           },
           {
             label: "Total Due Fees",
             data: [4000, 8000, 10000, 9000, 14000, 15000, 17000],
-            borderColor: "#E70F00", // Red line
+            borderColor: "#E70F00",
             backgroundColor: "rgba(231, 15, 0, 0.2)",
             tension: 0.4,
           },
@@ -37,7 +36,7 @@ const StudentFeesGraph = () => {
 
   const options = {
     responsive: true,
-    maintainAspectRatio: false,
+    maintainAspectRatio: false, 
     plugins: {
       tooltip: {
         enabled: true,
@@ -68,50 +67,14 @@ const StudentFeesGraph = () => {
     },
   };
 
-  const handleOptionChange = (event) => {
-    setSelectedOption(event.target.value);
-  };
-
   return (
-    <div className="bg-white p-6 rounded-lg border-2 border-gray-300 w-full relative">
-      {/* Dropdown at the top-right */}
-      <div className="absolute top-4 right-4">
-        <select
-          value={selectedOption}
-          onChange={handleOptionChange}
-          className="bg-white text-gray-700 py-2 px-4 rounded-lg outline-none border-2 border-transparent"
-          style={{
-            borderImage: "linear-gradient(90deg, #C83B62, #46138A) 1",
-          }}
-        >
-          <option value="By Month">By Month</option>
-          {[
-            "January",
-            "February",
-            "March",
-            "April",
-            "May",
-            "June",
-            "July",
-            "August",
-            "September",
-            "October",
-            "November",
-            "December",
-          ].map((month) => (
-            <option key={month} value={month}>
-              {month}
-            </option>
-          ))}
-        </select>
-      </div>
-
+    <div className="bg-white p-6 rounded-lg border border-gray-300 w-full relative">
       <h3 className="text-lg font-medium text-gray-700 mb-6">
         Monthly Fee Collection 2024
       </h3>
-      <div className="h-[400px]">
-        {graphData?.labels ? (
-          <Line data={graphData} options={options} />
+      <div className="h-96 w-full">
+        {graphData ? (
+          <Line data={graphData} options={options} ref={chartRef} />
         ) : (
           <p className="text-center text-gray-500">Loading graph data...</p>
         )}
