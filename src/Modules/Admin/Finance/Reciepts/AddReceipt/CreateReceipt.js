@@ -10,7 +10,6 @@ import SelectInput from "./Components/SelectInput";
 import ReturnItems from "./Components/ReturnItems";
 import FileInput from "./Components/FileInput";
 import { fetchAllClasses } from "../../../../../Store/Slices/Admin/Class/actions/classThunk";
-import { fetchSectionsByClass } from "../../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
 import { fetchStudentsByClassAndSection } from "../../../../../Store/Slices/Admin/Class/Students/studentThunks";
 import { createReceipt } from "../../../../../Store/Slices/Finance/Receipts/receiptsThunks";
 
@@ -31,27 +30,6 @@ const CreateReceipt = () => {
     dispatch(fetchAllClasses());
   }, [dispatch]);
 
-
- 
-
-
-
-
-  // Fetch students when a section is selected
-  useEffect(() => {
-    if (selectedClass && selectedSection) {
-      dispatch(
-        fetchStudentsByClassAndSection({
-          classId: selectedClass,
-          sectionId: selectedSection,
-        })
-      )
-        .unwrap()
-        .catch((error) => {
-          console.error("Failed to fetch students:", error);
-        });
-    }
-  }, [dispatch, selectedClass, selectedSection]);
   const initialValues = {
     notes: "",
     class: "",
@@ -153,6 +131,7 @@ const CreateReceipt = () => {
       .then((response) => {
         // Assuming thunks handle toast notifications
         resetForm();
+        // Optionally navigate or show success message
       })
       .catch((err) => {
         // Errors are handled in thunks
@@ -215,99 +194,61 @@ const CreateReceipt = () => {
               {/* Bill To Section */}
               <h2 className="text-lg font-semibold mb-4">Bill To</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                {/* Class Selection */}
                 <SelectInput
                   name="class"
                   label="Class"
-                  options={classes.map((cls) => ({ label: cls.className, value: cls._id }))}
+                  options={classes.map((cls) => ({ label: cls.className, value: cls._id }))} // Map classes to dropdown options
                   onChange={(e) => {
                     const classId = e.target.value;
                     console.log("Class selected:", classId); // Debugging
                     setFieldValue("class", classId);
                     setSelectedClass(classId);
-                    setFieldValue("section", ""); // Reset section and student when class changes
-                    setFieldValue("studentName", "");
-                    // Dispatch action to fetch sections for the selected class
-                    dispatch(fetchSectionsByClass(classId))
+                    setFieldValue("studentName", ""); // Reset student name when class changes
+
+                    // Debug payload
+                    const payload = { classId: String(classId), sectionId: "" };
+                    console.log("Dispatching fetchStudentsByClassAndSection with payload:", payload);
+
+                    // Dispatch the action
+                    dispatch(fetchStudentsByClassAndSection(payload.classId))
                       .unwrap()
-                      .then(() => {
-                        console.log("Sections fetched successfully for class:", classId); // Debugging
+                      .then((response) => {
+                        console.log("Response received:", response); // Debug the API response
+                        console.log("Students fetched successfully for class:", classId); // Success Debugging
                       })
                       .catch((error) => {
-                        console.error("Failed to fetch sections:", error);
+                        console.error("Failed to fetch students:", error); // Error Debugging
                       });
                   }}
                 />
-
-                {/* Section Selection */}
-                <SelectInput
-                  name="section"
-                  label="Section"
-                  options={
-                    selectedClass && sectionsList[selectedClass]
-                      ? sectionsList[selectedClass].map((sec) => ({
-                        label: sec.sectionName,
-                        value: sec._id,
-                      }))
-                      : []
-                  }
-                  onChange={(e) => {
-                    const sectionId = e.target.value;
-                    console.log("Section selected:", sectionId); // Debugging
-                    setFieldValue("section", sectionId);
-                    setSelectedSection(sectionId);
-                    setFieldValue("studentName", ""); // Reset student when section changes
-                    // Dispatch action to fetch students for the selected class and section
-                    dispatch(
-                      fetchStudentsByClassAndSection({
-                        classId: selectedClass,
-                        sectionId,
-                      })
-                    )
-                      .unwrap()
-                      .then(() => {
-                        console.log("Students fetched successfully for class:", selectedClass, "and section:", sectionId); // Debugging
-                      })
-                      .catch((error) => {
-                        console.error("Failed to fetch students:", error);
-                      });
-                  }}
-                  disabled={!selectedClass}
-                />
-
 
                 {/* Student Name Selection */}
                 <SelectInput
                   name="studentName"
                   label="Student Name"
                   options={
-                    selectedClass &&
-                      selectedSection &&
-                      studentsList[selectedClass] &&
-                      studentsList[selectedClass][selectedSection]
-                      ? studentsList[selectedClass][selectedSection].map((student) => ({
-                        label: student.name,
-                        value: student.name, // Adjust this if you need to store a different value
-                      }))
+                    Array.isArray(studentsList) // Ensure studentsList is an array
+                      ? studentsList.map((student) => {
+                        console.log("Mapping student:", student); // Debugging individual student object
+                        return {
+                          label: `${student.firstName} ${student.lastName}`, // Combine first name and last name
+                          value: student._id, // Use student ID as the value
+                        };
+                      })
                       : []
                   }
-                  onChange={(e) => setFieldValue("studentName", e.target.value)}
-                  disabled={!selectedClass || !selectedSection}
+                  onChange={(e) => {
+                    const studentId = e.target.value;
+                    console.log("Student selected:", studentId); // Debugging
+                    setFieldValue("studentName", studentId);
+                  }}
+                  disabled={
+                    !selectedClass || !Array.isArray(studentsList) || studentsList.length === 0
+                  }
                 />
 
-                {/* Admission Number */}
-                <TextInput
-                  name="admissionNumber"
-                  label="Admission Number"
-                  placeholder="Enter admission number"
-                />
 
-                {/* Parent Name */}
-                <TextInput
-                  name="parentName"
-                  label="Parent Name"
-                  placeholder="Enter parent name"
-                />
+
 
                 {/* Address */}
                 <TextInput
@@ -330,13 +271,7 @@ const CreateReceipt = () => {
                   placeholder="Enter mail ID"
                 />
 
-                {/* Academic Year */}
-                <TextInput
-                  name="academicYear"
-                  label="Academic Year"
-                  placeholder="Enter academic year"
-                  readOnly
-                />
+
               </div>
 
               {/* Return Items */}
