@@ -34,7 +34,7 @@ const SummaryRevenueList = () => {
     classId: "",
     sectionId: "",
     subCategory: "",
-    status: "",
+    paymentStatus: "",
   });
 
   useEffect(() => {
@@ -257,7 +257,7 @@ const SummaryRevenueList = () => {
               <label className="flex items-center text-sm space-x-2">
                 <input
                   type="radio"
-                  name="status"
+                  name="paymentStatus"
                   className="form-radio text-green-600"
                   value=""
                   defaultChecked
@@ -268,22 +268,32 @@ const SummaryRevenueList = () => {
               <label className="flex items-center text-sm space-x-2">
                 <input
                   type="radio"
-                  name="status"
+                  name="paymentStatus"
                   className="form-radio text-gray-500"
                   value="paid"
                   onChange={filterOnchange}
                 />
-                <span className="text-gray-700">Paid Student</span>
+                <span className="text-gray-700">Paid</span>
               </label>
               <label className="flex items-center text-sm space-x-2">
                 <input
                   type="radio"
-                  name="status"
+                  name="paymentStatus"
+                  className="form-radio text-gray-500"
+                  value="partial"
+                  onChange={filterOnchange}
+                />
+                <span className="text-gray-700">Partial </span>
+              </label>
+              <label className="flex items-center text-sm space-x-2">
+                <input
+                  type="radio"
+                  name="paymentStatus"
                   className="form-radio text-gray-500"
                   value="unpaid"
                   onChange={filterOnchange}
                 />
-                <span className="text-gray-700">Unpaid Student</span>
+                <span className="text-gray-700">Unpaid </span>
               </label>
             </div>
           </div>
