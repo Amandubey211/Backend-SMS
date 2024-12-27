@@ -15,9 +15,10 @@ const QuotationMain = () => {
             <div className="p-6 space-y-6">
                 {/* Header Section */}
                 <div className="flex justify-between items-center">
+                    
                     <div className="flex gap-4 justify-start items-center">
                         {/* Filters */}
-                        <div className="relative rounded-[0.625rem] p-[2px] bg-gradient-to-r from-[#C83B62] to-[#46138A]">
+                        {/* <div className="relative rounded-[0.625rem] p-[2px] bg-gradient-to-r from-[#C83B62] to-[#46138A]">
                             <select
                                 className="px-4 py-2 w-full bg-white text-gray-600 shadow-sm hover:shadow-md transition-all duration-200 focus:outline-none"
                                 style={{ margin: '0.01px 0.2px 0.01px 0.1px', borderRadius: '7px' }}
@@ -38,7 +39,7 @@ const QuotationMain = () => {
                                 <option>Unpaid</option>
                                 <option>Partial</option>
                             </select>
-                        </div>
+                        </div> */}
                     </div>
 
                     {/* Add New Receipt Button */}

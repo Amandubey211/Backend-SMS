@@ -35,7 +35,7 @@ import allstaffReducer from "./Slices/Admin/Users/Staff/staffSlice";
 
 import receiptsReducer from "./Slices/Finance/Receipts/receiptsSlice";
 import quotationReducer from "./Slices/Finance/Quotations/quotationSlice";
-
+import penaltyAdjustmentReducer from "./Slices/Finance/PenalityandAdjustment/adjustment.slice"
 // import earningReducer from "./Slices/Admin/Accounting/Earning/earningSlice";
 import studentFeesReducer from "./Slices/Finance/StudentFees/studentFeesSlice";
 import invoiceReducer from "./Slices/Finance/Invoice/invoiceSlice";
@@ -178,6 +178,7 @@ const AdminReducer = combineReducers({
   expenses: expensesReducer,
   studentFees: studentFeesReducer,
   invoices: invoiceReducer,
+  penaltyAdjustment:penaltyAdjustmentReducer,
 });
 
 const studentReducer = combineReducers({

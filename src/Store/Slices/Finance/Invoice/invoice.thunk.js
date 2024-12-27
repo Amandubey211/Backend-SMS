@@ -12,7 +12,11 @@ export const addInvoice = createAsyncThunk(
       dispatch(setShowError(false));
       try {
         const response = await postData(`/finance/invoice/create?say=${say}`, data);
-          toast.success("Invoice create successfully!");
+        if(response.success){
+           toast.success("Invoice create successfully!");     
+        }else{
+          toast.error("Something is wrong!");  
+        }
         return response.data
       } catch (error) {
         return handleError(error, dispatch, rejectWithValue);
@@ -26,6 +30,19 @@ export const fetchInvoice = createAsyncThunk(
     dispatch(setShowError(false));
       try {
         const response = await getData(`/finance/invoice/get?say=${say}`,params);
+        return response.data
+      } catch (error) {
+        return handleError(error, dispatch, rejectWithValue);
+      }
+    }
+  );
+export const fetchInvoiceCard = createAsyncThunk(
+    "earnings/fetchInvoiceCar",
+    async (params, { dispatch, rejectWithValue }) => {
+      const say = getAY();
+    dispatch(setShowError(false));
+      try {
+        const response = await getData(`/finance/dashboard/invoice/cardData?academicYearId=${say}`,);
         return response.data
       } catch (error) {
         return handleError(error, dispatch, rejectWithValue);
