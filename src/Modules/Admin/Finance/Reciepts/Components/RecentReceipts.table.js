@@ -306,7 +306,7 @@ const RecentReceipts = () => {
                 >
                   Download PDF
                 </button>
-                <button
+                {/* <button
                   className="w-40 py-2 text-white font-semibold rounded-md"
                   style={{
                     background: "linear-gradient(90deg, #C83B62 0%, #7F35CD 100%)",
@@ -316,7 +316,7 @@ const RecentReceipts = () => {
                   }}
                 >
                   Send Receipt
-                </button>
+                </button> */}
               </div>
 
               {/* Receipt Component */}

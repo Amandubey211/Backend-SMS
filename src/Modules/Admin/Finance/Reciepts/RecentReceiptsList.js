@@ -1,51 +1,61 @@
 // RecentReceiptsList.js
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import AdminLayout from "../../../../Components/Admin/AdminDashLayout";
-import { Menu, Dropdown, Input, Table, Button } from "antd";
+import { Menu, Dropdown, Input, Table } from "antd";
 import { MoreOutlined, ExclamationCircleOutlined, SearchOutlined } from "@ant-design/icons";
 import { FiUserPlus } from "react-icons/fi";
-import { ShareAltOutlined } from "@ant-design/icons";
 import { toast } from "react-hot-toast";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 import { fetchAllReceipts, cancelReceipt } from "../../../../Store/Slices/Finance/Receipts/receiptsThunks";
-import Spinner from "../../../../Components/Common/Spinner"; // Ensure the path is correct
-import DeleteConfirmationModal from "../../../../Components/Common/DeleteConfirmationModal"; // Ensure the path is correct
+import Spinner from "../../../../Components/Common/Spinner";
+import DeleteConfirmationModal from "../../../../Components/Common/DeleteConfirmationModal";
 import EmailModal from "../../../../Components/Common/EmailModal";
+
+// Import your Receipt component here
+import Receipt from "./Components/Receipt"; // <-- Adjust the path accordingly
 
 const RecentReceiptsList = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
-    const { receipts = [], loading, error } = useSelector((state) => state.admin.receipts || {});
+    const { receipts = [], loading, error } = useSelector(
+        (state) => state.admin.receipts || {}
+    );
+
+    // Basic states
     const [searchQuery, setSearchQuery] = useState("");
+
+    // Cancel receipt states
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedReceiptId, setSelectedReceiptId] = useState(null);
     const [cancelLoading, setCancelLoading] = useState(false);
+
+    // Email modal states
     const [isEmailModalOpen, setEmailModalOpen] = useState(false);
 
+    // **Receipt Preview** states
+    const [isReceiptVisible, setReceiptVisible] = useState(false);
+    const [selectedReceipt, setSelectedReceipt] = useState(null);
+
+    // Optional: useRef if you want to detect clicks outside the modal
+    const popupRef = useRef(null);
+
     useEffect(() => {
-        if (receipts.length === 0) { // Fetch only if no receipts are present
+        // Fetch only if no receipts are present
+        if (receipts.length === 0) {
             dispatch(fetchAllReceipts());
         }
     }, [dispatch, receipts.length]);
 
+    // -------- Handlers --------
     const handleNavigate = () => {
-        navigate('/finance/receipts/add-new-receipt');
-    };
-
-    const handleShareClick = () => {
-        setEmailModalOpen(true);
-    };
-
-    const closeEmailModal = () => {
-        setEmailModalOpen(false);
+        navigate("/finance/receipts/add-new-receipt");
     };
 
     const handleCancelReceipt = async () => {
         setCancelLoading(true);
         const result = await dispatch(cancelReceipt(selectedReceiptId));
-        console.log(result);
         if (result.payload === "Receipt cancel successfully") {
             toast.success("Receipt canceled successfully!");
             dispatch(fetchAllReceipts());
@@ -56,9 +66,23 @@ const RecentReceiptsList = () => {
         setModalVisible(false);
     };
 
+    const handlePreview = (record) => {
+        setSelectedReceipt(record);
+        setReceiptVisible(true);
+    };
+
+    // Email modal
+    const handleShareClick = () => {
+        setEmailModalOpen(true);
+    };
+    const closeEmailModal = () => {
+        setEmailModalOpen(false);
+    };
+
+    // -------- Table Setup --------
     const actionMenu = (record) => (
         <Menu>
-            <Menu.Item key="1" onClick={() => navigate(`/finance/receipts/details/${record._id}`)}>
+            <Menu.Item key="1" onClick={() => handlePreview(record)}>
                 Preview
             </Menu.Item>
             <Menu.Item
@@ -93,7 +117,8 @@ const RecentReceiptsList = () => {
             title: "Receipt ID",
             dataIndex: "receiptNumber",
             key: "receiptNumber",
-            sorter: (a, b) => (a.receiptNumber || "").localeCompare(b.receiptNumber || ""),
+            sorter: (a, b) =>
+                (a.receiptNumber || "").localeCompare(b.receiptNumber || ""),
             render: (text, record) => text || record._id || "N/A",
         },
         {
@@ -105,7 +130,8 @@ const RecentReceiptsList = () => {
                 const nameB = b.reciever?.name || b.receiver?.name || "";
                 return nameA.localeCompare(nameB);
             },
-            render: (_, record) => record.reciever?.name || record.receiver?.name || "N/A",
+            render: (_, record) =>
+                record.reciever?.name || record.receiver?.name || "N/A",
         },
         {
             title: "Paid Date",
@@ -160,6 +186,7 @@ const RecentReceiptsList = () => {
         },
     ];
 
+    // -------- Loading / Error Handling --------
     if (loading) {
         return (
             <AdminLayout>
@@ -181,6 +208,7 @@ const RecentReceiptsList = () => {
         );
     }
 
+    // -------- Render --------
     return (
         <AdminLayout>
             <div className="p-4 bg-white rounded-lg shadow-lg">
@@ -244,7 +272,7 @@ const RecentReceiptsList = () => {
                     }}
                 />
 
-                {/* Modals */}
+                {/* Cancel Confirmation Modal */}
                 <DeleteConfirmationModal
                     isOpen={modalVisible}
                     onClose={() => setModalVisible(false)}
@@ -253,6 +281,7 @@ const RecentReceiptsList = () => {
                     text="Cancel Receipt"
                 />
 
+                {/* Email Modal */}
                 <EmailModal
                     isOpen={isEmailModalOpen}
                     onClose={closeEmailModal}
@@ -263,6 +292,62 @@ const RecentReceiptsList = () => {
                     }}
                 />
             </div>
+
+            {/* ===================== Receipt Preview Overlay ===================== */}
+            {isReceiptVisible && (
+                <div className="fixed inset-0 z-50">
+                    {/* Background (Dim + Blur) */}
+                    <div
+                        className="absolute inset-0 bg-black bg-opacity-60"
+                        style={{ backdropFilter: "blur(8px)" }}
+                    />
+                    {/* Foreground: Centered Content */}
+                    <div className="relative flex items-center justify-center w-full h-full">
+                        <div
+                            ref={popupRef}
+                            className="relative p-6 w-full max-w-[700px] max-h-[90vh] bg-white rounded-md shadow-md"
+                        >
+                            {/* Top-Right Buttons (adjust styling as needed) */}
+                            <div className="absolute -top-4 -right-44 mt-4 flex flex-col items-start space-y-2">
+                                {/* Close Button */}
+                                <button
+                                    onClick={() => setReceiptVisible(false)}
+                                    className="bg-gray-200 hover:bg-gray-300 rounded-full w-8 h-8 flex items-center justify-center text-lg font-semibold"
+                                >
+                                    ✕
+                                </button>
+
+                                {/* Action Buttons */}
+                                <button
+                                    className="w-40 py-2 text-white font-semibold rounded-md"
+                                    style={{
+                                        background: "linear-gradient(90deg, #C83B62 0%, #7F35CD 100%)",
+                                    }}
+                                    onClick={() => {
+                                        // e.g. window.print() or custom PDF generation
+                                    }}
+                                >
+                                    Download PDF
+                                </button>
+                                {/* <button
+                                    className="w-40 py-2 text-white font-semibold rounded-md"
+                                    style={{
+                                        background: "linear-gradient(90deg, #C83B62 0%, #7F35CD 100%)",
+                                    }}
+                                    onClick={() => {
+                                        // e.g. trigger an API call to email the receipt
+                                    }}
+                                >
+                                    Send Receipt
+                                </button> */}
+                            </div>
+
+                            {/* Receipt Component */}
+                            <Receipt receiptData={selectedReceipt} />
+                        </div>
+                    </div>
+                </div>
+            )}
         </AdminLayout>
     );
 };
