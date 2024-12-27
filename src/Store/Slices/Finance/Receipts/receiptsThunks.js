@@ -213,7 +213,8 @@ export const fetchReceiptCardData = createAsyncThunk(
 
       const response = await getData(`/finance/dashboard/receipt/cardData?${queryParams.toString()}`);
 
-      if (response?.success) {
+      if (response) {
+        console.log(response)
         return response.data;
       } else {
         toast.error(response?.message || "Failed to fetch receipt card data.");

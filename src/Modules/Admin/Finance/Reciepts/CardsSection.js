@@ -1,65 +1,44 @@
-import React from "react";
-import { useSelector } from "react-redux";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchReceiptCardData } from "../../../../Store/Slices/Finance/Receipts/receiptsThunks"; // Adjust the path as needed
 import Card from "./Components/Card";
 
 const CardsSection = () => {
-  // Access receipts data from the Redux state
-  const { receiptsSummary = {}, loading = false, error = null } = useSelector((state) => state.admin.receipts || {});
+  const dispatch = useDispatch();
 
+  // Access receipts summary and loading/error states from Redux
+  const { receiptsSummary, loading = false, error = null } = useSelector(
+    (state) => state.admin.receipts || {}
+  );
 
+  // Dispatch the fetchReceiptCardData action when the component mounts
+  useEffect(() => {
+    dispatch(
+      fetchReceiptCardData({ year: new Date().getFullYear(), month: new Date().getMonth() + 1 })
+    );
+  }, [dispatch]);
+
+  console.log('this is summary',receiptsSummary)
   // Card configuration
   const cards = [
     {
       title: "Total Receipts Issued",
-      count: loading || error ? "0" : receiptsSummary?.totalIssued || "0",
+      count: loading || error ? "0" : receiptsSummary?.totalReceipts || "0",
       color: "bg-purple-100",
       textColor: "text-purple-700",
     },
     {
       title: "Total Amount Collected",
-      count: loading || error ? "0" : receiptsSummary?.totalCollected || "0",
+      count: loading || error ? "0" : receiptsSummary?.totalAmountCollected || "0",
       color: "bg-green-100",
       textColor: "text-green-700",
     },
     {
-      title: "Total Pending Balance",
-      count: loading || error ? "0" : receiptsSummary?.totalPending || "0",
+      title: "Cancelled Receipts",
+      count: loading || error ? "0" : receiptsSummary?.cancelledReceipts || "0",
       color: "bg-red-100",
       textColor: "text-red-700",
-    }
-    // },
-    // {
-    //   title: "Payment Mode",
-    //   customContent: (
-    //     <div>
-    //       <div className="flex justify-between">
-    //         <span className="text-red-600">Online</span>
-    //         <span className="text-gray-600">
-    //           {loading || error ? "0%" : `${receiptsSummary?.onlinePercentage || 0}%`}
-    //         </span>
-    //       </div>
-    //       <div className="w-full h-2 bg-gray-300 rounded-full">
-    //         <div
-    //           className="h-full bg-red-500 rounded-full"
-    //           style={{ width: `${receiptsSummary?.onlinePercentage || 0}%` }}
-    //         ></div>
-    //       </div>
-    //       <div className="flex justify-between mt-2">
-    //         <span className="text-purple-600">Offline</span>
-    //         <span className="text-gray-600">
-    //           {loading || error ? "0%" : `${receiptsSummary?.offlinePercentage || 0}%`}
-    //         </span>
-    //       </div>
-    //       <div className="w-full h-2 bg-gray-300 rounded-full">
-    //         <div
-    //           className="h-full bg-purple-500 rounded-full"
-    //           style={{ width: `${receiptsSummary?.offlinePercentage || 0}%` }}
-    //         ></div>
-    //       </div>
-    //     </div>
-    //   ),
-    //   color: "bg-white border border-purple-200",
-    // },
+    },
   ];
 
   return (
