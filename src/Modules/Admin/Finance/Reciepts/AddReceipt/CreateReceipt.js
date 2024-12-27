@@ -2,52 +2,79 @@ import React from "react";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import DashLayout from "../../../../../Components/Admin/AdminDashLayout";
 import TextInput from "./Components/TextInput";
 import ReturnItems from "./Components/ReturnItems";
 import FileInput from "./Components/FileInput";
 import { createReceipt } from "../../../../../Store/Slices/Finance/Receipts/receiptsThunks";
-import { toast } from "react-hot-toast"; // Make sure you're importing toast if not already
+import { toast } from "react-hot-toast";
 
 const CreateReceipt = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
 
-  // -----------------
-  // INITIAL VALUES
-  // -----------------
-  const initialValues = {
-    // Receiver sub-fields (all required)
+  // Check if we came from "View (Read-Only)"
+  const readOnly = location.state?.readOnly === true;
+  const receiptData = location.state?.receiptData || null;
+
+  // --- Utility to parse existing receipt data ---
+  const parseReceiptData = (data) => {
+    return {
+      // Map backend fields to form fields
+      receiverName: data.receiver?.name || "",
+      mailId: data.receiver?.email || "",
+      contactNumber: data.receiver?.phone || "",
+      address: data.receiver?.address || "",
+
+      tax: data.tax ? data.tax.toString() : "",
+      discount: data.discount ? data.discount.toString() : "",
+      penalty: data.penalty ? data.penalty.toString() : "",
+      totalPaidAmount: data.totalPaidAmount ? data.totalPaidAmount.toString() : "",
+
+      govtRefNumber: data.govtRefNumber || "",
+      remark: data.remark || "",
+      invoiceRefId: data.invoiceRefId || "", // optional
+
+      document: null, // can't populate an existing file
+
+      items: Array.isArray(data.lineItems)
+        ? data.lineItems.map((item) => ({
+            category: item.revenueType || "",
+            quantity: item.quantity?.toString() || "",
+            totalAmount: item.total?.toString() || "",
+          }))
+        : [{ category: "", quantity: "", totalAmount: "" }],
+    };
+  };
+
+  // --- Initial Values ---
+  const blankInitialValues = {
     receiverName: "",
     mailId: "",
     contactNumber: "",
     address: "",
 
-    // Payment info (all required in your schema)
     tax: "",
     discount: "",
     penalty: "",
     totalPaidAmount: "",
 
-    // Optional fields
     govtRefNumber: "",
     remark: "",
+    invoiceRefId: "",
 
-    // Optional file
     document: null,
-
-    // At least one line item is required
-    items: [
-      { category: "", quantity: "", totalAmount: "" }
-    ],
+    items: [{ category: "", quantity: "", totalAmount: "" }],
   };
 
-  // --------------------
-  // VALIDATION SCHEMA
-  // --------------------
+  const initialValues = readOnly && receiptData
+    ? parseReceiptData(receiptData)
+    : blankInitialValues;
+
+  // --- Validation Schema ---
   const validationSchema = Yup.object().shape({
-    // Required numeric fields
     tax: Yup.number()
       .typeError("Tax must be a number")
       .min(0, "Tax must be positive")
@@ -65,13 +92,11 @@ const CreateReceipt = () => {
       .min(0, "Total Paid must be positive")
       .required("Total Paid Amount is required"),
 
-    // Required contact fields
     contactNumber: Yup.string().required("Contact number is required"),
     mailId: Yup.string().email("Invalid email address").required("Email is required"),
     address: Yup.string().required("Address is required"),
     receiverName: Yup.string().required("Name is required"),
 
-    // Required line items
     items: Yup.array()
       .of(
         Yup.object().shape({
@@ -87,15 +112,17 @@ const CreateReceipt = () => {
         })
       )
       .min(1, "At least one line item is required"),
-
-    // Optional fields: govtRefNumber, remark, document
   });
 
-  // -------------
-  // HANDLE SUBMIT
-  // -------------
+  // --- Handle Submit (disabled if readOnly) ---
   const handleSubmit = (values, { setSubmitting, resetForm }) => {
-    // Prepare an object for the thunk
+    // If read-only, do nothing
+    if (readOnly) {
+      setSubmitting(false);
+      return;
+    }
+
+    // Prepare payload
     const formValues = {
       tax: values.tax || 0,
       discount: values.discount || 0,
@@ -104,6 +131,7 @@ const CreateReceipt = () => {
 
       govtRefNumber: values.govtRefNumber || "",
       remark: values.remark || "",
+      invoiceRefId: values.invoiceRefId || "",
 
       receiver: {
         name: values.receiverName,
@@ -111,27 +139,33 @@ const CreateReceipt = () => {
         phone: values.contactNumber,
         address: values.address,
       },
-
       lineItems: values.items.map((item) => ({
         revenueType: item.category,
         quantity: item.quantity,
         total: item.totalAmount,
       })),
-
-      // possible file
       document: values.document,
     };
 
     dispatch(createReceipt(formValues))
       .unwrap()
       .then((response) => {
-        // On success:
-        toast.success("Receipt created successfully!");
-        resetForm();             // Clear the form
-        navigate("/finance/receipts"); // Redirect user
+        // Check success. e.g. if response includes { message: "Receipt created successfully" }
+        // or if your thunk returns { status: 201, ... } etc.
+        console.log(response);
+        if (response?.message === "Receipt created successfully") {
+          toast.success("Receipt created successfully!");
+          resetForm();
+          // Navigate to the receipts list
+          navigate("/finance/receipts/receipt-list");
+        } else {
+          // If there's no "message" or success condition, show an error or handle accordingly
+          toast.error("Failed to create receipt.");
+        }
       })
       .catch((err) => {
         console.error("Error creating receipt:", err);
+        toast.error("Error creating receipt.");
       })
       .finally(() => {
         setSubmitting(false);
@@ -141,117 +175,142 @@ const CreateReceipt = () => {
   return (
     <DashLayout>
       <div className="p-6 min-h-screen">
+        {/* If read-only, show a top banner */}
+        {readOnly && (
+          <div className="bg-yellow-100 text-yellow-900 px-4 py-2 rounded-md mb-4">
+            Currently in read-only mode. You cannot edit these fields.
+          </div>
+        )}
+
         <Formik
           initialValues={initialValues}
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
+          enableReinitialize
         >
           {({ isSubmitting, resetForm, values, setFieldValue }) => (
             <Form id="create-receipt-form">
               {/* Header */}
               <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-semibold">Create Receipts</h1>
-                <div className="flex gap-4">
-                  <button
-                    type="button"
-                    onClick={() => resetForm()}
-                    className="border border-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-100"
-                  >
-                    Reset
-                  </button>
-                  {/* We can remove Preview if you want */}
-                  <button
-                    type="submit"
-                    className="px-4 py-2 rounded-md text-white"
-                    style={{
-                      background: "linear-gradient(to right, #ec4899, #a855f7)",
-                    }}
-                    disabled={isSubmitting}
-                  >
-                    {isSubmitting ? "Creating..." : "Create Receipt"}
-                  </button>
-                </div>
+                <h1 className="text-2xl font-semibold">
+                  {readOnly ? "View Receipt" : "Create Receipts"}
+                </h1>
+                {!readOnly && (
+                  <div className="flex gap-4">
+                    <button
+                      type="button"
+                      onClick={() => resetForm()}
+                      className="border border-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-100"
+                    >
+                      Reset
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-4 py-2 rounded-md text-white"
+                      style={{
+                        background: "linear-gradient(to right, #ec4899, #a855f7)",
+                      }}
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? "Creating..." : "Create Receipt"}
+                    </button>
+                  </div>
+                )}
               </div>
 
               {/* Receiver Info */}
               <h2 className="text-lg font-semibold mb-4">Receiver Details</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                {/* REQUIRED FIELD => add asterisk */}
                 <TextInput
                   name="receiverName"
                   label="Student Name *"
                   placeholder="Enter name"
+                  disabled={readOnly}
                 />
-                {/* REQUIRED FIELD => add asterisk */}
                 <TextInput
                   name="address"
                   label="Address *"
                   placeholder="Enter address"
+                  disabled={readOnly}
                 />
-                {/* REQUIRED FIELD => add asterisk */}
                 <TextInput
                   name="contactNumber"
                   label="Contact Number *"
                   placeholder="Enter contact number"
+                  disabled={readOnly}
                 />
-                {/* REQUIRED FIELD => add asterisk */}
                 <TextInput
                   name="mailId"
                   label="Email *"
                   placeholder="Enter email"
+                  disabled={readOnly}
                 />
               </div>
 
-              {/* Line Items */}
-              <ReturnItems values={values} setFieldValue={setFieldValue} />
+              {/* Return Items */}
+              {/* Pass readOnly so we can disable those fields in ReturnItems */}
+              <ReturnItems
+                values={values}
+                setFieldValue={setFieldValue}
+                readOnly={readOnly}
+              />
 
-              {/* Tax/Discount/Penalty/Total Paid */}
+              {/* Payment Info */}
               <h2 className="text-lg font-semibold mb-4 mt-6">Payment Info</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                {/* REQUIRED => add asterisk */}
                 <TextInput
                   name="tax"
                   label="Tax *"
                   placeholder="Enter tax amount"
+                  disabled={readOnly}
                 />
-                {/* REQUIRED => add asterisk */}
                 <TextInput
                   name="discount"
                   label="Discount *"
                   placeholder="Enter discount"
+                  disabled={readOnly}
                 />
-                {/* REQUIRED => add asterisk */}
                 <TextInput
                   name="penalty"
                   label="Penalty *"
                   placeholder="Enter penalty"
+                  disabled={readOnly}
                 />
-                {/* REQUIRED => add asterisk */}
                 <TextInput
                   name="totalPaidAmount"
                   label="Total Paid *"
                   placeholder="Enter total paid amount"
+                  disabled={readOnly}
                 />
-                {/* OPTIONAL => no asterisk */}
+                {/* Optional fields */}
                 <TextInput
                   name="govtRefNumber"
                   label="Government Reference Number"
                   placeholder="Enter reference number"
+                  disabled={readOnly}
                 />
-                {/* OPTIONAL => no asterisk */}
+                <TextInput
+                  name="invoiceRefId"
+                  label="Invoice Reference ID"
+                  placeholder="Enter invoice ref ID"
+                  disabled={readOnly}
+                />
                 <TextInput
                   name="remark"
                   label="Remarks"
                   placeholder="Any remarks here"
+                  disabled={readOnly}
                 />
-                {/* OPTIONAL => no asterisk */}
                 <FileInput
                   name="document"
                   label="Add Document (if any)"
                   placeholder="Upload file"
                   onChange={(e) => {
-                    setFieldValue("document", e.currentTarget.files[0]);
+                    if (!readOnly) {
+                      setFieldValue("document", e.currentTarget.files[0]);
+                    }
                   }}
+                  disabled={readOnly}
                 />
               </div>
             </Form>
