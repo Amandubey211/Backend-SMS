@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { Table, Input, Dropdown, Menu, Modal } from "antd";
+import { Table, Input, Dropdown, Menu } from "antd";
 import {
   SearchOutlined,
   MoreOutlined,
@@ -15,7 +15,7 @@ import {
   cancelReceipt,
 } from "../../../../../Store/Slices/Finance/Receipts/receiptsThunks";
 
-import Receipt from "./Receipt"; // <-- This is your renamed Receipt component (old Invoice.js)
+import Receipt from "./Receipt"; // This is your renamed Receipt component
 
 const RecentReceipts = () => {
   const navigate = useNavigate();
@@ -28,13 +28,17 @@ const RecentReceipts = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [dataFetched, setDataFetched] = useState(false);
 
+  // For canceling a receipt
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedReceiptId, setSelectedReceiptId] = useState(null);
   const [cancelLoading, setCancelLoading] = useState(false);
 
-  // For previewing receipt data in a modal
-  const [previewModalVisible, setPreviewModalVisible] = useState(false);
+  // For previewing a receipt in a custom modal
+  const [isReceiptVisible, setReceiptVisible] = useState(false);
   const [selectedReceipt, setSelectedReceipt] = useState(null);
+
+  // If you want to detect outside clicks to close the popup, you can reference it here
+  const popupRef = useRef(null);
 
   useEffect(() => {
     if (!dataFetched) {
@@ -43,6 +47,7 @@ const RecentReceipts = () => {
     }
   }, [dispatch, dataFetched]);
 
+  // Cancel the selected receipt
   const handleCancelReceipt = async () => {
     setCancelLoading(true);
     const result = await dispatch(cancelReceipt(selectedReceiptId));
@@ -56,10 +61,10 @@ const RecentReceipts = () => {
     setModalVisible(false);
   };
 
-  // Open preview modal with the selected receipt
+  // Show the receipt preview popup
   const handlePreview = (record) => {
     setSelectedReceipt(record);
-    setPreviewModalVisible(true);
+    setReceiptVisible(true);
   };
 
   const filteredData = receipts.filter((item) => {
@@ -147,9 +152,7 @@ const RecentReceipts = () => {
         <Dropdown
           overlay={
             <Menu>
-              <Menu.Item onClick={() => handlePreview(record)}>
-                Preview
-              </Menu.Item>
+              <Menu.Item onClick={() => handlePreview(record)}>Preview</Menu.Item>
               <Menu.Item
                 onClick={() => {
                   setSelectedReceiptId(record._id);
@@ -195,9 +198,7 @@ const RecentReceipts = () => {
   }
 
   return (
-    <div
-      style={{ border: "2px solid #FFCEDB", borderRadius: "8px", padding: "16px" }}
-    >
+    <div style={{ border: "2px solid #FFCEDB", borderRadius: "8px", padding: "16px" }}>
       <div
         style={{
           display: "flex",
@@ -226,6 +227,7 @@ const RecentReceipts = () => {
         </div>
       </div>
 
+      {/* The Receipts Table */}
       <Table
         rowKey={(record) => record._id}
         columns={columns}
@@ -255,7 +257,7 @@ const RecentReceipts = () => {
         }}
       />
 
-      {/* Cancel Receipt Confirmation Modal */}
+      {/* Cancel Receipt Confirmation Modal (unchanged) */}
       <DeleteConfirmationModal
         isOpen={modalVisible}
         onClose={() => setModalVisible(false)}
@@ -264,26 +266,66 @@ const RecentReceipts = () => {
         text="Cancel Receipt"
       />
 
-      {/* Preview Receipt Modal */}
-      <Modal
-        open={previewModalVisible}
-        onCancel={() => setPreviewModalVisible(false)}
-        footer={null}
-        width={700}
-        centered // <-- This centers the modal vertically
-        destroyOnClose
-        maskStyle={{
-          backdropFilter: "blur(0.5rem)",
-          backgroundColor: "rgba(0, 0, 0, 0.6)"
-        }} // <-- This adds the dim/blur effect
-      >
-        {selectedReceipt && (
-          <Receipt
-            receiptData={selectedReceipt}
-            onClose={() => setPreviewModalVisible(false)}
+      {/* Custom Overlay for Previewing a Receipt */}
+      {isReceiptVisible && (
+        <div className="fixed inset-0 z-50">
+          {/* Background (Dim + Blur) */}
+          <div
+            className="absolute inset-0 bg-black bg-opacity-60"
+            style={{ backdropFilter: "blur(8px)" }}
           />
-        )}
-      </Modal>
+
+          {/* Foreground: Centered Content */}
+          <div className="relative flex items-center justify-center w-full h-full">
+            <div
+              ref={popupRef}
+              className="relative p-6 w-full max-w-[700px] max-h-[90vh] bg-white rounded-md shadow-md"
+            >
+              {/* Top-Right Buttons */}
+              <div
+                className="absolute -top-4 -right-44 mt-4 flex flex-col items-start space-y-2"
+              // Adjust -right-20 as needed for your layout
+              >
+                {/* Close Button */}
+                <button
+                  onClick={() => setReceiptVisible(false)}
+                  className="bg-gray-200 hover:bg-gray-300 rounded-full w-8 h-8 flex items-center justify-center text-lg font-semibold"
+                >
+                  ✕
+                </button>
+
+                {/* Action Buttons */}
+                <button
+                  className="w-40 py-2 text-white font-semibold rounded-md"
+                  style={{
+                    background: "linear-gradient(90deg, #C83B62 0%, #7F35CD 100%)",
+                  }}
+                  onClick={() => {
+                    // e.g. window.print() or custom PDF generation
+                  }}
+                >
+                  Download PDF
+                </button>
+                <button
+                  className="w-40 py-2 text-white font-semibold rounded-md"
+                  style={{
+                    background: "linear-gradient(90deg, #C83B62 0%, #7F35CD 100%)",
+                  }}
+                  onClick={() => {
+                    // e.g. trigger an API call to email the receipt
+                  }}
+                >
+                  Send Receipt
+                </button>
+              </div>
+
+              {/* Receipt Component */}
+              <Receipt receiptData={selectedReceipt} />
+            </div>
+          </div>
+        </div>
+      )}
+
 
     </div>
   );
