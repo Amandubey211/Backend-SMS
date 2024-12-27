@@ -1,23 +1,40 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { Table, Input, Dropdown, Menu } from "antd";
-import { SearchOutlined, MoreOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
+import { Table, Input, Dropdown, Menu, Modal } from "antd";
+import {
+  SearchOutlined,
+  MoreOutlined,
+  ExclamationCircleOutlined,
+} from "@ant-design/icons";
 import { toast } from "react-hot-toast";
-import DeleteConfirmationModal from "../../../../../Components/Common/DeleteConfirmationModal"; // Adjust path if needed
-import Spinner from "../../../../../Components/Common/Spinner"; // Adjust path if needed
-import { fetchAllReceipts, cancelReceipt } from "../../../../../Store/Slices/Finance/Receipts/receiptsThunks";
+import DeleteConfirmationModal from "../../../../../Components/Common/DeleteConfirmationModal";
+import Spinner from "../../../../../Components/Common/Spinner";
+import {
+  fetchAllReceipts,
+  cancelReceipt,
+} from "../../../../../Store/Slices/Finance/Receipts/receiptsThunks";
+
+import Receipt from "./Receipt"; // <-- This is your renamed Receipt component (old Invoice.js)
 
 const RecentReceipts = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const { receipts = [], loading, error } = useSelector((state) => state.admin.receipts || {});
+  const { receipts = [], loading, error } = useSelector(
+    (state) => state.admin.receipts || {}
+  );
+
   const [searchQuery, setSearchQuery] = useState("");
   const [dataFetched, setDataFetched] = useState(false);
+
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedReceiptId, setSelectedReceiptId] = useState(null);
   const [cancelLoading, setCancelLoading] = useState(false);
+
+  // For previewing receipt data in a modal
+  const [previewModalVisible, setPreviewModalVisible] = useState(false);
+  const [selectedReceipt, setSelectedReceipt] = useState(null);
 
   useEffect(() => {
     if (!dataFetched) {
@@ -29,10 +46,8 @@ const RecentReceipts = () => {
   const handleCancelReceipt = async () => {
     setCancelLoading(true);
     const result = await dispatch(cancelReceipt(selectedReceiptId));
-    console.log(result);
     if (result.payload === "Receipt cancel successfully") {
       toast.success("Receipt canceled successfully!");
-      // Trigger re-fetching of receipts after successful cancellation
       dispatch(fetchAllReceipts());
     } else {
       toast.error("Failed to cancel receipt.");
@@ -41,6 +56,11 @@ const RecentReceipts = () => {
     setModalVisible(false);
   };
 
+  // Open preview modal with the selected receipt
+  const handlePreview = (record) => {
+    setSelectedReceipt(record);
+    setPreviewModalVisible(true);
+  };
 
   const filteredData = receipts.filter((item) => {
     const receiptNumber = item.receiptNumber?.toLowerCase() || "";
@@ -62,7 +82,8 @@ const RecentReceipts = () => {
       title: "Receipt ID",
       dataIndex: "receiptNumber",
       key: "receiptNumber",
-      sorter: (a, b) => (a.receiptNumber || "").localeCompare(b.receiptNumber || ""),
+      sorter: (a, b) =>
+        (a.receiptNumber || "").localeCompare(b.receiptNumber || ""),
       render: (text, record) => text || record._id || "N/A",
     },
     {
@@ -74,7 +95,8 @@ const RecentReceipts = () => {
         const nameB = b.reciever?.name || b.receiver?.name || "";
         return nameA.localeCompare(nameB);
       },
-      render: (_, record) => record.reciever?.name || record.receiver?.name || "N/A",
+      render: (_, record) =>
+        record.reciever?.name || record.receiver?.name || "N/A",
     },
     {
       title: "Paid Date",
@@ -125,7 +147,7 @@ const RecentReceipts = () => {
         <Dropdown
           overlay={
             <Menu>
-              <Menu.Item onClick={() => navigate(`/finance/receipts/details/${record._id}`)}>
+              <Menu.Item onClick={() => handlePreview(record)}>
                 Preview
               </Menu.Item>
               <Menu.Item
@@ -173,9 +195,20 @@ const RecentReceipts = () => {
   }
 
   return (
-    <div style={{ border: "2px solid #FFCEDB", borderRadius: "8px", padding: "16px" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "16px", alignItems: "center" }}>
-        <h2 style={{ fontSize: "1.25rem", fontWeight: "600" }}>Recent Receipts List</h2>
+    <div
+      style={{ border: "2px solid #FFCEDB", borderRadius: "8px", padding: "16px" }}
+    >
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          marginBottom: "16px",
+          alignItems: "center",
+        }}
+      >
+        <h2 style={{ fontSize: "1.25rem", fontWeight: "600" }}>
+          Recent Receipts List
+        </h2>
         <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
           <Input
             prefix={<SearchOutlined style={{ color: "rgba(0,0,0,.45)" }} />}
@@ -201,11 +234,11 @@ const RecentReceipts = () => {
           expandedRowRender: (record) => (
             <div>
               <strong>Line Items:</strong>
-              {record.lineItems.length > 0 ? (
+              {record.lineItems && record.lineItems.length > 0 ? (
                 <ul>
                   {record.lineItems.map((item, index) => (
                     <li key={index}>
-                      {item.name}: {item.amount} QAR
+                      {item.revenueType}: {item.total} QAR (Qty: {item.quantity})
                     </li>
                   ))}
                 </ul>
@@ -221,6 +254,8 @@ const RecentReceipts = () => {
           position: ["bottomRight"],
         }}
       />
+
+      {/* Cancel Receipt Confirmation Modal */}
       <DeleteConfirmationModal
         isOpen={modalVisible}
         onClose={() => setModalVisible(false)}
@@ -228,6 +263,28 @@ const RecentReceipts = () => {
         loading={cancelLoading}
         text="Cancel Receipt"
       />
+
+      {/* Preview Receipt Modal */}
+      <Modal
+        open={previewModalVisible}
+        onCancel={() => setPreviewModalVisible(false)}
+        footer={null}
+        width={700}
+        centered // <-- This centers the modal vertically
+        destroyOnClose
+        maskStyle={{
+          backdropFilter: "blur(0.5rem)",
+          backgroundColor: "rgba(0, 0, 0, 0.6)"
+        }} // <-- This adds the dim/blur effect
+      >
+        {selectedReceipt && (
+          <Receipt
+            receiptData={selectedReceipt}
+            onClose={() => setPreviewModalVisible(false)}
+          />
+        )}
+      </Modal>
+
     </div>
   );
 };
