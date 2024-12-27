@@ -64,7 +64,6 @@ const RecentReceipts = () => {
         setReceiptVisible(false);
       }
     }
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
@@ -72,7 +71,6 @@ const RecentReceipts = () => {
   }, [isReceiptVisible]);
 
   // -------------------- Handlers --------------------
-  // Cancel the selected receipt
   const handleCancelReceipt = async () => {
     setCancelLoading(true);
     const result = await dispatch(cancelReceipt(selectedReceiptId));
@@ -86,13 +84,21 @@ const RecentReceipts = () => {
     setModalVisible(false);
   };
 
-  // Show the receipt preview popup
   const handlePreview = (record) => {
     setSelectedReceipt(record);
     setReceiptVisible(true);
   };
 
-  // Download PDF
+  // NEW: View (Read-Only) mode
+  const handleViewReadOnly = (record) => {
+    navigate("/finance/receipts/add-new-receipt", {
+      state: {
+        readOnly: true,
+        receiptData: record,
+      },
+    });
+  };
+
   const handleDownloadPDF = async () => {
     if (!selectedReceipt) return;
     try {
@@ -100,16 +106,13 @@ const RecentReceipts = () => {
         ? `${selectedReceipt.receiptNumber}.pdf`
         : "receipt.pdf";
 
-      // Use html2canvas to capture the modal content
       const canvas = await html2canvas(popupRef.current, { scale: 2 });
       const imgData = canvas.toDataURL("image/png");
 
-      // Create a new jsPDF instance
-      const pdf = new jsPDF("p", "pt", "a4"); // 'p'=portrait, 'pt'=points, 'a4'=page format
+      const pdf = new jsPDF("p", "pt", "a4");
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
 
-      // Calculate aspect ratio to fit the image into the PDF
       const imgWidth = canvas.width;
       const imgHeight = canvas.height;
       const ratio = Math.min(pageWidth / imgWidth, pageHeight / imgHeight);
@@ -121,27 +124,6 @@ const RecentReceipts = () => {
     } catch (error) {
       console.error("Error generating PDF:", error);
       toast.error("Failed to generate PDF.");
-    }
-  };
-
-  // Print the receipt (native browser print)
-  const handlePrint = () => {
-    if (!selectedReceipt) return;
-    // Option A: Print the entire screen
-    // window.print();
-
-    // Option B: Print only the modal content
-    // We'll create a new window, write the popupRef content inside it, then print
-    const printWindow = window.open("", "PRINT", "height=600,width=800");
-    if (printWindow) {
-      printWindow.document.write("<html><head><title>Print Receipt</title>");
-      printWindow.document.write("</head><body>");
-      printWindow.document.write(popupRef.current.innerHTML);
-      printWindow.document.write("</body></html>");
-      printWindow.document.close();
-      printWindow.focus();
-      printWindow.print();
-      printWindow.close();
     }
   };
 
@@ -231,7 +213,15 @@ const RecentReceipts = () => {
         <Dropdown
           overlay={
             <Menu>
+              {/* 1) Preview in a popup */}
               <Menu.Item onClick={() => handlePreview(record)}>Preview</Menu.Item>
+
+              {/* 2) View as read-only in CreateReceipt */}
+              <Menu.Item onClick={() => handleViewReadOnly(record)}>
+                View (Read-Only)
+              </Menu.Item>
+
+              {/* 3) Cancel Receipt */}
               <Menu.Item
                 onClick={() => {
                   setSelectedReceiptId(record._id);
@@ -298,20 +288,12 @@ const RecentReceipts = () => {
           Recent Receipts List
         </h2>
         <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
-          {/* <Input
-            prefix={<SearchOutlined style={{ color: "rgba(0,0,0,.45)" }} />}
-            placeholder="Search"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            style={{ width: "250px" }}
-          /> */}
           <button
             onClick={() => navigate("/finance/receipts/receipt-list")}
             className="px-3 py-1 rounded-md border border-gray-400 shadow-md hover:shadow-xl hover:shadow-gray-300 transition duration-200 text-white bg-gradient-to-r from-pink-500 to-purple-500"
           >
             View More
           </button>
-
         </div>
       </div>
 
@@ -392,19 +374,6 @@ const RecentReceipts = () => {
                   Download PDF
                 </button>
 
-                {/* Print */}
-                {/* <button
-                  className="w-40 py-2 text-white font-semibold rounded-md"
-                  style={{
-                    background: "linear-gradient(90deg, #C83B62 0%, #7F35CD 100%)",
-                  }}
-                  onClick={handlePrint}
-                >
-                  Print Receipt
-                </button> */}
-                {/*
-                  If you want an email send button, you can add it here
-                */}
               </div>
 
               {/* Receipt Component */}
