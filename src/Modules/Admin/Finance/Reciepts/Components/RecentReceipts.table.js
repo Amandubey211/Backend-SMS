@@ -15,7 +15,12 @@ import {
   cancelReceipt,
 } from "../../../../../Store/Slices/Finance/Receipts/receiptsThunks";
 
-import Receipt from "./Receipt"; // This is your renamed Receipt component
+// Import jsPDF and html2canvas
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
+
+// Your renamed Receipt component
+import Receipt from "./Receipt";
 
 const RecentReceipts = () => {
   const navigate = useNavigate();
@@ -37,9 +42,10 @@ const RecentReceipts = () => {
   const [isReceiptVisible, setReceiptVisible] = useState(false);
   const [selectedReceipt, setSelectedReceipt] = useState(null);
 
-  // If you want to detect outside clicks to close the popup, you can reference it here
+  // Detect outside clicks to close the popup
   const popupRef = useRef(null);
 
+  // -------------------- Lifecycle --------------------
   useEffect(() => {
     if (!dataFetched) {
       dispatch(fetchAllReceipts());
@@ -47,6 +53,25 @@ const RecentReceipts = () => {
     }
   }, [dispatch, dataFetched]);
 
+  // Close modal if user clicks outside the popup
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (
+        popupRef.current &&
+        !popupRef.current.contains(event.target) &&
+        isReceiptVisible
+      ) {
+        setReceiptVisible(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isReceiptVisible]);
+
+  // -------------------- Handlers --------------------
   // Cancel the selected receipt
   const handleCancelReceipt = async () => {
     setCancelLoading(true);
@@ -67,6 +92,60 @@ const RecentReceipts = () => {
     setReceiptVisible(true);
   };
 
+  // Download PDF
+  const handleDownloadPDF = async () => {
+    if (!selectedReceipt) return;
+    try {
+      const pdfTitle = selectedReceipt.receiptNumber
+        ? `${selectedReceipt.receiptNumber}.pdf`
+        : "receipt.pdf";
+
+      // Use html2canvas to capture the modal content
+      const canvas = await html2canvas(popupRef.current, { scale: 2 });
+      const imgData = canvas.toDataURL("image/png");
+
+      // Create a new jsPDF instance
+      const pdf = new jsPDF("p", "pt", "a4"); // 'p'=portrait, 'pt'=points, 'a4'=page format
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+
+      // Calculate aspect ratio to fit the image into the PDF
+      const imgWidth = canvas.width;
+      const imgHeight = canvas.height;
+      const ratio = Math.min(pageWidth / imgWidth, pageHeight / imgHeight);
+      const newWidth = imgWidth * ratio;
+      const newHeight = imgHeight * ratio;
+
+      pdf.addImage(imgData, "PNG", 0, 0, newWidth, newHeight);
+      pdf.save(pdfTitle);
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      toast.error("Failed to generate PDF.");
+    }
+  };
+
+  // Print the receipt (native browser print)
+  const handlePrint = () => {
+    if (!selectedReceipt) return;
+    // Option A: Print the entire screen
+    // window.print();
+
+    // Option B: Print only the modal content
+    // We'll create a new window, write the popupRef content inside it, then print
+    const printWindow = window.open("", "PRINT", "height=600,width=800");
+    if (printWindow) {
+      printWindow.document.write("<html><head><title>Print Receipt</title>");
+      printWindow.document.write("</head><body>");
+      printWindow.document.write(popupRef.current.innerHTML);
+      printWindow.document.write("</body></html>");
+      printWindow.document.close();
+      printWindow.focus();
+      printWindow.print();
+      printWindow.close();
+    }
+  };
+
+  // -------------------- Table & Data --------------------
   const filteredData = receipts.filter((item) => {
     const receiptNumber = item.receiptNumber?.toLowerCase() || "";
     const receiverName =
@@ -171,6 +250,7 @@ const RecentReceipts = () => {
     },
   ];
 
+  // -------------------- Loading / Error States --------------------
   if (loading) {
     return (
       <div style={{ textAlign: "center", padding: "16px" }}>
@@ -197,8 +277,15 @@ const RecentReceipts = () => {
     );
   }
 
+  // -------------------- Render --------------------
   return (
-    <div style={{ border: "2px solid #FFCEDB", borderRadius: "8px", padding: "16px" }}>
+    <div
+      style={{
+        border: "2px solid #FFCEDB",
+        borderRadius: "8px",
+        padding: "16px",
+      }}
+    >
       <div
         style={{
           display: "flex",
@@ -266,7 +353,7 @@ const RecentReceipts = () => {
         text="Cancel Receipt"
       />
 
-      {/* Custom Overlay for Previewing a Receipt */}
+      {/* ===================== Custom Overlay for Previewing a Receipt ===================== */}
       {isReceiptVisible && (
         <div className="fixed inset-0 z-50">
           {/* Background (Dim + Blur) */}
@@ -284,7 +371,6 @@ const RecentReceipts = () => {
               {/* Top-Right Buttons */}
               <div
                 className="absolute -top-4 -right-44 mt-4 flex flex-col items-start space-y-2"
-              // Adjust -right-20 as needed for your layout
               >
                 {/* Close Button */}
                 <button
@@ -294,29 +380,30 @@ const RecentReceipts = () => {
                   ✕
                 </button>
 
-                {/* Action Buttons */}
+                {/* Download PDF */}
                 <button
                   className="w-40 py-2 text-white font-semibold rounded-md"
                   style={{
                     background: "linear-gradient(90deg, #C83B62 0%, #7F35CD 100%)",
                   }}
-                  onClick={() => {
-                    // e.g. window.print() or custom PDF generation
-                  }}
+                  onClick={handleDownloadPDF}
                 >
                   Download PDF
                 </button>
+
+                {/* Print */}
                 {/* <button
                   className="w-40 py-2 text-white font-semibold rounded-md"
                   style={{
                     background: "linear-gradient(90deg, #C83B62 0%, #7F35CD 100%)",
                   }}
-                  onClick={() => {
-                    // e.g. trigger an API call to email the receipt
-                  }}
+                  onClick={handlePrint}
                 >
-                  Send Receipt
+                  Print Receipt
                 </button> */}
+                {/*
+                  If you want an email send button, you can add it here
+                */}
               </div>
 
               {/* Receipt Component */}
@@ -325,8 +412,6 @@ const RecentReceipts = () => {
           </div>
         </div>
       )}
-
-
     </div>
   );
 };
