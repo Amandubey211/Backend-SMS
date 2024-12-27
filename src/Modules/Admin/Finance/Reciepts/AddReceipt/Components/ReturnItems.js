@@ -75,7 +75,7 @@ const ReturnItems = ({ values, setFieldValue }) => (
               }
               className="rounded-full w-12 h-12 flex items-center justify-center"
               style={{
-                background: "linear-gradient(to right, #ec4899, #a855f7)", // from-pink-500 to-purple-500
+                background: "linear-gradient(to right, #ec4899, #a855f7)", 
               }}
             >
               <span className="text-white text-lg">+</span>

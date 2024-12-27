@@ -27,44 +27,69 @@ export const fetchAllReceipts = createAsyncThunk(
   }
 );
 
-
 // Create a receipt
-
 export const createReceipt = createAsyncThunk(
   "receipts/createReceipt",
   async (formValues, { rejectWithValue }) => {
     try {
-      const schoolId = localStorage.getItem('schoolId'); // Fetch schoolId from localStorage
-      const academicYearId = getAY(); // Fetch academicYear using getAY()
+      
+      const storedSchoolId = localStorage.getItem("SelectedschoolId");
+      const schoolId = storedSchoolId || "";
 
-      // Prepare the payload
+      
+      const academicYearId = getAY(); 
+
+      // Merge in the schoolId and academicYear
       const payload = {
-        ...formValues,
+        ...formValues,      // tax, discount, penalty, totalPaidAmount, etc.
         schoolId,
         academicYear: academicYearId,
       };
 
-      // Create FormData for file upload
+      // Create FormData
       const formData = new FormData();
-      for (const key in payload) {
-        if (key === 'items') {
-          formData.append('lineItems', JSON.stringify(payload[key]));
-        } else if (key === 'document' && payload[key]) {
-          formData.append('document', payload[key]);
-        } else {
-          formData.append(key, payload[key]);
-        }
+
+      // 1) Append simple scalar fields
+      formData.append("tax", payload.tax);
+      formData.append("discount", payload.discount);
+      formData.append("penalty", payload.penalty);
+      formData.append("totalPaidAmount", payload.totalPaidAmount);
+      formData.append("govtRefNumber", payload.govtRefNumber);
+      formData.append("remark", payload.remark);
+      formData.append("schoolId", payload.schoolId);
+      formData.append("academicYear", payload.academicYear);
+
+      // 2) Append "receiver" as nested fields
+      //    e.g. receiver[name], receiver[email], etc.
+      formData.append("receiver[name]", payload.receiver.name);
+      formData.append("receiver[email]", payload.receiver.email);
+      formData.append("receiver[phone]", payload.receiver.phone);
+      formData.append("receiver[address]", payload.receiver.address);
+
+      // 3) Append lineItems as nested array fields
+      //    lineItems[0][revenueType], lineItems[0][quantity], ...
+      payload.lineItems.forEach((item, index) => {
+        formData.append(`lineItems[${index}][revenueType]`, item.revenueType);
+        formData.append(`lineItems[${index}][quantity]`, item.quantity);
+        formData.append(`lineItems[${index}][total]`, item.total);
+      });
+
+      // 4) Append file if present
+      if (payload.document) {
+        formData.append("document", payload.document);
       }
 
+      // For debugging, you can do:
+      // console.log([...formData.entries()]);
+
+      // Now POST the FormData
       const response = await postData("/finance/revenue/create/receipt", formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
+        headers: { "Content-Type": "multipart/form-data" },
       });
 
       if (response?.success) {
         toast.success("Receipt created successfully!");
-        return response.data;
+        return response.data; // or whatever data the API returns
       } else {
         toast.error(response?.message || "Failed to create receipt.");
         return rejectWithValue(response?.message || "Failed to create receipt.");
@@ -75,6 +100,7 @@ export const createReceipt = createAsyncThunk(
     }
   }
 );
+
 
 // Cancel a receipt
 export const cancelReceipt = createAsyncThunk(
