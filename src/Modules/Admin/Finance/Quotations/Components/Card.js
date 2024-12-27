@@ -4,7 +4,7 @@ const Card = ({ title, count, color, textColor, customContent }) => {
   return (
     <div className={`rounded-lg p-6 shadow-md ${color}`}>
       <h3 className="text-lg font-semibold">{title}</h3>
-      <p className="text-sm text-gray-600">(all categories)</p>
+      {/* <p className="text-sm text-gray-600">(all categories)</p> */}
       {customContent ? (
         <div className="mt-4">{customContent}</div>
       ) : (

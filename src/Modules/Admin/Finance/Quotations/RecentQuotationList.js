@@ -7,11 +7,11 @@ import { RiErrorWarningFill } from "react-icons/ri";
 import { FcDeleteDatabase } from "react-icons/fc";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { fetchAllQuotations } from "../../../../Store/Slices/Finance/Quotations/quotationThunks";
+import { fetchAllQuotations, updateQuotationStatus } from "../../../../Store/Slices/Finance/Quotations/quotationThunks";
 import Spinner from "../../../../Components/Common/Spinner";
 import EmailModal from "../../../../Components/Common/EmailModal";
 
-const RecentReceiptsList = () => {
+const RecentQuotationList = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -52,10 +52,15 @@ const RecentReceiptsList = () => {
     setEmailModalOpen(false);
   };
 
-  const actionMenu = (
+  const handleStatusChange = (quotationId, status) => {
+    dispatch(updateQuotationStatus({ id: quotationId, status }));
+  };
+
+  const actionMenu = (quotationId) => (
     <Menu>
       <Menu.Item key="1">View Details</Menu.Item>
-      <Menu.Item key="2">Send Reminder</Menu.Item>
+      <Menu.Item key="2" onClick={() => handleStatusChange(quotationId, "accept")}>Accept</Menu.Item>
+      <Menu.Item key="3" onClick={() => handleStatusChange(quotationId, "reject")}>Reject</Menu.Item>
     </Menu>
   );
 
@@ -68,7 +73,7 @@ const RecentReceiptsList = () => {
         <div className="flex justify-between items-center mt-4">
           {/* Status Filter */}
           <div className="flex space-x-6">
-            {["All", "accept", "reject", "panding"].map((status) => (
+            {["All", "accept", "reject", "pending"].map((status) => (
               <label key={status} className="flex items-center text-sm space-x-2">
                 <input
                   type="radio"
@@ -117,6 +122,7 @@ const RecentReceiptsList = () => {
                 <th className="py-3 px-4 font-medium">Purpose</th>
                 <th className="py-3 px-4 font-medium">Issue Date</th>
                 <th className="py-3 px-4 font-medium">Total Amount</th>
+                <th className="py-3 px-4 font-medium">Status</th>
                 <th className="py-3 px-4 font-medium">Action</th>
               </tr>
             </thead>
@@ -160,8 +166,9 @@ const RecentReceiptsList = () => {
                     <td className="py-4 px-4">{item?.remark || "N/A"}</td>
                     <td className="py-4 px-4">{new Date(item?.date).toLocaleDateString()}</td>
                     <td className="py-4 px-4">{item?.final_amount || "N/A"}</td>
+                    <td className="py-4 px-4">{item?.status || "pending"}</td>
                     <td className="py-4 px-4 flex items-center gap-4">
-                      <Dropdown overlay={actionMenu} trigger={["click"]}>
+                      <Dropdown overlay={actionMenu(item._id)} trigger={["click"]}>
                         <button className="w-8 h-8 flex items-center justify-center rounded-full border border-gray-300 hover:bg-gray-100">
                           <MoreOutlined style={{ fontSize: "16px", color: "#808080" }} />
                         </button>
@@ -219,4 +226,4 @@ const RecentReceiptsList = () => {
   );
 };
 
-export default RecentReceiptsList;
+export default RecentQuotationList;

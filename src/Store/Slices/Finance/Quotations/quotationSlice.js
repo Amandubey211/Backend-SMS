@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchAllQuotations, createQuotation, cancelQuotation } from "./quotationThunks";
+import { fetchAllQuotations, addQuotation, cancelQuotation, fetchQuotationCardData, updateQuotationStatus } from "./quotationThunks";
 
 const initialState = {
   quotations: [],
@@ -12,6 +12,10 @@ const initialState = {
   error: null,
   selectedQuotation: null,
   successMessage: null,
+  totalQuotations: 0,
+  acceptedQuotations: 0,
+  rejectedQuotations: 0,
+  pendingQuotations: 0
 };
 
 const quotationSlice = createSlice({
@@ -66,15 +70,15 @@ const quotationSlice = createSlice({
       })
 
       // Create Quotation
-      .addCase(createQuotation.pending, (state) => {
+      .addCase(addQuotation.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(createQuotation.fulfilled, (state) => {
+      .addCase(addQuotation.fulfilled, (state) => {
         state.loading = false;
         state.successMessage = "Quotation created successfully!";
       })
-      .addCase(createQuotation.rejected, (state, action) => {
+      .addCase(addQuotation.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Failed to create quotation.";
       })
@@ -91,7 +95,53 @@ const quotationSlice = createSlice({
       .addCase(cancelQuotation.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Failed to cancel quotation.";
-      });
+      })
+
+      // fetch dashboard cards
+      .addCase(fetchQuotationCardData.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchQuotationCardData.fulfilled, (state, action) => {
+        state.loading = false;
+        state.totalQuotations = action.payload.totalQuotations;
+        state.acceptedQuotations = action.payload.acceptedQuotations;
+        state.rejectedQuotations = action.payload.rejectedQuotations;
+        state.pendingQuotations = action.payload.pendingQuotations;
+      })
+      .addCase(fetchQuotationCardData.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Failed to fetch quotation cardData.";
+      })
+
+      .addCase(updateQuotationStatus.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateQuotationStatus.fulfilled, (state, action) => {
+        state.loading = false;
+        const updatedQuotation = action.payload;
+        console.log("updatedQuotation", updatedQuotation);
+
+        // Update the specific quotation in the state
+        const index = state.quotations.findIndex((quotation) => quotation._id === updatedQuotation._id);
+        if (index !== -1) {
+          state.quotations[index] = updatedQuotation;
+        }
+        // Update the count for the status
+        if (updatedQuotation.status === 'accept') {
+          state.acceptedQuotations += 1;
+          state.pendingQuotations -= 1;
+        } else if (updatedQuotation.status === 'reject') {
+          state.rejectedQuotations += 1;
+          state.pendingQuotations -= 1;
+        }
+      })
+      .addCase(updateQuotationStatus.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Failed to update quotation status.";
+      })
+
   },
 });
 
