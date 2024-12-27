@@ -8,6 +8,7 @@ import TextInput from "./Components/TextInput";
 import ReturnItems from "./Components/ReturnItems";
 import FileInput from "./Components/FileInput";
 import { createReceipt } from "../../../../../Store/Slices/Finance/Receipts/receiptsThunks";
+import { toast } from "react-toastify"; // Make sure you're importing toast if not already
 
 const CreateReceipt = () => {
   const dispatch = useDispatch();
@@ -124,10 +125,10 @@ const CreateReceipt = () => {
     dispatch(createReceipt(formValues))
       .unwrap()
       .then((response) => {
-        console.log("Receipt created successfully:", response);
-        resetForm();
-        // Optionally navigate if you wish:
-        // navigate("/receipts");
+        // On success:
+        toast.success("Receipt created successfully!");
+        resetForm();             // Clear the form
+        navigate("/finance/receipts"); // Redirect user
       })
       .catch((err) => {
         console.error("Error creating receipt:", err);
@@ -158,12 +159,7 @@ const CreateReceipt = () => {
                   >
                     Reset
                   </button>
-                  {/* <button
-                    type="button"
-                    className="border border-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-100"
-                  >
-                    Preview
-                  </button> */}
+                  {/* We can remove Preview if you want */}
                   <button
                     type="submit"
                     className="px-4 py-2 rounded-md text-white"
@@ -183,7 +179,7 @@ const CreateReceipt = () => {
                 {/* REQUIRED FIELD => add asterisk */}
                 <TextInput
                   name="receiverName"
-                  label="Receiver Name *"
+                  label="Student Name *"
                   placeholder="Enter name"
                 />
                 {/* REQUIRED FIELD => add asterisk */}
@@ -255,8 +251,6 @@ const CreateReceipt = () => {
                   placeholder="Upload file"
                   onChange={(e) => {
                     setFieldValue("document", e.currentTarget.files[0]);
-                    // If you want to see it in the console:
-                    // console.log("Selected file:", e.currentTarget.files[0]);
                   }}
                 />
               </div>

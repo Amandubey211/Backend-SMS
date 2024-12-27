@@ -84,6 +84,7 @@ export const createReceipt = createAsyncThunk(
       // console.log([...formData.entries()]);
 
       // Now POST the FormData
+      console.log(formData)
       const response = await postData("/finance/revenue/create/receipt", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
@@ -108,7 +109,7 @@ export const cancelReceipt = createAsyncThunk(
   "receipts/cancelReceipt",
   async (id, { rejectWithValue }) => {
     try {
-      const response = await putData(`/finance/receipts/cancel/${id}`);
+      const response = await putData(`/finance/revenue/cancel/receipt/${id}`);
       if (response?.success) {
         toast.success("Receipt canceled successfully!");
         return response.data;
