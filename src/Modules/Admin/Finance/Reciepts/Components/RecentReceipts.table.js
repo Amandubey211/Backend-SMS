@@ -298,19 +298,20 @@ const RecentReceipts = () => {
           Recent Receipts List
         </h2>
         <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
-          <Input
+          {/* <Input
             prefix={<SearchOutlined style={{ color: "rgba(0,0,0,.45)" }} />}
             placeholder="Search"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             style={{ width: "250px" }}
-          />
+          /> */}
           <button
             onClick={() => navigate("/finance/receipts/receipt-list")}
-            className="px-4 py-2 rounded-md border border-gray-400 shadow-md hover:shadow-xl hover:shadow-gray-300 transition duration-200 text-transparent bg-gradient-text bg-clip-text"
+            className="px-3 py-1 rounded-md border border-gray-400 shadow-md hover:shadow-xl hover:shadow-gray-300 transition duration-200 text-white bg-gradient-to-r from-pink-500 to-purple-500"
           >
             View More
           </button>
+
         </div>
       </div>
 

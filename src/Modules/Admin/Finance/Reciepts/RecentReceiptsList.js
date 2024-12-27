@@ -203,9 +203,6 @@ const RecentReceiptsList = () => {
             <Menu.Item key="1" onClick={() => handlePreview(record)}>
                 <FilePdfOutlined /> Preview
             </Menu.Item>
-            <Menu.Item key="2" onClick={() => handleUpdateReceipt(record)}>
-                <EditOutlined /> Update Receipt
-            </Menu.Item>
             <Menu.Item
                 key="3"
                 onClick={() => {
@@ -214,9 +211,6 @@ const RecentReceiptsList = () => {
                 }}
             >
                 <CloseCircleOutlined /> Cancel Receipt
-            </Menu.Item>
-            <Menu.Item key="4" onClick={() => handleDeleteReceipt(record)}>
-                <DeleteOutlined /> Delete Receipt
             </Menu.Item>
         </Menu>
     );
@@ -342,21 +336,24 @@ const RecentReceiptsList = () => {
     return (
         <AdminLayout>
             <div className="p-4 bg-white rounded-lg shadow-lg">
-                {/* Header */}
-                <h2 className="text-xl font-semibold mb-4">Recent Receipts List</h2>
-
-                {/* Top Section: Search, Export, Add New Receipt */}
+                {/* Header, Search Box, Export, and Add New Receipt in one line */}
                 <div className="flex justify-between items-center mb-4">
-                    <Input
-                        prefix={<SearchOutlined style={{ color: "rgba(0,0,0,.45)" }} />}
-                        placeholder="Search Receipt"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        style={{ width: "250px" }}
-                    />
+                    {/* Left Section: Header and Search Box */}
+                    <div className="flex items-center space-x-4">
+                        <h2 className="text-xl font-semibold">Recent Receipts List</h2>
+                        <Input
+                            prefix={<SearchOutlined style={{ color: "rgba(0,0,0,.45)" }} />}
+                            placeholder="Search Receipt"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            style={{ width: "250px" }}
+                        />
+                    </div>
+
+                    {/* Right Section: Export and Add New Receipt */}
                     <div className="flex items-center space-x-4">
                         <button
-                            className="flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-medium rounded-lg hover:opacity-90"
+                            className="flex items-center px-2 py-1 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-normal rounded-md hover:opacity-90"
                             onClick={() => setExportModalOpen(true)}
                         >
                             Export
