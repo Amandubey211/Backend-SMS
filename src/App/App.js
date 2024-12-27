@@ -74,6 +74,17 @@ import CreateQuotation from "../Modules/Admin/Finance/Quotations/AddQuotation/Cr
 import CreatePenaltyAdjustment from "../Modules/Admin/Finance/PenaltiesandAdjustments/AddPenaltyAdjustment/CreatePenaltyAdjustment.js";
 
 // lazy loaded routes
+const AdjustmentDashboard = lazy(() =>
+  import(
+    "../Modules/Admin/Finance/PenaltiesandAdjustments/AddPenaltyAdjustment/Dashboard/AdjustmentDashboard.js"
+  )
+);
+const PenalityandAdjustmentList = lazy(() =>
+  import(
+    "../Modules/Admin/Finance/PenaltiesandAdjustments/AddPenaltyAdjustment/Dashboard/PenalityandAdjustmentList.js"
+  )
+);
+
 const TotalExpenseList = lazy(() =>
   import(
     "../Modules/Admin/Finance/Expense/TotalExpenseList/TotalExpenseList.js"
@@ -1102,6 +1113,26 @@ function App() {
       element: (
         <ProtectRoute
           Component={RecentQuotationList}
+          allowedRoles={["admin", "accountant"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/finance/penaltyAdjustment/",
+      element: (
+        <ProtectRoute
+          Component={AdjustmentDashboard}
+          allowedRoles={["admin", "accountant"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/finance/penaltyAdjustment-list",
+      element: (
+        <ProtectRoute
+          Component={PenalityandAdjustmentList}
           allowedRoles={["admin", "accountant"]}
         />
       ),
