@@ -76,6 +76,7 @@ export const createReceipt = createAsyncThunk(
 
       // 4) Append file if present
       if (payload.document) {
+        console.log(payload.document)
         formData.append("document", payload.document);
       }
 
