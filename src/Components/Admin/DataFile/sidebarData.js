@@ -202,7 +202,7 @@ const sidebarData = [
       //   //requiredPermission: PERMISSIONS.VIEW_REPORTS,
       // },
       {
-        title: "Penalties",
+        title: "Penalties & Adjustment",
         path: "/finance/penaltyAdjustment",
         icon: <HiOutlineReceiptTax style={{ fontSize: "1.1rem" }} />,
         roles: [ROLES.ADMIN, ROLES.ACCOUNTANT],

@@ -19,6 +19,10 @@ const DecorationsForm = () => {
       name: "decorativeItems",
       placeholder: "Enter items (separate by comma)",
     },
+    { type: "date", label: "Start Date", name: "startDate" },
+
+    { type: "date", label: "End Date", name: "endDate" },
+
     {
       type: "number",
       label: "Total Banners",
@@ -33,9 +37,9 @@ const DecorationsForm = () => {
     },
     {
       type: "text",
-      label: "Description",
-      name: "description",
-      placeholder: "Enter description",
+      label: "vendor",
+      name: "vendor",
+      placeholder: "Enter vendor",
     },
     {
       type: "text",

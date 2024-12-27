@@ -12,21 +12,28 @@ const UtilitiesForm = () => {
       type: "select",
       label: "Utility Type",
       name: "utilityType",
-      options: ["Electricity", "Water", "Gas"],
+      options: ["electricity", "water", "internet", "gas", "other"],
     },
+    // {
+    //   type: "text",
+    //   label: "Bill Number/Invoice ID",
+    //   name: "billNumber",
+    //   placeholder: "Enter number",
+    // },
     {
       type: "text",
-      label: "Bill Number/Invoice ID",
-      name: "billNumber",
-      placeholder: "Enter number",
-    },
-    {
-      type: "text",
-      label: "Service Provider Name",
-      name: "serviceProvider",
+      label: "Name",
+      name: "name",
       placeholder: "Enter service provider name",
     },
-    { type: "date", label: "Due Date", name: "dueDate" },
+    {
+      type: "text",
+      label: "vendor",
+      name: "vendor",
+      placeholder: "Enter vendor name",
+    },
+
+    // { type: "date", label: "Due Date", name: "dueDate" },
     {
       type: "number",
       label: "Unit Consumption",
@@ -53,7 +60,7 @@ const UtilitiesForm = () => {
     {
       type: "number",
       label: "Total Amount",
-      name: "totalAmount",
+      name: "total_amount",
       placeholder: "Enter total amount",
     },
     {
@@ -77,7 +84,7 @@ const UtilitiesForm = () => {
     {
       type: "number",
       label: "Final Amount",
-      name: "finalAmount",
+      name: "final_amount",
       placeholder: "Enter final amount",
     },
     { type: "file", label: "Add Receipt/Document", name: "receipt" },

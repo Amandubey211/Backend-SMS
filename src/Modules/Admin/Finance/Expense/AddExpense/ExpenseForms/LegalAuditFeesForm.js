@@ -8,6 +8,18 @@ const LegalAuditFeesForm = () => {
 
   const expenseDetailsFields = [
     {
+      name: "name",
+      label: "Name",
+      type: "text",
+      placeholder: "Enter  name",
+    },
+    {
+      name: "vendor",
+      label: "vendor",
+      type: "text",
+      placeholder: "Enter  vendor",
+    },
+    {
       name: "serviceName",
       label: "Service Name",
       type: "text",
@@ -35,6 +47,18 @@ const LegalAuditFeesForm = () => {
       options: ["Monthly", "Quarterly", "Yearly"],
     },
     { name: "dateTime", label: "Date & Time", type: "datetime-local" },
+    {
+      name: "paymentType",
+      label: "Payment Type",
+      type: "select",
+      options: ["cash", "card", "online", "cheque", "other"],
+    },
+    {
+      name: "paymentStatus",
+      label: "Payment Status",
+      type: "select",
+      options: ["paid", "unpaid", "partial", "advance"]
+    },
     {
       name: "totalAmount",
       label: "Total Amount",

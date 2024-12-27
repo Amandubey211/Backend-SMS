@@ -8,6 +8,18 @@ const SocialMediaAdsForm = () => {
 
   const expenseDetailsFields = [
     {
+      name: "name",
+      label: "Name",
+      type: "text",
+      placeholder: "Enter  name",
+    },
+    {
+      name: "vendor",
+      label: "vendor",
+      type: "text",
+      placeholder: "Enter  vendor",
+    },
+    {
       name: "platformName",
       label: "Platform Name",
       type: "text",

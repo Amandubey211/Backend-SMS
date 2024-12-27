@@ -142,7 +142,7 @@ const ExpenseTable = () => {
   }));
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow space-y-4 mt-3">
+    <div className="bg-white p-4 rounded-lg space-y-4 mt-3">
       {/* Header */}
       <div className="flex justify-between items-center">
         <h2 className="text-lg font-medium text-gray-700">

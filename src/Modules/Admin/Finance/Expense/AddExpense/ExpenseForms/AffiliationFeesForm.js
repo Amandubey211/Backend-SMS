@@ -8,6 +8,24 @@ const AffiliationFeesForm = () => {
 
   const expenseDetailsFields = [
     {
+      name: "name",
+      label: "Name",
+      type: "text",
+      placeholder: "Enter  name",
+    },
+    {
+      name: "vendor",
+      label: "vendor",
+      type: "text",
+      placeholder: "Enter  vendor",
+    },
+    {
+      name: "affiliationFees",
+      label: "Affiliation Fees",
+      type: "number",
+      placeholder: "Enter total Affiliation Fees ",
+    },
+    {
       name: "governingBodyName",
       label: "Governing Body Name",
       type: "text",
@@ -17,7 +35,7 @@ const AffiliationFeesForm = () => {
       name: "paymentType",
       label: "Payment Type",
       type: "select",
-      options: ["Online", "Cheque", "Cash"],
+      options: ["cash", "card", "online", "cheque", "other"],
     },
     { name: "membershipDueDate", label: "Membership Due Date", type: "date" },
     {
@@ -36,6 +54,7 @@ const AffiliationFeesForm = () => {
       options: ["Monthly", "Quarterly", "Yearly"],
     },
     { name: "dateTime", label: "Date & Time", type: "datetime-local" },
+
     {
       name: "totalAmount",
       label: "Total Amount",
@@ -61,7 +80,7 @@ const AffiliationFeesForm = () => {
       placeholder: "Enter penalty amount",
     },
     {
-      name: "finalAmount",
+      name: "final_amount",
       label: "Final Amount",
       type: "number",
       placeholder: "Enter final amount",

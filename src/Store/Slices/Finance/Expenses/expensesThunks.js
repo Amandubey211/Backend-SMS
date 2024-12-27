@@ -3,7 +3,12 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { setShowError } from "../../Common/Alerts/alertsSlice";
 import { handleError } from "../../Common/Alerts/errorhandling.action";
-import { getData, postData, putData } from "../../../../services/apiEndpoints";
+import {
+  getData,
+  postData,
+  putData,
+  deleteData,
+} from "../../../../services/apiEndpoints"; // Ensure deleteData is implemented
 import toast from "react-hot-toast";
 
 /**
@@ -16,26 +21,62 @@ const getEndpointForCategory = (category, action, id) => {
     case "Salaries and Wages":
       if (action === "create") return `${baseUrl}/add/salaryWages`;
       if (action === "update") return `${baseUrl}/update/salaryWages/${id}`;
+      if (action === "delete") return `${baseUrl}/delete/salaryWages/${id}`;
       break;
 
-    case "Utility Maintenance":
+    case "Utilities and Maintenance":
       if (action === "create") return `${baseUrl}/add/utilityMaintenance`;
       if (action === "update")
         return `${baseUrl}/update/utilityMaintenance/${id}`;
+      if (action === "delete")
+        return `${baseUrl}/delete/utilityMaintenance/${id}`;
       break;
 
     case "Supplies":
       if (action === "create") return `${baseUrl}/add/supplies`;
       if (action === "update") return `${baseUrl}/update/supplies/${id}`;
+      if (action === "delete") return `${baseUrl}/delete/supplies/${id}`;
       break;
 
-    case "Event Activity":
+    case "Event and Activity Costs":
       if (action === "create") return `${baseUrl}/add/eventActivity`;
       if (action === "update") return `${baseUrl}/update/eventActivity/${id}`;
+      if (action === "delete") return `${baseUrl}/delete/eventActivity/${id}`;
+      break;
+
+    case "Library and Academic Resources":
+      if (action === "create") return `${baseUrl}/add/libraryAcademic`;
+      if (action === "update") return `${baseUrl}/edit/libraryAcademic/${id}`;
+      if (action === "delete") return `${baseUrl}/delete/libraryAcademic/${id}`;
+      break;
+
+    case "Marketing and Advertising":
+      if (action === "create") return `${baseUrl}/add/marketingAd`;
+      if (action === "update") return `${baseUrl}/edit/marketingAd/${id}`;
+      if (action === "delete") return `${baseUrl}/delete/marketingAd/${id}`;
+      break;
+
+    case "Miscellaneous":
+      if (action === "create") return `${baseUrl}/add/miscellaneous`;
+      if (action === "update") return `${baseUrl}/edit/miscellaneous/${id}`;
+      if (action === "delete") return `${baseUrl}/delete/miscellaneous/${id}`;
+      break;
+
+    case "IT and Software":
+      if (action === "create") return `${baseUrl}/add/software`;
+      if (action === "update") return `${baseUrl}/edit/software/${id}`;
+      if (action === "delete") return `${baseUrl}/delete/software/${id}`;
+
+    case "Examination and Affiliation": // New Category Added
+      if (action === "create") return `${baseUrl}/add/examAffiliatione`;
+      if (action === "update") return `${baseUrl}/edit/examAffiliatione/${id}`;
+      if (action === "delete")
+        return `${baseUrl}/delete/examAffiliatione/${id}`;
       break;
 
     // Add more categories as needed
     default:
+      toast.error(`Category ${category} not supported.`);
       throw new Error(`Category ${category} not supported.`);
   }
 };
@@ -80,6 +121,7 @@ export const addExpense = createAsyncThunk(
       } else {
         dispatch(setShowError(true));
         toast.error(response?.message || "Failed to add expense.");
+        return rejectWithValue(response?.message || "Failed to add expense.");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -114,6 +156,32 @@ export const updateExpense = createAsyncThunk(
 );
 
 /**
+ * Thunk to delete an existing expense.
+ */
+export const deleteExpense = createAsyncThunk(
+  "expenses/deleteExpense",
+  async ({ category, id }, { dispatch, rejectWithValue }) => {
+    try {
+      const endpoint = getEndpointForCategory(category, "delete", id);
+      const response = await deleteData(endpoint);
+
+      if (response?.success) {
+        toast.success("Expense deleted successfully!");
+        return { id, category };
+      } else {
+        dispatch(setShowError(true));
+        toast.error(response?.message || "Failed to delete expense.");
+        return rejectWithValue(
+          response?.message || "Failed to delete expense."
+        );
+      }
+    } catch (error) {
+      return handleError(error, dispatch, rejectWithValue);
+    }
+  }
+);
+
+/**
  * Thunk to fetch a single expense by ID and category.
  * Optional: Implement if you need to fetch individual expense details.
  */
@@ -122,7 +190,7 @@ export const fetchExpenseById = createAsyncThunk(
   async ({ category, id }, { dispatch, rejectWithValue }) => {
     try {
       dispatch(setShowError(false));
-      const endpoint = `/finance/expenses/get/${category}/${id}`;
+      const endpoint = `/finance/expense/get/${category}/${id}`;
       const response = await getData(endpoint);
 
       if (response?.success) {

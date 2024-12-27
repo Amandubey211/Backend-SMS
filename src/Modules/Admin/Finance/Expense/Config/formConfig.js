@@ -30,7 +30,8 @@ import CanteenEquipmentMaintenanceForm from "../AddExpense/ExpenseForms/CanteenE
 export const initialValuesMap = {
   "Teaching Staffs": {
     employeeName: "Jane Doe", // Full name of the employee
-    staffId: "TS2024-001", // Unique staff identifier
+    staffType: "teaching",
+    // staffId: "TS2024-001", // Unique staff identifier
     salaryAmount: "7500", // Gross salary amount (as a string if needed)
     paymentDate: "2024-12-25", // Date of payment (YYYY-MM-DD format)
     jobTitle: "Senior Mathematics Teacher", // Job title of the employee
@@ -43,23 +44,24 @@ export const initialValuesMap = {
     ifsc: "IFSC0001234", // IFSC code of the bank branch
     bankName: "Springfield Bank", // Name of the bank
     branchName: "Downtown Branch", // Specific branch name
-    baseSalary: 7500, // Base salary amount (number)
+    total_amount: 7500, // Base salary amount (number)
     tax: 750, // Tax deducted (number)
     deduction: 150, // Other deductions (number)
     penalty: 0, // Penalties, if any (number)
     bonus: 500, // Bonus amount, if any (number)
-    netSalary: 7500 - 750 - 150 + 500, // Calculated net salary (number)
-    paymentStatus: "Paid", // Status of the payment (e.g., Paid, Pending)
-    paymentType: "Direct Deposit", // Method of payment (e.g., Direct Deposit, Cheque)
-    paidAmount: 5100, // Amount actually paid (number)
-    advanceAmount: 0, // Any advance amount given (number)
-    remainingAmount: 0, // Any remaining amount to be paid (number)
+    final_amount: 7500 - 750 - 150 + 500, // Calculated net salary (number)
+    paymentStatus: "paid", // Status of the payment (e.g., Paid, Pending)
+    paymentType: "cash", // Method of payment (e.g., Direct Deposit, Cheque)
+    paid_amount: 5100, // Amount actually paid (number)
+    advance_amount: 0, // Any advance amount given (number)
+    remaining_amount: 0, // Any remaining amount to be paid (number)
     receipt: "receipts/jane_doe_2024-12-25.pdf", // Path or URL to the payment receipt
   },
 
   "Non-Teaching Staffs": {
     employeeName: "",
-    staffID: "",
+
+    staffType: "nonteaching",
     salaryAmount: "",
     paymentDate: "",
     jobTitle: "",
@@ -86,32 +88,38 @@ export const initialValuesMap = {
     receipt: null,
   },
   Utilities: {
-    utilityType: "",
-    billNumber: "",
-    serviceProvider: "",
-    dueDate: "",
-    unitConsumption: 0,
-    unitCost: 0,
-    billingPeriod: "",
-    dateTime: "",
-    totalAmount: 0,
-    tax: 0,
-    discount: 0,
+    utilityType: "electricity",
+    billNumber: "E123456789",
+    serviceProvider: "XYZ Power Company",
+    name: "Aman Sharma",
+    vendor: "aman",
+    dueDate: "2024-12-31",
+    unitConsumption: 150,
+    unitCost: 5,
+    billingPeriod: "2024-12-01 to 2024-12-31",
+    dateTime: "2024-12-27T14:30:00",
+    totalAmount: 750,
+    expenseSubCategory: "utility",
+    tax: 75,
+    discount: 25,
     penalty: 0,
-    finalAmount: 0,
-    receipt: null,
+    final_amount: 800,
+    total_amount: 800,
+    receipt: "receipt12345.pdf",
   },
   "Building Maintenance": {
     buildingName: "",
     services: "",
     vendorName: "",
     billingPeriod: "",
+    maintenanceCategory: "building",
     dateTime: "",
     totalAmount: 0,
     tax: 0,
+    expenseSubCategory: "maintenance",
     discount: 0,
     penalty: 0,
-    finalAmount: 0,
+    final_amount: 0,
     receipt: null,
   },
   "Furniture Maintenance": {
@@ -119,13 +127,14 @@ export const initialValuesMap = {
     furnitureType: "",
     expenseType: "",
     vendorName: "",
+    maintenanceCategory: "furniture",
     billingPeriod: "",
     dateTime: "",
     totalAmount: 0,
     tax: 0,
     discount: 0,
     penalty: 0,
-    finalAmount: 0,
+    final_amount: 0,
     receipt: null,
   },
   "IT Equipment Maintenance": {
@@ -133,13 +142,14 @@ export const initialValuesMap = {
     equipmentType: "",
     expenseType: "",
     vendorName: "",
+    maintenanceCategory: "itEquipment",
     billingPeriod: "",
     dateTime: "",
     totalAmount: 0,
     tax: 0,
     discount: 0,
     penalty: 0,
-    finalAmount: 0,
+    final_amount: 0,
     receipt: null,
   },
   "IT and Software": {
@@ -153,7 +163,7 @@ export const initialValuesMap = {
     tax: 0,
     discount: 0,
     penalty: 0,
-    finalAmount: 0,
+    final_amount: 0,
     receipt: null,
   },
   "Fuel Costs": {
@@ -168,20 +178,22 @@ export const initialValuesMap = {
     tax: 0,
     discount: 0,
     penalty: 0,
-    finalAmount: 0,
+    final_amount: 0,
     receipt: null,
   },
   "Classroom & Office Purpose": {
     itemsPurchased: "",
     vendorName: "",
     billNumber: "",
+    purchasedDate: "",
     billingPeriod: "",
     dateTime: "",
     totalAmount: 0,
     tax: 0,
     discount: 0,
     penalty: 0,
-    finalAmount: 0,
+    final_amount: 800,
+    total_amount: 800,
     receipt: null,
   },
   "Canteen Supplies": {
@@ -194,7 +206,7 @@ export const initialValuesMap = {
     tax: 0,
     discount: 0,
     penalty: 0,
-    finalAmount: 0,
+    final_amount: 0,
     receipt: null,
   },
   Decorations: {
@@ -202,7 +214,9 @@ export const initialValuesMap = {
     decorativeItems: "",
     totalBanners: 0,
     totalPosters: 0,
-    description: "",
+    vendor: "",
+    startDate: "",
+    endDate: "",
     serviceProvider: "",
     billingPeriod: "",
     dateTime: "",
@@ -210,7 +224,7 @@ export const initialValuesMap = {
     tax: 0,
     discount: 0,
     penalty: 0,
-    finalAmount: 0,
+    final_amount: 0,
     receipt: null,
   },
   "Equipment Rentals": {
@@ -226,7 +240,7 @@ export const initialValuesMap = {
     tax: 0,
     discount: 0,
     penalty: 0,
-    finalAmount: 0,
+    final_amount: 0,
     receipt: null,
   },
   PrizesAndGifts: {
@@ -242,11 +256,13 @@ export const initialValuesMap = {
     tax: 0,
     discount: 0,
     penalty: 0,
-    finalAmount: 0,
+    final_amount: 0,
     receipt: null,
   },
   "Book Purchases": {
     bookTitle: "",
+    name: "",
+    vendor: "aman",
     subject: "",
     quantity: 0,
     costPerBook: 0,
@@ -274,7 +290,7 @@ export const initialValuesMap = {
     tax: 0,
     discount: 0,
     penalty: 0,
-    finalAmount: 0,
+    final_amount: 0,
     receipt: null,
   },
   "Examination Invigilator Payments": {
@@ -286,11 +302,16 @@ export const initialValuesMap = {
     totalAmount: 0,
     tax: 0,
     discount: 0,
+    paymentType: "cash",
     penalty: 0,
-    finalAmount: 0,
+    final_amount: 0,
     receipt: null,
   },
   "Affiliation Fees": {
+    name: "test",
+    vendor: "aman",
+    affiliationFees: "",
+    paymentType:"cash",
     governingBodyName: "",
     paymentType: "",
     membershipDueDate: "",
@@ -301,10 +322,14 @@ export const initialValuesMap = {
     tax: 0,
     discount: 0,
     penalty: 0,
-    finalAmount: 0,
+    final_amount: 0,
     receipt: null,
   },
   "LMS/ERP Subscription": {
+    name: "",
+    vendor: "",
+    Date: "",
+    //
     platformName: "",
     numberOfUsers: 0,
     costPerUser: 0,
@@ -314,7 +339,7 @@ export const initialValuesMap = {
     tax: 0,
     discount: 0,
     penalty: 0,
-    finalAmount: 0,
+    final_amount: 0,
     receipt: null,
   },
   "Website Maintenance": {
@@ -327,7 +352,7 @@ export const initialValuesMap = {
     tax: 0,
     discount: 0,
     penalty: 0,
-    finalAmount: 0,
+    final_amount: 0,
     receipt: null,
   },
   "Software Licensing": {
@@ -342,11 +367,13 @@ export const initialValuesMap = {
     tax: 0,
     discount: 0,
     penalty: 0,
-    finalAmount: 0,
+    final_amount: 0,
     receipt: null,
   },
   "Social Media Ads": {
     platformName: "",
+    name:"",
+    vendor:"",
     campaignName: "",
     description: "",
     subscriptionPeriod: "",
@@ -355,7 +382,7 @@ export const initialValuesMap = {
     tax: 0,
     discount: 0,
     penalty: 0,
-    finalAmount: 0,
+    final_amount: 0,
     receipt: null,
   },
   "Brochures & Pamphlets": {
@@ -371,22 +398,25 @@ export const initialValuesMap = {
     tax: 0,
     discount: 0,
     penalty: 0,
-    finalAmount: 0,
+    final_amount: 0,
     receipt: null,
   },
   "Legal and Audit Fees": {
+    name:"",
+    vendor:"",
     serviceName: "",
     serviceProvider: "",
     description: "",
     subscriptionPeriod: "",
     dateTime: "",
+    paymentType:"cash",
     totalAmount: 0,
     tax: 0,
     discount: 0,
     penalty: 0,
-    finalAmount: 0,
+    final_amount: 0,
     receipt: null,
-    paymentStatus: "",
+    paymentStatus: "unpaid",
     paidAmount: 0,
     paidBy: "",
     paymentType: "",
@@ -407,7 +437,7 @@ export const initialValuesMap = {
     tax: 0,
     discount: 0,
     penalty: 0,
-    finalAmount: 0,
+    final_amount: 0,
     receipt: null,
     paymentStatus: "",
     paidAmount: 0,
@@ -430,7 +460,7 @@ export const initialValuesMap = {
     tax: 0,
     discount: 0,
     penalty: 0,
-    finalAmount: 0,
+    final_amount: 0,
     receipt: null,
     paymentStatus: "",
     paidAmount: 0,

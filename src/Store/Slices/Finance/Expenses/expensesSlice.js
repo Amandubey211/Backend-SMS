@@ -6,6 +6,7 @@ import {
   addExpense,
   updateExpense,
   fetchExpenseById,
+  deleteExpense,
 } from "./expensesThunks";
 
 const initialState = {
@@ -66,6 +67,7 @@ const expensesSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      // Fetch All Expenses
       .addCase(fetchAllExpenses.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -76,11 +78,11 @@ const expensesSlice = createSlice({
         state.totalRecords = action.payload.totalRecords;
         state.totalPages = action.payload.totalPages;
         state.currentPage = action.payload.currentPage;
-        state.totalExpense = action.payload.totalExpense;
+        state.totalExpenseAmount = action.payload.totalExpense || 0;
         state.remainingPartialPaidExpense =
-          action.payload.remainingPartialPaidExpense;
-        state.totalPaidAmount = action.payload.totalPaidAmount;
-        state.unpaidExpense = action.payload.unpaidExpense;
+          action.payload.remainingPartialPaidExpense || 0;
+        state.totalPaidAmount = action.payload.totalPaidAmount || 0;
+        state.unpaidExpense = action.payload.unpaidExpense || 0;
       })
       .addCase(fetchAllExpenses.rejected, (state, action) => {
         state.loading = false;
@@ -98,8 +100,10 @@ const expensesSlice = createSlice({
         // state.expenses.unshift(action.payload); // Add new expense to the start
         // state.totalRecords += 1;
 
-        // Update statistics
-        state.totalExpenseAmount += action.payload.finalAmount || 0;
+        // // Update statistics
+        // state.totalExpenseAmount += action.payload.finalAmount || 0;
+        // state.totalPaidAmount += action.payload.paidAmount || 0;
+        // state.unpaidExpense += action.payload.remainingAmount || 0;
       })
       .addCase(addExpense.rejected, (state, action) => {
         state.loading = false;
@@ -117,17 +121,62 @@ const expensesSlice = createSlice({
         //   (expense) => expense._id === action.payload._id
         // );
         // if (index !== -1) {
-        //   state.expenses[index] = action.payload; // Update the expense
+        //   // Update the expense
+        //   state.expenses[index] = action.payload;
 
         //   // Optionally, update statistics
-        //   const updatedAmount = action.payload.finalAmount || 0;
-        //   const previousAmount = state.expenses[index]?.finalAmount || 0;
-        //   state.totalExpenseAmount += updatedAmount - previousAmount;
+        //   // Calculate the difference in amounts if necessary
+        //   // For simplicity, let's recalculate totalExpenseAmount
+        //   state.totalExpenseAmount = state.expenses.reduce(
+        //     (acc, expense) => acc + (expense.finalAmount || 0),
+        //     0
+        //   );
+        //   state.totalPaidAmount = state.expenses.reduce(
+        //     (acc, expense) => acc + (expense.paidAmount || 0),
+        //     0
+        //   );
+        //   state.unpaidExpense = state.expenses.reduce(
+        //     (acc, expense) => acc + (expense.remainingAmount || 0),
+        //     0
+        //   );
         // }
       })
       .addCase(updateExpense.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Failed to update expense.";
+      })
+
+      // Delete Expense
+      .addCase(deleteExpense.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(deleteExpense.fulfilled, (state, action) => {
+        state.loading = false;
+        // const { id, category } = action.payload;
+        // state.expenses = state.expenses.filter((expense) => expense._id !== id);
+        // state.totalRecords -= 1;
+
+        // // Optionally, update statistics
+        // // Here, assuming you have access to the deleted expense's amounts
+        // // If not, you might need to refetch or store deleted expense details
+        // // For simplicity, we'll recalculate totals
+        // state.totalExpenseAmount = state.expenses.reduce(
+        //   (acc, expense) => acc + (expense.finalAmount || 0),
+        //   0
+        // );
+        // state.totalPaidAmount = state.expenses.reduce(
+        //   (acc, expense) => acc + (expense.paidAmount || 0),
+        //   0
+        // );
+        // state.unpaidExpense = state.expenses.reduce(
+        //   (acc, expense) => acc + (expense.remainingAmount || 0),
+        //   0
+        // );
+      })
+      .addCase(deleteExpense.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Failed to delete expense.";
       })
 
       // Fetch Expense By ID

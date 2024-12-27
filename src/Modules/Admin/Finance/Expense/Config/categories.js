@@ -34,19 +34,19 @@ export const subCategories = {
   ],
   "Event and Activity Costs": [
     "Decorations",
-    "Equipment Rentals",
-    "Prizes and Gifts",
+    // "Equipment Rentals",
+    // "Prizes and Gifts",
     //"Others",
   ],
   "Library and Academic Resources": [
     "Book Purchases",
-    "Digital Resources",
+    // "Digital Resources",
     //"Others",
   ],
   "IT and Software": [
     "LMS/ERP Subscription",
-    "Website Maintenance",
-    "Software Licensing",
+    // "Website Maintenance",
+    // "Software Licensing",
     //"Others",
   ],
   "Examination and Affiliation": [
@@ -62,8 +62,8 @@ export const subCategories = {
   ],
   Miscellaneous: [
     "Legal and Audit Fees",
-    "Insurance Premium",
-    "Canteen Equipment Maintenance",
+    // "Insurance Premium",
+    // "Canteen Equipment Maintenance",
     //"Others",
   ],
   // "Others": ["Custom Expenses"], // Kept commented out as per categories array

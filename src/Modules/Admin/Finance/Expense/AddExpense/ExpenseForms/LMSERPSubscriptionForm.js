@@ -8,23 +8,37 @@ const LMSERPSubscriptionForm = () => {
 
   const expenseDetailsFields = [
     {
-      name: "platformName",
-      label: "Platform Name",
+      name: "name",
+      label: "Name",
       type: "text",
-      placeholder: "Enter platform name",
+      placeholder: "Enter  name",
     },
     {
-      name: "numberOfUsers",
-      label: "Number Of Users",
-      type: "number",
-      placeholder: "Enter number of users",
+      name: "vendor",
+      label: "vendor",
+      type: "text",
+      placeholder: "Enter  vendor",
     },
-    {
-      name: "costPerUser",
-      label: "Cost Per User",
-      type: "number",
-      placeholder: "Enter cost per user",
-    },
+    { type: "date", label: "Date", name: "Date" },
+
+    // {
+    //   name: "platformName",
+    //   label: "Platform Name",
+    //   type: "text",
+    //   placeholder: "Enter platform name",
+    // },
+    // {
+    //   name: "numberOfUsers",
+    //   label: "Number Of Users",
+    //   type: "number",
+    //   placeholder: "Enter number of users",
+    // },
+    // {
+    //   name: "costPerUser",
+    //   label: "Cost Per User",
+    //   type: "number",
+    //   placeholder: "Enter cost per user",
+    // },
   ];
 
   const billingDetailsFields = [
@@ -60,7 +74,7 @@ const LMSERPSubscriptionForm = () => {
       placeholder: "Enter penalty amount",
     },
     {
-      name: "finalAmount",
+      name: "final_amount",
       label: "Final Amount (After tax/discount/penalty)",
       type: "number",
       placeholder: "Enter final amount",
