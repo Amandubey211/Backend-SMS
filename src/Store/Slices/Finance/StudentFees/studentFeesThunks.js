@@ -48,12 +48,12 @@ export const createStudentFee = createAsyncThunk(
 
 export const updateStudentFee = createAsyncThunk(
   "studentFees/updateStudentFee",
-  async ({ feeId, feeData }, { rejectWithValue, dispatch }) => {
+  async (data , { rejectWithValue, dispatch }) => {
     try {
       dispatch(setShowError(false));
       const response = await putData(
-        `/finance/revenue/update/student/fee/${feeId}`,
-        feeData
+        `/finance/revenue/update/student/fee/${data.feeId}`,
+        data
       );
       return response;
     } catch (error) {

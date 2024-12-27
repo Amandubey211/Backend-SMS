@@ -1,10 +1,11 @@
 // src/Store/Slices/Finance/Expenses/expensesSlice.js
 
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchInvoice } from "./invoice.thunk";
+import { fetchInvoice, fetchInvoiceCard } from "./invoice.thunk";
 
 const initialState = {
   invoices: [],
+  cardData:{},
   loading: false,
   error: null,
 };
@@ -33,6 +34,21 @@ const invoiceSlice = createSlice({
      
       })
       .addCase(fetchInvoice.rejected, (state, action) => {
+        state.loading = false;
+        state.invoices =  [];
+        state.error = action.payload
+      })
+      .addCase(fetchInvoiceCard.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchInvoiceCard.fulfilled, (state, action) => {
+        state.loading = false;
+        state.cardData = action.payload || {};
+        state.error =null
+     
+      })
+      .addCase(fetchInvoiceCard.rejected, (state, action) => {
         state.loading = false;
         state.invoices =  [];
         state.error = action.payload

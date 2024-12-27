@@ -12,6 +12,7 @@ import { fetchSectionsNamesByClass } from "../../../../Store/Slices/Admin/Class/
 import { fetchAllClasses } from "../../../../Store/Slices/Admin/Class/actions/classThunk";
 import Spinner from "../../../../Components/Common/Spinner";
 import NoDataFound from "../../../../Components/Common/NoDataFound";
+import EditStudentFeesForm from "./EditStudentFeesForm";
 
 const SummaryRevenueList = () => {
   const dispatch = useDispatch();
@@ -39,7 +40,7 @@ const SummaryRevenueList = () => {
 
   useEffect(() => {
     dispatch(fetchAllClasses());
-    dispatch(fetchAllIncomes(params)); // Fetch initial data
+    dispatch(fetchAllIncomes(params)); 
   }, [dispatch, params]);
 
   const filterOnchange = (e) => {
@@ -146,16 +147,9 @@ const SummaryRevenueList = () => {
               <Button
                 type="link"
                 icon={<EditOutlined />}
-                // onClick={() => {
-                //   const incomeToEdit = incomeIdMap[record.key];
-                //   if (incomeToEdit) {
-                //     dispatch(setReadOnly(true)); // Set readOnly to true for viewing
-                //     dispatch(setSelectedIncome(incomeToEdit)); // Dispatch the selected income to Redux
-                //     navigate("/finance/earning/add"); // Navigate without passing state
-                //   } else {
-                //     toast.error("Selected income not found.");
-                //   }
-                // }}
+                 onClick={() => {
+                   handleEditClick(record)
+                 }}
                 className="text-blue-600 hover:text-blue-800 p-0"
                 aria-label="Edit"
               />
@@ -194,6 +188,18 @@ const SummaryRevenueList = () => {
     "Other",
   ];
 
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+  const [selectedRecord, setSelectedRecord] = useState(null);
+
+  const handleEditClick = (record) => {
+    setSelectedRecord(record); // Set the selected record
+    setIsEditModalVisible(true); // Show the modal
+  };
+
+  const handleModalClose = () => {
+    setIsEditModalVisible(false); // Close the modal
+    setSelectedRecord(null); // Clear selected record
+  };
   return (
     <AdminLayout>
       <div className="p-6 bg-white shadow-lg rounded-lg">
@@ -283,7 +289,7 @@ const SummaryRevenueList = () => {
                   value="partial"
                   onChange={filterOnchange}
                 />
-                <span className="text-gray-700">Partial </span>
+                <span className="text-gray-700">Partial</span>
               </label>
               <label className="flex items-center text-sm space-x-2">
                 <input
@@ -293,7 +299,7 @@ const SummaryRevenueList = () => {
                   value="unpaid"
                   onChange={filterOnchange}
                 />
-                <span className="text-gray-700">Unpaid </span>
+                <span className="text-gray-700">Unpaid</span>
               </label>
             </div>
           </div>
@@ -336,10 +342,26 @@ const SummaryRevenueList = () => {
                 },
               }}
               rowKey="_id"
+              size="small"
             />
           )}
         </div>
       </div>
+      <Modal
+    title="Edit Student Fees"
+    visible={isEditModalVisible}
+    onCancel={handleModalClose}
+    footer={null} // No footer
+    width={800}
+   >
+  {selectedRecord && (
+    <EditStudentFeesForm
+      data={selectedRecord}
+      onClose={handleModalClose}
+    />
+  )}
+</Modal>
+
     </AdminLayout>
   );
 };

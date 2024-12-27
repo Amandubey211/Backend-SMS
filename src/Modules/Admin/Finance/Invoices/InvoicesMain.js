@@ -8,7 +8,7 @@ import RecentInvoice from "./Components/RecentInvoice.table";
 import ReturnInvoice from "./Components/ReturnInvoice.table";
 import Layout from "../../../../Components/Common/Layout";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchInvoice } from "../../../../Store/Slices/Finance/Invoice/invoice.thunk";
+import { fetchInvoice, fetchInvoiceCard } from "../../../../Store/Slices/Finance/Invoice/invoice.thunk";
 
 const InvoicesMain = () => {
     useNavHeading("Finance", "Invoices");
@@ -16,7 +16,8 @@ const InvoicesMain = () => {
     const dispatch = useDispatch()
     useEffect(()=>{
      dispatch(fetchInvoice({}))
-    },[])
+     dispatch(fetchInvoiceCard({}))
+    },[dispatch])
     return (
         <Layout title="Finance | Invoice">
         <AdminDashLayout>
@@ -37,14 +38,8 @@ const InvoicesMain = () => {
                     </button>
                 </div>
                 <CardsSection />
-               
-                
-                <RecentInvoice />
-                <ReturnInvoice />
-                
-               
-
-                
+                <RecentInvoice />                
+                <ReturnInvoice />                
             </div>
         </AdminDashLayout>
         </Layout>

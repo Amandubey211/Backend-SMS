@@ -4,12 +4,13 @@ import { SearchOutlined, MoreOutlined } from "@ant-design/icons";
 import { Table, Input, Button, Tooltip, Spin, Alert } from "antd";
 import { useSelector } from "react-redux";
 import moment from "moment";
+import { fetchInvoice } from "../../../../../Store/Slices/Finance/Invoice/invoice.thunk";
 
 const RecentInvoice = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
   const { loading, error, invoices } = useSelector((store) => store.admin.invoices);
-
+ 
   // Filtered data based on search query
   const filteredData = invoices.filter(
     (item) =>

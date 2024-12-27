@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import AdminLayout from "../../../../Components/Admin/AdminDashLayout";
-import { Menu, Dropdown, Table, Spin, Input, Tooltip, Button } from "antd";
+import { Menu, Dropdown, Table, Spin, Input, Tooltip, Button, Modal } from "antd";
 import { MoreOutlined, SearchOutlined } from "@ant-design/icons";
 import { FiUserPlus } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
@@ -12,8 +12,8 @@ import { fetchInvoice } from "../../../../Store/Slices/Finance/Invoice/invoice.t
 import { isCancel } from "axios";
 
 const RecentInvoiceList = () => {
-  const [isSortModalVisible, setSortModalVisible] = useState(false);
-  const [isInvoiceVisible, setInvoiceVisible] = useState(false); // Control popup visibility
+  const [isInvoiceVisible, setInvoiceVisible] = useState(false);
+  const [selectedInvoice, setSelectedInvoice] = useState(null); 
   const popupRef = useRef(null); // Reference for the Invoice popup
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
@@ -26,7 +26,13 @@ const RecentInvoiceList = () => {
       item?.receiver?.name?.toLowerCase()?.includes(searchQuery.toLowerCase()) ||
       item?.finalAmount?.toString()?.includes(searchQuery.toLowerCase())
   );
-
+  const handleAction = (action, record) => {
+    if (action === "return") {
+      console.log("Returning invoice", record);
+    } else if (action === "cancel") {
+      console.log("Cancelling invoice", record);
+    }
+  };
   // Define Ant Design columns
   const columns = [
     {
@@ -95,22 +101,28 @@ const RecentInvoiceList = () => {
       title: "Action",
       key: "action",
       render: (_, record) => (
-        <Tooltip title="More Options">
-          <Button
-            shape="circle"
-            icon={<MoreOutlined />}
-            onClick={() => console.log("Action on", record)}
-          />
-        </Tooltip>
+        <Dropdown
+          overlay={
+            <Menu>
+              <Menu.Item
+                onClick={() => {navigate('/finance/penaltyAdjustment/add-new-penalty-adjustment')}}
+              >
+                Return
+              </Menu.Item>
+              <Menu.Item
+                onClick={() => handleAction("cancel", record)}
+              >
+                Cancel
+              </Menu.Item>
+            </Menu>
+          }
+          trigger={["click"]}
+        >
+          <Button shape="circle" icon={<MoreOutlined />} />
+        </Dropdown>
       ),
     },
   ];
-
-
-
-  const openInvoice = () => {
-    setInvoiceVisible(true); // Show Invoice popup
-  };
 
   const closeInvoice = (e) => {
     if (popupRef.current && !popupRef.current.contains(e.target)) {
@@ -240,49 +252,103 @@ const dispatch = useDispatch()
               rowKey="invoiceNumber"
               pagination={{ pageSize: 10 }}
               size="small"
-              onRow={() => setSortModalVisible(true)}
+              onRow={(record) => ({
+                onClick: () => {setInvoiceVisible(true); setSelectedInvoice(record)}
+              })}
             />
           )}
         </div>
-        {isInvoiceVisible && (
-          <div
-            className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50"
-            style={{ backdropFilter: "blur(8px)" }} // Enhanced blur
-          >
-            {/* Invoice Modal Container */}
-            <div
-              ref={popupRef}
-              className="relative p-6 w-full max-w-[700px] max-h-[90vh] "
-            >
-              {/* Top-Right Buttons (Inside Invoice Container) */}
-              <div className="absolute top-4 right-0 left-[43rem] mt-4 mr-4 flex flex-col items-start space-y-2">
-                {/* Close Button */}
-                <button
-                  onClick={() => setInvoiceVisible(false)}
-                  className="bg-gray-200 hover:bg-gray-300 rounded-full w-8 h-8 flex items-center justify-center text-lg font-semibold"
-                >
-                  ✕
-                </button>
-
-                {/* Action Buttons */}
-                <button
-                  className="w-40 py-2 text-white font-semibold rounded-md"
-                  style={{ background: "linear-gradient(90deg, #C83B62 0%, #7F35CD 100%)" }}
-                >
-                  Download PDF
-                </button>
-                <button
-                  className="w-40 py-2 text-white font-semibold rounded-md"
-                  style={{ background: "linear-gradient(90deg, #C83B62 0%, #7F35CD 100%)" }}
-                >
-                  Send Invoice
-                </button>
+        {isInvoiceVisible && selectedInvoice && (
+          <Modal
+          visible={isInvoiceVisible}
+          onCancel={() => setInvoiceVisible(false)}
+          footer={null}
+          width={800}
+        >
+          <div className="bg-white shadow-md rounded-lg p-6">
+            {/* Header */}
+            <div className="flex justify-between items-center bg-pink-600 text-white p-4 rounded-md">
+              <div>
+                <p className="text-lg font-bold">ABC Higher Secondary School</p>
+                <p className="text-md">11th Street, Main Road, Pincode: 674258</p>
+                <p className="text-md">Maharashtra, India</p>
               </div>
-
-              {/* Invoice Component */}
-              <Invoice />
+              <div>
+                <img src="logo-placeholder.png" alt="Logo" className="h-12" />
+              </div>
+            </div>
+        
+            {/* Invoice Title */}
+            <h2 className="text-center text-xl font-bold text-white bg-pink-600 py-2 my-4 rounded-md">INVOICE</h2>
+        
+            {/* Invoice Details */}
+            <div className="flex  justify-between ">
+              <div>
+                <strong>Bill To:</strong>
+                <p>{selectedInvoice.receiver.name}</p>
+                <p>{selectedInvoice.receiver.address}</p>
+              </div>
+              <div>
+                <strong>Invoice Number:</strong>
+                <p>{selectedInvoice.invoiceNumber}</p>
+                <strong>Invoice Date:</strong>
+                <p>{moment(selectedInvoice.invoiceDate).format("YYYY-MM-DD")}</p>
+                <strong>Due Date:</strong>
+                <p>{moment(selectedInvoice.dueDate).format("YYYY-MM-DD")}</p>
+              </div>
+            </div>
+        
+            {/* Items Table */}
+            <table className="table-auto w-full border-collapse border border-gray-300 text-sm mb-4">
+              <thead>
+                <tr className="bg-pink-200">
+                  <th className="border border-gray-300 py-2">S.No</th>
+                  <th className="border border-gray-300 py-2">Category</th>
+                  <th className="border border-gray-300 py-2">Quantity</th>
+                  <th className="border border-gray-300 py-2">Amount (QAR)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {selectedInvoice.lineItems.map((item, index) => (
+                  <tr key={index} className="text-center">
+                    <td className="border border-gray-300 py-2">{index + 1}</td>
+                    <td className="border border-gray-300 py-2">{item.revenueType}</td>
+                    <td className="border border-gray-300 py-2">{item.quantity}</td>
+                    <td className="border border-gray-300 py-2">{item.amount}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+        
+            {/* Summary */}
+            <table className="w-full text-sm mb-4">
+              <tbody>
+                <tr>
+                  <td className="text-left font-bold">Subtotal:</td>
+                  <td className="text-right">{selectedInvoice.subtotal} QAR</td>
+                </tr>
+                <tr>
+                  <td className="text-left font-bold">Tax (12%):</td>
+                  <td className="text-right">{selectedInvoice.tax} QAR</td>
+                </tr>
+                <tr>
+                  <td className="text-left font-bold">Discount:</td>
+                  <td className="text-right">{selectedInvoice.discount || 0} QAR</td>
+                </tr>
+                <tr>
+                  <td className="text-left font-bold text-pink-700">Total:</td>
+                  <td className="text-right font-bold text-pink-700">{selectedInvoice.finalAmount?.toFixed(2)} QAR</td>
+                </tr>
+              </tbody>
+            </table>
+        
+            {/* Footer */}
+            <div className="text-center text-xs text-gray-600 mt-4">
+              {/* <p>For inquiries, contact: info@studentdiwan.com</p> */}
             </div>
           </div>
+        </Modal>
+        
         )}
       </div>
     </AdminLayout>
