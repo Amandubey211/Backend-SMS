@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import TextInput from "../Earnings/AddEarnings/Component/TextInput";
 import SelectInput from "../Earnings/AddEarnings/Component/SelectInput";
 import FileInput from "../Earnings/AddEarnings/Component/FileInput";
@@ -9,6 +9,64 @@ import { updateStudentFee } from "../../../../Store/Slices/Finance/StudentFees/s
 import { fetchAllIncomes } from "../../../../Store/Slices/Finance/Earnings/earningsThunks";
 
 export default function EditStudentFeesForm({ data }) {
+    const [initialValues, setInitialValues] = useState({
+        feeId: "",
+        subCategory: "",
+        feeCycle: "",
+        startDate: "",
+        endDate: "",
+        dueDate: "",
+        examType: "",
+        paymentType: "",
+        chequeNumber: "",
+        onlineTransactionId: "",
+        total_amount: 0,
+        discountType: "amount",
+        discount: 0,
+        tax: 0,
+        remaining_amount: 0,
+        advance_amount: 0,
+        penalty: 0,
+        paid_amount: 0,
+        paymentStatus: "",
+        studentId:'',
+        classId:'',
+        sectionId:'',
+    });
+
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        if (data) {
+console.log(data);
+
+            setInitialValues({
+                feeId: data._id || "",
+                subCategory: data.subCategory || "",
+                feeCycle: data.feeCycle?.type || "",
+                startDate: data.feeCycle?.startDate || "",
+                endDate: data.feeCycle?.endDate || "",
+                dueDate: data.dueDate || "",
+                examType: data.examType || "",
+                paymentType: data.paymentType || "",
+                chequeNumber: data.chequeNumber || "",
+                onlineTransactionId: data.onlineTransactionId || "",
+                total_amount: data.total_amount || 0,
+                discountType: data.discountType || "amount",
+                discount: data.discount || 0,
+                tax: data.tax || 0,
+                remaining_amount: data.remaining_amount || 0,
+                advance_amount: data.advance_amount || 0,
+                penalty: data.penalty || 0,
+                paid_amount: data.paid_amount || 0,
+                paymentStatus: data.paymentStatus || "",
+                studentId:data.studentId,
+               classId:data.classId,
+                sectionId:data.sectionId
+            });
+        }
+    }, [data]);
+
     const validationSchema = Yup.object().shape({
         subCategory: Yup.string().required("Subcategory is required"),
         paymentType: Yup.string().required("Payment type is required"),
@@ -26,8 +84,8 @@ export default function EditStudentFeesForm({ data }) {
             .required("Total amount is required")
             .positive("Total amount must be a positive number"),
         discount: Yup.number().min(0, "Discount cannot be negative"),
-        remaining_amount: Yup.number().min(0, "remaining cannot be negative"),
-        advance_amount: Yup.number().min(0, "advance cannot be negative"),
+        remaining_amount: Yup.number().min(0, "Remaining amount cannot be negative"),
+        advance_amount: Yup.number().min(0, "Advance amount cannot be negative"),
         tax: Yup.number().min(0, "Tax cannot be negative"),
         penalty: Yup.number().min(0, "Penalty cannot be negative"),
         paid_amount: Yup.number()
@@ -52,32 +110,10 @@ export default function EditStudentFeesForm({ data }) {
         return { finalAmount, remainingAmount, advanceAmount };
     };
 
-    const initialValues = {
-        feeId: data?._id,
-        subCategory: data?.subCategory || "",
-        feeCycle: data?.feeCycle || "",
-        startDate: data?.feeCycle?.startDate || "",
-        endDate: data?.feeCycle?.endDate || "",
-        dueDate: data?.dueDate || "",
-        examType: data?.examType || "",
-        paymentType: data?.paymentType || "",
-        chequeNumber: data?.chequeNumber || "",
-        onlineTransactionId: data?.onlineTransactionId || "",
-        total_amount: data?.total_amount || 0,
-        discountType: data?.discountType || "amount",
-        discount: data?.discount || 0,
-        tax: data?.tax || 0,
-        remaining_amount: data?.remaining_amount || 0,
-        advance_amount: data?.advance_amount || 0,
-        penalty: data?.penalty || 0,
-        paid_amount: data?.paid_amount || 0,
-        paymentStatus: data?.paymentStatus ,
-      
-    };
-const dispatch = useDispatch()
     return (
-        <div className="flex w-full border ">
+        <div className="flex w-full border">
             <Formik
+                enableReinitialize
                 initialValues={initialValues}
                 validationSchema={validationSchema}
                 onSubmit={(values) => {
@@ -90,10 +126,17 @@ const dispatch = useDispatch()
                         advance_amount: advanceAmount,
                     };
                     console.log("Submitted Data:", updatedValues);
-                       dispatch(updateStudentFee(updatedValues)).then(()=>{
-                         dispatch(fetchAllIncomes({ page: 1, limit: 20,categoryName:"Student-Based Revenue",includeDetails:true})); 
-                       })
-               }}
+                    dispatch(updateStudentFee(updatedValues)).then(() => {
+                        dispatch(
+                            fetchAllIncomes({
+                                page: 1,
+                                limit: 20,
+                                categoryName: "Student-Based Revenue",
+                                includeDetails: true,
+                            })
+                        );
+                    });
+                }}
             >
                 {({ setFieldValue, values, errors, touched }) => (
                     <Form className="bg-white px-5 py-2 flex w-full flex-col">
@@ -114,11 +157,7 @@ const dispatch = useDispatch()
                                 ]}
                             />
                             {values.subCategory === "Exam Fees" ? (
-                                <TextInput
-                                    label="Exam Type"
-                                    name="examType"
-                                    type="text"
-                                />
+                                <TextInput label="Exam Type" name="examType" type="text" />
                             ) : (
                                 <>
                                     <SelectInput
@@ -132,13 +171,9 @@ const dispatch = useDispatch()
                                             "Custom Date",
                                         ]}
                                     />
-                                    <TextInput
-                                        label="Start Date"
-                                        name="startDate"
-                                        type="date"
-                                    /></>
+                                    <TextInput label="Start Date" name="startDate" type="date" />
+                                </>
                             )}
-
                         </div>
                         <div className="grid grid-cols-3 gap-6 w-full">
                             {values.feeCycle == "Custom Date" &&

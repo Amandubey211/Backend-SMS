@@ -10,6 +10,7 @@ import {
   customRequest,
 } from "../../../../services/apiEndpoints";
 import { getAY } from "../../../../Utils/academivYear";
+import toast from "react-hot-toast";
 
 
 export const fetchOneStudentFee = createAsyncThunk(
@@ -55,6 +56,11 @@ export const updateStudentFee = createAsyncThunk(
         `/finance/revenue/update/student/fee/${data.feeId}`,
         data
       );
+      if(response.success){
+        toast.success('Data update successfully!')
+      }else{
+        toast.error('Something is wrong')
+      }
       return response;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
