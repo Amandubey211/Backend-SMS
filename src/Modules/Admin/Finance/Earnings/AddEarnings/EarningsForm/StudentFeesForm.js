@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import { Formik, Form } from "formik";
+import { Formik, Form, useFormikContext } from "formik";
 
 import StudentDetails from "../Component/StudentDetails";
 import { VscDebugBreakpointLog } from "react-icons/vsc";
@@ -105,6 +105,14 @@ const dispatch = useDispatch()
               label="Payment Type"
               name="paymentType"
               options={["cash", "card", "online", "cheque", "other"]}
+            />
+             <TextInput
+              label="Cheque Number (*If payment type is cheque)"
+              name="chequeNumber"
+            />
+         <TextInput
+              label="Online Transaction-ID (*If payment type is online)"
+              name="onlineTransactionId"
             />
             <FileInput
               label="Add receipt/document"

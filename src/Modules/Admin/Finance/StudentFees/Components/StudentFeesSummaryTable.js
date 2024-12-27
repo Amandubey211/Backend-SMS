@@ -140,8 +140,9 @@ const StudentFeesSummaryTable = () => {
               total: totalRecords,
               onChange: (page) => setCurrentPage(page),
             }}
-            rowKey="_id" // Ensure each record has a unique _id
+            rowKey="_id" 
             bordered
+            size="small"
           />
         </div>
       )}

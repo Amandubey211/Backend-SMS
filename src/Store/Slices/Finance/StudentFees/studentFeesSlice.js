@@ -59,11 +59,6 @@ const studentFeesSlice = createSlice({
       })
       .addCase(updateStudentFee.fulfilled, (state, action) => {
         state.loading = false;
-        const updatedFee = action.payload.data;
-        const index = state.fees.findIndex((fee) => fee._id === updatedFee._id);
-        if (index !== -1) {
-          state.fees[index] = updatedFee;
-        }
       })
       .addCase(updateStudentFee.rejected, (state, action) => {
         state.loading = false;

@@ -1,12 +1,14 @@
 import React from "react";
 import Card from "./Components/Card";
+import { useSelector } from "react-redux";
 
 const CardsSection = () => {
+  const { cardData } = useSelector((store) => store.admin.invoices);
   const cards = [
-    { title: "Total Invoices", count: "12,345", color: "bg-purple-100", textColor: "text-purple-700" },
-    { title: "Paid Invoices", count: "12,345", color: "bg-green-100", textColor: "text-green-700" },
-    { title: "Unpaid Invoices", count: "12,345", color: "bg-red-100", textColor: "text-red-700" },
-    { title: "Overdue Invoices", count: "12,345", color: "bg-yellow-100", textColor: "text-yellow-700" },
+    { title: "Total Invoices", count: cardData?.totalInvoices, color: "bg-purple-100", textColor: "text-purple-700" },
+    { title: "Return Invoices", count: cardData?.returnInvoices, color: "bg-green-100", textColor: "text-green-700" },
+    { title: "Cancel Invoices", count: cardData?.cancelledInvoices, color: "bg-red-100", textColor: "text-red-700" },
+    { title: "Overdue Invoices", count: cardData?.overdueInvoices, color: "bg-yellow-100", textColor: "text-yellow-700" },
   ];
 
   return (
