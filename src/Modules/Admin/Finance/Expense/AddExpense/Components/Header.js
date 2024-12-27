@@ -6,7 +6,6 @@ import { useSelector } from "react-redux";
 import { subCategories, categories } from "../../Config/categories";
 
 const Header = ({
-  onReset,
   onCategoryChange,
   onSubCategoryChange,
   description,

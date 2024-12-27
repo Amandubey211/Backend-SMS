@@ -123,15 +123,14 @@ const AddExpenses = () => {
 
       // Convert numeric fields to numbers
       const numericFields = [
-        "amount",
-        "quantity",
-        "unitCost",
-        "totalCost",
-        "cost",
-        "salaryAmount",
-        "bonusAmount",
-        "unitPrice",
-        "totalPrice",
+        "paid_amount",
+        "remaining_amount",
+        "tax",
+        "discount",
+        "penalty",
+        "total_amount",
+        "final_amount",
+        "return_amount",
         // Add other numeric fields as necessary
       ];
 
@@ -151,12 +150,12 @@ const AddExpenses = () => {
         ).unwrap();
         toast.success("Expense updated successfully!");
         dispatch(clearSelectedExpense());
-        navigate("/finance/total-expense-list");
+        navigate("/finance/expenses/total-expense-list");
       } else {
         // Add new record
         await dispatch(addExpense({ values: payload, category })).unwrap();
         toast.success("Expense added successfully!");
-        navigate("/finance/total-expense-list");
+        navigate("/finance/expenses/total-expense-list");
       }
     } catch (err) {
       toast.error(
@@ -213,7 +212,7 @@ const AddExpenses = () => {
         <Formik
           enableReinitialize
           initialValues={getInitialValues()}
-          validationSchema={getValidationSchema()}
+          // validationSchema={getValidationSchema()}
           onSubmit={handleSaveOrUpdate}
         >
           {({ resetForm }) => (

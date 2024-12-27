@@ -8,6 +8,19 @@ const BuildingMaintenanceForm = () => {
 
   const expenseDetailsFields = [
     {
+      type: "select",
+      label: "Maintenance Type",
+      name: "maintenanceCategory",
+      options: [
+        "building",
+        "furniture",
+        "itEquipment",
+        "stationery",
+        "transport",
+        "other",
+      ],
+    },
+    {
       type: "text",
       label: "Building/Block Name",
       name: "buildingName",

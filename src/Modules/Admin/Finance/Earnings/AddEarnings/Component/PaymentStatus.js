@@ -18,12 +18,12 @@ const paymentStatusFields = [
     placeholder: "Enter paid amount",
     min: 0,
   },
-  {
-    name: "paid_by", // Changed to snake_case
-    label: "Paid By",
-    type: "select",
-    options: ["Manual", "Auto"],
-  },
+  // {
+  //   name: "paid_by", // Changed to snake_case
+  //   label: "Paid By",
+  //   type: "select",
+  //   options: ["Manual", "Auto"],
+  // },
   {
     name: "payment_type", // Changed to snake_case
     label: "Payment Type",

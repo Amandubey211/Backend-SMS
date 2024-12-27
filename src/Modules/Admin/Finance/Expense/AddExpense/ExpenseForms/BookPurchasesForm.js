@@ -11,9 +11,21 @@ const BookPurchasesForm = () => {
     {
       type: "text",
       label: "Book Title",
-      name: "bookTitle",
+      name: "name",
       placeholder: "Enter book title",
     },
+    {
+      type: "text",
+      label: "vendor",
+      name: "vendor",
+      placeholder: "Enter vendor",
+    },
+    // {
+    //   type: "text",
+    //   label: "Book Title",
+    //   name: "bookTitle",
+    //   placeholder: "Enter book title",
+    // },
     {
       type: "text",
       label: "Subject/Genre",
@@ -32,12 +44,7 @@ const BookPurchasesForm = () => {
       name: "costPerBook",
       placeholder: "Enter cost per book",
     },
-    {
-      type: "text",
-      label: "Description",
-      name: "description",
-      placeholder: "Enter description",
-    },
+
     {
       type: "text",
       label: "Service Provider",

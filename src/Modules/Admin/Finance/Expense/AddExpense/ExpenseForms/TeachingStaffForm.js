@@ -14,12 +14,12 @@ const TeachingStaffForm = () => {
       name: "staffName",
       placeholder: "Enter staff name",
     },
-    {
-      type: "text",
-      label: "Staff ID",
-      name: "staffID",
-      placeholder: "Enter staff ID",
-    },
+    // {
+    //   type: "text",
+    //   label: "Staff ID",
+    //   name: "staffId",
+    //   placeholder: "Enter staff ID",
+    // },
     {
       type: "text",
       label: "Job Title",

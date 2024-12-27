@@ -10,21 +10,22 @@ const ClassroomOfficePurposeForm = () => {
     {
       type: "text",
       label: "Items Purchased",
-      name: "itemsPurchased",
+      name: "name",
       placeholder: "Enter item names (separated by comma)",
     },
     {
       type: "text",
       label: "Vendor Name",
-      name: "vendorName",
+      name: "vendor",
       placeholder: "Enter vendor name",
     },
-    {
-      type: "text",
-      label: "Bill Number",
-      name: "billNumber",
-      placeholder: "Enter bill number",
-    },
+    // {
+    //   type: "text",
+    //   label: "Bill Number",
+    //   name: "billNumber",
+    //   placeholder: "Enter bill number",
+    // },
+    { type: "date", label: "Purchased Date ", name: "purchasedDate" },
   ];
 
   const billingDetailsFields = [
