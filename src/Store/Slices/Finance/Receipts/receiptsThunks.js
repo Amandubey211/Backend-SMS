@@ -1,5 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { getData, postData, putData, deleteData  } from "../../../../services/apiEndpoints";
+import { getData, postData, putData, deleteData } from "../../../../services/apiEndpoints";
 import toast from "react-hot-toast";
 import { getAY } from "../../../../Utils/academivYear";
 
@@ -32,24 +32,22 @@ export const createReceipt = createAsyncThunk(
   "receipts/createReceipt",
   async (formValues, { rejectWithValue }) => {
     try {
-      
+      // 1) Fetch schoolId
       const storedSchoolId = localStorage.getItem("SelectedschoolId");
       const schoolId = storedSchoolId || "";
 
-      
-      const academicYearId = getAY(); 
+      // 2) Fetch academicYear
+      const academicYearId = getAY();
 
-      // Merge in the schoolId and academicYear
+      // 3) Merge formValues with schoolId, academicYear
       const payload = {
-        ...formValues,      // tax, discount, penalty, totalPaidAmount, etc.
+        ...formValues,
         schoolId,
         academicYear: academicYearId,
       };
 
-      // Create FormData
+      // 4) Create FormData
       const formData = new FormData();
-
-      // 1) Append simple scalar fields
       formData.append("tax", payload.tax);
       formData.append("discount", payload.discount);
       formData.append("penalty", payload.penalty);
@@ -59,49 +57,58 @@ export const createReceipt = createAsyncThunk(
       formData.append("schoolId", payload.schoolId);
       formData.append("academicYear", payload.academicYear);
 
-      // 2) Append "receiver" as nested fields
-      //    e.g. receiver[name], receiver[email], etc.
+      // Receiver (nested)
       formData.append("receiver[name]", payload.receiver.name);
       formData.append("receiver[email]", payload.receiver.email);
       formData.append("receiver[phone]", payload.receiver.phone);
       formData.append("receiver[address]", payload.receiver.address);
 
-      // 3) Append lineItems as nested array fields
-      //    lineItems[0][revenueType], lineItems[0][quantity], ...
+      // Line Items (nested array)
       payload.lineItems.forEach((item, index) => {
         formData.append(`lineItems[${index}][revenueType]`, item.revenueType);
         formData.append(`lineItems[${index}][quantity]`, item.quantity);
         formData.append(`lineItems[${index}][total]`, item.total);
       });
 
-      // 4) Append file if present
+      // Document (file) if present
       if (payload.document) {
-        console.log(payload.document)
+        console.log("Attaching document:", payload.document);
         formData.append("document", payload.document);
       }
 
-      // For debugging, you can do:
-      // console.log([...formData.entries()]);
-
-      // Now POST the FormData
-      console.log(formData)
+      // 5) POST
       const response = await postData("/finance/revenue/create/receipt", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
-      if (response?.success) {
+      // Depending on how postData is written, response might be:
+      //  - raw Axios response with status, data
+      //  - or just data object
+      // We'll try checking .status first, then .data or .message
+
+      // If postData returns the raw Axios response:
+      if (response?.status === 201) {
         toast.success("Receipt created successfully!");
-        return response.data; // or whatever data the API returns
-      } else {
-        toast.error(response?.message || "Failed to create receipt.");
-        return rejectWithValue(response?.message || "Failed to create receipt.");
+        return response.data; // success
       }
+
+      // Otherwise, if postData returns only data:
+      if (response?.message === "Receipt created successfully") {
+        toast.success("Receipt created successfully!");
+        return response; // or response.data if needed
+      }
+
+      // If neither condition is met, treat as failure
+      toast.error(response?.message || "Failed to create receipt.");
+      return rejectWithValue(response?.message || "Failed to create receipt.");
+
     } catch (error) {
       toast.error(error.message || "Error creating receipt.");
       return rejectWithValue(error.message || "Error creating receipt.");
     }
   }
 );
+
 
 // Update a receipt
 export const updateReceipt = createAsyncThunk(

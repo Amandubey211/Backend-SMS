@@ -41,10 +41,10 @@ const CreateReceipt = () => {
 
       items: Array.isArray(data.lineItems)
         ? data.lineItems.map((item) => ({
-          category: item.revenueType || "",
-          quantity: item.quantity?.toString() || "",
-          totalAmount: item.total?.toString() || "",
-        }))
+            category: item.revenueType || "",
+            quantity: item.quantity?.toString() || "",
+            totalAmount: item.total?.toString() || "",
+          }))
         : [{ category: "", quantity: "", totalAmount: "" }],
     };
   };
@@ -112,8 +112,6 @@ const CreateReceipt = () => {
         })
       )
       .min(1, "At least one line item is required"),
-
-    // invoiceRefId is optional
   });
 
   // --- Handle Submit (disabled if readOnly) ---
@@ -151,13 +149,23 @@ const CreateReceipt = () => {
 
     dispatch(createReceipt(formValues))
       .unwrap()
-      .then(() => {
-        toast.success("Receipt created successfully!");
-        resetForm();
-        navigate("/finance/receipts");
+      .then((response) => {
+        // Check success. e.g. if response includes { message: "Receipt created successfully" }
+        // or if your thunk returns { status: 201, ... } etc.
+        console.log(response);
+        if (response?.message === "Receipt created successfully") {
+          toast.success("Receipt created successfully!");
+          resetForm();
+          // Navigate to the receipts list
+          navigate("/finance/receipts/receipt-list");
+        } else {
+          // If there's no "message" or success condition, show an error or handle accordingly
+          toast.error("Failed to create receipt.");
+        }
       })
       .catch((err) => {
         console.error("Error creating receipt:", err);
+        toast.error("Error creating receipt.");
       })
       .finally(() => {
         setSubmitting(false);
@@ -240,6 +248,7 @@ const CreateReceipt = () => {
               </div>
 
               {/* Return Items */}
+              {/* Pass readOnly so we can disable those fields in ReturnItems */}
               <ReturnItems
                 values={values}
                 setFieldValue={setFieldValue}
