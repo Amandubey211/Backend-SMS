@@ -1,5 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchAllReceipts, createReceipt, cancelReceipt } from "./receiptsThunks";
+import {
+  fetchAllReceipts,
+  createReceipt,
+  cancelReceipt,
+  updateReceipt,
+  deleteReceipt,
+} from "./receiptsThunks";
 
 const initialState = {
   receipts: [], // Holds all receipts fetched from the API
@@ -69,6 +75,39 @@ const receiptsSlice = createSlice({
       .addCase(cancelReceipt.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Failed to cancel receipt.";
+      })
+
+      // Update Receipt
+      .addCase(updateReceipt.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateReceipt.fulfilled, (state, action) => {
+        state.loading = false;
+        state.successMessage = "Receipt updated successfully!";
+        const index = state.receipts.findIndex((r) => r._id === action.payload._id);
+        if (index !== -1) {
+          state.receipts[index] = action.payload; // Update the receipt in the state
+        }
+      })
+      .addCase(updateReceipt.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Failed to update receipt.";
+      })
+
+      // Delete Receipt
+      .addCase(deleteReceipt.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(deleteReceipt.fulfilled, (state, action) => {
+        state.loading = false;
+        state.successMessage = "Receipt deleted successfully!";
+        state.receipts = state.receipts.filter((r) => r._id !== action.payload); // Remove from state
+      })
+      .addCase(deleteReceipt.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Failed to delete receipt.";
       });
   },
 });

@@ -16,29 +16,7 @@ const ReceiptsMain = () => {
                 {/* Header Section */}
                 <div className="flex justify-between items-center">
                     <div className="flex gap-4 justify-start items-center">
-                        {/* Filters */}
-                        <div className="relative rounded-[0.625rem] p-[2px] bg-gradient-to-r from-[#C83B62] to-[#46138A]">
-                            <select
-                                className="px-4 py-2 w-full bg-white text-gray-600 shadow-sm hover:shadow-md transition-all duration-200 focus:outline-none"
-                                style={{ margin: '0.01px 0.2px 0.01px 0.1px', borderRadius: '7px' }}
-                            >
-                                <option>By Month</option>
-                                <option>January</option>
-                                <option>February</option>
-                                <option>March</option>
-                            </select>
-                        </div>
-                        <div className="relative rounded-[0.625rem] p-[2px] bg-gradient-to-r from-[#C83B62] to-[#46138A]">
-                            <select
-                                className="px-4 py-2 w-full bg-white text-gray-600 shadow-sm hover:shadow-md transition-all duration-200 focus:outline-none"
-                                style={{ margin: '0.01px 0.2px 0.01px 0.1px', borderRadius: '7px' }}
-                            >
-                                <option>Tuition Fees</option>
-                                <option>Paid</option>
-                                <option>Unpaid</option>
-                                <option>Partial</option>
-                            </select>
-                        </div>
+                        
                     </div>
 
                     {/* Add New Receipt Button */}
