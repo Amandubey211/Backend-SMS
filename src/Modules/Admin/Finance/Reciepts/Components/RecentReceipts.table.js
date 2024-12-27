@@ -31,15 +31,15 @@ const RecentReceipts = () => {
     const result = await dispatch(cancelReceipt(selectedReceiptId));
     console.log(result);
     if (result.payload === "Receipt cancel successfully") {
-        toast.success("Receipt canceled successfully!");
-        // Trigger re-fetching of receipts after successful cancellation
-        dispatch(fetchAllReceipts());
+      toast.success("Receipt canceled successfully!");
+      // Trigger re-fetching of receipts after successful cancellation
+      dispatch(fetchAllReceipts());
     } else {
-        toast.error("Failed to cancel receipt.");
+      toast.error("Failed to cancel receipt.");
     }
     setCancelLoading(false);
     setModalVisible(false);
-};
+  };
 
 
   const filteredData = receipts.filter((item) => {
@@ -174,16 +174,25 @@ const RecentReceipts = () => {
 
   return (
     <div style={{ border: "2px solid #FFCEDB", borderRadius: "8px", padding: "16px" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "16px" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "16px", alignItems: "center" }}>
         <h2 style={{ fontSize: "1.25rem", fontWeight: "600" }}>Recent Receipts List</h2>
-        <Input
-          prefix={<SearchOutlined style={{ color: "rgba(0,0,0,.45)" }} />}
-          placeholder="Search"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          style={{ width: "250px" }}
-        />
+        <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
+          <Input
+            prefix={<SearchOutlined style={{ color: "rgba(0,0,0,.45)" }} />}
+            placeholder="Search"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            style={{ width: "250px" }}
+          />
+          <button
+            onClick={() => navigate("/finance/receipts/receipt-list")}
+            className="px-4 py-2 rounded-md border border-gray-400 shadow-md hover:shadow-xl hover:shadow-gray-300 transition duration-200 text-transparent bg-gradient-text bg-clip-text"
+          >
+            View More
+          </button>
+        </div>
       </div>
+
       <Table
         rowKey={(record) => record._id}
         columns={columns}
