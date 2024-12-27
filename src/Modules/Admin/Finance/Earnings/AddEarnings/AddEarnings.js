@@ -23,6 +23,7 @@ import { EditOutlined } from "@ant-design/icons";
 import { formComponentsMap, initialValuesMap } from "./Config/formConfig";
 import { validationSchemas } from "./Config/validationSchemas";
 import toast from "react-hot-toast";
+import useNavHeading from "../../../../../Hooks/CommonHooks/useNavHeading ";
 
 const AddEarnings = () => {
   const navigate = useNavigate();
@@ -216,7 +217,7 @@ const AddEarnings = () => {
     setDescription("");
     if (selectedIncome) {
       dispatch(clearSelectedIncome()); // Clear selected income from Redux
-      navigate("/finance/total-revenue-list"); // Navigate back to revenue list
+      navigate("/finance/earning/total-revenue-list"); // Navigate back to revenue list
     } else {
       // Reset to default category and subCategory
       setSelectedCategory("Facility-Based Revenue");
@@ -379,14 +380,14 @@ const AddEarnings = () => {
         ).unwrap();
         toast.success("Earnings updated successfully!");
         dispatch(clearSelectedIncome()); // Clear the selected income after update
-        navigate("/finance/total-revenue-list");
+        navigate("/finance/earning/total-revenue-list");
       } else if (!selectedIncome) {
         // Add new record
         await dispatch(
           addEarnings({ values: payloadCamelCase, category })
         ).unwrap();
         toast.success("Earnings added successfully!");
-        navigate("/finance/total-revenue-list");
+        navigate("/finance/earning/total-revenue-list");
       }
     } catch (err) {
       toast.error(err || "An unexpected error occurred while saving the data.");
@@ -434,7 +435,7 @@ const AddEarnings = () => {
     }
     return () => clearTimeout(timer);
   }, [error]);
-
+  useNavHeading("Earnings", "Manage");
   return (
     <Layout
       title={

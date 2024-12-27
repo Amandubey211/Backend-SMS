@@ -74,6 +74,11 @@ import CreateQuotation from "../Modules/Admin/Finance/Quotations/AddQuotation/Cr
 import CreatePenaltyAdjustment from "../Modules/Admin/Finance/PenaltiesandAdjustments/AddPenaltyAdjustment/CreatePenaltyAdjustment.js";
 
 // lazy loaded routes
+const TotalExpenseList = lazy(() =>
+  import(
+    "../Modules/Admin/Finance/Expense/TotalExpenseList/TotalExpenseList.js"
+  )
+);
 const ExpenseMain = lazy(() =>
   import("../Modules/Admin/Finance/Expense/ExpenseMain.js")
 );
@@ -902,6 +907,16 @@ function App() {
       errorElement: <Error />,
     },
     {
+      path: "/finance/earning/total-revenue-list",
+      element: (
+        <ProtectRoute
+          Component={TotalRevenueList}
+          allowedRoles={["admin", "accountant"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
       path: "/finance/expenses",
       element: (
         <ProtectRoute
@@ -912,15 +927,16 @@ function App() {
       errorElement: <Error />,
     },
     {
-      path: "/finance/total-revenue-list",
+      path: "/finance/expenses/total-expense-list",
       element: (
         <ProtectRoute
-          Component={TotalRevenueList}
+          Component={TotalExpenseList}
           allowedRoles={["admin", "accountant"]}
         />
       ),
       errorElement: <Error />,
     },
+
     {
       path: "/finance/studentfees/add/form",
       element: (

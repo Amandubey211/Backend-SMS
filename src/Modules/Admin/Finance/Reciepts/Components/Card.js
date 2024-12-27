@@ -9,7 +9,7 @@ const Card = ({ title, count, color, textColor, customContent }) => {
         <div className="mt-4">{customContent}</div>
       ) : (
         <p className={`mt-4 text-3xl font-bold ${textColor}`}>
-          {count} <span className="text-lg">invoices</span>
+          {count} <span className="text-lg">receipts</span>
         </p>
       )}
     </div>

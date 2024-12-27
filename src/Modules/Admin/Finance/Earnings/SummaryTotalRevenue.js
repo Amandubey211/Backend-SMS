@@ -48,7 +48,7 @@ const SummaryTotalRevenue = () => {
 
   // Handle "View More" button click
   const handleViewMore = () => {
-    navigate("/finance/total-revenue-list");
+    navigate("/finance/earning/total-revenue-list");
   };
 
   // Define table columns with fixed widths and ellipsis
