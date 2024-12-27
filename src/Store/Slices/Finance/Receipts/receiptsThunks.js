@@ -204,7 +204,7 @@ export const fetchReceiptCardData = createAsyncThunk(
       if (month) queryParams.append("month", month);
       if (academicYearId) queryParams.append("academicYearId", academicYearId);
 
-      const response = await getData(`/finance/revenue/card-data?${queryParams.toString()}`);
+      const response = await getData(`/finance/dashboard/receipt/cardData?${queryParams.toString()}`);
 
       if (response?.success) {
         return response.data;

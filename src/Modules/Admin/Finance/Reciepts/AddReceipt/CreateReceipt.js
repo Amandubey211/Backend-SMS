@@ -8,7 +8,7 @@ import TextInput from "./Components/TextInput";
 import ReturnItems from "./Components/ReturnItems";
 import FileInput from "./Components/FileInput";
 import { createReceipt } from "../../../../../Store/Slices/Finance/Receipts/receiptsThunks";
-import { toast } from "react-toastify"; // Make sure you're importing toast if not already
+import { toast } from "react-hot-toast"; // Make sure you're importing toast if not already
 
 const CreateReceipt = () => {
   const dispatch = useDispatch();

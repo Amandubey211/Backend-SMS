@@ -1,19 +1,40 @@
 // RecentReceiptsList.js
+
 import React, { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import AdminLayout from "../../../../Components/Admin/AdminDashLayout";
 import { Menu, Dropdown, Input, Table } from "antd";
-import { MoreOutlined, ExclamationCircleOutlined, SearchOutlined } from "@ant-design/icons";
+import {
+    MoreOutlined,
+    ExclamationCircleOutlined,
+    SearchOutlined,
+    EditOutlined,
+    DeleteOutlined,
+    CloseCircleOutlined,
+    FilePdfOutlined,
+    FileExcelOutlined,
+} from "@ant-design/icons";
 import { FiUserPlus } from "react-icons/fi";
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-import { fetchAllReceipts, cancelReceipt } from "../../../../Store/Slices/Finance/Receipts/receiptsThunks";
+import {
+    fetchAllReceipts,
+    cancelReceipt,
+    deleteReceipt, // <-- Make sure you've exported this from receiptsThunks
+} from "../../../../Store/Slices/Finance/Receipts/receiptsThunks";
 import Spinner from "../../../../Components/Common/Spinner";
 import DeleteConfirmationModal from "../../../../Components/Common/DeleteConfirmationModal";
 import EmailModal from "../../../../Components/Common/EmailModal";
 
-// Import your Receipt component here
-import Receipt from "./Components/Receipt"; // <-- Adjust the path accordingly
+// Import your Receipt component
+import Receipt from "./Components/Receipt"; // Adjust path if needed
+
+// Import jsPDF and html2canvas
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
+
+// Import the ExportModal
+import ExportModal from "./Components/ExportModal"; // Adjust the path if needed
 
 const RecentReceiptsList = () => {
     const navigate = useNavigate();
@@ -38,22 +59,38 @@ const RecentReceiptsList = () => {
     const [isReceiptVisible, setReceiptVisible] = useState(false);
     const [selectedReceipt, setSelectedReceipt] = useState(null);
 
-    // Optional: useRef if you want to detect clicks outside the modal
+    // Export modal states
+    const [isExportModalOpen, setExportModalOpen] = useState(false);
+
+    // Ref for the modal content (used for outside-click detection & PDF generation)
     const popupRef = useRef(null);
 
+    // --- Lifecycle: Fetch receipts if empty ---
     useEffect(() => {
-        // Fetch only if no receipts are present
         if (receipts.length === 0) {
             dispatch(fetchAllReceipts());
         }
     }, [dispatch, receipts.length]);
 
-    // -------- Handlers --------
-    const handleNavigate = () => {
-        navigate("/finance/receipts/add-new-receipt");
-    };
+    // --- Close receipt preview modal on outside click ---
+    useEffect(() => {
+        function handleClickOutside(event) {
+            if (
+                popupRef.current &&
+                !popupRef.current.contains(event.target) &&
+                isReceiptVisible
+            ) {
+                setReceiptVisible(false);
+            }
+        }
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [isReceiptVisible]);
 
-    const handleCancelReceipt = async () => {
+    // --- Cancel a receipt ---
+    const handleConfirmCancelReceipt = async () => {
         setCancelLoading(true);
         const result = await dispatch(cancelReceipt(selectedReceiptId));
         if (result.payload === "Receipt cancel successfully") {
@@ -66,12 +103,80 @@ const RecentReceiptsList = () => {
         setModalVisible(false);
     };
 
+    // --- Preview a receipt (open modal) ---
     const handlePreview = (record) => {
         setSelectedReceipt(record);
         setReceiptVisible(true);
     };
 
-    // Email modal
+    // --- Update a receipt (placeholder) ---
+    const handleUpdateReceipt = (record) => {
+        // For now, just show a toast or console.log. 
+        // Later, you can navigate or pass the record to an update form.
+        toast.success("Update Receipt clicked! (Not implemented yet)");
+        console.log("Update Receipt Data:", record);
+    };
+
+    // --- Delete a receipt ---
+    const handleDeleteReceipt = async (record) => {
+        // Optionally, you could show a confirmation modal if needed.
+        const confirmDelete = window.confirm("Are you sure you want to delete this receipt?");
+        if (!confirmDelete) return;
+
+        try {
+            const result = await dispatch(deleteReceipt(record._id));
+            if (result.payload === "Receipt Deleted successfully") {
+                toast.success("Receipt deleted successfully!");
+                dispatch(fetchAllReceipts());
+            } else {
+                toast.error("Failed to delete receipt.");
+            }
+        } catch (err) {
+            console.error(err);
+            toast.error("An error occurred while deleting the receipt.");
+        }
+    };
+
+    // --- Download PDF from preview ---
+    const handleDownloadPDF = async () => {
+        try {
+            if (!selectedReceipt) return;
+
+            // Generate PDF filename from receiptNumber or default
+            const pdfTitle = selectedReceipt.receiptNumber
+                ? `${selectedReceipt.receiptNumber}.pdf`
+                : "receipt.pdf";
+
+            // Use html2canvas to capture the popupRef content
+            const canvas = await html2canvas(popupRef.current, { scale: 2 });
+            const imgData = canvas.toDataURL("image/png");
+
+            // Create a new jsPDF instance
+            const pdf = new jsPDF("p", "pt", "a4"); // 'p' for portrait, 'pt' for points
+            const pageWidth = pdf.internal.pageSize.getWidth();
+            const pageHeight = pdf.internal.pageSize.getHeight();
+
+            // Scale image to fit into PDF page
+            const imgWidth = canvas.width;
+            const imgHeight = canvas.height;
+            const ratio = Math.min(pageWidth / imgWidth, pageHeight / imgHeight);
+            const newWidth = imgWidth * ratio;
+            const newHeight = imgHeight * ratio;
+
+            pdf.addImage(imgData, "PNG", 0, 0, newWidth, newHeight);
+            pdf.save(pdfTitle);
+        } catch (error) {
+            console.error("Error generating PDF: ", error);
+            toast.error("Failed to generate PDF.");
+        }
+    };
+
+    // --- Navigate to Add New Receipt Page ---
+    const handleNavigate = () => {
+        navigate("/finance/receipts/add-new-receipt");
+    };
+
+    // --- Email Modal Helpers ---
     const handleShareClick = () => {
         setEmailModalOpen(true);
     };
@@ -79,28 +184,50 @@ const RecentReceiptsList = () => {
         setEmailModalOpen(false);
     };
 
-    // -------- Table Setup --------
+    // --- Build the data for Exporting (matching table columns) ---
+    const exportData = receipts.map((item) => ({
+        "Receipt ID": item.receiptNumber || item._id || "N/A",
+        "Recipient Name":
+            item.reciever?.name || item.receiver?.name || "N/A",
+        "Paid Date": item.date ? new Date(item.date).toLocaleDateString() : "N/A",
+        "Paid Amount": item.totalPaidAmount ? `${item.totalPaidAmount} QAR` : "N/A",
+        Tax: `${item.tax || 0} QAR`,
+        Discount: `${item.discount || 0} QAR`,
+        Penalty: `${item.penalty || 0} QAR`,
+        Remark: item.remark || "N/A",
+    }));
+
+    // --- Action Menu for the 3-dots column ---
     const actionMenu = (record) => (
         <Menu>
             <Menu.Item key="1" onClick={() => handlePreview(record)}>
-                Preview
+                <FilePdfOutlined /> Preview
+            </Menu.Item>
+            <Menu.Item key="2" onClick={() => handleUpdateReceipt(record)}>
+                <EditOutlined /> Update Receipt
             </Menu.Item>
             <Menu.Item
-                key="2"
+                key="3"
                 onClick={() => {
                     setSelectedReceiptId(record._id);
                     setModalVisible(true);
                 }}
             >
-                Cancel Receipt
+                <CloseCircleOutlined /> Cancel Receipt
+            </Menu.Item>
+            <Menu.Item key="4" onClick={() => handleDeleteReceipt(record)}>
+                <DeleteOutlined /> Delete Receipt
             </Menu.Item>
         </Menu>
     );
 
+    // --- Filter logic ---
     const filteredData = receipts.filter((item) => {
         const receiptNumber = item.receiptNumber?.toLowerCase() || "";
         const receiverName =
-            item.reciever?.name?.toLowerCase() || item.receiver?.name?.toLowerCase() || "";
+            item.reciever?.name?.toLowerCase() ||
+            item.receiver?.name?.toLowerCase() ||
+            "";
         const paidAmount = item.totalPaidAmount?.toString() || "";
         const dateString = item.date ? new Date(item.date).toLocaleDateString() : "";
 
@@ -112,6 +239,7 @@ const RecentReceiptsList = () => {
         );
     });
 
+    // --- Table columns ---
     const columns = [
         {
             title: "Receipt ID",
@@ -186,7 +314,7 @@ const RecentReceiptsList = () => {
         },
     ];
 
-    // -------- Loading / Error Handling --------
+    // --- Loading / Error Handling ---
     if (loading) {
         return (
             <AdminLayout>
@@ -200,7 +328,9 @@ const RecentReceiptsList = () => {
     if (error) {
         return (
             <AdminLayout>
-                <div style={{ textAlign: "center", color: "#FF4D4F", marginTop: "16px" }}>
+                <div
+                    style={{ textAlign: "center", color: "#FF4D4F", marginTop: "16px" }}
+                >
                     <ExclamationCircleOutlined style={{ fontSize: "48px" }} />
                     <p>Unable to fetch the receipts.</p>
                 </div>
@@ -208,7 +338,7 @@ const RecentReceiptsList = () => {
         );
     }
 
-    // -------- Render --------
+    // --- Render ---
     return (
         <AdminLayout>
             <div className="p-4 bg-white rounded-lg shadow-lg">
@@ -227,6 +357,7 @@ const RecentReceiptsList = () => {
                     <div className="flex items-center space-x-4">
                         <button
                             className="flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-medium rounded-lg hover:opacity-90"
+                            onClick={() => setExportModalOpen(true)}
                         >
                             Export
                         </button>
@@ -276,7 +407,7 @@ const RecentReceiptsList = () => {
                 <DeleteConfirmationModal
                     isOpen={modalVisible}
                     onClose={() => setModalVisible(false)}
-                    onConfirm={handleCancelReceipt}
+                    onConfirm={handleConfirmCancelReceipt}
                     loading={cancelLoading}
                     text="Cancel Receipt"
                 />
@@ -293,6 +424,15 @@ const RecentReceiptsList = () => {
                 />
             </div>
 
+            {/* ===================== Export Modal ===================== */}
+            <ExportModal
+                visible={isExportModalOpen}
+                onClose={() => setExportModalOpen(false)}
+                dataToExport={exportData}
+                title="Receipts_Report"
+                sheet="ReceiptsSheet"
+            />
+
             {/* ===================== Receipt Preview Overlay ===================== */}
             {isReceiptVisible && (
                 <div className="fixed inset-0 z-50">
@@ -307,7 +447,7 @@ const RecentReceiptsList = () => {
                             ref={popupRef}
                             className="relative p-6 w-full max-w-[700px] max-h-[90vh] bg-white rounded-md shadow-md"
                         >
-                            {/* Top-Right Buttons (adjust styling as needed) */}
+                            {/* Top-Right Buttons */}
                             <div className="absolute -top-4 -right-44 mt-4 flex flex-col items-start space-y-2">
                                 {/* Close Button */}
                                 <button
@@ -317,29 +457,31 @@ const RecentReceiptsList = () => {
                                     ✕
                                 </button>
 
-                                {/* Action Buttons */}
+                                {/* Download PDF Button */}
                                 <button
                                     className="w-40 py-2 text-white font-semibold rounded-md"
                                     style={{
                                         background: "linear-gradient(90deg, #C83B62 0%, #7F35CD 100%)",
                                     }}
-                                    onClick={() => {
-                                        // e.g. window.print() or custom PDF generation
-                                    }}
+                                    onClick={handleDownloadPDF}
                                 >
                                     Download PDF
                                 </button>
-                                {/* <button
-                                    className="w-40 py-2 text-white font-semibold rounded-md"
-                                    style={{
-                                        background: "linear-gradient(90deg, #C83B62 0%, #7F35CD 100%)",
-                                    }}
-                                    onClick={() => {
-                                        // e.g. trigger an API call to email the receipt
-                                    }}
-                                >
-                                    Send Receipt
-                                </button> */}
+
+                                {/* If you want a "Send Receipt" button as well, uncomment: */}
+                                {/* 
+                <button
+                  className="w-40 py-2 text-white font-semibold rounded-md"
+                  style={{
+                    background: "linear-gradient(90deg, #C83B62 0%, #7F35CD 100%)",
+                  }}
+                  onClick={() => {
+                    // e.g. trigger an API call to email the receipt
+                  }}
+                >
+                  Send Receipt
+                </button> 
+                */}
                             </div>
 
                             {/* Receipt Component */}
