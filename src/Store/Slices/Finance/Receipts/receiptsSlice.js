@@ -5,10 +5,12 @@ import {
   cancelReceipt,
   updateReceipt,
   deleteReceipt,
+  fetchReceiptCardData, // Import the fetchReceiptCardData action
 } from "./receiptsThunks";
 
 const initialState = {
   receipts: [], // Holds all receipts fetched from the API
+  receiptsSummary: {}, // Holds the receipt card summary data
   loading: false, // Tracks loading state for async actions
   error: null, // Stores error messages
   selectedReceipt: null, // Stores a specific selected receipt
@@ -21,6 +23,7 @@ const receiptsSlice = createSlice({
   reducers: {
     clearReceipts: (state) => {
       state.receipts = [];
+      state.receiptsSummary = {}; // Clear receiptsSummary as well
       state.loading = false;
       state.error = null;
       state.selectedReceipt = null;
@@ -35,6 +38,20 @@ const receiptsSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      // Fetch Receipt Card Data
+      .addCase(fetchReceiptCardData.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchReceiptCardData.fulfilled, (state, action) => {
+        state.loading = false;
+        state.receiptsSummary = action.payload || {}; // Update the summary data
+      })
+      .addCase(fetchReceiptCardData.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Failed to fetch receipt card data.";
+      })
+
       // Fetch All Receipts
       .addCase(fetchAllReceipts.pending, (state) => {
         state.loading = true;
@@ -54,7 +71,7 @@ const receiptsSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(createReceipt.fulfilled, (state, action) => {
+      .addCase(createReceipt.fulfilled, (state) => {
         state.loading = false;
         state.successMessage = "Receipt created successfully!";
       })
@@ -68,7 +85,7 @@ const receiptsSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(cancelReceipt.fulfilled, (state, action) => {
+      .addCase(cancelReceipt.fulfilled, (state) => {
         state.loading = false;
         state.successMessage = "Receipt canceled successfully!";
       })
