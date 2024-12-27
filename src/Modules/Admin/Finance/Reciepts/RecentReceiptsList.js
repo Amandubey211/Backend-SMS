@@ -1,4 +1,5 @@
 // RecentReceiptsList.js
+
 import React, { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import AdminLayout from "../../../../Components/Admin/AdminDashLayout";
@@ -7,6 +8,11 @@ import {
     MoreOutlined,
     ExclamationCircleOutlined,
     SearchOutlined,
+    EditOutlined,
+    DeleteOutlined,
+    CloseCircleOutlined,
+    FilePdfOutlined,
+    FileExcelOutlined,
 } from "@ant-design/icons";
 import { FiUserPlus } from "react-icons/fi";
 import { toast } from "react-hot-toast";
@@ -14,17 +20,21 @@ import { useNavigate } from "react-router-dom";
 import {
     fetchAllReceipts,
     cancelReceipt,
+    deleteReceipt, // <-- Make sure you've exported this from receiptsThunks
 } from "../../../../Store/Slices/Finance/Receipts/receiptsThunks";
 import Spinner from "../../../../Components/Common/Spinner";
 import DeleteConfirmationModal from "../../../../Components/Common/DeleteConfirmationModal";
 import EmailModal from "../../../../Components/Common/EmailModal";
 
-// Import your Receipt component here
+// Import your Receipt component
 import Receipt from "./Components/Receipt"; // Adjust path if needed
 
 // Import jsPDF and html2canvas
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+
+// Import the ExportModal
+import ExportModal from "./Components/ExportModal"; // Adjust the path if needed
 
 const RecentReceiptsList = () => {
     const navigate = useNavigate();
@@ -49,6 +59,9 @@ const RecentReceiptsList = () => {
     const [isReceiptVisible, setReceiptVisible] = useState(false);
     const [selectedReceipt, setSelectedReceipt] = useState(null);
 
+    // Export modal states
+    const [isExportModalOpen, setExportModalOpen] = useState(false);
+
     // Ref for the modal content (used for outside-click detection & PDF generation)
     const popupRef = useRef(null);
 
@@ -59,7 +72,7 @@ const RecentReceiptsList = () => {
         }
     }, [dispatch, receipts.length]);
 
-    // --- Close modal on outside click ---
+    // --- Close receipt preview modal on outside click ---
     useEffect(() => {
         function handleClickOutside(event) {
             if (
@@ -70,7 +83,6 @@ const RecentReceiptsList = () => {
                 setReceiptVisible(false);
             }
         }
-
         document.addEventListener("mousedown", handleClickOutside);
         return () => {
             document.removeEventListener("mousedown", handleClickOutside);
@@ -78,7 +90,7 @@ const RecentReceiptsList = () => {
     }, [isReceiptVisible]);
 
     // --- Cancel a receipt ---
-    const handleCancelReceipt = async () => {
+    const handleConfirmCancelReceipt = async () => {
         setCancelLoading(true);
         const result = await dispatch(cancelReceipt(selectedReceiptId));
         if (result.payload === "Receipt cancel successfully") {
@@ -97,7 +109,35 @@ const RecentReceiptsList = () => {
         setReceiptVisible(true);
     };
 
-    // --- Download PDF ---
+    // --- Update a receipt (placeholder) ---
+    const handleUpdateReceipt = (record) => {
+        // For now, just show a toast or console.log. 
+        // Later, you can navigate or pass the record to an update form.
+        toast.success("Update Receipt clicked! (Not implemented yet)");
+        console.log("Update Receipt Data:", record);
+    };
+
+    // --- Delete a receipt ---
+    const handleDeleteReceipt = async (record) => {
+        // Optionally, you could show a confirmation modal if needed.
+        const confirmDelete = window.confirm("Are you sure you want to delete this receipt?");
+        if (!confirmDelete) return;
+
+        try {
+            const result = await dispatch(deleteReceipt(record._id));
+            if (result.payload === "Receipt Deleted successfully") {
+                toast.success("Receipt deleted successfully!");
+                dispatch(fetchAllReceipts());
+            } else {
+                toast.error("Failed to delete receipt.");
+            }
+        } catch (err) {
+            console.error(err);
+            toast.error("An error occurred while deleting the receipt.");
+        }
+    };
+
+    // --- Download PDF from preview ---
     const handleDownloadPDF = async () => {
         try {
             if (!selectedReceipt) return;
@@ -130,6 +170,8 @@ const RecentReceiptsList = () => {
             toast.error("Failed to generate PDF.");
         }
     };
+
+    // --- Navigate to Add New Receipt Page ---
     const handleNavigate = () => {
         navigate("/finance/receipts/add-new-receipt");
     };
@@ -142,20 +184,39 @@ const RecentReceiptsList = () => {
         setEmailModalOpen(false);
     };
 
-    // --- Dropdown menu for action column ---
+    // --- Build the data for Exporting (matching table columns) ---
+    const exportData = receipts.map((item) => ({
+        "Receipt ID": item.receiptNumber || item._id || "N/A",
+        "Recipient Name":
+            item.reciever?.name || item.receiver?.name || "N/A",
+        "Paid Date": item.date ? new Date(item.date).toLocaleDateString() : "N/A",
+        "Paid Amount": item.totalPaidAmount ? `${item.totalPaidAmount} QAR` : "N/A",
+        Tax: `${item.tax || 0} QAR`,
+        Discount: `${item.discount || 0} QAR`,
+        Penalty: `${item.penalty || 0} QAR`,
+        Remark: item.remark || "N/A",
+    }));
+
+    // --- Action Menu for the 3-dots column ---
     const actionMenu = (record) => (
         <Menu>
             <Menu.Item key="1" onClick={() => handlePreview(record)}>
-                Preview
+                <FilePdfOutlined /> Preview
+            </Menu.Item>
+            <Menu.Item key="2" onClick={() => handleUpdateReceipt(record)}>
+                <EditOutlined /> Update Receipt
             </Menu.Item>
             <Menu.Item
-                key="2"
+                key="3"
                 onClick={() => {
                     setSelectedReceiptId(record._id);
                     setModalVisible(true);
                 }}
             >
-                Cancel Receipt
+                <CloseCircleOutlined /> Cancel Receipt
+            </Menu.Item>
+            <Menu.Item key="4" onClick={() => handleDeleteReceipt(record)}>
+                <DeleteOutlined /> Delete Receipt
             </Menu.Item>
         </Menu>
     );
@@ -164,7 +225,9 @@ const RecentReceiptsList = () => {
     const filteredData = receipts.filter((item) => {
         const receiptNumber = item.receiptNumber?.toLowerCase() || "";
         const receiverName =
-            item.reciever?.name?.toLowerCase() || item.receiver?.name?.toLowerCase() || "";
+            item.reciever?.name?.toLowerCase() ||
+            item.receiver?.name?.toLowerCase() ||
+            "";
         const paidAmount = item.totalPaidAmount?.toString() || "";
         const dateString = item.date ? new Date(item.date).toLocaleDateString() : "";
 
@@ -294,6 +357,7 @@ const RecentReceiptsList = () => {
                     <div className="flex items-center space-x-4">
                         <button
                             className="flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-medium rounded-lg hover:opacity-90"
+                            onClick={() => setExportModalOpen(true)}
                         >
                             Export
                         </button>
@@ -343,7 +407,7 @@ const RecentReceiptsList = () => {
                 <DeleteConfirmationModal
                     isOpen={modalVisible}
                     onClose={() => setModalVisible(false)}
-                    onConfirm={handleCancelReceipt}
+                    onConfirm={handleConfirmCancelReceipt}
                     loading={cancelLoading}
                     text="Cancel Receipt"
                 />
@@ -360,6 +424,15 @@ const RecentReceiptsList = () => {
                 />
             </div>
 
+            {/* ===================== Export Modal ===================== */}
+            <ExportModal
+                visible={isExportModalOpen}
+                onClose={() => setExportModalOpen(false)}
+                dataToExport={exportData}
+                title="Receipts_Report"
+                sheet="ReceiptsSheet"
+            />
+
             {/* ===================== Receipt Preview Overlay ===================== */}
             {isReceiptVisible && (
                 <div className="fixed inset-0 z-50">
@@ -374,7 +447,7 @@ const RecentReceiptsList = () => {
                             ref={popupRef}
                             className="relative p-6 w-full max-w-[700px] max-h-[90vh] bg-white rounded-md shadow-md"
                         >
-                            {/* Top-Right Buttons (adjust styling as needed) */}
+                            {/* Top-Right Buttons */}
                             <div className="absolute -top-4 -right-44 mt-4 flex flex-col items-start space-y-2">
                                 {/* Close Button */}
                                 <button
