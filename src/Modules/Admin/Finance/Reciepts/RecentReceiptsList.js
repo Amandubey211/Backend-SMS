@@ -24,6 +24,7 @@ import EmailModal from "../../../../Components/Common/EmailModal";
 
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+import {ExportOutlined} from "@ant-design/icons"; 
 
 // ExportModal if you have it:
 import ExportModal from "./Components/ExportModal";
@@ -35,7 +36,7 @@ const RecentReceiptsList = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
-    const { receipts = [], loading, error } = useSelector(
+    const { receipts = [], loading, error, pagination = {} } = useSelector(
         (state) => state.admin.receipts || {}
     );
 
@@ -57,15 +58,18 @@ const RecentReceiptsList = () => {
     // Export modal states
     const [isExportModalOpen, setExportModalOpen] = useState(false);
 
+    const [currentPage, setCurrentPage] = useState(1);
+    const [pageLimit, setPageLimit] = useState(10);
+
+
     // Ref for outside-click detection & PDF generation
     const popupRef = useRef(null);
 
     // --- 1) Fetch receipts if empty ---
     useEffect(() => {
-        if (receipts.length === 0) {
-            dispatch(fetchAllReceipts());
-        }
-    }, [dispatch, receipts.length]);
+        dispatch(fetchAllReceipts({ page: currentPage, limit: pageLimit }));
+    }, [dispatch, currentPage, pageLimit]);
+
 
     // --- 2) Close receipt preview modal on outside click ---
     useEffect(() => {
@@ -298,12 +302,16 @@ const RecentReceiptsList = () => {
             render: (penalty) => `${penalty || 0} QAR`,
         },
         {
-            title: "Remark",
-            dataIndex: "remark",
-            key: "remark",
-            sorter: (a, b) => (a.remark || "").localeCompare(b.remark || ""),
-            render: (remark) => remark || "N/A",
+            title: "Invoice Ref ID",
+            dataIndex: "invoiceNumber",
+            key: "invoiceNumber",
+            sorter: (a, b) =>
+                (a.invoiceNumber?.invoiceNumber || "").localeCompare(
+                    b.invoiceNumber?.invoiceNumber || ""
+                ),
+            render: (invoiceNumber) => invoiceNumber?.invoiceNumber || "N/A",
         },
+
         {
             title: "Action",
             key: "action",
@@ -315,29 +323,29 @@ const RecentReceiptsList = () => {
         },
     ];
 
-    // Loading / Error UI
-    if (loading) {
-        return (
-            <AdminLayout>
-                <div style={{ textAlign: "center", padding: "16px" }}>
-                    <Spinner />
-                </div>
-            </AdminLayout>
-        );
-    }
+    // // Loading / Error UI
+    // if (loading) {
+    //     return (
+    //         <AdminLayout>
+    //             <div style={{ textAlign: "center", padding: "16px" }}>
+    //                 <Spinner />
+    //             </div>
+    //         </AdminLayout>
+    //     );
+    // }
 
-    if (error) {
-        return (
-            <AdminLayout>
-                <div
-                    style={{ textAlign: "center", color: "#FF4D4F", marginTop: "16px" }}
-                >
-                    <ExclamationCircleOutlined style={{ fontSize: "48px" }} />
-                    <p>Unable to fetch the receipts.</p>
-                </div>
-            </AdminLayout>
-        );
-    }
+    // if (error) {
+    //     return (
+    //         <AdminLayout>
+    //             <div
+    //                 style={{ textAlign: "center", color: "#FF4D4F", marginTop: "16px" }}
+    //             >
+    //                 <ExclamationCircleOutlined style={{ fontSize: "48px" }} />
+    //                 <p>Unable to fetch the receipts.</p>
+    //             </div>
+    //         </AdminLayout>
+    //     );
+    // }
 
     // Render
     return (
@@ -357,12 +365,15 @@ const RecentReceiptsList = () => {
                     </div>
 
                     <div className="flex items-center space-x-4">
+
                         <button
-                            className="flex items-center px-2 py-1 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-normal rounded-md hover:opacity-90"
+                            className="flex items-center px-2 py-1 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-normal rounded-md hover:opacity-90 space-x-2"
                             onClick={() => setExportModalOpen(true)}
                         >
-                            Export
+                            <ExportOutlined className="text-sm" /> {/* Export Icon */}
+                            <span>Export</span> {/* Button text */}
                         </button>
+
                         <button
                             className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
                             onClick={handleNavigate}
@@ -374,37 +385,107 @@ const RecentReceiptsList = () => {
                         </button>
                     </div>
                 </div>
+                {loading ? (
+                    <div style={{ textAlign: "center", padding: "16px" }}>
+                        <Spinner />
+                    </div>
+                ) : error ? (
+                    <div style={{ textAlign: "center", color: "#FF4D4F", marginTop: "16px" }}>
+                        <ExclamationCircleOutlined style={{ fontSize: "48px" }} />
+                        <p>Unable to fetch the receipts.</p>
+                    </div>
+                ) : filteredData.length === 0 ? (
+                    <div style={{ textAlign: "center", color: "#999", marginTop: "16px" }}>
+                        <ExclamationCircleOutlined style={{ fontSize: "48px" }} />
+                        <p>No receipts available.</p>
+                    </div>
+                ) : (
+                    // Render Table and Custom Pagination
+                    <>
 
-                {/* Table */}
-                <Table
-                    rowKey={(record) => record._id}
-                    columns={columns}
-                    dataSource={filteredData}
-                    expandable={{
-                        expandedRowRender: (record) => (
-                            <div>
-                                <strong>Line Items:</strong>
-                                {record.lineItems && record.lineItems.length > 0 ? (
-                                    <ul>
-                                        {record.lineItems.map((item, index) => (
-                                            <li key={index}>
-                                                {item.revenueType || item.name || "Item"}: {item.total || 0} QAR
-                                            </li>
-                                        ))}
-                                    </ul>
-                                ) : (
-                                    <span>No line items available</span>
-                                )}
-                            </div>
-                        ),
-                    }}
-                    pagination={{
-                        pageSize: 10,
-                        showSizeChanger: true,
-                        position: ["bottomRight"],
-                    }}
-                />
+                        {/* Table */}
+                        <Table
+    rowKey={(record) => record._id}
+    columns={columns}
+    dataSource={filteredData}
+    expandable={{
+        expandedRowRender: (record) => (
+            <div>
+                <strong>Line Items:</strong>
+                {record.lineItems && record.lineItems.length > 0 ? (
+                    <ul>
+                        {record.lineItems.map((item, index) => (
+                            <li key={index}>
+                                {item.revenueType || item.name || "Item"}: {item.total || 0} QAR
+                            </li>
+                        ))}
+                    </ul>
+                ) : (
+                    <span>No line items available</span>
+                )}
+            </div>
+        ),
+    }}
+    pagination={{
+        current: currentPage, // Use state
+        total: pagination.totalRecords, // Total records from API response
+        pageSize: pageLimit, // Use state for limit
+        showSizeChanger: true,
+        pageSizeOptions: ["5", "10", "20", "50"],
+        size: "small",
+        showTotal: (total) =>
+            `Page ${currentPage} of ${Math.ceil(pagination.totalRecords / pageLimit)} | Total ${total} records`,
+        onChange: (page) => {
+            setCurrentPage(page); // Update currentPage state
+        },
+        onShowSizeChange: (current, size) => {
+            setPageLimit(size); // Update pageLimit state
+            setCurrentPage(1); // Reset to the first page
+        },
+    }}
+    summary={() => {
+        let totalPaidAmount = 0;
+        let totalTax = 0;
+        let totalDiscount = 0;
+        let totalPenalty = 0;
 
+        // Calculate totals from filteredData
+        filteredData.forEach((record) => {
+            totalPaidAmount += record.totalPaidAmount || 0;
+            totalTax += record.tax || 0;
+            totalDiscount += record.discount || 0;
+            totalPenalty += record.penalty || 0;
+        });
+
+        return (
+            <Table.Summary.Row>
+                <Table.Summary.Cell index={0} colSpan={3}>
+                    <strong>Totals:</strong>
+                </Table.Summary.Cell>
+                <Table.Summary.Cell index={1}>
+                    <strong>{totalPaidAmount.toLocaleString()} QAR</strong>
+                </Table.Summary.Cell>
+                <Table.Summary.Cell index={2}>
+                    <strong>{totalTax.toLocaleString()} QAR</strong>
+                </Table.Summary.Cell>
+                <Table.Summary.Cell index={3}>
+                    <strong>{totalDiscount.toLocaleString()} QAR</strong>
+                </Table.Summary.Cell>
+                <Table.Summary.Cell index={4}>
+                    <strong>{totalPenalty.toLocaleString()} QAR</strong>
+                </Table.Summary.Cell>
+                <Table.Summary.Cell index={5} />
+            </Table.Summary.Row>
+        );
+    }}
+    size="small"
+    bordered
+/>
+
+
+
+                    </>
+                )}
                 {/* Cancel Confirmation Modal */}
                 <DeleteConfirmationModal
                     isOpen={modalVisible}

@@ -26,7 +26,7 @@ const RecentReceipts = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const { receipts = [], loading, error } = useSelector(
+  const { receipts = [], loading, error, pagination = {} } = useSelector(
     (state) => state.admin.receipts || {}
   );
 
@@ -48,10 +48,11 @@ const RecentReceipts = () => {
   // -------------------- Lifecycle --------------------
   useEffect(() => {
     if (!dataFetched) {
-      dispatch(fetchAllReceipts());
+      dispatch(fetchAllReceipts({ page: pagination.currentPage || 1, limit: 5}));
       setDataFetched(true);
     }
-  }, [dispatch, dataFetched]);
+  }, [dispatch, dataFetched, pagination.currentPage, pagination.limit]);
+
 
   // Close modal if user clicks outside the popup
   useEffect(() => {
@@ -200,44 +201,49 @@ const RecentReceipts = () => {
       render: (penalty) => `${penalty || 0} QAR`,
     },
     {
-      title: "Remark",
-      dataIndex: "remark",
-      key: "remark",
-      sorter: (a, b) => (a.remark || "").localeCompare(b.remark || ""),
-      render: (remark) => remark || "N/A",
-    },
-    {
-      title: "Action",
-      key: "action",
-      render: (_, record) => (
-        <Dropdown
-          overlay={
-            <Menu>
-              {/* 1) Preview in a popup */}
-              <Menu.Item onClick={() => handlePreview(record)}>Preview</Menu.Item>
+      title: "Invoice Ref ID",
+      dataIndex: "invoiceNumber",
+      key: "invoiceNumber",
+      sorter: (a, b) =>
+          (a.invoiceNumber?.invoiceNumber || "").localeCompare(
+              b.invoiceNumber?.invoiceNumber || ""
+          ),
+      render: (invoiceNumber) => invoiceNumber?.invoiceNumber || "N/A",
+  },
+  ,
+    // },
+    // {
+    //   title: "Action",
+    //   key: "action",
+    //   render: (_, record) => (
+    //     <Dropdown
+    //       overlay={
+    //         <Menu>
+    //           {/* 1) Preview in a popup */}
+    //           <Menu.Item onClick={() => handlePreview(record)}>Preview</Menu.Item>
 
-              {/* 2) View as read-only in CreateReceipt */}
-              <Menu.Item onClick={() => handleViewReadOnly(record)}>
-                View (Read-Only)
-              </Menu.Item>
+    //           {/* 2) View as read-only in CreateReceipt */}
+    //           <Menu.Item onClick={() => handleViewReadOnly(record)}>
+    //             View (Read-Only)
+    //           </Menu.Item>
 
-              {/* 3) Cancel Receipt */}
-              <Menu.Item
-                onClick={() => {
-                  setSelectedReceiptId(record._id);
-                  setModalVisible(true);
-                }}
-              >
-                Cancel Receipt
-              </Menu.Item>
-            </Menu>
-          }
-          trigger={["click"]}
-        >
-          <MoreOutlined style={{ fontSize: "16px", cursor: "pointer" }} />
-        </Dropdown>
-      ),
-    },
+    //           {/* 3) Cancel Receipt */}
+    //           <Menu.Item
+    //             onClick={() => {
+    //               setSelectedReceiptId(record._id);
+    //               setModalVisible(true);
+    //             }}
+    //           >
+    //             Cancel Receipt
+    //           </Menu.Item>
+    //         </Menu>
+    //       }
+    //       trigger={["click"]}
+    //     >
+    //       <MoreOutlined style={{ fontSize: "16px", cursor: "pointer" }} />
+    //     </Dropdown>
+    //   ),
+    // },
   ];
 
   // -------------------- Loading / Error States --------------------
@@ -277,31 +283,35 @@ const RecentReceipts = () => {
       }}
     >
       <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          marginBottom: "16px",
-          alignItems: "center",
-        }}
-      >
-        <h2 style={{ fontSize: "1.25rem", fontWeight: "600" }}>
-          Recent Receipts List
-        </h2>
-        <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
-          <button
-            onClick={() => navigate("/finance/receipts/receipt-list")}
-            className="px-3 py-1 rounded-md border border-gray-400 shadow-md hover:shadow-xl hover:shadow-gray-300 transition duration-200 text-white bg-gradient-to-r from-pink-500 to-purple-500"
-          >
-            View More
-          </button>
-        </div>
-      </div>
+  style={{
+    display: "flex",
+    justifyContent: "space-between",
+    marginBottom: "16px",
+    alignItems: "center",
+  }}
+>
+  {/* Title with counts */}
+  <h2 style={{ fontSize: "1.25rem", fontWeight: "600" }}>
+    Recent Receipts List ({receipts.length}/{pagination.totalRecords || 0})
+  </h2>
+
+  {/* View More Button with counts */}
+  <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
+    <button
+      onClick={() => navigate("/finance/receipts/receipt-list")}
+      className="px-3 py-1 rounded-md border border-gray-400 shadow-md hover:shadow-xl hover:shadow-gray-300 transition duration-200 text-white bg-gradient-to-r from-pink-500 to-purple-500"
+    >
+      View More ({pagination.totalRecords || 0})
+    </button>
+  </div>
+</div>
+
 
       {/* The Receipts Table */}
       <Table
         rowKey={(record) => record._id}
         columns={columns}
-        dataSource={filteredData}
+        dataSource={receipts}
         expandable={{
           expandedRowRender: (record) => (
             <div>
@@ -320,12 +330,33 @@ const RecentReceipts = () => {
             </div>
           ),
         }}
-        pagination={{
-          pageSize: 5,
-          showSizeChanger: true,
-          position: ["bottomRight"],
-        }}
+        size='small'
+        pagination={false} // Disable Ant Design pagination
       />
+
+      
+      {/* Custom Pagination Component */}
+      {/*
+      <div style={{ display: "flex", justifyContent: "center", marginTop: "20px" }}>
+        <button
+          onClick={() => dispatch(fetchAllReceipts({ page: pagination.currentPage - 1, limit: pagination.limit }))}
+          disabled={pagination.currentPage === 1}
+          className="px-3 py-1 mx-1 rounded-md border border-gray-400 bg-gray-200 hover:bg-gray-300 disabled:bg-gray-100 disabled:cursor-not-allowed"
+        >
+          Previous
+        </button>
+        <span className="px-3 py-1 mx-2 font-semibold">
+          Page {pagination.currentPage || 1} of {pagination.totalPages || 1}
+        </span>
+        <button
+          onClick={() => dispatch(fetchAllReceipts({ page: pagination.currentPage + 1, limit: pagination.limit }))}
+          disabled={pagination.currentPage === pagination.totalPages}
+          className="px-3 py-1 mx-1 rounded-md border border-gray-400 bg-gray-200 hover:bg-gray-300 disabled:bg-gray-100 disabled:cursor-not-allowed"
+        >
+          Next
+        </button>
+      </div> */}
+
 
       {/* Cancel Receipt Confirmation Modal (unchanged) */}
       <DeleteConfirmationModal
@@ -375,6 +406,8 @@ const RecentReceipts = () => {
                 </button>
 
               </div>
+
+
 
               {/* Receipt Component */}
               <Receipt receiptData={selectedReceipt} />
