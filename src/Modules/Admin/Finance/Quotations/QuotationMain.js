@@ -2,7 +2,7 @@ import React from "react";
 import AdminDashLayout from "../../../../Components/Admin/AdminDashLayout";
 import CardsSection from "./CardsSection";
 import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
-import { FiUserPlus } from "react-icons/fi";
+import { FiPlus, FiUserPlus } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import QuotationReceipts from "./Components/RecentQuotation.table";
 
@@ -49,7 +49,7 @@ const QuotationMain = () => {
                     >
                         <span className="text-gray-800 font-medium">Add New Quotation</span>
                         <div className="w-12 h-12 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center text-white">
-                            <FiUserPlus size={16} />
+                            <FiPlus size={16} />
                         </div>
                     </button>
                 </div>

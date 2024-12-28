@@ -22,8 +22,8 @@ const Card = ({ title, count, icon }) => {
 
       {/* Value and Trend */}
       <div className="flex justify-between items-center">
-        <h2 className="text-xl md:text-2xl font-bold text-purple-800 truncate">
-          {count}
+        <h2 className="text-xl md:text-2xl font-bold text-purple-800 truncate px-2">
+          {count} <span className="text-xs">{count === 1 ? "quotation" : "quotations"}</span>
         </h2>
       </div>
     </div>
