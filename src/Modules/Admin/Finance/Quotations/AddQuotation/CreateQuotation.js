@@ -14,19 +14,20 @@ import Layout from "../../../../../Components/Common/Layout";
 const CreateQuotation = () => {
   const [loading, setLoading] = useState(false);
   const initialValues = {
-    contactNumberFrom: "",
-    mailIdFrom: "",
     notes: "",
-    vendorName: "",
-    addressTo: "",
-    contactNumberTo: "",
-    mailIdTo: "",
+    receiver: {
+      name: "",
+      email: "",
+      address: "",
+      phone:""
+    },
     purpose: "",
     status: "pending",
     lineItems: [{ revenueType: "", quantity: 1, amount: 0 }],
     quotationDate: "",
     subAmount: 0,
     tax: 0,
+    discountType: "percentage",
     discount: 0,
     finalAmount: 0,
     document: null,
@@ -38,12 +39,10 @@ const CreateQuotation = () => {
   };
 
   const validationSchema = Yup.object().shape({
-    contactNumberFrom: Yup.string().required("Contact Number is required"),
-    mailIdFrom: Yup.string().email("Invalid email").required("Mail ID is required"),
-    vendorName: Yup.string().required("Vendor/Organisation Name is required"),
-    addressTo: Yup.string().required("Address is required"),
-    contactNumberTo: Yup.string().required("Contact Number is required"),
-    mailIdTo: Yup.string().email("Invalid email").required("Mail ID is required"),
+    receiver: Yup.object().shape({
+      name: Yup.string().required("Receiver Name is required"),
+      email: Yup.string().email("Invalid email"),
+    }),
     purpose: Yup.string().required("Purpose is required"),
     items: Yup.array().of(
       Yup.object().shape({
@@ -52,6 +51,12 @@ const CreateQuotation = () => {
         rate: Yup.number().min(0, "Rate must be positive").required(),
       })
     ),
+    discountType: Yup.string()
+      .oneOf(["percentage", "amount"], "Invalid discount type")
+      .required("Discount type is required"),
+    discount: Yup.number()
+      .min(0, "Discount must be positive")
+      .required("Discount is required"),
     quotationDate: Yup.string().required("Quotation Date is required"),
     finalAmount: Yup.number().min(0, "Final amount must be positive"),
     remainingAmount: Yup.number().min(0, "Remaining amount must be positive"),
@@ -73,215 +78,202 @@ const CreateQuotation = () => {
 
   return (
     <Layout>
-    <DashLayout>
-      <div className="p-6 min-h-screen">
+      <DashLayout>
+        <div className="p-6 min-h-screen">
 
-        {/* Form Section */}
-        <Formik
-          initialValues={initialValues}
-          validationSchema={validationSchema}
-          onSubmit={handleSubmit}
-        >
-          {({ values, setFieldValue, isSubmitting }) => (
-            <Form>
-              <div className="flex justify-between gap-4 mb-6">
-                <div>
-                  <h1 className="text-2xl font-semibold mb-6">Create Quotation</h1>
+          {/* Form Section */}
+          <Formik
+            initialValues={initialValues}
+            validationSchema={validationSchema}
+            onSubmit={handleSubmit}
+          >
+            {({ values, setFieldValue, isSubmitting }) => (
+              <Form>
+                <div className="flex justify-between gap-4 mb-6">
+                  <div>
+                    <h1 className="text-2xl font-semibold mb-6">Create Quotation</h1>
+                  </div>
+                  <div className="gap-4">
+                    <button
+                      type="reset"
+                      className="border border-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-100"
+                    >
+                      Reset
+                    </button>
+                    <button
+                      type="button"
+                      className="border border-gray-300 text-gray-700 px-4 py-2 mx-2 rounded-md hover:bg-gray-100"
+                    >
+                      Preview
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={loading || isSubmitting}
+                      className="px-4 py-2 rounded-md text-white"
+                      //onClick={() => handleSubmit(values)}
+                      style={{
+                        background: "linear-gradient(to right, #ec4899, #a855f7)", // from-pink-500 to-purple-500
+                      }}
+                    >
+                      {loading ? 'Loading..' : 'Save Quotation'}
+                    </button></div>
                 </div>
-                <div className="gap-4">
-                  <button
-                    type="reset"
-                    className="border border-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-100"
-                  >
-                    Reset
-                  </button>
-                  <button
-                    type="button"
-                    className="border border-gray-300 text-gray-700 px-4 py-2 mx-2 rounded-md hover:bg-gray-100"
-                  >
-                    Preview
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={loading || isSubmitting}
-                    className="px-4 py-2 rounded-md text-white"
-                    //onClick={() => handleSubmit(values)}
-                    style={{
-                      background: "linear-gradient(to right, #ec4899, #a855f7)", // from-pink-500 to-purple-500
-                    }}
-                  >
-                    {loading ? 'Loading..' : 'Save Quotation'}
-                  </button></div>
-              </div>
-              {/* Quotation From Section */}
-              <h2 className="text-lg font-semibold mb-4">Quotation From</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                <TextInput
-                  name="contactNumberFrom"
-                  label="Contact Number"
-                  placeholder="Enter contact number"
-                />
-                <TextInput
-                  name="mailIdFrom"
-                  label="Mail ID"
-                  placeholder="Enter mail ID"
-                />
-                <TextInput
-                  name="notes"
-                  label="Notes"
-                  placeholder="Write notes here"
-                />
-              </div>
+                {/* Quotation From Section */}
+                <h2 className="text-lg font-semibold mb-4">Quotation To</h2>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                  <TextInput
+                    name="receiver.name"
+                    label="Receiver Name"
+                    placeholder="Enter receiver's name"
+                  />
+                  <TextInput
+                    name="receiver.address"
+                    label="Address"
+                    placeholder="Enter Address"
+                  />
+                  <TextInput
+                    name="receiver.phone"
+                    label="Contact Number"
+                    placeholder="Enter contact number"
+                  />
+                  <TextInput
+                    name="receiver.email"
+                    label="Mail ID"
+                    placeholder="Enter mail ID"
+                  />
+                  <TextInput
+                    name="purpose"
+                    label="Purpose"
+                    placeholder="Enter purpose"
+                  />
+                </div>
 
-              {/* Quotation To Section */}
-              <h2 className="text-lg font-semibold mb-4">Quotation To</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                <TextInput
-                  name="vendorName"
-                  label="Vendor/Organisation Name"
-                  placeholder="Enter name"
-                />
-                <TextInput
-                  name="addressTo"
-                  label="Address"
-                  placeholder="Enter Address"
-                />
-                <TextInput
-                  name="contactNumberTo"
-                  label="Contact Number"
-                  placeholder="Enter contact number"
-                />
-                <TextInput
-                  name="mailIdTo"
-                  label="Mail ID"
-                  placeholder="Enter mail ID"
-                />
-                <TextInput
-                  name="purpose"
-                  label="Purpose"
-                  placeholder="Enter purpose"
-                />
-              </div>
+                {/* Quotation Details Section */}
+                <div className="p-6 rounded-md flex items-center flex-col justify-center mx-20" style={{ backgroundColor: "#ECECEC" }}>
+                  <h2 className="text-lg font-semibold mb-4">Items</h2>
+                  <FieldArray name="lineItems">
+                    {({ remove, push }) => (
+                      <>
+                        {values.lineItems.map((item, index) => (
+                          <div
+                            key={index}
+                            className="grid grid-cols-12 gap-4 items-center mb-4"
+                          >
+                            <div className="col-span-4">
+                              <SelectInput
+                                name={`lineItems.${index}.revenueType`}
+                                label="Revenue Type"
+                                options={["studentFee",
+                                  "FacilityRevenue",
+                                  "service_based_revenue",
+                                  "community_externalaffair_revenue",
+                                  "financial_investment_revenue",
+                                  "Penalties",
+                                  "Other",]}
+                              />
+                            </div>
 
-              {/* Quotation Details Section */}
-              <div className="p-6 rounded-md flex items-center flex-col justify-center mx-20" style={{ backgroundColor: "#ECECEC" }}>
-                <h2 className="text-lg font-semibold mb-4">Items</h2>
-                <FieldArray name="lineItems">
-                  {({ remove, push }) => (
-                    <>
-                      {values.lineItems.map((item, index) => (
-                        <div
-                          key={index}
-                          className="grid grid-cols-12 gap-4 items-center mb-4"
-                        >
-                          <div className="col-span-4">
-                            <SelectInput
-                              name={`lineItems.${index}.revenueType`}
-                              label="Revenue Type"
-                              options={["studentFee",
-                                "FacilityRevenue",
-                                "service_based_revenue",
-                                "community_externalaffair_revenue",
-                                "financial_investment_revenue",
-                                "Penalties",
-                                "Other",]}
-                            />
+                            <div className="col-span-3">
+                              <TextInput
+                                name={`lineItems.${index}.quantity`}
+                                label="Quantity"
+                                type="number"
+                                placeholder="Enter Quantity"
+                              />
+                            </div>
+                            <div className="col-span-3">
+                              <TextInput
+                                name={`lineItems.${index}.amount`}
+                                label="Amount"
+                                type="number"
+                                placeholder="Enter Amount"
+                              />
+                            </div>
+                            <div className="col-span-2 flex items-center justify-center">
+                              <button
+                                type="button"
+                                onClick={() => remove(index)}
+                                className="text-red-500 hover:text-red-700"
+                              >
+                                ✖
+                              </button>
+                            </div>
                           </div>
-
-                          <div className="col-span-3">
-                            <TextInput
-                              name={`lineItems.${index}.quantity`}
-                              label="Quantity"
-                              type="number"
-                              placeholder="Enter Quantity"
-                            />
-                          </div>
-                          <div className="col-span-3">
-                            <TextInput
-                              name={`lineItems.${index}.amount`}
-                              label="Amount"
-                              type="number"
-                              placeholder="Enter Amount"
-                            />
-                          </div>
-                          <div className="col-span-2 flex items-center justify-center">
-                            <button
-                              type="button"
-                              onClick={() => remove(index)}
-                              className="text-red-500 hover:text-red-700"
-                            >
-                              ✖
-                            </button>
-                          </div>
+                        ))}
+                        <div className="flex justify-center items-center flex-col mt-4">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              push({ revenueType: "", quantity: 1, amount: 0 })
+                            }
+                            className="rounded-full w-12 h-12 flex items-center justify-center"
+                            style={{
+                              background: "linear-gradient(to right, #ec4899, #a855f7)", // from-pink-500 to-purple-500
+                            }}
+                          >
+                            <span className="text-white text-lg">+</span>
+                          </button>
+                          <span className="text-gray-600 text-sm mt-2">Add Item</span>
                         </div>
-                      ))}
-                      <div className="flex justify-center items-center flex-col mt-4">
-                        <button
-                          type="button"
-                          onClick={() =>
-                            push({ revenueType: "", quantity: 1, amount: 0 })
-                          }
-                          className="rounded-full w-12 h-12 flex items-center justify-center"
-                          style={{
-                            background: "linear-gradient(to right, #ec4899, #a855f7)", // from-pink-500 to-purple-500
-                          }}
-                        >
-                          <span className="text-white text-lg">+</span>
-                        </button>
-                        <span className="text-gray-600 text-sm mt-2">Add Item</span>
-                      </div>
-                    </>
-                  )}
-                </FieldArray>
-              </div>
+                      </>
+                    )}
+                  </FieldArray>
+                </div>
 
-              {/* Additional Details Section */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                <TextInput name="quotationDate" label="Quotation Date" placeholder="Enter date and time" type="datetime-local" />
-                <TextInput
-                  name="subAmount"
-                  label="Sub Amount"
-                  placeholder="Enter sub total"
-                />
-                <TextInput
-                  name="tax"
-                  label="Tax (Inc/Exc)"
-                  placeholder="Enter tax percentage"
-                />
-                <TextInput
-                  name="discount"
-                  label="Discount"
-                  placeholder="Enter discount"
-                />
-                <TextInput
-                  name="finalAmount"
-                  label="Final Amount (After tax/discount)"
-                  placeholder="Enter final amount"
-                  readOnly
-                />
-                <TextInput
-                  name="govtRefNumber"
-                  label="Govt Reference Number"
-                  placeholder="Enter Govt Reference Number"
-                />
-                <FileInput
-                  name="document"
-                  label="Add Document (if any)"
-                  placeholder="Upload file"
-                />
-                <SelectInput
-                  name='status'
-                  label="status"
-                  options={["pending",
-                    "accept",
-                    "reject",]}
-                />
-              </div>
-            </Form>
-          )}
-        </Formik>
-      </div>
-    </DashLayout>
+                {/* Additional Details Section */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                  <TextInput name="quotationDate" label="Quotation Date" placeholder="Enter date and time" type="datetime-local" />
+                  <TextInput
+                    name="subAmount"
+                    label="Sub Amount"
+                    placeholder="Enter sub total"
+                  />
+                  <TextInput
+                    name="tax"
+                    label="Tax (Inc/Exc)"
+                    placeholder="Enter tax percentage"
+                  />
+                  <SelectInput
+                    name="discountType"
+                    label="Discount Type"
+                    options={["percentage", "amount"]}
+                  />
+
+                  <TextInput
+                    name="discount"
+                    label={`Discount (${values.discountType === "percentage" ? "%" : "Amount"})`}
+                    placeholder={`Enter discount ${values.discountType}`}
+                    type="number"
+                  />
+                  <TextInput
+                    name="finalAmount"
+                    label="Final Amount (After tax/discount)"
+                    placeholder="Enter final amount"
+                    readOnly
+                  />
+                  <TextInput
+                    name="govtRefNumber"
+                    label="Govt Reference Number"
+                    placeholder="Enter Govt Reference Number"
+                  />
+                  <FileInput
+                    name="document"
+                    label="Add Document (if any)"
+                    placeholder="Upload file"
+                  />
+                  <SelectInput
+                    name='status'
+                    label="status"
+                    options={["pending",
+                      "accept",
+                      "reject",]}
+                  />
+                </div>
+              </Form>
+            )}
+          </Formik>
+        </div>
+      </DashLayout>
     </Layout>
   );
 };

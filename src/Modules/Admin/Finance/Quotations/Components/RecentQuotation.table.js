@@ -67,11 +67,16 @@ const RecentQuotation = () => {
             title: "Discount",
             dataIndex: "discount",
             key: "discount",
-            render: (value) => (
-                <Tag color="purple" className="text-xs">
+            render: (value, record) =>
+                record.discountType === "percentage" ? (
+                  <Tag color="purple" className="text-xs">
+                    {value || 0}%
+                  </Tag>
+                ) : (
+                  <Tag color="orange" className="text-xs">
                     {value || 0} QR
-                </Tag>
-            ),
+                  </Tag>
+                ),
             width: 100,
             ellipsis: true,
         },
@@ -91,9 +96,10 @@ const RecentQuotation = () => {
     const dataSource = quotations?.slice(0, 5).map((quotation) => ({
         key: quotation._id,
         quotationNumber: quotation.quotationNumber || "N/A",
-        quotationTo: quotation.reciever?.name || "N/A",
-        purpose: quotation.remark || "N/A",
+        quotationTo: quotation.receiver?.name || "N/A",
+        purpose: quotation.purpose || "N/A",
         discount: quotation.discount || 0,
+        discountType: quotation.discountType || "percentage",
         final_amount: quotation.final_amount || 0,
     }));
     console.log("totalRecords", totalRecords);
