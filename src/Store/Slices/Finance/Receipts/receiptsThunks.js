@@ -65,10 +65,10 @@ export const createReceipt = createAsyncThunk(
       });
 
       // Document (file) if present
-      if (payload.document) {
-        console.log("Attaching document:", payload.document);
-        formData.append("document", payload.document);
-      }
+      // if (payload.document) {
+      //   console.log("Attaching document:", payload.document);
+      //   formData.append("document", payload.document);
+      // }
 
       // 5) POST
       const response = await postData("/finance/revenue/create/receipt", formData, {

@@ -1,5 +1,12 @@
+// src/Store/Slices/Finance/Adjustments/penaltyAdjustmentSlice.js
+
 import { createSlice } from "@reduxjs/toolkit";
-import { cancleReturnInvoiceData, fetchReturnCardData, fetchReturnInvoice } from "./adjustment.thunk";
+import {
+  cancleReturnInvoiceData,
+  fetchReturnCardData,
+  fetchReturnInvoice,
+  createAdjustment,
+} from "./adjustment.thunk";
 
 const initialState = {
   adjustmentData: [],
@@ -8,23 +15,21 @@ const initialState = {
   totalRecords: 0,
   pageSize: 5,
   loading: false,
-  error: null, // Changed from boolean to allow storing error messages
+  error: null, // Changed from boolean to store error messages
   returnCardData: {},
+  successMessage: null, // To store success messages
 };
 
 const penaltyAdjustmentSlice = createSlice({
   name: "penaltyandAdjustment",
   initialState,
   reducers: {
-    // Set the current page for pagination
     setCurrentPage: (state, action) => {
       state.currentPage = action.payload;
     },
-    // Update the page size dynamically
     setPageSize: (state, action) => {
       state.pageSize = action.payload;
     },
-    // Reset adjustment data and pagination info
     resetAdjustmentData: (state) => {
       state.adjustmentData = [];
       state.currentPage = 0;
@@ -32,10 +37,13 @@ const penaltyAdjustmentSlice = createSlice({
       state.totalRecords = 0;
       state.loading = false;
       state.error = null;
+      state.successMessage = null;
     },
-    // Clear error messages
     clearError: (state) => {
       state.error = null;
+    },
+    clearSuccessMessage: (state) => {
+      state.successMessage = null;
     },
   },
   extraReducers: (builder) => {
@@ -54,7 +62,7 @@ const penaltyAdjustmentSlice = createSlice({
       })
       .addCase(fetchReturnInvoice.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload || "Failed to fetch return invoice.";
+        state.error = action.payload || "Failed to fetch return invoices.";
       })
 
       // Fetch Return Card Data
@@ -78,10 +86,31 @@ const penaltyAdjustmentSlice = createSlice({
       })
       .addCase(cancleReturnInvoiceData.fulfilled, (state) => {
         state.loading = false;
+        state.successMessage = "Return invoice canceled successfully!";
+        // Optionally, remove the canceled invoice from adjustmentData
+        // Example:
+        // state.adjustmentData = state.adjustmentData.filter(item => item._id !== action.payload.id);
       })
       .addCase(cancleReturnInvoiceData.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Failed to cancel return invoice.";
+      })
+
+      // Create Adjustment
+      .addCase(createAdjustment.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.successMessage = null;
+      })
+      .addCase(createAdjustment.fulfilled, (state, action) => {
+        state.loading = false;
+        state.successMessage = "Adjustment created successfully!";
+        state.adjustmentData.unshift(action.payload.adjustment); // Assuming the API returns the created adjustment
+        state.totalRecords += 1;
+      })
+      .addCase(createAdjustment.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Failed to create adjustment.";
       });
   },
 });
@@ -91,6 +120,7 @@ export const {
   setPageSize,
   resetAdjustmentData,
   clearError,
+  clearSuccessMessage,
 } = penaltyAdjustmentSlice.actions;
 
 export default penaltyAdjustmentSlice.reducer;

@@ -301,7 +301,7 @@ const CreateReceipt = () => {
                   placeholder="Any remarks here"
                   disabled={readOnly}
                 />
-                <FileInput
+                {/* <FileInput
                   name="document"
                   label="Add Document (if any)"
                   placeholder="Upload file"
@@ -311,7 +311,7 @@ const CreateReceipt = () => {
                     }
                   }}
                   disabled={readOnly}
-                />
+                /> */}
               </div>
             </Form>
           )}
