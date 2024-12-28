@@ -48,7 +48,7 @@ const RecentReceipts = () => {
   // -------------------- Lifecycle --------------------
   useEffect(() => {
     if (!dataFetched) {
-      dispatch(fetchAllReceipts({ page: pagination.currentPage || 1, limit: pagination.limit || 10 }));
+      dispatch(fetchAllReceipts({ page: pagination.currentPage || 1, limit: 5}));
       setDataFetched(true);
     }
   }, [dispatch, dataFetched, pagination.currentPage, pagination.limit]);
@@ -207,38 +207,39 @@ const RecentReceipts = () => {
       sorter: (a, b) => (a.receiptNumber || "").localeCompare(b.receiptNumber || ""),
       render: (receiptNumber) => receiptNumber || "N/A",
     },
-    {
-      title: "Action",
-      key: "action",
-      render: (_, record) => (
-        <Dropdown
-          overlay={
-            <Menu>
-              {/* 1) Preview in a popup */}
-              <Menu.Item onClick={() => handlePreview(record)}>Preview</Menu.Item>
+    // },
+    // {
+    //   title: "Action",
+    //   key: "action",
+    //   render: (_, record) => (
+    //     <Dropdown
+    //       overlay={
+    //         <Menu>
+    //           {/* 1) Preview in a popup */}
+    //           <Menu.Item onClick={() => handlePreview(record)}>Preview</Menu.Item>
 
-              {/* 2) View as read-only in CreateReceipt */}
-              <Menu.Item onClick={() => handleViewReadOnly(record)}>
-                View (Read-Only)
-              </Menu.Item>
+    //           {/* 2) View as read-only in CreateReceipt */}
+    //           <Menu.Item onClick={() => handleViewReadOnly(record)}>
+    //             View (Read-Only)
+    //           </Menu.Item>
 
-              {/* 3) Cancel Receipt */}
-              <Menu.Item
-                onClick={() => {
-                  setSelectedReceiptId(record._id);
-                  setModalVisible(true);
-                }}
-              >
-                Cancel Receipt
-              </Menu.Item>
-            </Menu>
-          }
-          trigger={["click"]}
-        >
-          <MoreOutlined style={{ fontSize: "16px", cursor: "pointer" }} />
-        </Dropdown>
-      ),
-    },
+    //           {/* 3) Cancel Receipt */}
+    //           <Menu.Item
+    //             onClick={() => {
+    //               setSelectedReceiptId(record._id);
+    //               setModalVisible(true);
+    //             }}
+    //           >
+    //             Cancel Receipt
+    //           </Menu.Item>
+    //         </Menu>
+    //       }
+    //       trigger={["click"]}
+    //     >
+    //       <MoreOutlined style={{ fontSize: "16px", cursor: "pointer" }} />
+    //     </Dropdown>
+    //   ),
+    // },
   ];
 
   // -------------------- Loading / Error States --------------------
@@ -324,8 +325,9 @@ const RecentReceipts = () => {
         pagination={false} // Disable Ant Design pagination
       />
 
+      
       {/* Custom Pagination Component */}
-      {/* Custom Pagination Component */}
+      {/*
       <div style={{ display: "flex", justifyContent: "center", marginTop: "20px" }}>
         <button
           onClick={() => dispatch(fetchAllReceipts({ page: pagination.currentPage - 1, limit: pagination.limit }))}
@@ -344,7 +346,7 @@ const RecentReceipts = () => {
         >
           Next
         </button>
-      </div>
+      </div> */}
 
 
       {/* Cancel Receipt Confirmation Modal (unchanged) */}
