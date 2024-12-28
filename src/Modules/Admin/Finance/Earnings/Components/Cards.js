@@ -1,4 +1,5 @@
-// src/Modules/Admin/Finance/Earnings/Cards.js
+// src/Modules/Admin/Finance/Earnings/Components/Cards.js
+
 import React from "react";
 import PropTypes from "prop-types";
 

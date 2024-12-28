@@ -1,7 +1,13 @@
 // src/Store/Slices/Finance/Earnings/earningsSlice.js
 
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchAllIncomes, addEarnings, updateEarnings } from "./earningsThunks";
+import {
+  fetchAllIncomes,
+  addEarnings,
+  updateEarnings,
+  fetchEarningGraph,
+  fetchCardDataRevenue,
+} from "./earningsThunks";
 
 const initialState = {
   incomes: [],
@@ -11,14 +17,19 @@ const initialState = {
   pageSize: 5,
   filters: {},
   loading: false,
+
   error: null,
+  graphLoading: false,
+  graphError: false,
   readOnly: false,
   selectedIncome: null,
-  // New statistics fields
   totalRevenue: 0,
   remainingPartialPaidRevenue: 0,
   totalPaidAmount: 0,
   unpaidRevenue: 0,
+  // New state fields for dynamic data
+  expenseGraph: [],
+  cardDataRevenue: [],
 };
 
 const earningsSlice = createSlice({
@@ -33,11 +44,15 @@ const earningsSlice = createSlice({
       state.loading = false;
       state.error = null;
       state.filters = {};
+      state.selectedIncome = null;
       // Reset statistics
       state.totalRevenue = 0;
       state.remainingPartialPaidRevenue = 0;
       state.totalPaidAmount = 0;
       state.unpaidRevenue = 0;
+      // Reset dynamic data
+      state.expenseGraph = [];
+      state.cardDataRevenue = [];
     },
     setSelectedIncome(state, action) {
       state.selectedIncome = action.payload;
@@ -87,11 +102,12 @@ const earningsSlice = createSlice({
         state.incomes = [];
         state.totalRecords = 0;
         state.totalPages = 0;
-        // Reset statistics on error
         state.totalRevenue = 0;
         state.remainingPartialPaidRevenue = 0;
         state.totalPaidAmount = 0;
         state.unpaidRevenue = 0;
+        state.graphError = false;
+        state.graphLoading = false;
       })
 
       // Add Earnings
@@ -101,7 +117,14 @@ const earningsSlice = createSlice({
       })
       .addCase(addEarnings.fulfilled, (state, action) => {
         state.loading = false;
-        // Optionally, you might refresh data or update the store
+        // // Optionally, you might refresh data or update the store
+        // // For example, prepend the new income to the incomes array
+        // state.incomes.unshift(action.payload);
+        // state.totalRecords += 1;
+        // // Update statistics
+        // state.totalRevenue += action.payload.final_amount || 0;
+        // state.totalPaidAmount += action.payload.paid_amount || 0;
+        // state.unpaidRevenue += action.payload.remaining_amount || 0;
       })
       .addCase(addEarnings.rejected, (state, action) => {
         state.loading = false;
@@ -115,11 +138,60 @@ const earningsSlice = createSlice({
       })
       .addCase(updateEarnings.fulfilled, (state, action) => {
         state.loading = false;
-        // Optionally, you might refresh data or update the store
+        // Optionally, update the specific income in the incomes array
+        // const index = state.incomes.findIndex(
+        //   (income) => income._id === action.payload._id
+        // );
+        // if (index !== -1) {
+        //   state.incomes[index] = action.payload;
+        //   // Recalculate statistics if necessary
+        //   state.totalRevenue = state.incomes.reduce(
+        //     (acc, income) => acc + (income.final_amount || 0),
+        //     0
+        //   );
+        //   state.totalPaidAmount = state.incomes.reduce(
+        //     (acc, income) => acc + (income.paid_amount || 0),
+        //     0
+        //   );
+        //   state.unpaidRevenue = state.incomes.reduce(
+        //     (acc, income) => acc + (income.remaining_amount || 0),
+        //     0
+        //   );
+        // }
       })
       .addCase(updateEarnings.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Failed to update earnings.";
+      })
+
+      // Fetch Expense Graph
+      .addCase(fetchEarningGraph.pending, (state) => {
+        state.graphLoading = true;
+        state.graphError = null;
+      })
+      .addCase(fetchEarningGraph.fulfilled, (state, action) => {
+        state.graphLoading = false;
+        state.expenseGraph = action.payload || [];
+      })
+      .addCase(fetchEarningGraph.rejected, (state, action) => {
+        state.graphLoading = false;
+        state.graphError =
+          action.payload || "Failed to fetch expense graph data.";
+      })
+
+      // Fetch Card Data Revenue
+      // Fetch Card Data Revenue
+      .addCase(fetchCardDataRevenue.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchCardDataRevenue.fulfilled, (state, action) => {
+        state.loading = false;
+        state.cardDataRevenue = action.payload || {};
+      })
+      .addCase(fetchCardDataRevenue.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Failed to fetch card data revenue.";
       });
   },
 });

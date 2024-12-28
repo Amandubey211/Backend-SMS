@@ -33,7 +33,6 @@ import useNavHeading from "../../../../../Hooks/CommonHooks/useNavHeading ";
 
 const TotalExpenseList = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   useNavHeading("Expense", "List");
 
   // Redux state
@@ -52,6 +51,7 @@ const TotalExpenseList = () => {
   } = useSelector((store) => store.admin.expenses);
 
   const [searchText, setSearchText] = useState("");
+  const [computedPageSize, setComputedPageSize] = useState(pageSize || 10);
 
   // Debounced fetch function
   const debouncedFetch = useCallback(
@@ -66,10 +66,10 @@ const TotalExpenseList = () => {
     const params = {
       search: searchText,
       page: currentPage,
-      limit: 10,
+      limit: computedPageSize,
     };
     debouncedFetch(params);
-  }, [debouncedFetch, searchText, currentPage]);
+  }, [debouncedFetch, searchText, currentPage, computedPageSize]);
 
   // Handle search input changes
   const handleSearch = (e) => {
@@ -176,10 +176,6 @@ const TotalExpenseList = () => {
     [expenses]
   );
 
-  // Compute pageSize from totalRecords and totalPages to reflect backend pagination
-  const computedPageSize =
-    totalPages > 0 ? Math.ceil(totalRecords / totalPages) : pageSize;
-
   // Statistics for Top Cards
   const cardData = useMemo(
     () => [
@@ -277,7 +273,19 @@ const TotalExpenseList = () => {
               current: currentPage,
               total: totalRecords,
               pageSize: computedPageSize,
-              showSizeChanger: false,
+              showSizeChanger: true,
+              pageSizeOptions: ["5", "10", "20", "50"], // Added page size options
+              size: "small",
+              showTotal: () =>
+                `Page ${currentPage} of ${totalPages} | Total ${totalRecords} records`,
+              onChange: (page, pageSize) => {
+                dispatch(setCurrentPage(page)); // Update the current page in Redux
+                setComputedPageSize(pageSize); // Update the local page size
+              },
+              onShowSizeChange: (current, size) => {
+                setComputedPageSize(size); // Handle page size change locally
+                dispatch(setCurrentPage(1)); // Optionally reset to first page
+              },
             }}
             loading={loading}
             bordered

@@ -5,6 +5,7 @@ import { setShowError } from "../../Common/Alerts/alertsSlice";
 import { handleError } from "../../Common/Alerts/errorhandling.action";
 import { getData, postData, putData } from "../../../../services/apiEndpoints";
 import toast from "react-hot-toast";
+import { getAY } from "../../../../Utils/academivYear";
 
 /**
  * Helper function to determine the correct API endpoints based on category.
@@ -104,6 +105,58 @@ export const fetchAllIncomes = createAsyncThunk(
       } else {
         toast.error(response?.message || "Failed to fetch incomes.");
         return rejectWithValue(response?.message || "Failed to fetch incomes.");
+      }
+    } catch (error) {
+      return handleError(error, dispatch, rejectWithValue);
+    }
+  }
+);
+export const fetchEarningGraph = createAsyncThunk(
+  "earnings/fetchEarningGraph",
+  async ({ groupBy = "month" }, { rejectWithValue, dispatch }) => {
+    try {
+      const say = getAY();
+      dispatch(setShowError(false));
+      const response = await getData("/finance/dashboard/revenue/graph", {
+        groupBy,
+        say,
+      });
+
+      if (response?.success) {
+        return response.data;
+      } else {
+        toast.error(response?.message || "Failed to fetch expense graph data.");
+        return rejectWithValue(
+          response?.message || "Failed to fetch expense graph data."
+        );
+      }
+    } catch (error) {
+      return handleError(error, dispatch, rejectWithValue);
+    }
+  }
+);
+
+export const fetchCardDataRevenue = createAsyncThunk(
+  "earnings/fetchCardDataRevenue",
+  async ({ year }, { rejectWithValue, dispatch }) => {
+    try {
+      const say = getAY();
+      dispatch(setShowError(false));
+      const response = await getData(`/finance/revenue/get-card-data-revenue`, {
+        academicYearId: say,
+        year,
+      });
+
+      if (response?.success) {
+        // Transform the response data into an array of card objects
+        return response.data;
+        // const transformedData = transformCardData(response.data);
+        // return transformedData;
+      } else {
+        toast.error(response?.message || "Failed to fetch card data revenue.");
+        return rejectWithValue(
+          response?.message || "Failed to fetch card data revenue."
+        );
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);

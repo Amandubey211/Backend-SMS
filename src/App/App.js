@@ -52,7 +52,6 @@ import TeacherTableView from "../Components/Staff/Teacher/TimeTable/Components/T
 import ParentTimeTablePage from "../Modules/Parents/TimeTable/TimeTablePage.js";
 import ParentTableView from "../Modules/Parents/TimeTable/Components/TableView.js";
 import ManageRolePage from "../Components/Common/RBAC/ManageRolePage.js";
-import EarningDash from "../Modules/Admin/Finance/Earnings/EarningDash.js";
 import TotalRevenueList from "../Modules/Admin/Finance/Earnings/TotalRevenueList.js";
 import StudentFeesDash from "../Modules/Admin/Finance/StudentFees/StudentFeesDash.js";
 import addStudentFeesForm from "../Modules/Admin/Finance/StudentFees/AddStudentFeesForm.js";
