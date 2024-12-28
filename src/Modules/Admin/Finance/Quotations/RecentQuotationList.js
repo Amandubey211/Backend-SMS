@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from "react";
-import AdminLayout from "../../../../Components/Admin/AdminDashLayout";
-import { Menu, Dropdown } from "antd";
-import { MoreOutlined } from "@ant-design/icons";
+import React, { useCallback, useEffect, useState } from "react";
+import AdminDashLayout from "../../../../Components/Admin/AdminDashLayout";
+import { CheckCircleOutlined, CloseCircleOutlined, FilePdfOutlined, MoreOutlined, SearchOutlined } from "@ant-design/icons";
 import { FiPlus, FiUserPlus } from "react-icons/fi";
 import { RiErrorWarningFill } from "react-icons/ri";
 import { FcDeleteDatabase } from "react-icons/fc";
@@ -10,220 +9,303 @@ import { useNavigate } from "react-router-dom";
 import { fetchAllQuotations, updateQuotationStatus } from "../../../../Store/Slices/Finance/Quotations/quotationThunks";
 import Spinner from "../../../../Components/Common/Spinner";
 import EmailModal from "../../../../Components/Common/EmailModal";
+import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
+import debounce from "lodash.debounce";
+import { setCurrentPage } from "../../../../Store/Slices/Finance/Quotations/quotationSlice";
+import { Alert, Button, Dropdown, Input, Menu, Spin, Table, Tag } from "antd";
+import Layout from "../../../../Components/Common/Layout";
 
 const RecentQuotationList = () => {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
+    useNavHeading("Finance", "Quotation List");
+    const {
+        quotations,
+        loading,
+        error,
+        totalRecords,
+        totalPages,
+        currentPage,
+        pageSize,
+    } = useSelector((state) => state.admin.quotations);
+    //const [isExportModalVisible, setIsExportModalVisible] = useState(false);
+    const [searchText, setSearchText] = useState("");
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
 
-  const [isEmailModalOpen, setEmailModalOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("All");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize] = useState(30); // Number of items per page
 
-  // Redux state
-  const { quotations = [], loading, error } = useSelector((state) => state.admin?.quotations || {});
+    const paze_size = totalPages > 0 ? Math.ceil(totalRecords / totalPages) : pageSize;
+    const [computedPageSize, setComputedPageSize] = useState(paze_size)
 
-  // Fetch quotations on component mount
-  useEffect(() => {
-    dispatch(fetchAllQuotations());
-  }, [dispatch]);
 
-  // Filter quotations based on status and search query
-  const filteredQuotations = quotations.filter((item) => {
-    const matchesStatus = statusFilter === "All" || item.status === statusFilter;
-    const matchesSearch =
-      item?.quotationNumber?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item?.reciever?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item?.remark?.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesStatus && matchesSearch;
-  });
+    // Debounced function to fetch adjustments with a fixed limit of 5
+    const debouncedFetch = useCallback(
+        debounce((params) => {
+            dispatch(fetchAllQuotations(params));
+        }, 300),
+        [dispatch]
+    );
 
-  // Paginate filtered quotations
-  const paginatedQuotations = filteredQuotations.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+    // Fetch data on component mount with limit set to 5
+    useEffect(() => {
+        console.log("Fetching data...", { searchText, currentPage, pageSize });
+        const params = {
+            //search: searchText,
+            page: 1, // Always fetch the first page
+            limit: 10, // Limit to 5 records
+            //sortBy: "createdAt",
+            //sortOrder: "desc",
+        };
+        debouncedFetch(params);
+    }, [debouncedFetch, searchText, currentPage, pageSize, computedPageSize]);
 
-  const totalPages = Math.ceil(filteredQuotations.length / pageSize);
+    console.log("after useEffect--", quotations);
+    const handleStatusChange = (quotationId, status) => {
+        dispatch(updateQuotationStatus({ id: quotationId, status }));
+    };
 
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
-  };
+    // Define table columns with fixed widths and ellipsis
+    const columns = [
+        {
+            title: "Quotation No.",
+            dataIndex: "quotationNumber",
+            key: "quotationNumber",
+            render: (text) => <span className="text-xs">{text}</span>,
+            width: 150,
+            ellipsis: true,
+        },
+        {
+            title: "ReceiverName",
+            dataIndex: "quotationTo",
+            key: "quotationTo",
+            render: (text) => <span className="text-xs">{text}</span>,
+            width: 150,
+            ellipsis: true,
+        },
+        {
+            title: "Purpose",
+            dataIndex: "purpose",
+            key: "purpose",
+            render: (text) => <span className="text-xs">{text}</span>,
+            width: 120,
+            ellipsis: true,
+        },
+        {
+            title: "Discount",
+            dataIndex: "discount",
+            key: "discount",
+            render: (value, record) =>
+                record.discountType === "percentage" ? (
+                    <Tag color="purple" className="text-xs">
+                        {value || 0}%
+                    </Tag>
+                ) : (
+                    <Tag color="orange" className="text-xs">
+                        {value || 0} QR
+                    </Tag>
+                ),
+            width: 100,
+            ellipsis: true,
+        },
+        {
+            title: "Final Amount(QR)",
+            dataIndex: "final_amount",
+            key: "final_amount",
+            render: (value) => (
+                <span className="text-xs text-green-600">{value || "0"} QR</span>
+            ),
+            width: 120,
+            ellipsis: true,
+        },
+        {
+            title: "Status",
+            dataIndex: "status",
+            key: "status",
+            render: (text) => <span className="text-xs">{text}</span>,
+            width: 120,
+            ellipsis: true,
+        },
+        {
+            title: "Action",
+            dataIndex: "action",
+            key: "action",
+            render: (_, record) => {
+                const menu = (
+                    <Menu>
+                        <Menu.Item key="1" onClick={() => console.log("Edit", record)}>
+                            <FilePdfOutlined style={{ marginRight: 8 }} /> preview
+                        </Menu.Item>
+                        <Menu.Item key="2" onClick={() => handleStatusChange(record.key, "accept")}>
+                            <CheckCircleOutlined style={{ marginRight: 8 }} /> Accept
+                        </Menu.Item>
+                        <Menu.Item key="3" onClick={() => handleStatusChange(record.key, "reject")}>
+                            <CloseCircleOutlined style={{ marginRight: 8 }} /> Reject
+                        </Menu.Item>
+                    </Menu>
+                );
 
-  const closeEmailModal = () => {
-    setEmailModalOpen(false);
-  };
+                return (
+                    <Dropdown overlay={menu} trigger={["click"]}>
+                        <MoreOutlined
+                            style={{
+                                fontSize: "15px",
+                                cursor: "pointer",
+                                transform: "rotate(180deg)",
+                            }}
+                        />
+                    </Dropdown>
+                );
+            },
+            width: 100,
+            ellipsis: true,
+        },
+    ];
 
-  const handleStatusChange = (quotationId, status) => {
-    dispatch(updateQuotationStatus({ id: quotationId, status }));
-  };
+    // Transform adjustments data to table dataSource and limit to 10 records
+    const dataSource = quotations?.map((quotation) => ({
+        key: quotation._id,
+        quotationNumber: quotation.quotationNumber || "N/A",
+        quotationTo: quotation.receiver?.name || "N/A",
+        purpose: quotation.purpose || "N/A",
+        discount: quotation.discount || 0,
+        discountType: quotation.discountType || "percentage",
+        final_amount: quotation.final_amount || 0,
+        status: quotation.status || "pending"
+    }));
 
-  const actionMenu = (quotationId) => (
-    <Menu>
-      <Menu.Item key="1">View Details</Menu.Item>
-      <Menu.Item key="2" onClick={() => handleStatusChange(quotationId, "accept")}>Accept</Menu.Item>
-      <Menu.Item key="3" onClick={() => handleStatusChange(quotationId, "reject")}>Reject</Menu.Item>
-    </Menu>
-  );
+    const transformAdjustmentData = (quotations) =>
+        quotations?.map((quotation, index) => ({
+            sNo: index + 1,
+            quotationNumber: quotation.quotationNumber || "N/A",
+            quotationTo: quotation.receiver?.name || "N/A",
+            purpose: quotation.purpose || "N/A",
+            discount: quotation.discount || 0,
+            discountType: quotation.discountType || "percentage",
+            final_amount: quotation.final_amount || 0,
+        })) || [];
 
-  return (
-    <AdminLayout>
-      <div className="p-4 bg-white rounded-lg shadow-lg">
-        <h2 className="text-xl font-semibold">Recent Quotations List</h2>
+    // Handle search input changes
+    const handleSearch = (e) => {
+        setSearchText(e.target.value);
+        dispatch(setCurrentPage(1));
+    };
 
-        {/* Filters and Search */}
-        <div className="flex justify-between items-center mt-4">
-          {/* Status Filter */}
-          <div className="flex space-x-6">
-            {["All", "accept", "reject", "pending"].map((status) => (
-              <label key={status} className="flex items-center text-sm space-x-2">
-                <input
-                  type="radio"
-                  name="statusFilter"
-                  className="form-radio text-green-600"
-                  checked={statusFilter === status}
-                  onChange={() => setStatusFilter(status)}
-                />
-                <span className={`font-medium ${statusFilter === status ? "text-green-600" : "text-gray-700"}`}>
-                  {status.charAt(0).toUpperCase() + status.slice(1)}
-                </span>
-              </label>
-            ))}
-          </div>
-
-          {/* Search Box */}
-          {/* <div className="relative">
-            <input
-              type="text"
-              placeholder="Search..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="border rounded-full pl-4 pr-4 py-2 w-64 shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-300"
-            />
-          </div> */}
-
-          {/* Add New Button */}
-          <button
-            onClick={() => navigate("/finance/quotations/add-new-quotations")}
-            className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
-          >
-            <span className="text-gray-800 font-medium">Add New Quotation</span>
-            <div className="w-12 h-12 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center text-white">
-              <FiPlus size={16} />
-            </div>
-          </button>
-        </div>
-
-        {/* Table */}
-        <div className="overflow-x-auto mt-6">
-          <table className="w-full border-collapse text-sm">
-            <thead>
-              <tr style={{ backgroundColor: "#FFCEDB" }} className="text-left text-gray-800">
-                <th className="py-3 px-4 font-medium">Quotation Number</th>
-                <th className="py-3 px-4 font-medium">Quotation To</th>
-                <th className="py-3 px-4 font-medium">Purpose</th>
-                <th className="py-3 px-4 font-medium">Issue Date</th>
-                <th className="py-3 px-4 font-medium">Total Amount</th>
-                <th className="py-3 px-4 font-medium">Status</th>
-                <th className="py-3 px-4 font-medium">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {loading && (
-                <tr>
-                  <td colSpan="6" className="py-4 px-4 text-center">
-                    <Spinner />
-                  </td>
-                </tr>
-              )}
-
-              {error && (
-                <tr>
-                  <td colSpan="6" className="py-4 px-4 text-center">
-                    <div className="flex flex-col justify-center items-center">
-                      <RiErrorWarningFill className="text-red-500 text-4xl" />
-                      <span className="text-red-500 mt-2">Unable to Fetch Quotations: {error}</span>
-                    </div>
-                  </td>
-                </tr>
-              )}
-
-              {!loading && !error && paginatedQuotations.length === 0 && (
-                <tr>
-                  <td colSpan="6" className="py-4 px-4 text-center">
-                    <div className="flex flex-col justify-center items-center">
-                      <FcDeleteDatabase className="text-4xl" />
-                      <span className="text-gray-600 mt-2">No Quotations Found!</span>
-                    </div>
-                  </td>
-                </tr>
-              )}
-
-              {!loading &&
-                !error &&
-                paginatedQuotations.map((item, index) => (
-                  <tr key={index} className="border-b hover:bg-gray-50">
-                    <td className="py-4 px-4">{item?.quotationNumber}</td>
-                    <td className="py-4 px-4">{item?.reciever?.name || "N/A"}</td>
-                    <td className="py-4 px-4">{item?.remark || "N/A"}</td>
-                    <td className="py-4 px-4">{new Date(item?.date).toLocaleDateString()}</td>
-                    <td className="py-4 px-4">{item?.final_amount || "N/A"}</td>
-                    <td className="py-4 px-4">{item?.status || "pending"}</td>
-                    <td className="py-4 px-4 flex items-center gap-4">
-                      <Dropdown overlay={actionMenu(item._id)} trigger={["click"]}>
-                        <button className="w-8 h-8 flex items-center justify-center rounded-full border border-gray-300 hover:bg-gray-100">
-                          <MoreOutlined style={{ fontSize: "16px", color: "#808080" }} />
-                        </button>
-                      </Dropdown>
-                    </td>
-                  </tr>
-                ))}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Pagination */}
-        <div className="flex justify-between items-center mt-4 text-gray-600 text-sm">
-          <span>
-            Showing {paginatedQuotations.length} of {filteredQuotations.length} Quotations
-          </span>
-          <div className="flex gap-2">
-            <button
-              onClick={() => handlePageChange(currentPage - 1)}
-              disabled={currentPage === 1}
-              className={`text-gray-500 ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""}`}
+    return (
+        <Layout title={"Quotation List | Student Diwan"}>
+            <AdminDashLayout>
+                <div className="bg-white p-4 rounded-lg  space-y-4 mt-3">
+                    {/* Header */}
+                    <div className="flex justify-between items-center">
+                        <Input
+                            placeholder="Search by Subcategory"
+                            prefix={<SearchOutlined />}
+                            className="w-full md:w-64 text-xs"
+                            value={searchText}
+                            onChange={handleSearch}
+                            allowClear
+                            style={{
+                                borderRadius: "0.375rem",
+                                height: "35px",
+                                borderColor: "#ff6bcb",
+                                boxShadow: "0 2px 4px rgba(255, 105, 180, 0.2)",
+                            }}
+                        />
+                        <div className="flex justify-end items-center gap-2">
+                            {/* <Button
+                                type="primary"
+                                icon={<ExportOutlined />}
+                                onClick={() => setIsExportModalVisible(true)}
+                                className="flex items-center bg-gradient-to-r  from-pink-500 to-pink-400 text-white border-none hover:from-pink-600 hover:to-pink-500 transition duration-200 text-xs px-4 py-2 rounded-md shadow-md"
+                            >
+                                Export
+                            </Button> */}
+                            <button
+                                onClick={() =>
+                                    navigate(
+                                        "/finance/penaltyAdjustment/add-new-penalty-adjustment"
+                                    )
+                                }
+                                className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
+                            >
+                                <span className="text-gray-800 font-medium">
+                                    Add New Quotation
+                                </span>
+                                <div className="w-12 h-12 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center text-white">
+                                    <FiPlus size={16} />
+                                </div>
+                            </button>
+                        </div>
+                        {/* <Button
+              onClick={handleViewMore}
+              className="px-4 py-2 bg-gradient-to-r from-[#C83B62] to-[#8E44AD] text-white rounded-md shadow hover:from-[#a3324e] hover:to-[#6e2384] transition text-xs"
+              size="small"
             >
-              « Back
-            </button>
-            {Array.from({ length: totalPages }).map((_, index) => (
-              <button
-                key={index}
-                onClick={() => handlePageChange(index + 1)}
-                className={`px-2 rounded ${currentPage === index + 1 ? "bg-purple-500 text-white" : "text-gray-500"}`}
-              >
-                {index + 1}
-              </button>
-            ))}
-            <button
-              onClick={() => handlePageChange(currentPage + 1)}
-              disabled={currentPage === totalPages}
-              className={`text-gray-500 ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : ""}`}
-            >
-              Next »
-            </button>
-          </div>
-        </div>
-      </div>
+              View More ({totalRecords})
+            </Button> */}
+                    </div>
 
-      <EmailModal
-        isOpen={isEmailModalOpen}
-        onClose={closeEmailModal}
-        sendButtonText="Send Quotation"
-        onSubmit={() => {
-          console.log("Send Quotation Clicked");
-          closeEmailModal();
-        }}
-      />
-    </AdminLayout>
-  );
+                    {/* Loading Indicator */}
+                    {loading && (
+                        <div className="flex justify-center">
+                            <Spin tip="Loading..." />
+                        </div>
+                    )}
+                    {/* Error Message */}
+                    {error && (
+                        <Alert
+                            message="Error"
+                            description={error}
+                            type="error"
+                            showIcon
+                            closable
+                        />
+                    )}
+                    {/* No Data Placeholder */}
+                    {/* {!loading && !error && (
+                        <div className="text-center text-gray-500 text-xs py-4">
+                            No records found.
+                        </div>
+                    )} */}
+                    {/* Table */}
+                    {!loading && !error && (
+                        <Table
+                            dataSource={dataSource}
+                            columns={columns}
+                            pagination={{
+                                current: currentPage,
+                                total: totalRecords,
+                                pageSize: computedPageSize,
+                                showSizeChanger: true,
+                                size: "small",
+                                showTotal: () =>
+                                    `Page ${currentPage} of ${totalPages} | Total ${totalRecords} records`,
+                                onChange: (page, pageSize) => {
+                                    setCurrentPage(page); // Update the current page
+                                    setComputedPageSize(pageSize); // Update the page size
+                                },
+                                onShowSizeChange: (current, size) => {
+                                    setComputedPageSize(size); // Handle page size change
+                                },
+                            }}
+                            onChange={(pagination) => {
+                                const newPage = pagination.current;
+                                dispatch(setCurrentPage(newPage));
+                            }}
+                            className="rounded-lg shadow text-xs"
+                            bordered
+                            size="small"
+                            tableLayout="fixed" // Fixed table layout
+                        />
+                    )}
+                    {/* <ExportModal
+                        visible={isExportModalVisible}
+                        onClose={() => setIsExportModalVisible(false)}
+                        dataToExport={transformAdjustmentData(adjustmentData)}
+                        title="Return Receipt Data"
+                        sheet="return_receipt_report"
+                    /> */}
+                </div>
+            </AdminDashLayout>
+        </Layout>
+    );
 };
 
 export default RecentQuotationList;
