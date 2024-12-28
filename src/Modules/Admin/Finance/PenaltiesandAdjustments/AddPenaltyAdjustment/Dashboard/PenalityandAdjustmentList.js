@@ -2,14 +2,14 @@ import React, { useCallback, useEffect, useState } from "react";
 import Layout from "../../../../../../Components/Common/Layout";
 import AdminDashLayout from "../../../../../../Components/Admin/AdminDashLayout";
 import useNavHeading from "../../../../../../Hooks/CommonHooks/useNavHeading ";
-import { Alert, Button, Input, Spin, Table, Tag } from "antd";
+import { Alert, Button, Dropdown, Input, Menu, Spin, Table, Tag } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAlladjustments } from "../../../../../../Store/Slices/Finance/Earnings/earningsThunks";
 import debounce from "lodash.debounce";
 import { fetchReturnInvoice } from "../../../../../../Store/Slices/Finance/PenalityandAdjustment/adjustment.thunk";
 import { useNavigate } from "react-router-dom";
-import { FiUserPlus } from "react-icons/fi";
-import { ExportOutlined, SearchOutlined } from "@ant-design/icons";
+import { FiPlus } from "react-icons/fi";
+import { EllipsisOutlined, ExportOutlined, MoreOutlined, SearchOutlined } from "@ant-design/icons";
 import ExportModal from "../../../Earnings/Components/ExportModal";
 import { setCurrentPage } from "../../../../../../Store/Slices/Finance/PenalityandAdjustment/adjustment.slice";
 
@@ -139,7 +139,33 @@ const PenalityandAdjustmentList = () => {
       title: "Action",
       dataIndex: "action",
       key: "action",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (_, record) => {
+        const menu = (
+          <Menu>
+            <Menu.Item key="1" onClick={() => console.log("Edit", record)}>
+              preview
+            </Menu.Item>
+            <Menu.Item key="2" onClick={() => console.log("Delete", record)}>
+              Cancle
+            </Menu.Item>
+            <Menu.Item key="3" onClick={() => console.log("View Details", record)}>
+              send Mail
+            </Menu.Item>
+          </Menu>
+        );
+  
+        return (
+          <Dropdown overlay={menu} trigger={["click"]}>
+            <MoreOutlined
+              style={{
+                fontSize: "15px",
+                cursor: "pointer",
+                transform: "rotate(180deg)", 
+              }}
+            />
+          </Dropdown>
+        );
+      },
       width: 100,
       ellipsis: true,
     },
@@ -225,7 +251,7 @@ const PenalityandAdjustmentList = () => {
                   Add New Adjustment
                 </span>
                 <div className="w-12 h-12 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center text-white">
-                  <FiUserPlus size={16} />
+                  <FiPlus size={16} />
                 </div>
               </button>
             </div>

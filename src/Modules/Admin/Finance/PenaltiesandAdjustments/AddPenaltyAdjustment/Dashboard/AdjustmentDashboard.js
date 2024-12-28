@@ -3,7 +3,7 @@ import Layout from "../../../../../../Components/Common/Layout";
 import AdminDashLayout from "../../../../../../Components/Admin/AdminDashLayout";
 import useNavHeading from "../../../../../../Hooks/CommonHooks/useNavHeading ";
 import SummaryPenalityandAdjustment from "./SummaryRenalityandAdjustment";
-import { FiUserPlus } from "react-icons/fi";
+import { FiPlus } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import CardSection from "../Components/CardSection";
 
@@ -22,7 +22,7 @@ const AdjustmentDashboard = () => {
             >
               <span className="text-gray-800 font-medium">Add New Adjustment</span>
               <div className="w-12 h-12 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center text-white">
-                <FiUserPlus size={16} />
+                <FiPlus size={16} />
               </div>
             </button>
           </div>
