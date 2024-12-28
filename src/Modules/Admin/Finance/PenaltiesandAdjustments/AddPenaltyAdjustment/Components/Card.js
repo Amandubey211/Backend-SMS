@@ -1,6 +1,6 @@
 // src/Modules/Admin/Finance/Earnings/Cards.js
 import React from "react";
-import PropTypes from "prop-types";
+
 
 const Card = ({ title, value, comparison, percentage, icon, trend }) => {
   const isTrendUp = trend === "up";
@@ -47,10 +47,6 @@ const Card = ({ title, value, comparison, percentage, icon, trend }) => {
   );
 };
 
-Card.propTypes = {
-  title: PropTypes.string.isRequired,
-  value: PropTypes.string.isRequired,
-  icon: PropTypes.node.isRequired,
-};
+
 
 export default Card;
