@@ -1,8 +1,8 @@
 
 import React from "react";
-import Card from "./Card"; // Reusing the Card component
 import { FaUserGraduate, FaWallet, FaBookReader } from "react-icons/fa";
 import { useSelector } from "react-redux";
+import StudentCard from "./StudentCard";
 const StudentCardSection = () => {
   const { unpaidRevenue,totalPaidAmount, totalRevenue} = useSelector(
     (state) => state.admin.earnings
@@ -35,7 +35,7 @@ const StudentCardSection = () => {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-6 place-items-center">
       {studentCardsData.map((item, index) => (
-        <Card key={index} {...item} />
+        <StudentCard key={index} {...item} />
       ))}
     </div>
   );
