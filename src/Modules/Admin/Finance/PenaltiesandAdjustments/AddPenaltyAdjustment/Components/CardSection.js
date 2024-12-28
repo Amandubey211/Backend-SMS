@@ -17,7 +17,7 @@ const CardSection = () => {
       title: "Total Return Invoices",
       value: (
         <>
-          {returnCardData?.totalReturnInvoices || 0} <span className="text-xs">invoice</span>
+          {returnCardData?.totalReturnInvoices || 0} <span className="text-xs">{returnCardData?.totalReturnInvoices===1?"invoice":"invoices"}</span>
         </>
       ),
       icon: (
@@ -30,7 +30,7 @@ const CardSection = () => {
       title: "Total Cancelled Return Invoices",
       value: (
         <>
-          {returnCardData?.totalCanceledInvoices || 0} <span className="text-xs">invoice</span>
+          {returnCardData?.totalCanceledInvoices || 0} <span className="text-xs">{returnCardData?.totalCanceledInvoices===1?"invoice":"invoices"}</span>
         </>
       ),
       icon: (

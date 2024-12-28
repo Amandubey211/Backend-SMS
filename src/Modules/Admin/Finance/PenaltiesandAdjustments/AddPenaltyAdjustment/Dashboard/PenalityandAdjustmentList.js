@@ -2,15 +2,26 @@ import React, { useCallback, useEffect, useState } from "react";
 import Layout from "../../../../../../Components/Common/Layout";
 import AdminDashLayout from "../../../../../../Components/Admin/AdminDashLayout";
 import useNavHeading from "../../../../../../Hooks/CommonHooks/useNavHeading ";
-import { Alert, Button, Dropdown, Input, Menu, Spin, Table, Tag } from "antd";
+import { Alert, Button, Dropdown, Input, Menu, Modal, Spin, Table, Tag } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import debounce from "lodash.debounce";
-import { cancleReturnInvoiceData, fetchReturnInvoice } from "../../../../../../Store/Slices/Finance/PenalityandAdjustment/adjustment.thunk";
+import {
+  cancleReturnInvoiceData,
+  fetchReturnInvoice,
+} from "../../../../../../Store/Slices/Finance/PenalityandAdjustment/adjustment.thunk";
 import { useNavigate } from "react-router-dom";
 import { FiPlus } from "react-icons/fi";
-import { ExportOutlined, MoreOutlined, SearchOutlined } from "@ant-design/icons";
+import {
+  CloseCircleOutlined,
+  ExportOutlined,
+  FilePdfOutlined,
+  MailOutlined,
+  MoreOutlined,
+  SearchOutlined,
+} from "@ant-design/icons";
 import ExportModal from "../../../Earnings/Components/ExportModal";
 import { setCurrentPage } from "../../../../../../Store/Slices/Finance/PenalityandAdjustment/adjustment.slice";
+import ReturnInvoice from "../../../../../../Utils/FinanceTemplate/ReturnInvoice";
 
 
 const PenalityandAdjustmentList = () => {
@@ -28,13 +39,20 @@ const PenalityandAdjustmentList = () => {
   const [searchText, setSearchText] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [isPreviewVisible, setPreviewVisible] = useState(false);
+  const [selectedReturnInvoice, setSelectedReturnInvoice] = useState();
 
+  const paze_size =
+    totalPages > 0 ? Math.ceil(totalRecords / totalPages) : pageSize;
+  const [computedPageSize, setComputedPageSize] = useState(paze_size);
 
-  const paze_size=totalPages > 0 ? Math.ceil(totalRecords / totalPages) : pageSize;
-  const [computedPageSize,setComputedPageSize]=useState(paze_size)
+    // Handle search input changes
+    const handleSearch = (e) => {
+      setSearchText(e.target.value);
+      dispatch(setCurrentPage(1));
+    };
 
-  
-  const handleCancleReturnInvoice=(id)=>{
+  const handleCancleReturnInvoice = (id) => {
     const params = {
       search: searchText,
       page: 1, // Always fetch the first page
@@ -42,8 +60,13 @@ const PenalityandAdjustmentList = () => {
       sortBy: "createdAt",
       sortOrder: "desc",
     };
-    dispatch(cancleReturnInvoiceData({params,id}))
-  }
+    dispatch(cancleReturnInvoiceData({ params, id }));
+  };
+
+  const handleReturnPreview = (record) => {
+    setSelectedReturnInvoice(record);
+    setPreviewVisible(true);
+  };
 
   // Debounced function to fetch adjustments with a fixed limit of 5
   const debouncedFetch = useCallback(
@@ -53,19 +76,19 @@ const PenalityandAdjustmentList = () => {
     [dispatch]
   );
 
- 
-
   // Fetch data on component mount with limit set to 5
   useEffect(() => {
     const params = {
       search: searchText,
-      page: 1, // Always fetch the first page
-      limit: 10, // Limit to 5 records
+      page: 1,
+      limit: 10,
       sortBy: "createdAt",
       sortOrder: "desc",
     };
     debouncedFetch(params);
-  }, [debouncedFetch, searchText, currentPage, pageSize,computedPageSize]);
+  }, [debouncedFetch, searchText, currentPage, pageSize, computedPageSize]);
+
+
 
   // Define table columns with fixed widths and ellipsis
   const columns = [
@@ -120,7 +143,11 @@ const PenalityandAdjustmentList = () => {
       title: "Status",
       dataIndex: "status",
       key: "status",
-      render: (text) => <Tag color={text=="Cancelled"?"red":"purple"} className="text-xs"><span className="text-xs">{text}</span></Tag>,
+      render: (text) => (
+        <Tag color={text == "Cancelled" ? "red" : "purple"} className="text-xs">
+          <span className="text-xs">{text}</span>
+        </Tag>
+      ),
       width: 100,
       ellipsis: true,
       sorter: (a, b) => a.status.localeCompare(b.status),
@@ -138,7 +165,7 @@ const PenalityandAdjustmentList = () => {
               day: "numeric",
             }).format(date)
           : "N/A";
-  
+
         return <span className="text-xs">{formattedDate}</span>;
       },
       width: 120,
@@ -152,31 +179,48 @@ const PenalityandAdjustmentList = () => {
       dataIndex: "action",
       key: "action",
       render: (_, record) => {
-        console.log("Record----------", record);
-    
+        console.log(record);
         const menuItems = [
           {
             key: "1",
-            label: "Preview",
-            onClick: () => console.log("Edit", record),
+            label: (
+              <span>
+                <FilePdfOutlined style={{ marginRight: 8 }} />
+                Preview
+              </span>
+            ),
+            onClick: () => {
+              handleReturnPreview(record);
+            },
           },
           {
             key: "2",
-            label: "Cancel",
-            onClick: () => handleCancleReturnInvoice(record?.key),
+            label: (
+              <span>
+                <CloseCircleOutlined style={{ marginRight: 8 }} />
+                {record?.status === "Cancelled" ? "Cancelled" : "Cancel"}
+              </span>
+            ),
+            onClick: () => {
+              if (record?.status !== "Cancelled")
+                handleCancleReturnInvoice(record?.key);
+            },
+            disabled: record?.status === "Cancelled",
           },
           {
             key: "3",
-            label: "Send Mail",
-            onClick: () => console.log("Send Mail", record),
+            label: (
+              <span>
+                <MailOutlined style={{ marginRight: 8 }} />
+                Send Mail
+              </span>
+            ),
+            // onClick: () => console.log("Send Mail", record),
           },
         ];
-    
+
         return (
-          <Dropdown
-            menu={{ items: menuItems }}
-            trigger={["click"]}
-          >
+          <Dropdown menu={{ items: menuItems }} trigger={["click"]}>
             <MoreOutlined
               style={{
                 fontSize: "15px",
@@ -189,10 +233,9 @@ const PenalityandAdjustmentList = () => {
       },
       width: 100,
       ellipsis: true,
-    }
-    
+    },
   ];
-  
+
   // Transform adjustments data to table dataSource and limit to 10 records
   const dataSource = adjustmentData?.map((adjustment) => ({
     key: adjustment?._id,
@@ -203,10 +246,11 @@ const PenalityandAdjustmentList = () => {
     // discountType: adjustment.discountType || "percentage",
     // penalty: adjustment.adjustmentPenalty || "N/A",
     // tax: adjustment.tax,
-    adjustmentAmount: adjustment.adjustmentTotal || 0,
-    adjustmentTotal: adjustment.adjustmentAmount || 0,
+    adjustmentAmount: adjustment?.adjustmentTotal || 0,
+    adjustmentTotal: adjustment?.adjustmentAmount || 0,
     status: adjustment.isCancel ? "Cancelled" : "-",
     adjustedAt: adjustment.adjustedAt || "N/A",
+    ...adjustment
   }));
 
   const transformAdjustmentData = (adjustmentData) =>
@@ -226,11 +270,11 @@ const PenalityandAdjustmentList = () => {
       academicYearDetails: adjustment?.academicYear?.year || "N/A",
     })) || [];
 
-  // Handle search input changes
-  const handleSearch = (e) => {
-    setSearchText(e.target.value);
-    dispatch(setCurrentPage(1));
-  };
+
+
+
+
+  console.log("-=====---=-========>>>>>>>",selectedReturnInvoice)
 
   return (
     <Layout title={"Penality & Adjustment List | Student Diwan"}>
@@ -248,8 +292,6 @@ const PenalityandAdjustmentList = () => {
               style={{
                 borderRadius: "0.375rem",
                 height: "35px",
-                borderColor: "#ff6bcb",
-                boxShadow: "0 2px 4px rgba(255, 105, 180, 0.2)",
               }}
             />
             <div className="flex justify-end items-center gap-2">
@@ -318,6 +360,7 @@ const PenalityandAdjustmentList = () => {
                 total: totalRecords,
                 pageSize: computedPageSize,
                 showSizeChanger: true,
+                pageSizeOptions: ["5", "10", "10", "20", "50"],
                 size: "small",
                 showTotal: () =>
                   `Page ${currentPage} of ${totalPages} | Total ${totalRecords} records`,
@@ -346,6 +389,15 @@ const PenalityandAdjustmentList = () => {
             title="Return Receipt Data"
             sheet="return_receipt_report"
           />
+           <Modal
+            visible={isPreviewVisible}
+            title="Return Invoice Preview"
+            footer={null}
+            onCancel={() => setPreviewVisible(false)}
+            width={800}
+          >
+            <ReturnInvoice data={selectedReturnInvoice} />
+          </Modal>
         </div>
       </AdminDashLayout>
     </Layout>
