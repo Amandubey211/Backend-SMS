@@ -57,13 +57,17 @@ const RecentReceiptsList = () => {
     // Export modal states
     const [isExportModalOpen, setExportModalOpen] = useState(false);
 
+    const [currentPage, setCurrentPage] = useState(1);
+    const [pageLimit, setPageLimit] = useState(10);
+
+
     // Ref for outside-click detection & PDF generation
     const popupRef = useRef(null);
 
     // --- 1) Fetch receipts if empty ---
     useEffect(() => {
-        dispatch(fetchAllReceipts({ page: pagination.currentPage || 1, limit: pagination.limit || 10 }));
-    }, [dispatch, pagination.currentPage, pagination.limit]);
+        dispatch(fetchAllReceipts({ page: currentPage, limit: pageLimit }));
+    }, [dispatch, currentPage, pageLimit]);
 
 
     // --- 2) Close receipt preview modal on outside click ---
@@ -419,55 +423,26 @@ const RecentReceiptsList = () => {
                                 ),
                             }}
                             pagination={{
-                                current: pagination.currentPage,
-                                total: pagination.totalRecords,
-                                pageSize: pagination.limit,
-                                showSizeChanger: false,
+                                current: currentPage, // Use state
+                                total: pagination.totalRecords, // Total records from API response
+                                pageSize: pageLimit, // Use state for limit
+                                showSizeChanger: true,
+                                pageSizeOptions: ["5", "10", "20", "50"],
                                 size: "small",
                                 showTotal: (total) =>
-                                    `Page ${pagination.currentPage} of ${pagination.totalPages} | Total ${total} records`,
+                                    `Page ${currentPage} of ${Math.ceil(pagination.totalRecords / pageLimit)} | Total ${total} records`,
                                 onChange: (page) => {
-                                    dispatch(fetchAllReceipts({ page, limit: pagination.limit }));
+                                    setCurrentPage(page); // Update currentPage state
                                 },
-                            }}
-                            summary={() => {
-                                let totalPaidAmount = 0;
-                                let totalTax = 0;
-                                let totalDiscount = 0;
-                                let totalPenalty = 0;
-
-                                // Calculate totals from filteredData
-                                filteredData.forEach((record) => {
-                                    totalPaidAmount += record.totalPaidAmount || 0;
-                                    totalTax += record.tax || 0;
-                                    totalDiscount += record.discount || 0;
-                                    totalPenalty += record.penalty || 0;
-                                });
-
-                                return (
-                                    <Table.Summary.Row>
-                                        <Table.Summary.Cell index={0} colSpan={3}>
-                                            <strong>Totals:</strong>
-                                        </Table.Summary.Cell>
-                                        <Table.Summary.Cell index={1}>
-                                            <strong>{totalPaidAmount.toLocaleString()} QAR</strong>
-                                        </Table.Summary.Cell>
-                                        <Table.Summary.Cell index={2}>
-                                            <strong>{totalTax.toLocaleString()} QAR</strong>
-                                        </Table.Summary.Cell>
-                                        <Table.Summary.Cell index={3}>
-                                            <strong>{totalDiscount.toLocaleString()} QAR</strong>
-                                        </Table.Summary.Cell>
-                                        <Table.Summary.Cell index={4}>
-                                            <strong>{totalPenalty.toLocaleString()} QAR</strong>
-                                        </Table.Summary.Cell>
-                                        <Table.Summary.Cell index={5} />
-                                    </Table.Summary.Row>
-                                );
+                                onShowSizeChange: (current, size) => {
+                                    setPageLimit(size); // Update pageLimit state
+                                    setCurrentPage(1); // Reset to the first page
+                                },
                             }}
                             size="small"
                             bordered
                         />
+
 
                     </>
                 )}
