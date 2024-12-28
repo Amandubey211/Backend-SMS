@@ -94,13 +94,15 @@ const RecentReceiptsList = () => {
         const result = await dispatch(cancelReceipt(selectedReceiptId));
         if (result.payload === "Receipt cancel successfully") {
             toast.success("Receipt canceled successfully!");
-            dispatch(fetchAllReceipts());
+            // Pass the currentPage and pageLimit when fetching receipts
+            dispatch(fetchAllReceipts({ page: currentPage, limit: pageLimit }));
         } else {
             toast.error("Failed to cancel receipt.");
         }
         setCancelLoading(false);
         setModalVisible(false);
     };
+
 
     // --- Preview Receipt (opens modal) ---
     const handlePreview = (record) => {
@@ -128,7 +130,8 @@ const RecentReceiptsList = () => {
             const result = await dispatch(deleteReceipt(record._id));
             if (result.payload === "Receipt Deleted successfully") {
                 toast.success("Receipt deleted successfully!");
-                dispatch(fetchAllReceipts());
+                // Pass the currentPage and pageLimit when fetching receipts
+                dispatch(fetchAllReceipts({ page: currentPage, limit: pageLimit }));
             } else {
                 toast.error("Failed to delete receipt.");
             }
