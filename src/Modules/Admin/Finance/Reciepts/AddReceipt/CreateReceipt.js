@@ -28,7 +28,7 @@ const CreateReceipt = () => {
       mailId: data.receiver?.email || "",
       contactNumber: data.receiver?.phone || "",
       address: data.receiver?.address || "",
-
+      discountType: data.discountType || "",
       tax: data.tax ? data.tax.toString() : "",
       discount: data.discount ? data.discount.toString() : "",
       penalty: data.penalty ? data.penalty.toString() : "",
@@ -38,7 +38,7 @@ const CreateReceipt = () => {
       remark: data.remark || "",
       invoiceNumber: data.invoiceNumber || "",
 
-      document: null, // can't populate an existing file
+      // document: null, // can't populate an existing file
 
       items: Array.isArray(data.lineItems)
         ? data.lineItems.map((item) => ({
@@ -66,7 +66,7 @@ const CreateReceipt = () => {
     remark: "",
     invoiceNumber: "",
 
-    document: null,
+    // document: null,
     items: [{ category: "", quantity: "", totalAmount: "" }],
   };
 
@@ -92,9 +92,10 @@ const CreateReceipt = () => {
       .min(0, "Penalty must be positive")
       .required("Penalty is required"),
     totalPaidAmount: Yup.number()
-      .typeError("Total Paid must be a number")
-      .min(0, "Total Paid must be positive")
+      .typeError("Total Paid must be a valid number")
+      .min(0, "Total Paid Amount cannot be negative")
       .required("Total Paid Amount is required"),
+
     contactNumber: Yup.string().required("Contact number is required"),
     mailId: Yup.string().email("Invalid email address").required("Email is required"),
     address: Yup.string().required("Address is required"),
@@ -115,27 +116,24 @@ const CreateReceipt = () => {
       )
       .min(1, "At least one line item is required"),
   });
-  
+
 
   // --- Handle Submit (disabled if readOnly) ---
   const handleSubmit = (values, { setSubmitting, resetForm }) => {
-    // If read-only, do nothing
     if (readOnly) {
       setSubmitting(false);
       return;
     }
 
-    // Prepare payload
     const formValues = {
-      tax: values.tax || 0,
-      discount: values.discount || 0,
-      penalty: values.penalty || 0,
-      totalPaidAmount: values.totalPaidAmount || 0,
+      tax: parseFloat(values.tax) || 0,
+      discount: parseFloat(values.discount) || 0,
+      penalty: parseFloat(values.penalty) || 0,
+      totalPaidAmount: parseFloat(values.totalPaidAmount) || 0,
       discountType: values.discountType || "",
       govtRefNumber: values.govtRefNumber || "",
       remark: values.remark || "",
       invoiceNumber: values.invoiceNumber || "",
-
       receiver: {
         name: values.receiverName,
         email: values.mailId,
@@ -144,25 +142,19 @@ const CreateReceipt = () => {
       },
       lineItems: values.items.map((item) => ({
         revenueType: item.category,
-        quantity: item.quantity,
-        total: item.totalAmount,
+        quantity: parseFloat(item.quantity) || 0,
+        total: parseFloat(item.totalAmount) || 0,
       })),
-      document: values.document,
     };
 
     dispatch(createReceipt(formValues))
       .unwrap()
       .then((response) => {
-        // Check success. e.g. if response includes { message: "Receipt created successfully" }
-        // or if your thunk returns { status: 201, ... } etc.
-        console.log(response);
         if (response?.message === "Receipt created successfully") {
           toast.success("Receipt created successfully!");
           resetForm();
-          // Navigate to the receipts list
           navigate("/finance/receipts/receipt-list");
         } else {
-          // If there's no "message" or success condition, show an error or handle accordingly
           toast.error("Failed to create receipt.");
         }
       })
@@ -174,6 +166,7 @@ const CreateReceipt = () => {
         setSubmitting(false);
       });
   };
+
 
   return (
     <DashLayout>
@@ -295,7 +288,10 @@ const CreateReceipt = () => {
                   label="Total Paid *"
                   placeholder="Enter total paid amount"
                   disabled={readOnly}
+                  inputMode="decimal"
+                  onChange={(e) => setFieldValue("totalPaidAmount", parseFloat(e.target.value) || "")}
                 />
+
                 {/* Optional fields */}
                 <TextInput
                   name="govtRefNumber"
