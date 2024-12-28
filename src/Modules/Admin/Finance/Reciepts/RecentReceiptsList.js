@@ -24,7 +24,7 @@ import EmailModal from "../../../../Components/Common/EmailModal";
 
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
-import {ExportOutlined} from "@ant-design/icons"; 
+import { ExportOutlined } from "@ant-design/icons";
 
 // ExportModal if you have it:
 import ExportModal from "./Components/ExportModal";
@@ -292,7 +292,7 @@ const RecentReceiptsList = () => {
             dataIndex: "discount",
             key: "discount",
             sorter: (a, b) => (a.discount || 0) - (b.discount || 0),
-            render: (discount) => `${discount || 0} QAR`,
+            render: (discount) => `${discount || 0}%`,
         },
         {
             title: "Penalty",
@@ -322,30 +322,6 @@ const RecentReceiptsList = () => {
             ),
         },
     ];
-
-    // // Loading / Error UI
-    // if (loading) {
-    //     return (
-    //         <AdminLayout>
-    //             <div style={{ textAlign: "center", padding: "16px" }}>
-    //                 <Spinner />
-    //             </div>
-    //         </AdminLayout>
-    //     );
-    // }
-
-    // if (error) {
-    //     return (
-    //         <AdminLayout>
-    //             <div
-    //                 style={{ textAlign: "center", color: "#FF4D4F", marginTop: "16px" }}
-    //             >
-    //                 <ExclamationCircleOutlined style={{ fontSize: "48px" }} />
-    //                 <p>Unable to fetch the receipts.</p>
-    //             </div>
-    //         </AdminLayout>
-    //     );
-    // }
 
     // Render
     return (
@@ -405,85 +381,82 @@ const RecentReceiptsList = () => {
 
                         {/* Table */}
                         <Table
-    rowKey={(record) => record._id}
-    columns={columns}
-    dataSource={filteredData}
-    expandable={{
-        expandedRowRender: (record) => (
-            <div>
-                <strong>Line Items:</strong>
-                {record.lineItems && record.lineItems.length > 0 ? (
-                    <ul>
-                        {record.lineItems.map((item, index) => (
-                            <li key={index}>
-                                {item.revenueType || item.name || "Item"}: {item.total || 0} QAR
-                            </li>
-                        ))}
-                    </ul>
-                ) : (
-                    <span>No line items available</span>
-                )}
-            </div>
-        ),
-    }}
-    pagination={{
-        current: currentPage, // Use state
-        total: pagination.totalRecords, // Total records from API response
-        pageSize: pageLimit, // Use state for limit
-        showSizeChanger: true,
-        pageSizeOptions: ["5", "10", "20", "50"],
-        size: "small",
-        showTotal: (total) =>
-            `Page ${currentPage} of ${Math.ceil(pagination.totalRecords / pageLimit)} | Total ${total} records`,
-        onChange: (page) => {
-            setCurrentPage(page); // Update currentPage state
-        },
-        onShowSizeChange: (current, size) => {
-            setPageLimit(size); // Update pageLimit state
-            setCurrentPage(1); // Reset to the first page
-        },
-    }}
-    summary={() => {
-        let totalPaidAmount = 0;
-        let totalTax = 0;
-        let totalDiscount = 0;
-        let totalPenalty = 0;
+                            rowKey={(record) => record._id}
+                            columns={columns}
+                            dataSource={filteredData}
+                            expandable={{
+                                expandedRowRender: (record) => (
+                                    <div>
+                                        <strong>Line Items:</strong>
+                                        {record.lineItems && record.lineItems.length > 0 ? (
+                                            <ul>
+                                                {record.lineItems.map((item, index) => (
+                                                    <li key={index}>
+                                                        {item.revenueType || item.name || "Item"}: {item.total || 0} QAR
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        ) : (
+                                            <span>No line items available</span>
+                                        )}
+                                    </div>
+                                ),
+                            }}
+                            pagination={{
+                                current: currentPage, // Use state
+                                total: pagination.totalRecords, // Total records from API response
+                                pageSize: pageLimit, // Use state for limit
+                                showSizeChanger: true,
+                                pageSizeOptions: ["5", "10", "20", "50"],
+                                size: "small",
+                                showTotal: (total) =>
+                                    `Page ${currentPage} of ${Math.ceil(pagination.totalRecords / pageLimit)} | Total ${total} records`,
+                                onChange: (page) => {
+                                    setCurrentPage(page); // Update currentPage state
+                                },
+                                onShowSizeChange: (current, size) => {
+                                    setPageLimit(size); // Update pageLimit state
+                                    setCurrentPage(1); // Reset to the first page
+                                },
+                            }}
+                            summary={() => {
+                                let totalPaidAmount = 0;
+                                let totalTax = 0;
+                                let totalDiscount = 0;
+                                let totalPenalty = 0;
 
-        // Calculate totals from filteredData
-        filteredData.forEach((record) => {
-            totalPaidAmount += record.totalPaidAmount || 0;
-            totalTax += record.tax || 0;
-            totalDiscount += record.discount || 0;
-            totalPenalty += record.penalty || 0;
-        });
+                                // Calculate totals from filteredData
+                                filteredData.forEach((record) => {
+                                    totalPaidAmount += record.totalPaidAmount || 0;
+                                    totalTax += record.tax || 0;
+                                    totalDiscount += record.discount || 0;
+                                    totalPenalty += record.penalty || 0;
+                                });
 
-        return (
-            <Table.Summary.Row>
-                <Table.Summary.Cell index={0} colSpan={3}>
-                    <strong>Totals:</strong>
-                </Table.Summary.Cell>
-                <Table.Summary.Cell index={1}>
-                    <strong>{totalPaidAmount.toLocaleString()} QAR</strong>
-                </Table.Summary.Cell>
-                <Table.Summary.Cell index={2}>
-                    <strong>{totalTax.toLocaleString()} QAR</strong>
-                </Table.Summary.Cell>
-                <Table.Summary.Cell index={3}>
-                    <strong>{totalDiscount.toLocaleString()} QAR</strong>
-                </Table.Summary.Cell>
-                <Table.Summary.Cell index={4}>
-                    <strong>{totalPenalty.toLocaleString()} QAR</strong>
-                </Table.Summary.Cell>
-                <Table.Summary.Cell index={5} />
-            </Table.Summary.Row>
-        );
-    }}
-    size="small"
-    bordered
-/>
-
-
-
+                                return (
+                                    <Table.Summary.Row>
+                                        <Table.Summary.Cell index={0} colSpan={3}>
+                                            <strong>Totals:</strong>
+                                        </Table.Summary.Cell>
+                                        <Table.Summary.Cell index={1}>
+                                            <strong>{totalPaidAmount.toLocaleString()} QAR</strong>
+                                        </Table.Summary.Cell>
+                                        <Table.Summary.Cell index={2}>
+                                            <strong>{totalTax.toLocaleString()} QAR</strong>
+                                        </Table.Summary.Cell>
+                                        <Table.Summary.Cell index={3}>
+                                            <strong>{totalDiscount.toLocaleString()}%</strong>
+                                        </Table.Summary.Cell>
+                                        <Table.Summary.Cell index={4}>
+                                            <strong>{totalPenalty.toLocaleString()} QAR</strong>
+                                        </Table.Summary.Cell>
+                                        <Table.Summary.Cell index={5} />
+                                    </Table.Summary.Row>
+                                );
+                            }}
+                            size="small"
+                            bordered
+                        />
                     </>
                 )}
                 {/* Cancel Confirmation Modal */}
