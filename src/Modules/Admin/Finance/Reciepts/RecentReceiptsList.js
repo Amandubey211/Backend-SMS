@@ -297,12 +297,16 @@ const RecentReceiptsList = () => {
             render: (penalty) => `${penalty || 0} QAR`,
         },
         {
-            title: "Invoice Ref ID",
-            dataIndex: "invoiceRefId",
-            key: "invoiceRefId",
-            sorter: (a, b) => (a.invoiceRefId || "").localeCompare(b.invoiceRefId || ""),
-            render: (invoiceRefId) => invoiceRefId || "N/A",
+            title: "Invoice Number",
+            dataIndex: "invoiceNumber",
+            key: "invoiceNumber",
+            sorter: (a, b) =>
+                (a.invoiceNumber?.invoiceNumber || "").localeCompare(
+                    b.invoiceNumber?.invoiceNumber || ""
+                ),
+            render: (invoiceNumber) => invoiceNumber?.invoiceNumber || "N/A",
         },
+
         {
             title: "Action",
             key: "action",
