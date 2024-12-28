@@ -9,6 +9,7 @@ import ReturnItems from "./Components/ReturnItems";
 import FileInput from "./Components/FileInput";
 import { createReceipt } from "../../../../../Store/Slices/Finance/Receipts/receiptsThunks";
 import { toast } from "react-hot-toast";
+import SelectInput from "../../PenaltiesandAdjustments/AddPenaltyAdjustment/Components/SelectInput";
 
 const CreateReceipt = () => {
   const dispatch = useDispatch();
@@ -35,7 +36,7 @@ const CreateReceipt = () => {
 
       govtRefNumber: data.govtRefNumber || "",
       remark: data.remark || "",
-      invoiceNumber: data.invoiceNumber || "", 
+      invoiceNumber: data.invoiceNumber || "",
 
       document: null, // can't populate an existing file
 
@@ -55,7 +56,7 @@ const CreateReceipt = () => {
     mailId: "",
     contactNumber: "",
     address: "",
-
+    discountType: "",
     tax: "",
     discount: "",
     penalty: "",
@@ -79,6 +80,9 @@ const CreateReceipt = () => {
       .typeError("Tax must be a number")
       .min(0, "Tax must be positive")
       .required("Tax is required"),
+    discountType: Yup.string()
+      .oneOf(["percentage", "fixed"], "Invalid discount type")
+      .required("Discount type is required"),
     discount: Yup.number()
       .typeError("Discount must be a number")
       .min(0, "Discount must be positive")
@@ -91,12 +95,10 @@ const CreateReceipt = () => {
       .typeError("Total Paid must be a number")
       .min(0, "Total Paid must be positive")
       .required("Total Paid Amount is required"),
-
     contactNumber: Yup.string().required("Contact number is required"),
     mailId: Yup.string().email("Invalid email address").required("Email is required"),
     address: Yup.string().required("Address is required"),
     receiverName: Yup.string().required("Name is required"),
-
     items: Yup.array()
       .of(
         Yup.object().shape({
@@ -113,6 +115,7 @@ const CreateReceipt = () => {
       )
       .min(1, "At least one line item is required"),
   });
+  
 
   // --- Handle Submit (disabled if readOnly) ---
   const handleSubmit = (values, { setSubmitting, resetForm }) => {
@@ -128,7 +131,7 @@ const CreateReceipt = () => {
       discount: values.discount || 0,
       penalty: values.penalty || 0,
       totalPaidAmount: values.totalPaidAmount || 0,
-
+      discountType: values.discountType || "",
       govtRefNumber: values.govtRefNumber || "",
       remark: values.remark || "",
       invoiceNumber: values.invoiceNumber || "",
@@ -270,6 +273,17 @@ const CreateReceipt = () => {
                   placeholder="Enter discount"
                   disabled={readOnly}
                 />
+                <SelectInput
+                  name="discountType"
+                  label="Discount Type *"
+                  options={[
+                    { value: "percentage", label: "Percentage" },
+                    { value: "fixed", label: "Fixed Amount" },
+                  ]}
+                  placeholder="Select discount type"
+                  disabled={readOnly}
+                />
+
                 <TextInput
                   name="penalty"
                   label="Penalty *"
