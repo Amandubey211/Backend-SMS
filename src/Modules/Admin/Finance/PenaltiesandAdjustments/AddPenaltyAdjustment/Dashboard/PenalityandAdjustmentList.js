@@ -4,21 +4,14 @@ import AdminDashLayout from "../../../../../../Components/Admin/AdminDashLayout"
 import useNavHeading from "../../../../../../Hooks/CommonHooks/useNavHeading ";
 import { Alert, Button, Dropdown, Input, Menu, Spin, Table, Tag } from "antd";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchAlladjustments } from "../../../../../../Store/Slices/Finance/Earnings/earningsThunks";
 import debounce from "lodash.debounce";
-import { fetchReturnInvoice } from "../../../../../../Store/Slices/Finance/PenalityandAdjustment/adjustment.thunk";
+import { cancleReturnInvoiceData, fetchReturnInvoice } from "../../../../../../Store/Slices/Finance/PenalityandAdjustment/adjustment.thunk";
 import { useNavigate } from "react-router-dom";
 import { FiPlus } from "react-icons/fi";
-import { EllipsisOutlined, ExportOutlined, MoreOutlined, SearchOutlined } from "@ant-design/icons";
+import { ExportOutlined, MoreOutlined, SearchOutlined } from "@ant-design/icons";
 import ExportModal from "../../../Earnings/Components/ExportModal";
 import { setCurrentPage } from "../../../../../../Store/Slices/Finance/PenalityandAdjustment/adjustment.slice";
 
-// Mapping payment types to corresponding icons
-// const paymentTypeIcons = {
-//   cash: <DollarOutlined />,
-//   online: <CloudOutlined />,
-//   credit: <CreditCardOutlined />,
-// };
 
 const PenalityandAdjustmentList = () => {
   useNavHeading("Finance", "Penality & Adjustment List");
@@ -41,6 +34,17 @@ const PenalityandAdjustmentList = () => {
   const [computedPageSize,setComputedPageSize]=useState(paze_size)
 
   
+  const handleCancleReturnInvoice=(id)=>{
+    const params = {
+      search: searchText,
+      page: 1, // Always fetch the first page
+      limit: 10, // Limit to 5 records
+      sortBy: "createdAt",
+      sortOrder: "desc",
+    };
+    dispatch(cancleReturnInvoiceData({params,id}))
+  }
+
   // Debounced function to fetch adjustments with a fixed limit of 5
   const debouncedFetch = useCallback(
     debounce((params) => {
@@ -48,6 +52,8 @@ const PenalityandAdjustmentList = () => {
     }, 300),
     [dispatch]
   );
+
+ 
 
   // Fetch data on component mount with limit set to 5
   useEffect(() => {
@@ -66,18 +72,20 @@ const PenalityandAdjustmentList = () => {
     {
       title: "Return Invoice No.",
       dataIndex: "return_invoice_no",
-      key: "return_imvoice_no",
+      key: "return_invoice_no",
       render: (text) => <span className="text-xs">{text}</span>,
       width: 150,
       ellipsis: true,
+      sorter: (a, b) => a.return_invoice_no.localeCompare(b.return_invoice_no),
     },
     {
       title: "Invoice No. Ref",
       dataIndex: "invoice_no",
-      key: "imvoice_no",
+      key: "invoice_no",
       render: (text) => <span className="text-xs">{text}</span>,
       width: 150,
       ellipsis: true,
+      sorter: (a, b) => a.invoice_no.localeCompare(b.invoice_no),
     },
     {
       title: "Receiver",
@@ -86,6 +94,7 @@ const PenalityandAdjustmentList = () => {
       render: (text) => <span className="text-xs">{text}</span>,
       width: 150,
       ellipsis: true,
+      sorter: (a, b) => a.receiver.localeCompare(b.receiver),
     },
     {
       title: "Total Amount(QR)",
@@ -94,6 +103,7 @@ const PenalityandAdjustmentList = () => {
       render: (value) => <span className="text-xs">{value || "0"} QR</span>,
       width: 120,
       ellipsis: true,
+      sorter: (a, b) => (a.adjustmentAmount || 0) - (b.adjustmentAmount || 0),
     },
     {
       title: "Final Amount(QR)",
@@ -104,15 +114,16 @@ const PenalityandAdjustmentList = () => {
       ),
       width: 120,
       ellipsis: true,
+      sorter: (a, b) => (a.adjustmentTotal || 0) - (b.adjustmentTotal || 0),
     },
-
     {
       title: "Status",
       dataIndex: "status",
       key: "status",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <Tag color={text=="Cancelled"?"red":"purple"} className="text-xs"><span className="text-xs">{text}</span></Tag>,
       width: 100,
       ellipsis: true,
+      sorter: (a, b) => a.status.localeCompare(b.status),
     },
     {
       title: "Date",
@@ -127,40 +138,50 @@ const PenalityandAdjustmentList = () => {
               day: "numeric",
             }).format(date)
           : "N/A";
-
+  
         return <span className="text-xs">{formattedDate}</span>;
       },
       width: 120,
       ellipsis: {
         showTitle: true,
       },
+      sorter: (a, b) => new Date(a.adjustedAt) - new Date(b.adjustedAt),
     },
     {
       title: "Action",
       dataIndex: "action",
       key: "action",
       render: (_, record) => {
-        const menu = (
-          <Menu>
-            <Menu.Item key="1" onClick={() => console.log("Edit", record)}>
-              preview
-            </Menu.Item>
-            <Menu.Item key="2" onClick={() => console.log("Delete", record)}>
-              Cancle
-            </Menu.Item>
-            <Menu.Item key="3" onClick={() => console.log("View Details", record)}>
-              send Mail
-            </Menu.Item>
-          </Menu>
-        );
-  
+        console.log("Record----------", record);
+    
+        const menuItems = [
+          {
+            key: "1",
+            label: "Preview",
+            onClick: () => console.log("Edit", record),
+          },
+          {
+            key: "2",
+            label: "Cancel",
+            onClick: () => handleCancleReturnInvoice(record?.key),
+          },
+          {
+            key: "3",
+            label: "Send Mail",
+            onClick: () => console.log("Send Mail", record),
+          },
+        ];
+    
         return (
-          <Dropdown overlay={menu} trigger={["click"]}>
+          <Dropdown
+            menu={{ items: menuItems }}
+            trigger={["click"]}
+          >
             <MoreOutlined
               style={{
                 fontSize: "15px",
                 cursor: "pointer",
-                transform: "rotate(180deg)", 
+                transform: "rotate(180deg)",
               }}
             />
           </Dropdown>
@@ -168,9 +189,10 @@ const PenalityandAdjustmentList = () => {
       },
       width: 100,
       ellipsis: true,
-    },
+    }
+    
   ];
-
+  
   // Transform adjustments data to table dataSource and limit to 10 records
   const dataSource = adjustmentData?.map((adjustment) => ({
     key: adjustment?._id,
