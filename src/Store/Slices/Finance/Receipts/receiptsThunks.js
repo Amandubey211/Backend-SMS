@@ -56,7 +56,7 @@ export const createReceipt = createAsyncThunk(
       formData.append("remark", payload.remark);
       formData.append("schoolId", payload.schoolId);
       formData.append("academicYear", payload.academicYear);
-
+      formData.append("invoiceNumber", payload.invoiceNumber);
       // Receiver (nested)
       formData.append("receiver[name]", payload.receiver.name);
       formData.append("receiver[email]", payload.receiver.email);

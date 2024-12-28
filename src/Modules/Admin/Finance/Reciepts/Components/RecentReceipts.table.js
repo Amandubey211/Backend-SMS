@@ -200,11 +200,11 @@ const RecentReceipts = () => {
       render: (penalty) => `${penalty || 0} QAR`,
     },
     {
-      title: "Remark",
-      dataIndex: "remark",
-      key: "remark",
-      sorter: (a, b) => (a.remark || "").localeCompare(b.remark || ""),
-      render: (remark) => remark || "N/A",
+        title: "Invoice Ref ID",
+        dataIndex: "receiptNumber",
+        key: "receiptNumber",
+        sorter: (a, b) => (a.receiptNumber || "").localeCompare(b.receiptNumber || ""),
+        render: (receiptNumber) => receiptNumber || "N/A",
     },
     {
       title: "Action",

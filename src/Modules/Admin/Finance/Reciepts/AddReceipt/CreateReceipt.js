@@ -35,16 +35,16 @@ const CreateReceipt = () => {
 
       govtRefNumber: data.govtRefNumber || "",
       remark: data.remark || "",
-      invoiceRefId: data.invoiceRefId || "", // optional
+      invoiceNumber: data.invoiceNumber || "", 
 
       document: null, // can't populate an existing file
 
       items: Array.isArray(data.lineItems)
         ? data.lineItems.map((item) => ({
-            category: item.revenueType || "",
-            quantity: item.quantity?.toString() || "",
-            totalAmount: item.total?.toString() || "",
-          }))
+          category: item.revenueType || "",
+          quantity: item.quantity?.toString() || "",
+          totalAmount: item.total?.toString() || "",
+        }))
         : [{ category: "", quantity: "", totalAmount: "" }],
     };
   };
@@ -63,7 +63,7 @@ const CreateReceipt = () => {
 
     govtRefNumber: "",
     remark: "",
-    invoiceRefId: "",
+    invoiceNumber: "",
 
     document: null,
     items: [{ category: "", quantity: "", totalAmount: "" }],
@@ -131,7 +131,7 @@ const CreateReceipt = () => {
 
       govtRefNumber: values.govtRefNumber || "",
       remark: values.remark || "",
-      invoiceRefId: values.invoiceRefId || "",
+      invoiceNumber: values.invoiceNumber || "",
 
       receiver: {
         name: values.receiverName,
@@ -290,9 +290,9 @@ const CreateReceipt = () => {
                   disabled={readOnly}
                 />
                 <TextInput
-                  name="invoiceRefId"
-                  label="Invoice Reference ID"
-                  placeholder="Enter invoice ref ID"
+                  name="invoiceNumber" // Renamed from invoiceRefId to invoiceNumber
+                  label="Invoice Reference ID" // You can update the label if needed
+                  placeholder="Enter invoice reference number"
                   disabled={readOnly}
                 />
                 <TextInput
