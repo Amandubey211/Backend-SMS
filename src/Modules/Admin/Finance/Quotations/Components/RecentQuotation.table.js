@@ -79,6 +79,7 @@ const RecentQuotation = () => {
             title: "Final Amount (QR)",
             dataIndex: "final_amount",
             key: "final_amount",
+            sorter: (a, b) => (a.final_amount || 0) - (b.final_amount || 0),
             render: (value) => <span className="text-xs">{value || "0"} QR</span>,
             width: 120,
             ellipsis: true,

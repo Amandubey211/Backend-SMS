@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import AdminLayout from "../../../../Components/Admin/AdminDashLayout";
 import { Menu, Dropdown } from "antd";
 import { MoreOutlined } from "@ant-design/icons";
-import { FiUserPlus } from "react-icons/fi";
+import { FiPlus, FiUserPlus } from "react-icons/fi";
 import { RiErrorWarningFill } from "react-icons/ri";
 import { FcDeleteDatabase } from "react-icons/fc";
 import { useDispatch, useSelector } from "react-redux";
@@ -107,7 +107,7 @@ const RecentQuotationList = () => {
           >
             <span className="text-gray-800 font-medium">Add New Quotation</span>
             <div className="w-12 h-12 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center text-white">
-              <FiUserPlus size={16} />
+              <FiPlus size={16} />
             </div>
           </button>
         </div>
