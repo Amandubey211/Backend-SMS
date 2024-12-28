@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import AdminLayout from "../../../../Components/Admin/AdminDashLayout";
-import { Menu, Dropdown, Input, Table } from "antd";
+import { Menu, Dropdown, Input, Table, Tag } from "antd";
 import {
     MoreOutlined,
     ExclamationCircleOutlined,
@@ -294,8 +294,19 @@ const RecentReceiptsList = () => {
             title: "Discount",
             dataIndex: "discount",
             key: "discount",
-            sorter: (a, b) => (a.discount || 0) - (b.discount || 0),
-            render: (discount) => `${discount || 0}%`,
+            sorter: (a, b) => (a.discount || 0) - (b.discount || 0), // Optional: Preserve sorting
+            render: (value, record) =>
+                record.discountType === "percentage" ? (
+                    <Tag color="purple" className="text-xs">
+                        {value || 0}%
+                    </Tag>
+                ) : (
+                    <Tag color="orange" className="text-xs">
+                        {value || 0} QR
+                    </Tag>
+                ),
+            width: 100,
+            ellipsis: true,
         },
         {
             title: "Penalty",
