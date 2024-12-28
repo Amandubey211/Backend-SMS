@@ -26,7 +26,7 @@ const Card = ({ title, count, color, textColor, customContent, tag, icon }) => {
               className={`${tag === "receipts" || tag === "receipt" ? "text-xs" : "text-purple-800"
                 }`}
             >
-              {tag === "receipts" || tag === "receipt" ? (count === 1 ? "receipt" : "receipts") : tag}
+              {tag === "receipts" || tag === "receipt" ? (count > 1 ? "receipts" : "receipt") : tag}
             </span>
           </p>
         </div>
