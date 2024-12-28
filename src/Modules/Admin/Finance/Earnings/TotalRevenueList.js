@@ -8,7 +8,6 @@ import {
   Spin,
   Alert,
   Tooltip,
-  Card,
   Tag,
   Checkbox,
 } from "antd";
@@ -38,6 +37,10 @@ import FilterRevenueModal from "./Components/FilterRevenueModal";
 import BulkEntriesModal from "./Components/BulkEntriesModal";
 import debounce from "lodash.debounce";
 import { fetchAllIncomes } from "../../../../Store/Slices/Finance/Earnings/earningsThunks";
+import { AiFillAccountBook } from "react-icons/ai";
+import { BiDonateHeart } from "react-icons/bi";
+import { FaRegMoneyBillAlt } from "react-icons/fa";
+import { MdOutlineMoneyOff } from "react-icons/md";
 import {
   setCurrentPage,
   setFilters,
@@ -47,6 +50,7 @@ import {
 } from "../../../../Store/Slices/Finance/Earnings/earningsSlice";
 import toast from "react-hot-toast";
 import Layout from "../../../../Components/Common/Layout";
+import Card from "../Expense/components/Card";
 
 // Mapping payment types to corresponding icons
 const paymentTypeIcons = {
@@ -455,66 +459,44 @@ const TotalRevenueList = () => {
   };
 
   // Retrieve statistics from Redux store and map to color classes
-  const cardData = useMemo(
-    () => [
+  // Define card data directly without importing from cardsData
+  const cardDataWithValues = useMemo(() => {
+    const cards = [
       {
-        title: "Paid Amount",
-        icon: <CheckCircleOutlined />,
-        color: "green",
-        amount: formatCurrency(totalPaidAmount),
+        title: "Total Revenue",
+        value: formatCurrency(totalRevenue),
+        icon: <AiFillAccountBook />,
+        color: "purple",
       },
-
       {
         title: "Remaining Partial Paid",
-        icon: <PieChartOutlined />,
+        value: formatCurrency(remainingPartialPaidRevenue),
+        icon: <BiDonateHeart />,
         color: "yellow",
-        amount: formatCurrency(remainingPartialPaidRevenue),
+      },
+      {
+        title: "Total Paid Amount",
+        value: formatCurrency(totalPaidAmount),
+        icon: <FaRegMoneyBillAlt />,
+        color: "green",
       },
       {
         title: "Unpaid Amount",
-        icon: <ExclamationCircleOutlined />,
+        value: formatCurrency(unpaidRevenue),
+        icon: <MdOutlineMoneyOff />,
         color: "red",
-        amount: formatCurrency(unpaidRevenue),
       },
+      // Add more cards if necessary
+    ];
 
-      {
-        title: "Total Revenue",
-        icon: <DollarCircleOutlined />,
-        color: "purple",
-        amount: formatCurrency(totalRevenue),
-      },
-    ],
-    [totalRevenue, remainingPartialPaidRevenue, unpaidRevenue, totalPaidAmount]
-  );
-  // Compact Card Mapping: Adjusted to make cards smaller
-  const compactCardMapping = cardData?.map((card, index) => {
-    const currentColor = colorClasses[card.color] || colorClasses["purple"];
-    return (
-      <Card
-        key={index}
-        title={
-          <div
-            className={`flex items-center gap-2 ${currentColor.text} text-sm font-semibold`}
-          >
-            {card.icon}
-            {card.title}
-          </div>
-        }
-        className={`${currentColor.bg} shadow-sm border-none flex-grow`}
-        headStyle={{ borderBottom: "none", padding: "8px 10px" }} // Reduced padding
-        bodyStyle={{ padding: "8px 10px" }} // Reduced padding
-        style={{
-          flex: "1 1 150px", // Adjusted flex basis
-          maxWidth: "350px", // Adjusted maxWidth
-          textAlign: "center",
-        }}
-      >
-        <p className={`${currentColor.text} text-lg font-bold`}>
-          {card.amount}
-        </p>
-      </Card>
-    );
-  });
+    return cards;
+  }, [
+    totalRevenue,
+    remainingPartialPaidRevenue,
+    totalPaidAmount,
+    unpaidRevenue,
+  ]);
+
   const transformIncomeData = (incomes) =>
     incomes?.map(({ _id, category, ...income }, index) => ({
       sNo: index + 1,
@@ -538,8 +520,16 @@ const TotalRevenueList = () => {
       <AdminLayout>
         <div className="p-4 space-y-3">
           {/* Top Cards Row */}
-          <div className="w-full h-full flex flex-wrap justify-center items-stretch gap-2 p-2">
-            {compactCardMapping}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {cardDataWithValues.map((card, index) => (
+              <Card
+                key={index}
+                title={card.title}
+                value={card.value}
+                icon={card.icon}
+                // Pass other props like comparison, percentage, icon, trend if needed
+              />
+            ))}
           </div>
 
           {/* Header Section */}

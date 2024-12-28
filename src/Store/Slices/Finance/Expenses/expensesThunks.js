@@ -205,3 +205,55 @@ export const fetchExpenseById = createAsyncThunk(
     }
   }
 );
+
+export const fetchExpenseGraph = createAsyncThunk(
+  "expenses/fetchExpenseGraph",
+  async ({ groupBy = "month" }, { rejectWithValue, dispatch }) => {
+    try {
+      const say = getAY(); // Academic Year Identifier
+      dispatch(setShowError(false));
+      const response = await getData("/finance/dashboard/expense/graph", {
+        groupBy,
+        say,
+      });
+
+      if (response?.success) {
+        return response.data;
+      } else {
+        toast.error(response?.message || "Failed to fetch expense graph data.");
+        return rejectWithValue(
+          response?.message || "Failed to fetch expense graph data."
+        );
+      }
+    } catch (error) {
+      return handleError(error, dispatch, rejectWithValue);
+    }
+  }
+);
+
+export const fetchCardDataExpense = createAsyncThunk(
+  "expenses/fetchCardDataExpense",
+  async ({ year }, { rejectWithValue, dispatch }) => {
+    try {
+      const say = getAY(); // Academic Year Identifier
+      dispatch(setShowError(false));
+      const response = await getData(`/finance/dashboard/expense/cardData`, {
+        academicYearId: say,
+        year,
+      });
+
+      if (response?.success) {
+        return response.data;
+      } else {
+        toast.error(
+          response?.message || "Failed to fetch card data for expenses."
+        );
+        return rejectWithValue(
+          response?.message || "Failed to fetch card data for expenses."
+        );
+      }
+    } catch (error) {
+      return handleError(error, dispatch, rejectWithValue);
+    }
+  }
+);

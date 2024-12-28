@@ -15,7 +15,6 @@ import { useSelector, useDispatch } from "react-redux";
 import { fetchEarningGraph } from "../../../../Store/Slices/Finance/Earnings/earningsThunks";
 import { Spin, Button } from "antd";
 import { ReloadOutlined } from "@ant-design/icons";
-import { FaRedoAlt } from "react-icons/fa";
 
 ChartJS.register(
   LineElement,
@@ -55,9 +54,10 @@ const TotalEarningGraph = () => {
   const dispatch = useDispatch();
 
   // Access expenseGraph from Redux store
-  const { expenseGraph, graphLoading, graphError } = useSelector(
+  const { expenseGraph, graphLoading, error } = useSelector(
     (state) => state.admin.earnings
   );
+  console.log(expenseGraph);
 
   // Fetch the earning graph data on component mount
   useEffect(() => {
@@ -186,50 +186,14 @@ const TotalEarningGraph = () => {
     },
   };
 
-  // Handle graphLoading and graphError states gracefully
+  // Handle graphLoading and error states gracefully
   if (graphLoading) {
     return (
-      <div className="relative w-full h-[300px] bg-white rounded-lg shadow flex justify-center items-center">
-        <div className="absolute inset-0 bg-white opacity-75 flex justify-center items-center">
-          <Spin
-            size="large"
-            tip="Loading graph..."
-            className="animate-pulse"
-            indicator={
-              <svg
-                className="animate-spin h-10 w-10 text-pink-500"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                ></circle>
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8v8H4z"
-                ></path>
-              </svg>
-            }
-          />
-        </div>
+      <div className="flex justify-center items-center h-full">
+        <Spin size="large" tip="graphLoading graph..." />
       </div>
     );
   }
-
-  // if (graphError) {
-  //   return (
-  //     <div className="w-full bg-white p-4 rounded-lg shadow flex justify-center items-center">
-  //       <Alert message="graphError loading graph." type="graphError" showIcon />
-  //     </div>
-  //   );
-  // }
 
   return (
     <div className="w-full bg-white p-4 rounded-lg shadow space-y-4">
@@ -246,15 +210,12 @@ const TotalEarningGraph = () => {
             dispatch(fetchEarningGraph({ groupBy: e.target.value }))
           }
           defaultValue="month" // Default value; you can manage this with local state if needed
-          className="px-4 py-2 bg-white text-gray-700 font-medium text-sm border rounded-md hover:shadow-md transition focus:outline-none flex items-center"
+          className="px-4 py-2 bg-white text-gray-700 font-medium text-sm border rounded-md hover:shadow-md transition focus:outline-none"
           style={{
             borderImageSource: "linear-gradient(to right, #C83B62, #46138A)",
             borderImageSlice: 1,
             borderWidth: "2px",
             borderRadius: "8px",
-            backgroundColor: "#fff",
-            backgroundImage: "none",
-            boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
           }}
           aria-label="Group by"
         >

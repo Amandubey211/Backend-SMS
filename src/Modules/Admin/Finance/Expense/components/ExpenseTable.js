@@ -104,7 +104,7 @@ const ExpenseTable = () => {
       title: "Final Amount",
       dataIndex: "finalAmount",
       key: "finalAmount",
-      render: (value) => `${value || 0} QAR`,
+      render: (value) => `${value || 0} QR`,
       width: 120,
       ellipsis: true,
     },
@@ -113,7 +113,7 @@ const ExpenseTable = () => {
       dataIndex: "paidAmount",
       key: "paidAmount",
       render: (value) => (
-        <span className="text-xs text-green-600">{value || 0} QAR</span>
+        <span className="text-xs text-green-600">{value || 0} QR</span>
       ),
       width: 120,
       ellipsis: true,
@@ -123,7 +123,7 @@ const ExpenseTable = () => {
       dataIndex: "remainingAmount",
       key: "remainingAmount",
       render: (value) => (
-        <span className="text-xs text-red-600">{value || 0} QAR</span>
+        <span className="text-xs text-red-600">{value || 0} QR</span>
       ),
       width: 140,
       ellipsis: true,
