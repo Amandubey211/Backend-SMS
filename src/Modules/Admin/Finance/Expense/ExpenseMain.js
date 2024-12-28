@@ -15,14 +15,14 @@ const ExpenseMain = () => {
   return (
     <Layout title="Expense Dashboard | Student Diwan">
       <DashLayout>
-        <div className="p-2 md:p-6 space-y-3 scroll-smooth overflow-y-auto h-full w-full mx-auto">
+        <div className="p-2 space-y-2 scroll-smooth overflow-y-auto h-full w-full mx-auto">
           {/* Header Section */}
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 md:gap-0">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+          <div className="flex flex-col md:flex-row justify-end items-start md:items-center gap-4 md:gap-0">
+            {/* <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
               <h2 className="text-xl sm:text-2xl font-bold text-gray-800">
                 Expense Dashboard
               </h2>
-            </div>
+            </div> */}
 
             <button
               onClick={() => navigate("/finance/expenses/add")}

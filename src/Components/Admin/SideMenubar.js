@@ -367,8 +367,8 @@ const getSidebarVariants = (breakpoint) => {
   const widthMap = {
     sm: { open: "8rem", closed: "5rem" },
     md: { open: "12rem", closed: "5rem" },
-    lg: { open: "13rem", closed: "5rem" },
-    xl: { open: "14rem", closed: "6rem" },
+    lg: { open: "11rem", closed: "5rem" },
+    xl: { open: "12rem", closed: "6rem" },
   };
 
   return {

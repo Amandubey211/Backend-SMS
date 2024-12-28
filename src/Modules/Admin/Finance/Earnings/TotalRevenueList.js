@@ -115,6 +115,9 @@ const TotalRevenueList = () => {
     unpaidRevenue,
   } = useSelector((state) => state.admin.earnings);
 
+  // Initialize local state for computedPageSize
+  const [computedPageSize, setComputedPageSize] = useState(pageSize || 10);
+
   // Memoize a mapping from _id to income object for faster lookup
   const incomeIdMap = useMemo(() => {
     const map = {};
@@ -137,12 +140,12 @@ const TotalRevenueList = () => {
     const params = {
       search: searchText,
       page: currentPage,
-      limit: 10,
+      limit: computedPageSize, // Use computedPageSize here
       includeDetails: true,
       ...filters,
     };
     debouncedFetch(params);
-  }, [debouncedFetch, searchText, currentPage, pageSize, filters]);
+  }, [debouncedFetch, searchText, currentPage, computedPageSize, filters]);
 
   // Handle search input changes
   const handleSearch = (e) => {
@@ -243,7 +246,7 @@ const TotalRevenueList = () => {
           if (record.paymentStatus === "unpaid") {
             return (
               <div className="flex items-center justify-center">
-                <Tooltip title="Not selectable">
+                <Tooltip title="Selectable">
                   <Checkbox
                     checked={isSelected}
                     onChange={(e) => {
@@ -451,10 +454,6 @@ const TotalRevenueList = () => {
     );
   };
 
-  // Compute pageSize from totalRecords and totalPages to reflect backend pagination
-  const computedPageSize =
-    totalPages > 0 ? Math.ceil(totalRecords / totalPages) : pageSize;
-
   // Retrieve statistics from Redux store and map to color classes
   const cardData = useMemo(
     () => [
@@ -487,7 +486,35 @@ const TotalRevenueList = () => {
     ],
     [totalRevenue, remainingPartialPaidRevenue, unpaidRevenue, totalPaidAmount]
   );
-
+  // Compact Card Mapping: Adjusted to make cards smaller
+  const compactCardMapping = cardData?.map((card, index) => {
+    const currentColor = colorClasses[card.color] || colorClasses["purple"];
+    return (
+      <Card
+        key={index}
+        title={
+          <div
+            className={`flex items-center gap-2 ${currentColor.text} text-sm font-semibold`}
+          >
+            {card.icon}
+            {card.title}
+          </div>
+        }
+        className={`${currentColor.bg} shadow-sm border-none flex-grow`}
+        headStyle={{ borderBottom: "none", padding: "8px 10px" }} // Reduced padding
+        bodyStyle={{ padding: "8px 10px" }} // Reduced padding
+        style={{
+          flex: "1 1 150px", // Adjusted flex basis
+          maxWidth: "350px", // Adjusted maxWidth
+          textAlign: "center",
+        }}
+      >
+        <p className={`${currentColor.text} text-lg font-bold`}>
+          {card.amount}
+        </p>
+      </Card>
+    );
+  });
   const transformIncomeData = (incomes) =>
     incomes?.map(({ _id, category, ...income }, index) => ({
       sNo: index + 1,
@@ -511,48 +538,13 @@ const TotalRevenueList = () => {
       <AdminLayout>
         <div className="p-4 space-y-3">
           {/* Top Cards Row */}
-          <div className="w-full h-full flex flex-wrap justify-center items-stretch gap-4 p-2">
-            {cardData?.map((card, index) => {
-              const currentColor =
-                colorClasses[card.color] || colorClasses["purple"];
-              return (
-                <Card
-                  key={index}
-                  title={
-                    <div
-                      className={`flex items-center gap-2 ${currentColor.text} font-bold`}
-                    >
-                      {card.icon}
-                      {card.title}
-                    </div>
-                  }
-                  className={`${currentColor.bg} shadow-sm border-none flex-grow`}
-                  headStyle={{ borderBottom: "none" }}
-                  style={{
-                    flex: "1 1 200px",
-                    maxWidth: "400px",
-                    textAlign: "center",
-                    padding: "0.2rem", // Reduced padding for compactness
-                  }}
-                >
-                  <p className={`${currentColor.text} text-lg font-bold`}>
-                    {card.amount}
-                  </p>
-                </Card>
-              );
-            })}
+          <div className="w-full h-full flex flex-wrap justify-center items-stretch gap-2 p-2">
+            {compactCardMapping}
           </div>
 
           {/* Header Section */}
           <div className="flex flex-col md:flex-row justify-between items-center md:items-start gap-4">
-            <div className="flex items-center gap-4">
-              <div
-                className="cursor-pointer text-xl font-semibold transition"
-                onClick={() => navigate(-1)}
-              >
-                Total Revenue List
-              </div>
-
+            <div className="flex items-center gap-4 ms-4">
               <Input
                 placeholder="Search by Subcategory"
                 prefix={<SearchOutlined />}
@@ -629,20 +621,26 @@ const TotalRevenueList = () => {
             <Table
               dataSource={dataSource}
               columns={columns}
-              // Use computedPageSize to show correct number of pages as per backend
+              // Updated pagination configuration
               pagination={{
                 current: currentPage,
                 total: totalRecords,
                 pageSize: computedPageSize,
-                showSizeChanger: false,
+                showSizeChanger: true, // Enable size changer
+                pageSizeOptions: ["5", "10", "10", "20", "50"], // Define page size options
                 size: "small",
-                showTotal: () =>
+                showTotal: (total, range) =>
                   `Page ${currentPage} of ${totalPages} | Total ${totalRecords} records`,
+                onChange: (page, pageSize) => {
+                  dispatch(setCurrentPage(page)); // Update the current page in Redux
+                  setComputedPageSize(pageSize); // Update the local page size
+                },
+                onShowSizeChange: (current, size) => {
+                  setComputedPageSize(size); // Handle page size change locally
+                  dispatch(setCurrentPage(1)); // Optionally reset to first page
+                },
               }}
-              onChange={(pagination) => {
-                const newPage = pagination.current;
-                dispatch(setCurrentPage(newPage));
-              }}
+              // Removed the conflicting onChange prop from the Table
               className="rounded-lg shadow text-xs"
               bordered
               size="small"
@@ -679,6 +677,9 @@ const TotalRevenueList = () => {
           <ExportModal
             visible={isExportModalVisible}
             onClose={() => setIsExportModalVisible(false)}
+            dataToExport={transformIncomeData(incomes)}
+            title="EarningsData"
+            sheet="earnings_report"
           />
           <FilterRevenueModal
             visible={isFilterModalVisible}
@@ -690,32 +691,6 @@ const TotalRevenueList = () => {
             onClose={() => setIsBulkEntriesModalVisible(false)}
           />
         </div>
-
-        {/* Modals */}
-        <DeleteModal
-          visible={isDeleteModalVisible}
-          onClose={() => {
-            setIsDeleteModalVisible(false);
-            setSelectedIncomeForDeletion(null);
-          }}
-          income={selectedIncomeForDeletion}
-        />
-        <ExportModal
-          visible={isExportModalVisible}
-          onClose={() => setIsExportModalVisible(false)}
-          dataToExport={transformIncomeData(incomes)}
-          title="EarningsData"
-          sheet="earnings_report"
-        />
-        <FilterRevenueModal
-          visible={isFilterModalVisible}
-          onClose={() => setIsFilterModalVisible(false)}
-          onFilterApply={handleFilterApply}
-        />
-        <BulkEntriesModal
-          visible={isBulkEntriesModalVisible}
-          onClose={() => setIsBulkEntriesModalVisible(false)}
-        />
       </AdminLayout>
     </Layout>
   );

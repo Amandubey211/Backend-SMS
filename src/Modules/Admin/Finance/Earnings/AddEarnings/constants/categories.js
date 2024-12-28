@@ -1,5 +1,5 @@
 export const categories = [
-  // "Student-Based Revenue",
+  "Student-Based Revenue",
   "Facility-Based Revenue",
   "Service-Based Revenue",
   "Community and External Revenue",
@@ -10,17 +10,17 @@ export const categories = [
 ];
 
 export const subCategories = {
-  // "Student-Based Revenue": [
-  //   "Tuition Fees",
-  //   "Transport Fees",
-  //   "Hostel Fees",
-  //   "Exam Fees",
-  //   "Event Fees",
-  //   "Certificate Fees",
-  //   "Meal Fees",
-  //   "Application Fees",
-  //   "Other",
-  // ],
+  "Student-Based Revenue": [
+    "Tuition Fees",
+    "Transport Fees",
+    "Hostel Fees",
+    "Exam Fees",
+    "Event Fees",
+    "Certificate Fees",
+    "Meal Fees",
+    "Application Fees",
+    "Other",
+  ],
   "Facility-Based Revenue": [
     "Rent Income",
     "Exam Center Fees",
