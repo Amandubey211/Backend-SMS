@@ -68,22 +68,31 @@ export const OnePaymentDetail = ({ category }) => {
   const { values, setFieldValue } = useFormikContext();
 
   useEffect(() => {
+    // Parse values
     const totalAmount = parseFloat(values[`totalAmount_${category}`]) || 0;
     const paidAmount = parseFloat(values[`paidAmount_${category}`]) || 0;
     const discount = parseFloat(values[`discount_${category}`]) || 0;
     const penalty = parseFloat(values[`penalty_${category}`]) || 0;
-    
-    const finalAmount = totalAmount - (totalAmount * discount) / 100 + penalty;
+    const discountType = values[`discountType_${category}`]; // 'percentage' or 'amount'
+  
+    // Calculate finalAmount based on discountType
+    let finalAmount = totalAmount;
+  
+    if (discountType === 'percentage') {
+      finalAmount -= (totalAmount * discount) / 100; // Apply percentage discount
+    } else if (discountType === 'amount') {
+      finalAmount -= discount; // Apply fixed amount discount
+    }
+  
+    finalAmount += penalty; // Add penalty if any
+  
     // Calculate advanceAmount
-    const advanceAmount = paidAmount > totalAmount ? paidAmount - finalAmount : 0;
-
+    const advanceAmount = paidAmount > finalAmount ? paidAmount - finalAmount : 0;
+  
     // Calculate remainingAmount
     const remainingAmount =
-      totalAmount > paidAmount ? totalAmount - paidAmount : 0;
-
-    // Calculate finalAmount
+      finalAmount > paidAmount ? finalAmount - paidAmount : 0;
   
-
     // Set calculated values
     setFieldValue(`advanceAmount_${category}`, advanceAmount.toFixed(2));
     setFieldValue(`remainingAmount_${category}`, remainingAmount.toFixed(2));
@@ -93,9 +102,11 @@ export const OnePaymentDetail = ({ category }) => {
     values[`paidAmount_${category}`],
     values[`discount_${category}`],
     values[`penalty_${category}`],
+    values[`discountType_${category}`], // Add discountType to dependencies
     setFieldValue,
     category,
   ]);
+  
 
   return (
     <div className="mb-6">

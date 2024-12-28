@@ -14,60 +14,60 @@ import StudentPaymentDetails from "../Component/StudentPaymentDetails";
 const StudentFeesForm = ({ selectCategories, allData, setStudentDetail,setFormData,formData,studentDetail }) => {
   const formikRef = useRef(null);
 const dispatch = useDispatch()
-  const handleCustomSubmit = () => {
-    if (formikRef.current) {
-      const { values, validateForm } = formikRef.current;
-      validateForm().then((errors) => {
-        if (Object.keys(errors).length === 0) {
-          console.log("Submitted values:", values);
-  
-          Object.keys(values).forEach((key) => {
-            let field = key.split('_')[0];
-            let subCategory = key.split('_')[1];
-  
-            setFormData((prev) => {
- 
-              const existingIndex = prev.findIndex(
-                (item) => item.subCategory === subCategory
-              );
-                
-              if (existingIndex !== -1) {
-               
-                const updated = [...prev];
-                updated[existingIndex] = {
-                  ...updated[existingIndex],
-                  [field]: values[key], 
-                  studentId: studentDetail.studentId,
-                  classId: studentDetail.classId,
-                  sectionId: studentDetail.sectionId,
-                  
-                };
-                console.log(`Updated specific category ${subCategory}:`, updated);
-                return updated;
-              } else {
-                // Add the field to every object in the array
-                const updated = prev.map((item) => ({
-                  ...item,
-                  [key]: values[key],
-                }));
-                console.log(
-                  `Added new field '${field}' to all categories:`,
-                  updated
-                );
-                return updated;
-              }
-             
-            });
-          });
-  
-          console.log("Final formData after updates:", formData);
-          dispatch(createStudentFee(formData))
-        } else {
-          console.error("Validation errors:", errors);
-        }
-      });
-    }
-  };
+const handleCustomSubmit = () => {
+  if (formikRef.current) {
+    const { values, validateForm } = formikRef.current;
+
+    validateForm().then((errors) => {
+      if (Object.keys(errors).length === 0) {
+        console.log("Submitted values:", values);
+
+        let updatedFormData = [...formData]; // Create a copy of the existing formData
+
+        Object.keys(values).forEach((key) => {
+          const field = key.split('_')[0];
+          const subCategory = key.split('_')[1];
+
+          const existingIndex = updatedFormData.findIndex(
+            (item) => item.subCategory === subCategory
+          );
+
+          if (existingIndex !== -1) {
+            // Update the specific category if it exists
+            updatedFormData[existingIndex] = {
+              ...updatedFormData[existingIndex],
+              [field]: values[key],
+              studentId: studentDetail.studentId,
+              classId: studentDetail.classId,
+              sectionId: studentDetail.sectionId,
+            };
+            console.log(`Updated specific category ${subCategory}:`, updatedFormData);
+          } else {
+            // Add the field to every object in the array
+            updatedFormData = updatedFormData.map((item) => ({
+              ...item,
+              [key]: values[key],
+            }));
+            console.log(
+              `Added new field '${field}' to all categories:`,
+              updatedFormData
+            );
+          }
+        });
+
+        // Set the updated data in state
+        setFormData(updatedFormData);
+        console.log("Final formData after updates:", updatedFormData);
+
+        // Dispatch action with the updated formData
+        dispatch(createStudentFee(updatedFormData));
+      } else {
+        console.error("Validation errors:", errors);
+      }
+    });
+  }
+};
+
   return (
     <Formik
       innerRef={formikRef}

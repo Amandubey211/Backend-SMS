@@ -39,6 +39,11 @@ export const createStudentFee = createAsyncThunk(
         `/finance/revenue/add/student/fee?say=${say}`,
         {allData:feeData}
       );
+      if(response.success){
+        toast.success('Fee added  successfully!')
+      }else{
+        toast.error('something is wrong!')
+      }
       return response;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
