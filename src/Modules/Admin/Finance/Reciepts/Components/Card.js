@@ -20,8 +20,14 @@ const Card = ({ title, count, color, textColor, customContent, tag, icon }) => {
         <div className="mt-4">{customContent}</div>
       ) : (
         <div className="mt-4">
-          <p className={`text-2xl font-bold text-purple-800`}>{count} {tag}</p>
+          <p className="text-2xl font-bold text-purple-800">
+            {count}{" "}
+            <span className={tag === "receipts" || tag === "receipt" ? "text" : ""}>
+              {tag === "receipts" || tag === "receipt" ? (count === 1 ? "receipt" : "receipts") : tag}
+            </span>
+          </p>
         </div>
+
       )}
     </div>
   );

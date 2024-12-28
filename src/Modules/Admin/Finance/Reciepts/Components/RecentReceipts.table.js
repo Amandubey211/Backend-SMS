@@ -173,18 +173,17 @@ const RecentReceipts = () => {
       render: (date) => (date ? new Date(date).toLocaleDateString() : "N/A"),
     },
     {
-      title: "Paid Amount",
-      dataIndex: "totalPaidAmount",
-      key: "paidAmount",
-      sorter: (a, b) => (a.totalPaidAmount || 0) - (b.totalPaidAmount || 0),
-      render: (amount) => (amount ? `${amount} QAR` : "N/A"),
-    },
-    {
       title: "Tax",
       dataIndex: "tax",
       key: "tax",
       sorter: (a, b) => (a.tax || 0) - (b.tax || 0),
-      render: (tax) => `${tax || 0} QAR`,
+      render: (tax) => (
+        <Tag color="red" className="text-xs">
+          {tax || 0} QR
+        </Tag>
+      ),
+      width: 100,
+      ellipsis: true,
     },
     {
       title: "Discount",
@@ -209,7 +208,17 @@ const RecentReceipts = () => {
       dataIndex: "penalty",
       key: "penalty",
       sorter: (a, b) => (a.penalty || 0) - (b.penalty || 0),
-      render: (penalty) => `${penalty || 0} QAR`,
+      render: (penalty) =>
+        <span style={{ color: "red" }}>
+          {penalty || 0} QR
+        </span>
+    },
+    {
+      title: "Paid Amount",
+      dataIndex: "totalPaidAmount",
+      key: "paidAmount",
+      sorter: (a, b) => (a.totalPaidAmount || 0) - (b.totalPaidAmount || 0),
+      render: (amount) => (amount ? `${amount} QR` : "N/A"),
     },
     {
       title: "Invoice Ref ID",
@@ -331,7 +340,7 @@ const RecentReceipts = () => {
                 <ul>
                   {record.lineItems.map((item, index) => (
                     <li key={index}>
-                      {item.revenueType}: {item.total} QAR (Qty: {item.quantity})
+                      {item.revenueType}: {item.total} QR (Qty: {item.quantity})
                     </li>
                   ))}
                 </ul>

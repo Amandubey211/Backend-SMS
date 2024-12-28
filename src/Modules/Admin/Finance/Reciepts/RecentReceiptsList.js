@@ -8,7 +8,8 @@ import {
     SearchOutlined,
     CloseCircleOutlined,
     FilePdfOutlined,
-    MailOutlined
+    MailOutlined,
+    EyeOutlined
 } from "@ant-design/icons";
 import { FiUserPlus } from "react-icons/fi";
 import { toast } from "react-hot-toast";
@@ -190,10 +191,10 @@ const RecentReceiptsList = () => {
         "Recipient Name":
             item.reciever?.name || item.receiver?.name || "N/A",
         "Paid Date": item.date ? new Date(item.date).toLocaleDateString() : "N/A",
-        "Paid Amount": item.totalPaidAmount ? `${item.totalPaidAmount} QAR` : "N/A",
-        "Tax": `${item.tax || 0} QAR`,
-        "Discount": `${item.discount || 0} QAR`,
-        "Penalty": `${item.penalty || 0} QAR`,
+        "Paid Amount": item.totalPaidAmount ? `${item.totalPaidAmount} QR` : "N/A",
+        "Tax": `${item.tax || 0} QR`,
+        "Discount": `${item.discount || 0} QR`,
+        "Penalty": `${item.penalty || 0} QR`,
         "Remark": item.remark || "N/A",
     }));
 
@@ -207,7 +208,7 @@ const RecentReceiptsList = () => {
 
             {/* 2) View (read-only) -> opens the same CreateReceipt but readOnly */}
             <Menu.Item key="2" onClick={() => handleViewReadOnlyReceipt(record)}>
-                <FilePdfOutlined /> View (read-only)
+                <EyeOutlined /> View (read-only)
             </Menu.Item>
 
             {/* 3) Cancel Receipt */}
@@ -277,18 +278,17 @@ const RecentReceiptsList = () => {
             render: (date) => (date ? new Date(date).toLocaleDateString() : "N/A"),
         },
         {
-            title: "Paid Amount",
-            dataIndex: "totalPaidAmount",
-            key: "paidAmount",
-            sorter: (a, b) => (a.totalPaidAmount || 0) - (b.totalPaidAmount || 0),
-            render: (amount) => (amount ? `${amount} QAR` : "N/A"),
-        },
-        {
             title: "Tax",
             dataIndex: "tax",
             key: "tax",
             sorter: (a, b) => (a.tax || 0) - (b.tax || 0),
-            render: (tax) => `${tax || 0} QAR`,
+            render: (tax) => (
+                <Tag color="red" className="text-xs">
+                    {tax || 0} QAR
+                </Tag>
+            ),
+            width: 100,
+            ellipsis: true,
         },
         {
             title: "Discount",
@@ -313,7 +313,18 @@ const RecentReceiptsList = () => {
             dataIndex: "penalty",
             key: "penalty",
             sorter: (a, b) => (a.penalty || 0) - (b.penalty || 0),
-            render: (penalty) => `${penalty || 0} QAR`,
+            render: (penalty) =>
+                <span style={{ color: "red" }}>
+                    {penalty || 0} QR
+                </span>
+            ,
+        },
+        {
+            title: "Paid Amount",
+            dataIndex: "totalPaidAmount",
+            key: "paidAmount",
+            sorter: (a, b) => (a.totalPaidAmount || 0) - (b.totalPaidAmount || 0),
+            render: (amount) => (amount ? `${amount} QR` : "N/A"),
         },
         {
             title: "Invoice Ref ID",
@@ -406,7 +417,7 @@ const RecentReceiptsList = () => {
                                             <ul>
                                                 {record.lineItems.map((item, index) => (
                                                     <li key={index}>
-                                                        {item.revenueType || item.name || "Item"}: {item.total || 0} QAR
+                                                        {item.revenueType || item.name || "Item"}: {item.total || 0} QR
                                                     </li>
                                                 ))}
                                             </ul>
@@ -453,16 +464,16 @@ const RecentReceiptsList = () => {
                                             <strong>Totals:</strong>
                                         </Table.Summary.Cell>
                                         <Table.Summary.Cell index={1}>
-                                            <strong>{totalPaidAmount.toLocaleString()} QAR</strong>
+                                            <strong>{totalPaidAmount.toLocaleString()} QR</strong>
                                         </Table.Summary.Cell>
                                         <Table.Summary.Cell index={2}>
-                                            <strong>{totalTax.toLocaleString()} QAR</strong>
+                                            <strong>{totalTax.toLocaleString()} QR</strong>
                                         </Table.Summary.Cell>
                                         <Table.Summary.Cell index={3}>
                                             <strong>{totalDiscount.toLocaleString()}%</strong>
                                         </Table.Summary.Cell>
                                         <Table.Summary.Cell index={4}>
-                                            <strong>{totalPenalty.toLocaleString()} QAR</strong>
+                                            <strong>{totalPenalty.toLocaleString()} QR</strong>
                                         </Table.Summary.Cell>
                                         <Table.Summary.Cell index={5} />
                                     </Table.Summary.Row>
