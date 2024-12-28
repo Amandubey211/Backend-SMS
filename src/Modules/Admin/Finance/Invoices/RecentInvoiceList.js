@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import AdminLayout from "../../../../Components/Admin/AdminDashLayout";
-import { Menu, Dropdown, Table, Spin, Input, Tooltip, Button, Modal } from "antd";
+import { Menu, Dropdown, Table, Spin, Input, Tooltip, Button, Modal, Tag, Pagination, Select } from "antd";
 import { MoreOutlined, SearchOutlined } from "@ant-design/icons";
 import { FiUserPlus } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
@@ -13,14 +13,16 @@ import { isCancel } from "axios";
 
 const RecentInvoiceList = () => {
   const [isInvoiceVisible, setInvoiceVisible] = useState(false);
-  const [selectedInvoice, setSelectedInvoice] = useState(null); 
-  const popupRef = useRef(null); // Reference for the Invoice popup
+  const [selectedInvoice, setSelectedInvoice] = useState(null);
+  const popupRef = useRef(null); 
   const navigate = useNavigate();
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
   const [searchQuery, setSearchQuery] = useState("");
-  const { loading, error, invoices } = useSelector((store) => store.admin.invoices);
+  const { loading, error, invoices,pagination } = useSelector((store) => store.admin.invoices);
 
   // Filtered data based on search query
-  const filteredData = invoices.filter(
+  const filteredData = invoices?.filter(
     (item) =>
       item?.invoiceNumber?.toLowerCase()?.includes(searchQuery.toLowerCase()) ||
       item?.receiver?.name?.toLowerCase()?.includes(searchQuery.toLowerCase()) ||
@@ -33,6 +35,14 @@ const RecentInvoiceList = () => {
       console.log("Cancelling invoice", record);
     }
   };
+  useEffect(() => {
+    const filters = {
+        page,
+        limit: pageSize,
+    };
+   
+    dispatch(fetchInvoice(filters));
+}, [ page, pageSize]);
   // Define Ant Design columns
   const columns = [
     {
@@ -57,7 +67,7 @@ const RecentInvoiceList = () => {
       title: "Final Amount",
       dataIndex: "finalAmount",
       key: "finalAmount",
-      render: (finalAmount) => finalAmount?.toFixed(2) + ' QR',
+      render: (finalAmount) => finalAmount?.toFixed(2) + ' QAR',
       sorter: (a, b) => a.finalAmount - b.finalAmount,
     },
     {
@@ -74,97 +84,92 @@ const RecentInvoiceList = () => {
           "N/A"
         ),
     },
+
     {
       title: "Status",
       dataIndex: "status",
       key: "status",
       render: (_, record) => {
-        let style = {};
+        let color = "green";
         let text = "Active";
-        if (record.isReturn) {
-          style = { backgroundColor: "#F3EAFF", color: "#3F2FF2" };
-          text = "Return";
-        } else if (record.isCancel) {
-          style = { backgroundColor: "#FFE6E5", color: "#E70F00" };
-          text = "Cancel";
-        } else {
-          style = { backgroundColor: "#cfe3d3", color: "#297538" };
+        if (record.isCancel) { color = "red"; text = "Cancel" } else if(record.isReturn){
+          color = "yellow"; text = "Return"
         }
         return (
-          <span className="px-4 py-2 rounded-md text-sm font-semibold" style={style}>
+          <Tag color={color} className="text-xs capitalize">
             {text}
-          </span>
+          </Tag>
         );
-      },
+      }
     },
-    {
-      title: "Action",
-      key: "action",
-      render: (_, record) => (
-        <Dropdown
-          overlay={
-            <Menu>
+  {
+    title: "Action",
+    key: "action",
+    render: (_, record) => (
+      <Dropdown
+        overlay={
+          <Menu>
               <Menu.Item
-                onClick={() => {navigate('/finance/penaltyAdjustment/add-new-penalty-adjustment')}}
-              >
-                Return
-              </Menu.Item>
-              <Menu.Item
-                onClick={() => handleAction("cancel", record)}
-              >
-                Cancel
-              </Menu.Item>
-            </Menu>
-          }
-          trigger={["click"]}
-        >
-          <Button shape="circle" icon={<MoreOutlined />} />
-        </Dropdown>
-      ),
+              onClick={() => { setInvoiceVisible(true); }}
+            >
+              Preview
+            </Menu.Item>
+            <Menu.Item
+              onClick={() => { navigate('/finance/penaltyAdjustment/add-new-penalty-adjustment') }}
+            >
+              Return
+            </Menu.Item>
+            <Menu.Item
+              onClick={() => handleAction("cancel", record)}
+            >
+              Cancel
+            </Menu.Item>
+          </Menu>
+        }
+        trigger={["click"]}
+      >
+        <Button shape="circle" icon={<MoreOutlined />} />
+      </Dropdown>
+    ),
     },
   ];
 
-  const closeInvoice = (e) => {
-    if (popupRef.current && !popupRef.current.contains(e.target)) {
-      setInvoiceVisible(false); // Close popup when clicking outside
-    }
-  };
+const closeInvoice = (e) => {
+  if (popupRef.current && !popupRef.current.contains(e.target)) {
+    setInvoiceVisible(false); // Close popup when clicking outside
+  }
+};
 const dispatch = useDispatch()
-  // Attach click outside listener
-  useEffect(() => {
-    document.addEventListener("mousedown", closeInvoice);
-    return () => document.removeEventListener("mousedown", closeInvoice);
-  }, []);
-  const filterOnchange = (e)=>{
-  const {name,value} = e.target;
-  if(value == "isCancel"){
-    dispatch(fetchInvoice({isCancel:true}))
-  }else if(value == "isReturn"){
-    dispatch(fetchInvoice({isReturn:true}))
-  }else{
+const filterOnchange = (e) => {
+  const { name, value } = e.target;
+  if (value == "isCancel") {
+    dispatch(fetchInvoice({ isCancel: true }))
+  } else if (value == "isReturn") {
+    dispatch(fetchInvoice({ isReturn: true }))
+  } else {
     dispatch(fetchInvoice({}))
   }
 
-  }
+}
 
-  return (
-    <AdminLayout>
-      <div className="p-4 bg-white rounded-lg ">
-        <div className="p-6 bg-white shadow-lg rounded-lg">
-          {/* Filters and Buttons Section */}
-          <div className="flex justify-between items-start">
-         
-            <div className="flex flex-col space-y-4">
-              <div className="flex gap-4">
-                <Input
-                  prefix={<SearchOutlined />}
-                  placeholder="Search"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-64"
-                />
-              </div>
-              <div className="flex space-x-6">
+return (
+  <AdminLayout>
+    <div className="p-4 bg-white rounded-lg ">
+      <div className="p-6 bg-white shadow-lg rounded-lg">
+        {/* Filters and Buttons Section */}
+        <div className="flex justify-between items-start">
+
+          <div className="flex flex-col space-y-4">
+            <div className="flex gap-4">
+              <Input
+                prefix={<SearchOutlined />}
+                placeholder="Search"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-64"
+              />
+            </div>
+            <div className="flex space-x-6">
               <label className="flex items-center text-sm space-x-2">
                 <input
                   type="radio"
@@ -197,69 +202,96 @@ const dispatch = useDispatch()
                 <span className="text-gray-700">Return</span>
               </label>
             </div>
-            </div>
-            {/* Right Side: Buttons */}
-            <div className="flex items-center space-x-4">
-              {/* Export Button */}
-              <button
-                className="flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-medium rounded-lg hover:opacity-90"
-                onClick={() => console.log("Exporting data...")} // Implement export functionality
-              >
-                Export
-                <span className="ml-2">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M5 10l7-7m0 0l7 7m-7-7v18"
-                    />
-                  </svg>
-                </span>
-              </button>
+          </div>
+          {/* Right Side: Buttons */}
+          <div className="flex items-center space-x-4">
+            {/* Export Button */}
+            <button
+              className="flex items-center px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-medium rounded-lg hover:opacity-90"
+              onClick={() => console.log("Exporting data...")} 
+            >
+              Export
+              <span className="ml-2">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5 10l7-7m0 0l7 7m-7-7v18"
+                  />
+                </svg>
+              </span>
+            </button>
 
-              {/* Add New Fee Button */}
-              <button
-                onClick={() =>
-                  navigate("/finance/invoices/add-new-invoice")
-                }
-                className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
-              >
-                <span className="text-gray-800 font-medium">Add New Invoice</span>
-                <div className="w-12 h-12 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center text-white">
-                  <FiUserPlus size={16} />
-                </div>
-              </button>
-            </div>
+            {/* Add New Fee Button */}
+            <button
+              onClick={() =>
+                navigate("/finance/invoices/add-new-invoice")
+              }
+              className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
+            >
+              <span className="text-gray-800 font-medium">Add New Invoice</span>
+              <div className="w-12 h-12 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center text-white">
+                <FiUserPlus size={16} />
+              </div>
+            </button>
           </div>
         </div>
+      </div>
 
-        {/* Custom Table */}
-        <div className="my-8 border shadow-sm rounded-lg ">
-          {/* Table Section */}
-          {loading ? (
-            <Spin tip="Loading..." />
-          ) : (
-            <Table
-              dataSource={filteredData}
-              columns={columns}
-              rowKey="invoiceNumber"
-              pagination={{ pageSize: 10 }}
-              size="small"
-              onRow={(record) => ({
-                onClick: () => {setInvoiceVisible(true); setSelectedInvoice(record)}
-              })}
-            />
-          )}
+      {/* Custom Table */}
+      <div className="my-8 border shadow-sm rounded-lg ">
+        {/* Table Section */}
+        {loading ? (
+          <Spin tip="Loading..." />
+        ) : (<>
+          <Table
+            dataSource={filteredData}
+            columns={columns}
+            rowKey="invoiceNumber"
+            pagination={false}
+            size="small"
+            onRow={(record) => ({
+              onClick: () => { setSelectedInvoice(record) }
+            })}
+          />
+      
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '10px',marginLeft:'2px' }}>
+        <div>
+          <span>Items per page: </span>
+          <Select
+            value={pagination.itemsPerPage}
+            onChange={(value) =>{  setPage(pagination.currentPage);
+              setPageSize(value);}}
+            options={[
+              { value: 5, label: '5' },
+              { value: 10, label: '10' },
+              { value: 20, label: '20' },
+              { value: 50, label: '50' },
+            ]}
+            style={{ width: '80px' }}
+          />
         </div>
-        {isInvoiceVisible && selectedInvoice && (
-          <Modal
+        <Pagination
+          current={pagination?.currentPage || 1}
+          total={pagination?.totalItems || 0}
+          pageSize={pagination?.itemsPerPage || 10}
+          onChange={(page, pageSize) => {
+              setPage(page);
+              setPageSize(pageSize);
+          }}/>
+      </div>
+          </>
+        )}
+      </div>
+      {isInvoiceVisible && selectedInvoice && (
+        <Modal
           visible={isInvoiceVisible}
           onCancel={() => setInvoiceVisible(false)}
           footer={null}
@@ -277,10 +309,10 @@ const dispatch = useDispatch()
                 <img src="logo-placeholder.png" alt="Logo" className="h-12" />
               </div>
             </div>
-        
+
             {/* Invoice Title */}
             <h2 className="text-center text-xl font-bold text-white bg-pink-600 py-2 my-4 rounded-md">INVOICE</h2>
-        
+
             {/* Invoice Details */}
             <div className="flex  justify-between ">
               <div>
@@ -297,7 +329,7 @@ const dispatch = useDispatch()
                 <p>{moment(selectedInvoice.dueDate).format("YYYY-MM-DD")}</p>
               </div>
             </div>
-        
+
             {/* Items Table */}
             <table className="table-auto w-full border-collapse border border-gray-300 text-sm mb-4">
               <thead>
@@ -319,7 +351,7 @@ const dispatch = useDispatch()
                 ))}
               </tbody>
             </table>
-        
+
             {/* Summary */}
             <table className="w-full text-sm mb-4">
               <tbody>
@@ -341,18 +373,18 @@ const dispatch = useDispatch()
                 </tr>
               </tbody>
             </table>
-        
+
             {/* Footer */}
             <div className="text-center text-xs text-gray-600 mt-4">
               {/* <p>For inquiries, contact: info@studentdiwan.com</p> */}
             </div>
           </div>
         </Modal>
-        
-        )}
-      </div>
-    </AdminLayout>
-  );
+
+      )}
+    </div>
+  </AdminLayout>
+);
 };
 
 export default RecentInvoiceList;

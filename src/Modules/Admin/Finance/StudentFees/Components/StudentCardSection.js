@@ -10,7 +10,7 @@ const StudentCardSection = () => {
   const studentCardsData = [
     {
       title: "Total Fees Collected",
-      value: `${totalPaidAmount || 0} QAR`,
+      value: `${totalPaidAmount?.toFixed(2) || 0} QAR`,
       comparison: "Compared to (1,20,000 QAR last month)",
       percentage: 25,
       icon: <FaUserGraduate />,
@@ -18,14 +18,14 @@ const StudentCardSection = () => {
     },
     {
       title: "Unpaid Fees",
-      value: `${unpaidRevenue || 0} QAR`,
+      value: `${unpaidRevenue?.toFixed(2) || 0} QAR`,
       comparison: "Compared to (20,000 QAR last month)",
       icon: <FaWallet />,
       trend: "up",
     },
     {
       title: "Total Unpaid & Paid",
-      value: `${totalRevenue || 0} QAR`,
+      value: `${totalRevenue?.toFixed(2) || 0} QAR`,
       comparison: "Compared to (25,000 QAR last month)",
       percentage: -20,
       icon: <FaBookReader />,

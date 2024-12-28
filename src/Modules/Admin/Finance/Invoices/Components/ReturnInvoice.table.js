@@ -12,9 +12,8 @@ const ReturnInvoice = () => {
   const { loading, error, invoices } = useSelector((store) => store.admin.invoices);
  
   // Filtered data based on search query
-  const filteredData = invoices.filter(
+  const filteredData = invoices?.filter(
     (item) =>
-     
       item?.invoiceNumber?.toLowerCase()?.includes(searchQuery.toLowerCase()) ||
       item?.receiver?.name?.toLowerCase()?.includes(searchQuery.toLowerCase()) ||
       item?.finalAmount?.toString()?.includes(searchQuery.toLowerCase())
@@ -93,18 +92,11 @@ const ReturnInvoice = () => {
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-semibold">Return Invoice List</h2>
         <div className="flex gap-4">
-          <Input
-            prefix={<SearchOutlined />}
-            placeholder="Search"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-64"
-          />
           <Button
-            type="primary"
+              className="px-4 py-2 bg-gradient-to-r from-[#C83B62] to-[#8E44AD] text-white rounded-md shadow hover:from-[#a3324e] hover:to-[#6e2384] transition text-xs"
             onClick={() => navigate("/finance/penaltyAdjustment/add-new-penalty-adjustment")}
           >
-            View More
+            View More ({filteredData?.filter((item)=>item.isReturn)?.length})
           </Button>
         </div>
       </div>
@@ -114,11 +106,11 @@ const ReturnInvoice = () => {
         <Spin tip="Loading..." />
       )  : (
         <Table
-          dataSource={filteredData?.filter((item)=>item.isReturn)}
+          dataSource={filteredData?.filter((item)=>item.isReturn)?.slice(0,5)}
           columns={columns}
           rowKey="invoiceNumber"
-          pagination={{ pageSize: 5 }}
           size="small"
+          pagination={false}
         />
       )}
     </div>

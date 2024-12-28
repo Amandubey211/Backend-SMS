@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useMemo } from "react";
-import { Table, Spin, Alert, Input, Button } from "antd";
-import { SearchOutlined } from "@ant-design/icons";
+import { Table, Spin, Alert, Input, Button,Tag } from "antd";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import moment from "moment";
@@ -33,7 +32,7 @@ const StudentFeesSummaryTable = () => {
   // Handle search filtering
   const filteredData = useMemo(() => {
     if (!incomes) return [];
-    return incomes.filter((item) => {
+    return incomes?.slice(0,5)?.filter((item) => {
       const searchableString = [
         item?.category?.[0]?.categoryName,
         item?.subCategory,
@@ -73,13 +72,35 @@ const StudentFeesSummaryTable = () => {
       dataIndex: "final_amount",
       key: "final_amount",
       sorter: (a, b) => (a.final_amount || 0) - (b.final_amount || 0),
-      render: (value) => (value ? `${value} QR` : "N/A"),
+      render: (value) => (value ? `${value} QAR` : "N/A"),
     },
     {
-      title: "Payment Status",
+      title: "Status",
       dataIndex: "paymentStatus",
       key: "paymentStatus",
-      render: (status) => status || "N/A",
+      render: (status) => {
+        let color = "default";
+        switch (status) {
+          case "paid":
+            color = "green";
+            break;
+          case "partial":
+            color = "yellow";
+            break;
+          case "unpaid":
+            color = "red";
+            break;
+          default:
+            color = "default";
+        }
+        return (
+          <Tag color={color} className="text-xs capitalize">
+            {status || "N/A"}
+          </Tag>
+        );
+      },
+      width: 80,
+      ellipsis: true,
     },
     {
       title: "Payment Type",
@@ -104,15 +125,6 @@ const StudentFeesSummaryTable = () => {
           Summary of Student Fees
         </h3>
         <div className="flex items-center space-x-4">
-          {/* Search Box */}
-          <Input
-            placeholder="Search Fees"
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-            prefix={<SearchOutlined />}
-            className="w-64"
-            allowClear
-          />
           {/* View More Button */}
           <Button
             type="primary"
@@ -134,13 +146,8 @@ const StudentFeesSummaryTable = () => {
           <Table
             dataSource={filteredData}
             columns={columns}
-            pagination={{
-              current: currentPage,
-              pageSize: 10,
-              total: totalRecords,
-              onChange: (page) => setCurrentPage(page),
-            }}
             rowKey="_id" 
+            pagination={false}
             bordered
             size="small"
           />

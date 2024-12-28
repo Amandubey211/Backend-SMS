@@ -8,6 +8,8 @@ const initialState = {
   cardData:{},
   loading: false,
   error: null,
+  pagination:{},
+
 };
 
 const invoiceSlice = createSlice({
@@ -29,7 +31,8 @@ const invoiceSlice = createSlice({
       })
       .addCase(fetchInvoice.fulfilled, (state, action) => {
         state.loading = false;
-        state.invoices = action.payload || [];
+        state.invoices = action.payload.data || [];
+        state.pagination = action.payload.pagination;
         state.error =null
      
       })
