@@ -1,150 +1,154 @@
-import React, { useEffect, useState, useMemo } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React, { useEffect, useCallback } from "react";
+import { Table, Spin, Alert, Button, Tag, Tooltip } from "antd";
 import { useNavigate } from "react-router-dom";
-import { Menu, Dropdown } from "antd";
-import { SearchOutlined, MoreOutlined } from "@ant-design/icons";
-import { RiErrorWarningFill } from "react-icons/ri";
-import { FcDeleteDatabase } from "react-icons/fc";
+import { useDispatch, useSelector } from "react-redux";
+import debounce from "lodash.debounce";
 import { fetchAllQuotations } from "../../../../../Store/Slices/Finance/Quotations/quotationThunks";
-import Spinner from "../../../../../Components/Common/Spinner";
+
 
 const RecentQuotation = () => {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState("");
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
 
-  // Fetching state from Redux store
-  const { quotations, loading, error } = useSelector((state) => state.admin.quotations);
-  console.log("this is ",quotations)
-  // Fetch quotations on component mount
-  useEffect(() => {
-    dispatch(fetchAllQuotations());
-  }, [dispatch]);
+    // Extracting necessary state from Redux store
+    const { quotations, totalRecords, loading, error } = useSelector((state) => state.admin.quotations);
 
-  // Filter data based on search query
-  const filteredData = useMemo(() => {
-    if (!quotations) return [];
-    return quotations.filter((item) =>
-      [
-        item.quotationNumber,
-        item.reciever?.name,
-        item.final_amount,
-        item.remark,
-        item.status,
-        item.lineItems.map((li) => li.revenueType).join(", "), // Join line items for filtering
-        item.SelectedItems?.map((si) => si.name).join(", "), // Join selected items for filtering
-      ]
-        .filter(Boolean) // Ensure no null/undefined
-        .some((field) => field.toLowerCase().includes(searchQuery.toLowerCase()))
+    // Debounced function to fetch incomes with a fixed limit of 5
+    const debouncedFetch = useCallback(
+        debounce((params) => {
+            dispatch(fetchAllQuotations(params));
+        }, 300),
+        [dispatch]
     );
-  }, [quotations, searchQuery]);
 
-  // Dropdown menu for actions
-  const actionMenu = (
-    <Menu>
-      <Menu.Item key="1" onClick={() => navigate(`/finance/quotations/details`)}>
-        View Details
-      </Menu.Item>
-      <Menu.Item key="2">Send Reminder</Menu.Item>
-    </Menu>
-  );
+    // Fetch data on component mount with limit set to 5
+    useEffect(() => {
+        const params = {
+            page: 1, // Always fetch the first page
+            limit: 5, // Limit to 5 records
+            //sortBy: "earnedDate",
+            //sortOrder: "desc",
+        };
+        debouncedFetch(params);
+    }, [debouncedFetch]);
 
-  return (
-    <div className="border-2 rounded-lg p-4" style={{ borderColor: "#FFCEDB" }}>
-      {/* Header Section */}
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold">Recent Quotation List</h2>
-        <div className="flex gap-4">
-          <div className="relative">
-            <SearchOutlined className="absolute left-3 top-[0.825rem] text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search"
-              className="border rounded-full pl-10 pr-4 py-2 w-64 shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-300"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-          <button
-            onClick={() => navigate("/finance/quotations/quotations-list")}
-            className="px-4 py-2 rounded-md border border-gray-400 shadow-md hover:shadow-xl hover:shadow-gray-300 transition duration-200 text-transparent bg-gradient-to-r from-pink-500 via-purple-500 to-pink-500 bg-clip-text"
-          >
-            View More
-          </button>
+    // Handle "View More" button click
+    const handleViewMore = () => {
+        navigate("/finance/quotations/quotations-list");
+    };
+
+    // Define table columns with fixed widths and ellipsis
+    const columns = [
+        {
+            title: "Quotation Number",
+            dataIndex: "quotationNumber",
+            key: "quotationNumber",
+            render: (text) => <span className="text-xs">{text}</span>,
+            width: 120,
+            ellipsis: true,
+        },
+        {
+            title: "Quotation To",
+            dataIndex: "quotationTo",
+            key: "quotationTo",
+            render: (text) => <span className="text-xs">{text}</span>,
+            width: 150,
+            ellipsis: true,
+        },
+        {
+            title: "Purpose",
+            dataIndex: "purpose",
+            key: "purpose",
+            render: (text) => <span className="text-xs">{text}</span>,
+            width: 120,
+            ellipsis: true,
+        },
+        {
+            title: "Discount",
+            dataIndex: "discount",
+            key: "discount",
+            render: (value) => (
+                <Tag color="purple" className="text-xs">
+                    {value || 0} QR
+                </Tag>
+            ),
+            width: 100,
+            ellipsis: true,
+        },
+        {
+            title: "Final Amount (QR)",
+            dataIndex: "final_amount",
+            key: "final_amount",
+            render: (value) => <span className="text-xs">{value || "0"} QR</span>,
+            width: 120,
+            ellipsis: true,
+        },
+
+    ];
+
+    // Transform incomes data to table dataSource and limit to 5 records
+    const dataSource = quotations?.slice(0, 5).map((quotation) => ({
+        key: quotation._id,
+        quotationNumber: quotation.quotationNumber || "N/A",
+        quotationTo: quotation.reciever?.name || "N/A",
+        purpose: quotation.remark || "N/A",
+        discount: quotation.discount || 0,
+        final_amount: quotation.final_amount || 0,
+    }));
+    console.log("totalRecords", totalRecords);
+
+    return (
+        <div className="bg-white p-4 rounded-lg shadow space-y-4 mt-3">
+            {/* Header */}
+            <div className="flex justify-between items-center">
+                <h2 className="text-lg font-medium text-gray-700">
+                    Summary of Quotation ({dataSource?.length || 5}/{totalRecords})
+                </h2>
+                <Button
+                    onClick={handleViewMore}
+                    className="px-4 py-2 bg-gradient-to-r from-[#C83B62] to-[#8E44AD] text-white rounded-md shadow hover:from-[#a3324e] hover:to-[#6e2384] transition text-xs"
+                    size="small"
+                >
+                    View More ({totalRecords})
+                </Button>
+            </div>
+
+            {/* Loading Indicator */}
+            {loading && (
+                <div className="flex justify-center">
+                    <Spin tip="Loading..." />
+                </div>
+            )}
+            {/* Error Message */}
+            {error && (
+                <Alert
+                    message="Error"
+                    description={error}
+                    type="error"
+                    showIcon
+                    closable
+                />
+            )}
+            {/* No Data Placeholder */}
+            {!loading && quotations.length === 0 && !error && (
+                <div className="text-center text-gray-500 text-xs py-4">
+                    No records found.
+                </div>
+            )}
+            {/* Table */}
+            {!loading && !error && quotations.length > 0 && (
+                <Table
+                    dataSource={dataSource}
+                    columns={columns}
+                    pagination={false} // Removed pagination controls
+                    className="rounded-lg shadow text-xs"
+                    bordered
+                    size="small"
+                    tableLayout="fixed" // Fixed table layout
+                />
+            )}
         </div>
-      </div>
-
-      {/* Table Section */}
-      <table className="w-full border-collapse text-sm">
-        <thead>
-          <tr style={{ backgroundColor: "#FFCEDB" }} className="text-left text-gray-800">
-            <th className="py-3 px-4 font-medium">Quotation Number</th>
-            <th className="py-3 px-4 font-medium">Quotation To</th>
-            <th className="py-3 px-4 font-medium">Purpose</th>
-            <th className="py-3 px-4 font-medium">Issue Date</th>
-            <th className="py-3 px-4 font-medium">Total Amount</th>
-            <th className="py-3 px-4 font-medium">Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {/* Loading State */}
-          {loading && (
-            <tr>
-              <td colSpan="6" className="py-4 px-4 text-center">
-                <Spinner />
-              </td>
-            </tr>
-          )}
-
-          {/* Error State */}
-          {error && (
-            <tr>
-              <td colSpan="6" className="py-4 px-4 text-center">
-                <div className="flex flex-col justify-center items-center">
-                  <RiErrorWarningFill className="text-red-500 text-4xl" />
-                  <span className="text-red-500 mt-2">Unable to Fetch Quotations: {error}</span>
-                </div>
-              </td>
-            </tr>
-          )}
-
-          {/* No Data State */}
-          {!loading && !error && filteredData.length === 0 && (
-            <tr>
-              <td colSpan="6" className="py-4 px-4 text-center">
-                <div className="flex flex-col justify-center items-center">
-                  <FcDeleteDatabase className="text-4xl" />
-                  <span className="text-gray-600 mt-2">No Quotation Yet!</span>
-                </div>
-              </td>
-            </tr>
-          )}
-
-          {/* Data Rows */}
-          {!loading &&
-            !error &&
-            filteredData.map((item) => (
-              <tr key={item._id} className="border-b hover:bg-gray-50">
-                <td className="py-4 px-4">{item.quotationNumber}</td>
-                <td className="py-4 px-4">{item.reciever?.name || "N/A"}</td>
-                <td className="py-4 px-4">{item.remark || "N/A"}</td>
-                <td className="py-4 px-4">{new Date(item.date).toLocaleDateString()}</td>
-                <td className="py-4 px-4">{item.final_amount || "N/A"}</td>
-                <td className="py-4 px-4">
-                  <Dropdown overlay={actionMenu} trigger={["click"]}>
-                    <button
-                      className="w-8 h-8 flex items-center justify-center rounded-full border border-gray-300 hover:bg-gray-100"
-                    >
-                      <MoreOutlined style={{ fontSize: "16px", color: "#808080" }} />
-                    </button>
-                  </Dropdown>
-                </td>
-              </tr>
-            ))}
-        </tbody>
-      </table>
-    </div>
-  );
+    );
 };
 
 export default RecentQuotation;
