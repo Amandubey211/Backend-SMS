@@ -35,7 +35,7 @@ const CardsSection = () => {
       count: loading || error ? "0" : receiptsSummary?.totalAmountCollected || "0",
       color: "bg-green-100",
       textColor: "text-green-700",
-      tag: "QAR",
+      tag: "QR",
       icon: (
 
         <FaMoneyBillAlt className="text-white text-xl" />

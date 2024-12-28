@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { Table, Input, Dropdown, Menu } from "antd";
+import { Table, Input, Dropdown, Tag } from "antd";
 import {
   SearchOutlined,
   MoreOutlined,
@@ -48,7 +48,7 @@ const RecentReceipts = () => {
   // -------------------- Lifecycle --------------------
   useEffect(() => {
     if (!dataFetched) {
-      dispatch(fetchAllReceipts({ page: pagination.currentPage || 1, limit: 5}));
+      dispatch(fetchAllReceipts({ page: pagination.currentPage || 1, limit: 5 }));
       setDataFetched(true);
     }
   }, [dispatch, dataFetched, pagination.currentPage, pagination.limit]);
@@ -173,44 +173,64 @@ const RecentReceipts = () => {
       render: (date) => (date ? new Date(date).toLocaleDateString() : "N/A"),
     },
     {
-      title: "Paid Amount",
-      dataIndex: "totalPaidAmount",
-      key: "paidAmount",
-      sorter: (a, b) => (a.totalPaidAmount || 0) - (b.totalPaidAmount || 0),
-      render: (amount) => (amount ? `${amount} QAR` : "N/A"),
-    },
-    {
       title: "Tax",
       dataIndex: "tax",
       key: "tax",
       sorter: (a, b) => (a.tax || 0) - (b.tax || 0),
-      render: (tax) => `${tax || 0} QAR`,
+      render: (tax) => (
+        <Tag color="red" className="text-xs">
+          {tax || 0} QR
+        </Tag>
+      ),
+      width: 100,
+      ellipsis: true,
     },
     {
       title: "Discount",
       dataIndex: "discount",
       key: "discount",
-      sorter: (a, b) => (a.discount || 0) - (b.discount || 0),
-      render: (discount) => `${discount || 0}%`,
+      sorter: (a, b) => (a.discount || 0) - (b.discount || 0), // Optional: Preserve sorting
+      render: (value, record) =>
+        record.discountType === "percentage" ? (
+          <Tag color="purple" className="text-xs">
+            {value || 0}%
+          </Tag>
+        ) : (
+          <Tag color="orange" className="text-xs">
+            {value || 0} QR
+          </Tag>
+        ),
+      width: 100,
+      ellipsis: true,
     },
     {
       title: "Penalty",
       dataIndex: "penalty",
       key: "penalty",
       sorter: (a, b) => (a.penalty || 0) - (b.penalty || 0),
-      render: (penalty) => `${penalty || 0} QAR`,
+      render: (penalty) =>
+        <span style={{ color: "red" }}>
+          {penalty || 0} QR
+        </span>
+    },
+    {
+      title: "Paid Amount",
+      dataIndex: "totalPaidAmount",
+      key: "paidAmount",
+      sorter: (a, b) => (a.totalPaidAmount || 0) - (b.totalPaidAmount || 0),
+      render: (amount) => (amount ? `${amount} QR` : "N/A"),
     },
     {
       title: "Invoice Ref ID",
       dataIndex: "invoiceNumber",
       key: "invoiceNumber",
       sorter: (a, b) =>
-          (a.invoiceNumber?.invoiceNumber || "").localeCompare(
-              b.invoiceNumber?.invoiceNumber || ""
-          ),
+        (a.invoiceNumber?.invoiceNumber || "").localeCompare(
+          b.invoiceNumber?.invoiceNumber || ""
+        ),
       render: (invoiceNumber) => invoiceNumber?.invoiceNumber || "N/A",
-  },
-  ,
+    },
+    ,
     // },
     // {
     //   title: "Action",
@@ -283,28 +303,28 @@ const RecentReceipts = () => {
       }}
     >
       <div
-  style={{
-    display: "flex",
-    justifyContent: "space-between",
-    marginBottom: "16px",
-    alignItems: "center",
-  }}
->
-  {/* Title with counts */}
-  <h2 style={{ fontSize: "1.25rem", fontWeight: "600" }}>
-    Recent Receipts List ({receipts.length}/{pagination.totalRecords || 0})
-  </h2>
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          marginBottom: "16px",
+          alignItems: "center",
+        }}
+      >
+        {/* Title with counts */}
+        <h2 style={{ fontSize: "1.25rem", fontWeight: "600" }}>
+          Recent Receipts List ({receipts.length}/{pagination.totalRecords || 0})
+        </h2>
 
-  {/* View More Button with counts */}
-  <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
-    <button
-      onClick={() => navigate("/finance/receipts/receipt-list")}
-      className="px-3 py-1 rounded-md border border-gray-400 shadow-md hover:shadow-xl hover:shadow-gray-300 transition duration-200 text-white bg-gradient-to-r from-pink-500 to-purple-500"
-    >
-      View More ({pagination.totalRecords || 0})
-    </button>
-  </div>
-</div>
+        {/* View More Button with counts */}
+        <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
+          <button
+            onClick={() => navigate("/finance/receipts/receipt-list")}
+            className="px-3 py-1 rounded-md border border-gray-400 shadow-md hover:shadow-xl hover:shadow-gray-300 transition duration-200 text-white bg-gradient-to-r from-pink-500 to-purple-500"
+          >
+            View More ({pagination.totalRecords || 0})
+          </button>
+        </div>
+      </div>
 
 
       {/* The Receipts Table */}
@@ -320,7 +340,7 @@ const RecentReceipts = () => {
                 <ul>
                   {record.lineItems.map((item, index) => (
                     <li key={index}>
-                      {item.revenueType}: {item.total} QAR (Qty: {item.quantity})
+                      {item.revenueType}: {item.total} QR (Qty: {item.quantity})
                     </li>
                   ))}
                 </ul>
@@ -334,7 +354,7 @@ const RecentReceipts = () => {
         pagination={false} // Disable Ant Design pagination
       />
 
-      
+
       {/* Custom Pagination Component */}
       {/*
       <div style={{ display: "flex", justifyContent: "center", marginTop: "20px" }}>
