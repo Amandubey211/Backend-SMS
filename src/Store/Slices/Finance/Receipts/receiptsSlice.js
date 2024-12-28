@@ -5,12 +5,18 @@ import {
   cancelReceipt,
   updateReceipt,
   deleteReceipt,
-  fetchReceiptCardData, // Import the fetchReceiptCardData action
+  fetchReceiptCardData,
 } from "./receiptsThunks";
 
 const initialState = {
   receipts: [], // Holds all receipts fetched from the API
   receiptsSummary: {}, // Holds the receipt card summary data
+  pagination: { // New field to store pagination metadata
+    currentPage: 1,
+    totalPages: 1,
+    totalRecords: 0,
+    limit: 10,
+  },
   loading: false, // Tracks loading state for async actions
   error: null, // Stores error messages
   selectedReceipt: null, // Stores a specific selected receipt
@@ -23,7 +29,8 @@ const receiptsSlice = createSlice({
   reducers: {
     clearReceipts: (state) => {
       state.receipts = [];
-      state.receiptsSummary = {}; // Clear receiptsSummary as well
+      state.receiptsSummary = {};
+      state.pagination = { currentPage: 1, totalPages: 1, totalRecords: 0, limit: 10 };
       state.loading = false;
       state.error = null;
       state.selectedReceipt = null;
@@ -35,6 +42,9 @@ const receiptsSlice = createSlice({
     clearSelectedReceipt(state) {
       state.selectedReceipt = null;
     },
+    updatePaginationLimit(state, action) {
+      state.pagination.limit = action.payload; // Allow changing the limit dynamically
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -45,7 +55,7 @@ const receiptsSlice = createSlice({
       })
       .addCase(fetchReceiptCardData.fulfilled, (state, action) => {
         state.loading = false;
-        state.receiptsSummary = action.payload || {}; // Update the summary data
+        state.receiptsSummary = action.payload || {};
       })
       .addCase(fetchReceiptCardData.rejected, (state, action) => {
         state.loading = false;
@@ -60,6 +70,7 @@ const receiptsSlice = createSlice({
       .addCase(fetchAllReceipts.fulfilled, (state, action) => {
         state.loading = false;
         state.receipts = action.payload.receipts || [];
+        state.pagination = action.payload.pagination || state.pagination; // Update pagination metadata
       })
       .addCase(fetchAllReceipts.rejected, (state, action) => {
         state.loading = false;
@@ -120,7 +131,7 @@ const receiptsSlice = createSlice({
       .addCase(deleteReceipt.fulfilled, (state, action) => {
         state.loading = false;
         state.successMessage = "Receipt deleted successfully!";
-        state.receipts = state.receipts.filter((r) => r._id !== action.payload); // Remove from state
+        state.receipts = state.receipts.filter((r) => r._id !== action.payload);
       })
       .addCase(deleteReceipt.rejected, (state, action) => {
         state.loading = false;
@@ -133,6 +144,7 @@ export const {
   clearReceipts,
   setSelectedReceipt,
   clearSelectedReceipt,
+  updatePaginationLimit,
 } = receiptsSlice.actions;
 
 export default receiptsSlice.reducer;

@@ -3,21 +3,14 @@ import { getData, postData, putData, deleteData } from "../../../../services/api
 import toast from "react-hot-toast";
 import { getAY } from "../../../../Utils/academivYear";
 
-// Fetch all receipts
 export const fetchAllReceipts = createAsyncThunk(
   "receipts/fetchAllReceipts",
-  async (_, { rejectWithValue }) => {
+  async ({ page = 1, limit = 10 }, { rejectWithValue }) => {
     try {
-      const response = await getData("/finance/revenue/all/receipt"); // Replace with your actual API endpoint
-
+      const response = await getData(`/finance/revenue/all/receipt?page=${page}&limit=${limit}`); // Backend API with pagination
       if (response?.data) {
-        // Extract data and other relevant fields from the response
-        const { data } = response;
-        console.log(data);
-        // Return only the receipts array for simplicity
-        return {
-          receipts: data,
-        };
+        const { data, pagination } = response;
+        return { receipts: data, pagination }; // Include pagination metadata
       } else {
         return rejectWithValue(response?.message || "Failed to fetch receipts.");
       }
@@ -26,6 +19,7 @@ export const fetchAllReceipts = createAsyncThunk(
     }
   }
 );
+
 
 // Create a receipt
 export const createReceipt = createAsyncThunk(

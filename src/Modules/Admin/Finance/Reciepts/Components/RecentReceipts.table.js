@@ -26,7 +26,7 @@ const RecentReceipts = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const { receipts = [], loading, error } = useSelector(
+  const { receipts = [], loading, error, pagination = {} } = useSelector(
     (state) => state.admin.receipts || {}
   );
 
@@ -48,10 +48,11 @@ const RecentReceipts = () => {
   // -------------------- Lifecycle --------------------
   useEffect(() => {
     if (!dataFetched) {
-      dispatch(fetchAllReceipts());
+      dispatch(fetchAllReceipts({ page: pagination.currentPage || 1, limit: pagination.limit || 10 }));
       setDataFetched(true);
     }
-  }, [dispatch, dataFetched]);
+  }, [dispatch, dataFetched, pagination.currentPage, pagination.limit]);
+
 
   // Close modal if user clicks outside the popup
   useEffect(() => {
@@ -200,11 +201,11 @@ const RecentReceipts = () => {
       render: (penalty) => `${penalty || 0} QAR`,
     },
     {
-        title: "Invoice Ref ID",
-        dataIndex: "receiptNumber",
-        key: "receiptNumber",
-        sorter: (a, b) => (a.receiptNumber || "").localeCompare(b.receiptNumber || ""),
-        render: (receiptNumber) => receiptNumber || "N/A",
+      title: "Invoice Ref ID",
+      dataIndex: "receiptNumber",
+      key: "receiptNumber",
+      sorter: (a, b) => (a.receiptNumber || "").localeCompare(b.receiptNumber || ""),
+      render: (receiptNumber) => receiptNumber || "N/A",
     },
     {
       title: "Action",
@@ -301,7 +302,7 @@ const RecentReceipts = () => {
       <Table
         rowKey={(record) => record._id}
         columns={columns}
-        dataSource={filteredData}
+        dataSource={receipts}
         expandable={{
           expandedRowRender: (record) => (
             <div>
@@ -320,12 +321,31 @@ const RecentReceipts = () => {
             </div>
           ),
         }}
-        pagination={{
-          pageSize: 5,
-          showSizeChanger: true,
-          position: ["bottomRight"],
-        }}
+        pagination={false} // Disable Ant Design pagination
       />
+
+      {/* Custom Pagination Component */}
+      {/* Custom Pagination Component */}
+      <div style={{ display: "flex", justifyContent: "center", marginTop: "20px" }}>
+        <button
+          onClick={() => dispatch(fetchAllReceipts({ page: pagination.currentPage - 1, limit: pagination.limit }))}
+          disabled={pagination.currentPage === 1}
+          className="px-3 py-1 mx-1 rounded-md border border-gray-400 bg-gray-200 hover:bg-gray-300 disabled:bg-gray-100 disabled:cursor-not-allowed"
+        >
+          Previous
+        </button>
+        <span className="px-3 py-1 mx-2 font-semibold">
+          Page {pagination.currentPage || 1} of {pagination.totalPages || 1}
+        </span>
+        <button
+          onClick={() => dispatch(fetchAllReceipts({ page: pagination.currentPage + 1, limit: pagination.limit }))}
+          disabled={pagination.currentPage === pagination.totalPages}
+          className="px-3 py-1 mx-1 rounded-md border border-gray-400 bg-gray-200 hover:bg-gray-300 disabled:bg-gray-100 disabled:cursor-not-allowed"
+        >
+          Next
+        </button>
+      </div>
+
 
       {/* Cancel Receipt Confirmation Modal (unchanged) */}
       <DeleteConfirmationModal
@@ -375,6 +395,8 @@ const RecentReceipts = () => {
                 </button>
 
               </div>
+
+
 
               {/* Receipt Component */}
               <Receipt receiptData={selectedReceipt} />
