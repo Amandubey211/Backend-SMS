@@ -191,7 +191,7 @@ const RecentReceipts = () => {
       dataIndex: "discount",
       key: "discount",
       sorter: (a, b) => (a.discount || 0) - (b.discount || 0),
-      render: (discount) => `${discount || 0} QAR`,
+      render: (discount) => `${discount || 0}%`,
     },
     {
       title: "Penalty",
