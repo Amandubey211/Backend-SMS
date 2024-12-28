@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchReturnCardData, fetchReturnInvoice } from "./adjustment.thunk";
+import { cancleReturnInvoiceData, fetchReturnCardData, fetchReturnInvoice } from "./adjustment.thunk";
 
 const initialState = {
   adjustmentData: [],
@@ -9,7 +9,7 @@ const initialState = {
   pageSize: 5,
   loading: false,
   error: false,
-  returnCardData:{}
+  returnCardData:{},
 
 };
 
@@ -47,8 +47,21 @@ const penaltyAdjustmentSlice = createSlice({
       .addCase(fetchReturnCardData.fulfilled, (state, action) => {
         state.loading = false;
         state.returnCardData = action.payload;
+    
       })
       .addCase(fetchReturnCardData.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || true;
+      })
+
+      .addCase(cancleReturnInvoiceData.pending, (state) => {
+        state.loading = true;
+        state.error = false;
+      })
+      .addCase(cancleReturnInvoiceData.fulfilled, (state, action) => {
+        state.loading = false;
+      })
+      .addCase(cancleReturnInvoiceData.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || true;
       });

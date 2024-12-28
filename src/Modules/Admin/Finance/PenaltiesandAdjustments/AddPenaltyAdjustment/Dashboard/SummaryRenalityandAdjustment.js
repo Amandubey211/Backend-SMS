@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import debounce from "lodash.debounce";
 import { fetchReturnInvoice } from "../../../../../../Store/Slices/Finance/PenalityandAdjustment/adjustment.thunk";
-import { fetchAllIncomes } from "../../../../../../Store/Slices/Finance/Earnings/earningsThunks";
+
 // import { setCurrentPage } from "../../../../Store/Slices/Finance/Earnings/earningsSlice";
 
 // Mapping payment types to corresponding icons
@@ -57,18 +57,20 @@ const SummaryPenalityandAdjustment= () => {
     {
       title: "Return Invoice No.",
       dataIndex: "return_invoice_no",
-      key: "return_imvoice_no",
+      key: "return_invoice_no",
       render: (text) => <span className="text-xs">{text}</span>,
       width: 150,
       ellipsis: true,
+      sorter: (a, b) => a.return_invoice_no.localeCompare(b.return_invoice_no),
     },
     {
       title: "Invoice No. Ref",
       dataIndex: "invoice_no",
-      key: "imvoice_no",
+      key: "invoice_no",
       render: (text) => <span className="text-xs">{text}</span>,
       width: 150,
       ellipsis: true,
+      sorter: (a, b) => a.invoice_no.localeCompare(b.invoice_no),
     },
     {
       title: "Receiver",
@@ -77,33 +79,36 @@ const SummaryPenalityandAdjustment= () => {
       render: (text) => <span className="text-xs">{text}</span>,
       width: 150,
       ellipsis: true,
+      sorter: (a, b) => a.receiver.localeCompare(b.receiver),
     },
     {
       title: "Total Amount(QR)",
       dataIndex: "adjustmentAmount",
       key: "adjustmentAmount",
-      render: (value) => (
-        <span className="text-xs">{value || "0"} QR</span>
-      ),
+      render: (value) => <span className="text-xs">{value || "0"} QR</span>,
       width: 120,
       ellipsis: true,
+      sorter: (a, b) => (a.adjustmentAmount || 0) - (b.adjustmentAmount || 0),
     },
     {
       title: "Final Amount(QR)",
       dataIndex: "adjustmentTotal",
       key: "adjustmentTotal",
-      render: (value) => <span className="text-xs text-green-600">{value || "0"} QR</span>,
+      render: (value) => (
+        <span className="text-xs text-green-600">{value || "0"} QR</span>
+      ),
       width: 120,
       ellipsis: true,
+      sorter: (a, b) => (a.adjustmentTotal || 0) - (b.adjustmentTotal || 0),
     },
-
     {
       title: "Status",
       dataIndex: "status",
       key: "status",
-      render: (text) => <span className="text-xs">{text}</span>,
+      render: (text) => <Tag color={text=="Cancelled"?"red":"purple"} className="text-xs"><span className="text-xs">{text}</span></Tag>,
       width: 100,
       ellipsis: true,
+      sorter: (a, b) => a.status.localeCompare(b.status),
     },
     {
       title: "Date",
@@ -118,15 +123,17 @@ const SummaryPenalityandAdjustment= () => {
               day: "numeric",
             }).format(date)
           : "N/A";
-
+  
         return <span className="text-xs">{formattedDate}</span>;
       },
       width: 120,
       ellipsis: {
         showTitle: true,
       },
-    }
+      sorter: (a, b) => new Date(a.adjustedAt) - new Date(b.adjustedAt),
+    },
   ];
+  
 
  // Transform incomes data to table dataSource and limit to 10 records
  const dataSource = adjustmentData?.map((adjustment) => ({
