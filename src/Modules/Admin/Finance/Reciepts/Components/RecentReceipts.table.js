@@ -283,25 +283,29 @@ const RecentReceipts = () => {
       }}
     >
       <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          marginBottom: "16px",
-          alignItems: "center",
-        }}
-      >
-        <h2 style={{ fontSize: "1.25rem", fontWeight: "600" }}>
-          Recent Receipts List
-        </h2>
-        <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
-          <button
-            onClick={() => navigate("/finance/receipts/receipt-list")}
-            className="px-3 py-1 rounded-md border border-gray-400 shadow-md hover:shadow-xl hover:shadow-gray-300 transition duration-200 text-white bg-gradient-to-r from-pink-500 to-purple-500"
-          >
-            View More
-          </button>
-        </div>
-      </div>
+  style={{
+    display: "flex",
+    justifyContent: "space-between",
+    marginBottom: "16px",
+    alignItems: "center",
+  }}
+>
+  {/* Title with counts */}
+  <h2 style={{ fontSize: "1.25rem", fontWeight: "600" }}>
+    Recent Receipts List ({receipts.length}/{pagination.totalRecords || 0})
+  </h2>
+
+  {/* View More Button with counts */}
+  <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
+    <button
+      onClick={() => navigate("/finance/receipts/receipt-list")}
+      className="px-3 py-1 rounded-md border border-gray-400 shadow-md hover:shadow-xl hover:shadow-gray-300 transition duration-200 text-white bg-gradient-to-r from-pink-500 to-purple-500"
+    >
+      View More ({pagination.totalRecords || 0})
+    </button>
+  </div>
+</div>
+
 
       {/* The Receipts Table */}
       <Table
@@ -326,6 +330,7 @@ const RecentReceipts = () => {
             </div>
           ),
         }}
+        size='small'
         pagination={false} // Disable Ant Design pagination
       />
 

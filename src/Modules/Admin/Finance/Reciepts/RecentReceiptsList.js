@@ -421,22 +421,53 @@ const RecentReceiptsList = () => {
                             pagination={{
                                 current: pagination.currentPage,
                                 total: pagination.totalRecords,
-                                pageSize: pagination.limit, // Ensure this is synced with your backend
+                                pageSize: pagination.limit,
                                 showSizeChanger: false,
                                 size: "small",
-                                showTotal: (total, range) =>
+                                showTotal: (total) =>
                                     `Page ${pagination.currentPage} of ${pagination.totalPages} | Total ${total} records`,
                                 onChange: (page) => {
                                     dispatch(fetchAllReceipts({ page, limit: pagination.limit }));
                                 },
                             }}
+                            summary={() => {
+                                let totalPaidAmount = 0;
+                                let totalTax = 0;
+                                let totalDiscount = 0;
+                                let totalPenalty = 0;
+
+                                // Calculate totals from filteredData
+                                filteredData.forEach((record) => {
+                                    totalPaidAmount += record.totalPaidAmount || 0;
+                                    totalTax += record.tax || 0;
+                                    totalDiscount += record.discount || 0;
+                                    totalPenalty += record.penalty || 0;
+                                });
+
+                                return (
+                                    <Table.Summary.Row>
+                                        <Table.Summary.Cell index={0} colSpan={3}>
+                                            <strong>Totals:</strong>
+                                        </Table.Summary.Cell>
+                                        <Table.Summary.Cell index={1}>
+                                            <strong>{totalPaidAmount.toLocaleString()} QAR</strong>
+                                        </Table.Summary.Cell>
+                                        <Table.Summary.Cell index={2}>
+                                            <strong>{totalTax.toLocaleString()} QAR</strong>
+                                        </Table.Summary.Cell>
+                                        <Table.Summary.Cell index={3}>
+                                            <strong>{totalDiscount.toLocaleString()} QAR</strong>
+                                        </Table.Summary.Cell>
+                                        <Table.Summary.Cell index={4}>
+                                            <strong>{totalPenalty.toLocaleString()} QAR</strong>
+                                        </Table.Summary.Cell>
+                                        <Table.Summary.Cell index={5} />
+                                    </Table.Summary.Row>
+                                );
+                            }}
                             size="small"
                             bordered
                         />
-
-
-
-
 
                     </>
                 )}
