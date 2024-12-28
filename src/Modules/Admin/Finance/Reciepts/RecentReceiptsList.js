@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import AdminLayout from "../../../../Components/Admin/AdminDashLayout";
-import { Menu, Dropdown, Input, Table, Tag } from "antd";
+import { Menu, Dropdown, Input, Table, Tag, Tooltip} from "antd";
 import {
     MoreOutlined,
     ExclamationCircleOutlined,
@@ -199,6 +199,7 @@ const RecentReceiptsList = () => {
     }));
 
     // --- 3-Dots Action Menu ---
+    // --- 3-Dots Action Menu ---
     const actionMenu = (record) => (
         <Menu>
             {/* 1) Preview -> PDF */}
@@ -206,28 +207,39 @@ const RecentReceiptsList = () => {
                 <FilePdfOutlined /> Preview
             </Menu.Item>
 
-            {/* 2) View (read-only) -> opens the same CreateReceipt but readOnly */}
+            {/* 2) View (read-only) */}
             <Menu.Item key="2" onClick={() => handleViewReadOnlyReceipt(record)}>
                 <EyeOutlined /> View (read-only)
             </Menu.Item>
 
             {/* 3) Cancel Receipt */}
-            <Menu.Item
-                key="3"
-                onClick={() => {
-                    setSelectedReceiptId(record._id);
-                    setModalVisible(true);
-                }}
-            >
-                <CloseCircleOutlined /> Cancel Receipt
-            </Menu.Item>
+<Menu.Item
+    key="3"
+    onClick={() => {
+        if (!record.isCancel) {
+            setSelectedReceiptId(record._id);
+            setModalVisible(true);
+        }
+    }}
+    disabled={record.isCancel} // Disable the option if the receipt is already canceled
+>
+    <Tooltip
+        title={record.isCancel ? "This receipt is already canceled" : "Cancel this receipt"}
+    >
+        <span>
+            <CloseCircleOutlined /> Cancel Receipt
+        </span>
+    </Tooltip>
+</Menu.Item>
 
-            {/* 4) Send Mail (just a toast for now) */}
+
+            {/* 4) Send Mail */}
             <Menu.Item key="4" onClick={() => toast.success("Send Mail clicked!")}>
                 <MailOutlined /> Send Mail
             </Menu.Item>
         </Menu>
     );
+
 
     // --- Filter logic ---
     const filteredData = receipts.filter((item) => {
