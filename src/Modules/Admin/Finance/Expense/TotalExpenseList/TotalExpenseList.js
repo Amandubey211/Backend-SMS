@@ -1,39 +1,55 @@
+// src/Modules/Admin/Finance/Components/TotalExpenseList.jsx
+
 import React, { useEffect, useMemo, useState, useCallback } from "react";
-import {
-  Table,
-  Input,
-  Button,
-  Spin,
-  Alert,
-  Tooltip,
-  Card,
-  Tag,
-  Checkbox,
-} from "antd";
+import { Table, Input, Button, Spin, Alert, Tooltip, Tag } from "antd";
 import {
   SearchOutlined,
   ExportOutlined,
   FilterOutlined,
-  EyeOutlined,
   EditOutlined,
   DeleteOutlined,
-  DollarCircleOutlined,
-  PieChartOutlined,
-  ExclamationCircleOutlined,
+  DollarOutlined,
+  SyncOutlined,
   CheckCircleOutlined,
+  CloseCircleOutlined,
 } from "@ant-design/icons";
+import { AiFillAccountBook } from "react-icons/ai";
+import { BiDonateHeart } from "react-icons/bi";
+import { FaRegMoneyBillAlt } from "react-icons/fa";
+import { MdOutlineMoneyOff } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import Layout from "../../../../../Components/Common/Layout";
 import DashLayout from "../../../../../Components/Admin/AdminDashLayout";
-import { fetchAllExpenses } from "../../../../../Store/Slices/Finance/Expenses/expensesThunks";
-import { setCurrentPage } from "../../../../../Store/Slices/Finance/Expenses/expensesSlice";
+// import DeleteModal from "./Components/DeleteModal";
 import debounce from "lodash.debounce";
+import { fetchAllExpenses } from "../../../../../Store/Slices/Finance/Expenses/expensesThunks";
+import {
+  setCurrentPage,
+  setFilters,
+  setReadOnly,
+  clearFilters,
+  setSelectedExpense,
+} from "../../../../../Store/Slices/Finance/Expenses/expensesSlice";
+import toast from "react-hot-toast";
+import Card from "../components/Card";
 import useNavHeading from "../../../../../Hooks/CommonHooks/useNavHeading ";
 
 const TotalExpenseList = () => {
+  useNavHeading("Finance", "Expense List");
+
+  // State variables
+  const [searchText, setSearchText] = useState("");
+  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+  const [isExportModalVisible, setIsExportModalVisible] = useState(false);
+  const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
+
+  const [selectedExpenseForDeletion, setSelectedExpenseForDeletion] =
+    useState(null);
+
+  // Navigation and dispatch
+  const navigate = useNavigate();
   const dispatch = useDispatch();
-  useNavHeading("Expense", "List");
 
   // Redux state
   const {
@@ -44,16 +60,30 @@ const TotalExpenseList = () => {
     totalPages,
     currentPage,
     pageSize,
-    totalExpense,
+    filters,
+    totalExpenseAmount,
     remainingPartialPaidExpense,
-    unpaidExpense,
     totalPaidAmount,
-  } = useSelector((store) => store.admin.expenses);
+    unpaidExpense,
+  } = useSelector((state) => state.admin.expenses);
 
-  const [searchText, setSearchText] = useState("");
+  // Initialize local state for computedPageSize
   const [computedPageSize, setComputedPageSize] = useState(pageSize || 10);
 
-  // Debounced fetch function
+  const CustomHeaderCell = (props) => (
+    <th {...props} className="bg-pink-100 py-1 px-2 text-xs" />
+  );
+
+  // Memoize a mapping from _id to expense object for faster lookup
+  const expenseIdMap = useMemo(() => {
+    const map = {};
+    expenses.forEach((expense) => {
+      map[expense._id] = expense;
+    });
+    return map;
+  }, [expenses]);
+
+  // Debounced fetch function to reduce API calls
   const debouncedFetch = useCallback(
     debounce((params) => {
       dispatch(fetchAllExpenses(params));
@@ -61,15 +91,17 @@ const TotalExpenseList = () => {
     [dispatch]
   );
 
-  // Fetch expenses on mount and dependencies change
+  // Fetch expenses on component mount and when dependencies change
   useEffect(() => {
     const params = {
       search: searchText,
       page: currentPage,
       limit: computedPageSize,
+      includeDetails: true,
+      ...filters,
     };
     debouncedFetch(params);
-  }, [debouncedFetch, searchText, currentPage, computedPageSize]);
+  }, [debouncedFetch, searchText, currentPage, computedPageSize, filters]);
 
   // Handle search input changes
   const handleSearch = (e) => {
@@ -77,219 +109,406 @@ const TotalExpenseList = () => {
     dispatch(setCurrentPage(1));
   };
 
-  // Format functions
+  // Handle filter application
+  const handleFilterApply = (appliedFilters) => {
+    if (Object.keys(appliedFilters).length === 0) {
+      dispatch(clearFilters());
+    } else {
+      dispatch(setFilters(appliedFilters));
+    }
+  };
+
+  // Render action buttons (Edit, Delete) for each row
+  const renderActionIcons = (record) => (
+    <div className="flex space-x-1" onClick={(e) => e.stopPropagation()}>
+      <Tooltip title="Edit">
+        <Button
+          type="link"
+          icon={<EditOutlined />}
+          onClick={() => {
+            const expenseToEdit = expenseIdMap[record.key];
+            if (expenseToEdit) {
+              dispatch(setReadOnly(false)); // Set readOnly to false for editing
+              dispatch(setSelectedExpense(expenseToEdit)); // Dispatch the selected expense to Redux
+              navigate("/finance/expenses/add"); // Navigate to edit page
+            } else {
+              toast.error("Selected expense not found.");
+            }
+          }}
+          className="text-blue-600 hover:text-blue-800 p-0"
+          aria-label="Edit"
+        />
+      </Tooltip>
+      <Tooltip title="Delete">
+        <Button
+          type="link"
+          icon={<DeleteOutlined />}
+          onClick={() => {
+            const expenseToDelete = expenseIdMap[record.key];
+            if (expenseToDelete) {
+              setSelectedExpenseForDeletion(expenseToDelete); // Set expense for deletion
+              setIsDeleteModalVisible(true);
+            } else {
+              toast.error("Selected expense not found.");
+            }
+          }}
+          className="text-red-600 hover:text-red-800 p-0"
+          aria-label="Delete"
+        />
+      </Tooltip>
+    </div>
+  );
+
+  // Formatting functions
   const formatCurrency = (value) =>
     value !== undefined && value !== null
       ? `${value.toLocaleString()} QR`
       : "N/A";
 
-  // Table columns
+  const formatPercentage = (value) =>
+    value !== undefined && value !== null ? `${value}%` : "N/A";
+
+  const formatDate = (date) =>
+    date ? new Date(date).toLocaleDateString() : "N/A";
+
+  // Define table columns without the selection column
   const columns = useMemo(
     () => [
+      {
+        title: "Category",
+        dataIndex: "categoryName",
+        key: "categoryName",
+        render: (text) => <span className="text-xs">{text}</span>,
+        width: 150,
+        ellipsis: true,
+      },
       {
         title: "Description",
         dataIndex: "description",
         key: "description",
         render: (text) => <span className="text-xs">{text}</span>,
-        ellipsis: true,
         width: 200,
+        ellipsis: true,
       },
+      // Discount Column
       {
-        title: "Payment Type",
-        dataIndex: "paymentType",
-        key: "paymentType",
-        render: (type) => <span className="text-xs capitalize">{type}</span>,
-        width: 100,
-      },
-      {
-        title: "Payment Status",
-        dataIndex: "paymentStatus",
-        key: "paymentStatus",
-        render: (status) => {
-          let color = "default";
-          switch (status) {
-            case "paid":
-              color = "green";
-              break;
-            case "partial":
-              color = "yellow";
-              break;
-            case "unpaid":
-              color = "red";
-              break;
-            default:
-              color = "default";
-          }
-          return (
-            <Tag color={color} className="text-xs capitalize">
-              {status || "N/A"}
+        title: "Discount",
+        dataIndex: "discount",
+        key: "discount",
+        render: (value, record) =>
+          record.discountType === "percentage" ? (
+            <Tag color="purple" className="text-xs">
+              {value || 0}%
             </Tag>
-          );
-        },
+          ) : (
+            <Tag color="orange" className="text-xs">
+              {value || 0} QR
+            </Tag>
+          ),
         width: 100,
+        ellipsis: true,
       },
+      // Penalty Column
       {
-        title: "Final Amount",
-        dataIndex: "finalAmount",
-        key: "finalAmount",
-        render: (value) => (
-          <span className="text-xs">{formatCurrency(value)}</span>
-        ),
-        width: 120,
-      },
-      {
-        title: "Paid Amount",
-        dataIndex: "paidAmount",
-        key: "paidAmount",
-        render: (value) => (
-          <span className="text-xs text-green-600">
-            {formatCurrency(value)}
-          </span>
-        ),
-        width: 120,
-      },
-      {
-        title: "Remaining Amount",
-        dataIndex: "remainingAmount",
-        key: "remainingAmount",
+        title: "Penalty",
+        dataIndex: "penalty",
+        key: "penalty",
         render: (value) => (
           <span className="text-xs text-red-600">{formatCurrency(value)}</span>
         ),
+        width: 100,
+        ellipsis: true,
+      },
+      // Final Amount Column
+      {
+        title: "Final Amount (QR)",
+        dataIndex: "finalAmount",
+        key: "finalAmount",
+        render: (value) => <span className="text-xs">{value || "0"} QR</span>,
+        width: 150,
+        ellipsis: true,
+      },
+      // Paid Amount Column
+      {
+        title: "Paid Amount (QR)",
+        dataIndex: "paidAmount",
+        key: "paidAmount",
+        render: (value) => (
+          <span className="text-xs text-green-600">{value || "0"} QR</span>
+        ),
+        width: 120,
+        ellipsis: true,
+      },
+      // Remaining Amount Column
+      {
+        title: "Remaining Amount (QR)",
+        dataIndex: "remainingAmount",
+        key: "remainingAmount",
+        render: (value) => (
+          <span className="text-xs text-red-600">{value || "0"} QR</span>
+        ),
+        width: 120,
+        ellipsis: true,
+      },
+      // Action Column
+      {
+        title: "Action",
+        key: "action",
+        render: (_, record) => renderActionIcons(record),
+        fixed: "right",
         width: 120,
       },
     ],
-    []
+    [expenseIdMap]
   );
 
-  // DataSource for Table
+  // Map expenses to data source with camelCase fields
   const dataSource = useMemo(
     () =>
       expenses?.map((expense) => ({
         key: expense._id,
-        description: expense.description,
-        paymentType: expense.paymentType,
-        paymentStatus: expense.paymentStatus,
-        finalAmount: expense.finalAmount,
-        paidAmount: expense.paidAmount,
-        remainingAmount: expense.remainingAmount,
+        categoryName: expense.category?.[0]?.categoryName || "N/A",
+        description: expense.description || (
+          <span className="text-yellow-600">No Description </span>
+        ),
+        paymentType: expense.paymentType || "N/A",
+        discount: expense.discount || 0,
+        discountType: expense.discountType || "percentage",
+        finalAmount: expense.finalAmount || 0,
+        paidAmount: expense.paidAmount || 0,
+        remainingAmount: expense.remainingAmount || 0,
+        penalty: expense.penalty || 0,
+        earnedDate: expense.paidDate || expense.generateDate || null,
+        totalAmount: expense.totalAmount || 0,
+        academicYearDetails: expense.academicYearDetails?.[0]?.year || "N/A",
       })),
     [expenses]
   );
 
-  // Statistics for Top Cards
-  const cardData = useMemo(
-    () => [
+  // Custom components for table headers
+  const components = {
+    header: {
+      cell: CustomHeaderCell,
+    },
+  };
+
+  // Table summary (totals row)
+  const summary = (pageData) => {
+    let totalFinalAmount = 0;
+    let totalPaidAmountSum = 0;
+    let totalRemainingAmount = 0;
+    let totalPenalty = 0;
+
+    pageData.forEach(
+      ({ finalAmount, paidAmount, remainingAmount, penalty }) => {
+        totalFinalAmount += finalAmount;
+        totalPaidAmountSum += paidAmount;
+        totalRemainingAmount += remainingAmount;
+        totalPenalty += penalty;
+      }
+    );
+
+    return (
+      <Table.Summary.Row>
+        <Table.Summary.Cell index={0} colSpan={3}>
+          <strong>Totals:</strong>
+        </Table.Summary.Cell>
+        <Table.Summary.Cell index={3}>
+          <strong>{formatCurrency(totalPenalty)}</strong>
+        </Table.Summary.Cell>
+        <Table.Summary.Cell index={4}>
+          <strong>{formatCurrency(totalFinalAmount)}</strong>
+        </Table.Summary.Cell>
+        <Table.Summary.Cell index={5}>
+          <strong>{formatCurrency(totalPaidAmountSum)}</strong>
+        </Table.Summary.Cell>
+        <Table.Summary.Cell index={6}>
+          <strong>{formatCurrency(totalRemainingAmount)}</strong>
+        </Table.Summary.Cell>
+        <Table.Summary.Cell index={7} />
+      </Table.Summary.Row>
+    );
+  };
+
+  // Define card data directly without importing from cardsData
+  // Define card data directly without importing from cardsData
+
+  // Define card data directly without importing from cardsData
+  const cardDataWithValues = useMemo(() => {
+    const cards = [
       {
-        title: "Paid Amount",
-        icon: <CheckCircleOutlined />,
-        color: "green",
-        amount: formatCurrency(totalPaidAmount),
+        title: "Total Paid Amount",
+        value: formatCurrency(totalPaidAmount),
+        icon: <FaRegMoneyBillAlt />,
+        // Add other card properties
       },
 
       {
         title: "Remaining Partial Paid",
-        icon: <PieChartOutlined />,
-        color: "yellow",
-        amount: formatCurrency(remainingPartialPaidExpense),
-      },
-      {
-        title: "Unpaid Amount",
-        icon: <ExclamationCircleOutlined />,
-        color: "red",
-        amount: formatCurrency(unpaidExpense),
+        value: formatCurrency(remainingPartialPaidExpense),
+        icon: <BiDonateHeart />,
+        // Add other card properties
       },
 
       {
-        title: "Total Expense",
-        icon: <DollarCircleOutlined />,
-        color: "purple",
-        amount: formatCurrency(totalExpense),
+        title: "Unpaid Amount",
+        value: formatCurrency(unpaidExpense),
+        icon: <MdOutlineMoneyOff />,
+        // Add other card properties
       },
-    ],
-    [totalExpense, remainingPartialPaidExpense, unpaidExpense, totalPaidAmount]
-  );
+      {
+        title: "Total Expense",
+        value: formatCurrency(totalExpenseAmount),
+        icon: <AiFillAccountBook />,
+        // Add other card properties like comparison, percentage, trend if needed
+      },
+      // Add more cards if necessary
+    ];
+
+    return cards;
+  }, [
+    totalExpenseAmount,
+    remainingPartialPaidExpense,
+    totalPaidAmount,
+    unpaidExpense,
+  ]);
 
   return (
     <Layout title="Expense List | Student Diwan">
       <DashLayout>
         <div className="p-4 space-y-3">
           {/* Top Cards Row */}
-          <div className="w-full flex flex-wrap justify-center items-stretch gap-4">
-            {cardData.map((card, index) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {cardDataWithValues.map((card, index) => (
               <Card
                 key={index}
-                title={
-                  <div
-                    className={`flex items-center gap-2 font-bold text-${card.color}-800`}
-                  >
-                    {card.icon}
-                    {card.title}
-                  </div>
-                }
-                className={`bg-${card.color}-100 shadow-sm border-none`}
-                headStyle={{ borderBottom: "none" }}
-                style={{
-                  flex: "1 1 200px",
-                  maxWidth: "400px",
-                  textAlign: "center",
-                }}
-              >
-                <p className={`text-${card.color}-800 text-lg font-bold`}>
-                  {card.amount}
-                </p>
-              </Card>
+                title={card.title}
+                value={card.value}
+                icon={card.icon}
+                // Pass other props like comparison, percentage, icon, trend if needed
+              />
             ))}
           </div>
 
           {/* Header Section */}
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold">Expense List</h3>
-            <Input
-              placeholder="Search expenses..."
-              prefix={<SearchOutlined />}
-              value={searchText}
-              onChange={handleSearch}
-              allowClear
-              className="w-64"
-            />
+          <div className="flex flex-col md:flex-row justify-between items-center md:items-start gap-4">
+            <div className="flex items-center gap-4 ms-4">
+              <Input
+                placeholder="Search by Subcategory"
+                prefix={<SearchOutlined />}
+                className="w-full md:w-64 text-xs"
+                value={searchText}
+                onChange={handleSearch}
+                allowClear
+                style={{
+                  borderRadius: "0.375rem",
+                  height: "35px",
+                  borderColor: "#ff6bcb",
+                  boxShadow: "0 2px 4px rgba(255, 105, 180, 0.2)",
+                }}
+              />
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              {/* Create Invoice button removed */}
+              <Button
+                className="flex items-center px-4 py-3 rounded-md text-xs bg-gradient-to-r from-pink-400 to-pink-300 text-white border-none shadow-md hover:from-pink-500 hover:to-pink-400 transition duration-200"
+                icon={<FilterOutlined />}
+                disabled
+                // onClick={() => setIsFilterModalVisible(true)}
+              >
+                Filter
+              </Button>
+              <Button
+                type="primary"
+                icon={<ExportOutlined />}
+                // onClick={() => setIsExportModalVisible(true)}
+                disabled
+                className="flex items-center bg-gradient-to-r from-pink-500 to-pink-400 text-white border-none hover:from-pink-600 hover:to-pink-500 transition duration-200 text-xs px-4 py-3 rounded-md shadow-md"
+              >
+                Export
+              </Button>
+              {/* Uncomment if Bulk Entries is needed
+              <Button
+                className="flex items-center px-3 py-1 bg-gradient-to-r from-pink-500 to-pink-400 text-white font-bold rounded-md hover:opacity-90 transition text-xs shadow-md"
+                icon={<UploadOutlined />}
+                onClick={() => setIsBulkEntriesModalVisible(true)}
+                size="small"
+              >
+                Bulk Entries
+              </Button>
+              */}
+            </div>
           </div>
 
-          {/* Error Message */}
-          {error && (
-            <Alert
-              message="Error"
-              description={error}
-              type="error"
-              showIcon
-              closable
-            />
+          {/* No Data Placeholder */}
+          {!loading && expenses.length === 0 && !error && (
+            <div className="text-center text-gray-500 text-xs py-4">
+              No records found.
+            </div>
           )}
 
           {/* Table */}
-          <Table
-            dataSource={dataSource}
-            columns={columns}
-            pagination={{
-              current: currentPage,
-              total: totalRecords,
-              pageSize: computedPageSize,
-              showSizeChanger: true,
-              pageSizeOptions: ["5", "10", "20", "50"], // Added page size options
-              size: "small",
-              showTotal: () =>
-                `Page ${currentPage} of ${totalPages} | Total ${totalRecords} records`,
-              onChange: (page, pageSize) => {
-                dispatch(setCurrentPage(page)); // Update the current page in Redux
-                setComputedPageSize(pageSize); // Update the local page size
-              },
-              onShowSizeChange: (current, size) => {
-                setComputedPageSize(size); // Handle page size change locally
-                dispatch(setCurrentPage(1)); // Optionally reset to first page
-              },
+          <div className="overflow-x-auto">
+            <Table
+              dataSource={dataSource}
+              columns={columns}
+              // Updated pagination configuration
+              pagination={{
+                current: currentPage,
+                total: totalRecords,
+                pageSize: computedPageSize,
+                showSizeChanger: true, // Enable size changer
+                pageSizeOptions: ["5", "10", "20", "50"], // Define page size options
+                size: "small",
+                showTotal: (total, range) =>
+                  `Page ${currentPage} of ${totalPages} | Total ${totalRecords} records`,
+                onChange: (page, pageSize) => {
+                  dispatch(setCurrentPage(page)); // Update the current page in Redux
+                  setComputedPageSize(pageSize); // Update the local page size
+                },
+                onShowSizeChange: (current, size) => {
+                  setComputedPageSize(size); // Handle page size change locally
+                  dispatch(setCurrentPage(1)); // Optionally reset to first page
+                },
+              }}
+              // Removed the conflicting onChange prop from the Table
+              className="rounded-lg shadow text-xs"
+              bordered
+              size="small"
+              tableLayout="fixed" // Fixed table layout for compactness
+              components={components}
+              loading={{
+                spinning: loading,
+                indicator: <Spin size="large" />,
+                tip: "Loading...",
+              }}
+              summary={summary}
+              // Removed rowSelection and rowClassName
+              // Removed onRow handler
+            />
+          </div>
+
+          {/* Modals */}
+          {/* <DeleteModal
+            visible={isDeleteModalVisible}
+            onClose={() => {
+              setIsDeleteModalVisible(false);
+              setSelectedExpenseForDeletion(null);
             }}
-            loading={loading}
-            bordered
+            expense={selectedExpenseForDeletion}
+          /> */}
+          {/* <ExportModal
+            visible={isExportModalVisible}
+            onClose={() => setIsExportModalVisible(false)}
+            dataToExport={transformExpenseData(expenses)}
+            title="ExpensesData"
+            sheet="expenses_report"
           />
+          <FilterExpenseModal
+            visible={isFilterModalVisible}
+            onClose={() => setIsFilterModalVisible(false)}
+            onFilterApply={handleFilterApply}
+          /> */}
         </div>
       </DashLayout>
     </Layout>

@@ -172,6 +172,7 @@ const earningsSlice = createSlice({
       .addCase(fetchEarningGraph.fulfilled, (state, action) => {
         state.graphLoading = false;
         state.expenseGraph = action.payload || [];
+        state.graphError = false;
       })
       .addCase(fetchEarningGraph.rejected, (state, action) => {
         state.graphLoading = false;

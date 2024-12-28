@@ -7,7 +7,9 @@ import {
   updateExpense,
   fetchExpenseById,
   deleteExpense,
-} from "./expensesThunks";
+  fetchExpenseGraph,
+  fetchCardDataExpense,
+} from "./expensesThunks"; // Ensure the path is correct
 
 const initialState = {
   expenses: [],
@@ -24,6 +26,8 @@ const initialState = {
   remainingPartialPaidExpense: 0,
   totalPaidAmount: 0,
   unpaidExpense: 0,
+  expenseGraph: [], // New state for graph data
+  cardDataExpense: {}, // New state for card data
 };
 
 const expensesSlice = createSlice({
@@ -43,6 +47,8 @@ const expensesSlice = createSlice({
       state.remainingPartialPaidExpense = 0;
       state.totalPaidAmount = 0;
       state.unpaidExpense = 0;
+      state.expenseGraph = [];
+      state.cardDataExpense = {};
     },
     setSelectedExpense(state, action) {
       state.selectedExpense = action.payload;
@@ -125,8 +131,7 @@ const expensesSlice = createSlice({
         //   state.expenses[index] = action.payload;
 
         //   // Optionally, update statistics
-        //   // Calculate the difference in amounts if necessary
-        //   // For simplicity, let's recalculate totalExpenseAmount
+        //   // Recalculate totals for accuracy
         //   state.totalExpenseAmount = state.expenses.reduce(
         //     (acc, expense) => acc + (expense.finalAmount || 0),
         //     0
@@ -158,9 +163,7 @@ const expensesSlice = createSlice({
         // state.totalRecords -= 1;
 
         // // Optionally, update statistics
-        // // Here, assuming you have access to the deleted expense's amounts
-        // // If not, you might need to refetch or store deleted expense details
-        // // For simplicity, we'll recalculate totals
+        // // Recalculate totals for accuracy
         // state.totalExpenseAmount = state.expenses.reduce(
         //   (acc, expense) => acc + (expense.finalAmount || 0),
         //   0
@@ -192,6 +195,38 @@ const expensesSlice = createSlice({
         state.loading = false;
         state.error = action.payload || "Failed to fetch expense.";
         state.selectedExpense = null;
+      })
+
+      // Fetch Expense Graph
+      .addCase(fetchExpenseGraph.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchExpenseGraph.fulfilled, (state, action) => {
+        state.loading = false;
+        state.expenseGraph = action.payload || [];
+      })
+      .addCase(fetchExpenseGraph.rejected, (state, action) => {
+        state.loading = false;
+        state.error =
+          action.payload ||
+          "An error occurred while fetching expense graph data.";
+      })
+
+      // Fetch Card Data Expense
+      .addCase(fetchCardDataExpense.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchCardDataExpense.fulfilled, (state, action) => {
+        state.loading = false;
+        state.cardDataExpense = action.payload || {};
+      })
+      .addCase(fetchCardDataExpense.rejected, (state, action) => {
+        state.loading = false;
+        state.error =
+          action.payload ||
+          "An error occurred while fetching expense card data.";
       });
   },
 });
