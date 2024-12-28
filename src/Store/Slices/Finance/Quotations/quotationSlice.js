@@ -60,9 +60,9 @@ const quotationSlice = createSlice({
         console.log("Fulfilled payload:", action.payload);
         state.loading = false;
         state.quotations = action.payload.data || [];
-        state.totalRecords = action.payload.totalRecords || 0;
-        state.totalPages = action.payload.totalPages || 0;
-        state.currentPage = action.payload.currentPage || 1;
+        state.totalRecords = action.payload.pagination.totalRecords || 0;
+        state.totalPages = action.payload.pagination.totalPages || 0;
+        state.currentPage = action.payload.pagination.currentPage || 1;
       })
       .addCase(fetchAllQuotations.rejected, (state, action) => {
         state.loading = false;
