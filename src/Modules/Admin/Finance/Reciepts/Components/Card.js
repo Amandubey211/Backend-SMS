@@ -1,6 +1,6 @@
 import React from "react";
 
-const Card = ({ title, count, color, textColor, customContent }) => {
+const Card = ({ title, count, color, textColor, customContent, tag }) => {
   return (
     <div className={`rounded-lg p-6 shadow-md ${color}`}>
       <h3 className="text-lg font-semibold">{title}</h3>
@@ -9,7 +9,7 @@ const Card = ({ title, count, color, textColor, customContent }) => {
         <div className="mt-4">{customContent}</div>
       ) : (
         <p className={`mt-4 text-3xl font-bold ${textColor}`}>
-          {count} <span className="text-lg">receipts</span>
+          {count} <span className="text-lg">{tag}</span>
         </p>
       )}
     </div>

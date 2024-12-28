@@ -297,7 +297,7 @@ const RecentReceiptsList = () => {
             render: (penalty) => `${penalty || 0} QAR`,
         },
         {
-            title: "Invoice Number",
+            title: "Invoice Ref ID",
             dataIndex: "invoiceNumber",
             key: "invoiceNumber",
             sorter: (a, b) =>
@@ -418,33 +418,25 @@ const RecentReceiptsList = () => {
                                     </div>
                                 ),
                             }}
-                            pagination={false}
+                            pagination={{
+                                current: pagination.currentPage,
+                                total: pagination.totalRecords,
+                                pageSize: pagination.limit, // Ensure this is synced with your backend
+                                showSizeChanger: false,
+                                size: "small",
+                                showTotal: (total, range) =>
+                                    `Page ${pagination.currentPage} of ${pagination.totalPages} | Total ${total} records`,
+                                onChange: (page) => {
+                                    dispatch(fetchAllReceipts({ page, limit: pagination.limit }));
+                                },
+                            }}
+                            size="small"
+                            bordered
                         />
 
-                        {/* Custom Pagination Component */}
-                        <div className="flex justify-end mt-5">
-                            <button
-                                onClick={() =>
-                                    dispatch(fetchAllReceipts({ page: pagination.currentPage - 1, limit: pagination.limit }))
-                                }
-                                disabled={pagination.currentPage === 1}
-                                className="px-2 py-1 mx-1 rounded-md border border-gray-300 bg-gradient-to-r from-pink-500 to-purple-600 text-white disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg hover:scale-105 transform transition duration-200"
-                            >
-                                Previous
-                            </button>
-                            <span className="px-2 py-1 mx-2 text-sm font-semibold">
-                                Page {pagination.currentPage || 1} of {pagination.totalPages || 1}
-                            </span>
-                            <button
-                                onClick={() =>
-                                    dispatch(fetchAllReceipts({ page: pagination.currentPage + 1, limit: pagination.limit }))
-                                }
-                                disabled={pagination.currentPage === pagination.totalPages}
-                                className="px-2 py-1 mx-1 rounded-md border border-gray-300 bg-gradient-to-r from-pink-500 to-purple-600 text-white disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg hover:scale-105 transform transition duration-200"
-                            >
-                                Next
-                            </button>
-                        </div>
+
+
+
 
                     </>
                 )}

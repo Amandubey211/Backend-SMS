@@ -26,18 +26,21 @@ const CardsSection = () => {
       count: loading || error ? "0" : receiptsSummary?.totalReceipts || "0",
       color: "bg-purple-100",
       textColor: "text-purple-700",
+      tag: 'receipts'
     },
     {
       title: "Total Amount Collected",
       count: loading || error ? "0" : receiptsSummary?.totalAmountCollected || "0",
       color: "bg-green-100",
       textColor: "text-green-700",
+      tag: 'QR'
     },
     {
       title: "Cancelled Receipts",
       count: loading || error ? "0" : receiptsSummary?.cancelledReceipts || "0",
       color: "bg-red-100",
       textColor: "text-red-700",
+      tag: 'receipts'
     },
   ];
 
