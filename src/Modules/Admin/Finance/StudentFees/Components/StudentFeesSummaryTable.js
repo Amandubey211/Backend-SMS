@@ -127,7 +127,7 @@ const StudentFeesSummaryTable = () => {
         <div className="flex items-center space-x-4">
           {/* View More Button */}
           <Button
-            type="primary"
+              className="px-4 py-2 bg-gradient-to-r from-[#C83B62] to-[#8E44AD] text-white rounded-md shadow hover:from-[#a3324e] hover:to-[#6e2384] transition text-xs"
             onClick={() => navigate("/finance/studentfees/total-revenue")}
           >
             View More {totalRecords}

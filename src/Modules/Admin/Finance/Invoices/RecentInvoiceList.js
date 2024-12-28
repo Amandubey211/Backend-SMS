@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import AdminLayout from "../../../../Components/Admin/AdminDashLayout";
 import { Menu, Dropdown, Table, Spin, Input, Tooltip, Button, Modal, Tag, Pagination, Select } from "antd";
-import { MoreOutlined, SearchOutlined } from "@ant-design/icons";
+import { ExportOutlined, MoreOutlined, SearchOutlined } from "@ant-design/icons";
 import { FiUserPlus } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import Invoice from "./Components/Invoice";
@@ -210,23 +210,7 @@ return (
               className="flex items-center px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-medium rounded-lg hover:opacity-90"
               onClick={() => console.log("Exporting data...")} 
             >
-              Export
-              <span className="ml-2">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M5 10l7-7m0 0l7 7m-7-7v18"
-                  />
-                </svg>
-              </span>
+              <ExportOutlined />  Export
             </button>
 
             {/* Add New Fee Button */}

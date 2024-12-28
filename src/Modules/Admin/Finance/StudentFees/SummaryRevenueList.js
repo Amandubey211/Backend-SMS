@@ -5,7 +5,7 @@ import React, { useState, useEffect } from "react";
 import { Table, Modal, Button, Spin, Alert, Tooltip, Tag } from "antd";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { EditOutlined, DeleteOutlined, EyeOutlined } from "@ant-design/icons";
+import { EditOutlined, DeleteOutlined, EyeOutlined, ExportOutlined } from "@ant-design/icons";
 import AdminLayout from "../../../../Components/Admin/AdminDashLayout";
 import { FiUserPlus } from "react-icons/fi";
 import moment from "moment"; // Replaced dayjs with moment
@@ -355,7 +355,7 @@ const SummaryRevenueList = () => {
               className="flex items-center px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-medium rounded-lg hover:opacity-90"
               onClick={() => console.log("Exporting data...")}
             >
-              Export
+              <ExportOutlined /> Export
             </button>
             <button
               onClick={() => navigate("/finance/studentfees/add/form")}
