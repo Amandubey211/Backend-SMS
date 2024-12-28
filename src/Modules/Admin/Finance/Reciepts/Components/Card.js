@@ -1,16 +1,27 @@
 import React from "react";
 
-const Card = ({ title, count, color, textColor, customContent, tag }) => {
+const Card = ({ title, count, color, textColor, customContent, tag, icon }) => {
   return (
-    <div className={`rounded-lg p-6 shadow-md ${color}`}>
-      <h3 className="text-lg font-semibold">{title}</h3>
-      <p className="text-sm text-gray-600">(all categories)</p>
+    <div
+      className={`rounded-lg p-6 shadow-md border`}
+      style={{
+        background:
+          "radial-gradient(100.5% 129.64% at 50.05% 35.24%, #FBF7FF 0%, #FFCEDB 100%)",
+        borderColor: "#DABDFF",
+      }}
+    >
+      <div className="flex items-center">
+        <div className="p-3 rounded-md bg-gradient-to-r from-purple-500 to-pink-500 text-white text-lg mr-3">
+          {icon}
+        </div>
+        <h3 className="text-lg font-semibold">{title}</h3>
+      </div>
       {customContent ? (
         <div className="mt-4">{customContent}</div>
       ) : (
-        <p className={`mt-4 text-3xl font-bold ${textColor}`}>
-          {count} <span className="text-lg">{tag}</span>
-        </p>
+        <div className="mt-4">
+          <p className={`text-2xl font-bold text-purple-800`}>{count} {tag}</p>
+        </div>
       )}
     </div>
   );
