@@ -60,7 +60,7 @@ const StudentDetails = ({setStudentDetail} ) => {
           options={studentsList || []}
           forWhom='student'
           onChange={handleInputChange}
-         // disabled = {loading}
+         disabled = {loading}
         />
       </div>
     </div>

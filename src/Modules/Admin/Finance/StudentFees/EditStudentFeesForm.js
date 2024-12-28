@@ -29,16 +29,16 @@ export default function EditStudentFeesForm({ data }) {
         penalty: 0,
         paid_amount: 0,
         paymentStatus: "",
-        studentId:'',
-        classId:'',
-        sectionId:'',
+        studentId: '',
+        classId: '',
+        sectionId: '',
     });
 
     const dispatch = useDispatch();
 
     useEffect(() => {
         if (data) {
-console.log(data);
+            console.log(data);
 
             setInitialValues({
                 feeId: data._id || "",
@@ -60,9 +60,9 @@ console.log(data);
                 penalty: data.penalty || 0,
                 paid_amount: data.paid_amount || 0,
                 paymentStatus: data.paymentStatus || "",
-                studentId:data.studentId,
-               classId:data.classId,
-                sectionId:data.sectionId
+                studentId: data.studentId,
+                classId: data.classId,
+                sectionId: data.sectionId
             });
         }
     }, [data]);
@@ -111,7 +111,20 @@ console.log(data);
     };
 
     return (
-        <div className="flex w-full border">
+
+        <div className="flex w-full border flex-col">
+            <div className="flex flex-row mx-4 gap-2 font-semibold justify-between my-2">
+                <div className="flex flex-row gap-2">
+                <h1 className="text-gray-500">Student : </h1>
+                <h1>{data?.studentDetails?.firstName}</h1>
+                <h1>{data?.studentDetails?.lastName}</h1>
+                </div>
+                <div className="flex flex-row mx-6 gap-2 ">
+                <h1 className="text-gray-500">Class :</h1>
+                <h1>{data?.classDetails?.className}</h1>
+            </div>
+            </div>
+            
             <Formik
                 enableReinitialize
                 initialValues={initialValues}

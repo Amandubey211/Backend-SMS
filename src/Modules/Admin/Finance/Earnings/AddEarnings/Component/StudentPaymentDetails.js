@@ -54,6 +54,11 @@ const StudentPaymentDetails = ({ category }) => {
           name={`paymentStatus_${category}`}
           options={["paid", "unpaid", "partial", "advance"]}
         />
+          <SelectInput
+          label="Discount Type"
+          name={`discountType_${category}`}
+          options={["percentage",  "amount"]}
+        />
 
         <TextInput
           label="Discount"

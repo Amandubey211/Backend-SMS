@@ -30,7 +30,7 @@ export const fetchInvoice = createAsyncThunk(
     dispatch(setShowError(false));
       try {
         const response = await getData(`/finance/invoice/get?say=${say}`,params);
-        return response.data
+        return response
       } catch (error) {
         return handleError(error, dispatch, rejectWithValue);
       }

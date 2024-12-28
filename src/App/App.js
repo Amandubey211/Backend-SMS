@@ -60,7 +60,7 @@ import SummaryRevenueList from "../Modules/Admin/Finance/StudentFees/SummaryReve
 import AddNewFees from "../Modules/Admin/Finance/StudentFees/AddNewFees/AddNewFees.js";
 import InvoicesMain from "../Modules/Admin/Finance/Invoices/InvoicesMain.js";
 import RecentInvoiceList from "../Modules/Admin/Finance/Invoices/RecentInvoiceList.js";
-import ReturnInvoiceList from "../Modules/Admin/Finance/Invoices/ReturnInvoiceList.js";
+//import ReturnInvoiceList from "../Modules/Admin/Finance/Invoices/ReturnInvoiceList.js";
 import EarningMainSection from "../Modules/Admin/Finance/Earnings/EarningMainSection.js";
 import ReceiptsMain from "../Modules/Admin/Finance/Reciepts/ReceiptsMain.js";
 import RecentReceiptsList from "../Modules/Admin/Finance/Reciepts/RecentReceiptsList.js";
@@ -1048,16 +1048,16 @@ function App() {
       ),
       errorElement: <Error />,
     },
-    {
-      path: "/finance/invoices/dashboard/return-invoices",
-      element: (
-        <ProtectRoute
-          Component={ReturnInvoiceList}
-          allowedRoles={["admin", "accountant"]}
-        />
-      ),
-      errorElement: <Error />,
-    },
+    // {
+    //   path: "/finance/invoices/dashboard/return-invoices",
+    //   element: (
+    //     <ProtectRoute
+    //       Component={ReturnInvoiceList}
+    //       allowedRoles={["admin", "accountant"]}
+    //     />
+    //   ),
+    //   errorElement: <Error />,
+    // },
     {
       path: "/finance/receipts",
       element: (

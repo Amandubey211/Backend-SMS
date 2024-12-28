@@ -73,8 +73,6 @@ const studentFeesSlice = createSlice({
       })
       .addCase(deleteStudentFees.fulfilled, (state, action) => {
         state.loading = false;
-        const { ids } = action.payload;
-        state.fees = state.fees.filter((fee) => !ids.includes(fee._id));
       })
       .addCase(deleteStudentFees.rejected, (state, action) => {
         state.loading = false;

@@ -71,14 +71,15 @@ export const updateStudentFee = createAsyncThunk(
 
 export const deleteStudentFees = createAsyncThunk(
   "studentFees/deleteStudentFees",
-  async (ids, { rejectWithValue, dispatch }) => {
+  async (data, { rejectWithValue, dispatch }) => {
     try {
       dispatch(setShowError(false));
       // Since DELETE requests typically don't have a body, use customRequest to send data
-      const response = await deleteData("/finance/revenue/delete/student/fee", {
-        ids,
-      });
-      return { response, ids };
+      const response = await customRequest('delete', "/finance/revenue/delete/student/fee", 
+        data
+      );
+      
+      return  response ;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }

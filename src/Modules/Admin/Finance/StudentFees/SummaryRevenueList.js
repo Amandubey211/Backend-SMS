@@ -1,11 +1,13 @@
+
+
+
 import React, { useState, useEffect } from "react";
-import { Table, Modal, Button, Spin, Alert, Tooltip } from "antd";
+import { Table, Modal, Button, Spin, Alert, Tooltip, Tag } from "antd";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import { EditOutlined, DeleteOutlined, EyeOutlined } from "@ant-design/icons";
 import AdminLayout from "../../../../Components/Admin/AdminDashLayout";
 import { FiUserPlus } from "react-icons/fi";
-import { deleteStudentFees } from "../../../../Store/Slices/Finance/StudentFees/studentFeesThunks";
 import moment from "moment"; // Replaced dayjs with moment
 import { fetchAllIncomes } from "../../../../Store/Slices/Finance/Earnings/earningsThunks";
 import { fetchSectionsNamesByClass } from "../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
@@ -13,13 +15,15 @@ import { fetchAllClasses } from "../../../../Store/Slices/Admin/Class/actions/cl
 import Spinner from "../../../../Components/Common/Spinner";
 import NoDataFound from "../../../../Components/Common/NoDataFound";
 import EditStudentFeesForm from "./EditStudentFeesForm";
+import Sidebar from "../../../../Components/Common/Sidebar";
+import { deleteStudentFees } from "../../../../Store/Slices/Finance/StudentFees/studentFeesThunks";
+import { use } from "i18next";
 
 const SummaryRevenueList = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
-
-  const { incomes, loading, error, totalRecords } = useSelector(
+  const { incomes, loading, error, totalRecords,totalPages } = useSelector(
     (state) => state.admin.earnings
   );
 
@@ -29,41 +33,56 @@ const SummaryRevenueList = () => {
   const classList = useSelector((state) => state.admin.class.classes);
 
   const [params, setParams] = useState({
-    limit: 10,
+    limit:  10,
     categoryName: "Student-Based Revenue",
-    includeDetails:true,
+    includeDetails: true,
     classId: "",
     sectionId: "",
     subCategory: "",
-    paymentStatus: "",
   });
+
+  const [selectedRowIds, setSelectedRowIds] = useState([]); // To store selected rows
 
   useEffect(() => {
     dispatch(fetchAllClasses());
-    dispatch(fetchAllIncomes(params)); 
+    dispatch(fetchAllIncomes(params));
   }, [dispatch, params]);
 
   const filterOnchange = (e) => {
     const { name, value } = e.target;
-   
 
     // Fetch filtered incomes immediately
     if (name === "classId") {
-      if(!value){
+      if (!value) {
         setParams((prev) => ({
           ...prev,
-          sectionId:'', 
+          sectionId: "",
         }));
-        dispatch(fetchSectionsNamesByClass("675bc4e3e7901c873905fd2f")); 
-      }else{
-        dispatch(fetchSectionsNamesByClass(value)); 
+        dispatch(fetchSectionsNamesByClass("675bc4e3e7901c873905fd2f"));
+      } else {
+        dispatch(fetchSectionsNamesByClass(value));
       }
-      
     }
     setParams((prev) => ({
       ...prev,
-      [name]: value, 
+      [name]: value,
     }));
+  };
+
+  const handleDeleteSelected = () => {
+    if (selectedRowIds.length > 0) {
+      dispatch(deleteStudentFees({ids:selectedRowIds})).then(()=>dispatch(fetchAllIncomes(params)));
+      setSelectedRowIds([]); 
+    } else {
+      console.log("No rows selected");
+    }
+  };
+
+  const rowSelection = {
+    onChange: (selectedRowKeys) => {
+      setSelectedRowIds(selectedRowKeys);
+    },
+    selectedRowKeys: selectedRowIds,
   };
 
   const columns = [
@@ -72,7 +91,9 @@ const SummaryRevenueList = () => {
       dataIndex: "studentDetails",
       key: "studentDetails",
       render: (studentDetails) =>
-        studentDetails?.firstName?.slice(0,10)+'..' || "N/A",
+        <Tooltip title={studentDetails?.firstName +' ' +studentDetails?.lastName}>
+        {studentDetails?.firstName?.slice(0, 10) + ".." || "N/A"}
+        </Tooltip>
     },
     {
       title: "Class",
@@ -87,35 +108,47 @@ const SummaryRevenueList = () => {
       render: (text) => <span>{text || "N/A"}</span>,
     },
     {
-      title: "Payment Status",
-      dataIndex: "paymentStatus",
-      key: "paymentStatus",
-      render: (status) => (
-        <span
-          className={`px-2 py-1 rounded-lg text-sm font-medium ${
-            status === "paid"
-              ? "bg-green-100 text-green-600"
-              : "bg-red-100 text-red-600"
-          }`}
-        >
-          {status}
-        </span>
-      ),
-    },
- 
+            title: "Status",
+            dataIndex: "paymentStatus",
+            key: "paymentStatus",
+            render: (status) => {
+              let color = "default";
+              switch (status) {
+                case "paid":
+                  color = "green";
+                  break;
+                case "partial":
+                  color = "yellow";
+                  break;
+                case "unpaid":
+                  color = "red";
+                  break;
+                default:
+                  color = "default";
+              }
+              return (
+                <Tag color={color} className="text-xs capitalize">
+                  {status || "N/A"}
+                </Tag>
+              );
+            },
+            width: 80,
+            ellipsis: true,
+          },
+
     {
       title: "Final Amount",
       dataIndex: "final_amount",
       key: "final_amount",
       sorter: (a, b) => (a.final_amount || 0) - (b.final_amount || 0),
-      render: (amount) => <span>{`${amount.toFixed(2)} QR`}</span>,
+      render: (amount) => <span>{`${amount.toFixed(2)} QAR`}</span>,
     },
     {
       title: "Paid Amount",
       dataIndex: "paid_amount",
       key: "paid_amount",
       sorter: (a, b) => a.paid_amount - b.paid_amount,
-      render: (amount) => <span>{`${amount.toFixed(2)} QR`}</span>,
+      render: (amount) => <span>{`${amount.toFixed(2)} QAR`}</span>,
     },
     {
       title: "Date",
@@ -128,50 +161,51 @@ const SummaryRevenueList = () => {
       title: "Discount",
       dataIndex: "discount",
       key: "discount",
-      render: (discount, record) => (
-        <span>
-          {discount
-            ? record.discountType === "percentage"
-              ? `${discount}%`
-              : `${discount} QR`
-            : "N/A"}
-        </span>
-      ),
+      render: (value, record) =>
+        record.discountType === "percentage" ? (
+          <Tag color="purple" className="text-xs">
+            {value || 0}%
+          </Tag>
+        ) : (
+          <Tag color="orange" className="text-xs">
+            {value || 0} QAR
+          </Tag>
+        ),
+      width: 100,
+      ellipsis: true,
     },
     {
       title: "Action",
       key: "action",
       render: (_, record) => (
-          <div className="flex space-x-1" onClick={(e) => e.stopPropagation()}>
-            <Tooltip title="Edit">
-              <Button
-                type="link"
-                icon={<EditOutlined />}
-                 onClick={() => {
-                   handleEditClick(record)
-                 }}
-                className="text-blue-600 hover:text-blue-800 p-0"
-                aria-label="Edit"
-              />
-            </Tooltip>
-            <Tooltip title="Delete">
-              <Button
-                type="link"
-                icon={<DeleteOutlined />}
-                // onClick={() => {
-                //   const incomeToDelete = incomeIdMap[record.key];
-                //   if (incomeToDelete) {
-                //     setSelectedIncomeForDeletion(incomeToDelete); // Set income for deletion
-                //     setIsDeleteModalVisible(true);
-                //   } else {
-                //     toast.error("Selected income not found.");
-                //   }
-                // }}
-                className="text-red-600 hover:text-red-800 p-0"
-                aria-label="Delete"
-              />
-            </Tooltip>
-          </div>
+        <div
+          className="flex space-x-1"
+          onClick={(e) => e.stopPropagation()}
+        >
+           <Tooltip title="View">
+            <Button
+              type="link"
+              icon={<EyeOutlined />}
+              onClick={() => {
+                handleEditClick(record);
+              }}
+              className="text-blue-600 hover:text-blue-800 p-0"
+              aria-label="Edit"
+            />
+          </Tooltip>
+          <Tooltip title="Edit">
+            <Button
+              type="link"
+              icon={<EditOutlined />}
+              onClick={() => {
+                handleEditClick(record);
+              }}
+              className="text-blue-600 hover:text-blue-800 p-0"
+              aria-label="Edit"
+            />
+          </Tooltip>
+         
+        </div>
       ),
     },
   ];
@@ -200,12 +234,13 @@ const SummaryRevenueList = () => {
     setIsEditModalVisible(false); // Close the modal
     setSelectedRecord(null); // Clear selected record
   };
+
   return (
     <AdminLayout>
       <div className="p-6 bg-white shadow-lg rounded-lg">
         {/* Filters and Buttons Section */}
         <div className="flex justify-between items-start">
-          <div className="flex flex-col space-y-4">
+        <div className="flex flex-col space-y-4">
             <div className="flex items-center space-x-4">
               {/* Class Filter */}
               <div className="flex flex-col">
@@ -301,12 +336,23 @@ const SummaryRevenueList = () => {
                 />
                 <span className="text-gray-700">Unpaid</span>
               </label>
-            </div>
+              <div className="flex items-center space-x-4 ">
+            {selectedRowIds.length > 0 && (
+              <Button
+                type="danger"
+                onClick={handleDeleteSelected}
+                icon={<DeleteOutlined />}
+              >
+                Delete Selected
+              </Button>
+            )}
           </div>
-
+            </div>
+            
+          </div>
           <div className="flex items-center space-x-4">
             <button
-              className="flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-medium rounded-lg hover:opacity-90"
+              className="flex items-center px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-medium rounded-lg hover:opacity-90"
               onClick={() => console.log("Exporting data...")}
             >
               Export
@@ -321,15 +367,17 @@ const SummaryRevenueList = () => {
               </div>
             </button>
           </div>
+        
         </div>
-
+        
         <div className="mt-6">
           {loading ? (
-            <Spinner/>
+            <Spinner />
           ) : error ? (
-           <NoDataFound/>
+            <NoDataFound />
           ) : (
             <Table
+              rowSelection={rowSelection}
               dataSource={incomes}
               columns={columns}
               pagination={{
@@ -345,23 +393,22 @@ const SummaryRevenueList = () => {
               size="small"
             />
           )}
+        
         </div>
       </div>
-      <Modal
-    title="Edit Student Fees"
-    visible={isEditModalVisible}
-    onCancel={handleModalClose}
-    footer={null} // No footer
-    width={800}
-   >
-  {selectedRecord && (
-    <EditStudentFeesForm
-      data={selectedRecord}
-      onClose={handleModalClose}
-    />
-  )}
-</Modal>
-
+      <Sidebar
+        title="Edit/View Student Fees"
+        isOpen={isEditModalVisible}
+        onClose={handleModalClose}
+        width="70"
+      >
+        {selectedRecord && (
+          <EditStudentFeesForm
+            data={selectedRecord}
+            onClose={handleModalClose}
+          />
+        )}
+      </Sidebar>
     </AdminLayout>
   );
 };
