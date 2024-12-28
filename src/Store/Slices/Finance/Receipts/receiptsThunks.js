@@ -43,6 +43,7 @@ export const createReceipt = createAsyncThunk(
       // 4) Create FormData
       const formData = new FormData();
       formData.append("tax", payload.tax);
+      formData.append("discountType", payload.discountType); // Add discountType to the payload
       formData.append("discount", payload.discount);
       formData.append("penalty", payload.penalty);
       formData.append("totalPaidAmount", payload.totalPaidAmount);
@@ -51,6 +52,7 @@ export const createReceipt = createAsyncThunk(
       formData.append("schoolId", payload.schoolId);
       formData.append("academicYear", payload.academicYear);
       formData.append("invoiceNumber", payload.invoiceNumber);
+
       // Receiver (nested)
       formData.append("receiver[name]", payload.receiver.name);
       formData.append("receiver[email]", payload.receiver.email);
@@ -65,43 +67,38 @@ export const createReceipt = createAsyncThunk(
       });
 
       // Document (file) if present
-      if (payload.document) {
-        console.log("Attaching document:", payload.document);
-        formData.append("document", payload.document);
-      }
+      // if (payload.document) {
+      //   console.log("Attaching document:", payload.document);
+      //   formData.append("document", payload.document);
+      // }
 
       // 5) POST
       const response = await postData("/finance/revenue/create/receipt", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
-      // Depending on how postData is written, response might be:
-      //  - raw Axios response with status, data
-      //  - or just data object
-      // We'll try checking .status first, then .data or .message
-
-      // If postData returns the raw Axios response:
+      // Success response handling
       if (response?.status === 201) {
         toast.success("Receipt created successfully!");
-        return response.data; // success
+        return response.data;
       }
 
-      // Otherwise, if postData returns only data:
       if (response?.message === "Receipt created successfully") {
         toast.success("Receipt created successfully!");
-        return response; // or response.data if needed
+        return response;
       }
 
-      // If neither condition is met, treat as failure
+      // Failure handling
       toast.error(response?.message || "Failed to create receipt.");
       return rejectWithValue(response?.message || "Failed to create receipt.");
-
     } catch (error) {
+      console.error("Error creating receipt:", error);
       toast.error(error.message || "Error creating receipt.");
       return rejectWithValue(error.message || "Error creating receipt.");
     }
   }
 );
+
 
 
 // Update a receipt
