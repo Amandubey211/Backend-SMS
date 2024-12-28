@@ -35,7 +35,7 @@ const RecentReceiptsList = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
-    const { receipts = [], loading, error } = useSelector(
+    const { receipts = [], loading, error, pagination = {} } = useSelector(
         (state) => state.admin.receipts || {}
     );
 
@@ -62,10 +62,9 @@ const RecentReceiptsList = () => {
 
     // --- 1) Fetch receipts if empty ---
     useEffect(() => {
-        if (receipts.length === 0) {
-            dispatch(fetchAllReceipts());
-        }
-    }, [dispatch, receipts.length]);
+        dispatch(fetchAllReceipts({ page: pagination.currentPage || 1, limit: pagination.limit || 10 }));
+    }, [dispatch, pagination.currentPage, pagination.limit]);
+
 
     // --- 2) Close receipt preview modal on outside click ---
     useEffect(() => {
@@ -315,29 +314,29 @@ const RecentReceiptsList = () => {
         },
     ];
 
-    // Loading / Error UI
-    if (loading) {
-        return (
-            <AdminLayout>
-                <div style={{ textAlign: "center", padding: "16px" }}>
-                    <Spinner />
-                </div>
-            </AdminLayout>
-        );
-    }
+    // // Loading / Error UI
+    // if (loading) {
+    //     return (
+    //         <AdminLayout>
+    //             <div style={{ textAlign: "center", padding: "16px" }}>
+    //                 <Spinner />
+    //             </div>
+    //         </AdminLayout>
+    //     );
+    // }
 
-    if (error) {
-        return (
-            <AdminLayout>
-                <div
-                    style={{ textAlign: "center", color: "#FF4D4F", marginTop: "16px" }}
-                >
-                    <ExclamationCircleOutlined style={{ fontSize: "48px" }} />
-                    <p>Unable to fetch the receipts.</p>
-                </div>
-            </AdminLayout>
-        );
-    }
+    // if (error) {
+    //     return (
+    //         <AdminLayout>
+    //             <div
+    //                 style={{ textAlign: "center", color: "#FF4D4F", marginTop: "16px" }}
+    //             >
+    //                 <ExclamationCircleOutlined style={{ fontSize: "48px" }} />
+    //                 <p>Unable to fetch the receipts.</p>
+    //             </div>
+    //         </AdminLayout>
+    //     );
+    // }
 
     // Render
     return (
@@ -374,37 +373,77 @@ const RecentReceiptsList = () => {
                         </button>
                     </div>
                 </div>
+                {loading ? (
+                    <div style={{ textAlign: "center", padding: "16px" }}>
+                        <Spinner />
+                    </div>
+                ) : error ? (
+                    <div style={{ textAlign: "center", color: "#FF4D4F", marginTop: "16px" }}>
+                        <ExclamationCircleOutlined style={{ fontSize: "48px" }} />
+                        <p>Unable to fetch the receipts.</p>
+                    </div>
+                ) : filteredData.length === 0 ? (
+                    <div style={{ textAlign: "center", color: "#999", marginTop: "16px" }}>
+                        <ExclamationCircleOutlined style={{ fontSize: "48px" }} />
+                        <p>No receipts available.</p>
+                    </div>
+                ) : (
+                    // Render Table and Custom Pagination
+                    <>
 
-                {/* Table */}
-                <Table
-                    rowKey={(record) => record._id}
-                    columns={columns}
-                    dataSource={filteredData}
-                    expandable={{
-                        expandedRowRender: (record) => (
-                            <div>
-                                <strong>Line Items:</strong>
-                                {record.lineItems && record.lineItems.length > 0 ? (
-                                    <ul>
-                                        {record.lineItems.map((item, index) => (
-                                            <li key={index}>
-                                                {item.revenueType || item.name || "Item"}: {item.total || 0} QAR
-                                            </li>
-                                        ))}
-                                    </ul>
-                                ) : (
-                                    <span>No line items available</span>
-                                )}
-                            </div>
-                        ),
-                    }}
-                    pagination={{
-                        pageSize: 10,
-                        showSizeChanger: true,
-                        position: ["bottomRight"],
-                    }}
-                />
+                        {/* Table */}
+                        <Table
+                            rowKey={(record) => record._id}
+                            columns={columns}
+                            dataSource={filteredData}
+                            expandable={{
+                                expandedRowRender: (record) => (
+                                    <div>
+                                        <strong>Line Items:</strong>
+                                        {record.lineItems && record.lineItems.length > 0 ? (
+                                            <ul>
+                                                {record.lineItems.map((item, index) => (
+                                                    <li key={index}>
+                                                        {item.revenueType || item.name || "Item"}: {item.total || 0} QAR
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        ) : (
+                                            <span>No line items available</span>
+                                        )}
+                                    </div>
+                                ),
+                            }}
+                            pagination={false}
+                        />
 
+                        {/* Custom Pagination Component */}
+                        <div className="flex justify-end mt-5">
+                            <button
+                                onClick={() =>
+                                    dispatch(fetchAllReceipts({ page: pagination.currentPage - 1, limit: pagination.limit }))
+                                }
+                                disabled={pagination.currentPage === 1}
+                                className="px-2 py-1 mx-1 rounded-md border border-gray-300 bg-gradient-to-r from-pink-500 to-purple-600 text-white disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg hover:scale-105 transform transition duration-200"
+                            >
+                                Previous
+                            </button>
+                            <span className="px-2 py-1 mx-2 text-sm font-semibold">
+                                Page {pagination.currentPage || 1} of {pagination.totalPages || 1}
+                            </span>
+                            <button
+                                onClick={() =>
+                                    dispatch(fetchAllReceipts({ page: pagination.currentPage + 1, limit: pagination.limit }))
+                                }
+                                disabled={pagination.currentPage === pagination.totalPages}
+                                className="px-2 py-1 mx-1 rounded-md border border-gray-300 bg-gradient-to-r from-pink-500 to-purple-600 text-white disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg hover:scale-105 transform transition duration-200"
+                            >
+                                Next
+                            </button>
+                        </div>
+
+                    </>
+                )}
                 {/* Cancel Confirmation Modal */}
                 <DeleteConfirmationModal
                     isOpen={modalVisible}
