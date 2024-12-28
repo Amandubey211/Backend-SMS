@@ -135,20 +135,21 @@ const SummaryPenalityandAdjustment= () => {
   ];
   
 
- // Transform incomes data to table dataSource and limit to 10 records
+ // Transform adjustments data to table dataSource and limit to 10 records
  const dataSource = adjustmentData?.map((adjustment) => ({
-  key: adjustment._id,
+  key: adjustment?._id,
   return_invoice_no: adjustment?.returnInvoiceNumber || "N/A",
-  invoice_no: adjustment.invoiceId.invoiceNumber || "N/A",
-  receiver: adjustment.invoiceId.receiver.name || "N/A",
+  invoice_no: adjustment?.invoiceId?.invoiceNumber || "N/A",
+  receiver: adjustment?.invoiceId?.receiver?.name || "N/A",
   // discount: adjustment.discount || 0,
   // discountType: adjustment.discountType || "percentage",
   // penalty: adjustment.adjustmentPenalty || "N/A",
   // tax: adjustment.tax,
-  adjustmentAmount: adjustment.adjustmentTotal || 0,
-  adjustmentTotal: adjustment.adjustmentAmount || 0,
+  adjustmentAmount: adjustment?.adjustmentTotal || 0,
+  adjustmentTotal: adjustment?.adjustmentAmount || 0,
   status: adjustment.isCancel ? "Cancelled" : "-",
-  adjustedAt: adjustment.adjustedAt || "N/A",
+  adjustedAt: adjustment?.adjustedAt || "N/A",
+  ...adjustment
 }));
 
   return (

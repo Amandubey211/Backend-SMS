@@ -249,7 +249,7 @@ const PenalityandAdjustmentList = () => {
     adjustmentAmount: adjustment?.adjustmentTotal || 0,
     adjustmentTotal: adjustment?.adjustmentAmount || 0,
     status: adjustment.isCancel ? "Cancelled" : "-",
-    adjustedAt: adjustment.adjustedAt || "N/A",
+    adjustedAt: adjustment?.adjustedAt || "N/A",
     ...adjustment
   }));
 
