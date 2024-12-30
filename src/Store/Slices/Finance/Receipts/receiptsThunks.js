@@ -7,7 +7,8 @@ export const fetchAllReceipts = createAsyncThunk(
   "receipts/fetchAllReceipts",
   async ({ page = 1, limit = 10 }, { rejectWithValue }) => {
     try {
-      const response = await getData(`/finance/revenue/all/receipt?page=${page}&limit=${limit}`); // Backend API with pagination
+      const say=getAY();
+      const response = await getData(`/finance/revenue/all/receipt?say=${say}&page=${page}&limit=${limit}`); // Backend API with pagination
       if (response?.data) {
         const { data, pagination } = response;
         return { receipts: data, pagination }; // Include pagination metadata
@@ -31,13 +32,12 @@ export const createReceipt = createAsyncThunk(
       const schoolId = storedSchoolId || "";
 
       // 2) Fetch academicYear
-      const academicYearId = getAY();
+      const say = getAY();
 
       // 3) Merge formValues with schoolId, academicYear
       const payload = {
         ...formValues,
-        schoolId,
-        academicYear: academicYearId,
+        schoolId
       };
 
       // 4) Create FormData
@@ -72,7 +72,7 @@ export const createReceipt = createAsyncThunk(
       // }
 
       // 5) POST
-      const response = await postData("/finance/revenue/create/receipt", formData, {
+      const response = await postData(`/finance/revenue/create/receipt?say=${say}`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 

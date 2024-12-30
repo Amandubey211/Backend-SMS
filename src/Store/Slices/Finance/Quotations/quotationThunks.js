@@ -1,13 +1,15 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { getData, postData, putData } from "../../../../services/apiEndpoints";
 import toast from "react-hot-toast";
+import { getAY } from "../../../../Utils/academivYear";
 
 // Fetch all quotations
 export const fetchAllQuotations = createAsyncThunk(
   "quotations/fetchAllQuotations",
   async (params, { rejectWithValue }) => {
     try {
-      const response = await getData("/finance/revenue/all/quotation", params);
+      const say=getAY();
+      const response = await getData(`/finance/revenue/all/quotation?say=${say}`, params);
       if (response) {
         return response;
       } else {
@@ -25,7 +27,8 @@ export const addQuotation = createAsyncThunk(
   "quotations/addQuotation",
   async (data, { rejectWithValue }) => {
     try {
-      const response = await postData("/finance/revenue/create/quotation", data);
+      const say=getAY();
+      const response = await postData(`/finance/revenue/create/quotation?say=${say}`, data);
       if (response?.success) {
         toast.success("Quotation created successfully!");
         return response.data;
@@ -63,7 +66,8 @@ export const fetchQuotationCardData = createAsyncThunk(
   "quotations/fetchCardData",
   async (params, { rejectWithValue }) => {
     try {
-      const response = await getData(`/finance/dashboard/quotation/cardData`, params);
+      const say=getAY();
+      const response = await getData(`/finance/dashboard/quotation/cardData?academicYearId=${say}`, params);
       if (response?.success) {
         //toast.success("Quotation canceled successfully!");
         return response.data;

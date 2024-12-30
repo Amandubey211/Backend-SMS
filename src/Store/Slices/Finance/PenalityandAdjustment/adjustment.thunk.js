@@ -97,7 +97,7 @@ export const fetchReturnCardData = createAsyncThunk(
     dispatch(setShowError(false));
     try {
       const response = await getData(
-        `/finance/dashboard/penaltyAdjustment/cardData?say=${say}`,
+        `/finance/dashboard/penaltyAdjustment/cardData?academicYearId=${say}`,
         params
       );
       return response?.data;
