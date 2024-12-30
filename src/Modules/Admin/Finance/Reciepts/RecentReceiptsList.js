@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import AdminLayout from "../../../../Components/Admin/AdminDashLayout";
-import { Menu, Dropdown, Input, Table, Tag, Tooltip} from "antd";
+import { Menu, Dropdown, Input, Table, Tag, Tooltip } from "antd";
 import {
     MoreOutlined,
     ExclamationCircleOutlined,
@@ -22,7 +22,7 @@ import {
 import Spinner from "../../../../Components/Common/Spinner";
 import DeleteConfirmationModal from "../../../../Components/Common/DeleteConfirmationModal";
 import EmailModal from "../../../../Components/Common/EmailModal";
-
+import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import { ExportOutlined } from "@ant-design/icons";
@@ -36,7 +36,7 @@ import Receipt from "./Components/Receipt"; // Adjust path if needed
 const RecentReceiptsList = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
-
+    useNavHeading("Finance", "Receipts List");
     const { receipts = [], loading, error, pagination = {} } = useSelector(
         (state) => state.admin.receipts || {}
     );
@@ -188,15 +188,22 @@ const RecentReceiptsList = () => {
     // --- Build data for Exporting ---
     const exportData = receipts.map((item) => ({
         "Receipt ID": item.receiptNumber || item._id || "N/A",
-        "Recipient Name":
-            item.reciever?.name || item.receiver?.name || "N/A",
-        "Paid Date": item.date ? new Date(item.date).toLocaleDateString() : "N/A",
-        "Paid Amount": item.totalPaidAmount ? `${item.totalPaidAmount} QR` : "N/A",
-        "Tax": `${item.tax || 0} QR`,
-        "Discount": `${item.discount || 0} QR`,
+        "Recipient Name": item.reciever?.name || item.receiver?.name || "N/A",
+        "Paid Date": item.date
+            ? new Date(item.date).toLocaleDateString("en-GB") // Use DD/MM/YYYY format
+            : "N/A",
+        "Paid Amount": item.totalPaidAmount
+            ? `${item.totalPaidAmount} QR`
+            : "N/A",
+        "Discount":
+            item.discountType === "percentage"
+                ? `${item.discount || 0}%`
+                : `${item.discount || 0} QR`,
         "Penalty": `${item.penalty || 0} QR`,
+        "Status": item.isCancel ? "Cancelled" : "Active", // Include Status
         "Remark": item.remark || "N/A",
     }));
+
 
     // --- 3-Dots Action Menu ---
     // --- 3-Dots Action Menu ---
@@ -213,24 +220,24 @@ const RecentReceiptsList = () => {
             </Menu.Item>
 
             {/* 3) Cancel Receipt */}
-<Menu.Item
-    key="3"
-    onClick={() => {
-        if (!record.isCancel) {
-            setSelectedReceiptId(record._id);
-            setModalVisible(true);
-        }
-    }}
-    disabled={record.isCancel} // Disable the option if the receipt is already canceled
->
-    <Tooltip
-        title={record.isCancel ? "This receipt is already canceled" : "Cancel this receipt"}
-    >
-        <span>
-            <CloseCircleOutlined /> Cancel Receipt
-        </span>
-    </Tooltip>
-</Menu.Item>
+            <Menu.Item
+                key="3"
+                onClick={() => {
+                    if (!record.isCancel) {
+                        setSelectedReceiptId(record._id);
+                        setModalVisible(true);
+                    }
+                }}
+                disabled={record.isCancel} // Disable the option if the receipt is already canceled
+            >
+                <Tooltip
+                    title={record.isCancel ? "This receipt is already canceled" : "Cancel this receipt"}
+                >
+                    <span>
+                        <CloseCircleOutlined /> Cancel Receipt
+                    </span>
+                </Tooltip>
+            </Menu.Item>
 
 
             {/* 4) Send Mail */}
@@ -283,30 +290,10 @@ const RecentReceiptsList = () => {
                 record.reciever?.name || record.receiver?.name || "N/A",
         },
         {
-            title: "Paid Date",
-            dataIndex: "date",
-            key: "date",
-            sorter: (a, b) => new Date(a.date) - new Date(b.date),
-            render: (date) => (date ? new Date(date).toLocaleDateString() : "N/A"),
-        },
-        {
-            title: "Tax",
-            dataIndex: "tax",
-            key: "tax",
-            sorter: (a, b) => (a.tax || 0) - (b.tax || 0),
-            render: (tax) => (
-                <Tag color="red" className="text-xs">
-                    {tax || 0} QAR
-                </Tag>
-            ),
-            width: 100,
-            ellipsis: true,
-        },
-        {
             title: "Discount",
             dataIndex: "discount",
             key: "discount",
-            sorter: (a, b) => (a.discount || 0) - (b.discount || 0), // Optional: Preserve sorting
+            sorter: (a, b) => (a.discount || 0) - (b.discount || 0),
             render: (value, record) =>
                 record.discountType === "percentage" ? (
                     <Tag color="purple" className="text-xs">
@@ -325,11 +312,9 @@ const RecentReceiptsList = () => {
             dataIndex: "penalty",
             key: "penalty",
             sorter: (a, b) => (a.penalty || 0) - (b.penalty || 0),
-            render: (penalty) =>
-                <span style={{ color: "red" }}>
-                    {penalty || 0} QR
-                </span>
-            ,
+            render: (penalty) => (
+                <span style={{ color: "red" }}>{penalty || 0} QR</span>
+            ),
         },
         {
             title: "Paid Amount",
@@ -348,7 +333,37 @@ const RecentReceiptsList = () => {
                 ),
             render: (invoiceNumber) => invoiceNumber?.invoiceNumber || "N/A",
         },
-
+        {
+            title: "Status",
+            dataIndex: "isCancel",
+            key: "status",
+            width: 100,
+            sorter: (a, b) => (a.isCancel === b.isCancel ? 0 : a.isCancel ? 1 : -1),
+            render: (isCancel) =>
+                isCancel ? (
+                    <Tag color="red" className="text-xs">
+                        Cancelled
+                    </Tag>
+                ) : (
+                    <Tag color="green" className="text-xs">
+                        Active
+                    </Tag>
+                ),
+        },
+        {
+            title: "Paid Date",
+            dataIndex: "date",
+            key: "date",
+            sorter: (a, b) => new Date(a.date) - new Date(b.date),
+            render: (date) =>
+                date
+                    ? new Date(date).toLocaleDateString("en-GB", {
+                        day: "2-digit",
+                        month: "2-digit",
+                        year: "numeric",
+                    })
+                    : "N/A",
+        },
         {
             title: "Action",
             key: "action",
@@ -360,6 +375,7 @@ const RecentReceiptsList = () => {
         },
     ];
 
+
     // Render
     return (
         <AdminLayout>
@@ -367,7 +383,6 @@ const RecentReceiptsList = () => {
                 {/* Header / Search / Export / Add New */}
                 <div className="flex justify-between items-center mb-4">
                     <div className="flex items-center space-x-4">
-                        <h2 className="text-xl font-semibold">Recent Receipts List</h2>
                         <Input
                             prefix={<SearchOutlined style={{ color: "rgba(0,0,0,.45)" }} />}
                             placeholder="Search Receipt"

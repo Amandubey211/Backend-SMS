@@ -14,7 +14,7 @@ const Card = ({ title, count, color, textColor, customContent, tag, icon }) => {
         <div className="p-3 rounded-md bg-gradient-to-r from-purple-500 to-pink-500 text-white text-lg mr-3">
           {icon}
         </div>
-        <h3 className="text-lg font-semibold">{title}</h3>
+        <h3 className="text-lg font-semibold px-2">{title}</h3>
       </div>
       {customContent ? (
         <div className="mt-4">{customContent}</div>
