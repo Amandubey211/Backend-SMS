@@ -32,7 +32,7 @@ const RecentReceipts = () => {
 
   const [searchQuery, setSearchQuery] = useState("");
   const [dataFetched, setDataFetched] = useState(false);
-
+  const [fetching, setFetching] = useState(true);
   // For canceling a receipt
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedReceiptId, setSelectedReceiptId] = useState(null);
@@ -46,12 +46,18 @@ const RecentReceipts = () => {
   const popupRef = useRef(null);
 
   // -------------------- Lifecycle --------------------
+  // -------------------- Lifecycle --------------------
   useEffect(() => {
     if (!dataFetched) {
-      dispatch(fetchAllReceipts({ page: pagination.currentPage || 1, limit: 5 }));
+      setFetching(true); // Start fetching
+      dispatch(fetchAllReceipts({ limit: 5, fetchLatest: true }))
+        .unwrap()
+        .then(() => setFetching(false)) // Mark fetching as complete
+        .catch(() => setFetching(false));
       setDataFetched(true);
     }
-  }, [dispatch, dataFetched, pagination.currentPage, pagination.limit]);
+  }, [dispatch, dataFetched]);
+
 
 
   // Close modal if user clicks outside the popup
@@ -129,20 +135,23 @@ const RecentReceipts = () => {
   };
 
   // -------------------- Table & Data --------------------
-  const filteredData = receipts.filter((item) => {
-    const receiptNumber = item.receiptNumber?.toLowerCase() || "";
-    const receiverName =
-      item.reciever?.name?.toLowerCase() || item.receiver?.name?.toLowerCase() || "";
-    const paidAmount = item.totalPaidAmount?.toString() || "";
-    const dateString = item.date ? new Date(item.date).toLocaleDateString() : "";
+  const filteredData = receipts
+    .filter((item) => {
+      const receiptNumber = item.receiptNumber?.toLowerCase() || "";
+      const receiverName =
+        item.reciever?.name?.toLowerCase() || item.receiver?.name?.toLowerCase() || "";
+      const paidAmount = item.totalPaidAmount?.toString() || "";
+      const dateString = item.date ? new Date(item.date).toLocaleDateString() : "";
 
-    return (
-      receiptNumber.includes(searchQuery.toLowerCase()) ||
-      receiverName.includes(searchQuery.toLowerCase()) ||
-      paidAmount.includes(searchQuery.toLowerCase()) ||
-      dateString.includes(searchQuery.toLowerCase())
-    );
-  });
+      return (
+        receiptNumber.includes(searchQuery.toLowerCase()) ||
+        receiverName.includes(searchQuery.toLowerCase()) ||
+        paidAmount.includes(searchQuery.toLowerCase()) ||
+        dateString.includes(searchQuery.toLowerCase())
+      );
+    })
+    .sort((a, b) => new Date(b.date) - new Date(a.date)); // Sort by date (latest first)
+
 
   const columns = [
     {
@@ -165,26 +174,19 @@ const RecentReceipts = () => {
       render: (_, record) =>
         record.reciever?.name || record.receiver?.name || "N/A",
     },
-    {
-      title: "Paid Date",
-      dataIndex: "date",
-      key: "date",
-      sorter: (a, b) => new Date(a.date) - new Date(b.date),
-      render: (date) => (date ? new Date(date).toLocaleDateString() : "N/A"),
-    },
-    {
-      title: "Tax",
-      dataIndex: "tax",
-      key: "tax",
-      sorter: (a, b) => (a.tax || 0) - (b.tax || 0),
-      render: (tax) => (
-        <Tag color="red" className="text-xs">
-          {tax || 0} QR
-        </Tag>
-      ),
-      width: 100,
-      ellipsis: true,
-    },
+    // {
+    //   title: "Tax",
+    //   dataIndex: "tax",
+    //   key: "tax",
+    //   sorter: (a, b) => (a.tax || 0) - (b.tax || 0),
+    //   render: (tax) => (
+    //     <Tag color="red" className="text-xs">
+    //       {tax || 0} QR
+    //     </Tag>
+    //   ),
+    //   width: 100,
+    //   ellipsis: true,
+    // },
     {
       title: "Discount",
       dataIndex: "discount",
@@ -231,6 +233,36 @@ const RecentReceipts = () => {
       render: (invoiceNumber) => invoiceNumber?.invoiceNumber || "N/A",
     },
     ,
+    {
+      title: "Status",
+      dataIndex: "isCancel",
+      key: "status",
+      render: (isCancel) =>
+        isCancel ? (
+          <Tag color="red" className="text-xs">
+            Cancelled
+          </Tag>
+        ) : (
+          <Tag color="green" className="text-xs">
+            Active
+          </Tag>
+        ),
+      sorter: (a, b) => a.isCancel - b.isCancel,
+    },
+    {
+      title: "Paid Date",
+      dataIndex: "date",
+      key: "date",
+      sorter: (a, b) => new Date(b.date) - new Date(a.date),
+      render: (date) =>
+        date
+          ? new Intl.DateTimeFormat("en-GB", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+          }).format(new Date(date))
+          : "N/A",
+    },
     // },
     // {
     //   title: "Action",
@@ -267,7 +299,7 @@ const RecentReceipts = () => {
   ];
 
   // -------------------- Loading / Error States --------------------
-  if (loading) {
+  if (fetching || loading) {
     return (
       <div style={{ textAlign: "center", padding: "16px" }}>
         <Spinner />
@@ -284,7 +316,7 @@ const RecentReceipts = () => {
     );
   }
 
-  if (filteredData.length === 0) {
+  if (!fetching && filteredData.length === 0) {
     return (
       <div style={{ textAlign: "center", color: "#999", marginTop: "16px" }}>
         <ExclamationCircleOutlined style={{ fontSize: "48px" }} />
@@ -319,9 +351,9 @@ const RecentReceipts = () => {
         <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
           <button
             onClick={() => navigate("/finance/receipts/receipt-list")}
-            className="px-3 py-1 rounded-md border border-gray-400 shadow-md hover:shadow-xl hover:shadow-gray-300 transition duration-200 text-white bg-gradient-to-r from-pink-500 to-purple-500"
+            className="px-3 py-1 rounded-md border border-gray-400 shadow-md hover:shadow-md hover:shadow-gray-300 transition duration-200 text-white bg-gradient-to-r from-pink-500 to-purple-500"
           >
-            View More ({pagination.totalRecords || 0})
+            View More ({pagination.totalRecords - 5 || 0})
           </button>
         </div>
       </div>
@@ -331,7 +363,7 @@ const RecentReceipts = () => {
       <Table
         rowKey={(record) => record._id}
         columns={columns}
-        dataSource={receipts}
+        dataSource={filteredData}
         expandable={{
           expandedRowRender: (record) => (
             <div>
@@ -353,30 +385,6 @@ const RecentReceipts = () => {
         size='small'
         pagination={false} // Disable Ant Design pagination
       />
-
-
-      {/* Custom Pagination Component */}
-      {/*
-      <div style={{ display: "flex", justifyContent: "center", marginTop: "20px" }}>
-        <button
-          onClick={() => dispatch(fetchAllReceipts({ page: pagination.currentPage - 1, limit: pagination.limit }))}
-          disabled={pagination.currentPage === 1}
-          className="px-3 py-1 mx-1 rounded-md border border-gray-400 bg-gray-200 hover:bg-gray-300 disabled:bg-gray-100 disabled:cursor-not-allowed"
-        >
-          Previous
-        </button>
-        <span className="px-3 py-1 mx-2 font-semibold">
-          Page {pagination.currentPage || 1} of {pagination.totalPages || 1}
-        </span>
-        <button
-          onClick={() => dispatch(fetchAllReceipts({ page: pagination.currentPage + 1, limit: pagination.limit }))}
-          disabled={pagination.currentPage === pagination.totalPages}
-          className="px-3 py-1 mx-1 rounded-md border border-gray-400 bg-gray-200 hover:bg-gray-300 disabled:bg-gray-100 disabled:cursor-not-allowed"
-        >
-          Next
-        </button>
-      </div> */}
-
 
       {/* Cancel Receipt Confirmation Modal (unchanged) */}
       <DeleteConfirmationModal
