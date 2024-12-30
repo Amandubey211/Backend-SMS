@@ -24,21 +24,19 @@ const Navbar = () => {
     (store) => store.common.user.navbar.leftHeading
   );
   const role = useSelector((store) => store.common.auth.role);
-  const dispatch = useDispatch()
- 
+  const dispatch = useDispatch();
+
   const selectAcademicYear = useSelector((store) => {
-    const say = getAY()
-      return store.common.academicYear.academicYears?.find((year) => year?._id == say)
-    
+    const say = getAY();
+    return store.common.academicYear.academicYears?.find(
+      (year) => year?._id == say
+    );
   });
   useEffect(() => {
-    if(!selectAcademicYear){
-         dispatch(fetchAcademicYear()) 
+    if (!selectAcademicYear) {
+      dispatch(fetchAcademicYear());
     }
-
   }, []);
-
-
 
   // Fetch notifications from IndexedDB
   const getNotificationsFromIndexedDB = () => {
@@ -96,22 +94,23 @@ const Navbar = () => {
   };
 
   const logout = async () => {
-    await dispatch(staffLogout())
+    await dispatch(staffLogout());
     setIsModalOpen(false);
   };
 
   return (
-    <div className="sticky top-0 left-0 right-0 z-20 bg-white border-b shadow-sm">
+    <div className="sticky top-0 w-full  left-0 right-0 z-20 bg-white border-b shadow-sm">
       <div className="flex items-center p-2 py-2.5 bg-white">
         {/* Left Heading */}
         <LeftHeading leftHeading={leftHeading} navigate={navigate} />
 
         <div className="flex items-center space-x-2 relative justify-center  ">
-         
-            <div className="border-r px-4 font-semibold text-gradient" title='Academic Year'>
-             AY: {selectAcademicYear && selectAcademicYear?.year}
-            </div>
-          
+          <div
+            className="border-r px-4 font-semibold text-gradient"
+            title="Academic Year"
+          >
+            AY: {selectAcademicYear && selectAcademicYear?.year}
+          </div>
 
           {/* Notification Icon with Count 
 
@@ -132,23 +131,25 @@ const Navbar = () => {
           */}
 
           {/* Settings Icon */}
-         <div>
-         <IconButton
-            icon={IoSettingsOutline}
-            label="Settings"
-            onClick={() => setShowSetting(!showSetting)}
-            className="hover:bg-gray-200 rounded-full transition-all duration-200"
-          />
-         </div>
+          <div>
+            <IconButton
+              icon={IoSettingsOutline}
+              label="Settings"
+              onClick={() => setShowSetting(!showSetting)}
+              className="hover:bg-gray-200 rounded-full transition-all duration-200"
+            />
+          </div>
 
           {/* Dropdown for Settings */}
-          <div> <SettingDropdown
-            showSetting={showSetting}
-            setShowSetting={setShowSetting}
-            navigateProfile={navigateProfile}
-            openModal={() => setIsModalOpen(true)}
-          /></div>
-         
+          <div>
+            {" "}
+            <SettingDropdown
+              showSetting={showSetting}
+              setShowSetting={setShowSetting}
+              navigateProfile={navigateProfile}
+              openModal={() => setIsModalOpen(true)}
+            />
+          </div>
         </div>
       </div>
 

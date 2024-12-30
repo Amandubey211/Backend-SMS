@@ -420,16 +420,16 @@ const TotalExpenseList = () => {
         <Table.Summary.Cell index={4}>
           <strong>{formatCurrency(totalPenalty)}</strong>
         </Table.Summary.Cell>
-        <Table.Summary.Cell index={5} />
-        <Table.Summary.Cell index={6}>
+        <Table.Summary.Cell index={5}>
           <strong>{formatCurrency(totalFinalAmount)}</strong>
         </Table.Summary.Cell>
-        <Table.Summary.Cell index={7}>
+        <Table.Summary.Cell index={6}>
           <strong>{formatCurrency(totalPaidAmountSum)}</strong>
         </Table.Summary.Cell>
-        <Table.Summary.Cell index={8}>
+        <Table.Summary.Cell index={7}>
           <strong>{formatCurrency(totalRemainingAmount)}</strong>
         </Table.Summary.Cell>
+        <Table.Summary.Cell index={8}></Table.Summary.Cell>
         <Table.Summary.Cell index={9} />
       </Table.Summary.Row>
     );
@@ -438,12 +438,6 @@ const TotalExpenseList = () => {
   // Retrieve statistics from Redux store and map to color classes
   const cardDataWithValues = useMemo(() => {
     const cards = [
-      {
-        title: "Total Expense",
-        value: formatCurrency(totalExpenseAmount, "QAR"),
-        icon: <AiFillAccountBook />,
-        color: "purple",
-      },
       {
         title: "Total Paid Amount",
         value: formatCurrency(totalPaidAmount, "QAR"),
@@ -461,6 +455,12 @@ const TotalExpenseList = () => {
         value: formatCurrency(unpaidExpense, "QAR"),
         icon: <MdOutlineMoneyOff />,
         color: "red",
+      },
+      {
+        title: "Total Expense",
+        value: formatCurrency(totalExpenseAmount, "QAR"),
+        icon: <AiFillAccountBook />,
+        color: "purple",
       },
       // Add more cards if necessary
     ];

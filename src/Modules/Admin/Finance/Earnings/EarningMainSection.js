@@ -25,9 +25,7 @@ const EarningMainSection = () => {
       <AdminDashLayout>
         <div className="w-[100%] p-2">
           <CardSection />
-
           <TotalEarningGraph />
-
           <SummaryTotalRevenue />
         </div>
       </AdminDashLayout>
