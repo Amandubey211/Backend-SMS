@@ -40,9 +40,9 @@ export const createStudentFee = createAsyncThunk(
         {allData:feeData}
       );
       if(response.success){
-        toast.success('Fee added  successfully!')
+        toast.success('Fees added  successfully!')
       }else{
-        toast.error('something is wrong!')
+        toast.error('Something is wrong!')
       }
       return response;
     } catch (error) {

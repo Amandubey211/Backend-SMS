@@ -9,6 +9,7 @@ import ReturnInvoice from "./Components/ReturnInvoice.table";
 import Layout from "../../../../Components/Common/Layout";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchInvoice, fetchInvoiceCard } from "../../../../Store/Slices/Finance/Invoice/invoice.thunk";
+import { FaPlusCircle } from "react-icons/fa";
 
 const InvoicesMain = () => {
     useNavHeading("Finance", "Invoices");
@@ -33,7 +34,7 @@ const InvoicesMain = () => {
                     >
                         <span className="text-gray-800 font-medium">Add New Invoice</span>
                         <div className="w-12 h-12 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center text-white">
-                            <FiUserPlus size={16} />
+                             <FaPlusCircle size={16} />
                         </div>
                     </button>
                 </div>
