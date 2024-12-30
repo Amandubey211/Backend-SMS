@@ -79,7 +79,12 @@ const StudentFeesGraph = () => {
       y: {
         title: {
           display: true,
-          text: "Fees Collected",
+          text: "Fees Collected (QR)",
+        },
+        ticks: {
+          callback: function (value) {
+            return `${value.toLocaleString()} QR `; // Format as QR with commas
+          },
         },
       },
     },
