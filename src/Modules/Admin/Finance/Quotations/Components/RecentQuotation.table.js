@@ -174,13 +174,13 @@ const RecentQuotation = () => {
                 />
             )}
             {/* No Data Placeholder */}
-            {!loading && quotations.length === 0 && !error && (
+            {/* {!loading && quotations.length === 0 && !error && (
                 <div className="text-center text-gray-500 text-xs py-4">
                     No records found.
                 </div>
-            )}
+            )} */}
             {/* Table */}
-            {!loading && !error && quotations.length > 0 && (
+            {!loading && !error && (
                 <Table
                     dataSource={dataSource}
                     columns={columns}
