@@ -1,15 +1,15 @@
 // src/Store/Slices/Finance/Expenses/expensesSlice.js
 
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchInvoice, fetchInvoiceCard } from "./invoice.thunk";
+import { fetchInvoice, fetchInvoiceCard, fetchInvoiceByNumber } from "./invoice.thunk";
 
 const initialState = {
   invoices: [],
-  cardData:{},
+  invoiceDetails: null,
+  cardData: {},
   loading: false,
   error: null,
-  pagination:{},
-
+  pagination: {},
 };
 
 const invoiceSlice = createSlice({
@@ -21,10 +21,13 @@ const invoiceSlice = createSlice({
       state.loading = false;
       state.error = null;
     },
+    clearInvoiceDetails: (state) => { // Added for clearing specific invoice details
+      state.invoiceDetails = null;
+    },
   },
   extraReducers: (builder) => {
     builder
-      // Fetch All Expenses
+      // Fetch All Invoices
       .addCase(fetchInvoice.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -33,14 +36,14 @@ const invoiceSlice = createSlice({
         state.loading = false;
         state.invoices = action.payload.data || [];
         state.pagination = action.payload.pagination;
-        state.error =null
-     
+        state.error = null;
       })
       .addCase(fetchInvoice.rejected, (state, action) => {
         state.loading = false;
-        state.invoices =  [];
-        state.error = action.payload
+        state.invoices = [];
+        state.error = action.payload;
       })
+      // Fetch Invoice Card
       .addCase(fetchInvoiceCard.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -48,20 +51,31 @@ const invoiceSlice = createSlice({
       .addCase(fetchInvoiceCard.fulfilled, (state, action) => {
         state.loading = false;
         state.cardData = action.payload || {};
-        state.error =null
-     
+        state.error = null;
       })
       .addCase(fetchInvoiceCard.rejected, (state, action) => {
         state.loading = false;
-        state.invoices =  [];
-        state.error = action.payload
+        state.cardData = {};
+        state.error = action.payload;
       })
+      // Fetch Invoice by Number
+      .addCase(fetchInvoiceByNumber.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchInvoiceByNumber.fulfilled, (state, action) => {
+        state.loading = false;
+        state.invoiceDetails = action.payload;
+        state.error = null;
+      })
+      .addCase(fetchInvoiceByNumber.rejected, (state, action) => {
+        state.loading = false;
+        state.invoiceDetails = null;
+        state.error = action.payload;
+      });
   },
 });
 
-export const {
-  clearInvoices,
-
-} = invoiceSlice.actions;
+export const { clearInvoices, clearInvoiceDetails } = invoiceSlice.actions;
 
 export default invoiceSlice.reducer;

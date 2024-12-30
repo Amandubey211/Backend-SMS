@@ -234,6 +234,12 @@ const CreateReceipt = () => {
                   placeholder="Enter email"
                   disabled={readOnly}
                 />
+                <TextInput
+                  name="invoiceNumber" // Renamed from invoiceRefId to invoiceNumber
+                  label="Invoice Reference Number" // You can update the label if needed
+                  placeholder="Enter invoice reference number"
+                  disabled={readOnly}
+                />
               </div>
 
               {/* Return Items */}
@@ -282,12 +288,6 @@ const CreateReceipt = () => {
                   name="govtRefNumber"
                   label="Government Reference Number"
                   placeholder="Enter reference number"
-                  disabled={readOnly}
-                />
-                <TextInput
-                  name="invoiceNumber" // Renamed from invoiceRefId to invoiceNumber
-                  label="Invoice Reference ID" // You can update the label if needed
-                  placeholder="Enter invoice reference number"
                   disabled={readOnly}
                 />
                 <TextInput
