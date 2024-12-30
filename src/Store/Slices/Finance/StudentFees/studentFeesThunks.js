@@ -125,3 +125,18 @@ export const studentFeesGraph = createAsyncThunk(
   }
 );
 
+
+export const fetchStudentFeeCardData = createAsyncThunk(
+  "studentFees/fetchStudentFeeCardData",
+  async (_, { rejectWithValue, dispatch }) => {
+    try {
+      dispatch(setShowError(false));
+      const response = await getData(
+        `/finance/dashboard/revenue/studentFeeDashboard`
+      );
+      return response.data;
+    } catch (error) {
+      return handleError(error, dispatch, rejectWithValue);
+    }
+  }
+);

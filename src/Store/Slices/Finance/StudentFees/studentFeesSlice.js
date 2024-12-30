@@ -7,6 +7,7 @@ import {
   updateStudentFee,
   deleteStudentFees,
   studentFeesGraph,
+  fetchStudentFeeCardData,
 } from "./studentFeesThunks";
 
 const initialState = {
@@ -14,7 +15,8 @@ const initialState = {
   fee: null,
   loading: false,
   error: null,
-  stdFeesGraph:[],
+  stdFeesGraph: [],
+  stdFeesCardData:{}
 };
 
 const studentFeesSlice = createSlice({
@@ -81,8 +83,8 @@ const studentFeesSlice = createSlice({
         state.error = action.payload || action.error.message;
       });
 
-      //student fees graph
-      builder
+    //student fees graph
+    builder
       .addCase(studentFeesGraph.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -92,6 +94,21 @@ const studentFeesSlice = createSlice({
         state.stdFeesGraph = action.payload?.data;
       })
       .addCase(studentFeesGraph.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || true;
+      });
+
+    //student fees card data
+    builder
+      .addCase(fetchStudentFeeCardData.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchStudentFeeCardData.fulfilled, (state, action) => {
+        state.loading = false;
+        state.stdFeesCardData = action.payload;
+      })
+      .addCase(fetchStudentFeeCardData.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || true;
       });
