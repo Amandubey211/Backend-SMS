@@ -51,6 +51,7 @@ import {
 import toast from "react-hot-toast";
 import Layout from "../../../../Components/Common/Layout";
 import Card from "../Expense/components/Card";
+import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 
 // Mapping payment types to corresponding icons
 const paymentTypeIcons = {
@@ -85,6 +86,9 @@ const CustomHeaderCell = (props) => (
 );
 
 const TotalRevenueList = () => {
+  // Set navigation heading
+  useNavHeading("Finance", "Earning List");
+
   // State variables
   const [searchText, setSearchText] = useState("");
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
@@ -225,10 +229,10 @@ const TotalRevenueList = () => {
     </div>
   );
 
-  // Formatting functions
-  const formatCurrency = (value) =>
+  // Formatting functions with optional currency parameter
+  const formatCurrency = (value, currency = "QR") =>
     value !== undefined && value !== null
-      ? `${value.toLocaleString()} QR`
+      ? `${value.toLocaleString()} ${currency}`
       : "N/A";
 
   const formatPercentage = (value) =>
@@ -422,14 +426,14 @@ const TotalRevenueList = () => {
   // Table summary (totals row)
   const summary = (pageData) => {
     let totalFinalAmount = 0;
-    let totalPaidAmount = 0;
+    let totalPaidAmountSum = 0;
     let totalRemainingAmount = 0;
     let totalPenalty = 0;
 
     pageData.forEach(
       ({ finalAmount, paidAmount, remainingAmount, penalty }) => {
         totalFinalAmount += finalAmount;
-        totalPaidAmount += paidAmount;
+        totalPaidAmountSum += paidAmount;
         totalRemainingAmount += remainingAmount;
         totalPenalty += penalty;
       }
@@ -448,7 +452,7 @@ const TotalRevenueList = () => {
           <strong>{formatCurrency(totalFinalAmount)}</strong>
         </Table.Summary.Cell>
         <Table.Summary.Cell index={7}>
-          <strong>{formatCurrency(totalPaidAmount)}</strong>
+          <strong>{formatCurrency(totalPaidAmountSum)}</strong>
         </Table.Summary.Cell>
         <Table.Summary.Cell index={8}>
           <strong>{formatCurrency(totalRemainingAmount)}</strong>
@@ -463,28 +467,30 @@ const TotalRevenueList = () => {
   const cardDataWithValues = useMemo(() => {
     const cards = [
       {
-        title: "Total Revenue",
-        value: formatCurrency(totalRevenue),
-        icon: <AiFillAccountBook />,
-        color: "purple",
-      },
-      {
-        title: "Remaining Partial Paid",
-        value: formatCurrency(remainingPartialPaidRevenue),
-        icon: <BiDonateHeart />,
-        color: "yellow",
-      },
-      {
         title: "Total Paid Amount",
-        value: formatCurrency(totalPaidAmount),
+        value: formatCurrency(totalPaidAmount, "QAR"),
         icon: <FaRegMoneyBillAlt />,
         color: "green",
       },
+
+      {
+        title: "Remaining Partial Paid",
+        value: formatCurrency(remainingPartialPaidRevenue, "QAR"),
+        icon: <BiDonateHeart />,
+        color: "yellow",
+      },
+
       {
         title: "Unpaid Amount",
-        value: formatCurrency(unpaidRevenue),
+        value: formatCurrency(unpaidRevenue, "QAR"),
         icon: <MdOutlineMoneyOff />,
         color: "red",
+      },
+      {
+        title: "Total Revenue",
+        value: formatCurrency(totalRevenue, "QAR"),
+        icon: <AiFillAccountBook />,
+        color: "purple",
       },
       // Add more cards if necessary
     ];
@@ -545,8 +551,8 @@ const TotalRevenueList = () => {
                 style={{
                   borderRadius: "0.375rem",
                   height: "35px",
-                  borderColor: "#ff6bcb",
-                  boxShadow: "0 2px 4px rgba(255, 105, 180, 0.2)",
+                  // borderColor: "#ff6bcb",
+                  // boxShadow: "0 2px 4px rgba(255, 105, 180, 0.2)",
                 }}
               />
             </div>
@@ -617,7 +623,7 @@ const TotalRevenueList = () => {
                 total: totalRecords,
                 pageSize: computedPageSize,
                 showSizeChanger: true, // Enable size changer
-                pageSizeOptions: ["5", "10", "10", "20", "50"], // Define page size options
+                pageSizeOptions: ["5", "10", "20", "50"], // Define page size options
                 size: "small",
                 showTotal: (total, range) =>
                   `Page ${currentPage} of ${totalPages} | Total ${totalRecords} records`,
@@ -658,6 +664,7 @@ const TotalRevenueList = () => {
           {/* Modals */}
           <DeleteModal
             visible={isDeleteModalVisible}
+            type="Earnings"
             onClose={() => {
               setIsDeleteModalVisible(false);
               setSelectedIncomeForDeletion(null);
