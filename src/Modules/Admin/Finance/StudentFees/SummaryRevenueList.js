@@ -364,7 +364,7 @@ const SummaryRevenueList = () => {
               onClick={() => navigate("/finance/studentfees/add/form")}
               className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
             >
-              <span className="text-gray-800 font-medium">Add New Fee</span>
+              <span className="text-gray-800 font-medium">Add New Fees</span>
               <div className="w-12 h-12 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center text-white">
                 <FaPlusCircle size={16} />
               </div>

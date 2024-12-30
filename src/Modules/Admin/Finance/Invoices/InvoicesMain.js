@@ -10,6 +10,7 @@ import Layout from "../../../../Components/Common/Layout";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchInvoice, fetchInvoiceCard } from "../../../../Store/Slices/Finance/Invoice/invoice.thunk";
 import { FaPlusCircle } from "react-icons/fa";
+import { setInvoiceData } from "../../../../Store/Slices/Finance/Invoice/invoiceSlice";
 
 const InvoicesMain = () => {
     useNavHeading("Finance", "Invoices");
@@ -29,7 +30,7 @@ const InvoicesMain = () => {
                     </div>
                     {/* Add New Invoice Button */}
                     <button
-                        onClick={() => navigate("/finance/invoices/add-new-invoice")}
+                       onClick={() => {dispatch(setInvoiceData());navigate('/finance/invoices/add-new-invoice')}}
                         className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
                     >
                         <span className="text-gray-800 font-medium">Add New Invoice</span>
