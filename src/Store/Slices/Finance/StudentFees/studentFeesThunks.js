@@ -90,3 +90,38 @@ export const deleteStudentFees = createAsyncThunk(
     }
   }
 );
+
+export const studentFeesGraph = createAsyncThunk(
+  "studentFees/studentFeesGraph",
+  async (params, { rejectWithValue, dispatch }) => {
+    try {
+      dispatch(setShowError(false));
+
+      // Default to the current year if no year is provided
+      const currentYear = new Date().getFullYear();
+
+      // Parse the `year` and `month` parameters to ensure they are numbers
+      const year = parseInt(params.year) || currentYear; // Default to current year if not provided
+      const month = params.view === "month" && params.month ? parseInt(params.month) : null; // Only parse month if view is "month"
+
+      // Build the query string based on the `params`
+      const queryParams = new URLSearchParams({
+        year: year,
+        ...(month && { month: month }), // Add month to the query string only if it's a valid number
+      }).toString();
+
+      console.log("Query Parameters:", queryParams); // For debugging
+
+      // Fix: Dynamic year value and correct URL construction
+      const url = `/finance/dashboard/revenue/studentFeeGraph?${queryParams}`;
+
+      // Make the API call
+      const response = await getData(url);
+      return response;
+    } catch (error) {
+      // Handle API errors
+      return handleError(error, dispatch, rejectWithValue);
+    }
+  }
+);
+

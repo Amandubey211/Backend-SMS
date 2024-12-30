@@ -6,6 +6,7 @@ import {
   createStudentFee,
   updateStudentFee,
   deleteStudentFees,
+  studentFeesGraph,
 } from "./studentFeesThunks";
 
 const initialState = {
@@ -13,6 +14,7 @@ const initialState = {
   fee: null,
   loading: false,
   error: null,
+  stdFeesGraph:[],
 };
 
 const studentFeesSlice = createSlice({
@@ -77,6 +79,21 @@ const studentFeesSlice = createSlice({
       .addCase(deleteStudentFees.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || action.error.message;
+      });
+
+      //student fees graph
+      builder
+      .addCase(studentFeesGraph.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(studentFeesGraph.fulfilled, (state, action) => {
+        state.loading = false;
+        state.stdFeesGraph = action.payload?.data;
+      })
+      .addCase(studentFeesGraph.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || true;
       });
   },
 });
