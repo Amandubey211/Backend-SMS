@@ -55,17 +55,13 @@ useEffect(() => {
   };
 
   return (
-    <div className="p-2 md:p-6 space-y-6 scroll-smooth overflow-y-auto h-full w-full ">
+    <div className="p-4 md:p-4 space-y-2 scroll-smooth overflow-y-auto h-full w-full ">
       {/* Header Section */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 md:gap-0">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-800">
-            Student Fees
-          </h2>
-        </div>
+  
+      <div className="flex flex-col md:flex-row justify-end items-start md:items-center gap-4 md:gap-0 ">
         <button
           onClick={() => navigate("/finance/studentfees/add/form")}
-          className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
+          className="inline-flex  items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
         >
           <span className="text-gray-800 font-medium">Add New Fees</span>
           <div className="w-12 h-12 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center text-white">
@@ -73,16 +69,15 @@ useEffect(() => {
           </div>
         </button>
       </div>
-
       {/* Animate Content Pushdown */}
       <motion.div
         animate={{ y: isDropdownOpen ? 120 : 0 }}
         transition={{ duration: 0.3 }}
-        className="flex-1 flex flex-col space-y-6"
+        className="flex-1 flex flex-col space-y-2"
       >
         {/* Cards Section */}
         <StudentCardSection />
-
+       
         {/* Graph Section */}
         <div className="w-full ">
           <StudentFeesGraph />

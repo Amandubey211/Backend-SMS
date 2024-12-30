@@ -33,7 +33,7 @@ const StudentCardSection = () => {
   }, [dispatch]);
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-6 place-items-center">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-2 place-items-center">
       {studentCardsData?.map((item, index) => (
         <StudentCard key={index} {...item} />
       ))}
