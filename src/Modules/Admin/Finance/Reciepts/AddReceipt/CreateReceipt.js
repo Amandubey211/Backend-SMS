@@ -32,7 +32,6 @@ const CreateReceipt = () => {
       tax: data.tax ? data.tax.toString() : "",
       discount: data.discount ? data.discount.toString() : "",
       penalty: data.penalty ? data.penalty.toString() : "",
-      totalPaidAmount: data.totalPaidAmount ? data.totalPaidAmount.toString() : "",
 
       govtRefNumber: data.govtRefNumber || "",
       remark: data.remark || "",
@@ -42,10 +41,10 @@ const CreateReceipt = () => {
 
       items: Array.isArray(data.lineItems)
         ? data.lineItems.map((item) => ({
-          category: item.revenueType || "",
-          quantity: item.quantity?.toString() || "",
-          totalAmount: item.total?.toString() || "",
-        }))
+            category: item.revenueType || "",
+            quantity: item.quantity || "", // Ensure it's a string
+            totalAmount: item.total !== undefined ? item.total.toString() : "", // Convert to string if exists
+          }))
         : [{ category: "", quantity: "", totalAmount: "" }],
     };
   };
@@ -60,7 +59,6 @@ const CreateReceipt = () => {
     tax: "",
     discount: "",
     penalty: "",
-    totalPaidAmount: "",
 
     govtRefNumber: "",
     remark: "",
@@ -81,7 +79,7 @@ const CreateReceipt = () => {
       .min(0, "Tax must be positive")
       .required("Tax is required"),
     discountType: Yup.string()
-      .oneOf(["percentage", "fixed"], "Invalid discount type")
+      .oneOf(["percentage", "amount"], "Invalid discount type")
       .required("Discount type is required"),
     discount: Yup.number()
       .typeError("Discount must be a number")
@@ -91,10 +89,6 @@ const CreateReceipt = () => {
       .typeError("Penalty must be a number")
       .min(0, "Penalty must be positive")
       .required("Penalty is required"),
-    totalPaidAmount: Yup.number()
-      .typeError("Total Paid must be a valid number")
-      .min(0, "Total Paid Amount cannot be negative")
-      .required("Total Paid Amount is required"),
 
     contactNumber: Yup.string().required("Contact number is required"),
     mailId: Yup.string().email("Invalid email address").required("Email is required"),
@@ -104,9 +98,7 @@ const CreateReceipt = () => {
       .of(
         Yup.object().shape({
           category: Yup.string().required("Category is required"),
-          quantity: Yup.number()
-            .typeError("Quantity must be a number")
-            .min(1, "Quantity must be at least 1")
+          quantity: Yup.string() // Change to string to match backend
             .required("Quantity is required"),
           totalAmount: Yup.number()
             .typeError("Total Amount must be a number")
@@ -116,7 +108,6 @@ const CreateReceipt = () => {
       )
       .min(1, "At least one line item is required"),
   });
-
 
   // --- Handle Submit (disabled if readOnly) ---
   const handleSubmit = (values, { setSubmitting, resetForm }) => {
@@ -129,7 +120,6 @@ const CreateReceipt = () => {
       tax: parseFloat(values.tax) || 0,
       discount: parseFloat(values.discount) || 0,
       penalty: parseFloat(values.penalty) || 0,
-      totalPaidAmount: parseFloat(values.totalPaidAmount) || 0,
       discountType: values.discountType || "",
       govtRefNumber: values.govtRefNumber || "",
       remark: values.remark || "",
@@ -142,10 +132,14 @@ const CreateReceipt = () => {
       },
       lineItems: values.items.map((item) => ({
         revenueType: item.category,
-        quantity: parseFloat(item.quantity) || 0,
+        quantity: item.quantity, // Keep as string
         total: parseFloat(item.totalAmount) || 0,
       })),
+      
     };
+
+    // Debugging: Log formValues
+    console.log("Submitting Form Values:", formValues);
 
     dispatch(createReceipt(formValues))
       .unwrap()
@@ -166,7 +160,6 @@ const CreateReceipt = () => {
         setSubmitting(false);
       });
   };
-
 
   return (
     <DashLayout>
@@ -271,7 +264,7 @@ const CreateReceipt = () => {
                   label="Discount Type *"
                   options={[
                     { value: "percentage", label: "Percentage" },
-                    { value: "fixed", label: "Fixed Amount" },
+                    { value: "amount", label: "Fixed Amount" }, // Changed to "amount"
                   ]}
                   placeholder="Select discount type"
                   disabled={readOnly}
@@ -282,14 +275,6 @@ const CreateReceipt = () => {
                   label="Penalty *"
                   placeholder="Enter penalty"
                   disabled={readOnly}
-                />
-                <TextInput
-                  name="totalPaidAmount"
-                  label="Total Paid *"
-                  placeholder="Enter total paid amount"
-                  disabled={readOnly}
-                  inputMode="decimal"
-                  onChange={(e) => setFieldValue("totalPaidAmount", parseFloat(e.target.value) || "")}
                 />
 
                 {/* Optional fields */}
@@ -332,3 +317,4 @@ const CreateReceipt = () => {
 };
 
 export default CreateReceipt;
+
