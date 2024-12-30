@@ -46,7 +46,6 @@ export const createReceipt = createAsyncThunk(
       formData.append("discountType", payload.discountType); // Add discountType to the payload
       formData.append("discount", payload.discount);
       formData.append("penalty", payload.penalty);
-      formData.append("totalPaidAmount", payload.totalPaidAmount);
       formData.append("govtRefNumber", payload.govtRefNumber);
       formData.append("remark", payload.remark);
       formData.append("schoolId", payload.schoolId);
