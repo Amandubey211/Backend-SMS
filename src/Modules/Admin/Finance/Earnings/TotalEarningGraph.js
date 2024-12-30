@@ -1,5 +1,3 @@
-
-
 import React, { useMemo } from "react";
 import { Bar } from "react-chartjs-2";
 import {
@@ -256,8 +254,10 @@ const TotalEarningGraph = () => {
   }
 
   return (
-    <div className="w-full h-96 bg-white p-4 rounded-lg shadow">
-      <Bar data={data} options={options} />
+    <div className="flex justify-center items-center">
+      <div className="w-[98%]  h-96 bg-white p-4 rounded-lg shadow">
+        <Bar data={data} options={options} />
+      </div>
     </div>
   );
 };
