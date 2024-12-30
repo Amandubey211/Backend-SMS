@@ -89,7 +89,7 @@ const StudentFeesGraph = () => {
     <div className="bg-white p-6 rounded-lg border border-gray-300 w-full relative">
       <div className="flex justify-between">
         <h3 className="text-lg font-medium text-gray-700 mb-6">
-          Monthly Fee Collection {selectedYear}
+           Fees Collection {selectedYear}
         </h3>
 
         <div className="flex items-center gap-4 mb-6">
